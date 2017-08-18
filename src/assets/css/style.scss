@@ -1,0 +1,184 @@
+.vp-portfolio,
+.vp-portfolio-wrap {
+    position: relative;
+    overflow: hidden;
+}
+.vp-portfolio,
+.vp-portfolio * {
+    box-sizing: border-box;
+}
+.vp-portfolio-wrap {
+    transition: 0.8s height ease-in-out;
+    height: 60px;
+}
+
+.vp-portfolio:after,
+.vp-portfolio-wrap:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.vp-portfolio__item {
+    width: 33.333%;
+    float: left;
+    opacity: 0;
+    visibility: hidden;
+    transition: .7s opacity, .7s visibility;
+}
+.vp-portfolio__item .vp-portfolio__item-img {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    padding-bottom: 56%;
+}
+.vp-portfolio__item .vp-portfolio__item-img-wrap,
+.vp-portfolio__item .vp-portfolio__item-img-wrap img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.vp-portfolio__item .vp-portfolio__item-img img {
+    object-fit: cover;
+    object-position: 50% 50%;
+    width: 100%;
+    height: 100%;
+}
+
+.vp-portfolio__item-overlay {
+    display: none;
+}
+
+// Preloader
+.vp-portfolio__preloader {
+    position: absolute;
+    left: 50%;
+    margin-left: -15px;
+    width: 23px;
+    height: 24px;
+    margin-top: 20px;
+    opacity: 0.5;
+    transition: .7s visibility;
+    animation: vp-preloader 2s linear infinite;
+
+    span {
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
+        width: 10px;
+        height: 7px;
+        background-color: #8a8a8a;
+
+        &:nth-of-type(1) {
+            height: 14px;
+        }
+        &:nth-of-type(2) {
+            left: 12px;
+        }
+        &:nth-of-type(3) {
+            top: 16px;
+        }
+        &:nth-of-type(4) {
+            left: 12px;
+            height: 14px;
+            top: 9px;
+        }
+    }
+}
+
+@keyframes vp-preloader {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    40%, 60% {
+        opacity: 1;
+    }
+}
+
+// On loaded portfolio
+.vp-portfolio.vp-portfolio__loaded {
+    .vp-portfolio__item {
+        opacity: 1;
+        visibility: visible;
+    }
+    .vp-portfolio__preloader {
+        visibility: hidden;
+    }
+}
+
+
+// Pagination
+.vp-pagination__style {
+    text-align: center;
+    margin-top: 20px;
+
+    a {
+        outline: none;
+        box-shadow: none;
+    }
+
+    // default
+    .page-numbers {
+        display: inline-block;
+        text-decoration: none;
+        margin: 0 3px;
+        padding: 8px 14px;
+        min-width: 40px;
+        color: inherit;
+        border: 1px solid #eaeaea;
+        background-color: #fff;
+        transition: .2s border-color, .2s background-color, .2s color;
+
+        &:hover {
+            border-color: #bfbfbf;
+        }
+
+        &.current {
+            cursor: default;
+            border-color: #0085ba;
+            background-color: #0082b7;
+            color: #fff;
+        }
+    }
+
+    // infinite and load more
+    .vp-pagination__load-more {
+        display: inline-block;
+        text-decoration: none;
+        margin: 0 3px;
+        padding: 8px 14px;
+        min-width: 40px;
+        color: inherit;
+        border: 1px solid #eaeaea;
+        background-color: #fff;
+        transition: .2s border-color, .2s background-color, .2s color;
+
+        &:hover {
+            border-color: #bfbfbf;
+        }
+    }
+
+    // show/hide labels
+    .vp-pagination__load-more .vp-pagination__load-more-no-more,
+    .vp-pagination__load-more .vp-pagination__load-more-loading,
+    &.vp-pagination__loading .vp-pagination__load-more span,
+    &.vp-pagination__no-more .vp-pagination__load-more span {
+        display: none;
+    }
+    .vp-pagination__load-more span,
+    &.vp-pagination__loading .vp-pagination__load-more .vp-pagination__load-more-loading,
+    &.vp-pagination__no-more .vp-pagination__load-more .vp-pagination__load-more-no-more {
+        display: block;
+    }
+
+    // disable no more button
+    &.vp-pagination__no-more .vp-pagination__load-more {
+        cursor: default;
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}
