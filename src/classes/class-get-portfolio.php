@@ -21,8 +21,8 @@ class Visual_Portfolio_Get {
          * the next is portfolio items sizes
          *
          * Example:
-         * 20|1,0.5|2,0.25|
-         *    20px gap between items
+         * 3|1,0.5|2,0.25|
+         *    3 columns in row
          *    First item 100% width and 50% height
          *    Second item 200% width and 25% height
          */
