@@ -335,13 +335,13 @@ class Visual_Portfolio_Get {
 
         switch ( $type ) {
             case 'infinite':
-                visual_portfolio()->get_template_part( 'pagination/infinite', $args );
+                visual_portfolio()->include_template( 'pagination/infinite', $args );
                 break;
             case 'load-more':
-                visual_portfolio()->get_template_part( 'pagination/load-more', $args );
+                visual_portfolio()->include_template( 'pagination/load-more', $args );
                 break;
             default:
-                visual_portfolio()->get_template_part( 'pagination/default', $args );
+                visual_portfolio()->include_template( 'pagination/default', $args );
                 break;
         }
 

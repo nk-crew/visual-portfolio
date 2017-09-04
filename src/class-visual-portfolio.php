@@ -154,14 +154,23 @@ class Visual_Portfolio {
     }
 
     /**
-     * Get template part
+     * Include template
      *
      * @param string $template_name file name.
      * @param array  $args args for template.
      */
-    public function get_template_part( $template_name, $args = array() ) {
+    public function include_template( $template_name, $args = array() ) {
+        if ( ! empty( $args ) && is_array( $args ) ) {
+            extract( $args );
+        }
+
         // template in theme folder.
         $template = locate_template( array( '/visual-portfolio/' . $template_name . '.php', $template_name . '.php' ) );
+
+        // template from plugins folder.
+        if ( ! $template ) {
+            $template = locate_template( array( '/plugins/visual-portfolio/' . $template_name . '.php', $template_name . '.php' ) );
+        }
 
         // default template.
         if ( ! $template ) {
