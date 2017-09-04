@@ -46,7 +46,7 @@
         $preview.attr('data-vp-layout', this.value);
         $preview.vp('init');
     });
-    $('[name=vp_list_gap]').on('change', function () {
+    $('[name=vp_list_gap]').on('change input', function () {
         $preview.attr('data-vp-items-gap', this.value);
         $preview.vp('init');
     });
