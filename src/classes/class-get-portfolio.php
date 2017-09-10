@@ -77,7 +77,7 @@ class Visual_Portfolio_Get {
 
             foreach ( self::$defaults as $k => $item ) {
                 $post_meta = get_post_meta( $id, $k, true );
-                if ( isset( $post_meta ) ) {
+                if ( isset( $post_meta ) && ! empty( $post_meta ) ) {
                     $options_or_id[ $k ] = $post_meta;
                 }
             }
