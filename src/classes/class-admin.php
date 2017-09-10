@@ -43,7 +43,7 @@ class Visual_Portfolio_Admin {
      * Enqueue styles and scripts
      */
     public function admin_enqueue_scripts() {
-        if ( 'visual-portfolios' === get_post_type() ) {
+        if ( 'vp_lists' === get_post_type() ) {
             // disable autosave due to it is not working for the custom metaboxes.
             wp_dequeue_script( 'autosave' );
 
@@ -137,7 +137,7 @@ class Visual_Portfolio_Admin {
         ));
 
         // portfolio lists post type.
-        register_post_type('visual-portfolios',
+        register_post_type('vp_lists',
             array(
                 'labels' => array(
                     'name'                => _x( 'Portfolio Lists', 'Post Type General Name', NK_VP_DOMAIN ),
@@ -214,7 +214,7 @@ class Visual_Portfolio_Admin {
     public function maybe_render_blank_state( $which ) {
         global $post_type;
 
-        if ( in_array( $post_type, array( 'visual-portfolios' ) ) && 'bottom' === $which ) {
+        if ( in_array( $post_type, array( 'vp_lists' ) ) && 'bottom' === $which ) {
             $counts = (array) wp_count_posts( $post_type );
             unset( $counts['auto-draft'] );
             $count = array_sum( $counts );
@@ -229,7 +229,7 @@ class Visual_Portfolio_Admin {
                 </div>
                 <div class="vp-portfolio-list__text">
                     <p><?php echo esc_html__( 'Ready to add your awesome portfolio?', NK_VP_DOMAIN ); ?></p>
-                    <a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=visual-portfolios' ) ); ?>"><?php echo esc_html__( 'Create your first portfolio list!', NK_VP_DOMAIN ); ?></a>
+                    <a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=vp_lists' ) ); ?>"><?php echo esc_html__( 'Create your first portfolio list!', NK_VP_DOMAIN ); ?></a>
                 </div>
             </div>
             <style type="text/css">
@@ -300,7 +300,7 @@ class Visual_Portfolio_Admin {
             esc_html__( 'Portfolio Lists', NK_VP_DOMAIN ),
             esc_html__( 'Portfolio Lists', NK_VP_DOMAIN ),
             'manage_options',
-            'edit.php?post_type=visual-portfolios'
+            'edit.php?post_type=vp_lists'
         );
 
         add_submenu_page(
@@ -325,7 +325,7 @@ class Visual_Portfolio_Admin {
         // Highlight menus.
         switch ( $current_screen->post_type ) {
             case 'portfolio':
-            case 'visual-portfolios':
+            case 'vp_lists':
                 $parent_file = 'visual-portfolio';
 
                 if ( 'portfolio_category' === $current_screen->taxonomy ) {
@@ -351,7 +351,7 @@ class Visual_Portfolio_Admin {
             'vp_name',
             esc_html__( 'Name & Shortcode', NK_VP_DOMAIN ),
             array( $this, 'add_name_metabox' ),
-            'visual-portfolios',
+            'vp_lists',
             'side',
             'high'
         );
@@ -359,7 +359,7 @@ class Visual_Portfolio_Admin {
             'vp_layout',
             esc_html__( 'Layout', NK_VP_DOMAIN ),
             array( $this, 'add_layout_metabox' ),
-            'visual-portfolios',
+            'vp_lists',
             'side',
             'default'
         );
@@ -367,7 +367,7 @@ class Visual_Portfolio_Admin {
             'vp_additional',
             esc_html__( 'Additional', NK_VP_DOMAIN ),
             array( $this, 'add_additional_metabox' ),
-            'visual-portfolios',
+            'vp_lists',
             'side',
             'default'
         );
@@ -376,7 +376,7 @@ class Visual_Portfolio_Admin {
             'vp_preview',
             esc_html__( 'Preview', NK_VP_DOMAIN ),
             array( $this, 'add_preview_metabox' ),
-            'visual-portfolios',
+            'vp_lists',
             'normal',
             'high'
         );
@@ -384,7 +384,7 @@ class Visual_Portfolio_Admin {
             'vp_content_source',
             esc_html__( 'Content Source', NK_VP_DOMAIN ),
             array( $this, 'add_content_source_metabox' ),
-            'visual-portfolios',
+            'vp_lists',
             'normal',
             'high'
         );
@@ -394,7 +394,7 @@ class Visual_Portfolio_Admin {
      * Save metaboxes
      */
     public function save_meta_boxes() {
-        add_action( 'save_post_visual-portfolios', array( $this, 'save_visual_portfolio_metaboxes' ) );
+        add_action( 'save_post_vp_lists', array( $this, 'save_visual_portfolio_metaboxes' ) );
     }
 
     /**

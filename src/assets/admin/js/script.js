@@ -26,7 +26,7 @@
     });
 
     // enable conditionize
-    if ('visual-portfolios' === $postType.val() && $editForm.length) {
+    if ('vp_lists' === $postType.val() && $editForm.length) {
         $editForm.conditionize();
     }
 
@@ -209,7 +209,7 @@
     });
 
     // prevent page closing
-    if ('visual-portfolios' === $postType.val() && $editForm.length) {
+    if ('vp_lists' === $postType.val() && $editForm.length) {
         var defaultForm = $editForm.serialize();
 
         $(window).on('beforeunload', function () {
