@@ -265,7 +265,7 @@
 
         // infinite loading
         var scrollTimeout;
-        var bottomPosToLoad = 200;
+        var bottomPosToLoad = 250;
         function checkVisibilityAndLoad () {
             var rect = self.$item[0].getBoundingClientRect();
 
