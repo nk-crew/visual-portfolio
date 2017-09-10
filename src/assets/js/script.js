@@ -413,7 +413,7 @@
             self.$wrap.isotope(options || {
                 itemSelector: '.vp-portfolio__item',
                 layoutMode: 'masonry',
-                transitionDuration: 0,
+                transitionDuration: 400,
                 percentPosition: true
             });
 
