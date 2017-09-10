@@ -325,6 +325,9 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
     th.column-portfolio_post_thumbs {
         width: 70px;
     }
+    th.column-vp_lists_post_shortcode {
+        width: 250px;
+    }
 
     @media screen and (max-width: 782px) {
         /* Hide column on mobile device */

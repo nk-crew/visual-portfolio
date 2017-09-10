@@ -24,9 +24,15 @@ class Visual_Portfolio_Admin {
         // show blank state for portfolio list page.
         add_action( 'manage_posts_extra_tablenav', array( $this, 'maybe_render_blank_state' ) );
 
-        // improvements for custom posts.
-        add_filter( 'manage_portfolio_posts_columns', array( $this, 'add_img_column' ) );
-        add_filter( 'manage_portfolio_posts_custom_column', array( $this, 'manage_img_column' ), 10, 2 );
+        // show thumbnail in portfolio list table.
+        add_filter( 'manage_portfolio_posts_columns', array( $this, 'add_portfolio_img_column' ) );
+        add_filter( 'manage_portfolio_posts_custom_column', array( $this, 'manage_portfolio_img_column' ), 10, 2 );
+
+        // show shortcode in vp_lists table.
+        add_filter( 'manage_vp_lists_posts_columns', array( $this, 'add_vp_lists_shortcode_column' ) );
+        add_filter( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_shortcode_column' ), 10, 2 );
+
+        // highlight admin menu items.
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
         add_filter( 'parent_file', array( $this, 'admin_menu_highlight_items' ) );
 
@@ -251,10 +257,12 @@ class Visual_Portfolio_Admin {
      *
      * @return array
      */
-    public function add_img_column( $columns = array() ) {
+    public function add_portfolio_img_column( $columns = array() ) {
         $column_meta = array(
             'portfolio_post_thumbs' => esc_html__( 'Thumbnail', NK_VP_DOMAIN ),
         );
+
+        // insert after first column.
         $columns = array_slice( $columns, 0, 1, true ) + $column_meta + array_slice( $columns, 1, null, true );
 
         return $columns;
@@ -265,11 +273,42 @@ class Visual_Portfolio_Admin {
      *
      * @param bool $column_name column name.
      */
-    public function manage_img_column( $column_name = false ) {
+    public function manage_portfolio_img_column( $column_name = false ) {
         if ( 'portfolio_post_thumbs' === $column_name && has_post_thumbnail() ) {
             echo '<a href="' . esc_url( get_edit_post_link() ) . '" class="vp-portfolio__thumbnail">';
             the_post_thumbnail( 'thumbnail' );
             echo '</a>';
+        }
+    }
+
+    /**
+     * Add shortcode example in vp_lists
+     *
+     * @param array $columns columns of the table.
+     *
+     * @return array
+     */
+    public function add_vp_lists_shortcode_column( $columns = array() ) {
+        $column_meta = array(
+            'vp_lists_post_shortcode' => esc_html__( 'Shortcode', NK_VP_DOMAIN ),
+        );
+
+        // insert before last column.
+        $columns = array_slice( $columns, 0, count( $columns ) - 1, true ) + $column_meta + array_slice( $columns, count( $columns ) - 1, null, true );
+
+        return $columns;
+    }
+
+    /**
+     * Add shortcode example in vp_lists column
+     *
+     * @param bool $column_name column name.
+     */
+    public function manage_vp_lists_shortcode_column( $column_name = false ) {
+        if ( 'vp_lists_post_shortcode' === $column_name ) {
+            echo '<code>';
+            echo '[visual_portfolio id="' . get_the_ID() . '"]';
+            echo '</code>';
         }
     }
 
