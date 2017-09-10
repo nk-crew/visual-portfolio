@@ -267,20 +267,20 @@
         var scrollTimeout;
         var bottomPosToLoad = 200;
         function checkVisibilityAndLoad () {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(function() {
-                var rect = self.$item[0].getBoundingClientRect();
+            var rect = self.$item[0].getBoundingClientRect();
 
-                if (rect.bottom > 0 && (rect.bottom - bottomPosToLoad) <= wndH) {
-                    self.loadNewItems(self.options.nextPageUrl, false, function () {
-                        checkVisibilityAndLoad();
-                    });
-                }
-            }, 20);
+            if (rect.bottom > 0 && (rect.bottom - bottomPosToLoad) <= wndH) {
+                self.loadNewItems(self.options.nextPageUrl, false, function () {
+                    checkVisibilityAndLoad();
+                });
+            }
         }
         if (self.options.pagination === 'infinite') {
             $wnd.on('load' + evp + ' scroll' + evp + ' resize' + evp + ' orientationchange' + evp, function() {
-                checkVisibilityAndLoad();
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {
+                    checkVisibilityAndLoad();
+                }, 60);
             });
             checkVisibilityAndLoad();
         }
