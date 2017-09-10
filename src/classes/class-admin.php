@@ -43,9 +43,12 @@ class Visual_Portfolio_Admin {
      * Enqueue styles and scripts
      */
     public function admin_enqueue_scripts() {
-        // disable autosave due to it is not working for the custom metaboxes.
         if ( 'visual-portfolios' === get_post_type() ) {
+            // disable autosave due to it is not working for the custom metaboxes.
             wp_dequeue_script( 'autosave' );
+
+            // enqueue portfolio styles and scripts.
+            Visual_Portfolio_Get::enqueue_scripts();
         }
 
         wp_enqueue_script( 'image-picker', visual_portfolio()->plugin_url . 'assets/vendor/image-picker/image-picker.min.js', array( 'jquery' ), '', true );
@@ -98,7 +101,7 @@ class Visual_Portfolio_Admin {
                 'show_in_menu' => false,
                 'menu_icon'    => 'dashicons-visual-portfolio',
                 'taxonomies'   => array(
-                    'portfolio_category'
+                    'portfolio_category',
                 ),
                 'capabilities' => array(
                     'edit_post' => 'edit_portfolio',
@@ -278,14 +281,14 @@ class Visual_Portfolio_Admin {
             esc_html__( 'Visual Portfolio', NK_VP_DOMAIN ),
             esc_html__( 'Visual Portfolio', NK_VP_DOMAIN ),
             'read_portfolio',
-            'edit.php?post_type=portfolio',
-            '',
+            'visual-portfolio',
+            null,
             'dashicons-visual-portfolio',
             20
         );
 
         add_submenu_page(
-            'edit.php?post_type=portfolio',
+            'visual-portfolio',
             esc_html__( 'Portfolio Items', NK_VP_DOMAIN ),
             esc_html__( 'Portfolio Items', NK_VP_DOMAIN ),
             'manage_options',
@@ -293,7 +296,7 @@ class Visual_Portfolio_Admin {
         );
 
         add_submenu_page(
-            'edit.php?post_type=portfolio',
+            'visual-portfolio',
             esc_html__( 'Portfolio Lists', NK_VP_DOMAIN ),
             esc_html__( 'Portfolio Lists', NK_VP_DOMAIN ),
             'manage_options',
@@ -301,7 +304,7 @@ class Visual_Portfolio_Admin {
         );
 
         add_submenu_page(
-            'edit.php?post_type=portfolio',
+            'visual-portfolio',
             esc_html__( 'Categories', NK_VP_DOMAIN ),
             esc_html__( 'Categories', NK_VP_DOMAIN ),
             'manage_options',
@@ -312,15 +315,29 @@ class Visual_Portfolio_Admin {
     /**
      * Highlighting portfolio custom menu items
      *
-     * @param string $parent_file parent menu url.
+     * @param string $parent_file - parent file.
      *
-     * @return string
+     * @return string $parent_file
      */
     public function admin_menu_highlight_items( $parent_file ) {
-        global $current_screen;
+        global $current_screen, $submenu_file, $submenu;
 
-        if ( 'portfolio' === $current_screen->post_type || 'visual-portfolios' === $current_screen->post_type ) {
-            $parent_file = 'edit.php?post_type=portfolio';
+        // Highlight menus.
+        switch ( $current_screen->post_type ) {
+            case 'portfolio':
+            case 'visual-portfolios':
+                $parent_file = 'visual-portfolio';
+
+                if ( 'portfolio_category' === $current_screen->taxonomy ) {
+                    $submenu_file = $current_screen->base . '.php?taxonomy=' . $current_screen->taxonomy . '&post_type=' . $current_screen->post_type;
+                }
+
+                break;
+        }
+
+        // Remove 'Visual Portfolio' sub menu item.
+        if ( isset( $submenu['visual-portfolio'] ) ) {
+            unset( $submenu['visual-portfolio'][0] );
         }
 
         return $parent_file;
@@ -331,8 +348,10 @@ class Visual_Portfolio_Admin {
      */
     public function add_meta_boxes() {
         add_meta_box( 'vp_name', 'Name & Shortcode', array( $this, 'add_name_metabox' ), 'visual-portfolios', 'side', 'high' );
+        add_meta_box( 'vp_layout', 'Layout', array( $this, 'add_layout_metabox' ), 'visual-portfolios', 'side', 'default' );
         add_meta_box( 'vp_additional', 'Additional', array( $this, 'add_additional_metabox' ), 'visual-portfolios', 'side', 'default' );
-        add_meta_box( 'vp_layout', 'Layout', array( $this, 'add_layout_metabox' ), 'visual-portfolios', 'normal', 'high' );
+
+        add_meta_box( 'vp_preview', 'Preview', array( $this, 'add_preview_metabox' ), 'visual-portfolios', 'normal', 'high' );
         add_meta_box( 'vp_content_source', 'Content Source', array( $this, 'add_content_source_metabox' ), 'visual-portfolios', 'normal', 'high' );
     }
 
@@ -352,7 +371,7 @@ class Visual_Portfolio_Admin {
         wp_nonce_field( basename( __FILE__ ), 'vp_layout_nonce' );
         ?>
         <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_list_name">List Name:</label>
+            <label class="post-attributes-label" for="vp_list_name">Name:</label>
         </p>
         <input class="vp-input" name="vp_list_name" type="text" id="vp_list_name" value="<?php echo esc_attr( $post->post_title ); ?>">
 
@@ -387,17 +406,19 @@ class Visual_Portfolio_Admin {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
 
         ?>
-        <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_list_count">Items Per Page:</label>
-        </p>
-        <input name="vp_list_count" id="vp_list_count" class="vp-rangeslider" type="range" min="0" max="50" value="<?php echo esc_attr( $meta['vp_list_count'] ); ?>">
+        <label class="post-attributes-label" for="vp_pagination">Pagination:</label>
+        <select class="vp-select2 vp-select2-nosearch" name="vp_pagination" id="vp_pagination">
+            <option value="false" <?php selected( $meta['vp_pagination'], 'false' ); ?>>Disabled</option>
+            <option value="paged" <?php selected( $meta['vp_pagination'], 'paged' ); ?>>Paged</option>
+            <option value="load-more" <?php selected( $meta['vp_pagination'], 'load-more' ); ?>>Load More</option>
+            <option value="infinite" <?php selected( $meta['vp_pagination'], 'infinite' ); ?>>Infinite</option>
+        </select>
 
-        <label class="post-attributes-label" for="vp_list_pagination">Pagination:</label>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_list_pagination" id="vp_list_pagination">
-            <option value="default" <?php selected( $meta['vp_list_pagination'], 'default' ); ?>>Default</option>
-            <option value="infinite" <?php selected( $meta['vp_list_pagination'], 'infinite' ); ?>>Infinite</option>
-            <option value="load-more" <?php selected( $meta['vp_list_pagination'], 'load-more' ); ?>>Load More</option>
-            <option value="false" <?php selected( $meta['vp_list_pagination'], 'false' ); ?>>Disabled</option>
+        <p></p>
+        <label class="post-attributes-label" for="vp_filter">Filter:</label>
+        <select class="vp-select2 vp-select2-nosearch" name="vp_filter" id="vp_filter">
+            <option value="false" <?php selected( $meta['vp_filter'], 'false' ); ?>>Disabled</option>
+            <option value="default" <?php selected( $meta['vp_filter'], 'default' ); ?>>Enabled</option>
         </select>
         <?php
     }
@@ -409,14 +430,17 @@ class Visual_Portfolio_Admin {
      */
     public function add_layout_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
-
-        ?>
-        <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label">Style:</label>
-        </p>
-
-        <?php
         $layouts = array(
+            'tiles' => __( 'Tiles', NK_VP_DOMAIN ),
+            'masonry' => __( 'Masonry', NK_VP_DOMAIN ),
+
+            /*
+             * TODO: Justified
+                'justified' => __( 'Justified', NK_VP_DOMAIN ),
+             */
+        );
+
+        $tile_types = array(
             '1-1' => '1|1,0.5|',
             '2-1' => '2|1,1|',
             '2-2' => '2|1,1.2|1,1.2|1,0.67|1,0.67|',
@@ -433,23 +457,76 @@ class Visual_Portfolio_Admin {
             '4-4' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
         );
 
-        $layout_images_uri = visual_portfolio()->plugin_url . 'assets/admin/images/layouts/';
+        $tile_images_uri = visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-';
         ?>
 
-        <select class="vp-image-picker" name="vp_list_layout">
-            <!-- <option data-img-src="<?php echo esc_url( $layout_images_uri . 'custom.png' ); ?>" data-img-alt="custom" value="custom">custom</option> -->
-            <?php foreach ( $layouts as $k => $val ) : ?>
-                <option data-img-src="<?php echo esc_url( $layout_images_uri . $k . '.png' ); ?>" data-img-alt="<?php echo esc_attr( $k ); ?>" value="<?php echo esc_attr( $val ); ?>" <?php echo $meta['vp_list_layout'] === $val ? 'selected' : ''; ?>><?php echo esc_html( $val ); ?></option>
+        <p></p>
+        <select class="vp-select2 vp-select2-nosearch" name="vp_layout">
+            <?php foreach ( $layouts as $type => $title ) : ?>
+                <option value="<?php echo esc_attr( $type ); ?>" <?php echo $meta['vp_layout'] === $type ? 'selected' : ''; ?>><?php echo esc_html( $title ); ?></option>
             <?php endforeach; ?>
         </select>
 
-        <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_list_gap">Gap:</label>
-        </p>
-        <input name="vp_list_gap" id="vp_list_gap" class="vp-rangeslider" type="range" min="0" max="150" value="<?php echo esc_attr( $meta['vp_list_gap'] ); ?>">
+        <div data-cond="[name=vp_layout] == tiles">
+            <p class="post-attributes-label-wrapper">
+                <label class="post-attributes-label"><?php echo esc_html__( 'Type:', NK_VP_DOMAIN ); ?></label>
+            </p>
 
+            <div class="vp-image-dropdown">
+                <span class="vp-image-dropdown__preview">
+                    <?php
+                    foreach ( $tile_types as $k => $val ) {
+                        if ( $meta['vp_tiles_type'] === $val ) {
+                            ?>
+                            <img src="<?php echo esc_url( $tile_images_uri . $k . '.svg' ); ?>" alt="">
+                            <?php
+                            break;
+                        }
+                    }
+                    ?>
+                </span>
+                <span class="vp-image-dropdown__title"><?php echo esc_html__( 'Select tiles type', NK_VP_DOMAIN ); ?></span>
+                <div class="vp-image-dropdown__content">
+                    <div>
+                        <select class="vp-image-picker" name="vp_tiles_type">
+                            <!-- <option data-img-src="<?php echo esc_url( $tile_images_uri . 'custom.png' ); ?>" data-img-alt="custom" value="custom">custom</option> -->
+                            <?php foreach ( $tile_types as $k => $val ) : ?>
+                                <option data-img-src="<?php echo esc_url( $tile_images_uri . $k . '.svg' ); ?>" data-img-alt="<?php echo esc_attr( $k ); ?>" value="<?php echo esc_attr( $val ); ?>" <?php echo $meta['vp_tiles_type'] === $val ? 'selected' : ''; ?>><?php echo esc_html( $val ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div data-cond="[name=vp_layout] == masonry">
+            <p class="post-attributes-label-wrapper">
+                <label class="post-attributes-label" for="vp_masonry_columns">Columns:</label>
+            </p>
+            <input name="vp_masonry_columns" id="vp_masonry_columns" class="vp-rangeslider" type="range" min="1" max="5" value="<?php echo esc_attr( $meta['vp_masonry_columns'] ); ?>">
+        </div>
+
+        <p class="post-attributes-label-wrapper">
+            <label class="post-attributes-label" for="vp_items_gap">Gap:</label>
+        </p>
+        <input name="vp_items_gap" id="vp_items_gap" class="vp-rangeslider" type="range" min="0" max="150" value="<?php echo esc_attr( $meta['vp_items_gap'] ); ?>">
+
+        <p class="post-attributes-label-wrapper">
+            <label class="post-attributes-label" for="vp_items_count">Items Per Page:</label>
+        </p>
+        <input name="vp_items_count" id="vp_items_count" class="vp-rangeslider" type="range" min="1" max="50" value="<?php echo esc_attr( $meta['vp_items_count'] ); ?>">
+        <?php
+    }
+
+    /**
+     * Add Preview metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_preview_metabox( $post ) {
+        ?>
         <div class="vp_list_preview">
-            <?php Visual_Portfolio_Get::get( $post->ID ); ?>
+            <?php echo Visual_Portfolio_Get::get( $post->ID ); ?>
         </div>
         <?php
     }
@@ -495,6 +572,22 @@ class Visual_Portfolio_Admin {
             <div class="vp-content-source__item-content">
                 <div data-content="portfolio">
                     <!-- Portfolio -->
+
+                    <p>
+                        <?php
+                        $url = get_admin_url( null, 'edit.php?post_type=portfolio' );
+                        $allowed_protocols = array(
+                            'a' => array(
+                                'href' => array(),
+                                'target' => array()
+                            ),
+                        );
+
+                        // translators: %1$s - escaped url.
+                        // translators: %2$s - non-escaped url.
+                        printf( wp_kses( __( 'Portfolio items list from <a href="%1$s" target="_blank">%2$s</a>', NK_VP_DOMAIN ), $allowed_protocols ), esc_url( $url ), esc_html( $url ) );
+                        ?>
+                    </p>
                 </div>
                 <div data-content="post-based">
                     <!-- Post-Based -->

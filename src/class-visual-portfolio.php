@@ -111,6 +111,7 @@ class Visual_Portfolio {
         $this->clear_expired_caches();
 
         // init classes.
+        new Visual_Portfolio_Settings;
         new Visual_Portfolio_Get;
         new Visual_Portfolio_Shortcode;
         new Visual_Portfolio_Admin;
@@ -148,6 +149,7 @@ class Visual_Portfolio {
      * Include dependencies
      */
     private function include_dependencies() {
+        require_once( $this->plugin_path . 'classes/class-settings.php' );
         require_once( $this->plugin_path . 'classes/class-get-portfolio.php' );
         require_once( $this->plugin_path . 'classes/class-shortcode.php' );
         require_once( $this->plugin_path . 'classes/class-admin.php' );

@@ -1,7 +1,9 @@
 (function ($) {
-   "use strict";
+    "use strict";
 
-   var $body = $('body');
+    var $body = $('body');
+    var $editForm = $('form[name="post"]');
+    var $postType = $('[name="post_type"]');
 
     /**
      * Portfolio list creation
@@ -24,7 +26,9 @@
     });
 
     // enable conditionize
-    $contentSource.conditionize();
+    if ('visual-portfolios' === $postType.val() && $editForm.length) {
+        $editForm.conditionize();
+    }
 
     // image picker
     $('.vp-image-picker').imagepicker();
@@ -42,13 +46,59 @@
 
     // reinit portfolio on options change
     var $preview = $('.vp_list_preview > .vp-portfolio');
-    $('[name=vp_list_layout]').on('change', function () {
-        $preview.attr('data-vp-layout', this.value);
+    $('[name=vp_layout], [name=vp_tiles_type], [name=vp_masonry_columns], [name=vp_items_gap]').on('change input', function () {
+        var name = $(this).attr('name');
+
+        // remove vp_
+        name = name.substring(3);
+
+        // replace _ to -
+        name = name.replace('_', '-');
+
+        $preview.attr('data-vp-' + name, this.value);
         $preview.vp('init');
     });
-    $('[name=vp_list_gap]').on('change input', function () {
-        $preview.attr('data-vp-items-gap', this.value);
-        $preview.vp('init');
+
+    // vp_layout -> data-vp-layout
+    // vp_tiles_type -> data-vp-tiles-type
+    // vp_items_gap -> data-vp-items-gap
+
+    // image dropdown
+    $body.on('click', '.vp-image-dropdown', function (e) {
+        if (!$(e.target).closest('.vp-image-dropdown__content').length) {
+            $(this).toggleClass('active');
+        }
+    });
+    $body.on('mousedown', function (e) {
+        var $select = $(e.target).closest('.vp-image-dropdown');
+        var $all = $('.vp-image-dropdown.active');
+
+        $all.each(function () {
+            if (this === $select[0]) {
+                return;
+            }
+
+            $(this).removeClass('active');
+        });
+    });
+    $body.on('change', '.vp-image-dropdown .vp-image-picker', function (e) {
+        var $this = $(this);
+        var pickerData = $this.data('picker');
+
+        if (pickerData) {
+            var $selected = pickerData.select.find('option[value="' + pickerData.select.val() + '"]');
+            var $optgroup = $selected.parent('optgroup');
+            var $dropdown = $this.closest('.vp-image-dropdown');
+            var src = $selected.attr('data-img-src');
+
+            if ($dropdown.length) {
+                $dropdown.children('.vp-image-dropdown__preview').html('<img src="' + src + '" alt="">');
+
+                if ($optgroup.length) {
+                    $dropdown.children('.vp-image-dropdown__title').html($optgroup.attr('label'));
+                }
+            }
+        }
     });
 
     // change shortcode name.
@@ -159,8 +209,6 @@
     });
 
     // prevent page closing
-    var $editForm = $('form[name="post"]');
-    var $postType = $('[name="post_type"]');
     if ('visual-portfolios' === $postType.val() && $editForm.length) {
         var defaultForm = $editForm.serialize();
 

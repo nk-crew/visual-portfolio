@@ -28,6 +28,6 @@ class Visual_Portfolio_Shortcode {
             'id' => '',
         ), $atts);
 
-        return Visual_Portfolio_Get::get( $atts['id'], true );
+        return Visual_Portfolio_Get::get( $atts['id'] );
     }
 }

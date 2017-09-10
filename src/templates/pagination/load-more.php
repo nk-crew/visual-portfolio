@@ -1,17 +1,19 @@
 <?php
 /**
  * Load more pagination template.
- * Available $args variable.
  *
+ * @var $args
  * @package visual-portfolio
  */
 
 ?>
 
-<div class="vp-pagination vp-pagination__style" data-vp-pagination-type="<?php echo esc_attr( $args['type'] ); ?>" data-vp-pagination-id="<?php echo esc_attr( $args['id'] ); ?>" data-vp-pagination-next-page-url="<?php echo esc_url( $args['next_page_url'] ); ?>">
-    <a class="vp-pagination__load-more" href="<?php echo esc_url( $args['next_page_url'] ); ?>">
-        <span>Load More</span>
-        <span class="vp-pagination__load-more-loading">Loading...</span>
-        <span class="vp-pagination__load-more-no-more">No More</span>
-    </a>
-</div>
+<ul class="<?php echo esc_attr( $args['class'] ); ?> vp-pagination__style-default" data-vp-pagination-type="<?php echo esc_attr( $args['type'] ); ?>">
+    <li class="vp-pagination__item">
+        <a class="vp-pagination__load-more" href="<?php echo esc_url( $args['next_page_url'] ); ?>">
+            <span>Load More</span>
+            <span class="vp-pagination__load-more-loading">Loading...</span>
+            <span class="vp-pagination__load-more-no-more">No More</span>
+        </a>
+    </li>
+</ul>

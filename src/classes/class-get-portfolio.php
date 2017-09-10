@@ -14,11 +14,14 @@ class Visual_Portfolio_Get {
      *
      * @var array
      */
-    private static $defaults = array(
+    static private $defaults = array(
+        // tiles, masonry.
+        'vp_layout'             => 'tiles',
+
         /**
-         * Layout parameter info:
-         * first parameter - is gap size in pixels
-         * the next is portfolio items sizes
+         * Tile type:
+         * first parameter - is columns number
+         * the next is item sizes
          *
          * Example:
          * 3|1,0.5|2,0.25|
@@ -26,13 +29,19 @@ class Visual_Portfolio_Get {
          *    First item 100% width and 50% height
          *    Second item 200% width and 25% height
          */
-        'vp_list_layout'           => '3|1,1|',
-        'vp_list_gap'              => 15,
-        'vp_list_count'            => 6,
-        'vp_list_filter'           => true,
+        'vp_tiles_type' => '3|1,1|',
+
+        // masonry columns count.
+        'vp_masonry_columns'       => 3,
+
+        'vp_items_gap'             => 15,
+        'vp_items_count'           => 6,
+
+        // false, default.
+        'vp_filter'                => 'default',
 
         // infinite, load-more, true.
-        'vp_list_pagination'       => 'load-more',
+        'vp_pagination'            => 'load-more',
 
         // portfolio, post-based.
         'vp_content_source'        => 'portfolio',
@@ -68,7 +77,7 @@ class Visual_Portfolio_Get {
 
             foreach ( self::$defaults as $k => $item ) {
                 $post_meta = get_post_meta( $id, $k, true );
-                if ( $post_meta ) {
+                if ( isset( $post_meta ) ) {
                     $options_or_id[ $k ] = $post_meta;
                 }
             }
@@ -78,39 +87,62 @@ class Visual_Portfolio_Get {
     }
 
     /**
+     * Scripts enqueued flag
+     *
+     * @var bool
+     */
+    static private $scripts_enqueued = false;
+
+    /**
      * Enqueue scripts and styles for portfolio.
      */
-    static private function enqueue_scripts() {
+    static public function enqueue_scripts() {
+        if ( self::$scripts_enqueued ) {
+            return;
+        }
+        self::$scripts_enqueued = true;
+
         wp_enqueue_script( 'imagesloaded', visual_portfolio()->plugin_url . 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js', '', '', true );
         wp_enqueue_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '', true );
 
-        wp_enqueue_script( 'visual-portfolio-infinite', visual_portfolio()->plugin_url . 'assets/js/infinite-scroll.js', array( 'jquery' ), '', true );
+        /*
+         * TODO: Justified
+           wp_enqueue_script( 'justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/justified-gallery/js/jquery.justifiedGallery.min.js', array( 'jquery' ), '', true );
+         */
 
         wp_enqueue_script( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/js/script.js', array( 'jquery' ), '', true );
         wp_enqueue_style( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/css/style.css' );
     }
 
     /**
+     * ID of the current printed portfolio
+     *
+     * @var int
+     */
+    static private $id = 0;
+
+    /**
      * Print portfolio by post ID or options
      *
      * @param int|array $options_or_id options for portfolio list to print.
-     * @param bool      $return return result instead of echo.
+     *
+     * @return string
      */
-    static public function get( $options_or_id = array(), $return = false ) {
+    static public function get( $options_or_id = array() ) {
         self::enqueue_scripts();
 
+        $id = ++self::$id;
         $options = self::get_options( $options_or_id );
 
         $result        = '';
-        $filter_values = array();
         $class         = 'vp-portfolio';
 
-        if ( ! $options['vp_list_pagination'] || '0' === $options['vp_list_pagination'] || 'false' === $options['vp_list_pagination'] ) {
-            $options['vp_list_pagination'] = false;
+        if ( ! $options['vp_pagination'] || '0' === $options['vp_pagination'] || 'false' === $options['vp_pagination'] ) {
+            $options['vp_pagination'] = false;
         }
 
         $paged = 0;
-        if ( $options['vp_list_pagination'] ) {
+        if ( $options['vp_pagination'] ) {
             $paged = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
         }
 
@@ -118,13 +150,29 @@ class Visual_Portfolio_Get {
          * Set Up Query options
          */
         $query_opts = array(
-            'showposts'  => intval( $options['vp_list_count'] ),
-            'posts_per_page' => intval( $options['vp_list_count'] ),
+            'showposts'  => intval( $options['vp_items_count'] ),
+            'posts_per_page' => intval( $options['vp_items_count'] ),
             'paged'      => $paged,
             'orderby'    => 'post_date',
             'order'      => $options['vp_posts_order_direction'],
             'post_type'  => 'portfolio',
         );
+
+        // Load certain taxonomies.
+        if ( isset( $_GET['vp_filter'] ) ) {
+            $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
+            $taxonomies = explode( ':', $taxonomies );
+
+            if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
+                $query_opts['tax_query'] = array(
+                    array(
+                        'taxonomy' => $taxonomies[0],
+                        'field' => 'slug',
+                        'terms' => $taxonomies[1],
+                    ),
+                );
+            }
+        }
 
         // Post based.
         if ( 'post-based' === $options['vp_content_source'] ) {
@@ -200,32 +248,41 @@ class Visual_Portfolio_Get {
             } // End if().
         } // End if().
 
+        $no_image = Visual_Portfolio_Settings::get_option( 'no_image','vp_general', false );
+
         // get Post List.
         $portfolio_query = new WP_Query( $query_opts );
         $portfolio_list = '';
 
-        while ( $portfolio_query->have_posts() ) : $portfolio_query->the_post();
-            $current_post_atts = '';
-            $alt = '';
-            $attachment_src = '';
+        while ( $portfolio_query->have_posts() ) :
+            $portfolio_query->the_post();
 
-            // Filter Matches.
-            // if ( $options['vp_list_filter'] ) {
-                // $category = get_the_terms( get_the_ID(), 'portfolio-category' );
-                // if ( $category ) {
-                    // $current_post_atts .= ' data-filter="';
-                    // foreach ( $category as $key => $cat_item ) {
-                    // $filter_values[] = $cat_item->name;
-                    // if ( $key > 0 ) {
-                    // $current_post_atts .= ', ';
-                    // }
-                    // $current_post_atts .= esc_attr( $cat_item->name );
-                    // }
-                    // $current_post_atts .= '"';
-                // }
-            // }
+            $current_filter_values = array();
+
+            // Get category taxonomies for data filter.
+            if ( $options['vp_filter'] ) {
+                $all_taxonomies = get_object_taxonomies( get_post() );
+                foreach ( $all_taxonomies as $cat ) {
+                    // allow only category taxonomies like category, portfolio_category, etc...
+                    if ( strpos( $cat, 'category' ) === false ) {
+                        continue;
+                    }
+
+                    $category = get_the_terms( get_post(), $cat );
+                    if ( $category && ! in_array( $category, $current_filter_values ) ) {
+                        foreach ( $category as $key => $cat_item ) {
+                            $current_filter_values[] = $cat_item->slug;
+                        }
+                    }
+                }
+            }
+
             // Attachment.
             $attachment = get_the_post_thumbnail( get_the_ID(), 'full' );
+
+            if ( ! $attachment && $no_image ) {
+                $attachment = wp_get_attachment_image( $no_image, 'full' );
+            }
 
             // Post link.
             $portfolio_url = get_permalink();
@@ -236,7 +293,15 @@ class Visual_Portfolio_Get {
             // Published Date.
             $published_date = get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) );
 
-            $portfolio_list .= '<div class="vp-portfolio__item"' . $current_post_atts . '>';
+            // filter data attribute string.
+            $filter_attr = implode( ',', $current_filter_values );
+            if ( $filter_attr ) {
+                $filter_attr = ' data-vp-filter="' . esc_attr( $filter_attr ) . '"';
+            } else {
+                $filter_attr = '';
+            }
+
+            $portfolio_list .= '<div class="vp-portfolio__item"' . $filter_attr . '>';
 
             $portfolio_list .= '<div class="vp-portfolio__item-img">';
             $portfolio_list .= '<div class="vp-portfolio__item-img-wrap">';
@@ -250,7 +315,7 @@ class Visual_Portfolio_Get {
 
             $portfolio_list .= '<div class="vp-portfolio__item-overlay">';
 
-            // add meta, heart, title, link, date.
+            // add meta data.
             if ( isset( $title ) && ! empty( $title ) && isset( $portfolio_url ) && ! empty( $portfolio_url ) ) {
                 $portfolio_list .= '<h2 class="nk-portfolio-title nk-post-title h4"><a href="' . esc_url( $portfolio_url ) . '">' . esc_html( $title ) . '</a></h2>';
             }
@@ -264,38 +329,140 @@ class Visual_Portfolio_Get {
         endwhile;
         wp_reset_postdata();
 
-        // Set Filter.
-        if ( $options['vp_list_filter'] && ! empty( $filter_values ) && isset( $filter_values ) && is_array( $filter_values ) ) {
-            foreach ( $filter_values as $key => $filter_value ) {
-                $filter_values[ $key ] = trim( $filter_value );
-            }
-            $filter_values = array_unique( $filter_values );
-            $result .= '<ul class="vp-portfolio__filter">';
-            $result .= '<li class="active" data-filter="*">All</li>';
-            foreach ( $filter_values as $key => $filter_value ) {
-                $result .= '<li data-filter="' . esc_attr( trim( $filter_value ) ) . '">' . esc_html( trim( $filter_value ) ) . '</li>';
-            }
-            $result .= '</ul>';
-        }
+        $start_page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
+        $max_pages = (int) ($portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages);
+        $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
 
         /**
          * Work with printing posts
          */
-        $result .= '<div class="' . esc_attr( $class ) . '" data-vp-layout="' . esc_attr( $options['vp_list_layout'] ) . '" data-vp-items-gap="' . esc_attr( $options['vp_list_gap'] ) . '">';
+        $result .= '<div class="' . esc_attr( $class ) . '" data-vp-id="' . esc_attr( $id ) . '" data-vp-layout="' . esc_attr( $options['vp_layout'] ) . '" data-vp-tiles-type="' . esc_attr( $options['vp_tiles_type'] ) . '" data-vp-masonry-columns="' . esc_attr( $options['vp_masonry_columns'] ) . '" data-vp-items-gap="' . esc_attr( $options['vp_items_gap'] ) . '" data-vp-pagination="' . esc_attr( $options['vp_pagination'] ) . '" data-vp-next-page-url="' . esc_url( $next_page_url ) . '">';
+
+        // Place preloader.
         $result .= '<div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>';
-        $result .= '<div class="vp-portfolio-wrap">';
+
+        // Place filter.
+        if ( $options['vp_filter'] ) {
+            $result .= self::filter( $query_opts, $options['vp_filter'] );
+        }
+
+        // Place portfolio list.
+        $result .= '<div class="vp-portfolio__wrap">';
         $result .= $portfolio_list;
         $result .= '</div>';
-        if ( $options['vp_list_pagination'] ) {
-            $result .= self::pagination( $portfolio_query, $options['vp_list_pagination'] );
+
+        // Place pagination.
+        if ( $options['vp_pagination'] ) {
+            $result .= self::pagination( $portfolio_query, $options['vp_pagination'] );
         }
+
         $result .= '</div>';
 
-        if ( $return ) {
-            return $result;
-        } else {
-            echo $result;
+        return $result;
+    }
+
+    /**
+     * Print filters
+     *
+     * @param array  $query_opts query options.
+     * @param string $type pagination type: default, infinite, load-more.
+     *
+     * @return string
+     */
+    static private function filter( $query_opts = null, $type = 'default' ) {
+        if ( empty( $query_opts ) || ! isset( $query_opts ) || ! is_array( $query_opts ) ) {
+            return '';
         }
+
+        // Get all available categories for current $query_opts.
+        $items = array();
+        $query_opts['posts_per_page'] = -1;
+        $query_opts['showposts'] = -1;
+        $query_opts['paged'] = -1;
+        $query_opts['tax_query'] = array();
+
+        // Get active item.
+        $active_item = false;
+        if ( isset( $_GET['vp_filter'] ) ) {
+            $active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
+        }
+        $there_is_active = false;
+
+        /**
+         * TODO: make caching using set_transient function. Info here - https://wordpress.stackexchange.com/a/145960
+         */
+        $portfolio_query = new WP_Query( $query_opts );
+        while ( $portfolio_query->have_posts() ) {
+            $portfolio_query->the_post();
+            $all_taxonomies = get_object_taxonomies( get_post() );
+
+            foreach ( $all_taxonomies as $cat ) {
+                // allow only category taxonomies like category, portfolio_category, etc...
+                if ( strpos( $cat, 'category' ) === false ) {
+                    continue;
+                }
+
+                // Retrieve terms.
+                $category = get_the_terms( get_post(), $cat );
+                if ( ! $category ) {
+                    continue;
+                }
+
+                // Prepare each terms array.
+                foreach ( $category as $key => $cat_item ) {
+                    $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
+
+                    $url = self::get_nopaging_url( false, array(
+                        'vp_filter' => urlencode( $unique_name ),
+                    ) );
+
+                    $items[ $unique_name ] = array(
+                        'filter'      => $cat_item->slug,
+                        'label'       => $cat_item->name,
+                        'description' => $cat_item->description,
+                        'count'       => $cat_item->count,
+                        'taxonomy'    => $cat_item->taxonomy,
+                        'active'      => $active_item === $unique_name,
+                        'url'         => $url,
+                        'class'       => 'vp-filter__item' . ($active_item === $unique_name ? ' vp-filter__item-active' : ''),
+                    );
+
+                    if ( $active_item === $unique_name ) {
+                        $there_is_active = true;
+                    }
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        // Add 'All' active item.
+        array_unshift($items , array(
+            'filter'      => '*',
+            'label'       => esc_html__( 'All', NK_VP_DOMAIN ),
+            'description' => false,
+            'count'       => false,
+            'active'      => ! $there_is_active,
+            'url'         => remove_query_arg( 'vp_filter', self::get_nopaging_url() ),
+            'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : ''),
+        ));
+
+        $args = array(
+            'class' => 'vp-filter',
+            'items' => $items,
+        );
+
+        ob_start();
+
+        switch ( $type ) {
+            default:
+                visual_portfolio()->include_template( 'filter/filter', $args );
+                break;
+        }
+
+        $return = ob_get_contents();
+        ob_end_clean();
+
+        return $return;
     }
 
     /**
@@ -303,8 +470,10 @@ class Visual_Portfolio_Get {
      *
      * @param object $query wp_query object.
      * @param string $type pagination type: default, infinite, load-more.
+     *
+     * @return string
      */
-    static private function pagination( $query = null, $type = 'default' ) {
+    static private function pagination( $query = null, $type = 'paged' ) {
         if ( null == $query ) {
             $query_name = 'wp_query';
 
@@ -329,7 +498,12 @@ class Visual_Portfolio_Get {
             'next_page_url' => $next_page_url,
             'start_page' => $start_page,
             'max_pages' => $query->max_num_pages,
+            'class' => 'vp-pagination',
         );
+
+        if ( ! $next_page_url ) {
+            $args['class'] .= ' vp-pagination__no-more';
+        }
 
         ob_start();
 
@@ -341,7 +515,61 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template( 'pagination/load-more', $args );
                 break;
             default:
-                visual_portfolio()->include_template( 'pagination/default', $args );
+                $pagination_links = paginate_links( array(
+                    'base' => esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) ),
+                    'format' => '',
+                    'type' => 'array',
+                    'current' => $args['start_page'],
+                    'total' => $args['max_pages'],
+                    'prev_text' => '&lt;',
+                    'next_text' => '&gt;',
+                    'end_size' => 1,
+                    'mid_size' => 2,
+                ) );
+
+                // parse html string and make arrays.
+                $filtered_links = array();
+                if ( $pagination_links ) {
+                    foreach ( $pagination_links as $link ) {
+                        $tag_data = self::extract_tags( $link, array( 'a', 'span' ) );
+                        $tag_data = ! empty( $tag_data ) ? $tag_data[0] : $tag_data;
+
+                        if ( ! empty( $tag_data ) ) {
+                            $atts = isset( $tag_data['attributes'] ) ? $tag_data['attributes'] : false;
+                            $href = $atts && isset( $atts['href'] ) ? $atts['href'] : false;
+                            $class = $atts && isset( $atts['class'] ) ? $atts['class'] : '';
+                            $label = isset( $tag_data['contents'] ) ? $tag_data['contents'] : false;
+
+                            $arr = array(
+                                'url'           => $href,
+                                'label'         => $label,
+                                'class'         => 'vp-pagination__item',
+                                'active'        => strpos( $class, 'current' ) !== false,
+                                'is_prev_arrow' => strpos( $class, 'prev' ) !== false,
+                                'is_next_arrow' => strpos( $class, 'next' ) !== false,
+                                'is_dots'       => strpos( $class, 'dots' ) !== false,
+                            );
+
+                            if ( $arr['active'] ) {
+                                $arr['class'] .= ' vp-pagination__item-active';
+                            }
+                            if ( $arr['is_prev_arrow'] ) {
+                                $arr['class'] .= ' vp-pagination__item-prev';
+                            }
+                            if ( $arr['is_next_arrow'] ) {
+                                $arr['class'] .= ' vp-pagination__item-next';
+                            }
+                            if ( $arr['is_dots'] ) {
+                                $arr['class'] .= ' vp-pagination__item-dots';
+                            }
+
+                            $filtered_links[] = $arr;
+                        }
+                    }
+                }
+
+                $args['items'] = $filtered_links;
+                visual_portfolio()->include_template( 'pagination/paged', $args );
                 break;
         }
 
@@ -349,5 +577,150 @@ class Visual_Portfolio_Get {
         ob_end_clean();
 
         return $return;
+    }
+
+    /**
+     * Return current url without page variables.
+     *
+     * @param string $current_url - custom page url.
+     * @param array  $query_arg - custom query arg.
+     * @return string
+     */
+    static private function get_nopaging_url( $current_url = false, $query_arg = array() ) {
+
+        // Use current page url.
+        if ( ! $current_url ) {
+            global $wp;
+            $query = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) ) : '';
+            $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url( $wp->request );
+
+            $current_url = add_query_arg( $query, '', $request_uri );
+        }
+
+        // Add custom query args.
+        $current_url = add_query_arg( $query_arg, $current_url );
+
+        // Remove paged get variable.
+        $current_url = remove_query_arg( 'paged', $current_url );
+
+        // Remove /page/{%}.
+        $pattern = '/page\\/[0-9]+\\//i';
+        $current_url = preg_replace( $pattern, '', $current_url );
+
+        return $current_url;
+    }
+
+    /**
+     * Extract specific HTML tags and their attributes from a string.
+     *
+     * Found in http://w-shadow.com/blog/2009/10/20/how-to-extract-html-tags-and-their-attributes-with-php/
+     *
+     * You can either specify one tag, an array of tag names, or a regular expression that matches the tag name(s).
+     * If multiple tags are specified you must also set the $selfclosing parameter and it must be the same for
+     * all specified tags (so you can't extract both normal and self-closing tags in one go).
+     *
+     * The function returns a numerically indexed array of extracted tags. Each entry is an associative array
+     * with these keys :
+     *  tag_name    - the name of the extracted tag, e.g. "a" or "img".
+     *  offset      - the numberic offset of the first character of the tag within the HTML source.
+     *  contents    - the inner HTML of the tag. This is always empty for self-closing tags.
+     *  attributes  - a name -> value array of the tag's attributes, or an empty array if the tag has none.
+     *  full_tag    - the entire matched tag, e.g. '<a href="http://example.com">example.com</a>'. This key
+     *                will only be present if you set $return_the_entire_tag to true.
+     *
+     * @param string       $html The HTML code to search for tags.
+     * @param string|array $tag The tag(s) to extract.
+     * @param bool         $selfclosing Whether the tag is self-closing or not. Setting it to null will force the script to try and make an educated guess.
+     * @param bool         $return_the_entire_tag Return the entire matched tag in 'full_tag' key of the results array.
+     * @param string       $charset The character set of the HTML code. Defaults to ISO-8859-1.
+     *
+     * @return array An array of extracted tags, or an empty array if no matching tags were found.
+     */
+    static private function extract_tags( $html, $tag, $selfclosing = null, $return_the_entire_tag = false, $charset = 'ISO-8859-1' ) {
+
+        if ( is_array( $tag ) ) {
+            $tag = implode( '|', $tag );
+        }
+
+        // If the user didn't specify if $tag is a self-closing tag we try to auto-detect it by checking against a list of known self-closing tags.
+        $selfclosing_tags = array( 'area', 'base', 'basefont', 'br', 'hr', 'input', 'img', 'link', 'meta', 'col', 'param' );
+        if ( is_null( $selfclosing ) ) {
+            $selfclosing = in_array( $tag, $selfclosing_tags );
+        }
+
+        // The regexp is different for normal and self-closing tags because I can't figure out how to make a sufficiently robust unified one.
+        if ( $selfclosing ) {
+            $tag_pattern =
+                '@<(?P<tag>' . $tag . ')           # <tag
+                (?P<attributes>\s[^>]+)?       # attributes, if any
+                \s*/?>                   # /> or just >, being lenient here 
+                @xsi';
+        } else {
+            $tag_pattern =
+                '@<(?P<tag>' . $tag . ')           # <tag
+                (?P<attributes>\s[^>]+)?       # attributes, if any
+                \s*>                 # >
+                (?P<contents>.*?)         # tag contents
+                </(?P=tag)>               # the closing </tag>
+                @xsi';
+        }
+
+        $attribute_pattern =
+            '@
+            (?P<name>\w+)                         # attribute name
+            \s*=\s*
+            (
+                (?P<quote>[\"\'])(?P<value_quoted>.*?)(?P=quote)    # a quoted value
+                |                           # or
+                (?P<value_unquoted>[^\s"\']+?)(?:\s+|$)           # an unquoted value (terminated by whitespace or EOF) 
+            )
+            @xsi';
+
+        // Find all tags.
+        if ( ! preg_match_all( $tag_pattern, $html, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) ) {
+            // Return an empty array if we didn't find anything.
+            return array();
+        }
+
+        $tags = array();
+        foreach ( $matches as $match ) {
+
+            // Parse tag attributes, if any.
+            $attributes = array();
+            if ( ! empty( $match['attributes'][0] ) ) {
+
+                if ( preg_match_all( $attribute_pattern, $match['attributes'][0], $attribute_data, PREG_SET_ORDER ) ) {
+                    // Turn the attribute data into a name->value array.
+                    foreach ( $attribute_data as $attr ) {
+                        if ( ! empty( $attr['value_quoted'] ) ) {
+                            $value = $attr['value_quoted'];
+                        } else if ( ! empty( $attr['value_unquoted'] ) ) {
+                            $value = $attr['value_unquoted'];
+                        } else {
+                            $value = '';
+                        }
+
+                        // Passing the value through html_entity_decode is handy when you want to extract link URLs or something like that. You might want to remove or modify this call if it doesn't fit your situation.
+                        $value = html_entity_decode( $value, ENT_QUOTES, $charset );
+
+                        $attributes[ $attr['name'] ] = $value;
+                    }
+                }
+            }
+
+            $tag = array(
+                'tag_name' => $match['tag'][0],
+                'offset' => $match[0][1],
+                'contents' => ! empty( $match['contents'] ) ? $match['contents'][0] : '', // empty for self-closing tags.
+                'attributes' => $attributes,
+            );
+            if ( $return_the_entire_tag ) {
+                $tag['full_tag'] = $match[0][0];
+            }
+
+            $tags[] = $tag;
+        }
+
+        return $tags;
     }
 }

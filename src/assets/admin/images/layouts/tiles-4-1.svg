@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="65" height="65" viewBox="0 0 65 65">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #cfcfcf;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="0" y="0" width="13" height="13" />
+  <rect class="cls-1" x="17" y="0" width="13" height="13" />
+  <rect class="cls-1" x="34" y="0" width="13" height="13" />
+  <rect class="cls-1" x="51" y="0" width="13" height="13" />
+
+  <rect class="cls-1" x="0" y="17" width="13" height="13" />
+  <rect class="cls-1" x="17" y="17" width="13" height="13" />
+  <rect class="cls-1" x="34" y="17" width="13" height="13" />
+  <rect class="cls-1" x="51" y="17" width="13" height="13" />
+
+  <rect class="cls-1" x="0" y="34" width="13" height="13" />
+  <rect class="cls-1" x="17" y="34" width="13" height="13" />
+  <rect class="cls-1" x="34" y="34" width="13" height="13" />
+  <rect class="cls-1" x="51" y="34" width="13" height="13" />
+
+  <rect class="cls-1" x="0" y="51" width="13" height="13" />
+  <rect class="cls-1" x="17" y="51" width="13" height="13" />
+  <rect class="cls-1" x="34" y="51" width="13" height="13" />
+  <rect class="cls-1" x="51" y="51" width="13" height="13" />
+</svg>

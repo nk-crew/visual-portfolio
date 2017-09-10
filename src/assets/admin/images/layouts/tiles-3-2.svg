@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="65" height="65" viewBox="0 0 65 65">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #cfcfcf;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="0" y="0" width="19" height="15" />
+  <rect class="cls-1" x="23" y="0" width="19" height="15" />
+  <rect class="cls-1" x="46" y="0" width="19" height="15" />
+
+  <rect class="cls-1" x="0" y="19" width="19" height="27" />
+  <rect class="cls-1" x="23" y="19" width="19" height="27" />
+  <rect class="cls-1" x="46" y="19" width="19" height="27" />
+  
+  <rect class="cls-1" x="0" y="50" width="19" height="15" />
+  <rect class="cls-1" x="23" y="50" width="19" height="15" />
+  <rect class="cls-1" x="46" y="50" width="19" height="15" />
+</svg>
