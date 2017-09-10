@@ -107,14 +107,11 @@ class Visual_Portfolio {
         // include helper files.
         $this->include_dependencies();
 
-        // clear caches.
-        $this->clear_expired_caches();
-
         // init classes.
-        new Visual_Portfolio_Settings;
-        new Visual_Portfolio_Get;
-        new Visual_Portfolio_Shortcode;
-        new Visual_Portfolio_Admin;
+        new Visual_Portfolio_Settings();
+        new Visual_Portfolio_Get();
+        new Visual_Portfolio_Shortcode();
+        new Visual_Portfolio_Admin();
     }
 
     /**
@@ -183,120 +180,6 @@ class Visual_Portfolio {
         $template = apply_filters( 'vp_include_template', $template, $template_name, $args );
 
         include $template;
-    }
-
-
-    /**
-     * Get all options
-     */
-    private function get_options() {
-        $options_slug = 'visual_portfolio_options';
-        return unserialize( get_option( $options_slug, 'a:0:{}' ) );
-    }
-    /**
-     * Update option
-     *
-     * @param mixed $name name of the option.
-     * @param mixed $value value of the option.
-     */
-    public function update_option( $name, $value ) {
-        $options_slug = 'visual_portfolio_options';
-        $options = self::get_options();
-        $options[ self::sanitize_key( $name ) ] = $value;
-        update_option( $options_slug, serialize( $options ) );
-    }
-    /**
-     * Get option
-     *
-     * @param mixed $name name of the option.
-     * @param mixed $default default option value.
-     *
-     * @return mixed
-     */
-    public function get_option( $name, $default = null ) {
-        $options = self::get_options();
-        $name = self::sanitize_key( $name );
-        return isset( $options[ $name ] ) ? $options[ $name ] : $default;
-    }
-    /**
-     * Sanitize value
-     *
-     * @param mixed $key value to sanitize.
-     *
-     * @return mixed
-     */
-    private function sanitize_key( $key ) {
-        return preg_replace( '/[^A-Za-z0-9\_]/i', '', str_replace( array( '-', ':' ), '_', $key ) );
-    }
-
-
-    /**
-     * Get all caches
-     * $time in seconds
-     */
-    private function get_caches() {
-        $caches_slug = 'cache';
-        return $this->get_option( $caches_slug, array() );
-    }
-    /**
-     * Set cache
-     *
-     * @param mixed $name name of the cache option.
-     * @param mixed $value value of the option.
-     * @param int   $time time in seconds to cache value.
-     */
-    public function set_cache( $name, $value, $time = 3600 ) {
-        if ( ! $time || $time <= 0 ) {
-            return;
-        }
-        $caches_slug = 'cache';
-        $caches = self::get_caches();
-
-        $caches[ self::sanitize_key( $name ) ] = array(
-        'value'   => $value,
-        'expired' => time() + ( (int) $time ? $time : 0),
-        );
-        $this->update_option( $caches_slug, $caches );
-    }
-    /**
-     * Get cache
-     *
-     * @param mixed $name name of the cache option.
-     * @param mixed $default default value if there is no cache option.
-     *
-     * @return mixed
-     */
-    public function get_cache( $name, $default = null ) {
-        $caches = self::get_caches();
-        $name = self::sanitize_key( $name );
-        return isset( $caches[ $name ]['value'] ) ? $caches[ $name ]['value'] : $default;
-    }
-    /**
-     * Clear selected cache
-     *
-     * @param mixed $name name of the cache option.
-     */
-    public function clear_cache( $name ) {
-        $caches_slug = 'cache';
-        $caches = self::get_caches();
-        $name = self::sanitize_key( $name );
-        if ( isset( $caches[ $name ] ) ) {
-            $caches[ $name ] = null;
-            $this->update_option( $caches_slug, $caches );
-        }
-    }
-    /**
-     * Clear all expired caches
-     */
-    public function clear_expired_caches() {
-        $caches_slug = 'cache';
-        $caches = self::get_caches();
-        foreach ( $caches as $k => $cache ) {
-            if ( isset( $cache ) && isset( $cache['expired'] ) && $cache['expired'] < time() ) {
-                $caches[ $k ] = null;
-            }
-        }
-        $this->update_option( $caches_slug, $caches );
     }
 }
 
