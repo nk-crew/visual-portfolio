@@ -455,7 +455,7 @@ class Visual_Portfolio_Get {
 
         switch ( $type ) {
             default:
-                visual_portfolio()->include_template( 'filter/filter', $args );
+                visual_portfolio()->include_template( 'items-list/filter/filter', $args );
                 break;
         }
 
@@ -509,10 +509,10 @@ class Visual_Portfolio_Get {
 
         switch ( $type ) {
             case 'infinite':
-                visual_portfolio()->include_template( 'pagination/infinite', $args );
+                visual_portfolio()->include_template( 'items-list/pagination/infinite', $args );
                 break;
             case 'load-more':
-                visual_portfolio()->include_template( 'pagination/load-more', $args );
+                visual_portfolio()->include_template( 'items-list/pagination/load-more', $args );
                 break;
             default:
                 $pagination_links = paginate_links( array(
@@ -569,7 +569,7 @@ class Visual_Portfolio_Get {
                 }
 
                 $args['items'] = $filtered_links;
-                visual_portfolio()->include_template( 'pagination/paged', $args );
+                visual_portfolio()->include_template( 'items-list/pagination/paged', $args );
                 break;
         }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Infinite pagination template.
+ * Load more pagination template.
  *
  * @var $args
  * @package visual-portfolio
@@ -13,7 +13,7 @@
         <a class="vp-pagination__load-more" href="<?php echo esc_url( $args['next_page_url'] ); ?>">
             <span><?php echo esc_html__( 'Load More', NK_VP_DOMAIN ); ?></span>
             <span class="vp-pagination__load-more-loading"><?php echo esc_html__( 'Loading...', NK_VP_DOMAIN ); ?></span>
-            <span class="vp-pagination__load-more-no-more"><?php echo esc_html__( 'Nothing Found', NK_VP_DOMAIN ); ?></span>
+            <span class="vp-pagination__load-more-no-more"><?php echo esc_html__( 'No More', NK_VP_DOMAIN ); ?></span>
         </a>
     </li>
 </ul>
