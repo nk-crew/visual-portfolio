@@ -364,9 +364,17 @@ class Visual_Portfolio_Admin {
             'default'
         );
         add_meta_box(
-            'vp_additional',
-            esc_html__( 'Additional', NK_VP_DOMAIN ),
-            array( $this, 'add_additional_metabox' ),
+            'vp_filter',
+            esc_html__( 'Filter', NK_VP_DOMAIN ),
+            array( $this, 'add_filter_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+        add_meta_box(
+            'vp_pagination',
+            esc_html__( 'Pagination', NK_VP_DOMAIN ),
+            array( $this, 'add_pagination_metabox' ),
             'vp_lists',
             'side',
             'default'
@@ -433,15 +441,54 @@ class Visual_Portfolio_Admin {
     }
 
     /**
-     * Add Additional metabox
+     * Add Filter metabox
      *
      * @param object $post The post object.
      */
-    public function add_additional_metabox( $post ) {
+    public function add_filter_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
 
         ?>
-        <label class="post-attributes-label" for="vp_pagination"><?php echo esc_html__( 'Pagination:', NK_VP_DOMAIN ); ?></label>
+        <p></p>
+        <select class="vp-select2 vp-select2-nosearch" name="vp_filter" id="vp_filter">
+            <option value="false" <?php selected( $meta['vp_filter'], 'false' ); ?>>
+                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="default" <?php selected( $meta['vp_filter'], 'default' ); ?>>
+                <?php echo esc_html__( 'Enabled', NK_VP_DOMAIN ); ?>
+            </option>
+        </select>
+
+        <div data-cond="[name=vp_filter] != false">
+            <p></p>
+            <label class="post-attributes-label" for="vp_filter_align">
+                <?php echo esc_html__( 'Align:', NK_VP_DOMAIN ); ?>
+            </label>
+            <select class="vp-select2 vp-select2-nosearch" name="vp_filter_align" id="vp_filter_align">
+                <option value="center" <?php selected( $meta['vp_filter_align'], 'center' ); ?>>
+                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                </option>
+                <option value="left" <?php selected( $meta['vp_filter_align'], 'left' ); ?>>
+                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                </option>
+                <option value="right" <?php selected( $meta['vp_filter_align'], 'right' ); ?>>
+                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                </option>
+            </select>
+        </div>
+        <?php
+    }
+
+    /**
+     * Add Pagination metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_pagination_metabox( $post ) {
+        $meta = Visual_Portfolio_Get::get_options( $post->ID );
+
+        ?>
+        <p></p>
         <select class="vp-select2 vp-select2-nosearch" name="vp_pagination" id="vp_pagination">
             <option value="false" <?php selected( $meta['vp_pagination'], 'false' ); ?>>
                 <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
@@ -457,16 +504,23 @@ class Visual_Portfolio_Admin {
             </option>
         </select>
 
-        <p></p>
-        <label class="post-attributes-label" for="vp_filter">Filter:</label>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_filter" id="vp_filter">
-            <option value="false" <?php selected( $meta['vp_filter'], 'false' ); ?>>
-                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="default" <?php selected( $meta['vp_filter'], 'default' ); ?>>
-                <?php echo esc_html__( 'Enabled', NK_VP_DOMAIN ); ?>
-            </option>
-        </select>
+        <div data-cond="[name=vp_pagination] != false">
+            <p></p>
+            <label class="post-attributes-label" for="vp_pagination_align">
+                <?php echo esc_html__( 'Align:', NK_VP_DOMAIN ); ?>
+            </label>
+            <select class="vp-select2 vp-select2-nosearch" name="vp_pagination_align" id="vp_pagination_align">
+                <option value="center" <?php selected( $meta['vp_pagination_align'], 'center' ); ?>>
+                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                </option>
+                <option value="left" <?php selected( $meta['vp_pagination_align'], 'left' ); ?>>
+                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                </option>
+                <option value="right" <?php selected( $meta['vp_pagination_align'], 'right' ); ?>>
+                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                </option>
+            </select>
+        </div>
         <?php
     }
 

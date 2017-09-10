@@ -39,9 +39,13 @@ class Visual_Portfolio_Get {
 
         // false, default.
         'vp_filter'                => 'default',
+        // center, left, right.
+        'vp_filter_align'          => 'center',
 
         // infinite, load-more, true.
         'vp_pagination'            => 'load-more',
+        // center, left, right.
+        'vp_pagination_align'      => 'center',
 
         // portfolio, post-based.
         'vp_content_source'        => 'portfolio',
@@ -78,6 +82,12 @@ class Visual_Portfolio_Get {
             foreach ( self::$defaults as $k => $item ) {
                 $post_meta = get_post_meta( $id, $k, true );
                 if ( isset( $post_meta ) && ! empty( $post_meta ) ) {
+                    if ( 'false' === $post_meta ) {
+                        $post_meta = false;
+                    }
+                    if ( 'true' === $post_meta ) {
+                        $post_meta = true;
+                    }
                     $options_or_id[ $k ] = $post_meta;
                 }
             }
@@ -136,10 +146,6 @@ class Visual_Portfolio_Get {
 
         $result        = '';
         $class         = 'vp-portfolio';
-
-        if ( ! $options['vp_pagination'] || '0' === $options['vp_pagination'] || 'false' === $options['vp_pagination'] ) {
-            $options['vp_pagination'] = false;
-        }
 
         $paged = 0;
         if ( $options['vp_pagination'] ) {
@@ -342,9 +348,7 @@ class Visual_Portfolio_Get {
         $result .= '<div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>';
 
         // Place filter.
-        if ( $options['vp_filter'] ) {
-            $result .= self::filter( $query_opts, $options['vp_filter'] );
-        }
+        $result .= self::filter( $query_opts, $options );
 
         // Place portfolio list.
         $result .= '<div class="vp-portfolio__wrap">';
@@ -352,9 +356,7 @@ class Visual_Portfolio_Get {
         $result .= '</div>';
 
         // Place pagination.
-        if ( $options['vp_pagination'] ) {
-            $result .= self::pagination( $portfolio_query, $options['vp_pagination'] );
-        }
+        $result .= self::pagination( $portfolio_query, $options );
 
         $result .= '</div>';
 
@@ -365,12 +367,12 @@ class Visual_Portfolio_Get {
      * Print filters
      *
      * @param array  $query_opts query options.
-     * @param string $type pagination type: default, infinite, load-more.
+     * @param object $vp_options current vp_list options.
      *
      * @return string
      */
-    static private function filter( $query_opts = null, $type = 'default' ) {
-        if ( empty( $query_opts ) || ! isset( $query_opts ) || ! is_array( $query_opts ) ) {
+    static private function filter( $query_opts = null, $vp_options ) {
+        if ( empty( $query_opts ) || ! isset( $query_opts ) || ! is_array( $query_opts ) || ! $vp_options['vp_filter'] ) {
             return '';
         }
 
@@ -447,13 +449,19 @@ class Visual_Portfolio_Get {
         ));
 
         $args = array(
-            'class' => 'vp-filter',
-            'items' => $items,
+            'class'           => 'vp-filter',
+            'items'           => $items,
+            'align'           => $vp_options['vp_filter_align'],
+            'vp_list_options' => $vp_options,
         );
+
+        if ( $vp_options['vp_filter_align'] ) {
+            $args['class'] .= ' vp-filter__align-' . $vp_options['vp_filter_align'];
+        }
 
         ob_start();
 
-        switch ( $type ) {
+        switch ( $vp_options['vp_filter'] ) {
             default:
                 visual_portfolio()->include_template( 'items-list/filter/filter', $args );
                 break;
@@ -469,20 +477,13 @@ class Visual_Portfolio_Get {
      * Print pagination
      *
      * @param object $query wp_query object.
-     * @param string $type pagination type: default, infinite, load-more.
+     * @param object $vp_options current vp_list options.
      *
      * @return string
      */
-    static private function pagination( $query = null, $type = 'paged' ) {
-        if ( null == $query ) {
-            $query_name = 'wp_query';
-
-            // Don't print empty markup if there's only one page.
-            if ( $GLOBALS[ $query_name ]->max_num_pages < 1 ) {
-                return '';
-            }
-
-            $query = $GLOBALS[ $query_name ];
+    static private function pagination( $query = null, $vp_options ) {
+        if ( null == $query || ! $vp_options['vp_pagination'] ) {
+            return '';
         }
 
         static $vp_pagination_id = 0;
@@ -493,21 +494,27 @@ class Visual_Portfolio_Get {
         $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
 
         $args = array(
-            'id' => $vp_pagination_id,
-            'type' => $type,
+            'id'            => $vp_pagination_id,
+            'type'          => $vp_options['vp_pagination'],
             'next_page_url' => $next_page_url,
-            'start_page' => $start_page,
-            'max_pages' => $query->max_num_pages,
-            'class' => 'vp-pagination',
+            'start_page'    => $start_page,
+            'max_pages'     => $query->max_num_pages,
+            'class'         => 'vp-pagination',
+            'align'         => $vp_options['vp_pagination_align'],
+            'vp_list_options' => $vp_options,
         );
 
         if ( ! $next_page_url ) {
             $args['class'] .= ' vp-pagination__no-more';
         }
 
+        if ( $vp_options['vp_pagination_align'] ) {
+            $args['class'] .= ' vp-pagination__align-' . $vp_options['vp_pagination_align'];
+        }
+
         ob_start();
 
-        switch ( $type ) {
+        switch ( $vp_options['vp_pagination'] ) {
             case 'infinite':
                 visual_portfolio()->include_template( 'items-list/pagination/infinite', $args );
                 break;

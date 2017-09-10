@@ -58,6 +58,12 @@
         $preview.attr('data-vp-' + name, this.value);
         $preview.vp('init');
     });
+    $('[name=vp_filter_align]').on('change', function () {
+        $preview.find('.vp-filter').removeClass('vp-filter__align-center vp-filter__align-left vp-filter__align-right').addClass('vp-filter__align-' + this.value);
+    });
+    $('[name=vp_pagination_align]').on('change', function () {
+        $preview.find('.vp-pagination').removeClass('vp-pagination__align-center vp-pagination__align-left vp-pagination__align-right').addClass('vp-pagination__align-' + this.value);
+    });
 
     // vp_layout -> data-vp-layout
     // vp_tiles_type -> data-vp-tiles-type
