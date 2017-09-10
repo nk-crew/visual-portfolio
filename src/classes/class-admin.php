@@ -228,8 +228,8 @@ class Visual_Portfolio_Admin {
                     <span class="dashicons-visual-portfolio-gray"></span>
                 </div>
                 <div class="vp-portfolio-list__text">
-                    <p>Ready to add your awesome portfolio?</p>
-                    <a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=visual-portfolios' ) ); ?>">Create your first portfolio list!</a>
+                    <p><?php echo esc_html__( 'Ready to add your awesome portfolio?', NK_VP_DOMAIN ); ?></p>
+                    <a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=visual-portfolios' ) ); ?>"><?php echo esc_html__( 'Create your first portfolio list!', NK_VP_DOMAIN ); ?></a>
                 </div>
             </div>
             <style type="text/css">
@@ -347,12 +347,47 @@ class Visual_Portfolio_Admin {
      * Add metaboxes
      */
     public function add_meta_boxes() {
-        add_meta_box( 'vp_name', 'Name & Shortcode', array( $this, 'add_name_metabox' ), 'visual-portfolios', 'side', 'high' );
-        add_meta_box( 'vp_layout', 'Layout', array( $this, 'add_layout_metabox' ), 'visual-portfolios', 'side', 'default' );
-        add_meta_box( 'vp_additional', 'Additional', array( $this, 'add_additional_metabox' ), 'visual-portfolios', 'side', 'default' );
+        add_meta_box(
+            'vp_name',
+            esc_html__( 'Name & Shortcode', NK_VP_DOMAIN ),
+            array( $this, 'add_name_metabox' ),
+            'visual-portfolios',
+            'side',
+            'high'
+        );
+        add_meta_box(
+            'vp_layout',
+            esc_html__( 'Layout', NK_VP_DOMAIN ),
+            array( $this, 'add_layout_metabox' ),
+            'visual-portfolios',
+            'side',
+            'default'
+        );
+        add_meta_box(
+            'vp_additional',
+            esc_html__( 'Additional', NK_VP_DOMAIN ),
+            array( $this, 'add_additional_metabox' ),
+            'visual-portfolios',
+            'side',
+            'default'
+        );
 
-        add_meta_box( 'vp_preview', 'Preview', array( $this, 'add_preview_metabox' ), 'visual-portfolios', 'normal', 'high' );
-        add_meta_box( 'vp_content_source', 'Content Source', array( $this, 'add_content_source_metabox' ), 'visual-portfolios', 'normal', 'high' );
+        add_meta_box(
+            'vp_preview',
+            esc_html__( 'Preview', NK_VP_DOMAIN ),
+            array( $this, 'add_preview_metabox' ),
+            'visual-portfolios',
+            'normal',
+            'high'
+        );
+        add_meta_box(
+            'vp_content_source',
+            esc_html__( 'Content Source', NK_VP_DOMAIN ),
+            array( $this, 'add_content_source_metabox' ),
+            'visual-portfolios',
+            'normal',
+            'high'
+        );
     }
 
     /**
@@ -371,15 +406,15 @@ class Visual_Portfolio_Admin {
         wp_nonce_field( basename( __FILE__ ), 'vp_layout_nonce' );
         ?>
         <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_list_name">Name:</label>
+            <label class="post-attributes-label" for="vp_list_name"><?php echo esc_html__( 'Name:', NK_VP_DOMAIN ); ?></label>
         </p>
         <input class="vp-input" name="vp_list_name" type="text" id="vp_list_name" value="<?php echo esc_attr( $post->post_title ); ?>">
 
         <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_list_shortcode">Shortcode:</label>
+            <label class="post-attributes-label" for="vp_list_shortcode"><?php echo esc_html__( 'Shortcode:', NK_VP_DOMAIN ); ?></label>
         </p>
         <input class="vp-input" name="vp_list_shortcode" type="text" id="vp_list_shortcode" value='<?php echo esc_attr( $post->ID ? '[visual_portfolio id="' . $post->ID . '"]' : '' ); ?>' readonly>
-        <p class="description">Place the shortcode where you want to show the portfolio list.</p>
+        <p class="description"><?php echo esc_html__( 'Place the shortcode where you want to show the portfolio list.', NK_VP_DOMAIN ); ?></p>
         <p></p>
 
         <style>
@@ -406,19 +441,31 @@ class Visual_Portfolio_Admin {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
 
         ?>
-        <label class="post-attributes-label" for="vp_pagination">Pagination:</label>
+        <label class="post-attributes-label" for="vp_pagination"><?php echo esc_html__( 'Pagination:', NK_VP_DOMAIN ); ?></label>
         <select class="vp-select2 vp-select2-nosearch" name="vp_pagination" id="vp_pagination">
-            <option value="false" <?php selected( $meta['vp_pagination'], 'false' ); ?>>Disabled</option>
-            <option value="paged" <?php selected( $meta['vp_pagination'], 'paged' ); ?>>Paged</option>
-            <option value="load-more" <?php selected( $meta['vp_pagination'], 'load-more' ); ?>>Load More</option>
-            <option value="infinite" <?php selected( $meta['vp_pagination'], 'infinite' ); ?>>Infinite</option>
+            <option value="false" <?php selected( $meta['vp_pagination'], 'false' ); ?>>
+                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="paged" <?php selected( $meta['vp_pagination'], 'paged' ); ?>>
+                <?php echo esc_html__( 'Paged', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="load-more" <?php selected( $meta['vp_pagination'], 'load-more' ); ?>>
+                <?php echo esc_html__( 'Load More', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="infinite" <?php selected( $meta['vp_pagination'], 'infinite' ); ?>>
+                <?php echo esc_html__( 'Infinite', NK_VP_DOMAIN ); ?>
+            </option>
         </select>
 
         <p></p>
         <label class="post-attributes-label" for="vp_filter">Filter:</label>
         <select class="vp-select2 vp-select2-nosearch" name="vp_filter" id="vp_filter">
-            <option value="false" <?php selected( $meta['vp_filter'], 'false' ); ?>>Disabled</option>
-            <option value="default" <?php selected( $meta['vp_filter'], 'default' ); ?>>Enabled</option>
+            <option value="false" <?php selected( $meta['vp_filter'], 'false' ); ?>>
+                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="default" <?php selected( $meta['vp_filter'], 'default' ); ?>>
+                <?php echo esc_html__( 'Enabled', NK_VP_DOMAIN ); ?>
+            </option>
         </select>
         <?php
     }
@@ -431,12 +478,12 @@ class Visual_Portfolio_Admin {
     public function add_layout_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
         $layouts = array(
-            'tiles' => __( 'Tiles', NK_VP_DOMAIN ),
-            'masonry' => __( 'Masonry', NK_VP_DOMAIN ),
+            'tiles'   => esc_html__( 'Tiles', NK_VP_DOMAIN ),
+            'masonry' => esc_html__( 'Masonry', NK_VP_DOMAIN ),
 
             /*
              * TODO: Justified
-                'justified' => __( 'Justified', NK_VP_DOMAIN ),
+                'justified' => esc_html__( 'Justified', NK_VP_DOMAIN ),
              */
         );
 
@@ -501,18 +548,18 @@ class Visual_Portfolio_Admin {
 
         <div data-cond="[name=vp_layout] == masonry">
             <p class="post-attributes-label-wrapper">
-                <label class="post-attributes-label" for="vp_masonry_columns">Columns:</label>
+                <label class="post-attributes-label" for="vp_masonry_columns"><?php echo esc_html__( 'Columns:', NK_VP_DOMAIN ); ?></label>
             </p>
             <input name="vp_masonry_columns" id="vp_masonry_columns" class="vp-rangeslider" type="range" min="1" max="5" value="<?php echo esc_attr( $meta['vp_masonry_columns'] ); ?>">
         </div>
 
         <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_items_gap">Gap:</label>
+            <label class="post-attributes-label" for="vp_items_gap"><?php echo esc_html__( 'Gap:', NK_VP_DOMAIN ); ?></label>
         </p>
         <input name="vp_items_gap" id="vp_items_gap" class="vp-rangeslider" type="range" min="0" max="150" value="<?php echo esc_attr( $meta['vp_items_gap'] ); ?>">
 
         <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_items_count">Items Per Page:</label>
+            <label class="post-attributes-label" for="vp_items_count"><?php echo esc_html__( 'Items Per Page:', NK_VP_DOMAIN ); ?></label>
         </p>
         <input name="vp_items_count" id="vp_items_count" class="vp-rangeslider" type="range" min="1" max="50" value="<?php echo esc_attr( $meta['vp_items_count'] ); ?>">
         <?php
@@ -542,7 +589,7 @@ class Visual_Portfolio_Admin {
         // post types list.
         $post_types = get_post_types( array(
             'public' => false,
-            'name' => 'attachment',
+            'name'   => 'attachment',
         ), 'names', 'NOT' );
         $post_types_list = array();
         if ( is_array( $post_types ) && ! empty( $post_types ) ) {
@@ -560,13 +607,13 @@ class Visual_Portfolio_Admin {
                 <div class="vp-content-source__item-icon">
                     <span class="dashicons dashicons-portfolio"></span>
                 </div>
-                <div class="vp-content-source__item-title">Portfolio</div>
+                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Portfolio', NK_VP_DOMAIN ); ?></div>
             </div>
             <div class="vp-content-source__item" data-content="post-based">
                 <div class="vp-content-source__item-icon">
                     <span class="dashicons dashicons-media-text"></span>
                 </div>
-                <div class="vp-content-source__item-title">Post-Based</div>
+                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Post-Based', NK_VP_DOMAIN ); ?></div>
             </div>
 
             <div class="vp-content-source__item-content">
@@ -578,8 +625,8 @@ class Visual_Portfolio_Admin {
                         $url = get_admin_url( null, 'edit.php?post_type=portfolio' );
                         $allowed_protocols = array(
                             'a' => array(
-                                'href' => array(),
-                                'target' => array()
+                                'href'   => array(),
+                                'target' => array(),
                             ),
                         );
 
@@ -595,7 +642,9 @@ class Visual_Portfolio_Admin {
                     <p></p>
                     <div class="vp-row">
                         <div class="vp-col-6">
-                            <label class="post-attributes-label" for="vp_posts_source">Data source:</label>
+                            <label class="post-attributes-label" for="vp_posts_source">
+                                <?php echo esc_html__( 'Data source:', NK_VP_DOMAIN ); ?>
+                            </label>
                             <select class="vp-select2" name="vp_posts_source" id="vp_posts_source">
                                 <?php
                                 foreach ( $post_types_list as $post_type ) {
@@ -608,7 +657,9 @@ class Visual_Portfolio_Admin {
                         </div>
 
                         <div class="vp-col-6" data-cond="[name=vp_posts_source] == ids">
-                            <label class="post-attributes-label" for="vp_posts_ids">Specific Posts:</label>
+                            <label class="post-attributes-label" for="vp_posts_ids">
+                                <?php echo esc_html__( 'Specific Posts:', NK_VP_DOMAIN ); ?>
+                            </label>
                             <select class="vp-select2 vp-select2-posts-ajax" type="text" name="vp_posts_ids[]" id="vp_posts_ids" multiple>
                                 <?php
                                 $selected_ids = $meta['vp_posts_ids'];
@@ -633,7 +684,9 @@ class Visual_Portfolio_Admin {
                         </div>
 
                         <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids">
-                            <label class="post-attributes-label" for="vp_posts_excluded_ids">Excluded Posts:</label>
+                            <label class="post-attributes-label" for="vp_posts_excluded_ids">
+                                <?php echo esc_html__( 'Excluded Posts:', NK_VP_DOMAIN ); ?>
+                            </label>
                             <select class="vp-select2 vp-select2-posts-ajax" data-post-type="[name=vp_posts_source]" type="text" name="vp_posts_excluded_ids[]" id="vp_posts_excluded_ids" multiple>
                                 <?php
                                 $excluded_ids = $meta['vp_posts_excluded_ids'];
@@ -658,17 +711,24 @@ class Visual_Portfolio_Admin {
                         </div>
 
                         <div class="vp-col-12" data-cond="[name=vp_posts_source] == custom_query">
-                            <label class="post-attributes-label" for="vp_posts_custom_query">Custom Query:</label>
+                            <label class="post-attributes-label" for="vp_posts_custom_query">
+                                <?php echo esc_html__( 'Custom Query:', NK_VP_DOMAIN ); ?>
+                            </label>
                             <textarea class="vp-input" name="vp_posts_custom_query" id="vp_posts_custom_query" cols="30" rows="3"><?php echo esc_textarea( $meta['vp_posts_custom_query'] ); ?></textarea>
                             <p class="description">
-                                Build custom query according to <a href="http://codex.wordpress.org/Function_Reference/query_posts">WordPress Codex</a>.
+                                <?php
+                                // translators: %1$s - escaped url.
+                                printf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', NK_VP_DOMAIN ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) );
+                                ?>
                             </p>
                         </div>
 
                         <div class="vp-col-clearfix"></div>
 
                         <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids && [name=vp_posts_source] != custom_query">
-                            <label class="post-attributes-label" for="vp_posts_taxonomies">Taxonomies:</label>
+                            <label class="post-attributes-label" for="vp_posts_taxonomies">
+                                <?php echo esc_html__( 'Taxonomies:', NK_VP_DOMAIN ); ?>
+                            </label>
                             <select class="vp-select2 vp-select2-taxonomies-ajax" name="vp_posts_taxonomies[]" id="vp_posts_taxonomies" multiple data-post-type-from="[name=vp_posts_source]">
                                 <?php
                                 $selected_tax = $meta['vp_posts_taxonomies'];
@@ -689,26 +749,46 @@ class Visual_Portfolio_Admin {
                             </select>
                         </div>
                         <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids && [name=vp_posts_source] != custom_query">
-                            <label class="post-attributes-label" for="vp_posts_taxonomies_relation">Taxonomies Relation:</label>
+                            <label class="post-attributes-label" for="vp_posts_taxonomies_relation">
+                                <?php echo esc_html__( 'Taxonomies Relation:', NK_VP_DOMAIN ); ?>
+                            </label>
                             <select class="vp-select2 vp-select2-nosearch" name="vp_posts_taxonomies_relation" id="vp_posts_taxonomies_relation">
-                                <option value="or" <?php selected( $meta['vp_posts_taxonomies_relation'], 'or' ); ?>>OR</option>
-                                <option value="and" <?php selected( $meta['vp_posts_taxonomies_relation'], 'and' ); ?>>AND</option>
+                                <option value="or" <?php selected( $meta['vp_posts_taxonomies_relation'], 'or' ); ?>>
+                                    <?php echo esc_html__( 'OR', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="and" <?php selected( $meta['vp_posts_taxonomies_relation'], 'and' ); ?>>
+                                    <?php echo esc_html__( 'AND', NK_VP_DOMAIN ); ?>
+                                </option>
                             </select>
                         </div>
 
                         <div class="vp-col-6">
-                            <label class="post-attributes-label" for="vp_posts_order_by">Order By:</label>
+                            <label class="post-attributes-label" for="vp_posts_order_by">
+                                <?php echo esc_html__( 'Order By:', NK_VP_DOMAIN ); ?>
+                            </label>
                             <select class="vp-select2 vp-select2-nosearch" name="vp_posts_order_by" id="vp_posts_order_by">
-                                <option value="post_date" <?php selected( $meta['vp_posts_order_by'], 'post_date' ); ?>>Date</option>
-                                <option value="title" <?php selected( $meta['vp_posts_order_by'], 'title' ); ?>>Title</option>
-                                <option value="id" <?php selected( $meta['vp_posts_order_by'], 'id' ); ?>>ID</option>
+                                <option value="post_date" <?php selected( $meta['vp_posts_order_by'], 'post_date' ); ?>>
+                                    <?php echo esc_html__( 'Date', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="title" <?php selected( $meta['vp_posts_order_by'], 'title' ); ?>>
+                                    <?php echo esc_html__( 'Title', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="id" <?php selected( $meta['vp_posts_order_by'], 'id' ); ?>>
+                                    <?php echo esc_html__( 'ID', NK_VP_DOMAIN ); ?>
+                                </option>
                             </select>
                         </div>
                         <div class="vp-col-6">
-                            <label class="post-attributes-label" for="vp_posts_order_direction">Order Direction:</label>
+                            <label class="post-attributes-label" for="vp_posts_order_direction">
+                                <?php echo esc_html__( 'Order Direction:', NK_VP_DOMAIN ); ?>
+                            </label>
                             <select class="vp-select2 vp-select2-nosearch" name="vp_posts_order_direction" id="vp_posts_order_direction">
-                                <option value="desc" <?php selected( $meta['vp_posts_order_direction'], 'desc' ); ?>>DESC</option>
-                                <option value="asc" <?php selected( $meta['vp_posts_order_direction'], 'asc' ); ?>>ASC</option>
+                                <option value="desc" <?php selected( $meta['vp_posts_order_direction'], 'desc' ); ?>>
+                                    <?php echo esc_html__( 'DESC', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="asc" <?php selected( $meta['vp_posts_order_direction'], 'asc' ); ?>>
+                                    <?php echo esc_html__( 'ASC', NK_VP_DOMAIN ); ?>
+                                </option>
                             </select>
                         </div>
                     </div>

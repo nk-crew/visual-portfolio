@@ -278,8 +278,8 @@ class Visual_Portfolio_Get {
             }
 
             // Attachment.
+            // TODO: Option to set custom image size.
             $attachment = get_the_post_thumbnail( get_the_ID(), 'full' );
-
             if ( ! $attachment && $no_image ) {
                 $attachment = wp_get_attachment_image( $no_image, 'full' );
             }
