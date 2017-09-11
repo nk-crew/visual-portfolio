@@ -141,7 +141,10 @@ class Visual_Portfolio_Get {
     static public function get( $options_or_id = array() ) {
         self::enqueue_scripts();
 
+        // generate ID.
         $id = ++self::$id;
+        $id = hash( 'crc32b', $id . $options_or_id );
+
         $options = self::get_options( $options_or_id );
 
         $result        = '';
