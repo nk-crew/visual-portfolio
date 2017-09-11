@@ -24,6 +24,9 @@
     $body.on('focus', '[name="vp_list_shortcode"]', function () {
        this.select();
     });
+    $body.on('click', 'td.vp_lists_post_shortcode', function () {
+        window.getSelection().selectAllChildren(this);
+    });
 
     // enable conditionize
     if ('vp_lists' === $postType.val() && $editForm.length) {
