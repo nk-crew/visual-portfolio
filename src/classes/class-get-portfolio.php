@@ -148,7 +148,7 @@ class Visual_Portfolio_Get {
         $options = self::get_options( $options_or_id );
 
         $result        = '';
-        $class         = 'vp-portfolio';
+        $class         = 'vp-portfolio vp-id-' . $id;
 
         $paged = 0;
         if ( $options['vp_pagination'] ) {

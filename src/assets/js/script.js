@@ -31,7 +31,6 @@
 
             // add id class
             self.id = $item.attr('data-vp-id');
-            self.$item.addClass('vp-id-' + self.id);
 
             // user options
             self.userOptions = userOptions;
