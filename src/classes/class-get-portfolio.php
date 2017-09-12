@@ -341,9 +341,9 @@ class Visual_Portfolio_Get {
 
         <div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>
 
-        <?php echo self::filter( $query_opts, $options ); ?>
-
         <?php
+        self::filter( $query_opts, $options );
+
         // items style.
         $items_wrap_class = 'vp-portfolio__items vp-portfolio__items-style-' . $options['vp_items_style'];
 
@@ -361,7 +361,6 @@ class Visual_Portfolio_Get {
         <div class="<?php echo esc_attr( $items_wrap_class ); ?>">
 
         <?php
-
         while ( $portfolio_query->have_posts() ) :
             $portfolio_query->the_post();
 
@@ -446,12 +445,13 @@ class Visual_Portfolio_Get {
             </div>
             <?php
         endwhile;
+
         wp_reset_postdata();
 
         ?>
         </div>
 
-        <?php echo self::pagination( $portfolio_query, $options ); ?>
+        <?php self::pagination( $portfolio_query, $options ); ?>
 
         </div>
 
@@ -464,14 +464,12 @@ class Visual_Portfolio_Get {
     /**
      * Print filters
      *
-     * @param array  $query_opts query options.
-     * @param object $vp_options current vp_list options.
-     *
-     * @return string
+     * @param array $query_opts query options.
+     * @param array $vp_options current vp_list options.
      */
-    static private function filter( $query_opts = null, $vp_options ) {
+    static private function filter( $query_opts, $vp_options ) {
         if ( empty( $query_opts ) || ! isset( $query_opts ) || ! is_array( $query_opts ) || ! $vp_options['vp_filter'] ) {
-            return '';
+            return;
         }
 
         // Get all available categories for current $query_opts.
@@ -557,18 +555,11 @@ class Visual_Portfolio_Get {
             $args['class'] .= ' vp-filter__align-' . $vp_options['vp_filter_align'];
         }
 
-        ob_start();
-
         switch ( $vp_options['vp_filter'] ) {
             default:
                 visual_portfolio()->include_template( 'items-list/filter/filter', $args );
                 break;
         }
-
-        $return = ob_get_contents();
-        ob_end_clean();
-
-        return $return;
     }
 
     /**
@@ -576,12 +567,10 @@ class Visual_Portfolio_Get {
      *
      * @param object $query wp_query object.
      * @param object $vp_options current vp_list options.
-     *
-     * @return string
      */
     static private function pagination( $query = null, $vp_options ) {
         if ( null == $query || ! $vp_options['vp_pagination'] ) {
-            return '';
+            return;
         }
 
         static $vp_pagination_id = 0;
@@ -609,8 +598,6 @@ class Visual_Portfolio_Get {
         if ( $vp_options['vp_pagination_align'] ) {
             $args['class'] .= ' vp-pagination__align-' . $vp_options['vp_pagination_align'];
         }
-
-        ob_start();
 
         switch ( $vp_options['vp_pagination'] ) {
             case 'infinite':
@@ -677,11 +664,6 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template( 'items-list/pagination/paged', $args );
                 break;
         }
-
-        $return = ob_get_contents();
-        ob_end_clean();
-
-        return $return;
     }
 
     /**
