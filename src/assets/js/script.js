@@ -610,7 +610,6 @@
     VP.prototype.initPhotoswipe = function initPhotoswipe () {
         var self = this;
 
-        var $gallery = $('.nk-popup-gallery');
         if(typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery') {
             return;
         }
@@ -642,7 +641,9 @@
                 };
 
                 if($meta.length) {
-                    item.title = $meta.html();
+                    var $caption = $meta.clone();
+                    $caption.find('.vp-portfolio__item-meta-icon').remove();
+                    item.title = $caption.html();
                 }
 
                 // save link to element for getThumbBoundsFn
@@ -651,9 +652,6 @@
                 if(childElements.length > 0) {
                     // thumbnail url
                     item.msrc = item.src;
-                    if(childElements.length > 1) {
-                        item.title = $(childElements).filter('.photoswipe-description').html();
-                    }
                 }
 
                 var mediumSrc = this.getAttribute('data-vp-popup-med-img') || item.src;
@@ -680,7 +678,7 @@
         };
 
         var openPhotoSwipe = function (index, galleryElement, disableAnimation, fromURL) {
-            var pswpElement = $('.pswp')[0],
+            var pswpElement = $('.vp-pswp')[0],
                 gallery,
                 options,
                 items;
@@ -697,32 +695,7 @@
                 tapToClose: true,
                 tapToToggleControls: false,
                 showHideOpacity: true,
-                galleryUID: self.id,
-
-                // Function builds caption markup
-                addCaptionHTMLFn: function (item, captionEl) {
-                    // item      - slide object
-                    // captionEl - caption DOM element
-                    // isFake    - true when content is added to fake caption container
-                    //             (used to get size of next or previous caption)
-
-                    if(!item.title && !item.author) {
-                        captionEl.children[0].innerHTML = '';
-                        return false;
-                    }
-                    var caption = '';
-                    if(item.title) {
-                        caption += item.title;
-                    }
-                    if(item.author) {
-                        if(item.title) {
-                            caption += '<br>';
-                        }
-                        caption += '<small>' + item.author + '</small>';
-                    }
-                    captionEl.children[0].innerHTML = caption;
-                    return true;
-                }
+                galleryUID: self.id
             };
 
             if(fromURL) {
@@ -827,12 +800,12 @@
         };
 
         // click action
-        self.$item.on('click.vp.vp-id-' + self.id, '.vp-portfolio__item-img-wrap', function (e) {
+        self.$item.on('click.vp.vp-id-' + self.id, '.vp-portfolio__item-wrap', function (e) {
             e.preventDefault();
 
             var index = 0;
             var clicked = this;
-            self.$item.find('.vp-portfolio__item-img-wrap').each(function (idx) {
+            self.$item.find('.vp-portfolio__item-wrap').each(function (idx) {
                 if (this === clicked) {
                     index = idx;
                     return false;
