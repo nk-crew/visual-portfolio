@@ -672,7 +672,7 @@ class Visual_Portfolio_Admin {
                     </label>
                     <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $caption_align_opt ); ?>" id="<?php echo esc_attr( $caption_align_opt ); ?>">
 
-                        <?php if ( 'fly' === $style ) : ?>
+                        <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
                             <optgroup label="<?php echo esc_attr__( 'Top', NK_VP_DOMAIN ); ?>">
                                 <option value="top-center" <?php selected( $meta[ $caption_align_opt ], 'top-center' ); ?>>
                                     <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
