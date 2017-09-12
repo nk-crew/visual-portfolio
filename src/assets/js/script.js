@@ -458,6 +458,7 @@
                 self.addStyle('.vp-portfolio__item .vp-portfolio__item-img', {
                     'margin-left': '-' + gapStyle,
                     'margin-top': '-' + gapStyle,
+                    'padding-top': gapStyle,
                     'width': 'calc(100% + ' + gapStyle + ')'
                 });
                 self.addStyle('.vp-portfolio__item .vp-portfolio__item-img-wrap', {
