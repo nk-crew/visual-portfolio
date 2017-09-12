@@ -22,6 +22,7 @@
         "gulp-line-ending-corrector": "^1.0.1",
         "gulp-cached": "^1.1.0",
         "gulp-sass": "^3.1.0",
+        "gulp-uglify": "^3.0.0",
         "gulp-autoprefixer": "^4.0.0"
     }
 }

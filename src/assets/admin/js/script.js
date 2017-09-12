@@ -1,3 +1,8 @@
+/*!
+ * Name    : Visual Portfolio
+ * Version : 1.0.0
+ * Author  : _nK https://nkdev.info
+ */
 (function ($) {
     "use strict";
 

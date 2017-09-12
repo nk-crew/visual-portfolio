@@ -10,7 +10,8 @@ var gulp      = require('gulp'),
     runSequence  = require('gulp-run-sequence'),
     cache     = require('gulp-cached'),
     del       = require('del'),
-    sass      = require('gulp-sass');
+    sass      = require('gulp-sass'),
+    uglify    = require('gulp-uglify');
 
 var src = 'src';
 var dist = 'dist/' + data.name;
@@ -36,13 +37,33 @@ gulp.task('copy_to_dist', function () {
  * Compile SCSS files
  */
 gulp.task('sass', function () {
-    return gulp.src(dist + '/**/*.scss')
+    return gulp.src(dist + '/assets/**/*.scss')
         .pipe(cache('sass'))
-        .pipe(sass().on('error', sass.logError))
+        .pipe(sass({
+            outputStyle: 'compressed'
+        }).on('error', sass.logError))
         .pipe(autoprefixer({
             browsers: ['last 3 version', '> 1%']
         }))
-        .pipe(gulp.dest(dist));
+        .pipe(gulp.dest(dist + '/assets'));
+});
+gulp.task('sass-clean', function () {
+    return del(dist + '/assets/**/*.scss');
+});
+
+
+/**
+ * Compile JS files
+ */
+gulp.task('js', function () {
+    return gulp.src([dist + '/assets/**/*.js', '!' + dist + '/assets/vendor/**/*'])
+        .pipe(cache('js'))
+        .pipe(uglify({
+            output: {
+                comments: /^!/
+            }
+        }))
+        .pipe(gulp.dest(dist + '/assets'));
 });
 
 
@@ -102,7 +123,7 @@ gulp.task('translate', function () {
  * Main Build Task
  */
 gulp.task('build', function(cb) {
-    runSequence('clean', 'copy_to_dist', 'sass', 'correct_lines_ending', 'update_text_domain', 'remove_unused_constant', 'translate', cb);
+    runSequence('clean', 'copy_to_dist', 'sass', 'sass-clean', 'js', 'correct_lines_ending', 'update_text_domain', 'remove_unused_constant', 'translate', cb);
 });
 gulp.task('watch_build', function(cb) {
     runSequence('copy_to_dist', 'sass', 'correct_lines_ending', 'update_text_domain', 'remove_unused_constant', 'translate', cb);
