@@ -37,6 +37,51 @@ class Visual_Portfolio_Get {
         'vp_items_gap'             => 15,
         'vp_items_count'           => 6,
 
+        // default, fly, fade.
+        'vp_items_style'           => 'fly',
+
+        /**
+         * Default Items Style
+         */
+        'vp_items_style_default__show_title' => true,
+        'vp_items_style_default__show_category' => true,
+        'vp_items_style_default__show_date' => false,
+        'vp_items_style_default__show_description' => false,
+        // center, left, right.
+        'vp_items_style_default__align' => 'center',
+
+        /**
+         * Fly Items Style
+         */
+        // false, title, title_description, title_category, title_category_description, icon.
+        'vp_items_style_fly__show_title' => true,
+        'vp_items_style_fly__show_category' => true,
+        'vp_items_style_fly__show_date' => false,
+        'vp_items_style_fly__show_description' => false,
+        'vp_items_style_fly__show_icon' => false,
+        'vp_items_style_fly__icon' => 'fa fa-search',
+        // *, top-*, bottom-*
+        // * = center, left, right.
+        'vp_items_style_fly__align' => 'center',
+        'vp_items_style_fly__bg_color' => '#212125',
+        'vp_items_style_fly__text_color' => '#fff',
+
+        /**
+         * Fade Items Style
+         */
+        // false, title, title_description, title_category, title_category_description, icon.
+        'vp_items_style_fade__show_title' => true,
+        'vp_items_style_fade__show_category' => true,
+        'vp_items_style_fade__show_date' => false,
+        'vp_items_style_fade__show_description' => false,
+        'vp_items_style_fade__show_icon' => false,
+        'vp_items_style_fade__icon' => 'fa fa-search',
+        // *, top-*, bottom-*
+        // * = center, left, right.
+        'vp_items_style_fade__align' => 'center',
+        'vp_items_style_fade__bg_color' => 'rgba(0, 0, 0, 0.85)',
+        'vp_items_style_fade__text_color' => '#fff',
+
         // false, default.
         'vp_filter'                => 'default',
         // center, left, right.
@@ -79,16 +124,20 @@ class Visual_Portfolio_Get {
             $id = $options_or_id;
             $options_or_id = array();
 
+            $post_meta = get_post_meta( get_the_ID() );
+
             foreach ( self::$defaults as $k => $item ) {
-                $post_meta = get_post_meta( $id, $k, true );
-                if ( isset( $post_meta ) && ! empty( $post_meta ) ) {
-                    if ( 'false' === $post_meta ) {
-                        $post_meta = false;
+                if ( isset( $post_meta[ $k ] ) && isset( $post_meta[ $k ][0] ) ) {
+                    $val = $post_meta[ $k ][0];
+
+                    if ( 'false' === $val || '' === $val ) {
+                        $val = false;
                     }
-                    if ( 'true' === $post_meta ) {
-                        $post_meta = true;
+                    if ( 'true' === $val ) {
+                        $val = true;
                     }
-                    $options_or_id[ $k ] = $post_meta;
+
+                    $options_or_id[ $k ] = $val;
                 }
             }
         }
@@ -111,6 +160,8 @@ class Visual_Portfolio_Get {
             return;
         }
         self::$scripts_enqueued = true;
+
+        wp_enqueue_style( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/css/font-awesome.min.css' );
 
         wp_enqueue_script( 'imagesloaded', visual_portfolio()->plugin_url . 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js', '', '', true );
         wp_enqueue_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '', true );
@@ -147,8 +198,7 @@ class Visual_Portfolio_Get {
 
         $options = self::get_options( $options_or_id );
 
-        $result        = '';
-        $class         = 'vp-portfolio vp-id-' . $id;
+        $class   = 'vp-portfolio vp-id-' . $id;
 
         $paged = 0;
         if ( $options['vp_pagination'] ) {
@@ -261,14 +311,51 @@ class Visual_Portfolio_Get {
 
         // get Post List.
         $portfolio_query = new WP_Query( $query_opts );
-        $portfolio_list = '';
+
+        $start_page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
+        $max_pages = (int) ($portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages);
+        $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
+
+        ob_start();
+        ?>
+
+        <div class="<?php echo esc_attr( $class ); ?>"
+             data-vp-layout="<?php echo esc_attr( $options['vp_layout'] ); ?>"
+             data-vp-tiles-type="<?php echo esc_attr( $options['vp_tiles_type'] ); ?>"
+             data-vp-masonry-columns="<?php echo esc_attr( $options['vp_masonry_columns'] ); ?>"
+             data-vp-items-style="<?php echo esc_attr( $options['vp_items_style'] ); ?>"
+             data-vp-items-gap="<?php echo esc_attr( $options['vp_items_gap'] ); ?>"
+             data-vp-pagination="<?php echo esc_attr( $options['vp_pagination'] ); ?>"
+             data-vp-next-page-url="<?php echo esc_url( $next_page_url ); ?>">
+
+        <div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>
+
+        <?php echo self::filter( $query_opts, $options ); ?>
+
+        <?php
+        // items style.
+        $items_wrap_class = 'vp-portfolio__items vp-portfolio__items-style-' . $options['vp_items_style'];
+
+        // get options for the current style.
+        $style_options = array();
+        $style_options_slug = 'vp_items_style_' . $options['vp_items_style'] . '__';
+        foreach ( $options as $k => $opt ) {
+            if ( substr( $k, 0, strlen( $style_options_slug ) ) === $style_options_slug ) {
+                $opt_name = str_replace( $style_options_slug, '', $k );
+                $style_options[ $opt_name ] = $opt;
+            }
+        }
+        ?>
+
+        <div class="<?php echo esc_attr( $items_wrap_class ); ?>">
+
+        <?php
 
         while ( $portfolio_query->have_posts() ) :
             $portfolio_query->the_post();
 
-            $current_filter_values = array();
-
             // Get category taxonomies for data filter.
+            $current_filter_values = array();
             if ( $options['vp_filter'] ) {
                 $all_taxonomies = get_object_taxonomies( get_post() );
                 foreach ( $all_taxonomies as $cat ) {
@@ -286,84 +373,60 @@ class Visual_Portfolio_Get {
                 }
             }
 
-            // Attachment.
-            // TODO: Option to set custom image size.
-            $attachment = get_the_post_thumbnail( get_the_ID(), 'full' );
-            if ( ! $attachment && $no_image ) {
-                $attachment = wp_get_attachment_image( $no_image, 'full' );
+            // args.
+            $args = array(
+                'url'             => get_permalink(),
+                'title'           => get_the_title(),
+                'published'       => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
+                'filter'          => implode( ',', $current_filter_values ),
+                // TODO: Option to set custom image size.
+                'image'           => get_the_post_thumbnail( get_the_ID(), 'full' ),
+                'style_options'   => $style_options,
+                'vp_list_options' => $options,
+            );
+
+            // No Image.
+            if ( ! $args['image'] && $no_image ) {
+                // TODO: Option to set custom image size.
+                $args['image'] = wp_get_attachment_image( $no_image, 'full' );
             }
+            ?>
 
-            // Post link.
-            $portfolio_url = get_permalink();
-
-            // Title.
-            $title = get_the_title();
-
-            // Published Date.
-            $published_date = get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) );
-
-            // filter data attribute string.
-            $filter_attr = implode( ',', $current_filter_values );
-            if ( $filter_attr ) {
-                $filter_attr = ' data-vp-filter="' . esc_attr( $filter_attr ) . '"';
-            } else {
-                $filter_attr = '';
-            }
-
-            $portfolio_list .= '<div class="vp-portfolio__item"' . $filter_attr . '>';
-
-            $portfolio_list .= '<div class="vp-portfolio__item-img">';
-            $portfolio_list .= '<div class="vp-portfolio__item-img-wrap">';
-            if ( isset( $portfolio_url ) && ! empty( $portfolio_url ) ) {
-                $portfolio_list .= '<a href="' . esc_url( $portfolio_url ) . '">' . $attachment . '</a>';
-            } else {
-                $portfolio_list .= $attachment;
-            }
-            $portfolio_list .= '</div>';
-            $portfolio_list .= '</div>';
-
-            $portfolio_list .= '<div class="vp-portfolio__item-overlay">';
-
-            // add meta data.
-            if ( isset( $title ) && ! empty( $title ) && isset( $portfolio_url ) && ! empty( $portfolio_url ) ) {
-                $portfolio_list .= '<h2 class="nk-portfolio-title nk-post-title h4"><a href="' . esc_url( $portfolio_url ) . '">' . esc_html( $title ) . '</a></h2>';
-            }
-            $portfolio_list .= '<div class="vp-portfolio__item-meta">';
-            if ( isset( $published_date ) && ! empty( $published_date ) ) {
-                $portfolio_list .= '<div class="vp-portfolio__item-meta-date">' . esc_html( $published_date ) . '</div>';
-            }
-            $portfolio_list .= '</div>';
-            $portfolio_list .= '</div>';
-            $portfolio_list .= '</div>';
+            <div class="vp-portfolio__item" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
+                <div class="vp-portfolio__item-wrap">
+                    <?php
+                    switch ( $options['vp_items_style'] ) {
+                        case 'fly':
+                            visual_portfolio()->include_template( 'items-list/items-style/fly/image', $args );
+                            visual_portfolio()->include_template( 'items-list/items-style/fly/meta', $args );
+                            break;
+                        case 'fade':
+                            visual_portfolio()->include_template( 'items-list/items-style/fade/image', $args );
+                            visual_portfolio()->include_template( 'items-list/items-style/fade/meta', $args );
+                            break;
+                        default:
+                            visual_portfolio()->include_template( 'items-list/items-style/image', $args );
+                            visual_portfolio()->include_template( 'items-list/items-style/meta', $args );
+                            break;
+                    }
+                    ?>
+                </div>
+            </div>
+            <?php
         endwhile;
         wp_reset_postdata();
 
-        $start_page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
-        $max_pages = (int) ($portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages);
-        $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
+        ?>
+        </div>
 
-        /**
-         * Work with printing posts
-         */
-        $result .= '<div class="' . esc_attr( $class ) . '" data-vp-id="' . esc_attr( $id ) . '" data-vp-layout="' . esc_attr( $options['vp_layout'] ) . '" data-vp-tiles-type="' . esc_attr( $options['vp_tiles_type'] ) . '" data-vp-masonry-columns="' . esc_attr( $options['vp_masonry_columns'] ) . '" data-vp-items-gap="' . esc_attr( $options['vp_items_gap'] ) . '" data-vp-pagination="' . esc_attr( $options['vp_pagination'] ) . '" data-vp-next-page-url="' . esc_url( $next_page_url ) . '">';
+        <?php echo self::pagination( $portfolio_query, $options ); ?>
 
-        // Place preloader.
-        $result .= '<div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>';
+        </div>
 
-        // Place filter.
-        $result .= self::filter( $query_opts, $options );
-
-        // Place portfolio list.
-        $result .= '<div class="vp-portfolio__wrap">';
-        $result .= $portfolio_list;
-        $result .= '</div>';
-
-        // Place pagination.
-        $result .= self::pagination( $portfolio_query, $options );
-
-        $result .= '</div>';
-
-        return $result;
+        <?php
+        $return = ob_get_contents();
+        ob_end_clean();
+        return $return;
     }
 
     /**

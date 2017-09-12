@@ -25,12 +25,22 @@
             var self = this;
 
             self.$item = $item;
-            self.$wrap = $item.children('.vp-portfolio__wrap');
+            self.$items_wrap = $item.children('.vp-portfolio__items');
             self.$pagination = $item.children('.vp-pagination');
             self.$filter = $item.children('.vp-filter');
 
-            // add id class
-            self.id = $item.attr('data-vp-id');
+            // get id from class
+            var classes = $item[0].className.split(/\s+/);
+            for (var k = 0; k < classes.length; k++) {
+                if (classes[k] && /^vp-id-/.test(classes[k])) {
+                    self.id = classes[k].replace(/^vp-id-/, '');
+                    break;
+                }
+            }
+            if (!self.id) {
+                console.error('Couldn\'t retrieve Visual Portfolio ID.');
+                return;
+            }
 
             // user options
             self.userOptions = userOptions;
@@ -75,8 +85,11 @@
         // init layout
         self.initLayout();
 
+        // init custom colors
+        self.initCustomColors();
+
         // images loaded
-        self.$wrap.imagesLoaded(function() {
+        self.$items_wrap.imagesLoaded(function() {
             self.$item.addClass('vp-portfolio__ready');
 
             // isotope
@@ -167,33 +180,39 @@
         self.renderStyle();
     };
 
+    var renderStylesTimeout;
     /**
      * Render style for the current portfolio list
      */
     VP.prototype.renderStyle = function renderStyle () {
         var self = this;
-        var id = self.id;
-        var stylesString = '';
 
-        // create string with styles
-        if (typeof stylesList[id] !== 'undefined') {
-            for (var k in stylesList[id]) {
-                stylesString += '.vp-id-' + id + ' ' + k + ' {';
-                for (var i in stylesList[id][k]) {
-                    stylesString += i + ':' + stylesList[id][k][i] + ';';
+        // timeout for the case, when styles added one by one
+        clearTimeout(renderStylesTimeout);
+        renderStylesTimeout = setTimeout(function () {
+            var id = self.id;
+            var stylesString = '';
+
+            // create string with styles
+            if (typeof stylesList[id] !== 'undefined') {
+                for (var k in stylesList[id]) {
+                    stylesString += '.vp-id-' + id + ' ' + k + ' {';
+                    for (var i in stylesList[id][k]) {
+                        stylesString += i + ':' + stylesList[id][k][i] + ';';
+                    }
+                    stylesString += '}';
                 }
-                stylesString += '}';
             }
-        }
 
-        // add in style tag
-        var $style = $('#vp-style-' + id);
-        if (!$style.length) {
-            $style = $('<style>').attr('id', 'vp-style-' + id).appendTo('head');
-        }
-        $style.html(stylesString);
+            // add in style tag
+            var $style = $('#vp-style-' + id);
+            if (!$style.length) {
+                $style = $('<style>').attr('id', 'vp-style-' + id).appendTo('head');
+            }
+            $style.html(stylesString);
 
-        self.emitEvent('renderStyle', [stylesString, stylesList, $style]);
+            self.emitEvent('renderStyle', [stylesString, stylesList, $style]);
+        }, 10);
     };
 
     /**
@@ -246,6 +265,42 @@
     VP.prototype.initEvents = function initEvents () {
         var self = this;
         var evp = '.vp.vp-id-' + self.id;
+
+        // Fly style
+        if ('fly' === self.options.itemsStyle) {
+            self.$item.on('mouseenter mouseleave', '.vp-portfolio__item-wrap', function (e) {
+                var $overlay = $(this).find('.vp-portfolio__item-overlay');
+                var itemRect = $(this)[0].getBoundingClientRect();
+
+                // detect mouse enter or leave
+                var x = (itemRect.width / 2 - e.clientX + itemRect.left) / (itemRect.width / 2);
+                var y = (itemRect.height / 2 - e.clientY + itemRect.top) / (itemRect.height / 2);
+                var enter = e.type === 'mouseenter';
+                var endX = '0%';
+                var endY = '0%';
+                if (Math.abs(x) > Math.abs(y)) {
+                    endX = (x > 0 ? '-10' : '10') + endX;
+                } else {
+                    endY = (y > 0 ? '-10' : '10') + endY;
+                }
+
+                if (enter) {
+                    $overlay.css({
+                        transform: 'translateX(' + endX + ') translateY(' + endY + ') translateZ(0)',
+                        transition: 'none'
+                    });
+                }
+
+                setTimeout(function () {
+                    $overlay.css({
+                        transition: '.2s transform cubic-bezier(0.455, 0.030, 0.515, 0.955)'
+                    });
+                    $overlay.css({
+                        transform: 'translateX(' + (enter ? '0%' : endX) + ') translateY(' + (enter ? '0%' : endY) + ') translateZ(0)'
+                    });
+                }, 0);
+            });
+        }
 
         // on filter click
         self.$item.on('click' + evp, '.vp-filter .vp-filter__item a', function (e) {
@@ -378,26 +433,58 @@
 
         // add gaps
         if (self.options.itemsGap && ('tiles' === self.options.layout || 'masonry' === self.options.layout)) {
-            self.addStyle('.vp-portfolio__wrap', {
+            self.addStyle('.vp-portfolio__items', {
                 'margin-left': '-' + self.options.itemsGap + 'px',
                 'margin-top': '-' + self.options.itemsGap + 'px'
             });
 
             var gapStyle = self.options.itemsGap + 'px';
-            var itemStyles = {};
 
+            self.addStyle('.vp-portfolio__item .vp-portfolio__item-wrap', {
+                'margin-left': gapStyle,
+                'margin-top': gapStyle
+            });
+
+            // tiles
             if ('tiles' === self.options.layout) {
-                itemStyles['top'] = gapStyle;
-                itemStyles['left'] = gapStyle;
-            } else {
-                itemStyles['padding-top'] = gapStyle;
-                itemStyles['padding-left'] = gapStyle;
+                self.addStyle('.vp-portfolio__item .vp-portfolio__item-img', {
+                    'margin-left': '-' + gapStyle,
+                    'margin-top': '-' + gapStyle,
+                    'width': 'calc(100% + ' + gapStyle + ')'
+                });
+                self.addStyle('.vp-portfolio__item .vp-portfolio__item-img-wrap', {
+                    'left': gapStyle,
+                    'top': gapStyle
+                });
             }
-
-            self.addStyle('.vp-portfolio__item .vp-portfolio__item-img-wrap', itemStyles);
         }
 
         self.emitEvent('initLayout');
+    };
+
+    /**
+     * Init custom color by data attributes:
+     * data-vp-bg-color
+     * data-vp-text-color
+     */
+    VP.prototype.initCustomColors = function initCustomColors () {
+        var self = this;
+
+        self.$item.find('[data-vp-bg-color]').each(function () {
+            var val = $(this).attr('data-vp-bg-color');
+            self.addStyle('[data-vp-bg-color="' + val + '"]', {
+                'background-color': val
+            });
+        });
+
+        self.$item.find('[data-vp-text-color]').each(function () {
+            var val = $(this).attr('data-vp-text-color');
+            self.addStyle('[data-vp-text-color="' + val + '"]', {
+                'color': val
+            });
+        });
+
+        self.emitEvent('initCustomColors');
     };
 
     /**
@@ -409,7 +496,7 @@
         var self = this;
 
         if (self.options.layout === 'tiles' || self.options.layout === 'masonry') {
-            self.$wrap.isotope(options || {
+            self.$items_wrap.isotope(options || {
                 itemSelector: '.vp-portfolio__item',
                 layoutMode: 'masonry',
                 transitionDuration: 400,
@@ -425,10 +512,10 @@
      */
     VP.prototype.destroyIsotope = function destroyIsotope () {
         var self = this;
-        var isotope = self.$wrap.data('isotope');
+        var isotope = self.$items_wrap.data('isotope');
 
         if (isotope) {
-            self.$wrap.isotope('destroy');
+            self.$items_wrap.isotope('destroy');
 
             self.emitEvent('destroyIsotope');
         }
@@ -441,7 +528,7 @@
         var self = this;
 
         if (self.options.layout === 'justified') {
-            self.$wrap.justifiedGallery({
+            self.$items_wrap.justifiedGallery({
                 lastRow: 'justify',
                 margins: self.options.itemsGap || 0,
                 border: 0,
@@ -460,7 +547,7 @@
      */
     VP.prototype.destroyJustifiedGallery = function destroyJustifiedGallery () {
         var self = this;
-        var jg = self.$wrap.data('jg.controller');
+        var jg = self.$items_wrap.data('jg.controller');
 
         if (jg) {
             // jg.destroy();
@@ -514,19 +601,19 @@
      */
     VP.prototype.addItems = function addItems ($items, removeExisting) {
         var self = this;
-        var isotope = self.$wrap.data('isotope');
+        var isotope = self.$items_wrap.data('isotope');
 
         if (isotope) {
             if (removeExisting) {
-                var $existing = self.$wrap.find('.vp-portfolio__item');
-                self.$wrap.isotope('remove', $existing);
+                var $existing = self.$items_wrap.find('.vp-portfolio__item');
+                self.$items_wrap.isotope('remove', $existing);
             }
 
-            self.$wrap.isotope('insert', $items);
+            self.$items_wrap.isotope('insert', $items);
             self.initIsotope('layout');
 
             // images loaded init
-            self.$wrap.imagesLoaded(function() {
+            self.$items_wrap.imagesLoaded(function() {
                 self.initIsotope('layout');
             });
         }
@@ -539,10 +626,10 @@
      */
     VP.prototype.removeItems = function removeItems ($items) {
         var self = this;
-        var isotope = self.$wrap.data('isotope');
+        var isotope = self.$items_wrap.data('isotope');
 
         if (isotope) {
-            self.$wrap.isotope('remove', $items);
+            self.$items_wrap.isotope('remove', $items);
         }
 
         self.emitEvent('removeItems', [$items]);
@@ -569,11 +656,11 @@
             var $body = $(data).filter('#vp-infinite-load-body');
 
             // find current block on new page
-            var $new_vp = $body.find('.vp-portfolio[data-vp-id="' + self.id + '"]');
+            var $new_vp = $body.find('.vp-portfolio.vp-id-' + self.id);
 
             // insert new items
             if ($new_vp.length) {
-                var newItems = $new_vp.children('.vp-portfolio__wrap').html();
+                var newItems = $new_vp.children('.vp-portfolio__items').html();
 
                 // update filter
                 if (self.$filter.length) {
@@ -607,6 +694,9 @@
             self.loading = false;
 
             self.emitEvent('endLoadingNewItems');
+
+            // init custom colors
+            self.initCustomColors();
 
             if (cb) {
                 cb();

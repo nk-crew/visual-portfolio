@@ -403,6 +403,14 @@ class Visual_Portfolio_Admin {
             'default'
         );
         add_meta_box(
+            'vp_items_style',
+            esc_html__( 'Items Style', NK_VP_DOMAIN ),
+            array( $this, 'add_items_style_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+        add_meta_box(
             'vp_filter',
             esc_html__( 'Filter', NK_VP_DOMAIN ),
             array( $this, 'add_filter_metabox' ),
@@ -476,90 +484,6 @@ class Visual_Portfolio_Admin {
                 display: none;
             }
         </style>
-        <?php
-    }
-
-    /**
-     * Add Filter metabox
-     *
-     * @param object $post The post object.
-     */
-    public function add_filter_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
-
-        ?>
-        <p></p>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_filter" id="vp_filter">
-            <option value="false" <?php selected( $meta['vp_filter'], 'false' ); ?>>
-                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="default" <?php selected( $meta['vp_filter'], 'default' ); ?>>
-                <?php echo esc_html__( 'Enabled', NK_VP_DOMAIN ); ?>
-            </option>
-        </select>
-
-        <div data-cond="[name=vp_filter] != false">
-            <p></p>
-            <label class="post-attributes-label" for="vp_filter_align">
-                <?php echo esc_html__( 'Align:', NK_VP_DOMAIN ); ?>
-            </label>
-            <select class="vp-select2 vp-select2-nosearch" name="vp_filter_align" id="vp_filter_align">
-                <option value="center" <?php selected( $meta['vp_filter_align'], 'center' ); ?>>
-                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
-                </option>
-                <option value="left" <?php selected( $meta['vp_filter_align'], 'left' ); ?>>
-                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
-                </option>
-                <option value="right" <?php selected( $meta['vp_filter_align'], 'right' ); ?>>
-                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
-                </option>
-            </select>
-        </div>
-        <?php
-    }
-
-    /**
-     * Add Pagination metabox
-     *
-     * @param object $post The post object.
-     */
-    public function add_pagination_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
-
-        ?>
-        <p></p>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_pagination" id="vp_pagination">
-            <option value="false" <?php selected( $meta['vp_pagination'], 'false' ); ?>>
-                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="paged" <?php selected( $meta['vp_pagination'], 'paged' ); ?>>
-                <?php echo esc_html__( 'Paged', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="load-more" <?php selected( $meta['vp_pagination'], 'load-more' ); ?>>
-                <?php echo esc_html__( 'Load More', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="infinite" <?php selected( $meta['vp_pagination'], 'infinite' ); ?>>
-                <?php echo esc_html__( 'Infinite', NK_VP_DOMAIN ); ?>
-            </option>
-        </select>
-
-        <div data-cond="[name=vp_pagination] != false">
-            <p></p>
-            <label class="post-attributes-label" for="vp_pagination_align">
-                <?php echo esc_html__( 'Align:', NK_VP_DOMAIN ); ?>
-            </label>
-            <select class="vp-select2 vp-select2-nosearch" name="vp_pagination_align" id="vp_pagination_align">
-                <option value="center" <?php selected( $meta['vp_pagination_align'], 'center' ); ?>>
-                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
-                </option>
-                <option value="left" <?php selected( $meta['vp_pagination_align'], 'left' ); ?>>
-                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
-                </option>
-                <option value="right" <?php selected( $meta['vp_pagination_align'], 'right' ); ?>>
-                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
-                </option>
-            </select>
-        </div>
         <?php
     }
 
@@ -655,6 +579,233 @@ class Visual_Portfolio_Admin {
             <label class="post-attributes-label" for="vp_items_count"><?php echo esc_html__( 'Items Per Page:', NK_VP_DOMAIN ); ?></label>
         </p>
         <input name="vp_items_count" id="vp_items_count" class="vp-rangeslider" type="range" min="1" max="50" value="<?php echo esc_attr( $meta['vp_items_count'] ); ?>">
+        <?php
+    }
+
+    /**
+     * Add Items Style metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_items_style_metabox( $post ) {
+        $meta = Visual_Portfolio_Get::get_options( $post->ID );
+        $styles = array(
+            'default'  => __( 'Default', NK_VP_DOMAIN ),
+            'fly'      => __( 'Fly', NK_VP_DOMAIN ),
+            'fade'     => __( 'Fade', NK_VP_DOMAIN ),
+        );
+
+        ?>
+        <p></p>
+        <select class="vp-select2 vp-select2-nosearch" name="vp_items_style" id="vp_items_style">
+            <?php foreach ( $styles as $style => $label ) : ?>
+                <option value="<?php echo esc_attr( $style ); ?>" <?php selected( $meta['vp_items_style'], $style ); ?>>
+                    <?php echo esc_html( $label ); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <?php foreach ( $styles as $style => $label ) : ?>
+            <div data-cond="[name=vp_items_style] == <?php echo esc_attr( $style ); ?>">
+
+                <?php
+                $opt = 'vp_items_style_' . $style . '__';
+                ?>
+
+                <p>
+                    <label for="<?php echo esc_attr( $opt . 'show_title' ); ?>">
+                        <input name="<?php echo esc_attr( $opt . 'show_title' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_title' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_title' ] ); ?>>
+                        <?php echo esc_html__( 'Show Title', NK_VP_DOMAIN ); ?>
+                    </label>
+                </p>
+
+                <p>
+                    <label for="<?php echo esc_attr( $opt . 'show_category' ); ?>">
+                        <input name="<?php echo esc_attr( $opt . 'show_category' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_category' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_category' ] ); ?>>
+                        <?php echo esc_html__( 'Show Category', NK_VP_DOMAIN ); ?>
+                    </label>
+                </p>
+
+                <p>
+                    <label for="<?php echo esc_attr( $opt . 'show_date' ); ?>">
+                        <input name="<?php echo esc_attr( $opt . 'show_date' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_date' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_date' ] ); ?>>
+                        <?php echo esc_html__( 'Show Date', NK_VP_DOMAIN ); ?>
+                    </label>
+                </p>
+
+                <p>
+                    <label for="<?php echo esc_attr( $opt . 'show_description' ); ?>">
+                        <input name="<?php echo esc_attr( $opt . 'show_description' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_description' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_description' ] ); ?>>
+                        <?php echo esc_html__( 'Show Description', NK_VP_DOMAIN ); ?>
+                    </label>
+                </p>
+
+                <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
+                    <p>
+                        <label for="<?php echo esc_attr( $opt . 'show_icon' ); ?>">
+                            <input name="<?php echo esc_attr( $opt . 'show_icon' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_icon' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_icon' ] ); ?>>
+                            <?php echo esc_html__( 'Show Icon', NK_VP_DOMAIN ); ?>
+                        </label>
+                    </p>
+
+                    <div data-cond="[name=<?php echo esc_attr( $opt . 'show_icon' ); ?>]">
+                        <p></p>
+                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon' ] ); ?>">
+                    </div>
+                <?php endif; ?>
+
+                <?php
+                $caption_align_opt = $opt . 'align';
+                ?>
+                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_title' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_category' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_date' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_description' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_icon' ); ?>] == true">
+                    <p></p>
+                    <label class="post-attributes-label" for="<?php echo esc_attr( $caption_align_opt ); ?>">
+                        <?php echo esc_html__( 'Caption Align:', NK_VP_DOMAIN ); ?>
+                    </label>
+                    <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $caption_align_opt ); ?>" id="<?php echo esc_attr( $caption_align_opt ); ?>">
+
+                        <?php if ( 'fly' === $style ) : ?>
+                            <optgroup label="<?php echo esc_attr__( 'Top', NK_VP_DOMAIN ); ?>">
+                                <option value="top-center" <?php selected( $meta[ $caption_align_opt ], 'top-center' ); ?>>
+                                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="top-left" <?php selected( $meta[ $caption_align_opt ], 'top-left' ); ?>>
+                                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="top-right" <?php selected( $meta[ $caption_align_opt ], 'top-right' ); ?>>
+                                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                                </option>
+                            </optgroup>
+                            <optgroup label="<?php echo esc_attr__( 'Center', NK_VP_DOMAIN ); ?>">
+                        <?php endif; ?>
+
+                            <option value="center" <?php selected( $meta[ $caption_align_opt ], 'center' ); ?>>
+                                <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                            </option>
+                            <option value="left" <?php selected( $meta[ $caption_align_opt ], 'left' ); ?>>
+                                <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                            </option>
+                            <option value="right" <?php selected( $meta[ $caption_align_opt ], 'right' ); ?>>
+                                <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                            </option>
+
+                        <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
+                            </optgroup>
+                            <optgroup label="<?php echo esc_attr__( 'Bottom', NK_VP_DOMAIN ); ?>">
+                                <option value="bottom-center" <?php selected( $meta[ $caption_align_opt ], 'bottom-center' ); ?>>
+                                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="bottom-left" <?php selected( $meta[ $caption_align_opt ], 'bottom-left' ); ?>>
+                                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="bottom-right" <?php selected( $meta[ $caption_align_opt ], 'bottom-right' ); ?>>
+                                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                                </option>
+                            </optgroup>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
+                <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
+                    <p></p>
+                    <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'bg_color' ); ?>">
+                        <?php echo esc_html__( 'Overlay Background Color:', NK_VP_DOMAIN ); ?>
+                    </label>
+                    <input class="vp-input" name="<?php echo esc_attr( $opt . 'bg_color' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'bg_color' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'bg_color' ] ); ?>">
+
+                    <p></p>
+                    <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'text_color' ); ?>">
+                        <?php echo esc_html__( 'Overlay Text Color:', NK_VP_DOMAIN ); ?>
+                    </label>
+                    <input class="vp-input" name="<?php echo esc_attr( $opt . 'text_color' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'text_color' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'text_color' ] ); ?>">
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+
+        <?php
+    }
+
+    /**
+     * Add Filter metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_filter_metabox( $post ) {
+        $meta = Visual_Portfolio_Get::get_options( $post->ID );
+
+        ?>
+        <p></p>
+        <select class="vp-select2 vp-select2-nosearch" name="vp_filter" id="vp_filter">
+            <option value="false" <?php selected( $meta['vp_filter'], 'false' ); ?>>
+                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="default" <?php selected( $meta['vp_filter'], 'default' ); ?>>
+                <?php echo esc_html__( 'Enabled', NK_VP_DOMAIN ); ?>
+            </option>
+        </select>
+
+        <div data-cond="[name=vp_filter] != false">
+            <p></p>
+            <label class="post-attributes-label" for="vp_filter_align">
+                <?php echo esc_html__( 'Align:', NK_VP_DOMAIN ); ?>
+            </label>
+            <select class="vp-select2 vp-select2-nosearch" name="vp_filter_align" id="vp_filter_align">
+                <option value="center" <?php selected( $meta['vp_filter_align'], 'center' ); ?>>
+                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                </option>
+                <option value="left" <?php selected( $meta['vp_filter_align'], 'left' ); ?>>
+                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                </option>
+                <option value="right" <?php selected( $meta['vp_filter_align'], 'right' ); ?>>
+                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                </option>
+            </select>
+        </div>
+        <?php
+    }
+
+    /**
+     * Add Pagination metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_pagination_metabox( $post ) {
+        $meta = Visual_Portfolio_Get::get_options( $post->ID );
+
+        ?>
+        <p></p>
+        <select class="vp-select2 vp-select2-nosearch" name="vp_pagination" id="vp_pagination">
+            <option value="false" <?php selected( $meta['vp_pagination'], 'false' ); ?>>
+                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="paged" <?php selected( $meta['vp_pagination'], 'paged' ); ?>>
+                <?php echo esc_html__( 'Paged', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="load-more" <?php selected( $meta['vp_pagination'], 'load-more' ); ?>>
+                <?php echo esc_html__( 'Load More', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="infinite" <?php selected( $meta['vp_pagination'], 'infinite' ); ?>>
+                <?php echo esc_html__( 'Infinite', NK_VP_DOMAIN ); ?>
+            </option>
+        </select>
+
+        <div data-cond="[name=vp_pagination] != false">
+            <p></p>
+            <label class="post-attributes-label" for="vp_pagination_align">
+                <?php echo esc_html__( 'Align:', NK_VP_DOMAIN ); ?>
+            </label>
+            <select class="vp-select2 vp-select2-nosearch" name="vp_pagination_align" id="vp_pagination_align">
+                <option value="center" <?php selected( $meta['vp_pagination_align'], 'center' ); ?>>
+                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                </option>
+                <option value="left" <?php selected( $meta['vp_pagination_align'], 'left' ); ?>>
+                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                </option>
+                <option value="right" <?php selected( $meta['vp_pagination_align'], 'right' ); ?>>
+                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                </option>
+            </select>
+        </div>
         <?php
     }
 
@@ -917,7 +1068,7 @@ class Visual_Portfolio_Admin {
 
                 update_post_meta( $post_id, $item, $result );
             } else {
-                delete_post_meta( $post_id, $item );
+                update_post_meta( $post_id, $item, false );
             }
         }
     }
