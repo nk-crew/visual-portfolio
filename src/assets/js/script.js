@@ -88,6 +88,9 @@
         // init custom colors
         self.initCustomColors();
 
+        // init photoswipe
+        self.initPhotoswipe();
+
         // images loaded
         self.$items_wrap.imagesLoaded(function() {
             self.$item.addClass('vp-portfolio__ready');
@@ -120,6 +123,9 @@
 
         // remove all generated styles
         self.removeStyle();
+
+        // destroy photoswipe
+        self.destroyPhotoswipe();
 
         // destroy isotope
         self.destroyIsotope();
@@ -594,6 +600,262 @@
 
             self.emitEvent('destroyJustifiedGallery');
         }
+    };
+
+    /**
+     * Init Photoswipe plugin
+     */
+    VP.prototype.initPhotoswipe = function initPhotoswipe () {
+        var self = this;
+
+        var $gallery = $('.nk-popup-gallery');
+        if(typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery') {
+            return;
+        }
+
+        // prepare photoswipe markup
+        var markup = '<div class="pswp vp-pswp vp-pswp-id-' + self.id + '" tabindex="-1" role="dialog" aria-hidden="true">\n          <div class="pswp__bg"></div>\n          <div class="pswp__scroll-wrap">\n            <div class="pswp__container">\n              <div class="pswp__item"></div>\n              <div class="pswp__item"></div>\n              <div class="pswp__item"></div>\n            </div>\n            <div class="pswp__ui pswp__ui--hidden">\n              <div class="pswp__top-bar">\n                <div class="pswp__counter"></div>\n                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>\n                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>\n                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>\n                <div class="pswp__preloader">\n                  <div class="pswp__preloader__icn">\n                    <div class="pswp__preloader__cut">\n                      <div class="pswp__preloader__donut"></div>\n                    </div>\n                  </div>\n                </div>\n              </div>\n              <div class="pswp__loading-indicator"><div class="pswp__loading-indicator__line"></div></div>\n              <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>\n              <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>\n              <div class="pswp__caption">\n                <div class="pswp__caption__center">\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>';
+        $('body').append(markup);
+
+        // init code
+        var parseThumbnailElements = function (el) {
+            var thumbElements = $(el).find('.vp-portfolio__item'),
+                items = [],
+                childElements,
+                $meta,
+                size,
+                item;
+
+            thumbElements.each(function () {
+                childElements = $(this).find('.vp-portfolio__item-img-wrap img');
+                $meta = $(this).find('.vp-portfolio__item-meta');
+                size = (this.getAttribute('data-vp-popup-img-size') || '1920x1080').split('x');
+
+                // create slide object
+                item = {
+                    src: this.getAttribute('data-vp-popup-img'),
+                    w: parseInt(size[0], 10),
+                    h: parseInt(size[1], 10),
+                    author: this.getAttribute('data-author')
+                };
+
+                if($meta.length) {
+                    item.title = $meta.html();
+                }
+
+                // save link to element for getThumbBoundsFn
+                item.el = this;
+
+                if(childElements.length > 0) {
+                    // thumbnail url
+                    item.msrc = item.src;
+                    if(childElements.length > 1) {
+                        item.title = $(childElements).filter('.photoswipe-description').html();
+                    }
+                }
+
+                var mediumSrc = this.getAttribute('data-vp-popup-med-img') || item.src;
+                if(mediumSrc) {
+                    size = (this.getAttribute('data-vp-popup-med-img-size') || this.getAttribute('data-vp-popup-img-size') || '1920x1080').split('x');
+                    // "medium-sized" image
+                    item.m = {
+                        src: mediumSrc,
+                        w: parseInt(size[0], 10),
+                        h: parseInt(size[1], 10)
+                    };
+                }
+
+                // original image
+                item.o = {
+                    src: item.src,
+                    w: item.w,
+                    h: item.h
+                };
+                items.push(item);
+            });
+
+            return items;
+        };
+
+        var openPhotoSwipe = function (index, galleryElement, disableAnimation, fromURL) {
+            var pswpElement = $('.pswp')[0],
+                gallery,
+                options,
+                items;
+
+            items = parseThumbnailElements(galleryElement);
+
+            // define options (if needed)
+            options = {
+                captionAndToolbarShowEmptyCaptions: false,
+                captionEl: true,
+                fullscreenEl: true,
+                shareEl: false,
+                bgOpacity: 1,
+                tapToClose: true,
+                tapToToggleControls: false,
+                showHideOpacity: true,
+                galleryUID: self.id,
+
+                // Function builds caption markup
+                addCaptionHTMLFn: function (item, captionEl) {
+                    // item      - slide object
+                    // captionEl - caption DOM element
+                    // isFake    - true when content is added to fake caption container
+                    //             (used to get size of next or previous caption)
+
+                    if(!item.title && !item.author) {
+                        captionEl.children[0].innerHTML = '';
+                        return false;
+                    }
+                    var caption = '';
+                    if(item.title) {
+                        caption += item.title;
+                    }
+                    if(item.author) {
+                        if(item.title) {
+                            caption += '<br>';
+                        }
+                        caption += '<small>' + item.author + '</small>';
+                    }
+                    captionEl.children[0].innerHTML = caption;
+                    return true;
+                }
+            };
+
+            if(fromURL) {
+                if(options.galleryPIDs) {
+                    // parse real index when custom PIDs are used
+                    // http://photoswipe.com/documentation/faq.html#custom-pid-in-url
+                    for(var j = 0; j < items.length; j++) {
+                        if(items[j].pid === index) {
+                            options.index = j;
+                            break;
+                        }
+                    }
+                } else {
+                    options.index = parseInt(index, 10) - 1;
+                }
+            } else {
+                options.index = parseInt(index, 10);
+            }
+
+            // exit if index not found
+            if(isNaN(options.index)) {
+                return;
+            }
+
+            if(disableAnimation) {
+                options.showAnimationDuration = 0;
+            }
+
+            // Pass data to PhotoSwipe and initialize it
+            gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+
+            // see: http://photoswipe.com/documentation/responsive-images.html
+            var realViewportWidth,
+                useLargeImages = false,
+                firstResize = true,
+                imageSrcWillChange;
+
+            gallery.listen('beforeResize', function () {
+                var dpiRatio = window.devicePixelRatio ? window.devicePixelRatio : 1;
+                dpiRatio = Math.min(dpiRatio, 2.5);
+                realViewportWidth = gallery.viewportSize.x * dpiRatio;
+
+                if(realViewportWidth >= 1200 || !gallery.likelyTouchDevice && realViewportWidth > 800 || screen.width > 1200 ) {
+                    if(!useLargeImages) {
+                        useLargeImages = true;
+                        imageSrcWillChange = true;
+                    }
+                } else {
+                    if(useLargeImages) {
+                        useLargeImages = false;
+                        imageSrcWillChange = true;
+                    }
+                }
+
+                if(imageSrcWillChange && !firstResize) {
+                    gallery.invalidateCurrItems();
+                }
+
+                if(firstResize) {
+                    firstResize = false;
+                }
+
+                imageSrcWillChange = false;
+            });
+
+            gallery.listen('gettingData', function (idx, item) {
+                if( useLargeImages ) {
+                    item.src = item.o.src;
+                    item.w = item.o.w;
+                    item.h = item.o.h;
+                } else {
+                    item.src = item.m.src;
+                    item.w = item.m.w;
+                    item.h = item.m.h;
+                }
+            });
+
+            gallery.init();
+        };
+
+        var photoswipeParseHash = function () {
+            var hash = window.location.hash.substring(1),
+                params = {};
+
+            if(hash.length < 5) { // pid=1
+                return params;
+            }
+
+            var vars = hash.split('&');
+            for (var i = 0; i < vars.length; i++) {
+                if(!vars[i]) {
+                    continue;
+                }
+                var pair = vars[i].split('=');
+                if(pair.length < 2) {
+                    continue;
+                }
+                params[pair[0]] = pair[1];
+            }
+
+            return params;
+        };
+
+        // click action
+        self.$item.on('click.vp.vp-id-' + self.id, '.vp-portfolio__item-img-wrap', function (e) {
+            e.preventDefault();
+
+            var index = 0;
+            var clicked = this;
+            self.$item.find('.vp-portfolio__item-img-wrap').each(function (idx) {
+                if (this === clicked) {
+                    index = idx;
+                    return false;
+                }
+                return true;
+            });
+            openPhotoSwipe(index, self.$item[0]);
+        });
+
+        // Parse URL and open gallery if it contains #&pid=3&gid=1
+        var hashData = photoswipeParseHash();
+        if(hashData.pid && hashData.gid === self.id) {
+            openPhotoSwipe(hashData.pid, self.$item[0], true, true);
+        }
+    };
+
+    /**
+     * Destroy Photoswipe plugin
+     */
+    VP.prototype.destroyPhotoswipe = function destroyPhotoswipe () {
+        var self = this;
+
+        self.$item.off('click.vp.vp-id-' + self.id);
+
+        $('.vp-pswp-id-' + self.id).remove();
     };
 
     /**

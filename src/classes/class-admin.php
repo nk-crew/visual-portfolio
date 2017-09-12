@@ -411,6 +411,14 @@ class Visual_Portfolio_Admin {
             'default'
         );
         add_meta_box(
+            'vp_items_click_action',
+            esc_html__( 'Items Click Action', NK_VP_DOMAIN ),
+            array( $this, 'add_items_click_action_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+        add_meta_box(
             'vp_filter',
             esc_html__( 'Filter', NK_VP_DOMAIN ),
             array( $this, 'add_filter_metabox' ),
@@ -722,6 +730,30 @@ class Visual_Portfolio_Admin {
             </div>
         <?php endforeach; ?>
 
+        <?php
+    }
+
+    /**
+     * Add Items Click Action metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_items_click_action_metabox( $post ) {
+        $meta = Visual_Portfolio_Get::get_options( $post->ID );
+
+        ?>
+        <p></p>
+        <select class="vp-select2 vp-select2-nosearch" name="vp_items_click_action" id="vp_items_click_action">
+            <option value="false" <?php selected( $meta['vp_items_click_action'], 'false' ); ?>>
+                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="url" <?php selected( $meta['vp_items_click_action'], 'url' ); ?>>
+                <?php echo esc_html__( 'URL', NK_VP_DOMAIN ); ?>
+            </option>
+            <option value="popup_gallery" <?php selected( $meta['vp_items_click_action'], 'popup_gallery' ); ?>>
+                <?php echo esc_html__( 'Popup Gallery', NK_VP_DOMAIN ); ?>
+            </option>
+        </select>
         <?php
     }
 

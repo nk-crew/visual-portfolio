@@ -82,6 +82,9 @@ class Visual_Portfolio_Get {
         'vp_items_style_fade__bg_color' => 'rgba(0, 0, 0, 0.85)',
         'vp_items_style_fade__text_color' => '#fff',
 
+        // false, url, popup_gallery.
+        'vp_items_click_action'    => 'url',
+
         // false, default.
         'vp_filter'                => 'default',
         // center, left, right.
@@ -171,6 +174,13 @@ class Visual_Portfolio_Get {
            wp_enqueue_script( 'justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/justified-gallery/js/jquery.justifiedGallery.min.js', array( 'jquery' ), '', true );
          */
 
+        // PhotoSwipe.
+        wp_enqueue_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css' );
+        wp_enqueue_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css' );
+        wp_enqueue_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', '', '', true );
+        wp_enqueue_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', '', '', true );
+
+        // Visual Portfolio.
         wp_enqueue_script( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/js/script.js', array( 'jquery' ), '', true );
         wp_enqueue_style( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/css/style.css' );
     }
@@ -324,6 +334,7 @@ class Visual_Portfolio_Get {
              data-vp-tiles-type="<?php echo esc_attr( $options['vp_tiles_type'] ); ?>"
              data-vp-masonry-columns="<?php echo esc_attr( $options['vp_masonry_columns'] ); ?>"
              data-vp-items-style="<?php echo esc_attr( $options['vp_items_style'] ); ?>"
+             data-vp-items-click-action="<?php echo esc_attr( $options['vp_items_click_action'] ); ?>"
              data-vp-items-gap="<?php echo esc_attr( $options['vp_items_gap'] ); ?>"
              data-vp-pagination="<?php echo esc_attr( $options['vp_pagination'] ); ?>"
              data-vp-next-page-url="<?php echo esc_url( $next_page_url ); ?>">
@@ -385,6 +396,21 @@ class Visual_Portfolio_Get {
                 'vp_list_options' => $options,
             );
 
+            // Click action.
+            $popup_image = false;
+            switch ( $options['vp_items_click_action'] ) {
+                case 'popup_gallery':
+                    if ( $args['image'] ) {
+                        $popup_image = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full' );
+                    } else if ( $no_image ) {
+                        $popup_image = wp_get_attachment_image_src( $no_image, 'full' );
+                    }
+                    break;
+                case false:
+                    $args['url'] = false;
+                    break;
+            }
+
             // No Image.
             if ( ! $args['image'] && $no_image ) {
                 // TODO: Option to set custom image size.
@@ -392,7 +418,13 @@ class Visual_Portfolio_Get {
             }
             ?>
 
-            <div class="vp-portfolio__item" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
+            <div class="vp-portfolio__item" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>"
+                <?php
+                if ( $popup_image ) {
+                    ?>
+                    data-vp-popup-img="<?php echo esc_url( $popup_image[0] ); ?>"
+                    data-vp-popup-img-size="<?php echo esc_attr( $popup_image[1] ); ?>x<?php echo esc_attr( $popup_image[2] ); ?>"
+                <? } ?>>
                 <div class="vp-portfolio__item-wrap">
                     <?php
                     switch ( $options['vp_items_style'] ) {
