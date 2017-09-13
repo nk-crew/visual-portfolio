@@ -109,8 +109,12 @@
         position: relative;
         display: block;
         overflow: hidden;
-        width: 100%;
-        padding-bottom: 56%;
+
+        &:before {
+            content: '';
+            display: block;
+            margin-top: 56%;
+        }
     }
     .vp-portfolio__item-img img {
         width: 100%;

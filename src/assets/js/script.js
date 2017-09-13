@@ -431,8 +431,8 @@
                                     'width': (w * 100 / columns) + '%'
                                 });
                             }
-                            self.addStyle(itemSelector + ' .vp-portfolio__item-img', {
-                                'padding-bottom': (h * 100) + '%'
+                            self.addStyle(itemSelector + ' .vp-portfolio__item-img:before', {
+                                'margin-top': (h * 100) + '%'
                             });
                         }
                     }
@@ -464,9 +464,7 @@
             if ('tiles' === self.options.layout) {
                 self.addStyle('.vp-portfolio__item .vp-portfolio__item-img', {
                     'margin-left': '-' + gapStyle,
-                    'margin-top': '-' + gapStyle,
-                    'padding-top': gapStyle,
-                    'width': 'calc(100% + ' + gapStyle + ')'
+                    'margin-top': '-' + gapStyle
                 });
                 self.addStyle('.vp-portfolio__item .vp-portfolio__item-img-wrap', {
                     'left': gapStyle,
