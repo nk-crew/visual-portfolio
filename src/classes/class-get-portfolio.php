@@ -44,7 +44,8 @@ class Visual_Portfolio_Get {
          * Default Items Style
          */
         'vp_items_style_default__show_title' => true,
-        'vp_items_style_default__show_category' => true,
+        'vp_items_style_default__show_categories' => true,
+        'vp_items_style_default__categories_count' => 1,
         'vp_items_style_default__show_date' => false,
         'vp_items_style_default__show_excerpt' => false,
         'vp_items_style_default__excerpt_words_count' => 15,
@@ -56,7 +57,8 @@ class Visual_Portfolio_Get {
          */
         // false, title, title_description, title_category, title_category_description, icon.
         'vp_items_style_fly__show_title' => true,
-        'vp_items_style_fly__show_category' => true,
+        'vp_items_style_fly__show_categories' => true,
+        'vp_items_style_fly__categories_count' => 1,
         'vp_items_style_fly__show_date' => false,
         'vp_items_style_fly__show_excerpt' => false,
         'vp_items_style_fly__excerpt_words_count' => 15,
@@ -73,7 +75,8 @@ class Visual_Portfolio_Get {
          */
         // false, title, title_description, title_category, title_category_description, icon.
         'vp_items_style_fade__show_title' => true,
-        'vp_items_style_fade__show_category' => true,
+        'vp_items_style_fade__show_categories' => true,
+        'vp_items_style_fade__categories_count' => 1,
         'vp_items_style_fade__show_date' => false,
         'vp_items_style_fade__show_excerpt' => false,
         'vp_items_style_fade__excerpt_words_count' => 15,
@@ -368,7 +371,8 @@ class Visual_Portfolio_Get {
             $portfolio_query->the_post();
 
             // Get category taxonomies for data filter.
-            $current_filter_values = array();
+            $filter_values = array();
+            $categories = array();
             if ( $options['vp_filter'] ) {
                 $all_taxonomies = get_object_taxonomies( get_post() );
                 foreach ( $all_taxonomies as $cat ) {
@@ -378,9 +382,25 @@ class Visual_Portfolio_Get {
                     }
 
                     $category = get_the_terms( get_post(), $cat );
-                    if ( $category && ! in_array( $category, $current_filter_values ) ) {
+
+                    if ( $category && ! in_array( $category, $filter_values ) ) {
                         foreach ( $category as $key => $cat_item ) {
-                            $current_filter_values[] = $cat_item->slug;
+                            // add in filter.
+                            $filter_values[] = $cat_item->slug;
+
+                            // add in categories array.
+                            $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
+                            $url = self::get_nopaging_url( false, array(
+                                'vp_filter' => urlencode( $unique_name ),
+                            ) );
+                            $categories[] = array(
+                                'slug'        => $cat_item->slug,
+                                'label'       => $cat_item->name,
+                                'description' => $cat_item->description,
+                                'count'       => $cat_item->count,
+                                'taxonomy'    => $cat_item->taxonomy,
+                                'url'         => $url,
+                            );
                         }
                     }
                 }
@@ -391,9 +411,10 @@ class Visual_Portfolio_Get {
                 'url'             => get_permalink(),
                 'title'           => get_the_title(),
                 'published'       => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
-                'filter'          => implode( ',', $current_filter_values ),
+                'filter'          => implode( ',', $filter_values ),
                 // TODO: Option to set custom image size.
                 'image'           => get_the_post_thumbnail( get_the_ID(), 'full' ),
+                'categories'      => $categories,
                 'style_options'   => $style_options,
                 'vp_list_options' => $options,
             );

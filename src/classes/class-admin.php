@@ -632,11 +632,18 @@ class Visual_Portfolio_Admin {
                 </p>
 
                 <p>
-                    <label for="<?php echo esc_attr( $opt . 'show_category' ); ?>">
-                        <input name="<?php echo esc_attr( $opt . 'show_category' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_category' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_category' ] ); ?>>
-                        <?php echo esc_html__( 'Show Category', NK_VP_DOMAIN ); ?>
+                    <label for="<?php echo esc_attr( $opt . 'show_categories' ); ?>">
+                        <input name="<?php echo esc_attr( $opt . 'show_categories' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_categories' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_categories' ] ); ?>>
+                        <?php echo esc_html__( 'Show Categories', NK_VP_DOMAIN ); ?>
                     </label>
                 </p>
+
+                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_categories' ); ?>]">
+                    <p class="post-attributes-label-wrapper">
+                        <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'categories_count' ); ?>"><?php echo esc_html__( 'Categories Count:', NK_VP_DOMAIN ); ?></label>
+                    </p>
+                    <input name="<?php echo esc_attr( $opt . 'categories_count' ); ?>" id="<?php echo esc_attr( $opt . 'categories_count' ); ?>" class="vp-rangeslider" type="range" min="1" max="10" value="<?php echo esc_attr( $meta[ $opt . 'categories_count' ] ); ?>">
+                </div>
 
                 <p>
                     <label for="<?php echo esc_attr( $opt . 'show_date' ); ?>">
@@ -676,7 +683,7 @@ class Visual_Portfolio_Admin {
                 <?php
                 $caption_align_opt = $opt . 'align';
                 ?>
-                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_title' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_category' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_date' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_excerpt' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_icon' ); ?>] == true">
+                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_title' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_categories' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_date' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_excerpt' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_icon' ); ?>] == true">
                     <p></p>
                     <label class="post-attributes-label" for="<?php echo esc_attr( $caption_align_opt ); ?>">
                         <?php echo esc_html__( 'Caption Align:', NK_VP_DOMAIN ); ?>

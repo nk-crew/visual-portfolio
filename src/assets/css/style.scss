@@ -152,6 +152,7 @@
 // Items Default Style
 .vp-portfolio__items-style-default {
     .vp-portfolio__item-meta {
+        position: relative;
         padding: 10px 15px;
 
         * + * {
@@ -173,7 +174,35 @@
             }
         }
         .vp-portfolio__item-meta-date {
-            font-size: 12px;
+            font-size: 11px;
+        }
+        .vp-portfolio__item-meta-categories {
+            position: absolute;
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none;
+            left: 0;
+            bottom: 100%;
+            margin: 0;
+            padding: 15px 10px;
+
+            .vp-portfolio__item-meta-category {
+                margin: 0 5px;
+                padding: 0;
+                
+                a {
+                    display: block;
+                    padding: 5px 10px;
+                    background-color: #4a4a4a;
+                    color: #fff;
+                    text-decoration: none;
+                    transition: .2s background-color;
+
+                    &:hover {
+                        background-color: #373737;
+                    }
+                }
+            }
         }
     }
 
@@ -221,10 +250,32 @@
             padding: 0 !important;
         }
         .vp-portfolio__item-meta-date {
-            font-size: 12px;
+            font-size: 11px;
         }
         .vp-portfolio__item-meta-icon {
             font-size: 30px;
+
+            + * {
+                margin-top: 15px !important;
+            }
+        }
+        .vp-portfolio__item-meta-categories {
+            position: absolute;
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none;
+            left: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 15px 10px;
+
+            .vp-portfolio__item-meta-category {
+                display: block;
+                margin: 0 5px;
+                padding: 5px 10px;
+                background-color: #3a3a3a;
+                color: #fff;
+            }
         }
     }
 
@@ -308,10 +359,32 @@
             padding: 0 !important;
         }
         .vp-portfolio__item-meta-date {
-            font-size: 12px;
+            font-size: 11px;
         }
         .vp-portfolio__item-meta-icon {
             font-size: 30px;
+
+            + * {
+                margin-top: 15px !important;
+            }
+        }
+        .vp-portfolio__item-meta-categories {
+            position: absolute;
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none;
+            left: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 15px 10px;
+
+            .vp-portfolio__item-meta-category {
+                display: block;
+                margin: 0 5px;
+                padding: 5px 10px;
+                background-color: #3a3a3a;
+                color: #fff;
+            }
         }
     }
 
