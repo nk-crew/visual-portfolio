@@ -325,6 +325,13 @@
             self.loadNewItems(this.href, self.options.pagination === 'paged');
         });
 
+        // on categories of item click
+        self.$item.on('click' + evp, '.vp-portfolio__items .vp-portfolio__item-meta-category a', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.loadNewItems(this.href, true);
+        });
+
         // infinite loading
         var scrollTimeout;
         var bottomPosToLoad = 250;
