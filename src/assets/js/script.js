@@ -508,6 +508,9 @@
             self.$items_wrap.isotope(options || {
                 itemSelector: '.vp-portfolio__item',
                 layoutMode: 'masonry',
+                // masonry: {
+                //     horizontalOrder: true
+                // },
                 transitionDuration: 400,
                 percentPosition: true
             });
