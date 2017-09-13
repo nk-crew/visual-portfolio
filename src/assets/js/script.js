@@ -276,7 +276,7 @@
 
         // Fly style
         if ('fly' === self.options.itemsStyle) {
-            self.$item.on('mouseenter mouseleave', '.vp-portfolio__item-wrap', function (e) {
+            self.$item.on('mouseenter'  + evp + ' mouseleave' + evp, '.vp-portfolio__item-wrap', function (e) {
                 var $overlay = $(this).find('.vp-portfolio__item-overlay');
                 var itemRect = $(this)[0].getBoundingClientRect();
 
@@ -368,7 +368,7 @@
         self.$item.off('click' + evp);
 
         // destroy infinite load events
-        $wnd.off('load' + evp + ' scroll' + evp + ' resize' + evp + ' orientationchange' + evp);
+        $wnd.off('load' + evp + ' scroll' + evp + ' resize' + evp + ' orientationchange' + evp + ' mouseenter'  + evp + ' mouseleave' + evp);
 
         self.emitEvent('destroyEvents');
     };
