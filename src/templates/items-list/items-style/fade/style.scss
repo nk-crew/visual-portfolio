@@ -45,6 +45,24 @@
                 margin-top: 15px !important;
             }
         }
+        .vp-portfolio__item-meta-categories {
+            position: absolute;
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none;
+            left: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 15px 10px;
+
+            .vp-portfolio__item-meta-category {
+                display: block;
+                margin: 0 5px;
+                padding: 5px 10px;
+                background-color: #4a4a4a;
+                color: #fff;
+            }
+        }
     }
 
     // align
