@@ -459,14 +459,17 @@ class Visual_Portfolio_Get {
                         case 'fly':
                             visual_portfolio()->include_template( 'items-list/items-style/fly/image', $args );
                             visual_portfolio()->include_template( 'items-list/items-style/fly/meta', $args );
+                            visual_portfolio()->include_template_style( 'visual-portfolio-items-style-fly', 'items-list/items-style/fly/style' );
                             break;
                         case 'fade':
                             visual_portfolio()->include_template( 'items-list/items-style/fade/image', $args );
                             visual_portfolio()->include_template( 'items-list/items-style/fade/meta', $args );
+                            visual_portfolio()->include_template_style( 'visual-portfolio-items-style-fade', 'items-list/items-style/fade/style' );
                             break;
                         default:
                             visual_portfolio()->include_template( 'items-list/items-style/image', $args );
                             visual_portfolio()->include_template( 'items-list/items-style/meta', $args );
+                            visual_portfolio()->include_template_style( 'visual-portfolio-items-style-default', 'items-list/items-style/style' );
                             break;
                     }
                     ?>
@@ -587,6 +590,7 @@ class Visual_Portfolio_Get {
         switch ( $vp_options['vp_filter'] ) {
             default:
                 visual_portfolio()->include_template( 'items-list/filter/filter', $args );
+                visual_portfolio()->include_template_style( 'visual-portfolio-filter-default', 'items-list/filter/style' );
                 break;
         }
     }
@@ -693,6 +697,7 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template( 'items-list/pagination/paged', $args );
                 break;
         }
+        visual_portfolio()->include_template_style( 'visual-portfolio-pagination-default', 'items-list/pagination/style' );
     }
 
     /**

@@ -1,0 +1,56 @@
+/**
+ * Default filter style
+ */
+.vp-filter__style-default {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: -3px;
+    padding: 0;
+    margin-bottom: 17px;
+
+    a {
+        outline: none;
+        box-shadow: none;
+    }
+
+    // align
+    &.vp-filter__align-left {
+        justify-content: flex-start;
+    }
+    &.vp-filter__align-right {
+        justify-content: flex-end;
+    }
+
+    .vp-filter__item {
+        flex: 0 0 auto;
+        list-style-type: none;
+        text-align: center;
+        margin: 3px;
+        padding: 0;
+
+        > * {
+            display: block;
+            text-decoration: none;
+            padding: 8px 14px;
+            min-width: 40px;
+            line-height: 1.4;
+            color: inherit;
+            border: 1px solid #eaeaea;
+            background-color: #fff;
+            transition: .2s border-color, .2s background-color, .2s color;
+        }
+
+        &:not(.vp-filter__item-active) > a:hover {
+            border-color: #bfbfbf;
+        }
+
+        &.vp-filter__item-active > * {
+            cursor: default;
+            border-color: #0085ba;
+            background-color: #0082b7;
+            color: #fff;
+        }
+    }
+}

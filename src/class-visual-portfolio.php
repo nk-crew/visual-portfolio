@@ -164,12 +164,7 @@ class Visual_Portfolio {
         }
 
         // template in theme folder.
-        $template = locate_template( array( '/visual-portfolio/' . $template_name . '.php', $template_name . '.php' ) );
-
-        // template from plugins folder.
-        if ( ! $template ) {
-            $template = locate_template( array( '/plugins/visual-portfolio/' . $template_name . '.php', $template_name . '.php' ) );
-        }
+        $template = locate_template( array( '/visual-portfolio/' . $template_name . '.php' ) );
 
         // default template.
         if ( ! $template ) {
@@ -180,6 +175,33 @@ class Visual_Portfolio {
         $template = apply_filters( 'vp_include_template', $template, $template_name, $args );
 
         include $template;
+    }
+
+    /**
+     * Include template style
+     *
+     * @param string       $handle style handle name.
+     * @param string       $template_name file name.
+     * @param array|string $dependencies dependencies array.
+     * @param string       $version version string.
+     * @param string       $media media string.
+     */
+    public function include_template_style( $handle, $template_name, $dependencies = '', $version = '', $media = '' ) {
+        if ( file_exists( get_stylesheet_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
+            // Child Theme (or just theme).
+            $template = trailingslashit( get_stylesheet_directory_uri() ) . '/visual-portfolio/' . $template_name . '.css';
+        } else if ( file_exists( get_template_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
+            // Parent Theme (if parent exists).
+            $template = trailingslashit( get_template_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
+        } else {
+            // Default file in plugin folder.
+            $template = $this->plugin_url . 'templates/' . $template_name . '.css';
+        }
+
+        // Allow 3rd party plugin filter template file from their plugin.
+        $template = apply_filters( 'vp_include_template_style', $template, $template_name, $dependencies, $version, $media );
+
+        wp_enqueue_style( $handle, $template, $dependencies, $version, $media );
     }
 }
 

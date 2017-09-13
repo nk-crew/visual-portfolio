@@ -1,0 +1,104 @@
+/**
+ * Fly items style
+ */
+.vp-portfolio__items-style-fly {
+    .vp-portfolio__item-overlay {
+        position: absolute;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        text-decoration: none;
+        background-color: #212125;
+        transform: translateY(-100%) translateX(-100%);
+        color: #fff;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 20px;
+    }
+    .vp-portfolio__item-meta {
+        * + * {
+            margin-top: 4px;
+        }
+
+        .nk-portfolio__item-meta-title {
+            color: inherit;
+            font-weight: 500;
+            font-size: 16px !important;
+            padding: 0 !important;
+        }
+        .vp-portfolio__item-meta-date {
+            font-size: 11px;
+        }
+        .vp-portfolio__item-meta-icon {
+            font-size: 30px;
+
+            + * {
+                margin-top: 15px !important;
+            }
+        }
+        .vp-portfolio__item-meta-categories {
+            position: absolute;
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none;
+            left: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 15px 10px;
+
+            .vp-portfolio__item-meta-category {
+                display: block;
+                margin: 0 5px;
+                padding: 5px 10px;
+                background-color: #4a4a4a;
+                color: #fff;
+            }
+        }
+    }
+
+    // align
+    .vp-portfolio__item-align-left {
+        justify-content: flex-start;
+        text-align: left;
+    }
+    .vp-portfolio__item-align-right {
+        justify-content: flex-end;
+        text-align: right;
+    }
+
+    .vp-portfolio__item-align-top-center {
+        justify-content: center;
+        align-items: flex-start;
+        text-align: center;
+    }
+    .vp-portfolio__item-align-top-left {
+        justify-content: flex-start;
+        align-items: flex-start;
+        text-align: left;
+    }
+    .vp-portfolio__item-align-top-right {
+        justify-content: flex-end;
+        align-items: flex-start;
+        text-align: right;
+    }
+
+    .vp-portfolio__item-align-bottom-center {
+        justify-content: center;
+        align-items: flex-end;
+        text-align: center;
+    }
+    .vp-portfolio__item-align-bottom-left {
+        justify-content: flex-start;
+        align-items: flex-end;
+        text-align: left;
+    }
+    .vp-portfolio__item-align-bottom-right {
+        justify-content: flex-end;
+        align-items: flex-end;
+        text-align: right;
+    }
+}

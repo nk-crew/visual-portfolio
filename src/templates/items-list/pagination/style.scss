@@ -1,0 +1,84 @@
+/**
+ * Default pagination style
+ */
+.vp-pagination__style-default {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: -3px;
+    padding: 0;
+    margin-top: 17px;
+
+    a {
+        outline: none;
+        box-shadow: none;
+    }
+
+    // align
+    &.vp-pagination__align-left {
+        justify-content: flex-start;
+    }
+    &.vp-pagination__align-right {
+        justify-content: flex-end;
+    }
+
+    .vp-pagination__item {
+        flex: 0 0 auto;
+        list-style-type: none;
+        text-align: center;
+        margin: 3px;
+        padding: 0;
+
+        > * {
+            display: block;
+            text-decoration: none;
+            padding: 8px 14px;
+            min-width: 40px;
+            line-height: 1.4;
+            color: inherit;
+            border: 1px solid #eaeaea;
+            background-color: #fff;
+            transition: .2s border-color, .2s background-color, .2s color;
+        }
+
+        &:not(.vp-pagination__item-active) > a:hover {
+            border-color: #bfbfbf;
+        }
+
+        &.vp-pagination__item-active > * {
+            cursor: default;
+            border-color: #0085ba;
+            background-color: #0082b7;
+            color: #fff;
+        }
+
+        &.vp-pagination__item-prev > *,
+        &.vp-pagination__item-next > * {
+            position: relative;
+            font-family: monospace;
+        }
+    }
+
+    // show/hide labels
+    .vp-pagination__load-more .vp-pagination__load-more-no-more,
+    .vp-pagination__load-more .vp-pagination__load-more-loading,
+    .vp-portfolio__loading & .vp-pagination__load-more span,
+    &.vp-pagination__no-more .vp-pagination__load-more span,
+    .vp-portfolio__loading &.vp-pagination__no-more .vp-pagination__load-more .vp-pagination__load-more-no-more {
+        display: none;
+    }
+    .vp-pagination__load-more span,
+    .vp-portfolio__loading & .vp-pagination__load-more .vp-pagination__load-more-loading,
+    &.vp-pagination__no-more .vp-pagination__load-more .vp-pagination__load-more-no-more {
+        display: block;
+    }
+
+    // disable no more and loading buttons
+    &.vp-pagination__no-more .vp-pagination__load-more,
+    .vp-portfolio__loading & .vp-pagination__load-more {
+        cursor: default;
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}

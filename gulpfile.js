@@ -37,7 +37,7 @@ gulp.task('copy_to_dist', function () {
  * Compile SCSS files
  */
 gulp.task('sass', function () {
-    return gulp.src(dist + '/assets/**/*.scss')
+    return gulp.src([dist + '/**/*.scss', '!' + dist + '/assets/vendor/**/*'])
         .pipe(cache('sass'))
         .pipe(sass({
             outputStyle: 'compressed'
@@ -45,7 +45,7 @@ gulp.task('sass', function () {
         .pipe(autoprefixer({
             browsers: ['last 3 version', '> 1%']
         }))
-        .pipe(gulp.dest(dist + '/assets'));
+        .pipe(gulp.dest(dist));
 });
 gulp.task('sass-clean', function () {
     return del(dist + '/assets/**/*.scss');
