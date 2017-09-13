@@ -57,6 +57,10 @@ class Visual_Portfolio_Admin {
             Visual_Portfolio_Get::enqueue_scripts();
         }
 
+        wp_enqueue_media();
+        wp_enqueue_style( 'wp-color-picker' );
+        wp_enqueue_script( 'wp-color-picker-alpha', visual_portfolio()->plugin_url . 'assets/vendor/wp-color-picker-alpha/wp-color-picker-alpha.min.js', array( 'wp-color-picker' ), '', true );
+
         wp_enqueue_script( 'image-picker', visual_portfolio()->plugin_url . 'assets/vendor/image-picker/image-picker.min.js', array( 'jquery' ), '', true );
         wp_enqueue_style( 'image-picker', visual_portfolio()->plugin_url . 'assets/vendor/image-picker/image-picker.css' );
 
@@ -719,13 +723,17 @@ class Visual_Portfolio_Admin {
                     <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'bg_color' ); ?>">
                         <?php echo esc_html__( 'Overlay Background Color:', NK_VP_DOMAIN ); ?>
                     </label>
-                    <input class="vp-input" name="<?php echo esc_attr( $opt . 'bg_color' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'bg_color' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'bg_color' ] ); ?>">
+                    <p>
+                        <input class="vp-input vp-color-picker" data-alpha="true" name="<?php echo esc_attr( $opt . 'bg_color' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'bg_color' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'bg_color' ] ); ?>">
+                    </p>
 
                     <p></p>
                     <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'text_color' ); ?>">
                         <?php echo esc_html__( 'Overlay Text Color:', NK_VP_DOMAIN ); ?>
                     </label>
-                    <input class="vp-input" name="<?php echo esc_attr( $opt . 'text_color' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'text_color' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'text_color' ] ); ?>">
+                    <p>
+                        <input class="vp-input vp-color-picker" data-alpha="true" name="<?php echo esc_attr( $opt . 'text_color' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'text_color' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'text_color' ] ); ?>">
+                    </p>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>

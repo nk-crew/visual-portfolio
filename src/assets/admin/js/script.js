@@ -38,6 +38,9 @@
         $editForm.conditionize();
     }
 
+    // color picker
+    $('.vp-color-picker').wpColorPicker();
+
     // image picker
     $('.vp-image-picker').imagepicker();
 
