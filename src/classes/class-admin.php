@@ -598,6 +598,15 @@ class Visual_Portfolio_Admin {
             <label class="post-attributes-label" for="vp_items_count"><?php echo esc_html__( 'Items Per Page:', NK_VP_DOMAIN ); ?></label>
         </p>
         <input name="vp_items_count" id="vp_items_count" class="vp-rangeslider" type="range" min="1" max="50" value="<?php echo esc_attr( $meta['vp_items_count'] ); ?>">
+
+        <p></p>
+        <label for="vp_stretch">
+            <input name="vp_stretch" type="checkbox" id="vp_stretch" value="true" <?php checked( $meta['vp_stretch'] ); ?>>
+            <?php echo esc_html__( 'Stretch', NK_VP_DOMAIN ); ?>
+        </label>
+        <p class="description">
+            <?php echo esc_html__( 'Will be visible only online', NK_VP_DOMAIN ); ?>
+        </p>
         <?php
     }
 

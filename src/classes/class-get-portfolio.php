@@ -36,6 +36,7 @@ class Visual_Portfolio_Get {
 
         'vp_items_gap'             => 15,
         'vp_items_count'           => 6,
+        'vp_stretch'               => false,
 
         // default, fly, fade.
         'vp_items_style'           => 'fly',
@@ -215,6 +216,11 @@ class Visual_Portfolio_Get {
         $options = self::get_options( $options_or_id );
 
         $class   = 'vp-portfolio vp-id-' . $id;
+
+        // stretch class.
+        if ( $options['vp_stretch'] ) {
+            $class .= ' vp-portfolio__stretch';
+        }
 
         $paged = 0;
         if ( $options['vp_pagination'] ) {

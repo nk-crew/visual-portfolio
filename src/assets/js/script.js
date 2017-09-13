@@ -274,8 +274,28 @@
         var self = this;
         var evp = '.vp.vp-id-' + self.id;
 
+        // Stretch
+        function stretch () {
+            var rect = self.$item[0].getBoundingClientRect();
+            var left = rect.left;
+            var right = wndW - rect.right;
+
+            var ml = parseFloat(self.$item.css('margin-left') || 0);
+            var mr = parseFloat(self.$item.css('margin-right') || 0);
+            self.$item.css({
+                'margin-left': ml - left,
+                'margin-right': mr - right
+            });
+        }
+        if ( self.$item.hasClass('vp-portfolio__stretch') && ! self.$item.parent('.vp_list_preview').length ) {
+            $wnd.on('load' + evp + ' resize' + evp + ' orientationchange' + evp, function() {
+                stretch();
+            });
+            stretch();
+        }
+
         // Fly style
-        if ('fly' === self.options.itemsStyle) {
+        if ( 'fly' === self.options.itemsStyle ) {
             self.$item.on('mouseenter'  + evp + ' mouseleave' + evp, '.vp-portfolio__item-wrap', function (e) {
                 var $overlay = $(this).find('.vp-portfolio__item-overlay');
                 var itemRect = $(this)[0].getBoundingClientRect();
