@@ -44,6 +44,14 @@
             </div>
             <?php
         }
+
+        if ( $args['style_options']['show_excerpt'] && $args['excerpt'] ) {
+            ?>
+            <div class="vp-portfolio__item-meta-excerpt">
+                <?php echo esc_html( $args['excerpt'] ); ?>
+            </div>
+            <?php
+        }
         ?>
     </div>
 </div>
