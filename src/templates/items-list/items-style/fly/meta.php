@@ -63,7 +63,7 @@
                     }
                     ?>
                     <li class="vp-portfolio__item-meta-category">
-                        <?php echo esc_html( $category['label'] ); ?>
+                        <span><?php echo esc_html( $category['label'] ); ?></span>
                     </li>
                     <?php
                     $count--;
