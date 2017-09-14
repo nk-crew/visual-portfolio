@@ -26,14 +26,16 @@
     position: relative;
     overflow: hidden;
 }
+.vp-portfolio__items-wrap {
+    opacity: 0;
+    visibility: hidden;
+    transition: .7s opacity, .7s visibility;
+}
 
 .vp-portfolio__item {
     position: relative;
     width: 33.333%;
     float: left;
-    opacity: 0;
-    visibility: hidden;
-    transition: .7s opacity, .7s visibility;
 }
 .vp-portfolio__item .vp-portfolio__item-img img,
 .vp-portfolio__item .vp-portfolio__item-img a {
@@ -50,7 +52,7 @@
     margin-left: -15px;
     width: 23px;
     height: 24px;
-    margin-top: 20px;
+    margin-top: 45px;
     opacity: 0.5;
     transition: .7s opacity, .7s visibility;
     animation: vp-preloader 2s linear infinite;
@@ -128,12 +130,12 @@
 
 // On loaded portfolio
 .vp-portfolio {
-    max-height: 65px;
+    min-height: 114px;
 }
 .vp-portfolio.vp-portfolio__ready {
-    max-height: none;
+    min-height: initial;
 
-    .vp-portfolio__item,
+    .vp-portfolio__items-wrap,
     .vp-filter,
     .vp-pagination {
         opacity: 1;
