@@ -34,12 +34,12 @@
             // get id from class
             var classes = $item[0].className.split(/\s+/);
             for (var k = 0; k < classes.length; k++) {
-                if (classes[k] && /^vp-id-/.test(classes[k])) {
-                    self.id = classes[k].replace(/^vp-id-/, '');
+                if (classes[k] && /^vp-uid-/.test(classes[k])) {
+                    self.uid = classes[k].replace(/^vp-uid-/, '');
                     break;
                 }
             }
-            if (!self.id) {
+            if (!self.uid) {
                 console.error('Couldn\'t retrieve Visual Portfolio ID.');
                 return;
             }
@@ -62,7 +62,7 @@
     // });
     VP.prototype.emitEvent = function emitEvent (event, data) {
         data = data ? [this].concat(data) : [this];
-        this.$item.trigger(event + '.vp.vp-id-' + this.id, data);
+        this.$item.trigger(event + '.vp.vp-uid-' + this.uid, data);
     };
 
     /**
@@ -150,15 +150,15 @@
      */
     VP.prototype.addStyle = function addStyle (selector, styles) {
         var self = this;
-        var id = self.id;
+        var uid = self.uid;
 
-        if (typeof stylesList[id] === 'undefined') {
-            stylesList[id] = {};
+        if (typeof stylesList[uid] === 'undefined') {
+            stylesList[uid] = {};
         }
-        if (typeof stylesList[id][selector] === 'undefined') {
-            stylesList[id][selector] = {};
+        if (typeof stylesList[uid][selector] === 'undefined') {
+            stylesList[uid][selector] = {};
         }
-        stylesList[id][selector] = $.extend(stylesList[id][selector], styles);
+        stylesList[uid][selector] = $.extend(stylesList[uid][selector], styles);
 
         self.emitEvent('addStyle', [selector, styles, stylesList]);
 
@@ -173,14 +173,14 @@
      */
     VP.prototype.removeStyle = function removeStyle (selector, styles) {
         var self = this;
-        var id = self.id;
+        var uid = self.uid;
 
-        if (typeof stylesList[id] === 'undefined' || !selector) {
-            stylesList[id] = {};
+        if (typeof stylesList[uid] === 'undefined' || !selector) {
+            stylesList[uid] = {};
         }
 
-        if (typeof stylesList[id][selector] !== 'undefined' && selector) {
-            delete stylesList[id][selector];
+        if (typeof stylesList[uid][selector] !== 'undefined' && selector) {
+            delete stylesList[uid][selector];
         }
 
         self.emitEvent('removeStyle', [selector, styles, stylesList]);
@@ -198,24 +198,24 @@
         // timeout for the case, when styles added one by one
         clearTimeout(renderStylesTimeout);
         renderStylesTimeout = setTimeout(function () {
-            var id = self.id;
+            var uid = self.uid;
             var stylesString = '';
 
             // create string with styles
-            if (typeof stylesList[id] !== 'undefined') {
-                for (var k in stylesList[id]) {
-                    stylesString += '.vp-id-' + id + ' ' + k + ' {';
-                    for (var i in stylesList[id][k]) {
-                        stylesString += i + ':' + stylesList[id][k][i] + ';';
+            if (typeof stylesList[uid] !== 'undefined') {
+                for (var k in stylesList[uid]) {
+                    stylesString += '.vp-uid-' + uid + ' ' + k + ' {';
+                    for (var i in stylesList[uid][k]) {
+                        stylesString += i + ':' + stylesList[uid][k][i] + ';';
                     }
                     stylesString += '}';
                 }
             }
 
             // add in style tag
-            var $style = $('#vp-style-' + id);
+            var $style = $('#vp-style-' + uid);
             if (!$style.length) {
-                $style = $('<style>').attr('id', 'vp-style-' + id).appendTo('head');
+                $style = $('<style>').attr('id', 'vp-style-' + uid).appendTo('head');
             }
             $style.html(stylesString);
 
@@ -272,7 +272,7 @@
      */
     VP.prototype.initEvents = function initEvents () {
         var self = this;
-        var evp = '.vp.vp-id-' + self.id;
+        var evp = '.vp.vp-uid-' + self.uid;
 
         // Stretch
         function stretch () {
@@ -382,7 +382,7 @@
      */
     VP.prototype.destroyEvents = function destroyEvents () {
         var self = this;
-        var evp = '.vp.vp-id-' + self.id;
+        var evp = '.vp.vp-uid-' + self.uid;
 
         // destroy click events
         self.$item.off(evp);
@@ -644,7 +644,7 @@
         }
 
         // prepare photoswipe markup
-        var markup = '<div class="pswp vp-pswp vp-pswp-id-' + self.id + '" tabindex="-1" role="dialog" aria-hidden="true">\n          <div class="pswp__bg"></div>\n          <div class="pswp__scroll-wrap">\n            <div class="pswp__container">\n              <div class="pswp__item"></div>\n              <div class="pswp__item"></div>\n              <div class="pswp__item"></div>\n            </div>\n            <div class="pswp__ui pswp__ui--hidden">\n              <div class="pswp__top-bar">\n                <div class="pswp__counter"></div>\n                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>\n                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>\n                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>\n                <div class="pswp__preloader">\n                  <div class="pswp__preloader__icn">\n                    <div class="pswp__preloader__cut">\n                      <div class="pswp__preloader__donut"></div>\n                    </div>\n                  </div>\n                </div>\n              </div>\n              <div class="pswp__loading-indicator"><div class="pswp__loading-indicator__line"></div></div>\n              <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>\n              <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>\n              <div class="pswp__caption">\n                <div class="pswp__caption__center">\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>';
+        var markup = '<div class="pswp vp-pswp vp-pswp-uid-' + self.uid + '" tabindex="-1" role="dialog" aria-hidden="true">\n          <div class="pswp__bg"></div>\n          <div class="pswp__scroll-wrap">\n            <div class="pswp__container">\n              <div class="pswp__item"></div>\n              <div class="pswp__item"></div>\n              <div class="pswp__item"></div>\n            </div>\n            <div class="pswp__ui pswp__ui--hidden">\n              <div class="pswp__top-bar">\n                <div class="pswp__counter"></div>\n                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>\n                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>\n                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>\n                <div class="pswp__preloader">\n                  <div class="pswp__preloader__icn">\n                    <div class="pswp__preloader__cut">\n                      <div class="pswp__preloader__donut"></div>\n                    </div>\n                  </div>\n                </div>\n              </div>\n              <div class="pswp__loading-indicator"><div class="pswp__loading-indicator__line"></div></div>\n              <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>\n              <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>\n              <div class="pswp__caption">\n                <div class="pswp__caption__center">\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>';
         $('body').append(markup);
 
         // init code
@@ -724,7 +724,7 @@
                 tapToClose: true,
                 tapToToggleControls: false,
                 showHideOpacity: true,
-                galleryUID: self.id
+                galleryUID: self.uid
             };
 
             if(fromURL) {
@@ -829,7 +829,7 @@
         };
 
         // click action
-        self.$item.on('click.vp.vp-id-' + self.id, '.vp-portfolio__item-wrap', function (e) {
+        self.$item.on('click.vp.vp-uid-' + self.uid, '.vp-portfolio__item-wrap', function (e) {
             e.preventDefault();
 
             var index = 0;
@@ -846,7 +846,7 @@
 
         // Parse URL and open gallery if it contains #&pid=3&gid=1
         var hashData = photoswipeParseHash();
-        if(hashData.pid && hashData.gid === self.id) {
+        if(hashData.pid && hashData.gid === self.uid) {
             openPhotoSwipe(hashData.pid, self.$item[0], true, true);
         }
     };
@@ -857,9 +857,9 @@
     VP.prototype.destroyPhotoswipe = function destroyPhotoswipe () {
         var self = this;
 
-        self.$item.off('click.vp.vp-id-' + self.id);
+        self.$item.off('click.vp.vp-uid-' + self.uid);
 
-        $('.vp-pswp-id-' + self.id).remove();
+        $('.vp-pswp-uid-' + self.uid).remove();
     };
 
     /**
@@ -922,7 +922,7 @@
             var $body = $(data).filter('#vp-infinite-load-body');
 
             // find current block on new page
-            var $new_vp = $body.find('.vp-portfolio.vp-id-' + self.id);
+            var $new_vp = $body.find('.vp-portfolio.vp-uid-' + self.uid);
 
             // insert new items
             if ($new_vp.length) {

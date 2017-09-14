@@ -223,13 +223,13 @@ class Visual_Portfolio_Get {
     static public function get( $options_or_id = array() ) {
         self::enqueue_scripts();
 
-        // generate ID.
-        $id = ++self::$id;
-        $id = hash( 'crc32b', $id . $options_or_id );
+        // generate unique ID.
+        $uid = ++self::$id;
+        $uid = hash( 'crc32b', $uid . $options_or_id );
 
         $options = self::get_options( $options_or_id );
 
-        $class   = 'vp-portfolio vp-id-' . $id;
+        $class   = 'vp-portfolio vp-uid-' . $uid;
 
         // stretch class.
         if ( $options['vp_stretch'] ) {
