@@ -382,6 +382,18 @@ class Visual_Portfolio_Get {
                 $style_options[ $opt_name ] = $opt;
             }
         }
+
+        // Insert styles.
+        switch ( $options['vp_items_style'] ) {
+            case 'fly':
+            case 'emerge':
+            case 'fade':
+                visual_portfolio()->include_template_style( 'visual-portfolio-items-style-fly', 'items-list/items-style/' . $options['vp_items_style'] . '/style' );
+                break;
+            default:
+                visual_portfolio()->include_template_style( 'visual-portfolio-items-style-default', 'items-list/items-style/style' );
+                break;
+        }
         ?>
 
         <div class="<?php echo esc_attr( $items_wrap_class ); ?>">
@@ -477,24 +489,14 @@ class Visual_Portfolio_Get {
                     <?php
                     switch ( $options['vp_items_style'] ) {
                         case 'fly':
-                            visual_portfolio()->include_template( 'items-list/items-style/fly/image', $args );
-                            visual_portfolio()->include_template( 'items-list/items-style/fly/meta', $args );
-                            visual_portfolio()->include_template_style( 'visual-portfolio-items-style-fly', 'items-list/items-style/fly/style' );
-                            break;
                         case 'emerge':
-                            visual_portfolio()->include_template( 'items-list/items-style/emerge/image', $args );
-                            visual_portfolio()->include_template( 'items-list/items-style/emerge/meta', $args );
-                            visual_portfolio()->include_template_style( 'visual-portfolio-items-style-emerge', 'items-list/items-style/emerge/style' );
-                            break;
                         case 'fade':
-                            visual_portfolio()->include_template( 'items-list/items-style/fade/image', $args );
-                            visual_portfolio()->include_template( 'items-list/items-style/fade/meta', $args );
-                            visual_portfolio()->include_template_style( 'visual-portfolio-items-style-fade', 'items-list/items-style/fade/style' );
+                            visual_portfolio()->include_template( 'items-list/items-style/' . $options['vp_items_style'] . '/image', $args );
+                            visual_portfolio()->include_template( 'items-list/items-style/' . $options['vp_items_style'] . '/meta', $args );
                             break;
                         default:
                             visual_portfolio()->include_template( 'items-list/items-style/image', $args );
                             visual_portfolio()->include_template( 'items-list/items-style/meta', $args );
-                            visual_portfolio()->include_template_style( 'visual-portfolio-items-style-default', 'items-list/items-style/style' );
                             break;
                     }
                     ?>
