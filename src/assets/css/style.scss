@@ -3,10 +3,8 @@
  * Version : 1.0.0
  * Author  : _nK https://nkdev.info
  */
-.vp-portfolio,
-.vp-portfolio__items {
+.vp-portfolio {
     position: relative;
-    overflow: hidden;
 }
 .vp-portfolio,
 .vp-portfolio * {
@@ -23,6 +21,7 @@
     clear: both;
 }
 
+.vp-portfolio__items-wrap,
 .vp-portfolio__item-wrap {
     position: relative;
     overflow: hidden;
@@ -153,7 +152,6 @@
     opacity: 0;
     visibility: hidden;
     transition: .7s opacity, .7s visibility;
-    z-index: 1;
 }
 
 // Pagination

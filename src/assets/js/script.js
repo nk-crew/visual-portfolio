@@ -27,9 +27,9 @@
             var self = this;
 
             self.$item = $item;
-            self.$items_wrap = $item.children('.vp-portfolio__items');
-            self.$pagination = $item.children('.vp-pagination');
-            self.$filter = $item.children('.vp-filter');
+            self.$items_wrap = $item.find('.vp-portfolio__items');
+            self.$pagination = $item.find('.vp-pagination');
+            self.$filter = $item.find('.vp-filter');
 
             // get id from class
             var classes = $item[0].className.split(/\s+/);
@@ -926,7 +926,7 @@
 
             // insert new items
             if ($new_vp.length) {
-                var newItems = $new_vp.children('.vp-portfolio__items').html();
+                var newItems = $new_vp.find('.vp-portfolio__items').html();
 
                 // update filter
                 if (self.$filter.length) {
