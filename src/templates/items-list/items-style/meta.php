@@ -3,17 +3,18 @@
  * Item meta template.
  *
  * @var $args
+ * @var $opts
  * @package visual-portfolio
  */
 
 ?>
 
-<div class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $args['style_options']['align'] ); ?>">
+<div class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
     <div class="vp-portfolio__item-meta">
         <?php
 
         // Show Title.
-        if ( $args['style_options']['show_title'] && $args['title'] ) {
+        if ( $opts['show_title'] && $args['title'] ) {
             ?>
             <h2 class="nk-portfolio__item-meta-title">
                 <?php
@@ -32,7 +33,7 @@
         }
 
         // Show Date.
-        if ( $args['style_options']['show_date'] && $args['published'] ) {
+        if ( $opts['show_date'] && $args['published'] ) {
             ?>
             <div class="vp-portfolio__item-meta-date">
                 <?php echo esc_html( $args['published'] ); ?>
@@ -41,7 +42,7 @@
         }
 
         // Show Excerpt.
-        if ( $args['style_options']['show_excerpt'] && $args['excerpt'] ) {
+        if ( $opts['show_excerpt'] && $args['excerpt'] ) {
             ?>
             <div class="vp-portfolio__item-meta-excerpt">
                 <?php echo esc_html( $args['excerpt'] ); ?>
@@ -50,11 +51,11 @@
         }
 
         // Show Categories.
-        if ( $args['style_options']['show_categories'] && $args['categories'] && ! empty( $args['categories'] ) ) {
+        if ( $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] ) ) {
             ?>
             <ul class="vp-portfolio__item-meta-categories">
                 <?php
-                $count = $args['style_options']['categories_count'];
+                $count = $opts['categories_count'];
                 foreach ( $args['categories'] as $category ) {
                     if ( ! $count ) {
                         break;

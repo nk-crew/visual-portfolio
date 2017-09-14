@@ -3,6 +3,7 @@
  * Item image template.
  *
  * @var $args
+ * @var $opts
  * @package visual-portfolio
  */
 

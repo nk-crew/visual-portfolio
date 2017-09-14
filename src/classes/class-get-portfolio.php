@@ -428,15 +428,15 @@ class Visual_Portfolio_Get {
 
             // args.
             $args = array(
-                'url'             => get_permalink(),
-                'title'           => get_the_title(),
-                'published'       => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
-                'filter'          => implode( ',', $filter_values ),
+                'url'        => get_permalink(),
+                'title'      => get_the_title(),
+                'published'  => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
+                'filter'     => implode( ',', $filter_values ),
                 // TODO: Option to set custom image size.
-                'image'           => get_the_post_thumbnail( get_the_ID(), 'full' ),
-                'categories'      => $categories,
-                'style_options'   => $style_options,
-                'vp_list_options' => $options,
+                'image'      => get_the_post_thumbnail( get_the_ID(), 'full' ),
+                'categories' => $categories,
+                'opts'       => $style_options,
+                'vp_ops'     => $options,
             );
 
             // Excerpt.
@@ -602,10 +602,10 @@ class Visual_Portfolio_Get {
         ));
 
         $args = array(
-            'class'           => 'vp-filter',
-            'items'           => $items,
-            'align'           => $vp_options['vp_filter_align'],
-            'vp_list_options' => $vp_options,
+            'class'    => 'vp-filter',
+            'items'    => $items,
+            'align'    => $vp_options['vp_filter_align'],
+            'vp_ops'   => $vp_options,
         );
 
         if ( $vp_options['vp_filter_align'] ) {
@@ -646,7 +646,7 @@ class Visual_Portfolio_Get {
             'max_pages'     => $query->max_num_pages,
             'class'         => 'vp-pagination',
             'align'         => $vp_options['vp_pagination_align'],
-            'vp_list_options' => $vp_options,
+            'vp_ops'        => $vp_options,
         );
 
         if ( ! $next_page_url ) {
