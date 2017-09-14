@@ -455,6 +455,14 @@ class Visual_Portfolio_Admin {
             'normal',
             'high'
         );
+        add_meta_box(
+            'vp_custom_css',
+            esc_html__( 'Custom CSS', NK_VP_DOMAIN ),
+            array( $this, 'add_custom_css_metabox' ),
+            'vp_lists',
+            'normal',
+            'high'
+        );
     }
 
     /**
@@ -1114,6 +1122,27 @@ class Visual_Portfolio_Admin {
     }
 
     /**
+     * Add Custom CSS metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_custom_css_metabox( $post ) {
+        $meta = Visual_Portfolio_Get::get_options( $post->ID );
+        ?>
+        <textarea class="vp-input" name="vp_custom_css" id="vp_custom_css" cols="30" rows="10"><?php echo esc_html( $meta['vp_custom_css'] ); ?></textarea>
+        <p class="description">
+            <?php echo esc_html__( 'Available classes:', NK_VP_DOMAIN ); ?>
+        </p>
+        <ul>
+            <li><code>.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code>.vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code>.vp-filter</code><?php echo esc_html__( ' - filter wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code>.vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', NK_VP_DOMAIN ); ?></li>
+        </ul>
+        <?php
+    }
+
+    /**
      * Save Layout metabox
      *
      * @param int $post_id The post ID.
@@ -1131,7 +1160,12 @@ class Visual_Portfolio_Admin {
 
         foreach ( $meta as $item ) {
             if ( isset( $_POST[ $item ] ) ) {
-                $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
+
+                if ( 'vp_custom_css' === $item ) {
+                    $result = wp_kses( wp_unslash( $_POST[ $item ] ), array( '\'', '\"' ) );
+                } else {
+                    $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
+                }
 
                 if ( 'Array' === $result ) {
                     $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );

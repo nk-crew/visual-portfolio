@@ -134,6 +134,9 @@ class Visual_Portfolio_Get {
 
         // desc, asc.
         'vp_posts_order_direction' => 'desc',
+
+        // custom CSS.
+        'vp_custom_css'            => '',
     );
 
     /**
@@ -230,6 +233,12 @@ class Visual_Portfolio_Get {
         $options = self::get_options( $options_or_id );
 
         $class   = 'vp-portfolio vp-uid-' . $uid;
+
+        // Add ID and custom CSS.
+        if ( ! is_array( $options_or_id ) ) {
+            $class .= ' vp-id-' . $options_or_id;
+            visual_portfolio()->include_custom_css( $options_or_id );
+        }
 
         // stretch class.
         if ( $options['vp_stretch'] ) {
