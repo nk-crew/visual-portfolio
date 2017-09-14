@@ -507,14 +507,14 @@
         self.$item.find('[data-vp-bg-color]').each(function () {
             var val = $(this).attr('data-vp-bg-color');
             self.addStyle('[data-vp-bg-color="' + val + '"]', {
-                'background-color': val
+                'background-color': val + ' !important'
             });
         });
 
         self.$item.find('[data-vp-text-color]').each(function () {
             var val = $(this).attr('data-vp-text-color');
             self.addStyle('[data-vp-text-color="' + val + '"]', {
-                'color': val
+                'color': val + ' !important'
             });
         });
 
