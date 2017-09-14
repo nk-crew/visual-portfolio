@@ -385,10 +385,10 @@
         var evp = '.vp.vp-id-' + self.id;
 
         // destroy click events
-        self.$item.off('click' + evp);
+        self.$item.off(evp);
 
         // destroy infinite load events
-        $wnd.off('load' + evp + ' scroll' + evp + ' resize' + evp + ' orientationchange' + evp + ' mouseenter'  + evp + ' mouseleave' + evp);
+        $wnd.off(evp);
 
         self.emitEvent('destroyEvents');
     };
