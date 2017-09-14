@@ -38,7 +38,7 @@ class Visual_Portfolio_Get {
         'vp_items_count'           => 6,
         'vp_stretch'               => false,
 
-        // default, fly, fade.
+        // default, fly, emerge, fade.
         'vp_items_style'           => 'fly',
 
         /**
@@ -70,6 +70,20 @@ class Visual_Portfolio_Get {
         'vp_items_style_fly__align' => 'center',
         'vp_items_style_fly__bg_color' => '#212125',
         'vp_items_style_fly__text_color' => '#fff',
+
+        /**
+         * Emerge Items Style
+         */
+        'vp_items_style_emerge__show_title' => true,
+        'vp_items_style_emerge__show_categories' => true,
+        'vp_items_style_emerge__categories_count' => 1,
+        'vp_items_style_emerge__show_date' => false,
+        'vp_items_style_emerge__show_excerpt' => false,
+        'vp_items_style_emerge__excerpt_words_count' => 15,
+        // center, left, right.
+        'vp_items_style_emerge__align' => 'center',
+        'vp_items_style_emerge__bg_color' => '#fff',
+        'vp_items_style_emerge__text_color' => '#000',
 
         /**
          * Fade Items Style
@@ -466,6 +480,11 @@ class Visual_Portfolio_Get {
                             visual_portfolio()->include_template( 'items-list/items-style/fly/image', $args );
                             visual_portfolio()->include_template( 'items-list/items-style/fly/meta', $args );
                             visual_portfolio()->include_template_style( 'visual-portfolio-items-style-fly', 'items-list/items-style/fly/style' );
+                            break;
+                        case 'emerge':
+                            visual_portfolio()->include_template( 'items-list/items-style/emerge/image', $args );
+                            visual_portfolio()->include_template( 'items-list/items-style/emerge/meta', $args );
+                            visual_portfolio()->include_template_style( 'visual-portfolio-items-style-emerge', 'items-list/items-style/emerge/style' );
                             break;
                         case 'fade':
                             visual_portfolio()->include_template( 'items-list/items-style/fade/image', $args );

@@ -620,6 +620,7 @@ class Visual_Portfolio_Admin {
         $styles = array(
             'default'  => __( 'Default', NK_VP_DOMAIN ),
             'fly'      => __( 'Fly', NK_VP_DOMAIN ),
+            'emerge'   => __( 'Emerge', NK_VP_DOMAIN ),
             'fade'     => __( 'Fade', NK_VP_DOMAIN ),
         );
 
@@ -748,7 +749,7 @@ class Visual_Portfolio_Admin {
                     </select>
                 </div>
 
-                <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
+                <?php if ( 'fly' === $style || 'emerge' === $style || 'fade' === $style ) : ?>
                     <p></p>
                     <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'bg_color' ); ?>">
                         <?php echo esc_html__( 'Overlay Background Color:', NK_VP_DOMAIN ); ?>
