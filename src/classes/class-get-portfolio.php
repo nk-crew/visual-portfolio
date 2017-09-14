@@ -633,15 +633,11 @@ class Visual_Portfolio_Get {
             return;
         }
 
-        static $vp_pagination_id = 0;
-        $vp_pagination_id++;
-
         $start_page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
         $max_pages = (int) ($query->max_num_pages < $start_page ? $start_page : $query->max_num_pages);
         $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
 
         $args = array(
-            'id'            => $vp_pagination_id,
             'type'          => $vp_options['vp_pagination'],
             'next_page_url' => $next_page_url,
             'start_page'    => $start_page,
