@@ -239,7 +239,7 @@ class Visual_Portfolio {
         $id = get_query_var( 'vp_custom_css_id' );
         $css = get_post_meta( $id, 'vp_custom_css', true );
 
-        if ( 'css' === $custom_css && $css ) {
+        if ( 'css' === $custom_css ) {
             header( 'Content-type: text/css' );
             $css = wp_kses( $css, array( '\'', '\"' ) );
             $css = str_replace( '&gt;' , '>' , $css );
