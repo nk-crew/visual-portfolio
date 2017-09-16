@@ -155,7 +155,7 @@ class Visual_Portfolio_Get {
 
             foreach ( self::$defaults as $k => $item ) {
                 if ( isset( $post_meta[ $k ] ) && isset( $post_meta[ $k ][0] ) ) {
-                    $val = $post_meta[ $k ][0];
+                    $val = maybe_unserialize( $post_meta[ $k ][0] );
 
                     if ( 'false' === $val || '' === $val ) {
                         $val = false;
