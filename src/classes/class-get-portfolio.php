@@ -234,10 +234,9 @@ class Visual_Portfolio_Get {
 
         $class   = 'vp-portfolio vp-uid-' . $uid;
 
-        // Add ID and custom CSS.
+        // Add ID to class.
         if ( ! is_array( $options_or_id ) ) {
             $class .= ' vp-id-' . $options_or_id;
-            visual_portfolio()->include_custom_css( $options_or_id );
         }
 
         // stretch class.
@@ -520,6 +519,12 @@ class Visual_Portfolio_Get {
         </div>
 
         <?php
+
+        // Add custom styles.
+        if ( ! is_array( $options_or_id ) ) {
+            visual_portfolio()->include_custom_css( $options_or_id );
+        }
+
         $return = ob_get_contents();
         ob_end_clean();
         return $return;

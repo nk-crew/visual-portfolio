@@ -226,8 +226,7 @@ class Visual_Portfolio {
                     $css_base_url = str_replace( 'http://', 'https://', $css_base_url );
                 }
             }
-            wp_register_style( 'vp-custom-css-' . $id, $css_base_url . '?vp_custom_css=css&vp_custom_css_id=' . $id );
-            wp_enqueue_style( 'vp-custom-css-' . $id );
+            wp_enqueue_style( 'vp-custom-css-' . $id, $css_base_url . '?vp_custom_css=css&vp_custom_css_id=' . $id );
         }
     }
 
