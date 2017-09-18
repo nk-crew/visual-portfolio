@@ -411,35 +411,33 @@ class Visual_Portfolio_Get {
                     // Get category taxonomies for data filter.
                     $filter_values = array();
                     $categories = array();
-                    if ( $options['vp_filter'] ) {
-                        $all_taxonomies = get_object_taxonomies( get_post() );
-                        foreach ( $all_taxonomies as $cat ) {
-                            // allow only category taxonomies like category, portfolio_category, etc...
-                            if ( strpos( $cat, 'category' ) === false ) {
-                                continue;
-                            }
+                    $all_taxonomies = get_object_taxonomies( get_post() );
+                    foreach ( $all_taxonomies as $cat ) {
+                        // allow only category taxonomies like category, portfolio_category, etc...
+                        if ( strpos( $cat, 'category' ) === false ) {
+                            continue;
+                        }
 
-                            $category = get_the_terms( get_post(), $cat );
+                        $category = get_the_terms( get_post(), $cat );
 
-                            if ( $category && ! in_array( $category, $filter_values ) ) {
-                                foreach ( $category as $key => $cat_item ) {
-                                    // add in filter.
-                                    $filter_values[] = $cat_item->slug;
+                        if ( $category && ! in_array( $category, $filter_values ) ) {
+                            foreach ( $category as $key => $cat_item ) {
+                                // add in filter.
+                                $filter_values[] = $cat_item->slug;
 
-                                    // add in categories array.
-                                    $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
-                                    $url = self::get_nopaging_url( false, array(
-                                        'vp_filter' => urlencode( $unique_name ),
-                                    ) );
-                                    $categories[] = array(
-                                        'slug'        => $cat_item->slug,
-                                        'label'       => $cat_item->name,
-                                        'description' => $cat_item->description,
-                                        'count'       => $cat_item->count,
-                                        'taxonomy'    => $cat_item->taxonomy,
-                                        'url'         => $url,
-                                    );
-                                }
+                                // add in categories array.
+                                $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
+                                $url = self::get_nopaging_url( false, array(
+                                    'vp_filter' => urlencode( $unique_name ),
+                                ) );
+                                $categories[] = array(
+                                    'slug'        => $cat_item->slug,
+                                    'label'       => $cat_item->name,
+                                    'description' => $cat_item->description,
+                                    'count'       => $cat_item->count,
+                                    'taxonomy'    => $cat_item->taxonomy,
+                                    'url'         => $url,
+                                );
                             }
                         }
                     }
