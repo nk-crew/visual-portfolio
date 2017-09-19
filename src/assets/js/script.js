@@ -147,20 +147,27 @@
      *
      * @param selector css selector
      * @param styles object with styles
+     * @param media string with media query
      */
-    VP.prototype.addStyle = function addStyle (selector, styles) {
+    VP.prototype.addStyle = function addStyle (selector, styles, media) {
+        media = media || '';
+
         var self = this;
         var uid = self.uid;
 
         if (typeof stylesList[uid] === 'undefined') {
             stylesList[uid] = {};
         }
-        if (typeof stylesList[uid][selector] === 'undefined') {
-            stylesList[uid][selector] = {};
+        if (typeof stylesList[uid][media] === 'undefined') {
+            stylesList[uid][media] = {};
         }
-        stylesList[uid][selector] = $.extend(stylesList[uid][selector], styles);
+        if (typeof stylesList[uid][media][selector] === 'undefined') {
+            stylesList[uid][media][selector] = {};
+        }
 
-        self.emitEvent('addStyle', [selector, styles, stylesList]);
+        stylesList[uid][media][selector] = $.extend(stylesList[uid][media][selector], styles);
+
+        self.emitEvent('addStyle', [selector, styles, media, stylesList]);
 
         self.renderStyle();
     };
@@ -170,17 +177,20 @@
      *
      * @param selector css selector (if not set - removed all styles)
      * @param styles object with styles
+     * @param media string with media query
      */
-    VP.prototype.removeStyle = function removeStyle (selector, styles) {
+    VP.prototype.removeStyle = function removeStyle (selector, styles, media) {
+        media = media || '';
+
         var self = this;
         var uid = self.uid;
 
-        if (typeof stylesList[uid] === 'undefined' || !selector) {
+        if (typeof stylesList[uid] !== 'undefined' && !selector) {
             stylesList[uid] = {};
         }
 
-        if (typeof stylesList[uid][selector] !== 'undefined' && selector) {
-            delete stylesList[uid][selector];
+        if (typeof stylesList[uid] !== 'undefined' && typeof stylesList[uid][media] !== 'undefined' && typeof stylesList[uid][media][selector] !== 'undefined' && selector) {
+            delete stylesList[uid][media][selector];
         }
 
         self.emitEvent('removeStyle', [selector, styles, stylesList]);
@@ -203,12 +213,25 @@
 
             // create string with styles
             if (typeof stylesList[uid] !== 'undefined') {
-                for (var k in stylesList[uid]) {
-                    stylesString += '.vp-uid-' + uid + ' ' + k + ' {';
-                    for (var i in stylesList[uid][k]) {
-                        stylesString += i + ':' + stylesList[uid][k][i] + ';';
+                // current uid styles
+                for (var m in stylesList[uid]) {
+                    // media
+                    if (m) {
+                        stylesString += '@media ' + m + ' {';
                     }
-                    stylesString += '}';
+                    for (var s in stylesList[uid][m]) {
+                        // selector
+                        stylesString += '.vp-uid-' + uid + ' ' + s + ' {';
+                        for (var p in stylesList[uid][m][s]) {
+                            // property and value
+                            stylesString += p + ':' + stylesList[uid][m][s][p] + ';';
+                        }
+                        stylesString += '}';
+                    }
+                    // media
+                    if (m) {
+                        stylesString += '}';
+                    }
                 }
             }
 
@@ -417,6 +440,8 @@
     VP.prototype.initLayout = function initLayout () {
         var self = this;
 
+        var screenSizes = [576, 768, 992, 1200];
+
         // prepare layout
         if (self.options.layout) {
             switch (self.options.layout) {
@@ -456,11 +481,32 @@
                             });
                         }
                     }
+
+                    // responsive
+                    for (var count = columns; count > 0; count--) {
+                        if (typeof screenSizes[count - 1] !== 'undefined') {
+                            self.addStyle('.vp-portfolio__item', {
+                                'width': (100 / count) + '%'
+                            }, 'screen and (max-width: ' + screenSizes[count - 1] + 'px)');
+                            self.addStyle('.vp-portfolio__item:nth-of-type(n)', {
+                                'width': (100 / count) + '%'
+                            }, 'screen and (max-width: ' + screenSizes[count - 1] + 'px)');
+                        }
+                    }
                     break;
                 case 'masonry':
                     self.addStyle('.vp-portfolio__item', {
                         'width': (100 / self.options.masonryColumns) + '%'
                     });
+
+                    // responsive
+                    for (var count = self.options.masonryColumns; count > 0; count--) {
+                        if (typeof screenSizes[count - 1] !== 'undefined') {
+                            self.addStyle('.vp-portfolio__item', {
+                                'width': (100 / count) + '%'
+                            }, 'screen and (max-width: ' + screenSizes[count - 1] + 'px)');
+                        }
+                    }
                 case 'justified':
                     break;
             }
