@@ -393,7 +393,7 @@ class Visual_Portfolio_Get {
             case 'fly':
             case 'emerge':
             case 'fade':
-                visual_portfolio()->include_template_style( 'visual-portfolio-items-style-fly', 'items-list/items-style/' . $options['vp_items_style'] . '/style' );
+                visual_portfolio()->include_template_style( 'visual-portfolio-items-style-' . $options['vp_items_style'], 'items-list/items-style/' . $options['vp_items_style'] . '/style' );
                 break;
             default:
                 visual_portfolio()->include_template_style( 'visual-portfolio-items-style-default', 'items-list/items-style/style' );
