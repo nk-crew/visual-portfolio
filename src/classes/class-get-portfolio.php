@@ -376,17 +376,23 @@ class Visual_Portfolio_Get {
         <div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>
 
         <?php
-        self::filter( $query_opts, $options );
-
         // get options for the current style.
         $style_options = array();
         $style_options_slug = 'vp_items_style_' . $options['vp_items_style'] . '__';
         foreach ( $options as $k => $opt ) {
+            // add option to array.
             if ( substr( $k, 0, strlen( $style_options_slug ) ) === $style_options_slug ) {
                 $opt_name = str_replace( $style_options_slug, '', $k );
                 $style_options[ $opt_name ] = $opt;
             }
+
+            // remove style options from the options list.
+            if ( substr( $k, 0, strlen( 'vp_items_style_' ) ) === 'vp_items_style_' ) {
+                unset( $options[ $k ] );
+            }
         }
+
+        self::filter( $query_opts, $options );
 
         // Insert styles.
         switch ( $options['vp_items_style'] ) {
