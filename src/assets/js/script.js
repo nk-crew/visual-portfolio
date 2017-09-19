@@ -19,6 +19,11 @@
     getWndSize();
     $wnd.on('resize load orientationchange', getWndSize);
 
+    // enable object-fit
+    if (typeof objectFitImages !== 'undefined') {
+        objectFitImages();
+    }
+
     /**
      * Main VP class
      */
