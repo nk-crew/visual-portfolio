@@ -424,7 +424,11 @@ class Visual_Portfolio_Get {
             }
         }
 
-        self::filter( $query_opts, $options );
+        ?>
+        <div class="vp-portfolio__filter-wrap">
+            <?php self::filter( $query_opts, $options ); ?>
+        </div>
+        <?php
 
         // Insert styles.
         switch ( $options['vp_items_style'] ) {
@@ -550,7 +554,9 @@ class Visual_Portfolio_Get {
             </div>
         </div>
 
-        <?php self::pagination( $portfolio_query, $options ); ?>
+        <div class="vp-portfolio__pagination-wrap">
+            <?php self::pagination( $portfolio_query, $options ); ?>
+        </div>
 
         </div>
 
