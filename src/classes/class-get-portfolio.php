@@ -355,6 +355,36 @@ class Visual_Portfolio_Get {
 
         $no_image = Visual_Portfolio_Settings::get_option( 'no_image','vp_general', false );
 
+        // prepare image sizes.
+        // TODO: Option to set custom image sizes.
+        $img_size_popup = 'vp_xl';
+        $img_size = 'vp_lg';
+        $columns_count = false;
+        if ( 'masonry' === $options['vp_layout'] ) {
+            $columns_count = (int) $options['vp_masonry_columns'];
+        }
+        if ( 'tiles' === $options['vp_layout'] ) {
+            $columns_count = explode( '|', $options['vp_tiles_type'], 1 );
+            $columns_count = (int) $columns_count[0];
+        }
+        switch ( $columns_count ) {
+            case 1:
+                $img_size = 'vp_xl';
+                break;
+            case 2:
+                $img_size = 'vp_lg';
+                break;
+            case 3:
+                $img_size = 'vp_md';
+                break;
+            case 4:
+                $img_size = 'vp_md';
+                break;
+            case 5:
+                $img_size = 'vp_sm';
+                break;
+        }
+
         // get Post List.
         $portfolio_query = new WP_Query( $query_opts );
 
@@ -455,8 +485,7 @@ class Visual_Portfolio_Get {
                         'title'      => get_the_title(),
                         'published'  => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
                         'filter'     => implode( ',', $filter_values ),
-                        // TODO: Option to set custom image size.
-                        'image'      => get_the_post_thumbnail( get_the_ID(), 'full' ),
+                        'image'      => get_the_post_thumbnail( get_the_ID(), $img_size ),
                         'categories' => $categories,
                         'opts'       => $style_options,
                         'vp_ops'     => $options,
@@ -472,9 +501,9 @@ class Visual_Portfolio_Get {
                     switch ( $options['vp_items_click_action'] ) {
                         case 'popup_gallery':
                             if ( $args['image'] ) {
-                                $popup_image = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full' );
+                                $popup_image = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_popup );
                             } else if ( $no_image ) {
-                                $popup_image = wp_get_attachment_image_src( $no_image, 'full' );
+                                $popup_image = wp_get_attachment_image_src( $no_image, $img_size_popup );
                             }
                             break;
                         case false:
@@ -484,8 +513,7 @@ class Visual_Portfolio_Get {
 
                     // No Image.
                     if ( ! $args['image'] && $no_image ) {
-                        // TODO: Option to set custom image size.
-                        $args['image'] = wp_get_attachment_image( $no_image, 'full' );
+                        $args['image'] = wp_get_attachment_image( $no_image, $img_size );
                     }
                     ?>
 

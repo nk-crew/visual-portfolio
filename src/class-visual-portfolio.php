@@ -105,6 +105,9 @@ class Visual_Portfolio {
         load_plugin_textdomain( NK_VP_DOMAIN, false, basename( dirname( __FILE__ ) ) . '/languages' );
 
         // include helper files.
+        $this->add_image_sizes();
+
+        // include helper files.
         $this->include_dependencies();
 
         // init classes.
@@ -142,6 +145,36 @@ class Visual_Portfolio {
         $this->plugin_version = $data['Version'];
         $this->plugin_slug = plugin_basename( __FILE__, '.php' );
         $this->plugin_name_sanitized = basename( __FILE__, '.php' );
+    }
+
+    /**
+     * Add image sizes.
+     */
+    public function add_image_sizes() {
+        // custom image sizes.
+        add_image_size( 'vp_sm', 500, 500 );
+        add_image_size( 'vp_md', 800, 800 );
+        add_image_size( 'vp_lg', 1280, 1280 );
+        add_image_size( 'vp_xl', 1920, 1920 );
+        add_filter( 'image_size_names_choose', array( $this, 'image_size_names_choose' ) );
+    }
+
+    /**
+     * Custom image sizes
+     *
+     * @param array $sizes - registered image sizes.
+     *
+     * @return array
+     */
+    public function image_size_names_choose( $sizes ) {
+        return array_merge(
+            $sizes, array(
+                'vp_sm' => esc_html__( 'Small (VP)', NK_VP_DOMAIN ),
+                'vp_md' => esc_html__( 'Medium (VP)', NK_VP_DOMAIN ),
+                'vp_lg' => esc_html__( 'Large (VP)', NK_VP_DOMAIN ),
+                'vp_xl' => esc_html__( 'Extra Large (VP)', NK_VP_DOMAIN ),
+            )
+        );
     }
 
     /**
