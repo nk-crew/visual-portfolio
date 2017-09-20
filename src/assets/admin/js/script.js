@@ -34,26 +34,32 @@
     });
 
     // enable conditionize
-    if ('vp_lists' === $postType.val() && $editForm.length) {
+    if ('vp_lists' === $postType.val() && $editForm.length && $.fn.conditionize) {
         $editForm.conditionize();
     }
 
     // color picker
-    $('.vp-color-picker').wpColorPicker();
+    if ($.fn.wpColorPicker) {
+        $('.vp-color-picker').wpColorPicker();
+    }
 
     // image picker
-    $('.vp-image-picker').imagepicker();
+    if ($.fn.imagepicker) {
+        $('.vp-image-picker').imagepicker();
+    }
 
     // rangeslider
-    $('.vp-rangeslider').rangeslider({
-        polyfill: false,
-        onInit: function() {
-            this.$handle.append('<span class="vp-rangeslider-handle-value">' + this.value + '</span>');
-        },
-        onSlide: function() {
-            this.$handle.children('.vp-rangeslider-handle-value').text(this.value);
-        }
-    });
+    if ($.fn.rangeslider) {
+        $('.vp-rangeslider').rangeslider({
+            polyfill: false,
+            onInit: function() {
+                this.$handle.append('<span class="vp-rangeslider-handle-value">' + this.value + '</span>');
+            },
+            onSlide: function() {
+                this.$handle.children('.vp-rangeslider-handle-value').text(this.value);
+            }
+        });
+    }
 
     // reinit portfolio on options change
     var $preview = $('.vp_list_preview > .vp-portfolio');
@@ -134,96 +140,98 @@
     }
 
     // enable select2
-    $('.vp-select2').each(function () {
-        var $this = $(this);
-        var opts = {
-            width: '100%',
-            minimumResultsForSearch: $this.hasClass('vp-select2-nosearch') ? -1 : 1
-        };
+    if ($.fn.select2) {
+        $('.vp-select2').each(function () {
+            var $this = $(this);
+            var opts = {
+                width: '100%',
+                minimumResultsForSearch: $this.hasClass('vp-select2-nosearch') ? -1 : 1
+            };
 
-        // ajax posts
-        if ($this.hasClass('vp-select2-posts-ajax')) {
-            opts = $.extend({
-                minimumInputLength: 1,
-                ajax: {
-                    url: ajaxurl,
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            action: 'vp_find_posts',
-                            q: params.term,
-                            post_type: $($this.attr('data-post-type')).val(),
-                            nonce: vpAdminVariables.nonce
-                        };
+            // ajax posts
+            if ($this.hasClass('vp-select2-posts-ajax')) {
+                opts = $.extend({
+                    minimumInputLength: 1,
+                    ajax: {
+                        url: ajaxurl,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                action: 'vp_find_posts',
+                                q: params.term,
+                                post_type: $($this.attr('data-post-type')).val(),
+                                nonce: vpAdminVariables.nonce
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data && data.length ? data : false
+                            };
+                        },
+                        cache: true
                     },
-                    processResults: function (data) {
-                        return {
-                            results: data && data.length ? data : false
-                        };
+                    escapeMarkup: function (markup) { return markup; },
+                    templateResult: function (data) {
+                        if (data.loading) return data.text;
+
+                        return "<div class='vp-select2-ajax__result'>" +
+                            "<div class='vp-select2-ajax__result-img'><img src='" + data.img + "' /></div>" +
+                            "<div class='vp-select2-ajax__result-data'>" +
+                            "<div class='vp-select2-ajax__result-title'>" + data.title + "</div>" +
+                            "<div class='vp-select2-ajax__result-post-type'>" + data.post_type + "</div>" +
+                            "</div>" +
+                            "</div>";
                     },
-                    cache: true
-                },
-                escapeMarkup: function (markup) { return markup; },
-                templateResult: function (data) {
-                    if (data.loading) return data.text;
+                    templateSelection: function (repo) {
+                        return repo.title || repo.text;
+                    }
+                }, opts);
+            }
 
-                    return "<div class='vp-select2-ajax__result'>" +
-                        "<div class='vp-select2-ajax__result-img'><img src='" + data.img + "' /></div>" +
-                        "<div class='vp-select2-ajax__result-data'>" +
-                        "<div class='vp-select2-ajax__result-title'>" + data.title + "</div>" +
-                        "<div class='vp-select2-ajax__result-post-type'>" + data.post_type + "</div>" +
-                        "</div>" +
-                        "</div>";
-                },
-                templateSelection: function (repo) {
-                    return repo.title || repo.text;
-                }
-            }, opts);
-        }
+            // ajax taxonomies
+            if ($this.hasClass('vp-select2-taxonomies-ajax')) {
+                var $postType = $this.attr('data-post-type-from') ? $($this.attr('data-post-type-from')) : false;
 
-        // ajax taxonomies
-        if ($this.hasClass('vp-select2-taxonomies-ajax')) {
-            var $postType = $this.attr('data-post-type-from') ? $($this.attr('data-post-type-from')) : false;
+                opts = $.extend({
+                    minimumInputLength: 1,
+                    ajax: {
+                        url: ajaxurl,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                action: 'vp_find_taxonomies',
+                                q: params.term,
+                                post_type: $postType ? $postType.val() : false,
+                                nonce: vpAdminVariables.nonce
+                            };
+                        },
+                        processResults: function (data) {
+                            var result = [];
 
-            opts = $.extend({
-                minimumInputLength: 1,
-                ajax: {
-                    url: ajaxurl,
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            action: 'vp_find_taxonomies',
-                            q: params.term,
-                            post_type: $postType ? $postType.val() : false,
-                            nonce: vpAdminVariables.nonce
-                        };
-                    },
-                    processResults: function (data) {
-                        var result = [];
-
-                        if (data) {
-                            for (var k in data) {
-                                result.push({
-                                    'text': k,
-                                    'children': data[k]
-                                })
+                            if (data) {
+                                for (var k in data) {
+                                    result.push({
+                                        'text': k,
+                                        'children': data[k]
+                                    })
+                                }
                             }
-                        }
 
-                        return {
-                            results: result
-                        };
-                    },
-                    cache: true
-                }
-            }, opts);
-        }
+                            return {
+                                results: result
+                            };
+                        },
+                        cache: true
+                    }
+                }, opts);
+            }
 
-        // init
-        $this.select2(opts).data('select2').$dropdown.addClass('select2-vp-container');
-    });
+            // init
+            $this.select2(opts).data('select2').$dropdown.addClass('select2-vp-container');
+        });
+    }
 
     // prevent page closing
     if ('vp_lists' === $postType.val() && $editForm.length) {
