@@ -590,7 +590,7 @@
                 // masonry: {
                 //     horizontalOrder: true
                 // },
-                transitionDuration: 400,
+                transitionDuration: '0.3s',
                 percentPosition: true
             });
 
