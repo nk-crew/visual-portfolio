@@ -53,7 +53,7 @@
     position: absolute;
     visibility: visible;
     left: 50%;
-    margin-left: -15px;
+    margin-left: -11px;
     width: 23px;
     height: 24px;
     margin-top: 45px;
@@ -150,6 +150,26 @@
         opacity: 0;
         visibility: hidden;
         animation: none;
+    }
+}
+
+// Loading
+.vp-portfolio.vp-portfolio__loading {
+    &:before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+
+    .vp-portfolio__items-wrap,
+    .vp-portfolio__filter-wrap,
+    .vp-portfolio__pagination-wrap {
+        opacity: 0.5;
     }
 }
 
