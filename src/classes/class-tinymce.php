@@ -37,6 +37,10 @@ class Visual_Portfolio_TinyMCE {
      */
     public function admin_enqueue_scripts( $page ) {
         if ( 'post.php' === $page || 'post-new.php' === $page ) {
+            // save global $post to fix issue with no able to create new pages.
+            global $post;
+            $tmp_post = $post;
+
             // add tiny mce data.
             $data_tiny_mce = array();
 
@@ -47,14 +51,19 @@ class Visual_Portfolio_TinyMCE {
                 'showposts'      => -1,
                 'paged'          => -1,
             ));
-            while ( $vp_query->have_posts() ) {
-                $vp_query->the_post();
-                $data_tiny_mce[] = array(
-                    'id'    => get_the_ID(),
-                    'title' => get_the_title(),
-                );
+            if ( $vp_query->have_posts() ) {
+                while ( $vp_query->have_posts() ) {
+                    $vp_query->the_post();
+                    $data_tiny_mce[] = array(
+                        'id'    => get_the_ID(),
+                        'title' => get_the_title(),
+                    );
+                }
+                wp_reset_postdata();
             }
-            wp_reset_postdata();
+
+            // restore $post.
+            $post = $tmp_post;
 
             // return if no data.
             if ( ! count( $data_tiny_mce ) ) {
