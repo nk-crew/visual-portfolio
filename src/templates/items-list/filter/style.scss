@@ -10,7 +10,7 @@
     padding: 0;
     margin-bottom: 17px;
 
-    a {
+    .vp-filter__item a {
         outline: none;
         box-shadow: none;
     }
@@ -33,7 +33,7 @@
         > * {
             display: block;
             text-decoration: none;
-            padding: 8px 14px;
+            padding: 8px 16px;
             min-width: 40px;
             line-height: 1.4;
             color: inherit;
@@ -48,8 +48,8 @@
 
         &.vp-filter__item-active > * {
             cursor: default;
-            border-color: #0085ba;
-            background-color: #0082b7;
+            border-color: #007acc;
+            background-color: #007acc;
             color: #fff;
         }
     }

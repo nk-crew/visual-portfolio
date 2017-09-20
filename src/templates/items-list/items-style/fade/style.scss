@@ -2,6 +2,11 @@
  * Fade items style
  */
 .vp-portfolio__items-style-fade {
+    .vp-portfolio__item a {
+        outline: none;
+        box-shadow: none;
+    }
+
     .vp-portfolio__item-overlay {
         position: absolute;
         display: flex;

@@ -2,6 +2,11 @@
  * Default items style
  */
 .vp-portfolio__items-style-default {
+    .vp-portfolio__item a {
+        outline: none;
+        box-shadow: none;
+    }
+
     .vp-portfolio__item-meta {
         position: relative;
         padding: 10px 15px;
@@ -20,7 +25,7 @@
                 text-decoration: none;
 
                 &:hover {
-                    color: #0082b7;
+                    color: #007acc;
                 }
             }
         }

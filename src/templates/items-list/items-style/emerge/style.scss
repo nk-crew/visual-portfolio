@@ -2,6 +2,11 @@
  * Emerge items style
  */
 .vp-portfolio__items-style-emerge {
+    .vp-portfolio__item a {
+        outline: none;
+        box-shadow: none;
+    }
+
     .vp-portfolio__item-overlay {
         position: absolute;
         padding: 15px;
