@@ -595,7 +595,7 @@
                 percentPosition: true
             });
 
-            self.emitEvent('initIsotope');
+            self.emitEvent('initIsotope', [options]);
         }
     };
 
