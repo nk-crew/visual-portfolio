@@ -39,6 +39,7 @@ class Visual_Portfolio {
     public static function instance() {
         if ( is_null( self::$_instance ) ) {
             self::$_instance = new self();
+            self::$_instance->register_scripts();
             self::$_instance->init_options();
             self::$_instance->init_hooks();
         }
@@ -134,6 +135,35 @@ class Visual_Portfolio {
      */
     public function rewrite_rules() {
         flush_rewrite_rules();
+    }
+
+    /**
+     * Register scripts that will be used in the future when portfolio will be printed.
+     */
+    public function register_scripts() {
+        wp_register_style( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/css/font-awesome.min.css' );
+
+        wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '', true );
+
+        wp_register_script( 'imagesloaded', visual_portfolio()->plugin_url . 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js', '', '', true );
+
+        // we need to dequeue isotope just because in some popular plugins used really old version of isotope.
+        wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '6.0.0', true );
+
+        /*
+         * TODO: Justified
+           wp_register_script( 'justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/justified-gallery/js/jquery.justifiedGallery.min.js', array( 'jquery' ), '', true );
+         */
+
+        // PhotoSwipe.
+        wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css' );
+        wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css' );
+        wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', '', '', true );
+        wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '', true );
+
+        // Visual Portfolio.
+        wp_register_script( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/js/script.js', array( 'jquery', 'isotope', 'photoswipe' ), '', true );
+        wp_register_style( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/css/style.css' );
     }
 
     /**

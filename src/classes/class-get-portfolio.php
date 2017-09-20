@@ -188,27 +188,26 @@ class Visual_Portfolio_Get {
         }
         self::$scripts_enqueued = true;
 
-        wp_enqueue_style( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/css/font-awesome.min.css' );
+        wp_enqueue_style( 'font-awesome' );
+        wp_enqueue_script( 'object-fit-images' );
+        wp_enqueue_script( 'imagesloaded' );
 
-        wp_enqueue_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '', true );
-
-        wp_enqueue_script( 'imagesloaded', visual_portfolio()->plugin_url . 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js', '', '', true );
-        wp_enqueue_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '', true );
+        wp_enqueue_script( 'isotope' );
 
         /*
          * TODO: Justified
-           wp_enqueue_script( 'justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/justified-gallery/js/jquery.justifiedGallery.min.js', array( 'jquery' ), '', true );
+           wp_enqueue_script( 'justified-gallery' );
          */
 
         // PhotoSwipe.
-        wp_enqueue_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css' );
-        wp_enqueue_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css' );
-        wp_enqueue_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', '', '', true );
-        wp_enqueue_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '', true );
+        wp_enqueue_style( 'photoswipe' );
+        wp_enqueue_style( 'photoswipe-default-skin' );
+        wp_enqueue_script( 'photoswipe' );
+        wp_enqueue_script( 'photoswipe-ui-default' );
 
         // Visual Portfolio.
-        wp_enqueue_script( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/js/script.js', array( 'jquery', 'isotope', 'photoswipe' ), '', true );
-        wp_enqueue_style( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/css/style.css' );
+        wp_enqueue_script( 'visual-portfolio' );
+        wp_enqueue_style( 'visual-portfolio' );
     }
 
     /**
