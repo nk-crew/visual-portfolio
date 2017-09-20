@@ -8,19 +8,25 @@
  * Plugin Icon
  */
 .dashicons-visual-portfolio,
-.dashicons-visual-portfolio-gray {
+.dashicons-visual-portfolio-gray,
+.mce-widget .mce-i-visual-portfolio {
     background-image: url('../images/icon.svg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 15px;
     opacity: 0.6;
 }
+.mce-widget .mce-i-visual-portfolio {
+    background-image: url('../images/icon-mce.svg');
+    opacity: 1;
+}
 .menu-top.current .dashicons-visual-portfolio,
 .menu-top:hover .dashicons-visual-portfolio,
 .wp-has-current-submenu .dashicons-visual-portfolio {
     opacity: 1;
 }
-.dashicons-visual-portfolio-gray {
+.dashicons-visual-portfolio-gray,
+.mce-i-visual-portfolio-gray {
     background-image: url('../images/icon-gray.svg');
 }
 
