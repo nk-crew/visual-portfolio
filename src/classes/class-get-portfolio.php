@@ -446,109 +446,111 @@ class Visual_Portfolio_Get {
         <div class="vp-portfolio__items-wrap">
             <div class="vp-portfolio__items vp-portfolio__items-style-<?php echo esc_attr( $options['vp_items_style'] ); ?>">
                 <?php
-                while ( $portfolio_query->have_posts() ) :
-                    $portfolio_query->the_post();
+                if ( $portfolio_query->have_posts() ) {
+                    while ( $portfolio_query->have_posts() ) {
+                        $portfolio_query->the_post();
 
-                    // Get category taxonomies for data filter.
-                    $filter_values = array();
-                    $categories = array();
-                    $all_taxonomies = get_object_taxonomies( get_post() );
-                    foreach ( $all_taxonomies as $cat ) {
-                        // allow only category taxonomies like category, portfolio_category, etc...
-                        if ( strpos( $cat, 'category' ) === false ) {
-                            continue;
-                        }
+                        // Get category taxonomies for data filter.
+                        $filter_values  = array();
+                        $categories     = array();
+                        $all_taxonomies = get_object_taxonomies( get_post() );
+                        foreach ( $all_taxonomies as $cat ) {
+                            // allow only category taxonomies like category, portfolio_category, etc...
+                            if ( strpos( $cat, 'category' ) === false ) {
+                                continue;
+                            }
 
-                        $category = get_the_terms( get_post(), $cat );
+                            $category = get_the_terms( get_post(), $cat );
 
-                        if ( $category && ! in_array( $category, $filter_values ) ) {
-                            foreach ( $category as $key => $cat_item ) {
-                                // add in filter.
-                                $filter_values[] = $cat_item->slug;
+                            if ( $category && ! in_array( $category, $filter_values ) ) {
+                                foreach ( $category as $key => $cat_item ) {
+                                    // add in filter.
+                                    $filter_values[] = $cat_item->slug;
 
-                                // add in categories array.
-                                $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
-                                $url = self::get_nopaging_url( false, array(
-                                    'vp_filter' => urlencode( $unique_name ),
-                                ) );
-                                $categories[] = array(
-                                    'slug'        => $cat_item->slug,
-                                    'label'       => $cat_item->name,
-                                    'description' => $cat_item->description,
-                                    'count'       => $cat_item->count,
-                                    'taxonomy'    => $cat_item->taxonomy,
-                                    'url'         => $url,
-                                );
+                                    // add in categories array.
+                                    $unique_name  = $cat_item->taxonomy . ':' . $cat_item->slug;
+                                    $url          = self::get_nopaging_url( false, array(
+                                        'vp_filter' => urlencode( $unique_name ),
+                                    ) );
+                                    $categories[] = array(
+                                        'slug'        => $cat_item->slug,
+                                        'label'       => $cat_item->name,
+                                        'description' => $cat_item->description,
+                                        'count'       => $cat_item->count,
+                                        'taxonomy'    => $cat_item->taxonomy,
+                                        'url'         => $url,
+                                    );
+                                }
                             }
                         }
-                    }
 
-                    // args.
-                    $args = array(
-                        'url'        => get_permalink(),
-                        'title'      => get_the_title(),
-                        'published'  => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
-                        'filter'     => implode( ',', $filter_values ),
-                        'image'      => get_the_post_thumbnail( get_the_ID(), $img_size ),
-                        'categories' => $categories,
-                        'opts'       => $style_options,
-                        'vp_ops'     => $options,
-                    );
+                        // args.
+                        $args = array(
+                            'url'        => get_permalink(),
+                            'title'      => get_the_title(),
+                            'published'  => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
+                            'filter'     => implode( ',', $filter_values ),
+                            'image'      => get_the_post_thumbnail( get_the_ID(), $img_size ),
+                            'categories' => $categories,
+                            'opts'       => $style_options,
+                            'vp_ops'     => $options,
+                        );
 
-                    // Excerpt.
-                    if ( $style_options['show_excerpt'] ) {
-                        $args['excerpt'] = wp_trim_words( do_shortcode( get_the_content() ), $style_options['excerpt_words_count'], '...' );
-                    }
+                        // Excerpt.
+                        if ( $style_options['show_excerpt'] ) {
+                            $args['excerpt'] = wp_trim_words( do_shortcode( get_the_content() ), $style_options['excerpt_words_count'], '...' );
+                        }
 
-                    // Click action.
-                    $popup_image = false;
-                    switch ( $options['vp_items_click_action'] ) {
-                        case 'popup_gallery':
-                            if ( $args['image'] ) {
-                                $popup_image = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_popup );
-                            } else if ( $no_image ) {
-                                $popup_image = wp_get_attachment_image_src( $no_image, $img_size_popup );
-                            }
-                            break;
-                        case false:
-                            $args['url'] = false;
-                            break;
-                    }
+                        // Click action.
+                        $popup_image = false;
+                        switch ( $options['vp_items_click_action'] ) {
+                            case 'popup_gallery':
+                                if ( $args['image'] ) {
+                                    $popup_image = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_popup );
+                                } else if ( $no_image ) {
+                                    $popup_image = wp_get_attachment_image_src( $no_image, $img_size_popup );
+                                }
+                                break;
+                            case false:
+                                $args['url'] = false;
+                                break;
+                        }
 
-                    // No Image.
-                    if ( ! $args['image'] && $no_image ) {
-                        $args['image'] = wp_get_attachment_image( $no_image, $img_size );
-                    }
-                    ?>
+                        // No Image.
+                        if ( ! $args['image'] && $no_image ) {
+                            $args['image'] = wp_get_attachment_image( $no_image, $img_size );
+                        }
+                        ?>
 
-                    <div class="vp-portfolio__item" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>"
-                        <?php
-                        if ( $popup_image ) {
-                            ?>
-                            data-vp-popup-img="<?php echo esc_url( $popup_image[0] ); ?>"
-                            data-vp-popup-img-size="<?php echo esc_attr( $popup_image[1] ); ?>x<?php echo esc_attr( $popup_image[2] ); ?>"
-                        <? } ?>>
-                        <div class="vp-portfolio__item-wrap">
+                        <div class="vp-portfolio__item" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>"
                             <?php
-                            switch ( $options['vp_items_style'] ) {
-                                case 'fly':
-                                case 'emerge':
-                                case 'fade':
-                                    visual_portfolio()->include_template( 'items-list/items-style/' . $options['vp_items_style'] . '/image', $args );
-                                    visual_portfolio()->include_template( 'items-list/items-style/' . $options['vp_items_style'] . '/meta', $args );
-                                    break;
-                                default:
-                                    visual_portfolio()->include_template( 'items-list/items-style/image', $args );
-                                    visual_portfolio()->include_template( 'items-list/items-style/meta', $args );
-                                    break;
-                            }
-                            ?>
+                            if ( $popup_image ) {
+                                ?>
+                                data-vp-popup-img="<?php echo esc_url( $popup_image[0] ); ?>"
+                                data-vp-popup-img-size="<?php echo esc_attr( $popup_image[1] ); ?>x<?php echo esc_attr( $popup_image[2] ); ?>"
+                            <? } ?>>
+                            <div class="vp-portfolio__item-wrap">
+                                <?php
+                                switch ( $options['vp_items_style'] ) {
+                                    case 'fly':
+                                    case 'emerge':
+                                    case 'fade':
+                                        visual_portfolio()->include_template( 'items-list/items-style/' . $options['vp_items_style'] . '/image', $args );
+                                        visual_portfolio()->include_template( 'items-list/items-style/' . $options['vp_items_style'] . '/meta', $args );
+                                        break;
+                                    default:
+                                        visual_portfolio()->include_template( 'items-list/items-style/image', $args );
+                                        visual_portfolio()->include_template( 'items-list/items-style/meta', $args );
+                                        break;
+                                }
+                                ?>
+                            </div>
                         </div>
-                    </div>
-                    <?php
-                endwhile;
+                        <?php
+                    }
 
-                wp_reset_postdata();
+                    wp_reset_postdata();
+                }
 
                 ?>
             </div>
@@ -601,48 +603,50 @@ class Visual_Portfolio_Get {
          * TODO: make caching using set_transient function. Info here - https://wordpress.stackexchange.com/a/145960
          */
         $portfolio_query = new WP_Query( $query_opts );
-        while ( $portfolio_query->have_posts() ) {
-            $portfolio_query->the_post();
-            $all_taxonomies = get_object_taxonomies( get_post() );
+        if ( $portfolio_query->have_posts() ) {
+            while ( $portfolio_query->have_posts() ) {
+                $portfolio_query->the_post();
+                $all_taxonomies = get_object_taxonomies( get_post() );
 
-            foreach ( $all_taxonomies as $cat ) {
-                // allow only category taxonomies like category, portfolio_category, etc...
-                if ( strpos( $cat, 'category' ) === false ) {
-                    continue;
-                }
+                foreach ( $all_taxonomies as $cat ) {
+                    // allow only category taxonomies like category, portfolio_category, etc...
+                    if ( strpos( $cat, 'category' ) === false ) {
+                        continue;
+                    }
 
-                // Retrieve terms.
-                $category = get_the_terms( get_post(), $cat );
-                if ( ! $category ) {
-                    continue;
-                }
+                    // Retrieve terms.
+                    $category = get_the_terms( get_post(), $cat );
+                    if ( ! $category ) {
+                        continue;
+                    }
 
-                // Prepare each terms array.
-                foreach ( $category as $key => $cat_item ) {
-                    $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
+                    // Prepare each terms array.
+                    foreach ( $category as $key => $cat_item ) {
+                        $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
 
-                    $url = self::get_nopaging_url( false, array(
-                        'vp_filter' => urlencode( $unique_name ),
-                    ) );
+                        $url = self::get_nopaging_url( false, array(
+                            'vp_filter' => urlencode( $unique_name ),
+                        ) );
 
-                    $items[ $unique_name ] = array(
-                        'filter'      => $cat_item->slug,
-                        'label'       => $cat_item->name,
-                        'description' => $cat_item->description,
-                        'count'       => $cat_item->count,
-                        'taxonomy'    => $cat_item->taxonomy,
-                        'active'      => $active_item === $unique_name,
-                        'url'         => $url,
-                        'class'       => 'vp-filter__item' . ($active_item === $unique_name ? ' vp-filter__item-active' : ''),
-                    );
+                        $items[ $unique_name ] = array(
+                            'filter'      => $cat_item->slug,
+                            'label'       => $cat_item->name,
+                            'description' => $cat_item->description,
+                            'count'       => $cat_item->count,
+                            'taxonomy'    => $cat_item->taxonomy,
+                            'active'      => $active_item === $unique_name,
+                            'url'         => $url,
+                            'class'       => 'vp-filter__item' . ($active_item === $unique_name ? ' vp-filter__item-active' : ''),
+                        );
 
-                    if ( $active_item === $unique_name ) {
-                        $there_is_active = true;
+                        if ( $active_item === $unique_name ) {
+                            $there_is_active = true;
+                        }
                     }
                 }
             }
+            wp_reset_postdata();
         }
-        wp_reset_postdata();
 
         // Add 'All' active item.
         array_unshift($items , array(
