@@ -39,8 +39,8 @@ class Visual_Portfolio {
     public static function instance() {
         if ( is_null( self::$_instance ) ) {
             self::$_instance = new self();
-            self::$_instance->register_scripts();
             self::$_instance->init_options();
+            self::$_instance->register_scripts();
             self::$_instance->init_hooks();
         }
         return self::$_instance;
