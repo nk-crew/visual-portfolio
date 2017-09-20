@@ -521,13 +521,14 @@
         }
 
         // add gaps
-        if (self.options.itemsGap && ('tiles' === self.options.layout || 'masonry' === self.options.layout)) {
+        var gap = parseInt(self.options.itemsGap, 10);
+        if (gap && ('tiles' === self.options.layout || 'masonry' === self.options.layout)) {
             self.addStyle('.vp-portfolio__items', {
-                'margin-left': '-' + self.options.itemsGap + 'px',
-                'margin-top': '-' + self.options.itemsGap + 'px'
+                'margin-left': '-' + gap + 'px',
+                'margin-top': '-' + gap + 'px'
             });
 
-            var gapStyle = self.options.itemsGap + 'px';
+            var gapStyle = gap + 'px';
 
             self.addStyle('.vp-portfolio__item .vp-portfolio__item-wrap', {
                 'margin-left': gapStyle,
