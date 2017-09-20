@@ -25,7 +25,7 @@
         opacity: 0;
         transition: .3s opacity;
     }
-    & .vp-portfolio__item-wrap:hover .vp-portfolio__item-overlay {
+    & .vp-portfolio__item:hover .vp-portfolio__item-overlay {
         opacity: 1;
     }
 

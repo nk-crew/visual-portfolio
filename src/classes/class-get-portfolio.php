@@ -357,6 +357,7 @@ class Visual_Portfolio_Get {
         // prepare image sizes.
         // TODO: Option to set custom image sizes.
         $img_size_popup = 'vp_xl';
+        $img_size_md_popup = 'vp_md';
         $img_size = 'vp_lg';
         $columns_count = false;
         if ( 'masonry' === $options['vp_layout'] ) {
@@ -502,12 +503,15 @@ class Visual_Portfolio_Get {
 
                         // Click action.
                         $popup_image = false;
+                        $popup_md_image = false;
                         switch ( $options['vp_items_click_action'] ) {
                             case 'popup_gallery':
                                 if ( $args['image'] ) {
                                     $popup_image = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_popup );
+                                    $popup_md_image = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_md_popup );
                                 } else if ( $no_image ) {
                                     $popup_image = wp_get_attachment_image_src( $no_image, $img_size_popup );
+                                    $popup_md_image = wp_get_attachment_image_src( $no_image, $img_size_md_popup );
                                 }
                                 break;
                             case false:
@@ -521,14 +525,20 @@ class Visual_Portfolio_Get {
                         }
                         ?>
 
-                        <div class="vp-portfolio__item" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>"
+                        <div class="vp-portfolio__item-wrap" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>"
                             <?php
                             if ( $popup_image ) {
                                 ?>
                                 data-vp-popup-img="<?php echo esc_url( $popup_image[0] ); ?>"
                                 data-vp-popup-img-size="<?php echo esc_attr( $popup_image[1] ); ?>x<?php echo esc_attr( $popup_image[2] ); ?>"
+                            <? } ?>
+                            <?php
+                            if ( $popup_md_image ) {
+                                ?>
+                                data-vp-popup-md-img="<?php echo esc_url( $popup_md_image[0] ); ?>"
+                                data-vp-popup-md-img-size="<?php echo esc_attr( $popup_md_image[1] ); ?>x<?php echo esc_attr( $popup_md_image[2] ); ?>"
                             <? } ?>>
-                            <div class="vp-portfolio__item-wrap">
+                            <div class="vp-portfolio__item">
                                 <?php
                                 switch ( $options['vp_items_style'] ) {
                                     case 'fly':

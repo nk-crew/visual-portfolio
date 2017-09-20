@@ -20,7 +20,7 @@
         transition: .2s transform;
     }
 
-    .vp-portfolio__item-wrap:hover .vp-portfolio__item-overlay {
+    .vp-portfolio__item:hover .vp-portfolio__item-overlay {
         transform: translateY(0);
     }
 

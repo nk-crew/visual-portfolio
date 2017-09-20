@@ -24,7 +24,7 @@
 .vp-portfolio__items-wrap,
 .vp-portfolio__filter-wrap,
 .vp-portfolio__pagination-wrap,
-.vp-portfolio__item-wrap {
+.vp-portfolio__item {
     position: relative;
     overflow: hidden;
 }
@@ -36,7 +36,7 @@
     transition: .7s opacity, .7s visibility;
 }
 
-.vp-portfolio__item {
+.vp-portfolio__item-wrap {
     position: relative;
     width: 33.333%;
     float: left;
@@ -128,7 +128,7 @@
 
 // Justified
 [data-vp-layout="justified"] {
-    .vp-portfolio__item {
+    .vp-portfolio__item-wrap {
         position: absolute;
     }
 }
