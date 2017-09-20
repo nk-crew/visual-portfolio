@@ -37,33 +37,23 @@ class Visual_Portfolio_TinyMCE {
      */
     public function admin_enqueue_scripts( $page ) {
         if ( 'post.php' === $page || 'post-new.php' === $page ) {
-            // save global $post to fix issue with no able to create new pages.
-            global $post;
-            $tmp_post = $post;
-
             // add tiny mce data.
             $data_tiny_mce = array();
 
             // get all visual-portfolio post types.
-            $vp_query = new WP_Query(array(
+            // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
+            $vp_query = get_posts(array(
                 'post_type'      => 'vp_lists',
                 'posts_per_page' => -1,
                 'showposts'      => -1,
                 'paged'          => -1,
             ));
-            if ( $vp_query->have_posts() ) {
-                while ( $vp_query->have_posts() ) {
-                    $vp_query->the_post();
-                    $data_tiny_mce[] = array(
-                        'id'    => get_the_ID(),
-                        'title' => get_the_title(),
-                    );
-                }
-                wp_reset_postdata();
+            foreach ( $vp_query as $post ) {
+                $data_tiny_mce[] = array(
+                    'id'    => $post->ID,
+                    'title' => $post->post_title,
+                );
             }
-
-            // restore $post.
-            $post = $tmp_post;
 
             // return if no data.
             if ( ! count( $data_tiny_mce ) ) {
