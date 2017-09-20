@@ -233,6 +233,34 @@
         });
     }
 
+    // codemirror
+    if (typeof CodeMirror !== 'undefined') {
+        var $customCss = $('[name="vp_custom_css"]');
+        if ($customCss.length) {
+            var editor = CodeMirror.fromTextArea($customCss[0], {
+                lineNumbers: true,
+                mode: 'css',
+                theme: 'eclipse',
+                indentUnit: 4,
+                autoCloseTags: true,
+                matchBrackets: true,
+                foldGutter: true,
+                lint: true,
+                showCursorWhenSelecting: true,
+                cursorScrollMargin: 30,
+                autocomplete: true,
+                autoCloseBrackets: true,
+                lineWrapping: true,
+                scrollPastEnd: true,
+                emmet_active: true,
+                emmet: true,
+                scrollbarStyle: 'simple',
+                gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter']
+            });
+            emmetCodeMirror(editor);
+        }
+    }
+
     // prevent page closing
     if ('vp_lists' === $postType.val() && $editForm.length) {
         var defaultForm = $editForm.serialize();

@@ -645,6 +645,13 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
     width: 100%;
 }
 
+/**
+ * Code editor
+ */
+[name="vp_custom_css"] + .CodeMirror {
+    border: 1px solid #dddddd;
+}
+
 
 /**
  * Responsive
