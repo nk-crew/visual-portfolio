@@ -33,8 +33,8 @@
 
             self.$item = $item;
             self.$items_wrap = $item.find('.vp-portfolio__items');
-            self.$pagination = $item.find('.vp-pagination');
-            self.$filter = $item.find('.vp-filter');
+            self.$pagination = $item.find('.vp-portfolio__pagination-wrap');
+            self.$filter = $item.find('.vp-portfolio__filter-wrap');
 
             // get id from class
             var classes = $item[0].className.split(/\s+/);
@@ -368,8 +368,11 @@
         });
 
         // on pagination click
-        self.$item.on('click' + evp, '.vp-pagination:not(.vp-pagination__no-more) .vp-pagination__item a', function (e) {
+        self.$item.on('click' + evp, '.vp-pagination .vp-pagination__item a', function (e) {
             e.preventDefault();
+            if ( $(this).hasClass('vp-pagination__no-more') && self.options.pagination !== 'paged') {
+                return;
+            }
             self.loadNewItems(this.href, self.options.pagination === 'paged');
         });
 
@@ -981,12 +984,12 @@
 
                 // update filter
                 if (self.$filter.length) {
-                    self.$filter.html($new_vp.children('.vp-filter').html());
+                    self.$filter.html($new_vp.find('.vp-portfolio__filter-wrap').html());
                 }
 
                 // update pagination
                 if (self.$pagination.length) {
-                    self.$pagination.html($new_vp.children('.vp-pagination').html());
+                    self.$pagination.html($new_vp.find('.vp-portfolio__pagination-wrap').html());
                 }
 
                 self.addItems($(newItems), removeExisting);
@@ -998,13 +1001,6 @@
             var nextPageUrl = $new_vp.attr('data-vp-next-page-url');
             self.options.nextPageUrl = nextPageUrl;
             self.$item.attr('data-vp-next-page-url', nextPageUrl);
-
-            // Update load more button
-            if (self.options.nextPageUrl) {
-                self.$pagination.removeClass('vp-pagination__no-more');
-            } else {
-                self.$pagination.addClass('vp-pagination__no-more');
-            }
 
             self.$item.removeClass('vp-portfolio__loading');
 
