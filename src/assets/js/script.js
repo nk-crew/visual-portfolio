@@ -711,29 +711,27 @@
                 item;
 
             thumbElements.each(function () {
-                $meta = $(this).find('.vp-portfolio__item-meta');
-                size = (this.getAttribute('data-vp-popup-img-size') || '1920x1080').split('x');
+                $meta = $(this).find('.vp-portfolio__item-popup');
+                size = ($meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
 
                 // create slide object
                 item = {
-                    src: this.getAttribute('data-vp-popup-img'),
+                    src: $meta.attr('data-vp-popup-img'),
                     w: parseInt(size[0], 10),
-                    h: parseInt(size[1], 10),
-                    author: this.getAttribute('data-author')
+                    h: parseInt(size[1], 10)
                 };
 
-                if($meta.length) {
-                    var $caption = $meta.clone();
-                    $caption.find('.vp-portfolio__item-meta-icon').remove();
-                    item.title = $caption.html();
+                var $caption = $meta.html();
+                if ($caption) {
+                    item.title = $caption;
                 }
 
                 // save link to element for getThumbBoundsFn
                 item.el = this;
 
-                var mediumSrc = this.getAttribute('data-vp-popup-md-img') || item.src;
+                var mediumSrc = $meta.attr('data-vp-popup-md-img') || item.src;
                 if(mediumSrc) {
-                    size = (this.getAttribute('data-vp-popup-md-img-size') || this.getAttribute('data-vp-popup-img-size') || '1920x1080').split('x');
+                    size = ($meta.attr('data-vp-popup-md-img-size') || $meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
                     // "medium-sized" image
                     item.m = {
                         src: mediumSrc,
