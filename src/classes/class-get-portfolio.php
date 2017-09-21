@@ -739,10 +739,8 @@ class Visual_Portfolio_Get {
 
         switch ( $vp_options['vp_pagination'] ) {
             case 'infinite':
-                visual_portfolio()->include_template( 'items-list/pagination/infinite', $args );
-                break;
             case 'load-more':
-                visual_portfolio()->include_template( 'items-list/pagination/load-more', $args );
+                visual_portfolio()->include_template( 'items-list/pagination/' . $vp_options['vp_pagination'], $args );
                 break;
             default:
                 $pagination_links = paginate_links( array(
@@ -796,6 +794,8 @@ class Visual_Portfolio_Get {
                             $filtered_links[] = $arr;
                         }
                     }
+                } else {
+                    return;
                 }
 
                 $args['items'] = $filtered_links;
