@@ -315,7 +315,7 @@
                 'margin-right': mr - right
             });
         }
-        if ( self.$item.hasClass('vp-portfolio__stretch') && ! self.$item.parent('.vp_list_preview').length ) {
+        if ( self.$item.hasClass('vp-portfolio__stretch') && ! self.$item.closest('#vp_preview').length ) {
             $wnd.on('load' + evp + ' resize' + evp + ' orientationchange' + evp, function() {
                 stretch();
             });
@@ -695,6 +695,11 @@
         var self = this;
 
         if(typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery') {
+            return;
+        }
+
+        // prevent on preview page
+        if ( self.$item.closest('#vp_preview').length ) {
             return;
         }
 

@@ -157,6 +157,8 @@ class Visual_Portfolio_Get {
                 if ( isset( $post_meta[ $k ] ) && isset( $post_meta[ $k ][0] ) ) {
                     $val = maybe_unserialize( $post_meta[ $k ][0] );
 
+                    $val = apply_filters( 'vp_get_option', $val, $k );
+
                     if ( 'false' === $val || '' === $val ) {
                         $val = false;
                     }
@@ -247,7 +249,7 @@ class Visual_Portfolio_Get {
 
         $paged = 0;
         if ( $options['vp_pagination'] ) {
-            $paged = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
+            $paged = self::get_current_page_number();
         }
 
         /**
@@ -388,7 +390,7 @@ class Visual_Portfolio_Get {
         // get Post List.
         $portfolio_query = new WP_Query( $query_opts );
 
-        $start_page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
+        $start_page = self::get_current_page_number();
         $max_pages = (int) ($portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages);
         $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
 
@@ -601,6 +603,18 @@ class Visual_Portfolio_Get {
     }
 
     /**
+     * Get current page number
+     * /page/2/
+     * ?page=2
+     *
+     * @return int
+     */
+    static private function get_current_page_number() {
+        $page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
+        return $page;
+    }
+
+    /**
      * Print filters
      *
      * @param array $query_opts query options.
@@ -715,7 +729,7 @@ class Visual_Portfolio_Get {
             return;
         }
 
-        $start_page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
+        $start_page = self::get_current_page_number();
         $max_pages = (int) ($query->max_num_pages < $start_page ? $start_page : $query->max_num_pages);
         $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
 

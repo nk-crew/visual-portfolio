@@ -57,6 +57,9 @@ class Visual_Portfolio_Admin {
             Visual_Portfolio_Get::enqueue_scripts();
 
             wp_enqueue_media();
+
+            wp_enqueue_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.min.js', '', '', true );
+
             wp_enqueue_style( 'wp-color-picker' );
             wp_enqueue_script( 'wp-color-picker-alpha', visual_portfolio()->plugin_url . 'assets/vendor/wp-color-picker-alpha/wp-color-picker-alpha.min.js', array( 'wp-color-picker' ), '', true );
 
@@ -922,9 +925,26 @@ class Visual_Portfolio_Admin {
      * @param object $post The post object.
      */
     public function add_preview_metabox( $post ) {
+        global $wp_rewrite;
+
+        $url = get_site_url();
+
+        if ( ! $wp_rewrite->using_permalinks() ) {
+            $url = add_query_arg( array(
+                'vp_preview' => 'vp_preview',
+            ), $url );
+        } else {
+            $url .= '/vp_preview';
+        }
+
+        $url = add_query_arg( array(
+            'vp_preview_frame' => 'true',
+            'vp_preview_frame_id' => $post->ID,
+        ), $url );
+
         ?>
         <div class="vp_list_preview">
-            <?php echo Visual_Portfolio_Get::get( $post->ID ); ?>
+            <iframe name="vp_list_preview_iframe" src="<?php echo esc_url( $url ); ?>" frameborder="0" noresize="noresize" scrolling="no"></iframe>
         </div>
         <?php
     }

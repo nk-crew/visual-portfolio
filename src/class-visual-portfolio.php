@@ -115,6 +115,7 @@ class Visual_Portfolio {
         new Visual_Portfolio_Settings();
         new Visual_Portfolio_Get();
         new Visual_Portfolio_Shortcode();
+        new Visual_Portfolio_Preview();
         new Visual_Portfolio_Admin();
         new Visual_Portfolio_TinyMCE();
     }
@@ -215,6 +216,7 @@ class Visual_Portfolio {
         require_once( $this->plugin_path . 'classes/class-settings.php' );
         require_once( $this->plugin_path . 'classes/class-get-portfolio.php' );
         require_once( $this->plugin_path . 'classes/class-shortcode.php' );
+        require_once( $this->plugin_path . 'classes/class-preview.php' );
         require_once( $this->plugin_path . 'classes/class-admin.php' );
         require_once( $this->plugin_path . 'classes/class-tinymce.php' );
     }

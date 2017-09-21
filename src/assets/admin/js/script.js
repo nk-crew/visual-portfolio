@@ -7,8 +7,22 @@
     "use strict";
 
     var $body = $('body');
+    var $window = $(window);
     var $editForm = $('form[name="post"]');
     var $postType = $('[name="post_type"]');
+
+    // select shortcode text in input
+    $body.on('focus', '[name="vp_list_shortcode"]', function () {
+        this.select();
+    });
+    $body.on('click', 'td.vp_lists_post_shortcode', function () {
+        window.getSelection().selectAllChildren(this);
+    });
+
+    // Activate code only in vp_lists page
+    if ( 'vp_lists' !== $postType.val() || ! $editForm.length ) {
+        return;
+    }
 
     /**
      * Portfolio list creation
@@ -21,26 +35,33 @@
     $contentSource.on('click', '.vp-content-source__item', function () {
         var contentName = $(this).attr('data-content');
         $contentSource.find('[data-content="' + contentName + '"]').addClass('active').siblings().removeClass('active');
-        $contentSourceInput.val(contentName);
+        $contentSourceInput.val(contentName).change();
     });
     $contentSource.children('[data-content="' + $contentSourceInput.val() + '"]').click();
 
-    // select shortcode text in input
-    $body.on('focus', '[name="vp_list_shortcode"]', function () {
-       this.select();
-    });
-    $body.on('click', 'td.vp_lists_post_shortcode', function () {
-        window.getSelection().selectAllChildren(this);
-    });
-
     // enable conditionize
-    if ('vp_lists' === $postType.val() && $editForm.length && $.fn.conditionize) {
+    if ($.fn.conditionize) {
         $editForm.conditionize();
     }
 
     // color picker
     if ($.fn.wpColorPicker) {
-        $('.vp-color-picker').wpColorPicker();
+        $('.vp-color-picker').each(function () {
+            var color_picker_timeout;
+            var initialCall = true;
+            function onChange (e, ui) {
+                if (initialCall) {
+                    initialCall = false;
+                    return;
+                }
+                clearTimeout(color_picker_timeout);
+                color_picker_timeout = setTimeout(function () {
+                    $(e.target).change();
+                }, 300);
+            }
+            $(this).data('change', onChange)
+                .wpColorPicker()
+        });
     }
 
     // image picker
@@ -61,25 +82,100 @@
         });
     }
 
-    // reinit portfolio on options change
-    var $preview = $('.vp_list_preview > .vp-portfolio');
-    $('[name=vp_layout], [name=vp_tiles_type], [name=vp_masonry_columns], [name=vp_items_gap]').on('change input', function () {
-        var name = $(this).attr('name');
+    // frame load
+    var $frame = $('.vp_list_preview iframe');
+    var $framePortfolio = false;
+    var frameJQuery = false;
+    var $preview_form = $('<form target="vp_list_preview_iframe" method="post" style="display: none">')
+            .attr('action', $frame.attr('src'))
+            .insertAfter($editForm);
 
-        // remove vp_
-        name = name.substring(3);
+    // resize iframe
+    if ( $.fn.iFrameResize ) {
+        $frame.iFrameResize({
+            interval: 10,
+            resizeFrom: 'child'
+        });
+    }
 
-        // replace _ to -
-        name = name.replace('_', '-');
+    // portfolio options changed
+    var reloadTimeout;
+    $editForm.on('change input', '[name*="vp_"]', function (e) {
+        var $this = $(this);
+        var data = {
+            name: $this.attr('name'),
+            value: $this.is('[type=checkbox], [type=radio]') ? $this.is(':checked') : $this.val(),
+            reload: 'change' === e.type,
+            jQuery: frameJQuery,
+            $portfolio: $framePortfolio
+        };
 
-        $preview.attr('data-vp-' + name, this.value);
-        $preview.vp('init');
+        // create form input to store current changed data.
+        var $input = $preview_form.find('[name="' + data.name + '"]');
+        if ( ! $input.length ) {
+            $input = $('<input type="hidden" name="' + data.name + '" />')
+                .appendTo($preview_form)
+        }
+        $input.attr('value', data.value);
+
+        $window.trigger('vp-preview-change', data);
+
+        // reload frame
+        if ( data.reload || ! $framePortfolio ) {
+            clearTimeout(reloadTimeout);
+            reloadTimeout = setTimeout(function () {
+                frameJQuery = false;
+                $framePortfolio = false;
+                $preview_form.submit();
+            }, 400);
+        }
     });
-    $('[name=vp_filter_align]').on('change', function () {
-        $preview.find('.vp-filter').removeClass('vp-filter__align-center vp-filter__align-left vp-filter__align-right').addClass('vp-filter__align-' + this.value);
+
+    $frame.on('load', function () {
+        frameJQuery = this.contentWindow.jQuery;
+        $framePortfolio = frameJQuery('.vp-portfolio');
     });
-    $('[name=vp_pagination_align]').on('change', function () {
-        $preview.find('.vp-pagination').removeClass('vp-pagination__align-center vp-pagination__align-left vp-pagination__align-right').addClass('vp-pagination__align-' + this.value);
+
+    // live reload
+    $window.on('vp-preview-change', function (e, data) {
+        if ( ! data.$portfolio ) {
+            return;
+        }
+        switch ( data.name ) {
+            case 'vp_layout':
+            case 'vp_tiles_type':
+            case 'vp_masonry_columns':
+            case 'vp_items_gap':
+                var name = data.name;
+
+                // remove vp_
+                name = name.substring(3);
+
+                // replace _ to -
+                name = name.replace('_', '-');
+
+                data.$portfolio.attr('data-vp-' + name, data.value);
+                data.$portfolio.vp('init');
+                data.reload = false;
+
+                break;
+            case 'vp_filter_align':
+                data.$portfolio.find('.vp-filter').removeClass('vp-filter__align-center vp-filter__align-left vp-filter__align-right').addClass('vp-filter__align-' + data.value);
+                data.reload = false;
+
+                break;
+            case 'vp_pagination_align':
+                data.$portfolio.find('.vp-pagination').removeClass('vp-pagination__align-center vp-pagination__align-left vp-pagination__align-right').addClass('vp-pagination__align-' + data.value);
+                data.reload = false;
+
+                break;
+
+            // prevent some options reload
+            case 'vp_list_name':
+            case 'vp_stretch':
+                data.reload = false;
+                break;
+        }
     });
 
     // vp_layout -> data-vp-layout
@@ -262,16 +358,13 @@
     }
 
     // prevent page closing
-    if ('vp_lists' === $postType.val() && $editForm.length) {
-        var defaultForm = $editForm.serialize();
-
-        $(window).on('beforeunload', function () {
-            var isChanged = defaultForm !== $editForm.serialize();
-            var isFormSent = $('[type=submit]').hasClass('disabled');
-            if (isChanged && !isFormSent) {
-                return true;
-            }
-        });
-    }
+    var defaultForm = $editForm.serialize();
+    $(window).on('beforeunload', function () {
+        var isChanged = defaultForm !== $editForm.serialize();
+        var isFormSent = $('[type=submit]').hasClass('disabled');
+        if (isChanged && !isFormSent) {
+            return true;
+        }
+    });
 
 })(jQuery);
