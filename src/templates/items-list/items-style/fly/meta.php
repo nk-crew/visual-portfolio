@@ -7,9 +7,19 @@
  * @package visual-portfolio
  */
 
+$tag = 'a';
+if ( ! $args['url'] ) {
+    $tag = 'span';
+}
 ?>
 
-<a href="<?php echo esc_url( $args['url'] ); ?>" class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>" data-vp-bg-color="<?php echo esc_attr( $opts['bg_color'] ); ?>" data-vp-text-color="<?php echo esc_attr( $opts['text_color'] ); ?>">
+<<?php echo esc_html( $tag ); ?>
+    <?php if ( $args['url'] ) : ?>
+        href="<?php echo esc_url( $args['url'] ); ?>"
+    <?php endif; ?>
+    class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>"
+    data-vp-bg-color="<?php echo esc_attr( $opts['bg_color'] ); ?>"
+    data-vp-text-color="<?php echo esc_attr( $opts['text_color'] ); ?>">
     <div class="vp-portfolio__item-meta">
         <?php
 
@@ -74,4 +84,4 @@
         }
         ?>
     </div>
-</a>
+</<?php echo esc_html( $tag ); ?>>
