@@ -405,7 +405,9 @@ class Visual_Portfolio_Get {
              data-vp-pagination="<?php echo esc_attr( $options['vp_pagination'] ); ?>"
              data-vp-next-page-url="<?php echo esc_url( $next_page_url ); ?>">
 
-        <div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>
+            <div class="vp-portfolio__preloader-wrap">
+                <div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>
+            </div>
 
         <?php
         // get options for the current style.
