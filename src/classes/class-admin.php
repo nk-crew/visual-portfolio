@@ -951,6 +951,7 @@ class Visual_Portfolio_Admin {
         $post_types_list[] = array( 'ids', esc_html__( 'Specific Posts', NK_VP_DOMAIN ) );
         $post_types_list[] = array( 'custom_query', esc_html__( 'Custom Query', NK_VP_DOMAIN ) );
         ?>
+        <p></p>
         <div class="vp-content-source">
             <input type="hidden" name="vp_content_source" value="<?php echo esc_attr( $meta['vp_content_source'] ); ?>">
 
@@ -1157,6 +1158,7 @@ class Visual_Portfolio_Admin {
     public function add_custom_css_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
         ?>
+        <p></p>
         <textarea class="vp-input" name="vp_custom_css" id="vp_custom_css" cols="30" rows="10"><?php echo esc_html( $meta['vp_custom_css'] ); ?></textarea>
         <p class="description">
             <?php echo esc_html__( 'Available classes:', NK_VP_DOMAIN ); ?>
