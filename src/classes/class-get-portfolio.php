@@ -593,8 +593,14 @@ class Visual_Portfolio_Get {
         <?php
 
         // Add custom styles.
-        if ( ! is_array( $options_or_id ) ) {
-            visual_portfolio()->include_custom_css( $options_or_id );
+        if ( ! is_array( $options_or_id ) && $options[ 'vp_custom_css' ] ) {
+            $custom_css_handle = 'vp-custom-css-' . $options_or_id;
+            $css = wp_kses( $options[ 'vp_custom_css' ], array( '\'', '\"' ) );
+            $css = str_replace( '&gt;' , '>' , $css );
+
+            wp_register_style( $custom_css_handle, false );
+            wp_enqueue_style( $custom_css_handle );
+            wp_add_inline_style( $custom_css_handle, $css );
         }
 
         $return = ob_get_contents();

@@ -125,8 +125,6 @@ class Visual_Portfolio {
      */
     public function init_hooks() {
         add_action( 'admin_init', array( $this, 'admin_init' ) );
-        add_filter( 'query_vars', array( $this, 'add_wp_var' ) );
-        add_action( 'template_redirect', array( $this, 'display_custom_css' ) );
         register_deactivation_hook( __FILE__, array( $this, 'rewrite_rules' ) );
         register_activation_hook( __FILE__, array( $this, 'rewrite_rules' ) );
     }
@@ -271,60 +269,6 @@ class Visual_Portfolio {
         $template = apply_filters( 'vp_include_template_style', $template, $template_name, $dependencies, $version, $media );
 
         wp_enqueue_style( $handle, $template, $dependencies, $version, $media );
-    }
-
-    /**
-     * Include custom CSS
-     *
-     * @param int $id - VP post id.
-     */
-    public function include_custom_css( $id ) {
-        $css = get_post_meta( $id, 'vp_custom_css', true );
-
-        if ( $css ) {
-            if ( function_exists( 'icl_object_id' ) ) {
-                $css_base_url = site_url();
-                if ( is_ssl() ) {
-                    $css_base_url = site_url( '/', 'https' );
-                }
-            } else {
-                $css_base_url = get_bloginfo( 'url' );
-                if ( is_ssl() ) {
-                    $css_base_url = str_replace( 'http://', 'https://', $css_base_url );
-                }
-            }
-            wp_enqueue_style( 'vp-custom-css-' . $id, $css_base_url . '?vp_custom_css=css&vp_custom_css_id=' . $id );
-        }
-    }
-
-    /**
-     * Display custom CSS
-     */
-    public function display_custom_css() {
-        $custom_css = get_query_var( 'vp_custom_css' );
-        $id = get_query_var( 'vp_custom_css_id' );
-        $css = get_post_meta( $id, 'vp_custom_css', true );
-
-        if ( 'css' === $custom_css ) {
-            header( 'Content-type: text/css' );
-            $css = wp_kses( $css, array( '\'', '\"' ) );
-            $css = str_replace( '&gt;' , '>' , $css );
-            echo $css;
-            exit;
-        }
-    }
-
-    /**
-     * Register custom query vars
-     *
-     * @param array $public_query_vars - query vars.
-     *
-     * @return array
-     */
-    public static function add_wp_var( $public_query_vars ) {
-        $public_query_vars[] = 'vp_custom_css';
-        $public_query_vars[] = 'vp_custom_css_id';
-        return $public_query_vars;
     }
 }
 

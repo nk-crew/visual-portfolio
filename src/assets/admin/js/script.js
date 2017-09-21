@@ -10,6 +10,7 @@
     var $window = $(window);
     var $editForm = $('form[name="post"]');
     var $postType = $('[name="post_type"]');
+    var post_ID = $('#post_ID').val();
 
     // select shortcode text in input
     $body.on('focus', '[name="vp_list_shortcode"]', function () {
@@ -166,6 +167,18 @@
                 break;
             case 'vp_pagination_align':
                 data.$portfolio.find('.vp-pagination').removeClass('vp-pagination__align-center vp-pagination__align-left vp-pagination__align-right').addClass('vp-pagination__align-' + data.value);
+                data.reload = false;
+
+                break;
+            case 'vp_custom_css':
+                var $html = data.$portfolio.closest('html');
+                var custom_css_id = 'vp-custom-css-' + post_ID + '-inline-css';
+                var $style = $html.find('#' + custom_css_id);
+                if ( ! $style.length ) {
+                    $style = data.jQuery('<style id="' + custom_css_id + '">');
+                    $html.find('body').prepend($style);
+                }
+                $style.html(data.value);
                 data.reload = false;
 
                 break;
@@ -354,6 +367,10 @@
                 gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter']
             });
             emmetCodeMirror(editor);
+            editor.on('change', function (cm) {
+                editor.save();
+                $customCss.change();
+            });
         }
     }
 
