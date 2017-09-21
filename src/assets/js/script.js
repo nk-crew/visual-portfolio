@@ -130,6 +130,7 @@
 
         // remove all generated styles
         self.removeStyle();
+        self.renderStyle();
 
         // destroy photoswipe
         self.destroyPhotoswipe();
@@ -173,8 +174,6 @@
         stylesList[uid][media][selector] = $.extend(stylesList[uid][media][selector], styles);
 
         self.emitEvent('addStyle', [selector, styles, media, stylesList]);
-
-        self.renderStyle();
     };
 
     /**
@@ -199,11 +198,8 @@
         }
 
         self.emitEvent('removeStyle', [selector, styles, stylesList]);
-
-        self.renderStyle();
     };
 
-    var renderStylesTimeout;
     /**
      * Render style for the current portfolio list
      */
@@ -211,44 +207,41 @@
         var self = this;
 
         // timeout for the case, when styles added one by one
-        clearTimeout(renderStylesTimeout);
-        renderStylesTimeout = setTimeout(function () {
-            var uid = self.uid;
-            var stylesString = '';
+        var uid = self.uid;
+        var stylesString = '';
 
-            // create string with styles
-            if (typeof stylesList[uid] !== 'undefined') {
-                // current uid styles
-                for (var m in stylesList[uid]) {
-                    // media
-                    if (m) {
-                        stylesString += '@media ' + m + ' {';
+        // create string with styles
+        if (typeof stylesList[uid] !== 'undefined') {
+            // current uid styles
+            for (var m in stylesList[uid]) {
+                // media
+                if (m) {
+                    stylesString += '@media ' + m + ' {';
+                }
+                for (var s in stylesList[uid][m]) {
+                    // selector
+                    stylesString += '.vp-uid-' + uid + ' ' + s + ' {';
+                    for (var p in stylesList[uid][m][s]) {
+                        // property and value
+                        stylesString += p + ':' + stylesList[uid][m][s][p] + ';';
                     }
-                    for (var s in stylesList[uid][m]) {
-                        // selector
-                        stylesString += '.vp-uid-' + uid + ' ' + s + ' {';
-                        for (var p in stylesList[uid][m][s]) {
-                            // property and value
-                            stylesString += p + ':' + stylesList[uid][m][s][p] + ';';
-                        }
-                        stylesString += '}';
-                    }
-                    // media
-                    if (m) {
-                        stylesString += '}';
-                    }
+                    stylesString += '}';
+                }
+                // media
+                if (m) {
+                    stylesString += '}';
                 }
             }
+        }
 
-            // add in style tag
-            var $style = $('#vp-style-' + uid);
-            if (!$style.length) {
-                $style = $('<style>').attr('id', 'vp-style-' + uid).appendTo('head');
-            }
-            $style.html(stylesString);
+        // add in style tag
+        var $style = $('#vp-style-' + uid);
+        if (!$style.length) {
+            $style = $('<style>').attr('id', 'vp-style-' + uid).appendTo('head');
+        }
+        $style.html(stylesString);
 
-            self.emitEvent('renderStyle', [stylesString, stylesList, $style]);
-        }, 10);
+        self.emitEvent('renderStyle', [stylesString, stylesList, $style]);
     };
 
     /**
@@ -548,6 +541,8 @@
             }
         }
 
+        self.renderStyle();
+
         self.emitEvent('initLayout');
     };
 
@@ -572,6 +567,8 @@
                 'color': val + ' !important'
             });
         });
+
+        self.renderStyle();
 
         self.emitEvent('initCustomColors');
     };
