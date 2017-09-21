@@ -341,7 +341,7 @@ class Visual_Portfolio_Admin {
      */
     public function manage_vp_lists_shortcode_column( $column_name = false ) {
         if ( 'vp_lists_post_shortcode' === $column_name ) {
-            echo '<code>';
+            echo '<code class="vp-onclick-selection">';
             echo '[visual_portfolio id="' . get_the_ID() . '"]';
             echo '</code>';
         }
@@ -1184,11 +1184,11 @@ class Visual_Portfolio_Admin {
             <?php echo esc_html__( 'Available classes:', NK_VP_DOMAIN ); ?>
         </p>
         <ul>
-            <li><code>.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code>.vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code>.vp-portfolio__item</code><?php echo esc_html__( ' - single item wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code>.vp-filter</code><?php echo esc_html__( ' - filter wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code>.vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-portfolio__item</code><?php echo esc_html__( ' - single item wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-filter</code><?php echo esc_html__( ' - filter wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', NK_VP_DOMAIN ); ?></li>
         </ul>
         <?php
     }

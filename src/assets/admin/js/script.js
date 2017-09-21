@@ -16,7 +16,7 @@
     $body.on('focus', '[name="vp_list_shortcode"]', function () {
         this.select();
     });
-    $body.on('click', 'td.vp_lists_post_shortcode', function () {
+    $body.on('click', '.vp-onclick-selection', function () {
         window.getSelection().selectAllChildren(this);
     });
 
