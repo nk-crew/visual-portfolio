@@ -83,6 +83,9 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 == Changelog ==
 
+= 1.1.1 =
+* fixed php enqueue errors
+
 = 1.1.0 =
 * preview changed to iframe - now all the portfolio styles showed the same as on your website frontend. Now iframe reloaded when changed all options (Customizer experience here)
 * added wrapper to filter and pagination

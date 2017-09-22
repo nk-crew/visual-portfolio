@@ -1,6 +1,6 @@
 /*!
  * Name    : Visual Portfolio
- * Version : 1.1.0
+ * Version : 1.1.1
  * Author  : nK https://nkdev.info
  */
 (function($) {
