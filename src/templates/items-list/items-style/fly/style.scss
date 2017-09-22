@@ -31,15 +31,12 @@
 
         .nk-portfolio__item-meta-title {
             color: inherit;
-            font-weight: 600;
-            font-size: 16px;
-            padding: 0;
         }
         .vp-portfolio__item-meta-date {
-            font-size: 11px;
+            font-size: 0.85em;
         }
         .vp-portfolio__item-meta-icon {
-            font-size: 30px;
+            font-size: 2em;
 
             + * {
                 margin-top: 15px;
