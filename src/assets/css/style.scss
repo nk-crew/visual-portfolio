@@ -101,14 +101,14 @@
 // Tiles
 [data-vp-layout="tiles"] {
     .vp-portfolio__item-img img,
-    .vp-portfolio__item-img-wrap {
+    .vp-portfolio__item-img {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
     }
-    .vp-portfolio__item-img {
+    .vp-portfolio__item-img-wrap {
         position: relative;
         display: block;
         overflow: hidden;

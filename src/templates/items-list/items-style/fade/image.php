@@ -9,8 +9,8 @@
 
 ?>
 
-<div class="vp-portfolio__item-img">
-    <div class="vp-portfolio__item-img-wrap">
+<div class="vp-portfolio__item-img-wrap">
+    <div class="vp-portfolio__item-img">
         <?php
         if ( $args['url'] ) {
             ?>

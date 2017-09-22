@@ -477,7 +477,7 @@
                                     'width': (w * 100 / columns) + '%'
                                 });
                             }
-                            self.addStyle(itemSelector + ' .vp-portfolio__item-img:before', {
+                            self.addStyle(itemSelector + ' .vp-portfolio__item-img-wrap:before', {
                                 'margin-top': (h * 100) + '%'
                             });
                         }
@@ -530,11 +530,11 @@
 
             // tiles
             if ('tiles' === self.options.layout) {
-                self.addStyle('.vp-portfolio__item-wrap .vp-portfolio__item-img', {
+                self.addStyle('.vp-portfolio__item-wrap .vp-portfolio__item-img-wrap', {
                     'margin-left': '-' + gapStyle,
                     'margin-top': '-' + gapStyle
                 });
-                self.addStyle('.vp-portfolio__item-wrap .vp-portfolio__item-img-wrap', {
+                self.addStyle('.vp-portfolio__item-wrap .vp-portfolio__item-img', {
                     'left': gapStyle,
                     'top': gapStyle
                 });
@@ -654,7 +654,7 @@
                 $entry.removeClass('jg-entry');
 
                 // Reset image style
-                var $img = $entry.find('.vp-portfolio__item-img-wrap img');
+                var $img = $entry.find('.vp-portfolio__item-img img');
                 if ($img.length) {
                     $img.css('width', '');
                     $img.css('height', '');
