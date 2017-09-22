@@ -1182,10 +1182,10 @@ class Visual_Portfolio_Admin {
         </p>
         <ul>
             <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-portfolio__item</code><?php echo esc_html__( ' - single item wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-filter</code><?php echo esc_html__( ' - filter wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__item</code><?php echo esc_html__( ' - single item wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-filter</code><?php echo esc_html__( ' - filter wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', NK_VP_DOMAIN ); ?></li>
         </ul>
         <?php
     }
