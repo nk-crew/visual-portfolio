@@ -643,9 +643,6 @@ class Visual_Portfolio_Admin {
             <input name="vp_stretch" type="checkbox" id="vp_stretch" value="true" <?php checked( $meta['vp_stretch'] ); ?>>
             <?php echo esc_html__( 'Stretch', NK_VP_DOMAIN ); ?>
         </label>
-        <p class="description">
-            <?php echo esc_html__( 'Will be visible only online', NK_VP_DOMAIN ); ?>
-        </p>
         <?php
     }
 

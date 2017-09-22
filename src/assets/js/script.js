@@ -308,7 +308,7 @@
                 'margin-right': mr - right
             });
         }
-        if ( self.$item.hasClass('vp-portfolio__stretch') && ! self.$item.closest('#vp_preview').length ) {
+        if ( self.$item.hasClass('vp-portfolio__stretch') ) {
             $wnd.on('load' + evp + ' resize' + evp + ' orientationchange' + evp, function() {
                 stretch();
             });
