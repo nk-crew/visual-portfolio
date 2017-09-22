@@ -1,6 +1,6 @@
 === Visual Portfolio ===
 Contributors: nko
-Tags: portfolio, gallery, image
+Tags: portfolio, builder, masonry, tiles, gallery, photos
 Requires at least: 4.0.0
 Tested up to: 4.8
 Stable tag: 1.0
@@ -13,16 +13,57 @@ Portfolio lists visual editor.
 
 == Description ==
 
-Portfolio lists visual editor, let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry or Tiles layouts.
+Visual Portfolio editor let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry or Tiles layouts.
+
+See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://demo.nkdev.info/#visual-portfolio)
+
 
 === Features ===
+
+* Visual preview for portfolio list shortcode builder
+* Templates for theme developers
 * Masonry layout
 * Tiles layout
-* 3 predefined hover effects (will be more in the future updates)
+* 3 predefined hover effects (will be more in the future updates):
+   * Fade
+   * Emerge
+   * Fly
+   * Default (no hover effect)
 * Infinite Scroll
 * Load More
 * Paged lists
 * Filtering
+* Popup gallery
+* Custom item gutters
+* Stretch option (if you want to break the fixed container of the page)
+* Custom posts type lists (not only portfolio)
+   * Posts by type
+   * Posts by specific ID
+   * Posts by taxonomies
+   * Custom order
+* Custom CSS for each portfolio lists
+* Shortcode generated, so you can place unlimited portfolio lists on the page
+
+
+= Real Examples =
+
+[Piroll - Portfolio Theme](https://demo.nkdev.info/#piroll)
+
+
+
+== Screenshots ==
+
+1. Visual Portfolio builder p.1
+2. Visual Portfolio builder p.2
+3. Portfolio items list admin
+4. Visual Portfolio shortcodes list admin
+5. Example: Tiles + Stretch
+6. Example: Masonry + Posts
+7. Example: Tiles + Custom hover color
+8. Example: Tiles + Paged pagination
+9. Example: Masonry
+10. Example: Tiles + Popup gallery
+11. Example: Popup Gallery
 
 
 
@@ -42,5 +83,40 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 == Changelog ==
 
+= 1.1.0 =
+* preview changed to iframe - now all the portfolio styles showed the same as on your website frontend. Now iframe reloaded when changed all options (Customizer experience here)
+* added wrapper to filter and pagination
+* added tinyMCE dropdown with list of visual-portfolio shortcodes
+* added CodeMirror for custom CSS field
+* added loading overlay
+* changed paged arrows to font-awesome
+* changed default templates style
+* changed popup gallery - now used image meta title and description
+* fixed popup gallery buttons style conflict with default WordPress themes
+* fixed styles rendering on initialization (without timeout now)
+* fixed isotope items animation and remove
+* fixed isotope version conflict with Visual Composer
+* fixed preloader opacity transition (added wrapper)
+* fixed showing paged pagination if no items
+* minor changes
+
+= 1.0.1 =
+* added custom CSS field
+* added object-fit polyfill to support old browsers
+* added custom image sizes
+* added responsive
+* added wrapper to items list
+* removed margin from main vp container
+* fixed array option retrieve error
+* minor changes
+
 = 1.0.0 =
-* Initial Release
+* initial Release
+
+
+
+== Frequently Asked Questions ==
+
+= How to change default templates and styles? =
+
+You can copy files from the **/visual-portfolio/templates/** to your **YOUR_THEME/visual/portfolio/** folder and change php code and css files here.
