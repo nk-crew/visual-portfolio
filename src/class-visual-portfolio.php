@@ -40,7 +40,6 @@ class Visual_Portfolio {
         if ( is_null( self::$_instance ) ) {
             self::$_instance = new self();
             self::$_instance->init_options();
-            self::$_instance->register_scripts();
             self::$_instance->init_hooks();
         }
         return self::$_instance;
@@ -125,6 +124,7 @@ class Visual_Portfolio {
      */
     public function init_hooks() {
         add_action( 'admin_init', array( $this, 'admin_init' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
         register_deactivation_hook( __FILE__, array( $this, 'rewrite_rules' ) );
         register_activation_hook( __FILE__, array( $this, 'rewrite_rules' ) );
     }
