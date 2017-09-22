@@ -1,4 +1,8 @@
-
+/*!
+ * Name    : Visual Portfolio
+ * Version : 1.1.0
+ * Author  : nK https://nkdev.info
+ */
 (function($) {
     if (typeof Visual_Portfolio_TinyMCE_Options === 'undefined' || ! Visual_Portfolio_TinyMCE_Options.length) {
         return;

@@ -1,3 +1,8 @@
+/*!
+ * Name    : Visual Portfolio
+ * Version : 1.1.0
+ * Author  : nK https://nkdev.info
+ */
 (function ($) {
     $('#vp_preview').on('click', '.vp-portfolio__item, .vp-portfolio__item a', function (e) {
         e.preventDefault();
