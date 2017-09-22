@@ -93,10 +93,9 @@
 
     // resize iframe
     if ( $.fn.iFrameResize ) {
-        var isOldIE = (navigator.userAgent.indexOf('MSIE') !== -1);
         $frame.iFrameResize({
             interval: 10,
-            heightCalculationMethod: isOldIE ? 'max' : 'lowestElement'
+            heightCalculationMethod: 'documentElementOffset'
         });
     }
 
