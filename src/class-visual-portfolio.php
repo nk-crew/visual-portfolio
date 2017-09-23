@@ -124,7 +124,9 @@ class Visual_Portfolio {
      */
     public function init_hooks() {
         add_action( 'admin_init', array( $this, 'admin_init' ) );
-        add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
+
+        // template_redirect is used instead of wp_enqueue_scripts just because some plugins use it and included an old isotope plugin. So, it was conflicted.
+        add_action( 'template_redirect', array( $this, 'register_scripts' ), 9 );
         register_deactivation_hook( __FILE__, array( $this, 'rewrite_rules' ) );
         register_activation_hook( __FILE__, array( $this, 'rewrite_rules' ) );
     }
@@ -147,7 +149,7 @@ class Visual_Portfolio {
         wp_register_script( 'imagesloaded', visual_portfolio()->plugin_url . 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js', '', '', true );
 
         // we need to dequeue isotope just because in some popular plugins used really old version of isotope.
-        wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '6.0.0', true );
+        wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '', true );
 
         /*
          * TODO: Justified
