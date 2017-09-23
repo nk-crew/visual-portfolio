@@ -148,7 +148,6 @@ class Visual_Portfolio {
 
         wp_register_script( 'imagesloaded', visual_portfolio()->plugin_url . 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js', '', '', true );
 
-        // we need to dequeue isotope just because in some popular plugins used really old version of isotope.
         wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '', true );
 
         /*
