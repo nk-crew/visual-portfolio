@@ -593,9 +593,9 @@ class Visual_Portfolio_Get {
         <?php
 
         // Add custom styles.
-        if ( ! is_array( $options_or_id ) && $options[ 'vp_custom_css' ] ) {
+        if ( ! is_array( $options_or_id ) && $options['vp_custom_css'] ) {
             $custom_css_handle = 'vp-custom-css-' . $options_or_id;
-            $css = wp_kses( $options[ 'vp_custom_css' ], array( '\'', '\"' ) );
+            $css = wp_kses( $options['vp_custom_css'], array( '\'', '\"' ) );
             $css = str_replace( '&gt;' , '>' , $css );
 
             wp_register_style( $custom_css_handle, false );
