@@ -53,9 +53,6 @@ class Visual_Portfolio_Admin {
             // disable autosave due to it is not working for the custom metaboxes.
             wp_dequeue_script( 'autosave' );
 
-            // enqueue portfolio styles and scripts.
-            Visual_Portfolio_Get::enqueue_scripts();
-
             wp_enqueue_media();
 
             wp_enqueue_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.min.js', '', '', true );
