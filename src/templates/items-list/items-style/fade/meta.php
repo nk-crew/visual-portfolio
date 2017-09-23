@@ -35,7 +35,7 @@ if ( ! $args['url'] ) {
         // Show Title.
         if ( $opts['show_title'] && $args['title'] ) {
             ?>
-            <h2 class="nk-portfolio__item-meta-title">
+            <h2 class="vp-portfolio__item-meta-title">
                 <?php
                 echo esc_html( $args['title'] );
                 ?>
