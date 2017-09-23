@@ -2,7 +2,7 @@
 /**
  * Plugin Name:  Visual Portfolio
  * Description:  Portfolio post type with visual editor
- * Version:      1.1.1
+ * Version:      1.1.2
  * Author:       nK
  * Author URI:   https://nkdev.info
  * License:      GPLv2 or later
