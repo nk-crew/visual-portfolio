@@ -906,6 +906,19 @@ class Visual_Portfolio_Admin {
                 </option>
             </select>
         </div>
+
+        <div data-cond="[name=vp_pagination] == paged">
+            <p></p>
+            <label for="vp_pagination_paged__show_arrows">
+                <input name="vp_pagination_paged__show_arrows" type="checkbox" id="vp_pagination_paged__show_arrows" value="true" <?php checked( $meta['vp_pagination_paged__show_arrows'] ); ?>>
+                <?php echo esc_html__( 'Show Arrows', NK_VP_DOMAIN ); ?>
+            </label>
+            <p></p>
+            <label for="vp_pagination_paged__show_numbers">
+                <input name="vp_pagination_paged__show_numbers" type="checkbox" id="vp_pagination_paged__show_numbers" value="true" <?php checked( $meta['vp_pagination_paged__show_numbers'] ); ?>>
+                <?php echo esc_html__( 'Show Numbers', NK_VP_DOMAIN ); ?>
+            </label>
+        </div>
         <?php
     }
 

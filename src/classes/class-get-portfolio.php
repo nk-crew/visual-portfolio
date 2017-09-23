@@ -112,6 +112,8 @@ class Visual_Portfolio_Get {
             'vp_pagination'            => 'load-more',
             // center, left, right.
             'vp_pagination_align'      => 'center',
+            'vp_pagination_paged__show_arrows' => true,
+            'vp_pagination_paged__show_numbers' => true,
 
             // portfolio, post-based.
             'vp_content_source'        => 'portfolio',
@@ -809,10 +811,22 @@ class Visual_Portfolio_Get {
                                 $arr['class'] .= ' vp-pagination__item-dots';
                             }
 
+                            // skip arrows if disabled.
+                            if ( ! $vp_options['vp_pagination_paged__show_arrows'] && ( $arr['is_prev_arrow'] || $arr['is_next_arrow'] ) ) {
+                                continue;
+                            }
+
+                            // skip numbers if disabled.
+                            if ( ! $vp_options['vp_pagination_paged__show_numbers'] && ! $arr['is_prev_arrow'] && ! $arr['is_next_arrow'] ) {
+                                continue;
+                            }
+
                             $filtered_links[] = $arr;
                         }
                     }
-                } else {
+                }
+
+                if ( empty( $filtered_links ) ) {
                     return;
                 }
 
