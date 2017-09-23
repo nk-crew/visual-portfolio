@@ -551,9 +551,9 @@ class Visual_Portfolio_Get {
                                 <div class="vp-portfolio__item-popup"
                                      style="display: none;"
                                      data-vp-popup-img="<?php echo esc_url( $popup_image['url'] ); ?>"
-                                     data-vp-popup-img-size="<?php echo esc_attr( $popup_image['width'] ); ?>x<?php echo esc_attr( $popup_image['height'] ); ?>"
+                                     data-vp-popup-img-size="<?php echo esc_attr( $popup_image['width'] . 'x' . $popup_image['height'] ); ?>"
                                      data-vp-popup-md-img="<?php echo esc_url( $popup_image['md_url'] ); ?>"
-                                     data-vp-popup-md-img-size="<?php echo esc_attr( $popup_image['md_width'] ); ?>x<?php echo esc_attr( $popup_image['md_height'] ); ?>"
+                                     data-vp-popup-md-img-size="<?php echo esc_attr( $popup_image['md_width'] . 'x' . $popup_image['md_height'] ); ?>"
                                 >
                                     <h3><?php echo esc_html( $popup_image['title'] ); ?></h3>
                                     <?php echo wp_kses_post( $popup_image['description'] ); ?>
