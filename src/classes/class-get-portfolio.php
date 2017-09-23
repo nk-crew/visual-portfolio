@@ -558,7 +558,7 @@ class Visual_Portfolio_Get {
                                     <h3><?php echo esc_html( $popup_image['title'] ); ?></h3>
                                     <?php echo wp_kses_post( $popup_image['description'] ); ?>
                                 </div>
-                            <? } ?>
+                            <?php } ?>
                             <div class="vp-portfolio__item">
                                 <?php
                                 switch ( $options['vp_items_style'] ) {
