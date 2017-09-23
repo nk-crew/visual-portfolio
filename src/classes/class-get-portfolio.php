@@ -10,134 +10,136 @@
  */
 class Visual_Portfolio_Get {
     /**
-     * Default options
+     * Get default options
      *
-     * @var array
+     * @return array
      */
-    static private $defaults = array(
-        // tiles, masonry.
-        'vp_layout'             => 'tiles',
+    static private function get_defaults() {
+        return array(
+            // tiles, masonry.
+            'vp_layout'             => 'tiles',
 
-        /**
-         * Tile type:
-         * first parameter - is columns number
-         * the next is item sizes
-         *
-         * Example:
-         * 3|1,0.5|2,0.25|
-         *    3 columns in row
-         *    First item 100% width and 50% height
-         *    Second item 200% width and 25% height
-         */
-        'vp_tiles_type' => '3|1,1|',
+            /**
+             * Tile type:
+             * first parameter - is columns number
+             * the next is item sizes
+             *
+             * Example:
+             * 3|1,0.5|2,0.25|
+             *    3 columns in row
+             *    First item 100% width and 50% height
+             *    Second item 200% width and 25% height
+             */
+            'vp_tiles_type' => '3|1,1|',
 
-        // masonry columns count.
-        'vp_masonry_columns'       => 3,
+            // masonry columns count.
+            'vp_masonry_columns'       => 3,
 
-        'vp_items_gap'             => 15,
-        'vp_items_count'           => 6,
-        'vp_stretch'               => false,
+            'vp_items_gap'             => 15,
+            'vp_items_count'           => 6,
+            'vp_stretch'               => false,
 
-        // default, fly, emerge, fade.
-        'vp_items_style'           => 'fly',
+            // default, fly, emerge, fade.
+            'vp_items_style'           => 'fly',
 
-        /**
-         * Default Items Style
-         */
-        'vp_items_style_default__show_title' => true,
-        'vp_items_style_default__show_categories' => true,
-        'vp_items_style_default__categories_count' => 1,
-        'vp_items_style_default__show_date' => false,
-        'vp_items_style_default__show_excerpt' => false,
-        'vp_items_style_default__excerpt_words_count' => 15,
-        // center, left, right.
-        'vp_items_style_default__align' => 'center',
+            /**
+             * Default Items Style
+             */
+            'vp_items_style_default__show_title' => true,
+            'vp_items_style_default__show_categories' => true,
+            'vp_items_style_default__categories_count' => 1,
+            'vp_items_style_default__show_date' => false,
+            'vp_items_style_default__show_excerpt' => false,
+            'vp_items_style_default__excerpt_words_count' => 15,
+            // center, left, right.
+            'vp_items_style_default__align' => 'center',
 
-        /**
-         * Fly Items Style
-         */
-        // false, title, title_description, title_category, title_category_description, icon.
-        'vp_items_style_fly__show_title' => true,
-        'vp_items_style_fly__show_categories' => true,
-        'vp_items_style_fly__categories_count' => 1,
-        'vp_items_style_fly__show_date' => false,
-        'vp_items_style_fly__show_excerpt' => false,
-        'vp_items_style_fly__excerpt_words_count' => 15,
-        'vp_items_style_fly__show_icon' => false,
-        'vp_items_style_fly__icon' => 'fa fa-search',
-        // *, top-*, bottom-*
-        // * = center, left, right.
-        'vp_items_style_fly__align' => 'center',
-        'vp_items_style_fly__bg_color' => '#212125',
-        'vp_items_style_fly__text_color' => '#fff',
+            /**
+             * Fly Items Style
+             */
+            // false, title, title_description, title_category, title_category_description, icon.
+            'vp_items_style_fly__show_title' => true,
+            'vp_items_style_fly__show_categories' => true,
+            'vp_items_style_fly__categories_count' => 1,
+            'vp_items_style_fly__show_date' => false,
+            'vp_items_style_fly__show_excerpt' => false,
+            'vp_items_style_fly__excerpt_words_count' => 15,
+            'vp_items_style_fly__show_icon' => false,
+            'vp_items_style_fly__icon' => 'fa fa-search',
+            // *, top-*, bottom-*
+            // * = center, left, right.
+            'vp_items_style_fly__align' => 'center',
+            'vp_items_style_fly__bg_color' => '#212125',
+            'vp_items_style_fly__text_color' => '#fff',
 
-        /**
-         * Emerge Items Style
-         */
-        'vp_items_style_emerge__show_title' => true,
-        'vp_items_style_emerge__show_categories' => true,
-        'vp_items_style_emerge__categories_count' => 1,
-        'vp_items_style_emerge__show_date' => false,
-        'vp_items_style_emerge__show_excerpt' => false,
-        'vp_items_style_emerge__excerpt_words_count' => 15,
-        // center, left, right.
-        'vp_items_style_emerge__align' => 'center',
-        'vp_items_style_emerge__bg_color' => '#fff',
-        'vp_items_style_emerge__text_color' => '#000',
+            /**
+             * Emerge Items Style
+             */
+            'vp_items_style_emerge__show_title' => true,
+            'vp_items_style_emerge__show_categories' => true,
+            'vp_items_style_emerge__categories_count' => 1,
+            'vp_items_style_emerge__show_date' => false,
+            'vp_items_style_emerge__show_excerpt' => false,
+            'vp_items_style_emerge__excerpt_words_count' => 15,
+            // center, left, right.
+            'vp_items_style_emerge__align' => 'center',
+            'vp_items_style_emerge__bg_color' => '#fff',
+            'vp_items_style_emerge__text_color' => '#000',
 
-        /**
-         * Fade Items Style
-         */
-        // false, title, title_description, title_category, title_category_description, icon.
-        'vp_items_style_fade__show_title' => true,
-        'vp_items_style_fade__show_categories' => true,
-        'vp_items_style_fade__categories_count' => 1,
-        'vp_items_style_fade__show_date' => false,
-        'vp_items_style_fade__show_excerpt' => false,
-        'vp_items_style_fade__excerpt_words_count' => 15,
-        'vp_items_style_fade__show_icon' => false,
-        'vp_items_style_fade__icon' => 'fa fa-search',
-        // *, top-*, bottom-*
-        // * = center, left, right.
-        'vp_items_style_fade__align' => 'center',
-        'vp_items_style_fade__bg_color' => 'rgba(0, 0, 0, 0.85)',
-        'vp_items_style_fade__text_color' => '#fff',
+            /**
+             * Fade Items Style
+             */
+            // false, title, title_description, title_category, title_category_description, icon.
+            'vp_items_style_fade__show_title' => true,
+            'vp_items_style_fade__show_categories' => true,
+            'vp_items_style_fade__categories_count' => 1,
+            'vp_items_style_fade__show_date' => false,
+            'vp_items_style_fade__show_excerpt' => false,
+            'vp_items_style_fade__excerpt_words_count' => 15,
+            'vp_items_style_fade__show_icon' => false,
+            'vp_items_style_fade__icon' => 'fa fa-search',
+            // *, top-*, bottom-*
+            // * = center, left, right.
+            'vp_items_style_fade__align' => 'center',
+            'vp_items_style_fade__bg_color' => 'rgba(0, 0, 0, 0.85)',
+            'vp_items_style_fade__text_color' => '#fff',
 
-        // false, url, popup_gallery.
-        'vp_items_click_action'    => 'url',
+            // false, url, popup_gallery.
+            'vp_items_click_action'    => 'url',
 
-        // false, default.
-        'vp_filter'                => 'default',
-        // center, left, right.
-        'vp_filter_align'          => 'center',
+            // false, default.
+            'vp_filter'                => 'default',
+            // center, left, right.
+            'vp_filter_align'          => 'center',
 
-        // infinite, load-more, true.
-        'vp_pagination'            => 'load-more',
-        // center, left, right.
-        'vp_pagination_align'      => 'center',
+            // infinite, load-more, true.
+            'vp_pagination'            => 'load-more',
+            // center, left, right.
+            'vp_pagination_align'      => 'center',
 
-        // portfolio, post-based.
-        'vp_content_source'        => 'portfolio',
+            // portfolio, post-based.
+            'vp_content_source'        => 'portfolio',
 
-        // post type, ids, custom_query.
-        'vp_posts_source'          => 'portfolio',
-        'vp_posts_ids'             => array(),
-        'vp_posts_excluded_ids'    => array(),
-        'vp_posts_custom_query'    => '',
-        'vp_posts_taxonomies'      => array(),
+            // post type, ids, custom_query.
+            'vp_posts_source'          => 'portfolio',
+            'vp_posts_ids'             => array(),
+            'vp_posts_excluded_ids'    => array(),
+            'vp_posts_custom_query'    => '',
+            'vp_posts_taxonomies'      => array(),
 
-        // or, and.
-        'vp_posts_taxonomies_relation' => 'or',
+            // or, and.
+            'vp_posts_taxonomies_relation' => 'or',
 
-        // date, title, id.
-        'vp_posts_order_by'        => 'post_date',
+            // date, title, id.
+            'vp_posts_order_by'        => 'post_date',
 
-        // desc, asc.
-        'vp_posts_order_direction' => 'desc',
+            // desc, asc.
+            'vp_posts_order_direction' => 'desc',
 
-        // custom CSS.
-        'vp_custom_css'            => '',
-    );
+            // custom CSS.
+            'vp_custom_css'            => '',
+        );
+    }
 
     /**
      * Get all available options of post.
@@ -153,7 +155,7 @@ class Visual_Portfolio_Get {
 
             $post_meta = get_post_meta( $id );
 
-            foreach ( self::$defaults as $k => $item ) {
+            foreach ( self::get_defaults() as $k => $item ) {
                 if ( isset( $post_meta[ $k ] ) && isset( $post_meta[ $k ][0] ) ) {
                     $val = maybe_unserialize( $post_meta[ $k ][0] );
 
@@ -171,7 +173,7 @@ class Visual_Portfolio_Get {
             }
         }
 
-        return array_merge( self::$defaults, $options_or_id );
+        return array_merge( self::get_defaults(), $options_or_id );
     }
 
     /**
