@@ -289,6 +289,39 @@
     };
 
     /**
+     * Check if lines cross
+     *
+     * @param {object} a - first point of the first line
+     * @param {object} b - second point of the first line
+     * @param {object} c - first point of the second line
+     * @param {object} d - second point of the second line
+     * @returns {boolean}
+     */
+    var isCrossLine = function (a, b, c, d) {
+        // Working code #1:
+        //
+        // var common = (b.x - a.x)*(d.y - c.y) - (b.y - a.y)*(d.x - c.x);
+        // if (common === 0) {
+        //     return false;
+        // }
+        //
+        // var rH = (a.y - c.y)*(d.x - c.x) - (a.x - c.x)*(d.y - c.y);
+        // var sH = (a.y - c.y)*(b.x - a.x) - (a.x - c.x)*(b.y - a.y);
+        //
+        // var r = rH / common;
+        // var s = sH / common;
+        //
+        // return r >= 0 && r <= 1 && s >= 0 && s <= 1;
+
+        // Working code #2:
+        var v1=(d.x-c.x)*(a.y-c.y)-(d.y-c.y)*(a.x-c.x);
+        var v2=(d.x-c.x)*(b.y-c.y)-(d.y-c.y)*(b.x-c.x);
+        var v3=(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+        var v4=(b.x-a.x)*(d.y-a.y)-(b.y-a.y)*(d.x-a.x);
+        return ((v1*v2<=0) && (v3*v4<=0));
+    };
+
+    /**
      * Init events
      */
     VP.prototype.initEvents = function initEvents () {
@@ -317,37 +350,88 @@
 
         // Fly style
         if ( 'fly' === self.options.itemsStyle ) {
-            self.$item.on('mouseenter'  + evp + ' mouseleave' + evp, '.vp-portfolio__item', function (e) {
-                var $overlay = $(this).find('.vp-portfolio__item-overlay');
-                var itemRect = $(this)[0].getBoundingClientRect();
 
-                // detect mouse enter or leave
-                var x = (itemRect.width / 2 - e.clientX + itemRect.left) / (itemRect.width / 2);
-                var y = (itemRect.height / 2 - e.clientY + itemRect.top) / (itemRect.height / 2);
+            // determine cursor position
+            var lastCursorPos = {};
+            $wnd.on('mousemove' + evp, function (e) {
+                lastCursorPos = {
+                    x : e.clientX,
+                    y : e.clientY
+                };
+            });
+
+            self.$item.on('mouseenter'  + evp + ' mouseleave' + evp, '.vp-portfolio__item', function (e) {
+                var $this = $(this);
+                var itemRect = $this[0].getBoundingClientRect();
+                var $overlay = $this.find('.vp-portfolio__item-overlay');
                 var enter = e.type === 'mouseenter';
                 var endX = '0%';
                 var endY = '0%';
-                if (Math.abs(x) > Math.abs(y)) {
-                    endX = (x > 0 ? '-10' : '10') + endX;
-                } else {
-                    endY = (y > 0 ? '-10' : '10') + endY;
+                var curCursorPos = {
+                    x: e.clientX,
+                    y: e.clientY
+                };
+
+                // find the corner that placed on cursor path.
+                var isUp = isCrossLine(
+                    { x: itemRect.left, y: itemRect.top },
+                    { x: itemRect.left + itemRect.width, y: itemRect.top },
+                    curCursorPos, lastCursorPos);
+                var isDown = isCrossLine(
+                    { x: itemRect.left, y: itemRect.top + itemRect.height },
+                    { x: itemRect.left + itemRect.width, y: itemRect.top + itemRect.height },
+                    curCursorPos, lastCursorPos);
+                var isLeft = isCrossLine(
+                    { x: itemRect.left, y: itemRect.top },
+                    { x: itemRect.left, y: itemRect.top + itemRect.height },
+                    curCursorPos, lastCursorPos);
+                var isRight = isCrossLine(
+                    { x: itemRect.left + itemRect.width, y: itemRect.top },
+                    { x: itemRect.left + itemRect.width, y: itemRect.top + itemRect.height },
+                    curCursorPos, lastCursorPos);
+
+                // Sometimes isCrossLine returned false, so we need to check direction manually (less accurate, but it is not a big problem).
+                if (!isUp && !isDown && !isLeft && !isRight) {
+                    var x = (itemRect.width / 2 - curCursorPos.x + itemRect.left) / (itemRect.width / 2);
+                    var y = (itemRect.height / 2 - curCursorPos.y + itemRect.top) / (itemRect.height / 2);
+                    if (Math.abs(x) > Math.abs(y)) {
+                        if (x > 0) {
+                            isLeft = true;
+                        } else {
+                            isRight = true;
+                        }
+                    } else {
+                        if (y > 0) {
+                            isUp = true;
+                        } else {
+                            isDown = true;
+                        }
+                    }
+                }
+
+                if (isUp) {
+                    endY = '-10' + endY;
+                } else if (isDown) {
+                    endY = '10' + endY;
+                } else if (isLeft) {
+                    endX = '-10' + endX;
+                } else if (isRight) {
+                    endX = '10' + endX;
                 }
 
                 if (enter) {
                     $overlay.css({
-                        transform: 'translateX(' + endX + ') translateY(' + endY + ') translateZ(0)',
-                        transition: 'none'
+                        transition: 'none',
+                        transform: 'translateX(' + endX + ') translateY(' + endY + ') translateZ(0)'
                     });
                 }
 
                 setTimeout(function () {
                     $overlay.css({
-                        transition: '.2s transform cubic-bezier(0.455, 0.030, 0.515, 0.955)'
-                    });
-                    $overlay.css({
+                        transition: '.2s transform ease-in-out',
                         transform: 'translateX(' + (enter ? '0%' : endX) + ') translateY(' + (enter ? '0%' : endY) + ') translateZ(0)'
                     });
-                }, 0);
+                });
             });
         }
 
