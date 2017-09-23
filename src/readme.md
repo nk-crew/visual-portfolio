@@ -87,12 +87,12 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 = 1.1.2 =
 * added options to hide arrows and numbers from the paged pagination
 * added support for Visual Composer
-* added class attribute support in shortcode
+* added class attribute in shortcode
 * added excerpt field to the portfolio post type
 * removed enqueued portfolio scripts and styles from the admin builder
 * improved fly effect, now direction calculated more correct
 * changed all items-styles hover effects
-* fixed showing excerpt from except post fields
+* fixed showing excerpt from excerpt post fields
 * fixed php short tag usage
 * fixed conflict with Visual Composer and old isotope plugin
 
