@@ -1,6 +1,6 @@
 === Visual Portfolio ===
 Contributors: nko
-Tags: portfolio, builder, masonry, tiles, gallery, photos
+Tags: portfolio, builder, masonry, tiles, gallery, photos, visual composer
 Requires at least: 4.0.0
 Tested up to: 4.8
 Stable tag: 1.0
@@ -43,6 +43,7 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
    * Custom order
 * Custom CSS for each portfolio lists
 * Shortcode generated, so you can place unlimited portfolio lists on the page
+* Visual Composer page builder supported
 
 
 = Real Examples =
@@ -83,6 +84,18 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 == Changelog ==
 
+= 1.1.2 =
+* added options to hide arrows and numbers from the paged pagination
+* added support for Visual Composer
+* added class attribute support in shortcode
+* added excerpt field to the portfolio post type
+* removed enqueued portfolio scripts and styles from the admin builder
+* improved fly effect, now direction calculated more correct
+* changed all items-styles hover effects
+* fixed showing excerpt from except post fields
+* fixed php short tag usage
+* fixed conflict with Visual Composer and old isotope plugin
+
 = 1.1.1 =
 * fixed php enqueue errors
 
@@ -98,7 +111,6 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 * fixed popup gallery buttons style conflict with default WordPress themes
 * fixed styles rendering on initialization (without timeout now)
 * fixed isotope items animation and remove
-* fixed isotope version conflict with Visual Composer
 * fixed preloader opacity transition (added wrapper)
 * fixed showing paged pagination if no items
 * minor changes
