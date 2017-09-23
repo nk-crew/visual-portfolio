@@ -514,7 +514,7 @@ class Visual_Portfolio_Get {
 
                         // Excerpt.
                         if ( $style_options['show_excerpt'] ) {
-                            $args['excerpt'] = wp_trim_words( do_shortcode( get_the_content() ), $style_options['excerpt_words_count'], '...' );
+                            $args['excerpt'] = wp_trim_words( do_shortcode( has_excerpt() ? get_the_excerpt() : get_the_content() ), $style_options['excerpt_words_count'], '...' );
                         }
 
                         // Click action.
