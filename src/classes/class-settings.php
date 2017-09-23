@@ -9,6 +9,11 @@ require_once( visual_portfolio()->plugin_path . 'classes/class-settings-api.php'
  * Visual Portfolio Settings Class
  */
 class Visual_Portfolio_Settings {
+    /**
+     * Settings API instance
+     *
+     * @var object
+     */
     public $settings_api;
 
     /**

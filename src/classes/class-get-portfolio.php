@@ -4,10 +4,6 @@
  *
  * @package visual-portfolio/get
  */
-
-/**
- * Get portfolio list
- */
 class Visual_Portfolio_Get {
     /**
      * Get default options

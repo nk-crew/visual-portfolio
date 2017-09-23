@@ -8,11 +8,10 @@
  * @author Tareq Hasan <tareq@weDevs.com>
  * @link https://tareq.co Tareq Hasan
  */
-if ( !class_exists( 'Visual_Portfolio_Settings_API' ) ):
 class Visual_Portfolio_Settings_API {
 
     /**
-     * settings sections array
+     * Settings sections array
      *
      * @var array
      */
@@ -25,6 +24,9 @@ class Visual_Portfolio_Settings_API {
      */
     protected $settings_fields = array();
 
+    /**
+     * Visual_Portfolio_Settings_API constructor.
+     */
     public function __construct() {
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
     }
@@ -704,5 +706,3 @@ class Visual_Portfolio_Settings_API {
     }
 
 }
-
-endif;

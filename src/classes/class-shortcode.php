@@ -4,10 +4,6 @@
  *
  * @package visual-portfolio/shortcode
  */
-
-/**
- * Shortcode Class
- */
 class Visual_Portfolio_Shortcode {
     /**
      * Visual_Portfolio_Shortcode constructor.

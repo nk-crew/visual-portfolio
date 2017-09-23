@@ -4,10 +4,6 @@
  *
  * @package visual-portfolio/admin
  */
-
-/**
- * Admin Class
- */
 class Visual_Portfolio_Admin {
     /**
      * Visual_Portfolio_Admin constructor.
