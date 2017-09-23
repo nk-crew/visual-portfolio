@@ -21,9 +21,11 @@ class Visual_Portfolio_Shortcode {
      */
     public function get_shortcode_out( $atts = array() ) {
         $atts = shortcode_atts(array(
-            'id' => '',
+            'id'     => '',
+            'class'  => '',
+            'vc_css' => '',
         ), $atts);
 
-        return Visual_Portfolio_Get::get( $atts['id'] );
+        return Visual_Portfolio_Get::get( $atts );
     }
 }

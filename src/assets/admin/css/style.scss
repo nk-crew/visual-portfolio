@@ -30,6 +30,42 @@
     background-image: url('../images/icon-gray.svg');
 }
 
+/**
+ * Visual Composer Icon
+ */
+.vc_element-icon[data-is-container=true].icon-visual-portfolio,
+.vc_element-icon.icon-visual-portfolio {
+    background-position: 50% 50%;
+}
+.vc_element-icon.icon-visual-portfolio,
+.vc_control-visual-portfolio {
+    position: relative;
+    background-image: url('../images/icon-vc.png');
+    background-size: cover;
+    background-position: 50% 50%;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.vc_control-visual-portfolio {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 0 2px;
+    cursor: pointer;
+}
+.vc_controls-row .vc_control-visual-portfolio {
+    float: right;
+    margin: 4px;
+}
+.vc_control-visual-portfolio-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+}
 
 /**
  * Grid

@@ -222,24 +222,36 @@ class Visual_Portfolio_Get {
     /**
      * Print portfolio by post ID or options
      *
-     * @param int|array $options_or_id options for portfolio list to print.
+     * @param array $atts options for portfolio list to print.
      *
      * @return string
      */
-    static public function get( $options_or_id = array() ) {
+    static public function get( $atts = array() ) {
+        if ( ! is_array( $atts ) || ! isset( $atts['id'] ) ) {
+            return '';
+        }
+
         self::enqueue_scripts();
 
         // generate unique ID.
         $uid = ++self::$id;
-        $uid = hash( 'crc32b', $uid . $options_or_id );
+        $uid = hash( 'crc32b', $uid . $atts['id'] );
 
-        $options = self::get_options( $options_or_id );
+        $options = self::get_options( $atts['id'] );
 
         $class   = 'vp-portfolio vp-uid-' . $uid;
 
         // Add ID to class.
-        if ( ! is_array( $options_or_id ) ) {
-            $class .= ' vp-id-' . $options_or_id;
+        $class .= ' vp-id-' . $atts['id'];
+
+        // Add custom class.
+        if ( isset( $atts['class'] ) ) {
+            $class .= ' ' . $atts['class'];
+        }
+
+        // Add custom css from VC.
+        if ( function_exists( 'vc_shortcode_custom_css_class' ) && isset( $atts['vc_css'] ) ) {
+            $class .= ' ' . vc_shortcode_custom_css_class( $atts['vc_css'] );
         }
 
         // stretch class.
@@ -593,8 +605,8 @@ class Visual_Portfolio_Get {
         <?php
 
         // Add custom styles.
-        if ( ! is_array( $options_or_id ) && $options['vp_custom_css'] ) {
-            $custom_css_handle = 'vp-custom-css-' . $options_or_id;
+        if ( $options['vp_custom_css'] ) {
+            $custom_css_handle = 'vp-custom-css-' . $atts['id'];
             $css = wp_kses( $options['vp_custom_css'], array( '\'', '\"' ) );
             $css = str_replace( '&gt;' , '>' , $css );
 

@@ -167,7 +167,7 @@ class Visual_Portfolio_Preview {
 
             <body>
                 <div id="vp_preview">
-                    <?php echo Visual_Portfolio_Get::get( $id ); ?>
+                    <?php echo Visual_Portfolio_Get::get( array( 'id' => $id ) ); ?>
                 </div>
 
                 <?php wp_footer(); ?>
