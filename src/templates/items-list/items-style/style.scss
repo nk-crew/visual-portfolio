@@ -7,6 +7,16 @@
         box-shadow: none;
     }
 
+    // Transitions
+    .vp-portfolio__item-img img {
+        transition: transform 2s cubic-bezier(0.08, 0.43, 0.24, 1);
+    }
+    .vp-portfolio__item:hover {
+        .vp-portfolio__item-img img {
+            transform: scale(1.1);
+        }
+    }
+
     // meta
     .vp-portfolio__item-meta {
         position: relative;
