@@ -34,7 +34,7 @@ class Visual_Portfolio_VC {
             ));
             $data_vc = array();
             foreach ( $vp_query as $post ) {
-                $data_vc[] = array( $post->ID, $post->post_title );
+                $data_vc[] = array( $post->ID, '#' . $post->ID . ' - ' . $post->post_title );
             }
 
             vc_map( array(

@@ -51,7 +51,7 @@ class Visual_Portfolio_TinyMCE {
             foreach ( $vp_query as $post ) {
                 $data_tiny_mce[] = array(
                     'id'    => $post->ID,
-                    'title' => $post->post_title,
+                    'title' => '#' . $post->ID . ' - ' . $post->post_title,
                 );
             }
 
