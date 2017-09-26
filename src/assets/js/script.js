@@ -1005,10 +1005,14 @@
             if (removeExisting) {
                 var $existing = self.$items_wrap.find('.vp-portfolio__item-wrap');
                 self.$items_wrap.isotope('remove', $existing);
-            }
 
-            self.$items_wrap.isotope('insert', $items);
-            self.initIsotope('layout');
+                // we need to prepend items when remove existing just because Tiles layout have troubles with appending and removing items
+                self.$items_wrap.prepend($items)
+                    .isotope('prepended', $items);
+            } else {
+                self.$items_wrap.append($items)
+                    .isotope('appended', $items);
+            }
 
             // images loaded init
             self.$items_wrap.imagesLoaded(function() {
