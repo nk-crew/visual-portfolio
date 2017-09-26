@@ -84,6 +84,12 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 == Changelog ==
 
+= 1.1.3 =
+* added ID in title to tinymce and visual composer dropdowns
+* fixed fly effect transition in Safari
+* fixed tiles filter jumping
+* fixed iframe height calculation if in theme set html height 100%;
+
 = 1.1.2 =
 * added options to hide arrows and numbers from the paged pagination
 * added support for Visual Composer
