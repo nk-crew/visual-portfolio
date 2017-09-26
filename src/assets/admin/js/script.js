@@ -94,8 +94,7 @@
     // resize iframe
     if ( $.fn.iFrameResize ) {
         $frame.iFrameResize({
-            interval: 10,
-            heightCalculationMethod: 'documentElementOffset'
+            interval: 10
         });
     }
 
