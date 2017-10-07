@@ -1,4 +1,6 @@
 .git
 .idea
+*.lock
 node_modules
-dist
+/vendor
+/dist
