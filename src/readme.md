@@ -84,6 +84,9 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 == Changelog ==
 
+= 1.1.4 =
+* fixed conflict with WooCommerce Photoswipe gallery
+
 = 1.1.3 =
 * added ID in title to tinymce and visual composer dropdowns
 * fixed fly effect transition in Safari
