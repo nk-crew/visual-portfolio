@@ -190,24 +190,6 @@ class Visual_Portfolio_Get {
         }
         self::$scripts_enqueued = true;
 
-        wp_enqueue_style( 'font-awesome' );
-        wp_enqueue_script( 'object-fit-images' );
-        wp_enqueue_script( 'imagesloaded' );
-
-        wp_enqueue_script( 'isotope' );
-
-        /*
-         * TODO: Justified
-           wp_enqueue_script( 'justified-gallery' );
-         */
-
-        // PhotoSwipe.
-        wp_enqueue_style( 'photoswipe' );
-        wp_enqueue_style( 'photoswipe-default-skin' );
-        wp_enqueue_script( 'photoswipe' );
-        wp_enqueue_script( 'photoswipe-ui-default' );
-
-        // Visual Portfolio.
         wp_enqueue_script( 'visual-portfolio' );
         wp_enqueue_style( 'visual-portfolio' );
     }
