@@ -154,7 +154,7 @@ class Visual_Portfolio_Admin {
                     'editor',
                     'thumbnail',
                     'revisions',
-                    'excerpt'
+                    'excerpt',
                 ),
             )
         );
