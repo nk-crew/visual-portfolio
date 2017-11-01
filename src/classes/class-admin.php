@@ -133,6 +133,7 @@ class Visual_Portfolio_Admin {
 
                 // adding to custom menu manually.
                 'show_in_menu' => false,
+                'show_in_admin_bar' => true,
                 'menu_icon'    => 'dashicons-visual-portfolio',
                 'taxonomies'   => array(
                     'portfolio_category',
