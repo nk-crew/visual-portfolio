@@ -393,6 +393,15 @@ class Visual_Portfolio_Get {
         $max_pages = (int) ($portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages);
         $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
 
+        // No items found.
+        if ( ! $portfolio_query->have_posts() ) {
+            ob_start();
+            self::notice( esc_html__( 'No items found.', NK_VP_DOMAIN ) );
+            $return = ob_get_contents();
+            ob_end_clean();
+            return $return;
+        }
+
         ob_start();
         ?>
 
@@ -619,6 +628,21 @@ class Visual_Portfolio_Get {
     static private function get_current_page_number() {
         $page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
         return $page;
+    }
+
+    /**
+     * Print notice
+     *
+     * @param string $notice notice string.
+     */
+    static private function notice( $notice ) {
+        if ( ! $notice ) {
+            return;
+        }
+        visual_portfolio()->include_template( 'notices/notices', array(
+            'notice' => $notice,
+        ) );
+        visual_portfolio()->include_template_style( 'visual-portfolio-notices-default', 'notices/style' );
     }
 
     /**
