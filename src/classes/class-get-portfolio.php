@@ -45,6 +45,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_default__show_categories' => true,
             'vp_items_style_default__categories_count' => 1,
             'vp_items_style_default__show_date' => false,
+            'vp_items_style_default__date_human_format' => false,
             'vp_items_style_default__show_excerpt' => false,
             'vp_items_style_default__excerpt_words_count' => 15,
             // center, left, right.
@@ -58,6 +59,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_fly__show_categories' => true,
             'vp_items_style_fly__categories_count' => 1,
             'vp_items_style_fly__show_date' => false,
+            'vp_items_style_fly__date_human_format' => false,
             'vp_items_style_fly__show_excerpt' => false,
             'vp_items_style_fly__excerpt_words_count' => 15,
             'vp_items_style_fly__show_icon' => false,
@@ -75,6 +77,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_emerge__show_categories' => true,
             'vp_items_style_emerge__categories_count' => 1,
             'vp_items_style_emerge__show_date' => false,
+            'vp_items_style_emerge__date_human_format' => false,
             'vp_items_style_emerge__show_excerpt' => false,
             'vp_items_style_emerge__excerpt_words_count' => 15,
             // center, left, right.
@@ -90,6 +93,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_fade__show_categories' => true,
             'vp_items_style_fade__categories_count' => 1,
             'vp_items_style_fade__show_date' => false,
+            'vp_items_style_fade__date_human_format' => false,
             'vp_items_style_fade__show_excerpt' => false,
             'vp_items_style_fade__excerpt_words_count' => 15,
             'vp_items_style_fade__show_icon' => false,
@@ -484,14 +488,16 @@ class Visual_Portfolio_Get {
 
                         // args.
                         $args = array(
-                            'url'        => get_permalink(),
-                            'title'      => get_the_title(),
-                            'published'  => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
-                            'filter'     => implode( ',', $filter_values ),
-                            'image'      => get_the_post_thumbnail( get_the_ID(), $img_size ),
-                            'categories' => $categories,
-                            'opts'       => $style_options,
-                            'vp_ops'     => $options,
+                            'url'             => get_permalink(),
+                            'title'           => get_the_title(),
+                            'published'       => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
+                            // translators: %s - published in human format.
+                            'published_human_format' => sprintf( esc_html__( '%s ago', NK_VP_DOMAIN ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) ),
+                            'filter'          => implode( ',', $filter_values ),
+                            'image'           => get_the_post_thumbnail( get_the_ID(), $img_size ),
+                            'categories'      => $categories,
+                            'opts'            => $style_options,
+                            'vp_ops'          => $options,
                         );
 
                         // Excerpt.

@@ -44,10 +44,16 @@ if ( ! $args['url'] ) {
         }
 
         // Show Date.
-        if ( $opts['show_date'] && $args['published'] ) {
+        if ( $opts['show_date'] ) {
             ?>
             <div class="vp-portfolio__item-meta-date">
-                <?php echo esc_html( $args['published'] ); ?>
+                <?php
+                if ( $opts['date_human_format'] && $args['published_human_format'] ) {
+                    echo esc_html( $args['published_human_format'] );
+                } else if ( $args['published'] ) {
+                    echo esc_html( $args['published'] );
+                }
+                ?>
             </div>
             <?php
         }

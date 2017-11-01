@@ -701,6 +701,13 @@ class Visual_Portfolio_Admin {
                 </p>
 
                 <p>
+                    <label for="<?php echo esc_attr( $opt . 'date_human_format' ); ?>">
+                        <input name="<?php echo esc_attr( $opt . 'date_human_format' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'date_human_format' ); ?>" value="true" <?php checked( $meta[ $opt . 'date_human_format' ] ); ?>>
+                        <?php echo esc_html__( 'Date in Human Format', NK_VP_DOMAIN ); ?>
+                    </label>
+                </p>
+
+                <p>
                     <label for="<?php echo esc_attr( $opt . 'show_excerpt' ); ?>">
                         <input name="<?php echo esc_attr( $opt . 'show_excerpt' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_excerpt' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_excerpt' ] ); ?>>
                         <?php echo esc_html__( 'Show Excerpt', NK_VP_DOMAIN ); ?>
