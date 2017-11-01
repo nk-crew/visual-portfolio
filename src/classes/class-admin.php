@@ -869,6 +869,12 @@ class Visual_Portfolio_Admin {
                     <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
                 </option>
             </select>
+
+            <p></p>
+            <label for="vp_filter_show_count">
+                <input name="vp_filter_show_count" type="checkbox" id="vp_filter_show_count" value="true" <?php checked( $meta['vp_filter_show_count'] ); ?>>
+                <?php echo esc_html__( 'Show Count', NK_VP_DOMAIN ); ?>
+            </label>
         </div>
         <?php
     }

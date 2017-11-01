@@ -111,6 +111,7 @@ class Visual_Portfolio_Get {
             'vp_filter'                => 'default',
             // center, left, right.
             'vp_filter_align'          => 'center',
+            'vp_filter_show_count'     => false,
 
             // infinite, load-more, true.
             'vp_pagination'            => 'load-more',
@@ -709,6 +710,7 @@ class Visual_Portfolio_Get {
             'class'    => 'vp-filter',
             'items'    => $items,
             'align'    => $vp_options['vp_filter_align'],
+            'show_count' => $vp_options['vp_filter_show_count'],
             'vp_ops'   => $vp_options,
         );
 
