@@ -681,7 +681,8 @@ class Visual_Portfolio_Get {
 
                 foreach ( $all_taxonomies as $cat ) {
                     // allow only category taxonomies like category, portfolio_category, etc...
-                    if ( strpos( $cat, 'category' ) === false ) {
+                    // + support for jetpack portfolio-type.
+                    if ( strpos( $cat, 'category' ) === false && strpos( $cat, 'jetpack-portfolio-type' ) === false ) {
                         continue;
                     }
 
