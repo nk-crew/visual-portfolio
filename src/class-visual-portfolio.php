@@ -162,10 +162,35 @@ class Visual_Portfolio {
         wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', '', '', true );
         wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '', true );
 
-
         // Visual Portfolio.
         wp_register_script( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/js/script.js', array( 'jquery', 'isotope', 'imagesloaded', 'object-fit-images', 'photoswipe-ui-default' ), '', true );
         wp_register_style( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/css/style.css', array( 'font-awesome', 'photoswipe-default-skin' ) );
+
+        // Visual Portfolio data.
+        $data_init = array(
+            '__' => array(
+                'couldnt_retrieve_vp' => esc_attr( 'Couldn\'t retrieve Visual Portfolio ID.', NK_VP_DOMAIN ),
+                'pswp_close' => esc_attr( 'Close (Esc)', NK_VP_DOMAIN ),
+                'pswp_share' => esc_attr( 'Share', NK_VP_DOMAIN ),
+                'pswp_fs' => esc_attr( 'Toggle fullscreen', NK_VP_DOMAIN ),
+                'pswp_zoom' => esc_attr( 'Zoom in/out', NK_VP_DOMAIN ),
+                'pswp_prev' => esc_attr( 'Previous (arrow left)', NK_VP_DOMAIN ),
+                'pswp_next' => esc_attr( 'Next (arrow right)', NK_VP_DOMAIN ),
+                'pswp_share_fb' => esc_attr( 'Share on Facebook', NK_VP_DOMAIN ),
+                'pswp_share_tw' => esc_attr( 'Tweet', NK_VP_DOMAIN ),
+                'pswp_share_pin' => esc_attr( 'Pin it', NK_VP_DOMAIN ),
+            ),
+            'settings_popup_gallery' => array(
+                'show_arrows' => Visual_Portfolio_Settings::get_option( 'show_arrows','vp_popup_gallery', true ),
+                'show_caption' => Visual_Portfolio_Settings::get_option( 'show_caption','vp_popup_gallery', true ),
+                'show_counter' => Visual_Portfolio_Settings::get_option( 'show_counter','vp_popup_gallery', true ),
+                'show_zoom_button' => Visual_Portfolio_Settings::get_option( 'show_zoom_button','vp_popup_gallery', true ),
+                'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button','vp_popup_gallery', true ),
+                'show_share_button' => Visual_Portfolio_Settings::get_option( 'show_share_button','vp_popup_gallery', true ),
+                'show_close_button' => Visual_Portfolio_Settings::get_option( 'show_close_button','vp_popup_gallery', true ),
+            ),
+        );
+        wp_localize_script( 'visual-portfolio', 'VPData', $data_init );
     }
 
     /**

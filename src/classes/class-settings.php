@@ -93,6 +93,10 @@ class Visual_Portfolio_Settings {
                 'id'    => 'vp_general',
                 'title' => esc_html__( 'General', NK_VP_DOMAIN ),
             ),
+            array(
+                'id'    => 'vp_popup_gallery',
+                'title' => esc_html__( 'Popup Gallery', NK_VP_DOMAIN ),
+            ),
         );
 
         return $sections;
@@ -115,6 +119,53 @@ class Visual_Portfolio_Settings {
                     'options' => array(
                         'button_label' => esc_html__( 'Choose Image', NK_VP_DOMAIN ),
                     ),
+                ),
+            ),
+            'vp_popup_gallery' => array(
+                array(
+                    'name'    => 'show_arrows',
+                    'label'   => esc_html__( 'Show Arrows', NK_VP_DOMAIN ),
+                    'desc'    => esc_html__( 'Arrows to navigate between images.', NK_VP_DOMAIN ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+                array(
+                    'name'    => 'show_caption',
+                    'label'   => esc_html__( 'Show Caption', NK_VP_DOMAIN ),
+                    'desc'    => esc_html__( 'Below images will be showed caption with Title and Description.', NK_VP_DOMAIN ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+                array(
+                    'name'    => 'show_counter',
+                    'label'   => esc_html__( 'Show Images Counter', NK_VP_DOMAIN ),
+                    'desc'    => esc_html__( 'On the top left corner will be showed images counter.', NK_VP_DOMAIN ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+                array(
+                    'name'    => 'show_zoom_button',
+                    'label'   => esc_html__( 'Show Zoom Button', NK_VP_DOMAIN ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+                array(
+                    'name'    => 'show_fullscreen_button',
+                    'label'   => esc_html__( 'Show Fullscreen Button', NK_VP_DOMAIN ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+                array(
+                    'name'    => 'show_share_button',
+                    'label'   => esc_html__( 'Show Share Button', NK_VP_DOMAIN ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+                array(
+                    'name'    => 'show_close_button',
+                    'label'   => esc_html__( 'Show Close Button', NK_VP_DOMAIN ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
                 ),
             ),
         );
