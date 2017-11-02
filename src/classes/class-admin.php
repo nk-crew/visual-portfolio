@@ -137,6 +137,7 @@ class Visual_Portfolio_Admin {
                 'menu_icon'    => 'dashicons-visual-portfolio',
                 'taxonomies'   => array(
                     'portfolio_category',
+                    'portfolio_tag',
                 ),
                 'capabilities' => array(
                     'edit_post' => 'edit_portfolio',
@@ -167,6 +168,19 @@ class Visual_Portfolio_Admin {
                 'slug' => 'portfolio-category',
             ),
             'hierarchical'  => true,
+            'publicly_queryable' => false,
+            'show_in_nav_menus' => false,
+            'show_admin_column' => true,
+        ));
+        register_taxonomy('portfolio_tag', 'portfolio', array(
+            'label'         => esc_html__( 'Tags', NK_VP_DOMAIN ),
+            'labels'        => array(
+                'menu_name' => esc_html__( 'Tags', NK_VP_DOMAIN ),
+            ),
+            'rewrite'       => array(
+                'slug' => 'portfolio-tag',
+            ),
+            'hierarchical'  => false,
             'publicly_queryable' => false,
             'show_in_nav_menus' => false,
             'show_admin_column' => true,
@@ -379,6 +393,14 @@ class Visual_Portfolio_Admin {
             'manage_options',
             'edit-tags.php?taxonomy=portfolio_category&post_type=portfolio'
         );
+
+        add_submenu_page(
+            'visual-portfolio',
+            esc_html__( 'Tags', NK_VP_DOMAIN ),
+            esc_html__( 'Tags', NK_VP_DOMAIN ),
+            'manage_options',
+            'edit-tags.php?taxonomy=portfolio_tag&post_type=portfolio'
+        );
     }
 
     /**
@@ -397,7 +419,7 @@ class Visual_Portfolio_Admin {
             case 'vp_lists':
                 $parent_file = 'visual-portfolio';
 
-                if ( 'portfolio_category' === $current_screen->taxonomy ) {
+                if ( 'portfolio_category' === $current_screen->taxonomy || 'portfolio_tag' === $current_screen->taxonomy ) {
                     $submenu_file = $current_screen->base . '.php?taxonomy=' . $current_screen->taxonomy . '&post_type=' . $current_screen->post_type;
                 }
 
