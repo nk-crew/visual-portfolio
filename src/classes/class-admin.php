@@ -318,9 +318,11 @@ class Visual_Portfolio_Admin {
      * @param bool $column_name column name.
      */
     public function manage_portfolio_img_column( $column_name = false ) {
-        if ( 'portfolio_post_thumbs' === $column_name && has_post_thumbnail() ) {
-            echo '<a href="' . esc_url( get_edit_post_link() ) . '" class="vp-portfolio__thumbnail">';
-            the_post_thumbnail( 'thumbnail' );
+        if ( 'portfolio_post_thumbs' === $column_name ) {
+            echo '<a href="' . esc_url( get_edit_post_link() ) . '" class="vp-portfolio__thumbnail ' . (has_post_thumbnail() ? '' : 'vp-portfolio__thumbnail-empty') . '">';
+            if ( has_post_thumbnail() ) {
+                the_post_thumbnail( 'thumbnail' );
+            }
             echo '</a>';
         }
     }

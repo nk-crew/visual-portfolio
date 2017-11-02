@@ -357,6 +357,7 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
  * Portfolio Post Type
  */
 .vp-portfolio__thumbnail {
+    position: relative;
     display: block;
     overflow: hidden;
     border-radius: 3px;
@@ -367,6 +368,40 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
         height: auto;
         max-height: 120px;
         max-width: 70px;
+    }
+}
+.vp-portfolio__thumbnail-empty {
+    padding-top: 100%;
+    background-color: #f1f1f1;
+    border: 1px solid #e8e8e8;
+
+    &,
+    &:hover,
+    &:active,
+    &:focus {
+        color: #a2a2a2;
+    }
+
+    &:after {
+        content: "\f128";
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 20px;
+        margin-left: -10px;
+        margin-top: -10px;
+        line-height: 1;
+        font-family: dashicons;
+        text-decoration: inherit;
+        font-weight: 400;
+        font-style: normal;
+        vertical-align: top;
+        text-align: center;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 }
 .wp-list-table {
