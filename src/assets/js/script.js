@@ -941,23 +941,30 @@
                 imageSrcWillChange;
 
             gallery.listen('beforeResize', function () {
-                var dpiRatio = window.devicePixelRatio ? window.devicePixelRatio : 1;
-                dpiRatio = Math.min(dpiRatio, 2.5);
-                realViewportWidth = gallery.viewportSize.x * dpiRatio;
+                // gallery.viewportSize.x - width of PhotoSwipe viewport
+                // gallery.viewportSize.y - height of PhotoSwipe viewport
+                // window.devicePixelRatio - ratio between physical pixels and device independent pixels (Number)
+                //                          1 (regular display), 2 (@2x, retina) ...
 
-                if(realViewportWidth >= 1200 || !gallery.likelyTouchDevice && realViewportWidth > 800 || screen.width > 1200 ) {
-                    if(!useLargeImages) {
-                        useLargeImages = true;
-                        imageSrcWillChange = true;
-                    }
-                } else {
-                    if(useLargeImages) {
-                        useLargeImages = false;
-                        imageSrcWillChange = true;
-                    }
+
+                // calculate real pixels when size changes
+                realViewportWidth = gallery.viewportSize.x * window.devicePixelRatio;
+
+                // Code below is needed if you want image to switch dynamically on window.resize
+
+                // Find out if current images need to be changed
+                if(useLargeImages && realViewportWidth < 1000) {
+                    useLargeImages = false;
+                    imageSrcWillChange = true;
+                } else if(!useLargeImages && realViewportWidth >= 1000) {
+                    useLargeImages = true;
+                    imageSrcWillChange = true;
                 }
 
+                // Invalidate items only when source is changed and when it's not the first update
                 if(imageSrcWillChange && !firstResize) {
+                    // invalidateCurrItems sets a flag on slides that are in DOM,
+                    // which will force update of content (image) on window.resize.
                     gallery.invalidateCurrItems();
                 }
 
