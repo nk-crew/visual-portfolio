@@ -143,4 +143,4 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 = How to change default templates and styles? =
 
-You can copy files from the **/visual-portfolio/templates/** to your **YOUR_THEME/visual/portfolio/** folder and change php code and css files here.
+You can copy files from the **/visual-portfolio/templates/** to your **YOUR_THEME/visual-portfolio/** folder and change php code and css files here.
