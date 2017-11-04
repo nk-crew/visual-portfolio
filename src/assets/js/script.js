@@ -438,26 +438,28 @@
         // on filter click
         self.$item.on('click' + evp, '.vp-filter .vp-filter__item a', function (e) {
             e.preventDefault();
+            var $this = $(this);
             if ( ! self.loading ) {
-                $(this).closest('.vp-filter__item').addClass('vp-filter__item-active').siblings().removeClass('vp-filter__item-active');
+                $this.closest('.vp-filter__item').addClass('vp-filter__item-active').siblings().removeClass('vp-filter__item-active');
             }
-            self.loadNewItems(this.href, true);
+            self.loadNewItems($this.attr('href'), true);
         });
 
         // on pagination click
         self.$item.on('click' + evp, '.vp-pagination .vp-pagination__item a', function (e) {
             e.preventDefault();
-            if ( $(this).hasClass('vp-pagination__no-more') && self.options.pagination !== 'paged') {
+            var $this = $(this);
+            if ( $this.hasClass('vp-pagination__no-more') && self.options.pagination !== 'paged') {
                 return;
             }
-            self.loadNewItems(this.href, self.options.pagination === 'paged');
+            self.loadNewItems($this.attr('href'), self.options.pagination === 'paged');
         });
 
         // on categories of item click
         self.$item.on('click' + evp, '.vp-portfolio__items .vp-portfolio__item-meta-category a', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            self.loadNewItems(this.href, true);
+            self.loadNewItems($(this).attr('href'), true);
         });
 
         // infinite loading
@@ -1150,7 +1152,7 @@
     /**
      * AJAX Load New Items
      */
-    VP.prototype.loadNewItems = function loadNewItems (url, removeExisting, cb) {
+    VP.prototype.loadNewItems = function (url, removeExisting, cb) {
         var self = this;
 
         if(self.loading || ! url) {
