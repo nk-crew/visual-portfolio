@@ -1,6 +1,6 @@
 === Visual Portfolio ===
 Contributors: nko
-Tags: portfolio, builder, masonry, tiles, gallery, photos, visual composer
+Tags: portfolio, gallery, works, masonry, popup
 Requires at least: 4.0.0
 Tested up to: 4.8
 Stable tag: 1.0
@@ -33,7 +33,7 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
 * Load More
 * Paged lists
 * Filtering
-* Popup gallery
+* Popup gallery (Youtube and Vimeo supported)
 * Custom item gutters
 * Stretch option (if you want to break the fixed container of the page)
 * Custom posts type lists (not only portfolio)
