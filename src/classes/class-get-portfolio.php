@@ -531,9 +531,6 @@ class Visual_Portfolio_Get {
                             if ( ! $args['image'] && isset( $oembed['thumbnail_url'] ) ) {
                                 $args['image'] = '<img src="' . esc_url( $oembed['thumbnail_url'] ) . '" alt="' . esc_attr( $oembed['title'] ) . '" />';
                             }
-
-                            // Change icon.
-
                         }
 
                         // Excerpt.

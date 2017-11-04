@@ -268,10 +268,38 @@ class Visual_Portfolio_Admin {
      */
     public function add_video_format_metabox( $post ) {
         wp_nonce_field( basename( __FILE__ ), 'vp_format_video_nonce' );
+
+        $video_url = get_post_meta( $post->ID, 'video_url', true );
+        $oembed_html = false;
+
+        $wpkses_iframe = array(
+            'iframe' => array(
+                'src'             => array(),
+                'height'          => array(),
+                'width'           => array(),
+                'frameborder'     => array(),
+                'allowfullscreen' => array(),
+            ),
+        );
+
+        if ( $video_url ) {
+            $oembed = visual_portfolio()->get_oembed_data( $video_url );
+
+            if ( $oembed && isset( $oembed['html'] ) ) {
+                $oembed_html = $oembed['html'];
+            }
+        }
         ?>
+
         <p></p>
-        <input class="vp-input" name="video_url" type="url" id="video_url" value="<?php echo esc_attr( get_post_meta( $post->ID, 'video_url', true ) ); ?>" placeholder="<?php echo esc_attr__( 'https://', NK_VP_DOMAIN ); ?>">
-        <div class="vp-oembed-preview"></div>
+        <input class="vp-input" name="video_url" type="url" id="video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="<?php echo esc_attr__( 'https://', NK_VP_DOMAIN ); ?>">
+        <div class="vp-oembed-preview">
+            <?php
+            if ( $oembed_html ) {
+                echo wp_kses( $oembed_html, $wpkses_iframe );
+            }
+            ?>
+        </div>
         <style>
             #vp_format_video {
                 display: <?php echo has_post_format( 'video' ) ? 'block' : 'none'; ?>;

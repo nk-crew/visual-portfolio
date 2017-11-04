@@ -62,7 +62,6 @@
             });
         }, 250);
     });
-    $('.vp-input[name="video_url"]').trigger('input');
 
 
     // Activate code only in vp_lists page
