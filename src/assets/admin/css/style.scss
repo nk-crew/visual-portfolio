@@ -405,17 +405,20 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
     display: block;
     overflow: hidden;
     border-radius: 3px;
+    padding-top: 100%;
+    max-width: 70px;
 
     img {
         display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        height: auto;
-        max-height: 120px;
-        max-width: 70px;
+        height: 100%;
+        object-fit: cover;
     }
 }
-.vp-portfolio__thumbnail-empty {
-    padding-top: 100%;
+.vp-portfolio__thumbnail:empty {
     background-color: #f1f1f1;
     border: 1px solid #e8e8e8;
 

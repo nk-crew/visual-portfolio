@@ -432,9 +432,19 @@ class Visual_Portfolio_Admin {
      */
     public function manage_portfolio_img_column( $column_name = false ) {
         if ( 'portfolio_post_thumbs' === $column_name ) {
-            echo '<a href="' . esc_url( get_edit_post_link() ) . '" class="vp-portfolio__thumbnail ' . (has_post_thumbnail() ? '' : 'vp-portfolio__thumbnail-empty') . '">';
+            echo '<a href="' . esc_url( get_edit_post_link() ) . '" class="vp-portfolio__thumbnail">';
             if ( has_post_thumbnail() ) {
                 the_post_thumbnail( 'thumbnail' );
+            } else if ( has_post_format( 'video' ) ) {
+                $video_url = get_post_meta( get_the_ID(), 'video_url', true );
+                if ( $video_url ) {
+                    $oembed = visual_portfolio()->get_oembed_data( $video_url );
+                    if ( isset( $oembed['thumbnail_url'] ) ) {
+                        ?>
+                        <img src="<?php echo esc_url( $oembed['thumbnail_url'] ); ?>" alt="" />
+                        <?php
+                    }
+                }
             }
             echo '</a>';
         }
