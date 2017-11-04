@@ -84,6 +84,21 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 == Changelog ==
 
+= 1.2.0 =
+* added support for oEmbed videos (Youtube and Vimeo supported)
+* added settings for popup gallery
+* added share button in popup gallery
+* added "Edit Portfolio Item" button in admin menu on frontend
+* added option to show filter items count
+* added option to show publised date in human format
+* added notice if no items found
+* added support for jetpack portfolio type filter
+* added portfolio tags support
+* updated color picker to support WordPress 4.9
+* fixed PhotoSwipe small images loading on mobile devices (performance improvements)
+* prevent load more click if href is empty
+* minor fixes and changes
+
 = 1.1.4 =
 * fixed conflict with WooCommerce Photoswipe gallery
 
