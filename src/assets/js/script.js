@@ -893,6 +893,16 @@
             var vpH = data.viewportSize.y * window.devicePixelRatio;
             var ratio = data.currItem.vw / data.currItem.vh;
             var resultW;
+            var $container = $(data.currItem.container);
+
+            var bars = data.options.barsSize;
+            var barTop = 0;
+            var barBot = 0;
+            if (bars) {
+                barTop = bars.top && bars.top !== 'auto' ? bars.top : 0;
+                barBot = bars.bottom && bars.bottom !== 'auto' ? bars.bottom : 0;
+            }
+            vpH -= barTop + barBot;
 
             if (ratio > vpW / vpH) {
                 resultW = vpW;
@@ -900,7 +910,11 @@
                 resultW = vpH * ratio;
             }
 
-            $(data.currItem.container).find('.vp-pswp-video').css('max-width', resultW);
+            $container.find('.vp-pswp-video').css('max-width', resultW);
+            $container.css({
+                top: barTop,
+                bottom: barBot
+            });
         };
 
         var openPhotoSwipe = function (index, galleryElement, disableAnimation, fromURL) {
