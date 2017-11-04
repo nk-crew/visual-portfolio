@@ -14,6 +14,11 @@ class Visual_Portfolio_Admin {
         // cutsom post types.
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
 
+        // add post formats.
+        add_action( 'init', array( $this, 'add_post_formats' ) );
+        add_action( 'add_meta_boxes', array( $this, 'add_post_format_metaboxes' ), 1 );
+        add_action( 'save_post', array( $this, 'save_post_format_metaboxes' ) );
+
         // custom post roles.
         add_action( 'admin_init', array( $this, 'add_role_caps' ) );
 
@@ -34,11 +39,12 @@ class Visual_Portfolio_Admin {
 
         // metaboxes.
         add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
-        $this->save_meta_boxes();
+        add_action( 'save_post_vp_lists', array( $this, 'save_visual_portfolio_metaboxes' ) );
 
         // ajax actions.
         add_action( 'wp_ajax_vp_find_posts', array( $this, 'ajax_find_posts' ) );
         add_action( 'wp_ajax_vp_find_taxonomies', array( $this, 'ajax_find_taxonomies' ) );
+        add_action( 'wp_ajax_vp_find_oembed', array( $this, 'ajax_find_oembed' ) );
     }
 
     /**
@@ -156,6 +162,7 @@ class Visual_Portfolio_Admin {
                     'thumbnail',
                     'revisions',
                     'excerpt',
+                    'post-formats',
                 ),
             )
         );
@@ -227,6 +234,84 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
+    }
+
+    /**
+     * Add post formats.
+     */
+    public function add_post_formats() {
+        add_theme_support( 'post-formats', array( 'video' ) );
+    }
+
+    /**
+     * Add post format metaboxes.
+     *
+     * @param string $post_type post type.
+     */
+    public function add_post_format_metaboxes( $post_type ) {
+        if ( post_type_supports( $post_type, 'post-formats' ) ) {
+            add_meta_box(
+                'vp_format_video',
+                esc_html__( 'Video', NK_VP_DOMAIN ),
+                array( $this, 'add_video_format_metabox' ),
+                null,
+                'side',
+                'default'
+            );
+        }
+    }
+
+    /**
+     * Add Video Format metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_video_format_metabox( $post ) {
+        wp_nonce_field( basename( __FILE__ ), 'vp_format_video_nonce' );
+        ?>
+        <p></p>
+        <input class="vp-input" name="video_url" type="url" id="video_url" value="<?php echo esc_attr( get_post_meta( $post->ID, 'video_url', true ) ); ?>" placeholder="<?php echo esc_attr__( 'https://', NK_VP_DOMAIN ); ?>">
+        <div class="vp-oembed-preview"></div>
+        <style>
+            #vp_format_video {
+                display: <?php echo has_post_format( 'video' ) ? 'block' : 'none'; ?>;
+            }
+        </style>
+        <?php
+    }
+
+    /**
+     * Save Format metabox
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function save_post_format_metaboxes( $post_id ) {
+        if ( ! isset( $_POST['vp_format_video_nonce'] ) ) {
+            return;
+        }
+
+        if ( ! wp_verify_nonce( sanitize_key( $_POST['vp_format_video_nonce'] ), basename( __FILE__ ) ) ) {
+            return;
+        }
+
+        $meta = array(
+            'video_url',
+        );
+
+        foreach ( $meta as $item ) {
+            if ( isset( $_POST[ $item ] ) ) {
+
+                $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
+
+                if ( 'Array' === $result ) {
+                    $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
+                }
+
+                update_post_meta( $post_id, $item, $result );
+            } else {
+                update_post_meta( $post_id, $item, false );
+            }
+        }
     }
 
     /**
@@ -516,13 +601,6 @@ class Visual_Portfolio_Admin {
     }
 
     /**
-     * Save metaboxes
-     */
-    public function save_meta_boxes() {
-        add_action( 'save_post_vp_lists', array( $this, 'save_visual_portfolio_metaboxes' ) );
-    }
-
-    /**
      * Add Title metabox
      *
      * @param object $post The post object.
@@ -755,7 +833,9 @@ class Visual_Portfolio_Admin {
 
                     <div data-cond="[name=<?php echo esc_attr( $opt . 'show_icon' ); ?>]">
                         <p></p>
-                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon' ] ); ?>">
+                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon' ] ); ?>" placeholder="<?php echo esc_attr( 'Standard Icon', NK_VP_DOMAIN ); ?>">
+                        <p></p>
+                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon_video' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon_video' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon_video' ] ); ?>" placeholder="<?php echo esc_attr( 'Video Icon', NK_VP_DOMAIN ); ?>">
                     </div>
                 <?php endif; ?>
 
@@ -1351,6 +1431,26 @@ class Visual_Portfolio_Admin {
         }
 
         echo json_encode( $taxonomies_by_type );
+
+        wp_die();
+    }
+
+    /**
+     * Find taxonomies ajax
+     */
+    public function ajax_find_oembed() {
+        check_ajax_referer( 'vp-ajax-nonce', 'nonce' );
+        if ( ! isset( $_GET['q'] ) ) {
+            wp_die();
+        }
+
+        $oembed = visual_portfolio()->get_oembed_data( sanitize_text_field( wp_unslash( $_GET['q'] ) ) );
+
+        if ( ! isset( $oembed ) || ! $oembed || ! isset( $oembed['html'] ) ) {
+            wp_die();
+        }
+
+        echo json_encode( $oembed );
 
         wp_die();
     }

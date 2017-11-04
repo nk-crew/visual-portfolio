@@ -27,7 +27,7 @@ if ( ! $args['url'] ) {
         if ( $opts['show_icon'] && $opts['icon'] ) {
             ?>
             <div class="vp-portfolio__item-meta-icon">
-                <span class="<?php echo esc_attr( $opts['icon'] ); ?>"></span>
+                <span class="<?php echo esc_attr( isset( $args['format_video_url'] ) ? $opts['icon_video'] : $opts['icon'] ); ?>"></span>
             </div>
             <?php
         }

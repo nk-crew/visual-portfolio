@@ -219,4 +219,40 @@
         right: 0;
         z-index: 1;
     }
+
+
+    .vp-pswp-video {
+        line-height: 0;
+        width: 100%;
+        height: 100%;
+        max-width: 1920px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        vertical-align: middle;
+        margin: 0 auto;
+        text-align: left;
+        z-index: 1045;
+
+        > div {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            width: 100%;
+
+            iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+            video {
+                width: 100% !important;
+                height: auto !important;
+                margin: 0;
+            }
+        }
+    }
 }

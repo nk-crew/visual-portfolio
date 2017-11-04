@@ -830,48 +830,77 @@
                 items = [],
                 $meta,
                 size,
-                item;
+                videoSize,
+                item,
+                video;
 
             thumbElements.each(function () {
                 $meta = $(this).find('.vp-portfolio__item-popup');
                 size = ($meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
+                videoSize = ($meta.attr('data-vp-popup-video-size') || '1920x1080').split('x');
+                video = $meta.attr('data-vp-popup-video');
 
-                // create slide object
-                item = {
-                    src: $meta.attr('data-vp-popup-img'),
-                    w: parseInt(size[0], 10),
-                    h: parseInt(size[1], 10)
-                };
-
-                var $caption = $meta.html();
-                if ($caption) {
-                    item.title = $caption;
-                }
-
-                // save link to element for getThumbBoundsFn
-                item.el = this;
-
-                var mediumSrc = $meta.attr('data-vp-popup-md-img') || item.src;
-                if(mediumSrc) {
-                    size = ($meta.attr('data-vp-popup-md-img-size') || $meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
-                    // "medium-sized" image
-                    item.m = {
-                        src: mediumSrc,
+                if (video) {
+                    item = {
+                        html: video,
+                        vw: parseInt(videoSize[0], 10),
+                        vh: parseInt(videoSize[1], 10)
+                    };
+                } else {
+                    // create slide object
+                    item = {
+                        src: $meta.attr('data-vp-popup-img'),
                         w: parseInt(size[0], 10),
                         h: parseInt(size[1], 10)
                     };
+
+                    var $caption = $meta.html();
+                    if ($caption) {
+                        item.title = $caption;
+                    }
+
+                    // save link to element for getThumbBoundsFn
+                    item.el = this;
+
+                    var mediumSrc = $meta.attr('data-vp-popup-md-img') || item.src;
+                    if(mediumSrc) {
+                        size = ($meta.attr('data-vp-popup-md-img-size') || $meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
+                        // "medium-sized" image
+                        item.m = {
+                            src: mediumSrc,
+                            w: parseInt(size[0], 10),
+                            h: parseInt(size[1], 10)
+                        };
+                    }
+
+                    // original image
+                    item.o = {
+                        src: item.src,
+                        w: item.w,
+                        h: item.h
+                    };
                 }
 
-                // original image
-                item.o = {
-                    src: item.src,
-                    w: item.w,
-                    h: item.h
-                };
                 items.push(item);
             });
 
             return items;
+        };
+
+        var resizeVideo = function (data) {
+            // calculate real viewport in pixels
+            var vpW = data.viewportSize.x * window.devicePixelRatio;
+            var vpH = data.viewportSize.y * window.devicePixelRatio;
+            var ratio = data.currItem.vw / data.currItem.vh;
+            var resultW;
+
+            if (ratio > vpW / vpH) {
+                resultW = vpW;
+            } else {
+                resultW = vpH * ratio;
+            }
+
+            $(data.currItem.container).find('.vp-pswp-video').css('max-width', resultW);
         };
 
         var openPhotoSwipe = function (index, galleryElement, disableAnimation, fromURL) {
@@ -946,7 +975,6 @@
                 // window.devicePixelRatio - ratio between physical pixels and device independent pixels (Number)
                 //                          1 (regular display), 2 (@2x, retina) ...
 
-
                 // calculate real pixels when size changes
                 realViewportWidth = gallery.viewportSize.x * window.devicePixelRatio;
 
@@ -976,6 +1004,9 @@
             });
 
             gallery.listen('gettingData', function (idx, item) {
+                if (item.html) {
+                    return;
+                }
                 if( useLargeImages ) {
                     item.src = item.o.src;
                     item.w = item.o.w;
@@ -984,6 +1015,18 @@
                     item.src = item.m.src;
                     item.w = item.m.w;
                     item.h = item.m.h;
+                }
+            });
+
+            gallery.listen('resize', function () {
+                if (typeof this.currItem.html !== 'undefined') {
+                    resizeVideo(this);
+                }
+            });
+
+            gallery.listen('afterChange', function() {
+                if (typeof this.currItem.html !== 'undefined') {
+                    resizeVideo(this);
                 }
             });
 

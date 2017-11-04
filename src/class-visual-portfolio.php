@@ -299,6 +299,56 @@ class Visual_Portfolio {
 
         wp_enqueue_style( $handle, $template, $dependencies, $version, $media );
     }
+
+    /**
+     * Get oEmbed data
+     *
+     * @param string $url - url of oembed.
+     * @param int    $width - width of oembed.
+     * @param int    $height - height of oembed.
+     *
+     * @return array|bool|false|object
+     */
+    public function get_oembed_data( $url, $width = null, $height = null ) {
+        if ( function_exists( '_wp_oembed_get_object' ) ) {
+            require_once( ABSPATH . WPINC . '/class-oembed.php' );
+        }
+
+        $args = array();
+        if ( $width ) {
+            $args['width'] = $width;
+        }
+        if ( $height ) {
+            $args['height'] = $height;
+        }
+
+        // If height is not given, but the width is, use 1080p aspect ratio. And vice versa.
+        if ( $width && ! $height ) {
+            $args['height'] = $width * (1080 / 1920);
+        }
+        if ( ! $width && $height ) {
+            $args['width'] = $height * (1920 / 1080);
+        }
+
+        $oembed = _wp_oembed_get_object();
+        $provider = $oembed->get_provider( $url, $args );
+        $data = $oembed->fetch( $provider, $url, $args );
+
+        if ( $data ) {
+            $data = (array) $data;
+            if ( ! isset( $data['url'] ) ) {
+                $data['url'] = $url;
+            }
+            if ( ! isset( $data['provider'] ) ) {
+                $data['provider'] = $provider;
+            }
+            // Convert url to hostname, eg: "youtube" instead of "https://youtube.com/".
+            $data['provider-name'] = pathinfo( str_replace( array( 'www.' ), '', parse_url( $url, PHP_URL_HOST ) ), PATHINFO_FILENAME );
+            return $data;
+        }
+
+        return false;
+    }
 }
 
 /**

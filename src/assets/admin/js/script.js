@@ -20,6 +20,51 @@
         window.getSelection().selectAllChildren(this);
     });
 
+    // Post format metabox show/hide
+    var $videoMetabox = $('#vp_format_video');
+    var $videoFormatCheckbox = $('#post-format-video');
+    function toggleVideoMetabox () {
+        $videoMetabox[$videoFormatCheckbox.is(':checked') ? 'show' : 'hide']();
+    }
+    if ($videoMetabox.length && $videoFormatCheckbox.length) {
+        toggleVideoMetabox();
+        $body.on('change', '[name=post_format]', function () {
+            toggleVideoMetabox();
+        });
+    }
+    var oembedAjax = null;
+    var oembedAjaxTimeout;
+    $body.on('change input', '.vp-input[name="video_url"]', function () {
+        if (oembedAjax !== null) {
+            oembedAjax.abort();
+        }
+
+        var $this = $(this);
+        $this.next('.vp-oembed-preview').html('');
+
+        clearTimeout(oembedAjaxTimeout);
+        oembedAjaxTimeout = setTimeout(function () {
+            oembedAjax = $.ajax({
+                url: ajaxurl,
+                method: 'GET',
+                dataType: 'json',
+                data: {
+                    action: 'vp_find_oembed',
+                    q: $this.val(),
+                    nonce: vpAdminVariables.nonce
+                },
+                complete: function (data) {
+                    var json = data.responseJSON;
+                    if (json && typeof json.html !== 'undefined') {
+                        $this.next('.vp-oembed-preview').html(json.html);
+                    }
+                }
+            });
+        }, 250);
+    });
+    $('.vp-input[name="video_url"]').trigger('input');
+
+
     // Activate code only in vp_lists page
     if ( 'vp_lists' !== $postType.val() || ! $editForm.length ) {
         return;

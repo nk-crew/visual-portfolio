@@ -64,6 +64,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_fly__excerpt_words_count' => 15,
             'vp_items_style_fly__show_icon' => false,
             'vp_items_style_fly__icon' => 'fa fa-search',
+            'vp_items_style_fly__icon_video' => 'fa fa-play',
             // *, top-*, bottom-*
             // * = center, left, right.
             'vp_items_style_fly__align' => 'center',
@@ -98,6 +99,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_fade__excerpt_words_count' => 15,
             'vp_items_style_fade__show_icon' => false,
             'vp_items_style_fade__icon' => 'fa fa-search',
+            'vp_items_style_fade__icon_video' => 'fa fa-play',
             // *, top-*, bottom-*
             // * = center, left, right.
             'vp_items_style_fade__align' => 'center',
@@ -500,6 +502,7 @@ class Visual_Portfolio_Get {
                         $args = array(
                             'url'             => get_permalink(),
                             'title'           => get_the_title(),
+                            'format'          => get_post_format() ? : 'standard',
                             'published'       => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
                             // translators: %s - published in human format.
                             'published_human_format' => sprintf( esc_html__( '%s ago', NK_VP_DOMAIN ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) ),
@@ -510,6 +513,29 @@ class Visual_Portfolio_Get {
                             'vp_ops'          => $options,
                         );
 
+                        // add video format args.
+                        $oembed = false;
+                        $video_url = false;
+                        if ( 'video' === $args['format'] ) {
+                            $video_url = get_post_meta( get_the_ID(), 'video_url', true );
+                            if ( $video_url ) {
+                                $oembed = visual_portfolio()->get_oembed_data( $video_url );
+                            }
+                        }
+                        if ( $oembed ) {
+                            $args['format_video_url'] = $video_url;
+                            $args['format_video_oembed'] = $oembed['html'];
+                            $args['format_video_oembed_width'] = $oembed['width'];
+                            $args['format_video_oembed_height'] = $oembed['height'];
+
+                            if ( ! $args['image'] && isset( $oembed['thumbnail_url'] ) ) {
+                                $args['image'] = '<img src="' . esc_url( $oembed['thumbnail_url'] ) . '" alt="' . esc_attr( $oembed['title'] ) . '" />';
+                            }
+
+                            // Change icon.
+
+                        }
+
                         // Excerpt.
                         if ( $style_options['show_excerpt'] ) {
                             $args['excerpt'] = wp_trim_words( do_shortcode( has_excerpt() ? get_the_excerpt() : get_the_content() ), $style_options['excerpt_words_count'], '...' );
@@ -517,27 +543,36 @@ class Visual_Portfolio_Get {
 
                         // Click action.
                         $popup_image = false;
+                        $popup_video = false;
                         switch ( $options['vp_items_click_action'] ) {
                             case 'popup_gallery':
-                                $img_id = $no_image;
-                                if ( $args['image'] ) {
-                                    $img_id = get_post_thumbnail_id();
-                                }
-                                if ( $img_id ) {
-                                    $attachment = get_post( get_post_thumbnail_id() );
-                                    if ( $attachment && 'attachment' === $attachment->post_type ) {
-                                        $img_meta = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_popup );
-                                        $img_md_meta = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_md_popup );
-                                        $popup_image = array(
-                                            'title' => $attachment->post_title,
-                                            'description' => $attachment->post_content,
-                                            'url' => $img_meta[0],
-                                            'width' => $img_meta[1],
-                                            'height' => $img_meta[2],
-                                            'md_url' => $img_md_meta[0],
-                                            'md_width' => $img_md_meta[1],
-                                            'md_height' => $img_md_meta[2],
-                                        );
+                                if ( $args['format_video_oembed'] ) {
+                                    $popup_video = array(
+                                        'html' => '<div class="vp-pswp-video"><div>' . $args['format_video_oembed'] . '</div></div>',
+                                        'width' => $args['format_video_oembed_width'],
+                                        'height' => $args['format_video_oembed_height'],
+                                    );
+                                } else {
+                                    $img_id = $no_image;
+                                    if ( $args['image'] ) {
+                                        $img_id = get_post_thumbnail_id();
+                                    }
+                                    if ( $img_id ) {
+                                        $attachment = get_post( get_post_thumbnail_id() );
+                                        if ( $attachment && 'attachment' === $attachment->post_type ) {
+                                            $img_meta = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_popup );
+                                            $img_md_meta = wp_get_attachment_image_src( get_post_thumbnail_id(), $img_size_md_popup );
+                                            $popup_image = array(
+                                                'title' => $attachment->post_title,
+                                                'description' => $attachment->post_content,
+                                                'url' => $img_meta[0],
+                                                'width' => $img_meta[1],
+                                                'height' => $img_meta[2],
+                                                'md_url' => $img_md_meta[0],
+                                                'md_width' => $img_md_meta[1],
+                                                'md_height' => $img_md_meta[2],
+                                            );
+                                        }
                                     }
                                 }
                                 break;
@@ -566,7 +601,17 @@ class Visual_Portfolio_Get {
                                     <h3><?php echo esc_html( $popup_image['title'] ); ?></h3>
                                     <?php echo wp_kses_post( $popup_image['description'] ); ?>
                                 </div>
-                            <?php } ?>
+                                <?php
+                            } else if ( $popup_video ) {
+                                ?>
+                                <div class="vp-portfolio__item-popup"
+                                     style="display: none;"
+                                     data-vp-popup-video="<?php echo esc_attr( $popup_video['html'] ); ?>"
+                                     data-vp-popup-video-size="<?php echo esc_attr( $popup_video['width'] . 'x' . $popup_video['height'] ); ?>"
+                                ></div>
+                                <?php
+                            }
+                            ?>
                             <div class="vp-portfolio__item">
                                 <?php
                                 switch ( $options['vp_items_style'] ) {
