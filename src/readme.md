@@ -84,6 +84,11 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 == Changelog ==
 
+= 1.2.1 =
+* fixed video format conflict with theme formats
+* fixed php error about undefined index
+* fixed buttons hover border issue in default themes
+
 = 1.2.0 =
 * added support for oEmbed videos (Youtube and Vimeo supported)
 * added settings for popup gallery
