@@ -15,7 +15,7 @@ class Visual_Portfolio_Admin {
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
 
         // add post formats.
-        add_action( 'init', array( $this, 'add_post_formats' ) );
+        add_action( 'after_setup_theme', array( $this, 'add_video_post_format' ), 99 );
         add_action( 'add_meta_boxes', array( $this, 'add_post_format_metaboxes' ), 1 );
         add_action( 'save_post', array( $this, 'save_post_format_metaboxes' ) );
 
@@ -237,10 +237,19 @@ class Visual_Portfolio_Admin {
     }
 
     /**
-     * Add post formats.
+     * Add video post format.
      */
-    public function add_post_formats() {
-        add_theme_support( 'post-formats', array( 'video' ) );
+    public function add_video_post_format() {
+        global $_wp_theme_features;
+        $formats = array( 'video' );
+
+        // Add existing formats.
+        if ( isset( $_wp_theme_features['post-formats'] ) && isset( $_wp_theme_features['post-formats'][0] ) ) {
+            $formats = array_merge( (array) $_wp_theme_features['post-formats'][0], $formats );
+        }
+        $formats = array_unique( $formats );
+
+        add_theme_support( 'post-formats', $formats );
     }
 
     /**
