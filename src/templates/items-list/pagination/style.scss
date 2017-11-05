@@ -55,16 +55,16 @@
     }
 
     // show/hide labels
-    .vp-pagination__load-more .vp-pagination__load-more-no-more,
-    .vp-pagination__load-more .vp-pagination__load-more-loading,
-    .vp-portfolio__loading & .vp-pagination__load-more span,
-    &.vp-pagination__no-more .vp-pagination__load-more span,
-    .vp-portfolio__loading &.vp-pagination__no-more .vp-pagination__load-more .vp-pagination__load-more-no-more {
+    .vp-pagination__load-more > .vp-pagination__load-more-no-more,
+    .vp-pagination__load-more > .vp-pagination__load-more-loading,
+    .vp-portfolio__loading & .vp-pagination__load-more > span,
+    &.vp-pagination__no-more .vp-pagination__load-more > span,
+    .vp-portfolio__loading &.vp-pagination__no-more .vp-pagination__load-more > .vp-pagination__load-more-no-more {
         display: none;
     }
-    .vp-pagination__load-more span,
-    .vp-portfolio__loading & .vp-pagination__load-more .vp-pagination__load-more-loading,
-    &.vp-pagination__no-more .vp-pagination__load-more .vp-pagination__load-more-no-more {
+    .vp-pagination__load-more > span,
+    .vp-portfolio__loading & .vp-pagination__load-more > .vp-pagination__load-more-loading,
+    &.vp-pagination__no-more .vp-pagination__load-more > .vp-pagination__load-more-no-more {
         display: block;
     }
 
