@@ -43,12 +43,12 @@
         }
 
         &:not(.vp-filter__item-active) > a:hover {
-            border-color: #bfbfbf;
+            border: 1px solid #bfbfbf;
         }
 
         &.vp-filter__item-active > * {
             cursor: default;
-            border-color: #007acc;
+            border: 1px solid #007acc;
             background-color: #007acc;
             color: #fff;
         }
