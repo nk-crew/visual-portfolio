@@ -543,7 +543,7 @@ class Visual_Portfolio_Get {
                         $popup_video = false;
                         switch ( $options['vp_items_click_action'] ) {
                             case 'popup_gallery':
-                                if ( $args['format_video_oembed'] ) {
+                                if ( isset( $args['format_video_oembed'] ) && $args['format_video_oembed'] ) {
                                     $popup_video = array(
                                         'html' => '<div class="vp-pswp-video"><div>' . $args['format_video_oembed'] . '</div></div>',
                                         'width' => $args['format_video_oembed_width'],
