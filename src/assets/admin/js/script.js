@@ -414,6 +414,16 @@
                 editor.save();
                 $customCss.change();
             });
+
+            // Autocomplete
+            // Thanks to https://stackoverflow.com/questions/13744176/codemirror-autocomplete-after-any-keyup
+            var ExcludedIntelliSenseTriggerKeys = [8, 9, 13, 16, 17, 18, 19, 20, 27, 33, 34, 35, 36, 37, 38, 39, 40, 45, 46, 91, 92, 93, 107, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 144, 145, 186, 187, 188, 189, 190, 191, 192, 220, 222];
+
+            editor.on('keyup', function (cm, event) {
+                if ( ! cm.state.completionActive && $.inArray(event.keyCode || event.which, ExcludedIntelliSenseTriggerKeys) === -1 ) {
+                    CodeMirror.commands.autocomplete(cm, null, { completeSingle: false });
+                }
+            });
         }
     }
 
