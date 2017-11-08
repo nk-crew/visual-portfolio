@@ -144,8 +144,6 @@ class Visual_Portfolio {
 
         wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '', true );
 
-        wp_register_script( 'imagesloaded', visual_portfolio()->plugin_url . 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js', '', '', true );
-
         wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '', true );
 
         /*
