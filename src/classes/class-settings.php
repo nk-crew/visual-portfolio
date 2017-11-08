@@ -3,6 +3,10 @@
  * Plugin Settings
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 require_once( visual_portfolio()->plugin_path . 'classes/class-settings-api.php' );
 
 /**

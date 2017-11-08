@@ -6,6 +6,10 @@
  * @package visual-portfolio
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 ?>
 
 <ul class="<?php echo esc_attr( $args['class'] ); ?> vp-filter__style-default">

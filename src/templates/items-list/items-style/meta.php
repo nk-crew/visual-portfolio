@@ -7,6 +7,10 @@
  * @package visual-portfolio
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 ?>
 
 <div class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">

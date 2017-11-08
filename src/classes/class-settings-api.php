@@ -1,4 +1,9 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * Visual Portfolio Settings API wrapper class
  * based on weDevs Settings API

@@ -7,6 +7,10 @@
  * @package visual-portfolio
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 $tag = 'a';
 if ( ! $args['url'] ) {
     $tag = 'span';
