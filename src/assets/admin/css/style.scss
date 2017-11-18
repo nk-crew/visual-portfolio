@@ -766,8 +766,80 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
 /**
  * Code editor
  */
-[name="vp_custom_css"] + .CodeMirror {
-    border: 1px solid #dddddd;
+.post-type-vp_lists {
+    .CodeMirror {
+        border: 1px solid #dddddd;
+        text-align: left;
+
+        .CodeMirror-matchingbracket {
+            background: rgba(255,150,0,.3);
+            color: inherit
+        }
+    }
+
+    [class*=CodeMirror-lint-message],
+    .CodeMirror-lint-marker-multiple,
+    [class*=CodeMirror-lint-marker] {
+        background-image: none
+    }
+
+    .CodeMirror-lint-marker-error,
+    .CodeMirror-lint-marker-warning {
+        cursor: help
+    }
+
+    .CodeMirror-lint-marker-multiple {
+        position: absolute;
+        top: 0
+    }
+
+    [class*=CodeMirror-lint-marker]:before {
+        font: 400 18px/1 dashicons;
+        position: relative;
+        top: -2px
+    }
+
+    [class*=CodeMirror-lint-message]:before {
+        font: 400 16px/1 dashicons;
+        left: 16px;
+        position: absolute
+    }
+
+    .CodeMirror-lint-message-error,
+    .CodeMirror-lint-message-warning {
+        box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+        margin: 5px 0 2px;
+        padding: 3px 12px 3px 28px
+    }
+
+    .CodeMirror-lint-message-warning {
+        background-color: #fff8e5;
+        border-left: 4px solid #ffb900
+    }
+
+    .CodeMirror-lint-message-warning:before,
+    .CodeMirror-lint-marker-warning:before {
+        content: "\f534";
+        color: #f6a306
+    }
+
+    .CodeMirror-lint-message-error {
+        background-color: #fbeaea;
+        border-left: 4px solid #dc3232
+    }
+
+    .CodeMirror-lint-message-error:before,
+    .CodeMirror-lint-marker-error:before {
+        content: "\f153";
+        color: #dc3232
+    }
+
+    .CodeMirror-lint-tooltip {
+        background: 0 0;
+        border: none;
+        border-radius: 0;
+        direction: ltr
+    }
 }
 
 

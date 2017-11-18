@@ -395,19 +395,14 @@
                 theme: 'eclipse',
                 indentUnit: 4,
                 autoCloseTags: true,
-                matchBrackets: true,
-                foldGutter: true,
-                lint: true,
-                showCursorWhenSelecting: true,
-                cursorScrollMargin: 30,
-                autocomplete: true,
                 autoCloseBrackets: true,
+                lint: true,
                 lineWrapping: true,
                 scrollPastEnd: true,
                 emmet_active: true,
                 emmet: true,
                 scrollbarStyle: 'simple',
-                gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter']
+                gutters: ['CodeMirror-lint-markers']
             });
             emmetCodeMirror(editor);
             editor.on('change', function (cm) {
@@ -416,12 +411,30 @@
             });
 
             // Autocomplete
-            // Thanks to https://stackoverflow.com/questions/13744176/codemirror-autocomplete-after-any-keyup
-            var ExcludedIntelliSenseTriggerKeys = [8, 9, 13, 16, 17, 18, 19, 20, 27, 33, 34, 35, 36, 37, 38, 39, 40, 45, 46, 91, 92, 93, 107, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 144, 145, 186, 187, 188, 189, 190, 191, 192, 220, 222];
-
             editor.on('keyup', function (cm, event) {
-                if ( ! cm.state.completionActive && $.inArray(event.keyCode || event.which, ExcludedIntelliSenseTriggerKeys) === -1 ) {
-                    CodeMirror.commands.autocomplete(cm, null, { completeSingle: false });
+                var shouldAutocomplete;
+                var isAlphaKey = /^[a-zA-Z]$/.test( event.key );
+                var lineBeforeCursor;
+                var token;
+
+                if ( cm.state.completionActive && isAlphaKey ) {
+                    return;
+                }
+
+                // Prevent autocompletion in string literals or comments.
+                token = cm.getTokenAt( cm.getCursor() );
+                if ( 'string' === token.type || 'comment' === token.type ) {
+                    return;
+                }
+
+                lineBeforeCursor = cm.doc.getLine( cm.doc.getCursor().line ).substr( 0, cm.doc.getCursor().ch );
+                shouldAutocomplete =
+                    isAlphaKey ||
+                    ':' === event.key ||
+                    ' ' === event.key && /:\s+$/.test( lineBeforeCursor );
+
+                if ( shouldAutocomplete ) {
+                    cm.showHint( { completeSingle: false } );
                 }
             });
         }
