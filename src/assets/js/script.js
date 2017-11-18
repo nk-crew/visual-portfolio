@@ -889,13 +889,24 @@
             return items;
         };
 
-        var resizeVideo = function (data) {
+        var resizeVideo = function (data, curItem) {
+            if (typeof curItem === 'undefined') {
+                if (data && data.itemHolders.length) {
+                    data.itemHolders.forEach(function (val) {
+                        if (val.item && val.item.html) {
+                            resizeVideo(data, val.item);
+                        }
+                    });
+                }
+                return;
+            }
+
             // calculate real viewport in pixels
             var vpW = data.viewportSize.x * window.devicePixelRatio;
             var vpH = data.viewportSize.y * window.devicePixelRatio;
-            var ratio = data.currItem.vw / data.currItem.vh;
+            var ratio = curItem.vw / curItem.vh;
             var resultW;
-            var $container = $(data.currItem.container);
+            var $container = $(curItem.container);
 
             var bars = data.options.barsSize;
             var barTop = 0;
@@ -1035,15 +1046,11 @@
             });
 
             gallery.listen('resize', function () {
-                if (typeof this.currItem.html !== 'undefined') {
-                    resizeVideo(this);
-                }
+                resizeVideo(this);
             });
 
             gallery.listen('afterChange', function() {
-                if (typeof this.currItem.html !== 'undefined') {
-                    resizeVideo(this);
-                }
+                resizeVideo(this);
             });
 
             gallery.init();
