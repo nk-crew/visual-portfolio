@@ -396,13 +396,15 @@
                 indentUnit: 4,
                 autoCloseTags: true,
                 autoCloseBrackets: true,
+                matchBrackets: true,
+                foldGutter: true,
                 lint: true,
                 lineWrapping: true,
                 scrollPastEnd: true,
                 emmet_active: true,
                 emmet: true,
                 scrollbarStyle: 'simple',
-                gutters: ['CodeMirror-lint-markers']
+                gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter']
             });
             emmetCodeMirror(editor);
             editor.on('change', function (cm) {
