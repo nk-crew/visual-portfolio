@@ -389,6 +389,31 @@
     if (typeof CodeMirror !== 'undefined') {
         var $customCss = $('[name="vp_custom_css"]');
         if ($customCss.length) {
+
+            // Hint with all available visual composer clasnames
+            if (vpAdminVariables && vpAdminVariables.classnames) {
+                var defaultCSShint = CodeMirror.hint.css;
+                CodeMirror.hint.css = function(cm) {
+                    var cur = cm.getCursor();
+                    var inner = defaultCSShint(cm) || {from: cur, to: cm.getCursor(), list: []};
+
+                    var token = cm.getTokenAt(cur);
+                    if (token.state.state === 'top' && token.string.indexOf('.') === 0) {
+                        inner = {
+                            from: CodeMirror.Pos(cur.line, token.start),
+                            to: CodeMirror.Pos(cur.line, token.end),
+                            list: []
+                        };
+                        vpAdminVariables.classnames.forEach(function (val) {
+                            if (val.indexOf(token.string) !== -1) {
+                                inner.list.push(val);
+                            }
+                        });
+                    }
+                    return inner;
+                };
+            }
+
             var editor = CodeMirror.fromTextArea($customCss[0], {
                 lineNumbers: true,
                 mode: 'css',
@@ -407,7 +432,7 @@
                 gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter']
             });
             emmetCodeMirror(editor);
-            editor.on('change', function (cm) {
+            editor.on('change', function () {
                 editor.save();
                 $customCss.change();
             });

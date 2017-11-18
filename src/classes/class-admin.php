@@ -56,7 +56,20 @@ class Visual_Portfolio_Admin {
      * Enqueue styles and scripts
      */
     public function admin_enqueue_scripts() {
+        $data_init = array(
+            'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
+        );
+
         if ( 'vp_lists' === get_post_type() ) {
+            $main_classname = '.vp-id-' . get_the_ID();
+            $data_init['classnames'] = array(
+                $main_classname,
+                $main_classname . ' .vp-portfolio__items',
+                $main_classname . ' .vp-portfolio__item',
+                $main_classname . ' .vp-filter',
+                $main_classname . ' .vp-pagination',
+            );
+
             // disable autosave due to it is not working for the custom metaboxes.
             wp_dequeue_script( 'autosave' );
 
@@ -112,10 +125,6 @@ class Visual_Portfolio_Admin {
 
         wp_enqueue_script( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.js', array( 'jquery' ), '', true );
         wp_enqueue_style( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.css' );
-
-        $data_init = array(
-            'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
-        );
         wp_localize_script( 'visual-portfolio-admin', 'vpAdminVariables', $data_init );
     }
 
