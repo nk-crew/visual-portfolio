@@ -863,19 +863,26 @@ class Visual_Portfolio_Admin {
                     <input name="<?php echo esc_attr( $opt . 'categories_count' ); ?>" id="<?php echo esc_attr( $opt . 'categories_count' ); ?>" class="vp-rangeslider" type="range" min="1" max="10" value="<?php echo esc_attr( $meta[ $opt . 'categories_count' ] ); ?>">
                 </div>
 
-                <p>
-                    <label for="<?php echo esc_attr( $opt . 'show_date' ); ?>">
-                        <input name="<?php echo esc_attr( $opt . 'show_date' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_date' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_date' ] ); ?>>
-                        <?php echo esc_html__( 'Show Date', NK_VP_DOMAIN ); ?>
-                    </label>
-                </p>
-
-                <p>
-                    <label for="<?php echo esc_attr( $opt . 'date_human_format' ); ?>">
-                        <input name="<?php echo esc_attr( $opt . 'date_human_format' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'date_human_format' ); ?>" value="true" <?php checked( $meta[ $opt . 'date_human_format' ] ); ?>>
-                        <?php echo esc_html__( 'Date in Human Format', NK_VP_DOMAIN ); ?>
-                    </label>
-                </p>
+                <div>
+                    <p class="post-attributes-label-wrapper">
+                        <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'show_date' ); ?>"><?php echo esc_html__( 'Show Date:', NK_VP_DOMAIN ); ?></label>
+                    </p>
+                    <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $opt . 'show_date' ); ?>" id="<?php echo esc_attr( $opt . 'show_date' ); ?>">
+                        <option value="false" <?php selected( $meta[ $opt . 'show_date' ], false ); ?>>
+                            <?php echo esc_html__( 'False', NK_VP_DOMAIN ); ?>
+                        </option>
+                        <option value="true" <?php selected( $meta[ $opt . 'show_date' ], true ); ?>>
+                            <?php echo esc_html__( 'Show', NK_VP_DOMAIN ); ?>
+                        </option>
+                        <option value="human" <?php selected( $meta[ $opt . 'show_date' ], 'human' ); ?>>
+                            <?php echo esc_html__( 'Human Format', NK_VP_DOMAIN ); ?>
+                        </option>
+                    </select>
+                </div>
+                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_date' ); ?>] == true">
+                    <p></p>
+                    <input class="vp-input" name="<?php echo esc_attr( $opt . 'date_format' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'date_format' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'date_format' ] ); ?>" placeholder="<?php echo esc_attr( 'F j, Y' ); ?>" data-hint="<?php echo esc_attr__( "Date format \r\n Example: F j, Y", NK_VP_DOMAIN ); ?>" data-hint-place="left">
+                </div>
 
                 <p>
                     <label for="<?php echo esc_attr( $opt . 'show_excerpt' ); ?>">

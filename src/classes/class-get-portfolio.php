@@ -50,7 +50,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_default__show_categories' => true,
             'vp_items_style_default__categories_count' => 1,
             'vp_items_style_default__show_date' => false,
-            'vp_items_style_default__date_human_format' => false,
+            'vp_items_style_default__date_format' => 'F j, Y',
             'vp_items_style_default__show_excerpt' => false,
             'vp_items_style_default__excerpt_words_count' => 15,
             // center, left, right.
@@ -64,7 +64,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_fly__show_categories' => true,
             'vp_items_style_fly__categories_count' => 1,
             'vp_items_style_fly__show_date' => false,
-            'vp_items_style_fly__date_human_format' => false,
+            'vp_items_style_fly__date_format' => 'F j, Y',
             'vp_items_style_fly__show_excerpt' => false,
             'vp_items_style_fly__excerpt_words_count' => 15,
             'vp_items_style_fly__show_icon' => false,
@@ -83,7 +83,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_emerge__show_categories' => true,
             'vp_items_style_emerge__categories_count' => 1,
             'vp_items_style_emerge__show_date' => false,
-            'vp_items_style_emerge__date_human_format' => false,
+            'vp_items_style_emerge__date_format' => 'F j, Y',
             'vp_items_style_emerge__show_excerpt' => false,
             'vp_items_style_emerge__excerpt_words_count' => 15,
             // center, left, right.
@@ -99,7 +99,7 @@ class Visual_Portfolio_Get {
             'vp_items_style_fade__show_categories' => true,
             'vp_items_style_fade__categories_count' => 1,
             'vp_items_style_fade__show_date' => false,
-            'vp_items_style_fade__date_human_format' => false,
+            'vp_items_style_fade__date_format' => 'F j, Y',
             'vp_items_style_fade__show_excerpt' => false,
             'vp_items_style_fade__excerpt_words_count' => 15,
             'vp_items_style_fade__show_icon' => false,
@@ -508,15 +508,27 @@ class Visual_Portfolio_Get {
                             'url'             => get_permalink(),
                             'title'           => get_the_title(),
                             'format'          => get_post_format() ? : 'standard',
-                            'published'       => get_the_time( esc_html__( 'F j, Y', NK_VP_DOMAIN ) ),
-                            // translators: %s - published in human format.
-                            'published_human_format' => sprintf( esc_html__( '%s ago', NK_VP_DOMAIN ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) ),
+                            'published'       => '',
+                            'published_time'  => get_the_time( 'U' ),
                             'filter'          => implode( ',', $filter_values ),
                             'image'           => get_the_post_thumbnail( get_the_ID(), $img_size ),
                             'categories'      => $categories,
                             'opts'            => $style_options,
                             'vp_ops'          => $options,
                         );
+
+                        // prepare date.
+                        if ( 'human' === $style_options['show_date'] ) {
+                            // translators: %s - published in human format.
+                            $args['published'] = sprintf( esc_html__( '%s ago', NK_VP_DOMAIN ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) );
+                        } else if ( $style_options['show_date'] ) {
+                            $args['published'] = get_the_time( $style_options['date_format'] ? : 'F j, Y' );
+                        }
+
+                        // fallback for Visual Portfolio 1.2.1 version.
+                        $style_options['date_human_format'] = 'human' === $style_options['show_date'];
+                        $args['opts'] = $style_options;
+                        $args['published_human_format'] = $args['published'];
 
                         // add video format args.
                         $oembed = false;
