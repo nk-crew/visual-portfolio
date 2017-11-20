@@ -123,6 +123,10 @@ class Visual_Portfolio_Admin {
             wp_enqueue_style( 'codemirror-theme-eclipse', visual_portfolio()->plugin_url . 'assets/vendor/codemirror/theme/eclipse.css' );
         }
 
+        wp_enqueue_script( 'popper.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/popper.min.js', '', '', true );
+        wp_enqueue_script( 'tooltip.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/tooltip.min.js', array( 'popper.js' ), '', true );
+        wp_enqueue_style( 'popper.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/popper.css' );
+
         wp_enqueue_script( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.js', array( 'jquery' ), '', true );
         wp_enqueue_style( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.css' );
         wp_localize_script( 'visual-portfolio-admin', 'vpAdminVariables', $data_init );
@@ -800,7 +804,7 @@ class Visual_Portfolio_Admin {
         <input name="vp_items_count" id="vp_items_count" class="vp-rangeslider" type="range" min="1" max="50" value="<?php echo esc_attr( $meta['vp_items_count'] ); ?>">
 
         <p></p>
-        <label for="vp_stretch">
+        <label for="vp_stretch" data-hint="<?php echo esc_attr__( 'Break container and display it wide', NK_VP_DOMAIN ); ?>" data-hint-place="left">
             <input name="vp_stretch" type="checkbox" id="vp_stretch" value="true" <?php checked( $meta['vp_stretch'] ); ?>>
             <?php echo esc_html__( 'Stretch', NK_VP_DOMAIN ); ?>
         </label>
@@ -897,9 +901,9 @@ class Visual_Portfolio_Admin {
 
                     <div data-cond="[name=<?php echo esc_attr( $opt . 'show_icon' ); ?>]">
                         <p></p>
-                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon' ] ); ?>" placeholder="<?php echo esc_attr( 'Standard Icon', NK_VP_DOMAIN ); ?>">
+                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon' ] ); ?>" placeholder="<?php echo esc_attr( 'Standard Icon', NK_VP_DOMAIN ); ?>" data-hint="<?php echo esc_attr__( 'Standard icon', NK_VP_DOMAIN ); ?>" data-hint-place="left">
                         <p></p>
-                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon_video' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon_video' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon_video' ] ); ?>" placeholder="<?php echo esc_attr( 'Video Icon', NK_VP_DOMAIN ); ?>">
+                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon_video' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon_video' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon_video' ] ); ?>" placeholder="<?php echo esc_attr( 'Video Icon', NK_VP_DOMAIN ); ?>" data-hint="<?php echo esc_attr__( 'Video icon', NK_VP_DOMAIN ); ?>" data-hint-place="left">
                     </div>
                 <?php endif; ?>
 

@@ -64,6 +64,18 @@
     });
 
 
+    // Popper.js
+    if ( typeof Tooltip !== 'undefined' ) {
+        $('[data-hint]').each(function () {
+            var $this = $(this);
+            new Tooltip(this, {
+                placement: $this.attr('data-hint-place') || 'top',
+                title: $this.attr('data-hint')
+            });
+        });
+    }
+
+
     // Activate code only in vp_lists page
     if ( 'vp_lists' !== $postType.val() || ! $editForm.length ) {
         return;
