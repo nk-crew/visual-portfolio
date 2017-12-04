@@ -22,6 +22,18 @@ class Visual_Portfolio_VC {
      */
     public function init_hooks() {
         add_action( 'init', array( $this, 'add_shortcode' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+    }
+
+    /**
+     * Enqueue script for frontend VC
+     *
+     * @param object $page - page object.
+     */
+    public function admin_enqueue_scripts( $page ) {
+        if ( 'post.php' === $page || 'post-new.php' === $page ) {
+            wp_enqueue_script( 'visual-portfolio-vc-frontend', visual_portfolio()->plugin_url . 'assets/admin/js/vc-frontend.js', array( 'jquery' ) );
+        }
     }
 
     /**
