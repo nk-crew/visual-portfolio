@@ -398,85 +398,163 @@
     }
 
     // codemirror
-    if (typeof CodeMirror !== 'undefined') {
-        var $customCss = $('[name="vp_custom_css"]');
-        if ($customCss.length) {
+    var $customCss = $('[name="vp_custom_css"]');
+    var saveEditorWithErrors = false;
 
-            // Hint with all available visual composer clasnames
-            if (vpAdminVariables && vpAdminVariables.classnames) {
-                var defaultCSShint = CodeMirror.hint.css;
-                CodeMirror.hint.css = function(cm) {
-                    var cur = cm.getCursor();
-                    var inner = defaultCSShint(cm) || {from: cur, to: cm.getCursor(), list: []};
+    // update editor error message
+    var firstTimeEditorUpdate = true;
+    function updateEditorError (errorAnnotations, editorChange) {
+        if ( firstTimeEditorUpdate ) {
+            editorChange = false;
+            firstTimeEditorUpdate = false;
+        }
+        if (vpAdminVariables && vpAdminVariables['css_editor_error_notice']) {
+            var message = false;
 
-                    var token = cm.getTokenAt(cur);
-                    if (token.state.state === 'top' && token.string.indexOf('.') === 0) {
-                        inner = {
-                            from: CodeMirror.Pos(cur.line, token.start),
-                            to: CodeMirror.Pos(cur.line, token.end),
-                            list: []
-                        };
-                        vpAdminVariables.classnames.forEach(function (val) {
-                            if (val.indexOf(token.string) !== -1) {
-                                inner.list.push(val);
-                            }
-                        });
-                    }
-                    return inner;
-                };
+            if ( 1 === errorAnnotations.length ) {
+                message = vpAdminVariables['css_editor_error_notice'].singular.replace( '%d', '1' );
+            } else if ( errorAnnotations.length > 1 ) {
+                message = vpAdminVariables['css_editor_error_notice'].plural.replace( '%d', String( errorAnnotations.length ) );
             }
 
-            var editor = CodeMirror.fromTextArea($customCss[0], {
-                lineNumbers: true,
-                mode: 'css',
-                theme: 'eclipse',
-                indentUnit: 4,
-                autoCloseTags: true,
-                autoCloseBrackets: true,
-                matchBrackets: true,
-                foldGutter: true,
-                lint: true,
-                lineWrapping: true,
-                scrollPastEnd: true,
-                emmet_active: true,
-                emmet: true,
-                scrollbarStyle: 'simple',
-                gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter']
-            });
-            emmetCodeMirror(editor);
-            editor.on('change', function () {
-                editor.save();
-                $customCss.change();
-            });
+            if (message) {
+                var $notice = $customCss.prev('#vp_custom_css_notice');
+                if ( ! $notice.length && ! editorChange ) {
+                    $notice = $('<div class="notice notice-error inline" id="vp_custom_css_notice"></div>');
+                    $customCss.before($notice);
+                }
 
-            // Autocomplete
-            editor.on('keyup', function (cm, event) {
-                var shouldAutocomplete;
-                var isAlphaKey = /^[a-zA-Z]$/.test( event.key );
-                var lineBeforeCursor;
-                var token;
-
-                if ( cm.state.completionActive && isAlphaKey ) {
+                if ( ! $notice.length ) {
                     return;
                 }
 
-                // Prevent autocompletion in string literals or comments.
-                token = cm.getTokenAt( cm.getCursor() );
-                if ( 'string' === token.type || 'comment' === token.type ) {
-                    return;
-                }
+                // add error notice
+                var noticeText =  '<p class="notification-message">' + message + '</p>' +
+                    '<p>' +
+                    '<input id="vp_custom_css_notice_prevent" type="checkbox">' +
+                    '<label for="vp_custom_css_notice_prevent">' + vpAdminVariables['css_editor_error_checkbox'] + '</label>' +
+                    '</p>';
 
-                lineBeforeCursor = cm.doc.getLine( cm.doc.getCursor().line ).substr( 0, cm.doc.getCursor().ch );
-                shouldAutocomplete =
-                    isAlphaKey ||
-                    ':' === event.key ||
-                    ' ' === event.key && /:\s+$/.test( lineBeforeCursor );
+                $notice.html(noticeText);
+            } else {
 
-                if ( shouldAutocomplete ) {
-                    cm.showHint( { completeSingle: false } );
-                }
-            });
+                // remove notice block if no errors
+                $customCss.prev('#vp_custom_css_notice').remove();
+            }
         }
+    }
+
+    if (typeof CodeMirror !== 'undefined' && $customCss.length) {
+        // Hint with all available visual composer clasnames
+        if (vpAdminVariables && vpAdminVariables.classnames) {
+            var defaultCSShint = CodeMirror.hint.css;
+            CodeMirror.hint.css = function(cm) {
+                var cur = cm.getCursor();
+                var inner = defaultCSShint(cm) || {from: cur, to: cm.getCursor(), list: []};
+
+                var token = cm.getTokenAt(cur);
+                if (token.state.state === 'top' && token.string.indexOf('.') === 0) {
+                    inner = {
+                        from: CodeMirror.Pos(cur.line, token.start),
+                        to: CodeMirror.Pos(cur.line, token.end),
+                        list: []
+                    };
+                    vpAdminVariables.classnames.forEach(function (val) {
+                        if (val.indexOf(token.string) !== -1) {
+                            inner.list.push(val);
+                        }
+                    });
+                }
+                return inner;
+            };
+        }
+
+        var editor = CodeMirror.fromTextArea($customCss[0], {
+            mode: 'css',
+            theme: 'eclipse',
+            indentUnit: 4,
+            autoCloseTags: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            foldGutter: true,
+            lint: {
+                options: {
+                    errors: true,
+                    'box-model': true,
+                    'display-property-grouping': true,
+                    'duplicate-properties': true,
+                    'known-properties': true,
+                    'outline-none': true
+                },
+
+                // save errors in vcLintErrors object to prevent page save
+                onUpdateLinting: function (annotations, annotationsSorted, cm) {
+                    var errors = [];
+                    annotations.forEach(function (annotation) {
+                        if ('error' === annotation.severity) {
+                            errors.push(annotation);
+                        }
+                    });
+                    cm.vcLintErrors = errors;
+
+                    if ( ! saveEditorWithErrors ) {
+                        updateEditorError(cm.vcLintErrors, true);
+                    }
+                }
+            },
+            lineNumbers: true,
+            lineWrapping: true,
+            scrollPastEnd: true,
+            emmet_active: true,
+            emmet: true,
+            styleActiveLine: true,
+            continueComments: true,
+            scrollbarStyle: 'simple',
+            extraKeys: {
+                "Ctrl-Space": "autocomplete",
+                "Ctrl-\/": "toggleComment",
+                "Cmd-\/": "toggleComment",
+                "Alt-F": "findPersistent"
+            },
+            gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter']
+        });
+        emmetCodeMirror(editor);
+
+        // save instance in data
+        $customCss.data('CodeMirrorInstance', editor);
+
+        editor.on('change', function () {
+            editor.save();
+            $customCss.change();
+        });
+
+        // Autocomplete
+        editor.on('keyup', function (cm, event) {
+            var shouldAutocomplete;
+            var isAlphaKey = /^[a-zA-Z]$/.test( event.key );
+            var lineBeforeCursor;
+            var token;
+
+            if ( cm.state.completionActive && isAlphaKey ) {
+                return;
+            }
+
+            // Prevent autocompletion in string literals or comments.
+            token = cm.getTokenAt( cm.getCursor() );
+            if ( 'string' === token.type || 'comment' === token.type ) {
+                return;
+            }
+
+            lineBeforeCursor = cm.doc.getLine( cm.doc.getCursor().line ).substr( 0, cm.doc.getCursor().ch );
+            shouldAutocomplete =
+                isAlphaKey ||
+                ':' === event.key ||
+                ' ' === event.key && /:\s+$/.test( lineBeforeCursor );
+
+            if ( shouldAutocomplete ) {
+                cm.showHint( { completeSingle: false } );
+            }
+        });
     }
 
     // prevent page closing
@@ -484,9 +562,47 @@
     $(window).on('beforeunload', function () {
         var isChanged = defaultForm !== $editForm.serialize();
         var isFormSent = $('[type=submit]').hasClass('disabled');
+
         if (isChanged && !isFormSent) {
             return true;
         }
+    });
+
+    // prevent page save if there is errors in CSS editor
+    $body.on('click', '#publish:not(.disabled)', function (e) {
+        if ( saveEditorWithErrors ) {
+            return;
+        }
+
+        var $publishBtn = $(this);
+
+        var editor = $customCss.length && $customCss.data('CodeMirrorInstance');
+        if (editor && editor.vcLintErrors && editor.vcLintErrors.length) {
+            e.preventDefault();
+
+            // disable publish button for 1.5 seconds
+            $publishBtn.addClass('disabled button-disabled button-primary-disabled');
+            setTimeout(function () {
+                $publishBtn.removeClass('disabled button-disabled button-primary-disabled');
+            }, 1500);
+
+            updateEditorError(editor.vcLintErrors, false);
+
+            // scroll to editor
+            $('html,body').animate({
+                scrollTop: $('#vp_custom_css').offset().top - 100
+            }, 300);
+
+            // scroll to editor with error
+            editor.focus();
+            editor.setCursor( editor.vcLintErrors[0].from.line );
+        }
+    });
+
+    // save also if CSS have errors
+    $body.on('change', '#vp_custom_css_notice_prevent', function () {
+        saveEditorWithErrors = true;
+        $(this).closest('.notice').slideUp();
     });
 
 })(jQuery);

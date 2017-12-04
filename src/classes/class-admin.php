@@ -69,6 +69,13 @@ class Visual_Portfolio_Admin {
                 $main_classname . ' .vp-filter',
                 $main_classname . ' .vp-pagination',
             );
+            $data_init['css_editor_error_notice'] = array(
+                /* translators: %d: error count */
+                'singular' => _n( 'There is %d error which must be fixed before you can save.', 'There are %d errors which must be fixed before you can save.', 1, NK_VP_DOMAIN ),
+                /* translators: %d: error count */
+                'plural'   => _n( 'There is %d error which must be fixed before you can save.', 'There are %d errors which must be fixed before you can save.', 2, NK_VP_DOMAIN ), // @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
+            );
+            $data_init['css_editor_error_checkbox'] = esc_html__( 'Update anyway, even though it might break your site?', NK_VP_DOMAIN );
 
             // disable autosave due to it is not working for the custom metaboxes.
             wp_dequeue_script( 'autosave' );
