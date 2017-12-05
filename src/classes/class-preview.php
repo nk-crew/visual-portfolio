@@ -76,17 +76,17 @@ class Visual_Portfolio_Preview {
      */
     public function filter_preview_option( $val, $name ) {
         if ( $this->preview_enabled ) {
+            // @codingStandardsIgnoreStart
             if ( isset( $_POST[ $name ] ) ) {
-                if ( 'vp_custom_css' === $name ) {
+                if ( is_array( $_POST[ $name ] ) ) {
+                    $val = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $name ] ) );
+                } else if ( 'vp_custom_css' === $name ) {
                     $val = wp_kses( wp_unslash( $_POST[ $name ] ), array( '\'', '\"' ) );
                 } else {
                     $val = sanitize_text_field( wp_unslash( $_POST[ $name ] ) );
                 }
-
-                if ( 'Array' === $val ) {
-                    $val = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
-                }
             }
+            // @codingStandardsIgnoreEnd
         }
 
         return $val;
