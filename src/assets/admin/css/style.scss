@@ -738,12 +738,19 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
     flex-wrap: wrap;
 
     .vp-select2-ajax__result-img {
+        position: relative;
         flex: 0 0 35px;
-    }
-    .vp-select2-ajax__result-img img {
-        display: block;
-        width: 100%;
-        height: auto;
+        background-size: cover;
+        background-position: center center;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+
+        &:after {
+            content: '';
+            display: block;
+            width: 100%;
+            padding-top: 100%;
+        }
     }
     .vp-select2-ajax__result-data {
         padding-left: 10px;

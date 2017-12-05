@@ -339,13 +339,28 @@
                     templateResult: function (data) {
                         if (data.loading) return data.text;
 
-                        return "<div class='vp-select2-ajax__result'>" +
-                            "<div class='vp-select2-ajax__result-img'><img src='" + data.img + "' /></div>" +
-                            "<div class='vp-select2-ajax__result-data'>" +
-                            "<div class='vp-select2-ajax__result-title'>" + data.title + "</div>" +
-                            "<div class='vp-select2-ajax__result-post-type'>" + data.post_type + "</div>" +
-                            "</div>" +
-                            "</div>";
+                        var title = '';
+                        if (data.title) {
+                            title = data.title;
+                        }
+
+                        var post_type = '';
+                        if (data.post_type) {
+                            post_type = data.post_type;
+                        }
+
+                        var img = '';
+                        if (data.img) {
+                            img = 'style="background-image: url(\'' + data.img + '\');"';
+                        }
+
+                        return '<div class="vp-select2-ajax__result">' +
+                                   '<div class="vp-select2-ajax__result-img" ' + img + '></div>' +
+                                   '<div class="vp-select2-ajax__result-data">' +
+                                       '<div class="vp-select2-ajax__result-title">' + title + '</div>' +
+                                       '<div class="vp-select2-ajax__result-post-type">' + post_type + '</div>' +
+                                   '</div>' +
+                               '</div>';
                     },
                     templateSelection: function (repo) {
                         return repo.title || repo.text;
