@@ -168,6 +168,7 @@ class Visual_Portfolio_Admin {
                 // adding to custom menu manually.
                 'show_in_menu' => false,
                 'show_in_admin_bar' => true,
+                'show_in_rest' => true,
                 'menu_icon'    => 'dashicons-visual-portfolio',
                 'taxonomies'   => array(
                     'portfolio_category',
@@ -205,6 +206,7 @@ class Visual_Portfolio_Admin {
             'hierarchical'  => true,
             'publicly_queryable' => false,
             'show_in_nav_menus' => false,
+            'show_in_rest' => true,
             'show_admin_column' => true,
         ));
         register_taxonomy('portfolio_tag', 'portfolio', array(
@@ -218,6 +220,7 @@ class Visual_Portfolio_Admin {
             'hierarchical'  => false,
             'publicly_queryable' => false,
             'show_in_nav_menus' => false,
+            'show_in_rest' => true,
             'show_admin_column' => true,
         ));
 
@@ -245,6 +248,7 @@ class Visual_Portfolio_Admin {
 
                 // adding to custom menu manually.
                 'show_in_menu' => false,
+                'show_in_rest' => true,
                 'capabilities' => array(
                     'edit_post' => 'edit_portfolio',
                     'edit_posts' => 'edit_portfolios',
