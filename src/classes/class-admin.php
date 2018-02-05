@@ -637,18 +637,28 @@ class Visual_Portfolio_Admin {
      */
     public function add_name_metabox( $post ) {
         wp_nonce_field( basename( __FILE__ ), 'vp_layout_nonce' );
-        ?>
-        <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_list_name"><?php echo esc_html__( 'Name:', NK_VP_DOMAIN ); ?></label>
-        </p>
-        <input class="vp-input" name="vp_list_name" type="text" id="vp_list_name" value="<?php echo esc_attr( $post->post_title ); ?>">
 
-        <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_list_shortcode"><?php echo esc_html__( 'Shortcode:', NK_VP_DOMAIN ); ?></label>
-        </p>
-        <input class="vp-input" name="vp_list_shortcode" type="text" id="vp_list_shortcode" value='<?php echo esc_attr( $post->ID ? '[visual_portfolio id="' . $post->ID . '"]' : '' ); ?>' readonly>
-        <p class="description"><?php echo esc_html__( 'Place the shortcode where you want to show the portfolio list.', NK_VP_DOMAIN ); ?></p>
-        <p></p>
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Name', NK_VP_DOMAIN ),
+                'name'  => 'vp_list_name',
+                'value' => $post->post_title,
+            )
+        );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Shortcode', NK_VP_DOMAIN ),
+                'description' => esc_html__( 'Place the shortcode where you want to show the portfolio list.', NK_VP_DOMAIN ),
+                'name'  => 'vp_list_shortcode',
+                'value' => $post->ID ? '[visual_portfolio id="' . $post->ID . '"]' : '',
+                'readonly' => true,
+            )
+        );
+
+        ?>
 
         <style>
             #submitdiv {

@@ -33,6 +33,7 @@ class Visual_Portfolio_Controls {
                 'name' => '',
                 'value' => '',
                 'placeholder' => '',
+                'readonly' => false,
 
                 // control-specific args.
                 // select.
@@ -108,7 +109,7 @@ class Visual_Portfolio_Controls {
      */
     public static function print_control_text( $args = array() ) {
         ?>
-        <input type="text" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>" placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>" class="vp-input">
+        <input type="text" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>" placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>" class="vp-input" <?php echo esc_attr( $args['readonly'] ? 'readonly' : '' ); ?>>
         <?php
     }
 
@@ -119,7 +120,7 @@ class Visual_Portfolio_Controls {
      */
     public static function print_control_textarea( $args = array() ) {
         ?>
-        <textarea name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" cols="<?php echo esc_attr( $args['cols'] ); ?>" rows="<?php echo esc_attr( $args['rows'] ); ?>"><?php echo esc_textarea( $args['value'] ); ?></textarea>
+        <textarea name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" cols="<?php echo esc_attr( $args['cols'] ); ?>" rows="<?php echo esc_attr( $args['rows'] ); ?>" <?php echo esc_attr( $args['readonly'] ? 'readonly' : '' ); ?>><?php echo esc_textarea( $args['value'] ); ?></textarea>
         <?php
     }
 
