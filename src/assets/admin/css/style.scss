@@ -73,7 +73,7 @@
 /**
  * Grid
  */
-$grid_gap: 7.5px;
+$grid_gap: 15px;
 $grid_sm: 600px;
 .vp-row {
     box-sizing: border-box;
@@ -116,6 +116,77 @@ $grid_sm: 600px;
 
 
 /**
+ * VP Lists creation page restyle.
+ */
+.post-type-vp_lists.post-php {
+    background-color: #EDEFF0;
+
+    // remove paddings and margins from default blocks
+    #wpcontent {
+        padding-left: 0;
+    }
+    .wrap {
+        margin: 0;
+    }
+    #poststuff {
+        padding-top: 0;
+    }
+    #wpfooter {
+        display: none;
+    }
+    #wpbody-content {
+        padding-bottom: 0;
+    }
+
+    #post-body.columns-2 #postbox-container-1 {
+        position: fixed;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 300px;
+        right: 300px;
+        top: 0;
+        bottom: 0;
+
+        html.wp-toolbar & {
+            top: 32px;
+        }
+
+        @media only screen and (max-width: 850px) {
+            width: 100%;
+            margin-right: 0;
+            position: relative;
+            right: auto;
+            top: auto;
+            bottom: auto;
+        }
+    }
+    #poststuff #post-body.columns-2 #side-sortables {
+        width: auto;
+    }
+
+    // widget
+    #poststuff .postbox {
+        margin-bottom: 0;
+        border-color: #e2e4e7;
+        border-right: 0;
+        border-top: 0;
+
+        > h2 {
+            padding: 15px;
+            border-bottom: none;
+        }
+        > .handlediv {
+            height: 50px;
+        }
+        > .inside {
+            padding: 15px;
+            padding-top: 0;
+        }
+    }
+}
+
+
+/**
  * Controls
  */
 .vp-control {
@@ -123,10 +194,6 @@ $grid_sm: 600px;
     flex-wrap: wrap;
     align-items: center;
     margin-bottom: 19px;
-
-    &:first-of-type {
-        margin-top: 12px;
-    }
 
     > label {
         width: 100%;
@@ -391,6 +458,7 @@ $grid_sm: 600px;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.07);
     background-color: #fff;
     padding: 5px 7px;
+    width: 100%;
 
     &,
     * {
@@ -643,7 +711,6 @@ $grid_sm: 600px;
     }
 }
 
-
 /**
  * Portfolio List page
  */
@@ -672,48 +739,6 @@ $grid_sm: 600px;
         }
     }
 }
-
-
-/**
- * Portfolio List creation process
- */
-.vp-steps {
-    margin-top: 15px;
-
-    .vp-steps__step {
-        background-color: #fff;
-        border: 1px solid #E5E5E5;
-        box-shadow: 0 1px 1px rgba(0,0,0,.04);
-        margin-bottom: 20px;
-        width: calc(100% - 302px);
-    }
-    .vp-steps__right {
-        float: right;
-        width: 280px;
-
-        .vp-steps__step {
-            width: 100%;
-            float: none;
-        }
-    }
-    .vp-steps__step-title {
-        font-weight: 500;
-        font-size: 14px;
-        padding: 8px 12px;
-        border-bottom: 1px solid #eee;
-    }
-    .vp-steps__step-content {
-        padding: 12px;
-
-        > :first-child {
-            margin-top: 0;
-        }
-        > :last-child {
-            margin-bottom: 0;
-        }
-    }
-}
-
 
 /**
  * Portfolio layout sections
@@ -795,9 +820,9 @@ $grid_sm: 600px;
         }
         > div {
             display: none;
-            padding: 0 12px;
-            margin-left: -6px;
-            margin-right: -6px;
+            padding: 0 15px;
+            margin-left: -9px;
+            margin-right: -9px;
             margin-top: 12px;
             margin-bottom: -12px;
             border-top: 1px solid #eee;

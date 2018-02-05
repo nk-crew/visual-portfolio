@@ -33,6 +33,9 @@ class Visual_Portfolio_Admin {
         // show blank state for portfolio list page.
         add_action( 'manage_posts_extra_tablenav', array( $this, 'maybe_render_blank_state' ) );
 
+        // remove screen options from portfolio list page.
+        add_action( 'screen_options_show_screen', array( $this, 'remove_screen_options' ), 10, 2 );
+
         // show thumbnail in portfolio list table.
         add_filter( 'manage_portfolio_posts_columns', array( $this, 'add_portfolio_img_column' ) );
         add_filter( 'manage_portfolio_posts_custom_column', array( $this, 'manage_portfolio_img_column' ), 10, 2 );
@@ -454,6 +457,21 @@ class Visual_Portfolio_Admin {
     }
 
     /**
+     * Remove screen options from vp list page.
+     *
+     * @param bool   $return  return default value.
+     * @param object $screen_object screen object.
+     *
+     * @return bool
+     */
+    public function remove_screen_options( $return, $screen_object ) {
+        if ( 'vp_lists' === $screen_object->id ) {
+            return false;
+        }
+        return $return;
+    }
+
+    /**
      * Add featured image in portfolio list
      *
      * @param array $columns columns of the table.
@@ -668,7 +686,9 @@ class Visual_Portfolio_Admin {
             #post-body-content,
             #submitdiv .handlediv,
             #submitdiv .hndle,
-            #minor-publishing {
+            #minor-publishing,
+            .wrap h1.wp-heading-inline,
+            .page-title-action {
                 display: none;
             }
         </style>
@@ -728,30 +748,32 @@ class Visual_Portfolio_Admin {
         ?>
 
         <div data-cond="[name=vp_layout] == tiles">
-            <label><?php echo esc_html__( 'Type', NK_VP_DOMAIN ); ?></label>
+            <div class="vp-control">
+                <label><?php echo esc_html__( 'Type', NK_VP_DOMAIN ); ?></label>
 
-            <div class="vp-control vp-control-image-dropdown">
-                <span class="vp-control-image-dropdown__preview">
-                    <?php
-                    foreach ( $tile_types as $k => $val ) {
-                        if ( $meta['vp_tiles_type'] === $val ) {
-                            ?>
-                            <img src="<?php echo esc_url( $tile_images_uri . $k . '.svg' ); ?>" alt="">
-                            <?php
-                            break;
+                <div class="vp-control-image-dropdown">
+                    <span class="vp-control-image-dropdown__preview">
+                        <?php
+                        foreach ( $tile_types as $k => $val ) {
+                            if ( $meta['vp_tiles_type'] === $val ) {
+                                ?>
+                                <img src="<?php echo esc_url( $tile_images_uri . $k . '.svg' ); ?>" alt="">
+                                <?php
+                                break;
+                            }
                         }
-                    }
-                    ?>
-                </span>
-                <span class="vp-control-image-dropdown__title"><?php echo esc_html__( 'Select tiles type', NK_VP_DOMAIN ); ?></span>
-                <div class="vp-control-image-dropdown__content">
-                    <div>
-                        <select class="vp-image-picker" name="vp_tiles_type">
-                            <!-- <option data-img-src="<?php echo esc_url( $tile_images_uri . 'custom.png' ); ?>" data-img-alt="custom" value="custom">custom</option> -->
-                            <?php foreach ( $tile_types as $k => $val ) : ?>
-                                <option data-img-src="<?php echo esc_url( $tile_images_uri . $k . '.svg' ); ?>" data-img-alt="<?php echo esc_attr( $k ); ?>" value="<?php echo esc_attr( $val ); ?>" <?php echo $meta['vp_tiles_type'] === $val ? 'selected' : ''; ?>><?php echo esc_html( $val ); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        ?>
+                    </span>
+                    <span class="vp-control-image-dropdown__title"><?php echo esc_html__( 'Select tiles type', NK_VP_DOMAIN ); ?></span>
+                    <div class="vp-control-image-dropdown__content">
+                        <div>
+                            <select class="vp-image-picker" name="vp_tiles_type">
+                                <!-- <option data-img-src="<?php echo esc_url( $tile_images_uri . 'custom.png' ); ?>" data-img-alt="custom" value="custom">custom</option> -->
+                                <?php foreach ( $tile_types as $k => $val ) : ?>
+                                    <option data-img-src="<?php echo esc_url( $tile_images_uri . $k . '.svg' ); ?>" data-img-alt="<?php echo esc_attr( $k ); ?>" value="<?php echo esc_attr( $val ); ?>" <?php echo $meta['vp_tiles_type'] === $val ? 'selected' : ''; ?>><?php echo esc_html( $val ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1372,7 +1394,7 @@ class Visual_Portfolio_Admin {
                                     'type'  => 'select2',
                                     'label'  => esc_html__( 'Excluded posts', NK_VP_DOMAIN ),
                                     'name'  => 'vp_posts_excluded_ids',
-                                    'value' => $excluded_ids,
+                                    'value' => (array) $excluded_ids,
                                     'searchable' => true,
                                     'multiple' => true,
                                     'post_type' => '[name=vp_posts_source]',
@@ -1427,7 +1449,7 @@ class Visual_Portfolio_Admin {
                                     'type'  => 'select2',
                                     'label'  => esc_html__( 'Taxonomies', NK_VP_DOMAIN ),
                                     'name'  => 'vp_posts_taxonomies',
-                                    'value' => array_map( 'sanitize_text_field', wp_unslash( isset( $selected_tax ) ? $selected_tax : array() ) ),
+                                    'value' => (array) $selected_tax,
                                     'searchable' => true,
                                     'multiple' => true,
                                     'post_type' => '[name=vp_posts_source]',
