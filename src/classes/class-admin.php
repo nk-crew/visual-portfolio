@@ -19,7 +19,7 @@ class Visual_Portfolio_Admin {
     public function __construct() {
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 
-        // cutsom post types.
+        // custom post types.
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
 
         // add post formats.
