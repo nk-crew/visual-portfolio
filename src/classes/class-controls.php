@@ -135,6 +135,21 @@ class Visual_Portfolio_Controls {
     }
 
     /**
+     * Print control toggle.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_toggle( $args = array() ) {
+        ?>
+        <div class="vp-toggle">
+            <input type="checkbox" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="true" <?php checked( $args['value'] ); ?>>
+            <span class="vp-toggle__track"></span>
+            <span class="vp-toggle__thumb"></span>
+        </div>
+        <?php
+    }
+
+    /**
      * Print control range.
      *
      * @param array $args - control args.

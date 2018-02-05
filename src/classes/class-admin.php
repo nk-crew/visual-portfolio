@@ -787,7 +787,7 @@ class Visual_Portfolio_Admin {
 
         Visual_Portfolio_Controls::get(
             array(
-                'type'  => 'checkbox',
+                'type'  => 'toggle',
                 'label' => esc_html__( 'Stretch', NK_VP_DOMAIN ),
                 'name'  => 'vp_stretch',
                 'value' => $meta['vp_stretch'],
@@ -829,7 +829,7 @@ class Visual_Portfolio_Admin {
 
                 Visual_Portfolio_Controls::get(
                     array(
-                        'type'  => 'checkbox',
+                        'type'  => 'toggle',
                         'label'  => esc_html__( 'Show Title', NK_VP_DOMAIN ),
                         'name'  => $opt . 'show_title',
                         'value' => $meta[ $opt . 'show_title' ],
@@ -838,7 +838,7 @@ class Visual_Portfolio_Admin {
 
                 Visual_Portfolio_Controls::get(
                     array(
-                        'type'  => 'checkbox',
+                        'type'  => 'toggle',
                         'label'  => esc_html__( 'Show Categories', NK_VP_DOMAIN ),
                         'name'  => $opt . 'show_categories',
                         'value' => $meta[ $opt . 'show_categories' ],
@@ -894,7 +894,7 @@ class Visual_Portfolio_Admin {
                 <?php
                 Visual_Portfolio_Controls::get(
                     array(
-                        'type'  => 'checkbox',
+                        'type'  => 'toggle',
                         'label'  => esc_html__( 'Show Excerpt', NK_VP_DOMAIN ),
                         'name'  => $opt . 'show_excerpt',
                         'value' => $meta[ $opt . 'show_excerpt' ],
@@ -921,7 +921,7 @@ class Visual_Portfolio_Admin {
                     <?php
                     Visual_Portfolio_Controls::get(
                         array(
-                            'type'  => 'checkbox',
+                            'type'  => 'toggle',
                             'label'  => esc_html__( 'Show Icon', NK_VP_DOMAIN ),
                             'name'  => $opt . 'show_icon',
                             'value' => $meta[ $opt . 'show_icon' ],
@@ -1099,7 +1099,7 @@ class Visual_Portfolio_Admin {
 
             Visual_Portfolio_Controls::get(
                 array(
-                    'type'  => 'checkbox',
+                    'type'  => 'toggle',
                     'label' => esc_html__( 'Show Count', NK_VP_DOMAIN ),
                     'name'  => 'vp_filter_show_count',
                     'value' => $meta['vp_filter_show_count'],
@@ -1155,7 +1155,7 @@ class Visual_Portfolio_Admin {
             <?php
             Visual_Portfolio_Controls::get(
                 array(
-                    'type'  => 'checkbox',
+                    'type'  => 'toggle',
                     'label'  => esc_html__( 'Show Arrows', NK_VP_DOMAIN ),
                     'name'  => 'vp_pagination_paged__show_arrows',
                     'value' => $meta['vp_pagination_paged__show_arrows'],
@@ -1164,7 +1164,7 @@ class Visual_Portfolio_Admin {
 
             Visual_Portfolio_Controls::get(
                 array(
-                    'type'  => 'checkbox',
+                    'type'  => 'toggle',
                     'label'  => esc_html__( 'Show Numbers', NK_VP_DOMAIN ),
                     'name'  => 'vp_pagination_paged__show_numbers',
                     'value' => $meta['vp_pagination_paged__show_numbers'],
