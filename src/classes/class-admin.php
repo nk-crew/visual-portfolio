@@ -40,7 +40,6 @@ class Visual_Portfolio_Admin {
 
         // highlight admin menu items.
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-        add_filter( 'parent_file', array( $this, 'admin_menu_highlight_items' ) );
 
         // metaboxes.
         add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
@@ -151,7 +150,7 @@ class Visual_Portfolio_Admin {
                     'singular_name'       => _x( 'Portfolio Item', 'Post Type Singular Name', NK_VP_DOMAIN ),
                     'menu_name'           => __( 'Visual Portfolio', NK_VP_DOMAIN ),
                     'parent_item_colon'   => __( 'Parent Portfolio Item', NK_VP_DOMAIN ),
-                    'all_items'           => __( 'All Portfolio Items', NK_VP_DOMAIN ),
+                    'all_items'           => __( 'Portfolio Items', NK_VP_DOMAIN ),
                     'view_item'           => __( 'View Portfolio Item', NK_VP_DOMAIN ),
                     'add_new_item'        => __( 'Add New Portfolio Item', NK_VP_DOMAIN ),
                     'add_new'             => __( 'Add New', NK_VP_DOMAIN ),
@@ -166,7 +165,7 @@ class Visual_Portfolio_Admin {
                 'show_ui'      => true,
 
                 // adding to custom menu manually.
-                'show_in_menu' => false,
+                'show_in_menu' => true,
                 'show_in_admin_bar' => true,
                 'show_in_rest' => true,
                 'menu_icon'    => 'dashicons-visual-portfolio',
@@ -196,7 +195,7 @@ class Visual_Portfolio_Admin {
             )
         );
         register_taxonomy('portfolio_category', 'portfolio', array(
-            'label'         => esc_html__( 'Categories', NK_VP_DOMAIN ),
+            'label'         => esc_html__( 'Portfolio Categories', NK_VP_DOMAIN ),
             'labels'        => array(
                 'menu_name' => esc_html__( 'Categories', NK_VP_DOMAIN ),
             ),
@@ -210,7 +209,7 @@ class Visual_Portfolio_Admin {
             'show_admin_column' => true,
         ));
         register_taxonomy('portfolio_tag', 'portfolio', array(
-            'label'         => esc_html__( 'Tags', NK_VP_DOMAIN ),
+            'label'         => esc_html__( 'Portfolio Tags', NK_VP_DOMAIN ),
             'labels'        => array(
                 'menu_name' => esc_html__( 'Tags', NK_VP_DOMAIN ),
             ),
@@ -228,17 +227,17 @@ class Visual_Portfolio_Admin {
         register_post_type('vp_lists',
             array(
                 'labels' => array(
-                    'name'                => _x( 'Portfolio Lists', 'Post Type General Name', NK_VP_DOMAIN ),
-                    'singular_name'       => _x( 'Portfolio List', 'Post Type Singular Name', NK_VP_DOMAIN ),
+                    'name'                => _x( 'Portfolio Layouts', 'Post Type General Name', NK_VP_DOMAIN ),
+                    'singular_name'       => _x( 'Portfolio Layout', 'Post Type Singular Name', NK_VP_DOMAIN ),
                     'menu_name'           => __( 'Visual Portfolio', NK_VP_DOMAIN ),
                     'parent_item_colon'   => __( 'Parent Portfolio Item', NK_VP_DOMAIN ),
-                    'all_items'           => __( 'All Portfolio Lists', NK_VP_DOMAIN ),
-                    'view_item'           => __( 'View Portfolio List', NK_VP_DOMAIN ),
-                    'add_new_item'        => __( 'Add New Portfolio List', NK_VP_DOMAIN ),
+                    'all_items'           => __( 'Portfolio Layouts', NK_VP_DOMAIN ),
+                    'view_item'           => __( 'View Portfolio Layout', NK_VP_DOMAIN ),
+                    'add_new_item'        => __( 'Add New Portfolio Layout', NK_VP_DOMAIN ),
                     'add_new'             => __( 'Add New', NK_VP_DOMAIN ),
-                    'edit_item'           => __( 'Edit Portfolio List', NK_VP_DOMAIN ),
-                    'update_item'         => __( 'Update Portfolio List', NK_VP_DOMAIN ),
-                    'search_items'        => __( 'Search Portfolio List', NK_VP_DOMAIN ),
+                    'edit_item'           => __( 'Edit Portfolio Layout', NK_VP_DOMAIN ),
+                    'update_item'         => __( 'Update Portfolio Layout', NK_VP_DOMAIN ),
+                    'search_items'        => __( 'Search Portfolio Layout', NK_VP_DOMAIN ),
                     'not_found'           => __( 'Not Found', NK_VP_DOMAIN ),
                     'not_found_in_trash'  => __( 'Not found in Trash', NK_VP_DOMAIN ),
                 ),
@@ -247,7 +246,7 @@ class Visual_Portfolio_Admin {
                 'show_ui'      => true,
 
                 // adding to custom menu manually.
-                'show_in_menu' => false,
+                'show_in_menu' => 'edit.php?post_type=portfolio',
                 'show_in_rest' => true,
                 'capabilities' => array(
                     'edit_post' => 'edit_portfolio',
@@ -526,78 +525,23 @@ class Visual_Portfolio_Admin {
      * Add Admin Page
      */
     public function admin_menu() {
-        add_menu_page(
-            esc_html__( 'Visual Portfolio', NK_VP_DOMAIN ),
-            esc_html__( 'Visual Portfolio', NK_VP_DOMAIN ),
-            'read_portfolio',
-            'visual-portfolio',
-            null,
-            'dashicons-visual-portfolio',
-            20
-        );
+        // Remove Add New submenu item.
+        remove_submenu_page( 'edit.php?post_type=portfolio', 'post-new.php?post_type=portfolio' );
 
-        add_submenu_page(
-            'visual-portfolio',
-            esc_html__( 'Portfolio Items', NK_VP_DOMAIN ),
-            esc_html__( 'Portfolio Items', NK_VP_DOMAIN ),
-            'manage_options',
-            'edit.php?post_type=portfolio'
-        );
-
-        add_submenu_page(
-            'visual-portfolio',
-            esc_html__( 'Portfolio Lists', NK_VP_DOMAIN ),
-            esc_html__( 'Portfolio Lists', NK_VP_DOMAIN ),
-            'manage_options',
-            'edit.php?post_type=vp_lists'
-        );
-
-        add_submenu_page(
-            'visual-portfolio',
-            esc_html__( 'Categories', NK_VP_DOMAIN ),
-            esc_html__( 'Categories', NK_VP_DOMAIN ),
-            'manage_options',
-            'edit-tags.php?taxonomy=portfolio_category&post_type=portfolio'
-        );
-
-        add_submenu_page(
-            'visual-portfolio',
-            esc_html__( 'Tags', NK_VP_DOMAIN ),
-            esc_html__( 'Tags', NK_VP_DOMAIN ),
-            'manage_options',
-            'edit-tags.php?taxonomy=portfolio_tag&post_type=portfolio'
-        );
-    }
-
-    /**
-     * Highlighting portfolio custom menu items
-     *
-     * @param string $parent_file - parent file.
-     *
-     * @return string $parent_file
-     */
-    public function admin_menu_highlight_items( $parent_file ) {
-        global $current_screen, $submenu_file, $submenu;
-
-        // Highlight menus.
-        switch ( $current_screen->post_type ) {
-            case 'portfolio':
-            case 'vp_lists':
-                $parent_file = 'visual-portfolio';
-
-                if ( 'portfolio_category' === $current_screen->taxonomy || 'portfolio_tag' === $current_screen->taxonomy ) {
-                    $submenu_file = $current_screen->base . '.php?taxonomy=' . $current_screen->taxonomy . '&post_type=' . $current_screen->post_type;
+        // Reorder Portfolio Layouts submenu item.
+        global $submenu;
+        foreach ( $submenu as $page => $items ) {
+            if ( 'edit.php?post_type=portfolio' === $page ) {
+                foreach ( $items as $id => $meta ) {
+                    if ( isset( $meta[2] ) && 'edit.php?post_type=vp_lists' === $meta[2] ) {
+                        $submenu[ $page ][6] = $submenu[ $page ][ $id ];
+                        unset( $submenu[ $page ][ $id ] );
+                        ksort( $submenu[ $page ] );
+                        break;
+                    }
                 }
-
-                break;
+            }
         }
-
-        // Remove 'Visual Portfolio' sub menu item.
-        if ( isset( $submenu['visual-portfolio'] ) ) {
-            unset( $submenu['visual-portfolio'][0] );
-        }
-
-        return $parent_file;
     }
 
     /**

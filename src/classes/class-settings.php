@@ -77,7 +77,7 @@ class Visual_Portfolio_Settings {
      */
     public function admin_menu() {
         add_submenu_page(
-            'visual-portfolio',
+            'edit.php?post_type=portfolio',
             esc_html__( 'Settings', NK_VP_DOMAIN ),
             esc_html__( 'Settings', NK_VP_DOMAIN ),
             'manage_options',
