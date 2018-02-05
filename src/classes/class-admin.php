@@ -653,7 +653,7 @@ class Visual_Portfolio_Admin {
                 'label' => esc_html__( 'Shortcode', NK_VP_DOMAIN ),
                 'description' => esc_html__( 'Place the shortcode where you want to show the portfolio list.', NK_VP_DOMAIN ),
                 'name'  => 'vp_list_shortcode',
-                'value' => $post->ID ? '[visual_portfolio id="' . $post->ID . '"]' : '',
+                'value' => $post->ID ? '[visual_portfolio id="' . $post->ID . '" class=""]' : '',
                 'readonly' => true,
             )
         );
