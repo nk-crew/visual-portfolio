@@ -66,7 +66,7 @@
 
     // Popper.js
     if ( typeof Tooltip !== 'undefined' ) {
-        $('[data-hint]').each(function () {
+        $('[data-hint]:not([data-hint=""]):not([data-hint="false"])').each(function () {
             var $this = $(this);
             new Tooltip(this, {
                 placement: $this.attr('data-hint-place') || 'top',
@@ -251,14 +251,14 @@
     // vp_items_gap -> data-vp-items-gap
 
     // image dropdown
-    $body.on('click', '.vp-image-dropdown', function (e) {
-        if (!$(e.target).closest('.vp-image-dropdown__content').length) {
+    $body.on('click', '.vp-control-image-dropdown', function (e) {
+        if (!$(e.target).closest('.vp-control-image-dropdown__content').length) {
             $(this).toggleClass('active');
         }
     });
     $body.on('mousedown', function (e) {
-        var $select = $(e.target).closest('.vp-image-dropdown');
-        var $all = $('.vp-image-dropdown.active');
+        var $select = $(e.target).closest('.vp-control-image-dropdown');
+        var $all = $('.vp-control-image-dropdown.active');
 
         $all.each(function () {
             if (this === $select[0]) {
@@ -268,21 +268,21 @@
             $(this).removeClass('active');
         });
     });
-    $body.on('change', '.vp-image-dropdown .vp-image-picker', function (e) {
+    $body.on('change', '.vp-control-image-dropdown .vp-image-picker', function (e) {
         var $this = $(this);
         var pickerData = $this.data('picker');
 
         if (pickerData) {
             var $selected = pickerData.select.find('option[value="' + pickerData.select.val() + '"]');
             var $optgroup = $selected.parent('optgroup');
-            var $dropdown = $this.closest('.vp-image-dropdown');
+            var $dropdown = $this.closest('.vp-control-image-dropdown');
             var src = $selected.attr('data-img-src');
 
             if ($dropdown.length) {
-                $dropdown.children('.vp-image-dropdown__preview').html('<img src="' + src + '" alt="">');
+                $dropdown.children('.vp-control-image-dropdown__preview').html('<img src="' + src + '" alt="">');
 
                 if ($optgroup.length) {
-                    $dropdown.children('.vp-image-dropdown__title').html($optgroup.attr('label'));
+                    $dropdown.children('.vp-control-image-dropdown__title').html($optgroup.attr('label'));
                 }
             }
         }
@@ -313,7 +313,8 @@
             };
 
             // ajax posts
-            if ($this.hasClass('vp-select2-posts-ajax')) {
+            if ($this.closest('.vp-select2-posts-ajax').length) {
+                var $postType = $this.attr('data-post-type') ? $($this.attr('data-post-type')) : false;
                 opts = $.extend({
                     minimumInputLength: 1,
                     ajax: {
@@ -324,7 +325,7 @@
                             return {
                                 action: 'vp_find_posts',
                                 q: params.term,
-                                post_type: $($this.attr('data-post-type')).val(),
+                                post_type: $postType ? $postType.val() : false,
                                 nonce: vpAdminVariables.nonce
                             };
                         },
@@ -369,8 +370,8 @@
             }
 
             // ajax taxonomies
-            if ($this.hasClass('vp-select2-taxonomies-ajax')) {
-                var $postType = $this.attr('data-post-type-from') ? $($this.attr('data-post-type-from')) : false;
+            if ($this.closest('.vp-select2-taxonomies-ajax').length) {
+                var $postType = $this.attr('data-post-type') ? $($this.attr('data-post-type')) : false;
 
                 opts = $.extend({
                     minimumInputLength: 1,

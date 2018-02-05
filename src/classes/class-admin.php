@@ -675,15 +675,6 @@ class Visual_Portfolio_Admin {
      */
     public function add_layout_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
-        $layouts = array(
-            'tiles'   => esc_html__( 'Tiles', NK_VP_DOMAIN ),
-            'masonry' => esc_html__( 'Masonry', NK_VP_DOMAIN ),
-
-            /*
-             * TODO: Justified
-                'justified' => esc_html__( 'Justified', NK_VP_DOMAIN ),
-             */
-        );
 
         $tile_types = array(
             '1-1' => '1|1,0.5|',
@@ -710,22 +701,30 @@ class Visual_Portfolio_Admin {
         );
 
         $tile_images_uri = visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-';
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'select2',
+                'name'  => 'vp_layout',
+                'value' => $meta['vp_layout'],
+                'options' => array(
+                    'tiles'   => esc_html__( 'Tiles', NK_VP_DOMAIN ),
+                    'masonry' => esc_html__( 'Masonry', NK_VP_DOMAIN ),
+
+                /*
+                 * TODO: Justified
+                    'justified' => esc_html__( 'Justified', NK_VP_DOMAIN ),
+                 */
+                ),
+            )
+        );
         ?>
 
-        <p></p>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_layout">
-            <?php foreach ( $layouts as $type => $title ) : ?>
-                <option value="<?php echo esc_attr( $type ); ?>" <?php echo $meta['vp_layout'] === $type ? 'selected' : ''; ?>><?php echo esc_html( $title ); ?></option>
-            <?php endforeach; ?>
-        </select>
-
         <div data-cond="[name=vp_layout] == tiles">
-            <p class="post-attributes-label-wrapper">
-                <label class="post-attributes-label"><?php echo esc_html__( 'Type:', NK_VP_DOMAIN ); ?></label>
-            </p>
+            <label><?php echo esc_html__( 'Type', NK_VP_DOMAIN ); ?></label>
 
-            <div class="vp-image-dropdown">
-                <span class="vp-image-dropdown__preview">
+            <div class="vp-control vp-control-image-dropdown">
+                <span class="vp-control-image-dropdown__preview">
                     <?php
                     foreach ( $tile_types as $k => $val ) {
                         if ( $meta['vp_tiles_type'] === $val ) {
@@ -737,8 +736,8 @@ class Visual_Portfolio_Admin {
                     }
                     ?>
                 </span>
-                <span class="vp-image-dropdown__title"><?php echo esc_html__( 'Select tiles type', NK_VP_DOMAIN ); ?></span>
-                <div class="vp-image-dropdown__content">
+                <span class="vp-control-image-dropdown__title"><?php echo esc_html__( 'Select tiles type', NK_VP_DOMAIN ); ?></span>
+                <div class="vp-control-image-dropdown__content">
                     <div>
                         <select class="vp-image-picker" name="vp_tiles_type">
                             <!-- <option data-img-src="<?php echo esc_url( $tile_images_uri . 'custom.png' ); ?>" data-img-alt="custom" value="custom">custom</option> -->
@@ -752,28 +751,53 @@ class Visual_Portfolio_Admin {
         </div>
 
         <div data-cond="[name=vp_layout] == masonry">
-            <p class="post-attributes-label-wrapper">
-                <label class="post-attributes-label" for="vp_masonry_columns"><?php echo esc_html__( 'Columns:', NK_VP_DOMAIN ); ?></label>
-            </p>
-            <input name="vp_masonry_columns" id="vp_masonry_columns" class="vp-rangeslider" type="range" min="1" max="5" value="<?php echo esc_attr( $meta['vp_masonry_columns'] ); ?>">
+            <?php
+            Visual_Portfolio_Controls::get(
+                array(
+                    'type'  => 'range',
+                    'label' => esc_html__( 'Columns', NK_VP_DOMAIN ),
+                    'name'  => 'vp_masonry_columns',
+                    'value' => $meta['vp_masonry_columns'],
+                    'min'   => 1,
+                    'max'   => 5,
+                )
+            );
+            ?>
         </div>
 
-        <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_items_gap"><?php echo esc_html__( 'Gap:', NK_VP_DOMAIN ); ?></label>
-        </p>
-        <input name="vp_items_gap" id="vp_items_gap" class="vp-rangeslider" type="range" min="0" max="150" value="<?php echo esc_attr( $meta['vp_items_gap'] ); ?>">
-
-        <p class="post-attributes-label-wrapper">
-            <label class="post-attributes-label" for="vp_items_count"><?php echo esc_html__( 'Items Per Page:', NK_VP_DOMAIN ); ?></label>
-        </p>
-        <input name="vp_items_count" id="vp_items_count" class="vp-rangeslider" type="range" min="1" max="50" value="<?php echo esc_attr( $meta['vp_items_count'] ); ?>">
-
-        <p></p>
-        <label for="vp_stretch" data-hint="<?php echo esc_attr__( 'Break container and display it wide', NK_VP_DOMAIN ); ?>" data-hint-place="left">
-            <input name="vp_stretch" type="checkbox" id="vp_stretch" value="true" <?php checked( $meta['vp_stretch'] ); ?>>
-            <?php echo esc_html__( 'Stretch', NK_VP_DOMAIN ); ?>
-        </label>
         <?php
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'range',
+                'label' => esc_html__( 'Gap', NK_VP_DOMAIN ),
+                'name'  => 'vp_items_gap',
+                'value' => $meta['vp_items_gap'],
+                'min'   => 0,
+                'max'   => 150,
+            )
+        );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'range',
+                'label' => esc_html__( 'Items Per Page', NK_VP_DOMAIN ),
+                'name'  => 'vp_items_count',
+                'value' => $meta['vp_items_count'],
+                'min'   => 1,
+                'max'   => 50,
+            )
+        );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'checkbox',
+                'label' => esc_html__( 'Stretch', NK_VP_DOMAIN ),
+                'name'  => 'vp_stretch',
+                'value' => $meta['vp_stretch'],
+                'hint'  => esc_attr__( 'Break container and display it wide', NK_VP_DOMAIN ),
+                'hint_place'  => 'left',
+            )
+        );
     }
 
     /**
@@ -790,92 +814,148 @@ class Visual_Portfolio_Admin {
             'fade'     => __( 'Fade', NK_VP_DOMAIN ),
         );
 
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'select2',
+                'name'  => 'vp_items_style',
+                'value' => $meta['vp_items_style'],
+                'options' => $styles,
+            )
+        );
         ?>
-        <p></p>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_items_style" id="vp_items_style">
-            <?php foreach ( $styles as $style => $label ) : ?>
-                <option value="<?php echo esc_attr( $style ); ?>" <?php selected( $meta['vp_items_style'], $style ); ?>>
-                    <?php echo esc_html( $label ); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
 
         <?php foreach ( $styles as $style => $label ) : ?>
             <div data-cond="[name=vp_items_style] == <?php echo esc_attr( $style ); ?>">
 
                 <?php
                 $opt = 'vp_items_style_' . $style . '__';
+
+                Visual_Portfolio_Controls::get(
+                    array(
+                        'type'  => 'checkbox',
+                        'label'  => esc_html__( 'Show Title', NK_VP_DOMAIN ),
+                        'name'  => $opt . 'show_title',
+                        'value' => $meta[ $opt . 'show_title' ],
+                    )
+                );
+
+                Visual_Portfolio_Controls::get(
+                    array(
+                        'type'  => 'checkbox',
+                        'label'  => esc_html__( 'Show Categories', NK_VP_DOMAIN ),
+                        'name'  => $opt . 'show_categories',
+                        'value' => $meta[ $opt . 'show_categories' ],
+                    )
+                );
                 ?>
 
-                <p>
-                    <label for="<?php echo esc_attr( $opt . 'show_title' ); ?>">
-                        <input name="<?php echo esc_attr( $opt . 'show_title' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_title' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_title' ] ); ?>>
-                        <?php echo esc_html__( 'Show Title', NK_VP_DOMAIN ); ?>
-                    </label>
-                </p>
-
-                <p>
-                    <label for="<?php echo esc_attr( $opt . 'show_categories' ); ?>">
-                        <input name="<?php echo esc_attr( $opt . 'show_categories' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_categories' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_categories' ] ); ?>>
-                        <?php echo esc_html__( 'Show Categories', NK_VP_DOMAIN ); ?>
-                    </label>
-                </p>
-
                 <div data-cond="[name=<?php echo esc_attr( $opt . 'show_categories' ); ?>]">
-                    <p class="post-attributes-label-wrapper">
-                        <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'categories_count' ); ?>"><?php echo esc_html__( 'Categories Count:', NK_VP_DOMAIN ); ?></label>
-                    </p>
-                    <input name="<?php echo esc_attr( $opt . 'categories_count' ); ?>" id="<?php echo esc_attr( $opt . 'categories_count' ); ?>" class="vp-rangeslider" type="range" min="1" max="10" value="<?php echo esc_attr( $meta[ $opt . 'categories_count' ] ); ?>">
+                    <?php
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'  => 'range',
+                            'label' => esc_html__( 'Categories Count', NK_VP_DOMAIN ),
+                            'name'  => $opt . 'categories_count',
+                            'value' => $meta[ $opt . 'categories_count' ],
+                            'min'   => 1,
+                            'max'   => 10,
+                        )
+                    );
+                    ?>
                 </div>
 
-                <div>
-                    <p class="post-attributes-label-wrapper">
-                        <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'show_date' ); ?>"><?php echo esc_html__( 'Show Date:', NK_VP_DOMAIN ); ?></label>
-                    </p>
-                    <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $opt . 'show_date' ); ?>" id="<?php echo esc_attr( $opt . 'show_date' ); ?>">
-                        <option value="false" <?php selected( $meta[ $opt . 'show_date' ], false ); ?>>
-                            <?php echo esc_html__( 'False', NK_VP_DOMAIN ); ?>
-                        </option>
-                        <option value="true" <?php selected( $meta[ $opt . 'show_date' ], true ); ?>>
-                            <?php echo esc_html__( 'Show', NK_VP_DOMAIN ); ?>
-                        </option>
-                        <option value="human" <?php selected( $meta[ $opt . 'show_date' ], 'human' ); ?>>
-                            <?php echo esc_html__( 'Human Format', NK_VP_DOMAIN ); ?>
-                        </option>
-                    </select>
-                </div>
+                <?php
+                Visual_Portfolio_Controls::get(
+                    array(
+                        'type'  => 'select2',
+                        'label' => esc_html__( 'Show Date', NK_VP_DOMAIN ),
+                        'name'  => $opt . 'show_date',
+                        'value' => $meta[ $opt . 'show_date' ],
+                        'options' => array(
+                            'false' => esc_html__( 'False', NK_VP_DOMAIN ),
+                            'true'  => esc_html__( 'Show', NK_VP_DOMAIN ),
+                            'human' => esc_html__( 'Human Format', NK_VP_DOMAIN ),
+                        ),
+                    )
+                );
+                ?>
                 <div data-cond="[name=<?php echo esc_attr( $opt . 'show_date' ); ?>] == true">
-                    <p></p>
-                    <input class="vp-input" name="<?php echo esc_attr( $opt . 'date_format' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'date_format' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'date_format' ] ); ?>" placeholder="<?php echo esc_attr( 'F j, Y' ); ?>" data-hint="<?php echo esc_attr__( "Date format \r\n Example: F j, Y", NK_VP_DOMAIN ); ?>" data-hint-place="left">
+                    <?php
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'  => 'text',
+                            'name'  => $opt . 'date_format',
+                            'value' => $meta[ $opt . 'date_format' ],
+                            'placeholder' => 'F j, Y',
+                            'hint' => esc_attr__( "Date format \r\n Example: F j, Y", NK_VP_DOMAIN ),
+                            'hint_place' => 'left',
+                        )
+                    );
+                    ?>
                 </div>
 
-                <p>
-                    <label for="<?php echo esc_attr( $opt . 'show_excerpt' ); ?>">
-                        <input name="<?php echo esc_attr( $opt . 'show_excerpt' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_excerpt' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_excerpt' ] ); ?>>
-                        <?php echo esc_html__( 'Show Excerpt', NK_VP_DOMAIN ); ?>
-                    </label>
-                </p>
+                <?php
+                Visual_Portfolio_Controls::get(
+                    array(
+                        'type'  => 'checkbox',
+                        'label'  => esc_html__( 'Show Excerpt', NK_VP_DOMAIN ),
+                        'name'  => $opt . 'show_excerpt',
+                        'value' => $meta[ $opt . 'show_excerpt' ],
+                    )
+                );
+                ?>
 
                 <div data-cond="[name=<?php echo esc_attr( $opt . 'show_excerpt' ); ?>]">
-                    <p class="post-attributes-label-wrapper">
-                        <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'excerpt_words_count' ); ?>"><?php echo esc_html__( 'Excerpt Words Count:', NK_VP_DOMAIN ); ?></label>
-                    </p>
-                    <input name="<?php echo esc_attr( $opt . 'excerpt_words_count' ); ?>" id="<?php echo esc_attr( $opt . 'excerpt_words_count' ); ?>" class="vp-rangeslider" type="range" min="1" max="200" value="<?php echo esc_attr( $meta[ $opt . 'excerpt_words_count' ] ); ?>">
+                    <?php
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'  => 'range',
+                            'label' => esc_html__( 'Excerpt Words Count', NK_VP_DOMAIN ),
+                            'name'  => $opt . 'excerpt_words_count',
+                            'value' => $meta[ $opt . 'excerpt_words_count' ],
+                            'min'   => 1,
+                            'max'   => 200,
+                        )
+                    );
+                    ?>
                 </div>
 
                 <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
-                    <p>
-                        <label for="<?php echo esc_attr( $opt . 'show_icon' ); ?>">
-                            <input name="<?php echo esc_attr( $opt . 'show_icon' ); ?>" type="checkbox" id="<?php echo esc_attr( $opt . 'show_icon' ); ?>" value="true" <?php checked( $meta[ $opt . 'show_icon' ] ); ?>>
-                            <?php echo esc_html__( 'Show Icon', NK_VP_DOMAIN ); ?>
-                        </label>
-                    </p>
+                    <?php
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'  => 'checkbox',
+                            'label'  => esc_html__( 'Show Icon', NK_VP_DOMAIN ),
+                            'name'  => $opt . 'show_icon',
+                            'value' => $meta[ $opt . 'show_icon' ],
+                        )
+                    );
+                    ?>
 
                     <div data-cond="[name=<?php echo esc_attr( $opt . 'show_icon' ); ?>]">
-                        <p></p>
-                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon' ] ); ?>" placeholder="<?php echo esc_attr( 'Standard Icon', NK_VP_DOMAIN ); ?>" data-hint="<?php echo esc_attr__( 'Standard icon', NK_VP_DOMAIN ); ?>" data-hint-place="left">
-                        <p></p>
-                        <input class="vp-input" name="<?php echo esc_attr( $opt . 'icon_video' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'icon_video' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'icon_video' ] ); ?>" placeholder="<?php echo esc_attr( 'Video Icon', NK_VP_DOMAIN ); ?>" data-hint="<?php echo esc_attr__( 'Video icon', NK_VP_DOMAIN ); ?>" data-hint-place="left">
+                        <?php
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'text',
+                                'name'  => $opt . 'icon',
+                                'value' => $meta[ $opt . 'icon' ],
+                                'placeholder' => esc_attr__( 'Standard icon', NK_VP_DOMAIN ),
+                                'hint' => esc_attr__( 'Standard icon', NK_VP_DOMAIN ),
+                                'hint_place' => 'left',
+                            )
+                        );
+
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'text',
+                                'name'  => $opt . 'icon_video',
+                                'value' => $meta[ $opt . 'icon_video' ],
+                                'placeholder' => esc_attr__( 'Video icon', NK_VP_DOMAIN ),
+                                'hint' => esc_attr__( 'Video icon', NK_VP_DOMAIN ),
+                                'hint_place' => 'left',
+                            )
+                        );
+                        ?>
                     </div>
                 <?php endif; ?>
 
@@ -883,13 +963,14 @@ class Visual_Portfolio_Admin {
                 $caption_align_opt = $opt . 'align';
                 ?>
                 <div data-cond="[name=<?php echo esc_attr( $opt . 'show_title' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_categories' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_date' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_excerpt' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_icon' ); ?>] == true">
-                    <p></p>
-                    <label class="post-attributes-label" for="<?php echo esc_attr( $caption_align_opt ); ?>">
-                        <?php echo esc_html__( 'Caption Align:', NK_VP_DOMAIN ); ?>
-                    </label>
-                    <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $caption_align_opt ); ?>" id="<?php echo esc_attr( $caption_align_opt ); ?>">
 
-                        <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
+                    <div class="vp-control">
+                        <label for="<?php echo esc_attr( $caption_align_opt ); ?>">
+                            <?php echo esc_html__( 'Caption Align:', NK_VP_DOMAIN ); ?>
+                        </label>
+                        <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $caption_align_opt ); ?>" id="<?php echo esc_attr( $caption_align_opt ); ?>">
+
+                            <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
                             <optgroup label="<?php echo esc_attr__( 'Top', NK_VP_DOMAIN ); ?>">
                                 <option value="top-center" <?php selected( $meta[ $caption_align_opt ], 'top-center' ); ?>>
                                     <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
@@ -902,19 +983,19 @@ class Visual_Portfolio_Admin {
                                 </option>
                             </optgroup>
                             <optgroup label="<?php echo esc_attr__( 'Center', NK_VP_DOMAIN ); ?>">
-                        <?php endif; ?>
+                                <?php endif; ?>
 
-                            <option value="center" <?php selected( $meta[ $caption_align_opt ], 'center' ); ?>>
-                                <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
-                            </option>
-                            <option value="left" <?php selected( $meta[ $caption_align_opt ], 'left' ); ?>>
-                                <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
-                            </option>
-                            <option value="right" <?php selected( $meta[ $caption_align_opt ], 'right' ); ?>>
-                                <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
-                            </option>
+                                <option value="center" <?php selected( $meta[ $caption_align_opt ], 'center' ); ?>>
+                                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="left" <?php selected( $meta[ $caption_align_opt ], 'left' ); ?>>
+                                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                                </option>
+                                <option value="right" <?php selected( $meta[ $caption_align_opt ], 'right' ); ?>>
+                                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                                </option>
 
-                        <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
+                                <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
                             </optgroup>
                             <optgroup label="<?php echo esc_attr__( 'Bottom', NK_VP_DOMAIN ); ?>">
                                 <option value="bottom-center" <?php selected( $meta[ $caption_align_opt ], 'bottom-center' ); ?>>
@@ -928,25 +1009,32 @@ class Visual_Portfolio_Admin {
                                 </option>
                             </optgroup>
                         <?php endif; ?>
-                    </select>
+                        </select>
+                    </div>
                 </div>
 
                 <?php if ( 'fly' === $style || 'emerge' === $style || 'fade' === $style ) : ?>
-                    <p></p>
-                    <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'bg_color' ); ?>">
-                        <?php echo esc_html__( 'Overlay Background Color:', NK_VP_DOMAIN ); ?>
-                    </label>
-                    <p>
-                        <input class="vp-input vp-color-picker" data-alpha="true" name="<?php echo esc_attr( $opt . 'bg_color' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'bg_color' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'bg_color' ] ); ?>">
-                    </p>
+                    <?php
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'  => 'color',
+                            'label'  => esc_html__( 'Overlay Background Color', NK_VP_DOMAIN ),
+                            'name'  => $opt . 'bg_color',
+                            'value' => $meta[ $opt . 'bg_color' ],
+                            'alpha' => true,
+                        )
+                    );
 
-                    <p></p>
-                    <label class="post-attributes-label" for="<?php echo esc_attr( $opt . 'text_color' ); ?>">
-                        <?php echo esc_html__( 'Overlay Text Color:', NK_VP_DOMAIN ); ?>
-                    </label>
-                    <p>
-                        <input class="vp-input vp-color-picker" data-alpha="true" name="<?php echo esc_attr( $opt . 'text_color' ); ?>" type="text" id="<?php echo esc_attr( $opt . 'text_color' ); ?>" value="<?php echo esc_attr( $meta[ $opt . 'text_color' ] ); ?>">
-                    </p>
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'  => 'color',
+                            'label'  => esc_html__( 'Overlay Text Color', NK_VP_DOMAIN ),
+                            'name'  => $opt . 'text_color',
+                            'value' => $meta[ $opt . 'text_color' ],
+                            'alpha' => true,
+                        )
+                    );
+                    ?>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
@@ -961,21 +1049,18 @@ class Visual_Portfolio_Admin {
      */
     public function add_items_click_action_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
-
-        ?>
-        <p></p>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_items_click_action" id="vp_items_click_action">
-            <option value="false" <?php selected( $meta['vp_items_click_action'], 'false' ); ?>>
-                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="url" <?php selected( $meta['vp_items_click_action'], 'url' ); ?>>
-                <?php echo esc_html__( 'URL', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="popup_gallery" <?php selected( $meta['vp_items_click_action'], 'popup_gallery' ); ?>>
-                <?php echo esc_html__( 'Popup Gallery', NK_VP_DOMAIN ); ?>
-            </option>
-        </select>
-        <?php
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'select2',
+                'name'  => 'vp_items_click_action',
+                'value' => $meta['vp_items_click_action'],
+                'options' => array(
+                    'false' => esc_html__( 'Disabled', NK_VP_DOMAIN ),
+                    'url' => esc_html__( 'URL', NK_VP_DOMAIN ),
+                    'popup_gallery' => esc_html__( 'Popup Gallery', NK_VP_DOMAIN ),
+                ),
+            )
+        );
     }
 
     /**
@@ -986,39 +1071,44 @@ class Visual_Portfolio_Admin {
     public function add_filter_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
 
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'select2',
+                'name'  => 'vp_filter',
+                'value' => $meta['vp_filter'],
+                'options' => array(
+                    'false' => esc_html__( 'Disabled', NK_VP_DOMAIN ),
+                    'default' => esc_html__( 'Enabled', NK_VP_DOMAIN ),
+                ),
+            )
+        );
         ?>
-        <p></p>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_filter" id="vp_filter">
-            <option value="false" <?php selected( $meta['vp_filter'], 'false' ); ?>>
-                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="default" <?php selected( $meta['vp_filter'], 'default' ); ?>>
-                <?php echo esc_html__( 'Enabled', NK_VP_DOMAIN ); ?>
-            </option>
-        </select>
 
         <div data-cond="[name=vp_filter] != false">
-            <p></p>
-            <label class="post-attributes-label" for="vp_filter_align">
-                <?php echo esc_html__( 'Align:', NK_VP_DOMAIN ); ?>
-            </label>
-            <select class="vp-select2 vp-select2-nosearch" name="vp_filter_align" id="vp_filter_align">
-                <option value="center" <?php selected( $meta['vp_filter_align'], 'center' ); ?>>
-                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
-                </option>
-                <option value="left" <?php selected( $meta['vp_filter_align'], 'left' ); ?>>
-                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
-                </option>
-                <option value="right" <?php selected( $meta['vp_filter_align'], 'right' ); ?>>
-                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
-                </option>
-            </select>
+            <?php
+            Visual_Portfolio_Controls::get(
+                array(
+                    'type'  => 'select2',
+                    'label' => esc_html__( 'Align', NK_VP_DOMAIN ),
+                    'name'  => 'vp_filter_align',
+                    'value' => $meta['vp_filter_align'],
+                    'options' => array(
+                        'center' => esc_html__( 'Center', NK_VP_DOMAIN ),
+                        'left' => esc_html__( 'Left', NK_VP_DOMAIN ),
+                        'right' => esc_html__( 'Right', NK_VP_DOMAIN ),
+                    ),
+                )
+            );
 
-            <p></p>
-            <label for="vp_filter_show_count">
-                <input name="vp_filter_show_count" type="checkbox" id="vp_filter_show_count" value="true" <?php checked( $meta['vp_filter_show_count'] ); ?>>
-                <?php echo esc_html__( 'Show Count', NK_VP_DOMAIN ); ?>
-            </label>
+            Visual_Portfolio_Controls::get(
+                array(
+                    'type'  => 'checkbox',
+                    'label' => esc_html__( 'Show Count', NK_VP_DOMAIN ),
+                    'name'  => 'vp_filter_show_count',
+                    'value' => $meta['vp_filter_show_count'],
+                )
+            );
+            ?>
         </div>
         <?php
     }
@@ -1031,52 +1121,59 @@ class Visual_Portfolio_Admin {
     public function add_pagination_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
 
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'select2',
+                'name'  => 'vp_pagination',
+                'value' => $meta['vp_pagination'],
+                'options' => array(
+                    'false' => esc_html__( 'Disabled', NK_VP_DOMAIN ),
+                    'paged' => esc_html__( 'Paged', NK_VP_DOMAIN ),
+                    'load-more' => esc_html__( 'Load More', NK_VP_DOMAIN ),
+                    'infinite' => esc_html__( 'Infinite', NK_VP_DOMAIN ),
+                ),
+            )
+        );
         ?>
-        <p></p>
-        <select class="vp-select2 vp-select2-nosearch" name="vp_pagination" id="vp_pagination">
-            <option value="false" <?php selected( $meta['vp_pagination'], 'false' ); ?>>
-                <?php echo esc_html__( 'Disabled', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="paged" <?php selected( $meta['vp_pagination'], 'paged' ); ?>>
-                <?php echo esc_html__( 'Paged', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="load-more" <?php selected( $meta['vp_pagination'], 'load-more' ); ?>>
-                <?php echo esc_html__( 'Load More', NK_VP_DOMAIN ); ?>
-            </option>
-            <option value="infinite" <?php selected( $meta['vp_pagination'], 'infinite' ); ?>>
-                <?php echo esc_html__( 'Infinite', NK_VP_DOMAIN ); ?>
-            </option>
-        </select>
 
         <div data-cond="[name=vp_pagination] != false">
-            <p></p>
-            <label class="post-attributes-label" for="vp_pagination_align">
-                <?php echo esc_html__( 'Align:', NK_VP_DOMAIN ); ?>
-            </label>
-            <select class="vp-select2 vp-select2-nosearch" name="vp_pagination_align" id="vp_pagination_align">
-                <option value="center" <?php selected( $meta['vp_pagination_align'], 'center' ); ?>>
-                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
-                </option>
-                <option value="left" <?php selected( $meta['vp_pagination_align'], 'left' ); ?>>
-                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
-                </option>
-                <option value="right" <?php selected( $meta['vp_pagination_align'], 'right' ); ?>>
-                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
-                </option>
-            </select>
+            <?php
+            Visual_Portfolio_Controls::get(
+                array(
+                    'type'  => 'select2',
+                    'label'  => esc_html__( 'Align', NK_VP_DOMAIN ),
+                    'name'  => 'vp_pagination_align',
+                    'value' => $meta['vp_pagination_align'],
+                    'options' => array(
+                        'center' => esc_html__( 'Center', NK_VP_DOMAIN ),
+                        'left' => esc_html__( 'Left', NK_VP_DOMAIN ),
+                        'right' => esc_html__( 'Right', NK_VP_DOMAIN ),
+                    ),
+                )
+            );
+            ?>
         </div>
 
         <div data-cond="[name=vp_pagination] == paged">
-            <p></p>
-            <label for="vp_pagination_paged__show_arrows">
-                <input name="vp_pagination_paged__show_arrows" type="checkbox" id="vp_pagination_paged__show_arrows" value="true" <?php checked( $meta['vp_pagination_paged__show_arrows'] ); ?>>
-                <?php echo esc_html__( 'Show Arrows', NK_VP_DOMAIN ); ?>
-            </label>
-            <p></p>
-            <label for="vp_pagination_paged__show_numbers">
-                <input name="vp_pagination_paged__show_numbers" type="checkbox" id="vp_pagination_paged__show_numbers" value="true" <?php checked( $meta['vp_pagination_paged__show_numbers'] ); ?>>
-                <?php echo esc_html__( 'Show Numbers', NK_VP_DOMAIN ); ?>
-            </label>
+            <?php
+            Visual_Portfolio_Controls::get(
+                array(
+                    'type'  => 'checkbox',
+                    'label'  => esc_html__( 'Show Arrows', NK_VP_DOMAIN ),
+                    'name'  => 'vp_pagination_paged__show_arrows',
+                    'value' => $meta['vp_pagination_paged__show_arrows'],
+                )
+            );
+
+            Visual_Portfolio_Controls::get(
+                array(
+                    'type'  => 'checkbox',
+                    'label'  => esc_html__( 'Show Numbers', NK_VP_DOMAIN ),
+                    'name'  => 'vp_pagination_paged__show_numbers',
+                    'value' => $meta['vp_pagination_paged__show_numbers'],
+                )
+            );
+            ?>
         </div>
         <?php
     }
@@ -1133,11 +1230,11 @@ class Visual_Portfolio_Admin {
         $post_types_list = array();
         if ( is_array( $post_types ) && ! empty( $post_types ) ) {
             foreach ( $post_types as $post_type ) {
-                $post_types_list[] = array( $post_type, ucfirst( $post_type ) );
+                $post_types_list[ $post_type ] = ucfirst( $post_type );
             }
         }
-        $post_types_list[] = array( 'ids', esc_html__( 'Specific Posts', NK_VP_DOMAIN ) );
-        $post_types_list[] = array( 'custom_query', esc_html__( 'Custom Query', NK_VP_DOMAIN ) );
+        $post_types_list['ids'] = esc_html__( 'Specific Posts', NK_VP_DOMAIN );
+        $post_types_list['custom_query'] = esc_html__( 'Custom Query', NK_VP_DOMAIN );
         ?>
         <p></p>
         <div class="vp-content-source">
@@ -1182,160 +1279,195 @@ class Visual_Portfolio_Admin {
                     <p></p>
                     <div class="vp-row">
                         <div class="vp-col-6">
-                            <label class="post-attributes-label" for="vp_posts_source">
-                                <?php echo esc_html__( 'Data source:', NK_VP_DOMAIN ); ?>
-                            </label>
-                            <select class="vp-select2" name="vp_posts_source" id="vp_posts_source">
-                                <?php
-                                foreach ( $post_types_list as $post_type ) {
-                                    ?>
-                                    <option value="<?php echo esc_attr( $post_type[0] ); ?>" <?php echo $meta['vp_posts_source'] === $post_type[0] ? 'selected' : ''; ?>><?php echo esc_html( $post_type[1] ); ?></option>
-                                    <?php
-                                }
-                                ?>
-                            </select>
+                            <?php
+                            Visual_Portfolio_Controls::get(
+                                array(
+                                    'type'  => 'select2',
+                                    'label'  => esc_html__( 'Data Source', NK_VP_DOMAIN ),
+                                    'name'  => 'vp_posts_source',
+                                    'value' => $meta['vp_posts_source'],
+                                    'searchable' => true,
+                                    'options' => $post_types_list,
+                                )
+                            );
+                            ?>
                         </div>
 
                         <div class="vp-col-6" data-cond="[name=vp_posts_source] == ids">
-                            <label class="post-attributes-label" for="vp_posts_ids">
-                                <?php echo esc_html__( 'Specific Posts:', NK_VP_DOMAIN ); ?>
-                            </label>
-                            <select class="vp-select2 vp-select2-posts-ajax" type="text" name="vp_posts_ids[]" id="vp_posts_ids" multiple>
-                                <?php
-                                $selected_ids = $meta['vp_posts_ids'];
-                                if ( isset( $selected_ids ) && is_array( $selected_ids ) && count( $selected_ids ) ) {
-                                    $post_query = new WP_Query(
-                                        array(
-                                            'post_type' => 'any',
-                                            'post__in' => $selected_ids,
-                                        )
-                                    );
+                            <?php
+                            $selected_ids = $meta['vp_posts_ids'];
+                            $selected_array = array();
+                            if ( isset( $selected_ids ) && is_array( $selected_ids ) && count( $selected_ids ) ) {
+                                $post_query = new WP_Query(
+                                    array(
+                                        'post_type' => 'any',
+                                        'post__in' => $selected_ids,
+                                    )
+                                );
 
-                                    if ( $post_query->have_posts() ) {
-                                        while ( $post_query->have_posts() ) {
-                                            $post_query->the_post();
-                                            ?>
-                                            <option value="<?php echo esc_attr( get_the_ID() ); ?>" selected><?php echo esc_html( get_the_title() ); ?></option>
-                                            <?php
-                                        }
-                                        wp_reset_postdata();
+                                if ( $post_query->have_posts() ) {
+                                    while ( $post_query->have_posts() ) {
+                                        $post_query->the_post();
+                                        $selected_array[ get_the_ID() ] = get_the_title();
                                     }
+                                    wp_reset_postdata();
                                 }
-                                ?>
-                            </select>
+                            }
+                            Visual_Portfolio_Controls::get(
+                                array(
+                                    'type'  => 'select2',
+                                    'label'  => esc_html__( 'Specific Posts', NK_VP_DOMAIN ),
+                                    'name'  => 'vp_posts_ids',
+                                    'value' => $selected_ids,
+                                    'searchable' => true,
+                                    'multiple' => true,
+                                    'options' => $selected_array,
+                                    'class' => 'vp-select2-posts-ajax',
+                                )
+                            );
+                            ?>
                         </div>
 
                         <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids">
-                            <label class="post-attributes-label" for="vp_posts_excluded_ids">
-                                <?php echo esc_html__( 'Excluded Posts:', NK_VP_DOMAIN ); ?>
-                            </label>
-                            <select class="vp-select2 vp-select2-posts-ajax" data-post-type="[name=vp_posts_source]" type="text" name="vp_posts_excluded_ids[]" id="vp_posts_excluded_ids" multiple>
-                                <?php
-                                $excluded_ids = $meta['vp_posts_excluded_ids'];
-                                if ( isset( $excluded_ids ) && is_array( $excluded_ids ) && count( $excluded_ids ) ) {
-                                    $post_query = new WP_Query(
-                                        array(
-                                            'post_type' => 'any',
-                                            'post__in' => $excluded_ids,
-                                        )
-                                    );
+                            <?php
+                            $excluded_ids = $meta['vp_posts_excluded_ids'];
+                            $excluded_array = array();
+                            if ( isset( $excluded_ids ) && is_array( $excluded_ids ) && count( $excluded_ids ) ) {
+                                $post_query = new WP_Query(
+                                    array(
+                                        'post_type' => 'any',
+                                        'post__in' => $excluded_ids,
+                                    )
+                                );
 
-                                    if ( $post_query->have_posts() ) {
-                                        while ( $post_query->have_posts() ) {
-                                            $post_query->the_post();
-                                            ?>
-                                            <option value="<?php echo esc_attr( get_the_ID() ); ?>" selected><?php echo esc_html( get_the_title() ); ?></option>
-                                            <?php
-                                        }
-                                        wp_reset_postdata();
+                                if ( $post_query->have_posts() ) {
+                                    while ( $post_query->have_posts() ) {
+                                        $post_query->the_post();
+                                        $excluded_array[ get_the_ID() ] = get_the_title();
                                     }
+                                    wp_reset_postdata();
                                 }
-                                ?>
-                            </select>
+                            }
+
+                            Visual_Portfolio_Controls::get(
+                                array(
+                                    'type'  => 'select2',
+                                    'label'  => esc_html__( 'Excluded Posts', NK_VP_DOMAIN ),
+                                    'name'  => 'vp_posts_excluded_ids',
+                                    'value' => $excluded_ids,
+                                    'searchable' => true,
+                                    'multiple' => true,
+                                    'post_type' => '[name=vp_posts_source]',
+                                    'options' => $excluded_array,
+                                    'class' => 'vp-select2-posts-ajax',
+                                )
+                            );
+                            ?>
                         </div>
 
                         <div class="vp-col-12" data-cond="[name=vp_posts_source] == custom_query">
-                            <label class="post-attributes-label" for="vp_posts_custom_query">
-                                <?php echo esc_html__( 'Custom Query:', NK_VP_DOMAIN ); ?>
-                            </label>
-                            <textarea class="vp-input" name="vp_posts_custom_query" id="vp_posts_custom_query" cols="30" rows="3"><?php echo esc_textarea( $meta['vp_posts_custom_query'] ); ?></textarea>
-                            <p class="description">
-                                <?php
-                                // translators: %1$s - escaped url.
-                                printf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', NK_VP_DOMAIN ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) );
-                                ?>
-                            </p>
+                            <?php
+                            Visual_Portfolio_Controls::get(
+                                array(
+                                    'type'  => 'textarea',
+                                    'label'  => esc_html__( 'Custom Query', NK_VP_DOMAIN ),
+                                    // translators: %1$s - escaped url.
+                                    'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', NK_VP_DOMAIN ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
+                                    'name'  => 'vp_posts_custom_query',
+                                    'value' => $meta['vp_posts_custom_query'],
+                                    'cols' => 30,
+                                    'rows' => 3,
+                                )
+                            );
+                            ?>
                         </div>
 
                         <div class="vp-col-clearfix"></div>
 
                         <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids && [name=vp_posts_source] != custom_query">
-                            <label class="post-attributes-label" for="vp_posts_taxonomies">
-                                <?php echo esc_html__( 'Taxonomies:', NK_VP_DOMAIN ); ?>
-                            </label>
-                            <select class="vp-select2 vp-select2-taxonomies-ajax" name="vp_posts_taxonomies[]" id="vp_posts_taxonomies" multiple data-post-type-from="[name=vp_posts_source]">
-                                <?php
-                                $selected_tax = $meta['vp_posts_taxonomies'];
-                                if ( isset( $selected_tax ) && is_array( $selected_tax ) && count( $selected_tax ) ) {
-                                    $term_query = new WP_Term_Query(
-                                        array(
-                                            'include' => $selected_tax,
-                                        )
-                                    );
+                            <?php
+                            $selected_tax = $meta['vp_posts_taxonomies'];
+                            $selected_tax_arr = array();
 
-                                    if ( ! empty( $term_query->terms ) ) {
-                                        foreach ( $term_query->terms as $term ) {
-                                            ?>
-                                            <option value="<?php echo esc_attr( $term->term_id ); ?>" selected><?php echo esc_html( $term->name ); ?></option>
-                                            <?php
-                                        }
+                            if ( isset( $selected_tax ) && is_array( $selected_tax ) && count( $selected_tax ) ) {
+
+                                // TODO: Not sure that include works...
+                                $term_query = new WP_Term_Query(
+                                    array(
+                                        'include' => $selected_tax,
+                                    )
+                                );
+
+                                if ( ! empty( $term_query->terms ) ) {
+                                    foreach ( $term_query->terms as $term ) {
+                                        $selected_tax_arr[ $term->term_id ] = $term->name;
                                     }
                                 }
-                                ?>
-                            </select>
+                            }
+                            Visual_Portfolio_Controls::get(
+                                array(
+                                    'type'  => 'select2',
+                                    'label'  => esc_html__( 'Taxonomies', NK_VP_DOMAIN ),
+                                    'name'  => 'vp_posts_taxonomies',
+                                    'value' => array_map( 'sanitize_text_field', wp_unslash( isset( $selected_tax ) ? $selected_tax : array() ) ),
+                                    'searchable' => true,
+                                    'multiple' => true,
+                                    'post_type' => '[name=vp_posts_source]',
+                                    'options' => $selected_tax_arr,
+                                    'class' => 'vp-select2-taxonomies-ajax',
+                                )
+                            );
+                            ?>
                         </div>
                         <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids && [name=vp_posts_source] != custom_query">
-                            <label class="post-attributes-label" for="vp_posts_taxonomies_relation">
-                                <?php echo esc_html__( 'Taxonomies Relation:', NK_VP_DOMAIN ); ?>
-                            </label>
-                            <select class="vp-select2 vp-select2-nosearch" name="vp_posts_taxonomies_relation" id="vp_posts_taxonomies_relation">
-                                <option value="or" <?php selected( $meta['vp_posts_taxonomies_relation'], 'or' ); ?>>
-                                    <?php echo esc_html__( 'OR', NK_VP_DOMAIN ); ?>
-                                </option>
-                                <option value="and" <?php selected( $meta['vp_posts_taxonomies_relation'], 'and' ); ?>>
-                                    <?php echo esc_html__( 'AND', NK_VP_DOMAIN ); ?>
-                                </option>
-                            </select>
+                            <?php
+                            Visual_Portfolio_Controls::get(
+                                array(
+                                    'type'  => 'select2',
+                                    'label'  => esc_html__( 'Taxonomies Relation', NK_VP_DOMAIN ),
+                                    'name'  => 'vp_posts_taxonomies_relation',
+                                    'value'  => $meta['vp_posts_taxonomies_relation'],
+                                    'options' => array(
+                                        'or' => esc_html__( 'OR', NK_VP_DOMAIN ),
+                                        'and' => esc_html__( 'AND', NK_VP_DOMAIN ),
+                                    ),
+                                )
+                            );
+                            ?>
                         </div>
 
                         <div class="vp-col-6">
-                            <label class="post-attributes-label" for="vp_posts_order_by">
-                                <?php echo esc_html__( 'Order By:', NK_VP_DOMAIN ); ?>
-                            </label>
-                            <select class="vp-select2 vp-select2-nosearch" name="vp_posts_order_by" id="vp_posts_order_by">
-                                <option value="post_date" <?php selected( $meta['vp_posts_order_by'], 'post_date' ); ?>>
-                                    <?php echo esc_html__( 'Date', NK_VP_DOMAIN ); ?>
-                                </option>
-                                <option value="title" <?php selected( $meta['vp_posts_order_by'], 'title' ); ?>>
-                                    <?php echo esc_html__( 'Title', NK_VP_DOMAIN ); ?>
-                                </option>
-                                <option value="id" <?php selected( $meta['vp_posts_order_by'], 'id' ); ?>>
-                                    <?php echo esc_html__( 'ID', NK_VP_DOMAIN ); ?>
-                                </option>
-                            </select>
+                            <?php
+                            Visual_Portfolio_Controls::get(
+                                array(
+                                    'type'  => 'select2',
+                                    'label'  => esc_html__( 'Order By', NK_VP_DOMAIN ),
+                                    'name'  => 'vp_posts_order_by',
+                                    'value'  => $meta['vp_posts_order_by'],
+                                    'options' => array(
+                                        'post_date' => esc_html__( 'Date', NK_VP_DOMAIN ),
+                                        'title' => esc_html__( 'Title', NK_VP_DOMAIN ),
+                                        'id' => esc_html__( 'ID', NK_VP_DOMAIN ),
+                                    ),
+                                )
+                            );
+                            ?>
                         </div>
                         <div class="vp-col-6">
-                            <label class="post-attributes-label" for="vp_posts_order_direction">
-                                <?php echo esc_html__( 'Order Direction:', NK_VP_DOMAIN ); ?>
-                            </label>
-                            <select class="vp-select2 vp-select2-nosearch" name="vp_posts_order_direction" id="vp_posts_order_direction">
-                                <option value="desc" <?php selected( $meta['vp_posts_order_direction'], 'desc' ); ?>>
-                                    <?php echo esc_html__( 'DESC', NK_VP_DOMAIN ); ?>
-                                </option>
-                                <option value="asc" <?php selected( $meta['vp_posts_order_direction'], 'asc' ); ?>>
-                                    <?php echo esc_html__( 'ASC', NK_VP_DOMAIN ); ?>
-                                </option>
-                            </select>
+                            <?php
+                            Visual_Portfolio_Controls::get(
+                                array(
+                                    'type'  => 'select2',
+                                    'label'  => esc_html__( 'Order Direction', NK_VP_DOMAIN ),
+                                    'name'  => 'vp_posts_order_direction',
+                                    'value'  => $meta['vp_posts_order_direction'],
+                                    'options' => array(
+                                        'desc' => esc_html__( 'DESC', NK_VP_DOMAIN ),
+                                        'asc' => esc_html__( 'ASC', NK_VP_DOMAIN ),
+                                    ),
+                                )
+                            );
+                            ?>
                         </div>
                     </div>
                 </div>

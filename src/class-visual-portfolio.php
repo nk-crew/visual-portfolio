@@ -239,6 +239,7 @@ class Visual_Portfolio {
         require_once( $this->plugin_path . 'classes/class-shortcode.php' );
         require_once( $this->plugin_path . 'classes/class-preview.php' );
         require_once( $this->plugin_path . 'classes/class-admin.php' );
+        require_once( $this->plugin_path . 'classes/class-controls.php' );
         require_once( $this->plugin_path . 'classes/class-tinymce.php' );
         require_once( $this->plugin_path . 'classes/class-vc.php' );
     }

@@ -100,7 +100,7 @@ $grid_sm: 600px;
     flex: 0 0 auto;
     padding-right: $grid_gap;
     padding-left: $grid_gap;
-    margin-bottom: $grid_gap * 2;
+    // margin-bottom: $grid_gap * 2;
 }
 
 @for $i from 1 through 12 {
@@ -112,6 +112,44 @@ $grid_sm: 600px;
 .vp-col-clearfix {
     flex-basis: 100%;
     max-width: 100%;
+}
+
+
+/**
+ * Controls
+ */
+.vp-control {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 19px;
+
+    &:first-of-type {
+        margin-top: 12px;
+    }
+
+    > label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    > .vp-control-description {
+        width: 100%;
+        font-size: 13px;
+        font-style: italic;
+        margin: 2px 0 5px;
+        color: #666;
+    }
+
+    // checkbox
+    &.vp-control-checkbox {
+        flex-wrap: nowrap;
+    }
+
+    // textarea
+    &.vp-control-textarea textarea {
+        width: 100%;
+    }
 }
 
 
@@ -223,7 +261,7 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
 /**
  * Image dropdown
  */
-.vp-image-dropdown {
+.vp-control-image-dropdown {
     position: relative;
     display: flex;
     align-items: center;
@@ -256,7 +294,7 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
         border-width: 0 4px 5px 4px;
     }
 
-    .vp-image-dropdown__preview {
+    .vp-control-image-dropdown__preview {
         display: block;
         flex: 0 0 auto;
         width: 32px;
@@ -268,12 +306,12 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
         }
     }
 
-    .vp-image-dropdown__title {
+    .vp-control-image-dropdown__title {
         flex: 1;
         padding-left: 10px;
     }
 
-    .vp-image-dropdown__content {
+    .vp-control-image-dropdown__content {
         display: none;
         position: absolute;
         cursor: default;
@@ -350,7 +388,7 @@ input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
             }
         }
     }
-    &.active .vp-image-dropdown__content {
+    &.active .vp-control-image-dropdown__content {
         display: block;
     }
 }
