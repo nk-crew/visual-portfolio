@@ -92,9 +92,6 @@ class Visual_Portfolio_Admin {
             wp_enqueue_script( 'image-picker', visual_portfolio()->plugin_url . 'assets/vendor/image-picker/image-picker.min.js', array( 'jquery' ), '', true );
             wp_enqueue_style( 'image-picker', visual_portfolio()->plugin_url . 'assets/vendor/image-picker/image-picker.css' );
 
-            wp_enqueue_script( 'rangeslider', visual_portfolio()->plugin_url . 'assets/vendor/rangeslider/rangeslider.min.js', '', '', true );
-            wp_enqueue_style( 'rangeslider', visual_portfolio()->plugin_url . 'assets/vendor/rangeslider/rangeslider.css' );
-
             wp_enqueue_script( 'select2', visual_portfolio()->plugin_url . 'assets/vendor/select2/js/select2.min.js', array( 'jquery' ), '', true );
             wp_enqueue_style( 'select2', visual_portfolio()->plugin_url . 'assets/vendor/select2/css/select2.css' );
 

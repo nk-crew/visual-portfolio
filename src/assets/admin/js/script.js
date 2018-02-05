@@ -101,6 +101,15 @@
         $editForm.conditionize();
     }
 
+    // range slider
+    $('.vp-control-range').each(function () {
+        var $inputs = $(this).find('input');
+
+        $inputs.on('change input', function () {
+            $inputs.val( $(this).val() );
+        });
+    });
+
     // color picker
     if ($.fn.wpColorPicker) {
         $('.vp-color-picker').each(function () {
@@ -124,19 +133,6 @@
     // image picker
     if ($.fn.imagepicker) {
         $('.vp-image-picker').imagepicker();
-    }
-
-    // rangeslider
-    if ($.fn.rangeslider) {
-        $('.vp-rangeslider').rangeslider({
-            polyfill: false,
-            onInit: function() {
-                this.$handle.append('<span class="vp-rangeslider-handle-value">' + this.value + '</span>');
-            },
-            onSlide: function() {
-                this.$handle.children('.vp-rangeslider-handle-value').text(this.value);
-            }
-        });
     }
 
     // frame load

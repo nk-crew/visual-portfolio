@@ -140,12 +140,10 @@ class Visual_Portfolio_Controls {
      * @param array $args - control args.
      */
     public static function print_control_range( $args = array() ) {
-        /**
-        <input type="range" min="1" max="100" class="blocks-range-control__slider" id="inspector-range-control-1" value="1000">
-        <input type="number" min="1" max="100" class="blocks-range-control__number" value="1000">
-         */
         ?>
-        <input name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" class="vp-rangeslider" type="range" min="<?php echo esc_attr( $args['min'] ); ?>" max="<?php echo esc_attr( $args['max'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        <input type="range" min="<?php echo esc_attr( $args['min'] ); ?>" max="<?php echo esc_attr( $args['max'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        <input type="number" min="<?php echo esc_attr( $args['min'] ); ?>" max="<?php echo esc_attr( $args['max'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
         <?php
     }
 

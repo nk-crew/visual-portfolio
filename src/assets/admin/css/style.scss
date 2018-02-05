@@ -197,64 +197,107 @@ $grid_sm: 600px;
 
 
 /**
- * Rangeslider
+ * Range Slider
  */
-.vp-rangeslider + .rangeslider {
-    height: 7px;
-    margin: 14px 0;
-    background: #f1f1f1;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1);
+.vp-control-range {
+    [type="number"] {
+        width: 50px;
+        margin-left: 10px;
+    }
 
-    .rangeslider__fill {
-        background: #0085ba;
+    [type="range"] {
+        flex: 1;
+        padding: 0;
+        -webkit-appearance: none;
+        background: transparent;
+
+        &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: #555d66;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+            box-sizing: border-box;
+            margin-top: -7px;
+        }
+
+        &::-moz-range-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: #555d66;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+            box-sizing: border-box;
+        }
+
+        &::-ms-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: #555d66;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+            box-sizing: border-box;
+            margin-top: 0;
+            height: 14px;
+            width: 14px;
+            border: 2px solid transparent;
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:focus::-webkit-slider-thumb {
+            outline: none;
+            color: #191e23;
+            box-shadow: inset 0 0 0 1px #6c7781,inset 0 0 0 2px #fff;
+        }
+
+        &:focus::-moz-range-thumb {
+            outline: none;
+            color: #191e23;
+            box-shadow: inset 0 0 0 1px #6c7781,inset 0 0 0 2px #fff;
+        }
+
+        &:focus::-ms-thumb {
+            outline: none;
+            color: #191e23;
+            box-shadow: inset 0 0 0 1px #6c7781,inset 0 0 0 2px #fff;
+        }
+
+        &::-webkit-slider-runnable-track {
+            height: 3px;
+            cursor: pointer;
+            background: #e2e4e7;
+            border-radius: 1.5px;
+            margin-top: -4px;
+        }
+
+        &::-moz-range-track {
+            height: 3px;
+            cursor: pointer;
+            background: #e2e4e7;
+            border-radius: 1.5px;
+        }
+
+        &::-ms-track {
+            margin-top: -4px;
+            background: transparent;
+            border-color: transparent;
+            color: transparent;
+            height: 3px;
+            cursor: pointer;
+            background: #e2e4e7;
+            border-radius: 1.5px;
+        }
     }
-    .rangeslider__handle {
-        top: -7px;
-        width: 18px;
-        height: 18px;
-        box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-        border: 1px solid #dcdcdc;
-    }
-    .rangeslider__handle:after {
-        width: 8px;
-        height: 8px;
-    }
-    .vp-rangeslider-handle-value {
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        padding: 2px 8px;
-        border-radius: 3px;
-        margin-bottom: 7px;
-        background-color: #3c3c3c;
-        color: #fff;
-        transform: translateX(-50%);
-        opacity: 0;
-        visibility: hidden;
-        transition: .3s opacity, .3s visibility;
-    }
-    .vp-rangeslider-handle-value:after {
-        content: '';
-        display: block;
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-left: 3px solid transparent;
-        border-right: 3px solid transparent;
-        border-top: 3px solid #3c3c3c;
-        transform: translateX(-50%);
-    }
-    .rangeslider__handle:hover .vp-rangeslider-handle-value,
-    &.rangeslider--active .vp-rangeslider-handle-value {
-        opacity: 1;
-        visibility: visible;
-    }
-}
-input[type="range"].vp-rangeslider:focus + .rangeslider .rangeslider__handle {
-    border-color: #aec7de;
-    box-shadow: 0 0 5px 0 rgba(30,140,190,.8);
 }
 
 
