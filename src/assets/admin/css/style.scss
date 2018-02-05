@@ -164,6 +164,16 @@ $grid_sm: 600px;
         width: auto;
     }
 
+    // notice
+    .notice {
+        margin: 0;
+        margin-bottom: 1px;
+        margin-right: 300px;
+        @media only screen and (max-width: 850px) {
+            margin-right: 0;
+        }
+    }
+
     // widget
     #poststuff .postbox {
         margin-bottom: 0;
