@@ -523,6 +523,17 @@ class Visual_Portfolio_Get {
                             'published_time'  => get_the_time( 'U' ),
                             'filter'          => implode( ',', $filter_values ),
                             'image'           => get_the_post_thumbnail( get_the_ID(), $img_size ),
+                            'image_allowed_html' => array(
+                                'img' => array(
+                                    'src'     => array(),
+                                    'srcset'  => array(),
+                                    'sizes'   => array(),
+                                    'alt'     => array(),
+                                    'class'   => array(),
+                                    'width'   => array(),
+                                    'height'  => array(),
+                                ),
+                            ),
                             'categories'      => $categories,
                             'opts'            => $style_options,
                             'vp_ops'          => $options,
