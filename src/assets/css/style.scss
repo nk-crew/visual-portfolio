@@ -157,6 +157,12 @@
         }
     }
 }
+.vp-single-filter.vp-single-filter__ready {
+    .vp-portfolio__filter-wrap {
+        opacity: 1;
+        visibility: visible;
+    }
+}
 
 // Loading
 .vp-portfolio.vp-portfolio__loading {

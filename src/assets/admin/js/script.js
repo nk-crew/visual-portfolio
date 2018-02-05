@@ -13,7 +13,7 @@
     var post_ID = $('#post_ID').val();
 
     // select shortcode text in input
-    $body.on('focus', '[name="vp_list_shortcode"]', function () {
+    $body.on('focus', '[name="vp_list_shortcode"], [name="vp_filter_shortcode"]', function () {
         this.select();
     });
     $body.on('click', '.vp-onclick-selection', function () {

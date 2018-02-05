@@ -256,118 +256,8 @@ class Visual_Portfolio_Get {
             $class .= ' vp-portfolio__stretch';
         }
 
-        $paged = 0;
-        if ( $options['vp_pagination'] ) {
-            $paged = self::get_current_page_number();
-        }
-
-        /**
-         * Set Up Query options
-         */
-        $query_opts = array(
-            'showposts'  => intval( $options['vp_items_count'] ),
-            'posts_per_page' => intval( $options['vp_items_count'] ),
-            'paged'      => $paged,
-            'orderby'    => 'post_date',
-            'order'      => $options['vp_posts_order_direction'],
-            'post_type'  => 'portfolio',
-        );
-
-        // Load certain taxonomies.
-        if ( isset( $_GET['vp_filter'] ) ) {
-            $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
-            $taxonomies = explode( ':', $taxonomies );
-
-            if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
-                $query_opts['tax_query'] = array(
-                    array(
-                        'taxonomy' => $taxonomies[0],
-                        'field' => 'slug',
-                        'terms' => $taxonomies[1],
-                    ),
-                );
-            }
-        }
-
-        // Post based.
-        if ( 'post-based' === $options['vp_content_source'] ) {
-            // Exclude IDs.
-            if ( ! empty( $options['vp_posts_excluded_ids'] ) ) {
-                $query_opts['post__not_in'] = $options['vp_posts_excluded_ids'];
-            }
-
-            // Order By.
-            switch ( $options['vp_posts_order_by'] ) {
-                case 'title':
-                    $query_opts['orderby'] = 'title';
-                    break;
-
-                case 'id':
-                    $query_opts['orderby'] = 'ID';
-                    break;
-
-                case 'post__in':
-                    $query_opts['orderby'] = 'post__in';
-                    break;
-
-                default:
-                    $query_opts['orderby'] = 'post_date';
-                    break;
-            }
-
-            if ( 'ids' === $options['vp_posts_source'] ) { // IDs.
-                $query_opts['post_type'] = 'any';
-                $query_opts['post__not_in'] = array();
-
-                if ( ! empty( $options['vp_posts_ids'] ) ) {
-                    $query_opts['post__in'] = $options['vp_posts_ids'];
-                }
-            } elseif ( 'custom_query' === $options['vp_posts_source'] ) { // Custom Query.
-                $query_opts['post_type'] = 'any';
-
-                $tmp_arr = array();
-                parse_str( html_entity_decode( $options['vp_posts_custom_query'] ), $tmp_arr );
-                $query_opts = array_merge( $query_opts, $tmp_arr );
-            } else {
-                $query_opts['post_type'] = $options['vp_posts_source'];
-
-                // Taxonomies.
-                if ( ! empty( $options['vp_posts_taxonomies'] ) ) {
-                    $terms_list = get_terms(
-                        get_object_taxonomies(
-                            get_post_types(
-                                array(
-                                    'public' => false,
-                                    'name'   => 'attachment',
-                                ), 'names', 'NOT'
-                            )
-                        )
-                    );
-
-                    $query_opts['tax_query'] = array(
-                        'relation' => $options['vp_posts_taxonomies_relation'],
-                    );
-                    foreach ( $options['vp_posts_taxonomies'] as $taxonomy ) {
-                        $taxonomy_name = null;
-
-                        foreach ( $terms_list as $term ) {
-                            if ( $term->term_id == $taxonomy ) {
-                                $taxonomy_name = $term->taxonomy;
-                                continue;
-                            }
-                        }
-
-                        if ( $taxonomy_name ) {
-                            $query_opts['tax_query'][] = array(
-                                'taxonomy' => $taxonomy_name,
-                                'field'    => 'id',
-                                'terms'    => $taxonomy,
-                            );
-                        }
-                    }
-                }
-            } // End if().
-        } // End if().
+        // Get query params.
+        $query_opts = self::get_query_params( $options );
 
         $no_image = Visual_Portfolio_Settings::get_option( 'no_image', 'vp_general', false );
 
@@ -452,11 +342,7 @@ class Visual_Portfolio_Get {
             }
         }
 
-        ?>
-        <div class="vp-portfolio__filter-wrap">
-            <?php self::filter( $query_opts, $options ); ?>
-        </div>
-        <?php
+        self::filter( $query_opts, $options );
 
         // Insert styles.
         switch ( $options['vp_items_style'] ) {
@@ -675,9 +561,7 @@ class Visual_Portfolio_Get {
             </div>
         </div>
 
-        <div class="vp-portfolio__pagination-wrap">
-            <?php self::pagination( $portfolio_query, $options ); ?>
-        </div>
+        <?php self::pagination( $portfolio_query, $options ); ?>
 
         </div>
 
@@ -700,6 +584,54 @@ class Visual_Portfolio_Get {
     }
 
     /**
+     * ID of the current printed single filter
+     *
+     * @var int
+     */
+    static private $filter_id = 0;
+
+    /**
+     * Print portfolio filter by post ID or options
+     *
+     * @param array $atts options for portfolio list to print.
+     *
+     * @return string
+     */
+    public static function get_filter( $atts = array() ) {
+        $options = self::get_options( $atts['id'] );
+
+        $options = array_merge( $options, array(
+            'vp_filter' => true,
+            'vp_filter_align' => $atts['align'],
+            'vp_filter_show_count' => 'true' === $atts['show_count'],
+        ) );
+
+        $query_opts = self::get_query_params( $options );
+
+        // generate unique ID.
+        $uid = ++self::$filter_id;
+        $uid = hash( 'crc32b', $uid . $atts['id'] );
+
+        $class = 'vp-single-filter vp-filter-uid-' . $uid . ' vp-id-' . $atts['id'];
+
+        // Add custom class.
+        if ( isset( $atts['class'] ) ) {
+            $class .= ' ' . $atts['class'];
+        }
+
+        ob_start();
+        ?>
+        <div class="<?php echo esc_attr( $class ); ?>">
+            <?php self::filter( $query_opts, $options ); ?>
+        </div>
+        <?php
+
+        $return = ob_get_contents();
+        ob_end_clean();
+        return $return;
+    }
+
+    /**
      * Get current page number
      * /page/2/
      * ?page=2
@@ -709,6 +641,127 @@ class Visual_Portfolio_Get {
     private static function get_current_page_number() {
         $page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
         return $page;
+    }
+
+    /**
+     * Get query params array.
+     *
+     * @param array $options portfolio options.
+     *
+     * @return array
+     */
+    private static function get_query_params( $options ) {
+        $paged = 0;
+        if ( $options['vp_pagination'] ) {
+            $paged = self::get_current_page_number();
+        }
+
+        $query_opts = array(
+            'showposts'  => intval( $options['vp_items_count'] ),
+            'posts_per_page' => intval( $options['vp_items_count'] ),
+            'paged'      => $paged,
+            'orderby'    => 'post_date',
+            'order'      => $options['vp_posts_order_direction'],
+            'post_type'  => 'portfolio',
+        );
+
+        // Load certain taxonomies.
+        if ( isset( $_GET['vp_filter'] ) ) {
+            $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
+            $taxonomies = explode( ':', $taxonomies );
+
+            if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
+                $query_opts['tax_query'] = array(
+                    array(
+                        'taxonomy' => $taxonomies[0],
+                        'field' => 'slug',
+                        'terms' => $taxonomies[1],
+                    ),
+                );
+            }
+        }
+
+        // Post based.
+        if ( 'post-based' === $options['vp_content_source'] ) {
+            // Exclude IDs.
+            if ( ! empty( $options['vp_posts_excluded_ids'] ) ) {
+                $query_opts['post__not_in'] = $options['vp_posts_excluded_ids'];
+            }
+
+            // Order By.
+            switch ( $options['vp_posts_order_by'] ) {
+                case 'title':
+                    $query_opts['orderby'] = 'title';
+                    break;
+
+                case 'id':
+                    $query_opts['orderby'] = 'ID';
+                    break;
+
+                case 'post__in':
+                    $query_opts['orderby'] = 'post__in';
+                    break;
+
+                default:
+                    $query_opts['orderby'] = 'post_date';
+                    break;
+            }
+
+            if ( 'ids' === $options['vp_posts_source'] ) { // IDs.
+                $query_opts['post_type'] = 'any';
+                $query_opts['post__not_in'] = array();
+
+                if ( ! empty( $options['vp_posts_ids'] ) ) {
+                    $query_opts['post__in'] = $options['vp_posts_ids'];
+                }
+            } elseif ( 'custom_query' === $options['vp_posts_source'] ) { // Custom Query.
+                $query_opts['post_type'] = 'any';
+
+                $tmp_arr = array();
+                parse_str( html_entity_decode( $options['vp_posts_custom_query'] ), $tmp_arr );
+                $query_opts = array_merge( $query_opts, $tmp_arr );
+            } else {
+                $query_opts['post_type'] = $options['vp_posts_source'];
+
+                // Taxonomies.
+                if ( ! empty( $options['vp_posts_taxonomies'] ) ) {
+                    $terms_list = get_terms(
+                        get_object_taxonomies(
+                            get_post_types(
+                                array(
+                                    'public' => false,
+                                    'name'   => 'attachment',
+                                ), 'names', 'NOT'
+                            )
+                        )
+                    );
+
+                    $query_opts['tax_query'] = array(
+                        'relation' => $options['vp_posts_taxonomies_relation'],
+                    );
+                    foreach ( $options['vp_posts_taxonomies'] as $taxonomy ) {
+                        $taxonomy_name = null;
+
+                        foreach ( $terms_list as $term ) {
+                            if ( $term->term_id == $taxonomy ) {
+                                $taxonomy_name = $term->taxonomy;
+                                continue;
+                            }
+                        }
+
+                        if ( $taxonomy_name ) {
+                            $query_opts['tax_query'][] = array(
+                                'taxonomy' => $taxonomy_name,
+                                'field'    => 'id',
+                                'terms'    => $taxonomy,
+                            );
+                        }
+                    }
+                }
+            } // End if().
+        } // End if().
+
+        return $query_opts;
     }
 
     /**
@@ -831,12 +884,20 @@ class Visual_Portfolio_Get {
             $args['class'] .= ' vp-filter__align-' . $vp_options['vp_filter_align'];
         }
 
+        ?>
+        <div class="vp-portfolio__filter-wrap">
+        <?php
+
         switch ( $vp_options['vp_filter'] ) {
             default:
                 visual_portfolio()->include_template( 'items-list/filter/filter', $args );
                 visual_portfolio()->include_template_style( 'visual-portfolio-filter-default', 'items-list/filter/style' );
                 break;
         }
+
+        ?>
+        </div>
+        <?php
     }
 
     /**
@@ -871,6 +932,10 @@ class Visual_Portfolio_Get {
         if ( $vp_options['vp_pagination_align'] ) {
             $args['class'] .= ' vp-pagination__align-' . $vp_options['vp_pagination_align'];
         }
+
+        ?>
+        <div class="vp-portfolio__pagination-wrap">
+        <?php
 
         switch ( $vp_options['vp_pagination'] ) {
             case 'infinite':
@@ -943,14 +1008,18 @@ class Visual_Portfolio_Get {
                     }
                 }
 
-                if ( empty( $filtered_links ) ) {
-                    return;
+                if ( ! empty( $filtered_links ) ) {
+                    $args['items'] = $filtered_links;
+                    visual_portfolio()->include_template( 'items-list/pagination/paged', $args );
                 }
 
-                $args['items'] = $filtered_links;
-                visual_portfolio()->include_template( 'items-list/pagination/paged', $args );
                 break;
         }
+
+        ?>
+        </div>
+        <?php
+
         visual_portfolio()->include_template_style( 'visual-portfolio-pagination-default', 'items-list/pagination/style' );
     }
 

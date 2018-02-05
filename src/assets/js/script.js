@@ -32,21 +32,29 @@
             var self = this;
 
             self.$item = $item;
-            self.$items_wrap = $item.find('.vp-portfolio__items');
-            self.$pagination = $item.find('.vp-portfolio__pagination-wrap');
-            self.$filter = $item.find('.vp-portfolio__filter-wrap');
 
             // get id from class
             var classes = $item[0].className.split(/\s+/);
             for (var k = 0; k < classes.length; k++) {
                 if (classes[k] && /^vp-uid-/.test(classes[k])) {
                     self.uid = classes[k].replace(/^vp-uid-/, '');
-                    break;
+                }
+                if (classes[k] && /^vp-id-/.test(classes[k])) {
+                    self.id = classes[k].replace(/^vp-id-/, '');
                 }
             }
             if (!self.uid) {
                 console.error(VPData.__.couldnt_retrieve_vp);
                 return;
+            }
+
+            self.$items_wrap = $item.find('.vp-portfolio__items');
+            self.$pagination = $item.find('.vp-portfolio__pagination-wrap');
+            self.$filter = $item.find('.vp-portfolio__filter-wrap');
+
+            // find single filter block.
+            if ( self.id ) {
+                self.$filter = self.$filter.add('.vp-single-filter.vp-id-' + self.id + ' .vp-portfolio__filter-wrap');
             }
 
             // user options
@@ -102,6 +110,10 @@
         self.$items_wrap.imagesLoaded(function() {
             self.$item.addClass('vp-portfolio__ready');
 
+            if ( self.id ) {
+                $('.vp-single-filter.vp-id-' + self.id).addClass('vp-single-filter__ready');
+            }
+
             // isotope
             self.initIsotope();
 
@@ -124,6 +136,10 @@
 
         // remove loaded class
         self.$item.removeClass('vp-portfolio__ready');
+
+        if ( self.id ) {
+            $('.vp-single-filter.vp-id-' + self.id).removeClass('vp-single-filter__ready');
+        }
 
         // destroy events
         self.destroyEvents();
@@ -436,7 +452,7 @@
         }
 
         // on filter click
-        self.$item.on('click' + evp, '.vp-filter .vp-filter__item a', function (e) {
+        self.$filter.on('click' + evp, '.vp-filter .vp-filter__item a', function (e) {
             e.preventDefault();
             var $this = $(this);
             if ( ! self.loading ) {
@@ -496,6 +512,7 @@
 
         // destroy click events
         self.$item.off(evp);
+        self.$filter.off(evp);
 
         // destroy infinite load events
         $wnd.off(evp);
@@ -1187,7 +1204,18 @@
 
                 // update filter
                 if (self.$filter.length) {
-                    self.$filter.html($new_vp.find('.vp-portfolio__filter-wrap').html());
+                    self.$filter.each(function () {
+                        var $filter = $(this);
+                        var newFilterContent = '';
+
+                        if ( $(this).parent().hasClass('vp-single-filter') ) {
+                            newFilterContent = $body.find('[class="' + $filter.attr('class') + '"] .vp-portfolio__filter-wrap').html();
+                        } else {
+                            newFilterContent = $new_vp.find('.vp-portfolio__filter-wrap').html();
+                        }
+
+                        $filter.html(newFilterContent);
+                    });
                 }
 
                 // update pagination

@@ -1118,6 +1118,17 @@ class Visual_Portfolio_Admin {
             ?>
         </div>
         <?php
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Filter Shortcode', NK_VP_DOMAIN ),
+                'description' => esc_html__( 'Place the shortcode where you want to show the filter.', NK_VP_DOMAIN ),
+                'name'  => 'vp_filter_shortcode',
+                'value' => $post->ID ? '[visual_portfolio_filter id="' . $post->ID . '" align="' . esc_attr( $meta['vp_filter_align'] ) . '" show_count="' . esc_attr( $meta['vp_filter_show_count'] ? 'true' : 'false' ) . '" class=""]' : '',
+                'readonly' => true,
+            )
+        );
     }
 
     /**
