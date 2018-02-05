@@ -125,14 +125,19 @@ class Visual_Portfolio {
 
         // template_redirect is used instead of wp_enqueue_scripts just because some plugins use it and included an old isotope plugin. So, it was conflicted.
         add_action( 'template_redirect', array( $this, 'register_scripts' ), 9 );
-        register_deactivation_hook( __FILE__, array( $this, 'rewrite_rules' ) );
-        register_activation_hook( __FILE__, array( $this, 'rewrite_rules' ) );
     }
 
     /**
-     * Rewrite rules for the portfolio custom post type
+     * Activation Hook
      */
-    public function rewrite_rules() {
+    public function activation_hook() {
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Deactivation Hook
+     */
+    public function deactivation_hook() {
         flush_rewrite_rules();
     }
 
@@ -357,3 +362,6 @@ function visual_portfolio() {
     return Visual_Portfolio::instance();
 }
 add_action( 'plugins_loaded', 'visual_portfolio' );
+
+register_deactivation_hook( __FILE__, array( visual_portfolio(), 'activation_hook' ) );
+register_activation_hook( __FILE__, array( visual_portfolio(), 'deactivation_hook' ) );
