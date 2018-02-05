@@ -145,6 +145,10 @@ $grid_sm: 600px;
     &.vp-control-checkbox,
     &.vp-control-toggle {
         flex-wrap: nowrap;
+
+        > label {
+            margin-bottom: 0;
+        }
     }
 
     // textarea
