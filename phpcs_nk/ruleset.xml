@@ -8,12 +8,16 @@
 	<!-- Set a description for this ruleset. -->
 	<description>A custom set of code standard rules to check for WordPress themes.</description>
 
+	<!-- Include sniffs for PHP cross-version compatibility. -->
+	<rule ref="PHPCompatibility"/>
+	<config name="testVersion" value="5.4"/>
+
 	<!-- Pass some flags to PHPCS:
-		 p flag: Show progress of the run.
-		 s flag: Show sniff codes in all reports.
-		 v flag: Print verbose output.
-		 n flag: Do not print warnings.
-	-->
+         p flag: Show progress of the run.
+         s flag: Show sniff codes in all reports.
+         v flag: Print verbose output.
+         n flag: Do not print warnings.
+    -->
 	<arg value="psvn"/>
 
 	<!-- Only check the PHP files. JS files are checked separately with JSCS and JSHint. -->
@@ -21,6 +25,7 @@
 
 	<!-- Check all files in this directory and the directories below it. -->
 	<file>.</file>
+	<exclude-pattern>*/vendors/*</exclude-pattern>
 
 	<!-- Include the WordPress ruleset, with exclusions. -->
 	<rule ref="WordPress">
@@ -31,19 +36,20 @@
 		<exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
 	</rule>
 
-	<!--Disallow tabs -->
+	<!-- Disallow tabs -->
 	<rule ref="Generic.WhiteSpace.DisallowTabIndent"/>
 
-	<!-- Verify that the text_domain is set to the desired text-domain.
-		 Multiple valid text domains can be provided as a comma-delimited list. -->
-	<rule ref="WordPress.WP.I18n">
+	<!-- Verify that no WP functions are used which are deprecated or have been removed.
+         The minimum version set here should be in line with the minimum WP version
+         as set in the "Requires at least" tag in the readme.txt file. -->
+	<rule ref="WordPress.WP.DeprecatedFunctions">
 		<properties>
-			<property name="text_domain" type="array" value="_s" />
+			<property name="minimum_supported_version" value="4.0" />
 		</properties>
 	</rule>
 
-	<!-- Allow for theme specific exceptions to the file name rules based
-		 on the theme hierarchy. -->
+	<!-- Prevent error about filename with Class
+         Disable theme specific exceptions -->
 	<rule ref="WordPress.Files.FileName">
 		<properties>
 			<property name="is_theme" value="false" />
@@ -51,16 +57,16 @@
 		</properties>
 	</rule>
 
-	<!-- Verify that no WP functions are used which are deprecated or have been removed.
-		 The minimum version set here should be in line with the minimum WP version
-		 as set in the "Requires at least" tag in the readme.txt file. -->
-	<rule ref="WordPress.WP.DeprecatedFunctions">
+	<!-- Disable some VIP errors -->
+	<rule ref="WordPress.VIP.RestrictedFunctions">
 		<properties>
-			<property name="minimum_supported_version" value="4.0" />
+			<property name="exclude" value="user_meta, custom_role, term_exists, get_term_by" />
+		</properties>
+	</rule>
+	<rule ref="WordPress.VIP.SessionFunctionsUsage">
+		<properties>
+			<property name="exclude" value="session" />
 		</properties>
 	</rule>
 
-	<!-- Include sniffs for PHP cross-version compatibility. -->
-	<config name="testVersion" value="5.4"/>
-	<rule ref="PHPCompatibility"/>
 </ruleset>

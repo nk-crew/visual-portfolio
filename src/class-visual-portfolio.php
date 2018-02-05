@@ -176,13 +176,13 @@ class Visual_Portfolio {
                 'pswp_share_pin' => esc_attr( 'Pin it', NK_VP_DOMAIN ),
             ),
             'settings_popup_gallery' => array(
-                'show_arrows' => Visual_Portfolio_Settings::get_option( 'show_arrows','vp_popup_gallery', true ),
-                'show_caption' => Visual_Portfolio_Settings::get_option( 'show_caption','vp_popup_gallery', true ),
-                'show_counter' => Visual_Portfolio_Settings::get_option( 'show_counter','vp_popup_gallery', true ),
-                'show_zoom_button' => Visual_Portfolio_Settings::get_option( 'show_zoom_button','vp_popup_gallery', true ),
-                'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button','vp_popup_gallery', true ),
-                'show_share_button' => Visual_Portfolio_Settings::get_option( 'show_share_button','vp_popup_gallery', true ),
-                'show_close_button' => Visual_Portfolio_Settings::get_option( 'show_close_button','vp_popup_gallery', true ),
+                'show_arrows' => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
+                'show_caption' => Visual_Portfolio_Settings::get_option( 'show_caption', 'vp_popup_gallery', true ),
+                'show_counter' => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
+                'show_zoom_button' => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
+                'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery', true ),
+                'show_share_button' => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery', true ),
+                'show_close_button' => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
             ),
         );
         wp_localize_script( 'visual-portfolio', 'VPData', $data_init );
@@ -251,6 +251,7 @@ class Visual_Portfolio {
      */
     public function include_template( $template_name, $args = array() ) {
         if ( ! empty( $args ) && is_array( $args ) ) {
+            // @codingStandardsIgnoreLine
             extract( $args );
         }
 
@@ -319,10 +320,10 @@ class Visual_Portfolio {
 
         // If height is not given, but the width is, use 1080p aspect ratio. And vice versa.
         if ( $width && ! $height ) {
-            $args['height'] = $width * (1080 / 1920);
+            $args['height'] = $width * ( 1080 / 1920 );
         }
         if ( ! $width && $height ) {
-            $args['width'] = $height * (1920 / 1080);
+            $args['width'] = $height * ( 1920 / 1080 );
         }
 
         $oembed = _wp_oembed_get_object();

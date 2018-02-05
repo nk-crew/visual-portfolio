@@ -1,13 +1,16 @@
 <?php
+/**
+ * Extend TinyMCE toolbar
+ *
+ * @package visual-portfolio/tinymce
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 /**
- * Extend TinyMCE toolbar
- *
- * @package visual-portfolio/tinymce
+ * Class Visual_Portfolio_TinyMCE
  */
 class Visual_Portfolio_TinyMCE {
     /**
@@ -47,12 +50,15 @@ class Visual_Portfolio_TinyMCE {
 
             // get all visual-portfolio post types.
             // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
-            $vp_query = get_posts(array(
-                'post_type'      => 'vp_lists',
-                'posts_per_page' => -1,
-                'showposts'      => -1,
-                'paged'          => -1,
-            ));
+            $vp_query = get_posts(
+                array(
+                    'post_type'      => 'vp_lists',
+                    // @codingStandardsIgnoreLine
+                    'posts_per_page' => -1,
+                    'showposts'      => -1,
+                    'paged'          => -1,
+                )
+            );
             foreach ( $vp_query as $post ) {
                 $data_tiny_mce[] = array(
                     'id'    => $post->ID,

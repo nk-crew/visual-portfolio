@@ -4,25 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "97d8eecd84aa743c1baf54000a4d5e71",
+    "content-hash": "9d405b85b68e6cb91143129e275effbe",
     "packages": [],
     "packages-dev": [
         {
             "name": "brainmaestro/composer-git-hooks",
-            "version": "v2.4.0",
+            "version": "v2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BrainMaestro/composer-git-hooks.git",
-                "reference": "cb8f4c70238cd06e20e2a5dc83cf721bc6f525c4"
+                "reference": "e4b55a716a95777164912d5bfac5f4cdd54c2277"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BrainMaestro/composer-git-hooks/zipball/cb8f4c70238cd06e20e2a5dc83cf721bc6f525c4",
-                "reference": "cb8f4c70238cd06e20e2a5dc83cf721bc6f525c4",
+                "url": "https://api.github.com/repos/BrainMaestro/composer-git-hooks/zipball/e4b55a716a95777164912d5bfac5f4cdd54c2277",
+                "reference": "e4b55a716a95777164912d5bfac5f4cdd54c2277",
                 "shasum": ""
             },
             "require": {
-                "symfony/console": "^3.2"
+                "symfony/console": "^3.2 || ^4.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^5.7"
@@ -52,67 +52,20 @@
                 "composer",
                 "git"
             ],
-            "time": "2017-10-20T16:03:09+00:00"
-        },
-        {
-            "name": "psr/log",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/log.git",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Log\\": "Psr/Log/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for logging libraries",
-            "homepage": "https://github.com/php-fig/log",
-            "keywords": [
-                "log",
-                "psr",
-                "psr-3"
-            ],
-            "time": "2016-10-10T12:19:37+00:00"
+            "time": "2018-01-29T09:32:05+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.1.1",
+            "version": "3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "d667e245d5dcd4d7bf80f26f2c947d476b66213e"
+                "reference": "d7c00c3000ac0ce79c96fcbfef86b49a71158cd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/d667e245d5dcd4d7bf80f26f2c947d476b66213e",
-                "reference": "d667e245d5dcd4d7bf80f26f2c947d476b66213e",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/d7c00c3000ac0ce79c96fcbfef86b49a71158cd1",
+                "reference": "d7c00c3000ac0ce79c96fcbfef86b49a71158cd1",
                 "shasum": ""
             },
             "require": {
@@ -150,25 +103,24 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2017-10-16T22:40:25+00:00"
+            "time": "2017-12-19T21:44:46+00:00"
         },
         {
             "name": "symfony/console",
-            "version": "v3.4.1",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "2cdef78de8f54f68ff16a857e710e7302b47d4c7"
+                "reference": "36d5b41e7d4e1ccf0370f6babe966c08ef0a1488"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/2cdef78de8f54f68ff16a857e710e7302b47d4c7",
-                "reference": "2cdef78de8f54f68ff16a857e710e7302b47d4c7",
+                "url": "https://api.github.com/repos/symfony/console/zipball/36d5b41e7d4e1ccf0370f6babe966c08ef0a1488",
+                "reference": "36d5b41e7d4e1ccf0370f6babe966c08ef0a1488",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.5.9|>=7.0.8",
-                "symfony/debug": "~2.8|~3.0|~4.0",
+                "php": "^7.1.3",
                 "symfony/polyfill-mbstring": "~1.0"
             },
             "conflict": {
@@ -177,11 +129,11 @@
             },
             "require-dev": {
                 "psr/log": "~1.0",
-                "symfony/config": "~3.3|~4.0",
+                "symfony/config": "~3.4|~4.0",
                 "symfony/dependency-injection": "~3.4|~4.0",
-                "symfony/event-dispatcher": "~2.8|~3.0|~4.0",
+                "symfony/event-dispatcher": "~3.4|~4.0",
                 "symfony/lock": "~3.4|~4.0",
-                "symfony/process": "~3.3|~4.0"
+                "symfony/process": "~3.4|~4.0"
             },
             "suggest": {
                 "psr/log": "For using the console logger",
@@ -192,7 +144,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.4-dev"
+                    "dev-master": "4.0-dev"
                 }
             },
             "autoload": {
@@ -219,76 +171,20 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-12-02T18:20:11+00:00"
-        },
-        {
-            "name": "symfony/debug",
-            "version": "v4.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/debug.git",
-                "reference": "26a15dab86c3820473716be4f846eac774ad4ad9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/debug/zipball/26a15dab86c3820473716be4f846eac774ad4ad9",
-                "reference": "26a15dab86c3820473716be4f846eac774ad4ad9",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1.3",
-                "psr/log": "~1.0"
-            },
-            "conflict": {
-                "symfony/http-kernel": "<3.4"
-            },
-            "require-dev": {
-                "symfony/http-kernel": "~3.4|~4.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Debug\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Debug Component",
-            "homepage": "https://symfony.com",
-            "time": "2017-11-21T09:27:49+00:00"
+            "time": "2018-01-29T09:06:29+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.6.0",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296"
+                "reference": "78be803ce01e55d3491c1397cf1c64beb9c1b63b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
-                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/78be803ce01e55d3491c1397cf1c64beb9c1b63b",
+                "reference": "78be803ce01e55d3491c1397cf1c64beb9c1b63b",
                 "shasum": ""
             },
             "require": {
@@ -300,7 +196,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.6-dev"
+                    "dev-master": "1.7-dev"
                 }
             },
             "autoload": {
@@ -334,7 +230,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2017-10-11T12:05:26+00:00"
+            "time": "2018-01-30T19:27:44+00:00"
         },
         {
             "name": "wimg/php-compatibility",
@@ -342,12 +238,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wimg/PHPCompatibility.git",
-                "reference": "514be0f250b2f4d1a18dbbd12e4063810ba22eec"
+                "reference": "f0792c10e5ee37cdae7edc28f3984436deb9a1d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wimg/PHPCompatibility/zipball/514be0f250b2f4d1a18dbbd12e4063810ba22eec",
-                "reference": "514be0f250b2f4d1a18dbbd12e4063810ba22eec",
+                "url": "https://api.github.com/repos/wimg/PHPCompatibility/zipball/f0792c10e5ee37cdae7edc28f3984436deb9a1d3",
+                "reference": "f0792c10e5ee37cdae7edc28f3984436deb9a1d3",
                 "shasum": ""
             },
             "require": {
@@ -361,7 +257,7 @@
                 "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0"
             },
             "suggest": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1"
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3"
             },
             "type": "phpcodesniffer-standard",
             "autoload": {
@@ -371,7 +267,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-3.0"
+                "LGPL-3.0-or-later"
             ],
             "authors": [
                 {
@@ -386,7 +282,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2017-12-02T01:33:23+00:00"
+            "time": "2018-02-01T17:09:26+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",

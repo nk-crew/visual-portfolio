@@ -1,13 +1,16 @@
 <?php
+/**
+ * Get portfolio list
+ *
+ * @package visual-portfolio/get
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 /**
- * Get portfolio list
- *
- * @package visual-portfolio/get
+ * Class Visual_Portfolio_Get
  */
 class Visual_Portfolio_Get {
     /**
@@ -15,7 +18,7 @@ class Visual_Portfolio_Get {
      *
      * @return array
      */
-    static private function get_defaults() {
+    private static function get_defaults() {
         return array(
             // tiles, masonry.
             'vp_layout'             => 'tiles',
@@ -157,7 +160,7 @@ class Visual_Portfolio_Get {
      * @param int|array $options_or_id options for portfolio list to print.
      * @return array
      */
-    static public function get_options( $options_or_id = array() ) {
+    public static function get_options( $options_or_id = array() ) {
         // get meta from the post.
         if ( ! is_array( $options_or_id ) ) {
             $id = $options_or_id;
@@ -191,12 +194,12 @@ class Visual_Portfolio_Get {
      *
      * @var bool
      */
-    static private $scripts_enqueued = false;
+    private static $scripts_enqueued = false;
 
     /**
      * Enqueue scripts and styles for portfolio.
      */
-    static public function enqueue_scripts() {
+    public static function enqueue_scripts() {
         if ( self::$scripts_enqueued ) {
             return;
         }
@@ -220,7 +223,7 @@ class Visual_Portfolio_Get {
      *
      * @return string
      */
-    static public function get( $atts = array() ) {
+    public static function get( $atts = array() ) {
         if ( ! is_array( $atts ) || ! isset( $atts['id'] ) ) {
             return '';
         }
@@ -330,10 +333,16 @@ class Visual_Portfolio_Get {
 
                 // Taxonomies.
                 if ( ! empty( $options['vp_posts_taxonomies'] ) ) {
-                    $terms_list = get_terms( get_object_taxonomies( get_post_types( array(
-                        'public' => false,
-                        'name'   => 'attachment',
-                    ), 'names', 'NOT' ) ) );
+                    $terms_list = get_terms(
+                        get_object_taxonomies(
+                            get_post_types(
+                                array(
+                                    'public' => false,
+                                    'name'   => 'attachment',
+                                ), 'names', 'NOT'
+                            )
+                        )
+                    );
 
                     $query_opts['tax_query'] = array(
                         'relation' => $options['vp_posts_taxonomies_relation'],
@@ -360,7 +369,7 @@ class Visual_Portfolio_Get {
             } // End if().
         } // End if().
 
-        $no_image = Visual_Portfolio_Settings::get_option( 'no_image','vp_general', false );
+        $no_image = Visual_Portfolio_Settings::get_option( 'no_image', 'vp_general', false );
 
         // prepare image sizes.
         // TODO: Option to set custom image sizes.
@@ -397,7 +406,7 @@ class Visual_Portfolio_Get {
         $portfolio_query = new WP_Query( $query_opts );
 
         $start_page = self::get_current_page_number();
-        $max_pages = (int) ($portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages);
+        $max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
         $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
 
         // No items found.
@@ -488,9 +497,11 @@ class Visual_Portfolio_Get {
 
                                     // add in categories array.
                                     $unique_name  = $cat_item->taxonomy . ':' . $cat_item->slug;
-                                    $url          = self::get_nopaging_url( false, array(
-                                        'vp_filter' => urlencode( $unique_name ),
-                                    ) );
+                                    $url          = self::get_nopaging_url(
+                                        false, array(
+                                            'vp_filter' => urlencode( $unique_name ),
+                                        )
+                                    );
                                     $categories[] = array(
                                         'slug'        => $cat_item->slug,
                                         'label'       => $cat_item->name,
@@ -665,7 +676,7 @@ class Visual_Portfolio_Get {
         if ( $options['vp_custom_css'] ) {
             $custom_css_handle = 'vp-custom-css-' . $atts['id'];
             $css = wp_kses( $options['vp_custom_css'], array( '\'', '\"' ) );
-            $css = str_replace( '&gt;' , '>' , $css );
+            $css = str_replace( '&gt;', '>', $css );
 
             wp_register_style( $custom_css_handle, false );
             wp_enqueue_style( $custom_css_handle );
@@ -684,7 +695,7 @@ class Visual_Portfolio_Get {
      *
      * @return int
      */
-    static private function get_current_page_number() {
+    private static function get_current_page_number() {
         $page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
         return $page;
     }
@@ -694,13 +705,15 @@ class Visual_Portfolio_Get {
      *
      * @param string $notice notice string.
      */
-    static private function notice( $notice ) {
+    private static function notice( $notice ) {
         if ( ! $notice ) {
             return;
         }
-        visual_portfolio()->include_template( 'notices/notices', array(
-            'notice' => $notice,
-        ) );
+        visual_portfolio()->include_template(
+            'notices/notices', array(
+                'notice' => $notice,
+            )
+        );
         visual_portfolio()->include_template_style( 'visual-portfolio-notices-default', 'notices/style' );
     }
 
@@ -710,13 +723,14 @@ class Visual_Portfolio_Get {
      * @param array $query_opts query options.
      * @param array $vp_options current vp_list options.
      */
-    static private function filter( $query_opts, $vp_options ) {
+    private static function filter( $query_opts, $vp_options ) {
         if ( empty( $query_opts ) || ! isset( $query_opts ) || ! is_array( $query_opts ) || ! $vp_options['vp_filter'] ) {
             return;
         }
 
         // Get all available categories for current $query_opts.
         $items = array();
+        // @codingStandardsIgnoreLine
         $query_opts['posts_per_page'] = -1;
         $query_opts['showposts'] = -1;
         $query_opts['paged'] = -1;
@@ -755,9 +769,11 @@ class Visual_Portfolio_Get {
                     foreach ( $category as $key => $cat_item ) {
                         $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
 
-                        $url = self::get_nopaging_url( false, array(
-                            'vp_filter' => urlencode( $unique_name ),
-                        ) );
+                        $url = self::get_nopaging_url(
+                            false, array(
+                                'vp_filter' => urlencode( $unique_name ),
+                            )
+                        );
 
                         $items[ $unique_name ] = array(
                             'filter'      => $cat_item->slug,
@@ -767,7 +783,7 @@ class Visual_Portfolio_Get {
                             'taxonomy'    => $cat_item->taxonomy,
                             'active'      => $active_item === $unique_name,
                             'url'         => $url,
-                            'class'       => 'vp-filter__item' . ($active_item === $unique_name ? ' vp-filter__item-active' : ''),
+                            'class'       => 'vp-filter__item' . ( $active_item === $unique_name ? ' vp-filter__item-active' : '' ),
                         );
 
                         if ( $active_item === $unique_name ) {
@@ -780,15 +796,17 @@ class Visual_Portfolio_Get {
         }
 
         // Add 'All' active item.
-        array_unshift($items , array(
-            'filter'      => '*',
-            'label'       => esc_html__( 'All', NK_VP_DOMAIN ),
-            'description' => false,
-            'count'       => false,
-            'active'      => ! $there_is_active,
-            'url'         => remove_query_arg( 'vp_filter', self::get_nopaging_url() ),
-            'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : ''),
-        ));
+        array_unshift(
+            $items, array(
+                'filter'      => '*',
+                'label'       => esc_html__( 'All', NK_VP_DOMAIN ),
+                'description' => false,
+                'count'       => false,
+                'active'      => ! $there_is_active,
+                'url'         => remove_query_arg( 'vp_filter', self::get_nopaging_url() ),
+                'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : '' ),
+            )
+        );
 
         $args = array(
             'class'    => 'vp-filter',
@@ -816,13 +834,13 @@ class Visual_Portfolio_Get {
      * @param object $query wp_query object.
      * @param object $vp_options current vp_list options.
      */
-    static private function pagination( $query = null, $vp_options ) {
+    private static function pagination( $query = null, $vp_options ) {
         if ( null == $query || ! $vp_options['vp_pagination'] ) {
             return;
         }
 
         $start_page = self::get_current_page_number();
-        $max_pages = (int) ($query->max_num_pages < $start_page ? $start_page : $query->max_num_pages);
+        $max_pages = (int) ( $query->max_num_pages < $start_page ? $start_page : $query->max_num_pages );
         $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
 
         $args = array(
@@ -849,17 +867,19 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template( 'items-list/pagination/' . $vp_options['vp_pagination'], $args );
                 break;
             default:
-                $pagination_links = paginate_links( array(
-                    'base' => esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) ),
-                    'format' => '',
-                    'type' => 'array',
-                    'current' => $args['start_page'],
-                    'total' => $args['max_pages'],
-                    'prev_text' => '&lt;',
-                    'next_text' => '&gt;',
-                    'end_size' => 1,
-                    'mid_size' => 2,
-                ) );
+                $pagination_links = paginate_links(
+                    array(
+                        'base' => esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) ),
+                        'format' => '',
+                        'type' => 'array',
+                        'current' => $args['start_page'],
+                        'total' => $args['max_pages'],
+                        'prev_text' => '&lt;',
+                        'next_text' => '&gt;',
+                        'end_size' => 1,
+                        'mid_size' => 2,
+                    )
+                );
 
                 // parse html string and make arrays.
                 $filtered_links = array();
@@ -930,7 +950,7 @@ class Visual_Portfolio_Get {
      * @param array  $query_arg - custom query arg.
      * @return string
      */
-    static private function get_nopaging_url( $current_url = false, $query_arg = array() ) {
+    private static function get_nopaging_url( $current_url = false, $query_arg = array() ) {
 
         // Use current page url.
         if ( ! $current_url ) {
@@ -980,7 +1000,7 @@ class Visual_Portfolio_Get {
      *
      * @return array An array of extracted tags, or an empty array if no matching tags were found.
      */
-    static private function extract_tags( $html, $tag, $selfclosing = null, $return_the_entire_tag = false, $charset = 'ISO-8859-1' ) {
+    private static function extract_tags( $html, $tag, $selfclosing = null, $return_the_entire_tag = false, $charset = 'ISO-8859-1' ) {
 
         if ( is_array( $tag ) ) {
             $tag = implode( '|', $tag );

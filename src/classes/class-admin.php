@@ -1,13 +1,16 @@
 <?php
+/**
+ * Admin
+ *
+ * @package visual-portfolio/admin
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 /**
- * Admin
- *
- * @package visual-portfolio/admin
+ * Class Visual_Portfolio_Admin
  */
 class Visual_Portfolio_Admin {
     /**
@@ -143,7 +146,8 @@ class Visual_Portfolio_Admin {
      */
     public function add_custom_post_type() {
         // portfolio items post type.
-        register_post_type('portfolio',
+        register_post_type(
+            'portfolio',
             array(
                 'labels' => array(
                     'name'                => _x( 'Portfolio Items', 'Post Type General Name', NK_VP_DOMAIN ),
@@ -194,37 +198,42 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
-        register_taxonomy('portfolio_category', 'portfolio', array(
-            'label'         => esc_html__( 'Portfolio Categories', NK_VP_DOMAIN ),
-            'labels'        => array(
-                'menu_name' => esc_html__( 'Categories', NK_VP_DOMAIN ),
-            ),
-            'rewrite'       => array(
-                'slug' => 'portfolio-category',
-            ),
-            'hierarchical'  => true,
-            'publicly_queryable' => false,
-            'show_in_nav_menus' => false,
-            'show_in_rest' => true,
-            'show_admin_column' => true,
-        ));
-        register_taxonomy('portfolio_tag', 'portfolio', array(
-            'label'         => esc_html__( 'Portfolio Tags', NK_VP_DOMAIN ),
-            'labels'        => array(
-                'menu_name' => esc_html__( 'Tags', NK_VP_DOMAIN ),
-            ),
-            'rewrite'       => array(
-                'slug' => 'portfolio-tag',
-            ),
-            'hierarchical'  => false,
-            'publicly_queryable' => false,
-            'show_in_nav_menus' => false,
-            'show_in_rest' => true,
-            'show_admin_column' => true,
-        ));
+        register_taxonomy(
+            'portfolio_category', 'portfolio', array(
+                'label'         => esc_html__( 'Portfolio Categories', NK_VP_DOMAIN ),
+                'labels'        => array(
+                    'menu_name' => esc_html__( 'Categories', NK_VP_DOMAIN ),
+                ),
+                'rewrite'       => array(
+                    'slug' => 'portfolio-category',
+                ),
+                'hierarchical'  => true,
+                'publicly_queryable' => false,
+                'show_in_nav_menus' => false,
+                'show_in_rest' => true,
+                'show_admin_column' => true,
+            )
+        );
+        register_taxonomy(
+            'portfolio_tag', 'portfolio', array(
+                'label'         => esc_html__( 'Portfolio Tags', NK_VP_DOMAIN ),
+                'labels'        => array(
+                    'menu_name' => esc_html__( 'Tags', NK_VP_DOMAIN ),
+                ),
+                'rewrite'       => array(
+                    'slug' => 'portfolio-tag',
+                ),
+                'hierarchical'  => false,
+                'publicly_queryable' => false,
+                'show_in_nav_menus' => false,
+                'show_in_rest' => true,
+                'show_admin_column' => true,
+            )
+        );
 
         // portfolio lists post type.
-        register_post_type('vp_lists',
+        register_post_type(
+            'vp_lists',
             array(
                 'labels' => array(
                     'name'                => _x( 'Portfolio Layouts', 'Post Type General Name', NK_VP_DOMAIN ),
@@ -534,6 +543,7 @@ class Visual_Portfolio_Admin {
             if ( 'edit.php?post_type=portfolio' === $page ) {
                 foreach ( $items as $id => $meta ) {
                     if ( isset( $meta[2] ) && 'edit.php?post_type=vp_lists' === $meta[2] ) {
+                        // @codingStandardsIgnoreLine
                         $submenu[ $page ][6] = $submenu[ $page ][ $id ];
                         unset( $submenu[ $page ][ $id ] );
                         ksort( $submenu[ $page ] );
@@ -1082,17 +1092,21 @@ class Visual_Portfolio_Admin {
         $url = get_site_url();
 
         if ( ! $wp_rewrite->using_permalinks() ) {
-            $url = add_query_arg( array(
-                'vp_preview' => 'vp_preview',
-            ), $url );
+            $url = add_query_arg(
+                array(
+                    'vp_preview' => 'vp_preview',
+                ), $url
+            );
         } else {
             $url .= '/vp_preview';
         }
 
-        $url = add_query_arg( array(
-            'vp_preview_frame' => 'true',
-            'vp_preview_frame_id' => $post->ID,
-        ), $url );
+        $url = add_query_arg(
+            array(
+                'vp_preview_frame' => 'true',
+                'vp_preview_frame_id' => $post->ID,
+            ), $url
+        );
 
         ?>
         <div class="vp_list_preview">
@@ -1110,10 +1124,12 @@ class Visual_Portfolio_Admin {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
 
         // post types list.
-        $post_types = get_post_types( array(
-            'public' => false,
-            'name'   => 'attachment',
-        ), 'names', 'NOT' );
+        $post_types = get_post_types(
+            array(
+                'public' => false,
+                'name'   => 'attachment',
+            ), 'names', 'NOT'
+        );
         $post_types_list = array();
         if ( is_array( $post_types ) && ! empty( $post_types ) ) {
             foreach ( $post_types as $post_type ) {
@@ -1188,10 +1204,12 @@ class Visual_Portfolio_Admin {
                                 <?php
                                 $selected_ids = $meta['vp_posts_ids'];
                                 if ( isset( $selected_ids ) && is_array( $selected_ids ) && count( $selected_ids ) ) {
-                                    $post_query = new WP_Query( array(
-                                        'post_type' => 'any',
-                                        'post__in' => $selected_ids,
-                                    ) );
+                                    $post_query = new WP_Query(
+                                        array(
+                                            'post_type' => 'any',
+                                            'post__in' => $selected_ids,
+                                        )
+                                    );
 
                                     if ( $post_query->have_posts() ) {
                                         while ( $post_query->have_posts() ) {
@@ -1215,10 +1233,12 @@ class Visual_Portfolio_Admin {
                                 <?php
                                 $excluded_ids = $meta['vp_posts_excluded_ids'];
                                 if ( isset( $excluded_ids ) && is_array( $excluded_ids ) && count( $excluded_ids ) ) {
-                                    $post_query = new WP_Query( array(
-                                        'post_type' => 'any',
-                                        'post__in' => $excluded_ids,
-                                    ) );
+                                    $post_query = new WP_Query(
+                                        array(
+                                            'post_type' => 'any',
+                                            'post__in' => $excluded_ids,
+                                        )
+                                    );
 
                                     if ( $post_query->have_posts() ) {
                                         while ( $post_query->have_posts() ) {
@@ -1257,12 +1277,14 @@ class Visual_Portfolio_Admin {
                                 <?php
                                 $selected_tax = $meta['vp_posts_taxonomies'];
                                 if ( isset( $selected_tax ) && is_array( $selected_tax ) && count( $selected_tax ) ) {
-                                    $term_query = new WP_Term_Query( array(
-                                        'include' => $selected_tax,
-                                    ) );
+                                    $term_query = new WP_Term_Query(
+                                        array(
+                                            'include' => $selected_tax,
+                                        )
+                                    );
 
                                     if ( ! empty( $term_query->terms ) ) {
-                                        foreach ( $term_query ->terms as $term ) {
+                                        foreach ( $term_query->terms as $term ) {
                                             ?>
                                             <option value="<?php echo esc_attr( $term->term_id ); ?>" selected><?php echo esc_html( $term->name ); ?></option>
                                             <?php
@@ -1396,11 +1418,13 @@ class Visual_Portfolio_Admin {
 
         $result = array();
 
-        $the_query = new WP_Query( array(
-            's' => sanitize_text_field( wp_unslash( $_GET['q'] ) ),
-            'posts_per_page' => 50,
-            'post_type' => $post_type,
-        ) );
+        $the_query = new WP_Query(
+            array(
+                's' => sanitize_text_field( wp_unslash( $_GET['q'] ) ),
+                'posts_per_page' => 50,
+                'post_type' => $post_type,
+            )
+        );
         if ( $the_query->have_posts() ) {
             while ( $the_query->have_posts() ) {
                 $the_query->the_post();
@@ -1429,10 +1453,12 @@ class Visual_Portfolio_Admin {
         if ( isset( $_GET['post_type'] ) ) {
             $post_type = sanitize_text_field( wp_unslash( $_GET['post_type'] ) );
         } else {
-            $post_type = get_post_types(array(
-                'public' => false,
-                'name' => 'attachment',
-            ), 'names', 'NOT');
+            $post_type = get_post_types(
+                array(
+                    'public' => false,
+                    'name' => 'attachment',
+                ), 'names', 'NOT'
+            );
         }
         $taxonomies_names = get_object_taxonomies( $post_type );
 
@@ -1441,15 +1467,17 @@ class Visual_Portfolio_Admin {
             wp_die();
         }
 
-        $terms = new WP_Term_Query( array(
-            'taxonomy' => $taxonomies_names,
-            'hide_empty' => false,
-            'search' => isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '',
-        ) );
+        $terms = new WP_Term_Query(
+            array(
+                'taxonomy' => $taxonomies_names,
+                'hide_empty' => false,
+                'search' => isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '',
+            )
+        );
 
         $taxonomies_by_type = array();
         if ( ! empty( $terms->terms ) ) {
-            foreach ( $terms ->terms as $term ) {
+            foreach ( $terms->terms as $term ) {
                 if ( ! isset( $taxonomies_by_type[ $term->taxonomy ] ) ) {
                     $taxonomies_by_type[ $term->taxonomy ] = array();
                 }

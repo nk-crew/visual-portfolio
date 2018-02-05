@@ -1,13 +1,16 @@
 <?php
+/**
+ * Register fake page for portfolio preview.
+ *
+ * @package visual-portfolio/preview
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 /**
- * Register fake page for portfolio preview.
- *
- * @package visual-portfolio/preview
+ * Class Visual_Portfolio_Preview
  */
 class Visual_Portfolio_Preview {
 
@@ -16,7 +19,7 @@ class Visual_Portfolio_Preview {
      *
      * @var bool
      */
-    var $preview_enabled = false;
+    public $preview_enabled = false;
 
     /**
      * Visual_Portfolio_Preview constructor.
@@ -99,7 +102,7 @@ class Visual_Portfolio_Preview {
         global $wp_rewrite;
 
         // add rewrite rule that matches /vp_preview .
-        add_rewrite_rule( 'vp_preview/?$','index.php?vp_preview=vp_preview','top' );
+        add_rewrite_rule( 'vp_preview/?$', 'index.php?vp_preview=vp_preview', 'top' );
 
         // add rewrite rule that matches /vp_preview/page/2 .
         add_rewrite_rule( "vp_preview/{$wp_rewrite->pagination_base}/([0-9]{1,})/?$", 'index.php?vp_preview=vp_preview&paged=$matches[1]', 'top' );
@@ -157,7 +160,7 @@ class Visual_Portfolio_Preview {
                         content: none !important;
                     }
                     #wpadminbar {
-                        display: none;
+                        display: none; <?php // @codingStandardsIgnoreLine ?>
                     }
                     #vp_preview {
                         position: relative;
@@ -172,7 +175,10 @@ class Visual_Portfolio_Preview {
 
             <body>
                 <div id="vp_preview">
-                    <?php echo Visual_Portfolio_Get::get( array( 'id' => $id ) ); ?>
+                    <?php
+                        // @codingStandardsIgnoreLine
+                        echo Visual_Portfolio_Get::get( array( 'id' => $id ) );
+                    ?>
                 </div>
 
                 <?php wp_footer(); ?>

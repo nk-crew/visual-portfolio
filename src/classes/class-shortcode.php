@@ -1,13 +1,16 @@
 <?php
+/**
+ * Shortcode
+ *
+ * @package visual-portfolio/shortcode
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 /**
- * Shortcode
- *
- * @package visual-portfolio/shortcode
+ * Class Visual_Portfolio_Shortcode
  */
 class Visual_Portfolio_Shortcode {
     /**
@@ -25,11 +28,13 @@ class Visual_Portfolio_Shortcode {
      * @return string
      */
     public function get_shortcode_out( $atts = array() ) {
-        $atts = shortcode_atts(array(
-            'id'     => '',
-            'class'  => '',
-            'vc_css' => '',
-        ), $atts);
+        $atts = shortcode_atts(
+            array(
+                'id'     => '',
+                'class'  => '',
+                'vc_css' => '',
+            ), $atts
+        );
 
         return Visual_Portfolio_Get::get( $atts );
     }

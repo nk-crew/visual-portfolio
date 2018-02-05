@@ -1,13 +1,13 @@
 {
     "require-dev": {
-        "squizlabs/php_codesniffer": "3.1.x",
+        "squizlabs/php_codesniffer": "3.2.x",
         "wp-coding-standards/wpcs": "^0.14.0",
         "wimg/php-compatibility": "@dev",
-        "brainmaestro/composer-git-hooks": "^2.3"
+        "brainmaestro/composer-git-hooks": "^2.3.1"
     },
     "scripts": {
         "phpcs": "phpcs --standard=phpcs_nk ./src",
-        "phpcbf": "phpcbf --standard=phpcs_nk --no-patch ./src",
+        "phpcbf": "phpcbf --standard=phpcs_nk ./src",
 
         "post-install-cmd": [
             "@configure_phpcs_paths",

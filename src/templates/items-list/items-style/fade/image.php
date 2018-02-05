@@ -19,11 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
         if ( $args['url'] ) {
             ?>
             <a href="<?php echo esc_url( $args['url'] ); ?>">
-                <?php echo $args['image']; ?>
+                <?php echo wp_kses_post( $args['image'] ); ?>
             </a>
             <?php
         } else {
-            echo $args['image'];
+            echo wp_kses_post( $args['image'] );
         }
         ?>
     </div>

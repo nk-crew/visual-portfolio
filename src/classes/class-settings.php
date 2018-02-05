@@ -1,13 +1,15 @@
 <?php
 /**
  * Plugin Settings
+ *
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-require_once( visual_portfolio()->plugin_path . 'classes/class-settings-api.php' );
+require_once( visual_portfolio()->plugin_path . 'vendors/class-settings-api.php' );
 
 /**
  * Visual Portfolio Settings Class
@@ -36,11 +38,11 @@ class Visual_Portfolio_Settings {
      *
      * @return bool|string
      */
-    static public function get_option( $option, $section, $default = '' ) {
+    public static function get_option( $option, $section, $default = '' ) {
         $options = get_option( $section );
 
         if ( isset( $options[ $option ] ) ) {
-            return 'off' === $options[ $option ] ? false : ('on' === $options[ $option ] ? true : $options[ $option ]);
+            return 'off' === $options[ $option ] ? false : ( 'on' === $options[ $option ] ? true : $options[ $option ] );
         }
 
         return $default;
@@ -91,7 +93,7 @@ class Visual_Portfolio_Settings {
      *
      * @return array
      */
-    function get_settings_sections() {
+    public function get_settings_sections() {
         $sections = array(
             array(
                 'id'    => 'vp_general',
@@ -111,7 +113,7 @@ class Visual_Portfolio_Settings {
      *
      * @return array settings fields
      */
-    function get_settings_fields() {
+    public function get_settings_fields() {
         $settings_fields = array(
             'vp_general' => array(
                 array(
@@ -182,7 +184,7 @@ class Visual_Portfolio_Settings {
      *
      * @return void
      */
-    function print_settings_page() {
+    public function print_settings_page() {
         echo '<div class="wrap">';
         echo '<h2>' . esc_html__( 'Visual Portfolio Settings', NK_VP_DOMAIN ) . '</h2>';
 
