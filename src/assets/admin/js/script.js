@@ -104,9 +104,11 @@
     // range slider
     $('.vp-control-range').each(function () {
         var $inputs = $(this).find('input');
+        var $hidden = $inputs.filter('[type="hidden"]');
 
-        $inputs.on('change input', function () {
+        $inputs.on('change input', function (e) {
             $inputs.val( $(this).val() );
+            $hidden.trigger('vp-fake-' + e.type);
         });
     });
 
@@ -152,12 +154,12 @@
 
     // portfolio options changed
     var reloadTimeout;
-    $editForm.on('change input', '[name*="vp_"]', function (e) {
+    $editForm.on('change input vp-fake-change vp-fake-input', '[name*="vp_"]', function (e) {
         var $this = $(this);
         var data = {
             name: $this.attr('name'),
             value: $this.is('[type=checkbox], [type=radio]') ? $this.is(':checked') : $this.val(),
-            reload: 'change' === e.type,
+            reload: 'change' === e.type || 'vp-fake-change' === e.type,
             jQuery: frameJQuery,
             $portfolio: $framePortfolio
         };
