@@ -1208,8 +1208,8 @@
                         var $filter = $(this);
                         var newFilterContent = '';
 
-                        if ( $(this).parent().hasClass('vp-single-filter') ) {
-                            newFilterContent = $body.find('[class="' + $filter.attr('class') + '"] .vp-portfolio__filter-wrap').html();
+                        if ( $filter.parent().hasClass('vp-single-filter') ) {
+                            newFilterContent = $body.find('[class="' + $filter.parent().attr('class').replace( ' vp-single-filter__ready', '' ) + '"] .vp-portfolio__filter-wrap').html();
                         } else {
                             newFilterContent = $new_vp.find('.vp-portfolio__filter-wrap').html();
                         }
