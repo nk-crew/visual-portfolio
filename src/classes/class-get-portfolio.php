@@ -342,7 +342,7 @@ class Visual_Portfolio_Get {
             }
         }
 
-        self::filter( $query_opts, $options );
+        self::filter( $options );
 
         // Insert styles.
         switch ( $options['vp_items_style'] ) {
@@ -606,7 +606,7 @@ class Visual_Portfolio_Get {
             'vp_filter_show_count' => 'true' === $atts['show_count'],
         ) );
 
-        $query_opts = self::get_query_params( $options );
+        $query_opts = self::get_query_params( $options, true );
 
         // generate unique ID.
         $uid = ++self::$filter_id;
@@ -622,7 +622,7 @@ class Visual_Portfolio_Get {
         ob_start();
         ?>
         <div class="<?php echo esc_attr( $class ); ?>">
-            <?php self::filter( $query_opts, $options ); ?>
+            <?php self::filter( $options ); ?>
         </div>
         <?php
 
@@ -647,10 +647,11 @@ class Visual_Portfolio_Get {
      * Get query params array.
      *
      * @param array $options portfolio options.
+     * @param bool  $for_filter prevent retrieving GET variable if used for filter.
      *
      * @return array
      */
-    private static function get_query_params( $options ) {
+    private static function get_query_params( $options, $for_filter = false ) {
         $paged = 0;
         if ( $options['vp_pagination'] ) {
             $paged = self::get_current_page_number();
@@ -666,7 +667,7 @@ class Visual_Portfolio_Get {
         );
 
         // Load certain taxonomies.
-        if ( isset( $_GET['vp_filter'] ) ) {
+        if ( ! $for_filter && isset( $_GET['vp_filter'] ) ) {
             $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
             $taxonomies = explode( ':', $taxonomies );
 
@@ -784,21 +785,20 @@ class Visual_Portfolio_Get {
     /**
      * Print filters
      *
-     * @param array $query_opts query options.
      * @param array $vp_options current vp_list options.
      */
-    private static function filter( $query_opts, $vp_options ) {
-        if ( empty( $query_opts ) || ! isset( $query_opts ) || ! is_array( $query_opts ) || ! $vp_options['vp_filter'] ) {
+    private static function filter( $vp_options ) {
+        if ( ! $vp_options['vp_filter'] ) {
             return;
         }
 
+        $query_opts = self::get_query_params( $vp_options, true );
+
         // Get all available categories for current $query_opts.
-        $items = array();
         // @codingStandardsIgnoreLine
         $query_opts['posts_per_page'] = -1;
         $query_opts['showposts'] = -1;
         $query_opts['paged'] = -1;
-        $query_opts['tax_query'] = array();
 
         // Get active item.
         $active_item = false;
@@ -810,6 +810,8 @@ class Visual_Portfolio_Get {
         /**
          * TODO: make caching using set_transient function. Info here - https://wordpress.stackexchange.com/a/145960
          */
+        $term_ids = array();
+        $term_taxonomies = array();
         $portfolio_query = new WP_Query( $query_opts );
         if ( $portfolio_query->have_posts() ) {
             while ( $portfolio_query->have_posts() ) {
@@ -831,27 +833,11 @@ class Visual_Portfolio_Get {
 
                     // Prepare each terms array.
                     foreach ( $category as $key => $cat_item ) {
-                        $unique_name = $cat_item->taxonomy . ':' . $cat_item->slug;
-
-                        $url = self::get_nopaging_url(
-                            false, array(
-                                'vp_filter' => urlencode( $unique_name ),
-                            )
-                        );
-
-                        $items[ $unique_name ] = array(
-                            'filter'      => $cat_item->slug,
-                            'label'       => $cat_item->name,
-                            'description' => $cat_item->description,
-                            'count'       => $cat_item->count,
-                            'taxonomy'    => $cat_item->taxonomy,
-                            'active'      => $active_item === $unique_name,
-                            'url'         => $url,
-                            'class'       => 'vp-filter__item' . ( $active_item === $unique_name ? ' vp-filter__item-active' : '' ),
-                        );
-
-                        if ( $active_item === $unique_name ) {
-                            $there_is_active = true;
+                        if ( ! in_array( $cat_item->term_id, $term_ids ) ) {
+                            $term_ids[] = $cat_item->term_id;
+                        }
+                        if ( ! in_array( $cat_item->taxonomy, $term_taxonomies ) ) {
+                            $term_taxonomies[] = $cat_item->taxonomy;
                         }
                     }
                 }
@@ -859,9 +845,45 @@ class Visual_Portfolio_Get {
             wp_reset_postdata();
         }
 
+        // Get all available terms and then pick only needed by ID
+        // we need this to support reordering plugins.
+        $all_terms = get_terms( array(
+            'taxonomy' => $term_taxonomies,
+            'hide_empty' => true,
+        ) );
+        $terms = array();
+        if ( isset( $all_terms ) && is_array( $all_terms ) ) {
+            foreach ( $all_terms as $term ) {
+                if ( in_array( $term->term_id, $term_ids ) ) {
+                    $unique_name = $term->taxonomy . ':' . $term->slug;
+
+                    $url = self::get_nopaging_url(
+                        false, array(
+                            'vp_filter' => urlencode( $unique_name ),
+                        )
+                    );
+
+                    $terms[ $unique_name ] = array(
+                        'filter'      => $term->slug,
+                        'label'       => $term->name,
+                        'description' => $term->description,
+                        'count'       => $term->count,
+                        'taxonomy'    => $term->taxonomy,
+                        'active'      => $active_item === $unique_name,
+                        'url'         => $url,
+                        'class'       => 'vp-filter__item' . ( $active_item === $unique_name ? ' vp-filter__item-active' : '' ),
+                    );
+
+                    if ( $active_item === $unique_name ) {
+                        $there_is_active = true;
+                    }
+                }
+            }
+        }
+
         // Add 'All' active item.
         array_unshift(
-            $items, array(
+            $terms, array(
                 'filter'      => '*',
                 'label'       => esc_html__( 'All', NK_VP_DOMAIN ),
                 'description' => false,
@@ -874,7 +896,7 @@ class Visual_Portfolio_Get {
 
         $args = array(
             'class'    => 'vp-filter',
-            'items'    => $items,
+            'items'    => $terms,
             'align'    => $vp_options['vp_filter_align'],
             'show_count' => $vp_options['vp_filter_show_count'],
             'vp_ops'   => $vp_options,
