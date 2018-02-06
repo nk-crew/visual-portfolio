@@ -18,9 +18,6 @@ jQuery(function ($) {
 
             if ($_frame) {
                 var $vp = $_frame(e.view.el).children('.vp-portfolio');
-
-                console.log($vp);
-
                 if ($vp.length && typeof $vp.vp !== 'undefined') {
                     $vp.vp();
                 }
