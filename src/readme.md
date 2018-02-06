@@ -84,6 +84,18 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 == Changelog ==
 
+= 1.3.0 =
+* improved CSS editor (added autocomplete hints; selectors hint; showing errors; preventing save when editor has errors)
+* improved layouts editor interface
+* added shortcode for portfolio filter (you can use filter outside of portfolio wrapper)
+* added possibility to change date format
+* added frontend Visual Composer support
+* added support for post ordering plugins (Intuitive Custom Post Order)
+* fixed popup video jumping
+* fixed some php errors in preview
+* fixed photoswipe duplicates if on the page > 1 visual portfolio with popup gallery
+* fixed permalinks flush on activation and deactivation
+
 = 1.2.1 =
 * fixed video format conflict with theme formats
 * fixed php error about undefined index
