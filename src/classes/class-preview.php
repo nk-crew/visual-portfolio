@@ -141,7 +141,7 @@ class Visual_Portfolio_Preview {
         wp_enqueue_script( 'visual-portfolio-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.js', array( 'jquery' ), '', true );
         ?>
         <!DOCTYPE html>
-        <html <?php language_attributes(); ?>>
+        <html <?php language_attributes(); ?> style="margin-top: 0 !important;">
             <head>
                 <meta name="viewport" content="width=device-width">
 
