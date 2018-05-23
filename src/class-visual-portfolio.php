@@ -278,13 +278,13 @@ class Visual_Portfolio {
     /**
      * Include template style
      *
-     * @param string       $handle style handle name.
-     * @param string       $template_name file name.
-     * @param array|string $dependencies dependencies array.
-     * @param string       $version version string.
-     * @param string       $media media string.
+     * @param string           $handle style handle name.
+     * @param string           $template_name file name.
+     * @param array            $deps dependencies array.
+     * @param string|bool|null $ver version string.
+     * @param string           $media media string.
      */
-    public function include_template_style( $handle, $template_name, $dependencies = '', $version = '', $media = '' ) {
+    public function include_template_style( $handle, $template_name, $deps = array(), $ver = false, $media = 'all' ) {
         if ( file_exists( get_stylesheet_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
             // Child Theme (or just theme).
             $template = trailingslashit( get_stylesheet_directory_uri() ) . '/visual-portfolio/' . $template_name . '.css';
@@ -297,9 +297,9 @@ class Visual_Portfolio {
         }
 
         // Allow 3rd party plugin filter template file from their plugin.
-        $template = apply_filters( 'vp_include_template_style', $template, $template_name, $dependencies, $version, $media );
+        $template = apply_filters( 'vp_include_template_style', $template, $template_name, $deps, $ver, $media );
 
-        wp_enqueue_style( $handle, $template, $dependencies, $version, $media );
+        wp_enqueue_style( $handle, $template, $deps, $ver, $media );
     }
 
     /**
