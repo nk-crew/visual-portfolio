@@ -70,7 +70,9 @@
             var $this = $(this);
             new Tooltip(this, {
                 placement: $this.attr('data-hint-place') || 'top',
-                title: $this.attr('data-hint')
+                title: $this.attr('data-hint'),
+                container: $('body')[0],
+                boundariesElement: 'viewport'
             });
         });
     }
