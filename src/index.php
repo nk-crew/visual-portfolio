@@ -1,3 +1,3 @@
 <?php
-// @codingStandardsIgnoreLine
+// phpcs:ignore
 /** Silence is golden. */

@@ -257,7 +257,7 @@ class Visual_Portfolio {
      */
     public function include_template( $template_name, $args = array() ) {
         if ( ! empty( $args ) && is_array( $args ) ) {
-            // @codingStandardsIgnoreLine
+	        // phpcs:ignore
             extract( $args );
         }
 

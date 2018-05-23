@@ -79,7 +79,7 @@ class Visual_Portfolio_Preview {
      */
     public function filter_preview_option( $val, $name ) {
         if ( $this->preview_enabled ) {
-            // @codingStandardsIgnoreStart
+	        // phpcs:disable
             if ( isset( $_POST[ $name ] ) ) {
                 if ( is_array( $_POST[ $name ] ) ) {
                     $val = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $name ] ) );
@@ -89,7 +89,7 @@ class Visual_Portfolio_Preview {
                     $val = sanitize_text_field( wp_unslash( $_POST[ $name ] ) );
                 }
             }
-            // @codingStandardsIgnoreEnd
+	        // phpcs:enable
         }
 
         return $val;
@@ -160,7 +160,7 @@ class Visual_Portfolio_Preview {
                         content: none !important;
                     }
                     #wpadminbar {
-                        display: none; <?php // @codingStandardsIgnoreLine ?>
+                        display: none; <?php // phpcs:ignore ?>
                     }
                     #vp_preview {
                         position: relative;
@@ -176,7 +176,7 @@ class Visual_Portfolio_Preview {
             <body>
                 <div id="vp_preview">
                     <?php
-                        // @codingStandardsIgnoreLine
+                    // phpcs:ignore
                         echo Visual_Portfolio_Get::get( array( 'id' => $id ) );
                     ?>
                 </div>

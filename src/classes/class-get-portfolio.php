@@ -800,7 +800,7 @@ class Visual_Portfolio_Get {
         $query_opts = self::get_query_params( $vp_options, true );
 
         // Get all available categories for current $query_opts.
-        // @codingStandardsIgnoreLine
+	    // phpcs:ignore
         $query_opts['posts_per_page'] = -1;
         $query_opts['showposts'] = -1;
         $query_opts['paged'] = -1;

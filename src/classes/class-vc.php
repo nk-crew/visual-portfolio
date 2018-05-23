@@ -49,7 +49,7 @@ class Visual_Portfolio_VC {
             $vp_query = get_posts(
                 array(
                     'post_type'       => 'vp_lists',
-                    // @codingStandardsIgnoreLine
+	                // phpcs:ignore
                     'posts_per_page'  => -1,
                     'showposts'       => -1,
                     'paged'           => -1,

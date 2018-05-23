@@ -558,7 +558,7 @@ class Visual_Portfolio_Admin {
             if ( 'edit.php?post_type=portfolio' === $page ) {
                 foreach ( $items as $id => $meta ) {
                     if ( isset( $meta[2] ) && 'edit.php?post_type=vp_lists' === $meta[2] ) {
-                        // @codingStandardsIgnoreLine
+	                    // phpcs:ignore
                         $submenu[ $page ][6] = $submenu[ $page ][ $id ];
                         unset( $submenu[ $page ][ $id ] );
                         ksort( $submenu[ $page ] );
