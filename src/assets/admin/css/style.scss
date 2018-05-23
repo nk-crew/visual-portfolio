@@ -160,6 +160,23 @@ $grid_sm: 600px;
             bottom: auto;
         }
     }
+    #postbox-container-2 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: calc(100% - 300px);
+        min-height: calc(100vh - 32px);
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+
+        @media only screen and (max-width: 850px) {
+            right: 0;
+            bottom: auto;
+            width: 100%;
+        }
+    }
     #poststuff #post-body.columns-2 #side-sortables {
         width: auto;
     }
