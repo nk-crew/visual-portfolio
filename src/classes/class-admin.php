@@ -1487,6 +1487,7 @@ class Visual_Portfolio_Admin {
                                         'post_date' => esc_html__( 'Date', NK_VP_DOMAIN ),
                                         'title' => esc_html__( 'Title', NK_VP_DOMAIN ),
                                         'id' => esc_html__( 'ID', NK_VP_DOMAIN ),
+                                        'rand' => esc_html__( 'Random', NK_VP_DOMAIN ),
                                     ),
                                 )
                             );

@@ -703,6 +703,11 @@ class Visual_Portfolio_Get {
                     $query_opts['orderby'] = 'post__in';
                     break;
 
+                case 'rand':
+                    // phpcs:ignore
+                    $query_opts['orderby'] = 'rand';
+                    break;
+
                 default:
                     $query_opts['orderby'] = 'post_date';
                     break;
