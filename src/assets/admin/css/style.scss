@@ -306,6 +306,8 @@ $grid_sm: 600px;
 
     [type="range"] {
         flex: 1;
+        width: 100%;
+        margin-left: 10px;
         padding: 0;
         -webkit-appearance: none;
         background: transparent;
@@ -320,7 +322,7 @@ $grid_sm: 600px;
             border: 4px solid transparent;
             background-clip: padding-box;
             box-sizing: border-box;
-            margin-top: -7px;
+            margin-top: -7px
         }
 
         &::-moz-range-thumb {
@@ -331,7 +333,7 @@ $grid_sm: 600px;
             background: #555d66;
             border: 4px solid transparent;
             background-clip: padding-box;
-            box-sizing: border-box;
+            box-sizing: border-box
         }
 
         &::-ms-thumb {
@@ -346,29 +348,35 @@ $grid_sm: 600px;
             margin-top: 0;
             height: 14px;
             width: 14px;
-            border: 2px solid transparent;
+            border: 2px solid transparent
         }
 
         &:focus {
-            outline: none;
+            outline: none
         }
 
         &:focus::-webkit-slider-thumb {
-            outline: none;
+            background-color: #fff;
             color: #191e23;
             box-shadow: inset 0 0 0 1px #6c7781,inset 0 0 0 2px #fff;
+            outline: 2px solid transparent;
+            outline-offset: -2px
         }
 
         &:focus::-moz-range-thumb {
-            outline: none;
+            background-color: #fff;
             color: #191e23;
             box-shadow: inset 0 0 0 1px #6c7781,inset 0 0 0 2px #fff;
+            outline: 2px solid transparent;
+            outline-offset: -2px
         }
 
         &:focus::-ms-thumb {
-            outline: none;
+            background-color: #fff;
             color: #191e23;
             box-shadow: inset 0 0 0 1px #6c7781,inset 0 0 0 2px #fff;
+            outline: 2px solid transparent;
+            outline-offset: -2px
         }
 
         &::-webkit-slider-runnable-track {
@@ -376,14 +384,14 @@ $grid_sm: 600px;
             cursor: pointer;
             background: #e2e4e7;
             border-radius: 1.5px;
-            margin-top: -4px;
+            margin-top: -4px
         }
 
         &::-moz-range-track {
             height: 3px;
             cursor: pointer;
             background: #e2e4e7;
-            border-radius: 1.5px;
+            border-radius: 1.5px
         }
 
         &::-ms-track {
@@ -394,7 +402,7 @@ $grid_sm: 600px;
             height: 3px;
             cursor: pointer;
             background: #e2e4e7;
-            border-radius: 1.5px;
+            border-radius: 1.5px
         }
     }
 }
@@ -404,71 +412,94 @@ $grid_sm: 600px;
  * Toggle
  */
 .vp-control-toggle {
+    &, * {
+        box-sizing: border-box;
+    }
+
     .vp-toggle {
         position: relative;
-    }
 
-    .vp-toggle .vp-toggle__track {
-        content: "";
-        display: inline-block;
-        vertical-align: top;
-        box-sizing: border-box;
-        background-color: #fff;
-        border: 2px solid #555d66;
-        width: 32px;
-        height: 18px;
-        border-radius: 9px;
-        transition: background .2s ease;
-    }
+        .vp-toggle__track {
+            content: "";
+            display: inline-block;
+            vertical-align: top;
+            box-sizing: border-box;
+            background-color: #fff;
+            border: 2px solid #6c7781;
+            width: 36px;
+            height: 18px;
+            border-radius: 9px;
+            transition: background .2s ease;
+            
+            &:after {
+                content: '';
+                display: block;
+                position: absolute;
+                top: 50%;
+                right: 5px;
+                width: 3px;
+                height: 3px;
+                margin-top: -3px;
+                border-radius: 3px;
+                border: 1.5px solid #6c7781;
+            }
+        }
 
-    .vp-toggle:hover .vp-toggle__track {
-        background-color: #e2e4e7;
-    }
+        &:hover .vp-toggle__track {
+            background-color: #e2e4e7;
+        }
 
-    [type="checkbox"]:checked ~ .vp-toggle__track {
-        background-color: #33b3db;
-        border: 2px solid #33b3db;
-    }
+        [type="checkbox"]:checked ~ .vp-toggle__track {
+            background-color: #33b3db;
+            border: 2px solid #33b3db;
 
-    .vp-toggle .vp-toggle__thumb {
-        display: block;
-        position: absolute;
-        top: 4px;
-        left: 4px;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        border: 2px solid #555d66;
-        background: #fff;
-        transition: transform .1s ease;
-    }
+            &:after {
+                top: 50%;
+                right: auto;
+                left: 8px;
+                width: 0;
+                height: 5px;
+                margin-top: -3px;
+                border-radius: 0;
+                border: 0;
+                border-right: 2px solid #fff;
+            }
+        }
 
-    [type="checkbox"]:focus ~ .vp-toggle__track {
-        box-shadow: 0 0 0 1px #fff,0 0 0 2px #33b3db,0 0 2px 2px #33b3db;
-    }
+        .vp-toggle__thumb {
+            display: block;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transition: transform .1s ease;
+            background-color: #6c7781;
+            border: 5px solid #6c7781;
+        }
 
-    [type="checkbox"]:checked ~ .vp-toggle__thumb {
-        border: 2px solid #fff;
-        background-color: #00a0d2;
-        transform: translateX(14px);
-    }
+        [type="checkbox"]:focus ~ .vp-toggle__track {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 3px #6c7781;
+        }
 
-    [type="checkbox"]:focus ~ .vp-toggle__thumb {
-        border-width: 5px;
-        width: 0;
-        height: 0;
-    }
+        [type="checkbox"]:checked ~ .vp-toggle__thumb {
+            background-color: #fff;
+            border-width: 0;
+            transform: translateX(18px);
+        }
 
-    [type="checkbox"] {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        margin: 0;
-        padding: 0;
-        z-index: 1;
+        [type="checkbox"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            z-index: 1;
+        }
     }
 }
 
