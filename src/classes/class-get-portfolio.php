@@ -2,7 +2,7 @@
 /**
  * Get portfolio list
  *
- * @package visual-portfolio/get
+ * @package @@plugin_name/get
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -205,8 +205,8 @@ class Visual_Portfolio_Get {
         }
         self::$scripts_enqueued = true;
 
-        wp_enqueue_script( 'visual-portfolio' );
-        wp_enqueue_style( 'visual-portfolio' );
+        wp_enqueue_script( '@@plugin_name' );
+        wp_enqueue_style( '@@plugin_name' );
     }
 
     /**
@@ -302,7 +302,7 @@ class Visual_Portfolio_Get {
         // No items found.
         if ( ! $portfolio_query->have_posts() ) {
             ob_start();
-            self::notice( esc_html__( 'No items found.', NK_VP_DOMAIN ) );
+            self::notice( esc_html__( 'No items found.', '@@text_domain' ) );
             $return = ob_get_contents();
             ob_end_clean();
             return $return;
@@ -349,10 +349,10 @@ class Visual_Portfolio_Get {
             case 'fly':
             case 'emerge':
             case 'fade':
-                visual_portfolio()->include_template_style( 'visual-portfolio-items-style-' . $options['vp_items_style'], 'items-list/items-style/' . $options['vp_items_style'] . '/style' );
+                visual_portfolio()->include_template_style( '@@plugin_name-items-style-' . $options['vp_items_style'], 'items-list/items-style/' . $options['vp_items_style'] . '/style' );
                 break;
             default:
-                visual_portfolio()->include_template_style( 'visual-portfolio-items-style-default', 'items-list/items-style/style' );
+                visual_portfolio()->include_template_style( '@@plugin_name-items-style-default', 'items-list/items-style/style' );
                 break;
         }
         ?>
@@ -428,7 +428,7 @@ class Visual_Portfolio_Get {
                         // prepare date.
                         if ( 'human' === $style_options['show_date'] ) {
                             // translators: %s - published in human format.
-                            $args['published'] = sprintf( esc_html__( '%s ago', NK_VP_DOMAIN ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) );
+                            $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) );
                         } else if ( $style_options['show_date'] ) {
                             $args['published'] = get_the_time( $style_options['date_format'] ? : 'F j, Y' );
                         }
@@ -600,11 +600,13 @@ class Visual_Portfolio_Get {
     public static function get_filter( $atts = array() ) {
         $options = self::get_options( $atts['id'] );
 
-        $options = array_merge( $options, array(
-            'vp_filter' => true,
-            'vp_filter_align' => $atts['align'],
-            'vp_filter_show_count' => 'true' === $atts['show_count'],
-        ) );
+        $options = array_merge(
+            $options, array(
+                'vp_filter' => true,
+                'vp_filter_align' => $atts['align'],
+                'vp_filter_show_count' => 'true' === $atts['show_count'],
+            )
+        );
 
         $query_opts = self::get_query_params( $options, true );
 
@@ -784,7 +786,7 @@ class Visual_Portfolio_Get {
                 'notice' => $notice,
             )
         );
-        visual_portfolio()->include_template_style( 'visual-portfolio-notices-default', 'notices/style' );
+        visual_portfolio()->include_template_style( '@@plugin_name-notices-default', 'notices/style' );
     }
 
     /**
@@ -852,10 +854,12 @@ class Visual_Portfolio_Get {
 
         // Get all available terms and then pick only needed by ID
         // we need this to support reordering plugins.
-        $all_terms = get_terms( array(
-            'taxonomy' => $term_taxonomies,
-            'hide_empty' => true,
-        ) );
+        $all_terms = get_terms(
+            array(
+                'taxonomy' => $term_taxonomies,
+                'hide_empty' => true,
+            )
+        );
         $terms = array();
         if ( isset( $all_terms ) && is_array( $all_terms ) ) {
             foreach ( $all_terms as $term ) {
@@ -890,7 +894,7 @@ class Visual_Portfolio_Get {
         array_unshift(
             $terms, array(
                 'filter'      => '*',
-                'label'       => esc_html__( 'All', NK_VP_DOMAIN ),
+                'label'       => esc_html__( 'All', '@@text_domain' ),
                 'description' => false,
                 'count'       => false,
                 'active'      => ! $there_is_active,
@@ -918,7 +922,7 @@ class Visual_Portfolio_Get {
         switch ( $vp_options['vp_filter'] ) {
             default:
                 visual_portfolio()->include_template( 'items-list/filter/filter', $args );
-                visual_portfolio()->include_template_style( 'visual-portfolio-filter-default', 'items-list/filter/style' );
+                visual_portfolio()->include_template_style( '@@plugin_name-filter-default', 'items-list/filter/style' );
                 break;
         }
 
@@ -1047,7 +1051,7 @@ class Visual_Portfolio_Get {
         </div>
         <?php
 
-        visual_portfolio()->include_template_style( 'visual-portfolio-pagination-default', 'items-list/pagination/style' );
+        visual_portfolio()->include_template_style( '@@plugin_name-pagination-default', 'items-list/pagination/style' );
     }
 
     /**

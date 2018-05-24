@@ -2,7 +2,7 @@
 /**
  * Plugin Settings
  *
- * @package visual-portfolio
+ * @package @@plugin_name
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -80,10 +80,10 @@ class Visual_Portfolio_Settings {
     public function admin_menu() {
         add_submenu_page(
             'edit.php?post_type=portfolio',
-            esc_html__( 'Settings', NK_VP_DOMAIN ),
-            esc_html__( 'Settings', NK_VP_DOMAIN ),
+            esc_html__( 'Settings', '@@text_domain' ),
+            esc_html__( 'Settings', '@@text_domain' ),
             'manage_options',
-            'visual-portfolio-settings',
+            '@@plugin_name-settings',
             array( $this, 'print_settings_page' )
         );
     }
@@ -97,11 +97,11 @@ class Visual_Portfolio_Settings {
         $sections = array(
             array(
                 'id'    => 'vp_general',
-                'title' => esc_html__( 'General', NK_VP_DOMAIN ),
+                'title' => esc_html__( 'General', '@@text_domain' ),
             ),
             array(
                 'id'    => 'vp_popup_gallery',
-                'title' => esc_html__( 'Popup Gallery', NK_VP_DOMAIN ),
+                'title' => esc_html__( 'Popup Gallery', '@@text_domain' ),
             ),
         );
 
@@ -118,58 +118,58 @@ class Visual_Portfolio_Settings {
             'vp_general' => array(
                 array(
                     'name'    => 'no_image',
-                    'label'   => esc_html__( 'No Image', NK_VP_DOMAIN ),
-                    'desc'    => esc_html__( 'This image used if featured image of post is not specified.', NK_VP_DOMAIN ),
+                    'label'   => esc_html__( 'No Image', '@@text_domain' ),
+                    'desc'    => esc_html__( 'This image used if featured image of post is not specified.', '@@text_domain' ),
                     'type'    => 'image',
                     'default' => '',
                     'options' => array(
-                        'button_label' => esc_html__( 'Choose Image', NK_VP_DOMAIN ),
+                        'button_label' => esc_html__( 'Choose Image', '@@text_domain' ),
                     ),
                 ),
             ),
             'vp_popup_gallery' => array(
                 array(
                     'name'    => 'show_arrows',
-                    'label'   => esc_html__( 'Show Arrows', NK_VP_DOMAIN ),
-                    'desc'    => esc_html__( 'Arrows to navigate between images.', NK_VP_DOMAIN ),
+                    'label'   => esc_html__( 'Show Arrows', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Arrows to navigate between images.', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_caption',
-                    'label'   => esc_html__( 'Show Caption', NK_VP_DOMAIN ),
-                    'desc'    => esc_html__( 'Below images will be showed caption with Title and Description.', NK_VP_DOMAIN ),
+                    'label'   => esc_html__( 'Show Caption', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Below images will be showed caption with Title and Description.', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_counter',
-                    'label'   => esc_html__( 'Show Images Counter', NK_VP_DOMAIN ),
-                    'desc'    => esc_html__( 'On the top left corner will be showed images counter.', NK_VP_DOMAIN ),
+                    'label'   => esc_html__( 'Show Images Counter', '@@text_domain' ),
+                    'desc'    => esc_html__( 'On the top left corner will be showed images counter.', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_zoom_button',
-                    'label'   => esc_html__( 'Show Zoom Button', NK_VP_DOMAIN ),
+                    'label'   => esc_html__( 'Show Zoom Button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_fullscreen_button',
-                    'label'   => esc_html__( 'Show Fullscreen Button', NK_VP_DOMAIN ),
+                    'label'   => esc_html__( 'Show Fullscreen Button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_share_button',
-                    'label'   => esc_html__( 'Show Share Button', NK_VP_DOMAIN ),
+                    'label'   => esc_html__( 'Show Share Button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_close_button',
-                    'label'   => esc_html__( 'Show Close Button', NK_VP_DOMAIN ),
+                    'label'   => esc_html__( 'Show Close Button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
@@ -186,7 +186,7 @@ class Visual_Portfolio_Settings {
      */
     public function print_settings_page() {
         echo '<div class="wrap">';
-        echo '<h2>' . esc_html__( 'Visual Portfolio Settings', NK_VP_DOMAIN ) . '</h2>';
+        echo '<h2>' . esc_html__( 'Visual Portfolio Settings', '@@text_domain' ) . '</h2>';
 
         $this->settings_api->show_navigation();
         $this->settings_api->show_forms();

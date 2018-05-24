@@ -1,17 +1,17 @@
 /*!
  * Name    : Visual Portfolio
- * Version : 1.3.0
+ * Version : @@plugin_version
  * Author  : nK https://nkdev.info
  */
 (function ($) {
-    var $portfolio = $('#vp_preview > .vp-portfolio');
-    $portfolio.on('click', '.vp-portfolio__item, .vp-portfolio__item a', function (e) {
+    const $portfolio = $('#vp_preview > .vp-portfolio');
+    $portfolio.on('click', '.vp-portfolio__item, .vp-portfolio__item a', (e) => {
         e.preventDefault();
         e.stopPropagation();
     });
     window.iFrameResizer = {
-        heightCalculationMethod: function () {
+        heightCalculationMethod() {
             return $portfolio.outerHeight(true);
-        }
+        },
     };
 }(jQuery));

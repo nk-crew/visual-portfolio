@@ -1,11 +1,34 @@
-# Getting Started
+## Requirements
 
-We use [`phpcs` (PHP_CodeSniffer)](https://github.com/squizlabs/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project. This ensures that we are consistent with WordPress PHP coding standards.
+| Prerequisite              | How to check  | How to install                                  |
+| ------------------------- | ------------- | ----------------------------------------------- |
+| PHP >= 5.5.9              | `php -v`      | [php.net](https://php.net/manual/en/install.php) |
+| Node.js >= 6.x.x          | `node -v`     | [nodejs.org](https://nodejs.org/)                |
+| Composer >= 1.0.0	        | `composer -V` | [getcomposer.org](https://getcomposer.org)       |
 
-When making any changes to the PHP code in this project, it's recommended to install and run `phpcs` on your computer. This is a step in our Travis CI build as well, but it is better to catch errors locally.
+## Installation
 
-- Install [Composer](https://getcomposer.org/download/) on your computer
-- Run `composer install` in the command line. Or if you need to update some dependencies, run `composer update --lock`
-- Run `composer phpcs` to show all errors
-- Run `composer phpcbf` to fix all errors
-- How to set up it in PhpStorm [see here](https://confluence.jetbrains.com/display/PhpStorm/PHP+Code+Sniffer+in+PhpStorm#PHPCodeSnifferinPhpStorm-1.EnablePHPCodeSnifferintegrationinPhpStorm)
+- Run `npm install` in the command line. Or if you need to update some dependencies, run `npm update`
+
+## Building
+
+- `npm run build` to run build
+- `npm run watch` to run build and start files watcher
+- `npm run production` to run build and prepare zip files for production
+
+## Linting
+
+We use `pre-commit` and `pre-push` hooks for Git to lint sources with `phpcs`, `eslint` and `stylelint` tasks.
+
+NPM commands to work with linting:
+
+- `npm run lint` to show `all` lint errors (described below)
+- `npm run lint-fix` to automatically fix some of `all` linters errors (described below)
+- `npm run php-lint` to show `phpcs` errors
+- `npm run php-lint-fix` to automatically fix some of the `phpcs` errors
+- `npm run js-lint` to show `eslint` errors
+- `npm run js-lint-fix` to automatically fix some of the `eslint` errors
+- `npm run css-lint` to show `stylelint` errors
+- `npm run css-lint-fix` to automatically fix some of the `stylelint` errors
+
+All linters compatible with the modern IDE and code editors.

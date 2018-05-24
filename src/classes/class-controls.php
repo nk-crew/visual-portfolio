@@ -2,7 +2,7 @@
 /**
  * Controls
  *
- * @package visual-portfolio
+ * @package @@plugin_name
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

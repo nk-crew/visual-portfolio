@@ -2,7 +2,7 @@
 /**
  * Register fake page for portfolio preview.
  *
- * @package visual-portfolio/preview
+ * @package @@plugin_name/preview
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -138,7 +138,7 @@ class Visual_Portfolio_Preview {
     public function print_template( $id ) {
         $this->preview_enabled = true;
         wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', '', '', true );
-        wp_enqueue_script( 'visual-portfolio-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.js', array( 'jquery' ), '', true );
+        wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery' ), '', true );
         ?>
         <!DOCTYPE html>
         <html <?php language_attributes(); ?> style="margin-top: 0 !important;">

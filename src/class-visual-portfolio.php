@@ -2,17 +2,15 @@
 /**
  * Plugin Name:  Visual Portfolio
  * Description:  Portfolio post type with visual editor
- * Version:      1.3.0
+ * Version:      @@plugin_version
  * Author:       nK
  * Author URI:   https://nkdev.info
  * License:      GPLv2 or later
  * License URI:  https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:  visual-portfolio
+ * Text Domain:  @@text_domain
  *
- * @package visual-portfolio
+ * @package @@plugin_name
  */
-
-define( 'NK_VP_DOMAIN', 'visual-portfolio' );
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -99,7 +97,7 @@ class Visual_Portfolio {
         $this->plugin_url = plugin_dir_url( __FILE__ );
 
         // load textdomain.
-        load_plugin_textdomain( NK_VP_DOMAIN, false, basename( dirname( __FILE__ ) ) . '/languages' );
+        load_plugin_textdomain( '@@text_domain', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
         // include helper files.
         $this->add_image_sizes();
@@ -163,24 +161,24 @@ class Visual_Portfolio {
         wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '', true );
 
         // Visual Portfolio.
-        wp_register_script( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/js/script.js', array( 'jquery', 'isotope', 'imagesloaded', 'object-fit-images', 'photoswipe-ui-default' ), '1.3.0', true );
-        wp_register_style( 'visual-portfolio', visual_portfolio()->plugin_url . 'assets/css/style.css', array( 'font-awesome', 'photoswipe-default-skin' ), '1.3.0' );
+        wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', array( 'jquery', 'isotope', 'imagesloaded', 'object-fit-images', 'photoswipe-ui-default' ), '@@plugin_version', true );
+        wp_register_style( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/css/style.min.css', array( 'font-awesome', 'photoswipe-default-skin' ), '@@plugin_version' );
 
         // Visual Portfolio data.
         $data_init = array(
             '__' => array(
-                'couldnt_retrieve_vp' => esc_attr( 'Couldn\'t retrieve Visual Portfolio ID.', NK_VP_DOMAIN ),
-                'pswp_close' => esc_attr( 'Close (Esc)', NK_VP_DOMAIN ),
-                'pswp_share' => esc_attr( 'Share', NK_VP_DOMAIN ),
-                'pswp_fs' => esc_attr( 'Toggle fullscreen', NK_VP_DOMAIN ),
-                'pswp_zoom' => esc_attr( 'Zoom in/out', NK_VP_DOMAIN ),
-                'pswp_prev' => esc_attr( 'Previous (arrow left)', NK_VP_DOMAIN ),
-                'pswp_next' => esc_attr( 'Next (arrow right)', NK_VP_DOMAIN ),
-                'pswp_share_fb' => esc_attr( 'Share on Facebook', NK_VP_DOMAIN ),
-                'pswp_share_tw' => esc_attr( 'Tweet', NK_VP_DOMAIN ),
-                'pswp_share_pin' => esc_attr( 'Pin it', NK_VP_DOMAIN ),
+                'couldnt_retrieve_vp' => esc_attr( 'Couldn\'t retrieve Visual Portfolio ID.', '@@text_domain' ),
+                'pswp_close' => esc_attr( 'Close (Esc)', '@@text_domain' ),
+                'pswp_share' => esc_attr( 'Share', '@@text_domain' ),
+                'pswp_fs' => esc_attr( 'Toggle fullscreen', '@@text_domain' ),
+                'pswp_zoom' => esc_attr( 'Zoom in/out', '@@text_domain' ),
+                'pswp_prev' => esc_attr( 'Previous (arrow left)', '@@text_domain' ),
+                'pswp_next' => esc_attr( 'Next (arrow right)', '@@text_domain' ),
+                'pswp_share_fb' => esc_attr( 'Share on Facebook', '@@text_domain' ),
+                'pswp_share_tw' => esc_attr( 'Tweet', '@@text_domain' ),
+                'pswp_share_pin' => esc_attr( 'Pin it', '@@text_domain' ),
             ),
-            'settings_popup_gallery' => array(
+            'settingsPopupGallery' => array(
                 'show_arrows' => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
                 'show_caption' => Visual_Portfolio_Settings::get_option( 'show_caption', 'vp_popup_gallery', true ),
                 'show_counter' => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
@@ -190,7 +188,7 @@ class Visual_Portfolio {
                 'show_close_button' => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
             ),
         );
-        wp_localize_script( 'visual-portfolio', 'VPData', $data_init );
+        wp_localize_script( '@@plugin_name', 'VPData', $data_init );
     }
 
     /**
@@ -227,10 +225,10 @@ class Visual_Portfolio {
     public function image_size_names_choose( $sizes ) {
         return array_merge(
             $sizes, array(
-                'vp_sm' => esc_html__( 'Small (VP)', NK_VP_DOMAIN ),
-                'vp_md' => esc_html__( 'Medium (VP)', NK_VP_DOMAIN ),
-                'vp_lg' => esc_html__( 'Large (VP)', NK_VP_DOMAIN ),
-                'vp_xl' => esc_html__( 'Extra Large (VP)', NK_VP_DOMAIN ),
+                'vp_sm' => esc_html__( 'Small (VP)', '@@text_domain' ),
+                'vp_md' => esc_html__( 'Medium (VP)', '@@text_domain' ),
+                'vp_lg' => esc_html__( 'Large (VP)', '@@text_domain' ),
+                'vp_xl' => esc_html__( 'Extra Large (VP)', '@@text_domain' ),
             )
         );
     }

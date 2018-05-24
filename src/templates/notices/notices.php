@@ -3,7 +3,7 @@
  * Default notices template.
  *
  * @var $args
- * @package visual-portfolio
+ * @package @@plugin_name
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

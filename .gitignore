@@ -1,6 +1,8 @@
-.git
+.DS_Store
+.sass-cache
+.publish
 .idea
-*.lock
-node_modules
-/vendor
 /dist
+/vendor
+/node_modules
+npm-debug.log

@@ -2,7 +2,7 @@
 /**
  * Extend TinyMCE toolbar
  *
- * @package visual-portfolio/tinymce
+ * @package @@plugin_name/tinymce
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -71,8 +71,8 @@ class Visual_Portfolio_TinyMCE {
                 return;
             }
 
-            wp_enqueue_script( 'visual-portfolio-tinymce-localize', visual_portfolio()->plugin_url . 'assets/admin/js/mce-localize.js' );
-            wp_localize_script( 'visual-portfolio-tinymce-localize', 'Visual_Portfolio_TinyMCE_Options', $data_tiny_mce );
+            wp_enqueue_script( '@@plugin_name-tinymce-localize', visual_portfolio()->plugin_url . 'assets/admin/js/mce-localize.min.js' );
+            wp_localize_script( '@@plugin_name-tinymce-localize', 'VPTinyMCEOptions', $data_tiny_mce );
         }
     }
 
@@ -84,7 +84,7 @@ class Visual_Portfolio_TinyMCE {
      * @return mixed
      */
     public function mce_external_plugins( $plugins ) {
-        $plugins['visual_portfolio'] = visual_portfolio()->plugin_url . 'assets/admin/js/mce-dropdown.js';
+        $plugins['visual_portfolio'] = visual_portfolio()->plugin_url . 'assets/admin/js/mce-dropdown.min.js';
         return $plugins;
     }
 

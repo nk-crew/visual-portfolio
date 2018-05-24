@@ -2,7 +2,7 @@
 /**
  * Shortcode for Visual Composer
  *
- * @package visual-portfolio/vc
+ * @package @@plugin_name/vc
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ class Visual_Portfolio_VC {
      */
     public function admin_enqueue_scripts( $page ) {
         if ( 'post.php' === $page || 'post-new.php' === $page ) {
-            wp_enqueue_script( 'visual-portfolio-vc-frontend', visual_portfolio()->plugin_url . 'assets/admin/js/vc-frontend.js', array( 'jquery' ) );
+            wp_enqueue_script( '@@plugin_name-vc-frontend', visual_portfolio()->plugin_url . 'assets/admin/js/vc-frontend.min.js', array( 'jquery' ) );
         }
     }
 
@@ -62,14 +62,14 @@ class Visual_Portfolio_VC {
 
             vc_map(
                 array(
-                    'name' => esc_html__( 'Visual Portfolio', NK_VP_DOMAIN ),
+                    'name' => esc_html__( 'Visual Portfolio', '@@text_domain' ),
                     'base' => 'visual_portfolio',
                     'controls' => 'full',
                     'icon'     => 'icon-visual-portfolio',
                     'params' => array(
                         array(
                             'type'        => 'dropdown',
-                            'heading'     => esc_html__( 'Select visual portfolio', NK_VP_DOMAIN ),
+                            'heading'     => esc_html__( 'Select visual portfolio', '@@text_domain' ),
                             'param_name'  => 'id',
                             'value'       => $data_vc,
                             'description' => '',
@@ -77,16 +77,16 @@ class Visual_Portfolio_VC {
                         ),
                         array(
                             'type'        => 'textfield',
-                            'heading'     => esc_html__( 'Custom Classes', NK_VP_DOMAIN ),
+                            'heading'     => esc_html__( 'Custom Classes', '@@text_domain' ),
                             'param_name'  => 'class',
                             'value'       => '',
                             'description' => '',
                         ),
                         array(
                             'type'       => 'css_editor',
-                            'heading'    => esc_html__( 'CSS', NK_VP_DOMAIN ),
+                            'heading'    => esc_html__( 'CSS', '@@text_domain' ),
                             'param_name' => 'vc_css',
-                            'group'      => esc_html__( 'Design Options', NK_VP_DOMAIN ),
+                            'group'      => esc_html__( 'Design Options', '@@text_domain' ),
                         ),
                     ),
                 )

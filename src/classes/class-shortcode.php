@@ -2,7 +2,7 @@
 /**
  * Shortcode
  *
- * @package visual-portfolio/shortcode
+ * @package @@plugin_name/shortcode
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

@@ -2,7 +2,7 @@
 /**
  * Admin
  *
- * @package visual-portfolio/admin
+ * @package @@plugin_name/admin
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,11 +76,11 @@ class Visual_Portfolio_Admin {
             );
             $data_init['css_editor_error_notice'] = array(
                 /* translators: %d: error count */
-                'singular' => _n( 'There is %d error which must be fixed before you can save.', 'There are %d errors which must be fixed before you can save.', 1, NK_VP_DOMAIN ),
+                'singular' => _n( 'There is %d error which must be fixed before you can save.', 'There are %d errors which must be fixed before you can save.', 1, '@@text_domain' ),
                 /* translators: %d: error count */
-                'plural'   => _n( 'There is %d error which must be fixed before you can save.', 'There are %d errors which must be fixed before you can save.', 2, NK_VP_DOMAIN ), // @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
+                'plural'   => _n( 'There is %d error which must be fixed before you can save.', 'There are %d errors which must be fixed before you can save.', 2, '@@text_domain' ), // @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
             );
-            $data_init['css_editor_error_checkbox'] = esc_html__( 'Update anyway, even though it might break your site?', NK_VP_DOMAIN );
+            $data_init['css_editor_error_checkbox'] = esc_html__( 'Update anyway, even though it might break your site?', '@@text_domain' );
 
             // disable autosave due to it is not working for the custom metaboxes.
             wp_dequeue_script( 'autosave' );
@@ -136,9 +136,9 @@ class Visual_Portfolio_Admin {
         wp_enqueue_script( 'tooltip.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/tooltip.min.js', array( 'popper.js' ), '', true );
         wp_enqueue_style( 'popper.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/popper.css' );
 
-        wp_enqueue_script( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.js', array( 'jquery' ), '1.3.0', true );
-        wp_enqueue_style( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.css', '', '1.3.0' );
-        wp_localize_script( 'visual-portfolio-admin', 'vpAdminVariables', $data_init );
+        wp_enqueue_script( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.min.js', array( 'jquery' ), '@@plugin_version', true );
+        wp_enqueue_style( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.min.css', '', '@@plugin_version' );
+        wp_localize_script( '@@plugin_name-admin', 'VPAdminVariables', $data_init );
     }
 
     /**
@@ -150,19 +150,19 @@ class Visual_Portfolio_Admin {
             'portfolio',
             array(
                 'labels' => array(
-                    'name'                => _x( 'Portfolio Items', 'Post Type General Name', NK_VP_DOMAIN ),
-                    'singular_name'       => _x( 'Portfolio Item', 'Post Type Singular Name', NK_VP_DOMAIN ),
-                    'menu_name'           => __( 'Visual Portfolio', NK_VP_DOMAIN ),
-                    'parent_item_colon'   => __( 'Parent Portfolio Item', NK_VP_DOMAIN ),
-                    'all_items'           => __( 'Portfolio Items', NK_VP_DOMAIN ),
-                    'view_item'           => __( 'View Portfolio Item', NK_VP_DOMAIN ),
-                    'add_new_item'        => __( 'Add New Portfolio Item', NK_VP_DOMAIN ),
-                    'add_new'             => __( 'Add New', NK_VP_DOMAIN ),
-                    'edit_item'           => __( 'Edit Portfolio Item', NK_VP_DOMAIN ),
-                    'update_item'         => __( 'Update Portfolio Item', NK_VP_DOMAIN ),
-                    'search_items'        => __( 'Search Portfolio Item', NK_VP_DOMAIN ),
-                    'not_found'           => __( 'Not Found', NK_VP_DOMAIN ),
-                    'not_found_in_trash'  => __( 'Not found in Trash', NK_VP_DOMAIN ),
+                    'name'                => _x( 'Portfolio Items', 'Post Type General Name', '@@text_domain' ),
+                    'singular_name'       => _x( 'Portfolio Item', 'Post Type Singular Name', '@@text_domain' ),
+                    'menu_name'           => __( 'Visual Portfolio', '@@text_domain' ),
+                    'parent_item_colon'   => __( 'Parent Portfolio Item', '@@text_domain' ),
+                    'all_items'           => __( 'Portfolio Items', '@@text_domain' ),
+                    'view_item'           => __( 'View Portfolio Item', '@@text_domain' ),
+                    'add_new_item'        => __( 'Add New Portfolio Item', '@@text_domain' ),
+                    'add_new'             => __( 'Add New', '@@text_domain' ),
+                    'edit_item'           => __( 'Edit Portfolio Item', '@@text_domain' ),
+                    'update_item'         => __( 'Update Portfolio Item', '@@text_domain' ),
+                    'search_items'        => __( 'Search Portfolio Item', '@@text_domain' ),
+                    'not_found'           => __( 'Not Found', '@@text_domain' ),
+                    'not_found_in_trash'  => __( 'Not found in Trash', '@@text_domain' ),
                 ),
                 'public'       => true,
                 'has_archive'  => false,
@@ -200,9 +200,9 @@ class Visual_Portfolio_Admin {
         );
         register_taxonomy(
             'portfolio_category', 'portfolio', array(
-                'label'         => esc_html__( 'Portfolio Categories', NK_VP_DOMAIN ),
+                'label'         => esc_html__( 'Portfolio Categories', '@@text_domain' ),
                 'labels'        => array(
-                    'menu_name' => esc_html__( 'Categories', NK_VP_DOMAIN ),
+                    'menu_name' => esc_html__( 'Categories', '@@text_domain' ),
                 ),
                 'rewrite'       => array(
                     'slug' => 'portfolio-category',
@@ -216,9 +216,9 @@ class Visual_Portfolio_Admin {
         );
         register_taxonomy(
             'portfolio_tag', 'portfolio', array(
-                'label'         => esc_html__( 'Portfolio Tags', NK_VP_DOMAIN ),
+                'label'         => esc_html__( 'Portfolio Tags', '@@text_domain' ),
                 'labels'        => array(
-                    'menu_name' => esc_html__( 'Tags', NK_VP_DOMAIN ),
+                    'menu_name' => esc_html__( 'Tags', '@@text_domain' ),
                 ),
                 'rewrite'       => array(
                     'slug' => 'portfolio-tag',
@@ -236,19 +236,19 @@ class Visual_Portfolio_Admin {
             'vp_lists',
             array(
                 'labels' => array(
-                    'name'                => _x( 'Portfolio Layouts', 'Post Type General Name', NK_VP_DOMAIN ),
-                    'singular_name'       => _x( 'Portfolio Layout', 'Post Type Singular Name', NK_VP_DOMAIN ),
-                    'menu_name'           => __( 'Visual Portfolio', NK_VP_DOMAIN ),
-                    'parent_item_colon'   => __( 'Parent Portfolio Item', NK_VP_DOMAIN ),
-                    'all_items'           => __( 'Portfolio Layouts', NK_VP_DOMAIN ),
-                    'view_item'           => __( 'View Portfolio Layout', NK_VP_DOMAIN ),
-                    'add_new_item'        => __( 'Add New Portfolio Layout', NK_VP_DOMAIN ),
-                    'add_new'             => __( 'Add New', NK_VP_DOMAIN ),
-                    'edit_item'           => __( 'Edit Portfolio Layout', NK_VP_DOMAIN ),
-                    'update_item'         => __( 'Update Portfolio Layout', NK_VP_DOMAIN ),
-                    'search_items'        => __( 'Search Portfolio Layout', NK_VP_DOMAIN ),
-                    'not_found'           => __( 'Not Found', NK_VP_DOMAIN ),
-                    'not_found_in_trash'  => __( 'Not found in Trash', NK_VP_DOMAIN ),
+                    'name'                => _x( 'Portfolio Layouts', 'Post Type General Name', '@@text_domain' ),
+                    'singular_name'       => _x( 'Portfolio Layout', 'Post Type Singular Name', '@@text_domain' ),
+                    'menu_name'           => __( 'Visual Portfolio', '@@text_domain' ),
+                    'parent_item_colon'   => __( 'Parent Portfolio Item', '@@text_domain' ),
+                    'all_items'           => __( 'Portfolio Layouts', '@@text_domain' ),
+                    'view_item'           => __( 'View Portfolio Layout', '@@text_domain' ),
+                    'add_new_item'        => __( 'Add New Portfolio Layout', '@@text_domain' ),
+                    'add_new'             => __( 'Add New', '@@text_domain' ),
+                    'edit_item'           => __( 'Edit Portfolio Layout', '@@text_domain' ),
+                    'update_item'         => __( 'Update Portfolio Layout', '@@text_domain' ),
+                    'search_items'        => __( 'Search Portfolio Layout', '@@text_domain' ),
+                    'not_found'           => __( 'Not Found', '@@text_domain' ),
+                    'not_found_in_trash'  => __( 'Not found in Trash', '@@text_domain' ),
                 ),
                 'public'       => false,
                 'has_archive'  => false,
@@ -301,7 +301,7 @@ class Visual_Portfolio_Admin {
         if ( post_type_supports( $post_type, 'post-formats' ) ) {
             add_meta_box(
                 'vp_format_video',
-                esc_html__( 'Video', NK_VP_DOMAIN ),
+                esc_html__( 'Video', '@@text_domain' ),
                 array( $this, 'add_video_format_metabox' ),
                 null,
                 'side',
@@ -341,7 +341,7 @@ class Visual_Portfolio_Admin {
         ?>
 
         <p></p>
-        <input class="vp-input" name="video_url" type="url" id="video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="<?php echo esc_attr__( 'https://', NK_VP_DOMAIN ); ?>">
+        <input class="vp-input" name="video_url" type="url" id="video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="<?php echo esc_attr__( 'https://', '@@text_domain' ); ?>">
         <div class="vp-oembed-preview">
             <?php
             if ( $oembed_html ) {
@@ -440,8 +440,8 @@ class Visual_Portfolio_Admin {
                     <span class="dashicons-visual-portfolio-gray"></span>
                 </div>
                 <div class="vp-portfolio-list__text">
-                    <p><?php echo esc_html__( 'Ready to add your awesome portfolio?', NK_VP_DOMAIN ); ?></p>
-                    <a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=vp_lists' ) ); ?>"><?php echo esc_html__( 'Create your first portfolio list!', NK_VP_DOMAIN ); ?></a>
+                    <p><?php echo esc_html__( 'Ready to add your awesome portfolio?', '@@text_domain' ); ?></p>
+                    <a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=vp_lists' ) ); ?>"><?php echo esc_html__( 'Create your first portfolio list!', '@@text_domain' ); ?></a>
                 </div>
             </div>
             <style type="text/css">
@@ -480,7 +480,7 @@ class Visual_Portfolio_Admin {
      */
     public function add_portfolio_img_column( $columns = array() ) {
         $column_meta = array(
-            'portfolio_post_thumbs' => esc_html__( 'Thumbnail', NK_VP_DOMAIN ),
+            'portfolio_post_thumbs' => esc_html__( 'Thumbnail', '@@text_domain' ),
         );
 
         // insert after first column.
@@ -523,7 +523,7 @@ class Visual_Portfolio_Admin {
      */
     public function add_vp_lists_shortcode_column( $columns = array() ) {
         $column_meta = array(
-            'vp_lists_post_shortcode' => esc_html__( 'Shortcode', NK_VP_DOMAIN ),
+            'vp_lists_post_shortcode' => esc_html__( 'Shortcode', '@@text_domain' ),
         );
 
         // insert before last column.
@@ -575,7 +575,7 @@ class Visual_Portfolio_Admin {
     public function add_meta_boxes() {
         add_meta_box(
             'vp_name',
-            esc_html__( 'Name & Shortcode', NK_VP_DOMAIN ),
+            esc_html__( 'Name & Shortcode', '@@text_domain' ),
             array( $this, 'add_name_metabox' ),
             'vp_lists',
             'side',
@@ -583,7 +583,7 @@ class Visual_Portfolio_Admin {
         );
         add_meta_box(
             'vp_layout',
-            esc_html__( 'Layout', NK_VP_DOMAIN ),
+            esc_html__( 'Layout', '@@text_domain' ),
             array( $this, 'add_layout_metabox' ),
             'vp_lists',
             'side',
@@ -591,7 +591,7 @@ class Visual_Portfolio_Admin {
         );
         add_meta_box(
             'vp_items_style',
-            esc_html__( 'Items Style', NK_VP_DOMAIN ),
+            esc_html__( 'Items Style', '@@text_domain' ),
             array( $this, 'add_items_style_metabox' ),
             'vp_lists',
             'side',
@@ -599,7 +599,7 @@ class Visual_Portfolio_Admin {
         );
         add_meta_box(
             'vp_items_click_action',
-            esc_html__( 'Items Click Action', NK_VP_DOMAIN ),
+            esc_html__( 'Items Click Action', '@@text_domain' ),
             array( $this, 'add_items_click_action_metabox' ),
             'vp_lists',
             'side',
@@ -607,7 +607,7 @@ class Visual_Portfolio_Admin {
         );
         add_meta_box(
             'vp_filter',
-            esc_html__( 'Filter', NK_VP_DOMAIN ),
+            esc_html__( 'Filter', '@@text_domain' ),
             array( $this, 'add_filter_metabox' ),
             'vp_lists',
             'side',
@@ -615,7 +615,7 @@ class Visual_Portfolio_Admin {
         );
         add_meta_box(
             'vp_pagination',
-            esc_html__( 'Pagination', NK_VP_DOMAIN ),
+            esc_html__( 'Pagination', '@@text_domain' ),
             array( $this, 'add_pagination_metabox' ),
             'vp_lists',
             'side',
@@ -624,7 +624,7 @@ class Visual_Portfolio_Admin {
 
         add_meta_box(
             'vp_preview',
-            esc_html__( 'Preview', NK_VP_DOMAIN ),
+            esc_html__( 'Preview', '@@text_domain' ),
             array( $this, 'add_preview_metabox' ),
             'vp_lists',
             'normal',
@@ -632,7 +632,7 @@ class Visual_Portfolio_Admin {
         );
         add_meta_box(
             'vp_content_source',
-            esc_html__( 'Content Source', NK_VP_DOMAIN ),
+            esc_html__( 'Content Source', '@@text_domain' ),
             array( $this, 'add_content_source_metabox' ),
             'vp_lists',
             'normal',
@@ -640,7 +640,7 @@ class Visual_Portfolio_Admin {
         );
         add_meta_box(
             'vp_custom_css',
-            esc_html__( 'Custom CSS', NK_VP_DOMAIN ),
+            esc_html__( 'Custom CSS', '@@text_domain' ),
             array( $this, 'add_custom_css_metabox' ),
             'vp_lists',
             'normal',
@@ -659,7 +659,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'text',
-                'label' => esc_html__( 'Name', NK_VP_DOMAIN ),
+                'label' => esc_html__( 'Name', '@@text_domain' ),
                 'name'  => 'vp_list_name',
                 'value' => $post->post_title,
             )
@@ -668,8 +668,8 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'text',
-                'label' => esc_html__( 'Shortcode', NK_VP_DOMAIN ),
-                'description' => esc_html__( 'Place the shortcode where you want to show the portfolio list.', NK_VP_DOMAIN ),
+                'label' => esc_html__( 'Shortcode', '@@text_domain' ),
+                'description' => esc_html__( 'Place the shortcode where you want to show the portfolio list.', '@@text_domain' ),
                 'name'  => 'vp_list_shortcode',
                 'value' => $post->ID ? '[visual_portfolio id="' . $post->ID . '" class=""]' : '',
                 'readonly' => true,
@@ -735,12 +735,12 @@ class Visual_Portfolio_Admin {
                 'name'  => 'vp_layout',
                 'value' => $meta['vp_layout'],
                 'options' => array(
-                    'tiles'   => esc_html__( 'Tiles', NK_VP_DOMAIN ),
-                    'masonry' => esc_html__( 'Masonry', NK_VP_DOMAIN ),
+                    'tiles'   => esc_html__( 'Tiles', '@@text_domain' ),
+                    'masonry' => esc_html__( 'Masonry', '@@text_domain' ),
 
                 /*
                  * TODO: Justified
-                    'justified' => esc_html__( 'Justified', NK_VP_DOMAIN ),
+                    'justified' => esc_html__( 'Justified', '@@text_domain' ),
                  */
                 ),
             )
@@ -749,7 +749,7 @@ class Visual_Portfolio_Admin {
 
         <div data-cond="[name=vp_layout] == tiles">
             <div class="vp-control">
-                <label><?php echo esc_html__( 'Type', NK_VP_DOMAIN ); ?></label>
+                <label><?php echo esc_html__( 'Type', '@@text_domain' ); ?></label>
 
                 <div class="vp-control-image-dropdown">
                     <span class="vp-control-image-dropdown__preview">
@@ -764,7 +764,7 @@ class Visual_Portfolio_Admin {
                         }
                         ?>
                     </span>
-                    <span class="vp-control-image-dropdown__title"><?php echo esc_html__( 'Select tiles type', NK_VP_DOMAIN ); ?></span>
+                    <span class="vp-control-image-dropdown__title"><?php echo esc_html__( 'Select tiles type', '@@text_domain' ); ?></span>
                     <div class="vp-control-image-dropdown__content">
                         <div>
                             <select class="vp-image-picker" name="vp_tiles_type">
@@ -784,7 +784,7 @@ class Visual_Portfolio_Admin {
             Visual_Portfolio_Controls::get(
                 array(
                     'type'  => 'range',
-                    'label' => esc_html__( 'Columns', NK_VP_DOMAIN ),
+                    'label' => esc_html__( 'Columns', '@@text_domain' ),
                     'name'  => 'vp_masonry_columns',
                     'value' => $meta['vp_masonry_columns'],
                     'min'   => 1,
@@ -798,7 +798,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'range',
-                'label' => esc_html__( 'Gap', NK_VP_DOMAIN ),
+                'label' => esc_html__( 'Gap', '@@text_domain' ),
                 'name'  => 'vp_items_gap',
                 'value' => $meta['vp_items_gap'],
                 'min'   => 0,
@@ -809,7 +809,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'range',
-                'label' => esc_html__( 'Items per page', NK_VP_DOMAIN ),
+                'label' => esc_html__( 'Items per page', '@@text_domain' ),
                 'name'  => 'vp_items_count',
                 'value' => $meta['vp_items_count'],
                 'min'   => 1,
@@ -820,10 +820,10 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'toggle',
-                'label' => esc_html__( 'Stretch', NK_VP_DOMAIN ),
+                'label' => esc_html__( 'Stretch', '@@text_domain' ),
                 'name'  => 'vp_stretch',
                 'value' => $meta['vp_stretch'],
-                'hint'  => esc_attr__( 'Break container and display it wide', NK_VP_DOMAIN ),
+                'hint'  => esc_attr__( 'Break container and display it wide', '@@text_domain' ),
                 'hint_place'  => 'left',
             )
         );
@@ -837,10 +837,10 @@ class Visual_Portfolio_Admin {
     public function add_items_style_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
         $styles = array(
-            'default'  => __( 'Default', NK_VP_DOMAIN ),
-            'fly'      => __( 'Fly', NK_VP_DOMAIN ),
-            'emerge'   => __( 'Emerge', NK_VP_DOMAIN ),
-            'fade'     => __( 'Fade', NK_VP_DOMAIN ),
+            'default'  => __( 'Default', '@@text_domain' ),
+            'fly'      => __( 'Fly', '@@text_domain' ),
+            'emerge'   => __( 'Emerge', '@@text_domain' ),
+            'fade'     => __( 'Fade', '@@text_domain' ),
         );
 
         Visual_Portfolio_Controls::get(
@@ -862,7 +862,7 @@ class Visual_Portfolio_Admin {
                 Visual_Portfolio_Controls::get(
                     array(
                         'type'  => 'toggle',
-                        'label'  => esc_html__( 'Show title', NK_VP_DOMAIN ),
+                        'label'  => esc_html__( 'Show title', '@@text_domain' ),
                         'name'  => $opt . 'show_title',
                         'value' => $meta[ $opt . 'show_title' ],
                     )
@@ -871,7 +871,7 @@ class Visual_Portfolio_Admin {
                 Visual_Portfolio_Controls::get(
                     array(
                         'type'  => 'toggle',
-                        'label'  => esc_html__( 'Show categories', NK_VP_DOMAIN ),
+                        'label'  => esc_html__( 'Show categories', '@@text_domain' ),
                         'name'  => $opt . 'show_categories',
                         'value' => $meta[ $opt . 'show_categories' ],
                     )
@@ -883,7 +883,7 @@ class Visual_Portfolio_Admin {
                     Visual_Portfolio_Controls::get(
                         array(
                             'type'  => 'range',
-                            'label' => esc_html__( 'Categories count', NK_VP_DOMAIN ),
+                            'label' => esc_html__( 'Categories count', '@@text_domain' ),
                             'name'  => $opt . 'categories_count',
                             'value' => $meta[ $opt . 'categories_count' ],
                             'min'   => 1,
@@ -897,13 +897,13 @@ class Visual_Portfolio_Admin {
                 Visual_Portfolio_Controls::get(
                     array(
                         'type'  => 'select2',
-                        'label' => esc_html__( 'Show date', NK_VP_DOMAIN ),
+                        'label' => esc_html__( 'Show date', '@@text_domain' ),
                         'name'  => $opt . 'show_date',
                         'value' => $meta[ $opt . 'show_date' ],
                         'options' => array(
-                            'false' => esc_html__( 'False', NK_VP_DOMAIN ),
-                            'true'  => esc_html__( 'Show', NK_VP_DOMAIN ),
-                            'human' => esc_html__( 'Human Format', NK_VP_DOMAIN ),
+                            'false' => esc_html__( 'False', '@@text_domain' ),
+                            'true'  => esc_html__( 'Show', '@@text_domain' ),
+                            'human' => esc_html__( 'Human Format', '@@text_domain' ),
                         ),
                     )
                 );
@@ -916,7 +916,7 @@ class Visual_Portfolio_Admin {
                             'name'  => $opt . 'date_format',
                             'value' => $meta[ $opt . 'date_format' ],
                             'placeholder' => 'F j, Y',
-                            'hint' => esc_attr__( "Date format \r\n Example: F j, Y", NK_VP_DOMAIN ),
+                            'hint' => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
                             'hint_place' => 'left',
                         )
                     );
@@ -927,7 +927,7 @@ class Visual_Portfolio_Admin {
                 Visual_Portfolio_Controls::get(
                     array(
                         'type'  => 'toggle',
-                        'label'  => esc_html__( 'Show excerpt', NK_VP_DOMAIN ),
+                        'label'  => esc_html__( 'Show excerpt', '@@text_domain' ),
                         'name'  => $opt . 'show_excerpt',
                         'value' => $meta[ $opt . 'show_excerpt' ],
                     )
@@ -939,7 +939,7 @@ class Visual_Portfolio_Admin {
                     Visual_Portfolio_Controls::get(
                         array(
                             'type'  => 'range',
-                            'label' => esc_html__( 'Excerpt words count', NK_VP_DOMAIN ),
+                            'label' => esc_html__( 'Excerpt words count', '@@text_domain' ),
                             'name'  => $opt . 'excerpt_words_count',
                             'value' => $meta[ $opt . 'excerpt_words_count' ],
                             'min'   => 1,
@@ -954,7 +954,7 @@ class Visual_Portfolio_Admin {
                     Visual_Portfolio_Controls::get(
                         array(
                             'type'  => 'toggle',
-                            'label'  => esc_html__( 'Show icon', NK_VP_DOMAIN ),
+                            'label'  => esc_html__( 'Show icon', '@@text_domain' ),
                             'name'  => $opt . 'show_icon',
                             'value' => $meta[ $opt . 'show_icon' ],
                         )
@@ -968,8 +968,8 @@ class Visual_Portfolio_Admin {
                                 'type'  => 'text',
                                 'name'  => $opt . 'icon',
                                 'value' => $meta[ $opt . 'icon' ],
-                                'placeholder' => esc_attr__( 'Standard icon', NK_VP_DOMAIN ),
-                                'hint' => esc_attr__( 'Standard icon', NK_VP_DOMAIN ),
+                                'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
+                                'hint' => esc_attr__( 'Standard icon', '@@text_domain' ),
                                 'hint_place' => 'left',
                             )
                         );
@@ -979,8 +979,8 @@ class Visual_Portfolio_Admin {
                                 'type'  => 'text',
                                 'name'  => $opt . 'icon_video',
                                 'value' => $meta[ $opt . 'icon_video' ],
-                                'placeholder' => esc_attr__( 'Video icon', NK_VP_DOMAIN ),
-                                'hint' => esc_attr__( 'Video icon', NK_VP_DOMAIN ),
+                                'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
+                                'hint' => esc_attr__( 'Video icon', '@@text_domain' ),
                                 'hint_place' => 'left',
                             )
                         );
@@ -995,46 +995,46 @@ class Visual_Portfolio_Admin {
 
                     <div class="vp-control">
                         <label for="<?php echo esc_attr( $caption_align_opt ); ?>">
-                            <?php echo esc_html__( 'Caption align', NK_VP_DOMAIN ); ?>
+                            <?php echo esc_html__( 'Caption align', '@@text_domain' ); ?>
                         </label>
                         <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $caption_align_opt ); ?>" id="<?php echo esc_attr( $caption_align_opt ); ?>">
 
                             <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
-                            <optgroup label="<?php echo esc_attr__( 'Top', NK_VP_DOMAIN ); ?>">
+                            <optgroup label="<?php echo esc_attr__( 'Top', '@@text_domain' ); ?>">
                                 <option value="top-center" <?php selected( $meta[ $caption_align_opt ], 'top-center' ); ?>>
-                                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
                                 </option>
                                 <option value="top-left" <?php selected( $meta[ $caption_align_opt ], 'top-left' ); ?>>
-                                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
                                 </option>
                                 <option value="top-right" <?php selected( $meta[ $caption_align_opt ], 'top-right' ); ?>>
-                                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
                                 </option>
                             </optgroup>
-                            <optgroup label="<?php echo esc_attr__( 'Center', NK_VP_DOMAIN ); ?>">
+                            <optgroup label="<?php echo esc_attr__( 'Center', '@@text_domain' ); ?>">
                                 <?php endif; ?>
 
                                 <option value="center" <?php selected( $meta[ $caption_align_opt ], 'center' ); ?>>
-                                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
                                 </option>
                                 <option value="left" <?php selected( $meta[ $caption_align_opt ], 'left' ); ?>>
-                                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
                                 </option>
                                 <option value="right" <?php selected( $meta[ $caption_align_opt ], 'right' ); ?>>
-                                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
                                 </option>
 
                                 <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
                             </optgroup>
-                            <optgroup label="<?php echo esc_attr__( 'Bottom', NK_VP_DOMAIN ); ?>">
+                            <optgroup label="<?php echo esc_attr__( 'Bottom', '@@text_domain' ); ?>">
                                 <option value="bottom-center" <?php selected( $meta[ $caption_align_opt ], 'bottom-center' ); ?>>
-                                    <?php echo esc_html__( 'Center', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
                                 </option>
                                 <option value="bottom-left" <?php selected( $meta[ $caption_align_opt ], 'bottom-left' ); ?>>
-                                    <?php echo esc_html__( 'Left', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
                                 </option>
                                 <option value="bottom-right" <?php selected( $meta[ $caption_align_opt ], 'bottom-right' ); ?>>
-                                    <?php echo esc_html__( 'Right', NK_VP_DOMAIN ); ?>
+                                    <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
                                 </option>
                             </optgroup>
                         <?php endif; ?>
@@ -1047,7 +1047,7 @@ class Visual_Portfolio_Admin {
                     Visual_Portfolio_Controls::get(
                         array(
                             'type'  => 'color',
-                            'label'  => esc_html__( 'Overlay background color', NK_VP_DOMAIN ),
+                            'label'  => esc_html__( 'Overlay background color', '@@text_domain' ),
                             'name'  => $opt . 'bg_color',
                             'value' => $meta[ $opt . 'bg_color' ],
                             'alpha' => true,
@@ -1057,7 +1057,7 @@ class Visual_Portfolio_Admin {
                     Visual_Portfolio_Controls::get(
                         array(
                             'type'  => 'color',
-                            'label'  => esc_html__( 'Overlay text color', NK_VP_DOMAIN ),
+                            'label'  => esc_html__( 'Overlay text color', '@@text_domain' ),
                             'name'  => $opt . 'text_color',
                             'value' => $meta[ $opt . 'text_color' ],
                             'alpha' => true,
@@ -1084,9 +1084,9 @@ class Visual_Portfolio_Admin {
                 'name'  => 'vp_items_click_action',
                 'value' => $meta['vp_items_click_action'],
                 'options' => array(
-                    'false' => esc_html__( 'Disabled', NK_VP_DOMAIN ),
-                    'url' => esc_html__( 'URL', NK_VP_DOMAIN ),
-                    'popup_gallery' => esc_html__( 'Popup Gallery', NK_VP_DOMAIN ),
+                    'false' => esc_html__( 'Disabled', '@@text_domain' ),
+                    'url' => esc_html__( 'URL', '@@text_domain' ),
+                    'popup_gallery' => esc_html__( 'Popup Gallery', '@@text_domain' ),
                 ),
             )
         );
@@ -1106,8 +1106,8 @@ class Visual_Portfolio_Admin {
                 'name'  => 'vp_filter',
                 'value' => $meta['vp_filter'],
                 'options' => array(
-                    'false' => esc_html__( 'Disabled', NK_VP_DOMAIN ),
-                    'default' => esc_html__( 'Enabled', NK_VP_DOMAIN ),
+                    'false' => esc_html__( 'Disabled', '@@text_domain' ),
+                    'default' => esc_html__( 'Enabled', '@@text_domain' ),
                 ),
             )
         );
@@ -1118,13 +1118,13 @@ class Visual_Portfolio_Admin {
             Visual_Portfolio_Controls::get(
                 array(
                     'type'  => 'select2',
-                    'label' => esc_html__( 'Align', NK_VP_DOMAIN ),
+                    'label' => esc_html__( 'Align', '@@text_domain' ),
                     'name'  => 'vp_filter_align',
                     'value' => $meta['vp_filter_align'],
                     'options' => array(
-                        'center' => esc_html__( 'Center', NK_VP_DOMAIN ),
-                        'left' => esc_html__( 'Left', NK_VP_DOMAIN ),
-                        'right' => esc_html__( 'Right', NK_VP_DOMAIN ),
+                        'center' => esc_html__( 'Center', '@@text_domain' ),
+                        'left' => esc_html__( 'Left', '@@text_domain' ),
+                        'right' => esc_html__( 'Right', '@@text_domain' ),
                     ),
                 )
             );
@@ -1132,7 +1132,7 @@ class Visual_Portfolio_Admin {
             Visual_Portfolio_Controls::get(
                 array(
                     'type'  => 'toggle',
-                    'label' => esc_html__( 'Show count', NK_VP_DOMAIN ),
+                    'label' => esc_html__( 'Show count', '@@text_domain' ),
                     'name'  => 'vp_filter_show_count',
                     'value' => $meta['vp_filter_show_count'],
                 )
@@ -1144,8 +1144,8 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'text',
-                'label' => esc_html__( 'Filter Shortcode', NK_VP_DOMAIN ),
-                'description' => esc_html__( 'Place the shortcode where you want to show the filter.', NK_VP_DOMAIN ),
+                'label' => esc_html__( 'Filter Shortcode', '@@text_domain' ),
+                'description' => esc_html__( 'Place the shortcode where you want to show the filter.', '@@text_domain' ),
                 'name'  => 'vp_filter_shortcode',
                 'value' => $post->ID ? '[visual_portfolio_filter id="' . $post->ID . '" align="' . esc_attr( $meta['vp_filter_align'] ) . '" show_count="' . esc_attr( $meta['vp_filter_show_count'] ? 'true' : 'false' ) . '" class=""]' : '',
                 'readonly' => true,
@@ -1167,10 +1167,10 @@ class Visual_Portfolio_Admin {
                 'name'  => 'vp_pagination',
                 'value' => $meta['vp_pagination'],
                 'options' => array(
-                    'false' => esc_html__( 'Disabled', NK_VP_DOMAIN ),
-                    'paged' => esc_html__( 'Paged', NK_VP_DOMAIN ),
-                    'load-more' => esc_html__( 'Load More', NK_VP_DOMAIN ),
-                    'infinite' => esc_html__( 'Infinite', NK_VP_DOMAIN ),
+                    'false' => esc_html__( 'Disabled', '@@text_domain' ),
+                    'paged' => esc_html__( 'Paged', '@@text_domain' ),
+                    'load-more' => esc_html__( 'Load More', '@@text_domain' ),
+                    'infinite' => esc_html__( 'Infinite', '@@text_domain' ),
                 ),
             )
         );
@@ -1181,13 +1181,13 @@ class Visual_Portfolio_Admin {
             Visual_Portfolio_Controls::get(
                 array(
                     'type'  => 'select2',
-                    'label'  => esc_html__( 'Align', NK_VP_DOMAIN ),
+                    'label'  => esc_html__( 'Align', '@@text_domain' ),
                     'name'  => 'vp_pagination_align',
                     'value' => $meta['vp_pagination_align'],
                     'options' => array(
-                        'center' => esc_html__( 'Center', NK_VP_DOMAIN ),
-                        'left' => esc_html__( 'Left', NK_VP_DOMAIN ),
-                        'right' => esc_html__( 'Right', NK_VP_DOMAIN ),
+                        'center' => esc_html__( 'Center', '@@text_domain' ),
+                        'left' => esc_html__( 'Left', '@@text_domain' ),
+                        'right' => esc_html__( 'Right', '@@text_domain' ),
                     ),
                 )
             );
@@ -1199,7 +1199,7 @@ class Visual_Portfolio_Admin {
             Visual_Portfolio_Controls::get(
                 array(
                     'type'  => 'toggle',
-                    'label'  => esc_html__( 'Show arrows', NK_VP_DOMAIN ),
+                    'label'  => esc_html__( 'Show arrows', '@@text_domain' ),
                     'name'  => 'vp_pagination_paged__show_arrows',
                     'value' => $meta['vp_pagination_paged__show_arrows'],
                 )
@@ -1208,7 +1208,7 @@ class Visual_Portfolio_Admin {
             Visual_Portfolio_Controls::get(
                 array(
                     'type'  => 'toggle',
-                    'label'  => esc_html__( 'Show numbers', NK_VP_DOMAIN ),
+                    'label'  => esc_html__( 'Show numbers', '@@text_domain' ),
                     'name'  => 'vp_pagination_paged__show_numbers',
                     'value' => $meta['vp_pagination_paged__show_numbers'],
                 )
@@ -1273,8 +1273,8 @@ class Visual_Portfolio_Admin {
                 $post_types_list[ $post_type ] = ucfirst( $post_type );
             }
         }
-        $post_types_list['ids'] = esc_html__( 'Specific Posts', NK_VP_DOMAIN );
-        $post_types_list['custom_query'] = esc_html__( 'Custom Query', NK_VP_DOMAIN );
+        $post_types_list['ids'] = esc_html__( 'Specific Posts', '@@text_domain' );
+        $post_types_list['custom_query'] = esc_html__( 'Custom Query', '@@text_domain' );
         ?>
         <div class="vp-content-source">
             <input type="hidden" name="vp_content_source" value="<?php echo esc_attr( $meta['vp_content_source'] ); ?>">
@@ -1283,13 +1283,13 @@ class Visual_Portfolio_Admin {
                 <div class="vp-content-source__item-icon">
                     <span class="dashicons dashicons-portfolio"></span>
                 </div>
-                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Portfolio', NK_VP_DOMAIN ); ?></div>
+                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Portfolio', '@@text_domain' ); ?></div>
             </div>
             <div class="vp-content-source__item" data-content="post-based">
                 <div class="vp-content-source__item-icon">
                     <span class="dashicons dashicons-media-text"></span>
                 </div>
-                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Post-Based', NK_VP_DOMAIN ); ?></div>
+                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Post-Based', '@@text_domain' ); ?></div>
             </div>
 
             <div class="vp-content-source__item-content">
@@ -1308,7 +1308,7 @@ class Visual_Portfolio_Admin {
 
                         // translators: %1$s - escaped url.
                         // translators: %2$s - non-escaped url.
-                        printf( wp_kses( __( 'Portfolio items list from <a href="%1$s" target="_blank">%2$s</a>', NK_VP_DOMAIN ), $allowed_protocols ), esc_url( $url ), esc_html( $url ) );
+                        printf( wp_kses( __( 'Portfolio items list from <a href="%1$s" target="_blank">%2$s</a>', '@@text_domain' ), $allowed_protocols ), esc_url( $url ), esc_html( $url ) );
                         ?>
                     </p>
                 </div>
@@ -1322,7 +1322,7 @@ class Visual_Portfolio_Admin {
                             Visual_Portfolio_Controls::get(
                                 array(
                                     'type'  => 'select2',
-                                    'label'  => esc_html__( 'Data source', NK_VP_DOMAIN ),
+                                    'label'  => esc_html__( 'Data source', '@@text_domain' ),
                                     'name'  => 'vp_posts_source',
                                     'value' => $meta['vp_posts_source'],
                                     'searchable' => true,
@@ -1355,7 +1355,7 @@ class Visual_Portfolio_Admin {
                             Visual_Portfolio_Controls::get(
                                 array(
                                     'type'  => 'select2',
-                                    'label'  => esc_html__( 'Specific posts', NK_VP_DOMAIN ),
+                                    'label'  => esc_html__( 'Specific posts', '@@text_domain' ),
                                     'name'  => 'vp_posts_ids',
                                     'value' => $selected_ids,
                                     'searchable' => true,
@@ -1391,7 +1391,7 @@ class Visual_Portfolio_Admin {
                             Visual_Portfolio_Controls::get(
                                 array(
                                     'type'  => 'select2',
-                                    'label'  => esc_html__( 'Excluded posts', NK_VP_DOMAIN ),
+                                    'label'  => esc_html__( 'Excluded posts', '@@text_domain' ),
                                     'name'  => 'vp_posts_excluded_ids',
                                     'value' => (array) $excluded_ids,
                                     'searchable' => true,
@@ -1409,9 +1409,9 @@ class Visual_Portfolio_Admin {
                             Visual_Portfolio_Controls::get(
                                 array(
                                     'type'  => 'textarea',
-                                    'label'  => esc_html__( 'Custom query', NK_VP_DOMAIN ),
+                                    'label'  => esc_html__( 'Custom query', '@@text_domain' ),
                                     // translators: %1$s - escaped url.
-                                    'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', NK_VP_DOMAIN ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
+                                    'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
                                     'name'  => 'vp_posts_custom_query',
                                     'value' => $meta['vp_posts_custom_query'],
                                     'cols' => 30,
@@ -1446,7 +1446,7 @@ class Visual_Portfolio_Admin {
                             Visual_Portfolio_Controls::get(
                                 array(
                                     'type'  => 'select2',
-                                    'label'  => esc_html__( 'Taxonomies', NK_VP_DOMAIN ),
+                                    'label'  => esc_html__( 'Taxonomies', '@@text_domain' ),
                                     'name'  => 'vp_posts_taxonomies',
                                     'value' => (array) $selected_tax,
                                     'searchable' => true,
@@ -1463,12 +1463,12 @@ class Visual_Portfolio_Admin {
                             Visual_Portfolio_Controls::get(
                                 array(
                                     'type'  => 'select2',
-                                    'label'  => esc_html__( 'Taxonomies relation', NK_VP_DOMAIN ),
+                                    'label'  => esc_html__( 'Taxonomies relation', '@@text_domain' ),
                                     'name'  => 'vp_posts_taxonomies_relation',
                                     'value'  => $meta['vp_posts_taxonomies_relation'],
                                     'options' => array(
-                                        'or' => esc_html__( 'OR', NK_VP_DOMAIN ),
-                                        'and' => esc_html__( 'AND', NK_VP_DOMAIN ),
+                                        'or' => esc_html__( 'OR', '@@text_domain' ),
+                                        'and' => esc_html__( 'AND', '@@text_domain' ),
                                     ),
                                 )
                             );
@@ -1480,14 +1480,14 @@ class Visual_Portfolio_Admin {
                             Visual_Portfolio_Controls::get(
                                 array(
                                     'type'  => 'select2',
-                                    'label'  => esc_html__( 'Order by', NK_VP_DOMAIN ),
+                                    'label'  => esc_html__( 'Order by', '@@text_domain' ),
                                     'name'  => 'vp_posts_order_by',
                                     'value'  => $meta['vp_posts_order_by'],
                                     'options' => array(
-                                        'post_date' => esc_html__( 'Date', NK_VP_DOMAIN ),
-                                        'title' => esc_html__( 'Title', NK_VP_DOMAIN ),
-                                        'id' => esc_html__( 'ID', NK_VP_DOMAIN ),
-                                        'rand' => esc_html__( 'Random', NK_VP_DOMAIN ),
+                                        'post_date' => esc_html__( 'Date', '@@text_domain' ),
+                                        'title' => esc_html__( 'Title', '@@text_domain' ),
+                                        'id' => esc_html__( 'ID', '@@text_domain' ),
+                                        'rand' => esc_html__( 'Random', '@@text_domain' ),
                                     ),
                                 )
                             );
@@ -1498,12 +1498,12 @@ class Visual_Portfolio_Admin {
                             Visual_Portfolio_Controls::get(
                                 array(
                                     'type'  => 'select2',
-                                    'label'  => esc_html__( 'Order direction', NK_VP_DOMAIN ),
+                                    'label'  => esc_html__( 'Order direction', '@@text_domain' ),
                                     'name'  => 'vp_posts_order_direction',
                                     'value'  => $meta['vp_posts_order_direction'],
                                     'options' => array(
-                                        'desc' => esc_html__( 'DESC', NK_VP_DOMAIN ),
-                                        'asc' => esc_html__( 'ASC', NK_VP_DOMAIN ),
+                                        'desc' => esc_html__( 'DESC', '@@text_domain' ),
+                                        'asc' => esc_html__( 'ASC', '@@text_domain' ),
                                     ),
                                 )
                             );
@@ -1526,14 +1526,14 @@ class Visual_Portfolio_Admin {
         ?>
         <textarea class="vp-input" name="vp_custom_css" id="vp_custom_css" cols="30" rows="10"><?php echo esc_html( $meta['vp_custom_css'] ); ?></textarea>
         <p class="description">
-            <?php echo esc_html__( 'Available classes:', NK_VP_DOMAIN ); ?>
+            <?php echo esc_html__( 'Available classes:', '@@text_domain' ); ?>
         </p>
         <ul>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__item</code><?php echo esc_html__( ' - single item wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-filter</code><?php echo esc_html__( ' - filter wrapper.', NK_VP_DOMAIN ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', NK_VP_DOMAIN ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', '@@text_domain' ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', '@@text_domain' ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__item</code><?php echo esc_html__( ' - single item wrapper.', '@@text_domain' ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-filter</code><?php echo esc_html__( ' - filter wrapper.', '@@text_domain' ); ?></li>
+            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', '@@text_domain' ); ?></li>
         </ul>
         <?php
     }

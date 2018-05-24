@@ -1,22 +1,23 @@
 /*!
  * Name    : Visual Portfolio
- * Version : 1.3.0
+ * Version : @@plugin_version
  * Author  : nK https://nkdev.info
  */
 .vp-portfolio {
     position: relative;
+    min-height: 114px;
 }
 .vp-portfolio,
 .vp-portfolio * {
     box-sizing: border-box;
 }
 .vp-portfolio__items {
-    transition: 0.3s height ease-in-out;
+    transition: .3s height ease-in-out;
 }
 
-.vp-portfolio:after,
-.vp-portfolio__items:after {
-    content: '';
+.vp-portfolio::after,
+.vp-portfolio__items::after {
+    content: "";
     display: block;
     clear: both;
 }
@@ -31,15 +32,15 @@
 .vp-portfolio__items-wrap,
 .vp-portfolio__filter-wrap,
 .vp-portfolio__pagination-wrap {
-    opacity: 0;
     visibility: hidden;
+    opacity: 0;
     transition: .7s opacity, .7s visibility;
 }
 
 .vp-portfolio__item-wrap {
     position: relative;
-    width: 33.333%;
     float: left;
+    width: 33.333%;
 }
 .vp-portfolio__item .vp-portfolio__item-img img,
 .vp-portfolio__item .vp-portfolio__item-img a {
@@ -57,10 +58,10 @@
 .vp-portfolio__preloader {
     position: absolute;
     left: 50%;
-    margin-left: -11px;
     width: 23px;
     height: 24px;
     margin-top: 45px;
+    margin-left: -11px;
     animation: vp-preloader 2s linear infinite;
 
     span {
@@ -82,18 +83,20 @@
             top: 16px;
         }
         &:nth-of-type(4) {
+            top: 9px;
             left: 12px;
             height: 14px;
-            top: 9px;
         }
     }
 }
 
 @keyframes vp-preloader {
-    0%, 100% {
-        opacity: 0.5;
+    0%,
+    100% {
+        opacity: .5;
     }
-    40%, 60% {
+    40%,
+    60% {
         opacity: 1;
     }
 }
@@ -104,17 +107,17 @@
     .vp-portfolio__item-img {
         position: absolute;
         top: 0;
-        left: 0;
         right: 0;
         bottom: 0;
+        left: 0;
     }
     .vp-portfolio__item-img-wrap {
         position: relative;
         display: block;
         overflow: hidden;
 
-        &:before {
-            content: '';
+        &::before {
+            content: "";
             display: block;
             margin-top: 56%;
         }
@@ -124,7 +127,8 @@
         height: 100%;
         object-fit: cover;
         object-position: 50% 50%;
-        font-family: 'object-fit: cover; object-position: 50% 50%;';
+        // stylelint-disable-next-line
+        font-family: "object-fit: cover; object-position: 50% 50%;";
     }
 }
 
@@ -136,21 +140,18 @@
 }
 
 // On loaded portfolio
-.vp-portfolio {
-    min-height: 114px;
-}
 .vp-portfolio.vp-portfolio__ready {
     min-height: initial;
 
     .vp-portfolio__items-wrap,
     .vp-portfolio__filter-wrap,
     .vp-portfolio__pagination-wrap {
-        opacity: 1;
         visibility: visible;
+        opacity: 1;
     }
     .vp-portfolio__preloader-wrap {
-        opacity: 0;
         visibility: hidden;
+        opacity: 0;
 
         .vp-portfolio__preloader {
             animation: none;
@@ -159,28 +160,28 @@
 }
 .vp-single-filter.vp-single-filter__ready {
     .vp-portfolio__filter-wrap {
-        opacity: 1;
         visibility: visible;
+        opacity: 1;
     }
 }
 
 // Loading
 .vp-portfolio.vp-portfolio__loading {
-    &:before {
-        content: '';
-        display: block;
+    &::before {
+        content: "";
         position: absolute;
+        display: block;
         top: 0;
-        left: 0;
         right: 0;
         bottom: 0;
+        left: 0;
         z-index: 1;
     }
 
     .vp-portfolio__items-wrap,
     .vp-portfolio__filter-wrap,
     .vp-portfolio__pagination-wrap {
-        opacity: 0.5;
+        opacity: .5;
     }
 }
 
@@ -192,26 +193,26 @@
     z-index: 100000;
 
     .pswp__caption {
-        background-color: rgba(0, 0, 0, 0.75);
+        background-color: rgba(0, 0, 0, .75);
 
         > div {
             max-width: 600px;
-            color: #fff;
             font-size: 12px;
+            color: #fff;
         }
 
         a {
             color: inherit;
 
             &:hover {
-                opacity: 0.8;
+                opacity: .8;
             }
         }
         .vp-portfolio__item-meta-title {
-            color: inherit;
             margin-top: 0;
             margin-bottom: 3px;
             font-size: 14px;
+            color: inherit;
 
             a {
                 text-decoration: none;
@@ -221,30 +222,30 @@
 
     .pswp__preloader {
         position: absolute;
-        bottom: 0;
         right: 0;
+        bottom: 0;
         z-index: 1;
     }
 
 
     .vp-pswp-video {
-        line-height: 0;
-        width: 100%;
-        height: 100%;
-        max-width: 1920px;
         position: relative;
         display: flex;
         align-items: center;
-        vertical-align: middle;
+        width: 100%;
+        max-width: 1920px;
+        height: 100%;
         margin: 0 auto;
+        line-height: 0;
         text-align: left;
+        vertical-align: middle;
         z-index: 1045;
 
         > div {
             position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
             width: 100%;
+            height: 0;
+            padding-bottom: 56.25%;
 
             iframe {
                 position: absolute;
@@ -255,7 +256,9 @@
                 margin: 0;
             }
             video {
+                // stylelint-disable-next-line declaration-no-important
                 width: 100% !important;
+                // stylelint-disable-next-line declaration-no-important
                 height: auto !important;
                 margin: 0;
             }

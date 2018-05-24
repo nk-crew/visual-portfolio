@@ -1,88 +1,98 @@
 /*!
  * Name    : Visual Portfolio
- * Version : 1.3.0
+ * Version : @@plugin_version
  * Author  : nK https://nkdev.info
  */
-(function ($) {
-    "use strict";
+/**
+ * Global Variables
+ */
+const $ = jQuery;
+const {
+    VPData,
+    objectFitImages,
+    PhotoSwipe,
+    PhotoSwipeUI_Default, // eslint-disable-line camelcase
+} = window;
+const {
+    __,
+    settingsPopupGallery,
+} = VPData;
 
-    /**
-     * Get window size
-     */
-    var $wnd = $(window);
-    var wndW = 0;
-    var wndH = 0;
-    function getWndSize () {
-        wndW = $wnd.width();
-        wndH = $wnd.height();
-    }
-    getWndSize();
-    $wnd.on('resize load orientationchange', getWndSize);
+/**
+ * Get window size
+ */
+const $wnd = $(window);
+let wndW = 0;
+let wndH = 0;
+function getWndSize() {
+    wndW = $wnd.width();
+    wndH = $wnd.height();
+}
+getWndSize();
+$wnd.on('resize load orientationchange', getWndSize);
 
-    // enable object-fit
-    if (typeof objectFitImages !== 'undefined') {
-        objectFitImages();
-    }
+// enable object-fit
+if (typeof objectFitImages !== 'undefined') {
+    objectFitImages();
+}
 
-    /**
-     * Main VP class
-     */
-    var VP = (function () {
-        function VP_inner ($item, userOptions) {
-            var self = this;
+/**
+ * Main VP class
+ */
+class VP {
+    constructor($item, userOptions) {
+        const self = this;
 
-            self.$item = $item;
+        self.$item = $item;
 
-            // get id from class
-            var classes = $item[0].className.split(/\s+/);
-            for (var k = 0; k < classes.length; k++) {
-                if (classes[k] && /^vp-uid-/.test(classes[k])) {
-                    self.uid = classes[k].replace(/^vp-uid-/, '');
-                }
-                if (classes[k] && /^vp-id-/.test(classes[k])) {
-                    self.id = classes[k].replace(/^vp-id-/, '');
-                }
+        // get id from class
+        const classes = $item[0].className.split(/\s+/);
+        for (let k = 0; k < classes.length; k++) {
+            if (classes[k] && /^vp-uid-/.test(classes[k])) {
+                self.uid = classes[k].replace(/^vp-uid-/, '');
             }
-            if (!self.uid) {
-                console.error(VPData.__.couldnt_retrieve_vp);
-                return;
+            if (classes[k] && /^vp-id-/.test(classes[k])) {
+                self.id = classes[k].replace(/^vp-id-/, '');
             }
-
-            self.$items_wrap = $item.find('.vp-portfolio__items');
-            self.$pagination = $item.find('.vp-portfolio__pagination-wrap');
-            self.$filter = $item.find('.vp-portfolio__filter-wrap');
-
-            // find single filter block.
-            if ( self.id ) {
-                self.$filter = self.$filter.add('.vp-single-filter.vp-id-' + self.id + ' .vp-portfolio__filter-wrap');
-            }
-
-            // user options
-            self.userOptions = userOptions;
-
-            self.firstRun = true;
-
-            self.init();
+        }
+        if (!self.uid) {
+            // eslint-disable-next-line no-console
+            console.error(__.couldnt_retrieve_vp);
+            return;
         }
 
-        return VP_inner;
-    }());
+        self.$items_wrap = $item.find('.vp-portfolio__items');
+        self.$pagination = $item.find('.vp-portfolio__pagination-wrap');
+        self.$filter = $item.find('.vp-portfolio__filter-wrap');
+
+        // find single filter block.
+        if (self.id) {
+            self.$filter = self.$filter.add(`.vp-single-filter.vp-id-${self.id} .vp-portfolio__filter-wrap`);
+        }
+
+        // user options
+        self.userOptions = userOptions;
+
+        self.firstRun = true;
+
+        self.init();
+    }
 
     // emit event
     // Example:
     // $(document).on('init.vp', function (event, infiniteObject) {
     //     console.log(infiniteObject);
     // });
-    VP.prototype.emitEvent = function emitEvent (event, data) {
+    emitEvent(event, data) {
         data = data ? [this].concat(data) : [this];
-        this.$item.trigger(event + '.vp.vp-uid-' + this.uid, data);
-    };
+        this.$item.trigger(`${event}.vp.vp-uid-${this.uid}`, data);
+    }
 
     /**
      * Init
      */
-    VP.prototype.init = function init () {
-        var self = this;
+    init() {
+        const self = this;
 
         // destroy if already inited
         if (!self.firstRun) {
@@ -107,11 +117,11 @@
         self.initPhotoswipe();
 
         // images loaded
-        self.$items_wrap.imagesLoaded(function() {
+        self.$items_wrap.imagesLoaded(() => {
             self.$item.addClass('vp-portfolio__ready');
 
-            if ( self.id ) {
-                $('.vp-single-filter.vp-id-' + self.id).addClass('vp-single-filter__ready');
+            if (self.id) {
+                $(`.vp-single-filter.vp-id-${self.id}`).addClass('vp-single-filter__ready');
             }
 
             // isotope
@@ -126,19 +136,19 @@
         self.emitEvent('init');
 
         self.firstRun = false;
-    };
+    }
 
     /**
      * Destroy
      */
-    VP.prototype.destroy = function destroy () {
-        var self = this;
+    destroy() {
+        const self = this;
 
         // remove loaded class
         self.$item.removeClass('vp-portfolio__ready');
 
-        if ( self.id ) {
-            $('.vp-single-filter.vp-id-' + self.id).removeClass('vp-single-filter__ready');
+        if (self.id) {
+            $(`.vp-single-filter.vp-id-${self.id}`).removeClass('vp-single-filter__ready');
         }
 
         // destroy events
@@ -160,10 +170,9 @@
         self.emitEvent('destroy');
 
         self.destroyed = true;
-    };
+    }
 
 
-    var stylesList = {};
     /**
      * Add style to the current portfolio list
      *
@@ -171,26 +180,30 @@
      * @param styles object with styles
      * @param media string with media query
      */
-    VP.prototype.addStyle = function addStyle (selector, styles, media) {
+    addStyle(selector, styles, media) {
         media = media || '';
 
-        var self = this;
-        var uid = self.uid;
+        const self = this;
+        const uid = self.uid;
 
-        if (typeof stylesList[uid] === 'undefined') {
-            stylesList[uid] = {};
-        }
-        if (typeof stylesList[uid][media] === 'undefined') {
-            stylesList[uid][media] = {};
-        }
-        if (typeof stylesList[uid][media][selector] === 'undefined') {
-            stylesList[uid][media][selector] = {};
+        if (!self.stylesList) {
+            self.stylesList = {};
         }
 
-        stylesList[uid][media][selector] = $.extend(stylesList[uid][media][selector], styles);
+        if (typeof self.stylesList[uid] === 'undefined') {
+            self.stylesList[uid] = {};
+        }
+        if (typeof self.stylesList[uid][media] === 'undefined') {
+            self.stylesList[uid][media] = {};
+        }
+        if (typeof self.stylesList[uid][media][selector] === 'undefined') {
+            self.stylesList[uid][media][selector] = {};
+        }
 
-        self.emitEvent('addStyle', [selector, styles, media, stylesList]);
-    };
+        self.stylesList[uid][media][selector] = $.extend(self.stylesList[uid][media][selector], styles);
+
+        self.emitEvent('addStyle', [selector, styles, media, self.stylesList]);
+    }
 
     /**
      * Remove style from the current portfolio list
@@ -199,66 +212,73 @@
      * @param styles object with styles
      * @param media string with media query
      */
-    VP.prototype.removeStyle = function removeStyle (selector, styles, media) {
+    removeStyle(selector, styles, media) {
         media = media || '';
 
-        var self = this;
-        var uid = self.uid;
+        const self = this;
+        const uid = self.uid;
 
-        if (typeof stylesList[uid] !== 'undefined' && !selector) {
-            stylesList[uid] = {};
+        if (!self.stylesList) {
+            self.stylesList = {};
         }
 
-        if (typeof stylesList[uid] !== 'undefined' && typeof stylesList[uid][media] !== 'undefined' && typeof stylesList[uid][media][selector] !== 'undefined' && selector) {
-            delete stylesList[uid][media][selector];
+        if (typeof self.stylesList[uid] !== 'undefined' && !selector) {
+            self.stylesList[uid] = {};
         }
 
-        self.emitEvent('removeStyle', [selector, styles, stylesList]);
-    };
+        if (typeof self.stylesList[uid] !== 'undefined' && typeof self.stylesList[uid][media] !== 'undefined' && typeof self.stylesList[uid][media][selector] !== 'undefined' && selector) {
+            delete self.stylesList[uid][media][selector];
+        }
+
+        self.emitEvent('removeStyle', [selector, styles, self.stylesList]);
+    }
 
     /**
      * Render style for the current portfolio list
      */
-    VP.prototype.renderStyle = function renderStyle () {
-        var self = this;
+    renderStyle() {
+        const self = this;
 
         // timeout for the case, when styles added one by one
-        var uid = self.uid;
-        var stylesString = '';
+        const uid = self.uid;
+        let stylesString = '';
+
+        if (!self.stylesList) {
+            self.stylesList = {};
+        }
 
         // create string with styles
-        if (typeof stylesList[uid] !== 'undefined') {
-            // current uid styles
-            for (var m in stylesList[uid]) {
+        if (typeof self.stylesList[uid] !== 'undefined') {
+            Object.keys(self.stylesList[uid]).forEach((m) => {
                 // media
                 if (m) {
-                    stylesString += '@media ' + m + ' {';
+                    stylesString += `@media ${m} {`;
                 }
-                for (var s in stylesList[uid][m]) {
+                Object.keys(self.stylesList[uid][m]).forEach((s) => {
                     // selector
-                    stylesString += '.vp-uid-' + uid + ' ' + s + ' {';
-                    for (var p in stylesList[uid][m][s]) {
+                    stylesString += `.vp-uid-${uid} ${s} {`;
+                    Object.keys(self.stylesList[uid][m][s]).forEach((p) => {
                         // property and value
-                        stylesString += p + ':' + stylesList[uid][m][s][p] + ';';
-                    }
+                        stylesString += `${p}:${self.stylesList[uid][m][s][p]};`;
+                    });
                     stylesString += '}';
-                }
+                });
                 // media
                 if (m) {
                     stylesString += '}';
                 }
-            }
+            });
         }
 
         // add in style tag
-        var $style = $('#vp-style-' + uid);
+        let $style = $(`#vp-style-${uid}`);
         if (!$style.length) {
-            $style = $('<style>').attr('id', 'vp-style-' + uid).appendTo('head');
+            $style = $('<style>').attr('id', `vp-style-${uid}`).appendTo('head');
         }
         $style.html(stylesString);
 
-        self.emitEvent('renderStyle', [stylesString, stylesList, $style]);
-    };
+        self.emitEvent('renderStyle', [stylesString, self.stylesList, $style]);
+    }
 
     /**
      * First char to lower case
@@ -266,15 +286,15 @@
      * @param str
      * @returns {string}
      */
-    VP.prototype.firstToLowerCase = function firstToLowerCase(str) {
+    firstToLowerCase(str) {
         return str.substr(0, 1).toLowerCase() + str.substr(1);
-    };
+    }
 
     /**
      * Init options
      */
-    VP.prototype.initOptions = function initOptions (userOptions) {
-        var self = this;
+    initOptions(userOptions) {
+        const self = this;
 
         // default options
         self.defaults = {
@@ -282,7 +302,7 @@
             itemsGap: 0,
             tilesType: '3|1,1|',
             masonryColumns: 3,
-            pagination: 'load-more'
+            pagination: 'load-more',
         };
 
         // new user options
@@ -291,18 +311,18 @@
         }
 
         // prepare data options
-        var dataOptions = self.$item[0].dataset;
-        var pureDataOptions = {};
-        for (var k in dataOptions) {
+        const dataOptions = self.$item[0].dataset;
+        const pureDataOptions = {};
+        Object.keys(dataOptions).forEach((k) => {
             if (k && k.substring(0, 2) === 'vp') {
                 pureDataOptions[self.firstToLowerCase(k.substring(2))] = dataOptions[k];
             }
-        }
+        });
 
         self.options = $.extend({}, self.defaults, pureDataOptions, self.userOptions);
 
         self.emitEvent('initOptions');
-    };
+    }
 
     /**
      * Check if lines cross
@@ -313,7 +333,7 @@
      * @param {object} d - second point of the second line
      * @returns {boolean}
      */
-    var isCrossLine = function (a, b, c, d) {
+    isCrossLine(a, b, c, d) {
         // Working code #1:
         //
         // var common = (b.x - a.x)*(d.y - c.y) - (b.y - a.y)*(d.x - c.x);
@@ -330,170 +350,173 @@
         // return r >= 0 && r <= 1 && s >= 0 && s <= 1;
 
         // Working code #2:
-        var v1=(d.x-c.x)*(a.y-c.y)-(d.y-c.y)*(a.x-c.x);
-        var v2=(d.x-c.x)*(b.y-c.y)-(d.y-c.y)*(b.x-c.x);
-        var v3=(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
-        var v4=(b.x-a.x)*(d.y-a.y)-(b.y-a.y)*(d.x-a.x);
-        return ((v1*v2<=0) && (v3*v4<=0));
-    };
+        const v1 = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
+        const v2 = (d.x - c.x) * (b.y - c.y) - (d.y - c.y) * (b.x - c.x);
+        const v3 = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+        const v4 = (b.x - a.x) * (d.y - a.y) - (b.y - a.y) * (d.x - a.x);
+        return ((v1 * v2 <= 0) && (v3 * v4 <= 0));
+    }
 
     /**
      * Init events
      */
-    VP.prototype.initEvents = function initEvents () {
-        var self = this;
-        var evp = '.vp.vp-uid-' + self.uid;
+    initEvents() {
+        const self = this;
+        const evp = `.vp.vp-uid-${self.uid}`;
 
         // Stretch
-        function stretch () {
-            var rect = self.$item[0].getBoundingClientRect();
-            var left = rect.left;
-            var right = wndW - rect.right;
+        function stretch() {
+            const rect = self.$item[0].getBoundingClientRect();
+            const left = rect.left;
+            const right = wndW - rect.right;
 
-            var ml = parseFloat(self.$item.css('margin-left') || 0);
-            var mr = parseFloat(self.$item.css('margin-right') || 0);
+            const ml = parseFloat(self.$item.css('margin-left') || 0);
+            const mr = parseFloat(self.$item.css('margin-right') || 0);
             self.$item.css({
                 'margin-left': ml - left,
-                'margin-right': mr - right
+                'margin-right': mr - right,
             });
         }
-        if ( self.$item.hasClass('vp-portfolio__stretch') ) {
-            $wnd.on('load' + evp + ' resize' + evp + ' orientationchange' + evp, function() {
+        if (self.$item.hasClass('vp-portfolio__stretch')) {
+            $wnd.on(`load${evp} resize${evp} orientationchange${evp}`, () => {
                 stretch();
             });
             stretch();
         }
 
         // Fly style
-        if ( 'fly' === self.options.itemsStyle ) {
-
+        if (self.options.itemsStyle === 'fly') {
             // determine cursor position
-            var lastCursorPos = {};
-            $wnd.on('mousemove' + evp, function (e) {
+            let lastCursorPos = {};
+            $wnd.on(`mousemove${evp}`, (e) => {
                 lastCursorPos = {
-                    x : e.clientX,
-                    y : e.clientY
+                    x: e.clientX,
+                    y: e.clientY,
                 };
             });
 
-            self.$item.on('mouseenter'  + evp + ' mouseleave' + evp, '.vp-portfolio__item', function (e) {
-                var $this = $(this);
-                var itemRect = $this[0].getBoundingClientRect();
-                var $overlay = $this.find('.vp-portfolio__item-overlay');
-                var enter = e.type === 'mouseenter';
-                var endX = '0%';
-                var endY = '0%';
-                var curCursorPos = {
+            self.$item.on(`mouseenter${evp} mouseleave${evp}`, '.vp-portfolio__item', function (e) {
+                const $this = $(this);
+                const itemRect = $this[0].getBoundingClientRect();
+                const $overlay = $this.find('.vp-portfolio__item-overlay');
+                const enter = e.type === 'mouseenter';
+                let endX = '0%';
+                let endY = '0%';
+                const curCursorPos = {
                     x: e.clientX,
-                    y: e.clientY
+                    y: e.clientY,
                 };
 
                 // find the corner that placed on cursor path.
-                var isUp = isCrossLine(
+                let isUp = self.isCrossLine(
                     { x: itemRect.left, y: itemRect.top },
                     { x: itemRect.left + itemRect.width, y: itemRect.top },
-                    curCursorPos, lastCursorPos);
-                var isDown = isCrossLine(
+                    curCursorPos, lastCursorPos,
+                );
+                let isDown = self.isCrossLine(
                     { x: itemRect.left, y: itemRect.top + itemRect.height },
                     { x: itemRect.left + itemRect.width, y: itemRect.top + itemRect.height },
-                    curCursorPos, lastCursorPos);
-                var isLeft = isCrossLine(
+                    curCursorPos, lastCursorPos,
+                );
+                let isLeft = self.isCrossLine(
                     { x: itemRect.left, y: itemRect.top },
                     { x: itemRect.left, y: itemRect.top + itemRect.height },
-                    curCursorPos, lastCursorPos);
-                var isRight = isCrossLine(
+                    curCursorPos, lastCursorPos,
+                );
+                let isRight = self.isCrossLine(
                     { x: itemRect.left + itemRect.width, y: itemRect.top },
                     { x: itemRect.left + itemRect.width, y: itemRect.top + itemRect.height },
-                    curCursorPos, lastCursorPos);
+                    curCursorPos, lastCursorPos,
+                );
 
-                // Sometimes isCrossLine returned false, so we need to check direction manually (less accurate, but it is not a big problem).
+                // Sometimes self.isCrossLine returned false, so we need to check direction manually (less accurate, but it is not a big problem).
                 if (!isUp && !isDown && !isLeft && !isRight) {
-                    var x = (itemRect.width / 2 - curCursorPos.x + itemRect.left) / (itemRect.width / 2);
-                    var y = (itemRect.height / 2 - curCursorPos.y + itemRect.top) / (itemRect.height / 2);
+                    const x = (itemRect.width / 2 - curCursorPos.x + itemRect.left) / (itemRect.width / 2);
+                    const y = (itemRect.height / 2 - curCursorPos.y + itemRect.top) / (itemRect.height / 2);
                     if (Math.abs(x) > Math.abs(y)) {
                         if (x > 0) {
                             isLeft = true;
                         } else {
                             isRight = true;
                         }
+                    } else if (y > 0) {
+                        isUp = true;
                     } else {
-                        if (y > 0) {
-                            isUp = true;
-                        } else {
-                            isDown = true;
-                        }
+                        isDown = true;
                     }
                 }
 
                 if (isUp) {
-                    endY = '-10' + endY;
+                    endY = `-10${endY}`;
                 } else if (isDown) {
-                    endY = '10' + endY;
+                    endY = `10${endY}`;
                 } else if (isLeft) {
-                    endX = '-10' + endX;
+                    endX = `-10${endX}`;
                 } else if (isRight) {
-                    endX = '10' + endX;
+                    endX = `10${endX}`;
                 }
 
                 if (enter) {
                     $overlay.css({
                         transition: 'none',
-                        transform: 'translateX(' + endX + ') translateY(' + endY + ') translateZ(0)'
+                        transform: `translateX(${endX}) translateY(${endY}) translateZ(0)`,
                     });
-                    // Trigger a reflow, flushing the CSS changes. This need to fix some glithes in Safari and Firefox. Info here - https://stackoverflow.com/questions/11131875/what-is-the-cleanest-way-to-disable-css-transition-effects-temporarily
+                    // Trigger a reflow, flushing the CSS changes. This need to fix some glithes in Safari and Firefox.
+                    // Info here - https://stackoverflow.com/questions/11131875/what-is-the-cleanest-way-to-disable-css-transition-effects-temporarily
+                    // eslint-disable-next-line no-unused-expressions
                     $overlay[0].offsetHeight;
                 }
 
                 $overlay.css({
                     transition: '.2s transform ease-in-out',
-                    transform: 'translateX(' + (enter ? '0%' : endX) + ') translateY(' + (enter ? '0%' : endY) + ') translateZ(0)'
+                    transform: `translateX(${enter ? '0%' : endX}) translateY(${enter ? '0%' : endY}) translateZ(0)`,
                 });
             });
         }
 
         // on filter click
-        self.$filter.on('click' + evp, '.vp-filter .vp-filter__item a', function (e) {
+        self.$filter.on(`click${evp}`, '.vp-filter .vp-filter__item a', function (e) {
             e.preventDefault();
-            var $this = $(this);
-            if ( ! self.loading ) {
+            const $this = $(this);
+            if (!self.loading) {
                 $this.closest('.vp-filter__item').addClass('vp-filter__item-active').siblings().removeClass('vp-filter__item-active');
             }
             self.loadNewItems($this.attr('href'), true);
         });
 
         // on pagination click
-        self.$item.on('click' + evp, '.vp-pagination .vp-pagination__item a', function (e) {
+        self.$item.on(`click${evp}`, '.vp-pagination .vp-pagination__item a', function (e) {
             e.preventDefault();
-            var $this = $(this);
-            if ( $this.hasClass('vp-pagination__no-more') && self.options.pagination !== 'paged') {
+            const $this = $(this);
+            if ($this.hasClass('vp-pagination__no-more') && self.options.pagination !== 'paged') {
                 return;
             }
             self.loadNewItems($this.attr('href'), self.options.pagination === 'paged');
         });
 
         // on categories of item click
-        self.$item.on('click' + evp, '.vp-portfolio__items .vp-portfolio__item-meta-category a', function (e) {
+        self.$item.on(`click${evp}`, '.vp-portfolio__items .vp-portfolio__item-meta-category a', function (e) {
             e.preventDefault();
             e.stopPropagation();
             self.loadNewItems($(this).attr('href'), true);
         });
 
         // infinite loading
-        var scrollTimeout;
-        var bottomPosToLoad = 250;
-        function checkVisibilityAndLoad () {
-            var rect = self.$item[0].getBoundingClientRect();
+        let scrollTimeout;
+        const bottomPosToLoad = 250;
+        function checkVisibilityAndLoad() {
+            const rect = self.$item[0].getBoundingClientRect();
 
             if (rect.bottom > 0 && (rect.bottom - bottomPosToLoad) <= wndH) {
-                self.loadNewItems(self.options.nextPageUrl, false, function () {
+                self.loadNewItems(self.options.nextPageUrl, false, () => {
                     checkVisibilityAndLoad();
                 });
             }
         }
         if (self.options.pagination === 'infinite') {
-            $wnd.on('load' + evp + ' scroll' + evp + ' resize' + evp + ' orientationchange' + evp, function() {
+            $wnd.on(`load${evp} scroll${evp} resize${evp} orientationchange${evp}`, () => {
                 clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(function() {
+                scrollTimeout = setTimeout(() => {
                     checkVisibilityAndLoad();
                 }, 60);
             });
@@ -501,14 +524,14 @@
         }
 
         self.emitEvent('initEvents');
-    };
+    }
 
     /**
      * Destroy events
      */
-    VP.prototype.destroyEvents = function destroyEvents () {
-        var self = this;
-        var evp = '.vp.vp-uid-' + self.uid;
+    destroyEvents() {
+        const self = this;
+        const evp = `.vp.vp-uid-${self.uid}`;
 
         // destroy click events
         self.$item.off(evp);
@@ -518,128 +541,130 @@
         $wnd.off(evp);
 
         self.emitEvent('destroyEvents');
-    };
+    }
 
     /**
      * Get Layout Settings
      *
      * @returns string
      */
-    VP.prototype.getTilesSettings = function getTilesSettings() {
-        var self = this;
+    getTilesSettings() {
+        const self = this;
 
-        var layoutArr = self.options.tilesType.split(/[:|]/);
+        const layoutArr = self.options.tilesType.split(/[:|]/);
 
         // remove last empty item
-        if (typeof layoutArr[layoutArr.length-1] !== 'undefined' && !layoutArr[layoutArr.length-1]) {
+        if (typeof layoutArr[layoutArr.length - 1] !== 'undefined' && !layoutArr[layoutArr.length - 1]) {
             layoutArr.pop();
         }
 
         return layoutArr;
-    };
+    }
 
     /**
      * Init layout
      */
-    VP.prototype.initLayout = function initLayout () {
-        var self = this;
+    initLayout() {
+        const self = this;
 
-        var screenSizes = [576, 768, 992, 1200];
+        const screenSizes = [576, 768, 992, 1200];
 
         // prepare layout
         if (self.options.layout) {
             switch (self.options.layout) {
-                case 'tiles':
-                    var settings = self.getTilesSettings();
+            case 'tiles': {
+                const settings = self.getTilesSettings();
 
-                    // get columns number
-                    var columns = parseInt(settings[0], 10);
-                    settings.shift();
+                // get columns number
+                const columns = parseInt(settings[0], 10) || 1;
+                settings.shift();
 
-                    columns = columns || 1;
+                // set columns
+                self.addStyle('.vp-portfolio__item-wrap', {
+                    width: `${100 / columns}%`,
+                });
 
-                    // set columns
-                    self.addStyle('.vp-portfolio__item-wrap', {
-                        'width': (100 / columns) + '%'
-                    });
+                // set items sizes
+                if (settings && settings.length) {
+                    for (let k = 0; k < settings.length; k++) {
+                        const size = settings[k].split(',');
+                        const w = parseFloat(size[0]) || 1;
+                        const h = parseFloat(size[1]) || 1;
 
-                    // set items sizes
-                    if (settings && settings.length) {
-                        for (var k = 0; k < settings.length; k++) {
-                            var size = settings[k].split(',');
-                            var w = parseFloat(size[0]) || 1;
-                            var h = parseFloat(size[1]) || 1;
+                        let itemSelector = '.vp-portfolio__item-wrap';
+                        if (settings.length > 1) {
+                            itemSelector += `:nth-of-type(${settings.length}n+${k + 1})`;
+                        }
 
-                            var itemSelector = '.vp-portfolio__item-wrap';
-                            if (settings.length > 1) {
-                                itemSelector += ':nth-of-type(' + settings.length + 'n+' + (k + 1) + ')';
-                            }
-
-                            if (w && w !== 1) {
-                                self.addStyle(itemSelector, {
-                                    'width': (w * 100 / columns) + '%'
-                                });
-                            }
-                            self.addStyle(itemSelector + ' .vp-portfolio__item-img-wrap:before', {
-                                'margin-top': (h * 100) + '%'
+                        if (w && w !== 1) {
+                            self.addStyle(itemSelector, {
+                                width: `${w * 100 / columns}%`,
                             });
                         }
+                        self.addStyle(`${itemSelector} .vp-portfolio__item-img-wrap:before`, {
+                            'margin-top': `${h * 100}%`,
+                        });
                     }
+                }
 
-                    // responsive
-                    for (var count = columns; count > 0; count--) {
-                        if (typeof screenSizes[count - 1] !== 'undefined') {
-                            self.addStyle('.vp-portfolio__item-wrap', {
-                                'width': (100 / count) + '%'
-                            }, 'screen and (max-width: ' + screenSizes[count - 1] + 'px)');
-                            self.addStyle('.vp-portfolio__item-wrap:nth-of-type(n)', {
-                                'width': (100 / count) + '%'
-                            }, 'screen and (max-width: ' + screenSizes[count - 1] + 'px)');
-                        }
+                // responsive
+                for (let count = columns; count > 0; count--) {
+                    if (typeof screenSizes[count - 1] !== 'undefined') {
+                        self.addStyle('.vp-portfolio__item-wrap', {
+                            width: `${100 / count}%`,
+                        }, `screen and (max-width: ${screenSizes[count - 1]}px)`);
+                        self.addStyle('.vp-portfolio__item-wrap:nth-of-type(n)', {
+                            width: `${100 / count}%`,
+                        }, `screen and (max-width: ${screenSizes[count - 1]}px)`);
                     }
-                    break;
-                case 'masonry':
-                    self.addStyle('.vp-portfolio__item-wrap', {
-                        'width': (100 / self.options.masonryColumns) + '%'
-                    });
+                }
+                break;
+            }
+            case 'masonry': {
+                self.addStyle('.vp-portfolio__item-wrap', {
+                    width: `${100 / self.options.masonryColumns}%`,
+                });
 
-                    // responsive
-                    for (var count = self.options.masonryColumns; count > 0; count--) {
-                        if (typeof screenSizes[count - 1] !== 'undefined') {
-                            self.addStyle('.vp-portfolio__item-wrap', {
-                                'width': (100 / count) + '%'
-                            }, 'screen and (max-width: ' + screenSizes[count - 1] + 'px)');
-                        }
+                // responsive
+                for (let count = self.options.masonryColumns; count > 0; count--) {
+                    if (typeof screenSizes[count - 1] !== 'undefined') {
+                        self.addStyle('.vp-portfolio__item-wrap', {
+                            width: `${100 / count}%`,
+                        }, `screen and (max-width: ${screenSizes[count - 1]}px)`);
                     }
-                case 'justified':
-                    break;
+                }
+            }
+            // falls through
+            case 'justified':
+                break;
+            // no default
             }
         }
 
         // add gaps
-        var gap = parseInt(self.options.itemsGap, 10);
-        if (gap && ('tiles' === self.options.layout || 'masonry' === self.options.layout)) {
+        const gap = parseInt(self.options.itemsGap, 10);
+        if (gap && (self.options.layout === 'tiles' || self.options.layout === 'masonry')) {
             self.addStyle('.vp-portfolio__items', {
-                'margin-left': '-' + gap + 'px',
-                'margin-top': '-' + gap + 'px'
+                'margin-left': `-${gap}px`,
+                'margin-top': `-${gap}px`,
             });
 
-            var gapStyle = gap + 'px';
+            const gapStyle = `${gap}px`;
 
             self.addStyle('.vp-portfolio__item-wrap .vp-portfolio__item', {
                 'margin-left': gapStyle,
-                'margin-top': gapStyle
+                'margin-top': gapStyle,
             });
 
             // tiles
-            if ('tiles' === self.options.layout) {
+            if (self.options.layout === 'tiles') {
                 self.addStyle('.vp-portfolio__item-wrap .vp-portfolio__item-img-wrap', {
-                    'margin-left': '-' + gapStyle,
-                    'margin-top': '-' + gapStyle
+                    'margin-left': `-${gapStyle}`,
+                    'margin-top': `-${gapStyle}`,
                 });
                 self.addStyle('.vp-portfolio__item-wrap .vp-portfolio__item-img', {
-                    'left': gapStyle,
-                    'top': gapStyle
+                    left: gapStyle,
+                    top: gapStyle,
                 });
             }
         }
@@ -647,42 +672,42 @@
         self.renderStyle();
 
         self.emitEvent('initLayout');
-    };
+    }
 
     /**
      * Init custom color by data attributes:
      * data-vp-bg-color
      * data-vp-text-color
      */
-    VP.prototype.initCustomColors = function initCustomColors () {
-        var self = this;
+    initCustomColors() {
+        const self = this;
 
         self.$item.find('[data-vp-bg-color]').each(function () {
-            var val = $(this).attr('data-vp-bg-color');
-            self.addStyle('[data-vp-bg-color="' + val + '"]', {
-                'background-color': val + ' !important'
+            const val = $(this).attr('data-vp-bg-color');
+            self.addStyle(`[data-vp-bg-color="${val}"]`, {
+                'background-color': `${val} !important`,
             });
         });
 
         self.$item.find('[data-vp-text-color]').each(function () {
-            var val = $(this).attr('data-vp-text-color');
-            self.addStyle('[data-vp-text-color="' + val + '"]', {
-                'color': val + ' !important'
+            const val = $(this).attr('data-vp-text-color');
+            self.addStyle(`[data-vp-text-color="${val}"]`, {
+                color: `${val} !important`,
             });
         });
 
         self.renderStyle();
 
         self.emitEvent('initCustomColors');
-    };
+    }
 
     /**
      * Init Isotope
      *
      * TODO: Check for MixItUp plugin
      */
-    VP.prototype.initIsotope = function initIsotope (options) {
-        var self = this;
+    initIsotope(options) {
+        const self = this;
 
         if (self.options.layout === 'tiles' || self.options.layout === 'masonry') {
             self.$items_wrap.isotope(options || {
@@ -692,32 +717,32 @@
                 //     horizontalOrder: true
                 // },
                 transitionDuration: '0.3s',
-                percentPosition: true
+                percentPosition: true,
             });
 
             self.emitEvent('initIsotope', [options]);
         }
-    };
+    }
 
     /**
      * Destroy Isotope
      */
-    VP.prototype.destroyIsotope = function destroyIsotope () {
-        var self = this;
-        var isotope = self.$items_wrap.data('isotope');
+    destroyIsotope() {
+        const self = this;
+        const isotope = self.$items_wrap.data('isotope');
 
         if (isotope) {
             self.$items_wrap.isotope('destroy');
 
             self.emitEvent('destroyIsotope');
         }
-    };
+    }
 
     /**
      * Init Justified Gallery plugin
      */
-    VP.prototype.initJustifiedGallery = function initJustifiedGallery () {
-        var self = this;
+    initJustifiedGallery() {
+        const self = this;
 
         if (self.options.layout === 'justified') {
             self.$items_wrap.justifiedGallery({
@@ -725,28 +750,28 @@
                 margins: self.options.itemsGap || 0,
                 border: 0,
                 selector: '.vp-portfolio__item-wrap',
-                waitThumbnailsLoad: false
+                waitThumbnailsLoad: false,
             });
 
             self.emitEvent('initJustifiedGallery');
         }
-    };
+    }
 
     /**
      * Destroy Justified Gallery plugin
      *
      * TODO: when this issue will be fixed (https://github.com/miromannino/Justified-Gallery/issues/228), need to use default destroy method
      */
-    VP.prototype.destroyJustifiedGallery = function destroyJustifiedGallery () {
-        var self = this;
-        var jg = self.$items_wrap.data('jg.controller');
+    destroyJustifiedGallery() {
+        const self = this;
+        const jg = self.$items_wrap.data('jg.controller');
 
         if (jg) {
             // jg.destroy();
 
             clearInterval(jg.checkWidthIntervalId);
-            $.each(jg.entries, function(_, entry) {
-                var $entry = $(entry);
+            $.each(jg.entries, (_, entry) => {
+                const $entry = $(entry);
 
                 // Reset entry style
                 $entry.css('width', '');
@@ -757,7 +782,7 @@
                 $entry.removeClass('jg-entry');
 
                 // Reset image style
-                var $img = $entry.find('.vp-portfolio__item-img img');
+                const $img = $entry.find('.vp-portfolio__item-img img');
                 if ($img.length) {
                     $img.css('width', '');
                     $img.css('height', '');
@@ -769,15 +794,12 @@
 
                 // Remove caption
                 jg.removeCaptionEventsHandlers($entry);
-                var $caption = jg.captionFromEntry($entry);
+                const $caption = jg.captionFromEntry($entry);
                 if ($entry.data('jg.createdCaption')) {
                     // remove also the caption element (if created by jg)
                     $entry.data('jg.createdCaption', undefined);
                     if ($caption !== null) $caption.remove();
-                } else {
-                    if ($caption !== null) $caption.fadeTo(0, 1);
-                }
-
+                } else if ($caption !== null) $caption.fadeTo(0, 1);
             });
 
             jg.$gallery.css('height', '');
@@ -786,74 +808,73 @@
 
             self.emitEvent('destroyJustifiedGallery');
         }
-    };
+    }
 
     /**
      * Init Photoswipe plugin
      */
-    VP.prototype.initPhotoswipe = function initPhotoswipe () {
-        var self = this;
+    initPhotoswipe() {
+        const self = this;
 
-        if(typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery') {
+        if (typeof PhotoSwipe === 'undefined' || !self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery') {
             return;
         }
 
-        var settings_popup_gallery = VPData.settings_popup_gallery;
-
         // prevent on preview page
-        if ( self.$item.closest('#vp_preview').length ) {
+        if (self.$item.closest('#vp_preview').length) {
             return;
         }
 
         // prepare photoswipe markup
-        if ( !$('.vp-pswp').length ) {
-            var markup = '' +
-                '<div class="pswp vp-pswp vp-pswp-uid-' + self.uid + '" tabindex="-1" role="dialog" aria-hidden="true">' +
-                '   <div class="pswp__bg"></div>' +
-                '   <div class="pswp__scroll-wrap">' +
-                '      <div class="pswp__container">' +
-                '          <div class="pswp__item"></div>' +
-                '          <div class="pswp__item"></div>' +
-                '          <div class="pswp__item"></div>' +
-                '      </div>' +
-                '      <div class="pswp__ui pswp__ui--hidden">' +
-                '          <div class="pswp__top-bar">' +
-                '              <div class="pswp__counter"></div>' +
-                '              <a class="pswp__button pswp__button--close" title="' + VPData.__.pswp_close + '"></a>' +
-                '              <a class="pswp__button pswp__button--share" title="' + VPData.__.pswp_share + '"></a>' +
-                '              <a class="pswp__button pswp__button--fs" title="' + VPData.__.pswp_fs + '"></a>' +
-                '              <a class="pswp__button pswp__button--zoom" title="' + VPData.__.pswp_zoom + '"></a>' +
-                '          </div>' +
-                '          <div class="pswp__preloader">' +
-                '              <div class="pswp__preloader__icn">' +
-                '                  <div class="pswp__preloader__cut">' +
-                '                      <div class="pswp__preloader__donut"></div>' +
-                '                  </div>' +
-                '              </div>' +
-                '          </div>' +
-                '          <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">' +
-                '              <div class="pswp__share-tooltip"></div>' +
-                '          </div>' +
-                '          <a class="pswp__button pswp__button--arrow--left" title="' + VPData.__.pswp_prev + '"></a>' +
-                '          <a class="pswp__button pswp__button--arrow--right" title="' + VPData.__.pswp_next + '"></a>' +
-                '          <div class="pswp__caption">' +
-                '              <div class="pswp__caption__center"></div>' +
-                '          </div>' +
-                '      </div>' +
-                '   </div>' +
-                '</div>';
+        if (!$('.vp-pswp').length) {
+            const markup = `
+            <div class="pswp vp-pswp vp-pswp-uid-'}${self.uid}" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="pswp__bg"></div>
+                <div class="pswp__scroll-wrap">
+                    <div class="pswp__container">
+                        <div class="pswp__item"></div>
+                        <div class="pswp__item"></div>
+                        <div class="pswp__item"></div>
+                    </div>
+                    <div class="pswp__ui pswp__ui--hidden">
+                        <div class="pswp__top-bar">
+                            <div class="pswp__counter"></div>
+                            <a class="pswp__button pswp__button--close" title="${__.pswp_close}"></a>
+                            <a class="pswp__button pswp__button--share" title="${__.pswp_share}"></a>
+                            <a class="pswp__button pswp__button--fs" title="${__.pswp_fs}"></a>
+                            <a class="pswp__button pswp__button--zoom" title="${__.pswp_zoom}"></a>
+                        </div>
+                        <div class="pswp__preloader">
+                            <div class="pswp__preloader__icn">
+                                <div class="pswp__preloader__cut">
+                                    <div class="pswp__preloader__donut"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                            <div class="pswp__share-tooltip"></div>
+                        </div>
+                        <a class="pswp__button pswp__button--arrow--left" title="${__.pswp_prev}"></a>
+                        <a class="pswp__button pswp__button--arrow--right" title="${__.pswp_next}"></a>
+                        <div class="pswp__caption">
+                            <div class="pswp__caption__center"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
             $('body').append(markup);
         }
 
         // init code
-        var parseThumbnailElements = function (el) {
-            var thumbElements = $(el).find('.vp-portfolio__item-wrap'),
-                items = [],
-                $meta,
-                size,
-                videoSize,
-                item,
-                video;
+        const parseThumbnailElements = function (el) {
+            const thumbElements = $(el).find('.vp-portfolio__item-wrap');
+            const items = [];
+            let $meta;
+            let size;
+            let videoSize;
+            let item;
+            let video;
 
             thumbElements.each(function () {
                 $meta = $(this).find('.vp-portfolio__item-popup');
@@ -865,17 +886,17 @@
                     item = {
                         html: video,
                         vw: parseInt(videoSize[0], 10),
-                        vh: parseInt(videoSize[1], 10)
+                        vh: parseInt(videoSize[1], 10),
                     };
                 } else {
                     // create slide object
                     item = {
                         src: $meta.attr('data-vp-popup-img'),
                         w: parseInt(size[0], 10),
-                        h: parseInt(size[1], 10)
+                        h: parseInt(size[1], 10),
                     };
 
-                    var $caption = $meta.html();
+                    const $caption = $meta.html();
                     if ($caption) {
                         item.title = $caption;
                     }
@@ -883,14 +904,14 @@
                     // save link to element for getThumbBoundsFn
                     item.el = this;
 
-                    var mediumSrc = $meta.attr('data-vp-popup-md-img') || item.src;
-                    if(mediumSrc) {
+                    const mediumSrc = $meta.attr('data-vp-popup-md-img') || item.src;
+                    if (mediumSrc) {
                         size = ($meta.attr('data-vp-popup-md-img-size') || $meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
                         // "medium-sized" image
                         item.m = {
                             src: mediumSrc,
                             w: parseInt(size[0], 10),
-                            h: parseInt(size[1], 10)
+                            h: parseInt(size[1], 10),
                         };
                     }
 
@@ -898,7 +919,7 @@
                     item.o = {
                         src: item.src,
                         w: item.w,
-                        h: item.h
+                        h: item.h,
                     };
                 }
 
@@ -908,10 +929,10 @@
             return items;
         };
 
-        var resizeVideo = function (data, curItem) {
+        function resizeVideo(data, curItem) {
             if (typeof curItem === 'undefined') {
                 if (data && data.itemHolders.length) {
-                    data.itemHolders.forEach(function (val) {
+                    data.itemHolders.forEach((val) => {
                         if (val.item && val.item.html) {
                             resizeVideo(data, val.item);
                         }
@@ -921,15 +942,15 @@
             }
 
             // calculate real viewport in pixels
-            var vpW = data.viewportSize.x * window.devicePixelRatio;
-            var vpH = data.viewportSize.y * window.devicePixelRatio;
-            var ratio = curItem.vw / curItem.vh;
-            var resultW;
-            var $container = $(curItem.container);
+            const vpW = data.viewportSize.x * window.devicePixelRatio;
+            let vpH = data.viewportSize.y * window.devicePixelRatio;
+            const ratio = curItem.vw / curItem.vh;
+            let resultW;
+            const $container = $(curItem.container);
 
-            var bars = data.options.barsSize;
-            var barTop = 0;
-            var barBot = 0;
+            const bars = data.options.barsSize;
+            let barTop = 0;
+            let barBot = 0;
             if (bars) {
                 barTop = bars.top && bars.top !== 'auto' ? bars.top : 0;
                 barBot = bars.bottom && bars.bottom !== 'auto' ? bars.bottom : 0;
@@ -945,47 +966,47 @@
             $container.find('.vp-pswp-video').css('max-width', resultW);
             $container.css({
                 top: barTop,
-                bottom: barBot
+                bottom: barBot,
             });
-        };
+        }
 
-        var openPhotoSwipe = function (index, galleryElement, disableAnimation, fromURL) {
-            var pswpElement = $('.vp-pswp')[0],
-                gallery,
-                options,
-                items;
-
-            items = parseThumbnailElements(galleryElement);
+        const openPhotoSwipe = function (index, galleryElement, disableAnimation, fromURL) {
+            const pswpElement = $('.vp-pswp')[0];
+            const items = parseThumbnailElements(galleryElement);
 
             // define options (if needed)
-            options = {
+            const options = {
                 captionAndToolbarShowEmptyCaptions: false,
-                closeEl: settings_popup_gallery.show_close_button,
-                captionEl: settings_popup_gallery.show_caption,
-                fullscreenEl: settings_popup_gallery.show_fullscreen_button,
-                zoomEl: settings_popup_gallery.show_zoom_button,
-                shareEl: settings_popup_gallery.show_share_button,
-                counterEl: settings_popup_gallery.show_counter,
-                arrowEl: settings_popup_gallery.show_arrows,
+                closeEl: settingsPopupGallery.show_close_button,
+                captionEl: settingsPopupGallery.show_caption,
+                fullscreenEl: settingsPopupGallery.show_fullscreen_button,
+                zoomEl: settingsPopupGallery.show_zoom_button,
+                shareEl: settingsPopupGallery.show_share_button,
+                counterEl: settingsPopupGallery.show_counter,
+                arrowEl: settingsPopupGallery.show_arrows,
                 shareButtons: [
-                    {id:'facebook', label: VPData.__.pswp_share_fb, url:'https://www.facebook.com/sharer/sharer.php?u={{url}}'},
-                    {id:'twitter', label: VPData.__.pswp_share_tw, url:'https://twitter.com/intent/tweet?text={{text}}&url={{url}}'},
-                    {id:'pinterest', label: VPData.__.pswp_share_pin, url:'https://www.pinterest.com/pin/create/button/'+
-                    '?url={{url}}&media={{image_url}}&description={{text}}'}
+                    { id: 'facebook', label: __.pswp_share_fb, url: 'https://www.facebook.com/sharer/sharer.php?u={{url}}' },
+                    { id: 'twitter', label: __.pswp_share_tw, url: 'https://twitter.com/intent/tweet?text={{text}}&url={{url}}' },
+                    {
+                        id: 'pinterest',
+                        label: __.pswp_share_pin,
+                        url: 'https://www.pinterest.com/pin/create/button/' +
+                        '?url={{url}}&media={{image_url}}&description={{text}}',
+                    },
                 ],
                 bgOpacity: 1,
                 tapToClose: true,
                 tapToToggleControls: false,
                 showHideOpacity: true,
-                galleryUID: self.uid
+                galleryUID: self.uid,
             };
 
-            if(fromURL) {
-                if(options.galleryPIDs) {
+            if (fromURL) {
+                if (options.galleryPIDs) {
                     // parse real index when custom PIDs are used
                     // http://photoswipe.com/documentation/faq.html#custom-pid-in-url
-                    for(var j = 0; j < items.length; j++) {
-                        if(items[j].pid === index) {
+                    for (let j = 0; j < items.length; j++) {
+                        if (items[j].pid === index) {
                             options.index = j;
                             break;
                         }
@@ -998,24 +1019,24 @@
             }
 
             // exit if index not found
-            if(isNaN(options.index)) {
+            if (Number.isNaN(options.index)) {
                 return;
             }
 
-            if(disableAnimation) {
+            if (disableAnimation) {
                 options.showAnimationDuration = 0;
             }
 
             // Pass data to PhotoSwipe and initialize it
-            gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+            const gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
 
             // see: http://photoswipe.com/documentation/responsive-images.html
-            var realViewportWidth,
-                useLargeImages = false,
-                firstResize = true,
-                imageSrcWillChange;
+            let realViewportWidth;
+            let useLargeImages = false;
+            let firstResize = true;
+            let imageSrcWillChange;
 
-            gallery.listen('beforeResize', function () {
+            gallery.listen('beforeResize', () => {
                 // gallery.viewportSize.x - width of PhotoSwipe viewport
                 // gallery.viewportSize.y - height of PhotoSwipe viewport
                 // window.devicePixelRatio - ratio between physical pixels and device independent pixels (Number)
@@ -1027,33 +1048,33 @@
                 // Code below is needed if you want image to switch dynamically on window.resize
 
                 // Find out if current images need to be changed
-                if(useLargeImages && realViewportWidth < 1000) {
+                if (useLargeImages && realViewportWidth < 1000) {
                     useLargeImages = false;
                     imageSrcWillChange = true;
-                } else if(!useLargeImages && realViewportWidth >= 1000) {
+                } else if (!useLargeImages && realViewportWidth >= 1000) {
                     useLargeImages = true;
                     imageSrcWillChange = true;
                 }
 
                 // Invalidate items only when source is changed and when it's not the first update
-                if(imageSrcWillChange && !firstResize) {
+                if (imageSrcWillChange && !firstResize) {
                     // invalidateCurrItems sets a flag on slides that are in DOM,
                     // which will force update of content (image) on window.resize.
                     gallery.invalidateCurrItems();
                 }
 
-                if(firstResize) {
+                if (firstResize) {
                     firstResize = false;
                 }
 
                 imageSrcWillChange = false;
             });
 
-            gallery.listen('gettingData', function (idx, item) {
+            gallery.listen('gettingData', (idx, item) => {
                 if (item.html) {
                     return;
                 }
-                if( useLargeImages ) {
+                if (useLargeImages) {
                     item.src = item.o.src;
                     item.w = item.o.w;
                     item.h = item.o.h;
@@ -1068,28 +1089,28 @@
                 resizeVideo(this);
             });
 
-            gallery.listen('afterChange', function() {
+            gallery.listen('afterChange', function () {
                 resizeVideo(this);
             });
 
             gallery.init();
         };
 
-        var photoswipeParseHash = function () {
-            var hash = window.location.hash.substring(1),
-                params = {};
+        const photoswipeParseHash = function () {
+            const hash = window.location.hash.substring(1);
+            const params = {};
 
-            if(hash.length < 5) { // pid=1
+            if (hash.length < 5) { // pid=1
                 return params;
             }
 
-            var vars = hash.split('&');
-            for (var i = 0; i < vars.length; i++) {
-                if(!vars[i]) {
+            const vars = hash.split('&');
+            for (let i = 0; i < vars.length; i++) {
+                if (!vars[i]) {
                     continue;
                 }
-                var pair = vars[i].split('=');
-                if(pair.length < 2) {
+                const pair = vars[i].split('=');
+                if (pair.length < 2) {
                     continue;
                 }
                 params[pair[0]] = pair[1];
@@ -1099,11 +1120,11 @@
         };
 
         // click action
-        self.$item.on('click.vp.vp-uid-' + self.uid, '.vp-portfolio__item', function (e) {
+        self.$item.on(`click.vp.vp-uid-${self.uid}`, '.vp-portfolio__item', function (e) {
             e.preventDefault();
 
-            var index = 0;
-            var clicked = this;
+            let index = 0;
+            const clicked = this;
             self.$item.find('.vp-portfolio__item').each(function (idx) {
                 if (this === clicked) {
                     index = idx;
@@ -1115,33 +1136,33 @@
         });
 
         // Parse URL and open gallery if it contains #&pid=3&gid=1
-        var hashData = photoswipeParseHash();
-        if(hashData.pid && hashData.gid === self.uid) {
+        const hashData = photoswipeParseHash();
+        if (hashData.pid && hashData.gid === self.uid) {
             openPhotoSwipe(hashData.pid, self.$item[0], true, true);
         }
-    };
+    }
 
     /**
      * Destroy Photoswipe plugin
      */
-    VP.prototype.destroyPhotoswipe = function destroyPhotoswipe () {
-        var self = this;
+    destroyPhotoswipe() {
+        const self = this;
 
-        self.$item.off('click.vp.vp-uid-' + self.uid);
+        self.$item.off(`click.vp.vp-uid-${self.uid}`);
 
-        $('.vp-pswp-uid-' + self.uid).remove();
-    };
+        $(`.vp-pswp-uid-${self.uid}`).remove();
+    }
 
     /**
      * Add New Items
      */
-    VP.prototype.addItems = function addItems ($items, removeExisting) {
-        var self = this;
-        var isotope = self.$items_wrap.data('isotope');
+    addItems($items, removeExisting) {
+        const self = this;
+        const isotope = self.$items_wrap.data('isotope');
 
         if (isotope) {
             if (removeExisting) {
-                var $existing = self.$items_wrap.find('.vp-portfolio__item-wrap');
+                const $existing = self.$items_wrap.find('.vp-portfolio__item-wrap');
                 self.$items_wrap.isotope('remove', $existing);
 
                 // we need to prepend items when remove existing just because Tiles layout have troubles with appending and removing items
@@ -1153,35 +1174,35 @@
             }
 
             // images loaded init
-            self.$items_wrap.imagesLoaded(function() {
+            self.$items_wrap.imagesLoaded(() => {
                 self.initIsotope('layout');
             });
         }
 
         self.emitEvent('addItems', [$items, removeExisting]);
-    };
+    }
 
     /**
      * Remove Items
      */
-    VP.prototype.removeItems = function removeItems ($items) {
-        var self = this;
-        var isotope = self.$items_wrap.data('isotope');
+    removeItems($items) {
+        const self = this;
+        const isotope = self.$items_wrap.data('isotope');
 
         if (isotope) {
             self.$items_wrap.isotope('remove', $items);
         }
 
         self.emitEvent('removeItems', [$items]);
-    };
+    }
 
     /**
      * AJAX Load New Items
      */
-    VP.prototype.loadNewItems = function (url, removeExisting, cb) {
-        var self = this;
+    loadNewItems(url, removeExisting, cb) {
+        const self = this;
 
-        if(self.loading || ! url) {
+        if (self.loading || !url) {
             return;
         }
         self.loading = true;
@@ -1191,27 +1212,27 @@
         self.emitEvent('startLoadingNewItems', [url]);
 
         // load to invisible container, then append to posts container
-        $.get(url, {}, function(data) {
-            data = data.replace('<body', '<body><div id="vp-infinite-load-body"').replace('</body>','</div></body>');
-            var $body = $(data).filter('#vp-infinite-load-body');
+        $.get(url, {}, (data) => {
+            data = data.replace('<body', '<body><div id="vp-infinite-load-body"').replace('</body>', '</div></body>');
+            const $body = $(data).filter('#vp-infinite-load-body');
 
             // find current block on new page
-            var $new_vp = $body.find('.vp-portfolio.vp-uid-' + self.uid);
+            const $newVP = $body.find(`.vp-portfolio.vp-uid-${self.uid}`);
 
             // insert new items
-            if ($new_vp.length) {
-                var newItems = $new_vp.find('.vp-portfolio__items').html();
+            if ($newVP.length) {
+                const newItems = $newVP.find('.vp-portfolio__items').html();
 
                 // update filter
                 if (self.$filter.length) {
                     self.$filter.each(function () {
-                        var $filter = $(this);
-                        var newFilterContent = '';
+                        const $filter = $(this);
+                        let newFilterContent = '';
 
-                        if ( $filter.parent().hasClass('vp-single-filter') ) {
-                            newFilterContent = $body.find('[class="' + $filter.parent().attr('class').replace( ' vp-single-filter__ready', '' ) + '"] .vp-portfolio__filter-wrap').html();
+                        if ($filter.parent().hasClass('vp-single-filter')) {
+                            newFilterContent = $body.find(`[class="${$filter.parent().attr('class').replace(' vp-single-filter__ready', '')}"] .vp-portfolio__filter-wrap`).html();
                         } else {
-                            newFilterContent = $new_vp.find('.vp-portfolio__filter-wrap').html();
+                            newFilterContent = $newVP.find('.vp-portfolio__filter-wrap').html();
                         }
 
                         $filter.html(newFilterContent);
@@ -1220,16 +1241,16 @@
 
                 // update pagination
                 if (self.$pagination.length) {
-                    self.$pagination.html($new_vp.find('.vp-portfolio__pagination-wrap').html());
+                    self.$pagination.html($newVP.find('.vp-portfolio__pagination-wrap').html());
                 }
 
                 self.addItems($(newItems), removeExisting);
 
-                self.emitEvent('loadedNewItems', [$new_vp, $new_vp, data]);
+                self.emitEvent('loadedNewItems', [$newVP, $newVP, data]);
             }
 
             // update next page data
-            var nextPageUrl = $new_vp.attr('data-vp-next-page-url');
+            const nextPageUrl = $newVP.attr('data-vp-next-page-url');
             self.options.nextPageUrl = nextPageUrl;
             self.$item.attr('data-vp-next-page-url', nextPageUrl);
 
@@ -1246,41 +1267,41 @@
                 cb();
             }
         });
-    };
+    }
+}
 
-    // global definition
-    var plugin = function (options) {
-        var args = Array.prototype.slice.call(arguments, 1),
-            ret;
+// global definition
+const plugin = function (options) {
+    const args = Array.prototype.slice.call(arguments, 1);
+    let ret;
 
-        this.each(function () {
-            if (typeof ret !== 'undefined') {
-                return;
+    this.each(function () {
+        if (typeof ret !== 'undefined') {
+            return;
+        }
+
+        if (typeof options === 'object' || typeof options === 'undefined') {
+            if (!this.vp) {
+                this.vp = new VP($(this), options);
             }
-
-            if (typeof options === 'object' || typeof options === 'undefined') {
-                if(!this.vp) {
-                    this.vp = new VP($(this), options);
-                }
-            } else if (this.vp) {
-                ret = this.vp[options].apply(this.vp, args);
-            }
-        });
-
-        return typeof ret !== 'undefined' ? ret : this;
-    };
-    plugin.constructor = VP;
-
-    // no conflict
-    var oldPlugin = jQuery.fn.vp;
-    jQuery.fn.vp = plugin;
-    jQuery.fn.vp.noConflict = function () {
-        jQuery.fn.vp = oldPlugin;
-        return this;
-    };
-
-    // initialization
-    $(function () {
-        $('.vp-portfolio').vp();
+        } else if (this.vp) {
+            ret = this.vp[options](...args);
+        }
     });
-})(jQuery);
+
+    return typeof ret !== 'undefined' ? ret : this;
+};
+plugin.constructor = VP;
+
+// no conflict
+const oldPlugin = jQuery.fn.vp;
+jQuery.fn.vp = plugin;
+jQuery.fn.vp.noConflict = function () {
+    jQuery.fn.vp = oldPlugin;
+    return this;
+};
+
+// initialization
+$(() => {
+    $('.vp-portfolio').vp();
+});

@@ -1,47 +1,48 @@
 /*!
  * Name    : Visual Portfolio
- * Version : 1.3.0
+ * Version : @@plugin_version
  * Author  : nK https://nkdev.info
  */
-(function($) {
-    if (typeof Visual_Portfolio_TinyMCE_Options === 'undefined' || ! Visual_Portfolio_TinyMCE_Options.length) {
-        return;
-    }
-    var options = [{
+const {
+    tinymce,
+    VPTinyMCEOptions,
+} = window;
+if (typeof VPTinyMCEOptions !== 'undefined' && VPTinyMCEOptions.length) {
+    const options = [{
         text: '',
-        value: ''
+        value: '',
     }];
 
-    for (var k in Visual_Portfolio_TinyMCE_Options) {
+    Object.keys(VPTinyMCEOptions).forEach((k) => {
         options.push({
-            text: Visual_Portfolio_TinyMCE_Options[k].title,
-            value: Visual_Portfolio_TinyMCE_Options[k].id
+            text: VPTinyMCEOptions[k].title,
+            value: VPTinyMCEOptions[k].id,
         });
-    }
+    });
 
     tinymce.create('tinymce.plugins.visual_portfolio', {
-        init : function(editor, url) {
+        init(editor) {
             editor.addButton('visual_portfolio', {
                 type: 'listbox',
-                title : 'Visual Portfolio',
+                title: 'Visual Portfolio',
                 icon: 'visual-portfolio',
                 classes: 'visual-portfolio-btn',
-                onclick: function () {
+                onclick() {
                     if (this.menu) {
-                        this.menu.$el.find('.mce-first').hide()
+                        this.menu.$el.find('.mce-first').hide();
                     }
                 },
-                onselect: function() {
-                    if ( this.value() ) {
-                        editor.insertContent('[visual_portfolio id="' + this.value() + '"]');
+                onselect() {
+                    if (this.value()) {
+                        editor.insertContent(`[visual_portfolio id="${this.value()}"]`);
                     }
                     this.value('');
                 },
                 values: options,
-                value: ''
+                value: '',
             });
-        }
+        },
     });
 
     tinymce.PluginManager.add('visual_portfolio', tinymce.plugins.visual_portfolio);
-})(jQuery);
+}

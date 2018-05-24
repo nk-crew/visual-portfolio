@@ -11,18 +11,18 @@
         position: absolute;
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding: 20px;
+        color: #fff;
         text-align: center;
         text-decoration: none;
         background-color: #212125;
         transform: translateY(-100%) translateX(-100%);
-        color: #fff;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 20px;
     }
 
     // meta
@@ -32,12 +32,12 @@
         }
     }
     .vp-portfolio__item-meta-title {
-        color: inherit;
-        font-size: 1.3em;
         margin-bottom: 0;
+        font-size: 1.3em;
+        color: inherit;
     }
     .vp-portfolio__item-meta-date {
-        font-size: 0.85em;
+        font-size: .85em;
     }
     .vp-portfolio__item-meta-icon {
         font-size: 2em;
@@ -50,22 +50,22 @@
         position: absolute;
         display: flex;
         flex-wrap: wrap;
-        list-style-type: none;
-        left: 0;
         bottom: 0;
-        margin: 0;
+        left: 0;
         padding: 15px 10px;
+        margin: 0;
+        list-style-type: none;
 
         .vp-portfolio__item-meta-category {
             display: block;
-            margin: 0 5px;
             padding: 4px 15px;
-            background-color: #3c3c3c;
+            margin: 0 5px;
             color: #fff;
+            background-color: #3c3c3c;
         }
     }
     .vp-portfolio__item-meta-excerpt {
-        opacity: 0.8;
+        opacity: .8;
     }
 
     // align
@@ -79,34 +79,34 @@
     }
 
     .vp-portfolio__item-align-top-center {
-        justify-content: center;
         align-items: flex-start;
+        justify-content: center;
         text-align: center;
     }
     .vp-portfolio__item-align-top-left {
-        justify-content: flex-start;
         align-items: flex-start;
+        justify-content: flex-start;
         text-align: left;
     }
     .vp-portfolio__item-align-top-right {
-        justify-content: flex-end;
         align-items: flex-start;
+        justify-content: flex-end;
         text-align: right;
     }
 
     .vp-portfolio__item-align-bottom-center {
-        justify-content: center;
         align-items: flex-end;
+        justify-content: center;
         text-align: center;
     }
     .vp-portfolio__item-align-bottom-left {
-        justify-content: flex-start;
         align-items: flex-end;
+        justify-content: flex-start;
         text-align: left;
     }
     .vp-portfolio__item-align-bottom-right {
-        justify-content: flex-end;
         align-items: flex-end;
+        justify-content: flex-end;
         text-align: right;
     }
 }
