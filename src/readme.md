@@ -1,24 +1,23 @@
-=== Visual Portfolio ===
-Contributors: nko
-Tags: portfolio, gallery, works, masonry, popup
-Requires at least: 4.0.0
-Tested up to: 4.9
-Stable tag: 1.0
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+# Visual Portfolio #
+* Contributors: nko
+* Tags: portfolio, gallery, works, masonry, popup
+* Requires at least: 4.0.0
+* Tested up to: 4.9
+* Stable tag: @@plugin_version
+* License: GPLv2 or later
+* License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Portfolio lists visual editor.
+Portfolio lists visual editor. Masonry, tiles, custom posts.
 
 
-
-== Description ==
+## Description ##
 
 Visual Portfolio editor let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry or Tiles layouts.
 
 See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://demo.nkdev.info/#visual-portfolio)
 
 
-=== Features ===
+= Features =
 
 * Visual preview for portfolio list shortcode builder
 * Templates for theme developers
@@ -52,7 +51,7 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
 
 
 
-== Screenshots ==
+## Screenshots ##
 
 1. Visual Portfolio builder p.1
 2. Visual Portfolio builder p.2
@@ -68,21 +67,21 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
 
 
 
-== Installation ==
+## Installation ##
 
-= Automatic installation =
+#### Automatic installation ####
 
 Automatic installation is the easiest option as WordPress handles the file transfers itself and you don’t need to leave your web browser. To do an automatic install of Visual Portfolio, log in to your WordPress dashboard, navigate to the Plugins menu and click Add New.
 
 In the search field type “Visual Portfolio” and click Search Plugins. Once you’ve found our plugin you can view details about it such as the point release, rating and description. Most importantly of course, you can install it by simply clicking “Install Now”.
 
-= Manual installation =
+#### Manual installation ####
 
 The manual installation method involves downloading our Visual Portfolio plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
 
 
 
-== Changelog ==
+## Changelog ##
 
 = 1.3.0 =
 * improved CSS editor (added autocomplete hints; selectors hint; showing errors; preventing save when editor has errors)
@@ -171,8 +170,8 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 
 
-== Frequently Asked Questions ==
+## Frequently Asked Questions ##
 
-= How to change default templates and styles? =
+#### How to change default templates and styles? ####
 
 You can copy files from the **/visual-portfolio/templates/** to your **YOUR_THEME/visual-portfolio/** folder and change php code and css files here.
