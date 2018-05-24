@@ -120,6 +120,14 @@ gulp.task('build_scss', function () {
             .pipe(gulp.dest(itemData.to))
     });
 });
+gulp.task('build_scss_templates', function () {
+    return runStream(work_folders, function (itemData) {
+        // copy scss template files.
+        return gulp.src([itemData.from + '/templates/**/*.scss'])
+            .pipe($.plumber({ errorHandler }))
+            .pipe(gulp.dest(itemData.to + '/templates/'));
+    });
+});
 gulp.task('copy_to_dist_watch_php', function () {
     return runStream(work_folders, function (itemData) {
         return gulp.src(itemData.from + '/**/*.php')
@@ -202,7 +210,7 @@ gulp.task('translate', function () {
  * Build Task [default]
  */
 gulp.task('build', function(cb) {
-    runSequence('clean', 'copy_to_dist', 'copy_to_dist_vendors', 'build_scss', 'build_js', 'correct_lines_ending', 'update_template_vars', 'translate', cb);
+    runSequence('clean', 'copy_to_dist', 'copy_to_dist_vendors', 'build_scss', 'build_scss_templates', 'build_js', 'correct_lines_ending', 'update_template_vars', 'translate', cb);
 });
 gulp.task('watch_build_php', function(cb) {
     runSequence('copy_to_dist_watch_php', 'update_template_vars_watch', 'translate', cb);
@@ -223,7 +231,7 @@ gulp.task('watch', ['build'], function() {
         var itemData = work_folders[k];
         gulp.watch([itemData.from + '/**/*.php', '!' + itemData.from + '/*vendor/**/*'], ['watch_build_php']);
         gulp.watch([itemData.from + '/**/*.js', '!' + itemData.from + '/*vendor/**/*'], ['build_js']);
-        gulp.watch([itemData.from + '/**/*.scss', '!' + itemData.from + '/*vendor/**/*'], ['build_scss']);
+        gulp.watch([itemData.from + '/**/*.scss', '!' + itemData.from + '/*vendor/**/*'], ['build_scss', 'build_scss_templates']);
         gulp.watch([itemData.from + '/**/*', '!' + itemData.from + '/**/*.{php,js,scss}', itemData.from + '/*vendor/**/*'], ['watch_build_all']);
         gulp.watch(itemData.from + '/**/vendor/**/*', ['watch_build_vendors']);
     }
