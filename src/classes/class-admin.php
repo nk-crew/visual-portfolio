@@ -159,9 +159,9 @@ class Visual_Portfolio_Admin {
         );
         wp_enqueue_style(
             'visual-portfolio-gutenberg',
-            plugins_url( '../assets/admin/js/gutenberg-block.min.css', __FILE__ ),
+            plugins_url( '../assets/admin/css/gutenberg-block.min.css', __FILE__ ),
             array(),
-            filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/js/gutenberg-block.min.css' )
+            filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/css/gutenberg-block.min.css' )
         );
     }
 
