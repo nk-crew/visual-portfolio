@@ -19,6 +19,12 @@ class Visual_Portfolio_Admin {
     public function __construct() {
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 
+        // include gutenberg block.
+        // work only if Gutenberg available.
+        if ( function_exists( 'register_block_type' ) ) {
+            add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
+        }
+
         // custom post types.
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
 
@@ -139,6 +145,24 @@ class Visual_Portfolio_Admin {
         wp_enqueue_script( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.min.js', array( 'jquery' ), '@@plugin_version', true );
         wp_enqueue_style( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.min.css', '', '@@plugin_version' );
         wp_localize_script( '@@plugin_name-admin', 'VPAdminVariables', $data_init );
+    }
+
+    /**
+     * Enqueue script for Gutenberg editor
+     */
+    public function enqueue_block_editor_assets() {
+        wp_enqueue_script(
+            'visual-portfolio-gutenberg',
+            plugins_url( '../assets/admin/js/gutenberg-block.min.js', __FILE__ ),
+            array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components' ),
+            filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/js/gutenberg-block.min.js' )
+        );
+        wp_enqueue_style(
+            'visual-portfolio-gutenberg',
+            plugins_url( '../assets/admin/js/gutenberg-block.min.css', __FILE__ ),
+            array(),
+            filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/js/gutenberg-block.min.css' )
+        );
     }
 
     /**

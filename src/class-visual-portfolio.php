@@ -107,6 +107,7 @@ class Visual_Portfolio {
 
         // init classes.
         new Visual_Portfolio_Settings();
+        new Visual_Portfolio_Rest();
         new Visual_Portfolio_Get();
         new Visual_Portfolio_Shortcode();
         new Visual_Portfolio_Preview();
@@ -238,6 +239,7 @@ class Visual_Portfolio {
      */
     private function include_dependencies() {
         require_once( $this->plugin_path . 'classes/class-settings.php' );
+        require_once( $this->plugin_path . 'classes/class-rest.php' );
         require_once( $this->plugin_path . 'classes/class-get-portfolio.php' );
         require_once( $this->plugin_path . 'classes/class-shortcode.php' );
         require_once( $this->plugin_path . 'classes/class-preview.php' );

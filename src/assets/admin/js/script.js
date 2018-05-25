@@ -12,45 +12,45 @@ const {
     emmetCodeMirror,
 } = window;
 
-const $body = $('body');
-const $window = $(window);
-const $editForm = $('form[name="post"]');
-const $postType = $('[name="post_type"]');
-const postID = $('#postID').val();
+const $body = $( 'body' );
+const $window = $( window );
+const $editForm = $( 'form[name="post"]' );
+const $postType = $( '[name="post_type"]' );
+const postID = $( '#postID' ).val();
 
 // select shortcode text in input
-$body.on('focus', '[name="vp_list_shortcode"], [name="vp_filter_shortcode"]', function () {
+$body.on( 'focus', '[name="vp_list_shortcode"], [name="vp_filter_shortcode"]', function() {
     this.select();
-});
-$body.on('click', '.vp-onclick-selection', function () {
-    window.getSelection().selectAllChildren(this);
-});
+} );
+$body.on( 'click', '.vp-onclick-selection', function() {
+    window.getSelection().selectAllChildren( this );
+} );
 
 // Post format metabox show/hide
-const $videoMetabox = $('#vp_format_video');
-const $videoFormatCheckbox = $('#post-format-video');
+const $videoMetabox = $( '#vp_format_video' );
+const $videoFormatCheckbox = $( '#post-format-video' );
 function toggleVideoMetabox() {
-    $videoMetabox[$videoFormatCheckbox.is(':checked') ? 'show' : 'hide']();
+    $videoMetabox[ $videoFormatCheckbox.is( ':checked' ) ? 'show' : 'hide' ]();
 }
-if ($videoMetabox.length && $videoFormatCheckbox.length) {
+if ( $videoMetabox.length && $videoFormatCheckbox.length ) {
     toggleVideoMetabox();
-    $body.on('change', '[name=post_format]', () => {
+    $body.on( 'change', '[name=post_format]', () => {
         toggleVideoMetabox();
-    });
+    } );
 }
 let oembedAjax = null;
 let oembedAjaxTimeout;
-$body.on('change input', '.vp-input[name="video_url"]', function () {
-    if (oembedAjax !== null) {
+$body.on( 'change input', '.vp-input[name="video_url"]', function() {
+    if ( oembedAjax !== null ) {
         oembedAjax.abort();
     }
 
-    const $this = $(this);
-    $this.next('.vp-oembed-preview').html('');
+    const $this = $( this );
+    $this.next( '.vp-oembed-preview' ).html( '' );
 
-    clearTimeout(oembedAjaxTimeout);
-    oembedAjaxTimeout = setTimeout(() => {
-        oembedAjax = $.ajax({
+    clearTimeout( oembedAjaxTimeout );
+    oembedAjaxTimeout = setTimeout( () => {
+        oembedAjax = $.ajax( {
             url: ajaxurl,
             method: 'GET',
             dataType: 'json',
@@ -59,34 +59,33 @@ $body.on('change input', '.vp-input[name="video_url"]', function () {
                 q: $this.val(),
                 nonce: VPAdminVariables.nonce,
             },
-            complete(data) {
+            complete( data ) {
                 const json = data.responseJSON;
-                if (json && typeof json.html !== 'undefined') {
-                    $this.next('.vp-oembed-preview').html(json.html);
+                if ( json && typeof json.html !== 'undefined' ) {
+                    $this.next( '.vp-oembed-preview' ).html( json.html );
                 }
             },
-        });
-    }, 250);
-});
-
+        } );
+    }, 250 );
+} );
 
 // Popper.js
-if (typeof Tooltip !== 'undefined') {
-    $('[data-hint]:not([data-hint=""]):not([data-hint="false"])').each(function () {
-        const $this = $(this);
+if ( typeof Tooltip !== 'undefined' ) {
+    $( '[data-hint]:not([data-hint=""]):not([data-hint="false"])' ).each( function() {
+        const $this = $( this );
         // eslint-disable-next-line no-new
-        new Tooltip(this, {
-            placement: $this.attr('data-hint-place') || 'top',
-            title: $this.attr('data-hint'),
-            container: $('body')[0],
+        new Tooltip( this, {
+            placement: $this.attr( 'data-hint-place' ) || 'top',
+            title: $this.attr( 'data-hint' ),
+            container: $( 'body' )[ 0 ],
             boundariesElement: 'viewport',
-        });
-    });
+        } );
+    } );
 }
 
-(function () {
+( function() {
     // Activate code only in vp_lists page
-    if ($postType.val() !== 'vp_lists' || !$editForm.length) {
+    if ( $postType.val() !== 'vp_lists' || ! $editForm.length ) {
         return;
     }
 
@@ -94,116 +93,116 @@ if (typeof Tooltip !== 'undefined') {
      * Portfolio list creation
      */
     // content source
-    const $contentSource = $('.vp-content-source');
-    const $contentSourceInput = $contentSource.find('[name="vp_content_source"]');
+    const $contentSource = $( '.vp-content-source' );
+    const $contentSourceInput = $contentSource.find( '[name="vp_content_source"]' );
 
     // activate content source
-    $contentSource.on('click', '.vp-content-source__item', function () {
-        const contentName = $(this).attr('data-content');
-        $contentSource.find(`[data-content="${contentName}"]`).addClass('active').siblings().removeClass('active');
-        $contentSourceInput.val(contentName).change();
-    });
-    $contentSource.children(`[data-content="${$contentSourceInput.val()}"]`).click();
+    $contentSource.on( 'click', '.vp-content-source__item', function() {
+        const contentName = $( this ).attr( 'data-content' );
+        $contentSource.find( `[data-content="${ contentName }"]` ).addClass( 'active' ).siblings().removeClass( 'active' );
+        $contentSourceInput.val( contentName ).change();
+    } );
+    $contentSource.children( `[data-content="${ $contentSourceInput.val() }"]` ).click();
 
     // enable conditionize
-    if ($.fn.conditionize) {
+    if ( $.fn.conditionize ) {
         $editForm.conditionize();
     }
 
     // range slider
-    $('.vp-control-range').each(function () {
-        const $inputs = $(this).find('input');
-        const $hidden = $inputs.filter('[type="hidden"]');
+    $( '.vp-control-range' ).each( function() {
+        const $inputs = $( this ).find( 'input' );
+        const $hidden = $inputs.filter( '[type="hidden"]' );
 
-        $inputs.on('change input', function (e) {
-            $inputs.val($(this).val());
-            $hidden.trigger(`vp-fake-${e.type}`);
-        });
-    });
+        $inputs.on( 'change input', function( e ) {
+            $inputs.val( $( this ).val() );
+            $hidden.trigger( `vp-fake-${ e.type }` );
+        } );
+    } );
 
     // color picker
-    if ($.fn.wpColorPicker) {
-        $('.vp-color-picker').each(function () {
+    if ( $.fn.wpColorPicker ) {
+        $( '.vp-color-picker' ).each( function() {
             let colorPickerTimeout;
             let initialCall = true;
-            function onChange(e) {
-                if (initialCall) {
+            function onChange( e ) {
+                if ( initialCall ) {
                     initialCall = false;
                     return;
                 }
-                clearTimeout(colorPickerTimeout);
-                colorPickerTimeout = setTimeout(() => {
-                    $(e.target).change();
-                }, 300);
+                clearTimeout( colorPickerTimeout );
+                colorPickerTimeout = setTimeout( () => {
+                    $( e.target ).change();
+                }, 300 );
             }
-            $(this).data('change', onChange).wpColorPicker();
-        });
+            $( this ).data( 'change', onChange ).wpColorPicker();
+        } );
     }
 
     // image picker
-    if ($.fn.imagepicker) {
-        $('.vp-image-picker').imagepicker();
+    if ( $.fn.imagepicker ) {
+        $( '.vp-image-picker' ).imagepicker();
     }
 
     // frame load
-    const $frame = $('.vp_list_preview iframe');
+    const $frame = $( '.vp_list_preview iframe' );
     let $framePortfolio = false;
     let frameJQuery = false;
-    const $previewForm = $('<form target="vp_list_preview_iframe" method="post" style="display: none">')
-        .attr('action', $frame.attr('src'))
-        .insertAfter($editForm);
+    const $previewForm = $( '<form target="vp_list_preview_iframe" method="post" style="display: none">' )
+        .attr( 'action', $frame.attr( 'src' ) )
+        .insertAfter( $editForm );
 
     // resize iframe
-    if ($.fn.iFrameResize) {
-        $frame.iFrameResize({
+    if ( $.fn.iFrameResize ) {
+        $frame.iFrameResize( {
             interval: 10,
-        });
+        } );
     }
 
     // portfolio options changed
     let reloadTimeout;
-    $editForm.on('change input vp-fake-change vp-fake-input', '[name*="vp_"]', function (e) {
-        const $this = $(this);
+    $editForm.on( 'change input vp-fake-change vp-fake-input', '[name*="vp_"]', function( e ) {
+        const $this = $( this );
         const data = {
-            name: $this.attr('name'),
-            value: $this.is('[type=checkbox], [type=radio]') ? $this.is(':checked') : $this.val(),
+            name: $this.attr( 'name' ),
+            value: $this.is( '[type=checkbox], [type=radio]' ) ? $this.is( ':checked' ) : $this.val(),
             reload: e.type === 'change' || e.type === 'vp-fake-change',
             jQuery: frameJQuery,
             $portfolio: $framePortfolio,
         };
 
         // create form input to store current changed data.
-        let $input = $previewForm.find(`[name="${data.name}"]`);
-        if (!$input.length) {
-            $input = $(`<input type="hidden" name="${data.name}" />`)
-                .appendTo($previewForm);
+        let $input = $previewForm.find( `[name="${ data.name }"]` );
+        if ( ! $input.length ) {
+            $input = $( `<input type="hidden" name="${ data.name }" />` )
+                .appendTo( $previewForm );
         }
-        $input.attr('value', data.value);
+        $input.attr( 'value', data.value );
 
-        $window.trigger('vp-preview-change', data);
+        $window.trigger( 'vp-preview-change', data );
 
         // reload frame
-        if (data.reload || !$framePortfolio) {
-            clearTimeout(reloadTimeout);
-            reloadTimeout = setTimeout(() => {
+        if ( data.reload || ! $framePortfolio ) {
+            clearTimeout( reloadTimeout );
+            reloadTimeout = setTimeout( () => {
                 frameJQuery = false;
                 $framePortfolio = false;
                 $previewForm.submit();
-            }, 400);
+            }, 400 );
         }
-    });
+    } );
 
-    $frame.on('load', function () {
+    $frame.on( 'load', function() {
         frameJQuery = this.contentWindow.jQuery;
-        $framePortfolio = frameJQuery('.vp-portfolio');
-    });
+        $framePortfolio = frameJQuery( '.vp-portfolio' );
+    } );
 
     // live reload
-    $window.on('vp-preview-change', (e, data) => {
-        if (!data.$portfolio) {
+    $window.on( 'vp-preview-change', ( e, data ) => {
+        if ( ! data.$portfolio ) {
             return;
         }
-        switch (data.name) {
+        switch ( data.name ) {
         case 'vp_layout':
         case 'vp_tiles_type':
         case 'vp_masonry_columns':
@@ -211,36 +210,36 @@ if (typeof Tooltip !== 'undefined') {
             let name = data.name;
 
             // remove vp_
-            name = name.substring(3);
+            name = name.substring( 3 );
 
             // replace _ to -
-            name = name.replace('_', '-');
+            name = name.replace( '_', '-' );
 
-            data.$portfolio.attr(`data-vp-${name}`, data.value);
-            data.$portfolio.vp('init');
+            data.$portfolio.attr( `data-vp-${ name }`, data.value );
+            data.$portfolio.vp( 'init' );
             data.reload = false;
 
             break;
         }
         case 'vp_filter_align':
-            data.$portfolio.find('.vp-filter').removeClass('vp-filter__align-center vp-filter__align-left vp-filter__align-right').addClass(`vp-filter__align-${data.value}`);
+            data.$portfolio.find( '.vp-filter' ).removeClass( 'vp-filter__align-center vp-filter__align-left vp-filter__align-right' ).addClass( `vp-filter__align-${ data.value }` );
             data.reload = false;
 
             break;
         case 'vp_pagination_align':
-            data.$portfolio.find('.vp-pagination').removeClass('vp-pagination__align-center vp-pagination__align-left vp-pagination__align-right').addClass(`vp-pagination__align-${data.value}`);
+            data.$portfolio.find( '.vp-pagination' ).removeClass( 'vp-pagination__align-center vp-pagination__align-left vp-pagination__align-right' ).addClass( `vp-pagination__align-${ data.value }` );
             data.reload = false;
 
             break;
         case 'vp_custom_css': {
-            const $html = data.$portfolio.closest('html');
-            const customCssID = `vp-custom-css-${postID}-inline-css`;
-            let $style = $html.find(`#${customCssID}`);
-            if (!$style.length) {
-                $style = data.jQuery(`<style id="${customCssID}">`);
-                $html.find('body').prepend($style);
+            const $html = data.$portfolio.closest( 'html' );
+            const customCssID = `vp-custom-css-${ postID }-inline-css`;
+            let $style = $html.find( `#${ customCssID }` );
+            if ( ! $style.length ) {
+                $style = data.jQuery( `<style id="${ customCssID }">` );
+                $html.find( 'body' ).prepend( $style );
             }
-            $style.html(data.value);
+            $style.html( data.value );
             data.reload = false;
 
             break;
@@ -252,84 +251,84 @@ if (typeof Tooltip !== 'undefined') {
             break;
         // no default
         }
-    });
+    } );
 
     // vp_layout -> data-vp-layout
     // vp_tiles_type -> data-vp-tiles-type
     // vp_items_gap -> data-vp-items-gap
 
     // image dropdown
-    $body.on('click', '.vp-control-image-dropdown', function (e) {
-        if (!$(e.target).closest('.vp-control-image-dropdown__content').length) {
-            $(this).toggleClass('active');
+    $body.on( 'click', '.vp-control-image-dropdown', function( e ) {
+        if ( ! $( e.target ).closest( '.vp-control-image-dropdown__content' ).length ) {
+            $( this ).toggleClass( 'active' );
         }
-    });
-    $body.on('mousedown', (e) => {
-        const $select = $(e.target).closest('.vp-control-image-dropdown');
-        const $all = $('.vp-control-image-dropdown.active');
+    } );
+    $body.on( 'mousedown', ( e ) => {
+        const $select = $( e.target ).closest( '.vp-control-image-dropdown' );
+        const $all = $( '.vp-control-image-dropdown.active' );
 
-        $all.each(function () {
-            if (this === $select[0]) {
+        $all.each( function() {
+            if ( this === $select[ 0 ] ) {
                 return;
             }
 
-            $(this).removeClass('active');
-        });
-    });
-    $body.on('change', '.vp-control-image-dropdown .vp-image-picker', function () {
-        const $this = $(this);
-        const pickerData = $this.data('picker');
+            $( this ).removeClass( 'active' );
+        } );
+    } );
+    $body.on( 'change', '.vp-control-image-dropdown .vp-image-picker', function() {
+        const $this = $( this );
+        const pickerData = $this.data( 'picker' );
 
-        if (pickerData) {
-            const $selected = pickerData.select.find(`option[value="${pickerData.select.val()}"]`);
-            const $optgroup = $selected.parent('optgroup');
-            const $dropdown = $this.closest('.vp-control-image-dropdown');
-            const src = $selected.attr('data-img-src');
+        if ( pickerData ) {
+            const $selected = pickerData.select.find( `option[value="${ pickerData.select.val() }"]` );
+            const $optgroup = $selected.parent( 'optgroup' );
+            const $dropdown = $this.closest( '.vp-control-image-dropdown' );
+            const src = $selected.attr( 'data-img-src' );
 
-            if ($dropdown.length) {
-                $dropdown.children('.vp-control-image-dropdown__preview').html(`<img src="${src}" alt="">`);
+            if ( $dropdown.length ) {
+                $dropdown.children( '.vp-control-image-dropdown__preview' ).html( `<img src="${ src }" alt="">` );
 
-                if ($optgroup.length) {
-                    $dropdown.children('.vp-control-image-dropdown__title').html($optgroup.attr('label'));
+                if ( $optgroup.length ) {
+                    $dropdown.children( '.vp-control-image-dropdown__title' ).html( $optgroup.attr( 'label' ) );
                 }
             }
         }
-    });
+    } );
 
     // change shortcode name.
-    const $listName = $('[name="vp_list_name"]');
-    const $postTitle = $('[name="post_title"]');
+    const $listName = $( '[name="vp_list_name"]' );
+    const $postTitle = $( '[name="post_title"]' );
 
-    if ($listName.length && $postTitle.length) {
-        $listName.on('input', () => {
-            if ($postTitle.val() !== $listName.val()) {
-                $postTitle.val($listName.val()).change();
+    if ( $listName.length && $postTitle.length ) {
+        $listName.on( 'input', () => {
+            if ( $postTitle.val() !== $listName.val() ) {
+                $postTitle.val( $listName.val() ).change();
             }
-        });
-        $postTitle.on('input', () => {
-            $listName.val($postTitle.val());
-        });
+        } );
+        $postTitle.on( 'input', () => {
+            $listName.val( $postTitle.val() );
+        } );
     }
 
     // enable select2
-    if ($.fn.select2) {
-        $('.vp-select2').each(function () {
-            const $this = $(this);
+    if ( $.fn.select2 ) {
+        $( '.vp-select2' ).each( function() {
+            const $this = $( this );
             let opts = {
                 width: '100%',
-                minimumResultsForSearch: $this.hasClass('vp-select2-nosearch') ? -1 : 1,
+                minimumResultsForSearch: $this.hasClass( 'vp-select2-nosearch' ) ? -1 : 1,
             };
-            const $postTypeAjax = $this.attr('data-post-type') ? $($this.attr('data-post-type')) : false;
+            const $postTypeAjax = $this.attr( 'data-post-type' ) ? $( $this.attr( 'data-post-type' ) ) : false;
 
             // ajax posts
-            if ($this.closest('.vp-select2-posts-ajax').length) {
-                opts = $.extend({
+            if ( $this.closest( '.vp-select2-posts-ajax' ).length ) {
+                opts = $.extend( {
                     minimumInputLength: 1,
                     ajax: {
                         url: ajaxurl,
                         dataType: 'json',
                         delay: 250,
-                        data(params) {
+                        data( params ) {
                             return {
                                 action: 'vp_find_posts',
                                 q: params.term,
@@ -337,55 +336,59 @@ if (typeof Tooltip !== 'undefined') {
                                 nonce: VPAdminVariables.nonce,
                             };
                         },
-                        processResults(data) {
+                        processResults( data ) {
                             return {
                                 results: data && data.length ? data : false,
                             };
                         },
                         cache: true,
                     },
-                    escapeMarkup(markup) { return markup; },
-                    templateResult(data) {
-                        if (data.loading) return data.text;
+                    escapeMarkup( markup ) {
+                        return markup;
+                    },
+                    templateResult( data ) {
+                        if ( data.loading ) {
+                            return data.text;
+                        }
 
                         let title = '';
-                        if (data.title) {
+                        if ( data.title ) {
                             title = data.title;
                         }
 
                         let postType = '';
-                        if (data.post_type) {
+                        if ( data.post_type ) {
                             postType = data.post_type;
                         }
 
                         let img = '';
-                        if (data.img) {
-                            img = `style="background-image: url('${data.img}');"`;
+                        if ( data.img ) {
+                            img = `style="background-image: url('${ data.img }');"`;
                         }
 
-                        return `${'<div class="vp-select2-ajax__result">' +
-                                   '<div class="vp-select2-ajax__result-img" '}${img}></div>` +
+                        return `${ '<div class="vp-select2-ajax__result">' +
+                                   '<div class="vp-select2-ajax__result-img" ' }${ img }></div>` +
                                    '<div class="vp-select2-ajax__result-data">' +
-                                       `<div class="vp-select2-ajax__result-title">${title}</div>` +
-                                       `<div class="vp-select2-ajax__result-post-type">${postType}</div>` +
+                                       `<div class="vp-select2-ajax__result-title">${ title }</div>` +
+                                       `<div class="vp-select2-ajax__result-post-type">${ postType }</div>` +
                                    '</div>' +
                                '</div>';
                     },
-                    templateSelection(repo) {
+                    templateSelection( repo ) {
                         return repo.title || repo.text;
                     },
-                }, opts);
+                }, opts );
             }
 
             // ajax taxonomies
-            if ($this.closest('.vp-select2-taxonomies-ajax').length) {
-                opts = $.extend({
+            if ( $this.closest( '.vp-select2-taxonomies-ajax' ).length ) {
+                opts = $.extend( {
                     minimumInputLength: 1,
                     ajax: {
                         url: ajaxurl,
                         dataType: 'json',
                         delay: 250,
-                        data(params) {
+                        data( params ) {
                             return {
                                 action: 'vp_find_taxonomies',
                                 q: params.term,
@@ -393,16 +396,16 @@ if (typeof Tooltip !== 'undefined') {
                                 nonce: VPAdminVariables.nonce,
                             };
                         },
-                        processResults(data) {
+                        processResults( data ) {
                             const result = [];
 
-                            if (data) {
-                                Object.keys(data).forEach((k) => {
-                                    result.push({
+                            if ( data ) {
+                                Object.keys( data ).forEach( ( k ) => {
+                                    result.push( {
                                         text: k,
-                                        children: data[k],
-                                    });
-                                });
+                                        children: data[ k ],
+                                    } );
+                                } );
                             }
 
                             return {
@@ -411,86 +414,86 @@ if (typeof Tooltip !== 'undefined') {
                         },
                         cache: true,
                     },
-                }, opts);
+                }, opts );
             }
 
             // init
-            $this.select2(opts).data('select2').$dropdown.addClass('select2-vp-container');
-        });
+            $this.select2( opts ).data( 'select2' ).$dropdown.addClass( 'select2-vp-container' );
+        } );
     }
 
     // codemirror
-    const $customCss = $('[name="vp_custom_css"]');
+    const $customCss = $( '[name="vp_custom_css"]' );
     let saveEditorWithErrors = false;
 
     // update editor error message
     let firstTimeEditorUpdate = true;
-    function updateEditorError(errorAnnotations, editorChange) {
-        if (firstTimeEditorUpdate) {
+    function updateEditorError( errorAnnotations, editorChange ) {
+        if ( firstTimeEditorUpdate ) {
             editorChange = false;
             firstTimeEditorUpdate = false;
         }
-        if (VPAdminVariables && VPAdminVariables.css_editor_error_notice) {
+        if ( VPAdminVariables && VPAdminVariables.css_editor_error_notice ) {
             let message = false;
 
-            if (errorAnnotations.length === 1) {
-                message = VPAdminVariables.css_editor_error_notice.singular.replace('%d', '1');
-            } else if (errorAnnotations.length > 1) {
-                message = VPAdminVariables.css_editor_error_notice.plural.replace('%d', String(errorAnnotations.length));
+            if ( errorAnnotations.length === 1 ) {
+                message = VPAdminVariables.css_editor_error_notice.singular.replace( '%d', '1' );
+            } else if ( errorAnnotations.length > 1 ) {
+                message = VPAdminVariables.css_editor_error_notice.plural.replace( '%d', String( errorAnnotations.length ) );
             }
 
-            if (message) {
-                let $notice = $customCss.prev('#vp_custom_css_notice');
-                if (!$notice.length && !editorChange) {
-                    $notice = $('<div class="notice notice-error inline" id="vp_custom_css_notice"></div>');
-                    $customCss.before($notice);
+            if ( message ) {
+                let $notice = $customCss.prev( '#vp_custom_css_notice' );
+                if ( ! $notice.length && ! editorChange ) {
+                    $notice = $( '<div class="notice notice-error inline" id="vp_custom_css_notice"></div>' );
+                    $customCss.before( $notice );
                 }
 
-                if (!$notice.length) {
+                if ( ! $notice.length ) {
                     return;
                 }
 
                 // add error notice
-                const noticeText = `<p class="notification-message">${message}</p>` +
+                const noticeText = `<p class="notification-message">${ message }</p>` +
                     '<p>' +
                     '<input id="vp_custom_css_notice_prevent" type="checkbox">' +
-                    `<label for="vp_custom_css_notice_prevent">${VPAdminVariables.css_editor_error_checkbox}</label>` +
+                    `<label for="vp_custom_css_notice_prevent">${ VPAdminVariables.css_editor_error_checkbox }</label>` +
                     '</p>';
 
-                $notice.html(noticeText);
+                $notice.html( noticeText );
             } else {
                 // remove notice block if no errors
-                $customCss.prev('#vp_custom_css_notice').remove();
+                $customCss.prev( '#vp_custom_css_notice' ).remove();
             }
         }
     }
 
-    if (typeof CodeMirror !== 'undefined' && $customCss.length) {
+    if ( typeof CodeMirror !== 'undefined' && $customCss.length ) {
         // Hint with all available visual composer clasnames
-        if (VPAdminVariables && VPAdminVariables.classnames) {
+        if ( VPAdminVariables && VPAdminVariables.classnames ) {
             const defaultCSShint = CodeMirror.hint.css;
-            CodeMirror.hint.css = function (cm) {
+            CodeMirror.hint.css = function( cm ) {
                 const cur = cm.getCursor();
-                let inner = defaultCSShint(cm) || { from: cur, to: cm.getCursor(), list: [] };
+                let inner = defaultCSShint( cm ) || { from: cur, to: cm.getCursor(), list: [] };
 
-                const token = cm.getTokenAt(cur);
-                if (token.state.state === 'top' && token.string.indexOf('.') === 0) {
+                const token = cm.getTokenAt( cur );
+                if ( token.state.state === 'top' && token.string.indexOf( '.' ) === 0 ) {
                     inner = {
-                        from: CodeMirror.Pos(cur.line, token.start),
-                        to: CodeMirror.Pos(cur.line, token.end),
+                        from: CodeMirror.Pos( cur.line, token.start ),
+                        to: CodeMirror.Pos( cur.line, token.end ),
                         list: [],
                     };
-                    VPAdminVariables.classnames.forEach((val) => {
-                        if (val.indexOf(token.string) !== -1) {
-                            inner.list.push(val);
+                    VPAdminVariables.classnames.forEach( ( val ) => {
+                        if ( val.indexOf( token.string ) !== -1 ) {
+                            inner.list.push( val );
                         }
-                    });
+                    } );
                 }
                 return inner;
             };
         }
 
-        const editor = CodeMirror.fromTextArea($customCss[0], {
+        const editor = CodeMirror.fromTextArea( $customCss[ 0 ], {
             mode: 'css',
             theme: 'eclipse',
             indentUnit: 4,
@@ -509,17 +512,17 @@ if (typeof Tooltip !== 'undefined') {
                 },
 
                 // save errors in vcLintErrors object to prevent page save
-                onUpdateLinting(annotations, annotationsSorted, cm) {
+                onUpdateLinting( annotations, annotationsSorted, cm ) {
                     const errors = [];
-                    annotations.forEach((annotation) => {
-                        if (annotation.severity === 'error') {
-                            errors.push(annotation);
+                    annotations.forEach( ( annotation ) => {
+                        if ( annotation.severity === 'error' ) {
+                            errors.push( annotation );
                         }
-                    });
+                    } );
                     cm.vcLintErrors = errors;
 
-                    if (!saveEditorWithErrors) {
-                        updateEditorError(cm.vcLintErrors, true);
+                    if ( ! saveEditorWithErrors ) {
+                        updateEditorError( cm.vcLintErrors, true );
                     }
                 },
             },
@@ -537,87 +540,87 @@ if (typeof Tooltip !== 'undefined') {
                 'Cmd-/': 'toggleComment',
                 'Alt-F': 'findPersistent',
             },
-            gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-        });
-        emmetCodeMirror(editor);
+            gutters: [ 'CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter' ],
+        } );
+        emmetCodeMirror( editor );
 
         // save instance in data
-        $customCss.data('CodeMirrorInstance', editor);
+        $customCss.data( 'CodeMirrorInstance', editor );
 
-        editor.on('change', () => {
+        editor.on( 'change', () => {
             editor.save();
             $customCss.change();
-        });
+        } );
 
         // Autocomplete
-        editor.on('keyup', (cm, event) => {
-            const isAlphaKey = /^[a-zA-Z]$/.test(event.key);
+        editor.on( 'keyup', ( cm, event ) => {
+            const isAlphaKey = /^[a-zA-Z]$/.test( event.key );
 
-            if (cm.state.completionActive && isAlphaKey) {
+            if ( cm.state.completionActive && isAlphaKey ) {
                 return;
             }
 
             // Prevent autocompletion in string literals or comments.
-            const token = cm.getTokenAt(cm.getCursor());
-            if (token.type === 'string' || token.type === 'comment') {
+            const token = cm.getTokenAt( cm.getCursor() );
+            if ( token.type === 'string' || token.type === 'comment' ) {
                 return;
             }
 
-            const lineBeforeCursor = cm.doc.getLine(cm.doc.getCursor().line).substr(0, cm.doc.getCursor().ch);
+            const lineBeforeCursor = cm.doc.getLine( cm.doc.getCursor().line ).substr( 0, cm.doc.getCursor().ch );
             const shouldAutocomplete =
                 isAlphaKey ||
                 event.key === ':' ||
-                event.key === ' ' && /:\s+$/.test(lineBeforeCursor);
+                ( event.key === ' ' && /:\s+$/.test( lineBeforeCursor ) );
 
-            if (shouldAutocomplete) {
-                cm.showHint({ completeSingle: false });
+            if ( shouldAutocomplete ) {
+                cm.showHint( { completeSingle: false } );
             }
-        });
+        } );
     }
 
     // prevent page closing
     const defaultForm = $editForm.serialize();
-    $(window).on('beforeunload', () => {
+    $( window ).on( 'beforeunload', () => {
         const isChanged = defaultForm !== $editForm.serialize();
-        const isFormSent = $('[type=submit]').hasClass('disabled');
+        const isFormSent = $( '[type=submit]' ).hasClass( 'disabled' );
 
-        return isChanged && !isFormSent;
-    });
+        return isChanged && ! isFormSent;
+    } );
 
     // prevent page save if there is errors in CSS editor
-    $body.on('click', '#publish:not(.disabled)', function (e) {
-        if (saveEditorWithErrors) {
+    $body.on( 'click', '#publish:not(.disabled)', function( e ) {
+        if ( saveEditorWithErrors ) {
             return;
         }
 
-        const $publishBtn = $(this);
+        const $publishBtn = $( this );
 
-        const editor = $customCss.length && $customCss.data('CodeMirrorInstance');
-        if (editor && editor.vcLintErrors && editor.vcLintErrors.length) {
+        const editor = $customCss.length && $customCss.data( 'CodeMirrorInstance' );
+        if ( editor && editor.vcLintErrors && editor.vcLintErrors.length ) {
             e.preventDefault();
 
             // disable publish button for 1.5 seconds
-            $publishBtn.addClass('disabled button-disabled button-primary-disabled');
-            setTimeout(() => {
-                $publishBtn.removeClass('disabled button-disabled button-primary-disabled');
-            }, 1500);
+            $publishBtn.addClass( 'disabled button-disabled button-primary-disabled' );
+            setTimeout( () => {
+                $publishBtn.removeClass( 'disabled button-disabled button-primary-disabled' );
+            }, 1500 );
 
-            updateEditorError(editor.vcLintErrors, false);
+            updateEditorError( editor.vcLintErrors, false );
 
             // scroll to editor
-            $('html,body').animate({
-                scrollTop: $('#vp_custom_css').offset().top - 100,
-            }, 300);
+            $( 'html,body' ).animate( {
+                scrollTop: $( '#vp_custom_css' ).offset().top - 100,
+            }, 300 );
 
             // scroll to editor with error
             editor.focus();
-            editor.setCursor(editor.vcLintErrors[0].from.line);
+            editor.setCursor( editor.vcLintErrors[ 0 ].from.line );
         }
-    });
+    } );
 
     // save also if CSS have errors
-    $body.on('change', '#vp_custom_css_notice_prevent', function () {
+    $body.on( 'change', '#vp_custom_css_notice_prevent', function() {
         saveEditorWithErrors = true;
-        $(this).closest('.notice').slideUp();
-    });
-}());
+        $( this ).closest( '.notice' ).slideUp();
+    } );
+}() );

@@ -9,24 +9,24 @@ const {
     vc,
 } = window;
 
-jQuery(() => {
+jQuery( () => {
     // shortcode frontend editor
-    if (typeof vc !== 'undefined') {
+    if ( typeof vc !== 'undefined' ) {
         // on shortcode add and update events
-        vc.events.on('shortcodes:add shortcodeView:updated', (e) => {
-            if (e.settings.base !== 'visual_portfolio') {
+        vc.events.on( 'shortcodes:add shortcodeView:updated', ( e ) => {
+            if ( e.settings.base !== 'visual_portfolio' ) {
                 return;
             }
 
-            const wnd = vc.$frame[0].contentWindow;
+            const wnd = vc.$frame[ 0 ].contentWindow;
             const $ = wnd ? wnd.jQuery : false;
 
-            if ($) {
-                const $vp = $(e.view.el).children('.vp-portfolio');
-                if ($vp.length && typeof $vp.vp !== 'undefined') {
+            if ( $ ) {
+                const $vp = $( e.view.el ).children( '.vp-portfolio' );
+                if ( $vp.length && typeof $vp.vp !== 'undefined' ) {
                     $vp.vp();
                 }
             }
-        });
+        } );
     }
-});
+} );
