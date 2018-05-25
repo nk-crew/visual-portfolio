@@ -1384,6 +1384,7 @@ class Visual_Portfolio_Admin {
                                     'value' => $selected_ids,
                                     'searchable' => true,
                                     'multiple' => true,
+                                    'post_type' => '[name=vp_posts_source]',
                                     'options' => $selected_array,
                                     'class' => 'vp-select2-posts-ajax',
                                 )
@@ -1607,7 +1608,7 @@ class Visual_Portfolio_Admin {
             wp_die();
         }
         $post_type = isset( $_GET['post_type'] ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'any';
-        if ( ! $post_type || 'custom_query' === $post_type ) {
+        if ( ! $post_type || 'custom_query' === $post_type || 'ids' === $post_type ) {
             $post_type = 'any';
         }
 
