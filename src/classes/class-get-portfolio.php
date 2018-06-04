@@ -71,8 +71,8 @@ class Visual_Portfolio_Get {
             'vp_items_style_fly__show_excerpt' => false,
             'vp_items_style_fly__excerpt_words_count' => 15,
             'vp_items_style_fly__show_icon' => false,
-            'vp_items_style_fly__icon' => 'fa fa-search',
-            'vp_items_style_fly__icon_video' => 'fa fa-play',
+            'vp_items_style_fly__icon' => 'fas fa-search',
+            'vp_items_style_fly__icon_video' => 'fas fa-play',
             // *, top-*, bottom-*
             // * = center, left, right.
             'vp_items_style_fly__align' => 'center',

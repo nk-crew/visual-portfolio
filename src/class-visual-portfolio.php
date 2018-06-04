@@ -144,11 +144,12 @@ class Visual_Portfolio {
      * Register scripts that will be used in the future when portfolio will be printed.
      */
     public function register_scripts() {
-        wp_register_style( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/css/font-awesome.min.css' );
+        wp_register_script( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/fontawesome-all.min.js', array( 'jquery' ), '5.0.13', true );
+        wp_register_script( 'font-awesome-v4-shims', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/fa-v4-shims.min.js', array( 'jquery' ), '5.0.13', true );
 
-        wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '', true );
+        wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '3.2.3', true );
 
-        wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '', true );
+        wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '3.0.6', true );
 
         /*
          * TODO: Justified
@@ -156,14 +157,14 @@ class Visual_Portfolio {
          */
 
         // PhotoSwipe.
-        wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css' );
-        wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css', array( 'photoswipe' ) );
-        wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', '', '', true );
-        wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '', true );
+        wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css', '', '4.1.2' );
+        wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css', array( 'photoswipe' ), '4.1.2' );
+        wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', '', '4.1.2', true );
+        wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '4.1.2', true );
 
         // Visual Portfolio.
-        wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', array( 'jquery', 'isotope', 'imagesloaded', 'object-fit-images', 'photoswipe-ui-default' ), '@@plugin_version', true );
-        wp_register_style( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/css/style.min.css', array( 'font-awesome', 'photoswipe-default-skin' ), '@@plugin_version' );
+        wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', array( 'jquery', 'isotope', 'imagesloaded', 'font-awesome', 'font-awesome-v4-shims', 'object-fit-images', 'photoswipe-ui-default' ), '@@plugin_version', true );
+        wp_register_style( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/css/style.min.css', array( 'photoswipe-default-skin' ), '@@plugin_version' );
 
         // Visual Portfolio data.
         $data_init = array(
