@@ -578,17 +578,11 @@ if ( typeof Tooltip !== 'undefined' ) {
         } );
     }
 
-    // prevent page closing
-    const defaultForm = $editForm.serialize();
-    $( window ).on( 'beforeunload', () => {
-        const isChanged = defaultForm !== $editForm.serialize();
-        const isFormSent = $( '[type=submit]' ).hasClass( 'disabled' );
-
-        return isChanged && ! isFormSent;
-    } );
-
     // prevent page save if there is errors in CSS editor
+    let publishClicked = false;
     $body.on( 'click', '#publish:not(.disabled)', function( e ) {
+        publishClicked = true;
+
         if ( saveEditorWithErrors ) {
             return;
         }
@@ -616,6 +610,17 @@ if ( typeof Tooltip !== 'undefined' ) {
             editor.focus();
             editor.setCursor( editor.vcLintErrors[ 0 ].from.line );
         }
+    } );
+
+    // prevent page closing
+    const defaultForm = $editForm.serialize();
+    $( window ).on( 'beforeunload', () => {
+        if ( publishClicked ) {
+            publishClicked = false;
+            return;
+        }
+
+        return defaultForm !== $editForm.serialize();
     } );
 
     // save also if CSS have errors
