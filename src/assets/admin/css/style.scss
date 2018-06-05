@@ -830,41 +830,38 @@ $grid_sm: 600px !default;
     .vp-content-source__item {
         position: relative;
         float: left;
-        width: 85px;
-        height: 85px;
+        width: 70px;
+        height: 50px;
         padding: 12px;
         margin: 0 6px;
-        color: #555;
+        color: #6c7781;
         text-align: center;
         cursor: pointer;
-        background-color: #f7f7f7;
-        border: 1px solid #ccc;
+        border: 1px solid transparent;
         border-radius: 3px;
 
         &.active,
         &:hover {
-            color: #23282d;
-            background-color: #fafafa;
-            border-color: #999;
+            color: #555;
+            background-color: #ecf0f4;
         }
         &.active {
             color: #fff;
-            text-shadow: 0 -1px 1px #006799, 1px 0 1px #006799, 0 1px 1px #006799, -1px 0 1px #006799;
-            background-color: #0085ba;
-            border-color: #0073aa #006799 #006799;
+            background-color: #6c7781;
+            border-color: #6c7781;
         }
 
         .vp-content-source__item-icon > span {
-            width: 35px;
-            height: 35px;
-            margin-top: 10px;
-            font-size: 35px;
+            width: 24px;
+            height: 24px;
+            margin-top: 2px;
+            font-size: 24px;
         }
         .vp-content-source__item-title {
             position: absolute;
-            top: 63%;
-            right: 12px;
-            left: 12px;
+            top: 58%;
+            right: 8px;
+            left: 8px;
             font-weight: 500;
         }
     }
@@ -926,11 +923,11 @@ $grid_sm: 600px !default;
         min-height: 27px;
 
         .select2-selection__choice {
+            padding: 3px 8px;
             margin-top: 3px;
             color: #fff;
-            text-shadow: 0 -1px 1px #006799, 1px 0 1px #006799, 0 1px 1px #006799, -1px 0 1px #006799;
-            background-color: #0085ba;
-            border-color: #0073aa #006799 #006799;
+            background-color: #6c7781;
+            border-color: #6c7781;
         }
 
         .select2-selection__choice__remove {
@@ -963,7 +960,7 @@ $grid_sm: 600px !default;
         background-color: #efeeee;
     }
     .select2-results__option--highlighted[aria-selected] {
-        background-color: #0085ba;
+        background-color: #33b3db;
     }
 }
 
