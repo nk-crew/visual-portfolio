@@ -804,22 +804,24 @@ class Visual_Portfolio_Admin {
             </div>
         </div>
 
-        <div data-cond="[name=vp_layout] == masonry">
-            <?php
-            Visual_Portfolio_Controls::get(
-                array(
-                    'type'  => 'range',
-                    'label' => esc_html__( 'Columns', '@@text_domain' ),
-                    'name'  => 'vp_masonry_columns',
-                    'value' => $meta['vp_masonry_columns'],
-                    'min'   => 1,
-                    'max'   => 5,
-                )
-            );
-            ?>
-        </div>
-
         <?php
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'range',
+                'label' => esc_html__( 'Columns', '@@text_domain' ),
+                'name'  => 'vp_masonry_columns',
+                'value' => $meta['vp_masonry_columns'],
+                'min'   => 1,
+                'max'   => 5,
+                'condition' => array(
+                    array(
+                        'control' => 'vp_layout',
+                        'value' => 'masonry',
+                    ),
+                ),
+            )
+        );
+
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'range',
@@ -901,24 +903,23 @@ class Visual_Portfolio_Admin {
                         'value' => $meta[ $opt . 'show_categories' ],
                     )
                 );
-                ?>
 
-                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_categories' ); ?>]">
-                    <?php
-                    Visual_Portfolio_Controls::get(
-                        array(
-                            'type'  => 'range',
-                            'label' => esc_html__( 'Categories count', '@@text_domain' ),
-                            'name'  => $opt . 'categories_count',
-                            'value' => $meta[ $opt . 'categories_count' ],
-                            'min'   => 1,
-                            'max'   => 10,
-                        )
-                    );
-                    ?>
-                </div>
+                Visual_Portfolio_Controls::get(
+                    array(
+                        'type'  => 'range',
+                        'label' => esc_html__( 'Categories count', '@@text_domain' ),
+                        'name'  => $opt . 'categories_count',
+                        'value' => $meta[ $opt . 'categories_count' ],
+                        'min'   => 1,
+                        'max'   => 10,
+                        'condition' => array(
+                            array(
+                                'control' => $opt . 'show_categories',
+                            ),
+                        ),
+                    )
+                );
 
-                <?php
                 Visual_Portfolio_Controls::get(
                     array(
                         'type'  => 'select2',
@@ -932,23 +933,23 @@ class Visual_Portfolio_Admin {
                         ),
                     )
                 );
-                ?>
-                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_date' ); ?>] == true">
-                    <?php
-                    Visual_Portfolio_Controls::get(
-                        array(
-                            'type'  => 'text',
-                            'name'  => $opt . 'date_format',
-                            'value' => $meta[ $opt . 'date_format' ],
-                            'placeholder' => 'F j, Y',
-                            'hint' => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
-                            'hint_place' => 'left',
-                        )
-                    );
-                    ?>
-                </div>
 
-                <?php
+                Visual_Portfolio_Controls::get(
+                    array(
+                        'type'  => 'text',
+                        'name'  => $opt . 'date_format',
+                        'value' => $meta[ $opt . 'date_format' ],
+                        'placeholder' => 'F j, Y',
+                        'hint' => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
+                        'hint_place' => 'left',
+                        'condition' => array(
+                            array(
+                                'control' => $opt . 'show_date',
+                            ),
+                        ),
+                    )
+                );
+
                 Visual_Portfolio_Controls::get(
                     array(
                         'type'  => 'toggle',
@@ -957,61 +958,66 @@ class Visual_Portfolio_Admin {
                         'value' => $meta[ $opt . 'show_excerpt' ],
                     )
                 );
-                ?>
 
-                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_excerpt' ); ?>]">
-                    <?php
-                    Visual_Portfolio_Controls::get(
-                        array(
-                            'type'  => 'range',
-                            'label' => esc_html__( 'Excerpt words count', '@@text_domain' ),
-                            'name'  => $opt . 'excerpt_words_count',
-                            'value' => $meta[ $opt . 'excerpt_words_count' ],
-                            'min'   => 1,
-                            'max'   => 200,
-                        )
-                    );
-                    ?>
-                </div>
+                Visual_Portfolio_Controls::get(
+                    array(
+                        'type'  => 'range',
+                        'label' => esc_html__( 'Excerpt words count', '@@text_domain' ),
+                        'name'  => $opt . 'excerpt_words_count',
+                        'value' => $meta[ $opt . 'excerpt_words_count' ],
+                        'min'   => 1,
+                        'max'   => 200,
+                        'condition' => array(
+                            array(
+                                'control' => $opt . 'show_excerpt',
+                            ),
+                        ),
+                    )
+                );
 
-                <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
-                    <?php
+                if ( 'fly' === $style || 'fade' === $style ) {
                     Visual_Portfolio_Controls::get(
                         array(
                             'type'  => 'toggle',
-                            'label'  => esc_html__( 'Show icon', '@@text_domain' ),
+                            'label' => esc_html__( 'Show icon', '@@text_domain' ),
                             'name'  => $opt . 'show_icon',
                             'value' => $meta[ $opt . 'show_icon' ],
                         )
                     );
-                    ?>
 
-                    <div data-cond="[name=<?php echo esc_attr( $opt . 'show_icon' ); ?>]">
-                        <?php
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'text',
-                                'name'  => $opt . 'icon',
-                                'value' => $meta[ $opt . 'icon' ],
-                                'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
-                                'hint' => esc_attr__( 'Standard icon', '@@text_domain' ),
-                                'hint_place' => 'left',
-                            )
-                        );
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'        => 'text',
+                            'name'        => $opt . 'icon',
+                            'value'       => $meta[ $opt . 'icon' ],
+                            'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
+                            'hint'        => esc_attr__( 'Standard icon', '@@text_domain' ),
+                            'hint_place'  => 'left',
+                            'condition'   => array(
+                                array(
+                                    'control' => $opt . 'show_icon',
+                                ),
+                            ),
+                        )
+                    );
 
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'text',
-                                'name'  => $opt . 'icon_video',
-                                'value' => $meta[ $opt . 'icon_video' ],
-                                'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
-                                'hint' => esc_attr__( 'Video icon', '@@text_domain' ),
-                                'hint_place' => 'left',
-                            )
-                        );
-                        ?>
-                    </div>
-                <?php endif; ?>
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'        => 'text',
+                            'name'        => $opt . 'icon_video',
+                            'value'       => $meta[ $opt . 'icon_video' ],
+                            'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
+                            'hint'        => esc_attr__( 'Video icon', '@@text_domain' ),
+                            'hint_place'  => 'left',
+                            'condition'   => array(
+                                array(
+                                    'control' => $opt . 'show_icon',
+                                ),
+                            ),
+                        )
+                    );
+                }
+                ?>
 
                 <?php
                 $caption_align_opt = $opt . 'align';
@@ -1136,35 +1142,43 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
-        ?>
 
-        <div data-cond="[name=vp_filter] != false">
-            <?php
-            Visual_Portfolio_Controls::get(
-                array(
-                    'type'  => 'select2',
-                    'label' => esc_html__( 'Align', '@@text_domain' ),
-                    'name'  => 'vp_filter_align',
-                    'value' => $meta['vp_filter_align'],
-                    'options' => array(
-                        'center' => esc_html__( 'Center', '@@text_domain' ),
-                        'left' => esc_html__( 'Left', '@@text_domain' ),
-                        'right' => esc_html__( 'Right', '@@text_domain' ),
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'select2',
+                'label' => esc_html__( 'Align', '@@text_domain' ),
+                'name'  => 'vp_filter_align',
+                'value' => $meta['vp_filter_align'],
+                'options' => array(
+                    'center' => esc_html__( 'Center', '@@text_domain' ),
+                    'left' => esc_html__( 'Left', '@@text_domain' ),
+                    'right' => esc_html__( 'Right', '@@text_domain' ),
+                ),
+                'condition'   => array(
+                    array(
+                        'control' => 'vp_filter',
+                        'operator' => '!=',
+                        'value' => 'false',
                     ),
-                )
-            );
+                ),
+            )
+        );
 
-            Visual_Portfolio_Controls::get(
-                array(
-                    'type'  => 'toggle',
-                    'label' => esc_html__( 'Show count', '@@text_domain' ),
-                    'name'  => 'vp_filter_show_count',
-                    'value' => $meta['vp_filter_show_count'],
-                )
-            );
-            ?>
-        </div>
-        <?php
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'toggle',
+                'label' => esc_html__( 'Show count', '@@text_domain' ),
+                'name'  => 'vp_filter_show_count',
+                'value' => $meta['vp_filter_show_count'],
+                'condition'   => array(
+                    array(
+                        'control' => 'vp_filter',
+                        'operator' => '!=',
+                        'value' => 'false',
+                    ),
+                ),
+            )
+        );
 
         Visual_Portfolio_Controls::get(
             array(
@@ -1199,48 +1213,57 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
-        ?>
 
-        <div data-cond="[name=vp_pagination] != false">
-            <?php
-            Visual_Portfolio_Controls::get(
-                array(
-                    'type'  => 'select2',
-                    'label'  => esc_html__( 'Align', '@@text_domain' ),
-                    'name'  => 'vp_pagination_align',
-                    'value' => $meta['vp_pagination_align'],
-                    'options' => array(
-                        'center' => esc_html__( 'Center', '@@text_domain' ),
-                        'left' => esc_html__( 'Left', '@@text_domain' ),
-                        'right' => esc_html__( 'Right', '@@text_domain' ),
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'select2',
+                'label'  => esc_html__( 'Align', '@@text_domain' ),
+                'name'  => 'vp_pagination_align',
+                'value' => $meta['vp_pagination_align'],
+                'options' => array(
+                    'center' => esc_html__( 'Center', '@@text_domain' ),
+                    'left' => esc_html__( 'Left', '@@text_domain' ),
+                    'right' => esc_html__( 'Right', '@@text_domain' ),
+                ),
+                'condition'   => array(
+                    array(
+                        'control' => 'vp_pagination',
+                        'operator' => '!=',
+                        'value' => 'false',
                     ),
-                )
-            );
-            ?>
-        </div>
+                ),
+            )
+        );
 
-        <div data-cond="[name=vp_pagination] == paged">
-            <?php
-            Visual_Portfolio_Controls::get(
-                array(
-                    'type'  => 'toggle',
-                    'label'  => esc_html__( 'Show arrows', '@@text_domain' ),
-                    'name'  => 'vp_pagination_paged__show_arrows',
-                    'value' => $meta['vp_pagination_paged__show_arrows'],
-                )
-            );
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'toggle',
+                'label'  => esc_html__( 'Show arrows', '@@text_domain' ),
+                'name'  => 'vp_pagination_paged__show_arrows',
+                'value' => $meta['vp_pagination_paged__show_arrows'],
+                'condition'   => array(
+                    array(
+                        'control' => 'vp_pagination',
+                        'value' => 'paged',
+                    ),
+                ),
+            )
+        );
 
-            Visual_Portfolio_Controls::get(
-                array(
-                    'type'  => 'toggle',
-                    'label'  => esc_html__( 'Show numbers', '@@text_domain' ),
-                    'name'  => 'vp_pagination_paged__show_numbers',
-                    'value' => $meta['vp_pagination_paged__show_numbers'],
-                )
-            );
-            ?>
-        </div>
-        <?php
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'toggle',
+                'label'  => esc_html__( 'Show numbers', '@@text_domain' ),
+                'name'  => 'vp_pagination_paged__show_numbers',
+                'value' => $meta['vp_pagination_paged__show_numbers'],
+                'condition'   => array(
+                    array(
+                        'control' => 'vp_pagination',
+                        'value' => 'paged',
+                    ),
+                ),
+            )
+        );
     }
 
     /**
@@ -1316,6 +1339,12 @@ class Visual_Portfolio_Admin {
                 </div>
                 <div class="vp-content-source__item-title"><?php echo esc_html__( 'Post-Based', '@@text_domain' ); ?></div>
             </div>
+            <div class="vp-content-source__item" data-content="images">
+                <div class="vp-content-source__item-icon">
+                    <span class="dashicons dashicons-images-alt2"></span>
+                </div>
+                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Images', '@@text_domain' ); ?></div>
+            </div>
 
             <div class="vp-content-source__item-content">
                 <div data-content="portfolio">
@@ -1357,184 +1386,211 @@ class Visual_Portfolio_Admin {
                             ?>
                         </div>
 
-                        <div class="vp-col-6" data-cond="[name=vp_posts_source] == ids">
-                            <?php
-                            $selected_ids = $meta['vp_posts_ids'];
-                            $selected_array = array();
-                            if ( isset( $selected_ids ) && is_array( $selected_ids ) && count( $selected_ids ) ) {
-                                $post_query = new WP_Query(
-                                    array(
-                                        'post_type' => 'any',
-                                        'post__in' => $selected_ids,
-                                    )
-                                );
+                        <?php
+                        $selected_ids = $meta['vp_posts_ids'];
+                        $selected_array = array();
+                        if ( isset( $selected_ids ) && is_array( $selected_ids ) && count( $selected_ids ) ) {
+                            $post_query = new WP_Query(
+                                array(
+                                    'post_type' => 'any',
+                                    'post__in' => $selected_ids,
+                                )
+                            );
 
-                                if ( $post_query->have_posts() ) {
-                                    while ( $post_query->have_posts() ) {
-                                        $post_query->the_post();
-                                        $selected_array[ get_the_ID() ] = get_the_title();
-                                    }
-                                    wp_reset_postdata();
+                            if ( $post_query->have_posts() ) {
+                                while ( $post_query->have_posts() ) {
+                                    $post_query->the_post();
+                                    $selected_array[ get_the_ID() ] = get_the_title();
                                 }
+                                wp_reset_postdata();
                             }
-                            Visual_Portfolio_Controls::get(
-                                array(
-                                    'type'  => 'select2',
-                                    'label'  => esc_html__( 'Specific posts', '@@text_domain' ),
-                                    'name'  => 'vp_posts_ids',
-                                    'value' => $selected_ids,
-                                    'searchable' => true,
-                                    'multiple' => true,
-                                    'post_type' => '[name=vp_posts_source]',
-                                    'options' => $selected_array,
-                                    'class' => 'vp-select2-posts-ajax',
-                                )
-                            );
-                            ?>
-                        </div>
-
-                        <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids">
-                            <?php
-                            $excluded_ids = $meta['vp_posts_excluded_ids'];
-                            $excluded_array = array();
-                            if ( isset( $excluded_ids ) && is_array( $excluded_ids ) && count( $excluded_ids ) ) {
-                                $post_query = new WP_Query(
+                        }
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'select2',
+                                'label'  => esc_html__( 'Specific posts', '@@text_domain' ),
+                                'name'  => 'vp_posts_ids',
+                                'value' => $selected_ids,
+                                'searchable' => true,
+                                'multiple' => true,
+                                'post_type' => '[name=vp_posts_source]',
+                                'options' => $selected_array,
+                                'class' => 'vp-select2-posts-ajax',
+                                'wrapper_class' => 'vp-col-6',
+                                'condition' => array(
                                     array(
-                                        'post_type' => 'any',
-                                        'post__in' => $excluded_ids,
-                                    )
-                                );
+                                        'control' => 'vp_posts_source',
+                                        'value' => 'ids',
+                                    ),
+                                ),
+                            )
+                        );
 
-                                if ( $post_query->have_posts() ) {
-                                    while ( $post_query->have_posts() ) {
-                                        $post_query->the_post();
-                                        $excluded_array[ get_the_ID() ] = get_the_title();
-                                    }
-                                    wp_reset_postdata();
+                        $excluded_ids = $meta['vp_posts_excluded_ids'];
+                        $excluded_array = array();
+                        if ( isset( $excluded_ids ) && is_array( $excluded_ids ) && count( $excluded_ids ) ) {
+                            $post_query = new WP_Query(
+                                array(
+                                    'post_type' => 'any',
+                                    'post__in' => $excluded_ids,
+                                )
+                            );
+
+                            if ( $post_query->have_posts() ) {
+                                while ( $post_query->have_posts() ) {
+                                    $post_query->the_post();
+                                    $excluded_array[ get_the_ID() ] = get_the_title();
                                 }
+                                wp_reset_postdata();
                             }
+                        }
 
-                            Visual_Portfolio_Controls::get(
-                                array(
-                                    'type'  => 'select2',
-                                    'label'  => esc_html__( 'Excluded posts', '@@text_domain' ),
-                                    'name'  => 'vp_posts_excluded_ids',
-                                    'value' => (array) $excluded_ids,
-                                    'searchable' => true,
-                                    'multiple' => true,
-                                    'post_type' => '[name=vp_posts_source]',
-                                    'options' => $excluded_array,
-                                    'class' => 'vp-select2-posts-ajax',
-                                )
-                            );
-                            ?>
-                        </div>
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'select2',
+                                'label'  => esc_html__( 'Excluded posts', '@@text_domain' ),
+                                'name'  => 'vp_posts_excluded_ids',
+                                'value' => (array) $excluded_ids,
+                                'searchable' => true,
+                                'multiple' => true,
+                                'post_type' => '[name=vp_posts_source]',
+                                'options' => $excluded_array,
+                                'class' => 'vp-select2-posts-ajax',
+                                'wrapper_class' => 'vp-col-6',
+                                'condition' => array(
+                                    array(
+                                        'control' => 'vp_posts_source',
+                                        'operator' => '!=',
+                                        'value' => 'ids',
+                                    ),
+                                ),
+                            )
+                        );
 
-                        <div class="vp-col-12" data-cond="[name=vp_posts_source] == custom_query">
-                            <?php
-                            Visual_Portfolio_Controls::get(
-                                array(
-                                    'type'  => 'textarea',
-                                    'label'  => esc_html__( 'Custom query', '@@text_domain' ),
-                                    // translators: %1$s - escaped url.
-                                    'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
-                                    'name'  => 'vp_posts_custom_query',
-                                    'value' => $meta['vp_posts_custom_query'],
-                                    'cols' => 30,
-                                    'rows' => 3,
-                                )
-                            );
-                            ?>
-                        </div>
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'textarea',
+                                'label'  => esc_html__( 'Custom query', '@@text_domain' ),
+                                // translators: %1$s - escaped url.
+                                'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
+                                'name'  => 'vp_posts_custom_query',
+                                'value' => $meta['vp_posts_custom_query'],
+                                'cols' => 30,
+                                'rows' => 3,
+                                'wrapper_class' => 'vp-col-12',
+                                'condition' => array(
+                                    array(
+                                        'control' => 'vp_posts_source',
+                                        'value' => 'custom_query',
+                                    ),
+                                ),
+                            )
+                        );
+                        ?>
 
                         <div class="vp-col-clearfix"></div>
+                        <?php
+                        $selected_tax = $meta['vp_posts_taxonomies'];
+                        $selected_tax_arr = array();
 
-                        <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids && [name=vp_posts_source] != custom_query">
-                            <?php
-                            $selected_tax = $meta['vp_posts_taxonomies'];
-                            $selected_tax_arr = array();
+                        if ( isset( $selected_tax ) && is_array( $selected_tax ) && count( $selected_tax ) ) {
 
-                            if ( isset( $selected_tax ) && is_array( $selected_tax ) && count( $selected_tax ) ) {
+                            // TODO: Not sure that include works...
+                            $term_query = new WP_Term_Query(
+                                array(
+                                    'include' => $selected_tax,
+                                )
+                            );
 
-                                // TODO: Not sure that include works...
-                                $term_query = new WP_Term_Query(
-                                    array(
-                                        'include' => $selected_tax,
-                                    )
-                                );
-
-                                if ( ! empty( $term_query->terms ) ) {
-                                    foreach ( $term_query->terms as $term ) {
-                                        $selected_tax_arr[ $term->term_id ] = $term->name;
-                                    }
+                            if ( ! empty( $term_query->terms ) ) {
+                                foreach ( $term_query->terms as $term ) {
+                                    $selected_tax_arr[ $term->term_id ] = $term->name;
                                 }
                             }
-                            Visual_Portfolio_Controls::get(
-                                array(
-                                    'type'  => 'select2',
-                                    'label'  => esc_html__( 'Taxonomies', '@@text_domain' ),
-                                    'name'  => 'vp_posts_taxonomies',
-                                    'value' => (array) $selected_tax,
-                                    'searchable' => true,
-                                    'multiple' => true,
-                                    'post_type' => '[name=vp_posts_source]',
-                                    'options' => $selected_tax_arr,
-                                    'class' => 'vp-select2-taxonomies-ajax',
-                                )
-                            );
-                            ?>
-                        </div>
-                        <div class="vp-col-6" data-cond="[name=vp_posts_source] != ids && [name=vp_posts_source] != custom_query">
-                            <?php
-                            Visual_Portfolio_Controls::get(
-                                array(
-                                    'type'  => 'select2',
-                                    'label'  => esc_html__( 'Taxonomies relation', '@@text_domain' ),
-                                    'name'  => 'vp_posts_taxonomies_relation',
-                                    'value'  => $meta['vp_posts_taxonomies_relation'],
-                                    'options' => array(
-                                        'or' => esc_html__( 'OR', '@@text_domain' ),
-                                        'and' => esc_html__( 'AND', '@@text_domain' ),
+                        }
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'select2',
+                                'label'  => esc_html__( 'Taxonomies', '@@text_domain' ),
+                                'name'  => 'vp_posts_taxonomies',
+                                'value' => (array) $selected_tax,
+                                'searchable' => true,
+                                'multiple' => true,
+                                'post_type' => '[name=vp_posts_source]',
+                                'options' => $selected_tax_arr,
+                                'class' => 'vp-select2-taxonomies-ajax',
+                                'wrapper_class' => 'vp-col-6',
+                                'condition' => array(
+                                    array(
+                                        'control' => 'vp_posts_source',
+                                        'operator' => '!=',
+                                        'value' => 'ids',
                                     ),
-                                )
-                            );
-                            ?>
-                        </div>
+                                    array(
+                                        'control' => 'vp_posts_source',
+                                        'operator' => '!=',
+                                        'value' => 'custom_query',
+                                    ),
+                                ),
+                            )
+                        );
 
-                        <div class="vp-col-6">
-                            <?php
-                            Visual_Portfolio_Controls::get(
-                                array(
-                                    'type'  => 'select2',
-                                    'label'  => esc_html__( 'Order by', '@@text_domain' ),
-                                    'name'  => 'vp_posts_order_by',
-                                    'value'  => $meta['vp_posts_order_by'],
-                                    'options' => array(
-                                        'post_date' => esc_html__( 'Date', '@@text_domain' ),
-                                        'title' => esc_html__( 'Title', '@@text_domain' ),
-                                        'id' => esc_html__( 'ID', '@@text_domain' ),
-                                        'rand' => esc_html__( 'Random', '@@text_domain' ),
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'select2',
+                                'label'  => esc_html__( 'Taxonomies relation', '@@text_domain' ),
+                                'name'  => 'vp_posts_taxonomies_relation',
+                                'value'  => $meta['vp_posts_taxonomies_relation'],
+                                'options' => array(
+                                    'or' => esc_html__( 'OR', '@@text_domain' ),
+                                    'and' => esc_html__( 'AND', '@@text_domain' ),
+                                ),
+                                'wrapper_class' => 'vp-col-6',
+                                'condition' => array(
+                                    array(
+                                        'control' => 'vp_posts_source',
+                                        'operator' => '!=',
+                                        'value' => 'ids',
                                     ),
-                                )
-                            );
-                            ?>
-                        </div>
-                        <div class="vp-col-6">
-                            <?php
-                            Visual_Portfolio_Controls::get(
-                                array(
-                                    'type'  => 'select2',
-                                    'label'  => esc_html__( 'Order direction', '@@text_domain' ),
-                                    'name'  => 'vp_posts_order_direction',
-                                    'value'  => $meta['vp_posts_order_direction'],
-                                    'options' => array(
-                                        'desc' => esc_html__( 'DESC', '@@text_domain' ),
-                                        'asc' => esc_html__( 'ASC', '@@text_domain' ),
+                                    array(
+                                        'control' => 'vp_posts_source',
+                                        'operator' => '!=',
+                                        'value' => 'custom_query',
                                     ),
-                                )
-                            );
-                            ?>
-                        </div>
+                                ),
+                            )
+                        );
+
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'select2',
+                                'label'  => esc_html__( 'Order by', '@@text_domain' ),
+                                'name'  => 'vp_posts_order_by',
+                                'value'  => $meta['vp_posts_order_by'],
+                                'options' => array(
+                                    'post_date' => esc_html__( 'Date', '@@text_domain' ),
+                                    'title' => esc_html__( 'Title', '@@text_domain' ),
+                                    'id' => esc_html__( 'ID', '@@text_domain' ),
+                                    'rand' => esc_html__( 'Random', '@@text_domain' ),
+                                ),
+                                'wrapper_class' => 'vp-col-6',
+                            )
+                        );
+
+                        Visual_Portfolio_Controls::get(
+                            array(
+                                'type'  => 'select2',
+                                'label'  => esc_html__( 'Order direction', '@@text_domain' ),
+                                'name'  => 'vp_posts_order_direction',
+                                'value'  => $meta['vp_posts_order_direction'],
+                                'options' => array(
+                                    'desc' => esc_html__( 'DESC', '@@text_domain' ),
+                                    'asc' => esc_html__( 'ASC', '@@text_domain' ),
+                                ),
+                                'wrapper_class' => 'vp-col-6',
+                            )
+                        );
+                        ?>
                     </div>
                 </div>
             </div>

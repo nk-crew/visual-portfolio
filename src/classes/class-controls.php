@@ -54,24 +54,85 @@ class Visual_Portfolio_Controls {
                 'hint'  => false,
                 'hint_place' => 'top',
 
+                // condition.
+                'condition' => array(
+                    /**
+                     * Array of arrays with data:
+                     *  'control' - control name.
+                     *  'operator' - operator (==, !==, >, <, >=, <=).
+                     *  'value' - condition value.
+                     */
+                ),
+
                 'class' => '',
+                'wrapper_class' => '',
             ), $args
         );
 
         $class = 'vp-control vp-control-' . $args['type'] . ' ' . $args['class'];
-        ?>
-        <div class="<?php echo esc_attr( $class ); ?>" data-hint="<?php echo esc_attr( $args['hint'] ? : 'false' ); ?>" data-hint-place="<?php echo esc_attr( $args['hint_place'] ? : 'top' ); ?>">
-            <?php
-            self::print_label( $args );
 
-            if ( method_exists( __CLASS__, 'print_control_' . $args['type'] ) ) {
-                call_user_func( array( __CLASS__, 'print_control_' . $args['type'] ), $args );
-            }
-
-            self::print_description( $args );
+        if ( $args['wrapper_class'] ) {
             ?>
-        </div>
+            <div class="<?php echo esc_attr( $args['wrapper_class'] ); ?>" <?php self::print_condition( $args ); ?>>
+            <?php
+        }
+
+        ?>
+            <div class="<?php echo esc_attr( $class ); ?>"
+                 data-hint="<?php echo esc_attr( $args['hint'] ? : 'false' ); ?>"
+                 data-hint-place="<?php echo esc_attr( $args['hint_place'] ? : 'top' ); ?>"
+                    <?php
+                    if ( ! $args['wrapper_class'] ) {
+                        self::print_condition( $args );
+                    }
+                    ?>
+            >
+                <?php
+                self::print_label( $args );
+
+                if ( method_exists( __CLASS__, 'print_control_' . $args['type'] ) ) {
+                    call_user_func( array( __CLASS__, 'print_control_' . $args['type'] ), $args );
+                }
+
+                self::print_description( $args );
+                ?>
+            </div>
         <?php
+
+        if ( $args['wrapper_class'] ) {
+            ?>
+            </div>
+            <?php
+        }
+    }
+
+    /**
+     * Print condition attribute.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_condition( $args = array() ) {
+        $condition_attr = '';
+        if ( $args['condition'] && ! empty( $args['condition'] ) ) {
+            foreach ( $args['condition'] as $cond ) {
+                if ( ! empty( $cond ) && isset( $cond['control'] ) ) {
+                    $control = $cond['control'];
+                    $operator = isset( $cond['operator'] ) ? $cond['operator'] : '==';
+                    $value = isset( $cond['value'] ) ? $cond['value'] : 'true';
+
+                    if ( ! empty( $condition_attr ) ) {
+                        $condition_attr .= ' && ';
+                    }
+
+                    $condition_attr .= '[name="' . $control . '"] ' . $operator . ' ' . $value;
+                }
+            }
+        }
+        if ( $condition_attr ) {
+            ?>
+            data-cond="<?php echo esc_attr( $condition_attr ? $condition_attr : '' ); ?>"
+            <?php
+        }
     }
 
     /**
