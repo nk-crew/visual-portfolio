@@ -40,6 +40,7 @@ class Visual_Portfolio_Controls {
                 'options' => array(),
                 'searchable' => false,
                 'multiple' => false,
+                'tags' => false,
                 'post_type' => '',
                 // checkbox.
                 'min' => '',
@@ -231,7 +232,7 @@ class Visual_Portfolio_Controls {
      */
     public static function print_control_select2( $args = array() ) {
         ?>
-        <select name="<?php echo esc_attr( $args['name'] . ( $args['multiple'] ? '[]' : '' ) ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" class="vp-select2 <?php echo esc_attr( $args['searchable'] ? '' : 'vp-select2-nosearch' ); ?>" data-post-type="<?php echo esc_attr( $args['post_type'] ); ?>" <?php echo esc_attr( $args['multiple'] ? 'multiple' : '' ); ?>>
+        <select name="<?php echo esc_attr( $args['name'] . ( $args['multiple'] ? '[]' : '' ) ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" class="vp-select2 <?php echo esc_attr( $args['searchable'] ? '' : 'vp-select2-nosearch' ); ?> <?php echo esc_attr( $args['tags'] ? 'vp-select2-tags' : '' ); ?>" data-post-type="<?php echo esc_attr( $args['post_type'] ); ?>" <?php echo esc_attr( $args['multiple'] ? 'multiple' : '' ); ?>>
             <?php
             foreach ( (array) $args['options'] as $type => $title ) :
                 $check_val = $type;
@@ -273,6 +274,153 @@ class Visual_Portfolio_Controls {
     public static function print_control_color( $args = array() ) {
         ?>
         <input class="vp-input vp-color-picker" data-alpha="<?php echo esc_attr( $args['alpha'] ? 'true' : 'false' ); ?>" name="<?php echo esc_attr( $args['name'] ); ?>" type="text" id="<?php echo esc_attr( $args['name'] ); ?>" placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        <?php
+    }
+
+    /**
+     * Print control gallery.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_gallery( $args = array() ) {
+        $images = (array) $args['value'];
+        $additional_data = array(
+            'title' => array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Title', '@@text_domain' ),
+                'name'  => $args['name'] . '_additional_title',
+            ),
+            'description' => array(
+                'type'  => 'textarea',
+                'label' => esc_html__( 'Description', '@@text_domain' ),
+                'name'  => $args['name'] . '_additional_description',
+            ),
+            'categories' => array(
+                'type'  => 'select2',
+                'label' => esc_html__( 'Categories', '@@text_domain' ),
+                'name'  => $args['name'] . '_additional_categories',
+                'multiple' => true,
+                'tags' => true,
+            ),
+            'format' => array(
+                'type'  => 'select2',
+                'label' => esc_html__( 'Format', '@@text_domain' ),
+                'name'  => $args['name'] . '_additional_format',
+                'default' => 'standard',
+                'options' => array(
+                    'standard' => esc_html__( 'Standard', '@@text_domain' ),
+                    'video' => esc_html__( 'Video', '@@text_domain' ),
+                ),
+            ),
+            'video_url' => array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Video URL', '@@text_domain' ),
+                'name'  => $args['name'] . '_additional_video_url',
+                'condition' => array(
+                    array(
+                        'control' => $args['name'] . '_additional_format',
+                        'value' => 'video',
+                    ),
+                ),
+            ),
+        );
+
+        ?>
+        <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( json_encode( $images ) ); ?>">
+
+        <div class="vp-control-gallery-additional-data">
+            <div class="vp-control-gallery-additional-data-preview">
+                <div class="vp-control-gallery-additional-data-preview-image">
+                    <img src="" alt="">
+                </div>
+                <div class="vp-control-gallery-additional-data-preview-data">
+                    <strong class="vp-control-gallery-additional-data-preview-name"></strong>
+                    <div class="vp-control-gallery-additional-data-preview-size"></div>
+                    <div class="vp-control-gallery-additional-data-preview-edit">
+                        <a href="#" target="_blank"><?php echo esc_html__( 'Edit', '@@text_domain' ); ?></a>
+                    </div>
+                </div>
+            </div>
+            <?php
+            foreach ( $additional_data as $name => $data_item ) {
+                Visual_Portfolio_Controls::get(
+                    array_merge( $data_item, array(
+                        'value'  => '',
+                        'class' => 'vp-no-reload',
+                    ) )
+                );
+            }
+            ?>
+        </div>
+        <div class="vp-control-gallery-items">
+            <?php
+            foreach ( $images as $data ) :
+                if ( ! isset( $data['id'] ) ) {
+                    continue;
+                }
+
+                $img = wp_get_attachment_image( $data['id'], 'thumbnail' );
+                $img_data = wp_prepare_attachment_for_js( $data['id'] );
+
+                ?>
+                <div class="vp-control-gallery-items-img" data-image-id="<?php echo esc_attr( $data['id'] ); ?>">
+                    <?php
+                    echo wp_kses( $img, array(
+                        'img' => array(
+                            'src'     => array(),
+                            'srcset'  => array(),
+                            'sizes'   => array(),
+                            'alt'     => array(),
+                            'class'   => array(),
+                            'width'   => array(),
+                            'height'  => array(),
+                        ),
+                    ) );
+
+                    // image meta data.
+                    echo '<div style="display: none;" data-meta="width">' . esc_html( $img_data['width'] ) . '</div>';
+                    echo '<div style="display: none;" data-meta="height">' . esc_html( $img_data['height'] ) . '</div>';
+                    echo '<div style="display: none;" data-meta="filename">' . esc_html( $img_data['filename'] ) . '</div>';
+                    echo '<div style="display: none;" data-meta="editLink">' . esc_url( $img_data['editLink'] ) . '</div>';
+                    echo '<div style="display: none;" data-meta="filesizeHumanReadable">' . esc_html( $img_data['filesizeHumanReadable'] ) . '</div>';
+
+                    // additional data.
+                    foreach ( $additional_data as $name => $data_item ) {
+                        $val = isset( $data[ $name ] ) ? $data[ $name ] : ( isset( $data_item['default'] ) ? $data_item['default'] : '' );
+
+                        if ( is_array( $val ) ) {
+                            $val = json_encode( $val );
+                        }
+
+                        echo '<div style="display: none;" data-additional="' . esc_attr( $name ) . '" ' . ( isset( $data_item['multiple'] ) ? 'data-to-json="true"' : '' ) . '>' . esc_html( $val ) . '</div>';
+                    }
+                    ?>
+                    <div class="vp-control-gallery-items-remove"><span class="dashicons dashicons-minus"></span></div>
+                </div>
+                <?php
+            endforeach;
+            ?>
+            <div class="vp-control-gallery-items-add"><span class="dashicons dashicons-plus"></span></div>
+        </div>
+        <div class="vp-control-gallery-items-default" style="display: none;">
+            <div class="vp-control-gallery-items-img" data-image-id="">
+                <img src="" alt="">
+
+                <div style="display: none;" data-meta="width"></div>
+                <div style="display: none;" data-meta="height"></div>
+                <div style="display: none;" data-meta="filename"></div>
+                <div style="display: none;" data-meta="editLink"></div>
+                <div style="display: none;" data-meta="filesizeHumanReadable"></div>
+
+                <?php
+                foreach ( $additional_data as $name => $data_item ) {
+                    $val = isset( $data_item['default'] ) ? $data_item['default'] : '';
+                    echo '<div style="display: none;" data-additional="' . esc_attr( $name ) . '" ' . ( isset( $data_item['multiple'] ) ? 'data-to-json="true"' : '' ) . '>' . esc_html( $val ) . '</div>';
+                }
+                ?>
+                <div class="vp-control-gallery-items-remove"><span class="dashicons dashicons-minus"></span></div>
+            </div>
+        </div>
         <?php
     }
 }

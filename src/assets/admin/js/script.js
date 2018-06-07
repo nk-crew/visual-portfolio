@@ -163,6 +163,12 @@ if ( typeof Tooltip !== 'undefined' ) {
     let reloadTimeout;
     $editForm.on( 'change input vp-fake-change vp-fake-input', '[name*="vp_"]', function( e ) {
         const $this = $( this );
+
+        // prevent reload.
+        if ( $this.closest( '.vp-no-reload' ).length ) {
+            return;
+        }
+
         const data = {
             name: $this.attr( 'name' ),
             value: $this.is( '[type=checkbox], [type=radio]' ) ? $this.is( ':checked' ) : $this.val(),
@@ -317,6 +323,7 @@ if ( typeof Tooltip !== 'undefined' ) {
             let opts = {
                 width: '100%',
                 minimumResultsForSearch: $this.hasClass( 'vp-select2-nosearch' ) ? -1 : 1,
+                tags: $this.hasClass( 'vp-select2-tags' ),
             };
             const $postTypeAjax = $this.attr( 'data-post-type' ) ? $( $this.attr( 'data-post-type' ) ) : false;
 
@@ -420,6 +427,247 @@ if ( typeof Tooltip !== 'undefined' ) {
             // init
             $this.select2( opts ).data( 'select2' ).$dropdown.addClass( 'select2-vp-container' );
         } );
+    }
+
+    const $galleries = $( '.vp-control-gallery' );
+    let showedGalleries = 0;
+
+    // get gallery item data by id.
+    function getGalleryItemData( $gallery, id ) {
+        const $item = $gallery.find( '[data-image-id="' + id + '"]' );
+        const data = {
+            id: id,
+        };
+
+        $item.find( '[data-additional]' ).each( function() {
+            const $this = $( this );
+            const name = $this.attr( 'data-additional' );
+            data[ name ] = $this.html();
+
+            if ( $this.attr( 'data-to-json' ) === 'true' ) {
+                try {
+                    data[ name ] = JSON.parse( data[ name ] );
+                } catch ( e ) {
+                    data[ name ] = '';
+                }
+            }
+        } );
+
+        return data;
+    }
+
+    // get gallery item meta by id.
+    function getGalleryItemMeta( $gallery, id ) {
+        const $item = $gallery.find( '[data-image-id="' + id + '"]' );
+        const data = {};
+
+        $item.find( '[data-meta]' ).each( function() {
+            data[ $( this ).attr( 'data-meta' ) ] = $( this ).html();
+        } );
+
+        return data;
+    }
+
+    // update gallery data and add it to the input.
+    function updateGalleryData( $gallery ) {
+        const items = [];
+        $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img' ).each( function() {
+            items.push( getGalleryItemData( $gallery, $( this ).attr( 'data-image-id' ) ) );
+        } );
+        const data = JSON.stringify( items );
+        const $input = $gallery.children( 'input[type="hidden"]' );
+
+        if ( data !== $input.val() ) {
+            $input.val( data ).change();
+        }
+    }
+
+    // show additional data block.
+    function showAdditionalDataBlock( $gallery, id ) {
+        const galleryName = $gallery.children( 'input[type="hidden"]' ).attr( 'name' );
+        const $dataBlock = $gallery.children( '.vp-control-gallery-additional-data' );
+        const $previewBlock = $dataBlock.children( '.vp-control-gallery-additional-data-preview' );
+        const $currentImg = $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img[data-image-id="' + id + '"]' );
+        const itemData = getGalleryItemData( $gallery, id );
+        const itemMeta = getGalleryItemMeta( $gallery, id );
+
+        if ( itemData ) {
+            Object.keys( itemData ).forEach( function( key ) {
+                const $input = $dataBlock.find( '[name="' + galleryName + '_additional_' + key + '"], [name="' + galleryName + '_additional_' + key + '[]"]' ).val( itemData[ key ] || '' );
+
+                if ( $input.hasClass( 'vp-select2' ) ) {
+                    if ( $input.hasClass( 'vp-select2-tags' ) ) {
+                        // get all available categories and add it to the tags list.
+                        let items = [];
+                        const options = [];
+                        $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img' ).each( function() {
+                            const data = getGalleryItemData( $gallery, $( this ).attr( 'data-image-id' ) );
+
+                            // merge 2 arrays without duplicates.
+                            if ( data && typeof data[ key ] !== 'undefined' && data[ key ] ) {
+                                items = [ ...new Set( [ ...items, ...data[ key ] ] ) ];
+                            }
+                        } );
+
+                        items.forEach( ( val ) => {
+                            options.push( new window.Option( val, val, false, false ) );
+                        } );
+
+                        $input.html( options.length ? options : '' );
+
+                        $input.val( typeof itemData[ key ] !== 'undefined' && itemData[ key ] ? itemData[ key ] : '' );
+                    }
+
+                    $input.trigger( 'change' );
+                }
+            } );
+        }
+
+        $previewBlock.find( '.vp-control-gallery-additional-data-preview-image img' ).attr( 'src', $currentImg.children( 'img' ).attr( 'src' ) || '' );
+        $previewBlock.find( '.vp-control-gallery-additional-data-preview-name' ).html( itemMeta.filename );
+        $previewBlock.find( '.vp-control-gallery-additional-data-preview-size' ).html( itemMeta.width + 'x' + itemMeta.height + ' (' + itemMeta.filesizeHumanReadable + ')' );
+        $previewBlock.find( '.vp-control-gallery-additional-data-preview-edit a' ).attr( 'href', itemMeta.editLink.replace( '&amp;', '&' ) );
+
+        // add active classes
+        $currentImg.siblings().removeClass( 'active' );
+        $currentImg.addClass( 'active' );
+        $dataBlock.addClass( 'active' );
+
+        showedGalleries = $galleries.find( '.vp-control-gallery-additional-data.active' ).length;
+    }
+
+    // Sortable + gallery
+    if ( $.fn.sortable ) {
+        $galleries.each( function() {
+            const $gallery = $( this );
+            const $defaultItem = $gallery.children( '.vp-control-gallery-items-default' );
+            $gallery.children( '.vp-control-gallery-items' ).sortable( {
+                animation: 150,
+                draggable: '.vp-control-gallery-items-img',
+                onUpdate() {
+                    updateGalleryData( $gallery );
+                },
+            } );
+
+            // remove item
+            $gallery.on( 'click', '.vp-control-gallery-items-remove', function( e ) {
+                e.preventDefault();
+                $( this ).parent().remove();
+                updateGalleryData( $gallery );
+            } );
+
+            // add item
+            $gallery.on( 'click', '.vp-control-gallery-items-add', function( e ) {
+                e.preventDefault();
+                let frame = $gallery.data( 'wp-frame' );
+
+                // If the media frame already exists, reopen it.
+                if ( frame ) {
+                    frame.open();
+                    return;
+                }
+
+                if ( ! wp.media ) {
+                    // eslint-disable-next-line
+                    console.error('Can\'t access wp.media object.');
+                    return;
+                }
+
+                // Create a new media frame
+                frame = wp.media( {
+                    title: 'Select or Upload Images',
+                    button: {
+                        text: 'Use this images',
+                    },
+                    multiple: true,
+                    library: {
+                        type: 'image',
+                    },
+                } );
+                $gallery.data( 'wp-frame', frame );
+
+                // When an image is selected in the media frame...
+                frame.on( 'select', () => {
+                    // Get media images details from the frame state
+                    const images = frame.state().get( 'selection' ).models;
+                    if ( images && images.length ) {
+                        images.forEach( ( item ) => {
+                            let url = item.changed.url;
+
+                            if ( item.changed.sizes && item.changed.sizes.thumbnail ) {
+                                url = item.changed.sizes.thumbnail.url;
+                            }
+
+                            const $newItem = $defaultItem.children().clone();
+                            $newItem.attr( 'data-image-id', item.id );
+                            $newItem.children( 'img' ).attr( 'src', url );
+
+                            $newItem.find( '[data-meta="width"]' ).html( item.changed.width );
+                            $newItem.find( '[data-meta="height"]' ).html( item.changed.height );
+                            $newItem.find( '[data-meta="filename"]' ).html( item.changed.filename );
+                            $newItem.find( '[data-meta="editLink"]' ).html( item.changed.editLink );
+                            $newItem.find( '[data-meta="filesizeHumanReadable"]' ).html( item.changed.filesizeHumanReadable );
+
+                            $gallery.find( '.vp-control-gallery-items-add' ).before( $newItem );
+                        } );
+                        updateGalleryData( $gallery );
+                    }
+                } );
+
+                // Finally, open the modal on click
+                frame.open();
+            } );
+
+            // edit item
+            $gallery.on( 'click', '.vp-control-gallery-items-img', function( e ) {
+                e.preventDefault();
+                showAdditionalDataBlock( $gallery, $( this ).attr( 'data-image-id' ) );
+            } );
+
+            // edit item
+            let updateTimer;
+            $gallery.on( 'change input', '.vp-control-gallery-additional-data [name]', function() {
+                clearTimeout( updateTimer );
+                updateTimer = setTimeout( () => {
+                    const $dataBlock = $gallery.children( '.vp-control-gallery-additional-data' );
+                    const galleryName = $gallery.children( 'input[type="hidden"]' ).attr( 'name' );
+                    const id = $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img.active' ).attr( 'data-image-id' );
+
+                    if ( id ) {
+                        const $currentItem = $gallery.children( '.vp-control-gallery-items' ).find( '[data-image-id="' + id + '"]' );
+
+                        $dataBlock.find( '[name*="' + galleryName + '_additional_"]' ).each( function() {
+                            const name = $( this ).attr( 'name' ).replace( galleryName + '_additional_', '' ).replace( '[]', '' );
+                            let val = $( this ).val() || '';
+
+                            if ( typeof val === 'object' ) {
+                                val = JSON.stringify( val );
+                            }
+
+                            $currentItem.find( '[data-additional="' + name + '"]' ).html( val || '' );
+                        } );
+
+                        updateGalleryData( $gallery );
+                    }
+                }, 200 );
+            } );
+        } );
+
+        // remove active classes.
+        if ( $galleries.length ) {
+            const $galleryDatas = $galleries.children( '.vp-control-gallery-additional-data' );
+            $( document ).on( 'click', function( e ) {
+                if ( showedGalleries ) {
+                    const target = e.target;
+
+                    if ( ! $( target ).closest( '.vp-control-gallery-additional-data, .vp-control-gallery-items-img' ).length ) {
+                        $galleryDatas.removeClass( 'active' );
+                        $galleries.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img.active' ).removeClass( 'active' );
+                        showedGalleries = $galleries.find( '.vp-control-gallery-additional-data.active' ).length;
+                    }
+                }
+            } );
+        }
     }
 
     // codemirror

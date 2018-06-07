@@ -104,6 +104,9 @@ class Visual_Portfolio_Admin {
             wp_enqueue_script( 'select2', visual_portfolio()->plugin_url . 'assets/vendor/select2/js/select2.min.js', array( 'jquery' ), '4.0.5', true );
             wp_enqueue_style( 'select2', visual_portfolio()->plugin_url . 'assets/vendor/select2/css/select2.css', '', '4.0.5' );
 
+            wp_enqueue_script( 'sortablejs', visual_portfolio()->plugin_url . 'assets/vendor/sortable/Sortable.min.js', array( 'jquery' ), '1.6.0', true );
+            wp_enqueue_script( 'sortablejs-jquery', visual_portfolio()->plugin_url . 'assets/vendor/sortable/jquery.binding.js', array( 'sortablejs' ), '1.6.0', true );
+
             wp_enqueue_script( 'conditionize', visual_portfolio()->plugin_url . 'assets/vendor/conditionize/conditionize.js', array( 'jquery' ), '', true );
 
             $codemirror_version = '5.38.0';
@@ -1592,6 +1595,20 @@ class Visual_Portfolio_Admin {
                         );
                         ?>
                     </div>
+                </div>
+                <div data-content="images">
+                    <!-- Images -->
+
+                    <p></p>
+                    <?php
+                    Visual_Portfolio_Controls::get(
+                        array(
+                            'type'  => 'gallery',
+                            'name'  => 'vp_images',
+                            'value' => $meta['vp_images'],
+                        )
+                    );
+                    ?>
                 </div>
             </div>
         </div>
