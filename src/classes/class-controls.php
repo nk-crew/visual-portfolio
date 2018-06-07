@@ -326,7 +326,7 @@ class Visual_Portfolio_Controls {
         );
 
         ?>
-        <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( json_encode( $images ) ); ?>">
+        <textarea name="<?php echo esc_attr( $args['name'] ); ?>" style="display: none;"><?php echo esc_textarea( json_encode( $images, JSON_UNESCAPED_UNICODE ) ); ?></textarea>
 
         <div class="vp-control-gallery-additional-data">
             <div class="vp-control-gallery-additional-data-preview">

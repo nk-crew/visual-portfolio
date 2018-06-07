@@ -475,7 +475,7 @@ if ( typeof Tooltip !== 'undefined' ) {
             items.push( getGalleryItemData( $gallery, $( this ).attr( 'data-image-id' ) ) );
         } );
         const data = JSON.stringify( items );
-        const $input = $gallery.children( 'input[type="hidden"]' );
+        const $input = $gallery.children( 'textarea' );
 
         if ( data !== $input.val() ) {
             $input.val( data ).change();
@@ -484,7 +484,7 @@ if ( typeof Tooltip !== 'undefined' ) {
 
     // show additional data block.
     function showAdditionalDataBlock( $gallery, id ) {
-        const galleryName = $gallery.children( 'input[type="hidden"]' ).attr( 'name' );
+        const galleryName = $gallery.children( 'textarea' ).attr( 'name' );
         const $dataBlock = $gallery.children( '.vp-control-gallery-additional-data' );
         const $previewBlock = $dataBlock.children( '.vp-control-gallery-additional-data-preview' );
         const $currentImg = $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img[data-image-id="' + id + '"]' );
@@ -630,7 +630,7 @@ if ( typeof Tooltip !== 'undefined' ) {
                 clearTimeout( updateTimer );
                 updateTimer = setTimeout( () => {
                     const $dataBlock = $gallery.children( '.vp-control-gallery-additional-data' );
-                    const galleryName = $gallery.children( 'input[type="hidden"]' ).attr( 'name' );
+                    const galleryName = $gallery.children( 'textarea' ).attr( 'name' );
                     const id = $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img.active' ).attr( 'data-image-id' );
 
                     if ( id ) {
