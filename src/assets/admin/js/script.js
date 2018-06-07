@@ -656,11 +656,11 @@ if ( typeof Tooltip !== 'undefined' ) {
         // remove active classes.
         if ( $galleries.length ) {
             const $galleryDatas = $galleries.children( '.vp-control-gallery-additional-data' );
-            $( document ).on( 'click', function( e ) {
+            $( document ).on( 'mousedown', function( e ) {
                 if ( showedGalleries ) {
                     const target = e.target;
 
-                    if ( ! $( target ).closest( '.vp-control-gallery-additional-data, .vp-control-gallery-items-img' ).length ) {
+                    if ( ! $( target ).closest( '.vp-control-gallery-additional-data, .vp-control-gallery-items-img, .select2-vp-container' ).length ) {
                         $galleryDatas.removeClass( 'active' );
                         $galleries.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img.active' ).removeClass( 'active' );
                         showedGalleries = $galleries.find( '.vp-control-gallery-additional-data.active' ).length;
