@@ -767,7 +767,7 @@ class Visual_Portfolio_Get {
                     $query_opts['post_type'] = $options['vp_posts_source'];
 
                     // Taxonomies.
-                    if ( ! empty( $options['vp_posts_taxonomies'] ) ) {
+                    if ( ! empty( $options['vp_posts_taxonomies'] ) && ! isset( $query_opts['tax_query'] ) ) {
                         $terms_list = get_terms(
                             get_object_taxonomies(
                                 get_post_types(
