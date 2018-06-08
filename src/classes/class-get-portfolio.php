@@ -654,12 +654,13 @@ class Visual_Portfolio_Get {
     private static function get_query_params( $options, $for_filter = false ) {
         $query_opts = array();
 
+        $is_images = 'images' === $options['vp_content_source'];
+
         $paged = 0;
-        if ( $options['vp_pagination'] ) {
+        if ( $options['vp_pagination'] || $is_images ) {
             $paged = self::get_current_page_number();
         }
 
-        $is_images = 'images' === $options['vp_content_source'];
         if ( $is_images ) {
             $query_opts['images'] = array();
 
