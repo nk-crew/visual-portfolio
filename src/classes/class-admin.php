@@ -765,11 +765,7 @@ class Visual_Portfolio_Admin {
                 'options' => array(
                     'tiles'   => esc_html__( 'Tiles', '@@text_domain' ),
                     'masonry' => esc_html__( 'Masonry', '@@text_domain' ),
-
-                /*
-                 * TODO: Justified
                     'justified' => esc_html__( 'Justified', '@@text_domain' ),
-                 */
                 ),
             )
         );
@@ -820,6 +816,41 @@ class Visual_Portfolio_Admin {
                     array(
                         'control' => 'vp_layout',
                         'value' => 'masonry',
+                    ),
+                ),
+            )
+        );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'range',
+                'label' => esc_html__( 'Row height', '@@text_domain' ),
+                'name'  => 'vp_justified_row_height',
+                'value' => $meta['vp_justified_row_height'],
+                'min'   => 100,
+                'max'   => 1000,
+                'condition' => array(
+                    array(
+                        'control' => 'vp_layout',
+                        'value' => 'justified',
+                    ),
+                ),
+            )
+        );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'range',
+                'label' => esc_html__( 'Row height tolerance', '@@text_domain' ),
+                'name'  => 'vp_justified_row_height_tolerance',
+                'value' => $meta['vp_justified_row_height_tolerance'],
+                'min'   => 0,
+                'max'   => 1,
+                'step'  => 0.05,
+                'condition' => array(
+                    array(
+                        'control' => 'vp_layout',
+                        'value' => 'justified',
                     ),
                 ),
             )

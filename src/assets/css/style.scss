@@ -134,8 +134,14 @@
 
 // Justified
 [data-vp-layout="justified"] {
+    .vp-portfolio__items {
+        transition: .2s height ease-in-out;
+    }
     .vp-portfolio__item-wrap {
-        position: absolute;
+        float: left;
+        top: 0;
+        left: 0;
+        transition: .2s transform ease-in-out, .2s width ease-in-out, .2s height ease-in-out;
     }
 }
 

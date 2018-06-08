@@ -42,9 +42,10 @@ class Visual_Portfolio_Controls {
                 'multiple' => false,
                 'tags' => false,
                 'post_type' => '',
-                // checkbox.
+                // range.
                 'min' => '',
                 'max' => '',
+                'step' => '1',
                 // textarea.
                 'cols' => '',
                 'rows' => '',
@@ -220,8 +221,8 @@ class Visual_Portfolio_Controls {
     public static function print_control_range( $args = array() ) {
         ?>
         <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
-        <input type="range" min="<?php echo esc_attr( $args['min'] ); ?>" max="<?php echo esc_attr( $args['max'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
-        <input type="number" min="<?php echo esc_attr( $args['min'] ); ?>" max="<?php echo esc_attr( $args['max'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        <input type="range" min="<?php echo esc_attr( $args['min'] ); ?>" max="<?php echo esc_attr( $args['max'] ); ?>" step="<?php echo esc_attr( $args['step'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        <input type="number" step="<?php echo esc_attr( $args['step'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
         <?php
     }
 

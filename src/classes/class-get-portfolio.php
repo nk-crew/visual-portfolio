@@ -44,8 +44,12 @@ class Visual_Portfolio_Get {
              */
             'vp_tiles_type' => '3|1,1|',
 
-            // masonry columns count.
+            // Masonry.
             'vp_masonry_columns'       => 3,
+
+            // Justified.
+            'vp_justified_row_height'  => 200,
+            'vp_justified_row_height_tolerance' => 0.25,
 
             'vp_items_gap'             => 15,
             'vp_items_count'           => 6,
@@ -350,6 +354,8 @@ class Visual_Portfolio_Get {
              data-vp-layout="<?php echo esc_attr( $options['vp_layout'] ); ?>"
              data-vp-tiles-type="<?php echo esc_attr( $options['vp_tiles_type'] ); ?>"
              data-vp-masonry-columns="<?php echo esc_attr( $options['vp_masonry_columns'] ); ?>"
+             data-vp-justified-row-height="<?php echo esc_attr( $options['vp_justified_row_height'] ); ?>"
+             data-vp-justified-row-height-tolerance="<?php echo esc_attr( $options['vp_justified_row_height_tolerance'] ); ?>"
              data-vp-items-style="<?php echo esc_attr( $options['vp_items_style'] ); ?>"
              data-vp-items-click-action="<?php echo esc_attr( $options['vp_items_click_action'] ); ?>"
              data-vp-items-gap="<?php echo esc_attr( $options['vp_items_gap'] ); ?>"

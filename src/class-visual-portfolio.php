@@ -151,10 +151,8 @@ class Visual_Portfolio {
 
         wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '3.0.6', true );
 
-        /*
-         * TODO: Justified
-           wp_register_script( 'justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/justified-gallery/js/jquery.justifiedGallery.min.js', array( 'jquery' ), '', true );
-         */
+        // fjGallery.
+        wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/fjGallery.min.js', array( 'jquery' ), '1.0.0', true );
 
         // PhotoSwipe.
         wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css', '', '4.1.2' );
@@ -163,7 +161,7 @@ class Visual_Portfolio {
         wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '4.1.2', true );
 
         // Visual Portfolio.
-        wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', array( 'jquery', 'isotope', 'imagesloaded', 'font-awesome', 'font-awesome-v4-shims', 'object-fit-images', 'photoswipe-ui-default' ), '@@plugin_version', true );
+        wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', array( 'jquery', 'isotope', 'flickr-justified-gallery', 'imagesloaded', 'font-awesome', 'font-awesome-v4-shims', 'object-fit-images', 'photoswipe-ui-default' ), '@@plugin_version', true );
         wp_register_style( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/css/style.min.css', array( 'photoswipe-default-skin' ), '@@plugin_version' );
 
         // Visual Portfolio data.

@@ -128,7 +128,7 @@ class VP {
             self.initIsotope();
 
             // justified gallery
-            self.initJustifiedGallery();
+            self.initFjGallery();
 
             self.emitEvent( 'imagesLoaded' );
         } );
@@ -165,7 +165,7 @@ class VP {
         self.destroyIsotope();
 
         // destroy justified gallery
-        self.destroyJustifiedGallery();
+        self.destroyFjGallery();
 
         self.emitEvent( 'destroy' );
 
@@ -303,6 +303,8 @@ class VP {
             itemsGap: 0,
             tilesType: '3|1,1|',
             masonryColumns: 3,
+            justifiedRowHeight: 250,
+            justifiedRowHeightTolerance: 0.25,
             pagination: 'load-more',
         };
 
@@ -742,78 +744,38 @@ class VP {
     }
 
     /**
-     * Init Justified Gallery plugin
+     * Init fjGallery plugin
+     *
+     * @param {mixed} args - custom args.
+     * @param {mixed} additional - additional args.
      */
-    initJustifiedGallery() {
+    initFjGallery( args = false, additional = null ) {
         const self = this;
 
         if ( self.options.layout === 'justified' ) {
-            self.$items_wrap.justifiedGallery( {
-                lastRow: 'justify',
-                margins: self.options.itemsGap || 0,
-                border: 0,
-                selector: '.vp-portfolio__item-wrap',
-                waitThumbnailsLoad: false,
-            } );
+            self.$items_wrap.fjGallery( args !== false ? args : {
+                gutter: parseFloat( self.options.itemsGap ) || 0,
+                rowHeight: parseFloat( self.options.justifiedRowHeight ) || 200,
+                rowHeightTolerance: parseFloat( self.options.justifiedRowHeightTolerance ) || 0,
+                itemSelector: '.vp-portfolio__item-wrap',
+                imageSelector: '.vp-portfolio__item-img img',
+            }, additional );
 
-            self.emitEvent( 'initJustifiedGallery' );
+            self.emitEvent( 'initFjGallery' );
         }
     }
 
     /**
-     * Destroy Justified Gallery plugin
-     *
-     * TODO: when this issue will be fixed (https://github.com/miromannino/Justified-Gallery/issues/228), need to use default destroy method
+     * Destroy fjGallery plugin
      */
-    destroyJustifiedGallery() {
+    destroyFjGallery() {
         const self = this;
-        const jg = self.$items_wrap.data( 'jg.controller' );
+        const fjGallery = self.$items_wrap.fjGallery;
 
-        if ( jg ) {
-            // jg.destroy();
+        if ( fjGallery ) {
+            self.$items_wrap.fjGallery( 'destroy' );
 
-            clearInterval( jg.checkWidthIntervalId );
-            $.each( jg.entries, ( _, entry ) => {
-                const $entry = $( entry );
-
-                // Reset entry style
-                $entry.css( 'width', '' );
-                $entry.css( 'height', '' );
-                $entry.css( 'top', '' );
-                $entry.css( 'left', '' );
-                $entry.data( 'jg.loaded', undefined );
-                $entry.removeClass( 'jg-entry' );
-
-                // Reset image style
-                const $img = $entry.find( '.vp-portfolio__item-img img' );
-                if ( $img.length ) {
-                    $img.css( 'width', '' );
-                    $img.css( 'height', '' );
-                    $img.css( 'margin-left', '' );
-                    $img.css( 'margin-top', '' );
-                    $img.attr( 'src', $img.data( 'jg.originalSrc' ) );
-                    $img.data( 'jg.originalSrc', undefined );
-                }
-
-                // Remove caption
-                jg.removeCaptionEventsHandlers( $entry );
-                const $caption = jg.captionFromEntry( $entry );
-                if ( $entry.data( 'jg.createdCaption' ) ) {
-                    // remove also the caption element (if created by jg)
-                    $entry.data( 'jg.createdCaption', undefined );
-                    if ( $caption !== null ) {
-                        $caption.remove();
-                    }
-                } else if ( $caption !== null ) {
-                    $caption.fadeTo( 0, 1 );
-                }
-            } );
-
-            jg.$gallery.css( 'height', '' );
-            jg.$gallery.removeClass( 'justified-gallery' );
-            jg.$gallery.data( 'jg.controller', undefined );
-
-            self.emitEvent( 'destroyJustifiedGallery' );
+            self.emitEvent( 'destroyFjGallery' );
         }
     }
 
@@ -1169,6 +1131,7 @@ class VP {
     addItems( $items, removeExisting ) {
         const self = this;
         const isotope = self.$items_wrap.data( 'isotope' );
+        const fjGallery = self.$items_wrap.fjGallery;
 
         if ( isotope ) {
             if ( removeExisting ) {
@@ -1187,6 +1150,16 @@ class VP {
             self.$items_wrap.imagesLoaded( () => {
                 self.initIsotope( 'layout' );
             } );
+        } if ( fjGallery ) {
+            if ( removeExisting ) {
+                self.destroyFjGallery();
+                self.$items_wrap.find( '.vp-portfolio__item-wrap' ).remove();
+                self.$items_wrap.prepend( $items );
+                self.initFjGallery();
+            } else {
+                self.$items_wrap.append( $items );
+                self.initFjGallery( 'appendImages', $items );
+            }
         }
 
         self.emitEvent( 'addItems', [ $items, removeExisting ] );
