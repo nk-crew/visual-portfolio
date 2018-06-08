@@ -463,7 +463,7 @@ class Visual_Portfolio_Get {
                         }
 
                         $args = array_merge( $each_item_args, array(
-                            'url'             => wp_get_attachment_image_url( $img['id'], $img_size_popup ),
+                            'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
                             'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
                             'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
                             'published_time'  => '',

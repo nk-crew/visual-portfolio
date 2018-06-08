@@ -177,6 +177,17 @@ class Visual_Portfolio_Controls {
     }
 
     /**
+     * Print control url.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_url( $args = array() ) {
+        ?>
+        <input type="url" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>" placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>" class="vp-input" <?php echo esc_attr( $args['readonly'] ? 'readonly' : '' ); ?>>
+        <?php
+    }
+
+    /**
      * Print control textarea.
      *
      * @param array $args - control args.
@@ -314,8 +325,9 @@ class Visual_Portfolio_Controls {
                 ),
             ),
             'video_url' => array(
-                'type'  => 'text',
+                'type'  => 'url',
                 'label' => esc_html__( 'Video URL', '@@text_domain' ),
+                'placeholder'  => esc_html__( 'https://...', '@@text_domain' ),
                 'name'  => $args['name'] . '_additional_video_url',
                 'condition' => array(
                     array(
@@ -323,6 +335,13 @@ class Visual_Portfolio_Controls {
                         'value' => 'video',
                     ),
                 ),
+            ),
+            'url' => array(
+                'type'  => 'url',
+                'label' => esc_html__( 'URL', '@@text_domain' ),
+                'description' => esc_html__( 'By default used full image url, you can use custom one', '@@text_domain' ),
+                'placeholder'  => esc_html__( 'https://...', '@@text_domain' ),
+                'name'  => $args['name'] . '_additional_url',
             ),
         );
 
