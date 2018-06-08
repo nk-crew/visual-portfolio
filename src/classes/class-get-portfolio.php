@@ -214,7 +214,7 @@ class Visual_Portfolio_Get {
         $result = array_merge( self::get_defaults(), $options_or_id );
 
         // quick fix for images array.
-        $result['vp_images'] = (array) is_string( $result['vp_images'] ) ? json_decode( $result['vp_images'], true ) : $result['vp_images'];
+        $result['vp_images'] = (array) ( is_string( $result['vp_images'] ) ? json_decode( $result['vp_images'], true ) : $result['vp_images'] );
 
         return $result;
     }
