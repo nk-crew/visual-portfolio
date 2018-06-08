@@ -215,7 +215,9 @@ class Visual_Portfolio_Admin {
                     'delete_posts' => 'delete_portfolios',
                     'delete_post' => 'delete_portfolio',
                 ),
-                'rewrite' => true,
+                'rewrite' => array(
+                    'slug' => Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general', 'portfolio' ),
+                ),
                 'supports' => array(
                     'title',
                     'editor',
