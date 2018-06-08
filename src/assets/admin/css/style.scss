@@ -118,7 +118,8 @@ $grid_sm: 600px !default;
 /**
  * VP Lists creation page restyle.
  */
-.post-type-vp_lists.post-php {
+.post-type-vp_lists.post-php,
+.post-type-vp_lists.post-new-php {
     background-color: #edeff0;
 
     // remove paddings and margins from default blocks
