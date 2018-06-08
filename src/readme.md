@@ -7,21 +7,22 @@
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Portfolio lists visual editor. Masonry, tiles, custom posts.
+Portfolio layouts visual editor. Masonry, justified, tiles, custom posts, custom images.
 
 
 ## Description ##
 
-Visual Portfolio editor let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry or Tiles layouts.
+Visual Portfolio editor let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry, Justified or Tiles layouts.
 
 See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://demo.nkdev.info/#visual-portfolio)
 
 
 = Features =
 
-* Visual preview for portfolio list shortcode builder
+* Visual preview for portfolio layouts shortcode builder
 * Templates for theme developers
 * Masonry layout
+* Justified layout (Flickr)
 * Tiles layout
 * 3 predefined hover effects (will be more in the future updates):
    * Fade
@@ -30,40 +31,45 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
    * Default (no hover effect)
 * Infinite Scroll
 * Load More
-* Paged lists
+* Paged layouts
 * Filtering
 * Popup gallery (Youtube and Vimeo supported)
 * Custom item gutters
 * Stretch option (if you want to break the fixed container of the page)
-* Custom posts type lists (not only portfolio)
+* Custom image sets
+* Custom posts type layouts (not only portfolio)
    * Posts by type
    * Posts by specific ID
    * Posts by taxonomies
    * Custom order
-* Custom CSS for each portfolio lists
-* Shortcode generated, so you can place unlimited portfolio lists on the page
-* Visual Composer page builder supported
+* Custom CSS for each portfolio layouts
+* Shortcode generated, so you can place unlimited portfolio layouts on the page
+* Gutenberg WordPress builder supported
+* WPBakery Page Builder page builder supported
 
 
 = Real Examples =
 
 [Piroll - Portfolio Theme](https://demo.nkdev.info/#piroll)
+[Snow - Portfolio Theme](https://demo.nkdev.info/#snow)
 
 
 
 ## Screenshots ##
 
 1. Visual Portfolio builder p.1
-2. Visual Portfolio builder p.2
-3. Portfolio items list admin
-4. Visual Portfolio shortcodes list admin
-5. Example: Tiles + Stretch
-6. Example: Masonry + Posts
-7. Example: Tiles + Custom hover color
-8. Example: Tiles + Paged pagination
-9. Example: Masonry
-10. Example: Tiles + Popup gallery
-11. Example: Popup Gallery
+2. Visual Portfolio builder p.2 (custom images set)
+3. Visual Portfolio builder p.3 (custom styles)
+4. Portfolio items admin
+5. Visual Portfolio layouts admin
+6. Example: Tiles + Stretch
+7. Example: Justified Gallery (Flickr)
+8. Example: Masonry + Posts
+9. Example: Tiles + Custom hover color
+10. Example: Tiles + Paged pagination
+11. Example: Masonry
+12. Example: Tiles + Popup gallery
+13. Example: Popup Gallery
 
 
 
@@ -83,12 +89,29 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.4.0 =
+* added Justified layout
+* added custom user images support in Content Source settings
+* added Gutenberg block to easily insert layouts
+* added Random order in Post-Based content source
+* added spinner to load more button
+* added setting to change portfolio slug
+* fixed video playing when popup were closed
+* fixed filter in post-based with taxonomies selected
+* fixed w3c validation error when enqueuing template styles
+* fixed specific posts selector ajax result
+* fixed publish button click (don't show confirm alert)
+* changed "No More" button text
+* changed active filter buttons background color
+* updated FontAwesome to 5 version
+* minor changes
+
 = 1.3.0 =
 * improved CSS editor (added autocomplete hints; selectors hint; showing errors; preventing save when editor has errors)
 * improved layouts editor interface
 * added shortcode for portfolio filter (you can use filter outside of portfolio wrapper)
 * added possibility to change date format
-* added frontend Visual Composer support
+* added frontend WPBakery Page Builder support
 * added support for post ordering plugins (Intuitive Custom Post Order)
 * fixed popup video jumping
 * fixed some php errors in preview
@@ -126,7 +149,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 = 1.1.2 =
 * added options to hide arrows and numbers from the paged pagination
-* added support for Visual Composer
+* added support for WPBakery Page Builder
 * added class attribute in shortcode
 * added excerpt field to the portfolio post type
 * removed enqueued portfolio scripts and styles from the admin builder
@@ -134,7 +157,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 * changed all items-styles hover effects
 * fixed showing excerpt from excerpt post fields
 * fixed php short tag usage
-* fixed conflict with Visual Composer and old isotope plugin
+* fixed conflict with WPBakery Page Builder and old isotope plugin
 
 = 1.1.1 =
 * fixed php enqueue errors
@@ -160,7 +183,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 * added object-fit polyfill to support old browsers
 * added custom image sizes
 * added responsive
-* added wrapper to items list
+* added wrapper to items layout
 * removed margin from main vp container
 * fixed array option retrieve error
 * minor changes
