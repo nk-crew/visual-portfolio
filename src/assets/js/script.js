@@ -1062,6 +1062,18 @@ class VP {
                 resizeVideo( this );
             } );
 
+            // remove video block
+            gallery.listen( 'destroy', function() {
+                const data = this;
+                if ( data && data.itemHolders.length ) {
+                    data.itemHolders.forEach( ( val ) => {
+                        if ( val.el ) {
+                            $( val.el ).find( '.vp-pswp-video' ).remove();
+                        }
+                    } );
+                }
+            } );
+
             gallery.init();
         };
 
