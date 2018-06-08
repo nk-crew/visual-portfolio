@@ -660,9 +660,14 @@ class Visual_Portfolio_Get {
         if ( $options['vp_pagination'] || $is_images ) {
             $paged = self::get_current_page_number();
         }
+        $count = intval( $options['vp_items_count'] );
 
         if ( $is_images ) {
             $query_opts['images'] = array();
+
+            if ( $count < 0 ) {
+                $count = 99999;
+            }
 
             // Load certain taxonomies.
             $images = array();
@@ -683,10 +688,10 @@ class Visual_Portfolio_Get {
                 $images = (array) $options['vp_images'];
             }
 
-            $query_opts['max_num_pages'] = ceil( count( $images ) / intval( $options['vp_items_count'] ) );
+            $query_opts['max_num_pages'] = ceil( count( $images ) / $count );
 
-            $start_from_item = ( $paged - 1 ) * intval( $options['vp_items_count'] );
-            $end_on_item = $start_from_item + intval( $options['vp_items_count'] );
+            $start_from_item = ( $paged - 1 ) * $count;
+            $end_on_item = $start_from_item + $count;
 
             if ( $for_filter ) {
                 $start_from_item = 0;
@@ -702,8 +707,8 @@ class Visual_Portfolio_Get {
             }
         } else {
             $query_opts = array(
-                'showposts'  => intval( $options['vp_items_count'] ),
-                'posts_per_page' => intval( $options['vp_items_count'] ),
+                'showposts'  => $count,
+                'posts_per_page' => $count,
                 'paged'      => $paged,
                 'orderby'    => 'post_date',
                 'order'      => $options['vp_posts_order_direction'],
