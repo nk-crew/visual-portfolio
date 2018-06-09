@@ -860,6 +860,16 @@ class Visual_Portfolio_Get {
         if ( $is_images ) {
             $query_opts = self::get_query_params( $vp_options, true );
 
+            // calculate categories count.
+            $categories_count = array();
+            foreach ( $query_opts['images'] as $img ) {
+                if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
+                    foreach ( $img['categories'] as $cat ) {
+                        $categories_count[ $cat ] = ( isset( $categories_count[ $cat ] ) ? $categories_count[ $cat ] : 0 ) + 1;
+                    }
+                }
+            }
+
             foreach ( $query_opts['images'] as $img ) {
                 if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
                     foreach ( $img['categories'] as $cat ) {
@@ -875,7 +885,7 @@ class Visual_Portfolio_Get {
                             'filter'      => $slug,
                             'label'       => $cat,
                             'description' => '',
-                            'count'       => '',
+                            'count'       => isset( $categories_count[ $cat ] ) && $categories_count[ $cat ] ? $categories_count[ $cat ] : '',
                             'taxonomy'    => 'category',
                             'active'      => $active_item === $slug,
                             'url'         => $url,
