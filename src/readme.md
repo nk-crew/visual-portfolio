@@ -91,11 +91,10 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 #### How to disable enqueued plugins (JS, CSS) on frontend ####
 There are some plugins, enqueued with Visual Portfolio on your page. If you don't like the plugin and/or want to change it to your alternate plugin, you can disable it using filters. Example:
 
-```php
-add_filter( 'vpf_enqueue_plugin_font_awesome', '__return_false' );
-```
+    add_filter( 'vpf_enqueue_plugin_font_awesome', '__return_false' );
 
 Available filters:
+
 * `vpf_enqueue_plugin_isotope`
 * `vpf_enqueue_plugin_flickr_justified_gallery`
 * `vpf_enqueue_plugin_object_fit_images`
@@ -103,6 +102,10 @@ Available filters:
 * `vpf_enqueue_plugin_font_awesome`
 
 Note: some functionality depends on these plugins and you may break the portfolio.
+
+#### How to change default templates and styles? ####
+
+You can copy files from the **/visual-portfolio/templates/** to your **YOUR_THEME/visual-portfolio/** folder and change php code and css files here.
 
 
 ## Changelog ##
@@ -215,11 +218,3 @@ Note: some functionality depends on these plugins and you may break the portfoli
 
 = 1.0.0 =
 * initial Release
-
-
-
-## Frequently Asked Questions ##
-
-#### How to change default templates and styles? ####
-
-You can copy files from the **/visual-portfolio/templates/** to your **YOUR_THEME/visual-portfolio/** folder and change php code and css files here.
