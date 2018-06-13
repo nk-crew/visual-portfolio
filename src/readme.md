@@ -107,6 +107,13 @@ Note: some functionality depends on these plugins and you may break the portfoli
 
 ## Changelog ##
 
+= 1.4.1 =
+* added filters to disable enqueued frontend plugins (see FAQ section)
+* added Custom URL option to custom images set
+* added support for negative number of items per page for custom images set (to show all available items on the page)
+* fixed custom images show when disabled pagination
+* fixed custom images filters count show
+
 = 1.4.0 =
 * added Justified layout
 * added custom user images support in Content Source settings
