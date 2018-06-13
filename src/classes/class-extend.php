@@ -36,7 +36,7 @@ class Visual_Portfolio_Extend {
                 ),
             )
          */
-        return apply_filters( 'vp_extend_layouts', array() );
+        return apply_filters( 'vpf_extend_layouts', array() );
     }
 
     /**
@@ -64,6 +64,6 @@ class Visual_Portfolio_Extend {
                 ),
             )
          */
-        return apply_filters( 'vp_extend_items_styles', array() );
+        return apply_filters( 'vpf_extend_items_styles', array() );
     }
 }
