@@ -1121,18 +1121,53 @@ class Visual_Portfolio_Admin {
         /**
          * Filter.
          */
+        $filters = array_merge( array(
+            // False.
+            'false' => array(
+                'title' => esc_html__( 'False', '@@text_domain' ),
+                'controls' => array(),
+            ),
+
+            // Default.
+            'masonry' => array(
+                'title' => esc_html__( 'Default', '@@text_domain' ),
+                'controls' => array(),
+            ),
+        ), Visual_Portfolio_Extend::filters() );
+
+        // Layouts selector.
+        $filters_selector = array();
+        foreach ( $filters as $name => $filter ) {
+            $filters_selector[ $name ] = $filter['title'];
+        }
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'filter',
                 'type'     => 'select2',
                 'name'     => 'vp_filter',
                 'default'  => 'default',
-                'options'  => array(
-                    'false'   => esc_html__( 'Disabled', '@@text_domain' ),
-                    'default' => esc_html__( 'Default', '@@text_domain' ),
-                ),
+                'options'  => $filters_selector,
             )
         );
+
+        // filters options.
+        foreach ( $filters as $name => $filter ) {
+            foreach ( $filter['controls'] as $field ) {
+                $field['category'] = 'filter';
+                $field['name'] = 'vp_' . $name . '_' . $field['name'];
+                $field['condition'] = array_merge(
+                    isset( $field['condition'] ) ? $field['condition'] : array(),
+                    array(
+                        array(
+                            'control' => 'vp_filter',
+                            'value' => $name,
+                        ),
+                    )
+                );
+                Visual_Portfolio_Controls::register( $field );
+            }
+        }
+
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'filter',

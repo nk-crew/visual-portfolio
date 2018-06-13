@@ -66,4 +66,24 @@ class Visual_Portfolio_Extend {
          */
         return apply_filters( 'vpf_extend_items_styles', array() );
     }
+
+    /**
+     * Additional Filters.
+     *
+     * @return array
+     */
+    public static function filters() {
+        /*
+         * Example:
+            array(
+                'new_filter' => array(
+                    'title' => esc_html__( 'New Filter', '@@text_domain' ),
+                    'controls' => array(
+                        ... controls ...
+                    ),
+                ),
+            )
+         */
+        return apply_filters( 'vpf_extend_filters', array() );
+    }
 }
