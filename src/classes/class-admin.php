@@ -903,7 +903,7 @@ class Visual_Portfolio_Admin {
         foreach ( $layouts as $name => $layout ) {
             foreach ( $layout['controls'] as $field ) {
                 $field['name'] = 'vp_' . $name . '_' . $field['name'];
-                $field['value'] = $meta[ $field['name'] ];
+                $field['value'] = isset( $meta[ $field['name'] ] ) ? $meta[ $field['name'] ] : $field['default'];
                 $field['condition'] = array_merge(
                     isset( $field['condition'] ) ? $field['condition'] : array(),
                     array(
@@ -958,243 +958,275 @@ class Visual_Portfolio_Admin {
      */
     public function add_items_style_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
-        $styles = array(
-            'default'  => __( 'Default', '@@text_domain' ),
-            'fly'      => __( 'Fly', '@@text_domain' ),
-            'emerge'   => __( 'Emerge', '@@text_domain' ),
-            'fade'     => __( 'Fade', '@@text_domain' ),
-        );
 
+        $items_styles = array_merge( array(
+            // Default.
+            'default' => array(
+                'title' => esc_html__( 'Default', '@@text_domain' ),
+                'builtin_controls' => array(
+                    'show_title' => true,
+                    'show_categories' => true,
+                    'show_date' => true,
+                    'show_excerpt' => true,
+                    'show_icons' => false,
+                    'align' => true,
+                ),
+                'controls' => array(),
+            ),
+
+            // Fly.
+            'fly' => array(
+                'title' => esc_html__( 'Fly', '@@text_domain' ),
+                'builtin_controls' => array(
+                    'show_title' => true,
+                    'show_categories' => true,
+                    'show_date' => true,
+                    'show_excerpt' => true,
+                    'show_icons' => true,
+                    'align' => 'extended',
+                ),
+                'controls' => array(
+                    array(
+                        'type'    => 'color',
+                        'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
+                        'name'    => 'bg_color',
+                        'default' => '#212125',
+                        'alpha'   => true,
+                    ),
+                    array(
+                        'type'    => 'color',
+                        'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
+                        'name'    => 'text_color',
+                        'default' => '#fff',
+                        'alpha'   => true,
+                    ),
+                ),
+            ),
+
+            // Emerge.
+            'emerge' => array(
+                'title' => esc_html__( 'Emerge', '@@text_domain' ),
+                'builtin_controls' => array(
+                    'show_title' => true,
+                    'show_categories' => true,
+                    'show_date' => true,
+                    'show_excerpt' => true,
+                    'show_icons' => false,
+                    'align' => true,
+                ),
+                'controls' => array(
+                    array(
+                        'type'    => 'color',
+                        'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
+                        'name'    => 'bg_color',
+                        'default' => '#fff',
+                        'alpha'   => true,
+                    ),
+                    array(
+                        'type'    => 'color',
+                        'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
+                        'name'    => 'text_color',
+                        'default' => '#000',
+                        'alpha'   => true,
+                    ),
+                ),
+            ),
+
+            // Fade.
+            'fade' => array(
+                'title' => esc_html__( 'Fade', '@@text_domain' ),
+                'builtin_controls' => array(
+                    'show_title' => true,
+                    'show_categories' => true,
+                    'show_date' => true,
+                    'show_excerpt' => true,
+                    'show_icons' => true,
+                    'align' => 'extended',
+                ),
+                'controls' => array(
+                    array(
+                        'type'    => 'color',
+                        'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
+                        'name'    => 'bg_color',
+                        'default' => 'rgba(0, 0, 0, 0.85)',
+                        'alpha'   => true,
+                    ),
+                    array(
+                        'type'    => 'color',
+                        'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
+                        'name'    => 'text_color',
+                        'default' => '#fff',
+                        'alpha'   => true,
+                    ),
+                ),
+            ),
+        ), Visual_Portfolio_Extend::items_styles() );
+
+        // Styles selector.
+        $items_styles_selector = array();
+        foreach ( $items_styles as $name => $style ) {
+            $items_styles_selector[ $name ] = $style['title'];
+        }
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'select2',
                 'name'  => 'vp_items_style',
                 'value' => $meta['vp_items_style'],
-                'options' => $styles,
+                'options' => $items_styles_selector,
             )
         );
-        ?>
 
-        <?php foreach ( $styles as $style => $label ) : ?>
-            <div data-cond="[name=vp_items_style] == <?php echo esc_attr( $style ); ?>">
-
-                <?php
-                $opt = 'vp_items_style_' . $style . '__';
-
-                Visual_Portfolio_Controls::get(
-                    array(
-                        'type'  => 'toggle',
-                        'label'  => esc_html__( 'Show title', '@@text_domain' ),
-                        'name'  => $opt . 'show_title',
-                        'value' => $meta[ $opt . 'show_title' ],
-                    )
-                );
-
-                Visual_Portfolio_Controls::get(
-                    array(
-                        'type'  => 'toggle',
-                        'label'  => esc_html__( 'Show categories', '@@text_domain' ),
-                        'name'  => $opt . 'show_categories',
-                        'value' => $meta[ $opt . 'show_categories' ],
-                    )
-                );
-
-                Visual_Portfolio_Controls::get(
-                    array(
-                        'type'  => 'range',
-                        'label' => esc_html__( 'Categories count', '@@text_domain' ),
-                        'name'  => $opt . 'categories_count',
-                        'value' => $meta[ $opt . 'categories_count' ],
-                        'min'   => 1,
-                        'max'   => 10,
-                        'condition' => array(
-                            array(
-                                'control' => $opt . 'show_categories',
+        // styles builtin options.
+        foreach ( $items_styles as $name => $style ) {
+            $new_fields = array();
+            $name_prefix = 'vp_items_style_' . $name . '__';
+            foreach ( $style['builtin_controls'] as $control_name => $val ) {
+                if ( ! $val ) {
+                    continue;
+                }
+                switch ( $control_name ) {
+                    case 'show_title':
+                        $new_fields[] = array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Show title', '@@text_domain' ),
+                            'name'    => 'show_title',
+                            'default' => true,
+                        );
+                        break;
+                    case 'show_categories':
+                        $new_fields[] = array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Show categories', '@@text_domain' ),
+                            'name'    => 'show_categories',
+                            'default' => true,
+                        );
+                        $new_fields[] = array(
+                            'type'    => 'range',
+                            'label'   => esc_html__( 'Categories count', '@@text_domain' ),
+                            'name'    => 'categories_count',
+                            'min'     => 1,
+                            'max'     => 10,
+                            'default' => 1,
+                            'condition' => array(
+                                array(
+                                    'control' => $name_prefix . 'show_categories',
+                                ),
                             ),
-                        ),
-                    )
-                );
-
-                Visual_Portfolio_Controls::get(
-                    array(
-                        'type'  => 'select2',
-                        'label' => esc_html__( 'Show date', '@@text_domain' ),
-                        'name'  => $opt . 'show_date',
-                        'value' => $meta[ $opt . 'show_date' ],
-                        'options' => array(
-                            'false' => esc_html__( 'False', '@@text_domain' ),
-                            'true'  => esc_html__( 'Show', '@@text_domain' ),
-                            'human' => esc_html__( 'Human Format', '@@text_domain' ),
-                        ),
-                    )
-                );
-
-                Visual_Portfolio_Controls::get(
-                    array(
-                        'type'  => 'text',
-                        'name'  => $opt . 'date_format',
-                        'value' => $meta[ $opt . 'date_format' ],
-                        'placeholder' => 'F j, Y',
-                        'hint' => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
-                        'hint_place' => 'left',
-                        'condition' => array(
-                            array(
-                                'control' => $opt . 'show_date',
+                        );
+                        break;
+                    case 'show_date':
+                        $new_fields[] = array(
+                            'type'    => 'select2',
+                            'label'   => esc_html__( 'Show date', '@@text_domain' ),
+                            'name'    => 'show_date',
+                            'default' => false,
+                            'options' => array(
+                                'false' => esc_html__( 'False', '@@text_domain' ),
+                                'true'  => esc_html__( 'Show', '@@text_domain' ),
+                                'human' => esc_html__( 'Human Format', '@@text_domain' ),
                             ),
-                        ),
-                    )
-                );
-
-                Visual_Portfolio_Controls::get(
-                    array(
-                        'type'  => 'toggle',
-                        'label'  => esc_html__( 'Show excerpt', '@@text_domain' ),
-                        'name'  => $opt . 'show_excerpt',
-                        'value' => $meta[ $opt . 'show_excerpt' ],
-                    )
-                );
-
-                Visual_Portfolio_Controls::get(
-                    array(
-                        'type'  => 'range',
-                        'label' => esc_html__( 'Excerpt words count', '@@text_domain' ),
-                        'name'  => $opt . 'excerpt_words_count',
-                        'value' => $meta[ $opt . 'excerpt_words_count' ],
-                        'min'   => 1,
-                        'max'   => 200,
-                        'condition' => array(
-                            array(
-                                'control' => $opt . 'show_excerpt',
+                        );
+                        $new_fields[] = array(
+                            'type'    => 'toggle',
+                            'name'    => 'date_format',
+                            'placeholder' => 'F j, Y',
+                            'default' => 'F j, Y',
+                            'hint' => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
+                            'hint_place' => 'left',
+                            'condition' => array(
+                                array(
+                                    'control' => $name_prefix . 'show_date',
+                                ),
                             ),
-                        ),
-                    )
-                );
-
-                if ( 'fly' === $style || 'fade' === $style ) {
-                    Visual_Portfolio_Controls::get(
-                        array(
-                            'type'  => 'toggle',
-                            'label' => esc_html__( 'Show icon', '@@text_domain' ),
-                            'name'  => $opt . 'show_icon',
-                            'value' => $meta[ $opt . 'show_icon' ],
-                        )
-                    );
-
-                    Visual_Portfolio_Controls::get(
-                        array(
+                        );
+                        break;
+                    case 'show_excerpt':
+                        $new_fields[] = array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Show excerpt', '@@text_domain' ),
+                            'name'    => 'show_excerpt',
+                            'default' => false,
+                        );
+                        $new_fields[] = array(
+                            'type'    => 'range',
+                            'label'   => esc_html__( 'Excerpt words count', '@@text_domain' ),
+                            'name'    => 'show_excerpt',
+                            'default' => 15,
+                            'min'     => 1,
+                            'max'     => 200,
+                            'condition' => array(
+                                array(
+                                    'control' => $name_prefix . 'show_excerpt',
+                                ),
+                            ),
+                        );
+                        break;
+                    case 'show_icons':
+                        $new_fields[] = array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Show icon', '@@text_domain' ),
+                            'name'    => 'show_icon',
+                            'default' => false,
+                        );
+                        $new_fields[] = array(
                             'type'        => 'text',
-                            'name'        => $opt . 'icon',
-                            'value'       => $meta[ $opt . 'icon' ],
+                            'name'        => 'icon',
+                            'default'     => '',
                             'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
                             'hint'        => esc_attr__( 'Standard icon', '@@text_domain' ),
                             'hint_place'  => 'left',
                             'condition'   => array(
                                 array(
-                                    'control' => $opt . 'show_icon',
+                                    'control' => $name_prefix . 'show_icon',
                                 ),
                             ),
-                        )
-                    );
-
-                    Visual_Portfolio_Controls::get(
-                        array(
+                        );
+                        $new_fields[] = array(
                             'type'        => 'text',
-                            'name'        => $opt . 'icon_video',
-                            'value'       => $meta[ $opt . 'icon_video' ],
+                            'name'        => 'icon_video',
+                            'default'     => '',
                             'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
                             'hint'        => esc_attr__( 'Video icon', '@@text_domain' ),
                             'hint_place'  => 'left',
                             'condition'   => array(
                                 array(
-                                    'control' => $opt . 'show_icon',
+                                    'control' => $name_prefix . 'show_icon',
                                 ),
                             ),
-                        )
-                    );
+                        );
+                        break;
+                    case 'align':
+                        $new_fields[] = array(
+                            'type'    => 'align',
+                            'label'   => esc_html__( 'Caption align', '@@text_domain' ),
+                            'name'    => 'align',
+                            'default' => 'center',
+                            'extended' => 'extended' === $val,
+                        );
+                        break;
+                    // no default.
                 }
-                ?>
+            }
+            $items_styles[ $name ]['controls'] = array_merge( $new_fields, $style['controls'] );
+        }
 
-                <?php
-                $caption_align_opt = $opt . 'align';
-                ?>
-                <div data-cond="[name=<?php echo esc_attr( $opt . 'show_title' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_categories' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_date' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_excerpt' ); ?>] == true || [name=<?php echo esc_attr( $opt . 'show_icon' ); ?>] == true">
-
-                    <div class="vp-control">
-                        <label for="<?php echo esc_attr( $caption_align_opt ); ?>">
-                            <?php echo esc_html__( 'Caption align', '@@text_domain' ); ?>
-                        </label>
-                        <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $caption_align_opt ); ?>" id="<?php echo esc_attr( $caption_align_opt ); ?>">
-
-                            <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
-                            <optgroup label="<?php echo esc_attr__( 'Top', '@@text_domain' ); ?>">
-                                <option value="top-center" <?php selected( $meta[ $caption_align_opt ], 'top-center' ); ?>>
-                                    <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
-                                </option>
-                                <option value="top-left" <?php selected( $meta[ $caption_align_opt ], 'top-left' ); ?>>
-                                    <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
-                                </option>
-                                <option value="top-right" <?php selected( $meta[ $caption_align_opt ], 'top-right' ); ?>>
-                                    <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
-                                </option>
-                            </optgroup>
-                            <optgroup label="<?php echo esc_attr__( 'Center', '@@text_domain' ); ?>">
-                                <?php endif; ?>
-
-                                <option value="center" <?php selected( $meta[ $caption_align_opt ], 'center' ); ?>>
-                                    <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
-                                </option>
-                                <option value="left" <?php selected( $meta[ $caption_align_opt ], 'left' ); ?>>
-                                    <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
-                                </option>
-                                <option value="right" <?php selected( $meta[ $caption_align_opt ], 'right' ); ?>>
-                                    <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
-                                </option>
-
-                                <?php if ( 'fly' === $style || 'fade' === $style ) : ?>
-                            </optgroup>
-                            <optgroup label="<?php echo esc_attr__( 'Bottom', '@@text_domain' ); ?>">
-                                <option value="bottom-center" <?php selected( $meta[ $caption_align_opt ], 'bottom-center' ); ?>>
-                                    <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
-                                </option>
-                                <option value="bottom-left" <?php selected( $meta[ $caption_align_opt ], 'bottom-left' ); ?>>
-                                    <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
-                                </option>
-                                <option value="bottom-right" <?php selected( $meta[ $caption_align_opt ], 'bottom-right' ); ?>>
-                                    <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
-                                </option>
-                            </optgroup>
-                        <?php endif; ?>
-                        </select>
-                    </div>
-                </div>
-
-                <?php if ( 'fly' === $style || 'emerge' === $style || 'fade' === $style ) : ?>
-                    <?php
-                    Visual_Portfolio_Controls::get(
+        // styles options.
+        foreach ( $items_styles as $name => $style ) {
+            foreach ( $style['controls'] as $field ) {
+                $field['name'] = 'vp_items_style_' . $name . '__' . $field['name'];
+                $field['value'] = isset( $meta[ $field['name'] ] ) ? $meta[ $field['name'] ] : $field['default'];
+                $field['condition'] = array_merge(
+                    isset( $field['condition'] ) ? $field['condition'] : array(),
+                    array(
                         array(
-                            'type'  => 'color',
-                            'label'  => esc_html__( 'Overlay background color', '@@text_domain' ),
-                            'name'  => $opt . 'bg_color',
-                            'value' => $meta[ $opt . 'bg_color' ],
-                            'alpha' => true,
-                        )
-                    );
-
-                    Visual_Portfolio_Controls::get(
-                        array(
-                            'type'  => 'color',
-                            'label'  => esc_html__( 'Overlay text color', '@@text_domain' ),
-                            'name'  => $opt . 'text_color',
-                            'value' => $meta[ $opt . 'text_color' ],
-                            'alpha' => true,
-                        )
-                    );
-                    ?>
-                <?php endif; ?>
-            </div>
-        <?php endforeach; ?>
-
-        <?php
+                            'control' => 'vp_items_style',
+                            'value' => $name,
+                        ),
+                    )
+                );
+                Visual_Portfolio_Controls::get( $field );
+            }
+        }
     }
 
     /**
@@ -1743,25 +1775,22 @@ class Visual_Portfolio_Admin {
             return;
         }
 
-        $meta = array_keys( Visual_Portfolio_Get::get_options( $post_id ) );
-
-        foreach ( $meta as $item ) {
-            if ( isset( $_POST[ $item ] ) ) {
-
-                if ( 'vp_custom_css' === $item ) {
-                    $result = wp_kses( wp_unslash( $_POST[ $item ] ), array( '\'', '\"' ) );
-                } else {
-                    $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
-                }
-
-                if ( 'Array' === $result ) {
-                    $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
-                }
-
-                update_post_meta( $post_id, $item, $result );
-            } else {
-                update_post_meta( $post_id, $item, false );
+        foreach ( (array) $_POST as $k => $item ) {
+            if ( ! substr( $k, 0, strlen( 'vp_' ) ) === 'vp_' ) {
+                continue;
             }
+
+            if ( 'vp_custom_css' === $k ) {
+                $result = wp_kses( wp_unslash( $item ), array( '\'', '\"' ) );
+            } else {
+                $result = sanitize_text_field( wp_unslash( $item ) );
+            }
+
+            if ( 'Array' === $result ) {
+                $result = array_map( 'sanitize_text_field', wp_unslash( $item ) );
+            }
+
+            update_post_meta( $post_id, $k, $result );
         }
     }
 

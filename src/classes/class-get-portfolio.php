@@ -186,21 +186,23 @@ class Visual_Portfolio_Get {
 
             $post_meta = get_post_meta( $id );
 
-            foreach ( self::get_defaults() as $k => $item ) {
-                if ( isset( $post_meta[ $k ] ) && isset( $post_meta[ $k ][0] ) ) {
-                    $val = maybe_unserialize( $post_meta[ $k ][0] );
-
-                    $val = apply_filters( 'vp_get_option', $val, $k );
-
-                    if ( 'false' === $val || '' === $val ) {
-                        $val = false;
-                    }
-                    if ( 'true' === $val ) {
-                        $val = true;
-                    }
-
-                    $options_or_id[ $k ] = $val;
+            foreach ( (array) $post_meta as $k => $item ) {
+                if ( ! substr( $k, 0, strlen( 'vp_' ) ) === 'vp_' ) {
+                    continue;
                 }
+
+                $val = maybe_unserialize( $item[0] );
+
+                $val = apply_filters( 'vp_get_option', $val, $k );
+
+                if ( 'false' === $val || '' === $val ) {
+                    $val = false;
+                }
+                if ( 'true' === $val ) {
+                    $val = true;
+                }
+
+                $options_or_id[ $k ] = $val;
             }
         }
 

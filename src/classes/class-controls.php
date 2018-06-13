@@ -51,6 +51,8 @@ class Visual_Portfolio_Controls {
                 'rows' => '',
                 // color.
                 'alpha' => false,
+                // align.
+                'extended' => false,
 
                 // hint.
                 'hint'  => false,
@@ -326,6 +328,58 @@ class Visual_Portfolio_Controls {
                 </div>
             </div>
         </div>
+        <?php
+    }
+
+    /**
+     * Print control align.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_align( $args = array() ) {
+        ?>
+        <select class="vp-select2 vp-select2-nosearch" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>">
+            <?php if ( $args['extended'] ) : ?>
+                <optgroup label="<?php echo esc_attr__( 'Top', '@@text_domain' ); ?>">
+                    <option value="top-center" <?php selected( $args['value'], 'top-center' ); ?>>
+                        <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
+                    </option>
+                    <option value="top-left" <?php selected( $args['value'], 'top-left' ); ?>>
+                        <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
+                    </option>
+                    <option value="top-right" <?php selected( $args['value'], 'top-right' ); ?>>
+                        <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
+                    </option>
+                </optgroup>
+                <optgroup label="<?php echo esc_attr__( 'Center', '@@text_domain' ); ?>">
+            <?php endif; ?>
+
+                <option value="center" <?php selected( $args['value'], 'center' ); ?>>
+                    <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
+                </option>
+                <option value="left" <?php selected( $args['value'], 'left' ); ?>>
+                    <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
+                </option>
+                <option value="right" <?php selected( $args['value'], 'right' ); ?>>
+                    <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
+                </option>
+
+            <?php if ( $args['extended'] ) : ?>
+                </optgroup>
+                <optgroup label="<?php echo esc_attr__( 'Bottom', '@@text_domain' ); ?>">
+                    <option value="bottom-center" <?php selected( $args['value'], 'bottom-center' ); ?>>
+                        <?php echo esc_html__( 'Center', '@@text_domain' ); ?>
+                    </option>
+                    <option value="bottom-left" <?php selected( $args['value'], 'bottom-left' ); ?>>
+                        <?php echo esc_html__( 'Left', '@@text_domain' ); ?>
+                    </option>
+                    <option value="bottom-right" <?php selected( $args['value'], 'bottom-right' ); ?>>
+                        <?php echo esc_html__( 'Right', '@@text_domain' ); ?>
+                    </option>
+                </optgroup>
+            <?php endif; ?>
+        </select>
+
         <?php
     }
 

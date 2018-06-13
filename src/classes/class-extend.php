@@ -34,14 +34,36 @@ class Visual_Portfolio_Extend {
                         ... controls ...
                     ),
                 ),
-                'new_layout_2' => array(
-                    'title' => esc_html__( 'New Layout 2', 'text_domain' ),
+            )
+         */
+        return apply_filters( 'vp_extend_layouts', array() );
+    }
+
+    /**
+     * Additional Items Styles.
+     *
+     * @return array
+     */
+    public static function items_styles() {
+        /*
+         * Example:
+            array(
+                'new_items_style' => array(
+                    'title' => esc_html__( 'New Items Style', '@@text_domain' ),
+                    'builtin_controls' => array(
+                        'show_title' => true,
+                        'show_categories' => true,
+                        'show_date' => true,
+                        'show_excerpt' => true,
+                        'show_icons' => false,
+                        'align' => true,
+                    ),
                     'controls' => array(
                         ... controls ...
                     ),
                 ),
             )
          */
-        return apply_filters( 'vp_extend_layouts', array() );
+        return apply_filters( 'vp_extend_items_styles', array() );
     }
 }
