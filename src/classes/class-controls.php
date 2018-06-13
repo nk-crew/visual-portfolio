@@ -268,6 +268,7 @@ class Visual_Portfolio_Controls {
      */
     public static function print_control_checkbox( $args = array() ) {
         ?>
+        <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>_hidden" value="false">
         <input type="checkbox" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="true" <?php checked( $args['value'] ); ?>>
         <?php
     }
@@ -280,6 +281,7 @@ class Visual_Portfolio_Controls {
     public static function print_control_toggle( $args = array() ) {
         ?>
         <div class="vp-toggle">
+            <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>_hidden" value="false">
             <input type="checkbox" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="true" <?php checked( $args['value'] ); ?>>
             <span class="vp-toggle__track"></span>
             <span class="vp-toggle__thumb"></span>
