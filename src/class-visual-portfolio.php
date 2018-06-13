@@ -298,7 +298,7 @@ class Visual_Portfolio {
         }
 
         // Allow 3rd party plugin filter template file from their plugin.
-        $template = apply_filters( 'vp_include_template', $template, $template_name, $args );
+        $template = apply_filters( 'vpf_include_template', $template, $template_name, $args );
 
         include $template;
     }
@@ -325,7 +325,7 @@ class Visual_Portfolio {
         }
 
         // Allow 3rd party plugin filter template file from their plugin.
-        $template = apply_filters( 'vp_include_template_style', $template, $template_name, $deps, $ver, $media );
+        $template = apply_filters( 'vpf_include_template_style', $template, $template_name, $deps, $ver, $media );
 
         wp_enqueue_style( $handle, $template, $deps, $ver, $media );
     }

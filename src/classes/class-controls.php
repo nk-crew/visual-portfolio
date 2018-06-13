@@ -218,7 +218,7 @@ class Visual_Portfolio_Controls {
         }
 
         // filter.
-        $result = apply_filters( 'vp_get_option', $result, $name, $post_id );
+        $result = apply_filters( 'vpf_get_option', $result, $name, $post_id );
 
         // fix for gallery array.
         if ( isset( $registered_data['type'] ) && 'gallery' === $registered_data['type'] ) {
