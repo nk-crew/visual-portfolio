@@ -265,6 +265,7 @@ class Visual_Portfolio {
      * Include dependencies
      */
     private function include_dependencies() {
+        require_once( $this->plugin_path . 'classes/class-extend.php' );
         require_once( $this->plugin_path . 'classes/class-settings.php' );
         require_once( $this->plugin_path . 'classes/class-rest.php' );
         require_once( $this->plugin_path . 'classes/class-get-portfolio.php' );

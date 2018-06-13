@@ -233,7 +233,7 @@ class Visual_Portfolio_Controls {
         ?>
         <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
         <input type="range" min="<?php echo esc_attr( $args['min'] ); ?>" max="<?php echo esc_attr( $args['max'] ); ?>" step="<?php echo esc_attr( $args['step'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
-        <input type="number" step="<?php echo esc_attr( $args['step'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        <input type="number" step="any" value="<?php echo esc_attr( $args['value'] ); ?>">
         <?php
     }
 
@@ -286,6 +286,46 @@ class Visual_Portfolio_Controls {
     public static function print_control_color( $args = array() ) {
         ?>
         <input class="vp-input vp-color-picker" data-alpha="<?php echo esc_attr( $args['alpha'] ? 'true' : 'false' ); ?>" name="<?php echo esc_attr( $args['name'] ); ?>" type="text" id="<?php echo esc_attr( $args['name'] ); ?>" placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        <?php
+    }
+
+    /**
+     * Print control images dropdown.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_images_dropdown( $args = array() ) {
+        ?>
+        <div class="vp-control-image-dropdown">
+            <span class="vp-control-image-dropdown__preview">
+                <?php
+                // selected image.
+                foreach ( (array) $args['options'] as $data ) {
+                    if ( $args['value'] === $data['value'] ) {
+                        ?>
+                        <img src="<?php echo esc_url( $data['url'] ); ?>" alt="">
+                        <?php
+                        break;
+                    }
+                }
+                ?>
+            </span>
+            <span class="vp-control-image-dropdown__title"><?php echo esc_html( $args['placeholder'] ); ?></span>
+            <div class="vp-control-image-dropdown__content">
+                <div>
+                    <select class="vp-image-picker" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>">
+                        <?php
+                        // selected image.
+                        foreach ( (array) $args['options'] as $data ) {
+                            ?>
+                            <option data-img-src="<?php echo esc_url( $data['url'] ); ?>" data-img-alt="<?php echo esc_attr( $data['value'] ); ?>" value="<?php echo esc_attr( $data['value'] ); ?>" <?php selected( $args['value'] === $data['value'] ); ?>><?php echo esc_html( $data['value'] ); ?></option>
+                            <?php
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+        </div>
         <?php
     }
 

@@ -22,41 +22,32 @@ if ( version_compare( PHP_VERSION, '5.5.9' ) >= 0 ) {
  */
 class Visual_Portfolio_Get {
     /**
+     * Default opts cache.
+     *
+     * @var null|array
+     */
+    private static $default_opts = null;
+
+    /**
      * Get default options
      *
      * @return array
      */
     private static function get_defaults() {
-        return array(
-            // tiles, masonry.
-            'vp_layout'             => 'tiles',
+        if ( self::$default_opts ) {
+            return self::$default_opts;
+        }
 
-            /**
-             * Tile type:
-             * first parameter - is columns number
-             * the next is item sizes
-             *
-             * Example:
-             * 3|1,0.5|2,0.25|
-             *    3 columns in row
-             *    First item 100% width and 50% height
-             *    Second item 200% width and 25% height
-             */
-            'vp_tiles_type' => '3|1,1|',
+        self::$default_opts = array(
+            // layouts (extendable).
+            'vp_layout'        => 'tiles',
 
-            // Masonry.
-            'vp_masonry_columns'       => 3,
+            'vp_items_gap'     => 15,
+            'vp_items_count'   => 6,
+            'vp_stretch'       => false,
 
-            // Justified.
-            'vp_justified_row_height'  => 200,
-            'vp_justified_row_height_tolerance' => 0.25,
-
-            'vp_items_gap'             => 15,
-            'vp_items_count'           => 6,
-            'vp_stretch'               => false,
-
-            // default, fly, emerge, fade.
-            'vp_items_style'           => 'fly',
+            // items style (extendable).
+            'vp_items_style'   => 'fly',
 
             /**
              * Default Items Style
@@ -177,6 +168,8 @@ class Visual_Portfolio_Get {
             // custom CSS.
             'vp_custom_css'            => '',
         );
+
+        return self::$default_opts;
     }
 
     /**

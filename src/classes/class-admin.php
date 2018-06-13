@@ -733,130 +733,189 @@ class Visual_Portfolio_Admin {
     public function add_layout_metabox( $post ) {
         $meta = Visual_Portfolio_Get::get_options( $post->ID );
 
-        $tile_types = array(
-            '1-1' => '1|1,0.5|',
-            '2-1' => '2|1,1|',
-            '2-2' => '2|1,0.8|',
-            '2-3' => '2|1,1.2|1,1.2|1,0.67|1,0.67|',
-            '2-4' => '2|1,1.2|1,0.67|1,1.2|1,0.67|',
-            '2-5' => '2|1,0.67|1,1|1,1|1,1|1,1|1,0.67|',
-            '3-1' => '3|1,1|',
-            '3-2' => '3|1,0.8|',
-            '3-3' => '3|1,1|1,1|1,1|1,1.3|1,1.3|1,1.3|',
-            '3-4' => '3|1,1|1,1|1,2|1,1|1,1|1,1|1,1|1,1|',
-            '3-5' => '3|1,2|1,1|1,1|1,1|1,1|1,1|1,1|1,1|',
-            '3-6' => '3|1,1|1,2|1,1|1,1|1,1|1,1|1,1|1,1|',
-            '3-7' => '3|1,1|1,2|1,1|1,1|1,1|1,1|2,0.5|',
-            '3-8' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|1,0.8|',
-            '3-9' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|',
-            '3-10' => '3|1,1|2,1|1,1|2,0.5|1,1|',
-            '3-11' => '3|1,2|2,0.5|1,1|1,2|2,0.5|',
-            '4-1' => '4|1,1|',
-            '4-2' => '4|1,1|1,1.34|1,1|1,1.34|1,1.34|1,1.34|1,1|1,1|',
-            '4-3' => '4|1,1|1,1|2,1|1,1|1,1|2,1|1,1|1,1|1,1|1,1|',
-            '4-4' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
-        );
+        $layouts = array_merge( array(
+            // Tiles.
+            'tiles' => array(
+                'title' => esc_html__( 'Tiles', '@@text_domain' ),
+                'controls' => array(
+                    /**
+                     * Tile type:
+                     * first parameter - is columns number
+                     * the next is item sizes
+                     *
+                     * Example:
+                     * 3|1,0.5|2,0.25|
+                     *    3 columns in row
+                     *    First item 100% width and 50% height
+                     *    Second item 200% width and 25% height
+                     */
+                    array(
+                        'type'  => 'images_dropdown',
+                        'label' => esc_html__( 'Type', '@@text_domain' ),
+                        'placeholder' => esc_html__( 'Select tiles type', '@@text_domain' ),
+                        'name'  => 'type',
+                        'default' => '3|1,1|',
+                        'options' => array(
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-1-1.svg',
+                                'value' => '1|1,0.5|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-1.svg',
+                                'value' => '2|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-2.svg',
+                                'value' => '2|1,0.8|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-3.svg',
+                                'value' => '2|1,1.2|1,1.2|1,0.67|1,0.67|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-4.svg',
+                                'value' => '2|1,1.2|1,0.67|1,1.2|1,0.67|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-5.svg',
+                                'value' => '2|1,0.67|1,1|1,1|1,1|1,1|1,0.67|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-1.svg',
+                                'value' => '3|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-2.svg',
+                                'value' => '3|1,0.8|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-3.svg',
+                                'value' => '3|1,1|1,1|1,1|1,1.3|1,1.3|1,1.3|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-4.svg',
+                                'value' => '3|1,1|1,1|1,2|1,1|1,1|1,1|1,1|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-5.svg',
+                                'value' => '3|1,2|1,1|1,1|1,1|1,1|1,1|1,1|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-6.svg',
+                                'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|1,1|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-7.svg',
+                                'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|2,0.5|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-8.svg',
+                                'value' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|1,0.8|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-9.svg',
+                                'value' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-10.svg',
+                                'value' => '3|1,1|2,1|1,1|2,0.5|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-11.svg',
+                                'value' => '3|1,2|2,0.5|1,1|1,2|2,0.5|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-1.svg',
+                                'value' => '4|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-2.svg',
+                                'value' => '4|1,1|1,1.34|1,1|1,1.34|1,1.34|1,1.34|1,1|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-3.svg',
+                                'value' => '4|1,1|1,1|2,1|1,1|1,1|2,1|1,1|1,1|1,1|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-4.svg',
+                                'value' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
 
-        $tile_images_uri = visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-';
+            // Masonry.
+            'masonry' => array(
+                'title' => esc_html__( 'Masonry', '@@text_domain' ),
+                'controls' => array(
+                    array(
+                        'type'  => 'range',
+                        'label' => esc_html__( 'Columns', '@@text_domain' ),
+                        'name'  => 'columns',
+                        'min'   => 1,
+                        'max'   => 5,
+                        'default' => 3,
+                    ),
+                ),
+            ),
 
+            // Justified.
+            'justified' => array(
+                'title' => esc_html__( 'Justified', '@@text_domain' ),
+                'controls' => array(
+                    array(
+                        'type'  => 'range',
+                        'label' => esc_html__( 'Row height', '@@text_domain' ),
+                        'name'  => 'row_height',
+                        'min'   => 100,
+                        'max'   => 1000,
+                        'default' => 200,
+                    ),
+                    array(
+                        'type'  => 'range',
+                        'label' => esc_html__( 'Row height tolerance', '@@text_domain' ),
+                        'name'  => 'row_height_tolerance',
+                        'min'   => 0,
+                        'max'   => 1,
+                        'step'  => 0.05,
+                        'default' => 0.25,
+                    ),
+                ),
+            ),
+        ), Visual_Portfolio_Extend::layouts() );
+
+        // Layouts selector.
+        $layouts_selector = array();
+        foreach ( $layouts as $name => $layout ) {
+            $layouts_selector[ $name ] = $layout['title'];
+        }
         Visual_Portfolio_Controls::get(
             array(
                 'type'  => 'select2',
                 'name'  => 'vp_layout',
                 'value' => $meta['vp_layout'],
-                'options' => array(
-                    'tiles'   => esc_html__( 'Tiles', '@@text_domain' ),
-                    'masonry' => esc_html__( 'Masonry', '@@text_domain' ),
-                    'justified' => esc_html__( 'Justified', '@@text_domain' ),
-                ),
+                'options' => $layouts_selector,
             )
         );
-        ?>
 
-        <div data-cond="[name=vp_layout] == tiles">
-            <div class="vp-control">
-                <label><?php echo esc_html__( 'Type', '@@text_domain' ); ?></label>
-
-                <div class="vp-control-image-dropdown">
-                    <span class="vp-control-image-dropdown__preview">
-                        <?php
-                        foreach ( $tile_types as $k => $val ) {
-                            if ( $meta['vp_tiles_type'] === $val ) {
-                                ?>
-                                <img src="<?php echo esc_url( $tile_images_uri . $k . '.svg' ); ?>" alt="">
-                                <?php
-                                break;
-                            }
-                        }
-                        ?>
-                    </span>
-                    <span class="vp-control-image-dropdown__title"><?php echo esc_html__( 'Select tiles type', '@@text_domain' ); ?></span>
-                    <div class="vp-control-image-dropdown__content">
-                        <div>
-                            <select class="vp-image-picker" name="vp_tiles_type">
-                                <!-- <option data-img-src="<?php echo esc_url( $tile_images_uri . 'custom.png' ); ?>" data-img-alt="custom" value="custom">custom</option> -->
-                                <?php foreach ( $tile_types as $k => $val ) : ?>
-                                    <option data-img-src="<?php echo esc_url( $tile_images_uri . $k . '.svg' ); ?>" data-img-alt="<?php echo esc_attr( $k ); ?>" value="<?php echo esc_attr( $val ); ?>" <?php echo $meta['vp_tiles_type'] === $val ? 'selected' : ''; ?>><?php echo esc_html( $val ); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <?php
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'range',
-                'label' => esc_html__( 'Columns', '@@text_domain' ),
-                'name'  => 'vp_masonry_columns',
-                'value' => $meta['vp_masonry_columns'],
-                'min'   => 1,
-                'max'   => 5,
-                'condition' => array(
+        // layouts options.
+        foreach ( $layouts as $name => $layout ) {
+            foreach ( $layout['controls'] as $field ) {
+                $field['name'] = 'vp_' . $name . '_' . $field['name'];
+                $field['value'] = $meta[ $field['name'] ];
+                $field['condition'] = array_merge(
+                    isset( $field['condition'] ) ? $field['condition'] : array(),
                     array(
-                        'control' => 'vp_layout',
-                        'value' => 'masonry',
-                    ),
-                ),
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'range',
-                'label' => esc_html__( 'Row height', '@@text_domain' ),
-                'name'  => 'vp_justified_row_height',
-                'value' => $meta['vp_justified_row_height'],
-                'min'   => 100,
-                'max'   => 1000,
-                'condition' => array(
-                    array(
-                        'control' => 'vp_layout',
-                        'value' => 'justified',
-                    ),
-                ),
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'range',
-                'label' => esc_html__( 'Row height tolerance', '@@text_domain' ),
-                'name'  => 'vp_justified_row_height_tolerance',
-                'value' => $meta['vp_justified_row_height_tolerance'],
-                'min'   => 0,
-                'max'   => 1,
-                'step'  => 0.05,
-                'condition' => array(
-                    array(
-                        'control' => 'vp_layout',
-                        'value' => 'justified',
-                    ),
-                ),
-            )
-        );
+                        array(
+                            'control' => 'vp_layout',
+                            'value' => $name,
+                        ),
+                    )
+                );
+                Visual_Portfolio_Controls::get( $field );
+            }
+        }
 
         Visual_Portfolio_Controls::get(
             array(
