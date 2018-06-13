@@ -14,6 +14,67 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Controls {
     /**
+     * Registered user fields to print it in the future.
+     *
+     * @var array
+     */
+    private static $registered_fields = array();
+
+    /**
+     * Default control args.
+     *
+     * @var array
+     */
+    private static $default_args = array(
+        // category for registered fields.
+        'category' => '',
+
+        'type' => 'text',
+        'label' => false,
+        'description' => false,
+        'name' => '',
+        'value' => '',
+        'placeholder' => '',
+        'readonly' => false,
+
+        // control-specific args.
+        // select.
+        'options' => array(),
+        'searchable' => false,
+        'multiple' => false,
+        'tags' => false,
+        'post_type' => '',
+        // range.
+        'min' => '',
+        'max' => '',
+        'step' => '1',
+        // textarea.
+        'cols' => '',
+        'rows' => '',
+        // color.
+        'alpha' => false,
+        // align.
+        'extended' => false,
+
+        // hint.
+        'hint'  => false,
+        'hint_place' => 'top',
+
+        // condition.
+        'condition' => array(
+            /**
+             * Array of arrays with data:
+             *  'control' - control name.
+             *  'operator' - operator (==, !==, >, <, >=, <=).
+             *  'value' - condition value.
+             */
+        ),
+
+        'class' => '',
+        'wrapper_class' => '',
+    );
+
+    /**
      * Visual_Portfolio_Controls constructor.
      */
     public function __construct() {
@@ -25,53 +86,7 @@ class Visual_Portfolio_Controls {
      * @param array $args - control args.
      */
     public static function get( $args = array() ) {
-        $args = array_merge(
-            array(
-                'type' => 'text',
-                'label' => false,
-                'description' => false,
-                'name' => '',
-                'value' => '',
-                'placeholder' => '',
-                'readonly' => false,
-
-                // control-specific args.
-                // select.
-                'options' => array(),
-                'searchable' => false,
-                'multiple' => false,
-                'tags' => false,
-                'post_type' => '',
-                // range.
-                'min' => '',
-                'max' => '',
-                'step' => '1',
-                // textarea.
-                'cols' => '',
-                'rows' => '',
-                // color.
-                'alpha' => false,
-                // align.
-                'extended' => false,
-
-                // hint.
-                'hint'  => false,
-                'hint_place' => 'top',
-
-                // condition.
-                'condition' => array(
-                    /**
-                     * Array of arrays with data:
-                     *  'control' - control name.
-                     *  'operator' - operator (==, !==, >, <, >=, <=).
-                     *  'value' - condition value.
-                     */
-                ),
-
-                'class' => '',
-                'wrapper_class' => '',
-            ), $args
-        );
+        $args = array_merge( self::$default_args, $args );
 
         $class = 'vp-control vp-control-' . $args['type'] . ' ' . $args['class'];
 
@@ -107,6 +122,52 @@ class Visual_Portfolio_Controls {
             ?>
             </div>
             <?php
+        }
+    }
+
+    /**
+     * Register control to print in the future.
+     *
+     * @param array $args - control args.
+     */
+    public static function register( $args = array() ) {
+        if ( ! isset( $args['name'] ) ) {
+            return;
+        }
+        self::$registered_fields[ $args['name'] ] = $args;
+    }
+
+    /**
+     * Get all registered controls.
+     */
+    public static function get_registered_array() {
+        return self::$registered_fields;
+    }
+
+    /**
+     * Print registered controls.
+     *
+     * @param bool $category - print specific category.
+     */
+    public static function get_registered( $category = false ) {
+        global $post;
+        foreach ( self::get_registered_array() as $field ) {
+            if ( ! $category || isset( $field['category'] ) && $category === $field['category'] ) {
+                $field['value'] = get_post_meta( $post->ID, $field['name'], true );
+
+                if ( '' === $field['value'] && isset( $field['default'] ) ) {
+                    $field['value'] = $field['default'];
+                }
+
+                if ( 'false' === $field['value'] || '' === $field['value'] ) {
+                    $field['value'] = false;
+                }
+                if ( 'true' === $field['value'] ) {
+                    $field['value'] = true;
+                }
+
+                self::get( $field );
+            }
         }
     }
 

@@ -53,6 +53,9 @@ class Visual_Portfolio_Admin {
         // highlight admin menu items.
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 
+        // register controls.
+        add_action( 'init', array( $this, 'register_controls' ) );
+
         // metaboxes.
         add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
         add_action( 'save_post_vp_lists', array( $this, 'save_visual_portfolio_metaboxes' ) );
@@ -600,139 +603,12 @@ class Visual_Portfolio_Admin {
     }
 
     /**
-     * Add metaboxes
+     * Register control fields for the metaboxes.
      */
-    public function add_meta_boxes() {
-        add_meta_box(
-            'vp_name',
-            esc_html__( 'Name & Shortcode', '@@text_domain' ),
-            array( $this, 'add_name_metabox' ),
-            'vp_lists',
-            'side',
-            'high'
-        );
-        add_meta_box(
-            'vp_layout',
-            esc_html__( 'Layout', '@@text_domain' ),
-            array( $this, 'add_layout_metabox' ),
-            'vp_lists',
-            'side',
-            'default'
-        );
-        add_meta_box(
-            'vp_items_style',
-            esc_html__( 'Items Style', '@@text_domain' ),
-            array( $this, 'add_items_style_metabox' ),
-            'vp_lists',
-            'side',
-            'default'
-        );
-        add_meta_box(
-            'vp_items_click_action',
-            esc_html__( 'Items Click Action', '@@text_domain' ),
-            array( $this, 'add_items_click_action_metabox' ),
-            'vp_lists',
-            'side',
-            'default'
-        );
-        add_meta_box(
-            'vp_filter',
-            esc_html__( 'Filter', '@@text_domain' ),
-            array( $this, 'add_filter_metabox' ),
-            'vp_lists',
-            'side',
-            'default'
-        );
-        add_meta_box(
-            'vp_pagination',
-            esc_html__( 'Pagination', '@@text_domain' ),
-            array( $this, 'add_pagination_metabox' ),
-            'vp_lists',
-            'side',
-            'default'
-        );
-
-        add_meta_box(
-            'vp_preview',
-            esc_html__( 'Preview', '@@text_domain' ),
-            array( $this, 'add_preview_metabox' ),
-            'vp_lists',
-            'normal',
-            'high'
-        );
-        add_meta_box(
-            'vp_content_source',
-            esc_html__( 'Content Source', '@@text_domain' ),
-            array( $this, 'add_content_source_metabox' ),
-            'vp_lists',
-            'normal',
-            'high'
-        );
-        add_meta_box(
-            'vp_custom_css',
-            esc_html__( 'Custom CSS', '@@text_domain' ),
-            array( $this, 'add_custom_css_metabox' ),
-            'vp_lists',
-            'normal',
-            'high'
-        );
-    }
-
-    /**
-     * Add Title metabox
-     *
-     * @param object $post The post object.
-     */
-    public function add_name_metabox( $post ) {
-        wp_nonce_field( basename( __FILE__ ), 'vp_layout_nonce' );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'text',
-                'label' => esc_html__( 'Name', '@@text_domain' ),
-                'name'  => 'vp_list_name',
-                'value' => $post->post_title,
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'text',
-                'label' => esc_html__( 'Shortcode', '@@text_domain' ),
-                'description' => esc_html__( 'Place the shortcode where you want to show the portfolio list.', '@@text_domain' ),
-                'name'  => 'vp_list_shortcode',
-                'value' => $post->ID ? '[visual_portfolio id="' . $post->ID . '" class=""]' : '',
-                'readonly' => true,
-            )
-        );
-
-        ?>
-
-        <style>
-            #submitdiv {
-                margin-top: -21px;
-                border-top: none;
-            }
-            #post-body-content,
-            #submitdiv .handlediv,
-            #submitdiv .hndle,
-            #minor-publishing,
-            .wrap h1.wp-heading-inline,
-            .page-title-action {
-                display: none;
-            }
-        </style>
-        <?php
-    }
-
-    /**
-     * Add Layout metabox
-     *
-     * @param object $post The post object.
-     */
-    public function add_layout_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
-
+    public function register_controls() {
+        /**
+         * Layouts.
+         */
         $layouts = array_merge( array(
             // Tiles.
             'tiles' => array(
@@ -890,20 +766,20 @@ class Visual_Portfolio_Admin {
         foreach ( $layouts as $name => $layout ) {
             $layouts_selector[ $name ] = $layout['title'];
         }
-        Visual_Portfolio_Controls::get(
+        Visual_Portfolio_Controls::register(
             array(
-                'type'  => 'select2',
-                'name'  => 'vp_layout',
-                'value' => $meta['vp_layout'],
-                'options' => $layouts_selector,
+                'category' => 'layouts',
+                'type'     => 'select2',
+                'name'     => 'vp_layout',
+                'options'  => $layouts_selector,
             )
         );
 
         // layouts options.
         foreach ( $layouts as $name => $layout ) {
             foreach ( $layout['controls'] as $field ) {
+                $field['category'] = 'layouts';
                 $field['name'] = 'vp_' . $name . '_' . $field['name'];
-                $field['value'] = isset( $meta[ $field['name'] ] ) ? $meta[ $field['name'] ] : $field['default'];
                 $field['condition'] = array_merge(
                     isset( $field['condition'] ) ? $field['condition'] : array(),
                     array(
@@ -913,52 +789,46 @@ class Visual_Portfolio_Admin {
                         ),
                     )
                 );
-                Visual_Portfolio_Controls::get( $field );
+                Visual_Portfolio_Controls::register( $field );
             }
         }
 
-        Visual_Portfolio_Controls::get(
+        Visual_Portfolio_Controls::register(
             array(
+                'category' => 'layouts',
                 'type'  => 'range',
                 'label' => esc_html__( 'Gap', '@@text_domain' ),
                 'name'  => 'vp_items_gap',
-                'value' => $meta['vp_items_gap'],
                 'min'   => 0,
                 'max'   => 150,
             )
         );
 
-        Visual_Portfolio_Controls::get(
+        Visual_Portfolio_Controls::register(
             array(
+                'category' => 'layouts',
                 'type'  => 'range',
                 'label' => esc_html__( 'Items per page', '@@text_domain' ),
                 'name'  => 'vp_items_count',
-                'value' => $meta['vp_items_count'],
                 'min'   => 1,
                 'max'   => 50,
             )
         );
 
-        Visual_Portfolio_Controls::get(
+        Visual_Portfolio_Controls::register(
             array(
+                'category' => 'layouts',
                 'type'  => 'toggle',
                 'label' => esc_html__( 'Stretch', '@@text_domain' ),
                 'name'  => 'vp_stretch',
-                'value' => $meta['vp_stretch'],
                 'hint'  => esc_attr__( 'Break container and display it wide', '@@text_domain' ),
                 'hint_place'  => 'left',
             )
         );
-    }
 
-    /**
-     * Add Items Style metabox
-     *
-     * @param object $post The post object.
-     */
-    public function add_items_style_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
-
+        /**
+         * Items Style
+         */
         $items_styles = array_merge( array(
             // Default.
             'default' => array(
@@ -1067,11 +937,11 @@ class Visual_Portfolio_Admin {
         foreach ( $items_styles as $name => $style ) {
             $items_styles_selector[ $name ] = $style['title'];
         }
-        Visual_Portfolio_Controls::get(
+        Visual_Portfolio_Controls::register(
             array(
+                'category' => 'items-style',
                 'type'  => 'select2',
                 'name'  => 'vp_items_style',
-                'value' => $meta['vp_items_style'],
                 'options' => $items_styles_selector,
             )
         );
@@ -1213,8 +1083,8 @@ class Visual_Portfolio_Admin {
         // styles options.
         foreach ( $items_styles as $name => $style ) {
             foreach ( $style['controls'] as $field ) {
+                $field['category'] = 'items-style';
                 $field['name'] = 'vp_items_style_' . $name . '__' . $field['name'];
-                $field['value'] = isset( $meta[ $field['name'] ] ) ? $meta[ $field['name'] ] : $field['default'];
                 $field['condition'] = array_merge(
                     isset( $field['condition'] ) ? $field['condition'] : array(),
                     array(
@@ -1224,9 +1094,149 @@ class Visual_Portfolio_Admin {
                         ),
                     )
                 );
-                Visual_Portfolio_Controls::get( $field );
+                Visual_Portfolio_Controls::register( $field );
             }
         }
+    }
+
+    /**
+     * Add metaboxes
+     */
+    public function add_meta_boxes() {
+        add_meta_box(
+            'vp_name',
+            esc_html__( 'Name & Shortcode', '@@text_domain' ),
+            array( $this, 'add_name_metabox' ),
+            'vp_lists',
+            'side',
+            'high'
+        );
+        add_meta_box(
+            'vp_layout',
+            esc_html__( 'Layout', '@@text_domain' ),
+            array( $this, 'add_layouts_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+        add_meta_box(
+            'vp_items_style',
+            esc_html__( 'Items Style', '@@text_domain' ),
+            array( $this, 'add_items_style_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+        add_meta_box(
+            'vp_items_click_action',
+            esc_html__( 'Items Click Action', '@@text_domain' ),
+            array( $this, 'add_items_click_action_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+        add_meta_box(
+            'vp_filter',
+            esc_html__( 'Filter', '@@text_domain' ),
+            array( $this, 'add_filter_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+        add_meta_box(
+            'vp_pagination',
+            esc_html__( 'Pagination', '@@text_domain' ),
+            array( $this, 'add_pagination_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+
+        add_meta_box(
+            'vp_preview',
+            esc_html__( 'Preview', '@@text_domain' ),
+            array( $this, 'add_preview_metabox' ),
+            'vp_lists',
+            'normal',
+            'high'
+        );
+        add_meta_box(
+            'vp_content_source',
+            esc_html__( 'Content Source', '@@text_domain' ),
+            array( $this, 'add_content_source_metabox' ),
+            'vp_lists',
+            'normal',
+            'high'
+        );
+        add_meta_box(
+            'vp_custom_css',
+            esc_html__( 'Custom CSS', '@@text_domain' ),
+            array( $this, 'add_custom_css_metabox' ),
+            'vp_lists',
+            'normal',
+            'high'
+        );
+    }
+
+    /**
+     * Add Title metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_name_metabox( $post ) {
+        wp_nonce_field( basename( __FILE__ ), 'vp_layout_nonce' );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Name', '@@text_domain' ),
+                'name'  => 'vp_list_name',
+                'value' => $post->post_title,
+            )
+        );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Shortcode', '@@text_domain' ),
+                'description' => esc_html__( 'Place the shortcode where you want to show the portfolio list.', '@@text_domain' ),
+                'name'  => 'vp_list_shortcode',
+                'value' => $post->ID ? '[visual_portfolio id="' . $post->ID . '" class=""]' : '',
+                'readonly' => true,
+            )
+        );
+
+        ?>
+
+        <style>
+            #submitdiv {
+                margin-top: -21px;
+                border-top: none;
+            }
+            #post-body-content,
+            #submitdiv .handlediv,
+            #submitdiv .hndle,
+            #minor-publishing,
+            .wrap h1.wp-heading-inline,
+            .page-title-action {
+                display: none;
+            }
+        </style>
+        <?php
+    }
+
+    /**
+     * Add Layouts metabox
+     */
+    public function add_layouts_metabox() {
+        Visual_Portfolio_Controls::get_registered( 'layouts' );
+    }
+
+    /**
+     * Add Items Style metabox
+     */
+    public function add_items_style_metabox() {
+        Visual_Portfolio_Controls::get_registered( 'items-style' );
     }
 
     /**
