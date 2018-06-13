@@ -22,194 +22,22 @@ if ( version_compare( PHP_VERSION, '5.5.9' ) >= 0 ) {
  */
 class Visual_Portfolio_Get {
     /**
-     * Default opts cache.
-     *
-     * @var null|array
-     */
-    private static $default_opts = null;
-
-    /**
-     * Get default options
-     *
-     * @return array
-     */
-    private static function get_defaults() {
-        if ( self::$default_opts ) {
-            return self::$default_opts;
-        }
-
-        self::$default_opts = array(
-            // layouts (extendable).
-            'vp_layout'        => 'tiles',
-
-            'vp_items_gap'     => 15,
-            'vp_items_count'   => 6,
-            'vp_stretch'       => false,
-
-            // items style (extendable).
-            'vp_items_style'   => 'fly',
-
-            /**
-             * Default Items Style
-             */
-            'vp_items_style_default__show_title' => true,
-            'vp_items_style_default__show_categories' => true,
-            'vp_items_style_default__categories_count' => 1,
-            'vp_items_style_default__show_date' => false,
-            'vp_items_style_default__date_format' => 'F j, Y',
-            'vp_items_style_default__show_excerpt' => false,
-            'vp_items_style_default__excerpt_words_count' => 15,
-            // center, left, right.
-            'vp_items_style_default__align' => 'center',
-
-            /**
-             * Fly Items Style
-             */
-            // false, title, title_description, title_category, title_category_description, icon.
-            'vp_items_style_fly__show_title' => true,
-            'vp_items_style_fly__show_categories' => true,
-            'vp_items_style_fly__categories_count' => 1,
-            'vp_items_style_fly__show_date' => false,
-            'vp_items_style_fly__date_format' => 'F j, Y',
-            'vp_items_style_fly__show_excerpt' => false,
-            'vp_items_style_fly__excerpt_words_count' => 15,
-            'vp_items_style_fly__show_icon' => false,
-            'vp_items_style_fly__icon' => 'fas fa-search',
-            'vp_items_style_fly__icon_video' => 'fas fa-play',
-            // *, top-*, bottom-*
-            // * = center, left, right.
-            'vp_items_style_fly__align' => 'center',
-            'vp_items_style_fly__bg_color' => '#212125',
-            'vp_items_style_fly__text_color' => '#fff',
-
-            /**
-             * Emerge Items Style
-             */
-            'vp_items_style_emerge__show_title' => true,
-            'vp_items_style_emerge__show_categories' => true,
-            'vp_items_style_emerge__categories_count' => 1,
-            'vp_items_style_emerge__show_date' => false,
-            'vp_items_style_emerge__date_format' => 'F j, Y',
-            'vp_items_style_emerge__show_excerpt' => false,
-            'vp_items_style_emerge__excerpt_words_count' => 15,
-            // center, left, right.
-            'vp_items_style_emerge__align' => 'center',
-            'vp_items_style_emerge__bg_color' => '#fff',
-            'vp_items_style_emerge__text_color' => '#000',
-
-            /**
-             * Fade Items Style
-             */
-            // false, title, title_description, title_category, title_category_description, icon.
-            'vp_items_style_fade__show_title' => true,
-            'vp_items_style_fade__show_categories' => true,
-            'vp_items_style_fade__categories_count' => 1,
-            'vp_items_style_fade__show_date' => false,
-            'vp_items_style_fade__date_format' => 'F j, Y',
-            'vp_items_style_fade__show_excerpt' => false,
-            'vp_items_style_fade__excerpt_words_count' => 15,
-            'vp_items_style_fade__show_icon' => false,
-            'vp_items_style_fade__icon' => 'fa fa-search',
-            'vp_items_style_fade__icon_video' => 'fa fa-play',
-            // *, top-*, bottom-*
-            // * = center, left, right.
-            'vp_items_style_fade__align' => 'center',
-            'vp_items_style_fade__bg_color' => 'rgba(0, 0, 0, 0.85)',
-            'vp_items_style_fade__text_color' => '#fff',
-
-            // false, url, popup_gallery.
-            'vp_items_click_action'    => 'url',
-
-            // false, default.
-            'vp_filter'                => 'default',
-            // center, left, right.
-            'vp_filter_align'          => 'center',
-            'vp_filter_show_count'     => false,
-
-            // infinite, load-more, true.
-            'vp_pagination'            => 'load-more',
-            // center, left, right.
-            'vp_pagination_align'      => 'center',
-            'vp_pagination_paged__show_arrows' => true,
-            'vp_pagination_paged__show_numbers' => true,
-
-            // portfolio, post-based.
-            'vp_content_source'        => 'portfolio',
-
-            // post type, ids, custom_query.
-            'vp_posts_source'          => 'portfolio',
-            'vp_posts_ids'             => array(),
-            'vp_posts_excluded_ids'    => array(),
-            'vp_posts_custom_query'    => '',
-            'vp_posts_taxonomies'      => array(),
-
-            // or, and.
-            'vp_posts_taxonomies_relation' => 'or',
-
-            // date, title, id.
-            'vp_posts_order_by'        => 'post_date',
-
-            // desc, asc.
-            'vp_posts_order_direction' => 'desc',
-
-            // custom images.
-            'vp_images'                => array(
-                /**
-                 * Array items:
-                 * id - image id.
-                 * title - image title.
-                 * description - image description.
-                 * categories - categories array.
-                 * format - image format [standard,video].
-                 * video_url - video url.
-                 */
-            ),
-
-            // custom CSS.
-            'vp_custom_css'            => '',
-        );
-
-        return self::$default_opts;
-    }
-
-    /**
      * Get all available options of post.
      *
      * @param int|array $options_or_id options for portfolio list to print.
      * @return array
      */
     public static function get_options( $options_or_id = array() ) {
+        $result = array();
+
         // get meta from the post.
         if ( ! is_array( $options_or_id ) ) {
-            $id = $options_or_id;
-            $options_or_id = array();
-
-            $post_meta = get_post_meta( $id );
-
-            foreach ( (array) $post_meta as $k => $item ) {
-                if ( ! substr( $k, 0, strlen( 'vp_' ) ) === 'vp_' ) {
-                    continue;
-                }
-
-                $val = maybe_unserialize( $item[0] );
-
-                $val = apply_filters( 'vp_get_option', $val, $k );
-
-                if ( 'false' === $val || '' === $val ) {
-                    $val = false;
-                }
-                if ( 'true' === $val ) {
-                    $val = true;
-                }
-
-                $options_or_id[ $k ] = $val;
+            foreach ( Visual_Portfolio_Controls::get_registered_array() as $item ) {
+                $result[ $item['name'] ] = Visual_Portfolio_Controls::get_registered_value( $item['name'], $options_or_id );
             }
+        } else {
+            $result = $options_or_id;
         }
-
-        $result = array_merge( self::get_defaults(), $options_or_id );
-
-        // quick fix for images array.
-        $result['vp_images'] = (array) ( is_string( $result['vp_images'] ) ? json_decode( $result['vp_images'], true ) : $result['vp_images'] );
 
         return $result;
     }
@@ -597,7 +425,7 @@ class Visual_Portfolio_Get {
 
         $options = array_merge(
             $options, array(
-                'vp_filter' => true,
+                'vp_filter' => $atts['type'],
                 'vp_filter_align' => $atts['align'],
                 'vp_filter_show_count' => 'true' === $atts['show_count'],
             )

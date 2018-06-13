@@ -112,6 +112,10 @@ $grid_sm: 600px !default;
 .vp-col-clearfix {
     flex-basis: 100%;
     max-width: 100%;
+
+    .vp-control-html {
+        margin-bottom: 0;
+    }
 }
 
 
@@ -1202,6 +1206,7 @@ $grid_sm: 600px !default;
  */
 .post-type-vp_lists {
     .CodeMirror {
+        width: 100%;
         text-align: left;
         border: 1px solid #ddd;
 

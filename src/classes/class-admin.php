@@ -771,6 +771,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'layouts',
                 'type'     => 'select2',
                 'name'     => 'vp_layout',
+                'default'  => 'tiles',
                 'options'  => $layouts_selector,
             )
         );
@@ -796,33 +797,36 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'layouts',
-                'type'  => 'range',
-                'label' => esc_html__( 'Gap', '@@text_domain' ),
-                'name'  => 'vp_items_gap',
-                'min'   => 0,
-                'max'   => 150,
+                'type'     => 'range',
+                'label'    => esc_html__( 'Gap', '@@text_domain' ),
+                'name'     => 'vp_items_gap',
+                'default'  => 15,
+                'min'      => 0,
+                'max'      => 150,
             )
         );
 
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'layouts',
-                'type'  => 'range',
-                'label' => esc_html__( 'Items per page', '@@text_domain' ),
-                'name'  => 'vp_items_count',
-                'min'   => 1,
-                'max'   => 50,
+                'type'     => 'range',
+                'label'    => esc_html__( 'Items per page', '@@text_domain' ),
+                'name'     => 'vp_items_count',
+                'default'  => 6,
+                'min'      => 1,
+                'max'      => 50,
             )
         );
 
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'layouts',
-                'type'  => 'toggle',
-                'label' => esc_html__( 'Stretch', '@@text_domain' ),
-                'name'  => 'vp_stretch',
-                'hint'  => esc_attr__( 'Break container and display it wide', '@@text_domain' ),
-                'hint_place'  => 'left',
+                'category'   => 'layouts',
+                'type'       => 'toggle',
+                'label'      => esc_html__( 'Stretch', '@@text_domain' ),
+                'name'       => 'vp_stretch',
+                'default'    => false,
+                'hint'       => esc_attr__( 'Break container and display it wide', '@@text_domain' ),
+                'hint_place' => 'left',
             )
         );
 
@@ -940,9 +944,10 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'items-style',
-                'type'  => 'select2',
-                'name'  => 'vp_items_style',
-                'options' => $items_styles_selector,
+                'type'     => 'select2',
+                'name'     => 'vp_items_style',
+                'default'  => 'fly',
+                'options'  => $items_styles_selector,
             )
         );
 
@@ -1041,7 +1046,7 @@ class Visual_Portfolio_Admin {
                         $new_fields[] = array(
                             'type'        => 'text',
                             'name'        => 'icon',
-                            'default'     => '',
+                            'default'     => 'fas fa-search',
                             'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
                             'hint'        => esc_attr__( 'Standard icon', '@@text_domain' ),
                             'hint_place'  => 'left',
@@ -1054,7 +1059,7 @@ class Visual_Portfolio_Admin {
                         $new_fields[] = array(
                             'type'        => 'text',
                             'name'        => 'icon_video',
-                            'default'     => '',
+                            'default'     => 'fas fa-play',
                             'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
                             'hint'        => esc_attr__( 'Video icon', '@@text_domain' ),
                             'hint_place'  => 'left',
@@ -1097,6 +1102,367 @@ class Visual_Portfolio_Admin {
                 Visual_Portfolio_Controls::register( $field );
             }
         }
+
+        /**
+         * Items Click Action
+         */
+        Visual_Portfolio_Controls::register( array(
+            'category' => 'items-click-action',
+            'type'     => 'select2',
+            'name'     => 'vp_items_click_action',
+            'default'  => 'url',
+            'options'  => array(
+                'false'         => esc_html__( 'Disabled', '@@text_domain' ),
+                'url'           => esc_html__( 'URL', '@@text_domain' ),
+                'popup_gallery' => esc_html__( 'Popup Gallery', '@@text_domain' ),
+            ),
+        ) );
+
+        /**
+         * Filter.
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'filter',
+                'type'     => 'select2',
+                'name'     => 'vp_filter',
+                'default'  => 'default',
+                'options'  => array(
+                    'false'   => esc_html__( 'Disabled', '@@text_domain' ),
+                    'default' => esc_html__( 'Default', '@@text_domain' ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'filter',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Align', '@@text_domain' ),
+                'name'     => 'vp_filter_align',
+                'default'  => 'center',
+                'options'  => array(
+                    'center' => esc_html__( 'Center', '@@text_domain' ),
+                    'left'   => esc_html__( 'Left', '@@text_domain' ),
+                    'right'  => esc_html__( 'Right', '@@text_domain' ),
+                ),
+                'condition' => array(
+                    array(
+                        'control' => 'vp_filter',
+                        'operator' => '!=',
+                        'value' => 'false',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'filter',
+                'type'     => 'toggle',
+                'label'    => esc_html__( 'Show count', '@@text_domain' ),
+                'name'     => 'vp_filter_show_count',
+                'default'  => false,
+                'condition' => array(
+                    array(
+                        'control' => 'vp_filter',
+                        'operator' => '!=',
+                        'value' => 'false',
+                    ),
+                ),
+            )
+        );
+
+        /**
+         * Pagination
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'pagination',
+                'type'      => 'select2',
+                'name'      => 'vp_pagination',
+                'default'   => 'load-more',
+                'options'   => array(
+                    'false'     => esc_html__( 'Disabled', '@@text_domain' ),
+                    'paged'     => esc_html__( 'Paged', '@@text_domain' ),
+                    'load-more' => esc_html__( 'Load More', '@@text_domain' ),
+                    'infinite'  => esc_html__( 'Infinite', '@@text_domain' ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'pagination',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Align', '@@text_domain' ),
+                'name'     => 'vp_pagination_align',
+                'default'  => 'center',
+                'options'  => array(
+                    'center' => esc_html__( 'Center', '@@text_domain' ),
+                    'left'   => esc_html__( 'Left', '@@text_domain' ),
+                    'right'  => esc_html__( 'Right', '@@text_domain' ),
+                ),
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'pagination',
+                'type'      => 'toggle',
+                'label'     => esc_html__( 'Show arrows', '@@text_domain' ),
+                'name'      => 'vp_pagination_paged__show_arrows',
+                'default'   => true,
+                'condition' => array(
+                    array(
+                        'control' => 'vp_pagination',
+                        'value'   => 'paged',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'pagination',
+                'type'      => 'toggle',
+                'label'     => esc_html__( 'Show numbers', '@@text_domain' ),
+                'name'      => 'vp_pagination_paged__show_numbers',
+                'default'   => true,
+                'condition' => array(
+                    array(
+                        'control' => 'vp_pagination',
+                        'value'   => 'paged',
+                    ),
+                ),
+            )
+        );
+
+        /**
+         * Code Editor
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'custom_css',
+                'type'      => 'code_editor',
+                'name'      => 'vp_custom_css',
+                'cols'      => '30',
+                'rows'      => '10',
+                'default'   => '',
+            )
+        );
+
+        /**
+         * Content Source
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source',
+                'type'     => 'hidden',
+                'name'     => 'vp_content_source',
+                'default'  => 'portfolio',
+            )
+        );
+
+        /**
+         * Content Source Posts
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'   => 'content-source-posts',
+                'type'       => 'select2',
+                'label'      => esc_html__( 'Data source', '@@text_domain' ),
+                'name'       => 'vp_posts_source',
+                'default'    => 'portfolio',
+                'value_callback' => array( $this, 'get_select2_post_types' ),
+                'searchable' => true,
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'   => 'content-source-posts',
+                'type'       => 'select2',
+                'label'      => esc_html__( 'Specific posts', '@@text_domain' ),
+                'name'       => 'vp_posts_ids',
+                'default'    => array(),
+                'value_callback' => array( $this, 'get_select2_selected_posts' ),
+                'searchable' => true,
+                'multiple'   => true,
+                'post_type'  => '[name=vp_posts_source]',
+                'class'      => 'vp-select2-posts-ajax',
+                'wrapper_class' => 'vp-col-6',
+                'condition'  => array(
+                    array(
+                        'control' => 'vp_posts_source',
+                        'value'   => 'ids',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'   => 'content-source-posts',
+                'type'       => 'select2',
+                'label'      => esc_html__( 'Excluded posts', '@@text_domain' ),
+                'name'       => 'vp_posts_excluded_ids',
+                'default'    => array(),
+                'value_callback' => array( $this, 'get_select2_excluded_posts' ),
+                'searchable' => true,
+                'multiple'   => true,
+                'post_type'  => '[name=vp_posts_source]',
+                'class'      => 'vp-select2-posts-ajax',
+                'wrapper_class' => 'vp-col-6',
+                'condition'  => array(
+                    array(
+                        'control'  => 'vp_posts_source',
+                        'operator' => '!=',
+                        'value'    => 'ids',
+                    ),
+                ),
+            )
+        );
+        $allowed_protocols = array(
+            'a' => array(
+                'href'   => array(),
+                'target' => array(),
+            ),
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'content-source-posts',
+                'type'      => 'textarea',
+                'label'     => esc_html__( 'Custom query', '@@text_domain' ),
+                // translators: %1$s - escaped url.
+                'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
+                'name'      => 'vp_posts_custom_query',
+                'default'   => '',
+                'cols'      => 30,
+                'rows'      => 3,
+                'wrapper_class' => 'vp-col-12',
+                'condition' => array(
+                    array(
+                        'control' => 'vp_posts_source',
+                        'value'   => 'custom_query',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'      => 'content-source-posts',
+                'type'          => 'html',
+                'name'          => 'vp_posts_custom_query_clearfix',
+                'wrapper_class' => 'vp-col-clearfix',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'   => 'content-source-posts',
+                'type'       => 'select2',
+                'label'      => esc_html__( 'Taxonomies', '@@text_domain' ),
+                'name'       => 'vp_posts_taxonomies',
+                'default'    => array(),
+                'value_callback' => array( $this, 'get_select2_taxonomies' ),
+                'searchable' => true,
+                'multiple'   => true,
+                'post_type'  => '[name=vp_posts_source]',
+                'class'      => 'vp-select2-taxonomies-ajax',
+                'wrapper_class' => 'vp-col-6',
+                'condition'  => array(
+                    array(
+                        'control'  => 'vp_posts_source',
+                        'operator' => '!=',
+                        'value'    => 'ids',
+                    ),
+                    array(
+                        'control'  => 'vp_posts_source',
+                        'operator' => '!=',
+                        'value'    => 'custom_query',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-posts',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Taxonomies relation', '@@text_domain' ),
+                'name'     => 'vp_posts_taxonomies_relation',
+                'default'  => 'or',
+                'options'  => array(
+                    'or'  => esc_html__( 'OR', '@@text_domain' ),
+                    'and' => esc_html__( 'AND', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_posts_source',
+                        'operator' => '!=',
+                        'value'    => 'ids',
+                    ),
+                    array(
+                        'control'  => 'vp_posts_source',
+                        'operator' => '!=',
+                        'value'    => 'custom_query',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-posts',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Order by', '@@text_domain' ),
+                'name'     => 'vp_posts_order_by',
+                'default'  => 'post_date',
+                'options'  => array(
+                    'post_date' => esc_html__( 'Date', '@@text_domain' ),
+                    'title'     => esc_html__( 'Title', '@@text_domain' ),
+                    'id'        => esc_html__( 'ID', '@@text_domain' ),
+                    'rand'      => esc_html__( 'Random', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-posts',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Order direction', '@@text_domain' ),
+                'name'     => 'vp_posts_order_direction',
+                'default'  => 'desc',
+                'options'  => array(
+                    'desc' => esc_html__( 'DESC', '@@text_domain' ),
+                    'asc'  => esc_html__( 'ASC', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+
+        /**
+         * Content Source Images
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-images',
+                'type'     => 'gallery',
+                'name'     => 'vp_images',
+                'default'  => array(
+                    /**
+                     * Array items:
+                     * id - image id.
+                     * title - image title.
+                     * description - image description.
+                     * categories - categories array.
+                     * format - image format [standard,video].
+                     * video_url - video url.
+                     */
+                ),
+            )
+        );
     }
 
     /**
@@ -1241,23 +1607,9 @@ class Visual_Portfolio_Admin {
 
     /**
      * Add Items Click Action metabox
-     *
-     * @param object $post The post object.
      */
-    public function add_items_click_action_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'select2',
-                'name'  => 'vp_items_click_action',
-                'value' => $meta['vp_items_click_action'],
-                'options' => array(
-                    'false' => esc_html__( 'Disabled', '@@text_domain' ),
-                    'url' => esc_html__( 'URL', '@@text_domain' ),
-                    'popup_gallery' => esc_html__( 'Popup Gallery', '@@text_domain' ),
-                ),
-            )
-        );
+    public function add_items_click_action_metabox() {
+        Visual_Portfolio_Controls::get_registered( 'items-click-action' );
     }
 
     /**
@@ -1266,56 +1618,11 @@ class Visual_Portfolio_Admin {
      * @param object $post The post object.
      */
     public function add_filter_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
+        Visual_Portfolio_Controls::get_registered( 'filter' );
 
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'select2',
-                'name'  => 'vp_filter',
-                'value' => $meta['vp_filter'],
-                'options' => array(
-                    'false' => esc_html__( 'Disabled', '@@text_domain' ),
-                    'default' => esc_html__( 'Enabled', '@@text_domain' ),
-                ),
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'select2',
-                'label' => esc_html__( 'Align', '@@text_domain' ),
-                'name'  => 'vp_filter_align',
-                'value' => $meta['vp_filter_align'],
-                'options' => array(
-                    'center' => esc_html__( 'Center', '@@text_domain' ),
-                    'left' => esc_html__( 'Left', '@@text_domain' ),
-                    'right' => esc_html__( 'Right', '@@text_domain' ),
-                ),
-                'condition'   => array(
-                    array(
-                        'control' => 'vp_filter',
-                        'operator' => '!=',
-                        'value' => 'false',
-                    ),
-                ),
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'toggle',
-                'label' => esc_html__( 'Show count', '@@text_domain' ),
-                'name'  => 'vp_filter_show_count',
-                'value' => $meta['vp_filter_show_count'],
-                'condition'   => array(
-                    array(
-                        'control' => 'vp_filter',
-                        'operator' => '!=',
-                        'value' => 'false',
-                    ),
-                ),
-            )
-        );
+        $type = Visual_Portfolio_Controls::get_registered_value( 'vp_filter' ) ? : 'default';
+        $align = Visual_Portfolio_Controls::get_registered_value( 'vp_filter_align' );
+        $show_count = Visual_Portfolio_Controls::get_registered_value( 'vp_filter_show_count' );
 
         Visual_Portfolio_Controls::get(
             array(
@@ -1323,7 +1630,7 @@ class Visual_Portfolio_Admin {
                 'label' => esc_html__( 'Filter Shortcode', '@@text_domain' ),
                 'description' => esc_html__( 'Place the shortcode where you want to show the filter.', '@@text_domain' ),
                 'name'  => 'vp_filter_shortcode',
-                'value' => $post->ID ? '[visual_portfolio_filter id="' . $post->ID . '" align="' . esc_attr( $meta['vp_filter_align'] ) . '" show_count="' . esc_attr( $meta['vp_filter_show_count'] ? 'true' : 'false' ) . '" class=""]' : '',
+                'value' => $post->ID ? '[visual_portfolio_filter id="' . $post->ID . '" type="' . esc_attr( $type ) . '" align="' . esc_attr( $align ) . '" show_count="' . esc_attr( $show_count ? 'true' : 'false' ) . '" class=""]' : '',
                 'readonly' => true,
             )
         );
@@ -1335,72 +1642,7 @@ class Visual_Portfolio_Admin {
      * @param object $post The post object.
      */
     public function add_pagination_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'select2',
-                'name'  => 'vp_pagination',
-                'value' => $meta['vp_pagination'],
-                'options' => array(
-                    'false' => esc_html__( 'Disabled', '@@text_domain' ),
-                    'paged' => esc_html__( 'Paged', '@@text_domain' ),
-                    'load-more' => esc_html__( 'Load More', '@@text_domain' ),
-                    'infinite' => esc_html__( 'Infinite', '@@text_domain' ),
-                ),
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'select2',
-                'label'  => esc_html__( 'Align', '@@text_domain' ),
-                'name'  => 'vp_pagination_align',
-                'value' => $meta['vp_pagination_align'],
-                'options' => array(
-                    'center' => esc_html__( 'Center', '@@text_domain' ),
-                    'left' => esc_html__( 'Left', '@@text_domain' ),
-                    'right' => esc_html__( 'Right', '@@text_domain' ),
-                ),
-                'condition'   => array(
-                    array(
-                        'control' => 'vp_pagination',
-                        'operator' => '!=',
-                        'value' => 'false',
-                    ),
-                ),
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'toggle',
-                'label'  => esc_html__( 'Show arrows', '@@text_domain' ),
-                'name'  => 'vp_pagination_paged__show_arrows',
-                'value' => $meta['vp_pagination_paged__show_arrows'],
-                'condition'   => array(
-                    array(
-                        'control' => 'vp_pagination',
-                        'value' => 'paged',
-                    ),
-                ),
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'toggle',
-                'label'  => esc_html__( 'Show numbers', '@@text_domain' ),
-                'name'  => 'vp_pagination_paged__show_numbers',
-                'value' => $meta['vp_pagination_paged__show_numbers'],
-                'condition'   => array(
-                    array(
-                        'control' => 'vp_pagination',
-                        'value' => 'paged',
-                    ),
-                ),
-            )
-        );
+        Visual_Portfolio_Controls::get_registered( 'pagination' );
     }
 
     /**
@@ -1443,26 +1685,11 @@ class Visual_Portfolio_Admin {
      * @param object $post The post object.
      */
     public function add_content_source_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
-
-        // post types list.
-        $post_types = get_post_types(
-            array(
-                'public' => false,
-                'name'   => 'attachment',
-            ), 'names', 'NOT'
-        );
-        $post_types_list = array();
-        if ( is_array( $post_types ) && ! empty( $post_types ) ) {
-            foreach ( $post_types as $post_type ) {
-                $post_types_list[ $post_type ] = ucfirst( $post_type );
-            }
-        }
-        $post_types_list['ids'] = esc_html__( 'Specific Posts', '@@text_domain' );
-        $post_types_list['custom_query'] = esc_html__( 'Custom Query', '@@text_domain' );
         ?>
         <div class="vp-content-source">
-            <input type="hidden" name="vp_content_source" value="<?php echo esc_attr( $meta['vp_content_source'] ); ?>">
+            <?php
+            Visual_Portfolio_Controls::get_registered( 'content-source' );
+            ?>
 
             <div class="vp-content-source__item" data-content="portfolio">
                 <div class="vp-content-source__item-icon">
@@ -1508,225 +1735,8 @@ class Visual_Portfolio_Admin {
 
                     <p></p>
                     <div class="vp-row">
-                        <div class="vp-col-6">
-                            <?php
-                            Visual_Portfolio_Controls::get(
-                                array(
-                                    'type'  => 'select2',
-                                    'label'  => esc_html__( 'Data source', '@@text_domain' ),
-                                    'name'  => 'vp_posts_source',
-                                    'value' => $meta['vp_posts_source'],
-                                    'searchable' => true,
-                                    'options' => $post_types_list,
-                                )
-                            );
-                            ?>
-                        </div>
-
                         <?php
-                        $selected_ids = $meta['vp_posts_ids'];
-                        $selected_array = array();
-                        if ( isset( $selected_ids ) && is_array( $selected_ids ) && count( $selected_ids ) ) {
-                            $post_query = new WP_Query(
-                                array(
-                                    'post_type' => 'any',
-                                    'post__in' => $selected_ids,
-                                )
-                            );
-
-                            if ( $post_query->have_posts() ) {
-                                while ( $post_query->have_posts() ) {
-                                    $post_query->the_post();
-                                    $selected_array[ get_the_ID() ] = get_the_title();
-                                }
-                                wp_reset_postdata();
-                            }
-                        }
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'select2',
-                                'label'  => esc_html__( 'Specific posts', '@@text_domain' ),
-                                'name'  => 'vp_posts_ids',
-                                'value' => $selected_ids,
-                                'searchable' => true,
-                                'multiple' => true,
-                                'post_type' => '[name=vp_posts_source]',
-                                'options' => $selected_array,
-                                'class' => 'vp-select2-posts-ajax',
-                                'wrapper_class' => 'vp-col-6',
-                                'condition' => array(
-                                    array(
-                                        'control' => 'vp_posts_source',
-                                        'value' => 'ids',
-                                    ),
-                                ),
-                            )
-                        );
-
-                        $excluded_ids = $meta['vp_posts_excluded_ids'];
-                        $excluded_array = array();
-                        if ( isset( $excluded_ids ) && is_array( $excluded_ids ) && count( $excluded_ids ) ) {
-                            $post_query = new WP_Query(
-                                array(
-                                    'post_type' => 'any',
-                                    'post__in' => $excluded_ids,
-                                )
-                            );
-
-                            if ( $post_query->have_posts() ) {
-                                while ( $post_query->have_posts() ) {
-                                    $post_query->the_post();
-                                    $excluded_array[ get_the_ID() ] = get_the_title();
-                                }
-                                wp_reset_postdata();
-                            }
-                        }
-
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'select2',
-                                'label'  => esc_html__( 'Excluded posts', '@@text_domain' ),
-                                'name'  => 'vp_posts_excluded_ids',
-                                'value' => (array) $excluded_ids,
-                                'searchable' => true,
-                                'multiple' => true,
-                                'post_type' => '[name=vp_posts_source]',
-                                'options' => $excluded_array,
-                                'class' => 'vp-select2-posts-ajax',
-                                'wrapper_class' => 'vp-col-6',
-                                'condition' => array(
-                                    array(
-                                        'control' => 'vp_posts_source',
-                                        'operator' => '!=',
-                                        'value' => 'ids',
-                                    ),
-                                ),
-                            )
-                        );
-
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'textarea',
-                                'label'  => esc_html__( 'Custom query', '@@text_domain' ),
-                                // translators: %1$s - escaped url.
-                                'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
-                                'name'  => 'vp_posts_custom_query',
-                                'value' => $meta['vp_posts_custom_query'],
-                                'cols' => 30,
-                                'rows' => 3,
-                                'wrapper_class' => 'vp-col-12',
-                                'condition' => array(
-                                    array(
-                                        'control' => 'vp_posts_source',
-                                        'value' => 'custom_query',
-                                    ),
-                                ),
-                            )
-                        );
-                        ?>
-
-                        <div class="vp-col-clearfix"></div>
-                        <?php
-                        $selected_tax = $meta['vp_posts_taxonomies'];
-                        $selected_tax_arr = array();
-
-                        if ( isset( $selected_tax ) && is_array( $selected_tax ) && count( $selected_tax ) ) {
-
-                            // TODO: Not sure that include works...
-                            $term_query = new WP_Term_Query(
-                                array(
-                                    'include' => $selected_tax,
-                                )
-                            );
-
-                            if ( ! empty( $term_query->terms ) ) {
-                                foreach ( $term_query->terms as $term ) {
-                                    $selected_tax_arr[ $term->term_id ] = $term->name;
-                                }
-                            }
-                        }
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'select2',
-                                'label'  => esc_html__( 'Taxonomies', '@@text_domain' ),
-                                'name'  => 'vp_posts_taxonomies',
-                                'value' => (array) $selected_tax,
-                                'searchable' => true,
-                                'multiple' => true,
-                                'post_type' => '[name=vp_posts_source]',
-                                'options' => $selected_tax_arr,
-                                'class' => 'vp-select2-taxonomies-ajax',
-                                'wrapper_class' => 'vp-col-6',
-                                'condition' => array(
-                                    array(
-                                        'control' => 'vp_posts_source',
-                                        'operator' => '!=',
-                                        'value' => 'ids',
-                                    ),
-                                    array(
-                                        'control' => 'vp_posts_source',
-                                        'operator' => '!=',
-                                        'value' => 'custom_query',
-                                    ),
-                                ),
-                            )
-                        );
-
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'select2',
-                                'label'  => esc_html__( 'Taxonomies relation', '@@text_domain' ),
-                                'name'  => 'vp_posts_taxonomies_relation',
-                                'value'  => $meta['vp_posts_taxonomies_relation'],
-                                'options' => array(
-                                    'or' => esc_html__( 'OR', '@@text_domain' ),
-                                    'and' => esc_html__( 'AND', '@@text_domain' ),
-                                ),
-                                'wrapper_class' => 'vp-col-6',
-                                'condition' => array(
-                                    array(
-                                        'control' => 'vp_posts_source',
-                                        'operator' => '!=',
-                                        'value' => 'ids',
-                                    ),
-                                    array(
-                                        'control' => 'vp_posts_source',
-                                        'operator' => '!=',
-                                        'value' => 'custom_query',
-                                    ),
-                                ),
-                            )
-                        );
-
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'select2',
-                                'label'  => esc_html__( 'Order by', '@@text_domain' ),
-                                'name'  => 'vp_posts_order_by',
-                                'value'  => $meta['vp_posts_order_by'],
-                                'options' => array(
-                                    'post_date' => esc_html__( 'Date', '@@text_domain' ),
-                                    'title' => esc_html__( 'Title', '@@text_domain' ),
-                                    'id' => esc_html__( 'ID', '@@text_domain' ),
-                                    'rand' => esc_html__( 'Random', '@@text_domain' ),
-                                ),
-                                'wrapper_class' => 'vp-col-6',
-                            )
-                        );
-
-                        Visual_Portfolio_Controls::get(
-                            array(
-                                'type'  => 'select2',
-                                'label'  => esc_html__( 'Order direction', '@@text_domain' ),
-                                'name'  => 'vp_posts_order_direction',
-                                'value'  => $meta['vp_posts_order_direction'],
-                                'options' => array(
-                                    'desc' => esc_html__( 'DESC', '@@text_domain' ),
-                                    'asc' => esc_html__( 'ASC', '@@text_domain' ),
-                                ),
-                                'wrapper_class' => 'vp-col-6',
-                            )
-                        );
+                        Visual_Portfolio_Controls::get_registered( 'content-source-posts' );
                         ?>
                     </div>
                 </div>
@@ -1735,13 +1745,7 @@ class Visual_Portfolio_Admin {
 
                     <p></p>
                     <?php
-                    Visual_Portfolio_Controls::get(
-                        array(
-                            'type'  => 'gallery',
-                            'name'  => 'vp_images',
-                            'value' => $meta['vp_images'],
-                        )
-                    );
+                    Visual_Portfolio_Controls::get_registered( 'content-source-images' );
                     ?>
                 </div>
             </div>
@@ -1755,9 +1759,8 @@ class Visual_Portfolio_Admin {
      * @param object $post The post object.
      */
     public function add_custom_css_metabox( $post ) {
-        $meta = Visual_Portfolio_Get::get_options( $post->ID );
+        Visual_Portfolio_Controls::get_registered( 'custom_css' );
         ?>
-        <textarea class="vp-input" name="vp_custom_css" id="vp_custom_css" cols="30" rows="10"><?php echo esc_html( $meta['vp_custom_css'] ); ?></textarea>
         <p class="description">
             <?php echo esc_html__( 'Available classes:', '@@text_domain' ); ?>
         </p>
@@ -1785,23 +1788,138 @@ class Visual_Portfolio_Admin {
             return;
         }
 
-        foreach ( (array) $_POST as $k => $item ) {
-            if ( ! substr( $k, 0, strlen( 'vp_' ) ) === 'vp_' ) {
-                continue;
-            }
+        $meta = array_keys( Visual_Portfolio_Get::get_options( $post_id ) );
 
-            if ( 'vp_custom_css' === $k ) {
-                $result = wp_kses( wp_unslash( $item ), array( '\'', '\"' ) );
+        foreach ( $meta as $item ) {
+            if ( isset( $_POST[ $item ] ) ) {
+                if ( 'vp_custom_css' === $item ) {
+                    $result = wp_kses( wp_unslash( $_POST[ $item ] ), array( '\'', '\"' ) );
+                } else {
+                    $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
+                }
+
+                if ( 'Array' === $result ) {
+                    $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
+                }
+
+                update_post_meta( $post_id, $item, $result );
             } else {
-                $result = sanitize_text_field( wp_unslash( $item ) );
+                update_post_meta( $post_id, $item, false );
             }
-
-            if ( 'Array' === $result ) {
-                $result = array_map( 'sanitize_text_field', wp_unslash( $item ) );
-            }
-
-            update_post_meta( $post_id, $k, $result );
         }
+    }
+
+    /**
+     * Get post types for select2.
+     *
+     * @return array
+     */
+    public function get_select2_post_types() {
+        // post types list.
+        $post_types = get_post_types(
+            array(
+                'public' => false,
+                'name'   => 'attachment',
+            ), 'names', 'NOT'
+        );
+
+        $post_types_list = array();
+        if ( is_array( $post_types ) && ! empty( $post_types ) ) {
+            foreach ( $post_types as $post_type ) {
+                $post_types_list[ $post_type ] = ucfirst( $post_type );
+            }
+        }
+        $post_types_list['ids'] = esc_html__( 'Specific Posts', '@@text_domain' );
+        $post_types_list['custom_query'] = esc_html__( 'Custom Query', '@@text_domain' );
+
+        return $post_types_list;
+    }
+
+    /**
+     * Get selected posts for select2.
+     *
+     * @return array
+     */
+    public function get_select2_selected_posts() {
+        global $post;
+
+        // get meta data.
+        $selected_ids = get_post_meta( $post->ID, 'vp_posts_ids', true );
+
+        $selected_array = array();
+        if ( isset( $selected_ids ) && is_array( $selected_ids ) && count( $selected_ids ) ) {
+            $posts = get_posts(
+                array(
+                    'post_type' => 'any',
+                    'post__in' => $selected_ids,
+                )
+            );
+
+            foreach ( $posts as $p ) {
+                $selected_array[ $p->ID ] = $p->post_title;
+            }
+        }
+
+        return $selected_array;
+    }
+
+    /**
+     * Get excluded posts for select2.
+     *
+     * @return array
+     */
+    public function get_select2_excluded_posts() {
+        global $post;
+
+        // get meta data.
+        $excluded_ids = get_post_meta( $post->ID, 'vp_posts_excluded_ids', true );
+
+        $excluded_array = array();
+        if ( isset( $excluded_ids ) && is_array( $excluded_ids ) && count( $excluded_ids ) ) {
+            $posts = get_posts(
+                array(
+                    'post_type' => 'any',
+                    'post__in' => $excluded_ids,
+                )
+            );
+
+            foreach ( $posts as $p ) {
+                $excluded_array[ $p->ID ] = $p->post_title;
+            }
+        }
+
+        return $excluded_array;
+    }
+
+    /**
+     * Get taxonomies for select2.
+     *
+     * @return array
+     */
+    public function get_select2_taxonomies() {
+        global $post;
+
+        // get meta data.
+        $selected_tax = get_post_meta( $post->ID, 'vp_posts_taxonomies', true );
+        $selected_tax_arr = array();
+
+        if ( isset( $selected_tax ) && is_array( $selected_tax ) && count( $selected_tax ) ) {
+
+            // TODO: Not sure that include works...
+            $term_query = new WP_Term_Query(
+                array(
+                    'include' => $selected_tax,
+                )
+            );
+
+            if ( ! empty( $term_query->terms ) ) {
+                foreach ( $term_query->terms as $term ) {
+                    $selected_tax_arr[ $term->term_id ] = $term->name;
+                }
+            }
+        }
+
+        return $selected_tax_arr;
     }
 
     /**

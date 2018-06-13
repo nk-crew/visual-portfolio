@@ -34,6 +34,7 @@ class Visual_Portfolio_Controls {
         'description' => false,
         'name' => '',
         'value' => '',
+        'value_callback' => '',
         'placeholder' => '',
         'readonly' => false,
 
@@ -81,12 +82,40 @@ class Visual_Portfolio_Controls {
     }
 
     /**
+     * Try to get value using users callback function.
+     *
+     * @param string $callback - users callback.
+     * @return mixed
+     */
+    private static function get_value_callback( $callback ) {
+        if ( isset( $callback ) && is_callable( $callback ) ) {
+            return call_user_func( $callback );
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Print control html.
      *
      * @param array $args - control args.
      */
     public static function get( $args = array() ) {
         $args = array_merge( self::$default_args, $args );
+
+        // value from callback function.
+        if ( isset( $args['value_callback'] ) ) {
+            $new_val = self::get_value_callback( $args['value_callback'] );
+
+            if ( null !== $new_val ) {
+                if ( 'select2' === $args['type'] ) {
+                    $args['options'] = $new_val;
+                    $args['value'] = array_keys( $new_val );
+                } else {
+                    $args['value'] = $new_val;
+                }
+            }
+        }
 
         $class = 'vp-control vp-control-' . $args['type'] . ' ' . $args['class'];
 
@@ -150,25 +179,61 @@ class Visual_Portfolio_Controls {
      * @param bool $category - print specific category.
      */
     public static function get_registered( $category = false ) {
-        global $post;
         foreach ( self::get_registered_array() as $field ) {
             if ( ! $category || isset( $field['category'] ) && $category === $field['category'] ) {
-                $field['value'] = get_post_meta( $post->ID, $field['name'], true );
-
-                if ( '' === $field['value'] && isset( $field['default'] ) ) {
-                    $field['value'] = $field['default'];
-                }
-
-                if ( 'false' === $field['value'] || '' === $field['value'] ) {
-                    $field['value'] = false;
-                }
-                if ( 'true' === $field['value'] ) {
-                    $field['value'] = true;
-                }
+                $field['value'] = self::get_registered_value( $field['name'] );
 
                 self::get( $field );
             }
         }
+    }
+
+    /**
+     * Get registered control value.
+     *
+     * @param string   $name - field name.
+     * @param int|bool $post_id - post id to get meta data.
+     *
+     * @return mixed
+     */
+    public static function get_registered_value( $name, $post_id = false ) {
+        if ( ! $post_id ) {
+            global $post;
+            $post_id = $post->ID;
+        }
+
+        // get meta data.
+        $result = get_post_meta( $post_id, $name, true );
+
+        // registered data.
+        $registered_data = isset( self::get_registered_array()[ $name ] ) ? self::get_registered_array()[ $name ] : false;
+
+        // find default.
+        $default = null;
+        if ( isset( $registered_data ) ) {
+            $default = isset( $registered_data['default'] ) ? $registered_data['default'] : $default;
+        }
+        if ( '' === $result && null !== $default ) {
+            $result = $default;
+        }
+
+        // filter.
+        $result = apply_filters( 'vp_get_option', $result, $name, $post_id );
+
+        // fix for gallery array.
+        if ( isset( $registered_data['type'] ) && 'gallery' === $registered_data['type'] ) {
+            $result = (array) ( is_string( $result ) ? json_decode( $result, true ) : $result );
+        }
+
+        // fix bool values.
+        if ( 'false' === $result || '' === $result ) {
+            $result = false;
+        }
+        if ( 'true' === $result ) {
+            $result = true;
+        }
+
+        return $result;
     }
 
     /**
@@ -225,6 +290,26 @@ class Visual_Portfolio_Controls {
         }
         ?>
         <div class="vp-control-description"><?php echo wp_kses_post( $args['description'] ); ?></div>
+        <?php
+    }
+
+    /**
+     * Print control HTML.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_html( $args = array() ) {
+        echo wp_kses_post( $args['value'] );
+    }
+
+    /**
+     * Print control hidden.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_hidden( $args = array() ) {
+        ?>
+        <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
         <?php
     }
 
@@ -598,6 +683,17 @@ class Visual_Portfolio_Controls {
                 <div class="vp-control-gallery-items-remove"><span class="dashicons dashicons-minus"></span></div>
             </div>
         </div>
+        <?php
+    }
+
+    /**
+     * Print control code editor.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_code_editor( $args = array() ) {
+        ?>
+        <textarea class="vp-input" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" cols="<?php echo esc_attr( $args['cols'] ); ?>" rows="<?php echo esc_attr( $args['rows'] ); ?>" placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>"><?php echo esc_html( $args['value'] ); ?></textarea>
         <?php
     }
 }
