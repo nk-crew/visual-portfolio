@@ -86,4 +86,32 @@ class Visual_Portfolio_Extend {
          */
         return apply_filters( 'vpf_extend_filters', array() );
     }
+
+    /**
+     * Portfolio Data Attributes.
+     *
+     * @param array $attrs - attributes.
+     * @param array $options - options.
+     * @return array
+     */
+    public static function portfolio_attrs( $attrs, $options ) {
+        /*
+         * Example:
+            array(
+                'data-vp-my-attribute' => 'data',
+            )
+         */
+        return apply_filters( 'vpf_extend_portfolio_data_attributes', $attrs, $options );
+    }
+
+    /**
+     * Portfolio Class.
+     *
+     * @param string $class - class.
+     * @param array  $options - options.
+     * @return array
+     */
+    public static function portfolio_class( $class, $options ) {
+        return apply_filters( 'vpf_extend_portfolio_class', $class, $options );
+    }
 }

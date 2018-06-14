@@ -171,20 +171,35 @@ class Visual_Portfolio_Get {
         }
 
         ob_start();
+
+        $data_atts = Visual_Portfolio_Extend::portfolio_attrs( array(
+            'data-vp-layout' => $options['vp_layout'],
+            'data-vp-tiles-type' => $options['vp_tiles_type'],
+            'data-vp-masonry-columns' => $options['vp_masonry_columns'],
+            'data-vp-justified-row-height' => $options['vp_justified_row_height'],
+            'data-vp-justified-row-height-tolerance' => $options['vp_justified_row_height_tolerance'],
+            'data-vp-items-style' => $options['vp_items_style'],
+            'data-vp-items-click-action' => $options['vp_items_click_action'],
+            'data-vp-items-gap' => $options['vp_items_gap'],
+            'data-vp-pagination' => $options['vp_pagination'],
+            'data-vp-next-page-url' => $next_page_url,
+        ), $options );
+
+        $class = Visual_Portfolio_Extend::portfolio_class( $class, $options );
+
         ?>
 
         <div class="<?php echo esc_attr( $class ); ?>"
-             data-vp-layout="<?php echo esc_attr( $options['vp_layout'] ); ?>"
-             data-vp-tiles-type="<?php echo esc_attr( $options['vp_tiles_type'] ); ?>"
-             data-vp-masonry-columns="<?php echo esc_attr( $options['vp_masonry_columns'] ); ?>"
-             data-vp-justified-row-height="<?php echo esc_attr( $options['vp_justified_row_height'] ); ?>"
-             data-vp-justified-row-height-tolerance="<?php echo esc_attr( $options['vp_justified_row_height_tolerance'] ); ?>"
-             data-vp-items-style="<?php echo esc_attr( $options['vp_items_style'] ); ?>"
-             data-vp-items-click-action="<?php echo esc_attr( $options['vp_items_click_action'] ); ?>"
-             data-vp-items-gap="<?php echo esc_attr( $options['vp_items_gap'] ); ?>"
-             data-vp-pagination="<?php echo esc_attr( $options['vp_pagination'] ); ?>"
-             data-vp-next-page-url="<?php echo esc_url( $next_page_url ); ?>">
-
+            <?php
+            foreach ( $data_atts as $name => $data ) {
+                if ( 'data-vp-next-page-url' === $name ) {
+                    echo esc_html( $name ) . '="' . esc_url( $data ) . '"';
+                } else {
+                    echo esc_html( $name ) . '="' . esc_attr( $data ) . '"';
+                }
+            }
+            ?>
+        >
             <div class="vp-portfolio__preloader-wrap">
                 <div class="vp-portfolio__preloader"><span></span><span></span><span></span><span></span><i></i></div>
             </div>
