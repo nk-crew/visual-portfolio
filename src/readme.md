@@ -126,6 +126,8 @@ Available events:
 * `vpf_include_template` [ $template, $template_name, $args ] - include php template.
 * `vpf_include_template_style` [ $template, $template_name, $deps, $ver, $media ] - include css template.
 * `vpf_get_layout_option` [ $value, $name, $post_id ] - get option for Layout.
+* `vpf_extend_portfolio_data_attributes` [ $attrs, $options ] - portfolio data attributes array.
+* `vpf_extend_portfolio_class` [ $class, $options ] - portfolio class string.
 * `vpf_extend_layouts` [ $layouts ] - custom layouts.
 
         add_filter( 'vpf_extend_layouts', 'my_filter_vpf_extend_layouts' );
@@ -222,6 +224,10 @@ Available events:
 
 
 ## Changelog ##
+
+= 1.4.2 =
+* prepared code for extending from 3rd-party developers
+* fixed saving unchecked toggle values in Layouts editor (Show title, Show categories, etc...)
 
 = 1.4.1 =
 * added filters to disable enqueued frontend plugins (see FAQ section)
