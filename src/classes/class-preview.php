@@ -34,7 +34,7 @@ class Visual_Portfolio_Preview {
     public function init_hooks() {
         add_filter( 'query_vars', array( $this, 'add_wp_var' ) );
         add_filter( 'pre_handle_404', array( $this, 'pre_handle_404' ) );
-        add_filter( 'vpf_get_option', array( $this, 'filter_preview_option' ), 10, 2 );
+        add_filter( 'vpf_get_layout_option', array( $this, 'filter_preview_option' ), 10, 2 );
         add_action( 'init', array( $this, 'flush_rules_preview_frame' ) );
         add_action( 'template_redirect', array( $this, 'template_redirect' ) );
     }

@@ -3,6 +3,7 @@
 * Tags: portfolio, gallery, works, masonry, popup
 * Requires at least: 4.0.0
 * Tested up to: 4.9
+* Requires PHP: 5.4
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -17,7 +18,7 @@ Visual Portfolio editor let you create beautiful portfolio layouts. Generates sh
 See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://demo.nkdev.info/#visual-portfolio)
 
 
-= Features =
+## Features ##
 
 * Visual preview for portfolio layouts shortcode builder
 * Templates for theme developers
@@ -48,7 +49,7 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
 * WPBakery Page Builder page builder supported
 
 
-= Real Examples =
+## Real Examples ##
 
 [Piroll - Portfolio Theme](https://demo.nkdev.info/#piroll)
 [Snow - Portfolio Theme](https://demo.nkdev.info/#snow)
@@ -88,7 +89,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Frequently Asked Questions ##
 
-#### How to disable enqueued plugins (JS, CSS) on frontend ####
+### How to disable enqueued plugins (JS, CSS) on frontend ####
 There are some plugins, enqueued with Visual Portfolio on your page. If you don't like the plugin and/or want to change it to your alternate plugin, you can disable it using filters. Example:
 
     add_filter( 'vpf_enqueue_plugin_font_awesome', '__return_false' );
@@ -103,9 +104,121 @@ Available filters:
 
 Note: some functionality depends on these plugins and you may break the portfolio.
 
-#### How to change default templates and styles? ####
+### How to change default templates and styles? ####
 
 You can copy files from the **/visual-portfolio/templates/** to your **YOUR_THEME/visual-portfolio/** folder and change php code and css files here.
+
+### DEV: WP filters. ####
+
+Visual Portfolio has several WP hooks that let you extend functionality.
+
+    add_filter( 'vpf_get_layout_option', 'my_filter_vpf_get_layout_option', 10, 3 );
+    
+    function my_filter_vpf_get_layout_option( $value, $name, $post_id ) {
+        var_dump( $value );
+        var_dump( $name );
+        var_dump( $post_id );
+        return $value;
+    }
+
+Available events:
+
+* `vpf_include_template` [ $template, $template_name, $args ] - include php template.
+* `vpf_include_template_style` [ $template, $template_name, $deps, $ver, $media ] - include css template.
+* `vpf_get_layout_option` [ $value, $name, $post_id ] - get option for Layout.
+* `vpf_extend_layouts` [ $layouts ] - custom layouts.
+
+        add_filter( 'vpf_extend_layouts', 'my_filter_vpf_extend_layouts' );
+
+        function my_filter_vpf_extend_layouts( $layouts ) {
+            return array_merge( $layouts, array(
+                'new_layout' => array(
+                    'title' => esc_html__( 'New Layout', 'text_domain' ),
+                    'controls' => array(
+                        ... controls (read below) ...
+                    ),
+                ),
+            ) );
+        }
+    
+    Note: On the portfolio will be added data attribute **[data-vp-layout="new_layout"]**, so you can play with it and use jQuery events to initialize the new layout.
+
+* `vpf_extend_items_styles` [ $items_styles ] - custom items styles.
+
+        add_filter( 'vpf_extend_items_styles', 'my_filter_vpf_extend_items_styles' );
+
+        function my_filter_vpf_extend_items_styles( $items_styles ) {
+            return array_merge( $items_styles, array(
+                'new_items_style' => array(
+                    'title' => esc_html__( 'New Items Style', '@@text_domain' ),
+                    'builtin_controls' => array(
+                        'show_title' => true,
+                        'show_categories' => true,
+                        'show_date' => true,
+                        'show_excerpt' => true,
+                        'show_icons' => false,
+                        'align' => true,
+                    ),
+                    'controls' => array(
+                        ... controls (read below) ...
+                    ),
+                ),
+            ) );
+        }
+    
+    Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/items-style/new_items_style**. See the structure of default templates to getting started.
+
+* `vpf_extend_filters` [ $filters ] - custom filters.
+
+        add_filter( 'vpf_extend_filters', 'my_filter_vpf_extend_filters' );
+
+        function my_filter_vpf_extend_filters( $filters ) {
+            return array_merge( $filters, array(
+                'new_filter' => array(
+                    'title' => esc_html__( 'New Filter', '@@text_domain' ),
+                    'controls' => array(
+                        ... controls (read below) ...
+                    ),
+                ),
+            ) );
+        }
+    
+    Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/filter/new_filter**. See the structure of default templates to getting started.
+
+
+### DEV: jQuery events. ####
+
+Visual Portfolio has a lot of jQuery events that let you extend functionality. Example:
+
+    $(document).on('init.vp', function (event) {
+        console.log(event, this);
+    });
+
+Available events:
+
+* `init.vp` - called after the portfolio fully inited
+* `destroy.vp` - called after portfolio destroyed.
+* `initOptions.vp` - called after new options inited.
+* `initEvents.vp` - called after new events inited.
+* `destroyEvents.vp` - called after events destroyed.
+* `initLayout.vp` - called after layout inited.
+* `addItems.vp` [ $items, removeExisting ] - called after new items added to the portfolio.
+* `removeItems.vp` [ $items, removeExisting ] - called after items removed from the portfolio.
+* `startLoadingNewItems.vp` [ url ] - called before AJAX started to load new items.
+* `loadedNewItems.vp` [ $newVP, $newVP, data ] - called after AJAX loaded new items.
+* `endLoadingNewItems.vp` - called after AJAX loaded new items and removed loading state from portfolio.
+* `initCustomColors.vp` - called after custom colors rendered.
+* `addStyle.vp` [ selector, styles, media, stylesList ] - called after added new custom styles.
+* `removeStyle.vp` [ selector, styles, stylesList ] - called after removed custom styles.
+* `renderStyle.vp` [ stylesString, stylesList, $style ] - called after rendered custom styles.
+* `imagesLoaded.vp` - called after images loaded.
+* `initIsotope.vp` - called after Isotope inited.
+* `destroyIsotope.vp` - called after Isotope destroyed.
+* `initFjGallery.vp` - called after fjGallery inited.
+* `destroyFjGallery.vp` - called after fjGallery destroyed.
+
+
+
 
 
 ## Changelog ##
