@@ -1225,6 +1225,21 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
+                'category'    => 'pagination',
+                'type'        => 'html',
+                'description' => esc_html__( 'Note: you will see the "Load More" pagination in the preview. "Infinite" pagination will be visible on the site.', '@@text_domain' ),
+                'name'        => 'vp_pagination_infinite_notice',
+                'condition'   => array(
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'infinite',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
                 'category' => 'pagination',
                 'type'     => 'select2',
                 'label'    => esc_html__( 'Align', '@@text_domain' ),

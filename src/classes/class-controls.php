@@ -605,7 +605,7 @@ class Visual_Portfolio_Controls {
             </div>
             <?php
             foreach ( $additional_data as $name => $data_item ) {
-                Visual_Portfolio_Controls::get(
+                self::get(
                     array_merge( $data_item, array(
                         'value'  => '',
                         'class' => 'vp-no-reload',

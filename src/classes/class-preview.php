@@ -76,6 +76,7 @@ class Visual_Portfolio_Preview {
      *
      * @param mixed  $val - value of the option.
      * @param string $name - name of the option.
+     * @return mixed
      */
     public function filter_preview_option( $val, $name ) {
         if ( $this->preview_enabled ) {
@@ -90,6 +91,11 @@ class Visual_Portfolio_Preview {
                 }
             }
 	        // phpcs:enable
+
+            // disable infinite loading in preview.
+            if ( 'vp_pagination' === $name && 'infinite' === $val ) {
+                $val = 'load-more';
+            }
         }
 
         return $val;
