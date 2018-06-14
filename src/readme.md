@@ -96,11 +96,11 @@ There are some plugins, enqueued with Visual Portfolio on your page. If you don'
 
 Available filters:
 
-* `vpf_enqueue_plugin_isotope`
-* `vpf_enqueue_plugin_flickr_justified_gallery`
-* `vpf_enqueue_plugin_object_fit_images`
-* `vpf_enqueue_plugin_photoswipe`
-* `vpf_enqueue_plugin_font_awesome`
+* **vpf_enqueue_plugin_isotope**
+* **vpf_enqueue_plugin_flickr_justified_gallery**
+* **vpf_enqueue_plugin_object_fit_images**
+* **vpf_enqueue_plugin_photoswipe**
+* **vpf_enqueue_plugin_font_awesome**
 
 Note: some functionality depends on these plugins and you may break the portfolio.
 
@@ -123,12 +123,12 @@ Visual Portfolio has several WP hooks that let you extend functionality.
 
 Available events:
 
-* `vpf_include_template` [ $template, $template_name, $args ] - include php template.
-* `vpf_include_template_style` [ $template, $template_name, $deps, $ver, $media ] - include css template.
-* `vpf_get_layout_option` [ $value, $name, $post_id ] - get option for Layout.
-* `vpf_extend_portfolio_data_attributes` [ $attrs, $options ] - portfolio data attributes array.
-* `vpf_extend_portfolio_class` [ $class, $options ] - portfolio class string.
-* `vpf_extend_layouts` [ $layouts ] - custom layouts.
+* **vpf_include_template** [ $template, $template_name, $args ] - include php template.
+* **vpf_include_template_style** [ $template, $template_name, $deps, $ver, $media ] - include css template.
+* **vpf_get_layout_option** [ $value, $name, $post_id ] - get option for Layout.
+* **vpf_extend_portfolio_data_attributes** [ $attrs, $options ] - portfolio data attributes array.
+* **vpf_extend_portfolio_class** [ $class, $options ] - portfolio class string.
+* **vpf_extend_layouts** [ $layouts ] - custom layouts.
 
         add_filter( 'vpf_extend_layouts', 'my_filter_vpf_extend_layouts' );
 
@@ -145,7 +145,7 @@ Available events:
     
     Note: On the portfolio will be added data attribute **[data-vp-layout="new_layout"]**, so you can play with it and use jQuery events to initialize the new layout.
 
-* `vpf_extend_items_styles` [ $items_styles ] - custom items styles.
+* **vpf_extend_items_styles** [ $items_styles ] - custom items styles.
 
         add_filter( 'vpf_extend_items_styles', 'my_filter_vpf_extend_items_styles' );
 
@@ -170,7 +170,7 @@ Available events:
     
     Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/items-style/new_items_style**. See the structure of default templates to getting started.
 
-* `vpf_extend_filters` [ $filters ] - custom filters.
+* **vpf_extend_filters** [ $filters ] - custom filters.
 
         add_filter( 'vpf_extend_filters', 'my_filter_vpf_extend_filters' );
 
@@ -187,6 +187,152 @@ Available events:
     
     Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/filter/new_filter**. See the structure of default templates to getting started.
 
+### DEV: Controls. ####
+
+These controls you can use in filters to extend Portfolio options (read **DEV: WP filters.** in FAQ).
+
+* The list of options, that available in all controls:
+
+        array(
+            // Control type. Full list you can find below.
+            'type'        => 'text',
+            'label'       => false,
+            'description' => false,
+            'name'        => '',
+            'placeholder' => '',
+            'readonly'    => false,
+            'default'     => 'default value',
+            
+            // Use the function to getting value.
+            'value_callback' => '',
+    
+            // hint.
+            'hint'        => false,
+            'hint_place'  => 'top',
+    
+            // condition.
+            'condition'   => array(
+                /**
+                 * Array of arrays with data:
+                 *  'control' - control name.
+                 *  'operator' - operator (==, !==, >, <, >=, <=).
+                 *  'value' - condition value.
+                 */
+            ),
+    
+            'class'         => '',
+            'wrapper_class' => '',
+        );
+
+* **text**
+
+        array(
+            'type'        => 'text',
+            'label'       => esc_html__( 'Text field', '@@text_domain' ),
+            'description' => esc_html__( 'Text field description', '@@text_domain' ),
+            'name'        => 'text_control_uniq_name',
+            'placeholder' => esc_html__( 'Text field placeholder', '@@text_domain' ),
+            'default'     => 'default value',
+    
+            // hint.
+            'hint'        => esc_html__( 'Text field hint', '@@text_domain' ),
+            'hint_place'  => 'left',
+        );
+
+* **hidden**
+
+        array(
+            'type'        => 'hidden',
+            'name'        => 'hidden_control_uniq_name',
+            'default'     => 'default value',
+        );
+
+* **url**
+
+        array(
+            'type'        => 'url',
+            'label'       => esc_html__( 'URL field', '@@text_domain' ),
+            'name'        => 'url_control_uniq_name',
+            'default'     => 'default value',
+        );
+
+* **textarea**
+
+        array(
+            'type'        => 'textarea',
+            'label'       => esc_html__( 'Textarea field', '@@text_domain' ),
+            'name'        => 'textarea_control_uniq_name',
+            'default'     => 'default value',
+            'cols'        => 30,
+            'rows'        => 10,
+        );
+
+* **checkbox**
+
+        array(
+            'type'        => 'checkbox',
+            'label'       => esc_html__( 'Checkbox field', '@@text_domain' ),
+            'name'        => 'checkbox_control_uniq_name',
+            'default'     => true,
+        );
+
+* **toggle**
+
+        array(
+            'type'        => 'toggle',
+            'label'       => esc_html__( 'Toggle field', '@@text_domain' ),
+            'name'        => 'toggle_control_uniq_name',
+            'default'     => true,
+        );
+
+* **range**
+
+        array(
+            'type'        => 'range',
+            'label'       => esc_html__( 'Range field', '@@text_domain' ),
+            'name'        => 'range_control_uniq_name',
+            'min'         => 1,
+            'max'         => 15,
+            'step'        => 1,
+            'default'     => 5,
+        );
+
+* **select2**
+
+        array(
+            'type'        => 'select2',
+            'label'       => esc_html__( 'Select2 field', '@@text_domain' ),
+            'name'        => 'select2_control_uniq_name',
+            'options'     => array(
+                'val1' => esc_html__( 'Value 1', '@@text_domain' ),
+                'val2' => esc_html__( 'Value 2', '@@text_domain' ),
+            ),
+            'default'     => 'val1',
+            'searchable'  => false,
+            'multiple'    => false,
+            'tags'        => false,
+        );
+
+* **color**
+
+        array(
+            'type'        => 'color',
+            'label'       => esc_html__( 'Color field', '@@text_domain' ),
+            'name'        => 'color_control_uniq_name',
+            'default'     => '#ccc',
+            'alpha'       => true,
+        );
+
+* **align**
+
+        array(
+            'type'        => 'align',
+            'label'       => esc_html__( 'Align field', '@@text_domain' ),
+            'name'        => 'align_control_uniq_name',
+            'default'     => 'center',
+            'extended'    => true,
+        );
+
 
 ### DEV: jQuery events. ####
 
@@ -198,26 +344,26 @@ Visual Portfolio has a lot of jQuery events that let you extend functionality. E
 
 Available events:
 
-* `init.vp` - called after the portfolio fully inited
-* `destroy.vp` - called after portfolio destroyed.
-* `initOptions.vp` - called after new options inited.
-* `initEvents.vp` - called after new events inited.
-* `destroyEvents.vp` - called after events destroyed.
-* `initLayout.vp` - called after layout inited.
-* `addItems.vp` [ $items, removeExisting ] - called after new items added to the portfolio.
-* `removeItems.vp` [ $items, removeExisting ] - called after items removed from the portfolio.
-* `startLoadingNewItems.vp` [ url ] - called before AJAX started to load new items.
-* `loadedNewItems.vp` [ $newVP, $newVP, data ] - called after AJAX loaded new items.
-* `endLoadingNewItems.vp` - called after AJAX loaded new items and removed loading state from portfolio.
-* `initCustomColors.vp` - called after custom colors rendered.
-* `addStyle.vp` [ selector, styles, media, stylesList ] - called after added new custom styles.
-* `removeStyle.vp` [ selector, styles, stylesList ] - called after removed custom styles.
-* `renderStyle.vp` [ stylesString, stylesList, $style ] - called after rendered custom styles.
-* `imagesLoaded.vp` - called after images loaded.
-* `initIsotope.vp` - called after Isotope inited.
-* `destroyIsotope.vp` - called after Isotope destroyed.
-* `initFjGallery.vp` - called after fjGallery inited.
-* `destroyFjGallery.vp` - called after fjGallery destroyed.
+* **init.vp** - called after the portfolio fully inited
+* **destroy.vp** - called after portfolio destroyed.
+* **initOptions.vp** - called after new options inited.
+* **initEvents.vp** - called after new events inited.
+* **destroyEvents.vp** - called after events destroyed.
+* **initLayout.vp** - called after layout inited.
+* **addItems.vp** [ $items, removeExisting ] - called after new items added to the portfolio.
+* **removeItems.vp** [ $items, removeExisting ] - called after items removed from the portfolio.
+* **startLoadingNewItems.vp** [ url ] - called before AJAX started to load new items.
+* **loadedNewItems.vp** [ $newVP, $newVP, data ] - called after AJAX loaded new items.
+* **endLoadingNewItems.vp** - called after AJAX loaded new items and removed loading state from portfolio.
+* **initCustomColors.vp** - called after custom colors rendered.
+* **addStyle.vp** [ selector, styles, media, stylesList ] - called after added new custom styles.
+* **removeStyle.vp** [ selector, styles, stylesList ] - called after removed custom styles.
+* **renderStyle.vp** [ stylesString, stylesList, $style ] - called after rendered custom styles.
+* **imagesLoaded.vp** - called after images loaded.
+* **initIsotope.vp** - called after Isotope inited.
+* **destroyIsotope.vp** - called after Isotope destroyed.
+* **initFjGallery.vp** - called after fjGallery inited.
+* **destroyFjGallery.vp** - called after fjGallery destroyed.
 
 
 
