@@ -179,7 +179,8 @@ class Visual_Portfolio_Controls {
      * @param bool $category - print specific category.
      */
     public static function get_registered( $category = false ) {
-        foreach ( self::get_registered_array() as $field ) {
+        $registered_array = self::get_registered_array();
+        foreach ( $registered_array as $field ) {
             if ( ! $category || isset( $field['category'] ) && $category === $field['category'] ) {
                 $field['value'] = self::get_registered_value( $field['name'] );
 
@@ -206,7 +207,8 @@ class Visual_Portfolio_Controls {
         $result = get_post_meta( $post_id, $name, true );
 
         // registered data.
-        $registered_data = isset( self::get_registered_array()[ $name ] ) ? self::get_registered_array()[ $name ] : false;
+        $registered_array = self::get_registered_array();
+        $registered_data = isset( $registered_array[ $name ] ) ? $registered_array[ $name ] : false;
 
         // find default.
         $default = null;
@@ -588,7 +590,7 @@ class Visual_Portfolio_Controls {
         );
 
         ?>
-        <textarea name="<?php echo esc_attr( $args['name'] ); ?>" style="display: none;"><?php echo esc_textarea( json_encode( $images, JSON_UNESCAPED_UNICODE ) ); ?></textarea>
+        <textarea name="<?php echo esc_attr( $args['name'] ); ?>" style="display: none;"><?php echo esc_textarea( json_encode( $images, defined( 'JSON_UNESCAPED_UNICODE' ) ? JSON_UNESCAPED_UNICODE : 256 ) ); ?></textarea>
 
         <div class="vp-control-gallery-additional-data">
             <div class="vp-control-gallery-additional-data-preview">
