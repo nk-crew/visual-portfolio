@@ -73,6 +73,7 @@
     .vp-portfolio__loading & .vp-pagination__load-more {
         pointer-events: none;
         cursor: default;
+        background-color: transparent;
         border: none;
         transition: none;
     }
