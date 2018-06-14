@@ -1,6 +1,6 @@
 /*!
  * Name    : Flickr's Justified Gallery [fjGallery]
- * Version : 1.0.0
+ * Version : 1.0.1
  * Author  : nK <https://nkdev.info>
  * GitHub  : https://github.com/nk-o/flickr-justified-gallery
  */
@@ -607,31 +607,38 @@ var fjGallery = function () {
                 $images = $images.get();
             }
 
+            if (!$images || !$images.length) {
+                return;
+            }
+
             $images.forEach(function ($item) {
                 // if $images is jQuery, for some reason in this array there is undefined item, that not a DOM,
                 // so we need to check for $item.querySelector.
                 if ($item && !$item.fjGalleryImage && $item.querySelector) {
                     var $image = $item.querySelector(self.options.imageSelector);
-                    $item.fjGalleryImage = self;
-                    var data = {
-                        $item: $item,
-                        $image: $image,
-                        width: parseFloat($image.getAttribute('width')) || false,
-                        height: parseFloat($image.getAttribute('height')) || false,
-                        loadSizes: function loadSizes() {
-                            var itemData = this;
-                            getImgDemensions($image, function (dimensions) {
-                                if (itemData.width !== dimensions.width || itemData.height !== dimensions.height) {
-                                    itemData.width = dimensions.width;
-                                    itemData.height = dimensions.height;
-                                    self.resize();
-                                }
-                            });
-                        }
-                    };
-                    data.loadSizes();
 
-                    self.images.push(data);
+                    if ($image) {
+                        $item.fjGalleryImage = self;
+                        var data = {
+                            $item: $item,
+                            $image: $image,
+                            width: parseFloat($image.getAttribute('width')) || false,
+                            height: parseFloat($image.getAttribute('height')) || false,
+                            loadSizes: function loadSizes() {
+                                var itemData = this;
+                                getImgDemensions($image, function (dimensions) {
+                                    if (itemData.width !== dimensions.width || itemData.height !== dimensions.height) {
+                                        itemData.width = dimensions.width;
+                                        itemData.height = dimensions.height;
+                                        self.resize();
+                                    }
+                                });
+                            }
+                        };
+                        data.loadSizes();
+
+                        self.images.push(data);
+                    }
                 }
             });
 
