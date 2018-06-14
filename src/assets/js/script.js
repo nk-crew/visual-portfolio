@@ -770,7 +770,7 @@ class VP {
      */
     destroyFjGallery() {
         const self = this;
-        const fjGallery = self.$items_wrap.fjGallery;
+        const fjGallery = self.$items_wrap[ 0 ].fjGallery;
 
         if ( fjGallery ) {
             self.$items_wrap.fjGallery( 'destroy' );
@@ -1143,7 +1143,7 @@ class VP {
     addItems( $items, removeExisting ) {
         const self = this;
         const isotope = self.$items_wrap.data( 'isotope' );
-        const fjGallery = self.$items_wrap.fjGallery;
+        const fjGallery = self.$items_wrap[ 0 ].fjGallery;
 
         if ( isotope ) {
             if ( removeExisting ) {
@@ -1158,8 +1158,10 @@ class VP {
                     .isotope( 'appended', $items );
             }
 
+            self.initIsotope( 'layout' );
+
             // images loaded init
-            self.$items_wrap.imagesLoaded( () => {
+            self.$items_wrap.imagesLoaded().progress( () => {
                 self.initIsotope( 'layout' );
             } );
         } if ( fjGallery ) {
