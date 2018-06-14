@@ -80,12 +80,12 @@ class VP {
 
     // emit event
     // Example:
-    // $(document).on('init.vp', function (event, infiniteObject) {
+    // $(document).on('init.vpf', function (event, infiniteObject) {
     //     console.log(infiniteObject);
     // });
     emitEvent( event, data ) {
         data = data ? [ this ].concat( data ) : [ this ];
-        this.$item.trigger( `${ event }.vp.vp-uid-${ this.uid }`, data );
+        this.$item.trigger( `${ event }.vpf.vpf-uid-${ this.uid }`, data );
     }
 
     /**
@@ -366,7 +366,7 @@ class VP {
      */
     initEvents() {
         const self = this;
-        const evp = `.vp.vp-uid-${ self.uid }`;
+        const evp = `.vpf.vpf-uid-${ self.uid }`;
 
         // Stretch
         function stretch() {
@@ -535,7 +535,7 @@ class VP {
      */
     destroyEvents() {
         const self = this;
-        const evp = `.vp.vp-uid-${ self.uid }`;
+        const evp = `.vpf.vpf-uid-${ self.uid }`;
 
         // destroy click events
         self.$item.off( evp );
@@ -1101,7 +1101,7 @@ class VP {
         };
 
         // click action
-        self.$item.on( `click.vp.vp-uid-${ self.uid }`, '.vp-portfolio__item', function( e ) {
+        self.$item.on( `click.vpf.vpf-uid-${ self.uid }`, '.vp-portfolio__item', function( e ) {
             e.preventDefault();
 
             let index = 0;
@@ -1129,7 +1129,7 @@ class VP {
     destroyPhotoswipe() {
         const self = this;
 
-        self.$item.off( `click.vp.vp-uid-${ self.uid }` );
+        self.$item.off( `click.vpf.vpf-uid-${ self.uid }` );
 
         $( `.vp-pswp-uid-${ self.uid }` ).remove();
     }
@@ -1282,11 +1282,11 @@ const plugin = function( options ) {
         }
 
         if ( typeof options === 'object' || typeof options === 'undefined' ) {
-            if ( ! this.vp ) {
-                this.vp = new VP( $( this ), options );
+            if ( ! this.vpf ) {
+                this.vpf = new VP( $( this ), options );
             }
-        } else if ( this.vp ) {
-            ret = this.vp[ options ]( ...args );
+        } else if ( this.vpf ) {
+            ret = this.vpf[ options ]( ...args );
         }
     } );
 
@@ -1295,14 +1295,14 @@ const plugin = function( options ) {
 plugin.constructor = VP;
 
 // no conflict
-const oldPlugin = jQuery.fn.vp;
-jQuery.fn.vp = plugin;
-jQuery.fn.vp.noConflict = function() {
-    jQuery.fn.vp = oldPlugin;
+const oldPlugin = jQuery.fn.vpf;
+jQuery.fn.vpf = plugin;
+jQuery.fn.vpf.noConflict = function() {
+    jQuery.fn.vpf = oldPlugin;
     return this;
 };
 
 // initialization
 $( () => {
-    $( '.vp-portfolio' ).vp();
+    $( '.vp-portfolio' ).vpf();
 } );

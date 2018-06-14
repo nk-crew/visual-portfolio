@@ -338,32 +338,32 @@ These controls you can use in filters to extend Portfolio options (read **DEV: W
 
 Visual Portfolio has a lot of jQuery events that let you extend functionality. Example:
 
-    $(document).on('init.vp', function (event) {
+    $(document).on('init.vpf', function (event) {
         console.log(event, this);
     });
 
 Available events:
 
-* **init.vp** - called after the portfolio fully inited
-* **destroy.vp** - called after portfolio destroyed.
-* **initOptions.vp** - called after new options inited.
-* **initEvents.vp** - called after new events inited.
-* **destroyEvents.vp** - called after events destroyed.
-* **initLayout.vp** - called after layout inited.
-* **addItems.vp** [ $items, removeExisting ] - called after new items added to the portfolio.
-* **removeItems.vp** [ $items, removeExisting ] - called after items removed from the portfolio.
-* **startLoadingNewItems.vp** [ url ] - called before AJAX started to load new items.
-* **loadedNewItems.vp** [ $newVP, $newVP, data ] - called after AJAX loaded new items.
-* **endLoadingNewItems.vp** - called after AJAX loaded new items and removed loading state from portfolio.
-* **initCustomColors.vp** - called after custom colors rendered.
-* **addStyle.vp** [ selector, styles, media, stylesList ] - called after added new custom styles.
-* **removeStyle.vp** [ selector, styles, stylesList ] - called after removed custom styles.
-* **renderStyle.vp** [ stylesString, stylesList, $style ] - called after rendered custom styles.
-* **imagesLoaded.vp** - called after images loaded.
-* **initIsotope.vp** - called after Isotope inited.
-* **destroyIsotope.vp** - called after Isotope destroyed.
-* **initFjGallery.vp** - called after fjGallery inited.
-* **destroyFjGallery.vp** - called after fjGallery destroyed.
+* **init.vpf** - called after the portfolio fully inited
+* **destroy.vpf** - called after portfolio destroyed.
+* **initOptions.vpf** - called after new options inited.
+* **initEvents.vpf** - called after new events inited.
+* **destroyEvents.vpf** - called after events destroyed.
+* **initLayout.vpf** - called after layout inited.
+* **addItems.vpf** [ $items, removeExisting ] - called after new items added to the portfolio.
+* **removeItems.vpf** [ $items, removeExisting ] - called after items removed from the portfolio.
+* **startLoadingNewItems.vpf** [ url ] - called before AJAX started to load new items.
+* **loadedNewItems.vpf** [ $newVP, $newVP, data ] - called after AJAX loaded new items.
+* **endLoadingNewItems.vpf** - called after AJAX loaded new items and removed loading state from portfolio.
+* **initCustomColors.vpf** - called after custom colors rendered.
+* **addStyle.vpf** [ selector, styles, media, stylesList ] - called after added new custom styles.
+* **removeStyle.vpf** [ selector, styles, stylesList ] - called after removed custom styles.
+* **renderStyle.vpf** [ stylesString, stylesList, $style ] - called after rendered custom styles.
+* **imagesLoaded.vpf** - called after images loaded.
+* **initIsotope.vpf** - called after Isotope inited.
+* **destroyIsotope.vpf** - called after Isotope destroyed.
+* **initFjGallery.vpf** - called after fjGallery inited.
+* **destroyFjGallery.vpf** - called after fjGallery destroyed.
 
 
 

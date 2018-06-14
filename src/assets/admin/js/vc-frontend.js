@@ -23,8 +23,8 @@ jQuery( () => {
 
             if ( $ ) {
                 const $vp = $( e.view.el ).children( '.vp-portfolio' );
-                if ( $vp.length && typeof $vp.vp !== 'undefined' ) {
-                    $vp.vp();
+                if ( $vp.length && typeof $vp.vpf !== 'undefined' ) {
+                    $vp.vpf();
                 }
             }
         } );

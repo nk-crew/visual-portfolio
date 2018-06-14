@@ -222,7 +222,7 @@ if ( typeof Tooltip !== 'undefined' ) {
             name = name.replace( '_', '-' );
 
             data.$portfolio.attr( `data-vp-${ name }`, data.value );
-            data.$portfolio.vp( 'init' );
+            data.$portfolio.vpf( 'init' );
             data.reload = false;
 
             break;
