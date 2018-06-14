@@ -1025,7 +1025,7 @@ class Visual_Portfolio_Admin {
                         $new_fields[] = array(
                             'type'    => 'range',
                             'label'   => esc_html__( 'Excerpt words count', '@@text_domain' ),
-                            'name'    => 'show_excerpt',
+                            'name'    => 'excerpt_words_count',
                             'default' => 15,
                             'min'     => 1,
                             'max'     => 200,
