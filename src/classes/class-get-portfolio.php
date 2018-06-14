@@ -225,13 +225,11 @@ class Visual_Portfolio_Get {
 
         // Insert styles.
         switch ( $options['vp_items_style'] ) {
-            case 'fly':
-            case 'emerge':
-            case 'fade':
-                visual_portfolio()->include_template_style( '@@plugin_name-items-style-' . $options['vp_items_style'], 'items-list/items-style/' . $options['vp_items_style'] . '/style' );
+            case 'default':
+                visual_portfolio()->include_template_style( '@@plugin_name-items-style-default', 'items-list/items-style/style' );
                 break;
             default:
-                visual_portfolio()->include_template_style( '@@plugin_name-items-style-default', 'items-list/items-style/style' );
+                visual_portfolio()->include_template_style( '@@plugin_name-items-style-' . $options['vp_items_style'], 'items-list/items-style/' . $options['vp_items_style'] . '/style' );
                 break;
         }
         ?>
@@ -851,9 +849,13 @@ class Visual_Portfolio_Get {
         <?php
 
         switch ( $vp_options['vp_filter'] ) {
-            default:
+            case 'default':
                 visual_portfolio()->include_template( 'items-list/filter/filter', $args );
                 visual_portfolio()->include_template_style( '@@plugin_name-filter-default', 'items-list/filter/style' );
+                break;
+            default:
+                visual_portfolio()->include_template( 'items-list/filter/' . $vp_options['vp_filter'] . '/filter', $args );
+                visual_portfolio()->include_template_style( '@@plugin_name-filter-' . $vp_options['vp_filter'], 'items-list/filter/' . $vp_options['vp_filter'] . '/style' );
                 break;
         }
 
@@ -986,15 +988,13 @@ class Visual_Portfolio_Get {
             <div class="vp-portfolio__item">
                 <?php
                 switch ( $args['vp_opts']['vp_items_style'] ) {
-                    case 'fly':
-                    case 'emerge':
-                    case 'fade':
-                        visual_portfolio()->include_template( 'items-list/items-style/' . $args['vp_opts']['vp_items_style'] . '/image', $args );
-                        visual_portfolio()->include_template( 'items-list/items-style/' . $args['vp_opts']['vp_items_style'] . '/meta', $args );
-                        break;
-                    default:
+                    case 'default':
                         visual_portfolio()->include_template( 'items-list/items-style/image', $args );
                         visual_portfolio()->include_template( 'items-list/items-style/meta', $args );
+                        break;
+                    default:
+                        visual_portfolio()->include_template( 'items-list/items-style/' . $args['vp_opts']['vp_items_style'] . '/image', $args );
+                        visual_portfolio()->include_template( 'items-list/items-style/' . $args['vp_opts']['vp_items_style'] . '/meta', $args );
                         break;
                 }
                 ?>
