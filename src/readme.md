@@ -371,6 +371,15 @@ Available events:
 
 ## Changelog ##
 
+= 1.4.3 =
+* added check for template existance before include it (to prevent errors when 3rd-party devs don't added templates)
+* fixed random order duplicates when used pagination
+* fixed errors in PHP < 5.5
+* disabled load-more pagination in the Portfolio preview
+* changed templates inclusion to support 3rd-party extensions
+* removed background color from the load button when loading or no items
+* renamed all events prefix from vp to vpf
+
 = 1.4.2 =
 * prepared code for extending from 3rd-party developers
 * fixed saving unchecked toggle values in Layouts editor (Show title, Show categories, etc...)
