@@ -1139,7 +1139,7 @@ class Visual_Portfolio_Admin {
             ),
 
             // Default.
-            'masonry' => array(
+            'default' => array(
                 'title' => esc_html__( 'Default', '@@text_domain' ),
                 'controls' => array(),
             ),
