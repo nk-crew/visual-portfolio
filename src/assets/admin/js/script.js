@@ -868,8 +868,9 @@ if ( typeof Tooltip !== 'undefined' ) {
             return;
         }
 
-        // eslint-disable-next-line eqeqeq
-        return defaultForm != $editForm.serialize();
+        if ( defaultForm !== $editForm.serialize() ) {
+            return true;
+        }
     } );
 
     // save also if CSS have errors
