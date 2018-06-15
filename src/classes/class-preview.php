@@ -57,6 +57,12 @@ class Visual_Portfolio_Preview {
 
         $this->preview_enabled = 'true' === $frame && $id;
         if ( $this->preview_enabled ) {
+            // check if the user can view vp_lists page.
+            if ( ! current_user_can( 'view_posts', $id ) ) {
+                $this->preview_enabled = false;
+                return;
+            }
+
             $this->preview_id = $id;
 
             // Tell WP Super Cache & W3 Total Cache to not cache WPReadable requests.
