@@ -1336,7 +1336,7 @@ class Visual_Portfolio_Admin {
         $filters = array_merge( array(
             // False.
             'false' => array(
-                'title' => esc_html__( 'False', '@@text_domain' ),
+                'title' => esc_html__( 'Disabled', '@@text_domain' ),
                 'controls' => array(),
             ),
 
