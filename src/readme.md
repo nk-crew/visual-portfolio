@@ -8,12 +8,12 @@
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Portfolio layouts visual editor. Masonry, justified, tiles, custom posts, custom images.
+Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, coverflow, custom posts, custom images.
 
 
 ## Description ##
 
-Visual Portfolio editor let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry, Justified or Tiles layouts.
+Visual Portfolio editor let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry, Justified, Tiles or Carousel layouts.
 
 See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://demo.nkdev.info/#visual-portfolio)
 
@@ -22,10 +22,12 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
 
 * Visual preview for portfolio layouts shortcode builder
 * Templates for theme developers
-* Masonry layout
-* Justified layout (Flickr)
-* Tiles layout
-* 3 predefined hover effects (will be more in the future updates):
+* 4 predefined layouts:
+    * Masonry
+    * Justified (Flickr)
+    * Tiles
+    * Slider (+ Carousel, Coverflow)
+* 3 predefined hover effects:
    * Fade
    * Emerge
    * Fly
