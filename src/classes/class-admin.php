@@ -1902,7 +1902,9 @@ class Visual_Portfolio_Admin {
         $post_types_list['ids'] = esc_html__( 'Specific Posts', '@@text_domain' );
         $post_types_list['custom_query'] = esc_html__( 'Custom Query', '@@text_domain' );
 
-        return $post_types_list;
+        return array(
+            'options' => $post_types_list,
+        );
     }
 
     /**
@@ -1930,7 +1932,10 @@ class Visual_Portfolio_Admin {
             }
         }
 
-        return $selected_array;
+        return array(
+            'value' => array_keys( $selected_array ),
+            'options' => $selected_array,
+        );
     }
 
     /**
@@ -1958,7 +1963,10 @@ class Visual_Portfolio_Admin {
             }
         }
 
-        return $excluded_array;
+        return array(
+            'value' => array_keys( $excluded_array ),
+            'options' => $excluded_array,
+        );
     }
 
     /**
@@ -1989,7 +1997,10 @@ class Visual_Portfolio_Admin {
             }
         }
 
-        return $selected_tax_arr;
+        return array(
+            'value' => array_keys( $selected_tax_arr ),
+            'options' => $selected_tax_arr,
+        );
     }
 
     /**

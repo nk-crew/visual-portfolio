@@ -107,13 +107,8 @@ class Visual_Portfolio_Controls {
         if ( isset( $args['value_callback'] ) ) {
             $new_val = self::get_value_callback( $args['value_callback'] );
 
-            if ( null !== $new_val ) {
-                if ( 'select2' === $args['type'] ) {
-                    $args['options'] = $new_val;
-                    $args['value'] = array_keys( $new_val );
-                } else {
-                    $args['value'] = $new_val;
-                }
+            if ( null !== $new_val && is_array( $new_val ) ) {
+                $args = array_merge( $args, $new_val );
             }
         }
 
