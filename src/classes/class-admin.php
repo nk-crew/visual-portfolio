@@ -964,7 +964,6 @@ class Visual_Portfolio_Admin {
         // styles builtin options.
         foreach ( $items_styles as $name => $style ) {
             $new_fields = array();
-            $name_prefix = 'vp_items_style_' . $name . '__';
             foreach ( $style['builtin_controls'] as $control_name => $val ) {
                 if ( ! $val ) {
                     continue;
@@ -994,7 +993,7 @@ class Visual_Portfolio_Admin {
                             'default' => 1,
                             'condition' => array(
                                 array(
-                                    'control' => $name_prefix . 'show_categories',
+                                    'control' => 'show_categories',
                                 ),
                             ),
                         );
@@ -1016,11 +1015,11 @@ class Visual_Portfolio_Admin {
                             'name'    => 'date_format',
                             'placeholder' => 'F j, Y',
                             'default' => 'F j, Y',
-                            'hint' => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
+                            'hint'    => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
                             'hint_place' => 'left',
                             'condition' => array(
                                 array(
-                                    'control' => $name_prefix . 'show_date',
+                                    'control' => 'show_date',
                                 ),
                             ),
                         );
@@ -1041,7 +1040,7 @@ class Visual_Portfolio_Admin {
                             'max'     => 200,
                             'condition' => array(
                                 array(
-                                    'control' => $name_prefix . 'show_excerpt',
+                                    'control' => 'show_excerpt',
                                 ),
                             ),
                         );
@@ -1062,7 +1061,7 @@ class Visual_Portfolio_Admin {
                             'hint_place'  => 'left',
                             'condition'   => array(
                                 array(
-                                    'control' => $name_prefix . 'show_icon',
+                                    'control' => 'show_icon',
                                 ),
                             ),
                         );
@@ -1075,7 +1074,7 @@ class Visual_Portfolio_Admin {
                             'hint_place'  => 'left',
                             'condition'   => array(
                                 array(
-                                    'control' => $name_prefix . 'show_icon',
+                                    'control' => 'show_icon',
                                 ),
                             ),
                         );
@@ -1100,6 +1099,16 @@ class Visual_Portfolio_Admin {
             foreach ( $style['controls'] as $field ) {
                 $field['category'] = 'items-style';
                 $field['name'] = 'vp_items_style_' . $name . '__' . $field['name'];
+
+                // condition names prefix fix.
+                if ( isset( $field['condition'] ) ) {
+                    foreach ( $field['condition'] as $k => $cond ) {
+                        if ( isset( $cond['control'] ) ) {
+                            $field['condition'][ $k ]['control'] = 'vp_items_style_' . $name . '__' . $cond['control'];
+                        }
+                    }
+                }
+
                 $field['condition'] = array_merge(
                     isset( $field['condition'] ) ? $field['condition'] : array(),
                     array(
