@@ -963,6 +963,9 @@ class Visual_Portfolio_Admin {
 
         // layouts options.
         foreach ( $layouts as $name => $layout ) {
+            if ( ! isset( $layout['controls'] ) ) {
+                continue;
+            }
             foreach ( $layout['controls'] as $field ) {
                 $field['category'] = 'layouts';
                 $field['name'] = 'vp_' . $name . '_' . $field['name'];
@@ -1149,138 +1152,143 @@ class Visual_Portfolio_Admin {
         // styles builtin options.
         foreach ( $items_styles as $name => $style ) {
             $new_fields = array();
-            foreach ( $style['builtin_controls'] as $control_name => $val ) {
-                if ( ! $val ) {
-                    continue;
-                }
-                switch ( $control_name ) {
-                    case 'show_title':
-                        $new_fields[] = array(
-                            'type'    => 'toggle',
-                            'label'   => esc_html__( 'Show title', '@@text_domain' ),
-                            'name'    => 'show_title',
-                            'default' => true,
-                        );
-                        break;
-                    case 'show_categories':
-                        $new_fields[] = array(
-                            'type'    => 'toggle',
-                            'label'   => esc_html__( 'Show categories', '@@text_domain' ),
-                            'name'    => 'show_categories',
-                            'default' => true,
-                        );
-                        $new_fields[] = array(
-                            'type'    => 'range',
-                            'label'   => esc_html__( 'Categories count', '@@text_domain' ),
-                            'name'    => 'categories_count',
-                            'min'     => 1,
-                            'max'     => 10,
-                            'default' => 1,
-                            'condition' => array(
-                                array(
-                                    'control' => 'show_categories',
+            if ( isset( $style['builtin_controls'] ) ) {
+                foreach ( $style['builtin_controls'] as $control_name => $val ) {
+                    if ( ! $val ) {
+                        continue;
+                    }
+                    switch ( $control_name ) {
+                        case 'show_title':
+                            $new_fields[] = array(
+                                'type'    => 'toggle',
+                                'label'   => esc_html__( 'Show title', '@@text_domain' ),
+                                'name'    => 'show_title',
+                                'default' => true,
+                            );
+                            break;
+                        case 'show_categories':
+                            $new_fields[] = array(
+                                'type'    => 'toggle',
+                                'label'   => esc_html__( 'Show categories', '@@text_domain' ),
+                                'name'    => 'show_categories',
+                                'default' => true,
+                            );
+                            $new_fields[] = array(
+                                'type'    => 'range',
+                                'label'   => esc_html__( 'Categories count', '@@text_domain' ),
+                                'name'    => 'categories_count',
+                                'min'     => 1,
+                                'max'     => 10,
+                                'default' => 1,
+                                'condition' => array(
+                                    array(
+                                        'control' => 'show_categories',
+                                    ),
                                 ),
-                            ),
-                        );
-                        break;
-                    case 'show_date':
-                        $new_fields[] = array(
-                            'type'    => 'select2',
-                            'label'   => esc_html__( 'Show date', '@@text_domain' ),
-                            'name'    => 'show_date',
-                            'default' => false,
-                            'options' => array(
-                                'false' => esc_html__( 'False', '@@text_domain' ),
-                                'true'  => esc_html__( 'Show', '@@text_domain' ),
-                                'human' => esc_html__( 'Human Format', '@@text_domain' ),
-                            ),
-                        );
-                        $new_fields[] = array(
-                            'type'    => 'text',
-                            'name'    => 'date_format',
-                            'placeholder' => 'F j, Y',
-                            'default' => 'F j, Y',
-                            'hint'    => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
-                            'hint_place' => 'left',
-                            'condition' => array(
-                                array(
-                                    'control' => 'show_date',
+                            );
+                            break;
+                        case 'show_date':
+                            $new_fields[] = array(
+                                'type'    => 'select2',
+                                'label'   => esc_html__( 'Show date', '@@text_domain' ),
+                                'name'    => 'show_date',
+                                'default' => false,
+                                'options' => array(
+                                    'false' => esc_html__( 'False', '@@text_domain' ),
+                                    'true'  => esc_html__( 'Show', '@@text_domain' ),
+                                    'human' => esc_html__( 'Human Format', '@@text_domain' ),
                                 ),
-                            ),
-                        );
-                        break;
-                    case 'show_excerpt':
-                        $new_fields[] = array(
-                            'type'    => 'toggle',
-                            'label'   => esc_html__( 'Show excerpt', '@@text_domain' ),
-                            'name'    => 'show_excerpt',
-                            'default' => false,
-                        );
-                        $new_fields[] = array(
-                            'type'    => 'range',
-                            'label'   => esc_html__( 'Excerpt words count', '@@text_domain' ),
-                            'name'    => 'excerpt_words_count',
-                            'default' => 15,
-                            'min'     => 1,
-                            'max'     => 200,
-                            'condition' => array(
-                                array(
-                                    'control' => 'show_excerpt',
+                            );
+                            $new_fields[] = array(
+                                'type'    => 'text',
+                                'name'    => 'date_format',
+                                'placeholder' => 'F j, Y',
+                                'default' => 'F j, Y',
+                                'hint'    => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
+                                'hint_place' => 'left',
+                                'condition' => array(
+                                    array(
+                                        'control' => 'show_date',
+                                    ),
                                 ),
-                            ),
-                        );
-                        break;
-                    case 'show_icons':
-                        $new_fields[] = array(
-                            'type'    => 'toggle',
-                            'label'   => esc_html__( 'Show icon', '@@text_domain' ),
-                            'name'    => 'show_icon',
-                            'default' => false,
-                        );
-                        $new_fields[] = array(
-                            'type'        => 'text',
-                            'name'        => 'icon',
-                            'default'     => 'fas fa-search',
-                            'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
-                            'hint'        => esc_attr__( 'Standard icon', '@@text_domain' ),
-                            'hint_place'  => 'left',
-                            'condition'   => array(
-                                array(
-                                    'control' => 'show_icon',
+                            );
+                            break;
+                        case 'show_excerpt':
+                            $new_fields[] = array(
+                                'type'    => 'toggle',
+                                'label'   => esc_html__( 'Show excerpt', '@@text_domain' ),
+                                'name'    => 'show_excerpt',
+                                'default' => false,
+                            );
+                            $new_fields[] = array(
+                                'type'    => 'range',
+                                'label'   => esc_html__( 'Excerpt words count', '@@text_domain' ),
+                                'name'    => 'excerpt_words_count',
+                                'default' => 15,
+                                'min'     => 1,
+                                'max'     => 200,
+                                'condition' => array(
+                                    array(
+                                        'control' => 'show_excerpt',
+                                    ),
                                 ),
-                            ),
-                        );
-                        $new_fields[] = array(
-                            'type'        => 'text',
-                            'name'        => 'icon_video',
-                            'default'     => 'fas fa-play',
-                            'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
-                            'hint'        => esc_attr__( 'Video icon', '@@text_domain' ),
-                            'hint_place'  => 'left',
-                            'condition'   => array(
-                                array(
-                                    'control' => 'show_icon',
+                            );
+                            break;
+                        case 'show_icons':
+                            $new_fields[] = array(
+                                'type'    => 'toggle',
+                                'label'   => esc_html__( 'Show icon', '@@text_domain' ),
+                                'name'    => 'show_icon',
+                                'default' => false,
+                            );
+                            $new_fields[] = array(
+                                'type'        => 'text',
+                                'name'        => 'icon',
+                                'default'     => 'fas fa-search',
+                                'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
+                                'hint'        => esc_attr__( 'Standard icon', '@@text_domain' ),
+                                'hint_place'  => 'left',
+                                'condition'   => array(
+                                    array(
+                                        'control' => 'show_icon',
+                                    ),
                                 ),
-                            ),
-                        );
-                        break;
-                    case 'align':
-                        $new_fields[] = array(
-                            'type'    => 'align',
-                            'label'   => esc_html__( 'Caption align', '@@text_domain' ),
-                            'name'    => 'align',
-                            'default' => 'center',
-                            'extended' => 'extended' === $val,
-                        );
-                        break;
-                    // no default.
+                            );
+                            $new_fields[] = array(
+                                'type'        => 'text',
+                                'name'        => 'icon_video',
+                                'default'     => 'fas fa-play',
+                                'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
+                                'hint'        => esc_attr__( 'Video icon', '@@text_domain' ),
+                                'hint_place'  => 'left',
+                                'condition'   => array(
+                                    array(
+                                        'control' => 'show_icon',
+                                    ),
+                                ),
+                            );
+                            break;
+                        case 'align':
+                            $new_fields[] = array(
+                                'type'    => 'align',
+                                'label'   => esc_html__( 'Caption align', '@@text_domain' ),
+                                'name'    => 'align',
+                                'default' => 'center',
+                                'extended' => 'extended' === $val,
+                            );
+                            break;
+                        // no default.
+                    }
                 }
             }
-            $items_styles[ $name ]['controls'] = array_merge( $new_fields, $style['controls'] );
+            $items_styles[ $name ]['controls'] = array_merge( $new_fields, isset( $style['controls'] ) ? $style['controls'] : array() );
         }
 
         // styles options.
         foreach ( $items_styles as $name => $style ) {
+            if ( ! isset( $style['controls'] ) ) {
+                continue;
+            }
             foreach ( $style['controls'] as $field ) {
                 $field['category'] = 'items-style';
                 $field['name'] = 'vp_items_style_' . $name . '__' . $field['name'];
@@ -1356,6 +1364,9 @@ class Visual_Portfolio_Admin {
 
         // filters options.
         foreach ( $filters as $name => $filter ) {
+            if ( ! isset( $filter['controls'] ) ) {
+                continue;
+            }
             foreach ( $filter['controls'] as $field ) {
                 $field['category'] = 'filter';
                 $field['name'] = 'vp_' . $name . '_' . $field['name'];

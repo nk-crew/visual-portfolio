@@ -377,7 +377,7 @@ class Visual_Portfolio_Get {
                         ) );
 
                         // Excerpt.
-                        if ( $args['opts']['show_excerpt'] && isset( $img['description'] ) && $img['description'] ) {
+                        if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] && isset( $img['description'] ) && $img['description'] ) {
                             $args['excerpt'] = wp_trim_words( $img['description'], $args['opts']['excerpt_words_count'], '...' );
                         }
 
@@ -438,7 +438,7 @@ class Visual_Portfolio_Get {
                         ) );
 
                         // Excerpt.
-                        if ( $args['opts']['show_excerpt'] ) {
+                        if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] ) {
                             $args['excerpt'] = wp_trim_words( do_shortcode( has_excerpt() ? get_the_excerpt() : get_the_content() ), $args['opts']['excerpt_words_count'], '...' );
                         }
 
@@ -993,16 +993,18 @@ class Visual_Portfolio_Get {
         $args['image'] = wp_get_attachment_image( $args['image_id'], $args['img_size'] );
 
         // prepare date.
-        if ( 'human' === $args['opts']['show_date'] ) {
-            // translators: %s - published in human format.
-            $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) );
-        } else if ( $args['opts']['show_date'] ) {
-            $args['published'] = get_the_time( $args['opts']['date_format'] ? : 'F j, Y' );
-        }
+        if ( isset( $args['opts']['show_date'] ) ) {
+            if ( 'human' === $args['opts']['show_date'] ) {
+                // translators: %s - published in human format.
+                $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) );
+            } else if ( $args['opts']['show_date'] ) {
+                $args['published'] = get_the_time( $args['opts']['date_format'] ? : 'F j, Y' );
+            }
 
-        // fallback for Visual Portfolio 1.2.1 version.
-        $args['opts']['date_human_format'] = 'human' === $args['opts']['show_date'];
-        $args['published_human_format'] = $args['published'];
+            // fallback for Visual Portfolio 1.2.1 version.
+            $args['opts']['date_human_format'] = 'human' === $args['opts']['show_date'];
+            $args['published_human_format'] = $args['published'];
+        }
 
         // add video format args.
         $oembed = false;
