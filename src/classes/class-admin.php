@@ -1012,7 +1012,7 @@ class Visual_Portfolio_Admin {
                             ),
                         );
                         $new_fields[] = array(
-                            'type'    => 'toggle',
+                            'type'    => 'text',
                             'name'    => 'date_format',
                             'placeholder' => 'F j, Y',
                             'default' => 'F j, Y',
