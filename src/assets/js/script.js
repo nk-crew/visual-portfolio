@@ -31,6 +31,11 @@ function getWndSize() {
 getWndSize();
 $wnd.on( 'resize load orientationchange', getWndSize );
 
+/**
+ * Screen sizes for responsive feature
+ */
+const screenSizes = [ 320, 576, 768, 992, 1200 ];
+
 // enable object-fit
 if ( typeof objectFitImages !== 'undefined' ) {
     objectFitImages();
@@ -571,8 +576,6 @@ class VP {
     initLayout() {
         const self = this;
 
-        const screenSizes = [ 576, 768, 992, 1200 ];
-
         // prepare layout
         if ( self.options.layout ) {
             switch ( self.options.layout ) {
@@ -611,16 +614,20 @@ class VP {
                     }
                 }
 
-                // responsive
-                for ( let count = columns; count > 0; count-- ) {
-                    if ( typeof screenSizes[ count - 1 ] !== 'undefined' ) {
+                // calculate responsive.
+                let count = columns - 1;
+                let currentPoint = Math.min( screenSizes.length - 1, count );
+
+                for ( ; currentPoint >= 0; currentPoint-- ) {
+                    if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
                         self.addStyle( '.vp-portfolio__item-wrap', {
                             width: `${ 100 / count }%`,
-                        }, `screen and (max-width: ${ screenSizes[ count - 1 ] }px)` );
+                        }, `screen and (max-width: ${ screenSizes[ currentPoint ] }px)` );
                         self.addStyle( '.vp-portfolio__item-wrap:nth-of-type(n)', {
                             width: `${ 100 / count }%`,
-                        }, `screen and (max-width: ${ screenSizes[ count - 1 ] }px)` );
+                        }, `screen and (max-width: ${ screenSizes[ currentPoint ] }px)` );
                     }
+                    count -= 1;
                 }
                 break;
             }
@@ -629,13 +636,18 @@ class VP {
                     width: `${ 100 / self.options.masonryColumns }%`,
                 } );
 
-                // responsive
-                for ( let count = self.options.masonryColumns; count > 0; count-- ) {
-                    if ( typeof screenSizes[ count - 1 ] !== 'undefined' ) {
+                // calculate responsive.
+                const columns = self.options.masonryColumns;
+                let count = columns - 1;
+                let currentPoint = Math.min( screenSizes.length - 1, count );
+
+                for ( ; currentPoint >= 0; currentPoint-- ) {
+                    if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
                         self.addStyle( '.vp-portfolio__item-wrap', {
                             width: `${ 100 / count }%`,
-                        }, `screen and (max-width: ${ screenSizes[ count - 1 ] }px)` );
+                        }, `screen and (max-width: ${ screenSizes[ currentPoint ] }px)` );
                     }
+                    count -= 1;
                 }
             }
             // falls through
