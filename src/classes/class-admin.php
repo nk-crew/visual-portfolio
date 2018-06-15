@@ -759,6 +759,191 @@ class Visual_Portfolio_Admin {
                     ),
                 ),
             ),
+
+            // Slider.
+            'slider' => array(
+                'title' => esc_html__( 'Slider', '@@text_domain' ),
+                'controls' => array(
+                    array(
+                        'type'    => 'select2',
+                        'label'   => esc_html__( 'Effect', '@@text_domain' ),
+                        'name'    => 'effect',
+                        'default' => 'slide',
+                        'options' => array(
+                            'slide'     => esc_html__( 'Slide', '@@text_domain' ),
+                            'coverflow' => esc_html__( 'Coverflow', '@@text_domain' ),
+                            'fade'      => esc_html__( 'Fade', '@@text_domain' ),
+                        ),
+                    ),
+                    array(
+                        'type'  => 'range',
+                        'label' => esc_html__( 'Speed (seconds)', '@@text_domain' ),
+                        'name'  => 'speed',
+                        'min'   => 0,
+                        'max'   => 5,
+                        'step'  => 0.1,
+                        'default' => 0.3,
+                    ),
+                    array(
+                        'type'  => 'range',
+                        'label' => esc_html__( 'Autoplay (seconds)', '@@text_domain' ),
+                        'name'  => 'autoplay',
+                        'min'   => 0,
+                        'max'   => 20,
+                        'step'  => 0.2,
+                        'default' => 6,
+                    ),
+                    array(
+                        'type'        => 'select2',
+                        'label'       => esc_html__( 'Items height', '@@text_domain' ),
+                        'name'        => 'items_height_type',
+                        'default'     => 'dynamic',
+                        'options'     => array(
+                            'auto'     => esc_html__( 'Auto', '@@text_domain' ),
+                            'static'   => esc_html__( 'Static (px)', '@@text_domain' ),
+                            'dynamic'  => esc_html__( 'Dynamic (%)', '@@text_domain' ),
+                        ),
+                    ),
+                    array(
+                        'type'  => 'range',
+                        'name'  => 'items_height_static',
+                        'min'   => 30,
+                        'max'   => 800,
+                        'default' => 300,
+                        'condition' => array(
+                            array(
+                                'control'  => 'items_height_type',
+                                'operator' => '==',
+                                'value'    => 'static',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'  => 'range',
+                        'name'  => 'items_height_dynamic',
+                        'min'   => 10,
+                        'max'   => 300,
+                        'default' => 80,
+                        'condition' => array(
+                            array(
+                                'control'  => 'items_height_type',
+                                'operator' => '==',
+                                'value'    => 'dynamic',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'        => 'select2',
+                        'label'       => esc_html__( 'Slides per view', '@@text_domain' ),
+                        'name'        => 'slides_per_view_type',
+                        'default'     => 'custom',
+                        'options'     => array(
+                            'auto'   => esc_html__( 'Auto', '@@text_domain' ),
+                            'custom' => esc_html__( 'Custom', '@@text_domain' ),
+                        ),
+                        'condition' => array(
+                            array(
+                                'control' => 'effect',
+                                'operator' => '!=',
+                                'value' => 'fade',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'      => 'range',
+                        'name'      => 'slides_per_view_custom',
+                        'min'       => 1,
+                        'max'       => 6,
+                        'default'   => 3,
+                        'condition' => array(
+                            array(
+                                'control'  => 'effect',
+                                'operator' => '!=',
+                                'value'    => 'fade',
+                            ),
+                            array(
+                                'control'  => 'slides_per_view_type',
+                                'operator' => '==',
+                                'value'    => 'custom',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Centered slides', '@@text_domain' ),
+                        'name'    => 'centered_slides',
+                        'default' => true,
+                        'condition' => array(
+                            array(
+                                'control' => 'effect',
+                                'operator' => '!=',
+                                'value' => 'fade',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Loop', '@@text_domain' ),
+                        'name'    => 'loop',
+                        'default' => false,
+                    ),
+                    array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Free scroll', '@@text_domain' ),
+                        'name'    => 'free_mode',
+                        'default' => false,
+                    ),
+                    array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Show arrows', '@@text_domain' ),
+                        'name'    => 'arrows',
+                        'default' => true,
+                    ),
+                    array(
+                        'type'        => 'text',
+                        'name'        => 'arrows_icon_prev',
+                        'default'     => 'fas fa-angle-left',
+                        'placeholder' => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
+                        'hint'        => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
+                        'hint_place'  => 'left',
+                        'condition'   => array(
+                            array(
+                                'control' => 'arrows',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'        => 'text',
+                        'name'        => 'arrows_icon_next',
+                        'default'     => 'fas fa-angle-right',
+                        'placeholder' => esc_attr__( 'Next arrow icon', '@@text_domain' ),
+                        'hint'        => esc_attr__( 'Next arrow icon', '@@text_domain' ),
+                        'hint_place'  => 'left',
+                        'condition'   => array(
+                            array(
+                                'control' => 'arrows',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Show bullets', '@@text_domain' ),
+                        'name'    => 'bullets',
+                        'default' => false,
+                    ),
+                    array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Dynamic bullets', '@@text_domain' ),
+                        'name'    => 'bullets_dynamic',
+                        'default' => false,
+                        'condition' => array(
+                            array(
+                                'control' => 'bullets',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         ), Visual_Portfolio_Extend::layouts() );
 
         // Layouts selector.

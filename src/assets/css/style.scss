@@ -12,7 +12,7 @@
     box-sizing: border-box;
 }
 .vp-portfolio__items {
-    transition: .3s height ease-in-out;
+    transition: .3s height ease-in-out, .3s transform ease-in-out;
 }
 
 .vp-portfolio::after,
@@ -142,6 +142,115 @@
         top: 0;
         left: 0;
         transition: .2s transform ease-in-out, .2s width ease-in-out, .2s height ease-in-out;
+    }
+}
+
+// Slider
+[data-vp-layout="slider"] {
+    .vp-portfolio__item-wrap {
+        float: none;
+        width: auto;
+    }
+    .vp-portfolio__item-img-wrap {
+        position: relative;
+        display: block;
+        overflow: hidden;
+    }
+    .vp-portfolio__item-img-wrap::before {
+        content: "";
+        display: block;
+    }
+    .vp-portfolio__item-img img {
+        object-fit: cover;
+        object-position: 50% 50%;
+        // stylelint-disable-next-line
+        font-family: "object-fit: cover; object-position: 50% 50%;";
+    }
+
+    // arrows
+    .vp-portfolio__items-arrow {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: 50%;
+        width: 40px;
+        height: 40px;
+        margin-top: -20px;
+        color: #6c7781;
+        cursor: pointer;
+        background-color: #fff;
+        border-radius: 50%;
+        box-shadow: 0 2px 15px 2px rgba(0, 0, 0, .05);
+        opacity: .5;
+        transition: .2s opacity ease-in-out;
+        z-index: 1;
+
+        // additional element to make the buttons clickable also in outside.
+        &::after {
+            content: "";
+            position: absolute;
+            display: block;
+            top: -10px;
+            right: -10px;
+            bottom: -10px;
+            left: -10px;
+        }
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+    .vp-portfolio__items-arrow-prev {
+        left: 10px;
+    }
+    .vp-portfolio__items-arrow-next {
+        right: 10px;
+    }
+
+    // bullets
+    &[data-vp-slider-bullets="true"] .vp-portfolio__items-wrap {
+        padding-bottom: 25px;
+
+        .vp-portfolio__items-arrow {
+            margin-top: -20px - 25px / 2px;
+        }
+    }
+    .vp-portfolio__items-bullets {
+        position: absolute;
+        margin-bottom: -15px;
+        text-align: center;
+        z-index: 1;
+
+        &.swiper-pagination-bullets-dynamic {
+            margin-bottom: -7px;
+        }
+
+        > span {
+            position: relative;
+            cursor: pointer;
+            background-color: #6c7781;
+            opacity: .2;
+            transition: .15s opacity ease-in-out;
+
+            &:hover {
+                opacity: .5;
+            }
+            &.swiper-pagination-bullet-active {
+                opacity: 1;
+            }
+
+            // additional element to make the buttons clickable also in outside.
+            &::after {
+                content: "";
+                position: absolute;
+                display: block;
+                top: -4px;
+                right: -4px;
+                bottom: -4px;
+                left: -4px;
+            }
+        }
     }
 }
 

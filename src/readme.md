@@ -100,6 +100,7 @@ Available filters:
 * **vpf_enqueue_plugin_flickr_justified_gallery**
 * **vpf_enqueue_plugin_object_fit_images**
 * **vpf_enqueue_plugin_photoswipe**
+* **vpf_enqueue_plugin_swiper**
 * **vpf_enqueue_plugin_font_awesome**
 
 Note: some functionality depends on these plugins and you may break the portfolio.

@@ -135,6 +135,9 @@ class VP {
             // justified gallery
             self.initFjGallery();
 
+            // slider
+            self.initSwiper();
+
             self.emitEvent( 'imagesLoaded' );
         } );
 
@@ -171,6 +174,9 @@ class VP {
 
         // destroy justified gallery
         self.destroyFjGallery();
+
+        // destroy swiper
+        self.destroySwiper();
 
         self.emitEvent( 'destroy' );
 
@@ -608,7 +614,7 @@ class VP {
                                 width: `${ w * 100 / columns }%`,
                             } );
                         }
-                        self.addStyle( `${ itemSelector } .vp-portfolio__item-img-wrap:before`, {
+                        self.addStyle( `${ itemSelector } .vp-portfolio__item-img-wrap::before`, {
                             'margin-top': `${ h * 100 }%`,
                         } );
                     }
@@ -652,6 +658,57 @@ class VP {
             }
             // falls through
             case 'justified':
+                break;
+            case 'slider':
+                if ( self.options.sliderItemsHeight !== 'auto' ) {
+                    if ( self.options.sliderSlidesPerView === 'auto' ) {
+                        // dynamic.
+                        if ( self.options.sliderItemsHeight.indexOf( '%' ) === self.options.sliderItemsHeight.length - 1 ) {
+                            self.addStyle( '.vp-portfolio__items-wrap::before', {
+                                content: '""',
+                                display: 'block',
+                                width: '100%',
+                                'margin-top': isNaN( self.options.sliderItemsHeight ) ? self.options.sliderItemsHeight : `${ self.options.sliderItemsHeight }px`,
+                            } );
+                            self.addStyle( '.vp-portfolio__items', {
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                            } );
+                            self.addStyle( '.vp-portfolio__item-wrap', {
+                                height: self.options.sliderBullets === 'true' ? 'calc( 100% - 25px )' : '100%',
+                            } );
+                            self.addStyle( '.vp-portfolio__item, .vp-portfolio__item-img-wrap, .vp-portfolio__item-img, .vp-portfolio__item-wrap .vp-portfolio__item .vp-portfolio__item-img a, .vp-portfolio__item-wrap .vp-portfolio__item .vp-portfolio__item-img img', {
+                                width: 'auto',
+                                height: '100%',
+                            } );
+
+                        // static.
+                        } else {
+                            self.addStyle( '.vp-portfolio__item .vp-portfolio__item-img img', {
+                                width: 'auto',
+                                height: isNaN( self.options.sliderItemsHeight ) ? self.options.sliderItemsHeight : `${ self.options.sliderItemsHeight }px`,
+                            } );
+                        }
+                    } else {
+                        self.addStyle( '.vp-portfolio__item-img-wrap::before', {
+                            'margin-top': isNaN( self.options.sliderItemsHeight ) ? self.options.sliderItemsHeight : `${ self.options.sliderItemsHeight }px`,
+                        } );
+                        self.addStyle( '.vp-portfolio__item-img img, .vp-portfolio__item-img', {
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0,
+                        } );
+                        self.addStyle( '.vp-portfolio__item .vp-portfolio__item-img img', {
+                            width: '100%',
+                            height: '100%',
+                        } );
+                    }
+                }
                 break;
             // no default
             }
@@ -758,14 +815,14 @@ class VP {
     /**
      * Init fjGallery plugin
      *
-     * @param {mixed} args - custom args.
+     * @param {mixed} options - gallery options.
      * @param {mixed} additional - additional args.
      */
-    initFjGallery( args = false, additional = null ) {
+    initFjGallery( options = false, additional = null ) {
         const self = this;
 
         if ( self.options.layout === 'justified' ) {
-            self.$items_wrap.fjGallery( args !== false ? args : {
+            self.$items_wrap.fjGallery( options !== false ? options : {
                 gutter: parseFloat( self.options.itemsGap ) || 0,
                 rowHeight: parseFloat( self.options.justifiedRowHeight ) || 200,
                 rowHeightTolerance: parseFloat( self.options.justifiedRowHeightTolerance ) || 0,
@@ -773,7 +830,7 @@ class VP {
                 imageSelector: '.vp-portfolio__item-img img',
             }, additional );
 
-            self.emitEvent( 'initFjGallery' );
+            self.emitEvent( 'initFjGallery', [ options ] );
         }
     }
 
@@ -788,6 +845,105 @@ class VP {
             self.$items_wrap.fjGallery( 'destroy' );
 
             self.emitEvent( 'destroyFjGallery' );
+        }
+    }
+
+    /**
+     * Init Swiper plugin
+     *
+     * @param {mixed} options - slider options.
+     */
+    initSwiper( options = false ) {
+        const self = this;
+
+        if ( self.options.layout === 'slider' && typeof window.Swiper !== 'undefined' ) {
+            const $parent = self.$items_wrap.parent();
+
+            $parent.addClass( 'swiper-container' );
+            self.$items_wrap.addClass( 'swiper-wrapper' );
+            self.$items_wrap.children().addClass( 'swiper-slide' );
+
+            // add arrows
+            if ( self.options.sliderArrows === 'true' && ! $parent.find( '.vp-portfolio__items-arrow' ).length ) {
+                $parent.append( `
+                    <div class="vp-portfolio__items-arrow vp-portfolio__items-arrow-prev"><span class="${ self.options.sliderArrowsIconPrev }"></span></div>
+                    <div class="vp-portfolio__items-arrow vp-portfolio__items-arrow-next"><span class="${ self.options.sliderArrowsIconNext }"></span></div>
+                ` );
+            }
+
+            // add bullets
+            if ( self.options.sliderBullets === 'true' && ! $parent.find( '.vp-portfolio__items-bullets' ).length ) {
+                $parent.append( '<div class="vp-portfolio__items-bullets"></div>' );
+            }
+
+            // calculate responsive.
+            const slidesPerView = self.options.sliderSlidesPerView || 3;
+            const breakPoints = {};
+
+            if ( ! isNaN( slidesPerView ) ) {
+                let count = slidesPerView - 1;
+                let currentPoint = Math.min( screenSizes.length - 1, count );
+
+                for ( ; currentPoint >= 0; currentPoint-- ) {
+                    if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
+                        breakPoints[ screenSizes[ currentPoint ] ] = {
+                            slidesPerView: count,
+                        };
+                    }
+                    count -= 1;
+                }
+            }
+
+            new window.Swiper( $parent[ 0 ], options || {
+                speed: ( parseFloat( self.options.sliderSpeed, 10 ) || 0 ) * 1000,
+                autoHeight: self.options.sliderItemsHeight === 'auto',
+                effect: self.options.sliderEffect || 'slide',
+                spaceBetween: parseFloat( self.options.itemsGap ) || 0,
+                centeredSlides: self.options.sliderCenteredSlides === 'true',
+                freeMode: self.options.sliderFreeMode === 'true',
+                loop: self.options.sliderLoop === 'true',
+                autoplay: parseFloat( self.options.sliderAutoplay ) > 0 && {
+                    delay: parseFloat( self.options.sliderAutoplay ) * 1000,
+                    disableOnInteraction: false,
+                },
+                navigation: self.options.sliderArrows === 'true' && {
+                    nextEl: '.vp-portfolio__items-arrow-next',
+                    prevEl: '.vp-portfolio__items-arrow-prev',
+                },
+                pagination: self.options.sliderBullets === 'true' && {
+                    el: '.vp-portfolio__items-bullets',
+                    clickable: true,
+                    dynamicBullets: self.options.sliderBulletsDynamic === 'true',
+                },
+                slidesPerView: slidesPerView,
+                breakpoints: breakPoints,
+                keyboard: true,
+                grabCursor: true,
+            } );
+
+            self.emitEvent( 'initSwiper', [ options ] );
+        }
+    }
+
+    /**
+     * Destroy Swiper plugin
+     */
+    destroySwiper() {
+        const self = this;
+        const Swiper = self.$items_wrap.parent()[ 0 ].swiper;
+
+        if ( Swiper ) {
+            Swiper.destroy();
+
+            const $parent = self.$items_wrap.parent();
+
+            $parent.removeClass( 'swiper-container' );
+            self.$items_wrap.removeClass( 'swiper-wrapper' );
+            self.$items_wrap.children().removeClass( 'swiper-slide' );
+
+            $parent.find( '.vp-portfolio__items-arrow, .vp-portfolio__items-bullets' ).remove();
+
+            self.emitEvent( 'destroySwiper' );
         }
     }
 
@@ -1156,6 +1312,7 @@ class VP {
         const self = this;
         const isotope = self.$items_wrap.data( 'isotope' );
         const fjGallery = self.$items_wrap[ 0 ].fjGallery;
+        const Swiper = self.$items_wrap.parent()[ 0 ].swiper;
 
         if ( isotope ) {
             if ( removeExisting ) {
@@ -1176,7 +1333,7 @@ class VP {
             self.$items_wrap.imagesLoaded().progress( () => {
                 self.initIsotope( 'layout' );
             } );
-        } if ( fjGallery ) {
+        } else if ( fjGallery ) {
             if ( removeExisting ) {
                 self.destroyFjGallery();
                 self.$items_wrap.find( '.vp-portfolio__item-wrap' ).remove();
@@ -1186,6 +1343,16 @@ class VP {
                 self.$items_wrap.append( $items );
                 self.initFjGallery( 'appendImages', $items );
             }
+        } else if ( Swiper ) {
+            if ( removeExisting ) {
+                Swiper.removeAllSlides();
+            }
+
+            const appendArr = [];
+            $items.addClass( 'swiper-slide' ).each( function() {
+                appendArr.push( this );
+            } );
+            Swiper.appendSlide( appendArr );
         }
 
         self.emitEvent( 'addItems', [ $items, removeExisting ] );

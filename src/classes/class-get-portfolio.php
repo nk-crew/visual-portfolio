@@ -73,6 +73,17 @@ class Visual_Portfolio_Get {
     }
 
     /**
+     * Check if portfolio showed in preview mode.
+     */
+    public static function is_preview() {
+        $frame = get_query_var( 'vp_preview_frame' );
+        $id = get_query_var( 'vp_preview_frame_id' );
+        $pagename = get_query_var( 'vp_preview' );
+
+        return 'vp_preview' === $pagename && 'true' === $frame && $id;
+    }
+
+    /**
      * ID of the current printed portfolio
      *
      * @var int
@@ -182,18 +193,65 @@ class Visual_Portfolio_Get {
 
         ob_start();
 
-        $data_atts = Visual_Portfolio_Extend::portfolio_attrs( array(
+        // prepare data-attributes.
+        $is_preview = self::is_preview();
+        $data_atts = array(
             'data-vp-layout' => $options['vp_layout'],
-            'data-vp-tiles-type' => $options['vp_tiles_type'],
-            'data-vp-masonry-columns' => $options['vp_masonry_columns'],
-            'data-vp-justified-row-height' => $options['vp_justified_row_height'],
-            'data-vp-justified-row-height-tolerance' => $options['vp_justified_row_height_tolerance'],
             'data-vp-items-style' => $options['vp_items_style'],
             'data-vp-items-click-action' => $options['vp_items_click_action'],
             'data-vp-items-gap' => $options['vp_items_gap'],
             'data-vp-pagination' => $options['vp_pagination'],
             'data-vp-next-page-url' => $next_page_url,
-        ), $options );
+        );
+        if ( 'tiles' === $options['vp_layout'] || $is_preview ) {
+            $data_atts['data-vp-tiles-type'] = $options['vp_tiles_type'];
+        }
+        if ( 'masonry' === $options['vp_layout'] || $is_preview ) {
+            $data_atts['data-vp-masonry-columns'] = $options['vp_masonry_columns'];
+        }
+        if ( 'justified' === $options['vp_layout'] || $is_preview ) {
+            $data_atts['data-vp-justified-row-height'] = $options['vp_justified_row_height'];
+            $data_atts['data-vp-justified-row-height-tolerance'] = $options['vp_justified_row_height_tolerance'];
+        }
+        if ( 'slider' === $options['vp_layout'] || $is_preview ) {
+            $data_atts['data-vp-slider-effect'] = $options['vp_slider_effect'];
+
+            switch ( $options['vp_slider_items_height_type'] ) {
+                case 'auto':
+                    $data_atts['data-vp-slider-items-height'] = 'auto';
+                    break;
+                case 'static':
+                    $data_atts['data-vp-slider-items-height'] = ( $options['vp_slider_items_height_static'] ? : '200' ) . 'px';
+                    break;
+                case 'dynamic':
+                    $data_atts['data-vp-slider-items-height'] = ( $options['vp_slider_items_height_dynamic'] ? : '80' ) . '%';
+                    break;
+                // no default.
+            }
+
+            switch ( $options['vp_slider_slides_per_view_type'] ) {
+                case 'auto':
+                    $data_atts['data-vp-slider-slides-per-view'] = 'auto';
+                    break;
+                case 'custom':
+                    $data_atts['data-vp-slider-slides-per-view'] = $options['vp_slider_slides_per_view_custom'] ? : '3';
+                    break;
+                // no default.
+            }
+
+            $data_atts['data-vp-slider-speed'] = $options['vp_slider_speed'];
+            $data_atts['data-vp-slider-autoplay'] = $options['vp_slider_autoplay'];
+            $data_atts['data-vp-slider-centered-slides'] = $options['vp_slider_centered_slides'] ? 'true' : 'false';
+            $data_atts['data-vp-slider-loop'] = $options['vp_slider_loop'] ? 'true' : 'false';
+            $data_atts['data-vp-slider-free-mode'] = $options['vp_slider_free_mode'] ? 'true' : 'false';
+            $data_atts['data-vp-slider-arrows'] = $options['vp_slider_arrows'] ? 'true' : 'false';
+            $data_atts['data-vp-slider-arrows-icon-prev'] = $options['vp_slider_arrows_icon_prev'] ? : '';
+            $data_atts['data-vp-slider-arrows-icon-next'] = $options['vp_slider_arrows_icon_next'] ? : '';
+            $data_atts['data-vp-slider-bullets'] = $options['vp_slider_bullets'] ? 'true' : 'false';
+            $data_atts['data-vp-slider-bullets-dynamic'] = $options['vp_slider_bullets_dynamic'] ? 'true' : 'false';
+        }
+
+        $data_atts = Visual_Portfolio_Extend::portfolio_attrs( $data_atts, $options );
 
         $class = Visual_Portfolio_Extend::portfolio_class( $class, $options );
 
@@ -274,7 +332,7 @@ class Visual_Portfolio_Get {
                     'no_image'        => $no_image,
                     'categories'      => array(),
                     'opts'            => $style_options,
-                    'vp_opts'          => $options,
+                    'vp_opts'         => $options,
                 );
 
                 if ( $is_images ) {
