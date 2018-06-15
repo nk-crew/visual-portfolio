@@ -781,6 +781,16 @@ class Visual_Portfolio_Admin {
             foreach ( $layout['controls'] as $field ) {
                 $field['category'] = 'layouts';
                 $field['name'] = 'vp_' . $name . '_' . $field['name'];
+
+                // condition names prefix fix.
+                if ( isset( $field['condition'] ) ) {
+                    foreach ( $field['condition'] as $k => $cond ) {
+                        if ( isset( $cond['control'] ) ) {
+                            $field['condition'][ $k ]['control'] = 'vp_' . $name . '_' . $cond['control'];
+                        }
+                    }
+                }
+
                 $field['condition'] = array_merge(
                     isset( $field['condition'] ) ? $field['condition'] : array(),
                     array(
@@ -1155,6 +1165,16 @@ class Visual_Portfolio_Admin {
             foreach ( $filter['controls'] as $field ) {
                 $field['category'] = 'filter';
                 $field['name'] = 'vp_' . $name . '_' . $field['name'];
+
+                // condition names prefix fix.
+                if ( isset( $field['condition'] ) ) {
+                    foreach ( $field['condition'] as $k => $cond ) {
+                        if ( isset( $cond['control'] ) ) {
+                            $field['condition'][ $k ]['control'] = 'vp_' . $name . '_' . $cond['control'];
+                        }
+                    }
+                }
+
                 $field['condition'] = array_merge(
                     isset( $field['condition'] ) ? $field['condition'] : array(),
                     array(
