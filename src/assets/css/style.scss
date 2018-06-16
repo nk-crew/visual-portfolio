@@ -181,9 +181,9 @@
         cursor: pointer;
         background-color: #fff;
         border-radius: 50%;
-        box-shadow: 0 2px 15px 2px rgba(0, 0, 0, .05);
+        box-shadow: 0 0 7px 2px rgba(0, 0, 0, .04);
         opacity: .5;
-        transition: .2s opacity ease-in-out;
+        transition: .2s opacity ease-in-out, .2s box-shadow ease-in-out;
         z-index: 1;
 
         // additional element to make the buttons clickable also in outside.
@@ -198,6 +198,7 @@
         }
 
         &:hover {
+            box-shadow: 0 2px 15px 2px rgba(0, 0, 0, .04);
             opacity: 1;
         }
     }
