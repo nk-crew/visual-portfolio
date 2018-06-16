@@ -931,7 +931,7 @@ class VP {
     destroySwiper() {
         const self = this;
         const $parent = self.$items_wrap.parent();
-        const Swiper = $parent.data( 'swiper' );
+        const Swiper = $parent[ 0 ].swiper;
 
         if ( Swiper ) {
             Swiper.destroy();
@@ -1311,7 +1311,7 @@ class VP {
         const self = this;
         const isotope = self.$items_wrap.data( 'isotope' );
         const fjGallery = self.$items_wrap.data( 'fjGallery' );
-        const Swiper = self.$items_wrap.parent().data( 'swiper' );
+        const Swiper = self.$items_wrap.parent()[ 0 ].swiper;
 
         if ( isotope ) {
             if ( removeExisting ) {

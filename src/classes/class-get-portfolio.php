@@ -76,11 +76,12 @@ class Visual_Portfolio_Get {
      * Check if portfolio showed in preview mode.
      */
     public static function is_preview() {
-        $frame = get_query_var( 'vp_preview_frame' );
-        $id = get_query_var( 'vp_preview_frame_id' );
-        $pagename = get_query_var( 'vp_preview' );
+        // phpcs:disable
+        $frame = isset( $_GET['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_frame'] ) ) : false;
+        $id = isset( $_GET['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_frame_id'] ) ) : false;
+        // phpcs:enable
 
-        return 'vp_preview' === $pagename && 'true' === $frame && $id;
+        return 'true' === $frame && $id;
     }
 
     /**

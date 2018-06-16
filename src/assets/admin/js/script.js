@@ -212,6 +212,19 @@ if ( typeof Tooltip !== 'undefined' ) {
         case 'vp_layout':
         case 'vp_tiles_type':
         case 'vp_masonry_columns':
+        case 'vp_justified_row_height':
+        case 'vp_justified_row_height_tolerance':
+        case 'vp_slider_effect':
+        case 'vp_slider_speed':
+        case 'vp_slider_autoplay':
+        case 'vp_slider_centered_slides':
+        case 'vp_slider_loop':
+        case 'vp_slider_free_mode':
+        case 'vp_slider_arrows':
+        case 'vp_slider_arrows_icon_prev':
+        case 'vp_slider_arrows_icon_next':
+        case 'vp_slider_bullets':
+        case 'vp_slider_bullets_dynamic':
         case 'vp_items_gap': {
             let name = data.name;
 
@@ -219,7 +232,7 @@ if ( typeof Tooltip !== 'undefined' ) {
             name = name.substring( 3 );
 
             // replace _ to -
-            name = name.replace( '_', '-' );
+            name = name.replace( /_/g, '-' );
 
             data.$portfolio.attr( `data-vp-${ name }`, data.value );
             data.$portfolio.vpf( 'init' );
