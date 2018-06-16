@@ -18,6 +18,7 @@
         background-color: #fff;
         transition: .5s transform cubic-bezier(.07, .72, .24, 1);
         transform: translateY(100%);
+        will-change: transform;
 
         &::before {
             content: "";
@@ -31,6 +32,7 @@
             transition: .5s transform ease;
             transform: rotate(0deg);
             transform-origin: 100% 0;
+            will-change: transform;
             z-index: -1;
         }
     }
@@ -38,6 +40,7 @@
     // Transitions
     .vp-portfolio__item-img img {
         transition: transform 2s cubic-bezier(.08, .43, .24, 1);
+        will-change: transform;
     }
 
     .vp-portfolio__item:hover {

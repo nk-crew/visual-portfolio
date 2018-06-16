@@ -13,6 +13,7 @@
     }
     .vp-portfolio__item-img img {
         transition: transform 2s cubic-bezier(.08, .43, .24, 1);
+        will-change: transform;
     }
     .vp-portfolio__item:hover {
         .vp-portfolio__item-img img {
@@ -66,6 +67,7 @@
                 text-decoration: none;
                 background-color: #3c3c3c;
                 transition: .2s background-color;
+                will-change: background-color;
 
                 &:hover {
                     background-color: #545454;

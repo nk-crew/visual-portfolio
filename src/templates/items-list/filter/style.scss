@@ -40,6 +40,7 @@
             background-color: #fff;
             border: 1px solid #eaeaea;
             transition: .2s border-color, .2s background-color, .2s color;
+            will-change: border-color, background-color, color;
         }
 
         &:not(.vp-filter__item-active) > a:hover {
