@@ -68,11 +68,12 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
 6. Example: Tiles + Stretch
 7. Example: Justified Gallery (Flickr)
 8. Example: Masonry + Posts
-9. Example: Tiles + Custom hover color
-10. Example: Tiles + Paged pagination
-11. Example: Masonry
-12. Example: Tiles + Popup gallery
-13. Example: Popup Gallery
+9. Example: Carousel and Coverflow
+10. Example: Tiles + Custom hover color
+11. Example: Tiles + Paged pagination
+12. Example: Masonry
+13. Example: Tiles + Popup gallery
+14. Example: Popup Gallery
 
 
 
@@ -373,6 +374,19 @@ Available events:
 
 
 ## Changelog ##
+
+= 1.5.0 =
+* added Slider (+ Carousel, Coverflow) layout
+* added capabilities check when generated preview page
+* improved responsive calculation algorithm
+* disabled preview page caching by some popular caching plugins
+* fixed isotope newly loaded items jumping
+* fixed conditions usage on controls in 3rd-party extensions
+* fixed PHP notices when trying to extend portfolio options
+* fixed Data source selected item (was always Post selected)
+* fixed Default filter show
+* fixed Date format control UI
+* fixed confirmation message when leaving layouts editor without change
 
 = 1.4.3 =
 * added check for template existance before include it (to prevent errors when 3rd-party devs don't added templates)
