@@ -1,6 +1,6 @@
 /*!
  * Name    : Flickr's Justified Gallery [fjGallery]
- * Version : 1.0.1
+ * Version : 1.0.2
  * Author  : nK <https://nkdev.info>
  * GitHub  : https://github.com/nk-o/flickr-justified-gallery
  */
@@ -319,6 +319,27 @@ _global.window.fjGallery.noConflict = function () {
 
 // jQuery support
 if (typeof _global.jQuery !== 'undefined') {
+    // add data to jQuery .data('fjGallery')
+    var oldInit = _global.window.fjGallery.constructor.prototype.init;
+    _global.window.fjGallery.constructor.prototype.init = function () {
+        this.jQcontainer = (0, _global.jQuery)(this.$container);
+        this.jQcontainer.data('fjGallery', this);
+        if (oldInit) {
+            oldInit.call(this);
+        }
+    };
+
+    // remove data from jQuery .data('fjGallery')
+    var oldDestroy = _global.window.fjGallery.constructor.prototype.destroy;
+    _global.window.fjGallery.constructor.prototype.destroy = function () {
+        if (this.jQcontainer) {
+            this.jQcontainer.removeData('fjGallery');
+        }
+        if (oldDestroy) {
+            oldDestroy.call(this);
+        }
+    };
+
     var jQueryPlugin = function jQueryPlugin() {
         var args = arguments || [];
         Array.prototype.unshift.call(args, this);

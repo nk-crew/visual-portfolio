@@ -839,7 +839,7 @@ class VP {
      */
     destroyFjGallery() {
         const self = this;
-        const fjGallery = self.$items_wrap[ 0 ].fjGallery;
+        const fjGallery = self.$items_wrap.data( 'fjGallery' );
 
         if ( fjGallery ) {
             self.$items_wrap.fjGallery( 'destroy' );
@@ -930,12 +930,11 @@ class VP {
      */
     destroySwiper() {
         const self = this;
-        const Swiper = self.$items_wrap.parent()[ 0 ].swiper;
+        const $parent = self.$items_wrap.parent();
+        const Swiper = $parent.data( 'swiper' );
 
         if ( Swiper ) {
             Swiper.destroy();
-
-            const $parent = self.$items_wrap.parent();
 
             $parent.removeClass( 'swiper-container' );
             self.$items_wrap.removeClass( 'swiper-wrapper' );
@@ -1311,8 +1310,8 @@ class VP {
     addItems( $items, removeExisting ) {
         const self = this;
         const isotope = self.$items_wrap.data( 'isotope' );
-        const fjGallery = self.$items_wrap[ 0 ].fjGallery;
-        const Swiper = self.$items_wrap.parent()[ 0 ].swiper;
+        const fjGallery = self.$items_wrap.data( 'fjGallery' );
+        const Swiper = self.$items_wrap.parent().data( 'swiper' );
 
         if ( isotope ) {
             if ( removeExisting ) {
