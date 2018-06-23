@@ -936,12 +936,29 @@ class Visual_Portfolio_Get {
             )
         );
 
+        // get options for the current style.
+        $filter_options = array();
+        $filter_options_slug = 'vp_filter_' . $vp_options['vp_filter'] . '__';
+        foreach ( $vp_options as $k => $opt ) {
+            // add option to array.
+            if ( substr( $k, 0, strlen( $filter_options_slug ) ) === $filter_options_slug ) {
+                $opt_name = str_replace( $filter_options_slug, '', $k );
+                $filter_options[ $opt_name ] = $opt;
+            }
+
+            // remove style options from the options list.
+            if ( substr( $k, 0, strlen( $filter_options_slug ) ) === $filter_options_slug ) {
+                unset( $vp_options[ $k ] );
+            }
+        }
+
         $args = array(
             'class'    => 'vp-filter',
             'items'    => $terms,
             'align'    => $vp_options['vp_filter_align'],
             'show_count' => $vp_options['vp_filter_show_count'],
-            'vp_opts'   => $vp_options,
+            'opts'     => $filter_options,
+            'vp_opts'  => $vp_options,
         );
 
         if ( $vp_options['vp_filter_align'] ) {

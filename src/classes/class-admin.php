@@ -1393,7 +1393,7 @@ class Visual_Portfolio_Admin {
             }
             foreach ( $filter['controls'] as $field ) {
                 $field['category'] = 'filter';
-                $field['name'] = 'vp_' . $name . '_' . $field['name'];
+                $field['name'] = 'vp_filter_' . $name . '__' . $field['name'];
 
                 // condition names prefix fix.
                 if ( isset( $field['condition'] ) ) {
