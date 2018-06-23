@@ -7,11 +7,16 @@
       }
     </style>
   </defs>
-  <rect class="cls-1" x="0" y="0" width="19" height="19" />
-  <rect class="cls-1" x="23" y="0" width="42" height="42" />
+  <rect class="cls-1" x="0" y="0" width="19" height="16" />
+  <rect class="cls-1" x="23" y="0" width="19" height="36" />
+  <rect class="cls-1" x="46" y="0" width="19" height="16" />
 
-  <rect class="cls-1" x="0" y="23" width="19" height="19" />
-  
-  <rect class="cls-1" x="0" y="46" width="42" height="19" />
-  <rect class="cls-1" x="46" y="46" width="19" height="19" />
+  <rect class="cls-1" x="0" y="20" width="19" height="16" />
+  <rect class="cls-1" x="46" y="20" width="19" height="36" />
+
+  <rect class="cls-1" x="0" y="40" width="19" height="36" />
+  <rect class="cls-1" x="23" y="40" width="19" height="16" />
+
+  <rect class="cls-1" x="23" y="59" width="19" height="16" />
+  <rect class="cls-1" x="46" y="59" width="19" height="16" />
 </svg>

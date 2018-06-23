@@ -646,14 +646,18 @@ class Visual_Portfolio_Admin {
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-3.svg',
-                                'value' => '2|1,1.2|1,1.2|1,0.67|1,0.67|',
+                                'value' => '2|1,1.34|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-4.svg',
-                                'value' => '2|1,1.2|1,0.67|1,1.2|1,0.67|',
+                                'value' => '2|1,1.2|1,1.2|1,0.67|1,0.67|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-5.svg',
+                                'value' => '2|1,1.2|1,0.67|1,1.2|1,0.67|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-6.svg',
                                 'value' => '2|1,0.67|1,1|1,1|1,1|1,1|1,0.67|',
                             ),
                             array(
@@ -666,38 +670,54 @@ class Visual_Portfolio_Admin {
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-3.svg',
-                                'value' => '3|1,1|1,1|1,1|1,1.3|1,1.3|1,1.3|',
+                                'value' => '3|1,1.3|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-4.svg',
-                                'value' => '3|1,1|1,1|1,2|1,1|1,1|1,1|1,1|1,1|',
+                                'value' => '3|1,1|1,1|1,1|1,1.3|1,1.3|1,1.3|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-5.svg',
-                                'value' => '3|1,2|1,1|1,1|1,1|1,1|1,1|1,1|1,1|',
+                                'value' => '3|1,1|1,1|1,2|1,1|1,1|1,1|1,1|1,1|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-6.svg',
-                                'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|1,1|1,1|',
+                                'value' => '3|1,2|1,1|1,1|1,1|1,1|1,1|1,1|1,1|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-7.svg',
-                                'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|2,0.5|',
+                                'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|1,1|1,1|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-8.svg',
-                                'value' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|1,0.8|',
+                                'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|2,0.5|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-9.svg',
-                                'value' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|',
+                                'value' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,0.8|1,0.8|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-10.svg',
-                                'value' => '3|1,1|2,1|1,1|2,0.5|1,1|',
+                                'value' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|1,0.8|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-11.svg',
+                                'value' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-12.svg',
+                                'value' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-13.svg',
+                                'value' => '3|1,1|2,1|1,1|2,0.5|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-14.svg',
+                                'value' => '3|1,1|2,1|1,1|1,1|1,1|1,1|2,0.5|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-15.svg',
                                 'value' => '3|1,2|2,0.5|1,1|1,2|2,0.5|',
                             ),
                             array(
@@ -710,10 +730,14 @@ class Visual_Portfolio_Admin {
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-3.svg',
-                                'value' => '4|1,1|1,1|2,1|1,1|1,1|2,1|1,1|1,1|1,1|1,1|',
+                                'value' => '4|1,0.8|1,1|1,0.8|1,1|1,1|1,1|1,0.8|1,0.8|',
                             ),
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-4.svg',
+                                'value' => '4|1,1|1,1|2,1|1,1|1,1|2,1|1,1|1,1|1,1|1,1|',
+                            ),
+                            array(
+                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-5.svg',
                                 'value' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
                             ),
                         ),

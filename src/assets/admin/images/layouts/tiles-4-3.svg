@@ -8,16 +8,22 @@
     </style>
   </defs>
   <rect class="cls-1" x="0" y="0" width="13" height="13" />
-  <rect class="cls-1" x="17" y="0" width="13" height="13" />
-  <rect class="cls-1" x="34" y="0" width="30" height="30" />
+  <rect class="cls-1" x="17" y="0" width="13" height="20" />
+  <rect class="cls-1" x="34" y="0" width="13" height="13" />
+  <rect class="cls-1" x="51" y="0" width="13" height="20" />
 
-  <rect class="cls-1" x="0" y="17" width="13" height="13" />
-  <rect class="cls-1" x="17" y="17" width="13" height="13" />
+  <rect class="cls-1" x="0" y="17" width="13" height="20" />
+  <rect class="cls-1" x="17" y="24" width="13" height="13" />
+  <rect class="cls-1" x="34" y="17" width="13" height="20" />
+  <rect class="cls-1" x="51" y="24" width="13" height="13" />
 
-  <rect class="cls-1" x="0" y="34" width="30" height="30" />
-  <rect class="cls-1" x="34" y="34" width="13" height="13" />
-  <rect class="cls-1" x="51" y="34" width="13" height="13" />
+  <rect class="cls-1" x="0" y="41" width="13" height="13" />
+  <rect class="cls-1" x="17" y="41" width="13" height="20" />
+  <rect class="cls-1" x="34" y="41" width="13" height="13" />
+  <rect class="cls-1" x="51" y="41" width="13" height="20" />
 
-  <rect class="cls-1" x="34" y="51" width="13" height="13" />
-  <rect class="cls-1" x="51" y="51" width="13" height="13" />
+  <rect class="cls-1" x="0" y="58" width="13" height="20" />
+  <rect class="cls-1" x="17" y="65" width="13" height="13" />
+  <rect class="cls-1" x="34" y="58" width="13" height="20" />
+  <rect class="cls-1" x="51" y="65" width="13" height="13" />
 </svg>
