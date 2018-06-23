@@ -13,6 +13,7 @@
 }
 .vp-portfolio__items {
     transition: .3s height ease-in-out, .3s transform ease-in-out;
+    will-change: height, transform;
 }
 
 .vp-portfolio::after,
@@ -35,6 +36,7 @@
     visibility: hidden;
     opacity: 0;
     transition: .7s opacity, .7s visibility;
+    will-change: opacity, visibility;
 }
 
 .vp-portfolio__item-wrap {
@@ -54,6 +56,7 @@
     visibility: visible;
     opacity: 1;
     transition: .7s opacity, .7s visibility;
+    will-change: opacity, visibility;
 }
 .vp-portfolio__preloader {
     position: absolute;
@@ -136,12 +139,14 @@
 [data-vp-layout="justified"] {
     .vp-portfolio__items {
         transition: .2s height ease-in-out;
+        will-change: height;
     }
     .vp-portfolio__item-wrap {
         float: left;
         top: 0;
         left: 0;
         transition: .2s transform ease-in-out, .2s width ease-in-out, .2s height ease-in-out;
+        will-change: transform, width, height;
     }
 }
 
@@ -184,6 +189,7 @@
         box-shadow: 0 0 7px 2px rgba(0, 0, 0, .04);
         opacity: .5;
         transition: .2s opacity ease-in-out, .2s box-shadow ease-in-out;
+        will-change: opacity, box-shadow;
         z-index: 1;
 
         // additional element to make the buttons clickable also in outside.
@@ -233,6 +239,7 @@
             background-color: #6c7781;
             opacity: .2;
             transition: .15s opacity ease-in-out;
+            will-change: opacity;
 
             &:hover {
                 opacity: .5;
