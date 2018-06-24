@@ -1525,6 +1525,46 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
+                'category'    => 'pagination',
+                'type'        => 'text',
+                'name'        => 'vp_pagination_paged__arrows_icon_prev',
+                'default'     => 'fas fa-angle-left',
+                'placeholder' => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
+                'hint_place'  => 'left',
+                'condition'   => array(
+                    array(
+                        'control' => 'vp_pagination',
+                        'value'   => 'paged',
+                    ),
+                    array(
+                        'control' => 'vp_pagination_paged__show_arrows',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'pagination',
+                'type'        => 'text',
+                'name'        => 'vp_pagination_paged__arrows_icon_next',
+                'default'     => 'fas fa-angle-right',
+                'placeholder' => esc_attr__( 'Next arrow icon', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Next arrow icon', '@@text_domain' ),
+                'hint_place'  => 'left',
+                'condition'   => array(
+                    array(
+                        'control' => 'vp_pagination',
+                        'value'   => 'paged',
+                    ),
+                    array(
+                        'control' => 'vp_pagination_paged__show_arrows',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
                 'category'  => 'pagination',
                 'type'      => 'toggle',
                 'label'     => esc_html__( 'Show numbers', '@@text_domain' ),

@@ -1235,6 +1235,10 @@ class Visual_Portfolio_Get {
 
                 if ( ! empty( $filtered_links ) ) {
                     $args['items'] = $filtered_links;
+                    if ( $vp_options['vp_pagination_paged__show_arrows'] ) {
+                        $args['arrows_icon_prev'] = $vp_options['vp_pagination_paged__arrows_icon_prev'];
+                        $args['arrows_icon_next'] = $vp_options['vp_pagination_paged__arrows_icon_next'];
+                    }
                     visual_portfolio()->include_template( 'items-list/pagination/paged', $args );
                 }
 

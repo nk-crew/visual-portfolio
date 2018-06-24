@@ -20,9 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
             <?php if ( $item['url'] ) : ?>
                 <a href="<?php echo esc_url( $item['url'] ); ?>">
                     <?php if ( $item['is_prev_arrow'] ) : ?>
-                        <span class="fa fa-angle-left"></span>
+                        <span class="<?php echo esc_attr( $args['arrows_icon_prev'] ); ?>"></span>
                     <?php elseif ( $item['is_next_arrow'] ) : ?>
-                        <span class="fa fa-angle-right"></span>
+                        <span class="<?php echo esc_attr( $args['arrows_icon_next'] ); ?>"></span>
                     <?php else : ?>
                         <?php echo esc_html( $item['label'] ); ?>
                     <?php endif; ?>
