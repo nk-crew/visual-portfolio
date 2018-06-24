@@ -1133,7 +1133,7 @@ class Visual_Portfolio_Get {
 
         // get options for the current pagination.
         $pagination_options = array();
-        $pagination_options_slug = 'vp_pagination_' . $vp_options['vp_pagination'] . '__';
+        $pagination_options_slug = 'vp_pagination_' . $vp_options['vp_pagination_style'] . '__';
         foreach ( $vp_options as $k => $opt ) {
             // add option to array.
             if ( substr( $k, 0, strlen( $pagination_options_slug ) ) === $pagination_options_slug ) {
