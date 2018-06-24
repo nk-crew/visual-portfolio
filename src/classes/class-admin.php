@@ -1530,6 +1530,13 @@ class Visual_Portfolio_Admin {
                     'load-more' => esc_html__( 'Load More', '@@text_domain' ),
                     'infinite'  => esc_html__( 'Infinite', '@@text_domain' ),
                 ),
+                'condition'   => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                ),
             )
         );
         Visual_Portfolio_Controls::register(
