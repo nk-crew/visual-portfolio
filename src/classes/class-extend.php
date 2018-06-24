@@ -88,6 +88,26 @@ class Visual_Portfolio_Extend {
     }
 
     /**
+     * Additional Pagination.
+     *
+     * @return array
+     */
+    public static function pagination() {
+        /*
+         * Example:
+            array(
+                'new_pagination' => array(
+                    'title' => esc_html__( 'New Pagination', '@@text_domain' ),
+                    'controls' => array(
+                        ... controls ...
+                    ),
+                ),
+            )
+         */
+        return apply_filters( 'vpf_extend_pagination', array() );
+    }
+
+    /**
      * Portfolio Data Attributes.
      *
      * @param array $attrs - attributes.

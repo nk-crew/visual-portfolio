@@ -1371,7 +1371,7 @@ class Visual_Portfolio_Admin {
             ),
         ), Visual_Portfolio_Extend::filters() );
 
-        // Layouts selector.
+        // Filters selector.
         $filters_selector = array();
         foreach ( $filters as $name => $filter ) {
             $filters_selector[ $name ] = $filter['title'];
@@ -1458,14 +1458,74 @@ class Visual_Portfolio_Admin {
         /**
          * Pagination
          */
+        $pagination = array_merge( array(
+            // False.
+            'false' => array(
+                'title' => esc_html__( 'Disabled', '@@text_domain' ),
+                'controls' => array(),
+            ),
+
+            // Default.
+            'default' => array(
+                'title' => esc_html__( 'Default', '@@text_domain' ),
+                'controls' => array(),
+            ),
+        ), Visual_Portfolio_Extend::pagination() );
+
+        // Pagination selector.
+        $pagination_selector = array();
+        foreach ( $pagination as $name => $pagin ) {
+            $pagination_selector[ $name ] = $pagin['title'];
+        }
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'pagination',
+                'type'     => 'select2',
+                'name'     => 'vp_pagination_style',
+                'default'  => 'default',
+                'options'  => $pagination_selector,
+            )
+        );
+
+        // pagination options.
+        foreach ( $pagination as $name => $pagin ) {
+            if ( ! isset( $pagin['controls'] ) ) {
+                continue;
+            }
+            foreach ( $pagin['controls'] as $field ) {
+                $field['category'] = 'pagination';
+                $field['name'] = 'vp_pagination_' . $name . '__' . $field['name'];
+
+                // condition names prefix fix.
+                if ( isset( $field['condition'] ) ) {
+                    foreach ( $field['condition'] as $k => $cond ) {
+                        if ( isset( $cond['control'] ) ) {
+                            $field['condition'][ $k ]['control'] = 'vp_' . $name . '_' . $cond['control'];
+                        }
+                    }
+                }
+
+                $field['condition'] = array_merge(
+                    isset( $field['condition'] ) ? $field['condition'] : array(),
+                    array(
+                        array(
+                            'control' => 'vp_pagination_style',
+                            'value' => $name,
+                        ),
+                    )
+                );
+                Visual_Portfolio_Controls::register( $field );
+            }
+        }
+
         Visual_Portfolio_Controls::register(
             array(
                 'category'  => 'pagination',
+                'label'     => esc_html__( 'Type', '@@text_domain' ),
                 'type'      => 'select2',
                 'name'      => 'vp_pagination',
                 'default'   => 'load-more',
                 'options'   => array(
-                    'false'     => esc_html__( 'Disabled', '@@text_domain' ),
                     'paged'     => esc_html__( 'Paged', '@@text_domain' ),
                     'load-more' => esc_html__( 'Load More', '@@text_domain' ),
                     'infinite'  => esc_html__( 'Infinite', '@@text_domain' ),
@@ -1479,6 +1539,11 @@ class Visual_Portfolio_Admin {
                 'description' => esc_html__( 'Note: you will see the "Load More" pagination in the preview. "Infinite" pagination will be visible on the site.', '@@text_domain' ),
                 'name'        => 'vp_pagination_infinite_notice',
                 'condition'   => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
                     array(
                         'control'  => 'vp_pagination',
                         'operator' => '==',
@@ -1501,6 +1566,11 @@ class Visual_Portfolio_Admin {
                 ),
                 'condition' => array(
                     array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
                         'control'  => 'vp_pagination',
                         'operator' => '!=',
                         'value'    => 'false',
@@ -1516,6 +1586,11 @@ class Visual_Portfolio_Admin {
                 'name'      => 'vp_pagination_paged__show_arrows',
                 'default'   => true,
                 'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
                     array(
                         'control' => 'vp_pagination',
                         'value'   => 'paged',
@@ -1533,6 +1608,11 @@ class Visual_Portfolio_Admin {
                 'hint'        => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
                 'hint_place'  => 'left',
                 'condition'   => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
                     array(
                         'control' => 'vp_pagination',
                         'value'   => 'paged',
@@ -1554,6 +1634,11 @@ class Visual_Portfolio_Admin {
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
                         'control' => 'vp_pagination',
                         'value'   => 'paged',
                     ),
@@ -1571,6 +1656,11 @@ class Visual_Portfolio_Admin {
                 'name'      => 'vp_pagination_paged__show_numbers',
                 'default'   => true,
                 'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
                     array(
                         'control' => 'vp_pagination',
                         'value'   => 'paged',

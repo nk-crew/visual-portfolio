@@ -191,9 +191,26 @@ Available events:
     
     Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/filter/new_filter**. See the structure of default templates to getting started.
 
+* **vpf_extend_pagination** [ $pagination ] - custom pagination.
+
+        add_filter( 'vpf_extend_pagination', 'my_pagination_vpf_extend_pagination' );
+
+        function my_pagination_vpf_extend_pagination( $pagination ) {
+            return array_merge( $pagination, array(
+                'new_pagination' => array(
+                    'title' => esc_html__( 'New Pagination', '@@text_domain' ),
+                    'controls' => array(
+                        ... controls (read below) ...
+                    ),
+                ),
+            ) );
+        }
+    
+    Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/pagination/new_pagination**. See the structure of default templates to getting started.
+
 ### DEV: Controls. ####
 
-These controls you can use in filters to extend Portfolio options (read **DEV: WP filters.** in FAQ).
+These controls you can use in filers to extend Portfolio options (read **DEV: WP filters.** in FAQ).
 
 * The list of options, that available in all controls:
 
