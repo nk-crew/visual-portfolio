@@ -1254,7 +1254,7 @@ class Visual_Portfolio_Get {
                         $args['arrows_icon_next'] = $vp_options['vp_pagination_paged__arrows_icon_next'];
                     }
                     visual_portfolio()->include_template( 'items-list/pagination' . $pagination_style_pref . '/paged', $args );
-                    visual_portfolio()->include_template_style( '@@plugin_name-pagination-' . $vp_options['vp_pagination_style'], 'items-list/pagination/paged/style' );
+                    visual_portfolio()->include_template_style( '@@plugin_name-pagination-' . $vp_options['vp_pagination_style'], 'items-list/pagination/style' );
                 }
 
                 break;
