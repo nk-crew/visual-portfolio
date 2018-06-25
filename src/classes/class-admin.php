@@ -1088,6 +1088,12 @@ class Visual_Portfolio_Admin {
                         'name'    => 'bg_color',
                         'default' => '#212125',
                         'alpha'   => true,
+                        'style'   => array(
+                            array(
+                                'element'  => '.vp-portfolio__items-style-fly .vp-portfolio__item-overlay',
+                                'property' => 'background-color',
+                            ),
+                        ),
                     ),
                     array(
                         'type'    => 'color',
@@ -1095,6 +1101,12 @@ class Visual_Portfolio_Admin {
                         'name'    => 'text_color',
                         'default' => '#fff',
                         'alpha'   => true,
+                        'style'   => array(
+                            array(
+                                'element'  => '.vp-portfolio__items-style-fly .vp-portfolio__item-overlay',
+                                'property' => 'color',
+                            ),
+                        ),
                     ),
                 ),
             ),
@@ -1117,6 +1129,12 @@ class Visual_Portfolio_Admin {
                         'name'    => 'bg_color',
                         'default' => '#fff',
                         'alpha'   => true,
+                        'style'   => array(
+                            array(
+                                'element'  => '.vp-portfolio__items-style-emerge .vp-portfolio__item-overlay',
+                                'property' => 'background-color',
+                            ),
+                        ),
                     ),
                     array(
                         'type'    => 'color',
@@ -1124,6 +1142,12 @@ class Visual_Portfolio_Admin {
                         'name'    => 'text_color',
                         'default' => '#000',
                         'alpha'   => true,
+                        'style'   => array(
+                            array(
+                                'element'  => '.vp-portfolio__items-style-emerge .vp-portfolio__item-overlay',
+                                'property' => 'color',
+                            ),
+                        ),
                     ),
                 ),
             ),
@@ -1146,6 +1170,12 @@ class Visual_Portfolio_Admin {
                         'name'    => 'bg_color',
                         'default' => 'rgba(0, 0, 0, 0.85)',
                         'alpha'   => true,
+                        'style'   => array(
+                            array(
+                                'element'  => '.vp-portfolio__items-style-fade .vp-portfolio__item-overlay',
+                                'property' => 'background-color',
+                            ),
+                        ),
                     ),
                     array(
                         'type'    => 'color',
@@ -1153,6 +1183,12 @@ class Visual_Portfolio_Admin {
                         'name'    => 'text_color',
                         'default' => '#fff',
                         'alpha'   => true,
+                        'style'   => array(
+                            array(
+                                'element'  => '.vp-portfolio__items-style-fade .vp-portfolio__item-overlay',
+                                'property' => 'color',
+                            ),
+                        ),
                     ),
                 ),
             ),
@@ -1691,6 +1727,20 @@ class Visual_Portfolio_Admin {
         );
 
         /**
+         * Custom controls styles.
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'controls_styles',
+                'type'      => 'textarea',
+                'name'      => 'vp_controls_styles',
+                'default'   => '',
+                'readonly'  => true,
+                'wrapper_class' => 'vp-controls-styles',
+            )
+        );
+
+        /**
          * Content Source
          */
         Visual_Portfolio_Controls::register(
@@ -1999,14 +2049,17 @@ class Visual_Portfolio_Admin {
 
         Visual_Portfolio_Controls::get(
             array(
-                'type'  => 'text',
-                'label' => esc_html__( 'Shortcode', '@@text_domain' ),
+                'type'     => 'text',
+                'label'    => esc_html__( 'Shortcode', '@@text_domain' ),
                 'description' => esc_html__( 'Place the shortcode where you want to show the portfolio list.', '@@text_domain' ),
-                'name'  => 'vp_list_shortcode',
-                'value' => $post->ID ? '[visual_portfolio id="' . $post->ID . '" class=""]' : '',
+                'name'     => 'vp_list_shortcode',
+                'value'    => $post->ID ? '[visual_portfolio id="' . $post->ID . '" class=""]' : '',
                 'readonly' => true,
             )
         );
+
+        // custom controls styles.
+        Visual_Portfolio_Controls::get_registered( 'controls_styles' );
 
         ?>
 
@@ -2015,6 +2068,7 @@ class Visual_Portfolio_Admin {
                 margin-top: -21px;
                 border-top: none;
             }
+            .vp-controls-styles,
             #post-body-content,
             #submitdiv .handlediv,
             #submitdiv .hndle,
@@ -2228,7 +2282,7 @@ class Visual_Portfolio_Admin {
 
         foreach ( $meta as $item ) {
             if ( isset( $_POST[ $item ] ) ) {
-                if ( 'vp_custom_css' === $item ) {
+                if ( 'vp_custom_css' === $item || 'vp_controls_styles' === $item ) {
                     $result = wp_kses( wp_unslash( $_POST[ $item ] ), array( '\'', '\"' ) );
                 } else {
                     $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );

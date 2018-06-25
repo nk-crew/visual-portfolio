@@ -16,7 +16,7 @@ const $body = $( 'body' );
 const $window = $( window );
 const $editForm = $( 'form[name="post"]' );
 const $postType = $( '[name="post_type"]' );
-const postID = $( '#postID' ).val();
+const postID = $( '#postID, #post_ID' ).eq( 0 ).val();
 
 // select shortcode text in input
 $body.on( 'focus', '[name="vp_list_shortcode"], [name="vp_filter_shortcode"]', function() {
@@ -159,6 +159,32 @@ if ( typeof Tooltip !== 'undefined' ) {
         } );
     }
 
+    // generate controls styles.
+    function generateControlsStyles() {
+        let styles = '';
+        const $styles = $( '[name="vp_controls_styles"]' );
+        const parentSelector = `.vp-id-${ postID }`;
+        const currentStyles = $styles.val();
+
+        $( '.vp-control-style [type="hidden"]' ).each( function() {
+            const $this = $( this );
+            const $control = $this.closest( '.vp-control' );
+
+            if ( 'none' !== $control.css( 'display' ) ) {
+                const val = $control.find( $this.attr( 'data-style-from' ) ).val();
+
+                if ( styles ) {
+                    styles += ' ';
+                }
+                styles += parentSelector + ' ' + $this.attr( 'data-style-element' ) + ' { ' + $this.attr( 'data-style-property' ) + ': ' + val + '; }';
+            }
+        } );
+
+        if ( currentStyles !== styles ) {
+            $styles.val( styles ).trigger( 'vp-fake-change' );
+        }
+    }
+
     // portfolio options changed
     let reloadTimeout;
     $editForm.on( 'change input vp-fake-change vp-fake-input', '[name*="vp_"]', function( e ) {
@@ -166,6 +192,14 @@ if ( typeof Tooltip !== 'undefined' ) {
 
         // prevent reload.
         if ( $this.closest( '.vp-no-reload' ).length ) {
+            return;
+        }
+
+        // find style of this control and generate it.
+        const $controlStyle = $( `[name="${ $this.attr( 'name' ) }__style[]"]` );
+        if ( $controlStyle.length ) {
+            // generate custom styles.
+            generateControlsStyles();
             return;
         }
 
@@ -187,6 +221,11 @@ if ( typeof Tooltip !== 'undefined' ) {
 
         $window.trigger( 'vp-preview-change', data );
 
+        if ( ! data.reload ) {
+            // generate custom styles.
+            generateControlsStyles();
+        }
+
         // reload frame
         if ( data.reload || ! $framePortfolio ) {
             clearTimeout( reloadTimeout );
@@ -201,6 +240,9 @@ if ( typeof Tooltip !== 'undefined' ) {
     $frame.on( 'load', function() {
         frameJQuery = this.contentWindow.jQuery;
         $framePortfolio = frameJQuery( '.vp-portfolio' );
+
+        // generate custom styles.
+        generateControlsStyles();
     } );
 
     // live reload
@@ -250,6 +292,19 @@ if ( typeof Tooltip !== 'undefined' ) {
             data.reload = false;
 
             break;
+        case 'vp_controls_styles': {
+            const $html = data.$portfolio.closest( 'html' );
+            const controlsCssID = `vp-controls-styles-${ postID }-inline-css`;
+            let $style = $html.find( `#${ controlsCssID }` );
+            if ( ! $style.length ) {
+                $style = data.jQuery( `<style id="${ controlsCssID }">` );
+                $html.find( 'body' ).prepend( $style );
+            }
+            $style.html( data.value );
+            data.reload = false;
+
+            break;
+        }
         case 'vp_custom_css': {
             const $html = data.$portfolio.closest( 'html' );
             const customCssID = `vp-custom-css-${ postID }-inline-css`;

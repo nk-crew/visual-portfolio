@@ -71,6 +71,15 @@ class Visual_Portfolio_Controls {
              */
         ),
 
+        // style.
+        'style' => array(
+            /**
+             * Array of arrays with data:
+             *  'element' - CSS selector string (.vp-portfolio__item, .vp-portfolio__item-overlay, etc).
+             *  'property' - CSS property (color, font-size, etc).
+             */
+        ),
+
         'class' => '',
         'wrapper_class' => '',
     );
@@ -132,6 +141,8 @@ class Visual_Portfolio_Controls {
             >
                 <?php
                 self::print_label( $args );
+
+                self::print_style( $args );
 
                 if ( method_exists( __CLASS__, 'print_control_' . $args['type'] ) ) {
                     call_user_func( array( __CLASS__, 'print_control_' . $args['type'] ), $args );
@@ -273,6 +284,34 @@ class Visual_Portfolio_Controls {
         }
         ?>
         <label for="<?php echo esc_attr( $args['name'] ); ?>"><?php echo esc_html( $args['label'] ); ?></label>
+        <?php
+    }
+
+    /**
+     * Print control style.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_style( $args = array() ) {
+        if ( ! $args['style'] || empty( $args['style'] ) ) {
+            return;
+        }
+        ?>
+        <div class="vp-control-style">
+            <?php
+            foreach ( $args['style'] as $style ) {
+                ?>
+                <input type="hidden"
+                       name="<?php echo esc_attr( $args['name'] ); ?>__style[]"
+                       data-style-from="[name='<?php echo esc_attr( $args['name'] ); ?>']"
+                       data-style-element="<?php echo esc_attr( $style['element'] ); ?>"
+                       data-style-property="<?php echo esc_attr( $style['property'] ); ?>"
+                       value=""
+                >
+                <?php
+            }
+            ?>
+        </div>
         <?php
     }
 

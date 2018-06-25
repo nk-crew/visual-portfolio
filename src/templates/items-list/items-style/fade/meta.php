@@ -21,9 +21,7 @@ if ( ! $args['url'] ) {
     <?php if ( $args['url'] ) : ?>
         href="<?php echo esc_url( $args['url'] ); ?>"
     <?php endif; ?>
-        class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>"
-    data-vp-bg-color="<?php echo esc_attr( $opts['bg_color'] ); ?>"
-    data-vp-text-color="<?php echo esc_attr( $opts['text_color'] ); ?>">
+        class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
     <div class="vp-portfolio__item-meta">
         <?php
 

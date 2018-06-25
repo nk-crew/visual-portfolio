@@ -469,6 +469,17 @@ class Visual_Portfolio_Get {
 
         <?php
 
+        // Add controls styles.
+        if ( $options['vp_controls_styles'] ) {
+            $controls_css_handle = 'vp-controls-styles-' . $atts['id'];
+            $css = wp_kses( $options['vp_controls_styles'], array( '\'', '\"' ) );
+            $css = str_replace( '&gt;', '>', $css );
+
+            wp_register_style( $controls_css_handle, false );
+            wp_enqueue_style( $controls_css_handle );
+            wp_add_inline_style( $controls_css_handle, $css );
+        }
+
         // Add custom styles.
         if ( $options['vp_custom_css'] ) {
             $custom_css_handle = 'vp-custom-css-' . $atts['id'];

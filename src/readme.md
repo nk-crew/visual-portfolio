@@ -240,6 +240,14 @@ These controls you can use in filers to extend Portfolio options (read **DEV: WP
                  *  'value' - condition value.
                  */
             ),
+            
+            // custom styles.
+            'style'       => array(
+                array(
+                    'element'  => '.vp-portfolio__item-overlay',
+                    'property' => 'background-color',
+                ),
+            ),
     
             'class'         => '',
             'wrapper_class' => '',
