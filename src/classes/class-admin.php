@@ -2455,7 +2455,7 @@ class Visual_Portfolio_Admin {
                     'post_type' => get_post_type( get_the_ID() ),
                 );
             }
-            wp_reset_postdata();
+            $the_query->reset_postdata();
         }
 
         echo json_encode( $result );

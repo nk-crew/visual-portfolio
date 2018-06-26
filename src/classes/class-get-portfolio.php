@@ -166,6 +166,9 @@ class Visual_Portfolio_Get {
 
         $start_page = self::get_current_page_number();
 
+        // stupid hack as wp_reset_postdata() function is not working for me...
+        $old_post = $GLOBALS['post'];
+
         $is_images = 'images' === $options['vp_content_source'];
         if ( $is_images ) {
             $query_opts = self::get_query_params( $options );
@@ -385,7 +388,7 @@ class Visual_Portfolio_Get {
 
                         self::each_item( $args );
                     }
-                } else if ( isset( $portfolio_query ) && $portfolio_query->have_posts() ) {
+                } else if ( isset( $portfolio_query ) ) {
                     while ( $portfolio_query->have_posts() ) {
                         $portfolio_query->the_post();
 
@@ -450,7 +453,7 @@ class Visual_Portfolio_Get {
                         self::each_item( $args );
                     }
 
-                    wp_reset_postdata();
+                    $portfolio_query->reset_postdata();
                 }
 
                 ?>
@@ -490,6 +493,10 @@ class Visual_Portfolio_Get {
             wp_enqueue_style( $custom_css_handle );
             wp_add_inline_style( $custom_css_handle, $css );
         }
+
+        // stupid hack as wp_reset_postdata() function is not working for me...
+        // phpcs:ignore
+        $GLOBALS['post'] = $old_post;
 
         $return = ob_get_contents();
         ob_end_clean();
@@ -860,38 +867,43 @@ class Visual_Portfolio_Get {
              */
             $term_ids = array();
             $term_taxonomies = array();
+
+            // stupid hack as wp_reset_postdata() function is not working for me...
+            $old_post = $GLOBALS['post'];
             $portfolio_query = new WP_Query( $query_opts );
-            if ( $portfolio_query->have_posts() ) {
-                while ( $portfolio_query->have_posts() ) {
-                    $portfolio_query->the_post();
-                    $all_taxonomies = get_object_taxonomies( get_post() );
+            while ( $portfolio_query->have_posts() ) {
+                $portfolio_query->the_post();
+                $all_taxonomies = get_object_taxonomies( get_post() );
 
-                    foreach ( $all_taxonomies as $cat ) {
-                        // allow only category taxonomies like category, portfolio_category, etc...
-                        // + support for jetpack portfolio-type.
-                        if ( strpos( $cat, 'category' ) === false && strpos( $cat, 'jetpack-portfolio-type' ) === false ) {
-                            continue;
+                foreach ( $all_taxonomies as $cat ) {
+                    // allow only category taxonomies like category, portfolio_category, etc...
+                    // + support for jetpack portfolio-type.
+                    if ( strpos( $cat, 'category' ) === false && strpos( $cat, 'jetpack-portfolio-type' ) === false ) {
+                        continue;
+                    }
+
+                    // Retrieve terms.
+                    $category = get_the_terms( get_post(), $cat );
+                    if ( ! $category ) {
+                        continue;
+                    }
+
+                    // Prepare each terms array.
+                    foreach ( $category as $key => $cat_item ) {
+                        if ( ! in_array( $cat_item->term_id, $term_ids ) ) {
+                            $term_ids[] = $cat_item->term_id;
                         }
-
-                        // Retrieve terms.
-                        $category = get_the_terms( get_post(), $cat );
-                        if ( ! $category ) {
-                            continue;
-                        }
-
-                        // Prepare each terms array.
-                        foreach ( $category as $key => $cat_item ) {
-                            if ( ! in_array( $cat_item->term_id, $term_ids ) ) {
-                                $term_ids[] = $cat_item->term_id;
-                            }
-                            if ( ! in_array( $cat_item->taxonomy, $term_taxonomies ) ) {
-                                $term_taxonomies[] = $cat_item->taxonomy;
-                            }
+                        if ( ! in_array( $cat_item->taxonomy, $term_taxonomies ) ) {
+                            $term_taxonomies[] = $cat_item->taxonomy;
                         }
                     }
                 }
-                wp_reset_postdata();
             }
+            $portfolio_query->reset_postdata();
+
+            // stupid hack as wp_reset_postdata() function is not working for me...
+            // phpcs:ignore
+            $GLOBALS['post'] = $old_post;
 
             // Get all available terms and then pick only needed by ID
             // we need this to support reordering plugins.
