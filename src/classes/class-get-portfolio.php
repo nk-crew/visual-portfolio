@@ -310,6 +310,7 @@ class Visual_Portfolio_Get {
                     'url'             => '',
                     'title'           => '',
                     'excerpt'         => '',
+                    'comments_number' => '',
                     'format'          => '',
                     'published'       => '',
                     'published_time'  => '',
@@ -437,6 +438,8 @@ class Visual_Portfolio_Get {
                             'image_id'        => get_post_thumbnail_id( get_the_ID() ),
                             'categories'      => $categories,
                         ) );
+
+                        $args['comments_number'] = get_comments_number();
 
                         // Excerpt.
                         if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] ) {
