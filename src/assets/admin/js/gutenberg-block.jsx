@@ -29,7 +29,7 @@ registerBlockType( 'nk/visual-portfolio', {
     title: 'Visual Portfolio',
 
     // add element with classname to support different icon sets like FontAwesome.
-    icon: <img className="visual-portfolio-gutenberg-icon" src={ elementIconBlack } alt="visual-portfolio-icon" />,
+    icon: <img className="dashicon visual-portfolio-gutenberg-icon" src={ elementIconBlack } alt="visual-portfolio-icon" />,
 
     category: 'common',
 

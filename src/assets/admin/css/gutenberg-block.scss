@@ -3,6 +3,7 @@
  */
 .wp-block-nk-visual-portfolio {
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-start;
     min-height: 0;
     padding: 14px;
@@ -21,7 +22,9 @@
 
     .visual-portfolio-gutenberg-icon {
         width: 23px;
+        min-width: 23px;
         height: 23px;
+        min-height: 23px;
         margin-right: 10px;
         margin-bottom: 0;
     }
@@ -44,29 +47,4 @@
 // icon
 img.visual-portfolio-gutenberg-icon {
     pointer-events: none;
-
-    .editor-default-block-appender .editor-inserter-with-shortcuts .components-icon-button & {
-        opacity: .4;
-        transition: .2s opacity;
-    }
-    .editor-default-block-appender:hover .editor-inserter-with-shortcuts .components-icon-button & {
-        opacity: 1;
-    }
-
-
-    .editor-inserter__block & {
-        opacity: .6;
-    }
-
-    .editor-block-inspector__card-icon & {
-        width: 100%;
-        opacity: .6;
-    }
-
-    .editor-inserter__block:not(:disabled):hover &,
-    .editor-inserter__block:not(:disabled).is-active &,
-    .editor-inserter__block:not(:disabled):active &,
-    .editor-inserter__block:not(:disabled):focus & {
-        opacity: 1;
-    }
 }
