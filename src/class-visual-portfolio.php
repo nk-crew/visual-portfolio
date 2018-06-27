@@ -124,6 +124,7 @@ class Visual_Portfolio {
 
         // template_redirect is used instead of wp_enqueue_scripts just because some plugins use it and included an old isotope plugin. So, it was conflicted.
         add_action( 'template_redirect', array( $this, 'register_scripts' ), 9 );
+        add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 9 );
     }
 
     /**
@@ -226,6 +227,13 @@ class Visual_Portfolio {
             ),
         );
         wp_localize_script( '@@plugin_name', 'VPData', $data_init );
+    }
+
+    /**
+     * Enqueue main style to prevent first-page load layout issues if the page contains portfolio.
+     */
+    public function wp_enqueue_scripts() {
+        wp_enqueue_style( '@@plugin_name' );
     }
 
     /**
