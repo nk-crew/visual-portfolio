@@ -39,6 +39,7 @@ registerBlockType( 'nk/visual-portfolio', {
         anchor: true,
         className: true,
         html: false,
+        align: [ 'wide', 'full' ],
         ghostkitIndents: true,
         ghostkitDisplay: true,
     },
