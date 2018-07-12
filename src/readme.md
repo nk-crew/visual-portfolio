@@ -53,8 +53,8 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
 
 ## Real Examples ##
 
-[Piroll - Portfolio Theme](https://demo.nkdev.info/#piroll)
-[Snow - Portfolio Theme](https://demo.nkdev.info/#snow)
+* [Piroll - Portfolio Theme](https://demo.nkdev.info/#piroll)
+* [Snow - Portfolio Theme](https://demo.nkdev.info/#snow)
 
 
 
@@ -395,6 +395,25 @@ Available events:
 * **destroyFjGallery.vpf** - called after fjGallery destroyed.
 
 
+### DEV: jQuery methods. ####
+
+Sometimes you may need to call Visual Portfolio methods manually, for example when you use AJAX page load, you will need to reinitialize portfolio, so you can use public methods. Example:
+
+    // Initialize.
+    $( '.vp-portfolio' ).vpf();
+
+    // Destroy.
+    $( '.vp-portfolio' ).vpf( 'destroy' );
+
+Available methods:
+
+* **init** - init/reinit portfolio
+* **destroy** - destroy portfolio
+* **addStyle** [ selector, styles, media ] - add custom styles to the current portfolio
+* **removeStyle** [ selector, styles, media ] - remove custom styles from the current portfolio
+* **renderStyle** - render custom styles
+* **addItems** [ $items, removeExisting ] - add new items to portfolio (called after AJAX loading)
+* **removeItems** [ $items ] - remove some items from portfolio (called after AJAX loading in Paged pagination)
 
 
 
