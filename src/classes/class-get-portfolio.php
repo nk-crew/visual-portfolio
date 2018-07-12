@@ -265,9 +265,9 @@ class Visual_Portfolio_Get {
             <?php
             foreach ( $data_atts as $name => $data ) {
                 if ( 'data-vp-next-page-url' === $name ) {
-                    echo esc_html( $name ) . '="' . esc_url( $data ) . '"';
+                    echo esc_html( $name ) . '="' . esc_url( $data ) . '" ';
                 } else {
-                    echo esc_html( $name ) . '="' . esc_attr( $data ) . '"';
+                    echo esc_html( $name ) . '="' . esc_attr( $data ) . '" ';
                 }
             }
             ?>
