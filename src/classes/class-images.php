@@ -196,14 +196,17 @@ class Visual_Portfolio_Images {
 
         // lazy placeholder.
         if ( $placeholder ) {
-            $attr['data-sizes'] = 'auto';
             $attr['data-src']   = $attr['src'];
             $attr['src']        = $placeholder;
         }
 
         $attr['class'] .= ' visual-portfolio-lazyload lazyload';
 
-        // Set Src Set.
+        // Src Set and Sizes.
+        if ( isset( $attr['sizes'] ) ) {
+            $attr['data-sizes'] = 'auto';
+            unset( $attr['sizes'] );
+        }
         if ( isset( $attr['srcset'] ) ) {
             $attr['data-srcset'] = $attr['srcset'];
             unset( $attr['srcset'] );
