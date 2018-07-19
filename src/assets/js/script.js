@@ -1348,7 +1348,10 @@ class VP {
                     .isotope( 'appended', $items );
             }
 
-            self.initIsotope( 'layout' );
+            // idk why, but with timeout isotope recalculate all items fine.
+            setTimeout( () => {
+                self.initIsotope( 'layout' );
+            }, 0 );
         } else if ( fjGallery ) {
             if ( removeExisting ) {
                 self.destroyFjGallery();
