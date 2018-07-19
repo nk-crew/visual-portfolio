@@ -895,7 +895,7 @@ class VP {
             }
 
             new window.Swiper( $parent[ 0 ], options || {
-                speed: ( parseFloat( self.options.sliderSpeed, 10 ) || 0 ) * 1000,
+                speed: ( parseFloat( self.options.sliderSpeed ) || 0 ) * 1000,
                 autoHeight: self.options.sliderItemsHeight === 'auto',
                 effect: self.options.sliderEffect || 'slide',
                 spaceBetween: parseFloat( self.options.itemsGap ) || 0,
