@@ -420,6 +420,27 @@ Available methods:
 
 ## Changelog ##
 
+= 1.6.0 =
+* NOTE: strongly recommend to regenerate thumbnails on your site using [this plugin](https://wordpress.org/plugins/regenerate-thumbnails/)
+* added lazy loading for images
+* added will-change styles in templates (animations should work smoother)
+* added new Tiles
+* added pagination paged arrows options
+* added align wide and full options in Gutenberg block
+* added support for custom controls styles (developers could create their own controls and add custom styles). Read FAQ for more information
+* added custom control options in filter templates (helpful for developers)
+* added pagination style and possibility to extend it from 3rd-party code
+* added portfolio item comments number data for templates
+* added 'resized' event for developers
+* always enqueued main style on all pages
+* changed carousel arrows shadow
+* fixed validation errors (added space between data attributes)
+* fixed video popup position
+* fixed portfolio bugged reload in preview
+* renamed nk-spinner to vp-spinner
+* removed double slash in custom theme template styles urls
+* removed imagesloaded usage
+
 = 1.5.0 =
 * added Slider (+ Carousel, Coverflow) layout
 * added capabilities check when generated preview page
