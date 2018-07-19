@@ -105,6 +105,7 @@ Available filters:
 * **vpf_enqueue_plugin_photoswipe**
 * **vpf_enqueue_plugin_swiper**
 * **vpf_enqueue_plugin_font_awesome**
+* **vpf_enqueue_plugin_font_lazysizes**
 
 Note: some functionality depends on these plugins and you may break the portfolio.
 
@@ -388,7 +389,6 @@ Available events:
 * **addStyle.vpf** [ selector, styles, media, stylesList ] - called after added new custom styles.
 * **removeStyle.vpf** [ selector, styles, stylesList ] - called after removed custom styles.
 * **renderStyle.vpf** [ stylesString, stylesList, $style ] - called after rendered custom styles.
-* **imagesLoaded.vpf** - called after images loaded.
 * **initIsotope.vpf** - called after Isotope inited.
 * **destroyIsotope.vpf** - called after Isotope destroyed.
 * **initFjGallery.vpf** - called after fjGallery inited.

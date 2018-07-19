@@ -35,7 +35,7 @@
 .vp-portfolio__pagination-wrap {
     visibility: hidden;
     opacity: 0;
-    transition: .7s opacity, .7s visibility;
+    transition: .3s opacity, .3s visibility;
     will-change: opacity, visibility;
 }
 
@@ -55,7 +55,7 @@
 .vp-portfolio__preloader-wrap {
     visibility: visible;
     opacity: 1;
-    transition: .7s opacity, .7s visibility;
+    transition: .3s opacity, .3s visibility;
     will-change: opacity, visibility;
 }
 .vp-portfolio__preloader {
@@ -387,4 +387,9 @@
             }
         }
     }
+}
+
+// LazyLoad image
+img.visual-portfolio-lazyload:not(.lazyloaded) {
+    background-color: rgba(171, 173, 191, .1);
 }

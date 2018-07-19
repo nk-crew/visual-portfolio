@@ -121,27 +121,22 @@ class VP {
         // init photoswipe
         self.initPhotoswipe();
 
-        // images loaded
-        self.$items_wrap.imagesLoaded( () => {
-            self.$item.addClass( 'vp-portfolio__ready' );
-
-            if ( self.id ) {
-                $( `.vp-single-filter.vp-id-${ self.id }` ).addClass( 'vp-single-filter__ready' );
-            }
-
-            // isotope
-            self.initIsotope();
-
-            // justified gallery
-            self.initFjGallery();
-
-            // slider
-            self.initSwiper();
-
-            self.emitEvent( 'imagesLoaded' );
-        } );
-
         self.emitEvent( 'init' );
+
+        self.$item.addClass( 'vp-portfolio__ready' );
+
+        if ( self.id ) {
+            $( `.vp-single-filter.vp-id-${ self.id }` ).addClass( 'vp-single-filter__ready' );
+        }
+
+        // isotope
+        self.initIsotope();
+
+        // justified gallery
+        self.initFjGallery();
+
+        // slider
+        self.initSwiper();
 
         self.firstRun = false;
     }
@@ -1327,11 +1322,6 @@ class VP {
             }
 
             self.initIsotope( 'layout' );
-
-            // images loaded init
-            self.$items_wrap.imagesLoaded().progress( () => {
-                self.initIsotope( 'layout' );
-            } );
         } else if ( fjGallery ) {
             if ( removeExisting ) {
                 self.destroyFjGallery();

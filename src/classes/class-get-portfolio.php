@@ -319,13 +319,18 @@ class Visual_Portfolio_Get {
                     'image_id'        => '',
                     'image_allowed_html' => array(
                         'img' => array(
-                            'src'     => array(),
-                            'srcset'  => array(),
-                            'sizes'   => array(),
-                            'alt'     => array(),
-                            'class'   => array(),
-                            'width'   => array(),
-                            'height'  => array(),
+                            'src'    => array(),
+                            'srcset' => array(),
+                            'sizes'  => array(),
+                            'alt'    => array(),
+                            'class'  => array(),
+                            'width'  => array(),
+                            'height' => array(),
+
+                            // Lazyload support.
+                            'data-src'    => array(),
+                            'data-sizes'  => array(),
+                            'data-srcset' => array(),
                         ),
                     ),
                     'img_size_popup'  => $img_size_popup,
@@ -1029,7 +1034,7 @@ class Visual_Portfolio_Get {
      */
     private static function each_item( $args ) {
         // prepare image.
-        $args['image'] = wp_get_attachment_image( $args['image_id'], $args['img_size'] );
+        $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'] );
 
         // prepare date.
         if ( isset( $args['opts']['show_date'] ) ) {
@@ -1100,7 +1105,7 @@ class Visual_Portfolio_Get {
 
         // No Image.
         if ( ! $args['image'] && $args['no_image'] ) {
-            $args['image'] = wp_get_attachment_image( $args['no_image'], $args['img_size'] );
+            $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'] );
         }
         ?>
 

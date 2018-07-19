@@ -198,6 +198,13 @@ class Visual_Portfolio {
             $vp_deps[] = 'font-awesome-v4-shims';
         }
 
+        // LazySizes.
+        if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
+            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array( 'jquery' ), '4.0.4', true );
+
+            $vp_deps[] = 'lazysizes';
+        }
+
         // Visual Portfolio.
         wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', $vp_deps, '@@plugin_version', true );
         wp_register_style( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/css/style.min.css', $vp_style_deps, '@@plugin_version' );
@@ -283,6 +290,7 @@ class Visual_Portfolio {
      */
     private function include_dependencies() {
         require_once( $this->plugin_path . 'classes/class-extend.php' );
+        require_once( $this->plugin_path . 'classes/class-images.php' );
         require_once( $this->plugin_path . 'classes/class-settings.php' );
         require_once( $this->plugin_path . 'classes/class-rest.php' );
         require_once( $this->plugin_path . 'classes/class-get-portfolio.php' );
