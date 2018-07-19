@@ -1100,8 +1100,8 @@ class VP {
             }
 
             // calculate real viewport in pixels
-            const vpW = data.viewportSize.x * window.devicePixelRatio;
-            let vpH = data.viewportSize.y * window.devicePixelRatio;
+            const vpW = data.viewportSize.x;
+            let vpH = data.viewportSize.y;
             const ratio = curItem.vw / curItem.vh;
             let resultW;
             const $container = $( curItem.container );
