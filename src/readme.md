@@ -409,6 +409,7 @@ Available methods:
 
 * **init** - init/reinit portfolio
 * **destroy** - destroy portfolio
+* **resized** - portfolio was resized
 * **addStyle** [ selector, styles, media ] - add custom styles to the current portfolio
 * **removeStyle** [ selector, styles, media ] - remove custom styles from the current portfolio
 * **renderStyle** - render custom styles

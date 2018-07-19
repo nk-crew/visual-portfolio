@@ -138,7 +138,27 @@ class VP {
         // slider
         self.initSwiper();
 
+        self.resized();
+
         self.firstRun = false;
+    }
+
+    /**
+     * Called after resized container.
+     */
+    resized() {
+        if ( typeof( window.Event ) === 'function' ) {
+            // modern browsers
+            window.dispatchEvent( new window.Event( 'resize' ) );
+        } else {
+            // for IE and other old browsers
+            // causes deprecation warning on modern browsers
+            const evt = window.document.createEvent( 'UIEvents' );
+            evt.initUIEvent( 'resize', true, false, window, 0 );
+            window.dispatchEvent( evt );
+        }
+
+        this.emitEvent( 'resized' );
     }
 
     /**
@@ -532,6 +552,13 @@ class VP {
             } );
             checkVisibilityAndLoad();
         }
+
+        // resized container
+        self.$item.on( `transitionend${ evp }`, '.vp-portfolio__items', function( e ) {
+            if ( e.currentTarget === e.target ) {
+                self.resized();
+            }
+        } );
 
         self.emitEvent( 'initEvents' );
     }
