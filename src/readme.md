@@ -420,6 +420,9 @@ Available methods:
 
 ## Changelog ##
 
+= 1.6.1 =
+* fixed validator error "The sizes attribute may be specified only if the srcset attribute is also present"
+
 = 1.6.0 =
 * NOTE: strongly recommend to regenerate thumbnails on your site using [this plugin](https://wordpress.org/plugins/regenerate-thumbnails/)
 * added lazy loading for images
