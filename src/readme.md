@@ -420,6 +420,11 @@ Available methods:
 
 ## Changelog ##
 
+= 1.6.2 =
+* additional check for isotope and fjGallery existence
+* added init outside of 'ready' event (possible faster initialization)
+* fixed lazyload possible conflict with the 3rd-party themes/plugins
+
 = 1.6.1 =
 * fixed validator error "The sizes attribute may be specified only if the srcset attribute is also present"
 
