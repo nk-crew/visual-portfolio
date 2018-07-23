@@ -1503,6 +1503,7 @@ jQuery.fn.vpf.noConflict = function() {
 };
 
 // initialization
+$( '.vp-portfolio' ).vpf();
 $( () => {
     $( '.vp-portfolio' ).vpf();
 } );
