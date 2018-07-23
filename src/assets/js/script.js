@@ -112,6 +112,9 @@ class VP {
         // init events
         self.initEvents();
 
+        // prepare lazyload images
+        self.prepareLazyLoad();
+
         // init layout
         self.initLayout();
 
@@ -578,6 +581,39 @@ class VP {
         $wnd.off( evp );
 
         self.emitEvent( 'destroyEvents' );
+    }
+
+    /**
+     * Prepare image for Lazyload
+     *
+     * We need to add lazyload class and attributes from global config of lazysizes.
+     * This need because some 3rd-party themes/plugins may change it and it will be conflicted with our config.
+     * Related topic: https://wordpress.org/support/topic/since-the-last-update-i-cant-see-image-featured-of-posts/#post-10519096.
+     */
+    prepareLazyLoad() {
+        const self = this;
+        const config = window.lazySizesConfig;
+
+        if ( config ) {
+            const attrsToReplace = {
+                'data-vpf-src': config.srcAttr,
+                'data-vpf-sizes': config.sizesAttr,
+                'data-vpf-srcset': config.srcsetAttr,
+            };
+
+            self.$items_wrap.find( `.visual-portfolio-lazyload:not(.${ config.lazyClass })` ).each( function() {
+                const $item = $( this );
+
+                Object.keys( attrsToReplace ).forEach( ( attr ) => {
+                    if ( attrsToReplace[ attr ] && attr !== attrsToReplace[ attr ] && $item.attr( attr ) ) {
+                        $item.attr( attrsToReplace[ attr ], $item.attr( attr ) );
+                        $item.removeAttr( attr );
+                    }
+                } );
+
+                $item.addClass( config.lazyClass );
+            } );
+        }
     }
 
     /**
@@ -1460,6 +1496,8 @@ class VP {
             self.loading = false;
 
             self.emitEvent( 'endLoadingNewItems' );
+
+            self.prepareLazyLoad();
 
             // init custom colors
             self.initCustomColors();

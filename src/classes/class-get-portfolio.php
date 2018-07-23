@@ -328,9 +328,9 @@ class Visual_Portfolio_Get {
                             'height' => array(),
 
                             // Lazyload support.
-                            'data-src'    => array(),
-                            'data-sizes'  => array(),
-                            'data-srcset' => array(),
+                            'data-vpf-src'    => array(),
+                            'data-vpf-sizes'  => array(),
+                            'data-vpf-srcset' => array(),
                         ),
                     ),
                     'img_size_popup'  => $img_size_popup,

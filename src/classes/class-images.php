@@ -42,9 +42,9 @@ class Visual_Portfolio_Images {
         if ( $allowedposttags ) {
             foreach ( $allowedposttags as $key => & $tags ) {
                 if ( 'img' === $key ) {
-                    $tags['data-src']    = true;
-                    $tags['data-sizes']  = true;
-                    $tags['data-srcset'] = true;
+                    $tags['data-vpf-src']    = true;
+                    $tags['data-vpf-sizes']  = true;
+                    $tags['data-vpf-srcset'] = true;
                 }
             }
         }
@@ -169,7 +169,7 @@ class Visual_Portfolio_Images {
         }
 
         // Lazyload already added.
-        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-src'] ) ) {
+        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-vpf-src'] ) ) {
             return $attr;
         }
 
@@ -196,19 +196,19 @@ class Visual_Portfolio_Images {
 
         // lazy placeholder.
         if ( $placeholder ) {
-            $attr['data-src']   = $attr['src'];
+            $attr['data-vpf-src']   = $attr['src'];
             $attr['src']        = $placeholder;
         }
 
-        $attr['class'] .= ' visual-portfolio-lazyload lazyload';
+        $attr['class'] .= ' visual-portfolio-lazyload';
 
         // Src Set and Sizes.
         if ( isset( $attr['sizes'] ) ) {
-            $attr['data-sizes'] = 'auto';
+            $attr['data-vpf-sizes'] = 'auto';
             unset( $attr['sizes'] );
         }
         if ( isset( $attr['srcset'] ) ) {
-            $attr['data-srcset'] = $attr['srcset'];
+            $attr['data-vpf-srcset'] = $attr['srcset'];
             unset( $attr['srcset'] );
         }
 
