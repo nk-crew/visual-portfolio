@@ -841,7 +841,7 @@ class VP {
     initIsotope( options ) {
         const self = this;
 
-        if ( self.options.layout === 'tiles' || self.options.layout === 'masonry' ) {
+        if ( self.$items_wrap.isotope && ( self.options.layout === 'tiles' || self.options.layout === 'masonry' ) ) {
             self.$items_wrap.isotope( options || {
                 itemSelector: '.vp-portfolio__item-wrap',
                 layoutMode: 'masonry',
@@ -879,7 +879,7 @@ class VP {
     initFjGallery( options = false, additional = null ) {
         const self = this;
 
-        if ( self.options.layout === 'justified' ) {
+        if ( self.$items_wrap.fjGallery && self.options.layout === 'justified' ) {
             self.$items_wrap.fjGallery( options !== false ? options : {
                 gutter: parseFloat( self.options.itemsGap ) || 0,
                 rowHeight: parseFloat( self.options.justifiedRowHeight ) || 200,
