@@ -754,7 +754,14 @@ class VP {
                         self.addStyle( '.vp-portfolio__item-img-wrap::before', {
                             'margin-top': isNaN( self.options.sliderItemsHeight ) ? self.options.sliderItemsHeight : `${ self.options.sliderItemsHeight }px`,
                         } );
-                        self.addStyle( '.vp-portfolio__item-img img, .vp-portfolio__item-img', {
+                        self.addStyle( '.vp-portfolio__item-img img', {
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0,
+                        } );
+                        self.addStyle( '.vp-portfolio__item-img', {
                             position: 'absolute',
                             top: 0,
                             right: 0,
