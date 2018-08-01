@@ -220,6 +220,7 @@ class Visual_Portfolio_Admin {
                 ),
                 'rewrite' => array(
                     'slug' => Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general', 'portfolio' ),
+                    'with_front' => false,
                 ),
                 'supports' => array(
                     'title',
