@@ -57,6 +57,7 @@
     .visual-portfolio-gutenberg-preview {
         position: relative;
         padding: 15px;
+        overflow: hidden;
 
         &::after {
             content: "";
@@ -74,7 +75,7 @@
             width: 200% !important;
             height: 601px;
             min-height: 20px;
-            margin-bottom: calc(-50% - 30px);
+            margin-bottom: -50%;
             overflow: hidden;
             transform: scale(.5);
             transform-origin: 0 0;
