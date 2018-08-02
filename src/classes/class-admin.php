@@ -164,12 +164,32 @@ class Visual_Portfolio_Admin {
             array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components' ),
             filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/js/gutenberg-block.min.js' )
         );
+
         wp_enqueue_style(
             'visual-portfolio-gutenberg',
             plugins_url( '../assets/admin/css/gutenberg-block.min.css', __FILE__ ),
             array(),
             filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/css/gutenberg-block.min.css' )
         );
+
+        // prepare preview URL.
+        global $wp_rewrite;
+
+        $url = get_site_url();
+
+        if ( ! $wp_rewrite->using_permalinks() ) {
+            $url = add_query_arg(
+                array(
+                    'vp_preview' => 'vp_preview',
+                ), $url
+            );
+        } else {
+            $url .= '/vp_preview';
+        }
+
+        wp_localize_script( 'visual-portfolio-gutenberg', 'VPAdminGutenbergVariables', array(
+            'preview_url' => $url,
+        ) );
     }
 
     /**
