@@ -25,7 +25,8 @@ function vpf_session_start() {
         session_start();
     }
 }
-add_action( 'init', 'vpf_session_start' );
+// we need smaller priority to prevent errors when some 3rd-party plugins output something.
+add_action( 'init', 'vpf_session_start', 5 );
 
 /**
  * Class Visual_Portfolio_Get
