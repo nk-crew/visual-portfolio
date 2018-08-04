@@ -138,7 +138,7 @@ class Visual_Portfolio_Get {
         // TODO: Option to set custom image sizes.
         $img_size_popup = 'vp_xl';
         $img_size_md_popup = 'vp_md';
-        $img_size = 'vp_lg';
+        $img_size = 'vp_xl';
         $columns_count = false;
         if ( 'masonry' === $options['vp_layout'] ) {
             $columns_count = (int) $options['vp_masonry_columns'];
@@ -152,16 +152,16 @@ class Visual_Portfolio_Get {
                 $img_size = 'vp_xl';
                 break;
             case 2:
-                $img_size = 'vp_lg';
+                $img_size = 'vp_xl';
                 break;
             case 3:
-                $img_size = 'vp_md';
+                $img_size = 'vp_xl';
                 break;
             case 4:
-                $img_size = 'vp_md';
+                $img_size = 'vp_lg';
                 break;
             case 5:
-                $img_size = 'vp_sm';
+                $img_size = 'vp_lg';
                 break;
         }
 
