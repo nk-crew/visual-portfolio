@@ -420,6 +420,9 @@ Available methods:
 
 ## Changelog ##
 
+= 1.6.4 =
+* fixed font-awesome dependency
+
 = 1.6.3 =
 * added portfolio preview iframe in Gutenberg block
 * changed portfolio default image sizes (since we use Lazyload, we can use larger image sizes)
