@@ -26,7 +26,7 @@
             "dist": "dist",
             "plugin_name": "visual-portfolio",
             "plugin_title": "Visual Portfolio",
-            "plugin_version": "1.6.2"
+            "plugin_version": "1.6.3"
         },
         "template_vars": [
             {

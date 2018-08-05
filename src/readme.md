@@ -36,7 +36,7 @@ See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://d
 * Load More
 * Paged layouts
 * Filtering
-* Popup gallery (Youtube and Vimeo supported)
+* Popup gallery (YouTube and Vimeo supported)
 * Custom item gutters
 * Stretch option (if you want to break the fixed container of the page)
 * Custom image sets
@@ -420,6 +420,14 @@ Available methods:
 
 ## Changelog ##
 
+= 1.6.3 =
+* added portfolio preview iframe in Gutenberg block
+* changed portfolio default image sizes (since we use Lazyload, we can use larger image sizes)
+* updated FontAwesome to 5.2.0
+* fixed Slider styles when used 2 sliders on the page
+* removed imagesloaded dependelcy
+* disabled 'with_front' in portfolio post type (thanks to [https://wordpress.org/support/topic/change-the-permalink-structure-2/](https://wordpress.org/support/topic/change-the-permalink-structure-2/))
+
 = 1.6.2 =
 * additional check for isotope and fjGallery existence
 * added init outside of 'ready' event (possible faster initialization)
@@ -517,7 +525,7 @@ Available methods:
 * fixed buttons hover border issue in default themes
 
 = 1.2.0 =
-* added support for oEmbed videos (Youtube and Vimeo supported)
+* added support for oEmbed videos (YouTube and Vimeo supported)
 * added settings for popup gallery
 * added share button in popup gallery
 * added "Edit Portfolio Item" button in admin menu on frontend
