@@ -953,17 +953,19 @@ class Visual_Portfolio_Get {
         }
 
         // Add 'All' active item.
-        array_unshift(
-            $terms, array(
-                'filter'      => '*',
-                'label'       => esc_html__( 'All', '@@text_domain' ),
-                'description' => false,
-                'count'       => false,
-                'active'      => ! $there_is_active,
-                'url'         => remove_query_arg( 'vp_filter', self::get_nopaging_url() ),
-                'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : '' ),
-            )
-        );
+        if ( $vp_options['vp_filter_text_all'] ) {
+            array_unshift(
+                $terms, array(
+                    'filter'      => '*',
+                    'label'       => $vp_options['vp_filter_text_all'],
+                    'description' => false,
+                    'count'       => false,
+                    'active'      => ! $there_is_active,
+                    'url'         => remove_query_arg( 'vp_filter', self::get_nopaging_url() ),
+                    'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : '' ),
+                )
+            );
+        }
 
         // get options for the current filter.
         $filter_options = array();
@@ -1210,6 +1212,16 @@ class Visual_Portfolio_Get {
         switch ( $vp_options['vp_pagination'] ) {
             case 'infinite':
             case 'load-more':
+                if ( 'infinite' === $vp_options['vp_pagination'] ) {
+                    $args['text_load'] = $vp_options['vp_pagination_infinite_text_load'];
+                    $args['text_loading'] = $vp_options['vp_pagination_infinite_text_loading'];
+                    $args['text_end_list'] = $vp_options['vp_pagination_infinite_text_end_list'];
+                } else {
+                    $args['text_load'] = $vp_options['vp_pagination_load_more_text_load'];
+                    $args['text_loading'] = $vp_options['vp_pagination_load_more_text_loading'];
+                    $args['text_end_list'] = $vp_options['vp_pagination_load_more_text_end_list'];
+                }
+
                 visual_portfolio()->include_template( 'items-list/pagination' . $pagination_style_pref . '/' . $vp_options['vp_pagination'], $args );
                 visual_portfolio()->include_template_style( '@@plugin_name-pagination-' . $vp_options['vp_pagination_style'], 'items-list/pagination' . $pagination_style_pref . '/style' );
                 break;

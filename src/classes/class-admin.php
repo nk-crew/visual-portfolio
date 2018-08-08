@@ -1520,6 +1520,22 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'filter',
+                'type'     => 'text',
+                'label'    => esc_html__( 'All button text', '@@text_domain' ),
+                'name'     => 'vp_filter_text_all',
+                'default'  => esc_attr__( 'All', '@@text_domain' ),
+                'condition' => array(
+                    array(
+                        'control' => 'vp_filter',
+                        'operator' => '!=',
+                        'value' => 'false',
+                    ),
+                ),
+            )
+        );
 
         /**
          * Pagination
@@ -1647,6 +1663,184 @@ class Visual_Portfolio_Admin {
                         'control'  => 'vp_pagination',
                         'operator' => '!=',
                         'value'    => 'false',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'   => 'pagination',
+                'type'       => 'html',
+                'label'      => esc_html__( 'Texts', '@@text_domain' ),
+                'name'       => 'vp_pagination_infinite_texts',
+                'condition'  => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'infinite',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'   => 'pagination',
+                'type'       => 'html',
+                'label'      => esc_html__( 'Texts', '@@text_domain' ),
+                'name'       => 'vp_pagination_load_more_texts',
+                'condition'  => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'load-more',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'pagination',
+                'type'     => 'text',
+                'name'     => 'vp_pagination_infinite_text_load',
+                'default'  => esc_attr__( 'Load more', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
+                'hint_place'  => 'left',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'infinite',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'pagination',
+                'type'     => 'text',
+                'name'     => 'vp_pagination_infinite_text_loading',
+                'default'  => esc_attr__( 'Loading more...', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
+                'hint_place'  => 'left',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'infinite',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'pagination',
+                'type'     => 'text',
+                'name'     => 'vp_pagination_infinite_text_end_list',
+                'default'  => esc_attr__( 'You’ve reached the end of the list', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'End of the list text', '@@text_domain' ),
+                'hint'        => esc_attr__( 'End of the list text', '@@text_domain' ),
+                'hint_place'  => 'left',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'infinite',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'pagination',
+                'type'     => 'text',
+                'name'     => 'vp_pagination_load_more_text_load',
+                'default'  => esc_attr__( 'Load more', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
+                'hint_place'  => 'left',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'load-more',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'pagination',
+                'type'     => 'text',
+                'name'     => 'vp_pagination_load_more_text_loading',
+                'default'  => esc_attr__( 'Loading more...', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
+                'hint_place'  => 'left',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'load-more',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'pagination',
+                'type'     => 'text',
+                'name'     => 'vp_pagination_load_more_text_end_list',
+                'default'  => esc_attr__( 'You’ve reached the end of the list', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'End of the list text', '@@text_domain' ),
+                'hint'        => esc_attr__( 'End of the list text', '@@text_domain' ),
+                'hint_place'  => 'left',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'vp_pagination',
+                        'operator' => '==',
+                        'value'    => 'load-more',
                     ),
                 ),
             )
