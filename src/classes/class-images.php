@@ -196,8 +196,8 @@ class Visual_Portfolio_Images {
 
         // lazy placeholder.
         if ( $placeholder ) {
-            $attr['data-vpf-src']   = $attr['src'];
-            $attr['src']        = $placeholder;
+            $attr['data-vpf-src'] = $attr['src'];
+            $attr['src']          = $placeholder;
         }
 
         $attr['class'] .= ' visual-portfolio-lazyload';

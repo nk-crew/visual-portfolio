@@ -1390,7 +1390,7 @@ class Visual_Portfolio_Get {
             $tag_pattern =
                 '@<(?P<tag>' . $tag . ')           # <tag
                 (?P<attributes>\s[^>]+)?       # attributes, if any
-                \s*/?>                   # /> or just >, being lenient here 
+                \s*/?>                   # /> or just >, being lenient here
                 @xsi';
         } else {
             $tag_pattern =
@@ -1409,7 +1409,7 @@ class Visual_Portfolio_Get {
             (
                 (?P<quote>[\"\'])(?P<value_quoted>.*?)(?P=quote)    # a quoted value
                 |                           # or
-                (?P<value_unquoted>[^\s"\']+?)(?:\s+|$)           # an unquoted value (terminated by whitespace or EOF) 
+                (?P<value_unquoted>[^\s"\']+?)(?:\s+|$)           # an unquoted value (terminated by whitespace or EOF)
             )
             @xsi';
 
