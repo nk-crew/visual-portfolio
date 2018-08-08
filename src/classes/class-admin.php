@@ -196,6 +196,8 @@ class Visual_Portfolio_Admin {
      * Add custom post type
      */
     public function add_custom_post_type() {
+        $custom_slug = Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general', 'portfolio' );
+
         // portfolio items post type.
         register_post_type(
             'portfolio',
@@ -239,7 +241,7 @@ class Visual_Portfolio_Admin {
                     'delete_post' => 'delete_portfolio',
                 ),
                 'rewrite' => array(
-                    'slug' => Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general', 'portfolio' ),
+                    'slug' => $custom_slug,
                     'with_front' => false,
                 ),
                 'supports' => array(
@@ -252,6 +254,13 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
+
+        // fix for paged /portfolio/ page.
+        add_rewrite_rule( '^portfolio/page/([0-9]+)', 'index.php?pagename=portfolio&paged=$matches[1]', 'top' );
+        if ( $custom_slug && 'portfolio' !== $custom_slug ) {
+            add_rewrite_rule( '^' . $custom_slug . '/page/([0-9]+)', 'index.php?pagename=' . $custom_slug . '&paged=$matches[1]', 'top' );
+        }
+
         register_taxonomy(
             'portfolio_category', 'portfolio', array(
                 'label'         => esc_html__( 'Portfolio Categories', '@@text_domain' ),
