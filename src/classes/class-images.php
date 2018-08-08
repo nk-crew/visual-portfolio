@@ -31,6 +31,9 @@ class Visual_Portfolio_Images {
         add_filter( 'wp_update_attachment_metadata', 'Visual_Portfolio_Images::generate_attachment_placeholder', 15 );
         add_filter( 'wp_generate_attachment_metadata', 'Visual_Portfolio_Images::generate_attachment_placeholder', 15 );
         add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::add_image_placeholders', 15, 3 );
+
+        // ignore Jetpack lazy.
+        add_filter( 'jetpack_lazy_images_skip_image_with_atttributes', 'Visual_Portfolio_Images::jetpack_lazy_images_skip_image_with_atttributes', 15, 2 );
     }
 
     /**
@@ -213,6 +216,18 @@ class Visual_Portfolio_Images {
         }
 
         return $attr;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param boolean $return     skip lazy Jetpack.
+     * @param array   $attributes image attributes.
+     *
+     * @return boolean
+     */
+    public static function jetpack_lazy_images_skip_image_with_atttributes( $return, $attributes ) {
+        return isset( $attributes['data-vpf-src'] );
     }
 }
 Visual_Portfolio_Images::construct();
