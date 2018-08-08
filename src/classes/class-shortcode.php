@@ -50,6 +50,7 @@ class Visual_Portfolio_Shortcode {
         $atts = shortcode_atts(
             array(
                 'id'     => '',
+                'type'   => 'default',
                 'align'  => 'center',
                 'show_count' => false,
                 'class'  => '',
