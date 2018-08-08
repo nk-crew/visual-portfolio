@@ -420,6 +420,13 @@ Available methods:
 
 ## Changelog ##
 
+= 1.6.5 =
+* added options for texts in filter and pagination
+* fixed paged /portfolio/ page (https://wordpress.org/support/topic/paging-infinite-loading-not-working/)
+* fixed vertical images quality
+* fixed conflict with Jetpack lazy
+* fixed filter shortcode output
+
 = 1.6.4 =
 * fixed font-awesome dependency
 
