@@ -1293,3 +1293,11 @@ $grid_sm: 600px !default;
         width: 100%;
     }
 }
+
+/**
+ * Hide unused metaboxes from admin pages.
+ */
+.post-type-vp_lists #slugdiv,
+.post-type-vp_lists #postcustom {
+    display: none;
+}
