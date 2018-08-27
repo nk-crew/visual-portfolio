@@ -93,6 +93,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 ## Frequently Asked Questions ##
 
 ### How to disable enqueued plugins (JS, CSS) on frontend ####
+
 There are some plugins, enqueued with Visual Portfolio on your page. If you don't like the plugin and/or want to change it to your alternate plugin, you can disable it using filters. Example:
 
     add_filter( 'vpf_enqueue_plugin_font_awesome', '__return_false' );
@@ -109,16 +110,29 @@ Available filters:
 
 Note: some functionality depends on these plugins and you may break the portfolio.
 
-### How to change default templates and styles? ####
+### How to use my custom taxonomy as filter ####
+
+There is available filer **vpf_allow_taxonomy_for_filter** that allow you to use custom taxonomy as filter. Example:
+
+    add_filter( 'vpf_allow_taxonomy_for_filter', 'my_filter_vpf_allow_taxonomy_for_filter', 10, 2 );
+
+    function my_filter_vpf_allow_taxonomy_for_filter( $allow, $taxonomy ) {
+        if ( 'my_custom_taxonomy' === $taxonomy ) {
+            $allow = true;
+        }
+        return $allow;
+    }
+
+### How to change default templates and styles ####
 
 You can copy files from the **/visual-portfolio/templates/** to your **YOUR_THEME/visual-portfolio/** folder and change php code and css files here.
 
-### DEV: WP filters. ####
+### DEV: WP filters ####
 
 Visual Portfolio has several WP hooks that let you extend functionality.
 
     add_filter( 'vpf_get_layout_option', 'my_filter_vpf_get_layout_option', 10, 3 );
-    
+
     function my_filter_vpf_get_layout_option( $value, $name, $post_id ) {
         var_dump( $value );
         var_dump( $name );
@@ -126,7 +140,7 @@ Visual Portfolio has several WP hooks that let you extend functionality.
         return $value;
     }
 
-Available events:
+Available filters:
 
 * **vpf_include_template** [ $template, $template_name, $args ] - include php template.
 * **vpf_include_template_style** [ $template, $template_name, $deps, $ver, $media ] - include css template.
@@ -147,7 +161,7 @@ Available events:
                 ),
             ) );
         }
-    
+
     Note: On the portfolio will be added data attribute **[data-vp-layout="new_layout"]**, so you can play with it and use jQuery events to initialize the new layout.
 
 * **vpf_extend_items_styles** [ $items_styles ] - custom items styles.
@@ -172,7 +186,7 @@ Available events:
                 ),
             ) );
         }
-    
+
     Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/items-style/new_items_style**. See the structure of default templates to getting started.
 
 * **vpf_extend_filters** [ $filters ] - custom filters.
@@ -189,7 +203,7 @@ Available events:
                 ),
             ) );
         }
-    
+
     Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/filter/new_filter**. See the structure of default templates to getting started.
 
 * **vpf_extend_pagination** [ $pagination ] - custom pagination.
@@ -206,10 +220,10 @@ Available events:
                 ),
             ) );
         }
-    
+
     Note: Make sure that you added template in **your_theme/visual-portfolio/items-list/pagination/new_pagination**. See the structure of default templates to getting started.
 
-### DEV: Controls. ####
+### DEV: Controls ####
 
 These controls you can use in filers to extend Portfolio options (read **DEV: WP filters.** in FAQ).
 
@@ -224,14 +238,14 @@ These controls you can use in filers to extend Portfolio options (read **DEV: WP
             'placeholder' => '',
             'readonly'    => false,
             'default'     => 'default value',
-            
+
             // Use the function to getting value.
             'value_callback' => '',
-    
+
             // hint.
             'hint'        => false,
             'hint_place'  => 'top',
-    
+
             // condition.
             'condition'   => array(
                 /**
@@ -241,7 +255,7 @@ These controls you can use in filers to extend Portfolio options (read **DEV: WP
                  *  'value' - condition value.
                  */
             ),
-            
+
             // custom styles.
             'style'       => array(
                 array(
@@ -249,7 +263,7 @@ These controls you can use in filers to extend Portfolio options (read **DEV: WP
                     'property' => 'background-color',
                 ),
             ),
-    
+
             'class'         => '',
             'wrapper_class' => '',
         );
@@ -263,7 +277,7 @@ These controls you can use in filers to extend Portfolio options (read **DEV: WP
             'name'        => 'text_control_uniq_name',
             'placeholder' => esc_html__( 'Text field placeholder', '@@text_domain' ),
             'default'     => 'default value',
-    
+
             // hint.
             'hint'        => esc_html__( 'Text field hint', '@@text_domain' ),
             'hint_place'  => 'left',
@@ -363,8 +377,7 @@ These controls you can use in filers to extend Portfolio options (read **DEV: WP
             'extended'    => true,
         );
 
-
-### DEV: jQuery events. ####
+### DEV: jQuery events ####
 
 Visual Portfolio has a lot of jQuery events that let you extend functionality. Example:
 
@@ -394,8 +407,7 @@ Available events:
 * **initFjGallery.vpf** - called after fjGallery inited.
 * **destroyFjGallery.vpf** - called after fjGallery destroyed.
 
-
-### DEV: jQuery methods. ####
+### DEV: jQuery methods ####
 
 Sometimes you may need to call Visual Portfolio methods manually, for example when you use AJAX page load, you will need to reinitialize portfolio, so you can use public methods. Example:
 
@@ -421,6 +433,7 @@ Available methods:
 ## Changelog ##
 
 = 1.6.5 =
+
 * added options for texts in filter and pagination
 * fixed paged /portfolio/ page (https://wordpress.org/support/topic/paging-infinite-loading-not-working/)
 * fixed vertical images quality
@@ -428,9 +441,11 @@ Available methods:
 * fixed filter shortcode output
 
 = 1.6.4 =
+
 * fixed font-awesome dependency
 
 = 1.6.3 =
+
 * added portfolio preview iframe in Gutenberg block
 * changed portfolio default image sizes (since we use Lazyload, we can use larger image sizes)
 * updated FontAwesome to 5.2.0
@@ -439,14 +454,17 @@ Available methods:
 * disabled 'with_front' in portfolio post type (thanks to [https://wordpress.org/support/topic/change-the-permalink-structure-2/](https://wordpress.org/support/topic/change-the-permalink-structure-2/))
 
 = 1.6.2 =
+
 * additional check for isotope and fjGallery existence
 * added init outside of 'ready' event (possible faster initialization)
 * fixed lazyload possible conflict with the 3rd-party themes/plugins
 
 = 1.6.1 =
+
 * fixed validator error "The sizes attribute may be specified only if the srcset attribute is also present"
 
 = 1.6.0 =
+
 * NOTE: strongly recommend to regenerate thumbnails on your site using [this plugin](https://wordpress.org/plugins/regenerate-thumbnails/)
 * added lazy loading for images
 * added will-change styles in templates (animations should work smoother)
@@ -468,6 +486,7 @@ Available methods:
 * removed imagesloaded usage
 
 = 1.5.0 =
+
 * added Slider (+ Carousel, Coverflow) layout
 * added capabilities check when generated preview page
 * improved responsive calculation algorithm
@@ -481,6 +500,7 @@ Available methods:
 * fixed confirmation message when leaving layouts editor without change
 
 = 1.4.3 =
+
 * added check for template existance before include it (to prevent errors when 3rd-party devs don't added templates)
 * fixed random order duplicates when used pagination
 * fixed errors in PHP < 5.5
@@ -490,10 +510,12 @@ Available methods:
 * renamed all events prefix from vp to vpf
 
 = 1.4.2 =
+
 * prepared code for extending from 3rd-party developers
 * fixed saving unchecked toggle values in Layouts editor (Show title, Show categories, etc...)
 
 = 1.4.1 =
+
 * added filters to disable enqueued frontend plugins (see FAQ section)
 * added Custom URL option to custom images set
 * added support for negative number of items per page for custom images set (to show all available items on the page)
@@ -501,6 +523,7 @@ Available methods:
 * fixed custom images filters count show
 
 = 1.4.0 =
+
 * added Justified layout
 * added custom user images support in Content Source settings
 * added Gutenberg block to easily insert layouts
@@ -518,6 +541,7 @@ Available methods:
 * minor changes
 
 = 1.3.0 =
+
 * improved CSS editor (added autocomplete hints; selectors hint; showing errors; preventing save when editor has errors)
 * improved layouts editor interface
 * added shortcode for portfolio filter (you can use filter outside of portfolio wrapper)
@@ -530,11 +554,13 @@ Available methods:
 * fixed permalinks flush on activation and deactivation
 
 = 1.2.1 =
+
 * fixed video format conflict with theme formats
 * fixed php error about undefined index
 * fixed buttons hover border issue in default themes
 
 = 1.2.0 =
+
 * added support for oEmbed videos (YouTube and Vimeo supported)
 * added settings for popup gallery
 * added share button in popup gallery
@@ -550,15 +576,18 @@ Available methods:
 * minor fixes and changes
 
 = 1.1.4 =
+
 * fixed conflict with WooCommerce Photoswipe gallery
 
 = 1.1.3 =
+
 * added ID in title to tinymce and visual composer dropdowns
 * fixed fly effect transition in Safari
 * fixed tiles filter jumping
 * fixed iframe height calculation if in theme set html height 100%;
 
 = 1.1.2 =
+
 * added options to hide arrows and numbers from the paged pagination
 * added support for WPBakery Page Builder
 * added class attribute in shortcode
@@ -571,9 +600,11 @@ Available methods:
 * fixed conflict with WPBakery Page Builder and old isotope plugin
 
 = 1.1.1 =
+
 * fixed php enqueue errors
 
 = 1.1.0 =
+
 * preview changed to iframe - now all the portfolio styles showed the same as on your website frontend. Now iframe reloaded when changed all options (Customizer experience here)
 * added wrapper to filter and pagination
 * added tinyMCE dropdown with list of visual-portfolio shortcodes
@@ -590,6 +621,7 @@ Available methods:
 * minor changes
 
 = 1.0.1 =
+
 * added custom CSS field
 * added object-fit polyfill to support old browsers
 * added custom image sizes
@@ -600,4 +632,5 @@ Available methods:
 * minor changes
 
 = 1.0.0 =
+
 * initial Release

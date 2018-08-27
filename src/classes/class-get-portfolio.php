@@ -93,6 +93,21 @@ class Visual_Portfolio_Get {
     static private $id = 0;
 
     /**
+     * Allow taxonomies to show in Filter
+     *
+     * @param string $taxonomy taxonomy name.
+     *
+     * @return bool
+     */
+    public static function allow_taxonomies_for_filter( $taxonomy ) {
+        return apply_filters(
+            'vpf_allow_taxonomy_for_filter',
+            strpos( $taxonomy, 'category' ) || strpos( $taxonomy, 'jetpack-portfolio-type' ),
+            $taxonomy
+        );
+    }
+
+    /**
      * Print portfolio by post ID or options
      *
      * @param array $atts options for portfolio list to print.
@@ -404,8 +419,8 @@ class Visual_Portfolio_Get {
                         $categories     = array();
                         $all_taxonomies = get_object_taxonomies( get_post() );
                         foreach ( $all_taxonomies as $cat ) {
-                            // allow only category taxonomies like category, portfolio_category, etc...
-                            if ( strpos( $cat, 'category' ) === false ) {
+                            // allow only specific taxonomies for filter.
+                            if ( ! self::allow_taxonomies_for_filter( $cat ) ) {
                                 continue;
                             }
 
@@ -885,9 +900,8 @@ class Visual_Portfolio_Get {
                 $all_taxonomies = get_object_taxonomies( get_post() );
 
                 foreach ( $all_taxonomies as $cat ) {
-                    // allow only category taxonomies like category, portfolio_category, etc...
-                    // + support for jetpack portfolio-type.
-                    if ( strpos( $cat, 'category' ) === false && strpos( $cat, 'jetpack-portfolio-type' ) === false ) {
+                    // allow only specific taxonomies for filter.
+                    if ( ! self::allow_taxonomies_for_filter( $cat ) ) {
                         continue;
                     }
 
