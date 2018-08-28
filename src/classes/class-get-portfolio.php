@@ -119,6 +119,8 @@ class Visual_Portfolio_Get {
             return '';
         }
 
+        self::$all_used_layout_ids[] = $atts['id'];
+
         self::enqueue_scripts();
 
         // generate unique ID.
@@ -1371,6 +1373,22 @@ class Visual_Portfolio_Get {
         }
 
         return $slug;
+    }
+
+    /**
+     * Array with all used layout IDs
+     *
+     * @var array
+     */
+    static private $all_used_layout_ids = array();
+
+    /**
+     * Get list with all used portfolios on the current page.
+     *
+     * @return array
+     */
+    public static function get_all_currently_used_ids() {
+        return self::$all_used_layout_ids;
     }
 
     /**

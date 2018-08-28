@@ -53,6 +53,9 @@ class Visual_Portfolio_Admin {
         // highlight admin menu items.
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 
+        // show admin menu dropdown with available portfolios on the current page.
+        add_action( 'wp_before_admin_bar_render', array( $this, 'wp_before_admin_bar_render' ) );
+
         // register controls.
         add_action( 'init', array( $this, 'register_controls' ) );
 
@@ -605,6 +608,51 @@ class Visual_Portfolio_Admin {
             echo '<code class="vp-onclick-selection">';
             echo '[visual_portfolio id="' . get_the_ID() . '"]';
             echo '</code>';
+        }
+    }
+
+    /**
+     * Add admin dropdown menu with all used Layouts on the current page.
+     */
+    public function wp_before_admin_bar_render() {
+        global $wp_admin_bar;
+
+        if ( ! is_super_admin() || ! is_admin_bar_showing() ) {
+            return;
+        }
+
+        // add all nodes of all Slider.
+        $layouts = Visual_Portfolio_Get::get_all_currently_used_ids();
+        $layouts = array_unique( $layouts );
+
+        if ( ! empty( $layouts ) ) {
+            $wp_admin_bar->add_node( array(
+                'parent' => false,
+                'id'     => 'visual_portfolio',
+                'title'  => esc_html__( 'Visual Portfolio', '@@text_domain' ),
+                'href'   => admin_url( 'edit.php?post_type=vp_lists' ),
+            ) );
+
+            // get visual-portfolio post types by IDs.
+            // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
+            $vp_query = get_posts(
+                array(
+                    'post_type'      => 'vp_lists',
+                    // phpcs:ignore
+                    'posts_per_page' => -1,
+                    'showposts'      => -1,
+                    'paged'          => -1,
+                    'post__in'       => $layouts,
+                )
+            );
+            foreach ( $vp_query as $post ) {
+                $wp_admin_bar->add_node( array(
+                    'parent' => 'visual_portfolio',
+                    'id'     => 'vp_list_' . esc_html( $post->ID ),
+                    'title'  => esc_html( $post->post_title ),
+                    'href'   => admin_url( 'post.php?post=' . $post->ID ) . '&action=edit',
+                ) );
+            }
         }
     }
 
