@@ -1294,6 +1294,23 @@ class VP {
                 resizeVideo( this );
             } );
 
+            // disable video play if no active.
+            gallery.listen( 'beforeChange', function() {
+                const data = this;
+                if ( data && data.itemHolders.length ) {
+                    const currentIndex = data.getCurrentIndex();
+
+                    data.itemHolders.forEach( ( val ) => {
+                        if ( val.el && val.index !== currentIndex ) {
+                            const $iframe = $( val.el ).find( '.vp-pswp-video iframe' );
+                            if ( $iframe.length ) {
+                                $iframe.attr( 'src', $iframe.attr( 'src' ) );
+                            }
+                        }
+                    } );
+                }
+            } );
+
             // remove video block
             gallery.listen( 'destroy', function() {
                 const data = this;
