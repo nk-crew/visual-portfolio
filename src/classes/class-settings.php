@@ -123,6 +123,13 @@ class Visual_Portfolio_Settings {
                     'default' => 'portfolio',
                 ),
                 array(
+                    'name'    => 'filter_taxonomies',
+                    'label'   => esc_html__( 'Filter Taxonomies', '@@text_domain' ),
+                    'desc'    => esc_html__( 'You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by "," separating values. Example: "product_cat,product_tag"', '@@text_domain' ),
+                    'type'    => 'text',
+                    'default' => '',
+                ),
+                array(
                     'name'    => 'no_image',
                     'label'   => esc_html__( 'No image', '@@text_domain' ),
                     'desc'    => esc_html__( 'This image used if featured image of post is not specified.', '@@text_domain' ),

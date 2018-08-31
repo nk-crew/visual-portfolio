@@ -100,12 +100,23 @@ class Visual_Portfolio_Get {
      * @return bool
      */
     public static function allow_taxonomies_for_filter( $taxonomy ) {
+        // check taxonomies from settings.
+        $custom_taxonomies        = Visual_Portfolio_Settings::get_option( 'filter_taxonomies', 'vp_general', '' );
+        $custom_taxonomies        = explode( ',', $custom_taxonomies );
+        $custom_taxonomies_result = false;
+        if ( $custom_taxonomies && ! empty( $custom_taxonomies ) ) {
+            foreach ( $custom_taxonomies as $tax ) {
+                $custom_taxonomies_result = $custom_taxonomies_result || 'product_cat' === $tax;
+            }
+        }
+
         return apply_filters(
             'vpf_allow_taxonomy_for_filter',
-            strpos( $taxonomy, 'category' )
-            || strpos( $taxonomy, 'jetpack-portfolio-type' )
-            || 'product_cat' === $taxonomy
-            || 'product_tag' === $taxonomy,
+            $custom_taxonomies_result
+                || strpos( $taxonomy, 'category' )
+                || strpos( $taxonomy, 'jetpack-portfolio-type' )
+                || 'product_cat' === $taxonomy
+                || 'product_tag' === $taxonomy,
             $taxonomy
         );
     }
