@@ -15,8 +15,10 @@ Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, co
 
 Visual Portfolio editor let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry, Justified, Tiles or Carousel layouts.
 
-See **Online Demo** here - [https://demo.nkdev.info/#visual-portfolio](https://demo.nkdev.info/#visual-portfolio)
+#### Links ####
 
+* [Live Demo](https://demo.nkdev.info/#visual-portfolio)
+* [GitHub](https://github.com/nk-o/visual-portfolio)
 
 ## Features ##
 
