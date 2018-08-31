@@ -3,6 +3,9 @@
  */
 
 // External Dependencies.
+if ( ! global._babelPolyfill ) {
+    require( 'babel-polyfill' );
+}
 import classnames from 'classnames/dedupe';
 import ReactIframeResizer from 'react-iframe-resizer-super';
 
@@ -26,8 +29,74 @@ const {
     Placeholder,
     Spinner,
     SelectControl,
-    withAPIData,
 } = wp.components;
+
+const { apiFetch } = wp;
+const {
+    registerStore,
+    withSelect,
+} = wp.data;
+
+const actions = {
+    setPortfolioLayouts( query, layouts ) {
+        return {
+            type: 'SET_PORTFOLIO_LAYOUTS',
+            query,
+            layouts,
+        };
+    },
+    getPortfolioLayouts( query ) {
+        return {
+            type: 'GET_PORTFOLIO_LAYOUTS',
+            query,
+        };
+    },
+};
+registerStore( 'nk/visual-portfolio', {
+    reducer( state = { layouts: {} }, action ) {
+        switch ( action.type ) {
+        case 'SET_PORTFOLIO_LAYOUTS':
+            if ( ! state.layouts[ action.query ] && action.layouts ) {
+                state.layouts[ action.query ] = action.layouts;
+            }
+            return state;
+        case 'GET_PORTFOLIO_LAYOUTS':
+            return action.layouts[ action.query ];
+        // no default
+        }
+        return state;
+    },
+    actions,
+    selectors: {
+        getPortfolioLayouts( state, query ) {
+            return state.layouts[ query ];
+        },
+    },
+    resolvers: {
+        * getPortfolioLayouts( state, query ) {
+            const layouts = apiFetch( { path: query } )
+                .catch( ( fetchedData ) => {
+                    if ( fetchedData && fetchedData.error && 'no_layouts_found' === fetchedData.error_code ) {
+                        return {
+                            response: [],
+                            error: false,
+                            success: true,
+                        };
+                    }
+
+                    return false;
+                } )
+                .then( ( fetchedData ) => {
+                    if ( fetchedData && fetchedData.success && fetchedData.response ) {
+                        return actions.setPortfolioLayouts( query, fetchedData.response );
+                    }
+
+                    return false;
+                } );
+            yield layouts;
+        },
+    },
+} );
 
 class VPEdit extends Component {
     // prevent re-render when ID has not changed.
@@ -66,13 +135,13 @@ class VPEdit extends Component {
         }
 
         // prepare portfolios list.
-        if ( portfolioLayouts && portfolioLayouts.data && portfolioLayouts.data.success ) {
+        if ( portfolioLayouts ) {
             portfolioLayoutsSelect = [ {
                 label: __( '--- Select layout ---' ),
                 value: '',
             } ];
-            Object.keys( portfolioLayouts.data.response ).map( ( key ) => {
-                const val = portfolioLayouts.data.response[ key ];
+            Object.keys( portfolioLayouts ).map( ( key ) => {
+                const val = portfolioLayouts[ key ];
                 portfolioLayoutsSelect.push( {
                     label: `#${ val.id } - ${ val.title }`,
                     value: val.id,
@@ -160,9 +229,9 @@ registerBlockType( 'nk/visual-portfolio', {
         },
     },
 
-    edit: withAPIData( () => {
+    edit: withSelect( ( select ) => {
         return {
-            portfolioLayouts: '/visual-portfolio/v1/get_layouts/',
+            portfolioLayouts: select( 'nk/visual-portfolio' ).getPortfolioLayouts( '/visual-portfolio/v1/get_layouts/' ),
         };
     } )( VPEdit ),
 

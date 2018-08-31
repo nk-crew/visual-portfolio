@@ -79,8 +79,8 @@
         "babel-core": "^6.26.0",
         "babel-eslint": "^8.2.2",
         "babel-loader": "^7.1.4",
+        "babel-plugin-transform-object-rest-spread": "^6.26.0",
         "babel-plugin-transform-react-jsx": "^6.24.1",
-        "babel-polyfill": "^6.26.0",
         "babel-preset-env": "^1.6.1",
         "cross-env": "^5.1.4",
         "css-loader": "^0.28.11",
@@ -131,6 +131,7 @@
         "webpack-stream": "^4.0.3"
     },
     "dependencies": {
+        "babel-polyfill": "^6.26.0",
         "classnames": "^2.2.5",
         "iframe-resizer": "^3.6.1",
         "react": "^16.3.1",
