@@ -132,7 +132,7 @@ class Visual_Portfolio_Settings {
                 array(
                     'name'    => 'no_image',
                     'label'   => esc_html__( 'No image', '@@text_domain' ),
-                    'desc'    => esc_html__( 'This image used if featured image of post is not specified.', '@@text_domain' ),
+                    'desc'    => esc_html__( 'This image used if the featured image of a post is not specified.', '@@text_domain' ),
                     'type'    => 'image',
                     'default' => '',
                     'options' => array(
