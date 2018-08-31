@@ -450,7 +450,7 @@ class Visual_Portfolio_Controls {
                         $selected = true;
                     }
                 } else {
-                    $selected = $args['value'] == $check_val;
+                    $selected = $args['value'] === $check_val;
                 }
 
                 ?>
