@@ -115,8 +115,7 @@ class Visual_Portfolio_Get {
             $custom_taxonomies_result
                 || strpos( $taxonomy, 'category' )
                 || strpos( $taxonomy, 'jetpack-portfolio-type' )
-                || 'product_cat' === $taxonomy
-                || 'product_tag' === $taxonomy,
+                || 'product_cat' === $taxonomy,
             $taxonomy
         );
     }
