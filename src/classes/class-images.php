@@ -191,6 +191,12 @@ class Visual_Portfolio_Images {
         // The right Image Placeholder.
         $metadata = get_post_meta( $attachment_id, '_wp_attachment_metadata', true );
 
+        // generate new placeholder.
+        if ( ! isset( $metadata['placeholder'] ) ) {
+            $metadata = self::generate_attachment_placeholder( $metadata );
+            update_post_meta( $attachment_id, '_wp_attachment_metadata', $metadata );
+        }
+
         if ( isset( $metadata['sizes'][ $size ]['placeholder'] ) ) {
             $placeholder = $metadata['sizes'][ $size ]['placeholder'];
         } elseif ( isset( $metadata['placeholder'] ) ) {
