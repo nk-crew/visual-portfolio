@@ -1118,14 +1118,16 @@ class Visual_Portfolio_Get {
                             $img_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_popup'] );
                             $img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
                             $popup_image = array(
-                                'title' => $attachment->post_title,
+                                'title'       => $attachment->post_title,
                                 'description' => $attachment->post_content,
-                                'url' => $img_meta[0],
-                                'width' => $img_meta[1],
-                                'height' => $img_meta[2],
-                                'md_url' => $img_md_meta[0],
-                                'md_width' => $img_md_meta[1],
-                                'md_height' => $img_md_meta[2],
+                                'caption'     => wp_get_attachment_caption( $attachment->ID ),
+                                'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+                                'url'         => $img_meta[0],
+                                'width'       => $img_meta[1],
+                                'height'      => $img_meta[2],
+                                'md_url'      => $img_md_meta[0],
+                                'md_width'    => $img_md_meta[1],
+                                'md_height'   => $img_md_meta[2],
                             );
                         }
                     }
@@ -1145,24 +1147,37 @@ class Visual_Portfolio_Get {
         <div class="vp-portfolio__item-wrap" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
             <?php
             if ( $popup_image ) {
+                $title_source       = Visual_Portfolio_Settings::get_option( 'caption_title', 'vp_popup_gallery', 'title' );
+                $description_source = Visual_Portfolio_Settings::get_option( 'caption_description', 'vp_popup_gallery', 'description' );
+
                 ?>
                 <div class="vp-portfolio__item-popup"
-                     style="display: none;"
-                     data-vp-popup-img="<?php echo esc_url( $popup_image['url'] ); ?>"
-                     data-vp-popup-img-size="<?php echo esc_attr( $popup_image['width'] . 'x' . $popup_image['height'] ); ?>"
-                     data-vp-popup-md-img="<?php echo esc_url( $popup_image['md_url'] ); ?>"
-                     data-vp-popup-md-img-size="<?php echo esc_attr( $popup_image['md_width'] . 'x' . $popup_image['md_height'] ); ?>"
+                    style="display: none;"
+                    data-vp-popup-img="<?php echo esc_url( $popup_image['url'] ); ?>"
+                    data-vp-popup-img-size="<?php echo esc_attr( $popup_image['width'] . 'x' . $popup_image['height'] ); ?>"
+                    data-vp-popup-md-img="<?php echo esc_url( $popup_image['md_url'] ); ?>"
+                    data-vp-popup-md-img-size="<?php echo esc_attr( $popup_image['md_width'] . 'x' . $popup_image['md_height'] ); ?>"
                 >
-                    <h3><?php echo esc_html( $popup_image['title'] ); ?></h3>
-                    <?php echo wp_kses_post( $popup_image['description'] ); ?>
+                    <?php
+                    if ( isset( $popup_image[ $title_source ] ) && $popup_image[ $title_source ] ) {
+                        ?>
+                        <h3><?php echo esc_html( $popup_image[ $title_source ] ); ?></h3>
+                        <?php
+                    }
+                    if ( isset( $popup_image[ $description_source ] ) && $popup_image[ $description_source ] ) {
+                        ?>
+                        <div><?php echo wp_kses_post( $popup_image[ $description_source ] ); ?></div>
+                        <?php
+                    }
+                    ?>
                 </div>
                 <?php
             } else if ( $popup_video ) {
                 ?>
                 <div class="vp-portfolio__item-popup"
-                     style="display: none;"
-                     data-vp-popup-video="<?php echo esc_attr( $popup_video['html'] ); ?>"
-                     data-vp-popup-video-size="<?php echo esc_attr( $popup_video['width'] . 'x' . $popup_video['height'] ); ?>"
+                    style="display: none;"
+                    data-vp-popup-video="<?php echo esc_attr( $popup_video['html'] ); ?>"
+                    data-vp-popup-video-size="<?php echo esc_attr( $popup_video['width'] . 'x' . $popup_video['height'] ); ?>"
                 ></div>
                 <?php
             }

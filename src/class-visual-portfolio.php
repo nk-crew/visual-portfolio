@@ -225,13 +225,13 @@ class Visual_Portfolio {
                 'pswp_share_pin' => esc_attr( 'Pin it', '@@text_domain' ),
             ),
             'settingsPopupGallery' => array(
-                'show_arrows' => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
-                'show_caption' => Visual_Portfolio_Settings::get_option( 'show_caption', 'vp_popup_gallery', true ),
-                'show_counter' => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
-                'show_zoom_button' => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
+                'show_arrows'            => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
+                'show_caption'           => Visual_Portfolio_Settings::get_option( 'show_caption', 'vp_popup_gallery', true ),
+                'show_counter'           => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
+                'show_zoom_button'       => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
                 'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery', true ),
-                'show_share_button' => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery', true ),
-                'show_close_button' => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
+                'show_share_button'      => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery', true ),
+                'show_close_button'      => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
             ),
         );
         wp_localize_script( '@@plugin_name', 'VPData', $data_init );
