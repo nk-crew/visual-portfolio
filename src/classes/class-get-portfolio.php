@@ -102,7 +102,10 @@ class Visual_Portfolio_Get {
     public static function allow_taxonomies_for_filter( $taxonomy ) {
         return apply_filters(
             'vpf_allow_taxonomy_for_filter',
-            strpos( $taxonomy, 'category' ) || strpos( $taxonomy, 'jetpack-portfolio-type' ),
+            strpos( $taxonomy, 'category' )
+            || strpos( $taxonomy, 'jetpack-portfolio-type' )
+            || 'product_cat' === $taxonomy
+            || 'product_tag' === $taxonomy,
             $taxonomy
         );
     }
