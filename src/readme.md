@@ -434,6 +434,18 @@ Available methods:
 
 ## Changelog ##
 
+= 1.7.0 =
+
+* added support for Gutenberg 3.7.0
+* added setting for custom taxonomies to show in portfolio filter
+* added support for WooCommerce categories in portfolio filter
+* added settings for the title and description popup gallery caption
+* added Read More button option for Default Items Style
+* added dropdown in top admin menu with the list of available portfolios on this page
+* added generation placeholders on the fly (no more need to regenerate thumbnails to get placeholder)
+* fixed popup image title color (were dark)
+* fixed popup video play after going to the next slide
+
 = 1.6.5 =
 
 * added options for texts in filter and pagination
