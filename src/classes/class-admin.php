@@ -1145,7 +1145,34 @@ class Visual_Portfolio_Admin {
                     'show_icons' => false,
                     'align' => true,
                 ),
-                'controls' => array(),
+                'controls' => array(
+                    array(
+                        'type'    => 'select2',
+                        'label'   => esc_html__( 'Show Read more button', '@@text_domain' ),
+                        'name'    => 'show_read_more',
+                        'default' => false,
+                        'options' => array(
+                            'false' => esc_html__( 'False', '@@text_domain' ),
+                            'true' => esc_html__( 'Always show', '@@text_domain' ),
+                            'more_tag' => esc_html__( 'Show when used "More tag" in the post', '@@text_domain' ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'text',
+                        'name'    => 'read_more_label',
+                        'placeholder' => 'Read More',
+                        'default' => 'Read More',
+                        'hint'    => esc_attr__( 'Read more button label', '@@text_domain' ),
+                        'hint_place' => 'left',
+                        'condition' => array(
+                            array(
+                                'control' => 'show_read_more',
+                                'operator' => '!=',
+                                'value' => 'false',
+                            ),
+                        ),
+                    ),
+                ),
             ),
 
             // Fly.

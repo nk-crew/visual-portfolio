@@ -1066,6 +1066,8 @@ class Visual_Portfolio_Get {
      *      'vp_opts' - vp options.
      */
     private static function each_item( $args ) {
+        global $post;
+
         // prepare image.
         $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'] );
 
@@ -1081,6 +1083,19 @@ class Visual_Portfolio_Get {
             // fallback for Visual Portfolio 1.2.1 version.
             $args['opts']['date_human_format'] = 'human' === $args['opts']['show_date'];
             $args['published_human_format'] = $args['published'];
+        }
+
+        // prepare read more button.
+        if ( isset( $args['opts']['show_read_more'] ) && $args['opts']['show_read_more'] ) {
+            if ( 'more_tag' === $args['opts']['show_read_more'] ) {
+                if ( strpos( $post->post_content, '<!--more-->' ) ) {
+                    $args['opts']['read_more_url'] = $args['url'] . '#more-' . get_the_ID();
+                } else {
+                    $args['opts']['show_read_more'] = false;
+                }
+            } else {
+                $args['opts']['read_more_url'] = $args['url'];
+            }
         }
 
         // add video format args.
