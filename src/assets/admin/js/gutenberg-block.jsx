@@ -10,8 +10,7 @@ import classnames from 'classnames/dedupe';
 import ReactIframeResizer from 'react-iframe-resizer-super';
 
 // Internal Dependencies.
-import elementIconBlack from '../images/icon-black.svg';
-import elementIconGray from '../images/icon-gray.svg';
+import ElementIcon from '../images/icon-gutenberg.svg';
 
 const variables = window.VPAdminGutenbergVariables;
 
@@ -165,7 +164,7 @@ class VPEdit extends Component {
             <div className={ className }>
                 <Placeholder
                     className="visual-portfolio-gutenberg-placeholder"
-                    icon={ <img className="visual-portfolio-gutenberg-icon" src={ elementIconGray } alt="visual-portfolio-icon" /> }
+                    icon={ <ElementIcon /> }
                     label={ __( 'Visual Portfolio' ) }
                 >
                     { ! Array.isArray( portfolioLayoutsSelect ) &&
@@ -208,7 +207,7 @@ registerBlockType( 'nk/visual-portfolio', {
     title: 'Visual Portfolio',
 
     // add element with classname to support different icon sets like FontAwesome.
-    icon: <img className="dashicon visual-portfolio-gutenberg-icon" src={ elementIconBlack } alt="visual-portfolio-icon" />,
+    icon: ElementIcon,
 
     category: 'common',
 

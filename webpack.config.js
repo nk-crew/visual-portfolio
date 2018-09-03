@@ -20,13 +20,7 @@ module.exports = {
             }, {
                 test: /\.svg$/,
                 use: [
-                    {
-                        loader: 'svg-url-loader',
-                        options: {
-                            noquotes: true,
-                        },
-                    },
-                    'svgo-loader',
+                    '@svgr/webpack',
                 ],
             },
         ],
