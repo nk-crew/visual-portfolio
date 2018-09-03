@@ -106,15 +106,15 @@ class Visual_Portfolio_Get {
         $custom_taxonomies_result = false;
         if ( $custom_taxonomies && ! empty( $custom_taxonomies ) ) {
             foreach ( $custom_taxonomies as $tax ) {
-                $custom_taxonomies_result = $custom_taxonomies_result || 'product_cat' === $tax;
+                $custom_taxonomies_result = $custom_taxonomies_result || $custom_taxonomies === $tax;
             }
         }
 
         return apply_filters(
             'vpf_allow_taxonomy_for_filter',
             $custom_taxonomies_result
-                || strpos( $taxonomy, 'category' )
-                || strpos( $taxonomy, 'jetpack-portfolio-type' )
+                || strpos( $taxonomy, 'category' ) !== false
+                || strpos( $taxonomy, 'jetpack-portfolio-type' ) !== false
                 || 'product_cat' === $taxonomy,
             $taxonomy
         );
