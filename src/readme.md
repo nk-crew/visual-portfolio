@@ -434,6 +434,11 @@ Available methods:
 
 ## Changelog ##
 
+= 1.7.1 =
+
+* fixed categories show in filter
+* fixed fade and fly items flex-wrap
+
 = 1.7.0 =
 
 * added support for Gutenberg 3.7.0
