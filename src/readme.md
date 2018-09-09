@@ -17,7 +17,8 @@ Visual Portfolio editor let you create beautiful portfolio layouts. Generates sh
 
 #### Links ####
 
-* [Live Demo](https://demo.nkdev.info/#visual-portfolio)
+* [Live Demo](https://wp.nkdev.info/free-visual-portfolio/)
+* [Documentation](https://wp.nkdev.info/free-visual-portfolio/documentation/getting-started/)
 * [GitHub](https://github.com/nk-o/visual-portfolio)
 
 ## Features ##
