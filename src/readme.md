@@ -161,6 +161,30 @@ Available filters:
 
     Note: On the portfolio will be added data attribute **[data-vp-layout="new_layout"]**, so you can play with it and use jQuery events to initialize the new layout.
 
+* **vpf_extend_tiles** [ $tiles ] - custom tiles.
+
+        add_filter( 'vpf_extend_tiles', 'my_filter_vpf_extend_tiles' );
+
+        function my_filter_vpf_extend_tiles( $tiles ) {
+            return array_merge( $tiles, array(
+                array(
+                    'url' => 'assets/images/tiles-1-1.svg',
+                    'value' => '1|1,0.5|',
+                ),
+                array(
+                    'url' => 'assets/images/tiles-2-1.svg',
+                    'value' => '2|1,1|',
+                ),
+            ) );
+        }
+
+    Example:
+    3|1,0.5|2,0.25|
+
+    * 3 columns in row
+    * First item 100% width and 50% height
+    * Second item 200% width and 25% height
+
 * **vpf_extend_items_styles** [ $items_styles ] - custom items styles.
 
         add_filter( 'vpf_extend_items_styles', 'my_filter_vpf_extend_items_styles' );

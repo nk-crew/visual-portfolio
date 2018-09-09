@@ -718,7 +718,7 @@ class Visual_Portfolio_Admin {
                         'placeholder' => esc_html__( 'Select tiles type', '@@text_domain' ),
                         'name'  => 'type',
                         'default' => '3|1,1|',
-                        'options' => array(
+                        'options' => array_merge( array(
                             array(
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-1-1.svg',
                                 'value' => '1|1,0.5|',
@@ -827,7 +827,7 @@ class Visual_Portfolio_Admin {
                                 'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-5.svg',
                                 'value' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
                             ),
-                        ),
+                        ), Visual_Portfolio_Extend::tiles() ),
                     ),
                 ),
             ),

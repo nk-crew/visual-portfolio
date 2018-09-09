@@ -40,6 +40,28 @@ class Visual_Portfolio_Extend {
     }
 
     /**
+     * Additional Tiles.
+     *
+     * @return array
+     */
+    public static function tiles() {
+        /*
+         * Example:
+            array(
+                array(
+                    'url' => 'assets/images/tiles-1-1.svg',
+                    'value' => '1|1,0.5|',
+                ),
+                array(
+                    'url' => 'assets/images/tiles-2-1.svg',
+                    'value' => '2|1,1|',
+                ),
+            )
+         */
+        return apply_filters( 'vpf_extend_tiles', array() );
+    }
+
+    /**
      * Additional Items Styles.
      *
      * @return array
