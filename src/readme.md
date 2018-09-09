@@ -1,4 +1,5 @@
 # Visual Portfolio #
+
 * Contributors: nko
 * Tags: portfolio, gallery, works, masonry, popup
 * Requires at least: 4.0.0
@@ -10,12 +11,11 @@
 
 Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, coverflow, custom posts, custom images.
 
-
 ## Description ##
 
-Visual Portfolio editor let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry, Justified, Tiles or Carousel layouts.
+Visual Portfolio let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry, Justified, Tiles or Carousel layouts.
 
-#### Links ####
+### Links ###
 
 * [Live Demo](https://wp.nkdev.info/free-visual-portfolio/)
 * [Documentation](https://wp.nkdev.info/free-visual-portfolio/documentation/getting-started/)
@@ -26,15 +26,15 @@ Visual Portfolio editor let you create beautiful portfolio layouts. Generates sh
 * Visual preview for portfolio layouts shortcode builder
 * Templates for theme developers
 * 4 predefined layouts:
-    * Masonry
-    * Justified (Flickr)
-    * Tiles
-    * Slider (+ Carousel, Coverflow)
+  * Masonry
+  * Justified (Flickr)
+  * Tiles
+  * Slider (+ Carousel, Coverflow)
 * 3 predefined hover effects:
-   * Fade
-   * Emerge
-   * Fly
-   * Default (no hover effect)
+  * Fade
+  * Emerge
+  * Fly
+  * Default (no hover effect)
 * Infinite Scroll
 * Load More
 * Paged layouts
@@ -44,22 +44,19 @@ Visual Portfolio editor let you create beautiful portfolio layouts. Generates sh
 * Stretch option (if you want to break the fixed container of the page)
 * Custom image sets
 * Custom posts type layouts (not only portfolio)
-   * Posts by type
-   * Posts by specific ID
-   * Posts by taxonomies
-   * Custom order
+  * Posts by type
+  * Posts by specific ID
+  * Posts by taxonomies
+  * Custom order
 * Custom CSS for each portfolio layouts
 * Shortcode generated, so you can place unlimited portfolio layouts on the page
 * Gutenberg WordPress builder supported
 * WPBakery Page Builder page builder supported
 
-
 ## Real Examples ##
 
 * [Piroll - Portfolio Theme](https://demo.nkdev.info/#piroll)
 * [Snow - Portfolio Theme](https://demo.nkdev.info/#snow)
-
-
 
 ## Screenshots ##
 
@@ -78,20 +75,17 @@ Visual Portfolio editor let you create beautiful portfolio layouts. Generates sh
 13. Example: Tiles + Popup gallery
 14. Example: Popup Gallery
 
-
-
 ## Installation ##
 
-#### Automatic installation ####
+### Automatic installation ###
 
 Automatic installation is the easiest option as WordPress handles the file transfers itself and you don’t need to leave your web browser. To do an automatic install of Visual Portfolio, log in to your WordPress dashboard, navigate to the Plugins menu and click Add New.
 
 In the search field type “Visual Portfolio” and click Search Plugins. Once you’ve found our plugin you can view details about it such as the point release, rating and description. Most importantly of course, you can install it by simply clicking “Install Now”.
 
-#### Manual installation ####
+### Manual installation ###
 
 The manual installation method involves downloading our Visual Portfolio plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
-
 
 ## Frequently Asked Questions ##
 
