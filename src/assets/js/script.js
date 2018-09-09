@@ -90,7 +90,8 @@ class VP {
     // });
     emitEvent( event, data ) {
         data = data ? [ this ].concat( data ) : [ this ];
-        this.$item.trigger( `${ event }.vpf.vpf-uid-${ this.uid }`, data );
+        this.$item.trigger( `${ event }.vpf`, data );
+        this.$item.trigger( `${ event }.vpf-uid-${ this.uid }`, data );
     }
 
     /**
@@ -395,7 +396,7 @@ class VP {
      */
     initEvents() {
         const self = this;
-        const evp = `.vpf.vpf-uid-${ self.uid }`;
+        const evp = `.vpf-uid-${ self.uid }`;
 
         // Stretch
         function stretch() {
@@ -571,7 +572,7 @@ class VP {
      */
     destroyEvents() {
         const self = this;
-        const evp = `.vpf.vpf-uid-${ self.uid }`;
+        const evp = `.vpf-uid-${ self.uid }`;
 
         // destroy click events
         self.$item.off( evp );
@@ -1350,7 +1351,7 @@ class VP {
         };
 
         // click action
-        self.$item.on( `click.vpf.vpf-uid-${ self.uid }`, '.vp-portfolio__item', function( e ) {
+        self.$item.on( `click.vpf-uid-${ self.uid }`, '.vp-portfolio__item', function( e ) {
             e.preventDefault();
 
             let index = 0;
@@ -1378,7 +1379,7 @@ class VP {
     destroyPhotoswipe() {
         const self = this;
 
-        self.$item.off( `click.vpf.vpf-uid-${ self.uid }` );
+        self.$item.off( `click.vpf-uid-${ self.uid }` );
 
         $( `.vp-pswp-uid-${ self.uid }` ).remove();
     }
