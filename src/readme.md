@@ -119,6 +119,12 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.7.2 =
+
+* added link to Documentation in admin menu
+* added **vpf_extend_tiles** filter
+* fixed custom jquery events triggering
+
 = 1.7.1 =
 
 * fixed categories show in filter
