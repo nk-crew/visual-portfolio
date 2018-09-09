@@ -180,7 +180,7 @@ Available filters:
                         'show_date' => true,
                         'show_excerpt' => true,
                         'show_icons' => false,
-                        'align' => true,
+                        'align' => true, // true, false, 'extended'
                     ),
                     'controls' => array(
                         ... controls (read below) ...
