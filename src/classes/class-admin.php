@@ -51,7 +51,7 @@ class Visual_Portfolio_Admin {
         add_filter( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_shortcode_column' ), 10, 2 );
 
         // highlight admin menu items.
-        add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+        add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
 
         // show admin menu dropdown with available portfolios on the current page.
         add_action( 'wp_before_admin_bar_render', array( $this, 'wp_before_admin_bar_render' ) );
@@ -678,6 +678,15 @@ class Visual_Portfolio_Admin {
                 }
             }
         }
+
+        // Documentation menu link.
+        add_submenu_page(
+            'edit.php?post_type=portfolio',
+            esc_html__( 'Documentation', '@@text_domain' ),
+            esc_html__( 'Documentation', '@@text_domain' ),
+            'manage_options',
+            'https://wp.nkdev.info/free-visual-portfolio/documentation/getting-started/'
+        );
     }
 
     /**
