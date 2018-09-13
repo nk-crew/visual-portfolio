@@ -1,4 +1,5 @@
 const UglifyJsPlugin = require( 'uglifyjs-webpack-plugin' );
+const md5 = require( 'md5' );
 
 module.exports = {
     module: {
@@ -19,9 +20,23 @@ module.exports = {
                 ],
             }, {
                 test: /\.svg$/,
-                use: [
-                    '@svgr/webpack',
-                ],
+                use: ( { resource } ) => ( {
+                    loader: '@svgr/webpack',
+                    options: {
+                        svgoConfig: {
+                            plugins: [
+                                {
+                                    removeViewBox: false,
+                                },
+                                {
+                                    cleanupIDs: {
+                                        prefix: `visual-portfolio-${ md5( resource ) }-`,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                } ),
             },
         ],
     },
