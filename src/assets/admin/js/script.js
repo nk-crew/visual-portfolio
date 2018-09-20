@@ -12,6 +12,8 @@ const {
     emmetCodeMirror,
 } = window;
 
+import { debounce } from 'throttle-debounce';
+
 const $body = $( 'body' );
 const $window = $( window );
 const $editForm = $( 'form[name="post"]' );
@@ -39,7 +41,25 @@ if ( $videoMetabox.length && $videoFormatCheckbox.length ) {
     } );
 }
 let oembedAjax = null;
-let oembedAjaxTimeout;
+function runAjaxVideoOembed( $this ) {
+    oembedAjax = $.ajax( {
+        url: ajaxurl,
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            action: 'vp_find_oembed',
+            q: $this.val(),
+            nonce: VPAdminVariables.nonce,
+        },
+        complete( data ) {
+            const json = data.responseJSON;
+            if ( json && typeof json.html !== 'undefined' ) {
+                $this.next( '.vp-oembed-preview' ).html( json.html );
+            }
+        },
+    } );
+}
+runAjaxVideoOembed = debounce( 300, runAjaxVideoOembed );
 $body.on( 'change input', '.vp-input[name="video_url"]', function() {
     if ( oembedAjax !== null ) {
         oembedAjax.abort();
@@ -48,25 +68,7 @@ $body.on( 'change input', '.vp-input[name="video_url"]', function() {
     const $this = $( this );
     $this.next( '.vp-oembed-preview' ).html( '' );
 
-    clearTimeout( oembedAjaxTimeout );
-    oembedAjaxTimeout = setTimeout( () => {
-        oembedAjax = $.ajax( {
-            url: ajaxurl,
-            method: 'GET',
-            dataType: 'json',
-            data: {
-                action: 'vp_find_oembed',
-                q: $this.val(),
-                nonce: VPAdminVariables.nonce,
-            },
-            complete( data ) {
-                const json = data.responseJSON;
-                if ( json && typeof json.html !== 'undefined' ) {
-                    $this.next( '.vp-oembed-preview' ).html( json.html );
-                }
-            },
-        } );
-    }, 250 );
+    runAjaxVideoOembed( $this );
 } );
 
 // Popper.js
@@ -123,19 +125,9 @@ if ( typeof Tooltip !== 'undefined' ) {
     // color picker
     if ( $.fn.wpColorPicker ) {
         $( '.vp-color-picker' ).each( function() {
-            let colorPickerTimeout;
-            let initialCall = true;
-            function onChange( e ) {
-                if ( initialCall ) {
-                    initialCall = false;
-                    return;
-                }
-                clearTimeout( colorPickerTimeout );
-                colorPickerTimeout = setTimeout( () => {
-                    $( e.target ).change();
-                }, 300 );
-            }
-            $( this ).data( 'change', onChange ).wpColorPicker();
+            $( this ).data( 'change', debounce( 300, ( e ) => {
+                $( e.target ).change();
+            } ) ).wpColorPicker();
         } );
     }
 
@@ -186,7 +178,12 @@ if ( typeof Tooltip !== 'undefined' ) {
     }
 
     // portfolio options changed
-    let reloadTimeout;
+    function reloadFrame() {
+        frameJQuery = false;
+        $framePortfolio = false;
+        $previewForm.submit();
+    }
+    reloadFrame = debounce( 400, reloadFrame );
     $editForm.on( 'change input vp-fake-change vp-fake-input', '[name*="vp_"]', function( e ) {
         const $this = $( this );
 
@@ -228,12 +225,7 @@ if ( typeof Tooltip !== 'undefined' ) {
 
         // reload frame
         if ( data.reload || ! $framePortfolio ) {
-            clearTimeout( reloadTimeout );
-            reloadTimeout = setTimeout( () => {
-                frameJQuery = false;
-                $framePortfolio = false;
-                $previewForm.submit();
-            }, 400 );
+            reloadFrame();
         }
     } );
 
@@ -693,32 +685,28 @@ if ( typeof Tooltip !== 'undefined' ) {
             } );
 
             // edit item
-            let updateTimer;
-            $gallery.on( 'change input', '.vp-control-gallery-additional-data [name]', function() {
-                clearTimeout( updateTimer );
-                updateTimer = setTimeout( () => {
-                    const $dataBlock = $gallery.children( '.vp-control-gallery-additional-data' );
-                    const galleryName = $gallery.children( 'textarea' ).attr( 'name' );
-                    const id = $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img.active' ).attr( 'data-image-id' );
+            $gallery.on( 'change input', '.vp-control-gallery-additional-data [name]', debounce( 200, function() {
+                const $dataBlock = $gallery.children( '.vp-control-gallery-additional-data' );
+                const galleryName = $gallery.children( 'textarea' ).attr( 'name' );
+                const id = $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img.active' ).attr( 'data-image-id' );
 
-                    if ( id ) {
-                        const $currentItem = $gallery.children( '.vp-control-gallery-items' ).find( '[data-image-id="' + id + '"]' );
+                if ( id ) {
+                    const $currentItem = $gallery.children( '.vp-control-gallery-items' ).find( '[data-image-id="' + id + '"]' );
 
-                        $dataBlock.find( '[name*="' + galleryName + '_additional_"]' ).each( function() {
-                            const name = $( this ).attr( 'name' ).replace( galleryName + '_additional_', '' ).replace( '[]', '' );
-                            let val = $( this ).val() || '';
+                    $dataBlock.find( '[name*="' + galleryName + '_additional_"]' ).each( function() {
+                        const name = $( this ).attr( 'name' ).replace( galleryName + '_additional_', '' ).replace( '[]', '' );
+                        let val = $( this ).val() || '';
 
-                            if ( typeof val === 'object' ) {
-                                val = JSON.stringify( val );
-                            }
+                        if ( typeof val === 'object' ) {
+                            val = JSON.stringify( val );
+                        }
 
-                            $currentItem.find( '[data-additional="' + name + '"]' ).html( val || '' );
-                        } );
+                        $currentItem.find( '[data-additional="' + name + '"]' ).html( val || '' );
+                    } );
 
-                        updateGalleryData( $gallery );
-                    }
-                }, 200 );
-            } );
+                    updateGalleryData( $gallery );
+                }
+            } ) );
         } );
 
         // remove active classes.

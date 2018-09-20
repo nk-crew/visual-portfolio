@@ -134,6 +134,7 @@
         "classnames": "^2.2.5",
         "iframe-resizer": "^3.6.1",
         "react": "^16.3.1",
-        "react-iframe-resizer-super": "^0.2.0"
+        "react-iframe-resizer-super": "^0.2.0",
+        "throttle-debounce": "^2.0.1"
     }
 }
