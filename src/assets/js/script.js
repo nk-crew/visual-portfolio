@@ -1534,6 +1534,22 @@ class VP {
     }
 }
 
+// Lazyloaded - remove preloader images placeholder effect.
+$( document ).on( 'lazybeforeunveil', function( e ) {
+    const $img = $( e.target );
+
+    if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
+        $img.closest( '.vp-portfolio__item-img' ).addClass( 'vp-portfolio__item-img-lazyloading' );
+    }
+} );
+$( document ).on( 'lazyloaded', function( e ) {
+    const $img = $( e.target );
+
+    if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
+        $img.closest( '.vp-portfolio__item-img-lazyloading' ).removeClass( 'vp-portfolio__item-img-lazyloading' );
+    }
+} );
+
 // global definition
 const plugin = function( options ) {
     const args = Array.prototype.slice.call( arguments, 1 );
