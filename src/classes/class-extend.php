@@ -40,6 +40,23 @@ class Visual_Portfolio_Extend {
     }
 
     /**
+     * Extend Specific Layout Controls.
+     *
+     * @param string $name - layout name.
+     * @param array  $controls - controls array.
+     * @return array
+     */
+    public static function layout_controls( $name, $controls ) {
+        /*
+         * Example:
+            array(
+                ... controls ...
+            )
+         */
+        return apply_filters( 'vpf_extend_layout_' . $name . '_controls', $controls );
+    }
+
+    /**
      * Additional Tiles.
      *
      * @return array
@@ -90,6 +107,23 @@ class Visual_Portfolio_Extend {
     }
 
     /**
+     * Extend Specific Item Style Controls.
+     *
+     * @param string $name - item style name.
+     * @param array  $controls - controls array.
+     * @return array
+     */
+    public static function item_style_controls( $name, $controls ) {
+        /*
+         * Example:
+            array(
+                ... controls ...
+            )
+         */
+        return apply_filters( 'vpf_extend_item_style_' . $name . '_controls', $controls );
+    }
+
+    /**
      * Additional Filters.
      *
      * @return array
@@ -110,6 +144,23 @@ class Visual_Portfolio_Extend {
     }
 
     /**
+     * Extend Specific Filter Controls.
+     *
+     * @param string $name - filter name.
+     * @param array  $controls - controls array.
+     * @return array
+     */
+    public static function filter_controls( $name, $controls ) {
+        /*
+         * Example:
+            array(
+                ... controls ...
+            )
+         */
+        return apply_filters( 'vpf_extend_filter_' . $name . '_controls', $controls );
+    }
+
+    /**
      * Additional Pagination.
      *
      * @return array
@@ -127,6 +178,23 @@ class Visual_Portfolio_Extend {
             )
          */
         return apply_filters( 'vpf_extend_pagination', array() );
+    }
+
+    /**
+     * Extend Specific Pagination Controls.
+     *
+     * @param string $name - filter name.
+     * @param array  $controls - controls array.
+     * @return array
+     */
+    public static function pagination_controls( $name, $controls ) {
+        /*
+         * Example:
+            array(
+                ... controls ...
+            )
+         */
+        return apply_filters( 'vpf_extend_pagination_' . $name . '_controls', $controls );
     }
 
     /**

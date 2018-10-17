@@ -1057,6 +1057,13 @@ class Visual_Portfolio_Admin {
             ),
         ), Visual_Portfolio_Extend::layouts() );
 
+        // Extend specific layout controls.
+        foreach ( $layouts as $name => $layout ) {
+            if ( isset( $layout['controls'] ) ) {
+                $layouts[ $name ]['controls'] = Visual_Portfolio_Extend::layout_controls( $name, $layout['controls'] );
+            }
+        }
+
         // Layouts selector.
         $layouts_selector = array();
         foreach ( $layouts as $name => $layout ) {
@@ -1308,6 +1315,13 @@ class Visual_Portfolio_Admin {
             ),
         ), Visual_Portfolio_Extend::items_styles() );
 
+        // Extend specific item style controls.
+        foreach ( $items_styles as $name => $style ) {
+            if ( isset( $style['controls'] ) ) {
+                $items_styles[ $name ]['controls'] = Visual_Portfolio_Extend::item_style_controls( $name, $style['controls'] );
+            }
+        }
+
         // Styles selector.
         $items_styles_selector = array();
         foreach ( $items_styles as $name => $style ) {
@@ -1521,6 +1535,13 @@ class Visual_Portfolio_Admin {
             ),
         ), Visual_Portfolio_Extend::filters() );
 
+        // Extend specific filter controls.
+        foreach ( $filters as $name => $filter ) {
+            if ( isset( $filter['controls'] ) ) {
+                $filters[ $name ]['controls'] = Visual_Portfolio_Extend::filter_controls( $name, $filter['controls'] );
+            }
+        }
+
         // Filters selector.
         $filters_selector = array();
         foreach ( $filters as $name => $filter ) {
@@ -1637,6 +1658,13 @@ class Visual_Portfolio_Admin {
                 'controls' => array(),
             ),
         ), Visual_Portfolio_Extend::pagination() );
+
+        // Extend specific pagination controls.
+        foreach ( $pagination as $name => $pagin ) {
+            if ( isset( $pagin['controls'] ) ) {
+                $pagination[ $name ]['controls'] = Visual_Portfolio_Extend::pagination_controls( $name, $pagin['controls'] );
+            }
+        }
 
         // Pagination selector.
         $pagination_selector = array();
