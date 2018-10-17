@@ -980,6 +980,9 @@ class VP {
                     el: '.vp-portfolio__items-bullets',
                     clickable: true,
                     dynamicBullets: self.options.sliderBulletsDynamic === 'true',
+                    renderBullet( index, className ) {
+                        return `<span class="${ className }" data-bullet-index="${ index }" data-bullet-number="${ index + 1 }"></span>`;
+                    },
                 },
                 slidesPerView: slidesPerView,
                 breakpoints: breakPoints,
