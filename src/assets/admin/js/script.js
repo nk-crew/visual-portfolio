@@ -163,12 +163,16 @@ if ( typeof Tooltip !== 'undefined' ) {
             const $control = $this.closest( '.vp-control' );
 
             if ( 'none' !== $control.css( 'display' ) ) {
-                const val = $control.find( $this.attr( 'data-style-from' ) ).val();
+                const mask = $this.attr( 'data-style-mask' ) || '$';
+                const val = mask.replace( '$', $control.find( $this.attr( 'data-style-from' ) ).val() );
+                const selector = parentSelector + ' ' + $this.attr( 'data-style-element' );
+                const property = $this.attr( 'data-style-property' );
 
                 if ( styles ) {
                     styles += ' ';
                 }
-                styles += parentSelector + ' ' + $this.attr( 'data-style-element' ) + ' { ' + $this.attr( 'data-style-property' ) + ': ' + val + '; }';
+
+                styles += `${ selector } { ${ property }: ${ val }; }`;
             }
         } );
 

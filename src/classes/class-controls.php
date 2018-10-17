@@ -77,6 +77,7 @@ class Visual_Portfolio_Controls {
              * Array of arrays with data:
              *  'element' - CSS selector string (.vp-portfolio__item, .vp-portfolio__item-overlay, etc).
              *  'property' - CSS property (color, font-size, etc).
+             *  'mask' - CSS value mask, for ex. "$px".
              */
         ),
 
@@ -300,15 +301,18 @@ class Visual_Portfolio_Controls {
         <div class="vp-control-style">
             <?php
             foreach ( $args['style'] as $style ) {
+                if ( $style['element'] && $style['property'] ) {
                 ?>
-                <input type="hidden"
-                       name="<?php echo esc_attr( $args['name'] ); ?>__style[]"
-                       data-style-from="[name='<?php echo esc_attr( $args['name'] ); ?>']"
-                       data-style-element="<?php echo esc_attr( $style['element'] ); ?>"
-                       data-style-property="<?php echo esc_attr( $style['property'] ); ?>"
-                       value=""
-                >
+                    <input type="hidden"
+                        name="<?php echo esc_attr( $args['name'] ); ?>__style[]"
+                        data-style-from="[name='<?php echo esc_attr( $args['name'] ); ?>']"
+                        data-style-element="<?php echo esc_attr( $style['element'] ); ?>"
+                        data-style-property="<?php echo esc_attr( $style['property'] ); ?>"
+                        data-style-mask="<?php echo esc_attr( isset( $style['mask'] ) ? $style['mask'] : '$' ); ?>"
+                        value=""
+                    >
                 <?php
+                }
             }
             ?>
         </div>
