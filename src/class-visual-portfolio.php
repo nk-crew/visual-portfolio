@@ -99,7 +99,7 @@ class Visual_Portfolio {
         // load textdomain.
         load_plugin_textdomain( '@@text_domain', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-        // include helper files.
+        // register images sizes.
         $this->add_image_sizes();
 
         // include helper files.
