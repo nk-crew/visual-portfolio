@@ -220,6 +220,7 @@ registerBlockType( 'nk/visual-portfolio', {
         align: [ 'wide', 'full' ],
         ghostkitIndents: true,
         ghostkitDisplay: true,
+        ghostkitSR: true,
     },
 
     attributes: {
