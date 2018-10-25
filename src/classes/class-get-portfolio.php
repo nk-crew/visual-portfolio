@@ -21,7 +21,7 @@ if ( version_compare( PHP_VERSION, '5.5.9' ) >= 0 ) {
  * Session Start
  */
 function vpf_session_start() {
-    if ( ! session_id() ) {
+    if ( ! is_admin() && ! session_id() ) {
         session_start();
     }
 }
