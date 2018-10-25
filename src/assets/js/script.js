@@ -38,7 +38,19 @@ const screenSizes = [ 320, 576, 768, 992, 1200 ];
 
 // enable object-fit
 if ( typeof objectFitImages !== 'undefined' ) {
-    objectFitImages();
+    // ofi and lazysizes conflicted, so we need to run lazysizes
+    // first and then run ofi polyfill.
+    objectFitImages( '.vp-portfolio img:not(.visual-portfolio-lazyload)' );
+
+    $( document ).on( 'lazybeforeunveil', function( e ) {
+        const $img = $( e.target );
+
+        if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
+            $img.one( 'load', function() {
+                objectFitImages( $img[ 0 ] );
+            } );
+        }
+    } );
 }
 
 /**
