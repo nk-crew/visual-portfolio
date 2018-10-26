@@ -2619,7 +2619,8 @@ class Visual_Portfolio_Admin {
         foreach ( $meta as $item ) {
             if ( isset( $_POST[ $item ] ) ) {
                 if ( 'vp_custom_css' === $item || 'vp_controls_styles' === $item ) {
-                    $result = wp_kses( wp_unslash( $_POST[ $item ] ), array( '\'', '\"' ) );
+                    // phpcs:ignore
+                    $result = wp_kses( $_POST[ $item ], array( '\'', '\"' ) );
                 } else {
                     $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
                 }
