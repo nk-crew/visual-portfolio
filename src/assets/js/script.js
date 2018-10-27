@@ -1236,7 +1236,7 @@ class VP {
             }
 
             // exit if index not found
-            if ( Number.isNaN( options.index ) ) {
+            if ( isNaN( options.index ) ) {
                 return;
             }
 
