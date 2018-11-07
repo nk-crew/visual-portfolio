@@ -2259,10 +2259,11 @@ class Visual_Portfolio_Admin {
                 'name'     => 'vp_posts_order_by',
                 'default'  => 'post_date',
                 'options'  => array(
-                    'post_date' => esc_html__( 'Date', '@@text_domain' ),
-                    'title'     => esc_html__( 'Title', '@@text_domain' ),
-                    'id'        => esc_html__( 'ID', '@@text_domain' ),
-                    'rand'      => esc_html__( 'Random', '@@text_domain' ),
+                    'post_date'  => esc_html__( 'Date', '@@text_domain' ),
+                    'title'      => esc_html__( 'Title', '@@text_domain' ),
+                    'id'         => esc_html__( 'ID', '@@text_domain' ),
+                    'menu_order' => esc_html__( 'Menu Order', '@@text_domain' ),
+                    'rand'       => esc_html__( 'Random', '@@text_domain' ),
                 ),
                 'wrapper_class' => 'vp-col-6',
             )
