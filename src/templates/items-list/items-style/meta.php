@@ -31,7 +31,15 @@ $show_meta = $opts['show_title'] && $args['title'] ||
                     <?php
                     if ( $args['url'] ) {
                         ?>
-                        <a href="<?php echo esc_url( $args['url'] ); ?>">
+                        <a href="<?php echo esc_url( $args['url'] ); ?>"
+                            <?php
+                            if ( isset( $args['url_target'] ) && $args['url_target'] ) :
+                                ?>
+                                target="<?php echo esc_attr( $args['url_target'] ); ?>"
+                                <?php
+                            endif;
+                            ?>
+                        >
                             <?php echo esc_html( $args['title'] ); ?>
                         </a>
                         <?php

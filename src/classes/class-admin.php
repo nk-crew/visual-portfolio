@@ -1517,6 +1517,24 @@ class Visual_Portfolio_Admin {
                 'popup_gallery' => esc_html__( 'Popup Gallery', '@@text_domain' ),
             ),
         ) );
+        Visual_Portfolio_Controls::register( array(
+            'category' => 'items-click-action',
+            'type'     => 'select2',
+            'label'    => esc_html__( 'Target', '@@text_domain' ),
+            'name'     => 'vp_items_click_action_url_target',
+            'default'  => 'url',
+            'options'  => array(
+                '' => esc_html__( 'Default', '@@text_domain' ),
+                '_blank' => esc_html__( 'New tab (_blank)', '@@text_domain' ),
+                '_top' => esc_html__( 'Top frame (_top)', '@@text_domain' ),
+            ),
+            'condition' => array(
+                array(
+                    'control' => 'vp_items_click_action',
+                    'value' => 'url',
+                ),
+            ),
+        ) );
 
         /**
          * Filter.

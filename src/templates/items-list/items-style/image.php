@@ -18,7 +18,15 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php
         if ( $args['url'] ) {
             ?>
-            <a href="<?php echo esc_url( $args['url'] ); ?>">
+            <a href="<?php echo esc_url( $args['url'] ); ?>"
+                <?php
+                if ( isset( $args['url_target'] ) && $args['url_target'] ) :
+                    ?>
+                    target="<?php echo esc_attr( $args['url_target'] ); ?>"
+                    <?php
+                endif;
+                ?>
+            >
                 <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
             </a>
             <?php

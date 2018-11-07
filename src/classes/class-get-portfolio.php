@@ -1150,6 +1150,9 @@ class Visual_Portfolio_Get {
             case false:
                 $args['url'] = false;
                 break;
+            default:
+                $args['url_target'] = $args['vp_opts']['vp_items_click_action_url_target'] ? : '';
+                break;
         }
 
         // No Image.
