@@ -4,7 +4,7 @@
 
 // External Dependencies.
 if ( ! global._babelPolyfill ) {
-    require( 'babel-polyfill' );
+    require( '@babel/polyfill' );
 }
 import classnames from 'classnames/dedupe';
 import ReactIframeResizer from 'react-iframe-resizer-super';

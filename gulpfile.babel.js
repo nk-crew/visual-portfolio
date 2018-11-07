@@ -17,6 +17,8 @@ const production_config = template(data.gulp_config.production);
 
 const dist = templateVars.dist;
 
+let isDev = false;
+
 // run streams for each of theme items (theme and plugins)
 function runStream (arr, func) {
     var streams = merge();
@@ -75,7 +77,7 @@ gulp.task('build_js', function () {
         return gulp.src([itemData.from + '/**/*.{js,jsx}', '!' + itemData.from + '/**/vendor/**/*'])
             .pipe($.plumber({ errorHandler }))
             .pipe(named())
-            .pipe(webpack(webpackconfig))
+            .pipe(webpack(webpackconfig(isDev)))
             .pipe($.rename({
                 suffix: '.min'
             }))
@@ -211,15 +213,18 @@ gulp.task('watch_build_vendors', function(cb) {
 /**
  * Watch Task
  */
-gulp.task('watch', ['build'], function() {
-    for (var k = 0; k < work_folders.length; k++) {
-        var itemData = work_folders[k];
-        gulp.watch([itemData.from + '/**/*.php', '!' + itemData.from + '/*vendor/**/*'], ['watch_build_php']);
-        gulp.watch([itemData.from + '/**/*.{js,jsx}', '!' + itemData.from + '/*vendor/**/*'], ['build_js']);
-        gulp.watch([itemData.from + '/**/*.scss', '!' + itemData.from + '/*vendor/**/*'], ['build_scss', 'build_scss_templates']);
-        gulp.watch([itemData.from + '/**/*', '!' + itemData.from + '/**/*.{php,js,jsx,scss}', itemData.from + '/*vendor/**/*'], ['watch_build_all']);
-        gulp.watch(itemData.from + '/**/vendor/**/*', ['watch_build_vendors']);
-    }
+gulp.task('watch', function() {
+    isDev = true;
+    runSequence( 'build', () => {
+        for (var k = 0; k < work_folders.length; k++) {
+            var itemData = work_folders[k];
+            gulp.watch([itemData.from + '/**/*.php', '!' + itemData.from + '/*vendor/**/*'], ['watch_build_php']);
+            gulp.watch([itemData.from + '/**/*.{js,jsx}', '!' + itemData.from + '/*vendor/**/*'], ['build_js']);
+            gulp.watch([itemData.from + '/**/*.scss', '!' + itemData.from + '/*vendor/**/*'], ['build_scss', 'build_scss_templates']);
+            gulp.watch([itemData.from + '/**/*', '!' + itemData.from + '/**/*.{php,js,jsx,scss}', itemData.from + '/*vendor/**/*'], ['watch_build_all']);
+            gulp.watch(itemData.from + '/**/vendor/**/*', ['watch_build_vendors']);
+        }
+    } );
 });
 
 
