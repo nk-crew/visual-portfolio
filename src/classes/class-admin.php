@@ -2695,10 +2695,20 @@ class Visual_Portfolio_Admin {
 
         $selected_array = array();
         if ( isset( $selected_ids ) && is_array( $selected_ids ) && count( $selected_ids ) ) {
+            // fill selected array.
+            foreach ( $selected_ids as $id ) {
+                $selected_array[ $id ] = $id;
+            }
+
             $posts = get_posts(
                 array(
                     'post_type' => 'any',
                     'post__in' => $selected_ids,
+
+                    // phpcs:ignore
+                    'posts_per_page' => -1,
+                    'showposts'      => -1,
+                    'paged'          => -1,
                 )
             );
 
@@ -2726,6 +2736,11 @@ class Visual_Portfolio_Admin {
 
         $excluded_array = array();
         if ( isset( $excluded_ids ) && is_array( $excluded_ids ) && count( $excluded_ids ) ) {
+            // fill excluded array.
+            foreach ( $excluded_ids as $id ) {
+                $excluded_array[ $id ] = $id;
+            }
+
             $posts = get_posts(
                 array(
                     'post_type' => 'any',
@@ -2757,6 +2772,10 @@ class Visual_Portfolio_Admin {
         $selected_tax_arr = array();
 
         if ( isset( $selected_tax ) && is_array( $selected_tax ) && count( $selected_tax ) ) {
+            // fill selected array.
+            foreach ( $selected_tax as $id ) {
+                $selected_tax_arr[ $id ] = $id;
+            }
 
             // TODO: Not sure that include works...
             $term_query = new WP_Term_Query(
