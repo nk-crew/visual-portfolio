@@ -607,7 +607,7 @@ class Visual_Portfolio_Controls {
                 ),
             ),
             'video_url' => array(
-                'type'  => 'url',
+                'type'  => 'text',
                 'label' => esc_html__( 'Video URL', '@@text_domain' ),
                 'placeholder'  => esc_html__( 'https://...', '@@text_domain' ),
                 'name'  => $args['name'] . '_additional_video_url',
@@ -619,7 +619,7 @@ class Visual_Portfolio_Controls {
                 ),
             ),
             'url' => array(
-                'type'  => 'url',
+                'type'  => 'text',
                 'label' => esc_html__( 'URL', '@@text_domain' ),
                 'description' => esc_html__( 'By default used full image url, you can use custom one', '@@text_domain' ),
                 'placeholder'  => esc_html__( 'https://...', '@@text_domain' ),
