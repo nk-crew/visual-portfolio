@@ -3,6 +3,10 @@
  * Version : @@plugin_version
  * Author  : nK https://nkdev.info
  */
+
+import { throttle } from 'throttle-debounce';
+import rafl from 'rafl';
+
 /**
  * Global Variables
  */
@@ -1601,3 +1605,19 @@ $( '.vp-portfolio' ).vpf();
 $( () => {
     $( '.vp-portfolio' ).vpf();
 } );
+
+const throttledInit = throttle( 200, () => {
+    rafl( () => {
+        $( '.vp-portfolio:not(.vp-portfolio__ready)' ).vpf();
+    } );
+} );
+if ( window.MutationObserver ) {
+    new window.MutationObserver( throttledInit )
+        .observe( document.documentElement, {
+            childList: true, subtree: true,
+        } );
+} else {
+    $( document ).on( 'DOMContentLoaded DOMNodeInserted load', () => {
+        throttledInit();
+    } );
+}
