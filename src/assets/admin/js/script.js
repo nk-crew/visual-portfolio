@@ -884,6 +884,30 @@ if ( typeof Tooltip !== 'undefined' ) {
                 cm.showHint( { completeSingle: false } );
             }
         } );
+
+        // resize handler
+        const $editorResizer = $( '.CodeMirror-resizer' ).after( $customCss );
+        const $editorContainer = $editorResizer.prev( '.CodeMirror' );
+        let editorResizeY;
+        let editorResizeH;
+
+        function onEditorResize( e ) {
+            $editorContainer.css( 'height', Math.max( 200, ( editorResizeH + e.originalEvent.y - editorResizeY ) ) );
+            editor.setSize( null, Math.max( 200, ( editorResizeH + e.y - editorResizeY ) ) + 'px' );
+        }
+
+        function enEditorResizeEnd() {
+            $body.off( 'mousemove', onEditorResize );
+            $body.off( 'mouseup', enEditorResizeEnd );
+        }
+
+        $editorResizer.on( 'mousedown', ( e ) => {
+            editorResizeY = e.originalEvent.y;
+            editorResizeH = $editorContainer.height();
+
+            $body.on( 'mousemove', onEditorResize );
+            $body.on( 'mouseup', enEditorResizeEnd );
+        } );
     }
 
     // prevent page save if there is errors in CSS editor

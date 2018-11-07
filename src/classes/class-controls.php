@@ -734,6 +734,7 @@ class Visual_Portfolio_Controls {
     public static function print_control_code_editor( $args = array() ) {
         ?>
         <textarea class="vp-input" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" cols="<?php echo esc_attr( $args['cols'] ); ?>" rows="<?php echo esc_attr( $args['rows'] ); ?>" placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>"><?php echo esc_html( $args['value'] ); ?></textarea>
+        <div class="CodeMirror-resizer"></div>
         <?php
     }
 }
