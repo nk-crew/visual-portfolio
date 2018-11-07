@@ -113,6 +113,8 @@ class Visual_Portfolio_Controls {
     public static function get( $args = array() ) {
         $args = array_merge( self::$default_args, $args );
 
+        $args = apply_filters( 'vpf_print_layout_control_args', $args );
+
         // value from callback function.
         if ( isset( $args['value_callback'] ) ) {
             $new_val = self::get_value_callback( $args['value_callback'] );
