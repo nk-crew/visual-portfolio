@@ -37,17 +37,17 @@ const {
 } = wp.data;
 
 const actions = {
+    apiFetch( request ) {
+        return {
+            type: 'API_FETCH',
+            request,
+        };
+    },
     setPortfolioLayouts( query, layouts ) {
         return {
             type: 'SET_PORTFOLIO_LAYOUTS',
             query,
             layouts,
-        };
-    },
-    getPortfolioLayouts( query ) {
-        return {
-            type: 'GET_PORTFOLIO_LAYOUTS',
-            query,
         };
     },
 };
@@ -59,8 +59,6 @@ registerStore( 'nk/visual-portfolio', {
                 state.layouts[ action.query ] = action.layouts;
             }
             return state;
-        case 'GET_PORTFOLIO_LAYOUTS':
-            return action.layouts[ action.query ];
         // no default
         }
         return state;
@@ -71,9 +69,9 @@ registerStore( 'nk/visual-portfolio', {
             return state.layouts[ query ];
         },
     },
-    resolvers: {
-        * getPortfolioLayouts( state, query ) {
-            const layouts = apiFetch( { path: query } )
+    controls: {
+        API_FETCH( { request } ) {
+            return apiFetch( request )
                 .catch( ( fetchedData ) => {
                     if ( fetchedData && fetchedData.error && 'no_layouts_found' === fetchedData.error_code ) {
                         return {
@@ -87,12 +85,16 @@ registerStore( 'nk/visual-portfolio', {
                 } )
                 .then( ( fetchedData ) => {
                     if ( fetchedData && fetchedData.success && fetchedData.response ) {
-                        return actions.setPortfolioLayouts( query, fetchedData.response );
+                        return fetchedData.response;
                     }
-
                     return false;
                 } );
-            yield layouts;
+        },
+    },
+    resolvers: {
+        * getPortfolioLayouts( query ) {
+            const layouts = yield actions.apiFetch( { path: query } );
+            return actions.setPortfolioLayouts( query, layouts );
         },
     },
 } );
