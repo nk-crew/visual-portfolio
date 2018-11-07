@@ -119,6 +119,31 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.8.0 =
+
+* added lazyload preloader placeholder animation
+* added Target option for Click Action URL
+* added ghostkitSR support in Gutenberg block (animate on scroll functionality)
+* added condition to show meta block in templates (less html if disabled showing meta data)
+* added possibility to resize custom CSS Editor
+* added Menu Order in post based source
+* added Mask property in control styles (for developers)
+* added filters to extend default controls for layouts, items styles, filters and paginations
+* added filter for control arguments `vpf_print_layout_control_args` (developers may change controls settings in layouts editor)
+* changed condition script for settings in layout editor, should improve performance
+* changed popup gallery z-index to 1500 (like in WooCommerce)
+* changed initialization method to Mutation Observers (portfolio will init automatically after ajax load)
+* removed wp_unslash from custom CSS code save (because some specific styles removed)
+* prevent session start in admin pages (this only needs in paged with random order)
+* fixed default sorting of selected/excluded posts and taxonomies in post based content source
+* fixed content source images disappear when in image meta added " symbol
+* fixed layouts fetch error in Gutenberg 4.2
+* fixed flex-wrap in fade style
+* fixed lazyload images in IE11
+* fixed popup gallery in IE11
+* fixed validation error when trying to use URLs like "/something" in content source images
+* minor changes
+
 = 1.7.2 =
 
 * added link to Documentation in admin menu
