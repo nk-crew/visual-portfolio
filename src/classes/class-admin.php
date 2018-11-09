@@ -1522,7 +1522,7 @@ class Visual_Portfolio_Admin {
             'type'     => 'select2',
             'label'    => esc_html__( 'Target', '@@text_domain' ),
             'name'     => 'vp_items_click_action_url_target',
-            'default'  => 'url',
+            'default'  => '',
             'options'  => array(
                 '' => esc_html__( 'Default', '@@text_domain' ),
                 '_blank' => esc_html__( 'New tab (_blank)', '@@text_domain' ),
