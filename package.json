@@ -29,7 +29,7 @@
             "dist": "dist",
             "plugin_name": "visual-portfolio",
             "plugin_title": "Visual Portfolio",
-            "plugin_version": "1.8.0"
+            "plugin_version": "1.8.1"
         },
         "template_vars": [
             {

@@ -119,6 +119,10 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.8.1 =
+
+* fixed Click Action Target default value
+
 = 1.8.0 =
 
 * added lazyload preloader placeholder animation
