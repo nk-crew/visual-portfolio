@@ -693,6 +693,8 @@ class Visual_Portfolio_Admin {
      * Register control fields for the metaboxes.
      */
     public function register_controls() {
+        do_action( 'vpf_before_register_controls' );
+
         /**
          * Layouts.
          */
@@ -2304,12 +2306,16 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
+
+        do_action( 'vpf_after_register_controls' );
     }
 
     /**
      * Add metaboxes
      */
     public function add_meta_boxes() {
+        do_action( 'vpf_before_add_meta_boxes' );
+
         add_meta_box(
             'vp_name',
             esc_html__( 'Name & Shortcode', '@@text_domain' ),
@@ -2383,6 +2389,8 @@ class Visual_Portfolio_Admin {
             'normal',
             'high'
         );
+
+        do_action( 'vpf_after_add_meta_boxes' );
     }
 
     /**
