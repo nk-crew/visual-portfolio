@@ -119,6 +119,11 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.8.2 =
+
+* added wp actions in registering controls and metaboxes
+* updated Conditionize script
+
 = 1.8.1 =
 
 * fixed Click Action Target default value
