@@ -215,7 +215,9 @@ class Visual_Portfolio_Get {
             $max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
         }
 
-        $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? get_pagenum_link( $start_page + 1 ) : false;
+        $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link( array(
+            'vp_page' => $start_page + 1,
+        ) ) : false;
 
         // No items found.
         if ( $is_images && empty( $query_opts['images'] ) || isset( $portfolio_query ) && ! $portfolio_query->have_posts() ) {
@@ -388,9 +390,10 @@ class Visual_Portfolio_Get {
                                     $filter_values[] = $slug;
 
                                     // add in categories array.
-                                    $url = self::get_nopaging_url(
-                                        false, array(
+                                    $url = self::get_pagenum_link(
+                                        array(
                                             'vp_filter' => urlencode( $slug ),
+                                            'vp_page' => 1,
                                         )
                                     );
                                     $categories[] = array(
@@ -449,9 +452,10 @@ class Visual_Portfolio_Get {
 
                                     // add in categories array.
                                     $unique_name  = $cat_item->taxonomy . ':' . $cat_item->slug;
-                                    $url          = self::get_nopaging_url(
-                                        false, array(
+                                    $url          = self::get_pagenum_link(
+                                        array(
                                             'vp_filter' => urlencode( $unique_name ),
+                                            'vp_page' => 1,
                                         )
                                     );
                                     $categories[] = array(
@@ -593,14 +597,12 @@ class Visual_Portfolio_Get {
 
     /**
      * Get current page number
-     * /page/2/
-     * ?page=2
+     * ?vp_page=2
      *
      * @return int
      */
     private static function get_current_page_number() {
-        $page = (int) max( 1, get_query_var( 'page' ), get_query_var( 'paged' ), isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1 );
-        return $page;
+        return max( 1, isset( $_GET['vp_page'] ) ? (int) $_GET['vp_page'] : 1 );
     }
 
     /**
@@ -871,9 +873,10 @@ class Visual_Portfolio_Get {
                 if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
                     foreach ( $img['categories'] as $cat ) {
                         $slug = self::create_slug( $cat );
-                        $url = self::get_nopaging_url(
-                            false, array(
+                        $url = self::get_pagenum_link(
+                            array(
                                 'vp_filter' => urlencode( $slug ),
+                                'vp_page' => 1,
                             )
                         );
 
@@ -959,9 +962,10 @@ class Visual_Portfolio_Get {
                     if ( in_array( $term->term_id, $term_ids ) ) {
                         $unique_name = $term->taxonomy . ':' . $term->slug;
 
-                        $url = self::get_nopaging_url(
-                            false, array(
+                        $url = self::get_pagenum_link(
+                            array(
                                 'vp_filter' => urlencode( $unique_name ),
+                                'vp_page' => 1,
                             )
                         );
 
@@ -993,7 +997,10 @@ class Visual_Portfolio_Get {
                     'description' => false,
                     'count'       => false,
                     'active'      => ! $there_is_active,
-                    'url'         => remove_query_arg( 'vp_filter', self::get_nopaging_url() ),
+                    'url'         => self::get_pagenum_link( array(
+                        'vp_filter' => '',
+                        'vp_page' => 1,
+                    ) ),
                     'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : '' ),
                 )
             );
@@ -1293,7 +1300,9 @@ class Visual_Portfolio_Get {
             default:
                 $pagination_links = paginate_links(
                     array(
-                        'base' => esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) ),
+                        'base' => esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', self::get_pagenum_link( array(
+                            'vp_page' => 999999999,
+                        ) ) ) ) ),
                         'format' => '',
                         'type' => 'array',
                         'current' => $args['start_page'],
@@ -1375,32 +1384,33 @@ class Visual_Portfolio_Get {
     }
 
     /**
-     * Return current url without page variables.
+     * Return current page url with paged support.
      *
-     * @param string|boolean $current_url - custom page url.
-     * @param array          $query_arg - custom query arg.
+     * @param array $query_arg - custom query arg.
      * @return string
      */
-    private static function get_nopaging_url( $current_url = false, $query_arg = array() ) {
-
+    private static function get_pagenum_link( $query_arg = array() ) {
         // Use current page url.
-        if ( ! $current_url ) {
-            global $wp;
-            $query = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) ) : '';
-            $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url( $wp->request );
+        global $wp;
+        $current_url = trailingslashit( home_url( $wp->request ) );
 
-            $current_url = add_query_arg( $query, '', $request_uri );
+        // phpcs:disable
+        if ( ! empty( $_GET ) ) {
+            $current_url = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( $_GET ) ), $current_url );
+        }
+        // phpcs:enable
+
+        if ( isset( $query_arg['vp_filter'] ) && ! $query_arg['vp_filter'] ) {
+            unset( $query_arg['vp_filter'] );
+            $current_url = remove_query_arg( 'vp_filter', $current_url );
+        }
+        if ( isset( $query_arg['vp_page'] ) && 1 === $query_arg['vp_page'] ) {
+            unset( $query_arg['vp_page'] );
+            $current_url = remove_query_arg( 'vp_page', $current_url );
         }
 
         // Add custom query args.
         $current_url = add_query_arg( $query_arg, $current_url );
-
-        // Remove paged get variable.
-        $current_url = remove_query_arg( 'paged', $current_url );
-
-        // Remove /page/{%}.
-        $pattern = '/page\\/[0-9]+\\//i';
-        $current_url = preg_replace( $pattern, '', $current_url );
 
         return $current_url;
     }
