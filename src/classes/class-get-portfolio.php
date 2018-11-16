@@ -284,6 +284,7 @@ class Visual_Portfolio_Get {
             $data_atts['data-vp-slider-arrows-icon-next'] = $options['vp_slider_arrows_icon_next'] ? : '';
             $data_atts['data-vp-slider-bullets'] = $options['vp_slider_bullets'] ? 'true' : 'false';
             $data_atts['data-vp-slider-bullets-dynamic'] = $options['vp_slider_bullets_dynamic'] ? 'true' : 'false';
+            $data_atts['data-vp-slider-mousewheel'] = $options['vp_slider_mousewheel'] ? 'true' : 'false';
         }
 
         $data_atts = Visual_Portfolio_Extend::portfolio_attrs( $data_atts, $options );

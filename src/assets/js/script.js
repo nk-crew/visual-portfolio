@@ -1000,6 +1000,7 @@ class VP {
                         return `<span class="${ className }" data-bullet-index="${ index }" data-bullet-number="${ index + 1 }"></span>`;
                     },
                 },
+                mousewheel: self.options.sliderMousewheel === 'true',
                 slidesPerView: slidesPerView,
                 breakpoints: breakPoints,
                 keyboard: true,

@@ -1055,6 +1055,12 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                     ),
+                    array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Mousewheel Control', '@@text_domain' ),
+                        'name'    => 'mousewheel',
+                        'default' => false,
+                    ),
                 ),
             ),
         ), Visual_Portfolio_Extend::layouts() );
