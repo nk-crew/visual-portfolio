@@ -682,22 +682,6 @@ class Visual_Portfolio_Get {
                 'post_type'  => 'portfolio',
             );
 
-            // Load certain taxonomies.
-            if ( ! $for_filter && isset( $_GET['vp_filter'] ) ) {
-                $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
-                $taxonomies = explode( ':', $taxonomies );
-
-                if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
-                    $query_opts['tax_query'] = array(
-                        array(
-                            'taxonomy' => $taxonomies[0],
-                            'field' => 'slug',
-                            'terms' => $taxonomies[1],
-                        ),
-                    );
-                }
-            }
-
             // Post based.
             if ( 'post-based' === $options['vp_content_source'] ) {
                 // Exclude IDs.
@@ -810,6 +794,24 @@ class Visual_Portfolio_Get {
                     }
                 } // End if().
             } // End if().
+
+            // Load certain taxonomies using custom filter.
+            if ( ! $for_filter && isset( $_GET['vp_filter'] ) ) {
+                $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
+                $taxonomies = explode( ':', $taxonomies );
+
+                if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
+                    $query_opts['tax_query'] = array(
+                        'relation' => 'AND',
+                        array(
+                            'taxonomy' => $taxonomies[0],
+                            'field' => 'slug',
+                            'terms' => $taxonomies[1],
+                        ),
+                        isset( $query_opts['tax_query'] ) ? $query_opts['tax_query'] : '',
+                    );
+                }
+            }
         }
 
         return $query_opts;
