@@ -398,26 +398,41 @@
 
 // LazyLoad image
 img.visual-portfolio-lazyload:not(.lazyloaded) {
-    background-color: rgba(132, 136, 177, .05);
+    opacity: 1;
+    transition: .3s opacity;
+    will-change: opacity;
 }
-.vp-portfolio__item-img-lazyloading::after {
+.vp-portfolio__item-img::after {
     content: "";
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
-    left: 50%;
-    width: 500%;
-    margin-left: -250%;
-    background: linear-gradient(-70deg, rgba(255, 255, 255, 0) 42%, rgba(255, 255, 255, .85) 50%, rgba(255, 255, 255, 0) 58%) 50% 50%;
-    animation: vp-lazyload-placeholder 3s linear infinite;
+    left: 0;
+    background: linear-gradient(-70deg, rgba(255, 255, 255, 0) 42%, rgba(255, 255, 255, .55) 50%, rgba(255, 255, 255, 0) 58%);
+    background-color: rgba(132, 136, 177, .05);
+    background-position: 0% 50%;
+    background-size: 500% 100%;
+    transition: .3s .3s opacity, .3s .3s visibility;
+}
+.vp-portfolio__item-img-lazyloading {
+    &::after {
+        visibility: visible;
+        opacity: 1;
+        transition: none;
+        animation: vp-lazyload-placeholder 3s linear infinite;
+    }
+
+    img.visual-portfolio-lazyload {
+        opacity: 0;
+    }
 }
 @keyframes vp-lazyload-placeholder {
     0%,
     80% {
-        transform: translate3d(-30%, 0, 0);
+        background-position: 100% 50%;
     }
     100% {
-        transform: translate3d(30%, 0, 0);
+        background-position: 0% 50%;
     }
 }

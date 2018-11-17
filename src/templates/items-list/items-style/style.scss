@@ -12,8 +12,8 @@
         overflow: hidden;
     }
     .vp-portfolio__item-img img {
-        transition: transform 2s cubic-bezier(.08, .43, .24, 1);
-        will-change: transform;
+        transition: transform 2s cubic-bezier(.08, .43, .24, 1), opacity .3s;
+        will-change: transform, opacity;
     }
     .vp-portfolio__item:hover {
         .vp-portfolio__item-img img {
