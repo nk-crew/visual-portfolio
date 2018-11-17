@@ -397,7 +397,7 @@
 }
 
 // LazyLoad image
-img.visual-portfolio-lazyload:not(.lazyloaded) {
+img.visual-portfolio-lazyload {
     opacity: 1;
     transition: .3s opacity;
     will-change: opacity;
