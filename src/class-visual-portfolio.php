@@ -164,7 +164,7 @@ class Visual_Portfolio {
 
         // Object Fit Images.
         if ( apply_filters( 'vpf_enqueue_plugin_object_fit_images', true ) ) {
-            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '3.2.3', true );
+            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '3.2.4', true );
 
             $vp_deps[] = 'object-fit-images';
         }
@@ -182,8 +182,8 @@ class Visual_Portfolio {
 
         // Swiper.
         if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.css', '', '4.3.3' );
-            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', '', '4.3.3', true );
+            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.css', '', '4.4.2' );
+            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', '', '4.4.2', true );
 
             $vp_deps[] = 'swiper';
             $vp_style_deps[] = 'swiper';
@@ -191,8 +191,8 @@ class Visual_Portfolio {
 
         // Font Awesome.
         if ( apply_filters( 'vpf_enqueue_plugin_font_awesome', true ) ) {
-            wp_register_script( 'font-awesome-v4-shims', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/v4-shims.min.js', array(), '5.2.0', true );
-            wp_register_script( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/all.min.js', array( 'font-awesome-v4-shims' ), '5.2.0', true );
+            wp_register_script( 'font-awesome-v4-shims', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/v4-shims.min.js', array(), '5.5.0', true );
+            wp_register_script( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/all.min.js', array( 'font-awesome-v4-shims' ), '5.5.0', true );
 
             $vp_deps[] = 'font-awesome';
         }
@@ -200,7 +200,7 @@ class Visual_Portfolio {
         // LazySizes.
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
-            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '4.1.0', true );
+            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '4.1.4', true );
 
             $vp_deps[] = 'lazysizes-object-fit-cover';
             $vp_deps[] = 'lazysizes';
