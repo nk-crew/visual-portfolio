@@ -119,6 +119,19 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.9.0 =
+
+Note: Don't forget to clear cache after plugin update. Changed portfolios with pagination enabled, so it may be broken.
+
+* added "Mousewheel Control" option in Slider
+* added fade-in transition for lazyloaded images
+* added automatic fill title and description fields when new images added in Images Content Source
+* added gutenberg block transform from shortcode
+* updated vendor plugins
+* fixed carousel position on first load (mostly on mobile devices)
+* fixed portfolio with custom taxonomies in post based + OR relation and filter active
+* fixed paged portfolios load on single posts and in archives. Now uses own get variable 'vp_page'
+
 = 1.8.2 =
 
 * added wp actions in registering controls and metaboxes
