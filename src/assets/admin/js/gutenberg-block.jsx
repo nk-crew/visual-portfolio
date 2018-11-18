@@ -237,9 +237,10 @@ registerBlockType( 'nk/visual-portfolio', {
         };
     } )( VPEdit ),
 
-    save( { attributes, className } ) {
+    save( { attributes } ) {
         const {
             id,
+            className,
         } = attributes;
 
         let result = '[visual_portfolio';
@@ -255,5 +256,28 @@ registerBlockType( 'nk/visual-portfolio', {
         result += ']';
 
         return <RawHTML>{ result }</RawHTML>;
+    },
+
+    transforms: {
+        from: [
+            {
+                type: 'shortcode',
+                tag: 'visual_portfolio',
+                attributes: {
+                    id: {
+                        type: 'string',
+                        shortcode: ( data ) => {
+                            return data.named.id;
+                        },
+                    },
+                    className: {
+                        type: 'string',
+                        shortcode: ( data ) => {
+                            return data.named.class;
+                        },
+                    },
+                },
+            },
+        ],
     },
 } );
