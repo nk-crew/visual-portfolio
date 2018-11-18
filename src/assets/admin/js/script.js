@@ -641,7 +641,7 @@ if ( typeof Tooltip !== 'undefined' ) {
                 frame = wp.media( {
                     title: 'Select or Upload Images',
                     button: {
-                        text: 'Use this images',
+                        text: 'Add images',
                     },
                     multiple: true,
                     library: {
@@ -656,21 +656,29 @@ if ( typeof Tooltip !== 'undefined' ) {
                     const images = frame.state().get( 'selection' ).models;
                     if ( images && images.length ) {
                         images.forEach( ( item ) => {
-                            let url = item.changed.url;
+                            let url = item.attributes.url;
 
-                            if ( item.changed.sizes && item.changed.sizes.thumbnail ) {
-                                url = item.changed.sizes.thumbnail.url;
+                            if ( item.attributes.sizes && item.attributes.sizes.thumbnail ) {
+                                url = item.attributes.sizes.thumbnail.url;
                             }
 
                             const $newItem = $defaultItem.children().clone();
                             $newItem.attr( 'data-image-id', item.id );
                             $newItem.children( 'img' ).attr( 'src', url );
 
-                            $newItem.find( '[data-meta="width"]' ).html( item.changed.width );
-                            $newItem.find( '[data-meta="height"]' ).html( item.changed.height );
-                            $newItem.find( '[data-meta="filename"]' ).html( item.changed.filename );
-                            $newItem.find( '[data-meta="editLink"]' ).html( item.changed.editLink );
-                            $newItem.find( '[data-meta="filesizeHumanReadable"]' ).html( item.changed.filesizeHumanReadable );
+                            $newItem.find( '[data-meta="width"]' ).html( item.attributes.width );
+                            $newItem.find( '[data-meta="height"]' ).html( item.attributes.height );
+                            $newItem.find( '[data-meta="filename"]' ).html( item.attributes.filename );
+                            $newItem.find( '[data-meta="editLink"]' ).html( item.attributes.editLink );
+                            $newItem.find( '[data-meta="filesizeHumanReadable"]' ).html( item.attributes.filesizeHumanReadable );
+
+                            // put title and description from image meta.
+                            if ( item.attributes.title ) {
+                                $newItem.find( '[data-additional="title"]' ).html( item.attributes.title );
+                            }
+                            if ( item.attributes.description ) {
+                                $newItem.find( '[data-additional="description"]' ).html( item.attributes.description );
+                            }
 
                             $gallery.find( '.vp-control-gallery-items-add' ).before( $newItem );
                         } );
