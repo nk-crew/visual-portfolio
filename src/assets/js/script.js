@@ -976,7 +976,7 @@ class VP {
                 }
             }
 
-            new window.Swiper( $parent[ 0 ], options || {
+            options = options || {
                 speed: ( parseFloat( self.options.sliderSpeed ) || 0 ) * 1000,
                 autoHeight: self.options.sliderItemsHeight === 'auto',
                 effect: self.options.sliderEffect || 'slide',
@@ -1005,7 +1005,28 @@ class VP {
                 breakpoints: breakPoints,
                 keyboard: true,
                 grabCursor: true,
-            } );
+            };
+
+            // fix first load slide position (seems like a conflict with lazySizes)
+            // issue: https://github.com/nk-o/visual-portfolio/issues/54
+            if ( 0 === options.speed ) {
+                options.speed = 1;
+            }
+            let positionFix = 0;
+            options.on = {
+                transitionEnd: function() {
+                    if ( 0 === positionFix ) {
+                        positionFix = 1;
+                        this.setTransition( 1 );
+                        this.setTranslate( this.translate + 0.1 );
+                    } else if ( 1 === positionFix ) {
+                        positionFix = 2;
+                        this.slideReset();
+                    }
+                },
+            };
+
+            new window.Swiper( $parent[ 0 ], options );
 
             self.emitEvent( 'initSwiper', [ options ] );
         }
