@@ -1071,7 +1071,7 @@ class VP {
         // prepare photoswipe markup
         if ( ! $( '.vp-pswp' ).length ) {
             const markup = `
-            <div class="pswp vp-pswp vp-pswp-uid-'}${ self.uid }" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="pswp vp-pswp vp-pswp-uid-${ self.uid }" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="pswp__bg"></div>
                 <div class="pswp__scroll-wrap">
                     <div class="pswp__container">
