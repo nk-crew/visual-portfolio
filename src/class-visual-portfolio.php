@@ -182,7 +182,7 @@ class Visual_Portfolio {
 
         // Swiper.
         if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.css', '', '4.4.2' );
+            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.min.css', '', '4.4.2' );
             wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', '', '4.4.2', true );
 
             $vp_deps[] = 'swiper';
