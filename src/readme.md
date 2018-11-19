@@ -119,6 +119,13 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.9.1 =
+
+* changed lazyload image preloader z position (not able to click on items links)
+* fixed Swiper styles 404
+* fixed PhotoSwipe top position when showed WP admin bar
+* fixed PhotoSwipe incorrect unique classname (not able to destroy it)
+
 = 1.9.0 =
 
 Note: Don't forget to clear cache after plugin update. Changed portfolios with pagination enabled, so it may be broken.
