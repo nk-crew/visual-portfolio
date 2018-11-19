@@ -318,6 +318,21 @@
 .vp-pswp {
     z-index: 1500;
 
+    // fixed top position when WP admin bar showed.
+    body.admin-bar & {
+        top: 32px;
+        min-height: calc(100% - 32px);
+
+        @media screen and (max-width: 782px) {
+            top: 42px;
+            min-height: calc(100% - 42px);
+        }
+        @media screen and (max-width: 600px) {
+            top: 0;
+            min-height: 100%;
+        }
+    }
+
     .pswp__caption {
         background-color: rgba(0, 0, 0, .75);
 
