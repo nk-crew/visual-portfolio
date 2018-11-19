@@ -402,7 +402,7 @@ img.visual-portfolio-lazyload {
     transition: .3s opacity;
     will-change: opacity;
 }
-.vp-portfolio__item-img::after {
+.vp-portfolio__item-img::before {
     content: "";
     position: absolute;
     top: 0;
@@ -416,7 +416,7 @@ img.visual-portfolio-lazyload {
     transition: .3s .3s opacity, .3s .3s visibility;
 }
 .vp-portfolio__item-img-lazyloading {
-    &::after {
+    &::before {
         visibility: visible;
         opacity: 1;
         transition: none;
