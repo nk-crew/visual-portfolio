@@ -119,6 +119,12 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.9.2 =
+
+* added page-attributes in portfolio post type (Order attribute)
+* fixed Menu Order in post based source (didn't work at all)
+* possible fixed iOs isotope images position (sometimes broken)
+
 = 1.9.1 =
 
 * changed lazyload image preloader z position (not able to click on items links)
