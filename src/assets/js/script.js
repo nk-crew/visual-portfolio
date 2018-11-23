@@ -158,7 +158,11 @@ class VP {
         // slider
         self.initSwiper();
 
+        // resized
         self.resized();
+
+        // images loaded
+        self.imagesLoaded();
 
         self.firstRun = false;
     }
@@ -179,6 +183,29 @@ class VP {
         }
 
         this.emitEvent( 'resized' );
+    }
+
+    /**
+     * Images loaded.
+     */
+    imagesLoaded() {
+        const self = this;
+
+        if ( ! self.$items_wrap.imagesLoaded ) {
+            return;
+        }
+
+        // sometimes on iOs isotope images failed to calculate positions, so we need this imagesLoaded event.
+        // related issue: https://github.com/nk-o/visual-portfolio/issues/55
+        self.$items_wrap.imagesLoaded( () => {
+            // isotope
+            self.initIsotope( 'layout' );
+
+            // justified gallery
+            self.initFjGallery();
+
+            this.emitEvent( 'imagesLoaded' );
+        } );
     }
 
     /**

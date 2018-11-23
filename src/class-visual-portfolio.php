@@ -145,7 +145,7 @@ class Visual_Portfolio {
      * Register scripts that will be used in the future when portfolio will be printed.
      */
     public function register_scripts() {
-        $vp_deps = array( 'jquery' );
+        $vp_deps = array( 'jquery', 'imagesloaded' );
         $vp_style_deps = array();
 
         // Isotope.
