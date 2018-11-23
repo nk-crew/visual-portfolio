@@ -705,6 +705,10 @@ class Visual_Portfolio_Get {
                         $query_opts['orderby'] = 'post__in';
                         break;
 
+                    case 'menu_order':
+                        $query_opts['orderby'] = 'menu_order';
+                        break;
+
                     // "rand" orderby don't work fine for paged, so we need to use custom solution.
                     // thanks to https://gist.github.com/hlashbrooke/6298714 .
                     case 'rand':

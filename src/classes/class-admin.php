@@ -254,6 +254,7 @@ class Visual_Portfolio_Admin {
                     'revisions',
                     'excerpt',
                     'post-formats',
+                    'page-attributes',
                 ),
             )
         );
