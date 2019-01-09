@@ -215,14 +215,19 @@ registerBlockType( 'nk/visual-portfolio', {
 
     keywords: [ 'visual portfolio', 'vp', 'portfolio' ],
 
+    ghostkit: {
+        supports: {
+            spacings: true,
+            display: true,
+            scrollReveal: true,
+        },
+    },
+
     supports: {
         anchor: true,
         className: true,
         html: false,
         align: [ 'wide', 'full' ],
-        ghostkitIndents: true,
-        ghostkitDisplay: true,
-        ghostkitSR: true,
     },
 
     attributes: {
