@@ -119,6 +119,12 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.9.3 =
+
+* added WP 5 compatibility in readme
+* added support for Ghost Kit 2.0 update
+* fixed popup gallery height when admin bar showed
+
 = 1.9.2 =
 
 * added page-attributes in portfolio post type (Order attribute)
