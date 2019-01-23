@@ -221,6 +221,7 @@ class Visual_Portfolio_Admin {
                     'not_found_in_trash'  => __( 'Not found in Trash', '@@text_domain' ),
                 ),
                 'public'       => true,
+                'publicly_queryable' => true,
                 'has_archive'  => false,
                 'show_ui'      => true,
 
@@ -258,12 +259,6 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
-
-        // fix for paged /portfolio/ page.
-        add_rewrite_rule( '^portfolio/page/([0-9]+)', 'index.php?pagename=portfolio&paged=$matches[1]', 'top' );
-        if ( $custom_slug && 'portfolio' !== $custom_slug ) {
-            add_rewrite_rule( '^' . $custom_slug . '/page/([0-9]+)', 'index.php?pagename=' . $custom_slug . '&paged=$matches[1]', 'top' );
-        }
 
         register_taxonomy(
             'portfolio_category', 'portfolio', array(
