@@ -476,7 +476,7 @@ class Visual_Portfolio_Get {
                             'format'          => get_post_format() ? : 'standard',
                             'published_time'  => get_the_time( 'U' ),
                             'filter'          => implode( ',', $filter_values ),
-                            'image_id'        => get_post_thumbnail_id( get_the_ID() ),
+                            'image_id'        => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
                             'categories'      => $categories,
                         ) );
 
