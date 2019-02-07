@@ -53,8 +53,9 @@ Visual Portfolio let you create beautiful portfolio layouts. Generates shortcode
 * Gutenberg WordPress builder supported
 * WPBakery Page Builder page builder supported
 
-## Real Examples ##
+## Real Usage Examples ##
 
+* [Skylith - Multipurpose Gutenberg Theme](https://demo.nkdev.info/#skylith)
 * [Piroll - Portfolio Theme](https://demo.nkdev.info/#piroll)
 * [Snow - Portfolio Theme](https://demo.nkdev.info/#snow)
 
