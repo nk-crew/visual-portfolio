@@ -115,7 +115,9 @@ class Slugify implements SlugifyInterface
         unset($rules);
 
         if ($options['lowercase']) {
-            $string = mb_strtolower($string);
+            // CHANGED: nK
+            // added check for mb_strtolower existence.
+            $string = function_exists('mb_strtolower') ? mb_strtolower($string) : strtolower($string);
         }
 
         $string = preg_replace($options['regexp'], $options['separator'], $string);
