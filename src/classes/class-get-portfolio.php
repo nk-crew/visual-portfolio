@@ -294,6 +294,7 @@ class Visual_Portfolio_Get {
             $data_atts['data-vp-slider-centered-slides'] = $options['vp_slider_centered_slides'] ? 'true' : 'false';
             $data_atts['data-vp-slider-loop'] = $options['vp_slider_loop'] ? 'true' : 'false';
             $data_atts['data-vp-slider-free-mode'] = $options['vp_slider_free_mode'] ? 'true' : 'false';
+            $data_atts['data-vp-slider-free-mode-sticky'] = $options['vp_slider_free_mode_sticky'] ? 'true' : 'false';
             $data_atts['data-vp-slider-arrows'] = $options['vp_slider_arrows'] ? 'true' : 'false';
             $data_atts['data-vp-slider-arrows-icon-prev'] = $options['vp_slider_arrows_icon_prev'] ? : '';
             $data_atts['data-vp-slider-arrows-icon-next'] = $options['vp_slider_arrows_icon_next'] ? : '';

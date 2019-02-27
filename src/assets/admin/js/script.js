@@ -260,6 +260,7 @@ if ( typeof Tooltip !== 'undefined' ) {
         case 'vp_slider_centered_slides':
         case 'vp_slider_loop':
         case 'vp_slider_free_mode':
+        case 'vp_slider_free_mode_sticky':
         case 'vp_slider_arrows':
         case 'vp_slider_arrows_icon_prev':
         case 'vp_slider_arrows_icon_next':

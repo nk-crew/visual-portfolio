@@ -1013,6 +1013,7 @@ class VP {
                 spaceBetween: parseFloat( self.options.itemsGap ) || 0,
                 centeredSlides: self.options.sliderCenteredSlides === 'true',
                 freeMode: self.options.sliderFreeMode === 'true',
+                freeModeSticky: self.options.sliderFreeModeSticky === 'true',
                 loop: self.options.sliderLoop === 'true',
                 autoplay: parseFloat( self.options.sliderAutoplay ) > 0 && {
                     delay: parseFloat( self.options.sliderAutoplay ) * 1000,

@@ -1033,6 +1033,17 @@ class Visual_Portfolio_Admin {
                     ),
                     array(
                         'type'    => 'toggle',
+                        'label'   => esc_html__( 'Free scroll Sticky', '@@text_domain' ),
+                        'name'    => 'free_mode_sticky',
+                        'default' => false,
+                        'condition' => array(
+                            array(
+                                'control' => 'free_mode',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'    => 'toggle',
                         'label'   => esc_html__( 'Show arrows', '@@text_domain' ),
                         'name'    => 'arrows',
                         'default' => true,
