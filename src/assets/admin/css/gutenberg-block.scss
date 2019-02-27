@@ -25,11 +25,16 @@
         }
 
         .components-placeholder__fieldset {
+            display: flex;
             align-items: center;
             justify-content: flex-start;
 
             > a {
                 margin-right: 10px;
+            }
+
+            > .components-base-control {
+                flex: 1;
             }
         }
 
@@ -59,6 +64,8 @@
         iframe {
             // stylelint-disable-next-line
             width: 200% !important;
+            // stylelint-disable-next-line
+            min-width: 200% !important;
             height: 601px;
             min-height: 20px;
             margin-bottom: -50%;
