@@ -1058,6 +1058,16 @@ class VP {
 
             new window.Swiper( $parent[ 0 ], options );
 
+            // autoplay hover pause.
+            if ( self.options.sliderAutoplayHoverPause === 'true' && parseFloat( self.options.sliderAutoplay ) > 0 ) {
+                self.$item.on( `mouseenter.vpf-uid-${ self.uid }`, '.swiper-container', function() {
+                    $parent[ 0 ].swiper.autoplay.stop();
+                } );
+                self.$item.on( `mouseleave.vpf-uid-${ self.uid }`, '.swiper-container', function() {
+                    $parent[ 0 ].swiper.autoplay.start();
+                } );
+            }
+
             self.emitEvent( 'initSwiper', [ options ] );
         }
     }

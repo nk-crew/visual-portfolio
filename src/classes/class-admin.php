@@ -919,6 +919,19 @@ class Visual_Portfolio_Admin {
                         'default' => 6,
                     ),
                     array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Pause on Mouse Over', '@@text_domain' ),
+                        'name'    => 'autoplay_hover_pause',
+                        'default' => false,
+                        'condition' => array(
+                            array(
+                                'control' => 'autoplay',
+                                'operator' => '>',
+                                'value' => 0,
+                            ),
+                        ),
+                    ),
+                    array(
                         'type'        => 'select2',
                         'label'       => esc_html__( 'Items height', '@@text_domain' ),
                         'name'        => 'items_height_type',

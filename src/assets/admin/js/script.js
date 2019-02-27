@@ -256,6 +256,7 @@ if ( typeof Tooltip !== 'undefined' ) {
         case 'vp_slider_effect':
         case 'vp_slider_speed':
         case 'vp_slider_autoplay':
+        case 'vp_slider_autoplay_hover_pause':
         case 'vp_slider_centered_slides':
         case 'vp_slider_loop':
         case 'vp_slider_free_mode':

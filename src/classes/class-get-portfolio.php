@@ -290,6 +290,7 @@ class Visual_Portfolio_Get {
 
             $data_atts['data-vp-slider-speed'] = $options['vp_slider_speed'];
             $data_atts['data-vp-slider-autoplay'] = $options['vp_slider_autoplay'];
+            $data_atts['data-vp-slider-autoplay-hover-pause'] = $options['vp_slider_autoplay_hover_pause'] ? 'true' : 'false';
             $data_atts['data-vp-slider-centered-slides'] = $options['vp_slider_centered_slides'] ? 'true' : 'false';
             $data_atts['data-vp-slider-loop'] = $options['vp_slider_loop'] ? 'true' : 'false';
             $data_atts['data-vp-slider-free-mode'] = $options['vp_slider_free_mode'] ? 'true' : 'false';
