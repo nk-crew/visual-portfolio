@@ -250,6 +250,7 @@ if ( typeof Tooltip !== 'undefined' ) {
         case 'vp_layout':
         case 'vp_tiles_type':
         case 'vp_masonry_columns':
+        case 'vp_grid_columns':
         case 'vp_justified_row_height':
         case 'vp_justified_row_height_tolerance':
         case 'vp_slider_effect':

@@ -846,6 +846,21 @@ class Visual_Portfolio_Admin {
                 ),
             ),
 
+            // Grid.
+            'grid' => array(
+                'title' => esc_html__( 'Grid', '@@text_domain' ),
+                'controls' => array(
+                    array(
+                        'type'  => 'range',
+                        'label' => esc_html__( 'Columns', '@@text_domain' ),
+                        'name'  => 'columns',
+                        'min'   => 1,
+                        'max'   => 5,
+                        'default' => 3,
+                    ),
+                ),
+            ),
+
             // Justified.
             'justified' => array(
                 'title' => esc_html__( 'Justified', '@@text_domain' ),

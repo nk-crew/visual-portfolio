@@ -170,13 +170,20 @@ class Visual_Portfolio_Get {
         $img_size_md_popup = 'vp_md';
         $img_size = 'vp_xl';
         $columns_count = false;
-        if ( 'masonry' === $options['vp_layout'] ) {
-            $columns_count = (int) $options['vp_masonry_columns'];
+
+        switch ( $options['vp_layout'] ) {
+            case 'masonry':
+                $columns_count = (int) $options['vp_masonry_columns'];
+                break;
+            case 'grid':
+                $columns_count = (int) $options['vp_grid_columns'];
+                break;
+            case 'tiles':
+                $columns_count = explode( '|', $options['vp_tiles_type'], 1 );
+                $columns_count = (int) $columns_count[0];
+                break;
         }
-        if ( 'tiles' === $options['vp_layout'] ) {
-            $columns_count = explode( '|', $options['vp_tiles_type'], 1 );
-            $columns_count = (int) $columns_count[0];
-        }
+
         switch ( $columns_count ) {
             case 1:
                 $img_size = 'vp_xl';
@@ -240,16 +247,21 @@ class Visual_Portfolio_Get {
             'data-vp-pagination' => $options['vp_pagination'],
             'data-vp-next-page-url' => $next_page_url,
         );
+
         if ( 'tiles' === $options['vp_layout'] || $is_preview ) {
             $data_atts['data-vp-tiles-type'] = $options['vp_tiles_type'];
         }
         if ( 'masonry' === $options['vp_layout'] || $is_preview ) {
             $data_atts['data-vp-masonry-columns'] = $options['vp_masonry_columns'];
         }
+        if ( 'grid' === $options['vp_layout'] || $is_preview ) {
+            $data_atts['data-vp-grid-columns'] = $options['vp_grid_columns'];
+        }
         if ( 'justified' === $options['vp_layout'] || $is_preview ) {
             $data_atts['data-vp-justified-row-height'] = $options['vp_justified_row_height'];
             $data_atts['data-vp-justified-row-height-tolerance'] = $options['vp_justified_row_height_tolerance'];
         }
+
         if ( 'slider' === $options['vp_layout'] || $is_preview ) {
             $data_atts['data-vp-slider-effect'] = $options['vp_slider_effect'];
 

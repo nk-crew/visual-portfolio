@@ -376,6 +376,7 @@ class VP {
             itemsGap: 0,
             tilesType: '3|1,1|',
             masonryColumns: 3,
+            gridColumns: 3,
             justifiedRowHeight: 250,
             justifiedRowHeightTolerance: 0.25,
             pagination: 'load-more',
@@ -739,13 +740,15 @@ class VP {
                 }
                 break;
             }
-            case 'masonry': {
+            case 'masonry':
+            case 'grid': {
+                const columns = self.options[ 'masonry' === self.options.layout ? 'masonryColumns' : 'gridColumns' ];
+
                 self.addStyle( '.vp-portfolio__item-wrap', {
-                    width: `${ 100 / self.options.masonryColumns }%`,
+                    width: `${ 100 / columns }%`,
                 } );
 
                 // calculate responsive.
-                const columns = self.options.masonryColumns;
                 let count = columns - 1;
                 let currentPoint = Math.min( screenSizes.length - 1, count );
 
@@ -825,7 +828,7 @@ class VP {
 
         // add gaps
         const gap = parseInt( self.options.itemsGap, 10 );
-        if ( gap && ( self.options.layout === 'tiles' || self.options.layout === 'masonry' ) ) {
+        if ( gap && ( self.options.layout === 'tiles' || self.options.layout === 'masonry' || self.options.layout === 'grid' ) ) {
             self.addStyle( '.vp-portfolio__items', {
                 'margin-left': `-${ gap }px`,
                 'margin-top': `-${ gap }px`,
@@ -892,10 +895,10 @@ class VP {
     initIsotope( options ) {
         const self = this;
 
-        if ( self.$items_wrap.isotope && ( self.options.layout === 'tiles' || self.options.layout === 'masonry' ) ) {
+        if ( self.$items_wrap.isotope && ( self.options.layout === 'tiles' || self.options.layout === 'masonry' || self.options.layout === 'grid' ) ) {
             self.$items_wrap.isotope( options || {
                 itemSelector: '.vp-portfolio__item-wrap',
-                layoutMode: 'masonry',
+                layoutMode: self.options.layout === 'grid' ? 'fitRows' : 'masonry',
                 // masonry: {
                 //     horizontalOrder: true
                 // },
