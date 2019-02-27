@@ -439,11 +439,11 @@ class Visual_Portfolio_Admin {
 
         foreach ( $meta as $item ) {
             if ( isset( $_POST[ $item ] ) ) {
-
-                $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
-
-                if ( 'Array' === $result ) {
+                // phpcs:ignore
+                if ( is_array( $_POST[ $item ] ) ) {
                     $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
+                } else {
+                    $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
                 }
 
                 update_post_meta( $post_id, $item, $result );
@@ -2651,11 +2651,12 @@ class Visual_Portfolio_Admin {
                     // phpcs:ignore
                     $result = wp_kses( $_POST[ $item ], array( '\'', '\"' ) );
                 } else {
-                    $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
-                }
-
-                if ( 'Array' === $result ) {
-                    $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
+                    // phpcs:ignore
+                    if ( is_array( $_POST[ $item ] ) ) {
+                        $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
+                    } else {
+                        $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
+                    }
                 }
 
                 update_post_meta( $post_id, $item, $result );
