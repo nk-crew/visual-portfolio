@@ -251,6 +251,7 @@ class Visual_Portfolio_Admin {
                 'supports' => array(
                     'title',
                     'editor',
+                    'author',
                     'thumbnail',
                     'revisions',
                     'excerpt',
