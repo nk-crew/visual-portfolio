@@ -896,7 +896,7 @@ class VP {
         const self = this;
 
         if ( self.$items_wrap.isotope && ( self.options.layout === 'tiles' || self.options.layout === 'masonry' || self.options.layout === 'grid' ) ) {
-            self.$items_wrap.isotope( options || {
+            const initOptions = options || {
                 itemSelector: '.vp-portfolio__item-wrap',
                 layoutMode: self.options.layout === 'grid' ? 'fitRows' : 'masonry',
                 // masonry: {
@@ -904,7 +904,11 @@ class VP {
                 // },
                 transitionDuration: '0.3s',
                 percentPosition: true,
-            } );
+            };
+
+            self.emitEvent( 'beforeInitIsotope', [ options ] );
+
+            self.$items_wrap.isotope( initOptions );
 
             self.emitEvent( 'initIsotope', [ options ] );
         }
@@ -934,15 +938,19 @@ class VP {
         const self = this;
 
         if ( self.$items_wrap.fjGallery && self.options.layout === 'justified' ) {
-            self.$items_wrap.fjGallery( options !== false ? options : {
+            const initOptions = options !== false ? options : {
                 gutter: parseFloat( self.options.itemsGap ) || 0,
                 rowHeight: parseFloat( self.options.justifiedRowHeight ) || 200,
                 rowHeightTolerance: parseFloat( self.options.justifiedRowHeightTolerance ) || 0,
                 itemSelector: '.vp-portfolio__item-wrap',
                 imageSelector: '.vp-portfolio__item-img img',
-            }, additional );
+            };
 
-            self.emitEvent( 'initFjGallery', [ options ] );
+            self.emitEvent( 'beforeInitFjGallery', [ initOptions, additional ] );
+
+            self.$items_wrap.fjGallery( initOptions, additional );
+
+            self.emitEvent( 'initFjGallery', [ initOptions, additional ] );
         }
     }
 
@@ -1056,6 +1064,8 @@ class VP {
                     }
                 },
             };
+
+            self.emitEvent( 'beforeInitSwiper', [ options ] );
 
             new window.Swiper( $parent[ 0 ], options );
 
