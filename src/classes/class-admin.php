@@ -2346,6 +2346,37 @@ class Visual_Portfolio_Admin {
                      * video_url - video url.
                      */
                 ),
+                'wrapper_class' => 'vp-col-12',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-images',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Order by', '@@text_domain' ),
+                'name'     => 'vp_images_order_by',
+                'default'  => 'default',
+                'options'  => array(
+                    'default' => esc_html__( 'Default', '@@text_domain' ),
+                    'date'    => esc_html__( 'Uploaded', '@@text_domain' ),
+                    'title'   => esc_html__( 'Title', '@@text_domain' ),
+                    'rand'    => esc_html__( 'Random', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-images',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Order direction', '@@text_domain' ),
+                'name'     => 'vp_images_order_direction',
+                'default'  => 'asc',
+                'options'  => array(
+                    'asc'  => esc_html__( 'ASC', '@@text_domain' ),
+                    'desc' => esc_html__( 'DESC', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
             )
         );
 
@@ -2639,9 +2670,11 @@ class Visual_Portfolio_Admin {
                     <!-- Images -->
 
                     <p></p>
-                    <?php
-                    Visual_Portfolio_Controls::get_registered( 'content-source-images' );
-                    ?>
+                    <div class="vp-row">
+                        <?php
+                        Visual_Portfolio_Controls::get_registered( 'content-source-images' );
+                        ?>
+                    </div>
                 </div>
             </div>
         </div>

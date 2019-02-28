@@ -627,6 +627,41 @@ class Visual_Portfolio_Get {
     static private $rand_seed_session = false;
 
     /**
+     * "rand" orderby don't work fine for paged, so we need to use custom solution.
+     * thanks to https://gist.github.com/hlashbrooke/6298714 .
+     */
+    private static function get_rand_seed_session() {
+        // phpcs:disable WordPress.VIP.SessionVariableUsage.SessionVarsProhibited
+
+        // already prepared.
+        if ( self::$rand_seed_session ) {
+            return self::$rand_seed_session;
+        }
+
+        // Reset vpf_random_seed on load of initial archive page.
+        if ( self::get_current_page_number() === 1 ) {
+            if ( isset( $_SESSION['vpf_random_seed'] ) ) {
+                unset( $_SESSION['vpf_random_seed'] );
+            }
+        }
+
+        // Get vpf_random_seed from session variable if it exists.
+        if ( isset( $_SESSION['vpf_random_seed'] ) ) {
+            self::$rand_seed_session = $_SESSION['vpf_random_seed'];
+        }
+
+        // Set new vpf_random_seed if none exists.
+        if ( ! self::$rand_seed_session ) {
+            self::$rand_seed_session = rand();
+            $_SESSION['vpf_random_seed'] = self::$rand_seed_session;
+        }
+
+        // phpcs:enable WordPress.VIP.SessionVariableUsage.SessionVarsProhibited
+
+        return self::$rand_seed_session;
+    }
+
+    /**
      * Get query params array.
      *
      * @param array $options portfolio options.
@@ -671,6 +706,46 @@ class Visual_Portfolio_Get {
                 $images = (array) $options['vp_images'];
             }
 
+            // order.
+            if ( isset( $options['vp_images_order_by'] ) && ! empty( $images ) ) {
+                switch ( $options['vp_images_order_by'] ) {
+                    case 'date':
+                    case 'title':
+                        $sort_tmp = array();
+                        $new_images = array();
+                        $sort_by = 'id';
+
+                        if ( 'title' === $options['vp_images_order_by'] ) {
+                            $sort_by = 'title';
+                        }
+
+                        foreach ( $images as &$ma ) {
+                            $sort_tmp[] = &$ma[ $sort_by ];
+                        }
+
+                        array_multisort( $sort_tmp, $images );
+                        foreach ( $images as &$ma ) {
+                            $new_images[] = $ma;
+                        }
+
+                        $images = $new_images;
+                        break;
+                    case 'rand':
+                        mt_srand( self::get_rand_seed_session() );
+                        for ( $i = count( $images ) - 1; $i > 0; $i-- ) {
+                            $j = @mt_rand( 0, $i );
+                            $tmp = $images[ $i ];
+                            $images[ $i ] = $images[ $j ];
+                            $images[ $j ] = $tmp;
+                        }
+                        break;
+                }
+                if ( 'desc' === $options['vp_images_order_direction'] ) {
+                    $images = array_reverse( $images );
+                }
+            }
+
+            // pages count.
             $query_opts['max_num_pages'] = ceil( count( $images ) / $count );
 
             $start_from_item = ( $paged - 1 ) * $count;
@@ -723,36 +798,9 @@ class Visual_Portfolio_Get {
                         $query_opts['orderby'] = 'menu_order';
                         break;
 
-                    // "rand" orderby don't work fine for paged, so we need to use custom solution.
-                    // thanks to https://gist.github.com/hlashbrooke/6298714 .
                     case 'rand':
-                        // phpcs:disable WordPress.VIP.SessionVariableUsage.SessionVarsProhibited
-
-                        // cache data to further use.
-                        if ( ! self::$rand_seed_session ) {
-                            // Reset vpf_random_seed on load of initial archive page.
-                            if ( self::get_current_page_number() === 1 ) {
-                                if ( isset( $_SESSION['vpf_random_seed'] ) ) {
-                                    unset( $_SESSION['vpf_random_seed'] );
-                                }
-                            }
-
-                            // Get vpf_random_seed from session variable if it exists.
-                            if ( isset( $_SESSION['vpf_random_seed'] ) ) {
-                                self::$rand_seed_session = $_SESSION['vpf_random_seed'];
-                            }
-
-                            // Set new vpf_random_seed if none exists.
-                            if ( ! self::$rand_seed_session ) {
-                                self::$rand_seed_session = rand();
-                                $_SESSION['vpf_random_seed'] = self::$rand_seed_session;
-                            }
-                        }
-
                         // Update ORDER BY clause to use vpf_random_seed.
-                        $query_opts['orderby'] = 'RAND(' . self::$rand_seed_session . ')';
-
-                        // phpcs:enable WordPress.VIP.SessionVariableUsage.SessionVarsProhibited
+                        $query_opts['orderby'] = 'RAND(' . self::get_rand_seed_session() . ')';
 
                         break;
 

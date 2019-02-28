@@ -1007,11 +1007,14 @@ $grid_sm: 600px !default;
  * Gallery + Sortable
  */
 .vp-control-gallery {
+    position: relative;
+    border-bottom: 1px solid #eaeaea;
+
     .vp-control-gallery-additional-data {
         position: absolute;
         box-sizing: border-box;
-        top: 0;
-        right: -350px;
+        top: -15px;
+        right: -365px;
         bottom: 0;
         width: 350px;
         padding: 15px 13px;
@@ -1021,7 +1024,7 @@ $grid_sm: 600px !default;
         transition: .15s right;
 
         &.active {
-            right: 0;
+            right: -15px;
 
             + .vp-control-gallery-items {
                 margin-right: 335px;
