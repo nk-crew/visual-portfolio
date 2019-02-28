@@ -27,7 +27,7 @@
 
     // meta
     .vp-portfolio__item-meta {
-        * + * {
+        > * + * {
             margin-top: 4px;
         }
     }
