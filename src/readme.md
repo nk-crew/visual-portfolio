@@ -3,7 +3,7 @@
 * Contributors: nko
 * Tags: portfolio, gallery, works, masonry, popup
 * Requires at least: 4.0.0
-* Tested up to: 5.0
+* Tested up to: 5.1
 * Requires PHP: 5.4
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
@@ -27,6 +27,7 @@ Visual Portfolio let you create beautiful portfolio layouts. Generates shortcode
 * Templates for theme developers
 * 4 predefined layouts:
   * Masonry
+  * Grid
   * Justified (Flickr)
   * Tiles
   * Slider (+ Carousel, Coverflow)
@@ -119,6 +120,23 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 [https://wp.nkdev.info/free-visual-portfolio/documentation/developers/jquery-methods/](https://wp.nkdev.info/free-visual-portfolio/documentation/developers/jquery-methods/)
 
 ## Changelog ##
+
+= 1.10.0 =
+
+* added Grid layout
+* added Order by and Order direction for Images Content Source
+* added Pause on Mouse Over option in Slider with Autoplay
+* added Free Scroll Sticky option in Slider
+* added figure and figcaption tags in portfolio items in layouts
+* added 'author' supports to portfolio posts
+* added new jQuery events 'beforeInitIsotope', 'beforeInitFjGallery', 'beforeInitSwiper', so the options could be changed before plugins init
+* changed meta blocks top margin
+* fixed post-based custom taxonomy and specific posts selector saving in WordPress 5.1
+* fixed error because of mb_strtolower existence
+* fixed popup gallery when Attachment used as post type
+* fixed fade meta max width in IE11
+* fixed Gutenberg block preview styles
+* removed code for paged single portfolios (as portfolio archives uses our own GET variable)
 
 = 1.9.3 =
 
