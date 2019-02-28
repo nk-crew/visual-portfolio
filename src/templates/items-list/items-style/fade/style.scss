@@ -99,6 +99,10 @@
     }
 
     // align
+    .vp-portfolio__item-align-center .vp-portfolio__item-meta {
+        align-items: center;
+        text-align: center;
+    }
     .vp-portfolio__item-align-left .vp-portfolio__item-meta {
         align-items: flex-start;
         text-align: left;

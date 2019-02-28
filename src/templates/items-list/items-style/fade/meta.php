@@ -37,7 +37,7 @@ $show_meta = $opts['show_icon'] && $opts['icon'] ||
     <?php endif; ?>
         class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
     <?php if ( $show_meta ) : ?>
-        <div class="vp-portfolio__item-meta">
+        <figcaption class="vp-portfolio__item-meta">
             <?php
 
             // Show Icon.
@@ -100,6 +100,6 @@ $show_meta = $opts['show_icon'] && $opts['icon'] ||
                 <?php
             }
             ?>
-        </div>
+        </figcaption>
     <?php endif; ?>
 </<?php echo esc_html( $tag ); ?>>

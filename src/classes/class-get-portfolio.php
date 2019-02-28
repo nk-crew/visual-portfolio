@@ -1227,7 +1227,7 @@ class Visual_Portfolio_Get {
                 <?php
             }
             ?>
-            <div class="vp-portfolio__item">
+            <figure class="vp-portfolio__item">
                 <?php
                 $items_style_pref = '';
                 if ( 'default' !== $args['vp_opts']['vp_items_style'] ) {
@@ -1236,7 +1236,7 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/image', $args );
                 visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/meta', $args );
                 ?>
-            </div>
+            </figure>
         </div>
         <?php
     }

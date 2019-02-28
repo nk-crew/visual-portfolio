@@ -54,6 +54,16 @@
     position: relative;
 }
 
+// figures
+.vp-portfolio figure.vp-portfolio__item {
+    margin: 0;
+}
+[class^="wp-block-"]:not(.wp-block-gallery) figcaption.vp-portfolio__item-meta,
+.vp-portfolio figcaption.vp-portfolio__item-meta {
+    margin-bottom: 0;
+    font-style: inherit;
+}
+
 // Preloader
 .vp-portfolio__preloader-wrap {
     visibility: visible;
