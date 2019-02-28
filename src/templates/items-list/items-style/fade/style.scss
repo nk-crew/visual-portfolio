@@ -36,6 +36,10 @@
         transform: scale(.8);
         will-change: transform, opacity;
 
+        > * {
+            max-width: 100%;
+        }
+
         > * + * {
             margin-top: 4px;
         }
