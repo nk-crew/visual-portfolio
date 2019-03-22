@@ -1642,6 +1642,18 @@ $( document ).on( 'lazyloaded', function( e ) {
     }
 } );
 
+// fix for Elementor popup gallery.
+// https://github.com/nk-o/visual-portfolio/issues/103
+if ( $( '.elementor' ).length ) {
+    $( document ).on( 'init.vpf addItems.vpf', function( event, vpObject ) {
+        vpObject.$item.find( '.vp-portfolio__item a' ).each( function() {
+            if ( /\.(png|jpe?g|gif|svg)(\?.*)?$/i.test( this.href ) ) {
+                $( this ).attr( 'data-elementor-open-lightbox', 'no' );
+            }
+        } );
+    } );
+}
+
 // global definition
 const plugin = function( options ) {
     const args = Array.prototype.slice.call( arguments, 1 );
