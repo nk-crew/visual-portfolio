@@ -153,7 +153,7 @@ class Visual_Portfolio_Preview {
      * @param int $id - visual portfolio shortcode id.
      */
     public function print_template( $id ) {
-        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', '', '3.6.3', true );
+        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', '', '4.0.4', true );
         wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery' ), '', true );
         ?>
         <!DOCTYPE html>
