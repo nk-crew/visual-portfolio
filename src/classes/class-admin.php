@@ -34,7 +34,7 @@ class Visual_Portfolio_Admin {
         add_action( 'save_post', array( $this, 'save_post_format_metaboxes' ) );
 
         // custom post roles.
-        add_action( 'admin_init', array( $this, 'add_role_caps' ) );
+        add_action( 'init', array( $this, 'add_role_caps' ) );
 
         // show blank state for portfolio list page.
         add_action( 'manage_posts_extra_tablenav', array( $this, 'maybe_render_blank_state' ) );
@@ -234,16 +234,8 @@ class Visual_Portfolio_Admin {
                     'portfolio_category',
                     'portfolio_tag',
                 ),
-                'capabilities' => array(
-                    'edit_post' => 'edit_portfolio',
-                    'edit_posts' => 'edit_portfolios',
-                    'edit_others_posts' => 'edit_other_portfolios',
-                    'publish_posts' => 'publish_portfolios',
-                    'read_post' => 'read_portfolio',
-                    'read_private_posts' => 'read_private_portfolios',
-                    'delete_posts' => 'delete_portfolios',
-                    'delete_post' => 'delete_portfolio',
-                ),
+                'map_meta_cap' => true,
+                'capability_type' => 'portfolio',
                 'rewrite' => array(
                     'slug' => $custom_slug,
                     'with_front' => false,
@@ -275,6 +267,12 @@ class Visual_Portfolio_Admin {
                 'show_in_nav_menus' => false,
                 'show_in_rest' => true,
                 'show_admin_column' => true,
+                'capabilities'          => array(
+                    'manage_terms' => 'manage_portfolio_terms',
+                    'edit_terms'   => 'edit_portfolio_terms',
+                    'delete_terms' => 'delete_portfolio_terms',
+                    'assign_terms' => 'assign_portfolio_terms',
+                ),
             )
         );
         register_taxonomy(
@@ -291,6 +289,12 @@ class Visual_Portfolio_Admin {
                 'show_in_nav_menus' => false,
                 'show_in_rest' => true,
                 'show_admin_column' => true,
+                'capabilities'          => array(
+                    'manage_terms' => 'manage_portfolio_terms',
+                    'edit_terms'   => 'edit_portfolio_terms',
+                    'delete_terms' => 'delete_portfolio_terms',
+                    'assign_terms' => 'assign_portfolio_terms',
+                ),
             )
         );
 
@@ -320,16 +324,8 @@ class Visual_Portfolio_Admin {
                 // adding to custom menu manually.
                 'show_in_menu' => 'edit.php?post_type=portfolio',
                 'show_in_rest' => true,
-                'capabilities' => array(
-                    'edit_post' => 'edit_portfolio',
-                    'edit_posts' => 'edit_portfolios',
-                    'edit_others_posts' => 'edit_other_portfolios',
-                    'publish_posts' => 'publish_portfolios',
-                    'read_post' => 'read_portfolio',
-                    'read_private_posts' => 'read_private_portfolios',
-                    'delete_posts' => 'delete_portfolios',
-                    'delete_post' => 'delete_portfolio',
-                ),
+                'map_meta_cap' => true,
+                'capability_type' => 'vp_list',
                 'rewrite' => true,
                 'supports' => array(
                     'title',
@@ -458,27 +454,86 @@ class Visual_Portfolio_Admin {
      * Add Roles
      */
     public function add_role_caps() {
-        global $wp_roles;
-
-        if ( isset( $wp_roles ) ) {
-            $wp_roles->add_cap( 'administrator', 'edit_portfolio' );
-            $wp_roles->add_cap( 'administrator', 'edit_portfolios' );
-            $wp_roles->add_cap( 'administrator', 'edit_other_portfolios' );
-            $wp_roles->add_cap( 'administrator', 'publish_portfolios' );
-            $wp_roles->add_cap( 'administrator', 'read_portfolio' );
-            $wp_roles->add_cap( 'administrator', 'read_private_portfolios' );
-            $wp_roles->add_cap( 'administrator', 'delete_portfolios' );
-            $wp_roles->add_cap( 'administrator', 'delete_portfolio' );
-
-            $wp_roles->add_cap( 'editor', 'read_portfolio' );
-            $wp_roles->add_cap( 'editor', 'read_private_portfolios' );
-
-            $wp_roles->add_cap( 'author', 'read_portfolio' );
-            $wp_roles->add_cap( 'author', 'read_private_portfolios' );
-
-            $wp_roles->add_cap( 'contributor', 'read_portfolio' );
-            $wp_roles->add_cap( 'contributor', 'read_private_portfolios' );
+        if ( ! is_blog_installed() ) {
+            return;
         }
+        if ( get_option( 'visual_portfolio_updated_caps' ) === '@@plugin_version' ) {
+            return;
+        }
+
+        $wp_roles = wp_roles();
+
+        if ( ! isset( $wp_roles ) || empty( $wp_roles ) || ! $wp_roles ) {
+            return;
+        }
+
+        $author = $wp_roles->get_role( 'author' );
+
+        $wp_roles->add_role(
+            'portfolio_manager',
+            __( 'Portfolio Manager', '@@text_domain' ),
+            $author->capabilities
+        );
+        $wp_roles->add_role(
+            'portfolio_author',
+            __( 'Portfolio Author', '@@text_domain' ),
+            $author->capabilities
+        );
+
+        $portfolio_cap = array(
+            'read_portfolio',
+            'read_private_portfolio',
+            'read_private_portfolios',
+            'edit_portfolio',
+            'edit_portfolios',
+            'edit_others_portfolios',
+            'edit_private_portfolios',
+            'edit_published_portfolios',
+            'delete_portfolio',
+            'delete_portfolios',
+            'delete_others_portfolios',
+            'delete_private_portfolios',
+            'delete_published_portfolios',
+            'publish_portfolios',
+
+            // Terms.
+            'manage_portfolio_terms',
+            'edit_portfolio_terms',
+            'delete_portfolio_terms',
+            'assign_portfolio_terms',
+        );
+
+        $lists_cap = array(
+            'read_vp_list',
+            'read_private_vp_list',
+            'read_private_vp_lists',
+            'edit_vp_list',
+            'edit_vp_lists',
+            'edit_others_vp_lists',
+            'edit_private_vp_lists',
+            'edit_published_vp_lists',
+            'delete_vp_list',
+            'delete_vp_lists',
+            'delete_others_vp_lists',
+            'delete_private_vp_lists',
+            'delete_published_vp_lists',
+            'publish_vp_lists',
+        );
+
+        /**
+         * Add capacities
+         */
+        foreach ( $portfolio_cap as $cap ) {
+            $wp_roles->add_cap( 'portfolio_manager', $cap );
+            $wp_roles->add_cap( 'portfolio_author', $cap );
+            $wp_roles->add_cap( 'administrator', $cap );
+        }
+        foreach ( $lists_cap as $cap ) {
+            $wp_roles->add_cap( 'portfolio_manager', $cap );
+            $wp_roles->add_cap( 'administrator', $cap );
+        }
+
+        update_option( 'visual_portfolio_updated_caps', '@@plugin_version' );
     }
 
     /**
