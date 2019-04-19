@@ -836,7 +836,9 @@ class VP {
 
             const gapStyle = `${ gap }px`;
 
-            self.addStyle( '.vp-portfolio__item-wrap .vp-portfolio__item', {
+            // we need to add this long selector to prevent conflicts with Elementor.
+            // related topic: https://wordpress.org/support/topic/gap-feature-does-not-work/#post-11403735
+            self.addStyle( '.vp-portfolio__items .vp-portfolio__item-wrap .vp-portfolio__item', {
                 'margin-left': gapStyle,
                 'margin-top': gapStyle,
             } );
