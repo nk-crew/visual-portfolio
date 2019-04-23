@@ -21,7 +21,7 @@ const $postType = $( '[name="post_type"]' );
 const postID = $( '#postID, #post_ID' ).eq( 0 ).val();
 
 // select shortcode text in input
-$body.on( 'focus', '[name="vp_list_shortcode"], [name="vp_filter_shortcode"]', function() {
+$body.on( 'focus', '[name="vp_list_shortcode"], [name="vp_filter_shortcode"], [name="vp_sort_shortcode"]', function() {
     this.select();
 } );
 $body.on( 'click', '.vp-onclick-selection', function() {
@@ -283,6 +283,11 @@ if ( typeof Tooltip !== 'undefined' ) {
         }
         case 'vp_filter_align':
             data.$portfolio.find( '.vp-filter' ).removeClass( 'vp-filter__align-center vp-filter__align-left vp-filter__align-right' ).addClass( `vp-filter__align-${ data.value }` );
+            data.reload = false;
+
+            break;
+        case 'vp_sort_align':
+            data.$portfolio.find( '.vp-sort' ).removeClass( 'vp-sort__align-center vp-sort__align-left vp-sort__align-right' ).addClass( `vp-sort__align-${ data.value }` );
             data.reload = false;
 
             break;

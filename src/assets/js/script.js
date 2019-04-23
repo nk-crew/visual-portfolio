@@ -85,10 +85,16 @@ class VP {
         self.$items_wrap = $item.find( '.vp-portfolio__items' );
         self.$pagination = $item.find( '.vp-portfolio__pagination-wrap' );
         self.$filter = $item.find( '.vp-portfolio__filter-wrap' );
+        self.$sort = $item.find( '.vp-portfolio__sort-wrap' );
 
         // find single filter block.
         if ( self.id ) {
             self.$filter = self.$filter.add( `.vp-single-filter.vp-id-${ self.id } .vp-portfolio__filter-wrap` );
+        }
+
+        // find single sort block.
+        if ( self.id ) {
+            self.$sort = self.$sort.add( `.vp-single-sort.vp-id-${ self.id } .vp-portfolio__sort-wrap` );
         }
 
         // user options
@@ -147,6 +153,7 @@ class VP {
 
         if ( self.id ) {
             $( `.vp-single-filter.vp-id-${ self.id }` ).addClass( 'vp-single-filter__ready' );
+            $( `.vp-single-sort.vp-id-${ self.id }` ).addClass( 'vp-single-sort__ready' );
         }
 
         // isotope
@@ -219,6 +226,7 @@ class VP {
 
         if ( self.id ) {
             $( `.vp-single-filter.vp-id-${ self.id }` ).removeClass( 'vp-single-filter__ready' );
+            $( `.vp-single-sort.vp-id-${ self.id }` ).removeClass( 'vp-single-sort__ready' );
         }
 
         // destroy events
@@ -562,6 +570,16 @@ class VP {
             self.loadNewItems( $this.attr( 'href' ), true );
         } );
 
+        // on sort click
+        self.$sort.on( `click${ evp }`, '.vp-sort .vp-sort__item a', function( e ) {
+            e.preventDefault();
+            const $this = $( this );
+            if ( ! self.loading ) {
+                $this.closest( '.vp-sort__item' ).addClass( 'vp-sort__item-active' ).siblings().removeClass( 'vp-sort__item-active' );
+            }
+            self.loadNewItems( $this.attr( 'href' ), true );
+        } );
+
         // on pagination click
         self.$item.on( `click${ evp }`, '.vp-pagination .vp-pagination__item a', function( e ) {
             e.preventDefault();
@@ -621,6 +639,7 @@ class VP {
         // destroy click events
         self.$item.off( evp );
         self.$filter.off( evp );
+        self.$sort.off( evp );
 
         // destroy infinite load events
         $wnd.off( evp );
@@ -1592,6 +1611,22 @@ class VP {
                         }
 
                         $filter.html( newFilterContent );
+                    } );
+                }
+
+                // update sort
+                if ( self.$sort.length ) {
+                    self.$sort.each( function() {
+                        const $sort = $( this );
+                        let newFilterContent = '';
+
+                        if ( $sort.parent().hasClass( 'vp-single-sort' ) ) {
+                            newFilterContent = $body.find( `[class="${ $sort.parent().attr( 'class' ).replace( ' vp-single-sort__ready', '' ) }"] .vp-portfolio__sort-wrap` ).html();
+                        } else {
+                            newFilterContent = $newVP.find( '.vp-portfolio__sort-wrap' ).html();
+                        }
+
+                        $sort.html( newFilterContent );
                     } );
                 }
 

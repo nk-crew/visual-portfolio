@@ -161,6 +161,43 @@ class Visual_Portfolio_Extend {
     }
 
     /**
+     * Additional Sort.
+     *
+     * @return array
+     */
+    public static function sort() {
+        /*
+         * Example:
+            array(
+                'new_sort' => array(
+                    'title' => esc_html__( 'New Sort', '@@text_domain' ),
+                    'controls' => array(
+                        ... controls ...
+                    ),
+                ),
+            )
+         */
+        return apply_filters( 'vpf_extend_sort', array() );
+    }
+
+    /**
+     * Extend Specific Sort Controls.
+     *
+     * @param string $name - sort name.
+     * @param array  $controls - controls array.
+     * @return array
+     */
+    public static function sort_controls( $name, $controls ) {
+        /*
+         * Example:
+            array(
+                ... controls ...
+            )
+         */
+        return apply_filters( 'vpf_extend_sort_' . $name . '_controls', $controls );
+    }
+
+    /**
      * Additional Pagination.
      *
      * @return array

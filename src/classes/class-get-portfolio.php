@@ -341,7 +341,33 @@ class Visual_Portfolio_Get {
             }
         }
 
+        // Filter and Sort controls.
+        ob_start();
         self::filter( $options );
+        $filter_content = ob_get_contents();
+        ob_end_clean();
+
+        ob_start();
+        self::sort( $options );
+        $sort_content = ob_get_contents();
+        ob_end_clean();
+
+        if ( $filter_content && $sort_content ) {
+            ?>
+            <div class="vp-portfolio__filter-sort-wrap">
+            <?php
+        }
+
+        // phpcs:ignore
+        echo $filter_content;
+        // phpcs:ignore
+        echo $sort_content;
+
+        if ( $filter_content && $sort_content ) {
+            ?>
+            </div>
+            <?php
+        }
 
         // Insert styles.
         $items_style_pref = '';
@@ -610,6 +636,53 @@ class Visual_Portfolio_Get {
     }
 
     /**
+     * ID of the current printed single sort
+     *
+     * @var int
+     */
+    static private $sort_id = 0;
+
+    /**
+     * Print portfolio sort by post ID or options
+     *
+     * @param array $atts options for portfolio list to print.
+     *
+     * @return string
+     */
+    public static function get_sort( $atts = array() ) {
+        $options = self::get_options( $atts['id'] );
+
+        $options = array_merge(
+            $options, array(
+                'vp_sort' => $atts['type'],
+                'vp_sort_align' => $atts['align'],
+            )
+        );
+
+        // generate unique ID.
+        $uid = ++self::$sort_id;
+        $uid = hash( 'crc32b', $uid . $atts['id'] );
+
+        $class = 'vp-single-sort vp-sort-uid-' . $uid . ' vp-id-' . $atts['id'];
+
+        // Add custom class.
+        if ( isset( $atts['class'] ) ) {
+            $class .= ' ' . $atts['class'];
+        }
+
+        ob_start();
+        ?>
+        <div class="<?php echo esc_attr( $class ); ?>">
+            <?php self::sort( $options ); ?>
+        </div>
+        <?php
+
+        $return = ob_get_contents();
+        ob_end_clean();
+        return $return;
+    }
+
+    /**
      * Get current page number
      * ?vp_page=2
      *
@@ -707,15 +780,43 @@ class Visual_Portfolio_Get {
             }
 
             // order.
-            if ( isset( $options['vp_images_order_by'] ) && ! empty( $images ) ) {
-                switch ( $options['vp_images_order_by'] ) {
+            $custom_order = false;
+            $custom_order_direction = $options['vp_images_order_direction'];
+
+            if ( isset( $options['vp_images_order_by'] ) ) {
+                $custom_order = $options['vp_images_order_by'];
+            }
+
+            // custom sorting.
+            if ( isset( $_GET['vp_sort'] ) ) {
+                $custom_get_order = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
+
+                switch ( $custom_get_order ) {
+                    case 'title':
+                    case 'date':
+                        $custom_order = $custom_get_order;
+                        $custom_order_direction = 'asc';
+                        break;
+                    case 'title_desc':
+                        $custom_order = 'title';
+                        $custom_order_direction = 'desc';
+                        break;
+                    case 'date_desc':
+                        $custom_order = 'date';
+                        $custom_order_direction = 'desc';
+                        break;
+                }
+            }
+
+            if ( $custom_order && ! empty( $images ) ) {
+                switch ( $custom_order ) {
                     case 'date':
                     case 'title':
                         $sort_tmp = array();
                         $new_images = array();
                         $sort_by = 'id';
 
-                        if ( 'title' === $options['vp_images_order_by'] ) {
+                        if ( 'title' === $custom_order ) {
                             $sort_by = 'title';
                         }
 
@@ -740,7 +841,7 @@ class Visual_Portfolio_Get {
                         }
                         break;
                 }
-                if ( 'desc' === $options['vp_images_order_direction'] ) {
+                if ( 'desc' === $custom_order_direction ) {
                     $images = array_reverse( $images );
                 }
             }
@@ -862,6 +963,34 @@ class Visual_Portfolio_Get {
                     }
                 } // End if().
             } // End if().
+
+            // Custom sorting.
+            if ( isset( $_GET['vp_sort'] ) ) {
+                $custom_get_order = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
+                $custom_order = false;
+                $custom_order_direction = false;
+
+                switch ( $custom_get_order ) {
+                    case 'title':
+                    case 'date':
+                        $custom_order = 'post_' . $custom_get_order;
+                        $custom_order_direction = 'asc';
+                        break;
+                    case 'title_desc':
+                        $custom_order = 'post_title';
+                        $custom_order_direction = 'desc';
+                        break;
+                    case 'date_desc':
+                        $custom_order = 'post_date';
+                        $custom_order_direction = 'desc';
+                        break;
+                }
+
+                if ( $custom_order && $custom_order_direction ) {
+                    $query_opts['orderby'] = $custom_order;
+                    $query_opts['order'] = $custom_order_direction;
+                }
+            }
 
             // Load certain taxonomies using custom filter.
             if ( ! $for_filter && isset( $_GET['vp_filter'] ) ) {
@@ -1113,6 +1242,99 @@ class Visual_Portfolio_Get {
 
         visual_portfolio()->include_template( 'items-list/filter' . $filter_style_pref . '/filter', $args );
         visual_portfolio()->include_template_style( '@@plugin_name-filter-' . $vp_options['vp_filter'], 'items-list/filter' . $filter_style_pref . '/style' );
+
+        ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Print sort
+     *
+     * @param array $vp_options current vp_list options.
+     */
+    private static function sort( $vp_options ) {
+        if ( ! $vp_options['vp_sort'] ) {
+            return;
+        }
+
+        $terms = array();
+
+        // Get active item.
+        $active_item = false;
+        if ( isset( $_GET['vp_sort'] ) ) {
+            $active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
+        }
+
+        $sort_items = array(
+            '' => esc_html__( 'Default sorting', '@@text_domain' ),
+            'date' => esc_html__( 'Sort by date (newest)', '@@text_domain' ),
+            'date_desc' => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
+            'title' => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
+            'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
+        );
+
+        foreach ( $sort_items as $slug => $label ) {
+            $url = self::get_pagenum_link(
+                array(
+                    'vp_sort' => urlencode( $slug ),
+                    'vp_page' => 1,
+                )
+            );
+
+            $is_active = ! $active_item && ! $slug ? true : $active_item === $slug;
+
+            // add in terms array.
+            $terms[ $slug ] = array(
+                'sort'        => $slug,
+                'label'       => $label,
+                'description' => '',
+                'active'      => $is_active,
+                'url'         => $url,
+                'class'       => 'vp-sort__item' . ( $is_active ? ' vp-sort__item-active' : '' ),
+            );
+        }
+
+        // get options for the current sort.
+        $sort_options = array();
+        $sort_options_slug = 'vp_sort_' . $vp_options['vp_sort'] . '__';
+        foreach ( $vp_options as $k => $opt ) {
+            // add option to array.
+            if ( substr( $k, 0, strlen( $sort_options_slug ) ) === $sort_options_slug ) {
+                $opt_name = str_replace( $sort_options_slug, '', $k );
+                $sort_options[ $opt_name ] = $opt;
+            }
+
+            // remove style options from the options list.
+            if ( substr( $k, 0, strlen( $sort_options_slug ) ) === $sort_options_slug ) {
+                unset( $vp_options[ $k ] );
+            }
+        }
+
+        $args = array(
+            'class'    => 'vp-sort',
+            'items'    => $terms,
+            'align'    => $vp_options['vp_sort_align'],
+            'opts'     => $sort_options,
+            'vp_opts'  => $vp_options,
+        );
+
+        if ( $vp_options['vp_sort_align'] ) {
+            $args['class'] .= ' vp-sort__align-' . $vp_options['vp_sort_align'];
+        }
+
+        ?>
+        <div class="vp-portfolio__sort-wrap">
+        <?php
+
+        $sort_style_pref = '';
+
+        if ( 'default' !== $vp_options['vp_sort'] ) {
+            $sort_style_pref = '/' . $vp_options['vp_sort'];
+        }
+
+        visual_portfolio()->include_template( 'items-list/sort' . $sort_style_pref . '/sort', $args );
+        visual_portfolio()->include_template_style( '@@plugin_name-sort-' . $vp_options['vp_sort'], 'items-list/sort' . $sort_style_pref . '/style' );
 
         ?>
         </div>
@@ -1469,6 +1691,10 @@ class Visual_Portfolio_Get {
         if ( isset( $query_arg['vp_filter'] ) && ! $query_arg['vp_filter'] ) {
             unset( $query_arg['vp_filter'] );
             $current_url = remove_query_arg( 'vp_filter', $current_url );
+        }
+        if ( isset( $query_arg['vp_sort'] ) && ! $query_arg['vp_sort'] ) {
+            unset( $query_arg['vp_sort'] );
+            $current_url = remove_query_arg( 'vp_sort', $current_url );
         }
         if ( isset( $query_arg['vp_page'] ) && 1 === $query_arg['vp_page'] ) {
             unset( $query_arg['vp_page'] );

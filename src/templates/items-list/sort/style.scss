@@ -1,0 +1,63 @@
+/**
+ * Default sort style
+ */
+.vp-sort__style-default {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
+    margin: -3px;
+    margin-bottom: 17px;
+    list-style-type: none;
+
+    .vp-sort__item a {
+        outline: none;
+        box-shadow: none;
+    }
+
+    // align
+    &.vp-sort__align-left {
+        justify-content: flex-start;
+    }
+    &.vp-sort__align-right {
+        justify-content: flex-end;
+    }
+
+    .vp-sort__item {
+        flex: 0 0 auto;
+        padding: 0;
+        margin: 3px;
+        text-align: center;
+        list-style-type: none;
+
+        > * {
+            display: block;
+            min-width: 40px;
+            padding: 8px 16px;
+            line-height: 1.4;
+            color: inherit;
+            text-decoration: none;
+            background-color: #fff;
+            border: 1px solid #eaeaea;
+            transition: .2s border-color, .2s background-color, .2s color;
+            will-change: border-color, background-color, color;
+        }
+
+        &:not(.vp-sort__item-active) > a:hover {
+            border: 1px solid #bfbfbf;
+        }
+
+        &.vp-sort__item-active > * {
+            color: #fff;
+            cursor: default;
+            background-color: #6c7781;
+            border: 1px solid #6c7781;
+        }
+
+        .vp-sort__item-count {
+            float: right;
+            margin-left: 8px;
+            font-size: 60%;
+        }
+    }
+}

@@ -25,6 +25,7 @@
 
 .vp-portfolio__items-wrap,
 .vp-portfolio__filter-wrap,
+.vp-portfolio__sort-wrap,
 .vp-portfolio__pagination-wrap,
 .vp-portfolio__item {
     position: relative;
@@ -32,6 +33,7 @@
 }
 .vp-portfolio__items-wrap,
 .vp-portfolio__filter-wrap,
+.vp-portfolio__sort-wrap,
 .vp-portfolio__pagination-wrap {
     visibility: hidden;
     opacity: 0;
@@ -52,6 +54,12 @@
 }
 .vp-portfolio__item-img {
     position: relative;
+}
+
+// sort and filter wrap
+.vp-portfolio__filter-sort-wrap {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 // figures
@@ -280,6 +288,7 @@
 
     .vp-portfolio__items-wrap,
     .vp-portfolio__filter-wrap,
+    .vp-portfolio__sort-wrap,
     .vp-portfolio__pagination-wrap {
         visibility: visible;
         opacity: 1;
@@ -295,6 +304,12 @@
 }
 .vp-single-filter.vp-single-filter__ready {
     .vp-portfolio__filter-wrap {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+.vp-single-sort.vp-single-sort__ready {
+    .vp-portfolio__sort-wrap {
         visibility: visible;
         opacity: 1;
     }
@@ -315,6 +330,7 @@
 
     .vp-portfolio__items-wrap,
     .vp-portfolio__filter-wrap,
+    .vp-portfolio__sort-wrap,
     .vp-portfolio__pagination-wrap {
         opacity: .5;
     }

@@ -1801,6 +1801,98 @@ class Visual_Portfolio_Admin {
         );
 
         /**
+         * Sort.
+         */
+        $sorts = array_merge( array(
+            // False.
+            'false' => array(
+                'title' => esc_html__( 'Disabled', '@@text_domain' ),
+                'controls' => array(),
+            ),
+
+            // Default.
+            'default' => array(
+                'title' => esc_html__( 'Default', '@@text_domain' ),
+                'controls' => array(),
+            ),
+        ), Visual_Portfolio_Extend::sort() );
+
+        // Extend specific sort controls.
+        foreach ( $sorts as $name => $sort ) {
+            if ( isset( $sort['controls'] ) ) {
+                $sorts[ $name ]['controls'] = Visual_Portfolio_Extend::sort_controls( $name, $sort['controls'] );
+            }
+        }
+
+        // Sort selector.
+        $sorts_selector = array();
+        foreach ( $sorts as $name => $sort ) {
+            $sorts_selector[ $name ] = $sort['title'];
+        }
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'sort',
+                'type'     => 'select2',
+                'name'     => 'vp_sort',
+                'default'  => 'false',
+                'options'  => $sorts_selector,
+            )
+        );
+
+        // sorts options.
+        foreach ( $sorts as $name => $sort ) {
+            if ( ! isset( $sort['controls'] ) ) {
+                continue;
+            }
+            foreach ( $sort['controls'] as $field ) {
+                $field['category'] = 'sort';
+                $field['name'] = 'vp_sort_' . $name . '__' . $field['name'];
+
+                // condition names prefix fix.
+                if ( isset( $field['condition'] ) ) {
+                    foreach ( $field['condition'] as $k => $cond ) {
+                        if ( isset( $cond['control'] ) ) {
+                            $field['condition'][ $k ]['control'] = 'vp_' . $name . '_' . $cond['control'];
+                        }
+                    }
+                }
+
+                $field['condition'] = array_merge(
+                    isset( $field['condition'] ) ? $field['condition'] : array(),
+                    array(
+                        array(
+                            'control' => 'vp_sort',
+                            'value' => $name,
+                        ),
+                    )
+                );
+                Visual_Portfolio_Controls::register( $field );
+            }
+        }
+
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'sort',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Align', '@@text_domain' ),
+                'name'     => 'vp_sort_align',
+                'default'  => 'center',
+                'options'  => array(
+                    'center' => esc_html__( 'Center', '@@text_domain' ),
+                    'left'   => esc_html__( 'Left', '@@text_domain' ),
+                    'right'  => esc_html__( 'Right', '@@text_domain' ),
+                ),
+                'condition' => array(
+                    array(
+                        'control' => 'vp_sort',
+                        'operator' => '!=',
+                        'value' => 'false',
+                    ),
+                ),
+            )
+        );
+
+        /**
          * Pagination
          */
         $pagination = array_merge( array(
@@ -2526,6 +2618,14 @@ class Visual_Portfolio_Admin {
             'default'
         );
         add_meta_box(
+            'vp_sort',
+            esc_html__( 'Sort', '@@text_domain' ),
+            array( $this, 'add_sort_metabox' ),
+            'vp_lists',
+            'side',
+            'default'
+        );
+        add_meta_box(
             'vp_pagination',
             esc_html__( 'Pagination', '@@text_domain' ),
             array( $this, 'add_pagination_metabox' ),
@@ -2656,6 +2756,15 @@ class Visual_Portfolio_Admin {
                 'readonly' => true,
             )
         );
+    }
+
+    /**
+     * Add Sort metabox
+     *
+     * @param object $post The post object.
+     */
+    public function add_sort_metabox( $post ) {
+        Visual_Portfolio_Controls::get_registered( 'sort' );
     }
 
     /**
