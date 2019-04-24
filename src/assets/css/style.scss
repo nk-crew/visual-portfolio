@@ -60,6 +60,10 @@
 .vp-portfolio__filter-sort-wrap {
     display: flex;
     flex-wrap: wrap;
+
+    .vp-portfolio__sort-wrap {
+        margin-left: auto;
+    }
 }
 
 // figures

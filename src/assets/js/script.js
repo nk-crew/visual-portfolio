@@ -580,6 +580,17 @@ class VP {
             self.loadNewItems( $this.attr( 'href' ), true );
         } );
 
+        // on filter/sort select change
+        self.$filter.add( self.$sort ).on( `change${ evp }`, '.vp-filter select, .vp-sort select', function() {
+            const $this = $( this );
+            const value = $this.val();
+            const $option = $this.find( `[value="${ value }"]` );
+
+            if ( $option.length ) {
+                self.loadNewItems( $option.attr( 'data-vp-url' ), true );
+            }
+        } );
+
         // on pagination click
         self.$item.on( `click${ evp }`, '.vp-pagination .vp-pagination__item a', function( e ) {
             e.preventDefault();

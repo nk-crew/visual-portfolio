@@ -1,0 +1,38 @@
+/**
+ * Dropdown sort style
+ */
+.vp-sort__style-dropdown {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
+    margin: -3px;
+    margin-bottom: 17px;
+    list-style-type: none;
+
+    // align
+    &.vp-sort__align-left {
+        justify-content: flex-start;
+    }
+    &.vp-sort__align-right {
+        justify-content: flex-end;
+    }
+
+    select {
+        display: block;
+        min-width: 40px;
+        padding: 8px 16px;
+        margin: 3px;
+        line-height: 1.4;
+        color: inherit;
+        text-decoration: none;
+        background-color: #fff;
+        border: 1px solid #eaeaea;
+        transition: .2s border-color, .2s background-color, .2s color;
+        will-change: border-color, background-color, color;
+
+        &:hover {
+            border: 1px solid #bfbfbf;
+        }
+    }
+}

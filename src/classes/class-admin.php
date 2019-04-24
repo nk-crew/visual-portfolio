@@ -1691,6 +1691,12 @@ class Visual_Portfolio_Admin {
                 'title' => esc_html__( 'Default', '@@text_domain' ),
                 'controls' => array(),
             ),
+
+            // Dropdown.
+            'dropdown' => array(
+                'title' => esc_html__( 'Dropdown', '@@text_domain' ),
+                'controls' => array(),
+            ),
         ), Visual_Portfolio_Extend::filters() );
 
         // Extend specific filter controls.
@@ -1813,6 +1819,12 @@ class Visual_Portfolio_Admin {
             // Default.
             'default' => array(
                 'title' => esc_html__( 'Default', '@@text_domain' ),
+                'controls' => array(),
+            ),
+
+            // Dropdown.
+            'dropdown' => array(
+                'title' => esc_html__( 'Dropdown', '@@text_domain' ),
                 'controls' => array(),
             ),
         ), Visual_Portfolio_Extend::sort() );
