@@ -1204,52 +1204,55 @@ class VP {
 
             thumbElements.each( function() {
                 $meta = $( this ).find( '.vp-portfolio__item-popup' );
-                size = ( $meta.attr( 'data-vp-popup-img-size' ) || '1920x1080' ).split( 'x' );
-                videoSize = ( $meta.attr( 'data-vp-popup-video-size' ) || '1920x1080' ).split( 'x' );
-                video = $meta.attr( 'data-vp-popup-video' );
 
-                if ( video ) {
-                    item = {
-                        html: video,
-                        vw: parseInt( videoSize[ 0 ], 10 ),
-                        vh: parseInt( videoSize[ 1 ], 10 ),
-                    };
-                } else {
-                    // create slide object
-                    item = {
-                        src: $meta.attr( 'data-vp-popup-img' ),
-                        w: parseInt( size[ 0 ], 10 ),
-                        h: parseInt( size[ 1 ], 10 ),
-                    };
+                if ( $meta && $meta.length ) {
+                    size = ( $meta.attr( 'data-vp-popup-img-size' ) || '1920x1080' ).split( 'x' );
+                    videoSize = ( $meta.attr( 'data-vp-popup-video-size' ) || '1920x1080' ).split( 'x' );
+                    video = $meta.attr( 'data-vp-popup-video' );
 
-                    const $caption = $meta.html();
-                    if ( $caption ) {
-                        item.title = $caption;
-                    }
-
-                    // save link to element for getThumbBoundsFn
-                    item.el = this;
-
-                    const mediumSrc = $meta.attr( 'data-vp-popup-md-img' ) || item.src;
-                    if ( mediumSrc ) {
-                        size = ( $meta.attr( 'data-vp-popup-md-img-size' ) || $meta.attr( 'data-vp-popup-img-size' ) || '1920x1080' ).split( 'x' );
-                        // "medium-sized" image
-                        item.m = {
-                            src: mediumSrc,
+                    if ( video ) {
+                        item = {
+                            html: video,
+                            vw: parseInt( videoSize[ 0 ], 10 ),
+                            vh: parseInt( videoSize[ 1 ], 10 ),
+                        };
+                    } else {
+                        // create slide object
+                        item = {
+                            src: $meta.attr( 'data-vp-popup-img' ),
                             w: parseInt( size[ 0 ], 10 ),
                             h: parseInt( size[ 1 ], 10 ),
                         };
+
+                        const $caption = $meta.html();
+                        if ( $caption ) {
+                            item.title = $caption;
+                        }
+
+                        // save link to element for getThumbBoundsFn
+                        item.el = this;
+
+                        const mediumSrc = $meta.attr( 'data-vp-popup-md-img' ) || item.src;
+                        if ( mediumSrc ) {
+                            size = ( $meta.attr( 'data-vp-popup-md-img-size' ) || $meta.attr( 'data-vp-popup-img-size' ) || '1920x1080' ).split( 'x' );
+                            // "medium-sized" image
+                            item.m = {
+                                src: mediumSrc,
+                                w: parseInt( size[ 0 ], 10 ),
+                                h: parseInt( size[ 1 ], 10 ),
+                            };
+                        }
+
+                        // original image
+                        item.o = {
+                            src: item.src,
+                            w: item.w,
+                            h: item.h,
+                        };
                     }
 
-                    // original image
-                    item.o = {
-                        src: item.src,
-                        w: item.w,
-                        h: item.h,
-                    };
+                    items.push( item );
                 }
-
-                items.push( item );
             } );
 
             return items;
@@ -1476,12 +1479,16 @@ class VP {
 
         // click action
         self.$item.on( `click.vpf-uid-${ self.uid }`, '.vp-portfolio__item', function( e ) {
+            if ( ! $( this ).closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item-popup' ).length ) {
+                return;
+            }
+
             e.preventDefault();
 
             let index = 0;
             const clicked = this;
-            self.$item.find( '.vp-portfolio__item' ).each( function( idx ) {
-                if ( this === clicked ) {
+            self.$item.find( '.vp-portfolio__item-wrap .vp-portfolio__item-popup' ).each( function( idx ) {
+                if ( $( this ).closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item' )[ 0 ] === clicked ) {
                     index = idx;
                     return false;
                 }

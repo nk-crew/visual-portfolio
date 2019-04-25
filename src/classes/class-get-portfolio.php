@@ -455,6 +455,7 @@ class Visual_Portfolio_Get {
                             'published_time'  => '',
                             'filter'          => implode( ',', $filter_values ),
                             'image_id'        => intval( $img['id'] ),
+                            'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
                             'categories'      => $categories,
                         ) );
 
@@ -1414,15 +1415,16 @@ class Visual_Portfolio_Get {
         // Click action.
         $popup_image = false;
         $popup_video = false;
+
         switch ( $args['vp_opts']['vp_items_click_action'] ) {
             case 'popup_gallery':
-                if ( isset( $args['format_video_oembed'] ) && $args['format_video_oembed'] ) {
+                if ( $args['allow_popup'] && isset( $args['format_video_oembed'] ) && $args['format_video_oembed'] ) {
                     $popup_video = array(
                         'html' => '<div class="vp-pswp-video"><div>' . $args['format_video_oembed'] . '</div></div>',
                         'width' => $args['format_video_oembed_width'],
                         'height' => $args['format_video_oembed_height'],
                     );
-                } else {
+                } else if ( $args['allow_popup'] ) {
                     $img_id = $args['image_id'] ? : $args['no_image'];
                     if ( $img_id ) {
                         $attachment = get_post( $args['image_id'] );
