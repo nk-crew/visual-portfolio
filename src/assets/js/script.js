@@ -1325,8 +1325,8 @@ class VP {
                     },
                 ],
                 bgOpacity: 1,
-                tapToClose: true,
-                tapToToggleControls: false,
+                tapToClose: false,
+                tapToToggleControls: true,
                 showHideOpacity: true,
                 galleryUID: self.uid,
             };
