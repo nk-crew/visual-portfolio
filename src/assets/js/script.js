@@ -1224,9 +1224,10 @@ class VP {
                             h: parseInt( size[ 1 ], 10 ),
                         };
 
-                        const $caption = $meta.html();
-                        if ( $caption ) {
-                            item.title = $caption;
+                        const $captionTitle = $meta.children( '.vp-portfolio__item-popup-title' ).get( 0 );
+                        const $captionDescription = $meta.children( '.vp-portfolio__item-popup-description' ).get( 0 );
+                        if ( $captionTitle || $captionDescription ) {
+                            item.title = ( $captionTitle ? $captionTitle.outerHTML : '' ) + ( $captionDescription ? $captionDescription.outerHTML : '' );
                         }
 
                         // save link to element for getThumbBoundsFn
@@ -1307,7 +1308,7 @@ class VP {
             const options = {
                 captionAndToolbarShowEmptyCaptions: false,
                 closeEl: settingsPopupGallery.show_close_button,
-                captionEl: settingsPopupGallery.show_caption,
+                captionEl: true,
                 fullscreenEl: settingsPopupGallery.show_fullscreen_button,
                 zoomEl: settingsPopupGallery.show_zoom_button,
                 shareEl: settingsPopupGallery.show_share_button,

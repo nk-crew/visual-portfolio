@@ -150,40 +150,6 @@ class Visual_Portfolio_Settings {
                 ),
 
                 array(
-                    'name'    => 'show_caption',
-                    'label'   => esc_html__( 'Show caption', '@@text_domain' ),
-                    'desc'    => esc_html__( 'Below images will be showed caption.', '@@text_domain' ),
-                    'type'    => 'checkbox',
-                    'default' => 'on',
-                ),
-                array(
-                    'name'    => 'caption_title',
-                    'desc'    => esc_html__( 'Caption Title', '@@text_domain' ),
-                    'type'    => 'select',
-                    'default' => 'title',
-                    'options' => array(
-                        'none'        => esc_html__( 'None', '@@text_domain' ),
-                        'title'       => esc_html__( 'Image Title', '@@text_domain' ),
-                        'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
-                        'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
-                        'description' => esc_html__( 'Image Description', '@@text_domain' ),
-                    ),
-                ),
-                array(
-                    'name'    => 'caption_description',
-                    'desc'    => esc_html__( 'Caption Description', '@@text_domain' ),
-                    'type'    => 'select',
-                    'default' => 'description',
-                    'options' => array(
-                        'none'        => esc_html__( 'None', '@@text_domain' ),
-                        'title'       => esc_html__( 'Image Title', '@@text_domain' ),
-                        'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
-                        'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
-                        'description' => esc_html__( 'Image Description', '@@text_domain' ),
-                    ),
-                ),
-
-                array(
                     'name'    => 'show_counter',
                     'label'   => esc_html__( 'Show images counter', '@@text_domain' ),
                     'desc'    => esc_html__( 'On the top left corner will be showed images counter.', '@@text_domain' ),

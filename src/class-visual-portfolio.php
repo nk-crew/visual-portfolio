@@ -226,7 +226,6 @@ class Visual_Portfolio {
             ),
             'settingsPopupGallery' => array(
                 'show_arrows'            => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
-                'show_caption'           => Visual_Portfolio_Settings::get_option( 'show_caption', 'vp_popup_gallery', true ),
                 'show_counter'           => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
                 'show_zoom_button'       => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
                 'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery', true ),
@@ -301,6 +300,7 @@ class Visual_Portfolio {
         require_once( $this->plugin_path . 'classes/class-controls.php' );
         require_once( $this->plugin_path . 'classes/class-tinymce.php' );
         require_once( $this->plugin_path . 'classes/class-vc.php' );
+        require_once( $this->plugin_path . 'classes/class-migration.php' );
     }
 
     /**

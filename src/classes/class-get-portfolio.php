@@ -1464,9 +1464,8 @@ class Visual_Portfolio_Get {
         <div class="vp-portfolio__item-wrap" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
             <?php
             if ( $popup_image ) {
-                $title_source       = Visual_Portfolio_Settings::get_option( 'caption_title', 'vp_popup_gallery', 'title' );
-                $description_source = Visual_Portfolio_Settings::get_option( 'caption_description', 'vp_popup_gallery', 'description' );
-
+                $title_source = $args['vp_opts']['vp_items_click_action_popup_title_source'] ? : '';
+                $description_source = $args['vp_opts']['vp_items_click_action_popup_description_source'] ? : '';
                 ?>
                 <div class="vp-portfolio__item-popup"
                     style="display: none;"
@@ -1478,12 +1477,12 @@ class Visual_Portfolio_Get {
                     <?php
                     if ( isset( $popup_image[ $title_source ] ) && $popup_image[ $title_source ] ) {
                         ?>
-                        <h3><?php echo esc_html( $popup_image[ $title_source ] ); ?></h3>
+                        <h3 class="vp-portfolio__item-popup-title"><?php echo esc_html( $popup_image[ $title_source ] ); ?></h3>
                         <?php
                     }
                     if ( isset( $popup_image[ $description_source ] ) && $popup_image[ $description_source ] ) {
                         ?>
-                        <div><?php echo wp_kses_post( $popup_image[ $description_source ] ); ?></div>
+                        <div class="vp-portfolio__item-popup-description"><?php echo wp_kses_post( $popup_image[ $description_source ] ); ?></div>
                         <?php
                     }
                     ?>

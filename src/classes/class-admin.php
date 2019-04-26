@@ -1657,6 +1657,8 @@ class Visual_Portfolio_Admin {
                 'popup_gallery' => esc_html__( 'Popup Gallery', '@@text_domain' ),
             ),
         ) );
+
+        // url.
         Visual_Portfolio_Controls::register( array(
             'category' => 'items-click-action',
             'type'     => 'select2',
@@ -1672,6 +1674,48 @@ class Visual_Portfolio_Admin {
                 array(
                     'control' => 'vp_items_click_action',
                     'value' => 'url',
+                ),
+            ),
+        ) );
+
+        // popup.
+        Visual_Portfolio_Controls::register( array(
+            'category' => 'items-click-action',
+            'type'     => 'select2',
+            'label'    => esc_html__( 'Title', '@@text_domain' ),
+            'name'     => 'vp_items_click_action_popup_title_source',
+            'default'  => 'title',
+            'options'  => array(
+                'none'        => esc_html__( 'None', '@@text_domain' ),
+                'title'       => esc_html__( 'Image Title', '@@text_domain' ),
+                'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
+                'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
+                'description' => esc_html__( 'Image Description', '@@text_domain' ),
+            ),
+            'condition' => array(
+                array(
+                    'control' => 'vp_items_click_action',
+                    'value' => 'popup_gallery',
+                ),
+            ),
+        ) );
+        Visual_Portfolio_Controls::register( array(
+            'category' => 'items-click-action',
+            'type'     => 'select2',
+            'label'    => esc_html__( 'Description', '@@text_domain' ),
+            'name'     => 'vp_items_click_action_popup_description_source',
+            'default'  => 'description',
+            'options'  => array(
+                'none'        => esc_html__( 'None', '@@text_domain' ),
+                'title'       => esc_html__( 'Image Title', '@@text_domain' ),
+                'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
+                'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
+                'description' => esc_html__( 'Image Description', '@@text_domain' ),
+            ),
+            'condition' => array(
+                array(
+                    'control' => 'vp_items_click_action',
+                    'value' => 'popup_gallery',
                 ),
             ),
         ) );

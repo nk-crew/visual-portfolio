@@ -979,17 +979,3 @@ if ( typeof Tooltip !== 'undefined' ) {
         $( this ).closest( '.notice' ).slideUp();
     } );
 }() );
-
-// Settings.
-function toggleCaptionSettings() {
-    const $checkbox = $( '[name="vp_popup_gallery[show_caption]"]' );
-
-    $checkbox.closest( 'tbody' )
-        .find( 'tr.caption_title, tr.caption_description' )
-        [ $checkbox.is( ':checked' ) ? 'show' : 'hide' ]();
-}
-if ( $body.hasClass( 'portfolio_page_visual-portfolio-settings' ) ) {
-    $body.on( 'change', '[name="vp_popup_gallery[show_caption]"]', toggleCaptionSettings );
-    $window.on( 'ready', toggleCaptionSettings );
-    toggleCaptionSettings();
-}
