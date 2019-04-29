@@ -813,6 +813,7 @@ class VP {
                                 bottom: 0,
                             } );
                             self.addStyle( '.vp-portfolio__item-wrap', {
+                                width: 'auto',
                                 height: self.options.sliderBullets === 'true' ? 'calc( 100% - 25px )' : '100%',
                             } );
                             self.addStyle( '.vp-portfolio__item, .vp-portfolio__item-img-wrap, .vp-portfolio__item-img, .vp-portfolio__item-wrap .vp-portfolio__item .vp-portfolio__item-img a, .vp-portfolio__item-wrap .vp-portfolio__item .vp-portfolio__item-img img', {
@@ -822,6 +823,9 @@ class VP {
 
                         // static.
                         } else {
+                            self.addStyle( '.vp-portfolio__item-wrap', {
+                                width: 'auto',
+                            } );
                             self.addStyle( '.vp-portfolio__item .vp-portfolio__item-img img', {
                                 width: 'auto',
                                 height: isNaN( self.options.sliderItemsHeight ) ? self.options.sliderItemsHeight : `${ self.options.sliderItemsHeight }px`,
