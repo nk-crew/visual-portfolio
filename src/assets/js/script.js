@@ -83,6 +83,7 @@ class VP {
         }
 
         self.$items_wrap = $item.find( '.vp-portfolio__items' );
+        self.$slider_thumbnails_wrap = $item.find( '.vp-portfolio__thumbnails' );
         self.$pagination = $item.find( '.vp-portfolio__pagination-wrap' );
         self.$filter = $item.find( '.vp-portfolio__filter-wrap' );
         self.$sort = $item.find( '.vp-portfolio__sort-wrap' );
@@ -676,7 +677,7 @@ class VP {
                 'data-vpf-srcset': config.srcsetAttr,
             };
 
-            self.$items_wrap.find( `.visual-portfolio-lazyload:not(.${ config.lazyClass })` ).each( function() {
+            self.$items_wrap.add( self.$slider_thumbnails_wrap ).find( `.visual-portfolio-lazyload:not(.${ config.lazyClass })` ).each( function() {
                 const $item = $( this );
 
                 Object.keys( attrsToReplace ).forEach( ( attr ) => {
@@ -795,66 +796,83 @@ class VP {
             case 'justified':
                 break;
             case 'slider':
-                if ( self.options.sliderItemsHeight !== 'auto' ) {
-                    if ( self.options.sliderSlidesPerView === 'auto' ) {
+                [ 'items', 'thumbnails' ].forEach( ( type ) => {
+                    const itemsHeight = type === 'items' ? self.options.sliderItemsHeight : self.options.sliderThumbnailsHeight;
+                    const typeSingle = type.replace( /s$/g, '' );
+
+                    if ( itemsHeight === 'auto' ) {
+                        return;
+                    }
+
+                    const itemsPerView = type === 'items' ? self.options.sliderSlidesPerView : self.options.sliderThumbnailsPerView;
+
+                    if ( itemsPerView === 'auto' ) {
                         // dynamic.
-                        if ( self.options.sliderItemsHeight.indexOf( '%' ) === self.options.sliderItemsHeight.length - 1 ) {
-                            self.addStyle( '.vp-portfolio__items-wrap::before', {
+                        if ( itemsHeight.indexOf( '%' ) === itemsHeight.length - 1 ) {
+                            self.addStyle( `.vp-portfolio__${ type }-wrap::before`, {
                                 content: '""',
                                 display: 'block',
                                 width: '100%',
-                                'margin-top': isNaN( self.options.sliderItemsHeight ) ? self.options.sliderItemsHeight : `${ self.options.sliderItemsHeight }px`,
+                                'margin-top': isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`,
                             } );
-                            self.addStyle( '.vp-portfolio__items', {
+                            self.addStyle( `.vp-portfolio__${ type }`, {
                                 position: 'absolute',
                                 top: 0,
                                 left: 0,
                                 right: 0,
                                 bottom: 0,
                             } );
-                            self.addStyle( '.vp-portfolio__item-wrap', {
+                            self.addStyle( `.vp-portfolio__${ typeSingle }-wrap`, {
                                 width: 'auto',
                                 height: self.options.sliderBullets === 'true' ? 'calc( 100% - 25px )' : '100%',
                             } );
-                            self.addStyle( '.vp-portfolio__item, .vp-portfolio__item-img-wrap, .vp-portfolio__item-img, .vp-portfolio__item-wrap .vp-portfolio__item .vp-portfolio__item-img a, .vp-portfolio__item-wrap .vp-portfolio__item .vp-portfolio__item-img img', {
+                            self.addStyle( `.vp-portfolio__${ typeSingle }, .vp-portfolio__${ typeSingle }-img-wrap, .vp-portfolio__${ typeSingle }-img, .vp-portfolio__${ typeSingle }-wrap .vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img a, .vp-portfolio__${ typeSingle }-wrap .vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img img`, {
                                 width: 'auto',
                                 height: '100%',
                             } );
 
                         // static.
                         } else {
-                            self.addStyle( '.vp-portfolio__item-wrap', {
+                            self.addStyle( `.vp-portfolio__${ typeSingle }-wrap`, {
                                 width: 'auto',
                             } );
-                            self.addStyle( '.vp-portfolio__item .vp-portfolio__item-img img', {
+                            self.addStyle( `.vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img img`, {
                                 width: 'auto',
-                                height: isNaN( self.options.sliderItemsHeight ) ? self.options.sliderItemsHeight : `${ self.options.sliderItemsHeight }px`,
+                                height: isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`,
                             } );
                         }
                     } else {
-                        self.addStyle( '.vp-portfolio__item-img-wrap::before', {
-                            'margin-top': isNaN( self.options.sliderItemsHeight ) ? self.options.sliderItemsHeight : `${ self.options.sliderItemsHeight }px`,
+                        self.addStyle( `.vp-portfolio__${ typeSingle }-img-wrap::before`, {
+                            'margin-top': isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`,
                         } );
-                        self.addStyle( '.vp-portfolio__item-img img', {
+                        self.addStyle( `.vp-portfolio__${ typeSingle }-img img`, {
                             position: 'absolute',
                             top: 0,
                             right: 0,
                             bottom: 0,
                             left: 0,
                         } );
-                        self.addStyle( '.vp-portfolio__item-img', {
+                        self.addStyle( `.vp-portfolio__${ typeSingle }-img`, {
                             position: 'absolute',
                             top: 0,
                             right: 0,
                             bottom: 0,
                             left: 0,
                         } );
-                        self.addStyle( '.vp-portfolio__item .vp-portfolio__item-img img', {
+                        self.addStyle( `.vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img img`, {
                             width: '100%',
                             height: '100%',
                         } );
                     }
+                } );
+
+                // thumbnails top gap.
+                if ( self.options.sliderThumbnailsGap ) {
+                    self.addStyle( '.vp-portfolio__thumbnails-wrap', {
+                        'margin-top': `${ self.options.sliderThumbnailsGap }px`,
+                    } );
                 }
+
                 break;
             // no default
             }
@@ -1103,6 +1121,54 @@ class VP {
 
             self.emitEvent( 'beforeInitSwiper', [ options ] );
 
+            // thumbnails.
+            if ( self.$slider_thumbnails_wrap.length ) {
+                const $thumbsParent = self.$slider_thumbnails_wrap.parent();
+
+                $thumbsParent.addClass( 'swiper-container' );
+                self.$slider_thumbnails_wrap.addClass( 'swiper-wrapper' );
+                self.$slider_thumbnails_wrap.children().addClass( 'swiper-slide' );
+
+                // calculate responsive.
+                const thumbnailsPerView = self.options.sliderThumbnailsPerView || 8;
+                const thumbnailsBreakPoints = {};
+
+                if ( ! isNaN( thumbnailsPerView ) ) {
+                    let count = thumbnailsPerView - 1;
+                    let currentPoint = Math.min( screenSizes.length - 1, count );
+
+                    for ( ; currentPoint >= 0; currentPoint-- ) {
+                        if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
+                            thumbnailsBreakPoints[ screenSizes[ currentPoint ] ] = {
+                                slidesPerView: count,
+                            };
+                        }
+                        count -= 1;
+                    }
+                }
+
+                const swiperThumbs = new window.Swiper( $thumbsParent[ 0 ], {
+                    autoHeight: self.options.sliderThumbnailsHeight === 'auto',
+                    effect: 'slide',
+                    spaceBetween: parseFloat( self.options.sliderThumbnailsGap ) || 0,
+                    loop: false,
+                    freeMode: true,
+                    freeModeSticky: true,
+                    loopedSlides: 5,
+                    slidesPerView: thumbnailsPerView,
+                    breakpoints: thumbnailsBreakPoints,
+                    keyboard: true,
+                    grabCursor: true,
+                    watchSlidesVisibility: true,
+                    watchSlidesProgress: true,
+                } );
+
+                options.thumbs = {
+                    swiper: swiperThumbs,
+                };
+            }
+
+            // init swiper.
             new window.Swiper( $parent[ 0 ], options );
 
             // autoplay hover pause.
@@ -1692,6 +1758,7 @@ $( document ).on( 'lazybeforeunveil', function( e ) {
 
     if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
         $img.closest( '.vp-portfolio__item-img' ).addClass( 'vp-portfolio__item-img-lazyloading' );
+        $img.closest( '.vp-portfolio__thumbnail-img' ).addClass( 'vp-portfolio__thumbnail-img-lazyloading' );
     }
 } );
 $( document ).on( 'lazyloaded', function( e ) {
@@ -1699,6 +1766,7 @@ $( document ).on( 'lazyloaded', function( e ) {
 
     if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
         $img.closest( '.vp-portfolio__item-img-lazyloading' ).removeClass( 'vp-portfolio__item-img-lazyloading' );
+        $img.closest( '.vp-portfolio__thumbnail-img-lazyloading' ).removeClass( 'vp-portfolio__thumbnail-img-lazyloading' );
     }
 } );
 

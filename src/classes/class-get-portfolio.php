@@ -301,6 +301,36 @@ class Visual_Portfolio_Get {
             $data_atts['data-vp-slider-bullets'] = $options['vp_slider_bullets'] ? 'true' : 'false';
             $data_atts['data-vp-slider-bullets-dynamic'] = $options['vp_slider_bullets_dynamic'] ? 'true' : 'false';
             $data_atts['data-vp-slider-mousewheel'] = $options['vp_slider_mousewheel'] ? 'true' : 'false';
+
+            $data_atts['data-vp-slider-thumbnails'] = $options['vp_slider_thumbnails'] ? 'true' : 'false';
+
+            if ( $options['vp_slider_thumbnails'] ) {
+                $data_atts['data-vp-slider-thumbnails-height'] = $options['vp_slider_thumbnails_height'];
+                $data_atts['data-vp-slider-thumbnails-gap'] = $options['vp_slider_thumbnails_gap'] ? : '0';
+
+                switch ( $options['vp_slider_thumbnails_height_type'] ) {
+                    case 'auto':
+                        $data_atts['data-vp-slider-thumbnails-height'] = 'auto';
+                        break;
+                    case 'static':
+                        $data_atts['data-vp-slider-thumbnails-height'] = ( $options['vp_slider_thumbnails_height_static'] ? : '100' ) . 'px';
+                        break;
+                    case 'dynamic':
+                        $data_atts['data-vp-slider-thumbnails-height'] = ( $options['vp_slider_thumbnails_height_dynamic'] ? : '30' ) . '%';
+                        break;
+                    // no default.
+                }
+
+                switch ( $options['vp_slider_thumbnails_per_view_type'] ) {
+                    case 'auto':
+                        $data_atts['data-vp-slider-thumbnails-per-view'] = 'auto';
+                        break;
+                    case 'custom':
+                        $data_atts['data-vp-slider-thumbnails-per-view'] = $options['vp_slider_thumbnails_per_view_custom'] ? : '6';
+                        break;
+                    // no default.
+                }
+            }
         }
 
         $data_atts = Visual_Portfolio_Extend::portfolio_attrs( $data_atts, $options );
@@ -375,6 +405,10 @@ class Visual_Portfolio_Get {
             $items_style_pref = '/' . $options['vp_items_style'];
         }
         visual_portfolio()->include_template_style( '@@plugin_name-items-style-' . $options['vp_items_style'], 'items-list/items-style' . $items_style_pref . '/style' );
+
+        // Prepare thumbnails.
+        $slider_thumbnails = array();
+        $slider_thumbnails_enable = 'slider' === $options['vp_layout'] && $options['vp_slider_thumbnails'];
         ?>
 
         <div class="vp-portfolio__items-wrap">
@@ -459,6 +493,8 @@ class Visual_Portfolio_Get {
                             'categories'      => $categories,
                         ) );
 
+                        $slider_thumbnails[] = $args['image_id'];
+
                         // Excerpt.
                         if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] && isset( $img['description'] ) && $img['description'] ) {
                             $args['excerpt'] = wp_trim_words( $img['description'], $args['opts']['excerpt_words_count'], '...' );
@@ -523,6 +559,8 @@ class Visual_Portfolio_Get {
 
                         $args['comments_number'] = get_comments_number();
 
+                        $slider_thumbnails[] = $args['image_id'];
+
                         // Excerpt.
                         if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] ) {
                             $args['excerpt'] = wp_trim_words( do_shortcode( has_excerpt() ? get_the_excerpt() : get_the_content() ), $args['opts']['excerpt_words_count'], '...' );
@@ -544,6 +582,37 @@ class Visual_Portfolio_Get {
                 ?>
             </div>
         </div>
+
+        <?php
+
+        if ( $slider_thumbnails_enable ) {
+            ?>
+            <div class="vp-portfolio__thumbnails-wrap">
+                <div class="vp-portfolio__thumbnails">
+                    <?php
+                    foreach ( $slider_thumbnails as $image_id ) {
+                        ?>
+                        <div class="vp-portfolio__thumbnail-wrap">
+                            <div class="vp-portfolio__thumbnail">
+                                <div class="vp-portfolio__thumbnail-img-wrap">
+                                    <div class="vp-portfolio__thumbnail-img">
+                                        <?php
+                                        // phpcs:ignore
+                                        echo Visual_Portfolio_Images::get_attachment_image( $image_id, $args['img_size'] );
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+            </div>
+            <?php
+        }
+
+        ?>
 
         <?php
         self::pagination( $options, array(

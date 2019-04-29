@@ -1193,6 +1193,107 @@ class Visual_Portfolio_Admin {
                         'name'    => 'mousewheel',
                         'default' => false,
                     ),
+                    array(
+                        'type'    => 'toggle',
+                        'label'   => esc_html__( 'Show thumbnails', '@@text_domain' ),
+                        'name'    => 'thumbnails',
+                        'default' => false,
+                    ),
+                    array(
+                        'type'     => 'range',
+                        'label'    => esc_html__( 'Thumbnails gap', '@@text_domain' ),
+                        'name'     => 'thumbnails_gap',
+                        'default'  => 15,
+                        'min'      => 0,
+                        'max'      => 150,
+                        'condition' => array(
+                            array(
+                                'control'  => 'thumbnails',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'        => 'select2',
+                        'label'       => esc_html__( 'Thumbnails height', '@@text_domain' ),
+                        'name'        => 'thumbnails_height_type',
+                        'default'     => 'static',
+                        'options'     => array(
+                            'auto'     => esc_html__( 'Auto', '@@text_domain' ),
+                            'static'   => esc_html__( 'Static (px)', '@@text_domain' ),
+                            'dynamic'  => esc_html__( 'Dynamic (%)', '@@text_domain' ),
+                        ),
+                        'condition' => array(
+                            array(
+                                'control'  => 'thumbnails',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'  => 'range',
+                        'name'  => 'thumbnails_height_static',
+                        'min'   => 10,
+                        'max'   => 400,
+                        'default' => 100,
+                        'condition' => array(
+                            array(
+                                'control'  => 'thumbnails',
+                            ),
+                            array(
+                                'control'  => 'thumbnails_height_type',
+                                'operator' => '==',
+                                'value'    => 'static',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'  => 'range',
+                        'name'  => 'thumbnails_height_dynamic',
+                        'min'   => 10,
+                        'max'   => 200,
+                        'default' => 30,
+                        'condition' => array(
+                            array(
+                                'control'  => 'thumbnails',
+                            ),
+                            array(
+                                'control'  => 'thumbnails_height_type',
+                                'operator' => '==',
+                                'value'    => 'dynamic',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'        => 'select2',
+                        'label'       => esc_html__( 'Thumbnails per view', '@@text_domain' ),
+                        'name'        => 'thumbnails_per_view_type',
+                        'default'     => 'custom',
+                        'options'     => array(
+                            'auto'   => esc_html__( 'Auto', '@@text_domain' ),
+                            'custom' => esc_html__( 'Custom', '@@text_domain' ),
+                        ),
+                        'condition' => array(
+                            array(
+                                'control'  => 'thumbnails',
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'      => 'range',
+                        'name'      => 'thumbnails_per_view_custom',
+                        'min'       => 1,
+                        'max'       => 14,
+                        'default'   => 8,
+                        'condition' => array(
+                            array(
+                                'control'  => 'thumbnails',
+                            ),
+                            array(
+                                'control'  => 'thumbnails_per_view_type',
+                                'operator' => '==',
+                                'value'    => 'custom',
+                            ),
+                        ),
+                    ),
                 ),
             ),
         ), Visual_Portfolio_Extend::layouts() );
