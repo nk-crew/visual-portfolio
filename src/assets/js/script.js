@@ -807,6 +807,13 @@ class VP {
                     const itemsPerView = type === 'items' ? self.options.sliderSlidesPerView : self.options.sliderThumbnailsPerView;
 
                     if ( itemsPerView === 'auto' ) {
+                        // fix fade slider items width.
+                        // https://github.com/nk-o/visual-portfolio/issues/95.
+                        let itemsWidth = 'auto';
+                        if ( type === 'items' && self.options.sliderEffect === 'fade' ) {
+                            itemsWidth = '100%';
+                        }
+
                         // dynamic.
                         if ( itemsHeight.indexOf( '%' ) === itemsHeight.length - 1 ) {
                             self.addStyle( `.vp-portfolio__${ type }-wrap::before`, {
@@ -827,7 +834,7 @@ class VP {
                                 height: self.options.sliderBullets === 'true' ? 'calc( 100% - 25px )' : '100%',
                             } );
                             self.addStyle( `.vp-portfolio__${ typeSingle }, .vp-portfolio__${ typeSingle }-img-wrap, .vp-portfolio__${ typeSingle }-img, .vp-portfolio__${ typeSingle }-wrap .vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img a, .vp-portfolio__${ typeSingle }-wrap .vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img img`, {
-                                width: 'auto',
+                                width: itemsWidth,
                                 height: '100%',
                             } );
 
@@ -837,7 +844,7 @@ class VP {
                                 width: 'auto',
                             } );
                             self.addStyle( `.vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img img`, {
-                                width: 'auto',
+                                width: itemsWidth,
                                 height: isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`,
                             } );
                         }
@@ -1099,6 +1106,11 @@ class VP {
                 keyboard: true,
                 grabCursor: true,
             };
+
+            // fix fade items collapse (mostly in Default items style).
+            if ( options.effect === 'fade' ) {
+                options.fadeEffect = { crossFade: true };
+            }
 
             // fix first load slide position (seems like a conflict with lazySizes)
             // issue: https://github.com/nk-o/visual-portfolio/issues/54
