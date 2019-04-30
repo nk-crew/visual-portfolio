@@ -107,6 +107,11 @@
         opacity: .8;
     }
 
+    // fix align for gutenberg block.
+    figcaption.vp-portfolio__item-meta {
+        text-align: inherit;
+    }
+
     // align
     .vp-portfolio__item-align-left {
         text-align: left;
