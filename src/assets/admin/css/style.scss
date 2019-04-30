@@ -215,6 +215,14 @@ $grid_sm: 600px !default;
             padding-top: 0;
         }
     }
+
+    // rtl
+    &.rtl {
+        #post-body.columns-2 #postbox-container-1 {
+            right: auto;
+            left: 300px;
+        }
+    }
 }
 
 
