@@ -557,6 +557,8 @@ class Visual_Portfolio_Get {
                             'categories'      => $categories,
                         ) );
 
+                        $args['allow_popup'] = isset( $args['image_id'] ) && $args['image_id'];
+
                         $args['comments_number'] = get_comments_number();
 
                         $slider_thumbnails[] = $args['image_id'];
@@ -1489,31 +1491,33 @@ class Visual_Portfolio_Get {
 
         switch ( $args['vp_opts']['vp_items_click_action'] ) {
             case 'popup_gallery':
-                if ( $args['allow_popup'] && isset( $args['format_video_oembed'] ) && $args['format_video_oembed'] ) {
-                    $popup_video = array(
-                        'html' => '<div class="vp-pswp-video"><div>' . $args['format_video_oembed'] . '</div></div>',
-                        'width' => $args['format_video_oembed_width'],
-                        'height' => $args['format_video_oembed_height'],
-                    );
-                } else if ( $args['allow_popup'] ) {
-                    $img_id = $args['image_id'] ? : $args['no_image'];
-                    if ( $img_id ) {
-                        $attachment = get_post( $args['image_id'] );
-                        if ( $attachment && 'attachment' === $attachment->post_type ) {
-                            $img_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_popup'] );
-                            $img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
-                            $popup_image = array(
-                                'title'       => $attachment->post_title,
-                                'description' => $attachment->post_content,
-                                'caption'     => wp_get_attachment_caption( $attachment->ID ),
-                                'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
-                                'url'         => $img_meta[0],
-                                'width'       => $img_meta[1],
-                                'height'      => $img_meta[2],
-                                'md_url'      => $img_md_meta[0],
-                                'md_width'    => $img_md_meta[1],
-                                'md_height'   => $img_md_meta[2],
-                            );
+                if ( isset( $args['allow_popup'] ) && $args['allow_popup'] ) {
+                    if ( isset( $args['format_video_oembed'] ) && $args['format_video_oembed'] ) {
+                        $popup_video = array(
+                            'html' => '<div class="vp-pswp-video"><div>' . $args['format_video_oembed'] . '</div></div>',
+                            'width' => $args['format_video_oembed_width'],
+                            'height' => $args['format_video_oembed_height'],
+                        );
+                    } else {
+                        $img_id = $args['image_id'] ? : $args['no_image'];
+                        if ( $img_id ) {
+                            $attachment = get_post( $args['image_id'] );
+                            if ( $attachment && 'attachment' === $attachment->post_type ) {
+                                $img_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_popup'] );
+                                $img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
+                                $popup_image = array(
+                                    'title'       => $attachment->post_title,
+                                    'description' => $attachment->post_content,
+                                    'caption'     => wp_get_attachment_caption( $attachment->ID ),
+                                    'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+                                    'url'         => $img_meta[0],
+                                    'width'       => $img_meta[1],
+                                    'height'      => $img_meta[2],
+                                    'md_url'      => $img_md_meta[0],
+                                    'md_width'    => $img_md_meta[1],
+                                    'md_height'   => $img_md_meta[2],
+                                );
+                            }
                         }
                     }
                 }
