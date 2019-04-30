@@ -305,7 +305,7 @@ class Visual_Portfolio_Get {
             $data_atts['data-vp-slider-thumbnails'] = $options['vp_slider_thumbnails'] ? 'true' : 'false';
 
             if ( $options['vp_slider_thumbnails'] ) {
-                $data_atts['data-vp-slider-thumbnails-height'] = $options['vp_slider_thumbnails_height'];
+                $data_atts['data-vp-slider-thumbnails-height'] = 'auto';
                 $data_atts['data-vp-slider-thumbnails-gap'] = $options['vp_slider_thumbnails_gap'] ? : '0';
 
                 switch ( $options['vp_slider_thumbnails_height_type'] ) {
