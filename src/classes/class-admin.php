@@ -778,7 +778,7 @@ class Visual_Portfolio_Admin {
             esc_html__( 'Documentation', '@@text_domain' ),
             esc_html__( 'Documentation', '@@text_domain' ),
             'manage_options',
-            'https://wp.nkdev.info/free-visual-portfolio/documentation/getting-started/'
+            'https://visualportfolio.co/documentation/getting-started/'
         );
     }
 

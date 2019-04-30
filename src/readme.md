@@ -17,8 +17,8 @@ Visual Portfolio let you create beautiful portfolio layouts. Generates shortcode
 
 ### Links ###
 
-* [Live Demo](https://wp.nkdev.info/free-visual-portfolio/)
-* [Documentation](https://wp.nkdev.info/free-visual-portfolio/documentation/getting-started/)
+* [Live Demo](https://visualportfolio.co/)
+* [Documentation](https://visualportfolio.co/documentation/getting-started/)
 * [GitHub](https://github.com/nk-o/visual-portfolio)
 
 ## Features ##
@@ -93,31 +93,31 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ### How to disable enqueued plugins (JS, CSS) on frontend ####
 
-[https://wp.nkdev.info/free-visual-portfolio/documentation/developers/disable-enqueued-plugins-js-css/](https://wp.nkdev.info/free-visual-portfolio/documentation/developers/disable-enqueued-plugins-js-css/)
+[https://visualportfolio.co/documentation/developers/disable-enqueued-plugins-js-css/](https://visualportfolio.co/documentation/developers/disable-enqueued-plugins-js-css/)
 
 ### How to use my custom taxonomy as filter ####
 
-[https://wp.nkdev.info/free-visual-portfolio/documentation/developers/custom-taxonomy-for-filter/](https://wp.nkdev.info/free-visual-portfolio/documentation/developers/custom-taxonomy-for-filter/)
+[https://visualportfolio.co/documentation/developers/custom-taxonomy-for-filter/](https://visualportfolio.co/documentation/developers/custom-taxonomy-for-filter/)
 
 ### How to change default templates and styles ####
 
-[https://wp.nkdev.info/free-visual-portfolio/documentation/developers/changing-default-templates-and-styles/](https://wp.nkdev.info/free-visual-portfolio/documentation/developers/changing-default-templates-and-styles/)
+[https://visualportfolio.co/documentation/developers/changing-default-templates-and-styles/](https://visualportfolio.co/documentation/developers/changing-default-templates-and-styles/)
 
 ### DEV: WP filters ####
 
-[https://wp.nkdev.info/free-visual-portfolio/documentation/developers/wordpress-filters/](https://wp.nkdev.info/free-visual-portfolio/documentation/developers/wordpress-filters/)
+[https://visualportfolio.co/documentation/developers/wordpress-filters/](https://visualportfolio.co/documentation/developers/wordpress-filters/)
 
 ### DEV: Controls ####
 
-[https://wp.nkdev.info/free-visual-portfolio/documentation/developers/wordpress-filters/controls/](https://wp.nkdev.info/free-visual-portfolio/documentation/developers/wordpress-filters/controls/)
+[https://visualportfolio.co/documentation/developers/wordpress-filters/controls/](https://visualportfolio.co/documentation/developers/wordpress-filters/controls/)
 
 ### DEV: jQuery events ####
 
-[https://wp.nkdev.info/free-visual-portfolio/documentation/developers/jquery-events/](https://wp.nkdev.info/free-visual-portfolio/documentation/developers/jquery-events/)
+[https://visualportfolio.co/documentation/developers/jquery-events/](https://visualportfolio.co/documentation/developers/jquery-events/)
 
 ### DEV: jQuery methods ####
 
-[https://wp.nkdev.info/free-visual-portfolio/documentation/developers/jquery-methods/](https://wp.nkdev.info/free-visual-portfolio/documentation/developers/jquery-methods/)
+[https://visualportfolio.co/documentation/developers/jquery-methods/](https://visualportfolio.co/documentation/developers/jquery-methods/)
 
 ## Changelog ##
 
