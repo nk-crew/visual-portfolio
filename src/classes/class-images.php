@@ -72,13 +72,21 @@ class Visual_Portfolio_Images {
      * @param string|array $size image size.
      * @param bool         $icon icon.
      * @param string|array $attr image attributes.
+     * @param bool         $lazyload use lazyload tags.
      *
      * @return string
      */
-    public static function get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '' ) {
-        self::$image_processing = true;
+    public static function get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazyload = true ) {
+        if ( $lazyload ) {
+            self::$image_processing = true;
+        }
+
         $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
-        self::$image_processing = false;
+
+        if ( $lazyload ) {
+            self::$image_processing = false;
+        }
+
         return $image;
     }
 

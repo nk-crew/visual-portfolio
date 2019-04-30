@@ -125,6 +125,9 @@ class Visual_Portfolio {
         // template_redirect is used instead of wp_enqueue_scripts just because some plugins use it and included an old isotope plugin. So, it was conflicted.
         add_action( 'template_redirect', array( $this, 'register_scripts' ), 9 );
         add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 9 );
+
+        // noscript tag.
+        add_filter( 'style_loader_tag', array( $this, 'style_loader_tag_noscript' ), 10, 2 );
     }
 
     /**
@@ -209,6 +212,7 @@ class Visual_Portfolio {
         // Visual Portfolio.
         wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', $vp_deps, '@@plugin_version', true );
         wp_register_style( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/css/style.min.css', $vp_style_deps, '@@plugin_version' );
+        wp_register_style( '@@plugin_name-noscript', visual_portfolio()->plugin_url . 'assets/css/noscript.min.css', $vp_style_deps, '@@plugin_version' );
 
         // Visual Portfolio data.
         $data_init = array(
@@ -241,6 +245,21 @@ class Visual_Portfolio {
      */
     public function wp_enqueue_scripts() {
         wp_enqueue_style( '@@plugin_name' );
+        wp_enqueue_style( '@@plugin_name-noscript' );
+    }
+
+    /**
+     * Add noscript tag to styles.
+     *
+     * @param  string $tag    The tag we want to wrap around.
+     * @param  string $handle The handle of the tag.
+     * @return string         The wrapped around tag.
+     */
+    public function style_loader_tag_noscript( $tag, $handle ) {
+        if ( '@@plugin_name-noscript' === $handle ) {
+            $tag = '<noscript>' . $tag . '</noscript>';
+        }
+        return $tag;
     }
 
     /**

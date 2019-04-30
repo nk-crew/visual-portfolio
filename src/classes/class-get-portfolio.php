@@ -1437,6 +1437,7 @@ class Visual_Portfolio_Get {
 
         // prepare image.
         $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'] );
+        $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', false );
 
         // prepare date.
         if ( isset( $args['opts']['show_date'] ) ) {
@@ -1478,6 +1479,7 @@ class Visual_Portfolio_Get {
 
             if ( ! $args['image'] && isset( $oembed['thumbnail_url'] ) ) {
                 $args['image'] = '<img src="' . esc_url( $oembed['thumbnail_url'] ) . '" alt="' . esc_attr( $oembed['title'] ) . '" />';
+                $args['image_noscript'] = $args['image'];
             }
         }
 
@@ -1527,6 +1529,7 @@ class Visual_Portfolio_Get {
         // No Image.
         if ( ! $args['image'] && $args['no_image'] ) {
             $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'] );
+            $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'], false, '', false );
         }
         ?>
 
