@@ -1,6 +1,6 @@
 # Visual Portfolio - layouts visual editor with Gutenberg support
 
-- Site https://wp.nkdev.info/free-visual-portfolio/
+- Site https://visualportfolio.co/
 - WordPress Plugin https://wordpress.org/plugins/visual-portfolio/
 
 ## Development
