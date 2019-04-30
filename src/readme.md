@@ -3,7 +3,7 @@
 * Contributors: nko
 * Tags: portfolio, gallery, works, masonry, popup
 * Requires at least: 4.0.0
-* Tested up to: 5.1
+* Tested up to: 5.2
 * Requires PHP: 5.4
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
@@ -40,6 +40,7 @@ Visual Portfolio let you create beautiful portfolio layouts. Generates shortcode
 * Load More
 * Paged layouts
 * Filtering
+* Sorting
 * Popup gallery (YouTube and Vimeo supported)
 * Custom item gutters
 * Stretch option (if you want to break the fixed container of the page)
@@ -120,6 +121,26 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 [https://visualportfolio.co/documentation/developers/jquery-methods/](https://visualportfolio.co/documentation/developers/jquery-methods/)
 
 ## Changelog ##
+
+= 1.11.0 =
+
+* added Sort controls
+* added Filter and Sort Dropdown styles
+* added 'Portfolio Manager' and 'Portfolio Author' roles
+* added portfolio custom taxonomies filter in admin page
+* added slider thumbnails support
+* added images and show it if javascript disabled (mostly for screen readers)
+* added photoswipe zoom effect
+* disabled image popup on items with custom URL
+* moved popup title and description settings to Layouts options
+* changed popup gallery tap actions (don't close on tap and toggle popup controls instead)
+* fixed Elementor popup gallery conflict
+* fixed roles for portfolio post types
+* fixed IE carousel items invisible
+* fixed items gap conflict with Elementor
+* fixed carousel "Slides per view" auto option with static or dynamic "Items height" option
+* fixed slider fade effect + default items style items width
+* fixed rtl admin layout styles
 
 = 1.10.0 =
 
