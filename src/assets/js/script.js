@@ -1318,12 +1318,16 @@ class VP {
                         const mediumSrc = $meta.attr( 'data-vp-popup-md-img' ) || item.src;
                         if ( mediumSrc ) {
                             size = ( $meta.attr( 'data-vp-popup-md-img-size' ) || $meta.attr( 'data-vp-popup-img-size' ) || '1920x1080' ).split( 'x' );
+
                             // "medium-sized" image
                             item.m = {
                                 src: mediumSrc,
                                 w: parseInt( size[ 0 ], 10 ),
                                 h: parseInt( size[ 1 ], 10 ),
                             };
+
+                            // thumbnail
+                            item.msrc = mediumSrc;
                         }
 
                         // original image
@@ -1383,7 +1387,8 @@ class VP {
         }
 
         const openPhotoSwipe = function( index, galleryElement, disableAnimation, fromURL ) {
-            const pswpElement = $( '.vp-pswp' )[ 0 ];
+            const $pswpElement = $( '.vp-pswp' );
+            const pswpElement = $pswpElement[ 0 ];
             const items = parseThumbnailElements( galleryElement );
 
             // define options (if needed)
@@ -1411,6 +1416,28 @@ class VP {
                 tapToToggleControls: true,
                 showHideOpacity: true,
                 galleryUID: self.uid,
+                getThumbBoundsFn( thumbIndex ) {
+                    if ( ! items[ thumbIndex ] || ! items[ thumbIndex ].el ) {
+                        return false;
+                    }
+
+                    const $el = $( items[ thumbIndex ].el ).find( 'img' )[ 0 ];
+
+                    if ( ! $el ) {
+                        return false;
+                    }
+
+                    const rect = $el.getBoundingClientRect();
+                    const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
+                    const pswpTop = parseFloat( $pswpElement.css( 'top' ) ) || 0;
+
+                    return {
+                        x: rect.left,
+                        y: rect.top + pageYScroll - pswpTop,
+                        w: rect.width,
+                        h: rect.height,
+                    };
+                },
             };
 
             if ( fromURL ) {
