@@ -27,6 +27,8 @@
 
     // meta
     .vp-portfolio__item-meta {
+        color: inherit;
+
         > * + * {
             margin-top: 4px;
         }
