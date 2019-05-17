@@ -20,6 +20,10 @@
         opacity: 0;
         transition: opacity 1s cubic-bezier(.07, .72, .24, 1);
         will-change: opacity;
+
+        // Fix FireFox image blinking
+        // https://github.com/nk-o/visual-portfolio/issues/92
+        z-index: 2;
     }
 
     // meta
@@ -86,6 +90,10 @@
     .vp-portfolio__item-img img {
         transition: transform 2s cubic-bezier(.08, .43, .24, 1), opacity .3s;
         will-change: transform, opacity;
+
+        // Fix FireFox image blinking
+        // https://github.com/nk-o/visual-portfolio/issues/92
+        z-index: 1;
     }
     & .vp-portfolio__item:hover {
         .vp-portfolio__item-overlay {
