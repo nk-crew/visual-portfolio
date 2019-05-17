@@ -1813,6 +1813,10 @@ $( document ).on( 'lazyloaded', function( e ) {
 // https://github.com/nk-o/visual-portfolio/issues/103
 if ( $( '.elementor' ).length ) {
     $( document ).on( 'init.vpf addItems.vpf', function( event, vpObject ) {
+        if ( 'vpf' !== event.namespace ) {
+            return;
+        }
+
         vpObject.$item.find( '.vp-portfolio__item a' ).each( function() {
             if ( /\.(png|jpe?g|gif|svg)(\?.*)?$/i.test( this.href ) ) {
                 $( this ).attr( 'data-elementor-open-lightbox', 'no' );
