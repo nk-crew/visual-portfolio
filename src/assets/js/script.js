@@ -130,6 +130,8 @@ class VP {
 
         self.destroyed = false;
 
+        self.removeNoscriptTags( self.$items_wrap );
+
         // init options
         self.initOptions();
 
@@ -690,6 +692,17 @@ class VP {
                 $item.addClass( config.lazyClass );
             } );
         }
+    }
+
+    /**
+     * Remove <noscript> tags.
+     * Some optimization plugin make something, that killed our styles with noscript tag.
+     * Related topic: https://wordpress.org/support/topic/visual-portfolio-and-sg-optimizer-dont-play-well/
+     *
+     * @param {object} $items items to work with
+     */
+    removeNoscriptTags( $items ) {
+        $items.find( 'noscript' ).remove();
     }
 
     /**
@@ -1636,6 +1649,8 @@ class VP {
         const isotope = self.$items_wrap.data( 'isotope' );
         const fjGallery = self.$items_wrap.data( 'fjGallery' );
         const Swiper = self.$items_wrap.parent()[ 0 ].swiper;
+
+        self.removeNoscriptTags( $items );
 
         if ( isotope ) {
             if ( removeExisting ) {
