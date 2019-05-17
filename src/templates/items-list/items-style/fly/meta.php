@@ -23,20 +23,20 @@ $show_meta = $opts['show_icon'] && $opts['icon'] ||
     $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] );
 ?>
 
-<<?php echo esc_html( $tag ); ?>
-    <?php if ( $args['url'] ) : ?>
-        href="<?php echo esc_url( $args['url'] ); ?>"
-        <?php
-        if ( isset( $args['url_target'] ) && $args['url_target'] ) :
-            ?>
-            target="<?php echo esc_attr( $args['url_target'] ); ?>"
-            <?php
-        endif;
-        ?>
-    <?php endif; ?>
-    class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
+<figcaption class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
     <?php if ( $show_meta ) : ?>
-        <figcaption class="vp-portfolio__item-meta">
+        <<?php echo esc_html( $tag ); ?>
+            <?php if ( $args['url'] ) : ?>
+                href="<?php echo esc_url( $args['url'] ); ?>"
+                <?php
+                if ( isset( $args['url_target'] ) && $args['url_target'] ) :
+                    ?>
+                    target="<?php echo esc_attr( $args['url_target'] ); ?>"
+                    <?php
+                endif;
+                ?>
+            <?php endif; ?>
+            class="vp-portfolio__item-meta">
             <?php
 
             // Show Icon.
@@ -99,6 +99,6 @@ $show_meta = $opts['show_icon'] && $opts['icon'] ||
                 <?php
             }
             ?>
-        </figcaption>
+        </<?php echo esc_html( $tag ); ?>>
     <?php endif; ?>
-</<?php echo esc_html( $tag ); ?>>
+</figcaption>

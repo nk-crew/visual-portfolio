@@ -21,6 +21,12 @@
         }
     }
 
+    // fix some themes figcaption styles.
+    figcaption.vp-portfolio__item-overlay {
+        font-style: inherit;
+        color: inherit;
+    }
+
     // meta
     .vp-portfolio__item-meta {
         position: relative;

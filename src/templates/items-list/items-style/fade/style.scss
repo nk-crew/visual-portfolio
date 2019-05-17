@@ -26,6 +26,12 @@
         z-index: 2;
     }
 
+    // fix some themes figcaption styles.
+    figcaption.vp-portfolio__item-overlay {
+        font-style: inherit;
+        color: #fff;
+    }
+
     // meta
     .vp-portfolio__item-meta {
         position: relative;

@@ -19,9 +19,9 @@ $show_meta = $opts['show_title'] && $args['title'] ||
 
 ?>
 
-<div class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
+<figcaption class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
     <?php if ( $show_meta ) : ?>
-        <figcaption class="vp-portfolio__item-meta">
+        <div class="vp-portfolio__item-meta">
             <?php
 
             // Show Title.
@@ -102,6 +102,6 @@ $show_meta = $opts['show_title'] && $args['title'] ||
                 <?php
             }
             ?>
-        </figcaption>
+        </div>
     <?php endif; ?>
-</div>
+</figcaption>

@@ -37,6 +37,11 @@
         }
     }
 
+    // fix some themes figcaption styles.
+    figcaption.vp-portfolio__item-overlay {
+        font-style: inherit;
+    }
+
     // Transitions
     .vp-portfolio__item-img img {
         transition: transform 2s cubic-bezier(.08, .43, .24, 1), opacity .3s;
