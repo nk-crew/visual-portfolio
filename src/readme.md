@@ -122,6 +122,14 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.11.1 =
+
+* fixed FireFox image blinking in Fade effect
+* fixed name of sorting by date items ('newest' is actually 'oldest')
+* fixed conflict with elementor carousel event
+* fixed conflict with SG Optimizer (remove noscript tag)
+* fixed w3 validation errors (figcaption tag may only be a child of figure tag)
+
 = 1.11.0 =
 
 * added Sort controls
