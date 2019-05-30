@@ -268,12 +268,8 @@ class Visual_Portfolio_Admin {
                 'show_in_nav_menus' => false,
                 'show_in_rest' => true,
                 'show_admin_column' => true,
-                'capabilities'          => array(
-                    'manage_terms' => 'manage_portfolio_terms',
-                    'edit_terms'   => 'edit_portfolio_terms',
-                    'delete_terms' => 'delete_portfolio_terms',
-                    'assign_terms' => 'assign_portfolio_terms',
-                ),
+                'map_meta_cap' => true,
+                'capability_type' => 'portfolio',
             )
         );
         register_taxonomy(
@@ -290,12 +286,8 @@ class Visual_Portfolio_Admin {
                 'show_in_nav_menus' => false,
                 'show_in_rest' => true,
                 'show_admin_column' => true,
-                'capabilities'          => array(
-                    'manage_terms' => 'manage_portfolio_terms',
-                    'edit_terms'   => 'edit_portfolio_terms',
-                    'delete_terms' => 'delete_portfolio_terms',
-                    'assign_terms' => 'assign_portfolio_terms',
-                ),
+                'map_meta_cap' => true,
+                'capability_type' => 'portfolio',
             )
         );
 
