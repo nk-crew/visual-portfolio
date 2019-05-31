@@ -391,6 +391,13 @@ class Visual_Portfolio {
      * @return array|bool|false|object
      */
     public function get_oembed_data( $url, $width = null, $height = null ) {
+        $cache_name = 'vp_oembed_data_' . $url . ( $width ? : '' ) . ( $height ? : '' );
+        $cached = get_transient( $cache_name );
+
+        if ( $cached ) {
+            return $cached;
+        }
+
         if ( function_exists( '_wp_oembed_get_object' ) ) {
             require_once( ABSPATH . WPINC . '/class-oembed.php' );
         }
@@ -423,8 +430,13 @@ class Visual_Portfolio {
             if ( ! isset( $data['provider'] ) ) {
                 $data['provider'] = $provider;
             }
+
             // Convert url to hostname, eg: "youtube" instead of "https://youtube.com/".
             $data['provider-name'] = pathinfo( str_replace( array( 'www.' ), '', parse_url( $url, PHP_URL_HOST ) ), PATHINFO_FILENAME );
+
+            // save cache.
+            set_transient( $cache_name, $data, DAY_IN_SECONDS );
+
             return $data;
         }
 
