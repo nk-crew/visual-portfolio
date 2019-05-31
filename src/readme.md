@@ -122,6 +122,14 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.12.0 =
+
+* changed video oembed loading method
+    * no more php oembed since it may be too heavy to load pages (used JS instead)
+    * no more video thumbnail loading if no featured image specified in post
+* fixed portfolio categories and tags capabilities
+* fixed &lt;a&gt; tag in fly and fade effect when all meta disabled
+
 = 1.11.1 =
 
 * fixed FireFox image blinking in Fade effect
