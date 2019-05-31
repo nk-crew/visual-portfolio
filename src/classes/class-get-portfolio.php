@@ -1469,20 +1469,8 @@ class Visual_Portfolio_Get {
         }
 
         // add video format args.
-        $oembed = false;
         if ( 'video' === $args['format'] && $args['video'] ) {
-            $oembed = visual_portfolio()->get_oembed_data( $args['video'] );
-        }
-        if ( $oembed ) {
-            $args['format_video_url']           = $args['video'];
-            $args['format_video_oembed']        = $oembed['html'];
-            $args['format_video_oembed_width']  = $oembed['width'];
-            $args['format_video_oembed_height'] = $oembed['height'];
-
-            if ( ! $args['image'] && isset( $oembed['thumbnail_url'] ) ) {
-                $args['image'] = '<img src="' . esc_url( $oembed['thumbnail_url'] ) . '" alt="' . esc_attr( $oembed['title'] ) . '" />';
-                $args['image_noscript'] = $args['image'];
-            }
+            $args['format_video_url'] = $args['video'];
         }
 
         // Click action.
@@ -1492,11 +1480,9 @@ class Visual_Portfolio_Get {
         switch ( $args['vp_opts']['vp_items_click_action'] ) {
             case 'popup_gallery':
                 if ( isset( $args['allow_popup'] ) && $args['allow_popup'] ) {
-                    if ( isset( $args['format_video_oembed'] ) && $args['format_video_oembed'] ) {
+                    if ( isset( $args['format_video_url'] ) && $args['format_video_url'] ) {
                         $popup_video = array(
-                            'html' => '<div class="vp-pswp-video"><div>' . $args['format_video_oembed'] . '</div></div>',
-                            'width' => $args['format_video_oembed_width'],
-                            'height' => $args['format_video_oembed_height'],
+                            'url' => $args['format_video_url'],
                         );
                     } else {
                         $img_id = $args['image_id'] ? : $args['no_image'];
@@ -1568,8 +1554,7 @@ class Visual_Portfolio_Get {
                 ?>
                 <div class="vp-portfolio__item-popup"
                     style="display: none;"
-                    data-vp-popup-video="<?php echo esc_attr( $popup_video['html'] ); ?>"
-                    data-vp-popup-video-size="<?php echo esc_attr( $popup_video['width'] . 'x' . $popup_video['height'] ); ?>"
+                    data-vp-popup-video="<?php echo esc_attr( $popup_video['url'] ); ?>"
                 ></div>
                 <?php
             }
