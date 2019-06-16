@@ -1270,11 +1270,16 @@ class VP {
                 vendor: 'vimeo',
                 id: Vimeo,
                 url,
-                embed: `<iframe width="1920" height="1080" src="//player.vimeo.com/video/${ Youtube }" frameborder="0" allowfullscreen></iframe>`,
+                embed: `<iframe width="1920" height="1080" src="//player.vimeo.com/video/${ Vimeo }" frameborder="0" allowfullscreen></iframe>`,
             };
         }
 
-        return false;
+        return {
+            vendor: 'unknown',
+            id: url,
+            url,
+            embed: `<iframe width="1920" height="1080" src="${ url }" frameborder="0" allowfullscreen></iframe>`,
+        };
     }
 
     /**
