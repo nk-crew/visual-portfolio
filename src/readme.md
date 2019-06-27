@@ -122,6 +122,12 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.12.1 =
+
+* fixed Vimeo and other vendors video popup loading
+* fixed Tiles sometimes wrong position calculation (for example in `2|2,1|1,1|1,1|`)
+* fixed overlay position bug in default theme in Fade and Fly effects
+
 = 1.12.0 =
 
 * changed video oembed loading method
