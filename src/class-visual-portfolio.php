@@ -351,15 +351,12 @@ class Visual_Portfolio {
     }
 
     /**
-     * Include template style
+     * Find css template file
      *
-     * @param string           $handle style handle name.
-     * @param string           $template_name file name.
-     * @param array            $deps dependencies array.
-     * @param string|bool|null $ver version string.
-     * @param string           $media media string.
+     * @param string $template_name file name.
+     * @return string
      */
-    public function include_template_style( $handle, $template_name, $deps = array(), $ver = false, $media = 'all' ) {
+    public function find_template_styles( $template_name ) {
         $template = '';
 
         if ( file_exists( get_stylesheet_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
@@ -371,6 +368,26 @@ class Visual_Portfolio {
         } else if ( file_exists( $this->plugin_path . 'templates/' . $template_name . '.css' ) ) {
             // Default file in plugin folder.
             $template = $this->plugin_url . 'templates/' . $template_name . '.css';
+        }
+
+        return $template;
+    }
+
+    /**
+     * Include template style
+     *
+     * @param string           $handle style handle name.
+     * @param string           $template_name file name.
+     * @param array            $deps dependencies array.
+     * @param string|bool|null $ver version string.
+     * @param string           $media media string.
+     */
+    public function include_template_style( $handle, $template_name, $deps = array(), $ver = false, $media = 'all' ) {
+        $template = $this->find_template_styles( $template_name );
+
+        // maybe find minified style.
+        if ( ! $template ) {
+            $template = $this->find_template_styles( $template_name . '.min' );
         }
 
         // Allow 3rd party plugin filter template file from their plugin.

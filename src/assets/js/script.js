@@ -181,7 +181,7 @@ class VP {
      * Called after resized container.
      */
     resized() {
-        if ( typeof( window.Event ) === 'function' ) {
+        if ( typeof window.Event === 'function' ) {
             // modern browsers
             window.dispatchEvent( new window.Event( 'resize' ) );
         } else {
