@@ -565,13 +565,13 @@ class VP {
                 }
 
                 if ( isUp ) {
-                    endY = `-10${ endY }`;
+                    endY = '-100.1%';
                 } else if ( isDown ) {
-                    endY = `10${ endY }`;
+                    endY = '100.1%';
                 } else if ( isLeft ) {
-                    endX = `-10${ endX }`;
+                    endX = '-100.1%';
                 } else if ( isRight ) {
-                    endX = `10${ endX }`;
+                    endX = '100.1%';
                 }
 
                 if ( enter ) {
