@@ -57,6 +57,35 @@ if ( typeof objectFitImages !== 'undefined' ) {
     } );
 }
 
+// fix masonry items position for Tiles layout.
+// https://github.com/nk-o/visual-portfolio/issues/111
+if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !== 'undefined' ) {
+    const MasonryMode = window.Isotope.LayoutMode.modes.masonry;
+
+    if ( MasonryMode ) {
+        const defaultMeasureColumns = MasonryMode.prototype.measureColumns;
+        MasonryMode.prototype.measureColumns = function() {
+            // if columnWidth is 0, default to columns count size.
+            if ( ! this.columnWidth ) {
+                const $vp = $( this.element ).closest( '.vp-portfolio[data-vp-layout="tiles"]' );
+
+                // change column size for Tiles type only.
+                if ( $vp.length ) {
+                    const layoutData = $vp.attr( 'data-vp-tiles-type' );
+                    let columnsCount = layoutData.split( '|' );
+                    columnsCount = parseInt( columnsCount[ 0 ] );
+
+                    if ( columnsCount ) {
+                        this.columnWidth = this.containerWidth / columnsCount;
+                    }
+                }
+            }
+
+            defaultMeasureColumns.call( this );
+        };
+    }
+}
+
 /**
  * Main VP class
  */
