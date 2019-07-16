@@ -22,18 +22,7 @@ const {
     settingsPopupGallery,
 } = VPData;
 
-/**
- * Get window size
- */
 const $wnd = $( window );
-let wndW = 0;
-let wndH = 0;
-function getWndSize() {
-    wndW = $wnd.width();
-    wndH = $wnd.height();
-}
-getWndSize();
-$wnd.on( 'resize load orientationchange', getWndSize );
 
 /**
  * Screen sizes for responsive feature
@@ -70,13 +59,28 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
                 const $vp = $( this.element ).closest( '.vp-portfolio[data-vp-layout="tiles"]' );
 
                 // change column size for Tiles type only.
-                if ( $vp.length ) {
-                    const layoutData = $vp.attr( 'data-vp-tiles-type' );
-                    let columnsCount = layoutData.split( '|' );
-                    columnsCount = parseInt( columnsCount[ 0 ] );
+                if ( $vp.length && $vp[ 0 ].vpf ) {
+                    const { vpf } = $vp[ 0 ];
+                    const settings = vpf.getTilesSettings();
 
-                    if ( columnsCount ) {
-                        this.columnWidth = this.containerWidth / columnsCount;
+                    // get columns number
+                    let columns = parseInt( settings[ 0 ], 10 ) || 1;
+
+                    // calculate responsive.
+                    let count = columns - 1;
+                    let currentPoint = Math.min( screenSizes.length - 1, count );
+
+                    for ( ; currentPoint >= 0; currentPoint-- ) {
+                        if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
+                            if ( window.innerWidth <= screenSizes[ currentPoint ] ) {
+                                columns = count;
+                            }
+                        }
+                        count -= 1;
+                    }
+
+                    if ( columns ) {
+                        this.columnWidth = this.containerWidth / columns;
                     }
                 }
             }
@@ -486,7 +490,7 @@ class VP {
         function stretch() {
             const rect = self.$item[ 0 ].getBoundingClientRect();
             const left = rect.left;
-            const right = wndW - rect.right;
+            const right = window.innerWidth - rect.right;
 
             const ml = parseFloat( self.$item.css( 'margin-left' ) || 0 );
             const mr = parseFloat( self.$item.css( 'margin-right' ) || 0 );
@@ -646,7 +650,7 @@ class VP {
         function checkVisibilityAndLoad() {
             const rect = self.$item[ 0 ].getBoundingClientRect();
 
-            if ( rect.bottom > 0 && ( rect.bottom - bottomPosToLoad ) <= wndH ) {
+            if ( rect.bottom > 0 && ( rect.bottom - bottomPosToLoad ) <= window.innerHeight ) {
                 self.loadNewItems( self.options.nextPageUrl, false, () => {
                     checkVisibilityAndLoad();
                 } );
