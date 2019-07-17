@@ -122,6 +122,11 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.12.2 =
+
+* fixed tiles size on small screens
+* fixed fly effect position (on 4k screens slightly visible part of overlay)
+
 = 1.12.1 =
 
 * fixed Vimeo and other vendors video popup loading
