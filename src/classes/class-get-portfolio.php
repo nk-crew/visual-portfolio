@@ -222,9 +222,11 @@ class Visual_Portfolio_Get {
             $max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
         }
 
-        $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link( array(
-            'vp_page' => $start_page + 1,
-        ) ) : false;
+        $next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
+            array(
+                'vp_page' => $start_page + 1,
+            )
+        ) : false;
 
         // No items found.
         if ( $is_images && empty( $query_opts['images'] ) || isset( $portfolio_query ) && ! $portfolio_query->have_posts() ) {
@@ -482,16 +484,18 @@ class Visual_Portfolio_Get {
                             }
                         }
 
-                        $args = array_merge( $each_item_args, array(
-                            'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
-                            'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
-                            'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
-                            'published_time'  => '',
-                            'filter'          => implode( ',', $filter_values ),
-                            'image_id'        => intval( $img['id'] ),
-                            'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
-                            'categories'      => $categories,
-                        ) );
+                        $args = array_merge(
+                            $each_item_args, array(
+                                'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
+                                'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
+                                'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
+                                'published_time'  => '',
+                                'filter'          => implode( ',', $filter_values ),
+                                'image_id'        => intval( $img['id'] ),
+                                'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
+                                'categories'      => $categories,
+                            )
+                        );
 
                         $slider_thumbnails[] = $args['image_id'];
 
@@ -547,15 +551,17 @@ class Visual_Portfolio_Get {
                             }
                         }
 
-                        $args = array_merge( $each_item_args, array(
-                            'url'             => get_permalink(),
-                            'title'           => get_the_title(),
-                            'format'          => get_post_format() ? : 'standard',
-                            'published_time'  => get_the_time( 'U' ),
-                            'filter'          => implode( ',', $filter_values ),
-                            'image_id'        => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
-                            'categories'      => $categories,
-                        ) );
+                        $args = array_merge(
+                            $each_item_args, array(
+                                'url'             => get_permalink(),
+                                'title'           => get_the_title(),
+                                'format'          => get_post_format() ? : 'standard',
+                                'published_time'  => get_the_time( 'U' ),
+                                'filter'          => implode( ',', $filter_values ),
+                                'image_id'        => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
+                                'categories'      => $categories,
+                            )
+                        );
 
                         $args['allow_popup'] = isset( $args['image_id'] ) && $args['image_id'];
 
@@ -617,11 +623,13 @@ class Visual_Portfolio_Get {
         ?>
 
         <?php
-        self::pagination( $options, array(
-            'start_page' => $start_page,
-            'max_pages' => $max_pages,
-            'next_page_url' => $next_page_url,
-        ) );
+        self::pagination(
+            $options, array(
+                'start_page' => $start_page,
+                'max_pages' => $max_pages,
+                'next_page_url' => $next_page_url,
+            )
+        );
         ?>
 
         </div>
@@ -1264,10 +1272,12 @@ class Visual_Portfolio_Get {
                     'description' => false,
                     'count'       => false,
                     'active'      => ! $there_is_active,
-                    'url'         => self::get_pagenum_link( array(
-                        'vp_filter' => '',
-                        'vp_page' => 1,
-                    ) ),
+                    'url'         => self::get_pagenum_link(
+                        array(
+                            'vp_filter' => '',
+                            'vp_page' => 1,
+                        )
+                    ),
                     'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : '' ),
                 )
             );
@@ -1650,9 +1660,17 @@ class Visual_Portfolio_Get {
             default:
                 $pagination_links = paginate_links(
                     array(
-                        'base' => esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', self::get_pagenum_link( array(
-                            'vp_page' => 999999999,
-                        ) ) ) ) ),
+                        'base' => esc_url_raw(
+                            str_replace(
+                                999999999, '%#%', remove_query_arg(
+                                    'add-to-cart', self::get_pagenum_link(
+                                        array(
+                                            'vp_page' => 999999999,
+                                        )
+                                    )
+                                )
+                            )
+                        ),
                         'format' => '',
                         'type' => 'array',
                         'current' => $args['start_page'],
