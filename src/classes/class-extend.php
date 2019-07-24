@@ -261,4 +261,30 @@ class Visual_Portfolio_Extend {
     public static function portfolio_class( $class, $options ) {
         return apply_filters( 'vpf_extend_portfolio_class', $class, $options );
     }
+
+    /**
+     * Additional Image Controls.
+     *
+     * @param array  $controls - list of image controls.
+     * @param string $name - unique option name.
+     * @return array
+     */
+    public static function image_controls( $controls, $name ) {
+        /*
+         * Example:
+            array(
+                'title' => array(
+                    'type'  => 'text',
+                    'label' => esc_html__( 'Title', '@@text_domain' ),
+                    'name'  => $name . '_additional_title',
+                ),
+                'description' => array(
+                    'type'  => 'textarea',
+                    'label' => esc_html__( 'Description', '@@text_domain' ),
+                    'name'  => $name . '_additional_description',
+                ),
+            )
+         */
+        return apply_filters( 'vpf_extend_image_controls', $controls, $name );
+    }
 }

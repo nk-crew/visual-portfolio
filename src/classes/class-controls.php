@@ -629,6 +629,8 @@ class Visual_Portfolio_Controls {
             ),
         );
 
+        $additional_data = Visual_Portfolio_Extend::image_controls( $additional_data, $args['name'] );
+
         ?>
         <textarea name="<?php echo esc_attr( $args['name'] ); ?>" style="display: none;"><?php echo esc_textarea( json_encode( $images, defined( 'JSON_UNESCAPED_UNICODE' ) ? JSON_UNESCAPED_UNICODE : 256 ) ); ?></textarea>
 
@@ -648,10 +650,12 @@ class Visual_Portfolio_Controls {
             <?php
             foreach ( $additional_data as $name => $data_item ) {
                 self::get(
-                    array_merge( $data_item, array(
-                        'value'  => '',
-                        'class' => 'vp-no-reload',
-                    ) )
+                    array_merge(
+                        $data_item, array(
+                            'value'  => '',
+                            'class' => 'vp-no-reload',
+                        )
+                    )
                 );
             }
             ?>
@@ -669,17 +673,19 @@ class Visual_Portfolio_Controls {
                 ?>
                 <div class="vp-control-gallery-items-img" data-image-id="<?php echo esc_attr( $data['id'] ); ?>">
                     <?php
-                    echo wp_kses( $img, array(
-                        'img' => array(
-                            'src'     => array(),
-                            'srcset'  => array(),
-                            'sizes'   => array(),
-                            'alt'     => array(),
-                            'class'   => array(),
-                            'width'   => array(),
-                            'height'  => array(),
-                        ),
-                    ) );
+                    echo wp_kses(
+                        $img, array(
+                            'img' => array(
+                                'src'     => array(),
+                                'srcset'  => array(),
+                                'sizes'   => array(),
+                                'alt'     => array(),
+                                'class'   => array(),
+                                'width'   => array(),
+                                'height'  => array(),
+                            ),
+                        )
+                    );
 
                     // image meta data.
                     echo '<div style="display: none;" data-meta="width">' . esc_html( $img_data['width'] ) . '</div>';
