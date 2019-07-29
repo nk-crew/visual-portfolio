@@ -24,6 +24,11 @@ class Visual_Portfolio_Images {
      * Visual_Portfolio_Images constructor.
      */
     public static function construct() {
+        // Skip AMP pages.
+        if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
+            return;
+        }
+
         // Prepare images base64 placeholders.
         // Thanks https://wordpress.org/plugins/powerkit/.
         add_action( 'init', 'Visual_Portfolio_Images::allow_lazy_attributes' );
