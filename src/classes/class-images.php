@@ -33,7 +33,7 @@ class Visual_Portfolio_Images {
         add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::add_image_placeholders', 15, 3 );
 
         // ignore Jetpack lazy.
-        add_filter( 'jetpack_lazy_images_skip_image_with_atttributes', 'Visual_Portfolio_Images::jetpack_lazy_images_skip_image_with_atttributes', 15, 2 );
+        add_filter( 'jetpack_lazy_images_skip_image_with_attributes', 'Visual_Portfolio_Images::jetpack_lazy_images_skip_image_with_attributes', 15, 2 );
     }
 
     /**
@@ -251,7 +251,7 @@ class Visual_Portfolio_Images {
      *
      * @return boolean
      */
-    public static function jetpack_lazy_images_skip_image_with_atttributes( $return, $attributes ) {
+    public static function jetpack_lazy_images_skip_image_with_attributes( $return, $attributes ) {
         return isset( $attributes['data-vpf-src'] );
     }
 }
