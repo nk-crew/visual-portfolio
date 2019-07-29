@@ -186,7 +186,7 @@ class Visual_Portfolio_Images {
         }
 
         // Lazyload already added.
-        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-vpf-src'] ) ) {
+        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-vpf-src'] ) || isset( $attr['data-src'] ) ) {
             return $attr;
         }
 
