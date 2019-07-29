@@ -48,6 +48,7 @@ class Visual_Portfolio_Images {
                     $tags['data-vpf-src']    = true;
                     $tags['data-vpf-sizes']  = true;
                     $tags['data-vpf-srcset'] = true;
+                    $tags['data-no-lazy']    = true;
                 }
             }
         }
@@ -209,6 +210,16 @@ class Visual_Portfolio_Images {
             $placeholder = $metadata['sizes'][ $size ]['placeholder'];
         } elseif ( isset( $metadata['placeholder'] ) ) {
             $placeholder = $metadata['placeholder'];
+        }
+
+        // Prevent WP Rocket lazy loading.
+        if ( defined( 'WP_ROCKET_VERSION' ) ) {
+            $attr['data-no-lazy'] = '1';
+        }
+
+        // Prevent WP Shush lazy loading.
+        if ( class_exists( 'WP_Smush' ) ) {
+            $attr['class'] .= ' no-lazyload';
         }
 
         // lazy placeholder.

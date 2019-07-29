@@ -441,6 +441,7 @@ class Visual_Portfolio_Get {
                             'data-vpf-src'    => array(),
                             'data-vpf-sizes'  => array(),
                             'data-vpf-srcset' => array(),
+                            'data-no-lazy'    => array(),
                         ),
                     ),
                     'img_size_popup'  => $img_size_popup,
