@@ -1858,7 +1858,7 @@ class Visual_Portfolio_Get {
      */
     public static function get_all_used_posts() {
         // add post IDs from main query.
-        if ( self::$check_main_query ) {
+        if ( self::$check_main_query && ! self::is_preview() ) {
             self::$check_main_query = false;
 
             global $wp_query;
