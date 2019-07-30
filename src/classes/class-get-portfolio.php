@@ -25,13 +25,69 @@ function vpf_session_start() {
         session_start();
     }
 }
-// we need smaller priority to prevent errors when some 3rd-party plugins output something.
+// We need a lower priority to prevent errors when 3rd-party plugins output something.
 add_action( 'init', 'vpf_session_start', 5 );
 
 /**
  * Class Visual_Portfolio_Get
  */
 class Visual_Portfolio_Get {
+    /**
+     * ID of the current printed portfolio
+     *
+     * @var int
+     */
+    private static $id = 0;
+
+    /**
+     * Scripts enqueued flag
+     *
+     * @var bool
+     */
+    private static $scripts_enqueued = false;
+
+    /**
+     * ID of the current printed single filter
+     *
+     * @var int
+     */
+    private static $filter_id = 0;
+
+    /**
+     * ID of the current printed single sort
+     *
+     * @var int
+     */
+    private static $sort_id = 0;
+
+    /**
+     * Random number for random order.
+     *
+     * @var int
+     */
+    private static $rand_seed_session = false;
+
+    /**
+     * Array with already used IDs on the page. Used for option 'Avoid duplicate posts'
+     *
+     * @var array
+     */
+    private static $used_posts = array();
+
+    /**
+     * Check for main query to avoid duplication.
+     *
+     * @var array
+     */
+    private static $check_main_query = true;
+
+    /**
+     * Array with all used layout IDs
+     *
+     * @var array
+     */
+    static private $used_layouts = array();
+
     /**
      * Get all available options of post.
      *
@@ -52,13 +108,6 @@ class Visual_Portfolio_Get {
 
         return $result;
     }
-
-    /**
-     * Scripts enqueued flag
-     *
-     * @var bool
-     */
-    private static $scripts_enqueued = false;
 
     /**
      * Enqueue scripts and styles for portfolio.
@@ -84,13 +133,6 @@ class Visual_Portfolio_Get {
 
         return 'true' === $frame && $id;
     }
-
-    /**
-     * ID of the current printed portfolio
-     *
-     * @var int
-     */
-    static private $id = 0;
 
     /**
      * Allow taxonomies to show in Filter
@@ -132,7 +174,7 @@ class Visual_Portfolio_Get {
             return '';
         }
 
-        self::$all_used_layout_ids[] = $atts['id'];
+        self::$used_layouts[] = $atts['id'];
 
         self::enqueue_scripts();
 
@@ -515,6 +557,8 @@ class Visual_Portfolio_Get {
                     while ( $portfolio_query->have_posts() ) {
                         $portfolio_query->the_post();
 
+                        self::$used_posts[] = get_the_ID();
+
                         // Get category taxonomies for data filter.
                         $filter_values  = array();
                         $categories     = array();
@@ -669,13 +713,6 @@ class Visual_Portfolio_Get {
     }
 
     /**
-     * ID of the current printed single filter
-     *
-     * @var int
-     */
-    static private $filter_id = 0;
-
-    /**
      * Print portfolio filter by post ID or options
      *
      * @param array $atts options for portfolio list to print.
@@ -715,13 +752,6 @@ class Visual_Portfolio_Get {
         ob_end_clean();
         return $return;
     }
-
-    /**
-     * ID of the current printed single sort
-     *
-     * @var int
-     */
-    static private $sort_id = 0;
 
     /**
      * Print portfolio sort by post ID or options
@@ -772,13 +802,6 @@ class Visual_Portfolio_Get {
     private static function get_current_page_number() {
         return max( 1, isset( $_GET['vp_page'] ) ? (int) $_GET['vp_page'] : 1 );
     }
-
-    /**
-     * Random number for random order.
-     *
-     * @var int
-     */
-    static private $rand_seed_session = false;
 
     /**
      * "rand" orderby don't work fine for paged, so we need to use custom solution.
@@ -951,7 +974,7 @@ class Visual_Portfolio_Get {
                 'posts_per_page' => $count,
                 'paged'      => $paged,
                 'orderby'    => 'post_date',
-                'order'      => $options['vp_posts_order_direction'],
+                'order'      => 'DESC',
                 'post_type'  => 'portfolio',
             );
 
@@ -990,6 +1013,9 @@ class Visual_Portfolio_Get {
                         $query_opts['orderby'] = 'post_date';
                         break;
                 }
+
+                // Order.
+                $query_opts['order'] = $options['vp_posts_order_direction'];
 
                 if ( 'ids' === $options['vp_posts_source'] ) { // IDs.
                     $query_opts['post_type'] = 'any';
@@ -1043,6 +1069,12 @@ class Visual_Portfolio_Get {
                         }
                     }
                 } // End if().
+
+                // Avoid duplicate posts.
+                if ( $options['vp_posts_avoid_duplicate_posts'] ) {
+                    $not_id = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
+                    $query_opts['post__not_in'] = array_merge( $not_id, self::get_all_used_posts() );
+                }
             } // End if().
 
             // Custom sorting.
@@ -1808,19 +1840,34 @@ class Visual_Portfolio_Get {
     }
 
     /**
-     * Array with all used layout IDs
+     * Get list with all used posts on the current page.
      *
-     * @var array
+     * @return array
      */
-    static private $all_used_layout_ids = array();
+    public static function get_all_used_posts() {
+        // add post IDs from main query.
+        if ( self::$check_main_query ) {
+            self::$check_main_query = false;
+
+            global $wp_query;
+
+            if ( isset( $wp_query ) && isset( $wp_query->posts ) ) {
+                foreach ( $wp_query->posts as $post ) {
+                    self::$used_posts[] = $post->ID;
+                }
+            }
+        }
+
+        return self::$used_posts;
+    }
 
     /**
      * Get list with all used portfolios on the current page.
      *
      * @return array
      */
-    public static function get_all_currently_used_ids() {
-        return self::$all_used_layout_ids;
+    public static function get_all_used_layouts() {
+        return self::$used_layouts;
     }
 
     /**

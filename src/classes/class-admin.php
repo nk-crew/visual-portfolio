@@ -703,7 +703,7 @@ class Visual_Portfolio_Admin {
         }
 
         // add all nodes of all Slider.
-        $layouts = Visual_Portfolio_Get::get_all_currently_used_ids();
+        $layouts = Visual_Portfolio_Get::get_all_used_layouts();
         $layouts = array_unique( $layouts );
 
         if ( ! empty( $layouts ) ) {
@@ -2680,6 +2680,16 @@ class Visual_Portfolio_Admin {
                     'desc' => esc_html__( 'DESC', '@@text_domain' ),
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
                 ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-posts',
+                'type'     => 'toggle',
+                'label'    => esc_html__( 'Avoid duplicate posts', '@@text_domain' ),
+                'name'     => 'vp_posts_avoid_duplicate_posts',
+                'default'  => false,
                 'wrapper_class' => 'vp-col-6',
             )
         );
