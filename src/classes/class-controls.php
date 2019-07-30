@@ -585,11 +585,25 @@ class Visual_Portfolio_Controls {
                 'type'  => 'text',
                 'label' => esc_html__( 'Title', '@@text_domain' ),
                 'name'  => $args['name'] . '_additional_title',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_images_titles_source',
+                        'operator' => '===',
+                        'value'    => 'custom',
+                    ),
+                ),
             ),
             'description' => array(
                 'type'  => 'textarea',
                 'label' => esc_html__( 'Description', '@@text_domain' ),
                 'name'  => $args['name'] . '_additional_description',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_images_descriptions_source',
+                        'operator' => '===',
+                        'value'    => 'custom',
+                    ),
+                ),
             ),
             'categories' => array(
                 'type'  => 'select2',

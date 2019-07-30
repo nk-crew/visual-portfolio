@@ -2720,6 +2720,42 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-images',
                 'type'     => 'select2',
+                'label'    => esc_html__( 'Titles', '@@text_domain' ),
+                'name'     => 'vp_images_titles_source',
+                'default'  => 'custom',
+                'options'  => array(
+                    'none'        => esc_html__( 'None', '@@text_domain' ),
+                    'custom'      => esc_html__( 'Custom', '@@text_domain' ),
+                    'title'       => esc_html__( 'Image Title', '@@text_domain' ),
+                    'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
+                    'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
+                    'description' => esc_html__( 'Image Description', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-images',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Descriptions', '@@text_domain' ),
+                'name'     => 'vp_images_descriptions_source',
+                'default'  => 'custom',
+                'options'  => array(
+                    'none'        => esc_html__( 'None', '@@text_domain' ),
+                    'custom'      => esc_html__( 'Custom', '@@text_domain' ),
+                    'title'       => esc_html__( 'Image Title', '@@text_domain' ),
+                    'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
+                    'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
+                    'description' => esc_html__( 'Image Description', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-images',
+                'type'     => 'select2',
                 'label'    => esc_html__( 'Order by', '@@text_domain' ),
                 'name'     => 'vp_images_order_by',
                 'default'  => 'default',

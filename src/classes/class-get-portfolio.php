@@ -883,6 +883,41 @@ class Visual_Portfolio_Get {
                 $images = (array) $options['vp_images'];
             }
 
+            // prepare titles and descriptions.
+            if ( 'custom' !== $options['vp_images_titles_source'] || 'custom' !== $options['vp_images_descriptions_source'] ) {
+                foreach ( $images as $k => $img ) {
+                    $img_meta = array(
+                        'title' => '',
+                        'description' => '',
+                        'caption' => '',
+                        'alt' => '',
+                        'none' => '',
+                    );
+
+                    // get image meta if needed.
+                    if ( 'none' !== $options['vp_images_titles_source'] || 'none' !== $options['vp_images_descriptions_source'] ) {
+                        $attachment = get_post( $img['id'] );
+
+                        if ( $attachment && 'attachment' === $attachment->post_type ) {
+                            $img_meta['title'] = $attachment->post_title;
+                            $img_meta['description'] = $attachment->post_content;
+                            $img_meta['caption'] = wp_get_attachment_caption( $attachment->ID );
+                            $img_meta['alt'] = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
+                        }
+                    }
+
+                    // title.
+                    if ( 'custom' !== $options['vp_images_titles_source'] ) {
+                        $images[ $k ]['title'] = $img_meta[ $options['vp_images_titles_source'] ];
+                    }
+
+                    // description.
+                    if ( 'custom' !== $options['vp_images_descriptions_source'] ) {
+                        $images[ $k ]['description'] = $img_meta[ $options['vp_images_descriptions_source'] ];
+                    }
+                }
+            }
+
             // order.
             $custom_order = false;
             $custom_order_direction = $options['vp_images_order_direction'];
