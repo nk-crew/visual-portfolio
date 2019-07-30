@@ -1750,6 +1750,7 @@ class VP {
      */
     initFancybox() {
         const self = this;
+        let fancyboxInstance;
 
         if ( typeof $.fancybox === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'fancybox' !== settingsPopupGallery.vendor ) {
             return;
@@ -1887,7 +1888,11 @@ class VP {
                 baseClass: 'vp-fancybox',
 
                 // Hide browser vertical scrollbars; use at your own risk
-                hideScrollbar: true,
+                hideScrollbar: false,
+
+                // Use mousewheel to navigate gallery
+                // If 'auto' - enabled for images only
+                wheel: false,
 
                 lang: 'wordpress',
                 i18n: {
@@ -1905,10 +1910,14 @@ class VP {
                         ZOOM: __.fancybox_zoom,
                     },
                 },
+
+                beforeClose() {
+                    fancyboxInstance = false;
+                },
             };
 
             // Start new fancybox instance
-            $.fancybox.open( items, options, index );
+            fancyboxInstance = $.fancybox.open( items, options, index );
         };
 
         // click action
@@ -1932,6 +1941,14 @@ class VP {
             }
 
             openFancybox( index, self.$item[ 0 ] );
+        } );
+
+        // close on scroll
+        $wnd.on( `scroll.vpf-uid-${ self.uid }`, () => {
+            if ( fancyboxInstance ) {
+                fancyboxInstance.close();
+                fancyboxInstance = false;
+            }
         } );
     }
 
