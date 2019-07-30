@@ -105,9 +105,11 @@ class Visual_Portfolio_Images {
      * @return string
      */
     public static function get_image_placeholder( $width = 1, $height = 1 ) {
-        // 'pk' slug just because this code is from Powerkit plugin,
-        // so we need to be compatible with it.
-        $transient = sprintf( 'pk_image_placeholder_%s_%s', $width, $height );
+        $ratio = self::get_ratio( $width, $height );
+        $width = $ratio['width'];
+        $height = $ratio['height'];
+
+        $transient = sprintf( 'vpf_image_placeholder_%s_%s', $width, $height );
 
         $placeholder_image = get_transient( $transient );
 
@@ -129,6 +131,34 @@ class Visual_Portfolio_Images {
         }
 
         return $placeholder_image;
+    }
+
+    /**
+     * GCD
+     * https://en.wikipedia.org/wiki/Greatest_common_divisor
+     *
+     * @param int $width size.
+     * @param int $height size.
+     * @return float
+     */
+    public static function greatest_common_divisor( $width, $height ) {
+        return ( $width % $height ) ? self::greatest_common_divisor( $height, $width % $height ) : $height;
+    }
+
+    /**
+     * Get Aspect Ratio of real width and height
+     *
+     * @param int $width size.
+     * @param int $height size.
+     * @return array
+     */
+    public static function get_ratio( $width, $height ) {
+        $gcd = self::greatest_common_divisor( $width, $height );
+
+        return array(
+            'width' => $width / $gcd,
+            'height' => $height / $gcd,
+        );
     }
 
     /**
