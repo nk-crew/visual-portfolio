@@ -1135,7 +1135,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Show arrows', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display arrows', '@@text_domain' ),
                             'name'    => 'arrows',
                             'default' => true,
                         ),
@@ -1167,7 +1167,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Show bullets', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display bullets', '@@text_domain' ),
                             'name'    => 'bullets',
                             'default' => false,
                         ),
@@ -1190,7 +1190,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Show thumbnails', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display thumbnails', '@@text_domain' ),
                             'name'    => 'thumbnails',
                             'default' => false,
                         ),
@@ -1402,13 +1402,13 @@ class Visual_Portfolio_Admin {
                     'controls' => array(
                         array(
                             'type'    => 'select2',
-                            'label'   => esc_html__( 'Show Read more button', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display Read more button', '@@text_domain' ),
                             'name'    => 'show_read_more',
                             'default' => false,
                             'options' => array(
                                 'false' => esc_html__( 'False', '@@text_domain' ),
                                 'true' => esc_html__( 'Always show', '@@text_domain' ),
-                                'more_tag' => esc_html__( 'Show when used "More tag" in the post', '@@text_domain' ),
+                                'more_tag' => esc_html__( 'Display when used "More tag" in the post', '@@text_domain' ),
                             ),
                         ),
                         array(
@@ -1588,7 +1588,7 @@ class Visual_Portfolio_Admin {
                         case 'show_title':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Show title', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display title', '@@text_domain' ),
                                 'name'    => 'show_title',
                                 'default' => true,
                             );
@@ -1596,7 +1596,7 @@ class Visual_Portfolio_Admin {
                         case 'show_categories':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Show categories', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display categories', '@@text_domain' ),
                                 'name'    => 'show_categories',
                                 'default' => true,
                             );
@@ -1617,12 +1617,12 @@ class Visual_Portfolio_Admin {
                         case 'show_date':
                             $new_fields[] = array(
                                 'type'    => 'select2',
-                                'label'   => esc_html__( 'Show date', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display date', '@@text_domain' ),
                                 'name'    => 'show_date',
                                 'default' => false,
                                 'options' => array(
                                     'false' => esc_html__( 'False', '@@text_domain' ),
-                                    'true'  => esc_html__( 'Show', '@@text_domain' ),
+                                    'true'  => esc_html__( 'Default', '@@text_domain' ),
                                     'human' => esc_html__( 'Human Format', '@@text_domain' ),
                                 ),
                             );
@@ -1643,7 +1643,7 @@ class Visual_Portfolio_Admin {
                         case 'show_excerpt':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Show excerpt', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display excerpt', '@@text_domain' ),
                                 'name'    => 'show_excerpt',
                                 'default' => false,
                             );
@@ -1664,7 +1664,7 @@ class Visual_Portfolio_Admin {
                         case 'show_icons':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Show icon', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display icon', '@@text_domain' ),
                                 'name'    => 'show_icon',
                                 'default' => false,
                             );
@@ -1930,7 +1930,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'filter',
                 'type'     => 'toggle',
-                'label'    => esc_html__( 'Show count', '@@text_domain' ),
+                'label'    => esc_html__( 'Display count', '@@text_domain' ),
                 'name'     => 'vp_filter_show_count',
                 'default'  => false,
                 'condition' => array(
@@ -2380,7 +2380,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'pagination',
                 'type'      => 'toggle',
-                'label'     => esc_html__( 'Show arrows', '@@text_domain' ),
+                'label'     => esc_html__( 'Display arrows', '@@text_domain' ),
                 'name'      => 'vp_pagination_paged__show_arrows',
                 'default'   => true,
                 'condition' => array(
@@ -2450,7 +2450,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'pagination',
                 'type'      => 'toggle',
-                'label'     => esc_html__( 'Show numbers', '@@text_domain' ),
+                'label'     => esc_html__( 'Display numbers', '@@text_domain' ),
                 'name'      => 'vp_pagination_paged__show_numbers',
                 'default'   => true,
                 'condition' => array(

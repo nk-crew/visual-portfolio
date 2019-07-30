@@ -143,40 +143,39 @@ class Visual_Portfolio_Settings {
             'vp_popup_gallery' => array(
                 array(
                     'name'    => 'show_arrows',
-                    'label'   => esc_html__( 'Show arrows', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display arrows', '@@text_domain' ),
                     'desc'    => esc_html__( 'Arrows to navigate between images.', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
-
                 array(
                     'name'    => 'show_counter',
-                    'label'   => esc_html__( 'Show images counter', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display images counter', '@@text_domain' ),
                     'desc'    => esc_html__( 'On the top left corner will be showed images counter.', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_zoom_button',
-                    'label'   => esc_html__( 'Show zoom button', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display zoom button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_fullscreen_button',
-                    'label'   => esc_html__( 'Show fullscreen button', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display fullscreen button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_share_button',
-                    'label'   => esc_html__( 'Show share button', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display share button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_close_button',
-                    'label'   => esc_html__( 'Show close button', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display close button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
