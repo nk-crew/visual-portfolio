@@ -1480,6 +1480,8 @@ class Visual_Portfolio_Get {
     private static function each_item( $args ) {
         global $post;
 
+        $is_posts = 'post-based' === $args['vp_opts']['vp_content_source'] || 'portfolio' === $args['vp_opts']['vp_content_source'];
+
         // prepare image.
         $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'] );
         $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', false );
@@ -1500,7 +1502,7 @@ class Visual_Portfolio_Get {
 
         // prepare read more button.
         if ( isset( $args['opts']['show_read_more'] ) && $args['opts']['show_read_more'] ) {
-            if ( 'more_tag' === $args['opts']['show_read_more'] ) {
+            if ( $is_posts && 'more_tag' === $args['opts']['show_read_more'] ) {
                 if ( strpos( $post->post_content, '<!--more-->' ) ) {
                     $args['opts']['read_more_url'] = $args['url'] . '#more-' . get_the_ID();
                 } else {
@@ -1564,9 +1566,19 @@ class Visual_Portfolio_Get {
             $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'] );
             $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'], false, '', false );
         }
+
+        // Posts Classes.
+        $class_name = 'vp-portfolio__item-wrap';
+        if ( $is_posts ) {
+            // post_class functionality.
+            $class_name = join( ' ', get_post_class( $class_name, get_the_ID() ) );
+        }
+
+        // Tag Name.
+        $tag_name = $is_posts ? 'article' : 'div';
         ?>
 
-        <div class="vp-portfolio__item-wrap" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
+        <<?php echo esc_attr( $tag_name ); ?> class="<?php echo esc_attr( $class_name ); ?>" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
             <?php
             if ( $popup_image ) {
                 $title_source = $args['vp_opts']['vp_items_click_action_popup_title_source'] ? : '';
@@ -1612,7 +1624,7 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/meta', $args );
                 ?>
             </figure>
-        </div>
+        </<?php echo esc_attr( $tag_name ); ?>>
         <?php
     }
 

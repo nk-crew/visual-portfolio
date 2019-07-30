@@ -46,6 +46,22 @@
     float: left;
     width: 33.333%;
 }
+
+// stylelint-disable
+// fix for default themes styles.
+[data-vp-layout]:not([data-vp-layout="slider"]) .vp-portfolio__item-wrap {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+[data-vp-layout="slider"] .vp-portfolio__item-wrap {
+    float: none;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    margin-bottom: 0 !important;
+}
+// stylelint-enable
+
 .vp-portfolio__item .vp-portfolio__item-img img,
 .vp-portfolio__item .vp-portfolio__item-img a,
 .vp-portfolio__item .vp-portfolio__thumbnail-img img {
@@ -179,9 +195,6 @@
 
 // Slider
 [data-vp-layout="slider"] {
-    .vp-portfolio__item-wrap {
-        float: none;
-    }
     .vp-portfolio__item-img-wrap,
     .vp-portfolio__thumbnail-img-wrap {
         position: relative;
