@@ -118,7 +118,7 @@ class Visual_Portfolio_Settings {
             'vp_general' => array(
                 array(
                     'name'    => 'portfolio_slug',
-                    'label'   => esc_html__( 'Portfolio slug', '@@text_domain' ),
+                    'label'   => esc_html__( 'Portfolio Slug', '@@text_domain' ),
                     'type'    => 'text',
                     'default' => 'portfolio',
                 ),
@@ -131,7 +131,7 @@ class Visual_Portfolio_Settings {
                 ),
                 array(
                     'name'    => 'no_image',
-                    'label'   => esc_html__( 'No image', '@@text_domain' ),
+                    'label'   => esc_html__( 'No Image', '@@text_domain' ),
                     'desc'    => esc_html__( 'This image used if the featured image of a post is not specified.', '@@text_domain' ),
                     'type'    => 'image',
                     'default' => '',
@@ -142,42 +142,74 @@ class Visual_Portfolio_Settings {
             ),
             'vp_popup_gallery' => array(
                 array(
+                    'name'    => 'vendor',
+                    'label'   => esc_html__( 'Vendor Script', '@@text_domain' ),
+                    'type'    => 'select',
+                    'options' => array(
+                        'photoswipe' => esc_html__( 'PhotoSwipe', '@@text_domain' ),
+                        'fancybox'   => esc_html__( 'Fancybox', '@@text_domain' ),
+                    ),
+                    'default' => 'photoswipe',
+                ),
+
+                // General Popup Settings.
+                array(
                     'name'    => 'show_arrows',
-                    'label'   => esc_html__( 'Display arrows', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display Arrows', '@@text_domain' ),
                     'desc'    => esc_html__( 'Arrows to navigate between images.', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_counter',
-                    'label'   => esc_html__( 'Display images counter', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display Images Counter', '@@text_domain' ),
                     'desc'    => esc_html__( 'On the top left corner will be showed images counter.', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_zoom_button',
-                    'label'   => esc_html__( 'Display zoom button', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display Zoom Button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_fullscreen_button',
-                    'label'   => esc_html__( 'Display fullscreen button', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display Fullscreen Button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_share_button',
-                    'label'   => esc_html__( 'Display share button', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display Share Button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
                 ),
                 array(
                     'name'    => 'show_close_button',
-                    'label'   => esc_html__( 'Display close button', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display Close Button', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => 'on',
+                ),
+
+                // Fancybox Popup Settings.
+                array(
+                    'name'    => 'show_thumbs',
+                    'label'   => esc_html__( 'Display Thumbnails', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+                array(
+                    'name'    => 'show_download_button',
+                    'label'   => esc_html__( 'Display Download Button', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'off',
+                ),
+                array(
+                    'name'    => 'show_slideshow',
+                    'label'   => esc_html__( 'Display Slideshow', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'off',
                 ),
             ),
         );
@@ -198,5 +230,22 @@ class Visual_Portfolio_Settings {
         $this->settings_api->show_forms();
 
         echo '</div>';
+
+        ?>
+        <script>
+            (function( $ ) {
+                // update controls.
+                function updateControls() {
+                    // popup gallery.
+                    var vendor = $('tr.vendor select').val();
+
+                    $('tr.show_download_button, tr.show_slideshow, tr.show_thumbs')[ 'fancybox' === vendor ? 'show' : 'hide' ]();
+                }
+
+                updateControls();
+                $('form').on('change', updateControls);
+            })(jQuery);
+        </script>
+        <?php
     }
 }

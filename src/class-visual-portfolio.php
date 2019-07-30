@@ -167,26 +167,36 @@ class Visual_Portfolio {
 
         // Object Fit Images.
         if ( apply_filters( 'vpf_enqueue_plugin_object_fit_images', true ) ) {
-            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '3.2.4', true );
+            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', array(), '3.2.4', true );
 
             $vp_deps[] = 'object-fit-images';
         }
 
+        $popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery', 'photoswipe' );
+
         // PhotoSwipe.
-        if ( apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
-            wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css', '', '4.1.3' );
+        if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
+            wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css', array(), '4.1.3' );
             wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css', array( 'photoswipe' ), '4.1.3' );
-            wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', '', '4.1.3', true );
+            wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', array(), '4.1.3', true );
             wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '4.1.3', true );
 
             $vp_deps[] = 'photoswipe-ui-default';
             $vp_style_deps[] = 'photoswipe-default-skin';
+
+            // Fancybox.
+        } elseif ( 'fancybox' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_fancybox', true ) ) {
+            wp_register_style( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/jquery.fancybox.min.css', array(), '3.5.7' );
+            wp_register_script( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/jquery.fancybox.min.js', array( 'jquery' ), '3.5.7', true );
+
+            $vp_deps[] = 'fancybox';
+            $vp_style_deps[] = 'fancybox';
         }
 
         // Swiper.
         if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.min.css', '', '4.5.0' );
-            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', '', '4.5.0', true );
+            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.min.css', array(), '4.5.0' );
+            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', array(), '4.5.0', true );
 
             $vp_deps[] = 'swiper';
             $vp_style_deps[] = 'swiper';
@@ -217,24 +227,45 @@ class Visual_Portfolio {
         // Visual Portfolio data.
         $data_init = array(
             '__' => array(
-                'couldnt_retrieve_vp' => esc_attr( 'Couldn\'t retrieve Visual Portfolio ID.', '@@text_domain' ),
-                'pswp_close' => esc_attr( 'Close (Esc)', '@@text_domain' ),
-                'pswp_share' => esc_attr( 'Share', '@@text_domain' ),
-                'pswp_fs' => esc_attr( 'Toggle fullscreen', '@@text_domain' ),
-                'pswp_zoom' => esc_attr( 'Zoom in/out', '@@text_domain' ),
-                'pswp_prev' => esc_attr( 'Previous (arrow left)', '@@text_domain' ),
-                'pswp_next' => esc_attr( 'Next (arrow right)', '@@text_domain' ),
-                'pswp_share_fb' => esc_attr( 'Share on Facebook', '@@text_domain' ),
-                'pswp_share_tw' => esc_attr( 'Tweet', '@@text_domain' ),
-                'pswp_share_pin' => esc_attr( 'Pin it', '@@text_domain' ),
+                'couldnt_retrieve_vp' => esc_attr__( 'Couldn\'t retrieve Visual Portfolio ID.', '@@text_domain' ),
+
+                'pswp_close' => esc_attr__( 'Close (Esc)', '@@text_domain' ),
+                'pswp_share' => esc_attr__( 'Share', '@@text_domain' ),
+                'pswp_fs' => esc_attr__( 'Toggle fullscreen', '@@text_domain' ),
+                'pswp_zoom' => esc_attr__( 'Zoom in/out', '@@text_domain' ),
+                'pswp_prev' => esc_attr__( 'Previous (arrow left)', '@@text_domain' ),
+                'pswp_next' => esc_attr__( 'Next (arrow right)', '@@text_domain' ),
+                'pswp_share_fb' => esc_attr__( 'Share on Facebook', '@@text_domain' ),
+                'pswp_share_tw' => esc_attr__( 'Tweet', '@@text_domain' ),
+                'pswp_share_pin' => esc_attr__( 'Pin it', '@@text_domain' ),
+
+                'fancybox_close' => esc_attr__( 'Close', '@@text_domain' ),
+                'fancybox_next' => esc_attr__( 'Next', '@@text_domain' ),
+                'fancybox_prev' => esc_attr__( 'Previous', '@@text_domain' ),
+                'fancybox_error' => __( 'The requested content cannot be loaded. <br /> Please try again later.', '@@text_domain' ),
+                'fancybox_play_start' => esc_attr__( 'Start slideshow', '@@text_domain' ),
+                'fancybox_play_stop' => esc_attr__( 'Pause slideshow', '@@text_domain' ),
+                'fancybox_full_screen' => esc_attr__( 'Full screen', '@@text_domain' ),
+                'fancybox_thumbs' => esc_attr__( 'Thumbnails', '@@text_domain' ),
+                'fancybox_download' => esc_attr__( 'Download', '@@text_domain' ),
+                'fancybox_share' => esc_attr__( 'Share', '@@text_domain' ),
+                'fancybox_zoom' => esc_attr__( 'Zoom', '@@text_domain' ),
             ),
             'settingsPopupGallery' => array(
+                'vendor'                 => $popup_vendor,
+
+                // General.
                 'show_arrows'            => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
                 'show_counter'           => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
                 'show_zoom_button'       => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
                 'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery', true ),
                 'show_share_button'      => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery', true ),
                 'show_close_button'      => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
+
+                // Fancybox.
+                'show_download_button'   => Visual_Portfolio_Settings::get_option( 'show_download_button', 'vp_popup_gallery', false ),
+                'show_slideshow'         => Visual_Portfolio_Settings::get_option( 'show_slideshow', 'vp_popup_gallery', false ),
+                'show_thumbs'            => Visual_Portfolio_Settings::get_option( 'show_thumbs', 'vp_popup_gallery', true ),
             ),
         );
         wp_localize_script( '@@plugin_name', 'VPData', $data_init );

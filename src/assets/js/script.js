@@ -180,8 +180,11 @@ class VP {
         // init custom colors
         self.initCustomColors();
 
-        // init photoswipe
+        // init Photoswipe
         self.initPhotoswipe();
+
+        // init Fancybox
+        self.initFancybox();
 
         self.emitEvent( 'init' );
 
@@ -272,8 +275,11 @@ class VP {
         self.removeStyle();
         self.renderStyle();
 
-        // destroy photoswipe
+        // destroy Photoswipe
         self.destroyPhotoswipe();
+
+        // destroy Fancybox
+        self.destroyFancybox();
 
         // destroy isotope
         self.destroyIsotope();
@@ -1290,20 +1296,27 @@ class VP {
 
         const Youtube = getYoutubeID( url );
         const Vimeo = getVimeoID( url );
+        let embedUrl = url;
 
         if ( Youtube ) {
+            embedUrl = `https://www.youtube.com/embed/${ Youtube }`;
+
             return {
                 vendor: 'youtube',
                 id: Youtube,
                 url,
-                embed: `<iframe width="1920" height="1080" src="https://www.youtube.com/embed/${ Youtube }" frameborder="0" allowfullscreen></iframe>`,
+                embedUrl,
+                embed: `<iframe width="1920" height="1080" src="${ embedUrl }" frameborder="0" allowfullscreen></iframe>`,
             };
         } else if ( Vimeo ) {
+            embedUrl = `//player.vimeo.com/video/${ Vimeo }`;
+
             return {
                 vendor: 'vimeo',
                 id: Vimeo,
                 url,
-                embed: `<iframe width="1920" height="1080" src="//player.vimeo.com/video/${ Vimeo }" frameborder="0" allowfullscreen></iframe>`,
+                embedUrl,
+                embed: `<iframe width="1920" height="1080" src="${ embedUrl }" frameborder="0" allowfullscreen></iframe>`,
             };
         }
 
@@ -1311,6 +1324,7 @@ class VP {
             vendor: 'unknown',
             id: url,
             url,
+            embedUrl,
             embed: `<iframe width="1920" height="1080" src="${ url }" frameborder="0" allowfullscreen></iframe>`,
         };
     }
@@ -1321,7 +1335,7 @@ class VP {
     initPhotoswipe() {
         const self = this;
 
-        if ( typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' ) {
+        if ( typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'photoswipe' !== settingsPopupGallery.vendor ) {
             return;
         }
 
@@ -1698,15 +1712,18 @@ class VP {
 
             e.preventDefault();
 
-            let index = 0;
+            let index = -1;
             const clicked = this;
             self.$item.find( '.vp-portfolio__item-wrap .vp-portfolio__item-popup' ).each( function( idx ) {
-                if ( $( this ).closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item' )[ 0 ] === clicked ) {
+                if ( -1 === index && $( this ).closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item' )[ 0 ] === clicked ) {
                     index = idx;
-                    return false;
                 }
-                return true;
             } );
+
+            if ( index < 0 ) {
+                index = 0;
+            }
+
             openPhotoSwipe( index, self.$item[ 0 ] );
         } );
 
@@ -1726,6 +1743,205 @@ class VP {
         self.$item.off( `click.vpf-uid-${ self.uid }` );
 
         $( `.vp-pswp-uid-${ self.uid }` ).remove();
+    }
+
+    /**
+     * Init Fancybox plugin
+     */
+    initFancybox() {
+        const self = this;
+
+        if ( typeof $.fancybox === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'fancybox' !== settingsPopupGallery.vendor ) {
+            return;
+        }
+
+        // prevent on preview page
+        if ( self.$item.closest( '#vp_preview' ).length ) {
+            return;
+        }
+
+        // find all elements
+        const parseThumbnailElements = function( el ) {
+            const thumbElements = $( el ).find( '.vp-portfolio__item-wrap' );
+            const items = [];
+            let $meta;
+            let size;
+            let videoSize;
+            let item;
+            let video;
+            let videoData;
+
+            thumbElements.each( function() {
+                $meta = $( this ).find( '.vp-portfolio__item-popup' );
+
+                if ( $meta && $meta.length ) {
+                    size = ( $meta.attr( 'data-vp-popup-img-size' ) || '1920x1080' ).split( 'x' );
+                    videoSize = '1920x1080'.split( 'x' );
+                    video = $meta.attr( 'data-vp-popup-video' );
+                    videoData = false;
+
+                    if ( video ) {
+                        videoData = self.parseVideo( video );
+                    }
+
+                    if ( videoData ) {
+                        item = {
+                            type: 'iframe',
+                            src: videoData.embedUrl,
+                            opts: {
+                                width: parseInt( videoSize[ 0 ], 10 ),
+                                height: parseInt( videoSize[ 1 ], 10 ),
+                            },
+                        };
+                    } else {
+                        // create slide object
+                        item = {
+                            type: 'image',
+                            src: $meta.attr( 'data-vp-popup-img' ),
+                            opts: {
+                                width: parseInt( size[ 0 ], 10 ),
+                                height: parseInt( size[ 1 ], 10 ),
+                                srcset: $meta.attr( 'data-vp-popup-img-srcset' ),
+                            },
+                        };
+
+                        const $captionTitle = $meta.children( '.vp-portfolio__item-popup-title' ).get( 0 );
+                        const $captionDescription = $meta.children( '.vp-portfolio__item-popup-description' ).get( 0 );
+                        if ( $captionTitle || $captionDescription ) {
+                            item.opts.caption = ( $captionTitle ? $captionTitle.outerHTML : '' ) + ( $captionDescription ? $captionDescription.outerHTML : '' );
+                        }
+
+                        // save link to element for getThumbBoundsFn
+                        item.el = this;
+
+                        const smallSrc = $meta.attr( 'data-vp-popup-sm-img' ) || item.src;
+                        if ( smallSrc ) {
+                            item.opts.thumb = smallSrc;
+                        }
+                    }
+
+                    items.push( item );
+                }
+            } );
+
+            return items;
+        };
+
+        const openFancybox = function( index, galleryElement ) {
+            const items = parseThumbnailElements( galleryElement );
+
+            const buttons = [];
+            if ( settingsPopupGallery.show_zoom_button ) {
+                buttons.push( 'zoom' );
+            }
+            if ( settingsPopupGallery.show_fullscreen_button ) {
+                buttons.push( 'fullScreen' );
+            }
+            if ( settingsPopupGallery.show_slideshow ) {
+                buttons.push( 'slideShow' );
+            }
+            if ( settingsPopupGallery.show_thumbs ) {
+                buttons.push( 'thumbs' );
+            }
+            if ( settingsPopupGallery.show_share_button ) {
+                buttons.push( 'share' );
+            }
+            if ( settingsPopupGallery.show_download_button ) {
+                buttons.push( 'download' );
+            }
+            if ( settingsPopupGallery.show_close_button ) {
+                buttons.push( 'close' );
+            }
+
+            // define options
+            const options = {
+                // Close existing modals
+                // Set this to false if you do not need to stack multiple instances
+                closeExisting: true,
+
+                // Enable infinite gallery navigation
+                loop: true,
+
+                // Should display navigation arrows at the screen edges
+                arrows: settingsPopupGallery.show_arrows,
+
+                // Should display counter at the top left corner
+                infobar: settingsPopupGallery.show_counter,
+
+                // Should display close button (using `btnTpl.smallBtn` template) over the content
+                // Can be true, false, "auto"
+                // If "auto" - will be automatically enabled for "html", "inline" or "ajax" items
+                smallBtn: false,
+
+                // Should display toolbar (buttons at the top)
+                // Can be true, false, "auto"
+                // If "auto" - will be automatically hidden if "smallBtn" is enabled
+                toolbar: 'auto',
+
+                // What buttons should appear in the top right corner.
+                // Buttons will be created using templates from `btnTpl` option
+                // and they will be placed into toolbar (class="fancybox-toolbar"` element)
+                buttons,
+
+                // Custom CSS class for layout
+                baseClass: 'vp-fancybox',
+
+                // Hide browser vertical scrollbars; use at your own risk
+                hideScrollbar: true,
+
+                lang: 'wordpress',
+                i18n: {
+                    wordpress: {
+                        CLOSE: __.fancybox_close,
+                        NEXT: __.fancybox_next,
+                        PREV: __.fancybox_prev,
+                        ERROR: __.fancybox_error,
+                        PLAY_START: __.fancybox_play_start,
+                        PLAY_STOP: __.fancybox_play_stop,
+                        FULL_SCREEN: __.fancybox_full_screen,
+                        THUMBS: __.fancybox_thumbs,
+                        DOWNLOAD: __.fancybox_download,
+                        SHARE: __.fancybox_share,
+                        ZOOM: __.fancybox_zoom,
+                    },
+                },
+            };
+
+            // Start new fancybox instance
+            $.fancybox.open( items, options, index );
+        };
+
+        // click action
+        self.$item.on( `click.vpf-uid-${ self.uid }`, '.vp-portfolio__item', function( e ) {
+            if ( ! $( this ).closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item-popup' ).length ) {
+                return;
+            }
+
+            e.preventDefault();
+
+            let index = -1;
+            const clicked = this;
+            self.$item.find( '.vp-portfolio__item-wrap .vp-portfolio__item-popup' ).each( function( idx ) {
+                if ( -1 === index && $( this ).closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item' )[ 0 ] === clicked ) {
+                    index = idx;
+                }
+            } );
+
+            if ( index < 0 ) {
+                index = 0;
+            }
+
+            openFancybox( index, self.$item[ 0 ] );
+        } );
+    }
+
+    /**
+     * Destroy Fancybox plugin
+     */
+    destroyFancybox() {
+        const self = this;
+
+        self.$item.off( `click.vpf-uid-${ self.uid }` );
     }
 
     /**

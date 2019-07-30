@@ -210,6 +210,7 @@ class Visual_Portfolio_Get {
         // TODO: Option to set custom image sizes.
         $img_size_popup = 'vp_xl';
         $img_size_md_popup = 'vp_md';
+        $img_size_sm_popup = 'vp_sm';
         $img_size = 'vp_xl';
         $columns_count = false;
 
@@ -488,6 +489,7 @@ class Visual_Portfolio_Get {
                     ),
                     'img_size_popup'  => $img_size_popup,
                     'img_size_md_popup' => $img_size_md_popup,
+                    'img_size_sm_popup' => $img_size_sm_popup,
                     'img_size'        => $img_size,
                     'no_image'        => $no_image,
                     'categories'      => array(),
@@ -1507,6 +1509,7 @@ class Visual_Portfolio_Get {
      *      'image_allowed_html' - image allowed attributes for wp_kses.
      *      'img_size_popup' - image size for popup.
      *      'img_size_md_popup' - md image size for popup.
+     *      'img_size_sm_popup' - sm image size for popup.
      *      'img_size' - image size.
      *      'no_image' - no image id.
      *      'opts' - style options.
@@ -1571,17 +1574,23 @@ class Visual_Portfolio_Get {
                             if ( $attachment && 'attachment' === $attachment->post_type ) {
                                 $img_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_popup'] );
                                 $img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
+                                $img_sm_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_sm_popup'] );
                                 $popup_image = array(
+                                    'id'          => $args['image_id'],
                                     'title'       => $attachment->post_title,
                                     'description' => $attachment->post_content,
                                     'caption'     => wp_get_attachment_caption( $attachment->ID ),
                                     'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
                                     'url'         => $img_meta[0],
+                                    'srcset'      => wp_get_attachment_image_srcset( $args['image_id'], $args['img_size_popup'] ),
                                     'width'       => $img_meta[1],
                                     'height'      => $img_meta[2],
                                     'md_url'      => $img_md_meta[0],
                                     'md_width'    => $img_md_meta[1],
                                     'md_height'   => $img_md_meta[2],
+                                    'sm_url'      => $img_sm_meta[0],
+                                    'sm_width'    => $img_sm_meta[1],
+                                    'sm_height'   => $img_sm_meta[2],
                                 );
                             }
                         }
@@ -1622,9 +1631,12 @@ class Visual_Portfolio_Get {
                 <div class="vp-portfolio__item-popup"
                     style="display: none;"
                     data-vp-popup-img="<?php echo esc_url( $popup_image['url'] ); ?>"
+                    data-vp-popup-img-srcset="<?php echo esc_attr( $popup_image['srcset'] ); ?>"
                     data-vp-popup-img-size="<?php echo esc_attr( $popup_image['width'] . 'x' . $popup_image['height'] ); ?>"
                     data-vp-popup-md-img="<?php echo esc_url( $popup_image['md_url'] ); ?>"
                     data-vp-popup-md-img-size="<?php echo esc_attr( $popup_image['md_width'] . 'x' . $popup_image['md_height'] ); ?>"
+                    data-vp-popup-sm-img="<?php echo esc_url( $popup_image['sm_url'] ); ?>"
+                    data-vp-popup-sm-img-size="<?php echo esc_attr( $popup_image['sm_width'] . 'x' . $popup_image['sm_height'] ); ?>"
                 >
                     <?php
                     if ( isset( $popup_image[ $title_source ] ) && $popup_image[ $title_source ] ) {
