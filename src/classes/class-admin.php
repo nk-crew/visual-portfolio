@@ -993,7 +993,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'range',
-                            'label' => esc_html__( 'Speed (seconds)', '@@text_domain' ),
+                            'label' => esc_html__( 'Speed (in Seconds)', '@@text_domain' ),
                             'name'  => 'speed',
                             'min'   => 0,
                             'max'   => 5,
@@ -1002,7 +1002,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'range',
-                            'label' => esc_html__( 'Autoplay (seconds)', '@@text_domain' ),
+                            'label' => esc_html__( 'Autoplay (in Seconds)', '@@text_domain' ),
                             'name'  => 'autoplay',
                             'min'   => 0,
                             'max'   => 20,
@@ -1024,7 +1024,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'        => 'select2',
-                            'label'       => esc_html__( 'Items height', '@@text_domain' ),
+                            'label'       => esc_html__( 'Items Height', '@@text_domain' ),
                             'name'        => 'items_height_type',
                             'default'     => 'dynamic',
                             'options'     => array(
@@ -1063,7 +1063,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'        => 'text',
-                            'label'       => esc_html__( 'Items minimal height', '@@text_domain' ),
+                            'label'       => esc_html__( 'Items Minimal Height', '@@text_domain' ),
                             'placeholder' => esc_attr__( '300px, 80vh', '@@text_domain' ),
                             'description' => esc_html__( 'Values with `vh` units will not be visible in preview.', '@@text_domain' ),
                             'name'        => 'items_min_height',
@@ -1078,7 +1078,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'        => 'select2',
-                            'label'       => esc_html__( 'Slides per view', '@@text_domain' ),
+                            'label'       => esc_html__( 'Slides Per View', '@@text_domain' ),
                             'name'        => 'slides_per_view_type',
                             'default'     => 'custom',
                             'options'     => array(
@@ -1114,7 +1114,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Centered slides', '@@text_domain' ),
+                            'label'   => esc_html__( 'Centered Slides', '@@text_domain' ),
                             'name'    => 'centered_slides',
                             'default' => true,
                             'condition' => array(
@@ -1133,13 +1133,13 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Free scroll', '@@text_domain' ),
+                            'label'   => esc_html__( 'Free Scroll', '@@text_domain' ),
                             'name'    => 'free_mode',
                             'default' => false,
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Free scroll Sticky', '@@text_domain' ),
+                            'label'   => esc_html__( 'Free Scroll Sticky', '@@text_domain' ),
                             'name'    => 'free_mode_sticky',
                             'default' => false,
                             'condition' => array(
@@ -1150,7 +1150,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Display arrows', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display Arrows', '@@text_domain' ),
                             'name'    => 'arrows',
                             'default' => true,
                         ),
@@ -1158,8 +1158,8 @@ class Visual_Portfolio_Admin {
                             'type'        => 'text',
                             'name'        => 'arrows_icon_prev',
                             'default'     => 'fas fa-angle-left',
-                            'placeholder' => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
-                            'hint'        => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
+                            'placeholder' => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
+                            'hint'        => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
                             'hint_place'  => 'left',
                             'condition'   => array(
                                 array(
@@ -1171,8 +1171,8 @@ class Visual_Portfolio_Admin {
                             'type'        => 'text',
                             'name'        => 'arrows_icon_next',
                             'default'     => 'fas fa-angle-right',
-                            'placeholder' => esc_attr__( 'Next arrow icon', '@@text_domain' ),
-                            'hint'        => esc_attr__( 'Next arrow icon', '@@text_domain' ),
+                            'placeholder' => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
+                            'hint'        => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
                             'hint_place'  => 'left',
                             'condition'   => array(
                                 array(
@@ -1182,13 +1182,13 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Display bullets', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display Bullets', '@@text_domain' ),
                             'name'    => 'bullets',
                             'default' => false,
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Dynamic bullets', '@@text_domain' ),
+                            'label'   => esc_html__( 'Dynamic Bullets', '@@text_domain' ),
                             'name'    => 'bullets_dynamic',
                             'default' => false,
                             'condition' => array(
@@ -1205,13 +1205,13 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'toggle',
-                            'label'   => esc_html__( 'Display thumbnails', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display Thumbnails', '@@text_domain' ),
                             'name'    => 'thumbnails',
                             'default' => false,
                         ),
                         array(
                             'type'     => 'range',
-                            'label'    => esc_html__( 'Thumbnails gap', '@@text_domain' ),
+                            'label'    => esc_html__( 'Thumbnails Gap', '@@text_domain' ),
                             'name'     => 'thumbnails_gap',
                             'default'  => 15,
                             'min'      => 0,
@@ -1224,7 +1224,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'        => 'select2',
-                            'label'       => esc_html__( 'Thumbnails height', '@@text_domain' ),
+                            'label'       => esc_html__( 'Thumbnails Height', '@@text_domain' ),
                             'name'        => 'thumbnails_height_type',
                             'default'     => 'static',
                             'options'     => array(
@@ -1274,7 +1274,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'        => 'select2',
-                            'label'       => esc_html__( 'Thumbnails per view', '@@text_domain' ),
+                            'label'       => esc_html__( 'Thumbnails Per View', '@@text_domain' ),
                             'name'        => 'thumbnails_per_view_type',
                             'default'     => 'custom',
                             'options'     => array(
@@ -1378,7 +1378,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'layouts',
                 'type'     => 'range',
-                'label'    => esc_html__( 'Items per page', '@@text_domain' ),
+                'label'    => esc_html__( 'Items Per Page', '@@text_domain' ),
                 'name'     => 'vp_items_count',
                 'default'  => 6,
                 'min'      => 1,
@@ -1417,7 +1417,7 @@ class Visual_Portfolio_Admin {
                     'controls' => array(
                         array(
                             'type'    => 'select2',
-                            'label'   => esc_html__( 'Display Read more button', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
                             'name'    => 'show_read_more',
                             'default' => false,
                             'options' => array(
@@ -1431,7 +1431,7 @@ class Visual_Portfolio_Admin {
                             'name'    => 'read_more_label',
                             'placeholder' => 'Read More',
                             'default' => 'Read More',
-                            'hint'    => esc_attr__( 'Read more button label', '@@text_domain' ),
+                            'hint'    => esc_attr__( 'Read More Button Label', '@@text_domain' ),
                             'hint_place' => 'left',
                             'condition' => array(
                                 array(
@@ -1458,7 +1458,7 @@ class Visual_Portfolio_Admin {
                     'controls' => array(
                         array(
                             'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
+                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
                             'name'    => 'bg_color',
                             'default' => '#212125',
                             'alpha'   => true,
@@ -1471,7 +1471,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
+                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
                             'name'    => 'text_color',
                             'default' => '#fff',
                             'alpha'   => true,
@@ -1499,7 +1499,7 @@ class Visual_Portfolio_Admin {
                     'controls' => array(
                         array(
                             'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
+                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
                             'name'    => 'bg_color',
                             'default' => '#fff',
                             'alpha'   => true,
@@ -1512,7 +1512,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
+                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
                             'name'    => 'text_color',
                             'default' => '#000',
                             'alpha'   => true,
@@ -1540,7 +1540,7 @@ class Visual_Portfolio_Admin {
                     'controls' => array(
                         array(
                             'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
+                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
                             'name'    => 'bg_color',
                             'default' => 'rgba(0, 0, 0, 0.85)',
                             'alpha'   => true,
@@ -1553,7 +1553,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
+                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
                             'name'    => 'text_color',
                             'default' => '#fff',
                             'alpha'   => true,
@@ -1603,7 +1603,7 @@ class Visual_Portfolio_Admin {
                         case 'show_title':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Display title', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Title', '@@text_domain' ),
                                 'name'    => 'show_title',
                                 'default' => true,
                             );
@@ -1611,13 +1611,13 @@ class Visual_Portfolio_Admin {
                         case 'show_categories':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Display categories', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Categories', '@@text_domain' ),
                                 'name'    => 'show_categories',
                                 'default' => true,
                             );
                             $new_fields[] = array(
                                 'type'    => 'range',
-                                'label'   => esc_html__( 'Categories count', '@@text_domain' ),
+                                'label'   => esc_html__( 'Categories Count', '@@text_domain' ),
                                 'name'    => 'categories_count',
                                 'min'     => 1,
                                 'max'     => 10,
@@ -1632,7 +1632,7 @@ class Visual_Portfolio_Admin {
                         case 'show_date':
                             $new_fields[] = array(
                                 'type'    => 'select2',
-                                'label'   => esc_html__( 'Display date', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Date', '@@text_domain' ),
                                 'name'    => 'show_date',
                                 'default' => false,
                                 'options' => array(
@@ -1658,13 +1658,13 @@ class Visual_Portfolio_Admin {
                         case 'show_excerpt':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Display excerpt', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Excerpt', '@@text_domain' ),
                                 'name'    => 'show_excerpt',
                                 'default' => false,
                             );
                             $new_fields[] = array(
                                 'type'    => 'range',
-                                'label'   => esc_html__( 'Excerpt words count', '@@text_domain' ),
+                                'label'   => esc_html__( 'Excerpt Words Count', '@@text_domain' ),
                                 'name'    => 'excerpt_words_count',
                                 'default' => 15,
                                 'min'     => 1,
@@ -1679,7 +1679,7 @@ class Visual_Portfolio_Admin {
                         case 'show_icons':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Display icon', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Icon', '@@text_domain' ),
                                 'name'    => 'show_icon',
                                 'default' => false,
                             );
@@ -1687,8 +1687,8 @@ class Visual_Portfolio_Admin {
                                 'type'        => 'text',
                                 'name'        => 'icon',
                                 'default'     => 'fas fa-search',
-                                'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
-                                'hint'        => esc_attr__( 'Standard icon', '@@text_domain' ),
+                                'placeholder' => esc_attr__( 'Standard Icon', '@@text_domain' ),
+                                'hint'        => esc_attr__( 'Standard Icon', '@@text_domain' ),
                                 'hint_place'  => 'left',
                                 'condition'   => array(
                                     array(
@@ -1700,8 +1700,8 @@ class Visual_Portfolio_Admin {
                                 'type'        => 'text',
                                 'name'        => 'icon_video',
                                 'default'     => 'fas fa-play',
-                                'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
-                                'hint'        => esc_attr__( 'Video icon', '@@text_domain' ),
+                                'placeholder' => esc_attr__( 'Video Icon', '@@text_domain' ),
+                                'hint'        => esc_attr__( 'Video Icon', '@@text_domain' ),
                                 'hint_place'  => 'left',
                                 'condition'   => array(
                                     array(
@@ -1713,7 +1713,7 @@ class Visual_Portfolio_Admin {
                         case 'align':
                             $new_fields[] = array(
                                 'type'    => 'align',
-                                'label'   => esc_html__( 'Caption align', '@@text_domain' ),
+                                'label'   => esc_html__( 'Caption Align', '@@text_domain' ),
                                 'name'    => 'align',
                                 'default' => 'center',
                                 'extended' => 'extended' === $val,
@@ -1784,8 +1784,8 @@ class Visual_Portfolio_Admin {
                 'default'  => '',
                 'options'  => array(
                     '' => esc_html__( 'Default', '@@text_domain' ),
-                    '_blank' => esc_html__( 'New tab (_blank)', '@@text_domain' ),
-                    '_top' => esc_html__( 'Top frame (_top)', '@@text_domain' ),
+                    '_blank' => esc_html__( 'New Tab (_blank)', '@@text_domain' ),
+                    '_top' => esc_html__( 'Top Frame (_top)', '@@text_domain' ),
                 ),
                 'condition' => array(
                     array(
@@ -1945,7 +1945,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'filter',
                 'type'     => 'toggle',
-                'label'    => esc_html__( 'Display count', '@@text_domain' ),
+                'label'    => esc_html__( 'Display Count', '@@text_domain' ),
                 'name'     => 'vp_filter_show_count',
                 'default'  => false,
                 'condition' => array(
@@ -1961,7 +1961,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'filter',
                 'type'     => 'text',
-                'label'    => esc_html__( 'All button text', '@@text_domain' ),
+                'label'    => esc_html__( 'All Button Text', '@@text_domain' ),
                 'name'     => 'vp_filter_text_all',
                 'default'  => esc_attr__( 'All', '@@text_domain' ),
                 'condition' => array(
@@ -2258,7 +2258,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'text',
                 'name'     => 'vp_pagination_infinite_text_load',
-                'default'  => esc_attr__( 'Load more', '@@text_domain' ),
+                'default'  => esc_attr__( 'Load More', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
@@ -2281,7 +2281,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'text',
                 'name'     => 'vp_pagination_infinite_text_loading',
-                'default'  => esc_attr__( 'Loading more...', '@@text_domain' ),
+                'default'  => esc_attr__( 'Loading More...', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
@@ -2327,7 +2327,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'text',
                 'name'     => 'vp_pagination_load_more_text_load',
-                'default'  => esc_attr__( 'Load more', '@@text_domain' ),
+                'default'  => esc_attr__( 'Load More', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
@@ -2350,7 +2350,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'text',
                 'name'     => 'vp_pagination_load_more_text_loading',
-                'default'  => esc_attr__( 'Loading more...', '@@text_domain' ),
+                'default'  => esc_attr__( 'Loading More...', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
@@ -2395,7 +2395,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'pagination',
                 'type'      => 'toggle',
-                'label'     => esc_html__( 'Display arrows', '@@text_domain' ),
+                'label'     => esc_html__( 'Display Arrows', '@@text_domain' ),
                 'name'      => 'vp_pagination_paged__show_arrows',
                 'default'   => true,
                 'condition' => array(
@@ -2465,7 +2465,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'pagination',
                 'type'      => 'toggle',
-                'label'     => esc_html__( 'Display numbers', '@@text_domain' ),
+                'label'     => esc_html__( 'Display Numbers', '@@text_domain' ),
                 'name'      => 'vp_pagination_paged__show_numbers',
                 'default'   => true,
                 'condition' => array(
@@ -2529,7 +2529,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'   => 'content-source-posts',
                 'type'       => 'select2',
-                'label'      => esc_html__( 'Data source', '@@text_domain' ),
+                'label'      => esc_html__( 'Data Source', '@@text_domain' ),
                 'name'       => 'vp_posts_source',
                 'default'    => 'portfolio',
                 'value_callback' => array( $this, 'get_select2_post_types' ),
@@ -2541,7 +2541,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'   => 'content-source-posts',
                 'type'       => 'select2',
-                'label'      => esc_html__( 'Specific posts', '@@text_domain' ),
+                'label'      => esc_html__( 'Specific Posts', '@@text_domain' ),
                 'name'       => 'vp_posts_ids',
                 'default'    => array(),
                 'value_callback' => array( $this, 'get_select2_selected_posts' ),
@@ -2562,7 +2562,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'   => 'content-source-posts',
                 'type'       => 'select2',
-                'label'      => esc_html__( 'Excluded posts', '@@text_domain' ),
+                'label'      => esc_html__( 'Excluded Posts', '@@text_domain' ),
                 'name'       => 'vp_posts_excluded_ids',
                 'default'    => array(),
                 'value_callback' => array( $this, 'get_select2_excluded_posts' ),
@@ -2590,7 +2590,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'content-source-posts',
                 'type'      => 'textarea',
-                'label'     => esc_html__( 'Custom query', '@@text_domain' ),
+                'label'     => esc_html__( 'Custom Query', '@@text_domain' ),
                 // translators: %1$s - escaped url.
                 'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
                 'name'      => 'vp_posts_custom_query',
@@ -2645,7 +2645,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-posts',
                 'type'     => 'select2',
-                'label'    => esc_html__( 'Taxonomies relation', '@@text_domain' ),
+                'label'    => esc_html__( 'Taxonomies Relation', '@@text_domain' ),
                 'name'     => 'vp_posts_taxonomies_relation',
                 'default'  => 'or',
                 'options'  => array(
@@ -2688,7 +2688,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-posts',
                 'type'     => 'select2',
-                'label'    => esc_html__( 'Order direction', '@@text_domain' ),
+                'label'    => esc_html__( 'Order Direction', '@@text_domain' ),
                 'name'     => 'vp_posts_order_direction',
                 'default'  => 'desc',
                 'options'  => array(
@@ -2702,7 +2702,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-posts',
                 'type'     => 'toggle',
-                'label'    => esc_html__( 'Avoid duplicate posts', '@@text_domain' ),
+                'label'    => esc_html__( 'Avoid Duplicate Posts', '@@text_domain' ),
                 'name'     => 'vp_posts_avoid_duplicate_posts',
                 'default'  => false,
                 'wrapper_class' => 'vp-col-6',
@@ -2787,7 +2787,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-images',
                 'type'     => 'select2',
-                'label'    => esc_html__( 'Order direction', '@@text_domain' ),
+                'label'    => esc_html__( 'Order Direction', '@@text_domain' ),
                 'name'     => 'vp_images_order_direction',
                 'default'  => 'asc',
                 'options'  => array(
