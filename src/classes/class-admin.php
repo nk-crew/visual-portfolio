@@ -1062,6 +1062,21 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
+                            'type'        => 'text',
+                            'label'       => esc_html__( 'Items minimal height', '@@text_domain' ),
+                            'placeholder' => esc_attr__( '300px, 80vh', '@@text_domain' ),
+                            'description' => esc_html__( 'Values with `vh` units will not be visible in preview.', '@@text_domain' ),
+                            'name'        => 'items_min_height',
+                            'default'     => '',
+                            'condition'   => array(
+                                array(
+                                    'control'  => 'items_height_type',
+                                    'operator' => '!==',
+                                    'value'    => 'auto',
+                                ),
+                            ),
+                        ),
+                        array(
                             'type'        => 'select2',
                             'label'       => esc_html__( 'Slides per view', '@@text_domain' ),
                             'name'        => 'slides_per_view_type',

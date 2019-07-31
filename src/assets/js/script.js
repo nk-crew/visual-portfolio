@@ -214,6 +214,17 @@ class VP {
     }
 
     /**
+     * Check if script loaded in preview.
+     *
+     * @return {boolean} is in preview.
+     */
+    isPreview() {
+        const self = this;
+
+        return !! self.$item.closest( '#vp_preview' ).length;
+    }
+
+    /**
      * Called after resized container.
      */
     resized() {
@@ -849,11 +860,19 @@ class VP {
                 break;
             case 'slider':
                 [ 'items', 'thumbnails' ].forEach( ( type ) => {
-                    const itemsHeight = type === 'items' ? self.options.sliderItemsHeight : self.options.sliderThumbnailsHeight;
+                    let itemsHeight = type === 'items' ? self.options.sliderItemsHeight : self.options.sliderThumbnailsHeight;
+                    let itemsMinHeight = type === 'items' ? self.options.sliderItemsMinHeight : 0;
                     const typeSingle = type.replace( /s$/g, '' );
 
                     if ( itemsHeight === 'auto' ) {
                         return;
+                    }
+
+                    itemsHeight = isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`;
+
+                    // prevent minHeight option in preview, when used 'vh' units.
+                    if ( itemsMinHeight && self.isPreview() && /vh/.test( itemsMinHeight ) ) {
+                        itemsMinHeight = 0;
                     }
 
                     const itemsPerView = type === 'items' ? self.options.sliderSlidesPerView : self.options.sliderThumbnailsPerView;
@@ -872,7 +891,7 @@ class VP {
                                 content: '""',
                                 display: 'block',
                                 width: '100%',
-                                'margin-top': isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`,
+                                'margin-top': itemsHeight,
                             } );
                             self.addStyle( `.vp-portfolio__${ type }`, {
                                 position: 'absolute',
@@ -890,6 +909,13 @@ class VP {
                                 height: '100%',
                             } );
 
+                            // min height.
+                            if ( itemsMinHeight ) {
+                                self.addStyle( `.vp-portfolio__${ type }-wrap`, {
+                                    'min-height': itemsMinHeight,
+                                } );
+                            }
+
                         // static.
                         } else {
                             self.addStyle( `.vp-portfolio__${ typeSingle }-wrap`, {
@@ -897,12 +923,19 @@ class VP {
                             } );
                             self.addStyle( `.vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img img`, {
                                 width: itemsWidth,
-                                height: isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`,
+                                height: itemsHeight,
                             } );
+
+                            // min height.
+                            if ( itemsMinHeight ) {
+                                self.addStyle( `.vp-portfolio__${ typeSingle } .vp-portfolio__${ typeSingle }-img img`, {
+                                    'min-height': itemsMinHeight,
+                                } );
+                            }
                         }
                     } else {
                         self.addStyle( `.vp-portfolio__${ typeSingle }-img-wrap::before`, {
-                            'margin-top': isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`,
+                            'margin-top': itemsHeight,
                         } );
                         self.addStyle( `.vp-portfolio__${ typeSingle }-img img`, {
                             position: 'absolute',
@@ -922,6 +955,13 @@ class VP {
                             width: '100%',
                             height: '100%',
                         } );
+
+                        // min height.
+                        if ( itemsMinHeight ) {
+                            self.addStyle( `.vp-portfolio__${ typeSingle }-img-wrap`, {
+                                'min-height': itemsMinHeight,
+                            } );
+                        }
                     }
                 } );
 
@@ -1340,7 +1380,7 @@ class VP {
         }
 
         // prevent on preview page
-        if ( self.$item.closest( '#vp_preview' ).length ) {
+        if ( self.isPreview() ) {
             return;
         }
 
@@ -1757,7 +1797,7 @@ class VP {
         }
 
         // prevent on preview page
-        if ( self.$item.closest( '#vp_preview' ).length ) {
+        if ( self.isPreview() ) {
             return;
         }
 

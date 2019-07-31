@@ -316,9 +316,11 @@ class Visual_Portfolio_Get {
                     break;
                 case 'static':
                     $data_atts['data-vp-slider-items-height'] = ( $options['vp_slider_items_height_static'] ? : '200' ) . 'px';
+                    $data_atts['data-vp-slider-items-min-height'] = $options['vp_slider_items_min_height'];
                     break;
                 case 'dynamic':
                     $data_atts['data-vp-slider-items-height'] = ( $options['vp_slider_items_height_dynamic'] ? : '80' ) . '%';
+                    $data_atts['data-vp-slider-items-min-height'] = $options['vp_slider_items_min_height'];
                     break;
                 // no default.
             }
