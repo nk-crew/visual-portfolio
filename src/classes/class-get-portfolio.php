@@ -1161,6 +1161,8 @@ class Visual_Portfolio_Get {
             }
         }
 
+        $query_opts = Visual_Portfolio_Extend::query_args( $query_opts, $options );
+
         return $query_opts;
     }
 
@@ -1371,7 +1373,7 @@ class Visual_Portfolio_Get {
 
         $args = array(
             'class'    => 'vp-filter',
-            'items'    => $terms,
+            'items'    => Visual_Portfolio_Extend::filter_items( $terms, $vp_options ),
             'align'    => $vp_options['vp_filter_align'],
             'show_count' => $vp_options['vp_filter_show_count'],
             'opts'     => $filter_options,
@@ -1418,13 +1420,13 @@ class Visual_Portfolio_Get {
             $active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
         }
 
-        $sort_items = array(
+        $sort_items = Visual_Portfolio_Extend::sort_items( array(
             '' => esc_html__( 'Default sorting', '@@text_domain' ),
             'date_desc' => esc_html__( 'Sort by date (newest)', '@@text_domain' ),
             'date' => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
             'title' => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
             'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
-        );
+        ), $vp_options );
 
         foreach ( $sort_items as $slug => $label ) {
             $url = self::get_pagenum_link(
@@ -1849,7 +1851,7 @@ class Visual_Portfolio_Get {
      * @param array $query_arg - custom query arg.
      * @return string
      */
-    private static function get_pagenum_link( $query_arg = array() ) {
+    public static function get_pagenum_link( $query_arg = array() ) {
         // Use current page url.
         global $wp;
         $current_url = trailingslashit( home_url( $wp->request ) );
@@ -1887,7 +1889,7 @@ class Visual_Portfolio_Get {
      *
      * @return string
      */
-    private static function create_slug( $str, $delimiter = '_' ) {
+    public static function create_slug( $str, $delimiter = '_' ) {
         $slug = $str;
 
         if ( class_exists( 'Cocur\Slugify\Slugify' ) ) {

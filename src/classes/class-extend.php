@@ -287,4 +287,66 @@ class Visual_Portfolio_Extend {
          */
         return apply_filters( 'vpf_extend_image_controls', $controls, $name );
     }
+
+    /**
+     * Extend Query Args.
+     *
+     * @param array  $args - query arguments.
+     * @param string $options - portfolio options.
+     * @return array
+     */
+    public static function query_args( $args, $options ) {
+        return apply_filters( 'vpf_extend_query_args', $args, $options );
+    }
+
+    /**
+     * Extend Filter Items.
+     *
+     * @param array  $items - list of all filter items.
+     * @param string $options - portfolio options.
+     * @return array
+     */
+    public static function filter_items( $items, $options ) {
+        /*
+         * Example:
+            array(
+                array(
+                    'filter'      => '*',
+                    'label'       => $options['vp_filter_text_all'],
+                    'description' => false,
+                    'count'       => false,
+                    'active'      => true,
+                    'url'         => Visual_Portfolio_Get::get_pagenum_link(
+                        array(
+                            'vp_filter' => '',
+                            'vp_page' => 1,
+                        )
+                    ),
+                    'class'       => 'vp-filter__item',
+                ),
+            )
+         */
+        return apply_filters( 'vpf_extend_filter_items', $items, $options );
+    }
+
+    /**
+     * Extend Sort Items.
+     *
+     * @param array  $items - list of all sort items.
+     * @param string $options - portfolio options.
+     * @return array
+     */
+    public static function sort_items( $items, $options ) {
+        /*
+         * Example:
+            array(
+                ''           => esc_html__( 'Default sorting', '@@text_domain' ),
+                'date_desc'  => esc_html__( 'Sort by date (newest)', '@@text_domain' ),
+                'date'       => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
+                'title'      => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
+                'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
+            )
+         */
+        return apply_filters( 'vpf_extend_sort_items', $items, $options );
+    }
 }
