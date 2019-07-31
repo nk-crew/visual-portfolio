@@ -122,6 +122,25 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.13.0 =
+
+* added Fancybox support
+* added option to avoid posts duplication
+* added posts classes (such as hentry) on portfolio items
+* added options to load images title and description automatically from meta data
+* added support for WP Smush and WP Rocket lazy loading options
+* added Items Minimal Height option for Slider layout
+* added new WordPress filters:
+  * `vpf_extend_image_controls`
+  * `vpf_extend_query_args`
+  * `vpf_extend_filter_items`
+  * `vpf_extend_sort_items`
+* improved placeholders function performance
+* changed single post tag to `artricle`
+* prevent lazy loading if `data-src` attribute already added on the image (fixed conflicts with some 3rd-party plugins)
+* prevent lazy loading on AMP pages
+* fixed Jetpack `jetpack_lazy_images_skip_image_with_attributes` filter name
+
 = 1.12.2 =
 
 * fixed tiles size on small screens
