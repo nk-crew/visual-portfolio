@@ -7,7 +7,7 @@
     "author": "nK <https://nkdev.info>",
     "scripts": {
         "build": "wpeg --build",
-        "dev": "wpeg --build --watch",
+        "watch": "wpeg --build --watch",
         "production": "wpeg --build --zip",
         "php-lint": "composer run-script phpcs",
         "php-lint-fix": "composer run-script phpcbf",
