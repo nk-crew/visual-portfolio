@@ -91,6 +91,83 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
 }
 
 /**
+ * Emit Resize Event.
+ */
+function windowResizeEmit() {
+    if ( typeof window.Event === 'function' ) {
+        // modern browsers
+        window.dispatchEvent( new window.Event( 'resize' ) );
+    } else {
+        // for IE and other old browsers
+        // causes deprecation warning on modern browsers
+        const evt = window.document.createEvent( 'UIEvents' );
+        evt.initUIEvent( 'resize', true, false, window, 0 );
+        window.dispatchEvent( evt );
+    }
+}
+
+const visibilityData = {};
+let shouldCheckVisibility = false;
+let checkVisibilityTimeout = false;
+
+// fix portfolio inside Tabs and Accordions
+// check visibility by timer https://stackoverflow.com/questions/19669786/check-if-element-is-visible-in-dom/33456469
+//
+// https://github.com/nk-o/visual-portfolio/issues/11
+// https://github.com/nk-o/visual-portfolio/issues/113
+function checkVisibility() {
+    clearTimeout( checkVisibilityTimeout );
+
+    if ( ! shouldCheckVisibility ) {
+        return;
+    }
+
+    const $items = $( '.vp-portfolio__ready' );
+
+    if ( $items.length ) {
+        let isVisibilityChanged = false;
+
+        $items.each( function() {
+            const { vpf } = this;
+
+            if ( ! vpf ) {
+                return;
+            }
+
+            const currentState = visibilityData[ vpf.uid ] || 'none';
+
+            visibilityData[ vpf.uid ] = this.offsetParent === null ? 'hidden' : 'visible';
+
+            // changed from hidden to visible.
+            if ( currentState === 'hidden' && visibilityData[ vpf.uid ] === 'visible' ) {
+                isVisibilityChanged = true;
+            }
+        } );
+
+        // resize, if visibility changed.
+        if ( isVisibilityChanged ) {
+            windowResizeEmit();
+        }
+    } else {
+        shouldCheckVisibility = false;
+    }
+
+    // run again.
+    checkVisibilityTimeout = setTimeout( checkVisibility, 500 );
+}
+
+// run check function only after portfolio inited.
+$( document ).on( 'inited.vpf', ( event ) => {
+    if ( 'vpf' !== event.namespace ) {
+        return;
+    }
+
+    shouldCheckVisibility = true;
+
+    checkVisibility();
+} );
+
+/**
  * Main VP class
  */
 class VP {
@@ -210,6 +287,8 @@ class VP {
         // images loaded
         self.imagesLoaded();
 
+        self.emitEvent( 'inited' );
+
         self.firstRun = false;
     }
 
@@ -228,16 +307,7 @@ class VP {
      * Called after resized container.
      */
     resized() {
-        if ( typeof window.Event === 'function' ) {
-            // modern browsers
-            window.dispatchEvent( new window.Event( 'resize' ) );
-        } else {
-            // for IE and other old browsers
-            // causes deprecation warning on modern browsers
-            const evt = window.document.createEvent( 'UIEvents' );
-            evt.initUIEvent( 'resize', true, false, window, 0 );
-            window.dispatchEvent( evt );
-        }
+        windowResizeEmit();
 
         this.emitEvent( 'resized' );
     }
