@@ -566,6 +566,7 @@ class Visual_Portfolio_Admin {
             $wp_roles->add_cap( 'portfolio_manager', $cap );
             $wp_roles->add_cap( 'portfolio_author', $cap );
             $wp_roles->add_cap( 'administrator', $cap );
+            $wp_roles->add_cap( 'editor', $cap );
         }
         foreach ( $lists_cap as $cap ) {
             $wp_roles->add_cap( 'portfolio_manager', $cap );
