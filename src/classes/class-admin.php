@@ -2593,7 +2593,7 @@ class Visual_Portfolio_Admin {
                 'type'      => 'textarea',
                 'label'     => esc_html__( 'Custom Query', '@@text_domain' ),
                 // translators: %1$s - escaped url.
-                'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
+                'description'  => sprintf( wp_kses( __( 'Build custom query according to WordPress Codex. See example here <a href="%1$s">%1$s</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'https://visualportfolio.co/documentation/portfolio-layouts/content-source/post-based/#custom-query' ) ),
                 'name'      => 'vp_posts_custom_query',
                 'default'   => '',
                 'cols'      => 30,
