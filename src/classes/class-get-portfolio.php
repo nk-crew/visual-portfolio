@@ -532,11 +532,12 @@ class Visual_Portfolio_Get {
                         }
 
                         $args = array_merge(
-                            $each_item_args, array(
+                            $each_item_args,
+                            array(
                                 'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
                                 'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
                                 'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
-                                'published_time'  => '',
+                                'published_time'  => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
                                 'filter'          => implode( ',', $filter_values ),
                                 'image_id'        => intval( $img['id'] ),
                                 'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
@@ -561,19 +562,21 @@ class Visual_Portfolio_Get {
                     while ( $portfolio_query->have_posts() ) {
                         $portfolio_query->the_post();
 
+                        $the_post = get_post();
+
                         self::$used_posts[] = get_the_ID();
 
                         // Get category taxonomies for data filter.
                         $filter_values  = array();
                         $categories     = array();
-                        $all_taxonomies = get_object_taxonomies( get_post() );
+                        $all_taxonomies = get_object_taxonomies( $the_post );
                         foreach ( $all_taxonomies as $cat ) {
                             // allow only specific taxonomies for filter.
                             if ( ! self::allow_taxonomies_for_filter( $cat ) ) {
                                 continue;
                             }
 
-                            $category = get_the_terms( get_post(), $cat );
+                            $category = get_the_terms( $the_post, $cat );
 
                             if ( $category && ! in_array( $category, $filter_values ) ) {
                                 foreach ( $category as $key => $cat_item ) {
@@ -605,7 +608,7 @@ class Visual_Portfolio_Get {
                                 'url'             => get_permalink(),
                                 'title'           => get_the_title(),
                                 'format'          => get_post_format() ? : 'standard',
-                                'published_time'  => get_the_time( 'U' ),
+                                'published_time'  => $the_post->post_date,
                                 'filter'          => implode( ',', $filter_values ),
                                 'image_id'        => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
                                 'categories'      => $categories,
@@ -888,20 +891,21 @@ class Visual_Portfolio_Get {
             }
 
             // prepare titles and descriptions.
-            if ( 'custom' !== $options['vp_images_titles_source'] || 'custom' !== $options['vp_images_descriptions_source'] ) {
-                foreach ( $images as $k => $img ) {
-                    $img_meta = array(
-                        'title' => '',
-                        'description' => '',
-                        'caption' => '',
-                        'alt' => '',
-                        'none' => '',
-                    );
+            foreach ( $images as $k => $img ) {
+                $img_meta = array(
+                    'title' => '',
+                    'description' => '',
+                    'caption' => '',
+                    'alt' => '',
+                    'none' => '',
+                    'date' => '',
+                );
 
+                $attachment = get_post( $img['id'] );
+
+                if ( $attachment ) {
                     // get image meta if needed.
                     if ( 'none' !== $options['vp_images_titles_source'] || 'none' !== $options['vp_images_descriptions_source'] ) {
-                        $attachment = get_post( $img['id'] );
-
                         if ( $attachment && 'attachment' === $attachment->post_type ) {
                             $img_meta['title'] = $attachment->post_title;
                             $img_meta['description'] = $attachment->post_content;
@@ -919,6 +923,9 @@ class Visual_Portfolio_Get {
                     if ( 'custom' !== $options['vp_images_descriptions_source'] ) {
                         $images[ $k ]['description'] = $img_meta[ $options['vp_images_descriptions_source'] ];
                     }
+
+                    // add published date.
+                    $images[ $k ]['published_time'] = $attachment->post_date;
                 }
             }
 
@@ -957,7 +964,7 @@ class Visual_Portfolio_Get {
                     case 'title':
                         $sort_tmp = array();
                         $new_images = array();
-                        $sort_by = 'id';
+                        $sort_by = 'date';
 
                         if ( 'title' === $custom_order ) {
                             $sort_by = 'title';
@@ -1532,9 +1539,9 @@ class Visual_Portfolio_Get {
         if ( isset( $args['opts']['show_date'] ) ) {
             if ( 'human' === $args['opts']['show_date'] ) {
                 // translators: %s - published in human format.
-                $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) );
+                $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( mysql2date( 'U', $args['published_time'], true ), current_time( 'timestamp' ) ) );
             } else if ( $args['opts']['show_date'] ) {
-                $args['published'] = get_the_time( $args['opts']['date_format'] ? : 'F j, Y' );
+                $args['published'] = mysql2date( $args['opts']['date_format'] ? : 'F j, Y', $args['published_time'], true );
             }
 
             // fallback for Visual Portfolio 1.2.1 version.
