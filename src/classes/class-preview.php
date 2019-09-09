@@ -58,7 +58,7 @@ class Visual_Portfolio_Preview {
         $this->preview_enabled = 'true' === $frame && $id;
         if ( $this->preview_enabled ) {
             // check if the user can view vp_lists page.
-            if ( ! current_user_can( 'read_portfolio', $id ) ) {
+            if ( ! current_user_can( 'read_vp_list', $id ) ) {
                 $this->preview_enabled = false;
                 return;
             }
