@@ -122,6 +122,14 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.13.1 =
+
+* updated FontAwesome
+* fixed portfolio inside Tabs and Accordions
+* fixed Editor role capabilities (add a possibility to manage portfolio items)
+* fixed published date output for Content Source -> Images
+* fixed Gutenberg block list of all available layouts
+
 = 1.13.0 =
 
 * added Fancybox support
