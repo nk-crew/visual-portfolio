@@ -608,7 +608,7 @@ class Visual_Portfolio_Get {
                                 'url'             => get_permalink(),
                                 'title'           => get_the_title(),
                                 'format'          => get_post_format() ? : 'standard',
-                                'published_time'  => $the_post->post_date,
+                                'published_time'  => get_the_date( 'Y-m-d H:i:s', $the_post ),
                                 'filter'          => implode( ',', $filter_values ),
                                 'image_id'        => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
                                 'categories'      => $categories,
@@ -925,7 +925,7 @@ class Visual_Portfolio_Get {
                     }
 
                     // add published date.
-                    $images[ $k ]['published_time'] = $attachment->post_date;
+                    $images[ $k ]['published_time'] = get_the_date( 'Y-m-d H:i:s', $attachment );
                 }
             }
 
