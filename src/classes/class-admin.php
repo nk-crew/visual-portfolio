@@ -967,7 +967,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'range',
-                            'label' => esc_html__( 'Row height tolerance', '@@text_domain' ),
+                            'label' => esc_html__( 'Row Height Tolerance', '@@text_domain' ),
                             'name'  => 'row_height_tolerance',
                             'min'   => 0,
                             'max'   => 1,
@@ -1423,7 +1423,7 @@ class Visual_Portfolio_Admin {
                             'default' => false,
                             'options' => array(
                                 'false' => esc_html__( 'False', '@@text_domain' ),
-                                'true' => esc_html__( 'Always show', '@@text_domain' ),
+                                'true' => esc_html__( 'Always Display', '@@text_domain' ),
                                 'more_tag' => esc_html__( 'Display when used "More tag" in the post', '@@text_domain' ),
                             ),
                         ),
@@ -2418,8 +2418,8 @@ class Visual_Portfolio_Admin {
                 'type'        => 'text',
                 'name'        => 'vp_pagination_paged__arrows_icon_prev',
                 'default'     => 'fas fa-angle-left',
-                'placeholder' => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
@@ -2443,8 +2443,8 @@ class Visual_Portfolio_Admin {
                 'type'        => 'text',
                 'name'        => 'vp_pagination_paged__arrows_icon_next',
                 'default'     => 'fas fa-angle-right',
-                'placeholder' => esc_attr__( 'Next arrow icon', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Next arrow icon', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
