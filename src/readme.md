@@ -122,6 +122,10 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.13.2 =
+
+* fixed incorrect post date if something filters it (for example Events Manager plugin). Thanks to https://wordpress.org/support/topic/date-problem-with-events-and-1-13-1-version/
+
 = 1.13.1 =
 
 * updated FontAwesome
