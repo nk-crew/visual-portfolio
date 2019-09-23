@@ -207,10 +207,9 @@ class Visual_Portfolio_Get {
         $no_image = Visual_Portfolio_Settings::get_option( 'no_image', 'vp_general', false );
 
         // prepare image sizes.
-        // TODO: Option to set custom image sizes.
-        $img_size_popup = 'vp_xl';
-        $img_size_md_popup = 'vp_md';
-        $img_size_sm_popup = 'vp_sm';
+        $img_size_popup = 'vp_xl_popup';
+        $img_size_md_popup = 'vp_md_popup';
+        $img_size_sm_popup = 'vp_sm_popup';
         $img_size = 'vp_xl';
         $columns_count = false;
 

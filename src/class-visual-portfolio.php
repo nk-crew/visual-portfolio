@@ -99,11 +99,11 @@ class Visual_Portfolio {
         // load textdomain.
         load_plugin_textdomain( '@@text_domain', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-        // register images sizes.
-        $this->add_image_sizes();
-
         // include helper files.
         $this->include_dependencies();
+
+        // register images sizes.
+        $this->add_image_sizes();
 
         // init classes.
         new Visual_Portfolio_Settings();
@@ -309,11 +309,23 @@ class Visual_Portfolio {
      * Add image sizes.
      */
     public function add_image_sizes() {
+        $sm = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) ? : 500;
+        $md = Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) ? : 800;
+        $lg = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) ? : 1280;
+        $xl = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) ? : 1920;
+        $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images', false ) ? : 500;
+        $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images', false ) ? : 800;
+        $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) ? : 1920;
+
         // custom image sizes.
-        add_image_size( 'vp_sm', 500, 500 );
-        add_image_size( 'vp_md', 800, 800 );
-        add_image_size( 'vp_lg', 1280, 1280 );
-        add_image_size( 'vp_xl', 1920, 1920 );
+        add_image_size( 'vp_sm', $sm, $sm );
+        add_image_size( 'vp_md', $md, $md );
+        add_image_size( 'vp_lg', $lg, $lg );
+        add_image_size( 'vp_xl', $xl, $xl );
+        add_image_size( 'vp_sm_popup', $sm_popup, $sm_popup );
+        add_image_size( 'vp_md_popup', $md_popup, $md_popup );
+        add_image_size( 'vp_xl_popup', $xl_popup, $xl_popup );
+
         add_filter( 'image_size_names_choose', array( $this, 'image_size_names_choose' ) );
     }
 

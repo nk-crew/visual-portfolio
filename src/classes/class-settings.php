@@ -100,6 +100,10 @@ class Visual_Portfolio_Settings {
                 'title' => esc_html__( 'General', '@@text_domain' ),
             ),
             array(
+                'id'    => 'vp_images',
+                'title' => esc_html__( 'Images', '@@text_domain' ),
+            ),
+            array(
                 'id'    => 'vp_popup_gallery',
                 'title' => esc_html__( 'Popup Gallery', '@@text_domain' ),
             ),
@@ -138,6 +142,75 @@ class Visual_Portfolio_Settings {
                     'options' => array(
                         'button_label' => esc_html__( 'Choose image', '@@text_domain' ),
                     ),
+                ),
+            ),
+            'vp_images' => array(
+                array(
+                    'name'    => 'images_note',
+                    // translators: %s: regen thumbs url.
+                    'desc'    => sprintf( __( 'After publishing your changes, new image sizes may not be shown until you <a href="%s" target="_blank">Regenerate Thumbnails</a>.', '@@text_domain' ), 'https://wordpress.org/plugins/regenerate-thumbnails/' ),
+                    'type'    => 'html',
+                ),
+                array(
+                    'name'    => 'images_title',
+                    'label'   => esc_html__( 'Layouts', '@@text_domain' ),
+                    'desc'    => __( 'Image sizes used in portfolio layouts.', '@@text_domain' ),
+                    'type'    => 'html',
+                ),
+                array(
+                    'name'    => 'sm',
+                    'label'   => esc_html__( 'Small', '@@text_domain' ),
+                    'type'    => 'number',
+                    'placeholder' => '500',
+                    'default' => 500,
+                ),
+                array(
+                    'name'    => 'md',
+                    'label'   => esc_html__( 'Medium', '@@text_domain' ),
+                    'type'    => 'number',
+                    'placeholder' => '800',
+                    'default' => 800,
+                ),
+                array(
+                    'name'    => 'lg',
+                    'label'   => esc_html__( 'Large', '@@text_domain' ),
+                    'type'    => 'number',
+                    'placeholder' => '1280',
+                    'default' => 1280,
+                ),
+                array(
+                    'name'    => 'xl',
+                    'label'   => esc_html__( 'Extra Large', '@@text_domain' ),
+                    'type'    => 'number',
+                    'placeholder' => '1920',
+                    'default' => 1920,
+                ),
+                array(
+                    'name'    => 'images_popup_title',
+                    'label'   => esc_html__( 'Popup Gallery', '@@text_domain' ),
+                    'desc'    => __( 'Image sizes used in popup gallery images.', '@@text_domain' ),
+                    'type'    => 'html',
+                ),
+                array(
+                    'name'    => 'sm_popup',
+                    'label'   => esc_html__( 'Small', '@@text_domain' ),
+                    'type'    => 'number',
+                    'placeholder' => '500',
+                    'default' => 500,
+                ),
+                array(
+                    'name'    => 'md_popup',
+                    'label'   => esc_html__( 'Medium', '@@text_domain' ),
+                    'type'    => 'number',
+                    'placeholder' => '800',
+                    'default' => 800,
+                ),
+                array(
+                    'name'    => 'xl_popup',
+                    'label'   => esc_html__( 'Large', '@@text_domain' ),
+                    'type'    => 'number',
+                    'placeholder' => '1920',
+                    'default' => 1920,
                 ),
             ),
             'vp_popup_gallery' => array(
