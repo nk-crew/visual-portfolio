@@ -69,7 +69,7 @@ class Visual_Portfolio_VC {
                     'params' => array(
                         array(
                             'type'        => 'dropdown',
-                            'heading'     => esc_html__( 'Select visual portfolio', '@@text_domain' ),
+                            'heading'     => esc_html__( 'Select Layout', '@@text_domain' ),
                             'param_name'  => 'id',
                             'value'       => $data_vc,
                             'description' => '',
