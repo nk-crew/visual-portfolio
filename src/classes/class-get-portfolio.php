@@ -11,10 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Slugify.
 if ( version_compare( PHP_VERSION, '5.5.9' ) >= 0 && ! class_exists( 'Cocur\Slugify\Slugify' ) ) {
-    require_once( visual_portfolio()->plugin_path . 'vendors/slugify/RuleProvider/RuleProviderInterface.php' );
-    require_once( visual_portfolio()->plugin_path . 'vendors/slugify/RuleProvider/DefaultRuleProvider.php' );
-    require_once( visual_portfolio()->plugin_path . 'vendors/slugify/SlugifyInterface.php' );
-    require_once( visual_portfolio()->plugin_path . 'vendors/slugify/Slugify.php' );
+    require_once visual_portfolio()->plugin_path . 'vendors/slugify/RuleProvider/RuleProviderInterface.php';
+    require_once visual_portfolio()->plugin_path . 'vendors/slugify/RuleProvider/DefaultRuleProvider.php';
+    require_once visual_portfolio()->plugin_path . 'vendors/slugify/SlugifyInterface.php';
+    require_once visual_portfolio()->plugin_path . 'vendors/slugify/Slugify.php';
 }
 
 /**

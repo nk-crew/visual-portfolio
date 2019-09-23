@@ -339,18 +339,18 @@ class Visual_Portfolio {
      * Include dependencies
      */
     private function include_dependencies() {
-        require_once( $this->plugin_path . 'classes/class-extend.php' );
-        require_once( $this->plugin_path . 'classes/class-images.php' );
-        require_once( $this->plugin_path . 'classes/class-settings.php' );
-        require_once( $this->plugin_path . 'classes/class-rest.php' );
-        require_once( $this->plugin_path . 'classes/class-get-portfolio.php' );
-        require_once( $this->plugin_path . 'classes/class-shortcode.php' );
-        require_once( $this->plugin_path . 'classes/class-preview.php' );
-        require_once( $this->plugin_path . 'classes/class-admin.php' );
-        require_once( $this->plugin_path . 'classes/class-controls.php' );
-        require_once( $this->plugin_path . 'classes/class-tinymce.php' );
-        require_once( $this->plugin_path . 'classes/class-vc.php' );
-        require_once( $this->plugin_path . 'classes/class-migration.php' );
+        require_once $this->plugin_path . 'classes/class-extend.php';
+        require_once $this->plugin_path . 'classes/class-images.php';
+        require_once $this->plugin_path . 'classes/class-settings.php';
+        require_once $this->plugin_path . 'classes/class-rest.php';
+        require_once $this->plugin_path . 'classes/class-get-portfolio.php';
+        require_once $this->plugin_path . 'classes/class-shortcode.php';
+        require_once $this->plugin_path . 'classes/class-preview.php';
+        require_once $this->plugin_path . 'classes/class-admin.php';
+        require_once $this->plugin_path . 'classes/class-controls.php';
+        require_once $this->plugin_path . 'classes/class-tinymce.php';
+        require_once $this->plugin_path . 'classes/class-vc.php';
+        require_once $this->plugin_path . 'classes/class-migration.php';
     }
 
     /**
@@ -447,7 +447,7 @@ class Visual_Portfolio {
         }
 
         if ( function_exists( '_wp_oembed_get_object' ) ) {
-            require_once( ABSPATH . WPINC . '/class-oembed.php' );
+            require_once ABSPATH . WPINC . '/class-oembed.php';
         }
 
         $args = array();
