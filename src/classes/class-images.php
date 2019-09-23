@@ -105,6 +105,11 @@ class Visual_Portfolio_Images {
      * @return string
      */
     public static function get_image_placeholder( $width = 1, $height = 1 ) {
+        // check if php GD library installed.
+        if ( ! extension_loaded( 'gd' ) || ! function_exists( 'imagecreate' ) ) {
+            return false;
+        }
+
         $ratio = self::get_ratio( $width, $height );
         $width = $ratio['width'];
         $height = $ratio['height'];
