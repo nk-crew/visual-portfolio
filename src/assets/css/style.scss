@@ -24,6 +24,7 @@
 }
 
 .vp-portfolio__items-wrap,
+.vp-portfolio__thumbnails-wrap,
 .vp-portfolio__filter-wrap,
 .vp-portfolio__sort-wrap,
 .vp-portfolio__pagination-wrap,
@@ -32,6 +33,7 @@
     overflow: hidden;
 }
 .vp-portfolio__items-wrap,
+.vp-portfolio__thumbnails-wrap,
 .vp-portfolio__filter-wrap,
 .vp-portfolio__sort-wrap,
 .vp-portfolio__pagination-wrap {
@@ -324,6 +326,7 @@
     min-height: initial;
 
     .vp-portfolio__items-wrap,
+    .vp-portfolio__thumbnails-wrap,
     .vp-portfolio__filter-wrap,
     .vp-portfolio__sort-wrap,
     .vp-portfolio__pagination-wrap {
@@ -366,6 +369,7 @@
     }
 
     .vp-portfolio__items-wrap,
+    .vp-portfolio__thumbnails-wrap,
     .vp-portfolio__filter-wrap,
     .vp-portfolio__sort-wrap,
     .vp-portfolio__pagination-wrap {

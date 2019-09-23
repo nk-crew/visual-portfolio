@@ -1365,10 +1365,27 @@ class VP {
     destroySwiper() {
         const self = this;
         const $parent = self.$items_wrap.parent();
-        const Swiper = $parent[ 0 ].swiper;
+        const $thumbsParent = self.$slider_thumbnails_wrap.length ? self.$slider_thumbnails_wrap.parent() : false;
 
-        if ( Swiper ) {
-            Swiper.destroy();
+        const SliderSwiper = $parent[ 0 ].swiper;
+        const ThumbsSwiper = $thumbsParent ? $thumbsParent[ 0 ].swiper : false;
+
+        let isDestroyed = false;
+
+        // Thumbnails.
+        if ( ThumbsSwiper ) {
+            ThumbsSwiper.destroy();
+
+            $thumbsParent.removeClass( 'swiper-container' );
+            self.$slider_thumbnails_wrap.removeClass( 'swiper-wrapper' );
+            self.$slider_thumbnails_wrap.children().removeClass( 'swiper-slide' );
+
+            isDestroyed = true;
+        }
+
+        // Slider.
+        if ( SliderSwiper ) {
+            SliderSwiper.destroy();
 
             $parent.removeClass( 'swiper-container' );
             self.$items_wrap.removeClass( 'swiper-wrapper' );
@@ -1376,6 +1393,10 @@ class VP {
 
             $parent.find( '.vp-portfolio__items-arrow, .vp-portfolio__items-bullets' ).remove();
 
+            isDestroyed = true;
+        }
+
+        if ( isDestroyed ) {
             self.emitEvent( 'destroySwiper' );
         }
     }
@@ -2076,8 +2097,9 @@ class VP {
      *
      * @param {object|dom|jQuery} $items - elements.
      * @param {bool} removeExisting - remove existing elements.
+     * @param {object} $newVP - new visual portfolio jQuery.
      */
-    addItems( $items, removeExisting ) {
+    addItems( $items, removeExisting, $newVP ) {
         const self = this;
         const isotope = self.$items_wrap.data( 'isotope' );
         const fjGallery = self.$items_wrap.data( 'fjGallery' );
@@ -2113,18 +2135,38 @@ class VP {
                 self.initFjGallery( 'appendImages', $items );
             }
         } else if ( Swiper ) {
-            if ( removeExisting ) {
-                Swiper.removeAllSlides();
+            // Slider.
+            {
+                if ( removeExisting ) {
+                    Swiper.removeAllSlides();
+                }
+
+                const appendArr = [];
+                $items.addClass( 'swiper-slide' ).each( function() {
+                    appendArr.push( this );
+                } );
+                Swiper.appendSlide( appendArr );
             }
 
-            const appendArr = [];
-            $items.addClass( 'swiper-slide' ).each( function() {
-                appendArr.push( this );
-            } );
-            Swiper.appendSlide( appendArr );
+            // Thumbnails.
+            const ThumbsSwiper = self.$slider_thumbnails_wrap.length ? self.$slider_thumbnails_wrap.parent()[ 0 ].swiper : false;
+            if ( ThumbsSwiper ) {
+                if ( removeExisting ) {
+                    ThumbsSwiper.removeAllSlides();
+                }
+
+                const appendArr = [];
+                $newVP.find( '.vp-portfolio__thumbnails > .vp-portfolio__thumbnail-wrap' )
+                    .clone()
+                    .addClass( 'swiper-slide' )
+                    .each( function() {
+                        appendArr.push( this );
+                    } );
+                ThumbsSwiper.appendSlide( appendArr );
+            }
         }
 
-        self.emitEvent( 'addItems', [ $items, removeExisting ] );
+        self.emitEvent( 'addItems', [ $items, removeExisting, $newVP ] );
     }
 
     /**
@@ -2211,7 +2253,7 @@ class VP {
                     self.$pagination.html( $newVP.find( '.vp-portfolio__pagination-wrap' ).html() );
                 }
 
-                self.addItems( $( newItems ), removeExisting );
+                self.addItems( $( newItems ), removeExisting, $newVP );
 
                 self.emitEvent( 'loadedNewItems', [ $newVP, $newVP, data ] );
             }
