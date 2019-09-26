@@ -1242,6 +1242,7 @@ class Visual_Portfolio_Get {
                             'description' => '',
                             'count'       => isset( $categories_count[ $cat ] ) && $categories_count[ $cat ] ? $categories_count[ $cat ] : '',
                             'taxonomy'    => 'category',
+                            'parent'      => 0,
                             'active'      => $active_item === $slug,
                             'url'         => $url,
                             'class'       => 'vp-filter__item' . ( $active_item === $slug ? ' vp-filter__item-active' : '' ),
@@ -1312,6 +1313,7 @@ class Visual_Portfolio_Get {
                     'hide_empty' => true,
                 )
             );
+
             if ( isset( $all_terms ) && is_array( $all_terms ) ) {
                 foreach ( $all_terms as $term ) {
                     if ( in_array( $term->term_id, $term_ids ) ) {
@@ -1330,6 +1332,7 @@ class Visual_Portfolio_Get {
                             'description' => $term->description,
                             'count'       => $term->count,
                             'taxonomy'    => $term->taxonomy,
+                            'parent'      => $term->parent,
                             'active'      => $active_item === $unique_name,
                             'url'         => $url,
                             'class'       => 'vp-filter__item' . ( $active_item === $unique_name ? ' vp-filter__item-active' : '' ),
