@@ -481,11 +481,44 @@ function updateGalleryData( $gallery ) {
     }
 }
 
+// Sticky gallery image additional data
+function maybeStickGalleryData() {
+    $galleries.find( '.vp-control-gallery-additional-data.active' ).each( function() {
+        const $this = $( this );
+        const $child = $this.children();
+
+        const height = $this.height();
+        const innerHeight = $child.height();
+
+        if ( innerHeight >= height ) {
+            $child.css( { marginTop: '' } );
+            return;
+        }
+
+        const maxOffset = height - innerHeight;
+
+        // 32 - admin top bar height
+        const blockOffset = $this.offset().top - 32;
+
+        if ( blockOffset >= 0 ) {
+            $child.css( { marginTop: '' } );
+            return;
+        }
+
+        $child.css( { marginTop: Math.min( maxOffset, Math.abs( blockOffset ) ) } );
+    } );
+}
+
+if ( $galleries.length ) {
+    $( '.postbox-container' ).on( 'scroll', debounce( 150, maybeStickGalleryData ) );
+    $window.on( 'scroll resize', debounce( 150, maybeStickGalleryData ) );
+}
+
 // show additional data block.
 function showAdditionalDataBlock( $gallery, id ) {
     const galleryName = $gallery.children( 'textarea' ).attr( 'name' );
     const $dataBlock = $gallery.children( '.vp-control-gallery-additional-data' );
-    const $previewBlock = $dataBlock.children( '.vp-control-gallery-additional-data-preview' );
+    const $previewBlock = $dataBlock.find( '.vp-control-gallery-additional-data-preview' );
     const $currentImg = $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img[data-image-id="' + id + '"]' );
     const itemData = getGalleryItemData( $gallery, id );
     const itemMeta = getGalleryItemMeta( $gallery, id );
@@ -533,6 +566,8 @@ function showAdditionalDataBlock( $gallery, id ) {
     $dataBlock.addClass( 'active' );
 
     showedGalleries = $galleries.find( '.vp-control-gallery-additional-data.active' ).length;
+
+    debounce( 150, maybeStickGalleryData )();
 }
 
 // Sortable + gallery

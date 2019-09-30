@@ -649,30 +649,32 @@ class Visual_Portfolio_Controls {
         <textarea name="<?php echo esc_attr( $args['name'] ); ?>" style="display: none;"><?php echo esc_textarea( json_encode( $images, defined( 'JSON_UNESCAPED_UNICODE' ) ? JSON_UNESCAPED_UNICODE : 256 ) ); ?></textarea>
 
         <div class="vp-control-gallery-additional-data">
-            <div class="vp-control-gallery-additional-data-preview">
-                <div class="vp-control-gallery-additional-data-preview-image">
-                    <img src="" alt="">
-                </div>
-                <div class="vp-control-gallery-additional-data-preview-data">
-                    <strong class="vp-control-gallery-additional-data-preview-name"></strong>
-                    <div class="vp-control-gallery-additional-data-preview-size"></div>
-                    <div class="vp-control-gallery-additional-data-preview-edit">
-                        <a href="#" target="_blank"><?php echo esc_html__( 'Edit', '@@text_domain' ); ?></a>
+            <div>
+                <div class="vp-control-gallery-additional-data-preview">
+                    <div class="vp-control-gallery-additional-data-preview-image">
+                        <img src="" alt="">
+                    </div>
+                    <div class="vp-control-gallery-additional-data-preview-data">
+                        <strong class="vp-control-gallery-additional-data-preview-name"></strong>
+                        <div class="vp-control-gallery-additional-data-preview-size"></div>
+                        <div class="vp-control-gallery-additional-data-preview-edit">
+                            <a href="#" target="_blank"><?php echo esc_html__( 'Edit', '@@text_domain' ); ?></a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <?php
-            foreach ( $additional_data as $name => $data_item ) {
-                self::get(
-                    array_merge(
-                        $data_item, array(
-                            'value'  => '',
-                            'class' => 'vp-no-reload',
+                <?php
+                foreach ( $additional_data as $name => $data_item ) {
+                    self::get(
+                        array_merge(
+                            $data_item, array(
+                                'value'  => '',
+                                'class' => 'vp-no-reload',
+                            )
                         )
-                    )
-                );
-            }
-            ?>
+                    );
+                }
+                ?>
+            </div>
         </div>
         <div class="vp-control-gallery-items">
             <?php

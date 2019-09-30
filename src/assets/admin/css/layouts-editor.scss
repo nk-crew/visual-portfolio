@@ -756,6 +756,14 @@
         border-left: 1px solid #eaeaea;
         transition: .15s right;
 
+        > div {
+            transition: .3s margin-top;
+
+            > .vp-control:last-of-type {
+                margin-bottom: 0;
+            }
+        }
+
         &.active {
             right: -15px;
 
@@ -810,7 +818,7 @@
         flex-wrap: wrap;
         align-content: flex-start;
         width: 120%;
-        height: 325px;
+        min-height: 325px;
         padding: 7px;
         margin: -12px;
         margin-bottom: 0;
