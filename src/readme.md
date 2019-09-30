@@ -1,7 +1,7 @@
 # Visual Portfolio #
 
 * Contributors: nko
-* Tags: portfolio, gallery, works, masonry, popup
+* Tags: portfolio, gallery, image, masonry, popup
 * Requires at least: 4.0.0
 * Tested up to: 5.2
 * Requires PHP: 5.4
@@ -9,11 +9,11 @@
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, coverflow, custom posts, custom images.
+Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, coverflow, custom posts, custom image galleries.
 
 ## Description ##
 
-Visual Portfolio let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry, Justified, Tiles or Carousel layouts.
+Visual Portfolio let you create beautiful portfolio layouts and image galleries. Generates shortcode to show portfolio or any custom post types using Masonry, Justified, Tiles or Carousel layouts.
 
 ### Links ###
 
