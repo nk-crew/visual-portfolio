@@ -1422,7 +1422,7 @@ class Visual_Portfolio_Admin {
                             'name'    => 'show_read_more',
                             'default' => false,
                             'options' => array(
-                                'false' => esc_html__( 'False', '@@text_domain' ),
+                                'false' => esc_html__( 'Hide', '@@text_domain' ),
                                 'true' => esc_html__( 'Always Display', '@@text_domain' ),
                                 'more_tag' => esc_html__( 'Display when used "More tag" in the post', '@@text_domain' ),
                             ),
@@ -1637,7 +1637,7 @@ class Visual_Portfolio_Admin {
                                 'name'    => 'show_date',
                                 'default' => false,
                                 'options' => array(
-                                    'false' => esc_html__( 'False', '@@text_domain' ),
+                                    'false' => esc_html__( 'Hide', '@@text_domain' ),
                                     'true'  => esc_html__( 'Default', '@@text_domain' ),
                                     'human' => esc_html__( 'Human Format', '@@text_domain' ),
                                 ),
