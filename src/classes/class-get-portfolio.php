@@ -110,19 +110,6 @@ class Visual_Portfolio_Get {
     }
 
     /**
-     * Enqueue scripts and styles for portfolio.
-     */
-    public static function enqueue_scripts() {
-        if ( self::$scripts_enqueued ) {
-            return;
-        }
-        self::$scripts_enqueued = true;
-
-        wp_enqueue_script( '@@plugin_name' );
-        wp_enqueue_style( '@@plugin_name' );
-    }
-
-    /**
      * Check if portfolio showed in preview mode.
      */
     public static function is_preview() {
@@ -176,8 +163,6 @@ class Visual_Portfolio_Get {
 
         self::$used_layouts[] = $atts['id'];
 
-        self::enqueue_scripts();
-
         // generate unique ID.
         $uid = ++self::$id;
         $uid = hash( 'crc32b', $uid . $atts['id'] );
@@ -188,6 +173,9 @@ class Visual_Portfolio_Get {
 
         // Add ID to class.
         $class .= ' vp-id-' . $atts['id'];
+
+        // Insert styles and scripts.
+        Visual_Portfolio_Assets::enqueue( $options );
 
         // Add custom class.
         if ( isset( $atts['class'] ) ) {
@@ -444,13 +432,6 @@ class Visual_Portfolio_Get {
             </div>
             <?php
         }
-
-        // Insert styles.
-        $items_style_pref = '';
-        if ( 'default' !== $options['vp_items_style'] ) {
-            $items_style_pref = '/' . $options['vp_items_style'];
-        }
-        visual_portfolio()->include_template_style( '@@plugin_name-items-style-' . $options['vp_items_style'], 'items-list/items-style' . $items_style_pref . '/style' );
 
         // Prepare thumbnails.
         $slider_thumbnails = array();
@@ -1406,7 +1387,6 @@ class Visual_Portfolio_Get {
         }
 
         visual_portfolio()->include_template( 'items-list/filter' . $filter_style_pref . '/filter', $args );
-        visual_portfolio()->include_template_style( '@@plugin_name-filter-' . $vp_options['vp_filter'], 'items-list/filter' . $filter_style_pref . '/style' );
 
         ?>
         </div>
@@ -1499,7 +1479,6 @@ class Visual_Portfolio_Get {
         }
 
         visual_portfolio()->include_template( 'items-list/sort' . $sort_style_pref . '/sort', $args );
-        visual_portfolio()->include_template_style( '@@plugin_name-sort-' . $vp_options['vp_sort'], 'items-list/sort' . $sort_style_pref . '/style' );
 
         ?>
         </div>
@@ -1760,7 +1739,6 @@ class Visual_Portfolio_Get {
                 }
 
                 visual_portfolio()->include_template( 'items-list/pagination' . $pagination_style_pref . '/' . $vp_options['vp_pagination'], $args );
-                visual_portfolio()->include_template_style( '@@plugin_name-pagination-' . $vp_options['vp_pagination_style'], 'items-list/pagination' . $pagination_style_pref . '/style' );
                 break;
             default:
                 $pagination_links = paginate_links(
@@ -1845,7 +1823,6 @@ class Visual_Portfolio_Get {
                         $args['arrows_icon_next'] = $vp_options['vp_pagination_paged__arrows_icon_next'];
                     }
                     visual_portfolio()->include_template( 'items-list/pagination' . $pagination_style_pref . '/paged', $args );
-                    visual_portfolio()->include_template_style( '@@plugin_name-pagination-' . $vp_options['vp_pagination_style'], 'items-list/pagination/style' );
                 }
 
                 break;

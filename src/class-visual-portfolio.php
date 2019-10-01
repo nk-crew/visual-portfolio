@@ -121,13 +121,6 @@ class Visual_Portfolio {
      */
     public function init_hooks() {
         add_action( 'admin_init', array( $this, 'admin_init' ) );
-
-        // template_redirect is used instead of wp_enqueue_scripts just because some plugins use it and included an old isotope plugin. So, it was conflicted.
-        add_action( 'template_redirect', array( $this, 'register_scripts' ), 9 );
-        add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 9 );
-
-        // noscript tag.
-        add_filter( 'style_loader_tag', array( $this, 'style_loader_tag_noscript' ), 10, 2 );
     }
 
     /**
@@ -142,155 +135,6 @@ class Visual_Portfolio {
      */
     public function deactivation_hook() {
         flush_rewrite_rules();
-    }
-
-    /**
-     * Register scripts that will be used in the future when portfolio will be printed.
-     */
-    public function register_scripts() {
-        $vp_deps = array( 'jquery', 'imagesloaded' );
-        $vp_style_deps = array();
-
-        // Isotope.
-        if ( apply_filters( 'vpf_enqueue_plugin_isotope', true ) ) {
-            wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '3.0.6', true );
-
-            $vp_deps[] = 'isotope';
-        }
-
-        // fjGallery.
-        if ( apply_filters( 'vpf_enqueue_plugin_flickr_justified_gallery', true ) ) {
-            wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/fjGallery.min.js', array( 'jquery' ), '1.0.2', true );
-
-            $vp_deps[] = 'flickr-justified-gallery';
-        }
-
-        // Object Fit Images.
-        if ( apply_filters( 'vpf_enqueue_plugin_object_fit_images', true ) ) {
-            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', array(), '3.2.4', true );
-
-            $vp_deps[] = 'object-fit-images';
-        }
-
-        $popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery', 'photoswipe' );
-
-        // PhotoSwipe.
-        if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
-            wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css', array(), '4.1.3' );
-            wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css', array( 'photoswipe' ), '4.1.3' );
-            wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', array(), '4.1.3', true );
-            wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '4.1.3', true );
-
-            $vp_deps[] = 'photoswipe-ui-default';
-            $vp_style_deps[] = 'photoswipe-default-skin';
-
-            // Fancybox.
-        } elseif ( 'fancybox' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_fancybox', true ) ) {
-            wp_register_style( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/jquery.fancybox.min.css', array(), '3.5.7' );
-            wp_register_script( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/jquery.fancybox.min.js', array( 'jquery' ), '3.5.7', true );
-
-            $vp_deps[] = 'fancybox';
-            $vp_style_deps[] = 'fancybox';
-        }
-
-        // Swiper.
-        if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.min.css', array(), '4.5.0' );
-            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', array(), '4.5.0', true );
-
-            $vp_deps[] = 'swiper';
-            $vp_style_deps[] = 'swiper';
-        }
-
-        // Font Awesome.
-        if ( apply_filters( 'vpf_enqueue_plugin_font_awesome', true ) ) {
-            wp_register_script( 'font-awesome-v4-shims', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/v4-shims.min.js', array(), '5.10.2', true );
-            wp_register_script( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/all.min.js', array( 'font-awesome-v4-shims' ), '5.10.2', true );
-
-            $vp_deps[] = 'font-awesome';
-        }
-
-        // LazySizes.
-        if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
-            wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
-            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '4.1.7', true );
-
-            $vp_deps[] = 'lazysizes-object-fit-cover';
-            $vp_deps[] = 'lazysizes';
-        }
-
-        // Visual Portfolio.
-        wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', $vp_deps, '@@plugin_version', true );
-        wp_register_style( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/css/style.min.css', $vp_style_deps, '@@plugin_version' );
-        wp_register_style( '@@plugin_name-noscript', visual_portfolio()->plugin_url . 'assets/css/noscript.min.css', $vp_style_deps, '@@plugin_version' );
-
-        // Visual Portfolio data.
-        $data_init = array(
-            '__' => array(
-                'couldnt_retrieve_vp' => esc_attr__( 'Couldn\'t retrieve Visual Portfolio ID.', '@@text_domain' ),
-
-                'pswp_close' => esc_attr__( 'Close (Esc)', '@@text_domain' ),
-                'pswp_share' => esc_attr__( 'Share', '@@text_domain' ),
-                'pswp_fs' => esc_attr__( 'Toggle fullscreen', '@@text_domain' ),
-                'pswp_zoom' => esc_attr__( 'Zoom in/out', '@@text_domain' ),
-                'pswp_prev' => esc_attr__( 'Previous (arrow left)', '@@text_domain' ),
-                'pswp_next' => esc_attr__( 'Next (arrow right)', '@@text_domain' ),
-                'pswp_share_fb' => esc_attr__( 'Share on Facebook', '@@text_domain' ),
-                'pswp_share_tw' => esc_attr__( 'Tweet', '@@text_domain' ),
-                'pswp_share_pin' => esc_attr__( 'Pin it', '@@text_domain' ),
-
-                'fancybox_close' => esc_attr__( 'Close', '@@text_domain' ),
-                'fancybox_next' => esc_attr__( 'Next', '@@text_domain' ),
-                'fancybox_prev' => esc_attr__( 'Previous', '@@text_domain' ),
-                'fancybox_error' => __( 'The requested content cannot be loaded. <br /> Please try again later.', '@@text_domain' ),
-                'fancybox_play_start' => esc_attr__( 'Start slideshow', '@@text_domain' ),
-                'fancybox_play_stop' => esc_attr__( 'Pause slideshow', '@@text_domain' ),
-                'fancybox_full_screen' => esc_attr__( 'Full screen', '@@text_domain' ),
-                'fancybox_thumbs' => esc_attr__( 'Thumbnails', '@@text_domain' ),
-                'fancybox_download' => esc_attr__( 'Download', '@@text_domain' ),
-                'fancybox_share' => esc_attr__( 'Share', '@@text_domain' ),
-                'fancybox_zoom' => esc_attr__( 'Zoom', '@@text_domain' ),
-            ),
-            'settingsPopupGallery' => array(
-                'vendor'                 => $popup_vendor,
-
-                // General.
-                'show_arrows'            => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
-                'show_counter'           => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
-                'show_zoom_button'       => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
-                'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery', true ),
-                'show_share_button'      => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery', true ),
-                'show_close_button'      => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
-
-                // Fancybox.
-                'show_download_button'   => Visual_Portfolio_Settings::get_option( 'show_download_button', 'vp_popup_gallery', false ),
-                'show_slideshow'         => Visual_Portfolio_Settings::get_option( 'show_slideshow', 'vp_popup_gallery', false ),
-                'show_thumbs'            => Visual_Portfolio_Settings::get_option( 'show_thumbs', 'vp_popup_gallery', true ),
-            ),
-        );
-        wp_localize_script( '@@plugin_name', 'VPData', $data_init );
-    }
-
-    /**
-     * Enqueue main style to prevent first-page load layout issues if the page contains portfolio.
-     */
-    public function wp_enqueue_scripts() {
-        wp_enqueue_style( '@@plugin_name' );
-        wp_enqueue_style( '@@plugin_name-noscript' );
-    }
-
-    /**
-     * Add noscript tag to styles.
-     *
-     * @param  string $tag    The tag we want to wrap around.
-     * @param  string $handle The handle of the tag.
-     * @return string         The wrapped around tag.
-     */
-    public function style_loader_tag_noscript( $tag, $handle ) {
-        if ( '@@plugin_name-noscript' === $handle ) {
-            $tag = '<noscript>' . $tag . '</noscript>';
-        }
-        return $tag;
     }
 
     /**
@@ -351,6 +195,7 @@ class Visual_Portfolio {
      * Include dependencies
      */
     private function include_dependencies() {
+        require_once $this->plugin_path . 'classes/class-assets.php';
         require_once $this->plugin_path . 'classes/class-extend.php';
         require_once $this->plugin_path . 'classes/class-images.php';
         require_once $this->plugin_path . 'classes/class-settings.php';

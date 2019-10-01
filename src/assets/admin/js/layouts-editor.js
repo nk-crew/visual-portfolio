@@ -174,7 +174,6 @@ $window.on( 'vp-preview-change', ( e, data ) => {
         return;
     }
     switch ( data.name ) {
-    case 'vp_layout':
     case 'vp_tiles_type':
     case 'vp_masonry_columns':
     case 'vp_grid_columns':
