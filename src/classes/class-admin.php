@@ -2996,6 +2996,20 @@ class Visual_Portfolio_Admin {
      */
     public function add_sort_metabox( $post ) {
         Visual_Portfolio_Controls::get_registered( 'sort' );
+
+        $type = Visual_Portfolio_Controls::get_registered_value( 'vp_sort' ) ? : 'default';
+        $align = Visual_Portfolio_Controls::get_registered_value( 'vp_sort_align' );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Sort Shortcode', '@@text_domain' ),
+                'description' => esc_html__( 'Place the shortcode where you want to show the sort.', '@@text_domain' ),
+                'name'  => 'vp_sort_shortcode',
+                'value' => $post->ID ? '[visual_portfolio_sort id="' . $post->ID . '" type="' . esc_attr( $type ) . '" align="' . esc_attr( $align ) . '" class=""]' : '',
+                'readonly' => true,
+            )
+        );
     }
 
     /**
