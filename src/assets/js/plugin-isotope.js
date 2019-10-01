@@ -1,10 +1,12 @@
 /*
  * Visual Portfolio plugin Isotope extension.
  */
+import { debounce } from 'throttle-debounce';
 const $ = window.jQuery;
+const $doc = $( document );
 
 // Extend VP class.
-$( document ).on( 'extendClass.vpf', ( event, VP ) => {
+$doc.on( 'extendClass.vpf', ( event, VP ) => {
     if ( 'vpf' !== event.namespace ) {
         return;
     }
@@ -53,7 +55,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
 } );
 
 // Add Items.
-$( document ).on( 'addItems.vpf', ( event, self, $items, removeExisting ) => {
+$doc.on( 'addItems.vpf', ( event, self, $items, removeExisting ) => {
     if ( 'vpf' !== event.namespace ) {
         return;
     }
@@ -83,7 +85,7 @@ $( document ).on( 'addItems.vpf', ( event, self, $items, removeExisting ) => {
 } );
 
 // Remove Items.
-$( document ).on( 'removeItems.vpf', ( event, self, $items ) => {
+$doc.on( 'removeItems.vpf', ( event, self, $items ) => {
     if ( 'vpf' !== event.namespace ) {
         return;
     }
@@ -98,7 +100,7 @@ $( document ).on( 'removeItems.vpf', ( event, self, $items ) => {
 } );
 
 // Init.
-$( document ).on( 'init.vpf', ( event, self ) => {
+$doc.on( 'init.vpf', ( event, self ) => {
     if ( 'vpf' !== event.namespace ) {
         return;
     }
@@ -107,7 +109,7 @@ $( document ).on( 'init.vpf', ( event, self ) => {
 } );
 
 // Images Loaded.
-$( document ).on( 'imagesLoaded.vpf', ( event, self ) => {
+$doc.on( 'imagesLoaded.vpf', ( event, self ) => {
     if ( 'vpf' !== event.namespace ) {
         return;
     }
@@ -118,10 +120,25 @@ $( document ).on( 'imagesLoaded.vpf', ( event, self ) => {
 } );
 
 // Destroy.
-$( document ).on( 'destroy.vpf', ( event, self ) => {
+$doc.on( 'destroy.vpf', ( event, self ) => {
     if ( 'vpf' !== event.namespace ) {
         return;
     }
 
     self.destroyIsotope();
 } );
+
+// WPBakery Page Builder fullwidth row fix.
+$doc.on( 'vc-full-width-row', debounce( 150, ( event, el ) => {
+    $( el ).find( '.vp-portfolio' ).each( function() {
+        if ( ! this.vpf || ! this.vpf.initIsotope ) {
+            return;
+        }
+
+        const isotope = this.vpf.$items_wrap.data( 'isotope' );
+
+        if ( isotope ) {
+            this.vpf.initIsotope( 'layout' );
+        }
+    } );
+} ) );
