@@ -175,7 +175,7 @@ class Visual_Portfolio_Get {
         $class .= ' vp-id-' . $atts['id'];
 
         // Insert styles and scripts.
-        Visual_Portfolio_Assets::enqueue( $options );
+        Visual_Portfolio_Assets::enqueue( $options, $atts['id'] );
 
         // Add custom class.
         if ( isset( $atts['class'] ) ) {
@@ -668,29 +668,7 @@ class Visual_Portfolio_Get {
 
         <?php
 
-        // Add controls styles.
-        if ( $options['vp_controls_styles'] ) {
-            $controls_css_handle = 'vp-controls-styles-' . $atts['id'];
-            $css = wp_kses( $options['vp_controls_styles'], array( '\'', '\"' ) );
-            $css = str_replace( '&gt;', '>', $css );
-
-            wp_register_style( $controls_css_handle, false );
-            wp_enqueue_style( $controls_css_handle );
-            wp_add_inline_style( $controls_css_handle, $css );
-        }
-
-        // Add custom styles.
-        if ( $options['vp_custom_css'] ) {
-            $custom_css_handle = 'vp-custom-css-' . $atts['id'];
-            $css = wp_kses( $options['vp_custom_css'], array( '\'', '\"' ) );
-            $css = str_replace( '&gt;', '>', $css );
-
-            wp_register_style( $custom_css_handle, false );
-            wp_enqueue_style( $custom_css_handle );
-            wp_add_inline_style( $custom_css_handle, $css );
-        }
-
-        // stupid hack as wp_reset_postdata() function is not working for me...
+        // stupid hack as wp_reset_postdata() function is not working for some reason...
         // phpcs:ignore
         $GLOBALS['post'] = $old_post;
 

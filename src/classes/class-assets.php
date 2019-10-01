@@ -104,9 +104,10 @@ class Visual_Portfolio_Assets {
     /**
      * Enqueue assets based on layout data.
      *
-     * @param array $options - layout data.
+     * @param array      $options - layout data.
+     * @param string|int $id - layout ID.
      */
-    public static function enqueue( $options ) {
+    public static function enqueue( $options, $id ) {
         $options = array_merge(
             array(
                 'vp_layout'             => false,
@@ -115,6 +116,8 @@ class Visual_Portfolio_Assets {
                 'vp_filter'             => false,
                 'vp_sort'               => false,
                 'vp_pagination_style'   => false,
+                'vp_controls_styles'    => false,
+                'vp_custom_css'         => false,
             ),
             $options
         );
@@ -226,6 +229,32 @@ class Visual_Portfolio_Assets {
                 'items-list/pagination' . $pagination_style_pref . '/style',
                 'template_style'
             );
+        }
+
+        // Controls styles.
+        if ( $options['vp_controls_styles'] ) {
+            $controls_css_handle = 'vp-controls-styles-' . $id;
+            $css = wp_kses( $options['vp_controls_styles'], array( '\'', '\"' ) );
+            $css = str_replace( '&gt;', '>', $css );
+
+            wp_register_style( $controls_css_handle, false );
+            wp_enqueue_style( $controls_css_handle );
+            wp_add_inline_style( $controls_css_handle, $css );
+
+            self::store_used_assets( $controls_css_handle, true, 'style' );
+        }
+
+        // Add custom styles.
+        if ( $options['vp_custom_css'] ) {
+            $custom_css_handle = 'vp-custom-css-' . $id;
+            $css = wp_kses( $options['vp_custom_css'], array( '\'', '\"' ) );
+            $css = str_replace( '&gt;', '>', $css );
+
+            wp_register_style( $custom_css_handle, false );
+            wp_enqueue_style( $custom_css_handle );
+            wp_add_inline_style( $custom_css_handle, $css );
+
+            self::store_used_assets( $custom_css_handle, true, 'style' );
         }
     }
 
@@ -549,7 +578,7 @@ class Visual_Portfolio_Assets {
             foreach ( $layout_ids as $id ) {
                 $options = Visual_Portfolio_Get::get_options( $id );
 
-                Visual_Portfolio_Assets::enqueue( $options );
+                Visual_Portfolio_Assets::enqueue( $options, $id );
             }
         }
     }
