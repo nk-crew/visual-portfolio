@@ -268,14 +268,14 @@ class Visual_Portfolio_Assets {
 
         // Swiper.
         if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.min.css', array(), '4.5.0' );
-            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', array(), '4.5.0', true );
+            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.min.css', array(), '5.0.4' );
+            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', array(), '5.0.4', true );
         }
 
         // Font Awesome.
         if ( apply_filters( 'vpf_enqueue_plugin_font_awesome', true ) ) {
-            wp_register_script( 'font-awesome-v4-shims', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/v4-shims.min.js', array(), '5.10.2', true );
-            wp_register_script( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/all.min.js', array( 'font-awesome-v4-shims' ), '5.10.2', true );
+            wp_register_script( 'font-awesome-v4-shims', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/v4-shims.min.js', array(), '5.11.2', true );
+            wp_register_script( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/all.min.js', array( 'font-awesome-v4-shims' ), '5.11.2', true );
 
             $vp_deps[] = 'font-awesome';
         }
@@ -283,7 +283,7 @@ class Visual_Portfolio_Assets {
         // LazySizes.
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
-            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '4.1.7', true );
+            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '5.1.1', true );
 
             $vp_deps[] = 'lazysizes-object-fit-cover';
             $vp_deps[] = 'lazysizes';
