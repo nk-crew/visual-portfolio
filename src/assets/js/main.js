@@ -570,7 +570,7 @@ class VP {
      */
     prepareLazyLoad() {
         const self = this;
-        const config = window.lazySizesConfig;
+        const config = window.lazySizes && window.lazySizes.cfg ? window.lazySizes.cfg : window.lazySizesConfig;
 
         if ( config ) {
             const attrsToReplace = {
