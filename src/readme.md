@@ -122,6 +122,20 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.14.0 =
+
+* added settings to change registered image sizes
+* added info about sort shortcode in Layouts metaboxes
+* improved assets loader (load only required css and js)
+* changed PhotoSwipe A tags to Buttons
+* removed height limitation for Images control in Layouts editor
+* fixed slider thumbnails ajax loading
+* fixed tiles wrong position calculation
+* fixed Isotope re-layout when WPBakery Page Builder resized full-width row
+* updated FontAwesome
+* updated LazySizes
+* updated Swiper (no more Internet Explorer support)
+
 = 1.13.2 =
 
 * fixed incorrect post date if something filters it (for example Events Manager plugin). Thanks to https://wordpress.org/support/topic/date-problem-with-events-and-1-13-1-version/
