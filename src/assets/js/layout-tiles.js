@@ -15,6 +15,8 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
     if ( MasonryMode ) {
         const defaultMeasureColumns = MasonryMode.prototype.measureColumns;
         MasonryMode.prototype.measureColumns = function() {
+            let runDefault = true;
+
             // if columnWidth is 0, default to columns count size.
             if ( ! this.columnWidth ) {
                 const $vp = $( this.element ).closest( '.vp-portfolio[data-vp-layout="tiles"]' );
@@ -42,11 +44,16 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
 
                     if ( columns ) {
                         this.columnWidth = this.containerWidth / columns;
+                        this.columnWidth += this.gutter;
+                        this.cols = columns;
+                        runDefault = false;
                     }
                 }
             }
 
-            defaultMeasureColumns.call( this );
+            if ( runDefault ) {
+                defaultMeasureColumns.call( this );
+            }
         };
     }
 }
