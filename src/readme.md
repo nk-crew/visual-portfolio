@@ -122,6 +122,11 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.14.1 =
+
+* added jQuery events for PhotoSwipe and Fancybox <https://visualportfolio.co/documentation/developers/jquery-events/>
+* fixed carousel responsive bug since new Swiper v5
+
 = 1.14.0 =
 
 * added settings to change registered image sizes
@@ -138,7 +143,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 = 1.13.2 =
 
-* fixed incorrect post date if something filters it (for example Events Manager plugin). Thanks to https://wordpress.org/support/topic/date-problem-with-events-and-1-13-1-version/
+* fixed incorrect post date if something filters it (for example Events Manager plugin). Thanks to <https://wordpress.org/support/topic/date-problem-with-events-and-1-13-1-version/>
 
 = 1.13.1 =
 
@@ -181,8 +186,8 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 = 1.12.0 =
 
 * changed video oembed loading method
-    * no more php oembed since it may be too heavy to load pages (used JS instead)
-    * no more video thumbnail loading if no featured image specified in post
+  * no more php oembed since it may be too heavy to load pages (used JS instead)
+  * no more video thumbnail loading if no featured image specified in post
 * fixed portfolio categories and tags capabilities
 * fixed &lt;a&gt; tag in fly and fade effect when all meta disabled
 
@@ -323,7 +328,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 = 1.6.5 =
 
 * added options for texts in filter and pagination
-* fixed paged /portfolio/ page (https://wordpress.org/support/topic/paging-infinite-loading-not-working/)
+* fixed paged /portfolio/ page (<https://wordpress.org/support/topic/paging-infinite-loading-not-working/>)
 * fixed vertical images quality
 * fixed conflict with Jetpack lazy
 * fixed filter shortcode output
