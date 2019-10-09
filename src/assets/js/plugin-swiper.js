@@ -42,21 +42,23 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             }
 
             // calculate responsive.
-            const slidesPerView = self.options.sliderSlidesPerView || 3;
+            let slidesPerView = self.options.sliderSlidesPerView || 3;
             const breakPoints = {};
 
             if ( ! isNaN( slidesPerView ) ) {
-                let count = slidesPerView - 1;
-                let currentPoint = Math.min( screenSizes.length - 1, count );
+                let count = slidesPerView;
+                let currentPoint = Math.min( screenSizes.length - 1, count - 1 );
 
                 for ( ; currentPoint >= 0; currentPoint-- ) {
                     if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
-                        breakPoints[ screenSizes[ currentPoint ] ] = {
+                        breakPoints[ screenSizes[ currentPoint ] + 1 ] = {
                             slidesPerView: count,
                         };
                     }
                     count -= 1;
                 }
+
+                slidesPerView = count || 1;
             }
 
             options = options || {
@@ -87,6 +89,9 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 mousewheel: self.options.sliderMousewheel === 'true',
                 slidesPerView: slidesPerView,
                 breakpoints: breakPoints,
+                // Since Swiper 5.0 this option is removed and it is `true` by default, but in older versions it was `false`.
+                // So we need to keep it as a fallback.
+                breakpointsInverse: true,
                 keyboard: true,
                 grabCursor: true,
             };
@@ -126,21 +131,23 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 self.$slider_thumbnails_wrap.children().addClass( 'swiper-slide' );
 
                 // calculate responsive.
-                const thumbnailsPerView = self.options.sliderThumbnailsPerView || 8;
+                let thumbnailsPerView = self.options.sliderThumbnailsPerView || 8;
                 const thumbnailsBreakPoints = {};
 
                 if ( ! isNaN( thumbnailsPerView ) ) {
-                    let count = thumbnailsPerView - 1;
-                    let currentPoint = Math.min( screenSizes.length - 1, count );
+                    let count = thumbnailsPerView;
+                    let currentPoint = Math.min( screenSizes.length - 1, count - 1 );
 
                     for ( ; currentPoint >= 0; currentPoint-- ) {
                         if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
-                            thumbnailsBreakPoints[ screenSizes[ currentPoint ] ] = {
+                            thumbnailsBreakPoints[ screenSizes[ currentPoint ] + 1 ] = {
                                 slidesPerView: count,
                             };
                         }
                         count -= 1;
                     }
+
+                    thumbnailsPerView = count || 1;
                 }
 
                 const swiperThumbs = new window.Swiper( $thumbsParent[ 0 ], {
@@ -153,6 +160,9 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                     loopedSlides: 5,
                     slidesPerView: thumbnailsPerView,
                     breakpoints: thumbnailsBreakPoints,
+                    // Since Swiper 5.0 this option is removed and it is `true` by default, but in older versions it was `false`.
+                    // So we need to keep it as a fallback.
+                    breakpointsInverse: true,
                     keyboard: true,
                     grabCursor: true,
                     watchSlidesVisibility: true,
