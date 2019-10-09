@@ -191,8 +191,12 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 },
             };
 
+            self.emitEvent( 'beforeInitFancybox', [ options, items, index ] );
+
             // Start new fancybox instance
             fancyboxInstance = $.fancybox.open( items, options, index );
+
+            self.emitEvent( 'initFancybox', [ options, items, index ] );
         };
 
         // click action
@@ -233,7 +237,13 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.destroyFancybox = function() {
         const self = this;
 
+        if ( typeof $.fancybox === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'fancybox' !== settingsPopupGallery.vendor ) {
+            return;
+        }
+
         self.$item.off( `click.vpf-uid-${ self.uid }` );
+
+        self.emitEvent( 'destroyFancybox' );
     };
 } );
 

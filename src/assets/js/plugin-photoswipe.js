@@ -274,6 +274,8 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 options.showAnimationDuration = 0;
             }
 
+            self.emitEvent( 'beforeInitPhotoSwipe', [ options, items, index ] );
+
             // Pass data to PhotoSwipe and initialize it
             const gallery = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, items, options );
 
@@ -370,6 +372,8 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             } );
 
             gallery.init();
+
+            self.emitEvent( 'initPhotoSwipe', [ options, items, index ] );
         };
 
         const photoswipeParseHash = function() {
@@ -431,9 +435,15 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.destroyPhotoswipe = function() {
         const self = this;
 
+        if ( typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'photoswipe' !== settingsPopupGallery.vendor ) {
+            return;
+        }
+
         self.$item.off( `click.vpf-uid-${ self.uid }` );
 
         $( `.vp-pswp-uid-${ self.uid }` ).remove();
+
+        self.emitEvent( 'destroyPhotoSwipe' );
     };
 } );
 
