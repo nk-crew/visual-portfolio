@@ -1315,6 +1315,8 @@ class Visual_Portfolio_Get {
                     'label'       => $vp_options['vp_filter_text_all'],
                     'description' => false,
                     'count'       => false,
+                    'id'          => 0,
+                    'parent'      => 0,
                     'active'      => ! $there_is_active,
                     'url'         => self::get_pagenum_link(
                         array(
