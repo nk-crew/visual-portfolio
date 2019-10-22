@@ -22,7 +22,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "npm run lint"
+            "pre-commit": "lint-staged"
         }
     },
     "devDependencies": {
@@ -42,12 +42,13 @@
         "husky": "^2.4.1",
         "json-file": "^0.1.0",
         "md5": "^2.2.1",
+        "micromatch": "^4.0.2",
         "stylelint": "^10.1.0",
         "stylelint-config-recommended-scss": "^3.3.0",
         "stylelint-config-standard": "^18.3.0",
         "stylelint-order": "^3.0.0",
         "stylelint-scss": "^3.8.0",
-        "wpeg": "0.0.15"
+        "wpeg": "0.0.23"
     },
     "dependencies": {
         "@babel/polyfill": "^7.0.0",
