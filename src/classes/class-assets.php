@@ -32,6 +32,8 @@ class Visual_Portfolio_Assets {
         add_action( 'template_redirect', array( $this, 'register_scripts' ), 9 );
         add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_head_assets' ), 9 );
 
+        add_action( 'template_redirect', array( $this, 'popup_custom_styles' ) );
+
         add_action( 'wp_footer', array( $this, 'wp_enqueue_foot_assets' ) );
 
         add_action( 'wp_head', array( $this, 'localize_global_data' ) );
@@ -423,6 +425,18 @@ class Visual_Portfolio_Assets {
 
         foreach ( $vp_scripts as $name => $data ) {
             wp_register_script( $name, visual_portfolio()->plugin_url . $data[0], $data[1], '@@plugin_version', true );
+        }
+    }
+
+    /**
+     * Dynamic styles for popup gallery plugins.
+     */
+    public function popup_custom_styles() {
+        $bg_color = Visual_Portfolio_Settings::get_option( 'background_color', 'vp_popup_gallery', '#1e1e1e' );
+
+        if ( $bg_color ) {
+            wp_add_inline_style( '@@plugin_name-popup-fancybox', '.vp-fancybox .fancybox-bg { background-color: ' . esc_attr( $bg_color ) . '; }' );
+            wp_add_inline_style( '@@plugin_name-popup-photoswipe', '.vp-pswp .pswp__bg { background-color: ' . esc_attr( $bg_color ) . '; }' );
         }
     }
 

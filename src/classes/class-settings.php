@@ -284,6 +284,14 @@ class Visual_Portfolio_Settings {
                     'type'    => 'checkbox',
                     'default' => 'off',
                 ),
+
+                // Colors.
+                array(
+                    'name'    => 'background_color',
+                    'label'   => esc_html__( 'Background Color', '@@text_domain' ),
+                    'type'    => 'color',
+                    'default' => '#1e1e1e',
+                ),
             ),
         );
 
