@@ -157,7 +157,7 @@ class Visual_Portfolio_Admin {
             wp_localize_script( '@@plugin_name-layout-admin', 'VPAdminVariables', $data_init );
         }
 
-        wp_enqueue_script( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.min.js', array( 'jquery' ), '@@plugin_version', true );
+        wp_enqueue_script( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.min.js', array( 'jquery', 'wp-data' ), '@@plugin_version', true );
         wp_enqueue_style( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.min.css', '', '@@plugin_version' );
         wp_localize_script( '@@plugin_name-admin', 'VPAdminVariables', $data_init );
     }

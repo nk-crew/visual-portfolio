@@ -25,15 +25,38 @@ $body.on( 'click', '.vp-onclick-selection', function() {
 // Post format metabox show/hide
 const $videoMetabox = $( '#vp_format_video' );
 const $videoFormatCheckbox = $( '#post-format-video' );
-function toggleVideoMetabox() {
-    $videoMetabox[ $videoFormatCheckbox.is( ':checked' ) ? 'show' : 'hide' ]();
+let isVideoFormat = null;
+
+function toggleVideoMetabox( show ) {
+    if ( isVideoFormat === null || isVideoFormat !== show ) {
+        isVideoFormat = show;
+        $videoMetabox[ show ? 'show' : 'hide' ]();
+    }
 }
-if ( $videoMetabox.length && $videoFormatCheckbox.length ) {
-    toggleVideoMetabox();
-    $body.on( 'change', '[name=post_format]', () => {
-        toggleVideoMetabox();
-    } );
+
+if ( $videoMetabox.length ) {
+    if ( $videoFormatCheckbox.length ) {
+        toggleVideoMetabox( $videoFormatCheckbox.is( ':checked' ) );
+
+        $body.on( 'change', '[name=post_format]', () => {
+            toggleVideoMetabox( $videoFormatCheckbox.is( ':checked' ) );
+        } );
+    }
+
+    // Gutenberg.
+    if ( wp.data && wp.data.subscribe ) {
+        const {
+            getCurrentPostAttribute,
+            getEditedPostAttribute,
+        } = wp.data.select( 'core/editor' );
+
+        wp.data.subscribe( () => {
+            const format = getEditedPostAttribute( 'format' ) || getCurrentPostAttribute( 'format' );
+            toggleVideoMetabox( format === 'video' );
+        } );
+    }
 }
+
 let oembedAjax = null;
 function runAjaxVideoOembed( $this ) {
     oembedAjax = $.ajax( {
