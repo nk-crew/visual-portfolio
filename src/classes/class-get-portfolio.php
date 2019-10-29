@@ -442,6 +442,7 @@ class Visual_Portfolio_Get {
             <div class="vp-portfolio__items vp-portfolio__items-style-<?php echo esc_attr( $options['vp_items_style'] ); ?>">
                 <?php
                 $each_item_args = array(
+                    'post_id'         => '',
                     'url'             => '',
                     'title'           => '',
                     'excerpt'         => '',
@@ -589,6 +590,7 @@ class Visual_Portfolio_Get {
 
                         $args = array_merge(
                             $each_item_args, array(
+                                'post_id'         => get_the_ID(),
                                 'url'             => get_permalink(),
                                 'title'           => get_the_title(),
                                 'format'          => get_post_format() ? : 'standard',
