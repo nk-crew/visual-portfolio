@@ -504,7 +504,9 @@ class Visual_Portfolio_Get {
                                         'label'       => $cat,
                                         'description' => '',
                                         'count'       => '',
-                                        'taxonomy'    => 'category',
+                                        'taxonomy'    => '',
+                                        'id'          => 0,
+                                        'parent'      => 0,
                                         'url'         => $url,
                                     );
                                 }
@@ -577,6 +579,8 @@ class Visual_Portfolio_Get {
                                         'description' => $cat_item->description,
                                         'count'       => $cat_item->count,
                                         'taxonomy'    => $cat_item->taxonomy,
+                                        'id'          => $cat_item->taxonomy,
+                                        'parent'      => $cat_item->parent,
                                         'url'         => $url,
                                     );
                                 }
