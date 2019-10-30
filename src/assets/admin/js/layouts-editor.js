@@ -91,15 +91,33 @@ function generateControlsStyles() {
 
         if ( 'none' !== $control.css( 'display' ) ) {
             const mask = $this.attr( 'data-style-mask' ) || '$';
-            const val = mask.replace( '$', $control.find( $this.attr( 'data-style-from' ) ).val() );
-            const selector = parentSelector + ' ' + $this.attr( 'data-style-element' );
-            const property = $this.attr( 'data-style-property' );
+            let $controlInput = $control.find( $this.attr( 'data-style-from' ) );
+            let controlVal = $controlInput.val();
+            let skip = false;
 
-            if ( styles ) {
-                styles += ' ';
+            // Toggle control support.
+            if ( $control.hasClass( 'vp-control-toggle' ) && $controlInput.length > 1 ) {
+                $controlInput = $controlInput.filter( '[type="checkbox"]' );
             }
 
-            styles += `${ selector } { ${ property }: ${ val }; }`;
+            // Checkbox and Toggle support.
+            if ( $controlInput.is( '[type="checkbox"]' ) ) {
+                controlVal = $controlInput.is( ':checked' );
+
+                skip = ! controlVal;
+            }
+
+            if ( ! skip ) {
+                const val = mask.replace( '$', controlVal );
+                const selector = parentSelector + ' ' + $this.attr( 'data-style-element' );
+                const property = $this.attr( 'data-style-property' );
+
+                if ( styles ) {
+                    styles += ' ';
+                }
+
+                styles += `${ selector } { ${ property }: ${ val }; }`;
+            }
         }
     } );
 
