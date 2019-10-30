@@ -4,14 +4,15 @@
  * Author  : nK https://nkdev.info
  */
 ( function( $ ) {
-    const $portfolio = $( '#vp_preview > .vp-portfolio' );
+    const $preview = $( '#vp_preview' );
+    const $portfolio = $preview.find( '.vp-portfolio' );
     $portfolio.on( 'click', '.vp-portfolio__item, .vp-portfolio__item a', ( e ) => {
         e.preventDefault();
         e.stopPropagation();
     } );
     window.iFrameResizer = {
         heightCalculationMethod() {
-            return $portfolio.outerHeight( true );
+            return $preview.outerHeight( true );
         },
     };
 }( jQuery ) );
