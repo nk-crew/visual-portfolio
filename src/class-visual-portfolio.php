@@ -114,6 +114,7 @@ class Visual_Portfolio {
         new Visual_Portfolio_Admin();
         new Visual_Portfolio_TinyMCE();
         new Visual_Portfolio_VC();
+        new Visual_Portfolio_Elementor();
     }
 
     /**
@@ -207,6 +208,7 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-controls.php';
         require_once $this->plugin_path . 'classes/class-tinymce.php';
         require_once $this->plugin_path . 'classes/class-vc.php';
+        require_once $this->plugin_path . 'classes/class-elementor.php';
         require_once $this->plugin_path . 'classes/class-migration.php';
     }
 

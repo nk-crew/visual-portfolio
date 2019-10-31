@@ -20,10 +20,7 @@ class Visual_Portfolio_Admin {
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 
         // include gutenberg block.
-        // work only if Gutenberg available.
-        if ( function_exists( 'register_block_type' ) ) {
-            add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
-        }
+        add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
 
         // custom post types.
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
@@ -180,27 +177,6 @@ class Visual_Portfolio_Admin {
             plugins_url( '../assets/admin/css/gutenberg-block.min.css', __FILE__ ),
             array(),
             filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/css/gutenberg-block.min.css' )
-        );
-
-        // prepare preview URL.
-        global $wp_rewrite;
-
-        $url = get_site_url();
-
-        if ( ! $wp_rewrite->using_permalinks() ) {
-            $url = add_query_arg(
-                array(
-                    'vp_preview' => 'vp_preview',
-                ), $url
-            );
-        } else {
-            $url .= '/vp_preview';
-        }
-
-        wp_localize_script(
-            'visual-portfolio-gutenberg', 'VPAdminGutenbergVariables', array(
-                'preview_url' => $url,
-            )
         );
     }
 

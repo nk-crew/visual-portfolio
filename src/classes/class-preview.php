@@ -44,6 +44,39 @@ class Visual_Portfolio_Preview {
         add_filter( 'vpf_get_layout_option', array( $this, 'filter_preview_option' ), 10, 2 );
         add_action( 'init', array( $this, 'flush_rules_preview_frame' ) );
         add_action( 'template_redirect', array( $this, 'template_redirect' ) );
+
+        add_action( 'wp_print_scripts', array( $this, 'localize_scripts' ), 9 );
+    }
+
+    /**
+     * Localize scripts with preview URL.
+     */
+    public function localize_scripts() {
+        // prepare preview URL.
+        global $wp_rewrite;
+
+        $url = get_site_url();
+
+        if ( ! $wp_rewrite->using_permalinks() ) {
+            $url = add_query_arg(
+                array(
+                    'vp_preview' => 'vp_preview',
+                ), $url
+            );
+        } else {
+            $url .= '/vp_preview';
+        }
+
+        wp_localize_script(
+            'visual-portfolio-gutenberg', 'VPAdminGutenbergVariables', array(
+                'preview_url' => $url,
+            )
+        );
+        wp_localize_script(
+            'visual-portfolio-elementor', 'VPAdminElementorVariables', array(
+                'preview_url' => $url,
+            )
+        );
     }
 
     /**
