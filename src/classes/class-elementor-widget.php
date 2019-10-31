@@ -79,7 +79,7 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
      * @return array Widget script dependencies.
      */
     public function get_script_depends() {
-        return array( 'visual-portfolio-elementor', 'visual-portfolio' );
+        return array( 'visual-portfolio-elementor' );
     }
 
     /**
@@ -125,6 +125,9 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
                 'label'   => esc_html__( 'Select Layout', '@@text_domain' ),
                 'type'    => \Elementor\Controls_Manager::SELECT2,
                 'options' => $options,
+                'dynamic' => array(
+                    'active' => true,
+                ),
             )
         );
 
