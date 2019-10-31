@@ -126,6 +126,123 @@ function generateControlsStyles() {
     }
 }
 
+// generate dom tree.
+function getNodeTree( node ) {
+    if ( node.hasChildNodes() ) {
+        const children = [];
+
+        for ( let j = 0; j < node.childNodes.length; j++ ) {
+            children.push( getNodeTree( node.childNodes[ j ] ) );
+        }
+
+        return {
+            classList: node.classList,
+            nodeName: node.nodeName,
+            children: children,
+        };
+    }
+
+    return false;
+}
+
+function printTree( node, attrs ) {
+    if ( ! node ) {
+        return '';
+    }
+
+    let txt = '';
+
+    if ( node.children.length ) {
+        let newTxt = '';
+        let classNameString = '';
+        let skip = false;
+        let collapse = false;
+
+        // Classes.
+        if ( node.classList && node.classList.length ) {
+            classNameString = ' class="';
+            node.classList.forEach( ( className ) => {
+                if ( ! attrs.skipClass || ! attrs.skipClass.test( className ) ) {
+                    classNameString += `<span class="vp-dom-tree-node-class">${ className }</span>`;
+                }
+
+                // Skip?
+                if ( attrs.skipNodeByClass && attrs.skipNodeByClass.test( className ) ) {
+                    skip = true;
+                }
+
+                // Collapse?
+                if ( attrs.collapseByClass && attrs.collapseByClass.test( className ) ) {
+                    collapse = true;
+                }
+            } );
+            classNameString += '"';
+        }
+
+        if ( ! skip ) {
+            newTxt += '<ul>';
+            newTxt += `<li class="vp-dom-tree-node ${ collapse ? 'is-collapsed' : '' }"><div><span class="vp-dom-tree-node-collapse"></span>&lt;${ node.nodeName.toLowerCase() }${ classNameString }`;
+
+            newTxt += '&gt;</div></li>';
+
+            node.children.forEach( ( childNode ) => {
+                if ( childNode ) {
+                    newTxt += `<li class="vp-dom-tree-child">${ printTree( childNode, attrs ) }</li>`;
+                }
+            } );
+
+            newTxt += '</ul>';
+
+            txt += newTxt;
+        }
+    }
+
+    return txt;
+}
+
+function addDomTree() {
+    if ( $framePortfolio ) {
+        const nodeTree = getNodeTree( $framePortfolio[ 0 ] );
+        $( '.vp-dom-tree' ).html( printTree( nodeTree, {
+            skipNodeByClass: /vp-portfolio__item-popup/,
+            collapseByClass: /^(vp-portfolio__preloader-wrap|vp-portfolio__filter-wrap|vp-portfolio__sort-wrap|vp-portfolio__items-wrap|vp-portfolio__pagination-wrap)$/,
+            skipClass: /vp-uid-/,
+        } ) );
+    }
+}
+
+if ( typeof window.ClipboardJS !== 'undefined' ) {
+    new window.ClipboardJS( '.vp-dom-tree-node-class, .vp-dom-tree-help code', {
+        target( trigger ) {
+            return trigger;
+        },
+        text( trigger ) {
+            return `.${ trigger.innerText.replace( /^\./, '' ) }`;
+        },
+    } ).on( 'success', ( e ) => {
+        if ( typeof window.Tooltip !== 'undefined' ) {
+            if ( ! e.trigger.tooltipClipboard ) {
+                e.trigger.tooltipClipboard = new window.Tooltip( e.trigger, {
+                    placement: 'top',
+                    title: 'Copied to Clipboard!',
+                    trigger: 'manual',
+                    container: $body[ 0 ],
+                } );
+            }
+
+            e.trigger.tooltipClipboard.show();
+
+            $( e.trigger ).one( 'mouseleave', () => {
+                e.trigger.tooltipClipboard.hide();
+            } );
+        }
+    } );
+}
+
+$body.on( 'click', '.vp-dom-tree-node-collapse', function() {
+    $( this ).closest( 'li' ).toggleClass( 'is-collapsed' );
+} );
+
 // portfolio options changed
 function reloadFrame() {
     frameJQuery = false;
@@ -184,6 +301,9 @@ $frame.on( 'load', function() {
 
     // generate custom styles.
     generateControlsStyles();
+
+    // add dom tree.
+    addDomTree();
 } );
 
 // live reload

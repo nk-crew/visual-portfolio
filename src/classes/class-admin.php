@@ -120,6 +120,8 @@ class Visual_Portfolio_Admin {
             wp_enqueue_script( 'tooltip.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/tooltip.min.js', array( 'popper.js' ), '1.14.3', true );
             wp_enqueue_style( 'popper.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/popper.css', '', '1.14.3' );
 
+            wp_enqueue_script( 'clipboard.js', visual_portfolio()->plugin_url . 'assets/vendor/clipboard.js/clipboard.min.js', '', '2.0.4' );
+
             $codemirror_version = '5.45.0';
             wp_enqueue_script( 'codemirror', visual_portfolio()->plugin_url . 'assets/vendor/codemirror/codemirror.js', '', $codemirror_version, true );
             wp_enqueue_script( 'codemirror-mode-css', visual_portfolio()->plugin_url . 'assets/vendor/codemirror/mode/css/css.js', '', $codemirror_version, true );
@@ -3142,13 +3144,12 @@ class Visual_Portfolio_Admin {
         <p class="description">
             <?php echo esc_html__( 'Available classes:', '@@text_domain' ); ?>
         </p>
-        <ul>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', '@@text_domain' ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', '@@text_domain' ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__item</code><?php echo esc_html__( ' - single item wrapper.', '@@text_domain' ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-filter</code><?php echo esc_html__( ' - filter wrapper.', '@@text_domain' ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', '@@text_domain' ); ?></li>
+        <ul class="vp-dom-tree-help">
+            <li><code>.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', '@@text_domain' ); ?></li>
         </ul>
+        <div class="vp-dom-tree">
+            <span class="spinner is-active"></span>
+        </div>
         <?php
     }
 

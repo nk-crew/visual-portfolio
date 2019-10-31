@@ -92,8 +92,8 @@ $body.on( 'change input', '.vp-input[name="video_url"]', function() {
 if ( typeof Tooltip !== 'undefined' ) {
     $( '[data-hint]:not([data-hint=""]):not([data-hint="false"])' ).each( function() {
         const $this = $( this );
-        // eslint-disable-next-line no-new
-        new Tooltip( this, {
+
+        new window.Tooltip( this, {
             placement: $this.attr( 'data-hint-place' ) || 'top',
             title: $this.attr( 'data-hint' ),
             container: $( 'body' )[ 0 ],
