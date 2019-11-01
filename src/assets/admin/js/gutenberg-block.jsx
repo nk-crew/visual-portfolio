@@ -6,11 +6,15 @@
 if ( ! global._babelPolyfill ) {
     require( '@babel/polyfill' );
 }
+import { throttle } from 'throttle-debounce';
 import classnames from 'classnames/dedupe';
-import ReactIframeResizer from 'react-iframe-resizer-super';
+import ReactIframeResizer from 'iframe-resizer-react';
 
 // Internal Dependencies.
 import ElementIcon from '../images/icon-gutenberg.svg';
+
+const $ = window.jQuery;
+const $wnd = $( window );
 
 const variables = window.VPAdminGutenbergVariables;
 
@@ -20,6 +24,7 @@ const {
     Fragment,
     RawHTML,
 } = wp.element;
+
 const {
     registerBlockType,
 } = wp.blocks;
@@ -27,14 +32,50 @@ const {
 const {
     Placeholder,
     Spinner,
+    PanelBody,
     SelectControl,
 } = wp.components;
 
+const {
+    InspectorControls,
+} = wp.blockEditor;
+
 const { apiFetch } = wp;
+
 const {
     registerStore,
     withSelect,
 } = wp.data;
+
+// add fake iframe width, so @media styles will work fine.
+function maybeResizePreviews() {
+    const contentWidth = $( '.editor-styles-wrapper' ).width();
+
+    if ( ! contentWidth ) {
+        return;
+    }
+
+    $( '.visual-portfolio-gutenberg-preview iframe' ).each( function() {
+        const $this = $( this );
+        const $inner = $this.closest( '.visual-portfolio-gutenberg-preview-inner' );
+        const parentWidth = $this.closest( '.visual-portfolio-gutenberg-preview' ).width();
+
+        $inner.css( {
+            width: contentWidth,
+        } );
+
+        if ( this.iFrameResizer ) {
+            this.iFrameResizer.sendMessage( {
+                name: 'resize',
+                width: parentWidth,
+            } );
+            this.iFrameResizer.resize();
+        }
+    } );
+}
+
+// window resize.
+$wnd.on( 'resize', throttle( 300, maybeResizePreviews ) );
 
 const actions = {
     apiFetch( request ) {
@@ -162,45 +203,61 @@ class VPEdit extends Component {
         // prepare iframe url.
         const iframeURL = variables.preview_url + ( variables.preview_url.split( '?' )[ 1 ] ? '&' : '?' ) + `vp_preview_frame=true&vp_preview_frame_id=${ id }`;
 
-        return (
-            <div className={ className }>
-                <Placeholder
-                    className="visual-portfolio-gutenberg-placeholder"
-                    icon={ <ElementIcon /> }
-                    label={ __( 'Visual Portfolio' ) }
-                >
-                    { ! Array.isArray( portfolioLayoutsSelect ) &&
-                        <Spinner />
-                    }
-                    { Array.isArray( portfolioLayoutsSelect ) && portfolioLayoutsSelect.length &&
-                        <Fragment>
-                            { currentItemUrl && <a href={ currentItemUrl } target="_blank">{ __( 'Edit Layout' ) }</a> }
-                            <SelectControl
-                                value={ id }
-                                onChange={ ( value ) => setAttributes( { id: value } ) }
-                                options={ portfolioLayoutsSelect }
-                            />
-                        </Fragment>
-                    }
-                    { Array.isArray( portfolioLayoutsSelect ) && ! portfolioLayoutsSelect.length &&
-                        __( 'No portfolio layouts found.' )
-                    }
-                </Placeholder>
-                { id ? (
-                    <div className="visual-portfolio-gutenberg-preview">
-                        <ReactIframeResizer
-                            src={ iframeURL }
-                            iframeResizerOptions={ {
-                                resizedCallback( data ) {
-                                    if ( data.iframe ) {
-                                        jQuery( data.iframe ).css( 'margin-bottom', -jQuery( data.iframe ).height() / 2 );
-                                    }
-                                },
-                            } }
-                        />
-                    </div>
+        const controls = (
+            <Fragment>
+                { ! Array.isArray( portfolioLayoutsSelect ) ? (
+                    <Spinner />
                 ) : '' }
-            </div>
+                { Array.isArray( portfolioLayoutsSelect ) && portfolioLayoutsSelect.length ? (
+                    <Fragment>
+                        <SelectControl
+                            value={ id }
+                            onChange={ ( value ) => setAttributes( { id: value } ) }
+                            options={ portfolioLayoutsSelect }
+                        />
+                    </Fragment>
+                ) : '' }
+                { Array.isArray( portfolioLayoutsSelect ) && ! portfolioLayoutsSelect.length ? (
+                    __( 'No portfolio layouts found.' )
+                ) : '' }
+            </Fragment>
+        );
+
+        return (
+            <Fragment>
+                <InspectorControls>
+                    <PanelBody>
+                        { controls }
+                    </PanelBody>
+                    { Array.isArray( portfolioLayoutsSelect ) && portfolioLayoutsSelect.length && currentItemUrl ? (
+                        <PanelBody>
+                            <a href={ currentItemUrl } target="_blank" rel="noopener noreferrer">{ __( 'Edit Layout' ) }</a>
+                        </PanelBody>
+                    ) : '' }
+                </InspectorControls>
+                <div className={ className }>
+                    { id ? (
+                        <div className="visual-portfolio-gutenberg-preview">
+                            <div className="visual-portfolio-gutenberg-preview-inner">
+                                <ReactIframeResizer
+                                    src={ iframeURL }
+                                    onInit={ () => {
+                                        maybeResizePreviews();
+                                    } }
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <Placeholder
+                            className="visual-portfolio-gutenberg-placeholder"
+                            icon={ <ElementIcon /> }
+                            label={ __( 'Visual Portfolio' ) }
+                        >
+                            { controls }
+                        </Placeholder>
+                    ) }
+                </div>
+            </Fragment>
         );
     }
 }

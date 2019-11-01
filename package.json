@@ -54,8 +54,8 @@
         "@babel/polyfill": "^7.0.0",
         "classnames": "^2.2.6",
         "iframe-resizer": "^3.6.3",
+        "iframe-resizer-react": "^1.0.1",
         "rafl": "^1.2.2",
-        "react-iframe-resizer-super": "^0.2.0",
         "throttle-debounce": "^2.0.1"
     }
 }

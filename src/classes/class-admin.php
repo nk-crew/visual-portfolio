@@ -168,7 +168,7 @@ class Visual_Portfolio_Admin {
         wp_enqueue_script(
             'visual-portfolio-gutenberg',
             plugins_url( '../assets/admin/js/gutenberg-block.min.js', __FILE__ ),
-            array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components' ),
+            array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components', 'jquery' ),
             filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/js/gutenberg-block.min.js' )
         );
 
