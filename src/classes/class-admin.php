@@ -3022,6 +3022,7 @@ class Visual_Portfolio_Admin {
         $url = add_query_arg(
             array(
                 'vp_preview_frame' => 'true',
+                'vp_preview_type' => 'layouts-editor',
                 'vp_preview_frame_id' => $post->ID,
             ), $url
         );

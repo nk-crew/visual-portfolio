@@ -188,6 +188,17 @@ class Visual_Portfolio_Preview {
     public function print_template( $id ) {
         wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', '', '4.2.1', true );
         wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery' ), '', true );
+
+        $class_name = 'vp-preview-wrapper';
+
+        // preview type.
+        // phpcs:ignore
+        $type = isset( $_GET['vp_preview_type'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_type'] ) ) : false;
+
+        if ( $type ) {
+            $class_name .= ' vp-preview-type-' . $type;
+        }
+
         ?>
         <!DOCTYPE html>
         <html <?php language_attributes(); ?> style="margin-top: 0 !important;">
@@ -223,7 +234,7 @@ class Visual_Portfolio_Preview {
             </head>
 
             <body>
-                <div id="vp_preview">
+                <div id="vp_preview" class="<?php echo esc_attr( $class_name ); ?>">
                     <?php
                         // phpcs:ignore
                         echo Visual_Portfolio_Get::get( array( 'id' => $id ) );

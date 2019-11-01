@@ -201,7 +201,7 @@ class VPEdit extends Component {
         }
 
         // prepare iframe url.
-        const iframeURL = variables.preview_url + ( variables.preview_url.split( '?' )[ 1 ] ? '&' : '?' ) + `vp_preview_frame=true&vp_preview_frame_id=${ id }`;
+        const iframeURL = variables.preview_url + ( variables.preview_url.split( '?' )[ 1 ] ? '&' : '?' ) + `vp_preview_frame=true&vp_preview_type=gutenberg&vp_preview_frame_id=${ id }`;
 
         const controls = (
             <Fragment>
