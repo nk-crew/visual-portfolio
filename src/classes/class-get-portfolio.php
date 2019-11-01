@@ -580,7 +580,7 @@ class Visual_Portfolio_Get {
                                         'description' => $cat_item->description,
                                         'count'       => $cat_item->count,
                                         'taxonomy'    => $cat_item->taxonomy,
-                                        'id'          => $cat_item->taxonomy,
+                                        'id'          => $cat_item->term_id,
                                         'parent'      => $cat_item->parent,
                                         'url'         => $url,
                                     );
