@@ -615,7 +615,8 @@ class Visual_Portfolio_Get {
                         if ( 'video' === $args['format'] ) {
                             $video_url = get_post_meta( get_the_ID(), 'video_url', true );
                             if ( $video_url ) {
-                                $args['video'] = $video_url;
+                                $args['video']       = $video_url;
+                                $args['allow_popup'] = true;
                             }
                         }
 
