@@ -31,15 +31,18 @@ $( window ).on( 'elementor/frontend/init', function( $data ) {
         elementorWindow.jQuery.find( '.visual-portfolio-elementor-preview iframe' ).forEach( ( item ) => {
             const $this = $( item );
             const parentWidth = $this.parent().width();
-            const frameJQuery = item.contentWindow.jQuery;
-
-            if ( frameJQuery ) {
-                frameJQuery( 'body' ).css( 'max-width', parentWidth );
-            }
 
             $this.css( {
                 width: elementorWidth,
             } );
+
+            if ( item.iFrameResizer ) {
+                item.iFrameResizer.sendMessage( {
+                    name: 'resize',
+                    width: parentWidth,
+                } );
+                item.iFrameResizer.resize();
+            }
         } );
     }
 
@@ -55,14 +58,12 @@ $( window ).on( 'elementor/frontend/init', function( $data ) {
 
         $frame.attr( 'src', iframeURL );
 
-        $frame.one( 'load', function() {
-            maybeResizePreviews();
-        } );
-
         // resize iframe
         if ( $.fn.iFrameResize ) {
             $frame.iFrameResize( {
-                interval: 10,
+                onInit() {
+                    maybeResizePreviews();
+                },
             } );
         }
     } );
