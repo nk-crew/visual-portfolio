@@ -7,7 +7,7 @@
 * Requires PHP: 5.4
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
-* License URI: http://www.gnu.org/licenses/gpl-2.0.html
+* License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
 Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, coverflow, custom posts, custom image galleries.
 
@@ -52,8 +52,9 @@ Visual Portfolio let you create beautiful portfolio layouts and image galleries.
   * Custom order
 * Custom CSS for each portfolio layouts
 * Shortcode generated, so you can place unlimited portfolio layouts on the page
-* Gutenberg WordPress builder supported
-* WPBakery Page Builder page builder supported
+* Gutenberg WordPress builder support
+* Elementor Page Builder support
+* WPBakery Page Builder support
 
 ## Real Usage Examples ##
 
@@ -121,6 +122,18 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 [https://visualportfolio.co/documentation/developers/jquery-methods/](https://visualportfolio.co/documentation/developers/jquery-methods/)
 
 ## Changelog ##
+
+= 1.15.0 =
+
+* added widget for Elementor
+* added settings to change popup gallery background color
+* added support for checkboxes and toggles in custom controls styles (needed for custom items styles)
+* added tree of nodes with classes to better coding in Layouts Custom CSS
+* better Gutenberg block preview (no more transform scale for iframe)
+* fixed Video Post Format URL metabox display in Gutenberg
+* fixed Video Popup in post with format video, but without post thumbnail
+* fixed layouts editor styles loading bug when browser tab is not active
+* additional attributes for taxonomies in templates
 
 = 1.14.1 =
 
