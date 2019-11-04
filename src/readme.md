@@ -123,6 +123,10 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.15.1 =
+
+* fixed errors when upload images without width or height (for example, SVG)
+
 = 1.15.0 =
 
 * added widget for Elementor
