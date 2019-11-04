@@ -110,6 +110,10 @@ class Visual_Portfolio_Images {
             return false;
         }
 
+        if ( ! (int) $width || ! (int) $height ) {
+            return false;
+        }
+
         $ratio = self::get_ratio( $width, $height );
         $width = $ratio['width'];
         $height = $ratio['height'];
