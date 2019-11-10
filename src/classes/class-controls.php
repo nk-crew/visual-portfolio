@@ -27,42 +27,42 @@ class Visual_Portfolio_Controls {
      */
     private static $default_args = array(
         // category for registered fields.
-        'category' => '',
+        'category'       => '',
 
-        'type' => 'text',
-        'label' => false,
-        'description' => false,
-        'name' => '',
-        'value' => '',
+        'type'           => 'text',
+        'label'          => false,
+        'description'    => false,
+        'name'           => '',
+        'value'          => '',
         'value_callback' => '',
-        'placeholder' => '',
-        'readonly' => false,
+        'placeholder'    => '',
+        'readonly'       => false,
 
         // control-specific args.
         // select.
-        'options' => array(),
-        'searchable' => false,
-        'multiple' => false,
-        'tags' => false,
-        'post_type' => '',
+        'options'        => array(),
+        'searchable'     => false,
+        'multiple'       => false,
+        'tags'           => false,
+        'post_type'      => '',
         // range.
-        'min' => '',
-        'max' => '',
-        'step' => '1',
+        'min'            => '',
+        'max'            => '',
+        'step'           => '1',
         // textarea.
-        'cols' => '',
-        'rows' => '',
+        'cols'           => '',
+        'rows'           => '',
         // color.
-        'alpha' => false,
+        'alpha'          => false,
         // align.
-        'extended' => false,
+        'extended'       => false,
 
         // hint.
-        'hint'  => false,
-        'hint_place' => 'top',
+        'hint'           => false,
+        'hint_place'     => 'top',
 
         // condition.
-        'condition' => array(
+        'condition'      => array(
             /**
              * Array of arrays with data:
              *  'control' - control name.
@@ -72,7 +72,7 @@ class Visual_Portfolio_Controls {
         ),
 
         // style.
-        'style' => array(
+        'style'          => array(
             /**
              * Array of arrays with data:
              *  'element' - CSS selector string (.vp-portfolio__item, .vp-portfolio__item-overlay, etc).
@@ -81,8 +81,8 @@ class Visual_Portfolio_Controls {
              */
         ),
 
-        'class' => '',
-        'wrapper_class' => '',
+        'class'          => '',
+        'wrapper_class'  => '',
     );
 
     /**
@@ -134,8 +134,8 @@ class Visual_Portfolio_Controls {
 
         ?>
             <div class="<?php echo esc_attr( $class ); ?>"
-                 data-hint="<?php echo esc_attr( $args['hint'] ? : 'false' ); ?>"
-                 data-hint-place="<?php echo esc_attr( $args['hint_place'] ? : 'top' ); ?>"
+                data-hint="<?php echo esc_attr( $args['hint'] ? : 'false' ); ?>"
+                data-hint-place="<?php echo esc_attr( $args['hint_place'] ? : 'top' ); ?>"
                     <?php
                     if ( ! $args['wrapper_class'] ) {
                         self::print_condition( $args );
@@ -217,7 +217,7 @@ class Visual_Portfolio_Controls {
 
         // registered data.
         $registered_array = self::get_registered_array();
-        $registered_data = isset( $registered_array[ $name ] ) ? $registered_array[ $name ] : false;
+        $registered_data  = isset( $registered_array[ $name ] ) ? $registered_array[ $name ] : false;
 
         // find default.
         $default = null;
@@ -257,9 +257,9 @@ class Visual_Portfolio_Controls {
         if ( $args['condition'] && ! empty( $args['condition'] ) ) {
             foreach ( $args['condition'] as $cond ) {
                 if ( ! empty( $cond ) && isset( $cond['control'] ) ) {
-                    $control = $cond['control'];
+                    $control  = $cond['control'];
                     $operator = isset( $cond['operator'] ) ? $cond['operator'] : '==';
-                    $value = isset( $cond['value'] ) ? $cond['value'] : 'true';
+                    $value    = isset( $cond['value'] ) ? $cond['value'] : 'true';
 
                     if ( ! empty( $condition_attr ) ) {
                         $condition_attr .= ' && ';
@@ -581,10 +581,10 @@ class Visual_Portfolio_Controls {
     public static function print_control_gallery( $args = array() ) {
         $images = (array) $args['value'];
         $additional_data = array(
-            'title' => array(
-                'type'  => 'text',
-                'label' => esc_html__( 'Title', '@@text_domain' ),
-                'name'  => $args['name'] . '_additional_title',
+            'title'       => array(
+                'type'      => 'text',
+                'label'     => esc_html__( 'Title', '@@text_domain' ),
+                'name'      => $args['name'] . '_additional_title',
                 'condition' => array(
                     array(
                         'control'  => 'vp_images_titles_source',
@@ -594,9 +594,9 @@ class Visual_Portfolio_Controls {
                 ),
             ),
             'description' => array(
-                'type'  => 'textarea',
-                'label' => esc_html__( 'Description', '@@text_domain' ),
-                'name'  => $args['name'] . '_additional_description',
+                'type'      => 'textarea',
+                'label'     => esc_html__( 'Description', '@@text_domain' ),
+                'name'      => $args['name'] . '_additional_description',
                 'condition' => array(
                     array(
                         'control'  => 'vp_images_descriptions_source',
@@ -605,41 +605,41 @@ class Visual_Portfolio_Controls {
                     ),
                 ),
             ),
-            'categories' => array(
-                'type'  => 'select2',
-                'label' => esc_html__( 'Categories', '@@text_domain' ),
-                'name'  => $args['name'] . '_additional_categories',
+            'categories'  => array(
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Categories', '@@text_domain' ),
+                'name'     => $args['name'] . '_additional_categories',
                 'multiple' => true,
-                'tags' => true,
+                'tags'     => true,
             ),
-            'format' => array(
-                'type'  => 'select2',
-                'label' => esc_html__( 'Format', '@@text_domain' ),
-                'name'  => $args['name'] . '_additional_format',
+            'format'      => array(
+                'type'    => 'select2',
+                'label'   => esc_html__( 'Format', '@@text_domain' ),
+                'name'    => $args['name'] . '_additional_format',
                 'default' => 'standard',
                 'options' => array(
                     'standard' => esc_html__( 'Standard', '@@text_domain' ),
-                    'video' => esc_html__( 'Video', '@@text_domain' ),
+                    'video'    => esc_html__( 'Video', '@@text_domain' ),
                 ),
             ),
-            'video_url' => array(
-                'type'  => 'text',
-                'label' => esc_html__( 'Video URL', '@@text_domain' ),
-                'placeholder'  => esc_html__( 'https://...', '@@text_domain' ),
-                'name'  => $args['name'] . '_additional_video_url',
-                'condition' => array(
+            'video_url'   => array(
+                'type'        => 'text',
+                'label'       => esc_html__( 'Video URL', '@@text_domain' ),
+                'placeholder' => esc_html__( 'https://...', '@@text_domain' ),
+                'name'        => $args['name'] . '_additional_video_url',
+                'condition'   => array(
                     array(
                         'control' => $args['name'] . '_additional_format',
-                        'value' => 'video',
+                        'value'   => 'video',
                     ),
                 ),
             ),
-            'url' => array(
-                'type'  => 'text',
-                'label' => esc_html__( 'URL', '@@text_domain' ),
+            'url'         => array(
+                'type'        => 'text',
+                'label'       => esc_html__( 'URL', '@@text_domain' ),
                 'description' => esc_html__( 'By default used full image url, you can use custom one', '@@text_domain' ),
-                'placeholder'  => esc_html__( 'https://...', '@@text_domain' ),
-                'name'  => $args['name'] . '_additional_url',
+                'placeholder' => esc_html__( 'https://...', '@@text_domain' ),
+                'name'        => $args['name'] . '_additional_url',
             ),
         );
 
@@ -667,7 +667,7 @@ class Visual_Portfolio_Controls {
                     self::get(
                         array_merge(
                             $data_item, array(
-                                'value'  => '',
+                                'value' => '',
                                 'class' => 'vp-no-reload',
                             )
                         )
@@ -683,7 +683,7 @@ class Visual_Portfolio_Controls {
                     continue;
                 }
 
-                $img = wp_get_attachment_image( $data['id'], 'thumbnail' );
+                $img      = wp_get_attachment_image( $data['id'], 'thumbnail' );
                 $img_data = wp_prepare_attachment_for_js( $data['id'] );
 
                 ?>
@@ -692,13 +692,13 @@ class Visual_Portfolio_Controls {
                     echo wp_kses(
                         $img, array(
                             'img' => array(
-                                'src'     => array(),
-                                'srcset'  => array(),
-                                'sizes'   => array(),
-                                'alt'     => array(),
-                                'class'   => array(),
-                                'width'   => array(),
-                                'height'  => array(),
+                                'src'    => array(),
+                                'srcset' => array(),
+                                'sizes'  => array(),
+                                'alt'    => array(),
+                                'class'  => array(),
+                                'width'  => array(),
+                                'height' => array(),
                             ),
                         )
                     );

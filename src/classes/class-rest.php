@@ -25,7 +25,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
      *
      * @var string
      */
-    protected $version   = '1';
+    protected $version = '1';
 
     /**
      * Visual_Portfolio_Rest constructor.
@@ -57,7 +57,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
     public function get_layouts() {
         // get all visual-portfolio post types.
         // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
-        $layouts = array();
+        $layouts  = array();
         $vp_query = get_posts(
             array(
                 'post_type'      => 'vp_lists',
@@ -91,7 +91,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
     public function success( $response ) {
         return new WP_REST_Response(
             array(
-                'success' => true,
+                'success'  => true,
                 'response' => $response,
             ), 200
         );
@@ -107,10 +107,10 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
     public function error( $code, $response ) {
         return new WP_REST_Response(
             array(
-                'error' => true,
-                'success' => false,
+                'error'      => true,
+                'success'    => false,
                 'error_code' => $code,
-                'response' => $response,
+                'response'   => $response,
             ), 401
         );
     }

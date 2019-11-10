@@ -48,13 +48,14 @@ class Visual_Portfolio_VC {
             // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
             $vp_query = get_posts(
                 array(
-                    'post_type'       => 'vp_lists',
+                    'post_type'      => 'vp_lists',
 	                // phpcs:ignore
-                    'posts_per_page'  => -1,
-                    'showposts'       => -1,
-                    'paged'           => -1,
+                    'posts_per_page' => -1,
+                    'showposts'      => -1,
+                    'paged'          => -1,
                 )
             );
+
             $data_vc = array();
             foreach ( $vp_query as $post ) {
                 $data_vc[] = array( $post->ID, '#' . $post->ID . ' - ' . $post->post_title );
@@ -62,11 +63,11 @@ class Visual_Portfolio_VC {
 
             vc_map(
                 array(
-                    'name' => esc_html__( 'Visual Portfolio', '@@text_domain' ),
-                    'base' => 'visual_portfolio',
+                    'name'     => esc_html__( 'Visual Portfolio', '@@text_domain' ),
+                    'base'     => 'visual_portfolio',
                     'controls' => 'full',
                     'icon'     => 'icon-visual-portfolio',
-                    'params' => array(
+                    'params'   => array(
                         array(
                             'type'        => 'dropdown',
                             'heading'     => esc_html__( 'Select Layout', '@@text_domain' ),

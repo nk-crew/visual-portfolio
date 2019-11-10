@@ -30,8 +30,8 @@ class Visual_Portfolio_Migrations {
             return;
         }
 
-        $new_show_caption = isset( $options['show_caption'] ) ? 'on' === $options['show_caption'] : true;
-        $new_title_source = $new_show_caption && isset( $options['caption_title'] ) ? $options['caption_title'] : 'none';
+        $new_show_caption       = isset( $options['show_caption'] ) ? 'on' === $options['show_caption'] : true;
+        $new_title_source       = $new_show_caption && isset( $options['caption_title'] ) ? $options['caption_title'] : 'none';
         $new_description_source = $new_show_caption && isset( $options['caption_description'] ) ? $options['caption_description'] : 'none';
 
         // Get all available Layouts.

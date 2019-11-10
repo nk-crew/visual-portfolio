@@ -114,8 +114,8 @@ class Visual_Portfolio_Images {
             return false;
         }
 
-        $ratio = self::get_ratio( $width, $height );
-        $width = $ratio['width'];
+        $ratio  = self::get_ratio( $width, $height );
+        $width  = $ratio['width'];
         $height = $ratio['height'];
 
         $transient = sprintf( 'vpf_image_placeholder_%s_%s', $width, $height );
@@ -125,7 +125,7 @@ class Visual_Portfolio_Images {
         if ( ! $placeholder_image ) {
             ob_start();
 
-            $image = imagecreate( $width, $height );
+            $image      = imagecreate( $width, $height );
             $background = imagecolorallocatealpha( $image, 0, 0, 255, 127 );
 
             imagepng( $image, null, 9 );
@@ -165,7 +165,7 @@ class Visual_Portfolio_Images {
         $gcd = self::greatest_common_divisor( $width, $height );
 
         return array(
-            'width' => $width / $gcd,
+            'width'  => $width / $gcd,
             'height' => $height / $gcd,
         );
     }
