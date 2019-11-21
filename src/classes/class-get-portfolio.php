@@ -1085,6 +1085,11 @@ class Visual_Portfolio_Get {
                 if ( $options['vp_posts_avoid_duplicate_posts'] ) {
                     $not_id                     = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
                     $query_opts['post__not_in'] = array_merge( $not_id, self::get_all_used_posts() );
+
+                    // Remove posts from post__in.
+                    if ( isset( $query_opts['post__in'] ) ) {
+                        $query_opts['post__in'] = array_diff( (array) $query_opts['post__in'], (array) $query_opts['post__not_in'] );
+                    }
                 }
             } // End if().
 
