@@ -43,25 +43,10 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         // Get layouts list.
         register_rest_route(
             $namespace, '/get_layouts/', array(
-                'methods'         => WP_REST_Server::READABLE,
-                'callback'        => array( $this, 'get_layouts' ),
-                'permission_callback'   => array( $this, 'get_layouts_permission' ),
+                'methods'  => WP_REST_Server::READABLE,
+                'callback' => array( $this, 'get_layouts' ),
             )
         );
-    }
-
-    /**
-     * Get read portfolios permissions.
-     *
-     * @param WP_REST_Request $request  request object.
-     *
-     * @return bool
-     */
-    public function get_layouts_permission( WP_REST_Request $request ) {
-        if ( ! current_user_can( 'read_portfolio' ) ) {
-            return $this->error( 'user_dont_have_permission', __( 'User don\'t have permissions to read Portfolio Layouts.', '@@text_domain' ) );
-        }
-        return true;
     }
 
     /**

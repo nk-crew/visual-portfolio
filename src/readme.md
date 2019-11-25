@@ -1,19 +1,19 @@
 # Visual Portfolio #
 
 * Contributors: nko
-* Tags: portfolio, gallery, works, masonry, popup
+* Tags: portfolio, gallery, image, masonry, popup
 * Requires at least: 4.0.0
-* Tested up to: 5.2
+* Tested up to: 5.3
 * Requires PHP: 5.4
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
-* License URI: http://www.gnu.org/licenses/gpl-2.0.html
+* License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
-Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, coverflow, custom posts, custom images.
+Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, coverflow, custom posts, custom image galleries.
 
 ## Description ##
 
-Visual Portfolio let you create beautiful portfolio layouts. Generates shortcode to show portfolio or any custom post types using Masonry, Justified, Tiles or Carousel layouts.
+Visual Portfolio let you create beautiful portfolio layouts and image galleries. Generates shortcode to show portfolio or any custom post types using Masonry, Justified, Tiles or Carousel layouts.
 
 ### Links ###
 
@@ -52,8 +52,9 @@ Visual Portfolio let you create beautiful portfolio layouts. Generates shortcode
   * Custom order
 * Custom CSS for each portfolio layouts
 * Shortcode generated, so you can place unlimited portfolio layouts on the page
-* Gutenberg WordPress builder supported
-* WPBakery Page Builder page builder supported
+* Gutenberg WordPress builder support
+* Elementor Page Builder support
+* WPBakery Page Builder support
 
 ## Real Usage Examples ##
 
@@ -122,6 +123,72 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.15.1 =
+
+* fixed errors when upload images without width or height (for example, SVG)
+
+= 1.15.0 =
+
+* added widget for Elementor
+* added settings to change popup gallery background color
+* added support for checkboxes and toggles in custom controls styles (needed for custom items styles)
+* added tree of nodes with classes to better coding in Layouts Custom CSS
+* better Gutenberg block preview (no more transform scale for iframe)
+* fixed Video Post Format URL metabox display in Gutenberg
+* fixed Video Popup in post with format video, but without post thumbnail
+* fixed layouts editor styles loading bug when browser tab is not active
+* additional attributes for taxonomies in templates
+
+= 1.14.1 =
+
+* added jQuery events for PhotoSwipe and Fancybox <https://visualportfolio.co/documentation/developers/jquery-events/>
+* fixed carousel responsive bug since new Swiper v5
+
+= 1.14.0 =
+
+* added settings to change registered image sizes
+* added info about sort shortcode in Layouts metaboxes
+* improved assets loader (load only required css and js)
+* changed PhotoSwipe A tags to Buttons
+* removed height limitation for Images control in Layouts editor
+* fixed slider thumbnails ajax loading
+* fixed tiles wrong position calculation
+* fixed Isotope re-layout when WPBakery Page Builder resized full-width row
+* updated FontAwesome
+* updated LazySizes
+* updated Swiper (no more Internet Explorer support)
+
+= 1.13.2 =
+
+* fixed incorrect post date if something filters it (for example Events Manager plugin). Thanks to <https://wordpress.org/support/topic/date-problem-with-events-and-1-13-1-version/>
+
+= 1.13.1 =
+
+* updated FontAwesome
+* fixed portfolio inside Tabs and Accordions
+* fixed Editor role capabilities (add a possibility to manage portfolio items)
+* fixed published date output for Content Source -> Images
+* fixed Gutenberg block list of all available layouts
+
+= 1.13.0 =
+
+* added Fancybox support
+* added option to avoid posts duplication
+* added posts classes (such as hentry) on portfolio items
+* added options to load images title and description automatically from meta data
+* added support for WP Smush and WP Rocket lazy loading options
+* added Items Minimal Height option for Slider layout
+* added new WordPress filters:
+  * `vpf_extend_image_controls`
+  * `vpf_extend_query_args`
+  * `vpf_extend_filter_items`
+  * `vpf_extend_sort_items`
+* improved placeholders function performance
+* changed single post tag to `artricle`
+* prevent lazy loading if `data-src` attribute already added on the image (fixed conflicts with some 3rd-party plugins)
+* prevent lazy loading on AMP pages
+* fixed Jetpack `jetpack_lazy_images_skip_image_with_attributes` filter name
+
 = 1.12.2 =
 
 * fixed tiles size on small screens
@@ -136,8 +203,8 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 = 1.12.0 =
 
 * changed video oembed loading method
-    * no more php oembed since it may be too heavy to load pages (used JS instead)
-    * no more video thumbnail loading if no featured image specified in post
+  * no more php oembed since it may be too heavy to load pages (used JS instead)
+  * no more video thumbnail loading if no featured image specified in post
 * fixed portfolio categories and tags capabilities
 * fixed &lt;a&gt; tag in fly and fade effect when all meta disabled
 
@@ -278,7 +345,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 = 1.6.5 =
 
 * added options for texts in filter and pagination
-* fixed paged /portfolio/ page (https://wordpress.org/support/topic/paging-infinite-loading-not-working/)
+* fixed paged /portfolio/ page (<https://wordpress.org/support/topic/paging-infinite-loading-not-working/>)
 * fixed vertical images quality
 * fixed conflict with Jetpack lazy
 * fixed filter shortcode output

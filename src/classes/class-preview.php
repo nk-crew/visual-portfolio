@@ -44,6 +44,39 @@ class Visual_Portfolio_Preview {
         add_filter( 'vpf_get_layout_option', array( $this, 'filter_preview_option' ), 10, 2 );
         add_action( 'init', array( $this, 'flush_rules_preview_frame' ) );
         add_action( 'template_redirect', array( $this, 'template_redirect' ) );
+
+        add_action( 'wp_print_scripts', array( $this, 'localize_scripts' ), 9 );
+    }
+
+    /**
+     * Localize scripts with preview URL.
+     */
+    public function localize_scripts() {
+        // prepare preview URL.
+        global $wp_rewrite;
+
+        $url = get_site_url();
+
+        if ( ! $wp_rewrite->using_permalinks() ) {
+            $url = add_query_arg(
+                array(
+                    'vp_preview' => 'vp_preview',
+                ), $url
+            );
+        } else {
+            $url .= '/vp_preview';
+        }
+
+        wp_localize_script(
+            'visual-portfolio-gutenberg', 'VPAdminGutenbergVariables', array(
+                'preview_url' => $url,
+            )
+        );
+        wp_localize_script(
+            'visual-portfolio-elementor', 'VPAdminElementorVariables', array(
+                'preview_url' => $url,
+            )
+        );
     }
 
     /**
@@ -58,7 +91,7 @@ class Visual_Portfolio_Preview {
         $this->preview_enabled = 'true' === $frame && $id;
         if ( $this->preview_enabled ) {
             // check if the user can view vp_lists page.
-            if ( ! current_user_can( 'read_portfolio', $id ) ) {
+            if ( ! current_user_can( 'read_vp_list', $id ) ) {
                 $this->preview_enabled = false;
                 return;
             }
@@ -153,8 +186,19 @@ class Visual_Portfolio_Preview {
      * @param int $id - visual portfolio shortcode id.
      */
     public function print_template( $id ) {
-        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', '', '4.0.4', true );
+        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', '', '4.2.1', true );
         wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery' ), '', true );
+
+        $class_name = 'vp-preview-wrapper';
+
+        // preview type.
+        // phpcs:ignore
+        $type = isset( $_GET['vp_preview_type'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_type'] ) ) : false;
+
+        if ( $type ) {
+            $class_name .= ' vp-preview-type-' . $type;
+        }
+
         ?>
         <!DOCTYPE html>
         <html <?php language_attributes(); ?> style="margin-top: 0 !important;">
@@ -190,7 +234,7 @@ class Visual_Portfolio_Preview {
             </head>
 
             <body>
-                <div id="vp_preview">
+                <div id="vp_preview" class="<?php echo esc_attr( $class_name ); ?>">
                     <?php
                         // phpcs:ignore
                         echo Visual_Portfolio_Get::get( array( 'id' => $id ) );

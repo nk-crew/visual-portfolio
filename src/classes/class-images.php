@@ -24,6 +24,11 @@ class Visual_Portfolio_Images {
      * Visual_Portfolio_Images constructor.
      */
     public static function construct() {
+        // Skip AMP pages.
+        if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
+            return;
+        }
+
         // Prepare images base64 placeholders.
         // Thanks https://wordpress.org/plugins/powerkit/.
         add_action( 'init', 'Visual_Portfolio_Images::allow_lazy_attributes' );
@@ -33,7 +38,7 @@ class Visual_Portfolio_Images {
         add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::add_image_placeholders', 15, 3 );
 
         // ignore Jetpack lazy.
-        add_filter( 'jetpack_lazy_images_skip_image_with_atttributes', 'Visual_Portfolio_Images::jetpack_lazy_images_skip_image_with_atttributes', 15, 2 );
+        add_filter( 'jetpack_lazy_images_skip_image_with_attributes', 'Visual_Portfolio_Images::jetpack_lazy_images_skip_image_with_attributes', 15, 2 );
     }
 
     /**
@@ -48,6 +53,7 @@ class Visual_Portfolio_Images {
                     $tags['data-vpf-src']    = true;
                     $tags['data-vpf-sizes']  = true;
                     $tags['data-vpf-srcset'] = true;
+                    $tags['data-no-lazy']    = true;
                 }
             }
         }
@@ -99,9 +105,20 @@ class Visual_Portfolio_Images {
      * @return string
      */
     public static function get_image_placeholder( $width = 1, $height = 1 ) {
-        // 'pk' slug just because this code is from Powerkit plugin,
-        // so we need to be compatible with it.
-        $transient = sprintf( 'pk_image_placeholder_%s_%s', $width, $height );
+        // check if php GD library installed.
+        if ( ! extension_loaded( 'gd' ) || ! function_exists( 'imagecreate' ) ) {
+            return false;
+        }
+
+        if ( ! (int) $width || ! (int) $height ) {
+            return false;
+        }
+
+        $ratio = self::get_ratio( $width, $height );
+        $width = $ratio['width'];
+        $height = $ratio['height'];
+
+        $transient = sprintf( 'vpf_image_placeholder_%s_%s', $width, $height );
 
         $placeholder_image = get_transient( $transient );
 
@@ -123,6 +140,34 @@ class Visual_Portfolio_Images {
         }
 
         return $placeholder_image;
+    }
+
+    /**
+     * GCD
+     * https://en.wikipedia.org/wiki/Greatest_common_divisor
+     *
+     * @param int $width size.
+     * @param int $height size.
+     * @return float
+     */
+    public static function greatest_common_divisor( $width, $height ) {
+        return ( $width % $height ) ? self::greatest_common_divisor( $height, $width % $height ) : $height;
+    }
+
+    /**
+     * Get Aspect Ratio of real width and height
+     *
+     * @param int $width size.
+     * @param int $height size.
+     * @return array
+     */
+    public static function get_ratio( $width, $height ) {
+        $gcd = self::greatest_common_divisor( $width, $height );
+
+        return array(
+            'width' => $width / $gcd,
+            'height' => $height / $gcd,
+        );
     }
 
     /**
@@ -180,7 +225,7 @@ class Visual_Portfolio_Images {
         }
 
         // Lazyload already added.
-        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-vpf-src'] ) ) {
+        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-vpf-src'] ) || isset( $attr['data-src'] ) ) {
             return $attr;
         }
 
@@ -209,6 +254,16 @@ class Visual_Portfolio_Images {
             $placeholder = $metadata['sizes'][ $size ]['placeholder'];
         } elseif ( isset( $metadata['placeholder'] ) ) {
             $placeholder = $metadata['placeholder'];
+        }
+
+        // Prevent WP Rocket lazy loading.
+        if ( defined( 'WP_ROCKET_VERSION' ) ) {
+            $attr['data-no-lazy'] = '1';
+        }
+
+        // Prevent WP Shush lazy loading.
+        if ( class_exists( 'WP_Smush' ) ) {
+            $attr['class'] .= ' no-lazyload';
         }
 
         // lazy placeholder.
@@ -240,7 +295,7 @@ class Visual_Portfolio_Images {
      *
      * @return boolean
      */
-    public static function jetpack_lazy_images_skip_image_with_atttributes( $return, $attributes ) {
+    public static function jetpack_lazy_images_skip_image_with_attributes( $return, $attributes ) {
         return isset( $attributes['data-vpf-src'] );
     }
 }

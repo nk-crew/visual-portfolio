@@ -585,11 +585,25 @@ class Visual_Portfolio_Controls {
                 'type'  => 'text',
                 'label' => esc_html__( 'Title', '@@text_domain' ),
                 'name'  => $args['name'] . '_additional_title',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_images_titles_source',
+                        'operator' => '===',
+                        'value'    => 'custom',
+                    ),
+                ),
             ),
             'description' => array(
                 'type'  => 'textarea',
                 'label' => esc_html__( 'Description', '@@text_domain' ),
                 'name'  => $args['name'] . '_additional_description',
+                'condition' => array(
+                    array(
+                        'control'  => 'vp_images_descriptions_source',
+                        'operator' => '===',
+                        'value'    => 'custom',
+                    ),
+                ),
             ),
             'categories' => array(
                 'type'  => 'select2',
@@ -629,32 +643,38 @@ class Visual_Portfolio_Controls {
             ),
         );
 
+        $additional_data = Visual_Portfolio_Extend::image_controls( $additional_data, $args['name'] );
+
         ?>
         <textarea name="<?php echo esc_attr( $args['name'] ); ?>" style="display: none;"><?php echo esc_textarea( json_encode( $images, defined( 'JSON_UNESCAPED_UNICODE' ) ? JSON_UNESCAPED_UNICODE : 256 ) ); ?></textarea>
 
         <div class="vp-control-gallery-additional-data">
-            <div class="vp-control-gallery-additional-data-preview">
-                <div class="vp-control-gallery-additional-data-preview-image">
-                    <img src="" alt="">
-                </div>
-                <div class="vp-control-gallery-additional-data-preview-data">
-                    <strong class="vp-control-gallery-additional-data-preview-name"></strong>
-                    <div class="vp-control-gallery-additional-data-preview-size"></div>
-                    <div class="vp-control-gallery-additional-data-preview-edit">
-                        <a href="#" target="_blank"><?php echo esc_html__( 'Edit', '@@text_domain' ); ?></a>
+            <div>
+                <div class="vp-control-gallery-additional-data-preview">
+                    <div class="vp-control-gallery-additional-data-preview-image">
+                        <img src="" alt="">
+                    </div>
+                    <div class="vp-control-gallery-additional-data-preview-data">
+                        <strong class="vp-control-gallery-additional-data-preview-name"></strong>
+                        <div class="vp-control-gallery-additional-data-preview-size"></div>
+                        <div class="vp-control-gallery-additional-data-preview-edit">
+                            <a href="#" target="_blank"><?php echo esc_html__( 'Edit', '@@text_domain' ); ?></a>
+                        </div>
                     </div>
                 </div>
+                <?php
+                foreach ( $additional_data as $name => $data_item ) {
+                    self::get(
+                        array_merge(
+                            $data_item, array(
+                                'value'  => '',
+                                'class' => 'vp-no-reload',
+                            )
+                        )
+                    );
+                }
+                ?>
             </div>
-            <?php
-            foreach ( $additional_data as $name => $data_item ) {
-                self::get(
-                    array_merge( $data_item, array(
-                        'value'  => '',
-                        'class' => 'vp-no-reload',
-                    ) )
-                );
-            }
-            ?>
         </div>
         <div class="vp-control-gallery-items">
             <?php
@@ -669,17 +689,19 @@ class Visual_Portfolio_Controls {
                 ?>
                 <div class="vp-control-gallery-items-img" data-image-id="<?php echo esc_attr( $data['id'] ); ?>">
                     <?php
-                    echo wp_kses( $img, array(
-                        'img' => array(
-                            'src'     => array(),
-                            'srcset'  => array(),
-                            'sizes'   => array(),
-                            'alt'     => array(),
-                            'class'   => array(),
-                            'width'   => array(),
-                            'height'  => array(),
-                        ),
-                    ) );
+                    echo wp_kses(
+                        $img, array(
+                            'img' => array(
+                                'src'     => array(),
+                                'srcset'  => array(),
+                                'sizes'   => array(),
+                                'alt'     => array(),
+                                'class'   => array(),
+                                'width'   => array(),
+                                'height'  => array(),
+                            ),
+                        )
+                    );
 
                     // image meta data.
                     echo '<div style="display: none;" data-meta="width">' . esc_html( $img_data['width'] ) . '</div>';

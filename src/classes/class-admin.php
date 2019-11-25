@@ -20,10 +20,7 @@ class Visual_Portfolio_Admin {
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 
         // include gutenberg block.
-        // work only if Gutenberg available.
-        if ( function_exists( 'register_block_type' ) ) {
-            add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
-        }
+        add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
 
         // custom post types.
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
@@ -100,7 +97,7 @@ class Visual_Portfolio_Admin {
 
             wp_enqueue_media();
 
-            wp_enqueue_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.min.js', '', '4.0.4', true );
+            wp_enqueue_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.min.js', '', '4.2.1', true );
 
             wp_enqueue_style( 'wp-color-picker' );
             wp_enqueue_script( 'wp-color-picker-alpha', visual_portfolio()->plugin_url . 'assets/vendor/wp-color-picker-alpha/wp-color-picker-alpha.min.js', array( 'wp-color-picker' ), '2.1.3', true );
@@ -114,11 +111,13 @@ class Visual_Portfolio_Admin {
             wp_enqueue_script( 'sortablejs', visual_portfolio()->plugin_url . 'assets/vendor/sortable/Sortable.min.js', array( 'jquery' ), '1.8.4', true );
             wp_enqueue_script( 'sortablejs-jquery', visual_portfolio()->plugin_url . 'assets/vendor/sortable/jquery.binding.js', array( 'sortablejs' ), '1.8.4', true );
 
-            wp_enqueue_script( 'conditionize', visual_portfolio()->plugin_url . 'assets/vendor/conditionize/conditionize.min.js', array( 'jquery' ), '1.0.1', true );
+            wp_enqueue_script( 'conditionize', visual_portfolio()->plugin_url . 'assets/vendor/conditionize/conditionize.min.js', array( 'jquery' ), '1.0.2', true );
 
             wp_enqueue_script( 'popper.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/popper.min.js', '', '1.14.3', true );
             wp_enqueue_script( 'tooltip.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/tooltip.min.js', array( 'popper.js' ), '1.14.3', true );
             wp_enqueue_style( 'popper.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/popper.css', '', '1.14.3' );
+
+            wp_enqueue_script( 'clipboard.js', visual_portfolio()->plugin_url . 'assets/vendor/clipboard.js/clipboard.min.js', '', '2.0.4' );
 
             $codemirror_version = '5.45.0';
             wp_enqueue_script( 'codemirror', visual_portfolio()->plugin_url . 'assets/vendor/codemirror/codemirror.js', '', $codemirror_version, true );
@@ -157,7 +156,7 @@ class Visual_Portfolio_Admin {
             wp_localize_script( '@@plugin_name-layout-admin', 'VPAdminVariables', $data_init );
         }
 
-        wp_enqueue_script( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.min.js', array( 'jquery' ), '@@plugin_version', true );
+        wp_enqueue_script( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.min.js', array( 'jquery', 'wp-data' ), '@@plugin_version', true );
         wp_enqueue_style( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.min.css', '', '@@plugin_version' );
         wp_localize_script( '@@plugin_name-admin', 'VPAdminVariables', $data_init );
     }
@@ -169,7 +168,7 @@ class Visual_Portfolio_Admin {
         wp_enqueue_script(
             'visual-portfolio-gutenberg',
             plugins_url( '../assets/admin/js/gutenberg-block.min.js', __FILE__ ),
-            array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components' ),
+            array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components', 'jquery' ),
             filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/js/gutenberg-block.min.js' )
         );
 
@@ -179,25 +178,6 @@ class Visual_Portfolio_Admin {
             array(),
             filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/css/gutenberg-block.min.css' )
         );
-
-        // prepare preview URL.
-        global $wp_rewrite;
-
-        $url = get_site_url();
-
-        if ( ! $wp_rewrite->using_permalinks() ) {
-            $url = add_query_arg(
-                array(
-                    'vp_preview' => 'vp_preview',
-                ), $url
-            );
-        } else {
-            $url .= '/vp_preview';
-        }
-
-        wp_localize_script( 'visual-portfolio-gutenberg', 'VPAdminGutenbergVariables', array(
-            'preview_url' => $url,
-        ) );
     }
 
     /**
@@ -564,6 +544,7 @@ class Visual_Portfolio_Admin {
             $wp_roles->add_cap( 'portfolio_manager', $cap );
             $wp_roles->add_cap( 'portfolio_author', $cap );
             $wp_roles->add_cap( 'administrator', $cap );
+            $wp_roles->add_cap( 'editor', $cap );
         }
         foreach ( $lists_cap as $cap ) {
             $wp_roles->add_cap( 'portfolio_manager', $cap );
@@ -701,16 +682,18 @@ class Visual_Portfolio_Admin {
         }
 
         // add all nodes of all Slider.
-        $layouts = Visual_Portfolio_Get::get_all_currently_used_ids();
+        $layouts = Visual_Portfolio_Get::get_all_used_layouts();
         $layouts = array_unique( $layouts );
 
         if ( ! empty( $layouts ) ) {
-            $wp_admin_bar->add_node( array(
-                'parent' => false,
-                'id'     => 'visual_portfolio',
-                'title'  => esc_html__( 'Visual Portfolio', '@@text_domain' ),
-                'href'   => admin_url( 'edit.php?post_type=vp_lists' ),
-            ) );
+            $wp_admin_bar->add_node(
+                array(
+                    'parent' => false,
+                    'id'     => 'visual_portfolio',
+                    'title'  => esc_html__( 'Visual Portfolio', '@@text_domain' ),
+                    'href'   => admin_url( 'edit.php?post_type=vp_lists' ),
+                )
+            );
 
             // get visual-portfolio post types by IDs.
             // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
@@ -725,12 +708,14 @@ class Visual_Portfolio_Admin {
                 )
             );
             foreach ( $vp_query as $post ) {
-                $wp_admin_bar->add_node( array(
-                    'parent' => 'visual_portfolio',
-                    'id'     => 'vp_list_' . esc_html( $post->ID ),
-                    'title'  => esc_html( $post->post_title ),
-                    'href'   => admin_url( 'post.php?post=' . $post->ID ) . '&action=edit',
-                ) );
+                $wp_admin_bar->add_node(
+                    array(
+                        'parent' => 'visual_portfolio',
+                        'id'     => 'vp_list_' . esc_html( $post->ID ),
+                        'title'  => esc_html( $post->post_title ),
+                        'href'   => admin_url( 'post.php?post=' . $post->ID ) . '&action=edit',
+                    )
+                );
             }
         }
     }
@@ -777,512 +762,531 @@ class Visual_Portfolio_Admin {
         /**
          * Layouts.
          */
-        $layouts = array_merge( array(
-            // Tiles.
-            'tiles' => array(
-                'title' => esc_html__( 'Tiles', '@@text_domain' ),
-                'controls' => array(
-                    /**
-                     * Tile type:
-                     * first parameter - is columns number
-                     * the next is item sizes
-                     *
-                     * Example:
-                     * 3|1,0.5|2,0.25|
-                     *    3 columns in row
-                     *    First item 100% width and 50% height
-                     *    Second item 200% width and 25% height
-                     */
-                    array(
-                        'type'  => 'images_dropdown',
-                        'label' => esc_html__( 'Type', '@@text_domain' ),
-                        'placeholder' => esc_html__( 'Select tiles type', '@@text_domain' ),
-                        'name'  => 'type',
-                        'default' => '3|1,1|',
-                        'options' => array_merge( array(
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-1-1.svg',
-                                'value' => '1|1,0.5|',
+        $layouts = array_merge(
+            array(
+                // Tiles.
+                'tiles' => array(
+                    'title' => esc_html__( 'Tiles', '@@text_domain' ),
+                    'controls' => array(
+                        /**
+                         * Tile type:
+                         * first parameter - is columns number
+                         * the next is item sizes
+                         *
+                         * Example:
+                         * 3|1,0.5|2,0.25|
+                         *    3 columns in row
+                         *    First item 100% width and 50% height
+                         *    Second item 200% width and 25% height
+                         */
+                        array(
+                            'type'  => 'images_dropdown',
+                            'label' => esc_html__( 'Type', '@@text_domain' ),
+                            'placeholder' => esc_html__( 'Select tiles type', '@@text_domain' ),
+                            'name'  => 'type',
+                            'default' => '3|1,1|',
+                            'options' => array_merge(
+                                array(
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-1-1.svg',
+                                        'value' => '1|1,0.5|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-1.svg',
+                                        'value' => '2|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-2.svg',
+                                        'value' => '2|1,0.8|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-3.svg',
+                                        'value' => '2|1,1.34|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-4.svg',
+                                        'value' => '2|1,1.2|1,1.2|1,0.67|1,0.67|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-5.svg',
+                                        'value' => '2|1,1.2|1,0.67|1,1.2|1,0.67|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-6.svg',
+                                        'value' => '2|1,0.67|1,1|1,1|1,1|1,1|1,0.67|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-1.svg',
+                                        'value' => '3|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-2.svg',
+                                        'value' => '3|1,0.8|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-3.svg',
+                                        'value' => '3|1,1.3|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-4.svg',
+                                        'value' => '3|1,1|1,1|1,1|1,1.3|1,1.3|1,1.3|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-5.svg',
+                                        'value' => '3|1,1|1,1|1,2|1,1|1,1|1,1|1,1|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-6.svg',
+                                        'value' => '3|1,2|1,1|1,1|1,1|1,1|1,1|1,1|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-7.svg',
+                                        'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|1,1|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-8.svg',
+                                        'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|2,0.5|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-9.svg',
+                                        'value' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,0.8|1,0.8|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-10.svg',
+                                        'value' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|1,0.8|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-11.svg',
+                                        'value' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-12.svg',
+                                        'value' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-13.svg',
+                                        'value' => '3|1,1|2,1|1,1|2,0.5|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-14.svg',
+                                        'value' => '3|1,1|2,1|1,1|1,1|1,1|1,1|2,0.5|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-15.svg',
+                                        'value' => '3|1,2|2,0.5|1,1|1,2|2,0.5|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-1.svg',
+                                        'value' => '4|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-2.svg',
+                                        'value' => '4|1,1|1,1.34|1,1|1,1.34|1,1.34|1,1.34|1,1|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-3.svg',
+                                        'value' => '4|1,0.8|1,1|1,0.8|1,1|1,1|1,1|1,0.8|1,0.8|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-4.svg',
+                                        'value' => '4|1,1|1,1|2,1|1,1|1,1|2,1|1,1|1,1|1,1|1,1|',
+                                    ),
+                                    array(
+                                        'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-5.svg',
+                                        'value' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
+                                    ),
+                                ), Visual_Portfolio_Extend::tiles()
                             ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-1.svg',
-                                'value' => '2|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-2.svg',
-                                'value' => '2|1,0.8|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-3.svg',
-                                'value' => '2|1,1.34|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-4.svg',
-                                'value' => '2|1,1.2|1,1.2|1,0.67|1,0.67|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-5.svg',
-                                'value' => '2|1,1.2|1,0.67|1,1.2|1,0.67|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-2-6.svg',
-                                'value' => '2|1,0.67|1,1|1,1|1,1|1,1|1,0.67|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-1.svg',
-                                'value' => '3|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-2.svg',
-                                'value' => '3|1,0.8|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-3.svg',
-                                'value' => '3|1,1.3|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-4.svg',
-                                'value' => '3|1,1|1,1|1,1|1,1.3|1,1.3|1,1.3|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-5.svg',
-                                'value' => '3|1,1|1,1|1,2|1,1|1,1|1,1|1,1|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-6.svg',
-                                'value' => '3|1,2|1,1|1,1|1,1|1,1|1,1|1,1|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-7.svg',
-                                'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|1,1|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-8.svg',
-                                'value' => '3|1,1|1,2|1,1|1,1|1,1|1,1|2,0.5|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-9.svg',
-                                'value' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,0.8|1,0.8|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-10.svg',
-                                'value' => '3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|1,0.8|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-11.svg',
-                                'value' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-12.svg',
-                                'value' => '3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-13.svg',
-                                'value' => '3|1,1|2,1|1,1|2,0.5|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-14.svg',
-                                'value' => '3|1,1|2,1|1,1|1,1|1,1|1,1|2,0.5|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-3-15.svg',
-                                'value' => '3|1,2|2,0.5|1,1|1,2|2,0.5|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-1.svg',
-                                'value' => '4|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-2.svg',
-                                'value' => '4|1,1|1,1.34|1,1|1,1.34|1,1.34|1,1.34|1,1|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-3.svg',
-                                'value' => '4|1,0.8|1,1|1,0.8|1,1|1,1|1,1|1,0.8|1,0.8|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-4.svg',
-                                'value' => '4|1,1|1,1|2,1|1,1|1,1|2,1|1,1|1,1|1,1|1,1|',
-                            ),
-                            array(
-                                'url' => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-5.svg',
-                                'value' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
-                            ),
-                        ), Visual_Portfolio_Extend::tiles() ),
+                        ),
                     ),
                 ),
-            ),
 
-            // Masonry.
-            'masonry' => array(
-                'title' => esc_html__( 'Masonry', '@@text_domain' ),
-                'controls' => array(
-                    array(
-                        'type'  => 'range',
-                        'label' => esc_html__( 'Columns', '@@text_domain' ),
-                        'name'  => 'columns',
-                        'min'   => 1,
-                        'max'   => 5,
-                        'default' => 3,
+                // Masonry.
+                'masonry' => array(
+                    'title' => esc_html__( 'Masonry', '@@text_domain' ),
+                    'controls' => array(
+                        array(
+                            'type'  => 'range',
+                            'label' => esc_html__( 'Columns', '@@text_domain' ),
+                            'name'  => 'columns',
+                            'min'   => 1,
+                            'max'   => 5,
+                            'default' => 3,
+                        ),
                     ),
                 ),
-            ),
 
-            // Grid.
-            'grid' => array(
-                'title' => esc_html__( 'Grid', '@@text_domain' ),
-                'controls' => array(
-                    array(
-                        'type'  => 'range',
-                        'label' => esc_html__( 'Columns', '@@text_domain' ),
-                        'name'  => 'columns',
-                        'min'   => 1,
-                        'max'   => 5,
-                        'default' => 3,
+                // Grid.
+                'grid' => array(
+                    'title' => esc_html__( 'Grid', '@@text_domain' ),
+                    'controls' => array(
+                        array(
+                            'type'  => 'range',
+                            'label' => esc_html__( 'Columns', '@@text_domain' ),
+                            'name'  => 'columns',
+                            'min'   => 1,
+                            'max'   => 5,
+                            'default' => 3,
+                        ),
                     ),
                 ),
-            ),
 
-            // Justified.
-            'justified' => array(
-                'title' => esc_html__( 'Justified', '@@text_domain' ),
-                'controls' => array(
-                    array(
-                        'type'  => 'range',
-                        'label' => esc_html__( 'Row height', '@@text_domain' ),
-                        'name'  => 'row_height',
-                        'min'   => 100,
-                        'max'   => 1000,
-                        'default' => 200,
-                    ),
-                    array(
-                        'type'  => 'range',
-                        'label' => esc_html__( 'Row height tolerance', '@@text_domain' ),
-                        'name'  => 'row_height_tolerance',
-                        'min'   => 0,
-                        'max'   => 1,
-                        'step'  => 0.05,
-                        'default' => 0.25,
+                // Justified.
+                'justified' => array(
+                    'title' => esc_html__( 'Justified', '@@text_domain' ),
+                    'controls' => array(
+                        array(
+                            'type'  => 'range',
+                            'label' => esc_html__( 'Row height', '@@text_domain' ),
+                            'name'  => 'row_height',
+                            'min'   => 100,
+                            'max'   => 1000,
+                            'default' => 200,
+                        ),
+                        array(
+                            'type'  => 'range',
+                            'label' => esc_html__( 'Row Height Tolerance', '@@text_domain' ),
+                            'name'  => 'row_height_tolerance',
+                            'min'   => 0,
+                            'max'   => 1,
+                            'step'  => 0.05,
+                            'default' => 0.25,
+                        ),
                     ),
                 ),
-            ),
 
-            // Slider.
-            'slider' => array(
-                'title' => esc_html__( 'Slider', '@@text_domain' ),
-                'controls' => array(
-                    array(
-                        'type'    => 'select2',
-                        'label'   => esc_html__( 'Effect', '@@text_domain' ),
-                        'name'    => 'effect',
-                        'default' => 'slide',
-                        'options' => array(
-                            'slide'     => esc_html__( 'Slide', '@@text_domain' ),
-                            'coverflow' => esc_html__( 'Coverflow', '@@text_domain' ),
-                            'fade'      => esc_html__( 'Fade', '@@text_domain' ),
-                        ),
-                    ),
-                    array(
-                        'type'  => 'range',
-                        'label' => esc_html__( 'Speed (seconds)', '@@text_domain' ),
-                        'name'  => 'speed',
-                        'min'   => 0,
-                        'max'   => 5,
-                        'step'  => 0.1,
-                        'default' => 0.3,
-                    ),
-                    array(
-                        'type'  => 'range',
-                        'label' => esc_html__( 'Autoplay (seconds)', '@@text_domain' ),
-                        'name'  => 'autoplay',
-                        'min'   => 0,
-                        'max'   => 20,
-                        'step'  => 0.2,
-                        'default' => 6,
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Pause on Mouse Over', '@@text_domain' ),
-                        'name'    => 'autoplay_hover_pause',
-                        'default' => false,
-                        'condition' => array(
-                            array(
-                                'control' => 'autoplay',
-                                'operator' => '>',
-                                'value' => 0,
+                // Slider.
+                'slider' => array(
+                    'title' => esc_html__( 'Slider', '@@text_domain' ),
+                    'controls' => array(
+                        array(
+                            'type'    => 'select2',
+                            'label'   => esc_html__( 'Effect', '@@text_domain' ),
+                            'name'    => 'effect',
+                            'default' => 'slide',
+                            'options' => array(
+                                'slide'     => esc_html__( 'Slide', '@@text_domain' ),
+                                'coverflow' => esc_html__( 'Coverflow', '@@text_domain' ),
+                                'fade'      => esc_html__( 'Fade', '@@text_domain' ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'        => 'select2',
-                        'label'       => esc_html__( 'Items height', '@@text_domain' ),
-                        'name'        => 'items_height_type',
-                        'default'     => 'dynamic',
-                        'options'     => array(
-                            'auto'     => esc_html__( 'Auto', '@@text_domain' ),
-                            'static'   => esc_html__( 'Static (px)', '@@text_domain' ),
-                            'dynamic'  => esc_html__( 'Dynamic (%)', '@@text_domain' ),
+                        array(
+                            'type'  => 'range',
+                            'label' => esc_html__( 'Speed (in Seconds)', '@@text_domain' ),
+                            'name'  => 'speed',
+                            'min'   => 0,
+                            'max'   => 5,
+                            'step'  => 0.1,
+                            'default' => 0.3,
                         ),
-                    ),
-                    array(
-                        'type'  => 'range',
-                        'name'  => 'items_height_static',
-                        'min'   => 30,
-                        'max'   => 800,
-                        'default' => 300,
-                        'condition' => array(
-                            array(
-                                'control'  => 'items_height_type',
-                                'operator' => '==',
-                                'value'    => 'static',
+                        array(
+                            'type'  => 'range',
+                            'label' => esc_html__( 'Autoplay (in Seconds)', '@@text_domain' ),
+                            'name'  => 'autoplay',
+                            'min'   => 0,
+                            'max'   => 20,
+                            'step'  => 0.2,
+                            'default' => 6,
+                        ),
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Pause on Mouse Over', '@@text_domain' ),
+                            'name'    => 'autoplay_hover_pause',
+                            'default' => false,
+                            'condition' => array(
+                                array(
+                                    'control' => 'autoplay',
+                                    'operator' => '>',
+                                    'value' => 0,
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'  => 'range',
-                        'name'  => 'items_height_dynamic',
-                        'min'   => 10,
-                        'max'   => 300,
-                        'default' => 80,
-                        'condition' => array(
-                            array(
-                                'control'  => 'items_height_type',
-                                'operator' => '==',
-                                'value'    => 'dynamic',
+                        array(
+                            'type'        => 'select2',
+                            'label'       => esc_html__( 'Items Height', '@@text_domain' ),
+                            'name'        => 'items_height_type',
+                            'default'     => 'dynamic',
+                            'options'     => array(
+                                'auto'     => esc_html__( 'Auto', '@@text_domain' ),
+                                'static'   => esc_html__( 'Static (px)', '@@text_domain' ),
+                                'dynamic'  => esc_html__( 'Dynamic (%)', '@@text_domain' ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'        => 'select2',
-                        'label'       => esc_html__( 'Slides per view', '@@text_domain' ),
-                        'name'        => 'slides_per_view_type',
-                        'default'     => 'custom',
-                        'options'     => array(
-                            'auto'   => esc_html__( 'Auto', '@@text_domain' ),
-                            'custom' => esc_html__( 'Custom', '@@text_domain' ),
-                        ),
-                        'condition' => array(
-                            array(
-                                'control' => 'effect',
-                                'operator' => '!=',
-                                'value' => 'fade',
+                        array(
+                            'type'  => 'range',
+                            'name'  => 'items_height_static',
+                            'min'   => 30,
+                            'max'   => 800,
+                            'default' => 300,
+                            'condition' => array(
+                                array(
+                                    'control'  => 'items_height_type',
+                                    'operator' => '==',
+                                    'value'    => 'static',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'      => 'range',
-                        'name'      => 'slides_per_view_custom',
-                        'min'       => 1,
-                        'max'       => 6,
-                        'default'   => 3,
-                        'condition' => array(
-                            array(
-                                'control'  => 'effect',
-                                'operator' => '!=',
-                                'value'    => 'fade',
-                            ),
-                            array(
-                                'control'  => 'slides_per_view_type',
-                                'operator' => '==',
-                                'value'    => 'custom',
+                        array(
+                            'type'  => 'range',
+                            'name'  => 'items_height_dynamic',
+                            'min'   => 10,
+                            'max'   => 300,
+                            'default' => 80,
+                            'condition' => array(
+                                array(
+                                    'control'  => 'items_height_type',
+                                    'operator' => '==',
+                                    'value'    => 'dynamic',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Centered slides', '@@text_domain' ),
-                        'name'    => 'centered_slides',
-                        'default' => true,
-                        'condition' => array(
-                            array(
-                                'control' => 'effect',
-                                'operator' => '!=',
-                                'value' => 'fade',
+                        array(
+                            'type'        => 'text',
+                            'label'       => esc_html__( 'Items Minimal Height', '@@text_domain' ),
+                            'placeholder' => esc_attr__( '300px, 80vh', '@@text_domain' ),
+                            'description' => esc_html__( 'Values with `vh` units will not be visible in preview.', '@@text_domain' ),
+                            'name'        => 'items_min_height',
+                            'default'     => '',
+                            'condition'   => array(
+                                array(
+                                    'control'  => 'items_height_type',
+                                    'operator' => '!==',
+                                    'value'    => 'auto',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Loop', '@@text_domain' ),
-                        'name'    => 'loop',
-                        'default' => false,
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Free scroll', '@@text_domain' ),
-                        'name'    => 'free_mode',
-                        'default' => false,
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Free scroll Sticky', '@@text_domain' ),
-                        'name'    => 'free_mode_sticky',
-                        'default' => false,
-                        'condition' => array(
-                            array(
-                                'control' => 'free_mode',
+                        array(
+                            'type'        => 'select2',
+                            'label'       => esc_html__( 'Slides Per View', '@@text_domain' ),
+                            'name'        => 'slides_per_view_type',
+                            'default'     => 'custom',
+                            'options'     => array(
+                                'auto'   => esc_html__( 'Auto', '@@text_domain' ),
+                                'custom' => esc_html__( 'Custom', '@@text_domain' ),
+                            ),
+                            'condition' => array(
+                                array(
+                                    'control' => 'effect',
+                                    'operator' => '!=',
+                                    'value' => 'fade',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Show arrows', '@@text_domain' ),
-                        'name'    => 'arrows',
-                        'default' => true,
-                    ),
-                    array(
-                        'type'        => 'text',
-                        'name'        => 'arrows_icon_prev',
-                        'default'     => 'fas fa-angle-left',
-                        'placeholder' => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
-                        'hint'        => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
-                        'hint_place'  => 'left',
-                        'condition'   => array(
-                            array(
-                                'control' => 'arrows',
+                        array(
+                            'type'      => 'range',
+                            'name'      => 'slides_per_view_custom',
+                            'min'       => 1,
+                            'max'       => 6,
+                            'default'   => 3,
+                            'condition' => array(
+                                array(
+                                    'control'  => 'effect',
+                                    'operator' => '!=',
+                                    'value'    => 'fade',
+                                ),
+                                array(
+                                    'control'  => 'slides_per_view_type',
+                                    'operator' => '==',
+                                    'value'    => 'custom',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'        => 'text',
-                        'name'        => 'arrows_icon_next',
-                        'default'     => 'fas fa-angle-right',
-                        'placeholder' => esc_attr__( 'Next arrow icon', '@@text_domain' ),
-                        'hint'        => esc_attr__( 'Next arrow icon', '@@text_domain' ),
-                        'hint_place'  => 'left',
-                        'condition'   => array(
-                            array(
-                                'control' => 'arrows',
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Centered Slides', '@@text_domain' ),
+                            'name'    => 'centered_slides',
+                            'default' => true,
+                            'condition' => array(
+                                array(
+                                    'control' => 'effect',
+                                    'operator' => '!=',
+                                    'value' => 'fade',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Show bullets', '@@text_domain' ),
-                        'name'    => 'bullets',
-                        'default' => false,
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Dynamic bullets', '@@text_domain' ),
-                        'name'    => 'bullets_dynamic',
-                        'default' => false,
-                        'condition' => array(
-                            array(
-                                'control' => 'bullets',
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Loop', '@@text_domain' ),
+                            'name'    => 'loop',
+                            'default' => false,
+                        ),
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Free Scroll', '@@text_domain' ),
+                            'name'    => 'free_mode',
+                            'default' => false,
+                        ),
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Free Scroll Sticky', '@@text_domain' ),
+                            'name'    => 'free_mode_sticky',
+                            'default' => false,
+                            'condition' => array(
+                                array(
+                                    'control' => 'free_mode',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Mousewheel Control', '@@text_domain' ),
-                        'name'    => 'mousewheel',
-                        'default' => false,
-                    ),
-                    array(
-                        'type'    => 'toggle',
-                        'label'   => esc_html__( 'Show thumbnails', '@@text_domain' ),
-                        'name'    => 'thumbnails',
-                        'default' => false,
-                    ),
-                    array(
-                        'type'     => 'range',
-                        'label'    => esc_html__( 'Thumbnails gap', '@@text_domain' ),
-                        'name'     => 'thumbnails_gap',
-                        'default'  => 15,
-                        'min'      => 0,
-                        'max'      => 150,
-                        'condition' => array(
-                            array(
-                                'control'  => 'thumbnails',
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Display Arrows', '@@text_domain' ),
+                            'name'    => 'arrows',
+                            'default' => true,
+                        ),
+                        array(
+                            'type'        => 'text',
+                            'name'        => 'arrows_icon_prev',
+                            'default'     => 'fas fa-angle-left',
+                            'placeholder' => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
+                            'hint'        => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
+                            'hint_place'  => 'left',
+                            'condition'   => array(
+                                array(
+                                    'control' => 'arrows',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'        => 'select2',
-                        'label'       => esc_html__( 'Thumbnails height', '@@text_domain' ),
-                        'name'        => 'thumbnails_height_type',
-                        'default'     => 'static',
-                        'options'     => array(
-                            'auto'     => esc_html__( 'Auto', '@@text_domain' ),
-                            'static'   => esc_html__( 'Static (px)', '@@text_domain' ),
-                            'dynamic'  => esc_html__( 'Dynamic (%)', '@@text_domain' ),
-                        ),
-                        'condition' => array(
-                            array(
-                                'control'  => 'thumbnails',
+                        array(
+                            'type'        => 'text',
+                            'name'        => 'arrows_icon_next',
+                            'default'     => 'fas fa-angle-right',
+                            'placeholder' => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
+                            'hint'        => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
+                            'hint_place'  => 'left',
+                            'condition'   => array(
+                                array(
+                                    'control' => 'arrows',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'  => 'range',
-                        'name'  => 'thumbnails_height_static',
-                        'min'   => 10,
-                        'max'   => 400,
-                        'default' => 100,
-                        'condition' => array(
-                            array(
-                                'control'  => 'thumbnails',
-                            ),
-                            array(
-                                'control'  => 'thumbnails_height_type',
-                                'operator' => '==',
-                                'value'    => 'static',
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Display Bullets', '@@text_domain' ),
+                            'name'    => 'bullets',
+                            'default' => false,
+                        ),
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Dynamic Bullets', '@@text_domain' ),
+                            'name'    => 'bullets_dynamic',
+                            'default' => false,
+                            'condition' => array(
+                                array(
+                                    'control' => 'bullets',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'  => 'range',
-                        'name'  => 'thumbnails_height_dynamic',
-                        'min'   => 10,
-                        'max'   => 200,
-                        'default' => 30,
-                        'condition' => array(
-                            array(
-                                'control'  => 'thumbnails',
-                            ),
-                            array(
-                                'control'  => 'thumbnails_height_type',
-                                'operator' => '==',
-                                'value'    => 'dynamic',
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Mousewheel Control', '@@text_domain' ),
+                            'name'    => 'mousewheel',
+                            'default' => false,
+                        ),
+                        array(
+                            'type'    => 'toggle',
+                            'label'   => esc_html__( 'Display Thumbnails', '@@text_domain' ),
+                            'name'    => 'thumbnails',
+                            'default' => false,
+                        ),
+                        array(
+                            'type'     => 'range',
+                            'label'    => esc_html__( 'Thumbnails Gap', '@@text_domain' ),
+                            'name'     => 'thumbnails_gap',
+                            'default'  => 15,
+                            'min'      => 0,
+                            'max'      => 150,
+                            'condition' => array(
+                                array(
+                                    'control'  => 'thumbnails',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'        => 'select2',
-                        'label'       => esc_html__( 'Thumbnails per view', '@@text_domain' ),
-                        'name'        => 'thumbnails_per_view_type',
-                        'default'     => 'custom',
-                        'options'     => array(
-                            'auto'   => esc_html__( 'Auto', '@@text_domain' ),
-                            'custom' => esc_html__( 'Custom', '@@text_domain' ),
-                        ),
-                        'condition' => array(
-                            array(
-                                'control'  => 'thumbnails',
+                        array(
+                            'type'        => 'select2',
+                            'label'       => esc_html__( 'Thumbnails Height', '@@text_domain' ),
+                            'name'        => 'thumbnails_height_type',
+                            'default'     => 'static',
+                            'options'     => array(
+                                'auto'     => esc_html__( 'Auto', '@@text_domain' ),
+                                'static'   => esc_html__( 'Static (px)', '@@text_domain' ),
+                                'dynamic'  => esc_html__( 'Dynamic (%)', '@@text_domain' ),
+                            ),
+                            'condition' => array(
+                                array(
+                                    'control'  => 'thumbnails',
+                                ),
                             ),
                         ),
-                    ),
-                    array(
-                        'type'      => 'range',
-                        'name'      => 'thumbnails_per_view_custom',
-                        'min'       => 1,
-                        'max'       => 14,
-                        'default'   => 8,
-                        'condition' => array(
-                            array(
-                                'control'  => 'thumbnails',
+                        array(
+                            'type'  => 'range',
+                            'name'  => 'thumbnails_height_static',
+                            'min'   => 10,
+                            'max'   => 400,
+                            'default' => 100,
+                            'condition' => array(
+                                array(
+                                    'control'  => 'thumbnails',
+                                ),
+                                array(
+                                    'control'  => 'thumbnails_height_type',
+                                    'operator' => '==',
+                                    'value'    => 'static',
+                                ),
                             ),
-                            array(
-                                'control'  => 'thumbnails_per_view_type',
-                                'operator' => '==',
-                                'value'    => 'custom',
+                        ),
+                        array(
+                            'type'  => 'range',
+                            'name'  => 'thumbnails_height_dynamic',
+                            'min'   => 10,
+                            'max'   => 200,
+                            'default' => 30,
+                            'condition' => array(
+                                array(
+                                    'control'  => 'thumbnails',
+                                ),
+                                array(
+                                    'control'  => 'thumbnails_height_type',
+                                    'operator' => '==',
+                                    'value'    => 'dynamic',
+                                ),
+                            ),
+                        ),
+                        array(
+                            'type'        => 'select2',
+                            'label'       => esc_html__( 'Thumbnails Per View', '@@text_domain' ),
+                            'name'        => 'thumbnails_per_view_type',
+                            'default'     => 'custom',
+                            'options'     => array(
+                                'auto'   => esc_html__( 'Auto', '@@text_domain' ),
+                                'custom' => esc_html__( 'Custom', '@@text_domain' ),
+                            ),
+                            'condition' => array(
+                                array(
+                                    'control'  => 'thumbnails',
+                                ),
+                            ),
+                        ),
+                        array(
+                            'type'      => 'range',
+                            'name'      => 'thumbnails_per_view_custom',
+                            'min'       => 1,
+                            'max'       => 14,
+                            'default'   => 8,
+                            'condition' => array(
+                                array(
+                                    'control'  => 'thumbnails',
+                                ),
+                                array(
+                                    'control'  => 'thumbnails_per_view_type',
+                                    'operator' => '==',
+                                    'value'    => 'custom',
+                                ),
                             ),
                         ),
                     ),
                 ),
-            ),
-        ), Visual_Portfolio_Extend::layouts() );
+            ), Visual_Portfolio_Extend::layouts()
+        );
 
         // Extend specific layout controls.
         foreach ( $layouts as $name => $layout ) {
@@ -1353,7 +1357,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'layouts',
                 'type'     => 'range',
-                'label'    => esc_html__( 'Items per page', '@@text_domain' ),
+                'label'    => esc_html__( 'Items Per Page', '@@text_domain' ),
                 'name'     => 'vp_items_count',
                 'default'  => 6,
                 'min'      => 1,
@@ -1376,171 +1380,173 @@ class Visual_Portfolio_Admin {
         /**
          * Items Style
          */
-        $items_styles = array_merge( array(
-            // Default.
-            'default' => array(
-                'title' => esc_html__( 'Default', '@@text_domain' ),
-                'builtin_controls' => array(
-                    'show_title' => true,
-                    'show_categories' => true,
-                    'show_date' => true,
-                    'show_excerpt' => true,
-                    'show_icons' => false,
-                    'align' => true,
-                ),
-                'controls' => array(
-                    array(
-                        'type'    => 'select2',
-                        'label'   => esc_html__( 'Show Read more button', '@@text_domain' ),
-                        'name'    => 'show_read_more',
-                        'default' => false,
-                        'options' => array(
-                            'false' => esc_html__( 'False', '@@text_domain' ),
-                            'true' => esc_html__( 'Always show', '@@text_domain' ),
-                            'more_tag' => esc_html__( 'Show when used "More tag" in the post', '@@text_domain' ),
-                        ),
+        $items_styles = array_merge(
+            array(
+                // Default.
+                'default' => array(
+                    'title' => esc_html__( 'Default', '@@text_domain' ),
+                    'builtin_controls' => array(
+                        'show_title' => true,
+                        'show_categories' => true,
+                        'show_date' => true,
+                        'show_excerpt' => true,
+                        'show_icons' => false,
+                        'align' => true,
                     ),
-                    array(
-                        'type'    => 'text',
-                        'name'    => 'read_more_label',
-                        'placeholder' => 'Read More',
-                        'default' => 'Read More',
-                        'hint'    => esc_attr__( 'Read more button label', '@@text_domain' ),
-                        'hint_place' => 'left',
-                        'condition' => array(
-                            array(
-                                'control' => 'show_read_more',
-                                'operator' => '!=',
-                                'value' => 'false',
+                    'controls' => array(
+                        array(
+                            'type'    => 'select2',
+                            'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
+                            'name'    => 'show_read_more',
+                            'default' => false,
+                            'options' => array(
+                                'false' => esc_html__( 'Hide', '@@text_domain' ),
+                                'true' => esc_html__( 'Always Display', '@@text_domain' ),
+                                'more_tag' => esc_html__( 'Display when used "More tag" in the post', '@@text_domain' ),
+                            ),
+                        ),
+                        array(
+                            'type'    => 'text',
+                            'name'    => 'read_more_label',
+                            'placeholder' => 'Read More',
+                            'default' => 'Read More',
+                            'hint'    => esc_attr__( 'Read More Button Label', '@@text_domain' ),
+                            'hint_place' => 'left',
+                            'condition' => array(
+                                array(
+                                    'control' => 'show_read_more',
+                                    'operator' => '!=',
+                                    'value' => 'false',
+                                ),
                             ),
                         ),
                     ),
                 ),
-            ),
 
-            // Fly.
-            'fly' => array(
-                'title' => esc_html__( 'Fly', '@@text_domain' ),
-                'builtin_controls' => array(
-                    'show_title' => true,
-                    'show_categories' => true,
-                    'show_date' => true,
-                    'show_excerpt' => true,
-                    'show_icons' => true,
-                    'align' => 'extended',
-                ),
-                'controls' => array(
-                    array(
-                        'type'    => 'color',
-                        'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
-                        'name'    => 'bg_color',
-                        'default' => '#212125',
-                        'alpha'   => true,
-                        'style'   => array(
-                            array(
-                                'element'  => '.vp-portfolio__items-style-fly .vp-portfolio__item-overlay',
-                                'property' => 'background-color',
+                // Fly.
+                'fly' => array(
+                    'title' => esc_html__( 'Fly', '@@text_domain' ),
+                    'builtin_controls' => array(
+                        'show_title' => true,
+                        'show_categories' => true,
+                        'show_date' => true,
+                        'show_excerpt' => true,
+                        'show_icons' => true,
+                        'align' => 'extended',
+                    ),
+                    'controls' => array(
+                        array(
+                            'type'    => 'color',
+                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                            'name'    => 'bg_color',
+                            'default' => '#212125',
+                            'alpha'   => true,
+                            'style'   => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-fly .vp-portfolio__item-overlay',
+                                    'property' => 'background-color',
+                                ),
+                            ),
+                        ),
+                        array(
+                            'type'    => 'color',
+                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                            'name'    => 'text_color',
+                            'default' => '#fff',
+                            'alpha'   => true,
+                            'style'   => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-fly .vp-portfolio__item-overlay',
+                                    'property' => 'color',
+                                ),
                             ),
                         ),
                     ),
-                    array(
-                        'type'    => 'color',
-                        'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
-                        'name'    => 'text_color',
-                        'default' => '#fff',
-                        'alpha'   => true,
-                        'style'   => array(
-                            array(
-                                'element'  => '.vp-portfolio__items-style-fly .vp-portfolio__item-overlay',
-                                'property' => 'color',
-                            ),
-                        ),
-                    ),
                 ),
-            ),
 
-            // Emerge.
-            'emerge' => array(
-                'title' => esc_html__( 'Emerge', '@@text_domain' ),
-                'builtin_controls' => array(
-                    'show_title' => true,
-                    'show_categories' => true,
-                    'show_date' => true,
-                    'show_excerpt' => true,
-                    'show_icons' => false,
-                    'align' => true,
-                ),
-                'controls' => array(
-                    array(
-                        'type'    => 'color',
-                        'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
-                        'name'    => 'bg_color',
-                        'default' => '#fff',
-                        'alpha'   => true,
-                        'style'   => array(
-                            array(
-                                'element'  => '.vp-portfolio__items-style-emerge .vp-portfolio__item-overlay',
-                                'property' => 'background-color',
+                // Emerge.
+                'emerge' => array(
+                    'title' => esc_html__( 'Emerge', '@@text_domain' ),
+                    'builtin_controls' => array(
+                        'show_title' => true,
+                        'show_categories' => true,
+                        'show_date' => true,
+                        'show_excerpt' => true,
+                        'show_icons' => false,
+                        'align' => true,
+                    ),
+                    'controls' => array(
+                        array(
+                            'type'    => 'color',
+                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                            'name'    => 'bg_color',
+                            'default' => '#fff',
+                            'alpha'   => true,
+                            'style'   => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-emerge .vp-portfolio__item-overlay',
+                                    'property' => 'background-color',
+                                ),
+                            ),
+                        ),
+                        array(
+                            'type'    => 'color',
+                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                            'name'    => 'text_color',
+                            'default' => '#000',
+                            'alpha'   => true,
+                            'style'   => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-emerge .vp-portfolio__item-overlay',
+                                    'property' => 'color',
+                                ),
                             ),
                         ),
                     ),
-                    array(
-                        'type'    => 'color',
-                        'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
-                        'name'    => 'text_color',
-                        'default' => '#000',
-                        'alpha'   => true,
-                        'style'   => array(
-                            array(
-                                'element'  => '.vp-portfolio__items-style-emerge .vp-portfolio__item-overlay',
-                                'property' => 'color',
-                            ),
-                        ),
-                    ),
                 ),
-            ),
 
-            // Fade.
-            'fade' => array(
-                'title' => esc_html__( 'Fade', '@@text_domain' ),
-                'builtin_controls' => array(
-                    'show_title' => true,
-                    'show_categories' => true,
-                    'show_date' => true,
-                    'show_excerpt' => true,
-                    'show_icons' => true,
-                    'align' => 'extended',
-                ),
-                'controls' => array(
-                    array(
-                        'type'    => 'color',
-                        'label'   => esc_html__( 'Overlay background color', '@@text_domain' ),
-                        'name'    => 'bg_color',
-                        'default' => 'rgba(0, 0, 0, 0.85)',
-                        'alpha'   => true,
-                        'style'   => array(
-                            array(
-                                'element'  => '.vp-portfolio__items-style-fade .vp-portfolio__item-overlay',
-                                'property' => 'background-color',
+                // Fade.
+                'fade' => array(
+                    'title' => esc_html__( 'Fade', '@@text_domain' ),
+                    'builtin_controls' => array(
+                        'show_title' => true,
+                        'show_categories' => true,
+                        'show_date' => true,
+                        'show_excerpt' => true,
+                        'show_icons' => true,
+                        'align' => 'extended',
+                    ),
+                    'controls' => array(
+                        array(
+                            'type'    => 'color',
+                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                            'name'    => 'bg_color',
+                            'default' => 'rgba(0, 0, 0, 0.85)',
+                            'alpha'   => true,
+                            'style'   => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-fade .vp-portfolio__item-overlay',
+                                    'property' => 'background-color',
+                                ),
+                            ),
+                        ),
+                        array(
+                            'type'    => 'color',
+                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                            'name'    => 'text_color',
+                            'default' => '#fff',
+                            'alpha'   => true,
+                            'style'   => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-fade .vp-portfolio__item-overlay',
+                                    'property' => 'color',
+                                ),
                             ),
                         ),
                     ),
-                    array(
-                        'type'    => 'color',
-                        'label'   => esc_html__( 'Overlay text color', '@@text_domain' ),
-                        'name'    => 'text_color',
-                        'default' => '#fff',
-                        'alpha'   => true,
-                        'style'   => array(
-                            array(
-                                'element'  => '.vp-portfolio__items-style-fade .vp-portfolio__item-overlay',
-                                'property' => 'color',
-                            ),
-                        ),
-                    ),
                 ),
-            ),
-        ), Visual_Portfolio_Extend::items_styles() );
+            ), Visual_Portfolio_Extend::items_styles()
+        );
 
         // Extend specific item style controls.
         foreach ( $items_styles as $name => $style ) {
@@ -1576,7 +1582,7 @@ class Visual_Portfolio_Admin {
                         case 'show_title':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Show title', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Title', '@@text_domain' ),
                                 'name'    => 'show_title',
                                 'default' => true,
                             );
@@ -1584,13 +1590,13 @@ class Visual_Portfolio_Admin {
                         case 'show_categories':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Show categories', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Categories', '@@text_domain' ),
                                 'name'    => 'show_categories',
                                 'default' => true,
                             );
                             $new_fields[] = array(
                                 'type'    => 'range',
-                                'label'   => esc_html__( 'Categories count', '@@text_domain' ),
+                                'label'   => esc_html__( 'Categories Count', '@@text_domain' ),
                                 'name'    => 'categories_count',
                                 'min'     => 1,
                                 'max'     => 10,
@@ -1605,12 +1611,12 @@ class Visual_Portfolio_Admin {
                         case 'show_date':
                             $new_fields[] = array(
                                 'type'    => 'select2',
-                                'label'   => esc_html__( 'Show date', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Date', '@@text_domain' ),
                                 'name'    => 'show_date',
                                 'default' => false,
                                 'options' => array(
-                                    'false' => esc_html__( 'False', '@@text_domain' ),
-                                    'true'  => esc_html__( 'Show', '@@text_domain' ),
+                                    'false' => esc_html__( 'Hide', '@@text_domain' ),
+                                    'true'  => esc_html__( 'Default', '@@text_domain' ),
                                     'human' => esc_html__( 'Human Format', '@@text_domain' ),
                                 ),
                             );
@@ -1631,13 +1637,13 @@ class Visual_Portfolio_Admin {
                         case 'show_excerpt':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Show excerpt', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Excerpt', '@@text_domain' ),
                                 'name'    => 'show_excerpt',
                                 'default' => false,
                             );
                             $new_fields[] = array(
                                 'type'    => 'range',
-                                'label'   => esc_html__( 'Excerpt words count', '@@text_domain' ),
+                                'label'   => esc_html__( 'Excerpt Words Count', '@@text_domain' ),
                                 'name'    => 'excerpt_words_count',
                                 'default' => 15,
                                 'min'     => 1,
@@ -1652,7 +1658,7 @@ class Visual_Portfolio_Admin {
                         case 'show_icons':
                             $new_fields[] = array(
                                 'type'    => 'toggle',
-                                'label'   => esc_html__( 'Show icon', '@@text_domain' ),
+                                'label'   => esc_html__( 'Display Icon', '@@text_domain' ),
                                 'name'    => 'show_icon',
                                 'default' => false,
                             );
@@ -1660,8 +1666,8 @@ class Visual_Portfolio_Admin {
                                 'type'        => 'text',
                                 'name'        => 'icon',
                                 'default'     => 'fas fa-search',
-                                'placeholder' => esc_attr__( 'Standard icon', '@@text_domain' ),
-                                'hint'        => esc_attr__( 'Standard icon', '@@text_domain' ),
+                                'placeholder' => esc_attr__( 'Standard Icon', '@@text_domain' ),
+                                'hint'        => esc_attr__( 'Standard Icon', '@@text_domain' ),
                                 'hint_place'  => 'left',
                                 'condition'   => array(
                                     array(
@@ -1673,8 +1679,8 @@ class Visual_Portfolio_Admin {
                                 'type'        => 'text',
                                 'name'        => 'icon_video',
                                 'default'     => 'fas fa-play',
-                                'placeholder' => esc_attr__( 'Video icon', '@@text_domain' ),
-                                'hint'        => esc_attr__( 'Video icon', '@@text_domain' ),
+                                'placeholder' => esc_attr__( 'Video Icon', '@@text_domain' ),
+                                'hint'        => esc_attr__( 'Video Icon', '@@text_domain' ),
                                 'hint_place'  => 'left',
                                 'condition'   => array(
                                     array(
@@ -1686,7 +1692,7 @@ class Visual_Portfolio_Admin {
                         case 'align':
                             $new_fields[] = array(
                                 'type'    => 'align',
-                                'label'   => esc_html__( 'Caption align', '@@text_domain' ),
+                                'label'   => esc_html__( 'Caption Align', '@@text_domain' ),
                                 'name'    => 'align',
                                 'default' => 'center',
                                 'extended' => 'extended' === $val,
@@ -1733,102 +1739,112 @@ class Visual_Portfolio_Admin {
         /**
          * Items Click Action
          */
-        Visual_Portfolio_Controls::register( array(
-            'category' => 'items-click-action',
-            'type'     => 'select2',
-            'name'     => 'vp_items_click_action',
-            'default'  => 'url',
-            'options'  => array(
-                'false'         => esc_html__( 'Disabled', '@@text_domain' ),
-                'url'           => esc_html__( 'URL', '@@text_domain' ),
-                'popup_gallery' => esc_html__( 'Popup Gallery', '@@text_domain' ),
-            ),
-        ) );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'items-click-action',
+                'type'     => 'select2',
+                'name'     => 'vp_items_click_action',
+                'default'  => 'url',
+                'options'  => array(
+                    'false'         => esc_html__( 'Disabled', '@@text_domain' ),
+                    'url'           => esc_html__( 'URL', '@@text_domain' ),
+                    'popup_gallery' => esc_html__( 'Popup Gallery', '@@text_domain' ),
+                ),
+            )
+        );
 
         // url.
-        Visual_Portfolio_Controls::register( array(
-            'category' => 'items-click-action',
-            'type'     => 'select2',
-            'label'    => esc_html__( 'Target', '@@text_domain' ),
-            'name'     => 'vp_items_click_action_url_target',
-            'default'  => '',
-            'options'  => array(
-                '' => esc_html__( 'Default', '@@text_domain' ),
-                '_blank' => esc_html__( 'New tab (_blank)', '@@text_domain' ),
-                '_top' => esc_html__( 'Top frame (_top)', '@@text_domain' ),
-            ),
-            'condition' => array(
-                array(
-                    'control' => 'vp_items_click_action',
-                    'value' => 'url',
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'items-click-action',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Target', '@@text_domain' ),
+                'name'     => 'vp_items_click_action_url_target',
+                'default'  => '',
+                'options'  => array(
+                    '' => esc_html__( 'Default', '@@text_domain' ),
+                    '_blank' => esc_html__( 'New Tab (_blank)', '@@text_domain' ),
+                    '_top' => esc_html__( 'Top Frame (_top)', '@@text_domain' ),
                 ),
-            ),
-        ) );
+                'condition' => array(
+                    array(
+                        'control' => 'vp_items_click_action',
+                        'value' => 'url',
+                    ),
+                ),
+            )
+        );
 
         // popup.
-        Visual_Portfolio_Controls::register( array(
-            'category' => 'items-click-action',
-            'type'     => 'select2',
-            'label'    => esc_html__( 'Title', '@@text_domain' ),
-            'name'     => 'vp_items_click_action_popup_title_source',
-            'default'  => 'title',
-            'options'  => array(
-                'none'        => esc_html__( 'None', '@@text_domain' ),
-                'title'       => esc_html__( 'Image Title', '@@text_domain' ),
-                'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
-                'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
-                'description' => esc_html__( 'Image Description', '@@text_domain' ),
-            ),
-            'condition' => array(
-                array(
-                    'control' => 'vp_items_click_action',
-                    'value' => 'popup_gallery',
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'items-click-action',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Title', '@@text_domain' ),
+                'name'     => 'vp_items_click_action_popup_title_source',
+                'default'  => 'title',
+                'options'  => array(
+                    'none'        => esc_html__( 'None', '@@text_domain' ),
+                    'title'       => esc_html__( 'Image Title', '@@text_domain' ),
+                    'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
+                    'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
+                    'description' => esc_html__( 'Image Description', '@@text_domain' ),
                 ),
-            ),
-        ) );
-        Visual_Portfolio_Controls::register( array(
-            'category' => 'items-click-action',
-            'type'     => 'select2',
-            'label'    => esc_html__( 'Description', '@@text_domain' ),
-            'name'     => 'vp_items_click_action_popup_description_source',
-            'default'  => 'description',
-            'options'  => array(
-                'none'        => esc_html__( 'None', '@@text_domain' ),
-                'title'       => esc_html__( 'Image Title', '@@text_domain' ),
-                'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
-                'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
-                'description' => esc_html__( 'Image Description', '@@text_domain' ),
-            ),
-            'condition' => array(
-                array(
-                    'control' => 'vp_items_click_action',
-                    'value' => 'popup_gallery',
+                'condition' => array(
+                    array(
+                        'control' => 'vp_items_click_action',
+                        'value' => 'popup_gallery',
+                    ),
                 ),
-            ),
-        ) );
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'items-click-action',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Description', '@@text_domain' ),
+                'name'     => 'vp_items_click_action_popup_description_source',
+                'default'  => 'description',
+                'options'  => array(
+                    'none'        => esc_html__( 'None', '@@text_domain' ),
+                    'title'       => esc_html__( 'Image Title', '@@text_domain' ),
+                    'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
+                    'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
+                    'description' => esc_html__( 'Image Description', '@@text_domain' ),
+                ),
+                'condition' => array(
+                    array(
+                        'control' => 'vp_items_click_action',
+                        'value' => 'popup_gallery',
+                    ),
+                ),
+            )
+        );
 
         /**
          * Filter.
          */
-        $filters = array_merge( array(
-            // False.
-            'false' => array(
-                'title' => esc_html__( 'Disabled', '@@text_domain' ),
-                'controls' => array(),
-            ),
+        $filters = array_merge(
+            array(
+                // False.
+                'false' => array(
+                    'title' => esc_html__( 'Disabled', '@@text_domain' ),
+                    'controls' => array(),
+                ),
 
-            // Default.
-            'default' => array(
-                'title' => esc_html__( 'Default', '@@text_domain' ),
-                'controls' => array(),
-            ),
+                // Default.
+                'default' => array(
+                    'title' => esc_html__( 'Default', '@@text_domain' ),
+                    'controls' => array(),
+                ),
 
-            // Dropdown.
-            'dropdown' => array(
-                'title' => esc_html__( 'Dropdown', '@@text_domain' ),
-                'controls' => array(),
-            ),
-        ), Visual_Portfolio_Extend::filters() );
+                // Dropdown.
+                'dropdown' => array(
+                    'title' => esc_html__( 'Dropdown', '@@text_domain' ),
+                    'controls' => array(),
+                ),
+            ), Visual_Portfolio_Extend::filters()
+        );
 
         // Extend specific filter controls.
         foreach ( $filters as $name => $filter ) {
@@ -1908,7 +1924,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'filter',
                 'type'     => 'toggle',
-                'label'    => esc_html__( 'Show count', '@@text_domain' ),
+                'label'    => esc_html__( 'Display Count', '@@text_domain' ),
                 'name'     => 'vp_filter_show_count',
                 'default'  => false,
                 'condition' => array(
@@ -1924,7 +1940,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'filter',
                 'type'     => 'text',
-                'label'    => esc_html__( 'All button text', '@@text_domain' ),
+                'label'    => esc_html__( 'All Button Text', '@@text_domain' ),
                 'name'     => 'vp_filter_text_all',
                 'default'  => esc_attr__( 'All', '@@text_domain' ),
                 'condition' => array(
@@ -1940,25 +1956,27 @@ class Visual_Portfolio_Admin {
         /**
          * Sort.
          */
-        $sorts = array_merge( array(
-            // False.
-            'false' => array(
-                'title' => esc_html__( 'Disabled', '@@text_domain' ),
-                'controls' => array(),
-            ),
+        $sorts = array_merge(
+            array(
+                // False.
+                'false' => array(
+                    'title' => esc_html__( 'Disabled', '@@text_domain' ),
+                    'controls' => array(),
+                ),
 
-            // Default.
-            'default' => array(
-                'title' => esc_html__( 'Default', '@@text_domain' ),
-                'controls' => array(),
-            ),
+                // Default.
+                'default' => array(
+                    'title' => esc_html__( 'Default', '@@text_domain' ),
+                    'controls' => array(),
+                ),
 
-            // Dropdown.
-            'dropdown' => array(
-                'title' => esc_html__( 'Dropdown', '@@text_domain' ),
-                'controls' => array(),
-            ),
-        ), Visual_Portfolio_Extend::sort() );
+                // Dropdown.
+                'dropdown' => array(
+                    'title' => esc_html__( 'Dropdown', '@@text_domain' ),
+                    'controls' => array(),
+                ),
+            ), Visual_Portfolio_Extend::sort()
+        );
 
         // Extend specific sort controls.
         foreach ( $sorts as $name => $sort ) {
@@ -2038,19 +2056,21 @@ class Visual_Portfolio_Admin {
         /**
          * Pagination
          */
-        $pagination = array_merge( array(
-            // False.
-            'false' => array(
-                'title' => esc_html__( 'Disabled', '@@text_domain' ),
-                'controls' => array(),
-            ),
+        $pagination = array_merge(
+            array(
+                // False.
+                'false' => array(
+                    'title' => esc_html__( 'Disabled', '@@text_domain' ),
+                    'controls' => array(),
+                ),
 
-            // Default.
-            'default' => array(
-                'title' => esc_html__( 'Default', '@@text_domain' ),
-                'controls' => array(),
-            ),
-        ), Visual_Portfolio_Extend::pagination() );
+                // Default.
+                'default' => array(
+                    'title' => esc_html__( 'Default', '@@text_domain' ),
+                    'controls' => array(),
+                ),
+            ), Visual_Portfolio_Extend::pagination()
+        );
 
         // Extend specific pagination controls.
         foreach ( $pagination as $name => $pagin ) {
@@ -2217,7 +2237,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'text',
                 'name'     => 'vp_pagination_infinite_text_load',
-                'default'  => esc_attr__( 'Load more', '@@text_domain' ),
+                'default'  => esc_attr__( 'Load More', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
@@ -2240,7 +2260,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'text',
                 'name'     => 'vp_pagination_infinite_text_loading',
-                'default'  => esc_attr__( 'Loading more...', '@@text_domain' ),
+                'default'  => esc_attr__( 'Loading More...', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
@@ -2286,7 +2306,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'text',
                 'name'     => 'vp_pagination_load_more_text_load',
-                'default'  => esc_attr__( 'Load more', '@@text_domain' ),
+                'default'  => esc_attr__( 'Load More', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
@@ -2309,7 +2329,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'text',
                 'name'     => 'vp_pagination_load_more_text_loading',
-                'default'  => esc_attr__( 'Loading more...', '@@text_domain' ),
+                'default'  => esc_attr__( 'Loading More...', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
@@ -2354,7 +2374,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'pagination',
                 'type'      => 'toggle',
-                'label'     => esc_html__( 'Show arrows', '@@text_domain' ),
+                'label'     => esc_html__( 'Display Arrows', '@@text_domain' ),
                 'name'      => 'vp_pagination_paged__show_arrows',
                 'default'   => true,
                 'condition' => array(
@@ -2376,8 +2396,8 @@ class Visual_Portfolio_Admin {
                 'type'        => 'text',
                 'name'        => 'vp_pagination_paged__arrows_icon_prev',
                 'default'     => 'fas fa-angle-left',
-                'placeholder' => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Prev arrow icon', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
@@ -2401,8 +2421,8 @@ class Visual_Portfolio_Admin {
                 'type'        => 'text',
                 'name'        => 'vp_pagination_paged__arrows_icon_next',
                 'default'     => 'fas fa-angle-right',
-                'placeholder' => esc_attr__( 'Next arrow icon', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Next arrow icon', '@@text_domain' ),
+                'placeholder' => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
+                'hint'        => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
@@ -2424,7 +2444,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'pagination',
                 'type'      => 'toggle',
-                'label'     => esc_html__( 'Show numbers', '@@text_domain' ),
+                'label'     => esc_html__( 'Display Numbers', '@@text_domain' ),
                 'name'      => 'vp_pagination_paged__show_numbers',
                 'default'   => true,
                 'condition' => array(
@@ -2488,7 +2508,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'   => 'content-source-posts',
                 'type'       => 'select2',
-                'label'      => esc_html__( 'Data source', '@@text_domain' ),
+                'label'      => esc_html__( 'Data Source', '@@text_domain' ),
                 'name'       => 'vp_posts_source',
                 'default'    => 'portfolio',
                 'value_callback' => array( $this, 'get_select2_post_types' ),
@@ -2500,7 +2520,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'   => 'content-source-posts',
                 'type'       => 'select2',
-                'label'      => esc_html__( 'Specific posts', '@@text_domain' ),
+                'label'      => esc_html__( 'Specific Posts', '@@text_domain' ),
                 'name'       => 'vp_posts_ids',
                 'default'    => array(),
                 'value_callback' => array( $this, 'get_select2_selected_posts' ),
@@ -2521,7 +2541,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'   => 'content-source-posts',
                 'type'       => 'select2',
-                'label'      => esc_html__( 'Excluded posts', '@@text_domain' ),
+                'label'      => esc_html__( 'Excluded Posts', '@@text_domain' ),
                 'name'       => 'vp_posts_excluded_ids',
                 'default'    => array(),
                 'value_callback' => array( $this, 'get_select2_excluded_posts' ),
@@ -2549,9 +2569,9 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'content-source-posts',
                 'type'      => 'textarea',
-                'label'     => esc_html__( 'Custom query', '@@text_domain' ),
+                'label'     => esc_html__( 'Custom Query', '@@text_domain' ),
                 // translators: %1$s - escaped url.
-                'description'  => sprintf( wp_kses( __( 'Build custom query according to <a href="%1$s">WordPress Codex</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'http://codex.wordpress.org/Function_Reference/query_posts' ) ),
+                'description'  => sprintf( wp_kses( __( 'Build custom query according to WordPress Codex. See example here <a href="%1$s">%1$s</a>.', '@@text_domain' ), $allowed_protocols ), esc_url( 'https://visualportfolio.co/documentation/portfolio-layouts/content-source/post-based/#custom-query' ) ),
                 'name'      => 'vp_posts_custom_query',
                 'default'   => '',
                 'cols'      => 30,
@@ -2604,7 +2624,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-posts',
                 'type'     => 'select2',
-                'label'    => esc_html__( 'Taxonomies relation', '@@text_domain' ),
+                'label'    => esc_html__( 'Taxonomies Relation', '@@text_domain' ),
                 'name'     => 'vp_posts_taxonomies_relation',
                 'default'  => 'or',
                 'options'  => array(
@@ -2647,13 +2667,23 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-posts',
                 'type'     => 'select2',
-                'label'    => esc_html__( 'Order direction', '@@text_domain' ),
+                'label'    => esc_html__( 'Order Direction', '@@text_domain' ),
                 'name'     => 'vp_posts_order_direction',
                 'default'  => 'desc',
                 'options'  => array(
                     'desc' => esc_html__( 'DESC', '@@text_domain' ),
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
                 ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-posts',
+                'type'     => 'toggle',
+                'label'    => esc_html__( 'Avoid Duplicate Posts', '@@text_domain' ),
+                'name'     => 'vp_posts_avoid_duplicate_posts',
+                'default'  => false,
                 'wrapper_class' => 'vp-col-6',
             )
         );
@@ -2684,6 +2714,42 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-images',
                 'type'     => 'select2',
+                'label'    => esc_html__( 'Titles', '@@text_domain' ),
+                'name'     => 'vp_images_titles_source',
+                'default'  => 'custom',
+                'options'  => array(
+                    'none'        => esc_html__( 'None', '@@text_domain' ),
+                    'custom'      => esc_html__( 'Custom', '@@text_domain' ),
+                    'title'       => esc_html__( 'Image Title', '@@text_domain' ),
+                    'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
+                    'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
+                    'description' => esc_html__( 'Image Description', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-images',
+                'type'     => 'select2',
+                'label'    => esc_html__( 'Descriptions', '@@text_domain' ),
+                'name'     => 'vp_images_descriptions_source',
+                'default'  => 'custom',
+                'options'  => array(
+                    'none'        => esc_html__( 'None', '@@text_domain' ),
+                    'custom'      => esc_html__( 'Custom', '@@text_domain' ),
+                    'title'       => esc_html__( 'Image Title', '@@text_domain' ),
+                    'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
+                    'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
+                    'description' => esc_html__( 'Image Description', '@@text_domain' ),
+                ),
+                'wrapper_class' => 'vp-col-6',
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'content-source-images',
+                'type'     => 'select2',
                 'label'    => esc_html__( 'Order by', '@@text_domain' ),
                 'name'     => 'vp_images_order_by',
                 'default'  => 'default',
@@ -2700,7 +2766,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category' => 'content-source-images',
                 'type'     => 'select2',
-                'label'    => esc_html__( 'Order direction', '@@text_domain' ),
+                'label'    => esc_html__( 'Order Direction', '@@text_domain' ),
                 'name'     => 'vp_images_order_direction',
                 'default'  => 'asc',
                 'options'  => array(
@@ -2908,6 +2974,20 @@ class Visual_Portfolio_Admin {
      */
     public function add_sort_metabox( $post ) {
         Visual_Portfolio_Controls::get_registered( 'sort' );
+
+        $type = Visual_Portfolio_Controls::get_registered_value( 'vp_sort' ) ? : 'default';
+        $align = Visual_Portfolio_Controls::get_registered_value( 'vp_sort_align' );
+
+        Visual_Portfolio_Controls::get(
+            array(
+                'type'  => 'text',
+                'label' => esc_html__( 'Sort Shortcode', '@@text_domain' ),
+                'description' => esc_html__( 'Place the shortcode where you want to show the sort.', '@@text_domain' ),
+                'name'  => 'vp_sort_shortcode',
+                'value' => $post->ID ? '[visual_portfolio_sort id="' . $post->ID . '" type="' . esc_attr( $type ) . '" align="' . esc_attr( $align ) . '" class=""]' : '',
+                'readonly' => true,
+            )
+        );
     }
 
     /**
@@ -2942,6 +3022,7 @@ class Visual_Portfolio_Admin {
         $url = add_query_arg(
             array(
                 'vp_preview_frame' => 'true',
+                'vp_preview_type' => 'layouts-editor',
                 'vp_preview_frame_id' => $post->ID,
             ), $url
         );
@@ -3040,13 +3121,12 @@ class Visual_Portfolio_Admin {
         <p class="description">
             <?php echo esc_html__( 'Available classes:', '@@text_domain' ); ?>
         </p>
-        <ul>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', '@@text_domain' ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__items</code><?php echo esc_html__( ' - items wrapper.', '@@text_domain' ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-portfolio__item</code><?php echo esc_html__( ' - single item wrapper.', '@@text_domain' ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-filter</code><?php echo esc_html__( ' - filter wrapper.', '@@text_domain' ); ?></li>
-            <li><code class="vp-onclick-selection">.vp-id-<?php echo esc_html( $post->ID ); ?> .vp-pagination</code><?php echo esc_html__( ' - pagination wrapper.', '@@text_domain' ); ?></li>
+        <ul class="vp-dom-tree-help">
+            <li><code>.vp-id-<?php echo esc_html( $post->ID ); ?></code><?php echo esc_html__( ' - use this classname for each styles you added. It is the main Visual Portfolio wrapper.', '@@text_domain' ); ?></li>
         </ul>
+        <div class="vp-dom-tree">
+            <span class="spinner is-active"></span>
+        </div>
         <?php
     }
 

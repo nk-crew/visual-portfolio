@@ -1,0 +1,48 @@
+/*
+ * Visual Portfolio styles for Fancybox.
+ */
+.vp-fancybox {
+    z-index: 1500;
+
+    // fixed top position when WP admin bar showed.
+    body.admin-bar & {
+        top: 32px;
+        height: calc(100% - 32px);
+
+        @media screen and (max-width: 782px) {
+            top: 42px;
+            height: calc(100% - 42px);
+        }
+        @media screen and (max-width: 600px) {
+            top: 0;
+            height: 100%;
+        }
+    }
+
+    .fancybox-caption__body {
+        font-size: 12px;
+        color: #fff;
+
+        h3 {
+            color: inherit;
+        }
+
+        a {
+            color: inherit;
+
+            &:hover {
+                opacity: .8;
+            }
+        }
+        .vp-portfolio__item-meta-title {
+            margin-top: 0;
+            margin-bottom: 3px;
+            font-size: 14px;
+            color: inherit;
+
+            a {
+                text-decoration: none;
+            }
+        }
+    }
+}

@@ -99,11 +99,11 @@ class Visual_Portfolio {
         // load textdomain.
         load_plugin_textdomain( '@@text_domain', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-        // register images sizes.
-        $this->add_image_sizes();
-
         // include helper files.
         $this->include_dependencies();
+
+        // register images sizes.
+        $this->add_image_sizes();
 
         // init classes.
         new Visual_Portfolio_Settings();
@@ -114,6 +114,7 @@ class Visual_Portfolio {
         new Visual_Portfolio_Admin();
         new Visual_Portfolio_TinyMCE();
         new Visual_Portfolio_VC();
+        new Visual_Portfolio_Elementor();
     }
 
     /**
@@ -121,13 +122,6 @@ class Visual_Portfolio {
      */
     public function init_hooks() {
         add_action( 'admin_init', array( $this, 'admin_init' ) );
-
-        // template_redirect is used instead of wp_enqueue_scripts just because some plugins use it and included an old isotope plugin. So, it was conflicted.
-        add_action( 'template_redirect', array( $this, 'register_scripts' ), 9 );
-        add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 9 );
-
-        // noscript tag.
-        add_filter( 'style_loader_tag', array( $this, 'style_loader_tag_noscript' ), 10, 2 );
     }
 
     /**
@@ -142,124 +136,6 @@ class Visual_Portfolio {
      */
     public function deactivation_hook() {
         flush_rewrite_rules();
-    }
-
-    /**
-     * Register scripts that will be used in the future when portfolio will be printed.
-     */
-    public function register_scripts() {
-        $vp_deps = array( 'jquery', 'imagesloaded' );
-        $vp_style_deps = array();
-
-        // Isotope.
-        if ( apply_filters( 'vpf_enqueue_plugin_isotope', true ) ) {
-            wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '3.0.6', true );
-
-            $vp_deps[] = 'isotope';
-        }
-
-        // fjGallery.
-        if ( apply_filters( 'vpf_enqueue_plugin_flickr_justified_gallery', true ) ) {
-            wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/fjGallery.min.js', array( 'jquery' ), '1.0.2', true );
-
-            $vp_deps[] = 'flickr-justified-gallery';
-        }
-
-        // Object Fit Images.
-        if ( apply_filters( 'vpf_enqueue_plugin_object_fit_images', true ) ) {
-            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', '', '3.2.4', true );
-
-            $vp_deps[] = 'object-fit-images';
-        }
-
-        // PhotoSwipe.
-        if ( apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
-            wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css', '', '4.1.3' );
-            wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css', array( 'photoswipe' ), '4.1.3' );
-            wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', '', '4.1.3', true );
-            wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'photoswipe' ), '4.1.3', true );
-
-            $vp_deps[] = 'photoswipe-ui-default';
-            $vp_style_deps[] = 'photoswipe-default-skin';
-        }
-
-        // Swiper.
-        if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.min.css', '', '4.5.0' );
-            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', '', '4.5.0', true );
-
-            $vp_deps[] = 'swiper';
-            $vp_style_deps[] = 'swiper';
-        }
-
-        // Font Awesome.
-        if ( apply_filters( 'vpf_enqueue_plugin_font_awesome', true ) ) {
-            wp_register_script( 'font-awesome-v4-shims', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/v4-shims.min.js', array(), '5.8.1', true );
-            wp_register_script( 'font-awesome', visual_portfolio()->plugin_url . 'assets/vendor/font-awesome/all.min.js', array( 'font-awesome-v4-shims' ), '5.8.1', true );
-
-            $vp_deps[] = 'font-awesome';
-        }
-
-        // LazySizes.
-        if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
-            wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
-            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '4.1.7', true );
-
-            $vp_deps[] = 'lazysizes-object-fit-cover';
-            $vp_deps[] = 'lazysizes';
-        }
-
-        // Visual Portfolio.
-        wp_register_script( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/js/script.min.js', $vp_deps, '@@plugin_version', true );
-        wp_register_style( '@@plugin_name', visual_portfolio()->plugin_url . 'assets/css/style.min.css', $vp_style_deps, '@@plugin_version' );
-        wp_register_style( '@@plugin_name-noscript', visual_portfolio()->plugin_url . 'assets/css/noscript.min.css', $vp_style_deps, '@@plugin_version' );
-
-        // Visual Portfolio data.
-        $data_init = array(
-            '__' => array(
-                'couldnt_retrieve_vp' => esc_attr( 'Couldn\'t retrieve Visual Portfolio ID.', '@@text_domain' ),
-                'pswp_close' => esc_attr( 'Close (Esc)', '@@text_domain' ),
-                'pswp_share' => esc_attr( 'Share', '@@text_domain' ),
-                'pswp_fs' => esc_attr( 'Toggle fullscreen', '@@text_domain' ),
-                'pswp_zoom' => esc_attr( 'Zoom in/out', '@@text_domain' ),
-                'pswp_prev' => esc_attr( 'Previous (arrow left)', '@@text_domain' ),
-                'pswp_next' => esc_attr( 'Next (arrow right)', '@@text_domain' ),
-                'pswp_share_fb' => esc_attr( 'Share on Facebook', '@@text_domain' ),
-                'pswp_share_tw' => esc_attr( 'Tweet', '@@text_domain' ),
-                'pswp_share_pin' => esc_attr( 'Pin it', '@@text_domain' ),
-            ),
-            'settingsPopupGallery' => array(
-                'show_arrows'            => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
-                'show_counter'           => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
-                'show_zoom_button'       => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
-                'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery', true ),
-                'show_share_button'      => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery', true ),
-                'show_close_button'      => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
-            ),
-        );
-        wp_localize_script( '@@plugin_name', 'VPData', $data_init );
-    }
-
-    /**
-     * Enqueue main style to prevent first-page load layout issues if the page contains portfolio.
-     */
-    public function wp_enqueue_scripts() {
-        wp_enqueue_style( '@@plugin_name' );
-        wp_enqueue_style( '@@plugin_name-noscript' );
-    }
-
-    /**
-     * Add noscript tag to styles.
-     *
-     * @param  string $tag    The tag we want to wrap around.
-     * @param  string $handle The handle of the tag.
-     * @return string         The wrapped around tag.
-     */
-    public function style_loader_tag_noscript( $tag, $handle ) {
-        if ( '@@plugin_name-noscript' === $handle ) {
-            $tag = '<noscript>' . $tag . '</noscript>';
-        }
-        return $tag;
     }
 
     /**
@@ -278,11 +154,23 @@ class Visual_Portfolio {
      * Add image sizes.
      */
     public function add_image_sizes() {
+        $sm = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) ? : 500;
+        $md = Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) ? : 800;
+        $lg = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) ? : 1280;
+        $xl = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) ? : 1920;
+        $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images', false ) ? : 500;
+        $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images', false ) ? : 800;
+        $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) ? : 1920;
+
         // custom image sizes.
-        add_image_size( 'vp_sm', 500, 500 );
-        add_image_size( 'vp_md', 800, 800 );
-        add_image_size( 'vp_lg', 1280, 1280 );
-        add_image_size( 'vp_xl', 1920, 1920 );
+        add_image_size( 'vp_sm', $sm, $sm );
+        add_image_size( 'vp_md', $md, $md );
+        add_image_size( 'vp_lg', $lg, $lg );
+        add_image_size( 'vp_xl', $xl, $xl );
+        add_image_size( 'vp_sm_popup', $sm_popup, $sm_popup );
+        add_image_size( 'vp_md_popup', $md_popup, $md_popup );
+        add_image_size( 'vp_xl_popup', $xl_popup, $xl_popup );
+
         add_filter( 'image_size_names_choose', array( $this, 'image_size_names_choose' ) );
     }
 
@@ -308,18 +196,20 @@ class Visual_Portfolio {
      * Include dependencies
      */
     private function include_dependencies() {
-        require_once( $this->plugin_path . 'classes/class-extend.php' );
-        require_once( $this->plugin_path . 'classes/class-images.php' );
-        require_once( $this->plugin_path . 'classes/class-settings.php' );
-        require_once( $this->plugin_path . 'classes/class-rest.php' );
-        require_once( $this->plugin_path . 'classes/class-get-portfolio.php' );
-        require_once( $this->plugin_path . 'classes/class-shortcode.php' );
-        require_once( $this->plugin_path . 'classes/class-preview.php' );
-        require_once( $this->plugin_path . 'classes/class-admin.php' );
-        require_once( $this->plugin_path . 'classes/class-controls.php' );
-        require_once( $this->plugin_path . 'classes/class-tinymce.php' );
-        require_once( $this->plugin_path . 'classes/class-vc.php' );
-        require_once( $this->plugin_path . 'classes/class-migration.php' );
+        require_once $this->plugin_path . 'classes/class-assets.php';
+        require_once $this->plugin_path . 'classes/class-extend.php';
+        require_once $this->plugin_path . 'classes/class-images.php';
+        require_once $this->plugin_path . 'classes/class-settings.php';
+        require_once $this->plugin_path . 'classes/class-rest.php';
+        require_once $this->plugin_path . 'classes/class-get-portfolio.php';
+        require_once $this->plugin_path . 'classes/class-shortcode.php';
+        require_once $this->plugin_path . 'classes/class-preview.php';
+        require_once $this->plugin_path . 'classes/class-admin.php';
+        require_once $this->plugin_path . 'classes/class-controls.php';
+        require_once $this->plugin_path . 'classes/class-tinymce.php';
+        require_once $this->plugin_path . 'classes/class-vc.php';
+        require_once $this->plugin_path . 'classes/class-elementor.php';
+        require_once $this->plugin_path . 'classes/class-migration.php';
     }
 
     /**
@@ -416,7 +306,7 @@ class Visual_Portfolio {
         }
 
         if ( function_exists( '_wp_oembed_get_object' ) ) {
-            require_once( ABSPATH . WPINC . '/class-oembed.php' );
+            require_once ABSPATH . WPINC . '/class-oembed.php';
         }
 
         $args = array();

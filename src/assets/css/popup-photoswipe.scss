@@ -1,0 +1,97 @@
+/*
+ * Visual Portfolio styles for PhotoSwipe.
+ */
+.vp-pswp {
+    z-index: 1500;
+
+    // fixed top position when WP admin bar showed.
+    body.admin-bar & {
+        top: 32px;
+        height: calc(100% - 32px);
+
+        @media screen and (max-width: 782px) {
+            top: 42px;
+            height: calc(100% - 42px);
+        }
+        @media screen and (max-width: 600px) {
+            top: 0;
+            height: 100%;
+        }
+    }
+
+    .pswp__caption {
+        background-color: rgba(0, 0, 0, .75);
+
+        > div {
+            max-width: 600px;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        h3 {
+            color: inherit;
+        }
+
+        a {
+            color: inherit;
+
+            &:hover {
+                opacity: .8;
+            }
+        }
+        .vp-portfolio__item-meta-title {
+            margin-top: 0;
+            margin-bottom: 3px;
+            font-size: 14px;
+            color: inherit;
+
+            a {
+                text-decoration: none;
+            }
+        }
+    }
+
+    .pswp__preloader {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+
+    .vp-pswp-video {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 1920px;
+        height: 100%;
+        margin: 0 auto;
+        line-height: 0;
+        text-align: left;
+        vertical-align: middle;
+        z-index: 1045;
+
+        > div {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%;
+
+            iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+            video {
+                // stylelint-disable-next-line declaration-no-important
+                width: 100% !important;
+                // stylelint-disable-next-line declaration-no-important
+                height: auto !important;
+                margin: 0;
+            }
+        }
+    }
+}

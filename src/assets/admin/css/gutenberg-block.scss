@@ -2,8 +2,6 @@
  * Gutenberg Block Styles
  */
 .wp-block-nk-visual-portfolio {
-    background-color: #f8f9f9;
-
     // placeholder
     .visual-portfolio-gutenberg-placeholder {
         flex-direction: row;
@@ -11,7 +9,7 @@
         justify-content: flex-start;
         min-height: 0;
         padding: 14px;
-        background-color: transparent;
+        background-color: #f8f9f9;
 
         .components-placeholder__label {
             flex: 1;
@@ -39,7 +37,8 @@
         }
 
         .spinner,
-        .components-base-control {
+        .components-base-control,
+        .components-base-control__field {
             margin: 0;
         }
     }
@@ -47,31 +46,43 @@
     // preview
     .visual-portfolio-gutenberg-preview {
         position: relative;
-        padding: 15px;
         overflow: hidden;
+        pointer-events: none;
 
-        &::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        // scale preview
         iframe {
-            // stylelint-disable-next-line
-            width: 200% !important;
-            // stylelint-disable-next-line
-            min-width: 200% !important;
-            height: 601px;
+            width: 100%;
+            max-width: none;
             min-height: 20px;
-            margin-bottom: -50%;
-            overflow: hidden;
-            transform: scale(.5);
-            transform-origin: 0 0;
+            margin: 0;
         }
     }
+    // .visual-portfolio-gutenberg-preview {
+    //     position: relative;
+    //     padding: 15px;
+    //     overflow: hidden;
+
+    //     &::after {
+    //         content: "";
+    //         position: absolute;
+    //         top: 0;
+    //         right: 0;
+    //         bottom: 0;
+    //         left: 0;
+    //         z-index: 1;
+    //     }
+
+    //     // scale preview
+    //     iframe {
+    //         // stylelint-disable-next-line
+    //         width: 200% !important;
+    //         // stylelint-disable-next-line
+    //         min-width: 200% !important;
+    //         height: 601px;
+    //         min-height: 20px;
+    //         margin-bottom: -50%;
+    //         overflow: hidden;
+    //         transform: scale(.5);
+    //         transform-origin: 0 0;
+    //     }
+    // }
 }

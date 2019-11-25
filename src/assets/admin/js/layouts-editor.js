@@ -91,15 +91,33 @@ function generateControlsStyles() {
 
         if ( 'none' !== $control.css( 'display' ) ) {
             const mask = $this.attr( 'data-style-mask' ) || '$';
-            const val = mask.replace( '$', $control.find( $this.attr( 'data-style-from' ) ).val() );
-            const selector = parentSelector + ' ' + $this.attr( 'data-style-element' );
-            const property = $this.attr( 'data-style-property' );
+            let $controlInput = $control.find( $this.attr( 'data-style-from' ) );
+            let controlVal = $controlInput.val();
+            let skip = false;
 
-            if ( styles ) {
-                styles += ' ';
+            // Toggle control support.
+            if ( $control.hasClass( 'vp-control-toggle' ) && $controlInput.length > 1 ) {
+                $controlInput = $controlInput.filter( '[type="checkbox"]' );
             }
 
-            styles += `${ selector } { ${ property }: ${ val }; }`;
+            // Checkbox and Toggle support.
+            if ( $controlInput.is( '[type="checkbox"]' ) ) {
+                controlVal = $controlInput.is( ':checked' );
+
+                skip = ! controlVal;
+            }
+
+            if ( ! skip ) {
+                const val = mask.replace( '$', controlVal );
+                const selector = parentSelector + ' ' + $this.attr( 'data-style-element' );
+                const property = $this.attr( 'data-style-property' );
+
+                if ( styles ) {
+                    styles += ' ';
+                }
+
+                styles += `${ selector } { ${ property }: ${ val }; }`;
+            }
         }
     } );
 
@@ -107,6 +125,123 @@ function generateControlsStyles() {
         $styles.val( styles ).trigger( 'vp-fake-change' );
     }
 }
+
+// generate dom tree.
+function getNodeTree( node ) {
+    if ( node.hasChildNodes() ) {
+        const children = [];
+
+        for ( let j = 0; j < node.childNodes.length; j++ ) {
+            children.push( getNodeTree( node.childNodes[ j ] ) );
+        }
+
+        return {
+            classList: node.classList,
+            nodeName: node.nodeName,
+            children: children,
+        };
+    }
+
+    return false;
+}
+
+function printTree( node, attrs ) {
+    if ( ! node ) {
+        return '';
+    }
+
+    let txt = '';
+
+    if ( node.children.length ) {
+        let newTxt = '';
+        let classNameString = '';
+        let skip = false;
+        let collapse = false;
+
+        // Classes.
+        if ( node.classList && node.classList.length ) {
+            classNameString = ' class="';
+            node.classList.forEach( ( className ) => {
+                if ( ! attrs.skipClass || ! attrs.skipClass.test( className ) ) {
+                    classNameString += `<span class="vp-dom-tree-node-class">${ className }</span>`;
+                }
+
+                // Skip?
+                if ( attrs.skipNodeByClass && attrs.skipNodeByClass.test( className ) ) {
+                    skip = true;
+                }
+
+                // Collapse?
+                if ( attrs.collapseByClass && attrs.collapseByClass.test( className ) ) {
+                    collapse = true;
+                }
+            } );
+            classNameString += '"';
+        }
+
+        if ( ! skip ) {
+            newTxt += '<ul>';
+            newTxt += `<li class="vp-dom-tree-node ${ collapse ? 'is-collapsed' : '' }"><div><span class="vp-dom-tree-node-collapse"></span>&lt;${ node.nodeName.toLowerCase() }${ classNameString }`;
+
+            newTxt += '&gt;</div></li>';
+
+            node.children.forEach( ( childNode ) => {
+                if ( childNode ) {
+                    newTxt += `<li class="vp-dom-tree-child">${ printTree( childNode, attrs ) }</li>`;
+                }
+            } );
+
+            newTxt += '</ul>';
+
+            txt += newTxt;
+        }
+    }
+
+    return txt;
+}
+
+function addDomTree() {
+    if ( $framePortfolio ) {
+        const nodeTree = getNodeTree( $framePortfolio[ 0 ] );
+        $( '.vp-dom-tree' ).html( printTree( nodeTree, {
+            skipNodeByClass: /vp-portfolio__item-popup/,
+            collapseByClass: /^(vp-portfolio__preloader-wrap|vp-portfolio__filter-wrap|vp-portfolio__sort-wrap|vp-portfolio__items-wrap|vp-portfolio__pagination-wrap)$/,
+            skipClass: /vp-uid-/,
+        } ) );
+    }
+}
+
+if ( typeof window.ClipboardJS !== 'undefined' ) {
+    new window.ClipboardJS( '.vp-dom-tree-node-class, .vp-dom-tree-help code', {
+        target( trigger ) {
+            return trigger;
+        },
+        text( trigger ) {
+            return `.${ trigger.innerText.replace( /^\./, '' ) }`;
+        },
+    } ).on( 'success', ( e ) => {
+        if ( typeof window.Tooltip !== 'undefined' ) {
+            if ( ! e.trigger.tooltipClipboard ) {
+                e.trigger.tooltipClipboard = new window.Tooltip( e.trigger, {
+                    placement: 'top',
+                    title: 'Copied to Clipboard!',
+                    trigger: 'manual',
+                    container: $body[ 0 ],
+                } );
+            }
+
+            e.trigger.tooltipClipboard.show();
+
+            $( e.trigger ).one( 'mouseleave', () => {
+                e.trigger.tooltipClipboard.hide();
+            } );
+        }
+    } );
+}
+
+$body.on( 'click', '.vp-dom-tree-node-collapse', function() {
+    $( this ).closest( 'li' ).toggleClass( 'is-collapsed' );
+} );
 
 // portfolio options changed
 function reloadFrame() {
@@ -166,6 +301,9 @@ $frame.on( 'load', function() {
 
     // generate custom styles.
     generateControlsStyles();
+
+    // add dom tree.
+    addDomTree();
 } );
 
 // live reload
@@ -174,7 +312,6 @@ $window.on( 'vp-preview-change', ( e, data ) => {
         return;
     }
     switch ( data.name ) {
-    case 'vp_layout':
     case 'vp_tiles_type':
     case 'vp_masonry_columns':
     case 'vp_grid_columns':
@@ -481,11 +618,44 @@ function updateGalleryData( $gallery ) {
     }
 }
 
+// Sticky gallery image additional data
+function maybeStickGalleryData() {
+    $galleries.find( '.vp-control-gallery-additional-data.active' ).each( function() {
+        const $this = $( this );
+        const $child = $this.children();
+
+        const height = $this.height();
+        const innerHeight = $child.height();
+
+        if ( innerHeight >= height ) {
+            $child.css( { marginTop: '' } );
+            return;
+        }
+
+        const maxOffset = height - innerHeight;
+
+        // 32 - admin top bar height
+        const blockOffset = $this.offset().top - 32;
+
+        if ( blockOffset >= 0 ) {
+            $child.css( { marginTop: '' } );
+            return;
+        }
+
+        $child.css( { marginTop: Math.min( maxOffset, Math.abs( blockOffset ) ) } );
+    } );
+}
+
+if ( $galleries.length ) {
+    $( '.postbox-container' ).on( 'scroll', debounce( 150, maybeStickGalleryData ) );
+    $window.on( 'scroll resize', debounce( 150, maybeStickGalleryData ) );
+}
+
 // show additional data block.
 function showAdditionalDataBlock( $gallery, id ) {
     const galleryName = $gallery.children( 'textarea' ).attr( 'name' );
     const $dataBlock = $gallery.children( '.vp-control-gallery-additional-data' );
-    const $previewBlock = $dataBlock.children( '.vp-control-gallery-additional-data-preview' );
+    const $previewBlock = $dataBlock.find( '.vp-control-gallery-additional-data-preview' );
     const $currentImg = $gallery.children( '.vp-control-gallery-items' ).find( '.vp-control-gallery-items-img[data-image-id="' + id + '"]' );
     const itemData = getGalleryItemData( $gallery, id );
     const itemMeta = getGalleryItemMeta( $gallery, id );
@@ -533,6 +703,8 @@ function showAdditionalDataBlock( $gallery, id ) {
     $dataBlock.addClass( 'active' );
 
     showedGalleries = $galleries.find( '.vp-control-gallery-additional-data.active' ).length;
+
+    debounce( 150, maybeStickGalleryData )();
 }
 
 // Sortable + gallery
