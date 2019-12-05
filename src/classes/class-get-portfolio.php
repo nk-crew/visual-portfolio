@@ -238,10 +238,17 @@ class Visual_Portfolio_Get {
         $old_post = $GLOBALS['post'];
 
         $is_images = 'images' === $options['vp_content_source'];
-        if ( $is_images ) {
+
+        $is_social = 'social-stream' === $options['vp_content_source'];
+
+        if ( $is_images || $is_social ) {
             $query_opts = self::get_query_params( $options );
 
-            $max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
+            if ( isset( $query_opts['max_num_pages'] ) ) {
+                $max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
+            } else {
+                $max_pages = $start_page;
+            }
         } else {
             // Get query params.
             $query_opts = self::get_query_params( $options );
@@ -480,7 +487,7 @@ class Visual_Portfolio_Get {
                     'vp_opts'         => $options,
                 );
 
-                if ( $is_images ) {
+                if ( $is_images || $is_social ) {
                     foreach ( $query_opts['images'] as $img ) {
                         // Get category taxonomies for data filter.
                         $filter_values  = array();
@@ -522,7 +529,7 @@ class Visual_Portfolio_Get {
                                 'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
                                 'published_time'  => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
                                 'filter'          => implode( ',', $filter_values ),
-                                'image_id'        => intval( $img['id'] ),
+                                'image_id'        => filter_var( $img['id'], FILTER_VALIDATE_URL ) ? $img['id'] : intval( $img['id'] ),
                                 'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
                                 'categories'      => $categories,
                             )
@@ -1400,13 +1407,15 @@ class Visual_Portfolio_Get {
             $active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
         }
 
-        $sort_items = Visual_Portfolio_Extend::sort_items( array(
-            '' => esc_html__( 'Default sorting', '@@text_domain' ),
-            'date_desc' => esc_html__( 'Sort by date (newest)', '@@text_domain' ),
-            'date' => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
-            'title' => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
-            'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
-        ), $vp_options );
+        $sort_items = Visual_Portfolio_Extend::sort_items(
+            array(
+                '' => esc_html__( 'Default sorting', '@@text_domain' ),
+                'date_desc' => esc_html__( 'Sort by date (newest)', '@@text_domain' ),
+                'date' => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
+                'title' => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
+                'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
+            ), $vp_options
+        );
 
         foreach ( $sort_items as $slug => $label ) {
             $url = self::get_pagenum_link(

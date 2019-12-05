@@ -87,7 +87,11 @@ class Visual_Portfolio_Images {
             self::$image_processing = true;
         }
 
-        $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
+        if ( filter_var( $attachment_id, FILTER_VALIDATE_URL ) ) {
+            $image = '<img src="' . esc_url( $attachment_id ) . '">';
+        } else {
+            $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
+        }
 
         if ( $lazyload ) {
             self::$image_processing = false;

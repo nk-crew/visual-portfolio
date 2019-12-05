@@ -38,7 +38,7 @@ class Visual_Portfolio_Shortcode {
             ), $atts
         );
 
-        return Visual_Portfolio_Get::get( $atts );
+        return apply_filters( 'vpf_get_shortcode_out', Visual_Portfolio_Get::get( $atts ), $atts );
     }
 
     /**

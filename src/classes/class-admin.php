@@ -3064,6 +3064,12 @@ class Visual_Portfolio_Admin {
                 </div>
                 <div class="vp-content-source__item-title"><?php echo esc_html__( 'Images', '@@text_domain' ); ?></div>
             </div>
+            <div class="vp-content-source__item" data-content="social-stream">
+                <div class="vp-content-source__item-icon">
+                    <span class="dashicons dashicons-share"></span>
+                </div>
+                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Social', '@@text_domain' ); ?></div>
+            </div>
 
             <div class="vp-content-source__item-content">
                 <div data-content="portfolio">
@@ -3102,6 +3108,24 @@ class Visual_Portfolio_Admin {
                     <div class="vp-row">
                         <?php
                         Visual_Portfolio_Controls::get_registered( 'content-source-images' );
+                        ?>
+                    </div>
+                </div>
+                <div data-content="social-stream">
+                    <!-- Images -->
+
+                    <p>
+                        <?php
+                        $url = 'https://visualportfolio.co/pricing';
+                        // translators: %1$s - escaped url.
+                        // translators: %2$s - non-escaped url.
+                        $social_stream_information = sprintf( apply_filters( 'vpf_print_social_stream_information', __( 'Social Stream are only available in the pro version of the plugin: <a href="%1$s" target="_blank">%2$s</a>', '@@text_domain' ) ), esc_url( $url ), esc_html( $url ) );
+                        echo wp_kses( $social_stream_information, $allowed_protocols );
+                        ?>
+                    </p>
+                    <div class="vp-row">
+                        <?php
+                        do_action( 'vpf_get_source_social_stream_registered_controls' );
                         ?>
                     </div>
                 </div>
