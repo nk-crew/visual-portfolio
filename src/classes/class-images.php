@@ -79,16 +79,111 @@ class Visual_Portfolio_Images {
      * @param bool         $icon icon.
      * @param string|array $attr image attributes.
      * @param bool         $lazyload use lazyload tags.
+     * @param bool|array   $custom_image use for unregistered database images.
      *
      * @return string
      */
-    public static function get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazyload = true ) {
+    public static function get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazyload = true, $custom_image = false ) {
         if ( $lazyload ) {
             self::$image_processing = true;
         }
 
-        if ( filter_var( $attachment_id, FILTER_VALIDATE_URL ) ) {
-            $image = '<img src="' . esc_url( $attachment_id ) . '">';
+        if ( is_array( $custom_image ) && $custom_image ) {
+
+            $widths = array();
+            foreach ( $custom_image as $key => $image_src ) {
+                if ( $image_src ) {
+                    $widths[] = absint( $key );
+                }
+            }
+
+            $src = ! empty( $widths ) ? $custom_image[ (string) max( $widths ) ] : '';
+
+            list( $width, $height ) = @getimagesize( $src );
+            $hwstring               = image_hwstring( $width, $height );
+            $size_class             = $size;
+
+            if ( is_array( $size_class ) ) {
+                $size_class = join( 'x', $size_class );
+            }
+
+            $default_attr = array(
+                'src'   => $src,
+                'class' => "attachment-$size_class size-$size_class",
+                'alt'   => '',
+            );
+
+            $attr = wp_parse_args( $attr, $default_attr );
+
+            if ( self::$image_processing ) {
+                $placeholder = self::get_image_placeholder( $width, $height );
+                $attr['src'] = $placeholder;
+                $attr['class'] .= ' visual-portfolio-lazyload';
+            }
+
+            // Generate 'srcset' and 'sizes' if not already present.
+            if ( ( ! isset( $attr['srcset'] ) || empty( $attr['srcset'] ) ) ) {
+
+                if ( is_array( $custom_image ) ) {
+                    $srcset     = '';
+                    $current_image_key = 0;
+                    $image_count = count( $custom_image );
+
+                    foreach ( $custom_image as $key => $image_src ) {
+                        if ( $image_src ) {
+                            $srcset .= $image_src . ' ' . $key . 'w';
+                            $current_image_key++;
+                            if ( $current_image_key < $image_count ) {
+                                $srcset .= ', ';
+                            }
+                        } else {
+                            $image_count--;
+                        }
+                    }
+
+                    $sizes = ! empty( $widths ) ? sprintf( '(max-width: %1$dpx) 100vw, %1$dpx', max( $widths ) ) : false;
+
+                    if ( $srcset && ( $sizes || ! empty( $attr['sizes'] ) ) && ! $lazyload ) {
+                        $attr['srcset'] = $srcset;
+
+                        if ( empty( $attr['sizes'] ) ) {
+                            $attr['sizes'] = $sizes;
+                        }
+                    }
+
+                    if ( $srcset && $lazyload ) {
+                        $attr['data-vpf-srcset'] = $srcset;
+                    }
+                }
+            }
+
+            if ( $lazyload ) {
+                $attr['data-vpf-sizes'] = 'auto';
+                $attr['data-vpf-src'] = $src;
+
+                if ( isset( $attr['sizes'] ) && ! empty( $attr['sizes'] ) ) {
+                    unset( $attr['sizes'] );
+                }
+            }
+
+            /**
+             * Filters the list of attachment image attributes.
+             *
+             * @since 2.8.0
+             *
+             * @param array        $attr       Attributes for the image markup.
+             * @param WP_Post      $attachment Image attachment post.
+             * @param string|array $size       Requested size. Image size or array of width and height values
+             *                                 (in that order). Default 'thumbnail'.
+             */
+            $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, array( 'ID' => $attachment_id ), $size );
+
+            $attr = array_map( 'esc_attr', $attr );
+            $image = rtrim( "<img $hwstring" );
+            foreach ( $attr as $name => $value ) {
+                $image .= " $name=" . '"' . $value . '"';
+            }
+            $image .= ' />';
         } else {
             $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
         }

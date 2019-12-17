@@ -529,9 +529,10 @@ class Visual_Portfolio_Get {
                                 'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
                                 'published_time'  => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
                                 'filter'          => implode( ',', $filter_values ),
-                                'image_id'        => filter_var( $img['id'], FILTER_VALIDATE_URL ) ? $img['id'] : intval( $img['id'] ),
+                                'image_id'        => intval( $img['id'] ),
                                 'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
                                 'categories'      => $categories,
+                                'custom_image'    => isset( $img['image'] ) && $img['image'] ? $img['image'] : false,
                             )
                         );
 
@@ -1511,8 +1512,8 @@ class Visual_Portfolio_Get {
         $is_posts = 'post-based' === $args['vp_opts']['vp_content_source'] || 'portfolio' === $args['vp_opts']['vp_content_source'];
 
         // prepare image.
-        $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'] );
-        $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', false );
+        $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', true, $args['custom_image'] );
+        $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', false, $args['custom_image'] );
 
         // prepare date.
         if ( isset( $args['opts']['show_date'] ) ) {

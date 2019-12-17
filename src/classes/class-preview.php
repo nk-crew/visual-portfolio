@@ -237,7 +237,7 @@ class Visual_Portfolio_Preview {
                 <div id="vp_preview" class="<?php echo esc_attr( $class_name ); ?>">
                     <?php
                         // phpcs:ignore
-                        echo apply_filters( 'vpf_print_template', Visual_Portfolio_Get::get( array( 'id' => $id ) ), $id );
+                        echo Visual_Portfolio_Get::get( array( 'id' => $id ) );
                     ?>
                 </div>
 

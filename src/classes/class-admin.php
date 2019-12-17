@@ -65,6 +65,8 @@ class Visual_Portfolio_Admin {
         add_action( 'wp_ajax_vp_find_posts', array( $this, 'ajax_find_posts' ) );
         add_action( 'wp_ajax_vp_find_taxonomies', array( $this, 'ajax_find_taxonomies' ) );
         add_action( 'wp_ajax_vp_find_oembed', array( $this, 'ajax_find_oembed' ) );
+
+        add_action( 'vpf_get_source_social_stream_registered_controls', array( __class__, 'social_stream_information' ) );
     }
 
     /**
@@ -3112,17 +3114,6 @@ class Visual_Portfolio_Admin {
                     </div>
                 </div>
                 <div data-content="social-stream">
-                    <!-- Images -->
-
-                    <p>
-                        <?php
-                        $url = 'https://visualportfolio.co/pricing';
-                        // translators: %1$s - escaped url.
-                        // translators: %2$s - non-escaped url.
-                        $social_stream_information = sprintf( apply_filters( 'vpf_print_social_stream_information', __( 'Social Stream are only available in the pro version of the plugin: <a href="%1$s" target="_blank">%2$s</a>', '@@text_domain' ) ), esc_url( $url ), esc_html( $url ) );
-                        echo wp_kses( $social_stream_information, $allowed_protocols );
-                        ?>
-                    </p>
                     <div class="vp-row">
                         <?php
                         do_action( 'vpf_get_source_social_stream_registered_controls' );
@@ -3132,6 +3123,26 @@ class Visual_Portfolio_Admin {
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * Information About Social Stream Functionality.
+     */
+    public static function social_stream_information() {
+        $url = 'https://visualportfolio.co/pricing';
+        $allowed_protocols = array(
+            'a' => array(
+                'href'   => array(),
+                'target' => array(),
+            ),
+            'p' => array(
+                'class' => array(),
+            ),
+        );
+        // translators: %1$s - escaped url.
+        // translators: %2$s - non-escaped url.
+        $social_stream_information = sprintf( __( '<p class="vp-col-12">Social Stream are only available in the pro version of the plugin: <a href="%1$s" target="_blank">%2$s</a></p>', '@@text_domain' ), esc_url( $url ), esc_html( $url ) );
+        echo wp_kses( $social_stream_information, $allowed_protocols );
     }
 
     /**
