@@ -261,8 +261,8 @@ class Visual_Portfolio_Images {
             $attr['data-no-lazy'] = '1';
         }
 
-        // Prevent WP Shush lazy loading.
-        if ( class_exists( 'WP_Smush' ) ) {
+        // Prevent WP Smush lazy loading.
+        if ( class_exists( 'WP_Smush' ) || class_exists( 'Smush\WP_Smush' ) ) {
             $attr['class'] .= ' no-lazyload';
         }
 
