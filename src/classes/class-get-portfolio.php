@@ -237,10 +237,17 @@ class Visual_Portfolio_Get {
         $old_post = $GLOBALS['post'];
 
         $is_images = 'images' === $options['vp_content_source'];
-        if ( $is_images ) {
+
+        $is_social = 'social-stream' === $options['vp_content_source'];
+
+        if ( $is_images || $is_social ) {
             $query_opts = self::get_query_params( $options );
 
-            $max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
+            if ( isset( $query_opts['max_num_pages'] ) ) {
+                $max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
+            } else {
+                $max_pages = $start_page;
+            }
         } else {
             // Get query params.
             $query_opts = self::get_query_params( $options );
@@ -480,7 +487,7 @@ class Visual_Portfolio_Get {
                     'vp_opts'            => $options,
                 );
 
-                if ( $is_images ) {
+                if ( $is_images || $is_social ) {
                     foreach ( $query_opts['images'] as $img ) {
                         // Get category taxonomies for data filter.
                         $filter_values = array();
@@ -517,14 +524,14 @@ class Visual_Portfolio_Get {
                         $args = array_merge(
                             $each_item_args,
                             array(
-                                'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
-                                'title'          => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
-                                'format'         => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
-                                'published_time' => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
-                                'filter'         => implode( ',', $filter_values ),
-                                'image_id'       => intval( $img['id'] ),
-                                'allow_popup'    => ! isset( $img['url'] ) || ! $img['url'],
-                                'categories'     => $categories,
+                                'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
+                                'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
+                                'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
+                                'published_time'  => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
+                                'filter'          => implode( ',', $filter_values ),
+                                'image_id'        => mb_strlen( $img['id'] < 10 ) ? intval( $img['id'] ) : $img['id'],
+                                'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
+                                'categories'      => $categories,
                             )
                         );
 
@@ -1509,7 +1516,7 @@ class Visual_Portfolio_Get {
         $is_posts = 'post-based' === $args['vp_opts']['vp_content_source'] || 'portfolio' === $args['vp_opts']['vp_content_source'];
 
         // prepare image.
-        $args['image']          = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'] );
+        $args['image']          = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', true );
         $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', false );
 
         // prepare date.

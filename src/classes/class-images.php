@@ -74,7 +74,7 @@ class Visual_Portfolio_Images {
     /**
      * Get attachment image wrapper.
      *
-     * @param int          $attachment_id attachment image id.
+     * @param string|int   $attachment_id attachment image id.
      * @param string|array $size image size.
      * @param bool         $icon icon.
      * @param string|array $attr image attributes.
@@ -87,7 +87,11 @@ class Visual_Portfolio_Images {
             self::$image_processing = true;
         }
 
-        $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
+        $image = apply_filters( 'vpf_wp_get_attachment_image_extend', false, $attachment_id, $size, $attr, $lazyload );
+
+        if ( ! $image ) {
+            $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
+        }
 
         if ( $lazyload ) {
             self::$image_processing = false;
