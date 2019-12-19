@@ -78,13 +78,15 @@ class Visual_Portfolio_Assets {
             return;
         }
 
-        uasort( self::$stored_assets[ $type ], function ( $a, $b ) {
-            if ( $a === $b ) {
-                return 0;
-            }
+        uasort(
+            self::$stored_assets[ $type ], function ( $a, $b ) {
+                if ( $a === $b ) {
+                    return 0;
+                }
 
-            return $a['priority'] < $b['priority'] ? -1 : 1;
-        } );
+                return $a['priority'] < $b['priority'] ? -1 : 1;
+            }
+        );
 
         foreach ( self::$stored_assets[ $type ] as $name => $data ) {
             $val = $data['value'];
