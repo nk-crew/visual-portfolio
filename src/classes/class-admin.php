@@ -3135,14 +3135,11 @@ class Visual_Portfolio_Admin {
                 'href'   => array(),
                 'target' => array(),
             ),
-            'p' => array(
-                'class' => array(),
-            ),
         );
         // translators: %1$s - escaped url.
         // translators: %2$s - non-escaped url.
-        $social_stream_information = sprintf( __( '<p class="vp-col-12">Social Stream are only available in the pro version of the plugin: <a href="%1$s" target="_blank">%2$s</a></p>', '@@text_domain' ), esc_url( $url ), esc_html( $url ) );
-        echo wp_kses( $social_stream_information, $allowed_protocols );
+        $social_stream_information = sprintf( __( 'Social Stream are only available in the pro version of the plugin: <a href="%1$s" target="_blank">%2$s</a>', '@@text_domain' ), esc_url( $url ), esc_html( $url ) );
+        echo '<p class="vp-col-12">' . wp_kses( $social_stream_information, $allowed_protocols ) . '</p>';
     }
 
     /**
