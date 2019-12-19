@@ -87,7 +87,7 @@ class Visual_Portfolio_Images {
             self::$image_processing = true;
         }
 
-        $image = apply_filters( 'vpf_wp_get_attachment_image_extend', $attachment_id, $size, $attr, $lazyload );
+        $image = apply_filters( 'vpf_wp_get_attachment_image_extend', false, $attachment_id, $size, $attr, $lazyload );
 
         if ( ! $image ) {
             $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
