@@ -161,6 +161,8 @@ class Visual_Portfolio_Get {
             return '';
         }
 
+        add_action( 'vpf_before_get_output' );
+
         self::$used_layouts[] = $atts['id'];
 
         // generate unique ID.
@@ -686,8 +688,11 @@ class Visual_Portfolio_Get {
         // phpcs:ignore
         $GLOBALS['post'] = $old_post;
 
+        add_action( 'vpf_after_get_output' );
+
         $return = ob_get_contents();
         ob_end_clean();
+
         return $return;
     }
 
