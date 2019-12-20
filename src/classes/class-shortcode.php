@@ -50,11 +50,11 @@ class Visual_Portfolio_Shortcode {
     public function get_shortcode_filter_out( $atts = array() ) {
         $atts = shortcode_atts(
             array(
-                'id'     => '',
-                'type'   => 'default',
-                'align'  => 'center',
+                'id'         => '',
+                'type'       => 'default',
+                'align'      => 'center',
                 'show_count' => false,
-                'class'  => '',
+                'class'      => '',
             ), $atts
         );
 

@@ -112,7 +112,7 @@ class Visual_Portfolio_Settings_API {
             if ( isset( $section['desc'] ) && ! empty( $section['desc'] ) ) {
                 $section['desc'] = '<div class="inside">' . $section['desc'] . '</div>';
                 $callback = create_function( '', 'echo "' . str_replace( '"', '\"', $section['desc'] ) . '";' );
-            } else if ( isset( $section['callback'] ) ) {
+            } elseif ( isset( $section['callback'] ) ) {
                 $callback = $section['callback'];
             } else {
                 $callback = null;

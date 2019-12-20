@@ -94,7 +94,7 @@ class Visual_Portfolio {
      */
     public function init_options() {
         $this->plugin_path = plugin_dir_path( __FILE__ );
-        $this->plugin_url = plugin_dir_url( __FILE__ );
+        $this->plugin_url  = plugin_dir_url( __FILE__ );
 
         // load textdomain.
         load_plugin_textdomain( '@@text_domain', false, basename( dirname( __FILE__ ) ) . '/languages' );
@@ -143,10 +143,10 @@ class Visual_Portfolio {
      */
     public function admin_init() {
         // get current plugin data.
-        $data = get_plugin_data( __FILE__ );
-        $this->plugin_name = $data['Name'];
-        $this->plugin_version = $data['Version'];
-        $this->plugin_slug = plugin_basename( __FILE__, '.php' );
+        $data                        = get_plugin_data( __FILE__ );
+        $this->plugin_name           = $data['Name'];
+        $this->plugin_version        = $data['Version'];
+        $this->plugin_slug           = plugin_basename( __FILE__, '.php' );
         $this->plugin_name_sanitized = basename( __FILE__, '.php' );
     }
 
@@ -154,10 +154,10 @@ class Visual_Portfolio {
      * Add image sizes.
      */
     public function add_image_sizes() {
-        $sm = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) ? : 500;
-        $md = Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) ? : 800;
-        $lg = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) ? : 1280;
-        $xl = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) ? : 1920;
+        $sm       = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) ? : 500;
+        $md       = Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) ? : 800;
+        $lg       = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) ? : 1280;
+        $xl       = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) ? : 1920;
         $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images', false ) ? : 500;
         $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images', false ) ? : 800;
         $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) ? : 1920;
@@ -252,10 +252,10 @@ class Visual_Portfolio {
         if ( file_exists( get_stylesheet_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
             // Child Theme (or just theme).
             $template = trailingslashit( get_stylesheet_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
-        } else if ( file_exists( get_template_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
+        } elseif ( file_exists( get_template_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
             // Parent Theme (if parent exists).
             $template = trailingslashit( get_template_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
-        } else if ( file_exists( $this->plugin_path . 'templates/' . $template_name . '.css' ) ) {
+        } elseif ( file_exists( $this->plugin_path . 'templates/' . $template_name . '.css' ) ) {
             // Default file in plugin folder.
             $template = $this->plugin_url . 'templates/' . $template_name . '.css';
         }
@@ -299,7 +299,7 @@ class Visual_Portfolio {
      */
     public function get_oembed_data( $url, $width = null, $height = null ) {
         $cache_name = 'vp_oembed_data_' . $url . ( $width ? : '' ) . ( $height ? : '' );
-        $cached = get_transient( $cache_name );
+        $cached     = get_transient( $cache_name );
 
         if ( $cached ) {
             return $cached;
@@ -325,9 +325,9 @@ class Visual_Portfolio {
             $args['width'] = $height * ( 1920 / 1080 );
         }
 
-        $oembed = _wp_oembed_get_object();
+        $oembed   = _wp_oembed_get_object();
         $provider = $oembed->get_provider( $url, $args );
-        $data = $oembed->fetch( $provider, $url, $args );
+        $data     = $oembed->fetch( $provider, $url, $args );
 
         if ( $data ) {
             $data = (array) $data;

@@ -238,6 +238,7 @@ class Visual_Portfolio_Assets {
         // Controls styles.
         if ( $options['vp_controls_styles'] ) {
             $controls_css_handle = 'vp-controls-styles-' . $id;
+
             $css = wp_kses( $options['vp_controls_styles'], array( '\'', '\"' ) );
             $css = str_replace( '&gt;', '>', $css );
 
@@ -251,6 +252,7 @@ class Visual_Portfolio_Assets {
         // Add custom styles.
         if ( $options['vp_custom_css'] ) {
             $custom_css_handle = 'vp-custom-css-' . $id;
+
             $css = wp_kses( $options['vp_custom_css'], array( '\'', '\"' ) );
             $css = str_replace( '&gt;', '>', $css );
 
@@ -266,7 +268,7 @@ class Visual_Portfolio_Assets {
      * Register scripts that will be used in the future when portfolio will be printed.
      */
     public function register_scripts() {
-        $vp_deps = array( 'jquery', 'imagesloaded' );
+        $vp_deps       = array( 'jquery', 'imagesloaded' );
         $vp_style_deps = array();
 
         $popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery', 'photoswipe' );
@@ -324,12 +326,12 @@ class Visual_Portfolio_Assets {
 
         // Visual Portfolio CSS.
         $vp_styles = array(
-            '@@plugin_name' => array( 'assets/css/main.min.css', $vp_style_deps ),
-            '@@plugin_name-noscript' => array( 'assets/css/noscript.min.css', array( '@@plugin_name' ) ),
+            '@@plugin_name'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
+            '@@plugin_name-noscript'         => array( 'assets/css/noscript.min.css', array( '@@plugin_name' ) ),
             '@@plugin_name-layout-justified' => array( 'assets/css/layout-justified.min.css', array( '@@plugin_name' ) ),
-            '@@plugin_name-layout-slider' => array( 'assets/css/layout-slider.min.css', array( '@@plugin_name', 'swiper' ) ),
-            '@@plugin_name-layout-tiles' => array( 'assets/css/layout-tiles.min.css', array( '@@plugin_name' ) ),
-            '@@plugin_name-popup-fancybox' => array( 'assets/css/popup-fancybox.min.css', array( '@@plugin_name', 'fancybox' ) ),
+            '@@plugin_name-layout-slider'    => array( 'assets/css/layout-slider.min.css', array( '@@plugin_name', 'swiper' ) ),
+            '@@plugin_name-layout-tiles'     => array( 'assets/css/layout-tiles.min.css', array( '@@plugin_name' ) ),
+            '@@plugin_name-popup-fancybox'   => array( 'assets/css/popup-fancybox.min.css', array( '@@plugin_name', 'fancybox' ) ),
             '@@plugin_name-popup-photoswipe' => array( 'assets/css/popup-photoswipe.min.css', array( '@@plugin_name', 'photoswipe-default-skin' ) ),
         );
 
@@ -339,11 +341,11 @@ class Visual_Portfolio_Assets {
 
         // Visual Portfolio JS.
         $vp_scripts = array(
-            '@@plugin_name' => array(
+            '@@plugin_name'                   => array(
                 'assets/js/main.min.js',
                 $vp_deps,
             ),
-            '@@plugin_name-plugin-isotope' => array(
+            '@@plugin_name-plugin-isotope'    => array(
                 'assets/js/plugin-isotope.min.js',
                 array(
                     'isotope',
@@ -355,7 +357,7 @@ class Visual_Portfolio_Assets {
                     'flickr-justified-gallery',
                 ),
             ),
-            '@@plugin_name-plugin-swiper' => array(
+            '@@plugin_name-plugin-swiper'     => array(
                 'assets/js/plugin-swiper.min.js',
                 array(
                     'swiper',
@@ -367,19 +369,19 @@ class Visual_Portfolio_Assets {
                     'photoswipe-ui-default',
                 ),
             ),
-            '@@plugin_name-plugin-fancybox' => array(
+            '@@plugin_name-plugin-fancybox'   => array(
                 'assets/js/plugin-fancybox.min.js',
                 array(
                     'fancybox',
                 ),
             ),
-            '@@plugin_name-layout-gaps' => array(
+            '@@plugin_name-layout-gaps'       => array(
                 'assets/js/layout-gaps.min.js',
                 array(
                     'jquery',
                 ),
             ),
-            '@@plugin_name-layout-masonry' => array(
+            '@@plugin_name-layout-masonry'    => array(
                 'assets/js/layout-masonry.min.js',
                 array(
                     'jquery',
@@ -387,7 +389,7 @@ class Visual_Portfolio_Assets {
                     '@@plugin_name-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-grid' => array(
+            '@@plugin_name-layout-grid'       => array(
                 'assets/js/layout-grid.min.js',
                 array(
                     'jquery',
@@ -395,7 +397,7 @@ class Visual_Portfolio_Assets {
                     '@@plugin_name-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-tiles' => array(
+            '@@plugin_name-layout-tiles'      => array(
                 'assets/js/layout-tiles.min.js',
                 array(
                     'jquery',
@@ -403,21 +405,21 @@ class Visual_Portfolio_Assets {
                     '@@plugin_name-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-justified' => array(
+            '@@plugin_name-layout-justified'  => array(
                 'assets/js/layout-justified.min.js',
                 array(
                     'jquery',
                     '@@plugin_name-plugin-fj-gallery',
                 ),
             ),
-            '@@plugin_name-layout-slider' => array(
+            '@@plugin_name-layout-slider'     => array(
                 'assets/js/layout-slider.min.js',
                 array(
                     'jquery',
                     '@@plugin_name-plugin-swiper',
                 ),
             ),
-            '@@plugin_name-items-style-fly' => array(
+            '@@plugin_name-items-style-fly'   => array(
                 'assets/js/items-style-fly.min.js',
                 array(
                     'jquery',
@@ -447,7 +449,7 @@ class Visual_Portfolio_Assets {
      */
     public function localize_global_data() {
         $data = array(
-            '__' => array(
+            '__'                   => array(
                 'couldnt_retrieve_vp'  => esc_attr__( 'Couldn\'t retrieve Visual Portfolio ID.', '@@text_domain' ),
 
                 'pswp_close'           => esc_attr__( 'Close (Esc)', '@@text_domain' ),
@@ -490,7 +492,7 @@ class Visual_Portfolio_Assets {
             ),
 
             // Screen sizes for responsive feature.
-            'screenSizes' => array( 320, 576, 768, 992, 1200 ),
+            'screenSizes'          => array( 320, 576, 768, 992, 1200 ),
         );
 
         echo "<script type='text/javascript'>\n";
@@ -541,7 +543,7 @@ class Visual_Portfolio_Assets {
             return;
         }
 
-        $posts = $wp_query->posts;
+        $posts   = $wp_query->posts;
         $pattern = get_shortcode_regex();
 
         $layout_ids = array();
@@ -554,7 +556,7 @@ class Visual_Portfolio_Assets {
                 && array_key_exists( 2, $matches )
                 && in_array( 'visual_portfolio', $matches[2] )
             ) {
-                $keys = array();
+                $keys       = array();
                 $shortcodes = array();
 
                 foreach ( $matches[0] as $key => $value ) {
@@ -564,8 +566,8 @@ class Visual_Portfolio_Assets {
                     parse_str( $get, $output );
 
                     // get all shortcode attribute keys.
-                    $keys = array_unique( array_merge( $keys, array_keys( $output ) ) );
-                    $shortcodes[] = $output;
+                                $keys = array_unique( array_merge( $keys, array_keys( $output ) ) );
+                    $shortcodes[]     = $output;
                 }
 
                 if ( $keys && $shortcodes ) {

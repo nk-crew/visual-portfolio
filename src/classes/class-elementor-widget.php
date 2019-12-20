@@ -106,6 +106,7 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
                 'paged'          => -1,
             )
         );
+
         $options = array();
         foreach ( $vp_query as $post ) {
             $options[ $post->ID ] = '#' . $post->ID . ' - ' . $post->post_title;

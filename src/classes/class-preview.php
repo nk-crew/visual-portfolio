@@ -85,7 +85,7 @@ class Visual_Portfolio_Preview {
     public function is_preview_check() {
         // phpcs:disable
         $frame = isset( $_GET['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_frame'] ) ) : false;
-        $id = isset( $_GET['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_frame_id'] ) ) : false;
+        $id    = isset( $_GET['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_frame_id'] ) ) : false;
         // phpcs:enable
 
         $this->preview_enabled = 'true' === $frame && $id;
@@ -132,7 +132,7 @@ class Visual_Portfolio_Preview {
             if ( isset( $_POST[ $name ] ) ) {
                 if ( is_array( $_POST[ $name ] ) ) {
                     $val = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $name ] ) );
-                } else if ( 'vp_custom_css' === $name ) {
+                } elseif ( 'vp_custom_css' === $name ) {
                     $val = wp_kses( wp_unslash( $_POST[ $name ] ), array( '\'', '\"' ) );
                 } else {
                     $val = sanitize_text_field( wp_unslash( $_POST[ $name ] ) );
