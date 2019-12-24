@@ -519,7 +519,10 @@ class VP {
 
             if ( rect.bottom > 0 && ( rect.bottom - bottomPosToLoad ) <= window.innerHeight ) {
                 self.loadNewItems( self.options.nextPageUrl, false, () => {
-                    checkVisibilityAndLoad();
+                    clearTimeout( scrollTimeout );
+                    scrollTimeout = setTimeout( () => {
+                        checkVisibilityAndLoad();
+                    }, 300 );
                 } );
             }
         }
