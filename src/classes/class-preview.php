@@ -241,6 +241,10 @@ class Visual_Portfolio_Preview {
                     ?>
                 </div>
 
+                <script>
+                    window.vp_preview_post_data = <?php echo isset( $_POST ) && ! empty( $_POST ) ? json_encode( $_POST ) : '{}'; ?>;
+                </script>
+
                 <?php wp_footer(); ?>
             </body>
         </html>

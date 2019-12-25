@@ -744,14 +744,20 @@ class VP {
         if ( self.loading || ! url ) {
             return;
         }
+
+        const ajaxData = {
+            method: 'POST',
+            url,
+        };
+
         self.loading = true;
 
         self.$item.addClass( 'vp-portfolio__loading' );
 
-        self.emitEvent( 'startLoadingNewItems', [ url ] );
+        self.emitEvent( 'startLoadingNewItems', [ url, ajaxData ] );
 
         // load to invisible container, then append to posts container
-        $.get( url, {}, ( data ) => {
+        $.ajax( ajaxData ).done( ( data ) => {
             data = data.replace( '<body', '<body><div id="vp-infinite-load-body"' ).replace( '</body>', '</div></body>' );
             const $body = $( data ).filter( '#vp-infinite-load-body' );
 
