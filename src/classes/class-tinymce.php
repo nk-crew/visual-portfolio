@@ -53,7 +53,6 @@ class Visual_Portfolio_TinyMCE {
             $vp_query = get_posts(
                 array(
                     'post_type'      => 'vp_lists',
-	                // phpcs:ignore
                     'posts_per_page' => -1,
                     'showposts'      => -1,
                     'paged'          => -1,
@@ -71,7 +70,7 @@ class Visual_Portfolio_TinyMCE {
                 return;
             }
 
-            wp_enqueue_script( '@@plugin_name-tinymce-localize', visual_portfolio()->plugin_url . 'assets/admin/js/mce-localize.min.js' );
+            wp_enqueue_script( '@@plugin_name-tinymce-localize', visual_portfolio()->plugin_url . 'assets/admin/js/mce-localize.min.js', array(), '@@plugin_version', true );
             wp_localize_script( '@@plugin_name-tinymce-localize', 'VPTinyMCEOptions', $data_tiny_mce );
         }
     }

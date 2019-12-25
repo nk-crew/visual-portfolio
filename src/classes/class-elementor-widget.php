@@ -19,7 +19,7 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
      * @param array      $data default widget data.
      * @param null|array $args default widget args.
      */
-    public function __construct( $data = [], $args = null ) {
+    public function __construct( $data = array(), $args = null ) {
         parent::__construct( $data, $args );
 
         wp_register_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.min.js', '', '4.2.1', true );
@@ -94,13 +94,13 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
     /**
      * Adds different input fields to allow the user to change and customize the widget settings.
      */
+    // phpcs:ignore
     protected function _register_controls() {
         // get all visual-portfolio post types.
         // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
         $vp_query = get_posts(
             array(
                 'post_type'      => 'vp_lists',
-                // phpcs:ignore
                 'posts_per_page' => -1,
                 'showposts'      => -1,
                 'paged'          => -1,
@@ -186,5 +186,5 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
      *
      * @param array $instance instance data.
      */
-    public function render_plain_content( $instance = [] ) {}
+    public function render_plain_content( $instance = array() ) {}
 }

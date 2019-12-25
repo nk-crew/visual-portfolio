@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="<?php echo esc_attr( $args['class'] ); ?> vp-filter__style-dropdown">
     <select>
         <?php
+        // phpcs:ignore
         foreach ( $args['items'] as $item ) {
             ?>
             <option class="<?php echo esc_attr( $item['class'] ); ?>" data-vp-url="<?php echo esc_url( $item['url'] ); ?>" data-vp-filter="<?php echo esc_attr( $item['filter'] ); ?>" value="<?php echo esc_attr( $item['filter'] ); ?>" <?php selected( $item['active'] ); ?>>

@@ -39,7 +39,6 @@ class Visual_Portfolio_Migrations {
         $layouts_query = get_posts(
             array(
                 'post_type'      => 'vp_lists',
-                // phpcs:ignore
                 'posts_per_page' => -1,
                 'showposts'      => -1,
                 'paged'          => -1,

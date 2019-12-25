@@ -11,11 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// phpcs:ignore
 $tag = 'a';
 if ( ! $args['url'] ) {
+    // phpcs:ignore
     $tag = 'span';
 }
 
+// phpcs:ignore
 $show_meta = $opts['show_icon'] && $opts['icon'] ||
     $opts['show_title'] && $args['title'] ||
     $opts['show_date'] ||
@@ -84,7 +87,10 @@ $show_meta = $opts['show_icon'] && $opts['icon'] ||
                 ?>
                 <ul class="vp-portfolio__item-meta-categories">
                     <?php
+                    // phpcs:ignore
                     $count = $opts['categories_count'];
+
+                    // phpcs:ignore
                     foreach ( $args['categories'] as $category ) {
                         if ( ! $count ) {
                             break;

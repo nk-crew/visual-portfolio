@@ -40,13 +40,6 @@ class Visual_Portfolio_Get {
     private static $id = 0;
 
     /**
-     * Scripts enqueued flag
-     *
-     * @var bool
-     */
-    private static $scripts_enqueued = false;
-
-    /**
      * ID of the current printed single filter
      *
      * @var int
@@ -86,7 +79,7 @@ class Visual_Portfolio_Get {
      *
      * @var array
      */
-    static private $used_layouts = array();
+    private static $used_layouts = array();
 
     /**
      * Get all available options of post.
@@ -277,7 +270,7 @@ class Visual_Portfolio_Get {
 
         // prepare data-attributes.
         $is_preview = self::is_preview();
-        $data_atts = array(
+        $data_atts  = array(
             'data-vp-layout'             => $options['vp_layout'],
             'data-vp-items-style'        => $options['vp_items_style'],
             'data-vp-items-click-action' => $options['vp_items_click_action'],
@@ -308,11 +301,11 @@ class Visual_Portfolio_Get {
                     $data_atts['data-vp-slider-items-height'] = 'auto';
                     break;
                 case 'static':
-                    $data_atts['data-vp-slider-items-height']     = ( $options['vp_slider_items_height_static'] ? : '200' ) . 'px';
+                    $data_atts['data-vp-slider-items-height']     = ( $options['vp_slider_items_height_static'] ? $options['vp_slider_items_height_static'] : '200' ) . 'px';
                     $data_atts['data-vp-slider-items-min-height'] = $options['vp_slider_items_min_height'];
                     break;
                 case 'dynamic':
-                    $data_atts['data-vp-slider-items-height']     = ( $options['vp_slider_items_height_dynamic'] ? : '80' ) . '%';
+                    $data_atts['data-vp-slider-items-height']     = ( $options['vp_slider_items_height_dynamic'] ? $options['vp_slider_items_height_dynamic'] : '80' ) . '%';
                     $data_atts['data-vp-slider-items-min-height'] = $options['vp_slider_items_min_height'];
                     break;
                 // no default.
@@ -323,7 +316,7 @@ class Visual_Portfolio_Get {
                     $data_atts['data-vp-slider-slides-per-view'] = 'auto';
                     break;
                 case 'custom':
-                    $data_atts['data-vp-slider-slides-per-view'] = $options['vp_slider_slides_per_view_custom'] ? : '3';
+                    $data_atts['data-vp-slider-slides-per-view'] = $options['vp_slider_slides_per_view_custom'] ? $options['vp_slider_slides_per_view_custom'] : '3';
                     break;
                 // no default.
             }
@@ -336,8 +329,8 @@ class Visual_Portfolio_Get {
             $data_atts['data-vp-slider-free-mode']            = $options['vp_slider_free_mode'] ? 'true' : 'false';
             $data_atts['data-vp-slider-free-mode-sticky']     = $options['vp_slider_free_mode_sticky'] ? 'true' : 'false';
             $data_atts['data-vp-slider-arrows']               = $options['vp_slider_arrows'] ? 'true' : 'false';
-            $data_atts['data-vp-slider-arrows-icon-prev']     = $options['vp_slider_arrows_icon_prev'] ? : '';
-            $data_atts['data-vp-slider-arrows-icon-next']     = $options['vp_slider_arrows_icon_next'] ? : '';
+            $data_atts['data-vp-slider-arrows-icon-prev']     = $options['vp_slider_arrows_icon_prev'] ? $options['vp_slider_arrows_icon_prev'] : '';
+            $data_atts['data-vp-slider-arrows-icon-next']     = $options['vp_slider_arrows_icon_next'] ? $options['vp_slider_arrows_icon_next'] : '';
             $data_atts['data-vp-slider-bullets']              = $options['vp_slider_bullets'] ? 'true' : 'false';
             $data_atts['data-vp-slider-bullets-dynamic']      = $options['vp_slider_bullets_dynamic'] ? 'true' : 'false';
             $data_atts['data-vp-slider-mousewheel']           = $options['vp_slider_mousewheel'] ? 'true' : 'false';
@@ -346,17 +339,17 @@ class Visual_Portfolio_Get {
 
             if ( $options['vp_slider_thumbnails'] ) {
                 $data_atts['data-vp-slider-thumbnails-height'] = 'auto';
-                $data_atts['data-vp-slider-thumbnails-gap']    = $options['vp_slider_thumbnails_gap'] ? : '0';
+                $data_atts['data-vp-slider-thumbnails-gap']    = $options['vp_slider_thumbnails_gap'] ? $options['vp_slider_thumbnails_gap'] : '0';
 
                 switch ( $options['vp_slider_thumbnails_height_type'] ) {
                     case 'auto':
                         $data_atts['data-vp-slider-thumbnails-height'] = 'auto';
                         break;
                     case 'static':
-                        $data_atts['data-vp-slider-thumbnails-height'] = ( $options['vp_slider_thumbnails_height_static'] ? : '100' ) . 'px';
+                        $data_atts['data-vp-slider-thumbnails-height'] = ( $options['vp_slider_thumbnails_height_static'] ? $options['vp_slider_thumbnails_height_static'] : '100' ) . 'px';
                         break;
                     case 'dynamic':
-                        $data_atts['data-vp-slider-thumbnails-height'] = ( $options['vp_slider_thumbnails_height_dynamic'] ? : '30' ) . '%';
+                        $data_atts['data-vp-slider-thumbnails-height'] = ( $options['vp_slider_thumbnails_height_dynamic'] ? $options['vp_slider_thumbnails_height_dynamic'] : '30' ) . '%';
                         break;
                     // no default.
                 }
@@ -366,7 +359,7 @@ class Visual_Portfolio_Get {
                         $data_atts['data-vp-slider-thumbnails-per-view'] = 'auto';
                         break;
                     case 'custom':
-                        $data_atts['data-vp-slider-thumbnails-per-view'] = $options['vp_slider_thumbnails_per_view_custom'] ? : '6';
+                        $data_atts['data-vp-slider-thumbnails-per-view'] = $options['vp_slider_thumbnails_per_view_custom'] ? $options['vp_slider_thumbnails_per_view_custom'] : '6';
                         break;
                     // no default.
                 }
@@ -496,17 +489,18 @@ class Visual_Portfolio_Get {
                         if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
                             foreach ( $img['categories'] as $cat ) {
                                 $slug = self::create_slug( $cat );
-                                if ( ! in_array( $slug, $filter_values ) ) {
+                                if ( ! in_array( $slug, $filter_values, true ) ) {
                                     // add in filter.
                                     $filter_values[] = $slug;
 
                                     // add in categories array.
                                     $url = self::get_pagenum_link(
                                         array(
-                                            'vp_filter' => urlencode( $slug ),
+                                            'vp_filter' => rawurlencode( $slug ),
                                             'vp_page'   => 1,
                                         )
                                     );
+
                                     $categories[] = array(
                                         'slug'        => $slug,
                                         'label'       => $cat,
@@ -529,7 +523,7 @@ class Visual_Portfolio_Get {
                                 'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
                                 'published_time'  => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
                                 'filter'          => implode( ',', $filter_values ),
-                                'image_id'        => mb_strlen( $img['id'] < 10 ) ? intval( $img['id'] ) : $img['id'],
+                                'image_id'        => intval( $img['id'] ),
                                 'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
                                 'categories'      => $categories,
                             )
@@ -568,7 +562,7 @@ class Visual_Portfolio_Get {
 
                             $category = get_the_terms( $the_post, $cat );
 
-                            if ( $category && ! in_array( $category, $filter_values ) ) {
+                            if ( $category && ! in_array( $category, $filter_values, true ) ) {
                                 foreach ( $category as $key => $cat_item ) {
                                     // add in filter.
                                     $filter_values[] = $cat_item->slug;
@@ -577,7 +571,7 @@ class Visual_Portfolio_Get {
                                     $unique_name  = $cat_item->taxonomy . ':' . $cat_item->slug;
                                     $url          = self::get_pagenum_link(
                                         array(
-                                            'vp_filter' => urlencode( $unique_name ),
+                                            'vp_filter' => rawurlencode( $unique_name ),
                                             'vp_page'   => 1,
                                         )
                                     );
@@ -596,11 +590,12 @@ class Visual_Portfolio_Get {
                         }
 
                         $args = array_merge(
-                            $each_item_args, array(
+                            $each_item_args,
+                            array(
                                 'post_id'        => get_the_ID(),
                                 'url'            => get_permalink(),
                                 'title'          => get_the_title(),
-                                'format'         => get_post_format() ? : 'standard',
+                                'format'         => get_post_format() ? get_post_format() : 'standard',
                                 'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
                                 'filter'         => implode( ',', $filter_values ),
                                 'image_id'       => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
@@ -670,7 +665,8 @@ class Visual_Portfolio_Get {
 
         <?php
         self::pagination(
-            $options, array(
+            $options,
+            array(
                 'start_page'    => $start_page,
                 'max_pages'     => $max_pages,
                 'next_page_url' => $next_page_url,
@@ -702,7 +698,8 @@ class Visual_Portfolio_Get {
         $options = self::get_options( $atts['id'] );
 
         $options = array_merge(
-            $options, array(
+            $options,
+            array(
                 'vp_filter'            => $atts['type'],
                 'vp_filter_align'      => $atts['align'],
                 'vp_filter_show_count' => 'true' === $atts['show_count'],
@@ -743,7 +740,8 @@ class Visual_Portfolio_Get {
         $options = self::get_options( $atts['id'] );
 
         $options = array_merge(
-            $options, array(
+            $options,
+            array(
                 'vp_sort'       => $atts['type'],
                 'vp_sort_align' => $atts['align'],
             )
@@ -779,6 +777,7 @@ class Visual_Portfolio_Get {
      * @return int
      */
     private static function get_current_page_number() {
+        // phpcs:ignore
         return max( 1, isset( $_GET['vp_page'] ) ? (int) $_GET['vp_page'] : 1 );
     }
 
@@ -787,8 +786,6 @@ class Visual_Portfolio_Get {
      * thanks to https://gist.github.com/hlashbrooke/6298714 .
      */
     private static function get_rand_seed_session() {
-        // phpcs:disable WordPress.VIP.SessionVariableUsage.SessionVarsProhibited
-
         // already prepared.
         if ( self::$rand_seed_session ) {
             return self::$rand_seed_session;
@@ -808,11 +805,10 @@ class Visual_Portfolio_Get {
 
         // Set new vpf_random_seed if none exists.
         if ( ! self::$rand_seed_session ) {
+            // phpcs:ignore
             self::$rand_seed_session     = rand();
             $_SESSION['vpf_random_seed'] = self::$rand_seed_session;
         }
-
-        // phpcs:enable WordPress.VIP.SessionVariableUsage.SessionVarsProhibited
 
         return self::$rand_seed_session;
     }
@@ -845,7 +841,10 @@ class Visual_Portfolio_Get {
 
             // Load certain taxonomies.
             $images = array();
+
+            // phpcs:ignore
             if ( ! $for_filter && isset( $_GET['vp_filter'] ) ) {
+                // phpcs:ignore
                 $category = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
 
                 foreach ( (array) $options['vp_images'] as $img ) {
@@ -910,7 +909,9 @@ class Visual_Portfolio_Get {
             }
 
             // custom sorting.
+            // phpcs:ignore
             if ( isset( $_GET['vp_sort'] ) ) {
+                // phpcs:ignore
                 $custom_get_order = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
 
                 switch ( $custom_get_order ) {
@@ -954,13 +955,17 @@ class Visual_Portfolio_Get {
                         $images = $new_images;
                         break;
                     case 'rand':
+                        // phpcs:ignore
                         mt_srand( self::get_rand_seed_session() );
+
                         for ( $i = count( $images ) - 1; $i > 0; $i-- ) {
+                            // phpcs:ignore
                             $j            = @mt_rand( 0, $i );
                             $tmp          = $images[ $i ];
                             $images[ $i ] = $images[ $j ];
                             $images[ $j ] = $tmp;
                         }
+
                         break;
                 }
                 if ( 'desc' === $custom_order_direction ) {
@@ -1059,11 +1064,14 @@ class Visual_Portfolio_Get {
                                     array(
                                         'public' => false,
                                         'name'   => 'attachment',
-                                    ), 'names', 'NOT'
+                                    ),
+                                    'names',
+                                    'NOT'
                                 )
                             )
                         );
 
+                        // phpcs:ignore
                         $query_opts['tax_query'] = array(
                             'relation' => $options['vp_posts_taxonomies_relation'],
                         );
@@ -1092,7 +1100,7 @@ class Visual_Portfolio_Get {
                             }
                         }
                     }
-                } // End if().
+                }
 
                 // Avoid duplicate posts.
                 if ( $options['vp_posts_avoid_duplicate_posts'] ) {
@@ -1104,10 +1112,12 @@ class Visual_Portfolio_Get {
                         $query_opts['post__in'] = array_diff( (array) $query_opts['post__in'], (array) $query_opts['post__not_in'] );
                     }
                 }
-            } // End if().
+            }
 
             // Custom sorting.
+            // phpcs:ignore
             if ( isset( $_GET['vp_sort'] ) ) {
+                // phpcs:ignore
                 $custom_get_order       = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
                 $custom_order           = false;
                 $custom_order_direction = false;
@@ -1135,17 +1145,20 @@ class Visual_Portfolio_Get {
             }
 
             // Load certain taxonomies using custom filter.
+            // phpcs:ignore
             if ( ! $for_filter && isset( $_GET['vp_filter'] ) ) {
+                // phpcs:ignore
                 $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
                 $taxonomies = explode( ':', $taxonomies );
 
                 if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
+                    // phpcs:ignore
                     $query_opts['tax_query'] = array(
                         'relation' => 'AND',
                         array(
                             'taxonomy' => $taxonomies[0],
-                            'field' => 'slug',
-                            'terms' => $taxonomies[1],
+                            'field'    => 'slug',
+                            'terms'    => $taxonomies[1],
                         ),
                         isset( $query_opts['tax_query'] ) ? $query_opts['tax_query'] : '',
                     );
@@ -1168,7 +1181,8 @@ class Visual_Portfolio_Get {
             return;
         }
         visual_portfolio()->include_template(
-            'notices/notices', array(
+            'notices/notices',
+            array(
                 'notice' => $notice,
             )
         );
@@ -1191,7 +1205,10 @@ class Visual_Portfolio_Get {
 
         // Get active item.
         $active_item = false;
+
+        // phpcs:ignore
         if ( isset( $_GET['vp_filter'] ) ) {
+            // phpcs:ignore
             $active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
         }
 
@@ -1212,9 +1229,9 @@ class Visual_Portfolio_Get {
                 if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
                     foreach ( $img['categories'] as $cat ) {
                         $slug = self::create_slug( $cat );
-                        $url = self::get_pagenum_link(
+                        $url  = self::get_pagenum_link(
                             array(
-                                'vp_filter' => urlencode( $slug ),
+                                'vp_filter' => rawurlencode( $slug ),
                                 'vp_page'   => 1,
                             )
                         );
@@ -1243,7 +1260,6 @@ class Visual_Portfolio_Get {
             $query_opts = self::get_query_params( $vp_options, true );
 
             // Get all available categories for current $query_opts.
-            // phpcs:ignore
             $query_opts['posts_per_page'] = -1;
             $query_opts['showposts']      = -1;
             $query_opts['paged']          = -1;
@@ -1275,10 +1291,10 @@ class Visual_Portfolio_Get {
 
                     // Prepare each terms array.
                     foreach ( $category as $key => $cat_item ) {
-                        if ( ! in_array( $cat_item->term_id, $term_ids ) ) {
+                        if ( ! in_array( $cat_item->term_id, $term_ids, true ) ) {
                             $term_ids[] = $cat_item->term_id;
                         }
-                        if ( ! in_array( $cat_item->taxonomy, $term_taxonomies ) ) {
+                        if ( ! in_array( $cat_item->taxonomy, $term_taxonomies, true ) ) {
                             $term_taxonomies[] = $cat_item->taxonomy;
                         }
                     }
@@ -1301,12 +1317,12 @@ class Visual_Portfolio_Get {
 
             if ( isset( $all_terms ) && is_array( $all_terms ) ) {
                 foreach ( $all_terms as $term ) {
-                    if ( in_array( $term->term_id, $term_ids ) ) {
+                    if ( in_array( $term->term_id, $term_ids, true ) ) {
                         $unique_name = $term->taxonomy . ':' . $term->slug;
 
                         $url = self::get_pagenum_link(
                             array(
-                                'vp_filter' => urlencode( $unique_name ),
+                                'vp_filter' => rawurlencode( $unique_name ),
                                 'vp_page'   => 1,
                             )
                         );
@@ -1335,7 +1351,8 @@ class Visual_Portfolio_Get {
         // Add 'All' active item.
         if ( $vp_options['vp_filter_text_all'] ) {
             array_unshift(
-                $terms, array(
+                $terms,
+                array(
                     'filter'      => '*',
                     'label'       => $vp_options['vp_filter_text_all'],
                     'description' => false,
@@ -1355,12 +1372,13 @@ class Visual_Portfolio_Get {
         }
 
         // get options for the current filter.
-        $filter_options = array();
+        $filter_options      = array();
         $filter_options_slug = 'vp_filter_' . $vp_options['vp_filter'] . '__';
+
         foreach ( $vp_options as $k => $opt ) {
             // add option to array.
             if ( substr( $k, 0, strlen( $filter_options_slug ) ) === $filter_options_slug ) {
-                $opt_name = str_replace( $filter_options_slug, '', $k );
+                $opt_name                    = str_replace( $filter_options_slug, '', $k );
                 $filter_options[ $opt_name ] = $opt;
             }
 
@@ -1414,7 +1432,10 @@ class Visual_Portfolio_Get {
 
         // Get active item.
         $active_item = false;
+
+        // phpcs:ignore
         if ( isset( $_GET['vp_sort'] ) ) {
+            // phpcs:ignore
             $active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
         }
 
@@ -1425,13 +1446,14 @@ class Visual_Portfolio_Get {
                 'date'       => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
                 'title'      => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
                 'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
-            ), $vp_options
+            ),
+            $vp_options
         );
 
         foreach ( $sort_items as $slug => $label ) {
             $url = self::get_pagenum_link(
                 array(
-                    'vp_sort' => urlencode( $slug ),
+                    'vp_sort' => rawurlencode( $slug ),
                     'vp_page' => 1,
                 )
             );
@@ -1450,12 +1472,13 @@ class Visual_Portfolio_Get {
         }
 
         // get options for the current sort.
-        $sort_options = array();
+        $sort_options      = array();
         $sort_options_slug = 'vp_sort_' . $vp_options['vp_sort'] . '__';
+
         foreach ( $vp_options as $k => $opt ) {
             // add option to array.
             if ( substr( $k, 0, strlen( $sort_options_slug ) ) === $sort_options_slug ) {
-                $opt_name = str_replace( $sort_options_slug, '', $k );
+                $opt_name                  = str_replace( $sort_options_slug, '', $k );
                 $sort_options[ $opt_name ] = $opt;
             }
 
@@ -1529,9 +1552,10 @@ class Visual_Portfolio_Get {
         if ( isset( $args['opts']['show_date'] ) ) {
             if ( 'human' === $args['opts']['show_date'] ) {
                 // translators: %s - published in human format.
+                // phpcs:ignore
                 $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( mysql2date( 'U', $args['published_time'], true ), current_time( 'timestamp' ) ) );
             } elseif ( $args['opts']['show_date'] ) {
-                $args['published'] = mysql2date( $args['opts']['date_format'] ? : 'F j, Y', $args['published_time'], true );
+                $args['published'] = mysql2date( $args['opts']['date_format'] ? $args['opts']['date_format'] : 'F j, Y', $args['published_time'], true );
             }
 
             // fallback for Visual Portfolio 1.2.1 version.
@@ -1569,7 +1593,8 @@ class Visual_Portfolio_Get {
                             'url' => $args['format_video_url'],
                         );
                     } else {
-                        $img_id = $args['image_id'] ? : $args['no_image'];
+                        $img_id = $args['image_id'] ? $args['image_id'] : $args['no_image'];
+
                         if ( $img_id ) {
                             $attachment = get_post( $args['image_id'] );
                             if ( $attachment && 'attachment' === $attachment->post_type ) {
@@ -1602,7 +1627,7 @@ class Visual_Portfolio_Get {
                 $args['url'] = false;
                 break;
             default:
-                $args['url_target'] = $args['vp_opts']['vp_items_click_action_url_target'] ? : '';
+                $args['url_target'] = $args['vp_opts']['vp_items_click_action_url_target'] ? $args['vp_opts']['vp_items_click_action_url_target'] : '';
                 break;
         }
 
@@ -1626,8 +1651,8 @@ class Visual_Portfolio_Get {
         <<?php echo esc_attr( $tag_name ); ?> class="<?php echo esc_attr( $class_name ); ?>" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
             <?php
             if ( $popup_image ) {
-                $title_source       = $args['vp_opts']['vp_items_click_action_popup_title_source'] ? : '';
-                $description_source = $args['vp_opts']['vp_items_click_action_popup_description_source'] ? : '';
+                $title_source       = $args['vp_opts']['vp_items_click_action_popup_title_source'] ? $args['vp_opts']['vp_items_click_action_popup_title_source'] : '';
+                $description_source = $args['vp_opts']['vp_items_click_action_popup_description_source'] ? $args['vp_opts']['vp_items_click_action_popup_description_source'] : '';
                 ?>
                 <div class="vp-portfolio__item-popup"
                     style="display: none;"
@@ -1696,7 +1721,7 @@ class Visual_Portfolio_Get {
         foreach ( $vp_options as $k => $opt ) {
             // add option to array.
             if ( substr( $k, 0, strlen( $pagination_options_slug ) ) === $pagination_options_slug ) {
-                $opt_name = str_replace( $pagination_options_slug, '', $k );
+                $opt_name                        = str_replace( $pagination_options_slug, '', $k );
                 $pagination_options[ $opt_name ] = $opt;
             }
 
@@ -1754,8 +1779,11 @@ class Visual_Portfolio_Get {
                     array(
                         'base'      => esc_url_raw(
                             str_replace(
-                                999999999, '%#%', remove_query_arg(
-                                    'add-to-cart', self::get_pagenum_link(
+                                999999999,
+                                '%#%',
+                                remove_query_arg(
+                                    'add-to-cart',
+                                    self::get_pagenum_link(
                                         array(
                                             'vp_page' => 999999999,
                                         )
@@ -1963,7 +1991,7 @@ class Visual_Portfolio_Get {
         // If the user didn't specify if $tag is a self-closing tag we try to auto-detect it by checking against a list of known self-closing tags.
         $selfclosing_tags = array( 'area', 'base', 'basefont', 'br', 'hr', 'input', 'img', 'link', 'meta', 'col', 'param' );
         if ( is_null( $selfclosing ) ) {
-            $selfclosing = in_array( $tag, $selfclosing_tags );
+            $selfclosing = in_array( $tag, $selfclosing_tags, true );
         }
 
         // The regexp is different for normal and self-closing tags because I can't figure out how to make a sufficiently robust unified one.

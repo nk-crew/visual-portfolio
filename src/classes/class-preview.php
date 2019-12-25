@@ -61,19 +61,24 @@ class Visual_Portfolio_Preview {
             $url = add_query_arg(
                 array(
                     'vp_preview' => 'vp_preview',
-                ), $url
+                ),
+                $url
             );
         } else {
             $url .= '/vp_preview';
         }
 
         wp_localize_script(
-            'visual-portfolio-gutenberg', 'VPAdminGutenbergVariables', array(
+            'visual-portfolio-gutenberg',
+            'VPAdminGutenbergVariables',
+            array(
                 'preview_url' => $url,
             )
         );
         wp_localize_script(
-            'visual-portfolio-elementor', 'VPAdminElementorVariables', array(
+            'visual-portfolio-elementor',
+            'VPAdminElementorVariables',
+            array(
                 'preview_url' => $url,
             )
         );
@@ -100,6 +105,7 @@ class Visual_Portfolio_Preview {
 
             // Tell WP Super Cache & W3 Total Cache to not cache WPReadable requests.
             if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+                // phpcs:ignore
                 define( 'DONOTCACHEPAGE', true );
             }
         }
@@ -186,8 +192,8 @@ class Visual_Portfolio_Preview {
      * @param int $id - visual portfolio shortcode id.
      */
     public function print_template( $id ) {
-        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', '', '4.2.1', true );
-        wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery' ), '', true );
+        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', array(), '4.2.1', true );
+        wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery' ), '@@plugin_version', true );
 
         $class_name = 'vp-preview-wrapper';
 
@@ -220,7 +226,7 @@ class Visual_Portfolio_Preview {
                         content: none !important;
                     }
                     #wpadminbar {
-                        display: none; <?php // phpcs:ignore ?>
+                        display: none;
                     }
                     #vp_preview {
                         position: relative;
@@ -242,6 +248,7 @@ class Visual_Portfolio_Preview {
                 </div>
 
                 <script>
+                    <?php // phpcs:ignore ?>
                     window.vp_preview_post_data = <?php echo isset( $_POST ) && ! empty( $_POST ) ? json_encode( $_POST ) : '{}'; ?>;
                 </script>
 

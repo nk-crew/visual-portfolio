@@ -42,7 +42,9 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 
         // Get layouts list.
         register_rest_route(
-            $namespace, '/get_layouts/', array(
+            $namespace,
+            '/get_layouts/',
+            array(
                 'methods'  => WP_REST_Server::READABLE,
                 'callback' => array( $this, 'get_layouts' ),
             )
@@ -61,7 +63,6 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         $vp_query = get_posts(
             array(
                 'post_type'      => 'vp_lists',
-                // phpcs:ignore
                 'posts_per_page' => -1,
                 'showposts'      => -1,
                 'paged'          => -1,
@@ -93,7 +94,8 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
             array(
                 'success'  => true,
                 'response' => $response,
-            ), 200
+            ),
+            200
         );
     }
 
@@ -111,7 +113,8 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
                 'success'    => false,
                 'error_code' => $code,
                 'response'   => $response,
-            ), 401
+            ),
+            401
         );
     }
 }

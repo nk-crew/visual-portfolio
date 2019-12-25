@@ -6,3 +6,5 @@
 /vendor
 /node_modules
 npm-debug.log
+.phpcs.xml
+phpcs.xml

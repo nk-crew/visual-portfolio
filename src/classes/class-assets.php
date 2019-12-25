@@ -79,7 +79,8 @@ class Visual_Portfolio_Assets {
         }
 
         uasort(
-            self::$stored_assets[ $type ], function ( $a, $b ) {
+            self::$stored_assets[ $type ],
+            function ( $a, $b ) {
                 if ( $a === $b ) {
                     return 0;
                 }
@@ -242,7 +243,7 @@ class Visual_Portfolio_Assets {
             $css = wp_kses( $options['vp_controls_styles'], array( '\'', '\"' ) );
             $css = str_replace( '&gt;', '>', $css );
 
-            wp_register_style( $controls_css_handle, false );
+            wp_register_style( $controls_css_handle, false, array(), '@@plugin_version' );
             wp_enqueue_style( $controls_css_handle );
             wp_add_inline_style( $controls_css_handle, $css );
 
@@ -256,7 +257,7 @@ class Visual_Portfolio_Assets {
             $css = wp_kses( $options['vp_custom_css'], array( '\'', '\"' ) );
             $css = str_replace( '&gt;', '>', $css );
 
-            wp_register_style( $custom_css_handle, false );
+            wp_register_style( $custom_css_handle, false, array(), '@@plugin_version' );
             wp_enqueue_style( $custom_css_handle );
             wp_add_inline_style( $custom_css_handle, $css );
 
@@ -506,17 +507,17 @@ class Visual_Portfolio_Assets {
      * Enqueue styles in head.
      */
     public function wp_enqueue_head_assets() {
-        Visual_Portfolio_Assets::enqueue_stored_assets( 'style' );
-        Visual_Portfolio_Assets::enqueue_stored_assets( 'template_style' );
+        self::enqueue_stored_assets( 'style' );
+        self::enqueue_stored_assets( 'template_style' );
     }
 
     /**
      * Enqueue scripts and styles in foot.
      */
     public function wp_enqueue_foot_assets() {
-        Visual_Portfolio_Assets::enqueue_stored_assets( 'style' );
-        Visual_Portfolio_Assets::enqueue_stored_assets( 'template_style' );
-        Visual_Portfolio_Assets::enqueue_stored_assets( 'script' );
+        self::enqueue_stored_assets( 'style' );
+        self::enqueue_stored_assets( 'template_style' );
+        self::enqueue_stored_assets( 'script' );
     }
 
     /**
@@ -554,7 +555,7 @@ class Visual_Portfolio_Assets {
                 isset( $post->post_content )
                 && preg_match_all( '/' . $pattern . '/s', $post->post_content, $matches )
                 && array_key_exists( 2, $matches )
-                && in_array( 'visual_portfolio', $matches[2] )
+                && in_array( 'visual_portfolio', $matches[2], true )
             ) {
                 $keys       = array();
                 $shortcodes = array();
@@ -585,7 +586,7 @@ class Visual_Portfolio_Assets {
 
                 // get all IDs from shortcodes.
                 foreach ( $shortcodes as $shortcode ) {
-                    if ( isset( $shortcode['id'] ) && $shortcode['id'] && ! in_array( $shortcode['id'], $layout_ids ) ) {
+                    if ( isset( $shortcode['id'] ) && $shortcode['id'] && ! in_array( $shortcode['id'], $layout_ids, true ) ) {
                         $layout_ids[] = str_replace( '"', '', $shortcode['id'] );
                     }
                 }
@@ -596,7 +597,7 @@ class Visual_Portfolio_Assets {
             foreach ( $layout_ids as $id ) {
                 $options = Visual_Portfolio_Get::get_options( $id );
 
-                Visual_Portfolio_Assets::enqueue( $options, $id );
+                self::enqueue( $options, $id );
             }
         }
     }

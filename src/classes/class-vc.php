@@ -35,7 +35,7 @@ class Visual_Portfolio_VC {
      */
     public function admin_enqueue_scripts( $page ) {
         if ( 'post.php' === $page || 'post-new.php' === $page ) {
-            wp_enqueue_script( '@@plugin_name-vc-frontend', visual_portfolio()->plugin_url . 'assets/admin/js/vc-frontend.min.js', array( 'jquery' ) );
+            wp_enqueue_script( '@@plugin_name-vc-frontend', visual_portfolio()->plugin_url . 'assets/admin/js/vc-frontend.min.js', array( 'jquery' ), '@@plugin_version', true );
         }
     }
 
@@ -49,7 +49,6 @@ class Visual_Portfolio_VC {
             $vp_query = get_posts(
                 array(
                     'post_type'      => 'vp_lists',
-	                // phpcs:ignore
                     'posts_per_page' => -1,
                     'showposts'      => -1,
                     'paged'          => -1,
