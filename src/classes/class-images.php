@@ -24,6 +24,13 @@ class Visual_Portfolio_Images {
      * Visual_Portfolio_Images constructor.
      */
     public static function construct() {
+        add_action( 'template_redirect', 'Visual_Portfolio_Images::init' );
+    }
+
+    /**
+     * Init hooks.
+     */
+    public static function init() {
         // Skip AMP pages.
         if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
             return;

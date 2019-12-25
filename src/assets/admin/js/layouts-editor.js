@@ -65,6 +65,7 @@ if ( $.fn.imagepicker ) {
 
 // frame load
 const $frame = $( '.vp_list_preview iframe' );
+let frameWindow = false;
 let $framePortfolio = false;
 let frameJQuery = false;
 const $previewForm = $( '<form target="vp_list_preview_iframe" method="post" style="display: none">' )
@@ -245,6 +246,7 @@ $body.on( 'click', '.vp-dom-tree-node-collapse', function() {
 
 // portfolio options changed
 function reloadFrame() {
+    frameWindow = false;
     frameJQuery = false;
     $framePortfolio = false;
     $previewForm.submit();
@@ -270,6 +272,7 @@ $editForm.on( 'change input vp-fake-change vp-fake-input', '[name*="vp_"]', func
         name: $this.attr( 'name' ),
         value: $this.is( '[type=checkbox], [type=radio]' ) ? $this.is( ':checked' ) : $this.val(),
         reload: e.type === 'change' || e.type === 'vp-fake-change',
+        window: frameWindow,
         jQuery: frameJQuery,
         $portfolio: $framePortfolio,
     };
@@ -287,6 +290,11 @@ $editForm.on( 'change input vp-fake-change vp-fake-input', '[name*="vp_"]', func
     if ( ! data.reload ) {
         // generate custom styles.
         generateControlsStyles();
+
+        // update ajax dynamic data.
+        if ( frameWindow && frameWindow.vp_preview_post_data ) {
+            frameWindow.vp_preview_post_data[ data.name ] = data.value;
+        }
     }
 
     // reload frame
@@ -296,6 +304,7 @@ $editForm.on( 'change input vp-fake-change vp-fake-input', '[name*="vp_"]', func
 } );
 
 $frame.on( 'load', function() {
+    frameWindow = this.contentWindow;
     frameJQuery = this.contentWindow.jQuery;
     $framePortfolio = frameJQuery( '.vp-portfolio' );
 
