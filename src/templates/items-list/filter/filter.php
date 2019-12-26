@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <ul class="<?php echo esc_attr( $args['class'] ); ?> vp-filter__style-default">
     <?php
+    // phpcs:ignore
     foreach ( $args['items'] as $item ) {
         ?>
         <li class="<?php echo esc_attr( $item['class'] ); ?>">

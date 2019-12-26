@@ -66,7 +66,7 @@ class Visual_Portfolio_Admin {
         add_action( 'wp_ajax_vp_find_taxonomies', array( $this, 'ajax_find_taxonomies' ) );
         add_action( 'wp_ajax_vp_find_oembed', array( $this, 'ajax_find_oembed' ) );
 
-        add_action( 'vpf_get_source_social_stream_registered_controls', array( __class__, 'social_stream_information' ) );
+        add_action( 'vpf_get_source_social_stream_registered_controls', array( $this, 'social_stream_information' ) );
     }
 
     /**
@@ -120,7 +120,7 @@ class Visual_Portfolio_Admin {
             wp_enqueue_script( 'tooltip.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/tooltip.min.js', array( 'popper.js' ), '1.14.3', true );
             wp_enqueue_style( 'popper.js', visual_portfolio()->plugin_url . 'assets/vendor/popper.js/popper.css', '', '1.14.3' );
 
-            wp_enqueue_script( 'clipboard.js', visual_portfolio()->plugin_url . 'assets/vendor/clipboard.js/clipboard.min.js', '', '2.0.4' );
+            wp_enqueue_script( 'clipboard.js', visual_portfolio()->plugin_url . 'assets/vendor/clipboard.js/clipboard.min.js', '', '2.0.4', true );
 
             $codemirror_version = '5.45.0';
             wp_enqueue_script( 'codemirror', visual_portfolio()->plugin_url . 'assets/vendor/codemirror/codemirror.js', '', $codemirror_version, true );
@@ -172,7 +172,8 @@ class Visual_Portfolio_Admin {
             'visual-portfolio-gutenberg',
             plugins_url( '../assets/admin/js/gutenberg-block.min.js', __FILE__ ),
             array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components', 'jquery' ),
-            filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/js/gutenberg-block.min.js' )
+            filemtime( plugin_dir_path( __FILE__ ) . '../assets/admin/js/gutenberg-block.min.js' ),
+            true
         );
 
         wp_enqueue_style(
@@ -242,7 +243,9 @@ class Visual_Portfolio_Admin {
         );
 
         register_taxonomy(
-            'portfolio_category', 'portfolio', array(
+            'portfolio_category',
+            'portfolio',
+            array(
                 'label'             => esc_html__( 'Portfolio Categories', '@@text_domain' ),
                 'labels'            => array(
                     'menu_name' => esc_html__( 'Categories', '@@text_domain' ),
@@ -260,7 +263,9 @@ class Visual_Portfolio_Admin {
             )
         );
         register_taxonomy(
-            'portfolio_tag', 'portfolio', array(
+            'portfolio_tag',
+            'portfolio',
+            array(
                 'label'             => esc_html__( 'Portfolio Tags', '@@text_domain' ),
                 'labels'            => array(
                     'menu_name' => esc_html__( 'Tags', '@@text_domain' ),
@@ -565,7 +570,7 @@ class Visual_Portfolio_Admin {
     public function maybe_render_blank_state( $which ) {
         global $post_type;
 
-        if ( in_array( $post_type, array( 'vp_lists' ) ) && 'bottom' === $which ) {
+        if ( in_array( $post_type, array( 'vp_lists' ), true ) && 'bottom' === $which ) {
             $counts = (array) wp_count_posts( $post_type );
             unset( $counts['auto-draft'] );
             $count = array_sum( $counts );
@@ -703,7 +708,6 @@ class Visual_Portfolio_Admin {
             $vp_query = get_posts(
                 array(
                     'post_type'      => 'vp_lists',
-                    // phpcs:ignore
                     'posts_per_page' => -1,
                     'showposts'      => -1,
                     'paged'          => -1,
@@ -898,7 +902,8 @@ class Visual_Portfolio_Admin {
                                         'url'   => visual_portfolio()->plugin_url . 'assets/admin/images/layouts/tiles-4-5.svg',
                                         'value' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
                                     ),
-                                ), Visual_Portfolio_Extend::tiles()
+                                ),
+                                Visual_Portfolio_Extend::tiles()
                             ),
                         ),
                     ),
@@ -1059,11 +1064,11 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'    => 'select2',
-                            'label'   => esc_html__( 'Slides Per View', '@@text_domain' ),
-                            'name'    => 'slides_per_view_type',
-                            'default' => 'custom',
-                            'options' => array(
+                            'type'      => 'select2',
+                            'label'     => esc_html__( 'Slides Per View', '@@text_domain' ),
+                            'name'      => 'slides_per_view_type',
+                            'default'   => 'custom',
+                            'options'   => array(
                                 'auto'   => esc_html__( 'Auto', '@@text_domain' ),
                                 'custom' => esc_html__( 'Custom', '@@text_domain' ),
                             ),
@@ -1205,11 +1210,11 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'    => 'select2',
-                            'label'   => esc_html__( 'Thumbnails Height', '@@text_domain' ),
-                            'name'    => 'thumbnails_height_type',
-                            'default' => 'static',
-                            'options' => array(
+                            'type'      => 'select2',
+                            'label'     => esc_html__( 'Thumbnails Height', '@@text_domain' ),
+                            'name'      => 'thumbnails_height_type',
+                            'default'   => 'static',
+                            'options'   => array(
                                 'auto'    => esc_html__( 'Auto', '@@text_domain' ),
                                 'static'  => esc_html__( 'Static (px)', '@@text_domain' ),
                                 'dynamic' => esc_html__( 'Dynamic (%)', '@@text_domain' ),
@@ -1255,11 +1260,11 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'    => 'select2',
-                            'label'   => esc_html__( 'Thumbnails Per View', '@@text_domain' ),
-                            'name'    => 'thumbnails_per_view_type',
-                            'default' => 'custom',
-                            'options' => array(
+                            'type'      => 'select2',
+                            'label'     => esc_html__( 'Thumbnails Per View', '@@text_domain' ),
+                            'name'      => 'thumbnails_per_view_type',
+                            'default'   => 'custom',
+                            'options'   => array(
                                 'auto'   => esc_html__( 'Auto', '@@text_domain' ),
                                 'custom' => esc_html__( 'Custom', '@@text_domain' ),
                             ),
@@ -1288,7 +1293,8 @@ class Visual_Portfolio_Admin {
                         ),
                     ),
                 ),
-            ), Visual_Portfolio_Extend::layouts()
+            ),
+            Visual_Portfolio_Extend::layouts()
         );
 
         // Extend specific layout controls.
@@ -1396,7 +1402,7 @@ class Visual_Portfolio_Admin {
                         'show_icons'      => false,
                         'align'           => true,
                     ),
-                    'controls' => array(
+                    'controls'         => array(
                         array(
                             'type'    => 'select2',
                             'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
@@ -1437,7 +1443,7 @@ class Visual_Portfolio_Admin {
                         'show_icons'      => true,
                         'align'           => 'extended',
                     ),
-                    'controls' => array(
+                    'controls'         => array(
                         array(
                             'type'    => 'color',
                             'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
@@ -1478,7 +1484,7 @@ class Visual_Portfolio_Admin {
                         'show_icons'      => false,
                         'align'           => true,
                     ),
-                    'controls' => array(
+                    'controls'         => array(
                         array(
                             'type'    => 'color',
                             'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
@@ -1519,7 +1525,7 @@ class Visual_Portfolio_Admin {
                         'show_icons'      => true,
                         'align'           => 'extended',
                     ),
-                    'controls' => array(
+                    'controls'         => array(
                         array(
                             'type'    => 'color',
                             'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
@@ -1548,7 +1554,8 @@ class Visual_Portfolio_Admin {
                         ),
                     ),
                 ),
-            ), Visual_Portfolio_Extend::items_styles()
+            ),
+            Visual_Portfolio_Extend::items_styles()
         );
 
         // Extend specific item style controls.
@@ -1759,12 +1766,12 @@ class Visual_Portfolio_Admin {
         // url.
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'items-click-action',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Target', '@@text_domain' ),
-                'name'     => 'vp_items_click_action_url_target',
-                'default'  => '',
-                'options'  => array(
+                'category'  => 'items-click-action',
+                'type'      => 'select2',
+                'label'     => esc_html__( 'Target', '@@text_domain' ),
+                'name'      => 'vp_items_click_action_url_target',
+                'default'   => '',
+                'options'   => array(
                     ''       => esc_html__( 'Default', '@@text_domain' ),
                     '_blank' => esc_html__( 'New Tab (_blank)', '@@text_domain' ),
                     '_top'   => esc_html__( 'Top Frame (_top)', '@@text_domain' ),
@@ -1781,12 +1788,12 @@ class Visual_Portfolio_Admin {
         // popup.
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'items-click-action',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Title', '@@text_domain' ),
-                'name'     => 'vp_items_click_action_popup_title_source',
-                'default'  => 'title',
-                'options'  => array(
+                'category'  => 'items-click-action',
+                'type'      => 'select2',
+                'label'     => esc_html__( 'Title', '@@text_domain' ),
+                'name'      => 'vp_items_click_action_popup_title_source',
+                'default'   => 'title',
+                'options'   => array(
                     'none'        => esc_html__( 'None', '@@text_domain' ),
                     'title'       => esc_html__( 'Image Title', '@@text_domain' ),
                     'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
@@ -1803,12 +1810,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'items-click-action',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Description', '@@text_domain' ),
-                'name'     => 'vp_items_click_action_popup_description_source',
-                'default'  => 'description',
-                'options'  => array(
+                'category'  => 'items-click-action',
+                'type'      => 'select2',
+                'label'     => esc_html__( 'Description', '@@text_domain' ),
+                'name'      => 'vp_items_click_action_popup_description_source',
+                'default'   => 'description',
+                'options'   => array(
                     'none'        => esc_html__( 'None', '@@text_domain' ),
                     'title'       => esc_html__( 'Image Title', '@@text_domain' ),
                     'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
@@ -1846,7 +1853,8 @@ class Visual_Portfolio_Admin {
                     'title'    => esc_html__( 'Dropdown', '@@text_domain' ),
                     'controls' => array(),
                 ),
-            ), Visual_Portfolio_Extend::filters()
+            ),
+            Visual_Portfolio_Extend::filters()
         );
 
         // Extend specific filter controls.
@@ -1904,12 +1912,12 @@ class Visual_Portfolio_Admin {
 
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'filter',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Align', '@@text_domain' ),
-                'name'     => 'vp_filter_align',
-                'default'  => 'center',
-                'options'  => array(
+                'category'  => 'filter',
+                'type'      => 'select2',
+                'label'     => esc_html__( 'Align', '@@text_domain' ),
+                'name'      => 'vp_filter_align',
+                'default'   => 'center',
+                'options'   => array(
                     'center' => esc_html__( 'Center', '@@text_domain' ),
                     'left'   => esc_html__( 'Left', '@@text_domain' ),
                     'right'  => esc_html__( 'Right', '@@text_domain' ),
@@ -1978,7 +1986,8 @@ class Visual_Portfolio_Admin {
                     'title'    => esc_html__( 'Dropdown', '@@text_domain' ),
                     'controls' => array(),
                 ),
-            ), Visual_Portfolio_Extend::sort()
+            ),
+            Visual_Portfolio_Extend::sort()
         );
 
         // Extend specific sort controls.
@@ -2036,12 +2045,12 @@ class Visual_Portfolio_Admin {
 
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'sort',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Align', '@@text_domain' ),
-                'name'     => 'vp_sort_align',
-                'default'  => 'center',
-                'options'  => array(
+                'category'  => 'sort',
+                'type'      => 'select2',
+                'label'     => esc_html__( 'Align', '@@text_domain' ),
+                'name'      => 'vp_sort_align',
+                'default'   => 'center',
+                'options'   => array(
                     'center' => esc_html__( 'Center', '@@text_domain' ),
                     'left'   => esc_html__( 'Left', '@@text_domain' ),
                     'right'  => esc_html__( 'Right', '@@text_domain' ),
@@ -2072,7 +2081,8 @@ class Visual_Portfolio_Admin {
                     'title'    => esc_html__( 'Default', '@@text_domain' ),
                     'controls' => array(),
                 ),
-            ), Visual_Portfolio_Extend::pagination()
+            ),
+            Visual_Portfolio_Extend::pagination()
         );
 
         // Extend specific pagination controls.
@@ -2140,7 +2150,7 @@ class Visual_Portfolio_Admin {
                     'load-more' => esc_html__( 'Load More', '@@text_domain' ),
                     'infinite'  => esc_html__( 'Infinite', '@@text_domain' ),
                 ),
-                'condition'   => array(
+                'condition' => array(
                     array(
                         'control'  => 'vp_pagination_style',
                         'operator' => '!=',
@@ -2171,12 +2181,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'pagination',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Align', '@@text_domain' ),
-                'name'     => 'vp_pagination_align',
-                'default'  => 'center',
-                'options'  => array(
+                'category'  => 'pagination',
+                'type'      => 'select2',
+                'label'     => esc_html__( 'Align', '@@text_domain' ),
+                'name'      => 'vp_pagination_align',
+                'default'   => 'center',
+                'options'   => array(
                     'center' => esc_html__( 'Center', '@@text_domain' ),
                     'left'   => esc_html__( 'Left', '@@text_domain' ),
                     'right'  => esc_html__( 'Right', '@@text_domain' ),
@@ -2625,12 +2635,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-posts',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Taxonomies Relation', '@@text_domain' ),
-                'name'     => 'vp_posts_taxonomies_relation',
-                'default'  => 'or',
-                'options'  => array(
+                'category'      => 'content-source-posts',
+                'type'          => 'select2',
+                'label'         => esc_html__( 'Taxonomies Relation', '@@text_domain' ),
+                'name'          => 'vp_posts_taxonomies_relation',
+                'default'       => 'or',
+                'options'       => array(
                     'or'  => esc_html__( 'OR', '@@text_domain' ),
                     'and' => esc_html__( 'AND', '@@text_domain' ),
                 ),
@@ -2651,12 +2661,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-posts',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Order by', '@@text_domain' ),
-                'name'     => 'vp_posts_order_by',
-                'default'  => 'post_date',
-                'options'  => array(
+                'category'      => 'content-source-posts',
+                'type'          => 'select2',
+                'label'         => esc_html__( 'Order by', '@@text_domain' ),
+                'name'          => 'vp_posts_order_by',
+                'default'       => 'post_date',
+                'options'       => array(
                     'post_date'  => esc_html__( 'Date', '@@text_domain' ),
                     'title'      => esc_html__( 'Title', '@@text_domain' ),
                     'id'         => esc_html__( 'ID', '@@text_domain' ),
@@ -2668,12 +2678,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-posts',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Order Direction', '@@text_domain' ),
-                'name'     => 'vp_posts_order_direction',
-                'default'  => 'desc',
-                'options'  => array(
+                'category'      => 'content-source-posts',
+                'type'          => 'select2',
+                'label'         => esc_html__( 'Order Direction', '@@text_domain' ),
+                'name'          => 'vp_posts_order_direction',
+                'default'       => 'desc',
+                'options'       => array(
                     'desc' => esc_html__( 'DESC', '@@text_domain' ),
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
                 ),
@@ -2696,10 +2706,10 @@ class Visual_Portfolio_Admin {
          */
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-images',
-                'type'     => 'gallery',
-                'name'     => 'vp_images',
-                'default'  => array(
+                'category'      => 'content-source-images',
+                'type'          => 'gallery',
+                'name'          => 'vp_images',
+                'default'       => array(
                     /**
                      * Array items:
                      * id - image id.
@@ -2715,12 +2725,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-images',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Titles', '@@text_domain' ),
-                'name'     => 'vp_images_titles_source',
-                'default'  => 'custom',
-                'options'  => array(
+                'category'      => 'content-source-images',
+                'type'          => 'select2',
+                'label'         => esc_html__( 'Titles', '@@text_domain' ),
+                'name'          => 'vp_images_titles_source',
+                'default'       => 'custom',
+                'options'       => array(
                     'none'        => esc_html__( 'None', '@@text_domain' ),
                     'custom'      => esc_html__( 'Custom', '@@text_domain' ),
                     'title'       => esc_html__( 'Image Title', '@@text_domain' ),
@@ -2733,12 +2743,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-images',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Descriptions', '@@text_domain' ),
-                'name'     => 'vp_images_descriptions_source',
-                'default'  => 'custom',
-                'options'  => array(
+                'category'      => 'content-source-images',
+                'type'          => 'select2',
+                'label'         => esc_html__( 'Descriptions', '@@text_domain' ),
+                'name'          => 'vp_images_descriptions_source',
+                'default'       => 'custom',
+                'options'       => array(
                     'none'        => esc_html__( 'None', '@@text_domain' ),
                     'custom'      => esc_html__( 'Custom', '@@text_domain' ),
                     'title'       => esc_html__( 'Image Title', '@@text_domain' ),
@@ -2751,12 +2761,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-images',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Order by', '@@text_domain' ),
-                'name'     => 'vp_images_order_by',
-                'default'  => 'default',
-                'options'  => array(
+                'category'      => 'content-source-images',
+                'type'          => 'select2',
+                'label'         => esc_html__( 'Order by', '@@text_domain' ),
+                'name'          => 'vp_images_order_by',
+                'default'       => 'default',
+                'options'       => array(
                     'default' => esc_html__( 'Default', '@@text_domain' ),
                     'date'    => esc_html__( 'Uploaded', '@@text_domain' ),
                     'title'   => esc_html__( 'Title', '@@text_domain' ),
@@ -2767,12 +2777,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-images',
-                'type'     => 'select2',
-                'label'    => esc_html__( 'Order Direction', '@@text_domain' ),
-                'name'     => 'vp_images_order_direction',
-                'default'  => 'asc',
-                'options'  => array(
+                'category'      => 'content-source-images',
+                'type'          => 'select2',
+                'label'         => esc_html__( 'Order Direction', '@@text_domain' ),
+                'name'          => 'vp_images_order_direction',
+                'default'       => 'asc',
+                'options'       => array(
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
                     'desc' => esc_html__( 'DESC', '@@text_domain' ),
                 ),
@@ -2954,7 +2964,7 @@ class Visual_Portfolio_Admin {
     public function add_filter_metabox( $post ) {
         Visual_Portfolio_Controls::get_registered( 'filter' );
 
-        $type       = Visual_Portfolio_Controls::get_registered_value( 'vp_filter' ) ? : 'default';
+        $type       = Visual_Portfolio_Controls::get_registered_value( 'vp_filter' ) ? Visual_Portfolio_Controls::get_registered_value( 'vp_filter' ) : 'default';
         $align      = Visual_Portfolio_Controls::get_registered_value( 'vp_filter_align' );
         $show_count = Visual_Portfolio_Controls::get_registered_value( 'vp_filter_show_count' );
 
@@ -2978,7 +2988,7 @@ class Visual_Portfolio_Admin {
     public function add_sort_metabox( $post ) {
         Visual_Portfolio_Controls::get_registered( 'sort' );
 
-        $type  = Visual_Portfolio_Controls::get_registered_value( 'vp_sort' ) ? : 'default';
+        $type  = Visual_Portfolio_Controls::get_registered_value( 'vp_sort' ) ? Visual_Portfolio_Controls::get_registered_value( 'vp_sort' ) : 'default';
         $align = Visual_Portfolio_Controls::get_registered_value( 'vp_sort_align' );
 
         Visual_Portfolio_Controls::get(
@@ -3016,7 +3026,8 @@ class Visual_Portfolio_Admin {
             $url = add_query_arg(
                 array(
                     'vp_preview' => 'vp_preview',
-                ), $url
+                ),
+                $url
             );
         } else {
             $url .= '/vp_preview';
@@ -3027,7 +3038,8 @@ class Visual_Portfolio_Admin {
                 'vp_preview_frame'    => 'true',
                 'vp_preview_type'     => 'layouts-editor',
                 'vp_preview_frame_id' => $post->ID,
-            ), $url
+            ),
+            $url
         );
 
         ?>
@@ -3130,7 +3142,7 @@ class Visual_Portfolio_Admin {
      * Information About Social Stream Functionality.
      */
     public static function social_stream_information() {
-        $url = 'https://visualportfolio.co/pricing';
+        $url               = 'https://visualportfolio.co/pricing';
         $allowed_protocols = array(
             'a' => array(
                 'href'   => array(),
@@ -3211,7 +3223,9 @@ class Visual_Portfolio_Admin {
             array(
                 'public' => false,
                 'name'   => 'attachment',
-            ), 'names', 'NOT'
+            ),
+            'names',
+            'NOT'
         );
 
         $post_types_list = array();
@@ -3248,10 +3262,8 @@ class Visual_Portfolio_Admin {
 
             $posts = get_posts(
                 array(
-                    'post_type' => 'any',
-                    'post__in'  => $selected_ids,
-
-                    // phpcs:ignore
+                    'post_type'      => 'any',
+                    'post__in'       => $selected_ids,
                     'posts_per_page' => -1,
                     'showposts'      => -1,
                     'paged'          => -1,
@@ -3397,7 +3409,9 @@ class Visual_Portfolio_Admin {
                 array(
                     'public' => false,
                     'name'   => 'attachment',
-                ), 'names', 'NOT'
+                ),
+                'names',
+                'NOT'
             );
         }
         $taxonomies_names = get_object_taxonomies( $post_type );

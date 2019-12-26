@@ -35,7 +35,8 @@ class Visual_Portfolio_Shortcode {
                 'id'     => '',
                 'class'  => '',
                 'vc_css' => '',
-            ), $atts
+            ),
+            $atts
         );
 
         return Visual_Portfolio_Get::get( $atts );
@@ -55,7 +56,8 @@ class Visual_Portfolio_Shortcode {
                 'align'      => 'center',
                 'show_count' => false,
                 'class'      => '',
-            ), $atts
+            ),
+            $atts
         );
 
         return Visual_Portfolio_Get::get_filter( $atts );
@@ -74,7 +76,8 @@ class Visual_Portfolio_Shortcode {
                 'type'  => 'default',
                 'align' => 'center',
                 'class' => '',
-            ), $atts
+            ),
+            $atts
         );
 
         return Visual_Portfolio_Get::get_sort( $atts );

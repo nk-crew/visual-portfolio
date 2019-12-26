@@ -145,6 +145,7 @@ class Visual_Portfolio_Images {
 
             $placeholder_code = ob_get_clean();
 
+            // phpcs:ignore
             $placeholder_image = 'data:image/png;base64,' . base64_encode( $placeholder_code );
 
             set_transient( $transient, $placeholder_image );

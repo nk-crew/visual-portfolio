@@ -23,21 +23,21 @@ class Visual_Portfolio {
     /**
      * The single class instance.
      *
-     * @var $_instance
+     * @var $instance
      */
-    private static $_instance = null;
+    private static $instance = null;
 
     /**
      * Main Instance
      * Ensures only one instance of this class exists in memory at any one time.
      */
     public static function instance() {
-        if ( is_null( self::$_instance ) ) {
-            self::$_instance = new self();
-            self::$_instance->init_options();
-            self::$_instance->init_hooks();
+        if ( is_null( self::$instance ) ) {
+            self::$instance = new self();
+            self::$instance->init_options();
+            self::$instance->init_hooks();
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
@@ -154,13 +154,13 @@ class Visual_Portfolio {
      * Add image sizes.
      */
     public function add_image_sizes() {
-        $sm       = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) ? : 500;
-        $md       = Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) ? : 800;
-        $lg       = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) ? : 1280;
-        $xl       = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) ? : 1920;
-        $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images', false ) ? : 500;
-        $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images', false ) ? : 800;
-        $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) ? : 1920;
+        $sm       = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) : 500;
+        $md       = Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) : 800;
+        $lg       = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) : 1280;
+        $xl       = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) : 1920;
+        $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images', false ) : 500;
+        $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images', false ) : 800;
+        $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) : 1920;
 
         // custom image sizes.
         add_image_size( 'vp_sm', $sm, $sm );
@@ -183,7 +183,8 @@ class Visual_Portfolio {
      */
     public function image_size_names_choose( $sizes ) {
         return array_merge(
-            $sizes, array(
+            $sizes,
+            array(
                 'vp_sm' => esc_html__( 'Small (VP)', '@@text_domain' ),
                 'vp_md' => esc_html__( 'Medium (VP)', '@@text_domain' ),
                 'vp_lg' => esc_html__( 'Large (VP)', '@@text_domain' ),
@@ -253,7 +254,7 @@ class Visual_Portfolio {
             // Child Theme (or just theme).
             $template = trailingslashit( get_stylesheet_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
         } elseif ( file_exists( get_template_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
-            // Parent Theme (if parent exists).
+            // Parent Theme (when parent exists).
             $template = trailingslashit( get_template_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
         } elseif ( file_exists( $this->plugin_path . 'templates/' . $template_name . '.css' ) ) {
             // Default file in plugin folder.
@@ -298,7 +299,7 @@ class Visual_Portfolio {
      * @return array|bool|false|object
      */
     public function get_oembed_data( $url, $width = null, $height = null ) {
-        $cache_name = 'vp_oembed_data_' . $url . ( $width ? : '' ) . ( $height ? : '' );
+        $cache_name = 'vp_oembed_data_' . $url . ( $width ? $width : '' ) . ( $height ? $height : '' );
         $cached     = get_transient( $cache_name );
 
         if ( $cached ) {

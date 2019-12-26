@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// phpcs:ignore
 $show_meta = $opts['show_title'] && $args['title'] ||
     $opts['show_date'] ||
     $opts['show_excerpt'] && $args['excerpt'] ||
@@ -83,7 +84,10 @@ $show_meta = $opts['show_title'] && $args['title'] ||
                 ?>
                 <ul class="vp-portfolio__item-meta-categories">
                     <?php
+                    // phpcs:ignore
                     $count = $opts['categories_count'];
+
+                    // phpcs:ignore
                     foreach ( $args['categories'] as $category ) {
                         if ( ! $count ) {
                             break;

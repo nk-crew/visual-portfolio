@@ -134,8 +134,8 @@ class Visual_Portfolio_Controls {
 
         ?>
             <div class="<?php echo esc_attr( $class ); ?>"
-                data-hint="<?php echo esc_attr( $args['hint'] ? : 'false' ); ?>"
-                data-hint-place="<?php echo esc_attr( $args['hint_place'] ? : 'top' ); ?>"
+                data-hint="<?php echo esc_attr( $args['hint'] ? $args['hint'] : 'false' ); ?>"
+                data-hint-place="<?php echo esc_attr( $args['hint_place'] ? $args['hint_place'] : 'top' ); ?>"
                     <?php
                     if ( ! $args['wrapper_class'] ) {
                         self::print_condition( $args );
@@ -304,7 +304,7 @@ class Visual_Portfolio_Controls {
             <?php
             foreach ( $args['style'] as $style ) {
                 if ( $style['element'] && $style['property'] ) {
-                ?>
+                    ?>
                     <input type="hidden"
                         name="<?php echo esc_attr( $args['name'] ); ?>__style[]"
                         data-style-from="[name='<?php echo esc_attr( $args['name'] ); ?>']"
@@ -313,7 +313,7 @@ class Visual_Portfolio_Controls {
                         data-style-mask="<?php echo esc_attr( isset( $style['mask'] ) ? $style['mask'] : '$' ); ?>"
                         value=""
                     >
-                <?php
+                    <?php
                 }
             }
             ?>
@@ -452,7 +452,7 @@ class Visual_Portfolio_Controls {
                 $selected = false;
 
                 if ( $args['multiple'] ) {
-                    if ( $args['value'] && is_array( $args['value'] ) && in_array( $check_val, $args['value'] ) ) {
+                    if ( $args['value'] && is_array( $args['value'] ) && in_array( $check_val, $args['value'], true ) ) {
                         $selected = true;
                     }
                 } else {
@@ -579,7 +579,7 @@ class Visual_Portfolio_Controls {
      * @param array $args - control args.
      */
     public static function print_control_gallery( $args = array() ) {
-        $images = (array) $args['value'];
+        $images          = (array) $args['value'];
         $additional_data = array(
             'title'       => array(
                 'type'      => 'text',
@@ -666,7 +666,8 @@ class Visual_Portfolio_Controls {
                 foreach ( $additional_data as $name => $data_item ) {
                     self::get(
                         array_merge(
-                            $data_item, array(
+                            $data_item,
+                            array(
                                 'value' => '',
                                 'class' => 'vp-no-reload',
                             )
@@ -690,7 +691,8 @@ class Visual_Portfolio_Controls {
                 <div class="vp-control-gallery-items-img" data-image-id="<?php echo esc_attr( $data['id'] ); ?>">
                     <?php
                     echo wp_kses(
-                        $img, array(
+                        $img,
+                        array(
                             'img' => array(
                                 'src'    => array(),
                                 'srcset' => array(),
