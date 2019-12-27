@@ -517,18 +517,22 @@ class Visual_Portfolio_Get {
                             }
                         }
 
-                        $args = array_merge(
-                            $each_item_args,
-                            array(
-                                'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
-                                'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
-                                'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
-                                'published_time'  => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
-                                'filter'          => implode( ',', $filter_values ),
-                                'image_id'        => intval( $img['id'] ),
-                                'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
-                                'categories'      => $categories,
-                            )
+                        $args = apply_filters(
+                            'vpf_each_item_args',
+                            array_merge(
+                                $each_item_args,
+                                array(
+                                    'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
+                                    'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
+                                    'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
+                                    'published_time'  => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
+                                    'filter'          => implode( ',', $filter_values ),
+                                    'image_id'        => intval( $img['id'] ),
+                                    'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
+                                    'categories'      => $categories,
+                                )
+                            ),
+                            $img
                         );
 
                         $slider_thumbnails[] = $args['image_id'];
