@@ -24,18 +24,6 @@ class Visual_Portfolio_Images {
      * Visual_Portfolio_Images constructor.
      */
     public static function construct() {
-        add_action( 'template_redirect', 'Visual_Portfolio_Images::init' );
-    }
-
-    /**
-     * Init hooks.
-     */
-    public static function init() {
-        // Skip AMP pages.
-        if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
-            return;
-        }
-
         // Prepare images base64 placeholders.
         // Thanks https://wordpress.org/plugins/powerkit/.
         add_action( 'init', 'Visual_Portfolio_Images::allow_lazy_attributes' );
@@ -46,6 +34,28 @@ class Visual_Portfolio_Images {
 
         // ignore Jetpack lazy.
         add_filter( 'jetpack_lazy_images_skip_image_with_attributes', 'Visual_Portfolio_Images::jetpack_lazy_images_skip_image_with_attributes', 15, 2 );
+    }
+
+    /**
+     * Init hooks.
+     */
+    public static function is_enabled() {
+        // check for AMP endpoint.
+        if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
+            return false;
+        }
+
+        // check if php GD library installed.
+        if ( ! extension_loaded( 'gd' ) || ! function_exists( 'imagecreate' ) ) {
+            return false;
+        }
+
+        // disable using filter.
+        if ( ! apply_filters( 'vpf_images_lazyload', true ) ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -90,6 +100,8 @@ class Visual_Portfolio_Images {
      * @return string
      */
     public static function get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazyload = true ) {
+        $lazyload = self::is_enabled() && $lazyload;
+
         if ( $lazyload ) {
             self::$image_processing = true;
         }
@@ -116,8 +128,7 @@ class Visual_Portfolio_Images {
      * @return string
      */
     public static function get_image_placeholder( $width = 1, $height = 1 ) {
-        // check if php GD library installed.
-        if ( ! extension_loaded( 'gd' ) || ! function_exists( 'imagecreate' ) ) {
+        if ( ! self::is_enabled() ) {
             return false;
         }
 
@@ -190,6 +201,10 @@ class Visual_Portfolio_Images {
      * @return array
      */
     public static function generate_attachment_placeholder( $metadata ) {
+        if ( ! self::is_enabled() ) {
+            return $metadata;
+        }
+
         // Generate image full size.
         if ( isset( $metadata['width'] ) && isset( $metadata['height'] ) ) {
             $metadata['placeholder'] = self::get_image_placeholder( $metadata['width'], $metadata['height'] );
@@ -226,6 +241,10 @@ class Visual_Portfolio_Images {
      * @return array
      */
     public static function add_image_placeholders( $attr, $attachment, $size ) {
+        if ( ! self::is_enabled() ) {
+            return $attr;
+        }
+
         // Is string.
         if ( ! is_string( $size ) ) {
             return $attr;
