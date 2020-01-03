@@ -127,6 +127,8 @@ class Visual_Portfolio_Assets {
             $options
         );
 
+        do_action( 'vpf_before_assets_enqueue', $options, $id );
+
         self::store_used_assets( '@@plugin_name', true, 'style', 9 );
         self::store_used_assets( '@@plugin_name-noscript', true, 'style', 9 );
 
@@ -263,6 +265,8 @@ class Visual_Portfolio_Assets {
 
             self::store_used_assets( $custom_css_handle, true, 'style' );
         }
+
+        do_action( 'vpf_after_assets_enqueue', $options, $id );
     }
 
     /**
@@ -273,6 +277,8 @@ class Visual_Portfolio_Assets {
         $vp_style_deps = array();
 
         $popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery', 'photoswipe' );
+
+        do_action( 'vpf_before_assets_register' );
 
         // Isotope.
         if ( apply_filters( 'vpf_enqueue_plugin_isotope', true ) ) {
@@ -431,6 +437,8 @@ class Visual_Portfolio_Assets {
         foreach ( $vp_scripts as $name => $data ) {
             wp_register_script( $name, visual_portfolio()->plugin_url . $data[0], $data[1], '@@plugin_version', true );
         }
+
+        do_action( 'vpf_after_assets_register' );
     }
 
     /**
