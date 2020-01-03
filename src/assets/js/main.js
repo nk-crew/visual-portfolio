@@ -139,6 +139,8 @@ class VP {
             return;
         }
 
+        self.href = window.location.href;
+
         self.$items_wrap = $item.find( '.vp-portfolio__items' );
         self.$slider_thumbnails_wrap = $item.find( '.vp-portfolio__thumbnails' );
         self.$pagination = $item.find( '.vp-portfolio__pagination-wrap' );
@@ -741,7 +743,7 @@ class VP {
     loadNewItems( url, removeExisting, cb ) {
         const self = this;
 
-        if ( self.loading || ! url ) {
+        if ( self.loading || ! url || self.href === url ) {
             return;
         }
 
@@ -749,6 +751,7 @@ class VP {
             method: 'POST',
             url,
             complete( { responseText } ) {
+                self.href = url;
                 self.replaceItems( responseText, removeExisting, cb );
             },
         };
