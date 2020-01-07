@@ -66,7 +66,7 @@ class Visual_Portfolio_Admin {
         add_action( 'wp_ajax_vp_find_taxonomies', array( $this, 'ajax_find_taxonomies' ) );
         add_action( 'wp_ajax_vp_find_oembed', array( $this, 'ajax_find_oembed' ) );
 
-        add_action( 'vpf_get_source_social_stream_registered_controls', array( $this, 'social_stream_information' ) );
+        add_action( 'vpf_get_source_social_stream_registered_controls', array( __class__, 'social_stream_information' ) );
     }
 
     /**
