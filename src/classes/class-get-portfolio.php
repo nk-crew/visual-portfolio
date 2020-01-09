@@ -518,7 +518,7 @@ class Visual_Portfolio_Get {
                         }
 
                         $args = apply_filters(
-                            'vpf_each_item_args',
+                            'vpf_image_item_args',
                             array_merge(
                                 $each_item_args,
                                 array(
@@ -595,18 +595,22 @@ class Visual_Portfolio_Get {
                             }
                         }
 
-                        $args = array_merge(
-                            $each_item_args,
-                            array(
-                                'post_id'        => get_the_ID(),
-                                'url'            => get_permalink(),
-                                'title'          => get_the_title(),
-                                'format'         => get_post_format() ? get_post_format() : 'standard',
-                                'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
-                                'filter'         => implode( ',', $filter_values ),
-                                'image_id'       => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
-                                'categories'     => $categories,
-                            )
+                        $args = apply_filters(
+                            'vpf_post_item_args',
+                            array_merge(
+                                $each_item_args,
+                                array(
+                                    'post_id'        => get_the_ID(),
+                                    'url'            => get_permalink(),
+                                    'title'          => get_the_title(),
+                                    'format'         => get_post_format() ? get_post_format() : 'standard',
+                                    'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
+                                    'filter'         => implode( ',', $filter_values ),
+                                    'image_id'       => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
+                                    'categories'     => $categories,
+                                )
+                            ),
+                            get_the_ID()
                         );
 
                         $args['allow_popup'] = isset( $args['image_id'] ) && $args['image_id'];
@@ -1185,7 +1189,7 @@ class Visual_Portfolio_Get {
      *
      * @param string $notice notice string.
      */
-    private static function notice( $notice ) {
+    public static function notice( $notice ) {
         if ( ! $notice ) {
             return;
         }
@@ -1610,23 +1614,29 @@ class Visual_Portfolio_Get {
                                 $img_meta    = wp_get_attachment_image_src( $args['image_id'], $args['img_size_popup'] );
                                 $img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
                                 $img_sm_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_sm_popup'] );
-                                $popup_image = array(
-                                    'id'          => $args['image_id'],
-                                    'title'       => $attachment->post_title,
-                                    'description' => $attachment->post_content,
-                                    'caption'     => wp_get_attachment_caption( $attachment->ID ),
-                                    'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
-                                    'url'         => $img_meta[0],
-                                    'srcset'      => wp_get_attachment_image_srcset( $args['image_id'], $args['img_size_popup'] ),
-                                    'width'       => $img_meta[1],
-                                    'height'      => $img_meta[2],
-                                    'md_url'      => $img_md_meta[0],
-                                    'md_width'    => $img_md_meta[1],
-                                    'md_height'   => $img_md_meta[2],
-                                    'sm_url'      => $img_sm_meta[0],
-                                    'sm_width'    => $img_sm_meta[1],
-                                    'sm_height'   => $img_sm_meta[2],
+
+                                $popup_image = apply_filters(
+                                    'vpf_extend_popup_image',
+                                    array(
+                                        'id'          => $args['image_id'],
+                                        'title'       => $attachment->post_title,
+                                        'description' => $attachment->post_content,
+                                        'caption'     => wp_get_attachment_caption( $attachment->ID ),
+                                        'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+                                        'url'         => $img_meta[0],
+                                        'srcset'      => wp_get_attachment_image_srcset( $args['image_id'], $args['img_size_popup'] ),
+                                        'width'       => $img_meta[1],
+                                        'height'      => $img_meta[2],
+                                        'md_url'      => $img_md_meta[0],
+                                        'md_width'    => $img_md_meta[1],
+                                        'md_height'   => $img_md_meta[2],
+                                        'sm_url'      => $img_sm_meta[0],
+                                        'sm_width'    => $img_sm_meta[1],
+                                        'sm_height'   => $img_sm_meta[2],
+                                    )
                                 );
+                            } elseif ( $args['image_id'] ) {
+                                $popup_image = apply_filters( 'vpf_extend_custom_popup_image', false, $args['image_id'] );
                             }
                         }
                     }
@@ -1645,6 +1655,8 @@ class Visual_Portfolio_Get {
             $args['image']          = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'] );
             $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'], false, '', false );
         }
+
+        $args = apply_filters( 'vpf_each_item_args', $args );
 
         // Posts Classes.
         $class_name = 'vp-portfolio__item-wrap';
