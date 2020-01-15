@@ -260,7 +260,7 @@ class Visual_Portfolio_Get {
         ) : false;
 
         // No items found.
-        if ( $is_images && empty( $query_opts['images'] ) || isset( $portfolio_query ) && ! $portfolio_query->have_posts() ) {
+        if ( ( ( $is_social || $is_images ) && empty( $query_opts['images'] ) ) || isset( $portfolio_query ) && ! $portfolio_query->have_posts() ) {
             ob_start();
             self::notice( esc_html__( 'No items found.', '@@text_domain' ) );
             $return = ob_get_contents();
@@ -482,7 +482,11 @@ class Visual_Portfolio_Get {
                     'vp_opts'            => $options,
                 );
 
-                if ( $is_images || $is_social ) {
+                if ( ( $is_images || $is_social ) &&
+                    isset( $query_opts['images'] ) &&
+                    is_array( $query_opts['images'] ) &&
+                    ! empty( $query_opts['images'] ) ) {
+
                     foreach ( $query_opts['images'] as $img ) {
                         // Get category taxonomies for data filter.
                         $filter_values = array();
@@ -1215,6 +1219,7 @@ class Visual_Portfolio_Get {
         $terms           = array();
         $there_is_active = false;
         $is_images       = 'images' === $vp_options['vp_content_source'];
+        $is_social       = 'social-stream' === $vp_options['vp_content_source'];
 
         // Get active item.
         $active_item = false;
@@ -1225,7 +1230,7 @@ class Visual_Portfolio_Get {
             $active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
         }
 
-        if ( $is_images ) {
+        if ( $is_images || $is_social ) {
             $query_opts = self::get_query_params( $vp_options, true );
 
             // calculate categories count.
