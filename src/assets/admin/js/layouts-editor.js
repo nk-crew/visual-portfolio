@@ -129,7 +129,7 @@ function generateControlsStyles() {
 
 // generate dom tree.
 function getNodeTree( node ) {
-    if ( node.hasChildNodes() ) {
+    if ( node && node.hasChildNodes() ) {
         const children = [];
 
         for ( let j = 0; j < node.childNodes.length; j++ ) {
