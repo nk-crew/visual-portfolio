@@ -3127,6 +3127,9 @@ class Visual_Portfolio_Admin {
                     </div>
                 </div>
                 <div data-content="social-stream">
+                    <!-- Social -->
+
+                    <p></p>
                     <div class="vp-row">
                         <?php
                         do_action( 'vpf_get_source_social_stream_registered_controls' );
