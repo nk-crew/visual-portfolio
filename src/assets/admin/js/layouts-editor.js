@@ -65,6 +65,7 @@ if ( $.fn.imagepicker ) {
 
 // frame load
 const $frame = $( '.vp_list_preview iframe' );
+const $framePreloader = $( '.vp_list_preview_preloader' );
 let frameWindow = false;
 let $framePortfolio = false;
 let frameJQuery = false;
@@ -77,6 +78,15 @@ if ( $.fn.iFrameResize ) {
     $frame.iFrameResize( {
         interval: 10,
     } );
+}
+
+// add preloader animation.
+function togglePreloader( add = true ) {
+    if ( add ) {
+        $framePreloader.addClass( 'vp_list_preview_preloader_active' );
+    } else {
+        $framePreloader.removeClass( 'vp_list_preview_preloader_active' );
+    }
 }
 
 // generate controls styles.
@@ -249,6 +259,11 @@ function reloadFrame() {
     frameWindow = false;
     frameJQuery = false;
     $framePortfolio = false;
+
+    // show preloader.
+    togglePreloader();
+
+    // submit form with new data.
     $previewForm.submit();
 }
 reloadFrame = debounce( 400, reloadFrame );
@@ -313,6 +328,9 @@ $frame.on( 'load', function() {
 
     // add dom tree.
     addDomTree();
+
+    // hide preloader.
+    togglePreloader( false );
 } );
 
 // live reload

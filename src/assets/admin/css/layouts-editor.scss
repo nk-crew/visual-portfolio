@@ -539,6 +539,7 @@
  * Portfolio layout sections
  */
 .vp_list_preview {
+    position: relative;
     padding: 0 12px;
     margin-right: -12px;
     margin-left: -12px;
@@ -547,6 +548,54 @@
         width: 100%;
         min-height: 120px;
         transition: height .3s;
+    }
+}
+
+/**
+ * Preloader
+ */
+$preloader_color: rgba(#fff, .3) !default;
+$preloader_color_inner: #fff !default;
+$preloader_size: 30px !default;
+$preloader_weight: 2px !default;
+$preloader_speed: .4s !default;
+
+.vp_list_preview_preloader {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    bottom: -16px;
+    left: -4px;
+    visibility: hidden;
+    background-color: #262829;
+    opacity: 0;
+    transition: .15s opacity, .15s visibility;
+
+    &::before {
+        content: "";
+        position: relative;
+        display: block;
+        top: 50%;
+        left: 50%;
+        width: $preloader_size;
+        height: $preloader_size;
+        margin-top: -$preloader_size/2 - $preloader_weight;
+        margin-left: -$preloader_size/2 - $preloader_weight;
+        text-indent: -9999em;
+        border: $preloader_weight solid $preloader_color;
+        border-left: $preloader_weight solid $preloader_color_inner;
+        border-radius: 50%;
+        animation: vp-preloader-spinner $preloader_speed infinite linear;
+    }
+
+    &.vp_list_preview_preloader_active {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+@keyframes vp-preloader-spinner {
+    100% {
+        transform: rotate(360deg);
     }
 }
 

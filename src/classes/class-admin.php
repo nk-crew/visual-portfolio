@@ -3045,6 +3045,7 @@ class Visual_Portfolio_Admin {
         ?>
         <div class="vp_list_preview">
             <iframe name="vp_list_preview_iframe" src="<?php echo esc_url( $url ); ?>" frameborder="0" noresize="noresize" scrolling="no"></iframe>
+            <div class="vp_list_preview_preloader vp_list_preview_preloader_active"></div>
         </div>
         <?php
     }
