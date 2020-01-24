@@ -24,12 +24,8 @@ class Visual_Portfolio_Images {
      * Visual_Portfolio_Images constructor.
      */
     public static function construct() {
-        // Prepare images base64 placeholders.
-        // Thanks https://wordpress.org/plugins/powerkit/.
         add_action( 'init', 'Visual_Portfolio_Images::allow_lazy_attributes' );
         add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
-        add_filter( 'wp_update_attachment_metadata', 'Visual_Portfolio_Images::generate_attachment_placeholder', 15 );
-        add_filter( 'wp_generate_attachment_metadata', 'Visual_Portfolio_Images::generate_attachment_placeholder', 15 );
         add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::add_image_placeholders', 15, 3 );
 
         // ignore Jetpack lazy.
@@ -42,11 +38,6 @@ class Visual_Portfolio_Images {
     public static function is_enabled() {
         // check for AMP endpoint.
         if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
-            return false;
-        }
-
-        // check if php GD library installed.
-        if ( ! extension_loaded( 'gd' ) || ! function_exists( 'imagecreate' ) ) {
             return false;
         }
 
@@ -140,29 +131,12 @@ class Visual_Portfolio_Images {
         $width  = $ratio['width'];
         $height = $ratio['height'];
 
-        $transient = sprintf( 'vpf_image_placeholder_%s_%s', $width, $height );
+        $placeholder = '<svg width="' . $width . '" height="' . $height . '" viewBox="0 0 ' . $width . ' ' . $height . '" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>';
 
-        $placeholder_image = get_transient( $transient );
+        $escape_search  = array( '<', '>', '#', '"' );
+        $escape_replace = array( '%3c', '%3e', '%23', '\'' );
 
-        if ( ! $placeholder_image ) {
-            ob_start();
-
-            $image      = imagecreate( $width, $height );
-            $background = imagecolorallocatealpha( $image, 0, 0, 255, 127 );
-
-            imagepng( $image, null, 9 );
-            imagecolordeallocate( $image, $background );
-            imagedestroy( $image );
-
-            $placeholder_code = ob_get_clean();
-
-            // phpcs:ignore
-            $placeholder_image = 'data:image/png;base64,' . base64_encode( $placeholder_code );
-
-            set_transient( $transient, $placeholder_image );
-        }
-
-        return $placeholder_image;
+        return 'data:image/svg+xml,' . str_replace( $escape_search, $escape_replace, $placeholder );
     }
 
     /**
@@ -191,43 +165,6 @@ class Visual_Portfolio_Images {
             'width'  => $width / $gcd,
             'height' => $height / $gcd,
         );
-    }
-
-    /**
-     * Attachment metadata filter.
-     *
-     * @param array $metadata - attachment meta data.
-     *
-     * @return array
-     */
-    public static function generate_attachment_placeholder( $metadata ) {
-        if ( ! self::is_enabled() ) {
-            return $metadata;
-        }
-
-        // Generate image full size.
-        if ( isset( $metadata['width'] ) && isset( $metadata['height'] ) ) {
-            $metadata['placeholder'] = self::get_image_placeholder( $metadata['width'], $metadata['height'] );
-        }
-
-        // Generate image sizes.
-        if ( isset( $metadata['sizes'] ) ) {
-            foreach ( $metadata['sizes'] as $slug => & $size ) {
-                // Ignore lqip size.
-                if ( preg_match( '/powerkit-lqip/', $slug ) ) {
-                    continue;
-                }
-                // Ignore retina size.
-                if ( preg_match( '/-2x$/', $slug ) ) {
-                    continue;
-                }
-                if ( isset( $size['width'] ) && isset( $size['height'] ) ) {
-                    $size['placeholder'] = self::get_image_placeholder( $size['width'], $size['height'] );
-                }
-            }
-        }
-
-        return $metadata;
     }
 
     /**
@@ -270,21 +207,24 @@ class Visual_Portfolio_Images {
         }
 
         // Default Placeholder.
-        $placeholder = false;
+        $placeholder   = false;
+        $placeholder_w = false;
+        $placeholder_h = false;
 
         // The right Image Placeholder.
         $metadata = get_post_meta( $attachment_id, '_wp_attachment_metadata', true );
 
-        // generate new placeholder.
-        if ( ! isset( $metadata['placeholder'] ) ) {
-            $metadata = self::generate_attachment_placeholder( $metadata );
-            update_post_meta( $attachment_id, '_wp_attachment_metadata', $metadata );
+        // generate placeholder.
+        if ( isset( $metadata['sizes'][ $size ] ) && isset( $metadata['sizes'][ $size ]['width'] ) && isset( $metadata['sizes'][ $size ]['height'] ) ) {
+            $placeholder_w = $metadata['sizes'][ $size ]['width'];
+            $placeholder_h = $metadata['sizes'][ $size ]['height'];
+        } elseif ( isset( $metadata['width'] ) && isset( $metadata['height'] ) ) {
+            $placeholder_w = $metadata['width'];
+            $placeholder_h = $metadata['height'];
         }
 
-        if ( isset( $metadata['sizes'][ $size ]['placeholder'] ) ) {
-            $placeholder = $metadata['sizes'][ $size ]['placeholder'];
-        } elseif ( isset( $metadata['placeholder'] ) ) {
-            $placeholder = $metadata['placeholder'];
+        if ( $placeholder_w && $placeholder_h ) {
+            $placeholder = self::get_image_placeholder( $placeholder_w, $placeholder_h );
         }
 
         // Prevent WP Rocket lazy loading.
