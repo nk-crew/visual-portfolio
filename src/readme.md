@@ -58,9 +58,10 @@ Visual Portfolio let you create beautiful portfolio layouts and image galleries.
 
 ## Real Usage Examples ##
 
-* [Skylith - Multipurpose Gutenberg Theme](https://demo.nkdev.info/#skylith)
-* [Piroll - Portfolio Theme](https://demo.nkdev.info/#piroll)
-* [Snow - Portfolio Theme](https://demo.nkdev.info/#snow)
+* [SquadForce - eSports Gaming WordPress Theme](https://wp.nkdev.info/squadforce/)
+* [Skylith - Multipurpose Gutenberg Theme](https://wp.nkdev.info/skylith/)
+* [Piroll - Portfolio Theme](https://wp.nkdev.info/piroll/)
+* [Snow - Portfolio Theme](https://wp.nkdev.info/snow/)
 
 ## Screenshots ##
 
