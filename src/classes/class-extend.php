@@ -25,6 +25,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function layouts() {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -47,6 +48,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function layout_controls( $name, $controls ) {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -62,6 +64,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function tiles() {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -84,6 +87,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function items_styles() {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -114,6 +118,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function item_style_controls( $name, $controls ) {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -129,6 +134,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function filters() {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -151,6 +157,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function filter_controls( $name, $controls ) {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -166,6 +173,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function sort() {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -188,6 +196,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function sort_controls( $name, $controls ) {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -203,6 +212,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function pagination() {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -225,6 +235,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function pagination_controls( $name, $controls ) {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -242,6 +253,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function portfolio_attrs( $attrs, $options ) {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -270,6 +282,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function image_controls( $controls, $name ) {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -293,10 +306,11 @@ class Visual_Portfolio_Extend {
      *
      * @param array  $args - query arguments.
      * @param string $options - portfolio options.
+     * @param string $id - portfolio id.
      * @return array
      */
-    public static function query_args( $args, $options ) {
-        return apply_filters( 'vpf_extend_query_args', $args, $options );
+    public static function query_args( $args, $options, $id ) {
+        return apply_filters( 'vpf_extend_query_args', $args, $options, $id );
     }
 
     /**
@@ -307,6 +321,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function filter_items( $items, $options ) {
+        // phpcs:ignore
         /*
          * Example:
             array(
@@ -337,6 +352,7 @@ class Visual_Portfolio_Extend {
      * @return array
      */
     public static function sort_items( $items, $options ) {
+        // phpcs:ignore
         /*
          * Example:
             array(

@@ -236,7 +236,7 @@ class Visual_Portfolio_Get {
         $is_social = 'social-stream' === $options['vp_content_source'];
 
         if ( $is_images || $is_social ) {
-            $query_opts = self::get_query_params( $options );
+            $query_opts = self::get_query_params( $options, false, $atts['id'] );
 
             if ( isset( $query_opts['max_num_pages'] ) ) {
                 $max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
@@ -245,7 +245,7 @@ class Visual_Portfolio_Get {
             }
         } else {
             // Get query params.
-            $query_opts = self::get_query_params( $options );
+            $query_opts = self::get_query_params( $options, false, $atts['id'] );
 
             // get Post List.
             $portfolio_query = new WP_Query( $query_opts );
@@ -835,10 +835,11 @@ class Visual_Portfolio_Get {
      *
      * @param array $options portfolio options.
      * @param bool  $for_filter prevent retrieving GET variable if used for filter.
+     * @param int   $layout_id portfolio layout id.
      *
      * @return array
      */
-    private static function get_query_params( $options, $for_filter = false ) {
+    private static function get_query_params( $options, $for_filter = false, $layout_id = false ) {
         $query_opts = array();
 
         $is_images = 'images' === $options['vp_content_source'];
@@ -1183,7 +1184,7 @@ class Visual_Portfolio_Get {
             }
         }
 
-        $query_opts = Visual_Portfolio_Extend::query_args( $query_opts, $options );
+        $query_opts = Visual_Portfolio_Extend::query_args( $query_opts, $options, $layout_id );
 
         return $query_opts;
     }
