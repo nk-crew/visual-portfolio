@@ -844,6 +844,9 @@ class VP {
 
         self.prepareLazyLoad();
 
+        // images loaded
+        self.imagesLoaded();
+
         // init custom colors
         self.initCustomColors();
     }

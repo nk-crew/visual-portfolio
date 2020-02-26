@@ -361,7 +361,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 * changed portfolio default image sizes (since we use Lazyload, we can use larger image sizes)
 * updated FontAwesome to 5.2.0
 * fixed Slider styles when used 2 sliders on the page
-* removed imagesloaded dependelcy
+* removed imagesloaded dependency
 * disabled 'with_front' in portfolio post type (thanks to [https://wordpress.org/support/topic/change-the-permalink-structure-2/](https://wordpress.org/support/topic/change-the-permalink-structure-2/))
 
 = 1.6.2 =
