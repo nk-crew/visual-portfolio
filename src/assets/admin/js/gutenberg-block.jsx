@@ -244,6 +244,7 @@ class VPEdit extends Component {
                                     onInit={ () => {
                                         maybeResizePreviews();
                                     } }
+                                    allowtransparency="true"
                                 />
                             </div>
                         </div>

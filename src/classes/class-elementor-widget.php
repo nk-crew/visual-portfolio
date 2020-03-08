@@ -188,7 +188,7 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
             ?>
         >
             <?php if ( $this->is_preview_mode() ) : ?>
-                <iframe></iframe>
+                <iframe allowtransparency="true"></iframe>
             <?php else : ?>
                 <?php echo do_shortcode( '[visual_portfolio id="' . esc_attr( $settings['id'] ) . '"]' ); ?>
             <?php endif; ?>
