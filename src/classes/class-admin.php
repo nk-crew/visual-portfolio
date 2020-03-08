@@ -3146,7 +3146,7 @@ class Visual_Portfolio_Admin {
      * Information About Social Stream Functionality.
      */
     public static function social_stream_information() {
-        $url               = 'https://visualportfolio.co/pricing';
+        $url               = 'https://visualportfolio.co/pro/';
         $allowed_protocols = array(
             'a' => array(
                 'href'   => array(),
