@@ -458,7 +458,7 @@ class VP {
                 'margin-right': mr - right,
             } );
         }
-        if ( self.$item.hasClass( 'vp-portfolio__stretch' ) ) {
+        if ( self.$item.hasClass( 'vp-portfolio__stretch' ) && ! self.isPreview() ) {
             $wnd.on( `load${ evp } resize${ evp } orientationchange${ evp }`, () => {
                 stretch();
             } );
