@@ -22,10 +22,21 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
     public function __construct( $data = array(), $args = null ) {
         parent::__construct( $data, $args );
 
-        wp_register_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.min.js', '', '4.2.1', true );
-        wp_register_script( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/js/elementor.min.js', array( 'elementor-frontend', 'iframe-resizer', 'jquery' ), '@@plugin_version', true );
+        if ( $this->is_preview_mode() ) {
+            wp_register_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.min.js', '', '4.2.1', true );
+            wp_register_script( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/js/elementor.min.js', array( 'elementor-frontend', 'iframe-resizer', 'jquery' ), '@@plugin_version', true );
 
-        wp_register_style( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/css/elementor.min.css', array(), '@@plugin_version' );
+            wp_register_style( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/css/elementor.min.css', array(), '@@plugin_version' );
+        }
+    }
+
+    /**
+     * Is edit mode check.
+     *
+     * @return boolean
+     */
+    public function is_preview_mode() {
+        return \Elementor\Plugin::$instance->preview->is_preview_mode() || \Elementor\Plugin::$instance->editor->is_edit_mode();
     }
 
     /**
@@ -79,7 +90,11 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
      * @return array Widget script dependencies.
      */
     public function get_script_depends() {
-        return array( 'visual-portfolio-elementor' );
+        if ( $this->is_preview_mode() ) {
+            return array( 'visual-portfolio-elementor' );
+        }
+
+        return array();
     }
 
     /**
@@ -88,7 +103,11 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
      * @return array Widget style dependencies.
      */
     public function get_style_depends() {
-        return array( 'visual-portfolio-elementor' );
+        if ( $this->is_preview_mode() ) {
+            return array( 'visual-portfolio-elementor' );
+        }
+
+        return array();
     }
 
     /**
@@ -151,13 +170,15 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
             return;
         }
 
-        $this->add_render_attribute(
-            'wrapper',
-            array(
-                'class'   => 'visual-portfolio-elementor-preview',
-                'data-id' => $settings['id'],
-            )
-        );
+        if ( $this->is_preview_mode() ) {
+            $this->add_render_attribute(
+                'wrapper',
+                array(
+                    'class'   => 'visual-portfolio-elementor-preview',
+                    'data-id' => $settings['id'],
+                )
+            );
+        }
 
         ?>
         <div
@@ -166,7 +187,11 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
                 echo $this->get_render_attribute_string( 'wrapper' );
             ?>
         >
-            <iframe></iframe>
+            <?php if ( $this->is_preview_mode() ) : ?>
+                <iframe></iframe>
+            <?php else : ?>
+                <?php echo do_shortcode( '[visual_portfolio id="' . esc_attr( $settings['id'] ) . '"]' ); ?>
+            <?php endif; ?>
         </div>
         <?php
     }
