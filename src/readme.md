@@ -124,6 +124,24 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.16.0 =
+
+* added preview preloader in layouts editor
+* added imagesloaded after AJAX loaded event (fixes Safari images stacking)
+* changed images placeholders to SVG (less code, better performance)
+* prevent ajax loading if requested URL is currently loaded
+* fixed Avoid Duplicate Posts option if used Post-Based with Custom Post IDs
+* fixed WP Smush lazyload conflict
+* fixed infinite scroll loading 2 next pages at a time
+* fixed Grid items position in FireFox
+* fixed stretch option usage in preview (just disable it)
+* fixed Elementor widget output on frontend
+* fixed post-based taxonomies when posts don't contain it
+* fixed AMP plugin integration PHP notices
+* fixed AJAX loading with changed layout settings in editor preview
+* fixed error in layouts preview when no items loaded
+* a lot of code improvements for upcoming PRO plugin
+
 = 1.15.1 =
 
 * fixed errors when upload images without width or height (for example, SVG)
