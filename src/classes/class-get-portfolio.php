@@ -1368,7 +1368,7 @@ class Visual_Portfolio_Get {
         }
 
         // Add 'All' active item.
-        if ( $vp_options['vp_filter_text_all'] ) {
+        if ( ! empty( $terms ) && $vp_options['vp_filter_text_all'] ) {
             array_unshift(
                 $terms,
                 array(
@@ -1388,6 +1388,11 @@ class Visual_Portfolio_Get {
                     'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : '' ),
                 )
             );
+        }
+
+        // No filters available.
+        if ( empty( $terms ) ) {
+            return;
         }
 
         // get options for the current filter.
