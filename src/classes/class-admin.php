@@ -3101,6 +3101,12 @@ class Visual_Portfolio_Admin {
                 </div>
                 <div class="vp-content-source__item-title"><?php echo esc_html__( 'Images', '@@text_domain' ); ?></div>
             </div>
+            <div class="vp-content-source__item" data-content="social-stream">
+                <div class="vp-content-source__item-icon">
+                    <span class="dashicons dashicons-share"></span>
+                </div>
+                <div class="vp-content-source__item-title"><?php echo esc_html__( 'Social', '@@text_domain' ); ?></div>
+            </div>
 
             <div class="vp-content-source__item-content">
                 <div data-content="portfolio">
