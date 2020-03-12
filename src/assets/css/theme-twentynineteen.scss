@@ -1,0 +1,9 @@
+// Fix links decoration.
+.entry .entry-content .vp-portfolio a {
+    text-decoration: none;
+}
+
+// Fix headings decorators.
+.vp-portfolio__item-meta-title::before {
+    content: none;
+}

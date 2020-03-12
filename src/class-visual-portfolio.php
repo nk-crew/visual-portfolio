@@ -210,6 +210,7 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-tinymce.php';
         require_once $this->plugin_path . 'classes/class-vc.php';
         require_once $this->plugin_path . 'classes/class-elementor.php';
+        require_once $this->plugin_path . 'classes/class-supported-themes.php';
         require_once $this->plugin_path . 'classes/class-migration.php';
     }
 

@@ -1,0 +1,8 @@
+// Fix links border.
+.entry-content .vp-portfolio {
+    a,
+    a:hover,
+    a:focus {
+        box-shadow: none;
+    }
+}
