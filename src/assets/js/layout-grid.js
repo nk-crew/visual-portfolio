@@ -25,6 +25,9 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
         };
 
         GridMode.prototype.measureColumns = function() {
+            // set items, used if measuring first item
+            this.items = this.isotope.filteredItems;
+
             this.getContainerWidth();
 
             // if columnWidth is 0, default to outerWidth of first item
