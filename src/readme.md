@@ -124,6 +124,15 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.16.1 =
+
+* added style fixes for some Twenty themes
+* added :focus styles in templates, where used :hover
+* disable filter output if no taxonomies found
+* reverted back taxonomies public queryable (users used it for permalinks)
+* fixed grid layout position calculation after filtering
+* fixed PhotoSwipe jQuery is not a function error
+
 = 1.16.0 =
 
 * added preview preloader in layouts editor
