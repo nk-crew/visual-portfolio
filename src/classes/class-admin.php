@@ -246,40 +246,40 @@ class Visual_Portfolio_Admin {
             'portfolio_category',
             'portfolio',
             array(
-                'label'             => esc_html__( 'Portfolio Categories', '@@text_domain' ),
-                'labels'            => array(
+                'label'              => esc_html__( 'Portfolio Categories', '@@text_domain' ),
+                'labels'             => array(
                     'menu_name' => esc_html__( 'Categories', '@@text_domain' ),
                 ),
-                'rewrite'           => array(
+                'rewrite'            => array(
                     'slug' => 'portfolio-category',
                 ),
-                'hierarchical'      => true,
-                'public'            => false,
-                'show_ui'           => true,
-                'show_in_rest'      => true,
-                'show_admin_column' => true,
-                'map_meta_cap'      => true,
-                'capability_type'   => 'portfolio',
+                'hierarchical'       => true,
+                'publicly_queryable' => false,
+                'show_in_nav_menus'  => true,
+                'show_in_rest'       => true,
+                'show_admin_column'  => true,
+                'map_meta_cap'       => true,
+                'capability_type'    => 'portfolio',
             )
         );
         register_taxonomy(
             'portfolio_tag',
             'portfolio',
             array(
-                'label'             => esc_html__( 'Portfolio Tags', '@@text_domain' ),
-                'labels'            => array(
+                'label'              => esc_html__( 'Portfolio Tags', '@@text_domain' ),
+                'labels'             => array(
                     'menu_name' => esc_html__( 'Tags', '@@text_domain' ),
                 ),
-                'rewrite'           => array(
+                'rewrite'            => array(
                     'slug' => 'portfolio-tag',
                 ),
-                'hierarchical'      => false,
-                'public'            => false,
-                'show_ui'           => true,
-                'show_in_rest'      => true,
-                'show_admin_column' => true,
-                'map_meta_cap'      => true,
-                'capability_type'   => 'portfolio',
+                'hierarchical'       => false,
+                'publicly_queryable' => false,
+                'show_in_nav_menus'  => true,
+                'show_in_rest'       => true,
+                'show_admin_column'  => true,
+                'map_meta_cap'       => true,
+                'capability_type'    => 'portfolio',
             )
         );
 
