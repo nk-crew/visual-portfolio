@@ -1395,12 +1395,13 @@ class Visual_Portfolio_Admin {
                 'default' => array(
                     'title'            => esc_html__( 'Default', '@@text_domain' ),
                     'builtin_controls' => array(
-                        'show_title'      => true,
-                        'show_categories' => true,
-                        'show_date'       => true,
-                        'show_excerpt'    => true,
-                        'show_icons'      => false,
-                        'align'           => true,
+                        'images_rounded_corners' => true,
+                        'show_title'             => true,
+                        'show_categories'        => true,
+                        'show_date'              => true,
+                        'show_excerpt'           => true,
+                        'show_icons'             => false,
+                        'align'                  => true,
                     ),
                     'controls'         => array(
                         array(
@@ -1436,12 +1437,13 @@ class Visual_Portfolio_Admin {
                 'fly' => array(
                     'title'            => esc_html__( 'Fly', '@@text_domain' ),
                     'builtin_controls' => array(
-                        'show_title'      => true,
-                        'show_categories' => true,
-                        'show_date'       => true,
-                        'show_excerpt'    => true,
-                        'show_icons'      => true,
-                        'align'           => 'extended',
+                        'images_rounded_corners' => true,
+                        'show_title'             => true,
+                        'show_categories'        => true,
+                        'show_date'              => true,
+                        'show_excerpt'           => true,
+                        'show_icons'             => true,
+                        'align'                  => 'extended',
                     ),
                     'controls'         => array(
                         array(
@@ -1477,12 +1479,13 @@ class Visual_Portfolio_Admin {
                 'emerge' => array(
                     'title'            => esc_html__( 'Emerge', '@@text_domain' ),
                     'builtin_controls' => array(
-                        'show_title'      => true,
-                        'show_categories' => true,
-                        'show_date'       => true,
-                        'show_excerpt'    => true,
-                        'show_icons'      => false,
-                        'align'           => true,
+                        'images_rounded_corners' => true,
+                        'show_title'             => true,
+                        'show_categories'        => true,
+                        'show_date'              => true,
+                        'show_excerpt'           => true,
+                        'show_icons'             => false,
+                        'align'                  => true,
                     ),
                     'controls'         => array(
                         array(
@@ -1518,12 +1521,13 @@ class Visual_Portfolio_Admin {
                 'fade' => array(
                     'title'            => esc_html__( 'Fade', '@@text_domain' ),
                     'builtin_controls' => array(
-                        'show_title'      => true,
-                        'show_categories' => true,
-                        'show_date'       => true,
-                        'show_excerpt'    => true,
-                        'show_icons'      => true,
-                        'align'           => 'extended',
+                        'images_rounded_corners' => true,
+                        'show_title'             => true,
+                        'show_categories'        => true,
+                        'show_date'              => true,
+                        'show_excerpt'           => true,
+                        'show_icons'             => true,
+                        'align'                  => 'extended',
                     ),
                     'controls'         => array(
                         array(
@@ -1589,6 +1593,23 @@ class Visual_Portfolio_Admin {
                         continue;
                     }
                     switch ( $control_name ) {
+                        case 'images_rounded_corners':
+                            $new_fields[] = array(
+                                'type'      => 'range',
+                                'label'     => esc_html__( 'Images Rounded Corners', '@@text_domain' ),
+                                'name'      => 'images_rounded_corners',
+                                'min'       => 0,
+                                'max'       => 50,
+                                'default'   => 0,
+                                'style'     => array(
+                                    array(
+                                        'element'  => 'fade' === $name || 'fly' === $name || 'emerge' === $name ? '.vp-portfolio__item' : '.vp-portfolio__item-img',
+                                        'property' => 'border-radius',
+                                        'mask'     => '$px',
+                                    ),
+                                ),
+                            );
+                            break;
                         case 'show_title':
                             $new_fields[] = array(
                                 'type'    => 'toggle',

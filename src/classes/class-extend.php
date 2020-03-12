@@ -30,7 +30,7 @@ class Visual_Portfolio_Extend {
          * Example:
             array(
                 'new_layout' => array(
-                    'title' => esc_html__( 'New Layout', 'text_domain' ),
+                    'title'    => esc_html__( 'New Layout', 'text_domain' ),
                     'controls' => array(
                         ... controls ...
                     ),
@@ -69,11 +69,11 @@ class Visual_Portfolio_Extend {
          * Example:
             array(
                 array(
-                    'url' => 'assets/images/tiles-1-1.svg',
+                    'url'   => 'assets/images/tiles-1-1.svg',
                     'value' => '1|1,0.5|',
                 ),
                 array(
-                    'url' => 'assets/images/tiles-2-1.svg',
+                    'url'   => 'assets/images/tiles-2-1.svg',
                     'value' => '2|1,1|',
                 ),
             )
@@ -92,16 +92,17 @@ class Visual_Portfolio_Extend {
          * Example:
             array(
                 'new_items_style' => array(
-                    'title' => esc_html__( 'New Items Style', '@@text_domain' ),
+                    'title'            => esc_html__( 'New Items Style', '@@text_domain' ),
                     'builtin_controls' => array(
-                        'show_title' => true,
-                        'show_categories' => true,
-                        'show_date' => true,
-                        'show_excerpt' => true,
-                        'show_icons' => false,
-                        'align' => true,
+                        'images_rounded_corners' => true,
+                        'show_title'             => true,
+                        'show_categories'        => true,
+                        'show_date'              => true,
+                        'show_excerpt'           => true,
+                        'show_icons'             => false,
+                        'align'                  => true,
                     ),
-                    'controls' => array(
+                    'controls'         => array(
                         ... controls ...
                     ),
                 ),
@@ -139,7 +140,7 @@ class Visual_Portfolio_Extend {
          * Example:
             array(
                 'new_filter' => array(
-                    'title' => esc_html__( 'New Filter', '@@text_domain' ),
+                    'title'    => esc_html__( 'New Filter', '@@text_domain' ),
                     'controls' => array(
                         ... controls ...
                     ),
@@ -178,7 +179,7 @@ class Visual_Portfolio_Extend {
          * Example:
             array(
                 'new_sort' => array(
-                    'title' => esc_html__( 'New Sort', '@@text_domain' ),
+                    'title'    => esc_html__( 'New Sort', '@@text_domain' ),
                     'controls' => array(
                         ... controls ...
                     ),
@@ -217,7 +218,7 @@ class Visual_Portfolio_Extend {
          * Example:
             array(
                 'new_pagination' => array(
-                    'title' => esc_html__( 'New Pagination', '@@text_domain' ),
+                    'title'    => esc_html__( 'New Pagination', '@@text_domain' ),
                     'controls' => array(
                         ... controls ...
                     ),

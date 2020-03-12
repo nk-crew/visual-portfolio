@@ -300,7 +300,7 @@ class Visual_Portfolio_Controls {
             return;
         }
         ?>
-        <div class="vp-control-style">
+        <div class="vp-control-style vp-no-reload">
             <?php
             foreach ( $args['style'] as $style ) {
                 if ( $style['element'] && $style['property'] ) {
