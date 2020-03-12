@@ -102,7 +102,8 @@
         // https://github.com/nk-o/visual-portfolio/issues/92
         z-index: 1;
     }
-    & .vp-portfolio__item:hover {
+    & .vp-portfolio__item:hover,
+    & .vp-portfolio__item:focus {
         .vp-portfolio__item-overlay {
             opacity: 1;
         }

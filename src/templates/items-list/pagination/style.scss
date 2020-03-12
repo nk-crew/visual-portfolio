@@ -43,7 +43,8 @@
             will-change: border-color, background-color, color;
         }
 
-        &:not(.vp-pagination__item-active) > a:hover {
+        &:not(.vp-pagination__item-active) > a:hover,
+        &:not(.vp-pagination__item-active) > a:focus {
             border: 1px solid #bfbfbf;
         }
 
