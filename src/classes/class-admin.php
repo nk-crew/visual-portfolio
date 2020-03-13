@@ -24,6 +24,8 @@ class Visual_Portfolio_Admin {
 
         // register controls.
         add_action( 'init', array( $this, 'register_controls' ) );
+        add_filter( 'vpf_extend_layouts', array( $this, 'add_default_layouts' ), 9 );
+        add_filter( 'vpf_extend_items_styles', array( $this, 'add_default_items_styles' ), 9 );
 
         // metaboxes.
         add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
@@ -153,15 +155,14 @@ class Visual_Portfolio_Admin {
     }
 
     /**
-     * Register control fields for the metaboxes.
+     * Add default layouts.
+     *
+     * @param array $layouts - layouts array.
+     *
+     * @return array
      */
-    public function register_controls() {
-        do_action( 'vpf_before_register_controls' );
-
-        /**
-         * Layouts.
-         */
-        $layouts = array_merge(
+    public function add_default_layouts( $layouts ) {
+        return array_merge(
             array(
                 // Tiles.
                 'tiles' => array(
@@ -691,107 +692,19 @@ class Visual_Portfolio_Admin {
                     ),
                 ),
             ),
-            Visual_Portfolio_Extend::layouts()
+            $layouts
         );
+    }
 
-        // Extend specific layout controls.
-        foreach ( $layouts as $name => $layout ) {
-            if ( isset( $layout['controls'] ) ) {
-                $layouts[ $name ]['controls'] = Visual_Portfolio_Extend::layout_controls( $name, $layout['controls'] );
-            }
-        }
-
-        // Layouts selector.
-        $layouts_selector = array();
-        foreach ( $layouts as $name => $layout ) {
-            $layouts_selector[ $name ] = array(
-                'value' => $name,
-                'title' => $layout['title'],
-                'icon'  => isset( $layout['icon'] ) ? $layout['icon'] : '',
-            );
-        }
-
-        Visual_Portfolio_Controls::register(
-            array(
-                'category' => 'layouts',
-                'type'     => 'icons_selector',
-                'name'     => 'vp_layout',
-                'default'  => 'tiles',
-                'options'  => $layouts_selector,
-            )
-        );
-
-        // layouts options.
-        foreach ( $layouts as $name => $layout ) {
-            if ( ! isset( $layout['controls'] ) ) {
-                continue;
-            }
-            foreach ( $layout['controls'] as $field ) {
-                $field['category'] = 'layouts';
-                $field['name']     = 'vp_' . $name . '_' . $field['name'];
-
-                // condition names prefix fix.
-                if ( isset( $field['condition'] ) ) {
-                    foreach ( $field['condition'] as $k => $cond ) {
-                        if ( isset( $cond['control'] ) ) {
-                            $field['condition'][ $k ]['control'] = 'vp_' . $name . '_' . $cond['control'];
-                        }
-                    }
-                }
-
-                $field['condition'] = array_merge(
-                    isset( $field['condition'] ) ? $field['condition'] : array(),
-                    array(
-                        array(
-                            'control' => 'vp_layout',
-                            'value'   => $name,
-                        ),
-                    )
-                );
-                Visual_Portfolio_Controls::register( $field );
-            }
-        }
-
-        Visual_Portfolio_Controls::register(
-            array(
-                'category' => 'layouts',
-                'type'     => 'range',
-                'label'    => esc_html__( 'Gap', '@@text_domain' ),
-                'name'     => 'vp_items_gap',
-                'default'  => 15,
-                'min'      => 0,
-                'max'      => 150,
-            )
-        );
-
-        Visual_Portfolio_Controls::register(
-            array(
-                'category' => 'layouts',
-                'type'     => 'range',
-                'label'    => esc_html__( 'Items Per Page', '@@text_domain' ),
-                'name'     => 'vp_items_count',
-                'default'  => 6,
-                'min'      => 1,
-                'max'      => 50,
-            )
-        );
-
-        Visual_Portfolio_Controls::register(
-            array(
-                'category'   => 'layouts',
-                'type'       => 'toggle',
-                'label'      => esc_html__( 'Stretch', '@@text_domain' ),
-                'name'       => 'vp_stretch',
-                'default'    => false,
-                'hint'       => esc_attr__( 'Break container and display it wide', '@@text_domain' ),
-                'hint_place' => 'left',
-            )
-        );
-
-        /**
-         * Items Style
-         */
-        $items_styles = array_merge(
+    /**
+     * Add default items styles.
+     *
+     * @param array $items_styles - items styles array.
+     *
+     * @return array
+     */
+    public function add_default_items_styles( $items_styles ) {
+        return array_merge(
             array(
                 // Default.
                 'default' => array(
@@ -965,8 +878,119 @@ class Visual_Portfolio_Admin {
                     ),
                 ),
             ),
-            Visual_Portfolio_Extend::items_styles()
+            $items_styles
         );
+    }
+
+    /**
+     * Register control fields for the metaboxes.
+     */
+    public function register_controls() {
+        do_action( 'vpf_before_register_controls' );
+
+        /**
+         * Layouts.
+         */
+        $layouts = Visual_Portfolio_Extend::layouts();
+
+        // Extend specific layout controls.
+        foreach ( $layouts as $name => $layout ) {
+            if ( isset( $layout['controls'] ) ) {
+                $layouts[ $name ]['controls'] = Visual_Portfolio_Extend::layout_controls( $name, $layout['controls'] );
+            }
+        }
+
+        // Layouts selector.
+        $layouts_selector = array();
+        foreach ( $layouts as $name => $layout ) {
+            $layouts_selector[ $name ] = array(
+                'value' => $name,
+                'title' => $layout['title'],
+                'icon'  => isset( $layout['icon'] ) ? $layout['icon'] : '',
+            );
+        }
+
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'layouts',
+                'type'     => 'icons_selector',
+                'name'     => 'vp_layout',
+                'default'  => 'tiles',
+                'options'  => $layouts_selector,
+            )
+        );
+
+        // layouts options.
+        foreach ( $layouts as $name => $layout ) {
+            if ( ! isset( $layout['controls'] ) ) {
+                continue;
+            }
+            foreach ( $layout['controls'] as $field ) {
+                $field['category'] = 'layouts';
+                $field['name']     = 'vp_' . $name . '_' . $field['name'];
+
+                // condition names prefix fix.
+                if ( isset( $field['condition'] ) ) {
+                    foreach ( $field['condition'] as $k => $cond ) {
+                        if ( isset( $cond['control'] ) ) {
+                            $field['condition'][ $k ]['control'] = 'vp_' . $name . '_' . $cond['control'];
+                        }
+                    }
+                }
+
+                $field['condition'] = array_merge(
+                    isset( $field['condition'] ) ? $field['condition'] : array(),
+                    array(
+                        array(
+                            'control' => 'vp_layout',
+                            'value'   => $name,
+                        ),
+                    )
+                );
+                Visual_Portfolio_Controls::register( $field );
+            }
+        }
+
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'layouts',
+                'type'     => 'range',
+                'label'    => esc_html__( 'Gap', '@@text_domain' ),
+                'name'     => 'vp_items_gap',
+                'default'  => 15,
+                'min'      => 0,
+                'max'      => 150,
+            )
+        );
+
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'layouts',
+                'type'     => 'range',
+                'label'    => esc_html__( 'Items Per Page', '@@text_domain' ),
+                'name'     => 'vp_items_count',
+                'default'  => 6,
+                'min'      => 1,
+                'max'      => 50,
+            )
+        );
+
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'   => 'layouts',
+                'type'       => 'toggle',
+                'label'      => esc_html__( 'Stretch', '@@text_domain' ),
+                'name'       => 'vp_stretch',
+                'default'    => false,
+                'hint'       => esc_attr__( 'Break container and display it wide', '@@text_domain' ),
+                'hint_place' => 'left',
+            )
+        );
+
+        /**
+         * Items Style
+         */
+        $items_styles = Visual_Portfolio_Extend::items_styles();
 
         // Extend specific item style controls.
         foreach ( $items_styles as $name => $style ) {

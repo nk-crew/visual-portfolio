@@ -39,9 +39,9 @@ class Visual_Portfolio_Custom_Post_Type {
         add_filter( 'manage_portfolio_posts_columns', array( $this, 'add_portfolio_img_column' ) );
         add_filter( 'manage_portfolio_posts_custom_column', array( $this, 'manage_portfolio_img_column' ), 10, 2 );
 
-        // show shortcode in vp_lists table.
-        add_filter( 'manage_vp_lists_posts_columns', array( $this, 'add_vp_lists_shortcode_column' ) );
-        add_filter( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_shortcode_column' ), 10, 2 );
+        // show icon and shortcode columns in vp_lists table.
+        add_filter( 'manage_vp_lists_posts_columns', array( $this, 'add_vp_lists_custom_columns' ) );
+        add_filter( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_custom_columns' ), 10, 2 );
 
         // highlight admin menu items.
         add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
@@ -515,29 +515,58 @@ class Visual_Portfolio_Custom_Post_Type {
     }
 
     /**
-     * Add shortcode example in vp_lists
+     * Add icons and shortcode columns in vp_lists admin.
      *
      * @param array $columns columns of the table.
      *
      * @return array
      */
-    public function add_vp_lists_shortcode_column( $columns = array() ) {
-        $column_meta = array(
+    public function add_vp_lists_custom_columns( $columns = array() ) {
+        // Icon column.
+        $column_icon = array(
+            'vp_lists_post_icon' => esc_html__( 'Icon', '@@text_domain' ),
+        );
+
+        // insert after first column.
+        $columns = array_slice( $columns, 0, 1, true ) + $column_icon + array_slice( $columns, 1, null, true );
+
+        // Shortcode column.
+        $column_shortcode = array(
             'vp_lists_post_shortcode' => esc_html__( 'Shortcode', '@@text_domain' ),
         );
 
         // insert before last column.
-        $columns = array_slice( $columns, 0, count( $columns ) - 1, true ) + $column_meta + array_slice( $columns, count( $columns ) - 1, null, true );
+        $columns = array_slice( $columns, 0, count( $columns ) - 1, true ) + $column_shortcode + array_slice( $columns, count( $columns ) - 1, null, true );
 
         return $columns;
     }
 
     /**
-     * Add shortcode example in vp_lists column
+     * Add icons and shortcode columns in vp_lists admin.
      *
      * @param bool $column_name column name.
      */
-    public function manage_vp_lists_shortcode_column( $column_name = false ) {
+    public function manage_vp_lists_custom_columns( $column_name = false ) {
+        if ( 'vp_lists_post_icon' === $column_name ) {
+            $all_layouts = Visual_Portfolio_Extend::layouts();
+            $opts        = Visual_Portfolio_Get::get_options( get_the_ID() );
+            $layout      = isset( $opts['vp_layout'] ) ? $opts['vp_layout'] : false;
+            $icon        = '';
+
+            if ( $layout ) {
+                foreach ( $all_layouts as $name => $data ) {
+                    if ( $name === $layout && isset( $data['icon'] ) ) {
+                        $icon = $data['icon'];
+                    }
+                }
+
+                echo '<a href="' . esc_url( get_edit_post_link() ) . '" class="vp-portfolio-list__icon">';
+                // phpcs:ignore
+                echo $icon;
+                echo '</a>';
+            }
+        }
+
         if ( 'vp_lists_post_shortcode' === $column_name ) {
             echo '<code class="vp-onclick-selection">';
             echo '[visual_portfolio id="' . get_the_ID() . '"]';
