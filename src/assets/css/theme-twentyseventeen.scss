@@ -6,3 +6,18 @@
         box-shadow: none;
     }
 }
+
+// Fix for figcaption in block.
+.wp-block-nk-visual-portfolio[class^="wp-block-"]:not(.wp-block-gallery) figcaption {
+    margin-bottom: 0;
+    font-style: inherit;
+    text-align: center;
+}
+
+// Fix color on hover.
+.vp-portfolio__items-style-fade .vp-portfolio__item-meta:hover,
+.vp-portfolio__items-style-fade .vp-portfolio__item-meta:focus,
+.vp-portfolio__items-style-fly .vp-portfolio__item-meta:hover,
+.vp-portfolio__items-style-fly .vp-portfolio__item-meta:focus {
+    color: inherit;
+}
