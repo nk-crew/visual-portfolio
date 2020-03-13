@@ -1097,7 +1097,9 @@ class Visual_Portfolio_Get {
                         // We need this empty array, because when taxonomy selected,
                         // ant posts don't have this taxonomy, we will see all available posts.
                         // Related topic: https://wordpress.org/support/topic/exclude-certain-category-from-filter/.
-                        $query_opts['tax_query'][] = array();
+                        if ( 'OR' === $options['vp_posts_taxonomies_relation'] ) {
+                            $query_opts['tax_query'][] = array();
+                        }
 
                         foreach ( $options['vp_posts_taxonomies'] as $taxonomy ) {
                             $taxonomy_name = null;
