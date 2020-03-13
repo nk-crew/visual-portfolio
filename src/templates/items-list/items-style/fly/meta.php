@@ -52,35 +52,6 @@ $show_meta = $opts['show_icon'] && $opts['icon'] ||
                 <?php
             }
 
-            // Show Title.
-            if ( $opts['show_title'] && $args['title'] ) {
-                ?>
-                <h2 class="vp-portfolio__item-meta-title">
-                    <?php
-                    echo esc_html( $args['title'] );
-                    ?>
-                </h2>
-                <?php
-            }
-
-            // Show Date.
-            if ( $opts['show_date'] ) {
-                ?>
-                <div class="vp-portfolio__item-meta-date">
-                    <?php echo esc_html( $args['published'] ); ?>
-                </div>
-                <?php
-            }
-
-            // Show Excerpt.
-            if ( $opts['show_excerpt'] && $args['excerpt'] ) {
-                ?>
-                <div class="vp-portfolio__item-meta-excerpt">
-                    <?php echo esc_html( $args['excerpt'] ); ?>
-                </div>
-                <?php
-            }
-
             // Show Categories.
             if ( $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] ) ) {
                 ?>
@@ -103,6 +74,35 @@ $show_meta = $opts['show_icon'] && $opts['icon'] ||
                     }
                     ?>
                 </ul>
+                <?php
+            }
+
+            // Show Date.
+            if ( $opts['show_date'] ) {
+                ?>
+                <div class="vp-portfolio__item-meta-date">
+                    <?php echo esc_html( $args['published'] ); ?>
+                </div>
+                <?php
+            }
+
+            // Show Title.
+            if ( $opts['show_title'] && $args['title'] ) {
+                ?>
+                <h2 class="vp-portfolio__item-meta-title">
+                    <?php
+                    echo esc_html( $args['title'] );
+                    ?>
+                </h2>
+                <?php
+            }
+
+            // Show Excerpt.
+            if ( $opts['show_excerpt'] && $args['excerpt'] ) {
+                ?>
+                <div class="vp-portfolio__item-meta-excerpt">
+                    <?php echo esc_html( $args['excerpt'] ); ?>
+                </div>
                 <?php
             }
             ?>

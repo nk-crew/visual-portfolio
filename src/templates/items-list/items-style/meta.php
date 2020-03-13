@@ -25,6 +25,42 @@ $show_meta = $opts['show_title'] && $args['title'] ||
         <div class="vp-portfolio__item-meta">
             <?php
 
+            // Show Categories.
+            if ( $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] ) ) {
+                ?>
+                <ul class="vp-portfolio__item-meta-categories">
+                    <?php
+                    // phpcs:ignore
+                    $count = $opts['categories_count'];
+
+                    // phpcs:ignore
+                    foreach ( $args['categories'] as $category ) {
+                        if ( ! $count ) {
+                            break;
+                        }
+                        ?>
+                        <li class="vp-portfolio__item-meta-category">
+                            <a href="<?php echo esc_html( $category['url'] ); ?>">
+                                <?php echo esc_html( $category['label'] ); ?>
+                            </a>
+                        </li>
+                        <?php
+                        $count--;
+                    }
+                    ?>
+                </ul>
+                <?php
+            }
+
+            // Show Date.
+            if ( $opts['show_date'] ) {
+                ?>
+                <div class="vp-portfolio__item-meta-date">
+                    <?php echo esc_html( $args['published'] ); ?>
+                </div>
+                <?php
+            }
+
             // Show Title.
             if ( $opts['show_title'] && $args['title'] ) {
                 ?>
@@ -52,15 +88,6 @@ $show_meta = $opts['show_title'] && $args['title'] ||
                 <?php
             }
 
-            // Show Date.
-            if ( $opts['show_date'] ) {
-                ?>
-                <div class="vp-portfolio__item-meta-date">
-                    <?php echo esc_html( $args['published'] ); ?>
-                </div>
-                <?php
-            }
-
             // Show Excerpt.
             if ( $opts['show_excerpt'] && $args['excerpt'] ) {
                 ?>
@@ -76,33 +103,6 @@ $show_meta = $opts['show_title'] && $args['title'] ||
                 <a class="vp-portfolio__item-meta-read-more" href="<?php echo esc_url( $opts['read_more_url'] ); ?>">
                     <?php echo esc_html( $opts['read_more_label'] ); ?>
                 </a>
-                <?php
-            }
-
-            // Show Categories.
-            if ( $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] ) ) {
-                ?>
-                <ul class="vp-portfolio__item-meta-categories">
-                    <?php
-                    // phpcs:ignore
-                    $count = $opts['categories_count'];
-
-                    // phpcs:ignore
-                    foreach ( $args['categories'] as $category ) {
-                        if ( ! $count ) {
-                            break;
-                        }
-                        ?>
-                        <li class="vp-portfolio__item-meta-category">
-                            <a href="<?php echo esc_html( $category['url'] ); ?>">
-                                <?php echo esc_html( $category['label'] ); ?>
-                            </a>
-                        </li>
-                        <?php
-                        $count--;
-                    }
-                    ?>
-                </ul>
                 <?php
             }
             ?>
