@@ -45,7 +45,8 @@
         padding: 2em;
         color: inherit;
         text-align: center;
-        transition: transform .3s ease, opacity .3s ease;
+        opacity: 0;
+        transition: transform .2s .1s ease, opacity .2s .1s ease;
         transform: scale(.95);
         will-change: transform, opacity;
 
@@ -118,6 +119,7 @@
             opacity: 1;
         }
         .vp-portfolio__item-meta {
+            opacity: 1;
             transform: scale(1);
         }
         .vp-portfolio__item-img img {
