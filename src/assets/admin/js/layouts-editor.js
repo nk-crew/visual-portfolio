@@ -63,6 +63,20 @@ if ( $.fn.imagepicker ) {
     $( '.vp-image-picker' ).imagepicker();
 }
 
+// icon picker
+$( '.vp-control-icons-selector' ).on( 'click', '.vp-control-icons-selector-item', function( e ) {
+    e.preventDefault();
+
+    const $this = $( this );
+    const val = $this.attr( 'data-value' );
+    const $input = $this.parent().find( '.vp-control-icons-selector-val' );
+
+    $this.addClass( 'vp-control-icons-selector-item-active' )
+        .siblings().removeClass( 'vp-control-icons-selector-item-active' );
+
+    $input.val( val ).change();
+} );
+
 // frame load
 const $frame = $( '.vp_list_preview iframe' );
 const $framePreloader = $( '.vp_list_preview_preloader' );

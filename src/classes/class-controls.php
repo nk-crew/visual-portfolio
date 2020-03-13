@@ -522,6 +522,33 @@ class Visual_Portfolio_Controls {
     }
 
     /**
+     * Print control icons selector.
+     *
+     * @param array $args - control args.
+     */
+    public static function print_control_icons_selector( $args = array() ) {
+        ?>
+        <div class="vp-control-icons-selector">
+            <?php
+            // selected image.
+            foreach ( $args['options'] as $data ) {
+                ?>
+                <button data-value="<?php echo esc_attr( $data['value'] ); ?>" class="vp-control-icons-selector-item <?php echo esc_attr( $args['value'] === $data['value'] ? 'vp-control-icons-selector-item-active' : '' ); ?>">
+                    <?php
+                    // phpcs:ignore
+                    echo $data['icon'];
+                    ?>
+                    <span><?php echo esc_html( $data['title'] ); ?></span>
+                </button>
+                <?php
+            }
+            ?>
+            <input type="hidden" class="vp-control-icons-selector-val" name="<?php echo esc_attr( $args['name'] ); ?>" id="<?php echo esc_attr( $args['name'] ); ?>" value="<?php echo esc_attr( $args['value'] ); ?>">
+        </div>
+        <?php
+    }
+
+    /**
      * Print control align.
      *
      * @param array $args - control args.

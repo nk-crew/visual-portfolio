@@ -786,6 +786,53 @@ $preloader_speed: .4s !default;
 }
 
 /**
+ * Icons Selector
+ */
+.vp-control-icons-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 15px;
+    width: 100%;
+
+    .vp-control-icons-selector-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        cursor: pointer;
+        background: none;
+        border: 1px solid #e2e4e7;
+        border-radius: 5px;
+        outline: none;
+        transition: .2s border, .2s box-shadow;
+
+        &:hover,
+        &:focus {
+            border-color: #555d66;
+        }
+
+        &.vp-control-icons-selector-item-active {
+            border-color: #007cba;
+            box-shadow: 0 0 0 1px #007cba;
+        }
+
+        svg {
+            width: 100%;
+            max-width: 40px;
+            height: auto;
+
+            + span {
+                padding-top: 8px;
+            }
+        }
+
+        span {
+            margin-top: auto;
+        }
+    }
+}
+
+/**
  * Gallery + Sortable
  */
 .vp-control-gallery {

@@ -774,6 +774,7 @@ class Visual_Portfolio_Admin {
                 // Tiles.
                 'tiles' => array(
                     'title'    => esc_html__( 'Tiles', '@@text_domain' ),
+                    'icon'     => '<svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="28" height="28" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="40.5" y="1.5" width="28" height="28" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="40.5" y="40.5001" width="28" height="28" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="1.5" y="40.5001" width="28" height="28" rx="2.5" stroke="currentColor" stroke-width="3"/></svg>',
                     'controls' => array(
                         /**
                          * Tile type:
@@ -912,6 +913,7 @@ class Visual_Portfolio_Admin {
                 // Masonry.
                 'masonry' => array(
                     'title'    => esc_html__( 'Masonry', '@@text_domain' ),
+                    'icon'     => '<svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="28" height="21" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="40.5001" y="47.5" width="28" height="21" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="40.5001" y="1.5" width="28" height="35" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="1.5" y="33.5" width="28" height="35" rx="2.5" stroke="currentColor" stroke-width="3"/></svg>',
                     'controls' => array(
                         array(
                             'type'    => 'range',
@@ -927,6 +929,7 @@ class Visual_Portfolio_Admin {
                 // Grid.
                 'grid' => array(
                     'title'    => esc_html__( 'Grid', '@@text_domain' ),
+                    'icon'     => '<svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="28" height="25" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="40.5001" y="45.5" width="28" height="23" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="40.5001" y="1.5" width="28" height="34" rx="2.5" stroke="currentColor" stroke-width="3"/><rect x="1.5" y="45.5" width="28" height="23" rx="2.5" stroke="currentColor" stroke-width="3"/></svg>',
                     'controls' => array(
                         array(
                             'type'    => 'range',
@@ -942,6 +945,7 @@ class Visual_Portfolio_Admin {
                 // Justified.
                 'justified' => array(
                     'title'    => esc_html__( 'Justified', '@@text_domain' ),
+                    'icon'     => '<svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="68.5" width="28" height="21" rx="2.5" transform="rotate(-90 1.5 68.5)" stroke="currentColor" stroke-width="3"/><rect x="47.5" y="29.5" width="28" height="21" rx="2.5" transform="rotate(-90 47.5 29.5)" stroke="currentColor" stroke-width="3"/><rect x="1.5" y="29.5" width="28" height="35" rx="2.5" transform="rotate(-90 1.5 29.5)" stroke="currentColor" stroke-width="3"/><rect x="33.5" y="68.5" width="28" height="35" rx="2.5" transform="rotate(-90 33.5 68.5)" stroke="currentColor" stroke-width="3"/></svg>',
                     'controls' => array(
                         array(
                             'type'    => 'range',
@@ -966,6 +970,7 @@ class Visual_Portfolio_Admin {
                 // Slider.
                 'slider' => array(
                     'title'    => esc_html__( 'Slider', '@@text_domain' ),
+                    'icon'     => '<svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="17.4999" y="56.5" width="43" height="35" rx="2.5" transform="rotate(-90 17.4999 56.5)" stroke="currentColor" stroke-width="3"/><path d="M63 16L63 54C63 54.5523 63.4477 55 64 55L70 55L70 58L64 58C61.7909 58 60 56.2091 60 54L60 16C60 13.7909 61.7909 12 64 12L70 12L70 15L64 15C63.4477 15 63 15.4477 63 16Z" fill="currentColor"/><path d="M7 16L7 54C7 54.5523 6.55228 55 6 55L1.31134e-07 55L0 58L6 58C8.20914 58 10 56.2091 10 54L10 16C10 13.7909 8.20914 12 6 12L1.03375e-07 12L-2.77589e-08 15L6 15C6.55229 15 7 15.4477 7 16Z" fill="currentColor"/></svg>',
                     'controls' => array(
                         array(
                             'type'    => 'select2',
@@ -1307,12 +1312,17 @@ class Visual_Portfolio_Admin {
         // Layouts selector.
         $layouts_selector = array();
         foreach ( $layouts as $name => $layout ) {
-            $layouts_selector[ $name ] = $layout['title'];
+            $layouts_selector[ $name ] = array(
+                'value' => $name,
+                'title' => $layout['title'],
+                'icon'  => isset( $layout['icon'] ) ? $layout['icon'] : '',
+            );
         }
+
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'layouts',
-                'type'     => 'select2',
+                'type'     => 'icons_selector',
                 'name'     => 'vp_layout',
                 'default'  => 'tiles',
                 'options'  => $layouts_selector,
@@ -1394,6 +1404,7 @@ class Visual_Portfolio_Admin {
                 // Default.
                 'default' => array(
                     'title'            => esc_html__( 'Default', '@@text_domain' ),
+                    'icon'             => '<svg width="70" height="80" viewBox="0 0 70 80" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="19.5" y1="78.5" x2="50.5" y2="78.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="1.5" y="1.5" width="67" height="67" rx="4.5" stroke="currentColor" stroke-width="3"/></svg>',
                     'builtin_controls' => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
@@ -1436,6 +1447,7 @@ class Visual_Portfolio_Admin {
                 // Fly.
                 'fly' => array(
                     'title'            => esc_html__( 'Fly', '@@text_domain' ),
+                    'icon'             => '<svg width="70" height="80" viewBox="0 0 70 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="67" height="67" rx="4.5" stroke="currentColor" stroke-width="3"/><line x1="1.5" y1="35.5" x2="16.5" y2="35.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><line x1="35.5" y1="1.5" x2="35.5" y2="68.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'builtin_controls' => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
@@ -1478,6 +1490,7 @@ class Visual_Portfolio_Admin {
                 // Emerge.
                 'emerge' => array(
                     'title'            => esc_html__( 'Emerge', '@@text_domain' ),
+                    'icon'             => '<svg width="71" height="80" viewBox="0 0 71 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="67" height="67" rx="4.5" stroke="currentColor" stroke-width="3"/><line x1="1.5843" y1="44.5893" x2="68.586" y2="48.4735" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><line x1="19.5" y1="57.5" x2="50.5" y2="57.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'builtin_controls' => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
@@ -1520,6 +1533,7 @@ class Visual_Portfolio_Admin {
                 // Fade.
                 'fade' => array(
                     'title'            => esc_html__( 'Fade', '@@text_domain' ),
+                    'icon'             => '<svg width="70" height="80" viewBox="0 0 70 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="67" height="67" rx="4.5" stroke="currentColor" stroke-width="3"/><line x1="19.5" y1="35.5" x2="50.5" y2="35.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'builtin_controls' => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
@@ -1572,12 +1586,17 @@ class Visual_Portfolio_Admin {
         // Styles selector.
         $items_styles_selector = array();
         foreach ( $items_styles as $name => $style ) {
-            $items_styles_selector[ $name ] = $style['title'];
+            $items_styles_selector[ $name ] = array(
+                'value' => $name,
+                'title' => $style['title'],
+                'icon'  => isset( $style['icon'] ) ? $style['icon'] : '',
+            );
         }
+
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'items-style',
-                'type'     => 'select2',
+                'type'     => 'icons_selector',
                 'name'     => 'vp_items_style',
                 'default'  => 'fly',
                 'options'  => $items_styles_selector,
