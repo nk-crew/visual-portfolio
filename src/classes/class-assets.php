@@ -231,6 +231,12 @@ class Visual_Portfolio_Assets {
                 $pagination_style_pref = '/' . $options['vp_pagination_style'];
             }
 
+            switch ( $options['vp_pagination'] ) {
+                case 'paged':
+                    self::store_used_assets( '@@plugin_name-pagination-paged', true, 'script' );
+                    break;
+            }
+
             self::store_used_assets(
                 '@@plugin_name-pagination-' . $options['vp_pagination_style'],
                 'items-list/pagination' . $pagination_style_pref . '/style',
@@ -428,6 +434,12 @@ class Visual_Portfolio_Assets {
             ),
             '@@plugin_name-items-style-fly'   => array(
                 'assets/js/items-style-fly.min.js',
+                array(
+                    'jquery',
+                ),
+            ),
+            '@@plugin_name-pagination-paged'  => array(
+                'assets/js/pagination-paged.min.js',
                 array(
                     'jquery',
                 ),

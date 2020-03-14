@@ -46,8 +46,8 @@
         color: inherit;
         text-align: center;
         opacity: 0;
-        transition: transform .2s .1s ease, opacity .2s .1s ease;
-        transform: scale(.95);
+        transition: transform .3s .05s ease, opacity .3s .05s ease;
+        transform: translateY(10px);
         will-change: transform, opacity;
 
         > * {
@@ -120,7 +120,7 @@
         }
         .vp-portfolio__item-meta {
             opacity: 1;
-            transform: scale(1);
+            transform: translateY(0);
         }
         .vp-portfolio__item-img img {
             transform: scale(1.05);

@@ -39,16 +39,22 @@ class Visual_Portfolio_Supported_Themes {
                     'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-twentynineteen.min.css',
                 );
                 break;
+            case 'twentyseventeen':
+                $result = array(
+                    'name' => 'vpf-twentyseventeen',
+                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-twentyseventeen.min.css',
+                );
+                break;
             case 'twentysixteen':
                 $result = array(
                     'name' => 'vpf-twentysixteen',
                     'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-twentysixteen.min.css',
                 );
                 break;
-            case 'twentyseventeen':
+            case 'twentyfifteen':
                 $result = array(
-                    'name' => 'vpf-twentyseventeen',
-                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-twentyseventeen.min.css',
+                    'name' => 'vpf-twentyfifteen',
+                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-twentyfifteen.min.css',
                 );
                 break;
         }

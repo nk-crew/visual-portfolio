@@ -6,7 +6,7 @@
     flex-wrap: wrap;
     justify-content: center;
     padding: 0;
-    margin: -3px;
+    margin: -6px;
     margin-bottom: 17px;
     list-style-type: none;
 
@@ -26,33 +26,37 @@
     .vp-filter__item {
         flex: 0 0 auto;
         padding: 0;
-        margin: 3px;
+        margin: 6px;
         text-align: center;
         list-style-type: none;
 
         > * {
             display: block;
             min-width: 40px;
-            padding: 8px 16px;
+            padding: .9em 1.6em;
+            font-size: .7em;
+            font-weight: 600;
             line-height: 1.4;
-            color: inherit;
+            color: #787878;
             text-decoration: none;
-            background-color: #fff;
-            border: 1px solid #eaeaea;
-            transition: .2s border-color, .2s background-color, .2s color;
-            will-change: border-color, background-color, color;
+            text-transform: uppercase;
+            letter-spacing: .015em;
+            background-color: #f7f7f7;
+            border-radius: 5px;
+            transition: .2s background-color ease, .2s color ease;
+            will-change: background-color, color;
         }
 
         &:not(.vp-filter__item-active) > a:hover,
         &:not(.vp-filter__item-active) > a:focus {
-            border: 1px solid #bfbfbf;
+            color: #4b4b4b;
+            background-color: #e8e8e8;
         }
 
         &.vp-filter__item-active > * {
             color: #fff;
             cursor: default;
-            background-color: #6c7781;
-            border: 1px solid #6c7781;
+            background-color: #2540cc;
         }
 
         .vp-filter__item-count {

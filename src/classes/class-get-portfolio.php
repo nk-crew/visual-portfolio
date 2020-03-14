@@ -262,7 +262,7 @@ class Visual_Portfolio_Get {
         // No items found.
         if ( ( ( $is_social || $is_images ) && empty( $query_opts['images'] ) ) || isset( $portfolio_query ) && ! $portfolio_query->have_posts() ) {
             ob_start();
-            self::notice( esc_html__( 'No items found.', '@@text_domain' ) );
+            self::notice( esc_html__( 'No items were found matching your selection.', '@@text_domain' ) );
             $return = ob_get_contents();
             ob_end_clean();
             return $return;

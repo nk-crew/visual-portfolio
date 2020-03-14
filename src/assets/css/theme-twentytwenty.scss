@@ -7,3 +7,17 @@
 .vp-portfolio__item figcaption {
     margin-top: 0;
 }
+
+// Fix preview background color.
+.vpf-preview-mode {
+    background: none;
+}
+
+// Fix font family.
+.vp-filter__item,
+.vp-sort__item,
+.vp-sort select,
+.vp-portfolio__item-meta-category,
+.vp-pagination__item {
+    font-family: "Inter var", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
+}

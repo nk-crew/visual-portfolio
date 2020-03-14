@@ -1,6 +1,6 @@
 <?php
 /**
- * Default notices template.
+ * Notices template.
  *
  * @var $args
  * @package @@plugin_name

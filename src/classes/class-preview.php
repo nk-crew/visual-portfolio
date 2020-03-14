@@ -228,16 +228,19 @@ class Visual_Portfolio_Preview {
                     #vp_preview {
                         position: relative;
                         z-index: 99999;
+                        padding: 15px 0;
                     }
                     .vp-portfolio {
                         margin-top: 0;
                         margin-bottom: 0;
+                        max-width: none !important;
+                        width: 100% !important;
                     }
                 </style>
             </head>
 
-            <body>
-                <div id="vp_preview" class="<?php echo esc_attr( $class_name ); ?>">
+            <body class="vpf-preview-mode">
+                <div id="vp_preview" class="entry-content <?php echo esc_attr( $class_name ); ?>">
                     <?php
                         // phpcs:ignore
                         echo Visual_Portfolio_Get::get( array( 'id' => $id ) );
