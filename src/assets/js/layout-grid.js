@@ -59,7 +59,7 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
 
         GridMode.prototype.getContainerWidth = function() {
             // container is parent if fit width
-            const isFitWidth = this._getOption( 'fitWidth' );
+            const isFitWidth = this._getOption ? this._getOption( 'fitWidth' ) : false;
             const container = isFitWidth ? this.element.parentNode : this.element;
 
             // check that this.size and size are there
