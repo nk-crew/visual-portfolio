@@ -124,6 +124,14 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 1.16.2 =
+
+* preview moved to `templates/preview`, so you can override it from themes
+* use base64 for placeholders
+* fixed posts output when taxonomies relation set to AND and no taxonomies selected
+* fixed Grid JS error if used old Isotope script (for example in Bridge theme)
+* fixed notices in PHP 7.4
+
 = 1.16.1 =
 
 * added style fixes for some Twenty themes
