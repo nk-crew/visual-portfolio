@@ -131,12 +131,15 @@ class Visual_Portfolio_Images {
         $width  = $ratio['width'];
         $height = $ratio['height'];
 
-        $placeholder = '<svg width="' . $width . '" height="' . $height . '" viewBox="0 0 ' . $width . ' ' . $height . '" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>';
+        // We need to use base64 to prevent rare cases when users use plugins
+        // that replaces http to https in xmlns attribute.
+        // phpcs:ignore
+        $placeholder = base64_encode( '<svg width="' . $width . '" height="' . $height . '" viewBox="0 0 ' . $width . ' ' . $height . '" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>' );
 
         $escape_search  = array( '<', '>', '#', '"' );
         $escape_replace = array( '%3c', '%3e', '%23', '\'' );
 
-        return 'data:image/svg+xml,' . str_replace( $escape_search, $escape_replace, $placeholder );
+        return 'data:image/svg+xml;base64,' . str_replace( $escape_search, $escape_replace, $placeholder );
     }
 
     /**
