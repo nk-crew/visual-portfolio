@@ -1,0 +1,35 @@
+/**
+ * Preview style
+ */
+html,
+body {
+    // stylelint-disable-next-line
+    margin: 0 !important;
+    // stylelint-disable-next-line
+    padding: 0 !important;
+}
+body::before {
+    // stylelint-disable-next-line
+    content: none !important;
+}
+#wpadminbar {
+    display: none;
+}
+#vp_preview {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    z-index: 99999;
+}
+.entry-content {
+    // stylelint-disable-next-line
+    padding: 0 !important;
+    // stylelint-disable-next-line
+    margin: 0 !important;
+}
+.vp-portfolio {
+    margin-top: 0;
+    margin-bottom: 0;
+}
