@@ -1,11 +1,18 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const pkg = require( 'json-file' ).read( './package.json' ).data;
 
 const cfg = {};
 
 // Build Paths.
+cfg.name = 'visual-portfolio';
 cfg.src = './src';
 cfg.dist_root = './dist';
-cfg.dist = '{dist_root}/visual-portfolio';
+cfg.dist = '{dist_root}/{name}';
+
+// Browser sync.
+cfg.browser_sync = {
+    proxy: '{name}.local',
+};
 
 // Template variables that will be automatically replaced.
 cfg.template_files_src = '{src}/**/*.{md,php,js,css}';
@@ -18,16 +25,24 @@ cfg.template_files_variables = {
 };
 
 // Copy files.
-cfg.copy_files_src = [ '{src}/**/*', '!{src}/**/*.{js,jsx,scss}', '{src}/**/vendor/**/*.{js,jsx,scss}' ];
+cfg.copy_files_src = [
+    '{src}/**/*',
+    '!{src}/**/*.{js,jsx,scss}',
+    '{src}/**/vendor/**/*.{js,jsx,scss}',
+];
 
 // Compile SCSS files.
-cfg.compile_scss_files_src = [ '{src}/**/*.scss', '!{src}/**/vendor/**/*' ];
+cfg.compile_scss_files_src = [
+    '{src}/**/*.scss',
+    '!{src}/**/vendor/**/*',
+];
 
 // Compile JS files.
-cfg.compile_js_files_src = [ '{src}/**/*.js', '!{src}/**/vendor/**/*' ];
-
-// Compile JSX files.
-cfg.compile_jsx_files_src = [ '{src}/*assets/admin/js/gutenberg-block.jsx' ];
+cfg.compile_js_files_src = [
+    '{src}/*assets/**/*.js',
+    '{src}/*gutenberg/index.js',
+    '!{src}/**/vendor/**/*',
+];
 
 // Correct line endings files.
 cfg.correct_line_endings_files_src = '{dist}/**/*.{js,css}';
@@ -49,16 +64,21 @@ cfg.zip_files = [
         src_opts: {
             base: '{dist_root}',
         },
-        dist: '{dist_root}/visual-portfolio.zip',
+        dist: '{dist_root}/{name}.zip',
     },
 ];
 
 // Watch files.
-cfg.watch_files = [ '{src}/**/*', '!{src}/**/*.{jsx,js,scss}' ];
+cfg.watch_files = [
+    '{src}/**/*',
+    '!{src}/**/*.{jsx,js,scss}',
+];
 
-cfg.watch_js_files = [ '{src}/**/*.js', '!{src}/*vendor/**/*' ];
-
-cfg.watch_jsx_files = [ '{src}/**/*.jsx', '{src}/**/*.scss', '!{src}/*vendor/**/*' ];
+cfg.watch_js_files = [
+    '{src}/**/*.js',
+    '{src}/gutenberg/**/*',
+    '!{src}/*vendor/**/*',
+];
 
 cfg.watch_scss_files = '{src}/**/*.scss';
 

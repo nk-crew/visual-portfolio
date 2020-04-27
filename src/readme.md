@@ -2,8 +2,8 @@
 
 * Contributors: nko
 * Tags: portfolio, gallery, image, masonry, popup
-* Requires at least: 4.0.0
-* Tested up to: 5.3
+* Requires at least: 5.4
+* Tested up to: 5.4
 * Requires PHP: 5.5.9
 * Stable tag: @@plugin_version
 * License: GPLv2 or later

@@ -1,7 +1,7 @@
 # Visual Portfolio - layouts visual editor with Gutenberg support
 
-- Site https://visualportfolio.co/
-- WordPress Plugin https://wordpress.org/plugins/visual-portfolio/
+- Site <https://visualportfolio.co/>
+- WordPress Plugin <https://wordpress.org/plugins/visual-portfolio/>
 
 ## Development
 
@@ -11,7 +11,7 @@
 | ------------------------- | ------------- | ----------------------------------------------- |
 | PHP >= 5.5.9              | `php -v`      | [php.net](https://php.net/manual/en/install.php) |
 | Node.js >= 6.x.x          | `node -v`     | [nodejs.org](https://nodejs.org/)                |
-| Composer >= 1.0.0	        | `composer -V` | [getcomposer.org](https://getcomposer.org)       |
+| Composer >= 1.0.0         | `composer -V` | [getcomposer.org](https://getcomposer.org)       |
 
 ### Installation
 
@@ -29,8 +29,6 @@ We use `pre-commit` and `pre-push` hooks for Git to lint sources with `phpcs`, `
 
 NPM commands to work with linting:
 
-- `npm run lint` to show `all` lint errors (described below)
-- `npm run lint-fix` to automatically fix some of `all` linters errors (described below)
 - `npm run php-lint` to show `phpcs` errors
 - `npm run php-lint-fix` to automatically fix some of the `phpcs` errors
 - `npm run js-lint` to show `eslint` errors

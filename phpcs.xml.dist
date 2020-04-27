@@ -61,8 +61,8 @@
     #############################################################################
     -->
 
-    <!-- Set the minimum supported WP version to WP 4.0. -->
-    <config name="minimum_supported_wp_version" value="4.0"/>
+    <!-- Set the minimum supported WP version to WP 5.4. -->
+    <config name="minimum_supported_wp_version" value="5.4"/>
 
     <!-- Prevent error about filename with Class -->
     <rule ref="WordPress.Files.FileName">
