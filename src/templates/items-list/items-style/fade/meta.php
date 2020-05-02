@@ -35,6 +35,7 @@ $show_meta = $opts['show_icon'] && $opts['icon'] ||
             if ( isset( $args['url_target'] ) && $args['url_target'] ) :
                 ?>
                 target="<?php echo esc_attr( $args['url_target'] ); ?>"
+                rel="noopener noreferrer"
                 <?php
             endif;
             ?>
