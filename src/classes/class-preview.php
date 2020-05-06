@@ -176,6 +176,11 @@ class Visual_Portfolio_Preview {
      * Template of preview page.
      */
     public function print_template() {
+        do_action( 'vpf_preview_template' );
+
+        // Hide admin bar.
+        add_filter( 'show_admin_bar', '__return_false' );
+
         wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', array(), '4.2.10', true );
         wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery', 'iframe-resizer-content' ), '@@plugin_version', true );
 
@@ -202,56 +207,16 @@ class Visual_Portfolio_Preview {
             }
         }
 
-        ?>
-        <!DOCTYPE html>
-        <html <?php language_attributes(); ?>>
-            <head>
-                <meta name="viewport" content="width=device-width">
+        // Custom styles.
+        visual_portfolio()->include_template_style( '@@plugin_name-preview', 'preview/style' );
 
-                <?php wp_head(); ?>
-
-                <style type="text/css">
-                    html,
-                    body {
-                        margin: 0 !important;
-                        padding: 0 !important;
-                    }
-                    body:before {
-                        content: none !important;
-                    }
-                    #wpadminbar {
-                        display: none;
-                    }
-                    #vp_preview {
-                        position: relative;
-                        z-index: 99999;
-                        padding: 15px 0;
-                    }
-                    .vp-portfolio {
-                        margin-top: 0;
-                        margin-bottom: 0;
-                        max-width: none !important;
-                        width: 100% !important;
-                    }
-                </style>
-            </head>
-
-            <body class="vpf-preview-mode">
-                <div id="vp_preview" class="entry-content <?php echo esc_attr( $class_name ); ?>">
-                    <?php
-                        // phpcs:ignore
-                        echo Visual_Portfolio_Get::get( $options );
-                    ?>
-                </div>
-
-                <script>
-                    <?php // phpcs:ignore ?>
-                    window.vp_preview_post_data = <?php echo isset( $_POST ) && ! empty( $_POST ) ? json_encode( $_POST ) : '{}'; ?>;
-                </script>
-
-                <?php wp_footer(); ?>
-            </body>
-        </html>
-        <?php
+        // Output template.
+        visual_portfolio()->include_template(
+            'preview/preview',
+            array(
+                'options'    => $options,
+                'class_name' => $class_name,
+            )
+        );
     }
 }

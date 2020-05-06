@@ -86,18 +86,20 @@ class Visual_Portfolio_Assets {
                     return 0;
                 }
 
-                return $a['priority'] < $b['priority'] ? -1 : 1;
+                if ( isset( $a['priority'] ) && isset( $b['priority'] ) ) {
+                    return $a['priority'] < $b['priority'] ? -1 : 1;
+                }
+
+                return 0;
             }
         );
 
         foreach ( self::$stored_assets[ $type ] as $name => $data ) {
-            $val = $data['value'];
-
-            if ( $val ) {
+            if ( isset( $data['value'] ) && $data['value'] ) {
                 if ( 'script' === $type ) {
                     wp_enqueue_script( $name );
-                } elseif ( is_string( $val ) ) {
-                    visual_portfolio()->include_template_style( $name, $val );
+                } elseif ( is_string( $data['value'] ) ) {
+                    visual_portfolio()->include_template_style( $name, $data['value'] );
                 } else {
                     wp_enqueue_style( $name );
                 }
