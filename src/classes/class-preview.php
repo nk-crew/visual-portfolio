@@ -181,8 +181,17 @@ class Visual_Portfolio_Preview {
         // Hide admin bar.
         add_filter( 'show_admin_bar', '__return_false' );
 
+        // Enqueue assets.
         wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', array(), '4.2.10', true );
         wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/preview.js', array( 'jquery', 'iframe-resizer-content' ), '@@plugin_version', true );
+
+        // Post data for script.
+        wp_localize_script(
+            '@@plugin_name-preview',
+            'vp_preview_post_data',
+            // phpcs:ignore
+            isset( $_POST ) && ! empty( $_POST ) ? $_POST : array()
+        );
 
         $class_name = 'vp-preview-wrapper';
 
