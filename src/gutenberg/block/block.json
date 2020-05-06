@@ -1,0 +1,10 @@
+{
+	"name": "visual-portfolio/block",
+	"category": "common",
+    "supports": {
+        "anchor": true,
+        "className": true,
+        "html": false,
+        "align": [ "wide", "full" ]
+    }
+}

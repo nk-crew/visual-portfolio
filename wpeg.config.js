@@ -12,6 +12,7 @@ cfg.dist = '{dist_root}/{name}';
 // Browser sync.
 cfg.browser_sync = {
     proxy: '{name}.local',
+    ghostMode: false,
 };
 
 // Template variables that will be automatically replaced.
@@ -33,14 +34,16 @@ cfg.copy_files_src = [
 
 // Compile SCSS files.
 cfg.compile_scss_files_src = [
-    '{src}/**/*.scss',
+    '{src}/*assets/**/*.scss',
+    '{src}/*gutenberg/*.scss',
+    '{src}/*templates/**/*.scss',
     '!{src}/**/vendor/**/*',
 ];
 
 // Compile JS files.
 cfg.compile_js_files_src = [
     '{src}/*assets/**/*.js',
-    '{src}/*gutenberg/index.js',
+    '{src}/*gutenberg/*.js',
     '!{src}/**/vendor/**/*',
 ];
 
@@ -77,6 +80,7 @@ cfg.watch_files = [
 cfg.watch_js_files = [
     '{src}/**/*.js',
     '{src}/gutenberg/**/*',
+    '!{src}/gutenberg/**/*.scss',
     '!{src}/*vendor/**/*',
 ];
 

@@ -2,6 +2,7 @@
  * Visual Portfolio plugin Isotope extension.
  */
 import { debounce } from 'throttle-debounce';
+
 const $ = window.jQuery;
 const $doc = $( document );
 
@@ -20,10 +21,10 @@ $doc.on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.initIsotope = function( options ) {
         const self = this;
 
-        if ( self.$items_wrap.isotope && ( self.options.layout === 'tiles' || self.options.layout === 'masonry' || self.options.layout === 'grid' ) ) {
+        if ( self.$items_wrap.isotope && ( 'tiles' === self.options.layout || 'masonry' === self.options.layout || 'grid' === self.options.layout ) ) {
             const initOptions = options || {
                 itemSelector: '.vp-portfolio__item-wrap',
-                layoutMode: self.options.layout === 'grid' ? 'fitRows' : 'masonry',
+                layoutMode: 'grid' === self.options.layout ? 'fitRows' : 'masonry',
                 // masonry: {
                 //     horizontalOrder: true
                 // },

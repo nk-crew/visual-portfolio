@@ -43,6 +43,9 @@ class Visual_Portfolio_Custom_Post_Type {
         add_filter( 'manage_vp_lists_posts_columns', array( $this, 'add_vp_lists_custom_columns' ) );
         add_filter( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_custom_columns' ), 10, 2 );
 
+        // change allowed blocks for vp_lists post type.
+        add_filter( 'allowed_block_types', array( $this, 'vp_lists_allowed_block_types' ), 10, 2 );
+
         // highlight admin menu items.
         add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
 
@@ -180,8 +183,16 @@ class Visual_Portfolio_Custom_Post_Type {
                 'rewrite'         => true,
                 'supports'        => array(
                     'title',
+                    'editor',
                     'revisions',
                 ),
+                'template'        => array(
+                    array(
+                        'visual-portfolio/saved-editor',
+                    ),
+                ),
+                // we can't use it since blocks didn't inserted in some posts.
+                // 'template_lock' => 'all',.
             )
         );
     }
@@ -549,8 +560,8 @@ class Visual_Portfolio_Custom_Post_Type {
     public function manage_vp_lists_custom_columns( $column_name = false ) {
         if ( 'vp_lists_post_icon' === $column_name ) {
             $all_layouts = Visual_Portfolio_Extend::layouts();
-            $opts        = Visual_Portfolio_Get::get_options( get_the_ID() );
-            $layout      = isset( $opts['vp_layout'] ) ? $opts['vp_layout'] : false;
+            $opts        = Visual_Portfolio_Get::get_options( array( 'id' => get_the_ID() ) );
+            $layout      = isset( $opts['layout'] ) ? $opts['layout'] : false;
             $icon        = '';
 
             if ( $layout ) {
@@ -572,6 +583,21 @@ class Visual_Portfolio_Custom_Post_Type {
             echo '[visual_portfolio id="' . get_the_ID() . '"]';
             echo '</code>';
         }
+    }
+
+    /**
+     * Allowed blocks for vp_lists post type.
+     *
+     * @param array  $allowed_block_types - blocks.
+     * @param object $post - post object.
+     * @return array
+     */
+    public function vp_lists_allowed_block_types( $allowed_block_types, $post ) {
+        if ( 'vp_lists' !== $post->post_type ) {
+            return $allowed_block_types;
+        }
+
+        return array( 'visual-portfolio/saved-editor' );
     }
 
     /**

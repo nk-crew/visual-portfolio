@@ -1,0 +1,22 @@
+/*
+ * Visual Portfolio Layouts Editor styles.
+ */
+
+.post-type-vp_lists {
+    .block-editor-block-list__breadcrumb,
+    .edit-post-layout__footer {
+        display: none;
+    }
+
+    // remove outline from block.
+    .block-editor-block-list__block::before,
+    .block-editor-block-contextual-toolbar,
+    .block-editor-block-list__insertion-point {
+        display: none;
+    }
+
+    // Remove writing container.
+    .block-editor-writing-flow__click-redirect {
+        display: none;
+    }
+}

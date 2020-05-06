@@ -5,7 +5,7 @@ const $ = window.jQuery;
 
 // Init paged pagination.
 $( document ).on( 'init.vpf loadedNewItems.vpf', ( event, self ) => {
-    if ( 'vpf' !== event.namespace || self.options.pagination !== 'paged' ) {
+    if ( 'vpf' !== event.namespace || 'paged' !== self.options.pagination ) {
         return;
     }
 

@@ -10,9 +10,7 @@
     } else {
         window.addEventListener( 'lazyunveilread', globalInstall, true );
     }
-}( window, function( window, document, lazySizes ) {
-    'use strict';
-
+}( window, ( window, document, lazySizes ) => {
     if ( ! window.addEventListener ) {
         return;
     }
@@ -22,16 +20,16 @@
     };
 
     const objectFitCover = {
-        calculateSize: function( element, width ) {
+        calculateSize( element, width ) {
             const CSS = getCSS( element );
 
-            if ( CSS && CSS.objectFit && CSS.objectFit === 'cover' ) {
-                const blockHeight = parseInt( element.getAttribute( 'height' ) );
-                const blockWidth = parseInt( element.getAttribute( 'width' ) );
+            if ( CSS && CSS.objectFit && 'cover' === CSS.objectFit ) {
+                const blockHeight = parseInt( element.getAttribute( 'height' ), 10 );
+                const blockWidth = parseInt( element.getAttribute( 'width' ), 10 );
 
                 if ( blockHeight ) {
                     if ( blockWidth / blockHeight > element.clientWidth / element.clientHeight ) {
-                        width = parseInt( element.clientHeight * blockWidth / blockHeight, 10 );
+                        width = parseInt( ( element.clientHeight * blockWidth ) / blockHeight, 10 );
                     }
                 }
             }
@@ -42,7 +40,7 @@
 
     lazySizes.objectFitCover = objectFitCover;
 
-    document.addEventListener( 'lazybeforesizes', function( e ) {
+    document.addEventListener( 'lazybeforesizes', ( e ) => {
         if ( e.defaultPrevented || e.detail.instance !== lazySizes ) {
             return;
         }

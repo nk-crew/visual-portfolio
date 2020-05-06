@@ -9,7 +9,7 @@ const {
 
 // fix masonry items position for Tiles layout.
 // https://github.com/nk-o/visual-portfolio/issues/111
-if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !== 'undefined' ) {
+if ( 'undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isotope.LayoutMode ) {
     const MasonryMode = window.Isotope.LayoutMode.modes.masonry;
 
     if ( MasonryMode ) {
@@ -33,8 +33,8 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
                     let count = columns - 1;
                     let currentPoint = Math.min( screenSizes.length - 1, count );
 
-                    for ( ; currentPoint >= 0; currentPoint-- ) {
-                        if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
+                    for ( ; 0 <= currentPoint; currentPoint -= 1 ) {
+                        if ( 0 < count && 'undefined' !== typeof screenSizes[ currentPoint ] ) {
                             if ( window.innerWidth <= screenSizes[ currentPoint ] ) {
                                 columns = count;
                             }
@@ -75,7 +75,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
         const layoutArr = self.options.tilesType.split( /[:|]/ );
 
         // remove last empty item
-        if ( typeof layoutArr[ layoutArr.length - 1 ] !== 'undefined' && ! layoutArr[ layoutArr.length - 1 ] ) {
+        if ( 'undefined' !== typeof layoutArr[ layoutArr.length - 1 ] && ! layoutArr[ layoutArr.length - 1 ] ) {
             layoutArr.pop();
         }
 
@@ -102,7 +102,7 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
         return;
     }
 
-    if ( self.options.layout !== 'tiles' ) {
+    if ( 'tiles' !== self.options.layout ) {
         return;
     }
 
@@ -119,19 +119,19 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
 
     // set items sizes
     if ( settings && settings.length ) {
-        for ( let k = 0; k < settings.length; k++ ) {
+        for ( let k = 0; k < settings.length; k += 1 ) {
             const size = settings[ k ].split( ',' );
             const w = parseFloat( size[ 0 ] ) || 1;
             const h = parseFloat( size[ 1 ] ) || 1;
 
             let itemSelector = '.vp-portfolio__item-wrap';
-            if ( settings.length > 1 ) {
+            if ( 1 < settings.length ) {
                 itemSelector += `:nth-of-type(${ settings.length }n+${ k + 1 })`;
             }
 
-            if ( w && w !== 1 ) {
+            if ( w && 1 !== w ) {
                 self.addStyle( itemSelector, {
-                    width: `${ w * 100 / columns }%`,
+                    width: `${ ( w * 100 ) / columns }%`,
                 } );
             }
             self.addStyle( `${ itemSelector } .vp-portfolio__item-img-wrap::before`, {
@@ -144,8 +144,8 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
     let count = columns - 1;
     let currentPoint = Math.min( screenSizes.length - 1, count );
 
-    for ( ; currentPoint >= 0; currentPoint-- ) {
-        if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
+    for ( ; 0 <= currentPoint; currentPoint -= 1 ) {
+        if ( 0 < count && 'undefined' !== typeof screenSizes[ currentPoint ] ) {
             self.addStyle( '.vp-portfolio__item-wrap', {
                 width: `${ 100 / count }%`,
             }, `screen and (max-width: ${ screenSizes[ currentPoint ] }px)` );

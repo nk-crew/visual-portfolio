@@ -30,7 +30,7 @@
 }
 
 // Fix figcaption padding.
-.wp-block-nk-visual-portfolio[class^="wp-block-"].vp-portfolio__items-style-fade figcaption,
-.wp-block-nk-visual-portfolio[class^="wp-block-"].vp-portfolio__items-style-fly figcaption {
+.wp-block-visual-portfolio[class^="wp-block-"].vp-portfolio__items-style-fade figcaption,
+.wp-block-visual-portfolio[class^="wp-block-"].vp-portfolio__items-style-fly figcaption {
     padding: 0;
 }

@@ -197,12 +197,18 @@ class Visual_Portfolio {
      * Include dependencies
      */
     private function include_dependencies() {
+        require_once $this->plugin_path . 'gutenberg/utils/control-condition-check/index.php';
+        require_once $this->plugin_path . 'gutenberg/utils/control-get-value/index.php';
+        require_once $this->plugin_path . 'gutenberg/utils/controls-dynamic-css/index.php';
+        require_once $this->plugin_path . 'classes/class-parse-blocks.php';
         require_once $this->plugin_path . 'classes/class-assets.php';
         require_once $this->plugin_path . 'classes/class-extend.php';
         require_once $this->plugin_path . 'classes/class-images.php';
         require_once $this->plugin_path . 'classes/class-settings.php';
         require_once $this->plugin_path . 'classes/class-rest.php';
         require_once $this->plugin_path . 'classes/class-get-portfolio.php';
+        require_once $this->plugin_path . 'classes/class-gutenberg.php';
+        require_once $this->plugin_path . 'classes/class-gutenberg-saved.php';
         require_once $this->plugin_path . 'classes/class-shortcode.php';
         require_once $this->plugin_path . 'classes/class-preview.php';
         require_once $this->plugin_path . 'classes/class-custom-post-type.php';
@@ -342,7 +348,7 @@ class Visual_Portfolio {
             }
 
             // Convert url to hostname, eg: "youtube" instead of "https://youtube.com/".
-            $data['provider-name'] = pathinfo( str_replace( array( 'www.' ), '', parse_url( $url, PHP_URL_HOST ) ), PATHINFO_FILENAME );
+            $data['provider-name'] = pathinfo( str_replace( array( 'www.' ), '', wp_parse_url( $url, PHP_URL_HOST ) ), PATHINFO_FILENAME );
 
             // save cache.
             set_transient( $cache_name, $data, DAY_IN_SECONDS );

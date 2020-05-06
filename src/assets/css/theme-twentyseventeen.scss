@@ -15,7 +15,7 @@
 }
 
 // Fix for figcaption in block.
-.wp-block-nk-visual-portfolio[class^="wp-block-"]:not(.wp-block-gallery) figcaption {
+.wp-block-visual-portfolio[class^="wp-block-"]:not(.wp-block-gallery) figcaption {
     margin-bottom: 0;
     font-style: inherit;
     text-align: center;

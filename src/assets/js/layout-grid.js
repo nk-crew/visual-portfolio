@@ -7,9 +7,11 @@ const {
     screenSizes,
 } = window.VPData;
 
+/* eslint-disable no-underscore-dangle */
+
 // fix grid items position for Grid layout and FireFox.
 // https://wordpress.org/support/topic/gallery-difference-between-firefox-and-all-other-browsers/
-if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !== 'undefined' ) {
+if ( 'undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isotope.LayoutMode ) {
     const GridMode = window.Isotope.LayoutMode.modes.fitRows;
 
     if ( GridMode ) {
@@ -36,22 +38,22 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
                 const firstItemElem = firstItem && firstItem.element;
 
                 // columnWidth fall back to item of first element
-                this.columnWidth = ( firstItemElem && window.getSize( firstItemElem ).outerWidth ) ||
+                this.columnWidth = ( firstItemElem && window.getSize( firstItemElem ).outerWidth )
                     // if first elem has no width, default to size of container
-                    this.containerWidth;
+                    || this.containerWidth;
             }
 
-            const columnWidth = this.columnWidth += this.gutter;
+            this.columnWidth += this.gutter;
 
             // calculate columns
             const containerWidth = this.containerWidth + this.gutter;
-            let cols = containerWidth / columnWidth;
+            let cols = containerWidth / this.columnWidth;
 
             // fix rounding errors, typically with gutters
-            const excess = columnWidth - ( containerWidth % columnWidth );
+            const excess = this.columnWidth - ( containerWidth % this.columnWidth );
 
             // if overshoot is less than a pixel, round up, otherwise floor it
-            const mathMethod = excess && excess < 1 ? 'round' : 'floor';
+            const mathMethod = excess && 1 > excess ? 'round' : 'floor';
 
             cols = Math[ mathMethod ]( cols );
             this.cols = Math.max( cols, 1 );
@@ -73,14 +75,14 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
 
             // how many columns does this brick span
             const remainder = item.size.outerWidth % this.columnWidth;
-            const mathMethod = remainder && remainder < 1 ? 'round' : 'ceil';
+            const mathMethod = remainder && 1 > remainder ? 'round' : 'ceil';
 
             // round if off by 1 pixel, otherwise use ceil
             let colSpan = Math[ mathMethod ]( item.size.outerWidth / this.columnWidth );
             colSpan = Math.min( colSpan, this.cols );
 
             let col = this.horizontalColIndex % this.cols;
-            const isOver = colSpan > 1 && col + colSpan > this.cols;
+            const isOver = 1 < colSpan && col + colSpan > this.cols;
 
             // shift to next row if item can't fit on current row
             col = isOver ? 0 : col;
@@ -92,7 +94,7 @@ if ( typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !
             const itemWidth = item.size.outerWidth + this.gutter;
 
             // if this element cannot fit in the current row
-            if ( this.x !== 0 && this.horizontalColIndex === 1 ) {
+            if ( 0 !== this.x && 1 === this.horizontalColIndex ) {
                 this.x = 0;
                 this.y = this.maxY;
             }
@@ -129,7 +131,7 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
         return;
     }
 
-    if ( self.options.layout !== 'grid' ) {
+    if ( 'grid' !== self.options.layout ) {
         return;
     }
 
@@ -141,8 +143,8 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
     let count = self.options.gridColumns - 1;
     let currentPoint = Math.min( screenSizes.length - 1, count );
 
-    for ( ; currentPoint >= 0; currentPoint-- ) {
-        if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
+    for ( ; 0 <= currentPoint; currentPoint -= 1 ) {
+        if ( 0 < count && 'undefined' !== typeof screenSizes[ currentPoint ] ) {
             self.addStyle( '.vp-portfolio__item-wrap', {
                 width: `${ 100 / count }%`,
             }, `screen and (max-width: ${ screenSizes[ currentPoint ] }px)` );

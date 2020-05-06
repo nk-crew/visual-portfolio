@@ -22,13 +22,6 @@ class Visual_Portfolio_Preview {
     public $preview_enabled = false;
 
     /**
-     * Preview portfolio page id.
-     *
-     * @var int|bool
-     */
-    public $preview_id = false;
-
-    /**
      * Visual_Portfolio_Preview constructor.
      */
     public function __construct() {
@@ -89,20 +82,13 @@ class Visual_Portfolio_Preview {
      */
     public function is_preview_check() {
         // phpcs:disable
-        $frame = isset( $_GET['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_frame'] ) ) : false;
-        $id    = isset( $_GET['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_frame_id'] ) ) : false;
+        $frame = isset( $_POST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame'] ) ) : false;
+        $id    = isset( $_POST['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
         // phpcs:enable
 
-        $this->preview_enabled = 'true' === $frame && $id;
+        $this->preview_enabled = 'true' === $frame;
+
         if ( $this->preview_enabled ) {
-            // check if the user can view vp_lists page.
-            if ( ! current_user_can( 'read_vp_list', $id ) ) {
-                $this->preview_enabled = false;
-                return;
-            }
-
-            $this->preview_id = $id;
-
             // Tell WP Super Cache & W3 Total Cache to not cache WPReadable requests.
             if ( ! defined( 'DONOTCACHEPAGE' ) ) {
                 // phpcs:ignore
@@ -138,7 +124,7 @@ class Visual_Portfolio_Preview {
             if ( isset( $_POST[ $name ] ) ) {
                 if ( is_array( $_POST[ $name ] ) ) {
                     $val = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $name ] ) );
-                } elseif ( 'vp_custom_css' === $name ) {
+                } elseif ( 'custom_css' === $name ) {
                     $val = wp_kses( wp_unslash( $_POST[ $name ] ), array( '\'', '\"' ) );
                 } else {
                     $val = sanitize_text_field( wp_unslash( $_POST[ $name ] ) );
@@ -181,33 +167,44 @@ class Visual_Portfolio_Preview {
      */
     public function template_redirect() {
         if ( $this->preview_enabled ) {
-            $this->print_template( $this->preview_id );
+            $this->print_template();
             exit;
         }
     }
 
     /**
      * Template of preview page.
-     *
-     * @param int $id - visual portfolio shortcode id.
      */
-    public function print_template( $id ) {
-        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', array(), '4.2.1', true );
-        wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery' ), '@@plugin_version', true );
+    public function print_template() {
+        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', array(), '4.2.10', true );
+        wp_enqueue_script( '@@plugin_name-preview', visual_portfolio()->plugin_url . 'assets/js/script-preview.min.js', array( 'jquery', 'iframe-resizer-content' ), '@@plugin_version', true );
 
         $class_name = 'vp-preview-wrapper';
 
         // preview type.
         // phpcs:ignore
-        $type = isset( $_GET['vp_preview_type'] ) ? esc_attr( wp_unslash( $_GET['vp_preview_type'] ) ) : false;
+        $type = isset( $_POST['vp_preview_type'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_type'] ) ) : false;
 
         if ( $type ) {
             $class_name .= ' vp-preview-type-' . $type;
         }
 
+        // Prepare portfolio post options.
+        $options = array();
+
+        // phpcs:ignore
+        if ( isset( $_POST ) && ! empty( $_POST ) ) {
+            // phpcs:ignore
+            foreach ( $_POST as $name => $val ) {
+                if ( strpos( $name, 'vp_' ) === 0 ) {
+                    $options[ preg_replace( '/^vp_/', '', $name ) ] = $val;
+                }
+            }
+        }
+
         ?>
         <!DOCTYPE html>
-        <html <?php language_attributes(); ?> style="margin-top: 0 !important;">
+        <html <?php language_attributes(); ?>>
             <head>
                 <meta name="viewport" content="width=device-width">
 
@@ -243,7 +240,7 @@ class Visual_Portfolio_Preview {
                 <div id="vp_preview" class="entry-content <?php echo esc_attr( $class_name ); ?>">
                     <?php
                         // phpcs:ignore
-                        echo Visual_Portfolio_Get::get( array( 'id' => $id ) );
+                        echo Visual_Portfolio_Get::get( $options );
                     ?>
                 </div>
 

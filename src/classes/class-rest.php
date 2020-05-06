@@ -45,14 +45,39 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
             $namespace,
             '/get_layouts/',
             array(
-                'methods'  => WP_REST_Server::READABLE,
-                'callback' => array( $this, 'get_layouts' ),
+                'methods'             => WP_REST_Server::READABLE,
+                'callback'            => array( $this, 'get_layouts' ),
+                'permission_callback' => array( $this, 'get_layouts_permission' ),
+            )
+        );
+
+        // Update layout data.
+        register_rest_route(
+            $namespace,
+            '/update_layout/',
+            array(
+                'methods'             => WP_REST_Server::EDITABLE,
+                'callback'            => array( $this, 'update_layout' ),
+                'permission_callback' => array( $this, 'update_layout_permission' ),
             )
         );
     }
 
     /**
-     * Get attachment image <img> tag.
+     * Get layout data permission.
+     *
+     * @return mixed
+     */
+    public function get_layouts_permission() {
+        if ( ! current_user_can( 'read_posts' ) ) {
+            return $this->error( 'vpf_data_cannot_read', esc_html__( 'Sorry, you are not allowed to read saved layouts data.', '@@text_domain' ) );
+        }
+
+        return true;
+    }
+
+    /**
+     * Get layout data.
      *
      * @return mixed
      */
@@ -81,6 +106,58 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         } else {
             return $this->error( 'no_layouts_found', __( 'Layouts not found.', '@@text_domain' ) );
         }
+    }
+
+    /**
+     * Update layout data permission.
+     *
+     * @return mixed
+     */
+    public function update_layout_permission() {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            return $this->error( 'vpf_data_cannot_read', esc_html__( 'Sorry, you are not allowed to edit saved layouts data.', '@@text_domain' ) );
+        }
+
+        return true;
+    }
+
+    /**
+     * Update layout data.
+     *
+     * @param WP_REST_Request $request Full details about the request.
+     *
+     * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+     */
+    public function update_layout( $request ) {
+        $post_id = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
+        $data    = isset( $request['data'] ) ? $request['data'] : false;
+
+        if ( $post_id && $data ) {
+            $meta = array_keys( Visual_Portfolio_Get::get_options( array( 'id' => $post_id ) ) );
+
+            foreach ( $meta as $name ) {
+                // Save with prefix.
+                $prefixed_name = 'vp_' . $name;
+
+                if ( isset( $data[ $prefixed_name ] ) ) {
+                    if ( 'vp_images' === $prefixed_name ) {
+                        $result = $data[ $prefixed_name ];
+                    } elseif ( 'vp_custom_css' === $prefixed_name ) {
+                        $result = wp_kses( $data[ $prefixed_name ], array( '\'', '\"' ) );
+                    } elseif ( is_array( $data[ $prefixed_name ] ) ) {
+                        $result = array_map( 'sanitize_text_field', wp_unslash( $data[ $prefixed_name ] ) );
+                    } else {
+                        $result = sanitize_text_field( wp_unslash( $data[ $prefixed_name ] ) );
+                    }
+
+                    update_post_meta( $post_id, $prefixed_name, $result );
+                } else {
+                    update_post_meta( $post_id, $prefixed_name, false );
+                }
+            }
+        }
+
+        return $this->success( $meta );
     }
 
     /**

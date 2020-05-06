@@ -18,8 +18,8 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.initFjGallery = function( options = false, additional = null ) {
         const self = this;
 
-        if ( self.$items_wrap.fjGallery && self.options.layout === 'justified' ) {
-            const initOptions = options !== false ? options : {
+        if ( self.$items_wrap.fjGallery && 'justified' === self.options.layout ) {
+            const initOptions = false !== options ? options : {
                 gutter: parseFloat( self.options.itemsGap ) || 0,
                 rowHeight: parseFloat( self.options.justifiedRowHeight ) || 200,
                 rowHeightTolerance: parseFloat( self.options.justifiedRowHeightTolerance ) || 0,

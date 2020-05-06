@@ -1,0 +1,84 @@
+$tiles_selector_gap: 5px !default;
+$tiles_selector_button_padding: 10px !default;
+
+.vpf-component-tiles-selector,
+.vpf-component-tiles-selector-items {
+    .vpf-tiles-preview-button {
+        @extend .vpf-component-icon-selector-item;
+
+        position: relative;
+        flex-direction: row;
+        width: 33.33%;
+        height: auto;
+        overflow: hidden;
+
+        &::after {
+            content: "";
+            display: block;
+            margin-top: 100%;
+        }
+    }
+    .vpf-tiles-preview-button-active {
+        @extend .vpf-component-icon-selector-item-active;
+    }
+
+    [data-tiles-preview] {
+        // stylelint-disable-next-line
+        position: absolute !important;
+        flex: 1;
+        top: $tiles_selector_button_padding - $tiles_selector_gap;
+        right: $tiles_selector_button_padding;
+        left: $tiles_selector_button_padding - $tiles_selector_gap;
+    }
+    .vpf-tiles-preview-item-wrap {
+        float: left;
+        padding-top: $tiles_selector_gap;
+        padding-left: $tiles_selector_gap;
+    }
+    .vpf-tiles-preview-item {
+        position: relative;
+        border: 2px solid #000;
+        border-radius: 3px;
+
+        &::after {
+            content: "";
+            display: block;
+        }
+    }
+}
+
+.vpf-component-tiles-selector {
+    .components-button {
+        display: flex;
+        width: 100%;
+        height: auto;
+        padding: 10px;
+        text-align: left;
+        white-space: normal;
+        // stylelint-disable-next-line
+        color: #212121 !important;
+        background: #f3f3f3;
+        border-color: #b3b3b3;
+    }
+    .vpf-tiles-preview-button {
+        flex: 0 0 80px;
+        width: 80px;
+        margin-right: 10px;
+        pointer-events: none;
+        border: 1px solid #b3b3b3;
+        // stylelint-disable-next-line
+        background: #fff !important;
+    }
+}
+
+.vpf-component-tiles-selector-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 15px;
+    margin: 12px 0;
+
+    .vpf-tiles-preview-button {
+        float: left;
+        width: 100%;
+    }
+}

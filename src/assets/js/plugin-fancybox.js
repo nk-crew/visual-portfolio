@@ -27,7 +27,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
         const self = this;
         let fancyboxInstance;
 
-        if ( typeof $.fancybox === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'fancybox' !== settingsPopupGallery.vendor ) {
+        if ( 'undefined' === typeof $.fancybox || ! self.options.itemsClickAction || 'popup_gallery' !== self.options.itemsClickAction || 'fancybox' !== settingsPopupGallery.vendor ) {
             return;
         }
 
@@ -215,7 +215,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 }
             } );
 
-            if ( index < 0 ) {
+            if ( 0 > index ) {
                 index = 0;
             }
 
@@ -237,7 +237,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.destroyFancybox = function() {
         const self = this;
 
-        if ( typeof $.fancybox === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'fancybox' !== settingsPopupGallery.vendor ) {
+        if ( 'undefined' === typeof $.fancybox || ! self.options.itemsClickAction || 'popup_gallery' !== self.options.itemsClickAction || 'fancybox' !== settingsPopupGallery.vendor ) {
             return;
         }
 

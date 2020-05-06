@@ -5,8 +5,8 @@
  */
 import { debounce } from 'throttle-debounce';
 
-const $ = jQuery;
 const {
+    jQuery: $,
     ajaxurl,
     VPAdminVariables,
     Tooltip,
@@ -28,7 +28,7 @@ const $videoFormatCheckbox = $( '#post-format-video' );
 let isVideoFormat = null;
 
 function toggleVideoMetabox( show ) {
-    if ( isVideoFormat === null || isVideoFormat !== show ) {
+    if ( null === isVideoFormat || isVideoFormat !== show ) {
         isVideoFormat = show;
         $videoMetabox[ show ? 'show' : 'hide' ]();
     }
@@ -52,16 +52,16 @@ if ( $videoMetabox.length ) {
 
         wp.data.subscribe( () => {
             const format = getEditedPostAttribute( 'format' ) || getCurrentPostAttribute( 'format' );
-            toggleVideoMetabox( format === 'video' );
+            toggleVideoMetabox( 'video' === format );
         } );
     }
 }
 
 let oembedAjax = null;
-function runAjaxVideoOembed( $this ) {
+let runAjaxVideoOembed = function( $this ) {
     oembedAjax = $.ajax( {
         url: ajaxurl,
-        method: 'GET',
+        method: 'POST',
         dataType: 'json',
         data: {
             action: 'vp_find_oembed',
@@ -70,15 +70,16 @@ function runAjaxVideoOembed( $this ) {
         },
         complete( data ) {
             const json = data.responseJSON;
-            if ( json && typeof json.html !== 'undefined' ) {
+            if ( json && 'undefined' !== typeof json.html ) {
                 $this.next( '.vp-oembed-preview' ).html( json.html );
             }
         },
     } );
-}
+};
 runAjaxVideoOembed = debounce( 300, runAjaxVideoOembed );
+
 $body.on( 'change input', '.vp-input[name="video_url"]', function() {
-    if ( oembedAjax !== null ) {
+    if ( null !== oembedAjax ) {
         oembedAjax.abort();
     }
 
@@ -89,10 +90,11 @@ $body.on( 'change input', '.vp-input[name="video_url"]', function() {
 } );
 
 // Popper.js
-if ( typeof Tooltip !== 'undefined' ) {
+if ( 'undefined' !== typeof Tooltip ) {
     $( '[data-hint]:not([data-hint=""]):not([data-hint="false"])' ).each( function() {
         const $this = $( this );
 
+        // eslint-disable-next-line no-new
         new window.Tooltip( this, {
             placement: $this.attr( 'data-hint-place' ) || 'top',
             title: $this.attr( 'data-hint' ),

@@ -35,12 +35,12 @@ function isCrossLine( a, b, c, d ) {
     const v2 = ( ( d.x - c.x ) * ( b.y - c.y ) ) - ( ( d.y - c.y ) * ( b.x - c.x ) );
     const v3 = ( ( b.x - a.x ) * ( c.y - a.y ) ) - ( ( b.y - a.y ) * ( c.x - a.x ) );
     const v4 = ( ( b.x - a.x ) * ( d.y - a.y ) ) - ( ( b.y - a.y ) * ( d.x - a.x ) );
-    return ( ( v1 * v2 <= 0 ) && ( v3 * v4 <= 0 ) );
+    return ( ( 0 >= v1 * v2 ) && ( 0 >= v3 * v4 ) );
 }
 
 // Init Events.
 $( document ).on( 'initEvents.vpf', ( event, self ) => {
-    if ( 'vpf' !== event.namespace || self.options.itemsStyle !== 'fly' ) {
+    if ( 'vpf' !== event.namespace || 'fly' !== self.options.itemsStyle ) {
         return;
     }
 
@@ -59,7 +59,7 @@ $( document ).on( 'initEvents.vpf', ( event, self ) => {
         const $this = $( this );
         const itemRect = $this[ 0 ].getBoundingClientRect();
         const $overlay = $this.find( '.vp-portfolio__item-overlay' );
-        const enter = e.type === 'mouseenter';
+        const enter = 'mouseenter' === e.type;
         let endX = '0%';
         let endY = '0%';
         const curCursorPos = {
@@ -94,12 +94,12 @@ $( document ).on( 'initEvents.vpf', ( event, self ) => {
             const x = ( ( itemRect.width / 2 ) - curCursorPos.x + itemRect.left ) / ( itemRect.width / 2 );
             const y = ( ( itemRect.height / 2 ) - curCursorPos.y + itemRect.top ) / ( itemRect.height / 2 );
             if ( Math.abs( x ) > Math.abs( y ) ) {
-                if ( x > 0 ) {
+                if ( 0 < x ) {
                     isLeft = true;
                 } else {
                     isRight = true;
                 }
-            } else if ( y > 0 ) {
+            } else if ( 0 < y ) {
                 isUp = true;
             } else {
                 isDown = true;
@@ -136,7 +136,7 @@ $( document ).on( 'initEvents.vpf', ( event, self ) => {
 
 // Destroy Events.
 $( document ).on( 'destroyEvents.vpf', ( event, self ) => {
-    if ( 'vpf' !== event.namespace || self.options.itemsStyle !== 'fly' ) {
+    if ( 'vpf' !== event.namespace || 'fly' !== self.options.itemsStyle ) {
         return;
     }
 

@@ -5,23 +5,30 @@
  */
 const $ = window.jQuery;
 const $body = $( 'body' );
+const $doc = $( document );
 const $preview = $( '#vp_preview' );
-const $portfolio = $preview.find( '.vp-portfolio' );
 
-// prevent click on items links.
-$portfolio.on( 'click', '.vp-portfolio__item, .vp-portfolio__item a', ( e ) => {
-    e.preventDefault();
+// prevent click on links.
+document.addEventListener( 'click', ( e ) => {
     e.stopPropagation();
-} );
+    e.preventDefault();
+
+    if ( window.parentIFrame ) {
+        window.parentIFrame.sendMessage( 'clicked' );
+    }
+}, true );
 
 // add dynamic data to AJAX calls.
-$( document ).on( 'startLoadingNewItems.vpf', function( event, vpObject, url, ajaxData ) {
+$doc.on( 'startLoadingNewItems.vpf', ( event, vpObject, url, ajaxData ) => {
     if ( 'vpf' !== event.namespace ) {
         return;
     }
 
     ajaxData.data = Object.assign( ajaxData.data || {}, window.vp_preview_post_data );
 } );
+
+// Dynamic CSS cache.
+const dynamicCSScache = {};
 
 // configure iFrame resizer script.
 window.iFrameResizer = {
@@ -30,9 +37,36 @@ window.iFrameResizer = {
         return $preview.outerHeight( true );
     },
     onMessage( data ) {
-        if ( data && data.name && 'resize' === data.name ) {
+        if ( ! data || ! data.name ) {
+            return;
+        }
+
+        switch ( data.name ) {
+        case 'resize':
             // This random number needed for proper resize Isotope and other plugins.
             $body.css( 'max-width', data.width + Math.random() );
+            break;
+        case 'dynamic-css': {
+            // Insert dynamic styles.
+            const styleId = `vp-dynamic-styles-${ data.blockId }-inline-css`;
+
+            // Skip if styles haven't changed.
+            if ( dynamicCSScache[ styleId ] && data.styles === dynamicCSScache[ styleId ] ) {
+                break;
+            }
+
+            let $style = $( `#${ styleId }` );
+
+            if ( ! $style.length ) {
+                $style = $( `<style id="${ styleId }"></style>` ).appendTo( 'head' );
+            }
+
+            dynamicCSScache[ styleId ] = data.styles;
+
+            $style.html( data.styles );
+            break;
+        }
+        // no default
         }
     },
 };

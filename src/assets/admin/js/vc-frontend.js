@@ -6,24 +6,25 @@
  * Author  : nK https://nkdev.info
  */
 const {
+    jQuery: $,
     vc,
 } = window;
 
-jQuery( () => {
+$( () => {
     // shortcode frontend editor
-    if ( typeof vc !== 'undefined' ) {
+    if ( 'undefined' !== typeof vc ) {
         // on shortcode add and update events
         vc.events.on( 'shortcodes:add shortcodeView:updated', ( e ) => {
-            if ( e.settings.base !== 'visual_portfolio' ) {
+            if ( 'visual_portfolio' !== e.settings.base ) {
                 return;
             }
 
             const wnd = vc.$frame[ 0 ].contentWindow;
-            const $ = wnd ? wnd.jQuery : false;
+            const jQframe = wnd ? wnd.jQuery : false;
 
-            if ( $ ) {
-                const $vp = $( e.view.el ).children( '.vp-portfolio' );
-                if ( $vp.length && typeof $vp.vpf !== 'undefined' ) {
+            if ( jQframe ) {
+                const $vp = jQframe( e.view.el ).children( '.vp-portfolio' );
+                if ( $vp.length && 'undefined' !== typeof $vp.vpf ) {
                     $vp.vpf();
                 }
             }

@@ -1,0 +1,72 @@
+
+.vpf-component-gallery-control {
+    .vpf-component-gallery-control-items {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 15px;
+        width: 100%;
+        margin-bottom: 15px;
+
+        .vpf-component-gallery-control-item {
+            min-width: 0;
+            overflow: hidden;
+            border-radius: 5px;
+
+            .components-button {
+                position: relative;
+                display: block;
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                padding-bottom: 100%;
+                // stylelint-disable-next-line
+                background-color: #d4d4d4 !important;
+                // stylelint-disable-next-line
+                box-shadow: none !important;
+                transition: .2s background-color;
+            }
+
+            img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: .2s opacity;
+            }
+
+            svg {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 20px;
+                height: 20px;
+                margin-top: -10px;
+                margin-left: -10px;
+                color: #fff;
+                opacity: 0;
+                transition: .2s opacity;
+                fill: none;
+            }
+
+            &:hover,
+            &:focus {
+                .components-button {
+                    // stylelint-disable-next-line
+                    background-color: #000 !important;
+                }
+                img {
+                    opacity: .6;
+                }
+                svg {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}
+.vpf-component-gallery-control-item-dropdown {
+    padding: 15px;
+}

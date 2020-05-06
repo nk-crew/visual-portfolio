@@ -26,7 +26,7 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
         return;
     }
 
-    if ( self.options.layout !== 'masonry' ) {
+    if ( 'masonry' !== self.options.layout ) {
         return;
     }
 
@@ -38,8 +38,8 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
     let count = self.options.masonryColumns - 1;
     let currentPoint = Math.min( screenSizes.length - 1, count );
 
-    for ( ; currentPoint >= 0; currentPoint-- ) {
-        if ( count > 0 && typeof screenSizes[ currentPoint ] !== 'undefined' ) {
+    for ( ; 0 <= currentPoint; currentPoint -= 1 ) {
+        if ( 0 < count && 'undefined' !== typeof screenSizes[ currentPoint ] ) {
             self.addStyle( '.vp-portfolio__item-wrap', {
                 width: `${ 100 / count }%`,
             }, `screen and (max-width: ${ screenSizes[ currentPoint ] }px)` );

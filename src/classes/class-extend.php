@@ -69,11 +69,9 @@ class Visual_Portfolio_Extend {
          * Example:
             array(
                 array(
-                    'url'   => 'assets/images/tiles-1-1.svg',
                     'value' => '1|1,0.5|',
                 ),
                 array(
-                    'url'   => 'assets/images/tiles-2-1.svg',
                     'value' => '2|1,1|',
                 ),
             )
@@ -290,12 +288,10 @@ class Visual_Portfolio_Extend {
                 'title' => array(
                     'type'  => 'text',
                     'label' => esc_html__( 'Title', '@@text_domain' ),
-                    'name'  => $name . '_additional_title',
                 ),
                 'description' => array(
                     'type'  => 'textarea',
                     'label' => esc_html__( 'Description', '@@text_domain' ),
-                    'name'  => $name . '_additional_description',
                 ),
             )
          */
@@ -328,7 +324,7 @@ class Visual_Portfolio_Extend {
             array(
                 array(
                     'filter'      => '*',
-                    'label'       => $options['vp_filter_text_all'],
+                    'label'       => $options['filter_text_all'],
                     'description' => false,
                     'count'       => false,
                     'active'      => true,

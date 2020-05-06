@@ -43,6 +43,7 @@ class Visual_Portfolio_Assets {
 
         // parse shortcodes from post content.
         add_filter( 'wp', array( $this, 'maybe_parse_shortcodes_from_content' ), 10 );
+        add_action( 'vpf_parse_blocks', array( $this, 'maybe_parse_blocks_from_content' ), 11 );
     }
 
     /**
@@ -109,25 +110,12 @@ class Visual_Portfolio_Assets {
     /**
      * Enqueue assets based on layout data.
      *
-     * @param array      $options - layout data.
-     * @param string|int $id - layout ID.
+     * @param array $options - layout data.
      */
-    public static function enqueue( $options, $id ) {
-        $options = array_merge(
-            array(
-                'vp_layout'             => false,
-                'vp_items_style'        => false,
-                'vp_items_click_action' => false,
-                'vp_filter'             => false,
-                'vp_sort'               => false,
-                'vp_pagination_style'   => false,
-                'vp_controls_styles'    => false,
-                'vp_custom_css'         => false,
-            ),
-            $options
-        );
+    public static function enqueue( $options ) {
+        $options = Visual_Portfolio_Get::get_options( $options );
 
-        do_action( 'vpf_before_assets_enqueue', $options, $id );
+        do_action( 'vpf_before_assets_enqueue', $options, $options['id'] );
 
         self::store_used_assets( '@@plugin_name', true, 'style', 9 );
         self::store_used_assets( '@@plugin_name-noscript', true, 'style', 9 );
@@ -135,7 +123,7 @@ class Visual_Portfolio_Assets {
         self::store_used_assets( '@@plugin_name', true, 'script', 11 );
 
         // Layout.
-        switch ( $options['vp_layout'] ) {
+        switch ( $options['layout'] ) {
             case 'masonry':
                 self::store_used_assets( '@@plugin_name-layout-masonry', true, 'script' );
                 break;
@@ -157,29 +145,29 @@ class Visual_Portfolio_Assets {
         }
 
         // Items Style.
-        if ( $options['vp_items_style'] ) {
+        if ( $options['items_style'] ) {
             $items_style_pref = '';
 
-            if ( 'default' !== $options['vp_items_style'] ) {
-                $items_style_pref = '/' . $options['vp_items_style'];
+            if ( 'default' !== $options['items_style'] ) {
+                $items_style_pref = '/' . $options['items_style'];
             }
 
-            switch ( $options['vp_items_style'] ) {
+            switch ( $options['items_style'] ) {
                 case 'fly':
                     self::store_used_assets( '@@plugin_name-items-style-fly', true, 'script' );
                     break;
             }
 
             self::store_used_assets(
-                '@@plugin_name-items-style-' . $options['vp_items_style'],
+                '@@plugin_name-items-style-' . $options['items_style'],
                 'items-list/items-style' . $items_style_pref . '/style',
                 'template_style'
             );
         }
 
         // Popup.
-        if ( 'popup_gallery' === $options['vp_items_click_action'] ) {
-            $popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery', 'photoswipe' );
+        if ( 'popup_gallery' === $options['items_click_action'] ) {
+            $popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'popup_gallery', 'photoswipe' );
 
             // Photoswipe.
             if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
@@ -194,85 +182,70 @@ class Visual_Portfolio_Assets {
         }
 
         // Filter.
-        if ( $options['vp_filter'] ) {
+        if ( $options['filter'] ) {
             $filter_style_pref = '';
 
-            if ( 'default' !== $options['vp_filter'] ) {
-                $filter_style_pref = '/' . $options['vp_filter'];
+            if ( 'default' !== $options['filter'] ) {
+                $filter_style_pref = '/' . $options['filter'];
             }
 
             self::store_used_assets(
-                '@@plugin_name-filter-' . $options['vp_filter'],
+                '@@plugin_name-filter-' . $options['filter'],
                 'items-list/filter' . $filter_style_pref . '/style',
                 'template_style'
             );
         }
 
         // Sort.
-        if ( $options['vp_sort'] ) {
+        if ( $options['sort'] ) {
             $sort_style_pref = '';
 
-            if ( 'default' !== $options['vp_sort'] ) {
-                $sort_style_pref = '/' . $options['vp_sort'];
+            if ( 'default' !== $options['sort'] ) {
+                $sort_style_pref = '/' . $options['sort'];
             }
 
             self::store_used_assets(
-                '@@plugin_name-sort-' . $options['vp_sort'],
+                '@@plugin_name-sort-' . $options['sort'],
                 'items-list/sort' . $sort_style_pref . '/style',
                 'template_style'
             );
         }
 
         // Pagination.
-        if ( $options['vp_pagination_style'] ) {
+        if ( $options['pagination_style'] ) {
             $pagination_style_pref = '';
 
-            if ( 'default' !== $options['vp_pagination_style'] ) {
-                $pagination_style_pref = '/' . $options['vp_pagination_style'];
+            if ( 'default' !== $options['pagination_style'] ) {
+                $pagination_style_pref = '/' . $options['pagination_style'];
             }
 
-            switch ( $options['vp_pagination'] ) {
+            switch ( $options['pagination'] ) {
                 case 'paged':
                     self::store_used_assets( '@@plugin_name-pagination-paged', true, 'script' );
                     break;
             }
 
             self::store_used_assets(
-                '@@plugin_name-pagination-' . $options['vp_pagination_style'],
+                '@@plugin_name-pagination-' . $options['pagination_style'],
                 'items-list/pagination' . $pagination_style_pref . '/style',
                 'template_style'
             );
         }
 
-        // Controls styles.
-        if ( $options['vp_controls_styles'] ) {
-            $controls_css_handle = 'vp-controls-styles-' . $id;
+        // Dynamic styles.
+        $dynamic_styles = Visual_Portfolio_Controls_Dynamic_CSS::get( $options );
 
-            $css = wp_kses( $options['vp_controls_styles'], array( '\'', '\"' ) );
-            $css = str_replace( '&gt;', '>', $css );
+        if ( $dynamic_styles ) {
+            $controls_css_handle = 'vp-dynamic-styles-' . $options['id'];
 
             wp_register_style( $controls_css_handle, false, array(), '@@plugin_version' );
             wp_enqueue_style( $controls_css_handle );
-            wp_add_inline_style( $controls_css_handle, $css );
+            wp_add_inline_style( $controls_css_handle, $dynamic_styles );
 
             self::store_used_assets( $controls_css_handle, true, 'style' );
         }
 
-        // Add custom styles.
-        if ( $options['vp_custom_css'] ) {
-            $custom_css_handle = 'vp-custom-css-' . $id;
-
-            $css = wp_kses( $options['vp_custom_css'], array( '\'', '\"' ) );
-            $css = str_replace( '&gt;', '>', $css );
-
-            wp_register_style( $custom_css_handle, false, array(), '@@plugin_version' );
-            wp_enqueue_style( $custom_css_handle );
-            wp_add_inline_style( $custom_css_handle, $css );
-
-            self::store_used_assets( $custom_css_handle, true, 'style' );
-        }
-
-        do_action( 'vpf_after_assets_enqueue', $options, $id );
+        do_action( 'vpf_after_assets_enqueue', $options, $options['id'] );
     }
 
     /**
@@ -615,9 +588,29 @@ class Visual_Portfolio_Assets {
 
         if ( ! empty( $layout_ids ) ) {
             foreach ( $layout_ids as $id ) {
-                $options = Visual_Portfolio_Get::get_options( $id );
+                self::enqueue( array( 'id' => $id ) );
+            }
+        }
+    }
 
-                self::enqueue( $options, $id );
+    /**
+     * Parse blocks from content.
+     *
+     * @param array $blocks - blocks list.
+     */
+    public function maybe_parse_blocks_from_content( $blocks ) {
+        if ( empty( $blocks ) ) {
+            return;
+        }
+
+        foreach ( $blocks as $block ) {
+            if (
+                isset( $block['blockName'] ) &&
+                'visual-portfolio/block' === $block['blockName'] &&
+                isset( $block['attrs']['content_source'] ) &&
+                isset( $block['attrs']['block_id'] )
+            ) {
+                self::enqueue( $block['attrs'] );
             }
         }
     }

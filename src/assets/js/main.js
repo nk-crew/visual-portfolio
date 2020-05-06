@@ -7,9 +7,8 @@ import rafl from 'rafl';
 /**
  * Global Variables
  */
-const $ = jQuery;
-
 const {
+    jQuery: $,
     VPData,
     objectFitImages,
 } = window;
@@ -21,16 +20,16 @@ const {
 const $wnd = $( window );
 
 // enable object-fit
-if ( typeof objectFitImages !== 'undefined' ) {
+if ( 'undefined' !== typeof objectFitImages ) {
     // ofi and lazysizes conflicted, so we need to run lazysizes
     // first and then run ofi polyfill.
     objectFitImages( '.vp-portfolio img:not(.visual-portfolio-lazyload)' );
 
-    $( document ).on( 'lazybeforeunveil', function( e ) {
+    $( document ).on( 'lazybeforeunveil', ( e ) => {
         const $img = $( e.target );
 
         if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
-            $img.one( 'load', function() {
+            $img.one( 'load', () => {
                 objectFitImages( $img[ 0 ] );
             } );
         }
@@ -41,7 +40,7 @@ if ( typeof objectFitImages !== 'undefined' ) {
  * Emit Resize Event.
  */
 function windowResizeEmit() {
-    if ( typeof window.Event === 'function' ) {
+    if ( 'function' === typeof window.Event ) {
         // modern browsers
         window.dispatchEvent( new window.Event( 'resize' ) );
     } else {
@@ -83,10 +82,10 @@ function checkVisibility() {
 
             const currentState = visibilityData[ vpf.uid ] || 'none';
 
-            visibilityData[ vpf.uid ] = this.offsetParent === null ? 'hidden' : 'visible';
+            visibilityData[ vpf.uid ] = null === this.offsetParent ? 'hidden' : 'visible';
 
             // changed from hidden to visible.
-            if ( currentState === 'hidden' && visibilityData[ vpf.uid ] === 'visible' ) {
+            if ( 'hidden' === currentState && 'visible' === visibilityData[ vpf.uid ] ) {
                 isVisibilityChanged = true;
             }
         } );
@@ -125,7 +124,7 @@ class VP {
 
         // get id from class
         const classes = $item[ 0 ].className.split( /\s+/ );
-        for ( let k = 0; k < classes.length; k++ ) {
+        for ( let k = 0; k < classes.length; k += 1 ) {
             if ( classes[ k ] && /^vp-uid-/.test( classes[ k ] ) ) {
                 self.uid = classes[ k ].replace( /^vp-uid-/, '' );
             }
@@ -298,19 +297,19 @@ class VP {
         media = media || '';
 
         const self = this;
-        const uid = self.uid;
+        const { uid } = self;
 
         if ( ! self.stylesList ) {
             self.stylesList = {};
         }
 
-        if ( typeof self.stylesList[ uid ] === 'undefined' ) {
+        if ( 'undefined' === typeof self.stylesList[ uid ] ) {
             self.stylesList[ uid ] = {};
         }
-        if ( typeof self.stylesList[ uid ][ media ] === 'undefined' ) {
+        if ( 'undefined' === typeof self.stylesList[ uid ][ media ] ) {
             self.stylesList[ uid ][ media ] = {};
         }
-        if ( typeof self.stylesList[ uid ][ media ][ selector ] === 'undefined' ) {
+        if ( 'undefined' === typeof self.stylesList[ uid ][ media ][ selector ] ) {
             self.stylesList[ uid ][ media ][ selector ] = {};
         }
 
@@ -330,17 +329,17 @@ class VP {
         media = media || '';
 
         const self = this;
-        const uid = self.uid;
+        const { uid } = self;
 
         if ( ! self.stylesList ) {
             self.stylesList = {};
         }
 
-        if ( typeof self.stylesList[ uid ] !== 'undefined' && ! selector ) {
+        if ( 'undefined' !== typeof self.stylesList[ uid ] && ! selector ) {
             self.stylesList[ uid ] = {};
         }
 
-        if ( typeof self.stylesList[ uid ] !== 'undefined' && typeof self.stylesList[ uid ][ media ] !== 'undefined' && typeof self.stylesList[ uid ][ media ][ selector ] !== 'undefined' && selector ) {
+        if ( 'undefined' !== typeof self.stylesList[ uid ] && 'undefined' !== typeof self.stylesList[ uid ][ media ] && 'undefined' !== typeof self.stylesList[ uid ][ media ][ selector ] && selector ) {
             delete self.stylesList[ uid ][ media ][ selector ];
         }
 
@@ -354,7 +353,7 @@ class VP {
         const self = this;
 
         // timeout for the case, when styles added one by one
-        const uid = self.uid;
+        const { uid } = self;
         let stylesString = '';
 
         if ( ! self.stylesList ) {
@@ -362,7 +361,7 @@ class VP {
         }
 
         // create string with styles
-        if ( typeof self.stylesList[ uid ] !== 'undefined' ) {
+        if ( 'undefined' !== typeof self.stylesList[ uid ] ) {
             Object.keys( self.stylesList[ uid ] ).forEach( ( m ) => {
                 // media
                 if ( m ) {
@@ -400,6 +399,7 @@ class VP {
      * @param {String} str string to transform
      * @returns {string} result string
      */
+    // eslint-disable-next-line class-methods-use-this
     firstToLowerCase( str ) {
         return str.substr( 0, 1 ).toLowerCase() + str.substr( 1 );
     }
@@ -428,7 +428,7 @@ class VP {
         const dataOptions = self.$item[ 0 ].dataset;
         const pureDataOptions = {};
         Object.keys( dataOptions ).forEach( ( k ) => {
-            if ( k && k.substring( 0, 2 ) === 'vp' ) {
+            if ( k && 'vp' === k.substring( 0, 2 ) ) {
                 pureDataOptions[ self.firstToLowerCase( k.substring( 2 ) ) ] = dataOptions[ k ];
             }
         } );
@@ -448,7 +448,7 @@ class VP {
         // Stretch
         function stretch() {
             const rect = self.$item[ 0 ].getBoundingClientRect();
-            const left = rect.left;
+            const { left } = rect;
             const right = window.innerWidth - rect.right;
 
             const ml = parseFloat( self.$item.css( 'margin-left' ) || 0 );
@@ -500,10 +500,10 @@ class VP {
         self.$item.on( `click${ evp }`, '.vp-pagination .vp-pagination__item a', function( e ) {
             e.preventDefault();
             const $this = $( this );
-            if ( $this.hasClass( 'vp-pagination__no-more' ) && self.options.pagination !== 'paged' ) {
+            if ( $this.hasClass( 'vp-pagination__no-more' ) && 'paged' !== self.options.pagination ) {
                 return;
             }
-            self.loadNewItems( $this.attr( 'href' ), self.options.pagination === 'paged' );
+            self.loadNewItems( $this.attr( 'href' ), 'paged' === self.options.pagination );
         } );
 
         // on categories of item click
@@ -519,7 +519,7 @@ class VP {
         function checkVisibilityAndLoad() {
             const rect = self.$item[ 0 ].getBoundingClientRect();
 
-            if ( rect.bottom > 0 && ( rect.bottom - bottomPosToLoad ) <= window.innerHeight ) {
+            if ( 0 < rect.bottom && ( rect.bottom - bottomPosToLoad ) <= window.innerHeight ) {
                 self.loadNewItems( self.options.nextPageUrl, false, () => {
                     clearTimeout( scrollTimeout );
                     scrollTimeout = setTimeout( () => {
@@ -528,7 +528,7 @@ class VP {
                 } );
             }
         }
-        if ( self.options.pagination === 'infinite' ) {
+        if ( 'infinite' === self.options.pagination ) {
             $wnd.on( `load${ evp } scroll${ evp } resize${ evp } orientationchange${ evp }`, () => {
                 clearTimeout( scrollTimeout );
                 scrollTimeout = setTimeout( () => {
@@ -539,7 +539,7 @@ class VP {
         }
 
         // resized container
-        self.$item.on( `transitionend${ evp }`, '.vp-portfolio__items', function( e ) {
+        self.$item.on( `transitionend${ evp }`, '.vp-portfolio__items', ( e ) => {
             if ( e.currentTarget === e.target ) {
                 self.resized();
             }
@@ -606,6 +606,7 @@ class VP {
      *
      * @param {object} $items items to work with
      */
+    // eslint-disable-next-line class-methods-use-this
     removeNoscriptTags( $items ) {
         $items.find( 'noscript' ).remove();
     }
@@ -655,13 +656,14 @@ class VP {
      *
      * @returns {object|boolean} video data
      */
+    // eslint-disable-next-line class-methods-use-this
     parseVideo( url ) {
         // parse youtube ID
         function getYoutubeID( ytUrl ) {
             // eslint-disable-next-line no-useless-escape
             const regExp = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
             const match = ytUrl.match( regExp );
-            return match && match[ 1 ].length === 11 ? match[ 1 ] : false;
+            return match && 11 === match[ 1 ].length ? match[ 1 ] : false;
         }
 
         // parse vimeo ID
@@ -686,7 +688,7 @@ class VP {
                 embedUrl,
                 embed: `<iframe width="1920" height="1080" src="${ embedUrl }" frameborder="0" allowfullscreen></iframe>`,
             };
-        } else if ( Vimeo ) {
+        } if ( Vimeo ) {
             embedUrl = `//player.vimeo.com/video/${ Vimeo }`;
 
             return {
@@ -853,7 +855,7 @@ class VP {
 }
 
 // Lazyloaded - remove preloader images placeholder effect.
-$( document ).on( 'lazybeforeunveil', function( e ) {
+$( document ).on( 'lazybeforeunveil', ( e ) => {
     const $img = $( e.target );
 
     if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
@@ -861,7 +863,7 @@ $( document ).on( 'lazybeforeunveil', function( e ) {
         $img.closest( '.vp-portfolio__thumbnail-img' ).addClass( 'vp-portfolio__thumbnail-img-lazyloading' );
     }
 } );
-$( document ).on( 'lazyloaded', function( e ) {
+$( document ).on( 'lazyloaded', ( e ) => {
     const $img = $( e.target );
 
     if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
@@ -873,7 +875,7 @@ $( document ).on( 'lazyloaded', function( e ) {
 // fix for Elementor popup gallery.
 // https://github.com/nk-o/visual-portfolio/issues/103
 if ( $( '.elementor' ).length ) {
-    $( document ).on( 'init.vpf addItems.vpf', function( event, vpObject ) {
+    $( document ).on( 'init.vpf addItems.vpf', ( event, vpObject ) => {
         if ( 'vpf' !== event.namespace ) {
             return;
         }
@@ -890,16 +892,15 @@ if ( $( '.elementor' ).length ) {
 $( document ).trigger( 'extendClass.vpf', [ VP ] );
 
 // global definition
-const plugin = function( options ) {
-    const args = Array.prototype.slice.call( arguments, 1 );
+const plugin = function( options, ...args ) {
     let ret;
 
     this.each( function() {
-        if ( typeof ret !== 'undefined' ) {
+        if ( 'undefined' !== typeof ret ) {
             return;
         }
 
-        if ( typeof options === 'object' || typeof options === 'undefined' ) {
+        if ( 'object' === typeof options || 'undefined' === typeof options ) {
             if ( ! this.vpf ) {
                 this.vpf = new VP( $( this ), options );
             }
@@ -908,15 +909,15 @@ const plugin = function( options ) {
         }
     } );
 
-    return typeof ret !== 'undefined' ? ret : this;
+    return 'undefined' !== typeof ret ? ret : this;
 };
 plugin.constructor = VP;
 
 // no conflict
-const oldPlugin = jQuery.fn.vpf;
-jQuery.fn.vpf = plugin;
-jQuery.fn.vpf.noConflict = function() {
-    jQuery.fn.vpf = oldPlugin;
+const oldPlugin = $.fn.vpf;
+$.fn.vpf = plugin;
+$.fn.vpf.noConflict = function() {
+    $.fn.vpf = oldPlugin;
     return this;
 };
 

@@ -1,0 +1,14 @@
+
+.vpf-component-align-control {
+    .components-toolbar > :nth-child(4) {
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .vpf-component-align-control-separator {
+        width: auto;
+        padding: 0;
+        pointer-events: none;
+        border: none;
+        border-right: 1px solid #e2e4e7;
+    }
+}

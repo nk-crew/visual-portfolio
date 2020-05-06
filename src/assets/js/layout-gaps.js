@@ -11,7 +11,7 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
 
     const gap = parseInt( self.options.itemsGap, 10 );
 
-    if ( ! gap || ! ( self.options.layout === 'tiles' || self.options.layout === 'masonry' || self.options.layout === 'grid' ) ) {
+    if ( ! gap || ! ( 'tiles' === self.options.layout || 'masonry' === self.options.layout || 'grid' === self.options.layout ) ) {
         return;
     }
 
@@ -30,7 +30,7 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
     } );
 
     // tiles
-    if ( self.options.layout === 'tiles' ) {
+    if ( 'tiles' === self.options.layout ) {
         self.addStyle( '.vp-portfolio__item-wrap .vp-portfolio__item-img-wrap', {
             'margin-left': `-${ gapStyle }`,
             'margin-top': `-${ gapStyle }`,

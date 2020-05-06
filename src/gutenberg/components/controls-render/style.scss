@@ -1,0 +1,22 @@
+
+.vpf-control-wrap-toggle,
+.vpf-control-wrap-checkbox {
+    > .components-base-control__field {
+        display: flex;
+
+        > .components-base-control__label {
+            margin-right: auto;
+            margin-bottom: 0;
+        }
+        .components-toggle-control {
+            margin-bottom: 0;
+
+            .components-base-control__field {
+                margin-bottom: 0;
+            }
+            .components-form-toggle {
+                margin-right: 0;
+            }
+        }
+    }
+}

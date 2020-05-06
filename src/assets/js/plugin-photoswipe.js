@@ -26,7 +26,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.initPhotoswipe = function() {
         const self = this;
 
-        if ( typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'photoswipe' !== settingsPopupGallery.vendor ) {
+        if ( 'undefined' === typeof PhotoSwipe || ! self.options.itemsClickAction || 'popup_gallery' !== self.options.itemsClickAction || 'photoswipe' !== settingsPopupGallery.vendor ) {
             return;
         }
 
@@ -154,7 +154,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
         };
 
         function resizeVideo( data, curItem ) {
-            if ( typeof curItem === 'undefined' ) {
+            if ( 'undefined' === typeof curItem ) {
                 if ( data && data.itemHolders.length ) {
                     data.itemHolders.forEach( ( val ) => {
                         if ( val.item && val.item.html ) {
@@ -176,8 +176,8 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             let barTop = 0;
             let barBot = 0;
             if ( bars ) {
-                barTop = bars.top && bars.top !== 'auto' ? bars.top : 0;
-                barBot = bars.bottom && bars.bottom !== 'auto' ? bars.bottom : 0;
+                barTop = bars.top && 'auto' !== bars.top ? bars.top : 0;
+                barBot = bars.bottom && 'auto' !== bars.bottom ? bars.bottom : 0;
             }
             vpH -= barTop + barBot;
 
@@ -215,8 +215,8 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                     {
                         id: 'pinterest',
                         label: __.pswp_share_pin,
-                        url: 'https://www.pinterest.com/pin/create/button/' +
-                        '?url={{url}}&media={{image_url}}&description={{text}}',
+                        url: 'https://www.pinterest.com/pin/create/button/'
+                        + '?url={{url}}&media={{image_url}}&description={{text}}',
                     },
                 ],
                 bgOpacity: 1,
@@ -252,7 +252,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 if ( options.galleryPIDs ) {
                     // parse real index when custom PIDs are used
                     // http://photoswipe.com/documentation/faq.html#custom-pid-in-url
-                    for ( let j = 0; j < items.length; j++ ) {
+                    for ( let j = 0; j < items.length; j += 1 ) {
                         if ( items[ j ].pid === index ) {
                             options.index = j;
                             break;
@@ -266,7 +266,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             }
 
             // exit if index not found
-            if ( isNaN( options.index ) ) {
+            if ( Number.isNaN( options.index ) ) {
                 return;
             }
 
@@ -297,10 +297,10 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 // Code below is needed if you want image to switch dynamically on window.resize
 
                 // Find out if current images need to be changed
-                if ( useLargeImages && realViewportWidth < 1000 ) {
+                if ( useLargeImages && 1000 > realViewportWidth ) {
                     useLargeImages = false;
                     imageSrcWillChange = true;
-                } else if ( ! useLargeImages && realViewportWidth >= 1000 ) {
+                } else if ( ! useLargeImages && 1000 <= realViewportWidth ) {
                     useLargeImages = true;
                     imageSrcWillChange = true;
                 }
@@ -380,19 +380,25 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             const hash = window.location.hash.substring( 1 );
             const params = {};
 
-            if ( hash.length < 5 ) { // pid=1
+            if ( 5 > hash.length ) { // pid=1
                 return params;
             }
 
             const vars = hash.split( '&' );
-            for ( let i = 0; i < vars.length; i++ ) {
+            for ( let i = 0; i < vars.length; i += 1 ) {
                 if ( ! vars[ i ] ) {
+                    // eslint-disable-next-line no-continue
                     continue;
                 }
+
                 const pair = vars[ i ].split( '=' );
-                if ( pair.length < 2 ) {
+
+                if ( 2 > pair.length ) {
+                    // eslint-disable-next-line no-continue
                     continue;
                 }
+
+                // eslint-disable-next-line prefer-destructuring
                 params[ pair[ 0 ] ] = pair[ 1 ];
             }
 
@@ -415,7 +421,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 }
             } );
 
-            if ( index < 0 ) {
+            if ( 0 > index ) {
                 index = 0;
             }
 
@@ -435,7 +441,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.destroyPhotoswipe = function() {
         const self = this;
 
-        if ( typeof PhotoSwipe === 'undefined' || ! self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery' || 'photoswipe' !== settingsPopupGallery.vendor ) {
+        if ( 'undefined' === typeof PhotoSwipe || ! self.options.itemsClickAction || 'popup_gallery' !== self.options.itemsClickAction || 'photoswipe' !== settingsPopupGallery.vendor ) {
             return;
         }
 

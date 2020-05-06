@@ -1,0 +1,40 @@
+
+.visual-portfolio-gutenberg-preview {
+    position: relative;
+    min-height: 100px;
+    overflow: hidden;
+
+    iframe {
+        width: 100%;
+        max-width: none;
+        min-height: 100px;
+        margin: 0;
+    }
+}
+
+// Loading.
+.visual-portfolio-gutenberg-preview-loading {
+    &::after {
+        content: "";
+        position: absolute;
+        display: block;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: #262829;
+    }
+
+    > .visual-portfolio-gutenberg-preview-inner {
+        position: absolute;
+    }
+
+    > .components-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: 0;
+        transform: translateX(-50%) translateY(-50%);
+        z-index: 10;
+    }
+}

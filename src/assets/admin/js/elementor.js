@@ -15,7 +15,7 @@ const {
 const $ = window.jQuery;
 const $wnd = $( window );
 
-$( window ).on( 'elementor/frontend/init', function( $data ) {
+$( window ).on( 'elementor/frontend/init', ( $data ) => {
     if ( ! variables ) {
         return;
     }
@@ -50,11 +50,11 @@ $( window ).on( 'elementor/frontend/init', function( $data ) {
     $wnd.on( 'resize', throttle( 300, maybeResizePreviews ) );
 
     // added/changed widget.
-    elementorFrontend.hooks.addAction( 'frontend/element_ready/visual-portfolio.default', $scope => {
+    elementorFrontend.hooks.addAction( 'frontend/element_ready/visual-portfolio.default', ( $scope ) => {
         const $block = $( $scope ).find( '.visual-portfolio-elementor-preview' );
         const $frame = $block.find( 'iframe' );
         const id = $block.attr( 'data-id' );
-        const iframeURL = variables.preview_url + ( variables.preview_url.split( '?' )[ 1 ] ? '&' : '?' ) + `vp_preview_frame=true&vp_preview_type=elementor&vp_preview_frame_id=${ id }`;
+        const iframeURL = `${ variables.preview_url + ( variables.preview_url.split( '?' )[ 1 ] ? '&' : '?' ) }vp_preview_frame=true&vp_preview_type=elementor&vp_preview_frame_id=${ id }`;
 
         $frame.attr( 'src', iframeURL );
 
