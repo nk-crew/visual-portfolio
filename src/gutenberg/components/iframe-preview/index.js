@@ -288,12 +288,12 @@ export default class IframePreview extends Component {
                     >
                         <input type="hidden" name="vp_preview_frame" value="true" />
                         <input type="hidden" name="vp_preview_type" value="gutenberg" />
-                        <input type="hidden" name="vp_content_source" value={ contentSource } />
 
                         { 'saved' === contentSource ? (
                             <input type="text" name="vp_id" value={ id } />
                         ) : (
                             <Fragment>
+                                <input type="hidden" name="vp_content_source" value={ contentSource } />
                                 { Object.keys( attributes ).map( ( k ) => {
                                     const val = attributes[ k ];
 

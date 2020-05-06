@@ -88,7 +88,7 @@ class BlockEdit extends Component {
                     <div className="vpf-component-layout-select">
                         <SelectControl
                             value={ id ? ` ${ id }` : '' }
-                            onChange={ ( value ) => setAttributes( { id: parseInt( value, 10 ) } ) }
+                            onChange={ ( value ) => setAttributes( { id: `${ parseInt( value, 10 ) }` } ) }
                             options={ portfolioLayoutsSelect }
                         />
                         { currentItemUrl ? (
