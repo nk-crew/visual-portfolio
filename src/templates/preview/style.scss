@@ -33,3 +33,9 @@ body::before {
     margin-top: 0;
     margin-bottom: 0;
 }
+
+// Hide Query Monitor.
+#query-monitor-main {
+    // stylelint-disable-next-line
+    display: none !important;
+}
