@@ -106,6 +106,14 @@ class Visual_Portfolio_Get {
             } else {
                 $result[ $item['name'] ] = Visual_Portfolio_Controls::get_registered_value( $item['name'], $block_id ? false : $id );
             }
+
+            // fix bool values.
+            if ( 'false' === $result[ $item['name'] ] || '' === $result[ $item['name'] ] ) {
+                $result[ $item['name'] ] = false;
+            }
+            if ( 'true' === $result[ $item['name'] ] ) {
+                $result[ $item['name'] ] = true;
+            }
         }
 
         if ( ! isset( $result['id'] ) ) {
