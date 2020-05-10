@@ -1161,6 +1161,11 @@ class Visual_Portfolio_Get {
                         $query_opts['post__in'] = array_diff( (array) $query_opts['post__in'], (array) $query_opts['post__not_in'] );
                     }
                 }
+
+                // Offset.
+                if ( $options['posts_offset'] ) {
+                    $query_opts['offset'] = $options['posts_offset'];
+                }
             }
 
             // Custom sorting.

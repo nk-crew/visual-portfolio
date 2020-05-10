@@ -969,6 +969,16 @@ class Visual_Portfolio_Admin {
                 'wrapper_class' => 'vp-col-6',
             )
         );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'content-source-post-based',
+                'type'        => 'range',
+                'label'       => esc_html__( 'Offset', '@@text_domain' ),
+                'description' => esc_html__( 'Use this setting to skip over posts (e.g. `2` to skip over 2 posts).', '@@text_domain' ),
+                'name'        => 'posts_offset',
+                'min'         => 0,
+            )
+        );
 
         /**
          * Content Source Images
