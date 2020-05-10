@@ -29,9 +29,6 @@ class Visual_Portfolio_Custom_Post_Type {
         // custom post roles.
         add_action( 'init', array( $this, 'add_role_caps' ) );
 
-        // show blank state for portfolio list page.
-        add_action( 'manage_posts_extra_tablenav', array( $this, 'maybe_render_blank_state' ) );
-
         // remove screen options from portfolio list page.
         add_action( 'screen_options_show_screen', array( $this, 'remove_screen_options' ), 10, 2 );
 
@@ -157,17 +154,17 @@ class Visual_Portfolio_Custom_Post_Type {
             'vp_lists',
             array(
                 'labels'          => array(
-                    'name'               => _x( 'Portfolio Layouts', 'Post Type General Name', '@@text_domain' ),
-                    'singular_name'      => _x( 'Portfolio Layout', 'Post Type Singular Name', '@@text_domain' ),
+                    'name'               => _x( 'Saved Layouts', 'Post Type General Name', '@@text_domain' ),
+                    'singular_name'      => _x( 'Saved Layout', 'Post Type Singular Name', '@@text_domain' ),
                     'menu_name'          => __( 'Visual Portfolio', '@@text_domain' ),
                     'parent_item_colon'  => __( 'Parent Portfolio Item', '@@text_domain' ),
-                    'all_items'          => __( 'Portfolio Layouts', '@@text_domain' ),
-                    'view_item'          => __( 'View Portfolio Layout', '@@text_domain' ),
-                    'add_new_item'       => __( 'Add New Portfolio Layout', '@@text_domain' ),
+                    'all_items'          => __( 'Saved Layouts', '@@text_domain' ),
+                    'view_item'          => __( 'View Saved Layout', '@@text_domain' ),
+                    'add_new_item'       => __( 'Add New Saved Layout', '@@text_domain' ),
                     'add_new'            => __( 'Add New', '@@text_domain' ),
-                    'edit_item'          => __( 'Edit Portfolio Layout', '@@text_domain' ),
-                    'update_item'        => __( 'Update Portfolio Layout', '@@text_domain' ),
-                    'search_items'       => __( 'Search Portfolio Layout', '@@text_domain' ),
+                    'edit_item'          => __( 'Edit Saved Layout', '@@text_domain' ),
+                    'update_item'        => __( 'Update Saved Layout', '@@text_domain' ),
+                    'search_items'       => __( 'Search Saved Layout', '@@text_domain' ),
                     'not_found'          => __( 'Not Found', '@@text_domain' ),
                     'not_found_in_trash' => __( 'Not found in Trash', '@@text_domain' ),
                 ),
@@ -440,44 +437,6 @@ class Visual_Portfolio_Custom_Post_Type {
     }
 
     /**
-     * Add blank page for portfolio lists
-     *
-     * @param string $which position.
-     */
-    public function maybe_render_blank_state( $which ) {
-        global $post_type;
-
-        if ( in_array( $post_type, array( 'vp_lists' ), true ) && 'bottom' === $which ) {
-            $counts = (array) wp_count_posts( $post_type );
-            unset( $counts['auto-draft'] );
-            $count = array_sum( $counts );
-
-            if ( 0 < $count ) {
-                return;
-            }
-            ?>
-            <div class="vp-portfolio-list">
-                <div class="vp-portfolio-list__icon">
-                    <span class="dashicons-visual-portfolio-gray"></span>
-                </div>
-                <div class="vp-portfolio-list__text">
-                    <p><?php echo esc_html__( 'Ready to add your awesome portfolio?', '@@text_domain' ); ?></p>
-                    <a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=vp_lists' ) ); ?>"><?php echo esc_html__( 'Create your first portfolio list!', '@@text_domain' ); ?></a>
-                </div>
-            </div>
-            <style type="text/css">
-                #posts-filter .wp-list-table,
-                #posts-filter .tablenav.top,
-                .tablenav.bottom .actions, .wrap .subsubsub,
-                .wp-heading-inline + .page-title-action {
-                    display: none;
-                }
-            </style>
-            <?php
-        }
-    }
-
-    /**
      * Remove screen options from vp list page.
      *
      * @param bool   $return  return default value.
@@ -654,22 +613,6 @@ class Visual_Portfolio_Custom_Post_Type {
     public function admin_menu() {
         // Remove Add New submenu item.
         remove_submenu_page( 'edit.php?post_type=portfolio', 'post-new.php?post_type=portfolio' );
-
-        // Reorder Portfolio Layouts submenu item.
-        global $submenu;
-        foreach ( $submenu as $page => $items ) {
-            if ( 'edit.php?post_type=portfolio' === $page ) {
-                foreach ( $items as $id => $meta ) {
-                    if ( isset( $meta[2] ) && 'edit.php?post_type=vp_lists' === $meta[2] ) {
-	                    // phpcs:ignore
-                        $submenu[ $page ][6] = $submenu[ $page ][ $id ];
-                        unset( $submenu[ $page ][ $id ] );
-                        ksort( $submenu[ $page ] );
-                        break;
-                    }
-                }
-            }
-        }
 
         // Documentation menu link.
         add_submenu_page(

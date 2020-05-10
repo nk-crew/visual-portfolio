@@ -8,7 +8,6 @@
  * Plugin Icon
  */
 .dashicons-visual-portfolio,
-.dashicons-visual-portfolio-gray,
 .mce-widget .mce-i-visual-portfolio {
     background-image: url("../images/icon.svg");
     background-repeat: no-repeat;
@@ -24,10 +23,6 @@
 .menu-top:hover .dashicons-visual-portfolio,
 .wp-has-current-submenu .dashicons-visual-portfolio {
     opacity: 1;
-}
-.dashicons-visual-portfolio-gray,
-.mce-i-visual-portfolio-gray {
-    background-image: url("../images/icon-gray.svg");
 }
 
 /**
@@ -230,7 +225,7 @@ $grid_sm: 600px !default;
         width: 70px;
     }
     th.column-vp_lists_post_icon {
-        width: 40px;
+        width: 28px;
     }
     th.column-vp_lists_post_shortcode {
         width: 250px;
@@ -294,30 +289,5 @@ $grid_sm: 600px !default;
         width: 70%;
         height: 70%;
         object-fit: cover;
-    }
-}
-.vp-portfolio-list {
-    .vp-portfolio-list__icon span {
-        display: block;
-        width: 120px;
-        height: 120px;
-        margin: 0 auto;
-        margin-top: 60px;
-        background-size: 105px;
-    }
-    .vp-portfolio-list__text {
-        text-align: center;
-
-        p {
-            margin-top: 30px;
-            margin-bottom: 30px;
-            font-size: 15px;
-            font-weight: 500;
-            color: #8e8e8e;
-        }
-
-        .button-hero {
-            display: inline-block;
-        }
     }
 }
