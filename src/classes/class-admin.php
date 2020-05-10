@@ -957,7 +957,7 @@ class Visual_Portfolio_Admin {
                 'category'      => 'content-source-post-based',
                 'type'          => 'toggle',
                 'label'         => esc_html__( 'Avoid Duplicates', '@@text_domain' ),
-                'description'   => esc_html__( 'Enable to avoid duplicate posts from showing up. This only effects the frontend.', '@@text_domain' ),
+                'description'   => esc_html__( 'Enable to avoid duplicate posts from showing up. This only effects the frontend', '@@text_domain' ),
                 'name'          => 'posts_avoid_duplicate_posts',
                 'default'       => false,
             )
@@ -967,7 +967,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-source-post-based',
                 'type'        => 'range',
                 'label'       => esc_html__( 'Offset', '@@text_domain' ),
-                'description' => esc_html__( 'Use this setting to skip over posts (e.g. `2` to skip over 2 posts).', '@@text_domain' ),
+                'description' => esc_html__( 'Use this setting to skip over posts (e.g. `2` to skip over 2 posts)', '@@text_domain' ),
                 'name'        => 'posts_offset',
                 'min'         => 0,
             )
