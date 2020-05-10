@@ -821,7 +821,6 @@ class Visual_Portfolio_Admin {
                 'default'       => '',
                 'cols'          => 30,
                 'rows'          => 3,
-                'wrapper_class' => 'vp-col-12',
                 'condition'     => array(
                     array(
                         'control' => 'posts_source',
@@ -841,7 +840,6 @@ class Visual_Portfolio_Admin {
                 'searchable'     => true,
                 'multiple'       => true,
                 'class'          => 'vp-select2-posts-ajax',
-                'wrapper_class'  => 'vp-col-6',
                 'condition'      => array(
                     array(
                         'control' => 'posts_source',
@@ -861,7 +859,6 @@ class Visual_Portfolio_Admin {
                 'searchable'     => true,
                 'multiple'       => true,
                 'class'          => 'vp-select2-posts-ajax',
-                'wrapper_class'  => 'vp-col-6',
                 'condition'      => array(
                     array(
                         'control'  => 'posts_source',
@@ -887,7 +884,6 @@ class Visual_Portfolio_Admin {
                 'searchable'     => true,
                 'multiple'       => true,
                 'class'          => 'vp-select2-taxonomies-ajax',
-                'wrapper_class'  => 'vp-col-6',
                 'condition'      => array(
                     array(
                         'control'  => 'posts_source',
@@ -913,7 +909,6 @@ class Visual_Portfolio_Admin {
                     'or'  => esc_html__( 'OR', '@@text_domain' ),
                     'and' => esc_html__( 'AND', '@@text_domain' ),
                 ),
-                'wrapper_class' => 'vp-col-6',
                 'condition'     => array(
                     array(
                         'control'  => 'posts_source',
@@ -942,7 +937,6 @@ class Visual_Portfolio_Admin {
                     'menu_order' => esc_html__( 'Menu Order', '@@text_domain' ),
                     'rand'       => esc_html__( 'Random', '@@text_domain' ),
                 ),
-                'wrapper_class' => 'vp-col-6',
             )
         );
         Visual_Portfolio_Controls::register(
@@ -956,17 +950,16 @@ class Visual_Portfolio_Admin {
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
                     'desc' => esc_html__( 'DESC', '@@text_domain' ),
                 ),
-                'wrapper_class' => 'vp-col-6',
             )
         );
         Visual_Portfolio_Controls::register(
             array(
                 'category'      => 'content-source-post-based',
                 'type'          => 'toggle',
-                'label'         => esc_html__( 'Avoid Duplicate Posts', '@@text_domain' ),
+                'label'         => esc_html__( 'Avoid Duplicates', '@@text_domain' ),
+                'description'   => esc_html__( 'Enable to avoid duplicate posts from showing up. This only effects the frontend.', '@@text_domain' ),
                 'name'          => 'posts_avoid_duplicate_posts',
                 'default'       => false,
-                'wrapper_class' => 'vp-col-6',
             )
         );
         Visual_Portfolio_Controls::register(
@@ -1055,7 +1048,6 @@ class Visual_Portfolio_Admin {
                      * video_url - video url.
                      */
                 ),
-                'wrapper_class'   => 'vp-col-12',
             )
         );
         Visual_Portfolio_Controls::register(
@@ -1073,7 +1065,6 @@ class Visual_Portfolio_Admin {
                     'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
                     'description' => esc_html__( 'Image Description', '@@text_domain' ),
                 ),
-                'wrapper_class' => 'vp-col-6',
             )
         );
         Visual_Portfolio_Controls::register(
@@ -1091,7 +1082,6 @@ class Visual_Portfolio_Admin {
                     'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
                     'description' => esc_html__( 'Image Description', '@@text_domain' ),
                 ),
-                'wrapper_class' => 'vp-col-6',
             )
         );
         Visual_Portfolio_Controls::register(
@@ -1107,7 +1097,6 @@ class Visual_Portfolio_Admin {
                     'title'   => esc_html__( 'Title', '@@text_domain' ),
                     'rand'    => esc_html__( 'Random', '@@text_domain' ),
                 ),
-                'wrapper_class' => 'vp-col-6',
             )
         );
         Visual_Portfolio_Controls::register(
@@ -1121,7 +1110,6 @@ class Visual_Portfolio_Admin {
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
                     'desc' => esc_html__( 'DESC', '@@text_domain' ),
                 ),
-                'wrapper_class' => 'vp-col-6',
             )
         );
 

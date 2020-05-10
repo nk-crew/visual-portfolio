@@ -61,7 +61,7 @@ class Visual_Portfolio_Get {
     private static $rand_seed_session = false;
 
     /**
-     * Array with already used IDs on the page. Used for option 'Avoid duplicate posts'
+     * Array with already used IDs on the page. Used for option 'Avoid Duplicates'
      *
      * @var array
      */
@@ -1151,7 +1151,7 @@ class Visual_Portfolio_Get {
                     }
                 }
 
-                // Avoid duplicate posts.
+                // Avoid duplicates.
                 if ( $options['posts_avoid_duplicate_posts'] ) {
                     $not_id                     = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
                     $query_opts['post__not_in'] = array_merge( $not_id, self::get_all_used_posts() );
