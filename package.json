@@ -33,7 +33,7 @@
         "micromatch": "^4.0.2",
         "po2json": "^0.4.5",
         "stylelint-config-nk": "^0.0.10",
-        "wpeg": "^1.0.9"
+        "wpeg": "^1.0.10"
     },
     "dependencies": {
         "@wordpress/base-styles": "^1.7.0",

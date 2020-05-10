@@ -6,6 +6,7 @@ import ElementIcon from '../../assets/admin/images/icon-gutenberg.svg';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
+import variations from './variations';
 
 /**
  * WordPress dependencies
@@ -22,7 +23,10 @@ const settings = {
     ...metadata,
     title: __( 'Visual Portfolio', '@@text_domain' ),
     description: __( 'Display galleries, posts and portfolio grids.', '@@text_domain' ),
-    icon: ElementIcon,
+    icon: {
+        foreground: '#2540CC',
+        src: <ElementIcon width="20" height="20" />,
+    },
     keywords: [
         __( 'gallery', '@@text_domain' ),
         __( 'images', '@@text_domain' ),
@@ -36,6 +40,7 @@ const settings = {
             scrollReveal: true,
         },
     },
+    variations,
     edit,
     save,
 };

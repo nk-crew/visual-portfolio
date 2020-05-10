@@ -12,6 +12,8 @@ cfg.dist = '{dist_root}/{name}';
 // Browser sync.
 cfg.browser_sync = {
     proxy: '{name}.local',
+    host: '{name}.local',
+    open: 'external',
     ghostMode: false,
 };
 

@@ -49,6 +49,15 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
         );
 
         register_block_type(
+            'visual-portfolio/saved',
+            array(
+                'render_callback' => array( $this, 'block_render' ),
+                'attributes'      => $attributes,
+            )
+        );
+
+        // Fallback.
+        register_block_type(
             'nk/visual-portfolio',
             array(
                 'render_callback' => array( $this, 'block_render' ),

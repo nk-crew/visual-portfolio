@@ -5,8 +5,9 @@
         display: flex;
 
         > .components-base-control__label {
-            margin-right: auto;
+            order: 2;
             margin-bottom: 0;
+            margin-left: 15px;
         }
         .components-toggle-control {
             margin-bottom: 0;
