@@ -972,6 +972,18 @@ class Visual_Portfolio_Admin {
                 'description' => esc_html__( 'Use this setting to skip over posts (e.g. `2` to skip over 2 posts)', '@@text_domain' ),
                 'name'        => 'posts_offset',
                 'min'         => 0,
+                'condition'   => array(
+                    array(
+                        'control'  => 'posts_source',
+                        'operator' => '!=',
+                        'value'    => 'ids',
+                    ),
+                    array(
+                        'control'  => 'posts_source',
+                        'operator' => '!=',
+                        'value'    => 'custom_query',
+                    ),
+                ),
             )
         );
 
@@ -2294,7 +2306,7 @@ selector p {
         }
         $post_types_selector['ids']          = array(
             'value' => 'ids',
-            'title' => esc_html__( 'Specific Posts', '@@text_domain' ),
+            'title' => esc_html__( 'Manual Selection', '@@text_domain' ),
             'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M5 11.6L7.30769 14L15 6" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         );
         $post_types_selector['custom_query'] = array(

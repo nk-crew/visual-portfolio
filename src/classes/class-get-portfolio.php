@@ -1156,6 +1156,11 @@ class Visual_Portfolio_Get {
                             }
                         }
                     }
+
+                    // Offset.
+                    if ( $options['posts_offset'] ) {
+                        $query_opts['offset'] = $options['posts_offset'];
+                    }
                 }
 
                 // Avoid duplicates.
@@ -1167,11 +1172,6 @@ class Visual_Portfolio_Get {
                     if ( isset( $query_opts['post__in'] ) ) {
                         $query_opts['post__in'] = array_diff( (array) $query_opts['post__in'], (array) $query_opts['post__not_in'] );
                     }
-                }
-
-                // Offset.
-                if ( $options['posts_offset'] ) {
-                    $query_opts['offset'] = $options['posts_offset'];
                 }
             }
 
