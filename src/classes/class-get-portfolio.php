@@ -1073,10 +1073,17 @@ class Visual_Portfolio_Get {
                         $query_opts['orderby'] = 'menu_order';
                         break;
 
+                    case 'comment_count':
+                        $query_opts['orderby'] = 'comment_count';
+                        break;
+
+                    case 'modified':
+                        $query_opts['orderby'] = 'modified';
+                        break;
+
                     case 'rand':
                         // Update ORDER BY clause to use vpf_random_seed.
                         $query_opts['orderby'] = 'RAND(' . self::get_rand_seed_session() . ')';
-
                         break;
 
                     default:
