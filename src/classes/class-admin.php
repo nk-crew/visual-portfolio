@@ -656,28 +656,26 @@ class Visual_Portfolio_Admin {
                     ),
                     'controls'         => array(
                         array(
-                            'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'    => 'bg_color',
-                            'default' => '#212125',
-                            'alpha'   => true,
-                            'style'   => array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                            'name'  => 'bg_color',
+                            'alpha' => true,
+                            'style' => array(
                                 array(
-                                    'element'  => '.vp-portfolio__items-style-fly .vp-portfolio__item-overlay',
-                                    'property' => 'background-color',
+                                    'element'  => '.vp-portfolio__items-style-fly',
+                                    'property' => '--vp-items-style-fly--overlay__background-color',
                                 ),
                             ),
                         ),
                         array(
-                            'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'    => 'text_color',
-                            'default' => '#fff',
-                            'alpha'   => true,
-                            'style'   => array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                            'name'  => 'text_color',
+                            'alpha' => true,
+                            'style' => array(
                                 array(
-                                    'element'  => '.vp-portfolio__items-style-fly .vp-portfolio__item-overlay',
-                                    'property' => 'color',
+                                    'element'  => '.vp-portfolio__items-style-fly',
+                                    'property' => '--vp-items-style-fly--overlay__color',
                                 ),
                             ),
                         ),
@@ -699,28 +697,26 @@ class Visual_Portfolio_Admin {
                     ),
                     'controls'         => array(
                         array(
-                            'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'    => 'bg_color',
-                            'default' => '#fff',
-                            'alpha'   => true,
-                            'style'   => array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                            'name'  => 'bg_color',
+                            'alpha' => true,
+                            'style' => array(
                                 array(
-                                    'element'  => '.vp-portfolio__items-style-emerge .vp-portfolio__item-overlay',
-                                    'property' => 'background-color',
+                                    'element'  => '.vp-portfolio__items-style-emerge',
+                                    'property' => '--vp-items-style-emerge--overlay__background-color',
                                 ),
                             ),
                         ),
                         array(
-                            'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'    => 'text_color',
-                            'default' => '#000',
-                            'alpha'   => true,
-                            'style'   => array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                            'name'  => 'text_color',
+                            'alpha' => true,
+                            'style' => array(
                                 array(
-                                    'element'  => '.vp-portfolio__items-style-emerge .vp-portfolio__item-overlay',
-                                    'property' => 'color',
+                                    'element'  => '.vp-portfolio__items-style-emerge',
+                                    'property' => '--vp-items-style-emerge--overlay__color',
                                 ),
                             ),
                         ),
@@ -742,28 +738,26 @@ class Visual_Portfolio_Admin {
                     ),
                     'controls'         => array(
                         array(
-                            'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'    => 'bg_color',
-                            'default' => 'rgba(0, 0, 0, 0.85)',
-                            'alpha'   => true,
-                            'style'   => array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                            'name'  => 'bg_color',
+                            'alpha' => true,
+                            'style' => array(
                                 array(
-                                    'element'  => '.vp-portfolio__items-style-fade .vp-portfolio__item-overlay',
-                                    'property' => 'background-color',
+                                    'element'  => '.vp-portfolio__items-style-fade',
+                                    'property' => '--vp-items-style-fade--overlay__background-color',
                                 ),
                             ),
                         ),
                         array(
-                            'type'    => 'color',
-                            'label'   => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'    => 'text_color',
-                            'default' => '#fff',
-                            'alpha'   => true,
-                            'style'   => array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                            'name'  => 'text_color',
+                            'alpha' => true,
+                            'style' => array(
                                 array(
-                                    'element'  => '.vp-portfolio__items-style-fade .vp-portfolio__item-overlay',
-                                    'property' => 'color',
+                                    'element'  => '.vp-portfolio__items-style-fade',
+                                    'property' => '--vp-items-style-fade--overlay__color',
                                 ),
                             ),
                         ),
@@ -1272,13 +1266,13 @@ class Visual_Portfolio_Admin {
                     switch ( $control_name ) {
                         case 'images_rounded_corners':
                             $new_fields[] = array(
-                                'type'      => 'range',
-                                'label'     => esc_html__( 'Images Rounded Corners', '@@text_domain' ),
-                                'name'      => 'images_rounded_corners',
-                                'min'       => 0,
-                                'max'       => 50,
-                                'default'   => 0,
-                                'style'     => array(
+                                'type'    => 'range',
+                                'label'   => esc_html__( 'Images Rounded Corners', '@@text_domain' ),
+                                'name'    => 'images_rounded_corners',
+                                'min'     => 0,
+                                'max'     => 50,
+                                'default' => 0,
+                                'style'   => array(
                                     array(
                                         'element'  => 'fade' === $name || 'fly' === $name || 'emerge' === $name ? '.vp-portfolio__item' : '.vp-portfolio__item-img',
                                         'property' => 'border-radius',

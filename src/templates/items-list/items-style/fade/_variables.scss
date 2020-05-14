@@ -11,7 +11,7 @@
     // Overlay.
     --vp-items-style-fade--overlay__text-decoration: none;
     --vp-items-style-fade--overlay__color: #fff;
-    --vp-items-style-fade--overlay__background-color: rgba(0, 0, 0, .85);
+    --vp-items-style-fade--overlay__background-color: var(--vp-color-brand);
 
     // Meta.
     --vp-items-style-fade--meta__padding-v: 2em;

@@ -8,7 +8,7 @@
     // Overlay.
     --vp-items-style-fly--overlay__text-decoration: none;
     --vp-items-style-fly--overlay__color: #fff;
-    --vp-items-style-fly--overlay__background-color: #212125;
+    --vp-items-style-fly--overlay__background-color: var(--vp-color-brand);
 
     // Meta.
     --vp-items-style-fly--meta__padding-v: 2em;

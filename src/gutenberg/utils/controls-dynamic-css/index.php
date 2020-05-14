@@ -83,7 +83,7 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
     public static function prepare_styles_from_params( $selector, $value, $params ) {
         $result = '';
 
-        if ( ! $selector || ! isset( $value ) || '' === $value || null === $value || ! isset( $params['property'] ) ) {
+        if ( ! $selector || ! isset( $value ) || empty( $value ) || null === $value || ! isset( $params['property'] ) ) {
             return $result;
         }
 
