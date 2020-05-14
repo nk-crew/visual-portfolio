@@ -1,0 +1,41 @@
+/**
+ * Items Style Default CSS Variables
+ */
+.vp-portfolio__items-style-default {
+    // Links.
+    --vp-items-style-default--links__color: inherit;
+    --vp-items-style-default--links__text-decoration: none;
+    --vp-items-style-default--links-hover__color: var(--vp-color-brand);
+
+    // Image.
+    --vp-items-style-default--image-hover__transform: scale(1.05);
+
+    // Meta.
+    --vp-items-style-default--meta__padding-v: 1.5em;
+    --vp-items-style-default--meta__padding-h: 2em;
+    --vp-items-style-default--meta-items__gap: 1.5em;
+
+    // Meta Categories.
+    --vp-items-style-default--meta-categories__font-size: .9em;
+    --vp-items-style-default--meta-categories__font-weight: 500;
+    --vp-items-style-default--meta-categories__text-transform: uppercase;
+    --vp-items-style-default--meta-categories__text-decoration: none;
+    --vp-items-style-default--meta-categories__opacity: .8;
+    --vp-items-style-default--meta-categories__gap: 5px;
+    --vp-items-style-default--meta-categories__separator: ", ";
+
+    // Meta Date.
+    --vp-items-style-default--meta-date__font-weight: 400;
+    --vp-items-style-default--meta-date__font-opacity: .8;
+
+    // Meta Title.
+    --vp-items-style-default--meta-title__font-size: 1.3em;
+
+    // Meta Excerpt.
+    --vp-items-style-default--meta-excerpt__line-height: 1.5;
+    --vp-items-style-default--meta-excerpt__opacity: .8;
+
+    // Transitions.
+    --vp-items-style-default-transition-duration: var(--vp-interactive__transition-duration);
+    --vp-items-style-default-transition-easing: var(--vp-interactive__transition-easing);
+}

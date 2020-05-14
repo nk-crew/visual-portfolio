@@ -1560,6 +1560,13 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
 
+                // Minimal.
+                'minimal' => array(
+                    'title'    => esc_html__( 'Minimal', '@@text_domain' ),
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
+                    'controls' => array(),
+                ),
+
                 // Dropdown.
                 'dropdown' => array(
                     'title'    => esc_html__( 'Dropdown', '@@text_domain' ),
@@ -1695,6 +1702,13 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
 
+                // Minimal.
+                'minimal' => array(
+                    'title'    => esc_html__( 'Minimal', '@@text_domain' ),
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
+                    'controls' => array(),
+                ),
+
                 // Dropdown.
                 'dropdown' => array(
                     'title'    => esc_html__( 'Dropdown', '@@text_domain' ),
@@ -1793,6 +1807,12 @@ class Visual_Portfolio_Admin {
                 // Default.
                 'default' => array(
                     'title'    => esc_html__( 'Default', '@@text_domain' ),
+                    'controls' => array(),
+                ),
+
+                // Minimal.
+                'minimal' => array(
+                    'title'    => esc_html__( 'Minimal', '@@text_domain' ),
                     'controls' => array(),
                 ),
             ),

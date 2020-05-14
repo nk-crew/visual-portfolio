@@ -221,10 +221,9 @@ class Visual_Portfolio_Assets {
                 $pagination_style_pref = '/' . $options['pagination_style'];
             }
 
-            switch ( $options['pagination'] ) {
-                case 'paged':
-                    self::store_used_assets( '@@plugin_name-pagination-paged', true, 'script' );
-                    break;
+            // Minimal page pagination helpful script.
+            if ( 'minimal' === $options['pagination_style'] && 'paged' === $options['pagination'] ) {
+                self::store_used_assets( '@@plugin_name-pagination-minimal-paged', true, 'script' );
             }
 
             self::store_used_assets(
@@ -329,11 +328,11 @@ class Visual_Portfolio_Assets {
 
         // Visual Portfolio JS.
         $vp_scripts = array(
-            '@@plugin_name'                   => array(
+            '@@plugin_name' => array(
                 'assets/js/main.min.js',
                 $vp_deps,
             ),
-            '@@plugin_name-plugin-isotope'    => array(
+            '@@plugin_name-plugin-isotope' => array(
                 'assets/js/plugin-isotope.min.js',
                 array(
                     'isotope',
@@ -345,7 +344,7 @@ class Visual_Portfolio_Assets {
                     'flickr-justified-gallery',
                 ),
             ),
-            '@@plugin_name-plugin-swiper'     => array(
+            '@@plugin_name-plugin-swiper' => array(
                 'assets/js/plugin-swiper.min.js',
                 array(
                     'swiper',
@@ -357,19 +356,19 @@ class Visual_Portfolio_Assets {
                     'photoswipe-ui-default',
                 ),
             ),
-            '@@plugin_name-plugin-fancybox'   => array(
+            '@@plugin_name-plugin-fancybox' => array(
                 'assets/js/plugin-fancybox.min.js',
                 array(
                     'fancybox',
                 ),
             ),
-            '@@plugin_name-layout-gaps'       => array(
+            '@@plugin_name-layout-gaps' => array(
                 'assets/js/layout-gaps.min.js',
                 array(
                     'jquery',
                 ),
             ),
-            '@@plugin_name-layout-masonry'    => array(
+            '@@plugin_name-layout-masonry' => array(
                 'assets/js/layout-masonry.min.js',
                 array(
                     'jquery',
@@ -377,7 +376,7 @@ class Visual_Portfolio_Assets {
                     '@@plugin_name-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-grid'       => array(
+            '@@plugin_name-layout-grid' => array(
                 'assets/js/layout-grid.min.js',
                 array(
                     'jquery',
@@ -385,7 +384,7 @@ class Visual_Portfolio_Assets {
                     '@@plugin_name-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-tiles'      => array(
+            '@@plugin_name-layout-tiles' => array(
                 'assets/js/layout-tiles.min.js',
                 array(
                     'jquery',
@@ -393,28 +392,28 @@ class Visual_Portfolio_Assets {
                     '@@plugin_name-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-justified'  => array(
+            '@@plugin_name-layout-justified' => array(
                 'assets/js/layout-justified.min.js',
                 array(
                     'jquery',
                     '@@plugin_name-plugin-fj-gallery',
                 ),
             ),
-            '@@plugin_name-layout-slider'     => array(
+            '@@plugin_name-layout-slider' => array(
                 'assets/js/layout-slider.min.js',
                 array(
                     'jquery',
                     '@@plugin_name-plugin-swiper',
                 ),
             ),
-            '@@plugin_name-items-style-fly'   => array(
+            '@@plugin_name-items-style-fly' => array(
                 'assets/js/items-style-fly.min.js',
                 array(
                     'jquery',
                 ),
             ),
-            '@@plugin_name-pagination-paged'  => array(
-                'assets/js/pagination-paged.min.js',
+            '@@plugin_name-pagination-minimal-paged' => array(
+                'assets/js/pagination-minimal-paged.min.js',
                 array(
                     'jquery',
                 ),

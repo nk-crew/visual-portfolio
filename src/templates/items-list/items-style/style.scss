@@ -1,16 +1,19 @@
+@import "./variables";
+
 /**
  * Default items style
  */
 .vp-portfolio__items-style-default {
     .vp-portfolio__item a {
-        color: inherit;
-        text-decoration: none;
+        color: var(--vp-items-style-default--links__color);
+        text-decoration: var(--vp-items-style-default--links__text-decoration);
         outline: none;
         box-shadow: none;
+        transition: var(--vp-items-style-default-transition-duration) color var(--vp-items-style-default-transition-easing);
 
         &:hover,
         &:focus {
-            color: #2540cc;
+            color: var(--vp-items-style-default--links-hover__color);
         }
     }
 
@@ -19,13 +22,13 @@
         overflow: hidden;
     }
     .vp-portfolio__item-img img {
-        transition: transform .3s ease, opacity .3s ease;
+        transition: var(--vp-items-style-default-transition-duration) transform var(--vp-items-style-default-transition-easing), var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
         will-change: transform, opacity;
     }
     .vp-portfolio__item:hover,
     .vp-portfolio__item:focus {
         .vp-portfolio__item-img img {
-            transform: scale(1.05);
+            transform: var(--vp-items-style-default--image-hover__transform);
         }
     }
 
@@ -38,10 +41,10 @@
     // meta
     .vp-portfolio__item-meta {
         position: relative;
-        padding: 1.5em 2em;
+        padding: var(--vp-items-style-default--meta__padding-v) var(--vp-items-style-default--meta__padding-h);
 
         > * {
-            margin-bottom: 1.5em;
+            margin-bottom: var(--vp-items-style-default--meta-items__gap);
         }
 
         > :last-child {
@@ -52,41 +55,41 @@
         display: inline-flex;
         flex-wrap: wrap;
         margin-right: 0;
-        margin-left: 0;
-        font-size: .9em;
-        font-weight: 500;
-        text-transform: uppercase;
+        margin-left: calc(-1 * var(--vp-items-style-default--meta-categories__gap));
+        font-size: var(--vp-items-style-default--meta-categories__font-size);
+        font-weight: var(--vp-items-style-default--meta-categories__font-weight);
+        text-transform: var(--vp-items-style-default--meta-categories__text-transform);
         list-style-type: none;
-        opacity: .8;
+        opacity: var(--vp-items-style-default--meta-categories__opacity);
 
         .vp-portfolio__item-meta-category {
             display: flex;
             padding: 0;
             margin: 0;
-            margin-right: 5px;
+            margin-left: var(--vp-items-style-default--meta-categories__gap);
 
             &::after {
-                content: ", ";
+                content: var(--vp-items-style-default--meta-categories__separator);
             }
             &:last-of-type::after {
                 content: none;
             }
 
             a {
-                text-decoration: none;
+                text-decoration: var(--vp-items-style-default--meta-categories__text-decoration);
             }
         }
     }
     .vp-portfolio__item-meta-date {
-        font-weight: 400;
-        opacity: .8;
+        font-weight: var(--vp-items-style-default--meta-date__font-weight);
+        opacity: var(--vp-items-style-default--meta-date__font-opacity);
     }
     .vp-portfolio__item-meta-title {
-        font-size: 1.3em;
+        font-size: var(--vp-items-style-default--meta-title__font-size);
     }
     .vp-portfolio__item-meta-excerpt {
-        line-height: 1.5;
-        opacity: .8;
+        line-height: var(--vp-items-style-default--meta-excerpt__line-height);
+        opacity: var(--vp-items-style-default--meta-excerpt__opacity);
     }
     .vp-portfolio__item-meta-read-more {
         display: inline-block;
@@ -95,11 +98,23 @@
     // align
     .vp-portfolio__item-align-left {
         text-align: left;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: flex-start;
+        }
     }
     .vp-portfolio__item-align-center {
         text-align: center;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: center;
+        }
     }
     .vp-portfolio__item-align-right {
         text-align: right;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: flex-end;
+        }
     }
 }

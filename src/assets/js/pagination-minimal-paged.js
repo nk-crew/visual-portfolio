@@ -1,11 +1,11 @@
 /*
- * Visual Portfolio pagination Paged.
+ * Minimal Paged pagination.
  */
 const $ = window.jQuery;
 
-// Init paged pagination.
+// Init minimal paged pagination.
 $( document ).on( 'init.vpf loadedNewItems.vpf', ( event, self ) => {
-    if ( 'vpf' !== event.namespace || 'paged' !== self.options.pagination ) {
+    if ( 'vpf' !== event.namespace || 'paged' !== self.options.pagination || ! self.$pagination.children( '.vp-pagination__style-minimal' ).length ) {
         return;
     }
 

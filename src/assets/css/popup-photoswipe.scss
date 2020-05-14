@@ -1,8 +1,10 @@
+@import "./variables-popup";
+
 /*
  * Visual Portfolio styles for PhotoSwipe.
  */
 .vp-pswp {
-    z-index: 1500;
+    z-index: var(--vp-popup__z-index);
 
     // fixed top position when WP admin bar showed.
     body.admin-bar & {

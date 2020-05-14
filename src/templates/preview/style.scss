@@ -1,15 +1,14 @@
+/* stylelint-disable declaration-no-important */
+
 /**
  * Preview style
  */
 html,
 body {
-    // stylelint-disable-next-line
-    margin: 0 !important;
-    // stylelint-disable-next-line
     padding: 0 !important;
+    margin: 0 !important;
 }
 body::before {
-    // stylelint-disable-next-line
     content: none !important;
 }
 #wpadminbar {
@@ -24,9 +23,7 @@ body::before {
     z-index: 99999;
 }
 .entry-content {
-    // stylelint-disable-next-line
     padding: 0 !important;
-    // stylelint-disable-next-line
     margin: 0 !important;
 }
 .vp-portfolio {
@@ -36,6 +33,5 @@ body::before {
 
 // Hide Query Monitor.
 #query-monitor-main {
-    // stylelint-disable-next-line
     display: none !important;
 }

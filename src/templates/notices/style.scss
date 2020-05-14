@@ -1,9 +1,13 @@
+@import "./variables";
+
 /**
  * Notices style
  */
 .vp-notice {
-    padding: 1em 1.3em;
-    color: #2540cc;
-    background-color: #f7f7f7;
-    border-left: 2px solid #2540cc;
+    padding: var(--vp-notice__padding-v) var(--vp-notice__padding-h);
+    color: var(--vp-notice__color);
+    background-color: var(--vp-notice__background-color);
+    border: var(--vp-notice__border-width) solid var(--vp-notice__border-color);
+    border-left-width: var(--vp-notice__border-left-width);
+    border-radius: var(--vp-notice__border-radius);
 }

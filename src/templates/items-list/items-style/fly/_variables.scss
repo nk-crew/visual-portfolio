@@ -1,0 +1,40 @@
+/**
+ * Items Style Fly CSS Variables
+ */
+.vp-portfolio__items-style-fly {
+    // Links.
+    --vp-items-style-fly--links__text-decoration: none;
+
+    // Overlay.
+    --vp-items-style-fly--overlay__text-decoration: none;
+    --vp-items-style-fly--overlay__color: #fff;
+    --vp-items-style-fly--overlay__background-color: #212125;
+
+    // Meta.
+    --vp-items-style-fly--meta__padding-v: 2em;
+    --vp-items-style-fly--meta__padding-h: 2em;
+    --vp-items-style-fly--meta-items__gap: 1.5em;
+
+    // Meta Icon.
+    --vp-items-style-fly--meta-icon__font-size: 2em;
+
+    // Meta Categories.
+    --vp-items-style-fly--meta-categories__font-size: .9em;
+    --vp-items-style-fly--meta-categories__font-weight: 500;
+    --vp-items-style-fly--meta-categories__text-transform: uppercase;
+    --vp-items-style-fly--meta-categories__text-decoration: none;
+    --vp-items-style-fly--meta-categories__opacity: .8;
+    --vp-items-style-fly--meta-categories__gap: 5px;
+    --vp-items-style-fly--meta-categories__separator: ", ";
+
+    // Meta Date.
+    --vp-items-style-fly--meta-date__font-weight: 400;
+    --vp-items-style-fly--meta-date__font-opacity: .8;
+
+    // Meta Title.
+    --vp-items-style-fly--meta-title__font-size: 1.3em;
+
+    // Meta Excerpt.
+    --vp-items-style-fly--meta-excerpt__line-height: 1.5;
+    --vp-items-style-fly--meta-excerpt__opacity: .8;
+}

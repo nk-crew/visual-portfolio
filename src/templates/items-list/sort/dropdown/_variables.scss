@@ -1,0 +1,25 @@
+/**
+ * Sort Dropdown CSS Variables
+ */
+.vp-sort__style-dropdown {
+    // Items.
+    --vp-sort-dropdown--items__gap: 6px;
+    --vp-sort-dropdown--items__min-width: 40px;
+    --vp-sort-dropdown--items__padding-v: .7em;
+    --vp-sort-dropdown--items__padding-h: 1.3em;
+    --vp-sort-dropdown--items__font-size: .7em;
+    --vp-sort-dropdown--items__font-weight: 600;
+    --vp-sort-dropdown--items__line-height: 1.4;
+    --vp-sort-dropdown--items__text-decoration: none;
+    --vp-sort-dropdown--items__text-transform: uppercase;
+    --vp-sort-dropdown--items__letter-spacing: .015em;
+    --vp-sort-dropdown--items__color: var(--vp-color-gray);
+    --vp-sort-dropdown--items__background-color: var(--vp-color-gray-lighten);
+    --vp-sort-dropdown--items__border-radius: var(--vp-border-radius);
+    --vp-sort-dropdown--items-hover__color: var(--vp-color-gray-darken);
+    --vp-sort-dropdown--items-hover__background-color: var(--vp-color-gray-light);
+
+    // Transitions.
+    --vp-sort-dropdown-transition-duration: var(--vp-interactive__transition-duration);
+    --vp-sort-dropdown-transition-easing: var(--vp-interactive__transition-easing);
+}

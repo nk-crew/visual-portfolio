@@ -1,0 +1,37 @@
+/**
+ * Global CSS Variables
+ */
+:root {
+    // Main colors.
+    --vp-color-brand: #2540cc;
+    --vp-color-gray: #6c7781;
+    --vp-color-gray-darken: #4b4b4b;
+    --vp-color-gray-light: #e8e8e8;
+    --vp-color-gray-lighten: #f7f7f7;
+
+    // Radius.
+    --vp-border-radius: 5px;
+
+    // Transitions.
+    --vp-transition-duration: .3s;
+    --vp-transition-easing: ease-in-out;
+    --vp-interactive__transition-duration: .2s;
+    --vp-interactive__transition-easing: ease-in-out;
+}
+
+.vp-portfolio {
+    --vp-wrap__min-height: 114px;
+    --vp-elements__gap: 20px;
+    --vp-images-lazy__background: linear-gradient(-70deg, rgba(255, 255, 255, 0) 42%, rgba(255, 255, 255, .55) 50%, rgba(255, 255, 255, 0) 58%);
+    --vp-images-lazy__background-color: rgba(132, 136, 177, .05);
+    --vp-images-lazy__animation-duration: 3s;
+}
+
+.vp-spinner {
+    --vp-spinner__color: currentColor;
+    --vp-spinner__size: 20px;
+    --vp-spinner__border-size: 2px;
+    --vp-spinner__speed: .3s;
+    --vp-spinner--background__color: var(--vp-spinner__color);
+    --vp-spinner--background__opacity: .3;
+}

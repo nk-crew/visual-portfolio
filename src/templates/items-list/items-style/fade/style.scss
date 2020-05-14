@@ -1,9 +1,11 @@
+@import "./variables";
+
 /**
  * Fade items style
  */
 .vp-portfolio__items-style-fade {
     .vp-portfolio__item a {
-        text-decoration: none;
+        text-decoration: var(--vp-items-style-fade--links__text-decoration);
         outline: none;
         box-shadow: none;
     }
@@ -14,11 +16,11 @@
         right: 0;
         bottom: 0;
         left: 0;
-        color: #fff;
-        text-decoration: none;
-        background-color: rgba(0, 0, 0, .85);
+        color: var(--vp-items-style-fade--overlay__color);
+        text-decoration: var(--vp-items-style-fade--overlay__text-decoration);
+        background-color: var(--vp-items-style-fade--overlay__background-color);
         opacity: 0;
-        transition: opacity .3s ease;
+        transition: var(--vp-items-style-fade-transition-duration) opacity var(--vp-items-style-fade-transition-easing);
         will-change: opacity;
 
         // Fix FireFox image blinking
@@ -30,7 +32,7 @@
     figcaption.vp-portfolio__item-overlay {
         margin: 0;
         font-style: inherit;
-        color: #fff;
+        color: var(--vp-items-style-fade--overlay__color);
     }
 
     // meta
@@ -42,17 +44,17 @@
         justify-content: center;
         width: 100%;
         height: 100%;
-        padding: 2em;
+        padding: var(--vp-items-style-fade--meta__padding-v) var(--vp-items-style-fade--meta__padding-h);
         color: inherit;
         text-align: center;
         opacity: 0;
-        transition: transform .3s .05s ease, opacity .3s .05s ease;
-        transform: translateY(10px);
+        transition: var(--vp-items-style-fade-transition-duration) transform .05s var(--vp-items-style-fade-transition-easing), var(--vp-items-style-fade-transition-duration) opacity .05s var(--vp-items-style-fade-transition-easing);
+        transform: var(--vp-items-style-fade--meta__transform);
         will-change: transform, opacity;
 
         > * {
             max-width: 100%;
-            margin-bottom: 1.5em;
+            margin-bottom: var(--vp-items-style-fade--meta-items__gap);
         }
 
         > :last-child {
@@ -60,61 +62,61 @@
         }
     }
     .vp-portfolio__item-meta-icon {
-        font-size: 2em;
+        font-size: var(--vp-items-style-fade--meta-icon__font-size);
     }
     .vp-portfolio__item-meta-categories {
         display: inline-flex;
         flex-wrap: wrap;
         margin-right: 0;
-        margin-left: 0;
-        font-size: .9em;
-        font-weight: 500;
-        text-transform: uppercase;
+        margin-left: calc(-1 * var(--vp-items-style-fade--meta-categories__gap));
+        font-size: var(--vp-items-style-fade--meta-categories__font-size);
+        font-weight: var(--vp-items-style-fade--meta-categories__font-weight);
+        text-transform: var(--vp-items-style-fade--meta-categories__text-transform);
         list-style-type: none;
-        opacity: .8;
+        opacity: var(--vp-items-style-fade--meta-categories__opacity);
 
         .vp-portfolio__item-meta-category {
             display: flex;
             padding: 0;
             margin: 0;
-            margin-right: 5px;
+            margin-left: var(--vp-items-style-fade--meta-categories__gap);
 
             &::after {
-                content: ", ";
+                content: var(--vp-items-style-fade--meta-categories__separator);
             }
             &:last-of-type::after {
                 content: none;
             }
 
             a {
-                text-decoration: none;
+                text-decoration: var(--vp-items-style-fade--meta-categories__text-decoration);
             }
         }
     }
     .vp-portfolio__item-meta-date {
-        font-weight: 400;
-        opacity: .8;
+        font-weight: var(--vp-items-style-fade--meta-date__font-weight);
+        opacity: var(--vp-items-style-fade--meta-date__font-opacity);
     }
     .vp-portfolio__item-meta-title {
-        font-size: 1.3em;
+        font-size: var(--vp-items-style-fade--meta-title__font-size);
         color: inherit;
     }
     .vp-portfolio__item-meta-excerpt {
-        line-height: 1.5;
-        opacity: .8;
+        line-height: var(--vp-items-style-fade--meta-excerpt__line-height);
+        opacity: var(--vp-items-style-fade--meta-excerpt__opacity);
     }
 
     // Transitions
     .vp-portfolio__item-img img {
-        transition: transform .3s ease, opacity .3s ease;
+        transition: var(--vp-items-style-fade-transition-duration) transform var(--vp-items-style-fade-transition-easing), var(--vp-items-style-fade-transition-duration) opacity var(--vp-items-style-fade-transition-easing);
         will-change: transform, opacity;
 
         // Fix FireFox image blinking
         // https://github.com/nk-o/visual-portfolio/issues/92
         z-index: 1;
     }
-    & .vp-portfolio__item:hover,
-    & .vp-portfolio__item:focus {
+    .vp-portfolio__item:hover,
+    .vp-portfolio__item:focus {
         .vp-portfolio__item-overlay {
             opacity: 1;
         }
@@ -123,7 +125,7 @@
             transform: translateY(0);
         }
         .vp-portfolio__item-img img {
-            transform: scale(1.05);
+            transform: var(--vp-items-style-fade--image-hover__transform);
         }
     }
 
@@ -131,45 +133,81 @@
     .vp-portfolio__item-align-center .vp-portfolio__item-meta {
         align-items: center;
         text-align: center;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: center;
+        }
     }
     .vp-portfolio__item-align-left .vp-portfolio__item-meta {
         align-items: flex-start;
         text-align: left;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: flex-start;
+        }
     }
     .vp-portfolio__item-align-right .vp-portfolio__item-meta {
         align-items: flex-end;
         text-align: right;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: flex-end;
+        }
     }
 
     .vp-portfolio__item-align-top-center .vp-portfolio__item-meta {
         align-items: center;
         justify-content: flex-start;
         text-align: center;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: center;
+        }
     }
     .vp-portfolio__item-align-top-left .vp-portfolio__item-meta {
         align-items: flex-start;
         justify-content: flex-start;
         text-align: left;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: flex-start;
+        }
     }
     .vp-portfolio__item-align-top-right .vp-portfolio__item-meta {
         align-items: flex-end;
         justify-content: flex-start;
         text-align: right;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: flex-end;
+        }
     }
 
     .vp-portfolio__item-align-bottom-center .vp-portfolio__item-meta {
         align-items: center;
         justify-content: flex-end;
         text-align: center;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: center;
+        }
     }
     .vp-portfolio__item-align-bottom-left .vp-portfolio__item-meta {
         align-items: flex-start;
         justify-content: flex-end;
         text-align: left;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: flex-start;
+        }
     }
     .vp-portfolio__item-align-bottom-right .vp-portfolio__item-meta {
         align-items: flex-end;
         justify-content: flex-end;
         text-align: right;
+
+        .vp-portfolio__item-meta-categories {
+            justify-content: flex-end;
+        }
     }
 }

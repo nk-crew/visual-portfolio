@@ -1,0 +1,25 @@
+/**
+ * Filter Dropdown CSS Variables
+ */
+.vp-filter__style-dropdown {
+    // Items.
+    --vp-filter-dropdown--items__gap: 6px;
+    --vp-filter-dropdown--items__min-width: 40px;
+    --vp-filter-dropdown--items__padding-v: .7em;
+    --vp-filter-dropdown--items__padding-h: 1.3em;
+    --vp-filter-dropdown--items__font-size: .7em;
+    --vp-filter-dropdown--items__font-weight: 600;
+    --vp-filter-dropdown--items__line-height: 1.4;
+    --vp-filter-dropdown--items__text-decoration: none;
+    --vp-filter-dropdown--items__text-transform: uppercase;
+    --vp-filter-dropdown--items__letter-spacing: .015em;
+    --vp-filter-dropdown--items__color: var(--vp-color-gray);
+    --vp-filter-dropdown--items__background-color: var(--vp-color-gray-lighten);
+    --vp-filter-dropdown--items__border-radius: var(--vp-border-radius);
+    --vp-filter-dropdown--items-hover__color: var(--vp-color-gray-darken);
+    --vp-filter-dropdown--items-hover__background-color: var(--vp-color-gray-light);
+
+    // Transitions.
+    --vp-filter-dropdown-transition-duration: var(--vp-interactive__transition-duration);
+    --vp-filter-dropdown-transition-easing: var(--vp-interactive__transition-easing);
+}
