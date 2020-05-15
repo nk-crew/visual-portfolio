@@ -2208,6 +2208,27 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'pagination',
+                'type'      => 'toggle',
+                'label'     => esc_html__( 'Hide on Reached End', '@@text_domain' ),
+                'name'      => 'pagination_hide_on_end',
+                'default'   => false,
+                'condition' => array(
+                    array(
+                        'control'  => 'pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control'  => 'pagination',
+                        'operator' => '!=',
+                        'value'    => 'paged',
+                    ),
+                ),
+            )
+        );
 
         /**
          * Code Editor

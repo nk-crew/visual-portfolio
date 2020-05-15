@@ -1847,7 +1847,10 @@ class Visual_Portfolio_Get {
                     $args['text_end_list'] = $vp_options['pagination_load_more_text_end_list'];
                 }
 
-                visual_portfolio()->include_template( 'items-list/pagination' . $pagination_style_pref . '/' . $vp_options['pagination'], $args );
+                if ( ! $vp_options['pagination_hide_on_end'] || $args['next_page_url'] ) {
+                    visual_portfolio()->include_template( 'items-list/pagination' . $pagination_style_pref . '/' . $vp_options['pagination'], $args );
+                }
+
                 break;
             default:
                 $pagination_links = paginate_links(
