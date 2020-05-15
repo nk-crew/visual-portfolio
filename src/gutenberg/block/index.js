@@ -7,6 +7,7 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import variations from './variations';
+import transforms from './transforms';
 
 /**
  * WordPress dependencies
@@ -43,6 +44,7 @@ const settings = {
     variations,
     edit,
     save,
+    transforms,
 };
 
 registerBlockType( name, settings );
