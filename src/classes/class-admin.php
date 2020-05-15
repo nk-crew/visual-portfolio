@@ -2212,6 +2212,49 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'pagination',
                 'type'      => 'toggle',
+                'label'     => esc_html__( 'Scroll to Top', '@@text_domain' ),
+                'name'      => 'pagination_paged__scroll_top',
+                'default'   => true,
+                'condition' => array(
+                    array(
+                        'control'  => 'pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control' => 'pagination',
+                        'value'   => 'paged',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'pagination',
+                'type'      => 'range',
+                'label'     => esc_html__( 'Scroll to Top Offset', '@@text_domain' ),
+                'name'      => 'pagination_paged__scroll_top_offset',
+                'default'   => 30,
+                'condition' => array(
+                    array(
+                        'control'  => 'pagination_style',
+                        'operator' => '!=',
+                        'value'    => 'false',
+                    ),
+                    array(
+                        'control' => 'pagination',
+                        'value'   => 'paged',
+                    ),
+                    array(
+                        'control' => 'pagination_paged__scroll_top',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'pagination',
+                'type'      => 'toggle',
                 'label'     => esc_html__( 'Hide on Reached End', '@@text_domain' ),
                 'name'      => 'pagination_hide_on_end',
                 'default'   => false,

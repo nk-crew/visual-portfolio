@@ -12,7 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<ul class="<?php echo esc_attr( $args['class'] ); ?> vp-pagination__style-default" data-vp-pagination-type="<?php echo esc_attr( $args['type'] ); ?>">
+<ul class="<?php echo esc_attr( $args['class'] ); ?> vp-pagination__style-default" data-vp-pagination-type="<?php echo esc_attr( $args['type'] ); ?>"
+<?php if ( isset( $args['scroll_top_offset'] ) ) : ?>
+    data-vp-pagination-scroll-top="<?php echo esc_attr( $args['scroll_top_offset'] ); ?>"
+<?php endif; ?>
+>
     <?php
     // phpcs:ignore
     foreach ( $args['items'] as $item ) {

@@ -500,10 +500,40 @@ class VP {
         self.$item.on( `click${ evp }`, '.vp-pagination .vp-pagination__item a', function( e ) {
             e.preventDefault();
             const $this = $( this );
-            if ( $this.hasClass( 'vp-pagination__no-more' ) && 'paged' !== self.options.pagination ) {
+            const $pagination = $this.closest( '.vp-pagination' );
+
+            if ( $pagination.hasClass( 'vp-pagination__no-more' ) && 'paged' !== self.options.pagination ) {
                 return;
             }
+
             self.loadNewItems( $this.attr( 'href' ), 'paged' === self.options.pagination );
+
+            // Scroll to top
+            if ( 'paged' === self.options.pagination && $pagination.hasClass( 'vp-pagination__scroll-top' ) ) {
+                const $adminBar = $( '#wpadminbar' );
+                const currentTop = window.pageYOffset || document.documentElement.scrollTop;
+                let { top } = self.$item.offset();
+
+                // Custom user offset.
+                if ( $pagination.attr( 'data-vp-pagination-scroll-top' ) ) {
+                    top -= parseInt( $pagination.attr( 'data-vp-pagination-scroll-top' ), 10 ) || 0;
+                }
+
+                // Admin bar offset.
+                if ( $adminBar.length && 'fixed' === $adminBar.css( 'position' ) ) {
+                    top -= parseInt( $( 'html' ).css( 'margin-top' ), 10 ) || 0;
+                }
+
+                // Limit max offset.
+                top = Math.max( 0, top );
+
+                if ( currentTop > top ) {
+                    window.scrollTo( {
+                        top,
+                        behavior: 'smooth',
+                    } );
+                }
+            }
         } );
 
         // on categories of item click
@@ -772,8 +802,9 @@ class VP {
      *
      * @param {string} content - new page content.
      * @param {bool} removeExisting - remove existing elements.
+     * @param {function} cb - callback.
      */
-    replaceItems( content, removeExisting ) {
+    replaceItems( content, removeExisting, cb ) {
         const self = this;
 
         if ( ! content ) {
@@ -831,6 +862,10 @@ class VP {
             self.addItems( $( newItems ), removeExisting, $newVP );
 
             self.emitEvent( 'loadedNewItems', [ $newVP, $newVP, content ] );
+
+            if ( cb ) {
+                cb();
+            }
         }
 
         // update next page data

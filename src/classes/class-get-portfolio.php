@@ -1817,10 +1817,12 @@ class Visual_Portfolio_Get {
             'vp_opts'       => $vp_options,
         );
 
+        // No more posts.
         if ( ! $args['next_page_url'] ) {
             $args['class'] .= ' vp-pagination__no-more';
         }
 
+        // Align.
         if ( $vp_options['pagination_align'] ) {
             $args['class'] .= ' vp-pagination__align-' . $vp_options['pagination_align'];
         }
@@ -1853,6 +1855,15 @@ class Visual_Portfolio_Get {
 
                 break;
             default:
+                // Scroll to top.
+                if ( $vp_options['pagination_paged__scroll_top'] ) {
+                    $args['class'] .= ' vp-pagination__scroll-top';
+
+                    if ( isset( $vp_options['pagination_paged__scroll_top_offset'] ) ) {
+                        $args['scroll_top_offset'] = $vp_options['pagination_paged__scroll_top_offset'];
+                    }
+                }
+
                 $pagination_links = paginate_links(
                     array(
                         'base'      => esc_url_raw(
