@@ -1,4 +1,9 @@
 /*
+ * External dependencies.
+ */
+import isNumber from 'is-number';
+
+/*
  * Visual Portfolio plugin Swiper extension.
  */
 const $ = window.jQuery;
@@ -45,7 +50,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             let slidesPerView = self.options.sliderSlidesPerView || 3;
             const breakPoints = {};
 
-            if ( ! Number.isNaN( slidesPerView ) ) {
+            if ( isNumber( slidesPerView ) ) {
                 let count = slidesPerView;
                 let currentPoint = Math.min( screenSizes.length - 1, count - 1 );
 
@@ -134,7 +139,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 let thumbnailsPerView = self.options.sliderThumbnailsPerView || 8;
                 const thumbnailsBreakPoints = {};
 
-                if ( ! Number.isNaN( thumbnailsPerView ) ) {
+                if ( isNumber( thumbnailsPerView ) ) {
                     let count = thumbnailsPerView;
                     let currentPoint = Math.min( screenSizes.length - 1, count - 1 );
 

@@ -42,6 +42,7 @@
         "clipboard-polyfill": "^2.8.6",
         "iframe-resizer": "^4.2.10",
         "iframe-resizer-react": "^1.0.3",
+        "is-number": "^7.0.0",
         "rafl": "^1.2.2",
         "react-ace": "^8.1.0",
         "react-masonry-component": "^6.2.1",

@@ -1,4 +1,9 @@
 /*
+ * External dependencies.
+ */
+import isNumber from 'is-number';
+
+/*
  * Visual Portfolio plugin Photoswipe extension.
  */
 const $ = window.jQuery;
@@ -266,7 +271,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             }
 
             // exit if index not found
-            if ( Number.isNaN( options.index ) ) {
+            if ( ! isNumber( options.index ) ) {
                 return;
             }
 

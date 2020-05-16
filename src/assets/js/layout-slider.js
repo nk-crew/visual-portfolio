@@ -1,4 +1,9 @@
 /*
+ * External dependencies.
+ */
+import isNumber from 'is-number';
+
+/*
  * Visual Portfolio layout Slider.
  */
 const $ = window.jQuery;
@@ -22,7 +27,7 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
             return;
         }
 
-        itemsHeight = Number.isNaN( itemsHeight ) ? itemsHeight : `${ itemsHeight }px`;
+        itemsHeight = isNumber( itemsHeight ) ? `${ itemsHeight }px` : itemsHeight;
 
         // prevent minHeight option in preview, when used 'vh' units.
         if ( itemsMinHeight && self.isPreview() && /vh/.test( itemsMinHeight ) ) {
