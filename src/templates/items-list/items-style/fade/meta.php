@@ -135,20 +135,11 @@ $show_meta = $inline_meta ||
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">
                             <?php
-                            if ( $args['author_url'] && 'a' !== $tag ) {
-                                ?>
-                                <a href="<?php echo esc_url( $args['author_url'] ); ?>">
-                                <?php
-                            }
-
-                            // translators: %s - author name.
-                            echo sprintf( esc_html__( 'By %s', '@@text_domain' ), esc_html( $args['author'] ) );
-
-                            if ( $args['author_url'] && 'a' !== $tag ) {
-                                ?>
-                                </a>
-                                <?php
-                            }
+                            printf(
+                                // translators: %s - author name.
+                                esc_html__( 'By %s', '@@text_domain' ),
+                                $args['author_url'] && 'a' !== $tag ? '<a href="' . esc_url( $args['author_url'] ) . '">' . esc_html( $args['author'] ) . '</a>' : esc_html( $args['author'] )
+                            );
                             ?>
                         </span>
                     </div>
