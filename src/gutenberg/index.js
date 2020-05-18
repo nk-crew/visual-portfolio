@@ -9,6 +9,11 @@ import ElementIcon from '../assets/admin/images/icon-gutenberg.svg';
 import './store';
 
 /**
+ * Extensions
+ */
+import './extensions/block-id';
+
+/**
  * Blocks
  */
 import './block';

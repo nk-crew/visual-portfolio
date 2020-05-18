@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
-import shorthash from 'shorthash';
 
 /**
  * Internal dependencies
@@ -30,64 +29,10 @@ const {
     InspectorControls,
 } = wp.blockEditor;
 
-const usedIds = {};
-
 /**
  * Block Edit Class.
  */
 export default class BlockEdit extends Component {
-    constructor( ...args ) {
-        super( ...args );
-
-        this.generateUniqueId = this.generateUniqueId.bind( this );
-    }
-
-    componentDidMount() {
-        this.generateUniqueId();
-    }
-
-    componentDidUpdate() {
-        this.generateUniqueId();
-    }
-
-    generateUniqueId() {
-        const {
-            clientId,
-            attributes,
-            setAttributes,
-        } = this.props;
-
-        let {
-            block_id: blockId,
-        } = attributes;
-
-        // prepare new block id.
-        if ( clientId && ! blockId ) {
-            let ID = blockId || '';
-
-            // check if ID already exist.
-            let tryCount = 10;
-            while ( ! ID || ( 'undefined' !== typeof usedIds[ ID ] && usedIds[ ID ] !== clientId && 0 < tryCount ) ) {
-                ID = shorthash.unique( clientId );
-                tryCount -= 1;
-            }
-
-            if ( ID && 'undefined' === typeof usedIds[ ID ] ) {
-                usedIds[ ID ] = clientId;
-            }
-
-            if ( ID !== blockId ) {
-                blockId = ID;
-            }
-
-            if ( attributes.block_id !== blockId ) {
-                setAttributes( {
-                    block_id: blockId,
-                } );
-            }
-        }
-    }
-
     render() {
         const {
             attributes,
