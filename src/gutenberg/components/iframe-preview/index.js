@@ -355,6 +355,20 @@ addFilter( 'vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-
 
             break;
         }
+        case 'items_style_default__align':
+        case 'items_style_fade__align':
+        case 'items_style_fly__align':
+        case 'items_style_emerge__align': {
+            let allAlignClasses = '';
+
+            [ 'left', 'center', 'right', 'top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right' ].forEach( ( alignName ) => {
+                allAlignClasses += `${ allAlignClasses ? ' ' : '' }vp-portfolio__item-align-${ alignName }`;
+            } );
+
+            data.$framePortfolio.find( '.vp-portfolio__item-overlay' ).removeClass( allAlignClasses ).addClass( `vp-portfolio__item-align-${ val }` );
+
+            break;
+        }
         case 'filter_align':
             data.$framePortfolio.find( '.vp-filter' ).removeClass( 'vp-filter__align-center vp-filter__align-left vp-filter__align-right' ).addClass( `vp-filter__align-${ val }` );
 
