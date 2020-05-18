@@ -94,6 +94,8 @@
         }
     }
     .vp-portfolio__item-meta-title {
+        margin-right: 0;
+        margin-left: 0;
         font-size: var(--vp-items-style-fade--meta-title__font-size);
         color: inherit;
     }
