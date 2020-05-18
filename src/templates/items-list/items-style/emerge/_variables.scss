@@ -11,7 +11,6 @@
     --vp-items-style-emerge--image-hover__transform: scale(1.05);
 
     // Overlay.
-    --vp-items-style-emerge--overlay__max-height: 50%;
     --vp-items-style-emerge--overlay__padding-v: 1.5em;
     --vp-items-style-emerge--overlay__padding-h: 2em;
     --vp-items-style-emerge--overlay__color: #000;
@@ -30,12 +29,18 @@
     --vp-items-style-emerge--meta-categories__text-transform: uppercase;
     --vp-items-style-emerge--meta-categories__text-decoration: none;
     --vp-items-style-emerge--meta-categories__opacity: .8;
-    --vp-items-style-emerge--meta-categories__gap: 5px;
+    --vp-items-style-emerge--meta-categories__gap: .4em;
     --vp-items-style-emerge--meta-categories__separator: ", ";
 
-    // Meta Date.
-    --vp-items-style-emerge--meta-date__font-weight: 400;
-    --vp-items-style-emerge--meta-date__font-opacity: .8;
+    // Meta Inline.
+    --vp-items-style-emerge--meta-inline__font-weight: 400;
+    --vp-items-style-emerge--meta-inline__line-height: 2;
+    --vp-items-style-emerge--meta-inline__font-opacity: .8;
+    --vp-items-style-emerge--meta-inline__gap: 1em;
+
+    // Meta Parts.
+    --vp-items-style-emerge--meta-part-icon__offset: .5em;
+    --vp-items-style-emerge--meta-part-icon__width: 1.2em;
 
     // Meta Title.
     --vp-items-style-emerge--meta-title__font-size: 1.3em;

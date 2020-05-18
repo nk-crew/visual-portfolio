@@ -83,13 +83,44 @@
             }
         }
     }
-    .vp-portfolio__item-meta-date {
-        font-weight: var(--vp-items-style-fly--meta-date__font-weight);
-        opacity: var(--vp-items-style-fly--meta-date__font-opacity);
-    }
     .vp-portfolio__item-meta-title {
         font-size: var(--vp-items-style-fly--meta-title__font-size);
         color: inherit;
+    }
+    .vp-portfolio__item-meta-inline {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        margin-left: calc(-1 * var(--vp-items-style-fly--meta-inline__gap));
+        font-weight: var(--vp-items-style-fly--meta-inline__font-weight);
+        line-height: var(--vp-items-style-fly--meta-inline__line-height);
+        opacity: var(--vp-items-style-fly--meta-inline__font-opacity);
+
+        > * {
+            margin-left: var(--vp-items-style-fly--meta-inline__gap);
+        }
+    }
+    .vp-portfolio__item-meta-part {
+        display: inline-flex;
+        align-items: center;
+    }
+    .vp-portfolio__item-meta-part-icon {
+        margin-right: var(--vp-items-style-fly--meta-part-icon__offset);
+
+        img,
+        svg {
+            width: var(--vp-items-style-fly--meta-part-icon__width);
+            height: auto;
+        }
+    }
+    .vp-portfolio__item-meta-author {
+        display: flex;
+        align-items: center;
+
+        img {
+            border-radius: var(--vp-items-style-fly--meta-part-icon__width);
+        }
     }
     .vp-portfolio__item-meta-excerpt {
         line-height: var(--vp-items-style-fly--meta-excerpt__line-height);
@@ -101,7 +132,8 @@
         align-items: center;
         text-align: center;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: center;
         }
     }
@@ -109,7 +141,8 @@
         align-items: flex-start;
         text-align: left;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: flex-start;
         }
     }
@@ -117,7 +150,8 @@
         align-items: flex-end;
         text-align: right;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: flex-end;
         }
     }
@@ -127,7 +161,8 @@
         justify-content: flex-start;
         text-align: center;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: center;
         }
     }
@@ -136,7 +171,8 @@
         justify-content: flex-start;
         text-align: left;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: flex-start;
         }
     }
@@ -145,7 +181,8 @@
         justify-content: flex-start;
         text-align: right;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: flex-end;
         }
     }
@@ -155,7 +192,8 @@
         justify-content: flex-end;
         text-align: center;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: center;
         }
     }
@@ -164,7 +202,8 @@
         justify-content: flex-end;
         text-align: left;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: flex-start;
         }
     }
@@ -173,7 +212,8 @@
         justify-content: flex-end;
         text-align: right;
 
-        .vp-portfolio__item-meta-categories {
+        .vp-portfolio__item-meta-categories,
+        .vp-portfolio__item-meta-inline {
             justify-content: flex-end;
         }
     }

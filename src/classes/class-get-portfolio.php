@@ -473,10 +473,17 @@ class Visual_Portfolio_Get {
                     'url'                => '',
                     'title'              => '',
                     'excerpt'            => '',
-                    'comments_number'    => '',
+                    'comments_count'     => '',
+                    'comments_url'       => '',
+                    'author'             => '',
+                    'author_url'         => '',
+                    'author_avatar'      => '',
+                    'views_count'        => '',
+                    'reading_time'       => '',
                     'format'             => '',
                     'published'          => '',
                     'published_time'     => '',
+                    'categories'         => array(),
                     'filter'             => '',
                     'video'              => '',
                     'image_id'           => '',
@@ -502,7 +509,6 @@ class Visual_Portfolio_Get {
                     'img_size_sm_popup'  => $img_size_sm_popup,
                     'img_size'           => $img_size,
                     'no_image'           => $no_image,
-                    'categories'         => array(),
                     'opts'               => $style_options,
                     'vp_opts'            => $options,
                 );
@@ -624,42 +630,50 @@ class Visual_Portfolio_Get {
                             }
                         }
 
-                        $args = apply_filters(
-                            'vpf_post_item_args',
-                            array_merge(
-                                $each_item_args,
-                                array(
-                                    'post_id'        => get_the_ID(),
-                                    'url'            => get_permalink(),
-                                    'title'          => get_the_title(),
-                                    'format'         => get_post_format() ? get_post_format() : 'standard',
-                                    'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
-                                    'filter'         => implode( ',', $filter_values ),
-                                    'image_id'       => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
-                                    'categories'     => $categories,
-                                )
-                            ),
-                            get_the_ID()
+                        $args = array_merge(
+                            $each_item_args,
+                            array(
+                                'post_id'        => get_the_ID(),
+                                'url'            => get_permalink(),
+                                'title'          => get_the_title(),
+                                'format'         => get_post_format() ? get_post_format() : 'standard',
+                                'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
+                                'filter'         => implode( ',', $filter_values ),
+                                'image_id'       => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
+                                'categories'     => $categories,
+                                'comments_count' => get_comments_number( get_the_ID() ),
+                                'comments_url'   => get_comments_link( get_the_ID() ),
+                                'views_count'    => Visual_Portfolio_Custom_Post_Meta::get_views_count( get_the_ID() ),
+                                'reading_time'   => Visual_Portfolio_Custom_Post_Meta::get_reading_time( get_the_ID() ),
+                            )
                         );
 
-                        $args['allow_popup'] = isset( $args['image_id'] ) && $args['image_id'];
-
-                        $args['comments_number'] = get_comments_number();
-
-                        $slider_thumbnails[] = $args['image_id'];
+                        // Author.
+                        $author_id = get_the_author_meta( 'ID' );
+                        if ( $author_id ) {
+                            $args['author']        = get_the_author();
+                            $args['author_url']    = get_author_posts_url( $author_id );
+                            $args['author_avatar'] = get_avatar_url( $author_id, array( 'size' => 50 ) );
+                        }
 
                         // Excerpt.
                         if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] ) {
                             $args['excerpt'] = wp_trim_words( do_shortcode( has_excerpt() ? get_the_excerpt() : get_the_content() ), $args['opts']['excerpt_words_count'], '...' );
                         }
 
+                        $args['allow_popup'] = isset( $args['image_id'] ) && $args['image_id'];
+
                         if ( 'video' === $args['format'] ) {
-                            $video_url = get_post_meta( get_the_ID(), 'video_url', true );
+                            $video_url = Visual_Portfolio_Custom_Post_Meta::get_video_format_url( get_the_ID() );
                             if ( $video_url ) {
                                 $args['video']       = $video_url;
                                 $args['allow_popup'] = true;
                             }
                         }
+
+                        $slider_thumbnails[] = $args['image_id'];
+
+                        $args = apply_filters( 'vpf_post_item_args', $args, $args['post_id'] );
 
                         self::each_item( $args );
                     }

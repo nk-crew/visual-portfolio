@@ -21,11 +21,6 @@ class Visual_Portfolio_Custom_Post_Type {
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
         add_action( 'restrict_manage_posts', array( $this, 'filter_custom_post_by_taxonomies' ), 10 );
 
-        // add post formats.
-        add_action( 'after_setup_theme', array( $this, 'add_video_post_format' ), 99 );
-        add_action( 'add_meta_boxes', array( $this, 'add_post_format_metaboxes' ), 1 );
-        add_action( 'save_post', array( $this, 'save_post_format_metaboxes' ) );
-
         // custom post roles.
         add_action( 'init', array( $this, 'add_role_caps' ) );
 
@@ -231,121 +226,6 @@ class Visual_Portfolio_Custom_Post_Type {
                 );
             }
             echo '</select>';
-        }
-    }
-
-    /**
-     * Add video post format.
-     */
-    public function add_video_post_format() {
-        global $_wp_theme_features;
-        $formats = array( 'video' );
-
-        // Add existing formats.
-        if ( isset( $_wp_theme_features['post-formats'] ) && isset( $_wp_theme_features['post-formats'][0] ) ) {
-            $formats = array_merge( (array) $_wp_theme_features['post-formats'][0], $formats );
-        }
-        $formats = array_unique( $formats );
-
-        add_theme_support( 'post-formats', $formats );
-    }
-
-    /**
-     * Add post format metaboxes.
-     *
-     * @param string $post_type post type.
-     */
-    public function add_post_format_metaboxes( $post_type ) {
-        if ( post_type_supports( $post_type, 'post-formats' ) ) {
-            add_meta_box(
-                'vp_format_video',
-                esc_html__( 'Video', '@@text_domain' ),
-                array( $this, 'add_video_format_metabox' ),
-                null,
-                'side',
-                'default'
-            );
-        }
-    }
-
-    /**
-     * Add Video Format metabox
-     *
-     * @param object $post The post object.
-     */
-    public function add_video_format_metabox( $post ) {
-        wp_nonce_field( basename( __FILE__ ), 'vp_format_video_nonce' );
-
-        $video_url   = get_post_meta( $post->ID, 'video_url', true );
-        $oembed_html = false;
-
-        $wpkses_iframe = array(
-            'iframe' => array(
-                'src'             => array(),
-                'height'          => array(),
-                'width'           => array(),
-                'frameborder'     => array(),
-                'allowfullscreen' => array(),
-            ),
-        );
-
-        if ( $video_url ) {
-            $oembed = visual_portfolio()->get_oembed_data( $video_url );
-
-            if ( $oembed && isset( $oembed['html'] ) ) {
-                $oembed_html = $oembed['html'];
-            }
-        }
-        ?>
-
-        <p></p>
-        <input class="vp-input" name="video_url" type="url" id="video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="<?php echo esc_attr__( 'https://', '@@text_domain' ); ?>">
-        <div class="vp-oembed-preview">
-            <?php
-            if ( $oembed_html ) {
-                echo wp_kses( $oembed_html, $wpkses_iframe );
-            }
-            ?>
-        </div>
-        <style>
-            #vp_format_video {
-                display: <?php echo has_post_format( 'video' ) ? 'block' : 'none'; ?>;
-            }
-        </style>
-        <?php
-    }
-
-    /**
-     * Save Format metabox
-     *
-     * @param int $post_id The post ID.
-     */
-    public static function save_post_format_metaboxes( $post_id ) {
-        if ( ! isset( $_POST['vp_format_video_nonce'] ) ) {
-            return;
-        }
-
-        if ( ! wp_verify_nonce( sanitize_key( $_POST['vp_format_video_nonce'] ), basename( __FILE__ ) ) ) {
-            return;
-        }
-
-        $meta = array(
-            'video_url',
-        );
-
-        foreach ( $meta as $item ) {
-            if ( isset( $_POST[ $item ] ) ) {
-                // phpcs:ignore
-                if ( is_array( $_POST[ $item ] ) ) {
-                    $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
-                } else {
-                    $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
-                }
-
-                update_post_meta( $post_id, $item, $result );
-            } else {
-                update_post_meta( $post_id, $item, false );
-            }
         }
     }
 

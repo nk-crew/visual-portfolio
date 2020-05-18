@@ -46,6 +46,7 @@ const {
     TextControl,
     TextareaControl,
     CheckboxControl,
+    RadioControl,
     ToggleControl,
 } = wp.components;
 
@@ -121,7 +122,10 @@ ControlsRender.Control = function( props ) {
     }
 
     let renderControl = '';
+    let renderControlLabel = props.label;
     let renderControlAfter = '';
+    const renderControlHelp = props.description ? <RawHTML>{ props.description }</RawHTML> : false;
+    const renderControlClassName = classnames( 'vpf-control-wrap', `vpf-control-wrap-${ props.type }` );
     const controlVal = controlGetValue( props.name, attributes );
 
     // Specific controls.
@@ -295,6 +299,24 @@ ControlsRender.Control = function( props ) {
             />
         );
         break;
+    case 'radio':
+        renderControl = (
+            <RadioControl
+                label={ renderControlLabel }
+                selected={ controlVal }
+                options={ (
+                    Object.keys( props.options || {} ).map( ( val ) => (
+                        {
+                            label: props.options[ val ],
+                            value: val,
+                        }
+                    ) )
+                ) }
+                onChange={ ( option ) => onChange( option ) }
+            />
+        );
+        renderControlLabel = false;
+        break;
     case 'color':
         renderControl = (
             <ColorPicker
@@ -307,19 +329,23 @@ ControlsRender.Control = function( props ) {
     case 'textarea':
         renderControl = (
             <TextareaControl
+                label={ renderControlLabel }
                 value={ controlVal }
                 onChange={ ( val ) => onChange( val ) }
             />
         );
+        renderControlLabel = false;
         break;
     case 'url':
         renderControl = (
             <TextControl
+                label={ renderControlLabel }
                 type="url"
                 value={ controlVal }
                 onChange={ ( val ) => onChange( val ) }
             />
         );
+        renderControlLabel = false;
         break;
     case 'hidden':
         renderControl = (
@@ -333,10 +359,12 @@ ControlsRender.Control = function( props ) {
     default:
         renderControl = (
             <TextControl
+                label={ renderControlLabel }
                 value={ controlVal }
                 onChange={ ( val ) => onChange( val ) }
             />
         );
+        renderControlLabel = false;
     }
 
     // Hint.
@@ -351,9 +379,9 @@ ControlsRender.Control = function( props ) {
     return (
         <Fragment>
             <BaseControl
-                label={ props.label }
-                help={ props.description ? <RawHTML>{ props.description }</RawHTML> : false }
-                className={ classnames( 'vpf-control-wrap', `vpf-control-wrap-${ props.type }` ) }
+                label={ renderControlLabel }
+                help={ renderControlHelp }
+                className={ renderControlClassName }
             >
                 <div>
                     { renderControl }

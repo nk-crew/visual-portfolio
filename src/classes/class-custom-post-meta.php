@@ -1,0 +1,277 @@
+<?php
+/**
+ * Add custom meta data to posts.
+ *
+ * @package @@plugin_name/admin
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+/**
+ * Class Visual_Portfolio_Custom_Post_Meta
+ */
+class Visual_Portfolio_Custom_Post_Meta {
+    /**
+     * Visual_Portfolio_Custom_Post_Meta constructor.
+     */
+    public static function init() {
+        // add post formats.
+        add_action( 'after_setup_theme', array( __CLASS__, 'add_video_post_format' ), 99 );
+        add_action( 'add_meta_boxes', array( __CLASS__, 'add_post_format_metaboxes' ), 1 );
+        add_action( 'save_post', array( __CLASS__, 'save_post_format_metaboxes' ) );
+        add_action( 'save_post', array( __CLASS__, 'update_words_count' ) );
+        add_action( 'wp_head', array( __CLASS__, 'update_views_count' ) );
+    }
+
+    /**
+     * Get video format URL.
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function get_video_format_url( $post_id ) {
+        if ( ! $post_id ) {
+            $post_id = get_the_ID();
+        }
+
+        $video_url = get_post_meta( $post_id, '_vp_format_video_url', true );
+
+        // fallback.
+        if ( ! $video_url ) {
+            $video_url = get_post_meta( $post_id, 'video_url', true );
+        }
+
+        return $video_url;
+    }
+
+    /**
+     * Add video post format.
+     */
+    public static function add_video_post_format() {
+        global $_wp_theme_features;
+        $formats = array( 'video' );
+
+        // Add existing formats.
+        if ( isset( $_wp_theme_features['post-formats'] ) && isset( $_wp_theme_features['post-formats'][0] ) ) {
+            $formats = array_merge( (array) $_wp_theme_features['post-formats'][0], $formats );
+        }
+        $formats = array_unique( $formats );
+
+        add_theme_support( 'post-formats', $formats );
+    }
+
+    /**
+     * Add post format metaboxes.
+     *
+     * @param string $post_type post type.
+     */
+    public static function add_post_format_metaboxes( $post_type ) {
+        if ( post_type_supports( $post_type, 'post-formats' ) ) {
+            add_meta_box(
+                'vp_format_video',
+                esc_html__( 'Video', '@@text_domain' ),
+                array( __CLASS__, 'add_video_format_metabox' ),
+                null,
+                'side',
+                'default'
+            );
+        }
+    }
+
+    /**
+     * Add Video Format metabox
+     *
+     * @param object $post The post object.
+     */
+    public static function add_video_format_metabox( $post ) {
+        wp_nonce_field( basename( __FILE__ ), 'vp_format_video_nonce' );
+
+        $video_url   = self::get_video_format_url( $post->ID );
+        $oembed_html = false;
+
+        $wpkses_iframe = array(
+            'iframe' => array(
+                'src'             => array(),
+                'height'          => array(),
+                'width'           => array(),
+                'frameborder'     => array(),
+                'allowfullscreen' => array(),
+            ),
+        );
+
+        if ( $video_url ) {
+            $oembed = visual_portfolio()->get_oembed_data( $video_url );
+
+            if ( $oembed && isset( $oembed['html'] ) ) {
+                $oembed_html = $oembed['html'];
+            }
+        }
+        ?>
+
+        <p></p>
+        <input class="vp-input" name="_vp_format_video_url" type="url" id="_vp_format_video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="<?php echo esc_attr__( 'https://', '@@text_domain' ); ?>">
+        <div class="vp-oembed-preview">
+            <?php
+            if ( $oembed_html ) {
+                echo wp_kses( $oembed_html, $wpkses_iframe );
+            }
+            ?>
+        </div>
+        <style>
+            #vp_format_video {
+                display: <?php echo has_post_format( 'video' ) ? 'block' : 'none'; ?>;
+            }
+        </style>
+        <?php
+    }
+
+    /**
+     * Save Format metabox
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function save_post_format_metaboxes( $post_id ) {
+        if ( ! isset( $_POST['vp_format_video_nonce'] ) ) {
+            return;
+        }
+
+        if ( ! wp_verify_nonce( sanitize_key( $_POST['vp_format_video_nonce'] ), basename( __FILE__ ) ) ) {
+            return;
+        }
+
+        $meta = array(
+            '_vp_format_video_url',
+        );
+
+        foreach ( $meta as $item ) {
+            if ( isset( $_POST[ $item ] ) ) {
+                // phpcs:ignore
+                if ( is_array( $_POST[ $item ] ) ) {
+                    $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
+                } else {
+                    $result = sanitize_text_field( wp_unslash( $_POST[ $item ] ) );
+                }
+
+                update_post_meta( $post_id, $item, $result );
+
+                // remove old video meta.
+                if ( '_vp_format_video_url' === $item && get_post_meta( $post_id, 'video_url', true ) ) {
+                    delete_post_meta( $post_id, 'video_url' );
+                }
+            } else {
+                update_post_meta( $post_id, $item, false );
+            }
+        }
+    }
+
+    /**
+     * Update views count.
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function update_views_count( $post_id ) {
+        if ( ! is_single() ) {
+            return;
+        }
+
+        if ( ! $post_id ) {
+            $post_id = get_the_ID();
+        }
+
+        $current_views = self::get_views_count( $post_id );
+
+        update_post_meta( $post_id, '_vp_views_count', $current_views + 1 );
+
+        // Support for https://wordpress.org/plugins/post-views-counter/ .
+        if ( function_exists( 'pvc_view_post' ) ) {
+            pvc_view_post( $post_id );
+        }
+    }
+
+    /**
+     * Get views count.
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function get_views_count( $post_id ) {
+        if ( ! $post_id ) {
+            $post_id = get_the_ID();
+        }
+
+        // Support for https://wordpress.org/plugins/post-views-counter/ .
+        if ( function_exists( 'pvc_get_post_views' ) ) {
+            return pvc_get_post_views( $post_id );
+        }
+
+        $current_views = get_post_meta( $post_id, '_vp_views_count', true );
+
+        if ( ! $current_views ) {
+            $current_views = 0;
+        }
+
+        return $current_views;
+    }
+
+    /**
+     * Update reading time.
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function update_words_count( $post_id ) {
+        if ( ! $post_id ) {
+            $post_id = get_the_ID();
+        }
+
+        $current_reading_time = self::calculate_words_count( $post_id );
+
+        update_post_meta( $post_id, '_vp_words_count', $current_reading_time );
+    }
+
+    /**
+     * Get reading time.
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function get_reading_time( $post_id ) {
+        if ( ! $post_id ) {
+            $post_id = get_the_ID();
+        }
+
+        $post_words_count = get_post_meta( $post_id, '_vp_words_count', true );
+
+        if ( ! $post_words_count ) {
+            $post_words_count = self::calculate_words_count( $post_id );
+        }
+
+        $reading_time = $post_words_count / 220;
+
+        // When reading time is 0, return it as `< 1` instead of `0`.
+        if ( 1 > $reading_time ) {
+            $reading_time = esc_html__( '< 1', '@@text_domain' );
+        } else {
+            $reading_time = ceil( $reading_time );
+        }
+
+        return $reading_time;
+    }
+
+    /**
+     * Calculate words count.
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function calculate_words_count( $post_id ) {
+        if ( ! $post_id ) {
+            $post_id = get_the_ID();
+        }
+
+        $content     = get_the_content( null, false, $post_id );
+        $content     = wp_strip_all_tags( $content );
+        $words_count = count( preg_split( '/\s+/', $content ) );
+
+        return $words_count;
+    }
+}
+
+Visual_Portfolio_Custom_Post_Meta::init();

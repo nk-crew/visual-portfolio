@@ -4,26 +4,3 @@
     word-break: break-word;
     opacity: .5;
 }
-
-.vpf-control-wrap-toggle,
-.vpf-control-wrap-checkbox {
-    > .components-base-control__field {
-        display: flex;
-
-        > .components-base-control__label {
-            order: 2;
-            margin-bottom: 0;
-            margin-left: 15px;
-        }
-        .components-toggle-control {
-            margin-bottom: 0;
-
-            .components-base-control__field {
-                margin-bottom: 0;
-            }
-            .components-form-toggle {
-                margin-right: 0;
-            }
-        }
-    }
-}

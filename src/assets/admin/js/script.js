@@ -78,7 +78,7 @@ let runAjaxVideoOembed = function( $this ) {
 };
 runAjaxVideoOembed = debounce( 300, runAjaxVideoOembed );
 
-$body.on( 'change input', '.vp-input[name="video_url"]', function() {
+$body.on( 'change input', '.vp-input[name="_vp_format_video_url"]', function() {
     if ( null !== oembedAjax ) {
         oembedAjax.abort();
     }
