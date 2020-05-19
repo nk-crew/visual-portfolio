@@ -123,12 +123,7 @@ $show_meta = $inline_meta ||
                                     <?php
                                 }
                             } else {
-                                ?>
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="10" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/>
-                                    <path d="M2 18.5C2.55106 14.3854 5.84867 11.5 10 11.5C14.1513 11.5 17.4489 14.3854 18 18.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <?php
+                                visual_portfolio()->include_template( 'icons/user' );
                             }
                             ?>
                         </span>
@@ -150,11 +145,7 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-date">
                         <span class="vp-portfolio__item-meta-part-icon">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="1" y="3.5" width="18" height="15.5" rx="3" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M6 5V1M14 5V1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 9H1.5" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
+                            <?php visual_portfolio()->include_template( 'icons/calendar' ); ?>
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">
                             <?php echo esc_html( $args['published'] ); ?>
@@ -168,10 +159,7 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-comments">
                         <span class="vp-portfolio__item-meta-part-icon">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 15V15C2.34315 15 1 13.6569 1 12V4C1 2.34315 2.34315 1 4 1H16C17.6569 1 19 2.34315 19 4V12C19 13.6569 17.6569 15 16 15H11.5" stroke="currentColor" stroke-width="1.5"/>
-                                <path d="M3.5 15H5.20001V19L9.5 15H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <?php visual_portfolio()->include_template( 'icons/message' ); ?>
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">
                             <?php
@@ -204,10 +192,7 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-views">
                         <span class="vp-portfolio__item-meta-part-icon">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="10" cy="10" r="2.5" fill="currentColor"/>
-                                <path d="M1 10C1 10 4.27273 3 10 3C15.7273 3 19 10 19 10C19 10 15.7273 17 10 17C4.27273 17 1 10 1 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <?php visual_portfolio()->include_template( 'icons/eye' ); ?>
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">
                             <?php
@@ -224,10 +209,7 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-reading-rime">
                         <span class="vp-portfolio__item-meta-part-icon">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2.60001 16.8823C2.60001 16.3207 2.84403 15.7821 3.2784 15.3849C3.71277 14.9878 4.30189 14.7647 4.91618 14.7647H17.4235" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M4.91618 1H17.4235V19H4.91618C4.30189 19 3.71277 18.7629 3.2784 18.341C2.84403 17.919 2.60001 17.3467 2.60001 16.75V3.25C2.60001 2.65326 2.84403 2.08097 3.2784 1.65901C3.71277 1.23705 4.30189 1 4.91618 1V1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <?php visual_portfolio()->include_template( 'icons/book' ); ?>
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">
                             <?php
