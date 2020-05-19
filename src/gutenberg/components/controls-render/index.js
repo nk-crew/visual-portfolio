@@ -54,6 +54,10 @@ const {
     controls: registeredControls,
 } = window.VPGutenbergVariables;
 
+const {
+    VPSavedLayoutVariables,
+} = window;
+
 /**
  * Component Class
  */
@@ -79,6 +83,11 @@ class ControlsRender extends Component {
                     const control = usedControls[ name ];
 
                     if ( category && ( ! control.category || category !== control.category ) ) {
+                        return '';
+                    }
+
+                    // Allow Stretch control on Saved Layouts editor only.
+                    if ( 'stretch' === control.name && ! VPSavedLayoutVariables ) {
                         return '';
                     }
 
