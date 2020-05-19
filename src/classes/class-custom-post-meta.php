@@ -231,6 +231,13 @@ class Visual_Portfolio_Custom_Post_Meta {
     /**
      * Get reading time.
      *
+     * Read time is based on the average reading speed of an adult (roughly 265 WPM).
+     * We take the total word count of a post and translate it into minutes.
+     * For posts in Chinese, Japanese and Korean, it's a function of
+     * number of characters (500 characters/min).
+     *
+     * @thanks https://help.medium.com/hc/en-us/articles/214991667-Read-time
+     *
      * @param int $post_id The post ID.
      */
     public static function get_reading_time( $post_id ) {
@@ -244,7 +251,27 @@ class Visual_Portfolio_Custom_Post_Meta {
             $post_words_count = self::calculate_words_count( $post_id );
         }
 
-        $reading_time = $post_words_count / 220;
+        $locale = get_locale();
+
+        switch ( $locale ) {
+            // zh_CN - Chinese (China)
+            // zh_HK - Chinese (Hong Kong SAR China)
+            // zh_SG - Chinese (Singapore)
+            // zh_TW - Chinese (Taiwan)
+            // ja_JP - Japanese (Japan)
+            // ko_KR - Korean (South Korea).
+            case 'zh_CN':
+            case 'zh_HK':
+            case 'zh_SG':
+            case 'zh_TW':
+            case 'ja_JP':
+            case 'ko_KR':
+                $reading_time = $post_words_count / 500;
+                break;
+            default:
+                $reading_time = $post_words_count / 265;
+                break;
+        }
 
         // When reading time is 0, return it as `< 1` instead of `0`.
         if ( 1 > $reading_time ) {
