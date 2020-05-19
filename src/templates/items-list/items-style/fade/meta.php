@@ -108,6 +108,9 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-author">
                         <span class="vp-portfolio__item-meta-part-icon">
+                            <span class="vp-screen-reader-text">
+                                <?php echo esc_html__( 'Author', '@@text_domain' ); ?>
+                            </span>
                             <?php
                             if ( $args['author_avatar'] ) {
                                 if ( $args['author_url'] && 'a' !== $tag ) {
@@ -146,6 +149,9 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-date">
                         <span class="vp-portfolio__item-meta-part-icon">
+                            <span class="vp-screen-reader-text">
+                                <?php echo esc_html__( 'Date', '@@text_domain' ); ?>
+                            </span>
                             <?php visual_portfolio()->include_template( 'icons/calendar' ); ?>
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">
@@ -160,6 +166,9 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-comments">
                         <span class="vp-portfolio__item-meta-part-icon">
+                            <span class="vp-screen-reader-text">
+                                <?php echo esc_html__( 'Comments', '@@text_domain' ); ?>
+                            </span>
                             <?php visual_portfolio()->include_template( 'icons/message' ); ?>
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">
@@ -193,6 +202,9 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-views">
                         <span class="vp-portfolio__item-meta-part-icon">
+                            <span class="vp-screen-reader-text">
+                                <?php echo esc_html__( 'Views', '@@text_domain' ); ?>
+                            </span>
                             <?php visual_portfolio()->include_template( 'icons/eye' ); ?>
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">
@@ -210,6 +222,9 @@ $show_meta = $inline_meta ||
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-reading-rime">
                         <span class="vp-portfolio__item-meta-part-icon">
+                            <span class="vp-screen-reader-text">
+                                <?php echo esc_html__( 'Reading Time', '@@text_domain' ); ?>
+                            </span>
                             <?php visual_portfolio()->include_template( 'icons/book' ); ?>
                         </span>
                         <span class="vp-portfolio__item-meta-part-text">

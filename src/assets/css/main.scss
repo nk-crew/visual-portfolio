@@ -53,6 +53,45 @@
     width: 33.333%;
 }
 
+// screen readers only.
+.vp-screen-reader-text {
+    // stylelint-disable-next-line
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    word-break: normal;
+    // stylelint-disable-next-line
+    word-wrap: normal !important;
+    border: 0;
+    clip-path: inset(50%);
+
+    &:focus {
+        display: block;
+        top: 5px;
+        right: 5px;
+        width: auto;
+        height: auto;
+        padding: 15px 23px 14px;
+        // stylelint-disable-next-line
+        clip: auto !important;
+        font-size: 14px;
+        font-size: .875rem;
+        font-weight: 700;
+        line-height: normal;
+        color: var(--vp-color-brand);
+        text-decoration: none;
+        background-color: #f1f1f1;
+        border-radius: 3px;
+        box-shadow: 0 0 2px 2px rgba(0, 0, 0, .6);
+        clip-path: none;
+        z-index: 100000;
+    }
+}
+
 // stylelint-disable
 // fix for default themes styles.
 [data-vp-layout]:not([data-vp-layout="slider"]) .vp-portfolio__item-wrap {
