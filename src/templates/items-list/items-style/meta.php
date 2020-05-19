@@ -20,7 +20,6 @@ $inline_meta = $opts['show_author'] && $args['author'] ||
 
 // phpcs:ignore
 $show_meta = $inline_meta ||
-    $opts['show_icon'] && $opts['icon'] ||
     $opts['show_title'] && $args['title'] ||
     $opts['show_excerpt'] && $args['excerpt'] ||
     $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] );
