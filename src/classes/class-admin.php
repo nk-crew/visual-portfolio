@@ -620,11 +620,11 @@ class Visual_Portfolio_Admin {
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
                             'name'    => 'show_read_more',
-                            'default' => false,
+                            'default' => 'false',
                             'options' => array(
                                 'false'    => esc_html__( 'Hide', '@@text_domain' ),
                                 'true'     => esc_html__( 'Always Display', '@@text_domain' ),
-                                'more_tag' => esc_html__( 'Display when used "More tag" in the post', '@@text_domain' ),
+                                'more_tag' => esc_html__( 'Display when used `More tag` in the post', '@@text_domain' ),
                             ),
                         ),
                         array(
