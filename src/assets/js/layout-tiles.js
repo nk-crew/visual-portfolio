@@ -135,7 +135,7 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
                 } );
             }
             self.addStyle( `${ itemSelector } .vp-portfolio__item-img-wrap::before`, {
-                'margin-top': `${ h * 100 }%`,
+                'padding-top': `${ h * 100 }%`,
             } );
         }
     }
