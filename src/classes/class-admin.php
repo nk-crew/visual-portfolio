@@ -598,9 +598,9 @@ class Visual_Portfolio_Admin {
     public function add_default_items_styles( $items_styles ) {
         return array_merge(
             array(
-                // Default.
+                // Classic.
                 'default' => array(
-                    'title'            => esc_html__( 'Default', '@@text_domain' ),
+                    'title'            => esc_html__( 'Classic', '@@text_domain' ),
                     'icon'             => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="5.89285" y1="22.25" x2="14.1071" y2="22.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
                     'builtin_controls' => array(
                         'images_rounded_corners' => true,
@@ -639,6 +639,51 @@ class Visual_Portfolio_Admin {
                                     'control'  => 'show_read_more',
                                     'operator' => '!=',
                                     'value'    => 'false',
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+
+                // Fade.
+                'fade' => array(
+                    'title'            => esc_html__( 'Fade', '@@text_domain' ),
+                    'icon'             => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="5.89285" y1="10.25" x2="14.1071" y2="10.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    'builtin_controls' => array(
+                        'images_rounded_corners' => true,
+                        'show_title'             => true,
+                        'show_categories'        => true,
+                        'show_date'              => true,
+                        'show_author'            => true,
+                        'show_comments_count'    => true,
+                        'show_views_count'       => true,
+                        'show_reading_time'      => true,
+                        'show_excerpt'           => true,
+                        'show_icons'             => true,
+                        'align'                  => 'extended',
+                    ),
+                    'controls'         => array(
+                        array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                            'name'  => 'bg_color',
+                            'alpha' => true,
+                            'style' => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-fade',
+                                    'property' => '--vp-items-style-fade--overlay__background-color',
+                                ),
+                            ),
+                        ),
+                        array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                            'name'  => 'text_color',
+                            'alpha' => true,
+                            'style' => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-fade',
+                                    'property' => '--vp-items-style-fade--overlay__color',
                                 ),
                             ),
                         ),
@@ -729,51 +774,6 @@ class Visual_Portfolio_Admin {
                                 array(
                                     'element'  => '.vp-portfolio__items-style-emerge',
                                     'property' => '--vp-items-style-emerge--overlay__color',
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-
-                // Fade.
-                'fade' => array(
-                    'title'            => esc_html__( 'Fade', '@@text_domain' ),
-                    'icon'             => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="5.89285" y1="10.25" x2="14.1071" y2="10.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'builtin_controls' => array(
-                        'images_rounded_corners' => true,
-                        'show_title'             => true,
-                        'show_categories'        => true,
-                        'show_date'              => true,
-                        'show_author'            => true,
-                        'show_comments_count'    => true,
-                        'show_views_count'       => true,
-                        'show_reading_time'      => true,
-                        'show_excerpt'           => true,
-                        'show_icons'             => true,
-                        'align'                  => 'extended',
-                    ),
-                    'controls'         => array(
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'  => 'bg_color',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fade',
-                                    'property' => '--vp-items-style-fade--overlay__background-color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'  => 'text_color',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fade',
-                                    'property' => '--vp-items-style-fade--overlay__color',
                                 ),
                             ),
                         ),
@@ -1301,7 +1301,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'items-style',
                 'type'     => 'icons_selector',
                 'name'     => 'items_style',
-                'default'  => 'fly',
+                'default'  => 'fade',
                 'options'  => $items_styles_selector,
             )
         );
