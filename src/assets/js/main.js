@@ -521,7 +521,7 @@ class VP {
 
                 // Admin bar offset.
                 if ( $adminBar.length && 'fixed' === $adminBar.css( 'position' ) ) {
-                    top -= parseInt( $( 'html' ).css( 'margin-top' ), 10 ) || 0;
+                    top -= $adminBar.outerHeight();
                 }
 
                 // Limit max offset.
