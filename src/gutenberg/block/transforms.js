@@ -28,6 +28,7 @@ export default {
 
                 return createBlock( 'visual-portfolio/block', {
                     content_source: 'images',
+                    items_count: -1,
                     layout: 'masonry',
                     items_style_fly__align: 'bottom-center',
                     filter: 'false',
