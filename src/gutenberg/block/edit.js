@@ -66,15 +66,24 @@ export default class BlockEdit extends Component {
             images,
         } = attributes;
 
-        // If setup wizard enabled, let's disable it manually.
+        // Set some starter attributes for different content sources.
+        // And hide the setup wizard.
         if ( setupWizard && contentSource ) {
             switch ( contentSource ) {
             case 'images':
                 if ( images && images.length ) {
                     setAttributes( {
                         setup_wizard: '',
+                        items_count: -1,
                     } );
                 }
+                break;
+            case 'post-based':
+            case 'social-stream':
+                setAttributes( {
+                    setup_wizard: '',
+                    pagination_style: 'minimal',
+                } );
                 break;
             default:
                 setAttributes( {
