@@ -80,9 +80,10 @@
         text-align: center;
         z-index: 1;
 
-        // &.swiper-pagination-bullets-dynamic {
-        //     margin-bottom: var(--vp-layout-slider--bullets-dynamic-wrap__margin-bottom);
-        // }
+        // Fixes Swiper default font-size
+        &.swiper-pagination-bullets-dynamic {
+            font-size: 1em;
+        }
 
         > .swiper-pagination-bullet {
             position: relative;
