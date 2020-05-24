@@ -1124,6 +1124,8 @@ class Visual_Portfolio_Get {
                     $tmp_arr = array();
                     parse_str( html_entity_decode( $options['posts_custom_query'] ), $tmp_arr );
                     $query_opts = array_merge( $query_opts, $tmp_arr );
+                } elseif ( 'current_query' === $options['posts_source'] ) {
+                    $query_opts = $GLOBALS['wp_query']->query_vars;
                 } else {
                     $query_opts['post_type'] = $options['posts_source'];
 
