@@ -344,10 +344,6 @@ addFilter( 'vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-
         case 'slider_loop':
         case 'slider_free_mode':
         case 'slider_free_mode_sticky':
-        case 'slider_arrows':
-        case 'slider_arrows_icon_prev':
-        case 'slider_arrows_icon_next':
-        case 'slider_bullets':
         case 'slider_bullets_dynamic':
         case 'items_gap': {
             data.$framePortfolio.attr( `data-vp-${ name.replace( /_/g, '-' ) }`, val );

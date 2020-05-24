@@ -432,32 +432,6 @@ class Visual_Portfolio_Admin {
                             'default'   => true,
                         ),
                         array(
-                            'type'        => 'text',
-                            'name'        => 'arrows_icon_prev',
-                            'default'     => 'fas fa-angle-left',
-                            'placeholder' => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
-                            'hint'        => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
-                            'hint_place'  => 'left',
-                            'condition'   => array(
-                                array(
-                                    'control' => 'arrows',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'        => 'text',
-                            'name'        => 'arrows_icon_next',
-                            'default'     => 'fas fa-angle-right',
-                            'placeholder' => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
-                            'hint'        => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
-                            'hint_place'  => 'left',
-                            'condition'   => array(
-                                array(
-                                    'control' => 'arrows',
-                                ),
-                            ),
-                        ),
-                        array(
                             'type'      => 'checkbox',
                             'alongside' => esc_html__( 'Display Bullets', '@@text_domain' ),
                             'name'      => 'bullets',
@@ -1465,32 +1439,6 @@ class Visual_Portfolio_Admin {
                                 'name'      => 'show_icon',
                                 'default'   => false,
                             );
-                            $new_fields[] = array(
-                                'type'        => 'text',
-                                'name'        => 'icon',
-                                'default'     => 'fas fa-search',
-                                'placeholder' => esc_attr__( 'Standard Icon', '@@text_domain' ),
-                                'hint'        => esc_attr__( 'Standard Icon', '@@text_domain' ),
-                                'hint_place'  => 'left',
-                                'condition'   => array(
-                                    array(
-                                        'control' => 'show_icon',
-                                    ),
-                                ),
-                            );
-                            $new_fields[] = array(
-                                'type'        => 'text',
-                                'name'        => 'icon_video',
-                                'default'     => 'fas fa-play',
-                                'placeholder' => esc_attr__( 'Video Icon', '@@text_domain' ),
-                                'hint'        => esc_attr__( 'Video Icon', '@@text_domain' ),
-                                'hint_place'  => 'left',
-                                'condition'   => array(
-                                    array(
-                                        'control' => 'show_icon',
-                                    ),
-                                ),
-                            );
                             break;
                         case 'align':
                             $new_fields[] = array(
@@ -2247,56 +2195,6 @@ class Visual_Portfolio_Admin {
                     array(
                         'control' => 'pagination',
                         'value'   => 'paged',
-                    ),
-                ),
-            )
-        );
-        Visual_Portfolio_Controls::register(
-            array(
-                'category'    => 'pagination',
-                'type'        => 'text',
-                'name'        => 'pagination_paged__arrows_icon_prev',
-                'default'     => 'fas fa-angle-left',
-                'placeholder' => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Prev Arrow Icon', '@@text_domain' ),
-                'hint_place'  => 'left',
-                'condition'   => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
-                        'control' => 'pagination',
-                        'value'   => 'paged',
-                    ),
-                    array(
-                        'control' => 'pagination_paged__show_arrows',
-                    ),
-                ),
-            )
-        );
-        Visual_Portfolio_Controls::register(
-            array(
-                'category'    => 'pagination',
-                'type'        => 'text',
-                'name'        => 'pagination_paged__arrows_icon_next',
-                'default'     => 'fas fa-angle-right',
-                'placeholder' => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Next Arrow Icon', '@@text_domain' ),
-                'hint_place'  => 'left',
-                'condition'   => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
-                        'control' => 'pagination',
-                        'value'   => 'paged',
-                    ),
-                    array(
-                        'control' => 'pagination_paged__show_arrows',
                     ),
                 ),
             )

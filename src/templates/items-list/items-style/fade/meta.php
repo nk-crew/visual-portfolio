@@ -27,7 +27,7 @@ $inline_meta = $opts['show_author'] && $args['author'] ||
 
 // phpcs:ignore
 $show_meta = $inline_meta ||
-    $opts['show_icon'] && $opts['icon'] ||
+    $opts['show_icon'] ||
     $opts['show_title'] && $args['title'] ||
     $opts['show_excerpt'] && $args['excerpt'] ||
     $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] );
@@ -53,10 +53,16 @@ $show_meta = $inline_meta ||
             <?php
 
             // Show Icon.
-            if ( $opts['show_icon'] && $opts['icon'] ) {
+            if ( $opts['show_icon'] ) {
                 ?>
                 <div class="vp-portfolio__item-meta-icon">
-                    <span class="<?php echo esc_attr( isset( $args['format_video_url'] ) ? $opts['icon_video'] : $opts['icon'] ); ?>"></span>
+                    <?php
+                    if ( isset( $args['format_video_url'] ) ) {
+                        visual_portfolio()->include_template( 'icons/play' );
+                    } else {
+                        visual_portfolio()->include_template( 'icons/search' );
+                    }
+                    ?>
                 </div>
                 <?php
             }

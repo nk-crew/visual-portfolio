@@ -20,13 +20,15 @@ if ( ! defined( 'ABSPATH' ) ) {
         <li class="<?php echo esc_attr( $item['class'] ); ?>">
             <?php if ( $item['url'] ) : ?>
                 <a href="<?php echo esc_url( $item['url'] ); ?>">
-                    <?php if ( $item['is_prev_arrow'] ) : ?>
-                        <span class="<?php echo esc_attr( $args['arrows_icon_prev'] ); ?>"></span>
-                    <?php elseif ( $item['is_next_arrow'] ) : ?>
-                        <span class="<?php echo esc_attr( $args['arrows_icon_next'] ); ?>"></span>
-                    <?php else : ?>
-                        <?php echo esc_html( $item['label'] ); ?>
-                    <?php endif; ?>
+                    <?php
+                    if ( $item['is_prev_arrow'] ) {
+                        visual_portfolio()->include_template( 'icons/arrow-left' );
+                    } elseif ( $item['is_next_arrow'] ) {
+                        visual_portfolio()->include_template( 'icons/arrow-right' );
+                    } else {
+                        echo esc_html( $item['label'] );
+                    }
+                    ?>
                 </a>
             <?php else : ?>
                 <span><?php echo esc_html( $item['label'] ); ?></span>

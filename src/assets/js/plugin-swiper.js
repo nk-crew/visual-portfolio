@@ -33,19 +33,6 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             self.$items_wrap.addClass( 'swiper-wrapper' );
             self.$items_wrap.children().addClass( 'swiper-slide' );
 
-            // add arrows
-            if ( 'true' === self.options.sliderArrows && ! $parent.find( '.vp-portfolio__items-arrow' ).length ) {
-                $parent.append( `
-                    <div class="vp-portfolio__items-arrow vp-portfolio__items-arrow-prev"><span class="${ self.options.sliderArrowsIconPrev }"></span></div>
-                    <div class="vp-portfolio__items-arrow vp-portfolio__items-arrow-next"><span class="${ self.options.sliderArrowsIconNext }"></span></div>
-                ` );
-            }
-
-            // add bullets
-            if ( 'true' === self.options.sliderBullets && ! $parent.find( '.vp-portfolio__items-bullets' ).length ) {
-                $parent.append( '<div class="vp-portfolio__items-bullets"></div>' );
-            }
-
             // calculate responsive.
             let slidesPerView = self.options.sliderSlidesPerView || 3;
             const breakPoints = {};
@@ -229,7 +216,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             self.$items_wrap.removeClass( 'swiper-wrapper' );
             self.$items_wrap.children().removeClass( 'swiper-slide' );
 
-            $parent.find( '.vp-portfolio__items-arrow, .vp-portfolio__items-bullets' ).remove();
+            $parent.find( '.vp-portfolio__items-bullets' ).html( '' );
 
             isDestroyed = true;
         }
