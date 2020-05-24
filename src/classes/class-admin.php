@@ -1610,7 +1610,7 @@ class Visual_Portfolio_Admin {
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
-                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.879261 8.13636V12.5H1.77415V9.64915H1.81037L2.93963 12.4787H3.54901L4.67827 9.6598H4.71449V12.5H5.60938V8.13636H4.47159L3.26989 11.0682H3.21875L2.01705 8.13636H0.879261ZM10.0194 8.13636H9.10103V10.8807H9.06268L7.17915 8.13636H6.3695V12.5H7.29208V9.75355H7.32404L9.22248 12.5H10.0194V8.13636ZM10.7816 8.13636V12.5H11.6765V9.64915H11.7127L12.842 12.4787H13.4513L14.5806 9.6598H14.6168V12.5H15.5117V8.13636H14.3739L13.1722 11.0682H13.1211L11.9194 8.13636H10.7816ZM16.2718 12.5H19.0652V11.7393H17.1944V8.13636H16.2718V12.5Z" fill="currentColor"/></svg>',
                     'controls' => array(),
                 ),
 
@@ -1756,7 +1756,7 @@ class Visual_Portfolio_Admin {
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
-                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.879261 8.13636V12.5H1.77415V9.64915H1.81037L2.93963 12.4787H3.54901L4.67827 9.6598H4.71449V12.5H5.60938V8.13636H4.47159L3.26989 11.0682H3.21875L2.01705 8.13636H0.879261ZM10.0194 8.13636H9.10103V10.8807H9.06268L7.17915 8.13636H6.3695V12.5H7.29208V9.75355H7.32404L9.22248 12.5H10.0194V8.13636ZM10.7816 8.13636V12.5H11.6765V9.64915H11.7127L12.842 12.4787H13.4513L14.5806 9.6598H14.6168V12.5H15.5117V8.13636H14.3739L13.1722 11.0682H13.1211L11.9194 8.13636H10.7816ZM16.2718 12.5H19.0652V11.7393H17.1944V8.13636H16.2718V12.5Z" fill="currentColor"/></svg>',
                     'controls' => array(),
                 ),
 
@@ -1856,18 +1856,21 @@ class Visual_Portfolio_Admin {
                 // False.
                 'false' => array(
                     'title'    => esc_html__( 'Disabled', '@@text_domain' ),
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="9.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="18.2409" y2="-0.75" transform="matrix(0.707107 0.707107 0.707107 -0.707107 4.15475 3.14285)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'controls' => array(),
                 ),
 
                 // Classic.
                 'default' => array(
                     'title'    => esc_html__( 'Classic', '@@text_domain' ),
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
                     'controls' => array(),
                 ),
 
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.879261 8.13636V12.5H1.77415V9.64915H1.81037L2.93963 12.4787H3.54901L4.67827 9.6598H4.71449V12.5H5.60938V8.13636H4.47159L3.26989 11.0682H3.21875L2.01705 8.13636H0.879261ZM10.0194 8.13636H9.10103V10.8807H9.06268L7.17915 8.13636H6.3695V12.5H7.29208V9.75355H7.32404L9.22248 12.5H10.0194V8.13636ZM10.7816 8.13636V12.5H11.6765V9.64915H11.7127L12.842 12.4787H13.4513L14.5806 9.6598H14.6168V12.5H15.5117V8.13636H14.3739L13.1722 11.0682H13.1211L11.9194 8.13636H10.7816ZM16.2718 12.5H19.0652V11.7393H17.1944V8.13636H16.2718V12.5Z" fill="currentColor"/></svg>',
                     'controls' => array(),
                 ),
             ),
@@ -1884,12 +1887,16 @@ class Visual_Portfolio_Admin {
         // Pagination selector.
         $pagination_selector = array();
         foreach ( $pagination as $name => $pagin ) {
-            $pagination_selector[ $name ] = $pagin['title'];
+            $pagination_selector[ $name ] = array(
+                'value' => $name,
+                'title' => $pagin['title'],
+                'icon'  => isset( $pagin['icon'] ) ? $pagin['icon'] : '',
+            );
         }
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'pagination',
-                'type'     => 'select',
+                'type'     => 'icons_selector',
                 'name'     => 'pagination_style',
                 'default'  => 'default',
                 'options'  => $pagination_selector,
@@ -1938,7 +1945,7 @@ class Visual_Portfolio_Admin {
                     array(
                         'value' => 'paged',
                         'title' => esc_html__( 'Paged', '@@text_domain' ),
-                        'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10L1.45001 9.96239" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.08911 12.6015L1.45001 9.9624L4.08911 7.3233" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 10L19 9.96239" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.3609 12.6015L19 9.9624L16.3609 7.3233" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                        'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.12749 7.40909H2.11577L0.855469 8.20703V9.16158L2.02131 8.43075H2.05114V12.5H3.12749V7.40909ZM7.57768 12.5H11.2069V11.62H9.06916V11.5852L9.81241 10.8569C10.8589 9.90234 11.1398 9.42507 11.1398 8.84588C11.1398 7.96342 10.4189 7.33949 9.32768 7.33949C8.25879 7.33949 7.52548 7.97834 7.52797 8.97763H8.54963C8.54714 8.49041 8.85538 8.19212 9.32022 8.19212C9.76767 8.19212 10.1008 8.47053 10.1008 8.91797C10.1008 9.32315 9.85218 9.60156 9.38983 10.0465L7.57768 11.7244V12.5ZM17.1088 12.5696C18.2523 12.5696 19.0701 11.9407 19.0676 11.0707C19.0701 10.4368 18.6674 9.98438 17.9192 9.88991V9.85014C18.4885 9.74822 18.8812 9.34553 18.8787 8.77379C18.8812 7.97088 18.1777 7.33949 17.1238 7.33949C16.0797 7.33949 15.2942 7.95099 15.2793 8.83097H16.3109C16.3233 8.44318 16.6788 8.19212 17.1188 8.19212C17.5538 8.19212 17.8446 8.45561 17.8422 8.83842C17.8446 9.23864 17.5041 9.50959 17.0144 9.50959H16.5396V10.3001H17.0144C17.5911 10.3001 17.9515 10.5884 17.949 10.9986C17.9515 11.4038 17.6035 11.6822 17.1113 11.6822C16.6365 11.6822 16.2811 11.4336 16.2612 11.0607H15.1774C15.1948 11.9506 15.9902 12.5696 17.1088 12.5696Z" fill="currentColor"/></svg>',
                     ),
                     array(
                         'value' => 'load-more',
