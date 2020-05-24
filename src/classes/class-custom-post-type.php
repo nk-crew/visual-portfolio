@@ -95,6 +95,7 @@ class Visual_Portfolio_Custom_Post_Type {
                     'editor',
                     'author',
                     'thumbnail',
+                    'comments',
                     'revisions',
                     'excerpt',
                     'post-formats',
