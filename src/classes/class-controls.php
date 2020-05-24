@@ -14,6 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Controls {
     /**
+     * Registered user categories to print it in the future.
+     *
+     * @var array
+     */
+    private static $registered_categories = array();
+
+    /**
      * Registered user fields to print it in the future.
      *
      * @var array
@@ -65,6 +72,9 @@ class Visual_Portfolio_Controls {
         // hint.
         'hint'           => false,
         'hint_place'     => 'top',
+
+        // display in setup wizard.
+        'setup_wizard'   => false,
 
         // condition.
         'condition'      => array(
@@ -148,6 +158,15 @@ class Visual_Portfolio_Controls {
     }
 
     /**
+     * Register category to print in the future.
+     *
+     * @param array $categories - categories args.
+     */
+    public static function register_categories( $categories = array() ) {
+        self::$registered_categories = array_merge( self::$registered_categories, $categories );
+    }
+
+    /**
      * Register control to print in the future.
      *
      * @param array $args - control args.
@@ -161,6 +180,8 @@ class Visual_Portfolio_Controls {
 
     /**
      * Get all registered controls.
+     *
+     * @return array
      */
     public static function get_registered_array() {
         $result = array();
@@ -190,21 +211,12 @@ class Visual_Portfolio_Controls {
     }
 
     /**
-     * Print registered controls.
+     * Get all registered categories.
      *
-     * @param bool $category - print specific category.
+     * @return array
      */
-    public static function get_registered( $category = false ) {
-        global $post;
-
-        $registered_array = self::get_registered_array();
-        foreach ( $registered_array as $field ) {
-            if ( ! $category || isset( $field['category'] ) && $category === $field['category'] ) {
-                $field['value'] = self::get_registered_value( $field['name'], $post->ID );
-
-                self::get( $field );
-            }
-        }
+    public static function get_registered_categories() {
+        return self::$registered_categories;
     }
 
     /**

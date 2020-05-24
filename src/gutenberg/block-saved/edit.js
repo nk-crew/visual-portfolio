@@ -150,7 +150,7 @@ class BlockEdit extends Component {
                         />
                     ) : (
                         <Placeholder
-                            className="vpf-component-placeholder vpf-component-placeholder-saved"
+                            className="vpf-setup-wizard-saved"
                             icon={ <ElementIcon width="20" height="20" /> }
                             label={ __( 'Saved Visual Portfolio', '@@text_domain' ) }
                         >

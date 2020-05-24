@@ -101,6 +101,7 @@ class GalleryControl extends Component {
             onChange,
             noticeOperations,
             noticeUI,
+            isSetupWizard,
         } = this.props;
 
         const filteredValue = value.filter( ( img ) => img.id );
@@ -109,21 +110,21 @@ class GalleryControl extends Component {
             <div className="vpf-component-gallery-control">
                 { ! filteredValue || ! Object.keys( filteredValue ).length ? (
                     <MediaPlaceholder
-                        icon="format-gallery"
+                        icon={ <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" ariaHidden="true" focusable="false"><path d="M20 4v12H8V4h12m0-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 9.67l1.69 2.26 2.48-3.1L19 15H9zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z" /></svg> }
                         labels={ {
                             title: __( 'Images', '@@text_domain' ),
-                            name: __( 'images', '@@text_domain' ),
+                            instructions: __( 'Drag images, upload new ones or select files from your library.', '@@text_domain' ),
                         } }
                         onSelect={ ( images ) => {
                             this.setState( { hasError: false } );
                             onChange( this.prepareImages( images ) );
                         } }
-                        notices={ noticeUI }
                         accept="image/*"
                         allowedTypes={ ALLOWED_MEDIA_TYPES }
-                        disableMaxUploadErrorMessages
                         multiple
                         onError={ this.onUploadError }
+                        notices={ noticeUI }
+                        disableMaxUploadErrorMessages
                     />
                 ) : '' }
                 { filteredValue && Object.keys( filteredValue ).length ? (
@@ -216,6 +217,7 @@ class GalleryControl extends Component {
                                                                 name={ imgControlName }
                                                                 value={ img[ name ] }
                                                                 condition={ newCondition }
+                                                                isSetupWizard={ isSetupWizard }
                                                             />
                                                         );
                                                     } ) }

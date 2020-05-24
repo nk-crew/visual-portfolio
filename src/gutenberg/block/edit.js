@@ -22,17 +22,104 @@ const {
 
 const {
     Placeholder,
-    PanelBody,
 } = wp.components;
 
 const {
     InspectorControls,
 } = wp.blockEditor;
 
+const {
+    controls_categories: registeredControlsCategories,
+} = window.VPGutenbergVariables;
+
 /**
  * Block Edit Class.
  */
 export default class BlockEdit extends Component {
+    componentDidMount() {
+        const {
+            attributes,
+            setAttributes,
+        } = this.props;
+
+        const {
+            block_id: blockId,
+            setup_wizard: setupWizard,
+        } = attributes;
+
+        if ( ! setupWizard && ! blockId ) {
+            setAttributes( {
+                setup_wizard: 'true',
+            } );
+        }
+    }
+
+    componentDidUpdate() {
+        const {
+            attributes,
+            setAttributes,
+        } = this.props;
+
+        const {
+            setup_wizard: setupWizard,
+            content_source: contentSource,
+            images,
+        } = attributes;
+
+        // If setup wizard enabled, let's disable it manually.
+        if ( setupWizard && contentSource ) {
+            switch ( contentSource ) {
+            case 'images':
+                if ( images && images.length ) {
+                    setAttributes( {
+                        setup_wizard: '',
+                    } );
+                }
+                break;
+            default:
+                setAttributes( {
+                    setup_wizard: '',
+                } );
+                break;
+            }
+        }
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    renderControls( props, isSetupWizard = false ) {
+        const {
+            attributes,
+        } = props;
+
+        let {
+            content_source: contentSource,
+        } = attributes;
+
+        // Saved layouts by default displaying Portfolio source.
+        if ( 'portfolio' === contentSource ) {
+            contentSource = '';
+        }
+
+        return (
+            <Fragment>
+                <ControlsRender category="content-source" { ...props } isSetupWizard={ isSetupWizard } />
+                { contentSource ? (
+                    <Fragment>
+                        { Object.keys( registeredControlsCategories ).map( ( name ) => {
+                            if ( 'content-source' === name ) {
+                                return '';
+                            }
+
+                            return (
+                                <ControlsRender key={ name } category={ name } { ...props } isSetupWizard={ isSetupWizard } />
+                            );
+                        } ) }
+                    </Fragment>
+                ) : '' }
+            </Fragment>
+        );
+    }
+
     render() {
         const {
             attributes,
@@ -43,32 +130,9 @@ export default class BlockEdit extends Component {
         } = this.props;
 
         const {
+            setup_wizard: setupWizard,
             ghostkitClassname,
         } = attributes;
-
-        let {
-            content_source: contentSource,
-        } = attributes;
-
-        let contentSourceTitle = '';
-
-        switch ( contentSource ) {
-        case 'post-based':
-            contentSourceTitle = __( 'Posts Settings', '@@text_domain' );
-            break;
-        case 'images':
-            contentSourceTitle = __( 'Images Settings', '@@text_domain' );
-            break;
-        case 'social-stream':
-            contentSourceTitle = __( 'Social Stream Settings', '@@text_domain' );
-            break;
-        // no default
-        }
-
-        // Saved layouts by default displaying Portfolio source.
-        if ( 'portfolio' === contentSource ) {
-            contentSource = '';
-        }
 
         // add custom classname.
         if ( ghostkitClassname ) {
@@ -77,52 +141,21 @@ export default class BlockEdit extends Component {
 
         return (
             <Fragment>
-                <InspectorControls>
-                    <PanelBody title={ __( 'Content Source', '@@text_domain' ) }>
-                        <ControlsRender category="content-source" { ...this.props } />
-                    </PanelBody>
-                    { contentSource ? (
-                        <Fragment>
-                            <PanelBody>
-                                <ControlsRender category="content-source-additional" { ...this.props } />
-                            </PanelBody>
-                            <PanelBody title={ contentSourceTitle }>
-                                <ControlsRender category={ `content-source-${ contentSource }` } { ...this.props } />
-                            </PanelBody>
-                            <PanelBody title={ __( 'Layout', '@@text_domain' ) } initialOpen={ false }>
-                                <ControlsRender category="layouts" { ...this.props } />
-                            </PanelBody>
-                            <PanelBody title={ __( 'Items Style', '@@text_domain' ) } initialOpen={ false }>
-                                <ControlsRender category="items-style" { ...this.props } />
-                            </PanelBody>
-                            <PanelBody title={ __( 'Items Click Action', '@@text_domain' ) } initialOpen={ false }>
-                                <ControlsRender category="items-click-action" { ...this.props } />
-                            </PanelBody>
-                            <PanelBody title={ __( 'Filter', '@@text_domain' ) } initialOpen={ false }>
-                                <ControlsRender category="filter" { ...this.props } />
-                            </PanelBody>
-                            <PanelBody title={ __( 'Sort', '@@text_domain' ) } initialOpen={ false }>
-                                <ControlsRender category="sort" { ...this.props } />
-                            </PanelBody>
-                            <PanelBody title={ __( 'Pagination', '@@text_domain' ) } initialOpen={ false }>
-                                <ControlsRender category="pagination" { ...this.props } />
-                            </PanelBody>
-                            <PanelBody title={ __( 'Custom CSS', '@@text_domain' ) } initialOpen={ false }>
-                                <ControlsRender category="custom_css" { ...this.props } />
-                            </PanelBody>
-                        </Fragment>
-                    ) : '' }
-                </InspectorControls>
+                { 'true' !== setupWizard ? (
+                    <InspectorControls>
+                        { this.renderControls( this.props ) }
+                    </InspectorControls>
+                ) : '' }
                 <div className={ className }>
-                    { contentSource ? (
+                    { 'true' !== setupWizard ? (
                         <IframePreview { ...this.props } />
                     ) : (
                         <Placeholder
-                            className="vpf-component-placeholder"
+                            className="vpf-setup-wizard"
                             icon={ <ElementIcon width="20" height="20" /> }
-                            label={ __( 'Visual Portfolio' ) }
+                            label={ __( 'Visual Portfolio', '@@text_domain' ) }
                         >
-                            <ControlsRender category="content-source" { ...this.props } />
+                            { this.renderControls( this.props, true ) }
                         </Placeholder>
                     ) }
                 </div>

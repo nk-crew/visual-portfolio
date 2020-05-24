@@ -154,8 +154,9 @@ class Visual_Portfolio_Gutenberg_Block {
             '@@plugin_name-gutenberg',
             'VPGutenbergVariables',
             array(
-                'nonce'    => wp_create_nonce( 'vp-ajax-nonce' ),
-                'controls' => Visual_Portfolio_Controls::get_registered_array(),
+                'nonce'               => wp_create_nonce( 'vp-ajax-nonce' ),
+                'controls'            => Visual_Portfolio_Controls::get_registered_array(),
+                'controls_categories' => Visual_Portfolio_Controls::get_registered_categories(),
             )
         );
     }

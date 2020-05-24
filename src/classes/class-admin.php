@@ -765,15 +765,47 @@ class Visual_Portfolio_Admin {
         do_action( 'vpf_before_register_controls' );
 
         /**
+         * Categories.
+         */
+        Visual_Portfolio_Controls::register_categories(
+            array(
+                'content-source'               => esc_html__( 'Content Source', '@@text_domain' ),
+                'content-source-additional'    => '',
+                'content-source-post-based'    => esc_html__( 'Posts Settings', '@@text_domain' ),
+                'content-source-images'        => esc_html__( 'Images Settings', '@@text_domain' ),
+                'content-source-social-stream' => esc_html__( 'Social Stream Settings', '@@text_domain' ),
+                'layouts'                      => esc_html__( 'Layout', '@@text_domain' ),
+                'items-style'                  => esc_html__( 'Items Style', '@@text_domain' ),
+                'items-click-action'           => esc_html__( 'Items Click Action', '@@text_domain' ),
+                'filter'                       => esc_html__( 'Filter', '@@text_domain' ),
+                'sort'                         => esc_html__( 'Sort', '@@text_domain' ),
+                'pagination'                   => esc_html__( 'Pagination', '@@text_domain' ),
+                'custom_css'                   => esc_html__( 'Custom CSS', '@@text_domain' ),
+            )
+        );
+
+        /**
+         * Enabled setup wizard.
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'type'    => 'hidden',
+                'name'    => 'setup_wizard',
+                'default' => '',
+            )
+        );
+
+        /**
          * Content Source
          */
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source',
-                'type'     => 'icons_selector',
-                'name'     => 'content_source',
-                'default'  => '',
-                'options'  => array(
+                'category'     => 'content-source',
+                'type'         => 'icons_selector',
+                'name'         => 'content_source',
+                'setup_wizard' => true,
+                'default'      => '',
+                'options'      => array(
                     'post-based' => array(
                         'value' => 'post-based',
                         'title' => esc_html__( 'Posts', '@@text_domain' ),
@@ -1040,6 +1072,7 @@ class Visual_Portfolio_Admin {
                 'category'        => 'content-source-images',
                 'type'            => 'gallery',
                 'name'            => 'images',
+                'setup_wizard'    => true,
                 'image_controls'  => array(
                     'title'       => array(
                         'type'      => 'text',
@@ -1177,13 +1210,14 @@ class Visual_Portfolio_Admin {
          */
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-additional',
-                'type'     => 'range',
-                'label'    => esc_html__( 'Items Per Page', '@@text_domain' ),
-                'name'     => 'items_count',
-                'default'  => 6,
-                'min'      => 1,
-                'max'      => 50,
+                'category'    => 'content-source-additional',
+                'type'        => 'range',
+                'label'       => esc_html__( 'Items Per Page', '@@text_domain' ),
+                'description' => esc_html__( 'Type `-1` to output all available items (helpful for image galleries). But be careful, the output of all your posts can adversely affect the performance of your site.', '@@text_domain' ),
+                'name'        => 'items_count',
+                'default'     => 6,
+                'min'         => 1,
+                'max'         => 50,
             )
         );
 
@@ -1675,7 +1709,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'filter',
                 'type'     => 'icons_selector',
                 'name'     => 'filter',
-                'default'  => 'default',
+                'default'  => 'false',
                 'options'  => $filters_selector,
             )
         );
@@ -1928,7 +1962,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'icons_selector',
                 'name'     => 'pagination_style',
-                'default'  => 'default',
+                'default'  => 'false',
                 'options'  => $pagination_selector,
             )
         );

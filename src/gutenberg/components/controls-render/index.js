@@ -39,6 +39,7 @@ const {
 } = wp.hooks;
 
 const {
+    PanelBody,
     Tooltip,
     BaseControl,
     ButtonGroup,
@@ -52,6 +53,7 @@ const {
 
 const {
     controls: registeredControls,
+    controls_categories: registeredControlsCategories,
 } = window.VPGutenbergVariables;
 
 const {
@@ -69,45 +71,75 @@ class ControlsRender extends Component {
             setAttributes,
             controls,
             clientId,
+            isSetupWizard,
         } = this.props;
 
         if ( ! attributes ) {
             return '';
         }
 
+        // content source conditions.
+        if ( /^content-source-/g.test( category ) && 'content-source-additional' !== category && `content-source-${ attributes.content_source }` !== category ) {
+            return '';
+        }
+
         const usedControls = controls || registeredControls;
+        const result = [];
+
+        Object.keys( usedControls )
+            .forEach( ( name ) => {
+                const control = usedControls[ name ];
+
+                if ( category && ( ! control.category || category !== control.category ) ) {
+                    return;
+                }
+
+                // Allow Stretch control on Saved Layouts editor only.
+                if ( 'stretch' === control.name && ! VPSavedLayoutVariables ) {
+                    return;
+                }
+
+                const controlData = applyFilters( 'vpf.editor.controls-render', {
+                    attributes,
+                    onChange: ( val ) => {
+                        setAttributes( { [ control.name ]: val } );
+                    },
+                    ...control,
+                } );
+
+                // Conditions check.
+                if ( ! ControlsRender.AllowRender( controlData, isSetupWizard ) ) {
+                    return;
+                }
+
+                result.push(
+                    <ControlsRender.Control
+                        key={ `control-${ control.name }-${ control.label }` }
+                        { ...controlData }
+                        clientId={ clientId }
+                        isSetupWizard={ isSetupWizard }
+                    />
+                );
+            } );
+
+        const categoryTitle = 'undefined' !== typeof registeredControlsCategories[ category ] ? registeredControlsCategories[ category ] : category;
+
+        if ( isSetupWizard ) {
+            return (
+                result.length ? (
+                    <div className="vpf-setup-wizard-panel">
+                        { result }
+                    </div>
+                ) : ''
+            );
+        }
 
         return (
-            <Fragment>
-                { Object.keys( usedControls ).map( ( name ) => {
-                    const control = usedControls[ name ];
-
-                    if ( category && ( ! control.category || category !== control.category ) ) {
-                        return '';
-                    }
-
-                    // Allow Stretch control on Saved Layouts editor only.
-                    if ( 'stretch' === control.name && ! VPSavedLayoutVariables ) {
-                        return '';
-                    }
-
-                    const controlData = applyFilters( 'vpf.editor.controls-render', {
-                        attributes,
-                        onChange: ( val ) => {
-                            setAttributes( { [ control.name ]: val } );
-                        },
-                        ...control,
-                    } );
-
-                    return (
-                        <ControlsRender.Control
-                            key={ `control-${ control.name }-${ control.label }` }
-                            { ...controlData }
-                            clientId={ clientId }
-                        />
-                    );
-                } ) }
-            </Fragment>
+            result.length ? (
+                <PanelBody title={ categoryTitle }>
+                    { result }
+                </PanelBody>
+            ) : ''
         );
     }
 }
@@ -123,10 +155,11 @@ ControlsRender.Control = function( props ) {
     const {
         attributes,
         onChange,
+        isSetupWizard,
     } = props;
 
     // Conditions check.
-    if ( props.condition && props.condition.length && ! controlConditionCheck( props.condition, attributes ) ) {
+    if ( ! ControlsRender.AllowRender( props, isSetupWizard ) ) {
         return '';
     }
 
@@ -216,6 +249,7 @@ ControlsRender.Control = function( props ) {
                 name={ props.name }
                 value={ controlVal }
                 onChange={ ( val ) => onChange( val ) }
+                isSetupWizard={ isSetupWizard }
             />
         );
         break;
@@ -399,6 +433,24 @@ ControlsRender.Control = function( props ) {
             { renderControlAfter }
         </Fragment>
     );
+};
+
+/**
+ * Check if control is allowed to rendering.
+ */
+ControlsRender.AllowRender = function( props, isSetupWizard = false ) {
+    if ( props.condition && props.condition.length && ! controlConditionCheck( props.condition, props.attributes ) ) {
+        return false;
+    }
+
+    // console.log(isSetupWizard);
+
+
+    if ( isSetupWizard && ! props.setup_wizard ) {
+        return false;
+    }
+
+    return true;
 };
 
 export default ControlsRender;
