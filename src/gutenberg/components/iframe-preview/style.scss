@@ -1,19 +1,20 @@
 
 .visual-portfolio-gutenberg-preview {
     position: relative;
-    min-height: 100px;
+    min-height: 40px;
     overflow: hidden;
 
     iframe {
         width: 100%;
         max-width: none;
-        min-height: 100px;
         margin: 0;
     }
 }
 
 // Loading.
 .visual-portfolio-gutenberg-preview-loading {
+    min-height: 150px;
+
     &::after {
         content: "";
         position: absolute;
@@ -22,7 +23,11 @@
         right: 0;
         bottom: 0;
         left: 0;
-        background-color: #262829;
+        background-color: rgba(139, 139, 150, .1);
+    }
+
+    iframe {
+        opacity: 0;
     }
 
     > .visual-portfolio-gutenberg-preview-inner {
