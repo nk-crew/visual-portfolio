@@ -1664,17 +1664,17 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
 
-                // Classic.
-                'default' => array(
-                    'title'    => esc_html__( 'Classic', '@@text_domain' ),
-                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
-                    'controls' => array(),
-                ),
-
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
                     'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.879261 8.13636V12.5H1.77415V9.64915H1.81037L2.93963 12.4787H3.54901L4.67827 9.6598H4.71449V12.5H5.60938V8.13636H4.47159L3.26989 11.0682H3.21875L2.01705 8.13636H0.879261ZM10.0194 8.13636H9.10103V10.8807H9.06268L7.17915 8.13636H6.3695V12.5H7.29208V9.75355H7.32404L9.22248 12.5H10.0194V8.13636ZM10.7816 8.13636V12.5H11.6765V9.64915H11.7127L12.842 12.4787H13.4513L14.5806 9.6598H14.6168V12.5H15.5117V8.13636H14.3739L13.1722 11.0682H13.1211L11.9194 8.13636H10.7816ZM16.2718 12.5H19.0652V11.7393H17.1944V8.13636H16.2718V12.5Z" fill="currentColor"/></svg>',
+                    'controls' => array(),
+                ),
+
+                // Classic.
+                'default' => array(
+                    'title'    => esc_html__( 'Classic', '@@text_domain' ),
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
                     'controls' => array(),
                 ),
 
@@ -1810,17 +1810,17 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
 
-                // Classic.
-                'default' => array(
-                    'title'    => esc_html__( 'Classic', '@@text_domain' ),
-                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
-                    'controls' => array(),
-                ),
-
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
                     'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.879261 8.13636V12.5H1.77415V9.64915H1.81037L2.93963 12.4787H3.54901L4.67827 9.6598H4.71449V12.5H5.60938V8.13636H4.47159L3.26989 11.0682H3.21875L2.01705 8.13636H0.879261ZM10.0194 8.13636H9.10103V10.8807H9.06268L7.17915 8.13636H6.3695V12.5H7.29208V9.75355H7.32404L9.22248 12.5H10.0194V8.13636ZM10.7816 8.13636V12.5H11.6765V9.64915H11.7127L12.842 12.4787H13.4513L14.5806 9.6598H14.6168V12.5H15.5117V8.13636H14.3739L13.1722 11.0682H13.1211L11.9194 8.13636H10.7816ZM16.2718 12.5H19.0652V11.7393H17.1944V8.13636H16.2718V12.5Z" fill="currentColor"/></svg>',
+                    'controls' => array(),
+                ),
+
+                // Classic.
+                'default' => array(
+                    'title'    => esc_html__( 'Classic', '@@text_domain' ),
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
                     'controls' => array(),
                 ),
 
@@ -1924,17 +1924,17 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
 
-                // Classic.
-                'default' => array(
-                    'title'    => esc_html__( 'Classic', '@@text_domain' ),
-                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
-                    'controls' => array(),
-                ),
-
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
                     'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.879261 8.13636V12.5H1.77415V9.64915H1.81037L2.93963 12.4787H3.54901L4.67827 9.6598H4.71449V12.5H5.60938V8.13636H4.47159L3.26989 11.0682H3.21875L2.01705 8.13636H0.879261ZM10.0194 8.13636H9.10103V10.8807H9.06268L7.17915 8.13636H6.3695V12.5H7.29208V9.75355H7.32404L9.22248 12.5H10.0194V8.13636ZM10.7816 8.13636V12.5H11.6765V9.64915H11.7127L12.842 12.4787H13.4513L14.5806 9.6598H14.6168V12.5H15.5117V8.13636H14.3739L13.1722 11.0682H13.1211L11.9194 8.13636H10.7816ZM16.2718 12.5H19.0652V11.7393H17.1944V8.13636H16.2718V12.5Z" fill="currentColor"/></svg>',
+                    'controls' => array(),
+                ),
+
+                // Classic.
+                'default' => array(
+                    'title'    => esc_html__( 'Classic', '@@text_domain' ),
+                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="5.89286" width="18.5" height="7.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M0.857143 11.1071V12.8214C0.857143 13.2948 1.2409 13.6786 1.71429 13.6786H18.2857C18.7591 13.6786 19.1429 13.2948 19.1429 12.8214V11.1071L19.5714 10.25C19.8081 10.25 20 10.4419 20 10.6786V12.8214C20 13.7682 19.2325 14.5357 18.2857 14.5357H1.71429C0.767512 14.5357 0 13.7682 0 12.8214V10.6786C0 10.4419 0.191878 10.25 0.428571 10.25L0.857143 11.1071Z" fill="currentColor"/></svg>',
                     'controls' => array(),
                 ),
             ),
