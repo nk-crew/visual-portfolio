@@ -189,7 +189,7 @@ $show_meta = $inline_meta ||
                                 echo esc_html__( 'No Comments', '@@text_domain' );
                             } else {
                                 // translators: %s Number of comments.
-                                echo esc_html( printf( _n( '%s Comment', '%s Comments', $args['comments_count'], '@@text_domain' ), number_format_i18n( (int) $args['comments_count'] ) ) );
+                                echo esc_html( sprintf( _n( '%s Comment', '%s Comments', $args['comments_count'], '@@text_domain' ), number_format_i18n( (int) $args['comments_count'] ) ) );
                             }
 
                             if ( $args['comments_url'] && 'a' !== $tag ) {
