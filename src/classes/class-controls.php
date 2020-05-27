@@ -261,7 +261,7 @@ class Visual_Portfolio_Controls {
         }
 
         // fix bool values.
-        if ( 'false' === $result || '' === $result ) {
+        if ( 'false' === $result ) {
             $result = false;
         }
         if ( 'true' === $result ) {

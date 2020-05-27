@@ -108,7 +108,7 @@ class Visual_Portfolio_Get {
             }
 
             // fix bool values.
-            if ( 'false' === $result[ $item['name'] ] || '' === $result[ $item['name'] ] ) {
+            if ( 'false' === $result[ $item['name'] ] ) {
                 $result[ $item['name'] ] = false;
             }
             if ( 'true' === $result[ $item['name'] ] ) {
