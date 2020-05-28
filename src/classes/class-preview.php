@@ -216,6 +216,9 @@ class Visual_Portfolio_Preview {
             }
         }
 
+        // Register assets.
+        Visual_Portfolio_Assets::enqueue( $options );
+
         // Custom styles.
         visual_portfolio()->include_template_style( '@@plugin_name-preview', 'preview/style' );
 
