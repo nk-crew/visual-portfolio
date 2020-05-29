@@ -84,6 +84,12 @@ class Visual_Portfolio_Preview {
         // phpcs:disable
         $frame = isset( $_POST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame'] ) ) : false;
         $id    = isset( $_POST['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
+
+        // Elementor preview.
+        if ( ! $frame && ! $id && isset( $_REQUEST['vp_preview_type'] ) && 'elementor' === $_REQUEST['vp_preview_type'] ) {
+            $frame = isset( $_REQUEST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_REQUEST['vp_preview_frame'] ) ) : false;
+            $id    = isset( $_REQUEST['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_REQUEST['vp_preview_frame_id'] ) ) : false;
+        }
         // phpcs:enable
 
         $this->preview_enabled = 'true' === $frame;
@@ -163,7 +169,7 @@ class Visual_Portfolio_Preview {
     /**
      * Display preview frame
      * Available by requesting:
-     * SITE/vp_preview/?vp_preview_frame=true&vp_preview_frame_id=10
+     * SITE/vp_preview/ with POST data: `vp_preview_frame=true&vp_preview_frame_id=10`
      */
     public function template_redirect() {
         if ( $this->preview_enabled ) {
@@ -206,7 +212,7 @@ class Visual_Portfolio_Preview {
         // Prepare portfolio post options.
         $options = array();
 
-        // phpcs:ignore
+        // phpcs:disable
         if ( isset( $_POST ) && ! empty( $_POST ) ) {
             // phpcs:ignore
             foreach ( $_POST as $name => $val ) {
@@ -215,6 +221,12 @@ class Visual_Portfolio_Preview {
                 }
             }
         }
+
+        // Elementor preview.
+        if ( isset( $_REQUEST['vp_preview_type'] ) && 'elementor' === $_REQUEST['vp_preview_type'] && isset( $_REQUEST['vp_preview_frame_id'] ) ) {
+            $options[ 'id' ] = esc_attr( wp_unslash( $_REQUEST['vp_preview_frame_id'] ) );
+        }
+        // phpcs:enable
 
         // Register assets.
         Visual_Portfolio_Assets::enqueue( $options );
