@@ -769,18 +769,54 @@ class Visual_Portfolio_Admin {
          */
         Visual_Portfolio_Controls::register_categories(
             array(
-                'content-source'               => esc_html__( 'Content Source', '@@text_domain' ),
-                'content-source-additional'    => '',
-                'content-source-post-based'    => esc_html__( 'Posts Settings', '@@text_domain' ),
-                'content-source-images'        => esc_html__( 'Images Settings', '@@text_domain' ),
-                'content-source-social-stream' => esc_html__( 'Social Stream Settings', '@@text_domain' ),
-                'layouts'                      => esc_html__( 'Layout', '@@text_domain' ),
-                'items-style'                  => esc_html__( 'Items Style', '@@text_domain' ),
-                'items-click-action'           => esc_html__( 'Items Click Action', '@@text_domain' ),
-                'filter'                       => esc_html__( 'Filter', '@@text_domain' ),
-                'sort'                         => esc_html__( 'Sort', '@@text_domain' ),
-                'pagination'                   => esc_html__( 'Pagination', '@@text_domain' ),
-                'custom_css'                   => esc_html__( 'Custom CSS', '@@text_domain' ),
+                'content-source'               => array(
+                    'title'     => esc_html__( 'Content Source', '@@text_domain' ),
+                    'is_opened' => true,
+                ),
+                'content-source-additional'    => array(
+                    'title'     => '',
+                    'is_opened' => true,
+                ),
+                'content-source-post-based'    => array(
+                    'title'     => esc_html__( 'Posts Settings', '@@text_domain' ),
+                    'is_opened' => true,
+                ),
+                'content-source-images'        => array(
+                    'title'     => esc_html__( 'Images Settings', '@@text_domain' ),
+                    'is_opened' => true,
+                ),
+                'content-source-social-stream' => array(
+                    'title'     => esc_html__( 'Social Stream Settings', '@@text_domain' ),
+                    'is_opened' => true,
+                ),
+                'layouts'                      => array(
+                    'title'     => esc_html__( 'Layout', '@@text_domain' ),
+                    'is_opened' => false,
+                ),
+                'items-style'                  => array(
+                    'title'     => esc_html__( 'Items Style', '@@text_domain' ),
+                    'is_opened' => false,
+                ),
+                'items-click-action'           => array(
+                    'title'     => esc_html__( 'Items Click Action', '@@text_domain' ),
+                    'is_opened' => false,
+                ),
+                'filter'                       => array(
+                    'title'     => esc_html__( 'Filter', '@@text_domain' ),
+                    'is_opened' => false,
+                ),
+                'sort'                         => array(
+                    'title'     => esc_html__( 'Sort', '@@text_domain' ),
+                    'is_opened' => false,
+                ),
+                'pagination'                   => array(
+                    'title'     => esc_html__( 'Pagination', '@@text_domain' ),
+                    'is_opened' => false,
+                ),
+                'custom_css'                   => array(
+                    'title'     => esc_html__( 'Custom CSS', '@@text_domain' ),
+                    'is_opened' => false,
+                ),
             )
         );
 

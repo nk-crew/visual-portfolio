@@ -60,6 +60,8 @@ const {
     VPSavedLayoutVariables,
 } = window;
 
+const openedCategoriesCache = {};
+
 /**
  * Component Class
  */
@@ -122,7 +124,17 @@ class ControlsRender extends Component {
                 );
             } );
 
-        const categoryTitle = 'undefined' !== typeof registeredControlsCategories[ category ] ? registeredControlsCategories[ category ] : category;
+        let categoryTitle = category;
+        let categoryOpened = false;
+
+        if ( 'undefined' !== typeof registeredControlsCategories[ category ] ) {
+            categoryTitle = registeredControlsCategories[ category ].title;
+
+            if ( 'undefined' === typeof openedCategoriesCache[ category ] ) {
+                openedCategoriesCache[ category ] = registeredControlsCategories[ category ].is_opened || false;
+            }
+            categoryOpened = openedCategoriesCache[ category ];
+        }
 
         if ( isSetupWizard ) {
             return (
@@ -136,7 +148,13 @@ class ControlsRender extends Component {
 
         return (
             result.length ? (
-                <PanelBody title={ categoryTitle }>
+                <PanelBody
+                    title={ categoryTitle }
+                    initialOpen={ categoryOpened }
+                    onToggle={ () => {
+                        openedCategoriesCache[ category ] = ! categoryOpened;
+                    } }
+                >
                     { result }
                 </PanelBody>
             ) : ''
