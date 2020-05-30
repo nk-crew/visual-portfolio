@@ -163,13 +163,13 @@ class Visual_Portfolio {
         $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) : 1920;
 
         // custom image sizes.
-        add_image_size( 'vp_sm', $sm, $sm );
-        add_image_size( 'vp_md', $md, $md );
-        add_image_size( 'vp_lg', $lg, $lg );
-        add_image_size( 'vp_xl', $xl, $xl );
-        add_image_size( 'vp_sm_popup', $sm_popup, $sm_popup );
-        add_image_size( 'vp_md_popup', $md_popup, $md_popup );
-        add_image_size( 'vp_xl_popup', $xl_popup, $xl_popup );
+        add_image_size( 'vp_sm', $sm, 9999 );
+        add_image_size( 'vp_md', $md, 9999 );
+        add_image_size( 'vp_lg', $lg, 9999 );
+        add_image_size( 'vp_xl', $xl, 9999 );
+        add_image_size( 'vp_sm_popup', $sm_popup, 9999 );
+        add_image_size( 'vp_md_popup', $md_popup, 9999 );
+        add_image_size( 'vp_xl_popup', $xl_popup, 9999 );
 
         add_filter( 'image_size_names_choose', array( $this, 'image_size_names_choose' ) );
     }
