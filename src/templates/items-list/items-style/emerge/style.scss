@@ -69,6 +69,8 @@
     .vp-portfolio__item-meta-categories {
         display: inline-flex;
         flex-wrap: wrap;
+        padding-right: 0;
+        padding-left: 0;
         margin-right: 0;
         margin-left: calc(-1 * var(--vp-items-style-emerge--meta-categories__gap));
         font-size: var(--vp-items-style-emerge--meta-categories__font-size);
