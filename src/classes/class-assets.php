@@ -33,6 +33,7 @@ class Visual_Portfolio_Assets {
         add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_head_assets' ), 9 );
 
         add_action( 'template_redirect', array( $this, 'popup_custom_styles' ) );
+        add_action( 'template_redirect', array( $this, 'popup_for_default_wordpress_images' ) );
 
         add_action( 'wp_footer', array( $this, 'wp_enqueue_foot_assets' ) );
 
@@ -169,18 +170,7 @@ class Visual_Portfolio_Assets {
 
         // Popup.
         if ( 'popup_gallery' === $options['items_click_action'] ) {
-            $popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'popup_gallery', 'photoswipe' );
-
-            // Photoswipe.
-            if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
-                self::store_used_assets( '@@plugin_name-plugin-photoswipe', true, 'script' );
-                self::store_used_assets( '@@plugin_name-popup-photoswipe', true, 'style' );
-
-                // Fancybox.
-            } elseif ( 'fancybox' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_fancybox', true ) ) {
-                self::store_used_assets( '@@plugin_name-plugin-fancybox', true, 'script' );
-                self::store_used_assets( '@@plugin_name-popup-fancybox', true, 'style' );
-            }
+            self::enqueue_popup_assets();
         }
 
         // Filter.
@@ -247,6 +237,26 @@ class Visual_Portfolio_Assets {
         }
 
         do_action( 'vpf_after_assets_enqueue', $options, $options['id'] );
+    }
+
+    /**
+     * Enqueue popup assets.
+     *
+     * @return void
+     */
+    public static function enqueue_popup_assets() {
+        $popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery', 'photoswipe' );
+
+        // Photoswipe.
+        if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
+            self::store_used_assets( '@@plugin_name-plugin-photoswipe', true, 'script' );
+            self::store_used_assets( '@@plugin_name-popup-photoswipe', true, 'style' );
+
+            // Fancybox.
+        } elseif ( 'fancybox' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_fancybox', true ) ) {
+            self::store_used_assets( '@@plugin_name-plugin-fancybox', true, 'script' );
+            self::store_used_assets( '@@plugin_name-popup-fancybox', true, 'style' );
+        }
     }
 
     /**
@@ -342,16 +352,24 @@ class Visual_Portfolio_Assets {
                     'swiper',
                 ),
             ),
+            '@@plugin_name-popup-gallery' => array(
+                'assets/js/popup-gallery.min.js',
+                array(
+                    'jquery',
+                ),
+            ),
             '@@plugin_name-plugin-photoswipe' => array(
                 'assets/js/plugin-photoswipe.min.js',
                 array(
                     'photoswipe-ui-default',
+                    '@@plugin_name-popup-gallery',
                 ),
             ),
             '@@plugin_name-plugin-fancybox' => array(
                 'assets/js/plugin-fancybox.min.js',
                 array(
                     'fancybox',
+                    '@@plugin_name-popup-gallery',
                 ),
             ),
             '@@plugin_name-layout-gaps' => array(
@@ -432,6 +450,15 @@ class Visual_Portfolio_Assets {
     }
 
     /**
+     * Add popup for default WordPress images.
+     */
+    public function popup_for_default_wordpress_images() {
+        if ( Visual_Portfolio_Settings::get_option( 'enable_on_wordpress_images', 'vp_popup_gallery', false ) ) {
+            self::enqueue_popup_assets();
+        }
+    }
+
+    /**
      * Add global Visual Portfolio data.
      */
     public function localize_global_data() {
@@ -462,20 +489,24 @@ class Visual_Portfolio_Assets {
                 'fancybox_zoom'        => esc_attr__( 'Zoom', '@@text_domain' ),
             ),
             'settingsPopupGallery' => array(
-                'vendor'                 => Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery', 'photoswipe' ),
+                // Default WordPress Images.
+                'enable_on_wordpress_images' => Visual_Portfolio_Settings::get_option( 'enable_on_wordpress_images', 'vp_popup_gallery', false ),
+
+                // Vendor.
+                'vendor'                     => Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery', 'photoswipe' ),
 
                 // General.
-                'show_arrows'            => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
-                'show_counter'           => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
-                'show_zoom_button'       => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
-                'show_fullscreen_button' => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery', true ),
-                'show_share_button'      => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery', true ),
-                'show_close_button'      => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
+                'show_arrows'                => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery', true ),
+                'show_counter'               => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery', true ),
+                'show_zoom_button'           => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery', true ),
+                'show_fullscreen_button'     => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery', true ),
+                'show_share_button'          => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery', true ),
+                'show_close_button'          => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery', true ),
 
                 // Fancybox.
-                'show_download_button'   => Visual_Portfolio_Settings::get_option( 'show_download_button', 'vp_popup_gallery', false ),
-                'show_slideshow'         => Visual_Portfolio_Settings::get_option( 'show_slideshow', 'vp_popup_gallery', false ),
-                'show_thumbs'            => Visual_Portfolio_Settings::get_option( 'show_thumbs', 'vp_popup_gallery', true ),
+                'show_download_button'       => Visual_Portfolio_Settings::get_option( 'show_download_button', 'vp_popup_gallery', false ),
+                'show_slideshow'             => Visual_Portfolio_Settings::get_option( 'show_slideshow', 'vp_popup_gallery', false ),
+                'show_thumbs'                => Visual_Portfolio_Settings::get_option( 'show_thumbs', 'vp_popup_gallery', true ),
             ),
 
             // Screen sizes for responsive feature.

@@ -680,66 +680,6 @@ class VP {
     }
 
     /**
-     * Parse video URL and return object with data
-     *
-     * @param {string} url - video url.
-     *
-     * @returns {object|boolean} video data
-     */
-    // eslint-disable-next-line class-methods-use-this
-    parseVideo( url ) {
-        // parse youtube ID
-        function getYoutubeID( ytUrl ) {
-            // eslint-disable-next-line no-useless-escape
-            const regExp = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
-            const match = ytUrl.match( regExp );
-            return match && 11 === match[ 1 ].length ? match[ 1 ] : false;
-        }
-
-        // parse vimeo ID
-        function getVimeoID( vmUrl ) {
-            // eslint-disable-next-line no-useless-escape
-            const regExp = /https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/;
-            const match = vmUrl.match( regExp );
-            return match && match[ 3 ] ? match[ 3 ] : false;
-        }
-
-        const Youtube = getYoutubeID( url );
-        const Vimeo = getVimeoID( url );
-        let embedUrl = url;
-
-        if ( Youtube ) {
-            embedUrl = `https://www.youtube.com/embed/${ Youtube }`;
-
-            return {
-                vendor: 'youtube',
-                id: Youtube,
-                url,
-                embedUrl,
-                embed: `<iframe width="1920" height="1080" src="${ embedUrl }" frameborder="0" allowfullscreen></iframe>`,
-            };
-        } if ( Vimeo ) {
-            embedUrl = `//player.vimeo.com/video/${ Vimeo }`;
-
-            return {
-                vendor: 'vimeo',
-                id: Vimeo,
-                url,
-                embedUrl,
-                embed: `<iframe width="1920" height="1080" src="${ embedUrl }" frameborder="0" allowfullscreen></iframe>`,
-            };
-        }
-
-        return {
-            vendor: 'unknown',
-            id: url,
-            url,
-            embedUrl,
-            embed: `<iframe width="1920" height="1080" src="${ url }" frameborder="0" allowfullscreen></iframe>`,
-        };
-    }
-
-    /**
      * Add New Items
      *
      * @param {object|dom|jQuery} $items - elements.

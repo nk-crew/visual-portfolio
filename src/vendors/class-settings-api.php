@@ -82,10 +82,11 @@ class Visual_Portfolio_Settings_API {
 
     function add_field( $section, $field ) {
         $defaults = array(
-            'name'  => '',
-            'label' => '',
-            'desc'  => '',
-            'type'  => 'text',
+            'name'   => '',
+            'label'  => '',
+            'desc'   => '',
+            'type'   => 'text',
+            'is_pro' => false,
         );
 
         $arg = wp_parse_args( $field, $defaults );
@@ -129,10 +130,16 @@ class Visual_Portfolio_Settings_API {
                 $type = isset( $option['type'] ) ? $option['type'] : 'text';
                 $label = isset( $option['label'] ) ? $option['label'] : '';
                 $callback = isset( $option['callback'] ) ? $option['callback'] : array( $this, 'callback_' . $type );
+                $class_name = isset( $option['class'] ) ? $option['class'] : $name;
+                $is_pro = isset( $option['is_pro'] ) ? $option['is_pro'] : false;
+
+                if ( $is_pro ) {
+                    $class_name .= ' vpf-settings-control-pro';
+                }
 
                 $args = array(
                     'id'                => $name,
-                    'class'             => isset( $option['class'] ) ? $option['class'] : $name,
+                    'class'             => $class_name,
                     'label_for'         => "{$section}[{$name}]",
                     'desc'              => isset( $option['desc'] ) ? $option['desc'] : '',
                     'name'              => $label,
@@ -146,6 +153,7 @@ class Visual_Portfolio_Settings_API {
                     'min'               => isset( $option['min'] ) ? $option['min'] : '',
                     'max'               => isset( $option['max'] ) ? $option['max'] : '',
                     'step'              => isset( $option['step'] ) ? $option['step'] : '',
+                    'is_pro'            => isset( $option['is_pro'] ) ? $option['is_pro'] : false,
                 );
 
                 add_settings_field( "{$section}[{$name}]", $label, $callback, $section, $section, $args );

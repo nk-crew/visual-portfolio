@@ -291,3 +291,34 @@ $grid_sm: 600px !default;
         object-fit: cover;
     }
 }
+
+/**
+ * Settings
+ */
+.portfolio_page_visual-portfolio-settings {
+    // PRO control.
+    .vpf-settings-control-pro {
+        fieldset {
+            pointer-events: none;
+            opacity: .5;
+        }
+        th {
+            position: relative;
+            padding-right: 50px;
+
+            label::after {
+                content: "PRO";
+                position: absolute;
+                display: block;
+                top: 50%;
+                right: 10px;
+                padding: .2em .8em;
+                font-size: .8em;
+                color: #fff;
+                background-color: #2540cc;
+                border-radius: 1em;
+                transform: translateY(-50%);
+            }
+        }
+    }
+}

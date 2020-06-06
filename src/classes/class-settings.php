@@ -146,13 +146,20 @@ class Visual_Portfolio_Settings {
             ),
             'vp_images' => array(
                 array(
-                    'name'    => 'images_note',
-                    // translators: %s: regen thumbs url.
-                    'desc'    => sprintf( __( 'After publishing your changes, new image sizes may not be shown until you <a href="%s" target="_blank">Regenerate Thumbnails</a>.', '@@text_domain' ), 'https://wordpress.org/plugins/regenerate-thumbnails/' ),
-                    'type'    => 'html',
+                    'name'    => 'lazy_loading',
+                    'label'   => esc_html__( 'Lazy Loading', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Enable', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+
+                array(
+                    'name'  => 'images_sizes_title',
+                    'label' => esc_html__( 'Image Sizes', '@@text_domain' ),
+                    'type'  => 'html',
                 ),
                 array(
-                    'name'    => 'images_title',
+                    'name'    => 'images_layouts_title',
                     'label'   => esc_html__( 'Layouts', '@@text_domain' ),
                     'desc'    => __( 'Image sizes used in portfolio layouts.', '@@text_domain' ),
                     'type'    => 'html',
@@ -212,8 +219,15 @@ class Visual_Portfolio_Settings {
                     'placeholder' => '1920',
                     'default'     => 1920,
                 ),
+                array(
+                    'name'    => 'images_sizes_note',
+                    // translators: %s: regenerate thumbnails url.
+                    'desc'    => sprintf( __( 'After publishing your changes, new image sizes may not be shown until you <a href="%s" target="_blank">Regenerate Thumbnails</a>.', '@@text_domain' ), 'https://wordpress.org/plugins/regenerate-thumbnails/' ),
+                    'type'    => 'html',
+                ),
             ),
             'vp_popup_gallery' => array(
+                // Vendor.
                 array(
                     'name'    => 'vendor',
                     'label'   => esc_html__( 'Vendor Script', '@@text_domain' ),
@@ -223,6 +237,25 @@ class Visual_Portfolio_Settings {
                         'fancybox'   => esc_html__( 'Fancybox', '@@text_domain' ),
                     ),
                     'default' => 'photoswipe',
+                ),
+
+                // Default WordPress Images.
+                array(
+                    'name'    => 'enable_on_wordpress_images',
+                    'label'   => esc_html__( 'WordPress Images', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Enable popup for WordPress images and galleries.', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'off',
+                ),
+
+                // Deeplinking.
+                array(
+                    'name'    => 'deep_linking',
+                    'label'   => esc_html__( 'Deep Linking', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Makes URL automatically change when you open popup and you can easily link to specific popup image.', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                    'is_pro'  => true,
                 ),
 
                 // General Popup Settings.

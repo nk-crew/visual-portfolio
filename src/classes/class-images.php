@@ -41,6 +41,12 @@ class Visual_Portfolio_Images {
             return false;
         }
 
+        // check plugin settings.
+        $enabled = Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images', true );
+        if ( ! $enabled ) {
+            return false;
+        }
+
         // disable using filter.
         if ( ! apply_filters( 'vpf_images_lazyload', true ) ) {
             return false;
