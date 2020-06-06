@@ -143,6 +143,16 @@ class Visual_Portfolio_Settings {
                         'button_label' => esc_html__( 'Choose image', '@@text_domain' ),
                     ),
                 ),
+
+                // AJAX Caching and Preloading.
+                array(
+                    'name'    => 'ajax_caching',
+                    'label'   => esc_html__( 'AJAX Caching and Preloading', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Reduce AJAX calls request time.', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                    'is_pro'  => true,
+                ),
             ),
             'vp_images' => array(
                 array(
