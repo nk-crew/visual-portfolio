@@ -37,6 +37,10 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             let slidesPerView = self.options.sliderSlidesPerView || 3;
             const breakPoints = {};
 
+            if ( 'fade' === self.options.sliderEffect ) {
+                slidesPerView = 1;
+            }
+
             if ( isNumber( slidesPerView ) ) {
                 let count = slidesPerView;
                 let currentPoint = Math.min( screenSizes.length - 1, count - 1 );
