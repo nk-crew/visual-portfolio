@@ -6,10 +6,8 @@
 .vp-filter__style-dropdown {
     display: flex;
     flex-wrap: wrap;
-    padding: 0;
     margin-top: calc(-1 * var(--vp-filter-dropdown--items__gap));
     margin-left: calc(-1 * var(--vp-filter-dropdown--items__gap));
-    list-style-type: none;
 
     select {
         display: block;

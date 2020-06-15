@@ -6,11 +6,8 @@
 .vp-filter__style-default {
     display: flex;
     flex-wrap: wrap;
-    padding: 0;
-    margin: 0;
     margin-top: calc(-1 * var(--vp-filter-default--items__gap));
     margin-left: calc(-1 * var(--vp-filter-default--items__gap));
-    list-style-type: none;
 
     .vp-filter__item a {
         outline: none;
@@ -30,12 +27,9 @@
 
     .vp-filter__item {
         flex: 0 0 auto;
-        padding: 0;
-        margin: 0;
         margin-top: var(--vp-filter-default--items__gap);
         margin-left: var(--vp-filter-default--items__gap);
         text-align: center;
-        list-style-type: none;
 
         > * {
             display: block;

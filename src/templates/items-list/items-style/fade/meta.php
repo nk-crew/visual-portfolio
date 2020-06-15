@@ -70,7 +70,7 @@ $show_meta = $inline_meta ||
             // Show Categories.
             if ( $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] ) ) {
                 ?>
-                <ul class="vp-portfolio__item-meta-categories">
+                <div class="vp-portfolio__item-meta-categories">
                     <?php
                     // phpcs:ignore
                     $count = $opts['categories_count'];
@@ -81,14 +81,14 @@ $show_meta = $inline_meta ||
                             break;
                         }
                         ?>
-                        <li class="vp-portfolio__item-meta-category">
+                        <div class="vp-portfolio__item-meta-category">
                             <span><?php echo esc_html( $category['label'] ); ?></span>
-                        </li>
+                        </div>
                         <?php
                         $count--;
                     }
                     ?>
-                </ul>
+                </div>
                 <?php
             }
 

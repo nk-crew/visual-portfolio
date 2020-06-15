@@ -12,12 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<ul class="<?php echo esc_attr( $args['class'] ); ?> vp-filter__style-default">
+<div class="<?php echo esc_attr( $args['class'] ); ?> vp-filter__style-default">
     <?php
     // phpcs:ignore
     foreach ( $args['items'] as $item ) {
         ?>
-        <li class="<?php echo esc_attr( $item['class'] ); ?>">
+        <div class="<?php echo esc_attr( $item['class'] ); ?>">
             <a href="<?php echo esc_url( $item['url'] ); ?>" data-vp-filter="<?php echo esc_attr( $item['filter'] ); ?>">
                 <?php echo esc_html( $item['label'] ); ?>
 
@@ -31,8 +31,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                 }
                 ?>
             </a>
-        </li>
+        </div>
         <?php
     }
     ?>
-</ul>
+</div>

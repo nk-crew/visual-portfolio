@@ -69,20 +69,14 @@
     .vp-portfolio__item-meta-categories {
         display: inline-flex;
         flex-wrap: wrap;
-        padding-right: 0;
-        padding-left: 0;
-        margin-right: 0;
         margin-left: calc(-1 * var(--vp-items-style-emerge--meta-categories__gap));
         font-size: var(--vp-items-style-emerge--meta-categories__font-size);
         font-weight: var(--vp-items-style-emerge--meta-categories__font-weight);
         text-transform: var(--vp-items-style-emerge--meta-categories__text-transform);
-        list-style-type: none;
         opacity: var(--vp-items-style-emerge--meta-categories__opacity);
 
         .vp-portfolio__item-meta-category {
             display: flex;
-            padding: 0;
-            margin: 0;
             margin-left: var(--vp-items-style-emerge--meta-categories__gap);
 
             &::after {

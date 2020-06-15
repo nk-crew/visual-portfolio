@@ -6,10 +6,8 @@
 .vp-sort__style-dropdown {
     display: flex;
     flex-wrap: wrap;
-    padding: 0;
     margin-top: calc(-1 * var(--vp-sort-dropdown--items__gap));
     margin-left: calc(-1 * var(--vp-sort-dropdown--items__gap));
-    list-style-type: none;
 
     select {
         display: block;
