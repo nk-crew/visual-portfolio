@@ -2,7 +2,7 @@
 .vpf-component-elements-selector-control-location {
     position: relative;
     padding: 15px;
-    background-color: $light-gray-200;
+    background-color: $light-gray-100;
     border-radius: 5px;
 
     & + & {
@@ -51,14 +51,16 @@
         display: flex;
         flex-wrap: wrap;
         margin-top: -10px;
-        margin-left: -10px;
+
+        > * {
+            width: 100%;
+        }
 
         .vpf-component-elements-selector-control-location-options-add-button {
             display: flex;
             align-items: center;
             width: 100%;
             margin-top: 10px;
-            margin-left: 10px;
 
             .components-button {
                 justify-content: center;
@@ -69,23 +71,24 @@
             }
         }
         .vpf-component-elements-selector-control-location-options-item {
-            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 9px 12px;
             margin-top: 10px;
-            margin-left: 10px;
-            color: #fff;
-            background-color: $dark-gray-100;
-            border: none;
+            color: $dark-gray-200;
+            background-color: transparent;
+            border: 1px solid $light-gray-700;
             border-radius: 3px;
         }
         button.vpf-component-elements-selector-control-location-options-item {
-            display: flex;
-            align-items: center;
             cursor: pointer;
-            background-color: $dark-gray-200;
 
             &:hover,
             &:focus {
-                background-color: $dark-gray-300;
+                color: $dark-gray-300;
+                border-color: $dark-gray-300;
             }
 
             svg {
@@ -94,18 +97,6 @@
                 margin-left: 5px;
             }
         }
-    }
-    .vpf-component-elements-selector-control-location-options-left {
-        justify-content: flex-start;
-    }
-    .vpf-component-elements-selector-control-location-options-right {
-        justify-content: flex-end;
-    }
-    .vpf-component-elements-selector-control-location-options-center {
-        justify-content: center;
-    }
-    .vpf-component-elements-selector-control-location-options-between {
-        justify-content: space-between;
     }
 }
 

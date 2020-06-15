@@ -131,6 +131,13 @@
 .vp-portfolio__layout-elements {
     display: flex;
     flex-wrap: wrap;
+    margin-top: calc(-1 * var(--vp-elements__gap));
+    margin-left: calc(-1 * var(--vp-elements__gap));
+
+    > * {
+        margin-top: var(--vp-elements__gap);
+        margin-left: var(--vp-elements__gap);
+    }
 
     &-align-left {
         justify-content: flex-start;
