@@ -122,6 +122,12 @@ class Visual_Portfolio_Assets {
 
         self::store_used_assets( '@@plugin_name', true, 'style', 9 );
         self::store_used_assets( '@@plugin_name-noscript', true, 'style', 9 );
+        self::store_used_assets( '@@plugin_name-notices-default', true, 'style', 9 );
+        self::store_used_assets(
+            '@@plugin_name-notices-default',
+            'notices/style',
+            'template_style'
+        );
 
         self::store_used_assets( '@@plugin_name', true, 'script', 11 );
 
@@ -173,8 +179,17 @@ class Visual_Portfolio_Assets {
             self::enqueue_popup_assets();
         }
 
+        $layout_elements = array();
+
+        if ( isset( $options['layout_elements']['top']['elements'] ) ) {
+            $layout_elements = array_merge( $layout_elements, $options['layout_elements']['top']['elements'] );
+        }
+        if ( isset( $options['layout_elements']['bottom']['elements'] ) ) {
+            $layout_elements = array_merge( $layout_elements, $options['layout_elements']['bottom']['elements'] );
+        }
+
         // Filter.
-        if ( $options['filter'] ) {
+        if ( in_array( 'filter', $layout_elements, true ) ) {
             $filter_style_pref = '';
 
             if ( 'default' !== $options['filter'] ) {
@@ -189,7 +204,7 @@ class Visual_Portfolio_Assets {
         }
 
         // Sort.
-        if ( $options['sort'] ) {
+        if ( in_array( 'sort', $layout_elements, true ) ) {
             $sort_style_pref = '';
 
             if ( 'default' !== $options['sort'] ) {
@@ -204,7 +219,7 @@ class Visual_Portfolio_Assets {
         }
 
         // Pagination.
-        if ( $options['pagination_style'] ) {
+        if ( in_array( 'pagination', $layout_elements, true ) ) {
             $pagination_style_pref = '';
 
             if ( 'default' !== $options['pagination_style'] ) {

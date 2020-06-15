@@ -14,10 +14,13 @@ import TilesSelector from '../tiles-selector';
 import AlignControl from '../align-control';
 import SelectControl from '../select-control';
 // eslint-disable-next-line import/no-cycle
+import ElementsSelector from '../elements-selector';
+// eslint-disable-next-line import/no-cycle
 import GalleryControl from '../gallery-control';
 import ColorPicker from '../color-picker';
 import ClassesTree from '../classes-tree';
 import ToggleModal from '../toggle-modal';
+import ProNote from '../pro-note';
 import controlConditionCheck from '../../utils/control-condition-check';
 import controlGetValue from '../../utils/control-get-value';
 
@@ -69,6 +72,7 @@ class ControlsRender extends Component {
     render() {
         const {
             category,
+            categoryToggle = true,
             attributes,
             setAttributes,
             controls,
@@ -103,6 +107,7 @@ class ControlsRender extends Component {
 
                 const controlData = applyFilters( 'vpf.editor.controls-render', {
                     attributes,
+                    setAttributes,
                     onChange: ( val ) => {
                         setAttributes( { [ control.name ]: val } );
                     },
@@ -124,11 +129,13 @@ class ControlsRender extends Component {
                 );
             } );
 
-        let categoryTitle = category;
-        let categoryOpened = false;
+        let categoryTitle = categoryToggle ? category : false;
+        let categoryPro = false;
+        let categoryOpened = ! categoryToggle;
 
-        if ( 'undefined' !== typeof registeredControlsCategories[ category ] ) {
+        if ( categoryToggle && 'undefined' !== typeof registeredControlsCategories[ category ] ) {
             categoryTitle = registeredControlsCategories[ category ].title;
+            categoryPro = !! registeredControlsCategories[ category ].is_pro;
 
             if ( 'undefined' === typeof openedCategoriesCache[ category ] ) {
                 openedCategoriesCache[ category ] = registeredControlsCategories[ category ].is_opened || false;
@@ -149,7 +156,12 @@ class ControlsRender extends Component {
         return (
             result.length ? (
                 <PanelBody
-                    title={ categoryTitle }
+                    title={ categoryTitle ? (
+                        <Fragment>
+                            { categoryTitle }
+                            { categoryPro ? <span className="vpf-control-category-title-pro">{ __( 'PRO', '@@text_domain' ) }</span> : '' }
+                        </Fragment>
+                    ) : false }
                     initialOpen={ categoryOpened }
                     onToggle={ () => {
                         openedCategoriesCache[ category ] = ! categoryOpened;
@@ -184,7 +196,7 @@ ControlsRender.Control = function( props ) {
     let renderControl = '';
     let renderControlLabel = props.label;
     let renderControlAfter = '';
-    const renderControlHelp = props.description ? <RawHTML>{ props.description }</RawHTML> : false;
+    let renderControlHelp = props.description ? <RawHTML>{ props.description }</RawHTML> : false;
     const renderControlClassName = classnames( 'vpf-control-wrap', `vpf-control-wrap-${ props.type }` );
     const controlVal = controlGetValue( props.name, attributes );
 
@@ -246,6 +258,17 @@ ControlsRender.Control = function( props ) {
                 value={ controlVal }
                 options={ props.options }
                 onChange={ ( val ) => onChange( val ) }
+            />
+        );
+        break;
+    case 'elements_selector':
+        renderControl = (
+            <ElementsSelector
+                value={ controlVal }
+                locations={ props.locations }
+                options={ props.options }
+                onChange={ ( val ) => onChange( val ) }
+                props={ props }
             />
         );
         break;
@@ -417,6 +440,20 @@ ControlsRender.Control = function( props ) {
             />
         );
         break;
+    case 'pro_note':
+        renderControl = (
+            <ProNote title={ renderControlLabel }>
+                { renderControlHelp ? (
+                    <p>{ renderControlHelp }</p>
+                ) : '' }
+                <ProNote.Button target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/">
+                    { __( 'Read More', '@@text_domain' ) }
+                </ProNote.Button>
+            </ProNote>
+        );
+        renderControlLabel = false;
+        renderControlHelp = false;
+        break;
     default:
         renderControl = (
             <TextControl
@@ -460,9 +497,6 @@ ControlsRender.AllowRender = function( props, isSetupWizard = false ) {
     if ( props.condition && props.condition.length && ! controlConditionCheck( props.condition, props.attributes ) ) {
         return false;
     }
-
-    // console.log(isSetupWizard);
-
 
     if ( isSetupWizard && ! props.setup_wizard ) {
         return false;

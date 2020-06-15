@@ -761,6 +761,15 @@ class VP {
         // insert new items
         if ( $newVP.length ) {
             const newItems = $newVP.find( '.vp-portfolio__items' ).html();
+            const nothingFound = $newVP.hasClass( 'vp-portfolio-not-found' );
+
+            if ( nothingFound ) {
+                self.$item.find( '.vp-portfolio__items-wrap' ).before( $newVP.find( '.vp-notice' ).clone() );
+                self.$item.addClass( 'vp-portfolio-not-found' );
+            } else {
+                self.$item.find( '.vp-notice' ).remove();
+                self.$item.removeClass( 'vp-portfolio-not-found' );
+            }
 
             // update filter
             if ( self.$filter.length ) {
@@ -801,7 +810,7 @@ class VP {
 
             self.addItems( $( newItems ), removeExisting, $newVP );
 
-            self.emitEvent( 'loadedNewItems', [ $newVP, $newVP, content ] );
+            self.emitEvent( 'loadedNewItems', [ $newVP, removeExisting, content ] );
 
             if ( cb ) {
                 cb();

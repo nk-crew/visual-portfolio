@@ -34,8 +34,7 @@ class Visual_Portfolio {
     public static function instance() {
         if ( is_null( self::$instance ) ) {
             self::$instance = new self();
-            self::$instance->init_options();
-            self::$instance->init_hooks();
+            self::$instance->init();
         }
         return self::$instance;
     }
@@ -55,32 +54,18 @@ class Visual_Portfolio {
     public $plugin_url;
 
     /**
-     * Plugin name
+     * Path to the pro plugin directory
      *
-     * @var $plugin_name
+     * @var $plugin_path
      */
-    public $plugin_name;
+    public $pro_plugin_path;
 
     /**
-     * Plugin version
+     * URL to the pro plugin directory
      *
-     * @var $plugin_version
+     * @var $plugin_url
      */
-    public $plugin_version;
-
-    /**
-     * Plugin slug
-     *
-     * @var $plugin_slug
-     */
-    public $plugin_slug;
-
-    /**
-     * Plugin name sanitized
-     *
-     * @var $plugin_name_sanitized
-     */
-    public $plugin_name_sanitized;
+    public $pro_plugin_url;
 
     /**
      * Visual_Portfolio constructor.
@@ -92,9 +77,14 @@ class Visual_Portfolio {
     /**
      * Init options
      */
-    public function init_options() {
+    public function init() {
         $this->plugin_path = plugin_dir_path( __FILE__ );
         $this->plugin_url  = plugin_dir_url( __FILE__ );
+
+        if ( in_array( 'visual-portfolio-pro/class-visual-portfolio-pro.php', (array) get_option( 'active_plugins', array() ), true ) ) {
+            $this->pro_plugin_path = plugin_dir_path( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
+            $this->pro_plugin_url  = plugin_dir_url( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
+        }
 
         // load textdomain.
         load_plugin_textdomain( '@@text_domain', false, basename( dirname( __FILE__ ) ) . '/languages' );
@@ -118,13 +108,6 @@ class Visual_Portfolio {
     }
 
     /**
-     * Init hooks
-     */
-    public function init_hooks() {
-        add_action( 'admin_init', array( $this, 'admin_init' ) );
-    }
-
-    /**
      * Activation Hook
      */
     public function activation_hook() {
@@ -136,18 +119,6 @@ class Visual_Portfolio {
      */
     public function deactivation_hook() {
         flush_rewrite_rules();
-    }
-
-    /**
-     * Init variables
-     */
-    public function admin_init() {
-        // get current plugin data.
-        $data                        = get_plugin_data( __FILE__ );
-        $this->plugin_name           = $data['Name'];
-        $this->plugin_version        = $data['Version'];
-        $this->plugin_slug           = plugin_basename( __FILE__, '.php' );
-        $this->plugin_name_sanitized = basename( __FILE__, '.php' );
     }
 
     /**
@@ -237,6 +208,11 @@ class Visual_Portfolio {
         // template in theme folder.
         $template = locate_template( array( '/visual-portfolio/' . $template_name . '.php' ) );
 
+        // pro plugin template.
+        if ( ! $template && $this->pro_plugin_path && file_exists( $this->pro_plugin_path . 'templates/' . $template_name . '.php' ) ) {
+            $template = $this->pro_plugin_path . 'templates/' . $template_name . '.php';
+        }
+
         // default template.
         if ( ! $template ) {
             $template = $this->plugin_path . 'templates/' . $template_name . '.php';
@@ -265,6 +241,9 @@ class Visual_Portfolio {
         } elseif ( file_exists( get_template_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
             // Parent Theme (when parent exists).
             $template = trailingslashit( get_template_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
+        } elseif ( $this->pro_plugin_path && file_exists( $this->pro_plugin_path . 'templates/' . $template_name . '.css' ) ) {
+            // PRO plugin folder.
+            $template = $this->pro_plugin_url . 'templates/' . $template_name . '.css';
         } elseif ( file_exists( $this->plugin_path . 'templates/' . $template_name . '.css' ) ) {
             // Default file in plugin folder.
             $template = $this->plugin_url . 'templates/' . $template_name . '.css';

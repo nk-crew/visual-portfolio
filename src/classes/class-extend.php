@@ -303,6 +303,17 @@ class Visual_Portfolio_Extend {
     }
 
     /**
+     * Extend Options before Query Args.
+     *
+     * @param string $options - portfolio options.
+     * @param string $id - portfolio id.
+     * @return array
+     */
+    public static function options_before_query_args( $options, $id ) {
+        return apply_filters( 'vpf_extend_options_before_query_args', $options, $id );
+    }
+
+    /**
      * Extend Query Args.
      *
      * @param array  $args - query arguments.

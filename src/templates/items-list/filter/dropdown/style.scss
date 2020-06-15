@@ -6,19 +6,10 @@
 .vp-filter__style-dropdown {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     padding: 0;
     margin-top: calc(-1 * var(--vp-filter-dropdown--items__gap));
     margin-left: calc(-1 * var(--vp-filter-dropdown--items__gap));
     list-style-type: none;
-
-    // align
-    &.vp-filter__align-left {
-        justify-content: flex-start;
-    }
-    &.vp-filter__align-right {
-        justify-content: flex-end;
-    }
 
     select {
         display: block;

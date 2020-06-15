@@ -88,6 +88,15 @@ class Visual_Portfolio_Gutenberg_Block {
                         'type' => 'object',
                     );
                     break;
+                case 'elements_selector':
+                    $attributes[ $control['name'] ]['type']  = 'object';
+                    $attributes[ $control['name'] ]['items'] = array(
+                        'type' => 'object',
+                    );
+                    break;
+                case 'pro_note':
+                    unset( $attributes[ $control['name'] ] );
+                    break;
             }
 
             if ( isset( $control['default'] ) ) {

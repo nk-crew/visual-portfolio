@@ -187,7 +187,7 @@ class Visual_Portfolio_Get {
             return '';
         }
 
-        do_action( 'vpf_before_get_output' );
+        do_action( 'vpf_before_get_output', $options );
 
         self::$used_layouts[] = $options['id'];
 
@@ -290,10 +290,23 @@ class Visual_Portfolio_Get {
             )
         ) : false;
 
+        $options['start_page']    = $start_page;
+        $options['max_pages']     = $max_pages;
+        $options['next_page_url'] = $next_page_url;
+
         // No items found.
         if ( ( ( $is_social || $is_images ) && empty( $query_opts['images'] ) ) || isset( $portfolio_query ) && ! $portfolio_query->have_posts() ) {
             ob_start();
-            self::notice( esc_html__( 'No items were found matching your selection.', '@@text_domain' ) );
+            $class .= ' vp-portfolio-not-found';
+
+            ?>
+            <div class="<?php echo esc_attr( $class ); ?>">
+                <?php
+                self::notice( esc_html__( 'No items were found matching your selection.', '@@text_domain' ) );
+                ?>
+            </div>
+            <?php
+
             $return = ob_get_contents();
             ob_end_clean();
             return $return;
@@ -426,33 +439,8 @@ class Visual_Portfolio_Get {
             }
         }
 
-        // Filter and Sort controls.
-        ob_start();
-        self::filter( $options );
-        $filter_content = ob_get_contents();
-        ob_end_clean();
-
-        ob_start();
-        self::sort( $options );
-        $sort_content = ob_get_contents();
-        ob_end_clean();
-
-        if ( $filter_content && $sort_content ) {
-            ?>
-            <div class="vp-portfolio__filter-sort-wrap">
-            <?php
-        }
-
-        // phpcs:ignore
-        echo $filter_content;
-        // phpcs:ignore
-        echo $sort_content;
-
-        if ( $filter_content && $sort_content ) {
-            ?>
-            </div>
-            <?php
-        }
+        // Top Layout elements.
+        self::print_layout_elements( 'top', $options );
 
         // Prepare thumbnails.
         $slider_thumbnails = array();
@@ -724,14 +712,8 @@ class Visual_Portfolio_Get {
             );
         }
 
-        self::pagination(
-            $options,
-            array(
-                'start_page'    => $start_page,
-                'max_pages'     => $max_pages,
-                'next_page_url' => $next_page_url,
-            )
-        );
+        // Bottom Layout elements.
+        self::print_layout_elements( 'bottom', $options );
 
         visual_portfolio()->include_template(
             'items-list/wrapper-end',
@@ -740,16 +722,67 @@ class Visual_Portfolio_Get {
             )
         );
 
+        do_action( 'vpf_after_get_output', $options );
+
         // stupid hack as wp_reset_postdata() function is not working for some reason...
         // phpcs:ignore
         $GLOBALS['post'] = $old_post;
-
-        do_action( 'vpf_after_get_output' );
 
         $return = ob_get_contents();
         ob_end_clean();
 
         return $return;
+    }
+
+    /**
+     * Print layout elements like Filter, Sort, Search and Pagination.
+     *
+     * @param string $position elements position.
+     * @param array  $options options for portfolio list to print.
+     */
+    public static function print_layout_elements( $position, $options ) {
+        $layout_elements = $options['layout_elements'];
+
+        if ( ! isset( $layout_elements[ $position ] ) || ! isset( $layout_elements[ $position ]['elements'] ) ) {
+            return;
+        }
+
+        $registered   = Visual_Portfolio_Controls::get_registered_array();
+        $control_data = $registered['layout_elements'];
+        $class_name   = 'vp-portfolio__layout-elements';
+
+        if ( $position ) {
+            $class_name .= ' vp-portfolio__layout-elements-' . $position;
+        }
+
+        if ( isset( $layout_elements[ $position ]['align'] ) ) {
+            $class_name .= ' vp-portfolio__layout-elements-align-' . $layout_elements[ $position ]['align'];
+        }
+
+        ob_start();
+        foreach ( $layout_elements[ $position ]['elements'] as $element ) {
+            if ( isset( $control_data['options'][ $element ]['render_callback'] ) && is_callable( $control_data['options'][ $element ]['render_callback'] ) ) {
+                call_user_func( $control_data['options'][ $element ]['render_callback'], $options, $element, $position );
+            }
+            do_action( 'vpf_layout_elements', $options, $element, $position );
+        }
+        $elements_content = ob_get_contents();
+        ob_end_clean();
+
+        if ( ! $elements_content ) {
+            return;
+        }
+
+        ?>
+        <div class="<?php echo esc_attr( $class_name ); ?>">
+        <?php
+
+        // phpcs:ignore
+        echo $elements_content;
+
+        ?>
+        </div>
+        <?php
     }
 
     /**
@@ -888,9 +921,9 @@ class Visual_Portfolio_Get {
      * @return array
      */
     private static function get_query_params( $options, $for_filter = false, $layout_id = false ) {
+        $options    = Visual_Portfolio_Extend::options_before_query_args( $options, $layout_id );
         $query_opts = array();
-
-        $is_images = 'images' === $options['content_source'];
+        $is_images  = 'images' === $options['content_source'];
 
         $paged = 0;
         if ( $options['pagination'] || $is_images ) {
@@ -1272,7 +1305,6 @@ class Visual_Portfolio_Get {
                 'notice' => $notice,
             )
         );
-        visual_portfolio()->include_template_style( '@@plugin_name-notices-default', 'notices/style' );
     }
 
     /**
@@ -1280,7 +1312,7 @@ class Visual_Portfolio_Get {
      *
      * @param array $vp_options current vp_list options.
      */
-    private static function filter( $vp_options ) {
+    public static function filter( $vp_options ) {
         if ( ! $vp_options['filter'] ) {
             return;
         }
@@ -1483,15 +1515,10 @@ class Visual_Portfolio_Get {
         $args = array(
             'class'      => 'vp-filter',
             'items'      => Visual_Portfolio_Extend::filter_items( $terms, $vp_options ),
-            'align'      => $vp_options['filter_align'],
             'show_count' => $vp_options['filter_show_count'],
             'opts'       => $filter_options,
             'vp_opts'    => $vp_options,
         );
-
-        if ( $vp_options['filter_align'] ) {
-            $args['class'] .= ' vp-filter__align-' . $vp_options['filter_align'];
-        }
 
         ?>
         <div class="vp-portfolio__filter-wrap">
@@ -1515,7 +1542,7 @@ class Visual_Portfolio_Get {
      *
      * @param array $vp_options current vp_list options.
      */
-    private static function sort( $vp_options ) {
+    public static function sort( $vp_options ) {
         if ( ! $vp_options['sort'] ) {
             return;
         }
@@ -1583,14 +1610,9 @@ class Visual_Portfolio_Get {
         $args = array(
             'class'   => 'vp-sort',
             'items'   => $terms,
-            'align'   => $vp_options['sort_align'],
             'opts'    => $sort_options,
             'vp_opts' => $vp_options,
         );
-
-        if ( $vp_options['sort_align'] ) {
-            $args['class'] .= ' vp-sort__align-' . $vp_options['sort_align'];
-        }
 
         ?>
         <div class="vp-portfolio__sort-wrap">
@@ -1805,12 +1827,8 @@ class Visual_Portfolio_Get {
      * Print pagination
      *
      * @param array $vp_options - current vp_list options.
-     * @param array $args - pagination args.
-     *      'start_page'
-     *      'max_pages'
-     *      'next_page_url'.
      */
-    private static function pagination( $vp_options, $args ) {
+    public static function pagination( $vp_options ) {
         if ( ! $vp_options['pagination_style'] || ! $vp_options['pagination'] ) {
             return;
         }
@@ -1833,11 +1851,10 @@ class Visual_Portfolio_Get {
 
         $args = array(
             'type'          => $vp_options['pagination'],
-            'next_page_url' => $args['next_page_url'],
-            'start_page'    => $args['start_page'],
-            'max_pages'     => $args['max_pages'],
+            'next_page_url' => $vp_options['next_page_url'],
+            'start_page'    => $vp_options['start_page'],
+            'max_pages'     => $vp_options['max_pages'],
             'class'         => 'vp-pagination',
-            'align'         => $vp_options['pagination_align'],
             'opts'          => $pagination_options,
             'vp_opts'       => $vp_options,
         );
@@ -1845,11 +1862,6 @@ class Visual_Portfolio_Get {
         // No more posts.
         if ( ! $args['next_page_url'] ) {
             $args['class'] .= ' vp-pagination__no-more';
-        }
-
-        // Align.
-        if ( $vp_options['pagination_align'] ) {
-            $args['class'] .= ' vp-pagination__align-' . $vp_options['pagination_align'];
         }
 
         ?>

@@ -82,7 +82,19 @@ export default class BlockEdit extends Component {
             case 'social-stream':
                 setAttributes( {
                     setup_wizard: '',
-                    pagination_style: 'minimal',
+                    layout_elements: {
+                        top: {
+                            elements: [],
+                            align: 'center',
+                        },
+                        items: {
+                            elements: [ 'items' ],
+                        },
+                        bottom: {
+                            elements: [ 'pagination' ],
+                            align: 'center',
+                        },
+                    },
                 } );
                 break;
             default:

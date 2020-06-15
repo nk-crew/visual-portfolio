@@ -1,0 +1,30 @@
+.vpf-pro-component-note-inner {
+    padding: 20px;
+    text-align: center;
+    background-color: $light-gray-300;
+    border-radius: 4px;
+
+    h3 {
+        margin-bottom: 15px;
+    }
+}
+
+.vpf-pro-component-note-button {
+    display: inline-block;
+    padding: 7px 15px;
+    margin-top: 5px;
+    text-decoration: none;
+    background: #2540cc;
+    border-radius: 3px;
+
+    &,
+    &:hover,
+    &:focus,
+    &:active {
+        color: #fff;
+    }
+    &:hover,
+    &:focus {
+        background: lighten(#2540cc, 5%);
+    }
+}

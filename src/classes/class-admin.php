@@ -27,8 +27,6 @@ class Visual_Portfolio_Admin {
 
         // ajax actions.
         add_action( 'wp_ajax_vp_find_oembed', array( $this, 'ajax_find_oembed' ) );
-
-        add_action( 'vpf_get_source_social_stream_registered_controls', array( __CLASS__, 'social_stream_information' ) );
     }
 
     /**
@@ -789,9 +787,9 @@ class Visual_Portfolio_Admin {
                     'title'     => esc_html__( 'Social Stream Settings', '@@text_domain' ),
                     'is_opened' => true,
                 ),
-                'layouts'                      => array(
+                'layout-elements'              => array(
                     'title'     => esc_html__( 'Layout', '@@text_domain' ),
-                    'is_opened' => false,
+                    'is_opened' => true,
                 ),
                 'items-style'                  => array(
                     'title'     => esc_html__( 'Items Style', '@@text_domain' ),
@@ -799,18 +797,6 @@ class Visual_Portfolio_Admin {
                 ),
                 'items-click-action'           => array(
                     'title'     => esc_html__( 'Items Click Action', '@@text_domain' ),
-                    'is_opened' => false,
-                ),
-                'filter'                       => array(
-                    'title'     => esc_html__( 'Filter', '@@text_domain' ),
-                    'is_opened' => false,
-                ),
-                'sort'                         => array(
-                    'title'     => esc_html__( 'Sort', '@@text_domain' ),
-                    'is_opened' => false,
-                ),
-                'pagination'                   => array(
-                    'title'     => esc_html__( 'Pagination', '@@text_domain' ),
                     'is_opened' => false,
                 ),
                 'custom_css'                   => array(
@@ -1238,6 +1224,19 @@ class Visual_Portfolio_Admin {
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
                     'desc' => esc_html__( 'DESC', '@@text_domain' ),
                 ),
+            )
+        );
+
+        /**
+         * Content Source Social Stream.
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'content-source-social-stream',
+                'type'        => 'pro_note',
+                'name'        => 'social_pro_note',
+                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                'description' => esc_html__( 'Social feeds are only available for PRO users.', '@@text_domain' ),
             )
         );
 
@@ -1689,17 +1688,86 @@ class Visual_Portfolio_Admin {
         );
 
         /**
+         * Layout Elements.
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'layout-elements',
+                'type'      => 'elements_selector',
+                'name'      => 'layout_elements',
+                'locations' => array(
+                    'top'    => array(
+                        'title' => esc_html__( 'Top', '@@text_domain' ),
+                        'align' => array(
+                            'left',
+                            'center',
+                            'right',
+                            'between',
+                        ),
+                    ),
+                    'items'  => array(),
+                    'bottom' => array(
+                        'title' => esc_html__( 'Bottom', '@@text_domain' ),
+                        'align' => array(
+                            'left',
+                            'center',
+                            'right',
+                            'between',
+                        ),
+                    ),
+                ),
+                'default'   => array(
+                    'top'    => array(
+                        'elements' => array(),
+                        'align'    => 'center',
+                    ),
+                    'items'  => array(
+                        'elements' => array( 'items' ),
+                    ),
+                    'bottom' => array(
+                        'elements' => array(),
+                        'align'    => 'center',
+                    ),
+                ),
+                'options'   => array(
+                    'filter' => array(
+                        'title'             => esc_html__( 'Filter', '@@text_domain' ),
+                        'allowed_locations' => array( 'top' ),
+                        'category'          => 'filter',
+                        'render_callback'   => 'Visual_Portfolio_Get::filter',
+                    ),
+                    'sort' => array(
+                        'title'             => esc_html__( 'Sort', '@@text_domain' ),
+                        'allowed_locations' => array( 'top' ),
+                        'category'          => 'sort',
+                        'render_callback'   => 'Visual_Portfolio_Get::sort',
+                    ),
+                    'search' => array(
+                        'title'             => esc_html__( 'Search', '@@text_domain' ),
+                        'allowed_locations' => array( 'top' ),
+                        'category'          => 'search',
+                        'is_pro'            => true,
+                    ),
+                    'items' => array(
+                        'title'             => esc_html__( 'Items', '@@text_domain' ),
+                        'allowed_locations' => array( 'items' ),
+                        'category'          => 'layouts',
+                    ),
+                    'pagination' => array(
+                        'title'             => esc_html__( 'Pagination', '@@text_domain' ),
+                        'allowed_locations' => array( 'bottom' ),
+                        'category'          => 'pagination',
+                        'render_callback'   => 'Visual_Portfolio_Get::pagination',
+                    ),
+                ),
+            )
+        );
+
+        /**
          * Filter.
          */
         $filters = array_merge(
             array(
-                // False.
-                'false' => array(
-                    'title'    => esc_html__( 'Disabled', '@@text_domain' ),
-                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="9.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="18.2409" y2="-0.75" transform="matrix(0.707107 0.707107 0.707107 -0.707107 4.15475 3.14285)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'controls' => array(),
-                ),
-
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
@@ -1745,7 +1813,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'filter',
                 'type'     => 'icons_selector',
                 'name'     => 'filter',
-                'default'  => 'false',
+                'default'  => 'minimal',
                 'options'  => $filters_selector,
             )
         );
@@ -1788,33 +1856,10 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'  => 'filter',
-                'type'      => 'align',
-                'label'     => esc_html__( 'Align', '@@text_domain' ),
-                'name'      => 'filter_align',
-                'default'   => 'center',
-                'condition' => array(
-                    array(
-                        'control'  => 'filter',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                ),
-            )
-        );
-        Visual_Portfolio_Controls::register(
-            array(
-                'category'  => 'filter',
                 'type'      => 'checkbox',
                 'alongside' => esc_html__( 'Display Count', '@@text_domain' ),
                 'name'      => 'filter_show_count',
                 'default'   => false,
-                'condition' => array(
-                    array(
-                        'control'  => 'filter',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                ),
             )
         );
         Visual_Portfolio_Controls::register(
@@ -1824,13 +1869,6 @@ class Visual_Portfolio_Admin {
                 'label'     => esc_html__( 'All Button Text', '@@text_domain' ),
                 'name'      => 'filter_text_all',
                 'default'   => esc_attr__( 'All', '@@text_domain' ),
-                'condition' => array(
-                    array(
-                        'control'  => 'filter',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                ),
             )
         );
 
@@ -1839,13 +1877,6 @@ class Visual_Portfolio_Admin {
          */
         $sorts = array_merge(
             array(
-                // False.
-                'false' => array(
-                    'title'    => esc_html__( 'Disabled', '@@text_domain' ),
-                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="9.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="18.2409" y2="-0.75" transform="matrix(0.707107 0.707107 0.707107 -0.707107 4.15475 3.14285)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'controls' => array(),
-                ),
-
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
@@ -1891,7 +1922,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'sort',
                 'type'     => 'icons_selector',
                 'name'     => 'sort',
-                'default'  => 'false',
+                'default'  => 'dropdown',
                 'options'  => $sorts_selector,
             )
         );
@@ -1931,20 +1962,16 @@ class Visual_Portfolio_Admin {
             }
         }
 
+        /**
+         * Search
+         */
         Visual_Portfolio_Controls::register(
             array(
-                'category'  => 'sort',
-                'type'      => 'align',
-                'label'     => esc_html__( 'Align', '@@text_domain' ),
-                'name'      => 'sort_align',
-                'default'   => 'center',
-                'condition' => array(
-                    array(
-                        'control'  => 'sort',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                ),
+                'category'    => 'search',
+                'type'        => 'pro_note',
+                'name'        => 'search_pro_note',
+                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                'description' => esc_html__( 'The search module is only available for PRO users.', '@@text_domain' ),
             )
         );
 
@@ -1953,13 +1980,6 @@ class Visual_Portfolio_Admin {
          */
         $pagination = array_merge(
             array(
-                // False.
-                'false' => array(
-                    'title'    => esc_html__( 'Disabled', '@@text_domain' ),
-                    'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="9.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="18.2409" y2="-0.75" transform="matrix(0.707107 0.707107 0.707107 -0.707107 4.15475 3.14285)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'controls' => array(),
-                ),
-
                 // Minimal.
                 'minimal' => array(
                     'title'    => esc_html__( 'Minimal', '@@text_domain' ),
@@ -1998,7 +2018,7 @@ class Visual_Portfolio_Admin {
                 'category' => 'pagination',
                 'type'     => 'icons_selector',
                 'name'     => 'pagination_style',
-                'default'  => 'false',
+                'default'  => 'minimal',
                 'options'  => $pagination_selector,
             )
         );
@@ -2058,13 +2078,6 @@ class Visual_Portfolio_Admin {
                         'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 1.42857V4.85714" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.5" d="M10 14V17.4286" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.875" d="M4.28571 3.71428L6.57142 5.99999" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.375" d="M13.4286 12.8571L15.7143 15.1429" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.75" d="M2 9.42857H5.42857" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.25" d="M14.5714 9.42857H18" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.625" d="M4.28571 15.1429L6.57142 12.8571" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path opacity="0.125" d="M13.4286 5.99999L15.7143 3.71428" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     ),
                 ),
-                'condition' => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                ),
             )
         );
         Visual_Portfolio_Controls::register(
@@ -2074,11 +2087,6 @@ class Visual_Portfolio_Admin {
                 'description' => esc_html__( 'Note: you will see the "Load More" pagination in the preview. "Infinite" pagination will be visible on the site.', '@@text_domain' ),
                 'name'        => 'pagination_infinite_notice',
                 'condition'   => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
                     array(
                         'control'  => 'pagination',
                         'operator' => '==',
@@ -2090,36 +2098,10 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'  => 'pagination',
-                'type'      => 'align',
-                'label'     => esc_html__( 'Align', '@@text_domain' ),
-                'name'      => 'pagination_align',
-                'default'   => 'center',
-                'condition' => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
-                        'control'  => 'pagination',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                ),
-            )
-        );
-        Visual_Portfolio_Controls::register(
-            array(
-                'category'  => 'pagination',
                 'type'      => 'html',
                 'label'     => esc_html__( 'Texts', '@@text_domain' ),
                 'name'      => 'pagination_infinite_texts',
                 'condition' => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
                     array(
                         'control'  => 'pagination',
                         'operator' => '==',
@@ -2135,11 +2117,6 @@ class Visual_Portfolio_Admin {
                 'label'     => esc_html__( 'Texts', '@@text_domain' ),
                 'name'      => 'pagination_load_more_texts',
                 'condition' => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
                     array(
                         'control'  => 'pagination',
                         'operator' => '==',
@@ -2159,11 +2136,6 @@ class Visual_Portfolio_Admin {
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
                         'control'  => 'pagination',
                         'operator' => '==',
                         'value'    => 'infinite',
@@ -2181,11 +2153,6 @@ class Visual_Portfolio_Admin {
                 'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
                 'condition'   => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
                     array(
                         'control'  => 'pagination',
                         'operator' => '==',
@@ -2205,11 +2172,6 @@ class Visual_Portfolio_Admin {
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
                         'control'  => 'pagination',
                         'operator' => '==',
                         'value'    => 'infinite',
@@ -2227,11 +2189,6 @@ class Visual_Portfolio_Admin {
                 'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
                 'condition'   => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
                     array(
                         'control'  => 'pagination',
                         'operator' => '==',
@@ -2251,11 +2208,6 @@ class Visual_Portfolio_Admin {
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
                         'control'  => 'pagination',
                         'operator' => '==',
                         'value'    => 'load-more',
@@ -2274,11 +2226,6 @@ class Visual_Portfolio_Admin {
                 'hint_place'  => 'left',
                 'condition'   => array(
                     array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
                         'control'  => 'pagination',
                         'operator' => '==',
                         'value'    => 'load-more',
@@ -2295,11 +2242,6 @@ class Visual_Portfolio_Admin {
                 'default'   => true,
                 'condition' => array(
                     array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
                         'control' => 'pagination',
                         'value'   => 'paged',
                     ),
@@ -2314,11 +2256,6 @@ class Visual_Portfolio_Admin {
                 'name'      => 'pagination_paged__show_numbers',
                 'default'   => true,
                 'condition' => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
                     array(
                         'control' => 'pagination',
                         'value'   => 'paged',
@@ -2335,11 +2272,6 @@ class Visual_Portfolio_Admin {
                 'default'   => true,
                 'condition' => array(
                     array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
-                    array(
                         'control' => 'pagination',
                         'value'   => 'paged',
                     ),
@@ -2354,11 +2286,6 @@ class Visual_Portfolio_Admin {
                 'name'      => 'pagination_paged__scroll_top_offset',
                 'default'   => 30,
                 'condition' => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
                     array(
                         'control' => 'pagination',
                         'value'   => 'paged',
@@ -2377,11 +2304,6 @@ class Visual_Portfolio_Admin {
                 'name'      => 'pagination_hide_on_end',
                 'default'   => false,
                 'condition' => array(
-                    array(
-                        'control'  => 'pagination_style',
-                        'operator' => '!=',
-                        'value'    => 'false',
-                    ),
                     array(
                         'control'  => 'pagination',
                         'operator' => '!=',

@@ -68,6 +68,8 @@ class Visual_Portfolio_Controls {
         'min_lines'      => 5,
         'allow_modal'    => true,
         'classes_tree'   => false,
+        // elements selector.
+        'locations'      => array(),
 
         // hint.
         'hint'           => false,

@@ -6,7 +6,6 @@
 .vp-pagination__style-default {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     padding: 0;
     margin: 0;
     margin-top: calc(-1 * var(--vp-pagination-default--items__gap));
@@ -19,10 +18,13 @@
     }
 
     // align
-    &.vp-pagination__align-left {
+    .vp-portfolio__layout-elements-align-left & {
         justify-content: flex-start;
     }
-    &.vp-pagination__align-right {
+    .vp-portfolio__layout-elements-align-center & {
+        justify-content: center;
+    }
+    .vp-portfolio__layout-elements-align-right & {
         justify-content: flex-end;
     }
 

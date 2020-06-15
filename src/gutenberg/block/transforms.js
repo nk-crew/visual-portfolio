@@ -31,8 +31,6 @@ export default {
                     items_count: -1,
                     layout: 'masonry',
                     items_style_fly__align: 'bottom-center',
-                    filter: 'false',
-                    pagination_style: 'false',
                     masonry_columns: parseInt( attributes.columns, 10 ) || 3,
                     items_click_action: 'none' === attributes.linkTo ? 'false' : 'url',
                     images,
@@ -76,8 +74,6 @@ export default {
                     items_style_default__excerpt_words_count: 'full_post' === displayPostContentRadio ? 100 : excerptLength,
                     items_style_default__align: 'left',
                     items_style_default__show_read_more: displayPostContent ? 'true' : 'false',
-                    filter: 'false',
-                    pagination_style: 'false',
                     className,
                 } );
             },
