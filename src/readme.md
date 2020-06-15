@@ -1,4 +1,4 @@
-# Visual Portfolio #
+# Visual Portfolio, Posts & Image Gallery #
 
 * Contributors: nko
 * Tags: portfolio, gallery, image, masonry, popup
@@ -9,7 +9,7 @@
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
-Portfolio layouts visual editor. Masonry, justified, tiles, carousel, slider, coverflow, custom posts, custom image galleries.
+Visual editor for your portfolio, posts and image galleries.
 
 ## Description ##
 
