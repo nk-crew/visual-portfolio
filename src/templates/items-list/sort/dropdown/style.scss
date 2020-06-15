@@ -12,6 +12,7 @@
     select {
         display: block;
         min-width: var(--vp-sort-dropdown--items__min-width);
+        min-height: var(--vp-search-default--input__min-height);
         padding: var(--vp-sort-dropdown--items__padding-v) var(--vp-sort-dropdown--items__padding-h);
         margin-top: var(--vp-sort-dropdown--items__gap);
         margin-left: var(--vp-sort-dropdown--items__gap);
