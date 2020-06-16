@@ -120,6 +120,9 @@ class Visual_Portfolio_Get {
             $result['id'] = $block_id ? $block_id : $id;
         }
 
+        // filter.
+        $result = apply_filters( 'vpf_get_options', $result, $atts );
+
         return $result;
     }
 

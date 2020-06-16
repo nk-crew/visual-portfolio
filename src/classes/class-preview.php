@@ -34,7 +34,7 @@ class Visual_Portfolio_Preview {
     public function init_hooks() {
         add_action( 'init', array( $this, 'is_preview_check' ) );
         add_filter( 'pre_handle_404', array( $this, 'pre_handle_404' ) );
-        add_filter( 'vpf_get_layout_option', array( $this, 'filter_preview_option' ), 10, 2 );
+        add_filter( 'vpf_get_options', array( $this, 'filter_preview_option' ) );
         add_action( 'init', array( $this, 'flush_rules_preview_frame' ) );
         add_action( 'template_redirect', array( $this, 'template_redirect' ) );
 
@@ -118,33 +118,18 @@ class Visual_Portfolio_Preview {
     }
 
     /**
-     * Change
+     * Disable infinite loading in preview.
      *
-     * @param mixed  $val - value of the option.
-     * @param string $name - name of the option.
-     * @return mixed
+     * @param array $options - options.
+     *
+     * @return array
      */
-    public function filter_preview_option( $val, $name ) {
-        if ( $this->preview_enabled ) {
-	        // phpcs:disable
-            if ( isset( $_POST[ $name ] ) ) {
-                if ( is_array( $_POST[ $name ] ) ) {
-                    $val = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $name ] ) );
-                } elseif ( 'custom_css' === $name ) {
-                    $val = wp_kses( wp_unslash( $_POST[ $name ] ), array( '\'', '\"' ) );
-                } else {
-                    $val = sanitize_text_field( wp_unslash( $_POST[ $name ] ) );
-                }
-            }
-	        // phpcs:enable
-
-            // disable infinite loading in preview.
-            if ( 'vp_pagination' === $name && 'infinite' === $val ) {
-                $val = 'load-more';
-            }
+    public function filter_preview_option( $options ) {
+        if ( $this->preview_enabled && isset( $options['pagination'] ) && 'infinite' === $options['pagination'] ) {
+            $options['pagination'] = 'load-more';
         }
 
-        return $val;
+        return $options;
     }
 
     /**
