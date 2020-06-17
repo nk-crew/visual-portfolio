@@ -18,6 +18,7 @@ import ElementsSelector from '../elements-selector';
 // eslint-disable-next-line import/no-cycle
 import GalleryControl from '../gallery-control';
 import ColorPicker from '../color-picker';
+import DatePicker from '../date-picker';
 import ClassesTree from '../classes-tree';
 import ToggleModal from '../toggle-modal';
 import ProNote from '../pro-note';
@@ -406,6 +407,14 @@ ControlsRender.Control = function( props ) {
             <ColorPicker
                 value={ controlVal }
                 alpha={ props.alpha }
+                onChange={ ( val ) => onChange( val ) }
+            />
+        );
+        break;
+    case 'date':
+        renderControl = (
+            <DatePicker
+                value={ controlVal }
                 onChange={ ( val ) => onChange( val ) }
             />
         );

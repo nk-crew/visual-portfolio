@@ -894,7 +894,6 @@ class Visual_Portfolio_Admin {
                 'value_callback' => array( $this, 'find_posts_select_control' ),
                 'searchable'     => true,
                 'multiple'       => true,
-                'class'          => 'vp-select2-posts-ajax',
                 'condition'      => array(
                     array(
                         'control' => 'posts_source',
@@ -913,7 +912,6 @@ class Visual_Portfolio_Admin {
                 'value_callback' => array( $this, 'find_posts_select_control' ),
                 'searchable'     => true,
                 'multiple'       => true,
-                'class'          => 'vp-select2-posts-ajax',
                 'condition'      => array(
                     array(
                         'control'  => 'posts_source',
@@ -943,7 +941,6 @@ class Visual_Portfolio_Admin {
                 'value_callback' => array( $this, 'find_taxonomies_select_control' ),
                 'searchable'     => true,
                 'multiple'       => true,
-                'class'          => 'vp-select2-taxonomies-ajax',
                 'condition'      => array(
                     array(
                         'control'  => 'posts_source',
@@ -1083,6 +1080,15 @@ class Visual_Portfolio_Admin {
                         'value'    => 'current_query',
                     ),
                 ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'content-source-post-based',
+                'type'        => 'pro_note',
+                'name'        => 'additional_query_settings_pro',
+                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                'description' => esc_html__( 'Additional query settings.', '@@text_domain' ),
             )
         );
 
