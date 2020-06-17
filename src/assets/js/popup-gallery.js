@@ -116,6 +116,7 @@ const VPPopupAPI = {
                 if ( videoData ) {
                     item = {
                         type: 'embed',
+                        el: this,
                         src: videoData.embedUrl,
                         embed: videoData.embed,
                         width: parseInt( videoSize[ 0 ], 10 ),

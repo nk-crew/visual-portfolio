@@ -335,6 +335,21 @@ class Visual_Portfolio_Settings {
                     'type'    => 'color',
                     'default' => '#1e1e1e',
                 ),
+
+                // Page iframe popup.
+                array(
+                    'name'    => 'pages_iframe_custom_css',
+                    'label'   => esc_html__( 'Pages iFrame Custom CSS', '@@text_domain' ),
+                    'desc'    => esc_html__( 'When you display pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`.', '@@text_domain' ),
+                    'type'    => 'textarea',
+                    'default' => '
+.vp-popup-iframe .site-header,
+.vp-popup-iframe #site-footer,
+.vp-popup-iframe #colophon {
+    display: none;
+}',
+                    'is_pro'  => true,
+                ),
             ),
         );
 

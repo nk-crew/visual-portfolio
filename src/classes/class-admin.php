@@ -905,7 +905,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'       => 'content-source-post-based',
-                'type'           => 'select2',
+                'type'           => 'select',
                 'label'          => esc_html__( 'Excluded Posts', '@@text_domain' ),
                 'name'           => 'posts_excluded_ids',
                 'default'        => array(),
@@ -934,7 +934,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'       => 'content-source-post-based',
-                'type'           => 'select2',
+                'type'           => 'select',
                 'label'          => esc_html__( 'Taxonomies', '@@text_domain' ),
                 'name'           => 'posts_taxonomies',
                 'default'        => array(),
@@ -1242,7 +1242,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'pro_note',
                 'name'        => 'social_pro_note',
                 'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
-                'description' => esc_html__( 'Social feeds are only available for PRO users.', '@@text_domain' ),
+                'description' => esc_html__( 'Social feeds such as Instagram, Youtube, etc...', '@@text_domain' ),
             )
         );
 
@@ -1618,7 +1618,7 @@ class Visual_Portfolio_Admin {
                     ),
                     array(
                         'value' => 'popup_gallery',
-                        'title' => esc_html__( 'Popup Gallery', '@@text_domain' ),
+                        'title' => esc_html__( 'Popup', '@@text_domain' ),
                         'icon'  => '<svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6.75" y="14.25" width="13.5" height="13.5" rx="1.25" transform="rotate(-90 6.75 14.25)" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M2 19L4.29088 16.7396" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5L5.51523 15.5152L5.5 18" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     ),
                 ),
@@ -1685,6 +1685,21 @@ class Visual_Portfolio_Admin {
                     'description' => esc_html__( 'Image Description', '@@text_domain' ),
                 ),
                 'condition' => array(
+                    array(
+                        'control' => 'items_click_action',
+                        'value'   => 'popup_gallery',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'items-click-action',
+                'type'        => 'pro_note',
+                'name'        => 'items_click_action_pro_note',
+                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                'description' => esc_html__( 'Display pages in popup iframe, not just images.', '@@text_domain' ),
+                'condition'   => array(
                     array(
                         'control' => 'items_click_action',
                         'value'   => 'popup_gallery',

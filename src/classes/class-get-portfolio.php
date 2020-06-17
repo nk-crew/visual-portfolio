@@ -1699,52 +1699,8 @@ class Visual_Portfolio_Get {
         }
 
         // Click action.
-        $popup_image = false;
-        $popup_video = false;
-
         switch ( $args['vp_opts']['items_click_action'] ) {
             case 'popup_gallery':
-                if ( isset( $args['allow_popup'] ) && $args['allow_popup'] ) {
-                    if ( isset( $args['format_video_url'] ) && $args['format_video_url'] ) {
-                        $popup_video = array(
-                            'url' => $args['format_video_url'],
-                        );
-                    } else {
-                        $img_id = $args['image_id'] ? $args['image_id'] : $args['no_image'];
-
-                        if ( $img_id ) {
-                            $attachment = get_post( $args['image_id'] );
-                            if ( $attachment && 'attachment' === $attachment->post_type ) {
-                                $img_meta    = wp_get_attachment_image_src( $args['image_id'], $args['img_size_popup'] );
-                                $img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
-                                $img_sm_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_sm_popup'] );
-
-                                $popup_image = apply_filters(
-                                    'vpf_extend_popup_image',
-                                    array(
-                                        'id'          => $args['image_id'],
-                                        'title'       => $attachment->post_title,
-                                        'description' => $attachment->post_content,
-                                        'caption'     => wp_get_attachment_caption( $attachment->ID ),
-                                        'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
-                                        'url'         => $img_meta[0],
-                                        'srcset'      => wp_get_attachment_image_srcset( $args['image_id'], $args['img_size_popup'] ),
-                                        'width'       => $img_meta[1],
-                                        'height'      => $img_meta[2],
-                                        'md_url'      => $img_md_meta[0],
-                                        'md_width'    => $img_md_meta[1],
-                                        'md_height'   => $img_md_meta[2],
-                                        'sm_url'      => $img_sm_meta[0],
-                                        'sm_width'    => $img_sm_meta[1],
-                                        'sm_height'   => $img_sm_meta[2],
-                                    )
-                                );
-                            } elseif ( $args['image_id'] ) {
-                                $popup_image = apply_filters( 'vpf_extend_custom_popup_image', false, $args['image_id'] );
-                            }
-                        }
-                    }
-                }
                 break;
             case false:
                 $args['url'] = false;
@@ -1774,44 +1730,7 @@ class Visual_Portfolio_Get {
         ?>
 
         <<?php echo esc_attr( $tag_name ); ?> class="<?php echo esc_attr( $class_name ); ?>" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
-            <?php
-            if ( $popup_image ) {
-                $title_source       = $args['vp_opts']['items_click_action_popup_title_source'] ? $args['vp_opts']['items_click_action_popup_title_source'] : '';
-                $description_source = $args['vp_opts']['items_click_action_popup_description_source'] ? $args['vp_opts']['items_click_action_popup_description_source'] : '';
-                ?>
-                <div class="vp-portfolio__item-popup"
-                    style="display: none;"
-                    data-vp-popup-img="<?php echo esc_url( $popup_image['url'] ); ?>"
-                    data-vp-popup-img-srcset="<?php echo esc_attr( $popup_image['srcset'] ); ?>"
-                    data-vp-popup-img-size="<?php echo esc_attr( $popup_image['width'] . 'x' . $popup_image['height'] ); ?>"
-                    data-vp-popup-md-img="<?php echo esc_url( $popup_image['md_url'] ); ?>"
-                    data-vp-popup-md-img-size="<?php echo esc_attr( $popup_image['md_width'] . 'x' . $popup_image['md_height'] ); ?>"
-                    data-vp-popup-sm-img="<?php echo esc_url( $popup_image['sm_url'] ); ?>"
-                    data-vp-popup-sm-img-size="<?php echo esc_attr( $popup_image['sm_width'] . 'x' . $popup_image['sm_height'] ); ?>"
-                >
-                    <?php
-                    if ( isset( $popup_image[ $title_source ] ) && $popup_image[ $title_source ] ) {
-                        ?>
-                        <h3 class="vp-portfolio__item-popup-title"><?php echo esc_html( $popup_image[ $title_source ] ); ?></h3>
-                        <?php
-                    }
-                    if ( isset( $popup_image[ $description_source ] ) && $popup_image[ $description_source ] ) {
-                        ?>
-                        <div class="vp-portfolio__item-popup-description"><?php echo wp_kses_post( $popup_image[ $description_source ] ); ?></div>
-                        <?php
-                    }
-                    ?>
-                </div>
-                <?php
-            } elseif ( $popup_video ) {
-                ?>
-                <div class="vp-portfolio__item-popup"
-                    style="display: none;"
-                    data-vp-popup-video="<?php echo esc_attr( $popup_video['url'] ); ?>"
-                ></div>
-                <?php
-            }
-            ?>
+            <?php self::item_popup_data( $args ); ?>
             <figure class="vp-portfolio__item">
                 <?php
                 $items_style_pref = '';
@@ -1824,6 +1743,103 @@ class Visual_Portfolio_Get {
             </figure>
         </<?php echo esc_attr( $tag_name ); ?>>
         <?php
+    }
+
+    /**
+     * Print item popup data.
+     *
+     * @param array $args - item args.
+     */
+    private static function item_popup_data( $args ) {
+        $popup_image = false;
+        $popup_video = false;
+
+        if ( isset( $args['allow_popup'] ) && $args['allow_popup'] ) {
+            if ( isset( $args['format_video_url'] ) && $args['format_video_url'] ) {
+                $popup_video = array(
+                    'url' => $args['format_video_url'],
+                );
+            } else {
+                $img_id = $args['image_id'] ? $args['image_id'] : $args['no_image'];
+
+                if ( $img_id ) {
+                    $attachment = get_post( $args['image_id'] );
+                    if ( $attachment && 'attachment' === $attachment->post_type ) {
+                        $img_meta    = wp_get_attachment_image_src( $args['image_id'], $args['img_size_popup'] );
+                        $img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
+                        $img_sm_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_sm_popup'] );
+
+                        $popup_image = apply_filters(
+                            'vpf_extend_popup_image',
+                            array(
+                                'id'          => $args['image_id'],
+                                'title'       => $attachment->post_title,
+                                'description' => $attachment->post_content,
+                                'caption'     => wp_get_attachment_caption( $attachment->ID ),
+                                'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+                                'url'         => $img_meta[0],
+                                'srcset'      => wp_get_attachment_image_srcset( $args['image_id'], $args['img_size_popup'] ),
+                                'width'       => $img_meta[1],
+                                'height'      => $img_meta[2],
+                                'md_url'      => $img_md_meta[0],
+                                'md_width'    => $img_md_meta[1],
+                                'md_height'   => $img_md_meta[2],
+                                'sm_url'      => $img_sm_meta[0],
+                                'sm_width'    => $img_sm_meta[1],
+                                'sm_height'   => $img_sm_meta[2],
+                            )
+                        );
+                    } elseif ( $args['image_id'] ) {
+                        $popup_image = apply_filters( 'vpf_extend_custom_popup_image', false, $args['image_id'] );
+                    }
+                }
+            }
+        }
+
+        ob_start();
+
+        if ( $popup_image ) {
+            $title_source       = $args['vp_opts']['items_click_action_popup_title_source'] ? $args['vp_opts']['items_click_action_popup_title_source'] : '';
+            $description_source = $args['vp_opts']['items_click_action_popup_description_source'] ? $args['vp_opts']['items_click_action_popup_description_source'] : '';
+            ?>
+            <div class="vp-portfolio__item-popup"
+                style="display: none;"
+                data-vp-popup-img="<?php echo esc_url( $popup_image['url'] ); ?>"
+                data-vp-popup-img-srcset="<?php echo esc_attr( $popup_image['srcset'] ); ?>"
+                data-vp-popup-img-size="<?php echo esc_attr( $popup_image['width'] . 'x' . $popup_image['height'] ); ?>"
+                data-vp-popup-md-img="<?php echo esc_url( $popup_image['md_url'] ); ?>"
+                data-vp-popup-md-img-size="<?php echo esc_attr( $popup_image['md_width'] . 'x' . $popup_image['md_height'] ); ?>"
+                data-vp-popup-sm-img="<?php echo esc_url( $popup_image['sm_url'] ); ?>"
+                data-vp-popup-sm-img-size="<?php echo esc_attr( $popup_image['sm_width'] . 'x' . $popup_image['sm_height'] ); ?>"
+            >
+                <?php
+                if ( isset( $popup_image[ $title_source ] ) && $popup_image[ $title_source ] ) {
+                    ?>
+                    <h3 class="vp-portfolio__item-popup-title"><?php echo esc_html( $popup_image[ $title_source ] ); ?></h3>
+                    <?php
+                }
+                if ( isset( $popup_image[ $description_source ] ) && $popup_image[ $description_source ] ) {
+                    ?>
+                    <div class="vp-portfolio__item-popup-description"><?php echo wp_kses_post( $popup_image[ $description_source ] ); ?></div>
+                    <?php
+                }
+                ?>
+            </div>
+            <?php
+        } elseif ( $popup_video ) {
+            ?>
+            <div class="vp-portfolio__item-popup"
+                style="display: none;"
+                data-vp-popup-video="<?php echo esc_url( $popup_video['url'] ); ?>"
+            ></div>
+            <?php
+        }
+
+        $popup_output = ob_get_clean();
+        $popup_output = apply_filters( 'vpf_print_popup_data', $popup_output, $args );
+
+        // phpcs:ignore
+        echo $popup_output;
     }
 
     /**

@@ -178,6 +178,8 @@ class Visual_Portfolio_Controls {
             return;
         }
         self::$registered_fields[ $args['name'] ] = $args;
+
+        do_action( 'vpf_registered_control', $args['name'], $args );
     }
 
     /**
