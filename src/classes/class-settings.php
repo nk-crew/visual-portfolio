@@ -20,13 +20,13 @@ class Visual_Portfolio_Settings {
      *
      * @var object
      */
-    public $settings_api;
+    public static $settings_api;
 
     /**
      * Visual_Portfolio_Settings constructor.
      */
     public function __construct() {
-        $this->init_actions();
+        self::init_actions();
     }
 
     /**
@@ -34,28 +34,40 @@ class Visual_Portfolio_Settings {
      *
      * @param string $option - option name.
      * @param string $section - section name.
-     * @param string $default - default option value.
+     * @param string $deprecated_default - default option value.
      *
      * @return bool|string
      */
-    public static function get_option( $option, $section, $default = '' ) {
+    public static function get_option( $option, $section, $deprecated_default = '' ) {
         $options = get_option( $section );
+        $result  = '';
 
         if ( isset( $options[ $option ] ) ) {
-            return 'off' === $options[ $option ] ? false : ( 'on' === $options[ $option ] ? true : $options[ $option ] );
+            $result = $options[ $option ];
+        } else {
+            // find default.
+            $fields = self::get_settings_fields();
+
+            if ( isset( $fields[ $section ] ) && is_array( $fields[ $section ] ) ) {
+                foreach ( $fields[ $section ] as $option ) {
+                    if ( $option === $option['name'] && isset( $option['default'] ) ) {
+                        $result = $option['default'];
+                    }
+                }
+            }
         }
 
-        return $default;
+        return 'off' === $result ? false : ( 'on' === $result ? true : $result );
     }
 
     /**
      * Init actions
      */
-    public function init_actions() {
-        $this->settings_api = new Visual_Portfolio_Settings_API();
+    public static function init_actions() {
+        self::$settings_api = new Visual_Portfolio_Settings_API();
 
-        add_action( 'admin_init', array( $this, 'admin_init' ) );
-        add_action( 'admin_menu', array( $this, 'admin_menu' ), 11 );
+        add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
+        add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ), 11 );
     }
 
     /**
@@ -63,13 +75,13 @@ class Visual_Portfolio_Settings {
      *
      * @return void
      */
-    public function admin_init() {
+    public static function admin_init() {
         // set the settings.
-        $this->settings_api->set_sections( $this->get_settings_sections() );
-        $this->settings_api->set_fields( $this->get_settings_fields() );
+        self::$settings_api->set_sections( self::get_settings_sections() );
+        self::$settings_api->set_fields( self::get_settings_fields() );
 
         // initialize settings.
-        $this->settings_api->admin_init();
+        self::$settings_api->admin_init();
     }
 
     /**
@@ -77,14 +89,14 @@ class Visual_Portfolio_Settings {
      *
      * @return void
      */
-    public function admin_menu() {
+    public static function admin_menu() {
         add_submenu_page(
             'edit.php?post_type=portfolio',
             esc_html__( 'Settings', '@@text_domain' ),
             esc_html__( 'Settings', '@@text_domain' ),
             'manage_options',
             '@@plugin_name-settings',
-            array( $this, 'print_settings_page' )
+            array( __CLASS__, 'print_settings_page' )
         );
     }
 
@@ -93,7 +105,7 @@ class Visual_Portfolio_Settings {
      *
      * @return array
      */
-    public function get_settings_sections() {
+    public static function get_settings_sections() {
         $sections = array(
             array(
                 'id'    => 'vp_general',
@@ -117,7 +129,7 @@ class Visual_Portfolio_Settings {
      *
      * @return array settings fields
      */
-    public function get_settings_fields() {
+    public static function get_settings_fields() {
         $settings_fields = array(
             'vp_general' => array(
                 array(
@@ -361,12 +373,12 @@ class Visual_Portfolio_Settings {
      *
      * @return void
      */
-    public function print_settings_page() {
+    public static function print_settings_page() {
         echo '<div class="wrap">';
         echo '<h2>' . esc_html__( 'Visual Portfolio Settings', '@@text_domain' ) . '</h2>';
 
-        $this->settings_api->show_navigation();
-        $this->settings_api->show_forms();
+        self::$settings_api->show_navigation();
+        self::$settings_api->show_forms();
 
         echo '</div>';
 

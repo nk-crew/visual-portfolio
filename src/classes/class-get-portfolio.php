@@ -153,7 +153,7 @@ class Visual_Portfolio_Get {
      */
     public static function allow_taxonomies_for_filter( $taxonomy ) {
         // check taxonomies from settings.
-        $custom_taxonomies        = Visual_Portfolio_Settings::get_option( 'filter_taxonomies', 'vp_general', '' );
+        $custom_taxonomies        = Visual_Portfolio_Settings::get_option( 'filter_taxonomies', 'vp_general' );
         $custom_taxonomies        = explode( ',', $custom_taxonomies );
         $custom_taxonomies_result = false;
         if ( $custom_taxonomies && ! empty( $custom_taxonomies ) ) {
@@ -220,7 +220,7 @@ class Visual_Portfolio_Get {
             $class .= ' vp-portfolio__stretch';
         }
 
-        $no_image = Visual_Portfolio_Settings::get_option( 'no_image', 'vp_general', false );
+        $no_image = Visual_Portfolio_Settings::get_option( 'no_image', 'vp_general' );
 
         // prepare image sizes.
         $img_size_popup    = 'vp_xl_popup';

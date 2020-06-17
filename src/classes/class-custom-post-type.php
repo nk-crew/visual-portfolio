@@ -49,7 +49,7 @@ class Visual_Portfolio_Custom_Post_Type {
      * Add custom post type
      */
     public function add_custom_post_type() {
-        $custom_slug = Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general', 'portfolio' );
+        $custom_slug = Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general' );
 
         // portfolio items post type.
         register_post_type(

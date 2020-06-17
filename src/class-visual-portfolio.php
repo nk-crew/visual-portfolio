@@ -125,13 +125,13 @@ class Visual_Portfolio {
      * Add image sizes.
      */
     public function add_image_sizes() {
-        $sm       = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'sm', 'vp_images', false ) : 500;
-        $md       = Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'md', 'vp_images', false ) : 800;
-        $lg       = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'lg', 'vp_images', false ) : 1280;
-        $xl       = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'xl', 'vp_images', false ) : 1920;
-        $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images', false ) : 500;
-        $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images', false ) : 800;
-        $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) ? Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images', false ) : 1920;
+        $sm       = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images' );
+        $md       = Visual_Portfolio_Settings::get_option( 'md', 'vp_images' );
+        $lg       = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images' );
+        $xl       = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images' );
+        $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images' );
+        $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images' );
+        $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images' );
 
         // custom image sizes.
         add_image_size( 'vp_sm', $sm, 9999 );

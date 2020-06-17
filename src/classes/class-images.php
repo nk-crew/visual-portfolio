@@ -42,7 +42,7 @@ class Visual_Portfolio_Images {
         }
 
         // check plugin settings.
-        $enabled = Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images', true );
+        $enabled = Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' );
         if ( ! $enabled ) {
             return false;
         }
