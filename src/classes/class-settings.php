@@ -162,7 +162,7 @@ class Visual_Portfolio_Settings {
                     'label'   => esc_html__( 'AJAX Caching and Preloading', '@@text_domain' ),
                     'desc'    => esc_html__( 'Reduce AJAX calls request time.', '@@text_domain' ),
                     'type'    => 'checkbox',
-                    'default' => 'on',
+                    'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? 'off' : 'on',
                     'is_pro'  => true,
                 ),
             ),
@@ -276,7 +276,7 @@ class Visual_Portfolio_Settings {
                     'label'   => esc_html__( 'Deep Linking', '@@text_domain' ),
                     'desc'    => esc_html__( 'Makes URL automatically change when you open popup and you can easily link to specific popup image.', '@@text_domain' ),
                     'type'    => 'checkbox',
-                    'default' => 'on',
+                    'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? 'off' : 'on',
                     'is_pro'  => true,
                 ),
 
@@ -354,7 +354,7 @@ class Visual_Portfolio_Settings {
                     'label'   => esc_html__( 'Pages iFrame Custom CSS', '@@text_domain' ),
                     'desc'    => esc_html__( 'When you display pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`.', '@@text_domain' ),
                     'type'    => 'textarea',
-                    'default' => '
+                    'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? '' : '
 .vp-popup-iframe .site-header,
 .vp-popup-iframe #site-footer,
 .vp-popup-iframe #colophon {
