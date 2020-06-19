@@ -49,9 +49,9 @@ class Visual_Portfolio_Settings {
             $fields = self::get_settings_fields();
 
             if ( isset( $fields[ $section ] ) && is_array( $fields[ $section ] ) ) {
-                foreach ( $fields[ $section ] as $option ) {
-                    if ( $option === $option['name'] && isset( $option['default'] ) ) {
-                        $result = $option['default'];
+                foreach ( $fields[ $section ] as $field_data ) {
+                    if ( $option === $field_data['name'] && isset( $field_data['default'] ) ) {
+                        $result = $field_data['default'];
                     }
                 }
             }
