@@ -14,16 +14,154 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Migrations {
     /**
+     * The version.
+     *
+     * @var string
+     */
+    protected $version = '@@plugin_version';
+
+    /**
+     * Initial version.
+     *
+     * @var string
+     */
+    protected $initial_version = '';
+
+    /**
+     * The theme version as stored in the db.
+     *
+     * @var string
+     */
+    protected $previous_version;
+
+    /**
      * Visual_Portfolio_Extend constructor.
      */
     public function __construct() {
-        $this->migrate_popup_caption_settings();
+        if ( is_admin() ) {
+            add_action( 'admin_init', array( $this, 'init' ), 3 );
+        } else {
+            add_action( 'wp', array( $this, 'init' ), 3 );
+        }
+    }
+
+    /**
+     * Init.
+     */
+    public function init() {
+        // Migration code added after 1.16.2 plugin version.
+        $saved_version   = get_option( 'vpf_db_version', '1.16.2' );
+        $current_version = $this->version;
+
+        foreach ( $this->get_migrations() as $migration ) {
+            if ( version_compare( $saved_version, $migration['version'], '<' ) ) {
+                call_user_func( $migration['cb'] );
+            }
+        }
+
+        if ( version_compare( $saved_version, $current_version, '<' ) ) {
+            update_option( 'vpf_db_version', $current_version );
+        }
+    }
+
+    /**
+     * Get all available migrations.
+     *
+     * @return array
+     */
+    public function get_migrations() {
+        return array(
+            array(
+                'version' => '2.0.0',
+                'cb'      => array( $this, 'v_2_0_0' ),
+            ),
+            array(
+                'version' => '1.11.0',
+                'cb'      => array( $this, 'v_1_11_0' ),
+            ),
+        );
+    }
+
+    /**
+     * 1. Change Portfolio content source to Post with custom post type Portfolio
+     * 2. Change filters, sort and pagination to layout-elements.
+     */
+    public function v_2_0_0() {
+        // Get all available Layouts.
+        // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408.
+        $layouts_query = get_posts(
+            array(
+                'post_type'      => 'vp_lists',
+                'posts_per_page' => -1,
+                'showposts'      => -1,
+                'paged'          => -1,
+            )
+        );
+
+        if ( $layouts_query ) {
+            foreach ( $layouts_query as $post ) {
+                // Change Portfolio content source to Post with custom post type Portfolio.
+                if ( 'portfolio' === get_post_meta( $post->ID, 'vp_content_source', true ) ) {
+                    update_post_meta( $post->ID, 'vp_content_source', 'post-based' );
+                    update_post_meta( $post->ID, 'vp_posts_source', 'portfolio' );
+                }
+
+                // Change filters, sort and pagination to layout-elements.
+                if ( ! get_post_meta( $post->ID, 'vp_layout_elements', true ) ) {
+                    $top    = array();
+                    $bottom = array();
+
+                    // Filter.
+                    if ( 'false' !== get_post_meta( $post->ID, 'vp_filter', true ) ) {
+                        $top[] = 'filter';
+                    } else {
+                        update_post_meta( $post->ID, 'vp_filter', 'minimal' );
+                    }
+
+                    // Sort.
+                    if ( 'false' !== get_post_meta( $post->ID, 'vp_sort', true ) ) {
+                        $top[] = 'sort';
+                    } else {
+                        update_post_meta( $post->ID, 'vp_sort', 'dropdown' );
+                    }
+
+                    // Pagination.
+                    if ( 'false' !== get_post_meta( $post->ID, 'vp_pagination_style', true ) ) {
+                        $bottom[] = 'pagination';
+                    } else {
+                        update_post_meta( $post->ID, 'vp_pagination_style', 'minimal' );
+                    }
+
+                    // Layout Elements.
+                    if ( ! empty( $top ) || ! empty( $bottom ) ) {
+                        update_post_meta(
+                            $post->ID,
+                            'vp_layout_elements',
+                            array(
+                                'top'    => array(
+                                    'elements' => $top,
+                                    'align'    => 'center',
+                                ),
+                                'items'  => array(
+                                    'elements' => array( 'items' ),
+                                ),
+                                'bottom' => array(
+                                    'elements' => $bottom,
+                                    'align'    => 'center',
+                                ),
+                            )
+                        );
+                    }
+                }
+            }
+            wp_reset_postdata();
+        }
     }
 
     /**
      * Move popup title and description settings to single Layouts.
      */
-    public function migrate_popup_caption_settings() {
+    public function v_1_11_0() {
         $options = get_option( 'vp_popup_gallery' );
 
         if ( ! isset( $options['show_caption'] ) && ! isset( $options['caption_title'] ) && ! isset( $options['caption_description'] ) ) {
