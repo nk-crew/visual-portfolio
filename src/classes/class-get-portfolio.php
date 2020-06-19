@@ -460,6 +460,7 @@ class Visual_Portfolio_Get {
         );
 
         $each_item_args = array(
+            'uid'                => '',
             'post_id'            => '',
             'url'                => '',
             'title'              => '',
@@ -548,6 +549,7 @@ class Visual_Portfolio_Get {
                     array_merge(
                         $each_item_args,
                         array(
+                            'uid'             => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
                             'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
                             'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
                             'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
@@ -586,6 +588,7 @@ class Visual_Portfolio_Get {
                 $filter_values  = array();
                 $categories     = array();
                 $all_taxonomies = get_object_taxonomies( $the_post );
+
                 foreach ( $all_taxonomies as $cat ) {
                     // allow only specific taxonomies for filter.
                     if ( ! self::allow_taxonomies_for_filter( $cat ) ) {
@@ -624,6 +627,7 @@ class Visual_Portfolio_Get {
                 $args = array_merge(
                     $each_item_args,
                     array(
+                        'uid'            => hash( 'crc32b', 'post-' . get_the_ID() ),
                         'post_id'        => get_the_ID(),
                         'url'            => get_permalink(),
                         'title'          => get_the_title(),
@@ -939,6 +943,11 @@ class Visual_Portfolio_Get {
 
             if ( ! isset( $options['images'] ) || ! is_array( $options['images'] ) ) {
                 $options['images'] = array();
+            }
+
+            // add unique IDs.
+            foreach ( $options['images'] as $k => $img ) {
+                $options['images'][ $k ]['uid'] = hash( 'crc32b', 'image-' . $k . $img['id'] );
             }
 
             if ( $count < 0 ) {
@@ -1723,6 +1732,9 @@ class Visual_Portfolio_Get {
         if ( $is_posts ) {
             // post_class functionality.
             $class_name = join( ' ', get_post_class( $class_name, get_the_ID() ) );
+        }
+        if ( $args['uid'] ) {
+            $class_name .= ' vp-portfolio__item-uid-' . esc_attr( $args['uid'] );
         }
 
         // Tag Name.
