@@ -108,25 +108,28 @@ class Visual_Portfolio_Migrations {
 
                 // Change filters, sort and pagination to layout-elements.
                 if ( ! get_post_meta( $post->ID, 'vp_layout_elements', true ) ) {
-                    $top    = array();
-                    $bottom = array();
+                    $top        = array();
+                    $bottom     = array();
+                    $filter     = get_post_meta( $post->ID, 'vp_filter', true );
+                    $sort       = get_post_meta( $post->ID, 'vp_sort', true );
+                    $pagination = get_post_meta( $post->ID, 'vp_pagination_style', true );
 
                     // Filter.
-                    if ( 'false' !== get_post_meta( $post->ID, 'vp_filter', true ) ) {
+                    if ( $filter && 'false' !== $filter && false !== $filter ) {
                         $top[] = 'filter';
                     } else {
                         update_post_meta( $post->ID, 'vp_filter', 'minimal' );
                     }
 
                     // Sort.
-                    if ( 'false' !== get_post_meta( $post->ID, 'vp_sort', true ) ) {
+                    if ( $sort && 'false' !== $sort && false !== $sort ) {
                         $top[] = 'sort';
                     } else {
                         update_post_meta( $post->ID, 'vp_sort', 'dropdown' );
                     }
 
                     // Pagination.
-                    if ( 'false' !== get_post_meta( $post->ID, 'vp_pagination_style', true ) ) {
+                    if ( $pagination && 'false' !== $pagination && false !== $pagination ) {
                         $bottom[] = 'pagination';
                     } else {
                         update_post_meta( $post->ID, 'vp_pagination_style', 'minimal' );
