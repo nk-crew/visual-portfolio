@@ -1,8 +1,4 @@
 const {
-    merge,
-} = window.lodash;
-
-const {
     VPSavedLayoutVariables,
 } = window;
 
@@ -24,7 +20,10 @@ function reducer( state = { data: VPSavedLayoutVariables.data }, action ) {
         if ( action.data && state ) {
             return {
                 ...state,
-                data: merge( {}, state.data, action.data ),
+                data: {
+                    ...state.data,
+                    ...action.data,
+                },
             };
         }
 
