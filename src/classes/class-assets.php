@@ -643,11 +643,23 @@ class Visual_Portfolio_Assets {
         }
 
         foreach ( $blocks as $block ) {
+            // Block.
             if (
                 isset( $block['blockName'] ) &&
                 'visual-portfolio/block' === $block['blockName'] &&
                 isset( $block['attrs']['content_source'] ) &&
                 isset( $block['attrs']['block_id'] )
+            ) {
+                self::enqueue( $block['attrs'] );
+
+                // Saved block.
+            } elseif (
+                isset( $block['blockName'] ) &&
+                (
+                    'visual-portfolio/saved' === $block['blockName'] ||
+                    'nk/visual-portfolio' === $block['blockName']
+                ) &&
+                isset( $block['attrs']['id'] )
             ) {
                 self::enqueue( $block['attrs'] );
             }
