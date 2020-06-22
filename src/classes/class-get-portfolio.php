@@ -1229,7 +1229,7 @@ class Visual_Portfolio_Get {
 
                     // Offset.
                     if ( $options['posts_offset'] ) {
-                        $query_opts['offset'] = $options['posts_offset'];
+                        $query_opts['offset'] = $options['posts_offset'] + ( $paged - 1 ) * $count;
                     }
                 }
 
