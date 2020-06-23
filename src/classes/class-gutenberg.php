@@ -41,6 +41,9 @@ class Visual_Portfolio_Gutenberg_Block {
             'block_id' => array(
                 'type' => 'string',
             ),
+            'align' => array(
+                'type' => 'string',
+            ),
             'className' => array(
                 'type' => 'string',
             ),
@@ -123,9 +126,21 @@ class Visual_Portfolio_Gutenberg_Block {
     public function block_render( $attributes ) {
         ob_start();
 
+        $attributes = array_merge(
+            array(
+                'align'     => '',
+                'className' => '',
+            ),
+            $attributes
+        );
+
         $class_name = 'wp-block-visual-portfolio';
 
-        if ( isset( $attributes['className'] ) && $attributes['className'] ) {
+        if ( $attributes['align'] ) {
+            $class_name .= ' align' . $attributes['align'];
+        }
+
+        if ( $attributes['className'] ) {
             $class_name .= ' ' . $attributes['className'];
         }
 

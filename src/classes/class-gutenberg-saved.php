@@ -40,6 +40,9 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
             'id' => array(
                 'type' => 'string',
             ),
+            'align' => array(
+                'type' => 'string',
+            ),
             'className' => array(
                 'type' => 'string',
             ),
@@ -79,6 +82,7 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
         $attributes = array_merge(
             array(
                 'id'        => '',
+                'align'     => '',
                 'className' => '',
             ),
             $attributes
@@ -89,6 +93,10 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
         }
 
         $class_name = 'wp-block-visual-portfolio';
+
+        if ( $attributes['align'] ) {
+            $class_name .= ' align' . $attributes['align'];
+        }
 
         if ( $attributes['className'] ) {
             $class_name .= ' ' . $attributes['className'];
