@@ -2377,54 +2377,6 @@ selector p {
     }
 
     /**
-     * Add Title metabox
-     *
-     * @param object $post The post object.
-     */
-    public function add_name_metabox( $post ) {
-        wp_nonce_field( basename( __FILE__ ), 'vp_layout_nonce' );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'  => 'text',
-                'label' => esc_html__( 'Name', '@@text_domain' ),
-                'name'  => 'list_name',
-                'value' => $post->post_title,
-            )
-        );
-
-        Visual_Portfolio_Controls::get(
-            array(
-                'type'        => 'text',
-                'label'       => esc_html__( 'Shortcode', '@@text_domain' ),
-                'description' => esc_html__( 'Place the shortcode where you want to show the portfolio list.', '@@text_domain' ),
-                'name'        => 'list_shortcode',
-                'value'       => $post->ID ? '[visual_portfolio id="' . $post->ID . '" class=""]' : '',
-                'readonly'    => true,
-            )
-        );
-
-        ?>
-
-        <style>
-            #submitdiv {
-                margin-top: -21px;
-                border-top: none;
-            }
-            .vp-controls-styles,
-            #post-body-content,
-            #submitdiv .handlediv,
-            #submitdiv .hndle,
-            #minor-publishing,
-            .wrap h1.wp-heading-inline,
-            .page-title-action {
-                display: none;
-            }
-        </style>
-        <?php
-    }
-
-    /**
      * Find post types options for control.
      *
      * @return array
