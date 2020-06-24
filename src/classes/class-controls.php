@@ -244,7 +244,7 @@ class Visual_Portfolio_Controls {
         if ( isset( $registered_data ) ) {
             $default = isset( $registered_data['default'] ) ? $registered_data['default'] : $default;
         }
-        if ( empty( $result ) && null !== $default ) {
+        if ( ! isset( $result ) && null !== $default ) {
             $result = $default;
         }
 
