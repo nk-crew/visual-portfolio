@@ -8,6 +8,7 @@ import Masonry from 'react-masonry-component';
  * Internal dependencies
  */
 import StylesRender from '../styles-render';
+import ToggleModal from '../toggle-modal';
 
 /**
  * WordPress dependencies
@@ -31,10 +32,6 @@ const {
 export default class TilesSelector extends Component {
     constructor( ...args ) {
         super( ...args );
-
-        this.state = {
-            isLayoutsShown: false,
-        };
 
         this.renderPreview = this.renderPreview.bind( this );
     }
@@ -103,38 +100,29 @@ export default class TilesSelector extends Component {
             onChange,
         } = this.props;
 
-        const {
-            isLayoutsShown,
-        } = this.state;
-
         return (
             <Fragment>
                 <div className="vpf-component-tiles-selector">
-                    <Button
-                        isSecondary
-                        isLarge
-                        onClick={ () => this.setState( { isLayoutsShown: ! isLayoutsShown } ) }
-                        aria-expanded={ isLayoutsShown }
+                    <ToggleModal
+                        modalTitle={ __( 'Tiles', '@@text_domain' ) }
+                        buttonLabel={ __( 'Edit Tiles', '@@text_domain' ) }
                     >
-                        <div className="vpf-tiles-preview-button">
-                            { this.renderPreview( value ) }
+                        <div className="vpf-component-tiles-selector-items">
+                            { options.map( ( data ) => (
+                                <Button
+                                    key={ data.value }
+                                    onClick={ () => onChange( data.value ) }
+                                    className={ classnames( 'vpf-tiles-preview-button', value === data.value ? 'vpf-tiles-preview-button-active' : '' ) }
+                                >
+                                    { this.renderPreview( data.value ) }
+                                </Button>
+                            ) ) }
                         </div>
-                        { isLayoutsShown ? __( 'Hide Available Tiles', '@@text_domain' ) : __( 'Display Available Tiles', '@@text_domain' ) }
-                    </Button>
-                </div>
-                { isLayoutsShown ? (
-                    <div className="vpf-component-tiles-selector-items">
-                        { options.map( ( data ) => (
-                            <Button
-                                key={ data.value }
-                                onClick={ () => onChange( data.value ) }
-                                className={ classnames( 'vpf-tiles-preview-button', value === data.value ? 'vpf-tiles-preview-button-active' : '' ) }
-                            >
-                                { this.renderPreview( data.value ) }
-                            </Button>
-                        ) ) }
+                    </ToggleModal>
+                    <div className="vpf-tiles-preview-button">
+                        { this.renderPreview( value ) }
                     </div>
-                ) : '' }
+                </div>
             </Fragment>
         );
     }

@@ -1,4 +1,40 @@
+%vpf-icons-selector-item {
+    height: auto;
+    padding: 10px;
+    margin: 0;
+    color: #636569;
+    // stylelint-disable-next-line
+    background: #f7f7f7 !important;
+    border: 1px solid #f7f7f7;
+    border-radius: 5px;
+    outline: none;
 
+    &:hover,
+    &:focus {
+        // stylelint-disable-next-line
+        border-color: #a1a7af !important;
+        // stylelint-disable-next-line
+        box-shadow: 0 0 0 1px #a1a7af !important;
+        // stylelint-disable-next-line
+        background: #fff !important;
+    }
+}
+%vpf-icons-selector-item-active {
+    // stylelint-disable-next-line
+    border-color: #007cba !important;
+    // stylelint-disable-next-line
+    box-shadow: 0 0 0 1px #007cba !important;
+    // stylelint-disable-next-line
+    background: #fff !important;
+
+    svg {
+        opacity: 1;
+    }
+}
+
+.vpf-control-wrap-icons_selector {
+    margin-bottom: 24px;
+}
 .vpf-component-icon-selector {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -6,20 +42,13 @@
     width: 100%;
 
     .vpf-component-icon-selector-item {
+        @extend %vpf-icons-selector-item;
+
         display: flex;
         flex-direction: column;
         align-items: center;
         min-width: 0;
-        height: auto;
-        padding: 10px;
-        margin: 0;
-        color: #636569;
         cursor: pointer;
-        // stylelint-disable-next-line
-        background: #f7f7f7 !important;
-        border: 1px solid #f7f7f7;
-        border-radius: 5px;
-        outline: none;
         transition: .2s border, .2s background-color, .2s box-shadow;
 
         svg {
@@ -30,27 +59,8 @@
             fill: none;
         }
 
-        &:hover,
-        &:focus {
-            // stylelint-disable-next-line
-            border-color: #a1a7af !important;
-            // stylelint-disable-next-line
-            box-shadow: 0 0 0 1px #a1a7af !important;
-            // stylelint-disable-next-line
-            background: #fff !important;
-        }
-
         &.vpf-component-icon-selector-item-active {
-            // stylelint-disable-next-line
-            border-color: #007cba !important;
-            // stylelint-disable-next-line
-            box-shadow: 0 0 0 1px #007cba !important;
-            // stylelint-disable-next-line
-            background: #fff !important;
-
-            svg {
-                opacity: 1;
-            }
+            @extend %vpf-icons-selector-item-active;
         }
 
         span {
