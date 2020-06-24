@@ -288,6 +288,7 @@ function parseImgData( link ) {
 if ( settingsPopupGallery.enable_on_wordpress_images ) {
     $( document ).on( 'click', `
         .wp-block-image > a,
+        .wp-block-image > figure > a,
         .wp-block-gallery .blocks-gallery-item > figure > a,
         .wp-block-media-text > figure > a,
         .gallery .gallery-icon > a,
