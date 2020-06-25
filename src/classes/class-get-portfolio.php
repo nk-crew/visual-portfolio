@@ -1002,12 +1002,12 @@ class Visual_Portfolio_Get {
 
                     // title.
                     if ( 'custom' !== $options['images_titles_source'] ) {
-                        $images[ $k ]['title'] = $img_meta[ $options['images_titles_source'] ];
+                        $images[ $k ]['title'] = isset( $img_meta[ $options['images_titles_source'] ] ) ? $img_meta[ $options['images_titles_source'] ] : '';
                     }
 
                     // description.
                     if ( 'custom' !== $options['images_descriptions_source'] ) {
-                        $images[ $k ]['description'] = $img_meta[ $options['images_descriptions_source'] ];
+                        $images[ $k ]['description'] = isset( $img_meta[ $options['images_descriptions_source'] ] ) ? $img_meta[ $options['images_descriptions_source'] ] : '';
                     }
 
                     // add published date.
