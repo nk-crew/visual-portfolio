@@ -38,6 +38,10 @@ class Visual_Portfolio_Custom_Post_Type {
         // change allowed blocks for vp_lists post type.
         add_filter( 'allowed_block_types', array( $this, 'vp_lists_allowed_block_types' ), 10, 2 );
 
+        // force enable Gutenberg editor in 'vp_lists' for Classic Editor plugin.
+        add_action( 'classic_editor_enabled_editors_for_post_type', array( $this, 'vp_lists_classic_plugin_force_gutenberg' ), 150, 2 );
+        add_action( 'use_block_editor_for_post_type', array( $this, 'vp_lists_classic_plugin_force_gutenberg_2' ), 150, 2 );
+
         // highlight admin menu items.
         add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
 
@@ -486,6 +490,37 @@ class Visual_Portfolio_Custom_Post_Type {
                 );
             }
         }
+    }
+
+    /**
+     * Force set Gutenberg editor for 'vp_lists' in Classic Editor plugin.
+     *
+     * @param array  $editors    Associative array of the editors and whether they are enabled for the post type.
+     * @param string $post_type The post type.
+     */
+    public function vp_lists_classic_plugin_force_gutenberg( $editors, $post_type ) {
+        if ( 'vp_lists' !== $post_type ) {
+            return $editors;
+        }
+
+        return array(
+            'classic_editor' => false,
+            'block_editor'   => true,
+        );
+    }
+
+    /**
+     * Force set Gutenberg editor for 'vp_lists' in Classic Editor plugin.
+     *
+     * @param boolean $use_block_editor Use block editor.
+     * @param string  $post_type The post type.
+     */
+    public function vp_lists_classic_plugin_force_gutenberg_2( $use_block_editor, $post_type ) {
+        if ( 'vp_lists' !== $post_type ) {
+            return $use_block_editor;
+        }
+
+        return true;
     }
 
     /**
