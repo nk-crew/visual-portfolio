@@ -302,6 +302,7 @@ ControlsRender.Control = function( props ) {
                 mode={ props.mode }
                 maxLines={ props.max_lines }
                 minLines={ props.min_lines }
+                codePlaceholder={ props.code_placeholder }
                 onChange={ ( val ) => onChange( val ) }
             />
         );

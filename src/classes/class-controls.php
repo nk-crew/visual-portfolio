@@ -34,52 +34,53 @@ class Visual_Portfolio_Controls {
      */
     private static $default_args = array(
         // category for registered fields.
-        'category'       => '',
+        'category'         => '',
 
-        'type'           => 'text',
-        'label'          => false,
-        'description'    => false,
-        'name'           => '',
-        'value'          => '',
-        'value_callback' => '',
-        'placeholder'    => '',
-        'readonly'       => false,
+        'type'             => 'text',
+        'label'            => false,
+        'description'      => false,
+        'name'             => '',
+        'value'            => '',
+        'value_callback'   => '',
+        'placeholder'      => '',
+        'readonly'         => false,
 
         // control-specific args.
         // select.
-        'options'        => array(),
-        'searchable'     => false,
-        'multiple'       => false,
-        'creatable'      => false,
+        'options'          => array(),
+        'searchable'       => false,
+        'multiple'         => false,
+        'creatable'        => false,
         // range.
-        'min'            => '',
-        'max'            => '',
-        'step'           => '1',
+        'min'              => '',
+        'max'              => '',
+        'step'             => '1',
         // textarea.
-        'cols'           => '',
-        'rows'           => '',
+        'cols'             => '',
+        'rows'             => '',
         // color.
-        'alpha'          => false,
+        'alpha'            => false,
         // align.
-        'extended'       => false,
+        'extended'         => false,
         // code editor.
-        'mode'           => 'css',
-        'max_lines'      => 20,
-        'min_lines'      => 5,
-        'allow_modal'    => true,
-        'classes_tree'   => false,
+        'mode'             => 'css',
+        'max_lines'        => 20,
+        'min_lines'        => 5,
+        'allow_modal'      => true,
+        'classes_tree'     => false,
+        'code_placeholder' => '',
         // elements selector.
-        'locations'      => array(),
+        'locations'        => array(),
 
         // hint.
-        'hint'           => false,
-        'hint_place'     => 'top',
+        'hint'             => false,
+        'hint_place'       => 'top',
 
         // display in setup wizard.
-        'setup_wizard'   => false,
+        'setup_wizard'     => false,
 
         // condition.
-        'condition'      => array(
+        'condition'        => array(
             /**
              * Array of arrays with data:
              *  'control'  - control name.
@@ -89,7 +90,7 @@ class Visual_Portfolio_Controls {
         ),
 
         // style.
-        'style'          => array(
+        'style'            => array(
             /**
              * Array of arrays with data:
              *  'element'  - CSS selector string (.vp-portfolio__item, .vp-portfolio__item-overlay, etc).
@@ -98,8 +99,8 @@ class Visual_Portfolio_Controls {
              */
         ),
 
-        'class'          => '',
-        'wrapper_class'  => '',
+        'class'            => '',
+        'wrapper_class'    => '',
     );
 
     /**

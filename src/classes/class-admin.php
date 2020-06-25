@@ -2348,17 +2348,18 @@ class Visual_Portfolio_Admin {
          */
         Visual_Portfolio_Controls::register(
             array(
-                'category'     => 'custom_css',
-                'type'         => 'code_editor',
-                'name'         => 'custom_css',
-                'max_lines'    => 20,
-                'min_lines'    => 5,
-                'mode'         => 'css',
-                'mode'         => 'css',
-                'allow_modal'  => true,
-                'classes_tree' => true,
-                'default'      => '',
-                'description'  => '<p></p>
+                'category'         => 'custom_css',
+                'type'             => 'code_editor',
+                'name'             => 'custom_css',
+                'max_lines'        => 20,
+                'min_lines'        => 5,
+                'mode'             => 'css',
+                'mode'             => 'css',
+                'allow_modal'      => true,
+                'classes_tree'     => true,
+                'code_placeholder' => "selector {\n\n}",
+                'default'          => '',
+                'description'      => '<p></p>
                 <p>' . wp_kses_post( __( 'Use <code>selector</code> rule to change block styles.', '@@text_domain' ) ) . '</p>
                 <p>' . esc_html__( 'Example:', '@@text_domain' ) . '</p>
                 <pre class="vpf-control-pre-custom-css">

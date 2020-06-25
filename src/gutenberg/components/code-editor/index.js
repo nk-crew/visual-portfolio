@@ -27,6 +27,7 @@ export default class CodeEditor extends Component {
             mode,
             maxLines,
             minLines,
+            codePlaceholder,
         } = this.props;
 
         return (
@@ -53,8 +54,10 @@ export default class CodeEditor extends Component {
                 editorProps={ {
                     $blockScrolling: Infinity,
                 } }
-                value={ value }
-                onChange={ onChange }
+                value={ value || codePlaceholder }
+                onChange={ ( val ) => {
+                    onChange( val === codePlaceholder ? '' : val );
+                } }
                 mode={ mode }
                 maxLines={ maxLines }
                 minLines={ minLines }
