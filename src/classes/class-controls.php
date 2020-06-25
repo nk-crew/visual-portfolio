@@ -272,6 +272,12 @@ class Visual_Portfolio_Controls {
             $result = true;
         }
 
+        // custom CSS.
+        if ( 'custom_css' === $name && $result ) {
+            $result = wp_kses( $result, array( '\'', '\"' ) );
+            $result = str_replace( '&gt;', '>', $result );
+        }
+
         return $result;
     }
 }

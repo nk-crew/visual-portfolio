@@ -55,9 +55,7 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
 
         // Custom CSS.
         if ( isset( $options['custom_css'] ) && $options['custom_css'] ) {
-            $custom_css = wp_kses( $options['custom_css'], array( '\'', '\"' ) );
-            $custom_css = str_replace( '&gt;', '>', $custom_css );
-            $custom_css = str_replace( 'selector', $selector, $custom_css );
+            $custom_css = str_replace( 'selector', $selector, $options['custom_css'] );
 
             $result .= $custom_css;
         }
