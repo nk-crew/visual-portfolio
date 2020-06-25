@@ -44,10 +44,11 @@ export default class BlockEdit extends Component {
 
         const {
             block_id: blockId,
+            content_source: contentSource,
             setup_wizard: setupWizard,
         } = attributes;
 
-        if ( ! setupWizard && ! blockId ) {
+        if ( ! setupWizard && ( ! blockId || ! contentSource ) ) {
             setAttributes( {
                 setup_wizard: 'true',
             } );
