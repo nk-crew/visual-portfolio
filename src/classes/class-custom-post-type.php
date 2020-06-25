@@ -150,11 +150,11 @@ class Visual_Portfolio_Custom_Post_Type {
             'vp_lists',
             array(
                 'labels'          => array(
-                    'name'               => _x( 'Saved', 'Post Type General Name', '@@text_domain' ),
+                    'name'               => _x( 'Saved Layouts', 'Post Type General Name', '@@text_domain' ),
                     'singular_name'      => _x( 'Saved Layout', 'Post Type Singular Name', '@@text_domain' ),
                     'menu_name'          => __( 'Visual Portfolio', '@@text_domain' ),
                     'parent_item_colon'  => __( 'Parent Portfolio Item', '@@text_domain' ),
-                    'all_items'          => __( 'Saved', '@@text_domain' ),
+                    'all_items'          => __( 'Saved Layouts', '@@text_domain' ),
                     'view_item'          => __( 'View Saved Layout', '@@text_domain' ),
                     'add_new_item'       => __( 'Add New Saved Layout', '@@text_domain' ),
                     'add_new'            => __( 'Add New', '@@text_domain' ),
