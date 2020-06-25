@@ -111,9 +111,28 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
-= 2.0.0 =
+! IMPORTANT for v2.0 - this is a major plugin upgrade. A lot of things were changed. We recommend you test it on a staging site first before update it on the production site.
 
-! IMPORTANT - this is a major plugin upgrade. A lot of things were changed. We recommend you test it on a staging site first before update it on the production site.
+Migration Notes:
+
+* If you extended portfolio options using PHP, you will need to remove `vp_` prefix from your custom options. Example - <https://github.com/nk-o/visual-portfolio/blob/master/src/classes/class-admin.php#L854-L865>
+* If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - <https://visualportfolio.co/documentation/developers/css-variables/>
+* If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-o/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
+
+= 2.0.1 =
+
+* fixed removing all images settings when editing gallery images
+* fixed bug, when Saved Layout value `0` or `false` resets to defaults (for example, items gaps)
+* fixed custom CSS escape symbol `>`
+* fixed popup image for the old Gutenberg image block structure
+* fixed setup wizard displaying in Saved Layouts
+* fixed retrieve registered value of Saved Layout
+* force enable Gutenberg editor for Saved Layouts to prevent conflicts with plugins, that uses Classic Editor
+* changed images uploading control (added resorting, removing and adding new images, instead of default WordPress gallery edit tool)
+* changed tiles selector to modal component (better UI)
+* changed "Saved" menu item to "Saved Layouts", as users couldn't find it
+
+= 2.0.0 =
 
 * updated overall UI
 * updated all items styles
