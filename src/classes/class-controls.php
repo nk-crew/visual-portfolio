@@ -234,7 +234,12 @@ class Visual_Portfolio_Controls {
      */
     public static function get_registered_value( $name, $post_id = false ) {
         // get meta data.
-        $result = $post_id ? get_post_meta( $post_id, 'vp_' . $name, true ) : null;
+        $result = null;
+
+        // get meta data from saved layout.
+        if ( $post_id && metadata_exists( 'post', $post_id, 'vp_' . $name ) ) {
+            $result = get_post_meta( $post_id, 'vp_' . $name, true );
+        }
 
         // registered data.
         $registered_array = self::get_registered_array();
@@ -245,7 +250,7 @@ class Visual_Portfolio_Controls {
         if ( isset( $registered_data ) ) {
             $default = isset( $registered_data['default'] ) ? $registered_data['default'] : $default;
         }
-        if ( ! isset( $result ) && null !== $default ) {
+        if ( ! isset( $result ) && isset( $default ) ) {
             $result = $default;
         }
 
