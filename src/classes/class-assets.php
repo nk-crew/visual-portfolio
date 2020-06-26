@@ -328,6 +328,33 @@ class Visual_Portfolio_Assets {
             $vp_deps[] = 'lazysizes';
         }
 
+        // CSS Vars Polyfill.
+        if ( apply_filters( 'vpf_enqueue_plugin_css_vars_polyfill', true ) ) {
+            $polyfill_name    = 'ie11-custom-properties';
+            $polyfill_version = '4.0.1';
+            $polyfill_url     = visual_portfolio()->plugin_url . 'assets/vendor/ie11-custom-properties/ie11-custom-properties.js?ver=' . $polyfill_version;
+
+            // Already added in 3rd-party code.
+            if ( wp_script_is( $polyfill_name ) || wp_script_is( $polyfill_name, 'registered' ) ) {
+                return;
+            }
+
+            wp_register_script( $polyfill_name, '', array(), $polyfill_version, true );
+            wp_add_inline_script(
+                $polyfill_name,
+                '!function( d ) {
+                    // For IE11 only.
+                    if( window.MSInputMethodContext && document.documentMode ) {
+                        var s = d.createElement( \'script\' );
+                        s.src = \'' . esc_url( $polyfill_url ) . '\';
+                        d.head.appendChild( s );
+                    }
+                }(document)'
+            );
+
+            $vp_deps[] = $polyfill_name;
+        }
+
         // Visual Portfolio CSS.
         $vp_styles = array(
             '@@plugin_name'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
