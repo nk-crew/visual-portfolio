@@ -1258,7 +1258,6 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-source-additional',
                 'type'        => 'range',
                 'label'       => esc_html__( 'Items Per Page', '@@text_domain' ),
-                'description' => esc_html__( 'Type `-1` to output all available items (helpful for image galleries). But be careful, the output of all your posts can adversely affect the performance of your site.', '@@text_domain' ),
                 'name'        => 'items_count',
                 'default'     => 6,
                 'min'         => 1,

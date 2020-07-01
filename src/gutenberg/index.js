@@ -12,6 +12,7 @@ import './store';
  * Extensions
  */
 import './extensions/block-id';
+import './extensions/customize-controls';
 
 /**
  * Blocks

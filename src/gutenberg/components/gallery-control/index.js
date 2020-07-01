@@ -352,11 +352,11 @@ export default compose( [
 
 
 // add list of all categories to gallery images.
-addFilter( 'vpf.editor.controls-render', 'vpf/editor/controls-render/images-categories-suggestions', ( data ) => {
+addFilter( 'vpf.editor.controls-render-data', 'vpf/editor/controls-render-data/images-categories-suggestions', ( data ) => {
     if ( 'images' === data.name ) {
         const categories = [];
 
-        // find all use categories.
+        // find all used categories.
         if ( data.attributes.images && data.attributes.images.length ) {
             data.attributes.images.forEach( ( image ) => {
                 if ( image.categories && image.categories.length ) {

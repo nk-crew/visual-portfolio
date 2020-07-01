@@ -60,10 +60,6 @@ const {
     controls_categories: registeredControlsCategories,
 } = window.VPGutenbergVariables;
 
-const {
-    VPSavedLayoutVariables,
-} = window;
-
 const openedCategoriesCache = {};
 
 /**
@@ -101,12 +97,7 @@ class ControlsRender extends Component {
                     return;
                 }
 
-                // Allow Stretch control on Saved Layouts editor only.
-                if ( 'stretch' === control.name && ! VPSavedLayoutVariables ) {
-                    return;
-                }
-
-                const controlData = applyFilters( 'vpf.editor.controls-render', {
+                const controlData = applyFilters( 'vpf.editor.controls-render-data', {
                     attributes,
                     setAttributes,
                     onChange: ( val ) => {
@@ -121,12 +112,16 @@ class ControlsRender extends Component {
                 }
 
                 result.push(
-                    <ControlsRender.Control
-                        key={ `control-${ control.name }-${ control.label }` }
-                        { ...controlData }
-                        clientId={ clientId }
-                        isSetupWizard={ isSetupWizard }
-                    />
+                    applyFilters(
+                        'vpf.editor.controls-render',
+                        <ControlsRender.Control
+                            key={ `control-${ control.name }-${ control.label }` }
+                            { ...controlData }
+                            clientId={ clientId }
+                            isSetupWizard={ isSetupWizard }
+                        />,
+                        controlData
+                    )
                 );
             } );
 
@@ -504,6 +499,10 @@ ControlsRender.Control = function( props ) {
  * Check if control is allowed to rendering.
  */
 ControlsRender.AllowRender = function( props, isSetupWizard = false ) {
+    if ( props.skip ) {
+        return false;
+    }
+
     if ( props.condition && props.condition.length && ! controlConditionCheck( props.condition, props.attributes ) ) {
         return false;
     }
