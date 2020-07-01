@@ -18,6 +18,15 @@ document.addEventListener( 'click', ( e ) => {
     }
 }, true );
 
+// prevent click on <select> and similar elements.
+document.addEventListener( 'mousedown', ( e ) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    e.target.blur();
+    window.focus();
+}, true );
+
 // add dynamic data to AJAX calls.
 $doc.on( 'startLoadingNewItems.vpf', ( event, vpObject, url, ajaxData ) => {
     if ( 'vpf' !== event.namespace ) {
