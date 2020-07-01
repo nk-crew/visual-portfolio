@@ -72,6 +72,8 @@ export default class IframePreview extends Component {
                 // select current block on click message.
                 if ( 'clicked' === message ) {
                     wp.data.dispatch( 'core/editor' ).selectBlock( clientId );
+
+                    window.focus();
                 }
             },
         }, this.frameRef.current );
