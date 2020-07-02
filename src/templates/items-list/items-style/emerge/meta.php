@@ -70,7 +70,11 @@ $show_meta = $inline_meta ||
                             if ( isset( $args['url_target'] ) && $args['url_target'] ) :
                                 ?>
                                 target="<?php echo esc_attr( $args['url_target'] ); ?>"
-                                rel="noopener noreferrer"
+                                <?php
+                            endif;
+                            if ( isset( $args['url_rel'] ) && $args['url_rel'] ) :
+                                ?>
+                                rel="<?php echo esc_attr( $args['url_rel'] ); ?>"
                                 <?php
                             endif;
                             ?>

@@ -1649,6 +1649,21 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'items-click-action',
+                'type'      => 'text',
+                'label'     => esc_html__( 'Rel', '@@text_domain' ),
+                'name'      => 'items_click_action_url_rel',
+                'default'   => '',
+                'condition' => array(
+                    array(
+                        'control' => 'items_click_action',
+                        'value'   => 'url',
+                    ),
+                ),
+            )
+        );
 
         // popup.
         Visual_Portfolio_Controls::register(

@@ -110,4 +110,4 @@ const withUniqueBlockId = createHigherOrderComponent( ( BlockEdit ) => {
     } ) )( newEdit );
 }, 'withUniqueBlockId' );
 
-addFilter( 'editor.BlockEdit', 'lazyblocks/uniqueBlockId', withUniqueBlockId );
+addFilter( 'editor.BlockEdit', 'vpf/editor/unique-block-id', withUniqueBlockId );

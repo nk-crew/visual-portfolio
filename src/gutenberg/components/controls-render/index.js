@@ -101,7 +101,8 @@ class ControlsRender extends Component {
                     attributes,
                     setAttributes,
                     onChange: ( val ) => {
-                        setAttributes( { [ control.name ]: val } );
+                        const newAttrs = applyFilters( 'vpf.editor.controls-on-change', { [ control.name ]: val }, control, val, attributes );
+                        setAttributes( newAttrs );
                     },
                     ...control,
                 } );
