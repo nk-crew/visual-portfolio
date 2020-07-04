@@ -29,24 +29,8 @@ const {
     Button,
 } = wp.components;
 
-const {
-    VPSavedLayoutVariables,
-} = window;
-
-addFilter( 'vpf.editor.controls-render-data', 'vpf/editor/controls-render-data/customize-controls', ( data ) => {
-    // Allow Stretch control on Saved Layouts editor only.
-    if ( 'stretch' === data.name && ! VPSavedLayoutVariables ) {
-        data = {
-            ...data,
-            skip: true,
-        };
-    }
-
-    return data;
-} );
-
+// Items count with "All Items" button.
 addFilter( 'vpf.editor.controls-render', 'vpf/editor/controls-render/customize-controls', ( render, data ) => {
-    // Items count with unlimited button.
     if ( 'items_count' === data.name ) {
         const {
             description,
