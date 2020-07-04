@@ -40,7 +40,7 @@ addFilter( 'vpf.editor.controls-render', 'vpf/editor/controls-render/customize-c
 
         const renderControlHelp = description ? <RawHTML>{ description }</RawHTML> : false;
         const renderControlClassName = classnames( 'vpf-control-wrap', `vpf-control-wrap-${ data.type }` );
-        const controlVal = controlGetValue( data.name, attributes );
+        const controlVal = parseInt( controlGetValue( data.name, attributes ), 10 );
 
         render = (
             <BaseControl
