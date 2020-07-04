@@ -56,11 +56,6 @@ class Visual_Portfolio_Admin {
 
             $block_data = Visual_Portfolio_Get::get_options( array( 'id' => get_the_ID() ) );
 
-            // remove id from block data, as we don't need this in our layouts editor.
-            if ( isset( $block_data['id'] ) ) {
-                unset( $block_data['id'] );
-            }
-
             wp_localize_script(
                 '@@plugin_name-saved-layouts',
                 'VPSavedLayoutVariables',

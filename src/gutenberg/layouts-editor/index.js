@@ -48,7 +48,7 @@ class LayoutsEditorBlock extends Component {
             <BlockEdit
                 attributes={ {
                     ...blockData,
-                    block_id: clientId,
+                    block_id: blockData.id || clientId,
                 } }
                 setAttributes={ ( data ) => {
                     updateBlockData( data );
