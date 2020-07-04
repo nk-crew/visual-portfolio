@@ -104,7 +104,7 @@ export default function getDynamicCSS( options ) {
 
     // Custom CSS.
     if ( 'undefined' !== typeof options.custom_css && options.custom_css ) {
-        result += options.custom_css.replace( 'selector', selector );
+        result += options.custom_css.replace( /selector/g, selector );
     }
 
     return result;
