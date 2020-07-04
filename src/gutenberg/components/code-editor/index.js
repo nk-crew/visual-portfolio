@@ -20,6 +20,37 @@ const {
  * Component Class
  */
 export default class CodeEditor extends Component {
+    constructor( ...args ) {
+        super( ...args );
+
+        this.state = {
+            codePlaceholder: this.props.codePlaceholder,
+        };
+
+        this.maybeRemovePlaceholder = this.maybeRemovePlaceholder.bind( this );
+    }
+
+    componentDidMount() {
+        this.maybeRemovePlaceholder();
+    }
+
+    /**
+     * Remove placeholder after first change.
+     */
+    maybeRemovePlaceholder() {
+        const {
+            value,
+        } = this.props;
+
+        const {
+            codePlaceholder,
+        } = this.state;
+
+        if ( value && codePlaceholder ) {
+            this.setState( { codePlaceholder: '' } );
+        }
+    }
+
     render() {
         const {
             value,
@@ -27,8 +58,11 @@ export default class CodeEditor extends Component {
             mode,
             maxLines,
             minLines,
-            codePlaceholder,
         } = this.props;
+
+        const {
+            codePlaceholder,
+        } = this.state;
 
         return (
             <AceEditor
@@ -57,6 +91,8 @@ export default class CodeEditor extends Component {
                 value={ value || codePlaceholder }
                 onChange={ ( val ) => {
                     onChange( val === codePlaceholder ? '' : val );
+
+                    this.maybeRemovePlaceholder();
                 } }
                 mode={ mode }
                 maxLines={ maxLines }
