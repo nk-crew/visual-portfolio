@@ -72,7 +72,7 @@ window.iFrameResizer = {
 
             dynamicCSScache[ styleId ] = data.styles;
 
-            $style.html( data.styles );
+            $style.text( data.styles );
             break;
         }
         // no default

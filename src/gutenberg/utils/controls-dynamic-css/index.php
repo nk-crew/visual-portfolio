@@ -55,7 +55,17 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
 
         // Custom CSS.
         if ( isset( $options['custom_css'] ) && $options['custom_css'] ) {
+            // replace 'selector' to actual css selector.
             $custom_css = str_replace( 'selector', $selector, $options['custom_css'] );
+
+            // a little security fix.
+            $custom_css = str_replace( '</', '&lt;/', $custom_css );
+
+            if ( isset( $options['id'] ) ) {
+                $custom_css = str_replace( '&gt;', '>', $custom_css );
+                $custom_css = str_replace( '\"', '"', $custom_css );
+                $custom_css = str_replace( "\'", "'", $custom_css );
+            }
 
             $result .= $custom_css;
         }

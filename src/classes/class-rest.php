@@ -142,11 +142,10 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
                 if ( isset( $data[ $prefixed_name ] ) ) {
                     if (
                         'vp_images' === $prefixed_name ||
-                        'vp_layout_elements' === $prefixed_name
+                        'vp_layout_elements' === $prefixed_name ||
+                        'vp_custom_css' === $prefixed_name
                     ) {
                         $result = $data[ $prefixed_name ];
-                    } elseif ( 'vp_custom_css' === $prefixed_name ) {
-                        $result = wp_kses( $data[ $prefixed_name ], array( '\'', '\"' ) );
                     } elseif ( is_array( $data[ $prefixed_name ] ) ) {
                         $result = array_map( 'sanitize_text_field', wp_unslash( $data[ $prefixed_name ] ) );
                     } else {

@@ -278,9 +278,8 @@ class Visual_Portfolio_Controls {
             $result = true;
         }
 
-        // custom CSS.
+        // Fix for old plugin versions (< 2.0).
         if ( 'custom_css' === $name && $result ) {
-            $result = wp_kses( $result, array( '\'', '\"' ) );
             $result = str_replace( '&gt;', '>', $result );
         }
 
