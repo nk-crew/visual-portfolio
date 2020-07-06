@@ -220,7 +220,10 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             self.$items_wrap.removeClass( 'swiper-wrapper' );
             self.$items_wrap.children().removeClass( 'swiper-slide' );
 
-            $parent.find( '.vp-portfolio__items-bullets' ).html( '' );
+            $parent.find( '.vp-portfolio__items-bullets' )
+                .removeClass( 'swiper-pagination-clickable swiper-pagination-bullets-dynamic' )
+                .removeAttr( 'style' )
+                .html( '' );
 
             isDestroyed = true;
         }
