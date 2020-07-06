@@ -244,21 +244,28 @@ class GalleryControl extends Component {
 
         if ( images && images.length ) {
             images.forEach( ( img ) => {
-                let imgThumbnailUrl = img.url;
-
-                if ( img.sizes && img.sizes.thumbnail && img.sizes.thumbnail.url ) {
-                    imgThumbnailUrl = img.sizes.thumbnail.url;
-                } else if ( img.sizes && img.sizes.medium && img.sizes.medium.url ) {
-                    imgThumbnailUrl = img.sizes.medium.url;
-                } else if ( img.sizes && img.sizes.large && img.sizes.large.url ) {
-                    imgThumbnailUrl = img.sizes.large.url;
-                }
-
-                result.push( {
+                const imgData = {
                     id: img.id,
                     imgUrl: img.url,
-                    imgThumbnailUrl,
-                } );
+                    imgThumbnailUrl: img.url,
+                };
+
+                if ( img.sizes && img.sizes.thumbnail && img.sizes.thumbnail.url ) {
+                    imgData.imgThumbnailUrl = img.sizes.thumbnail.url;
+                } else if ( img.sizes && img.sizes.medium && img.sizes.medium.url ) {
+                    imgData.imgThumbnailUrl = img.sizes.medium.url;
+                } else if ( img.sizes && img.sizes.large && img.sizes.large.url ) {
+                    imgData.imgThumbnailUrl = img.sizes.large.url;
+                }
+
+                if ( img.title ) {
+                    imgData.title = img.title;
+                }
+                if ( img.description ) {
+                    imgData.description = img.description;
+                }
+
+                result.push( imgData );
             } );
         }
 
