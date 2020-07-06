@@ -31,7 +31,7 @@ Visual Portfolio let you create beautiful portfolio layouts and image galleries.
   * Justified (Flickr)
   * Tiles
   * Slider (+ Carousel, Coverflow)
-* 3 predefined hover effects:
+* 4 predefined hover effects:
   * Fade
   * Classic
   * Emerge
@@ -118,6 +118,26 @@ Migration Notes:
 * If you extended portfolio options using PHP, you will need to remove `vp_` prefix from your custom options. Example - <https://github.com/nk-o/visual-portfolio/blob/master/src/classes/class-admin.php#L854-L865>
 * If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - <https://visualportfolio.co/documentation/developers/css-variables/>
 * If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-o/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
+
+= 2.1.0 =
+
+* added possibility to change images aspect ratio for Masonry and Grid layouts
+* added Rel option in Click Action URL
+* added support for Author field in Images Content Source
+* added button for All Items per page (instead of telling users to use `-1` value)
+* added CSS arrow to Filter and Sort dropdowns
+* added 'class' attribute in PHP filter `vpf_each_item_args` to let users extend classes of each items
+* improved custom CSS code sanitation
+* changed default font-size in Filter, Sort and Pagination
+* fixed SVG icons fill rule in templates
+* fixed gutenberg block key events (remove, clone, etc)
+* fixed click on dropdown elements in preview
+* fixed saved layouts id usage in classname
+* fixed dynamic bullets reload in preview
+* fixed Custom CSS dynamic update in preview
+* fixed Custom CSS code editor placeholder rendering
+* fixed adding image title and description automatically when add images in images content source
+* minor changes
 
 = 2.0.1 =
 
