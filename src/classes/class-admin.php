@@ -1167,6 +1167,16 @@ class Visual_Portfolio_Admin {
                         'description' => esc_html__( 'By default used full image url, you can use custom one', '@@text_domain' ),
                         'placeholder' => esc_html__( 'https://...', '@@text_domain' ),
                     ),
+                    'author' => array(
+                        'type'    => 'text',
+                        'label'   => esc_html__( 'Author Name', '@@text_domain' ),
+                        'default' => '',
+                    ),
+                    'author_url'  => array(
+                        'type'    => 'text',
+                        'label'   => esc_html__( 'Author URL', '@@text_domain' ),
+                        'default' => '',
+                    ),
                 ),
                 'default'         => array(
                     /**

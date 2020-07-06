@@ -566,6 +566,8 @@ class Visual_Portfolio_Get {
                             'image_id'        => intval( $img['id'] ),
                             'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
                             'categories'      => $categories,
+                            'author'          => isset( $img['author'] ) && $img['author'] ? $img['author'] : '',
+                            'author_url'      => isset( $img['author'] ) && isset( $img['author_url'] ) && $img['author'] && $img['author_url'] ? $img['author_url'] : '',
                         )
                     ),
                     $img
