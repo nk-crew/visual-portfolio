@@ -335,7 +335,9 @@ addFilter( 'vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-
         switch ( name ) {
         case 'tiles_type':
         case 'masonry_columns':
+        case 'masonry_images_aspect_ratio':
         case 'grid_columns':
+        case 'grid_images_aspect_ratio':
         case 'justified_row_height':
         case 'justified_row_height_tolerance':
         case 'slider_effect':

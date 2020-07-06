@@ -7,6 +7,29 @@ const {
     screenSizes,
 } = window.VPData;
 
+/**
+ * Parse aspect ratio string.
+ *
+ * @param {String} val - aspect ratio string.
+ *
+ * @return {Array}
+ */
+function parseAspectRatio( val ) {
+    let left = '';
+    let right = '';
+
+    if ( val && /:/g.test( val ) ) {
+        const parts = val.split( ':' );
+
+        // eslint-disable-next-line prefer-destructuring
+        left = parts[ 0 ];
+        // eslint-disable-next-line prefer-destructuring
+        right = parts[ 1 ];
+    }
+
+    return [ left, right ];
+}
+
 // Init Options.
 $( document ).on( 'initOptions.vpf', ( event, self ) => {
     if ( 'vpf' !== event.namespace ) {
@@ -17,6 +40,9 @@ $( document ).on( 'initOptions.vpf', ( event, self ) => {
 
     if ( ! self.options.masonryColumns ) {
         self.options.masonryColumns = self.defaults.masonryColumns;
+    }
+    if ( ! self.options.masonryImagesAspectRatio ) {
+        self.options.masonryImagesAspectRatio = self.defaults.masonryImagesAspectRatio;
     }
 } );
 
@@ -30,6 +56,16 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
         return;
     }
 
+    // aspect ratio.
+    const aspectRatio = parseAspectRatio( self.options.masonryImagesAspectRatio );
+
+    if ( aspectRatio && aspectRatio[ 0 ] && aspectRatio[ 1 ] ) {
+        self.addStyle( '.vp-portfolio__item-wrap .vp-portfolio__item-img-wrap::before', {
+            'padding-top': `${ 100 * ( aspectRatio[ 1 ] / aspectRatio[ 0 ] ) }%`,
+        } );
+    }
+
+    // columns.
     self.addStyle( '.vp-portfolio__item-wrap', {
         width: `${ 100 / self.options.masonryColumns }%`,
     } );

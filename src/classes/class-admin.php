@@ -201,6 +201,12 @@ class Visual_Portfolio_Admin {
                             'max'     => 5,
                             'default' => 3,
                         ),
+                        array(
+                            'type'    => 'aspect_ratio',
+                            'label'   => esc_html__( 'Images Aspect Ratio', '@@text_domain' ),
+                            'name'    => 'images_aspect_ratio',
+                            'default' => '',
+                        ),
                     ),
                 ),
 
@@ -216,6 +222,12 @@ class Visual_Portfolio_Admin {
                             'min'     => 1,
                             'max'     => 5,
                             'default' => 3,
+                        ),
+                        array(
+                            'type'    => 'aspect_ratio',
+                            'label'   => esc_html__( 'Images Aspect Ratio', '@@text_domain' ),
+                            'name'    => 'images_aspect_ratio',
+                            'default' => '',
                         ),
                     ),
                 ),

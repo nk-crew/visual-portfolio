@@ -135,9 +135,11 @@ class Visual_Portfolio_Assets {
         switch ( $options['layout'] ) {
             case 'masonry':
                 self::store_used_assets( '@@plugin_name-layout-masonry', true, 'script' );
+                self::store_used_assets( '@@plugin_name-layout-masonry', true, 'style' );
                 break;
             case 'grid':
                 self::store_used_assets( '@@plugin_name-layout-grid', true, 'script' );
+                self::store_used_assets( '@@plugin_name-layout-grid', true, 'style' );
                 break;
             case 'tiles':
                 self::store_used_assets( '@@plugin_name-layout-tiles', true, 'script' );
@@ -361,6 +363,8 @@ class Visual_Portfolio_Assets {
             '@@plugin_name-noscript'         => array( 'assets/css/noscript.min.css', array( '@@plugin_name' ) ),
             '@@plugin_name-layout-justified' => array( 'assets/css/layout-justified.min.css', array( '@@plugin_name' ) ),
             '@@plugin_name-layout-slider'    => array( 'assets/css/layout-slider.min.css', array( '@@plugin_name', 'swiper' ) ),
+            '@@plugin_name-layout-masonry'   => array( 'assets/css/layout-masonry.min.css', array( '@@plugin_name' ) ),
+            '@@plugin_name-layout-grid'      => array( 'assets/css/layout-grid.min.css', array( '@@plugin_name' ) ),
             '@@plugin_name-layout-tiles'     => array( 'assets/css/layout-tiles.min.css', array( '@@plugin_name' ) ),
             '@@plugin_name-popup-fancybox'   => array( 'assets/css/popup-fancybox.min.css', array( '@@plugin_name', 'fancybox' ) ),
             '@@plugin_name-popup-photoswipe' => array( 'assets/css/popup-photoswipe.min.css', array( '@@plugin_name', 'photoswipe-default-skin' ) ),

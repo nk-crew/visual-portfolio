@@ -333,9 +333,17 @@ class Visual_Portfolio_Get {
         }
         if ( 'masonry' === $options['layout'] || $is_preview ) {
             $data_attrs['data-vp-masonry-columns'] = $options['masonry_columns'];
+
+            if ( $options['masonry_images_aspect_ratio'] ) {
+                $data_attrs['data-vp-masonry-images-aspect-ratio'] = $options['masonry_images_aspect_ratio'];
+            }
         }
         if ( 'grid' === $options['layout'] || $is_preview ) {
             $data_attrs['data-vp-grid-columns'] = $options['grid_columns'];
+
+            if ( $options['grid_images_aspect_ratio'] ) {
+                $data_attrs['data-vp-grid-images-aspect-ratio'] = $options['grid_images_aspect_ratio'];
+            }
         }
         if ( 'justified' === $options['layout'] || $is_preview ) {
             $data_attrs['data-vp-justified-row-height']           = $options['justified_row_height'];

@@ -12,6 +12,7 @@ import IconsSelector from '../icons-selector';
 import CodeEditor from '../code-editor';
 import TilesSelector from '../tiles-selector';
 import AlignControl from '../align-control';
+import AspectRatio from '../aspect-ratio';
 import SelectControl from '../select-control';
 // eslint-disable-next-line import/no-cycle
 import ElementsSelector from '../elements-selector';
@@ -274,6 +275,15 @@ ControlsRender.Control = function( props ) {
             <AlignControl
                 value={ controlVal }
                 extended={ props.extended }
+                onChange={ ( val ) => onChange( val ) }
+            />
+        );
+        break;
+    }
+    case 'aspect_ratio': {
+        renderControl = (
+            <AspectRatio
+                value={ controlVal }
                 onChange={ ( val ) => onChange( val ) }
             />
         );
