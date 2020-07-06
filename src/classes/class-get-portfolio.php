@@ -1734,23 +1734,23 @@ class Visual_Portfolio_Get {
             $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'], false, '', false );
         }
 
-        $args = apply_filters( 'vpf_each_item_args', $args );
-
-        // Posts Classes.
-        $class_name = 'vp-portfolio__item-wrap';
+        // Class.
+        $args['class'] = 'vp-portfolio__item-wrap';
         if ( $is_posts ) {
             // post_class functionality.
-            $class_name = join( ' ', get_post_class( $class_name, get_the_ID() ) );
+            $args['class'] = join( ' ', get_post_class( $args['class'], get_the_ID() ) );
         }
         if ( $args['uid'] ) {
-            $class_name .= ' vp-portfolio__item-uid-' . esc_attr( $args['uid'] );
+            $args['class'] .= ' vp-portfolio__item-uid-' . esc_attr( $args['uid'] );
         }
+
+        $args = apply_filters( 'vpf_each_item_args', $args );
 
         // Tag Name.
         $tag_name = $is_posts ? 'article' : 'div';
         ?>
 
-        <<?php echo esc_attr( $tag_name ); ?> class="<?php echo esc_attr( $class_name ); ?>" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
+        <<?php echo esc_attr( $tag_name ); ?> class="<?php echo esc_attr( $args['class'] ); ?>" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
             <?php self::item_popup_data( $args ); ?>
             <figure class="vp-portfolio__item">
                 <?php
