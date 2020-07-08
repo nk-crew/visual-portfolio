@@ -99,6 +99,23 @@
         margin-top: 15px;
         margin-left: 15px;
         border: 1px dashed #6d6d6d;
+
+        > span {
+            display: none;
+            margin-left: .5em;
+            font-size: .9em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        // Inside block editor.
+        .wp-block & {
+            padding: 25px 10px;
+
+            > span {
+                display: inline-block;
+            }
+        }
     }
 }
 .vpf-component-gallery-control-item-dropdown {

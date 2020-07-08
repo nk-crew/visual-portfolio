@@ -39,7 +39,6 @@ const {
 } = wp.compose;
 
 const {
-    MediaPlaceholder,
     MediaUpload,
 } = wp.blockEditor;
 
@@ -210,6 +209,9 @@ const SortableList = SortableContainer( ( props ) => {
                         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" role="img" aria-hidden="true" focusable="false">
                             <path d="M10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6zM10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6z" />
                         </svg>
+                        <span>
+                            { __( 'Add Images', '@@text_domain' ) }
+                        </span>
                     </Button>
                 ) }
             />
@@ -280,7 +282,6 @@ class GalleryControl extends Component {
             name: controlName,
             value,
             onChange,
-            noticeUI,
             isSetupWizard,
         } = this.props;
 
@@ -288,65 +289,44 @@ class GalleryControl extends Component {
 
         return (
             <div className="vpf-component-gallery-control">
-                { ! filteredValue || ! Object.keys( filteredValue ).length ? (
-                    <MediaPlaceholder
-                        icon={ <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" ariaHidden="true" focusable="false"><path d="M20 4v12H8V4h12m0-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 9.67l1.69 2.26 2.48-3.1L19 15H9zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z" /></svg> }
-                        labels={ {
-                            title: __( 'Images', '@@text_domain' ),
-                            instructions: __( 'Drag images, upload new ones or select files from your library.', '@@text_domain' ),
-                        } }
-                        onSelect={ ( images ) => {
-                            this.setState( { hasError: false } );
-                            onChange( this.prepareImages( images ) );
-                        } }
-                        accept="image/*"
-                        allowedTypes={ ALLOWED_MEDIA_TYPES }
-                        multiple
-                        onError={ this.onUploadError }
-                        notices={ noticeUI }
-                        disableMaxUploadErrorMessages
-                    />
-                ) : '' }
-                { filteredValue && Object.keys( filteredValue ).length ? (
-                    <MediaUpload
-                        onSelect={ ( images ) => {
-                            this.setState( { hasError: false } );
-                            onChange( this.prepareImages( images ) );
-                        } }
-                        allowedTypes={ ALLOWED_MEDIA_TYPES }
-                        multiple
-                        value={ filteredValue.map( ( img ) => img.id ) }
-                        render={ () => (
-                            <Fragment>
-                                <SortableList
-                                    ref={ self.sortRef }
-                                    items={ filteredValue }
-                                    onChange={ onChange }
-                                    imageControls={ imageControls }
-                                    controlName={ controlName }
-                                    attributes={ attributes }
-                                    isSetupWizard={ isSetupWizard }
-                                    prepareImages={ self.prepareImages }
-                                    axis="xy"
-                                    distance="3"
-                                    onSortEnd={ ( { oldIndex, newIndex } ) => {
-                                        const newImages = arrayMove( [ ...filteredValue ], oldIndex, newIndex );
-                                        onChange( newImages );
-                                    } }
-                                    helperClass="vpf-component-gallery-control-items-sortable"
-                                    helperContainer={ () => {
-                                        if ( self.sortRef && self.sortRef.current && self.sortRef.current.container ) {
-                                            return self.sortRef.current.container;
-                                        }
+                <MediaUpload
+                    onSelect={ ( images ) => {
+                        this.setState( { hasError: false } );
+                        onChange( this.prepareImages( images ) );
+                    } }
+                    allowedTypes={ ALLOWED_MEDIA_TYPES }
+                    multiple
+                    value={ filteredValue && Object.keys( filteredValue ).length ? filteredValue.map( ( img ) => img.id ) : [] }
+                    render={ () => (
+                        <Fragment>
+                            <SortableList
+                                ref={ self.sortRef }
+                                items={ filteredValue }
+                                onChange={ onChange }
+                                imageControls={ imageControls }
+                                controlName={ controlName }
+                                attributes={ attributes }
+                                isSetupWizard={ isSetupWizard }
+                                prepareImages={ self.prepareImages }
+                                axis="xy"
+                                distance="3"
+                                onSortEnd={ ( { oldIndex, newIndex } ) => {
+                                    const newImages = arrayMove( [ ...filteredValue ], oldIndex, newIndex );
+                                    onChange( newImages );
+                                } }
+                                helperClass="vpf-component-gallery-control-items-sortable"
+                                helperContainer={ () => {
+                                    if ( self.sortRef && self.sortRef.current && self.sortRef.current.container ) {
+                                        return self.sortRef.current.container;
+                                    }
 
-                                        // sometimes container ref disappears, so we can find dom element manually.
-                                        return document.body;
-                                    } }
-                                />
-                            </Fragment>
-                        ) }
-                    />
-                ) : '' }
+                                    // sometimes container ref disappears, so we can find dom element manually.
+                                    return document.body;
+                                } }
+                            />
+                        </Fragment>
+                    ) }
+                />
             </div>
         );
     }
