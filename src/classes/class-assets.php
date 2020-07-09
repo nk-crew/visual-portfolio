@@ -241,17 +241,15 @@ class Visual_Portfolio_Assets {
         }
 
         // Dynamic styles.
-        $dynamic_styles = Visual_Portfolio_Controls_Dynamic_CSS::get( $options );
+        // Always add it even if no custom CSS available to better render dynamic styles in preview.
+        $dynamic_styles      = Visual_Portfolio_Controls_Dynamic_CSS::get( $options );
+        $controls_css_handle = 'vp-dynamic-styles-' . $options['id'];
 
-        if ( $dynamic_styles ) {
-            $controls_css_handle = 'vp-dynamic-styles-' . $options['id'];
+        wp_register_style( $controls_css_handle, false, array(), '@@plugin_version' );
+        wp_enqueue_style( $controls_css_handle );
+        wp_add_inline_style( $controls_css_handle, $dynamic_styles ? $dynamic_styles : ' ' );
 
-            wp_register_style( $controls_css_handle, false, array(), '@@plugin_version' );
-            wp_enqueue_style( $controls_css_handle );
-            wp_add_inline_style( $controls_css_handle, $dynamic_styles );
-
-            self::store_used_assets( $controls_css_handle, true, 'style' );
-        }
+        self::store_used_assets( $controls_css_handle, true, 'style' );
 
         do_action( 'vpf_after_assets_enqueue', $options, $options['id'] );
     }
