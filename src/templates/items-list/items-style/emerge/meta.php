@@ -79,11 +79,11 @@ $show_meta = $inline_meta ||
                             endif;
                             ?>
                         >
-                            <?php echo esc_html( $args['title'] ); ?>
+                            <?php echo wp_kses_post( $args['title'] ); ?>
                         </a>
                         <?php
                     } else {
-                        echo esc_html( $args['title'] );
+                        echo wp_kses_post( $args['title'] );
                     }
                     ?>
                 </h2>
@@ -249,7 +249,7 @@ $show_meta = $inline_meta ||
             if ( $opts['show_excerpt'] && $args['excerpt'] ) {
                 ?>
                 <div class="vp-portfolio__item-meta-excerpt">
-                    <?php echo esc_html( $args['excerpt'] ); ?>
+                    <?php echo wp_kses_post( $args['excerpt'] ); ?>
                 </div>
                 <?php
             }

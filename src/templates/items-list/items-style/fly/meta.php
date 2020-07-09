@@ -100,7 +100,7 @@ $show_meta = $inline_meta ||
                 ?>
                 <h2 class="vp-portfolio__item-meta-title">
                     <?php
-                    echo esc_html( $args['title'] );
+                    echo wp_kses_post( $args['title'] );
                     ?>
                 </h2>
                 <?php
@@ -265,7 +265,7 @@ $show_meta = $inline_meta ||
             if ( $opts['show_excerpt'] && $args['excerpt'] ) {
                 ?>
                 <div class="vp-portfolio__item-meta-excerpt">
-                    <?php echo esc_html( $args['excerpt'] ); ?>
+                    <?php echo wp_kses_post( $args['excerpt'] ); ?>
                 </div>
                 <?php
             }
