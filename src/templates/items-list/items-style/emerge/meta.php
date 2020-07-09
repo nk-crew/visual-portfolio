@@ -46,7 +46,7 @@ $show_meta = $inline_meta ||
                         }
                         ?>
                         <div class="vp-portfolio__item-meta-category">
-                            <a href="<?php echo esc_html( $category['url'] ); ?>">
+                            <a href="<?php echo esc_url( $category['url'] ); ?>">
                                 <?php echo esc_html( $category['label'] ); ?>
                             </a>
                         </div>
