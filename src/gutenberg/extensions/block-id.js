@@ -48,8 +48,8 @@ const withUniqueBlockId = createHigherOrderComponent( ( BlockEdit ) => {
             } = this.props;
 
             // fix duplicated classes after block clone.
-            if ( clientId && attributes.blockId && 'undefined' === typeof usedIds[ attributes.blockId ] ) {
-                usedIds[ attributes.blockId ] = clientId;
+            if ( clientId && attributes.block_id && 'undefined' === typeof usedIds[ attributes.block_id ] ) {
+                usedIds[ attributes.block_id ] = clientId;
             }
 
             this.maybeCreateBlockId = this.maybeCreateBlockId.bind( this );
