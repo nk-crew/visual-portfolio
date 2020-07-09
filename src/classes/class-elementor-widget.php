@@ -20,6 +20,15 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
      * @param null|array $args default widget args.
      */
     public function __construct( $data = array(), $args = null ) {
+        // Migrate from old 'id' control to new 'saved_id'.
+        if ( isset( $data['settings']['id'] ) ) {
+            if ( $data['settings']['id'] && ( ! isset( $data['settings']['saved_id'] ) || ! $data['settings']['saved_id'] ) ) {
+                $data['settings']['saved_id'] = $data['settings']['id'];
+            }
+
+            unset( $data['settings']['id'] );
+        }
+
         parent::__construct( $data, $args );
 
         if ( $this->is_preview_mode() ) {
@@ -140,7 +149,7 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
         );
 
         $this->add_control(
-            'id',
+            'saved_id',
             array(
                 'label'   => esc_html__( 'Select Layout', '@@text_domain' ),
                 'type'    => \Elementor\Controls_Manager::SELECT2,
@@ -160,13 +169,14 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
     protected function render() {
         $settings = array_merge(
             array(
-                'id'    => false,
-                'class' => '',
+                'saved_id' => false,
+                'class'    => '',
             ),
             $this->get_settings()
         );
 
-        if ( ! $settings['id'] ) {
+        // No saved layout selected.
+        if ( ! $settings['saved_id'] ) {
             return;
         }
 
@@ -175,7 +185,7 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
                 'wrapper',
                 array(
                     'class'   => 'visual-portfolio-elementor-preview',
-                    'data-id' => $settings['id'],
+                    'data-id' => $settings['saved_id'],
                 )
             );
         }
@@ -190,7 +200,7 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
             <?php if ( $this->is_preview_mode() ) : ?>
                 <iframe allowtransparency="true"></iframe>
             <?php else : ?>
-                <?php echo do_shortcode( '[visual_portfolio id="' . esc_attr( $settings['id'] ) . '"]' ); ?>
+                <?php echo do_shortcode( '[visual_portfolio id="' . esc_attr( $settings['saved_id'] ) . '"]' ); ?>
             <?php endif; ?>
         </div>
         <?php
