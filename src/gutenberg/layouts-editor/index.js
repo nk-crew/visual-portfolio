@@ -136,10 +136,30 @@ class UpdateEditor extends Component {
      * Run when something changed in editor.
      */
     update() {
+        this.changeToVisualMode();
         this.addBlock();
         this.alwaysSelectBlock();
         this.checkIfPostEdited();
         this.saveMetaOnPostUpdate();
+    }
+
+    /**
+     * Force change gutenberg edit mode to Visual.
+     */
+    changeToVisualMode() {
+        const {
+            editorSettings,
+            editorMode,
+            switchEditorMode,
+        } = this.props;
+
+        if ( ! editorSettings.richEditingEnabled ) {
+            return;
+        }
+
+        if ( 'text' === editorMode ) {
+            switchEditorMode();
+        }
     }
 
     /**
@@ -274,20 +294,35 @@ class UpdateEditor extends Component {
 registerPlugin( 'vpf-saved-layouts-editor', {
     render: compose(
         withSelect( ( select ) => {
-            const isSavingPost = select( 'core/editor' ).isSavingPost();
-            const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-            const selectedBlock = wp.data.select( 'core/block-editor' ).getSelectedBlock();
-            const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
-            const postId = select( 'core/editor' ).getCurrentPostId();
-            const blockData = select( 'visual-portfolio/saved-layout-data' ).getBlockData();
-
-            return {
+            const {
                 isSavingPost,
                 isAutosavingPost,
-                selectedBlock,
-                blocks,
-                postId,
-                blockData,
+                getCurrentPostId,
+                getEditorSettings,
+            } = select( 'core/editor' );
+
+            const {
+                getSelectedBlock,
+                getBlocks,
+            } = select( 'core/block-editor' );
+
+            const {
+                getEditorMode,
+            } = select( 'core/edit-post' );
+
+            const {
+                getBlockData,
+            } = select( 'visual-portfolio/saved-layout-data' );
+
+            return {
+                isSavingPost: isSavingPost(),
+                isAutosavingPost: isAutosavingPost(),
+                selectedBlock: getSelectedBlock(),
+                editorSettings: getEditorSettings(),
+                editorMode: getEditorMode(),
+                blocks: getBlocks(),
+                postId: getCurrentPostId(),
+                blockData: getBlockData(),
             };
         } ),
         withDispatch( ( dispatch ) => {
@@ -301,11 +336,16 @@ registerPlugin( 'vpf-saved-layouts-editor', {
                 editPost,
             } = dispatch( 'core/editor' );
 
+            const {
+                switchEditorMode,
+            } = dispatch( 'core/edit-post' );
+
             return {
                 selectBlock,
                 insertBlocks,
                 resetBlocks,
                 editPost,
+                switchEditorMode,
             };
         } ),
     )( UpdateEditor ),
