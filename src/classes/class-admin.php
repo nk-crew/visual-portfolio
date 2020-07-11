@@ -38,8 +38,10 @@ class Visual_Portfolio_Admin {
         );
 
         wp_enqueue_script( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.min.js', array( 'jquery', 'wp-data' ), '@@plugin_version', true );
-        wp_enqueue_style( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.min.css', '', '@@plugin_version' );
         wp_localize_script( '@@plugin_name-admin', 'VPAdminVariables', $data_init );
+        wp_enqueue_style( '@@plugin_name-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.min.css', '', '@@plugin_version' );
+        wp_style_add_data( '@@plugin_name-admin', 'rtl', 'replace' );
+        wp_style_add_data( '@@plugin_name-admin', 'suffix', '.min' );
     }
 
     /**
@@ -53,6 +55,8 @@ class Visual_Portfolio_Admin {
         if ( 'vp_lists' === get_post_type() ) {
             wp_enqueue_script( '@@plugin_name-saved-layouts', visual_portfolio()->plugin_url . 'gutenberg/layouts-editor.min.js', array( 'jquery' ), '@@plugin_version', true );
             wp_enqueue_style( '@@plugin_name-saved-layouts', visual_portfolio()->plugin_url . 'gutenberg/layouts-editor.min.css', '', '@@plugin_version' );
+            wp_style_add_data( '@@plugin_name-saved-layouts', 'rtl', 'replace' );
+            wp_style_add_data( '@@plugin_name-saved-layouts', 'suffix', '.min' );
 
             $block_data = Visual_Portfolio_Get::get_options( array( 'id' => get_the_ID() ) );
 

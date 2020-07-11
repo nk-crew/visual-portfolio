@@ -36,6 +36,8 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
             wp_register_script( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/js/elementor.min.js', array( 'elementor-frontend', 'iframe-resizer', 'jquery' ), '@@plugin_version', true );
 
             wp_register_style( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/css/elementor.min.css', array(), '@@plugin_version' );
+            wp_style_add_data( 'visual-portfolio-elementor', 'rtl', 'replace' );
+            wp_style_add_data( 'visual-portfolio-elementor', 'suffix', '.min' );
         }
     }
 

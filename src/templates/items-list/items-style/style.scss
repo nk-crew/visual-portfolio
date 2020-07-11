@@ -64,11 +64,20 @@
             display: flex;
             margin-left: var(--vp-items-style-default--meta-categories__gap);
 
-            &::after {
-                content: var(--vp-items-style-default--meta-categories__separator);
-            }
-            &:last-of-type::after {
-                content: none;
+            @if variable-exists(rtl) and $rtl {
+                &::before {
+                    content: var(--vp-items-style-default--meta-categories__separator);
+                }
+                &:first-of-type::before {
+                    content: none;
+                }
+            } @else {
+                &::after {
+                    content: var(--vp-items-style-default--meta-categories__separator);
+                }
+                &:last-of-type::after {
+                    content: none;
+                }
             }
 
             a {

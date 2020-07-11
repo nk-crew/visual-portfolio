@@ -292,7 +292,7 @@ class Visual_Portfolio_Assets {
 
         // fjGallery.
         if ( apply_filters( 'vpf_enqueue_plugin_flickr_justified_gallery', true ) ) {
-            wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/fjGallery.min.js', array( 'jquery' ), '1.0.2', true );
+            wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/fjGallery.min.js', array( 'jquery' ), '1.0.3', true );
         }
 
         // Object Fit Images.
@@ -370,6 +370,8 @@ class Visual_Portfolio_Assets {
 
         foreach ( $vp_styles as $name => $data ) {
             wp_register_style( $name, visual_portfolio()->plugin_url . $data[0], $data[1], '@@plugin_version' );
+            wp_style_add_data( $name, 'rtl', 'replace' );
+            wp_style_add_data( $name, 'suffix', '.min' );
         }
 
         // Visual Portfolio JS.

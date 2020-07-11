@@ -58,6 +58,13 @@
             box-shadow: var(--vp-layout-slider--arrows-hover__box-shadow);
             opacity: var(--vp-layout-slider--arrows-hover__opacity);
         }
+
+        // RTL.
+        @if variable-exists(rtl) and $rtl {
+            svg {
+                transform: scaleX(-1);
+            }
+        }
     }
     .vp-portfolio__items-arrow-prev {
         left: var(--vp-layout-slider--arrows__offset);

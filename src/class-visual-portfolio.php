@@ -263,10 +263,12 @@ class Visual_Portfolio {
      */
     public function include_template_style( $handle, $template_name, $deps = array(), $ver = false, $media = 'all' ) {
         $template = $this->find_template_styles( $template_name );
+        $is_min   = false;
 
         // maybe find minified style.
         if ( ! $template ) {
             $template = $this->find_template_styles( $template_name . '.min' );
+            $is_min   = true;
         }
 
         // Allow 3rd party plugin filter template file from their plugin.
@@ -274,6 +276,11 @@ class Visual_Portfolio {
 
         if ( $template ) {
             wp_enqueue_style( $handle, $template, $deps, $ver, $media );
+            wp_style_add_data( $handle, 'rtl', 'replace' );
+
+            if ( $template ) {
+                wp_style_add_data( $handle, 'suffix', '.min' );
+            }
         }
     }
 

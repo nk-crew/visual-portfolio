@@ -69,6 +69,8 @@ class Visual_Portfolio_Supported_Themes {
         $theme_compat = $this->get_theme_compatibility_style();
         if ( $theme_compat ) {
             wp_enqueue_style( $theme_compat['name'], $theme_compat['url'], array(), '@@plugin_version' );
+            wp_style_add_data( $theme_compat['name'], 'rtl', 'replace' );
+            wp_style_add_data( $theme_compat['name'], 'suffix', '.min' );
         }
     }
 }

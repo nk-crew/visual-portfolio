@@ -91,4 +91,14 @@
     &.vp-pagination__no-more .vp-pagination__load-more {
         opacity: .5;
     }
+
+    // Paged for RTL.
+    @if variable-exists(rtl) and $rtl {
+        &[data-vp-pagination-type="paged"] {
+            .vp-pagination__item-next svg,
+            .vp-pagination__item-prev svg {
+                transform: scaleX(-1);
+            }
+        }
+    }
 }

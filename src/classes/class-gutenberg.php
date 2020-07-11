@@ -173,6 +173,8 @@ class Visual_Portfolio_Gutenberg_Block {
             array(),
             '@@plugin_version'
         );
+        wp_style_add_data( '@@plugin_name-gutenberg', 'rtl', 'replace' );
+        wp_style_add_data( '@@plugin_name-gutenberg', 'suffix', '.min' );
 
         wp_localize_script(
             '@@plugin_name-gutenberg',
