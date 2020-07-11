@@ -10,6 +10,14 @@
         box-shadow: none;
     }
 
+    // display overlay on item focus.
+    .vp-portfolio__item-focus .vp-portfolio__item-overlay {
+        // stylelint-disable-next-line
+        transform: translateX(0%) translateY(0%) translateZ(0) !important;
+        // stylelint-disable-next-line
+        transition: transform .2s ease-in-out 0 !important;
+    }
+
     .vp-portfolio__item-overlay {
         position: absolute;
         top: 0;

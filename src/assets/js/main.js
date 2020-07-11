@@ -465,6 +465,14 @@ class VP {
             stretch();
         }
 
+        // add helper focus class
+        self.$item.on( `focus${ evp }`, '.vp-portfolio__item a', function() {
+            $( this ).closest( '.vp-portfolio__item' ).addClass( 'vp-portfolio__item-focus' );
+        } );
+        self.$item.on( `blur${ evp }`, '.vp-portfolio__item a', function() {
+            $( this ).closest( '.vp-portfolio__item' ).removeClass( 'vp-portfolio__item-focus' );
+        } );
+
         // on filter click
         self.$filter.on( `click${ evp }`, '.vp-filter .vp-filter__item a', function( e ) {
             e.preventDefault();

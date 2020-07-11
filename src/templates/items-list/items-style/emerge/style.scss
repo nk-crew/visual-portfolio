@@ -145,7 +145,7 @@
     }
 
     .vp-portfolio__item:hover,
-    .vp-portfolio__item:focus {
+    .vp-portfolio__item-focus {
         .vp-portfolio__item-img img {
             transform: var(--vp-items-style-emerge--image-hover__transform);
         }

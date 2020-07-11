@@ -50,6 +50,7 @@ $show_meta = $inline_meta ||
                 <?php
             endif;
             ?>
+            tabindex="-1"
         <?php endif; ?>
         class="vp-portfolio__item-meta">
 
