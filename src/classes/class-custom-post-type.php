@@ -42,6 +42,9 @@ class Visual_Portfolio_Custom_Post_Type {
         add_action( 'classic_editor_enabled_editors_for_post_type', array( $this, 'vp_lists_classic_plugin_force_gutenberg' ), 150, 2 );
         add_action( 'use_block_editor_for_post_type', array( $this, 'vp_lists_classic_plugin_force_gutenberg_2' ), 150, 2 );
 
+        // force enable Gutenberg in 'vp_lists' for users with disabled option "Visual Editor".
+        add_filter( 'user_can_richedit', array( $this, 'vp_lists_user_can_richedit_force' ) );
+
         // highlight admin menu items.
         add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
 
@@ -518,6 +521,21 @@ class Visual_Portfolio_Custom_Post_Type {
     public function vp_lists_classic_plugin_force_gutenberg_2( $use_block_editor, $post_type ) {
         if ( 'vp_lists' !== $post_type ) {
             return $use_block_editor;
+        }
+
+        return true;
+    }
+
+    /**
+     * Force enable Gutenberg in 'vp_lists' for users with disabled option "Visual Editor".
+     *
+     * @param boolean $enabled Rich edit enabled.
+     */
+    public function vp_lists_user_can_richedit_force( $enabled ) {
+        global $post_type;
+
+        if ( isset( $post_type ) && 'vp_lists' !== $post_type ) {
+            return $enabled;
         }
 
         return true;
