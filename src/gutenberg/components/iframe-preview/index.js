@@ -68,7 +68,7 @@ export default class IframePreview extends Component {
         iframeResizer( {
             interval: 10,
             checkOrigin: false,
-            messageCallback( { message } ) {
+            onMessage( { message } ) {
                 // select current block on click message.
                 if ( 'clicked' === message ) {
                     wp.data.dispatch( 'core/editor' ).selectBlock( clientId );
