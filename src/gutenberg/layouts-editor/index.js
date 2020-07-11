@@ -13,25 +13,23 @@ const { isEqual } = window.lodash;
 
 const {
     registerBlockType,
+    createBlock,
 } = wp.blocks;
+
+const { registerPlugin } = wp.plugins;
 
 const { __ } = wp.i18n;
 
 const { apiFetch } = wp;
 
-const {
-    Component,
-} = wp.element;
-
-const { compose } = wp.compose;
+const { Component } = wp.element;
 
 const {
     withSelect,
     withDispatch,
-    dispatch,
-    select,
-    subscribe,
 } = wp.data;
+
+const { compose } = wp.compose;
 
 /**
  * Layouts Editor block
@@ -60,14 +58,14 @@ class LayoutsEditorBlock extends Component {
 }
 
 const LayoutsEditorBlockWithSelect = compose( [
-    withSelect( () => {
+    withSelect( ( select ) => {
         const blockData = select( 'visual-portfolio/saved-layout-data' ).getBlockData();
 
         return {
             blockData,
         };
     } ),
-    withDispatch( () => ( {
+    withDispatch( ( dispatch ) => ( {
         updateBlockData( data ) {
             dispatch( 'visual-portfolio/saved-layout-data' ).updateBlockData( data );
         },
@@ -114,113 +112,201 @@ registerBlockType( 'visual-portfolio/saved-editor', {
     },
 } );
 
-// Add default block to post if doesn't exist.
-const getBlockList = () => wp.data.select( 'core/block-editor' ).getBlocks();
-let blockList = getBlockList();
-let blocksRestoreBusy = false;
-subscribe( () => {
-    if ( blocksRestoreBusy ) {
-        return;
+class UpdateEditor extends Component {
+    componentDidMount() {
+        const {
+            isSavingPost,
+            isAutosavingPost,
+        } = this.props;
+
+        this.defaultBlockData = false;
+        this.editorRefreshTimeout = false;
+
+        this.wasSavingPost = isSavingPost;
+        this.wasAutosavingPost = isAutosavingPost;
+
+        this.update();
     }
 
-    const newBlockList = getBlockList();
-    const blockListChanged = newBlockList !== blockList;
-    const isValidList = 1 === newBlockList.length && newBlockList[ 0 ] && 'visual-portfolio/saved-editor' === newBlockList[ 0 ].name;
-    blockList = newBlockList;
-
-    if ( blockListChanged && ! isValidList ) {
-        blocksRestoreBusy = true;
-        wp.data.dispatch( 'core/block-editor' ).resetBlocks( [] );
-        wp.data.dispatch( 'core/block-editor' ).insertBlocks(
-            wp.blocks.createBlock( 'visual-portfolio/saved-editor' )
-        );
-        blocksRestoreBusy = false;
-    }
-} );
-
-// always select main block.
-subscribe( () => {
-    const selectedBlock = wp.data.select( 'core/block-editor' ).getSelectedBlock();
-    const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
-
-    if ( selectedBlock && 'visual-portfolio/saved-editor' === selectedBlock.name ) {
-        return;
+    componentDidUpdate() {
+        this.update();
     }
 
-    let selectBlockId = '';
-    blocks.forEach( ( blockData ) => {
-        if ( 'visual-portfolio/saved-editor' === blockData.name ) {
-            selectBlockId = blockData.clientId;
+    /**
+     * Run when something changed in editor.
+     */
+    update() {
+        this.addBlock();
+        this.alwaysSelectBlock();
+        this.checkIfPostEdited();
+        this.saveMetaOnPostUpdate();
+    }
+
+    /**
+     * Add default block to post if doesn't exist.
+     */
+    addBlock() {
+        if ( this.blocksRestoreBusy ) {
+            return;
         }
-    } );
 
-    if ( selectBlockId ) {
-        wp.data.dispatch( 'core/block-editor' ).selectBlock( selectBlockId );
-    }
-} );
+        const {
+            resetBlocks,
+            insertBlocks,
+            blocks,
+        } = this.props;
 
-// check if block data changed.
-let defaultBlockData = false;
-let editorRefreshTimeout = false;
-subscribe( () => {
-    const isSavingPost = select( 'core/editor' ).isSavingPost();
-    const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-    const blockData = select( 'visual-portfolio/saved-layout-data' ).getBlockData();
+        const isValidList = 1 === blocks.length && blocks[ 0 ] && 'visual-portfolio/saved-editor' === blocks[ 0 ].name;
 
-    if ( ! blockData || ! Object.keys( blockData ).length ) {
-        return;
-    }
-
-    if ( isSavingPost || isAutosavingPost || ! defaultBlockData ) {
-        defaultBlockData = { ...blockData };
-        return;
-    }
-
-    clearTimeout( editorRefreshTimeout );
-    editorRefreshTimeout = setTimeout( () => {
-        // isEqual can't determine that resorted objects are not equal.
-        const changedControls = defaultBlockData.controls
-                                && blockData.controls
-                                && ! isEqual( Object.keys( defaultBlockData.controls ), Object.keys( blockData.controls ) );
-
-        if ( changedControls || ! isEqual( defaultBlockData, blockData ) ) {
-            wp.data.dispatch( 'core/editor' ).editPost( { edited: true } );
+        if ( ! isValidList ) {
+            this.blocksRestoreBusy = true;
+            resetBlocks( [] );
+            insertBlocks(
+                createBlock( 'visual-portfolio/saved-editor' )
+            );
+            this.blocksRestoreBusy = false;
         }
-    }, 150 );
-} );
+    }
 
-// save meta data on post save.
-let wasSavingPost = select( 'core/editor' ).isSavingPost();
-let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-subscribe( () => {
-    const isSavingPost = select( 'core/editor' ).isSavingPost();
-    const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-    const shouldUpdate = wasSavingPost && ! isSavingPost && ! wasAutosavingPost;
+    /**
+     * Always select block.
+     */
+    alwaysSelectBlock() {
+        const {
+            selectedBlock,
+            blocks,
+            selectBlock,
+        } = this.props;
 
-    // Save current state for next inspection.
-    wasSavingPost = isSavingPost;
-    wasAutosavingPost = isAutosavingPost;
+        if ( selectedBlock && 'visual-portfolio/saved-editor' === selectedBlock.name ) {
+            return;
+        }
 
-    if ( shouldUpdate ) {
-        const postId = select( 'core/editor' ).getCurrentPostId();
-        const blockData = select( 'visual-portfolio/saved-layout-data' ).getBlockData();
-        const prefixedBlockData = {};
-
-        Object.keys( blockData ).forEach( ( name ) => {
-            prefixedBlockData[ `vp_${ name }` ] = blockData[ name ];
+        let selectBlockId = '';
+        blocks.forEach( ( blockData ) => {
+            if ( 'visual-portfolio/saved-editor' === blockData.name ) {
+                selectBlockId = blockData.clientId;
+            }
         } );
 
-        apiFetch( {
-            path: '/visual-portfolio/v1/update_layout/',
-            method: 'POST',
-            data: {
-                data: prefixedBlockData,
-                post_id: postId,
-            },
-        } )
-            .catch( ( response ) => {
-                // eslint-disable-next-line
-                console.log( response );
-            } );
+        if ( selectBlockId ) {
+            selectBlock( selectBlockId );
+        }
     }
+
+    /**
+     * Check if post meta data edited and allow to update the post.
+     */
+    checkIfPostEdited() {
+        const {
+            isSavingPost,
+            isAutosavingPost,
+            blockData,
+            editPost,
+        } = this.props;
+
+        if ( ! blockData || ! Object.keys( blockData ).length ) {
+            return;
+        }
+
+        if ( isSavingPost || isAutosavingPost || ! this.defaultBlockData ) {
+            this.defaultBlockData = { ...blockData };
+            return;
+        }
+
+        clearTimeout( this.editorRefreshTimeout );
+        this.editorRefreshTimeout = setTimeout( () => {
+            // isEqual can't determine that resorted objects are not equal.
+            const changedControls = this.defaultBlockData.controls
+                                    && blockData.controls
+                                    && ! isEqual( Object.keys( this.defaultBlockData.controls ), Object.keys( blockData.controls ) );
+
+            if ( changedControls || ! isEqual( this.defaultBlockData, blockData ) ) {
+                editPost( { edited: true } );
+            }
+        }, 150 );
+    }
+
+    /**
+     * Save meta data on post save.
+     */
+    saveMetaOnPostUpdate() {
+        const {
+            isSavingPost,
+            isAutosavingPost,
+            postId,
+            blockData,
+        } = this.props;
+
+        const shouldUpdate = this.wasSavingPost && ! isSavingPost && ! this.wasAutosavingPost;
+
+        // Save current state for next inspection.
+        this.wasSavingPost = isSavingPost;
+        this.wasAutosavingPost = isAutosavingPost;
+
+        if ( shouldUpdate ) {
+            const prefixedBlockData = {};
+
+            Object.keys( blockData ).forEach( ( name ) => {
+                prefixedBlockData[ `vp_${ name }` ] = blockData[ name ];
+            } );
+
+            apiFetch( {
+                path: '/visual-portfolio/v1/update_layout/',
+                method: 'POST',
+                data: {
+                    data: prefixedBlockData,
+                    post_id: postId,
+                },
+            } )
+                .catch( ( response ) => {
+                    // eslint-disable-next-line
+                    console.log( response );
+                } );
+        }
+    }
+
+    render() {
+        return null;
+    }
+}
+
+registerPlugin( 'vpf-saved-layouts-editor', {
+    render: compose(
+        withSelect( ( select ) => {
+            const isSavingPost = select( 'core/editor' ).isSavingPost();
+            const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+            const selectedBlock = wp.data.select( 'core/block-editor' ).getSelectedBlock();
+            const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
+            const postId = select( 'core/editor' ).getCurrentPostId();
+            const blockData = select( 'visual-portfolio/saved-layout-data' ).getBlockData();
+
+            return {
+                isSavingPost,
+                isAutosavingPost,
+                selectedBlock,
+                blocks,
+                postId,
+                blockData,
+            };
+        } ),
+        withDispatch( ( dispatch ) => {
+            const {
+                selectBlock,
+                insertBlocks,
+                resetBlocks,
+            } = dispatch( 'core/block-editor' );
+
+            const {
+                editPost,
+            } = dispatch( 'core/editor' );
+
+            return {
+                selectBlock,
+                insertBlocks,
+                resetBlocks,
+                editPost,
+            };
+        } ),
+    )( UpdateEditor ),
 } );
