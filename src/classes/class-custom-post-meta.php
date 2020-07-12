@@ -19,10 +19,25 @@ class Visual_Portfolio_Custom_Post_Meta {
     public static function init() {
         // add post formats.
         add_action( 'after_setup_theme', array( __CLASS__, 'add_video_post_format' ), 99 );
+        add_action( 'init', array( __CLASS__, 'register_post_meta' ) );
         add_action( 'add_meta_boxes', array( __CLASS__, 'add_post_format_metaboxes' ), 1 );
         add_action( 'save_post', array( __CLASS__, 'save_post_format_metaboxes' ) );
         add_action( 'save_post', array( __CLASS__, 'update_words_count' ) );
         add_action( 'wp_head', array( __CLASS__, 'update_views_count' ) );
+    }
+
+    /**
+     * Check if current page is gutenberg.
+     *
+     * @return boolean
+     */
+    public static function is_gutenberg() {
+        $current_screen = get_current_screen();
+        if ( method_exists( $current_screen, 'is_block_editor' ) && $current_screen->is_block_editor() ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -50,6 +65,7 @@ class Visual_Portfolio_Custom_Post_Meta {
      */
     public static function add_video_post_format() {
         global $_wp_theme_features;
+
         $formats = array( 'video' );
 
         // Add existing formats.
@@ -62,21 +78,68 @@ class Visual_Portfolio_Custom_Post_Meta {
     }
 
     /**
+     * Register post meta.
+     */
+    public static function register_post_meta() {
+        $post_type_names = array_keys( get_post_types() );
+        foreach ( $post_type_names as $post_type ) {
+            // Register meta for all post types.
+            register_meta(
+                'post',
+                '_vp_format_video_url',
+                array(
+                    'object_subtype' => $post_type,
+                    'type'           => 'string',
+                    'single'         => true,
+                    'show_in_rest'   => true,
+                    'auth_callback'  => array( __CLASS__, 'rest_auth' ),
+                )
+            );
+
+            // Add support for 'custom-fields' to work in Gutenberg.
+            add_post_type_support( $post_type, 'custom-fields' );
+        }
+    }
+
+    /**
+     * Determines REST API authentication.
+     *
+     * @param bool   $allowed Whether it is allowed.
+     * @param string $meta_key The meta key being checked.
+     * @param int    $post_id The post ID being checked.
+     * @param int    $user_id The user ID being checked.
+     * @param string $cap The current capability.
+     * @param array  $caps All capabilities.
+     * @return bool Whether the user can do it.
+     */
+    public static function rest_auth( $allowed, $meta_key, $post_id, $user_id, $cap, $caps ) {
+        return user_can( $user_id, 'edit_post', $post_id );
+    }
+
+    /**
      * Add post format metaboxes.
      *
      * @param string $post_type post type.
      */
     public static function add_post_format_metaboxes( $post_type ) {
-        if ( post_type_supports( $post_type, 'post-formats' ) ) {
-            add_meta_box(
-                'vp_format_video',
-                esc_html__( 'Video', '@@text_domain' ),
-                array( __CLASS__, 'add_video_format_metabox' ),
-                null,
-                'side',
-                'default'
-            );
+        // Prevent if Gutenberg enabled.
+        if ( self::is_gutenberg() ) {
+            return;
         }
+
+        // Prevent if no Video post format supported.
+        if ( ! post_type_supports( $post_type, 'post-formats' ) ) {
+            return;
+        }
+
+        add_meta_box(
+            'vp_format_video',
+            esc_html__( 'Video', '@@text_domain' ),
+            array( __CLASS__, 'add_video_format_metabox' ),
+            null,
+            'side',
+            'default'
+        );
     }
 
     /**

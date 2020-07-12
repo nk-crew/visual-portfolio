@@ -160,6 +160,7 @@ class Visual_Portfolio_Gutenberg_Block {
      * Enqueue script for Gutenberg editor
      */
     public function enqueue_block_editor_assets() {
+        // Block.
         wp_enqueue_script(
             '@@plugin_name-gutenberg',
             plugins_url( '../gutenberg/index.min.js', __FILE__ ),
@@ -184,6 +185,15 @@ class Visual_Portfolio_Gutenberg_Block {
                 'controls'            => Visual_Portfolio_Controls::get_registered_array(),
                 'controls_categories' => Visual_Portfolio_Controls::get_registered_categories(),
             )
+        );
+
+        // Meta.
+        wp_enqueue_script(
+            '@@plugin_name-gutenberg-custom-post-meta',
+            plugins_url( '../gutenberg/custom-post-meta.min.js', __FILE__ ),
+            array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components', 'wp-plugins' ),
+            '@@plugin_version',
+            true
         );
     }
 }
