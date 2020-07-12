@@ -17,7 +17,6 @@ const { Component } = wp.element;
 const {
     PanelRow,
     TextControl,
-    createSlotFill,
 } = wp.components;
 
 const {
@@ -25,8 +24,6 @@ const {
 } = wp.editPost;
 
 const { registerPlugin } = wp.plugins;
-
-const { Slot } = createSlotFill( 'VpVideoSidebar' );
 
 const {
     jQuery: $,
@@ -155,7 +152,6 @@ class VpVideoComponent extends Component {
                     { /* eslint-disable-next-line react/no-danger */ }
                     <div className="vp-oembed-preview" dangerouslySetInnerHTML={ { __html: oembedHTML } } />
                 </PanelRow>
-                <Slot />
             </PluginDocumentSettingPanel>
         );
     }
