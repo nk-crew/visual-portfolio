@@ -557,17 +557,18 @@ class Visual_Portfolio_Get {
                     array_merge(
                         $each_item_args,
                         array(
-                            'uid'             => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
-                            'url'             => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
-                            'title'           => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
-                            'format'          => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
-                            'published_time'  => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
-                            'filter'          => implode( ',', $filter_values ),
-                            'image_id'        => intval( $img['id'] ),
-                            'allow_popup'     => ! isset( $img['url'] ) || ! $img['url'],
-                            'categories'      => $categories,
-                            'author'          => isset( $img['author'] ) && $img['author'] ? $img['author'] : '',
-                            'author_url'      => isset( $img['author'] ) && isset( $img['author_url'] ) && $img['author'] && $img['author_url'] ? $img['author_url'] : '',
+                            'uid'            => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
+                            'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
+                            'title'          => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
+                            'format'         => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
+                            'published_time' => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
+                            'filter'         => implode( ',', $filter_values ),
+                            'image_id'       => intval( $img['id'] ),
+                            'focal_point'    => isset( $img['focalPoint'] ) && $img['focalPoint'] ? $img['focalPoint'] : '',
+                            'allow_popup'    => ! isset( $img['url'] ) || ! $img['url'],
+                            'categories'     => $categories,
+                            'author'         => isset( $img['author'] ) && $img['author'] ? $img['author'] : '',
+                            'author_url'     => isset( $img['author'] ) && isset( $img['author_url'] ) && $img['author'] && $img['author_url'] ? $img['author_url'] : '',
                         )
                     ),
                     $img
@@ -645,6 +646,7 @@ class Visual_Portfolio_Get {
                         'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
                         'filter'         => implode( ',', $filter_values ),
                         'image_id'       => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
+                        'focal_point'    => Visual_Portfolio_Custom_Post_Meta::get_featured_image_focal_point( get_the_ID() ),
                         'categories'     => $categories,
                         'comments_count' => get_comments_number( get_the_ID() ),
                         'comments_url'   => get_comments_link( get_the_ID() ),
@@ -1750,9 +1752,16 @@ class Visual_Portfolio_Get {
 
         // Tag Name.
         $tag_name = $is_posts ? 'article' : 'div';
+
+        $tag_attributes = 'class="' . esc_attr( $args['class'] ) . '" data-vp-filter="' . esc_attr( $args['filter'] ) . '"';
+
+        if ( $args['focal_point'] && ! empty( $args['focal_point'] ) ) {
+            $tag_attributes .= ' style="--vp-images__object-position: ' . esc_attr( 100 * $args['focal_point']['x'] ) . '% ' . esc_attr( 100 * $args['focal_point']['y'] ) . '%;"';
+        }
+
         ?>
 
-        <<?php echo esc_attr( $tag_name ); ?> class="<?php echo esc_attr( $args['class'] ); ?>" data-vp-filter="<?php echo esc_attr( $args['filter'] ); ?>">
+        <<?php echo esc_attr( $tag_name ); ?> <?php echo $tag_attributes; // phpcs:ignore ?>>
             <?php self::item_popup_data( $args ); ?>
             <figure class="vp-portfolio__item">
                 <?php

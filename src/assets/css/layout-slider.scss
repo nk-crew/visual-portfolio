@@ -17,8 +17,8 @@
     }
     .vp-portfolio__item-img img,
     .vp-portfolio__thumbnail-img img {
-        object-fit: cover;
-        object-position: 50% 50%;
+        object-fit: var(--vp-images__object-fit);
+        object-position: var(--vp-images__object-position);
         // stylelint-disable-next-line
         font-family: "object-fit: cover; object-position: 50% 50%;";
     }

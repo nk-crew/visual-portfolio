@@ -293,6 +293,7 @@ ControlsRender.Control = function( props ) {
         renderControl = (
             <GalleryControl
                 imageControls={ props.image_controls }
+                focalPoint={ props.focal_point }
                 attributes={ attributes }
                 name={ props.name }
                 value={ controlVal }

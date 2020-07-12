@@ -30,6 +30,7 @@ const {
 const {
     Button,
     Dropdown,
+    FocalPointPicker,
     withNotices,
 } = wp.components;
 
@@ -68,6 +69,7 @@ const SortableItem = SortableElement( ( props ) => {
         imageControls,
         controlName,
         attributes,
+        focalPoint,
         isSetupWizard,
     } = props;
 
@@ -110,6 +112,24 @@ const SortableItem = SortableElement( ( props ) => {
             ) }
             renderContent={ () => (
                 <div className="vpf-component-gallery-control-item-dropdown">
+                    { focalPoint ? (
+                        <FocalPointPicker
+                            url={ img.imgThumbnailUrl || img.imgUrl }
+                            value={ img.focalPoint }
+                            onChange={ ( val ) => {
+                                const newImages = [ ...items ];
+
+                                if ( newImages[ idx ] ) {
+                                    newImages[ idx ] = {
+                                        ...newImages[ idx ],
+                                        focalPoint: val,
+                                    };
+
+                                    onChange( newImages );
+                                }
+                            } }
+                        />
+                    ) : '' }
                     { Object.keys( imageControls ).map( ( name ) => {
                         const newCondition = [];
 
@@ -166,6 +186,7 @@ const SortableList = SortableContainer( ( props ) => {
         imageControls,
         controlName,
         attributes,
+        focalPoint,
         isSetupWizard,
         prepareImages,
     } = props;
@@ -184,6 +205,7 @@ const SortableList = SortableContainer( ( props ) => {
                     imageControls={ imageControls }
                     controlName={ controlName }
                     attributes={ attributes }
+                    focalPoint={ focalPoint }
                     isSetupWizard={ isSetupWizard }
                 />
             ) ) }
@@ -282,6 +304,7 @@ class GalleryControl extends Component {
             name: controlName,
             value,
             onChange,
+            focalPoint,
             isSetupWizard,
         } = this.props;
 
@@ -306,6 +329,7 @@ class GalleryControl extends Component {
                                 imageControls={ imageControls }
                                 controlName={ controlName }
                                 attributes={ attributes }
+                                focalPoint={ focalPoint }
                                 isSetupWizard={ isSetupWizard }
                                 prepareImages={ self.prepareImages }
                                 axis="xy"

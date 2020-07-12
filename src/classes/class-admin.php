@@ -1116,8 +1116,9 @@ class Visual_Portfolio_Admin {
                 'type'            => 'gallery',
                 'name'            => 'images',
                 'setup_wizard'    => true,
+                'focal_point'     => true,
                 'image_controls'  => array(
-                    'title'       => array(
+                    'title' => array(
                         'type'      => 'text',
                         'label'     => esc_html__( 'Title', '@@text_domain' ),
                         'condition' => array(
@@ -1139,13 +1140,13 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                     ),
-                    'categories'  => array(
+                    'categories' => array(
                         'type'      => 'select',
                         'label'     => esc_html__( 'Categories', '@@text_domain' ),
                         'multiple'  => true,
                         'creatable' => true,
                     ),
-                    'format'      => array(
+                    'format' => array(
                         'type'    => 'select',
                         'label'   => esc_html__( 'Format', '@@text_domain' ),
                         'default' => 'standard',
@@ -1154,7 +1155,7 @@ class Visual_Portfolio_Admin {
                             'video'    => esc_html__( 'Video', '@@text_domain' ),
                         ),
                     ),
-                    'video_url'   => array(
+                    'video_url' => array(
                         'type'        => 'text',
                         'label'       => esc_html__( 'Video URL', '@@text_domain' ),
                         'placeholder' => esc_html__( 'https://...', '@@text_domain' ),
@@ -1165,7 +1166,7 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                     ),
-                    'url'         => array(
+                    'url' => array(
                         'type'        => 'text',
                         'label'       => esc_html__( 'URL', '@@text_domain' ),
                         'description' => esc_html__( 'By default used full image url, you can use custom one', '@@text_domain' ),
@@ -1176,7 +1177,7 @@ class Visual_Portfolio_Admin {
                         'label'   => esc_html__( 'Author Name', '@@text_domain' ),
                         'default' => '',
                     ),
-                    'author_url'  => array(
+                    'author_url' => array(
                         'type'    => 'text',
                         'label'   => esc_html__( 'Author URL', '@@text_domain' ),
                         'default' => '',

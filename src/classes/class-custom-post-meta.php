@@ -41,26 +41,6 @@ class Visual_Portfolio_Custom_Post_Meta {
     }
 
     /**
-     * Get video format URL.
-     *
-     * @param int $post_id The post ID.
-     */
-    public static function get_video_format_url( $post_id ) {
-        if ( ! $post_id ) {
-            $post_id = get_the_ID();
-        }
-
-        $video_url = get_post_meta( $post_id, '_vp_format_video_url', true );
-
-        // fallback.
-        if ( ! $video_url ) {
-            $video_url = get_post_meta( $post_id, 'video_url', true );
-        }
-
-        return $video_url;
-    }
-
-    /**
      * Add video post format.
      */
     public static function add_video_post_format() {
@@ -92,6 +72,29 @@ class Visual_Portfolio_Custom_Post_Meta {
                     'type'           => 'string',
                     'single'         => true,
                     'show_in_rest'   => true,
+                    'auth_callback'  => array( __CLASS__, 'rest_auth' ),
+                )
+            );
+            register_meta(
+                'post',
+                '_vp_image_focal_point',
+                array(
+                    'object_subtype' => $post_type,
+                    'type'           => 'object',
+                    'single'         => true,
+                    'show_in_rest'   => array(
+                        'schema' => array(
+                            'type'       => 'object',
+                            'properties' => array(
+                                'x' => array(
+                                    'type' => 'string',
+                                ),
+                                'y' => array(
+                                    'type' => 'string',
+                                ),
+                            ),
+                        ),
+                    ),
                     'auth_callback'  => array( __CLASS__, 'rest_auth' ),
                 )
             );
@@ -226,6 +229,50 @@ class Visual_Portfolio_Custom_Post_Meta {
                 update_post_meta( $post_id, $item, false );
             }
         }
+    }
+
+    /**
+     * Get video format URL.
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function get_video_format_url( $post_id ) {
+        if ( ! $post_id ) {
+            $post_id = get_the_ID();
+        }
+
+        $video_url = get_post_meta( $post_id, '_vp_format_video_url', true );
+
+        // fallback.
+        if ( ! $video_url ) {
+            $video_url = get_post_meta( $post_id, 'video_url', true );
+        }
+
+        return $video_url;
+    }
+
+    /**
+     * Get featured image focal point.
+     *
+     * @param int $post_id The post ID.
+     */
+    public static function get_featured_image_focal_point( $post_id ) {
+        if ( ! $post_id ) {
+            $post_id = get_the_ID();
+        }
+
+        $focal_point = get_post_meta( $post_id, '_vp_image_focal_point', true );
+
+        if (
+            ! isset( $focal_point ) ||
+            empty( $focal_point ) ||
+            ! isset( $focal_point['x'] ) || ! isset( $focal_point['y'] ) ||
+            ( '0.5' === $focal_point['x'] && '0.5' === $focal_point['y'] )
+        ) {
+            return null;
+        }
+
+        return $focal_point;
     }
 
     /**

@@ -71,6 +71,8 @@ class Visual_Portfolio_Controls {
         'code_placeholder' => '',
         // elements selector.
         'locations'        => array(),
+        // gallery.
+        'focal_point'      => false,
 
         // hint.
         'hint'             => false,
