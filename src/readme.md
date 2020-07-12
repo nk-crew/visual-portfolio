@@ -119,6 +119,22 @@ Migration Notes:
 * If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - <https://visualportfolio.co/documentation/developers/css-variables/>
 * If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-o/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
 
+= 2.2.0 =
+
+* added RTL support
+* added images Focal Point picker
+* added styles to display overlays on items focus (helpful for screen readers)
+* added possibility to output inline tags inside titles and excerpt
+* added Video meta box for Gutenberg posts (using native Gutenberg API)
+* fixed images uploading in block (automatically add title and description)
+* fixed block id regeneration after edit page reload (resolves unnecessary post re-save requirement)
+* always add custom CSS tag even if no custom CSS available, to better render dynamic styles in preview
+* fixed Elementor widget problem with removing (usage of bad settings name `id` renamed to `saved_id`)
+* fixed URL output for item categories (use esc_url)
+* force enable Visual Editor on Saved Layouts for users, who disabled it
+* force change editor mode to Visual in Saved Layouts editor
+* minor changes
+
 = 2.1.0 =
 
 * added possibility to change images aspect ratio for Masonry and Grid layouts
