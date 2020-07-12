@@ -191,9 +191,17 @@ class Visual_Portfolio_Gutenberg_Block {
         wp_enqueue_script(
             '@@plugin_name-gutenberg-custom-post-meta',
             plugins_url( '../gutenberg/custom-post-meta.min.js', __FILE__ ),
-            array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components', 'wp-plugins' ),
+            array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components', 'wp-plugins', 'jquery' ),
             '@@plugin_version',
             true
+        );
+
+        wp_localize_script(
+            '@@plugin_name-gutenberg-custom-post-meta',
+            'VPGutenbergMetaVariables',
+            array(
+                'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
+            )
         );
     }
 }

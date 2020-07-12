@@ -42,19 +42,6 @@ if ( $videoMetabox.length ) {
             toggleVideoMetabox( $videoFormatCheckbox.is( ':checked' ) );
         } );
     }
-
-    // Gutenberg.
-    if ( wp.data && wp.data.subscribe ) {
-        const {
-            getCurrentPostAttribute,
-            getEditedPostAttribute,
-        } = wp.data.select( 'core/editor' );
-
-        wp.data.subscribe( () => {
-            const format = getEditedPostAttribute( 'format' ) || getCurrentPostAttribute( 'format' );
-            toggleVideoMetabox( 'video' === format );
-        } );
-    }
 }
 
 let oembedAjax = null;
