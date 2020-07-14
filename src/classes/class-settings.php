@@ -119,6 +119,10 @@ class Visual_Portfolio_Settings {
                 'id'    => 'vp_popup_gallery',
                 'title' => esc_html__( 'Popup Gallery', '@@text_domain' ),
             ),
+            array(
+                'id'    => 'vp_social_integrations',
+                'title' => esc_html__( 'Social Integrations', '@@text_domain' ),
+            ),
         );
 
         return $sections;
@@ -363,9 +367,16 @@ class Visual_Portfolio_Settings {
                     'is_pro'  => true,
                 ),
             ),
+            'vp_social_integrations' => array(
+                array(
+                    'name'    => 'pro_informations',
+                    'desc'    => esc_html__( 'The social module is only available for PRO users.', '@@text_domain' ),
+                    'type'    => 'html',
+                ),
+            ),
         );
 
-        return $settings_fields;
+        return apply_filters( 'vpf_settings_fields', $settings_fields );
     }
 
     /**
