@@ -20,9 +20,10 @@ $doc.on( 'extendClass.vpf', ( event, VP ) => {
      */
     VP.prototype.initIsotope = function( options ) {
         const self = this;
-        const isRtl = 'rtl' === getComputedStyle( self.$items_wrap[ 0 ] ).direction;
 
         if ( self.$items_wrap.isotope && ( 'tiles' === self.options.layout || 'masonry' === self.options.layout || 'grid' === self.options.layout ) ) {
+            const isRtl = 'rtl' === getComputedStyle( self.$items_wrap[ 0 ] ).direction;
+
             const initOptions = options || {
                 itemSelector: '.vp-portfolio__item-wrap',
                 layoutMode: 'grid' === self.options.layout ? 'fitRows' : 'masonry',
