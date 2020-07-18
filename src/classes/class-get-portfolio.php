@@ -158,7 +158,7 @@ class Visual_Portfolio_Get {
         $custom_taxonomies_result = false;
         if ( $custom_taxonomies && ! empty( $custom_taxonomies ) ) {
             foreach ( $custom_taxonomies as $tax ) {
-                $custom_taxonomies_result = $custom_taxonomies_result || $custom_taxonomies === $tax;
+                $custom_taxonomies_result = $custom_taxonomies_result || $taxonomy === $tax;
             }
         }
 
