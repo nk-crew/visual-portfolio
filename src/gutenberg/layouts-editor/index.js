@@ -9,6 +9,10 @@ import BlockEdit from '../block/edit';
 /**
  * WordPress dependencies
  */
+const {
+    jQuery: $,
+} = window;
+
 const { isEqual } = window.lodash;
 
 const {
@@ -198,7 +202,13 @@ class UpdateEditor extends Component {
             selectBlock,
         } = this.props;
 
+        // if selected block, do nothing.
         if ( selectedBlock && 'visual-portfolio/saved-editor' === selectedBlock.name ) {
+            return;
+        }
+
+        // check if selected post title, also do nothing.
+        if ( $( '.editor-post-title__block.is-selected' ).length ) {
             return;
         }
 
