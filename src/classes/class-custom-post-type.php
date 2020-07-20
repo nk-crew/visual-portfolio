@@ -41,6 +41,7 @@ class Visual_Portfolio_Custom_Post_Type {
         // force enable Gutenberg editor in 'vp_lists' for Classic Editor plugin.
         add_action( 'classic_editor_enabled_editors_for_post_type', array( $this, 'vp_lists_classic_plugin_force_gutenberg' ), 150, 2 );
         add_action( 'use_block_editor_for_post_type', array( $this, 'vp_lists_classic_plugin_force_gutenberg_2' ), 150, 2 );
+        add_action( 'use_block_editor_for_post', array( $this, 'vp_lists_classic_plugin_force_gutenberg_3' ), 150, 2 );
 
         // force enable Gutenberg in 'vp_lists' for users with disabled option "Visual Editor".
         add_filter( 'user_can_richedit', array( $this, 'vp_lists_user_can_richedit_force' ) );
@@ -524,6 +525,20 @@ class Visual_Portfolio_Custom_Post_Type {
         }
 
         return true;
+    }
+
+    /**
+     * Force set Gutenberg editor for 'vp_lists' in 3rd-party plugins/themes, that uses their own builders.
+     *
+     * @param boolean $use_block_editor Use block editor.
+     * @param object  $post The post object.
+     */
+    public function vp_lists_classic_plugin_force_gutenberg_3( $use_block_editor, $post ) {
+        if ( isset( $post->post_type ) && 'vp_lists' === $post->post_type ) {
+            return true;
+        }
+
+        return $use_block_editor;
     }
 
     /**
