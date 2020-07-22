@@ -18,10 +18,11 @@
 
     .vp-portfolio__item-overlay {
         position: absolute;
+        display: flex;
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: var(--vp-items-style-emerge--overlay__padding-v) var(--vp-items-style-emerge--overlay__padding-h);
+        max-height: 100%;
         color: var(--vp-items-style-emerge--overlay__color);
         background-color: var(--vp-items-style-emerge--overlay__background-color);
         transition: var(--vp-items-style-emerge-transition-duration) transform var(--vp-items-style-emerge-transition-easing);
@@ -52,6 +53,11 @@
 
     // meta
     .vp-portfolio__item-meta {
+        flex: 1;
+        min-width: 100%;
+        max-height: 100%;
+        padding: var(--vp-items-style-emerge--overlay__padding-v) var(--vp-items-style-emerge--overlay__padding-h);
+        overflow: auto;
         color: inherit;
         opacity: 0;
         transition: transform var(--vp-items-style-emerge-transition-duration) .1s var(--vp-items-style-emerge-transition-easing), opacity var(--vp-items-style-emerge-transition-duration) .1s var(--vp-items-style-emerge-transition-easing);

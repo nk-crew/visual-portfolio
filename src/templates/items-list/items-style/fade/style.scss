@@ -45,6 +45,7 @@
         width: 100%;
         height: 100%;
         padding: var(--vp-items-style-fade--meta__padding-v) var(--vp-items-style-fade--meta__padding-h);
+        overflow: auto;
         color: inherit;
         text-align: center;
         opacity: 0;
