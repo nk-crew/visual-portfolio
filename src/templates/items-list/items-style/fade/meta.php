@@ -115,7 +115,7 @@ $show_meta = $inline_meta ||
                 <?php
 
                 // Show Author.
-                if ( $opts['show_author'] ) {
+                if ( $opts['show_author'] && $args['author'] ) {
                     ?>
                     <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-author">
                         <span class="vp-portfolio__item-meta-part-icon">
