@@ -190,7 +190,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
         }
 
         // click action
-        self.$item.on( `click.vpf-uid-${ self.uid }`, '.vp-portfolio__item', function( e ) {
+        self.$item.on( `click.vpf-uid-${ self.uid }`, '.vp-portfolio__item a.vp-portfolio__item-meta, .vp-portfolio__item .vp-portfolio__item-img > a, .vp-portfolio__item .vp-portfolio__item-meta-title > a', function( e ) {
             if ( ! $( this ).closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item-popup' ).length ) {
                 return;
             }
