@@ -12,6 +12,7 @@ import './store';
  * Extensions
  */
 import './extensions/block-id';
+import './extensions/classic-icon-with-overlay';
 import './extensions/items-count-all';
 import './extensions/link-rel';
 import './extensions/stretch-for-saved-only';

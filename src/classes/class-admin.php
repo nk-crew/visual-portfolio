@@ -595,8 +595,9 @@ class Visual_Portfolio_Admin {
                         'show_views_count'       => true,
                         'show_reading_time'      => true,
                         'show_excerpt'           => true,
-                        'show_icons'             => false,
+                        'show_icons'             => true,
                         'align'                  => true,
+                        'overlay'                => true,
                     ),
                     'controls'         => array(
                         array(
@@ -644,33 +645,9 @@ class Visual_Portfolio_Admin {
                         'show_excerpt'           => true,
                         'show_icons'             => true,
                         'align'                  => 'extended',
+                        'overlay'                => true,
                     ),
-                    'controls'         => array(
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'  => 'bg_color',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fade',
-                                    'property' => '--vp-items-style-fade--overlay__background-color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'  => 'text_color',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fade',
-                                    'property' => '--vp-items-style-fade--overlay__color',
-                                ),
-                            ),
-                        ),
-                    ),
+                    'controls'         => array(),
                 ),
 
                 // Fly.
@@ -689,33 +666,9 @@ class Visual_Portfolio_Admin {
                         'show_excerpt'           => true,
                         'show_icons'             => true,
                         'align'                  => 'extended',
+                        'overlay'                => true,
                     ),
-                    'controls'         => array(
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'  => 'bg_color',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fly',
-                                    'property' => '--vp-items-style-fly--overlay__background-color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'  => 'text_color',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fly',
-                                    'property' => '--vp-items-style-fly--overlay__color',
-                                ),
-                            ),
-                        ),
-                    ),
+                    'controls'         => array(),
                 ),
 
                 // Emerge.
@@ -734,33 +687,9 @@ class Visual_Portfolio_Admin {
                         'show_excerpt'           => true,
                         'show_icons'             => false,
                         'align'                  => true,
+                        'overlay'                => true,
                     ),
-                    'controls'         => array(
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'  => 'bg_color',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-emerge',
-                                    'property' => '--vp-items-style-emerge--overlay__background-color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'  => 'text_color',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-emerge',
-                                    'property' => '--vp-items-style-emerge--overlay__color',
-                                ),
-                            ),
-                        ),
-                    ),
+                    'controls'         => array(),
                 ),
             ),
             $items_styles
@@ -1577,6 +1506,32 @@ class Visual_Portfolio_Admin {
                                 'name'     => 'align',
                                 'default'  => 'center',
                                 'extended' => 'extended' === $val,
+                            );
+                            break;
+                        case 'overlay':
+                            $new_fields[] = array(
+                                'type'  => 'color',
+                                'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                                'name'  => 'bg_color',
+                                'alpha' => true,
+                                'style' => array(
+                                    array(
+                                        'element'  => '.vp-portfolio__items-style-' . $name,
+                                        'property' => '--vp-items-style-' . $name . '--overlay__background-color',
+                                    ),
+                                ),
+                            );
+                            $new_fields[] = array(
+                                'type'  => 'color',
+                                'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                                'name'  => 'text_color',
+                                'alpha' => true,
+                                'style' => array(
+                                    array(
+                                        'element'  => '.vp-portfolio__items-style-' . $name,
+                                        'property' => '--vp-items-style-' . $name . '--overlay__color',
+                                    ),
+                                ),
                             );
                             break;
                         // no default.

@@ -103,6 +103,7 @@ class Visual_Portfolio_Extend {
                         'show_excerpt'           => true,
                         'show_icons'             => false,
                         'align'                  => true,
+                        'overlay'                => false,
                     ),
                     'controls'         => array(
                         ... controls ...

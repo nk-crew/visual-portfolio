@@ -17,6 +17,27 @@
         }
     }
 
+    .vp-portfolio__item-img-overlay {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        color: var(--vp-items-style-default--overlay__color);
+        text-decoration: var(--vp-items-style-default--overlay__text-decoration);
+        background-color: var(--vp-items-style-default--overlay__background-color);
+        opacity: 0;
+        transition: var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
+        will-change: opacity;
+
+        // Fix FireFox image blinking
+        // https://github.com/nk-o/visual-portfolio/issues/92
+        z-index: 2;
+    }
+
     // Transitions
     .vp-portfolio__item-img {
         overflow: hidden;
@@ -27,6 +48,9 @@
     }
     .vp-portfolio__item:hover,
     .vp-portfolio__item-focus {
+        .vp-portfolio__item-img-overlay {
+            opacity: 1;
+        }
         .vp-portfolio__item-img img {
             transform: var(--vp-items-style-default--image-hover__transform);
         }
@@ -50,6 +74,9 @@
         > :last-child {
             margin-bottom: 0;
         }
+    }
+    .vp-portfolio__item-meta-icon {
+        font-size: var(--vp-items-style-default--meta-icon__font-size);
     }
     .vp-portfolio__item-meta-categories {
         display: inline-flex;

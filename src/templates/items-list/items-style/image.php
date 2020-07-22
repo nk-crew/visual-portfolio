@@ -32,15 +32,35 @@ if ( ! defined( 'ABSPATH' ) ) {
                 endif;
                 ?>
             >
-                <noscript><?php echo wp_kses( $args['image_noscript'], $args['image_allowed_html'] ); ?></noscript>
-                <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
+            <?php
+        }
+        ?>
+            <noscript><?php echo wp_kses( $args['image_noscript'], $args['image_allowed_html'] ); ?></noscript>
+            <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
+
+            <div class="vp-portfolio__item-img-overlay">
+                <?php
+                // Show Icon.
+                if ( $opts['show_icon'] ) {
+                    ?>
+                    <div class="vp-portfolio__item-meta-icon">
+                        <?php
+                        if ( isset( $args['format_video_url'] ) ) {
+                            visual_portfolio()->include_template( 'icons/play' );
+                        } else {
+                            visual_portfolio()->include_template( 'icons/search' );
+                        }
+                        ?>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+        <?php
+        if ( $args['url'] ) {
+            ?>
             </a>
             <?php
-        } else {
-            ?>
-            <noscript><?php echo wp_kses( $args['image_noscript'], $args['image_allowed_html'] ); ?></noscript>
-            <?php
-            echo wp_kses( $args['image'], $args['image_allowed_html'] );
         }
         ?>
     </div>
