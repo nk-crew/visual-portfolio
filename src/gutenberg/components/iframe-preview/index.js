@@ -142,11 +142,11 @@ export default class IframePreview extends Component {
         } );
 
         if ( Object.keys( changedAttributes ).length ) {
-            let reload = true;
+            let reload = false;
 
             // Don't reload if block has dynamic styles.
             Object.keys( changedAttributes ).forEach( ( name ) => {
-                reload = reload && ! hasDynamicCSS( name );
+                reload = reload || ! hasDynamicCSS( name );
             } );
 
             const data = applyFilters( 'vpf.editor.changed-attributes', {
