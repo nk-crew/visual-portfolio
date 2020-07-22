@@ -59,7 +59,7 @@
     // fix some themes figcaption styles.
     figcaption.vp-portfolio__item-overlay {
         font-style: inherit;
-        color: inherit;
+        color: var(--vp-items-style-default--meta__color);
     }
 
     // meta
