@@ -162,23 +162,23 @@ class Visual_Portfolio_Gutenberg_Block {
     public function enqueue_block_editor_assets() {
         // Block.
         wp_enqueue_script(
-            '@@plugin_name-gutenberg',
+            'visual-portfolio-gutenberg',
             plugins_url( '../gutenberg/index.min.js', __FILE__ ),
             array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components', 'jquery' ),
             '@@plugin_version',
             true
         );
         wp_enqueue_style(
-            '@@plugin_name-gutenberg',
+            'visual-portfolio-gutenberg',
             plugins_url( '../gutenberg/style.min.css', __FILE__ ),
             array(),
             '@@plugin_version'
         );
-        wp_style_add_data( '@@plugin_name-gutenberg', 'rtl', 'replace' );
-        wp_style_add_data( '@@plugin_name-gutenberg', 'suffix', '.min' );
+        wp_style_add_data( 'visual-portfolio-gutenberg', 'rtl', 'replace' );
+        wp_style_add_data( 'visual-portfolio-gutenberg', 'suffix', '.min' );
 
         wp_localize_script(
-            '@@plugin_name-gutenberg',
+            'visual-portfolio-gutenberg',
             'VPGutenbergVariables',
             array(
                 'nonce'               => wp_create_nonce( 'vp-ajax-nonce' ),
@@ -189,7 +189,7 @@ class Visual_Portfolio_Gutenberg_Block {
 
         // Meta.
         wp_enqueue_script(
-            '@@plugin_name-gutenberg-custom-post-meta',
+            'visual-portfolio-gutenberg-custom-post-meta',
             plugins_url( '../gutenberg/custom-post-meta.min.js', __FILE__ ),
             array( 'wp-editor', 'wp-i18n', 'wp-element', 'wp-components', 'wp-plugins', 'jquery' ),
             '@@plugin_version',
@@ -197,7 +197,7 @@ class Visual_Portfolio_Gutenberg_Block {
         );
 
         wp_localize_script(
-            '@@plugin_name-gutenberg-custom-post-meta',
+            'visual-portfolio-gutenberg-custom-post-meta',
             'VPGutenbergMetaVariables',
             array(
                 'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),

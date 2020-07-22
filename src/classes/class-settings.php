@@ -95,7 +95,7 @@ class Visual_Portfolio_Settings {
             esc_html__( 'Settings', '@@text_domain' ),
             esc_html__( 'Settings', '@@text_domain' ),
             'manage_options',
-            '@@plugin_name-settings',
+            'visual-portfolio-settings',
             array( __CLASS__, 'print_settings_page' )
         );
     }

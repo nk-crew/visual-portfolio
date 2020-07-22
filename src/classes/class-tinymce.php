@@ -70,8 +70,8 @@ class Visual_Portfolio_TinyMCE {
                 return;
             }
 
-            wp_enqueue_script( '@@plugin_name-tinymce-localize', visual_portfolio()->plugin_url . 'assets/admin/js/mce-localize.min.js', array(), '@@plugin_version', true );
-            wp_localize_script( '@@plugin_name-tinymce-localize', 'VPTinyMCEOptions', $data_tiny_mce );
+            wp_enqueue_script( 'visual-portfolio-tinymce-localize', visual_portfolio()->plugin_url . 'assets/admin/js/mce-localize.min.js', array(), '@@plugin_version', true );
+            wp_localize_script( 'visual-portfolio-tinymce-localize', 'VPTinyMCEOptions', $data_tiny_mce );
         }
     }
 

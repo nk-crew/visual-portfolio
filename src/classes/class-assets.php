@@ -98,11 +98,11 @@ class Visual_Portfolio_Assets {
         foreach ( self::$stored_assets[ $type ] as $name => $data ) {
             if ( isset( $data['value'] ) && $data['value'] ) {
                 if ( 'script' === $type ) {
-                    wp_enqueue_script( $name );
+                    wp_enqueue_script( $name, '', array(), '@@plugin_version', true );
                 } elseif ( is_string( $data['value'] ) ) {
-                    visual_portfolio()->include_template_style( $name, $data['value'] );
+                    visual_portfolio()->include_template_style( $name, $data['value'], array(), '@@plugin_version' );
                 } else {
-                    wp_enqueue_style( $name );
+                    wp_enqueue_style( $name, '', array(), '@@plugin_version' );
                 }
 
                 self::$stored_assets[ $type ]['value'] = false;
@@ -120,38 +120,38 @@ class Visual_Portfolio_Assets {
 
         do_action( 'vpf_before_assets_enqueue', $options, $options['id'] );
 
-        self::store_used_assets( '@@plugin_name', true, 'style', 9 );
-        self::store_used_assets( '@@plugin_name-noscript', true, 'style', 9 );
-        self::store_used_assets( '@@plugin_name-notices-default', true, 'style', 9 );
+        self::store_used_assets( 'visual-portfolio', true, 'style', 9 );
+        self::store_used_assets( 'visual-portfolio-noscript', true, 'style', 9 );
+        self::store_used_assets( 'visual-portfolio-notices-default', true, 'style', 9 );
         self::store_used_assets(
-            '@@plugin_name-notices-default',
+            'visual-portfolio-notices-default',
             'notices/style',
             'template_style'
         );
 
-        self::store_used_assets( '@@plugin_name', true, 'script', 11 );
+        self::store_used_assets( 'visual-portfolio', true, 'script', 11 );
 
         // Layout.
         switch ( $options['layout'] ) {
             case 'masonry':
-                self::store_used_assets( '@@plugin_name-layout-masonry', true, 'script' );
-                self::store_used_assets( '@@plugin_name-layout-masonry', true, 'style' );
+                self::store_used_assets( 'visual-portfolio-layout-masonry', true, 'script' );
+                self::store_used_assets( 'visual-portfolio-layout-masonry', true, 'style' );
                 break;
             case 'grid':
-                self::store_used_assets( '@@plugin_name-layout-grid', true, 'script' );
-                self::store_used_assets( '@@plugin_name-layout-grid', true, 'style' );
+                self::store_used_assets( 'visual-portfolio-layout-grid', true, 'script' );
+                self::store_used_assets( 'visual-portfolio-layout-grid', true, 'style' );
                 break;
             case 'tiles':
-                self::store_used_assets( '@@plugin_name-layout-tiles', true, 'script' );
-                self::store_used_assets( '@@plugin_name-layout-tiles', true, 'style' );
+                self::store_used_assets( 'visual-portfolio-layout-tiles', true, 'script' );
+                self::store_used_assets( 'visual-portfolio-layout-tiles', true, 'style' );
                 break;
             case 'justified':
-                self::store_used_assets( '@@plugin_name-layout-justified', true, 'script' );
-                self::store_used_assets( '@@plugin_name-layout-justified', true, 'style' );
+                self::store_used_assets( 'visual-portfolio-layout-justified', true, 'script' );
+                self::store_used_assets( 'visual-portfolio-layout-justified', true, 'style' );
                 break;
             case 'slider':
-                self::store_used_assets( '@@plugin_name-layout-slider', true, 'script' );
-                self::store_used_assets( '@@plugin_name-layout-slider', true, 'style' );
+                self::store_used_assets( 'visual-portfolio-layout-slider', true, 'script' );
+                self::store_used_assets( 'visual-portfolio-layout-slider', true, 'style' );
                 break;
         }
 
@@ -165,12 +165,12 @@ class Visual_Portfolio_Assets {
 
             switch ( $options['items_style'] ) {
                 case 'fly':
-                    self::store_used_assets( '@@plugin_name-items-style-fly', true, 'script' );
+                    self::store_used_assets( 'visual-portfolio-items-style-fly', true, 'script' );
                     break;
             }
 
             self::store_used_assets(
-                '@@plugin_name-items-style-' . $options['items_style'],
+                'visual-portfolio-items-style-' . $options['items_style'],
                 'items-list/items-style' . $items_style_pref . '/style',
                 'template_style'
             );
@@ -199,7 +199,7 @@ class Visual_Portfolio_Assets {
             }
 
             self::store_used_assets(
-                '@@plugin_name-filter-' . $options['filter'],
+                'visual-portfolio-filter-' . $options['filter'],
                 'items-list/filter' . $filter_style_pref . '/style',
                 'template_style'
             );
@@ -214,7 +214,7 @@ class Visual_Portfolio_Assets {
             }
 
             self::store_used_assets(
-                '@@plugin_name-sort-' . $options['sort'],
+                'visual-portfolio-sort-' . $options['sort'],
                 'items-list/sort' . $sort_style_pref . '/style',
                 'template_style'
             );
@@ -230,11 +230,11 @@ class Visual_Portfolio_Assets {
 
             // Minimal page pagination helpful script.
             if ( 'minimal' === $options['pagination_style'] && 'paged' === $options['pagination'] ) {
-                self::store_used_assets( '@@plugin_name-pagination-minimal-paged', true, 'script' );
+                self::store_used_assets( 'visual-portfolio-pagination-minimal-paged', true, 'script' );
             }
 
             self::store_used_assets(
-                '@@plugin_name-pagination-' . $options['pagination_style'],
+                'visual-portfolio-pagination-' . $options['pagination_style'],
                 'items-list/pagination' . $pagination_style_pref . '/style',
                 'template_style'
             );
@@ -264,13 +264,13 @@ class Visual_Portfolio_Assets {
 
         // Photoswipe.
         if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
-            self::store_used_assets( '@@plugin_name-plugin-photoswipe', true, 'script' );
-            self::store_used_assets( '@@plugin_name-popup-photoswipe', true, 'style' );
+            self::store_used_assets( 'visual-portfolio-plugin-photoswipe', true, 'script' );
+            self::store_used_assets( 'visual-portfolio-popup-photoswipe', true, 'style' );
 
             // Fancybox.
         } elseif ( 'fancybox' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_fancybox', true ) ) {
-            self::store_used_assets( '@@plugin_name-plugin-fancybox', true, 'script' );
-            self::store_used_assets( '@@plugin_name-popup-fancybox', true, 'style' );
+            self::store_used_assets( 'visual-portfolio-plugin-fancybox', true, 'script' );
+            self::store_used_assets( 'visual-portfolio-popup-fancybox', true, 'style' );
         }
     }
 
@@ -357,15 +357,15 @@ class Visual_Portfolio_Assets {
 
         // Visual Portfolio CSS.
         $vp_styles = array(
-            '@@plugin_name'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
-            '@@plugin_name-noscript'         => array( 'assets/css/noscript.min.css', array( '@@plugin_name' ) ),
-            '@@plugin_name-layout-justified' => array( 'assets/css/layout-justified.min.css', array( '@@plugin_name' ) ),
-            '@@plugin_name-layout-slider'    => array( 'assets/css/layout-slider.min.css', array( '@@plugin_name', 'swiper' ) ),
-            '@@plugin_name-layout-masonry'   => array( 'assets/css/layout-masonry.min.css', array( '@@plugin_name' ) ),
-            '@@plugin_name-layout-grid'      => array( 'assets/css/layout-grid.min.css', array( '@@plugin_name' ) ),
-            '@@plugin_name-layout-tiles'     => array( 'assets/css/layout-tiles.min.css', array( '@@plugin_name' ) ),
-            '@@plugin_name-popup-fancybox'   => array( 'assets/css/popup-fancybox.min.css', array( '@@plugin_name', 'fancybox' ) ),
-            '@@plugin_name-popup-photoswipe' => array( 'assets/css/popup-photoswipe.min.css', array( '@@plugin_name', 'photoswipe-default-skin' ) ),
+            'visual-portfolio'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
+            'visual-portfolio-noscript'         => array( 'assets/css/noscript.min.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-layout-justified' => array( 'assets/css/layout-justified.min.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-layout-slider'    => array( 'assets/css/layout-slider.min.css', array( 'visual-portfolio', 'swiper' ) ),
+            'visual-portfolio-layout-masonry'   => array( 'assets/css/layout-masonry.min.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-layout-grid'      => array( 'assets/css/layout-grid.min.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-layout-tiles'     => array( 'assets/css/layout-tiles.min.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-popup-fancybox'   => array( 'assets/css/popup-fancybox.min.css', array( 'visual-portfolio', 'fancybox' ) ),
+            'visual-portfolio-popup-photoswipe' => array( 'assets/css/popup-photoswipe.min.css', array( 'visual-portfolio', 'photoswipe-default-skin' ) ),
         );
 
         foreach ( $vp_styles as $name => $data ) {
@@ -376,99 +376,99 @@ class Visual_Portfolio_Assets {
 
         // Visual Portfolio JS.
         $vp_scripts = array(
-            '@@plugin_name' => array(
+            'visual-portfolio' => array(
                 'assets/js/main.min.js',
                 $vp_deps,
             ),
-            '@@plugin_name-plugin-isotope' => array(
+            'visual-portfolio-plugin-isotope' => array(
                 'assets/js/plugin-isotope.min.js',
                 array(
                     'isotope',
                 ),
             ),
-            '@@plugin_name-plugin-fj-gallery' => array(
+            'visual-portfolio-plugin-fj-gallery' => array(
                 'assets/js/plugin-fj-gallery.min.js',
                 array(
                     'flickr-justified-gallery',
                 ),
             ),
-            '@@plugin_name-plugin-swiper' => array(
+            'visual-portfolio-plugin-swiper' => array(
                 'assets/js/plugin-swiper.min.js',
                 array(
                     'swiper',
                 ),
             ),
-            '@@plugin_name-popup-gallery' => array(
+            'visual-portfolio-popup-gallery' => array(
                 'assets/js/popup-gallery.min.js',
                 array(
                     'jquery',
                 ),
             ),
-            '@@plugin_name-plugin-photoswipe' => array(
+            'visual-portfolio-plugin-photoswipe' => array(
                 'assets/js/plugin-photoswipe.min.js',
                 array(
                     'photoswipe-ui-default',
-                    '@@plugin_name-popup-gallery',
+                    'visual-portfolio-popup-gallery',
                 ),
             ),
-            '@@plugin_name-plugin-fancybox' => array(
+            'visual-portfolio-plugin-fancybox' => array(
                 'assets/js/plugin-fancybox.min.js',
                 array(
                     'fancybox',
-                    '@@plugin_name-popup-gallery',
+                    'visual-portfolio-popup-gallery',
                 ),
             ),
-            '@@plugin_name-layout-gaps' => array(
+            'visual-portfolio-layout-gaps' => array(
                 'assets/js/layout-gaps.min.js',
                 array(
                     'jquery',
                 ),
             ),
-            '@@plugin_name-layout-masonry' => array(
+            'visual-portfolio-layout-masonry' => array(
                 'assets/js/layout-masonry.min.js',
                 array(
                     'jquery',
-                    '@@plugin_name-layout-gaps',
-                    '@@plugin_name-plugin-isotope',
+                    'visual-portfolio-layout-gaps',
+                    'visual-portfolio-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-grid' => array(
+            'visual-portfolio-layout-grid' => array(
                 'assets/js/layout-grid.min.js',
                 array(
                     'jquery',
-                    '@@plugin_name-layout-gaps',
-                    '@@plugin_name-plugin-isotope',
+                    'visual-portfolio-layout-gaps',
+                    'visual-portfolio-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-tiles' => array(
+            'visual-portfolio-layout-tiles' => array(
                 'assets/js/layout-tiles.min.js',
                 array(
                     'jquery',
-                    '@@plugin_name-layout-gaps',
-                    '@@plugin_name-plugin-isotope',
+                    'visual-portfolio-layout-gaps',
+                    'visual-portfolio-plugin-isotope',
                 ),
             ),
-            '@@plugin_name-layout-justified' => array(
+            'visual-portfolio-layout-justified' => array(
                 'assets/js/layout-justified.min.js',
                 array(
                     'jquery',
-                    '@@plugin_name-plugin-fj-gallery',
+                    'visual-portfolio-plugin-fj-gallery',
                 ),
             ),
-            '@@plugin_name-layout-slider' => array(
+            'visual-portfolio-layout-slider' => array(
                 'assets/js/layout-slider.min.js',
                 array(
                     'jquery',
-                    '@@plugin_name-plugin-swiper',
+                    'visual-portfolio-plugin-swiper',
                 ),
             ),
-            '@@plugin_name-items-style-fly' => array(
+            'visual-portfolio-items-style-fly' => array(
                 'assets/js/items-style-fly.min.js',
                 array(
                     'jquery',
                 ),
             ),
-            '@@plugin_name-pagination-minimal-paged' => array(
+            'visual-portfolio-pagination-minimal-paged' => array(
                 'assets/js/pagination-minimal-paged.min.js',
                 array(
                     'jquery',
@@ -490,8 +490,8 @@ class Visual_Portfolio_Assets {
         $bg_color = Visual_Portfolio_Settings::get_option( 'background_color', 'vp_popup_gallery' );
 
         if ( $bg_color ) {
-            wp_add_inline_style( '@@plugin_name-popup-fancybox', '.vp-fancybox .fancybox-bg { background-color: ' . esc_attr( $bg_color ) . '; }' );
-            wp_add_inline_style( '@@plugin_name-popup-photoswipe', '.vp-pswp .pswp__bg { background-color: ' . esc_attr( $bg_color ) . '; }' );
+            wp_add_inline_style( 'visual-portfolio-popup-fancybox', '.vp-fancybox .fancybox-bg { background-color: ' . esc_attr( $bg_color ) . '; }' );
+            wp_add_inline_style( 'visual-portfolio-popup-photoswipe', '.vp-pswp .pswp__bg { background-color: ' . esc_attr( $bg_color ) . '; }' );
         }
     }
 
@@ -591,7 +591,7 @@ class Visual_Portfolio_Assets {
      * @return string         The wrapped around tag.
      */
     public function style_loader_tag_noscript( $tag, $handle ) {
-        if ( '@@plugin_name-noscript' === $handle ) {
+        if ( 'visual-portfolio-noscript' === $handle ) {
             $tag = '<noscript>' . $tag . '</noscript>';
         }
         return $tag;
