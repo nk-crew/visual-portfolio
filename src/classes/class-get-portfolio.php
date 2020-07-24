@@ -421,18 +421,6 @@ class Visual_Portfolio_Get {
             }
         }
 
-        $data_attrs = Visual_Portfolio_Extend::portfolio_attrs( $data_attrs, $options );
-        $class      = Visual_Portfolio_Extend::portfolio_class( $class, $options );
-
-        visual_portfolio()->include_template(
-            'items-list/wrapper-start',
-            array(
-                'options'    => $options,
-                'data_attrs' => $data_attrs,
-                'class'      => $class,
-            )
-        );
-
         // get options for the current style.
         $style_options      = array();
         $style_options_slug = 'items_style_' . $options['items_style'] . '__';
@@ -450,6 +438,19 @@ class Visual_Portfolio_Get {
             }
         }
 
+        $data_attrs = Visual_Portfolio_Extend::portfolio_attrs( $data_attrs, $options );
+        $class      = Visual_Portfolio_Extend::portfolio_class( $class, $options );
+
+        visual_portfolio()->include_template(
+            'items-list/wrapper-start',
+            array(
+                'options'       => $options,
+                'style_options' => $style_options,
+                'data_attrs'    => $data_attrs,
+                'class'         => $class,
+            )
+        );
+
         // Top Layout elements.
         self::print_layout_elements( 'top', $options );
 
@@ -463,7 +464,8 @@ class Visual_Portfolio_Get {
         visual_portfolio()->include_template(
             'items-list/items-wrapper-start',
             array(
-                'options' => $options,
+                'options'       => $options,
+                'style_options' => $style_options,
             )
         );
 
@@ -691,7 +693,8 @@ class Visual_Portfolio_Get {
         visual_portfolio()->include_template(
             'items-list/items-wrapper-end',
             array(
-                'options' => $options,
+                'options'       => $options,
+                'style_options' => $style_options,
             )
         );
 
@@ -701,7 +704,8 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template(
                     'items-list/layouts/slider/arrows',
                     array(
-                        'options' => $options,
+                        'options'       => $options,
+                        'style_options' => $style_options,
                     )
                 );
             }
@@ -709,7 +713,8 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template(
                     'items-list/layouts/slider/bullets',
                     array(
-                        'options' => $options,
+                        'options'       => $options,
+                        'style_options' => $style_options,
                     )
                 );
             }
@@ -724,9 +729,10 @@ class Visual_Portfolio_Get {
             visual_portfolio()->include_template(
                 'items-list/layouts/slider/thumbnails',
                 array(
-                    'options'    => $options,
-                    'thumbnails' => $slider_thumbnails,
-                    'img_size'   => $img_size,
+                    'options'       => $options,
+                    'style_options' => $style_options,
+                    'thumbnails'    => $slider_thumbnails,
+                    'img_size'      => $img_size,
                 )
             );
         }
@@ -737,7 +743,8 @@ class Visual_Portfolio_Get {
         visual_portfolio()->include_template(
             'items-list/wrapper-end',
             array(
-                'options' => $options,
+                'options'       => $options,
+                'style_options' => $style_options,
             )
         );
 

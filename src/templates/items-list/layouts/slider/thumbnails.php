@@ -3,6 +3,7 @@
  * Slider layout thumbnails.
  *
  * @var $options
+ * @var $style_options
  * @var $thumbnails
  * @var $img_size
  *

@@ -48,11 +48,32 @@
     }
     .vp-portfolio__item:hover,
     .vp-portfolio__item-focus {
+        .vp-portfolio__item-img img {
+            transform: var(--vp-items-style-default--image-hover__transform);
+        }
+    }
+
+    // Overlay
+    &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
+    &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
         .vp-portfolio__item-img-overlay {
             opacity: 1;
         }
-        .vp-portfolio__item-img img {
-            transform: var(--vp-items-style-default--image-hover__transform);
+    }
+    &.vp-portfolio__items-show-overlay-default {
+        .vp-portfolio__item-img-overlay {
+            opacity: 1;
+        }
+        .vp-portfolio__item:hover,
+        .vp-portfolio__item-focus {
+            .vp-portfolio__item-img-overlay {
+                opacity: 0;
+            }
+        }
+    }
+    &.vp-portfolio__items-show-overlay-always {
+        .vp-portfolio__item-img-overlay {
+            opacity: 1;
         }
     }
 

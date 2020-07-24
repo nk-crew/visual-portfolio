@@ -3,6 +3,7 @@
  * Slider layout bullets.
  *
  * @var $options
+ * @var $style_options
  *
  * @package @@plugin_name
  */

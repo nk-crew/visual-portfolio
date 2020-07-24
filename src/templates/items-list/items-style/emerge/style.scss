@@ -155,6 +155,49 @@
         .vp-portfolio__item-img img {
             transform: var(--vp-items-style-emerge--image-hover__transform);
         }
+    }
+
+    // Overlay
+    &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
+    &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
+        .vp-portfolio__item-overlay {
+            transform: translateY(0);
+            &::before {
+                transform: var(--vp-items-style-emerge--overlay-skew-hover__transform);
+            }
+        }
+        .vp-portfolio__item-meta {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    &.vp-portfolio__items-show-overlay-default {
+        .vp-portfolio__item-overlay {
+            transform: translateY(0);
+            &::before {
+                transform: var(--vp-items-style-emerge--overlay-skew-hover__transform);
+            }
+        }
+        .vp-portfolio__item-meta {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .vp-portfolio__item:hover,
+        .vp-portfolio__item-focus {
+            .vp-portfolio__item-overlay {
+                transform: translateY(100%);
+                &::before {
+                    transform: var(--vp-items-style-emerge--overlay-skew__transform);
+                }
+            }
+            .vp-portfolio__item-meta {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }
+    }
+    &.vp-portfolio__items-show-overlay-always {
         .vp-portfolio__item-overlay {
             transform: translateY(0);
             &::before {

@@ -626,6 +626,17 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
+                            'type'    => 'radio',
+                            'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
+                            'name'    => 'show_overlay',
+                            'default' => 'hover',
+                            'options' => array(
+                                'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
+                                'default' => esc_html__( 'Default State Only', '@@text_domain' ),
+                                'always'  => esc_html__( 'Always', '@@text_domain' ),
+                            ),
+                        ),
+                        array(
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
                             'name'  => 'bg_color',
@@ -706,6 +717,17 @@ class Visual_Portfolio_Admin {
                         'align'                  => 'extended',
                     ),
                     'controls'         => array(
+                        array(
+                            'type'    => 'radio',
+                            'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
+                            'name'    => 'show_overlay',
+                            'default' => 'hover',
+                            'options' => array(
+                                'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
+                                'default' => esc_html__( 'Default State Only', '@@text_domain' ),
+                                'always'  => esc_html__( 'Always', '@@text_domain' ),
+                            ),
+                        ),
                         array(
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
@@ -796,6 +818,17 @@ class Visual_Portfolio_Admin {
                         'align'                  => true,
                     ),
                     'controls'         => array(
+                        array(
+                            'type'    => 'radio',
+                            'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
+                            'name'    => 'show_overlay',
+                            'default' => 'hover',
+                            'options' => array(
+                                'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
+                                'default' => esc_html__( 'Default State Only', '@@text_domain' ),
+                                'always'  => esc_html__( 'Always', '@@text_domain' ),
+                            ),
+                        ),
                         array(
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),

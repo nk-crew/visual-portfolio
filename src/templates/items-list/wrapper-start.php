@@ -3,6 +3,7 @@
  * Wrapper start.
  *
  * @var $options
+ * @var $style_options
  * @var $class
  * @var $data_attrs
  *
