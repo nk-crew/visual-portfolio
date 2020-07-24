@@ -37,6 +37,7 @@ class Visual_Portfolio_Preview {
         add_filter( 'vpf_get_options', array( $this, 'filter_preview_option' ) );
         add_action( 'init', array( $this, 'flush_rules_preview_frame' ) );
         add_action( 'template_redirect', array( $this, 'template_redirect' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 11 );
 
         add_action( 'wp_print_scripts', array( $this, 'localize_scripts' ), 9 );
     }
@@ -160,6 +161,17 @@ class Visual_Portfolio_Preview {
         if ( $this->preview_enabled ) {
             $this->print_template();
             exit;
+        }
+    }
+
+    /**
+     * Enqueue scripts action.
+     */
+    public function wp_enqueue_scripts() {
+        // Dequeue WooCommerce Geolocation script, since it reloads our preview iframe.
+        // Thanks to https://wordpress.org/support/topic/in-editor-the-normal-preview-replaced-with-a-smaller-website-load/ .
+        if ( $this->preview_enabled && wp_script_is( 'wc-geolocation', 'enqueued' ) ) {
+            wp_dequeue_script( 'wc-geolocation' );
         }
     }
 
