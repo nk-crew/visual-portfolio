@@ -135,6 +135,7 @@ class Visual_Portfolio_Settings_API {
 
                 if ( $is_pro ) {
                     $class_name .= ' vpf-settings-control-pro';
+                    $label .= '<span class="vpf-settings-control-pro-label">?<span>' . esc_html__( 'This feature available in PRO plugin only', '@@text_domain' ) . '</span></span>';
                 }
 
                 $args = array(

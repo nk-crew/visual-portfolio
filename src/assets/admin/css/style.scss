@@ -333,31 +333,86 @@ $grid_sm: 600px !default;
             pointer-events: none;
             opacity: .5;
         }
-        > th {
+        .vpf-settings-control-pro-label {
             position: relative;
-            padding-right: 50px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            font-family: sans-serif;
+            font-size: 11px;
+            line-height: 18px;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            background-color: #4c4c4c;
+            border-radius: 10px;
 
-            label::after {
-                content: "PRO";
+            > span {
                 position: absolute;
-                display: block;
-                top: 30px;
-                right: 10px;
-                padding: .2em .8em;
-                font-size: .8em;
-                color: #fff;
-                background-color: #2540cc;
-                border-radius: 1em;
-                transform: translateY(-50%);
+                display: none;
+                bottom: 100%;
+                width: 130px;
+                padding: 5px;
+                margin-bottom: 10px;
+                background-color: rgba(0, 0, 0, .8);
+                border-radius: 4px;
+                z-index: 9990;
             }
+
+            &:hover > span,
+            &:focus > span {
+                display: block;
+            }
+        }
+    }
+
+    // Settings info PRO.
+    .social_pro_info > th {
+        display: none;
+    }
+    .vpf-settings-info-pro {
+        max-width: 240px;
+        padding: 20px;
+        text-align: center;
+        background-color: #e2e2e2;
+        border-radius: 4px;
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        p {
+            margin-bottom: 1em;
+            font-size: 13px;
+        }
+    }
+    .vpf-settings-info-pro-button {
+        display: inline-block;
+        padding: 7px 15px;
+        margin-top: 5px;
+        text-decoration: none;
+        background: #2540cc;
+        border-radius: 3px;
+
+        &,
+        &:hover,
+        &:focus,
+        &:active {
+            color: #fff;
+        }
+        &:hover,
+        &:focus {
+            background: lighten(#2540cc, 5%);
         }
     }
 }
 
-/**
- * TODO: PRO
- */
-.vpf-settings-control-pro,
-.vpf-control-wrap-pro_note {
+#vp_social_integrations h2,
+#vp_social_integrations .submit {
     display: none;
 }
