@@ -65,12 +65,17 @@ const VPPopupAPI = {
                         embedUrl = embedUrl.replace( /{{video_url}}/g, url );
                         embedUrl = embedUrl.replace( /{{video_url_encoded}}/g, encodeURIComponent( url ) );
 
+                        const width = vendorData.width || 1920;
+                        const height = vendorData.height || 1080;
+
                         result = {
                             vendor: vendorData.vendor,
                             id: videoId,
-                            embed: `<iframe width="1920" height="1080" src="${ embedUrl }" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`,
+                            embed: `<iframe width="${ width }" height="${ height }" src="${ embedUrl }" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`,
                             embedUrl,
                             url,
+                            width,
+                            height,
                         };
                     }
                 }
@@ -97,7 +102,6 @@ const VPPopupAPI = {
         const items = [];
         let $meta;
         let size;
-        let videoSize;
         let item;
         let video;
         let videoData;
@@ -107,7 +111,6 @@ const VPPopupAPI = {
 
             if ( $meta && $meta.length ) {
                 size = ( $meta.attr( 'data-vp-popup-img-size' ) || '1920x1080' ).split( 'x' );
-                videoSize = '1920x1080'.split( 'x' );
                 video = $meta.attr( 'data-vp-popup-video' );
                 videoData = false;
 
@@ -121,8 +124,8 @@ const VPPopupAPI = {
                         el: this,
                         src: videoData.embedUrl,
                         embed: videoData.embed,
-                        width: parseInt( videoSize[ 0 ], 10 ),
-                        height: parseInt( videoSize[ 1 ], 10 ),
+                        width: videoData.width || 1920,
+                        height: videoData.height || 1080,
                     };
                 } else {
                     // create slide object
