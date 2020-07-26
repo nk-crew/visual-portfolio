@@ -54,7 +54,13 @@ function resizeVideo( data, curItem ) {
         resultW = vpH * ratio;
     }
 
-    $container.find( '.vp-pswp-video' ).css( 'max-width', resultW );
+    const $videoCont = $container.find( '.vp-pswp-video' );
+
+    $videoCont.css( 'max-width', resultW );
+    $videoCont.children().css( {
+        paddingBottom: `${ 100 * ( curItem.vh / curItem.vw ) }%`,
+    } );
+
     $container.css( {
         top: barTop,
         bottom: barBot,
