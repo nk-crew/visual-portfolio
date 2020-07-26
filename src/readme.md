@@ -18,6 +18,7 @@ Visual Portfolio let you create beautiful portfolio layouts and image galleries.
 ### Links ###
 
 * [Live Demo](https://visualportfolio.co/)
+* [Visual Portfolio PRO](https://visualportfolio.co/pro/)
 * [Documentation](https://visualportfolio.co/documentation/getting-started/)
 * [GitHub](https://github.com/nk-o/visual-portfolio)
 
@@ -53,6 +54,12 @@ Visual Portfolio let you create beautiful portfolio layouts and image galleries.
 * Custom CSS for each portfolio layouts
 * Elementor Page Builder support
 * WPBakery Page Builder support
+
+## PRO ##
+
+The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [Learn more](https://visualportfolio.co/pro/).
+
+If you don't want any of the PRO features, but want to support us, this is the only way you may do it.
 
 ## Real Usage Examples ##
 
