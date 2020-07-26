@@ -23,10 +23,19 @@ if ( 'undefined' !== typeof $.fancybox && VPPopupAPI ) {
 
         // prepare items for fancybox api.
         items.forEach( ( item ) => {
-            if ( 'embed' === item.type ) {
+            if ( 'embed' === item.type && item.src ) {
                 finalItems.push( {
                     type: 'iframe',
                     src: item.src,
+                    opts: {
+                        width: item.width,
+                        height: item.height,
+                    },
+                } );
+            } else if ( 'embed' === item.type && item.embed ) {
+                finalItems.push( {
+                    type: 'html',
+                    src: item.embed,
                     opts: {
                         width: item.width,
                         height: item.height,

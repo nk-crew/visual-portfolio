@@ -21,6 +21,22 @@ const $wnd = $( window );
 const VPPopupAPI = {
     vendor: false,
 
+    vendors: [
+        {
+            vendor: 'youtube',
+            embedUrl: 'https://www.youtube.com/embed/{{video_id}}',
+            pattern: /(https?:\/\/)?(www.)?(youtube\.com|youtu\.be|youtube-nocookie\.com)\/(?:embed\/|v\/|watch\?v=|watch\?list=(.*)&v=|watch\?(.*[^&]&)v=)?((\w|-){11})(&list=(\w+)&?)?/,
+            patternIndex: 6,
+        },
+        {
+            vendor: 'vimeo',
+            embedUrl: 'https://player.vimeo.com/video/{{video_id}}',
+            // eslint-disable-next-line no-useless-escape
+            pattern: /https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/,
+            patternIndex: 3,
+        },
+    ],
+
     init() {},
     open() {},
     close() {},
@@ -33,54 +49,40 @@ const VPPopupAPI = {
      * @returns {object|boolean} video data
      */
     parseVideo( url ) {
-        // Parse Youtube ID
-        function getYoutubeID( ytUrl ) {
-            // eslint-disable-next-line no-useless-escape
-            const regExp = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
-            const match = ytUrl.match( regExp );
-            return match && 11 === match[ 1 ].length ? match[ 1 ] : false;
-        }
+        let result = false;
 
-        // Parse Vimeo ID
-        function getVimeoID( vmUrl ) {
-            // eslint-disable-next-line no-useless-escape
-            const regExp = /https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/;
-            const match = vmUrl.match( regExp );
-            return match && match[ 3 ] ? match[ 3 ] : false;
-        }
+        VPPopupAPI.vendors.forEach( ( vendorData ) => {
+            if ( ! result ) {
+                const match = url.match( vendorData.pattern );
+                const videoId = match && match[ vendorData.patternIndex ] ? match[ vendorData.patternIndex ] : false;
 
-        const Youtube = getYoutubeID( url );
-        const Vimeo = getVimeoID( url );
-        let embedUrl = url;
+                if ( videoId ) {
+                    if ( vendorData.embedCallback ) {
+                        result = vendorData.embedCallback( url, match );
+                    } else {
+                        let { embedUrl } = vendorData;
+                        embedUrl = embedUrl.replace( /{{video_id}}/g, videoId );
+                        embedUrl = embedUrl.replace( /{{video_url}}/g, url );
+                        embedUrl = embedUrl.replace( /{{video_url_encoded}}/g, encodeURIComponent( url ) );
 
-        if ( Youtube ) {
-            embedUrl = `https://www.youtube.com/embed/${ Youtube }`;
+                        result = {
+                            vendor: vendorData.vendor,
+                            id: videoId,
+                            embed: `<iframe width="1920" height="1080" src="${ embedUrl }" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`,
+                            embedUrl,
+                            url,
+                        };
+                    }
+                }
+            }
+        } );
 
-            return {
-                vendor: 'youtube',
-                id: Youtube,
-                url,
-                embedUrl,
-                embed: `<iframe width="1920" height="1080" src="${ embedUrl }" frameborder="0" allowfullscreen></iframe>`,
-            };
-        } if ( Vimeo ) {
-            embedUrl = `//player.vimeo.com/video/${ Vimeo }`;
-
-            return {
-                vendor: 'vimeo',
-                id: Vimeo,
-                url,
-                embedUrl,
-                embed: `<iframe width="1920" height="1080" src="${ embedUrl }" frameborder="0" allowfullscreen></iframe>`,
-            };
-        }
-
-        return {
+        return result || {
             vendor: 'unknown',
             id: url,
             url,
-            embedUrl,
-            embed: `<iframe width="1920" height="1080" src="${ url }" frameborder="0" allowfullscreen></iframe>`,
+            embedUrl: url,
+            embed: `<iframe width="1920" height="1080" src="${ url }" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`,
         };
     },
 
