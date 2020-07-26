@@ -20,6 +20,11 @@ class Visual_Portfolio_Admin {
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
         add_action( 'enqueue_block_editor_assets', array( $this, 'saved_layouts_editor_enqueue_scripts' ) );
 
+        // Pro link.
+        add_filter( 'plugin_action_links_' . visual_portfolio()->plugin_basename, array( $this, 'add_go_pro_link_plugins_page' ) );
+        add_action( 'admin_init', array( $this, 'go_pro_redirect' ) );
+        add_action( 'admin_menu', array( $this, 'pro_admin_menu' ), 12 );
+
         // register controls.
         add_action( 'init', array( $this, 'register_controls' ), 9 );
         add_filter( 'vpf_extend_layouts', array( $this, 'add_default_layouts' ), 9 );
@@ -69,6 +74,56 @@ class Visual_Portfolio_Admin {
                 )
             );
         }
+    }
+
+    /**
+     * Add Go Pro link to plugins page.
+     *
+     * @param Array $links - available links.
+     *
+     * @return array
+     */
+    public function add_go_pro_link_plugins_page( $links ) {
+        return array_merge(
+            $links,
+            array(
+                '<a target="_blank" href="admin.php?page=visual_portfolio_go_pro">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>',
+            )
+        );
+    }
+
+    /**
+     * Go Pro.
+     * Redirect to the Pro purchase page.
+     */
+    public function go_pro_redirect() {
+        // phpcs:ignore
+        if ( ! isset( $_GET['page'] ) || empty( $_GET['page'] ) ) {
+            return;
+        }
+
+        // phpcs:ignore
+        if ( 'visual_portfolio_go_pro' === $_GET['page'] ) {
+            // phpcs:ignore
+            wp_redirect( 'https://visualportfolio.co/pro/' );
+            exit();
+        }
+    }
+
+    /**
+     * Register the admin settings menu PRO link.
+     *
+     * @return void
+     */
+    public function pro_admin_menu() {
+        add_submenu_page(
+            'edit.php?post_type=portfolio',
+            '',
+            '<span class="dashicons dashicons-star-filled" style="font-size: 17px"></span> ' . esc_html__( 'Go Pro', '@@text_domain' ),
+            'manage_options',
+            'visual_portfolio_go_pro',
+            array( $this, 'go_pro_redirect' )
+        );
     }
 
     /**

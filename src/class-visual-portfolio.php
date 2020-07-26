@@ -40,6 +40,13 @@ class Visual_Portfolio {
     }
 
     /**
+     * Basename of plugin main file
+     *
+     * @var $plugin_basename
+     */
+    public $plugin_basename;
+
+    /**
      * Path to the plugin directory
      *
      * @var $plugin_path
@@ -78,8 +85,9 @@ class Visual_Portfolio {
      * Init options
      */
     public function init() {
-        $this->plugin_path = plugin_dir_path( __FILE__ );
-        $this->plugin_url  = plugin_dir_url( __FILE__ );
+        $this->plugin_basename = plugin_basename( __FILE__ );
+        $this->plugin_path     = plugin_dir_path( __FILE__ );
+        $this->plugin_url      = plugin_dir_url( __FILE__ );
 
         if ( in_array( 'visual-portfolio-pro/class-visual-portfolio-pro.php', (array) get_option( 'active_plugins', array() ), true ) ) {
             $this->pro_plugin_path = plugin_dir_path( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
