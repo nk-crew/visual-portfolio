@@ -2779,3 +2779,5 @@ selector p {
         wp_die();
     }
 }
+
+new Visual_Portfolio_Admin();

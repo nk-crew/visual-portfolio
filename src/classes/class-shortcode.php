@@ -83,3 +83,5 @@ class Visual_Portfolio_Shortcode {
         return Visual_Portfolio_Get::get_sort( $atts );
     }
 }
+
+new Visual_Portfolio_Shortcode();

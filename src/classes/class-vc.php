@@ -94,3 +94,5 @@ class Visual_Portfolio_VC {
         }
     }
 }
+
+new Visual_Portfolio_VC();

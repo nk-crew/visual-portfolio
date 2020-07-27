@@ -419,3 +419,5 @@ class Visual_Portfolio_Settings {
         <?php
     }
 }
+
+new Visual_Portfolio_Settings();

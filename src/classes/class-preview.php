@@ -241,3 +241,5 @@ class Visual_Portfolio_Preview {
         );
     }
 }
+
+new Visual_Portfolio_Preview();

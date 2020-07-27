@@ -102,17 +102,6 @@ class Visual_Portfolio {
 
         // register images sizes.
         $this->add_image_sizes();
-
-        // init classes.
-        new Visual_Portfolio_Settings();
-        new Visual_Portfolio_Rest();
-        new Visual_Portfolio_Get();
-        new Visual_Portfolio_Shortcode();
-        new Visual_Portfolio_Preview();
-        new Visual_Portfolio_Admin();
-        new Visual_Portfolio_TinyMCE();
-        new Visual_Portfolio_VC();
-        new Visual_Portfolio_Elementor();
     }
 
     /**

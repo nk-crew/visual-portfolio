@@ -197,3 +197,5 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         );
     }
 }
+
+new Visual_Portfolio_Rest();

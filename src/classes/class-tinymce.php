@@ -99,3 +99,5 @@ class Visual_Portfolio_TinyMCE {
         return $buttons;
     }
 }
+
+new Visual_Portfolio_TinyMCE();

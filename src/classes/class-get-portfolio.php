@@ -2254,3 +2254,5 @@ class Visual_Portfolio_Get {
         return $tags;
     }
 }
+
+new Visual_Portfolio_Get();
