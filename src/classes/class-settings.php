@@ -61,6 +61,25 @@ class Visual_Portfolio_Settings {
     }
 
     /**
+     * Update Option Value
+     *
+     * @param string $option - option name.
+     * @param string $section - section name.
+     * @param string $value - new option value.
+     */
+    public static function update_option( $option, $section, $value ) {
+        $options = get_option( $section );
+
+        if ( ! is_array( $options ) ) {
+            $options = array();
+        }
+
+        $options[ $option ] = $value;
+
+        update_option( $section, $options );
+    }
+
+    /**
      * Init actions
      */
     public static function init_actions() {
