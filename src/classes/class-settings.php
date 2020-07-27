@@ -125,7 +125,7 @@ class Visual_Portfolio_Settings {
             ),
         );
 
-        return $sections;
+        return apply_filters( 'vpf_settings_sections', $sections );
     }
 
     /**
