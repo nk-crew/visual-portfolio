@@ -1708,6 +1708,15 @@ class Visual_Portfolio_Get {
             $args['published_human_format']    = $args['published'];
         }
 
+        // add video format args.
+        if ( 'video' === $args['format'] && $args['video'] ) {
+            $args['format_video_url'] = $args['video'];
+
+            if ( ! $is_posts ) {
+                $args['url'] = $args['video'];
+            }
+        }
+
         // prepare read more button.
         if ( isset( $args['opts']['show_read_more'] ) && $args['opts']['show_read_more'] ) {
             if ( $is_posts && 'more_tag' === $args['opts']['show_read_more'] ) {
@@ -1719,11 +1728,6 @@ class Visual_Portfolio_Get {
             } else {
                 $args['opts']['read_more_url'] = $args['url'];
             }
-        }
-
-        // add video format args.
-        if ( 'video' === $args['format'] && $args['video'] ) {
-            $args['format_video_url'] = $args['video'];
         }
 
         // Click action.
