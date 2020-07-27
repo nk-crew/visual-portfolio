@@ -345,6 +345,11 @@ $grid_sm: 600px !default;
  * Settings
  */
 .portfolio_page_visual-portfolio-settings {
+    // Notices styles fix.
+    .metabox-holder .notice {
+        padding: 15px;
+    }
+
     // PRO control.
     .vpf-settings-control-pro {
         > td {
