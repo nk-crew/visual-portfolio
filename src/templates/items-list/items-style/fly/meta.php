@@ -61,10 +61,19 @@ $show_meta = $inline_meta ||
                 ?>
                 <div class="vp-portfolio__item-meta-icon">
                     <?php
-                    if ( isset( $args['format_video_url'] ) ) {
-                        visual_portfolio()->include_template( 'icons/play' );
-                    } else {
-                        visual_portfolio()->include_template( 'icons/search' );
+                    switch ( $args['format'] ) {
+                        case 'video':
+                            visual_portfolio()->include_template( 'icons/play' );
+                            break;
+                        case 'audio':
+                            visual_portfolio()->include_template( 'icons/music' );
+                            break;
+                        case 'gallery':
+                            visual_portfolio()->include_template( 'icons/gallery' );
+                            break;
+                        default:
+                            visual_portfolio()->include_template( 'icons/search' );
+                            break;
                     }
                     ?>
                 </div>
