@@ -21,7 +21,8 @@ if ( version_compare( PHP_VERSION, '5.5.9' ) >= 0 && ! class_exists( 'Cocur\Slug
  * Session Start
  */
 function vpf_session_start() {
-    if ( ! is_admin() && ! session_id() ) {
+    // Fixes problem with headers sent - https://wordpress.org/support/topic/headers-already-sent-43/ .
+    if ( ! is_admin() && ! session_id() && ! headers_sent() ) {
         session_start();
     }
 }
