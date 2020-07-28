@@ -554,26 +554,22 @@ class Visual_Portfolio_Get {
                     }
                 }
 
-                $args = apply_filters(
-                    'vpf_image_item_args',
-                    array_merge(
-                        $each_item_args,
-                        array(
-                            'uid'            => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
-                            'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
-                            'title'          => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
-                            'format'         => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
-                            'published_time' => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
-                            'filter'         => implode( ',', $filter_values ),
-                            'image_id'       => intval( $img['id'] ),
-                            'focal_point'    => isset( $img['focalPoint'] ) && $img['focalPoint'] ? $img['focalPoint'] : '',
-                            'allow_popup'    => ! isset( $img['url'] ) || ! $img['url'],
-                            'categories'     => $categories,
-                            'author'         => isset( $img['author'] ) && $img['author'] ? $img['author'] : '',
-                            'author_url'     => isset( $img['author'] ) && isset( $img['author_url'] ) && $img['author'] && $img['author_url'] ? $img['author_url'] : '',
-                        )
-                    ),
-                    $img
+                $args = array_merge(
+                    $each_item_args,
+                    array(
+                        'uid'            => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
+                        'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
+                        'title'          => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
+                        'format'         => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
+                        'published_time' => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
+                        'filter'         => implode( ',', $filter_values ),
+                        'image_id'       => intval( $img['id'] ),
+                        'focal_point'    => isset( $img['focalPoint'] ) && $img['focalPoint'] ? $img['focalPoint'] : '',
+                        'allow_popup'    => ! isset( $img['url'] ) || ! $img['url'],
+                        'categories'     => $categories,
+                        'author'         => isset( $img['author'] ) && $img['author'] ? $img['author'] : '',
+                        'author_url'     => isset( $img['author'] ) && isset( $img['author_url'] ) && $img['author'] && $img['author_url'] ? $img['author_url'] : '',
+                    )
                 );
 
                 $slider_thumbnails[] = $args['image_id'];
@@ -586,6 +582,8 @@ class Visual_Portfolio_Get {
                 if ( 'video' === $args['format'] && isset( $img['video_url'] ) && $img['video_url'] ) {
                     $args['video'] = $img['video_url'];
                 }
+
+                $args = apply_filters( 'vpf_image_item_args', $args, $img );
 
                 self::each_item( $args );
             }

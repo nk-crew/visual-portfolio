@@ -144,7 +144,13 @@ class VpVideoComponent extends Component {
                 className="vpf-meta-video-panel"
             >
                 <PanelRow>
-                    <p className="description">{ __( 'Video will be used in Visual Portfolio layouts only.', '@@text_domain' ) }</p>
+                    <p className="description">
+                        { __( 'Video will be used in Visual Portfolio layouts only. Full list of supported links', '@@text_domain' ) }
+                        &nbsp;
+                        <a href="https://visualportfolio.co/documentation/portfolio-items/video-portfolio-item/#supported-video-vendors" target="_blank" rel="noopener noreferrer">
+                            { __( 'see here', '@@text_domain' ) }
+                        </a>
+                    </p>
                 </PanelRow>
                 <PanelRow>
                     <TextControl
