@@ -13,8 +13,6 @@ const {
     settingsPopupGallery,
 } = VPData;
 
-const $wnd = $( window );
-
 /*
  * Global Popup Gallery API.
  */
@@ -220,11 +218,6 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             const items = VPPopupAPI.parseGallery( self.$item );
 
             VPPopupAPI.open( items, index, self );
-        } );
-
-        // close on scroll
-        $wnd.on( `scroll.vpf-uid-${ self.uid }`, () => {
-            VPPopupAPI.close();
         } );
     };
 

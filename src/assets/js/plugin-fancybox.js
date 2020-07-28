@@ -114,7 +114,7 @@ if ( 'undefined' !== typeof $.fancybox && VPPopupAPI ) {
             baseClass: 'vp-fancybox',
 
             // Hide browser vertical scrollbars; use at your own risk
-            hideScrollbar: false,
+            hideScrollbar: true,
 
             // Use mousewheel to navigate gallery
             // If 'auto' - enabled for images only
