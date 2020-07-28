@@ -126,6 +126,27 @@ Migration Notes:
 * If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - <https://visualportfolio.co/documentation/developers/css-variables/>
 * If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-o/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
 
+= 2.3.0 =
+
+* added PRO version support <https://visualportfolio.co/pro/>
+* added overlay support for Classic style
+* added options to change meta color, links color and links hover color for all items styles
+* added options to show items overlay on hover only, on default state only and always
+* added version number to stored assets (may fix the caching issue, when users update to the latest version)
+* added vertical scroll to overlay meta data when overflow for Fade, Fly and Emerge styles
+* improved click action for popup gallery (don't open popup if click on some meta links)
+* improved Play icon for video items
+* disabled possibility to close popup on page scroll
+* fixed renaming saved layouts possibility
+* fixed portfolio preview frame loading when WooCommerce Geolocation option enabled
+* fixed displaying Stretch option in Saved Layouts
+* fixed Author meta displaying when no author specified in image options
+* fixed custom taxonomies setting usage
+* fixed RTL check error in Isotope module when no items available
+* fixed disabled Gutenberg editor in some 3rd-party plugins/themes
+* fixed rare headers sent error
+* minor fixes
+
 = 2.2.0 =
 
 * added RTL support
