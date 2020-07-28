@@ -180,7 +180,7 @@ class Visual_Portfolio_Controls {
         if ( ! isset( $args['name'] ) ) {
             return;
         }
-        self::$registered_fields[ $args['name'] ] = $args;
+        self::$registered_fields[ $args['name'] ] = apply_filters( 'vpf_register_control', $args, $args['name'] );
 
         do_action( 'vpf_registered_control', $args['name'], $args );
     }
