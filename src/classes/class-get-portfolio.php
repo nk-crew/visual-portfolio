@@ -615,10 +615,10 @@ class Visual_Portfolio_Get {
                             $filter_values[] = $cat_item->slug;
 
                             // add in categories array.
-                            $unique_name  = $cat_item->taxonomy . ':' . $cat_item->slug;
+                            $unique_name  = rawurlencode( $cat_item->taxonomy . ':' ) . $cat_item->slug;
                             $url          = self::get_pagenum_link(
                                 array(
-                                    'vp_filter' => rawurlencode( $unique_name ),
+                                    'vp_filter' => $unique_name,
                                     'vp_page'   => 1,
                                 )
                             );
@@ -1467,14 +1467,16 @@ class Visual_Portfolio_Get {
             if ( isset( $all_terms ) && is_array( $all_terms ) ) {
                 foreach ( $all_terms as $term ) {
                     if ( in_array( $term->term_id, $term_ids, true ) ) {
-                        $unique_name = $term->taxonomy . ':' . $term->slug;
+                        $unique_name = rawurlencode( $term->taxonomy . ':' ) . $term->slug;
 
                         $url = self::get_pagenum_link(
                             array(
-                                'vp_filter' => rawurlencode( $unique_name ),
+                                'vp_filter' => $unique_name,
                                 'vp_page'   => 1,
                             )
                         );
+
+                        $is_active = rawurldecode( $unique_name ) === $active_item;
 
                         $terms[ $unique_name ] = array(
                             'filter'      => $term->slug,
@@ -1484,12 +1486,12 @@ class Visual_Portfolio_Get {
                             'taxonomy'    => $term->taxonomy,
                             'id'          => $term->term_id,
                             'parent'      => $term->parent,
-                            'active'      => $active_item === $unique_name,
+                            'active'      => $is_active,
                             'url'         => $url,
-                            'class'       => 'vp-filter__item' . ( $active_item === $unique_name ? ' vp-filter__item-active' : '' ),
+                            'class'       => 'vp-filter__item' . ( $is_active ? ' vp-filter__item-active' : '' ),
                         );
 
-                        if ( $active_item === $unique_name ) {
+                        if ( $is_active ) {
                             $there_is_active = true;
                         }
                     }
