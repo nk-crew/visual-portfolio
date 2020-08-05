@@ -442,6 +442,8 @@ class Visual_Portfolio_Get {
         $data_attrs = Visual_Portfolio_Extend::portfolio_attrs( $data_attrs, $options );
         $class      = Visual_Portfolio_Extend::portfolio_class( $class, $options );
 
+        do_action( 'vpf_before_wrapper_start', $options, $style_options );
+
         visual_portfolio()->include_template(
             'items-list/wrapper-start',
             array(
@@ -451,6 +453,8 @@ class Visual_Portfolio_Get {
                 'class'         => $class,
             )
         );
+
+        do_action( 'vpf_after_wrapper_start', $options, $style_options );
 
         // Top Layout elements.
         self::print_layout_elements( 'top', $options );
@@ -462,6 +466,8 @@ class Visual_Portfolio_Get {
         <div class="vp-portfolio__items-wrap">
         <?php
 
+        do_action( 'vpf_before_items_wrapper_start', $options, $style_options );
+
         visual_portfolio()->include_template(
             'items-list/items-wrapper-start',
             array(
@@ -469,6 +475,8 @@ class Visual_Portfolio_Get {
                 'style_options' => $style_options,
             )
         );
+
+        do_action( 'vpf_after_items_wrapper_start', $options, $style_options );
 
         $each_item_args = array(
             'uid'                => '',
@@ -689,6 +697,8 @@ class Visual_Portfolio_Get {
             $portfolio_query->reset_postdata();
         }
 
+        do_action( 'vpf_before_items_wrapper_end', $options, $style_options );
+
         visual_portfolio()->include_template(
             'items-list/items-wrapper-end',
             array(
@@ -696,6 +706,8 @@ class Visual_Portfolio_Get {
                 'style_options' => $style_options,
             )
         );
+
+        do_action( 'vpf_after_items_wrapper_end', $options, $style_options );
 
         // Slider arrows and bullets.
         if ( 'slider' === $options['layout'] ) {
@@ -739,6 +751,8 @@ class Visual_Portfolio_Get {
         // Bottom Layout elements.
         self::print_layout_elements( 'bottom', $options );
 
+        do_action( 'vpf_before_wrapper_end', $options, $style_options );
+
         visual_portfolio()->include_template(
             'items-list/wrapper-end',
             array(
@@ -746,6 +760,8 @@ class Visual_Portfolio_Get {
                 'style_options' => $style_options,
             )
         );
+
+        do_action( 'vpf_after_wrapper_end', $options, $style_options );
 
         do_action( 'vpf_after_get_output', $options );
 
