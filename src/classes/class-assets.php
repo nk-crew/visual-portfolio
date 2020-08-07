@@ -131,6 +131,9 @@ class Visual_Portfolio_Assets {
 
         self::store_used_assets( 'visual-portfolio', true, 'script', 11 );
 
+        self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'script' );
+        self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'style' );
+
         // Layout.
         switch ( $options['layout'] ) {
             case 'masonry':
@@ -319,6 +322,12 @@ class Visual_Portfolio_Assets {
             wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', array(), '5.0.4', true );
         }
 
+        // Simplebar.
+        if ( apply_filters( 'vpf_enqueue_plugin_simplebar', true ) ) {
+            wp_register_style( 'simplebar', visual_portfolio()->plugin_url . 'assets/vendor/simplebar/simplebar.min.css', array(), '5.2.1' );
+            wp_register_script( 'simplebar', visual_portfolio()->plugin_url . 'assets/vendor/simplebar/simplebar.min.js', array(), '5.2.1', true );
+        }
+
         // LazySizes.
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
@@ -359,6 +368,7 @@ class Visual_Portfolio_Assets {
         $vp_styles = array(
             'visual-portfolio'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
             'visual-portfolio-noscript'         => array( 'assets/css/noscript.min.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-custom-scrollbar' => array( 'assets/css/custom-scrollbar.min.css', array( 'simplebar' ) ),
             'visual-portfolio-layout-justified' => array( 'assets/css/layout-justified.min.css', array( 'visual-portfolio' ) ),
             'visual-portfolio-layout-slider'    => array( 'assets/css/layout-slider.min.css', array( 'visual-portfolio', 'swiper' ) ),
             'visual-portfolio-layout-masonry'   => array( 'assets/css/layout-masonry.min.css', array( 'visual-portfolio' ) ),
@@ -396,6 +406,12 @@ class Visual_Portfolio_Assets {
                 'assets/js/plugin-swiper.min.js',
                 array(
                     'swiper',
+                ),
+            ),
+            'visual-portfolio-custom-scrollbar' => array(
+                'assets/js/custom-scrollbar.min.js',
+                array(
+                    'simplebar',
                 ),
             ),
             'visual-portfolio-popup-gallery' => array(

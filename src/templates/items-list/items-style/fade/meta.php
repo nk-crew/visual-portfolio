@@ -52,7 +52,7 @@ $show_meta = $inline_meta ||
             ?>
             tabindex="-1"
         <?php endif; ?>
-        class="vp-portfolio__item-meta">
+        class="vp-portfolio__item-meta vp-portfolio__custom-scrollbar">
 
         <?php if ( $show_meta ) : ?>
             <?php

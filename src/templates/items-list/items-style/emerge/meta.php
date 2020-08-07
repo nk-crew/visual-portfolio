@@ -28,7 +28,7 @@ $show_meta = $inline_meta ||
 
 <figcaption class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
     <?php if ( $show_meta ) : ?>
-        <div class="vp-portfolio__item-meta">
+        <div class="vp-portfolio__item-meta vp-portfolio__custom-scrollbar">
             <?php
 
             // Show Categories.
