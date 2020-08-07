@@ -73,6 +73,7 @@ class Visual_Portfolio_Gutenberg_Block {
                 case 'toggle':
                     $attributes[ $control['name'] ]['type'] = 'boolean';
                     break;
+                case 'number':
                 case 'range':
                     $attributes[ $control['name'] ]['type'] = 'number';
                     break;
