@@ -16,12 +16,16 @@ const { __ } = wp.i18n;
 
 const {
     registerBlockType,
+    getCategories,
 } = wp.blocks;
 
 const { name } = metadata;
 
+const hasMediaCategory = getCategories().some( ( category ) => 'media' === category.slug );
+
 const settings = {
     ...metadata,
+    category: hasMediaCategory ? metadata.category : 'common',
     title: __( 'Visual Portfolio', '@@text_domain' ),
     description: __( 'Display galleries, posts and portfolio grids.', '@@text_domain' ),
     icon: {

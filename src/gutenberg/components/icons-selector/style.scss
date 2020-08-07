@@ -21,9 +21,9 @@
 }
 %vpf-icons-selector-item-active {
     // stylelint-disable-next-line
-    border-color: #007cba !important;
+    border-color: $gray-900 !important;
     // stylelint-disable-next-line
-    box-shadow: 0 0 0 1px #007cba !important;
+    box-shadow: 0 0 0 1px $gray-900 !important;
     // stylelint-disable-next-line
     background: #fff !important;
 

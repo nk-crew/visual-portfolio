@@ -66,7 +66,7 @@
                 justify-content: center;
                 width: 100%;
                 background: none;
-                border: 1px dashed #ccc;
+                border: 1px solid $gray-900;
                 box-shadow: none;
             }
         }
@@ -79,7 +79,7 @@
             margin-top: 10px;
             color: $dark-gray-200;
             background-color: transparent;
-            border: 1px solid $light-gray-700;
+            border: 1px solid $gray-900;
             border-radius: 3px;
         }
         button.vpf-component-elements-selector-control-location-options-item {

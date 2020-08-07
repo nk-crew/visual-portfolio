@@ -1,6 +1,6 @@
 {
 	"name": "visual-portfolio/block",
-	"category": "common",
+	"category": "media",
     "supports": {
         "anchor": true,
         "className": true,

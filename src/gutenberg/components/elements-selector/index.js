@@ -124,6 +124,10 @@ export default class ElementsSelector extends Component {
                 result.push(
                     <Dropdown
                         key={ optionName }
+                        contentClassName="vpf-component-dropdown-no-padding"
+                        popoverProps={ {
+                            position: 'bottom center',
+                        } }
                         renderToggle={ ( { isOpen, onToggle } ) => (
                             <button
                                 type="button"
@@ -262,7 +266,9 @@ export default class ElementsSelector extends Component {
                     { Object.keys( availableElements ).length ? (
                         <DropdownMenu
                             className="vpf-component-elements-selector-control-location-options-add-button"
-                            position="bottom"
+                            popoverProps={ {
+                                position: 'bottom center',
+                            } }
                             icon={ (
                                 <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" role="img" aria-hidden="true" focusable="false">
                                     <path d="M10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6zM10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6z" />

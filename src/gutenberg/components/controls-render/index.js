@@ -54,6 +54,7 @@ const {
     CheckboxControl,
     RadioControl,
     ToggleControl,
+    RangeControl,
 } = wp.components;
 
 const {
@@ -227,8 +228,8 @@ ControlsRender.Control = function( props ) {
                 { Object.keys( props.options || {} ).map( ( val ) => (
                     <Button
                         isSmall
-                        isSecondary
                         isPrimary={ controlVal === val }
+                        isPressed={ controlVal === val }
                         key={ val }
                         onClick={ () => onChange( val ) }
                     >
@@ -340,38 +341,14 @@ ControlsRender.Control = function( props ) {
         }
         break;
     case 'range':
-        // We can't use RangeControl just because it automatically resets value, that is not in range of min and max.
-        //
-        // <RangeControl
-        //     min={ props.min }
-        //     max={ props.max }
-        //     step={ props.step }
-        //     value={ controlVal }
-        //     onChange={ ( val ) => onChange( val ) }
-        // />
         renderControl = (
-            <div className="components-base-control components-range-control">
-                <div className="components-base-control__field">
-                    <input
-                        className="components-range-control__slider"
-                        type="range"
-                        min={ props.min }
-                        max={ props.max }
-                        step={ props.step }
-                        value={ controlVal }
-                        onChange={ ( e ) => onChange( parseFloat( e.target.value ) ) }
-                    />
-                    <input
-                        className="components-range-control__number"
-                        type="number"
-                        min={ props.min }
-                        max={ props.max }
-                        step={ props.step }
-                        value={ controlVal }
-                        onChange={ ( e ) => onChange( parseFloat( e.target.value ) ) }
-                    />
-                </div>
-            </div>
+            <RangeControl
+                min={ props.min }
+                max={ props.max }
+                step={ props.step }
+                value={ controlVal }
+                onChange={ ( val ) => onChange( val ) }
+            />
         );
         break;
     case 'toggle':
@@ -444,6 +421,20 @@ ControlsRender.Control = function( props ) {
                 type="url"
                 value={ controlVal }
                 onChange={ ( val ) => onChange( val ) }
+            />
+        );
+        renderControlLabel = false;
+        break;
+    case 'number':
+        renderControl = (
+            <TextControl
+                label={ renderControlLabel }
+                type="number"
+                min={ props.min }
+                max={ props.max }
+                step={ props.step }
+                value={ controlVal }
+                onChange={ ( val ) => onChange( parseFloat( val ) ) }
             />
         );
         renderControlLabel = false;

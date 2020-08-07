@@ -253,7 +253,7 @@ class Visual_Portfolio_Admin {
                     'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="7.35714" height="5.35714" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="11.8929" y="13.8928" width="7.35714" height="5.35715" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="11.8929" y="0.75" width="7.35714" height="9.35714" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="0.75" y="9.89285" width="7.35714" height="9.35715" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
                     'controls' => array(
                         array(
-                            'type'    => 'range',
+                            'type'    => 'number',
                             'label'   => esc_html__( 'Columns', '@@text_domain' ),
                             'name'    => 'columns',
                             'min'     => 1,
@@ -275,7 +275,7 @@ class Visual_Portfolio_Admin {
                     'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="7.35714" height="6.5" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="11.8929" y="13.3214" width="7.35714" height="5.92857" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="11.8929" y="0.75" width="7.35714" height="9.07143" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="0.75" y="13.3214" width="7.35714" height="5.92857" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
                     'controls' => array(
                         array(
-                            'type'    => 'range',
+                            'type'    => 'number',
                             'label'   => esc_html__( 'Columns', '@@text_domain' ),
                             'name'    => 'columns',
                             'min'     => 1,
@@ -346,7 +346,7 @@ class Visual_Portfolio_Admin {
                             'label'   => esc_html__( 'Autoplay (in Seconds)', '@@text_domain' ),
                             'name'    => 'autoplay',
                             'min'     => 0,
-                            'max'     => 20,
+                            'max'     => 60,
                             'step'    => 0.2,
                             'default' => 6,
                         ),
@@ -375,7 +375,7 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'      => 'range',
+                            'type'      => 'number',
                             'name'      => 'items_height_static',
                             'min'       => 30,
                             'max'       => 800,
@@ -389,7 +389,7 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'      => 'range',
+                            'type'      => 'number',
                             'name'      => 'items_height_dynamic',
                             'min'       => 10,
                             'max'       => 300,
@@ -435,7 +435,7 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'      => 'range',
+                            'type'      => 'number',
                             'name'      => 'slides_per_view_custom',
                             'min'       => 1,
                             'max'       => 6,
@@ -554,7 +554,7 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'      => 'range',
+                            'type'      => 'number',
                             'name'      => 'thumbnails_height_static',
                             'min'       => 10,
                             'max'       => 400,
@@ -571,7 +571,7 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'      => 'range',
+                            'type'      => 'number',
                             'name'      => 'thumbnails_height_dynamic',
                             'min'       => 10,
                             'max'       => 200,
@@ -603,7 +603,7 @@ class Visual_Portfolio_Admin {
                             ),
                         ),
                         array(
-                            'type'      => 'range',
+                            'type'      => 'number',
                             'name'      => 'thumbnails_per_view_custom',
                             'min'       => 1,
                             'max'       => 14,
@@ -1246,6 +1246,7 @@ class Visual_Portfolio_Admin {
                 'description' => esc_html__( 'Use this setting to skip over posts (e.g. `2` to skip over 2 posts)', '@@text_domain' ),
                 'name'        => 'posts_offset',
                 'min'         => 0,
+                'max'         => 100,
                 'condition'   => array(
                     array(
                         'control'  => 'posts_source',
@@ -1446,13 +1447,12 @@ class Visual_Portfolio_Admin {
          */
         Visual_Portfolio_Controls::register(
             array(
-                'category'    => 'content-source-additional',
-                'type'        => 'range',
-                'label'       => esc_html__( 'Items Per Page', '@@text_domain' ),
-                'name'        => 'items_count',
-                'default'     => 6,
-                'min'         => 1,
-                'max'         => 50,
+                'category' => 'content-source-additional',
+                'type'     => 'number',
+                'label'    => esc_html__( 'Items Per Page', '@@text_domain' ),
+                'name'     => 'items_count',
+                'default'  => 6,
+                'min'      => 1,
             )
         );
 
@@ -1543,7 +1543,7 @@ class Visual_Portfolio_Admin {
                 'name'     => 'items_gap',
                 'default'  => 15,
                 'min'      => 0,
-                'max'      => 150,
+                'max'      => 200,
             )
         );
 
@@ -1594,7 +1594,7 @@ class Visual_Portfolio_Admin {
                                 'label'   => esc_html__( 'Images Rounded Corners', '@@text_domain' ),
                                 'name'    => 'images_rounded_corners',
                                 'min'     => 0,
-                                'max'     => 50,
+                                'max'     => 100,
                                 'default' => 0,
                                 'style'   => array(
                                     array(
@@ -1625,7 +1625,7 @@ class Visual_Portfolio_Admin {
                                 'label'     => esc_html__( 'Categories Count', '@@text_domain' ),
                                 'name'      => 'categories_count',
                                 'min'       => 1,
-                                'max'       => 10,
+                                'max'       => 20,
                                 'default'   => 1,
                                 'condition' => array(
                                     array(
@@ -1718,7 +1718,7 @@ class Visual_Portfolio_Admin {
                                 'default'   => false,
                             );
                             $new_fields[] = array(
-                                'type'      => 'range',
+                                'type'      => 'number',
                                 'label'     => esc_html__( 'Excerpt Words Count', '@@text_domain' ),
                                 'name'      => 'excerpt_words_count',
                                 'default'   => 15,
@@ -2511,7 +2511,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'  => 'pagination',
-                'type'      => 'range',
+                'type'      => 'number',
                 'label'     => esc_html__( 'Scroll to Top Offset', '@@text_domain' ),
                 'name'      => 'pagination_paged__scroll_top_offset',
                 'default'   => 30,

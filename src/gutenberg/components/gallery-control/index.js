@@ -77,7 +77,10 @@ const SortableItem = SortableElement( ( props ) => {
         <Dropdown
             // eslint-disable-next-line react/no-array-index-key
             key={ `${ img.id || img.imgThumbnailUrl || img.imgUrl }-${ idx }` }
-            position="bottom center"
+            contentClassName="vpf-component-dropdown-no-padding"
+            popoverProps={ {
+                position: 'bottom center',
+            } }
             className="vpf-component-gallery-control-item"
             renderToggle={ ( { isOpen, onToggle } ) => (
                 <Fragment>
@@ -228,8 +231,8 @@ const SortableList = SortableContainer( ( props ) => {
                             open();
                         } }
                     >
-                        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" role="img" aria-hidden="true" focusable="false">
-                            <path d="M10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6zM10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false">
+                            <path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
                         </svg>
                         <span>
                             { __( 'Add Images', '@@text_domain' ) }
@@ -360,7 +363,6 @@ export default compose( [
     withInstanceId,
     withNotices,
 ] )( GalleryControl );
-
 
 // add list of all categories to gallery images.
 addFilter( 'vpf.editor.controls-render-data', 'vpf/editor/controls-render-data/images-categories-suggestions', ( data ) => {

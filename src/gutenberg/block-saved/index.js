@@ -14,12 +14,16 @@ const { __ } = wp.i18n;
 
 const {
     registerBlockType,
+    getCategories,
 } = wp.blocks;
 
 const { name } = metadata;
 
+const hasMediaCategory = getCategories().some( ( category ) => 'media' === category.slug );
+
 const settings = {
     ...metadata,
+    category: hasMediaCategory ? metadata.category : 'common',
     title: __( 'Visual Portfolio Saved', '@@text_domain' ),
     description: __( 'Display saved Visual Portfolio layouts.', '@@text_domain' ),
     icon: {
