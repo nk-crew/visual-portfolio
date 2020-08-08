@@ -33,24 +33,28 @@ const {
 } = wp.element;
 
 const {
+    withSelect,
+} = wp.data;
+
+const {
     Spinner,
 } = wp.components;
 
 /**
  * Component Class
  */
-export default class IframePreview extends Component {
+class IframePreview extends Component {
     constructor( ...args ) {
         super( ...args );
 
         this.state = {
-            attributes: { ...this.props.attributes },
             loading: true,
         };
 
         this.frameRef = createRef();
         this.formRef = createRef();
 
+        this.maybePreviewTypeChanged = this.maybePreviewTypeChanged.bind( this );
         this.maybeAttributesChanged = this.maybeAttributesChanged.bind( this );
         this.onFrameLoad = this.onFrameLoad.bind( this );
         this.maybeReload = this.maybeReload.bind( this );
@@ -84,8 +88,9 @@ export default class IframePreview extends Component {
         this.maybeReload();
     }
 
-    componentDidUpdate() {
-        this.maybeAttributesChanged();
+    componentDidUpdate( prevProps ) {
+        this.maybePreviewTypeChanged( prevProps );
+        this.maybeAttributesChanged( prevProps );
     }
 
     componentWillUnmount() {
@@ -114,7 +119,15 @@ export default class IframePreview extends Component {
         } );
     }
 
-    maybeAttributesChanged() {
+    maybePreviewTypeChanged( prevProps ) {
+        if ( prevProps.previewDeviceType === this.props.previewDeviceType ) {
+            return;
+        }
+
+        this.maybeResizePreviews();
+    }
+
+    maybeAttributesChanged( prevProps ) {
         if ( this.busyReload ) {
             return;
         }
@@ -126,7 +139,7 @@ export default class IframePreview extends Component {
 
         const {
             attributes: oldAttributes,
-        } = this.state;
+        } = prevProps;
 
         const frame = this.frameRef.current;
 
@@ -174,17 +187,10 @@ export default class IframePreview extends Component {
                 }
             }
 
-            this.setState( {
-                attributes: {
-                    ...oldAttributes,
-                    ...data.attributes,
-                },
-            }, () => {
-                if ( data.reload ) {
-                    this.maybeReloadDebounce();
-                }
-                this.busyReload = false;
-            } );
+            if ( data.reload ) {
+                this.maybeReloadDebounce();
+            }
+            this.busyReload = false;
         } else {
             this.busyReload = false;
         }
@@ -261,11 +267,11 @@ export default class IframePreview extends Component {
 
     render() {
         const {
+            attributes,
             clientId,
         } = this.props;
 
         const {
-            attributes,
             loading,
         } = this.state;
 
@@ -320,6 +326,16 @@ export default class IframePreview extends Component {
         );
     }
 }
+
+export default withSelect( ( select ) => {
+    const {
+        __experimentalGetPreviewDeviceType,
+    } = select( 'core/edit-post' );
+
+    return {
+        previewDeviceType: __experimentalGetPreviewDeviceType ? __experimentalGetPreviewDeviceType() : 'desktop',
+    };
+} )( IframePreview );
 
 // live reload
 addFilter( 'vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-reload', ( data ) => {
