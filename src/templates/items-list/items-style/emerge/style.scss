@@ -52,20 +52,27 @@
     }
 
     // meta
-    .vp-portfolio__item-meta {
+    .vp-portfolio__item-meta-wrap {
         flex: 1;
-        min-width: 100%;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+    }
+    .vp-portfolio__item-meta {
+        width: 100%;
         max-height: 100%;
         padding: var(--vp-items-style-emerge--overlay__padding-v) var(--vp-items-style-emerge--overlay__padding-h);
-        overflow: auto;
         color: inherit;
-        opacity: 0;
-        transition: transform var(--vp-items-style-emerge-transition-duration) .1s var(--vp-items-style-emerge-transition-easing), opacity var(--vp-items-style-emerge-transition-duration) .1s var(--vp-items-style-emerge-transition-easing);
-        transform: translateY(10px);
-        will-change: transform, opacity;
 
         > * {
             margin-bottom: var(--vp-items-style-emerge--meta-items__gap);
+            opacity: 0;
+            transition-delay: calc(var(--vp-items-style-emerge--meta-staggering__transition-delay) * var(--vp-items--meta-staggering__index));
+            transition-timing-function: var(--vp-items-style-emerge--meta-staggering__transition-easing);
+            transition-duration: var(--vp-items-style-emerge--meta-staggering__transition-duration);
+            transition-property: opacity, transform;
+            transform: translateY(10px);
+            will-change: transform, opacity;
         }
 
         > :last-child {
@@ -79,11 +86,11 @@
         font-size: var(--vp-items-style-emerge--meta-categories__font-size);
         font-weight: var(--vp-items-style-emerge--meta-categories__font-weight);
         text-transform: var(--vp-items-style-emerge--meta-categories__text-transform);
-        opacity: var(--vp-items-style-emerge--meta-categories__opacity);
 
         .vp-portfolio__item-meta-category {
             display: flex;
             margin-left: var(--vp-items-style-emerge--meta-categories__gap);
+            opacity: var(--vp-items-style-emerge--meta-categories__opacity);
 
             @if variable-exists(rtl) and $rtl {
                 &::before {
@@ -120,10 +127,10 @@
         margin-left: calc(-1 * var(--vp-items-style-emerge--meta-inline__gap));
         font-weight: var(--vp-items-style-emerge--meta-inline__font-weight);
         line-height: var(--vp-items-style-emerge--meta-inline__line-height);
-        opacity: var(--vp-items-style-emerge--meta-inline__font-opacity);
 
         > * {
             margin-left: var(--vp-items-style-emerge--meta-inline__gap);
+            opacity: var(--vp-items-style-emerge--meta-inline__font-opacity);
         }
     }
     .vp-portfolio__item-meta-part-icon {
@@ -141,7 +148,10 @@
     }
     .vp-portfolio__item-meta-excerpt {
         line-height: var(--vp-items-style-emerge--meta-excerpt__line-height);
-        opacity: var(--vp-items-style-emerge--meta-excerpt__opacity);
+
+        > div {
+            opacity: var(--vp-items-style-emerge--meta-excerpt__opacity);
+        }
     }
 
     // Transitions
@@ -166,7 +176,7 @@
                 transform: var(--vp-items-style-emerge--overlay-skew-hover__transform);
             }
         }
-        .vp-portfolio__item-meta {
+        .vp-portfolio__item-meta > * {
             opacity: 1;
             transform: translateY(0);
         }
@@ -178,7 +188,7 @@
                 transform: var(--vp-items-style-emerge--overlay-skew-hover__transform);
             }
         }
-        .vp-portfolio__item-meta {
+        .vp-portfolio__item-meta > * {
             opacity: 1;
             transform: translateY(0);
         }
@@ -191,7 +201,7 @@
                     transform: var(--vp-items-style-emerge--overlay-skew__transform);
                 }
             }
-            .vp-portfolio__item-meta {
+            .vp-portfolio__item-meta > * {
                 opacity: 0;
                 transform: translateY(10px);
             }
@@ -204,7 +214,7 @@
                 transform: var(--vp-items-style-emerge--overlay-skew-hover__transform);
             }
         }
-        .vp-portfolio__item-meta {
+        .vp-portfolio__item-meta > * {
             opacity: 1;
             transform: translateY(0);
         }

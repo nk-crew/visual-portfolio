@@ -249,7 +249,9 @@ $show_meta = $inline_meta ||
             if ( $opts['show_excerpt'] && $args['excerpt'] ) {
                 ?>
                 <div class="vp-portfolio__item-meta-excerpt">
-                    <?php echo wp_kses_post( $args['excerpt'] ); ?>
+                    <div>
+                        <?php echo wp_kses_post( $args['excerpt'] ); ?>
+                    </div>
                 </div>
                 <?php
             }

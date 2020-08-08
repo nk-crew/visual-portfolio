@@ -31,6 +31,10 @@
     --vp-images-lazy__background: linear-gradient(-70deg, rgba(140, 140, 140, 0) 42%, rgba(140, 140, 140, .05) 50%, rgba(140, 140, 140, 0) 58%);
     --vp-images-lazy__background-color: rgba(140, 140, 140, .05);
     --vp-images-lazy__animation-duration: 3s;
+
+    // Items meta staggering default index.
+    // Used in `items-meta-staggering.js` script
+    --vp-items--meta-staggering__index: 1;
 }
 
 .vp-spinner {

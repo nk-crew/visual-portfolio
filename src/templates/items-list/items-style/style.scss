@@ -106,11 +106,11 @@
         font-size: var(--vp-items-style-default--meta-categories__font-size);
         font-weight: var(--vp-items-style-default--meta-categories__font-weight);
         text-transform: var(--vp-items-style-default--meta-categories__text-transform);
-        opacity: var(--vp-items-style-default--meta-categories__opacity);
 
         .vp-portfolio__item-meta-category {
             display: flex;
             margin-left: var(--vp-items-style-default--meta-categories__gap);
+            opacity: var(--vp-items-style-default--meta-categories__opacity);
 
             @if variable-exists(rtl) and $rtl {
                 &::before {
@@ -146,10 +146,10 @@
         margin-left: calc(-1 * var(--vp-items-style-default--meta-inline__gap));
         font-weight: var(--vp-items-style-default--meta-inline__font-weight);
         line-height: var(--vp-items-style-default--meta-inline__line-height);
-        opacity: var(--vp-items-style-default--meta-inline__font-opacity);
 
         > * {
             margin-left: var(--vp-items-style-default--meta-inline__gap);
+            opacity: var(--vp-items-style-default--meta-inline__font-opacity);
         }
     }
     .vp-portfolio__item-meta-part-icon {

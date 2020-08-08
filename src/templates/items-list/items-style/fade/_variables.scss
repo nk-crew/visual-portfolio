@@ -47,6 +47,11 @@
     --vp-items-style-fade--meta-excerpt__line-height: 1.5;
     --vp-items-style-fade--meta-excerpt__opacity: .8;
 
+    // Meta Staggering Animation.
+    --vp-items-style-fade--meta-staggering__transition-duration: .25s;
+    --vp-items-style-fade--meta-staggering__transition-delay: .07s;
+    --vp-items-style-fade--meta-staggering__transition-easing: ease-out;
+
     // Transitions.
     --vp-items-style-fade-transition-duration: var(--vp-interactive__transition-duration);
     --vp-items-style-fade-transition-easing: var(--vp-interactive__transition-easing);
