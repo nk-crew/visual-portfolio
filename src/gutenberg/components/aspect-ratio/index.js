@@ -109,6 +109,10 @@ export default class AspectRatio extends Component {
                             this.setState( {
                                 isCustom: true,
                             } );
+
+                            if ( ! value ) {
+                                onChange( '3:4' );
+                            }
                         } else {
                             this.setState( {
                                 isCustom: false,
