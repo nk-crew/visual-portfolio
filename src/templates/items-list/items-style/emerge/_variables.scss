@@ -51,7 +51,7 @@
     // Meta Staggering Animation.
     --vp-items-style-emerge--meta-staggering__transition-duration: .25s;
     --vp-items-style-emerge--meta-staggering__transition-delay: .07s;
-    --vp-items-style-emerge--meta-staggering__transition-easing: ease-out;
+    --vp-items-style-emerge--meta-staggering__transition-easing: cubic-bezier(.25, .46, .45, .94);
 
     // Transitions.
     --vp-items-style-emerge-transition-duration: var(--vp-interactive__transition-duration);

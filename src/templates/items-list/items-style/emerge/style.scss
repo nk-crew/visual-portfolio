@@ -25,7 +25,7 @@
         max-height: 100%;
         color: var(--vp-items-style-emerge--overlay__color);
         background-color: var(--vp-items-style-emerge--overlay__background-color);
-        transition: var(--vp-items-style-emerge-transition-duration) transform var(--vp-items-style-emerge-transition-easing);
+        transition: var(--vp-items-style-emerge-transition-duration) transform cubic-bezier(.25, .46, .45, .94);
         transform: translateY(100%);
         will-change: transform;
 
