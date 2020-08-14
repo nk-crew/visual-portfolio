@@ -394,29 +394,35 @@ class Visual_Portfolio_Assets {
             ),
             'visual-portfolio-items-meta-staggering' => array(
                 'assets/js/items-meta-staggering.min.js',
-                array(),
+                array(
+                    'jquery',
+                ),
             ),
             'visual-portfolio-plugin-isotope' => array(
                 'assets/js/plugin-isotope.min.js',
                 array(
+                    'jquery',
                     'isotope',
                 ),
             ),
             'visual-portfolio-plugin-fj-gallery' => array(
                 'assets/js/plugin-fj-gallery.min.js',
                 array(
+                    'jquery',
                     'flickr-justified-gallery',
                 ),
             ),
             'visual-portfolio-plugin-swiper' => array(
                 'assets/js/plugin-swiper.min.js',
                 array(
+                    'jquery',
                     'swiper',
                 ),
             ),
             'visual-portfolio-custom-scrollbar' => array(
                 'assets/js/custom-scrollbar.min.js',
                 array(
+                    'jquery',
                     'simplebar',
                 ),
             ),
@@ -429,6 +435,7 @@ class Visual_Portfolio_Assets {
             'visual-portfolio-plugin-photoswipe' => array(
                 'assets/js/plugin-photoswipe.min.js',
                 array(
+                    'jquery',
                     'photoswipe-ui-default',
                     'visual-portfolio-popup-gallery',
                 ),
@@ -436,6 +443,7 @@ class Visual_Portfolio_Assets {
             'visual-portfolio-plugin-fancybox' => array(
                 'assets/js/plugin-fancybox.min.js',
                 array(
+                    'jquery',
                     'fancybox',
                     'visual-portfolio-popup-gallery',
                 ),
