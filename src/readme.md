@@ -118,13 +118,17 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
-! IMPORTANT for v2.0 - this is a major plugin upgrade. A lot of things were changed. We recommend you test it on a staging site first before update it on the production site.
+= 2.4.0 =
 
-Migration Notes:
-
-* If you extended portfolio options using PHP, you will need to remove `vp_` prefix from your custom options. Example - <https://github.com/nk-o/visual-portfolio/blob/master/src/classes/class-admin.php#L854-L865>
-* If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - <https://visualportfolio.co/documentation/developers/css-variables/>
-* If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-o/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
+* added support for WordPress 5.5
+* added meta staggering animation for Fade and Emerge items style
+* added custom scrollbar for overlays with overflow (looks better, than system scrollbar)
+* added more wp actions in portfolio output (helpful for developers)
+* added iframe resize when Gutenberg preview device type changed
+* updated PRO plugin pricing plans. Added a single site license, which many users asked for
+* fixed custom aspect ratio select (set default value if value is empty)
+* fixed post taxonomies slug in the filter (fixes support for languages like Japanese, Chinese, Russian, etc.)
+* fixed possible JS error 'jQuery is not defined'
 
 = 2.3.0 =
 
@@ -197,6 +201,16 @@ Migration Notes:
 * changed "Saved" menu item to "Saved Layouts", as users couldn't find it
 
 = 2.0.0 =
+
+! IMPORTANT for version 2.x - this is a major plugin upgrade. A lot of things were changed. We recommend you test it on a staging site first before update it on the production site.
+
+Migration Notes:
+
+* If you extended portfolio options using PHP, you will need to remove `vp_` prefix from your custom options. Example - <https://github.com/nk-o/visual-portfolio/blob/master/src/classes/class-admin.php#L854-L865>
+* If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - <https://visualportfolio.co/documentation/developers/css-variables/>
+* If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-o/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
+
+Log:
 
 * updated overall UI
 * updated all items styles
