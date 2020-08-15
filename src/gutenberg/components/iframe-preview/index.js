@@ -98,7 +98,7 @@ class IframePreview extends Component {
         window.removeEventListener( 'resize', this.maybeResizePreviewsThrottle );
 
         if ( this.frameRef.current.iframeResizer ) {
-            this.frameRef.current.iframeResizer.removeListeners();
+            this.frameRef.current.iframeResizer.close();
         }
     }
 
