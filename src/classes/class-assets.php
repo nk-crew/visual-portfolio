@@ -134,8 +134,6 @@ class Visual_Portfolio_Assets {
         self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'script' );
         self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'style' );
 
-        self::store_used_assets( 'visual-portfolio-items-meta-staggering', true, 'script' );
-
         // Layout.
         switch ( $options['layout'] ) {
             case 'masonry':
@@ -391,12 +389,6 @@ class Visual_Portfolio_Assets {
             'visual-portfolio' => array(
                 'assets/js/main.min.js',
                 $vp_deps,
-            ),
-            'visual-portfolio-items-meta-staggering' => array(
-                'assets/js/items-meta-staggering.min.js',
-                array(
-                    'jquery',
-                ),
             ),
             'visual-portfolio-plugin-isotope' => array(
                 'assets/js/plugin-isotope.min.js',

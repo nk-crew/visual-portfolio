@@ -58,11 +58,18 @@
         color: inherit;
         text-align: center;
 
+        // Indexes for staggering.
+        @for $i from 1 through 6 {
+            > :nth-child(#{$i}) {
+                --vp-items-style-fade--meta-staggering__index: #{$i};
+            }
+        }
+
         > * {
             max-width: 100%;
             margin-bottom: var(--vp-items-style-fade--meta-items__gap);
             opacity: 0;
-            transition-delay: calc(var(--vp-items-style-fade--meta-staggering__transition-delay) * var(--vp-items--meta-staggering__index));
+            transition-delay: calc(var(--vp-items-style-fade--meta-staggering__transition-delay) * var(--vp-items-style-fade--meta-staggering__index));
             transition-timing-function: var(--vp-items-style-fade--meta-staggering__transition-easing);
             transition-duration: var(--vp-items-style-fade--meta-staggering__transition-duration);
             transition-property: opacity, transform;

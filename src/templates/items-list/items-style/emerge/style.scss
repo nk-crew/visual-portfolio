@@ -64,10 +64,17 @@
         padding: var(--vp-items-style-emerge--overlay__padding-v) var(--vp-items-style-emerge--overlay__padding-h);
         color: inherit;
 
+        // Indexes for staggering.
+        @for $i from 1 through 6 {
+            > :nth-child(#{$i}) {
+                --vp-items-style-emerge--meta-staggering__index: #{$i};
+            }
+        }
+
         > * {
             margin-bottom: var(--vp-items-style-emerge--meta-items__gap);
             opacity: 0;
-            transition-delay: calc(var(--vp-items-style-emerge--meta-staggering__transition-delay) * var(--vp-items--meta-staggering__index));
+            transition-delay: calc(var(--vp-items-style-emerge--meta-staggering__transition-delay) * var(--vp-items-style-emerge--meta-staggering__index));
             transition-timing-function: var(--vp-items-style-emerge--meta-staggering__transition-easing);
             transition-duration: var(--vp-items-style-emerge--meta-staggering__transition-duration);
             transition-property: opacity, transform;
