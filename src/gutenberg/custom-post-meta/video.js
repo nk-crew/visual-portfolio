@@ -128,7 +128,7 @@ class VpVideoComponent extends Component {
         } = this.state;
 
         if ( 'video' !== getPostFormat() ) {
-            return '';
+            return null;
         }
 
         return (

@@ -80,12 +80,12 @@ class ControlsRender extends Component {
         } = this.props;
 
         if ( ! attributes ) {
-            return '';
+            return null;
         }
 
         // content source conditions.
         if ( /^content-source-/g.test( category ) && 'content-source-additional' !== category && `content-source-${ attributes.content_source }` !== category ) {
-            return '';
+            return null;
         }
 
         const usedControls = controls || registeredControls;
@@ -189,7 +189,7 @@ ControlsRender.Control = function( props ) {
 
     // Conditions check.
     if ( ! ControlsRender.AllowRender( props, isSetupWizard ) ) {
-        return '';
+        return null;
     }
 
     let renderControl = '';

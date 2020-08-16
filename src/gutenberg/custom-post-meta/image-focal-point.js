@@ -34,7 +34,7 @@ class VpImageFocalPointComponent extends Component {
         const thumbnailData = getThumbnail();
 
         if ( ! thumbnailData || ! thumbnailData.source_url ) {
-            return '';
+            return null;
         }
 
         let focalPoint = getMeta( '_vp_image_focal_point' );

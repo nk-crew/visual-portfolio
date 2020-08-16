@@ -212,7 +212,7 @@ export default class ElementsSelector extends Component {
         }
 
         if ( ! controls.length ) {
-            return '';
+            return null;
         }
 
         return (

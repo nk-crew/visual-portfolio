@@ -129,7 +129,7 @@ export default class BlockEdit extends Component {
                     <Fragment>
                         { Object.keys( registeredControlsCategories ).map( ( name ) => {
                             if ( 'content-source' === name ) {
-                                return '';
+                                return null;
                             }
 
                             return (

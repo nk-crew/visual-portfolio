@@ -105,7 +105,7 @@ export default class ClassesTree extends Component {
 
     render() {
         if ( ! this.iframePreview ) {
-            return '';
+            return null;
         }
 
         return (
@@ -161,9 +161,8 @@ ClassesTree.TreeItem = class TreeItem extends Component {
             skipClass,
         } = this.props;
 
-
         if ( ! node || ! node.children.length ) {
-            return '';
+            return null;
         }
 
         const classes = [];
@@ -184,7 +183,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
         }
 
         if ( skip ) {
-            return '';
+            return null;
         }
 
         return (
@@ -235,7 +234,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
                                 </li>
                             );
                         }
-                        return '';
+                        return null;
                     } )
                 ) : '' }
             </ul>
