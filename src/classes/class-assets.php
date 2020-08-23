@@ -131,9 +131,6 @@ class Visual_Portfolio_Assets {
 
         self::store_used_assets( 'visual-portfolio', true, 'script', 11 );
 
-        self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'script' );
-        self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'style' );
-
         // Layout.
         switch ( $options['layout'] ) {
             case 'masonry':
@@ -157,6 +154,10 @@ class Visual_Portfolio_Assets {
                 self::store_used_assets( 'visual-portfolio-layout-slider', true, 'style' );
                 break;
         }
+
+        // Custom Scrollbar.
+        self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'script' );
+        self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'style' );
 
         // Items Style.
         if ( $options['items_style'] ) {
