@@ -509,6 +509,7 @@ class Visual_Portfolio_Get {
                     'height'          => array(),
 
                     // Lazyload support.
+                    'loading'         => array(),
                     'data-vpf-src'    => array(),
                     'data-vpf-sizes'  => array(),
                     'data-vpf-srcset' => array(),

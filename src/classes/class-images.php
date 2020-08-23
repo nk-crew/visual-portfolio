@@ -68,6 +68,7 @@ class Visual_Portfolio_Images {
                     $tags['data-vpf-sizes']  = true;
                     $tags['data-vpf-srcset'] = true;
                     $tags['data-no-lazy']    = true;
+                    $tags['loading']         = true;
                 }
             }
         }
@@ -246,6 +247,9 @@ class Visual_Portfolio_Images {
             $attr['class'] .= ' no-lazyload';
         }
 
+        // Prevent Native lazy loading.
+        $attr['loading'] = 'eager';
+
         // lazy placeholder.
         if ( $placeholder ) {
             $attr['data-vpf-src'] = $attr['src'];
@@ -268,7 +272,7 @@ class Visual_Portfolio_Images {
     }
 
     /**
-     * Undocumented function
+     * Skip Jetpack lazy loading.
      *
      * @param boolean $return     skip lazy Jetpack.
      * @param array   $attributes image attributes.
