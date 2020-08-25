@@ -8,9 +8,14 @@
     --vp-items-style-emerge--links-hover__color: var(--vp-color-brand);
 
     // Image.
-    --vp-items-style-emerge--image-hover__transform: scale(1.05);
+    --vp-items-style-emerge--image__transform: translateY(0);
+    --vp-items-style-emerge--image-hover__transform: translateY(-10px);
+
+    // Image Overlay.
+    --vp-items-style-emerge--img-overlay__background-color: transparent;
 
     // Overlay.
+    --vp-items-style-emerge--overlay__min-height: 40px;
     --vp-items-style-emerge--overlay__padding-v: 1.5em;
     --vp-items-style-emerge--overlay__padding-h: 2em;
     --vp-items-style-emerge--overlay__color: #fff;

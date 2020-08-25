@@ -875,7 +875,7 @@ class Visual_Portfolio_Admin {
                     'controls'         => array(
                         array(
                             'type'    => 'radio',
-                            'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display Meta Overlay', '@@text_domain' ),
                             'name'    => 'show_overlay',
                             'default' => 'hover',
                             'options' => array(
@@ -886,7 +886,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Meta Overlay Background Color', '@@text_domain' ),
                             'name'  => 'bg_color',
                             'alpha' => true,
                             'style' => array(
@@ -898,7 +898,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Meta Overlay Text Color', '@@text_domain' ),
                             'name'  => 'text_color',
                             'alpha' => true,
                             'style' => array(
@@ -910,7 +910,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Links Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Meta Overlay Links Color', '@@text_domain' ),
                             'name'  => 'links_color',
                             'alpha' => true,
                             'style' => array(
@@ -922,13 +922,36 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Links Hover Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Meta Overlay Links Hover Color', '@@text_domain' ),
                             'name'  => 'links_hover_color',
                             'alpha' => true,
                             'style' => array(
                                 array(
                                     'element'  => '.vp-portfolio__items-style-emerge',
                                     'property' => '--vp-items-style-emerge--links-hover__color',
+                                ),
+                            ),
+                        ),
+                        array(
+                            'type'    => 'radio',
+                            'label'   => esc_html__( 'Display Image Overlay', '@@text_domain' ),
+                            'name'    => 'show_img_overlay',
+                            'default' => 'hover',
+                            'options' => array(
+                                'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
+                                'default' => esc_html__( 'Default State Only', '@@text_domain' ),
+                                'always'  => esc_html__( 'Always', '@@text_domain' ),
+                            ),
+                        ),
+                        array(
+                            'type'  => 'color',
+                            'label' => esc_html__( 'Image Overlay Background Color', '@@text_domain' ),
+                            'name'  => 'img_overlay_bg_color',
+                            'alpha' => true,
+                            'style' => array(
+                                array(
+                                    'element'  => '.vp-portfolio__items-style-emerge',
+                                    'property' => '--vp-items-style-emerge--img-overlay__background-color',
                                 ),
                             ),
                         ),

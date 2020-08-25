@@ -16,18 +16,42 @@
         }
     }
 
+    .vp-portfolio__item-img-overlay {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: var(--vp-items-style-emerge--img-overlay__background-color);
+        opacity: 0;
+        transition: var(--vp-items-style-emerge-transition-duration) opacity var(--vp-items-style-emerge-transition-easing);
+        will-change: opacity;
+
+        // Fix FireFox image blinking
+        // https://github.com/nk-o/visual-portfolio/issues/92
+        z-index: 2;
+    }
+
     .vp-portfolio__item-overlay {
         position: absolute;
         display: flex;
         bottom: 0;
         left: 0;
         width: 100%;
+        min-height: 50px;
         max-height: 100%;
         color: var(--vp-items-style-emerge--overlay__color);
         background-color: var(--vp-items-style-emerge--overlay__background-color);
         transition: var(--vp-items-style-emerge-transition-duration) transform cubic-bezier(.25, .46, .45, .94);
         transform: translateY(100%);
         will-change: transform;
+
+        // Fix FireFox image blinking
+        // https://github.com/nk-o/visual-portfolio/issues/92
+        z-index: 2;
 
         &::before {
             content: "";
@@ -167,16 +191,36 @@
         will-change: transform, opacity;
     }
 
-    .vp-portfolio__item:hover,
-    .vp-portfolio__item-focus {
-        .vp-portfolio__item-img img {
-            transform: var(--vp-items-style-emerge--image-hover__transform);
+    // Image Overlay
+    &.vp-portfolio__items-show-img-overlay-hover .vp-portfolio__item:hover,
+    &.vp-portfolio__items-show-img-overlay-hover .vp-portfolio__item-focus {
+        .vp-portfolio__item-img-overlay {
+            opacity: 1;
+        }
+    }
+    &.vp-portfolio__items-show-img-overlay-default {
+        .vp-portfolio__item-img-overlay {
+            opacity: 1;
+        }
+        .vp-portfolio__item:hover,
+        .vp-portfolio__item-focus {
+            .vp-portfolio__item-img-overlay {
+                opacity: 0;
+            }
+        }
+    }
+    &.vp-portfolio__items-show-img-overlay-always {
+        .vp-portfolio__item-img-overlay {
+            opacity: 1;
         }
     }
 
-    // Overlay
+    // Meta Overlay
     &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
     &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
+        .vp-portfolio__item-img img {
+            transform: var(--vp-items-style-emerge--image-hover__transform);
+        }
         .vp-portfolio__item-overlay {
             transform: translateY(0);
             &::before {
@@ -189,6 +233,9 @@
         }
     }
     &.vp-portfolio__items-show-overlay-default {
+        .vp-portfolio__item-img img {
+            transform: var(--vp-items-style-emerge--image-hover__transform);
+        }
         .vp-portfolio__item-overlay {
             transform: translateY(0);
             &::before {
@@ -202,6 +249,9 @@
 
         .vp-portfolio__item:hover,
         .vp-portfolio__item-focus {
+            .vp-portfolio__item-img img {
+                transform: var(--vp-items-style-emerge--image__transform);
+            }
             .vp-portfolio__item-overlay {
                 transform: translateY(100%);
                 &::before {
@@ -215,6 +265,9 @@
         }
     }
     &.vp-portfolio__items-show-overlay-always {
+        .vp-portfolio__item-img img {
+            transform: var(--vp-items-style-emerge--image-hover__transform);
+        }
         .vp-portfolio__item-overlay {
             transform: translateY(0);
             &::before {
