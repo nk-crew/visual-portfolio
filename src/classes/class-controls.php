@@ -201,7 +201,21 @@ class Visual_Portfolio_Controls {
                 $img_controls = array();
 
                 // Extend.
-                $result[ $k ]['image_controls'] = Visual_Portfolio_Extend::image_controls( $result[ $k ]['image_controls'], $result[ $k ]['name'] );
+                // phpcs:ignore
+                /*
+                * Example:
+                    array(
+                        'title' => array(
+                            'type'  => 'text',
+                            'label' => esc_html__( 'Title', '@@text_domain' ),
+                        ),
+                        'description' => array(
+                            'type'  => 'textarea',
+                            'label' => esc_html__( 'Description', '@@text_domain' ),
+                        ),
+                    )
+                */
+                $result[ $k ]['image_controls'] = apply_filters( 'vpf_extend_image_controls', $result[ $k ]['image_controls'], $result[ $k ]['name'] );
 
                 // Get default controls data.
                 foreach ( $result[ $k ]['image_controls'] as $i => $img_args ) {

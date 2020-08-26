@@ -25,7 +25,7 @@ class Visual_Portfolio_Assets {
     );
 
     /**
-     * Visual_Portfolio_Extend constructor.
+     * Visual_Portfolio_Assets constructor.
      */
     public function __construct() {
         // template_redirect is used instead of wp_enqueue_scripts just because some plugins use it and included an old isotope plugin. So, it was conflicted.

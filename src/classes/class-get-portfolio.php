@@ -83,6 +83,43 @@ class Visual_Portfolio_Get {
     private static $used_layouts = array();
 
     /**
+     * Get all available layouts.
+     *
+     * @return array
+     */
+    public static function get_all_layouts() {
+        // phpcs:ignore
+        /*
+         * Example:
+            array(
+                'new_layout' => array(
+                    'title'    => esc_html__( 'New Layout', 'text_domain' ),
+                    'controls' => array(
+                        ... controls ...
+                    ),
+                ),
+            )
+         */
+        $layouts = apply_filters( 'vpf_extend_layouts', array() );
+
+        // Extend specific layout controls.
+        foreach ( $layouts as $name => $layout ) {
+            if ( isset( $layout['controls'] ) ) {
+                // phpcs:ignore
+                /*
+                 * Example:
+                    array(
+                        ... controls ...
+                    )
+                 */
+                $layouts[ $name ]['controls'] = apply_filters( 'vpf_extend_layout_' . $name . '_controls', $layout['controls'] );
+            }
+        }
+
+        return $layouts;
+    }
+
+    /**
      * Get all available options of post.
      *
      * @param array $atts options for portfolio list to print.
@@ -439,8 +476,15 @@ class Visual_Portfolio_Get {
             }
         }
 
-        $data_attrs = Visual_Portfolio_Extend::portfolio_attrs( $data_attrs, $options );
-        $class      = Visual_Portfolio_Extend::portfolio_class( $class, $options );
+        // phpcs:ignore
+        /*
+         * Example:
+            array(
+                'data-vp-my-attribute' => 'data',
+            )
+         */
+        $data_attrs = apply_filters( 'vpf_extend_portfolio_data_attributes', $data_attrs, $options );
+        $class      = apply_filters( 'vpf_extend_portfolio_class', $class, $options );
 
         do_action( 'vpf_before_wrapper_start', $options, $style_options );
 
@@ -976,7 +1020,7 @@ class Visual_Portfolio_Get {
      * @return array
      */
     private static function get_query_params( $options, $for_filter = false, $layout_id = false ) {
-        $options    = Visual_Portfolio_Extend::options_before_query_args( $options, $layout_id );
+        $options    = apply_filters( 'vpf_extend_options_before_query_args', $options, $layout_id );
         $query_opts = array();
         $is_images  = 'images' === $options['content_source'];
 
@@ -1345,7 +1389,7 @@ class Visual_Portfolio_Get {
             }
         }
 
-        $query_opts = Visual_Portfolio_Extend::query_args( $query_opts, $options, $layout_id );
+        $query_opts = apply_filters( 'vpf_extend_query_args', $query_opts, $options, $layout_id );
 
         return $query_opts;
     }
@@ -1576,7 +1620,27 @@ class Visual_Portfolio_Get {
 
         $args = array(
             'class'      => 'vp-filter',
-            'items'      => Visual_Portfolio_Extend::filter_items( $terms, $vp_options ),
+            // phpcs:ignore
+            /*
+             * Example:
+                array(
+                    array(
+                        'filter'      => '*',
+                        'label'       => $options['filter_text_all'],
+                        'description' => false,
+                        'count'       => false,
+                        'active'      => true,
+                        'url'         => Visual_Portfolio_Get::get_pagenum_link(
+                            array(
+                                'vp_filter' => '',
+                                'vp_page' => 1,
+                            )
+                        ),
+                        'class'       => 'vp-filter__item',
+                    ),
+                )
+             */
+            'items'      => apply_filters( 'vpf_extend_filter_items', $terms, $vp_options ),
             'show_count' => $vp_options['filter_show_count'],
             'opts'       => $filter_options,
             'vp_opts'    => $vp_options,
@@ -1620,7 +1684,8 @@ class Visual_Portfolio_Get {
             $active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
         }
 
-        $sort_items = Visual_Portfolio_Extend::sort_items(
+        $sort_items = apply_filters(
+            'vpf_extend_sort_items',
             array(
                 ''           => esc_html__( 'Default sorting', '@@text_domain' ),
                 'date_desc'  => esc_html__( 'Sort by date (newest)', '@@text_domain' ),

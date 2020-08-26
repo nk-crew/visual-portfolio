@@ -170,7 +170,6 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'gutenberg/utils/controls-dynamic-css/index.php';
         require_once $this->plugin_path . 'classes/class-parse-blocks.php';
         require_once $this->plugin_path . 'classes/class-assets.php';
-        require_once $this->plugin_path . 'classes/class-extend.php';
         require_once $this->plugin_path . 'classes/class-images.php';
         require_once $this->plugin_path . 'classes/class-settings.php';
         require_once $this->plugin_path . 'classes/class-rest.php';

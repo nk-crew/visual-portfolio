@@ -35,7 +35,7 @@ class Visual_Portfolio_Migrations {
     protected $previous_version;
 
     /**
-     * Visual_Portfolio_Extend constructor.
+     * Visual_Portfolio_Migrations constructor.
      */
     public function __construct() {
         if ( is_admin() ) {

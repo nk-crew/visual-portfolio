@@ -407,7 +407,7 @@ class Visual_Portfolio_Custom_Post_Type {
      */
     public function manage_vp_lists_custom_columns( $column_name = false ) {
         if ( 'vp_lists_post_icon' === $column_name ) {
-            $all_layouts = Visual_Portfolio_Extend::layouts();
+            $all_layouts = Visual_Portfolio_Get::get_all_layouts();
             $opts        = Visual_Portfolio_Get::get_options( array( 'id' => get_the_ID() ) );
             $layout      = isset( $opts['layout'] ) ? $opts['layout'] : false;
             $icon        = '';

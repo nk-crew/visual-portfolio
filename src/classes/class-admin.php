@@ -241,7 +241,19 @@ class Visual_Portfolio_Admin {
                                         'value' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
                                     ),
                                 ),
-                                Visual_Portfolio_Extend::tiles()
+                                // phpcs:ignore
+                                /*
+                                 * Example:
+                                    array(
+                                        array(
+                                            'value' => '1|1,0.5|',
+                                        ),
+                                        array(
+                                            'value' => '2|1,1|',
+                                        ),
+                                    )
+                                 */
+                                apply_filters( 'vpf_extend_tiles', array() )
                             ),
                         ),
                     ),
@@ -1494,14 +1506,7 @@ class Visual_Portfolio_Admin {
         /**
          * Layouts.
          */
-        $layouts = Visual_Portfolio_Extend::layouts();
-
-        // Extend specific layout controls.
-        foreach ( $layouts as $name => $layout ) {
-            if ( isset( $layout['controls'] ) ) {
-                $layouts[ $name ]['controls'] = Visual_Portfolio_Extend::layout_controls( $name, $layout['controls'] );
-            }
-        }
+        $layouts = Visual_Portfolio_Get::get_all_layouts();
 
         // Layouts selector.
         $layouts_selector = array();
@@ -1573,12 +1578,44 @@ class Visual_Portfolio_Admin {
         /**
          * Items Style
          */
-        $items_styles = Visual_Portfolio_Extend::items_styles();
+        // phpcs:ignore
+        /*
+         * Example:
+            array(
+                'new_items_style' => array(
+                    'title'            => esc_html__( 'New Items Style', '@@text_domain' ),
+                    'builtin_controls' => array(
+                        'images_rounded_corners' => true,
+                        'show_title'             => true,
+                        'show_categories'        => true,
+                        'show_date'              => true,
+                        'show_author'            => true,
+                        'show_comments_count'    => true,
+                        'show_views_count'       => true,
+                        'show_reading_time'      => true,
+                        'show_excerpt'           => true,
+                        'show_icons'             => false,
+                        'align'                  => true,
+                    ),
+                    'controls'         => array(
+                        ... controls ...
+                    ),
+                ),
+            )
+         */
+        $items_styles = apply_filters( 'vpf_extend_items_styles', array() );
 
         // Extend specific item style controls.
         foreach ( $items_styles as $name => $style ) {
             if ( isset( $style['controls'] ) ) {
-                $items_styles[ $name ]['controls'] = Visual_Portfolio_Extend::item_style_controls( $name, $style['controls'] );
+                // phpcs:ignore
+                /*
+                 * Example:
+                    array(
+                        ... controls ...
+                    )
+                 */
+                $items_styles[ $name ]['controls'] = apply_filters( 'vpf_extend_item_style_' . $name . '_controls', $style['controls'] );
             }
         }
 
@@ -2042,13 +2079,32 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
             ),
-            Visual_Portfolio_Extend::filters()
+            // phpcs:ignore
+            /*
+             * Example:
+                array(
+                    'new_filter' => array(
+                        'title'    => esc_html__( 'New Filter', '@@text_domain' ),
+                        'controls' => array(
+                            ... controls ...
+                        ),
+                    ),
+                )
+             */
+            apply_filters( 'vpf_extend_filters', array() )
         );
 
         // Extend specific filter controls.
         foreach ( $filters as $name => $filter ) {
             if ( isset( $filter['controls'] ) ) {
-                $filters[ $name ]['controls'] = Visual_Portfolio_Extend::filter_controls( $name, $filter['controls'] );
+                // phpcs:ignore
+                /*
+                 * Example:
+                    array(
+                        ... controls ...
+                    )
+                 */
+                $filters[ $name ]['controls'] = apply_filters( 'vpf_extend_filter_' . $name . '_controls', $filter['controls'] );
             }
         }
 
@@ -2151,13 +2207,32 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
             ),
-            Visual_Portfolio_Extend::sort()
+            // phpcs:ignore
+            /*
+             * Example:
+                array(
+                    'new_sort' => array(
+                        'title'    => esc_html__( 'New Sort', '@@text_domain' ),
+                        'controls' => array(
+                            ... controls ...
+                        ),
+                    ),
+                )
+             */
+            apply_filters( 'vpf_extend_sort', array() )
         );
 
         // Extend specific sort controls.
         foreach ( $sorts as $name => $sort ) {
             if ( isset( $sort['controls'] ) ) {
-                $sorts[ $name ]['controls'] = Visual_Portfolio_Extend::sort_controls( $name, $sort['controls'] );
+                // phpcs:ignore
+                /*
+                 * Example:
+                    array(
+                        ... controls ...
+                    )
+                 */
+                $sorts[ $name ]['controls'] = apply_filters( 'vpf_extend_sort_' . $name . '_controls', $sort['controls'] );
             }
         }
 
@@ -2247,13 +2322,32 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
             ),
-            Visual_Portfolio_Extend::pagination()
+            // phpcs:ignore
+            /*
+             * Example:
+                array(
+                    'new_pagination' => array(
+                        'title'    => esc_html__( 'New Pagination', '@@text_domain' ),
+                        'controls' => array(
+                            ... controls ...
+                        ),
+                    ),
+                )
+             */
+            apply_filters( 'vpf_extend_pagination', array() )
         );
 
         // Extend specific pagination controls.
         foreach ( $pagination as $name => $pagin ) {
             if ( isset( $pagin['controls'] ) ) {
-                $pagination[ $name ]['controls'] = Visual_Portfolio_Extend::pagination_controls( $name, $pagin['controls'] );
+                // phpcs:ignore
+                /*
+                 * Example:
+                    array(
+                        ... controls ...
+                    )
+                 */
+                $pagination[ $name ]['controls'] = apply_filters( 'vpf_extend_pagination_' . $name . '_controls', $pagin['controls'] );
             }
         }
 
