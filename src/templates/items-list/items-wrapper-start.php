@@ -4,6 +4,7 @@
  *
  * @var $options
  * @var $style_options
+ * @var $class
  *
  * @package @@plugin_name
  */
@@ -12,16 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$vpf_item_classes = 'vp-portfolio__items vp-portfolio__items-style-' . $options['items_style'];
-
-if ( isset( $style_options['show_overlay'] ) && $style_options['show_overlay'] ) {
-    $vpf_item_classes .= ' vp-portfolio__items-show-overlay-' . $style_options['show_overlay'];
-}
-
-if ( isset( $style_options['show_img_overlay'] ) && $style_options['show_img_overlay'] ) {
-    $vpf_item_classes .= ' vp-portfolio__items-show-img-overlay-' . $style_options['show_img_overlay'];
-}
-
 ?>
 
-<div class="<?php echo esc_attr( $vpf_item_classes ); ?>">
+<div class="<?php echo esc_attr( $class ); ?>">

@@ -468,11 +468,24 @@ class Visual_Portfolio_Get {
 
         do_action( 'vpf_before_items_wrapper_start', $options, $style_options );
 
+        $items_class = 'vp-portfolio__items vp-portfolio__items-style-' . $options['items_style'];
+
+        if ( isset( $style_options['show_overlay'] ) && $style_options['show_overlay'] ) {
+            $items_class .= ' vp-portfolio__items-show-overlay-' . $style_options['show_overlay'];
+        }
+
+        if ( isset( $style_options['show_img_overlay'] ) && $style_options['show_img_overlay'] ) {
+            $items_class .= ' vp-portfolio__items-show-img-overlay-' . $style_options['show_img_overlay'];
+        }
+
+        $items_class = apply_filters( 'vpf_extend_portfolio_items_class', $items_class, $options );
+
         visual_portfolio()->include_template(
             'items-list/items-wrapper-start',
             array(
                 'options'       => $options,
                 'style_options' => $style_options,
+                'class'         => $items_class,
             )
         );
 
