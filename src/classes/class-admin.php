@@ -763,6 +763,12 @@ class Visual_Portfolio_Admin {
                                 ),
                             ),
                         ),
+                        array(
+                            'type'        => 'pro_note',
+                            'name'        => 'additional_style_settings_pro',
+                            'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                            'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
+                        ),
                     ),
                 ),
 
@@ -819,6 +825,12 @@ class Visual_Portfolio_Admin {
                                 ),
                             ),
                         ),
+                        array(
+                            'type'        => 'pro_note',
+                            'name'        => 'additional_style_settings_pro',
+                            'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                            'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
+                        ),
                     ),
                 ),
 
@@ -863,6 +875,12 @@ class Visual_Portfolio_Admin {
                                     'property' => '--vp-items-style-fly--overlay__color',
                                 ),
                             ),
+                        ),
+                        array(
+                            'type'        => 'pro_note',
+                            'name'        => 'additional_style_settings_pro',
+                            'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                            'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
                         ),
                     ),
                 ),
@@ -966,6 +984,12 @@ class Visual_Portfolio_Admin {
                                     'property' => '--vp-items-style-emerge--img-overlay__background-color',
                                 ),
                             ),
+                        ),
+                        array(
+                            'type'        => 'pro_note',
+                            'name'        => 'additional_style_settings_pro',
+                            'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                            'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
                         ),
                     ),
                 ),
