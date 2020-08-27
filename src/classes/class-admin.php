@@ -1007,7 +1007,7 @@ class Visual_Portfolio_Admin {
                 ),
                 'layout-elements'              => array(
                     'title'     => esc_html__( 'Layout', '@@text_domain' ),
-                    'is_opened' => true,
+                    'is_opened' => false,
                 ),
                 'items-style'                  => array(
                     'title'     => esc_html__( 'Items Style', '@@text_domain' ),
