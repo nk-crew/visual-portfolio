@@ -35,11 +35,11 @@ $doc.on( 'extendClass.vpf', ( event, VP ) => {
                 originLeft: ! isRtl,
             };
 
-            self.emitEvent( 'beforeInitIsotope', [ options ] );
+            self.emitEvent( 'beforeInitIsotope', [ initOptions ] );
 
             self.$items_wrap.isotope( initOptions );
 
-            self.emitEvent( 'initIsotope', [ options ] );
+            self.emitEvent( 'initIsotope', [ initOptions ] );
         }
     };
 
