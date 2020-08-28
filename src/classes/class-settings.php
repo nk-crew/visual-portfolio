@@ -393,7 +393,7 @@ class Visual_Portfolio_Settings {
                         <div class="vpf-settings-info-pro">
                             <h3>' . esc_html__( 'PRO Feature', '@@text_domain' ) . '</h3>
                             <div>
-                                <p>' . esc_html__( 'Social feeds such as Youtube, Vimeo, Flickr, Twitter, etc...', '@@text_domain' ) . '</p>
+                                <p>' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ) . '</p>
                                 <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
                             </div>
                         </div>

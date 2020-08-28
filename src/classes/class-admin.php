@@ -1497,7 +1497,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'pro_note',
                 'name'        => 'social_pro_note',
                 'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
-                'description' => esc_html__( 'Social feeds such as Youtube, Vimeo, Flickr, Twitter, etc...', '@@text_domain' ),
+                'description' => esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ),
             )
         );
 
