@@ -131,7 +131,7 @@
 .vp-portfolio__layout-elements {
     display: flex;
     flex-wrap: wrap;
-    width: 100%;
+    width: calc(100% + var(--vp-elements__gap));
     margin-top: calc(-1 * var(--vp-elements__gap));
     margin-left: calc(-1 * var(--vp-elements__gap));
 
