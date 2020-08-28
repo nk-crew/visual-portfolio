@@ -483,8 +483,8 @@ class Visual_Portfolio_Get {
                 'data-vp-my-attribute' => 'data',
             )
          */
-        $data_attrs = apply_filters( 'vpf_extend_portfolio_data_attributes', $data_attrs, $options );
-        $class      = apply_filters( 'vpf_extend_portfolio_class', $class, $options );
+        $data_attrs = apply_filters( 'vpf_extend_portfolio_data_attributes', $data_attrs, $options, $style_options );
+        $class      = apply_filters( 'vpf_extend_portfolio_class', $class, $options, $style_options );
 
         do_action( 'vpf_before_wrapper_start', $options, $style_options );
 
@@ -522,7 +522,7 @@ class Visual_Portfolio_Get {
             $items_class .= ' vp-portfolio__items-show-img-overlay-' . $style_options['show_img_overlay'];
         }
 
-        $items_class = apply_filters( 'vpf_extend_portfolio_items_class', $items_class, $options );
+        $items_class = apply_filters( 'vpf_extend_portfolio_items_class', $items_class, $options, $style_options );
 
         visual_portfolio()->include_template(
             'items-list/items-wrapper-start',
@@ -821,7 +821,7 @@ class Visual_Portfolio_Get {
 
         do_action( 'vpf_after_wrapper_end', $options, $style_options );
 
-        do_action( 'vpf_after_get_output', $options );
+        do_action( 'vpf_after_get_output', $options, $style_options );
 
         // stupid hack as wp_reset_postdata() function is not working for some reason...
         // phpcs:ignore
