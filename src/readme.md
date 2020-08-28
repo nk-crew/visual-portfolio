@@ -118,6 +118,19 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 2.5.0 =
+
+* added Image Overlay setting on Emerge Style
+* added support for images filters in PRO plugin version <https://visualportfolio.co/masonry-image-filters/>
+* changed Emerge image transform from scale to translateY
+* fixed filter displaying in FireFox
+* fixed custom scrollbar initialization after ajax load
+* fixed Isotope event options variable
+* moved items class from templates to internal code + added filter to let users extend this class string
+* removed native lazy loading from Visual Portfolio images where our JS lazy loading enabled (prevent possible conflicts)
+* removed staggering animation script (simplified to use CSS only)
+* minor changes
+
 = 2.4.0 =
 
 * added support for WordPress 5.5
