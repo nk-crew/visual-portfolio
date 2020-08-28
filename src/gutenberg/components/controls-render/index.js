@@ -123,7 +123,8 @@ class ControlsRender extends Component {
                             clientId={ clientId }
                             isSetupWizard={ isSetupWizard }
                         />,
-                        controlData
+                        controlData,
+                        this.props
                     )
                 );
             } );
