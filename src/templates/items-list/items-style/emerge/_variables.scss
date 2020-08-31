@@ -20,10 +20,9 @@
     --vp-items-style-emerge--overlay__padding-h: 2em;
     --vp-items-style-emerge--overlay__color: #fff;
     --vp-items-style-emerge--overlay__background-color: #000;
-    --vp-items-style-emerge--overlay-skew__compensate: -15%;
-    --vp-items-style-emerge--overlay-skew__height: 600%;
-    --vp-items-style-emerge--overlay-skew__transform: rotate(0deg);
-    --vp-items-style-emerge--overlay-skew-hover__transform: rotate(3deg);
+    --vp-items-style-emerge--overlay-skew__height: 200%;
+    --vp-items-style-emerge--overlay-skew__transform: skew(0deg, 0deg);
+    --vp-items-style-emerge--overlay-skew-hover__transform: skew(0deg, 3deg);
 
     // Meta.
     --vp-items-style-emerge--meta-items__gap: 1.5em;

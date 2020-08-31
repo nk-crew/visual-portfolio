@@ -59,7 +59,7 @@
             display: block;
             top: 0;
             right: 0;
-            left: var(--vp-items-style-emerge--overlay-skew__compensate);
+            left: 0;
             height: var(--vp-items-style-emerge--overlay-skew__height);
             background-color: var(--vp-items-style-emerge--overlay__background-color);
             transition: var(--vp-items-style-emerge-transition-duration) transform var(--vp-items-style-emerge-transition-easing);
