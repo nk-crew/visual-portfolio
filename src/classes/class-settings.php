@@ -412,6 +412,8 @@ class Visual_Portfolio_Settings {
      * @return void
      */
     public static function print_settings_page() {
+        self::$settings_api->admin_enqueue_scripts();
+
         echo '<div class="wrap">';
         echo '<h2>' . esc_html__( 'Visual Portfolio Settings', '@@text_domain' ) . '</h2>';
 

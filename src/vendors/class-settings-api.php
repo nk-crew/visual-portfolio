@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * based on weDevs Settings API
  *
  * ADDED PR: https://github.com/tareq1988/wordpress-settings-api-class/pull/47
+ * ADDED: enqueue scripts manually, without `admin_enqueue_scripts` action.
  *
  * @author Tareq Hasan <tareq@weDevs.com>
  * @link https://tareq.co Tareq Hasan
@@ -33,7 +34,7 @@ class Visual_Portfolio_Settings_API {
      * Visual_Portfolio_Settings_API constructor.
      */
     public function __construct() {
-        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+        // add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
     }
 
     /**
