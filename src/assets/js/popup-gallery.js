@@ -297,8 +297,9 @@ if ( settingsPopupGallery.enable_on_wordpress_images ) {
         figure.tiled-gallery__item > a,
         p > a
     `, function( e ) {
-        // check if child node is <img> tag.
-        if ( 1 !== this.childNodes.length || 'IMG' !== this.childNodes[ 0 ].nodeName ) {
+        // check if child node is <img> or <picture> tag.
+        // <picture> tag used in plugins, that adds WebP support
+        if ( 1 !== this.childNodes.length || ( 'IMG' !== this.childNodes[ 0 ].nodeName && 'PICTURE' !== this.childNodes[ 0 ].nodeName ) ) {
             return;
         }
 
