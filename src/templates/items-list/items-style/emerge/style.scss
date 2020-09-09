@@ -53,20 +53,22 @@
         // https://github.com/nk-o/visual-portfolio/issues/92
         z-index: 2;
 
-        &::before {
-            content: "";
-            position: absolute;
-            display: block;
-            top: 0;
-            right: 0;
-            left: 0;
-            height: var(--vp-items-style-emerge--overlay-skew__height);
-            background-color: var(--vp-items-style-emerge--overlay__background-color);
-            transition: var(--vp-items-style-emerge-transition-duration) transform var(--vp-items-style-emerge-transition-easing);
-            transform: var(--vp-items-style-emerge--overlay-skew__transform);
-            transform-origin: 100% 0;
-            will-change: transform;
-            z-index: -1;
+        @supports (clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%)) {
+            &::before {
+                content: "";
+                position: absolute;
+                display: block;
+                right: 0;
+                bottom: calc(100% - .1px);
+                left: 0;
+                // fixed visual issue, when .1px of transparent line visible.
+                height: calc(.1px + var(--vp-items-style-emerge--overlay-skew__height));
+                clip-path: polygon(0 var(--vp-items-style-emerge--overlay-skew__clip-left), 100% var(--vp-items-style-emerge--overlay-skew__clip-right), 100% 100%, 0% 100%);
+                background-color: var(--vp-items-style-emerge--overlay__background-color);
+                transition: var(--vp-items-style-emerge-transition-duration) clip-path var(--vp-items-style-emerge-transition-easing);
+                will-change: clip-path;
+                z-index: -1;
+            }
         }
     }
 
@@ -222,10 +224,10 @@
             transform: var(--vp-items-style-emerge--image-hover__transform);
         }
         .vp-portfolio__item-overlay {
+            --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
+            --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
+
             transform: translateY(0);
-            &::before {
-                transform: var(--vp-items-style-emerge--overlay-skew-hover__transform);
-            }
         }
         .vp-portfolio__item-meta > * {
             opacity: 1;
@@ -237,10 +239,10 @@
             transform: var(--vp-items-style-emerge--image-hover__transform);
         }
         .vp-portfolio__item-overlay {
+            --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
+            --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
+
             transform: translateY(0);
-            &::before {
-                transform: var(--vp-items-style-emerge--overlay-skew-hover__transform);
-            }
         }
         .vp-portfolio__item-meta > * {
             opacity: 1;
@@ -253,10 +255,10 @@
                 transform: var(--vp-items-style-emerge--image__transform);
             }
             .vp-portfolio__item-overlay {
+                --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew__height);
+                --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew__height);
+
                 transform: translateY(100%);
-                &::before {
-                    transform: var(--vp-items-style-emerge--overlay-skew__transform);
-                }
             }
             .vp-portfolio__item-meta > * {
                 opacity: 0;
@@ -269,10 +271,10 @@
             transform: var(--vp-items-style-emerge--image-hover__transform);
         }
         .vp-portfolio__item-overlay {
+            --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
+            --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
+
             transform: translateY(0);
-            &::before {
-                transform: var(--vp-items-style-emerge--overlay-skew-hover__transform);
-            }
         }
         .vp-portfolio__item-meta > * {
             opacity: 1;
