@@ -32,16 +32,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                 endif;
                 ?>
             >
-                <noscript><?php echo wp_kses( $args['image_noscript'], $args['image_allowed_html'] ); ?></noscript>
                 <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
 
                 <div class="vp-portfolio__item-img-overlay"></div>
             </a>
             <?php
         } else {
-            ?>
-            <noscript><?php echo wp_kses( $args['image_noscript'], $args['image_allowed_html'] ); ?></noscript>
-            <?php
             echo wp_kses( $args['image'], $args['image_allowed_html'] );
         }
         ?>

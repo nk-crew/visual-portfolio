@@ -556,7 +556,8 @@ class Visual_Portfolio_Get {
             'video'              => '',
             'image_id'           => '',
             'image_allowed_html' => array(
-                'img' => array(
+                'noscript' => array(),
+                'img'      => array(
                     'src'             => array(),
                     'srcset'          => array(),
                     'sizes'           => array(),
@@ -1786,8 +1787,10 @@ class Visual_Portfolio_Get {
         $is_posts = 'post-based' === $args['vp_opts']['content_source'] || 'portfolio' === $args['vp_opts']['content_source'];
 
         // prepare image.
-        $args['image']          = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', true );
-        $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', false );
+        $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', true );
+
+        // fallback for old templates versions.
+        $args['image_noscript'] = '';
 
         // prepare date.
         if ( isset( $args['opts']['show_date'] ) ) {
@@ -1841,8 +1844,7 @@ class Visual_Portfolio_Get {
 
         // No Image.
         if ( ! $args['image'] && $args['no_image'] ) {
-            $args['image']          = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'] );
-            $args['image_noscript'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'], false, '', false );
+            $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'], false, '', true );
         }
 
         // Class.

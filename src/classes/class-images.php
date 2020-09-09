@@ -99,6 +99,19 @@ class Visual_Portfolio_Images {
      */
     public static function get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazyload = true ) {
         $lazyload = self::is_enabled() && $lazyload;
+        $noscript = '';
+
+        if ( $lazyload ) {
+            $noscript = apply_filters( 'vpf_wp_get_attachment_image_extend', false, $attachment_id, $size, $attr, false );
+
+            if ( ! $noscript ) {
+                $noscript = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
+            }
+
+            if ( $noscript ) {
+                $noscript = '<noscript>' . $noscript . '</noscript>';
+            }
+        }
 
         if ( $lazyload ) {
             self::$image_processing = true;
@@ -114,7 +127,7 @@ class Visual_Portfolio_Images {
             self::$image_processing = false;
         }
 
-        return $image;
+        return $noscript . $image;
     }
 
     /**
