@@ -1596,6 +1596,13 @@ class Visual_Portfolio_Admin {
                 'default'  => 15,
                 'min'      => 0,
                 'max'      => 200,
+                'style'    => array(
+                    array(
+                        'element'  => '.vp-portfolio__items',
+                        'property' => '--vp-items__gap',
+                        'mask'     => '$px',
+                    ),
+                ),
             )
         );
 

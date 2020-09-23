@@ -2,6 +2,18 @@
  * Visual Portfolio layout Tiles.
  */
 [data-vp-layout="tiles"] {
+    // Gaps.
+    .vp-portfolio__items,
+    .vp-portfolio__item-wrap .vp-portfolio__item-img-wrap {
+        margin-top: calc(-1 * var(--vp-items__gap));
+        margin-left: calc(-1 * var(--vp-items__gap));
+    }
+    .vp-portfolio__item-wrap .vp-portfolio__item {
+        margin-top: var(--vp-items__gap);
+        margin-left: var(--vp-items__gap);
+    }
+
+    // Images
     .vp-portfolio__item-img img,
     .vp-portfolio__item-img {
         position: absolute;
@@ -9,6 +21,10 @@
         right: 0;
         bottom: 0;
         left: 0;
+    }
+    .vp-portfolio__item-img {
+        top: var(--vp-items__gap);
+        left: var(--vp-items__gap);
     }
     .vp-portfolio__item-img-wrap {
         position: relative;

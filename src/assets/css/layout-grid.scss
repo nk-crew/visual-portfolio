@@ -1,6 +1,20 @@
 /*
  * Visual Portfolio layout Grid.
  */
+
+// Gaps.
+[data-vp-layout="grid"] {
+    .vp-portfolio__items {
+        margin-top: calc(-1 * var(--vp-items__gap));
+        margin-left: calc(-1 * var(--vp-items__gap));
+    }
+    .vp-portfolio__item-wrap .vp-portfolio__item {
+        margin-top: var(--vp-items__gap);
+        margin-left: var(--vp-items__gap);
+    }
+}
+
+// Images.
 [data-vp-grid-images-aspect-ratio*=":"] {
     .vp-portfolio__item-img img,
     .vp-portfolio__item-img {

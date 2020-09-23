@@ -129,6 +129,11 @@ class Visual_Portfolio_Assets {
             'template_style'
         );
 
+        // Additional styles for Elementor.
+        if ( class_exists( '\Elementor\Plugin' ) ) {
+            self::store_used_assets( 'visual-portfolio-elementor', true, 'style', 9 );
+        }
+
         self::store_used_assets( 'visual-portfolio', true, 'script', 11 );
 
         // Layout.
@@ -369,6 +374,7 @@ class Visual_Portfolio_Assets {
         $vp_styles = array(
             'visual-portfolio'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
             'visual-portfolio-noscript'         => array( 'assets/css/noscript.min.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-elementor'        => array( 'assets/css/elementor.min.css', array( 'visual-portfolio' ) ),
             'visual-portfolio-custom-scrollbar' => array( 'assets/css/custom-scrollbar.min.css', array( 'simplebar' ) ),
             'visual-portfolio-layout-justified' => array( 'assets/css/layout-justified.min.css', array( 'visual-portfolio' ) ),
             'visual-portfolio-layout-slider'    => array( 'assets/css/layout-slider.min.css', array( 'visual-portfolio', 'swiper' ) ),
@@ -441,17 +447,10 @@ class Visual_Portfolio_Assets {
                     'visual-portfolio-popup-gallery',
                 ),
             ),
-            'visual-portfolio-layout-gaps' => array(
-                'assets/js/layout-gaps.min.js',
-                array(
-                    'jquery',
-                ),
-            ),
             'visual-portfolio-layout-masonry' => array(
                 'assets/js/layout-masonry.min.js',
                 array(
                     'jquery',
-                    'visual-portfolio-layout-gaps',
                     'visual-portfolio-plugin-isotope',
                 ),
             ),
@@ -459,7 +458,6 @@ class Visual_Portfolio_Assets {
                 'assets/js/layout-grid.min.js',
                 array(
                     'jquery',
-                    'visual-portfolio-layout-gaps',
                     'visual-portfolio-plugin-isotope',
                 ),
             ),
@@ -467,7 +465,6 @@ class Visual_Portfolio_Assets {
                 'assets/js/layout-tiles.min.js',
                 array(
                     'jquery',
-                    'visual-portfolio-layout-gaps',
                     'visual-portfolio-plugin-isotope',
                 ),
             ),
