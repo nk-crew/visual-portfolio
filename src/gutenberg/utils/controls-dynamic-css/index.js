@@ -87,15 +87,17 @@ export default function getDynamicCSS( options ) {
     // Controls styles.
     Object.keys( registeredControls ).forEach( ( k ) => {
         const control = registeredControls[ k ];
+        let allow = 'undefined' !== typeof control.style && control.style;
 
         // Check condition.
-        if (
-            'undefined' !== typeof control.style
-            && control.style
-            && 'undefined' !== typeof control.condition
-            && control.condition.length
-            && conditionCheck( control.condition, options )
-        ) {
+        allow = allow && (
+            'undefined' === typeof control.condition
+            || ! control.condition.length
+            || ! conditionCheck( control.condition, options )
+        );
+
+        // Prepare styles.
+        if ( allow ) {
             control.style.forEach( ( data ) => {
                 result += prepareStylesFromParams( selector, options[ control.name ], data );
             } );

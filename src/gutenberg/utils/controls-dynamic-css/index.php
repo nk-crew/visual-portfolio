@@ -35,21 +35,20 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
 
         // Controls styles.
         foreach ( $registered as $k => $control ) {
-            if ( ! isset( $control['style'] ) || empty( $control['style'] ) ) {
-                continue;
-            }
+            $allow = isset( $control['style'] ) && ! empty( $control['style'] );
 
             // Check condition.
-            if (
+            $allow = $allow && (
                 ! isset( $control['condition'] ) ||
                 empty( $control['condition'] ) ||
                 ! Visual_Portfolio_Control_Condition_Check::check( $control['condition'], $options )
-            ) {
-                continue;
-            }
+            );
 
-            foreach ( $control['style'] as $data ) {
-                $result .= self::prepare_styles_from_params( $selector, $options[ $control['name'] ], $data );
+            // Prepare styles.
+            if ( $allow ) {
+                foreach ( $control['style'] as $data ) {
+                    $result .= self::prepare_styles_from_params( $selector, $options[ $control['name'] ], $data );
+                }
             }
         }
 
