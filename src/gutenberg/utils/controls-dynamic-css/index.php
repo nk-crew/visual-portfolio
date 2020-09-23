@@ -38,11 +38,9 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
             $allow = isset( $control['style'] ) && ! empty( $control['style'] );
 
             // Check condition.
-            $allow = $allow && (
-                ! isset( $control['condition'] ) ||
-                empty( $control['condition'] ) ||
-                ! Visual_Portfolio_Control_Condition_Check::check( $control['condition'], $options )
-            );
+            if ( $allow && isset( $control['condition'] ) && ! empty( $control['condition'] ) ) {
+                $allow = Visual_Portfolio_Control_Condition_Check::check( $control['condition'], $options );
+            }
 
             // Prepare styles.
             if ( $allow ) {

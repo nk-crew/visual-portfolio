@@ -90,11 +90,9 @@ export default function getDynamicCSS( options ) {
         let allow = 'undefined' !== typeof control.style && control.style;
 
         // Check condition.
-        allow = allow && (
-            'undefined' === typeof control.condition
-            || ! control.condition.length
-            || ! conditionCheck( control.condition, options )
-        );
+        if ( allow && 'undefined' !== typeof control.condition && control.condition.length ) {
+            allow = conditionCheck( control.condition, options );
+        }
 
         // Prepare styles.
         if ( allow ) {
