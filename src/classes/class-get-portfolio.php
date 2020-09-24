@@ -640,8 +640,6 @@ class Visual_Portfolio_Get {
                     )
                 );
 
-                $slider_thumbnails[] = $args['image_id'];
-
                 // Excerpt.
                 if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] && isset( $img['description'] ) && $img['description'] ) {
                     $args['excerpt'] = wp_trim_words( $img['description'], $args['opts']['excerpt_words_count'], '...' );
@@ -652,6 +650,8 @@ class Visual_Portfolio_Get {
                 }
 
                 $args = apply_filters( 'vpf_image_item_args', $args, $img );
+
+                $slider_thumbnails[] = $args['image_id'];
 
                 self::each_item( $args );
             }
@@ -746,9 +746,9 @@ class Visual_Portfolio_Get {
                     }
                 }
 
-                $slider_thumbnails[] = $args['image_id'];
-
                 $args = apply_filters( 'vpf_post_item_args', $args, $args['post_id'] );
+
+                $slider_thumbnails[] = $args['image_id'];
 
                 self::each_item( $args );
             }
