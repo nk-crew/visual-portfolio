@@ -71,6 +71,7 @@ class IframePreview extends Component {
 
         iframeResizer( {
             interval: 10,
+            warningTimeout: 60000,
             checkOrigin: false,
             onMessage( { message } ) {
                 // select current block on click message.
