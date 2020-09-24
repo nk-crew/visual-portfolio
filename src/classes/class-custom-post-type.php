@@ -465,7 +465,7 @@ class Visual_Portfolio_Custom_Post_Type {
         }
 
         if ( 'vp_lists_post_shortcode' === $column_name ) {
-            echo '<code class="vp-onclick-selection">';
+            echo '<code class="vp-onclick-selection" role="button" tabIndex="0" aria-hidden="true">';
             echo '[visual_portfolio id="' . get_the_ID() . '"]';
             echo '</code>';
         }
