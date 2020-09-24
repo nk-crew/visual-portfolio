@@ -50,7 +50,7 @@ class VpImageFocalPointComponent extends Component {
                 name="VPImageFocalPoint"
                 title={ __( 'Featured Image Focal Point', '@@text_domain' ) }
                 icon={ (
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="0.75" y="0.75" width="18.5" height="18.5" rx="1.25" stroke="currentColor" strokeWidth="1.5" fill="transparent" />
                         <path d="M1 15.5L6 12L10 14L14.5 10L19 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="transparent" />
                     </svg>

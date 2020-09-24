@@ -176,27 +176,10 @@ $grid_sm: 600px !default;
     }
 }
 
-
-/**
- * Post video meta.
- */
-.vpf-meta-video-panel {
-    > .components-panel__body-title .components-panel__icon {
-        order: -1;
-        margin-right: 10px;
-        margin-left: 0;
-    }
-}
-
 /**
  * Post featured image focal point meta.
  */
 .vpf-meta-image-focal-point-panel {
-    > .components-panel__body-title .components-panel__icon {
-        order: -1;
-        margin-right: 10px;
-        margin-left: 0;
-    }
     .components-focal-point-picker_position-display-container {
         .components-base-control__label {
             max-width: 100%;
