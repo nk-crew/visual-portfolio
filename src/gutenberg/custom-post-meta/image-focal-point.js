@@ -27,11 +27,9 @@ class VpImageFocalPointComponent extends Component {
     render() {
         const {
             getMeta,
-            getThumbnail,
+            thumbnailData,
             updateMeta,
         } = this.props;
-
-        const thumbnailData = getThumbnail();
 
         if ( ! thumbnailData || ! thumbnailData.source_url ) {
             return null;
@@ -75,17 +73,30 @@ class VpImageFocalPointComponent extends Component {
 }
 
 const VpImageFocalPoint = compose( [
-    withSelect( ( select ) => ( {
-        getMeta( name ) {
-            const meta = select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
-            return meta[ name ];
-        },
-        getThumbnail() {
-            const featuredImageId = select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+    withSelect( ( select ) => {
+        const {
+            getEditedPostAttribute,
+        } = select( 'core/editor' );
 
-            return featuredImageId ? select( 'core' ).getMedia( featuredImageId ) : null;
-        },
-    } ) ),
+        const {
+            getMedia,
+        } = select( 'core' );
+
+        const featuredImageId = getEditedPostAttribute( 'featured_media' );
+        const meta = getEditedPostAttribute( 'meta' ) || {};
+
+        // support for custom thumbnail from Pro plugin.
+        // eslint-disable-next-line no-underscore-dangle
+        const customThumbnailId = meta._vp_custom_thumbnail || false;
+        const thumbnailData = customThumbnailId || featuredImageId ? getMedia( customThumbnailId || featuredImageId ) : null;
+
+        return {
+            thumbnailData,
+            getMeta( name ) {
+                return meta[ name ];
+            },
+        };
+    } ),
     withDispatch( ( dispatch ) => ( {
         updateMeta( name, val ) {
             dispatch( 'core/editor' ).editPost( { meta: { [ name ]: val } } );
