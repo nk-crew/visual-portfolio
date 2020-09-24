@@ -26,12 +26,23 @@ const { __ } = wp.i18n;
 
 const { apiFetch } = wp;
 
-const { Component } = wp.element;
+const {
+    Fragment,
+    Component,
+} = wp.element;
+
+const {
+    PanelBody,
+} = wp.components;
 
 const {
     withSelect,
     withDispatch,
 } = wp.data;
+
+const {
+    InspectorControls,
+} = wp.blockEditor;
 
 const { compose } = wp.compose;
 
@@ -39,24 +50,84 @@ const { compose } = wp.compose;
  * Layouts Editor block
  */
 class LayoutsEditorBlock extends Component {
+    // eslint-disable-next-line class-methods-use-this
+    onShortcodeClick( event ) {
+        window.getSelection().selectAllChildren( event.target );
+    }
+
     render() {
         const {
+            postId,
             blockData,
             updateBlockData,
             clientId,
         } = this.props;
 
         return (
-            <BlockEdit
-                attributes={ {
-                    ...blockData,
-                    block_id: blockData.id || clientId,
-                } }
-                setAttributes={ ( data ) => {
-                    updateBlockData( data );
-                } }
-                clientId={ clientId }
-            />
+            <Fragment>
+                <InspectorControls>
+                    <PanelBody
+                        title={ __( 'Shortcodes', '@@text_domain' ) }
+                    >
+                        <p>{ __( 'To output this saved layout and its components you can use the following shortcodes:' ) }</p>
+
+                        <p>
+                            { __( 'Layout:', '@@text_domain' ) }
+                            <br />
+                            <code
+                                role="button"
+                                tabIndex="0"
+                                aria-hidden="true"
+                                onClick={ this.onShortcodeClick }
+                            >
+                                [visual_portfolio id=&quot;
+                                { postId }
+                                &quot;]
+                            </code>
+                        </p>
+
+                        <p>
+                            { __( 'Filter (optional):', '@@text_domain' ) }
+                            <br />
+                            <code
+                                role="button"
+                                tabIndex="0"
+                                aria-hidden="true"
+                                onClick={ this.onShortcodeClick }
+                            >
+                                [visual_portfolio_filter id=&quot;
+                                { postId }
+                                &quot;]
+                            </code>
+                        </p>
+
+                        <p>
+                            { __( 'Sort (optional):', '@@text_domain' ) }
+                            <br />
+                            <code
+                                role="button"
+                                tabIndex="0"
+                                aria-hidden="true"
+                                onClick={ this.onShortcodeClick }
+                            >
+                                [visual_portfolio_sort id=&quot;
+                                { postId }
+                                &quot;]
+                            </code>
+                        </p>
+                    </PanelBody>
+                </InspectorControls>
+                <BlockEdit
+                    attributes={ {
+                        ...blockData,
+                        block_id: blockData.id || clientId,
+                    } }
+                    setAttributes={ ( data ) => {
+                        updateBlockData( data );
+                    } }
+                    clientId={ clientId }
+                />
+            </Fragment>
         );
     }
 }
@@ -64,8 +135,10 @@ class LayoutsEditorBlock extends Component {
 const LayoutsEditorBlockWithSelect = compose( [
     withSelect( ( select ) => {
         const blockData = select( 'visual-portfolio/saved-layout-data' ).getBlockData();
+        const postId = select( 'core/editor' ).getCurrentPostId();
 
         return {
+            postId,
             blockData,
         };
     } ),
