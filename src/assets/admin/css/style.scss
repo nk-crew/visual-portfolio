@@ -312,6 +312,28 @@ $grid_sm: 600px !default;
 /**
  * Portfolio List page
  */
+.notice.vpf-saved-layouts-notice {
+    padding: 11px 15px;
+    margin-top: 15px;
+    font-size: 14px;
+    line-height: 1.4;
+
+    h2 {
+        margin-top: 5px;
+        margin-bottom: 12px;
+    }
+    p {
+        font-size: 15px;
+    }
+
+    svg {
+        display: inline-block;
+        width: 1.3em;
+        height: 1.3em;
+        margin-right: .2em;
+        vertical-align: -.28em;
+    }
+}
 .vp-portfolio-list__icon {
     position: relative;
     display: block;

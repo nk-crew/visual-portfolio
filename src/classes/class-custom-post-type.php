@@ -31,6 +31,9 @@ class Visual_Portfolio_Custom_Post_Type {
         add_filter( 'manage_portfolio_posts_columns', array( $this, 'add_portfolio_img_column' ) );
         add_filter( 'manage_portfolio_posts_custom_column', array( $this, 'manage_portfolio_img_column' ), 10, 2 );
 
+        // show notice in vp_lists admin list page.
+        add_filter( 'admin_notices', array( $this, 'add_vp_lists_notice' ) );
+
         // show icon and shortcode columns in vp_lists table.
         add_filter( 'manage_vp_lists_posts_columns', array( $this, 'add_vp_lists_custom_columns' ) );
         add_filter( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_custom_columns' ), 10, 2 );
@@ -371,6 +374,41 @@ class Visual_Portfolio_Custom_Post_Type {
             }
             echo '</a>';
         }
+    }
+
+    /**
+     * Show notice in vp_lists admin list page.
+     */
+    public function add_vp_lists_notice() {
+        $current_screen = get_current_screen();
+
+        if ( ! isset( $current_screen->post_type ) || 'vp_lists' !== $current_screen->post_type ) {
+            return;
+        }
+
+        ?>
+        <div class="notice notice-info vpf-saved-layouts-notice">
+            <h2>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <?php echo esc_html__( 'When to use Saved Layouts', '@@text_domain' ); ?>
+            </h2>
+            <p>
+                <?php
+                // translators: %s - url to documentation.
+                echo wp_kses_post( sprintf( __( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%s" target="_blank">Visual Portfolio Blocks</a>.', '@@text_domain' ), 'https://visualportfolio.co/documentation/portfolio-blocks/' ) );
+                ?>
+            </p>
+            <p>
+                <?php
+                // translators: %s - url to documentation.
+                echo wp_kses_post( sprintf( __( 'To reuse blocks, you can use the built-in Gutenberg feature - <a href="%s" target="_blank">Reusable Blocks</a>.', '@@text_domain' ), 'https://www.wpbeginner.com/beginners-guide/how-to-create-a-reusable-block-in-wordpress/' ) );
+                ?>
+            </p>
+            <p>
+                <?php echo esc_html__( 'Saved Layouts may be only used for 3rd-party builders only (such as Elementor, WPBakery Page Builder, etc). Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', '@@text_domain' ); ?>
+            </p>
+        </div>
+        <?php
     }
 
     /**
