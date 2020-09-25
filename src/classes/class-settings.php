@@ -278,10 +278,10 @@ class Visual_Portfolio_Settings {
                     'label'   => esc_html__( 'Vendor Script', '@@text_domain' ),
                     'type'    => 'select',
                     'options' => array(
-                        'photoswipe' => esc_html__( 'PhotoSwipe', '@@text_domain' ),
                         'fancybox'   => esc_html__( 'Fancybox', '@@text_domain' ),
+                        'photoswipe' => esc_html__( 'PhotoSwipe', '@@text_domain' ),
                     ),
-                    'default' => 'photoswipe',
+                    'default' => 'fancybox',
                 ),
 
                 // Default WordPress Images.
