@@ -729,7 +729,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Meta Text Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Caption Text Color', '@@text_domain' ),
                             'name'  => 'meta_text_color',
                             'alpha' => true,
                             'style' => array(
@@ -741,7 +741,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Meta Links Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Caption Links Color', '@@text_domain' ),
                             'name'  => 'meta_links_color',
                             'alpha' => true,
                             'style' => array(
@@ -753,7 +753,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Meta Links Hover Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Caption Links Hover Color', '@@text_domain' ),
                             'name'  => 'meta_links_hover_color',
                             'alpha' => true,
                             'style' => array(
@@ -905,7 +905,7 @@ class Visual_Portfolio_Admin {
                     'controls'         => array(
                         array(
                             'type'    => 'radio',
-                            'label'   => esc_html__( 'Display Meta Overlay', '@@text_domain' ),
+                            'label'   => esc_html__( 'Display Caption', '@@text_domain' ),
                             'name'    => 'show_overlay',
                             'default' => 'hover',
                             'options' => array(
@@ -916,7 +916,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Meta Overlay Background Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Caption Background Color', '@@text_domain' ),
                             'name'  => 'bg_color',
                             'alpha' => true,
                             'style' => array(
@@ -928,7 +928,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Meta Overlay Text Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Caption Text Color', '@@text_domain' ),
                             'name'  => 'text_color',
                             'alpha' => true,
                             'style' => array(
@@ -940,7 +940,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Meta Overlay Links Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Caption Links Color', '@@text_domain' ),
                             'name'  => 'links_color',
                             'alpha' => true,
                             'style' => array(
@@ -952,7 +952,7 @@ class Visual_Portfolio_Admin {
                         ),
                         array(
                             'type'  => 'color',
-                            'label' => esc_html__( 'Meta Overlay Links Hover Color', '@@text_domain' ),
+                            'label' => esc_html__( 'Caption Links Hover Color', '@@text_domain' ),
                             'name'  => 'links_hover_color',
                             'alpha' => true,
                             'style' => array(
