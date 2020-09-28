@@ -118,6 +118,22 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 2.6.0 =
+
+* added WPML config
+* added section with possibility to copy shortcode right inside Saved Layout editor
+* added notice to admin list with Saved Layouts (information about when to use Saved Layouts)
+* improved Emerge overlay skew transform
+* improved noscript images output
+* changed default popup gallery plugin to Fancybox
+* changed Gap styles output for Grid, Masonry, Tiles to CSS variables
+* changed editor preview warning time to 60 seconds
+* fixed Gaps styles compatibility with the latest Elementor update
+* fixed controls dynamic CSS render when no condition added
+* fixed Emerge overlay semi-transparent overlay background
+* fixed images popup gallery when WebP support enabled in 3rd-party plugins
+* minor changes
+
 = 2.5.0 =
 
 * added Image Overlay setting on Emerge Style
