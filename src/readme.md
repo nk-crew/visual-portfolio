@@ -118,6 +118,10 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 2.6.1 =
+
+* fixed images displaying when Tiles + 0 gap used
+
 = 2.6.0 =
 
 * added WPML config
