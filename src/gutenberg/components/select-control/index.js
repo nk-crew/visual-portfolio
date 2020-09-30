@@ -5,6 +5,7 @@ import { debounce } from 'throttle-debounce';
 import Select, { components } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import CreatableSelect from 'react-select/creatable';
+import selectStyles from 'gutenberg-react-select-styles';
 
 const {
     Option,
@@ -30,100 +31,6 @@ const {
 /**
  * Internal dependencies
  */
-const customStyles = {
-    control: ( styles, state ) => ( {
-        ...styles,
-        cursor: 'pointer',
-        minHeight: 30,
-        ...state.isFocused && ! state.isDisabled ? {
-            borderColor: '#007cba',
-        } : {
-            borderColor: '#7e8993',
-            '&:hover': {
-                borderColor: '#7e8993',
-            },
-        },
-        ...state.isFocused ? {
-            boxShadow: '0 0 0 1px #007cba',
-            '&:hover': {
-                borderColor: '#007cba',
-            },
-        } : {},
-    } ),
-    valueContainer: ( styles ) => ( {
-        ...styles,
-        padding: '0 8px',
-    } ),
-    input: ( styles ) => ( {
-        ...styles,
-        margin: 0,
-        height: 30,
-        paddingTop: 0,
-        paddingBottom: 0,
-        input: {
-            boxShadow: 'none !important',
-        },
-    } ),
-    dropdownIndicator: ( styles ) => ( {
-        ...styles,
-        padding: 5,
-        color: '#555555',
-        '&:hover': {
-            color: '#555555',
-        },
-        svg: {
-            width: 17,
-            height: 17,
-        },
-    } ),
-    clearIndicator: ( styles ) => ( {
-        ...styles,
-        padding: 5,
-        svg: {
-            width: 15,
-            height: 15,
-        },
-    } ),
-    indicatorSeparator: () => false,
-    multiValue: ( styles ) => ( {
-        ...styles,
-        padding: '2px 3px',
-        borderRadius: 4,
-        backgroundColor: '#555d66',
-    } ),
-    multiValueLabel: ( styles ) => ( {
-        ...styles,
-        padding: 0,
-        color: '#fff',
-    } ),
-    multiValueRemove: ( styles ) => ( {
-        ...styles,
-        padding: 0,
-        marginLeft: 5,
-        color: '#adadad',
-        svg: {
-            width: 10,
-            height: 10,
-        },
-    } ),
-    option: ( styles, state ) => ( {
-        ...styles,
-        display: 'flex',
-        alignItems: 'center',
-        padding: '4px 10px',
-        ...state.isFocused ? {
-            backgroundColor: '#efefef',
-        } : {},
-        ...state.isSelected ? {
-            backgroundColor: '#007cba',
-        } : {},
-    } ),
-    menu: ( styles ) => ( {
-        ...styles,
-        zIndex: 2,
-    } ),
-};
-
 const cachedOptions = {};
 
 /**
@@ -358,7 +265,7 @@ export default class VpfSelectControl extends Component {
             // Test opened menu items:
             // menuIsOpen: true,
             className: 'vpf-component-select',
-            styles: customStyles,
+            styles: selectStyles,
             components: {
                 Option( optionProps ) {
                     const {
