@@ -231,19 +231,21 @@ class Visual_Portfolio_Images {
 
         // Default Placeholder.
         $placeholder   = false;
-        $placeholder_w = false;
-        $placeholder_h = false;
+        $placeholder_w = isset( $attr['width'] ) ? $attr['width'] : false;
+        $placeholder_h = isset( $attr['height'] ) ? $attr['height'] : false;
 
-        // The right Image Placeholder.
-        $metadata = get_post_meta( $attachment_id, '_wp_attachment_metadata', true );
+        if ( ! $placeholder_w || ! $placeholder_h ) {
+            // The right Image Placeholder.
+            $metadata = get_post_meta( $attachment_id, '_wp_attachment_metadata', true );
 
-        // generate placeholder.
-        if ( isset( $metadata['sizes'][ $size ] ) && isset( $metadata['sizes'][ $size ]['width'] ) && isset( $metadata['sizes'][ $size ]['height'] ) ) {
-            $placeholder_w = $metadata['sizes'][ $size ]['width'];
-            $placeholder_h = $metadata['sizes'][ $size ]['height'];
-        } elseif ( isset( $metadata['width'] ) && isset( $metadata['height'] ) ) {
-            $placeholder_w = $metadata['width'];
-            $placeholder_h = $metadata['height'];
+            // generate placeholder.
+            if ( isset( $metadata['sizes'][ $size ] ) && isset( $metadata['sizes'][ $size ]['width'] ) && isset( $metadata['sizes'][ $size ]['height'] ) ) {
+                $placeholder_w = $metadata['sizes'][ $size ]['width'];
+                $placeholder_h = $metadata['sizes'][ $size ]['height'];
+            } elseif ( isset( $metadata['width'] ) && isset( $metadata['height'] ) ) {
+                $placeholder_w = $metadata['width'];
+                $placeholder_h = $metadata['height'];
+            }
         }
 
         if ( $placeholder_w && $placeholder_h ) {
