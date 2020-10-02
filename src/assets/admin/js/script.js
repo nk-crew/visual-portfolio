@@ -20,6 +20,13 @@ $body.on( 'focus', '[name="vp_list_shortcode"], [name="vp_filter_shortcode"], [n
 $body.on( 'click', '.vp-onclick-selection', function() {
     window.getSelection().selectAllChildren( this );
 } );
+// fix the problem with Gutenberg shortcode transform (allowed only plain text pasted).
+$body.on( 'copy cut', '.vp-onclick-selection', ( e ) => {
+    const copyText = window.getSelection().toString().replace( /[\n\r]+/g, '' );
+
+    e.originalEvent.clipboardData.setData( 'text/plain', copyText );
+    e.originalEvent.preventDefault();
+} );
 
 // Post format metabox show/hide
 const $videoMetabox = $( '#vp_format_video' );

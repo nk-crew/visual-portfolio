@@ -55,6 +55,16 @@ class LayoutsEditorBlock extends Component {
         window.getSelection().selectAllChildren( event.target );
     }
 
+    // fix the problem with Gutenberg shortcode transform (allowed only plain text pasted).
+    // eslint-disable-next-line class-methods-use-this
+    onShortcodeCopy( event ) {
+        // fix the problem with Gutenberg shortcode transform (allowed only plain text pasted).
+        const copyText = window.getSelection().toString().replace( /[\n\r]+/g, '' );
+
+        event.clipboardData.setData( 'text/plain', copyText );
+        event.preventDefault();
+    }
+
     render() {
         const {
             postId,
@@ -79,6 +89,8 @@ class LayoutsEditorBlock extends Component {
                                 tabIndex="0"
                                 aria-hidden="true"
                                 onClick={ this.onShortcodeClick }
+                                onCopy={ this.onShortcodeCopy }
+                                onCut={ this.onShortcodeCopy }
                             >
                                 [visual_portfolio id=&quot;
                                 { postId }
@@ -94,6 +106,8 @@ class LayoutsEditorBlock extends Component {
                                 tabIndex="0"
                                 aria-hidden="true"
                                 onClick={ this.onShortcodeClick }
+                                onCopy={ this.onShortcodeCopy }
+                                onCut={ this.onShortcodeCopy }
                             >
                                 [visual_portfolio_filter id=&quot;
                                 { postId }
@@ -109,6 +123,8 @@ class LayoutsEditorBlock extends Component {
                                 tabIndex="0"
                                 aria-hidden="true"
                                 onClick={ this.onShortcodeClick }
+                                onCopy={ this.onShortcodeCopy }
+                                onCut={ this.onShortcodeCopy }
                             >
                                 [visual_portfolio_sort id=&quot;
                                 { postId }
