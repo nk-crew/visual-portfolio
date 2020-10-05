@@ -277,12 +277,15 @@ class GalleryControl extends Component {
                     imgThumbnailUrl: img.url,
                 };
 
-                if ( img.sizes && img.sizes.thumbnail && img.sizes.thumbnail.url ) {
-                    imgData.imgThumbnailUrl = img.sizes.thumbnail.url;
-                } else if ( img.sizes && img.sizes.medium && img.sizes.medium.url ) {
-                    imgData.imgThumbnailUrl = img.sizes.medium.url;
-                } else if ( img.sizes && img.sizes.large && img.sizes.large.url ) {
-                    imgData.imgThumbnailUrl = img.sizes.large.url;
+                // Prepare thumbnail for all images except GIF, since GIFs animated only in full size.
+                if ( ! img.mime || 'image/gif' !== img.mime ) {
+                    if ( img.sizes && img.sizes.thumbnail && img.sizes.thumbnail.url ) {
+                        imgData.imgThumbnailUrl = img.sizes.thumbnail.url;
+                    } else if ( img.sizes && img.sizes.medium && img.sizes.medium.url ) {
+                        imgData.imgThumbnailUrl = img.sizes.medium.url;
+                    } else if ( img.sizes && img.sizes.large && img.sizes.large.url ) {
+                        imgData.imgThumbnailUrl = img.sizes.large.url;
+                    }
                 }
 
                 if ( img.title ) {

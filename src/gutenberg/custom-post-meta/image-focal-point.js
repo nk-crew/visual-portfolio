@@ -38,16 +38,18 @@ class VpImageFocalPointComponent extends Component {
 
             previewUrl = thumbnailData.source_url;
 
-            if ( thumbnailData.media_details && thumbnailData.media_details.sizes && thumbnailData.media_details.sizes[ mediaSize ] ) {
-                // use mediaSize when available
-                previewUrl = thumbnailData.media_details.sizes[ mediaSize ].source_url;
-            } else {
-                // get fallbackMediaSize if mediaSize is not available
-                const fallbackMediaSize = 'thumbnail';
+            if ( ! thumbnailData.mime_type || 'image/gif' !== thumbnailData.mime_type ) {
+                if ( thumbnailData.media_details && thumbnailData.media_details.sizes && thumbnailData.media_details.sizes[ mediaSize ] ) {
+                    // use mediaSize when available
+                    previewUrl = thumbnailData.media_details.sizes[ mediaSize ].source_url;
+                } else {
+                    // get fallbackMediaSize if mediaSize is not available
+                    const fallbackMediaSize = 'thumbnail';
 
-                if ( thumbnailData.media_details && thumbnailData.media_details.sizes && thumbnailData.media_details.sizes[ fallbackMediaSize ] ) {
-                    // use fallbackMediaSize when mediaSize is not available
-                    previewUrl = thumbnailData.media_details.sizes[ fallbackMediaSize ].source_url;
+                    if ( thumbnailData.media_details && thumbnailData.media_details.sizes && thumbnailData.media_details.sizes[ fallbackMediaSize ] ) {
+                        // use fallbackMediaSize when mediaSize is not available
+                        previewUrl = thumbnailData.media_details.sizes[ fallbackMediaSize ].source_url;
+                    }
                 }
             }
         }

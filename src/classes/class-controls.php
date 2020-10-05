@@ -280,8 +280,8 @@ class Visual_Portfolio_Controls {
             // add image url if doesn't exist.
             foreach ( $result as $k => $data ) {
                 if ( ! isset( $data['imgUrl'] ) && isset( $data['id'] ) ) {
-                    $result[ $k ]['imgUrl']          = wp_get_attachment_image_url( $data['id'], 'full' );
-                    $result[ $k ]['imgThumbnailUrl'] = wp_get_attachment_image_url( $data['id'], 'thumbnail' );
+                    $result[ $k ]['imgUrl']          = Visual_Portfolio_Images::wp_get_attachment_image_url( $data['id'], 'full' );
+                    $result[ $k ]['imgThumbnailUrl'] = Visual_Portfolio_Images::wp_get_attachment_image_url( $data['id'], 'thumbnail' );
                 }
             }
         }

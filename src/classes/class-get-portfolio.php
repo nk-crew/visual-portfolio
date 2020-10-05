@@ -626,7 +626,7 @@ class Visual_Portfolio_Get {
                     $each_item_args,
                     array(
                         'uid'            => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
-                        'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : wp_get_attachment_image_url( $img['id'], $img_size_popup ),
+                        'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : Visual_Portfolio_Images::wp_get_attachment_image_url( $img['id'], $img_size_popup ),
                         'title'          => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
                         'format'         => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
                         'published_time' => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',

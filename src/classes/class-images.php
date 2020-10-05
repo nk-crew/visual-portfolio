@@ -33,6 +33,27 @@ class Visual_Portfolio_Images {
     }
 
     /**
+     * Get the URL of an image attachment.
+     *
+     * @param int          $attachment_id Image attachment ID.
+     * @param string|array $size          Optional. Image size to retrieve. Accepts any valid image size, or an array
+     *                                    of width and height values in pixels (in that order). Default 'thumbnail'.
+     * @param bool         $icon          Optional. Whether the image should be treated as an icon. Default false.
+     *
+     * @return string|false Attachment URL or false if no image is available.
+     */
+    public static function wp_get_attachment_image_url( $attachment_id, $size = 'thumbnail', $icon = false ) {
+        $mime_type = get_post_mime_type( $attachment_id );
+
+        // Prevent usage of resized GIFs, since GIFs animated only in full size.
+        if ( $mime_type && 'image/gif' === $mime_type ) {
+            $size = 'full';
+        }
+
+        return wp_get_attachment_image_url( $attachment_id, $size, $icon );
+    }
+
+    /**
      * Init hooks.
      */
     public static function is_enabled() {
@@ -98,8 +119,14 @@ class Visual_Portfolio_Images {
      * @return string
      */
     public static function get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazyload = true ) {
-        $lazyload = self::is_enabled() && $lazyload;
-        $noscript = '';
+        $mime_type = get_post_mime_type( $attachment_id );
+        $lazyload  = self::is_enabled() && $lazyload;
+        $noscript  = '';
+
+        // Prevent usage of resized GIFs, since GIFs animated only in full size.
+        if ( $mime_type && 'image/gif' === $mime_type ) {
+            $size = 'full';
+        }
 
         if ( $lazyload ) {
             $noscript = apply_filters( 'vpf_wp_get_attachment_image_extend', false, $attachment_id, $size, $attr, false );
