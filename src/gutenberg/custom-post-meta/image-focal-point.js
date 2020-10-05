@@ -31,7 +31,28 @@ class VpImageFocalPointComponent extends Component {
             updateMeta,
         } = this.props;
 
-        if ( ! thumbnailData || ! thumbnailData.source_url ) {
+        let previewUrl = '';
+
+        if ( thumbnailData ) {
+            const mediaSize = 'post-thumbnail';
+
+            previewUrl = thumbnailData.source_url;
+
+            if ( thumbnailData.media_details && thumbnailData.media_details.sizes && thumbnailData.media_details.sizes[ mediaSize ] ) {
+                // use mediaSize when available
+                previewUrl = thumbnailData.media_details.sizes[ mediaSize ].source_url;
+            } else {
+                // get fallbackMediaSize if mediaSize is not available
+                const fallbackMediaSize = 'thumbnail';
+
+                if ( thumbnailData.media_details && thumbnailData.media_details.sizes && thumbnailData.media_details.sizes[ fallbackMediaSize ] ) {
+                    // use fallbackMediaSize when mediaSize is not available
+                    previewUrl = thumbnailData.media_details.sizes[ fallbackMediaSize ].source_url;
+                }
+            }
+        }
+
+        if ( ! previewUrl ) {
             return null;
         }
 
@@ -60,7 +81,7 @@ class VpImageFocalPointComponent extends Component {
                 </PanelRow>
                 <PanelRow>
                     <FocalPointPicker
-                        url={ thumbnailData.source_url }
+                        url={ previewUrl }
                         value={ focalPoint }
                         onChange={ ( val ) => {
                             updateMeta( '_vp_image_focal_point', val );
