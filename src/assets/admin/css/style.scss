@@ -179,7 +179,7 @@ $grid_sm: 600px !default;
 /**
  * Post featured image focal point meta.
  */
-.vpf-meta-image-focal-point-panel {
+.vpf-post-image-focal-point-panel {
     .components-focal-point-picker_position-display-container {
         .components-base-control__label {
             max-width: 100%;
@@ -187,6 +187,11 @@ $grid_sm: 600px !default;
         .components-base-control {
             margin-bottom: 0;
         }
+    }
+
+    // hide default image preview.
+    ~ .editor-post-featured-image .editor-post-featured-image__preview {
+        display: none;
     }
 }
 

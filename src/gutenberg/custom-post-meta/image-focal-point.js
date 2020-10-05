@@ -7,7 +7,10 @@ const { withInstanceId, compose } = wp.compose;
 
 const { withSelect, withDispatch } = wp.data;
 
-const { Component } = wp.element;
+const {
+    Fragment,
+    Component,
+} = wp.element;
 
 const {
     PanelRow,
@@ -15,10 +18,8 @@ const {
 } = wp.components;
 
 const {
-    PluginDocumentSettingPanel,
-} = wp.editPost;
-
-const { registerPlugin } = wp.plugins;
+    addFilter,
+} = wp.hooks;
 
 /**
  * Component
@@ -67,17 +68,7 @@ class VpImageFocalPointComponent extends Component {
         }
 
         return (
-            <PluginDocumentSettingPanel
-                name="VPImageFocalPoint"
-                title={ __( 'Featured Image Focal Point', '@@text_domain' ) }
-                icon={ (
-                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="0.75" y="0.75" width="18.5" height="18.5" rx="1.25" stroke="currentColor" strokeWidth="1.5" fill="transparent" />
-                        <path d="M1 15.5L6 12L10 14L14.5 10L19 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="transparent" />
-                    </svg>
-                ) }
-                className="vpf-meta-image-focal-point-panel"
-            >
+            <div className="vpf-post-image-focal-point-panel">
                 <PanelRow>
                     <p className="description">{ __( 'Focal point will be used in Visual Portfolio layouts only.', '@@text_domain' ) }</p>
                 </PanelRow>
@@ -90,7 +81,7 @@ class VpImageFocalPointComponent extends Component {
                         } }
                     />
                 </PanelRow>
-            </PluginDocumentSettingPanel>
+            </div>
         );
     }
 }
@@ -107,11 +98,7 @@ const VpImageFocalPoint = compose( [
 
         const featuredImageId = getEditedPostAttribute( 'featured_media' );
         const meta = getEditedPostAttribute( 'meta' ) || {};
-
-        // support for custom thumbnail from Pro plugin.
-        // eslint-disable-next-line no-underscore-dangle
-        const customThumbnailId = meta._vp_custom_thumbnail || false;
-        const thumbnailData = customThumbnailId || featuredImageId ? getMedia( customThumbnailId || featuredImageId ) : null;
+        const thumbnailData = featuredImageId ? getMedia( featuredImageId ) : null;
 
         return {
             thumbnailData,
@@ -128,6 +115,13 @@ const VpImageFocalPoint = compose( [
     withInstanceId,
 ] )( VpImageFocalPointComponent );
 
-registerPlugin( 'vp-image-focal-point', {
-    render: VpImageFocalPoint,
-} );
+addFilter( 'editor.PostFeaturedImage', 'vpf/post-featured-image-focal-point', ( OriginalComponent ) => (
+    function( props ) {
+        return (
+            <Fragment>
+                <VpImageFocalPoint />
+                <OriginalComponent { ...props } />
+            </Fragment>
+        );
+    }
+) );
