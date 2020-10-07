@@ -185,7 +185,7 @@ class Visual_Portfolio_Preview {
         add_filter( 'show_admin_bar', '__return_false' );
 
         // Enqueue assets.
-        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.contentWindow.min.js', array(), '4.2.10', true );
+        wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js', array(), '4.2.11', true );
         wp_enqueue_script( 'visual-portfolio-preview', visual_portfolio()->plugin_url . 'assets/js/preview.js', array( 'jquery', 'iframe-resizer-content' ), '@@plugin_version', true );
 
         // Post data for script.

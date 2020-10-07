@@ -32,7 +32,7 @@ class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
         parent::__construct( $data, $args );
 
         if ( $this->is_preview_mode() ) {
-            wp_register_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/iframeResizer.min.js', '', '4.2.1', true );
+            wp_register_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/js/iframeResizer.min.js', '', '4.2.11', true );
             wp_register_script( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/js/elementor.min.js', array( 'elementor-frontend', 'iframe-resizer', 'jquery' ), '@@plugin_version', true );
 
             wp_register_style( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/css/elementor.min.css', array(), '@@plugin_version' );
