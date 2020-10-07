@@ -296,48 +296,48 @@ class Visual_Portfolio_Assets {
 
         // Isotope.
         if ( apply_filters( 'vpf_enqueue_plugin_isotope', true ) ) {
-            wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope/isotope.pkgd.min.js', array( 'jquery' ), '3.0.6', true );
+            wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope-layout/dist/isotope.pkgd.min.js', array( 'jquery' ), '3.0.6', true );
         }
 
         // fjGallery.
         if ( apply_filters( 'vpf_enqueue_plugin_flickr_justified_gallery', true ) ) {
-            wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/fjGallery.min.js', array( 'jquery' ), '1.0.3', true );
+            wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js', array( 'jquery' ), '1.0.3', true );
         }
 
         // Object Fit Images.
         if ( apply_filters( 'vpf_enqueue_plugin_object_fit_images', true ) ) {
-            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/ofi.min.js', array(), '3.2.4', true );
+            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/dist/ofi.min.js', array(), '3.2.4', true );
         }
 
         // PhotoSwipe.
         if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
-            wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.css', array(), '4.1.3' );
-            wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/default-skin/default-skin.css', array( 'photoswipe' ), '4.1.3' );
-            wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe.min.js', array( 'jquery' ), '4.1.3', true );
-            wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/photoswipe-ui-default.min.js', array( 'jquery', 'photoswipe' ), '4.1.3', true );
+            wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/photoswipe.css', array(), '4.1.3' );
+            wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/default-skin/default-skin.css', array( 'photoswipe' ), '4.1.3' );
+            wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/photoswipe.min.js', array( 'jquery' ), '4.1.3', true );
+            wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/photoswipe-ui-default.min.js', array( 'jquery', 'photoswipe' ), '4.1.3', true );
 
             // Fancybox.
         } elseif ( 'fancybox' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_fancybox', true ) ) {
-            wp_register_style( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/jquery.fancybox.min.css', array(), '3.5.7' );
-            wp_register_script( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/jquery.fancybox.min.js', array( 'jquery' ), '3.5.7', true );
+            wp_register_style( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/dist/jquery.fancybox.min.css', array(), '3.5.7' );
+            wp_register_script( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/dist/jquery.fancybox.min.js', array( 'jquery' ), '3.5.7', true );
         }
 
         // Swiper.
         if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/css/swiper.min.css', array(), '5.0.4' );
-            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/js/swiper.min.js', array(), '5.0.4', true );
+            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '6.3.2' );
+            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.js', array(), '6.3.2', true );
         }
 
         // Simplebar.
         if ( apply_filters( 'vpf_enqueue_plugin_simplebar', true ) ) {
-            wp_register_style( 'simplebar', visual_portfolio()->plugin_url . 'assets/vendor/simplebar/simplebar.min.css', array(), '5.2.1' );
-            wp_register_script( 'simplebar', visual_portfolio()->plugin_url . 'assets/vendor/simplebar/simplebar.min.js', array(), '5.2.1', true );
+            wp_register_style( 'simplebar', visual_portfolio()->plugin_url . 'assets/vendor/simplebar/dist/simplebar.min.css', array(), '5.3.0' );
+            wp_register_script( 'simplebar', visual_portfolio()->plugin_url . 'assets/vendor/simplebar/dist/simplebar.min.js', array(), '5.3.0', true );
         }
 
         // LazySizes.
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
-            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '5.1.1', true );
+            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '5.2.2', true );
 
             $vp_deps[] = 'lazysizes-object-fit-cover';
             $vp_deps[] = 'lazysizes';
@@ -346,8 +346,8 @@ class Visual_Portfolio_Assets {
         // CSS Vars Polyfill.
         if ( apply_filters( 'vpf_enqueue_plugin_css_vars_polyfill', true ) ) {
             $polyfill_name    = 'ie11-custom-properties';
-            $polyfill_version = '4.0.1';
-            $polyfill_url     = visual_portfolio()->plugin_url . 'assets/vendor/ie11-custom-properties/ie11-custom-properties.js?ver=' . $polyfill_version;
+            $polyfill_version = '4.1.0';
+            $polyfill_url     = visual_portfolio()->plugin_url . 'assets/vendor/ie11-custom-properties/ie11CustomProperties.js?ver=' . $polyfill_version;
 
             // Already added in 3rd-party code.
             if ( wp_script_is( $polyfill_name ) || wp_script_is( $polyfill_name, 'registered' ) ) {
