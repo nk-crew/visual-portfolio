@@ -188,3 +188,16 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
         count -= 1;
     }
 } );
+
+// Change Isotope Layout Mode.
+$( document ).on( 'beforeInitIsotope.vpf', ( event, self, initOptions ) => {
+    if ( 'vpf' !== event.namespace ) {
+        return;
+    }
+
+    if ( 'grid' !== self.options.layout ) {
+        return;
+    }
+
+    initOptions.layoutMode = 'fitRows';
+} );
