@@ -21,7 +21,7 @@ $doc.on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.initIsotope = function( options ) {
         const self = this;
 
-        if ( self.$items_wrap.isotope && ( [ 'tiles', 'masonry', 'grid', 'rows' ].includes( self.options.layout ) ) ) {
+        if ( self.$items_wrap.isotope && ( [ 'tiles', 'masonry', 'grid' ].includes( self.options.layout ) ) ) {
             const isRtl = 'rtl' === getComputedStyle( self.$items_wrap[ 0 ] ).direction;
 
             const initOptions = options || {
