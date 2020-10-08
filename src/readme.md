@@ -118,6 +118,15 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 2.6.2 =
+
+* improved image lazyloading support for PRO plugin and social integrations
+* improved animated GIFs usage (we can't use resized images, used full size only)
+* updated 3rd-party vendor scripts
+* moved posts Focal Point picker panel to Featured image selector panel (better UI)
+* fixed Focal Point image preview size on posts
+* fixed saved layout shortcode paste and Gutenberg transform to block
+
 = 2.6.1 =
 
 * fixed images displaying when Tiles + 0 gap used
