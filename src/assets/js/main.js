@@ -23,12 +23,12 @@ const $wnd = $( window );
 if ( 'undefined' !== typeof objectFitImages ) {
     // ofi and lazysizes conflicted, so we need to run lazysizes
     // first and then run ofi polyfill.
-    objectFitImages( '.vp-portfolio img:not(.visual-portfolio-lazyload)' );
+    objectFitImages( '.vp-portfolio img:not(.vp-lazyload)' );
 
     $( document ).on( 'lazybeforeunveil', ( e ) => {
         const $img = $( e.target );
 
-        if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
+        if ( $img.hasClass( 'vp-lazyload' ) ) {
             $img.one( 'load', () => {
                 objectFitImages( $img[ 0 ] );
             } );
@@ -617,12 +617,12 @@ class VP {
 
         if ( config ) {
             const attrsToReplace = {
-                'data-vpf-src': config.srcAttr,
-                'data-vpf-sizes': config.sizesAttr,
-                'data-vpf-srcset': config.srcsetAttr,
+                'data-src': config.srcAttr,
+                'data-sizes': config.sizesAttr,
+                'data-srcset': config.srcsetAttr,
             };
 
-            self.$items_wrap.add( self.$slider_thumbnails_wrap ).find( `.visual-portfolio-lazyload:not(.${ config.lazyClass })` ).each( function() {
+            self.$items_wrap.add( self.$slider_thumbnails_wrap ).find( `.vp-lazyload:not(.${ config.lazyClass })` ).each( function() {
                 const $item = $( this );
 
                 Object.keys( attrsToReplace ).forEach( ( attr ) => {
@@ -850,7 +850,7 @@ class VP {
 $( document ).on( 'lazybeforeunveil', ( e ) => {
     const $img = $( e.target );
 
-    if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
+    if ( $img.hasClass( 'vp-lazyload' ) ) {
         $img.closest( '.vp-portfolio__item-img' ).addClass( 'vp-portfolio__item-img-lazyloading' );
         $img.closest( '.vp-portfolio__thumbnail-img' ).addClass( 'vp-portfolio__thumbnail-img-lazyloading' );
     }
@@ -858,7 +858,7 @@ $( document ).on( 'lazybeforeunveil', ( e ) => {
 $( document ).on( 'lazyloaded', ( e ) => {
     const $img = $( e.target );
 
-    if ( $img.hasClass( 'visual-portfolio-lazyload' ) ) {
+    if ( $img.hasClass( 'vp-lazyload' ) ) {
         $img.closest( '.vp-portfolio__item-img-lazyloading' ).removeClass( 'vp-portfolio__item-img-lazyloading' );
         $img.closest( '.vp-portfolio__thumbnail-img-lazyloading' ).removeClass( 'vp-portfolio__thumbnail-img-lazyloading' );
     }

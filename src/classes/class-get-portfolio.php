@@ -568,9 +568,9 @@ class Visual_Portfolio_Get {
 
                     // Lazyload support.
                     'loading'         => array(),
-                    'data-vpf-src'    => array(),
-                    'data-vpf-sizes'  => array(),
-                    'data-vpf-srcset' => array(),
+                    'data-src'        => array(),
+                    'data-sizes'      => array(),
+                    'data-srcset'     => array(),
                     'data-no-lazy'    => array(),
                 ),
             ),

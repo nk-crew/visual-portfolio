@@ -85,11 +85,11 @@ class Visual_Portfolio_Images {
         if ( $allowedposttags ) {
             foreach ( $allowedposttags as $key => & $tags ) {
                 if ( 'img' === $key ) {
-                    $tags['data-vpf-src']    = true;
-                    $tags['data-vpf-sizes']  = true;
-                    $tags['data-vpf-srcset'] = true;
-                    $tags['data-no-lazy']    = true;
-                    $tags['loading']         = true;
+                    $tags['data-src']     = true;
+                    $tags['data-sizes']   = true;
+                    $tags['data-srcset']  = true;
+                    $tags['data-no-lazy'] = true;
+                    $tags['loading']      = true;
                 }
             }
         }
@@ -243,7 +243,7 @@ class Visual_Portfolio_Images {
         }
 
         // Lazyload already added.
-        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-vpf-src'] ) || isset( $attr['data-src'] ) ) {
+        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-src'] ) ) {
             return $attr;
         }
 
@@ -294,19 +294,19 @@ class Visual_Portfolio_Images {
 
         // lazy placeholder.
         if ( $placeholder ) {
-            $attr['data-vpf-src'] = $attr['src'];
-            $attr['src']          = $placeholder;
+            $attr['data-src'] = $attr['src'];
+            $attr['src']      = $placeholder;
         }
 
-        $attr['class'] .= ' visual-portfolio-lazyload';
+        $attr['class'] .= ' vp-lazyload';
 
         // Src Set and Sizes.
         if ( isset( $attr['sizes'] ) ) {
-            $attr['data-vpf-sizes'] = 'auto';
+            $attr['data-sizes'] = 'auto';
             unset( $attr['sizes'] );
         }
         if ( isset( $attr['srcset'] ) ) {
-            $attr['data-vpf-srcset'] = $attr['srcset'];
+            $attr['data-srcset'] = $attr['srcset'];
             unset( $attr['srcset'] );
         }
 
@@ -322,7 +322,7 @@ class Visual_Portfolio_Images {
      * @return boolean
      */
     public static function jetpack_lazy_images_skip_image_with_attributes( $return, $attributes ) {
-        return isset( $attributes['data-vpf-src'] );
+        return isset( $attributes['data-src'] );
     }
 }
 Visual_Portfolio_Images::construct();

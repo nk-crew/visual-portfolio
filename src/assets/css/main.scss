@@ -275,7 +275,7 @@
 }
 
 // LazyLoad image
-img.visual-portfolio-lazyload {
+img.vp-lazyload {
     opacity: 1;
     transition: var(--vp-transition-duration) opacity;
     will-change: opacity;
@@ -303,7 +303,7 @@ img.visual-portfolio-lazyload {
         animation: vp-lazyload-placeholder var(--vp-images-lazy__animation-duration) linear infinite;
     }
 
-    img.visual-portfolio-lazyload {
+    img.vp-lazyload {
         opacity: 0;
     }
 }
