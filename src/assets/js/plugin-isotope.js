@@ -1,10 +1,16 @@
 /*
  * Visual Portfolio plugin Isotope extension.
  */
-import { debounce } from 'throttle-debounce';
+import {
+    throttle,
+    debounce,
+} from 'throttle-debounce';
 
 const $ = window.jQuery;
+const $wnd = $( window );
 const $doc = $( document );
+
+const SUPPORTED_LAYOUTS = [ 'tiles', 'masonry', 'grid' ];
 
 // Extend VP class.
 $doc.on( 'extendClass.vpf', ( event, VP ) => {
@@ -21,7 +27,7 @@ $doc.on( 'extendClass.vpf', ( event, VP ) => {
     VP.prototype.initIsotope = function( options ) {
         const self = this;
 
-        if ( self.$items_wrap.isotope && ( [ 'tiles', 'masonry', 'grid' ].includes( self.options.layout ) ) ) {
+        if ( self.$items_wrap.isotope && SUPPORTED_LAYOUTS.includes( self.options.layout ) ) {
             const isRtl = 'rtl' === getComputedStyle( self.$items_wrap[ 0 ] ).direction;
 
             const initOptions = options || {
@@ -33,6 +39,9 @@ $doc.on( 'extendClass.vpf', ( event, VP ) => {
                 transitionDuration: '0.3s',
                 percentPosition: true,
                 originLeft: ! isRtl,
+
+                // See `initEvents.vpf` event why we need this option disabled.
+                resize: false,
             };
 
             self.emitEvent( 'beforeInitIsotope', [ initOptions ] );
@@ -130,6 +139,37 @@ $doc.on( 'destroy.vpf', ( event, self ) => {
     }
 
     self.destroyIsotope();
+} );
+
+// Init events.
+$doc.on( 'initEvents.vpf', ( event, self ) => {
+    if ( 'vpf' !== event.namespace ) {
+        return;
+    }
+
+    // We need to resize isotope manually, since the native relayout
+    // is not working properly, when container size is not changed
+    // but items sizes are changed in CSS. For some reason Isotope don't relayout it.
+    if ( self.$items_wrap.isotope && SUPPORTED_LAYOUTS.includes( self.options.layout ) ) {
+        const evp = `.vpf-uid-${ self.uid }`;
+
+        $wnd.on( `resize${ evp }`, throttle( 100, () => {
+            self.$items_wrap.isotope( 'layout' );
+        } ) );
+    }
+} );
+
+// Destroy events.
+$doc.on( 'destroyEvents.vpf', ( event, self ) => {
+    if ( 'vpf' !== event.namespace ) {
+        return;
+    }
+
+    if ( SUPPORTED_LAYOUTS.includes( self.options.layout ) ) {
+        const evp = `.vpf-uid-${ self.uid }`;
+
+        $wnd.off( `resize${ evp }` );
+    }
 } );
 
 // WPBakery Page Builder fullwidth row fix.
