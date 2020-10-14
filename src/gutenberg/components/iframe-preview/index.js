@@ -14,6 +14,7 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
+import './live-reload-conditions';
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
 
 const $ = window.jQuery;
@@ -24,7 +25,6 @@ const variables = window.VPAdminGutenbergVariables;
  */
 const {
     applyFilters,
-    addFilter,
 } = wp.hooks;
 
 const {
@@ -41,6 +41,8 @@ const {
     Spinner,
 } = wp.components;
 
+let uniqueIdCount = 1;
+
 /**
  * Component Class
  */
@@ -50,7 +52,10 @@ class IframePreview extends Component {
 
         this.state = {
             loading: true,
+            uniqueId: `vpf-preview-${ uniqueIdCount }`,
         };
+
+        uniqueIdCount += 1;
 
         this.frameRef = createRef();
         this.formRef = createRef();
@@ -67,8 +72,8 @@ class IframePreview extends Component {
 
     componentDidMount() {
         const {
-            clientId,
-        } = this.props;
+            uniqueId,
+        } = this.state;
 
         iframeResizer( {
             interval: 10,
@@ -77,7 +82,7 @@ class IframePreview extends Component {
             onMessage( { message } ) {
                 // select current block on click message.
                 if ( 'clicked' === message ) {
-                    wp.data.dispatch( 'core/block-editor' ).selectBlock( clientId );
+                    wp.data.dispatch( 'core/block-editor' ).selectBlock( uniqueId );
 
                     window.focus();
                 }
@@ -101,6 +106,7 @@ class IframePreview extends Component {
 
         if ( this.frameRef.current.iframeResizer ) {
             this.frameRef.current.iframeResizer.close();
+            this.frameRef.current.iframeResizer.removeListeners();
         }
     }
 
@@ -115,13 +121,13 @@ class IframePreview extends Component {
 
         if ( this.frameJQuery ) {
             this.$framePortfolio = this.frameJQuery( '.vp-portfolio' );
+
+            this.maybeResizePreviews();
+
+            this.setState( {
+                loading: false,
+            } );
         }
-
-        this.maybeResizePreviews();
-
-        this.setState( {
-            loading: false,
-        } );
     }
 
     maybePreviewTypeChanged( prevProps ) {
@@ -273,11 +279,11 @@ class IframePreview extends Component {
     render() {
         const {
             attributes,
-            clientId,
         } = this.props;
 
         const {
             loading,
+            uniqueId,
         } = this.state;
 
         const {
@@ -294,7 +300,7 @@ class IframePreview extends Component {
                 <div className="visual-portfolio-gutenberg-preview-inner">
                     <form
                         action={ variables.preview_url }
-                        target={ `vpf-preview-${ clientId }` }
+                        target={ uniqueId }
                         method="POST"
                         style={ { display: 'none' } }
                         ref={ this.formRef }
@@ -317,8 +323,8 @@ class IframePreview extends Component {
                     </form>
                     <iframe
                         title="vp-preview"
-                        id={ `vpf-preview-${ clientId }` }
-                        name={ `vpf-preview-${ clientId }` }
+                        id={ uniqueId }
+                        name={ uniqueId }
                         // eslint-disable-next-line
                         allowtransparency="true"
                         ref={ this.frameRef }
@@ -341,81 +347,3 @@ export default withSelect( ( select ) => {
         previewDeviceType: __experimentalGetPreviewDeviceType ? __experimentalGetPreviewDeviceType() : 'desktop',
     };
 } )( IframePreview );
-
-// live reload
-addFilter( 'vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-reload', ( data ) => {
-    if ( ! data.$framePortfolio ) {
-        return data;
-    }
-
-    let reload = false;
-
-    Object.keys( data.attributes ).forEach( ( name ) => {
-        const val = data.attributes[ name ];
-
-        switch ( name ) {
-        case 'tiles_type':
-        case 'masonry_columns':
-        case 'masonry_images_aspect_ratio':
-        case 'grid_columns':
-        case 'grid_images_aspect_ratio':
-        case 'justified_row_height':
-        case 'justified_row_height_tolerance':
-        case 'slider_effect':
-        case 'slider_speed':
-        case 'slider_autoplay':
-        case 'slider_autoplay_hover_pause':
-        case 'slider_centered_slides':
-        case 'slider_loop':
-        case 'slider_free_mode':
-        case 'slider_free_mode_sticky':
-        case 'slider_bullets_dynamic':
-        case 'items_gap': {
-            data.$framePortfolio.attr( `data-vp-${ name.replace( /_/g, '-' ) }`, val );
-            data.$framePortfolio.vpf( 'init' );
-
-            break;
-        }
-        case 'items_style_default__align':
-        case 'items_style_fade__align':
-        case 'items_style_fly__align':
-        case 'items_style_emerge__align': {
-            let allAlignClasses = '';
-
-            [ 'left', 'center', 'right', 'top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right' ].forEach( ( alignName ) => {
-                allAlignClasses += `${ allAlignClasses ? ' ' : '' }vp-portfolio__item-align-${ alignName }`;
-            } );
-
-            data.$framePortfolio.find( '.vp-portfolio__item-overlay' ).removeClass( allAlignClasses ).addClass( `vp-portfolio__item-align-${ val }` );
-
-            break;
-        }
-        case 'filter_align':
-            data.$framePortfolio.find( '.vp-filter' ).removeClass( 'vp-filter__align-center vp-filter__align-left vp-filter__align-right' ).addClass( `vp-filter__align-${ val }` );
-
-            break;
-        case 'sort_align':
-            data.$framePortfolio.find( '.vp-sort' ).removeClass( 'vp-sort__align-center vp-sort__align-left vp-sort__align-right' ).addClass( `vp-sort__align-${ val }` );
-
-            break;
-        case 'pagination_align':
-            data.$framePortfolio.find( '.vp-pagination' ).removeClass( 'vp-pagination__align-center vp-pagination__align-left vp-pagination__align-right' ).addClass( `vp-pagination__align-${ val }` );
-
-            break;
-        // prevent some options reload
-        case 'list_name':
-        case 'stretch':
-        case 'custom_css':
-            // no reload
-            break;
-        default:
-            reload = reload || data.reload;
-            break;
-        }
-    } );
-
-    return {
-        ...data,
-        reload,
-    };
-} );
