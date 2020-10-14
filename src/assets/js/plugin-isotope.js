@@ -5,6 +5,7 @@ import {
     throttle,
     debounce,
 } from 'throttle-debounce';
+import rafSchd from 'raf-schd';
 
 const $ = window.jQuery;
 const $wnd = $( window );
@@ -153,9 +154,9 @@ $doc.on( 'initEvents.vpf', ( event, self ) => {
     if ( self.$items_wrap.isotope && SUPPORTED_LAYOUTS.includes( self.options.layout ) ) {
         const evp = `.vpf-uid-${ self.uid }`;
 
-        $wnd.on( `resize${ evp }`, throttle( 100, () => {
+        $wnd.on( `resize${ evp }`, throttle( 100, rafSchd( () => {
             self.$items_wrap.isotope( 'layout' );
-        } ) );
+        } ) ) );
     }
 } );
 
@@ -173,7 +174,7 @@ $doc.on( 'destroyEvents.vpf', ( event, self ) => {
 } );
 
 // WPBakery Page Builder fullwidth row fix.
-$doc.on( 'vc-full-width-row', debounce( 150, ( event, el ) => {
+$doc.on( 'vc-full-width-row', debounce( 150, rafSchd( ( event, el ) => {
     $( el ).find( '.vp-portfolio' ).each( function() {
         if ( ! this.vpf || ! this.vpf.initIsotope ) {
             return;
@@ -185,4 +186,4 @@ $doc.on( 'vc-full-width-row', debounce( 150, ( event, el ) => {
             this.vpf.initIsotope( 'layout' );
         }
     } );
-} ) );
+} ) ) );

@@ -2,6 +2,7 @@
  * External Dependencies
  */
 import { debounce } from 'throttle-debounce';
+import rafSchd from 'raf-schd';
 
 /**
  * WordPress Dependencies
@@ -43,7 +44,7 @@ class VpVideoComponent extends Component {
             oembedHTML: '',
         };
 
-        this.maybePrepareOembed = debounce( 300, this.maybePrepareOembed.bind( this ) );
+        this.maybePrepareOembed = debounce( 300, rafSchd( this.maybePrepareOembed.bind( this ) ) );
     }
 
     componentDidMount() {

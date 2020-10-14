@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { debounce } from 'throttle-debounce';
+import rafSchd from 'raf-schd';
 import Select, { components } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import CreatableSelect from 'react-select/creatable';
@@ -53,7 +54,7 @@ export default class VpfSelectControl extends Component {
         this.getDefaultValue = this.getDefaultValue.bind( this );
         this.findValueData = this.findValueData.bind( this );
         this.requestAjax = this.requestAjax.bind( this );
-        this.requestAjaxDebounce = debounce( 300, this.requestAjax );
+        this.requestAjaxDebounce = debounce( 300, rafSchd( this.requestAjax ) );
     }
 
     componentDidMount() {

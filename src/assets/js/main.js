@@ -2,7 +2,7 @@
  * Visual Portfolio main script.
  */
 import { throttle } from 'throttle-debounce';
-import rafl from 'rafl';
+import rafSchd from 'raf-schd';
 
 /**
  * Global Variables
@@ -919,11 +919,9 @@ $( () => {
     $( '.vp-portfolio' ).vpf();
 } );
 
-const throttledInit = throttle( 200, () => {
-    rafl( () => {
-        $( '.vp-portfolio:not(.vp-portfolio__ready)' ).vpf();
-    } );
-} );
+const throttledInit = throttle( 200, rafSchd( () => {
+    $( '.vp-portfolio:not(.vp-portfolio__ready)' ).vpf();
+} ) );
 if ( window.MutationObserver ) {
     new window.MutationObserver( throttledInit )
         .observe( document.documentElement, {

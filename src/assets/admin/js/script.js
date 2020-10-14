@@ -4,6 +4,7 @@
  * Author  : nK https://nkdev.info
  */
 import { debounce } from 'throttle-debounce';
+import rafSchd from 'raf-schd';
 
 const {
     jQuery: $,
@@ -69,7 +70,7 @@ let runAjaxVideoOembed = function( $this ) {
         },
     } );
 };
-runAjaxVideoOembed = debounce( 300, runAjaxVideoOembed );
+runAjaxVideoOembed = debounce( 300, rafSchd( runAjaxVideoOembed ) );
 
 $body.on( 'change input', '.vp-input[name="_vp_format_video_url"]', function() {
     if ( null !== oembedAjax ) {

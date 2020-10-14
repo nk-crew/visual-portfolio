@@ -7,6 +7,7 @@ import './style.scss';
  * External dependencies
  */
 import { throttle, debounce } from 'throttle-debounce';
+import rafSchd from 'raf-schd';
 import iframeResizer from 'iframe-resizer/js/iframeResizer';
 import classnames from 'classnames/dedupe';
 
@@ -58,9 +59,9 @@ class IframePreview extends Component {
         this.maybeAttributesChanged = this.maybeAttributesChanged.bind( this );
         this.onFrameLoad = this.onFrameLoad.bind( this );
         this.maybeReload = this.maybeReload.bind( this );
-        this.maybeReloadDebounce = debounce( 300, this.maybeReload.bind( this ) );
+        this.maybeReloadDebounce = debounce( 300, rafSchd( this.maybeReload.bind( this ) ) );
         this.maybeResizePreviews = this.maybeResizePreviews.bind( this );
-        this.maybeResizePreviewsThrottle = throttle( 100, this.maybeResizePreviews );
+        this.maybeResizePreviewsThrottle = throttle( 100, rafSchd( this.maybeResizePreviews ) );
         this.printInput = this.printInput.bind( this );
     }
 

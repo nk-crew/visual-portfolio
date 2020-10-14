@@ -6,6 +6,7 @@
  * Author  : nK https://nkdev.info
  */
 import { throttle } from 'throttle-debounce';
+import rafSchd from 'raf-schd';
 
 const {
     elementorFrontend,
@@ -47,7 +48,7 @@ $( window ).on( 'elementor/frontend/init', ( $data ) => {
     }
 
     // window resize.
-    $wnd.on( 'resize', throttle( 300, maybeResizePreviews ) );
+    $wnd.on( 'resize', throttle( 300, rafSchd( maybeResizePreviews ) ) );
 
     // added/changed widget.
     elementorFrontend.hooks.addAction( 'frontend/element_ready/visual-portfolio.default', ( $scope ) => {
