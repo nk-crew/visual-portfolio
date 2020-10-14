@@ -112,7 +112,10 @@ class IframePreview extends Component {
     onFrameLoad( e ) {
         this.frameWindow = e.target.contentWindow;
         this.frameJQuery = e.target.contentWindow.jQuery;
-        this.$framePortfolio = this.frameJQuery( '.vp-portfolio' );
+
+        if ( this.frameJQuery ) {
+            this.$framePortfolio = this.frameJQuery( '.vp-portfolio' );
+        }
 
         this.maybeResizePreviews();
 

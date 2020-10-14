@@ -72,7 +72,10 @@ export default class ClassesTree extends Component {
 
         this.frameWindow = this.iframePreview.contentWindow;
         this.frameJQuery = this.iframePreview.contentWindow.jQuery;
-        this.$framePortfolio = this.frameJQuery( '.vp-portfolio' );
+
+        if ( this.frameJQuery ) {
+            this.$framePortfolio = this.frameJQuery( '.vp-portfolio' );
+        }
 
         this.updateTreeData();
     }
