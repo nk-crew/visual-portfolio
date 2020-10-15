@@ -72,8 +72,8 @@ class IframePreview extends Component {
 
     componentDidMount() {
         const {
-            uniqueId,
-        } = this.state;
+            clientId,
+        } = this.props;
 
         iframeResizer( {
             interval: 10,
@@ -82,7 +82,7 @@ class IframePreview extends Component {
             onMessage( { message } ) {
                 // select current block on click message.
                 if ( 'clicked' === message ) {
-                    wp.data.dispatch( 'core/block-editor' ).selectBlock( uniqueId );
+                    wp.data.dispatch( 'core/block-editor' ).selectBlock( clientId );
 
                     window.focus();
                 }
