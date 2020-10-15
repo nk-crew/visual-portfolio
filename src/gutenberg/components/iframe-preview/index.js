@@ -124,9 +124,16 @@ class IframePreview extends Component {
 
             this.maybeResizePreviews();
 
-            this.setState( {
-                loading: false,
-            } );
+            if ( this.frameTimeout ) {
+                clearTimeout( this.frameTimeout );
+            }
+
+            // We need this timeout, since we resize iframe size and layouts resized with transitions.
+            this.frameTimeout = setTimeout( () => {
+                this.setState( {
+                    loading: false,
+                } );
+            }, 300 );
         }
     }
 
