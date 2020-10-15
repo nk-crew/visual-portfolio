@@ -10,7 +10,6 @@ import rafSchd from 'raf-schd';
 const {
     jQuery: $,
     VPData,
-    objectFitImages,
 } = window;
 
 const {
@@ -18,23 +17,6 @@ const {
 } = VPData;
 
 const $wnd = $( window );
-
-// enable object-fit
-if ( 'undefined' !== typeof objectFitImages ) {
-    // ofi and lazysizes conflicted, so we need to run lazysizes
-    // first and then run ofi polyfill.
-    objectFitImages( '.vp-portfolio img:not(.vp-lazyload)' );
-
-    $( document ).on( 'lazybeforeunveil', ( e ) => {
-        const $img = $( e.target );
-
-        if ( $img.hasClass( 'vp-lazyload' ) ) {
-            $img.one( 'load', () => {
-                objectFitImages( $img[ 0 ] );
-            } );
-        }
-    } );
-}
 
 /**
  * Emit Resize Event.
@@ -195,9 +177,6 @@ class VP {
 
         // init events
         self.initEvents();
-
-        // prepare lazyload images
-        self.prepareLazyLoad();
 
         // init layout
         self.initLayout();
@@ -605,39 +584,6 @@ class VP {
     }
 
     /**
-     * Prepare image for Lazyload
-     *
-     * We need to add lazyload class and attributes from global config of lazysizes.
-     * This need because some 3rd-party themes/plugins may change it and it will be conflicted with our config.
-     * Related topic: https://wordpress.org/support/topic/since-the-last-update-i-cant-see-image-featured-of-posts/#post-10519096.
-     */
-    prepareLazyLoad() {
-        const self = this;
-        const config = window.lazySizes && window.lazySizes.cfg ? window.lazySizes.cfg : window.lazySizesConfig;
-
-        if ( config ) {
-            const attrsToReplace = {
-                'data-src': config.srcAttr,
-                'data-sizes': config.sizesAttr,
-                'data-srcset': config.srcsetAttr,
-            };
-
-            self.$items_wrap.add( self.$slider_thumbnails_wrap ).find( `.vp-lazyload:not(.${ config.lazyClass })` ).each( function() {
-                const $item = $( this );
-
-                Object.keys( attrsToReplace ).forEach( ( attr ) => {
-                    if ( attrsToReplace[ attr ] && attr !== attrsToReplace[ attr ] && $item.attr( attr ) ) {
-                        $item.attr( attrsToReplace[ attr ], $item.attr( attr ) );
-                        $item.removeAttr( attr );
-                    }
-                } );
-
-                $item.addClass( config.lazyClass );
-            } );
-        }
-    }
-
-    /**
      * Remove <noscript> tags.
      * Some optimization plugin make something, that killed our styles with noscript tag.
      * Related topic: https://wordpress.org/support/topic/visual-portfolio-and-sg-optimizer-dont-play-well/
@@ -836,8 +782,6 @@ class VP {
 
         self.emitEvent( 'endLoadingNewItems' );
 
-        self.prepareLazyLoad();
-
         // images loaded
         self.imagesLoaded();
 
@@ -845,24 +789,6 @@ class VP {
         self.initCustomColors();
     }
 }
-
-// Lazyloaded - remove preloader images placeholder effect.
-$( document ).on( 'lazybeforeunveil', ( e ) => {
-    const $img = $( e.target );
-
-    if ( $img.hasClass( 'vp-lazyload' ) ) {
-        $img.closest( '.vp-portfolio__item-img' ).addClass( 'vp-portfolio__item-img-lazyloading' );
-        $img.closest( '.vp-portfolio__thumbnail-img' ).addClass( 'vp-portfolio__thumbnail-img-lazyloading' );
-    }
-} );
-$( document ).on( 'lazyloaded', ( e ) => {
-    const $img = $( e.target );
-
-    if ( $img.hasClass( 'vp-lazyload' ) ) {
-        $img.closest( '.vp-portfolio__item-img-lazyloading' ).removeClass( 'vp-portfolio__item-img-lazyloading' );
-        $img.closest( '.vp-portfolio__thumbnail-img-lazyloading' ).removeClass( 'vp-portfolio__thumbnail-img-lazyloading' );
-    }
-} );
 
 // fix for Elementor popup gallery.
 // https://github.com/nk-o/visual-portfolio/issues/103

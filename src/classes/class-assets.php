@@ -164,6 +164,11 @@ class Visual_Portfolio_Assets {
         self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'script' );
         self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'style' );
 
+        // Images Lazy Loading.
+        if ( Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' ) ) {
+            self::store_used_assets( 'visual-portfolio-images-lazy-loading', true, 'script' );
+        }
+
         // Items Style.
         if ( $options['items_style'] ) {
             $items_style_pref = '';
@@ -338,9 +343,6 @@ class Visual_Portfolio_Assets {
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
             wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '5.2.2', true );
-
-            $vp_deps[] = 'lazysizes-object-fit-cover';
-            $vp_deps[] = 'lazysizes';
         }
 
         // CSS Vars Polyfill.
@@ -423,6 +425,14 @@ class Visual_Portfolio_Assets {
                 array(
                     'jquery',
                     'simplebar',
+                ),
+            ),
+            'visual-portfolio-images-lazy-loading' => array(
+                'assets/js/images-lazy-loading.min.js',
+                array(
+                    'jquery',
+                    'lazysizes-object-fit-cover',
+                    'lazysizes',
                 ),
             ),
             'visual-portfolio-popup-gallery' => array(
