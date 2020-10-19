@@ -1,7 +1,7 @@
 # Visual Portfolio, Posts & Image Gallery #
 
 * Contributors: nko
-* Tags: portfolio, gallery, image, masonry, popup
+* Tags: portfolio, gallery, photo gallery, image gallery, lightbox gallery
 * Requires at least: 5.4
 * Tested up to: 5.5
 * Requires PHP: 5.5.9
@@ -9,11 +9,13 @@
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
-Gutenberg block for your portfolio, posts and image galleries.
+Gutenberg block for your portfolio, posts and image gallery.
 
 ## Description ##
 
-Visual Portfolio let you create beautiful portfolio layouts and image galleries. Visually create and edit Gutenberg block to show portfolio or any custom post types using Masonry, Justified, Tiles, Grid or Carousel layouts.
+Create beautiful, clean and powerful photo galleries and portfolio layouts using Visual Portfolio plugin. It is easy for simple photo galleries, but powerful enough for professional photographers, visual artists, and studios websites.
+
+Visual block editor for your gallery, portfolio or any custom post type with support to various layouts such as Masonry, Justified, Tiles, Grid, and Carousel.
 
 ### Links ###
 
@@ -22,28 +24,77 @@ Visual Portfolio let you create beautiful portfolio layouts and image galleries.
 * [Documentation](https://visualportfolio.co/documentation/getting-started/)
 * [GitHub](https://github.com/nk-o/visual-portfolio)
 
-## Features ##
+### Visual Gallery Builder ###
 
-* Visual Gutenberg block editor
-* Templates for theme developers
-* 5 predefined layouts:
-  * Masonry
-  * Grid
-  * Justified (Flickr)
-  * Tiles
-  * Slider (+ Carousel, Coverflow)
-* 4 predefined hover effects:
-  * Fade
-  * Classic
-  * Emerge
-  * Fly
-* Infinite Scroll
-* Load More
-* Paged layouts
-* Filtering
-* Sorting
-* Popup gallery (YouTube and Vimeo supported)
-* Popup gallery for default WordPress images and galleries
+Build your portfolio and galleries with no coding knowledge. Thanks to Gutenberg page builder you are able to create and customize galleries visually.
+
+### Optimized to be Fast as Native ###
+
+Despite the rich functionality, the Visual Portfolio is optimized as much as possible, to be fast and lightweight.
+
+All scripts and styles are loaded only when they are needed for the current page that displays your gallery. Pictures are not loaded in the main thread due to lazy loading. Moreover, our plugin is compatible with third-party WebP providers and image optimization plugins.
+
+Smart automatic loading image sizes, that currently needed for item size.
+
+### Layouts ###
+
+Our gallery plugin shipped with popular layouts such as Masonry and Justified (Flickr). Every feature optimized and works seamlessly with all of these layouts, you just need to set up and go with no headache. See it in action:
+
+* [Masonry](https://visualportfolio.co/masonry-image-filters/)
+* [Justified (Flickr)](https://visualportfolio.co/justified-tilt-effect/)
+* [Tiles](https://visualportfolio.co/tiles-custom-color/)
+* [Grid](https://visualportfolio.co/grid/)
+* [Slider](https://visualportfolio.co/slider/) (Fade, Carousel, Coverflow)
+
+### Visual Effects ###
+
+Showcase your portfolio items with clean and beautiful visual styles. See it in action:
+
+* [Classic](https://visualportfolio.co/masonry/)
+* [Fade](https://visualportfolio.co/tiles-paged-pagination/)
+* [Emerge](https://visualportfolio.co/masonry-infinite-scroll/)
+* [Fly](https://visualportfolio.co/tiles-popup-gallery/)
+* [Caption Move (PRO)](https://visualportfolio.co/masonry-caption-move/)
+
+### Easily Customizable ###
+
+The gallery block with live preview includes a lot of design settings that are point-and-click, no coding knowledge required. If you're a bit more adventurous, the custom CSS module and PHP filters are set up to be easily used by developers.
+
+### Portfolio Post Type ###
+
+Custom post type `portfolio` will ensure all your portfolios to keep in a single post type. In this way, you can distinguish your portfolios from other post types. Taxonomies are used to categorize your portfolio types, it will help you to group and sort your portfolios.
+
+### Photo Galleries ###
+
+You can also create galleries using image sets right inside block editor. Just drop your images and gallery is ready.
+
+### Powerful Lightbox ###
+
+Visual Portfolio uses only modern solutions, and lightboxes are not an exception. High performance, mobile optimization, retina-ready, and a wide range of features available in Fancybox and PhotoSwipe plugins, that you can choose for your lightboxes.
+
+**Mobile Optimized** <br> Looks great on every device. Swipe to navigate, spread/pinch to zoom in/out supported on touch devices.
+
+**GPU Accelerated** <br> Hardware accelerated animations for better performance and seamless user experience.
+
+**Smart Loading** <br> Images are responsive and loaded progressively using lazy loading on demand.
+
+### SEO-friendly ###
+
+Visual Portfolio plugin is built keeping SEO and performance in mind by defining proper structure and tags. Furthermore, due to optimization, it is lightweight and fast when it comes to page load.
+
+### More Features ###
+
+* Lightboxes for Visual Portfolio galleries and for standard WordPress images and galleries
+* Popup gallery vendors
+  * Images
+  * YouTube
+  * Vimeo
+* AJAX posts loading
+  * Infinite Scroll
+  * Load More button
+  * Paged pagination
+* Filter gallery layouts by Category or custom taxonomy
+* Sort gallery items by date and title
 * Custom item gutters
 * Custom image sets
 * Custom posts type layouts (not only portfolio)
@@ -51,22 +102,45 @@ Visual Portfolio let you create beautiful portfolio layouts and image galleries.
   * Posts by specific ID
   * Posts by taxonomies
   * Custom order
+* Images lazy load built-in - improves page loading speed
 * Custom CSS for each portfolio layouts
+* WPML and Polylang multi language support
+* RTL support
 * Elementor Page Builder support
 * WPBakery Page Builder support
+* Completely responsive and mobile ready – layouts automagically transforms to display perfectly on your screen size
+* CSS variables and templates system for theme developers
 
-## PRO ##
+### PRO ###
 
 The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [Learn more](https://visualportfolio.co/pro/).
 
+### Some neat PRO features ###
+
+* Social Integrations - automatically fetch posts for your social networks to display in gallery on your site
+  * Instagram
+  * Youtube
+  * Vimeo
+  * Flickr
+  * Twitter
+  * Dribbble
+* Stylish interaction effects
+* Instagram-like image filters for normal and hover states
+* AJAX Improvements
+* Advanced query builder settings
+* Additional popup gallery vendors
+  * Instagram
+  * DailyMotion
+  * Facebook Videos
+  * TikTok
+  * Soundcloud
+  * VideoPress
+  * Twitch
+  * Wistia
+  * Self Hosted Videos
+* Find more features here - <https://visualportfolio.co/pro/>
+
 If you don't want any of the PRO features, but want to support us, this is the only way you may do it.
-
-## Real Usage Examples ##
-
-* [SquadForce - eSports Gaming WordPress Theme](https://wp.nkdev.info/squadforce/)
-* [Skylith - Multipurpose Gutenberg Theme](https://wp.nkdev.info/skylith/)
-* [Piroll - Portfolio Theme](https://wp.nkdev.info/piroll/)
-* [Snow - Portfolio Theme](https://wp.nkdev.info/snow/)
 
 ## Screenshots ##
 
