@@ -35,7 +35,6 @@ class Visual_Portfolio_Preview {
         add_action( 'init', array( $this, 'is_preview_check' ) );
         add_filter( 'pre_handle_404', array( $this, 'pre_handle_404' ) );
         add_filter( 'vpf_get_options', array( $this, 'filter_preview_option' ) );
-        add_action( 'init', array( $this, 'flush_rules_preview_frame' ) );
         add_action( 'template_redirect', array( $this, 'template_redirect' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 11 );
 
@@ -46,21 +45,12 @@ class Visual_Portfolio_Preview {
      * Localize scripts with preview URL.
      */
     public function localize_scripts() {
-        // prepare preview URL.
-        global $wp_rewrite;
-
-        $url = get_site_url();
-
-        if ( ! $wp_rewrite->using_permalinks() ) {
-            $url = add_query_arg(
-                array(
-                    'vp_preview' => 'vp_preview',
-                ),
-                $url
-            );
-        } else {
-            $url .= '/vp_preview';
-        }
+        $url = add_query_arg(
+            array(
+                'vp_preview' => 'vp_preview',
+            ),
+            get_site_url()
+        );
 
         wp_localize_script(
             'visual-portfolio-gutenberg',
@@ -134,28 +124,9 @@ class Visual_Portfolio_Preview {
     }
 
     /**
-     * Register preview 'vp_preview' page tag.
-     */
-    public function flush_rules_preview_frame() {
-        global $wp_rewrite;
-
-        // add rewrite rule that matches /vp_preview .
-        add_rewrite_rule( 'vp_preview/?$', 'index.php?vp_preview=vp_preview', 'top' );
-
-        // add rewrite rule that matches /vp_preview/page/2 .
-        add_rewrite_rule( "vp_preview/{$wp_rewrite->pagination_base}/([0-9]{1,})/?$", 'index.php?vp_preview=vp_preview&paged=$matches[1]', 'top' );
-
-        // add endpoint, in this case 'vp_preview' to satisfy our rewrite rule /vp_preview .
-        add_rewrite_endpoint( 'vp_preview', EP_PERMALINK | EP_PAGES );
-
-        // flush rules to get this to work properly (do this once, then comment out) .
-        $wp_rewrite->flush_rules();
-    }
-
-    /**
      * Display preview frame
      * Available by requesting:
-     * SITE/vp_preview/ with POST data: `vp_preview_frame=true&vp_preview_frame_id=10`
+     * SITE/?vp_preview=vp_preview with POST data: `vp_preview_frame=true&vp_preview_frame_id=10`
      */
     public function template_redirect() {
         if ( $this->preview_enabled ) {
