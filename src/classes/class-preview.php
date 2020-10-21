@@ -33,7 +33,6 @@ class Visual_Portfolio_Preview {
      */
     public function init_hooks() {
         add_action( 'init', array( $this, 'is_preview_check' ) );
-        add_filter( 'pre_handle_404', array( $this, 'pre_handle_404' ) );
         add_filter( 'vpf_get_options', array( $this, 'filter_preview_option' ) );
         add_action( 'template_redirect', array( $this, 'template_redirect' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 11 );
@@ -45,13 +44,21 @@ class Visual_Portfolio_Preview {
      * Localize scripts with preview URL.
      */
     public function localize_scripts() {
-        $url = add_query_arg(
-            array(
-                'vp_preview' => 'vp_preview',
-            ),
-            get_site_url()
+        add_filter( 'pre_option_permalink_structure', '__return_empty_string' );
+
+        $url = set_url_scheme(
+            add_query_arg(
+                array(
+                    'vp_preview'      => 'vp_preview',
+                    'vp_preview_time' => time(),
+                ),
+                get_site_url()
+            )
         );
 
+        remove_filter( 'pre_option_permalink_structure', '__return_empty_string' );
+
+        // Localize scripts.
         wp_localize_script(
             'visual-portfolio-gutenberg',
             'VPAdminGutenbergVariables',
@@ -72,6 +79,11 @@ class Visual_Portfolio_Preview {
      * Check if the page is preview.
      */
     public function is_preview_check() {
+        // phpcs:ignore
+        if ( ! isset( $_GET['vp_preview'] ) ) {
+            return false;
+        }
+
         // phpcs:disable
         $frame = isset( $_POST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame'] ) ) : false;
         $id    = isset( $_POST['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
@@ -84,28 +96,6 @@ class Visual_Portfolio_Preview {
         // phpcs:enable
 
         $this->preview_enabled = 'true' === $frame;
-
-        if ( $this->preview_enabled ) {
-            // Tell WP Super Cache & W3 Total Cache to not cache WPReadable requests.
-            if ( ! defined( 'DONOTCACHEPAGE' ) ) {
-                // phpcs:ignore
-                define( 'DONOTCACHEPAGE', true );
-            }
-        }
-    }
-
-    /**
-     * Prevent 404 headers if it is vp_preview page.
-     *
-     * @param bool $val - handle 404 headers.
-     *
-     * @return bool
-     */
-    public function pre_handle_404( $val ) {
-        if ( $this->preview_enabled ) {
-            $val = true;
-        }
-        return $val;
     }
 
     /**
@@ -129,10 +119,12 @@ class Visual_Portfolio_Preview {
      * SITE/?vp_preview=vp_preview with POST data: `vp_preview_frame=true&vp_preview_frame_id=10`
      */
     public function template_redirect() {
-        if ( $this->preview_enabled ) {
-            $this->print_template();
-            exit;
+        if ( is_admin() || ! $this->preview_enabled ) {
+            return;
         }
+
+        $this->print_template();
+        exit;
     }
 
     /**
@@ -147,12 +139,59 @@ class Visual_Portfolio_Preview {
     }
 
     /**
+     * Do not cache.
+     *
+     * Tell WordPress cache plugins not to cache this request.
+     */
+    public function do_not_cache() {
+        // Disable cache plugins.
+        if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+            // phpcs:ignore
+            define( 'DONOTCACHEPAGE', true );
+        }
+
+        if ( ! defined( 'DONOTCACHEDB' ) ) {
+            // phpcs:ignore
+            define( 'DONOTCACHEDB', true );
+        }
+
+        if ( ! defined( 'DONOTMINIFY' ) ) {
+            // phpcs:ignore
+            define( 'DONOTMINIFY', true );
+        }
+
+        if ( ! defined( 'DONOTCDN' ) ) {
+            // phpcs:ignore
+            define( 'DONOTCDN', true );
+        }
+
+        if ( ! defined( 'DONOTCACHCEOBJECT' ) ) {
+            // phpcs:ignore
+            define( 'DONOTCACHCEOBJECT', true );
+        }
+
+        // Set the headers to prevent caching for the different browsers.
+        nocache_headers();
+    }
+
+    /**
      * Template of preview page.
      */
     public function print_template() {
         do_action( 'vpf_preview_template' );
 
-        // Hide admin bar.
+        // Tell to WP Cache plugins do not cache this request.
+        $this->do_not_cache();
+
+        // Don't redirect to permalink.
+        remove_action( 'template_redirect', 'redirect_canonical' );
+
+        // Compatibility with Yoast SEO plugin when 'Removes unneeded query variables from the URL' enabled.
+        if ( class_exists( 'WPSEO_Frontend' ) ) {
+            remove_action( 'template_redirect', array( \WPSEO_Frontend::get_instance(), 'clean_permalink' ), 1 );
+        }
+
+        // Disable the WP admin bar.
         add_filter( 'show_admin_bar', '__return_false' );
 
         // Enqueue assets.
