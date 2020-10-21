@@ -336,7 +336,7 @@ class Visual_Portfolio_Assets {
                 wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper-5-4-5/swiper.min.js', array(), '5.4.5', true );
             } else {
                 wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '6.3.2' );
-                wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.js', array(), '6.3.2', true );
+                wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '6.3.2', true );
             }
         }
 

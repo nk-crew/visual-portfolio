@@ -56,8 +56,8 @@ cfg.copy_files_src = [
     './node_modules/*photoswipe/dist/default-skin/preloader.gif',
     './node_modules/*simplebar/dist/simplebar.min.js',
     './node_modules/*simplebar/dist/simplebar.min.css',
-    './node_modules/*swiper/swiper-bundle.js',
-    './node_modules/*swiper/swiper-bundle.js.map',
+    './node_modules/*swiper/swiper-bundle.min.js',
+    './node_modules/*swiper/swiper-bundle.min.js.map',
     './node_modules/*swiper/swiper-bundle.min.css',
 ];
 
