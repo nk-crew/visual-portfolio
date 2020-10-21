@@ -192,10 +192,17 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 2.7.1 =
+
+* added legacy Swiper version, when Elementor plugin enabled (resolves conflict with it)
+* improved preview page code
+* fixed Justify layout JS error
+
 = 2.7.0 =
 
 * changed lazy-loading attributes (use most popular `data-src` instead of custom attributes)
 * improved iframe preview render code (prevent re-arrange animation when iframe loaded)
+* updated all vendor scripts to the latest versions
 * moved lazy loading to separate script (less page loading size, when you disable Lazy Loading feature in settings)
 * slightly improved performance by using raf-schd package
 * fixed Isotope re-layout when window resized and items size changed, but container have static size
