@@ -22,6 +22,11 @@
     --vp-interactive__transition-easing: ease-in-out;
 }
 
+// Vertical gap.
+.vp-portfolio__items {
+    --vp-items__gap-vertical: var(--vp-items__gap);
+}
+
 .vp-portfolio {
     --vp-wrap__min-height: 114px;
     --vp-elements__gap: 20px;

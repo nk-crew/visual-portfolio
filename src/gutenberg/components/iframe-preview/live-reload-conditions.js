@@ -33,7 +33,8 @@ addFilter( 'vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-
         case 'slider_free_mode':
         case 'slider_free_mode_sticky':
         case 'slider_bullets_dynamic':
-        case 'items_gap': {
+        case 'items_gap':
+        case 'items_gap_vertical': {
             data.$framePortfolio.attr( `data-vp-${ name.replace( /_/g, '-' ) }`, val );
             data.$framePortfolio.vpf( 'init' );
 

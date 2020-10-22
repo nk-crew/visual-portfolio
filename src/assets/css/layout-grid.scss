@@ -5,11 +5,11 @@
 // Gaps.
 [data-vp-layout="grid"] {
     .vp-portfolio__items {
-        margin-top: calc(-1 * var(--vp-items__gap));
+        margin-top: calc(-1 * var(--vp-items__gap-vertical));
         margin-left: calc(-1 * var(--vp-items__gap));
     }
     .vp-portfolio__item-wrap .vp-portfolio__item {
-        margin-top: var(--vp-items__gap);
+        margin-top: var(--vp-items__gap-vertical);
         margin-left: var(--vp-items__gap);
     }
 }

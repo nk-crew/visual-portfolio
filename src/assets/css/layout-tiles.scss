@@ -5,11 +5,11 @@
     // Gaps.
     .vp-portfolio__items,
     .vp-portfolio__item-wrap .vp-portfolio__item-img-wrap {
-        margin-top: calc(-1 * var(--vp-items__gap));
+        margin-top: calc(-1 * var(--vp-items__gap-vertical));
         margin-left: calc(-1 * var(--vp-items__gap));
     }
     .vp-portfolio__item-wrap .vp-portfolio__item {
-        margin-top: var(--vp-items__gap);
+        margin-top: var(--vp-items__gap-vertical);
         margin-left: var(--vp-items__gap);
     }
 
@@ -23,7 +23,7 @@
         left: 0;
     }
     .vp-portfolio__item-img {
-        top: var(--vp-items__gap);
+        top: var(--vp-items__gap-vertical);
         left: var(--vp-items__gap);
     }
     .vp-portfolio__item-img-wrap {

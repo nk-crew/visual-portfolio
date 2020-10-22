@@ -362,6 +362,7 @@ class Visual_Portfolio_Get {
             'data-vp-items-style'        => $options['items_style'],
             'data-vp-items-click-action' => $options['items_click_action'],
             'data-vp-items-gap'          => $options['items_gap'],
+            'data-vp-items-gap-vertical' => $options['items_gap_vertical'],
             'data-vp-pagination'         => $options['pagination'],
             'data-vp-next-page-url'      => $next_page_url,
         );

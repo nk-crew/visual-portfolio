@@ -1612,6 +1612,32 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'layouts',
+                'type'        => 'range',
+                'label'       => esc_html__( 'Vertical Gap', '@@text_domain' ),
+                'description' => esc_html__( 'When empty, used Gap option', '@@text_domain' ),
+                'name'        => 'items_gap_vertical',
+                'default'     => '',
+                'min'         => 0,
+                'max'         => 200,
+                'style'       => array(
+                    array(
+                        'element'  => '.vp-portfolio__items',
+                        'property' => '--vp-items__gap-vertical',
+                        'mask'     => '$px',
+                    ),
+                ),
+                'condition'   => array(
+                    array(
+                        'control'  => 'layout',
+                        'operator' => '!==',
+                        'value'    => 'slider',
+                    ),
+                ),
+            )
+        );
 
         /**
          * Items Style
