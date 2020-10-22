@@ -9,13 +9,13 @@
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
-Gutenberg block for your portfolio, posts and image gallery.
+Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block.
 
 ## Description ##
 
-Create beautiful, clean and powerful photo galleries and portfolio layouts using Visual Portfolio plugin. It is easy for simple photo galleries, but powerful enough for professional photographers, visual artists, and studios websites.
+Create beautiful, clean, and powerful photo galleries and portfolio layouts using the Visual Portfolio plugin. It is easy for simple photo galleries, but powerful enough for professionals. Whether you're a photographer, agency, or anything in between, Visual Portfolio will boost your online presence.
 
-Visual block editor for your gallery, portfolio or any custom post type with support to various layouts such as Masonry, Justified, Tiles, Grid, and Carousel.
+We tried to make for you a convenient visual block editor for your gallery, portfolio, or any custom post type with support to various layouts such as Masonry, Justified, Tiles, Grid, and Carousel.
 
 ### Links ###
 
@@ -34,27 +34,27 @@ Despite the rich functionality, the Visual Portfolio is optimized as much as pos
 
 All scripts and styles are loaded only when they are needed for the current page that displays your gallery. Pictures are not loaded in the main thread due to lazy loading. Moreover, our plugin is compatible with third-party WebP providers and image optimization plugins.
 
-Smart automatic loading image sizes, that currently needed for item size.
+Smart adaptive image sizes fully supported.
 
 ### Layouts ###
 
 Our gallery plugin shipped with popular layouts such as Masonry and Justified (Flickr). Every feature optimized and works seamlessly with all of these layouts, you just need to set up and go with no headache. See it in action:
 
-* [Masonry](https://visualportfolio.co/masonry-image-filters/)
-* [Justified (Flickr)](https://visualportfolio.co/justified-tilt-effect/)
-* [Tiles](https://visualportfolio.co/tiles-custom-color/)
-* [Grid](https://visualportfolio.co/grid/)
-* [Slider](https://visualportfolio.co/slider/) (Fade, Carousel, Coverflow)
+* [Masonry Gallery](https://visualportfolio.co/masonry-image-filters/)
+* [Justified (Flickr) Gallery](https://visualportfolio.co/justified-tilt-effect/)
+* [Tiles Gallery](https://visualportfolio.co/tiles-custom-color/)
+* [Grid Gallery](https://visualportfolio.co/grid/)
+* [Slider Gallery](https://visualportfolio.co/slider/) (Fade, Carousel, Coverflow)
 
 ### Visual Effects ###
 
-Showcase your portfolio items with clean and beautiful visual styles. See it in action:
+Showcase your portfolio items ang gallery images with clean and beautiful visual styles. See it in action:
 
-* [Classic](https://visualportfolio.co/masonry/)
-* [Fade](https://visualportfolio.co/tiles-paged-pagination/)
-* [Emerge](https://visualportfolio.co/masonry-infinite-scroll/)
-* [Fly](https://visualportfolio.co/tiles-popup-gallery/)
-* [Caption Move (PRO)](https://visualportfolio.co/masonry-caption-move/)
+* [Classic Style](https://visualportfolio.co/masonry/)
+* [Fade Effect](https://visualportfolio.co/tiles-paged-pagination/)
+* [Emerge Effect](https://visualportfolio.co/masonry-infinite-scroll/)
+* [Fly Effect](https://visualportfolio.co/tiles-popup-gallery/)
+* [PRO Caption Move Effect](https://visualportfolio.co/masonry-caption-move/)
 
 ### Easily Customizable ###
 
@@ -70,7 +70,7 @@ You can also create galleries using image sets right inside block editor. Just d
 
 ### Powerful Lightbox ###
 
-Visual Portfolio uses only modern solutions, and lightboxes are not an exception. High performance, mobile optimization, retina-ready, and a wide range of features available in Fancybox and PhotoSwipe plugins, that you can choose for your lightboxes.
+Visual Portfolio uses only modern solutions, and lightboxes are not an exception. High performance, mobile optimization, retina-ready, and a wide range of features available in Fancybox and PhotoSwipe plugins, that you can choose for your gallery lightboxes.
 
 **Mobile Optimized** <br> Looks great on every device. Swipe to navigate, spread/pinch to zoom in/out supported on touch devices.
 
@@ -89,6 +89,7 @@ Visual Portfolio plugin is built keeping SEO and performance in mind by defining
   * Images
   * YouTube
   * Vimeo
+  * more vendors available in PRO plugin
 * AJAX posts loading
   * Infinite Scroll
   * Load More button
