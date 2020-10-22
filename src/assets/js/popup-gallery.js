@@ -262,9 +262,15 @@ function isLinkImage( link ) {
 
 // Parse image data from link.
 function parseImgData( link ) {
-    const img = link.childNodes[ 0 ];
     const $link = $( link );
+    let img = link.childNodes[ 0 ];
     let caption = $link.next( 'figcaption' );
+
+    // <noscript> tag used in plugins, that adds lazy loading
+    if ( 'NOSCRIPT' === img.nodeName && link.childNodes[ 1 ] ) {
+        // eslint-disable-next-line prefer-destructuring
+        img = link.childNodes[ 1 ];
+    }
 
     if ( ! caption.length && $link.parent( '.gallery-icon' ).length ) {
         caption = $link.parent( '.gallery-icon' ).next( 'figcaption' );
@@ -297,9 +303,21 @@ if ( settingsPopupGallery.enable_on_wordpress_images ) {
         figure.tiled-gallery__item > a,
         p > a
     `, function( e ) {
+        if ( ! this.childNodes.length ) {
+            return;
+        }
+
+        let imageNode = this.childNodes[ 0 ];
+
+        // <noscript> tag used in plugins, that adds lazy loading
+        if ( 'NOSCRIPT' === imageNode.nodeName && this.childNodes[ 1 ] ) {
+            // eslint-disable-next-line prefer-destructuring
+            imageNode = this.childNodes[ 1 ];
+        }
+
         // check if child node is <img> or <picture> tag.
         // <picture> tag used in plugins, that adds WebP support
-        if ( 1 !== this.childNodes.length || ( 'IMG' !== this.childNodes[ 0 ].nodeName && 'PICTURE' !== this.childNodes[ 0 ].nodeName ) ) {
+        if ( 'IMG' !== imageNode.nodeName && 'PICTURE' !== imageNode.nodeName ) {
             return;
         }
 
