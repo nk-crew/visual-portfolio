@@ -14,3 +14,20 @@
     background-color: #2540cc;
     border-radius: 1em;
 }
+
+.components-panel__body-toggle > .vpf-control-category-title-icon {
+    position: absolute;
+    display: block;
+    top: 50%;
+    transform: translateY(-50%);
+
+    + span {
+        margin-left: 35px;
+    }
+
+    svg {
+        display: block;
+        width: 18px;
+        height: 18px;
+    }
+}

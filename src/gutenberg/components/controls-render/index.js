@@ -130,11 +130,13 @@ class ControlsRender extends Component {
             } );
 
         let categoryTitle = categoryToggle ? category : false;
+        let categoryIcon = false;
         let categoryPro = false;
         let categoryOpened = ! categoryToggle;
 
         if ( categoryToggle && 'undefined' !== typeof registeredControlsCategories[ category ] ) {
             categoryTitle = registeredControlsCategories[ category ].title;
+            categoryIcon = registeredControlsCategories[ category ].icon || false;
             categoryPro = !! registeredControlsCategories[ category ].is_pro;
 
             if ( 'undefined' === typeof openedCategoriesCache[ category ] ) {
@@ -158,7 +160,12 @@ class ControlsRender extends Component {
                 <PanelBody
                     title={ categoryTitle ? (
                         <Fragment>
-                            { categoryTitle }
+                            { categoryIcon ? (
+                                <span className="vpf-control-category-title-icon">
+                                    <RawHTML>{ categoryIcon }</RawHTML>
+                                </span>
+                            ) : null }
+                            <span>{ categoryTitle }</span>
                             { categoryPro ? <span className="vpf-control-category-title-pro">{ __( 'PRO', '@@text_domain' ) }</span> : '' }
                         </Fragment>
                     ) : false }
