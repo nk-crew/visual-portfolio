@@ -73,7 +73,11 @@ $show_meta = $inline_meta ||
                                 visual_portfolio()->include_template( 'icons/gallery' );
                                 break;
                             default:
-                                visual_portfolio()->include_template( 'icons/search' );
+                                if ( isset( $args['vp_opts']['items_click_action'] ) && 'popup_gallery' === $args['vp_opts']['items_click_action'] ) {
+                                    visual_portfolio()->include_template( 'icons/search' );
+                                } else {
+                                    visual_portfolio()->include_template( 'icons/image' );
+                                }
                                 break;
                         }
                         ?>
