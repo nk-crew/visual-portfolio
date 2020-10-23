@@ -23,6 +23,8 @@ if ( 'undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isot
 
                 // change column size for Tiles type only.
                 if ( $vp.length && $vp[ 0 ].vpf ) {
+                    this.getContainerWidth();
+
                     const { vpf } = $vp[ 0 ];
                     const settings = vpf.getTilesSettings();
 
