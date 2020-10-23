@@ -120,6 +120,11 @@ if ( 'undefined' !== typeof $.fancybox && VPPopupAPI ) {
             // If 'auto' - enabled for images only
             wheel: false,
 
+            // Clicked on the content
+            clickContent( current ) {
+                return 'image' === current.type && settingsPopupGallery.click_to_zoom ? 'zoom' : false;
+            },
+
             lang: 'wordpress',
             i18n: {
                 wordpress: {

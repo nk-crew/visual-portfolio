@@ -96,4 +96,9 @@
             }
         }
     }
+
+    // Default cursor when click to zoom option disabled.
+    &.vp-pswp-no-zoom .pswp__img {
+        cursor: default;
+    }
 }

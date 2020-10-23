@@ -590,6 +590,8 @@ class Visual_Portfolio_Assets {
                 'show_download_button'       => Visual_Portfolio_Settings::get_option( 'show_download_button', 'vp_popup_gallery' ),
                 'show_slideshow'             => Visual_Portfolio_Settings::get_option( 'show_slideshow', 'vp_popup_gallery' ),
                 'show_thumbs'                => Visual_Portfolio_Settings::get_option( 'show_thumbs', 'vp_popup_gallery' ),
+
+                'click_to_zoom'              => Visual_Portfolio_Settings::get_option( 'click_to_zoom', 'vp_popup_gallery' ),
             ),
 
             // Screen sizes for responsive feature.

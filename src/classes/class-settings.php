@@ -363,6 +363,14 @@ class Visual_Portfolio_Settings {
                     'default' => 'off',
                 ),
 
+                // Click to Zoom.
+                array(
+                    'name'    => 'click_to_zoom',
+                    'label'   => esc_html__( 'Click to Zoom', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'on',
+                ),
+
                 // Colors.
                 array(
                     'name'    => 'background_color',

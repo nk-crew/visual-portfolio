@@ -73,7 +73,7 @@ if ( PhotoSwipe && VPPopupAPI ) {
     // prepare photoswipe markup
     if ( ! $( '.vp-pswp' ).length ) {
         const markup = `
-        <div class="pswp vp-pswp" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="pswp vp-pswp${ settingsPopupGallery.click_to_zoom ? '' : ' vp-pswp-no-zoom' }" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="pswp__bg"></div>
             <div class="pswp__scroll-wrap">
                 <div class="pswp__container">
@@ -197,6 +197,27 @@ if ( PhotoSwipe && VPPopupAPI ) {
                     w: rect.width,
                     h: rect.height,
                 };
+            },
+            getDoubleTapZoom( isMouseClick, item ) {
+                // isMouseClick          - true if mouse, false if double-tap
+                // item                  - slide object that is zoomed, usually current
+                // item.initialZoomLevel - initial scale ratio of image
+                //                         e.g. if viewport is 700px and image is 1400px,
+                //                              initialZoomLevel will be 0.5
+                if ( isMouseClick ) {
+                    // is mouse click on image or zoom icon
+
+                    // zoom to original
+                    return settingsPopupGallery.click_to_zoom ? 1 : item.initialZoomLevel;
+
+                    // e.g. for 1400px image:
+                    // 0.5 - zooms to 700px
+                    // 2   - zooms to 2800px
+                }
+
+                // zoom to original if initial zoom is less than 0.7x,
+                // otherwise to 1.5x, to make sure that double-tap gesture always zooms image.
+                return 0.7 > item.initialZoomLevel ? 1 : 1.5;
             },
         };
 
