@@ -202,11 +202,11 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 = 2.7.0 =
 
 * changed lazy-loading attributes (use most popular `data-src` instead of custom attributes)
-* improved iframe preview render code (prevent re-arrange animation when iframe loaded)
+* improved iframe gallery preview render code (prevent re-arrange animation when iframe loaded)
 * updated all vendor scripts to the latest versions
 * moved lazy loading to separate script (less page loading size, when you disable Lazy Loading feature in settings)
 * slightly improved performance by using raf-schd package
-* fixed Isotope re-layout when window resized and items size changed, but container have static size
+* fixed Isotope re-layout when window resized and gallery items size changed, but container have static size
 * fixed iframe preview JS error
 * fixed slider arrow color variable name
 * minor changes
@@ -222,7 +222,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 = 2.6.1 =
 
-* fixed images displaying when Tiles + 0 gap used
+* fixed gallery images displaying when Tiles + 0 gap used
 
 = 2.6.0 =
 
@@ -248,7 +248,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 * fixed filter displaying in FireFox
 * fixed custom scrollbar initialization after ajax load
 * fixed Isotope event options variable
-* moved items class from templates to internal code + added filter to let users extend this class string
+* moved gallery items class from templates to internal code + added filter to let users extend this class string
 * removed native lazy loading from Visual Portfolio images where our JS lazy loading enabled (prevent possible conflicts)
 * removed staggering animation script (simplified to use CSS only)
 * minor changes
@@ -268,9 +268,9 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 = 2.3.0 =
 
 * added PRO version support <https://visualportfolio.co/pro/>
-* added overlay support for Classic style
+* added overlay support for Classic gallery style
 * added options to change meta color, links color and links hover color for all items styles
-* added options to show items overlay on hover only, on default state only and always
+* added options to show gallery items overlay on hover only, on default state only and always
 * added version number to stored assets (may fix the caching issue, when users update to the latest version)
 * added vertical scroll to overlay meta data when overflow for Fade, Fly and Emerge styles
 * improved click action for popup gallery (don't open popup if click on some meta links)
@@ -331,7 +331,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 * fixed setup wizard displaying in Saved Layouts
 * fixed retrieve registered value of Saved Layout
 * force enable Gutenberg editor for Saved Layouts to prevent conflicts with plugins, that uses Classic Editor
-* changed images uploading control (added resorting, removing and adding new images, instead of default WordPress gallery edit tool)
+* changed gallery images uploading control (added resorting, removing and adding new images, instead of default WordPress gallery edit tool)
 * changed tiles selector to modal component (better UI)
 * changed "Saved" menu item to "Saved Layouts", as users couldn't find it
 
@@ -348,10 +348,10 @@ Migration Notes:
 Log:
 
 * updated overall UI
-* updated all items styles
+* updated all gallery items styles
 * updated all filters and pagination styles
 * added full-featured Gutenberg block
-* added popup support for default WordPress images and galleries (enable it manually in plugin settings)
+* added popup gallery support for default WordPress images and galleries (enable it manually in plugin settings)
 * added new UI component - Layout Elements, where you can change Filter, Sort, Items and Pagination
 * added Minimal styles for Filters, Sort and Pagination
 * added images corner radius option
@@ -452,7 +452,7 @@ Log:
 * removed height limitation for Images control in Layouts editor
 * fixed slider thumbnails ajax loading
 * fixed tiles wrong position calculation
-* fixed Isotope re-layout when WPBakery Page Builder resized full-width row
+* fixed Isotope gallery re-layout when WPBakery Page Builder resized full-width row
 * updated FontAwesome
 * updated LazySizes
 * updated Swiper (no more Internet Explorer support)
@@ -464,7 +464,7 @@ Log:
 = 1.13.1 =
 
 * updated FontAwesome
-* fixed portfolio inside Tabs and Accordions
+* fixed portfolio gallery inside Tabs and Accordions
 * fixed Editor role capabilities (add a possibility to manage portfolio items)
 * fixed published date output for Content Source -> Images
 * fixed Gutenberg block list of all available layouts
@@ -530,7 +530,7 @@ Log:
 * fixed Elementor popup gallery conflict
 * fixed roles for portfolio post types
 * fixed IE carousel items invisible
-* fixed items gap conflict with Elementor
+* fixed gallery items gap conflict with Elementor
 * fixed carousel "Slides per view" auto option with static or dynamic "Items height" option
 * fixed slider fade effect + default items style items width
 * fixed rtl admin layout styles
