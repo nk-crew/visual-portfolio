@@ -1862,16 +1862,27 @@ class Visual_Portfolio_Get {
 
         // Tag Name.
         $tag_name = $is_posts ? 'article' : 'div';
+        $tag_name = apply_filters( 'vpf_each_item_tag_name', $tag_name, $args );
 
-        $tag_attributes = 'class="' . esc_attr( $args['class'] ) . '" data-vp-filter="' . esc_attr( $args['filter'] ) . '"';
+        $attrs = array(
+            'class'          => $args['class'],
+            'data-vp-filter' => $args['filter'],
+        );
 
         if ( $args['focal_point'] && ! empty( $args['focal_point'] ) ) {
-            $tag_attributes .= ' style="--vp-images__object-position: ' . esc_attr( 100 * $args['focal_point']['x'] ) . '% ' . esc_attr( 100 * $args['focal_point']['y'] ) . '%;"';
+            $attrs['style'] = '--vp-images__object-position: ' . esc_attr( 100 * $args['focal_point']['x'] ) . '% ' . esc_attr( 100 * $args['focal_point']['y'] ) . '%;';
+        }
+
+        $attrs        = apply_filters( 'vpf_each_item_tag_attrs', $attrs, $args );
+        $attrs_string = '';
+
+        foreach ( $attrs as $name => $val ) {
+            $attrs_string .= ( $attrs_string ? ' ' : '' ) . esc_attr( $name ) . '="' . esc_attr( $val ) . '"';
         }
 
         ?>
 
-        <<?php echo esc_attr( $tag_name ); ?> <?php echo $tag_attributes; // phpcs:ignore ?>>
+        <<?php echo esc_attr( $tag_name ); ?> <?php echo $attrs_string; // phpcs:ignore ?>>
             <?php self::item_popup_data( $args ); ?>
             <figure class="vp-portfolio__item">
                 <?php
