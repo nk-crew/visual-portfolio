@@ -114,7 +114,13 @@ const SortableItem = SortableElement( ( props ) => {
             { isOpen ? (
                 <Modal
                     title={ __( 'Image Settings', '@@text_domain' ) }
-                    onRequestClose={ closeModal }
+                    onRequestClose={ ( e ) => {
+                        if ( e.relatedTarget && e.relatedTarget.classList && e.relatedTarget.classList.contains( 'media-modal' ) ) {
+                            // Don't close modal if opened media modal.
+                        } else {
+                            closeModal( e );
+                        }
+                    } }
                 >
                     <div className="vpf-component-gallery-control-item-modal">
                         { focalPoint ? (

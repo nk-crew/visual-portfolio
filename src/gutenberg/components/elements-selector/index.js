@@ -97,7 +97,13 @@ function ElementsSelectorOptions( props ) {
             { isOpen ? (
                 <Modal
                     title={ __( 'Layout Items Settings', '@@text_domain' ) }
-                    onRequestClose={ closeModal }
+                    onRequestClose={ ( e ) => {
+                        if ( e.relatedTarget && e.relatedTarget.classList && e.relatedTarget.classList.contains( 'media-modal' ) ) {
+                            // Don't close modal if opened media modal.
+                        } else {
+                            closeModal( e );
+                        }
+                    } }
                     className="vpf-component-elements-selector-modal"
                 >
                     { options[ optionName ] && options[ optionName ].category ? (
