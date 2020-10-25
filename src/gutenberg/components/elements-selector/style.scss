@@ -108,3 +108,21 @@
     background-color: #2540cc;
     border-radius: 1em;
 }
+
+.vpf-component-elements-selector-modal {
+    .components-panel__body {
+        max-width: 350px;
+        padding-right: 24px;
+        padding-left: 24px;
+        margin-right: -24px;
+        margin-left: -24px;
+    }
+    .components-modal__header + .components-panel__body {
+        padding-top: 0;
+        border-top: none;
+    }
+    .components-panel__body:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+}

@@ -9,6 +9,7 @@
 
         .vpf-component-gallery-control-item {
             position: relative;
+            display: inline-block;
             width: calc(33.33% - 15px);
             margin-top: 15px;
             margin-left: 15px;
@@ -118,6 +119,7 @@
         }
     }
 }
-.vpf-component-gallery-control-item-dropdown {
-    padding: 15px;
+
+.vpf-component-gallery-control-item-modal {
+    max-width: 300px;
 }

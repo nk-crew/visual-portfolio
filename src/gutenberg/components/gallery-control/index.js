@@ -25,12 +25,13 @@ const {
 const {
     Fragment,
     Component,
+    useState,
     createRef,
 } = wp.element;
 
 const {
     Button,
-    Dropdown,
+    Modal,
     FocalPointPicker,
     withNotices,
 } = wp.components;
@@ -75,119 +76,119 @@ const SortableItem = SortableElement( ( props ) => {
         isSetupWizard,
     } = props;
 
+    const [ isOpen, setOpen ] = useState( false );
+    const openModal = () => setOpen( true );
+    const closeModal = () => setOpen( false );
+
     return (
-        <Dropdown
-            // eslint-disable-next-line react/no-array-index-key
-            key={ `${ img.id || img.imgThumbnailUrl || img.imgUrl }-${ idx }` }
-            contentClassName="vpf-component-dropdown-no-padding"
-            popoverProps={ {
-                position: 'bottom center',
-            } }
-            className="vpf-component-gallery-control-item"
-            renderToggle={ ( { isOpen, onToggle } ) => (
-                <Fragment>
-                    <Button
-                        className="vpf-component-gallery-control-item-button"
-                        onClick={ onToggle }
-                        aria-expanded={ isOpen }
-                    >
-                        <img src={ img.imgThumbnailUrl || img.imgUrl } alt={ img.alt || img.imgThumbnailUrl || img.imgUrl } />
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="3" />
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                        </svg>
-                    </Button>
-                    <Button
-                        className="vpf-component-gallery-control-item-remove"
-                        onClick={ () => {
-                            const newImages = [ ...items ];
+        <Fragment>
+            <div className="vpf-component-gallery-control-item">
+                <Button
+                    className="vpf-component-gallery-control-item-button"
+                    onClick={ openModal }
+                    aria-expanded={ isOpen }
+                >
+                    <img src={ img.imgThumbnailUrl || img.imgUrl } alt={ img.alt || img.imgThumbnailUrl || img.imgUrl } />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                </Button>
+                <Button
+                    className="vpf-component-gallery-control-item-remove"
+                    onClick={ () => {
+                        const newImages = [ ...items ];
 
-                            if ( newImages[ idx ] ) {
-                                newImages.splice( idx, 1 );
+                        if ( newImages[ idx ] ) {
+                            newImages.splice( idx, 1 );
 
-                                onChange( newImages );
-                            }
-                        } }
-                    >
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M3.5 5.5H7.5M16.5 5.5H12.5M12.5 5.5V2.5H7.5V5.5M12.5 5.5H7.5M5 8.5L6 17H14L15 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="transparent" />
-                        </svg>
-                    </Button>
-                </Fragment>
-            ) }
-            renderContent={ () => (
-                <div className="vpf-component-gallery-control-item-dropdown">
-                    { focalPoint ? (
-                        <FocalPointPicker
-                            url={ img.imgThumbnailUrl || img.imgUrl }
-                            value={ img.focalPoint }
-                            onChange={ ( val ) => {
-                                const newImages = [ ...items ];
-
-                                if ( newImages[ idx ] ) {
-                                    newImages[ idx ] = {
-                                        ...newImages[ idx ],
-                                        focalPoint: val,
-                                    };
-
-                                    onChange( newImages );
-                                }
-                            } }
-                        />
-                    ) : '' }
-                    { Object.keys( imageControls ).map( ( name ) => {
-                        const newCondition = [];
-
-                        // prepare name.
-                        const imgControlName = `${ controlName }[${ idx }].${ name }`;
-
-                        // prepare conditions for the current item.
-                        if ( imageControls[ name ].condition.length ) {
-                            imageControls[ name ].condition.forEach( ( data ) => {
-                                const newData = { ...data };
-
-                                if ( newData.control && /SELF/g.test( newData.control ) ) {
-                                    newData.control = newData.control.replace( /SELF/g, `${ controlName }[${ idx }]` );
-                                }
-
-                                newCondition.push( newData );
-                            } );
+                            onChange( newImages );
                         }
+                    } }
+                >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.5 5.5H7.5M16.5 5.5H12.5M12.5 5.5V2.5H7.5V5.5M12.5 5.5H7.5M5 8.5L6 17H14L15 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="transparent" />
+                    </svg>
+                </Button>
+            </div>
+            { isOpen ? (
+                <Modal
+                    title={ __( 'Image Settings', '@@text_domain' ) }
+                    onRequestClose={ closeModal }
+                >
+                    <div className="vpf-component-gallery-control-item-modal">
+                        { focalPoint ? (
+                            <FocalPointPicker
+                                url={ img.imgThumbnailUrl || img.imgUrl }
+                                value={ img.focalPoint }
+                                onChange={ ( val ) => {
+                                    const newImages = [ ...items ];
 
-                        return (
-                            applyFilters(
-                                'vpf.editor.gallery-controls-render',
-                                <ControlsRender.Control
-                                    // eslint-disable-next-line react/no-array-index-key
-                                    key={ `${ img.id || img.imgThumbnailUrl || img.imgUrl }-${ idx }-${ name }` }
-                                    attributes={ attributes }
-                                    onChange={ ( val ) => {
-                                        const newImages = [ ...items ];
+                                    if ( newImages[ idx ] ) {
+                                        newImages[ idx ] = {
+                                            ...newImages[ idx ],
+                                            focalPoint: val,
+                                        };
 
-                                        if ( newImages[ idx ] ) {
-                                            newImages[ idx ] = {
-                                                ...newImages[ idx ],
-                                                [ name ]: val,
-                                            };
+                                        onChange( newImages );
+                                    }
+                                } }
+                            />
+                        ) : '' }
+                        { Object.keys( imageControls ).map( ( name ) => {
+                            const newCondition = [];
 
-                                            onChange( newImages );
-                                        }
-                                    } }
-                                    { ...imageControls[ name ] }
-                                    name={ imgControlName }
-                                    value={ img[ name ] }
-                                    condition={ newCondition }
-                                    clientId={ clientId }
-                                    isSetupWizard={ isSetupWizard }
-                                />,
-                                imageControls[ name ],
-                                props
-                            )
-                        );
-                    } ) }
-                </div>
-            ) }
-        />
+                            // prepare name.
+                            const imgControlName = `${ controlName }[${ idx }].${ name }`;
+
+                            // prepare conditions for the current item.
+                            if ( imageControls[ name ].condition.length ) {
+                                imageControls[ name ].condition.forEach( ( data ) => {
+                                    const newData = { ...data };
+
+                                    if ( newData.control && /SELF/g.test( newData.control ) ) {
+                                        newData.control = newData.control.replace( /SELF/g, `${ controlName }[${ idx }]` );
+                                    }
+
+                                    newCondition.push( newData );
+                                } );
+                            }
+
+                            return (
+                                applyFilters(
+                                    'vpf.editor.gallery-controls-render',
+                                    <ControlsRender.Control
+                                        // eslint-disable-next-line react/no-array-index-key
+                                        key={ `${ img.id || img.imgThumbnailUrl || img.imgUrl }-${ idx }-${ name }` }
+                                        attributes={ attributes }
+                                        onChange={ ( val ) => {
+                                            const newImages = [ ...items ];
+
+                                            if ( newImages[ idx ] ) {
+                                                newImages[ idx ] = {
+                                                    ...newImages[ idx ],
+                                                    [ name ]: val,
+                                                };
+
+                                                onChange( newImages );
+                                            }
+                                        } }
+                                        { ...imageControls[ name ] }
+                                        name={ imgControlName }
+                                        value={ img[ name ] }
+                                        condition={ newCondition }
+                                        clientId={ clientId }
+                                        isSetupWizard={ isSetupWizard }
+                                    />,
+                                    imageControls[ name ],
+                                    props
+                                )
+                            );
+                        } ) }
+                    </div>
+                </Modal>
+            ) : null }
+        </Fragment>
     );
 } );
 const SortableList = SortableContainer( ( props ) => {

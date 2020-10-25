@@ -19,6 +19,7 @@ const {
 const {
     Component,
     Fragment,
+    useState,
 } = wp.element;
 
 const {
@@ -26,6 +27,7 @@ const {
     Button,
     DropdownMenu,
     Dropdown,
+    Modal,
     Toolbar,
     BaseControl,
 } = wp.components;
@@ -62,6 +64,79 @@ const alignIcons = {
 };
 
 /**
+ * Options render
+ */
+function ElementsSelectorOptions( props ) {
+    const {
+        location,
+        locationData,
+        value,
+        onChange,
+        options,
+        optionName,
+        parentProps,
+    } = props;
+
+    const [ isOpen, setOpen ] = useState( false );
+    const openModal = () => setOpen( true );
+    const closeModal = () => setOpen( false );
+
+    return (
+        <Fragment>
+            <button
+                type="button"
+                aria-expanded={ isOpen }
+                className="vpf-component-elements-selector-control-location-options-item"
+                onClick={ openModal }
+            >
+                { options[ optionName ] ? options[ optionName ].title : optionName }
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 4L14 10L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            </button>
+            { isOpen ? (
+                <Modal
+                    title={ __( 'Layout Items Settings', '@@text_domain' ) }
+                    onRequestClose={ closeModal }
+                    className="vpf-component-elements-selector-modal"
+                >
+                    { options[ optionName ] && options[ optionName ].category ? (
+                        <ControlsRender
+                            { ...parentProps.props }
+                            category={ options[ optionName ].category }
+                            categoryToggle={ false }
+                        />
+                    ) : '' }
+                    <PanelBody>
+                        <BaseControl label={ __( 'Remove', '@@text_domain' ) }>
+                            <br />
+                            <Button
+                                isSecondary
+                                isSmall
+                                onClick={ () => {
+                                    // eslint-disable-next-line no-alert
+                                    if ( window.confirm( __( 'Are you sure you want to remove the element?', '@@text_domain' ) ) ) {
+                                        onChange( {
+                                            ...value,
+                                            [ location ]: {
+                                                ...value[ location ],
+                                                elements: locationData.elements.filter( ( elementName ) => elementName !== optionName ),
+                                            },
+                                        } );
+                                    }
+                                } }
+                            >
+                                { __( 'Remove Element', '@@text_domain' ) }
+                            </Button>
+                        </BaseControl>
+                    </PanelBody>
+                </Modal>
+            ) : null }
+        </Fragment>
+    );
+}
+
+/**
  * Component Class
  */
 export default class ElementsSelector extends Component {
@@ -69,7 +144,6 @@ export default class ElementsSelector extends Component {
         super( ...args );
 
         this.getLocationData = this.getLocationData.bind( this );
-        this.renderOptions = this.renderOptions.bind( this );
         this.renderLocation = this.renderLocation.bind( this );
         this.renderAlignSettings = this.renderAlignSettings.bind( this );
     }
@@ -106,81 +180,6 @@ export default class ElementsSelector extends Component {
             availableAlign,
             availableElements,
         };
-    }
-
-    renderOptions( location ) {
-        const {
-            value,
-            onChange,
-            options,
-            props,
-        } = this.props;
-
-        const locationData = this.getLocationData( location );
-        const result = [];
-
-        if ( locationData.elements.length ) {
-            locationData.elements.forEach( ( optionName ) => {
-                result.push(
-                    <Dropdown
-                        key={ optionName }
-                        contentClassName="vpf-component-dropdown-no-padding"
-                        popoverProps={ {
-                            position: 'bottom center',
-                        } }
-                        renderToggle={ ( { isOpen, onToggle } ) => (
-                            <button
-                                type="button"
-                                aria-expanded={ isOpen }
-                                className="vpf-component-elements-selector-control-location-options-item"
-                                onClick={ onToggle }
-                            >
-                                { options[ optionName ] ? options[ optionName ].title : optionName }
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8 4L14 10L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </button>
-                        ) }
-                        renderContent={ () => (
-                            <Fragment>
-                                { options[ optionName ] && options[ optionName ].category ? (
-                                    <ControlsRender
-                                        { ...props }
-                                        category={ options[ optionName ].category }
-                                        categoryToggle={ false }
-                                    />
-                                ) : '' }
-                                <PanelBody>
-                                    <BaseControl label={ __( 'Remove', '@@text_domain' ) }>
-                                        <br />
-                                        <Button
-                                            isSecondary
-                                            isSmall
-                                            onClick={ () => {
-                                                // eslint-disable-next-line no-alert
-                                                if ( window.confirm( __( 'Are you sure you want to remove the element?', '@@text_domain' ) ) ) {
-                                                    onChange( {
-                                                        ...value,
-                                                        [ location ]: {
-                                                            ...value[ location ],
-                                                            elements: locationData.elements.filter( ( elementName ) => elementName !== optionName ),
-                                                        },
-                                                    } );
-                                                }
-                                            } }
-                                        >
-                                            { __( 'Remove Element', '@@text_domain' ) }
-                                        </Button>
-                                    </BaseControl>
-                                </PanelBody>
-                            </Fragment>
-                        ) }
-                    />
-                );
-            } );
-        }
-
-        return result;
     }
 
     renderAlignSettings( location ) {
@@ -242,6 +241,7 @@ export default class ElementsSelector extends Component {
         const {
             value,
             onChange,
+            options,
         } = this.props;
 
         const locationData = this.getLocationData( location );
@@ -262,7 +262,20 @@ export default class ElementsSelector extends Component {
                     </div>
                 ) : '' }
                 <div className={ classnames( 'vpf-component-elements-selector-control-location-options', locationData.align ? `vpf-component-elements-selector-control-location-options-${ locationData.align }` : '' ) }>
-                    { this.renderOptions( location ) }
+                    { locationData.elements.length ? (
+                        locationData.elements.map( ( optionName ) => (
+                            <ElementsSelectorOptions
+                                key={ optionName }
+                                location={ location }
+                                locationData={ locationData }
+                                value={ value }
+                                onChange={ onChange }
+                                options={ options }
+                                optionName={ optionName }
+                                parentProps={ this.props }
+                            />
+                        ) )
+                    ) : null }
                     { Object.keys( availableElements ).length ? (
                         <DropdownMenu
                             className="vpf-component-elements-selector-control-location-options-add-button"
