@@ -18,6 +18,7 @@ const {
 } = wp.i18n;
 
 const {
+    applyFilters,
     addFilter,
 } = wp.hooks;
 
@@ -70,6 +71,7 @@ const SortableItem = SortableElement( ( props ) => {
         controlName,
         attributes,
         focalPoint,
+        clientId,
         isSetupWizard,
     } = props;
 
@@ -153,28 +155,34 @@ const SortableItem = SortableElement( ( props ) => {
                         }
 
                         return (
-                            <ControlsRender.Control
-                                // eslint-disable-next-line react/no-array-index-key
-                                key={ `${ img.id || img.imgThumbnailUrl || img.imgUrl }-${ idx }-${ name }` }
-                                attributes={ attributes }
-                                onChange={ ( val ) => {
-                                    const newImages = [ ...items ];
+                            applyFilters(
+                                'vpf.editor.gallery-controls-render',
+                                <ControlsRender.Control
+                                    // eslint-disable-next-line react/no-array-index-key
+                                    key={ `${ img.id || img.imgThumbnailUrl || img.imgUrl }-${ idx }-${ name }` }
+                                    attributes={ attributes }
+                                    onChange={ ( val ) => {
+                                        const newImages = [ ...items ];
 
-                                    if ( newImages[ idx ] ) {
-                                        newImages[ idx ] = {
-                                            ...newImages[ idx ],
-                                            [ name ]: val,
-                                        };
+                                        if ( newImages[ idx ] ) {
+                                            newImages[ idx ] = {
+                                                ...newImages[ idx ],
+                                                [ name ]: val,
+                                            };
 
-                                        onChange( newImages );
-                                    }
-                                } }
-                                { ...imageControls[ name ] }
-                                name={ imgControlName }
-                                value={ img[ name ] }
-                                condition={ newCondition }
-                                isSetupWizard={ isSetupWizard }
-                            />
+                                            onChange( newImages );
+                                        }
+                                    } }
+                                    { ...imageControls[ name ] }
+                                    name={ imgControlName }
+                                    value={ img[ name ] }
+                                    condition={ newCondition }
+                                    clientId={ clientId }
+                                    isSetupWizard={ isSetupWizard }
+                                />,
+                                imageControls[ name ],
+                                props
+                            )
                         );
                     } ) }
                 </div>
