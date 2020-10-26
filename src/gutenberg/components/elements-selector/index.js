@@ -235,11 +235,7 @@ export default class ElementsSelector extends Component {
                     </button>
                 ) }
                 renderContent={ () => (
-                    <PanelBody>
-                        <BaseControl label={ __( 'Align', '@@text_domain' ) }>
-                            <Toolbar controls={ controls } />
-                        </BaseControl>
-                    </PanelBody>
+                    <Toolbar controls={ controls } />
                 ) }
             />
         );
