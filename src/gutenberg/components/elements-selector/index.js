@@ -112,30 +112,32 @@ function ElementsSelectorOptions( props ) {
                             category={ options[ optionName ].category }
                             categoryToggle={ false }
                         />
-                    ) : '' }
-                    <PanelBody>
-                        <BaseControl label={ __( 'Remove', '@@text_domain' ) }>
-                            <br />
-                            <Button
-                                isSecondary
-                                isSmall
-                                onClick={ () => {
-                                    // eslint-disable-next-line no-alert
-                                    if ( window.confirm( __( 'Are you sure you want to remove the element?', '@@text_domain' ) ) ) {
-                                        onChange( {
-                                            ...value,
-                                            [ location ]: {
-                                                ...value[ location ],
-                                                elements: locationData.elements.filter( ( elementName ) => elementName !== optionName ),
-                                            },
-                                        } );
-                                    }
-                                } }
-                            >
-                                { __( 'Remove Element', '@@text_domain' ) }
-                            </Button>
-                        </BaseControl>
-                    </PanelBody>
+                    ) : null }
+                    { 'items' !== optionName ? (
+                        <PanelBody>
+                            <BaseControl label={ __( 'Remove', '@@text_domain' ) }>
+                                <br />
+                                <Button
+                                    isSecondary
+                                    isSmall
+                                    onClick={ () => {
+                                        // eslint-disable-next-line no-alert
+                                        if ( window.confirm( __( 'Are you sure you want to remove the element?', '@@text_domain' ) ) ) {
+                                            onChange( {
+                                                ...value,
+                                                [ location ]: {
+                                                    ...value[ location ],
+                                                    elements: locationData.elements.filter( ( elementName ) => elementName !== optionName ),
+                                                },
+                                            } );
+                                        }
+                                    } }
+                                >
+                                    { __( 'Remove Element', '@@text_domain' ) }
+                                </Button>
+                            </BaseControl>
+                        </PanelBody>
+                    ) : null }
                 </Modal>
             ) : null }
         </Fragment>
