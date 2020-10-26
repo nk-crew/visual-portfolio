@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name:  Visual Portfolio
- * Description:  Portfolio post type with visual editor
+ * Plugin Name:  Visual Portfolio, Posts & Image Gallery
+ * Description:  Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block.
  * Version:      @@plugin_version
  * Author:       nK
  * Author URI:   https://nkdev.info
