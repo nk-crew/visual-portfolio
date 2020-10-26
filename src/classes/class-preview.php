@@ -33,6 +33,7 @@ class Visual_Portfolio_Preview {
      */
     public function init_hooks() {
         add_action( 'init', array( $this, 'is_preview_check' ) );
+        add_filter( 'pre_handle_404', array( $this, 'pre_handle_404' ) );
         add_filter( 'vpf_get_options', array( $this, 'filter_preview_option' ) );
         add_action( 'template_redirect', array( $this, 'template_redirect' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 11 );
@@ -41,36 +42,54 @@ class Visual_Portfolio_Preview {
     }
 
     /**
-     * Localize scripts with preview URL.
+     * Prepare preview URL to use from our preview iframe.
+     *
+     * @return string
      */
-    public function localize_scripts() {
+    public function get_preview_url() {
         add_filter( 'pre_option_permalink_structure', '__return_empty_string' );
 
-        $url = set_url_scheme(
+        $preview_url = set_url_scheme(
             add_query_arg(
                 array(
                     'vp_preview'      => 'vp_preview',
                     'vp_preview_time' => time(),
                 ),
-                get_site_url()
+                // We used `get_site_url()` before, but it does not work on some hosts,
+                // that have custom URL structure in admin area.
+                //
+                // For example:
+                // * Admin URL: https://mysite.com/wp/
+                // * Front URL: https://mysite.com/
+                // .
+                get_home_url( '/' )
             )
         );
 
         remove_filter( 'pre_option_permalink_structure', '__return_empty_string' );
+
+        return $preview_url;
+    }
+
+    /**
+     * Localize scripts with preview URL.
+     */
+    public function localize_scripts() {
+        $preview_url = $this->get_preview_url();
 
         // Localize scripts.
         wp_localize_script(
             'visual-portfolio-gutenberg',
             'VPAdminGutenbergVariables',
             array(
-                'preview_url' => $url,
+                'preview_url' => $preview_url,
             )
         );
         wp_localize_script(
             'visual-portfolio-elementor',
             'VPAdminElementorVariables',
             array(
-                'preview_url' => $url,
+                'preview_url' => $preview_url,
             )
         );
     }
@@ -96,6 +115,17 @@ class Visual_Portfolio_Preview {
         // phpcs:enable
 
         $this->preview_enabled = 'true' === $frame;
+    }
+
+    /**
+     * Prevent 404 headers if it is vp_preview page.
+     *
+     * @param bool $val - handle 404 headers.
+     *
+     * @return bool
+     */
+    public function pre_handle_404( $val ) {
+        return $this->preview_enabled ? true : $val;
     }
 
     /**
