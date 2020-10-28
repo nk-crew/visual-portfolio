@@ -193,6 +193,25 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 2.8.0 =
+
+* added support for Custom Hover image in PRO version <https://visualportfolio.co/custom-hover-image-animated-gif/>
+* added Vertical Gap option
+* added icons to all categories toggles in editor
+* added Popup Gallery setting to disable "Click to Zoom"
+* added PHP filters to extend items: `vpf_each_item_tag_name` and `vpf_each_item_tag_attrs` <https://visualportfolio.co/documentation/developers/wordpress-filters/>
+* changed preloader animation (SVG logo with spinner)
+* changed item icon when click action is not popup gallery (display image icon instead of zoom)
+* changed image and layout settings dropdowns to modals
+* fixed conflict of lazy loading and Imagify WebP feature
+* fixed Tiles layout resize position bug
+* fixed WordPress images popup when used lazy loading from Autoptimize
+* fixed possibility to remove Items from Layouts control (items are required part for each layout, you can't remove it
+* fixed align component UI in Layouts control
+* fixed iframe preview on some hosts
+* removed usage of deprecated jQuery 'ready' event in Settings
+* minor fixes
+
 = 2.7.1 =
 
 * added legacy Swiper version, when Elementor plugin enabled (resolves conflict with it)
