@@ -20,7 +20,10 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
 
         if ( self.$items_wrap.fjGallery && 'justified' === self.options.layout ) {
             const initOptions = false !== options ? options : {
-                gutter: parseFloat( self.options.itemsGap ) || 0,
+                gutter: {
+                    horizontal: parseFloat( self.options.itemsGap ) || 0,
+                    vertical: '' !== self.options.itemsGapVertical ? ( parseFloat( self.options.itemsGapVertical ) || 0 ) : ( parseFloat( self.options.itemsGap ) || 0 ),
+                },
                 rowHeight: parseFloat( self.options.justifiedRowHeight ) || 200,
                 rowHeightTolerance: parseFloat( self.options.justifiedRowHeightTolerance ) || 0,
                 itemSelector: '.vp-portfolio__item-wrap',
