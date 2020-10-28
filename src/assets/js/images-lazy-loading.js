@@ -67,18 +67,21 @@ $doc.on( 'extendClass.vpf', ( event, VP ) => {
                 'data-srcset': config.srcsetAttr,
             };
 
-            self.$items_wrap.add( self.$slider_thumbnails_wrap ).find( `.vp-lazyload:not(.${ config.lazyClass })` ).each( function() {
-                const $item = $( this );
+            self.$items_wrap.add( self.$slider_thumbnails_wrap )
+                .find( `img.vp-lazyload:not(.${ config.lazyClass }), picture.vp-lazyload img:not(.${ config.lazyClass })` ).each( function() {
+                    const $item = $( this );
 
-                Object.keys( attrsToReplace ).forEach( ( attr ) => {
-                    if ( attrsToReplace[ attr ] && attr !== attrsToReplace[ attr ] && $item.attr( attr ) ) {
-                        $item.attr( attrsToReplace[ attr ], $item.attr( attr ) );
-                        $item.removeAttr( attr );
-                    }
+                    Object.keys( attrsToReplace ).forEach( ( attr ) => {
+                        if ( attrsToReplace[ attr ] && attr !== attrsToReplace[ attr ] && $item.attr( attr ) ) {
+                            $item.attr( attrsToReplace[ attr ], $item.attr( attr ) );
+                            $item.removeAttr( attr );
+                        }
+                    } );
+
+                    // We need to add our class to support 3rd-party plugins, that adds
+                    // WebP support using <picture> tags (for example Imagify).
+                    $item.addClass( `vp-lazyload ${ config.lazyClass }` );
                 } );
-
-                $item.addClass( config.lazyClass );
-            } );
         }
     };
 } );
