@@ -209,6 +209,10 @@ const SortableList = SortableContainer( ( props ) => {
         prepareImages,
     } = props;
 
+    // Automatically open images selector when first time select Images in Setup Wizard.
+    const [ isOpenedInSetupWizard, setOpenOnSetupWizard ] = useState( ! isSetupWizard );
+    const openOnSetupWizard = () => setOpenOnSetupWizard( true );
+
     return (
         <div className="vpf-component-gallery-control-items">
             { items.map( ( img, idx ) => (
@@ -238,22 +242,29 @@ const SortableList = SortableContainer( ( props ) => {
                 } }
                 allowedTypes={ ALLOWED_MEDIA_TYPES }
                 value={ false }
-                render={ ( { open } ) => (
-                    <Button
-                        className="vpf-component-gallery-control-item-add"
-                        onClick={ ( event ) => {
-                            event.stopPropagation();
-                            open();
-                        } }
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false">
-                            <path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
-                        </svg>
-                        <span>
-                            { __( 'Add Images', '@@text_domain' ) }
-                        </span>
-                    </Button>
-                ) }
+                render={ ( { open } ) => {
+                    if ( ! isOpenedInSetupWizard ) {
+                        openOnSetupWizard();
+                        open();
+                    }
+
+                    return (
+                        <Button
+                            className="vpf-component-gallery-control-item-add"
+                            onClick={ ( event ) => {
+                                event.stopPropagation();
+                                open();
+                            } }
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false">
+                                <path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
+                            </svg>
+                            <span>
+                                { __( 'Add Images', '@@text_domain' ) }
+                            </span>
+                        </Button>
+                    );
+                } }
             />
         </div>
     );
