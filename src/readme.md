@@ -193,6 +193,11 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Changelog ##
 
+= 2.8.1 =
+
+* fixed preloader SVG position
+* fixed preview loading error on some hosts
+
 = 2.8.0 =
 
 * added support for Custom Hover image in PRO version <https://visualportfolio.co/custom-hover-image-animated-gif/>
