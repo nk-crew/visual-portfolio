@@ -61,8 +61,15 @@ class Visual_Portfolio_Preview {
                 // For example:
                 // * Admin URL: https://mysite.com/wp/
                 // * Front URL: https://mysite.com/
+                //
+                // Use `trailingslashit` to fix some rare servers problems
+                // when preview is not working if no trailing slash in URL.
+                //
+                // For example:
+                // * Error:   https://mysite.com/wp
+                // * Success: https://mysite.com/wp/
                 // .
-                get_home_url( '/' )
+                trailingslashit( get_home_url( '/' ) )
             )
         );
 
