@@ -5,11 +5,14 @@
  */
 .vp-portfolio {
     position: relative;
-    min-height: var(--vp-wrap__min-height);
-}
-.vp-portfolio,
-.vp-portfolio * {
     box-sizing: border-box;
+    min-height: var(--vp-wrap__min-height);
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: inherit;
+    }
 }
 .vp-portfolio__items {
     transition: var(--vp-transition-duration) height var(--vp-transition-easing), var(--vp-transition-duration) transform var(--vp-transition-easing);
