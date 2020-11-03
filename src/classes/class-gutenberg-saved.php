@@ -102,8 +102,15 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
             $class_name .= ' ' . $attributes['className'];
         }
 
+        $html_atts = 'class="' . esc_attr( $class_name ) . '"';
+
+        // Ghost Kit animate on scroll support.
+        if ( isset( $attributes['ghostkitSR'] ) && $attributes['ghostkitSR'] ) {
+            $html_atts .= ' data-ghostkit-sr="' . esc_attr( $attributes['ghostkitSR'] ) . '"';
+        }
+
         ?>
-        <div class="<?php echo esc_attr( $class_name ); ?>">
+        <div <?php echo $html_atts; // phpcs:ignore ?>>
             <?php
             // phpcs:ignore
             echo Visual_Portfolio_Get::get( array( 'id' => $attributes['id'] ) );
