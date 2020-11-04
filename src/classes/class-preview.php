@@ -69,7 +69,7 @@ class Visual_Portfolio_Preview {
                 // * Error:   https://mysite.com/wp
                 // * Success: https://mysite.com/wp/
                 // .
-                trailingslashit( get_home_url( '/' ) )
+                trailingslashit( home_url( '/' ) )
             )
         );
 
