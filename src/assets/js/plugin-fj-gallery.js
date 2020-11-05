@@ -26,6 +26,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 },
                 rowHeight: parseFloat( self.options.justifiedRowHeight ) || 200,
                 rowHeightTolerance: parseFloat( self.options.justifiedRowHeightTolerance ) || 0,
+                calculateItemsHeight: true,
                 itemSelector: '.vp-portfolio__item-wrap',
                 imageSelector: '.vp-portfolio__item-img img',
             };
