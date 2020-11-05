@@ -104,7 +104,9 @@ const VPPopupAPI = {
         let video;
         let videoData;
 
-        $gallery.find( '.vp-portfolio__item-wrap' ).each( function() {
+        // Find all gallery items
+        // Prevent Swiper slider duplicates.
+        $gallery.find( '.vp-portfolio__item-wrap:not(.swiper-slide-duplicate):not(.swiper-slide-duplicate-active)' ).each( function() {
             $meta = $( this ).find( '.vp-portfolio__item-popup' );
 
             if ( $meta && $meta.length ) {
@@ -205,7 +207,9 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             let index = -1;
             const clicked = $this.closest( '.vp-portfolio__item' )[ 0 ];
 
-            self.$item.find( '.vp-portfolio__item-wrap .vp-portfolio__item-popup' ).each( function( idx ) {
+            // Find all gallery items
+            // Prevent Swiper slider duplicates.
+            self.$item.find( '.vp-portfolio__item-wrap:not(.swiper-slide-duplicate):not(.swiper-slide-duplicate-active) .vp-portfolio__item-popup' ).each( function( idx ) {
                 if ( -1 === index && $( this ).closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item' )[ 0 ] === clicked ) {
                     index = idx;
                 }
