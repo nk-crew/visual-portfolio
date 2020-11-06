@@ -9,6 +9,7 @@
                     <key name="categories" />
                 </key>
             </key>
+            <key name="no_items_notice" />
             <key name="items_style_default__date_format" />
             <key name="items_style_fade__date_format" />
             <key name="items_style_fly__date_format" />

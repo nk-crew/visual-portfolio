@@ -1524,6 +1524,16 @@ class Visual_Portfolio_Admin {
 
         Visual_Portfolio_Controls::register(
             array(
+                'category' => 'content-source-additional',
+                'type'     => 'text',
+                'label'    => esc_html__( 'No Items Notice', '@@text_domain' ),
+                'name'     => 'no_items_notice',
+                'default'  => esc_html__( 'No items were found matching your selection.', '@@text_domain' ),
+            )
+        );
+
+        Visual_Portfolio_Controls::register(
+            array(
                 'category'   => 'content-source-additional',
                 'type'       => 'checkbox',
                 'alongside'  => esc_html__( 'Stretch', '@@text_domain' ),

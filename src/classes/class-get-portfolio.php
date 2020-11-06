@@ -343,7 +343,7 @@ class Visual_Portfolio_Get {
             ?>
             <div class="<?php echo esc_attr( $class ); ?>">
                 <?php
-                self::notice( esc_html__( 'No items were found matching your selection.', '@@text_domain' ) );
+                self::notice( $options['no_items_notice'] );
                 ?>
             </div>
             <?php
