@@ -1299,7 +1299,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-source-post-based',
                 'type'        => 'checkbox',
                 'alongside'   => esc_html__( 'Avoid Duplicates', '@@text_domain' ),
-                'description' => esc_html__( 'Enable to avoid duplicate posts from showing up. This only effects the frontend', '@@text_domain' ),
+                'description' => esc_html__( 'Enable to avoid duplicate posts from showing up. This only affects the frontend', '@@text_domain' ),
                 'name'        => 'posts_avoid_duplicate_posts',
                 'default'     => false,
             )
