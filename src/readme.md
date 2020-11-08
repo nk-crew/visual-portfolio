@@ -122,10 +122,14 @@ The Visual Portfolio plugin is also available in a professional version which in
   * Instagram
   * Youtube
   * Vimeo
+  * Google Photos
   * Flickr
   * Twitter
   * Dribbble
 * Stylish interaction effects
+  * Hover Tilt Effect
+  * Custom Hover Image (useful for animated GIFs)
+  * Caption Move Style
 * Instagram-like image filters for normal and hover states
 * AJAX Improvements
 * Advanced query builder settings
@@ -163,35 +167,65 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ## Frequently Asked Questions ##
 
-### How to disable enqueued plugins (JS, CSS) on frontend ####
+### Does Visual Portfolio has documentation? ####
 
-[https://visualportfolio.co/documentation/developers/disable-enqueued-plugins-js-css/](https://visualportfolio.co/documentation/developers/disable-enqueued-plugins-js-css/)
+Yes, our plugin has documentation to easily get started with galleries. Read it here - [Visual Portfolio Documentation](https://visualportfolio.co/documentation/getting-started/)
 
-### How to use my custom taxonomy as filter ####
+### What themes does Visual Portfolio support? ####
 
-[https://visualportfolio.co/documentation/developers/custom-taxonomy-for-filter/](https://visualportfolio.co/documentation/developers/custom-taxonomy-for-filter/)
+Visual Portfolio has been tested with many WordPress themes and supports all major WordPress themes. Since we follow WordPress’ plugin development guidelines, you can rest assured that Visual Portfolio galleries will work perfectly, no matter what theme you use. If you’ve installed Visual Portfolio and are facing issues, it might not be because of a theme incompatibility. Please get in touch with the support team by opening a support ticket in our support forum, and we will fix it for you.
 
-### How to change default templates and styles ####
+### Do I have to remove other Gallery and Portfolio plugins if I install Visual Portfolio? ####
 
-[https://visualportfolio.co/documentation/developers/changing-default-templates-and-styles/](https://visualportfolio.co/documentation/developers/changing-default-templates-and-styles/)
+That is recommended. Visual Portfolio is designed to be an all in one Gallery and Portfolio plugin. If you use other Gallery plugins with Visual Portfolio on your website, not only will the performance of your website be negatively affected, but both plugins working together can produce unexpected conflicts or errors.
 
-### DEV: WP filters ####
+### Are the galleries mobile friendly? ####
 
-[https://visualportfolio.co/documentation/developers/wordpress-filters/](https://visualportfolio.co/documentation/developers/wordpress-filters/)
+Yes, Visual Portfolio built with mobile optimization in mind. It will automatically fit your screen size, so you don't need to worry about. Furthermore, we prepared lazy loading, which significantly increases page loading speed. Before making a decision, just check by yourself how [Visual Portfolio works on mobile devices](https://visualportfolio.co/masonry/).
 
-### DEV: Controls ####
+### Can I upload multiple images at once? ####
 
-[https://visualportfolio.co/documentation/developers/wordpress-filters/controls/](https://visualportfolio.co/documentation/developers/wordpress-filters/controls/)
+Yes, you can batch upload entire photo galleries at one time thanks to WordPress media library functionality.
 
-### DEV: jQuery events ####
+### Is there pagination for photo galleries? ####
 
-[https://visualportfolio.co/documentation/developers/jquery-events/](https://visualportfolio.co/documentation/developers/jquery-events/)
+Yes, you can use 3 type of pagination when displaying photo galleries or posts. Choose the number of photos to display and select Paged, Load More or Infinite Loading pagination. Examples with all gallery pagination types are [available on the Visual Portfolio website](https://visualportfolio.co/).
 
-### DEV: jQuery methods ####
+### Can I filter images and portfolio items by categories? ####
 
-[https://visualportfolio.co/documentation/developers/jquery-methods/](https://visualportfolio.co/documentation/developers/jquery-methods/)
+Yes, our plugin has built in support for AJAX Filter by items categories. See a couple of examples:
+
+* [Category filtering with links](https://visualportfolio.co/grid/)
+* [Category filtering + Sort with Select](https://visualportfolio.co/filterable-and-sortable/)
+
+### Can I add an external links to galleries? ####
+
+Yes, you can add external links to your gallery items.
+
+### Is Visual Portfolio developers friendly? ####
+
+Yes, we prepared a lot of filters and actions for developers, so you can easily extend default functionality for your need. [Read here more info for developers](https://visualportfolio.co/documentation/developers/).
+
+### Is Visual Portfolio translation ready? ####
+
+Yes, Visual Portfolio has full translation and localization support via the `visual-portfolio` textdomain. To submit a translation, see <https://translate.wordpress.org/projects/wp-plugins/visual-portfolio/>
+
+### More Information ####
+
+For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/).
 
 ## Changelog ##
+
+= 2.8.2 =
+
+* added option to change No Items notice
+* removed changing opacity of items while AJAX loading
+* fixed (finally!) wrong items position when used Default Items Style + Justified Layout
+* fixed wrong preview iframe URL on WP Multisite
+* fixed Ghost Kit animate on scroll extension compatibility <https://ghostkit.io/extensions/animate-on-scroll/>
+* fixed duplicates in popup gallery, when used carousel with loop
+* fixed preloader animation styles conflict with some themes
+* fixed PHP warning "non-numeric value encountered"
 
 = 2.8.1 =
 
@@ -566,7 +600,7 @@ Log:
 * added Pause on Mouse Over option in Slider with Autoplay
 * added Free Scroll Sticky option in Slider
 * added figure and figcaption tags in portfolio items in layouts
-* added 'author' supports to portfolio posts
+* added 'author' supports to portfolio posts to display in your galleries
 * added new jQuery events 'beforeInitIsotope', 'beforeInitFjGallery', 'beforeInitSwiper', so the options could be changed before plugins init
 * changed meta blocks top margin
 * fixed post-based custom taxonomy and specific posts selector saving in WordPress 5.1
@@ -679,7 +713,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 
 = 1.6.3 =
 
-* added portfolio preview iframe in Gutenberg block
+* added portfolio gallery preview iframe in Gutenberg block
 * changed portfolio default image sizes (since we use Lazyload, we can use larger image sizes)
 * updated FontAwesome to 5.2.0
 * fixed Slider styles when used 2 sliders on the page
@@ -688,7 +722,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 
 = 1.6.2 =
 
-* additional check for isotope and fjGallery existence
+* additional check for isotope and Flickr Justified Gallery existence
 * added init outside of 'ready' event (possible faster initialization)
 * fixed lazyload possible conflict with the 3rd-party themes/plugins
 
@@ -699,7 +733,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 = 1.6.0 =
 
 * NOTE: strongly recommend to regenerate thumbnails on your site using [this plugin](https://wordpress.org/plugins/regenerate-thumbnails/)
-* added lazy loading for images
+* added lazy loading for gallery images
 * added will-change styles in templates (animations should work smoother)
 * added new Tiles
 * added pagination paged arrows options
@@ -712,7 +746,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 * always enqueued main style on all pages
 * changed carousel arrows shadow
 * fixed validation errors (added space between data attributes)
-* fixed video popup position
+* fixed video popup gallery position
 * fixed portfolio bugged reload in preview
 * renamed nk-spinner to vp-spinner
 * removed double slash in custom theme template styles urls
@@ -720,11 +754,11 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 
 = 1.5.0 =
 
-* added Slider (+ Carousel, Coverflow) layout
+* added Slider (+ Carousel, Coverflow) layout gallery
 * added capabilities check when generated preview page
 * improved responsive calculation algorithm
 * disabled preview page caching by some popular caching plugins
-* fixed isotope newly loaded items jumping
+* fixed isotope newly loaded gallery items jumping
 * fixed conditions usage on controls in 3rd-party extensions
 * fixed PHP notices when trying to extend portfolio options
 * fixed Data source selected item (was always Post selected)
@@ -734,7 +768,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 
 = 1.4.3 =
 
-* added check for template existance before include it (to prevent errors when 3rd-party devs don't added templates)
+* added check for template existence before include it (to prevent errors when 3rd-party devs don't added templates)
 * fixed random order duplicates when used pagination
 * fixed errors in PHP < 5.5
 * disabled Infinite Load pagination in the Portfolio preview
@@ -757,13 +791,13 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 
 = 1.4.0 =
 
-* added Justified layout
+* added Justified gallery layout
 * added custom user images support in Content Source settings
 * added Gutenberg block to easily insert layouts
 * added Random order in Post-Based content source
 * added spinner to load more button
 * added setting to change portfolio slug
-* fixed video playing when popup were closed
+* fixed video playing when popup gallery were closed
 * fixed filter in post-based with taxonomies selected
 * fixed w3c validation error when enqueuing template styles
 * fixed specific posts selector ajax result
@@ -781,7 +815,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 * added possibility to change date format
 * added frontend WPBakery Page Builder support
 * added support for post ordering plugins (Intuitive Custom Post Order)
-* fixed popup video jumping
+* fixed popup video gallery jumping
 * fixed some php errors in preview
 * fixed photoswipe duplicates if on the page > 1 visual portfolio with popup gallery
 * fixed permalinks flush on activation and deactivation
@@ -799,7 +833,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 * added share button in popup gallery
 * added "Edit Portfolio Item" button in admin menu on frontend
 * added option to show filter items count
-* added option to show publised date in human format
+* added option to show published date in human format
 * added notice if no items found
 * added support for jetpack portfolio type filter
 * added portfolio tags support
