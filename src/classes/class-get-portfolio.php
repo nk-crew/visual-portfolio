@@ -1870,7 +1870,7 @@ class Visual_Portfolio_Get {
         );
 
         if ( $args['focal_point'] && ! empty( $args['focal_point'] ) ) {
-            $attrs['style'] = '--vp-images__object-position: ' . esc_attr( 100 * $args['focal_point']['x'] ) . '% ' . esc_attr( 100 * $args['focal_point']['y'] ) . '%;';
+            $attrs['style'] = '--vp-images__object-position: ' . esc_attr( 100 * floatval( $args['focal_point']['x'] ) ) . '% ' . esc_attr( 100 * floatval( $args['focal_point']['y'] ) ) . '%;';
         }
 
         $attrs        = apply_filters( 'vpf_each_item_tag_attrs', $attrs, $args );
