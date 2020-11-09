@@ -1291,13 +1291,15 @@ class Visual_Portfolio_Get {
 
                         // phpcs:ignore
                         $query_opts['tax_query'] = array(
-                            'relation' => $options['posts_taxonomies_relation'],
+                            // We save strings like 'or', 'and'
+                            // but to use it we need these strings in uppercase.
+                            'relation' => strtoupper( $options['posts_taxonomies_relation'] ),
                         );
 
                         // We need this empty array, because when taxonomy selected,
-                        // ant posts don't have this taxonomy, we will see all available posts.
+                        // and posts don't have this taxonomy, we will see all available posts.
                         // Related topic: https://wordpress.org/support/topic/exclude-certain-category-from-filter/.
-                        if ( 'OR' === $options['posts_taxonomies_relation'] ) {
+                        if ( 'OR' === $query_opts['tax_query']['relation'] ) {
                             $query_opts['tax_query'][] = array();
                         }
 
