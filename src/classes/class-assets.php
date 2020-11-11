@@ -594,8 +594,8 @@ class Visual_Portfolio_Assets {
                 'click_to_zoom'              => Visual_Portfolio_Settings::get_option( 'click_to_zoom', 'vp_popup_gallery' ),
             ),
 
-            // Screen sizes for responsive feature.
-            'screenSizes'          => array( 320, 576, 768, 992, 1200 ),
+            // Screen sizes (breakpoints) for responsive feature: xs, sm, md, lg, xl.
+            'screenSizes'          => Visual_Portfolio_Breakpoints::get_breakpoints(),
         );
 
         echo "<script type='text/javascript'>\n";
