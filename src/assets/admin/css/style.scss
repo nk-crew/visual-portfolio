@@ -400,6 +400,15 @@ $grid_sm: 600px !default;
                 display: block;
             }
         }
+
+        // Hide pro control info from individual breakpoint settings.
+        &.breakpoint_xs .vpf-settings-control-pro-label,
+        &.breakpoint_sm .vpf-settings-control-pro-label,
+        &.breakpoint_md .vpf-settings-control-pro-label,
+        &.breakpoint_lg .vpf-settings-control-pro-label,
+        &.breakpoint_xl .vpf-settings-control-pro-label {
+            display: none;
+        }
     }
 
     // Settings info PRO.
