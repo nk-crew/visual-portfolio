@@ -153,6 +153,8 @@ class Visual_Portfolio_Settings {
      * @return array settings fields
      */
     public static function get_settings_fields() {
+        $default_breakpoints = Visual_Portfolio_Breakpoints::get_default_breakpoints();
+
         $settings_fields = array(
             'vp_general' => array(
                 array(
@@ -187,6 +189,64 @@ class Visual_Portfolio_Settings {
                     'type'    => 'checkbox',
                     'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? 'off' : 'on',
                     'is_pro'  => true,
+                ),
+
+                // Breakpoints.
+                array(
+                    'name'        => 'xs_breakpoint',
+                    'label'       => esc_html__( 'Portrait phone breakpoint', '@@text_domain' ),
+                    'type'        => 'number',
+                    'min'         => '1',
+                    'max'         => (int) $default_breakpoints['sm'] - 1,
+                    'placeholder' => (string) $default_breakpoints['xs'],
+                    'default'     => (int) $default_breakpoints['xs'],
+                    'desc'        => esc_html__( 'Sets the breakpoint on portrait mobile devices. Below this breakpoint mobile layout will appear.', '@@text_domain' ),
+                    'is_pro'      => true,
+                ),
+                array(
+                    'name'        => 'sm_breakpoint',
+                    'label'       => esc_html__( 'Mobile breakpoint', '@@text_domain' ),
+                    'type'        => 'number',
+                    'min'         => (int) $default_breakpoints['xs'] + 1,
+                    'max'         => (int) $default_breakpoints['md'] - 1,
+                    'placeholder' => (string) $default_breakpoints['sm'],
+                    'default'     => (int) $default_breakpoints['sm'],
+                    'desc'        => esc_html__( 'Sets the breakpoint between portrait phone and mobile devices. Below this breakpoint mobile layout will appear.', '@@text_domain' ),
+                    'is_pro'      => true,
+                ),
+                array(
+                    'name'        => 'md_breakpoint',
+                    'label'       => esc_html__( 'Tablet breakpoint', '@@text_domain' ),
+                    'type'        => 'number',
+                    'min'         => (int) $default_breakpoints['sm'] + 1,
+                    'max'         => (int) $default_breakpoints['lg'] - 1,
+                    'placeholder' => (string) $default_breakpoints['md'],
+                    'default'     => (int) $default_breakpoints['md'],
+                    'desc'        => esc_html__( 'Sets the breakpoint between desktop and tablet devices. Below this breakpoint tablet layout will appear.', '@@text_domain' ),
+                    'is_pro'      => true,
+                ),
+                array(
+                    'name'        => 'lg_breakpoint',
+                    'label'       => esc_html__( 'Desktop breakpoint', '@@text_domain' ),
+                    'type'        => 'number',
+                    'min'         => (int) $default_breakpoints['md'] + 1,
+                    'max'         => (int) $default_breakpoints['xl'] - 1,
+                    'placeholder' => (string) $default_breakpoints['lg'],
+                    'default'     => (int) $default_breakpoints['lg'],
+                    'desc'        => esc_html__( 'Sets the breakpoint between extra large and desktop devices. Below this breakpoint desktop layout will appear.', '@@text_domain' ),
+                    'is_pro'      => true,
+                ),
+                array(
+                    'name'        => 'xl_breakpoint',
+                    'label'       => esc_html__( 'Large Desktop breakpoint', '@@text_domain' ),
+                    'type'        => 'number',
+                    'min'         => (int) $default_breakpoints['lg'] + 1,
+                    'max'         => 7000,
+                    'placeholder' => (string) $default_breakpoints['xl'],
+                    'default'     => (int) $default_breakpoints['xl'],
+                    'desc'        => esc_html__( 'Sets the breakpoint between extra large devices. Below this breakpoint large desktop layout will appear.', '@@text_domain' ),
+                    'is_pro'      => true,
+
                 ),
             ),
             'vp_images' => array(
