@@ -505,10 +505,11 @@ class Visual_Portfolio_Settings {
             (function( $ ) {
                 // update controls.
                 function updateControls() {
-                    // popup gallery.
-                    var vendor = $('tr.vendor select').val();
+                    // popup gallery settings.
+                    var $popupGalleryContainer = $('#vp_popup_gallery');
+                    var vendor = $popupGalleryContainer.find('tr.vendor select').val();
 
-                    $('tr.show_download_button, tr.show_slideshow, tr.show_thumbs')[ 'fancybox' === vendor ? 'show' : 'hide' ]();
+                    $popupGalleryContainer.find('tr.show_download_button, tr.show_slideshow, tr.show_thumbs')[ 'fancybox' === vendor ? 'show' : 'hide' ]();
                 }
 
                 updateControls();
