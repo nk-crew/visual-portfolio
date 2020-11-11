@@ -105,7 +105,7 @@ class Visual_Portfolio_Admin {
         // phpcs:ignore
         if ( 'visual_portfolio_go_pro' === $_GET['page'] ) {
             // phpcs:ignore
-            wp_redirect( 'https://visualportfolio.co/pro/' );
+            wp_redirect( 'https://visualportfolio.co/pro/?utm_source=freeplugin&utm_medium=link&utm_campaign=admin_page&utm_content=@@plugin_version' );
             exit();
         }
     }

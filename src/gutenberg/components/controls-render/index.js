@@ -462,7 +462,7 @@ ControlsRender.Control = function( props ) {
                 { renderControlHelp ? (
                     <p>{ renderControlHelp }</p>
                 ) : '' }
-                <ProNote.Button target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/">
+                <ProNote.Button target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&amp;utm_medium=link&amp;utm_campaign=block_settings&amp;utm_content=@@plugin_version">
                     { __( 'Read More', '@@text_domain' ) }
                 </ProNote.Button>
             </ProNote>

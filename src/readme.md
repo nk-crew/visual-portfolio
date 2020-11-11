@@ -19,9 +19,9 @@ We tried to make for you a convenient visual block editor for your gallery, port
 
 ### Links ###
 
-* [Live Demo](https://visualportfolio.co/)
-* [Visual Portfolio PRO](https://visualportfolio.co/pro/)
-* [Documentation](https://visualportfolio.co/documentation/getting-started/)
+* [Live Demo](https://visualportfolio.co/?utm_source=wporg&utm_medium=link&utm_campaign=demo)
+* [Visual Portfolio PRO](https://visualportfolio.co/pro/?utm_source=wporg&utm_medium=link&utm_campaign=pro)
+* [Documentation](https://visualportfolio.co/documentation/getting-started/?utm_source=wporg&utm_medium=link&utm_campaign=docs)
 * [GitHub](https://github.com/nk-o/visual-portfolio)
 
 ### Visual Gallery Builder ###
@@ -114,7 +114,7 @@ Visual Portfolio plugin is built keeping SEO and performance in mind by defining
 
 ### PRO ###
 
-The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [Learn more](https://visualportfolio.co/pro/).
+The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [Learn more](https://visualportfolio.co/pro/?utm_source=wporg&utm_medium=link&utm_campaign=pro).
 
 ### Some neat PRO features ###
 
@@ -143,7 +143,7 @@ The Visual Portfolio plugin is also available in a professional version which in
   * Twitch
   * Wistia
   * Self Hosted Videos
-* Find more features here - <https://visualportfolio.co/pro/>
+* Find more features here - <https://visualportfolio.co/pro/?utm_source=wporg&utm_medium=link&utm_campaign=pro>
 
 If you don't want any of the PRO features, but want to support us, this is the only way you may do it.
 

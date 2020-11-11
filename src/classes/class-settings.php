@@ -402,7 +402,7 @@ class Visual_Portfolio_Settings {
                             <h3>' . esc_html__( 'PRO Feature', '@@text_domain' ) . '</h3>
                             <div>
                                 <p>' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ) . '</p>
-                                <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
+                                <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&utm_medium=link&utm_campaign=plugin_settings&utm_content=@@plugin_version">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
                             </div>
                         </div>
                     ',
