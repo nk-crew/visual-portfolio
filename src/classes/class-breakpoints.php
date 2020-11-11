@@ -18,7 +18,7 @@ class Visual_Portfolio_Breakpoints {
      *
      * @var int
      */
-    private static $default_xs = 322;
+    private static $default_xs = 320;
 
     /**
      * Mobile Default Breakpoint.
