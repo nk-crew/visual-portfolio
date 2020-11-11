@@ -513,6 +513,11 @@ class Visual_Portfolio_Settings {
 
                 updateControls();
                 $('form').on('change', updateControls);
+
+                <?php if ( ! class_exists( 'Visual_Portfolio_Pro' ) ) : ?>
+                    // disable pro inputs.
+                    $('.vpf-settings-control-pro').find('input, textarea').attr('disabled', 'disabled');
+                <?php endif; ?>
             })(jQuery);
         </script>
         <?php
