@@ -515,6 +515,22 @@ class Visual_Portfolio_Settings {
                 updateControls();
                 $('form').on('change', updateControls);
 
+                // Don't allow adding input number values that > then max attribute and < min attribute.
+                $('form').on('input', '[type="number"]', function(e) {
+                    var current = parseFloat( this.value );
+                    var min = parseFloat(this.min);
+                    var max = parseFloat(this.max);
+
+                    if ('' !== this.value) {
+                        if (!Number.isNaN(min) && current < min) {
+                            this.value = min;
+                        }
+                        if (!Number.isNaN(max) && current > max) {
+                            this.value = max;
+                        }
+                    }
+                });
+
                 <?php if ( ! class_exists( 'Visual_Portfolio_Pro' ) ) : ?>
                     // disable pro inputs.
                     $('.vpf-settings-control-pro').find('input, textarea').attr('disabled', 'disabled');
