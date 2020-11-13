@@ -76,6 +76,7 @@ export default class BlockEdit extends Component {
                     setAttributes( {
                         setup_wizard: '',
                         items_count: -1,
+                        items_click_action: 'popup_gallery',
                     } );
                 }
                 break;
