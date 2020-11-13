@@ -243,21 +243,8 @@
 }
 
 // Loading
-.vp-portfolio.vp-portfolio__loading {
-    &::before {
-        content: "";
-        position: absolute;
-        display: block;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 1;
-    }
-
-    .vp-portfolio__layout-elements {
-        opacity: .5;
-    }
+.vp-portfolio.vp-portfolio__loading .vp-portfolio__layout-elements {
+    opacity: .5;
 }
 
 // Popup Galleries
