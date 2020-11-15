@@ -13,8 +13,6 @@ const {
     jQuery: $,
 } = window;
 
-const { isEqual } = window.lodash;
-
 const {
     registerBlockType,
     createBlock,
@@ -329,19 +327,14 @@ class UpdateEditor extends Component {
         }
 
         if ( isSavingPost || isAutosavingPost || ! this.defaultBlockData ) {
-            this.defaultBlockData = { ...blockData };
+            this.defaultBlockData = JSON.stringify( blockData );
             return;
         }
 
         clearTimeout( this.editorRefreshTimeout );
         this.editorRefreshTimeout = setTimeout( () => {
-            // isEqual can't determine that resorted objects are not equal.
-            const changedControls = this.defaultBlockData.controls
-                                    && blockData.controls
-                                    && ! isEqual( Object.keys( this.defaultBlockData.controls ), Object.keys( blockData.controls ) );
-
-            if ( changedControls || ! isEqual( this.defaultBlockData, blockData ) ) {
-                editPost( { edited: true } );
+            if ( this.defaultBlockData !== JSON.stringify( blockData ) ) {
+                editPost( { edited: new Date() } );
             }
         }, 150 );
     }
