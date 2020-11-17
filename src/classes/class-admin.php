@@ -310,7 +310,7 @@ class Visual_Portfolio_Admin {
                     'controls' => array(
                         array(
                             'type'    => 'range',
-                            'label'   => esc_html__( 'Row height', '@@text_domain' ),
+                            'label'   => esc_html__( 'Row Height', '@@text_domain' ),
                             'name'    => 'row_height',
                             'min'     => 100,
                             'max'     => 1000,
