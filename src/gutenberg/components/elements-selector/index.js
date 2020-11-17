@@ -96,7 +96,7 @@ function ElementsSelectorOptions( props ) {
             </button>
             { isOpen ? (
                 <Modal
-                    title={ __( 'Layout Items Settings', '@@text_domain' ) }
+                    title={ `${ options[ optionName ] ? options[ optionName ].title : optionName } ${ __( 'Settings', '@@text_domain' ) }` }
                     onRequestClose={ ( e ) => {
                         if ( e.relatedTarget && e.relatedTarget.classList && e.relatedTarget.classList.contains( 'media-modal' ) ) {
                             // Don't close modal if opened media modal.
