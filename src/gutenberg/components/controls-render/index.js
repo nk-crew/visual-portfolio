@@ -328,6 +328,7 @@ ControlsRender.Control = function( props ) {
                 <ToggleModal
                     modalTitle={ __( 'Custom CSS', '@@text_domain' ) }
                     buttonLabel={ __( 'Open in Modal', '@@text_domain' ) }
+                    size="md"
                 >
                     <BaseControl
                         label={ props.label }

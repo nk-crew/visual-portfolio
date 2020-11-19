@@ -1,0 +1,14 @@
+.vpf-component-modal {
+    @media (min-width: 600px) {
+        &.vpf-component-modal-size-md {
+            min-width: 600px;
+        }
+    }
+
+    // size
+    @media (min-width: 840px) {
+        &.vpf-component-modal-size-lg {
+            min-width: 800px;
+        }
+    }
+}

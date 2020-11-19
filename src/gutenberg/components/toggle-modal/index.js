@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames/dedupe';
+
+/**
  * WordPress dependencies
  */
 const {
@@ -28,6 +33,7 @@ export default class ToggleModal extends Component {
             children,
             modalTitle,
             buttonLabel,
+            size,
         } = this.props;
 
         const {
@@ -46,6 +52,7 @@ export default class ToggleModal extends Component {
                     <Modal
                         title={ modalTitle }
                         onRequestClose={ () => this.setState( { isOpened: ! isOpened } ) }
+                        className={ classnames( 'vpf-component-modal', size ? `vpf-component-modal-size-${ size }` : '' ) }
                     >
                         { children }
                     </Modal>
