@@ -1,11 +1,17 @@
-.vpf-control-wrap .components-base-control__help {
-    margin-top: 0;
-    margin-bottom: 0;
-    word-break: break-word;
-    opacity: .5;
-}
-.components-modal__content .vpf-control-wrap {
-    margin-bottom: 24px;
+.vpf-control-wrap {
+    .components-base-control__help {
+        margin-top: 0;
+        margin-bottom: 0;
+        word-break: break-word;
+        opacity: .5;
+    }
+    .components-base-control__label {
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+    .components-modal__content & {
+        margin-bottom: 24px;
+    }
 }
 
 .vpf-control-category-title-pro {
