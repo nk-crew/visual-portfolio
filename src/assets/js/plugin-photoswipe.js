@@ -165,19 +165,53 @@ if ( PhotoSwipe && VPPopupAPI ) {
                 {
                     id: 'facebook',
                     label: __.pswp_share_fb,
-                    url: 'https://www.facebook.com/sharer/sharer.php?u={{image_url}}',
+                    url: 'https://www.facebook.com/sharer/sharer.php?u={{url}}',
                 },
                 {
                     id: 'twitter',
                     label: __.pswp_share_tw,
-                    url: 'https://twitter.com/intent/tweet?text={{text}}&url={{image_url}}',
+                    url: 'https://twitter.com/intent/tweet?text={{text}}&url={{url}}',
                 },
                 {
                     id: 'pinterest',
                     label: __.pswp_share_pin,
-                    url: 'https://www.pinterest.com/pin/create/button/?url={{image_url}}&media={{image_url}}&description={{text}}',
+                    url: 'https://www.pinterest.com/pin/create/button/?url={{url}}&media={{image_url}}&description={{text}}',
                 },
             ],
+            getImageURLForShare() {
+                const currentItem = items[ pswpInstance.getCurrentIndex() ];
+
+                if ( 'image' === currentItem.type && currentItem.src ) {
+                    return currentItem.src;
+                }
+
+                return pswpInstance.currItem.src || '';
+            },
+            getPageURLForShare() {
+                const currentItem = items[ pswpInstance.getCurrentIndex() ];
+
+                if ( 'image' === currentItem.type && currentItem.src ) {
+                    return currentItem.src;
+                }
+
+                return window.location.href;
+            },
+            getTextForShare() {
+                const currentItem = items[ pswpInstance.getCurrentIndex() ];
+
+                if ( currentItem.caption ) {
+                    const $caption = $( currentItem.caption );
+
+                    if ( $caption.filter( '.vp-portfolio__item-popup-title' ).length ) {
+                        return $caption.filter( '.vp-portfolio__item-popup-title' ).text();
+                    }
+                    if ( $caption.filter( '.vp-portfolio__item-popup-description' ).length ) {
+                        return $caption.filter( '.vp-portfolio__item-popup-description' ).text();
+                    }
+                }
+
+                return '';
+            },
             bgOpacity: 1,
             tapToClose: false,
             tapToToggleControls: true,
