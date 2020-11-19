@@ -1525,10 +1525,45 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category' => 'content-source-additional',
-                'type'     => 'text',
-                'label'    => esc_html__( 'No Items Notice', '@@text_domain' ),
-                'name'     => 'no_items_notice',
-                'default'  => esc_html__( 'No items were found matching your selection.', '@@text_domain' ),
+                'type'     => 'buttons',
+                'label'    => esc_html__( 'No Items Action', '@@text_domain' ),
+                'name'     => 'no_items_action',
+                'default'  => 'notice',
+                'options'  => array(
+                    'notice' => esc_html__( 'Notice', '@@text_domain' ),
+                    'hide'   => esc_html__( 'Hide', '@@text_domain' ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'content-source-additional',
+                'type'        => 'text',
+                'placeholder' => esc_html__( 'Notice', '@@text_domain' ),
+                'name'        => 'no_items_notice',
+                'default'     => esc_html__( 'No items were found matching your selection.', '@@text_domain' ),
+                'condition'   => array(
+                    array(
+                        'control'  => 'no_items_action',
+                        'operator' => '===',
+                        'value'    => 'notice',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'content-source-additional',
+                'type'        => 'html',
+                'description' => esc_html__( 'Note: you will see the notice in the preview. Block will be hidden in the site frontend.', '@@text_domain' ),
+                'name'        => 'no_items_action_hide_info',
+                'condition'   => array(
+                    array(
+                        'control'  => 'no_items_action',
+                        'operator' => '===',
+                        'value'    => 'hide',
+                    ),
+                ),
             )
         );
 

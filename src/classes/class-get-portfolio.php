@@ -334,9 +334,18 @@ class Visual_Portfolio_Get {
         $options['max_pages']     = $max_pages;
         $options['next_page_url'] = $next_page_url;
 
+        $is_preview = self::is_preview();
+
         // No items found.
         if ( ( ( $is_social || $is_images ) && empty( $query_opts['images'] ) ) || isset( $portfolio_query ) && ! $portfolio_query->have_posts() ) {
+
+            // Don't display any output if no items found (works on frontend only).
+            if ( ! $is_preview && 'notice' !== $options['no_items_action'] ) {
+                return '';
+            }
+
             ob_start();
+
             $class .= ' vp-portfolio-not-found';
 
             ?>
@@ -355,7 +364,6 @@ class Visual_Portfolio_Get {
         ob_start();
 
         // prepare data-attributes.
-        $is_preview = self::is_preview();
         $data_attrs = array(
             'data-vp-layout'             => $options['layout'],
             'data-vp-items-style'        => $options['items_style'],
