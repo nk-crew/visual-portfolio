@@ -162,13 +162,20 @@ if ( PhotoSwipe && VPPopupAPI ) {
             counterEl: settingsPopupGallery.show_counter,
             arrowEl: settingsPopupGallery.show_arrows,
             shareButtons: [
-                { id: 'facebook', label: __.pswp_share_fb, url: 'https://www.facebook.com/sharer/sharer.php?u={{url}}' },
-                { id: 'twitter', label: __.pswp_share_tw, url: 'https://twitter.com/intent/tweet?text={{text}}&url={{url}}' },
+                {
+                    id: 'facebook',
+                    label: __.pswp_share_fb,
+                    url: 'https://www.facebook.com/sharer/sharer.php?u={{image_url}}',
+                },
+                {
+                    id: 'twitter',
+                    label: __.pswp_share_tw,
+                    url: 'https://twitter.com/intent/tweet?text={{text}}&url={{image_url}}',
+                },
                 {
                     id: 'pinterest',
                     label: __.pswp_share_pin,
-                    url: 'https://www.pinterest.com/pin/create/button/'
-                    + '?url={{url}}&media={{image_url}}&description={{text}}',
+                    url: 'https://www.pinterest.com/pin/create/button/?url={{image_url}}&media={{image_url}}&description={{text}}',
                 },
             ],
             bgOpacity: 1,
