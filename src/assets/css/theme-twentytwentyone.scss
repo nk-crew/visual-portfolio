@@ -1,0 +1,15 @@
+// Fix headings margin.
+.entry-content .vp-portfolio__item-meta-title {
+    margin-top: 0;
+}
+
+// Fix caption margin.
+.vp-portfolio__item figcaption {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+// Fix preview background color.
+.vp-preview-body {
+    background: none;
+}
