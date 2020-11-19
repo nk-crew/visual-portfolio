@@ -457,6 +457,7 @@ class Visual_Portfolio_Settings {
                     'type'    => 'textarea',
                     'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? '' : '
 .vp-popup-iframe #site-header,
+.vp-popup-iframe #masthead,
 .vp-popup-iframe #site-footer,
 .vp-popup-iframe #colophon {
     display: none;
