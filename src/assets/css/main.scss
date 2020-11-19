@@ -7,6 +7,7 @@
     position: relative;
     box-sizing: border-box;
     min-height: var(--vp-wrap__min-height);
+    overflow-wrap: break-word;
 
     *,
     *::before,
