@@ -117,7 +117,6 @@ class Visual_Portfolio_Preview {
         // Elementor preview.
         if ( ! $frame && ! $id && isset( $_REQUEST['vp_preview_type'] ) && 'elementor' === $_REQUEST['vp_preview_type'] ) {
             $frame = isset( $_REQUEST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_REQUEST['vp_preview_frame'] ) ) : false;
-            $id    = isset( $_REQUEST['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_REQUEST['vp_preview_frame_id'] ) ) : false;
         }
         // phpcs:enable
 
