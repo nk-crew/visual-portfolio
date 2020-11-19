@@ -269,10 +269,6 @@ if ( PhotoSwipe && VPPopupAPI ) {
             return;
         }
 
-        if ( self ) {
-            self.emitEvent( 'beforeInitPhotoSwipe', [ options, finalItems, index ] );
-        }
-
         // Pass data to PhotoSwipe and initialize it
         pswpInstance = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, finalItems, options );
 
@@ -397,6 +393,10 @@ if ( PhotoSwipe && VPPopupAPI ) {
 
             pswpInstance = false;
         } );
+
+        if ( self ) {
+            self.emitEvent( 'beforeInitPhotoSwipe', [ options, finalItems, index, pswpInstance ] );
+        }
 
         pswpInstance.init();
 
