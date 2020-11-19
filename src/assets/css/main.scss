@@ -13,6 +13,12 @@
     *::after {
         box-sizing: inherit;
     }
+
+    // Fixes Swiper box-sizing conflict.
+    // https://github.com/nk-o/visual-portfolio/issues/147
+    .swiper-wrapper {
+        box-sizing: inherit;
+    }
 }
 .vp-portfolio__items {
     transition: var(--vp-transition-duration) height var(--vp-transition-easing), var(--vp-transition-duration) transform var(--vp-transition-easing);
@@ -299,7 +305,6 @@ img.vp-lazyload {
 .vp-spinner {
     position: relative;
     display: block;
-    box-sizing: border-box;
     width: var(--vp-spinner__size);
     height: var(--vp-spinner__size);
     text-indent: -9999em;
