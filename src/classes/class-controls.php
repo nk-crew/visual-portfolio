@@ -240,7 +240,7 @@ class Visual_Portfolio_Controls {
             $result[ $k ] = apply_filters( 'vpf_print_layout_control_args', $result[ $k ] );
         }
 
-        self::$cached_all_registered_controls = $result;
+        self::$cached_all_registered_controls = apply_filters( 'vpf_registered_controls', $result );
 
         return self::$cached_all_registered_controls;
     }
