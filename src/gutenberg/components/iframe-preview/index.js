@@ -53,6 +53,7 @@ class IframePreview extends Component {
         this.state = {
             loading: true,
             uniqueId: `vpf-preview-${ uniqueIdCount }`,
+            latestIframeHeight: 0,
         };
 
         uniqueIdCount += 1;
@@ -215,8 +216,15 @@ class IframePreview extends Component {
     }
 
     maybeReload() {
+        let latestIframeHeight = 0;
+
+        if ( this.frameRef.current ) {
+            latestIframeHeight = this.frameRef.current.scrollHeight;
+        }
+
         this.setState( {
             loading: true,
+            latestIframeHeight,
         } );
         this.formRef.current.submit();
     }
@@ -291,6 +299,7 @@ class IframePreview extends Component {
         const {
             loading,
             uniqueId,
+            latestIframeHeight,
         } = this.state;
 
         const {
@@ -299,10 +308,12 @@ class IframePreview extends Component {
         } = attributes;
 
         return (
-            <div className={ classnames(
-                'visual-portfolio-gutenberg-preview',
-                loading ? 'visual-portfolio-gutenberg-preview-loading' : ''
-            ) }
+            <div
+                className={ classnames(
+                    'visual-portfolio-gutenberg-preview',
+                    loading ? 'visual-portfolio-gutenberg-preview-loading' : ''
+                ) }
+                style={ loading ? { minHeight: latestIframeHeight } : {} }
             >
                 <div className="visual-portfolio-gutenberg-preview-inner">
                     <form
