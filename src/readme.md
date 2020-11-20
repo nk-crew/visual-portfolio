@@ -13,7 +13,7 @@ Modern gallery and portfolio plugin with advanced layouts editor. Clean and powe
 
 ## Description ##
 
-Create beautiful, clean, and powerful photo galleries and portfolio layouts using the Visual Portfolio plugin. It is easy for simple photo galleries, but powerful enough for professionals. Whether you're a photographer, agency, or anything in between, Visual Portfolio will boost your online presence.
+Create beautiful, clean, and powerful photo galleries and portfolio layouts using the Visual Portfolio gallery plugin. It is easy for simple photo galleries, but powerful enough for professionals. Whether you're a photographer, agency, or anything in between, Visual Portfolio will boost your online presence.
 
 We tried to make for you a convenient visual block editor for your gallery, portfolio, or any custom post type with support to various layouts such as Masonry, Justified, Tiles, Grid, and Carousel.
 
@@ -26,7 +26,7 @@ We tried to make for you a convenient visual block editor for your gallery, port
 
 ### Visual Gallery Builder ###
 
-Build your portfolio and galleries with no coding knowledge. Thanks to Gutenberg page builder you are able to create and customize galleries visually.
+Build your portfolio and gallery blocks with no coding knowledge. Thanks to Gutenberg page builder you are able to create and customize galleries visually.
 
 ### Optimized to be Fast as Native ###
 
@@ -130,6 +130,7 @@ The Visual Portfolio plugin is also available in a professional version which in
   * Hover Tilt Effect
   * Custom Hover Image (useful for animated GIFs)
   * Caption Move Style
+* Responsive Breakpoints settings
 * Instagram-like image filters for normal and hover states
 * AJAX Improvements
 * Advanced query builder settings
@@ -215,6 +216,24 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/).
 
 ## Changelog ##
+
+= 2.9.0 =
+
+* improved plugin documentation <https://visualportfolio.co/documentation/getting-started/>. Added more pages with detailed descriptions
+* added Breakpoints settings in Pro plugin to control responsive screen sizes, on which responsive features stack
+* added option to completely hide the block if no items found
+* updated WPBakery shortcode icon
+* allow pointer events while AJAX loading
+* automatically enable popup gallery, when select Images source in Setup Wizard
+* changed Custom CSS modal size
+* changed PhotoSwipe share URLs (share actual image urls)
+* fixed linear loading time decrease, when adding more blocks on the page
+* fixed custom query with selected taxonomy displaying all available posts, when taxonomy posts doesn't exist
+* fixed layout elements modal labels
+* fixed Swiper and items styles displaying scrollbars in Safari
+* fixed Saved Layout disabled Update button
+* fixed preloader icon w3c validator errors
+* minor changes
 
 = 2.8.2 =
 
