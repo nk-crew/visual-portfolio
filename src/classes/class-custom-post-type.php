@@ -405,7 +405,10 @@ class Visual_Portfolio_Custom_Post_Type {
                 ?>
             </p>
             <p>
-                <?php echo esc_html__( 'Saved Layouts may be only used for 3rd-party builders only (such as Elementor, WPBakery Page Builder, etc). Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', '@@text_domain' ); ?>
+                <?php
+                // translators: %s - url to documentation.
+                echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders only (such as Elementor, WPBakery Page Builder, etc), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', '@@text_domain' ), 'https://visualportfolio.co/documentation/saved-layouts-and-shortcodes/' ) );
+                ?>
             </p>
         </div>
         <?php
