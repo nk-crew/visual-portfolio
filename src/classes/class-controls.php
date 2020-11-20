@@ -28,6 +28,13 @@ class Visual_Portfolio_Controls {
     private static $registered_fields = array();
 
     /**
+     * Cached all registered controls.
+     *
+     * @var array
+     */
+    private static $cached_all_registered_controls = array();
+
+    /**
      * Default control args.
      *
      * @var array
@@ -191,6 +198,11 @@ class Visual_Portfolio_Controls {
      * @return array
      */
     public static function get_registered_array() {
+        // Return cached version of all controls.
+        if ( ! empty( self::$cached_all_registered_controls ) ) {
+            return self::$cached_all_registered_controls;
+        }
+
         $result = array();
 
         foreach ( self::$registered_fields as $k => $args ) {
@@ -228,7 +240,9 @@ class Visual_Portfolio_Controls {
             $result[ $k ] = apply_filters( 'vpf_print_layout_control_args', $result[ $k ] );
         }
 
-        return $result;
+        self::$cached_all_registered_controls = $result;
+
+        return self::$cached_all_registered_controls;
     }
 
     /**
