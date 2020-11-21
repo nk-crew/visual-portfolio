@@ -129,7 +129,7 @@ class Visual_Portfolio_Images {
         }
 
         if ( $lazyload ) {
-            $noscript = apply_filters( 'vpf_wp_get_attachment_image_extend', false, $attachment_id, $size, $attr, false );
+            $noscript = apply_filters( 'vpf_wp_get_attachment_image', false, $attachment_id, $size, $attr, false );
 
             if ( ! $noscript ) {
                 $noscript = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
@@ -144,7 +144,7 @@ class Visual_Portfolio_Images {
             self::$image_processing = true;
         }
 
-        $image = apply_filters( 'vpf_wp_get_attachment_image_extend', false, $attachment_id, $size, $attr, $lazyload );
+        $image = apply_filters( 'vpf_wp_get_attachment_image', false, $attachment_id, $size, $attr, $lazyload );
 
         if ( ! $image ) {
             $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );

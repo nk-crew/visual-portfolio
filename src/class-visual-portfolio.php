@@ -165,6 +165,9 @@ class Visual_Portfolio {
      * Include dependencies
      */
     private function include_dependencies() {
+        // Deprecations run before all features.
+        require_once $this->plugin_path . 'classes/class-deprecated.php';
+
         require_once $this->plugin_path . 'gutenberg/utils/control-condition-check/index.php';
         require_once $this->plugin_path . 'gutenberg/utils/control-get-value/index.php';
         require_once $this->plugin_path . 'gutenberg/utils/controls-dynamic-css/index.php';
@@ -188,6 +191,8 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-supported-themes.php';
         require_once $this->plugin_path . 'classes/class-breakpoints.php';
         require_once $this->plugin_path . 'classes/class-wpml.php';
+
+        // Migration run after all features.
         require_once $this->plugin_path . 'classes/class-migration.php';
     }
 

@@ -1932,7 +1932,7 @@ class Visual_Portfolio_Get {
                         $img_sm_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_sm_popup'] );
 
                         $popup_image = apply_filters(
-                            'vpf_extend_popup_image',
+                            'vpf_popup_image_data',
                             array(
                                 'id'          => $args['image_id'],
                                 'title'       => $attachment->post_title,
@@ -1952,7 +1952,7 @@ class Visual_Portfolio_Get {
                             )
                         );
                     } elseif ( $args['image_id'] ) {
-                        $popup_image = apply_filters( 'vpf_extend_custom_popup_image', false, $args['image_id'] );
+                        $popup_image = apply_filters( 'vpf_popup_custom_image_data', false, $args['image_id'] );
                     }
                 }
             }
@@ -1998,7 +1998,7 @@ class Visual_Portfolio_Get {
         }
 
         $popup_output = ob_get_clean();
-        $popup_output = apply_filters( 'vpf_print_popup_data', $popup_output, $args );
+        $popup_output = apply_filters( 'vpf_popup_output', $popup_output, $args );
 
         // phpcs:ignore
         echo $popup_output;

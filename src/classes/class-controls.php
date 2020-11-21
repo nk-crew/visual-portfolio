@@ -240,7 +240,7 @@ class Visual_Portfolio_Controls {
                 $result[ $k ]['image_controls'] = $img_controls;
             }
 
-            $result[ $k ] = apply_filters( 'vpf_print_layout_control_args', $result[ $k ] );
+            $result[ $k ] = apply_filters( 'vpf_registered_control_args', $result[ $k ] );
         }
 
         self::$cached_all_registered_controls = apply_filters( 'vpf_registered_controls', $result );
@@ -288,7 +288,7 @@ class Visual_Portfolio_Controls {
         }
 
         // filter.
-        $result = apply_filters( 'vpf_get_layout_option', $result, $name, $post_id );
+        $result = apply_filters( 'vpf_control_value', $result, $name, $post_id );
 
         // fix for gallery array.
         if ( isset( $registered_data['type'] ) && 'gallery' === $registered_data['type'] ) {

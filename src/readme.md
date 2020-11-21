@@ -680,7 +680,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 * added Menu Order in post based source
 * added Mask property in control styles (for developers)
 * added filters to extend default controls for layouts, items styles, filters and paginations
-* added filter for control arguments `vpf_print_layout_control_args` (developers may change controls settings in layouts editor)
+* added filter for control arguments `vpf_registered_control_args` (developers may change controls settings in layouts editor)
 * changed condition script for settings in layout editor, should improve performance
 * changed popup gallery z-index to 1500 (like in WooCommerce)
 * changed initialization method to Mutation Observers (portfolio will init automatically after ajax load)
