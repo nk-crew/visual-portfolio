@@ -144,7 +144,7 @@ The Visual Portfolio plugin is also available in a professional version which in
   * Twitch
   * Wistia
   * Self Hosted Videos
-* Find more features here - <https://visualportfolio.co/pro/?utm_source=wporg&utm_medium=link&utm_campaign=pro>
+* Find more portfolio and gallery features here - <https://visualportfolio.co/pro/?utm_source=wporg&utm_medium=link&utm_campaign=pro>
 
 If you don't want any of the PRO features, but want to support us, this is the only way you may do it.
 

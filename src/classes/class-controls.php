@@ -88,6 +88,9 @@ class Visual_Portfolio_Controls {
         // display in setup wizard.
         'setup_wizard'     => false,
 
+        // support for WPML.
+        'wpml'             => false,
+
         // condition.
         'condition'        => array(
             /**

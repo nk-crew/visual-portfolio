@@ -25,24 +25,9 @@
         </gutenberg-block>
     </gutenberg-blocks>
 
-	<custom-fields>
-		<custom-field action="translate">vp_no_items_notice</custom-field>
-		<custom-field action="translate">vp_items_style_default__date_format</custom-field>
-		<custom-field action="translate">vp_items_style_default__read_more_label</custom-field>
-		<custom-field action="translate">vp_items_style_fade__date_format</custom-field>
-		<custom-field action="translate">vp_items_style_fly__date_format</custom-field>
-		<custom-field action="translate">vp_items_style_emerge__date_format</custom-field>
-		<custom-field action="translate">vp_filter_text_all</custom-field>
-		<custom-field action="translate">vp_pagination_infinite_text_load</custom-field>
-		<custom-field action="translate">vp_pagination_infinite_text_loading</custom-field>
-		<custom-field action="translate">vp_pagination_infinite_text_end_list</custom-field>
-		<custom-field action="translate">vp_pagination_load_more_text_load</custom-field>
-		<custom-field action="translate">vp_pagination_load_more_text_loading</custom-field>
-		<custom-field action="translate">vp_pagination_load_more_text_end_list</custom-field>
-    </custom-fields>
-
     <custom-types>
         <custom-type translate="1">portfolio</custom-type>
+        <custom-type translate="1">vp_lists</custom-type>
     </custom-types>
     <taxonomies>
         <taxonomy translate="1">portfolio_category</taxonomy>

@@ -186,8 +186,9 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-vc.php';
         require_once $this->plugin_path . 'classes/class-elementor.php';
         require_once $this->plugin_path . 'classes/class-supported-themes.php';
-        require_once $this->plugin_path . 'classes/class-migration.php';
         require_once $this->plugin_path . 'classes/class-breakpoints.php';
+        require_once $this->plugin_path . 'classes/class-wpml.php';
+        require_once $this->plugin_path . 'classes/class-migration.php';
     }
 
     /**

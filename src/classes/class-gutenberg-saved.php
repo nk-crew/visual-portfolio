@@ -92,6 +92,10 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
             return '';
         }
 
+        // WPML support.
+        // phpcs:ignore
+        $attributes['id'] = apply_filters( 'wpml_object_id', $attributes['id'], 'vp_lists', true );
+
         $class_name = 'wp-block-visual-portfolio';
 
         if ( $attributes['align'] ) {

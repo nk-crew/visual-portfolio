@@ -684,6 +684,7 @@ class Visual_Portfolio_Admin {
                             'default'     => 'Read More',
                             'hint'        => esc_attr__( 'Read More Button Label', '@@text_domain' ),
                             'hint_place'  => 'left',
+                            'wpml'        => true,
                             'condition'   => array(
                                 array(
                                     'control'  => 'show_read_more',
@@ -1350,6 +1351,7 @@ class Visual_Portfolio_Admin {
                 'category'        => 'content-source-images',
                 'type'            => 'gallery',
                 'name'            => 'images',
+                'wpml'            => true,
                 'setup_wizard'    => true,
                 'focal_point'     => true,
                 'image_controls'  => array(
@@ -1542,6 +1544,7 @@ class Visual_Portfolio_Admin {
                 'placeholder' => esc_html__( 'Notice', '@@text_domain' ),
                 'name'        => 'no_items_notice',
                 'default'     => esc_html__( 'No items were found matching your selection.', '@@text_domain' ),
+                'wpml'        => true,
                 'condition'   => array(
                     array(
                         'control'  => 'no_items_action',
@@ -1822,6 +1825,7 @@ class Visual_Portfolio_Admin {
                                 'default'     => 'F j, Y',
                                 'hint'        => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
                                 'hint_place'  => 'left',
+                                'wpml'        => true,
                                 'condition'   => array(
                                     array(
                                         'control' => 'show_date',
@@ -2282,11 +2286,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category'  => 'filter',
-                'type'      => 'text',
-                'label'     => esc_html__( 'All Button Text', '@@text_domain' ),
-                'name'      => 'filter_text_all',
-                'default'   => esc_attr__( 'All', '@@text_domain' ),
+                'category' => 'filter',
+                'type'     => 'text',
+                'label'    => esc_html__( 'All Button Text', '@@text_domain' ),
+                'name'     => 'filter_text_all',
+                'default'  => esc_attr__( 'All', '@@text_domain' ),
+                'wpml'     => true,
             )
         );
 
@@ -2590,6 +2595,7 @@ class Visual_Portfolio_Admin {
                 'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
+                'wpml'        => true,
                 'condition'   => array(
                     array(
                         'control'  => 'pagination',
@@ -2608,6 +2614,7 @@ class Visual_Portfolio_Admin {
                 'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
+                'wpml'        => true,
                 'condition'   => array(
                     array(
                         'control'  => 'pagination',
@@ -2626,6 +2633,7 @@ class Visual_Portfolio_Admin {
                 'placeholder' => esc_attr__( 'End of the list text', '@@text_domain' ),
                 'hint'        => esc_attr__( 'End of the list text', '@@text_domain' ),
                 'hint_place'  => 'left',
+                'wpml'        => true,
                 'condition'   => array(
                     array(
                         'control'  => 'pagination',
@@ -2644,6 +2652,7 @@ class Visual_Portfolio_Admin {
                 'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
+                'wpml'        => true,
                 'condition'   => array(
                     array(
                         'control'  => 'pagination',
@@ -2662,6 +2671,7 @@ class Visual_Portfolio_Admin {
                 'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'hint_place'  => 'left',
+                'wpml'        => true,
                 'condition'   => array(
                     array(
                         'control'  => 'pagination',
@@ -2680,6 +2690,7 @@ class Visual_Portfolio_Admin {
                 'placeholder' => esc_attr__( 'End of the list text', '@@text_domain' ),
                 'hint'        => esc_attr__( 'End of the list text', '@@text_domain' ),
                 'hint_place'  => 'left',
+                'wpml'        => true,
                 'condition'   => array(
                     array(
                         'control'  => 'pagination',
