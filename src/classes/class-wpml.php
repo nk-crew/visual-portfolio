@@ -45,12 +45,22 @@ class Visual_Portfolio_WPML {
         foreach ( $controls as $control ) {
             $name = 'vp_' . $control['name'];
 
+            // Create initial arrays.
+            if ( ! isset( $iclTranslationManagement->settings['custom_fields_translation'] ) ) {
+                $iclTranslationManagement->settings['custom_fields_translation'] = array();
+            }
+            if ( ! isset( $iclTranslationManagement->settings['custom_fields_readonly_config'] ) ) {
+                $iclTranslationManagement->settings['custom_fields_readonly_config'] = array();
+            }
+
+            // Add fields translation.
             if ( ! isset( $iclTranslationManagement->settings['custom_fields_translation'][ $name ] ) ) {
                 $iclTranslationManagement->settings['custom_fields_translation'][ $name ] = $control['wpml'] ? WPML_TRANSLATE_CUSTOM_FIELD : WPML_COPY_CUSTOM_FIELD;
 
                 $allow_save = true;
             }
 
+            // Add fields read only.
             if ( ! in_array( $name, $iclTranslationManagement->settings['custom_fields_readonly_config'], true ) ) {
                 $iclTranslationManagement->settings['custom_fields_readonly_config'][] = $name;
 
