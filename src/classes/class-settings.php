@@ -367,7 +367,7 @@ class Visual_Portfolio_Settings {
                 array(
                     'name'    => 'deep_linking',
                     'label'   => esc_html__( 'Deep Linking', '@@text_domain' ),
-                    'desc'    => esc_html__( 'Makes URL automatically change when you open popup and you can easily link to specific popup image.', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Makes URL automatically change to reflect the current opened popup, and you can easily link directly to that image or video.', '@@text_domain' ),
                     'type'    => 'checkbox',
                     'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? 'off' : 'on',
                     'is_pro'  => true,

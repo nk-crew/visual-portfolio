@@ -1438,7 +1438,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'      => 'content-source-images',
                 'type'          => 'select',
-                'label'         => esc_html__( 'Titles', '@@text_domain' ),
+                'label'         => esc_html__( 'Titles Source', '@@text_domain' ),
                 'name'          => 'images_titles_source',
                 'default'       => 'custom',
                 'options'       => array(
@@ -1455,7 +1455,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'      => 'content-source-images',
                 'type'          => 'select',
-                'label'         => esc_html__( 'Descriptions', '@@text_domain' ),
+                'label'         => esc_html__( 'Descriptions Source', '@@text_domain' ),
                 'name'          => 'images_descriptions_source',
                 'default'       => 'custom',
                 'options'       => array(
@@ -2034,7 +2034,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'items-click-action',
                 'type'      => 'select',
-                'label'     => esc_html__( 'Title', '@@text_domain' ),
+                'label'     => esc_html__( 'Title Source', '@@text_domain' ),
                 'name'      => 'items_click_action_popup_title_source',
                 'default'   => 'title',
                 'options'   => array(
@@ -2056,7 +2056,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'  => 'items-click-action',
                 'type'      => 'select',
-                'label'     => esc_html__( 'Description', '@@text_domain' ),
+                'label'     => esc_html__( 'Description Source', '@@text_domain' ),
                 'name'      => 'items_click_action_popup_description_source',
                 'default'   => 'description',
                 'options'   => array(
