@@ -171,6 +171,7 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'gutenberg/utils/control-condition-check/index.php';
         require_once $this->plugin_path . 'gutenberg/utils/control-get-value/index.php';
         require_once $this->plugin_path . 'gutenberg/utils/controls-dynamic-css/index.php';
+        require_once $this->plugin_path . 'classes/class-templates.php';
         require_once $this->plugin_path . 'classes/class-parse-blocks.php';
         require_once $this->plugin_path . 'classes/class-assets.php';
         require_once $this->plugin_path . 'classes/class-images.php';
@@ -203,56 +204,18 @@ class Visual_Portfolio {
      * @param array  $args args for template.
      */
     public function include_template( $template_name, $args = array() ) {
-        if ( ! empty( $args ) && is_array( $args ) ) {
-	        // phpcs:ignore
-            extract( $args );
-        }
-
-        // template in theme folder.
-        $template = locate_template( array( '/visual-portfolio/' . $template_name . '.php' ) );
-
-        // pro plugin template.
-        if ( ! $template && $this->pro_plugin_path && file_exists( $this->pro_plugin_path . 'templates/' . $template_name . '.php' ) ) {
-            $template = $this->pro_plugin_path . 'templates/' . $template_name . '.php';
-        }
-
-        // default template.
-        if ( ! $template ) {
-            $template = $this->plugin_path . 'templates/' . $template_name . '.php';
-        }
-
-        // Allow 3rd party plugin filter template file from their plugin.
-        $template = apply_filters( 'vpf_include_template', $template, $template_name, $args );
-
-        if ( file_exists( $template ) ) {
-            include $template;
-        }
+        Visual_Portfolio_Templates::include_template( $template_name, $args );
     }
 
     /**
      * Find css template file
      *
      * @param string $template_name file name.
+     *
      * @return string
      */
     public function find_template_styles( $template_name ) {
-        $template = '';
-
-        if ( file_exists( get_stylesheet_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
-            // Child Theme (or just theme).
-            $template = trailingslashit( get_stylesheet_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
-        } elseif ( file_exists( get_template_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
-            // Parent Theme (when parent exists).
-            $template = trailingslashit( get_template_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
-        } elseif ( $this->pro_plugin_path && file_exists( $this->pro_plugin_path . 'templates/' . $template_name . '.css' ) ) {
-            // PRO plugin folder.
-            $template = $this->pro_plugin_url . 'templates/' . $template_name . '.css';
-        } elseif ( file_exists( $this->plugin_path . 'templates/' . $template_name . '.css' ) ) {
-            // Default file in plugin folder.
-            $template = $this->plugin_url . 'templates/' . $template_name . '.css';
-        }
-
-        return $template;
+        return Visual_Portfolio_Templates::find_template_styles( $template_name );
     }
 
     /**
@@ -265,26 +228,7 @@ class Visual_Portfolio {
      * @param string           $media media string.
      */
     public function include_template_style( $handle, $template_name, $deps = array(), $ver = false, $media = 'all' ) {
-        $template = $this->find_template_styles( $template_name );
-        $is_min   = false;
-
-        // maybe find minified style.
-        if ( ! $template ) {
-            $template = $this->find_template_styles( $template_name . '.min' );
-            $is_min   = true;
-        }
-
-        // Allow 3rd party plugin filter template file from their plugin.
-        $template = apply_filters( 'vpf_include_template_style', $template, $template_name, $deps, $ver, $media );
-
-        if ( $template ) {
-            wp_enqueue_style( $handle, $template, $deps, $ver, $media );
-            wp_style_add_data( $handle, 'rtl', 'replace' );
-
-            if ( $template ) {
-                wp_style_add_data( $handle, 'suffix', '.min' );
-            }
-        }
+        Visual_Portfolio_Templates::include_template_style( $handle, $template_name, $deps, $ver, $media );
     }
 
     /**
