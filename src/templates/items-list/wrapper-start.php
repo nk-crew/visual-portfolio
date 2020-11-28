@@ -10,6 +10,8 @@
  * @package @@plugin_name
  */
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -18,7 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="<?php echo esc_attr( $class ); ?>"
     <?php
-    // phpcs:ignore
     foreach ( $data_attrs as $name => $data ) {
         if ( 'data-vp-next-page-url' === $name ) {
             echo esc_html( $name ) . '="' . esc_url( $data ) . '" ';

@@ -3,6 +3,7 @@
  * Default infinite pagination template.
  *
  * @var $args
+ *
  * @package @@plugin_name
  */
 

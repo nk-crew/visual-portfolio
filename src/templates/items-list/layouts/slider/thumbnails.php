@@ -10,6 +10,8 @@
  * @package @@plugin_name
  */
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -19,7 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="vp-portfolio__thumbnails-wrap">
     <div class="vp-portfolio__thumbnails">
         <?php
-        // phpcs:ignore
         foreach ( $thumbnails as $image_id ) {
             ?>
             <div class="vp-portfolio__thumbnail-wrap">

@@ -3,6 +3,7 @@
  * Default load more pagination template.
  *
  * @var $args
+ *
  * @package @@plugin_name
  */
 

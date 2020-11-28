@@ -4,42 +4,31 @@
  *
  * @var $args
  * @var $opts
+ *
  * @package @@plugin_name
  */
+
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+$link_data = array(
+    'href'   => $args['url'],
+    'target' => $args['url_target'],
+    'rel'    => $args['url_rel'],
+);
+
 ?>
 
 <div class="vp-portfolio__item-img-wrap">
     <div class="vp-portfolio__item-img">
-        <?php
-        if ( $args['url'] ) {
-            ?>
-            <a href="<?php echo esc_url( $args['url'] ); ?>"
-                <?php
-                if ( isset( $args['url_target'] ) && $args['url_target'] ) :
-                    ?>
-                    target="<?php echo esc_attr( $args['url_target'] ); ?>"
-                    <?php
-                endif;
-                if ( isset( $args['url_rel'] ) && $args['url_rel'] ) :
-                    ?>
-                    rel="<?php echo esc_attr( $args['url_rel'] ); ?>"
-                    <?php
-                endif;
-                ?>
-            >
-                <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
+        <?php visual_portfolio()->include_template( 'global/link-start', $link_data ); ?>
 
-                <div class="vp-portfolio__item-img-overlay"></div>
-            </a>
-            <?php
-        } else {
-            echo wp_kses( $args['image'], $args['image_allowed_html'] );
-        }
-        ?>
+        <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
+        <div class="vp-portfolio__item-img-overlay"></div>
+
+        <?php visual_portfolio()->include_template( 'global/link-утв', $link_data ); ?>
     </div>
 </div>

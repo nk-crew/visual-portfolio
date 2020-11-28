@@ -3,8 +3,11 @@
  * Dropdown sort template.
  *
  * @var $args
+ *
  * @package @@plugin_name
  */
+
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -15,7 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="<?php echo esc_attr( $args['class'] ); ?> vp-sort__style-dropdown">
     <select>
         <?php
-        // phpcs:ignore
         foreach ( $args['items'] as $item ) {
             ?>
             <option class="<?php echo esc_attr( $item['class'] ); ?>" data-vp-url="<?php echo esc_url( $item['url'] ); ?>" data-vp-sort="<?php echo esc_attr( $item['sort'] ); ?>" value="<?php echo esc_attr( $item['sort'] ); ?>" <?php selected( $item['active'] ); ?>>

@@ -3,8 +3,11 @@
  * Minimal paged pagination template.
  *
  * @var $args
+ *
  * @package @@plugin_name
  */
+
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -14,7 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="<?php echo esc_attr( $args['class'] ); ?> vp-pagination__style-minimal" data-vp-pagination-type="<?php echo esc_attr( $args['type'] ); ?>">
     <?php
-    // phpcs:ignore
     foreach ( $args['items'] as $item ) {
         ?>
         <div class="<?php echo esc_attr( $item['class'] ); ?>">

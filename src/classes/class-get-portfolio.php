@@ -1840,6 +1840,9 @@ class Visual_Portfolio_Get {
         }
 
         // Click action.
+        $args['url_target'] = false;
+        $args['url_rel']    = false;
+
         switch ( $args['vp_opts']['items_click_action'] ) {
             case 'popup_gallery':
                 break;
@@ -1847,8 +1850,8 @@ class Visual_Portfolio_Get {
                 $args['url'] = false;
                 break;
             default:
-                $args['url_target'] = $args['vp_opts']['items_click_action_url_target'] ? $args['vp_opts']['items_click_action_url_target'] : '';
-                $args['url_rel']    = $args['vp_opts']['items_click_action_url_rel'] ? $args['vp_opts']['items_click_action_url_rel'] : '';
+                $args['url_target'] = $args['vp_opts']['items_click_action_url_target'] ? $args['vp_opts']['items_click_action_url_target'] : false;
+                $args['url_rel']    = $args['vp_opts']['items_click_action_url_rel'] ? $args['vp_opts']['items_click_action_url_rel'] : false;
                 break;
         }
 

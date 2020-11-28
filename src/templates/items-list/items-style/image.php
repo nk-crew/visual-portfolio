@@ -4,76 +4,43 @@
  *
  * @var $args
  * @var $opts
+ *
  * @package @@plugin_name
  */
+
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+$link_data = array(
+    'href'   => $args['url'],
+    'target' => $args['url_target'],
+    'rel'    => $args['url_rel'],
+);
+
 ?>
 
 <div class="vp-portfolio__item-img-wrap">
     <div class="vp-portfolio__item-img">
-        <?php
-        if ( $args['url'] ) {
-            ?>
-            <a href="<?php echo esc_url( $args['url'] ); ?>"
-                <?php
-                if ( isset( $args['url_target'] ) && $args['url_target'] ) :
-                    ?>
-                    target="<?php echo esc_attr( $args['url_target'] ); ?>"
-                    <?php
-                endif;
-                if ( isset( $args['url_rel'] ) && $args['url_rel'] ) :
-                    ?>
-                    rel="<?php echo esc_attr( $args['url_rel'] ); ?>"
-                    <?php
-                endif;
-                ?>
-            >
-            <?php
-        }
-        ?>
-            <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
+        <?php visual_portfolio()->include_template( 'global/link-start', $link_data ); ?>
 
-            <div class="vp-portfolio__item-img-overlay">
-                <?php
-                // Show Icon.
-                if ( $opts['show_icon'] ) {
-                    ?>
-                    <div class="vp-portfolio__item-meta-icon">
-                        <?php
-                        switch ( $args['format'] ) {
-                            case 'video':
-                                visual_portfolio()->include_template( 'icons/play' );
-                                break;
-                            case 'audio':
-                                visual_portfolio()->include_template( 'icons/music' );
-                                break;
-                            case 'gallery':
-                                visual_portfolio()->include_template( 'icons/gallery' );
-                                break;
-                            default:
-                                if ( isset( $args['vp_opts']['items_click_action'] ) && 'popup_gallery' === $args['vp_opts']['items_click_action'] ) {
-                                    visual_portfolio()->include_template( 'icons/search' );
-                                } else {
-                                    visual_portfolio()->include_template( 'icons/image' );
-                                }
-                                break;
-                        }
-                        ?>
-                    </div>
-                    <?php
-                }
-                ?>
-            </div>
-        <?php
-        if ( $args['url'] ) {
-            ?>
-            </a>
+        <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
+
+        <div class="vp-portfolio__item-img-overlay">
             <?php
-        }
-        ?>
+            // Show Icon.
+            visual_portfolio()->include_template(
+                'items-list/item-parts/icon',
+                array(
+                    'args' => $args,
+                    'opts' => $opts,
+                )
+            );
+            ?>
+        </div>
+
+        <?php visual_portfolio()->include_template( 'global/link-end', $link_data ); ?>
     </div>
 </div>

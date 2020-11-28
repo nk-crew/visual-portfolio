@@ -3,8 +3,11 @@
  * Default paged pagination template.
  *
  * @var $args
+ *
  * @package @@plugin_name
  */
+
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -18,7 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php endif; ?>
 >
     <?php
-    // phpcs:ignore
     foreach ( $args['items'] as $item ) {
         ?>
         <div class="<?php echo esc_attr( $item['class'] ); ?>">
