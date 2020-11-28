@@ -1281,6 +1281,11 @@ class Visual_Portfolio_Get {
                 } else {
                     $query_opts['post_type'] = $options['posts_source'];
 
+                    // Post Types Set.
+                    if ( 'post_types_set' === $options['posts_source'] ) {
+                        $query_opts['post_type'] = (array) $options['post_types_set'];
+                    }
+
                     // Taxonomies.
                     if ( ! empty( $options['posts_taxonomies'] ) && ! isset( $query_opts['tax_query'] ) ) {
                         $terms_list = get_terms(

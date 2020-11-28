@@ -1138,6 +1138,23 @@ class Visual_Portfolio_Admin {
             array(
                 'category'       => 'content-source-post-based',
                 'type'           => 'select',
+                'label'          => esc_html__( 'Post Types', '@@text_domain' ),
+                'name'           => 'post_types_set',
+                'default'        => array( 'post' ),
+                'value_callback' => array( $this, 'find_posts_types_select_control' ),
+                'multiple'       => true,
+                'condition'      => array(
+                    array(
+                        'control' => 'posts_source',
+                        'value'   => 'post_types_set',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'       => 'content-source-post-based',
+                'type'           => 'select',
                 'label'          => esc_html__( 'Specific Posts', '@@text_domain' ),
                 'name'           => 'posts_ids',
                 'default'        => array(),
@@ -2842,17 +2859,22 @@ selector p {
                 );
             }
         }
-        $post_types_selector['ids']           = array(
+        $post_types_selector['post_types_set'] = array(
+            'value' => 'post_types_set',
+            'title' => esc_html__( 'Post Types Set', '@@text_domain' ),
+            'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 1C11 1 5.5 1 5 1C4.5 1 3.94017 1.06696 3.5 1.5C3.02194 1.97032 3 2.5 3 3.14286C3 3.78571 3 16 3 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.75 3.75H13.4457L18.25 8.41705V18.3C18.25 18.5448 18.1501 18.7842 17.9648 18.9641C17.7789 19.1448 17.5221 19.25 17.25 19.25H6.75C6.47788 19.25 6.22113 19.1448 6.03515 18.9641C5.84991 18.7842 5.75 18.5448 5.75 18.3V4.7C5.75 4.45517 5.84991 4.21582 6.03515 4.03588C6.22113 3.85521 6.47788 3.75 6.75 3.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 4V9H19" stroke="currentColor" stroke-width="1.5"/><path d="M15 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 8H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 16H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        );
+        $post_types_selector['ids']            = array(
             'value' => 'ids',
             'title' => esc_html__( 'Manual Selection', '@@text_domain' ),
             'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M5 11.6L7.30769 14L15 6" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         );
-        $post_types_selector['custom_query']  = array(
+        $post_types_selector['custom_query']   = array(
             'value' => 'custom_query',
             'title' => esc_html__( 'Custom Query', '@@text_domain' ),
             'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.7678 0.91749L10.7678 0.917496L10.7707 0.919154L17.7678 4.91831C17.7682 4.91856 17.7687 4.91882 17.7691 4.91907C17.9584 5.02866 18.1156 5.186 18.225 5.37541C18.3347 5.56526 18.3926 5.78064 18.3929 5.99995V14.0001C18.3926 14.2194 18.3347 14.4347 18.225 14.6246C18.1156 14.814 17.9583 14.9714 17.769 15.081C17.7686 15.0812 17.7682 15.0814 17.7678 15.0817L10.7707 19.0808L10.7678 19.0825C10.5778 19.1922 10.3622 19.25 10.1429 19.25C9.92346 19.25 9.70793 19.1922 9.51791 19.0825L9.51501 19.0808L2.51791 15.0817C2.5175 15.0814 2.51708 15.0812 2.51667 15.081C2.32739 14.9714 2.17015 14.814 2.06067 14.6246C1.95102 14.4348 1.89314 14.2196 1.89285 14.0004V5.99959C1.89314 5.78041 1.95102 5.56516 2.06067 5.37541C2.17014 5.186 2.32736 5.02865 2.5166 4.91907C2.51704 4.91881 2.51747 4.91856 2.51791 4.91831L9.51501 0.919154L9.51502 0.91916L9.51791 0.91749C9.70793 0.807761 9.92346 0.75 10.1429 0.75C10.3622 0.75 10.5778 0.807761 10.7678 0.91749Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1449 18.9286V9.42857" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.1159 4.78261L10.1449 9.42029L2.02899 4.78261" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
         );
-        $post_types_selector['current_query'] = array(
+        $post_types_selector['current_query']  = array(
             'value' => 'current_query',
             'title' => esc_html__( 'Current Query', '@@text_domain' ),
             'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.7678 0.91749L10.7678 0.917496L10.7707 0.919154L17.7678 4.91831C17.7682 4.91856 17.7687 4.91882 17.7691 4.91907C17.9584 5.02866 18.1156 5.186 18.225 5.37541C18.3347 5.56526 18.3926 5.78064 18.3929 5.99995V14.0001C18.3926 14.2194 18.3347 14.4347 18.225 14.6246C18.1156 14.814 17.9583 14.9714 17.769 15.081C17.7686 15.0812 17.7682 15.0814 17.7678 15.0817L10.7707 19.0808L10.7678 19.0825C10.5778 19.1922 10.3622 19.25 10.1429 19.25C9.92346 19.25 9.70793 19.1922 9.51791 19.0825L9.51501 19.0808L2.51791 15.0817C2.5175 15.0814 2.51708 15.0812 2.51667 15.081C2.32739 14.9714 2.17015 14.814 2.06067 14.6246C1.95102 14.4348 1.89314 14.2196 1.89285 14.0004V5.99959C1.89314 5.78041 1.95102 5.56516 2.06067 5.37541C2.17014 5.186 2.32736 5.02865 2.5166 4.91907C2.51704 4.91881 2.51747 4.91856 2.51791 4.91831L9.51501 0.919154L9.51502 0.91916L9.51791 0.91749C9.70793 0.807761 9.92346 0.75 10.1429 0.75C10.3622 0.75 10.5778 0.807761 10.7678 0.91749Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1449 18.9286V9.42857" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.1159 4.78261L10.1449 9.42029L2.02899 4.78261" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
@@ -2861,6 +2883,40 @@ selector p {
         return array(
             'options' => $post_types_selector,
         );
+    }
+
+    /**
+     * Find post types for select control.
+     *
+     * @return array
+     */
+    public function find_posts_types_select_control() {
+        check_ajax_referer( 'vp-ajax-nonce', 'nonce' );
+
+        $result = array();
+
+        // post types list.
+        $post_types = get_post_types(
+            array(
+                'public' => false,
+                'name'   => 'attachment',
+            ),
+            'names',
+            'NOT'
+        );
+
+        if ( is_array( $post_types ) && ! empty( $post_types ) ) {
+            $result['options'] = array();
+
+            foreach ( $post_types as $post_type ) {
+                $result['options'][ $post_type ] = array(
+                    'value' => $post_type,
+                    'label' => ucfirst( $post_type ),
+                );
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -2885,7 +2941,7 @@ selector p {
 
         $post_type = isset( $attributes['posts_source'] ) ? sanitize_text_field( wp_unslash( $attributes['posts_source'] ) ) : 'any';
 
-        if ( ! $post_type || 'custom_query' === $post_type || 'ids' === $post_type ) {
+        if ( ! $post_type || 'post_types_set' === $post_type || 'custom_query' === $post_type || 'ids' === $post_type ) {
             $post_type = 'any';
         }
 
@@ -2948,7 +3004,7 @@ selector p {
         if ( isset( $_POST['q'] ) ) {
             $post_type = isset( $_POST['post_type'] ) ? sanitize_text_field( wp_unslash( $_POST['post_type'] ) ) : 'any';
 
-            if ( ! $post_type || 'custom_query' === $post_type || 'ids' === $post_type ) {
+            if ( ! $post_type || 'post_types_set' === $post_type || 'custom_query' === $post_type || 'ids' === $post_type ) {
                 $post_type = 'any';
             }
 
