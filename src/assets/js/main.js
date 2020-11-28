@@ -433,8 +433,10 @@ class VP {
             const ml = parseFloat( self.$item.css( 'margin-left' ) || 0 );
             const mr = parseFloat( self.$item.css( 'margin-right' ) || 0 );
             self.$item.css( {
-                'margin-left': ml - left,
-                'margin-right': mr - right,
+                marginLeft: ml - left,
+                marginRight: mr - right,
+                maxWidth: 'none',
+                width: 'auto',
             } );
         }
         if ( self.$item.hasClass( 'vp-portfolio__stretch' ) && ! self.isPreview() ) {
