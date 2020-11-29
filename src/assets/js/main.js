@@ -678,6 +678,9 @@ class VP {
         const ajaxData = {
             method: 'POST',
             url,
+            data: {
+                vpf_ajax_call: true,
+            },
             complete( { responseText } ) {
                 self.href = url;
                 self.replaceItems( responseText, removeExisting, cb );
