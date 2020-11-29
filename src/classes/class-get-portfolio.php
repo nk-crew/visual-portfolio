@@ -2214,6 +2214,8 @@ class Visual_Portfolio_Get {
         // Add custom query args.
         $current_url = add_query_arg( $query_arg, $current_url );
 
+        $current_url = apply_filters( 'vpf_get_pagenum_link', $current_url, $query_arg );
+
         return $current_url;
     }
 
