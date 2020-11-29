@@ -359,6 +359,12 @@ $grid_sm: 600px !default;
         opacity: .7;
     }
 
+    // Image control.
+    .wpsa-image-remove {
+        display: none;
+        margin-left: 10px;
+    }
+
     // Notices styles fix.
     .metabox-holder .notice {
         padding: 15px;
