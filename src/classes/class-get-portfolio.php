@@ -1674,6 +1674,13 @@ class Visual_Portfolio_Get {
 
         visual_portfolio()->include_template( 'items-list/filter' . $filter_style_pref . '/filter', $args );
 
+        // We need to include these styles, since users can insert filters using separate shortcode.
+        Visual_Portfolio_Assets::store_used_assets(
+            'visual-portfolio-filter-' . $vp_options['filter'],
+            'items-list/filter' . $filter_style_pref . '/style',
+            'template_style'
+        );
+
         ?>
         </div>
         <?php
@@ -1768,6 +1775,13 @@ class Visual_Portfolio_Get {
         }
 
         visual_portfolio()->include_template( 'items-list/sort' . $sort_style_pref . '/sort', $args );
+
+        // We need to include these styles, since users can insert sort using separate shortcode.
+        Visual_Portfolio_Assets::store_used_assets(
+            'visual-portfolio-sort-' . $vp_options['sort'],
+            'items-list/sort' . $sort_style_pref . '/style',
+            'template_style'
+        );
 
         ?>
         </div>
