@@ -372,6 +372,14 @@ class Visual_Portfolio_Settings {
                     'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? 'off' : 'on',
                     'is_pro'  => true,
                 ),
+                array(
+                    'name'    => 'deep_linking_url_to_share_images',
+                    'label'   => esc_html__( 'Use Deep Linking URL to Share Images', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Check to share Deep Linking URLs when sharing images. When disabled, all galleries will share direct links to image files.', '@@text_domain' ),
+                    'type'    => 'checkbox',
+                    'default' => 'off',
+                    'is_pro'  => true,
+                ),
 
                 // General Popup Settings.
                 array(
