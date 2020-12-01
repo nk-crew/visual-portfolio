@@ -573,25 +573,29 @@ class Visual_Portfolio_Assets {
             ),
             'settingsPopupGallery' => array(
                 // Default WordPress Images.
-                'enable_on_wordpress_images' => Visual_Portfolio_Settings::get_option( 'enable_on_wordpress_images', 'vp_popup_gallery' ),
+                'enable_on_wordpress_images'       => Visual_Portfolio_Settings::get_option( 'enable_on_wordpress_images', 'vp_popup_gallery' ),
 
                 // Vendor.
-                'vendor'                     => Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery' ),
+                'vendor'                           => Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery' ),
+
+                // Deep Linking.
+                'deep_linking'                     => Visual_Portfolio_Settings::get_option( 'deep_linking', 'vp_popup_gallery' ),
+                'deep_linking_url_to_share_images' => Visual_Portfolio_Settings::get_option( 'deep_linking_url_to_share_images', 'vp_popup_gallery' ),
 
                 // General.
-                'show_arrows'                => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery' ),
-                'show_counter'               => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery' ),
-                'show_zoom_button'           => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery' ),
-                'show_fullscreen_button'     => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery' ),
-                'show_share_button'          => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery' ),
-                'show_close_button'          => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery' ),
+                'show_arrows'                      => Visual_Portfolio_Settings::get_option( 'show_arrows', 'vp_popup_gallery' ),
+                'show_counter'                     => Visual_Portfolio_Settings::get_option( 'show_counter', 'vp_popup_gallery' ),
+                'show_zoom_button'                 => Visual_Portfolio_Settings::get_option( 'show_zoom_button', 'vp_popup_gallery' ),
+                'show_fullscreen_button'           => Visual_Portfolio_Settings::get_option( 'show_fullscreen_button', 'vp_popup_gallery' ),
+                'show_share_button'                => Visual_Portfolio_Settings::get_option( 'show_share_button', 'vp_popup_gallery' ),
+                'show_close_button'                => Visual_Portfolio_Settings::get_option( 'show_close_button', 'vp_popup_gallery' ),
 
                 // Fancybox.
-                'show_download_button'       => Visual_Portfolio_Settings::get_option( 'show_download_button', 'vp_popup_gallery' ),
-                'show_slideshow'             => Visual_Portfolio_Settings::get_option( 'show_slideshow', 'vp_popup_gallery' ),
-                'show_thumbs'                => Visual_Portfolio_Settings::get_option( 'show_thumbs', 'vp_popup_gallery' ),
+                'show_thumbs'                      => Visual_Portfolio_Settings::get_option( 'show_thumbs', 'vp_popup_gallery' ),
+                'show_download_button'             => Visual_Portfolio_Settings::get_option( 'show_download_button', 'vp_popup_gallery' ),
+                'show_slideshow'                   => Visual_Portfolio_Settings::get_option( 'show_slideshow', 'vp_popup_gallery' ),
 
-                'click_to_zoom'              => Visual_Portfolio_Settings::get_option( 'click_to_zoom', 'vp_popup_gallery' ),
+                'click_to_zoom'                    => Visual_Portfolio_Settings::get_option( 'click_to_zoom', 'vp_popup_gallery' ),
             ),
 
             // Screen sizes (breakpoints) for responsive feature: xs, sm, md, lg, xl.
