@@ -1,0 +1,11 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="20" height="20" rx="10" fill="white" />
+    <path d="M11.5062 13.9L14.0488 6.59998H11.6894L9.39999 13.9H11.5062Z" fill="url(#vpf_logo_paint0_linear)" />
+    <path d="M8.54255 13.9L5.99999 6.59998H8.35932L10.6488 13.9H8.54255Z" fill="black" />
+    <defs>
+        <linearGradient id="vpf_logo_paint0_linear" x1="12.9" y1="6.59998" x2="6.59999" y2="15.4" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="black" />
+            <stop offset="1" stop-color="black" stop-opacity="0" />
+        </linearGradient>
+    </defs>
+</svg>
