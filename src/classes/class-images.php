@@ -321,17 +321,23 @@ class Visual_Portfolio_Images {
 
         if ( isset( $attributes['srcset'] ) ) {
             $attributes['data-srcset'] = $attributes['srcset'];
-            unset( $attributes['srcset'] );
+
+            if ( $placeholder ) {
+                $attributes['srcset'] = $placeholder;
+            } else {
+                unset( $attributes['srcset'] );
+            }
+
+            // In case if the image doesn't have `srcset`, we need to add placeholder to `src`.
+        } elseif ( $placeholder ) {
+            $attributes['src'] = $placeholder;
         }
+
         if ( isset( $attributes['sizes'] ) ) {
             unset( $attributes['sizes'] );
         }
 
         $attributes['data-sizes'] = 'auto';
-
-        if ( $placeholder ) {
-            $attributes['srcset'] = $placeholder;
-        }
 
         // Prevent Native lazy loading.
         $attributes['loading'] = 'eager';
