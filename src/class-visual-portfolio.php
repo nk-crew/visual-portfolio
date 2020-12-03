@@ -89,7 +89,7 @@ class Visual_Portfolio {
         $this->plugin_path     = plugin_dir_path( __FILE__ );
         $this->plugin_url      = plugin_dir_url( __FILE__ );
 
-        if ( in_array( 'visual-portfolio-pro/class-visual-portfolio-pro.php', (array) get_option( 'active_plugins', array() ), true ) ) {
+        if ( function_exists( 'visual_portfolio_pro' ) ) {
             $this->pro_plugin_path = plugin_dir_path( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
             $this->pro_plugin_url  = plugin_dir_url( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
         }
