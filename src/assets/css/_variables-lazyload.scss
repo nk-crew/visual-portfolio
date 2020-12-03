@@ -1,0 +1,14 @@
+/**
+ * Lazyload CSS Variables
+ */
+
+:root {
+    // Lazy.
+    --vp-lazyload-images__background: linear-gradient(-70deg, rgba(140, 140, 140, 0) 42%, rgba(140, 140, 140, .05) 50%, rgba(140, 140, 140, 0) 58%);
+    --vp-lazyload-images__background-color: rgba(140, 140, 140, .05);
+    --vp-lazyload-images__animation-duration: 3s;
+
+    // Transitions.
+    --vp-lazyload-transition-duration: .3s;
+    --vp-lazyload-transition-easing: ease-in-out;
+}

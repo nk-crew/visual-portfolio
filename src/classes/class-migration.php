@@ -72,6 +72,10 @@ class Visual_Portfolio_Migrations {
     public function get_migrations() {
         return array(
             array(
+                'version' => '2.10.0',
+                'cb'      => array( $this, 'v_2_10_0' ),
+            ),
+            array(
                 'version' => '2.0.0',
                 'cb'      => array( $this, 'v_2_0_0' ),
             ),
@@ -80,6 +84,25 @@ class Visual_Portfolio_Migrations {
                 'cb'      => array( $this, 'v_1_11_0' ),
             ),
         );
+    }
+
+    /**
+     * Move popup title and description settings to single Layouts.
+     */
+    public function v_2_10_0() {
+        $options = get_option( 'vp_images' );
+
+        if ( ! isset( $options['lazy_loading'] ) ) {
+            return;
+        }
+
+        if ( 'off' === $options['lazy_loading'] || ! $options['lazy_loading'] ) {
+            $options['lazy_loading'] = '';
+        } else {
+            $options['lazy_loading'] = 'vp';
+        }
+
+        update_option( 'vp_images', $options );
     }
 
     /**

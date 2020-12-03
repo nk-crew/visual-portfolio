@@ -34,11 +34,6 @@
     // Images.
     --vp-images__object-fit: cover;
     --vp-images__object-position: 50% 50%;
-
-    // Images Lazy.
-    --vp-images-lazy__background: linear-gradient(-70deg, rgba(140, 140, 140, 0) 42%, rgba(140, 140, 140, .05) 50%, rgba(140, 140, 140, 0) 58%);
-    --vp-images-lazy__background-color: rgba(140, 140, 140, .05);
-    --vp-images-lazy__animation-duration: 3s;
 }
 
 .vp-spinner {

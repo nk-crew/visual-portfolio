@@ -21,12 +21,67 @@ class Visual_Portfolio_Images {
     public static $image_processing = false;
 
     /**
+     * Allow Visual Portfolio images to use lazyload.
+     *
+     * @var bool
+     */
+    public static $allow_vp_lazyload = false;
+
+    /**
+     * Allow WordPress images to use lazyload.
+     *
+     * @var bool
+     */
+    public static $allow_wp_lazyload = false;
+
+    /**
      * Visual_Portfolio_Images constructor.
      */
     public static function construct() {
-        add_action( 'init', 'Visual_Portfolio_Images::allow_lazy_attributes' );
+        add_action( 'wp', 'Visual_Portfolio_Images::init' );
+    }
+
+    /**
+     * Init
+     */
+    public static function init() {
+        // Don't lazy load for feeds, previews and admin side.
+        if ( is_feed() || is_preview() || is_admin() ) {
+            return;
+        }
+
+        // Don't add on AMP endpoint.
+        if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
+            return;
+        }
+
+        self::$allow_vp_lazyload = ! ! Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' );
+        self::$allow_wp_lazyload = 'full' === Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' );
+
+        // Check for plugin settings.
+        if ( ! self::$allow_vp_lazyload && ! self::$allow_wp_lazyload ) {
+            return;
+        }
+
+        // disable using filter.
+        if ( ! apply_filters( 'vpf_images_lazyload', true ) ) {
+            return;
+        }
+
+        if ( self::$allow_wp_lazyload ) {
+            add_filter( 'the_content', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
+            add_filter( 'post_thumbnail_html', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
+            add_filter( 'get_avatar', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
+            add_filter( 'widget_text', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
+            add_filter( 'get_image_tag', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
+        }
+        add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::process_image_attributes', 9999 );
+
+        add_action( 'wp_kses_allowed_html', 'Visual_Portfolio_Images::allow_lazy_attributes' );
+        add_filter( 'vpf_image_item_args', 'Visual_Portfolio_Images::vp_kses_allow_lazy_attributes', 15 );
+        add_filter( 'vpf_post_item_args', 'Visual_Portfolio_Images::vp_kses_allow_lazy_attributes', 15 );
         add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
-        add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::add_image_placeholders', 15, 3 );
+        add_action( 'wp_head', 'Visual_Portfolio_Images::add_nojs_fallback' );
 
         // ignore Jetpack lazy.
         add_filter( 'jetpack_lazy_images_skip_image_with_attributes', 'Visual_Portfolio_Images::jetpack_lazy_images_skip_image_with_attributes', 15, 2 );
@@ -54,45 +109,56 @@ class Visual_Portfolio_Images {
     }
 
     /**
-     * Init hooks.
+     * Allow attributes of Lazy Load for wp_kses.
+     *
+     * @param array $allowed_tags The allowed tags and their attributes.
+     *
+     * @return array
      */
-    public static function is_enabled() {
-        // check for AMP endpoint.
-        if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
-            return false;
+    public static function allow_lazy_attributes( $allowed_tags ) {
+        if ( ! isset( $allowed_tags['img'] ) ) {
+            return $allowed_tags;
         }
 
-        // check plugin settings.
-        $enabled = Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' );
-        if ( ! $enabled ) {
-            return false;
-        }
+        // But, if images are allowed, ensure that our attributes are allowed!
+        $img_attributes = array_merge(
+            $allowed_tags['img'],
+            array(
+                'data-src'     => 1,
+                'data-sizes'   => 1,
+                'data-srcset'  => 1,
+                'data-no-lazy' => 1,
+                'loading'      => 1,
+            )
+        );
 
-        // disable using filter.
-        if ( ! apply_filters( 'vpf_images_lazyload', true ) ) {
-            return false;
-        }
+        $allowed_tags['img'] = $img_attributes;
 
-        return true;
+        return $allowed_tags;
     }
 
     /**
-     * Allow attributes of Lazy Load for wp_kses.
+     * Allow attributes of Lazy Load for wp_kses used in vp images.
+     *
+     * @param array $args vp item args.
+     *
+     * @return array
      */
-    public static function allow_lazy_attributes() {
-        global $allowedposttags;
+    public static function vp_kses_allow_lazy_attributes( $args ) {
+        $args['image_allowed_html']['noscript'] = array();
 
-        if ( $allowedposttags ) {
-            foreach ( $allowedposttags as $key => & $tags ) {
-                if ( 'img' === $key ) {
-                    $tags['data-src']     = true;
-                    $tags['data-sizes']   = true;
-                    $tags['data-srcset']  = true;
-                    $tags['data-no-lazy'] = true;
-                    $tags['loading']      = true;
-                }
-            }
-        }
+        $args['image_allowed_html']['img'] = array_merge(
+            $args['image_allowed_html']['img'],
+            array(
+                'loading'      => array(),
+                'data-src'     => array(),
+                'data-sizes'   => array(),
+                'data-srcset'  => array(),
+                'data-no-lazy' => array(),
+            )
+        );
+
+        return $args;
     }
 
     /**
@@ -108,41 +174,212 @@ class Visual_Portfolio_Images {
     }
 
     /**
+     * Add image placeholders.
+     *
+     * @param string $content Content.
+     * @return string
+     */
+    public static function add_image_placeholders( $content ) {
+        // This is a pretty simple regex, but it works.
+        $content = preg_replace_callback( '#<(img)([^>]+?)(>(.*?)</\\1>|[\/]?>)#si', 'Visual_Portfolio_Images::process_image', $content );
+
+        return $content;
+    }
+
+    /**
+     * Returns true when a given array of attributes contains attributes or class signifying lazy images.
+     * should not process the image.
+     *
+     * @param array $attributes all available image attributes.
+     *
+     * @return bool
+     */
+    public static function should_skip_image_with_blocked_attributes( $attributes ) {
+        // Check for blocked classes.
+        if ( ! empty( $attributes['class'] ) ) {
+            $blocked_classes = array(
+                'lazyload',
+                'skip-lazy',
+                'gazette-featured-content-thumbnail',
+            );
+
+            /**
+             * Allow plugins and themes to tell lazy images to skip an image with a given class.
+             */
+            $blocked_classes = apply_filters( 'vpf_lazyload_images_blocked_classes', $blocked_classes );
+
+            if ( ! is_array( $blocked_classes ) || empty( $blocked_classes ) ) {
+                return false;
+            }
+
+            foreach ( $blocked_classes as $class ) {
+                if ( false !== strpos( $attributes['class'], $class ) ) {
+                    return true;
+                }
+            }
+        }
+
+        $blocked_attributes = array(
+            'data-skip-lazy',
+            'data-src',
+        );
+
+        foreach ( $blocked_attributes as $attr ) {
+            if ( isset( $attributes[ $attr ] ) ) {
+                return true;
+            }
+        }
+
+        // Skip lazy load from VPF images if option disabled.
+        if ( ! self::$allow_vp_lazyload && self::$image_processing ) {
+            return true;
+        }
+
+        // Skip lazy load from WordPress images if option disabled.
+        if ( ! self::$allow_wp_lazyload && ! self::$image_processing ) {
+            return true;
+        }
+
+        /**
+         * Allow plugins and themes to conditionally skip processing an image via its attributes.
+         */
+        if ( apply_filters( 'vpf_lazyload_skip_image_with_attributes', false, $attributes ) ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Processes images in content by acting as the preg_replace_callback.
+     *
+     * @param array $matches Matches.
+     *
+     * @return string The image with updated lazy attributes.
+     */
+    public static function process_image( $matches ) {
+        $old_attributes_str       = $matches[2];
+        $old_attributes_kses_hair = wp_kses_hair( $old_attributes_str, wp_allowed_protocols() );
+
+        if ( empty( $old_attributes_kses_hair['src'] ) ) {
+            return $matches[0];
+        }
+
+        $old_attributes = self::flatten_kses_hair_data( $old_attributes_kses_hair );
+
+        // If we didn't add lazy attributes, just return the original image source.
+        if ( ! empty( $old_attributes['class'] ) && false !== strpos( $old_attributes['class'], 'vp-lazyload' ) ) {
+            return $matches[0];
+        }
+
+        $new_attributes     = self::process_image_attributes( $old_attributes );
+        $new_attributes_str = self::build_attributes_string( $new_attributes );
+
+        return sprintf( '<noscript>%1$s</noscript><img %2$s>', $matches[0], $new_attributes_str );
+    }
+
+    /**
+     * Given an array of image attributes, updates the `src`, `srcset`, and `sizes` attributes so
+     * that they load lazily.
+     *
+     * @param array $attributes Attributes.
+     *
+     * @return array The updated image attributes array with lazy load attributes.
+     */
+    public static function process_image_attributes( $attributes ) {
+        if ( empty( $attributes['src'] ) ) {
+            return $attributes;
+        }
+
+        if ( self::should_skip_image_with_blocked_attributes( $attributes ) ) {
+            return $attributes;
+        }
+
+        // Default Placeholder.
+        $placeholder   = false;
+        $placeholder_w = isset( $attributes['width'] ) ? $attributes['width'] : false;
+        $placeholder_h = isset( $attributes['height'] ) ? $attributes['height'] : false;
+
+        // Trying to get image size from metadata.
+        if ( ! $placeholder_w || ! $placeholder_h ) {
+            $image_id = self::attributes_to_image_id( $attributes );
+            $metadata = get_post_meta( $image_id, '_wp_attachment_metadata', true );
+
+            if ( isset( $metadata['width'] ) && isset( $metadata['height'] ) ) {
+                $placeholder_w = $metadata['width'];
+                $placeholder_h = $metadata['height'];
+            }
+        }
+
+        if ( $placeholder_w && $placeholder_h ) {
+            $placeholder = self::get_image_placeholder( $placeholder_w, $placeholder_h );
+        }
+
+        // We set this, adding the query arg so that it doesn't exactly equal the src attribute, so that photon JavaScript
+        // will hold off on processing this image.
+        $attributes['data-src'] = esc_url_raw( add_query_arg( 'is-pending-load', true, $attributes['src'] ) );
+
+        if ( isset( $attributes['srcset'] ) ) {
+            $attributes['data-srcset'] = $attributes['srcset'];
+            unset( $attributes['srcset'] );
+        }
+        if ( isset( $attributes['sizes'] ) ) {
+            unset( $attributes['sizes'] );
+        }
+
+        $attributes['data-sizes'] = 'auto';
+
+        if ( $placeholder ) {
+            $attributes['srcset'] = $placeholder;
+        }
+
+        // Prevent Native lazy loading.
+        $attributes['loading'] = 'eager';
+
+        // Add custom classname.
+        $attributes['class'] = sprintf( '%s vp-lazyload', empty( $attributes['class'] ) ? '' : $attributes['class'] );
+
+        // Prevent WP Rocket lazy loading.
+        if ( defined( 'WP_ROCKET_VERSION' ) ) {
+            $attributes['data-no-lazy'] = '1';
+        }
+
+        // Prevent WP Smush lazy loading.
+        if ( class_exists( 'WP_Smush' ) || class_exists( 'Smush\WP_Smush' ) ) {
+            $attributes['class'] .= ' no-lazyload';
+        }
+
+        /**
+         * Allow plugins and themes to override the attributes on the image before the content is updated.
+         *
+         * One potential use of this filter is for themes that set `height:auto` on the `img` tag.
+         * With this filter, the theme could get the width and height attributes from the
+         * $attributes array and then add a style tag that sets those values as well, which could
+         * minimize reflow as images load.
+         */
+        return apply_filters( 'vpf_lazyload_images_new_attributes', $attributes );
+    }
+
+    /**
      * Get attachment image wrapper.
      *
      * @param string|int   $attachment_id attachment image id.
      * @param string|array $size image size.
      * @param bool         $icon icon.
      * @param string|array $attr image attributes.
-     * @param bool         $lazyload use lazyload tags.
+     * @param bool         $lazyload DEPRECATED use lazyload tags.
      *
      * @return string
      */
     public static function get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazyload = true ) {
         $mime_type = get_post_mime_type( $attachment_id );
-        $lazyload  = self::is_enabled() && $lazyload;
-        $noscript  = '';
 
         // Prevent usage of resized GIFs, since GIFs animated only in full size.
         if ( $mime_type && 'image/gif' === $mime_type ) {
             $size = 'full';
         }
 
-        if ( $lazyload ) {
-            $noscript = apply_filters( 'vpf_wp_get_attachment_image', false, $attachment_id, $size, $attr, false );
-
-            if ( ! $noscript ) {
-                $noscript = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
-            }
-
-            if ( $noscript ) {
-                $noscript = '<noscript>' . $noscript . '</noscript>';
-            }
-        }
-
-        if ( $lazyload ) {
-            self::$image_processing = true;
-        }
+        self::$image_processing = true;
 
         $image = apply_filters( 'vpf_wp_get_attachment_image', false, $attachment_id, $size, $attr, $lazyload );
 
@@ -150,11 +387,9 @@ class Visual_Portfolio_Images {
             $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
         }
 
-        if ( $lazyload ) {
-            self::$image_processing = false;
-        }
+        self::$image_processing = false;
 
-        return $noscript . $image;
+        return $image;
     }
 
     /**
@@ -166,10 +401,6 @@ class Visual_Portfolio_Images {
      * @return string
      */
     public static function get_image_placeholder( $width = 1, $height = 1 ) {
-        if ( ! self::is_enabled() ) {
-            return false;
-        }
-
         if ( ! (int) $width || ! (int) $height ) {
             return false;
         }
@@ -186,7 +417,10 @@ class Visual_Portfolio_Images {
         $escape_search  = array( '<', '>', '#', '"' );
         $escape_replace = array( '%3c', '%3e', '%23', '\'' );
 
-        return 'data:image/svg+xml;base64,' . str_replace( $escape_search, $escape_replace, $placeholder );
+        return apply_filters(
+            'vpf_lazyload_image_placeholder',
+            'data:image/svg+xml;base64,' . str_replace( $escape_search, $escape_replace, $placeholder )
+        );
     }
 
     /**
@@ -218,99 +452,84 @@ class Visual_Portfolio_Images {
     }
 
     /**
-     * Add placeholder for Visual Portfolio images.
+     * Flatter KSES hair data.
      *
-     * @param array        $attr       Attributes for the image markup.
-     * @param WP_Post      $attachment Image attachment post.
-     * @param string|array $size       Requested size. Image size or array of width and height values
-     *                                 (in that order). Default 'thumbnail'.
+     * @param array $attributes Attributes.
      *
      * @return array
      */
-    public static function add_image_placeholders( $attr, $attachment, $size ) {
-        if ( ! self::is_enabled() ) {
-            return $attr;
+    private static function flatten_kses_hair_data( $attributes ) {
+        $flattened_attributes = array();
+
+        foreach ( $attributes as $name => $attribute ) {
+            $flattened_attributes[ $name ] = $attribute['value'];
         }
 
-        // Is string.
-        if ( ! is_string( $size ) ) {
-            return $attr;
-        }
+        return $flattened_attributes;
+    }
 
-        // Use only when called class method get_attachment_image.
-        if ( ! self::$image_processing ) {
-            return $attr;
-        }
+    /**
+     * Build attributes string.
+     *
+     * @param array $attributes Attributes.
+     *
+     * @return string
+     */
+    private static function build_attributes_string( $attributes ) {
+        $string = array();
 
-        // Lazyload already added.
-        if ( strpos( $attr['class'], 'lazyload' ) !== false || isset( $attr['data-src'] ) ) {
-            return $attr;
-        }
-
-        // Get attachment id.
-        $attachment_id = null;
-
-        if ( isset( $attachment->ID ) ) {
-            $attachment_id = $attachment->ID;
-        } elseif ( isset( $attachment['ID'] ) ) {
-            $attachment_id = $attachment['ID'];
-        }
-
-        // Default Placeholder.
-        $placeholder   = false;
-        $placeholder_w = isset( $attr['width'] ) ? $attr['width'] : false;
-        $placeholder_h = isset( $attr['height'] ) ? $attr['height'] : false;
-
-        if ( ! $placeholder_w || ! $placeholder_h ) {
-            // The right Image Placeholder.
-            $metadata = get_post_meta( $attachment_id, '_wp_attachment_metadata', true );
-
-            // generate placeholder.
-            if ( isset( $metadata['sizes'][ $size ] ) && isset( $metadata['sizes'][ $size ]['width'] ) && isset( $metadata['sizes'][ $size ]['height'] ) ) {
-                $placeholder_w = $metadata['sizes'][ $size ]['width'];
-                $placeholder_h = $metadata['sizes'][ $size ]['height'];
-            } elseif ( isset( $metadata['width'] ) && isset( $metadata['height'] ) ) {
-                $placeholder_w = $metadata['width'];
-                $placeholder_h = $metadata['height'];
+        foreach ( $attributes as $name => $value ) {
+            if ( '' === $value ) {
+                $string[] = sprintf( '%s', $name );
+            } else {
+                $string[] = sprintf( '%s="%s"', $name, esc_attr( $value ) );
             }
         }
 
-        if ( $placeholder_w && $placeholder_h ) {
-            $placeholder = self::get_image_placeholder( $placeholder_w, $placeholder_h );
+        return implode( ' ', $string );
+    }
+
+    /**
+     * Tries to convert an attachment IMG attr into a post object.
+     *
+     * @param array $attributes image attributes.
+     *
+     * @return int|bool
+     */
+    private static function attributes_to_image_id( $attributes ) {
+        // Get ID from class.
+        if ( isset( $attributes['class'] ) && preg_match( '/wp-image-(\d*)/i', $attributes['class'], $match ) ) {
+            return $match[1];
         }
 
-        // Prevent WP Rocket lazy loading.
-        if ( defined( 'WP_ROCKET_VERSION' ) ) {
-            $attr['data-no-lazy'] = '1';
+        if ( isset( $attributes['src'] ) ) {
+            // Remove the thumbnail size.
+            $src = preg_replace( '~-[0-9]+x[0-9]+(?=\..{2,6})~', '', $attributes['src'] );
+
+            return attachment_url_to_postid( $src );
         }
 
-        // Prevent WP Smush lazy loading.
-        if ( class_exists( 'WP_Smush' ) || class_exists( 'Smush\WP_Smush' ) ) {
-            $attr['class'] .= ' no-lazyload';
-        }
+        return false;
+    }
 
-        // Prevent Native lazy loading.
-        $attr['loading'] = 'eager';
-
-        // lazy placeholder.
-        if ( $placeholder ) {
-            $attr['data-src'] = $attr['src'];
-            $attr['src']      = $placeholder;
-        }
-
-        $attr['class'] .= ' vp-lazyload';
-
-        // Src Set and Sizes.
-        if ( isset( $attr['sizes'] ) ) {
-            $attr['data-sizes'] = 'auto';
-            unset( $attr['sizes'] );
-        }
-        if ( isset( $attr['srcset'] ) ) {
-            $attr['data-srcset'] = $attr['srcset'];
-            unset( $attr['srcset'] );
-        }
-
-        return $attr;
+    /**
+     * Adds JavaScript to check if the current browser supports JavaScript as well as some styles to hide lazy
+     * images when the browser does not support JavaScript.
+     */
+    public static function add_nojs_fallback() {
+        ?>
+        <style type="text/css">
+            /* If html does not have either class, do not show lazy loaded images. */
+            html:not(.vp-lazyload-enabled):not(.js) .vp-lazyload {
+                display: none;
+            }
+        </style>
+        <script>
+            document.documentElement.classList.add(
+                'vp-lazyload-enabled'
+            );
+        </script>
+        <?php
     }
 
     /**

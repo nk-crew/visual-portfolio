@@ -170,8 +170,6 @@ class VP {
 
         self.destroyed = false;
 
-        self.removeNoscriptTags( self.$items_wrap );
-
         // init options
         self.initOptions();
 
@@ -586,18 +584,6 @@ class VP {
     }
 
     /**
-     * Remove <noscript> tags.
-     * Some optimization plugin make something, that killed our styles with noscript tag.
-     * Related topic: https://wordpress.org/support/topic/visual-portfolio-and-sg-optimizer-dont-play-well/
-     *
-     * @param {object} $items items to work with
-     */
-    // eslint-disable-next-line class-methods-use-this
-    removeNoscriptTags( $items ) {
-        $items.find( 'noscript' ).remove();
-    }
-
-    /**
      * Init layout
      */
     initLayout() {
@@ -644,8 +630,6 @@ class VP {
      */
     addItems( $items, removeExisting, $newVP ) {
         const self = this;
-
-        self.removeNoscriptTags( $items );
 
         self.emitEvent( 'addItems', [ $items, removeExisting, $newVP ] );
     }

@@ -33,7 +33,7 @@ class Visual_Portfolio_Assets {
         add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_head_assets' ), 9 );
 
         add_action( 'template_redirect', array( $this, 'popup_custom_styles' ) );
-        add_action( 'template_redirect', array( $this, 'popup_for_default_wordpress_images' ) );
+        add_action( 'template_redirect', array( $this, 'assets_for_default_wordpress_images' ) );
 
         add_action( 'wp_footer', array( $this, 'wp_enqueue_foot_assets' ) );
 
@@ -164,11 +164,6 @@ class Visual_Portfolio_Assets {
         self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'script' );
         self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'style' );
 
-        // Images Lazy Loading.
-        if ( Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' ) ) {
-            self::store_used_assets( 'visual-portfolio-images-lazy-loading', true, 'script' );
-        }
-
         // Items Style.
         if ( $options['items_style'] ) {
             $items_style_pref = '';
@@ -188,6 +183,11 @@ class Visual_Portfolio_Assets {
                 'items-list/items-style' . $items_style_pref . '/style',
                 'template_style'
             );
+        }
+
+        // Images Lazy Loading.
+        if ( Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' ) ) {
+            self::enqueue_lazyload_assets();
         }
 
         // Popup.
@@ -289,6 +289,16 @@ class Visual_Portfolio_Assets {
     }
 
     /**
+     * Enqueue lazyload assets.
+     *
+     * @return void
+     */
+    public static function enqueue_lazyload_assets() {
+        self::store_used_assets( 'visual-portfolio-lazyload', true, 'script' );
+        self::store_used_assets( 'visual-portfolio-lazyload', true, 'style' );
+    }
+
+    /**
      * Register scripts that will be used in the future when portfolio will be printed.
      */
     public function register_scripts() {
@@ -349,6 +359,7 @@ class Visual_Portfolio_Assets {
         // LazySizes.
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
+            wp_register_script( 'lazysizes-config', visual_portfolio()->plugin_url . 'assets/js/lazysizes-config.min.js', array(), '@@plugin_version', true );
             wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '5.2.2', true );
         }
 
@@ -384,6 +395,7 @@ class Visual_Portfolio_Assets {
             'visual-portfolio'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
             'visual-portfolio-noscript'         => array( 'assets/css/noscript.min.css', array( 'visual-portfolio' ) ),
             'visual-portfolio-elementor'        => array( 'assets/css/elementor.min.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-lazyload'         => array( 'assets/css/lazyload.min.css', array() ),
             'visual-portfolio-custom-scrollbar' => array( 'assets/css/custom-scrollbar.min.css', array( 'simplebar' ) ),
             'visual-portfolio-layout-justified' => array( 'assets/css/layout-justified.min.css', array( 'visual-portfolio' ) ),
             'visual-portfolio-layout-slider'    => array( 'assets/css/layout-slider.min.css', array( 'visual-portfolio', 'swiper' ) ),
@@ -434,11 +446,12 @@ class Visual_Portfolio_Assets {
                     'simplebar',
                 ),
             ),
-            'visual-portfolio-images-lazy-loading' => array(
-                'assets/js/images-lazy-loading.min.js',
+            'visual-portfolio-lazyload' => array(
+                'assets/js/lazyload.min.js',
                 array(
                     'jquery',
                     'lazysizes-object-fit-cover',
+                    'lazysizes-config',
                     'lazysizes',
                 ),
             ),
@@ -535,9 +548,12 @@ class Visual_Portfolio_Assets {
     /**
      * Add popup for default WordPress images.
      */
-    public function popup_for_default_wordpress_images() {
+    public function assets_for_default_wordpress_images() {
         if ( Visual_Portfolio_Settings::get_option( 'enable_on_wordpress_images', 'vp_popup_gallery' ) ) {
             self::enqueue_popup_assets();
+        }
+        if ( 'full' === Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' ) ) {
+            self::enqueue_lazyload_assets();
         }
     }
 

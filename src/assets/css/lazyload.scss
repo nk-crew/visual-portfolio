@@ -1,0 +1,53 @@
+@import "./variables-lazyload";
+
+/*
+ * Visual Portfolio Lazyload Images
+ */
+
+// LazyLoad image
+img.vp-lazyload,
+img.vp-lazyloaded,
+img.vp-lazypreload,
+img.vp-lazyloading {
+    opacity: 0;
+    transition: var(--vp-lazyload-transition-duration) opacity;
+    will-change: opacity;
+}
+img.vp-lazyloaded {
+    opacity: 1;
+}
+
+.vp-portfolio__item-img::before,
+.vp-portfolio__thumbnail-img::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: var(--vp-lazyload-images__background);
+    background-color: var(--vp-lazyload-images__background-color);
+    background-position: 0% 50%;
+    background-size: 500% 100%;
+    transition: var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) opacity, var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) visibility;
+}
+
+.vp-portfolio__item-img-lazyloading,
+.vp-portfolio__thumbnail-img-lazyloading {
+    &::before {
+        visibility: visible;
+        opacity: 1;
+        transition: none;
+        animation: vp-lazyload-placeholder var(--vp-lazyload-images__animation-duration) linear infinite;
+    }
+}
+
+@keyframes vp-lazyload-placeholder {
+    0%,
+    80% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

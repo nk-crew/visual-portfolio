@@ -563,23 +563,17 @@ class Visual_Portfolio_Get {
             'filter'             => '',
             'video'              => '',
             'image_id'           => '',
+            // wp_kses allowed attributes for image
+            // extended in class-images for lazyloading support.
             'image_allowed_html' => array(
-                'noscript' => array(),
-                'img'      => array(
-                    'src'             => array(),
-                    'srcset'          => array(),
-                    'sizes'           => array(),
-                    'alt'             => array(),
-                    'class'           => array(),
-                    'width'           => array(),
-                    'height'          => array(),
-
-                    // Lazyload support.
-                    'loading'         => array(),
-                    'data-src'        => array(),
-                    'data-sizes'      => array(),
-                    'data-srcset'     => array(),
-                    'data-no-lazy'    => array(),
+                'img' => array(
+                    'src'    => array(),
+                    'srcset' => array(),
+                    'sizes'  => array(),
+                    'alt'    => array(),
+                    'class'  => array(),
+                    'width'  => array(),
+                    'height' => array(),
                 ),
             ),
             'img_size_popup'     => $img_size_popup,
@@ -1816,7 +1810,7 @@ class Visual_Portfolio_Get {
         $is_posts = 'post-based' === $args['vp_opts']['content_source'] || 'portfolio' === $args['vp_opts']['content_source'];
 
         // prepare image.
-        $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '', true );
+        $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '' );
 
         // fallback for old templates versions.
         $args['image_noscript'] = '';
@@ -1876,7 +1870,7 @@ class Visual_Portfolio_Get {
 
         // No Image.
         if ( ! $args['image'] && $args['no_image'] ) {
-            $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'], false, '', true );
+            $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['no_image'], $args['img_size'], false, '' );
         }
 
         // Class.
