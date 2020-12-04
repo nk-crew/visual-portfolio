@@ -29,6 +29,6 @@ $link_data = array(
         <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
         <div class="vp-portfolio__item-img-overlay"></div>
 
-        <?php visual_portfolio()->include_template( 'global/link-утв', $link_data ); ?>
+        <?php visual_portfolio()->include_template( 'global/link-end', $link_data ); ?>
     </div>
 </div>
