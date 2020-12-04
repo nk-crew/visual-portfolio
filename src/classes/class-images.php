@@ -38,13 +38,58 @@ class Visual_Portfolio_Images {
      * Visual_Portfolio_Images constructor.
      */
     public static function construct() {
-        add_action( 'wp', 'Visual_Portfolio_Images::init' );
+        add_action( 'wp', 'Visual_Portfolio_Images::init_lazyload' );
+
+        self::add_image_sizes();
     }
 
     /**
-     * Init
+     * Add image sizes.
      */
-    public static function init() {
+    public static function add_image_sizes() {
+        $sm       = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images' );
+        $md       = Visual_Portfolio_Settings::get_option( 'md', 'vp_images' );
+        $lg       = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images' );
+        $xl       = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images' );
+        $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images' );
+        $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images' );
+        $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images' );
+
+        // custom image sizes.
+        add_image_size( 'vp_sm', $sm, 9999 );
+        add_image_size( 'vp_md', $md, 9999 );
+        add_image_size( 'vp_lg', $lg, 9999 );
+        add_image_size( 'vp_xl', $xl, 9999 );
+        add_image_size( 'vp_sm_popup', $sm_popup, 9999 );
+        add_image_size( 'vp_md_popup', $md_popup, 9999 );
+        add_image_size( 'vp_xl_popup', $xl_popup, 9999 );
+
+        add_filter( 'image_size_names_choose', 'Visual_Portfolio_Images::image_size_names_choose' );
+    }
+
+    /**
+     * Custom image sizes
+     *
+     * @param array $sizes - registered image sizes.
+     *
+     * @return array
+     */
+    public function image_size_names_choose( $sizes ) {
+        return array_merge(
+            $sizes,
+            array(
+                'vp_sm' => esc_html__( 'Small (VP)', '@@text_domain' ),
+                'vp_md' => esc_html__( 'Medium (VP)', '@@text_domain' ),
+                'vp_lg' => esc_html__( 'Large (VP)', '@@text_domain' ),
+                'vp_xl' => esc_html__( 'Extra Large (VP)', '@@text_domain' ),
+            )
+        );
+    }
+
+    /**
+     * Init Lazyload
+     */
+    public static function init_lazyload() {
         // Don't lazy load for feeds, previews and admin side.
         if ( is_feed() || is_preview() || is_admin() ) {
             return;

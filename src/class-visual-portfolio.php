@@ -99,9 +99,6 @@ class Visual_Portfolio {
 
         // include helper files.
         $this->include_dependencies();
-
-        // register images sizes.
-        $this->add_image_sizes();
     }
 
     /**
@@ -119,49 +116,6 @@ class Visual_Portfolio {
     }
 
     /**
-     * Add image sizes.
-     */
-    public function add_image_sizes() {
-        $sm       = Visual_Portfolio_Settings::get_option( 'sm', 'vp_images' );
-        $md       = Visual_Portfolio_Settings::get_option( 'md', 'vp_images' );
-        $lg       = Visual_Portfolio_Settings::get_option( 'lg', 'vp_images' );
-        $xl       = Visual_Portfolio_Settings::get_option( 'xl', 'vp_images' );
-        $sm_popup = Visual_Portfolio_Settings::get_option( 'sm_popup', 'vp_images' );
-        $md_popup = Visual_Portfolio_Settings::get_option( 'md_popup', 'vp_images' );
-        $xl_popup = Visual_Portfolio_Settings::get_option( 'xl_popup', 'vp_images' );
-
-        // custom image sizes.
-        add_image_size( 'vp_sm', $sm, 9999 );
-        add_image_size( 'vp_md', $md, 9999 );
-        add_image_size( 'vp_lg', $lg, 9999 );
-        add_image_size( 'vp_xl', $xl, 9999 );
-        add_image_size( 'vp_sm_popup', $sm_popup, 9999 );
-        add_image_size( 'vp_md_popup', $md_popup, 9999 );
-        add_image_size( 'vp_xl_popup', $xl_popup, 9999 );
-
-        add_filter( 'image_size_names_choose', array( $this, 'image_size_names_choose' ) );
-    }
-
-    /**
-     * Custom image sizes
-     *
-     * @param array $sizes - registered image sizes.
-     *
-     * @return array
-     */
-    public function image_size_names_choose( $sizes ) {
-        return array_merge(
-            $sizes,
-            array(
-                'vp_sm' => esc_html__( 'Small (VP)', '@@text_domain' ),
-                'vp_md' => esc_html__( 'Medium (VP)', '@@text_domain' ),
-                'vp_lg' => esc_html__( 'Large (VP)', '@@text_domain' ),
-                'vp_xl' => esc_html__( 'Extra Large (VP)', '@@text_domain' ),
-            )
-        );
-    }
-
-    /**
      * Include dependencies
      */
     private function include_dependencies() {
@@ -174,8 +128,8 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-templates.php';
         require_once $this->plugin_path . 'classes/class-parse-blocks.php';
         require_once $this->plugin_path . 'classes/class-assets.php';
-        require_once $this->plugin_path . 'classes/class-images.php';
         require_once $this->plugin_path . 'classes/class-settings.php';
+        require_once $this->plugin_path . 'classes/class-images.php';
         require_once $this->plugin_path . 'classes/class-rest.php';
         require_once $this->plugin_path . 'classes/class-get-portfolio.php';
         require_once $this->plugin_path . 'classes/class-gutenberg.php';
