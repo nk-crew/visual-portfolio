@@ -195,7 +195,8 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
         }
 
         // click action
-        self.$item.on( `click.vpf-uid-${ self.uid }`, '.vp-portfolio__item a.vp-portfolio__item-meta, .vp-portfolio__item .vp-portfolio__item-img > a, .vp-portfolio__item .vp-portfolio__item-meta-title > a', function( e ) {
+        // `a.vp-portfolio__item-overlay` added as fallback for old templates, used in themes.
+        self.$item.on( `click.vpf-uid-${ self.uid }`, '.vp-portfolio__item a.vp-portfolio__item-meta, .vp-portfolio__item .vp-portfolio__item-img > a, .vp-portfolio__item .vp-portfolio__item-meta-title > a, .vp-portfolio__item a.vp-portfolio__item-overlay', function( e ) {
             const $this = $( this );
 
             if ( ! $this.closest( '.vp-portfolio__item-wrap' ).find( '.vp-portfolio__item-popup' ).length ) {
