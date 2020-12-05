@@ -128,6 +128,9 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-templates.php';
         require_once $this->plugin_path . 'classes/class-parse-blocks.php';
         require_once $this->plugin_path . 'classes/class-assets.php';
+        require_once $this->plugin_path . 'classes/class-breakpoints.php';
+
+        // this settings class order is required.
         require_once $this->plugin_path . 'classes/class-settings.php';
         require_once $this->plugin_path . 'classes/class-images.php';
         require_once $this->plugin_path . 'classes/class-rest.php';
@@ -144,7 +147,6 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-vc.php';
         require_once $this->plugin_path . 'classes/class-elementor.php';
         require_once $this->plugin_path . 'classes/class-supported-themes.php';
-        require_once $this->plugin_path . 'classes/class-breakpoints.php';
         require_once $this->plugin_path . 'classes/class-wpml.php';
 
         // Migration run after all features.
