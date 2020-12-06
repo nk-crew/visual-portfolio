@@ -360,9 +360,7 @@ class Visual_Portfolio_Images {
             $placeholder = self::get_image_placeholder( $placeholder_w, $placeholder_h );
         }
 
-        // We set this, adding the query arg so that it doesn't exactly equal the src attribute, so that photon JavaScript
-        // will hold off on processing this image.
-        $attributes['data-src'] = esc_url_raw( add_query_arg( 'is-pending-load', true, $attributes['src'] ) );
+        $attributes['data-src'] = $attributes['src'];
 
         if ( isset( $attributes['srcset'] ) ) {
             $attributes['data-srcset'] = $attributes['srcset'];
