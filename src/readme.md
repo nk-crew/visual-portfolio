@@ -289,6 +289,14 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.10.1 =
+
+* added setting to enable lazy loading for all images on site (not only for Visual Portfolio)
+* changed preloader logo svg to img tag
+* fixed wrong path for Pro templates
+* fixed wrong name of link template
+* fixed popup gallery for old deprecated overlay class
+
 = 2.10.0 =
 
 * added new Query setting to select multiple post types
