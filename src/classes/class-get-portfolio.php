@@ -210,13 +210,13 @@ class Visual_Portfolio_Get {
     }
 
     /**
-     * Print portfolio by post ID or options
+     * Prepare config, that will be used for output.
      *
      * @param array $atts options for portfolio list to print.
      *
-     * @return string
+     * @return array|bool
      */
-    public static function get( $atts = array() ) {
+    public static function get_output_config( $atts = array() ) {
         if ( ! is_array( $atts ) ) {
             return '';
         }
@@ -224,7 +224,7 @@ class Visual_Portfolio_Get {
         $options = self::get_options( $atts );
 
         if ( ! $options ) {
-            return '';
+            return false;
         }
 
         do_action( 'vpf_before_get_output', $options );
@@ -238,9 +238,6 @@ class Visual_Portfolio_Get {
 
         // Add ID to class.
         $class .= ' vp-id-' . $options['id'];
-
-        // Insert styles and scripts.
-        Visual_Portfolio_Assets::enqueue( $options );
 
         // Add custom class.
         if ( isset( $atts['class'] ) ) {
@@ -297,14 +294,10 @@ class Visual_Portfolio_Get {
                 break;
         }
 
+        $is_preview = self::is_preview();
         $start_page = self::get_current_page_number();
-
-        // stupid hack as wp_reset_postdata() function is not working for me...
-        $old_post = $GLOBALS['post'];
-
-        $is_images = 'images' === $options['content_source'];
-
-        $is_social = 'social-stream' === $options['content_source'];
+        $is_images  = 'images' === $options['content_source'];
+        $is_social  = 'social-stream' === $options['content_source'];
 
         if ( $is_images || $is_social ) {
             $query_opts = self::get_query_params( $options, false, $options['id'] );
@@ -317,6 +310,9 @@ class Visual_Portfolio_Get {
         } else {
             // Get query params.
             $query_opts = self::get_query_params( $options, false, $options['id'] );
+
+            // stupid hack as wp_reset_postdata() function is not working for some reason...
+            $old_post = $GLOBALS['post'];
 
             // get Post List.
             $portfolio_query = new WP_Query( $query_opts );
@@ -334,36 +330,9 @@ class Visual_Portfolio_Get {
         $options['max_pages']     = $max_pages;
         $options['next_page_url'] = $next_page_url;
 
-        $is_preview = self::is_preview();
-
-        // No items found.
-        if ( ( ( $is_social || $is_images ) && empty( $query_opts['images'] ) ) || isset( $portfolio_query ) && ! $portfolio_query->have_posts() ) {
-
-            // Don't display any output if no items found (works on frontend only).
-            if ( ! $is_preview && 'notice' !== $options['no_items_action'] ) {
-                return '';
-            }
-
-            ob_start();
-
-            $class .= ' vp-portfolio-not-found';
-
-            ?>
-            <div class="<?php echo esc_attr( $class ); ?>">
-                <?php
-                self::notice( $options['no_items_notice'] );
-                ?>
-            </div>
-            <?php
-
-            $return = ob_get_contents();
-            ob_end_clean();
-            return $return;
-        }
-
-        ob_start();
-
-        // prepare data-attributes.
+        /**
+         * Prepare data-attributes.
+         */
         $data_attrs = array(
             'data-vp-layout'             => $options['layout'],
             'data-vp-items-style'        => $options['items_style'],
@@ -494,32 +463,6 @@ class Visual_Portfolio_Get {
         $data_attrs = apply_filters( 'vpf_extend_portfolio_data_attributes', $data_attrs, $options, $style_options );
         $class      = apply_filters( 'vpf_extend_portfolio_class', $class, $options, $style_options );
 
-        do_action( 'vpf_before_wrapper_start', $options, $style_options );
-
-        visual_portfolio()->include_template(
-            'items-list/wrapper-start',
-            array(
-                'options'       => $options,
-                'style_options' => $style_options,
-                'data_attrs'    => $data_attrs,
-                'class'         => $class,
-            )
-        );
-
-        do_action( 'vpf_after_wrapper_start', $options, $style_options );
-
-        // Top Layout elements.
-        self::print_layout_elements( 'top', $options );
-
-        // Prepare thumbnails.
-        $slider_thumbnails = array();
-
-        ?>
-        <div class="vp-portfolio__items-wrap">
-        <?php
-
-        do_action( 'vpf_before_items_wrapper_start', $options, $style_options );
-
         $items_class = 'vp-portfolio__items vp-portfolio__items-style-' . $options['items_style'];
 
         if ( isset( $style_options['show_overlay'] ) && $style_options['show_overlay'] ) {
@@ -532,17 +475,9 @@ class Visual_Portfolio_Get {
 
         $items_class = apply_filters( 'vpf_extend_portfolio_items_class', $items_class, $options, $style_options );
 
-        visual_portfolio()->include_template(
-            'items-list/items-wrapper-start',
-            array(
-                'options'       => $options,
-                'style_options' => $style_options,
-                'class'         => $items_class,
-            )
-        );
-
-        do_action( 'vpf_after_items_wrapper_start', $options, $style_options );
-
+        /**
+         * Prepare each item args.
+         */
         $each_item_args = array(
             'uid'                => '',
             'post_id'            => '',
@@ -584,6 +519,7 @@ class Visual_Portfolio_Get {
             'opts'               => $style_options,
             'vp_opts'            => $options,
         );
+        $items = array();
 
         if ( ( $is_images || $is_social ) &&
             isset( $query_opts['images'] ) &&
@@ -653,9 +589,7 @@ class Visual_Portfolio_Get {
 
                 $args = apply_filters( 'vpf_image_item_args', $args, $img );
 
-                $slider_thumbnails[] = $args['image_id'];
-
-                self::each_item( $args );
+                $items[] = $args;
             }
         } elseif ( isset( $portfolio_query ) ) {
             while ( $portfolio_query->have_posts() ) {
@@ -750,68 +684,219 @@ class Visual_Portfolio_Get {
 
                 $args = apply_filters( 'vpf_post_item_args', $args, $args['post_id'] );
 
-                $slider_thumbnails[] = $args['image_id'];
-
-                self::each_item( $args );
+                $items[] = $args;
             }
 
             $portfolio_query->reset_postdata();
+
+            // stupid hack as wp_reset_postdata() function is not working for some reason...
+            // phpcs:ignore
+            $GLOBALS['post'] = $old_post;
         }
 
-        do_action( 'vpf_before_items_wrapper_end', $options, $style_options );
+        $notices = array();
+
+        // No items found notice.
+        if ( empty( $items ) ) {
+            $class .= ' vp-portfolio-not-found';
+
+            // Don't display any output if no items found (works on frontend only).
+            if ( $options['no_items_notice'] && ( $is_preview || 'notice' === $options['no_items_action'] ) ) {
+                $notices[] = $options['no_items_notice'];
+            }
+        }
+
+        $result = array(
+            'options'           => $options,
+            'style_options'     => $style_options,
+            'class'             => $class,
+            'data_attrs'        => $data_attrs,
+            'items_class'       => $items_class,
+            'items'             => $items,
+            'notices'           => $notices,
+            'img_size_popup'    => $img_size_popup,
+            'img_size_md_popup' => $img_size_md_popup,
+            'img_size_sm_popup' => $img_size_sm_popup,
+            'img_size'          => $img_size,
+        );
+
+        return $result;
+    }
+
+    /**
+     * Print portfolio by post ID or options
+     *
+     * @param array $atts options for portfolio list to print.
+     *
+     * @return string
+     */
+    public static function get( $atts = array() ) {
+        $config = self::get_output_config( $atts );
+
+        if ( ! $config ) {
+            return '';
+        }
+
+        $options       = $config['options'];
+        $style_options = $config['style_options'];
+        $data_attrs    = $config['data_attrs'];
+        $class         = $config['class'];
+        $items         = $config['items'];
+        $items_class   = $config['items_class'];
+        $notices       = $config['notices'];
+
+        // Insert styles and scripts.
+        Visual_Portfolio_Assets::enqueue( $options );
+
+        // No items found.
+        if ( empty( $items ) ) {
+            if ( empty( $notices ) ) {
+                return '';
+            }
+
+            ob_start();
+
+            ?>
+            <div class="<?php echo esc_attr( $class ); ?>">
+                <?php
+                foreach ( $notices as $notice ) {
+                    self::notice( $notice );
+                }
+                ?>
+            </div>
+            <?php
+
+            return ob_get_clean();
+        }
+
+        ob_start();
+
+        /**
+         * Wrapper start.
+         */
+        do_action( 'vpf_before_wrapper_start', $options, $style_options );
 
         visual_portfolio()->include_template(
-            'items-list/items-wrapper-end',
+            'items-list/wrapper-start',
             array(
                 'options'       => $options,
                 'style_options' => $style_options,
+                'data_attrs'    => $data_attrs,
+                'class'         => $class,
             )
         );
 
-        do_action( 'vpf_after_items_wrapper_end', $options, $style_options );
+        do_action( 'vpf_after_wrapper_start', $options, $style_options );
 
-        // Slider arrows and bullets.
-        if ( 'slider' === $options['layout'] ) {
-            if ( $options['slider_arrows'] ) {
-                visual_portfolio()->include_template(
-                    'items-list/layouts/slider/arrows',
-                    array(
-                        'options'       => $options,
-                        'style_options' => $style_options,
-                    )
-                );
-            }
-            if ( $options['slider_bullets'] ) {
-                visual_portfolio()->include_template(
-                    'items-list/layouts/slider/bullets',
-                    array(
-                        'options'       => $options,
-                        'style_options' => $style_options,
-                    )
-                );
-            }
-        }
+        /**
+         * Top layout elements.
+         */
+        self::print_layout_elements( 'top', $options );
 
+        /**
+         * Items wrap.
+         */
         ?>
+        <div class="vp-portfolio__items-wrap">
+            <?php
+
+            /**
+             * Items wrapper start.
+             */
+            do_action( 'vpf_before_items_wrapper_start', $options, $style_options );
+
+            visual_portfolio()->include_template(
+                'items-list/items-wrapper-start',
+                array(
+                    'options'       => $options,
+                    'style_options' => $style_options,
+                    'class'         => $items_class,
+                )
+            );
+
+            do_action( 'vpf_after_items_wrapper_start', $options, $style_options );
+
+            /**
+             * Each item.
+             */
+            if ( is_array( $items ) && ! empty( $items ) ) {
+                foreach ( $items as $item_args ) {
+                    self::each_item( $item_args );
+                }
+            }
+
+            /**
+             * Items wrapper end.
+             */
+            do_action( 'vpf_before_items_wrapper_end', $options, $style_options );
+
+            visual_portfolio()->include_template(
+                'items-list/items-wrapper-end',
+                array(
+                    'options'       => $options,
+                    'style_options' => $style_options,
+                )
+            );
+
+            do_action( 'vpf_after_items_wrapper_end', $options, $style_options );
+
+            // Slider arrows and bullets.
+            if ( 'slider' === $options['layout'] ) {
+                if ( $options['slider_arrows'] ) {
+                    visual_portfolio()->include_template(
+                        'items-list/layouts/slider/arrows',
+                        array(
+                            'options'       => $options,
+                            'style_options' => $style_options,
+                        )
+                    );
+                }
+                if ( $options['slider_bullets'] ) {
+                    visual_portfolio()->include_template(
+                        'items-list/layouts/slider/bullets',
+                        array(
+                            'options'       => $options,
+                            'style_options' => $style_options,
+                        )
+                    );
+                }
+            }
+
+            ?>
         </div>
         <?php
 
-        // Slider thumbnails.
+        /**
+         * Carousel thumbnails.
+         */
         if ( 'slider' === $options['layout'] && $options['slider_thumbnails'] ) {
+            $slider_thumbnails = array();
+
+            if ( is_array( $items ) && ! empty( $items ) ) {
+                foreach ( $items as $item_args ) {
+                    $slider_thumbnails[] = $item_args['image_id'];
+                }
+            }
+
             visual_portfolio()->include_template(
                 'items-list/layouts/slider/thumbnails',
                 array(
                     'options'       => $options,
                     'style_options' => $style_options,
                     'thumbnails'    => $slider_thumbnails,
-                    'img_size'      => $img_size,
+                    'img_size'      => $config['img_size'],
                 )
             );
         }
 
-        // Bottom Layout elements.
+        /**
+         * Bottom layout elements.
+         */
         self::print_layout_elements( 'bottom', $options );
 
+        /**
+         * Wrapper end.
+         */
         do_action( 'vpf_before_wrapper_end', $options, $style_options );
 
         visual_portfolio()->include_template(
@@ -825,10 +910,6 @@ class Visual_Portfolio_Get {
         do_action( 'vpf_after_wrapper_end', $options, $style_options );
 
         do_action( 'vpf_after_get_output', $options, $style_options );
-
-        // stupid hack as wp_reset_postdata() function is not working for some reason...
-        // phpcs:ignore
-        $GLOBALS['post'] = $old_post;
 
         $return = ob_get_contents();
         ob_end_clean();
