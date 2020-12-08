@@ -24,7 +24,7 @@ class Visual_Portfolio_3rd_Elementor {
      * Register widget
      */
     public function widgets_registered() {
-        require_once visual_portfolio()->plugin_path . 'classes/class-elementor-widget.php';
+        require_once visual_portfolio()->plugin_path . 'classes/3rd/class-elementor-widget.php';
 
         \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new Visual_Portfolio_3rd_Elementor_Widget() );
     }
