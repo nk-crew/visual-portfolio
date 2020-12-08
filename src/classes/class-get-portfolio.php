@@ -244,7 +244,7 @@ class Visual_Portfolio_Get {
             $class .= ' ' . $atts['class'];
         }
 
-        // Add custom css from VC.
+        // Add custom CSS from VC.
         if ( function_exists( 'vc_shortcode_custom_css_class' ) && isset( $atts['vc_css'] ) ) {
             $class .= ' ' . vc_shortcode_custom_css_class( $atts['vc_css'] );
         }
