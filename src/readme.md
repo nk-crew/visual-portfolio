@@ -290,6 +290,13 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.10.3 =
+
+* fixed Elementor widget PHP error
+* fixed preloader logo styles
+* fixed wrong output of filters after AJAX call
+* fixed number controls value type bug (for example, when you change Offset option, it will not display the actual value in Saved Layout)
+
 = 2.10.2 =
 
 * fixed conflict of lazy loading and Imagify WebP feature (again)
