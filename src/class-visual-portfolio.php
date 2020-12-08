@@ -143,10 +143,10 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-custom-post-meta.php';
         require_once $this->plugin_path . 'classes/class-admin.php';
         require_once $this->plugin_path . 'classes/class-controls.php';
-        require_once $this->plugin_path . 'classes/class-tinymce.php';
         require_once $this->plugin_path . 'classes/class-supported-themes.php';
 
         // 3rd code integration.
+        require_once $this->plugin_path . 'classes/3rd/class-tinymce.php';
         require_once $this->plugin_path . 'classes/3rd/class-vc.php';
         require_once $this->plugin_path . 'classes/3rd/class-elementor.php';
         require_once $this->plugin_path . 'classes/3rd/class-imagify.php';

@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Visual_Portfolio_TinyMCE
+ * Class Visual_Portfolio_3rd_TinyMCE
  */
-class Visual_Portfolio_TinyMCE {
+class Visual_Portfolio_3rd_TinyMCE {
     /**
-     * Visual_Portfolio_TinyMCE constructor.
+     * Visual_Portfolio_3rd_TinyMCE constructor.
      */
     public function __construct() {
         $this->init_hooks();
@@ -100,4 +100,4 @@ class Visual_Portfolio_TinyMCE {
     }
 }
 
-new Visual_Portfolio_TinyMCE();
+new Visual_Portfolio_3rd_TinyMCE();
