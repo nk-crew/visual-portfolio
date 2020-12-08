@@ -22,7 +22,7 @@ Modern gallery and portfolio plugin with advanced layouts editor. Clean and powe
 
 Create beautiful, clean, and powerful photo galleries and portfolio layouts using the Visual Portfolio gallery plugin. It is easy for simple photo galleries, but powerful enough for professionals. Whether you're a photographer, agency, or anything in between, **Visual Portfolio will boost your online presence**.
 
-### 💯 Visual Gallery Builder ###
+### 🏆 Visual Gallery Builder ###
 
 Build your portfolio and gallery blocks with no coding knowledge. Thanks to Gutenberg page builder you are able to create and customize galleries visually.
 
@@ -72,7 +72,7 @@ Fine-tune the source of your galleries. Display posts, portfolios, and any other
 
 ### 🖼️ Photo Galleries ###
 
-You can also create galleries using image sets right inside block editor. Just drop your images and gallery is ready.
+Create galleries using image sets right inside block editor, just drop your images and the gallery is ready. You can create unlimited galleries with different styles, there is no limitation.
 
 ### ⚡ Powerful Lightbox ###
 
@@ -127,7 +127,7 @@ Visual Portfolio adds a new layer of compatibility for [WPML](https://wpml.org/)
 
 Visual Portfolio gives you a wide range of filters and actions to customize every part of your gallery. Also, it allows you to overwrite templates and change it in the theme directory. Moreover, you can customize separate portfolio lists using custom CSS and CSS Variables.
 
-### 🌟 Visual Portfolio Pro ###
+### 🔥 Visual Portfolio Pro ###
 
 > The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [**Learn more about Visual Portfolio Pro**](https://visualportfolio.co/pro/?utm_source=wporg&utm_medium=link&utm_campaign=pro)
 >
@@ -170,13 +170,14 @@ Makes URL automatically change when you open popup and you can easily link to a 
 
 [**Find much more portfolio and gallery features of Visual Portfolio Pro today!**](https://visualportfolio.co/pro/?utm_source=wporg&utm_medium=link&utm_campaign=pro)
 
-### ⭐ More Features ###
+### 🌟 More Features ###
 
 * **Lightboxes for Standard WordPress Images**
 Image lightbox available for Visual Portfolio galleries as well as for standard WordPress images and galleries in your content.
 
 * **AJAX Loading and Pagination**
-Every dynamic part of the Visual Portfolio plugin is using AJAX to update the gallery content in live mode. To split long portfolio lists we prepared 3 types of pagination:
+Every dynamic part of the Visual Portfolio plugin is using AJAX to update the gallery content in live mode.
+Organized galleries and portfolio lists will make your website look more professional, easy to navigate and result in a better user experience. We prepared 3 types of paginations for you:
   * Infinite Scroll
   * Load More button
   * Paged pagination
@@ -288,6 +289,10 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/).
 
 ## Changelog ##
+
+= 2.10.2 =
+
+* fixed conflict of lazy loading and Imagify WebP feature (again)
 
 = 2.10.1 =
 
