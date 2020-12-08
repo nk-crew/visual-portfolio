@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Visual_Portfolio_Elementor_Widget
+ * Class Visual_Portfolio_3rd_Elementor_Widget
  */
-class Visual_Portfolio_Elementor_Widget extends \Elementor\Widget_Base {
+class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
     /**
-     * Constructor of Visual_Portfolio_Elementor_Widget class.
+     * Constructor of Visual_Portfolio_3rd_Elementor_Widget class.
      *
      * @param array      $data default widget data.
      * @param null|array $args default widget args.

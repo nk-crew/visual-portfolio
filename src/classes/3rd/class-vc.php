@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Visual_Portfolio_VC
+ * Class Visual_Portfolio_3rd_VC
  */
-class Visual_Portfolio_VC {
+class Visual_Portfolio_3rd_VC {
     /**
-     * Visual_Portfolio_VC constructor.
+     * Visual_Portfolio_3rd_VC constructor.
      */
     public function __construct() {
         $this->init_hooks();
@@ -95,4 +95,4 @@ class Visual_Portfolio_VC {
     }
 }
 
-new Visual_Portfolio_VC();
+new Visual_Portfolio_3rd_VC();

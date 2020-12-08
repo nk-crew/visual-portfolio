@@ -12,11 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 // phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
 
 /**
- * Class Visual_Portfolio_WPML
+ * Class Visual_Portfolio_3rd_WPML
  */
-class Visual_Portfolio_WPML {
+class Visual_Portfolio_3rd_WPML {
     /**
-     * Visual_Portfolio_WPML constructor.
+     * Visual_Portfolio_3rd_WPML constructor.
      */
     public function __construct() {
         global $iclTranslationManagement;
@@ -90,4 +90,4 @@ class Visual_Portfolio_WPML {
     }
 }
 
-new Visual_Portfolio_WPML();
+new Visual_Portfolio_3rd_WPML();

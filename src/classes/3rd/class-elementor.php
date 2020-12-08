@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Visual_Portfolio_Elementor
+ * Class Visual_Portfolio_3rd_Elementor
  */
-class Visual_Portfolio_Elementor {
+class Visual_Portfolio_3rd_Elementor {
     /**
-     * Visual_Portfolio_Elementor constructor.
+     * Visual_Portfolio_3rd_Elementor constructor.
      */
     public function __construct() {
         add_action( 'elementor/widgets/widgets_registered', array( $this, 'widgets_registered' ) );
@@ -26,8 +26,8 @@ class Visual_Portfolio_Elementor {
     public function widgets_registered() {
         require_once visual_portfolio()->plugin_path . 'classes/class-elementor-widget.php';
 
-        \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new Visual_Portfolio_Elementor_Widget() );
+        \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new Visual_Portfolio_3rd_Elementor_Widget() );
     }
 }
 
-new Visual_Portfolio_Elementor();
+new Visual_Portfolio_3rd_Elementor();
