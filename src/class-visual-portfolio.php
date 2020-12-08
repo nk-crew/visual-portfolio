@@ -149,6 +149,7 @@ class Visual_Portfolio {
         // 3rd code integration.
         require_once $this->plugin_path . 'classes/3rd/class-vc.php';
         require_once $this->plugin_path . 'classes/3rd/class-elementor.php';
+        require_once $this->plugin_path . 'classes/3rd/class-imagify.php';
         require_once $this->plugin_path . 'classes/3rd/class-wpml.php';
 
         // Migration run after all features.

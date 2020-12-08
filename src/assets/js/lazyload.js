@@ -25,6 +25,11 @@ if ( 'undefined' !== typeof objectFitImages ) {
     } );
 }
 
+// recalculate image size if parent is <picture>
+$doc.on( 'lazybeforesizes', ( e ) => {
+    e.detail.width = $( e.target ).parents( ':not(picture)' ).innerWidth() || e.detail.width;
+} );
+
 // Lazyloaded - remove preloader images placeholder effect.
 $doc.on( 'lazybeforeunveil', ( e ) => {
     const $img = $( e.target );
