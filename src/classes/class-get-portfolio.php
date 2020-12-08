@@ -1284,13 +1284,20 @@ class Visual_Portfolio_Get {
             }
         } else {
             $query_opts = array(
-                'showposts'      => $count,
                 'posts_per_page' => $count,
+                'showposts'      => $count,
                 'paged'          => $paged,
                 'orderby'        => 'post_date',
                 'order'          => 'DESC',
                 'post_type'      => 'portfolio',
             );
+
+            // Get all available categories for filter.
+            if ( $for_filter ) {
+                $query_opts['posts_per_page'] = -1;
+                $query_opts['showposts']      = -1;
+                $query_opts['paged']          = -1;
+            }
 
             // Post based.
             if ( 'post-based' === $options['content_source'] ) {
@@ -1572,11 +1579,6 @@ class Visual_Portfolio_Get {
             }
         } else {
             $query_opts = self::get_query_params( $vp_options, true );
-
-            // Get all available categories for current $query_opts.
-            $query_opts['posts_per_page'] = -1;
-            $query_opts['showposts']      = -1;
-            $query_opts['paged']          = -1;
 
             /**
              * TODO: make caching using set_transient function. Info here - https://wordpress.stackexchange.com/a/145960
