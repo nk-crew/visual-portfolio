@@ -355,8 +355,8 @@ ControlsRender.Control = function( props ) {
                 min={ props.min }
                 max={ props.max }
                 step={ props.step }
-                value={ controlVal }
-                onChange={ ( val ) => onChange( val ) }
+                value={ parseFloat( controlVal ) }
+                onChange={ ( val ) => onChange( parseFloat( val ) ) }
             />
         );
         break;
@@ -442,7 +442,7 @@ ControlsRender.Control = function( props ) {
                 min={ props.min }
                 max={ props.max }
                 step={ props.step }
-                value={ controlVal }
+                value={ parseFloat( controlVal ) }
                 onChange={ ( val ) => onChange( parseFloat( val ) ) }
             />
         );
