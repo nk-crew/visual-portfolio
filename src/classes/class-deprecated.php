@@ -72,7 +72,7 @@ class Visual_Portfolio_Deprecations {
 
         // Add generic handler.
         // Use a priority of 10, and accepted args of 10 (ignored by WP).
-        add_action( $replacement, '_acf_apply_deprecated_hook', 10, 10 );
+        add_action( $replacement, array( $this, 'apply_deprecated_hook' ), 10, 10 );
     }
 
     /**
