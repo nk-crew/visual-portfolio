@@ -18,16 +18,73 @@ if ( version_compare( PHP_VERSION, '5.5.9' ) >= 0 && ! class_exists( 'Cocur\Slug
 }
 
 /**
- * Session Start
+ * Session Start.
  */
 function vpf_session_start() {
+    // We don't need sessions in admin side.
+    if ( is_admin() ) {
+        return;
+    }
+
     // Fixes problem with headers sent - https://wordpress.org/support/topic/headers-already-sent-43/ .
-    if ( ! is_admin() && ! session_id() && ! headers_sent() ) {
-        session_start();
+    if ( headers_sent() ) {
+        return;
+    }
+
+    if ( ! function_exists( 'session_status' ) ) {
+        if ( session_id() ) {
+            // phpcs:ignore
+            @session_start();
+        }
+    } elseif ( session_status() !== PHP_SESSION_ACTIVE ) {
+        // phpcs:ignore
+        @session_start();
     }
 }
 // We need a lower priority to prevent errors when 3rd-party plugins output something.
 add_action( 'init', 'vpf_session_start', 5 );
+
+/**
+ * Session Close.
+ */
+function vpf_session_close() {
+    if ( session_id() ) {
+        // phpcs:ignore
+        @session_write_close();
+    }
+}
+add_action( 'shutdown', 'vpf_session_close', 999 );
+
+/**
+ * Write session to disk to prevent cURL time-out which may occur with
+ * WordPress (since 4.9.2, see https://core.trac.wordpress.org/ticket/43358),
+ * or plugins such as "Health Check".
+ *
+ * @param false|array|WP_Error $preempt - A preemptive return value of an HTTP request.
+ * @param array                $r - HTTP request arguments.
+ * @param string               $url - The request URL.
+ *
+ * @return mixed
+ */
+function vpf_pre_http_request( $preempt, $r, $url ) {
+    // VPF_DISABLE_SWC can be defined in wp-config.php (undocumented).
+    if ( ! defined( 'VPF_DISABLE_SWC' ) && isset( $_SESSION ) ) {
+        if ( function_exists( 'get_site_url' ) ) {
+            // phpcs:ignore
+            $parse = parse_url( get_site_url() );
+
+            // phpcs:ignore
+            $s_url = @$parse['scheme'] . "://{$parse['host']}";
+
+            if ( strpos( $url, $s_url ) === 0 ) {
+                vpf_session_close();
+            }
+        }
+    }
+
+    return $preempt;
+}
+add_filter( 'pre_http_request', 'vpf_pre_http_request', 10, 3 );
 
 /**
  * Class Visual_Portfolio_Get
