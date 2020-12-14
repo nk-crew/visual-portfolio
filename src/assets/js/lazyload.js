@@ -47,6 +47,6 @@ $doc.on( 'lazybeforeunveil', ( e ) => {
 $doc.on( 'lazyloaded', ( e ) => {
     const $img = $( e.target );
 
-    $img.closest( '.vp-portfolio__item-img-lazyloading' ).removeClass( 'vp-portfolio__item-img-lazyloading' );
-    $img.closest( '.vp-portfolio__thumbnail-img-lazyloading' ).removeClass( 'vp-portfolio__thumbnail-img-lazyloading' );
+    $img.closest( '.vp-portfolio__item-img' ).removeClass( 'vp-portfolio__item-img-lazyloading' ).addClass( 'vp-portfolio__item-img-lazyloaded' );
+    $img.closest( '.vp-portfolio__thumbnail-img' ).removeClass( 'vp-portfolio__thumbnail-img-lazyloading' ).addClass( 'vp-portfolio__thumbnail-img-lazyloaded' );
 } );
