@@ -390,11 +390,6 @@ class Visual_Portfolio_Images {
         // Add custom classname.
         $attributes['class'] = sprintf( '%s vp-lazyload', empty( $attributes['class'] ) ? '' : $attributes['class'] );
 
-        // Prevent WP Smush lazy loading.
-        if ( class_exists( 'WP_Smush' ) || class_exists( 'Smush\WP_Smush' ) ) {
-            $attributes['class'] .= ' no-lazyload';
-        }
-
         /**
          * Allow plugins and themes to override the attributes on the image before the content is updated.
          *
