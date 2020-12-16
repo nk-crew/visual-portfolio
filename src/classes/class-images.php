@@ -100,16 +100,17 @@ class Visual_Portfolio_Images {
             return;
         }
 
+        // Disable using filter.
+        // Same filter used in `class-assets.php`.
+        if ( ! apply_filters( 'vpf_images_lazyload', true ) ) {
+            return;
+        }
+
         self::$allow_vp_lazyload = ! ! Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' );
         self::$allow_wp_lazyload = 'full' === Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' );
 
         // Check for plugin settings.
         if ( ! self::$allow_vp_lazyload && ! self::$allow_wp_lazyload ) {
-            return;
-        }
-
-        // disable using filter.
-        if ( ! apply_filters( 'vpf_images_lazyload', true ) ) {
             return;
         }
 
@@ -120,6 +121,7 @@ class Visual_Portfolio_Images {
             add_filter( 'widget_text', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
             add_filter( 'get_image_tag', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
         }
+
         add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::process_image_attributes', 9999 );
 
         add_action( 'wp_kses_allowed_html', 'Visual_Portfolio_Images::allow_lazy_attributes' );

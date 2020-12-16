@@ -294,6 +294,12 @@ class Visual_Portfolio_Assets {
      * @return void
      */
     public static function enqueue_lazyload_assets() {
+        // Disable lazyload assets using filter.
+        // Same filter used in `class-images.php`.
+        if ( ! apply_filters( 'vpf_images_lazyload', true ) ) {
+            return;
+        }
+
         self::store_used_assets( 'visual-portfolio-lazyload', true, 'script' );
         self::store_used_assets( 'visual-portfolio-lazyload', true, 'style' );
     }
