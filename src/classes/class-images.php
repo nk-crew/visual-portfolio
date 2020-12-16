@@ -390,11 +390,6 @@ class Visual_Portfolio_Images {
         // Add custom classname.
         $attributes['class'] = sprintf( '%s vp-lazyload', empty( $attributes['class'] ) ? '' : $attributes['class'] );
 
-        // Prevent WP Rocket lazy loading.
-        if ( defined( 'WP_ROCKET_VERSION' ) ) {
-            $attributes['data-no-lazy'] = '1';
-        }
-
         // Prevent WP Smush lazy loading.
         if ( class_exists( 'WP_Smush' ) || class_exists( 'Smush\WP_Smush' ) ) {
             $attributes['class'] .= ' no-lazyload';
