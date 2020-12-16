@@ -557,6 +557,8 @@ class Visual_Portfolio_Get {
             'image_id'           => '',
             // wp_kses allowed attributes for image
             // extended in class-images for lazyloading support.
+            //
+            // DEPRECATED, but we should keep it, as a lot of custom user templates may still use it.
             'image_allowed_html' => array(
                 'img' => array(
                     'src'    => array(),

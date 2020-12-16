@@ -26,7 +26,13 @@ $link_data = array(
     <div class="vp-portfolio__item-img">
         <?php visual_portfolio()->include_template( 'global/link-start', $link_data ); ?>
 
-        <?php echo wp_kses( $args['image'], $args['image_allowed_html'] ); ?>
+        <?php
+        // Show Image.
+        visual_portfolio()->include_template(
+            'items-list/item-parts/image',
+            array( 'image' => $args['image'] )
+        );
+        ?>
 
         <?php visual_portfolio()->include_template( 'global/link-end', $link_data ); ?>
     </div>
