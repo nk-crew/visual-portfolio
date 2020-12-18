@@ -248,7 +248,12 @@ class Visual_Portfolio_Custom_Post_Type {
         if ( ! is_blog_installed() ) {
             return;
         }
-        if ( get_option( 'visual_portfolio_updated_caps' ) === '@@plugin_version' ) {
+
+        global $wp_version;
+
+        $check_string = 'Plugin: @@plugin_version WP: ' . $wp_version;
+
+        if ( get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
             return;
         }
 
@@ -325,7 +330,7 @@ class Visual_Portfolio_Custom_Post_Type {
             $wp_roles->add_cap( 'administrator', $cap );
         }
 
-        update_option( 'visual_portfolio_updated_caps', '@@plugin_version' );
+        update_option( 'visual_portfolio_updated_caps', $check_string );
     }
 
     /**
