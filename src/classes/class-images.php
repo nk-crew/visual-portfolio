@@ -228,7 +228,10 @@ class Visual_Portfolio_Images {
      */
     public static function add_image_placeholders( $content ) {
         // This is a pretty simple regex, but it works.
-        $content = preg_replace_callback( '#<(img)([^>]+?)(>(.*?)</\\1>|[\/]?>)#si', 'Visual_Portfolio_Images::process_image', $content );
+        //
+        // 1. Find <img> tags
+        // 2. Exclude tags, placed inside <noscript>.
+        $content = preg_replace_callback( '#(?<!noscript\>)<(img)([^>]+?)(>(.*?)</\\1>|[\/]?>)#si', 'Visual_Portfolio_Images::process_image', $content );
 
         return $content;
     }
@@ -245,7 +248,9 @@ class Visual_Portfolio_Images {
         // Check for blocked classes.
         if ( ! empty( $attributes['class'] ) ) {
             $blocked_classes = array(
+                'lazy',
                 'lazyload',
+                'lazy-load',
                 'skip-lazy',
                 'gazette-featured-content-thumbnail',
             );
@@ -268,8 +273,18 @@ class Visual_Portfolio_Images {
 
         $blocked_attributes = array(
             'data-skip-lazy',
+            'data-no-lazy',
             'data-src',
+            'data-srcset',
+            'data-lazy-original',
+            'data-lazy-src',
+            'data-lazyload',
         );
+
+        /**
+         * Allow plugins and themes to tell lazy images to skip an image with a given attribute.
+         */
+        $blocked_attributes = apply_filters( 'vpf_lazyload_images_blocked_attributes', $blocked_attributes );
 
         foreach ( $blocked_attributes as $attr ) {
             if ( isset( $attributes[ $attr ] ) ) {
