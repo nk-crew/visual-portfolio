@@ -149,8 +149,10 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/3rd/class-tinymce.php';
         require_once $this->plugin_path . 'classes/3rd/class-vc.php';
         require_once $this->plugin_path . 'classes/3rd/class-elementor.php';
+        require_once $this->plugin_path . 'classes/3rd/class-a3-lazy-load.php';
         require_once $this->plugin_path . 'classes/3rd/class-ewww-image-optimizer.php';
         require_once $this->plugin_path . 'classes/3rd/class-imagify.php';
+        require_once $this->plugin_path . 'classes/3rd/class-lazy-loading-responsive-images.php';
         require_once $this->plugin_path . 'classes/3rd/class-avada.php';
         require_once $this->plugin_path . 'classes/3rd/class-wpml.php';
 
