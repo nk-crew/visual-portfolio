@@ -146,15 +146,15 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-supported-themes.php';
 
         // 3rd code integration.
-        require_once $this->plugin_path . 'classes/3rd/class-tinymce.php';
-        require_once $this->plugin_path . 'classes/3rd/class-vc.php';
-        require_once $this->plugin_path . 'classes/3rd/class-elementor.php';
-        require_once $this->plugin_path . 'classes/3rd/class-a3-lazy-load.php';
-        require_once $this->plugin_path . 'classes/3rd/class-ewww-image-optimizer.php';
-        require_once $this->plugin_path . 'classes/3rd/class-imagify.php';
-        require_once $this->plugin_path . 'classes/3rd/class-lazy-loading-responsive-images.php';
-        require_once $this->plugin_path . 'classes/3rd/class-avada.php';
-        require_once $this->plugin_path . 'classes/3rd/class-wpml.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-a3-lazy-load.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-elementor.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-ewww-image-optimizer.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-imagify.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-lazy-loading-responsive-images.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-tinymce.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-vc.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-wpml.php';
+        require_once $this->plugin_path . 'classes/3rd/themes/class-avada.php';
 
         // Migration run after all features.
         require_once $this->plugin_path . 'classes/class-migration.php';
