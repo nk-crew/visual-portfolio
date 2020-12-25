@@ -262,7 +262,7 @@ $( document ).on( 'destroy.vpf', ( event, self ) => {
 
 // Check if link is image.
 function isLinkImage( link ) {
-    return /(.png|.jpg|.jpeg|.gif|.tiff|.bmp|.webp)$/.test( link.href.toLowerCase().split( '?' )[ 0 ].split( '#' )[ 0 ] );
+    return /(.png|.jpg|.jpeg|.gif|.tiff|.tif|.jfif|.jpe|.svg|.bmp|.webp)$/.test( link.href.toLowerCase().split( '?' )[ 0 ].split( '#' )[ 0 ] );
 }
 
 // Parse image data from link.
