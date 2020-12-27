@@ -290,6 +290,20 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.10.4 =
+
+* added more image extensions support for popup gallery (tif, jfif, jpe, svg)
+* changed images output to separate template include, no more needed `image_allowed_html` config
+* removed color overlay from lazyloaded image (we saw it in the transparent PNG images, even if it does not needed)
+* fixed Health Check loopback error on some hosts
+* fixed role caps update after WordPress updated
+* fixed Lazy Load conflicts in 3rd-party code:
+  * Avada theme
+  * EWWW Image Optimizer plugin
+  * A3 Lazy Load plugin
+  * Lazy Loader plugin
+* renamed `lazy-sizes-config` file to prevent conflicts with some security plugins
+
 = 2.10.3 =
 
 * fixed Elementor widget PHP error
