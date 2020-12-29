@@ -748,7 +748,10 @@ class Visual_Portfolio_Get {
 
             $portfolio_query->reset_postdata();
 
-            // stupid hack as wp_reset_postdata() function is not working for some reason...
+            // Sometimes, when we use WPBakery Page Builder, without this reset output is wrong.
+            wp_reset_postdata();
+
+            // stupid hack as wp_reset_postdata() function is not working in some situations...
             // phpcs:ignore
             $GLOBALS['post'] = $old_post;
         }
@@ -1675,9 +1678,13 @@ class Visual_Portfolio_Get {
                     }
                 }
             }
+
             $portfolio_query->reset_postdata();
 
-            // stupid hack as wp_reset_postdata() function is not working for me...
+            // Sometimes, when we use WPBakery Page Builder, without this reset output is wrong.
+            wp_reset_postdata();
+
+            // stupid hack as wp_reset_postdata() function is not working in some situations...
             // phpcs:ignore
             $GLOBALS['post'] = $old_post;
 
