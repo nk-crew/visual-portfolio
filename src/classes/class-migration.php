@@ -25,14 +25,7 @@ class Visual_Portfolio_Migrations {
      *
      * @var string
      */
-    protected $initial_version = '';
-
-    /**
-     * The theme version as stored in the db.
-     *
-     * @var string
-     */
-    protected $previous_version;
+    protected $initial_version = '1.16.2';
 
     /**
      * Visual_Portfolio_Migrations constructor.
@@ -49,8 +42,8 @@ class Visual_Portfolio_Migrations {
      * Init.
      */
     public function init() {
-        // Migration code added after 1.16.2 plugin version.
-        $saved_version   = get_option( 'vpf_db_version', '1.16.2' );
+        // Migration code added after `$this->initial_version` plugin version.
+        $saved_version   = get_option( 'vpf_db_version', $this->initial_version );
         $current_version = $this->version;
 
         foreach ( $this->get_migrations() as $migration ) {
