@@ -290,6 +290,13 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.10.5 =
+
+* added posts data for each item templates (fixes wrong output in Leedo theme)
+* fixed possible conflicts with themes custom styles for &lt;a> tags and non-visible images
+* fixed possible wrong order of lazysizes dependencies in some themes
+* fixed rare bug with WPBakery Page Builder, when wrong items content displayed
+
 = 2.10.4 =
 
 * added more image extensions support for popup gallery (tif, jfif, jpe, svg)
