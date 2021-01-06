@@ -1954,8 +1954,6 @@ class Visual_Portfolio_Get {
      *      'vp_opts' - vp options.
      */
     private static function each_item( $args ) {
-        global $post;
-
         $is_posts = 'post-based' === $args['vp_opts']['content_source'] || 'portfolio' === $args['vp_opts']['content_source'];
 
         // prepare image.
@@ -1991,8 +1989,8 @@ class Visual_Portfolio_Get {
         // prepare read more button.
         if ( isset( $args['opts']['show_read_more'] ) && $args['opts']['show_read_more'] ) {
             if ( $is_posts && 'more_tag' === $args['opts']['show_read_more'] ) {
-                if ( strpos( $post->post_content, '<!--more-->' ) ) {
-                    $args['opts']['read_more_url'] = $args['url'] . '#more-' . get_the_ID();
+                if ( strpos( get_post_field( 'post_content', $args['post_id'] ), '<!--more-->' ) ) {
+                    $args['opts']['read_more_url'] = $args['url'] . '#more-' . $args['post_id'];
                 } else {
                     $args['opts']['show_read_more'] = false;
                 }
@@ -2026,7 +2024,7 @@ class Visual_Portfolio_Get {
         $args['class'] = 'vp-portfolio__item-wrap';
         if ( $is_posts ) {
             // post_class functionality.
-            $args['class'] = join( ' ', get_post_class( $args['class'], get_the_ID() ) );
+            $args['class'] = join( ' ', get_post_class( $args['class'], $args['post_id'] ) );
         }
         if ( $args['uid'] ) {
             $args['class'] .= ' vp-portfolio__item-uid-' . esc_attr( $args['uid'] );
