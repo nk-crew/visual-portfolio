@@ -137,6 +137,13 @@
     position: relative;
 }
 
+// Fix conflict with such theme styles:
+// a { position: relative; }
+// https://wordpress.org/support/topic/gallery-images-grey/
+.vp-portfolio__item .vp-portfolio__item-img a {
+    position: unset;
+}
+
 // layout elements
 .vp-portfolio__layout-elements {
     display: flex;
