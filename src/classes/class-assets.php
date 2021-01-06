@@ -366,7 +366,7 @@ class Visual_Portfolio_Assets {
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
             wp_register_script( 'lazysizes-config', visual_portfolio()->plugin_url . 'assets/js/lazysizes-cfg.min.js', array(), '@@plugin_version', true );
-            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array(), '5.2.2', true );
+            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array( 'lazysizes-object-fit-cover', 'lazysizes-config' ), '5.2.2', true );
         }
 
         // CSS Vars Polyfill.
@@ -456,8 +456,6 @@ class Visual_Portfolio_Assets {
                 'assets/js/lazyload.min.js',
                 array(
                     'jquery',
-                    'lazysizes-object-fit-cover',
-                    'lazysizes-config',
                     'lazysizes',
                 ),
             ),
