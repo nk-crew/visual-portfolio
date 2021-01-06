@@ -1954,7 +1954,23 @@ class Visual_Portfolio_Get {
      *      'vp_opts' - vp options.
      */
     private static function each_item( $args ) {
+        global $post;
+
         $is_posts = 'post-based' === $args['vp_opts']['content_source'] || 'portfolio' === $args['vp_opts']['content_source'];
+
+        // In older plugin versions we used the query objects in these templates.
+        // And some theme authors used these data to run wp functions to output posts data.
+        // In order to add back-compatibility, we need to "restore" such a possibility.
+        //
+        // Example: https://wordpress.org/support/topic/title-and-link-error-for-blog/.
+        $set_post_object = $is_posts && isset( $args['post_id'] ) && $args['post_id'];
+
+        if ( $set_post_object ) {
+            // phpcs:ignore
+            $post = get_post( $args['post_id'] );
+
+            setup_postdata( $post );
+        }
 
         // prepare image.
         $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '' );
@@ -2068,6 +2084,10 @@ class Visual_Portfolio_Get {
             </figure>
         </<?php echo esc_attr( $tag_name ); ?>>
         <?php
+
+        if ( $set_post_object ) {
+            wp_reset_postdata();
+        }
     }
 
     /**
