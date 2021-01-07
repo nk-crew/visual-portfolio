@@ -63,6 +63,12 @@ class Visual_Portfolio_Supported_Themes {
                     'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-twentyfifteen.min.css',
                 );
                 break;
+            case 'airtifact':
+                $result = array(
+                    'name' => 'vpf-airtifact',
+                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-airtifact.min.css',
+                );
+                break;
         }
 
         return $result;
