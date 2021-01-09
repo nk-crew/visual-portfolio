@@ -19,6 +19,7 @@ class Visual_Portfolio_Admin {
     public function __construct() {
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
         add_action( 'enqueue_block_editor_assets', array( $this, 'saved_layouts_editor_enqueue_scripts' ) );
+        add_action( 'in_admin_header', array( $this, 'in_admin_header' ) );
         add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
         // Pro link.
@@ -98,6 +99,86 @@ class Visual_Portfolio_Admin {
         }
 
         return $text;
+    }
+
+    /**
+     * Admin navigation.
+     */
+    public function in_admin_header() {
+        if ( ! function_exists( 'get_current_screen' ) ) {
+            return;
+        }
+
+        $screen = get_current_screen();
+
+        // Determine if the current page being viewed is "Lazy Blocks" related.
+        if ( ! isset( $screen->post_type ) || ( 'portfolio' !== $screen->post_type && 'vp_lists' !== $screen->post_type ) ) {
+            return;
+        }
+
+        global $submenu, $submenu_file, $plugin_page;
+
+        $parent_slug = 'edit.php?post_type=portfolio';
+        $tabs        = array();
+
+        // Generate array of navigation items.
+        if ( isset( $submenu[ $parent_slug ] ) ) {
+            foreach ( $submenu[ $parent_slug ] as $i => $sub_item ) {
+
+                // Check user can access page.
+                if ( ! current_user_can( $sub_item[1] ) ) {
+                    continue;
+                }
+
+                // Ignore "Add New".
+                if ( 'post-new.php?post_type=portfolio' === $sub_item[2] ) {
+                    continue;
+                }
+
+                // Define tab.
+                $tab = array(
+                    'text' => $sub_item[0],
+                    'url'  => $sub_item[2],
+                );
+
+                // Convert submenu slug "test" to "$parent_slug&page=test".
+                if ( ! strpos( $sub_item[2], '.php' ) && 0 !== strpos( $sub_item[2], 'https://' ) ) {
+                    $tab['url'] = add_query_arg( array( 'page' => $sub_item[2] ), $parent_slug );
+                }
+
+                // Detect active state.
+                if ( $submenu_file === $sub_item[2] || $plugin_page === $sub_item[2] ) {
+                    $tab['is_active'] = true;
+                }
+
+                $tabs[] = $tab;
+            }
+        }
+
+        // Bail early if set to false.
+        if ( false === $tabs ) {
+            return;
+        }
+
+        ?>
+        <div class="vpf-admin-toolbar">
+            <h2>
+                <i class="dashicons-visual-portfolio"></i>
+                <?php echo esc_html__( 'Visual Portfolio', '@@text_domain' ); ?>
+            </h2>
+            <?php
+            foreach ( $tabs as $tab ) {
+                printf(
+                    '<a class="vpf-admin-toolbar-tab%s" href="%s">%s</a>',
+                    ! empty( $tab['is_active'] ) ? ' is-active' : '',
+                    esc_url( $tab['url'] ),
+                    // phpcs:ignore
+                    $tab['text']
+                );
+            }
+            ?>
+        </div>
+        <?php
     }
 
     /**

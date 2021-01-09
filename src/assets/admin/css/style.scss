@@ -8,7 +8,8 @@
  * Go Pro menu link
  */
 #adminmenu a[href*="page=visual_portfolio_go_pro"],
-.wp-list-table.plugins a[href*="page=visual_portfolio_go_pro"] {
+.wp-list-table.plugins a[href*="page=visual_portfolio_go_pro"],
+.vpf-admin-toolbar a[href*="page=visual_portfolio_go_pro"] {
     font-weight: 700;
     color: #ff6a38;
 
@@ -81,6 +82,64 @@
     bottom: 0;
     left: 0;
     z-index: 2;
+}
+
+// Admin toolbar.
+.vpf-admin-toolbar {
+    background-color: #fff;
+    border-bottom: 1px solid #d7dbde;
+
+    @media screen and (max-width: 600px) {
+        display: none;
+    }
+
+    #wpcontent & {
+        padding-left: 20px;
+        margin-left: -20px;
+    }
+
+    h2 {
+        display: inline-block;
+        padding: 5px 0;
+        margin: 0 10px 0 0;
+        font-size: 14px;
+        line-height: 2.57143;
+
+        i {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-top: -5px;
+            margin-right: 5px;
+            vertical-align: middle;
+            filter: invert(1);
+            opacity: 1;
+        }
+    }
+
+    .vpf-admin-toolbar-tab {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 0 2px;
+        font-size: 14px;
+        line-height: 2.57143;
+        color: inherit;
+        text-decoration: none;
+
+        &.is-active {
+            padding-bottom: 2px;
+            border-bottom: #007cba solid 3px;
+        }
+
+        &:hover,
+        &:focus {
+            color: #007cba;
+        }
+
+        .dashicons {
+            line-height: 2;
+        }
+    }
 }
 
 /**
