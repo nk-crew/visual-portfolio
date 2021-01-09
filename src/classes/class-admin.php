@@ -19,6 +19,7 @@ class Visual_Portfolio_Admin {
     public function __construct() {
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
         add_action( 'enqueue_block_editor_assets', array( $this, 'saved_layouts_editor_enqueue_scripts' ) );
+        add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
         // Pro link.
         add_filter( 'plugin_action_links_' . visual_portfolio()->plugin_basename, array( $this, 'add_go_pro_link_plugins_page' ) );
@@ -74,6 +75,29 @@ class Visual_Portfolio_Admin {
                 )
             );
         }
+    }
+
+    /**
+     * Admin footer text.
+     *
+     * @param string $text The admin footer text.
+     *
+     * @return string
+     */
+    public function admin_footer_text( $text ) {
+        if ( ! function_exists( 'get_current_screen' ) ) {
+            return $text;
+        }
+
+        $screen = get_current_screen();
+
+        // Determine if the current page being viewed is "Visual Portfolio" related.
+        if ( isset( $screen->post_type ) && ( 'portfolio' === $screen->post_type || 'vp_lists' === $screen->post_type ) ) {
+            // Use RegExp to append "Visual Portfolio" after the <a> element allowing translations to read correctly.
+            return preg_replace( '/(<a[\S\s]+?\/a>)/', '$1 ' . esc_attr__( 'and', '@@text_domain' ) . ' <a href="https://visualportfolio.co/" target="_blank">Visual Portfolio</a>', $text, 1 );
+        }
+
+        return $text;
     }
 
     /**
