@@ -112,6 +112,10 @@ class Visual_Portfolio {
      * Deactivation Hook
      */
     public function deactivation_hook() {
+        // Sometimes users can't access portfolio items.
+        // As a workaround user may deactivate and activate the plugin to resolve this problem.
+        update_option( 'visual_portfolio_updated_caps', '' );
+
         flush_rewrite_rules();
     }
 
