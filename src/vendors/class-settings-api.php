@@ -139,6 +139,26 @@ class Visual_Portfolio_Settings_API {
                     $label .= '<span class="vpf-settings-control-pro-label">?<span>' . esc_html__( 'This feature available in PRO plugin only', '@@text_domain' ) . '</span></span>';
                 }
 
+                $data_condition = '';
+                if ( isset( $option['condition'] ) && is_array( $option['condition'] ) && ! empty( $option['condition'] ) ) {
+                    foreach ( $option['condition'] as $key => $condition ) {
+                        if ( 1 < count( $option['condition'] ) ) {
+                            $data_condition .= '( ';
+                        }
+
+                        $condition['value'] = empty( $condition['value'] ) ? "''" : "'" . $condition['value'] . "'";
+
+                        $data_condition .= $condition['control'] . $condition['operator'] . $condition['value'];
+
+                        if ( 1 < count( $option['condition'] ) ) {
+                            $data_condition .= ' )';
+                            if ( ( count( $option['condition'] ) - 1 ) !== $key ) {
+                                $data_condition .= ' && ';
+                            }
+                        }
+                    }
+                }
+
                 $args = array(
                     'id'                => $name,
                     'class'             => $class_name,
@@ -156,6 +176,7 @@ class Visual_Portfolio_Settings_API {
                     'max'               => isset( $option['max'] ) ? $option['max'] : '',
                     'step'              => isset( $option['step'] ) ? $option['step'] : '',
                     'is_pro'            => isset( $option['is_pro'] ) ? $option['is_pro'] : false,
+                    'condition'         => $data_condition,
                 );
 
                 add_settings_field( "{$section}[{$name}]", $label, $callback, $section, $section, $args );
@@ -402,7 +423,7 @@ class Visual_Portfolio_Settings_API {
         $id = $args['section'] . '[' . $args['id'] . ']';
         $label = isset( $args['options']['button_label'] ) ? $args['options']['button_label'] : __( 'Choose Image' );
         $label_remove = isset( $args['options']['button_remove_label'] ) ? $args['options']['button_remove_label'] : __( 'Remove Image' );
-        $img = wp_get_attachment_image_src( $value );
+        $img = wp_get_attachment_image_src( $value, $args['size'] ? $args['size'] : 'thumbnail' );
         $img_url = $img ? $img[0] : '';
 
         $html  = sprintf( '<input type="hidden" class="%1$s-text wpsa-image-id" id="%2$s" name="%2$s" value="%3$s"/>', $size, $id, $value );
