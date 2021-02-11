@@ -139,6 +139,10 @@ class Visual_Portfolio_Settings {
                 'title' => esc_html__( 'Popup Gallery', '@@text_domain' ),
             ),
             array(
+                'id'    => 'vp_watermarks',
+                'title' => esc_html__( 'Watermarks', '@@text_domain' ),
+            ),
+            array(
                 'id'    => 'vp_social_integrations',
                 'title' => esc_html__( 'Social Integrations', '@@text_domain' ),
             ),
@@ -476,6 +480,21 @@ class Visual_Portfolio_Settings {
     display: none;
 }',
                     'is_pro'  => true,
+                ),
+            ),
+            'vp_watermarks' => array(
+                array(
+                    'name'    => 'social_pro_info',
+                    'desc'    => '
+                        <div class="vpf-settings-info-pro">
+                            <h3>' . esc_html__( 'PRO Feature', '@@text_domain' ) . '</h3>
+                            <div>
+                                <p>' . esc_html__( 'Data protection such as watermarks.', '@@text_domain' ) . '</p>
+                                <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&utm_medium=link&utm_campaign=plugin_settings&utm_content=@@plugin_version">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
+                            </div>
+                        </div>
+                    ',
+                    'type'    => 'html',
                 ),
             ),
             'vp_social_integrations' => array(

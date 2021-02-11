@@ -1137,10 +1137,6 @@ class Visual_Portfolio_Admin {
                     'is_opened' => true,
                     'icon'      => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.0428 14.3315V1.71123C16.0428 0.748663 15.2941 0 14.3315 0H1.71123C0.748663 0 0 0.748663 0 1.71123V14.3315C0 15.2941 0.748663 16.0428 1.71123 16.0428H14.3315C15.2941 16.0428 16.0428 15.2941 16.0428 14.3315ZM1.60428 1.71123C1.60428 1.60428 1.71123 1.60428 1.71123 1.60428H14.3315C14.4385 1.60428 14.4385 1.71123 14.4385 1.71123V9.62567L11.9786 7.80749C11.6578 7.59358 11.3369 7.59358 11.016 7.80749L7.91444 10.0535L5.34759 8.87701C5.13369 8.77005 4.81283 8.77005 4.59893 8.87701L1.49733 10.4813V1.71123H1.60428ZM1.60428 14.3315V12.4064L5.02674 10.5882L7.59358 11.8717C7.80749 11.9786 8.12834 11.9786 8.4492 11.7647L11.4438 9.62567L14.4385 11.7647V14.4385C14.4385 14.5455 14.3315 14.5455 14.3315 14.5455H1.71123C1.71123 14.4385 1.60428 14.3315 1.60428 14.3315Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M19.25 5.75C19.6642 5.75 20 6.08579 20 6.5C20 6.91421 20 17.25 20 17.25C20 18.7688 18.7688 20 17.25 20H4.27C3.85579 20 3.52 19.6642 3.52 19.25C3.52 18.8358 3.85579 18.5 4.27 18.5H17.25C17.9404 18.5 18.5 17.9404 18.5 17.25C18.5 17.25 18.5 6.91421 18.5 6.5C18.5 6.08579 18.8358 5.75 19.25 5.75Z" fill="currentColor"/></svg>',
                 ),
-                'content-protection'           => array(
-                    'title'     => esc_html__( 'Protection', '@@text_domain' ),
-                    'is_opened' => false,
-                ),
                 'content-source-social-stream' => array(
                     'title'     => esc_html__( 'Social Stream Settings', '@@text_domain' ),
                     'is_opened' => true,
@@ -1160,6 +1156,11 @@ class Visual_Portfolio_Admin {
                     'title'     => esc_html__( 'Items Click Action', '@@text_domain' ),
                     'is_opened' => false,
                     'icon'      => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.9857 10.718L2.83729 12.8686M13.933 13.9327L11.9062 19L7.85261 7.85198L19 11.9058L13.933 13.9327ZM13.933 13.9327L19 19L13.933 13.9327ZM6.01633 1L6.80374 3.93598L6.01633 1ZM3.93683 6.80305L1 6.0156L3.93683 6.80305ZM12.8689 2.83537L10.7185 4.98592L12.8689 2.83537Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent"/></svg>',
+                ),
+                'content-protection'           => array(
+                    'title'     => esc_html__( 'Protection', '@@text_domain' ),
+                    'is_opened' => false,
+                    'icon'      => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2222 9H3.77778C2.79594 9 2 9.81403 2 10.8182V17.1818C2 18.186 2.79594 19 3.77778 19H16.2222C17.2041 19 18 18.186 18 17.1818V10.8182C18 9.81403 17.2041 9 16.2222 9Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 9V5.88889C6 4.85749 6.42143 3.86834 7.17157 3.13903C7.92172 2.40972 8.93913 2 10 2C11.0609 2 12.0783 2.40972 12.8284 3.13903C13.5786 3.86834 14 4.85749 14 5.88889V9" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                 ),
                 'custom_css'                   => array(
                     'title'     => esc_html__( 'Custom CSS', '@@text_domain' ),
@@ -1639,8 +1640,9 @@ class Visual_Portfolio_Admin {
                 'description' => esc_html__( 'Data protection such as watermarks.', '@@text_domain' ),
                 'condition'   => array(
                     array(
-                        'control' => 'content_source',
-                        'value'   => 'images',
+                        'control'  => 'content_source',
+                        'operator' => '!==',
+                        'value'    => 'social-stream',
                     ),
                 ),
             )
