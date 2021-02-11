@@ -53,6 +53,7 @@ class IframePreview extends Component {
         this.state = {
             loading: true,
             uniqueId: `vpf-preview-${ uniqueIdCount }`,
+            currentIframeHeight: 0,
             latestIframeHeight: 0,
         };
 
@@ -68,13 +69,17 @@ class IframePreview extends Component {
         this.maybeReloadDebounce = debounce( 300, rafSchd( this.maybeReload.bind( this ) ) );
         this.maybeResizePreviews = this.maybeResizePreviews.bind( this );
         this.maybeResizePreviewsThrottle = throttle( 100, rafSchd( this.maybeResizePreviews ) );
+        this.updateIframeHeight = this.updateIframeHeight.bind( this );
+        this.updateIframeHeightThrottle = throttle( 100, rafSchd( this.updateIframeHeight ) );
         this.printInput = this.printInput.bind( this );
     }
 
     componentDidMount() {
+        const self = this;
+
         const {
             clientId,
-        } = this.props;
+        } = self.props;
 
         iframeResizer( {
             interval: 10,
@@ -88,12 +93,15 @@ class IframePreview extends Component {
                     window.focus();
                 }
             },
-        }, this.frameRef.current );
+            onResized( { height } ) {
+                self.updateIframeHeightThrottle( `${ height }px` );
+            },
+        }, self.frameRef.current );
 
-        this.frameRef.current.addEventListener( 'load', this.onFrameLoad );
-        window.addEventListener( 'resize', this.maybeResizePreviewsThrottle );
+        self.frameRef.current.addEventListener( 'load', self.onFrameLoad );
+        window.addEventListener( 'resize', self.maybeResizePreviewsThrottle );
 
-        this.maybeReload();
+        self.maybeReload();
     }
 
     componentDidUpdate( prevProps ) {
@@ -219,7 +227,7 @@ class IframePreview extends Component {
         let latestIframeHeight = 0;
 
         if ( this.frameRef.current ) {
-            latestIframeHeight = this.frameRef.current.scrollHeight;
+            latestIframeHeight = this.state.currentIframeHeight;
         }
 
         this.setState( {
@@ -241,10 +249,9 @@ class IframePreview extends Component {
 
         const frame = this.frameRef.current;
         const $frame = $( frame );
-        const $inner = $frame.closest( '.visual-portfolio-gutenberg-preview-inner' );
         const parentWidth = $frame.closest( '.visual-portfolio-gutenberg-preview' ).width();
 
-        $inner.css( {
+        $frame.css( {
             width: contentWidth,
         } );
 
@@ -255,6 +262,15 @@ class IframePreview extends Component {
             } );
             frame.iFrameResizer.resize();
         }
+    }
+
+    /**
+     * Update iframe height.
+     */
+    updateIframeHeight( newHeight ) {
+        this.setState( {
+            currentIframeHeight: newHeight,
+        } );
     }
 
     /**
@@ -299,6 +315,7 @@ class IframePreview extends Component {
         const {
             loading,
             uniqueId,
+            currentIframeHeight,
             latestIframeHeight,
         } = this.state;
 
@@ -313,7 +330,7 @@ class IframePreview extends Component {
                     'visual-portfolio-gutenberg-preview',
                     loading ? 'visual-portfolio-gutenberg-preview-loading' : ''
                 ) }
-                style={ loading ? { minHeight: latestIframeHeight } : {} }
+                style={ { minHeight: loading ? latestIframeHeight : currentIframeHeight } }
             >
                 <div className="visual-portfolio-gutenberg-preview-inner">
                     <form

@@ -5,8 +5,10 @@
     overflow: hidden;
 
     iframe {
+        position: absolute;
         width: 100%;
-        max-width: none;
+        // stylelint-disable-next-line
+        max-width: none !important;
         margin: 0;
     }
 }
