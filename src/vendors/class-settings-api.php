@@ -586,26 +586,41 @@ class Visual_Portfolio_Settings_API {
     function show_forms() {
         ?>
         <div class="metabox-holder">
-            <?php foreach ( $this->settings_sections as $form ) { ?>
-                <div id="<?php echo $form['id']; ?>" class="group" style="display: none;">
-                    <form method="post" action="options.php">
-                        <?php
-                        do_action( 'wsa_form_top_' . $form['id'], $form );
-                        settings_fields( $form['id'] );
-                        do_settings_sections( $form['id'] );
-                        do_action( 'wsa_form_bottom_' . $form['id'], $form );
-                        if ( isset( $this->settings_fields[ $form['id'] ] ) ) :
-                            ?>
-                            <div style="padding-left: 10px">
-                                <?php submit_button(); ?>
-                            </div>
-                        <?php endif; ?>
-                    </form>
-                </div>
-            <?php } ?>
+            <?php foreach ( $this->settings_sections as $form ) {
+                echo apply_filters( 'vp_settings_show_section_form', $this->get_form( $form ), $form );
+            } ?>
         </div>
         <?php
         $this->script();
+    }
+
+    /**
+     * Get the section settings form.
+     * This function return displays detailed section in a each of forms.
+     *
+     * @param array $form - Form item.
+     * @return string
+     */
+    function get_form( $form ) {
+        ob_start();
+        ?>
+        <div id="<?php echo $form['id']; ?>" class="group" style="display: none;">
+            <form method="post" action="options.php">
+                <?php
+                do_action( 'wsa_form_top_' . $form['id'], $form );
+                settings_fields( $form['id'] );
+                do_settings_sections( $form['id'] );
+                do_action( 'wsa_form_bottom_' . $form['id'], $form );
+                if ( isset( $this->settings_fields[ $form['id'] ] ) ) :
+                    ?>
+                    <div style="padding-left: 10px">
+                        <?php submit_button(); ?>
+                    </div>
+                <?php endif; ?>
+            </form>
+        </div>
+        <?
+        return ob_get_clean();
     }
 
     /**
@@ -719,6 +734,8 @@ class Visual_Portfolio_Settings_API {
                         $this.siblings('.wpsa-image-id').val(attachment.id).change();
                         $this.siblings('.wpsa-image-preview').children('img').attr('src', url);
                         $this.siblings('.wpsa-image-remove').css('display', 'inline-block');
+
+                        $this.trigger( 'wpsa-image-browse-selected', [ attachment, url ] );
                     })
 
                     // Finally, open the modal
@@ -740,6 +757,8 @@ class Visual_Portfolio_Settings_API {
                     $this.siblings('.wpsa-image-id').val('').change();
                     $this.siblings('.wpsa-image-preview').children('img').attr('src', '');
                     $this.css('display', '');
+
+                    $this.trigger( 'wpsa-image-removed' );
                 });
             });
         </script>
