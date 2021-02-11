@@ -330,7 +330,7 @@ class IframePreview extends Component {
                     'visual-portfolio-gutenberg-preview',
                     loading ? 'visual-portfolio-gutenberg-preview-loading' : ''
                 ) }
-                style={ { minHeight: loading ? latestIframeHeight : currentIframeHeight } }
+                style={ { height: loading ? latestIframeHeight : currentIframeHeight } }
             >
                 <div className="visual-portfolio-gutenberg-preview-inner">
                     <form
