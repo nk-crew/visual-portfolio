@@ -46,6 +46,7 @@ class Visual_Portfolio_Settings_API {
         wp_enqueue_media();
         wp_enqueue_script( 'wp-color-picker' );
         wp_enqueue_script( 'jquery' );
+        wp_enqueue_script( 'conditionize2', visual_portfolio()->plugin_url . 'assets/vendor/conditionize2/jquery.conditionize2.min.js', array( 'jquery' ), '@@plugin_version' );
     }
 
     /**
@@ -139,26 +140,6 @@ class Visual_Portfolio_Settings_API {
                     $label .= '<span class="vpf-settings-control-pro-label">?<span>' . esc_html__( 'This feature available in PRO plugin only', '@@text_domain' ) . '</span></span>';
                 }
 
-                $data_condition = '';
-                if ( isset( $option['condition'] ) && is_array( $option['condition'] ) && ! empty( $option['condition'] ) ) {
-                    foreach ( $option['condition'] as $key => $condition ) {
-                        if ( 1 < count( $option['condition'] ) ) {
-                            $data_condition .= '( ';
-                        }
-
-                        $condition['value'] = empty( $condition['value'] ) ? "''" : "'" . $condition['value'] . "'";
-
-                        $data_condition .= $condition['control'] . $condition['operator'] . $condition['value'];
-
-                        if ( 1 < count( $option['condition'] ) ) {
-                            $data_condition .= ' )';
-                            if ( ( count( $option['condition'] ) - 1 ) !== $key ) {
-                                $data_condition .= ' && ';
-                            }
-                        }
-                    }
-                }
-
                 $args = array(
                     'id'                => $name,
                     'class'             => $class_name,
@@ -176,7 +157,8 @@ class Visual_Portfolio_Settings_API {
                     'max'               => isset( $option['max'] ) ? $option['max'] : '',
                     'step'              => isset( $option['step'] ) ? $option['step'] : '',
                     'is_pro'            => isset( $option['is_pro'] ) ? $option['is_pro'] : false,
-                    'condition'         => $data_condition,
+                    'condition'         => isset( $option['condition'] ) ? $option['condition'] : null,
+                    'conditionize'      => isset( $option['condition'] ) ? $this->convert_arguments_to_conditionize_string( $option['condition'] ) : '',
                 );
 
                 add_settings_field( "{$section}[{$name}]", $label, $callback, $section, $section, $args );
@@ -485,6 +467,97 @@ class Visual_Portfolio_Settings_API {
     }
 
     /**
+     * Displays a toggle field for a settings field
+     *
+     * @param array $args settings field args.
+     */
+    public function callback_toggle( $args ) {
+        $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
+        $size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
+        $type  = 'checkbox';
+
+        echo '<label class="vp-toggle-field">';
+        echo sprintf( '<input type="hidden" name="%1$s[%2$s]" value="off" />', esc_attr( $args['section'] ), esc_attr( $args['id'] ) );
+        echo sprintf(
+            '<input type="%1$s" class="%2$s-text" id="%3$s[%4$s]" name="%3$s[%4$s]" value="on" %5$s/>',
+            esc_attr( $type ),
+            esc_attr( $size ),
+            esc_attr( $args['section'] ),
+            esc_attr( $args['id'] ),
+            checked( $value, 'on', false )
+        );
+        echo '<span class="vp-toggle-field-slider-round"></span></label>';
+        echo wp_kses_post( $this->get_field_description( $args ) );
+    }
+
+    /**
+     * Displays a range field for a settings field
+     *
+     * @param array $args settings field args.
+     */
+    public function callback_range( $args ) {
+
+        $value       = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
+        $size        = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
+        $type        = isset( $args['type'] ) ? $args['type'] : 'range';
+        $placeholder = empty( $args['placeholder'] ) ? '' : ' placeholder="' . $args['placeholder'] . '"';
+        $min         = empty( $args['min'] ) ? '' : ' min="' . $args['min'] . '"';
+        $max         = empty( $args['max'] ) ? '' : ' max="' . $args['max'] . '"';
+        $step        = empty( $args['max'] ) ? '' : ' step="' . $args['step'] . '"';
+        ?>
+        <?php
+            echo sprintf(
+                '<input type="%1$s" class="%2$s-range vp-input-range" id="%3$s[%4$s]" name="%3$s[%4$s]" value="%5$s"%6$s%7$s%8$s%9$s/>',
+                esc_attr( $type ),
+                esc_attr( $size ),
+                esc_attr( $args['section'] ),
+                esc_attr( $args['id'] ),
+                esc_attr( $value ),
+                esc_attr( $placeholder ),
+                esc_attr( $min ),
+                esc_attr( $max ),
+                esc_attr( $step )
+            );
+            echo sprintf(
+                '<input type="number" class="number-range vp-input-number-range" name="%1$s[%2$s]" value="%3$s"%4$s%5$s%6$s%7$s/>',
+                esc_attr( $args['section'] ),
+                esc_attr( $args['id'] ),
+                esc_attr( $value ),
+                esc_attr( $placeholder ),
+                esc_attr( $min ),
+                esc_attr( $max ),
+                esc_attr( $step )
+            );
+            echo wp_kses_post( $this->get_field_description( $args ) );
+        ?>
+        <?php
+    }
+
+    /**
+     * Displays a hidden field for a settings field
+     *
+     * @param array $args settings field args.
+     */
+    public function callback_hidden( $args ) {
+
+        $value       = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
+        $size        = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
+        $type        = isset( $args['type'] ) ? $args['type'] : 'hidden';
+        $placeholder = empty( $args['placeholder'] ) ? '' : ' placeholder="' . $args['placeholder'] . '"';
+
+        echo sprintf(
+            '<input type="%1$s" class="%2$s-text" id="%3$s[%4$s]" name="%3$s[%4$s]" value="%5$s"%6$s/>',
+            esc_attr( $type ),
+            esc_attr( $size ),
+            esc_attr( $args['section'] ),
+            esc_attr( $args['id'] ),
+            esc_attr( $value ),
+            esc_attr( $placeholder )
+        );
+        echo wp_kses_post( $this->get_field_description( $args ) );
+    }
+
+    /**
      * Sanitize callback for Settings API
      *
      * @return mixed
@@ -609,7 +682,7 @@ class Visual_Portfolio_Settings_API {
                 <?php
                 do_action( 'wsa_form_top_' . $form['id'], $form );
                 settings_fields( $form['id'] );
-                do_settings_sections( $form['id'] );
+                $this->do_settings_sections( $form['id'] );
                 do_action( 'wsa_form_bottom_' . $form['id'], $form );
                 if ( isset( $this->settings_fields[ $form['id'] ] ) ) :
                     ?>
@@ -624,6 +697,225 @@ class Visual_Portfolio_Settings_API {
     }
 
     /**
+     * Prints out all settings sections added to a particular settings page
+     *
+     * Part of the Settings API. Use this in a settings page callback function
+     * to output all the sections and fields that were added to that $page with
+     * add_settings_section() and add_settings_field()
+     *
+     * @global array $wp_settings_sections Storage array of all settings sections added to admin pages.
+     * @global array $wp_settings_fields Storage array of settings fields and info about their pages/sections.
+     *
+     * @param string $page The slug name of the page whose settings sections you want to output.
+     */
+    function do_settings_sections( $page ) {
+        global $wp_settings_sections, $wp_settings_fields;
+
+        if ( ! isset( $wp_settings_sections[ $page ] ) ) {
+            return;
+        }
+
+        foreach ( (array) $wp_settings_sections[ $page ] as $section ) {
+            if ( $section['title'] ) {
+                echo "<h2>{$section['title']}</h2>\n";
+            }
+
+            if ( $section['callback'] ) {
+                call_user_func( $section['callback'], $section );
+            }
+
+            if ( ! isset( $wp_settings_fields ) || ! isset( $wp_settings_fields[ $page ] ) || ! isset( $wp_settings_fields[ $page ][ $section['id'] ] ) ) {
+                continue;
+            }
+            echo '<table class="form-table" role="presentation">';
+            $this->do_settings_fields( $page, $section['id'] );
+            echo '</table>';
+        }
+    }
+
+    /**
+     * Print out the settings fields for a particular settings section.
+     *
+     * Part of the Settings API. Use this in a settings page to output
+     * a specific section. Should normally be called by do_settings_sections()
+     * rather than directly.
+     *
+     * @global array $wp_settings_fields Storage array of settings fields and their pages/sections.
+     *
+     * @param string $page Slug title of the admin page whose settings fields you want to show.
+     * @param string $section Slug title of the settings section whose fields you want to show.
+     */
+    function do_settings_fields( $page, $section ) {
+        global $wp_settings_fields;
+
+        if ( ! isset( $wp_settings_fields[ $page ][ $section ] ) ) {
+            return;
+        }
+
+        foreach ( (array) $wp_settings_fields[ $page ][ $section ] as $field ) {
+            $class     = '';
+            $condition = '';
+            $style     = '';
+
+            if ( ! empty( $field['args']['class'] ) ) {
+                $class = $field['args']['class'];
+            }
+
+            if ( isset( $field['args']['conditionize'] ) && ! empty( $field['args']['conditionize'] ) ) {
+                $class    .= ' vpf-conditionize';
+                $condition = ' data-condition="' . esc_attr( $field['args']['conditionize'] ) . '"';
+                $style     = ' style="display: ' . esc_attr( $this->get_conditionize_displayed_styles( $field['args']['condition'] ) ) . ';"';
+            }
+
+            if ( ! empty( $class ) ) {
+                $class = ' class="' . esc_attr( $class ) . '"';
+            }
+
+            echo "<tr{$class}{$condition}{$style}>";
+
+            if ( ! empty( $field['args']['label_for'] ) ) {
+                echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . $field['title'] . '</label></th>';
+            } else {
+                echo '<th scope="row">' . $field['title'] . '</th>';
+            }
+
+            echo '<td>';
+            call_user_func( $field['callback'], $field['args'] );
+            echo '</td>';
+            echo '</tr>';
+        }
+    }
+
+    /**
+     * Get conditionize displayed styles.
+     *
+     * @param array $condition - Condition array.
+     * @param string $type - Type of displayed style. Supported block, flex, grid.
+     * @return string
+     */
+    function get_conditionize_displayed_styles( $condition, $type = 'table-row' ) {
+        $condition_process_of_comparison = array();
+
+        if ( isset( $condition ) && is_array( $condition ) && ! empty( $condition ) ) {
+
+            foreach ( $condition as $condition ) {
+
+                $control = str_replace( '[', ',', $condition['control'] );
+                $control = str_replace( ']', '', $control );
+                $control_parts = explode( ',', $control );
+
+                if ( isset( $control_parts ) && is_array( $control_parts ) && ! empty( $control_parts ) ) {
+                    foreach ( $control_parts as $key => $control_part ) {
+                        if ( 0 === $key ) {
+                            $section = $control_part;
+                        }
+                        if ( 1 === $key ) {
+                            $option_name = $control_part;
+                        }
+
+                        switch ( $key ) {
+                            case 0:
+                            default:
+                                $section = $control_part;
+                                break;
+                            case 1:
+                                $option_name = $control_part;
+                                break;
+                            case 2:
+                                $sub_name = $control_part;
+                                break;
+                        }
+                    }
+
+                    if ( isset( $section ) && isset( $option_name ) ) {
+                        $option_key = array_search( $option_name, array_column( $this->settings_fields[ $section ], 'name') );
+                        $default    = false;
+
+                        if ( false !== $option_key ) {
+                            $default = $this->settings_fields[ $section ][ $option_key ]['default'];
+                        }
+
+                        $option_value = $this->get_option( $option_name, $section, $default );
+
+                        $option_value = isset( $sub_name ) ? $option_value[ $sub_name ] : $option_value;
+                    }
+                }
+
+                if (
+                    isset( $option_value ) &&
+                    isset( $condition['operator'] ) &&
+                    isset( $condition['value'] ) &&
+                    ! empty( $condition['operator'] )
+                ) {
+                    switch ( $condition['operator'] ) {
+                        case '==':
+                        default:
+                            $comparison = $option_value === $condition['value'] ? true : false;
+                            break;
+                        case '!==':
+                        case '!=':
+                            $comparison = $option_value !== $condition['value'] ? true : false;
+                            break;
+                        case '<=':
+                            $comparison = $option_value <= $condition['value'] ? true : false;
+                            break;
+                        case '<':
+                            $comparison = $option_value < $condition['value'] ? true : false;
+                            break;
+                        case '>=':
+                            $comparison = $option_value >= $condition['value'] ? true : false;
+                            break;
+                        case '>':
+                            $comparison = $option_value > $condition['value'] ? true : false;
+                            break;
+                    }
+                    $condition_process_of_comparison[] = $comparison;
+                }
+            }
+        }
+
+        $display   = 'none';
+        if (
+            in_array( true, $condition_process_of_comparison, true ) &&
+            ! in_array( false, $condition_process_of_comparison, true )
+        ) {
+            $display = $type;
+        }
+
+        return $display;
+    }
+
+    /**
+     * Convert condition arguments to Conditionize string.
+     *
+     * @param array $conditions - Array with Condition arguments.
+     * @return string
+     */
+    function convert_arguments_to_conditionize_string( $conditions ) {
+        $data_condition = '';
+        if ( isset( $conditions ) && is_array( $conditions ) && ! empty( $conditions ) ) {
+            foreach ( $conditions as $key => $condition ) {
+                if ( 1 < count( $conditions ) ) {
+                    $data_condition .= '( ';
+                }
+
+                $condition['value'] = empty( $condition['value'] ) ? "''" : "'" . $condition['value'] . "'";
+
+                $data_condition .= $condition['control'] . $condition['operator'] . $condition['value'];
+
+                if ( 1 < count( $conditions ) ) {
+                    $data_condition .= ' )';
+                    if ( ( count( $conditions ) - 1 ) !== $key ) {
+                        $data_condition .= ' && ';
+                    }
+                }
+            }
+        }
+
+        return $data_condition;
+    }
+
+    /**
      * Tabbable JavaScript codes & Initiate Color Picker
      *
      * This code uses localstorage for displaying active tabs
@@ -632,6 +924,9 @@ class Visual_Portfolio_Settings_API {
         ?>
         <script>
             jQuery(function($) {
+                //Initiate Conditionize
+                $( '.vpf-conditionize' ).conditionize();
+
                 //Initiate Color Picker
                 $('.wp-color-picker-field').wpColorPicker();
 
@@ -759,6 +1054,25 @@ class Visual_Portfolio_Settings_API {
                     $this.css('display', '');
 
                     $this.trigger( 'wpsa-image-removed' );
+                });
+
+                $( 'input.vp-input-range, input.vp-input-number-range' ).on( 'input change', function() {
+                    const name = $( this ).attr( 'name' );
+                    const min = parseInt( $( this ).attr( 'min' ).replace( /"/g, '' ), 10 );
+                    const max = parseInt( $( this ).attr( 'max' ).replace( /"/g, '' ), 10 );
+                    const val = parseInt( $( this ).val(), 10 );
+                    const inputs = $( `input[name="${ name }"]` );
+
+                    if ( max < val ) {
+                        $( this ).val( max );
+                    }
+                    if ( min > val || isNaN( val ) ) {
+                        $( this ).val( min );
+                    }
+
+                    if ( $( inputs[ 0 ] ).val() !== $( inputs[ 1 ] ).val() ) {
+                        inputs.val( $( this ).val() );
+                    }
                 });
             });
         </script>

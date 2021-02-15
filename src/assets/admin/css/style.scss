@@ -523,6 +523,69 @@ $grid_sm: 600px !default;
             background: lighten(#2540cc, 5%);
         }
     }
+
+    /**
+    * Toggle Field.
+    **/
+    .vp-toggle-field {
+        position: relative;
+        display: inline-block;
+        width: 36px;
+        height: 18px;
+        input {
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+        .vp-toggle-field-slider-round {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            cursor: pointer;
+            background-color: #ccc;
+            border-radius: 34px;
+            transition: .4s;
+            &::before {
+                content: "";
+                position: absolute;
+                bottom: 3px;
+                left: 3px;
+                width: 12px;
+                height: 12px;
+                background-color: #fff;
+                border-radius: 50%;
+                transition: .4s;
+            }
+        }
+        input:checked + .vp-toggle-field-slider-round {
+            background-color: #007cba;
+        }
+
+        input:focus + .vp-toggle-field-slider-round {
+            box-shadow: 0 0 1px #007cba;
+        }
+
+        input:checked + .vp-toggle-field-slider-round::before {
+            transform: translateX(18px);
+        }
+    }
+
+    /**
+    * Range Field.
+    **/
+    .regular-range {
+        width: 183px;
+    }
+    .number-range {
+        box-sizing: border-box;
+        width: 55px;
+        margin-left: 9px;
+        background: #fff;
+        border: 1px solid #8f969f;
+        border-radius: 4px;
+    }
 }
 
 #vp_social_integrations,
