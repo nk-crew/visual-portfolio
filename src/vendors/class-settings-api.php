@@ -507,7 +507,7 @@ class Visual_Portfolio_Settings_API {
         ?>
         <?php
             echo sprintf(
-                '<input type="%1$s" class="%2$s-range vp-input-range" id="%3$s[%4$s]" name="%3$s[%4$s]" value="%5$s"%6$s%7$s%8$s%9$s/>',
+                '<input type="%1$s" class="%2$s-range vp-range-field" id="%3$s[%4$s]" name="%3$s[%4$s]" value="%5$s"%6$s%7$s%8$s%9$s/>',
                 esc_attr( $type ),
                 esc_attr( $size ),
                 esc_attr( $args['section'] ),
@@ -519,7 +519,7 @@ class Visual_Portfolio_Settings_API {
                 esc_attr( $step )
             );
             echo sprintf(
-                '<input type="number" class="number-range vp-input-number-range" name="%1$s[%2$s]" value="%3$s"%4$s%5$s%6$s%7$s/>',
+                '<input type="number" class="number-range vp-range-number-field" name="%1$s[%2$s]" value="%3$s"%4$s%5$s%6$s%7$s/>',
                 esc_attr( $args['section'] ),
                 esc_attr( $args['id'] ),
                 esc_attr( $value ),
@@ -1056,7 +1056,7 @@ class Visual_Portfolio_Settings_API {
                     $this.trigger( 'wpsa-image-removed' );
                 });
 
-                $( 'input.vp-input-range, input.vp-input-number-range' ).on( 'input change', function() {
+                $( 'input.vp-range-field, input.vp-range-number-field' ).on( 'input change', function() {
                     const name = $( this ).attr( 'name' );
                     const min = parseInt( $( this ).attr( 'min' ).replace( /"/g, '' ), 10 );
                     const max = parseInt( $( this ).attr( 'max' ).replace( /"/g, '' ), 10 );
