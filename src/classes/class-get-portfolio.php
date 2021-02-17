@@ -311,6 +311,15 @@ class Visual_Portfolio_Get {
             $class .= ' vp-portfolio__stretch';
         }
 
+        // Filter to replace the main layout with custom. Particularly needed for password protection or age verification.
+        $custom_output = apply_filters( 'vpf_custom_output', false, $uid, $class, $options );
+
+        if ( $custom_output ) {
+            return array(
+                'custom_output' => $custom_output,
+            );
+        }
+
         $no_image = Visual_Portfolio_Settings::get_option( 'no_image', 'vp_general' );
 
         // prepare image sizes.
@@ -797,6 +806,10 @@ class Visual_Portfolio_Get {
 
         if ( ! $config ) {
             return '';
+        }
+
+        if ( isset( $config['custom_output'] ) ) {
+            return $config['custom_output'];
         }
 
         $options       = $config['options'];
