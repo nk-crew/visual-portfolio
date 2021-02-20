@@ -808,7 +808,7 @@ class Visual_Portfolio_Get {
         $notices       = $config['notices'];
 
         // Insert styles and scripts.
-        Visual_Portfolio_Assets::enqueue( $options );
+        Visual_Portfolio_Assets::enqueue( $atts );
 
         // No items found.
         if ( empty( $items ) ) {
