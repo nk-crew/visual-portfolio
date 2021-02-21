@@ -606,8 +606,6 @@ $grid_sm: 600px !default;
     .vp-toggle-field {
         position: relative;
         display: inline-block;
-        width: 36px;
-        height: 18px;
 
         input {
             width: 0;
@@ -620,6 +618,8 @@ $grid_sm: 600px !default;
             right: 0;
             bottom: 0;
             left: 0;
+            width: 36px;
+            height: 18px;
             cursor: pointer;
             background-color: #ccc;
             border-radius: 34px;
@@ -650,12 +650,8 @@ $grid_sm: 600px !default;
             transform: translateX(18px);
         }
 
-        + .description {
-            display: inline-block;
-            max-width: calc(100% - 50px);
-            margin: 0;
-            margin-left: .8em;
-            vertical-align: middle;
+        .description {
+            margin-left: 22px;
         }
     }
 

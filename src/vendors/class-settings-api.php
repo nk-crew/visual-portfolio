@@ -473,21 +473,13 @@ class Visual_Portfolio_Settings_API {
      */
     public function callback_toggle( $args ) {
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
-        $size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
-        $type  = 'checkbox';
 
-        echo '<label class="vp-toggle-field">';
-        echo sprintf( '<input type="hidden" name="%1$s[%2$s]" value="off" />', esc_attr( $args['section'] ), esc_attr( $args['id'] ) );
-        echo sprintf(
-            '<input type="%1$s" class="%2$s-text" id="%3$s[%4$s]" name="%3$s[%4$s]" value="on" %5$s/>',
-            esc_attr( $type ),
-            esc_attr( $size ),
-            esc_attr( $args['section'] ),
-            esc_attr( $args['id'] ),
-            checked( $value, 'on', false )
-        );
-        echo '<span class="vp-toggle-field-slider-round"></span></label>';
-        echo wp_kses_post( $this->get_field_description( $args ) );
+        $html = sprintf( '<label for="wpuf-%1$s[%2$s]" class="vp-toggle-field">', $args['section'], $args['id'] );
+        $html .= sprintf( '<input type="hidden" name="%1$s[%2$s]" value="off" />', esc_attr( $args['section'] ), esc_attr( $args['id'] ) );
+        $html .= sprintf( '<input type="checkbox" id="wpuf-%1$s[%2$s]" name="%1$s[%2$s]" value="on" %3$s/>', esc_attr( $args['section'] ), esc_attr( $args['id'] ), checked( $value, 'on', false ) );
+        $html  .= sprintf( '<span class="vp-toggle-field-slider-round"></span><span class="description">%1$s</span></label>', $args['desc'] );
+
+        echo $html;
     }
 
     /**
