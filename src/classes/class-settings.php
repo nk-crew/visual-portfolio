@@ -129,22 +129,27 @@ class Visual_Portfolio_Settings {
             array(
                 'id'    => 'vp_general',
                 'title' => esc_html__( 'General', '@@text_domain' ),
+                'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>',
             ),
             array(
                 'id'    => 'vp_images',
                 'title' => esc_html__( 'Images', '@@text_domain' ),
+                'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>',
             ),
             array(
                 'id'    => 'vp_popup_gallery',
                 'title' => esc_html__( 'Popup Gallery', '@@text_domain' ),
+                'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>',
             ),
             array(
                 'id'    => 'vp_watermarks',
                 'title' => esc_html__( 'Watermarks', '@@text_domain' ),
+                'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>',
             ),
             array(
                 'id'    => 'vp_social_integrations',
                 'title' => esc_html__( 'Social Integrations', '@@text_domain' ),
+                'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>',
             ),
         );
 
@@ -484,12 +489,12 @@ class Visual_Portfolio_Settings {
             ),
             'vp_watermarks' => array(
                 array(
-                    'name'    => 'social_pro_info',
+                    'name'    => 'pro_info',
                     'desc'    => '
                         <div class="vpf-settings-info-pro">
                             <h3>' . esc_html__( 'Pro Feature', '@@text_domain' ) . '</h3>
                             <div>
-                                <p>' . esc_html__( 'Data protection such as watermarks.', '@@text_domain' ) . '</p>
+                                <p>' . esc_html__( 'Protect your works using watermarks', '@@text_domain' ) . '</p>
                                 <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&utm_medium=link&utm_campaign=plugin_settings&utm_content=@@plugin_version">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
                             </div>
                         </div>
@@ -499,7 +504,7 @@ class Visual_Portfolio_Settings {
             ),
             'vp_social_integrations' => array(
                 array(
-                    'name'    => 'social_pro_info',
+                    'name'    => 'pro_info',
                     'desc'    => '
                         <div class="vpf-settings-info-pro">
                             <h3>' . esc_html__( 'Pro Feature', '@@text_domain' ) . '</h3>
@@ -526,7 +531,7 @@ class Visual_Portfolio_Settings {
         self::$settings_api->admin_enqueue_scripts();
 
         echo '<div class="wrap">';
-        echo '<h2>' . esc_html__( 'Visual Portfolio Settings', '@@text_domain' ) . '</h2>';
+        echo '<h2>' . esc_html__( 'Settings', '@@text_domain' ) . '</h2>';
 
         self::$settings_api->show_navigation();
         self::$settings_api->show_forms();

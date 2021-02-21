@@ -414,6 +414,83 @@ $grid_sm: 600px !default;
  * Settings
  */
 .portfolio_page_visual-portfolio-settings {
+    $settings_nav_width: 220px !default;
+
+    // Navigation.
+    @media (min-width: 782px) {
+        h2.nav-tab-wrapper {
+            position: relative;
+            margin-right: -1px;
+            border: none;
+        }
+        .nav-tab-wrapper {
+            display: flex;
+            flex-direction: column;
+            float: left;
+            width: $settings_nav_width;
+
+            .nav-tab {
+                padding: 10px 15px;
+                margin-bottom: -1px;
+                margin-left: 0;
+                background: none;
+                border: 1px solid transparent;
+                border-right: none;
+                border-left: 2px solid transparent;
+            }
+            .nav-tab:hover,
+            .nav-tab:focus,
+            .nav-tab-active {
+                background: #fff;
+                border-color: #d7dbde;
+                border-left-color: #007cba;
+            }
+        }
+        .metabox-holder {
+            float: left;
+            width: calc(100% - #{$settings_nav_width + 2});
+            min-height: 320px;
+            margin-top: 9px;
+        }
+    }
+    .nav-tab-wrapper {
+        svg {
+            width: 1.2em;
+            height: 1.2em;
+            margin-right: .5em;
+            vertical-align: -.2em;
+        }
+    }
+
+    // Content with settings.
+    .metabox-holder {
+        box-sizing: border-box;
+        padding: 10px 20px;
+        background-color: #fff;
+        border: 1px solid #d7dbde;
+    }
+
+    // Controls base layout.
+    .form-table {
+        tr {
+            display: block;
+        }
+        th {
+            display: block;
+            width: 100%;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+        td {
+            display: block;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+    }
+    .submit {
+        margin: 0;
+    }
+
     .description {
         opacity: .7;
     }
@@ -429,7 +506,7 @@ $grid_sm: 600px !default;
         padding: 15px;
     }
 
-    // PRO control.
+    // Pro control.
     .vpf-settings-control-pro {
         > td {
             pointer-events: none;
@@ -482,7 +559,7 @@ $grid_sm: 600px !default;
         }
     }
 
-    // Settings info PRO.
+    // Settings info Pro.
     .social_pro_info > th {
         display: none;
     }
@@ -490,8 +567,7 @@ $grid_sm: 600px !default;
         max-width: 240px;
         padding: 20px;
         text-align: center;
-        background-color: #e2e2e2;
-        border-radius: 4px;
+        border: 2px solid #2540cc;
 
         h3 {
             margin-top: 0;
@@ -525,8 +601,8 @@ $grid_sm: 600px !default;
     }
 
     /**
-    * Toggle Field.
-    **/
+     * Toggle Field.
+     **/
     .vp-toggle-field {
         position: relative;
         display: inline-block;
@@ -573,8 +649,8 @@ $grid_sm: 600px !default;
     }
 
     /**
-    * Range Field.
-    **/
+     * Range Field.
+     **/
     .vp-range-field {
         width: 183px;
     }
@@ -590,7 +666,6 @@ $grid_sm: 600px !default;
 
 #vp_social_integrations,
 #vp_watermarks {
-    h2,
     .submit {
         display: none;
     }

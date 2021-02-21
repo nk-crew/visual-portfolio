@@ -137,7 +137,7 @@ class Visual_Portfolio_Settings_API {
 
                 if ( $is_pro ) {
                     $class_name .= ' vpf-settings-control-pro';
-                    $label .= '<span class="vpf-settings-control-pro-label">?<span>' . esc_html__( 'This feature available in PRO plugin only', '@@text_domain' ) . '</span></span>';
+                    $label .= '<span class="vpf-settings-control-pro-label">?<span>' . esc_html__( 'This feature available in Pro plugin only', '@@text_domain' ) . '</span></span>';
                 }
 
                 $args = array(
@@ -643,7 +643,7 @@ class Visual_Portfolio_Settings_API {
         }
 
         foreach ( $this->settings_sections as $tab ) {
-            $html .= sprintf( '<a href="#%1$s" class="nav-tab" id="%1$s-tab">%2$s</a>', $tab['id'], $tab['title'] );
+            $html .= sprintf( '<a href="#%1$s" class="nav-tab" id="%1$s-tab">%2$s%3$s</a>', $tab['id'], isset( $tab['icon'] ) ? $tab['icon'] : '', $tab['title'] );
         }
 
         $html .= '</h2>';
@@ -686,7 +686,7 @@ class Visual_Portfolio_Settings_API {
                 do_action( 'wsa_form_bottom_' . $form['id'], $form );
                 if ( isset( $this->settings_fields[ $form['id'] ] ) ) :
                     ?>
-                    <div style="padding-left: 10px">
+                    <div>
                         <?php submit_button(); ?>
                     </div>
                 <?php endif; ?>
@@ -716,10 +716,6 @@ class Visual_Portfolio_Settings_API {
         }
 
         foreach ( (array) $wp_settings_sections[ $page ] as $section ) {
-            if ( $section['title'] ) {
-                echo "<h2>{$section['title']}</h2>\n";
-            }
-
             if ( $section['callback'] ) {
                 call_user_func( $section['callback'], $section );
             }

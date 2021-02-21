@@ -1637,7 +1637,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'pro_note',
                 'name'        => 'protection_pro_note',
                 'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                'description' => esc_html__( 'Data protection such as watermarks, block password and age verification', '@@text_domain' ),
+                'description' => esc_html__( 'Protect your works using watermarks, password, and age gate', '@@text_domain' ),
                 'condition'   => array(
                     array(
                         'control'  => 'content_source',
