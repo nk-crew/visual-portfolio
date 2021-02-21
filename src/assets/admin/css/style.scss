@@ -665,6 +665,7 @@ $grid_sm: 600px !default;
     .vp-range-field {
         width: 183px;
         height: 3px;
+        vertical-align: middle;
         cursor: pointer;
         background: #007cba;
         outline: none;
@@ -690,6 +691,7 @@ $grid_sm: 600px !default;
         box-sizing: border-box;
         width: 55px;
         margin-left: 9px;
+        vertical-align: middle;
         background: #fff;
         border: 1px solid #8f969f;
         border-radius: 4px;
