@@ -220,7 +220,7 @@ class Visual_Portfolio_Admin {
     }
 
     /**
-     * Register the admin settings menu PRO link.
+     * Register the admin settings menu Pro link.
      *
      * @return void
      */
@@ -876,7 +876,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                            'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
                             'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
                         ),
                     ),
@@ -938,7 +938,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                            'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
                             'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
                         ),
                     ),
@@ -989,7 +989,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                            'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
                             'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
                         ),
                     ),
@@ -1098,7 +1098,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                            'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
                             'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
                         ),
                     ),
@@ -1469,7 +1469,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-source-post-based',
                 'type'        => 'pro_note',
                 'name'        => 'additional_query_settings_pro',
-                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
                 'description' => esc_html__( 'Additional query settings.', '@@text_domain' ),
             )
         );
@@ -1636,7 +1636,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-protection',
                 'type'        => 'pro_note',
                 'name'        => 'protection_pro_note',
-                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
                 'description' => esc_html__( 'Data protection such as watermarks, block password and age verification', '@@text_domain' ),
                 'condition'   => array(
                     array(
@@ -1656,7 +1656,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-source-social-stream',
                 'type'        => 'pro_note',
                 'name'        => 'social_pro_note',
-                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
                 'description' => esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ),
             )
         );
@@ -2230,7 +2230,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'items-click-action',
                 'type'        => 'pro_note',
                 'name'        => 'items_click_action_pro_note',
-                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
+                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
                 'description' => esc_html__( 'Display pages in popup iframe, not just images.', '@@text_domain' ),
                 'condition'   => array(
                     array(
@@ -2563,8 +2563,8 @@ class Visual_Portfolio_Admin {
                 'category'    => 'search',
                 'type'        => 'pro_note',
                 'name'        => 'search_pro_note',
-                'label'       => esc_html__( 'PRO Feature', '@@text_domain' ),
-                'description' => esc_html__( 'The search module is only available for PRO users.', '@@text_domain' ),
+                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
+                'description' => esc_html__( 'The search module is only available for Pro users.', '@@text_domain' ),
             )
         );
 
