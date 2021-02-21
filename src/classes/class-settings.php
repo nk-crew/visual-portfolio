@@ -273,11 +273,11 @@ class Visual_Portfolio_Settings {
                     'name'    => 'lazy_loading',
                     'label'   => esc_html__( 'Lazy Loading', '@@text_domain' ),
                     'desc'    => esc_html__( 'Enable lazy loading for Visual Portfolio layouts only or for the whole website.', '@@text_domain' ),
-                    'type'    => 'radio',
+                    'type'    => 'select',
                     'default' => 'vp',
                     'options' => array(
                         ''     => esc_html__( 'Disabled', '@@text_domain' ),
-                        'vp'   => esc_html__( 'Visual Portfolio only', '@@text_domain' ),
+                        'vp'   => esc_html__( 'Visual Portfolio Only', '@@text_domain' ),
                         'full' => esc_html__( 'All images', '@@text_domain' ),
                     ),
                 ),
