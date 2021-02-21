@@ -653,6 +653,27 @@ $grid_sm: 600px !default;
      **/
     .vp-range-field {
         width: 183px;
+        height: 3px;
+        cursor: pointer;
+        background: #007cba;
+        outline: none;
+        box-shadow: none;
+        // stylelint-disable-next-line
+        -webkit-appearance: none;
+
+        &::-webkit-slider-thumb {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border: 1px solid #7e8993;
+            border-radius: 20px;
+            transition: border-width .2s cubic-bezier(.26, .08, .15, 1);
+            appearance: none;
+        }
+        &:active::-webkit-slider-thumb {
+            border-color: #007cba;
+            box-shadow: 0 0 0 1px #007cba;
+        }
     }
     .vp-range-number-field {
         box-sizing: border-box;
