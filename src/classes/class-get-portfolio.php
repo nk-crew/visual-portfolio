@@ -1434,7 +1434,14 @@ class Visual_Portfolio_Get {
                     parse_str( html_entity_decode( $options['posts_custom_query'] ), $tmp_arr );
                     $query_opts = array_merge( $query_opts, $tmp_arr );
                 } elseif ( 'current_query' === $options['posts_source'] ) {
-                    $query_opts = $GLOBALS['wp_query']->query_vars;
+                    $query_vars = $GLOBALS['wp_query']->query_vars;
+
+                    // Add pagination paged value.
+                    if ( $query_opts['paged'] && ( ! isset( $query_vars['paged'] ) || ! $query_vars['paged'] ) ) {
+                        $query_vars['paged'] = $query_opts['paged'];
+                    }
+
+                    $query_opts = $query_vars;
                 } else {
                     $query_opts['post_type'] = $options['posts_source'];
 
