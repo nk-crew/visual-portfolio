@@ -40,7 +40,7 @@ class Visual_Portfolio_Settings_API {
     /**
      * Enqueue scripts and styles
      */
-    function admin_enqueue_scripts() {
+    public function admin_enqueue_scripts() {
         wp_enqueue_style( 'wp-color-picker' );
 
         wp_enqueue_media();
@@ -54,7 +54,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $sections setting sections array
      */
-    function set_sections( $sections ) {
+    public function set_sections( $sections ) {
         $this->settings_sections = $sections;
 
         return $this;
@@ -65,7 +65,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $section
      */
-    function add_section( $section ) {
+    public function add_section( $section ) {
         $this->settings_sections[] = $section;
 
         return $this;
@@ -76,13 +76,13 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $fields settings fields array
      */
-    function set_fields( $fields ) {
+    public function set_fields( $fields ) {
         $this->settings_fields = $fields;
 
         return $this;
     }
 
-    function add_field( $section, $field ) {
+    public function add_field( $section, $field ) {
         $defaults = array(
             'name'   => '',
             'label'  => '',
@@ -105,7 +105,7 @@ class Visual_Portfolio_Settings_API {
      * This function gets the initiated settings sections and fields. Then
      * registers them to WordPress and ready for use.
      */
-    function admin_init() {
+    public function admin_init() {
         // register settings sections
         foreach ( $this->settings_sections as $section ) {
             if ( false == get_option( $section['id'] ) ) {
@@ -191,7 +191,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_text( $args ) {
+    public function callback_text( $args ) {
 
         $value       = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $size        = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -209,7 +209,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_url( $args ) {
+    public function callback_url( $args ) {
         $this->callback_text( $args );
     }
 
@@ -218,7 +218,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_number( $args ) {
+    public function callback_number( $args ) {
         $value       = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $size        = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
         $type        = isset( $args['type'] ) ? $args['type'] : 'number';
@@ -238,7 +238,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_checkbox( $args ) {
+    public function callback_checkbox( $args ) {
 
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
 
@@ -257,7 +257,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_multicheck( $args ) {
+    public function callback_multicheck( $args ) {
 
         $value = $this->get_option( $args['id'], $args['section'], $args['std'] );
         $html  = '<fieldset>';
@@ -280,7 +280,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_radio( $args ) {
+    public function callback_radio( $args ) {
 
         $value = $this->get_option( $args['id'], $args['section'], $args['std'] );
         $html  = '<fieldset>';
@@ -302,7 +302,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_select( $args ) {
+    public function callback_select( $args ) {
 
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -323,7 +323,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_textarea( $args ) {
+    public function callback_textarea( $args ) {
 
         $value       = esc_textarea( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $size        = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -341,7 +341,7 @@ class Visual_Portfolio_Settings_API {
      * @param array $args settings field args
      * @return string
      */
-    function callback_html( $args ) {
+    public function callback_html( $args ) {
         echo $this->get_field_description( $args );
     }
 
@@ -350,7 +350,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_wysiwyg( $args ) {
+    public function callback_wysiwyg( $args ) {
 
         $value = $this->get_option( $args['id'], $args['section'], $args['std'] );
         $size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : '500px';
@@ -379,7 +379,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_file( $args ) {
+    public function callback_file( $args ) {
 
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -398,7 +398,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_image( $args ) {
+    public function callback_image( $args ) {
 
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $size = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -422,7 +422,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_password( $args ) {
+    public function callback_password( $args ) {
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
 
@@ -437,7 +437,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_color( $args ) {
+    public function callback_color( $args ) {
 
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -454,7 +454,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param array $args settings field args
      */
-    function callback_pages( $args ) {
+    public function callback_pages( $args ) {
 
         $dropdown_args = array(
             'selected' => esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) ),
@@ -554,7 +554,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @return mixed
      */
-    function sanitize_options( $options ) {
+    public function sanitize_options( $options ) {
 
         if ( ! $options ) {
             return $options;
@@ -580,7 +580,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @return mixed string or bool false
      */
-    function get_sanitize_callback( $slug = '' ) {
+    public function get_sanitize_callback( $slug = '' ) {
         if ( empty( $slug ) ) {
             return false;
         }
@@ -608,7 +608,7 @@ class Visual_Portfolio_Settings_API {
      * @param string $default default text if it's not found
      * @return string
      */
-    function get_option( $option, $section, $default = '' ) {
+    public function get_option( $option, $section, $default = '' ) {
 
         $options = get_option( $section );
 
@@ -624,7 +624,7 @@ class Visual_Portfolio_Settings_API {
      *
      * Shows all the settings section labels as tab
      */
-    function show_navigation() {
+    public function show_navigation() {
         $html = '<h2 class="nav-tab-wrapper">';
 
         $count = count( $this->settings_sections );
@@ -648,7 +648,7 @@ class Visual_Portfolio_Settings_API {
      *
      * This function displays every sections in a different form
      */
-    function show_forms() {
+    public function show_forms() {
         ?>
         <div class="metabox-holder">
             <?php foreach ( $this->settings_sections as $form ) {
@@ -666,7 +666,7 @@ class Visual_Portfolio_Settings_API {
      * @param array $form - Form item.
      * @return string
      */
-    function get_form( $form ) {
+    public function get_form( $form ) {
         ob_start();
         ?>
         <div id="<?php echo $form['id']; ?>" class="group" style="display: none;">
@@ -700,7 +700,7 @@ class Visual_Portfolio_Settings_API {
      *
      * @param string $page The slug name of the page whose settings sections you want to output.
      */
-    function do_settings_sections( $page ) {
+    public function do_settings_sections( $page ) {
         global $wp_settings_sections, $wp_settings_fields;
 
         if ( ! isset( $wp_settings_sections[ $page ] ) ) {
@@ -733,7 +733,7 @@ class Visual_Portfolio_Settings_API {
      * @param string $page Slug title of the admin page whose settings fields you want to show.
      * @param string $section Slug title of the settings section whose fields you want to show.
      */
-    function do_settings_fields( $page, $section ) {
+    public function do_settings_fields( $page, $section ) {
         global $wp_settings_fields;
 
         if ( ! isset( $wp_settings_fields[ $page ][ $section ] ) ) {
@@ -781,7 +781,7 @@ class Visual_Portfolio_Settings_API {
      * @param string $type - Type of displayed style. Supported block, flex, grid.
      * @return string
      */
-    function get_conditionize_displayed_styles( $condition, $type = 'table-row' ) {
+    public function get_conditionize_displayed_styles( $condition, $type = 'table-row' ) {
         $condition_process_of_comparison = array();
 
         if ( isset( $condition ) && is_array( $condition ) && ! empty( $condition ) ) {
@@ -879,7 +879,7 @@ class Visual_Portfolio_Settings_API {
      * @param array $conditions - Array with Condition arguments.
      * @return string
      */
-    function convert_arguments_to_conditionize_string( $conditions ) {
+    public function convert_arguments_to_conditionize_string( $conditions ) {
         $data_condition = '';
         if ( isset( $conditions ) && is_array( $conditions ) && ! empty( $conditions ) ) {
             foreach ( $conditions as $key => $condition ) {
@@ -908,7 +908,7 @@ class Visual_Portfolio_Settings_API {
      *
      * This code uses localstorage for displaying active tabs
      */
-    function script() {
+    public function script() {
         ?>
         <script>
             jQuery(function($) {
