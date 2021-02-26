@@ -881,7 +881,7 @@ class Visual_Portfolio_Settings_API {
                 <?php endif; ?>
             </form>
         </div>
-        <?
+        <?php
         return ob_get_clean();
     }
 
