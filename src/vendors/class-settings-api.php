@@ -644,6 +644,170 @@ class Visual_Portfolio_Settings_API {
     }
 
     /**
+     * Tabbable JavaScript codes & Initiate Color Picker
+     *
+     * This code uses localstorage for displaying active tabs
+     */
+    public function script() {
+        ?>
+        <script>
+            jQuery(function($) {
+                //Initiate Conditionize
+                $( '.vpf-conditionize' ).conditionize();
+
+                //Initiate Color Picker
+                $('.wp-color-picker-field').wpColorPicker();
+
+                // Switches option sections
+                $('.group').hide();
+                var activetab = '';
+                if (typeof(localStorage) != 'undefined' ) {
+                    activetab = localStorage.getItem("activetab");
+                }
+
+                //if url has section id as hash then set it as active or override the current local storage value
+                if(window.location.hash){
+                    activetab = window.location.hash;
+                    if (typeof(localStorage) != 'undefined' ) {
+                        localStorage.setItem("activetab", activetab);
+                    }
+                }
+
+                if (activetab != '' && $(activetab).length ) {
+                    $(activetab).fadeIn();
+                } else {
+                    $('.group:first').fadeIn();
+                }
+                $('.group .collapsed').each(function(){
+                    $(this).find('input:checked').parent().parent().parent().nextAll().each(
+                        function(){
+                            if ($(this).hasClass('last')) {
+                                $(this).removeClass('hidden');
+                                return false;
+                            }
+                            $(this).filter('.hidden').removeClass('hidden');
+                        });
+                });
+
+                if (activetab != '' && $(activetab + '-tab').length ) {
+                    $(activetab + '-tab').addClass('nav-tab-active');
+                }
+                else {
+                    $('.nav-tab-wrapper a:first').addClass('nav-tab-active');
+                }
+                $('.nav-tab-wrapper a').click(function(evt) {
+                    $('.nav-tab-wrapper a').removeClass('nav-tab-active');
+                    $(this).addClass('nav-tab-active').blur();
+                    var clicked_group = $(this).attr('href');
+                    if (typeof(localStorage) != 'undefined' ) {
+                        localStorage.setItem("activetab", $(this).attr('href'));
+                    }
+                    $('.group').hide();
+                    $(clicked_group).fadeIn();
+                    evt.preventDefault();
+                });
+
+                $('.wpsa-browse').on('click', function (event) {
+                    event.preventDefault();
+
+                    var $this = $(this);
+
+                    // Create the media frame.
+                    var file_frame = wp.media.frames.file_frame = wp.media({
+                        title: $this.data('uploader_title'),
+                        button: {
+                            text: $this.data('uploader_button_text'),
+                        },
+                        multiple: false
+                    });
+
+                    file_frame.on('select', function () {
+                        attachment = file_frame.state().get('selection').first().toJSON();
+                        $this.prev('.wpsa-url').val(attachment.url).change();
+                    });
+
+                    // Finally, open the modal
+                    file_frame.open();
+                });
+
+                $('.wpsa-image-browse').on('click', function(event) {
+                    event.preventDefault();
+                    var $this = $(this);
+
+                    // Create the media frame.
+                    var file_frame = wp.media.frames.file_frame = wp.media({
+                        title: $this.data('uploader_title'),
+                        button: {
+                            text: $this.data('uploader_button_text'),
+                        },
+                        multiple: false,
+                        library: { type: 'image' }
+                    })
+
+                    .on('select', function () {
+                        attachment = file_frame.state().get('selection').first().toJSON();
+                        var url;
+
+                        if (attachment.sizes && attachment.sizes.thumbnail) {
+                            url = attachment.sizes.thumbnail.url;
+                        } else {
+                            url = attachment.url;
+                        }
+
+                        $this.siblings('.wpsa-image-id').val(attachment.id).change();
+                        $this.siblings('.wpsa-image-preview').children('img').attr('src', url);
+                        $this.siblings('.wpsa-image-remove').css('display', 'inline-block');
+
+                        $this.trigger( 'wpsa-image-browse-selected', [ attachment, url ] );
+                    })
+
+                    // Finally, open the modal
+                    .open();
+                });
+
+                $('.wpsa-image-remove').each(function() {
+                    var $this = $(this);
+
+                    if ( $this.siblings('.wpsa-image-id').val() ) {
+                        $this.css('display', 'inline-block');
+                    }
+                });
+
+                $('.wpsa-image-remove').on('click', function(event) {
+                    event.preventDefault();
+                    var $this = $(this);
+
+                    $this.siblings('.wpsa-image-id').val('').change();
+                    $this.siblings('.wpsa-image-preview').children('img').attr('src', '');
+                    $this.css('display', '');
+
+                    $this.trigger( 'wpsa-image-removed' );
+                });
+
+                $( 'input.vp-range-field, input.vp-range-number-field' ).on( 'input change', function() {
+                    const name = $( this ).attr( 'name' );
+                    const min = parseInt( $( this ).attr( 'min' ).replace( /"/g, '' ), 10 );
+                    const max = parseInt( $( this ).attr( 'max' ).replace( /"/g, '' ), 10 );
+                    const val = parseInt( $( this ).val(), 10 );
+                    const inputs = $( `input[name="${ name }"]` );
+
+                    if ( max < val ) {
+                        $( this ).val( max );
+                    }
+                    if ( min > val || isNaN( val ) ) {
+                        $( this ).val( min );
+                    }
+
+                    if ( $( inputs[ 0 ] ).val() !== $( inputs[ 1 ] ).val() ) {
+                        inputs.val( $( this ).val() );
+                    }
+                });
+            });
+        </script>
+        <?php
+    }
+
+    /**
      * Show the section settings forms
      *
      * This function displays every sections in a different form
@@ -659,36 +823,7 @@ class Visual_Portfolio_Settings_API {
         $this->script();
     }
 
-    /**
-     * Get the section settings form.
-     * This function return displays detailed section in a each of forms.
-     *
-     * @param array $form - Form item.
-     * @return string
-     */
-    public function get_form( $form ) {
-        ob_start();
-        ?>
-        <div id="<?php echo $form['id']; ?>" class="group" style="display: none;">
-            <form method="post" action="options.php">
-                <?php
-                do_action( 'wsa_form_top_' . $form['id'], $form );
-                settings_fields( $form['id'] );
-                $this->do_settings_sections( $form['id'] );
-                do_action( 'wsa_form_bottom_' . $form['id'], $form );
-                if ( isset( $this->settings_fields[ $form['id'] ] ) ) :
-                    ?>
-                    <div>
-                        <?php submit_button(); ?>
-                    </div>
-                <?php endif; ?>
-            </form>
-        </div>
-        <?
-        return ob_get_clean();
-    }
-
-    /**
+        /**
      * Prints out all settings sections added to a particular settings page
      *
      * Part of the Settings API. Use this in a settings page callback function
@@ -719,6 +854,35 @@ class Visual_Portfolio_Settings_API {
             $this->do_settings_fields( $page, $section['id'] );
             echo '</table>';
         }
+    }
+
+    /**
+     * Get the section settings form.
+     * This function return displays detailed section in a each of forms.
+     *
+     * @param array $form - Form item.
+     * @return string
+     */
+    public function get_form( $form ) {
+        ob_start();
+        ?>
+        <div id="<?php echo $form['id']; ?>" class="group" style="display: none;">
+            <form method="post" action="options.php">
+                <?php
+                do_action( 'wsa_form_top_' . $form['id'], $form );
+                settings_fields( $form['id'] );
+                $this->do_settings_sections( $form['id'] );
+                do_action( 'wsa_form_bottom_' . $form['id'], $form );
+                if ( isset( $this->settings_fields[ $form['id'] ] ) ) :
+                    ?>
+                    <div>
+                        <?php submit_button(); ?>
+                    </div>
+                <?php endif; ?>
+            </form>
+        </div>
+        <?
+        return ob_get_clean();
     }
 
     /**
@@ -901,169 +1065,5 @@ class Visual_Portfolio_Settings_API {
         }
 
         return $data_condition;
-    }
-
-    /**
-     * Tabbable JavaScript codes & Initiate Color Picker
-     *
-     * This code uses localstorage for displaying active tabs
-     */
-    public function script() {
-        ?>
-        <script>
-            jQuery(function($) {
-                //Initiate Conditionize
-                $( '.vpf-conditionize' ).conditionize();
-
-                //Initiate Color Picker
-                $('.wp-color-picker-field').wpColorPicker();
-
-                // Switches option sections
-                $('.group').hide();
-                var activetab = '';
-                if (typeof(localStorage) != 'undefined' ) {
-                    activetab = localStorage.getItem("activetab");
-                }
-
-                //if url has section id as hash then set it as active or override the current local storage value
-                if(window.location.hash){
-                    activetab = window.location.hash;
-                    if (typeof(localStorage) != 'undefined' ) {
-                        localStorage.setItem("activetab", activetab);
-                    }
-                }
-
-                if (activetab != '' && $(activetab).length ) {
-                    $(activetab).fadeIn();
-                } else {
-                    $('.group:first').fadeIn();
-                }
-                $('.group .collapsed').each(function(){
-                    $(this).find('input:checked').parent().parent().parent().nextAll().each(
-                        function(){
-                            if ($(this).hasClass('last')) {
-                                $(this).removeClass('hidden');
-                                return false;
-                            }
-                            $(this).filter('.hidden').removeClass('hidden');
-                        });
-                });
-
-                if (activetab != '' && $(activetab + '-tab').length ) {
-                    $(activetab + '-tab').addClass('nav-tab-active');
-                }
-                else {
-                    $('.nav-tab-wrapper a:first').addClass('nav-tab-active');
-                }
-                $('.nav-tab-wrapper a').click(function(evt) {
-                    $('.nav-tab-wrapper a').removeClass('nav-tab-active');
-                    $(this).addClass('nav-tab-active').blur();
-                    var clicked_group = $(this).attr('href');
-                    if (typeof(localStorage) != 'undefined' ) {
-                        localStorage.setItem("activetab", $(this).attr('href'));
-                    }
-                    $('.group').hide();
-                    $(clicked_group).fadeIn();
-                    evt.preventDefault();
-                });
-
-                $('.wpsa-browse').on('click', function (event) {
-                    event.preventDefault();
-
-                    var $this = $(this);
-
-                    // Create the media frame.
-                    var file_frame = wp.media.frames.file_frame = wp.media({
-                        title: $this.data('uploader_title'),
-                        button: {
-                            text: $this.data('uploader_button_text'),
-                        },
-                        multiple: false
-                    });
-
-                    file_frame.on('select', function () {
-                        attachment = file_frame.state().get('selection').first().toJSON();
-                        $this.prev('.wpsa-url').val(attachment.url).change();
-                    });
-
-                    // Finally, open the modal
-                    file_frame.open();
-                });
-
-                $('.wpsa-image-browse').on('click', function(event) {
-                    event.preventDefault();
-                    var $this = $(this);
-
-                    // Create the media frame.
-                    var file_frame = wp.media.frames.file_frame = wp.media({
-                        title: $this.data('uploader_title'),
-                        button: {
-                            text: $this.data('uploader_button_text'),
-                        },
-                        multiple: false,
-                        library: { type: 'image' }
-                    })
-
-                    .on('select', function () {
-                        attachment = file_frame.state().get('selection').first().toJSON();
-                        var url;
-
-                        if (attachment.sizes && attachment.sizes.thumbnail) {
-                            url = attachment.sizes.thumbnail.url;
-                        } else {
-                            url = attachment.url;
-                        }
-
-                        $this.siblings('.wpsa-image-id').val(attachment.id).change();
-                        $this.siblings('.wpsa-image-preview').children('img').attr('src', url);
-                        $this.siblings('.wpsa-image-remove').css('display', 'inline-block');
-
-                        $this.trigger( 'wpsa-image-browse-selected', [ attachment, url ] );
-                    })
-
-                    // Finally, open the modal
-                    .open();
-                });
-
-                $('.wpsa-image-remove').each(function() {
-                    var $this = $(this);
-
-                    if ( $this.siblings('.wpsa-image-id').val() ) {
-                        $this.css('display', 'inline-block');
-                    }
-                });
-
-                $('.wpsa-image-remove').on('click', function(event) {
-                    event.preventDefault();
-                    var $this = $(this);
-
-                    $this.siblings('.wpsa-image-id').val('').change();
-                    $this.siblings('.wpsa-image-preview').children('img').attr('src', '');
-                    $this.css('display', '');
-
-                    $this.trigger( 'wpsa-image-removed' );
-                });
-
-                $( 'input.vp-range-field, input.vp-range-number-field' ).on( 'input change', function() {
-                    const name = $( this ).attr( 'name' );
-                    const min = parseInt( $( this ).attr( 'min' ).replace( /"/g, '' ), 10 );
-                    const max = parseInt( $( this ).attr( 'max' ).replace( /"/g, '' ), 10 );
-                    const val = parseInt( $( this ).val(), 10 );
-                    const inputs = $( `input[name="${ name }"]` );
-
-                    if ( max < val ) {
-                        $( this ).val( max );
-                    }
-                    if ( min > val || isNaN( val ) ) {
-                        $( this ).val( min );
-                    }
-
-                    if ( $( inputs[ 0 ] ).val() !== $( inputs[ 1 ] ).val() ) {
-                        inputs.val( $( this ).val() );
-                    }
-                });
-            });
-        </script>
-        <?php
     }
 }
