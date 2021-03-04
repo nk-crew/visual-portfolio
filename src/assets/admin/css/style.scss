@@ -449,8 +449,12 @@ $grid_sm: 600px !default;
         .metabox-holder {
             float: left;
             width: calc(100% - #{$settings_nav_width + 2});
-            min-height: 320px;
             margin-top: 9px;
+
+            > div,
+            > div > form {
+                min-height: 340px;
+            }
         }
     }
     .nav-tab-wrapper {
@@ -468,6 +472,29 @@ $grid_sm: 600px !default;
         padding: 10px 20px;
         background-color: #fff;
         border: 1px solid #d7dbde;
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        // Footer with save button.
+        .metabox-holder-footer {
+            position: sticky;
+            bottom: 0;
+            padding: 15px 20px;
+            margin-top: auto;
+            margin-right: -20px;
+            margin-bottom: -10px;
+            margin-left: -20px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+
+            > p {
+                padding: 0;
+                margin: 0;
+            }
+        }
     }
 
     // Controls base layout.
@@ -696,7 +723,7 @@ $grid_sm: 600px !default;
 
 #vp_social_integrations,
 #vp_watermarks {
-    .submit {
+    .metabox-holder-footer {
         display: none;
     }
 }

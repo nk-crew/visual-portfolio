@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * ADDED PR: https://github.com/tareq1988/wordpress-settings-api-class/pull/47
  * ADDED: enqueue scripts manually, without `admin_enqueue_scripts` action.
+ * ADDED: new controls such as toggle and number slider.
  *
  * @author Tareq Hasan <tareq@weDevs.com>
  * @link https://tareq.co Tareq Hasan
@@ -875,7 +876,7 @@ class Visual_Portfolio_Settings_API {
                 do_action( 'wsa_form_bottom_' . $form['id'], $form );
                 if ( isset( $this->settings_fields[ $form['id'] ] ) ) :
                     ?>
-                    <div>
+                    <div class="metabox-holder-footer">
                         <?php submit_button(); ?>
                     </div>
                 <?php endif; ?>
