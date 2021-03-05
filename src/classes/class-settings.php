@@ -437,22 +437,43 @@ class Visual_Portfolio_Settings {
 
                 // Fancybox Popup Settings.
                 array(
-                    'name'    => 'show_thumbs',
-                    'label'   => esc_html__( 'Display Thumbnails', '@@text_domain' ),
-                    'type'    => 'toggle',
-                    'default' => 'on',
+                    'name'      => 'show_thumbs',
+                    'label'     => esc_html__( 'Display Thumbnails', '@@text_domain' ),
+                    'type'      => 'toggle',
+                    'default'   => 'on',
+                    'condition' => array(
+                        array(
+                            'control'  => 'vp_popup_gallery[vendor]',
+                            'operator' => '===',
+                            'value'    => 'fancybox',
+                        ),
+                    ),
                 ),
                 array(
-                    'name'    => 'show_download_button',
-                    'label'   => esc_html__( 'Display Download Button', '@@text_domain' ),
-                    'type'    => 'toggle',
-                    'default' => 'off',
+                    'name'      => 'show_download_button',
+                    'label'     => esc_html__( 'Display Download Button', '@@text_domain' ),
+                    'type'      => 'toggle',
+                    'default'   => 'off',
+                    'condition' => array(
+                        array(
+                            'control'  => 'vp_popup_gallery[vendor]',
+                            'operator' => '===',
+                            'value'    => 'fancybox',
+                        ),
+                    ),
                 ),
                 array(
-                    'name'    => 'show_slideshow',
-                    'label'   => esc_html__( 'Display Slideshow', '@@text_domain' ),
-                    'type'    => 'toggle',
-                    'default' => 'off',
+                    'name'      => 'show_slideshow',
+                    'label'     => esc_html__( 'Display Slideshow', '@@text_domain' ),
+                    'type'      => 'toggle',
+                    'default'   => 'off',
+                    'condition' => array(
+                        array(
+                            'control'  => 'vp_popup_gallery[vendor]',
+                            'operator' => '===',
+                            'value'    => 'fancybox',
+                        ),
+                    ),
                 ),
 
                 // Click to Zoom.
@@ -541,18 +562,6 @@ class Visual_Portfolio_Settings {
         ?>
         <script>
             (function( $ ) {
-                // update controls.
-                function updateControls() {
-                    // popup gallery settings.
-                    var $popupGalleryContainer = $('#vp_popup_gallery');
-                    var vendor = $popupGalleryContainer.find('tr.vendor select').val();
-
-                    $popupGalleryContainer.find('tr.show_download_button, tr.show_slideshow, tr.show_thumbs')[ 'fancybox' === vendor ? 'show' : 'hide' ]();
-                }
-
-                updateControls();
-                $('form').on('change', updateControls);
-
                 // Don't allow adding input number values that > then max attribute and < min attribute.
                 $('form').on('input', '[type="number"]', function(e) {
                     var current = parseFloat( this.value );
