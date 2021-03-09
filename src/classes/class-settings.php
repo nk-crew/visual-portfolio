@@ -443,7 +443,7 @@ class Visual_Portfolio_Settings {
                     'default'   => 'on',
                     'condition' => array(
                         array(
-                            'control'  => 'vp_popup_gallery[vendor]',
+                            'control'  => '[name="vp_popup_gallery[vendor]"]',
                             'operator' => '===',
                             'value'    => 'fancybox',
                         ),
@@ -456,7 +456,7 @@ class Visual_Portfolio_Settings {
                     'default'   => 'off',
                     'condition' => array(
                         array(
-                            'control'  => 'vp_popup_gallery[vendor]',
+                            'control'  => '[name="vp_popup_gallery[vendor]"]',
                             'operator' => '===',
                             'value'    => 'fancybox',
                         ),
@@ -469,7 +469,7 @@ class Visual_Portfolio_Settings {
                     'default'   => 'off',
                     'condition' => array(
                         array(
-                            'control'  => 'vp_popup_gallery[vendor]',
+                            'control'  => '[name="vp_popup_gallery[vendor]"]',
                             'operator' => '===',
                             'value'    => 'fancybox',
                         ),

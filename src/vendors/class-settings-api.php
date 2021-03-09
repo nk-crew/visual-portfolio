@@ -47,7 +47,7 @@ class Visual_Portfolio_Settings_API {
         wp_enqueue_media();
         wp_enqueue_script( 'wp-color-picker' );
         wp_enqueue_script( 'jquery' );
-        wp_enqueue_script( 'conditionize2', visual_portfolio()->plugin_url . 'assets/vendor/conditionize2/jquery.conditionize2.min.js', array( 'jquery' ), '@@plugin_version' );
+        wp_enqueue_script( 'conditionize', visual_portfolio()->plugin_url . 'assets/vendor/conditionize/conditionize.min.js', array( 'jquery' ), '1.0.5' );
     }
 
     /**
@@ -653,10 +653,10 @@ class Visual_Portfolio_Settings_API {
         ?>
         <script>
             jQuery(function($) {
-                //Initiate Conditionize
-                $( '.vpf-conditionize' ).conditionize();
+                // Initiate Conditionize
+                $( '.metabox-holder' ).conditionize();
 
-                //Initiate Color Picker
+                // Initiate Color Picker
                 $('.wp-color-picker-field').wpColorPicker();
 
                 // Switches option sections
@@ -915,9 +915,7 @@ class Visual_Portfolio_Settings_API {
             }
 
             if ( isset( $field['args']['conditionize'] ) && ! empty( $field['args']['conditionize'] ) ) {
-                $class    .= ' vpf-conditionize';
-                $condition = ' data-condition="' . esc_attr( $field['args']['conditionize'] ) . '"';
-                $style     = ' style="display: ' . esc_attr( $this->get_conditionize_displayed_styles( $field['args']['condition'] ) ) . ';"';
+                $condition = ' data-cond="' . esc_attr( $field['args']['conditionize'] ) . '"';
             }
 
             if ( ! empty( $class ) ) {
@@ -940,105 +938,6 @@ class Visual_Portfolio_Settings_API {
     }
 
     /**
-     * Get conditionize displayed styles.
-     *
-     * @param array $condition - Condition array.
-     * @param string $type - Type of displayed style. Supported block, flex, grid.
-     * @return string
-     */
-    public function get_conditionize_displayed_styles( $condition, $type = 'table-row' ) {
-        $condition_process_of_comparison = array();
-
-        if ( isset( $condition ) && is_array( $condition ) && ! empty( $condition ) ) {
-
-            foreach ( $condition as $condition ) {
-
-                $control = str_replace( '[', ',', $condition['control'] );
-                $control = str_replace( ']', '', $control );
-                $control_parts = explode( ',', $control );
-
-                if ( isset( $control_parts ) && is_array( $control_parts ) && ! empty( $control_parts ) ) {
-                    foreach ( $control_parts as $key => $control_part ) {
-                        if ( 0 === $key ) {
-                            $section = $control_part;
-                        }
-                        if ( 1 === $key ) {
-                            $option_name = $control_part;
-                        }
-
-                        switch ( $key ) {
-                            case 0:
-                            default:
-                                $section = $control_part;
-                                break;
-                            case 1:
-                                $option_name = $control_part;
-                                break;
-                            case 2:
-                                $sub_name = $control_part;
-                                break;
-                        }
-                    }
-
-                    if ( isset( $section ) && isset( $option_name ) ) {
-                        $option_key = array_search( $option_name, array_column( $this->settings_fields[ $section ], 'name') );
-                        $default    = false;
-
-                        if ( false !== $option_key ) {
-                            $default = $this->settings_fields[ $section ][ $option_key ]['default'];
-                        }
-
-                        $option_value = $this->get_option( $option_name, $section, $default );
-
-                        $option_value = isset( $sub_name ) ? $option_value[ $sub_name ] : $option_value;
-                    }
-                }
-
-                if (
-                    isset( $option_value ) &&
-                    isset( $condition['operator'] ) &&
-                    isset( $condition['value'] ) &&
-                    ! empty( $condition['operator'] )
-                ) {
-                    switch ( $condition['operator'] ) {
-                        case '==':
-                        default:
-                            $comparison = $option_value === $condition['value'] ? true : false;
-                            break;
-                        case '!==':
-                        case '!=':
-                            $comparison = $option_value !== $condition['value'] ? true : false;
-                            break;
-                        case '<=':
-                            $comparison = $option_value <= $condition['value'] ? true : false;
-                            break;
-                        case '<':
-                            $comparison = $option_value < $condition['value'] ? true : false;
-                            break;
-                        case '>=':
-                            $comparison = $option_value >= $condition['value'] ? true : false;
-                            break;
-                        case '>':
-                            $comparison = $option_value > $condition['value'] ? true : false;
-                            break;
-                    }
-                    $condition_process_of_comparison[] = $comparison;
-                }
-            }
-        }
-
-        $display   = 'none';
-        if (
-            in_array( true, $condition_process_of_comparison, true ) &&
-            ! in_array( false, $condition_process_of_comparison, true )
-        ) {
-            $display = $type;
-        }
-
-        return $display;
-    }
-
-    /**
      * Convert condition arguments to Conditionize string.
      *
      * @param array $conditions - Array with Condition arguments.
@@ -1048,19 +947,16 @@ class Visual_Portfolio_Settings_API {
         $data_condition = '';
         if ( isset( $conditions ) && is_array( $conditions ) && ! empty( $conditions ) ) {
             foreach ( $conditions as $key => $condition ) {
-                if ( 1 < count( $conditions ) ) {
-                    $data_condition .= '( ';
+                $condition['value'] = empty( $condition['value'] ) ? "''" : ( '' . $condition['value'] );
+
+                $data_condition .= $condition['control'];
+
+                if ( isset( $condition['operator'] ) && isset( $condition['value'] ) ) {
+                    $data_condition .= ' ' . $condition['operator'] . ' ' . $condition['value'];
                 }
 
-                $condition['value'] = empty( $condition['value'] ) ? "''" : "'" . $condition['value'] . "'";
-
-                $data_condition .= $condition['control'] . $condition['operator'] . $condition['value'];
-
-                if ( 1 < count( $conditions ) ) {
-                    $data_condition .= ' )';
-                    if ( ( count( $conditions ) - 1 ) !== $key ) {
-                        $data_condition .= ' && ';
-                    }
+                if ( 1 < count( $conditions ) && ( count( $conditions ) - 1 ) !== $key ) {
+                    $data_condition .= ' && ';
                 }
             }
         }
