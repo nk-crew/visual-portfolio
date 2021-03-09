@@ -402,6 +402,15 @@ class Visual_Portfolio_Settings {
                     'is_pro'  => true,
                 ),
 
+                // Loop.
+                array(
+                    'name'    => 'loop',
+                    'label'   => esc_html__( 'Loop', '@@text_domain' ),
+                    'type'    => 'toggle',
+                    'default' => 'on',
+                    'is_pro'  => true,
+                ),
+
                 // General Popup Settings.
                 array(
                     'name'    => 'show_arrows',
