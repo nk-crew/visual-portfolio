@@ -466,6 +466,44 @@ class Visual_Portfolio_Settings {
                     ),
                 ),
                 array(
+                    'name'      => 'thumbs_auto_start',
+                    'label'     => esc_html__( 'Thumbnails Opened At Startup', '@@text_domain' ),
+                    'type'      => 'toggle',
+                    'default'   => 'off',
+                    'is_pro'    => true,
+                    'condition' => array(
+                        array(
+                            'control' => '[type="checkbox"][name="vp_popup_gallery[show_thumbs]"]',
+                        ),
+                        array(
+                            'control'  => '[name="vp_popup_gallery[vendor]"]',
+                            'operator' => '===',
+                            'value'    => 'fancybox',
+                        ),
+                    ),
+                ),
+                array(
+                    'name'      => 'thumbs_position',
+                    'label'     => esc_html__( 'Thumbnails Position', '@@text_domain' ),
+                    'type'      => 'select',
+                    'default'   => 'vertical',
+                    'options'   => array(
+                        'vertical'   => esc_html__( 'Vertical', '@@text_domain' ),
+                        'horizontal' => esc_html__( 'Horizontal', '@@text_domain' ),
+                    ),
+                    'is_pro'    => true,
+                    'condition' => array(
+                        array(
+                            'control' => '[type="checkbox"][name="vp_popup_gallery[show_thumbs]"]',
+                        ),
+                        array(
+                            'control'  => '[name="vp_popup_gallery[vendor]"]',
+                            'operator' => '===',
+                            'value'    => 'fancybox',
+                        ),
+                    ),
+                ),
+                array(
                     'name'      => 'show_download_button',
                     'label'     => esc_html__( 'Display Download Button', '@@text_domain' ),
                     'type'      => 'toggle',
