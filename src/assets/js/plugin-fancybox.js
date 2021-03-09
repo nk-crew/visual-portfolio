@@ -151,6 +151,12 @@ if ( 'undefined' !== typeof $.fancybox && VPPopupAPI ) {
             self.emitEvent( 'beforeInitFancybox', [ options, finalItems, index ] );
         }
 
+        // Disable Loop if only 1 item in gallery.
+        // We need this because Fancybox still let us scroll gallery using keyboard.
+        if ( 1 === items.length ) {
+            options.loop = false;
+        }
+
         // Start new fancybox instance
         fancyboxInstance = $.fancybox.open( finalItems, options, index );
 
