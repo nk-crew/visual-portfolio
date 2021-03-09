@@ -46,7 +46,10 @@ class Visual_Portfolio_3rd_TinyMCE {
     public function admin_enqueue_scripts( $page ) {
         if ( 'post.php' === $page || 'post-new.php' === $page ) {
             // add tiny mce data.
-            $data_tiny_mce = array();
+            $data_tiny_mce = array(
+                'plugin_name' => visual_portfolio()->plugin_name,
+                'layouts'     => array(),
+            );
 
             // get all visual-portfolio post types.
             // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
@@ -59,19 +62,19 @@ class Visual_Portfolio_3rd_TinyMCE {
                 )
             );
             foreach ( $vp_query as $post ) {
-                $data_tiny_mce[] = array(
+                $data_tiny_mce['layouts'][] = array(
                     'id'    => $post->ID,
                     'title' => '#' . $post->ID . ' - ' . $post->post_title,
                 );
             }
 
             // return if no data.
-            if ( ! count( $data_tiny_mce ) ) {
+            if ( empty( $data_tiny_mce['layouts'] ) ) {
                 return;
             }
 
             wp_enqueue_script( 'visual-portfolio-tinymce-localize', visual_portfolio()->plugin_url . 'assets/admin/js/mce-localize.min.js', array(), '@@plugin_version', true );
-            wp_localize_script( 'visual-portfolio-tinymce-localize', 'VPTinyMCEOptions', $data_tiny_mce );
+            wp_localize_script( 'visual-portfolio-tinymce-localize', 'VPTinyMCEData', $data_tiny_mce );
         }
     }
 

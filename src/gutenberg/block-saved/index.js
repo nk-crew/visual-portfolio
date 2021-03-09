@@ -10,7 +10,10 @@ import deprecated from './deprecated';
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
+const {
+    __,
+    sprintf,
+} = wp.i18n;
 
 const {
     registerBlockType,
@@ -19,13 +22,17 @@ const {
 
 const { name } = metadata;
 
+const {
+    plugin_name: pluginName,
+} = window.VPGutenbergVariables;
+
 const hasMediaCategory = getCategories().some( ( category ) => 'media' === category.slug );
 
 const settings = {
     ...metadata,
     category: hasMediaCategory ? metadata.category : 'common',
-    title: __( 'Visual Portfolio Saved', '@@text_domain' ),
-    description: __( 'Display saved Visual Portfolio layouts.', '@@text_domain' ),
+    title: sprintf( __( '%s Saved', '@@text_domain' ), pluginName ),
+    description: sprintf( __( 'Display saved %s layouts.', '@@text_domain' ), pluginName ),
     icon: {
         foreground: '#2540CC',
         src: (

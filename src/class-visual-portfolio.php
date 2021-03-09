@@ -40,6 +40,13 @@ class Visual_Portfolio {
     }
 
     /**
+     * Name of the plugin
+     *
+     * @var $plugin_name
+     */
+    public $plugin_name;
+
+    /**
      * Basename of plugin main file
      *
      * @var $plugin_basename
@@ -85,6 +92,7 @@ class Visual_Portfolio {
      * Init options
      */
     public function init() {
+        $this->plugin_name     = esc_html__( 'Visual Portfolio', '@@text_domain' );
         $this->plugin_basename = plugin_basename( __FILE__ );
         $this->plugin_path     = plugin_dir_path( __FILE__ );
         $this->plugin_url      = plugin_dir_url( __FILE__ );

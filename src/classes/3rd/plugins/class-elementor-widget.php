@@ -65,7 +65,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
      * @return string Widget title.
      */
     public function get_title() {
-        return __( 'Visual Portfolio', '@@text_domain' );
+        return visual_portfolio()->plugin_name;
     }
 
     /**

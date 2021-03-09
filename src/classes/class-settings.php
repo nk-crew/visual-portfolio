@@ -151,6 +151,11 @@ class Visual_Portfolio_Settings {
                 'title' => esc_html__( 'Social Integrations', '@@text_domain' ),
                 'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>',
             ),
+            array(
+                'id'    => 'vp_white_label',
+                'title' => esc_html__( 'White Label', '@@text_domain' ),
+                'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>',
+            ),
         );
 
         return apply_filters( 'vpf_settings_sections', $sections );
@@ -272,12 +277,14 @@ class Visual_Portfolio_Settings {
                 array(
                     'name'    => 'lazy_loading',
                     'label'   => esc_html__( 'Lazy Loading', '@@text_domain' ),
-                    'desc'    => esc_html__( 'Enable lazy loading for Visual Portfolio layouts only or for the whole website.', '@@text_domain' ),
+                    // translators: %s - plugin brand name.
+                    'desc'    => sprintf( esc_html__( 'Enable lazy loading for %s layouts only or for the whole website.', '@@text_domain' ), visual_portfolio()->plugin_name ),
                     'type'    => 'select',
                     'default' => 'vp',
                     'options' => array(
                         ''     => esc_html__( 'Disabled', '@@text_domain' ),
-                        'vp'   => esc_html__( 'Visual Portfolio Only', '@@text_domain' ),
+                        // translators: %s - plugin brand name.
+                        'vp'   => sprintf( esc_html__( '%s Only', '@@text_domain' ), visual_portfolio()->plugin_name ),
                         'full' => esc_html__( 'All images', '@@text_domain' ),
                     ),
                 ),
@@ -531,6 +538,21 @@ class Visual_Portfolio_Settings {
                             <h3>' . esc_html__( 'Pro Feature', '@@text_domain' ) . '</h3>
                             <div>
                                 <p>' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ) . '</p>
+                                <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&utm_medium=link&utm_campaign=plugin_settings&utm_content=@@plugin_version">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
+                            </div>
+                        </div>
+                    ',
+                    'type'    => 'html',
+                ),
+            ),
+            'vp_white_label' => array(
+                array(
+                    'name'    => 'pro_info',
+                    'desc'    => '
+                        <div class="vpf-settings-info-pro">
+                            <h3>' . esc_html__( 'Pro Feature', '@@text_domain' ) . '</h3>
+                            <div>
+                                <p>' . esc_html__( 'Remove our plugin brand and logos from Front and Admin areas', '@@text_domain' ) . '</p>
                                 <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&utm_medium=link&utm_campaign=plugin_settings&utm_content=@@plugin_version">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
                             </div>
                         </div>

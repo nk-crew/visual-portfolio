@@ -13,7 +13,10 @@ import SelectControl from '../components/select-control';
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
+const {
+    __,
+    sprintf,
+} = wp.i18n;
 
 const {
     Component,
@@ -34,6 +37,10 @@ const {
 const {
     InspectorControls,
 } = wp.blockEditor;
+
+const {
+    plugin_name: pluginName,
+} = window.VPGutenbergVariables;
 
 /**
  * Block Edit Class.
@@ -152,7 +159,7 @@ class BlockEdit extends Component {
                         <Placeholder
                             className="vpf-setup-wizard-saved"
                             icon={ <ElementIcon width="20" height="20" /> }
-                            label={ __( 'Saved Visual Portfolio', '@@text_domain' ) }
+                            label={ sprintf( __( 'Saved %s', '@@text_domain' ), pluginName ) }
                         >
                             { this.getSelector() }
                         </Placeholder>

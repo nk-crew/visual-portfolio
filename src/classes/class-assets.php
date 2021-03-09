@@ -567,7 +567,8 @@ class Visual_Portfolio_Assets {
     public function localize_global_data() {
         $data = array(
             '__'                   => array(
-                'couldnt_retrieve_vp'  => esc_attr__( 'Couldn\'t retrieve Visual Portfolio ID.', '@@text_domain' ),
+                // translators: %s - plugin name.
+                'couldnt_retrieve_vp'  => sprintf( __( 'Couldn\'t retrieve %s ID.', '@@text_domain' ), visual_portfolio()->plugin_name ),
 
                 'pswp_close'           => esc_attr__( 'Close (Esc)', '@@text_domain' ),
                 'pswp_share'           => esc_attr__( 'Share', '@@text_domain' ),

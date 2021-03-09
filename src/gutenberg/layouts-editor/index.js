@@ -20,7 +20,10 @@ const {
 
 const { registerPlugin } = wp.plugins;
 
-const { __ } = wp.i18n;
+const {
+    __,
+    sprintf,
+} = wp.i18n;
 
 const { apiFetch } = wp;
 
@@ -43,6 +46,10 @@ const {
 } = wp.blockEditor;
 
 const { compose } = wp.compose;
+
+const {
+    plugin_name: pluginName,
+} = window.VPGutenbergVariables;
 
 /**
  * Layouts Editor block
@@ -164,8 +171,8 @@ const LayoutsEditorBlockWithSelect = compose( [
 ] )( LayoutsEditorBlock );
 
 registerBlockType( 'visual-portfolio/saved-editor', {
-    title: __( 'Visual Portfolio Editor', '@@text_domain' ),
-    description: __( 'Edit saved Visual Portfolio layouts.', '@@text_domain' ),
+    title: sprintf( __( '%s Editor', '@@text_domain' ), pluginName ),
+    description: sprintf( __( 'Edit saved %s layouts.', '@@text_domain' ), pluginName ),
     icon: {
         foreground: '#2540CC',
         src: (

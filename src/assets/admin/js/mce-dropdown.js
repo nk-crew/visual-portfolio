@@ -5,18 +5,19 @@
  */
 const {
     tinymce,
-    VPTinyMCEOptions,
+    VPTinyMCEData,
 } = window;
-if ( 'undefined' !== typeof VPTinyMCEOptions && VPTinyMCEOptions.length ) {
+
+if ( 'undefined' !== typeof VPTinyMCEData && VPTinyMCEData.layouts.length ) {
     const options = [ {
         text: '',
         value: '',
     } ];
 
-    Object.keys( VPTinyMCEOptions ).forEach( ( k ) => {
+    Object.keys( VPTinyMCEData.layouts ).forEach( ( k ) => {
         options.push( {
-            text: VPTinyMCEOptions[ k ].title,
-            value: VPTinyMCEOptions[ k ].id,
+            text: VPTinyMCEData.layouts[ k ].title,
+            value: VPTinyMCEData.layouts[ k ].id,
         } );
     } );
 
@@ -24,7 +25,7 @@ if ( 'undefined' !== typeof VPTinyMCEOptions && VPTinyMCEOptions.length ) {
         init( editor ) {
             editor.addButton( 'visual_portfolio', {
                 type: 'listbox',
-                title: 'Visual Portfolio',
+                title: VPTinyMCEData.plugin_name,
                 icon: 'visual-portfolio',
                 classes: 'visual-portfolio-btn',
                 onclick() {

@@ -13,8 +13,6 @@ import IframePreview from '../components/iframe-preview';
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
-
 const {
     Component,
     Fragment,
@@ -29,6 +27,7 @@ const {
 } = wp.blockEditor;
 
 const {
+    plugin_name: pluginName,
     controls_categories: registeredControlsCategories,
 } = window.VPGutenbergVariables;
 
@@ -176,7 +175,7 @@ export default class BlockEdit extends Component {
                         <Placeholder
                             className="vpf-setup-wizard"
                             icon={ <ElementIcon width="20" height="20" /> }
-                            label={ __( 'Visual Portfolio', '@@text_domain' ) }
+                            label={ pluginName }
                         >
                             { this.renderControls( this.props, true ) }
                         </Placeholder>

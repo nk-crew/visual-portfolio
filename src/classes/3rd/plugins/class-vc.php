@@ -62,7 +62,7 @@ class Visual_Portfolio_3rd_VC {
 
             vc_map(
                 array(
-                    'name'     => esc_html__( 'Visual Portfolio', '@@text_domain' ),
+                    'name'     => visual_portfolio()->plugin_name,
                     'base'     => 'visual_portfolio',
                     'controls' => 'full',
                     'icon'     => 'icon-visual-portfolio',

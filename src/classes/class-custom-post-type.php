@@ -69,7 +69,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 'labels'             => array(
                     'name'               => _x( 'Portfolio Items', 'Post Type General Name', '@@text_domain' ),
                     'singular_name'      => _x( 'Portfolio Item', 'Post Type Singular Name', '@@text_domain' ),
-                    'menu_name'          => __( 'Visual Portfolio', '@@text_domain' ),
+                    'menu_name'          => visual_portfolio()->plugin_name,
                     'parent_item_colon'  => __( 'Parent Portfolio Item', '@@text_domain' ),
                     'all_items'          => __( 'Portfolio Items', '@@text_domain' ),
                     'view_item'          => __( 'View Portfolio Item', '@@text_domain' ),
@@ -163,7 +163,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 'labels'          => array(
                     'name'               => _x( 'Saved Layouts', 'Post Type General Name', '@@text_domain' ),
                     'singular_name'      => _x( 'Saved Layout', 'Post Type Singular Name', '@@text_domain' ),
-                    'menu_name'          => __( 'Visual Portfolio', '@@text_domain' ),
+                    'menu_name'          => visual_portfolio()->plugin_name,
                     'parent_item_colon'  => __( 'Parent Portfolio Item', '@@text_domain' ),
                     'all_items'          => __( 'Saved Layouts', '@@text_domain' ),
                     'view_item'          => __( 'View Saved Layout', '@@text_domain' ),
@@ -399,8 +399,15 @@ class Visual_Portfolio_Custom_Post_Type {
             </h2>
             <p>
                 <?php
-                // translators: %s - url to documentation.
-                echo wp_kses_post( sprintf( __( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%s" target="_blank">Visual Portfolio Blocks</a>.', '@@text_domain' ), 'https://visualportfolio.co/documentation/portfolio-blocks/' ) );
+                echo wp_kses_post(
+                    sprintf(
+                        // translators: %1$s - url to documentation.
+                        // translators: %2$s - plugin name.
+                        __( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', '@@text_domain' ),
+                        'https://visualportfolio.co/documentation/portfolio-blocks/',
+                        visual_portfolio()->plugin_name
+                    )
+                );
                 ?>
             </p>
             <p>
@@ -513,7 +520,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 array(
                     'parent' => false,
                     'id'     => 'visual_portfolio',
-                    'title'  => esc_html__( 'Visual Portfolio', '@@text_domain' ),
+                    'title'  => visual_portfolio()->plugin_name,
                     'href'   => admin_url( 'edit.php?post_type=vp_lists' ),
                 )
             );

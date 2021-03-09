@@ -190,6 +190,7 @@ class Visual_Portfolio_Gutenberg_Block {
             'VPGutenbergVariables',
             array(
                 'nonce'               => wp_create_nonce( 'vp-ajax-nonce' ),
+                'plugin_name'         => visual_portfolio()->plugin_name,
                 'controls'            => Visual_Portfolio_Controls::get_registered_array(),
                 'controls_categories' => Visual_Portfolio_Controls::get_registered_categories(),
             )
@@ -208,7 +209,8 @@ class Visual_Portfolio_Gutenberg_Block {
             'visual-portfolio-gutenberg-custom-post-meta',
             'VPGutenbergMetaVariables',
             array(
-                'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
+                'nonce'       => wp_create_nonce( 'vp-ajax-nonce' ),
+                'plugin_name' => visual_portfolio()->plugin_name,
             )
         );
     }

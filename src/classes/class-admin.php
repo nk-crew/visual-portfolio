@@ -94,8 +94,10 @@ class Visual_Portfolio_Admin {
 
         // Determine if the current page being viewed is "Visual Portfolio" related.
         if ( isset( $screen->post_type ) && ( 'portfolio' === $screen->post_type || 'vp_lists' === $screen->post_type ) ) {
+            $footer_text = esc_attr__( 'and', '@@text_domain' ) . ' <a href="https://visualportfolio.co/" target="_blank">' . visual_portfolio()->plugin_name . '</a>';
+
             // Use RegExp to append "Visual Portfolio" after the <a> element allowing translations to read correctly.
-            return preg_replace( '/(<a[\S\s]+?\/a>)/', '$1 ' . esc_attr__( 'and', '@@text_domain' ) . ' <a href="https://visualportfolio.co/" target="_blank">Visual Portfolio</a>', $text, 1 );
+            return preg_replace( '/(<a[\S\s]+?\/a>)/', '$1 ' . $footer_text, $text, 1 );
         }
 
         return $text;
@@ -168,7 +170,7 @@ class Visual_Portfolio_Admin {
         <div class="vpf-admin-toolbar">
             <h2>
                 <i class="dashicons-visual-portfolio"></i>
-                <?php echo esc_html__( 'Visual Portfolio', '@@text_domain' ); ?>
+                <?php echo esc_html( visual_portfolio()->plugin_name ); ?>
             </h2>
             <?php
             foreach ( $tabs as $tab ) {

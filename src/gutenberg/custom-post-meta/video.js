@@ -7,7 +7,10 @@ import rafSchd from 'raf-schd';
 /**
  * WordPress Dependencies
  */
-const { __ } = wp.i18n;
+const {
+    __,
+    sprintf,
+} = wp.i18n;
 
 const { withInstanceId, compose } = wp.compose;
 
@@ -146,7 +149,7 @@ class VpVideoComponent extends Component {
             >
                 <PanelRow>
                     <p className="description">
-                        { __( 'Video will be used in Visual Portfolio layouts only. Full list of supported links', '@@text_domain' ) }
+                        { sprintf( __( 'Video will be used in %s layouts only. Full list of supported links', '@@text_domain' ), VPGutenbergMetaVariables.plugin_name ) }
                         &nbsp;
                         <a href="https://visualportfolio.co/documentation/portfolio-items/video-portfolio-item/#supported-video-vendors" target="_blank" rel="noopener noreferrer">
                             { __( 'see here', '@@text_domain' ) }

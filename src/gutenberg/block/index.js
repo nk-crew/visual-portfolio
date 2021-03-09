@@ -21,12 +21,16 @@ const {
 
 const { name } = metadata;
 
+const {
+    plugin_name: pluginName,
+} = window.VPGutenbergVariables;
+
 const hasMediaCategory = getCategories().some( ( category ) => 'media' === category.slug );
 
 const settings = {
     ...metadata,
     category: hasMediaCategory ? metadata.category : 'common',
-    title: __( 'Visual Portfolio', '@@text_domain' ),
+    title: pluginName,
     description: __( 'Display galleries, posts and portfolio grids.', '@@text_domain' ),
     icon: {
         foreground: '#2540CC',
