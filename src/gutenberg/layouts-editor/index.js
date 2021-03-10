@@ -28,6 +28,10 @@ const {
 const { apiFetch } = wp;
 
 const {
+    applyFilters,
+} = wp.hooks;
+
+const {
     Fragment,
     Component,
 } = wp.element;
@@ -136,6 +140,12 @@ class LayoutsEditorBlock extends Component {
                                 &quot;]
                             </code>
                         </p>
+
+                        { applyFilters(
+                            'vpf.layouts-editor.shortcodes',
+                            '',
+                            this
+                        ) }
                     </PanelBody>
                 </InspectorControls>
                 <BlockEdit
