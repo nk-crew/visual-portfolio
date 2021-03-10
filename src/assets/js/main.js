@@ -41,8 +41,8 @@ let checkVisibilityTimeout = false;
 // fix portfolio inside Tabs and Accordions
 // check visibility by timer https://stackoverflow.com/questions/19669786/check-if-element-is-visible-in-dom/33456469
 //
-// https://github.com/nk-o/visual-portfolio/issues/11
-// https://github.com/nk-o/visual-portfolio/issues/113
+// https://github.com/nk-crew/visual-portfolio/issues/11
+// https://github.com/nk-crew/visual-portfolio/issues/113
 function checkVisibility() {
     clearTimeout( checkVisibilityTimeout );
 
@@ -780,7 +780,7 @@ class VP {
 }
 
 // fix for Elementor popup gallery.
-// https://github.com/nk-o/visual-portfolio/issues/103
+// https://github.com/nk-crew/visual-portfolio/issues/103
 if ( $( '.elementor' ).length ) {
     $( document ).on( 'init.vpf addItems.vpf', ( event, vpObject ) => {
         if ( 'vpf' !== event.namespace ) {

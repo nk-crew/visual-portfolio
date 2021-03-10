@@ -8,7 +8,7 @@ const {
 } = window.VPData;
 
 // fix masonry items position for Tiles layout.
-// https://github.com/nk-o/visual-portfolio/issues/111
+// https://github.com/nk-crew/visual-portfolio/issues/111
 if ( 'undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isotope.LayoutMode ) {
     const MasonryMode = window.Isotope.LayoutMode.modes.masonry;
 

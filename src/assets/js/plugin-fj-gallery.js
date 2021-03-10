@@ -93,7 +93,7 @@ $( document ).on( 'imagesLoaded.vpf', ( event, self ) => {
     }
 
     // sometimes on iOs images failed to calculate positions, so we need this imagesLoaded event.
-    // related issue: https://github.com/nk-o/visual-portfolio/issues/55
+    // related issue: https://github.com/nk-crew/visual-portfolio/issues/55
     self.initFjGallery();
 } );
 

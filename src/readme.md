@@ -18,7 +18,7 @@ Modern gallery and portfolio plugin with advanced layouts editor. Clean and powe
 
 **Portfolio websites are the most popular nowadays.** We created <a href="https://visualportfolio.co/?utm_source=wporg&utm_medium=link&utm_campaign=demo" target="_blank">**Visual Portfolio, Posts & Image Gallery WordPress plugin**</a>, to help every creative, agency, or photographers get access to the powerful tools they need to showcase their beautiful works and attract more love from their potential and existing customers.
 
-<a href="https://visualportfolio.co/?utm_source=wporg&utm_medium=link&utm_campaign=demo" target="_blank">See Live Demo</a> | <a href="https://visualportfolio.co/documentation/getting-started/?utm_source=wporg&utm_medium=link&utm_campaign=docs" target="_blank">Documentation</a> | <a href="https://github.com/nk-o/visual-portfolio" target="_blank">GitHub</a>
+<a href="https://visualportfolio.co/?utm_source=wporg&utm_medium=link&utm_campaign=demo" target="_blank">See Live Demo</a> | <a href="https://visualportfolio.co/documentation/getting-started/?utm_source=wporg&utm_medium=link&utm_campaign=docs" target="_blank">Documentation</a> | <a href="https://github.com/nk-crew/visual-portfolio" target="_blank">GitHub</a>
 
 Create beautiful, clean, and powerful photo galleries and portfolio layouts using the Visual Portfolio gallery plugin. It is easy for simple photo galleries, but powerful enough for professionals. Whether you're a photographer, agency, or anything in between, **Visual Portfolio will boost your online presence**.
 
@@ -546,9 +546,9 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 Migration Notes:
 
-* If you extended portfolio options using PHP, you will need to remove `vp_` prefix from your custom options. Example - <https://github.com/nk-o/visual-portfolio/blob/master/src/classes/class-admin.php#L854-L865>
+* If you extended portfolio options using PHP, you will need to remove `vp_` prefix from your custom options. Example - <https://github.com/nk-crew/visual-portfolio/blob/master/src/classes/class-admin.php#L854-L865>
 * If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - <https://visualportfolio.co/documentation/developers/css-variables/>
-* If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-o/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
+* If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-crew/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
 
 Log:
 
@@ -587,7 +587,7 @@ Log:
 * fixed assets loading order in preview
 * fixed z-index CSS variable for Fancybox
 * fixed swiper fade effect slide width
-* moved all SVG icons to separate templates to let developers overwrite it <https://github.com/nk-o/visual-portfolio/tree/master/src/templates/icons>
+* moved all SVG icons to separate templates to let developers overwrite it <https://github.com/nk-crew/visual-portfolio/tree/master/src/templates/icons>
 * renamed `Portfolio Layouts` to `Saved`
 * renamed `Default` Items Styles, Filter, Sort and Pagination to `Classic`
 * a lot of minor changes

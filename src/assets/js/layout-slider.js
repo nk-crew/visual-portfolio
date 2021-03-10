@@ -38,7 +38,7 @@ $( document ).on( 'initLayout.vpf', ( event, self ) => {
 
         if ( 'auto' === itemsPerView ) {
             // fix fade slider items width.
-            // https://github.com/nk-o/visual-portfolio/issues/95.
+            // https://github.com/nk-crew/visual-portfolio/issues/95.
             let itemsWidth = 'auto';
             if ( 'items' === type && 'fade' === self.options.sliderEffect ) {
                 itemsWidth = '100%';

@@ -98,7 +98,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             }
 
             // fix first load slide position (seems like a conflict with lazySizes)
-            // issue: https://github.com/nk-o/visual-portfolio/issues/54
+            // issue: https://github.com/nk-crew/visual-portfolio/issues/54
             if ( 0 === options.speed ) {
                 options.speed = 1;
             }
