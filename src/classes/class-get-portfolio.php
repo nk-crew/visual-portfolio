@@ -986,10 +986,7 @@ class Visual_Portfolio_Get {
 
         do_action( 'vpf_after_get_output', $options, $style_options );
 
-        $return = ob_get_contents();
-        ob_end_clean();
-
-        return $return;
+        return ob_get_clean();
     }
 
     /**
@@ -1074,15 +1071,14 @@ class Visual_Portfolio_Get {
         }
 
         ob_start();
+
         ?>
         <div class="<?php echo esc_attr( $class ); ?>">
             <?php self::filter( $options ); ?>
         </div>
         <?php
 
-        $return = ob_get_contents();
-        ob_end_clean();
-        return $return;
+        return ob_get_clean();
     }
 
     /**
@@ -1115,15 +1111,14 @@ class Visual_Portfolio_Get {
         }
 
         ob_start();
+
         ?>
         <div class="<?php echo esc_attr( $class ); ?>">
             <?php self::sort( $options ); ?>
         </div>
         <?php
 
-        $return = ob_get_contents();
-        ob_end_clean();
-        return $return;
+        return ob_get_clean();
     }
 
     /**
