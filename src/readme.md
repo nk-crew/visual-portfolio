@@ -150,6 +150,12 @@ Automatically fetch posts from your social networks to display in gallery on you
   * [Custom Hover Image](https://visualportfolio.co/custom-hover-image-animated-gif/) - useful for animated GIFs
   * [Caption Move Style](https://visualportfolio.co/masonry-caption-move/)
 
+* [**Theft Protection**](https://visualportfolio.co/theft-protection/)
+
+  * **Watermarks** - add your logo on top of your images to make them harder to steal
+  * **Password Form** - add a password to gallery blocks and send it to your clients
+  * **Age Gate** - Protect visitors from viewing adult content
+
 * **Responsive Breakpoints Settings**
 Manually control the screen sizes, which used by the automatic responsive function to adapt your gallery layouts.
 
@@ -167,6 +173,9 @@ Display posts and pages in popup iframe, not only image and video galleries. It'
 
 * **Popup Gallery Deep Linking**
 Makes URL automatically change when you open popup and you can easily link to a specific popup image.
+
+* **White Label**
+Possibility to use your brand name and logo instead of our "Visual Portfolio".
 
 [**Find much more portfolio and gallery features of Visual Portfolio Pro today!**](https://visualportfolio.co/pro/?utm_source=wporg&utm_medium=link&utm_campaign=pro)
 
@@ -289,6 +298,27 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/).
 
 ## Changelog ##
+
+= 2.11.0 =
+
+* added support for Watermarks in Pro plugin
+* added support for Block Password Protection in Pro plugin
+* added support for Age Gate Protection in Pro plugin
+* added support for White Label in Pro plugin
+* added support for Popup settings (Loop, Thumbnails Open At Startup, Thumbnails Position) in Pro plugin
+* added top toolbar to admin pages
+* improved Fancybox Thumbnails styles
+* improved settings UI
+* removed instant JS init to allow 3rd-party scripts use jQuery events
+* prevent Fancybox to loop a single Popup image using keyboard arrows
+* fixed custom CSS enqueue when block is not inside content
+* fixed paged gallery with Current Query option enabled
+* fixed Gutenberg iframe preview width conflict with Gutenberg container styles
+* fixed Gutenberg iframe preview height when iframe is in loading state
+* fixed lazy loading on preloader img logo
+* fixed image sizes in Twenty Twenty One theme
+* fixed conflict styles in Airtifact theme
+* minor changes
 
 = 2.10.5 =
 
