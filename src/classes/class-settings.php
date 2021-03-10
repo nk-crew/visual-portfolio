@@ -209,7 +209,7 @@ class Visual_Portfolio_Settings {
                 array(
                     'name'   => 'breakpoints_title',
                     'label'  => esc_html__( 'Responsive Breakpoints', '@@text_domain' ),
-                    'type'   => 'html',
+                    'type'   => 'section_title',
                     'is_pro' => true,
                 ),
                 array(
@@ -290,15 +290,10 @@ class Visual_Portfolio_Settings {
                 ),
 
                 array(
-                    'name'  => 'images_sizes_title',
-                    'label' => esc_html__( 'Image Sizes', '@@text_domain' ),
-                    'type'  => 'html',
-                ),
-                array(
                     'name'    => 'images_layouts_title',
-                    'label'   => esc_html__( 'Layouts', '@@text_domain' ),
+                    'label'   => esc_html__( 'Layouts Image Sizes', '@@text_domain' ),
                     'desc'    => __( 'Image sizes used in portfolio layouts.', '@@text_domain' ),
-                    'type'    => 'html',
+                    'type'    => 'section_title',
                 ),
                 array(
                     'name'        => 'sm',
@@ -330,9 +325,9 @@ class Visual_Portfolio_Settings {
                 ),
                 array(
                     'name'    => 'images_popup_title',
-                    'label'   => esc_html__( 'Popup Gallery', '@@text_domain' ),
+                    'label'   => esc_html__( 'Popup Gallery Image Sizes', '@@text_domain' ),
                     'desc'    => __( 'Image sizes used in popup gallery images.', '@@text_domain' ),
-                    'type'    => 'html',
+                    'type'    => 'section_title',
                 ),
                 array(
                     'name'        => 'sm_popup',
@@ -384,6 +379,12 @@ class Visual_Portfolio_Settings {
                     'default' => 'off',
                 ),
 
+                // Section divider.
+                array(
+                    'name'   => 'popup_general_divider_title',
+                    'type'   => 'section_title',
+                ),
+
                 // Deeplinking.
                 array(
                     'name'    => 'deep_linking',
@@ -411,7 +412,20 @@ class Visual_Portfolio_Settings {
                     'is_pro'  => true,
                 ),
 
-                // General Popup Settings.
+                // Click to Zoom.
+                array(
+                    'name'    => 'click_to_zoom',
+                    'label'   => esc_html__( 'Click to Zoom', '@@text_domain' ),
+                    'type'    => 'toggle',
+                    'default' => 'on',
+                ),
+
+                // UI Elements.
+                array(
+                    'name'  => 'popup_ui_elements_title',
+                    'label' => esc_html__( 'UI Elements', '@@text_domain' ),
+                    'type'  => 'section_title',
+                ),
                 array(
                     'name'    => 'show_arrows',
                     'label'   => esc_html__( 'Display Arrows', '@@text_domain' ),
@@ -530,23 +544,18 @@ class Visual_Portfolio_Settings {
                     ),
                 ),
 
-                // Click to Zoom.
+                // Misc settings.
                 array(
-                    'name'    => 'click_to_zoom',
-                    'label'   => esc_html__( 'Click to Zoom', '@@text_domain' ),
-                    'type'    => 'toggle',
-                    'default' => 'on',
+                    'name'  => 'popup_misc_title',
+                    'label' => esc_html__( 'Misc', '@@text_domain' ),
+                    'type'  => 'section_title',
                 ),
-
-                // Colors.
                 array(
                     'name'    => 'background_color',
                     'label'   => esc_html__( 'Background Color', '@@text_domain' ),
                     'type'    => 'color',
                     'default' => '#1e1e1e',
                 ),
-
-                // Page iframe popup.
                 array(
                     'name'    => 'pages_iframe_custom_css',
                     'label'   => esc_html__( 'Pages iFrame Custom CSS', '@@text_domain' ),

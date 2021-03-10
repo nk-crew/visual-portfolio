@@ -525,6 +525,30 @@ $grid_sm: 600px !default;
         opacity: .7;
     }
 
+    // Section Title.
+    .vpf-setting-type-section_title {
+        &::before {
+            content: "";
+            display: block;
+            padding-top: 15px;
+            margin-right: -20px;
+            margin-left: -20px;
+            border-top: 1px solid #d7dbde;
+        }
+
+        label {
+            font-size: 15px;
+        }
+        label:empty {
+            display: block;
+            margin-top: -20px;
+        }
+
+        .description {
+            margin-top: -5px;
+        }
+    }
+
     // Image control.
     .wpsa-image-remove {
         display: none;

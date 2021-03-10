@@ -347,6 +347,16 @@ class Visual_Portfolio_Settings_API {
     }
 
     /**
+     * Displays the section title for a settings field
+     *
+     * @param array $args settings field args
+     * @return string
+     */
+    public function callback_section_title( $args ) {
+        echo $this->get_field_description( $args );
+    }
+
+    /**
      * Displays a rich text textarea for a settings field
      *
      * @param array $args settings field args
@@ -912,6 +922,10 @@ class Visual_Portfolio_Settings_API {
 
             if ( ! empty( $field['args']['class'] ) ) {
                 $class = $field['args']['class'];
+            }
+
+            if ( isset( $field['args']['type'] ) ) {
+                $class .= ' vpf-setting-type-' . $field['args']['type'];
             }
 
             if ( isset( $field['args']['conditionize'] ) && ! empty( $field['args']['conditionize'] ) ) {
