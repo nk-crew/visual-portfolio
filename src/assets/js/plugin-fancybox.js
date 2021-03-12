@@ -13,6 +13,9 @@ const {
     settingsPopupGallery,
 } = VPData;
 
+const $doc = $( document );
+const $window = $( window );
+
 if ( 'undefined' !== typeof $.fancybox && VPPopupAPI ) {
     let fancyboxInstance;
 
@@ -170,4 +173,14 @@ if ( 'undefined' !== typeof $.fancybox && VPPopupAPI ) {
             fancyboxInstance = false;
         }
     };
+
+    // Fix zoom image sizes attribute.
+    // https://wordpress.org/support/topic/blurry-zoom-images/
+    $doc.on( 'transitionend', '.fancybox-content', function() {
+        const $img = $( this ).find( '.fancybox-image[sizes]' );
+
+        const sizes = `${ Math.round( 100 * ( $img.width() / $window.width() ) ) }vw`;
+
+        $img.attr( 'sizes', sizes );
+    } );
 }
