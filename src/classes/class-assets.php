@@ -25,6 +25,13 @@ class Visual_Portfolio_Assets {
     );
 
     /**
+     * When styles already included in head.
+     *
+     * @var array
+     */
+    private static $head_css_included = false;
+
+    /**
      * Visual_Portfolio_Assets constructor.
      */
     public function __construct() {
@@ -259,9 +266,30 @@ class Visual_Portfolio_Assets {
         $dynamic_styles      = Visual_Portfolio_Controls_Dynamic_CSS::get( $options );
         $controls_css_handle = 'vp-dynamic-styles-' . $options['id'];
 
-        wp_register_style( $controls_css_handle, false, array(), '@@plugin_version' );
-        wp_enqueue_style( $controls_css_handle );
-        wp_add_inline_style( $controls_css_handle, $dynamic_styles ? $dynamic_styles : ' ' );
+        if ( ! wp_style_is( $controls_css_handle, 'enqueued' ) ) {
+            $dynamic_styles = wp_kses( $dynamic_styles, array( '\'', '\"' ) );
+
+            // Enqueue custom CSS.
+            if ( ! self::$head_css_included ) {
+                wp_register_style( $controls_css_handle, false, array(), '@@plugin_version' );
+                wp_enqueue_style( $controls_css_handle );
+                wp_add_inline_style( $controls_css_handle, $dynamic_styles ? $dynamic_styles : ' ' );
+
+                // Enqueue JS instead of CSS when rendering in <body> to prevent W3C errors.
+            } elseif ( ! wp_script_is( $controls_css_handle, 'enqueued' ) ) {
+                wp_register_script( $controls_css_handle, false, array(), '@@plugin_version', true );
+                wp_enqueue_script( $controls_css_handle );
+                wp_add_inline_script(
+                    $controls_css_handle,
+                    '(function(){
+                        var styleTag = document.createElement("style");
+                        styleTag.id = "' . esc_attr( $controls_css_handle ) . '-inline-css";
+                        styleTag.innerHTML = "' . preg_replace( "/[\r\n]+/", ' ', ( $dynamic_styles ? $dynamic_styles : ' ' ) ) . '";
+                        document.body.appendChild(styleTag);
+                    }());'
+                );
+            }
+        }
 
         self::store_used_assets( $controls_css_handle, true, 'style' );
 
@@ -636,6 +664,8 @@ class Visual_Portfolio_Assets {
     public function wp_enqueue_head_assets() {
         self::enqueue_stored_assets( 'style' );
         self::enqueue_stored_assets( 'template_style' );
+
+        self::$head_css_included = true;
     }
 
     /**
