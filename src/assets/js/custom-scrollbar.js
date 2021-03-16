@@ -80,4 +80,16 @@ if ( allowScrollbar && 'undefined' !== typeof SimpleBar ) {
 
         self.destroyCustomScrollbar();
     } );
+
+    // Fix Simplebar content size in some themes.
+    // For example, in Astra theme in content with enabled sidebar, Simplebar calculate wrong height automatically.
+    $( () => {
+        $( '[data-simplebar="init"].vp-portfolio__custom-scrollbar' ).each( function() {
+            const instance = SimpleBar.instances.get( this );
+
+            if ( instance ) {
+                instance.recalculate();
+            }
+        } );
+    } );
 }
