@@ -171,8 +171,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             }
 
             // init swiper.
-            // eslint-disable-next-line no-new
-            new window.Swiper( $parent[ 0 ], options );
+            const instance = new window.Swiper( $parent[ 0 ], options );
 
             // autoplay hover pause.
             if ( 'true' === self.options.sliderAutoplayHoverPause && 0 < parseFloat( self.options.sliderAutoplay ) ) {
@@ -184,7 +183,7 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 } );
             }
 
-            self.emitEvent( 'initSwiper', [ options ] );
+            self.emitEvent( 'initSwiper', [ options, instance ] );
         }
     };
 

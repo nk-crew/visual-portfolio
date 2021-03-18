@@ -6,12 +6,14 @@ const {
     SimpleBar,
 } = window;
 
+const $doc = $( document );
+
 // Don't run on Mac and mobile devices.
 const allowScrollbar = ! /Mac|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test( navigator.userAgent );
 
 if ( allowScrollbar && 'undefined' !== typeof SimpleBar ) {
     // Extend VP class.
-    $( document ).on( 'extendClass.vpf', ( event, VP ) => {
+    $doc.on( 'extendClass.vpf', ( event, VP ) => {
         if ( 'vpf' !== event.namespace ) {
             return;
         }
@@ -25,8 +27,12 @@ if ( allowScrollbar && 'undefined' !== typeof SimpleBar ) {
             self.emitEvent( 'beforeInitCustomScrollbar' );
 
             self.$items_wrap.find( '.vp-portfolio__custom-scrollbar' ).each( function() {
-                // eslint-disable-next-line no-new
-                new SimpleBar( this );
+                const instance = SimpleBar.instances.get( this );
+
+                if ( ! instance ) {
+                    // eslint-disable-next-line no-new
+                    new SimpleBar( this );
+                }
             } );
 
             self.emitEvent( 'initCustomScrollbar' );
@@ -51,7 +57,7 @@ if ( allowScrollbar && 'undefined' !== typeof SimpleBar ) {
     } );
 
     // Add Items.
-    $( document ).on( 'addItems.vpf', ( event, self, $items, removeExisting ) => {
+    $doc.on( 'addItems.vpf', ( event, self, $items, removeExisting ) => {
         if ( 'vpf' !== event.namespace ) {
             return;
         }
@@ -64,7 +70,7 @@ if ( allowScrollbar && 'undefined' !== typeof SimpleBar ) {
     } );
 
     // Init.
-    $( document ).on( 'init.vpf', ( event, self ) => {
+    $doc.on( 'init.vpf', ( event, self ) => {
         if ( 'vpf' !== event.namespace ) {
             return;
         }
@@ -73,12 +79,23 @@ if ( allowScrollbar && 'undefined' !== typeof SimpleBar ) {
     } );
 
     // Destroy.
-    $( document ).on( 'destroy.vpf', ( event, self ) => {
+    $doc.on( 'destroy.vpf', ( event, self ) => {
         if ( 'vpf' !== event.namespace ) {
             return;
         }
 
         self.destroyCustomScrollbar();
+    } );
+
+    // Init Swiper duplicated slides scrollbars.
+    $doc.on( 'initSwiper.vpf', ( event, self ) => {
+        if ( 'vpf' !== event.namespace ) {
+            return;
+        }
+
+        if ( 'true' === self.options.sliderLoop ) {
+            self.initCustomScrollbar();
+        }
     } );
 
     // Fix Simplebar content size in some themes.
