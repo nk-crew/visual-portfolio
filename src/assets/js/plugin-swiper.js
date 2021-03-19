@@ -60,6 +60,8 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             options = options || {
                 speed: ( parseFloat( self.options.sliderSpeed ) || 0 ) * 1000,
                 autoHeight: 'auto' === self.options.sliderItemsHeight,
+                // fixes conflict with custom cursor movement.
+                touchStartPreventDefault: false,
                 effect: self.options.sliderEffect || 'slide',
                 spaceBetween: parseFloat( self.options.itemsGap ) || 0,
                 centeredSlides: 'true' === self.options.sliderCenteredSlides,
@@ -149,6 +151,8 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 const swiperThumbs = new window.Swiper( $thumbsParent[ 0 ], {
                     autoHeight: 'auto' === self.options.sliderThumbnailsHeight,
                     effect: 'slide',
+                    // fixes conflict with custom cursor movement.
+                    touchStartPreventDefault: false,
                     spaceBetween: parseFloat( self.options.sliderThumbnailsGap ) || 0,
                     loop: false,
                     freeMode: true,
