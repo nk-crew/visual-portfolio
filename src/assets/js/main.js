@@ -232,7 +232,7 @@ class VP {
             return;
         }
 
-        self.$items_wrap.imagesLoaded( () => {
+        self.$items_wrap.imagesLoaded().progress( () => {
             this.emitEvent( 'imagesLoaded' );
         } );
     }
