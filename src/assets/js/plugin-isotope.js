@@ -155,7 +155,7 @@ $doc.on( 'initEvents.vpf', ( event, self ) => {
         const evp = `.vpf-uid-${ self.uid }`;
 
         $wnd.on( `resize${ evp }`, throttle( 100, rafSchd( () => {
-            self.$items_wrap.isotope( 'layout' );
+            self.initIsotope( 'layout' );
         } ) ) );
     }
 } );
