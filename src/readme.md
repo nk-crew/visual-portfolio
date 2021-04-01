@@ -299,6 +299,15 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.11.1 =
+
+* improved custom styles output in `<body>` - use JS to prevent w3c error
+* fixed Fancybox blurry zoom images in Firefox
+* fixed custom scrollbar wrong height in Astra theme
+* fixed custom scrollbar in Swiper duplicated slides
+* fixed custom styles wrong selector generation (mostly resolves conflict in Carousel layout)
+* minor changes
+
 = 2.11.0 =
 
 * added support for Watermarks in Pro plugin
