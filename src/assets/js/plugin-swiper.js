@@ -60,8 +60,6 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
             options = options || {
                 speed: ( parseFloat( self.options.sliderSpeed ) || 0 ) * 1000,
                 autoHeight: 'auto' === self.options.sliderItemsHeight,
-                // fixes conflict with custom cursor movement.
-                touchStartPreventDefault: false,
                 effect: self.options.sliderEffect || 'slide',
                 spaceBetween: parseFloat( self.options.itemsGap ) || 0,
                 centeredSlides: 'true' === self.options.sliderCenteredSlides,
@@ -116,6 +114,17 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                         this.slideReset();
                     }
                 },
+                // These events used to add fixes for
+                // conflict with custom cursor movement.
+                touchStart( swiper, e ) {
+                    self.emitEvent( 'swiperTouchStart', [ swiper, e ] );
+                },
+                touchMove( swiper, e ) {
+                    self.emitEvent( 'swiperTouchMove', [ swiper, e ] );
+                },
+                touchEnd( swiper, e ) {
+                    self.emitEvent( 'swiperTouchEnd', [ swiper, e ] );
+                },
             };
 
             self.emitEvent( 'beforeInitSwiper', [ options ] );
@@ -151,8 +160,6 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                 const swiperThumbs = new window.Swiper( $thumbsParent[ 0 ], {
                     autoHeight: 'auto' === self.options.sliderThumbnailsHeight,
                     effect: 'slide',
-                    // fixes conflict with custom cursor movement.
-                    touchStartPreventDefault: false,
                     spaceBetween: parseFloat( self.options.sliderThumbnailsGap ) || 0,
                     loop: false,
                     freeMode: true,
@@ -167,6 +174,19 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                     grabCursor: true,
                     watchSlidesVisibility: true,
                     watchSlidesProgress: true,
+                    on: {
+                        // These events used to add fixes for
+                        // conflict with custom cursor movement.
+                        touchStart( swiper, e ) {
+                            self.emitEvent( 'swiperTouchStart', [ swiper, e ] );
+                        },
+                        touchMove( swiper, e ) {
+                            self.emitEvent( 'swiperTouchMove', [ swiper, e ] );
+                        },
+                        touchEnd( swiper, e ) {
+                            self.emitEvent( 'swiperTouchEnd', [ swiper, e ] );
+                        },
+                    },
                 } );
 
                 options.thumbs = {
