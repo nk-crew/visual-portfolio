@@ -346,7 +346,13 @@ class VP {
                 }
                 Object.keys( self.stylesList[ uid ][ m ] ).forEach( ( s ) => {
                     // selector
-                    stylesString += `.vp-uid-${ uid } ${ s } {`;
+                    const selectorParent = `.vp-uid-${ uid }`;
+                    let selector = `${ selectorParent } ${ s }`;
+
+                    // add parent selector after `,`.
+                    selector = selector.replace( /, |,/g, `, ${ selectorParent } ` );
+
+                    stylesString += `${ selector } {`;
                     Object.keys( self.stylesList[ uid ][ m ][ s ] ).forEach( ( p ) => {
                         // property and value
                         stylesString += `${ p }:${ self.stylesList[ uid ][ m ][ s ][ p ] };`;
