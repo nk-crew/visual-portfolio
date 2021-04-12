@@ -440,6 +440,17 @@ class Visual_Portfolio_Images {
         $image = apply_filters( 'vpf_wp_get_attachment_image', false, $attachment_id, $size, $attr, $lazyload );
 
         if ( ! $image ) {
+            if ( ! is_array( $attr ) ) {
+                $attr = array();
+            }
+            if ( ! isset( $attr['class'] ) ) {
+                $attr['class'] = '';
+            }
+
+            // Add class `wp-image-ID` to allow parsers to get current image ID and make manipulations.
+            // For example, this class is used in our lazyloading script to determine the image ID.
+            $attr['class'] .= ( $attr['class'] ? ' ' : '' ) . 'wp-image-' . $attachment_id;
+
             $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
         }
 
@@ -553,19 +564,26 @@ class Visual_Portfolio_Images {
      * @return int|bool
      */
     private static function attributes_to_image_id( $attributes ) {
+        $img_id = false;
+
         // Get ID from class.
         if ( isset( $attributes['class'] ) && preg_match( '/wp-image-(\d*)/i', $attributes['class'], $match ) ) {
-            return $match[1];
+            $img_id = $match[1];
         }
 
-        if ( isset( $attributes['src'] ) ) {
+        if ( ! $img_id && isset( $attributes['src'] ) ) {
             // Remove the thumbnail size.
-            $src = preg_replace( '~-[0-9]+x[0-9]+(?=\..{2,6})~', '', $attributes['src'] );
+            $src    = preg_replace( '~-[0-9]+x[0-9]+(?=\..{2,6})~', '', $attributes['src'] );
+            $img_id = attachment_url_to_postid( $src );
 
-            return attachment_url_to_postid( $src );
+            // Sometimes, when the uploaded image larger than max-size, this images scaled and filename changed to `NAME-scaled.EXT`.
+            if ( ! $img_id ) {
+                $src    = preg_replace( '~-[0-9]+x[0-9]+(?=\..{2,6})~', '-scaled', $attributes['src'] );
+                $img_id = attachment_url_to_postid( $src );
+            }
         }
 
-        return false;
+        return $img_id;
     }
 
     /**
