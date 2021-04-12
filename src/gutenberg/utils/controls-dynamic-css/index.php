@@ -45,7 +45,18 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
             // Prepare styles.
             if ( $allow ) {
                 foreach ( $control['style'] as $data ) {
-                    $result .= self::prepare_styles_from_params( $selector, $options[ $control['name'] ], $data );
+                    $val = $options[ $control['name'] ];
+
+                    // Prepare Aspect Ratio control value.
+                    if ( isset( $control['type'] ) && 'aspect_ratio' === $control['type'] && $val ) {
+                        $ratio_array = explode( ':', $val );
+
+                        if ( isset( $ratio_array[0] ) && $ratio_array[0] && isset( $ratio_array[1] ) && $ratio_array[1] ) {
+                            $val = ( 100 * $ratio_array[1] / $ratio_array[0] ) . '%';
+                        }
+                    }
+
+                    $result .= self::prepare_styles_from_params( $selector, $val, $data );
                 }
             }
         }

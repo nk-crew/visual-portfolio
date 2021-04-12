@@ -97,7 +97,18 @@ export default function getDynamicCSS( options ) {
         // Prepare styles.
         if ( allow ) {
             control.style.forEach( ( data ) => {
-                result += prepareStylesFromParams( selector, options[ control.name ], data );
+                let val = options[ control.name ];
+
+                // Prepare Aspect Ratio control value.
+                if ( control.type && 'aspect_ratio' === control.type && val ) {
+                    const ratioArray = val.split( ':' );
+
+                    if ( ratioArray[ 0 ] && ratioArray[ 1 ] ) {
+                        val = `${ 100 * ( ratioArray[ 1 ] / ratioArray[ 0 ] ) }%`;
+                    }
+                }
+
+                result += prepareStylesFromParams( selector, val, data );
             } );
         }
     } );

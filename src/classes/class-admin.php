@@ -388,6 +388,12 @@ class Visual_Portfolio_Admin {
                             'label'   => esc_html__( 'Images Aspect Ratio', '@@text_domain' ),
                             'name'    => 'images_aspect_ratio',
                             'default' => '',
+                            'style'   => array(
+                                array(
+                                    'element'  => '.vp-portfolio__item-wrap .vp-portfolio__item-img-wrap::before',
+                                    'property' => 'padding-top',
+                                ),
+                            ),
                         ),
                     ),
                 ),
@@ -410,6 +416,12 @@ class Visual_Portfolio_Admin {
                             'label'   => esc_html__( 'Images Aspect Ratio', '@@text_domain' ),
                             'name'    => 'images_aspect_ratio',
                             'default' => '',
+                            'style'   => array(
+                                array(
+                                    'element'  => '.vp-portfolio__item-wrap .vp-portfolio__item-img-wrap::before',
+                                    'property' => 'padding-top',
+                                ),
+                            ),
                         ),
                     ),
                 ),
