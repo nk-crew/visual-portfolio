@@ -21,7 +21,10 @@ $doc.on( 'extendClass.vpf', ( event, VP ) => {
 
     /**
      * Init Isotope
-     * TODO: Check for MixItUp plugin
+     * TODO: Check one of these scripts as alternative
+     * - https://github.com/haltu/muuri
+     * - https://github.com/Vestride/Shuffle
+     * - https://github.com/patrickkunka/mixitup
      *
      * @param {object} options isotope options
      */
