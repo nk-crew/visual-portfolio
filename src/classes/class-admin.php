@@ -1399,6 +1399,7 @@ class Visual_Portfolio_Admin {
                     'comment_count' => esc_html__( 'Comments Count', '@@text_domain' ),
                     'modified'      => esc_html__( 'Modified', '@@text_domain' ),
                     'menu_order'    => esc_html__( 'Menu Order', '@@text_domain' ),
+                    'post__in'      => esc_html__( 'Manual Selection', '@@text_domain' ),
                     'rand'          => esc_html__( 'Random', '@@text_domain' ),
                 ),
                 'condition'     => array(
