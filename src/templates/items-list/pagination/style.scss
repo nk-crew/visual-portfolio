@@ -84,8 +84,12 @@
     .vp-portfolio__loading & .vp-pagination__load-more {
         pointer-events: none;
         cursor: default;
-        background-color: transparent;
+        // Important used to fix focused button background.
+        // stylelint-disable-next-line
+        background-color: transparent !important;
         border: none;
+        // stylelint-disable-next-line
+        outline: none !important;
         transition: none;
     }
     &.vp-pagination__no-more .vp-pagination__load-more {
