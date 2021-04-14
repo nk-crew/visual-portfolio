@@ -7,6 +7,11 @@ import Select, { components } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import CreatableSelect from 'react-select/creatable';
 import selectStyles from 'gutenberg-react-select-styles';
+import {
+    SortableContainer,
+    SortableElement,
+    sortableHandle,
+} from 'react-sortable-hoc';
 
 const {
     Option,
@@ -33,6 +38,31 @@ const {
  * Internal dependencies
  */
 const cachedOptions = {};
+
+const SortableSelect = SortableContainer( Select );
+const SortableCreatableSelect = SortableContainer( CreatableSelect );
+const SortableAsyncSelect = SortableContainer( AsyncSelect );
+const SortableMultiValueLabel = sortableHandle( ( props ) => (
+    <components.MultiValueLabel { ...props } />
+) );
+const SortableMultiValue = SortableElement( ( props ) => {
+    // this prevents the menu from being opened/closed when the user clicks
+    // on a value to begin dragging it. ideally, detecting a click (instead of
+    // a drag) would still focus the control and toggle the menu, but that
+    // requires some magic with refs that are out of scope for this example
+    const onMouseDown = ( e ) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    const innerProps = { ...props.innerProps, onMouseDown };
+    return <components.MultiValue { ...props } innerProps={ innerProps } />;
+} );
+
+function arrayMove( array, from, to ) {
+    array = array.slice();
+    array.splice( 0 > to ? array.length + to : to, 0, array.splice( from, 1 )[ 0 ] );
+    return array;
+}
 
 /**
  * Component Class
@@ -320,10 +350,33 @@ export default class VpfSelectControl extends Component {
             placeholder: isSearchable ? __( 'Type to search...', '@@text_domain' ) : __( 'Select...', '@@text_domain' ),
         };
 
+        // Multiple select.
+        if ( isMultiple ) {
+            selectProps.useDragHandle = true;
+            selectProps.axis = 'xy';
+            selectProps.onSortEnd = ( { oldIndex, newIndex } ) => {
+                const newValue = arrayMove( this.getDefaultValue(), oldIndex, newIndex );
+                selectProps.onChange( newValue );
+            };
+            selectProps.distance = 4;
+            // small fix for https://github.com/clauderic/react-sortable-hoc/pull/352:
+            selectProps.getHelperDimensions = ( { node } ) => node.getBoundingClientRect();
+            selectProps.components.MultiValue = SortableMultiValue;
+            selectProps.components.MultiValueLabel = SortableMultiValueLabel;
+        }
+
         // Creatable select.
         if ( isCreatable ) {
             selectProps.placeholder = __( 'Type and press Enter...', '@@text_domain' );
             selectProps.isSearchable = true;
+
+            if ( isMultiple ) {
+                return (
+                    <SortableCreatableSelect
+                        { ...selectProps }
+                    />
+                );
+            }
 
             return (
                 <CreatableSelect
@@ -357,6 +410,14 @@ export default class VpfSelectControl extends Component {
             delete selectProps.options;
             delete selectProps.isLoading;
 
+            if ( isMultiple ) {
+                return (
+                    <SortableAsyncSelect
+                        { ...selectProps }
+                    />
+                );
+            }
+
             return (
                 <AsyncSelect
                     { ...selectProps }
@@ -365,6 +426,14 @@ export default class VpfSelectControl extends Component {
         }
 
         // Default select.
+        if ( isMultiple ) {
+            return (
+                <SortableSelect
+                    { ...selectProps }
+                />
+            );
+        }
+
         return (
             <Select
                 { ...selectProps }
