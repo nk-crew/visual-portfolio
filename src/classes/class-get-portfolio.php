@@ -1316,15 +1316,19 @@ class Visual_Portfolio_Get {
                         $images = $new_images;
                         break;
                     case 'rand':
-                        // phpcs:ignore
-                        mt_srand( self::get_rand_seed_session() );
-
-                        for ( $i = count( $images ) - 1; $i > 0; $i-- ) {
+                        // We don't need to randomize order for filter,
+                        // because filter list will be always changed once AJAX loaded.
+                        if ( ! $for_filter ) {
                             // phpcs:ignore
-                            $j            = @mt_rand( 0, $i );
-                            $tmp          = $images[ $i ];
-                            $images[ $i ] = $images[ $j ];
-                            $images[ $j ] = $tmp;
+                            mt_srand( self::get_rand_seed_session() );
+
+                            for ( $i = count( $images ) - 1; $i > 0; $i-- ) {
+                                // phpcs:ignore
+                                $j            = @mt_rand( 0, $i );
+                                $tmp          = $images[ $i ];
+                                $images[ $i ] = $images[ $j ];
+                                $images[ $j ] = $tmp;
+                            }
                         }
 
                         break;
