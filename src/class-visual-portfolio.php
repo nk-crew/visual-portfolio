@@ -144,6 +144,7 @@ class Visual_Portfolio {
 
         // this settings class order is required.
         require_once $this->plugin_path . 'classes/class-settings.php';
+        require_once $this->plugin_path . 'classes/class-ask-review.php';
         require_once $this->plugin_path . 'classes/class-images.php';
         require_once $this->plugin_path . 'classes/class-rest.php';
         require_once $this->plugin_path . 'classes/class-get-portfolio.php';
