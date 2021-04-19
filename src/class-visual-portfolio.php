@@ -113,6 +113,9 @@ class Visual_Portfolio {
      * Activation Hook
      */
     public function activation_hook() {
+        // Welcome Page Flag.
+        set_transient( '_visual_portfolio_welcome_screen_activation_redirect', true, 30 );
+
         flush_rewrite_rules();
     }
 
@@ -144,6 +147,7 @@ class Visual_Portfolio {
 
         // this settings class order is required.
         require_once $this->plugin_path . 'classes/class-settings.php';
+        require_once $this->plugin_path . 'classes/class-welcome-screen.php';
         require_once $this->plugin_path . 'classes/class-ask-review.php';
         require_once $this->plugin_path . 'classes/class-images.php';
         require_once $this->plugin_path . 'classes/class-rest.php';

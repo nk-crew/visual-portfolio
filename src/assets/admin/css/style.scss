@@ -754,3 +754,300 @@ $grid_sm: 600px !default;
         display: none;
     }
 }
+
+
+/**
+ * Welcome Screen.
+ */
+$escaped-svg-characters: (
+    ("<", "%3c"),
+    (">", "%3e"),
+    ("#", "%23"),
+    ("(", "%28"),
+    (")", "%29"),
+) !default;
+
+// Replace `$search` with `$replace` in `$string`
+// Used on our SVG icon backgrounds for custom forms.
+//
+// @author Hugo Giraudel
+// @param {String} $string - Initial string
+// @param {String} $search - Substring to replace
+// @param {String} $replace ('') - New value
+// @return {String} - Updated string
+@function str-replace($string, $search, $replace: "") {
+    $index: str-index($string, $search);
+
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return $string;
+}
+
+// See https://codepen.io/kevinweber/pen/dXWoRw
+//
+// Requires the use of quotes around data URIs.
+
+@function escape-svg($string) {
+    @if str-index($string, "data:image/svg+xml") {
+        @each $char, $encoded in $escaped-svg-characters {
+            $string: str-replace($string, $char, $encoded);
+        }
+    }
+
+    @return $string;
+}
+
+.vpf-welcome-screen {
+    box-sizing: border-box;
+    padding-right: 20px;
+    padding-left: 20px;
+    margin-left: -20px;
+    font-size: 16px;
+    line-height: 1.6;
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: inherit;
+    }
+
+    @media screen and (max-width: 782px) {
+        margin-left: -10px;
+    }
+
+    p {
+        font-size: inherit;
+        line-height: 1.6;
+    }
+
+    h2 {
+        margin-top: 0;
+        font-size: 1.8em;
+        font-weight: 700;
+        line-height: 1.4;
+        text-align: center;
+    }
+
+    .vpf-welcome-head {
+        position: relative;
+        padding: 120px 0;
+        margin-bottom: 120px;
+        color: #fff;
+        background-color: #000;
+        z-index: 0;
+
+        @media screen and (max-width: 600px) {
+            margin-bottom: 60px;
+        }
+
+        .vpf-welcome-head-background {
+            position: absolute;
+            display: block;
+            top: 0;
+            right: -20px;
+            width: calc(100% + 40px);
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        // Logo.
+        .vpf-welcome-head-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            margin-bottom: 20px;
+            color: #fff;
+
+            @media screen and (max-width: 600px) {
+                font-size: 20px;
+            }
+        }
+        .dashicons-visual-portfolio {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            margin-top: 3px;
+            margin-right: 20px;
+            background-size: 60px;
+            opacity: 1;
+
+            @media screen and (max-width: 600px) {
+                width: 30px;
+                height: 30px;
+                margin-right: 10px;
+                background-size: 30px;
+            }
+        }
+
+        // Subtitle.
+        .vpf-welcome-subtitle {
+            max-width: 480px;
+            margin: 0 auto;
+            font-weight: 500;
+            line-height: 1.7;
+            color: #c1c1c1;
+            text-align: center;
+        }
+
+        // Pro info.
+        .vpf-welcome-head-pro-info {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            width: 100%;
+            max-width: 570px;
+            padding: 25px 45px;
+            color: #131313;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 3px;
+            box-shadow: 0 5px 10px 0 rgba(#000, .1);
+            transform: translateX(-50%);
+
+            @media screen and (max-width: 1120px) {
+                max-width: 530px;
+            }
+            @media screen and (max-width: 600px) {
+                position: relative;
+            }
+        }
+    }
+
+    .vpf-welcome-content {
+        max-width: 700px;
+        margin: 0 auto;
+
+        // Title.
+        .vpf-welcome-content-title {
+            max-width: 600px;
+            margin: 0 auto;
+            margin-bottom: 50px;
+        }
+
+        // Features.
+        .vpf-welcome-content-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 30px;
+            list-style: none;
+
+            @media screen and (max-width: 600px) {
+                grid-template-columns: 1fr;
+            }
+
+            li {
+                position: relative;
+                padding-left: 30px;
+
+                > span {
+                    position: absolute;
+                    display: block;
+                    top: 0;
+                    left: 0;
+                }
+                > strong {
+                    color: #000;
+                }
+            }
+        }
+
+        hr {
+            max-width: 200px;
+            margin-top: 30px;
+            margin-bottom: 60px;
+        }
+
+        // Buttons.
+        .vpf-welcome-content-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 10px;
+            max-width: 450px;
+            margin: 0 auto;
+            margin-bottom: 50px;
+            text-align: center;
+
+            @media screen and (max-width: 600px) {
+                grid-template-columns: 1fr;
+            }
+
+            a {
+                padding: 11px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #fff;
+                text-decoration: none;
+                text-transform: uppercase;
+                background-color: #2540cc;
+                border-radius: 3px;
+
+                &:hover,
+                &:focus {
+                    background-color: #13289a;
+                }
+
+                &:last-child {
+                    color: #000;
+                    background-color: #d2d2d2;
+
+                    &:hover,
+                    &:focus {
+                        background-color: #bdbdbd;
+                    }
+                }
+            }
+        }
+    }
+
+    // Pro.
+    .vpf-welcome-foot-pro-info {
+        max-width: 700px;
+        padding: 40px;
+        margin: 60px auto;
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+
+        ul {
+            max-width: 500px;
+            margin: 40px auto;
+            column-count: 2;
+            font-weight: 500;
+
+            @media screen and (max-width: 600px) {
+                column-count: 1;
+            }
+
+            > li::before {
+                content: "";
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                margin-right: 6px;
+                vertical-align: -.25em;
+                background-image: url("#{escape-svg('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#1e9059"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>')}");
+            }
+        }
+
+        > a {
+            display: block;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            text-transform: uppercase;
+            background-color: #1e9059;
+            border-radius: 3px;
+
+            &:hover,
+            &:focus {
+                background-color: #0f7544;
+            }
+        }
+    }
+}
