@@ -43,9 +43,52 @@ const {
 
 const {
     MediaUpload,
+    MediaUploadCheck,
 } = wp.blockEditor;
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
+function prepareImage( img ) {
+    const imgData = {
+        id: img.id,
+        imgUrl: img.url,
+        imgThumbnailUrl: img.url,
+    };
+
+    // Prepare thumbnail for all images except GIF, since GIFs animated only in full size.
+    if ( ! img.mime || 'image/gif' !== img.mime ) {
+        if ( img.sizes && img.sizes.large && img.sizes.large.url ) {
+            imgData.imgThumbnailUrl = img.sizes.large.url;
+        } else if ( img.sizes && img.sizes.medium && img.sizes.medium.url ) {
+            imgData.imgThumbnailUrl = img.sizes.medium.url;
+        } else if ( img.sizes && img.sizes.thumbnail && img.sizes.thumbnail.url ) {
+            imgData.imgThumbnailUrl = img.sizes.thumbnail.url;
+        }
+    }
+
+    if ( img.title ) {
+        imgData.title = img.title;
+    }
+    if ( img.description ) {
+        imgData.description = img.description;
+    }
+
+    return imgData;
+}
+
+function prepareImages( images ) {
+    const result = [];
+
+    if ( images && images.length ) {
+        images.forEach( ( img ) => {
+            const imgData = prepareImage( img );
+
+            result.push( imgData );
+        } );
+    }
+
+    return result;
+}
 
 function arrayMove( arr, oldIndex, newIndex ) {
     if ( newIndex >= arr.length ) {
@@ -123,23 +166,66 @@ const SortableItem = SortableElement( ( props ) => {
                     } }
                 >
                     <div className="vpf-component-gallery-control-item-modal">
-                        { focalPoint ? (
-                            <FocalPointPicker
-                                url={ img.imgThumbnailUrl || img.imgUrl }
-                                value={ img.focalPoint }
-                                onChange={ ( val ) => {
-                                    const newImages = [ ...items ];
+                        { focalPoint && img.id ? (
+                            <MediaUploadCheck>
+                                <div className="editor-post-featured-image">
+                                    <FocalPointPicker
+                                        url={ img.imgThumbnailUrl || img.imgUrl }
+                                        value={ img.focalPoint }
+                                        onChange={ ( val ) => {
+                                            const newImages = [ ...items ];
 
-                                    if ( newImages[ idx ] ) {
-                                        newImages[ idx ] = {
-                                            ...newImages[ idx ],
-                                            focalPoint: val,
-                                        };
+                                            if ( newImages[ idx ] ) {
+                                                newImages[ idx ] = {
+                                                    ...newImages[ idx ],
+                                                    focalPoint: val,
+                                                };
 
-                                        onChange( newImages );
-                                    }
-                                } }
-                            />
+                                                onChange( newImages );
+                                            }
+                                        } }
+                                    />
+                                    <MediaUpload
+                                        onSelect={ ( image ) => {
+                                            const newImages = [ ...items ];
+
+                                            if ( newImages[ idx ] ) {
+                                                const imgData = prepareImage( image );
+
+                                                newImages[ idx ] = {
+                                                    ...newImages[ idx ],
+                                                    ...imgData,
+                                                };
+
+                                                onChange( newImages );
+                                            }
+                                        } }
+                                        allowedTypes={ ALLOWED_MEDIA_TYPES }
+                                        render={ ( { open } ) => (
+                                            <Button onClick={ open } isSecondary>
+                                                { __( 'Replace Image', '@@text_domain' ) }
+                                            </Button>
+                                        ) }
+                                    />
+                                    <Button
+                                        onClick={ () => {
+                                            const newImages = [ ...items ];
+
+                                            if ( newImages[ idx ] ) {
+                                                newImages.splice( idx, 1 );
+
+                                                onChange( newImages );
+                                            }
+
+                                            closeModal();
+                                        } }
+                                        isLink
+                                        isDestructive
+                                    >
+                                        { __( 'Remove Image', '@@text_domain' ) }
+                                    </Button>
+                                </div>
+                            </MediaUploadCheck>
                         ) : '' }
                         { Object.keys( imageControls ).map( ( name ) => {
                             const newCondition = [];
@@ -206,7 +292,6 @@ const SortableList = SortableContainer( ( props ) => {
         attributes,
         focalPoint,
         isSetupWizard,
-        prepareImages,
     } = props;
 
     // Automatically open images selector when first time select Images in Setup Wizard.
@@ -218,7 +303,7 @@ const SortableList = SortableContainer( ( props ) => {
             { items.map( ( img, idx ) => (
                 <SortableItem
                     // eslint-disable-next-line react/no-array-index-key
-                    key={ `lzb-constructor-controls-items-sortable-${ img.id }-${ idx }` }
+                    key={ `lzb-constructor-controls-items-sortable-${ idx }` }
                     index={ idx }
                     img={ img }
                     idx={ idx }
@@ -291,43 +376,6 @@ class GalleryControl extends Component {
         noticeOperations.createErrorNotice( message );
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    prepareImages( images ) {
-        const result = [];
-
-        if ( images && images.length ) {
-            images.forEach( ( img ) => {
-                const imgData = {
-                    id: img.id,
-                    imgUrl: img.url,
-                    imgThumbnailUrl: img.url,
-                };
-
-                // Prepare thumbnail for all images except GIF, since GIFs animated only in full size.
-                if ( ! img.mime || 'image/gif' !== img.mime ) {
-                    if ( img.sizes && img.sizes.thumbnail && img.sizes.thumbnail.url ) {
-                        imgData.imgThumbnailUrl = img.sizes.thumbnail.url;
-                    } else if ( img.sizes && img.sizes.medium && img.sizes.medium.url ) {
-                        imgData.imgThumbnailUrl = img.sizes.medium.url;
-                    } else if ( img.sizes && img.sizes.large && img.sizes.large.url ) {
-                        imgData.imgThumbnailUrl = img.sizes.large.url;
-                    }
-                }
-
-                if ( img.title ) {
-                    imgData.title = img.title;
-                }
-                if ( img.description ) {
-                    imgData.description = img.description;
-                }
-
-                result.push( imgData );
-            } );
-        }
-
-        return result;
-    }
-
     render() {
         const self = this;
         const {
@@ -347,7 +395,7 @@ class GalleryControl extends Component {
                 <MediaUpload
                     onSelect={ ( images ) => {
                         this.setState( { hasError: false } );
-                        onChange( this.prepareImages( images ) );
+                        onChange( prepareImages( images ) );
                     } }
                     allowedTypes={ ALLOWED_MEDIA_TYPES }
                     multiple
@@ -363,7 +411,6 @@ class GalleryControl extends Component {
                                 attributes={ attributes }
                                 focalPoint={ focalPoint }
                                 isSetupWizard={ isSetupWizard }
-                                prepareImages={ self.prepareImages }
                                 axis="xy"
                                 distance="3"
                                 onSortEnd={ ( { oldIndex, newIndex } ) => {
