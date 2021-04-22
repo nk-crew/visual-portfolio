@@ -84,7 +84,7 @@ class ControlsRender extends Component {
         }
 
         // content source conditions.
-        if ( /^content-source-/g.test( category ) && 'content-source-additional' !== category && `content-source-${ attributes.content_source }` !== category ) {
+        if ( /^content-source-/g.test( category ) && 'content-source-general' !== category && `content-source-${ attributes.content_source }` !== category ) {
             return null;
         }
 
