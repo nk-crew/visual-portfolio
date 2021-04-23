@@ -23,6 +23,14 @@ class Visual_Portfolio_Settings {
     public static $settings_api;
 
     /**
+     * Cached settings fields. We call settings fields method a lot of times to get default values.
+     * So, for performance reasons we need to cache the output.
+     *
+     * @var object
+     */
+    public static $cached_settings_fields;
+
+    /**
      * Visual_Portfolio_Settings constructor.
      */
     public function __construct() {
@@ -167,6 +175,10 @@ class Visual_Portfolio_Settings {
      * @return array settings fields
      */
     public static function get_settings_fields() {
+        if ( ! empty( self::$cached_settings_fields ) ) {
+            return self::$cached_settings_fields;
+        }
+
         $default_breakpoints = Visual_Portfolio_Breakpoints::get_default_breakpoints();
 
         $settings_fields = array(
@@ -618,7 +630,9 @@ class Visual_Portfolio_Settings {
             ),
         );
 
-        return apply_filters( 'vpf_settings_fields', $settings_fields );
+        self::$cached_settings_fields = apply_filters( 'vpf_settings_fields', $settings_fields );
+
+        return self::$cached_settings_fields;
     }
 
     /**
