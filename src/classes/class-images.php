@@ -39,8 +39,8 @@ class Visual_Portfolio_Images {
      */
     public static function construct() {
         add_action( 'wp', 'Visual_Portfolio_Images::init_lazyload' );
-
-        self::add_image_sizes();
+        add_action( 'after_setup_theme', 'Visual_Portfolio_Images::add_image_sizes' );
+        add_filter( 'image_size_names_choose', 'Visual_Portfolio_Images::image_size_names_choose' );
     }
 
     /**
@@ -63,8 +63,6 @@ class Visual_Portfolio_Images {
         add_image_size( 'vp_sm_popup', $sm_popup, 9999 );
         add_image_size( 'vp_md_popup', $md_popup, 9999 );
         add_image_size( 'vp_xl_popup', $xl_popup, 9999 );
-
-        add_filter( 'image_size_names_choose', 'Visual_Portfolio_Images::image_size_names_choose' );
     }
 
     /**
