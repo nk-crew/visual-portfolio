@@ -1222,6 +1222,22 @@ class Visual_Portfolio_Get {
                 $images = $options['images'];
             }
 
+            $images_ids = array();
+            foreach ( $images as $k => $img ) {
+                $images_ids[] = (int) $img['id'];
+            }
+
+            // Find all used attachments.
+            $all_attachments = get_posts(
+                array(
+                    'post_type'      => 'attachment',
+                    'posts_per_page' => -1,
+                    'showposts'      => -1,
+                    'paged'          => -1,
+                    'post__in'       => $images_ids,
+                )
+            );
+
             // prepare titles and descriptions.
             foreach ( $images as $k => $img ) {
                 $img_meta = array(
@@ -1233,7 +1249,14 @@ class Visual_Portfolio_Get {
                     'date'        => '',
                 );
 
-                $attachment = get_post( $img['id'] );
+                // Find current attachment post data.
+                $attachment = false;
+                foreach ( $all_attachments as $post ) {
+                    if ( $post->ID === (int) $img['id'] ) {
+                        $attachment = $post;
+                        break;
+                    }
+                }
 
                 if ( $attachment ) {
                     // get image meta if needed.
