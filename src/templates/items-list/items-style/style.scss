@@ -41,6 +41,10 @@
     // Transitions
     .vp-portfolio__item-img {
         overflow: hidden;
+
+        // fix for safari border-radius.
+        // https://github.com/nk-crew/visual-portfolio/issues/150
+        z-index: 0;
     }
     .vp-portfolio__item-img img {
         transition: var(--vp-items-style-default-transition-duration) transform var(--vp-items-style-default-transition-easing), var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);

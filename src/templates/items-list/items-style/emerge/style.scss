@@ -4,6 +4,12 @@
  * Emerge items style
  */
 .vp-portfolio__items-style-emerge {
+    // fix for safari border-radius.
+    // https://github.com/nk-crew/visual-portfolio/issues/150
+    .vp-portfolio__item {
+        z-index: 0;
+    }
+
     .vp-portfolio__item a {
         color: var(--vp-items-style-emerge--links__color);
         text-decoration: var(--vp-items-style-emerge--links__text-decoration);
