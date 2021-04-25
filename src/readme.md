@@ -9,7 +9,7 @@
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
-Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block.
+Modern photo gallery and portfolio plugin with advanced layouts editor. Clean and powerful image gallery styles with enormous settings in the Gutenberg block.
 
 ## Description ##
 
