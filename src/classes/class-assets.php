@@ -268,6 +268,7 @@ class Visual_Portfolio_Assets {
 
         if ( ! wp_style_is( $controls_css_handle, 'enqueued' ) ) {
             $dynamic_styles = wp_kses( $dynamic_styles, array( '\'', '\"' ) );
+            $dynamic_styles = str_replace( '&gt;', '>', $dynamic_styles );
 
             // Enqueue custom CSS.
             if ( ! self::$head_css_included ) {
