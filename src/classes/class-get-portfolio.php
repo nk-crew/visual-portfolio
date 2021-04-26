@@ -1456,14 +1456,26 @@ class Visual_Portfolio_Get {
                     parse_str( html_entity_decode( $options['posts_custom_query'] ), $tmp_arr );
                     $query_opts = array_merge( $query_opts, $tmp_arr );
                 } elseif ( 'current_query' === $options['posts_source'] ) {
-                    $query_vars = $GLOBALS['wp_query']->query_vars;
+                    global $wp_query;
 
-                    // Add pagination paged value.
-                    if ( $query_opts['paged'] && ( ! isset( $query_vars['paged'] ) || ! $query_vars['paged'] ) ) {
-                        $query_vars['paged'] = $query_opts['paged'];
+                    if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
+                        // Unset `offset` because if is set, $wp_query overrides/ignores the paged parameter and breaks pagination.
+                        if ( isset( $query_opts['offset'] ) ) {
+                            unset( $query_opts['offset'] );
+                        }
+
+                        $query_opts = wp_parse_args( $wp_query->query_vars, $query_opts );
+
+                        // Add post type.
+                        if ( empty( $query_opts['post_type'] ) && is_singular() ) {
+                            $query_opts['post_type'] = get_post_type( get_the_ID() );
+                        }
+
+                        // Add pagination paged value.
+                        if ( $query_opts['paged'] && ( ! isset( $wp_query->query_vars['paged'] ) || ! $wp_query->query_vars['paged'] ) ) {
+                            $wp_query->query_vars['paged'] = $query_opts['paged'];
+                        }
                     }
-
-                    $query_opts = $query_vars;
                 } else {
                     $query_opts['post_type'] = $options['posts_source'];
 
