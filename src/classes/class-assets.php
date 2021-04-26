@@ -141,7 +141,7 @@ class Visual_Portfolio_Assets {
             self::store_used_assets( 'visual-portfolio-elementor', true, 'style', 9 );
         }
 
-        self::store_used_assets( 'visual-portfolio', true, 'script', 11 );
+        self::store_used_assets( 'visual-portfolio', true, 'script', 12 );
 
         // Layout.
         switch ( $options['layout'] ) {
