@@ -136,13 +136,17 @@ Visual Portfolio gives you a wide range of filters and actions to customize ever
 * **Social Integrations**
 Automatically fetch posts from your social networks to display in gallery on your site.
 
-  * [Youtube](https://visualportfolio.co/social-youtube/)
   * [Instagram](https://visualportfolio.co/social-instagram/)
+  * [Youtube](https://visualportfolio.co/social-youtube/)
   * [Vimeo](https://visualportfolio.co/social-vimeo/)
-  * [Flickr](https://visualportfolio.co/social-flickr/)
+  * [Unsplash](https://visualportfolio.co/social-unsplash/)
   * [Twitter](https://visualportfolio.co/social-twitter/)
-  * [Dribbble](https://visualportfolio.co/social-dribbble/)
+  * [Flickr](https://visualportfolio.co/social-flickr/)
   * [Google Photos](https://visualportfolio.co/social-google-photos/)
+  * [Dribbble](https://visualportfolio.co/social-dribbble/)
+  * [Twitch](https://visualportfolio.co/social-twitch/)
+  * VK (Vkontakte)
+  * RSS
 
 * **Stylish interaction effects**
 
@@ -298,6 +302,27 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/).
 
 ## Changelog ##
+
+= 2.12.0 =
+
+* added new social feeds support in Pro plugin:
+  * Unsplash
+  * Twitch
+  * VK (Vkontakte)
+  * RSS
+* added possibility to replace image in gallery control
+* added possibility to reorder manually selected posts
+* added posts order for Manual Selection
+* improved overall performance. In some (not all) galleries loading speed increased up to 20%
+* improved Aspect Ratio control rendering dynamic CSS
+* changed general options to collapsible panel
+* fixed large images (mostly 4k images) parser wrong data for lazyloading
+* fixed wrong filter categories when Images in Random Order
+* fixed displaying border-radius in Safari browser
+* fixed load more button background in loading state when button focused
+* fixed possible error with nested reusable blocks while parse page blocks
+* fixed custom CSS output `>` symbol
+* minor changes
 
 = 2.11.1 =
 
