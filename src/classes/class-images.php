@@ -437,7 +437,7 @@ class Visual_Portfolio_Images {
 
         $image = apply_filters( 'vpf_wp_get_attachment_image', false, $attachment_id, $size, $attr, $lazyload );
 
-        if ( ! $image ) {
+        if ( ! $image && false === strripos( $attachment_id, 'vpf_pro_social' ) ) {
             if ( ! is_array( $attr ) ) {
                 $attr = array();
             }
