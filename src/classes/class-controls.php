@@ -284,9 +284,11 @@ class Visual_Portfolio_Controls {
                 $result_meta = array();
 
                 // We should unserialize array data as in standard function https://developer.wordpress.org/reference/functions/get_metadata_raw/.
-                foreach ( $saved_meta as $key => $val ) {
-                    if ( isset( $val[0] ) ) {
-                        $result_meta[ $key ] = maybe_unserialize( $val[0] );
+                if ( is_array( $saved_meta ) ) {
+                    foreach ( $saved_meta as $key => $val ) {
+                        if ( isset( $val[0] ) ) {
+                            $result_meta[ $key ] = maybe_unserialize( $val[0] );
+                        }
                     }
                 }
 
