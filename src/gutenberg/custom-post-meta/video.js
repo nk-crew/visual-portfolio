@@ -69,10 +69,10 @@ class VpVideoComponent extends Component {
 
         const {
             getMeta,
-            getPostFormat,
+            postFormat,
         } = this.props;
 
-        if ( 'video' !== getPostFormat() ) {
+        if ( 'video' !== postFormat ) {
             return;
         }
 
@@ -123,7 +123,7 @@ class VpVideoComponent extends Component {
     render() {
         const {
             getMeta,
-            getPostFormat,
+            postFormat,
             updateMeta,
         } = this.props;
 
@@ -131,7 +131,7 @@ class VpVideoComponent extends Component {
             oembedHTML,
         } = this.state;
 
-        if ( 'video' !== getPostFormat() ) {
+        if ( 'video' !== postFormat ) {
             return null;
         }
 
@@ -182,9 +182,7 @@ const VpVideo = compose( [
             const meta = select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
             return meta[ name ];
         },
-        getPostFormat() {
-            return select( 'core/editor' ).getEditedPostAttribute( 'format' );
-        },
+        postFormat: select( 'core/editor' ).getEditedPostAttribute( 'format' ),
     } ) ),
     withDispatch( ( dispatch ) => ( {
         updateMeta( name, val ) {
