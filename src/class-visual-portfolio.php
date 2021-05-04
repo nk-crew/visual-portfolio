@@ -285,5 +285,5 @@ function visual_portfolio() {
 }
 add_action( 'plugins_loaded', 'visual_portfolio' );
 
-register_deactivation_hook( __FILE__, array( visual_portfolio(), 'activation_hook' ) );
-register_activation_hook( __FILE__, array( visual_portfolio(), 'deactivation_hook' ) );
+register_activation_hook( __FILE__, array( visual_portfolio(), 'activation_hook' ) );
+register_deactivation_hook( __FILE__, array( visual_portfolio(), 'deactivation_hook' ) );
