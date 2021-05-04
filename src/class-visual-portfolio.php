@@ -144,6 +144,7 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-parse-blocks.php';
         require_once $this->plugin_path . 'classes/class-assets.php';
         require_once $this->plugin_path . 'classes/class-breakpoints.php';
+        require_once $this->plugin_path . 'classes/class-image-placeholder.php';
 
         // this settings class order is required.
         require_once $this->plugin_path . 'classes/class-settings.php';
