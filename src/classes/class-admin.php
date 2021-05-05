@@ -1964,8 +1964,8 @@ class Visual_Portfolio_Admin {
                                 'default' => 0,
                                 'style'   => array(
                                     array(
-                                        'element'  => 'fade' === $name || 'fly' === $name || 'emerge' === $name ? '.vp-portfolio__item' : '.vp-portfolio__item-img',
-                                        'property' => 'border-radius',
+                                        'element'  => '.vp-portfolio__items-style-' . $name,
+                                        'property' => '--vp-items-style-' . $name . '--image__border-radius',
                                         'mask'     => '$px',
                                     ),
                                 ),

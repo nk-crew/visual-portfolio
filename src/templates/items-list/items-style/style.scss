@@ -41,6 +41,7 @@
     // Transitions
     .vp-portfolio__item-img {
         overflow: hidden;
+        border-radius: var(--vp-items-style-default--image__border-radius);
 
         // fix for safari border-radius.
         // https://github.com/nk-crew/visual-portfolio/issues/150

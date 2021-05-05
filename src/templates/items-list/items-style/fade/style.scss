@@ -4,9 +4,11 @@
  * Fade items style
  */
 .vp-portfolio__items-style-fade {
-    // fix for safari border-radius.
-    // https://github.com/nk-crew/visual-portfolio/issues/150
     .vp-portfolio__item {
+        border-radius: var(--vp-items-style-fade--image__border-radius);
+
+        // fix for safari border-radius.
+        // https://github.com/nk-crew/visual-portfolio/issues/150
         z-index: 0;
     }
 
