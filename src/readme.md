@@ -145,7 +145,7 @@ Automatically fetch posts from your social networks to display in gallery on you
   * [Google Photos](https://visualportfolio.co/social-google-photos/)
   * [Dribbble](https://visualportfolio.co/social-dribbble/)
   * [Twitch](https://visualportfolio.co/social-twitch/)
-  * [RSS](https://visualportfolio.co/social-medium/)
+  * [RSS](https://visualportfolio.co/social-medium-rss/)
   * VK (Vkontakte)
 
 * **Stylish interaction effects**
