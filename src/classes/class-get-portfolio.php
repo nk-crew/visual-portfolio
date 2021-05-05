@@ -1418,7 +1418,11 @@ class Visual_Portfolio_Get {
                         break;
 
                     case 'menu_order':
-                        $query_opts['orderby'] = 'menu_order';
+                        // We should order by `menu_order` and as fallback order by `post_date`.
+                        $query_opts['orderby'] = array(
+                            'menu_order' => $options['posts_order_direction'],
+                            'post_date'  => 'desc',
+                        );
                         break;
 
                     case 'comment_count':

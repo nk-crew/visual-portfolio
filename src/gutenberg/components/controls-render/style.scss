@@ -11,6 +11,15 @@
     }
 }
 
+// Notice control.
+.vpf-control-wrap-notice .components-notice {
+    margin: 0;
+
+    &.is-info {
+        background-color: #e6f7ff;
+    }
+}
+
 .vpf-control-category-title-pro {
     padding: .2em .8em;
     margin-right: 30px;

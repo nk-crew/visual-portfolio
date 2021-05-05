@@ -60,6 +60,8 @@ class Visual_Portfolio_Controls {
         'readonly'         => false,
 
         // control-specific args.
+        // notice.
+        'status'           => 'info',
         // select.
         'options'          => array(),
         'searchable'       => false,

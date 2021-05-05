@@ -46,6 +46,7 @@ const {
 const {
     PanelBody,
     Tooltip,
+    Notice,
     BaseControl,
     ButtonGroup,
     Button,
@@ -456,6 +457,16 @@ ControlsRender.Control = function( props ) {
                 onChange={ ( val ) => onChange( val ) }
             />
         );
+        break;
+    case 'notice':
+        renderControl = (
+            renderControlHelp ? (
+                <Notice status={ props.status } isDismissible={ false }>
+                    { renderControlHelp }
+                </Notice>
+            ) : ''
+        );
+        renderControlHelp = false;
         break;
     case 'pro_note':
         renderControl = (

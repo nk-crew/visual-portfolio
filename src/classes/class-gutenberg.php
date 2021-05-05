@@ -98,6 +98,7 @@ class Visual_Portfolio_Gutenberg_Block {
                         'type' => 'object',
                     );
                     break;
+                case 'notice':
                 case 'pro_note':
                     unset( $attributes[ $control['name'] ] );
                     break;

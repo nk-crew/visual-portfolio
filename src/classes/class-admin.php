@@ -1420,6 +1420,33 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'      => 'content-source-post-based',
+                'type'          => 'notice',
+                // translators: %1$s - url.
+                // translators: %2$s - link text.
+                'description'   => wp_kses_post( sprintf( __( 'Menu Order is typically used in combination with one of these plugins: <a href="%1$s" target="_blank">%2$s</a>', '@@text_domain' ), 'https://wordpress.org/plugins/search/post+order/', 'Post Order Plugins' ) ),
+                'name'          => 'posts_order_direction_notice',
+                'condition'     => array(
+                    array(
+                        'control'  => 'posts_order_by',
+                        'operator' => '===',
+                        'value'    => 'menu_order',
+                    ),
+                    array(
+                        'control'  => 'posts_source',
+                        'operator' => '!=',
+                        'value'    => 'custom_query',
+                    ),
+                    array(
+                        'control'  => 'posts_source',
+                        'operator' => '!=',
+                        'value'    => 'current_query',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'      => 'content-source-post-based',
                 'type'          => 'radio',
                 'label'         => esc_html__( 'Order Direction', '@@text_domain' ),
                 'name'          => 'posts_order_direction',
