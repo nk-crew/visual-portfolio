@@ -21,10 +21,9 @@ class Visual_Portfolio_3rd_Avada {
             return;
         }
 
-        $current_theme = wp_get_theme();
         $avada_options = get_option( 'fusion_options' );
 
-        if ( 'Avada' !== $current_theme->get( 'Name' ) || ! isset( $avada_options['lazy_load'] ) || 'avada' !== $avada_options['lazy_load'] ) {
+        if ( 'avada' !== get_template() || ! isset( $avada_options['lazy_load'] ) || 'avada' !== $avada_options['lazy_load'] ) {
             return;
         }
 
