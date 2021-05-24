@@ -15,7 +15,8 @@
         "css-lint-fix": "stylelint --fix --syntax scss \"src/**/*.scss\"",
         "js-lint": "eslint src/",
         "js-lint-fix": "eslint --fix src/",
-        "postinstall": "npx simple-git-hooks && composer install"
+        "update-git-hooks": "npx simple-git-hooks",
+        "postinstall": "composer install"
     },
     "devDependencies": {
         "@babel/node": "^7.13.10",
