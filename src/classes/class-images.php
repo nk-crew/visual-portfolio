@@ -470,10 +470,6 @@ class Visual_Portfolio_Images {
             return false;
         }
 
-        $ratio  = self::get_ratio( $width, $height );
-        $width  = $ratio['width'];
-        $height = $ratio['height'];
-
         // We need to use base64 to prevent rare cases when users use plugins
         // that replaces http to https in xmlns attribute.
         // phpcs:ignore
@@ -485,34 +481,6 @@ class Visual_Portfolio_Images {
         return apply_filters(
             'vpf_lazyload_image_placeholder',
             'data:image/svg+xml;base64,' . str_replace( $escape_search, $escape_replace, $placeholder )
-        );
-    }
-
-    /**
-     * GCD
-     * https://en.wikipedia.org/wiki/Greatest_common_divisor
-     *
-     * @param int $width size.
-     * @param int $height size.
-     * @return float
-     */
-    public static function greatest_common_divisor( $width, $height ) {
-        return ( $width % $height ) ? self::greatest_common_divisor( $height, $width % $height ) : $height;
-    }
-
-    /**
-     * Get Aspect Ratio of real width and height
-     *
-     * @param int $width size.
-     * @param int $height size.
-     * @return array
-     */
-    public static function get_ratio( $width, $height ) {
-        $gcd = self::greatest_common_divisor( $width, $height );
-
-        return array(
-            'width'  => $width / $gcd,
-            'height' => $height / $gcd,
         );
     }
 
