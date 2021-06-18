@@ -2130,6 +2130,7 @@ class Visual_Portfolio_Get {
 
         <<?php echo esc_attr( $tag_name ); ?> <?php echo $attrs_string; // phpcs:ignore ?>>
             <?php self::item_popup_data( $args ); ?>
+            <?php do_action( 'vpf_before_portfolio_item', $args ); ?>
             <figure class="vp-portfolio__item">
                 <?php
                 $items_style_pref = '';
@@ -2140,6 +2141,7 @@ class Visual_Portfolio_Get {
                 visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/meta', $args );
                 ?>
             </figure>
+            <?php do_action( 'vpf_after_portfolio_item', $args ); ?>
         </<?php echo esc_attr( $tag_name ); ?>>
         <?php
 

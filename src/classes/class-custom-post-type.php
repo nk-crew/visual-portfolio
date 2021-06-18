@@ -50,6 +50,7 @@ class Visual_Portfolio_Custom_Post_Type {
         add_filter( 'user_can_richedit', array( $this, 'vp_lists_user_can_richedit_force' ) );
 
         // highlight admin menu items.
+        add_action( 'admin_menu', array( $this, 'add_proofing_admin_menu' ), 10 );
         add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
 
         // show admin menu dropdown with available portfolios on the current page.
@@ -623,6 +624,18 @@ class Visual_Portfolio_Custom_Post_Type {
             esc_html__( 'Documentation', '@@text_domain' ),
             'manage_options',
             'https://visualportfolio.co/documentation/getting-started/'
+        );
+    }
+
+    public function add_proofing_admin_menu() {
+        // Proofing menu link.
+        add_submenu_page(
+            'edit.php?post_type=portfolio',
+            '',
+            '<span class="dashicons dashicons-star-filled" style="font-size: 17px"></span> ' . esc_html__( 'Proofing', '@@text_domain' ),
+            'manage_options',
+            'visual_portfolio_go_pro_proofing',
+            array( $this, 'go_pro_redirect' )
         );
     }
 }
