@@ -4,6 +4,8 @@
  * Author  : nK https://nkdev.info
  */
 
+@use "sass:math";
+
 /*
  * Go Pro menu link
  */
@@ -177,8 +179,8 @@ $grid_sm: 600px !default;
 
 @for $i from 1 through 12 {
     .vp-col-#{$i} {
-        flex-basis: 100% * $i / 12;
-        max-width: 100% * $i / 12;
+        flex-basis: math.div(100% * $i, 12);
+        max-width: math.div(100% * $i, 12);
     }
 }
 .vp-col-clearfix {
