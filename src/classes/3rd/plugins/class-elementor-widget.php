@@ -132,7 +132,6 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
             array(
                 'post_type'      => 'vp_lists',
                 'posts_per_page' => -1,
-                'showposts'      => -1,
                 'paged'          => -1,
             )
         );

@@ -531,7 +531,6 @@ class Visual_Portfolio_Custom_Post_Type {
                 array(
                     'post_type'      => 'vp_lists',
                     'posts_per_page' => -1,
-                    'showposts'      => -1,
                     'paged'          => -1,
                     'post__in'       => $layouts,
                 )

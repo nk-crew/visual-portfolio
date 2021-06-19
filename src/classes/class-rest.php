@@ -89,7 +89,6 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
             array(
                 'post_type'      => 'vp_lists',
                 'posts_per_page' => -1,
-                'showposts'      => -1,
                 'paged'          => -1,
             )
         );

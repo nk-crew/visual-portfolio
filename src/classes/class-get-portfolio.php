@@ -1232,7 +1232,6 @@ class Visual_Portfolio_Get {
                 array(
                     'post_type'      => 'attachment',
                     'posts_per_page' => -1,
-                    'showposts'      => -1,
                     'paged'          => -1,
                     'post__in'       => $images_ids,
                 )
@@ -1382,7 +1381,6 @@ class Visual_Portfolio_Get {
         } else {
             $query_opts = array(
                 'posts_per_page' => $count,
-                'showposts'      => $count,
                 'paged'          => $paged,
                 'orderby'        => 'post_date',
                 'order'          => 'DESC',
@@ -1392,7 +1390,6 @@ class Visual_Portfolio_Get {
             // Get all available categories for filter.
             if ( $for_filter ) {
                 $query_opts['posts_per_page'] = -1;
-                $query_opts['showposts']      = -1;
                 $query_opts['paged']          = -1;
             }
 
