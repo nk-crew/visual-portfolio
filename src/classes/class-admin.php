@@ -1709,12 +1709,27 @@ class Visual_Portfolio_Admin {
          */
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'content-source-general',
-                'type'     => 'number',
-                'label'    => esc_html__( 'Items Per Page', '@@text_domain' ),
-                'name'     => 'items_count',
-                'default'  => 6,
-                'min'      => 1,
+                'category'  => 'content-source-general',
+                'type'      => 'number',
+                'label'     => esc_html__( 'Items Per Page', '@@text_domain' ),
+                'name'      => 'items_count',
+                'default'   => 6,
+                'min'       => 1,
+                'condition' => array(
+                    array(
+                        array(
+                            'control'  => 'content_source',
+                            'operator' => '!==',
+                            'value'    => 'post-based',
+                        ),
+                        // AND.
+                        array(
+                            'control'  => 'posts_source',
+                            'operator' => '!==',
+                            'value'    => 'current_query',
+                        ),
+                    ),
+                ),
             )
         );
 
