@@ -631,12 +631,48 @@ class Visual_Portfolio_Custom_Post_Type {
         // Proofing menu link.
         add_submenu_page(
             'edit.php?post_type=portfolio',
-            '',
-            '<span class="dashicons dashicons-star-filled" style="font-size: 17px"></span> ' . esc_html__( 'Proofing', '@@text_domain' ),
+            esc_html__( 'Proofing', '@@text_domain' ),
+            esc_html__( 'Proofing', '@@text_domain' ),
             'manage_options',
-            'visual_portfolio_go_pro_proofing',
-            array( $this, 'go_pro_redirect' )
+            'vpf_go_pro_proofing',
+            array( $this, 'go_proofing_pro_page' )
         );
+    }
+
+    /**
+     * Proofing.
+     * Render of proofing page.
+     */
+    public function go_proofing_pro_page() {
+        // phpcs:ignore
+        if ( ! isset( $_GET['page'] ) || empty( $_GET['page'] ) ) {
+            return;
+        }
+
+        // phpcs:ignore
+        if ( 'vpf_go_pro_proofing' === $_GET['page'] ) {
+            ?>
+            <table class="form-table" role="presentation">
+                <tbody>
+                    <tr class="pro_info vpf-setting-type-html">
+                        <td>
+                            <div class="vpf-settings-info-pro">
+                                <h3>
+                                    <?php echo esc_html__( 'Pro Feature', '@@text_domain' ); ?>
+                                </h3>
+                                <div>
+                                    <p><?php echo esc_html__( 'Protect your works using watermarks', '@@text_domain' ); ?></p>
+                                    <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&amp;utm_medium=link&amp;utm_campaign=plugin_settings&amp;utm_content=2.12.1">
+                                    <?php echo esc_html__( 'Read More', '@@text_domain' ); ?>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <?php
+        }
     }
 }
 

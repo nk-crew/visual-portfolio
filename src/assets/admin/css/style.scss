@@ -413,7 +413,8 @@ $grid_sm: 600px !default;
 /**
  * Settings
  */
-.portfolio_page_visual-portfolio-settings {
+.portfolio_page_visual-portfolio-settings,
+.portfolio_page_vpf_go_pro_proofing {
     $settings_nav_width: 220px !default;
     $settings_content_height: 340px !default;
 
@@ -754,6 +755,10 @@ $grid_sm: 600px !default;
     .metabox-holder-footer {
         display: none;
     }
+}
+
+.portfolio_page_vpf_go_pro_proofing .form-table {
+    margin-left: 15px;
 }
 
 
