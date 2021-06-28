@@ -627,6 +627,11 @@ class Visual_Portfolio_Custom_Post_Type {
         );
     }
 
+    /**
+     * Add Proofing Admin Page.
+     *
+     * @return void
+     */
     public function add_proofing_admin_menu() {
         // Proofing menu link.
         add_submenu_page(
@@ -634,7 +639,7 @@ class Visual_Portfolio_Custom_Post_Type {
             esc_html__( 'Proofing', '@@text_domain' ),
             esc_html__( 'Proofing', '@@text_domain' ),
             'manage_options',
-            'vpf_go_pro_proofing',
+            'vpf_proofing_page',
             array( $this, 'go_proofing_pro_page' )
         );
     }
@@ -650,7 +655,7 @@ class Visual_Portfolio_Custom_Post_Type {
         }
 
         // phpcs:ignore
-        if ( 'vpf_go_pro_proofing' === $_GET['page'] ) {
+        if ( 'vpf_proofing_page' === $_GET['page'] ) {
             ?>
             <table class="form-table" role="presentation">
                 <tbody>
@@ -661,7 +666,7 @@ class Visual_Portfolio_Custom_Post_Type {
                                     <?php echo esc_html__( 'Pro Feature', '@@text_domain' ); ?>
                                 </h3>
                                 <div>
-                                    <p><?php echo esc_html__( 'Protect your works using watermarks', '@@text_domain' ); ?></p>
+                                    <p><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', '@@text_domain' ); ?></p>
                                     <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&amp;utm_medium=link&amp;utm_campaign=plugin_settings&amp;utm_content=2.12.1">
                                     <?php echo esc_html__( 'Read More', '@@text_domain' ); ?>
                                     </a>
