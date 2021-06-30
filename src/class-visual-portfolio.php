@@ -165,6 +165,7 @@ class Visual_Portfolio {
 
         // 3rd code integration.
         require_once $this->plugin_path . 'classes/3rd/plugins/class-a3-lazy-load.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-divi.php';
         require_once $this->plugin_path . 'classes/3rd/plugins/class-elementor.php';
         require_once $this->plugin_path . 'classes/3rd/plugins/class-ewww-image-optimizer.php';
         require_once $this->plugin_path . 'classes/3rd/plugins/class-imagify.php';
