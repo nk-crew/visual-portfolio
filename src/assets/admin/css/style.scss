@@ -413,8 +413,7 @@ $grid_sm: 600px !default;
 /**
  * Settings
  */
-.portfolio_page_visual-portfolio-settings,
-.portfolio_page_vpf_proofing_page {
+.portfolio_page_visual-portfolio-settings {
     $settings_nav_width: 220px !default;
     $settings_content_height: 340px !default;
 
@@ -614,47 +613,6 @@ $grid_sm: 600px !default;
         }
     }
 
-    // Settings info Pro.
-    .social_pro_info > th {
-        display: none;
-    }
-    .vpf-settings-info-pro {
-        max-width: 240px;
-        padding: 20px;
-        text-align: center;
-        border: 2px solid #2540cc;
-
-        h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 13px;
-        }
-
-        p {
-            margin-bottom: 1em;
-            font-size: 13px;
-        }
-    }
-    .vpf-settings-info-pro-button {
-        display: inline-block;
-        padding: 7px 15px;
-        margin-top: 5px;
-        text-decoration: none;
-        background: #2540cc;
-        border-radius: 3px;
-
-        &,
-        &:hover,
-        &:focus,
-        &:active {
-            color: #fff;
-        }
-        &:hover,
-        &:focus {
-            background: lighten(#2540cc, 5%);
-        }
-    }
-
     /**
      * Toggle Field.
      **/
@@ -749,16 +707,60 @@ $grid_sm: 600px !default;
     }
 }
 
+/**
+ * PRO Info for Settings and Proofing page.
+ */
+.portfolio_page_visual-portfolio-settings,
+.portfolio_page_vpf_proofing_page {
+    // Settings info Pro.
+    .social_pro_info > th {
+        display: none;
+    }
+    .vpf-settings-info-pro {
+        max-width: 240px;
+        padding: 20px;
+        text-align: center;
+        background-color: #fff;
+        border: 2px solid #2540cc;
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 13px;
+            font-size: 15px;
+        }
+
+        p {
+            margin-bottom: 13px;
+            font-size: 13px;
+        }
+    }
+    .vpf-settings-info-pro-button {
+        display: inline-block;
+        padding: 7px 15px;
+        margin-top: 5px;
+        text-decoration: none;
+        background: #2540cc;
+        border-radius: 3px;
+
+        &,
+        &:hover,
+        &:focus,
+        &:active {
+            color: #fff;
+        }
+        &:hover,
+        &:focus {
+            background: lighten(#2540cc, 5%);
+        }
+    }
+}
+
 #vp_social_integrations,
 #vp_watermarks,
 #vp_white_label {
     .metabox-holder-footer {
         display: none;
     }
-}
-
-.portfolio_page_vpf_proofing_page .form-table {
-    margin-left: 15px;
 }
 
 
