@@ -310,6 +310,8 @@ class IframePreview extends Component {
     render() {
         const {
             attributes,
+            postType,
+            postId,
         } = this.props;
 
         const {
@@ -342,6 +344,8 @@ class IframePreview extends Component {
                     >
                         <input type="hidden" name="vp_preview_frame" value="true" />
                         <input type="hidden" name="vp_preview_type" value="gutenberg" />
+                        <input type="hidden" name="vp_preview_post_type" value={ postType } />
+                        <input type="hidden" name="vp_preview_post_id" value={ postId } />
 
                         { 'saved' === contentSource ? (
                             <input type="text" name="vp_id" value={ id } />
@@ -378,7 +382,13 @@ export default withSelect( ( select ) => {
         __experimentalGetPreviewDeviceType,
     } = select( 'core/edit-post' );
 
+    const {
+        getCurrentPost,
+    } = select( 'core/editor' );
+
     return {
         previewDeviceType: __experimentalGetPreviewDeviceType ? __experimentalGetPreviewDeviceType() : 'desktop',
+        postType: getCurrentPost().type,
+        postId: getCurrentPost().id,
     };
 } )( IframePreview );
