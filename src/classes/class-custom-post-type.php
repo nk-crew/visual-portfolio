@@ -50,6 +50,7 @@ class Visual_Portfolio_Custom_Post_Type {
         add_filter( 'user_can_richedit', array( $this, 'vp_lists_user_can_richedit_force' ) );
 
         // highlight admin menu items.
+        add_action( 'admin_menu', array( $this, 'add_proofing_admin_menu' ), 10 );
         add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
 
         // show admin menu dropdown with available portfolios on the current page.
@@ -623,6 +624,59 @@ class Visual_Portfolio_Custom_Post_Type {
             'manage_options',
             'https://visualportfolio.co/documentation/getting-started/'
         );
+    }
+
+    /**
+     * Add Proofing Admin Page.
+     *
+     * @return void
+     */
+    public function add_proofing_admin_menu() {
+        // Proofing menu link.
+        add_submenu_page(
+            'edit.php?post_type=portfolio',
+            esc_html__( 'Proofing', '@@text_domain' ),
+            esc_html__( 'Proofing', '@@text_domain' ),
+            'manage_options',
+            'vpf_proofing_page',
+            array( $this, 'go_proofing_pro_page' )
+        );
+    }
+
+    /**
+     * Proofing.
+     * Render of proofing page.
+     */
+    public function go_proofing_pro_page() {
+        // phpcs:ignore
+        if ( ! isset( $_GET['page'] ) || empty( $_GET['page'] ) ) {
+            return;
+        }
+
+        // phpcs:ignore
+        if ( 'vpf_proofing_page' === $_GET['page'] ) {
+            ?>
+            <table class="form-table" role="presentation">
+                <tbody>
+                    <tr class="pro_info vpf-setting-type-html">
+                        <td>
+                            <div class="vpf-settings-info-pro">
+                                <h3>
+                                    <?php echo esc_html__( 'Pro Feature', '@@text_domain' ); ?>
+                                </h3>
+                                <div>
+                                    <p><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', '@@text_domain' ); ?></p>
+                                    <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&amp;utm_medium=link&amp;utm_campaign=plugin_settings&amp;utm_content=2.12.1">
+                                    <?php echo esc_html__( 'Read More', '@@text_domain' ); ?>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <?php
+        }
     }
 }
 

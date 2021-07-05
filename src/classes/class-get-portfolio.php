@@ -2129,16 +2129,22 @@ class Visual_Portfolio_Get {
 
         <<?php echo esc_attr( $tag_name ); ?> <?php echo $attrs_string; // phpcs:ignore ?>>
             <?php self::item_popup_data( $args ); ?>
+            <?php do_action( 'vpf_before_each_item', $args ); ?>
             <figure class="vp-portfolio__item">
                 <?php
+                do_action( 'vpf_each_item_start', $args );
+
                 $items_style_pref = '';
                 if ( 'default' !== $args['vp_opts']['items_style'] ) {
                     $items_style_pref = '/' . $args['vp_opts']['items_style'];
                 }
                 visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/image', $args );
                 visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/meta', $args );
+
+                do_action( 'vpf_each_item_end', $args );
                 ?>
             </figure>
+            <?php do_action( 'vpf_after_each_item', $args ); ?>
         </<?php echo esc_attr( $tag_name ); ?>>
         <?php
 
