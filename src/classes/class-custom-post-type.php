@@ -83,7 +83,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 ),
                 'public'             => true,
                 'publicly_queryable' => true,
-                'has_archive'        => false,
+                'has_archive'        => true,
                 'show_ui'            => true,
 
                 // adding to custom menu manually.

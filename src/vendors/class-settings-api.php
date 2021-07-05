@@ -48,6 +48,9 @@ class Visual_Portfolio_Settings_API {
         wp_enqueue_script( 'wp-color-picker' );
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( 'conditionize', visual_portfolio()->plugin_url . 'assets/vendor/conditionize/conditionize.min.js', array( 'jquery' ), '1.0.5' );
+
+        wp_enqueue_style( 'select2', visual_portfolio()->plugin_url . 'assets/vendor/select2/css/select2.min.css', array(), '4.1.0' );
+        wp_enqueue_script( 'select2', visual_portfolio()->plugin_url . 'assets/vendor/select2/js/select2.min.js', array( 'jquery' ), '4.1.0' );
     }
 
     /**
@@ -160,6 +163,7 @@ class Visual_Portfolio_Settings_API {
                     'is_pro'            => isset( $option['is_pro'] ) ? $option['is_pro'] : false,
                     'condition'         => isset( $option['condition'] ) ? $option['condition'] : null,
                     'conditionize'      => isset( $option['condition'] ) ? $this->convert_arguments_to_conditionize_string( $option['condition'] ) : '',
+                    'select2'           => isset( $option['select2'] ) ? $option['select2'] : false,
                 );
 
                 add_settings_field( "{$section}[{$name}]", $label, $callback, $section, $section, $args );
@@ -306,8 +310,9 @@ class Visual_Portfolio_Settings_API {
     public function callback_select( $args ) {
 
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
-        $size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
-        $html  = sprintf( '<select class="%1$s" name="%2$s[%3$s]" id="%2$s[%3$s]">', $size, $args['section'], $args['id'] );
+        $classes  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
+        $classes .= isset( $args['select2'] ) && $args['select2'] ? ' vp-select2-field' : '';
+        $html  = sprintf( '<select class="%1$s" name="%2$s[%3$s]" id="%2$s[%3$s]">', $classes, $args['section'], $args['id'] );
 
         foreach ( $args['options'] as $key => $label ) {
             $html .= sprintf( '<option value="%s"%s>%s</option>', $key, selected( $value, $key, false ), $label );
@@ -812,6 +817,9 @@ class Visual_Portfolio_Settings_API {
                     if ( $( inputs[ 0 ] ).val() !== $( inputs[ 1 ] ).val() ) {
                         inputs.val( $( this ).val() );
                     }
+                });
+                $( document ).ready( function() {
+                    $( '.vp-select2-field' ).select2();
                 });
             });
         </script>
