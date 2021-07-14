@@ -3,7 +3,7 @@
 * Contributors: nko
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
 * Requires at least: 5.4
-* Tested up to: 5.7
+* Tested up to: 5.8
 * Requires PHP: 5.5.9
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
@@ -160,6 +160,13 @@ Automatically fetch posts from your social networks to display in gallery on you
   * **Password Form** - add a password to gallery blocks and send it to your clients
   * **Age Gate** - Protect visitors from viewing adult content
 
+* [**Photos Proofing**](https://visualportfolio.co/documentation/proofing/)
+Communicate with your clients in a modern way:
+
+  1. **Create Proofing Gallery** - Easily create a gallery with photos, as you did before. Change styling, layout, etc. if you want.
+  2. **Send to a Client** - Send photos collection to your client for proofing. The client will be able to leave comments on individual photos and communicate with you.
+  3. **Get Approval** - Once the client approves the selection, you will be able to see the selected photos and copy filenames for post-production.
+
 * **Responsive Breakpoints Settings**
 Manually control the screen sizes, which used by the automatic responsive function to adapt your gallery layouts.
 
@@ -302,6 +309,18 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/).
 
 ## Changelog ##
+
+= 2.13.0 =
+
+* added Photo Proofing support in Pro plugin <https://visualportfolio.co/documentation/proofing/>
+* improved image loading placeholder animation
+* changed aspect-ratio base64 placeholders to full-size in lazyloading images
+* hide the Items Per Page option when selected Current Query
+* fixed rare conflict with reusable blocks while parsing
+* fixed Current Query displaying posts problem
+* fixed conflict between Divi image block width and Visual Portfolio lazy loading
+* fixed lightbox and lazyloading conflicts in Enfold theme
+* fixed Avada compatibility code run if used child theme
 
 = 2.12.1 =
 
