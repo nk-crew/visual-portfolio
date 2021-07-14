@@ -93,7 +93,7 @@ class Visual_Portfolio_Admin {
         $screen = get_current_screen();
 
         // Determine if the current page being viewed is "Visual Portfolio" related.
-        if ( isset( $screen->post_type ) && ( 'portfolio' === $screen->post_type || 'vp_lists' === $screen->post_type ) ) {
+        if ( isset( $screen->post_type ) && ( 'portfolio' === $screen->post_type || 'vp_lists' === $screen->post_type || 'vp_proofing' === $screen->post_type ) ) {
             $footer_text = esc_attr__( 'and', '@@text_domain' ) . ' <a href="https://visualportfolio.co/" target="_blank">' . visual_portfolio()->plugin_name . '</a>';
 
             // Use RegExp to append "Visual Portfolio" after the <a> element allowing translations to read correctly.
@@ -116,7 +116,7 @@ class Visual_Portfolio_Admin {
         // Determine if the current page being viewed is "Lazy Blocks" related.
         if (
             ! isset( $screen->post_type ) ||
-            ( 'portfolio' !== $screen->post_type && 'vp_lists' !== $screen->post_type ) ||
+            ( 'portfolio' !== $screen->post_type && 'vp_lists' !== $screen->post_type && 'vp_proofing' !== $screen->post_type ) ||
             ( isset( $screen->is_block_editor ) && $screen->is_block_editor() )
         ) {
             return;
