@@ -27,6 +27,11 @@ if ( 'undefined' !== typeof objectFitImages ) {
 
 // recalculate image size if parent is <picture>
 $doc.on( 'lazybeforesizes', ( e ) => {
+    // for some reason sometimes e.detail is undefined, so we need to check it.
+    if ( ! e.detail || ! e.detail.width || ! e.target ) {
+        return;
+    }
+
     e.detail.width = $( e.target ).parents( ':not(picture)' ).innerWidth() || e.detail.width;
 } );
 

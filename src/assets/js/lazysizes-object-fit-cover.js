@@ -41,7 +41,8 @@
     lazySizes.objectFitCover = objectFitCover;
 
     document.addEventListener( 'lazybeforesizes', ( e ) => {
-        if ( e.defaultPrevented || e.detail.instance !== lazySizes ) {
+        // for some reason sometimes e.detail is undefined, so we need to check it.
+        if ( e.defaultPrevented || ! e.detail || ! e.detail.width || ! e.target || e.detail.instance !== lazySizes ) {
             return;
         }
 
