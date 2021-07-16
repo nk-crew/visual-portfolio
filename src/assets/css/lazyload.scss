@@ -27,6 +27,8 @@ img.vp-lazyloaded {
     right: 0;
     bottom: 0;
     left: 0;
+    // Fixed possible bug with inaccessible links on images in the Classic style.
+    pointer-events: none;
     visibility: visible;
     background: var(--vp-lazyload-images__background);
     opacity: 1;
@@ -50,7 +52,7 @@ img.vp-lazyloaded {
 .vp-portfolio__thumbnail-img-lazyloaded::before,
 .vp-portfolio__item-img-lazyloaded::after,
 .vp-portfolio__thumbnail-img-lazyloaded::after {
-    visibility: visible;
+    visibility: hidden;
     opacity: 0;
 }
 
