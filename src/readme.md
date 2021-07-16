@@ -310,6 +310,10 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.13.1 =
+
+* fixed possible bug with inaccessible links on images in the Classic style
+
 = 2.13.0 =
 
 * added Photo Proofing support in Pro plugin <https://visualportfolio.co/documentation/proofing/>
