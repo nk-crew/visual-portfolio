@@ -39,7 +39,7 @@ class Visual_Portfolio_Custom_Post_Type {
         add_filter( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_custom_columns' ), 10, 2 );
 
         // change allowed blocks for vp_lists post type.
-        add_filter( 'allowed_block_types', array( $this, 'vp_lists_allowed_block_types' ), 10, 2 );
+        add_filter( 'allowed_block_types_all', array( $this, 'vp_lists_allowed_block_types_all' ), 10, 2 );
 
         // force enable Gutenberg editor in 'vp_lists' for Classic Editor plugin.
         add_action( 'classic_editor_enabled_editors_for_post_type', array( $this, 'vp_lists_classic_plugin_force_gutenberg' ), 150, 2 );
@@ -491,11 +491,11 @@ class Visual_Portfolio_Custom_Post_Type {
      * Allowed blocks for vp_lists post type.
      *
      * @param array  $allowed_block_types - blocks.
-     * @param object $post - post object.
+     * @param object $editor_context - editor context.
      * @return array
      */
-    public function vp_lists_allowed_block_types( $allowed_block_types, $post ) {
-        if ( 'vp_lists' !== $post->post_type ) {
+    public function vp_lists_allowed_block_types_all( $allowed_block_types, $editor_context ) {
+        if ( ! empty( $editor_context->post ) && 'vp_lists' !== $editor_context->post->post_type ) {
             return $allowed_block_types;
         }
 
