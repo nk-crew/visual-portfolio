@@ -1543,7 +1543,9 @@ class Visual_Portfolio_Get {
                 }
 
                 // Avoid duplicates.
-                if ( $options['posts_avoid_duplicate_posts'] ) {
+                // We should prevent this when using filter, since all current posts will be excluded
+                // from the filter query and we may not see all filter buttons.
+                if ( ! $for_filter && $options['posts_avoid_duplicate_posts'] ) {
                     $not_id                     = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
                     $query_opts['post__not_in'] = array_merge( $not_id, self::get_all_used_posts() );
 
