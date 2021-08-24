@@ -25,7 +25,7 @@ const {
 
 const {
     PluginDocumentSettingPanel,
-} = wp.editPost;
+} = wp.editPost || {};
 
 const { registerPlugin } = wp.plugins;
 
@@ -192,6 +192,10 @@ const VpVideo = compose( [
     withInstanceId,
 ] )( VpVideoComponent );
 
-registerPlugin( 'vp-video', {
-    render: VpVideo,
-} );
+// Check if editPost available.
+// For example, on the Widgets screen this variable is not defined.
+if ( wp.editPost ) {
+    registerPlugin( 'vp-video', {
+        render: VpVideo,
+    } );
+}
