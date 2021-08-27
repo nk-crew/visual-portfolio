@@ -36,7 +36,9 @@ class Visual_Portfolio_Custom_Post_Type {
 
         // show icon and shortcode columns in vp_lists table.
         add_filter( 'manage_vp_lists_posts_columns', array( $this, 'add_vp_lists_custom_columns' ) );
-        add_filter( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_custom_columns' ), 10, 2 );
+        add_action( 'manage_vp_lists_posts_custom_column', array( $this, 'manage_vp_lists_custom_columns' ), 10, 2 );
+        add_action( 'restrict_manage_posts', array( $this, 'restrict_manage_posts_vp_lists' ) );
+        add_action( 'parse_query', array( $this, 'parse_query_vp_lists' ) );
 
         // change allowed blocks for vp_lists post type.
         add_filter( 'allowed_block_types_all', array( $this, 'vp_lists_allowed_block_types_all' ), 10, 2 );
@@ -484,6 +486,109 @@ class Visual_Portfolio_Custom_Post_Type {
             echo '<code class="vp-onclick-selection" role="button" tabIndex="0" aria-hidden="true">';
             echo '[visual_portfolio id="' . get_the_ID() . '"]';
             echo '</code>';
+        }
+    }
+
+    /**
+     * Add custom filtering selects for vp_lists admin screen.
+     */
+    public function restrict_manage_posts_vp_lists() {
+        global $typenow;
+
+        if ( 'vp_lists' === $typenow ) {
+            $all_layouts         = Visual_Portfolio_Get::get_all_layouts();
+            $all_items_styles    = Visual_Portfolio_Get::get_all_items_styles();
+            $all_content_sources = array(
+                'post-based'    => esc_html__( 'Posts', '@@text_domain' ),
+                'images'        => esc_html__( 'Images', '@@text_domain' ),
+                'social-stream' => esc_html__( 'Social', '@@text_domain' ),
+            );
+
+            // phpcs:ignore
+            $selected_layout = isset( $_GET['vp_layout'] ) ? $_GET['vp_layout'] : '';
+            // phpcs:ignore
+            $selected_items_style = isset( $_GET['vp_items_style'] ) ? $_GET['vp_items_style'] : '';
+            // phpcs:ignore
+            $selected_content_source = isset( $_GET['vp_content_source'] ) ? $_GET['vp_content_source'] : '';
+
+            ?>
+            <select name="vp_layout" id="filter-by-vp_layout">
+                <option value="0"><?php echo esc_html__( 'All layouts', '@@text_domain' ); ?></option>
+                <?php
+                foreach ( $all_layouts as $name => $data ) {
+                    ?>
+                    <option value="<?php echo esc_attr( $name ); ?>" <?php echo $name === $selected_layout ? 'selected="selected"' : ''; ?>><?php echo esc_html( $data['title'] ); ?></option>
+                    <?php
+                }
+                ?>
+            </select>
+            <select name="vp_items_style" id="filter-by-vp_items_style">
+                <option value="0"><?php echo esc_html__( 'All styles', '@@text_domain' ); ?></option>
+                <?php
+                foreach ( $all_items_styles as $name => $data ) {
+                    ?>
+                    <option value="<?php echo esc_attr( $name ); ?>" <?php echo $name === $selected_items_style ? 'selected="selected"' : ''; ?>><?php echo esc_html( $data['title'] ); ?></option>
+                    <?php
+                }
+                ?>
+            </select>
+            <select name="vp_content_source" id="filter-by-vp_content_source">
+                <option value="0"><?php echo esc_html__( 'All sources', '@@text_domain' ); ?></option>
+                <?php
+                foreach ( $all_content_sources as $name => $title ) {
+                    ?>
+                    <option value="<?php echo esc_attr( $name ); ?>" <?php echo $name === $selected_content_source ? 'selected="selected"' : ''; ?>><?php echo esc_html( $title ); ?></option>
+                    <?php
+                }
+                ?>
+            </select>
+            <?php
+        };
+    }
+
+    /**
+     * Custom filtering for vp_lists admin screen.
+     *
+     * @param object $query - current query data.
+     */
+    public function parse_query_vp_lists( $query ) {
+        global $pagenow;
+
+        $q_vars = &$query->query_vars;
+
+        if ( 'edit.php' === $pagenow && isset( $q_vars['post_type'] ) && 'vp_lists' === $q_vars['post_type'] ) {
+            $meta_query = array();
+
+            // phpcs:ignore
+            $filter_layout = isset( $_GET['vp_layout'] ) ? $_GET['vp_layout'] : '';
+            // phpcs:ignore
+            $filter_items_style = isset( $_GET['vp_items_style'] ) ? $_GET['vp_items_style'] : '';
+            // phpcs:ignore
+            $filter_content_source = isset( $_GET['vp_content_source'] ) ? $_GET['vp_content_source'] : '';
+
+            if ( $filter_layout ) {
+                $meta_query[] = array(
+                    'key'   => 'vp_layout',
+                    'value' => $filter_layout,
+                );
+            }
+            if ( $filter_items_style ) {
+                $meta_query[] = array(
+                    'key'   => 'vp_items_style',
+                    'value' => $filter_items_style,
+                );
+            }
+            if ( $filter_content_source ) {
+                $meta_query[] = array(
+                    'key'   => 'vp_content_source',
+                    'value' => $filter_content_source,
+                );
+            }
+
+            if ( ! empty( $meta_query ) ) {
+                // phpcs:ignore
+                $q_vars['meta_query'] = $meta_query;
+            }
         }
     }
 

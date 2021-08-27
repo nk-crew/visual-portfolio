@@ -1900,45 +1900,7 @@ class Visual_Portfolio_Admin {
          * Items Style
          */
         // phpcs:ignore
-        /*
-         * Example:
-            array(
-                'new_items_style' => array(
-                    'title'            => esc_html__( 'New Items Style', '@@text_domain' ),
-                    'builtin_controls' => array(
-                        'images_rounded_corners' => true,
-                        'show_title'             => true,
-                        'show_categories'        => true,
-                        'show_date'              => true,
-                        'show_author'            => true,
-                        'show_comments_count'    => true,
-                        'show_views_count'       => true,
-                        'show_reading_time'      => true,
-                        'show_excerpt'           => true,
-                        'show_icons'             => false,
-                        'align'                  => true,
-                    ),
-                    'controls'         => array(
-                        ... controls ...
-                    ),
-                ),
-            )
-         */
-        $items_styles = apply_filters( 'vpf_extend_items_styles', array() );
-
-        // Extend specific item style controls.
-        foreach ( $items_styles as $name => $style ) {
-            if ( isset( $style['controls'] ) ) {
-                // phpcs:ignore
-                /*
-                 * Example:
-                    array(
-                        ... controls ...
-                    )
-                 */
-                $items_styles[ $name ]['controls'] = apply_filters( 'vpf_extend_item_style_' . $name . '_controls', $style['controls'] );
-            }
-        }
+        $items_styles = Visual_Portfolio_Get::get_all_items_styles();
 
         // Styles selector.
         $items_styles_selector = array();
