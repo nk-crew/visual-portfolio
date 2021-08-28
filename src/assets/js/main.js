@@ -701,8 +701,8 @@ class VP {
         }
 
         // load to invisible container, then append to posts container
-        content = content.replace( '<body', '<body><div id="vp-infinite-load-body"' ).replace( '</body>', '</div></body>' );
-        const $body = $( content ).filter( '#vp-infinite-load-body' );
+        content = content.replace( '<body', '<body><div id="vp-ajax-load-body"' ).replace( '</body>', '</div></body>' );
+        const $body = $( content ).filter( '#vp-ajax-load-body' );
 
         // find current block on new page
         const $newVP = $body.find( `.vp-portfolio.vp-uid-${ self.uid }` );
