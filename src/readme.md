@@ -310,6 +310,16 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.13.2 =
+
+* added filtering for Saved Layouts admin screen
+* fixed filter categories bug when using Avoid Duplicates option
+* fixed WP 5.8 deprecated filter usage
+* fixed WP 5.8 Widgets editor conflict
+* fixed possible js error when using SVG images and lazy loading
+* fixed block preview loading when active plugin "Paid Memberships Pro - Member Homepages Add On"
+* minor changes
+
 = 2.13.1 =
 
 * fixed possible bug with inaccessible links on images in the Classic style
