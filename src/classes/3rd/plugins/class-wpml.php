@@ -26,6 +26,7 @@ class Visual_Portfolio_3rd_WPML {
         }
 
         add_filter( 'vpf_registered_controls', array( $this, 'make_control_translatable' ) );
+        add_filter( 'vpf_extend_options_before_query_args', array( $this, 'prepare_custom_query_taxonomies' ) );
     }
 
     /**
@@ -87,6 +88,28 @@ class Visual_Portfolio_3rd_WPML {
         }
 
         return $controls;
+    }
+
+    /**
+     * Convert custom taxonomies to the current language.
+     *
+     * @param array $options - query options.
+     *
+     * @return array
+     */
+    public function prepare_custom_query_taxonomies( $options ) {
+        if ( isset( $options['posts_taxonomies'] ) && ! empty( $options['posts_taxonomies'] ) ) {
+            foreach ( $options['posts_taxonomies'] as $k => $taxonomy ) {
+                $taxonomy_data = get_term( $taxonomy );
+
+                if ( isset( $taxonomy_data->taxonomy ) ) {
+                    // phpcs:ignore
+                    $options['posts_taxonomies'][$k] = apply_filters( 'wpml_object_id', $taxonomy, $taxonomy_data->taxonomy, true );
+                }
+            }
+        }
+
+        return $options;
     }
 }
 
