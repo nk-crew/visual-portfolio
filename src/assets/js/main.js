@@ -465,7 +465,7 @@ class VP {
             if ( ! self.loading ) {
                 $this.closest( '.vp-filter__item' ).addClass( 'vp-filter__item-active' ).siblings().removeClass( 'vp-filter__item-active' );
             }
-            self.loadNewItems( $this.attr( 'href' ), true );
+            self.loadNewItems( $this.attr( 'href' ), true, false );
         } );
 
         // on sort click
@@ -475,7 +475,7 @@ class VP {
             if ( ! self.loading ) {
                 $this.closest( '.vp-sort__item' ).addClass( 'vp-sort__item-active' ).siblings().removeClass( 'vp-sort__item-active' );
             }
-            self.loadNewItems( $this.attr( 'href' ), true );
+            self.loadNewItems( $this.attr( 'href' ), true, false );
         } );
 
         // on filter/sort select change
@@ -485,7 +485,7 @@ class VP {
             const $option = $this.find( `[value="${ value }"]` );
 
             if ( $option.length ) {
-                self.loadNewItems( $option.attr( 'data-vp-url' ), true );
+                self.loadNewItems( $option.attr( 'data-vp-url' ), true, false );
             }
         } );
 
@@ -499,7 +499,7 @@ class VP {
                 return;
             }
 
-            self.loadNewItems( $this.attr( 'href' ), 'paged' === self.options.pagination );
+            self.loadNewItems( $this.attr( 'href' ), 'paged' === self.options.pagination, self.options );
 
             // Scroll to top
             if ( 'paged' === self.options.pagination && $pagination.hasClass( 'vp-pagination__scroll-top' ) ) {
@@ -533,7 +533,7 @@ class VP {
         self.$item.on( `click${ evp }`, '.vp-portfolio__items .vp-portfolio__item-meta-category a', function( e ) {
             e.preventDefault();
             e.stopPropagation();
-            self.loadNewItems( $( this ).attr( 'href' ), true );
+            self.loadNewItems( $( this ).attr( 'href' ), true, false );
         } );
 
         // infinite loading
@@ -543,7 +543,7 @@ class VP {
             const rect = self.$item[ 0 ].getBoundingClientRect();
 
             if ( 0 < rect.bottom && ( rect.bottom - bottomPosToLoad ) <= window.innerHeight ) {
-                self.loadNewItems( self.options.nextPageUrl, false, () => {
+                self.loadNewItems( self.options.nextPageUrl, false, false, () => {
                     clearTimeout( scrollTimeout );
                     scrollTimeout = setTimeout( () => {
                         checkVisibilityAndLoad();
@@ -656,13 +656,19 @@ class VP {
      *
      * @param {string} url - url to request.
      * @param {bool} removeExisting - remove existing elements.
+     * @param {object} attributes - post attributes.
      * @param {function} cb - callback.
      */
-    loadNewItems( url, removeExisting, cb ) {
+    loadNewItems( url, removeExisting, attributes, cb ) {
         const self = this;
+        let randomSeed = false;
 
         if ( self.loading || ! url || self.href === url ) {
             return;
+        }
+
+        if ( attributes && 'undefined' !== typeof attributes && 'undefined' !== typeof attributes.randomSeed ) {
+            randomSeed = attributes.randomSeed;
         }
 
         const ajaxData = {
@@ -670,6 +676,7 @@ class VP {
             url,
             data: {
                 vpf_ajax_call: true,
+                vpf_random_seed: randomSeed,
             },
             complete( { responseText } ) {
                 self.href = url;

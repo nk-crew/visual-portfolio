@@ -18,75 +18,6 @@ if ( version_compare( PHP_VERSION, '5.5.9' ) >= 0 && ! class_exists( 'Cocur\Slug
 }
 
 /**
- * Session Start.
- */
-function vpf_session_start() {
-    // We don't need sessions in admin side.
-    if ( is_admin() ) {
-        return;
-    }
-
-    // Fixes problem with headers sent - https://wordpress.org/support/topic/headers-already-sent-43/ .
-    if ( headers_sent() ) {
-        return;
-    }
-
-    if ( ! function_exists( 'session_status' ) ) {
-        if ( session_id() ) {
-            // phpcs:ignore
-            @session_start();
-        }
-    } elseif ( session_status() !== PHP_SESSION_ACTIVE ) {
-        // phpcs:ignore
-        @session_start();
-    }
-}
-// We need a lower priority to prevent errors when 3rd-party plugins output something.
-add_action( 'init', 'vpf_session_start', 5 );
-
-/**
- * Session Close.
- */
-function vpf_session_close() {
-    if ( session_id() ) {
-        // phpcs:ignore
-        @session_write_close();
-    }
-}
-add_action( 'shutdown', 'vpf_session_close', 999 );
-
-/**
- * Write session to disk to prevent cURL time-out which may occur with
- * WordPress (since 4.9.2, see https://core.trac.wordpress.org/ticket/43358),
- * or plugins such as "Health Check".
- *
- * @param false|array|WP_Error $preempt - A preemptive return value of an HTTP request.
- * @param array                $r - HTTP request arguments.
- * @param string               $url - The request URL.
- *
- * @return mixed
- */
-function vpf_pre_http_request( $preempt, $r, $url ) {
-    // VPF_DISABLE_SWC can be defined in wp-config.php (undocumented).
-    if ( ! defined( 'VPF_DISABLE_SWC' ) && isset( $_SESSION ) ) {
-        if ( function_exists( 'get_site_url' ) ) {
-            // phpcs:ignore
-            $parse = parse_url( get_site_url() );
-
-            // phpcs:ignore
-            $s_url = @$parse['scheme'] . "://{$parse['host']}";
-
-            if ( strpos( $url, $s_url ) === 0 ) {
-                vpf_session_close();
-            }
-        }
-    }
-
-    return $preempt;
-}
-add_filter( 'pre_http_request', 'vpf_pre_http_request', 10, 3 );
-
-/**
  * Class Visual_Portfolio_Get
  */
 class Visual_Portfolio_Get {
@@ -458,6 +389,21 @@ class Visual_Portfolio_Get {
             'data-vp-pagination'         => $options['pagination'],
             'data-vp-next-page-url'      => $next_page_url,
         );
+
+        if (
+            (
+                'post-based' === $options['content_source'] &&
+                'rand' === $options['posts_order_by']
+            ) ||
+            (
+                isset( $options['images'] ) &&
+                ! empty( $options['images'] ) &&
+                is_array( $options['images'] ) &&
+                'rand' === $options['images_order_by']
+            )
+        ) {
+            $data_attrs['data-vp-random-seed'] = self::get_rand_seed_session();
+        }
 
         if ( 'tiles' === $options['layout'] || $is_preview ) {
             $data_attrs['data-vp-tiles-type'] = $options['tiles_type'];
@@ -1194,21 +1140,22 @@ class Visual_Portfolio_Get {
 
         // Reset vpf_random_seed on load of initial archive page.
         if ( self::get_current_page_number() === 1 ) {
-            if ( isset( $_SESSION['vpf_random_seed'] ) ) {
-                unset( $_SESSION['vpf_random_seed'] );
+            if ( isset( self::$rand_seed_session ) ) {
+                self::$rand_seed_session = false;
             }
         }
 
-        // Get vpf_random_seed from session variable if it exists.
-        if ( isset( $_SESSION['vpf_random_seed'] ) ) {
-            self::$rand_seed_session = $_SESSION['vpf_random_seed'];
+        // Get vpf_random_seed from request variable if it exists.
+        // phpcs:ignore
+        if ( isset( $_REQUEST['vpf_random_seed'] ) && is_numeric( $_REQUEST['vpf_random_seed'] ) ) {
+            // phpcs:ignore
+            self::$rand_seed_session = (int) $_REQUEST['vpf_random_seed'];
         }
 
         // Set new vpf_random_seed if none exists.
         if ( ! self::$rand_seed_session ) {
             // phpcs:ignore
-            self::$rand_seed_session     = rand();
-            $_SESSION['vpf_random_seed'] = self::$rand_seed_session;
+            self::$rand_seed_session = rand();
         }
 
         return self::$rand_seed_session;
