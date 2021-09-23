@@ -2469,13 +2469,24 @@ class Visual_Portfolio_Get {
     public static function get_pagenum_link( $query_arg = array() ) {
         // Use current page url.
         global $wp;
-        $current_url = trailingslashit( home_url( $wp->request ) );
+        $current_url = '';
 
-        // phpcs:disable
-        if ( ! empty( $_GET ) ) {
-            $current_url = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( $_GET ) ), $current_url );
+        // We should use REQUEST_URI in case if the user used non-default permalinks.
+        // For example, this one:
+        // - /index.php/%postname% .
+        // phpcs:ignore
+        if ( isset( $_SERVER['REQUEST_URI'] ) && $_SERVER['REQUEST_URI'] ) {
+            // phpcs:ignore
+            $current_url = $_SERVER['REQUEST_URI'];
+        } else {
+            $current_url = trailingslashit( home_url( $wp->request ) );
+
+            // phpcs:ignore
+            if ( ! empty( $_GET ) ) {
+                // phpcs:ignore
+                $current_url = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( $_GET ) ), $current_url );
+            }
         }
-        // phpcs:enable
 
         if ( isset( $query_arg['vp_filter'] ) && ! $query_arg['vp_filter'] ) {
             unset( $query_arg['vp_filter'] );
