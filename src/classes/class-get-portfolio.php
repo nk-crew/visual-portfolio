@@ -600,6 +600,7 @@ class Visual_Portfolio_Get {
             'url'                => '',
             'title'              => '',
             'excerpt'            => '',
+            'content'            => '',
             'comments_count'     => '',
             'comments_url'       => '',
             'author'             => '',
@@ -684,6 +685,7 @@ class Visual_Portfolio_Get {
                         'uid'            => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
                         'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : Visual_Portfolio_Images::wp_get_attachment_image_url( $img['id'], $img_size_popup ),
                         'title'          => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
+                        'content'        => isset( $img['description'] ) && $img['description'] ? $img['description'] : '',
                         'format'         => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
                         'published_time' => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
                         'filter'         => implode( ',', $filter_values ),
@@ -697,8 +699,8 @@ class Visual_Portfolio_Get {
                 );
 
                 // Excerpt.
-                if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] && isset( $img['description'] ) && $img['description'] ) {
-                    $args['excerpt'] = wp_trim_words( $img['description'], $args['opts']['excerpt_words_count'], '...' );
+                if ( isset( $args['opts']['show_excerpt'] ) && $args['content'] ) {
+                    $args['excerpt'] = wp_trim_words( $args['content'], $args['opts']['excerpt_words_count'], '...' );
                 }
 
                 if ( 'video' === $args['format'] && isset( $img['video_url'] ) && $img['video_url'] ) {
@@ -764,6 +766,7 @@ class Visual_Portfolio_Get {
                         'post_id'        => get_the_ID(),
                         'url'            => get_permalink(),
                         'title'          => get_the_title(),
+                        'content'        => get_the_content(),
                         'format'         => get_post_format() ? get_post_format() : 'standard',
                         'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
                         'filter'         => implode( ',', $filter_values ),
@@ -787,7 +790,7 @@ class Visual_Portfolio_Get {
 
                 // Excerpt.
                 if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] ) {
-                    $args['excerpt'] = wp_trim_words( do_shortcode( has_excerpt() ? get_the_excerpt() : get_the_content() ), $args['opts']['excerpt_words_count'], '...' );
+                    $args['excerpt'] = wp_trim_words( do_shortcode( has_excerpt() ? get_the_excerpt() : $args['content'] ), $args['opts']['excerpt_words_count'], '...' );
                 }
 
                 $args['allow_popup'] = isset( $args['image_id'] ) && $args['image_id'];
@@ -2213,6 +2216,7 @@ class Visual_Portfolio_Get {
 
                 if ( $img_id ) {
                     $attachment = get_post( $args['image_id'] );
+
                     if ( $attachment && 'attachment' === $attachment->post_type ) {
                         $img_meta    = wp_get_attachment_image_src( $args['image_id'], $args['img_size_popup'] );
                         $img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
@@ -2221,25 +2225,35 @@ class Visual_Portfolio_Get {
                         $popup_image = apply_filters(
                             'vpf_popup_image_data',
                             array(
-                                'id'          => $args['image_id'],
-                                'title'       => $attachment->post_title,
-                                'description' => $attachment->post_content,
-                                'caption'     => wp_get_attachment_caption( $attachment->ID ),
-                                'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
-                                'url'         => $img_meta[0],
-                                'srcset'      => wp_get_attachment_image_srcset( $args['image_id'], $args['img_size_popup'] ),
-                                'width'       => $img_meta[1],
-                                'height'      => $img_meta[2],
-                                'md_url'      => $img_md_meta[0],
-                                'md_width'    => $img_md_meta[1],
-                                'md_height'   => $img_md_meta[2],
-                                'sm_url'      => $img_sm_meta[0],
-                                'sm_width'    => $img_sm_meta[1],
-                                'sm_height'   => $img_sm_meta[2],
+                                'id'               => $args['image_id'],
+                                'title'            => $attachment->post_title,
+                                'description'      => $attachment->post_content,
+                                'caption'          => wp_get_attachment_caption( $attachment->ID ),
+                                'alt'              => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+                                'url'              => $img_meta[0],
+                                'srcset'           => wp_get_attachment_image_srcset( $args['image_id'], $args['img_size_popup'] ),
+                                'width'            => $img_meta[1],
+                                'height'           => $img_meta[2],
+                                'md_url'           => $img_md_meta[0],
+                                'md_width'         => $img_md_meta[1],
+                                'md_height'        => $img_md_meta[2],
+                                'sm_url'           => $img_sm_meta[0],
+                                'sm_width'         => $img_sm_meta[1],
+                                'sm_height'        => $img_sm_meta[2],
+                                'item_title'       => $args['title'],
+                                'item_description' => $args['content'],
                             )
                         );
                     } elseif ( $args['image_id'] ) {
                         $popup_image = apply_filters( 'vpf_popup_custom_image_data', false, $args['image_id'] );
+
+                        // Check items title and description availability.
+                        if ( $popup_image && ! isset( $popup_image['item_title'] ) ) {
+                            $popup_image['item_title'] = $popup_image['title'];
+                        }
+                        if ( $popup_image && ! isset( $popup_image['item_description'] ) ) {
+                            $popup_image['item_description'] = $popup_image['description'];
+                        }
                     }
                 }
             }

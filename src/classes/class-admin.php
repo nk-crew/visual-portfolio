@@ -2209,11 +2209,13 @@ class Visual_Portfolio_Admin {
                 'name'      => 'items_click_action_popup_title_source',
                 'default'   => 'title',
                 'options'   => array(
-                    'none'        => esc_html__( 'None', '@@text_domain' ),
-                    'title'       => esc_html__( 'Image Title', '@@text_domain' ),
-                    'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
-                    'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
-                    'description' => esc_html__( 'Image Description', '@@text_domain' ),
+                    'none'             => esc_html__( 'None', '@@text_domain' ),
+                    'title'            => esc_html__( 'Image Title', '@@text_domain' ),
+                    'caption'          => esc_html__( 'Image Caption', '@@text_domain' ),
+                    'alt'              => esc_html__( 'Image Alt', '@@text_domain' ),
+                    'description'      => esc_html__( 'Image Description', '@@text_domain' ),
+                    'item_title'       => esc_html__( 'Item Title', '@@text_domain' ),
+                    'item_description' => esc_html__( 'Item Description', '@@text_domain' ),
                 ),
                 'condition' => array(
                     array(
@@ -2231,11 +2233,13 @@ class Visual_Portfolio_Admin {
                 'name'      => 'items_click_action_popup_description_source',
                 'default'   => 'description',
                 'options'   => array(
-                    'none'        => esc_html__( 'None', '@@text_domain' ),
-                    'title'       => esc_html__( 'Image Title', '@@text_domain' ),
-                    'caption'     => esc_html__( 'Image Caption', '@@text_domain' ),
-                    'alt'         => esc_html__( 'Image Alt', '@@text_domain' ),
-                    'description' => esc_html__( 'Image Description', '@@text_domain' ),
+                    'none'             => esc_html__( 'None', '@@text_domain' ),
+                    'title'            => esc_html__( 'Image Title', '@@text_domain' ),
+                    'caption'          => esc_html__( 'Image Caption', '@@text_domain' ),
+                    'alt'              => esc_html__( 'Image Alt', '@@text_domain' ),
+                    'description'      => esc_html__( 'Image Description', '@@text_domain' ),
+                    'item_title'       => esc_html__( 'Item Title', '@@text_domain' ),
+                    'item_description' => esc_html__( 'Item Description', '@@text_domain' ),
                 ),
                 'condition' => array(
                     array(
