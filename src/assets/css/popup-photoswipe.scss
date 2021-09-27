@@ -87,12 +87,17 @@
                 height: 100%;
                 margin: 0;
             }
-            video {
+            video,
+            audio {
+                position: absolute;
                 // stylelint-disable-next-line declaration-no-important
                 width: 100% !important;
                 // stylelint-disable-next-line declaration-no-important
-                height: auto !important;
+                height: 100% !important;
                 margin: 0;
+            }
+            audio {
+                padding: 20px;
             }
         }
     }
