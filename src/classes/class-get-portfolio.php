@@ -2156,7 +2156,8 @@ class Visual_Portfolio_Get {
         if ( isset( $args['allow_popup'] ) && $args['allow_popup'] ) {
             if ( isset( $args['format_video_url'] ) && $args['format_video_url'] ) {
                 $popup_video = array(
-                    'url' => $args['format_video_url'],
+                    'url'    => $args['format_video_url'],
+                    'poster' => wp_get_attachment_image_url( $args['image_id'], 'full' ),
                 );
             } else {
                 $img_id = $args['image_id'] ? $args['image_id'] : $args['no_image'];
@@ -2241,6 +2242,7 @@ class Visual_Portfolio_Get {
             <div class="vp-portfolio__item-popup"
                 style="display: none;"
                 data-vp-popup-video="<?php echo esc_url( $popup_video['url'] ); ?>"
+                data-vp-popup-poster="<?php echo $popup_video['poster'] ? esc_url( $popup_video['poster'] ) : ''; ?>"
             ></div>
             <?php
         }

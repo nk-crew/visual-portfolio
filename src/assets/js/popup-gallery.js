@@ -43,10 +43,11 @@ const VPPopupAPI = {
      * Parse video URL and return object with data
      *
      * @param {string} url - video url.
+     * @param {string} url - optional poster url.
      *
      * @returns {object|boolean} video data
      */
-    parseVideo( url ) {
+    parseVideo( url, poster ) {
         let result = false;
 
         VPPopupAPI.vendors.forEach( ( vendorData ) => {
@@ -56,7 +57,7 @@ const VPPopupAPI = {
 
                 if ( videoId ) {
                     if ( vendorData.embedCallback ) {
-                        result = vendorData.embedCallback( url, match );
+                        result = vendorData.embedCallback( url, match, poster );
                     } else {
                         let { embedUrl } = vendorData;
                         embedUrl = embedUrl.replace( /{{video_id}}/g, videoId );
@@ -115,13 +116,14 @@ const VPPopupAPI = {
                 videoData = false;
 
                 if ( video ) {
-                    videoData = VPPopupAPI.parseVideo( video );
+                    videoData = VPPopupAPI.parseVideo( video, $meta.attr( 'data-vp-popup-poster' ) );
                 }
 
                 if ( videoData ) {
                     item = {
                         type: 'embed',
                         el: this,
+                        poster: videoData.poster,
                         src: videoData.embedUrl,
                         embed: videoData.embed,
                         width: videoData.width || 1920,
