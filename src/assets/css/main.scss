@@ -171,8 +171,9 @@
     }
 }
 
-// figures
+// Fix custom theme styles for figures
 .vp-portfolio figure.vp-portfolio__item {
+    display: block;
     margin: 0;
 }
 [class^="wp-block-"]:not(.wp-block-gallery) figcaption.vp-portfolio__item-meta,
