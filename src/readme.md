@@ -310,6 +310,20 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.14.0 =
+
+* IMPORTANT - there may be breaking changes for some of your galleries. Please, don't forget to make a backup and test the plugin on a staging site before updating it on production
+* added possibility to display post title and content in the image lightboxes (select the sources in the click action settings)
+* added support for posters in video and audio popups (added automatically)
+* slightly improved performance, when using the Taxonomies option
+* changed required PHP version to 7.2
+* changed required WordPress version to 5.8
+* fixed conflict with WPML and Taxonomies option
+* fixed AJAX loading pagination with custom permalink "/index.php/%postname%"
+* fixed js error in the new widgets editor
+* fixed rare conflict with theme styles and our images figure tag
+* removed sessions usage for randomly ordered galleries. Better for cached pages with caching plugins. If you want to use the caching plugin and random option, you will need to disable caching for the page, where used this random gallery
+
 = 2.13.2 =
 
 * added filtering for Saved Layouts admin screen
