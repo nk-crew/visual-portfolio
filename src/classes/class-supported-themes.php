@@ -69,6 +69,12 @@ class Visual_Portfolio_Supported_Themes {
                     'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-airtifact.min.css',
                 );
                 break;
+            case 'betheme':
+                $result = array(
+                    'name' => 'vpf-betheme',
+                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-betheme.min.css',
+                );
+                break;
         }
 
         return $result;

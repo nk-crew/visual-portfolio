@@ -1,6 +1,6 @@
 <?php
 /**
- * Avada Theme.
+ * Enfold Theme.
  *
  * @package @@plugin_name
  */
