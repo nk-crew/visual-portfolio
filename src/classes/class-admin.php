@@ -459,7 +459,7 @@ class Visual_Portfolio_Admin {
                             'default'     => 0,
                         ),
                         array(
-                            'type'    => 'radio',
+                            'type'    => 'select',
                             'label'   => esc_html__( 'Last Row Align', '@@text_domain' ),
                             'name'    => 'last_row',
                             'default' => 'left',
