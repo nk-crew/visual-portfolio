@@ -310,6 +310,12 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.14.1 =
+
+* added justified options `Max Rows Count` and `Last Row Align`
+* fixed huge galleries with Justified layout crash on iOs devices
+* fixed popup styles conflict in BeTheme
+
 = 2.14.0 =
 
 * IMPORTANT - there may be breaking changes for some of your galleries. Please, don't forget to make a backup and test the plugin on a staging site before updating it on production
