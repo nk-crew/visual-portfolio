@@ -43,7 +43,7 @@
         "ace-builds": "^1.4.12",
         "classnames": "^2.3.1",
         "clipboard-polyfill": "^3.0.3",
-        "flickr-justified-gallery": "^1.0.7",
+        "flickr-justified-gallery": "^2.0.0",
         "gutenberg-react-select-styles": "0.0.2",
         "ie11-custom-properties": "^4.1.0",
         "iframe-resizer": "^4.3.2",

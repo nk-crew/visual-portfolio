@@ -425,6 +425,8 @@ class Visual_Portfolio_Get {
         if ( 'justified' === $options['layout'] || $is_preview ) {
             $data_attrs['data-vp-justified-row-height']           = $options['justified_row_height'];
             $data_attrs['data-vp-justified-row-height-tolerance'] = $options['justified_row_height_tolerance'];
+            $data_attrs['data-vp-justified-max-rows-count']       = $options['justified_max_rows_count'];
+            $data_attrs['data-vp-justified-last-row']             = $options['justified_last_row'];
         }
 
         if ( 'slider' === $options['layout'] || $is_preview ) {

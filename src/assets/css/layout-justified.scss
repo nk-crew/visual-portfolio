@@ -1,18 +1,10 @@
-@import "./variables-justified";
-
 /*
  * Visual Portfolio layout Justified.
  */
 [data-vp-layout="justified"] {
-    .vp-portfolio__items {
-        transition: var(--vp-justified__transition-duration) height var(--vp-justified__transition-easing);
-        will-change: height;
-    }
     .vp-portfolio__item-wrap {
         float: left;
         top: 0;
         left: 0;
-        transition: var(--vp-justified__transition-duration) transform var(--vp-justified__transition-easing);
-        will-change: transform;
     }
 }

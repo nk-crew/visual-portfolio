@@ -24,6 +24,8 @@ addFilter( 'vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-
         case 'grid_images_aspect_ratio':
         case 'justified_row_height':
         case 'justified_row_height_tolerance':
+        case 'justified_max_rows_count':
+        case 'justified_last_row':
         case 'slider_effect':
         case 'slider_speed':
         case 'slider_autoplay':

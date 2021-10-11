@@ -25,11 +25,18 @@ $( document ).on( 'extendClass.vpf', ( event, VP ) => {
                     vertical: '' !== self.options.itemsGapVertical ? ( parseFloat( self.options.itemsGapVertical ) || 0 ) : ( parseFloat( self.options.itemsGap ) || 0 ),
                 },
                 rowHeight: parseFloat( self.options.justifiedRowHeight ) || 200,
+                maxRowsCount: parseInt( self.options.justifiedMaxRowsCount, 10 ) || 0,
+                lastRow: self.options.justifiedLastRow || 'left',
                 rowHeightTolerance: parseFloat( self.options.justifiedRowHeightTolerance ) || 0,
                 calculateItemsHeight: true,
                 itemSelector: '.vp-portfolio__item-wrap',
                 imageSelector: '.vp-portfolio__item-img img',
+                transitionDuration: '0.3s',
             };
+
+            if ( 0 === initOptions.maxRowsCount ) {
+                initOptions.maxRowsCount = Number.POSITIVE_INFINITY;
+            }
 
             self.emitEvent( 'beforeInitFjGallery', [ initOptions, additional ] );
 

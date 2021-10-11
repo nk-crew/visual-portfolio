@@ -448,6 +448,28 @@ class Visual_Portfolio_Admin {
                             'step'    => 0.05,
                             'default' => 0.25,
                         ),
+                        array(
+                            'type'        => 'range',
+                            'label'       => esc_html__( 'Max Rows Count', '@@text_domain' ),
+                            'description' => esc_html__( 'Limit the number of rows to display. 0 means - unlimited.', '@@text_domain' ),
+                            'name'        => 'max_rows_count',
+                            'min'         => 0,
+                            'max'         => 50,
+                            'step'        => 1,
+                            'default'     => 0,
+                        ),
+                        array(
+                            'type'    => 'radio',
+                            'label'   => esc_html__( 'Last Row Align', '@@text_domain' ),
+                            'name'    => 'last_row',
+                            'default' => 'left',
+                            'options' => array(
+                                'left'   => esc_html__( 'Left', '@@text_domain' ),
+                                'center' => esc_html__( 'Center', '@@text_domain' ),
+                                'right'  => esc_html__( 'Right', '@@text_domain' ),
+                                'hide'   => esc_html__( 'Hide', '@@text_domain' ),
+                            ),
+                        ),
                     ),
                 ),
 
