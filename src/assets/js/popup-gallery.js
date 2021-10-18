@@ -304,6 +304,7 @@ if ( settingsPopupGallery.enable_on_wordpress_images ) {
         .wp-block-image > a,
         .wp-block-image > figure > a,
         .wp-block-gallery .blocks-gallery-item > figure > a,
+        .wp-block-gallery .wp-block-image > a,
         .wp-block-media-text > figure > a,
         .gallery .gallery-icon > a,
         figure.wp-caption > a,
@@ -343,7 +344,7 @@ if ( settingsPopupGallery.enable_on_wordpress_images ) {
 
         // Block gallery, WordPress default gallery, Jetpack gallery.
         if ( $gallery.length ) {
-            const $galleryItems = $gallery.find( '.blocks-gallery-item > figure > a, .gallery-icon > a, figure.tiled-gallery__item > a' );
+            const $galleryItems = $gallery.find( '.blocks-gallery-item > figure > a, .wp-block-image > a, .gallery-icon > a, figure.tiled-gallery__item > a' );
             let i = 0;
 
             $galleryItems.each( function() {
