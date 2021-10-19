@@ -997,6 +997,7 @@ class Visual_Portfolio_Get {
      * @param array  $options options for portfolio list to print.
      */
     public static function print_layout_elements( $position, $options ) {
+        $options         = apply_filters( 'vpf_layout_element_options', $options );
         $layout_elements = $options['layout_elements'];
 
         if ( ! isset( $layout_elements[ $position ] ) || ! isset( $layout_elements[ $position ]['elements'] ) ) {

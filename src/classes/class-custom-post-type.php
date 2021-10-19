@@ -63,7 +63,22 @@ class Visual_Portfolio_Custom_Post_Type {
      * Add custom post type
      */
     public function add_custom_post_type() {
-        $custom_slug = Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general' );
+        // Backward compatible with old slug option.
+        // phpcs:ignore
+        $custom_slug = Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
+
+        if ( empty( $custom_slug ) ) {
+            // When deleting the archive page, we leave the old slug without overwriting the permalinks.
+            // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
+            $custom_slug = get_option( '_vp_saved_delete_archive_slug', 'portfolio' );
+        }
+
+        $archive_page = Visual_Portfolio_Settings::get_option( 'portfolio_archive_page', 'vp_general' );
+
+        if ( isset( $archive_page ) && ! empty( $archive_page ) ) {
+            // If there is a selected page of archives, we substitute its slug.
+            $custom_slug = get_post_field( 'post_name', $archive_page );
+        }
 
         // portfolio items post type.
         register_post_type(
@@ -86,7 +101,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 ),
                 'public'             => true,
                 'publicly_queryable' => true,
-                'has_archive'        => false,
+                'has_archive'        => true,
                 'show_ui'            => true,
 
                 // adding to custom menu manually.
