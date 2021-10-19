@@ -184,10 +184,12 @@ class Visual_Portfolio_Settings {
         $settings_fields = array(
             'vp_general' => array(
                 array(
-                    'name'    => 'portfolio_slug',
-                    'label'   => esc_html__( 'Portfolio Slug', '@@text_domain' ),
-                    'type'    => 'text',
-                    'default' => 'portfolio',
+                    'name'              => 'portfolio_archive_page',
+                    'label'             => esc_html__( 'Archive Page', '@@text_domain' ),
+                    'type'              => 'select',
+                    'select2'           => true,
+                    'options'           => Visual_Portfolio_Archive_Mapping::get_pages_list(),
+                    'sanitize_callback' => array( 'Visual_Portfolio_Archive_Mapping', 'save_archive_page_option' ),
                 ),
                 array(
                     'name'    => 'filter_taxonomies',
