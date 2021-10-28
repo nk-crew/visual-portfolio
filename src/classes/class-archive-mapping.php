@@ -23,6 +23,13 @@ class Visual_Portfolio_Archive_Mapping {
     private $archive_page = null;
 
     /**
+     * Permalink settings.
+     *
+     * @var array
+     */
+    private $permalinks = array();
+
+    /**
      * Visual_Portfolio_Archive_Mapping constructor.
      */
     public function __construct() {
@@ -35,8 +42,14 @@ class Visual_Portfolio_Archive_Mapping {
         add_action( 'admin_init', array( $this, 'flush_rules_if_set_transient' ) );
         add_action( 'vpf_extend_query_args', array( $this, 'extend_query_args' ), 10, 2 );
         add_filter( 'vpf_layout_element_options', array( $this, 'unset_pagination_archive_page' ), 10, 1 );
-        add_filter( 'manage_pages_columns', array( $this, 'add_archive_mapped_column' ), 5 );
-        add_action( 'manage_pages_custom_column', array( $this, 'add_archive_mapped_label' ), 5, 2 );
+
+        // Add a post display state for special Portfolio Archive page.
+        add_filter( 'display_post_states', array( $this, 'add_display_post_states' ), 10, 2 );
+
+        // Add Permalinks.
+        add_action( 'admin_init', array( $this, 'permalink_settings_init' ) );
+        add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
+        add_filter( 'post_type_link', array( $this, 'portfolio_category_permalink' ), 1, 2 );
     }
 
     /**
@@ -46,6 +59,7 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public function init() {
         $this->archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
+        $this->permalinks   = self::get_permalink_structure();
 
         if ( isset( $this->archive_page ) && ! empty( $this->archive_page ) ) {
 
@@ -58,6 +72,223 @@ class Visual_Portfolio_Archive_Mapping {
     }
 
     /**
+     * Init permalink settings.
+     *
+     * @return void
+     */
+    public function permalink_settings_init() {
+        add_settings_section(
+            'portfolio-permalink',
+            esc_html__( 'Portfolio permalinks', '@@text_domain' ),
+            array( $this, 'settings' ),
+            'permalink'
+        );
+
+        add_settings_field(
+            'vp_category_slug',
+            esc_html__( 'Portfolio category base', '@@text_domain' ),
+            array( $this, 'slug_input' ),
+            'permalink',
+            'optional',
+            array(
+                'id'          => 'vp_category_slug',
+                'placeholder' => esc_attr_x( 'portfolio-category', 'slug', '@@text_domain' ),
+                'value'       => 'category_base',
+            )
+        );
+
+        add_settings_field(
+            'vp_tag_slug',
+            esc_html__( 'Portfolio tag base', '@@text_domain' ),
+            array( $this, 'slug_input' ),
+            'permalink',
+            'optional',
+            array(
+                'id'          => 'vp_tag_slug',
+                'placeholder' => esc_attr_x( 'portfolio-tag', 'slug', '@@text_domain' ),
+                'value'       => 'tag_base',
+            )
+        );
+    }
+
+    /**
+     * Get permalink settings for things like portfolios and taxonomies.
+     *
+     * The permalink settings are stored to the option instead of
+     * being blank and inheritting from the locale. This speeds up page loading
+     * times by negating the need to switch locales on each page load.
+     *
+     * This is more inline with WP core behavior which does not localize slugs.
+     *
+     * @return array
+     */
+    public static function get_permalink_structure() {
+        $saved_permalinks = (array) get_option( 'portfolio_permalinks', array() );
+        $permalinks       = wp_parse_args(
+            array_filter( $saved_permalinks ),
+            array(
+                'portfolio_base'         => _x( 'portfolio', 'slug', '@@text_domain' ),
+                'category_base'          => _x( 'portfolio-category', 'slug', '@@text_domain' ),
+                'tag_base'               => _x( 'portfolio-tag', 'slug', '@@text_domain' ),
+                'attribute_base'         => '',
+                'use_verbose_page_rules' => false,
+            )
+        );
+
+        if ( $saved_permalinks !== $permalinks ) {
+            update_option( 'portfolio_permalinks', $permalinks );
+        }
+
+        $permalinks['portfolio_rewrite_slug'] = untrailingslashit( $permalinks['portfolio_base'] );
+        $permalinks['category_rewrite_slug']  = untrailingslashit( $permalinks['category_base'] );
+        $permalinks['tag_rewrite_slug']       = untrailingslashit( $permalinks['tag_base'] );
+
+        return $permalinks;
+    }
+
+    /**
+     * Show a slug input box.
+     *
+     * @param array $attributes - Setting attributes.
+     * @return void
+     */
+    public function slug_input( $attributes ) {
+        $id          = $attributes['id'];
+        $placeholder = $attributes['placeholder'];
+        $value       = $attributes['value'];
+        ?>
+        <input
+            name="<?php echo esc_attr( $id ); ?>"
+            id="<?php echo esc_attr( $id ); ?>"
+            value="<?php echo esc_html( isset( $this->permalinks[ $value ] ) ? $this->permalinks[ $value ] : '' ); ?>"
+            placeholder="<?php echo esc_attr( $placeholder ); ?>"
+            type="text"
+            class="regular-text code"
+        />
+        <?php
+    }
+
+    /**
+     * Show the settings.
+     */
+    public function settings() {
+        /* translators: %s: Home URL */
+        echo wp_kses_post( wpautop( sprintf( __( 'If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories.', '@@text_domain' ), esc_url( home_url( '/' ) ) ) ) );
+
+        $portfolio_archive_id = $this->archive_page;
+        $base_slug            = urldecode( ( $portfolio_archive_id > 0 && get_post( $portfolio_archive_id ) ) ? get_page_uri( $portfolio_archive_id ) : _x( 'portfolio', 'default-slug', '@@text_domain' ) );
+        $portfolio_base       = _x( 'portfolio', 'default-slug', '@@text_domain' );
+
+        $structures = array(
+            0 => '',
+            1 => $base_slug,
+            2 => trailingslashit( $base_slug ) . '%portfolio_category%',
+        );
+        ?>
+        <table class="form-table vp-permalink-structure">
+            <tbody>
+                <tr>
+                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[0] ); ?>" class="vp-permalink-radio" <?php checked( $structures[0], $this->permalinks['portfolio_base'] ); ?> /> <?php esc_html_e( 'Default', '@@text_domain' ); ?></label></th>
+                    <td><code class="default-example"><?php echo esc_html( home_url() ); ?>/?portfolio=sample-portfolio</code> <code class="non-default-example"><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $portfolio_base ); ?>/sample-portfolio/</code></td>
+                </tr>
+                <?php if ( $portfolio_archive_id ) : ?>
+                    <tr>
+                        <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[1] ); ?>" class="vp-permalink-radio" <?php checked( $structures[1], $this->permalinks['portfolio_base'] ); ?> /> <?php esc_html_e( 'Portfolio base', '@@text_domain' ); ?></label></th>
+                        <td><code><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $base_slug ); ?>/sample-portfolio/</code></td>
+                    </tr>
+                    <tr>
+                        <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[2] ); ?>" class="vp-permalink-radio" <?php checked( $structures[2], $this->permalinks['portfolio_base'] ); ?> /> <?php esc_html_e( 'Portfolio base with category', '@@text_domain' ); ?></label></th>
+                        <td><code><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $base_slug ); ?>/portfolio-category/sample-portfolio/</code></td>
+                    </tr>
+                <?php endif; ?>
+                <tr>
+                    <th><label><input name="portfolio_permalink" id="portfolio_custom_selection" type="radio" value="custom" class="tog" <?php checked( in_array( $this->permalinks['portfolio_base'], $structures, true ), false ); ?> />
+                        <?php esc_html_e( 'Custom base', '@@text_domain' ); ?></label></th>
+                    <td>
+                        <input name="portfolio_permalink_structure" id="portfolio_permalink_structure" type="text" value="<?php echo esc_attr( $this->permalinks['portfolio_base'] ? trailingslashit( $this->permalinks['portfolio_base'] ) : '' ); ?>" class="regular-text code"> <span class="description"><?php esc_html_e( 'Enter a custom base to use. A base must be set or WordPress will use default instead.', '@@text_domain' ); ?></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php wp_nonce_field( 'vp-permalinks', 'vp-permalinks-nonce' ); ?>
+        <script type="text/javascript">
+            jQuery( function() {
+                jQuery('input.vp-permalink-radio').change(function() {
+                    jQuery('portfolio_permalink_structure').val( jQuery( this ).val() );
+                });
+                jQuery('.permalink-structure input').change(function() {
+                    jQuery('.vp-permalink-structure').find('code.non-default-example, code.default-example').hide();
+                    if ( jQuery(this).val() ) {
+                        jQuery('.vp-permalink-structure code.non-default-example').show();
+                        jQuery('.vp-permalink-structure input').removeAttr('disabled');
+                    } else {
+                        jQuery('.vp-permalink-structure code.default-example').show();
+                        jQuery('.vp-permalink-structure input:eq(0)').click();
+                        jQuery('.vp-permalink-structure input').attr('disabled', 'disabled');
+                    }
+                });
+                jQuery('.permalink-structure input:checked').change();
+                jQuery('#portfolio_permalink_structure').focus( function(){
+                    jQuery('#portfolio_custom_selection').click();
+                } );
+            } );
+        </script>
+        <?php
+    }
+
+    /**
+     * Save the permalink settings.
+     */
+    public function permalink_settings_save() {
+        if ( ! is_admin() ) {
+            return;
+        }
+
+        // We need to save the options ourselves; settings api does not trigger save for the permalinks page.
+        // phpcs:ignore
+        if ( isset( $_POST['permalink_structure'], $_POST['vp-permalinks-nonce'], $_POST['vp_category_slug'], $_POST['vp_tag_slug'] ) && wp_verify_nonce( wp_unslash( $_POST['vp-permalinks-nonce'] ), 'vp-permalinks' ) ) {
+
+            $permalinks = (array) get_option( 'portfolio_permalinks', array() );
+            // phpcs:ignore
+            $permalinks['category_base'] = wp_unslash( $_POST['vp_category_slug'] );
+            // phpcs:ignore
+            $permalinks['tag_base']      = wp_unslash( $_POST['vp_tag_slug'] );
+
+            // Generate portfolio base.
+            // phpcs:ignore
+            $portfolio_base = isset( $_POST['portfolio_permalink'] ) ? wp_unslash( $_POST['portfolio_permalink'] ) : '';
+
+            if ( 'custom' === $portfolio_base ) {
+                if ( isset( $_POST['portfolio_permalink_structure'] ) ) {
+                    // phpcs:ignore
+                    $portfolio_base = preg_replace( '#/+#', '/', '/' . str_replace( '#', '', trim( wp_unslash( $_POST['portfolio_permalink_structure'] ) ) ) );
+                } else {
+                    $portfolio_base = '/';
+                }
+
+                // This is an invalid base structure and breaks pages.
+                if ( '/%portfolio_category%/' === trailingslashit( $portfolio_base ) ) {
+                    $portfolio_base = '/' . _x( 'portfolio', 'slug', '@@text_domain' ) . $portfolio_base;
+                }
+            } elseif ( empty( $portfolio_base ) ) {
+                $portfolio_base = _x( 'portfolio', 'slug', '@@text_domain' );
+            }
+
+            $permalinks['portfolio_base'] = $portfolio_base;
+
+            // Shop base may require verbose page rules if nesting pages.
+            $portfolio_archive_id = $this->archive_page;
+            $portfolio_permalink  = ( $portfolio_archive_id > 0 && get_post( $portfolio_archive_id ) ) ? get_page_uri( $portfolio_archive_id ) : _x( 'portfolio', 'default-slug', '@@text_domain' );
+
+            if ( $portfolio_archive_id && stristr( trim( $permalinks['portfolio_base'], '/' ), $portfolio_permalink ) ) {
+                $permalinks['use_verbose_page_rules'] = true;
+            }
+
+            update_option( 'portfolio_permalinks', $permalinks );
+        }
+    }
+
+    /**
      * Initialize archive rewrite rules.
      *
      * @return void
@@ -66,11 +297,47 @@ class Visual_Portfolio_Archive_Mapping {
         $slug = get_post_field( 'post_name', $this->archive_page );
         add_rewrite_tag( '%vp_page%', '([^&]+)' );
         add_rewrite_tag( '%vp_page_archive%', '([^&]+)' );
+        add_rewrite_tag( '%vp_filter%', '([^&]+)' );
+
         add_rewrite_rule(
             '^' . $slug . '/page/?([0-9]{1,})/?',
             'index.php?post_type=portfolio&vp_page_archive=1&vp_page=$matches[1]',
             'top'
         );
+
+        add_rewrite_rule(
+            '^' . $this->permalinks['category_base'] . '/([^/]*)/?',
+            'index.php?post_type=portfolio&vp_page_archive=1&vp_filter=portfolio_category:$matches[1]',
+            'top'
+        );
+
+        add_rewrite_rule(
+            '^' . $this->permalinks['tag_base'] . '/([^/]*)/?',
+            'index.php?post_type=portfolio&vp_page_archive=1&portfolio_tag=$matches[1]',
+            'top'
+        );
+    }
+
+    /**
+     * Change Portfolio Permalink if set portfolio category taxonomy.
+     *
+     * @param  string  $permalink - current permalink.
+     * @param  WP_Post $post - current post.
+     * @return string
+     */
+    public function portfolio_category_permalink( $permalink, $post ) {
+        if ( strpos( $permalink, '%portfolio_category%' ) === false ) {
+            return $permalink;
+        }
+
+        $terms = get_the_terms( $post, 'portfolio_category' );
+        if ( ! is_wp_error( $terms ) && ! empty( $terms ) && is_object( $terms[0] ) ) {
+            $term_slug = array_pop( $terms )->slug;
+        } else {
+            $term_slug = 'no-portfolio_category';
+        }
+
+        return str_replace( '%portfolio_category%', $term_slug, $permalink );
     }
 
     /**
@@ -80,7 +347,7 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public function maybe_override_archive( $query ) {
         if ( is_admin() ) {
-            return $query;
+            return;
         }
 
         $post_type = 'portfolio';
@@ -106,6 +373,26 @@ class Visual_Portfolio_Archive_Mapping {
             $query->is_singular          = true;
             $query->is_page              = true;
             $query->is_post_type_archive = false;
+            if (
+                isset( $query->query['vp_filter'] ) &&
+                ! empty( $query->query['vp_filter'] ) &&
+                (
+                    (
+                        // phpcs:ignore
+                        isset( $_GET['vp_filter'] ) &&
+                        // phpcs:ignore
+                        ! empty( $_GET['vp_filter'] )
+                    ) ||
+                    (
+                        // phpcs:ignore
+                        isset( $_REQUEST['vpf_ajax_call'] ) &&
+                        // phpcs:ignore
+                        $_REQUEST['vpf_ajax_call']
+                    )
+                )
+            ) {
+                $query->set( 'vp_filter', '' );
+            }
         }
     }
 
@@ -123,13 +410,21 @@ class Visual_Portfolio_Archive_Mapping {
         if ( 'current_query' === $options['posts_source'] && isset( $post_id ) && $post_id ) {
             $post_meta = get_post_meta( (int) $post_id, '_vp_post_type_mapped', true );
             if ( ! empty( $post_meta ) && $post_meta ) {
+
                 $args['post_type'] = $post_meta;
-                if ( isset( $args['vp_page_archive'] ) && $args['vp_page_archive'] ) {
+
+                if (
+                    isset( $args['vp_page_archive'] ) &&
+                    $args['vp_page_archive'] &&
+                    isset( $args['vp_page'] )
+                ) {
                     $args['paged'] = $args['vp_page'];
                 }
+
                 if ( isset( $args['page_id'] ) ) {
                     unset( $args['page_id'] );
                 }
+
                 unset( $args['p'] );
             }
         }
@@ -152,8 +447,9 @@ class Visual_Portfolio_Archive_Mapping {
                     if ( ! empty( $container['elements'] ) ) {
                         $key = array_search( 'pagination', $container['elements'], true );
                         if ( false !== $key && isset( $options['pagination'] ) ) {
-                            if ( 'paged' === $options['pagination'] ) {
-                                $options['start_page'] = $wp_query->query_vars['vp_page'];
+                            if ( 'paged' === $options['pagination'] || is_tax() ) {
+                                // phpcs:ignore
+                                $options['start_page'] = $wp_query->query_vars['vp_page'] ?? 1;
                             } else {
                                 unset( $options['layout_elements'][ $position ]['elements'][ $key ] );
                             }
@@ -214,7 +510,7 @@ class Visual_Portfolio_Archive_Mapping {
      * Delete pages list transient if page created.
      *
      * @param int     $post_ID - Post ID.
-     * @param array   $post - Post Data.
+     * @param WP_Post $post - Post Data.
      * @param boolean $update - Updated Flag.
      * @return void
      */
@@ -350,7 +646,7 @@ class Visual_Portfolio_Archive_Mapping {
             }
 
             $args = array(
-                'post_title'    => esc_html__( 'Portfolio Archive', '@@text_domain' ),
+                'post_title'    => esc_html__( 'Portfolio', '@@text_domain' ),
                 'post_status'   => 'publish',
                 'post_type'     => 'page',
                 'post_name'     => $custom_slug,
@@ -386,39 +682,47 @@ class Visual_Portfolio_Archive_Mapping {
     }
 
     /**
-     * Add columns to the pages screen in the admin
+     * Add a post display state for special Portfolio Archive page in the pages list table.
      *
-     * @param array $columns Array of key => value columns.
-     *
-     * @return array Updated list of columns.
+     * @param array   $post_states - An array of post display states.
+     * @param WP_Post $post        - The current post object.
+     * @return array $post_states  - An array of post display states.
      */
-    public function add_archive_mapped_column( $columns ) {
-        $columns['vp_archive_mapped'] = esc_html__( 'Archive Mapping', '@@text_domain' );
-        return $columns;
+    public function add_display_post_states( $post_states, $post ) {
+        if ( 'page' === $post->post_type ) {
+            // If successful, returns the post type slug.
+            $post_type = get_post_meta( $post->ID, '_vp_post_type_mapped', true );
+            if ( $post_type && ! empty( $post_type ) ) {
+                $post_states[] = esc_html__( 'Portfolio Page', '@@text_domain' );
+            }
+        }
+        return $post_states;
     }
 
     /**
-     * Populate the column values for the mapped posts.
+     * Get Portfolio Archive Slug.
      *
-     * @param string $column_name The column name.
-     * @param int    $page_id     The Page ID.
+     * @return string
      */
-    public function add_archive_mapped_label( $column_name, $page_id ) {
-        if ( 'vp_archive_mapped' === $column_name ) {
-            // If successful, returns the post type slug.
-            $post_type = get_post_meta( $page_id, '_vp_post_type_mapped', true );
-            if ( $post_type && ! empty( $post_type ) ) {
-                $archive_link = get_post_type_archive_link( $post_type );
-                if ( $archive_link ) {
-                    echo sprintf(
-                        '<a href="%s">%s</a>',
-                        esc_url( $archive_link ),
-                        esc_html__( 'View Post Type Archive', '@@text_domain' )
-                    );
-                }
-                return;
-            }
+    public static function get_portfolio_slug() {
+        // Backward compatible with old slug option.
+        // phpcs:ignore
+        $custom_slug = Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
+
+        if ( empty( $custom_slug ) ) {
+            // When deleting the archive page, we leave the old slug without overwriting the permalinks.
+            // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
+            $custom_slug = get_option( '_vp_saved_delete_archive_slug', 'portfolio' );
         }
+
+        $archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
+
+        if ( isset( $archive_page ) && ! empty( $archive_page ) ) {
+            // If there is a selected page of archives, we substitute its slug.
+            $custom_slug = get_post_field( 'post_name', $archive_page );
+        }
+
+        return $custom_slug;
     }
 }
 new Visual_Portfolio_Archive_Mapping();

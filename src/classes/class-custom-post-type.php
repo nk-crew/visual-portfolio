@@ -63,22 +63,9 @@ class Visual_Portfolio_Custom_Post_Type {
      * Add custom post type
      */
     public function add_custom_post_type() {
-        // Backward compatible with old slug option.
-        // phpcs:ignore
-        $custom_slug = Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
 
-        if ( empty( $custom_slug ) ) {
-            // When deleting the archive page, we leave the old slug without overwriting the permalinks.
-            // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-            $custom_slug = get_option( '_vp_saved_delete_archive_slug', 'portfolio' );
-        }
-
-        $archive_page = Visual_Portfolio_Settings::get_option( 'portfolio_archive_page', 'vp_general' );
-
-        if ( isset( $archive_page ) && ! empty( $archive_page ) ) {
-            // If there is a selected page of archives, we substitute its slug.
-            $custom_slug = get_post_field( 'post_name', $archive_page );
-        }
+        $custom_slug = Visual_Portfolio_Archive_Mapping::get_portfolio_slug();
+        $permalinks  = Visual_Portfolio_Archive_Mapping::get_permalink_structure();
 
         // portfolio items post type.
         register_post_type(
@@ -101,7 +88,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 ),
                 'public'             => true,
                 'publicly_queryable' => true,
-                'has_archive'        => true,
+                'has_archive'        => $custom_slug,
                 'show_ui'            => true,
 
                 // adding to custom menu manually.
@@ -116,7 +103,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 'map_meta_cap'       => true,
                 'capability_type'    => 'portfolio',
                 'rewrite'            => array(
-                    'slug'       => $custom_slug,
+                    'slug'       => $permalinks['portfolio_base'],
                     'with_front' => false,
                 ),
                 'supports'           => array(
@@ -142,10 +129,10 @@ class Visual_Portfolio_Custom_Post_Type {
                     'menu_name' => esc_html__( 'Categories', '@@text_domain' ),
                 ),
                 'rewrite'            => array(
-                    'slug' => 'portfolio-category',
+                    'slug' => $permalinks['category_base'],
                 ),
                 'hierarchical'       => true,
-                'publicly_queryable' => false,
+                'publicly_queryable' => true,
                 'show_in_nav_menus'  => true,
                 'show_in_rest'       => true,
                 'show_admin_column'  => true,
@@ -162,10 +149,10 @@ class Visual_Portfolio_Custom_Post_Type {
                     'menu_name' => esc_html__( 'Tags', '@@text_domain' ),
                 ),
                 'rewrite'            => array(
-                    'slug' => 'portfolio-tag',
+                    'slug' => $permalinks['tag_base'],
                 ),
                 'hierarchical'       => false,
-                'publicly_queryable' => false,
+                'publicly_queryable' => true,
                 'show_in_nav_menus'  => true,
                 'show_in_rest'       => true,
                 'show_admin_column'  => true,

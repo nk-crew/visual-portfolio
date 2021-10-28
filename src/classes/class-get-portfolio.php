@@ -1207,9 +1207,9 @@ class Visual_Portfolio_Get {
             $images = array();
 
             // phpcs:ignore
-            if ( ! $for_filter && isset( $_GET['vp_filter'] ) ) {
+            if ( ! $for_filter && ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
                 // phpcs:ignore
-                $category = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
+                $category = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
 
                 foreach ( $options['images'] as $img ) {
                     if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
@@ -1580,9 +1580,9 @@ class Visual_Portfolio_Get {
 
             // Load certain taxonomies using custom filter.
             // phpcs:ignore
-            if ( ! $for_filter && isset( $_GET['vp_filter'] ) ) {
+            if ( ! $for_filter && ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
                 // phpcs:ignore
-                $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
+                $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
                 $taxonomies = explode( ':', $taxonomies );
 
                 if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
@@ -1640,15 +1640,14 @@ class Visual_Portfolio_Get {
         // Get active item.
         $active_item = false;
 
+        $query_opts = self::get_query_params( $vp_options, true );
         // phpcs:ignore
-        if ( isset( $_GET['vp_filter'] ) ) {
+        if ( ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
             // phpcs:ignore
-            $active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
+            $active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
         }
 
         if ( $is_images || $is_social ) {
-            $query_opts = self::get_query_params( $vp_options, true );
-
             // calculate categories count.
             $categories_count = array();
             foreach ( $query_opts['images'] as $img ) {
@@ -1691,8 +1690,6 @@ class Visual_Portfolio_Get {
                 }
             }
         } else {
-            $query_opts = self::get_query_params( $vp_options, true );
-
             /**
              * TODO: make caching using set_transient function. Info here - https://wordpress.stackexchange.com/a/145960
              */
