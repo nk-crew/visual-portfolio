@@ -440,7 +440,6 @@ class Visual_Portfolio_Archive_Mapping {
     public function unset_pagination_archive_page( $options ) {
         global $wp_query;
         if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
-            // phpcs:ignore
             $is_page_archive = $wp_query->query_vars['vp_page_archive'] ?? false;
             if ( $is_page_archive ) {
                 foreach ( $options['layout_elements'] as $position => $container ) {
@@ -448,7 +447,6 @@ class Visual_Portfolio_Archive_Mapping {
                         $key = array_search( 'pagination', $container['elements'], true );
                         if ( false !== $key && isset( $options['pagination'] ) ) {
                             if ( 'paged' === $options['pagination'] || is_tax() ) {
-                                // phpcs:ignore
                                 $options['start_page'] = $wp_query->query_vars['vp_page'] ?? 1;
                             } else {
                                 unset( $options['layout_elements'][ $position ]['elements'][ $key ] );
@@ -638,7 +636,6 @@ class Visual_Portfolio_Archive_Mapping {
      */
     private function create_archive_page() {
         if ( ! get_option( '_vp_add_archive_page' ) ) {
-            // phpcs:ignore
             $custom_slug = Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
 
             if ( empty( $custom_slug ) ) {
@@ -706,7 +703,6 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public static function get_portfolio_slug() {
         // Backward compatible with old slug option.
-        // phpcs:ignore
         $custom_slug = Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
 
         if ( empty( $custom_slug ) ) {
