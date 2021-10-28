@@ -670,7 +670,7 @@ class Visual_Portfolio_Archive_Mapping {
                     wp_slash(
                         array(
                             'ID'           => $post_id,
-                            'post_content' => '<!-- wp:visual-portfolio/block {"block_id":"' . hash( 'crc32b', $slug . $post_id ) . '","content_source":"post-based","posts_source":"current_query","layout_elements":{"top":{"elements":[],"align":"center"},"items":{"elements":["items"]},"bottom":{"elements":["pagination"],"align":"center"}},"pagination_style":"default","pagination":"paged"} /-->',
+                            'post_content' => '<!-- wp:visual-portfolio/block {"block_id":"' . hash( 'crc32b', $slug . $post_id ) . '","content_source":"post-based","posts_source":"current_query","layout_elements":{"top":{"elements":["filter"],"align":"center"},"items":{"elements":["items"]},"bottom":{"elements":["pagination"],"align":"center"}},"pagination_style":"default","pagination":"paged"} /-->',
                         )
                     )
                 );
