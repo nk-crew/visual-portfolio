@@ -84,27 +84,27 @@ class Visual_Portfolio_Migrations {
     }
 
     /**
-     * When migrating, check the old slug option and create a page with archive page based on it.
-     *
-     * @return void
+     * Check the old portfolio slug option and create a page with archive page based on it.
      */
     public function v_2_15_0() {
         // Backward compatible with old slug option.
         $settings_section = 'vp_general';
         $option_name      = 'portfolio_slug';
-        $custom_slug      = Visual_Portfolio_Settings::get_option( $option_name, $settings_section );
-        if ( ! empty( $custom_slug ) ) {
-            $archive_id = get_option( '_vp_add_archive_page' );
+        $options          = get_option( $settings_section );
+
+        if ( isset( $options[ $option_name ] ) ) {
+            $custom_slug = $options[ $option_name ];
+            $archive_id  = get_option( '_vp_add_archive_page' );
+
             if ( $archive_id ) {
                 // Update archive slug on page.
                 wp_update_post(
-                    wp_slash(
-                        array(
-                            'ID'        => $archive_id,
-                            'post_name' => $custom_slug,
-                        )
+                    array(
+                        'ID'        => $archive_id,
+                        'post_name' => wp_slash( $custom_slug ),
                     )
                 );
+
                 // Set transient for rewrite flush rules.
                 set_transient( 'vp_flush_rules', true );
 
@@ -122,7 +122,6 @@ class Visual_Portfolio_Migrations {
             }
 
             // Delete old option.
-            $options = get_option( $settings_section );
             unset( $options[ $option_name ] );
             update_option( $settings_section, $options );
         }
