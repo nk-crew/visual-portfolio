@@ -65,6 +65,10 @@ class Visual_Portfolio_Migrations {
     public function get_migrations() {
         return array(
             array(
+                'version' => '2.14.1',
+                'cb'      => array( $this, 'v_2_15_0' ),
+            ),
+            array(
                 'version' => '2.10.0',
                 'cb'      => array( $this, 'v_2_10_0' ),
             ),
@@ -77,6 +81,22 @@ class Visual_Portfolio_Migrations {
                 'cb'      => array( $this, 'v_1_11_0' ),
             ),
         );
+    }
+
+    /**
+     * When migrating, check the old slug option and create a page with archive page based on it.
+     *
+     * @return void
+     */
+    public function v_2_15_0() {
+        // Backward compatible with old slug option.
+        $custom_slug = Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
+        $archive_id  = get_option( '_vp_add_archive_page' );
+        if ( $archive_id ) {
+            wp_delete_post( $archive_id, true );
+            delete_option( '_vp_add_archive_page' );
+        }
+        Visual_Portfolio_Archive_Mapping::create_archive_page( $custom_slug );
     }
 
     /**
