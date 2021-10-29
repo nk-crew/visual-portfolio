@@ -187,7 +187,6 @@ class Visual_Portfolio_Settings {
                     'name'              => 'portfolio_archive_page',
                     'label'             => esc_html__( 'Archive Page', '@@text_domain' ),
                     'type'              => 'select',
-                    'select2'           => true,
                     'options'           => Visual_Portfolio_Archive_Mapping::get_pages_list(),
                     'sanitize_callback' => array( 'Visual_Portfolio_Archive_Mapping', 'save_archive_page_option' ),
                 ),

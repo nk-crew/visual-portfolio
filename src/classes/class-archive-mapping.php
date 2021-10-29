@@ -34,7 +34,6 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public function __construct() {
         add_action( 'init', array( $this, 'init' ), 9 );
-        add_action( 'save_post', array( $this, 'save_page' ), 10, 3 );
         add_action( 'pre_post_update', array( $this, 'pre_page_update' ), 10, 2 );
         add_action( 'deleted_post', array( $this, 'delete_archive_page' ), 10, 1 );
         add_action( 'trashed_post', array( $this, 'delete_archive_page' ), 10, 1 );
@@ -50,6 +49,9 @@ class Visual_Portfolio_Archive_Mapping {
         add_action( 'admin_init', array( $this, 'permalink_settings_init' ) );
         add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
         add_filter( 'post_type_link', array( $this, 'portfolio_category_permalink' ), 1, 2 );
+
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+        add_action( 'wp_ajax_vp_get_pages_list', array( $this, 'get_posts_ajax_callback' ) );
     }
 
     /**
@@ -68,7 +70,19 @@ class Visual_Portfolio_Archive_Mapping {
             add_action( 'pre_get_posts', array( $this, 'maybe_override_archive' ) );
         }
 
-        $this->create_archive_page();
+        self::create_archive_page();
+    }
+
+    /**
+     * Enqueue archive select2 ajax script.
+     *
+     * @param  string $page - Current admin page.
+     * @return void
+     */
+    public function admin_enqueue_scripts( $page ) {
+        if ( 'portfolio_page_@@text_domain-settings' === $page ) {
+            wp_enqueue_script( '@@text_domain-archive-page-selector', visual_portfolio()->plugin_url . 'assets/admin/js/archive-page-selector.min.js', array( 'jquery', 'select2' ), '@@plugin_version', true );
+        }
     }
 
     /**
@@ -131,7 +145,6 @@ class Visual_Portfolio_Archive_Mapping {
                 'category_base'          => _x( 'portfolio-category', 'slug', '@@text_domain' ),
                 'tag_base'               => _x( 'portfolio-tag', 'slug', '@@text_domain' ),
                 'attribute_base'         => '',
-                'use_verbose_page_rules' => false,
             )
         );
 
@@ -139,9 +152,9 @@ class Visual_Portfolio_Archive_Mapping {
             update_option( 'portfolio_permalinks', $permalinks );
         }
 
-        $permalinks['portfolio_rewrite_slug'] = untrailingslashit( $permalinks['portfolio_base'] );
-        $permalinks['category_rewrite_slug']  = untrailingslashit( $permalinks['category_base'] );
-        $permalinks['tag_rewrite_slug']       = untrailingslashit( $permalinks['tag_base'] );
+        $permalinks['portfolio_base'] = untrailingslashit( $permalinks['portfolio_base'] );
+        $permalinks['category_base']  = untrailingslashit( $permalinks['category_base'] );
+        $permalinks['tag_base']       = untrailingslashit( $permalinks['tag_base'] );
 
         return $permalinks;
     }
@@ -275,14 +288,6 @@ class Visual_Portfolio_Archive_Mapping {
             }
 
             $permalinks['portfolio_base'] = $portfolio_base;
-
-            // Shop base may require verbose page rules if nesting pages.
-            $portfolio_archive_id = $this->archive_page;
-            $portfolio_permalink  = ( $portfolio_archive_id > 0 && get_post( $portfolio_archive_id ) ) ? get_page_uri( $portfolio_archive_id ) : _x( 'portfolio', 'default-slug', '@@text_domain' );
-
-            if ( $portfolio_archive_id && stristr( trim( $permalinks['portfolio_base'], '/' ), $portfolio_permalink ) ) {
-                $permalinks['use_verbose_page_rules'] = true;
-            }
 
             update_option( 'portfolio_permalinks', $permalinks );
         }
@@ -489,10 +494,6 @@ class Visual_Portfolio_Archive_Mapping {
      * @return void
      */
     public function pre_page_update( $post_ID, $data ) {
-        if ( 'page' === $data['post_type'] && get_the_title( $post_ID ) !== $data['post_title'] ) {
-            delete_transient( 'vp_pages_list' );
-        }
-
         if (
             'page' === $data['post_type'] &&
             (int) $this->archive_page === (int) $post_ID &&
@@ -505,39 +506,51 @@ class Visual_Portfolio_Archive_Mapping {
     }
 
     /**
-     * Delete pages list transient if page created.
-     *
-     * @param int     $post_ID - Post ID.
-     * @param WP_Post $post - Post Data.
-     * @param boolean $update - Updated Flag.
-     * @return void
-     */
-    public function save_page( $post_ID, $post, $update ) {
-        if ( 'page' === $post->post_type && ! $update ) {
-            delete_transient( 'vp_pages_list' );
-        }
-    }
-
-    /**
      * Get Pages List.
      *
      * @return array
      */
     public static function get_pages_list() {
-        $saved_pages_list = get_transient( 'vp_pages_list' );
-
-        if ( ! $saved_pages_list ) {
-            $pages_list = array(
-                '' => esc_html__( 'Select Page', '@@text_domain' ),
-            );
-            $pages      = get_pages();
-            foreach ( $pages as $page ) {
-                $pages_list[ $page->ID ] = $page->post_title;
-            }
-            $saved_pages_list = $pages_list;
-            set_transient( 'vp_pages_list', $saved_pages_list, 0 );
+        $options      = get_option( 'vp_general' );
+        $archive_page = $options['portfolio_archive_page'] ?? false;
+        $pages_list   = array(
+            '' => esc_html__( 'Search Page', '@@text_domain' ),
+        );
+        if ( $archive_page ) {
+            $archive_title               = get_post_field( 'post_title', $archive_page );
+            $pages_list[ $archive_page ] = $archive_title;
         }
-        return $saved_pages_list;
+        return $pages_list;
+    }
+
+    /**
+     * Get Posts for Select2 archive page field by Ajax.
+     *
+     * @return void
+     */
+    public function get_posts_ajax_callback() {
+        $return         = array();
+        $search_results = new WP_Query(
+            array(
+                // phpcs:ignore
+                's'                   => $_GET['q'],
+                'post_status'         => 'publish',
+                'ignore_sticky_posts' => 1,
+                'posts_per_page'      => 50,
+                'post_type'           => 'page',
+            )
+        );
+        if ( $search_results->have_posts() ) {
+            while ( $search_results->have_posts() ) {
+                $search_results->the_post();
+                $title    = ( mb_strlen( $search_results->post->post_title ) > 50 ) ? mb_substr( $search_results->post->post_title, 0, 49 ) . '...' : $search_results->post->post_title;
+                $return[] = array( $search_results->post->ID, $title );
+            }
+        }
+
+        echo wp_json_encode( $return );
+
+        die;
     }
 
     /**
@@ -548,16 +561,10 @@ class Visual_Portfolio_Archive_Mapping {
      * @return void
      */
     public function delete_archive_page( $post_ID ) {
-        if ( 'page' === get_post_type( $post_ID ) ) {
-            delete_transient( 'vp_pages_list' );
-        }
-
         if ( ! empty( $this->archive_page ) && (int) $post_ID === (int) $this->archive_page ) {
             Settings::update_option( 'portfolio_archive_page', 'vp_general', '' );
 
             self::delete_post_type_mapped_meta();
-
-            update_option( '_vp_saved_delete_archive_slug', str_replace( '__trashed', '', get_post_field( 'post_name', $this->archive_page ) ) );
         }
     }
 
@@ -588,8 +595,6 @@ class Visual_Portfolio_Archive_Mapping {
                 is_numeric( $old_value['portfolio_archive_page'] )
             ) {
                 self::delete_post_type_mapped_meta();
-
-                delete_option( '_vp_saved_delete_archive_slug' );
 
                 set_transient( 'vp_flush_rules', true );
 
@@ -632,15 +637,11 @@ class Visual_Portfolio_Archive_Mapping {
     /**
      * Create default archive page.
      *
+     * @param string $custom_slug - Default Archive Slug.
      * @return void
      */
-    private function create_archive_page() {
+    public static function create_archive_page( $custom_slug = 'portfolio' ) {
         if ( ! get_option( '_vp_add_archive_page' ) ) {
-            $custom_slug = Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
-
-            if ( empty( $custom_slug ) ) {
-                $custom_slug = 'portfolio';
-            }
 
             $args = array(
                 'post_title'    => esc_html__( 'Portfolio', '@@text_domain' ),
@@ -658,8 +659,6 @@ class Visual_Portfolio_Archive_Mapping {
 
                 set_transient( 'vp_flush_rules', true );
 
-                add_option( '_vp_add_archive_page', true );
-
                 self::save_archive_page_option( $post_id );
 
                 $post = get_post( $post_id );
@@ -674,6 +673,8 @@ class Visual_Portfolio_Archive_Mapping {
                         )
                     )
                 );
+
+                add_option( '_vp_add_archive_page', $post_id );
             }
         }
     }
@@ -702,14 +703,10 @@ class Visual_Portfolio_Archive_Mapping {
      * @return string
      */
     public static function get_portfolio_slug() {
-        // Backward compatible with old slug option.
-        $custom_slug = Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
 
-        if ( empty( $custom_slug ) ) {
-            // When deleting the archive page, we leave the old slug without overwriting the permalinks.
-            // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-            $custom_slug = get_option( '_vp_saved_delete_archive_slug', 'portfolio' );
-        }
+        // When deleting the archive page, we leave the old slug without overwriting the permalinks.
+        // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
+        $custom_slug = 'portfolio';
 
         $archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
 
