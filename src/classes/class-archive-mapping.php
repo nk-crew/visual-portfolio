@@ -48,7 +48,7 @@ class Visual_Portfolio_Archive_Mapping {
         // Add Permalinks.
         add_action( 'admin_init', array( $this, 'permalink_settings_init' ) );
         add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
-        add_filter( 'post_type_link', array( $this, 'portfolio_category_permalink' ), 1, 2 );
+        add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
 
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
         add_action( 'wp_ajax_vp_get_pages_list', array( $this, 'get_posts_ajax_callback' ) );
@@ -134,14 +134,16 @@ class Visual_Portfolio_Archive_Mapping {
      *
      * This is more inline with WP core behavior which does not localize slugs.
      *
+     * @param boolean $replace_portfolio_slug - replace portfolio slug automatically. Used in post type registration.
+     *
      * @return array
      */
-    public static function get_permalink_structure() {
+    public static function get_permalink_structure( $replace_portfolio_slug = false ) {
         $saved_permalinks = (array) get_option( 'portfolio_permalinks', array() );
         $permalinks       = wp_parse_args(
             array_filter( $saved_permalinks ),
             array(
-                'portfolio_base'         => _x( 'portfolio', 'slug', '@@text_domain' ),
+                'portfolio_base'         => '%portfolio_page_slug%',
                 'category_base'          => _x( 'portfolio-category', 'slug', '@@text_domain' ),
                 'tag_base'               => _x( 'portfolio-tag', 'slug', '@@text_domain' ),
                 'attribute_base'         => '',
@@ -150,6 +152,11 @@ class Visual_Portfolio_Archive_Mapping {
 
         if ( $saved_permalinks !== $permalinks ) {
             update_option( 'portfolio_permalinks', $permalinks );
+        }
+
+        // Replace portfolio page slug.
+        if ( $replace_portfolio_slug && strpos( $permalinks['portfolio_base'], '%portfolio_page_slug%' ) !== false ) {
+            $permalinks['portfolio_base'] = str_replace( '%portfolio_page_slug%', self::get_portfolio_slug(), $permalinks['portfolio_base'] );
         }
 
         $permalinks['portfolio_base'] = untrailingslashit( $permalinks['portfolio_base'] );
@@ -188,61 +195,65 @@ class Visual_Portfolio_Archive_Mapping {
         /* translators: %s: Home URL */
         echo wp_kses_post( wpautop( sprintf( __( 'If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories.', '@@text_domain' ), esc_url( home_url( '/' ) ) ) ) );
 
-        $portfolio_archive_id = $this->archive_page;
-        $base_slug            = urldecode( ( $portfolio_archive_id > 0 && get_post( $portfolio_archive_id ) ) ? get_page_uri( $portfolio_archive_id ) : _x( 'portfolio', 'default-slug', '@@text_domain' ) );
-        $portfolio_base       = _x( 'portfolio', 'default-slug', '@@text_domain' );
+        $page_slug    = '%portfolio_page_slug%';
+        $default_slug = _x( 'portfolio', 'default-slug', '@@text_domain' );
+        $current_base = trailingslashit( $this->permalinks['portfolio_base'] );
+        $structures   = array(
+            0  => '',
+            1  => '/' . trailingslashit( $page_slug ),
+            2  => '/' . trailingslashit( $page_slug ) . trailingslashit( '%portfolio_category%' ),
 
-        $structures = array(
-            0 => '',
-            1 => $base_slug,
-            2 => trailingslashit( $base_slug ) . '%portfolio_category%',
+            // Only used in the html output in the settings.
+            99 => '/' . trailingslashit( $default_slug ),
         );
+
         ?>
         <table class="form-table vp-permalink-structure">
             <tbody>
                 <tr>
-                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[0] ); ?>" class="vp-permalink-radio" <?php checked( $structures[0], $this->permalinks['portfolio_base'] ); ?> /> <?php esc_html_e( 'Default', '@@text_domain' ); ?></label></th>
-                    <td><code class="default-example"><?php echo esc_html( home_url() ); ?>/?portfolio=sample-portfolio</code> <code class="non-default-example"><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $portfolio_base ); ?>/sample-portfolio/</code></td>
+                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[0] ); ?>" class="vp-permalink-radio" <?php checked( $structures[99], $current_base ); ?> /> <?php esc_html_e( 'Default', '@@text_domain' ); ?></label></th>
+                    <td><code class="default-example"><?php echo esc_html( home_url() ); ?>/?portfolio=sample-portfolio</code> <code class="non-default-example"><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $default_slug ); ?>/sample-portfolio/</code></td>
                 </tr>
-                <?php if ( $portfolio_archive_id ) : ?>
-                    <tr>
-                        <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[1] ); ?>" class="vp-permalink-radio" <?php checked( $structures[1], $this->permalinks['portfolio_base'] ); ?> /> <?php esc_html_e( 'Portfolio base', '@@text_domain' ); ?></label></th>
-                        <td><code><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $base_slug ); ?>/sample-portfolio/</code></td>
-                    </tr>
-                    <tr>
-                        <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[2] ); ?>" class="vp-permalink-radio" <?php checked( $structures[2], $this->permalinks['portfolio_base'] ); ?> /> <?php esc_html_e( 'Portfolio base with category', '@@text_domain' ); ?></label></th>
-                        <td><code><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $base_slug ); ?>/portfolio-category/sample-portfolio/</code></td>
-                    </tr>
-                <?php endif; ?>
                 <tr>
-                    <th><label><input name="portfolio_permalink" id="portfolio_custom_selection" type="radio" value="custom" class="tog" <?php checked( in_array( $this->permalinks['portfolio_base'], $structures, true ), false ); ?> />
+                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[1] ); ?>" class="vp-permalink-radio" <?php checked( $structures[1], $current_base ); ?> /> <?php esc_html_e( 'Portfolio base', '@@text_domain' ); ?></label></th>
+                    <td><code><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $page_slug ); ?>/sample-portfolio/</code></td>
+                </tr>
+                <tr>
+                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[2] ); ?>" class="vp-permalink-radio" <?php checked( $structures[2], $current_base ); ?> /> <?php esc_html_e( 'Portfolio base with category', '@@text_domain' ); ?></label></th>
+                    <td><code><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $page_slug ); ?>/portfolio-category/sample-portfolio/</code></td>
+                </tr>
+                <tr>
+                    <th><label><input name="portfolio_permalink" id="portfolio_custom_selection" type="radio" value="custom" class="tog" <?php checked( in_array( $current_base, $structures, true ), false ); ?> />
                         <?php esc_html_e( 'Custom base', '@@text_domain' ); ?></label></th>
                     <td>
-                        <input name="portfolio_permalink_structure" id="portfolio_permalink_structure" type="text" value="<?php echo esc_attr( $this->permalinks['portfolio_base'] ? trailingslashit( $this->permalinks['portfolio_base'] ) : '' ); ?>" class="regular-text code"> <span class="description"><?php esc_html_e( 'Enter a custom base to use. A base must be set or WordPress will use default instead.', '@@text_domain' ); ?></span>
+                        <input name="portfolio_permalink_structure" id="portfolio_permalink_structure" type="text" value="<?php echo esc_attr( $current_base ? $current_base : '' ); ?>" class="regular-text code"> <span class="description"><?php esc_html_e( 'Enter a custom base to use. A base must be set or WordPress will use default instead.', '@@text_domain' ); ?></span>
                     </td>
                 </tr>
             </tbody>
         </table>
         <?php wp_nonce_field( 'vp-permalinks', 'vp-permalinks-nonce' ); ?>
         <script type="text/javascript">
-            jQuery( function() {
-                jQuery('input.vp-permalink-radio').change(function() {
-                    jQuery('portfolio_permalink_structure').val( jQuery( this ).val() );
-                });
-                jQuery('.permalink-structure input').change(function() {
-                    jQuery('.vp-permalink-structure').find('code.non-default-example, code.default-example').hide();
-                    if ( jQuery(this).val() ) {
-                        jQuery('.vp-permalink-structure code.non-default-example').show();
-                        jQuery('.vp-permalink-structure input').removeAttr('disabled');
+            jQuery( function( $ ) {
+                $( 'input.vp-permalink-radio' ).on( 'change', function() {
+                    $( '#portfolio_permalink_structure' ).val( $( this ).val() );
+                } );
+
+                $('.permalink-structure input').on( 'change', function() {
+                    $( '.vp-permalink-structure' ).find( 'code.non-default-example, code.default-example' ).hide();
+
+                    if ( $( this ).val() ) {
+                        $( '.vp-permalink-structure code.non-default-example' ).show();
+                        $( '.vp-permalink-structure input' ).removeAttr( 'disabled' );
                     } else {
-                        jQuery('.vp-permalink-structure code.default-example').show();
-                        jQuery('.vp-permalink-structure input:eq(0)').click();
-                        jQuery('.vp-permalink-structure input').attr('disabled', 'disabled');
+                        $( '.vp-permalink-structure code.default-example' ).show();
+                        $( '.vp-permalink-structure input:eq(0)' ).trigger( 'click' );
+                        $( '.vp-permalink-structure input' ).attr( 'disabled', 'disabled' );
                     }
-                });
-                jQuery('.permalink-structure input:checked').change();
-                jQuery('#portfolio_permalink_structure').focus( function(){
-                    jQuery('#portfolio_custom_selection').click();
+                } );
+
+                $( '.permalink-structure input:checked' ).trigger( 'change' );
+                $( '#portfolio_permalink_structure' ).on( 'focus', function() {
+                    $( '#portfolio_custom_selection' ).trigger( 'click' );
                 } );
             } );
         </script>
@@ -281,10 +292,10 @@ class Visual_Portfolio_Archive_Mapping {
 
                 // This is an invalid base structure and breaks pages.
                 if ( '/%portfolio_category%/' === trailingslashit( $portfolio_base ) ) {
-                    $portfolio_base = '/' . _x( 'portfolio', 'slug', '@@text_domain' ) . $portfolio_base;
+                    $portfolio_base = '/%portfolio_page_slug%' . $portfolio_base;
                 }
             } elseif ( empty( $portfolio_base ) ) {
-                $portfolio_base = _x( 'portfolio', 'slug', '@@text_domain' );
+                $portfolio_base = '/' . _x( 'portfolio', 'default-slug', '@@text_domain' );
             }
 
             $permalinks['portfolio_base'] = $portfolio_base;
@@ -324,25 +335,26 @@ class Visual_Portfolio_Archive_Mapping {
     }
 
     /**
-     * Change Portfolio Permalink if set portfolio category taxonomy.
+     * Replace tags in Portfolio Permalinks.
      *
      * @param  string  $permalink - current permalink.
      * @param  WP_Post $post - current post.
      * @return string
      */
-    public function portfolio_category_permalink( $permalink, $post ) {
-        if ( strpos( $permalink, '%portfolio_category%' ) === false ) {
-            return $permalink;
+    public function portfolio_permalink_replacements( $permalink, $post ) {
+        // Category slug.
+        if ( strpos( $permalink, '%portfolio_category%' ) !== false ) {
+            $terms = get_the_terms( $post, 'portfolio_category' );
+            if ( ! is_wp_error( $terms ) && ! empty( $terms ) && is_object( $terms[0] ) ) {
+                $term_slug = array_pop( $terms )->slug;
+            } else {
+                $term_slug = 'no-portfolio_category';
+            }
+
+            $permalink = str_replace( '%portfolio_category%', $term_slug, $permalink );
         }
 
-        $terms = get_the_terms( $post, 'portfolio_category' );
-        if ( ! is_wp_error( $terms ) && ! empty( $terms ) && is_object( $terms[0] ) ) {
-            $term_slug = array_pop( $terms )->slug;
-        } else {
-            $term_slug = 'no-portfolio_category';
-        }
-
-        return str_replace( '%portfolio_category%', $term_slug, $permalink );
+        return $permalink;
     }
 
     /**
@@ -703,10 +715,9 @@ class Visual_Portfolio_Archive_Mapping {
      * @return string
      */
     public static function get_portfolio_slug() {
-
         // When deleting the archive page, we leave the old slug without overwriting the permalinks.
         // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-        $custom_slug = 'portfolio';
+        $custom_slug = _x( 'portfolio', 'default-slug', '@@text_domain' );
 
         $archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
 

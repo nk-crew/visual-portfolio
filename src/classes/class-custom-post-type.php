@@ -65,7 +65,7 @@ class Visual_Portfolio_Custom_Post_Type {
     public function add_custom_post_type() {
 
         $custom_slug = Visual_Portfolio_Archive_Mapping::get_portfolio_slug();
-        $permalinks  = Visual_Portfolio_Archive_Mapping::get_permalink_structure();
+        $permalinks  = Visual_Portfolio_Archive_Mapping::get_permalink_structure( true );
 
         // portfolio items post type.
         register_post_type(

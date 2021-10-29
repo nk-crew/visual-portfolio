@@ -108,13 +108,6 @@ class Visual_Portfolio_Migrations {
                 // Set transient for rewrite flush rules.
                 set_transient( 'vp_flush_rules', true );
 
-                // Set Portfolio Base permalink with new archive slug.
-                $permalinks = (array) get_option( 'portfolio_permalinks', array() );
-
-                $permalinks['portfolio_base'] = get_post_field( 'post_name', $archive_id );
-
-                update_option( 'portfolio_permalinks', $permalinks );
-
                 flush_rewrite_rules();
             } else {
                 // Create archive page.
