@@ -90,13 +90,42 @@ class Visual_Portfolio_Migrations {
      */
     public function v_2_15_0() {
         // Backward compatible with old slug option.
-        $custom_slug = Visual_Portfolio_Settings::get_option( 'portfolio_slug', 'vp_general' ) ?? 'portfolio';
-        $archive_id  = get_option( '_vp_add_archive_page' );
-        if ( $archive_id ) {
-            wp_delete_post( $archive_id, true );
-            delete_option( '_vp_add_archive_page' );
+        $settings_section = 'vp_general';
+        $option_name      = 'portfolio_slug';
+        $custom_slug      = Visual_Portfolio_Settings::get_option( $option_name, $settings_section );
+        if ( ! empty( $custom_slug ) ) {
+            $archive_id = get_option( '_vp_add_archive_page' );
+            if ( $archive_id ) {
+                // Update archive slug on page.
+                wp_update_post(
+                    wp_slash(
+                        array(
+                            'ID'        => $archive_id,
+                            'post_name' => $custom_slug,
+                        )
+                    )
+                );
+                // Set transient for rewrite flush rules.
+                set_transient( 'vp_flush_rules', true );
+
+                // Set Portfolio Base permalink with new archive slug.
+                $permalinks = (array) get_option( 'portfolio_permalinks', array() );
+
+                $permalinks['portfolio_base'] = get_post_field( 'post_name', $archive_id );
+
+                update_option( 'portfolio_permalinks', $permalinks );
+
+                flush_rewrite_rules();
+            } else {
+                // Create archive page.
+                Visual_Portfolio_Archive_Mapping::create_archive_page( $custom_slug );
+            }
+
+            // Delete old option.
+            $options = get_option( $settings_section );
+            unset( $options[ $option_name ] );
+            update_option( $settings_section, $options );
         }
-        Visual_Portfolio_Archive_Mapping::create_archive_page( $custom_slug );
     }
 
     /**
