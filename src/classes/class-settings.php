@@ -186,6 +186,7 @@ class Visual_Portfolio_Settings {
                 array(
                     'name'              => 'portfolio_archive_page',
                     'label'             => esc_html__( 'Archive Page', '@@text_domain' ),
+                    'desc'              => esc_html__( 'Base page of your portfolio, where will be placed your works archive.', '@@text_domain' ),
                     'type'              => 'select',
                     'options'           => Visual_Portfolio_Archive_Mapping::get_pages_list(),
                     'sanitize_callback' => array( 'Visual_Portfolio_Archive_Mapping', 'save_archive_page_option' ),
