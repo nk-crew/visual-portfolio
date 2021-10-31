@@ -105,10 +105,8 @@ class Visual_Portfolio_Migrations {
                     )
                 );
 
-                // Set transient for rewrite flush rules.
-                set_transient( 'vp_flush_rules', true );
-
-                flush_rewrite_rules();
+                // Rewrite flush rules.
+                visual_portfolio()->defer_flush_rewrite_rules();
             } else {
                 // Create archive page.
                 Visual_Portfolio_Archive_Mapping::create_archive_page( $custom_slug );

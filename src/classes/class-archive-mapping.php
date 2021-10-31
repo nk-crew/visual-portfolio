@@ -37,8 +37,7 @@ class Visual_Portfolio_Archive_Mapping {
         add_action( 'pre_post_update', array( $this, 'pre_page_update' ), 10, 2 );
         add_action( 'deleted_post', array( $this, 'delete_archive_page' ), 10, 1 );
         add_action( 'trashed_post', array( $this, 'delete_archive_page' ), 10, 1 );
-        add_action( 'update_option_vp_general', array( $this, 'flush_rules_after_update' ), 10, 3 );
-        add_action( 'admin_init', array( $this, 'flush_rules_if_set_transient' ) );
+        add_action( 'update_option_vp_general', array( $this, 'flush_rewrite_rules_after_update' ), 10, 3 );
         add_action( 'vpf_extend_query_args', array( $this, 'extend_query_args' ), 10, 2 );
         add_filter( 'vpf_layout_element_options', array( $this, 'unset_pagination_archive_page' ), 10, 1 );
 
@@ -488,10 +487,9 @@ class Visual_Portfolio_Archive_Mapping {
 
             self::delete_post_type_mapped_meta();
 
+            visual_portfolio()->defer_flush_rewrite_rules();
+
             update_post_meta( (int) $post_id, '_vp_post_type_mapped', 'portfolio' );
-
-            set_transient( 'vp_flush_rules', true );
-
         }
 
         return $post_id;
@@ -511,9 +509,7 @@ class Visual_Portfolio_Archive_Mapping {
             (int) $this->archive_page === (int) $post_ID &&
             get_post_field( 'post_name', $post_ID ) !== $data['post_name']
         ) {
-            set_transient( 'vp_flush_rules', true );
-
-            $this->flush_rules();
+            visual_portfolio()->defer_flush_rewrite_rules();
         }
     }
 
@@ -588,7 +584,7 @@ class Visual_Portfolio_Archive_Mapping {
      * @param  string $option - Name of option.
      * @return void
      */
-    public function flush_rules_after_update( $old_value, $value, $option ) {
+    public function flush_rewrite_rules_after_update( $old_value, $value, $option ) {
         if (
             isset( $old_value['portfolio_archive_page'] ) &&
             isset( $value['portfolio_archive_page'] ) &&
@@ -598,7 +594,7 @@ class Visual_Portfolio_Archive_Mapping {
                 ! empty( $value['portfolio_archive_page'] ) &&
                 $old_value['portfolio_archive_page'] === $value['portfolio_archive_page']
             ) {
-                $this->flush_rules();
+                visual_portfolio()->defer_flush_rewrite_rules();
             }
 
             if (
@@ -608,31 +604,9 @@ class Visual_Portfolio_Archive_Mapping {
             ) {
                 self::delete_post_type_mapped_meta();
 
-                set_transient( 'vp_flush_rules', true );
-
-                $this->flush_rules();
+                visual_portfolio()->defer_flush_rewrite_rules();
             }
         }
-    }
-
-    /**
-     * Rewrite Flush Rules if set Transient.
-     *
-     * @return void
-     */
-    public function flush_rules_if_set_transient() {
-        if ( delete_transient( 'vp_flush_rules' ) ) {
-            $this->flush_rules();
-        }
-    }
-
-    /**
-     * Rewrite Flush Rules.
-     *
-     * @return void
-     */
-    public function flush_rules() {
-        flush_rewrite_rules();
     }
 
     /**
@@ -669,7 +643,7 @@ class Visual_Portfolio_Archive_Mapping {
 
                 Settings::update_option( 'portfolio_archive_page', 'vp_general', $post_id );
 
-                set_transient( 'vp_flush_rules', true );
+                visual_portfolio()->defer_flush_rewrite_rules();
 
                 self::save_archive_page_option( $post_id );
 

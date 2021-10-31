@@ -105,8 +105,44 @@ class Visual_Portfolio {
         // load textdomain.
         load_plugin_textdomain( '@@text_domain', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
+        // Hooks.
+        add_action( 'init', array( $this, 'run_deferred_rewrite_rules' ), 20 );
+
         // include helper files.
         $this->include_dependencies();
+    }
+
+    /**
+     * Rewrite Flush Rules if set Transient right after we registered the Portfolio post type.
+     * ! This is important part, since flush will work only once the post type registered.
+     *
+     * TODO: re-check this code, as it looks strange.
+     *
+     * @return void
+     */
+    public function run_deferred_rewrite_rules() {
+        if ( get_transient( 'vp_flush_rewrite_rules' ) ) {
+            $this->flush_rewrite_rules();
+            delete_transient( 'vp_flush_rewrite_rules' );
+        }
+    }
+
+    /**
+     * Deferred Rewrite Flush Rules.
+     *
+     * @return void
+     */
+    public function defer_flush_rewrite_rules() {
+        set_transient( 'vp_flush_rewrite_rules', true );
+    }
+
+    /**
+     * Rewrite Flush Rules.
+     *
+     * @return void
+     */
+    public function flush_rewrite_rules() {
+        flush_rewrite_rules();
     }
 
     /**
@@ -116,7 +152,7 @@ class Visual_Portfolio {
         // Welcome Page Flag.
         set_transient( '_visual_portfolio_welcome_screen_activation_redirect', true, 30 );
 
-        flush_rewrite_rules();
+        $this->defer_flush_rewrite_rules();
     }
 
     /**
@@ -127,7 +163,7 @@ class Visual_Portfolio {
         // As a workaround user may deactivate and activate the plugin to resolve this problem.
         update_option( 'visual_portfolio_updated_caps', '' );
 
-        flush_rewrite_rules();
+        $this->flush_rewrite_rules();
     }
 
     /**
