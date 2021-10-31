@@ -7,7 +7,41 @@ const {
 
 export default {
     from: [
-        // Transform from default Gallery block.
+        // Transform from default Gallery block (since WordPress 5.9).
+        {
+            type: 'block',
+            blocks: [ 'core/gallery' ],
+            isMatch( attributes, blockData ) {
+                return blockData.innerBlocks && blockData.innerBlocks.length;
+            },
+            transform( attributes, innerBlocks ) {
+                const {
+                    className,
+                } = attributes;
+
+                const images = innerBlocks.map( ( img ) => ( {
+                    id: parseInt( img.attributes.id, 10 ),
+                    imgUrl: img.attributes.url,
+                    imgThumbnailUrl: img.attributes.url,
+                    title: img.attributes.caption,
+                    url: ( 'custom' === img.attributes.linkDestination || 'attachment' === img.attributes.linkDestination ) && img.attributes.href ? img.attributes.href : '',
+                } ) );
+
+                return createBlock( 'visual-portfolio/block', {
+                    setup_wizard: 'false',
+                    content_source: 'images',
+                    items_count: -1,
+                    layout: 'masonry',
+                    items_style_fly__align: 'bottom-center',
+                    masonry_columns: parseInt( attributes.columns, 10 ) || 3,
+                    items_click_action: 'url',
+                    images,
+                    className,
+                } );
+            },
+        },
+
+        // Transform from default Gallery block (before WordPress 5.9).
         {
             type: 'block',
             blocks: [ 'core/gallery' ],
@@ -27,6 +61,7 @@ export default {
                 } ) );
 
                 return createBlock( 'visual-portfolio/block', {
+                    setup_wizard: 'false',
                     content_source: 'images',
                     items_count: -1,
                     layout: 'masonry',

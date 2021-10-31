@@ -68,7 +68,7 @@ export default class BlockEdit extends Component {
 
         // Set some starter attributes for different content sources.
         // And hide the setup wizard.
-        if ( setupWizard && contentSource ) {
+        if ( 'true' === setupWizard && contentSource ) {
             switch ( contentSource ) {
             case 'images':
                 if ( images && images.length ) {
