@@ -48,9 +48,6 @@ class Visual_Portfolio_Archive_Mapping {
         add_action( 'admin_init', array( $this, 'permalink_settings_init' ) );
         add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
         add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
-
-        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
-        add_action( 'wp_ajax_vp_get_pages_list', array( $this, 'get_posts_ajax_callback' ) );
     }
 
     /**
@@ -70,18 +67,6 @@ class Visual_Portfolio_Archive_Mapping {
         }
 
         self::create_archive_page();
-    }
-
-    /**
-     * Enqueue archive select2 ajax script.
-     *
-     * @param  string $page - Current admin page.
-     * @return void
-     */
-    public function admin_enqueue_scripts( $page ) {
-        if ( 'portfolio_page_@@text_domain-settings' === $page ) {
-            wp_enqueue_script( '@@text_domain-archive-page-selector', visual_portfolio()->plugin_url . 'assets/admin/js/archive-page-selector.min.js', array( 'jquery', 'select2' ), '@@plugin_version', true );
-        }
     }
 
     /**
@@ -511,54 +496,6 @@ class Visual_Portfolio_Archive_Mapping {
         ) {
             visual_portfolio()->defer_flush_rewrite_rules();
         }
-    }
-
-    /**
-     * Get Pages List.
-     *
-     * @return array
-     */
-    public static function get_pages_list() {
-        $options      = get_option( 'vp_general' );
-        $archive_page = $options['portfolio_archive_page'] ?? false;
-        $pages_list   = array(
-            '' => esc_html__( 'Search Page', '@@text_domain' ),
-        );
-        if ( $archive_page ) {
-            $archive_title               = get_post_field( 'post_title', $archive_page );
-            $pages_list[ $archive_page ] = $archive_title;
-        }
-        return $pages_list;
-    }
-
-    /**
-     * Get Posts for Select2 archive page field by Ajax.
-     *
-     * @return void
-     */
-    public function get_posts_ajax_callback() {
-        $return         = array();
-        $search_results = new WP_Query(
-            array(
-                // phpcs:ignore
-                's'                   => $_GET['q'],
-                'post_status'         => 'publish',
-                'ignore_sticky_posts' => 1,
-                'posts_per_page'      => 50,
-                'post_type'           => 'page',
-            )
-        );
-        if ( $search_results->have_posts() ) {
-            while ( $search_results->have_posts() ) {
-                $search_results->the_post();
-                $title    = ( mb_strlen( $search_results->post->post_title ) > 50 ) ? mb_substr( $search_results->post->post_title, 0, 49 ) . '...' : $search_results->post->post_title;
-                $return[] = array( $search_results->post->ID, $title );
-            }
-        }
-
-        echo wp_json_encode( $return );
-
-        die;
     }
 
     /**
