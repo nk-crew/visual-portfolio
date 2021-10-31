@@ -163,7 +163,6 @@ class Visual_Portfolio_Settings_API {
                     'is_pro'            => isset( $option['is_pro'] ) ? $option['is_pro'] : false,
                     'condition'         => isset( $option['condition'] ) ? $option['condition'] : null,
                     'conditionize'      => isset( $option['condition'] ) ? $this->convert_arguments_to_conditionize_string( $option['condition'] ) : '',
-                    'select2'           => isset( $option['select2'] ) ? $option['select2'] : false,
                 );
 
                 add_settings_field( "{$section}[{$name}]", $label, $callback, $section, $section, $args );
@@ -311,7 +310,6 @@ class Visual_Portfolio_Settings_API {
 
         $value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
         $classes  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
-        $classes .= isset( $args['select2'] ) && $args['select2'] ? ' vp-select2-field' : '';
         $html  = sprintf( '<select class="%1$s" name="%2$s[%3$s]" id="%2$s[%3$s]">', $classes, $args['section'], $args['id'] );
 
         foreach ( $args['options'] as $key => $label ) {
@@ -817,9 +815,6 @@ class Visual_Portfolio_Settings_API {
                     if ( $( inputs[ 0 ] ).val() !== $( inputs[ 1 ] ).val() ) {
                         inputs.val( $( this ).val() );
                     }
-                });
-                $( document ).ready( function() {
-                    $( '.vp-select2-field' ).select2();
                 });
             });
         </script>
