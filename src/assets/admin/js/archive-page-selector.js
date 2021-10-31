@@ -19,6 +19,7 @@ $( 'select[name="vp_general[portfolio_archive_page]"]' ).select2( {
         processResults( ajaxData ) {
             const options = [];
             const data = this.$element.select2( 'data' );
+            let alreadyAddedID = false;
 
             // add selected value.
             if ( data && data[ 0 ] && data[ 0 ].selected ) {
@@ -26,16 +27,19 @@ $( 'select[name="vp_general[portfolio_archive_page]"]' ).select2( {
                     id: data[ 0 ].id,
                     text: data[ 0 ].text,
                 } );
+                alreadyAddedID = data[ 0 ].id;
             }
 
             // parse new options.
             if ( ajaxData ) {
                 // ajaxData is the array of arrays, and each of them contains ID and the Label of the option
-                $.each( ajaxData, ( index, text ) => { // do not forget that "index" is just auto incremented value
-                    options.push( {
-                        id: text[ 0 ],
-                        text: text[ 1 ],
-                    } );
+                $.each( ajaxData, ( index, itemData ) => {
+                    if ( ! alreadyAddedID || alreadyAddedID !== itemData[ 0 ] ) {
+                        options.push( {
+                            id: itemData[ 0 ],
+                            text: itemData[ 1 ],
+                        } );
+                    }
                 } );
             }
 
