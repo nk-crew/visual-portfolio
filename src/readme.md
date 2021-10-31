@@ -66,6 +66,8 @@ The gallery block with live preview includes a lot of design settings that are p
 
 Custom post type `portfolio` will ensure all your portfolios to keep in a single post type. In this way, you can distinguish your portfolios from other post types. Taxonomies are used to categorize your portfolio types, it will help you to group and sort your portfolios. Moreover, you can use these portfolios as a source for your showcase gallery using Visual Portfolio block.
 
+Customize and rename Portfolio archive templates using visual gallery and page builder <https://visualportfolio.co/documentation/portfolio-archive/>
+
 ### 💎 Posts Query Builder ###
 
 Fine-tune the source of your galleries. Display posts, portfolios, and any other post types, filter by taxonomies, author, and date ranges, include or exclude specific posts, and much more options.
@@ -309,6 +311,15 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/).
 
 ## Changelog ##
+
+= 2.15.0 =
+
+* added support for Portfolio post type archives. Read more <https://visualportfolio.co/documentation/portfolio-archive/>
+  * added customizable archive by using custom Page with Portfolio block inside
+  * added support for Category and Tags archives
+  * added permalink settings to `Settings > Permalinks`. Read more <https://visualportfolio.co/documentation/settings/permalinks/>
+* added compatibility for standard galleries in WordPress 5.9
+* fixed Saved Layouts editor title click in WordPress 5.9
 
 = 2.14.1 =
 

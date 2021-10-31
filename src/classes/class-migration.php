@@ -65,7 +65,7 @@ class Visual_Portfolio_Migrations {
     public function get_migrations() {
         return array(
             array(
-                'version' => '2.14.1',
+                'version' => '2.15.0',
                 'cb'      => array( $this, 'v_2_15_0' ),
             ),
             array(
