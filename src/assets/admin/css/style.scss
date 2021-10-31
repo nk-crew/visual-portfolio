@@ -583,6 +583,7 @@ $grid_sm: 600px !default;
             line-height: 18px;
             color: #fff;
             text-align: center;
+            text-decoration: none;
             cursor: pointer;
             background-color: #4c4c4c;
             border-radius: 10px;
@@ -592,10 +593,11 @@ $grid_sm: 600px !default;
                 display: none;
                 bottom: 100%;
                 width: 130px;
-                padding: 5px;
+                padding: 10px;
                 margin-bottom: 10px;
-                background-color: rgba(0, 0, 0, .8);
+                background-color: #000;
                 border-radius: 4px;
+                box-shadow: 0 1px 7px rgba(#000, .3);
                 z-index: 9990;
             }
 

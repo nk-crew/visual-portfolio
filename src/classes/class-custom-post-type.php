@@ -773,7 +773,7 @@ class Visual_Portfolio_Custom_Post_Type {
                                 </h3>
                                 <div>
                                     <p><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', '@@text_domain' ); ?></p>
-                                    <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&amp;utm_medium=link&amp;utm_campaign=plugin_settings&amp;utm_content=2.12.1">
+                                    <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=freeplugin&amp;utm_medium=link&amp;utm_campaign=plugin_settings&amp;utm_content=@@plugin_version">
                                     <?php echo esc_html__( 'Read More', '@@text_domain' ); ?>
                                     </a>
                                 </div>
