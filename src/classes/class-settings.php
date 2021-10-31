@@ -720,17 +720,22 @@ class Visual_Portfolio_Settings {
      * @return void
      */
     public static function get_posts_ajax_callback() {
-        $return         = array();
-        $search_results = new WP_Query(
-            array(
-                // phpcs:ignore
-                's'                   => $_GET['q'],
-                'post_status'         => 'publish',
-                'ignore_sticky_posts' => 1,
-                'posts_per_page'      => 50,
-                'post_type'           => 'page',
-            )
+        $return     = array();
+        $query_opts = array(
+            'post_status'         => 'publish',
+            'ignore_sticky_posts' => 1,
+            'posts_per_page'      => 50,
+            'post_type'           => 'page',
         );
+
+        // phpcs:disable
+        if ( isset( $_GET['q'] ) && $_GET['q'] ) {
+            $query_opts['s'] = $_GET['q'];
+        }
+        // phpcs:enable
+
+        $search_results = new WP_Query( $query_opts );
+
         if ( $search_results->have_posts() ) {
             while ( $search_results->have_posts() ) {
                 $search_results->the_post();

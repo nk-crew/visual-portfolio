@@ -12,22 +12,37 @@ $( 'select[name="vp_general[portfolio_archive_page]"]' ).select2( {
         data( params ) {
             return {
                 q: params.term, // search query
+                selected: this[ 0 ].value,
                 action: 'vp_get_pages_list', // AJAX action for admin-ajax.php
             };
         },
-        processResults( data ) {
+        processResults( ajaxData ) {
             const options = [];
-            if ( data ) {
-                // data is the array of arrays, and each of them contains ID and the Label of the option
-                $.each( data, ( index, text ) => { // do not forget that "index" is just auto incremented value
-                    options.push( { id: text[ 0 ], text: text[ 1 ] } );
+            const data = this.$element.select2( 'data' );
+
+            // add selected value.
+            if ( data && data[ 0 ] && data[ 0 ].selected ) {
+                options.push( {
+                    id: data[ 0 ].id,
+                    text: data[ 0 ].text,
                 } );
             }
+
+            // parse new options.
+            if ( ajaxData ) {
+                // ajaxData is the array of arrays, and each of them contains ID and the Label of the option
+                $.each( ajaxData, ( index, text ) => { // do not forget that "index" is just auto incremented value
+                    options.push( {
+                        id: text[ 0 ],
+                        text: text[ 1 ],
+                    } );
+                } );
+            }
+
             return {
                 results: options,
             };
         },
         cache: true,
     },
-    minimumInputLength: 1, // the minimum of symbols to input before perform a search
 } );

@@ -707,6 +707,17 @@ $grid_sm: 600px !default;
         border: 1px solid #8f969f;
         border-radius: 4px;
     }
+
+    /**
+     * Select2 Field
+     */
+    .select2-container {
+        .select2-selection--single {
+            width: 350px;
+            height: 30px;
+            border: 1px solid #8c8f94;
+        }
+    }
 }
 
 /**
