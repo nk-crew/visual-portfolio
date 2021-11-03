@@ -312,6 +312,11 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.15.1 =
+
+* fixed category filter working in galleries placed on the Homepage
+* fixed massive updating post meta, when running `get_posts()` when using WPBakery shortcode (and in other similar places)
+
 = 2.15.0 =
 
 * added support for Portfolio post type archives. Read more <https://visualportfolio.co/documentation/portfolio-archive/>
