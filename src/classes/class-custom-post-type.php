@@ -729,7 +729,7 @@ class Visual_Portfolio_Custom_Post_Type {
             esc_html__( 'Documentation', '@@text_domain' ),
             esc_html__( 'Documentation', '@@text_domain' ),
             'manage_options',
-            'https://visualportfolio.co/documentation/getting-started/'
+            'https://visualportfolio.co/documentation/getting-started/?utm_source=plugin_menu&utm_medium=link&utm_campaign=docs&utm_content=@@plugin_version'
         );
     }
 
