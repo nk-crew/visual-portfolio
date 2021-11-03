@@ -48,9 +48,11 @@ class Visual_Portfolio_3rd_VC {
             // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
             $vp_query = get_posts(
                 array(
-                    'post_type'      => 'vp_lists',
-                    'posts_per_page' => -1,
-                    'paged'          => -1,
+                    'post_type'              => 'vp_lists',
+                    'posts_per_page'         => -1,
+                    'paged'                  => -1,
+                    'update_post_meta_cache' => false,
+                    'update_post_term_cache' => false,
                 )
             );
 

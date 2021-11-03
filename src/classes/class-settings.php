@@ -722,10 +722,12 @@ class Visual_Portfolio_Settings {
     public static function get_posts_ajax_callback() {
         $return     = array();
         $query_opts = array(
-            'post_status'         => 'publish',
-            'ignore_sticky_posts' => 1,
-            'posts_per_page'      => 50,
-            'post_type'           => 'page',
+            'post_status'            => 'publish',
+            'ignore_sticky_posts'    => 1,
+            'posts_per_page'         => 50,
+            'post_type'              => 'page',
+            'update_post_meta_cache' => false,
+            'update_post_term_cache' => false,
         );
 
         // phpcs:disable

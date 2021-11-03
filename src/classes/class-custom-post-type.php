@@ -637,10 +637,12 @@ class Visual_Portfolio_Custom_Post_Type {
             // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
             $vp_query = get_posts(
                 array(
-                    'post_type'      => 'vp_lists',
-                    'posts_per_page' => -1,
-                    'paged'          => -1,
-                    'post__in'       => $layouts,
+                    'post_type'              => 'vp_lists',
+                    'posts_per_page'         => -1,
+                    'paged'                  => -1,
+                    'post__in'               => $layouts,
+                    'update_post_meta_cache' => false,
+                    'update_post_term_cache' => false,
                 )
             );
             foreach ( $vp_query as $post ) {

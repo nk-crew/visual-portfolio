@@ -87,9 +87,11 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         $layouts  = array();
         $vp_query = get_posts(
             array(
-                'post_type'      => 'vp_lists',
-                'posts_per_page' => -1,
-                'paged'          => -1,
+                'post_type'              => 'vp_lists',
+                'posts_per_page'         => -1,
+                'paged'                  => -1,
+                'update_post_meta_cache' => false,
+                'update_post_term_cache' => false,
             )
         );
         foreach ( $vp_query as $post ) {

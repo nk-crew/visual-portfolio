@@ -1233,10 +1233,12 @@ class Visual_Portfolio_Get {
             // Find all used attachments.
             $all_attachments = get_posts(
                 array(
-                    'post_type'      => 'attachment',
-                    'posts_per_page' => -1,
-                    'paged'          => -1,
-                    'post__in'       => $images_ids,
+                    'post_type'              => 'attachment',
+                    'posts_per_page'         => -1,
+                    'paged'                  => -1,
+                    'post__in'               => $images_ids,
+                    'update_post_meta_cache' => false,
+                    'update_post_term_cache' => false,
                 )
             );
 
