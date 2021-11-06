@@ -198,7 +198,7 @@ class Visual_Portfolio_Admin {
         return array_merge(
             $links,
             array(
-                '<a target="_blank" href="admin.php?page=visual_portfolio_go_pro">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>',
+                '<a target="_blank" href="admin.php?page=visual_portfolio_go_pro&utm_medium=plugins_list">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>',
             )
         );
     }
@@ -215,8 +215,16 @@ class Visual_Portfolio_Admin {
 
         // phpcs:ignore
         if ( 'visual_portfolio_go_pro' === $_GET['page'] ) {
+            $medium = 'admin_menu';
+
             // phpcs:ignore
-            wp_redirect( 'https://visualportfolio.co/pro/?utm_source=freeplugin&utm_medium=link&utm_campaign=admin_page&utm_content=@@plugin_version' );
+            if ( isset( $_GET['utm_medium'] ) ) {
+                // phpcs:ignore
+                $medium = $_GET['utm_medium'];
+            }
+
+            // phpcs:ignore
+            wp_redirect( 'https://visualportfolio.co/pro/?utm_source=plugin&utm_medium=' . esc_attr( $medium ) . '&utm_campaign=go_pro&utm_content=@@plugin_version' );
             exit();
         }
     }
