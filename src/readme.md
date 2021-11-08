@@ -312,6 +312,11 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.15.2 =
+
+* fixed pagination working in galleries placed on the Homepage
+* fixed possible bug with translated strings in JS files
+
 = 2.15.1 =
 
 * fixed category filter working in galleries placed on the Homepage
