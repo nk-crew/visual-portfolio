@@ -295,13 +295,13 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public function init_rewrite_rules() {
         $slug = get_post_field( 'post_name', $this->archive_page );
-        add_rewrite_tag( '%vp_page%', '([^&]+)' );
+        add_rewrite_tag( '%vp_page_query%', '([^&]+)' );
         add_rewrite_tag( '%vp_page_archive%', '([^&]+)' );
         add_rewrite_tag( '%vp_category%', '([^&]+)' );
 
         add_rewrite_rule(
             '^' . $slug . '/page/?([0-9]{1,})/?',
-            'index.php?post_type=portfolio&vp_page_archive=1&vp_page=$matches[1]',
+            'index.php?post_type=portfolio&vp_page_archive=1&vp_page_query=$matches[1]',
             'top'
         );
         add_rewrite_rule(
@@ -401,6 +401,20 @@ class Visual_Portfolio_Archive_Mapping {
             ) {
                 $query->set( 'vp_filter', '' );
             }
+
+            if (
+                isset( $query->query['vp_page_query'] ) &&
+                ! empty( $query->query['vp_page_query'] ) &&
+                (
+                    // phpcs:ignore
+                    isset( $_REQUEST['vpf_ajax_call'] ) &&
+                    // phpcs:ignore
+                    $_REQUEST['vpf_ajax_call']
+                )
+            ) {
+                unset( $query->query['vp_page_query'] );
+                unset( $query->query_vars['vp_page_query'] );
+            }
         }
     }
 
@@ -424,9 +438,10 @@ class Visual_Portfolio_Archive_Mapping {
                 if (
                     isset( $args['vp_page_archive'] ) &&
                     $args['vp_page_archive'] &&
-                    isset( $args['vp_page'] )
+                    isset( $args['vp_page_query'] ) &&
+                    ! empty( $args['vp_page_query'] )
                 ) {
-                    $args['paged'] = $args['vp_page'];
+                    $args['paged'] = $args['vp_page_query'];
                 }
 
                 if ( isset( $args['page_id'] ) ) {
@@ -455,7 +470,8 @@ class Visual_Portfolio_Archive_Mapping {
                         $key = array_search( 'pagination', $container['elements'], true );
                         if ( false !== $key && isset( $options['pagination'] ) ) {
                             if ( 'paged' === $options['pagination'] || is_tax() ) {
-                                $options['start_page'] = $wp_query->query_vars['vp_page'] ?? 1;
+                                // phpcs:ignore
+                                $options['start_page'] = $wp_query->query_vars['vp_page_query'] ?? $_REQUEST['vp_page'] ?? 1;
                             } else {
                                 unset( $options['layout_elements'][ $position ]['elements'][ $key ] );
                             }
