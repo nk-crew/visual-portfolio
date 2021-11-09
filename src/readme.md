@@ -312,6 +312,10 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.15.3 =
+
+* fixed standard Gallery block transformation errors
+
 = 2.15.2 =
 
 * fixed pagination working in galleries placed on the Homepage
