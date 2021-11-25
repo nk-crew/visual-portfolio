@@ -170,6 +170,8 @@ class VP {
 
         self.destroyed = false;
 
+        self.$item.addClass( 'vp-portfolio__ready' );
+
         // init options
         self.initOptions();
 
@@ -183,8 +185,6 @@ class VP {
         self.initCustomColors();
 
         self.emitEvent( 'init' );
-
-        self.$item.addClass( 'vp-portfolio__ready' );
 
         if ( self.id ) {
             $( `.vp-single-filter.vp-id-${ self.id }` ).addClass( 'vp-single-filter__ready' );
