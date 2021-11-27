@@ -2999,6 +2999,7 @@ class Visual_Portfolio_Admin {
                 'mode'             => 'css',
                 'allow_modal'      => true,
                 'classes_tree'     => true,
+                'encode'           => true,
                 'code_placeholder' => "selector {\n\n}",
                 'default'          => '',
                 'description'      => '<p></p>

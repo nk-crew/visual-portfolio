@@ -25,6 +25,7 @@ import ToggleModal from '../toggle-modal';
 import ProNote from '../pro-note';
 import controlConditionCheck from '../../utils/control-condition-check';
 import controlGetValue from '../../utils/control-get-value';
+import { maybeEncode, maybeDecode } from '../../utils/encode-decode';
 
 /**
  * WordPress dependencies
@@ -315,12 +316,12 @@ ControlsRender.Control = function( props ) {
     case 'code_editor':
         renderControl = (
             <CodeEditor
-                value={ controlVal }
+                value={ props.encode ? maybeDecode( controlVal ) : controlVal }
                 mode={ props.mode }
                 maxLines={ props.max_lines }
                 minLines={ props.min_lines }
                 codePlaceholder={ props.code_placeholder }
-                onChange={ ( val ) => onChange( val ) }
+                onChange={ ( val ) => onChange( props.encode ? maybeEncode( val ) : val ) }
             />
         );
 

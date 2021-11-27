@@ -84,6 +84,7 @@ class Visual_Portfolio_Controls {
         'min_lines'        => 5,
         'allow_modal'      => true,
         'classes_tree'     => false,
+        'encode'           => false,
         'code_placeholder' => '',
         // elements selector.
         'locations'        => array(),
@@ -338,8 +339,11 @@ class Visual_Portfolio_Controls {
             $result = true;
         }
 
-        // Fix for old plugin versions (< 2.0).
         if ( 'custom_css' === $name && $result ) {
+            // Decode.
+            $result = visual_portfolio_decode( $result );
+
+            // Fix for old plugin versions (< 2.0).
             $result = str_replace( '&gt;', '>', $result );
         }
 

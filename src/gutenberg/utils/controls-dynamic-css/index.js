@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import conditionCheck from '../control-condition-check';
+import { maybeDecode } from '../encode-decode';
 
 const {
     controls: registeredControls,
@@ -116,6 +117,9 @@ export default function getDynamicCSS( options ) {
     // Custom CSS.
     if ( 'undefined' !== typeof options.custom_css && options.custom_css ) {
         let customCss = options.custom_css;
+
+        // Decode.
+        customCss = maybeDecode( customCss );
 
         // replace 'selector' to actual css selector.
         customCss = customCss.replace( /selector/g, selector );

@@ -63,8 +63,11 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
 
         // Custom CSS.
         if ( isset( $options['custom_css'] ) && $options['custom_css'] ) {
+            // decode.
+            $custom_css = visual_portfolio_decode( $options['custom_css'] );
+
             // replace 'selector' to actual css selector.
-            $custom_css = str_replace( 'selector', $selector, $options['custom_css'] );
+            $custom_css = str_replace( 'selector', $selector, $custom_css );
 
             // a little security fix.
             $custom_css = str_replace( '</', '&lt;/', $custom_css );

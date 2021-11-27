@@ -176,6 +176,7 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'gutenberg/utils/control-condition-check/index.php';
         require_once $this->plugin_path . 'gutenberg/utils/control-get-value/index.php';
         require_once $this->plugin_path . 'gutenberg/utils/controls-dynamic-css/index.php';
+        require_once $this->plugin_path . 'gutenberg/utils/encode-decode/index.php';
         require_once $this->plugin_path . 'classes/class-templates.php';
         require_once $this->plugin_path . 'classes/class-parse-blocks.php';
         require_once $this->plugin_path . 'classes/class-assets.php';
