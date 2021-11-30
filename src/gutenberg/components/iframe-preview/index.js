@@ -286,6 +286,7 @@ class IframePreview extends Component {
             type: 'text',
             name,
             value: val,
+            readOnly: true,
         };
 
         if ( 'number' === typeof val ) {
@@ -345,13 +346,13 @@ class IframePreview extends Component {
                         style={ { display: 'none' } }
                         ref={ this.formRef }
                     >
-                        <input type="hidden" name="vp_preview_frame" value="true" />
-                        <input type="hidden" name="vp_preview_type" value="gutenberg" />
-                        <input type="hidden" name="vp_preview_post_type" value={ postType } />
-                        <input type="hidden" name="vp_preview_post_id" value={ postId } />
+                        <input type="hidden" name="vp_preview_frame" value="true" readOnly />
+                        <input type="hidden" name="vp_preview_type" value="gutenberg" readOnly />
+                        <input type="hidden" name="vp_preview_post_type" value={ postType } readOnly />
+                        <input type="hidden" name="vp_preview_post_id" value={ postId } readOnly />
 
                         { 'saved' === contentSource ? (
-                            <input type="text" name="vp_id" value={ id } />
+                            <input type="text" name="vp_id" value={ id } readOnly />
                         ) : (
                             <Fragment>
                                 { Object.keys( attributes ).map( ( k ) => {
