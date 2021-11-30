@@ -283,7 +283,6 @@ class IframePreview extends Component {
      */
     printInput( name, val ) {
         const params = {
-            key: name,
             type: 'text',
             name,
             value: val,
@@ -297,7 +296,11 @@ class IframePreview extends Component {
         } else if ( 'object' === typeof val && null !== val ) {
             return (
                 <Fragment>
-                    { Object.keys( val ).map( ( i ) => this.printInput( `${ name }[${ i }]`, val[ i ] ) ) }
+                    { Object.keys( val ).map( ( i ) => (
+                        <Fragment key={ `${ name }[${ i }]` }>
+                            { this.printInput( `${ name }[${ i }]`, val[ i ] ) }
+                        </Fragment>
+                    ) ) }
                 </Fragment>
             );
         }
@@ -351,11 +354,14 @@ class IframePreview extends Component {
                             <input type="text" name="vp_id" value={ id } />
                         ) : (
                             <Fragment>
-                                <input type="hidden" name="vp_content_source" value={ contentSource } />
                                 { Object.keys( attributes ).map( ( k ) => {
                                     const val = attributes[ k ];
 
-                                    return this.printInput( `vp_${ k }`, val );
+                                    return (
+                                        <Fragment key={ `vp_${ k }` }>
+                                            { this.printInput( `vp_${ k }`, val ) }
+                                        </Fragment>
+                                    );
                                 } ) }
                             </Fragment>
                         ) }
