@@ -312,6 +312,13 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.15.4 =
+
+* added encoding for block custom CSS to prevent conflicts with Gutenberg attributes sanitization
+* fixed blocks assets rendering inside custom content locations (for example, widgets area)
+* fixed some react warnings
+* minor changes
+
 = 2.15.3 =
 
 * fixed standard Gallery block transformation errors
