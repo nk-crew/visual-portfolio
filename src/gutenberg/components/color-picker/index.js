@@ -48,7 +48,7 @@ export default class ColorPicker extends Component {
 
         return (
             <Dropdown
-                className={ classnames( 'components-color-palette__item-wrapper components-circular-option-picker__option-wrapper', value ? '' : 'components-color-palette__custom-color' ) }
+                className={ classnames( 'components-color-palette__item-wrapper components-circular-option-picker__option-wrapper' ) }
                 contentClassName="components-color-palette__picker"
                 renderToggle={ ( { isOpen, onToggle } ) => (
                     <Tooltip text={ hint }>
