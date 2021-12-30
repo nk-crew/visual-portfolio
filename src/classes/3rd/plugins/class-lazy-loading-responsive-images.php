@@ -23,6 +23,7 @@ class Visual_Portfolio_3rd_Lazy_Loader {
 
         // Disable our lazyload if Lazy Loader plugin installed.
         add_filter( 'vpf_images_lazyload', '__return_false' );
+        add_filter( 'vpf_enqueue_plugin_lazysizes', '__return_false' );
     }
 }
 

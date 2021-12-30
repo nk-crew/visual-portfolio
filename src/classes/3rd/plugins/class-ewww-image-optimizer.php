@@ -23,6 +23,7 @@ class Visual_Portfolio_3rd_Ewww_Image_Optimizer {
 
         // Disable our lazyload if EWWW lazyload used.
         add_filter( 'vpf_images_lazyload', '__return_false' );
+        add_filter( 'vpf_enqueue_plugin_lazysizes', '__return_false' );
     }
 }
 
