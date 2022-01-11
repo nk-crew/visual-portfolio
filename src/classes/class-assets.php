@@ -270,8 +270,10 @@ class Visual_Portfolio_Assets {
             $dynamic_styles = wp_kses( $dynamic_styles, array( '\'', '\"' ) );
             $dynamic_styles = str_replace( '&gt;', '>', $dynamic_styles );
 
+            $dynamic_styles_inline_style = apply_filters( 'vpf_enqueue_dynamic_styles_inline_style', ! self::$head_css_included, $dynamic_styles, $controls_css_handle );
+
             // Enqueue custom CSS.
-            if ( ! self::$head_css_included ) {
+            if ( $dynamic_styles_inline_style ) {
                 wp_register_style( $controls_css_handle, false, array(), '@@plugin_version' );
                 wp_enqueue_style( $controls_css_handle );
                 wp_add_inline_style( $controls_css_handle, $dynamic_styles ? $dynamic_styles : ' ' );

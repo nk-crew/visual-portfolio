@@ -214,6 +214,7 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/3rd/plugins/class-wpml.php';
         require_once $this->plugin_path . 'classes/3rd/themes/class-avada.php';
         require_once $this->plugin_path . 'classes/3rd/themes/class-enfold.php';
+        require_once $this->plugin_path . 'classes/3rd/themes/class-thrive-architect.php';
 
         // Migration run after all features.
         require_once $this->plugin_path . 'classes/class-migration.php';
