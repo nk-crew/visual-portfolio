@@ -312,6 +312,14 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.15.5 =
+
+* fixed conflict with SG Optimizer lazy loading
+* fixed conflict with Architect page builder (added hacky fix for our inline styles)
+* fixed conflict with Avada lazy loading
+* fixed color picker styles in the latest Gutenberg
+* fixed slow loading of Gallery control in editor UI (now uses lazy loading)
+
 = 2.15.4 =
 
 * added encoding for block custom CSS to prevent conflicts with Gutenberg attributes sanitization
