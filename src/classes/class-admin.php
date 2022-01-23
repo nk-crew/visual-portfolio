@@ -1205,7 +1205,7 @@ class Visual_Portfolio_Admin {
                 'content-protection'           => array(
                     'title'     => esc_html__( 'Protection', '@@text_domain' ),
                     'is_opened' => false,
-                    'icon'      => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2222 9H3.77778C2.79594 9 2 9.81403 2 10.8182V17.1818C2 18.186 2.79594 19 3.77778 19H16.2222C17.2041 19 18 18.186 18 17.1818V10.8182C18 9.81403 17.2041 9 16.2222 9Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent"/><path d="M6 9V5.88889C6 4.85749 6.42143 3.86834 7.17157 3.13903C7.92172 2.40972 8.93913 2 10 2C11.0609 2 12.0783 2.40972 12.8284 3.13903C13.5786 3.86834 14 4.85749 14 5.88889V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent"/></svg>',
+                    'icon'      => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.1667 18.6667C10.1667 18.6667 16.8333 15.3333 16.8333 10.3333V4.5L10.1667 2L3.5 4.5V10.3333C3.5 15.3333 10.1667 18.6667 10.1667 18.6667Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>',
                 ),
                 'custom_css'                   => array(
                     'title'     => esc_html__( 'Custom CSS', '@@text_domain' ),
