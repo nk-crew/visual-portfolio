@@ -15,7 +15,7 @@ use Nette\DI\ServiceDefinition;
  */
 class SlugifyExtension extends CompilerExtension
 {
-    public function loadConfiguration()
+    public function loadConfiguration(): void
     {
         $builder = $this->getContainerBuilder();
 
@@ -28,12 +28,12 @@ class SlugifyExtension extends CompilerExtension
             ->setAutowired(false);
     }
 
-    public function beforeCompile()
+    public function beforeCompile(): void
     {
         $builder = $this->getContainerBuilder();
 
         $self = $this;
-        $registerToLatte = function(ServiceDefinition $def) use ($self) {
+        $registerToLatte = function (ServiceDefinition $def) use ($self) {
             $def->addSetup('addFilter', ['slugify', [$self->prefix('@helper'), 'slugify']]);
         };
 

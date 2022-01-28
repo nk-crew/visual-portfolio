@@ -7,6 +7,9 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
+ * CHANGED by nK:
+ *   - added check for `mb_strtolower` existence and use `strtolower` if mb is not available
  */
 
 namespace Cocur\Slugify;
@@ -26,7 +29,7 @@ use Cocur\Slugify\RuleProvider\RuleProviderInterface;
  */
 class Slugify implements SlugifyInterface
 {
-    const LOWERCASE_NUMBERS_DASHES = '/([^A-Za-z0-9]|-)+/';
+    const LOWERCASE_NUMBERS_DASHES = '/[^A-Za-z0-9]+/';
 
     /**
      * @var array<string,string>
@@ -45,12 +48,15 @@ class Slugify implements SlugifyInterface
         'regexp'    => self::LOWERCASE_NUMBERS_DASHES,
         'separator' => '-',
         'lowercase' => true,
+        'lowercase_after_regexp' => false,
         'trim' => true,
+        'strip_tags' => false,
         'rulesets'  => [
             'default',
             // Languages are preferred if they appear later, list is ordered by number of
             // websites in that language
             // https://en.wikipedia.org/wiki/Languages_used_on_the_Internet#Content_languages_for_websites
+            'armenian',
             'azerbaijani',
             'burmese',
             'hindi',
@@ -63,6 +69,7 @@ class Slugify implements SlugifyInterface
             'greek',
             'czech',
             'arabic',
+            'slovak',
             'turkish',
             'polish',
             'german',
@@ -111,16 +118,26 @@ class Slugify implements SlugifyInterface
             $rules = $this->rules;
         }
 
+        $string = ($options['strip_tags'])
+            ? strip_tags($string)
+            : $string;
+
         $string = strtr($string, $rules);
         unset($rules);
 
-        if ($options['lowercase']) {
+        if ($options['lowercase'] && !$options['lowercase_after_regexp']) {
             // CHANGED: nK
             // added check for mb_strtolower existence.
             $string = function_exists('mb_strtolower') ? mb_strtolower($string) : strtolower($string);
         }
 
         $string = preg_replace($options['regexp'], $options['separator'], $string);
+
+        if ($options['lowercase'] && $options['lowercase_after_regexp']) {
+            // CHANGED: nK
+            // added check for mb_strtolower existence.
+            $string = function_exists('mb_strtolower') ? mb_strtolower($string) : strtolower($string);
+        }
 
         return ($options['trim'])
             ? trim($string, $options['separator'])
