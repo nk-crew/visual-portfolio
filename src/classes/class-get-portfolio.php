@@ -601,6 +601,7 @@ class Visual_Portfolio_Get {
                 if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
                     foreach ( $img['categories'] as $cat ) {
                         $slug = self::create_slug( $cat );
+
                         if ( ! in_array( $slug, $filter_values, true ) ) {
                             // add in filter.
                             $filter_values[] = $slug;
@@ -2488,6 +2489,12 @@ class Visual_Portfolio_Get {
         if ( class_exists( 'Cocur\Slugify\Slugify' ) ) {
             $slugify = new Cocur\Slugify\Slugify();
             $slug    = $slugify->slugify( $str, $delimiter );
+
+            // Sometimes Slugify can't add slug to string with unicode.
+            // We will return the standard string.
+            if ( ! $slug ) {
+                $slug = $str;
+            }
         }
 
         return $slug;
