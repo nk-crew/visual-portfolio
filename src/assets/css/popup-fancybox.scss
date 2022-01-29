@@ -4,88 +4,93 @@
  * Visual Portfolio styles for Fancybox.
  */
 .vp-fancybox {
-    z-index: var(--vp-popup__z-index);
+  z-index: var(--vp-popup__z-index);
 
-    // fixed top position when WP admin bar showed.
-    body.admin-bar & {
-        top: 32px;
-        height: calc(100% - 32px);
+  // fixed top position when WP admin bar showed.
+  body.admin-bar & {
+    top: 32px;
+    height: calc(100% - 32px);
 
-        @media screen and (max-width: 782px) {
-            top: 42px;
-            height: calc(100% - 42px);
-        }
-        @media screen and (max-width: 600px) {
-            top: 0;
-            height: 100%;
-        }
+    @media screen and (max-width: 782px) {
+      top: 42px;
+      height: calc(100% - 42px);
+    }
+    @media screen and (max-width: 600px) {
+      top: 0;
+      height: 100%;
+    }
+  }
+
+  // Caption.
+  .fancybox-caption__body {
+    font-size: 12px;
+    color: #fff;
+
+    h3 {
+      color: inherit;
     }
 
-    // Caption.
-    .fancybox-caption__body {
-        font-size: 12px;
-        color: #fff;
+    a {
+      color: inherit;
 
-        h3 {
-            color: inherit;
-        }
-
-        a {
-            color: inherit;
-
-            &:hover {
-                opacity: .8;
-            }
-        }
-        .vp-portfolio__item-meta-title {
-            margin-top: 0;
-            margin-bottom: 3px;
-            font-size: 14px;
-            color: inherit;
-
-            a {
-                text-decoration: none;
-            }
-        }
+      &:hover {
+        opacity: 0.8;
+      }
     }
 
-    // Thumbnails.
-    .fancybox-thumbs {
-        width: var(--vp-popup--thumbnails__size);
-        background: var(--vp-popup--thumbnails__background-color);
-    }
-    &.fancybox-show-thumbs .fancybox-inner {
-        right: var(--vp-popup--thumbnails__size);
-    }
-    .fancybox-thumbs__list a {
-        width: var(--vp-popup--thumbnails__size);
-        max-width: calc(100% - 4px);
-        height: calc(var(--vp-popup--thumbnails__size) / calc(var(--vp-popup--thumbnails__aspect-ratio)));
+    .vp-portfolio__item-meta-title {
+      margin-top: 0;
+      margin-bottom: 3px;
+      font-size: 14px;
+      color: inherit;
 
-        &::before {
-            border: 2px solid var(--vp-popup--thumbnails--items__border-color);
-        }
+      a {
+        text-decoration: none;
+      }
+    }
+  }
 
-        @supports (aspect-ratio: 16 / 9) {
-            width: calc(100% - 4px);
-            max-width: none;
-            height: auto;
-            max-height: none;
-            // stylelint-disable-next-line
-            aspect-ratio: var(--vp-popup--thumbnails__aspect-ratio);
-        }
+  // Thumbnails.
+  .fancybox-thumbs {
+    width: var(--vp-popup--thumbnails__size);
+    background: var(--vp-popup--thumbnails__background-color);
+  }
+
+  &.fancybox-show-thumbs .fancybox-inner {
+    right: var(--vp-popup--thumbnails__size);
+  }
+
+  .fancybox-thumbs__list a {
+    width: var(--vp-popup--thumbnails__size);
+    max-width: calc(100% - 4px);
+    height: calc(var(--vp-popup--thumbnails__size) / calc(var(--vp-popup--thumbnails__aspect-ratio)));
+
+    &::before {
+      border: 2px solid var(--vp-popup--thumbnails--items__border-color);
     }
-    .fancybox-thumbs-y .fancybox-thumbs__list {
-        &::-webkit-scrollbar {
-            width: var(--vp-popup--thumbnails--scrollbar__size);
-        }
-        &::-webkit-scrollbar-track {
-            background: var(--vp-popup--thumbnails--scrollbar-track__background-color);
-            box-shadow: none;
-        }
-        &::-webkit-scrollbar-thumb {
-            background: var(--vp-popup--thumbnails--scrollbar-thumb__background-color);
-            border-radius: var(--vp-popup--thumbnails--scrollbar-thumb__border-radius);
-        }
+
+    @supports (aspect-ratio: 16 / 9) {
+      width: calc(100% - 4px);
+      max-width: none;
+      height: auto;
+      max-height: none;
+      aspect-ratio: var(--vp-popup--thumbnails__aspect-ratio);
     }
+  }
+
+  .fancybox-thumbs-y .fancybox-thumbs__list {
+    &::-webkit-scrollbar {
+      width: var(--vp-popup--thumbnails--scrollbar__size);
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--vp-popup--thumbnails--scrollbar-track__background-color);
+      box-shadow: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--vp-popup--thumbnails--scrollbar-thumb__background-color);
+      border-radius: var(--vp-popup--thumbnails--scrollbar-thumb__border-radius);
+    }
+  }
 }

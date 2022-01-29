@@ -4,203 +4,220 @@
  * Default items style
  */
 .vp-portfolio__items-style-default {
-    .vp-portfolio__item a {
-        color: var(--vp-items-style-default--links__color);
-        text-decoration: var(--vp-items-style-default--links__text-decoration);
-        outline: none;
-        box-shadow: none;
-        transition: var(--vp-items-style-default-transition-duration) color var(--vp-items-style-default-transition-easing);
+  .vp-portfolio__item a {
+    color: var(--vp-items-style-default--links__color);
+    text-decoration: var(--vp-items-style-default--links__text-decoration);
+    outline: none;
+    box-shadow: none;
+    transition: var(--vp-items-style-default-transition-duration) color var(--vp-items-style-default-transition-easing);
 
-        &:hover,
-        &:focus {
-            color: var(--vp-items-style-default--links-hover__color);
-        }
+    &:hover,
+    &:focus {
+      color: var(--vp-items-style-default--links-hover__color);
     }
+  }
 
-    .vp-portfolio__item-img-overlay {
-        position: absolute;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        color: var(--vp-items-style-default--overlay__color);
-        text-decoration: var(--vp-items-style-default--overlay__text-decoration);
-        background-color: var(--vp-items-style-default--overlay__background-color);
-        opacity: 0;
-        transition: var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
-        will-change: opacity;
+  .vp-portfolio__item-img-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 
-        // Fix FireFox image blinking
-        // https://github.com/nk-crew/visual-portfolio/issues/92
-        z-index: 2;
-    }
+    // Fix FireFox image blinking
+    // https://github.com/nk-crew/visual-portfolio/issues/92
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--vp-items-style-default--overlay__color);
+    text-decoration: var(--vp-items-style-default--overlay__text-decoration);
+    background-color: var(--vp-items-style-default--overlay__background-color);
+    opacity: 0;
+    transition: var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
+    will-change: opacity;
+  }
 
-    // Transitions
-    .vp-portfolio__item-img {
-        overflow: hidden;
-        border-radius: var(--vp-items-style-default--image__border-radius);
+  // Transitions
+  .vp-portfolio__item-img {
 
-        // fix for safari border-radius.
-        // https://github.com/nk-crew/visual-portfolio/issues/150
-        z-index: 0;
-    }
+    // fix for safari border-radius.
+    // https://github.com/nk-crew/visual-portfolio/issues/150
+    z-index: 0;
+    overflow: hidden;
+    border-radius: var(--vp-items-style-default--image__border-radius);
+  }
+
+  .vp-portfolio__item-img img {
+    transition: var(--vp-items-style-default-transition-duration) transform var(--vp-items-style-default-transition-easing), var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
+    will-change: transform, opacity;
+  }
+
+  .vp-portfolio__item:hover,
+  .vp-portfolio__item-focus {
     .vp-portfolio__item-img img {
-        transition: var(--vp-items-style-default-transition-duration) transform var(--vp-items-style-default-transition-easing), var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
-        will-change: transform, opacity;
+      transform: var(--vp-items-style-default--image-hover__transform);
     }
+  }
+
+  // Overlay
+  &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
+  &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
+    .vp-portfolio__item-img-overlay {
+      opacity: 1;
+    }
+  }
+
+  &.vp-portfolio__items-show-overlay-default {
+    .vp-portfolio__item-img-overlay {
+      opacity: 1;
+    }
+
     .vp-portfolio__item:hover,
     .vp-portfolio__item-focus {
-        .vp-portfolio__item-img img {
-            transform: var(--vp-items-style-default--image-hover__transform);
-        }
+      .vp-portfolio__item-img-overlay {
+        opacity: 0;
+      }
+    }
+  }
+
+  &.vp-portfolio__items-show-overlay-always {
+    .vp-portfolio__item-img-overlay {
+      opacity: 1;
+    }
+  }
+
+  // fix some themes figcaption styles.
+  figcaption.vp-portfolio__item-overlay {
+    font-style: inherit;
+    color: var(--vp-items-style-default--meta__color);
+  }
+
+  // meta
+  .vp-portfolio__item-meta {
+    position: relative;
+    padding: var(--vp-items-style-default--meta__padding-v) var(--vp-items-style-default--meta__padding-h);
+
+    > * {
+      margin-bottom: var(--vp-items-style-default--meta-items__gap);
     }
 
-    // Overlay
-    &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
-    &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
-        .vp-portfolio__item-img-overlay {
-            opacity: 1;
-        }
+    > :last-child {
+      margin-bottom: 0;
     }
-    &.vp-portfolio__items-show-overlay-default {
-        .vp-portfolio__item-img-overlay {
-            opacity: 1;
-        }
-        .vp-portfolio__item:hover,
-        .vp-portfolio__item-focus {
-            .vp-portfolio__item-img-overlay {
-                opacity: 0;
-            }
-        }
-    }
-    &.vp-portfolio__items-show-overlay-always {
-        .vp-portfolio__item-img-overlay {
-            opacity: 1;
-        }
-    }
+  }
 
-    // fix some themes figcaption styles.
-    figcaption.vp-portfolio__item-overlay {
-        font-style: inherit;
-        color: var(--vp-items-style-default--meta__color);
-    }
+  .vp-portfolio__item-meta-icon {
+    font-size: var(--vp-items-style-default--meta-icon__font-size);
+  }
 
-    // meta
-    .vp-portfolio__item-meta {
-        position: relative;
-        padding: var(--vp-items-style-default--meta__padding-v) var(--vp-items-style-default--meta__padding-h);
+  .vp-portfolio__item-meta-categories {
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-left: calc(-1 * var(--vp-items-style-default--meta-categories__gap));
+    font-size: var(--vp-items-style-default--meta-categories__font-size);
+    font-weight: var(--vp-items-style-default--meta-categories__font-weight);
+    text-transform: var(--vp-items-style-default--meta-categories__text-transform);
 
-        > * {
-            margin-bottom: var(--vp-items-style-default--meta-items__gap);
+    .vp-portfolio__item-meta-category {
+      display: flex;
+      margin-left: var(--vp-items-style-default--meta-categories__gap);
+      opacity: var(--vp-items-style-default--meta-categories__opacity);
+
+      @if variable-exists(rtl) and $rtl {
+        &::before {
+          content: var(--vp-items-style-default--meta-categories__separator);
         }
 
-        > :last-child {
-            margin-bottom: 0;
+        &:first-of-type::before {
+          content: none;
         }
-    }
-    .vp-portfolio__item-meta-icon {
-        font-size: var(--vp-items-style-default--meta-icon__font-size);
-    }
-    .vp-portfolio__item-meta-categories {
-        display: inline-flex;
-        flex-wrap: wrap;
-        margin-left: calc(-1 * var(--vp-items-style-default--meta-categories__gap));
-        font-size: var(--vp-items-style-default--meta-categories__font-size);
-        font-weight: var(--vp-items-style-default--meta-categories__font-weight);
-        text-transform: var(--vp-items-style-default--meta-categories__text-transform);
-
-        .vp-portfolio__item-meta-category {
-            display: flex;
-            margin-left: var(--vp-items-style-default--meta-categories__gap);
-            opacity: var(--vp-items-style-default--meta-categories__opacity);
-
-            @if variable-exists(rtl) and $rtl {
-                &::before {
-                    content: var(--vp-items-style-default--meta-categories__separator);
-                }
-                &:first-of-type::before {
-                    content: none;
-                }
-            } @else {
-                &::after {
-                    content: var(--vp-items-style-default--meta-categories__separator);
-                }
-                &:last-of-type::after {
-                    content: none;
-                }
-            }
-
-            a {
-                text-decoration: var(--vp-items-style-default--meta-categories__text-decoration);
-            }
+      } @else {
+        &::after {
+          content: var(--vp-items-style-default--meta-categories__separator);
         }
+
+        &:last-of-type::after {
+          content: none;
+        }
+      }
+
+      a {
+        text-decoration: var(--vp-items-style-default--meta-categories__text-decoration);
+      }
     }
-    .vp-portfolio__item-meta-title {
-        margin-right: 0;
-        margin-left: 0;
-        font-size: var(--vp-items-style-default--meta-title__font-size);
+  }
+
+  .vp-portfolio__item-meta-title {
+    margin-right: 0;
+    margin-left: 0;
+    font-size: var(--vp-items-style-default--meta-title__font-size);
+  }
+
+  .vp-portfolio__item-meta-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin-left: calc(-1 * var(--vp-items-style-default--meta-inline__gap));
+    font-weight: var(--vp-items-style-default--meta-inline__font-weight);
+    line-height: var(--vp-items-style-default--meta-inline__line-height);
+
+    > * {
+      margin-left: var(--vp-items-style-default--meta-inline__gap);
+      opacity: var(--vp-items-style-default--meta-inline__font-opacity);
     }
+  }
+
+  .vp-portfolio__item-meta-part-icon {
+    margin-right: var(--vp-items-style-default--meta-part-icon__offset);
+  }
+
+  .vp-portfolio__item-meta-author {
+    display: flex;
+    align-items: center;
+
+    img {
+      width: 1em;
+      height: auto;
+      border-radius: 1em;
+    }
+  }
+
+  .vp-portfolio__item-meta-excerpt {
+    line-height: var(--vp-items-style-default--meta-excerpt__line-height);
+    opacity: var(--vp-items-style-default--meta-excerpt__opacity);
+  }
+
+  .vp-portfolio__item-meta-read-more {
+    display: inline-block;
+  }
+
+  // align
+  .vp-portfolio__item-align-left {
+    text-align: left;
+
+    .vp-portfolio__item-meta-categories,
     .vp-portfolio__item-meta-inline {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        margin-left: calc(-1 * var(--vp-items-style-default--meta-inline__gap));
-        font-weight: var(--vp-items-style-default--meta-inline__font-weight);
-        line-height: var(--vp-items-style-default--meta-inline__line-height);
+      justify-content: flex-start;
+    }
+  }
 
-        > * {
-            margin-left: var(--vp-items-style-default--meta-inline__gap);
-            opacity: var(--vp-items-style-default--meta-inline__font-opacity);
-        }
-    }
-    .vp-portfolio__item-meta-part-icon {
-        margin-right: var(--vp-items-style-default--meta-part-icon__offset);
-    }
-    .vp-portfolio__item-meta-author {
-        display: flex;
-        align-items: center;
+  .vp-portfolio__item-align-center {
+    text-align: center;
 
-        img {
-            width: 1em;
-            height: auto;
-            border-radius: 1em;
-        }
+    .vp-portfolio__item-meta-categories,
+    .vp-portfolio__item-meta-inline {
+      justify-content: center;
     }
-    .vp-portfolio__item-meta-excerpt {
-        line-height: var(--vp-items-style-default--meta-excerpt__line-height);
-        opacity: var(--vp-items-style-default--meta-excerpt__opacity);
-    }
-    .vp-portfolio__item-meta-read-more {
-        display: inline-block;
-    }
+  }
 
-    // align
-    .vp-portfolio__item-align-left {
-        text-align: left;
+  .vp-portfolio__item-align-right {
+    text-align: right;
 
-        .vp-portfolio__item-meta-categories,
-        .vp-portfolio__item-meta-inline {
-            justify-content: flex-start;
-        }
+    .vp-portfolio__item-meta-categories,
+    .vp-portfolio__item-meta-inline {
+      justify-content: flex-end;
     }
-    .vp-portfolio__item-align-center {
-        text-align: center;
-
-        .vp-portfolio__item-meta-categories,
-        .vp-portfolio__item-meta-inline {
-            justify-content: center;
-        }
-    }
-    .vp-portfolio__item-align-right {
-        text-align: right;
-
-        .vp-portfolio__item-meta-categories,
-        .vp-portfolio__item-meta-inline {
-            justify-content: flex-end;
-        }
-    }
+  }
 }

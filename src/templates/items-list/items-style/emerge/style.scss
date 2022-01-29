@@ -4,307 +4,331 @@
  * Emerge items style
  */
 .vp-portfolio__items-style-emerge {
-    .vp-portfolio__item {
-        border-radius: var(--vp-items-style-emerge--image__border-radius);
+  .vp-portfolio__item {
 
-        // fix for safari border-radius.
-        // https://github.com/nk-crew/visual-portfolio/issues/150
-        z-index: 0;
+    // fix for safari border-radius.
+    // https://github.com/nk-crew/visual-portfolio/issues/150
+    z-index: 0;
+    border-radius: var(--vp-items-style-emerge--image__border-radius);
+  }
+
+  .vp-portfolio__item a {
+    color: var(--vp-items-style-emerge--links__color);
+    text-decoration: var(--vp-items-style-emerge--links__text-decoration);
+    outline: none;
+    box-shadow: none;
+
+    &:hover,
+    &:focus {
+      color: var(--vp-items-style-emerge--links-hover__color);
+    }
+  }
+
+  .vp-portfolio__item-img-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    // Fix FireFox image blinking
+    // https://github.com/nk-crew/visual-portfolio/issues/92
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--vp-items-style-emerge--img-overlay__background-color);
+    opacity: 0;
+    transition: var(--vp-items-style-emerge-transition-duration) opacity var(--vp-items-style-emerge-transition-easing);
+    will-change: opacity;
+  }
+
+  .vp-portfolio__item-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    // Fix FireFox image blinking
+    // https://github.com/nk-crew/visual-portfolio/issues/92
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    min-height: 50px;
+    max-height: 100%;
+    color: var(--vp-items-style-emerge--overlay__color);
+    background-color: var(--vp-items-style-emerge--overlay__background-color);
+    transition: var(--vp-items-style-emerge-transition-duration) transform cubic-bezier(0.25, 0.46, 0.45, 0.94), var(--vp-items-style-emerge-transition-duration) clip-path cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateY(100%);
+    will-change: transform, clip-path;
+
+    @supports (clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%)) {
+      padding-top: var(--vp-items-style-emerge--overlay-skew__height);
+      clip-path: polygon(0 var(--vp-items-style-emerge--overlay-skew__clip-left), 100% var(--vp-items-style-emerge--overlay-skew__clip-right), 100% 100%, 0% 100%);
+    }
+  }
+
+  // fix some themes figcaption styles.
+  figcaption.vp-portfolio__item-overlay {
+    font-style: inherit;
+  }
+
+  // meta
+  .vp-portfolio__item-meta-wrap {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .vp-portfolio__item-meta {
+    width: 100%;
+    max-height: 100%;
+    padding: var(--vp-items-style-emerge--overlay__padding-v) var(--vp-items-style-emerge--overlay__padding-h);
+    color: inherit;
+
+    // Indexes for staggering.
+    @for $i from 1 through 6 {
+      > :nth-child(#{$i}) {
+        --vp-items-style-emerge--meta-staggering__index: #{$i};
+      }
     }
 
-    .vp-portfolio__item a {
-        color: var(--vp-items-style-emerge--links__color);
-        text-decoration: var(--vp-items-style-emerge--links__text-decoration);
-        outline: none;
-        box-shadow: none;
+    > * {
+      margin-bottom: var(--vp-items-style-emerge--meta-items__gap);
+      opacity: 0;
+      transition-delay: calc(var(--vp-items-style-emerge--meta-staggering__transition-delay) * var(--vp-items-style-emerge--meta-staggering__index));
+      transition-timing-function: var(--vp-items-style-emerge--meta-staggering__transition-easing);
+      transition-duration: var(--vp-items-style-emerge--meta-staggering__transition-duration);
+      transition-property: opacity, transform;
+      transform: translateY(10px);
+      will-change: transform, opacity;
+    }
 
-        &:hover,
-        &:focus {
-            color: var(--vp-items-style-emerge--links-hover__color);
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .vp-portfolio__item-meta-categories {
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-left: calc(-1 * var(--vp-items-style-emerge--meta-categories__gap));
+    font-size: var(--vp-items-style-emerge--meta-categories__font-size);
+    font-weight: var(--vp-items-style-emerge--meta-categories__font-weight);
+    text-transform: var(--vp-items-style-emerge--meta-categories__text-transform);
+
+    .vp-portfolio__item-meta-category {
+      display: flex;
+      margin-left: var(--vp-items-style-emerge--meta-categories__gap);
+      opacity: var(--vp-items-style-emerge--meta-categories__opacity);
+
+      @if variable-exists(rtl) and $rtl {
+        &::before {
+          content: var(--vp-items-style-emerge--meta-categories__separator);
         }
+
+        &:first-of-type::before {
+          content: none;
+        }
+      } @else {
+        &::after {
+          content: var(--vp-items-style-emerge--meta-categories__separator);
+        }
+
+        &:last-of-type::after {
+          content: none;
+        }
+      }
+
+      a {
+        text-decoration: var(--vp-items-style-emerge--meta-categories__text-decoration);
+      }
+    }
+  }
+
+  .vp-portfolio__item-meta-title {
+    margin-right: 0;
+    margin-left: 0;
+    font-size: var(--vp-items-style-emerge--meta-title__font-size);
+    color: inherit;
+  }
+
+  .vp-portfolio__item-meta-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin-left: calc(-1 * var(--vp-items-style-emerge--meta-inline__gap));
+    font-weight: var(--vp-items-style-emerge--meta-inline__font-weight);
+    line-height: var(--vp-items-style-emerge--meta-inline__line-height);
+
+    > * {
+      margin-left: var(--vp-items-style-emerge--meta-inline__gap);
+      opacity: var(--vp-items-style-emerge--meta-inline__font-opacity);
+    }
+  }
+
+  .vp-portfolio__item-meta-part-icon {
+    margin-right: var(--vp-items-style-emerge--meta-part-icon__offset);
+  }
+
+  .vp-portfolio__item-meta-author {
+    display: flex;
+    align-items: center;
+
+    img {
+      width: 1em;
+      height: auto;
+      border-radius: 1em;
+    }
+  }
+
+  .vp-portfolio__item-meta-excerpt {
+    line-height: var(--vp-items-style-emerge--meta-excerpt__line-height);
+
+    > div {
+      opacity: var(--vp-items-style-emerge--meta-excerpt__opacity);
+    }
+  }
+
+  // Transitions
+  .vp-portfolio__item-img img {
+    transition: transform var(--vp-items-style-emerge-transition-duration) var(--vp-items-style-emerge-transition-easing), opacity var(--vp-items-style-emerge-transition-duration) var(--vp-items-style-emerge-transition-easing);
+    will-change: transform, opacity;
+  }
+
+  // Image Overlay
+  &.vp-portfolio__items-show-img-overlay-hover .vp-portfolio__item:hover,
+  &.vp-portfolio__items-show-img-overlay-hover .vp-portfolio__item-focus {
+    .vp-portfolio__item-img-overlay {
+      opacity: 1;
+    }
+  }
+
+  &.vp-portfolio__items-show-img-overlay-default {
+    .vp-portfolio__item-img-overlay {
+      opacity: 1;
     }
 
-    .vp-portfolio__item-img-overlay {
-        position: absolute;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background-color: var(--vp-items-style-emerge--img-overlay__background-color);
+    .vp-portfolio__item:hover,
+    .vp-portfolio__item-focus {
+      .vp-portfolio__item-img-overlay {
         opacity: 0;
-        transition: var(--vp-items-style-emerge-transition-duration) opacity var(--vp-items-style-emerge-transition-easing);
-        will-change: opacity;
+      }
+    }
+  }
 
-        // Fix FireFox image blinking
-        // https://github.com/nk-crew/visual-portfolio/issues/92
-        z-index: 2;
+  &.vp-portfolio__items-show-img-overlay-always {
+    .vp-portfolio__item-img-overlay {
+      opacity: 1;
+    }
+  }
+
+  // Meta Overlay
+  &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
+  &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
+    .vp-portfolio__item-img img {
+      transform: var(--vp-items-style-emerge--image-hover__transform);
     }
 
     .vp-portfolio__item-overlay {
-        position: absolute;
-        display: flex;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        min-height: 50px;
-        max-height: 100%;
-        color: var(--vp-items-style-emerge--overlay__color);
-        background-color: var(--vp-items-style-emerge--overlay__background-color);
-        transition: var(--vp-items-style-emerge-transition-duration) transform cubic-bezier(.25, .46, .45, .94), var(--vp-items-style-emerge-transition-duration) clip-path cubic-bezier(.25, .46, .45, .94);
-        transform: translateY(100%);
-        will-change: transform, clip-path;
+      --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
+      --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
 
-        // Fix FireFox image blinking
-        // https://github.com/nk-crew/visual-portfolio/issues/92
-        z-index: 2;
-
-        @supports (clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%)) {
-            padding-top: var(--vp-items-style-emerge--overlay-skew__height);
-            clip-path: polygon(0 var(--vp-items-style-emerge--overlay-skew__clip-left), 100% var(--vp-items-style-emerge--overlay-skew__clip-right), 100% 100%, 0% 100%);
-        }
+      transform: translateY(0);
     }
 
-    // fix some themes figcaption styles.
-    figcaption.vp-portfolio__item-overlay {
-        font-style: inherit;
+    .vp-portfolio__item-meta > * {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
 
-    // meta
-    .vp-portfolio__item-meta-wrap {
-        flex: 1;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-    }
-    .vp-portfolio__item-meta {
-        width: 100%;
-        max-height: 100%;
-        padding: var(--vp-items-style-emerge--overlay__padding-v) var(--vp-items-style-emerge--overlay__padding-h);
-        color: inherit;
-
-        // Indexes for staggering.
-        @for $i from 1 through 6 {
-            > :nth-child(#{$i}) {
-                --vp-items-style-emerge--meta-staggering__index: #{$i};
-            }
-        }
-
-        > * {
-            margin-bottom: var(--vp-items-style-emerge--meta-items__gap);
-            opacity: 0;
-            transition-delay: calc(var(--vp-items-style-emerge--meta-staggering__transition-delay) * var(--vp-items-style-emerge--meta-staggering__index));
-            transition-timing-function: var(--vp-items-style-emerge--meta-staggering__transition-easing);
-            transition-duration: var(--vp-items-style-emerge--meta-staggering__transition-duration);
-            transition-property: opacity, transform;
-            transform: translateY(10px);
-            will-change: transform, opacity;
-        }
-
-        > :last-child {
-            margin-bottom: 0;
-        }
-    }
-    .vp-portfolio__item-meta-categories {
-        display: inline-flex;
-        flex-wrap: wrap;
-        margin-left: calc(-1 * var(--vp-items-style-emerge--meta-categories__gap));
-        font-size: var(--vp-items-style-emerge--meta-categories__font-size);
-        font-weight: var(--vp-items-style-emerge--meta-categories__font-weight);
-        text-transform: var(--vp-items-style-emerge--meta-categories__text-transform);
-
-        .vp-portfolio__item-meta-category {
-            display: flex;
-            margin-left: var(--vp-items-style-emerge--meta-categories__gap);
-            opacity: var(--vp-items-style-emerge--meta-categories__opacity);
-
-            @if variable-exists(rtl) and $rtl {
-                &::before {
-                    content: var(--vp-items-style-emerge--meta-categories__separator);
-                }
-                &:first-of-type::before {
-                    content: none;
-                }
-            } @else {
-                &::after {
-                    content: var(--vp-items-style-emerge--meta-categories__separator);
-                }
-                &:last-of-type::after {
-                    content: none;
-                }
-            }
-
-            a {
-                text-decoration: var(--vp-items-style-emerge--meta-categories__text-decoration);
-            }
-        }
-    }
-    .vp-portfolio__item-meta-title {
-        margin-right: 0;
-        margin-left: 0;
-        font-size: var(--vp-items-style-emerge--meta-title__font-size);
-        color: inherit;
-    }
-    .vp-portfolio__item-meta-inline {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        margin-left: calc(-1 * var(--vp-items-style-emerge--meta-inline__gap));
-        font-weight: var(--vp-items-style-emerge--meta-inline__font-weight);
-        line-height: var(--vp-items-style-emerge--meta-inline__line-height);
-
-        > * {
-            margin-left: var(--vp-items-style-emerge--meta-inline__gap);
-            opacity: var(--vp-items-style-emerge--meta-inline__font-opacity);
-        }
-    }
-    .vp-portfolio__item-meta-part-icon {
-        margin-right: var(--vp-items-style-emerge--meta-part-icon__offset);
-    }
-    .vp-portfolio__item-meta-author {
-        display: flex;
-        align-items: center;
-
-        img {
-            width: 1em;
-            height: auto;
-            border-radius: 1em;
-        }
-    }
-    .vp-portfolio__item-meta-excerpt {
-        line-height: var(--vp-items-style-emerge--meta-excerpt__line-height);
-
-        > div {
-            opacity: var(--vp-items-style-emerge--meta-excerpt__opacity);
-        }
-    }
-
-    // Transitions
+  &.vp-portfolio__items-show-overlay-default {
     .vp-portfolio__item-img img {
-        transition: transform var(--vp-items-style-emerge-transition-duration) var(--vp-items-style-emerge-transition-easing), opacity var(--vp-items-style-emerge-transition-duration) var(--vp-items-style-emerge-transition-easing);
-        will-change: transform, opacity;
+      transform: var(--vp-items-style-emerge--image-hover__transform);
     }
 
-    // Image Overlay
-    &.vp-portfolio__items-show-img-overlay-hover .vp-portfolio__item:hover,
-    &.vp-portfolio__items-show-img-overlay-hover .vp-portfolio__item-focus {
-        .vp-portfolio__item-img-overlay {
-            opacity: 1;
-        }
-    }
-    &.vp-portfolio__items-show-img-overlay-default {
-        .vp-portfolio__item-img-overlay {
-            opacity: 1;
-        }
-        .vp-portfolio__item:hover,
-        .vp-portfolio__item-focus {
-            .vp-portfolio__item-img-overlay {
-                opacity: 0;
-            }
-        }
-    }
-    &.vp-portfolio__items-show-img-overlay-always {
-        .vp-portfolio__item-img-overlay {
-            opacity: 1;
-        }
+    .vp-portfolio__item-overlay {
+      --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
+      --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
+
+      transform: translateY(0);
     }
 
-    // Meta Overlay
-    &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
-    &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
-        .vp-portfolio__item-img img {
-            transform: var(--vp-items-style-emerge--image-hover__transform);
-        }
-        .vp-portfolio__item-overlay {
-            --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
-            --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
-
-            transform: translateY(0);
-        }
-        .vp-portfolio__item-meta > * {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    &.vp-portfolio__items-show-overlay-default {
-        .vp-portfolio__item-img img {
-            transform: var(--vp-items-style-emerge--image-hover__transform);
-        }
-        .vp-portfolio__item-overlay {
-            --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
-            --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
-
-            transform: translateY(0);
-        }
-        .vp-portfolio__item-meta > * {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .vp-portfolio__item:hover,
-        .vp-portfolio__item-focus {
-            .vp-portfolio__item-img img {
-                transform: var(--vp-items-style-emerge--image__transform);
-            }
-            .vp-portfolio__item-overlay {
-                --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew__height);
-                --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew__height);
-
-                transform: translateY(100%);
-            }
-            .vp-portfolio__item-meta > * {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-        }
-    }
-    &.vp-portfolio__items-show-overlay-always {
-        .vp-portfolio__item-img img {
-            transform: var(--vp-items-style-emerge--image-hover__transform);
-        }
-        .vp-portfolio__item-overlay {
-            --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
-            --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
-
-            transform: translateY(0);
-        }
-        .vp-portfolio__item-meta > * {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .vp-portfolio__item-meta > * {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    // fix align for gutenberg block.
-    figcaption.vp-portfolio__item-meta {
-        text-align: inherit;
+    .vp-portfolio__item:hover,
+    .vp-portfolio__item-focus {
+      .vp-portfolio__item-img img {
+        transform: var(--vp-items-style-emerge--image__transform);
+      }
+
+      .vp-portfolio__item-overlay {
+        --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew__height);
+        --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew__height);
+
+        transform: translateY(100%);
+      }
+
+      .vp-portfolio__item-meta > * {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+    }
+  }
+
+  &.vp-portfolio__items-show-overlay-always {
+    .vp-portfolio__item-img img {
+      transform: var(--vp-items-style-emerge--image-hover__transform);
     }
 
-    // align
-    .vp-portfolio__item-align-left {
-        text-align: left;
+    .vp-portfolio__item-overlay {
+      --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew-hover__clip-left);
+      --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew-hover__clip-right);
 
-        .vp-portfolio__item-meta-categories,
-        .vp-portfolio__item-meta-inline {
-            justify-content: flex-start;
-        }
+      transform: translateY(0);
     }
-    .vp-portfolio__item-align-center {
-        text-align: center;
 
-        .vp-portfolio__item-meta-categories,
-        .vp-portfolio__item-meta-inline {
-            justify-content: center;
-        }
+    .vp-portfolio__item-meta > * {
+      opacity: 1;
+      transform: translateY(0);
     }
-    .vp-portfolio__item-align-right {
-        text-align: right;
+  }
 
-        .vp-portfolio__item-meta-categories,
-        .vp-portfolio__item-meta-inline {
-            justify-content: flex-end;
-        }
+  // fix align for gutenberg block.
+  figcaption.vp-portfolio__item-meta {
+    text-align: inherit;
+  }
+
+  // align
+  .vp-portfolio__item-align-left {
+    text-align: left;
+
+    .vp-portfolio__item-meta-categories,
+    .vp-portfolio__item-meta-inline {
+      justify-content: flex-start;
     }
+  }
+
+  .vp-portfolio__item-align-center {
+    text-align: center;
+
+    .vp-portfolio__item-meta-categories,
+    .vp-portfolio__item-meta-inline {
+      justify-content: center;
+    }
+  }
+
+  .vp-portfolio__item-align-right {
+    text-align: right;
+
+    .vp-portfolio__item-meta-categories,
+    .vp-portfolio__item-meta-inline {
+      justify-content: flex-end;
+    }
+  }
 }

@@ -9,59 +9,61 @@ img.vp-lazyload,
 img.vp-lazyloaded,
 img.vp-lazypreload,
 img.vp-lazyloading {
-    opacity: 0;
-    transition: var(--vp-lazyload-transition-duration) opacity;
-    will-change: opacity;
+  opacity: 0;
+  transition: var(--vp-lazyload-transition-duration) opacity;
+  will-change: opacity;
 }
+
 img.vp-lazyloaded {
-    opacity: 1;
+  opacity: 1;
 }
 
 .vp-portfolio__item-img::before,
 .vp-portfolio__thumbnail-img::before,
 .vp-portfolio__item-img::after,
 .vp-portfolio__thumbnail-img::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    // Fixed possible bug with inaccessible links on images in the Classic style.
-    pointer-events: none;
-    visibility: visible;
-    background: var(--vp-lazyload-images__background);
-    opacity: 1;
-    transition: var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) opacity, var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) visibility;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  // Fixed possible bug with inaccessible links on images in the Classic style.
+  pointer-events: none;
+  visibility: visible;
+  content: "";
+  background: var(--vp-lazyload-images__background);
+  opacity: 1;
+  transition: var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) opacity, var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) visibility;
 }
 
 .vp-portfolio__item-img-lazyloading::before,
 .vp-portfolio__thumbnail-img-lazyloading::before,
 .vp-portfolio__item-img-lazyloading::after,
 .vp-portfolio__thumbnail-img-lazyloading::after {
-    animation: vp-lazyload-placeholder var(--vp-lazyload-images__animation-duration) linear infinite;
+  animation: vp-lazyload-placeholder var(--vp-lazyload-images__animation-duration) linear infinite;
 }
 
 .vp-portfolio__item-img::before,
 .vp-portfolio__thumbnail-img::before {
-    background: var(--vp-lazyload-images__background-second);
-    animation-delay: var(--vp-lazyload-images__animation-second-delay);
+  background: var(--vp-lazyload-images__background-second);
+  animation-delay: var(--vp-lazyload-images__animation-second-delay);
 }
 
 .vp-portfolio__item-img-lazyloaded::before,
 .vp-portfolio__thumbnail-img-lazyloaded::before,
 .vp-portfolio__item-img-lazyloaded::after,
 .vp-portfolio__thumbnail-img-lazyloaded::after {
-    visibility: hidden;
-    opacity: 0;
+  visibility: hidden;
+  opacity: 0;
 }
 
 @keyframes vp-lazyload-placeholder {
-    0%,
-    100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0;
-    }
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }

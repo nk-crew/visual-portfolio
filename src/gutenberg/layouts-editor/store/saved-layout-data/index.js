@@ -3,10 +3,11 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import * as controls from './controls';
 
-const {
-    registerStore,
-} = wp.data;
+const { registerStore } = wp.data;
 
-registerStore( 'visual-portfolio/saved-layout-data', {
-    reducer, selectors, actions, controls,
-} );
+registerStore('visual-portfolio/saved-layout-data', {
+  reducer,
+  selectors,
+  actions,
+  controls,
+});

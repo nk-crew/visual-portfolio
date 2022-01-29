@@ -1,148 +1,147 @@
-
 .vpf-component-gallery-control {
-    .vpf-component-gallery-control-items {
+  .vpf-component-gallery-control-items {
+    position: relative;
+    width: calc(100% + 15px);
+    margin-top: -15px;
+    margin-bottom: 15px;
+    margin-left: -15px;
+
+    .vpf-component-gallery-control-item {
+      position: relative;
+      display: inline-block;
+      width: calc(33.33% - 15px);
+      margin-top: 15px;
+      margin-left: 15px;
+
+      .vpf-component-gallery-control-item-button {
         position: relative;
-        width: calc(100% + 15px);
-        margin-top: -15px;
-        margin-bottom: 15px;
-        margin-left: -15px;
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        padding-bottom: 100%;
+        overflow: hidden;
+        background-color: #f7f7f7 !important;
+        border-radius: 5px;
+        box-shadow: none !important;
+        transition: 0.2s background-color;
 
-        .vpf-component-gallery-control-item {
-            position: relative;
-            display: inline-block;
-            width: calc(33.33% - 15px);
-            margin-top: 15px;
-            margin-left: 15px;
-
-            .vpf-component-gallery-control-item-button {
-                position: relative;
-                display: block;
-                width: 100%;
-                height: 100%;
-                padding: 0;
-                padding-bottom: 100%;
-                overflow: hidden;
-                // stylelint-disable-next-line
-                background-color: #f7f7f7 !important;
-                border-radius: 5px;
-                // stylelint-disable-next-line
-                box-shadow: none !important;
-                transition: .2s background-color;
-
-                img {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    border: 1px solid #efefef;
-                    border-radius: 5px;
-                    transition: .2s opacity;
-                }
-
-                svg {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    width: 20px;
-                    height: 20px;
-                    margin-top: -10px;
-                    margin-left: -10px;
-                    color: #fff;
-                    opacity: 0;
-                    transition: .2s opacity;
-                    fill: none;
-                }
-
-                &:hover,
-                &:focus {
-                    // stylelint-disable-next-line
-                    background-color: #000 !important;
-
-                    img {
-                        opacity: .6;
-                    }
-                    svg {
-                        opacity: 1;
-                    }
-                }
-            }
+        img {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border: 1px solid #efefef;
+          border-radius: 5px;
+          transition: 0.2s opacity;
         }
 
-        .vpf-component-gallery-control-item-remove {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            top: -5px;
-            right: -5px;
-            width: 20px;
-            height: 20px;
-            padding: 0;
-            color: #fff;
-            background-color: #272727;
-            border-radius: 20px;
-            opacity: 0;
-            transition: .2s opacity, .2s background-color;
-
-            svg {
-                width: 70%;
-                height: auto;
-            }
+        svg {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 20px;
+          height: 20px;
+          margin-top: -10px;
+          margin-left: -10px;
+          color: #fff;
+          opacity: 0;
+          fill: none;
+          transition: 0.2s opacity;
         }
-        .vpf-component-gallery-control-item:hover .vpf-component-gallery-control-item-remove,
-        .vpf-component-gallery-control-item:focus .vpf-component-gallery-control-item-remove {
+
+        &:hover,
+        &:focus {
+          background-color: #000 !important;
+
+          img {
+            opacity: 0.6;
+          }
+
+          svg {
             opacity: 1;
+          }
         }
+      }
     }
-    .vpf-component-gallery-control-item-add.components-button {
-        justify-content: center;
-        width: calc(100% - 15px);
-        margin-top: 15px;
-        margin-left: 15px;
-        border: 1px solid $gray-900;
 
-        > span {
-            display: none;
-            margin-left: .5em;
-            font-size: .9em;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
+    .vpf-component-gallery-control-item-remove {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      color: #fff;
+      background-color: #272727;
+      border-radius: 20px;
+      opacity: 0;
+      transition: 0.2s opacity, 0.2s background-color;
 
-        // Inside block editor.
-        .wp-block & {
-            padding: 25px 10px;
-
-            > span {
-                display: inline-block;
-            }
-        }
+      svg {
+        width: 70%;
+        height: auto;
+      }
     }
+
+    .vpf-component-gallery-control-item:hover .vpf-component-gallery-control-item-remove,
+    .vpf-component-gallery-control-item:focus .vpf-component-gallery-control-item-remove {
+      opacity: 1;
+    }
+  }
+
+  .vpf-component-gallery-control-item-add.components-button {
+    justify-content: center;
+    width: calc(100% - 15px);
+    margin-top: 15px;
+    margin-left: 15px;
+    border: 1px solid $gray-900;
+
+    > span {
+      display: none;
+      margin-left: 0.5em;
+      font-size: 0.9em;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    // Inside block editor.
+    .wp-block & {
+      padding: 25px 10px;
+
+      > span {
+        display: inline-block;
+      }
+    }
+  }
 }
 
 .vpf-component-gallery-control-item-modal {
-    max-width: 540px;
+  max-width: 540px;
 
-    .editor-post-featured-image {
-        margin-bottom: 30px;
+  .editor-post-featured-image {
+    margin-bottom: 30px;
+  }
+
+  @media screen and (min-width: 600px) {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+
+    > div {
+      position: sticky;
+      top: 30px;
+      flex: 1;
+      margin-bottom: 0;
+
+      + div {
+        width: 280px;
+      }
     }
-
-    @media screen and (min-width: 600px) {
-        display: flex;
-        align-items: flex-start;
-        gap: 30px;
-
-        > div {
-            position: sticky;
-            flex: 1;
-            top: 30px;
-            margin-bottom: 0;
-
-            + div {
-                width: 280px;
-            }
-        }
-    }
+  }
 }

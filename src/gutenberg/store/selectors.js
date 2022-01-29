@@ -1,3 +1,3 @@
-export function getPortfolioLayouts( state ) {
-    return state.layouts;
+export function getPortfolioLayouts(state) {
+  return state.layouts;
 }

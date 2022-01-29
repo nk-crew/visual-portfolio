@@ -8,14 +8,14 @@ const { useEffect } = wp.element;
  *
  * @returns {Null} nothing.
  */
-export default function StylesRender( { children } ) {
-    useEffect( () => {
-        const node = document.createElement( 'style' );
-        node.innerHTML = children;
-        document.body.appendChild( node );
+export default function StylesRender({ children }) {
+  useEffect(() => {
+    const node = document.createElement('style');
+    node.innerHTML = children;
+    document.body.appendChild(node);
 
-        return () => document.body.removeChild( node );
-    }, [ children ] );
+    return () => document.body.removeChild(node);
+  }, [children]);
 
-    return null;
+  return null;
 }

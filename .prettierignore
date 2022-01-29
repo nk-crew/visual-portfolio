@@ -1,0 +1,7 @@
+**/*.css
+**/*.scss
+**/*.html
+node_modules
+dist
+vendor
+vendors

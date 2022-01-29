@@ -1,76 +1,70 @@
 %vpf-icons-selector-item {
-    height: auto;
-    padding: 10px;
-    margin: 0;
-    color: #636569;
-    // stylelint-disable-next-line
-    background: #f7f7f7 !important;
-    border: 1px solid #f7f7f7;
-    border-radius: 5px;
-    outline: none;
+  height: auto;
+  padding: 10px;
+  margin: 0;
+  color: #636569;
+  background: #f7f7f7 !important;
+  border: 1px solid #f7f7f7;
+  border-radius: 5px;
+  outline: none;
 
-    &:hover,
-    &:focus {
-        // stylelint-disable-next-line
-        border-color: #a1a7af !important;
-        // stylelint-disable-next-line
-        box-shadow: 0 0 0 1px #a1a7af !important;
-        // stylelint-disable-next-line
-        background: #fff !important;
-    }
+  &:hover,
+  &:focus {
+    background: #fff !important;
+    border-color: #a1a7af !important;
+    box-shadow: 0 0 0 1px #a1a7af !important;
+  }
 }
 %vpf-icons-selector-item-active {
-    // stylelint-disable-next-line
-    border-color: $gray-900 !important;
-    // stylelint-disable-next-line
-    box-shadow: 0 0 0 1px $gray-900 !important;
-    // stylelint-disable-next-line
-    background: #fff !important;
+  background: #fff !important;
+  border-color: $gray-900 !important;
+  box-shadow: 0 0 0 1px $gray-900 !important;
 
-    svg {
-        opacity: 1;
-    }
+  svg {
+    opacity: 1;
+  }
 }
 
 .vpf-component-icon-selector {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 15px;
-    width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 15px;
+  width: 100%;
 
-    .vpf-component-icon-selector-item {
-        @extend %vpf-icons-selector-item;
+  .vpf-component-icon-selector-item {
+    @extend %vpf-icons-selector-item;
 
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-width: 0;
-        cursor: pointer;
-        transition: .2s border, .2s background-color, .2s box-shadow;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    cursor: pointer;
+    transition: 0.2s border, 0.2s background-color, 0.2s box-shadow;
 
-        svg {
-            width: 100%;
-            max-width: 20px;
-            height: auto;
-            color: #000;
-            fill: none;
-        }
-
-        &.vpf-component-icon-selector-item-active {
-            @extend %vpf-icons-selector-item-active;
-        }
-
-        span {
-            margin-top: auto;
-            margin-right: -8px;
-            margin-left: -8px;
-            font-size: .73em;
-            font-weight: 600;
-            text-transform: uppercase;
-            word-break: break-word;
-        }
-        div + span {
-            padding-top: 8px;
-        }
+    svg {
+      width: 100%;
+      max-width: 20px;
+      height: auto;
+      color: #000;
+      fill: none;
     }
+
+    &.vpf-component-icon-selector-item-active {
+      @extend %vpf-icons-selector-item-active;
+    }
+
+    span {
+      margin-top: auto;
+      margin-right: -8px;
+      margin-left: -8px;
+      font-size: 0.73em;
+      font-weight: 600;
+      text-transform: uppercase;
+      word-break: break-word;
+    }
+
+    div + span {
+      padding-top: 8px;
+    }
+  }
 }

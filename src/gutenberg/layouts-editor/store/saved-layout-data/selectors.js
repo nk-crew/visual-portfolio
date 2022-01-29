@@ -1,7 +1,5 @@
-const {
-    VPSavedLayoutVariables,
-} = window;
+const { VPSavedLayoutVariables } = window;
 
-export function getBlockData( state ) {
-    return state.data || VPSavedLayoutVariables.data;
+export function getBlockData(state) {
+  return state.data || VPSavedLayoutVariables.data;
 }

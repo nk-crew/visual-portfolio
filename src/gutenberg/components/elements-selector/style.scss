@@ -1,128 +1,131 @@
-
 .vpf-component-elements-selector-control-location {
-    position: relative;
-    padding: 15px;
-    background-color: $light-gray-100;
-    border-radius: 5px;
+  position: relative;
+  padding: 15px;
+  background-color: $light-gray-100;
+  border-radius: 5px;
 
-    & + & {
-        margin-top: 10px;
+  & + & {
+    margin-top: 10px;
+  }
+
+  .vpf-component-elements-selector-control-location-title {
+    margin-top: -4px;
+    margin-bottom: 7px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  .vpf-component-elements-selector-control-location-align {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+
+    button {
+      display: flex;
+      width: 25px;
+      padding: 4px 5px;
+      font-size: 10px;
+      color: $dark-gray-100;
+      cursor: pointer;
+      background: none;
+      border: none;
+      border-radius: 2px;
+      transition: 0.2s background-color;
+
+      &:hover,
+      &:focus {
+        color: $dark-gray-400;
+      }
+
+      svg {
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+
+  .vpf-component-elements-selector-control-location-options {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: -10px;
+
+    > * {
+      width: 100%;
     }
 
-    .vpf-component-elements-selector-control-location-title {
-        margin-top: -4px;
-        margin-bottom: 7px;
-        font-size: 10px;
-        font-weight: 600;
-        text-transform: uppercase;
-        opacity: .5;
+    .vpf-component-elements-selector-control-location-options-add-button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin-top: 10px;
+
+      .components-button {
+        justify-content: center;
+        width: 100%;
+        background: none;
+        border: 1px solid $gray-900;
+        box-shadow: none;
+      }
     }
 
-    .vpf-component-elements-selector-control-location-align {
-        position: absolute;
-        top: 8px;
-        right: 10px;
-
-        button {
-            display: flex;
-            width: 25px;
-            padding: 4px 5px;
-            font-size: 10px;
-            color: $dark-gray-100;
-            cursor: pointer;
-            background: none;
-            border: none;
-            border-radius: 2px;
-            transition: .2s background-color;
-
-            &:hover,
-            &:focus {
-                color: $dark-gray-400;
-            }
-
-            svg {
-                width: 100%;
-                height: auto;
-            }
-        }
+    .vpf-component-elements-selector-control-location-options-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 9px 12px;
+      margin-top: 10px;
+      color: $dark-gray-200;
+      background-color: transparent;
+      border: 1px solid $gray-900;
+      border-radius: 3px;
     }
 
-    .vpf-component-elements-selector-control-location-options {
-        display: flex;
-        flex-wrap: wrap;
-        margin-top: -10px;
+    button.vpf-component-elements-selector-control-location-options-item {
+      cursor: pointer;
 
-        > * {
-            width: 100%;
-        }
+      &:hover,
+      &:focus {
+        color: $dark-gray-300;
+        border-color: $dark-gray-300;
+      }
 
-        .vpf-component-elements-selector-control-location-options-add-button {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            margin-top: 10px;
-
-            .components-button {
-                justify-content: center;
-                width: 100%;
-                background: none;
-                border: 1px solid $gray-900;
-                box-shadow: none;
-            }
-        }
-        .vpf-component-elements-selector-control-location-options-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            padding: 9px 12px;
-            margin-top: 10px;
-            color: $dark-gray-200;
-            background-color: transparent;
-            border: 1px solid $gray-900;
-            border-radius: 3px;
-        }
-        button.vpf-component-elements-selector-control-location-options-item {
-            cursor: pointer;
-
-            &:hover,
-            &:focus {
-                color: $dark-gray-300;
-                border-color: $dark-gray-300;
-            }
-
-            svg {
-                width: 10px;
-                height: auto;
-                margin-left: 5px;
-            }
-        }
+      svg {
+        width: 10px;
+        height: auto;
+        margin-left: 5px;
+      }
     }
+  }
 }
 
 .vpf-component-elements-selector-control-location-options-title-pro {
-    padding: .2em .8em;
-    margin-left: auto;
-    font-size: .8em;
-    color: #fff;
-    background-color: #2540cc;
-    border-radius: 1em;
+  padding: 0.2em 0.8em;
+  margin-left: auto;
+  font-size: 0.8em;
+  color: #fff;
+  background-color: #2540cc;
+  border-radius: 1em;
 }
 
 .vpf-component-elements-selector-modal {
-    .components-panel__body {
-        max-width: 350px;
-        padding-right: 24px;
-        padding-left: 24px;
-        margin-right: -24px;
-        margin-left: -24px;
-    }
-    .components-modal__header + .components-panel__body {
-        padding-top: 0;
-        border-top: none;
-    }
-    .components-panel__body:last-child {
-        padding-bottom: 0;
-        border-bottom: none;
-    }
+  .components-panel__body {
+    max-width: 350px;
+    padding-right: 24px;
+    padding-left: 24px;
+    margin-right: -24px;
+    margin-left: -24px;
+  }
+
+  .components-modal__header + .components-panel__body {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .components-panel__body:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
 }

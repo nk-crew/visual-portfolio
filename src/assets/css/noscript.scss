@@ -4,7 +4,7 @@
 
 // preloader
 .vp-portfolio__preloader-wrap {
-    display: none;
+  display: none;
 }
 
 // hidden items before load.
@@ -12,16 +12,16 @@
 .vp-portfolio__filter-wrap,
 .vp-portfolio__sort-wrap,
 .vp-portfolio__pagination-wrap {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
 // image tag without script
 .vp-portfolio__item .vp-portfolio__item-img noscript + img {
-    display: none;
+  display: none;
 }
 
 // Slider thumbnails
 .vp-portfolio__thumbnails-wrap {
-    display: none;
+  display: none;
 }

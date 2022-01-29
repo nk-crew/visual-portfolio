@@ -12,53 +12,53 @@ import controlGetValue from '../control-get-value';
  *
  * @returns {boolean}
  */
-function compare( left, operator, right ) {
-    let checkResult = true;
+function compare(left, operator, right) {
+  let checkResult = true;
 
-    switch ( operator ) {
+  switch (operator) {
     case '==':
-        // eslint-disable-next-line
-        checkResult = left == right;
-        break;
+      // eslint-disable-next-line
+      checkResult = left == right;
+      break;
     case '===':
-        checkResult = left === right;
-        break;
+      checkResult = left === right;
+      break;
     case '!=':
-        // eslint-disable-next-line
-        checkResult = left != right;
-        break;
+      // eslint-disable-next-line
+      checkResult = left != right;
+      break;
     case '!==':
-        checkResult = left !== right;
-        break;
+      checkResult = left !== right;
+      break;
     case '*=':
-        checkResult = -1 !== left.indexOf( right );
-        break;
+      checkResult = left.indexOf(right) !== -1;
+      break;
     case '>=':
-        checkResult = left >= right;
-        break;
+      checkResult = left >= right;
+      break;
     case '<=':
-        checkResult = left <= right;
-        break;
+      checkResult = left <= right;
+      break;
     case '>':
-        checkResult = left > right;
-        break;
+      checkResult = left > right;
+      break;
     case '<':
-        checkResult = left < right;
-        break;
+      checkResult = left < right;
+      break;
     case '&&':
     case 'AND':
-        checkResult = left && right;
-        break;
+      checkResult = left && right;
+      break;
     case '||':
     case 'OR':
-        checkResult = left || right;
-        break;
+      checkResult = left || right;
+      break;
     default:
-        checkResult = left;
-        break;
-    }
+      checkResult = left;
+      break;
+  }
 
-    return checkResult;
+  return checkResult;
 }
 
 /**
@@ -70,36 +70,36 @@ function compare( left, operator, right ) {
  *
  * @returns {Boolean} is check pass.
  */
-export default function conditionCheck( condition, attributes, relation = 'AND' ) {
-    // by default result will be TRUE for relation AND
-    // and FALSE for relation OR.
-    let result = 'AND' === relation;
+export default function conditionCheck(condition, attributes, relation = 'AND') {
+  // by default result will be TRUE for relation AND
+  // and FALSE for relation OR.
+  let result = relation === 'AND';
 
-    const childRelation = result ? 'OR' : 'AND';
+  const childRelation = result ? 'OR' : 'AND';
 
-    condition.forEach( ( data ) => {
-        if ( Array.isArray( data ) && ! data.control ) {
-            result = compare( result, relation, conditionCheck( data, attributes, childRelation ) );
-        } else if ( data.control ) {
-            let left = controlGetValue( data.control, attributes );
-            const operator = data.operator || '==';
-            let right = 'undefined' !== typeof data.value ? data.value : 'true';
+  condition.forEach((data) => {
+    if (Array.isArray(data) && !data.control) {
+      result = compare(result, relation, conditionCheck(data, attributes, childRelation));
+    } else if (data.control) {
+      let left = controlGetValue(data.control, attributes);
+      const operator = data.operator || '==';
+      let right = typeof data.value !== 'undefined' ? data.value : 'true';
 
-            if ( 'true' === left ) {
-                left = true;
-            } else if ( 'false' === left ) {
-                left = false;
-            }
+      if (left === 'true') {
+        left = true;
+      } else if (left === 'false') {
+        left = false;
+      }
 
-            if ( 'true' === right ) {
-                right = true;
-            } else if ( 'false' === right ) {
-                right = false;
-            }
+      if (right === 'true') {
+        right = true;
+      } else if (right === 'false') {
+        right = false;
+      }
 
-            result = compare( result, relation, compare( left, operator, right ) );
-        }
-    } );
+      result = compare(result, relation, compare(left, operator, right));
+    }
+  });
 
-    return result;
+  return result;
 }

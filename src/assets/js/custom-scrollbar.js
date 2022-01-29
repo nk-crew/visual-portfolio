@@ -1,112 +1,114 @@
+/* eslint-disable no-param-reassign */
 /*
  * Visual Portfolio custom scrollbar extension.
  */
-const {
-    jQuery: $,
-    SimpleBar,
-} = window;
+const { jQuery: $, SimpleBar } = window;
 
-const $doc = $( document );
+const $doc = $(document);
 
 // Don't run on Mac and mobile devices.
-const allowScrollbar = ! /Mac|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test( navigator.userAgent );
+const allowScrollbar = !/Mac|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+  navigator.userAgent
+);
 
-if ( allowScrollbar && 'undefined' !== typeof SimpleBar ) {
-    // Extend VP class.
-    $doc.on( 'extendClass.vpf', ( event, VP ) => {
-        if ( 'vpf' !== event.namespace ) {
-            return;
+if (allowScrollbar && typeof SimpleBar !== 'undefined') {
+  // Extend VP class.
+  $doc.on('extendClass.vpf', (event, VP) => {
+    if (event.namespace !== 'vpf') {
+      return;
+    }
+
+    /**
+     * Init Simplebar plugin
+     */
+    VP.prototype.initCustomScrollbar = function () {
+      const self = this;
+
+      self.emitEvent('beforeInitCustomScrollbar');
+
+      self.$items_wrap.find('.vp-portfolio__custom-scrollbar').each(function () {
+        const instance = SimpleBar.instances.get(this);
+
+        if (!instance) {
+          // eslint-disable-next-line no-new
+          new SimpleBar(this);
         }
+      });
 
-        /**
-         * Init Simplebar plugin
-         */
-        VP.prototype.initCustomScrollbar = function() {
-            const self = this;
+      self.emitEvent('initCustomScrollbar');
+    };
 
-            self.emitEvent( 'beforeInitCustomScrollbar' );
+    /**
+     * Destroy Simplebar plugin
+     */
+    VP.prototype.destroyCustomScrollbar = function () {
+      const self = this;
 
-            self.$items_wrap.find( '.vp-portfolio__custom-scrollbar' ).each( function() {
-                const instance = SimpleBar.instances.get( this );
+      self.$items_wrap
+        .find('[data-simplebar="init"].vp-portfolio__custom-scrollbar')
+        .each(function () {
+          const instance = SimpleBar.instances.get(this);
 
-                if ( ! instance ) {
-                    // eslint-disable-next-line no-new
-                    new SimpleBar( this );
-                }
-            } );
+          if (instance) {
+            instance.unMount();
+          }
+        });
 
-            self.emitEvent( 'initCustomScrollbar' );
-        };
+      self.emitEvent('destroyCustomScrollbar');
+    };
+  });
 
-        /**
-         * Destroy Simplebar plugin
-         */
-        VP.prototype.destroyCustomScrollbar = function() {
-            const self = this;
+  // Add Items.
+  $doc.on('addItems.vpf', (event, self, $items, removeExisting) => {
+    if (event.namespace !== 'vpf') {
+      return;
+    }
 
-            self.$items_wrap.find( '[data-simplebar="init"].vp-portfolio__custom-scrollbar' ).each( function() {
-                const instance = SimpleBar.instances.get( this );
+    if (removeExisting) {
+      self.destroyCustomScrollbar();
+    }
 
-                if ( instance ) {
-                    instance.unMount();
-                }
-            } );
+    self.initCustomScrollbar();
+  });
 
-            self.emitEvent( 'destroyCustomScrollbar' );
-        };
-    } );
+  // Init.
+  $doc.on('init.vpf', (event, self) => {
+    if (event.namespace !== 'vpf') {
+      return;
+    }
 
-    // Add Items.
-    $doc.on( 'addItems.vpf', ( event, self, $items, removeExisting ) => {
-        if ( 'vpf' !== event.namespace ) {
-            return;
-        }
+    self.initCustomScrollbar();
+  });
 
-        if ( removeExisting ) {
-            self.destroyCustomScrollbar();
-        }
+  // Destroy.
+  $doc.on('destroy.vpf', (event, self) => {
+    if (event.namespace !== 'vpf') {
+      return;
+    }
 
-        self.initCustomScrollbar();
-    } );
+    self.destroyCustomScrollbar();
+  });
 
-    // Init.
-    $doc.on( 'init.vpf', ( event, self ) => {
-        if ( 'vpf' !== event.namespace ) {
-            return;
-        }
+  // Init Swiper duplicated slides scrollbars.
+  $doc.on('initSwiper.vpf', (event, self) => {
+    if (event.namespace !== 'vpf') {
+      return;
+    }
 
-        self.initCustomScrollbar();
-    } );
+    if (self.options.sliderLoop === 'true') {
+      self.initCustomScrollbar();
+    }
+  });
 
-    // Destroy.
-    $doc.on( 'destroy.vpf', ( event, self ) => {
-        if ( 'vpf' !== event.namespace ) {
-            return;
-        }
+  // Fix Simplebar content size in some themes.
+  // For example, in Astra theme in content with enabled sidebar, Simplebar calculate wrong height automatically.
+  $(() => {
+    $('[data-simplebar="init"].vp-portfolio__custom-scrollbar').each(function () {
+      const instance = SimpleBar.instances.get(this);
 
-        self.destroyCustomScrollbar();
-    } );
-
-    // Init Swiper duplicated slides scrollbars.
-    $doc.on( 'initSwiper.vpf', ( event, self ) => {
-        if ( 'vpf' !== event.namespace ) {
-            return;
-        }
-
-        if ( 'true' === self.options.sliderLoop ) {
-            self.initCustomScrollbar();
-        }
-    } );
-
-    // Fix Simplebar content size in some themes.
-    // For example, in Astra theme in content with enabled sidebar, Simplebar calculate wrong height automatically.
-    $( () => {
-        $( '[data-simplebar="init"].vp-portfolio__custom-scrollbar' ).each( function() {
-            const instance = SimpleBar.instances.get( this );
-
-            if ( instance ) {
-                instance.recalculate();
-            }
-        } );
-    } );
+      if (instance) {
+        instance.recalculate();
+      }
+    });
+  });
 }

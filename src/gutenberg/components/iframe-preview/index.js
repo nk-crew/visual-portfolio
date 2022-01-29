@@ -23,23 +23,13 @@ const variables = window.VPAdminGutenbergVariables;
 /**
  * WordPress dependencies
  */
-const {
-    applyFilters,
-} = wp.hooks;
+const { applyFilters } = wp.hooks;
 
-const {
-    Component,
-    Fragment,
-    createRef,
-} = wp.element;
+const { Component, Fragment, createRef } = wp.element;
 
-const {
-    withSelect,
-} = wp.data;
+const { withSelect } = wp.data;
 
-const {
-    Spinner,
-} = wp.components;
+const { Spinner } = wp.components;
 
 let uniqueIdCount = 1;
 
@@ -47,355 +37,329 @@ let uniqueIdCount = 1;
  * Component Class
  */
 class IframePreview extends Component {
-    constructor( ...args ) {
-        super( ...args );
+  constructor(...args) {
+    super(...args);
 
-        this.state = {
-            loading: true,
-            uniqueId: `vpf-preview-${ uniqueIdCount }`,
-            currentIframeHeight: 0,
-            latestIframeHeight: 0,
-        };
+    this.state = {
+      loading: true,
+      uniqueId: `vpf-preview-${uniqueIdCount}`,
+      currentIframeHeight: 0,
+      latestIframeHeight: 0,
+    };
 
-        uniqueIdCount += 1;
+    uniqueIdCount += 1;
 
-        this.frameRef = createRef();
-        this.formRef = createRef();
+    this.frameRef = createRef();
+    this.formRef = createRef();
 
-        this.maybePreviewTypeChanged = this.maybePreviewTypeChanged.bind( this );
-        this.maybeAttributesChanged = this.maybeAttributesChanged.bind( this );
-        this.onFrameLoad = this.onFrameLoad.bind( this );
-        this.maybeReload = this.maybeReload.bind( this );
-        this.maybeReloadDebounce = debounce( 300, rafSchd( this.maybeReload.bind( this ) ) );
-        this.maybeResizePreviews = this.maybeResizePreviews.bind( this );
-        this.maybeResizePreviewsThrottle = throttle( 100, rafSchd( this.maybeResizePreviews ) );
-        this.updateIframeHeight = this.updateIframeHeight.bind( this );
-        this.updateIframeHeightThrottle = throttle( 100, rafSchd( this.updateIframeHeight ) );
-        this.printInput = this.printInput.bind( this );
+    this.maybePreviewTypeChanged = this.maybePreviewTypeChanged.bind(this);
+    this.maybeAttributesChanged = this.maybeAttributesChanged.bind(this);
+    this.onFrameLoad = this.onFrameLoad.bind(this);
+    this.maybeReload = this.maybeReload.bind(this);
+    this.maybeReloadDebounce = debounce(300, rafSchd(this.maybeReload.bind(this)));
+    this.maybeResizePreviews = this.maybeResizePreviews.bind(this);
+    this.maybeResizePreviewsThrottle = throttle(100, rafSchd(this.maybeResizePreviews));
+    this.updateIframeHeight = this.updateIframeHeight.bind(this);
+    // eslint-disable-next-line react/no-unused-class-component-methods
+    this.updateIframeHeightThrottle = throttle(100, rafSchd(this.updateIframeHeight));
+    this.printInput = this.printInput.bind(this);
+  }
+
+  componentDidMount() {
+    const self = this;
+
+    const { clientId } = self.props;
+
+    iframeResizer(
+      {
+        interval: 10,
+        warningTimeout: 60000,
+        checkOrigin: false,
+        onMessage({ message }) {
+          // select current block on click message.
+          if (message === 'clicked') {
+            wp.data.dispatch('core/block-editor').selectBlock(clientId);
+
+            window.focus();
+          }
+        },
+        onResized({ height }) {
+          self.updateIframeHeightThrottle(`${height}px`);
+        },
+      },
+      self.frameRef.current
+    );
+
+    self.frameRef.current.addEventListener('load', self.onFrameLoad);
+    window.addEventListener('resize', self.maybeResizePreviewsThrottle);
+
+    self.maybeReload();
+  }
+
+  componentDidUpdate(prevProps) {
+    this.maybePreviewTypeChanged(prevProps);
+    this.maybeAttributesChanged(prevProps);
+  }
+
+  componentWillUnmount() {
+    this.frameRef.current.removeEventListener('load', this.onFrameLoad);
+    window.removeEventListener('resize', this.maybeResizePreviewsThrottle);
+
+    if (this.frameRef.current.iframeResizer) {
+      this.frameRef.current.iframeResizer.close();
+      this.frameRef.current.iframeResizer.removeListeners();
+    }
+  }
+
+  /**
+   * On frame load event.
+   *
+   * @param {Object} e - event data.
+   */
+  onFrameLoad(e) {
+    this.frameWindow = e.target.contentWindow;
+    this.frameJQuery = e.target.contentWindow.jQuery;
+
+    if (this.frameJQuery) {
+      this.$framePortfolio = this.frameJQuery('.vp-portfolio');
+
+      this.maybeResizePreviews();
+
+      if (this.frameTimeout) {
+        clearTimeout(this.frameTimeout);
+      }
+
+      // We need this timeout, since we resize iframe size and layouts resized with transitions.
+      this.frameTimeout = setTimeout(() => {
+        this.setState({
+          loading: false,
+        });
+      }, 300);
+    }
+  }
+
+  maybePreviewTypeChanged(prevProps) {
+    if (prevProps.previewDeviceType === this.props.previewDeviceType) {
+      return;
     }
 
-    componentDidMount() {
-        const self = this;
+    this.maybeResizePreviews();
+  }
 
-        const {
-            clientId,
-        } = self.props;
-
-        iframeResizer( {
-            interval: 10,
-            warningTimeout: 60000,
-            checkOrigin: false,
-            onMessage( { message } ) {
-                // select current block on click message.
-                if ( 'clicked' === message ) {
-                    wp.data.dispatch( 'core/block-editor' ).selectBlock( clientId );
-
-                    window.focus();
-                }
-            },
-            onResized( { height } ) {
-                self.updateIframeHeightThrottle( `${ height }px` );
-            },
-        }, self.frameRef.current );
-
-        self.frameRef.current.addEventListener( 'load', self.onFrameLoad );
-        window.addEventListener( 'resize', self.maybeResizePreviewsThrottle );
-
-        self.maybeReload();
+  maybeAttributesChanged(prevProps) {
+    if (this.busyReload) {
+      return;
     }
+    this.busyReload = true;
 
-    componentDidUpdate( prevProps ) {
-        this.maybePreviewTypeChanged( prevProps );
-        this.maybeAttributesChanged( prevProps );
-    }
+    const { attributes: newAttributes } = this.props;
 
-    componentWillUnmount() {
-        this.frameRef.current.removeEventListener( 'load', this.onFrameLoad );
-        window.removeEventListener( 'resize', this.maybeResizePreviewsThrottle );
+    const { attributes: oldAttributes } = prevProps;
 
-        if ( this.frameRef.current.iframeResizer ) {
-            this.frameRef.current.iframeResizer.close();
-            this.frameRef.current.iframeResizer.removeListeners();
-        }
-    }
+    const frame = this.frameRef.current;
 
-    /**
-     * On frame load event.
-     *
-     * @param {Object} e - event data.
-     */
-    onFrameLoad( e ) {
-        this.frameWindow = e.target.contentWindow;
-        this.frameJQuery = e.target.contentWindow.jQuery;
+    const changedAttributes = {};
 
-        if ( this.frameJQuery ) {
-            this.$framePortfolio = this.frameJQuery( '.vp-portfolio' );
+    // change changed attributes.
+    Object.keys(newAttributes).forEach((name) => {
+      const val = newAttributes[name];
 
-            this.maybeResizePreviews();
+      if (typeof oldAttributes[name] === 'undefined' || oldAttributes[name] !== val) {
+        changedAttributes[name] = val;
+      }
+    });
 
-            if ( this.frameTimeout ) {
-                clearTimeout( this.frameTimeout );
-            }
+    if (Object.keys(changedAttributes).length) {
+      let reload = false;
 
-            // We need this timeout, since we resize iframe size and layouts resized with transitions.
-            this.frameTimeout = setTimeout( () => {
-                this.setState( {
-                    loading: false,
-                } );
-            }, 300 );
-        }
-    }
+      // Don't reload if block has dynamic styles.
+      Object.keys(changedAttributes).forEach((name) => {
+        reload = reload || !hasDynamicCSS(name);
+      });
 
-    maybePreviewTypeChanged( prevProps ) {
-        if ( prevProps.previewDeviceType === this.props.previewDeviceType ) {
-            return;
-        }
+      const data = applyFilters('vpf.editor.changed-attributes', {
+        attributes: changedAttributes,
+        reload,
+        $frame: this.frameRef.current,
+        frameWindow: this.frameWindow,
+        frameJQuery: this.frameJQuery,
+        $framePortfolio: this.$framePortfolio,
+      });
 
-        this.maybeResizePreviews();
-    }
-
-    maybeAttributesChanged( prevProps ) {
-        if ( this.busyReload ) {
-            return;
-        }
-        this.busyReload = true;
-
-        const {
-            attributes: newAttributes,
-        } = this.props;
-
-        const {
-            attributes: oldAttributes,
-        } = prevProps;
-
-        const frame = this.frameRef.current;
-
-        const changedAttributes = {};
-
-        // change changed attributes.
-        Object.keys( newAttributes ).forEach( ( name ) => {
-            const val = newAttributes[ name ];
-
-            if ( 'undefined' === typeof oldAttributes[ name ] || oldAttributes[ name ] !== val ) {
-                changedAttributes[ name ] = val;
-            }
-        } );
-
-        if ( Object.keys( changedAttributes ).length ) {
-            let reload = false;
-
-            // Don't reload if block has dynamic styles.
-            Object.keys( changedAttributes ).forEach( ( name ) => {
-                reload = reload || ! hasDynamicCSS( name );
-            } );
-
-            const data = applyFilters( 'vpf.editor.changed-attributes', {
-                attributes: changedAttributes,
-                reload,
-                $frame: this.frameRef.current,
-                frameWindow: this.frameWindow,
-                frameJQuery: this.frameJQuery,
-                $framePortfolio: this.$framePortfolio,
-            } );
-
-            if ( ! data.reload ) {
-                // Update AJAX dynamic data.
-                if ( data.frameWindow && data.frameWindow.vp_preview_post_data ) {
-                    data.frameWindow.vp_preview_post_data[ data.name ] = data.value;
-                }
-
-                // Insert dynamic CSS.
-                if ( frame.iFrameResizer && newAttributes.block_id ) {
-                    frame.iFrameResizer.sendMessage( {
-                        name: 'dynamic-css',
-                        blockId: newAttributes.block_id,
-                        styles: getDynamicCSS( newAttributes ),
-                    } );
-                }
-            }
-
-            if ( data.reload ) {
-                this.maybeReloadDebounce();
-            }
-            this.busyReload = false;
-        } else {
-            this.busyReload = false;
-        }
-    }
-
-    maybeReload() {
-        let latestIframeHeight = 0;
-
-        if ( this.frameRef.current ) {
-            latestIframeHeight = this.state.currentIframeHeight;
+      if (!data.reload) {
+        // Update AJAX dynamic data.
+        if (data.frameWindow && data.frameWindow.vp_preview_post_data) {
+          data.frameWindow.vp_preview_post_data[data.name] = data.value;
         }
 
-        this.setState( {
-            loading: true,
-            latestIframeHeight,
-        } );
-        this.formRef.current.submit();
-    }
-
-    /**
-     * Resize frame to properly work with @media.
-     */
-    maybeResizePreviews() {
-        const contentWidth = $( '.editor-styles-wrapper' ).width();
-
-        if ( ! contentWidth || ! this.frameRef.current ) {
-            return;
+        // Insert dynamic CSS.
+        if (frame.iFrameResizer && newAttributes.block_id) {
+          frame.iFrameResizer.sendMessage({
+            name: 'dynamic-css',
+            blockId: newAttributes.block_id,
+            styles: getDynamicCSS(newAttributes),
+          });
         }
+      }
 
-        const frame = this.frameRef.current;
-        const $frame = $( frame );
-        const parentWidth = $frame.closest( '.visual-portfolio-gutenberg-preview' ).width();
+      if (data.reload) {
+        this.maybeReloadDebounce();
+      }
+      this.busyReload = false;
+    } else {
+      this.busyReload = false;
+    }
+  }
 
-        $frame.css( {
-            width: contentWidth,
-        } );
+  maybeReload() {
+    let latestIframeHeight = 0;
 
-        if ( frame.iFrameResizer ) {
-            frame.iFrameResizer.sendMessage( {
-                name: 'resize',
-                width: parentWidth,
-            } );
-            frame.iFrameResizer.resize();
-        }
+    if (this.frameRef.current) {
+      latestIframeHeight = this.state.currentIframeHeight;
     }
 
-    /**
-     * Update iframe height.
-     */
-    updateIframeHeight( newHeight ) {
-        this.setState( {
-            currentIframeHeight: newHeight,
-        } );
+    this.setState({
+      loading: true,
+      latestIframeHeight,
+    });
+    this.formRef.current.submit();
+  }
+
+  /**
+   * Resize frame to properly work with @media.
+   */
+  maybeResizePreviews() {
+    const contentWidth = $('.editor-styles-wrapper').width();
+
+    if (!contentWidth || !this.frameRef.current) {
+      return;
     }
 
-    /**
-     * Prepare form input for POST variables.
-     *
-     * @param {String} name - option name.
-     * @param {Mixed} val - option value.
-     *
-     * @returns {JSX} - form control.
-     */
-    printInput( name, val ) {
-        const params = {
-            type: 'text',
-            name,
-            value: val,
-            readOnly: true,
-        };
+    const frame = this.frameRef.current;
+    const $frame = $(frame);
+    const parentWidth = $frame.closest('.visual-portfolio-gutenberg-preview').width();
 
-        if ( 'number' === typeof val ) {
-            params.type = 'number';
-        } else if ( 'boolean' === typeof val ) {
-            params.type = 'number';
-            params.value = val ? 1 : 0;
-        } else if ( 'object' === typeof val && null !== val ) {
-            return (
-                <Fragment>
-                    { Object.keys( val ).map( ( i ) => (
-                        <Fragment key={ `${ name }[${ i }]` }>
-                            { this.printInput( `${ name }[${ i }]`, val[ i ] ) }
-                        </Fragment>
-                    ) ) }
-                </Fragment>
-            );
-        }
+    $frame.css({
+      width: contentWidth,
+    });
 
-        return (
-            <input { ...params } />
-        );
+    if (frame.iFrameResizer) {
+      frame.iFrameResizer.sendMessage({
+        name: 'resize',
+        width: parentWidth,
+      });
+      frame.iFrameResizer.resize();
+    }
+  }
+
+  /**
+   * Update iframe height.
+   */
+  updateIframeHeight(newHeight) {
+    this.setState({
+      currentIframeHeight: newHeight,
+    });
+  }
+
+  /**
+   * Prepare form input for POST variables.
+   *
+   * @param {String} name - option name.
+   * @param {Mixed} val - option value.
+   *
+   * @returns {JSX} - form control.
+   */
+  printInput(name, val) {
+    const params = {
+      type: 'text',
+      name,
+      value: val,
+      readOnly: true,
+    };
+
+    if (typeof val === 'number') {
+      params.type = 'number';
+    } else if (typeof val === 'boolean') {
+      params.type = 'number';
+      params.value = val ? 1 : 0;
+    } else if (typeof val === 'object' && val !== null) {
+      return (
+        <Fragment>
+          {Object.keys(val).map((i) => (
+            <Fragment key={`${name}[${i}]`}>{this.printInput(`${name}[${i}]`, val[i])}</Fragment>
+          ))}
+        </Fragment>
+      );
     }
 
-    render() {
-        const {
-            attributes,
-            postType,
-            postId,
-        } = this.props;
+    return <input {...params} />;
+  }
 
-        const {
-            loading,
-            uniqueId,
-            currentIframeHeight,
-            latestIframeHeight,
-        } = this.state;
+  render() {
+    const { attributes, postType, postId } = this.props;
 
-        const {
-            id,
-            content_source: contentSource,
-        } = attributes;
+    const { loading, uniqueId, currentIframeHeight, latestIframeHeight } = this.state;
 
-        return (
-            <div
-                className={ classnames(
-                    'visual-portfolio-gutenberg-preview',
-                    loading ? 'visual-portfolio-gutenberg-preview-loading' : ''
-                ) }
-                style={ { height: loading ? latestIframeHeight : currentIframeHeight } }
-            >
-                <div className="visual-portfolio-gutenberg-preview-inner">
-                    <form
-                        action={ variables.preview_url }
-                        target={ uniqueId }
-                        method="POST"
-                        style={ { display: 'none' } }
-                        ref={ this.formRef }
-                    >
-                        <input type="hidden" name="vp_preview_frame" value="true" readOnly />
-                        <input type="hidden" name="vp_preview_type" value="gutenberg" readOnly />
-                        <input type="hidden" name="vp_preview_post_type" value={ postType } readOnly />
-                        <input type="hidden" name="vp_preview_post_id" value={ postId } readOnly />
+    const { id, content_source: contentSource } = attributes;
 
-                        { 'saved' === contentSource ? (
-                            <input type="text" name="vp_id" value={ id } readOnly />
-                        ) : (
-                            <Fragment>
-                                { Object.keys( attributes ).map( ( k ) => {
-                                    const val = attributes[ k ];
+    return (
+      <div
+        className={classnames(
+          'visual-portfolio-gutenberg-preview',
+          loading ? 'visual-portfolio-gutenberg-preview-loading' : ''
+        )}
+        style={{ height: loading ? latestIframeHeight : currentIframeHeight }}
+      >
+        <div className="visual-portfolio-gutenberg-preview-inner">
+          <form
+            action={variables.preview_url}
+            target={uniqueId}
+            method="POST"
+            style={{ display: 'none' }}
+            ref={this.formRef}
+          >
+            <input type="hidden" name="vp_preview_frame" value="true" readOnly />
+            <input type="hidden" name="vp_preview_type" value="gutenberg" readOnly />
+            <input type="hidden" name="vp_preview_post_type" value={postType} readOnly />
+            <input type="hidden" name="vp_preview_post_id" value={postId} readOnly />
 
-                                    return (
-                                        <Fragment key={ `vp_${ k }` }>
-                                            { this.printInput( `vp_${ k }`, val ) }
-                                        </Fragment>
-                                    );
-                                } ) }
-                            </Fragment>
-                        ) }
-                    </form>
-                    <iframe
-                        title="vp-preview"
-                        id={ uniqueId }
-                        name={ uniqueId }
-                        // eslint-disable-next-line
-                        allowtransparency="true"
-                        ref={ this.frameRef }
-                    />
-                </div>
-                { loading ? (
-                    <Spinner />
-                ) : '' }
-            </div>
-        );
-    }
+            {contentSource === 'saved' ? (
+              <input type="text" name="vp_id" value={id} readOnly />
+            ) : (
+              <Fragment>
+                {Object.keys(attributes).map((k) => {
+                  const val = attributes[k];
+
+                  return <Fragment key={`vp_${k}`}>{this.printInput(`vp_${k}`, val)}</Fragment>;
+                })}
+              </Fragment>
+            )}
+          </form>
+          <iframe
+            title="vp-preview"
+            id={uniqueId}
+            name={uniqueId}
+            // eslint-disable-next-line
+            allowtransparency="true"
+            ref={this.frameRef}
+          />
+        </div>
+        {loading ? <Spinner /> : ''}
+      </div>
+    );
+  }
 }
 
-export default withSelect( ( select ) => {
-    const {
-        __experimentalGetPreviewDeviceType,
-    } = select( 'core/edit-post' ) || {};
+export default withSelect((select) => {
+  const { __experimentalGetPreviewDeviceType } = select('core/edit-post') || {};
 
-    const {
-        getCurrentPost,
-    } = select( 'core/editor' ) || {};
+  const { getCurrentPost } = select('core/editor') || {};
 
-    return {
-        previewDeviceType: __experimentalGetPreviewDeviceType ? __experimentalGetPreviewDeviceType() : 'desktop',
-        postType: getCurrentPost ? getCurrentPost().type : 'standard',
-        postId: getCurrentPost ? getCurrentPost().id : 'widgets',
-    };
-} )( IframePreview );
+  return {
+    previewDeviceType: __experimentalGetPreviewDeviceType
+      ? __experimentalGetPreviewDeviceType()
+      : 'desktop',
+    postType: getCurrentPost ? getCurrentPost().type : 'standard',
+    postId: getCurrentPost ? getCurrentPost().id : 'widgets',
+  };
+})(IframePreview);

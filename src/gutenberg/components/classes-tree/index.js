@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /**
  * External dependencies
  */
@@ -6,241 +7,233 @@ import * as clipboard from 'clipboard-polyfill';
 /**
  * WordPress dependencies
  */
-const {
-    Component,
-    Fragment,
-} = wp.element;
+const { Component, Fragment } = wp.element;
 
 // generate dom tree.
-function getNodeTree( node ) {
-    if ( node && node.hasChildNodes() ) {
-        const children = [];
+function getNodeTree(node) {
+  if (node && node.hasChildNodes()) {
+    const children = [];
 
-        for ( let j = 0; j < node.childNodes.length; j += 1 ) {
-            children.push( getNodeTree( node.childNodes[ j ] ) );
-        }
-
-        return {
-            classList: node.classList,
-            nodeName: node.nodeName,
-            children,
-        };
+    for (let j = 0; j < node.childNodes.length; j += 1) {
+      children.push(getNodeTree(node.childNodes[j]));
     }
 
-    return false;
+    return {
+      classList: node.classList,
+      nodeName: node.nodeName,
+      children,
+    };
+  }
+
+  return false;
 }
 
 /**
  * Component Class
  */
 export default class ClassesTree extends Component {
-    constructor( ...args ) {
-        super( ...args );
+  constructor(...args) {
+    super(...args);
 
-        this.state = {
-            nodes: false,
-        };
+    this.state = {
+      nodes: false,
+    };
 
-        this.onFrameLoad = this.onFrameLoad.bind( this );
-        this.maybeFindIframe = this.maybeFindIframe.bind( this );
-        this.updateTreeData = this.updateTreeData.bind( this );
+    this.onFrameLoad = this.onFrameLoad.bind(this);
+    this.maybeFindIframe = this.maybeFindIframe.bind(this);
+    this.updateTreeData = this.updateTreeData.bind(this);
+  }
+
+  componentDidMount() {
+    this.maybeFindIframe();
+  }
+
+  componentDidUpdate() {
+    this.maybeFindIframe();
+  }
+
+  componentWillUnmount() {
+    if (!this.iframePreview) {
+      return;
     }
 
-    componentDidMount() {
-        this.maybeFindIframe();
+    this.iframePreview.removeEventListener('load', this.onFrameLoad);
+  }
+
+  /**
+   * On frame load event.
+   */
+  onFrameLoad() {
+    if (!this.iframePreview.contentWindow) {
+      return;
     }
 
-    componentDidUpdate() {
-        this.maybeFindIframe();
+    // this.frameWindow = this.iframePreview.contentWindow;
+    this.frameJQuery = this.iframePreview.contentWindow.jQuery;
+
+    if (this.frameJQuery) {
+      this.$framePortfolio = this.frameJQuery('.vp-portfolio');
     }
 
-    componentWillUnmount() {
-        if ( ! this.iframePreview ) {
-            return;
-        }
+    this.updateTreeData();
+  }
 
-        this.iframePreview.removeEventListener( 'load', this.onFrameLoad );
+  maybeFindIframe() {
+    if (this.iframePreview) {
+      return;
     }
 
-    /**
-     * On frame load event.
-     */
-    onFrameLoad() {
-        if ( ! this.iframePreview.contentWindow ) {
-            return;
-        }
+    const { clientId } = this.props;
 
-        this.frameWindow = this.iframePreview.contentWindow;
-        this.frameJQuery = this.iframePreview.contentWindow.jQuery;
+    const iframePreview = document.getElementById(`vpf-preview-${clientId}`);
 
-        if ( this.frameJQuery ) {
-            this.$framePortfolio = this.frameJQuery( '.vp-portfolio' );
-        }
+    if (iframePreview) {
+      this.iframePreview = iframePreview;
+      this.iframePreview.addEventListener('load', this.onFrameLoad);
+      this.onFrameLoad();
+    }
+  }
 
-        this.updateTreeData();
+  updateTreeData() {
+    if (this.$framePortfolio) {
+      this.setState({
+        nodes: getNodeTree(this.$framePortfolio[0]),
+      });
+    }
+  }
+
+  render() {
+    if (!this.iframePreview) {
+      return null;
     }
 
-    maybeFindIframe() {
-        if ( this.iframePreview ) {
-            return;
-        }
-
-        const {
-            clientId,
-        } = this.props;
-
-        const iframePreview = document.getElementById( `vpf-preview-${ clientId }` );
-
-        if ( iframePreview ) {
-            this.iframePreview = iframePreview;
-            this.iframePreview.addEventListener( 'load', this.onFrameLoad );
-            this.onFrameLoad();
-        }
-    }
-
-    updateTreeData() {
-        if ( this.$framePortfolio ) {
-            this.setState( {
-                nodes: getNodeTree( this.$framePortfolio[ 0 ] ),
-            } );
-        }
-    }
-
-    render() {
-        if ( ! this.iframePreview ) {
-            return null;
-        }
-
-        return (
-            <div className="vpf-component-classes-tree">
-                <ClassesTree.TreeItem
-                    node={ this.state.nodes }
-                    skipNodeByClass={ /vp-portfolio__item-popup/ }
-                    collapseByClass={ /^(vp-portfolio__preloader-wrap|vp-portfolio__filter-wrap|vp-portfolio__sort-wrap|vp-portfolio__items-wrap|vp-portfolio__pagination-wrap)$/ }
-                    skipClass={ /vp-uid-/ }
-                />
-            </div>
-        );
-    }
+    return (
+      <div className="vpf-component-classes-tree">
+        <ClassesTree.TreeItem
+          node={this.state.nodes}
+          skipNodeByClass={/vp-portfolio__item-popup/}
+          collapseByClass={
+            /^(vp-portfolio__preloader-wrap|vp-portfolio__filter-wrap|vp-portfolio__sort-wrap|vp-portfolio__items-wrap|vp-portfolio__pagination-wrap)$/
+          }
+          skipClass={/vp-uid-/}
+        />
+      </div>
+    );
+  }
 }
 
 ClassesTree.TreeItem = class TreeItem extends Component {
-    constructor( ...args ) {
-        super( ...args );
+  constructor(...args) {
+    super(...args);
 
-        this.state = {
-            isCollapsed: null,
-        };
+    this.state = {
+      isCollapsed: null,
+    };
 
-        this.isCollapsed = this.isCollapsed.bind( this );
+    this.isCollapsed = this.isCollapsed.bind(this);
+  }
+
+  isCollapsed() {
+    const { node, collapseByClass } = this.props;
+
+    let { isCollapsed } = this.state;
+
+    // check if collapsed by default.
+    if (isCollapsed === null && node && node.classList && node.classList.length) {
+      node.classList.forEach((className) => {
+        if (collapseByClass && collapseByClass.test(className)) {
+          isCollapsed = true;
+        }
+      });
     }
 
-    isCollapsed() {
-        const {
-            node,
-            collapseByClass,
-        } = this.props;
+    return isCollapsed;
+  }
 
-        let {
-            isCollapsed,
-        } = this.state;
+  render() {
+    const { node, skipNodeByClass, skipClass } = this.props;
 
-        // check if collapsed by default.
-        if ( null === isCollapsed && node && node.classList && node.classList.length ) {
-            node.classList.forEach( ( className ) => {
-                if ( collapseByClass && collapseByClass.test( className ) ) {
-                    isCollapsed = true;
-                }
-            } );
-        }
-
-        return isCollapsed;
+    if (!node || !node.children.length) {
+      return null;
     }
 
-    render() {
-        const {
-            node,
-            skipNodeByClass,
-            skipClass,
-        } = this.props;
+    const classes = [];
+    let skip = false;
 
-        if ( ! node || ! node.children.length ) {
-            return null;
+    // Classes.
+    if (node.classList && node.classList.length) {
+      node.classList.forEach((className) => {
+        if (!skipClass || !skipClass.test(className)) {
+          classes.push(className);
         }
 
-        const classes = [];
-        let skip = false;
-
-        // Classes.
-        if ( node.classList && node.classList.length ) {
-            node.classList.forEach( ( className ) => {
-                if ( ! skipClass || ! skipClass.test( className ) ) {
-                    classes.push( className );
-                }
-
-                // Skip?
-                if ( skipNodeByClass && skipNodeByClass.test( className ) ) {
-                    skip = true;
-                }
-            } );
+        // Skip?
+        if (skipNodeByClass && skipNodeByClass.test(className)) {
+          skip = true;
         }
-
-        if ( skip ) {
-            return null;
-        }
-
-        return (
-            <ul>
-                <li className={ `vpf-component-classes-tree-node ${ this.isCollapsed() ? '' : 'is-collapsed' }` }>
-                    <div>
-                        { node.children.length ? (
-                            // eslint-disable-next-line jsx-a11y/control-has-associated-label
-                            <button
-                                type="button"
-                                className="vpf-component-classes-tree-node-collapse"
-                                onClick={ () => this.setState( { isCollapsed: ! this.isCollapsed() } ) }
-                            />
-                        ) : '' }
-                        &lt;
-                        { node.nodeName.toLowerCase() }
-                        { /* eslint-disable-next-line react/no-danger */ }
-                        { classes.length ? (
-                            <Fragment>
-                                { ' class="' }
-                                { classes.map( ( className ) => (
-                                    <button
-                                        key={ className }
-                                        type="button"
-                                        className="vpf-component-classes-tree-node-class"
-                                        onClick={ () => {
-                                            clipboard.writeText( className );
-                                        } }
-                                    >
-                                        { className }
-                                    </button>
-                                ) ) }
-                                { '"' }
-                            </Fragment>
-                        ) : '' }
-                        &gt;
-                    </div>
-                </li>
-                { node.children.length && this.isCollapsed() ? (
-                    node.children.map( ( childNode ) => {
-                        if ( childNode ) {
-                            return (
-                                <li className="vpf-component-classes-tree-child">
-                                    <ClassesTree.TreeItem
-                                        { ...this.props }
-                                        node={ childNode }
-                                    />
-                                </li>
-                            );
-                        }
-                        return null;
-                    } )
-                ) : '' }
-            </ul>
-        );
+      });
     }
+
+    if (skip) {
+      return null;
+    }
+
+    return (
+      <ul>
+        <li
+          className={`vpf-component-classes-tree-node ${this.isCollapsed() ? '' : 'is-collapsed'}`}
+        >
+          <div>
+            {node.children.length ? (
+              // eslint-disable-next-line jsx-a11y/control-has-associated-label
+              <button
+                type="button"
+                className="vpf-component-classes-tree-node-collapse"
+                onClick={() => this.setState({ isCollapsed: !this.isCollapsed() })}
+              />
+            ) : (
+              ''
+            )}
+            &lt;
+            {node.nodeName.toLowerCase()}
+            {/* eslint-disable-next-line react/no-danger */}
+            {classes.length ? (
+              <Fragment>
+                {' class="'}
+                {classes.map((className) => (
+                  <button
+                    key={className}
+                    type="button"
+                    className="vpf-component-classes-tree-node-class"
+                    onClick={() => {
+                      clipboard.writeText(className);
+                    }}
+                  >
+                    {className}
+                  </button>
+                ))}
+                {'" '}
+              </Fragment>
+            ) : (
+              ''
+            )}
+            &gt;
+          </div>
+        </li>
+        {/* eslint-disable indent */}
+        {node.children.length && this.isCollapsed()
+          ? node.children.map((childNode) => {
+              if (childNode) {
+                return (
+                  <li className="vpf-component-classes-tree-child">
+                    <ClassesTree.TreeItem {...this.props} node={childNode} />
+                  </li>
+                );
+              }
+              return null;
+            })
+          : ''}
+      </ul>
+    );
+  }
 };

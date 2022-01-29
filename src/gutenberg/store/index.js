@@ -10,10 +10,12 @@ import * as actions from './actions';
 import * as controls from './controls';
 import * as resolvers from './resolvers';
 
-const {
-    registerStore,
-} = wp.data;
+const { registerStore } = wp.data;
 
-registerStore( 'visual-portfolio', {
-    reducer, selectors, actions, controls, resolvers,
-} );
+registerStore('visual-portfolio', {
+  reducer,
+  selectors,
+  actions,
+  controls,
+  resolvers,
+});

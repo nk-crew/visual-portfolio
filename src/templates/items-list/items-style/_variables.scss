@@ -2,54 +2,54 @@
  * Items Style Default CSS Variables
  */
 .vp-portfolio__items-style-default {
-    // Links.
-    --vp-items-style-default--links__color: inherit;
-    --vp-items-style-default--links__text-decoration: none;
-    --vp-items-style-default--links-hover__color: var(--vp-color-brand);
+  // Links.
+  --vp-items-style-default--links__color: inherit;
+  --vp-items-style-default--links__text-decoration: none;
+  --vp-items-style-default--links-hover__color: var(--vp-color-brand);
 
-    // Image.
-    --vp-items-style-default--image__border-radius: 0;
-    --vp-items-style-default--image-hover__transform: scale(1.05);
+  // Image.
+  --vp-items-style-default--image__border-radius: 0;
+  --vp-items-style-default--image-hover__transform: scale(1.05);
 
-    // Meta.
-    --vp-items-style-default--meta__color: inherit;
-    --vp-items-style-default--meta__padding-v: 1.5em;
-    --vp-items-style-default--meta__padding-h: 2em;
-    --vp-items-style-default--meta-items__gap: 1.5em;
+  // Meta.
+  --vp-items-style-default--meta__color: inherit;
+  --vp-items-style-default--meta__padding-v: 1.5em;
+  --vp-items-style-default--meta__padding-h: 2em;
+  --vp-items-style-default--meta-items__gap: 1.5em;
 
-    // Overlay.
-    --vp-items-style-default--overlay__color: #fff;
-    --vp-items-style-default--overlay__background-color: transparent;
+  // Overlay.
+  --vp-items-style-default--overlay__color: #fff;
+  --vp-items-style-default--overlay__background-color: transparent;
 
-    // Meta Icon.
-    --vp-items-style-default--meta-icon__font-size: 2em;
+  // Meta Icon.
+  --vp-items-style-default--meta-icon__font-size: 2em;
 
-    // Meta Categories.
-    --vp-items-style-default--meta-categories__font-size: .9em;
-    --vp-items-style-default--meta-categories__font-weight: 500;
-    --vp-items-style-default--meta-categories__text-transform: uppercase;
-    --vp-items-style-default--meta-categories__text-decoration: none;
-    --vp-items-style-default--meta-categories__opacity: .8;
-    --vp-items-style-default--meta-categories__gap: .4em;
-    --vp-items-style-default--meta-categories__separator: ", ";
+  // Meta Categories.
+  --vp-items-style-default--meta-categories__font-size: 0.9em;
+  --vp-items-style-default--meta-categories__font-weight: 500;
+  --vp-items-style-default--meta-categories__text-transform: uppercase;
+  --vp-items-style-default--meta-categories__text-decoration: none;
+  --vp-items-style-default--meta-categories__opacity: 0.8;
+  --vp-items-style-default--meta-categories__gap: 0.4em;
+  --vp-items-style-default--meta-categories__separator: ", ";
 
-    // Meta Inline.
-    --vp-items-style-default--meta-inline__font-weight: 400;
-    --vp-items-style-default--meta-inline__line-height: 2;
-    --vp-items-style-default--meta-inline__font-opacity: .8;
-    --vp-items-style-default--meta-inline__gap: 1em;
+  // Meta Inline.
+  --vp-items-style-default--meta-inline__font-weight: 400;
+  --vp-items-style-default--meta-inline__line-height: 2;
+  --vp-items-style-default--meta-inline__font-opacity: 0.8;
+  --vp-items-style-default--meta-inline__gap: 1em;
 
-    // Meta Parts.
-    --vp-items-style-default--meta-part-icon__offset: .5em;
+  // Meta Parts.
+  --vp-items-style-default--meta-part-icon__offset: 0.5em;
 
-    // Meta Title.
-    --vp-items-style-default--meta-title__font-size: 1.3em;
+  // Meta Title.
+  --vp-items-style-default--meta-title__font-size: 1.3em;
 
-    // Meta Excerpt.
-    --vp-items-style-default--meta-excerpt__line-height: 1.5;
-    --vp-items-style-default--meta-excerpt__opacity: .8;
+  // Meta Excerpt.
+  --vp-items-style-default--meta-excerpt__line-height: 1.5;
+  --vp-items-style-default--meta-excerpt__opacity: 0.8;
 
-    // Transitions.
-    --vp-items-style-default-transition-duration: var(--vp-interactive__transition-duration);
-    --vp-items-style-default-transition-easing: var(--vp-interactive__transition-easing);
+  // Transitions.
+  --vp-items-style-default-transition-duration: var(--vp-interactive__transition-duration);
+  --vp-items-style-default-transition-easing: var(--vp-interactive__transition-easing);
 }

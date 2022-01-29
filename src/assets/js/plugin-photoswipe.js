@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable indent */
 /*
  * External dependencies.
  */
@@ -9,71 +11,70 @@ import isNumber from 'is-number';
 const $ = window.jQuery;
 
 const {
-    VPData,
-    VPPopupAPI,
-    PhotoSwipe,
-    PhotoSwipeUI_Default, // eslint-disable-line camelcase
+  VPData,
+  VPPopupAPI,
+  PhotoSwipe,
+  PhotoSwipeUI_Default, // eslint-disable-line camelcase
 } = window;
 
-const {
-    __,
-    settingsPopupGallery,
-} = VPData;
+const { __, settingsPopupGallery } = VPData;
 
-function resizeVideo( data, curItem ) {
-    if ( 'undefined' === typeof curItem ) {
-        if ( data && data.itemHolders.length ) {
-            data.itemHolders.forEach( ( val ) => {
-                if ( val.item && val.item.html ) {
-                    resizeVideo( data, val.item );
-                }
-            } );
+function resizeVideo(data, curItem) {
+  if (typeof curItem === 'undefined') {
+    if (data && data.itemHolders.length) {
+      data.itemHolders.forEach((val) => {
+        if (val.item && val.item.html) {
+          resizeVideo(data, val.item);
         }
-        return;
+      });
     }
+    return;
+  }
 
-    // calculate real viewport in pixels
-    const vpW = data.viewportSize.x;
-    let vpH = data.viewportSize.y;
-    const ratio = curItem.vw / curItem.vh;
-    let resultW;
-    const $container = $( curItem.container );
+  // calculate real viewport in pixels
+  const vpW = data.viewportSize.x;
+  let vpH = data.viewportSize.y;
+  const ratio = curItem.vw / curItem.vh;
+  let resultW;
+  const $container = $(curItem.container);
 
-    const bars = data.options.barsSize;
-    let barTop = 0;
-    let barBot = 0;
-    if ( bars ) {
-        barTop = bars.top && 'auto' !== bars.top ? bars.top : 0;
-        barBot = bars.bottom && 'auto' !== bars.bottom ? bars.bottom : 0;
-    }
-    vpH -= barTop + barBot;
+  const bars = data.options.barsSize;
+  let barTop = 0;
+  let barBot = 0;
+  if (bars) {
+    barTop = bars.top && bars.top !== 'auto' ? bars.top : 0;
+    barBot = bars.bottom && bars.bottom !== 'auto' ? bars.bottom : 0;
+  }
+  vpH -= barTop + barBot;
 
-    if ( ratio > vpW / vpH ) {
-        resultW = vpW;
-    } else {
-        resultW = vpH * ratio;
-    }
+  if (ratio > vpW / vpH) {
+    resultW = vpW;
+  } else {
+    resultW = vpH * ratio;
+  }
 
-    const $videoCont = $container.find( '.vp-pswp-video' );
+  const $videoCont = $container.find('.vp-pswp-video');
 
-    $videoCont.css( 'max-width', resultW );
-    $videoCont.children().css( {
-        paddingBottom: `${ 100 * ( curItem.vh / curItem.vw ) }%`,
-    } );
+  $videoCont.css('max-width', resultW);
+  $videoCont.children().css({
+    paddingBottom: `${100 * (curItem.vh / curItem.vw)}%`,
+  });
 
-    $container.css( {
-        top: barTop,
-        bottom: barBot,
-    } );
+  $container.css({
+    top: barTop,
+    bottom: barBot,
+  });
 }
 
-if ( PhotoSwipe && VPPopupAPI ) {
-    let pswpInstance;
+if (PhotoSwipe && VPPopupAPI) {
+  let pswpInstance;
 
-    // prepare photoswipe markup
-    if ( ! $( '.vp-pswp' ).length ) {
-        const markup = `
-        <div class="pswp vp-pswp${ settingsPopupGallery.click_to_zoom ? '' : ' vp-pswp-no-zoom' }" tabindex="-1" role="dialog" aria-hidden="true">
+  // prepare photoswipe markup
+  if (!$('.vp-pswp').length) {
+    const markup = `
+        <div class="pswp vp-pswp${
+          settingsPopupGallery.click_to_zoom ? '' : ' vp-pswp-no-zoom'
+        }" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="pswp__bg"></div>
             <div class="pswp__scroll-wrap">
                 <div class="pswp__container">
@@ -84,10 +85,18 @@ if ( PhotoSwipe && VPPopupAPI ) {
                 <div class="pswp__ui pswp__ui--hidden">
                     <div class="pswp__top-bar">
                         <div class="pswp__counter"></div>
-                        <button class="pswp__button pswp__button--close" title="${ __.pswp_close }"></button>
-                        <button class="pswp__button pswp__button--share" title="${ __.pswp_share }"></button>
-                        <button class="pswp__button pswp__button--fs" title="${ __.pswp_fs }"></button>
-                        <button class="pswp__button pswp__button--zoom" title="${ __.pswp_zoom }"></button>
+                        <button class="pswp__button pswp__button--close" title="${
+                          __.pswp_close
+                        }"></button>
+                        <button class="pswp__button pswp__button--share" title="${
+                          __.pswp_share
+                        }"></button>
+                        <button class="pswp__button pswp__button--fs" title="${
+                          __.pswp_fs
+                        }"></button>
+                        <button class="pswp__button pswp__button--zoom" title="${
+                          __.pswp_zoom
+                        }"></button>
                     </div>
                     <div class="pswp__preloader">
                         <div class="pswp__preloader__icn">
@@ -99,8 +108,12 @@ if ( PhotoSwipe && VPPopupAPI ) {
                     <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
                         <div class="pswp__share-tooltip"></div>
                     </div>
-                    <button class="pswp__button pswp__button--arrow--left" title="${ __.pswp_prev }"></button>
-                    <button class="pswp__button pswp__button--arrow--right" title="${ __.pswp_next }"></button>
+                    <button class="pswp__button pswp__button--arrow--left" title="${
+                      __.pswp_prev
+                    }"></button>
+                    <button class="pswp__button pswp__button--arrow--right" title="${
+                      __.pswp_next
+                    }"></button>
                     <div class="pswp__caption">
                         <div class="pswp__caption__center"></div>
                     </div>
@@ -108,306 +121,308 @@ if ( PhotoSwipe && VPPopupAPI ) {
             </div>
         </div>
         `;
-        $( 'body' ).append( markup );
+    $('body').append(markup);
+  }
+
+  // Extend Popup API.
+  VPPopupAPI.vendor = 'photoswipe';
+  VPPopupAPI.open = function (items, index, self) {
+    const finalItems = [];
+
+    // prepare items for fancybox api.
+    items.forEach((item) => {
+      if (item.type === 'embed') {
+        finalItems.push({
+          html: `<div class="vp-pswp-video"><div>${item.embed}</div></div>`,
+          vw: item.width || 0,
+          vh: item.height || 0,
+        });
+      } else {
+        finalItems.push({
+          src: item.src,
+          el: item.el,
+          w: item.width || 0,
+          h: item.height || 0,
+          title: item.caption,
+          o: {
+            src: item.src,
+            w: item.width || 0,
+            h: item.height || 0,
+          },
+          ...(item.srcMedium
+            ? {
+                m: {
+                  src: item.srcMedium,
+                  w: item.srcMediumWidth || 0,
+                  h: item.srcMediumHeight || 0,
+                },
+                msrc: item.srcMedium,
+              }
+            : {}),
+        });
+      }
+    });
+
+    const $pswpElement = $('.vp-pswp');
+    const pswpElement = $pswpElement[0];
+
+    // define options (if needed)
+    const options = {
+      captionAndToolbarShowEmptyCaptions: false,
+      closeEl: settingsPopupGallery.show_close_button,
+      captionEl: true,
+      fullscreenEl: settingsPopupGallery.show_fullscreen_button,
+      zoomEl: settingsPopupGallery.show_zoom_button,
+      shareEl: settingsPopupGallery.show_share_button,
+      counterEl: settingsPopupGallery.show_counter,
+      arrowEl: settingsPopupGallery.show_arrows,
+      shareButtons: [
+        {
+          id: 'facebook',
+          label: __.pswp_share_fb,
+          url: 'https://www.facebook.com/sharer/sharer.php?u={{url}}',
+        },
+        {
+          id: 'twitter',
+          label: __.pswp_share_tw,
+          url: 'https://twitter.com/intent/tweet?text={{text}}&url={{url}}',
+        },
+        {
+          id: 'pinterest',
+          label: __.pswp_share_pin,
+          url: 'https://www.pinterest.com/pin/create/button/?url={{url}}&media={{image_url}}&description={{text}}',
+        },
+      ],
+      getImageURLForShare() {
+        const currentItem = items[pswpInstance.getCurrentIndex()];
+
+        if (currentItem.type === 'image' && currentItem.src) {
+          return currentItem.src;
+        }
+
+        return pswpInstance.currItem.src || '';
+      },
+      getPageURLForShare() {
+        const currentItem = items[pswpInstance.getCurrentIndex()];
+
+        if (currentItem.type === 'image' && currentItem.src) {
+          return currentItem.src;
+        }
+
+        return window.location.href;
+      },
+      getTextForShare() {
+        const currentItem = items[pswpInstance.getCurrentIndex()];
+
+        if (currentItem.caption) {
+          const $caption = $(currentItem.caption);
+
+          if ($caption.filter('.vp-portfolio__item-popup-title').length) {
+            return $caption.filter('.vp-portfolio__item-popup-title').text();
+          }
+          if ($caption.filter('.vp-portfolio__item-popup-description').length) {
+            return $caption.filter('.vp-portfolio__item-popup-description').text();
+          }
+        }
+
+        return '';
+      },
+      bgOpacity: 1,
+      tapToClose: false,
+      tapToToggleControls: true,
+      showHideOpacity: true,
+      history: false,
+      getThumbBoundsFn(thumbIndex) {
+        if (!finalItems[thumbIndex] || !finalItems[thumbIndex].el) {
+          return false;
+        }
+
+        const $el = $(finalItems[thumbIndex].el).find('img')[0];
+
+        if (!$el) {
+          return false;
+        }
+
+        const rect = $el.getBoundingClientRect();
+        const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
+        const pswpTop = parseFloat($pswpElement.css('top')) || 0;
+
+        return {
+          x: rect.left,
+          y: rect.top + pageYScroll - pswpTop,
+          w: rect.width,
+          h: rect.height,
+        };
+      },
+      getDoubleTapZoom(isMouseClick, item) {
+        // isMouseClick          - true if mouse, false if double-tap
+        // item                  - slide object that is zoomed, usually current
+        // item.initialZoomLevel - initial scale ratio of image
+        //                         e.g. if viewport is 700px and image is 1400px,
+        //                              initialZoomLevel will be 0.5
+        if (isMouseClick) {
+          // is mouse click on image or zoom icon
+
+          // zoom to original
+          return settingsPopupGallery.click_to_zoom ? 1 : item.initialZoomLevel;
+
+          // e.g. for 1400px image:
+          // 0.5 - zooms to 700px
+          // 2   - zooms to 2800px
+        }
+
+        // zoom to original if initial zoom is less than 0.7x,
+        // otherwise to 1.5x, to make sure that double-tap gesture always zooms image.
+        return item.initialZoomLevel < 0.7 ? 1 : 1.5;
+      },
+    };
+
+    options.index = parseInt(index, 10);
+
+    // exit if index not found
+    if (!isNumber(options.index)) {
+      return;
     }
 
-    // Extend Popup API.
-    VPPopupAPI.vendor = 'photoswipe';
-    VPPopupAPI.open = function( items, index, self ) {
-        const finalItems = [];
+    // Pass data to PhotoSwipe and initialize it
+    pswpInstance = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, finalItems, options);
 
-        // prepare items for fancybox api.
-        items.forEach( ( item ) => {
-            if ( 'embed' === item.type ) {
-                finalItems.push( {
-                    html: `<div class="vp-pswp-video"><div>${ item.embed }</div></div>`,
-                    vw: item.width || 0,
-                    vh: item.height || 0,
-                } );
-            } else {
-                finalItems.push( {
-                    src: item.src,
-                    el: item.el,
-                    w: item.width || 0,
-                    h: item.height || 0,
-                    title: item.caption,
-                    o: {
-                        src: item.src,
-                        w: item.width || 0,
-                        h: item.height || 0,
-                    },
-                    ...( item.srcMedium ? {
-                        m: {
-                            src: item.srcMedium,
-                            w: item.srcMediumWidth || 0,
-                            h: item.srcMediumHeight || 0,
-                        },
-                        msrc: item.srcMedium,
-                    } : {} ),
-                } );
-            }
-        } );
+    // see: http://photoswipe.com/documentation/responsive-images.html
+    let realViewportWidth;
+    let useLargeImages = false;
+    let firstResize = true;
+    let imageSrcWillChange;
 
-        const $pswpElement = $( '.vp-pswp' );
-        const pswpElement = $pswpElement[ 0 ];
+    pswpInstance.listen('beforeResize', () => {
+      // pswpInstance.viewportSize.x - width of PhotoSwipe viewport
+      // pswpInstance.viewportSize.y - height of PhotoSwipe viewport
+      // window.devicePixelRatio - ratio between physical pixels and device independent pixels (Number)
+      //                          1 (regular display), 2 (@2x, retina) ...
 
-        // define options (if needed)
-        const options = {
-            captionAndToolbarShowEmptyCaptions: false,
-            closeEl: settingsPopupGallery.show_close_button,
-            captionEl: true,
-            fullscreenEl: settingsPopupGallery.show_fullscreen_button,
-            zoomEl: settingsPopupGallery.show_zoom_button,
-            shareEl: settingsPopupGallery.show_share_button,
-            counterEl: settingsPopupGallery.show_counter,
-            arrowEl: settingsPopupGallery.show_arrows,
-            shareButtons: [
-                {
-                    id: 'facebook',
-                    label: __.pswp_share_fb,
-                    url: 'https://www.facebook.com/sharer/sharer.php?u={{url}}',
-                },
-                {
-                    id: 'twitter',
-                    label: __.pswp_share_tw,
-                    url: 'https://twitter.com/intent/tweet?text={{text}}&url={{url}}',
-                },
-                {
-                    id: 'pinterest',
-                    label: __.pswp_share_pin,
-                    url: 'https://www.pinterest.com/pin/create/button/?url={{url}}&media={{image_url}}&description={{text}}',
-                },
-            ],
-            getImageURLForShare() {
-                const currentItem = items[ pswpInstance.getCurrentIndex() ];
+      // calculate real pixels when size changes
+      realViewportWidth = pswpInstance.viewportSize.x * window.devicePixelRatio;
 
-                if ( 'image' === currentItem.type && currentItem.src ) {
-                    return currentItem.src;
-                }
+      // Code below is needed if you want image to switch dynamically on window.resize
 
-                return pswpInstance.currItem.src || '';
-            },
-            getPageURLForShare() {
-                const currentItem = items[ pswpInstance.getCurrentIndex() ];
+      // Find out if current images need to be changed
+      if (useLargeImages && realViewportWidth < 1000) {
+        useLargeImages = false;
+        imageSrcWillChange = true;
+      } else if (!useLargeImages && realViewportWidth >= 1000) {
+        useLargeImages = true;
+        imageSrcWillChange = true;
+      }
 
-                if ( 'image' === currentItem.type && currentItem.src ) {
-                    return currentItem.src;
-                }
+      // Invalidate items only when source is changed and when it's not the first update
+      if (imageSrcWillChange && !firstResize) {
+        // invalidateCurrItems sets a flag on slides that are in DOM,
+        // which will force update of content (image) on window.resize.
+        pswpInstance.invalidateCurrItems();
+      }
 
-                return window.location.href;
-            },
-            getTextForShare() {
-                const currentItem = items[ pswpInstance.getCurrentIndex() ];
+      if (firstResize) {
+        firstResize = false;
+      }
 
-                if ( currentItem.caption ) {
-                    const $caption = $( currentItem.caption );
+      imageSrcWillChange = false;
+    });
 
-                    if ( $caption.filter( '.vp-portfolio__item-popup-title' ).length ) {
-                        return $caption.filter( '.vp-portfolio__item-popup-title' ).text();
-                    }
-                    if ( $caption.filter( '.vp-portfolio__item-popup-description' ).length ) {
-                        return $caption.filter( '.vp-portfolio__item-popup-description' ).text();
-                    }
-                }
+    pswpInstance.listen('gettingData', (idx, item) => {
+      if (item.html) {
+        return;
+      }
+      if (useLargeImages && item.o) {
+        if (item.o.src) {
+          item.src = item.o.src;
+        }
+        if (item.o.w) {
+          item.w = item.o.w;
+        }
+        if (item.o.h) {
+          item.h = item.o.h;
+        }
+      } else if (item.m) {
+        if (item.m.src) {
+          item.src = item.m.src;
+        }
+        if (item.m.w) {
+          item.w = item.m.w;
+        }
+        if (item.m.h) {
+          item.h = item.m.h;
+        }
+      }
+    });
 
-                return '';
-            },
-            bgOpacity: 1,
-            tapToClose: false,
-            tapToToggleControls: true,
-            showHideOpacity: true,
-            history: false,
-            getThumbBoundsFn( thumbIndex ) {
-                if ( ! finalItems[ thumbIndex ] || ! finalItems[ thumbIndex ].el ) {
-                    return false;
-                }
+    pswpInstance.listen('imageLoadComplete', (idx, item) => {
+      if (item.h < 1 || item.w < 1) {
+        const img = new Image();
 
-                const $el = $( finalItems[ thumbIndex ].el ).find( 'img' )[ 0 ];
-
-                if ( ! $el ) {
-                    return false;
-                }
-
-                const rect = $el.getBoundingClientRect();
-                const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
-                const pswpTop = parseFloat( $pswpElement.css( 'top' ) ) || 0;
-
-                return {
-                    x: rect.left,
-                    y: rect.top + pageYScroll - pswpTop,
-                    w: rect.width,
-                    h: rect.height,
-                };
-            },
-            getDoubleTapZoom( isMouseClick, item ) {
-                // isMouseClick          - true if mouse, false if double-tap
-                // item                  - slide object that is zoomed, usually current
-                // item.initialZoomLevel - initial scale ratio of image
-                //                         e.g. if viewport is 700px and image is 1400px,
-                //                              initialZoomLevel will be 0.5
-                if ( isMouseClick ) {
-                    // is mouse click on image or zoom icon
-
-                    // zoom to original
-                    return settingsPopupGallery.click_to_zoom ? 1 : item.initialZoomLevel;
-
-                    // e.g. for 1400px image:
-                    // 0.5 - zooms to 700px
-                    // 2   - zooms to 2800px
-                }
-
-                // zoom to original if initial zoom is less than 0.7x,
-                // otherwise to 1.5x, to make sure that double-tap gesture always zooms image.
-                return 0.7 > item.initialZoomLevel ? 1 : 1.5;
-            },
+        img.onload = () => {
+          item.w = img.width;
+          item.h = img.height;
+          pswpInstance.invalidateCurrItems();
+          pswpInstance.updateSize(true);
         };
 
-        options.index = parseInt( index, 10 );
+        img.src = item.src;
+      }
+    });
 
-        // exit if index not found
-        if ( ! isNumber( options.index ) ) {
-            return;
-        }
+    pswpInstance.listen('resize', function () {
+      resizeVideo(this);
+    });
 
-        // Pass data to PhotoSwipe and initialize it
-        pswpInstance = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, finalItems, options );
+    pswpInstance.listen('afterChange', function () {
+      resizeVideo(this);
+    });
 
-        // see: http://photoswipe.com/documentation/responsive-images.html
-        let realViewportWidth;
-        let useLargeImages = false;
-        let firstResize = true;
-        let imageSrcWillChange;
+    // disable video play if no active.
+    pswpInstance.listen('beforeChange', function () {
+      const data = this;
+      if (data && data.itemHolders.length) {
+        const currentIndex = data.getCurrentIndex();
 
-        pswpInstance.listen( 'beforeResize', () => {
-            // pswpInstance.viewportSize.x - width of PhotoSwipe viewport
-            // pswpInstance.viewportSize.y - height of PhotoSwipe viewport
-            // window.devicePixelRatio - ratio between physical pixels and device independent pixels (Number)
-            //                          1 (regular display), 2 (@2x, retina) ...
-
-            // calculate real pixels when size changes
-            realViewportWidth = pswpInstance.viewportSize.x * window.devicePixelRatio;
-
-            // Code below is needed if you want image to switch dynamically on window.resize
-
-            // Find out if current images need to be changed
-            if ( useLargeImages && 1000 > realViewportWidth ) {
-                useLargeImages = false;
-                imageSrcWillChange = true;
-            } else if ( ! useLargeImages && 1000 <= realViewportWidth ) {
-                useLargeImages = true;
-                imageSrcWillChange = true;
+        data.itemHolders.forEach((val) => {
+          if (val.el && val.index !== currentIndex) {
+            const $iframe = $(val.el).find('.vp-pswp-video iframe');
+            if ($iframe.length) {
+              $iframe.attr('src', $iframe.attr('src'));
             }
+          }
+        });
+      }
+    });
 
-            // Invalidate items only when source is changed and when it's not the first update
-            if ( imageSrcWillChange && ! firstResize ) {
-                // invalidateCurrItems sets a flag on slides that are in DOM,
-                // which will force update of content (image) on window.resize.
-                pswpInstance.invalidateCurrItems();
-            }
+    // remove video block
+    pswpInstance.listen('destroy', function () {
+      const data = this;
 
-            if ( firstResize ) {
-                firstResize = false;
-            }
+      if (data && data.itemHolders.length) {
+        data.itemHolders.forEach((val) => {
+          if (val.el) {
+            $(val.el).find('.vp-pswp-video').remove();
+          }
+        });
+      }
 
-            imageSrcWillChange = false;
-        } );
+      pswpInstance = false;
+    });
 
-        pswpInstance.listen( 'gettingData', ( idx, item ) => {
-            if ( item.html ) {
-                return;
-            }
-            if ( useLargeImages && item.o ) {
-                if ( item.o.src ) {
-                    item.src = item.o.src;
-                }
-                if ( item.o.w ) {
-                    item.w = item.o.w;
-                }
-                if ( item.o.h ) {
-                    item.h = item.o.h;
-                }
-            } else if ( item.m ) {
-                if ( item.m.src ) {
-                    item.src = item.m.src;
-                }
-                if ( item.m.w ) {
-                    item.w = item.m.w;
-                }
-                if ( item.m.h ) {
-                    item.h = item.m.h;
-                }
-            }
-        } );
+    if (self) {
+      self.emitEvent('beforeInitPhotoSwipe', [options, finalItems, index, pswpInstance]);
+    }
 
-        pswpInstance.listen( 'imageLoadComplete', ( idx, item ) => {
-            if ( 1 > item.h || 1 > item.w ) {
-                const img = new Image();
+    pswpInstance.init();
 
-                img.onload = () => {
-                    item.w = img.width;
-                    item.h = img.height;
-                    pswpInstance.invalidateCurrItems();
-                    pswpInstance.updateSize( true );
-                };
-
-                img.src = item.src;
-            }
-        } );
-
-        pswpInstance.listen( 'resize', function() {
-            resizeVideo( this );
-        } );
-
-        pswpInstance.listen( 'afterChange', function() {
-            resizeVideo( this );
-        } );
-
-        // disable video play if no active.
-        pswpInstance.listen( 'beforeChange', function() {
-            const data = this;
-            if ( data && data.itemHolders.length ) {
-                const currentIndex = data.getCurrentIndex();
-
-                data.itemHolders.forEach( ( val ) => {
-                    if ( val.el && val.index !== currentIndex ) {
-                        const $iframe = $( val.el ).find( '.vp-pswp-video iframe' );
-                        if ( $iframe.length ) {
-                            $iframe.attr( 'src', $iframe.attr( 'src' ) );
-                        }
-                    }
-                } );
-            }
-        } );
-
-        // remove video block
-        pswpInstance.listen( 'destroy', function() {
-            const data = this;
-
-            if ( data && data.itemHolders.length ) {
-                data.itemHolders.forEach( ( val ) => {
-                    if ( val.el ) {
-                        $( val.el ).find( '.vp-pswp-video' ).remove();
-                    }
-                } );
-            }
-
-            pswpInstance = false;
-        } );
-
-        if ( self ) {
-            self.emitEvent( 'beforeInitPhotoSwipe', [ options, finalItems, index, pswpInstance ] );
-        }
-
-        pswpInstance.init();
-
-        if ( self ) {
-            self.emitEvent( 'initPhotoSwipe', [ options, finalItems, index, pswpInstance ] );
-        }
-    };
-    VPPopupAPI.close = function() {
-        if ( pswpInstance ) {
-            pswpInstance.close();
-            pswpInstance = false;
-        }
-    };
+    if (self) {
+      self.emitEvent('initPhotoSwipe', [options, finalItems, index, pswpInstance]);
+    }
+  };
+  VPPopupAPI.close = function () {
+    if (pswpInstance) {
+      pswpInstance.close();
+      pswpInstance = false;
+    }
+  };
 }
