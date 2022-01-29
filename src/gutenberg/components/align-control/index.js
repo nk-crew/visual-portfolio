@@ -3,7 +3,7 @@
  */
 const { Component } = wp.element;
 
-const { Toolbar } = wp.components;
+const { Toolbar, ToolbarButton } = wp.components;
 
 const hAlign = {
   left: (
@@ -132,34 +132,40 @@ export default class IconsSelector extends Component {
     const { extended, onChange } = this.props;
 
     const value = this.getAlignObject();
+
+    // Fallback for older Gutenberg versions, where we used Toolbar for alignment controls.
     const controls = [];
 
     Object.keys(hAlign).forEach((val) => {
-      controls.push({
-        icon: hAlign[val],
-        title: `${extended ? 'Horizontal ' : ''}${val.charAt(0).toUpperCase() + val.slice(1)}`,
-        onClick: () => onChange(this.getAlignString(val, value.v)),
-        isActive: value.h === val,
-      });
+      controls.push(
+        <ToolbarButton
+          key={val}
+          icon={hAlign[val]}
+          label={`${extended ? 'Horizontal ' : ''}${val.charAt(0).toUpperCase() + val.slice(1)}`}
+          onClick={() => onChange(this.getAlignString(val, value.v))}
+          isActive={value.h === val}
+        />
+      );
     });
 
     if (extended) {
-      controls.push({
-        className: 'vpf-component-align-control-separator',
-      });
+      controls.push(<div key="separator" className="vpf-component-align-control-separator" />);
       Object.keys(vAlign).forEach((val) => {
-        controls.push({
-          icon: vAlign[val],
-          title: `Vertical ${val.charAt(0).toUpperCase() + val.slice(1)}`,
-          onClick: () => onChange(this.getAlignString(value.h, val)),
-          isActive: value.v === val,
-        });
+        controls.push(
+          <ToolbarButton
+            key={val}
+            icon={vAlign[val]}
+            label={`Vertical ${val.charAt(0).toUpperCase() + val.slice(1)}`}
+            onClick={() => onChange(this.getAlignString(value.h, val))}
+            isActive={value.v === val}
+          />
+        );
       });
     }
 
     return (
       <div className="vpf-component-align-control">
-        <Toolbar controls={controls} />
+        <Toolbar label="Align Control">{controls}</Toolbar>
       </div>
     );
   }

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-curly-newline */
 /**
  * External dependencies
  */
@@ -16,7 +17,8 @@ const { __ } = wp.i18n;
 
 const { Component, Fragment, useState } = wp.element;
 
-const { PanelBody, Button, DropdownMenu, Dropdown, Modal, Toolbar, BaseControl } = wp.components;
+const { PanelBody, Button, DropdownMenu, Dropdown, Modal, Toolbar, ToolbarButton, BaseControl } =
+  wp.components;
 
 const alignIcons = {
   left: (
@@ -307,20 +309,23 @@ export default class ElementsSelector extends Component {
 
     if (locationData.availableAlign.length) {
       locationData.availableAlign.forEach((alignName) => {
-        controls.push({
-          icon: alignIcons[alignName],
-          title: `${alignName.charAt(0).toUpperCase() + alignName.slice(1)}`,
-          onClick() {
-            onChange({
-              ...value,
-              [location]: {
-                ...value[location],
-                align: alignName,
-              },
-            });
-          },
-          isActive: locationData.align ? locationData.align === alignName : false,
-        });
+        controls.push(
+          <ToolbarButton
+            key={alignName}
+            icon={alignIcons[alignName]}
+            label={`${alignName.charAt(0).toUpperCase() + alignName.slice(1)}`}
+            onClick={() =>
+              onChange({
+                ...value,
+                [location]: {
+                  ...value[location],
+                  align: alignName,
+                },
+              })
+            }
+            isActive={locationData.align ? locationData.align === alignName : false}
+          />
+        );
       });
     }
 
@@ -342,7 +347,7 @@ export default class ElementsSelector extends Component {
               : alignIcons.center}
           </button>
         )}
-        renderContent={() => <Toolbar controls={controls} />}
+        renderContent={() => <Toolbar label="Elements Selector">{controls}</Toolbar>}
       />
     );
   }
