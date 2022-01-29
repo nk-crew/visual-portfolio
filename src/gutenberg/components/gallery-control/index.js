@@ -262,7 +262,6 @@ const SortableItem = SortableElement((props) => {
                 return applyFilters(
                   'vpf.editor.gallery-controls-render',
                   <ControlsRender.Control
-                    // eslint-disable-next-line react/no-array-index-key
                     key={`${img.id || img.imgThumbnailUrl || img.imgUrl}-${idx}-${name}`}
                     attributes={attributes}
                     onChange={(val) => {
@@ -424,7 +423,7 @@ class GalleryControl extends Component {
               focalPoint={focalPoint}
               isSetupWizard={isSetupWizard}
               axis="xy"
-              distance="3"
+              distance={3}
               onSortEnd={({ oldIndex, newIndex }) => {
                 const newImages = arrayMove([...filteredValue], oldIndex, newIndex);
                 onChange(newImages);
