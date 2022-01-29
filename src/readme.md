@@ -3,7 +3,7 @@
 * Contributors: nko
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
 * Requires at least: 5.8
-* Tested up to: 5.8
+* Tested up to: 5.9
 * Requires PHP: 7.2
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
