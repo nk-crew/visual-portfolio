@@ -227,56 +227,58 @@ const SortableItem = SortableElement( ( props ) => {
                                 </div>
                             </MediaUploadCheck>
                         ) : '' }
-                        { Object.keys( imageControls ).map( ( name ) => {
-                            const newCondition = [];
+                        <div>
+                            { Object.keys( imageControls ).map( ( name ) => {
+                                const newCondition = [];
 
-                            // prepare name.
-                            const imgControlName = `${ controlName }[${ idx }].${ name }`;
+                                // prepare name.
+                                const imgControlName = `${ controlName }[${ idx }].${ name }`;
 
-                            // prepare conditions for the current item.
-                            if ( imageControls[ name ].condition.length ) {
-                                imageControls[ name ].condition.forEach( ( data ) => {
-                                    const newData = { ...data };
+                                // prepare conditions for the current item.
+                                if ( imageControls[ name ].condition.length ) {
+                                    imageControls[ name ].condition.forEach( ( data ) => {
+                                        const newData = { ...data };
 
-                                    if ( newData.control && /SELF/g.test( newData.control ) ) {
-                                        newData.control = newData.control.replace( /SELF/g, `${ controlName }[${ idx }]` );
-                                    }
+                                        if ( newData.control && /SELF/g.test( newData.control ) ) {
+                                            newData.control = newData.control.replace( /SELF/g, `${ controlName }[${ idx }]` );
+                                        }
 
-                                    newCondition.push( newData );
-                                } );
-                            }
+                                        newCondition.push( newData );
+                                    } );
+                                }
 
-                            return (
-                                applyFilters(
-                                    'vpf.editor.gallery-controls-render',
-                                    <ControlsRender.Control
-                                        // eslint-disable-next-line react/no-array-index-key
-                                        key={ `${ img.id || img.imgThumbnailUrl || img.imgUrl }-${ idx }-${ name }` }
-                                        attributes={ attributes }
-                                        onChange={ ( val ) => {
-                                            const newImages = [ ...items ];
+                                return (
+                                    applyFilters(
+                                        'vpf.editor.gallery-controls-render',
+                                        <ControlsRender.Control
+                                            // eslint-disable-next-line react/no-array-index-key
+                                            key={ `${ img.id || img.imgThumbnailUrl || img.imgUrl }-${ idx }-${ name }` }
+                                            attributes={ attributes }
+                                            onChange={ ( val ) => {
+                                                const newImages = [ ...items ];
 
-                                            if ( newImages[ idx ] ) {
-                                                newImages[ idx ] = {
-                                                    ...newImages[ idx ],
-                                                    [ name ]: val,
-                                                };
+                                                if ( newImages[ idx ] ) {
+                                                    newImages[ idx ] = {
+                                                        ...newImages[ idx ],
+                                                        [ name ]: val,
+                                                    };
 
-                                                onChange( newImages );
-                                            }
-                                        } }
-                                        { ...imageControls[ name ] }
-                                        name={ imgControlName }
-                                        value={ img[ name ] }
-                                        condition={ newCondition }
-                                        clientId={ clientId }
-                                        isSetupWizard={ isSetupWizard }
-                                    />,
-                                    imageControls[ name ],
-                                    props
-                                )
-                            );
-                        } ) }
+                                                    onChange( newImages );
+                                                }
+                                            } }
+                                            { ...imageControls[ name ] }
+                                            name={ imgControlName }
+                                            value={ img[ name ] }
+                                            condition={ newCondition }
+                                            clientId={ clientId }
+                                            isSetupWizard={ isSetupWizard }
+                                        />,
+                                        imageControls[ name ],
+                                        props
+                                    )
+                                );
+                            } ) }
+                        </div>
                     </div>
                 </Modal>
             ) : null }

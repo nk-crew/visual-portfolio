@@ -123,9 +123,26 @@
 }
 
 .vpf-component-gallery-control-item-modal {
-    max-width: 300px;
+    max-width: 540px;
 
     .editor-post-featured-image {
         margin-bottom: 30px;
+    }
+
+    @media screen and (min-width: 600px) {
+        display: flex;
+        align-items: flex-start;
+        gap: 30px;
+
+        > div {
+            position: sticky;
+            flex: 1;
+            top: 30px;
+            margin-bottom: 0;
+
+            + div {
+                width: 280px;
+            }
+        }
     }
 }
