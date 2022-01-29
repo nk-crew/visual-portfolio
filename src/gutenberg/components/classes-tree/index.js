@@ -85,7 +85,7 @@ export default class ClassesTree extends Component {
 
     const { clientId } = this.props;
 
-    const iframePreview = document.getElementById(`vpf-preview-${clientId}`);
+    const iframePreview = document.querySelector(`#block-${clientId} iframe`);
 
     if (iframePreview) {
       this.iframePreview = iframePreview;
