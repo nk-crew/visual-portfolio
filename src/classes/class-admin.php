@@ -2305,7 +2305,7 @@ class Visual_Portfolio_Admin {
                 'name'      => 'layout_elements',
                 'locations' => array(
                     'top'    => array(
-                        'title' => esc_html__( 'Top', '@@text_domain' ),
+                        'title' => esc_html__( 'Start', '@@text_domain' ),
                         'align' => array(
                             'left',
                             'center',
@@ -2313,9 +2313,11 @@ class Visual_Portfolio_Admin {
                             'between',
                         ),
                     ),
-                    'items'  => array(),
+                    'items'  => array(
+                        'title' => esc_html__( 'Middle', '@@text_domain' ),
+                    ),
                     'bottom' => array(
-                        'title' => esc_html__( 'Bottom', '@@text_domain' ),
+                        'title' => esc_html__( 'End', '@@text_domain' ),
                         'align' => array(
                             'left',
                             'center',
@@ -2357,7 +2359,7 @@ class Visual_Portfolio_Admin {
                         'is_pro'            => true,
                     ),
                     'items' => array(
-                        'title'             => esc_html__( 'Items', '@@text_domain' ),
+                        'title'             => esc_html__( 'Layout Items', '@@text_domain' ),
                         'allowed_locations' => array( 'items' ),
                         'category'          => 'layouts',
                     ),

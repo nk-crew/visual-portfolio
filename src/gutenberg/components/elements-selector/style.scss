@@ -1,26 +1,22 @@
 .vpf-component-elements-selector-control-location {
   position: relative;
-  padding: 15px;
-  background-color: $light-gray-100;
-  border-radius: 5px;
+  // background-color: $light-gray-100;
 
   & + & {
-    margin-top: 10px;
+    margin-top: 17px;
   }
 
   .vpf-component-elements-selector-control-location-title {
-    margin-top: -4px;
-    margin-bottom: 7px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    opacity: 0.5;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.6;
   }
 
   .vpf-component-elements-selector-control-location-align {
     position: absolute;
-    top: 8px;
-    right: 10px;
+    top: -2px;
+    right: 0;
 
     button {
       display: flex;
@@ -29,7 +25,6 @@
       font-size: 10px;
       color: $dark-gray-100;
       cursor: pointer;
-      background: none;
       border: none;
       border-radius: 2px;
       transition: 0.2s background-color;
@@ -64,9 +59,17 @@
       .components-button {
         justify-content: center;
         width: 100%;
-        background: none;
-        border: 1px solid $gray-900;
+        height: 40px;
+        background: #fff;
+        border: 1px solid #e1e1e1;
+        border-radius: 4px;
         box-shadow: none;
+
+        &:hover,
+        &:focus {
+          background: #f9f8f8;
+          border-color: #cbcbcb;
+        }
       }
     }
 
@@ -75,28 +78,59 @@
       align-items: center;
       justify-content: space-between;
       width: 100%;
+      height: 40px;
       padding: 9px 12px;
       margin-top: 10px;
-      color: $dark-gray-200;
-      background-color: transparent;
-      border: 1px solid $gray-900;
-      border-radius: 3px;
+      font-weight: 500;
+      color: #000;
+      background-color: #f9f8f8;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 10%);
+
+      &:hover,
+      &:focus {
+        color: var(--wp-admin-theme-color);
+        border-color: $gray-600;
+      }
     }
 
     button.vpf-component-elements-selector-control-location-options-item {
       cursor: pointer;
 
-      &:hover,
-      &:focus {
-        color: $dark-gray-300;
-        border-color: $dark-gray-300;
-      }
-
       svg {
-        width: 10px;
+        width: 13px;
         height: auto;
         margin-left: 5px;
       }
+    }
+  }
+}
+
+// Align dropdown.
+.vpf-component-elements-selector-align__dropdown-content {
+  &.is-from-top,
+  &.is-from-bottom {
+    margin-top: -34px;
+    margin-right: 10px;
+    margin-left: -44px;
+  }
+
+  .components-accessible-toolbar {
+    border: none;
+
+    .components-button.has-icon.has-icon {
+      min-width: 40px;
+      height: 30px;
+      padding-top: 0;
+      padding-right: 0;
+      padding-bottom: 0;
+      padding-left: 0;
+    }
+
+    .components-button::before {
+      right: 4px;
+      left: 4px;
     }
   }
 }

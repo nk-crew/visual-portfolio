@@ -17,144 +17,59 @@ const { __ } = wp.i18n;
 
 const { Component, Fragment, useState } = wp.element;
 
-const { PanelBody, Button, DropdownMenu, Dropdown, Modal, Toolbar, ToolbarButton, BaseControl } =
-  wp.components;
+const { PanelBody, Button, DropdownMenu, Dropdown, Modal, Toolbar, ToolbarButton } = wp.components;
 
 const alignIcons = {
   left: (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect
-        x="0.75"
-        y="0.75"
-        width="18.5"
-        height="18.5"
-        rx="3.25"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="4.5"
-        y1="4.5"
-        x2="4.5"
-        y2="15.5"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="9.5"
-        y1="4.5"
-        x2="9.5"
-        y2="15.5"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
+    <svg
+      width="24"
+      height="24"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M9 9v6h11V9H9zM4 20h1.5V4H4v16z" />
     </svg>
   ),
   center: (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect
-        x="0.75"
-        y="0.75"
-        width="18.5"
-        height="18.5"
-        rx="3.25"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="7.5"
-        y1="4.5"
-        x2="7.5"
-        y2="15.5"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="12.5"
-        y1="4.5"
-        x2="12.5"
-        y2="15.5"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
+    <svg
+      width="24"
+      height="24"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M20 9h-7.2V4h-1.6v5H4v6h7.2v5h1.6v-5H20z" />
     </svg>
   ),
   right: (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect
-        x="0.75"
-        y="0.75"
-        width="18.5"
-        height="18.5"
-        rx="3.25"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="15.5"
-        y1="15.5"
-        x2="15.5"
-        y2="4.5"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="10.5"
-        y1="15.5"
-        x2="10.5"
-        y2="4.5"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
+    <svg
+      width="24"
+      height="24"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M4 15h11V9H4v6zM18.5 4v16H20V4h-1.5z" />
     </svg>
   ),
   between: (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect
-        x="0.75"
-        y="0.75"
-        width="18.5"
-        height="18.5"
-        rx="3.25"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="15.5"
-        y1="15.5"
-        x2="15.5"
-        y2="4.5"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="4.5"
-        y1="15.5"
-        x2="4.5"
-        y2="4.5"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
+    <svg
+      width="24"
+      height="24"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M9 15h6V9H9v6zm-5 5h1.5V4H4v16zM18.5 4v16H20V4h-1.5z" />
     </svg>
   ),
 };
@@ -186,8 +101,8 @@ function ElementsSelectorOptions(props) {
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M8 4L14 10L8 16"
-            stroke="currentColor"
+            d="M11 4L17 10M17 10L11 16M17 10H3"
+            stroke="black"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -222,34 +137,35 @@ function ElementsSelectorOptions(props) {
           ) : null}
           {optionName !== 'items' ? (
             <PanelBody>
-              <BaseControl label={__('Remove', '@@text_domain')}>
-                <br />
-                <Button
-                  isSecondary
-                  isSmall
-                  onClick={() => {
+              <Button
+                isLink
+                style={{
+                  color: 'red',
+                  marginTop: '5px',
+                }}
+                onClick={() => {
+                  // eslint-disable-next-line no-alert
+                  if (
                     // eslint-disable-next-line no-alert
-                    if (
-                      // eslint-disable-next-line no-alert
-                      window.confirm(
-                        __('Are you sure you want to remove the element?', '@@text_domain')
-                      )
-                    ) {
-                      onChange({
-                        ...value,
-                        [location]: {
-                          ...value[location],
-                          elements: locationData.elements.filter(
-                            (elementName) => elementName !== optionName
-                          ),
-                        },
-                      });
-                    }
-                  }}
-                >
-                  {__('Remove Element', '@@text_domain')}
-                </Button>
-              </BaseControl>
+                    window.confirm(
+                      __('Are you sure you want to remove the element?', '@@text_domain')
+                    )
+                  ) {
+                    onChange({
+                      ...value,
+                      [location]: {
+                        ...value[location],
+                        elements: locationData.elements.filter(
+                          (elementName) => elementName !== optionName
+                        ),
+                      },
+                    });
+                  }
+                }}
+              >
+                {__('Remove', '@@text_domain')}
+                {` ${options[optionName] ? options[optionName].title : optionName}`}
+              </Button>
             </PanelBody>
           ) : null}
         </Modal>
@@ -335,6 +251,9 @@ export default class ElementsSelector extends Component {
 
     return (
       <Dropdown
+        position="bottom left"
+        className="vpf-component-elements-selector-align__dropdown"
+        contentClassName="vpf-component-elements-selector-align__dropdown-content"
         renderToggle={({ isOpen, onToggle }) => (
           <button
             type="button"
@@ -364,16 +283,14 @@ export default class ElementsSelector extends Component {
           <div className="vpf-component-elements-selector-control-location-title">
             {locationData.title}
           </div>
-        ) : (
-          ''
-        )}
-        {locationData.availableAlign.length ? (
+        ) : null}
+
+        {locationData.availableAlign.length && locationData.elements.length ? (
           <div className="vpf-component-elements-selector-control-location-align">
             {this.renderAlignSettings(location)}
           </div>
-        ) : (
-          ''
-        )}
+        ) : null}
+
         <div
           className={classnames(
             'vpf-component-elements-selector-control-location-options',
@@ -407,15 +324,15 @@ export default class ElementsSelector extends Component {
               icon={
                 // eslint-disable-next-line react/jsx-wrap-multilines
                 <svg
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   xmlns="http://www.w3.org/2000/svg"
-                  viewBox="-2 -2 24 24"
+                  viewBox="0 0 24 24"
                   role="img"
                   aria-hidden="true"
                   focusable="false"
                 >
-                  <path d="M10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6zM10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6z" />
+                  <path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
                 </svg>
               }
               controls={Object.keys(availableElements).map((optionName) => ({
