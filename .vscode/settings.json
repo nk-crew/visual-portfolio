@@ -3,6 +3,9 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[php]": {
+    "editor.defaultFormatter": null
+  },
   "editor.formatOnSave": true,
 
   "scss.validate": false,
