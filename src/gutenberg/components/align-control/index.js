@@ -139,7 +139,7 @@ export default class IconsSelector extends Component {
     Object.keys(hAlign).forEach((val) => {
       controls.push(
         <ToolbarButton
-          key={val}
+          key={`h-${val}`}
           icon={hAlign[val]}
           label={`${extended ? 'Horizontal ' : ''}${val.charAt(0).toUpperCase() + val.slice(1)}`}
           onClick={() => onChange(this.getAlignString(val, value.v))}
@@ -153,7 +153,7 @@ export default class IconsSelector extends Component {
       Object.keys(vAlign).forEach((val) => {
         controls.push(
           <ToolbarButton
-            key={val}
+            key={`v-${val}`}
             icon={vAlign[val]}
             label={`Vertical ${val.charAt(0).toUpperCase() + val.slice(1)}`}
             onClick={() => onChange(this.getAlignString(value.h, val))}
