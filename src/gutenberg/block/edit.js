@@ -6,7 +6,6 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
-import ElementIcon from '../../assets/admin/images/icon-gutenberg.svg';
 import ControlsRender from '../components/controls-render';
 import IframePreview from '../components/iframe-preview';
 
@@ -15,7 +14,7 @@ import IframePreview from '../components/iframe-preview';
  */
 const { Component, Fragment } = wp.element;
 
-const { Placeholder } = wp.components;
+const { __ } = wp.i18n;
 
 const { InspectorControls } = wp.blockEditor;
 
@@ -149,13 +148,13 @@ export default class BlockEdit extends Component {
           {setupWizard !== 'true' ? (
             <IframePreview {...this.props} />
           ) : (
-            <Placeholder
-              className="vpf-setup-wizard"
-              icon={<ElementIcon width="20" height="20" />}
-              label={pluginName}
-            >
+            <div className="vpf-setup-wizard">
+              <div className="vpf-setup-wizard-title">{pluginName}</div>
+              <div className="vpf-setup-wizard-description">
+                {__('Select content source for this layout', '@@text_domain')}
+              </div>
               {this.renderControls(this.props, true)}
-            </Placeholder>
+            </div>
           )}
         </div>
       </Fragment>
