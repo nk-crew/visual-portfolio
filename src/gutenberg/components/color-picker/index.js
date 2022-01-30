@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
-
-/**
  * WordPress dependencies
  */
 const WPColorPicker = wp.components.ColorPicker;
@@ -42,21 +37,20 @@ export default class ColorPicker extends Component {
 
     return (
       <Dropdown
-        className={classnames(
-          'components-color-palette__item-wrapper components-circular-option-picker__option-wrapper'
-        )}
-        contentClassName="components-color-palette__picker"
+        position="bottom left"
+        className="vpf-component-color-picker__dropdown"
+        contentClassName="vpf-component-color-picker__dropdown-content"
         renderToggle={({ isOpen, onToggle }) => (
           <Tooltip text={hint}>
             <button
               type="button"
               aria-expanded={isOpen}
-              className="components-color-palette__item components-circular-option-picker__option"
+              className="vpf-component-color-toggle"
               onClick={onToggle}
               aria-label={hint}
               style={{ color: value || '' }}
             >
-              <span className="components-color-palette__custom-color-gradient" />
+              <span />
             </button>
           </Tooltip>
         )}
