@@ -1,6 +1,12 @@
-/**
- * Editor Styles
- */
+// Block preview example.
+.vpf-example-preview {
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+// Setup wizard.
 .vpf-setup-wizard {
   padding: 30px;
   padding-bottom: 35px;

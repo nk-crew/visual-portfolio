@@ -1216,6 +1216,17 @@ class Visual_Portfolio_Admin {
         );
 
         /**
+         * Enabled preview for gutenberg block.
+         */
+        Visual_Portfolio_Controls::register(
+            array(
+                'type'    => 'hidden',
+                'name'    => 'preview_image_example',
+                'default' => '',
+            )
+        );
+
+        /**
          * Enabled setup wizard.
          */
         Visual_Portfolio_Controls::register(

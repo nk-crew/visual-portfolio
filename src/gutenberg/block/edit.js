@@ -18,8 +18,11 @@ const { __ } = wp.i18n;
 
 const { InspectorControls } = wp.blockEditor;
 
-const { plugin_name: pluginName, controls_categories: registeredControlsCategories } =
-  window.VPGutenbergVariables;
+const {
+  plugin_name: pluginName,
+  plugin_url: pluginUrl,
+  controls_categories: registeredControlsCategories,
+} = window.VPGutenbergVariables;
 
 /**
  * Block Edit Class.
@@ -130,20 +133,35 @@ export default class BlockEdit extends Component {
 
     let { className } = this.props;
 
-    const { setup_wizard: setupWizard, ghostkitClassname } = attributes;
+    const {
+      setup_wizard: setupWizard,
+      preview_image_example: previewExample,
+      layout,
+      ghostkitClassname,
+    } = attributes;
 
     // add custom classname.
     if (ghostkitClassname) {
       className = classnames(className, ghostkitClassname);
     }
 
+    // Display block preview.
+    if (previewExample === 'true') {
+      return (
+        <div className="vpf-example-preview">
+          <img
+            src={`${pluginUrl}/assets/admin/images/example-${layout}.png`}
+            alt={`Preview of ${layout} layout`}
+          />
+        </div>
+      );
+    }
+
     return (
       <Fragment>
         {setupWizard !== 'true' ? (
           <InspectorControls>{this.renderControls(this.props)}</InspectorControls>
-        ) : (
-          ''
-        )}
+        ) : null}
         <div className={className}>
           {setupWizard !== 'true' ? (
             <IframePreview {...this.props} />

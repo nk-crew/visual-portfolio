@@ -44,6 +44,11 @@ const settings = {
       scrollReveal: true,
     },
   },
+  example: {
+    attributes: {
+      preview_image_example: 'true',
+    },
+  },
   variations,
   edit,
   save,
