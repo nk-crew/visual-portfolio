@@ -314,6 +314,20 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.15.6 =
+
+* tested with WordPress 5.9
+* added promo Youtube video in the plugin description on wordpress.org
+* added a quick check to create_slug function - if slug for some reason is empty, return the label. This function is used to create slugs categories, added in the image galleries.
+* added block previews when adding it to the Gutenberg editor
+* improved styles of the block setup wizard
+* improved styles of the welcome screen
+* improved styles of image settings popup
+* improved styles of Layout section in the block settings
+* improved styles of color picker component
+* improved styles of align control component
+* fixed classes tree displaying in the block custom CSS modal
+
 = 2.15.5 =
 
 * fixed conflict with SG Optimizer lazy loading
