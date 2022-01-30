@@ -23,20 +23,23 @@
       width: 25px;
       padding: 4px 5px;
       font-size: 10px;
-      color: $dark-gray-100;
+      color: #000;
       cursor: pointer;
-      border: none;
-      border-radius: 2px;
-      transition: 0.2s background-color;
+      background: #fff;
+      border: 1px solid #e1e1e1;
+      border-radius: 3px;
 
       &:hover,
       &:focus {
-        color: $dark-gray-400;
+        color: var(--wp-admin-theme-color);
+        background: #f9f8f8;
+        border-color: #cbcbcb;
       }
 
       svg {
         width: 100%;
         height: auto;
+        fill: currentcolor;
       }
     }
   }
