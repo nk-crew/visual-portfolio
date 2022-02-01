@@ -2132,8 +2132,8 @@ class Visual_Portfolio_Get {
                 if ( 'default' !== $args['vp_opts']['items_style'] ) {
                     $items_style_pref = '/' . $args['vp_opts']['items_style'];
                 }
-                visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/image', $args );
-                visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/meta', $args );
+                visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/image', apply_filters( 'vpf_each_item_image_args', $args ) );
+                visual_portfolio()->include_template( 'items-list/items-style' . $items_style_pref . '/meta', apply_filters( 'vpf_each_item_meta_args', $args ) );
 
                 do_action( 'vpf_each_item_end', $args );
                 ?>
