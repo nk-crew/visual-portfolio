@@ -26,6 +26,7 @@ import ProNote from '../pro-note';
 import controlConditionCheck from '../../utils/control-condition-check';
 import controlGetValue from '../../utils/control-get-value';
 import { maybeEncode, maybeDecode } from '../../utils/encode-decode';
+import SortableControl from '../sortable-control';
 
 /**
  * WordPress dependencies
@@ -457,6 +458,18 @@ ControlsRender.Control = function (props) {
       );
       renderControlLabel = false;
       renderControlHelp = false;
+      break;
+    case 'sortable':
+      renderControl = (
+        <SortableControl
+          label={renderControlLabel}
+          controlName={props.name}
+          attributes={attributes}
+          value={controlVal}
+          options={props.options || {}}
+          onChange={(val) => onChange(val)}
+        />
+      );
       break;
     default:
       renderControl = (
