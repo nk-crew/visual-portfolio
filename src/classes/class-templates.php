@@ -16,6 +16,9 @@ class Visual_Portfolio_Templates {
      * @param array  $args args for template.
      */
     public static function include_template( $template_name, $args = array() ) {
+        // Allow 3rd party plugin filter template args from their plugin.
+        $args = apply_filters( 'vpf_include_template_args', $args, $template_name );
+
         if ( ! empty( $args ) && is_array( $args ) ) {
 	        // phpcs:ignore
             extract( $args );
