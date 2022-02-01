@@ -70,6 +70,7 @@ class ControlsRender extends Component {
       controls,
       clientId,
       isSetupWizard,
+      showPanel = true,
     } = this.props;
 
     if (!attributes) {
@@ -149,6 +150,10 @@ class ControlsRender extends Component {
 
     if (isSetupWizard) {
       return result.length ? <div className="vpf-setup-wizard-panel">{result}</div> : '';
+    }
+
+    if (!showPanel) {
+      return result.length ? result : '';
     }
 
     return result.length ? (
