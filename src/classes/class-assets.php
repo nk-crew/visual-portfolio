@@ -287,7 +287,7 @@ class Visual_Portfolio_Assets {
                     '(function(){
                         var styleTag = document.createElement("style");
                         styleTag.id = "' . esc_attr( $controls_css_handle ) . '-inline-css";
-                        styleTag.innerHTML = "' . preg_replace( "/[\r\n]+/", ' ', ( $dynamic_styles ? $dynamic_styles : ' ' ) ) . '";
+                        styleTag.innerHTML = ' . wp_json_encode( $dynamic_styles ? $dynamic_styles : ' ' ) . ';
                         document.body.appendChild(styleTag);
                     }());'
                 );
