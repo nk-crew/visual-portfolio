@@ -8,6 +8,8 @@ import { SortableContainer, SortableElement, sortableHandle, arrayMove } from 'r
  */
 const { Component } = wp.element;
 
+const { Button } = wp.components;
+
 const DragHandle = sortableHandle(() => (
   <span>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,24 +23,49 @@ const DragHandle = sortableHandle(() => (
   </span>
 ));
 
-const SortableItem = SortableElement(({ value, sourceOptions }) => {
-  const label = sourceOptions[value];
+const SortableItem = SortableElement(({ element, sourceOptions, props, state }) => {
+  const { allowDisablingOptions, onChange } = props;
+
+  const { value, disabledOptions } = state;
+
+  const label = sourceOptions[element];
   return (
     <li>
       <DragHandle />
       {label}
+      {allowDisablingOptions ? (
+        <Button
+          className="vpf-component-sortable-delete"
+          onClick={() => {
+            const updateValue = value;
+            const findIndex = value.indexOf(element);
+            const disabledOption = updateValue.splice(findIndex, 1);
+            disabledOptions.push(disabledOption);
+
+            onChange(JSON.stringify(updateValue));
+            this.setState({
+              value: updateValue,
+              disabledOptions,
+            });
+          }}
+        >
+          -
+        </Button>
+      ) : null}
     </li>
   );
 });
 
-const SortableList = SortableContainer(({ items, sourceOptions }) => (
-  <ul className="vpf-component-sortable">
+const SortableList = SortableContainer(({ items, sourceOptions, classes, props, state }) => (
+  <ul className={classes}>
     {items.map((value, index) => (
       <SortableItem
         key={`item-${value}`}
         index={index}
-        value={value}
+        element={value}
         sourceOptions={sourceOptions}
+        props={props}
+        state={state}
       />
     ))}
   </ul>
@@ -51,34 +78,77 @@ export default class SortableControl extends Component {
   constructor(...args) {
     super(...args);
 
-    const { options } = this.props;
+    const { options, defaultVal } = this.props;
 
-    const defaultOptions = Object.keys(options);
-
-    this.state = {
-      defaultOptions,
-    };
-  }
-
-  render() {
-    const { options, onChange } = this.props;
-
-    const { defaultOptions } = this.state;
+    const defaultOptions = defaultVal || Object.keys(options);
 
     const value =
       typeof this.props.value !== 'undefined' ? JSON.parse(this.props.value) : defaultOptions;
 
+    const disabledOptions = Object.keys(options).filter((findValue) => !value.includes(findValue));
+
+    this.state = {
+      value,
+      disabledOptions,
+    };
+  }
+
+  render() {
+    const { options, allowDisablingOptions, onChange } = this.props;
+
+    const { value, disabledOptions } = this.state;
+
+    let classes = 'vpf-component-sortable';
+
+    classes = disabledOptions.length > 0 ? `${classes} vpf-dragging-has-disabled-options` : classes;
+
     return (
-      <SortableList
-        items={value}
-        sourceOptions={options}
-        onSortEnd={({ oldIndex, newIndex }) => {
-          const updateValue = arrayMove([...value], oldIndex, newIndex);
-          onChange(JSON.stringify(updateValue));
-        }}
-        useDragHandle
-        helperClass="vpf-component-sortable-item-dragging"
-      />
+      <div>
+        <SortableList
+          items={value}
+          sourceOptions={options}
+          classes={classes}
+          props={this.props}
+          state={this.state}
+          onSortEnd={({ oldIndex, newIndex }) => {
+            const updateValue = arrayMove([...value], oldIndex, newIndex);
+            onChange(JSON.stringify(updateValue));
+            this.setState({
+              value: updateValue,
+            });
+          }}
+          useDragHandle
+          helperClass="vpf-component-sortable-item-dragging"
+        />
+        {disabledOptions.length > 0 ? (
+          <ul className="vpf-component-sortable-disabled">
+            {disabledOptions.map((el) => (
+              <li key={`disabled-item-${el}`}>
+                {allowDisablingOptions ? (
+                  <Button
+                    className="vpf-component-sortable-add"
+                    onClick={() => {
+                      const updateValue = value;
+                      const findIndex = disabledOptions.indexOf(el);
+                      disabledOptions.splice(findIndex, 1);
+                      updateValue.push(el);
+
+                      onChange(JSON.stringify(updateValue));
+                      this.setState({
+                        value: updateValue,
+                        disabledOptions,
+                      });
+                    }}
+                  >
+                    +
+                  </Button>
+                ) : null}
+                {options[el]}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
     );
   }
 }

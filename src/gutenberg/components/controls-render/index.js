@@ -472,6 +472,8 @@ ControlsRender.Control = function (props) {
           attributes={attributes}
           value={controlVal}
           options={props.options || {}}
+          defaultVal={props.default || {}}
+          allowDisablingOptions={props.allow_disabling_options || false}
           onChange={(val) => onChange(val)}
         />
       );
