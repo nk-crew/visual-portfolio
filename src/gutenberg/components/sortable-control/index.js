@@ -85,8 +85,15 @@ export default class SortableControl extends Component {
 
     const defaultOptions = defaultVal || Object.keys(options);
 
-    const value =
-      typeof this.props.value !== 'undefined' ? JSON.parse(this.props.value) : defaultOptions;
+    let value = defaultOptions;
+
+    if (typeof this.props.value !== 'undefined') {
+      if (typeof this.props.value === 'string') {
+        value = JSON.parse(this.props.value);
+      } else {
+        value = this.props.value;
+      }
+    }
 
     const disabledOptions = Object.keys(options).filter((findValue) => !value.includes(findValue));
 
