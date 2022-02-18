@@ -26,6 +26,7 @@
     "@babel/register": "^7.16.9",
     "@svgr/webpack": "^5.5.0",
     "base64-inline-loader": "^2.0.1",
+    "browserslist-config-nk": "^1.0.0",
     "eslint-config-nk": "^1.1.0",
     "husky": "^7.0.4",
     "json-file": "^0.1.0",
