@@ -23,7 +23,7 @@ const DragHandle = sortableHandle(() => (
   </span>
 ));
 
-const SortableItem = SortableElement(({ element, sourceOptions, props, state }) => {
+const SortableItem = SortableElement(({ element, sourceOptions, props, state, controlObject }) => {
   const { allowDisablingOptions, onChange } = props;
 
   const { value, disabledOptions } = state;
@@ -39,11 +39,11 @@ const SortableItem = SortableElement(({ element, sourceOptions, props, state }) 
           onClick={() => {
             const updateValue = value;
             const findIndex = value.indexOf(element);
-            const disabledOption = updateValue.splice(findIndex, 1);
-            disabledOptions.push(disabledOption);
+            updateValue.splice(findIndex, 1);
+            disabledOptions.push(element);
 
             onChange(JSON.stringify(updateValue));
-            this.setState({
+            controlObject.setState({
               value: updateValue,
               disabledOptions,
             });
@@ -56,20 +56,23 @@ const SortableItem = SortableElement(({ element, sourceOptions, props, state }) 
   );
 });
 
-const SortableList = SortableContainer(({ items, sourceOptions, classes, props, state }) => (
-  <ul className={classes}>
-    {items.map((value, index) => (
-      <SortableItem
-        key={`item-${value}`}
-        index={index}
-        element={value}
-        sourceOptions={sourceOptions}
-        props={props}
-        state={state}
-      />
-    ))}
-  </ul>
-));
+const SortableList = SortableContainer(
+  ({ items, sourceOptions, classes, props, state, controlObject }) => (
+    <ul className={classes}>
+      {items.map((value, index) => (
+        <SortableItem
+          key={`item-${value}`}
+          index={index}
+          element={value}
+          sourceOptions={sourceOptions}
+          props={props}
+          state={state}
+          controlObject={controlObject}
+        />
+      ))}
+    </ul>
+  )
+);
 
 /**
  * Component Class
@@ -110,6 +113,7 @@ export default class SortableControl extends Component {
           classes={classes}
           props={this.props}
           state={this.state}
+          controlObject={this}
           onSortEnd={({ oldIndex, newIndex }) => {
             const updateValue = arrayMove([...value], oldIndex, newIndex);
             onChange(JSON.stringify(updateValue));
