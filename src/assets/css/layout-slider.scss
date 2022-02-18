@@ -21,8 +21,6 @@
   .vp-portfolio__thumbnail-img img {
     object-fit: var(--vp-images__object-fit);
     object-position: var(--vp-images__object-position);
-    /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-    font-family: "object-fit: cover; object-position: 50% 50%;";
   }
 
   // arrows

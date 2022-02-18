@@ -356,11 +356,6 @@ class Visual_Portfolio_Assets {
             wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js', array( 'jquery' ), '1.0.3', true );
         }
 
-        // Object Fit Images.
-        if ( apply_filters( 'vpf_enqueue_plugin_object_fit_images', true ) ) {
-            wp_register_script( 'object-fit-images', visual_portfolio()->plugin_url . 'assets/vendor/object-fit-images/dist/ofi.min.js', array(), '3.2.4', true );
-        }
-
         // PhotoSwipe.
         if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
             wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/photoswipe.css', array(), '4.1.3' );
@@ -398,33 +393,6 @@ class Visual_Portfolio_Assets {
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
             wp_register_script( 'lazysizes-config', visual_portfolio()->plugin_url . 'assets/js/lazysizes-cfg.min.js', array(), '@@plugin_version', true );
             wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array( 'lazysizes-object-fit-cover', 'lazysizes-config' ), '5.2.2', true );
-        }
-
-        // CSS Vars Polyfill.
-        if ( apply_filters( 'vpf_enqueue_plugin_css_vars_polyfill', true ) ) {
-            $polyfill_name    = 'ie11-custom-properties';
-            $polyfill_version = '4.1.0';
-            $polyfill_url     = visual_portfolio()->plugin_url . 'assets/vendor/ie11-custom-properties/ie11CustomProperties.js?ver=' . $polyfill_version;
-
-            // Already added in 3rd-party code.
-            if ( wp_script_is( $polyfill_name ) || wp_script_is( $polyfill_name, 'registered' ) ) {
-                return;
-            }
-
-            wp_register_script( $polyfill_name, '', array(), $polyfill_version, true );
-            wp_add_inline_script(
-                $polyfill_name,
-                '!function( d ) {
-                    // For IE11 only.
-                    if( window.MSInputMethodContext && document.documentMode ) {
-                        var s = d.createElement( \'script\' );
-                        s.src = \'' . esc_url( $polyfill_url ) . '\';
-                        d.head.appendChild( s );
-                    }
-                }(document)'
-            );
-
-            $vp_deps[] = $polyfill_name;
         }
 
         // Visual Portfolio CSS.

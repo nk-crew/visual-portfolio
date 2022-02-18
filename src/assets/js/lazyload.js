@@ -1,26 +1,9 @@
 /*
  * Visual Portfolio images lazy load.
  */
-const { jQuery: $, objectFitImages } = window;
+const { jQuery: $ } = window;
 
 const $doc = $(document);
-
-// enable object-fit
-if ('undefined' !== typeof objectFitImages) {
-  // ofi and lazysizes conflicted, so we need to run lazysizes
-  // first and then run ofi polyfill.
-  objectFitImages('.vp-portfolio img:not(.vp-lazyload)');
-
-  $doc.on('lazybeforeunveil', (e) => {
-    const $img = $(e.target);
-
-    if ($img.closest('.vp-portfolio').length) {
-      $img.one('load', () => {
-        objectFitImages($img[0]);
-      });
-    }
-  });
-}
 
 // recalculate image size if parent is <picture>
 $doc.on('lazybeforesizes', (e) => {
