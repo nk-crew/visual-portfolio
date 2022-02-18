@@ -110,7 +110,7 @@ class Visual_Portfolio_Gutenberg_Block {
         }
 
         register_block_type(
-            'visual-portfolio/block',
+            visual_portfolio()->plugin_path . 'gutenberg/block',
             array(
                 'render_callback' => array( $this, 'block_render' ),
                 'attributes'      => $attributes,

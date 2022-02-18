@@ -52,7 +52,7 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
         );
 
         register_block_type(
-            'visual-portfolio/saved',
+            visual_portfolio()->plugin_path . 'gutenberg/block-saved',
             array(
                 'render_callback' => array( $this, 'block_render' ),
                 'attributes'      => $attributes,

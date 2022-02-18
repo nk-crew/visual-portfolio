@@ -10,21 +10,12 @@ import deprecated from './deprecated';
 /**
  * WordPress dependencies
  */
-const { __, sprintf } = wp.i18n;
-
-const { registerBlockType, getCategories } = wp.blocks;
+const { registerBlockType } = wp.blocks;
 
 const { name } = metadata;
 
-const { plugin_name: pluginName } = window.VPGutenbergVariables;
-
-const hasMediaCategory = getCategories().some((category) => 'media' === category.slug);
-
 const settings = {
   ...metadata,
-  category: hasMediaCategory ? metadata.category : 'common',
-  title: sprintf(__('%s Saved', '@@text_domain'), pluginName),
-  description: sprintf(__('Display saved %s layouts.', '@@text_domain'), pluginName),
   icon: {
     foreground: '#2540CC',
     src: (
@@ -77,11 +68,6 @@ const settings = {
       </svg>
     ),
   },
-  keywords: [
-    __('saved', '@@text_domain'),
-    __('portfolio', '@@text_domain'),
-    __('vpf', '@@text_domain'),
-  ],
   ghostkit: {
     supports: {
       styles: true,

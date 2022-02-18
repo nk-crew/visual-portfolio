@@ -15,31 +15,32 @@ import SelectControl from '../components/select-control';
  */
 const { __, sprintf } = wp.i18n;
 
-const { Component, Fragment } = wp.element;
+const { Fragment } = wp.element;
 
 const { Placeholder, Spinner, PanelBody, Button } = wp.components;
 
-const { withSelect } = wp.data;
+const { useSelect } = wp.data;
 
-const { InspectorControls } = wp.blockEditor;
+const { useBlockProps, InspectorControls } = wp.blockEditor;
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 
 /**
  * Block Edit Class.
  */
-class BlockEdit extends Component {
-  constructor(...args) {
-    super(...args);
+export default function BlockEdit(props) {
+  const { clientId, setAttributes, attributes } = props;
 
-    this.getSelector = this.getSelector.bind(this);
-  }
+  const { id, ghostkitClassname } = attributes;
 
-  getSelector() {
-    const { portfolioLayouts, setAttributes, attributes } = this.props;
+  const { portfolioLayouts } = useSelect(
+    (select) => ({
+      portfolioLayouts: select('visual-portfolio').getPortfolioLayouts(),
+    }),
+    []
+  );
 
-    const { id } = attributes;
-
+  function getSelector() {
     let portfolioLayoutsSelect = false;
     let currentItemUrl = false;
 
@@ -110,47 +111,39 @@ class BlockEdit extends Component {
     );
   }
 
-  render() {
-    const { attributes, clientId } = this.props;
+  let className = '';
 
-    let { className } = this.props;
-
-    const { id, ghostkitClassname } = attributes;
-
-    // add custom classname.
-    if (ghostkitClassname) {
-      className = classnames(className, ghostkitClassname);
-    }
-
-    return (
-      <Fragment>
-        <InspectorControls>
-          <PanelBody>{this.getSelector()}</PanelBody>
-        </InspectorControls>
-        <div className={className}>
-          {id ? (
-            <IframePreview
-              attributes={{
-                content_source: 'saved',
-                id,
-              }}
-              clientId={clientId}
-            />
-          ) : (
-            <Placeholder
-              className="vpf-setup-wizard-saved"
-              icon={<ElementIcon width="20" height="20" />}
-              label={sprintf(__('Saved %s', '@@text_domain'), pluginName)}
-            >
-              {this.getSelector()}
-            </Placeholder>
-          )}
-        </div>
-      </Fragment>
-    );
+  // add custom classname.
+  if (ghostkitClassname) {
+    className = classnames(className, ghostkitClassname);
   }
-}
 
-export default withSelect((select) => ({
-  portfolioLayouts: select('visual-portfolio').getPortfolioLayouts(),
-}))(BlockEdit);
+  const blockProps = useBlockProps({
+    className,
+  });
+
+  return (
+    <div {...blockProps}>
+      <InspectorControls>
+        <PanelBody>{getSelector()}</PanelBody>
+      </InspectorControls>
+      {id ? (
+        <IframePreview
+          attributes={{
+            content_source: 'saved',
+            id,
+          }}
+          clientId={clientId}
+        />
+      ) : (
+        <Placeholder
+          className="vpf-setup-wizard-saved"
+          icon={<ElementIcon width="20" height="20" />}
+          label={sprintf(__('Saved %s', '@@text_domain'), pluginName)}
+        >
+          {getSelector()}
+        </Placeholder>
+      )}
+    </div>
+  );
+}

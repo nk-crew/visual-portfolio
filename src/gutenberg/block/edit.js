@@ -12,11 +12,11 @@ import IframePreview from '../components/iframe-preview';
 /**
  * WordPress dependencies
  */
-const { Component, Fragment } = wp.element;
+const { useEffect, Fragment } = wp.element;
 
 const { __ } = wp.i18n;
 
-const { InspectorControls } = wp.blockEditor;
+const { useBlockProps, InspectorControls } = wp.blockEditor;
 
 const {
   plugin_name: pluginName,
@@ -24,33 +24,66 @@ const {
   controls_categories: registeredControlsCategories,
 } = window.VPGutenbergVariables;
 
+function renderControls(props, isSetupWizard = false) {
+  const { attributes } = props;
+
+  let { content_source: contentSource } = attributes;
+
+  // Saved layouts by default displaying Portfolio source.
+  if ('portfolio' === contentSource) {
+    contentSource = '';
+  }
+
+  return (
+    <Fragment>
+      <ControlsRender category="content-source" {...props} isSetupWizard={isSetupWizard} />
+      {contentSource ? (
+        <Fragment>
+          {Object.keys(registeredControlsCategories).map((name) => {
+            if ('content-source' === name) {
+              return null;
+            }
+
+            return (
+              <ControlsRender key={name} category={name} {...props} isSetupWizard={isSetupWizard} />
+            );
+          })}
+        </Fragment>
+      ) : (
+        ''
+      )}
+    </Fragment>
+  );
+}
+
 /**
  * Block Edit Class.
  */
-export default class BlockEdit extends Component {
-  componentDidMount() {
-    const { attributes, setAttributes } = this.props;
+export default function BlockEdit(props) {
+  const { attributes, setAttributes } = props;
 
-    const {
-      block_id: blockId,
-      content_source: contentSource,
-      setup_wizard: setupWizard,
-    } = attributes;
+  const {
+    block_id: blockId,
+    content_source: contentSource,
+    setup_wizard: setupWizard,
+    preview_image_example: previewExample,
+    layout,
+    images,
+    ghostkitClassname,
+  } = attributes;
 
+  // Display setup wizard on mount.
+  useEffect(() => {
     if (!setupWizard && (!blockId || !contentSource)) {
       setAttributes({
         setup_wizard: 'true',
       });
     }
-  }
+  }, []);
 
-  componentDidUpdate() {
-    const { attributes, setAttributes } = this.props;
-
-    const { setup_wizard: setupWizard, content_source: contentSource, images } = attributes;
-
-    // Set some starter attributes for different content sources.
-    // And hide the setup wizard.
+  // Set some starter attributes for different content sources.
+  // And hide the setup wizard.
+  useEffect(() => {
     if ('true' === setupWizard && contentSource) {
       switch (contentSource) {
         case 'images':
@@ -88,94 +121,47 @@ export default class BlockEdit extends Component {
           break;
       }
     }
+  }, [setupWizard, contentSource, images]);
+
+  let className = '';
+
+  // add custom classname.
+  if (ghostkitClassname) {
+    className = classnames(className, ghostkitClassname);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  renderControls(props, isSetupWizard = false) {
-    const { attributes } = props;
-
-    let { content_source: contentSource } = attributes;
-
-    // Saved layouts by default displaying Portfolio source.
-    if ('portfolio' === contentSource) {
-      contentSource = '';
-    }
-
+  // Display block preview.
+  if ('true' === previewExample) {
     return (
-      <Fragment>
-        <ControlsRender category="content-source" {...props} isSetupWizard={isSetupWizard} />
-        {contentSource ? (
-          <Fragment>
-            {Object.keys(registeredControlsCategories).map((name) => {
-              if ('content-source' === name) {
-                return null;
-              }
-
-              return (
-                <ControlsRender
-                  key={name}
-                  category={name}
-                  {...props}
-                  isSetupWizard={isSetupWizard}
-                />
-              );
-            })}
-          </Fragment>
-        ) : (
-          ''
-        )}
-      </Fragment>
+      <div className="vpf-example-preview">
+        <img
+          src={`${pluginUrl}/assets/admin/images/example-${layout}.png`}
+          alt={`Preview of ${layout} layout`}
+        />
+      </div>
     );
   }
 
-  render() {
-    const { attributes } = this.props;
+  const blockProps = useBlockProps({
+    className,
+  });
 
-    let { className } = this.props;
-
-    const {
-      setup_wizard: setupWizard,
-      preview_image_example: previewExample,
-      layout,
-      ghostkitClassname,
-    } = attributes;
-
-    // add custom classname.
-    if (ghostkitClassname) {
-      className = classnames(className, ghostkitClassname);
-    }
-
-    // Display block preview.
-    if ('true' === previewExample) {
-      return (
-        <div className="vpf-example-preview">
-          <img
-            src={`${pluginUrl}/assets/admin/images/example-${layout}.png`}
-            alt={`Preview of ${layout} layout`}
-          />
+  return (
+    <div {...blockProps}>
+      {'true' !== setupWizard ? (
+        <Fragment>
+          <InspectorControls>{renderControls(props)}</InspectorControls>
+          <IframePreview {...props} />
+        </Fragment>
+      ) : (
+        <div className="vpf-setup-wizard">
+          <div className="vpf-setup-wizard-title">{pluginName}</div>
+          <div className="vpf-setup-wizard-description">
+            {__('Select content source for this layout', '@@text_domain')}
+          </div>
+          {renderControls(props, true)}
         </div>
-      );
-    }
-
-    return (
-      <Fragment>
-        {'true' !== setupWizard ? (
-          <InspectorControls>{this.renderControls(this.props)}</InspectorControls>
-        ) : null}
-        <div className={className}>
-          {'true' !== setupWizard ? (
-            <IframePreview {...this.props} />
-          ) : (
-            <div className="vpf-setup-wizard">
-              <div className="vpf-setup-wizard-title">{pluginName}</div>
-              <div className="vpf-setup-wizard-description">
-                {__('Select content source for this layout', '@@text_domain')}
-              </div>
-              {this.renderControls(this.props, true)}
-            </div>
-          )}
-        </div>
-      </Fragment>
-    );
-  }
+      )}
+    </div>
+  );
 }

@@ -12,30 +12,16 @@ import transforms from './transforms';
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
-
-const { registerBlockType, getCategories } = wp.blocks;
+const { registerBlockType } = wp.blocks;
 
 const { name } = metadata;
 
-const { plugin_name: pluginName } = window.VPGutenbergVariables;
-
-const hasMediaCategory = getCategories().some((category) => 'media' === category.slug);
-
 const settings = {
   ...metadata,
-  category: hasMediaCategory ? metadata.category : 'common',
-  title: pluginName,
-  description: __('Display galleries, posts and portfolio grids.', '@@text_domain'),
   icon: {
     foreground: '#2540CC',
     src: <ElementIcon width="20" height="20" />,
   },
-  keywords: [
-    __('gallery', '@@text_domain'),
-    __('images', '@@text_domain'),
-    __('vpf', '@@text_domain'),
-  ],
   ghostkit: {
     supports: {
       styles: true,
