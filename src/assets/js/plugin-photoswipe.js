@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable indent */
 /*
  * External dependencies.
  */
@@ -20,7 +18,7 @@ const {
 const { __, settingsPopupGallery } = VPData;
 
 function resizeVideo(data, curItem) {
-  if (typeof curItem === 'undefined') {
+  if ('undefined' === typeof curItem) {
     if (data && data.itemHolders.length) {
       data.itemHolders.forEach((val) => {
         if (val.item && val.item.html) {
@@ -42,8 +40,8 @@ function resizeVideo(data, curItem) {
   let barTop = 0;
   let barBot = 0;
   if (bars) {
-    barTop = bars.top && bars.top !== 'auto' ? bars.top : 0;
-    barBot = bars.bottom && bars.bottom !== 'auto' ? bars.bottom : 0;
+    barTop = bars.top && 'auto' !== bars.top ? bars.top : 0;
+    barBot = bars.bottom && 'auto' !== bars.bottom ? bars.bottom : 0;
   }
   vpH -= barTop + barBot;
 
@@ -131,7 +129,7 @@ if (PhotoSwipe && VPPopupAPI) {
 
     // prepare items for fancybox api.
     items.forEach((item) => {
-      if (item.type === 'embed') {
+      if ('embed' === item.type) {
         finalItems.push({
           html: `<div class="vp-pswp-video"><div>${item.embed}</div></div>`,
           vw: item.width || 0,
@@ -196,7 +194,7 @@ if (PhotoSwipe && VPPopupAPI) {
       getImageURLForShare() {
         const currentItem = items[pswpInstance.getCurrentIndex()];
 
-        if (currentItem.type === 'image' && currentItem.src) {
+        if ('image' === currentItem.type && currentItem.src) {
           return currentItem.src;
         }
 
@@ -205,7 +203,7 @@ if (PhotoSwipe && VPPopupAPI) {
       getPageURLForShare() {
         const currentItem = items[pswpInstance.getCurrentIndex()];
 
-        if (currentItem.type === 'image' && currentItem.src) {
+        if ('image' === currentItem.type && currentItem.src) {
           return currentItem.src;
         }
 
@@ -273,7 +271,7 @@ if (PhotoSwipe && VPPopupAPI) {
 
         // zoom to original if initial zoom is less than 0.7x,
         // otherwise to 1.5x, to make sure that double-tap gesture always zooms image.
-        return item.initialZoomLevel < 0.7 ? 1 : 1.5;
+        return 0.7 > item.initialZoomLevel ? 1 : 1.5;
       },
     };
 
@@ -305,10 +303,10 @@ if (PhotoSwipe && VPPopupAPI) {
       // Code below is needed if you want image to switch dynamically on window.resize
 
       // Find out if current images need to be changed
-      if (useLargeImages && realViewportWidth < 1000) {
+      if (useLargeImages && 1000 > realViewportWidth) {
         useLargeImages = false;
         imageSrcWillChange = true;
-      } else if (!useLargeImages && realViewportWidth >= 1000) {
+      } else if (!useLargeImages && 1000 <= realViewportWidth) {
         useLargeImages = true;
         imageSrcWillChange = true;
       }
@@ -355,7 +353,7 @@ if (PhotoSwipe && VPPopupAPI) {
     });
 
     pswpInstance.listen('imageLoadComplete', (idx, item) => {
-      if (item.h < 1 || item.w < 1) {
+      if (1 > item.h || 1 > item.w) {
         const img = new Image();
 
         img.onload = () => {

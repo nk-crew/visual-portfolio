@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /*
  * Visual Portfolio main script.
  */
@@ -18,7 +17,7 @@ const $wnd = $(window);
  * Emit Resize Event.
  */
 function windowResizeEmit() {
-  if (typeof window.Event === 'function') {
+  if ('function' === typeof window.Event) {
     // modern browsers
     window.dispatchEvent(new window.Event('resize'));
   } else {
@@ -60,10 +59,10 @@ function checkVisibility() {
 
       const currentState = visibilityData[vpf.uid] || 'none';
 
-      visibilityData[vpf.uid] = this.offsetParent === null ? 'hidden' : 'visible';
+      visibilityData[vpf.uid] = null === this.offsetParent ? 'hidden' : 'visible';
 
       // changed from hidden to visible.
-      if (currentState === 'hidden' && visibilityData[vpf.uid] === 'visible') {
+      if ('hidden' === currentState && 'visible' === visibilityData[vpf.uid]) {
         isVisibilityChanged = true;
       }
     });
@@ -82,7 +81,7 @@ function checkVisibility() {
 
 // run check function only after portfolio inited.
 $(document).on('inited.vpf', (event) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -278,13 +277,13 @@ class VP {
       self.stylesList = {};
     }
 
-    if (typeof self.stylesList[uid] === 'undefined') {
+    if ('undefined' === typeof self.stylesList[uid]) {
       self.stylesList[uid] = {};
     }
-    if (typeof self.stylesList[uid][media] === 'undefined') {
+    if ('undefined' === typeof self.stylesList[uid][media]) {
       self.stylesList[uid][media] = {};
     }
-    if (typeof self.stylesList[uid][media][selector] === 'undefined') {
+    if ('undefined' === typeof self.stylesList[uid][media][selector]) {
       self.stylesList[uid][media][selector] = {};
     }
 
@@ -310,14 +309,14 @@ class VP {
       self.stylesList = {};
     }
 
-    if (typeof self.stylesList[uid] !== 'undefined' && !selector) {
+    if ('undefined' !== typeof self.stylesList[uid] && !selector) {
       self.stylesList[uid] = {};
     }
 
     if (
-      typeof self.stylesList[uid] !== 'undefined' &&
-      typeof self.stylesList[uid][media] !== 'undefined' &&
-      typeof self.stylesList[uid][media][selector] !== 'undefined' &&
+      'undefined' !== typeof self.stylesList[uid] &&
+      'undefined' !== typeof self.stylesList[uid][media] &&
+      'undefined' !== typeof self.stylesList[uid][media][selector] &&
       selector
     ) {
       delete self.stylesList[uid][media][selector];
@@ -341,7 +340,7 @@ class VP {
     }
 
     // create string with styles
-    if (typeof self.stylesList[uid] !== 'undefined') {
+    if ('undefined' !== typeof self.stylesList[uid]) {
       Object.keys(self.stylesList[uid]).forEach((m) => {
         // media
         if (m) {
@@ -414,7 +413,7 @@ class VP {
     const dataOptions = self.$item[0].dataset;
     const pureDataOptions = {};
     Object.keys(dataOptions).forEach((k) => {
-      if (k && k.substring(0, 2) === 'vp') {
+      if (k && 'vp' === k.substring(0, 2)) {
         pureDataOptions[self.firstToLowerCase(k.substring(2))] = dataOptions[k];
       }
     });
@@ -508,15 +507,15 @@ class VP {
       const $this = $(this);
       const $pagination = $this.closest('.vp-pagination');
 
-      if ($pagination.hasClass('vp-pagination__no-more') && self.options.pagination !== 'paged') {
+      if ($pagination.hasClass('vp-pagination__no-more') && 'paged' !== self.options.pagination) {
         return;
       }
 
-      self.loadNewItems($this.attr('href'), self.options.pagination === 'paged');
+      self.loadNewItems($this.attr('href'), 'paged' === self.options.pagination);
 
       // Scroll to top
       if (
-        self.options.pagination === 'paged' &&
+        'paged' === self.options.pagination &&
         $pagination.hasClass('vp-pagination__scroll-top')
       ) {
         const $adminBar = $('#wpadminbar');
@@ -529,7 +528,7 @@ class VP {
         }
 
         // Admin bar offset.
-        if ($adminBar.length && $adminBar.css('position') === 'fixed') {
+        if ($adminBar.length && 'fixed' === $adminBar.css('position')) {
           top -= $adminBar.outerHeight();
         }
 
@@ -562,7 +561,7 @@ class VP {
     function checkVisibilityAndLoad() {
       const rect = self.$item[0].getBoundingClientRect();
 
-      if (rect.bottom > 0 && rect.bottom - bottomPosToLoad <= window.innerHeight) {
+      if (0 < rect.bottom && rect.bottom - bottomPosToLoad <= window.innerHeight) {
         self.loadNewItems(self.options.nextPageUrl, false, () => {
           clearTimeout(scrollTimeout);
           scrollTimeout = setTimeout(() => {
@@ -571,7 +570,7 @@ class VP {
         });
       }
     }
-    if (self.options.pagination === 'infinite') {
+    if ('infinite' === self.options.pagination) {
       $wnd.on(`load${evp} scroll${evp} resize${evp} orientationchange${evp}`, () => {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
@@ -691,7 +690,7 @@ class VP {
       url,
       data: {
         vpf_ajax_call: true,
-        vpf_random_seed: typeof randomSeed !== 'undefined' ? randomSeed : false,
+        vpf_random_seed: 'undefined' !== typeof randomSeed ? randomSeed : false,
       },
       complete({ responseText }) {
         self.href = url;
@@ -827,7 +826,7 @@ class VP {
 // https://github.com/nk-crew/visual-portfolio/issues/103
 if ($('.elementor').length) {
   $(document).on('init.vpf addItems.vpf', (event, vpObject) => {
-    if (event.namespace !== 'vpf') {
+    if ('vpf' !== event.namespace) {
       return;
     }
 
@@ -847,11 +846,11 @@ const plugin = function (options, ...args) {
   let ret;
 
   this.each(function () {
-    if (typeof ret !== 'undefined') {
+    if ('undefined' !== typeof ret) {
       return;
     }
 
-    if (typeof options === 'object' || typeof options === 'undefined') {
+    if ('object' === typeof options || 'undefined' === typeof options) {
       if (!this.vpf) {
         this.vpf = new VP($(this), options);
       }
@@ -860,7 +859,7 @@ const plugin = function (options, ...args) {
     }
   });
 
-  return typeof ret !== 'undefined' ? ret : this;
+  return 'undefined' !== typeof ret ? ret : this;
 };
 plugin.constructor = VP;
 

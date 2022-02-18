@@ -38,7 +38,7 @@ const $videoFormatCheckbox = $('#post-format-video');
 let isVideoFormat = null;
 
 function toggleVideoMetabox(show) {
-  if (isVideoFormat === null || isVideoFormat !== show) {
+  if (null === isVideoFormat || isVideoFormat !== show) {
     isVideoFormat = show;
     $videoMetabox[show ? 'show' : 'hide']();
   }
@@ -67,7 +67,7 @@ let runAjaxVideoOembed = function ($this) {
     },
     complete(data) {
       const json = data.responseJSON;
-      if (json && typeof json.html !== 'undefined') {
+      if (json && 'undefined' !== typeof json.html) {
         $this.next('.vp-oembed-preview').html(json.html);
       }
     },
@@ -76,7 +76,7 @@ let runAjaxVideoOembed = function ($this) {
 runAjaxVideoOembed = debounce(300, rafSchd(runAjaxVideoOembed));
 
 $body.on('change input', '.vp-input[name="_vp_format_video_url"]', function () {
-  if (oembedAjax !== null) {
+  if (null !== oembedAjax) {
     oembedAjax.abort();
   }
 

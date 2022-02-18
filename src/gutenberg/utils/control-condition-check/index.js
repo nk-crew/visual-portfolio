@@ -31,7 +31,7 @@ function compare(left, operator, right) {
       checkResult = left !== right;
       break;
     case '*=':
-      checkResult = left.indexOf(right) !== -1;
+      checkResult = -1 !== left.indexOf(right);
       break;
     case '>=':
       checkResult = left >= right;
@@ -73,7 +73,7 @@ function compare(left, operator, right) {
 export default function conditionCheck(condition, attributes, relation = 'AND') {
   // by default result will be TRUE for relation AND
   // and FALSE for relation OR.
-  let result = relation === 'AND';
+  let result = 'AND' === relation;
 
   const childRelation = result ? 'OR' : 'AND';
 
@@ -83,17 +83,17 @@ export default function conditionCheck(condition, attributes, relation = 'AND') 
     } else if (data.control) {
       let left = controlGetValue(data.control, attributes);
       const operator = data.operator || '==';
-      let right = typeof data.value !== 'undefined' ? data.value : 'true';
+      let right = 'undefined' !== typeof data.value ? data.value : 'true';
 
-      if (left === 'true') {
+      if ('true' === left) {
         left = true;
-      } else if (left === 'false') {
+      } else if ('false' === left) {
         left = false;
       }
 
-      if (right === 'true') {
+      if ('true' === right) {
         right = true;
-      } else if (right === 'false') {
+      } else if ('false' === right) {
         right = false;
       }
 

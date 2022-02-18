@@ -135,7 +135,7 @@ function ElementsSelectorOptions(props) {
               categoryToggle={false}
             />
           ) : null}
-          {optionName !== 'items' ? (
+          {'items' !== optionName ? (
             <PanelBody>
               <Button
                 isLink
@@ -201,8 +201,8 @@ export default class ElementsSelector extends Component {
       const data = options[name];
 
       if (
-        (!data.allowed_locations || data.allowed_locations.indexOf(location) !== -1) &&
-        elements.indexOf(name) === -1
+        (!data.allowed_locations || -1 !== data.allowed_locations.indexOf(location)) &&
+        -1 === elements.indexOf(name)
       ) {
         availableElements[name] = data;
       }
@@ -301,7 +301,6 @@ export default class ElementsSelector extends Component {
         >
           {locationData.elements.length
             ? locationData.elements.map((optionName) => (
-                // eslint-disable-next-line react/jsx-indent
                 <ElementsSelectorOptions
                   key={optionName}
                   location={location}
@@ -312,7 +311,6 @@ export default class ElementsSelector extends Component {
                   optionName={optionName}
                   parentProps={this.props}
                 />
-                // eslint-disable-next-line indent
               ))
             : null}
           {Object.keys(availableElements).length ? (
@@ -322,7 +320,6 @@ export default class ElementsSelector extends Component {
                 position: 'bottom center',
               }}
               icon={
-                // eslint-disable-next-line react/jsx-wrap-multilines
                 <svg
                   width="20"
                   height="20"
@@ -355,7 +352,7 @@ export default class ElementsSelector extends Component {
 
                   const newElements = [...locationData.elements];
 
-                  if (newElements.indexOf(optionName) === -1) {
+                  if (-1 === newElements.indexOf(optionName)) {
                     newElements.push(optionName);
 
                     onChange({

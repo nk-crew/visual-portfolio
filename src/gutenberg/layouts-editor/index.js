@@ -264,7 +264,7 @@ class UpdateEditor extends Component {
       return;
     }
 
-    if (editorMode === 'text') {
+    if ('text' === editorMode) {
       switchEditorMode();
     }
   }
@@ -280,7 +280,7 @@ class UpdateEditor extends Component {
     const { resetBlocks, insertBlocks, blocks } = this.props;
 
     const isValidList =
-      blocks.length === 1 && blocks[0] && blocks[0].name === 'visual-portfolio/saved-editor';
+      1 === blocks.length && blocks[0] && 'visual-portfolio/saved-editor' === blocks[0].name;
 
     if (!isValidList) {
       this.blocksRestoreBusy = true;
@@ -297,7 +297,7 @@ class UpdateEditor extends Component {
     const { selectedBlock, blocks, selectBlock } = this.props;
 
     // if selected block, do nothing.
-    if (selectedBlock && selectedBlock.name === 'visual-portfolio/saved-editor') {
+    if (selectedBlock && 'visual-portfolio/saved-editor' === selectedBlock.name) {
       return;
     }
 
@@ -309,7 +309,7 @@ class UpdateEditor extends Component {
 
     let selectBlockId = '';
     blocks.forEach((blockData) => {
-      if (blockData.name === 'visual-portfolio/saved-editor') {
+      if ('visual-portfolio/saved-editor' === blockData.name) {
         selectBlockId = blockData.clientId;
       }
     });

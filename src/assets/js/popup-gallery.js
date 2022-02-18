@@ -194,18 +194,17 @@ window.VPPopupAPI = VPPopupAPI;
 
 // Extend VP class.
 $(document).on('extendClass.vpf', (event, VP) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
   /**
    * Init popup gallery
    */
-  // eslint-disable-next-line no-param-reassign
   VP.prototype.initPopupGallery = function () {
     const self = this;
 
-    if (!self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery') {
+    if (!self.options.itemsClickAction || 'popup_gallery' !== self.options.itemsClickAction) {
       return;
     }
 
@@ -239,14 +238,14 @@ $(document).on('extendClass.vpf', (event, VP) => {
           )
           .each(function (idx) {
             if (
-              index === -1 &&
+              -1 === index &&
               $(this).closest('.vp-portfolio__item-wrap').find('.vp-portfolio__item')[0] === clicked
             ) {
               index = idx;
             }
           });
 
-        if (index < 0) {
+        if (0 > index) {
           index = 0;
         }
 
@@ -260,11 +259,10 @@ $(document).on('extendClass.vpf', (event, VP) => {
   /**
    * Destroy popup gallery
    */
-  // eslint-disable-next-line no-param-reassign
   VP.prototype.destroyPopupGallery = function () {
     const self = this;
 
-    if (!self.options.itemsClickAction || self.options.itemsClickAction !== 'popup_gallery') {
+    if (!self.options.itemsClickAction || 'popup_gallery' !== self.options.itemsClickAction) {
       return;
     }
 
@@ -276,7 +274,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
 // Init.
 $(document).on('init.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -285,7 +283,7 @@ $(document).on('init.vpf', (event, self) => {
 
 // Destroy.
 $(document).on('destroy.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -306,7 +304,7 @@ function parseImgData(link) {
   let caption = $link.next('figcaption');
 
   // <noscript> tag used in plugins, that adds lazy loading
-  if (img.nodeName === 'NOSCRIPT' && link.childNodes[1]) {
+  if ('NOSCRIPT' === img.nodeName && link.childNodes[1]) {
     // eslint-disable-next-line prefer-destructuring
     img = link.childNodes[1];
   }
@@ -353,14 +351,14 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
       let imageNode = this.childNodes[0];
 
       // <noscript> tag used in plugins, that adds lazy loading
-      if (imageNode.nodeName === 'NOSCRIPT' && this.childNodes[1]) {
+      if ('NOSCRIPT' === imageNode.nodeName && this.childNodes[1]) {
         // eslint-disable-next-line prefer-destructuring
         imageNode = this.childNodes[1];
       }
 
       // check if child node is <img> or <picture> tag.
       // <picture> tag used in plugins, that adds WebP support
-      if (imageNode.nodeName !== 'IMG' && imageNode.nodeName !== 'PICTURE') {
+      if ('IMG' !== imageNode.nodeName && 'PICTURE' !== imageNode.nodeName) {
         return;
       }
 

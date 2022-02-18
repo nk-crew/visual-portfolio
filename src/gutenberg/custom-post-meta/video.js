@@ -54,7 +54,7 @@ class VpVideoComponent extends Component {
 
     const { getMeta, postFormat } = this.props;
 
-    if (postFormat !== 'video') {
+    if ('video' !== postFormat) {
       return;
     }
 
@@ -92,7 +92,7 @@ class VpVideoComponent extends Component {
           oembedHTML: '',
         };
 
-        if (json && typeof json.html !== 'undefined') {
+        if (json && 'undefined' !== typeof json.html) {
           newState.oembedHTML = json.html;
         }
         this.setState(newState);
@@ -107,7 +107,7 @@ class VpVideoComponent extends Component {
 
     const { oembedHTML } = this.state;
 
-    if (postFormat !== 'video') {
+    if ('video' !== postFormat) {
       return null;
     }
 
@@ -116,7 +116,6 @@ class VpVideoComponent extends Component {
         name="VPVideo"
         title={__('Video', '@@text_domain')}
         icon={
-          // eslint-disable-next-line react/jsx-wrap-multilines
           <svg
             width="14"
             height="14"

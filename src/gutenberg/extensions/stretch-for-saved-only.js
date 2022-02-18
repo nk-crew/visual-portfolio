@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /**
  * WordPress dependencies
  */
@@ -9,7 +8,7 @@ addFilter(
   'vpf.editor.controls-render-data',
   'vpf/editor/controls-render-data/customize-controls',
   (data) => {
-    if (data.name === 'stretch' && !window.VPSavedLayoutVariables) {
+    if ('stretch' === data.name && !window.VPSavedLayoutVariables) {
       data = {
         ...data,
         skip: true,

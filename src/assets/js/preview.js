@@ -37,11 +37,10 @@ document.addEventListener(
 
 // add dynamic data to AJAX calls.
 $doc.on('startLoadingNewItems.vpf', (event, vpObject, url, ajaxData) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
-  // eslint-disable-next-line no-param-reassign
   ajaxData.data = Object.assign(ajaxData.data || {}, window.vp_preview_post_data);
 });
 

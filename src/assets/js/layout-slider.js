@@ -10,21 +10,21 @@ const $ = window.jQuery;
 
 // Init Layout.
 $(document).on('initLayout.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
-  if (self.options.layout !== 'slider') {
+  if ('slider' !== self.options.layout) {
     return;
   }
 
   ['items', 'thumbnails'].forEach((type) => {
     let itemsHeight =
-      type === 'items' ? self.options.sliderItemsHeight : self.options.sliderThumbnailsHeight;
-    let itemsMinHeight = type === 'items' ? self.options.sliderItemsMinHeight : 0;
+      'items' === type ? self.options.sliderItemsHeight : self.options.sliderThumbnailsHeight;
+    let itemsMinHeight = 'items' === type ? self.options.sliderItemsMinHeight : 0;
     const typeSingle = type.replace(/s$/g, '');
 
-    if (itemsHeight === 'auto') {
+    if ('auto' === itemsHeight) {
       return;
     }
 
@@ -36,13 +36,13 @@ $(document).on('initLayout.vpf', (event, self) => {
     }
 
     const itemsPerView =
-      type === 'items' ? self.options.sliderSlidesPerView : self.options.sliderThumbnailsPerView;
+      'items' === type ? self.options.sliderSlidesPerView : self.options.sliderThumbnailsPerView;
 
-    if (itemsPerView === 'auto') {
+    if ('auto' === itemsPerView) {
       // fix fade slider items width.
       // https://github.com/nk-crew/visual-portfolio/issues/95.
       let itemsWidth = 'auto';
-      if (type === 'items' && self.options.sliderEffect === 'fade') {
+      if ('items' === type && 'fade' === self.options.sliderEffect) {
         itemsWidth = '100%';
       }
 
@@ -63,7 +63,7 @@ $(document).on('initLayout.vpf', (event, self) => {
         });
         self.addStyle(`.vp-portfolio__${typeSingle}-wrap`, {
           width: 'auto',
-          height: self.options.sliderBullets === 'true' ? 'calc( 100% - 25px )' : '100%',
+          height: 'true' === self.options.sliderBullets ? 'calc( 100% - 25px )' : '100%',
         });
         self.addStyle(
           `.vp-portfolio__${typeSingle}, .vp-portfolio__${typeSingle}-img-wrap, .vp-portfolio__${typeSingle}-img, .vp-portfolio__${typeSingle}-wrap .vp-portfolio__${typeSingle} .vp-portfolio__${typeSingle}-img a, .vp-portfolio__${typeSingle}-wrap .vp-portfolio__${typeSingle} .vp-portfolio__${typeSingle}-img img`,

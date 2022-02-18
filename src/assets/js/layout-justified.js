@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /*
  * Visual Portfolio layout Justified.
  */
@@ -6,7 +5,7 @@ const $ = window.jQuery;
 
 // Init Options.
 $(document).on('initOptions.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 

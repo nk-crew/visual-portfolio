@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /*
  * Visual Portfolio plugin Isotope extension.
  */
@@ -13,7 +12,7 @@ const SUPPORTED_LAYOUTS = ['tiles', 'masonry', 'grid'];
 
 // Extend VP class.
 $doc.on('extendClass.vpf', (event, VP) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -30,7 +29,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
     const self = this;
 
     if (self.$items_wrap.isotope && SUPPORTED_LAYOUTS.includes(self.options.layout)) {
-      const isRtl = getComputedStyle(self.$items_wrap[0]).direction === 'rtl';
+      const isRtl = 'rtl' === getComputedStyle(self.$items_wrap[0]).direction;
 
       const initOptions = options || {
         itemSelector: '.vp-portfolio__item-wrap',
@@ -71,7 +70,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
 
 // Add Items.
 $doc.on('addItems.vpf', (event, self, $items, removeExisting) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -99,7 +98,7 @@ $doc.on('addItems.vpf', (event, self, $items, removeExisting) => {
 
 // Remove Items.
 $doc.on('removeItems.vpf', (event, self, $items) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -114,7 +113,7 @@ $doc.on('removeItems.vpf', (event, self, $items) => {
 
 // Init.
 $doc.on('init.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -123,7 +122,7 @@ $doc.on('init.vpf', (event, self) => {
 
 // Images Loaded.
 $doc.on('imagesLoaded.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -134,7 +133,7 @@ $doc.on('imagesLoaded.vpf', (event, self) => {
 
 // Destroy.
 $doc.on('destroy.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -143,7 +142,7 @@ $doc.on('destroy.vpf', (event, self) => {
 
 // Init events.
 $doc.on('initEvents.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -167,7 +166,7 @@ $doc.on('initEvents.vpf', (event, self) => {
 
 // Destroy events.
 $doc.on('destroyEvents.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 

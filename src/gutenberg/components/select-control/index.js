@@ -45,9 +45,8 @@ const SortableMultiValue = SortableElement((props) => {
 });
 
 function arrayMove(array, from, to) {
-  // eslint-disable-next-line no-param-reassign
   array = array.slice();
-  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+  array.splice(0 > to ? array.length + to : to, 0, array.splice(from, 1)[0]);
   return array;
 }
 
@@ -112,7 +111,7 @@ export default class VpfSelectControl extends Component {
     let result = null;
 
     if (isMultiple) {
-      if ((!value && typeof value !== 'string') || !value.length) {
+      if ((!value && 'string' !== typeof value) || !value.length) {
         return result;
       }
 
@@ -122,7 +121,7 @@ export default class VpfSelectControl extends Component {
         result.push(this.findValueData(innerVal));
       });
     } else {
-      if (!value && typeof value !== 'string') {
+      if (!value && 'string' !== typeof value) {
         return result;
       }
 
@@ -153,7 +152,7 @@ export default class VpfSelectControl extends Component {
         const data = options[val];
 
         if (val === findVal) {
-          if (typeof data === 'string') {
+          if ('string' === typeof data) {
             result.label = data;
           } else {
             result = data;
@@ -237,7 +236,7 @@ export default class VpfSelectControl extends Component {
     return Object.keys(options || {}).map((val) => {
       const option = options[val];
 
-      if (typeof option === 'object') {
+      if ('object' === typeof option) {
         return {
           value: option.value,
           label: option.label,
@@ -257,7 +256,7 @@ export default class VpfSelectControl extends Component {
     const { ajaxStatus } = this.state;
 
     const isAsync = !!callback && isSearchable;
-    const isLoading = ajaxStatus && ajaxStatus === 'progress';
+    const isLoading = ajaxStatus && 'progress' === ajaxStatus;
 
     const selectProps = {
       // Test opened menu items:
@@ -271,7 +270,7 @@ export default class VpfSelectControl extends Component {
 
           return (
             <Option {...optionProps}>
-              {typeof data.img !== 'undefined' ? (
+              {'undefined' !== typeof data.img ? (
                 <div className="vpf-component-select-option-img">
                   {data.img ? <img src={data.img} alt={data.label} /> : ''}
                 </div>

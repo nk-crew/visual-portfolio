@@ -80,7 +80,7 @@ class ControlsRender extends Component {
     // content source conditions.
     if (
       /^content-source-/g.test(category) &&
-      category !== 'content-source-general' &&
+      'content-source-general' !== category &&
       `content-source-${attributes.content_source}` !== category
     ) {
       return null;
@@ -137,12 +137,12 @@ class ControlsRender extends Component {
     let categoryPro = false;
     let categoryOpened = !categoryToggle;
 
-    if (categoryToggle && typeof registeredControlsCategories[category] !== 'undefined') {
+    if (categoryToggle && 'undefined' !== typeof registeredControlsCategories[category]) {
       categoryTitle = registeredControlsCategories[category].title;
       categoryIcon = registeredControlsCategories[category].icon || false;
       categoryPro = !!registeredControlsCategories[category].is_pro;
 
-      if (typeof openedCategoriesCache[category] === 'undefined') {
+      if ('undefined' === typeof openedCategoriesCache[category]) {
         openedCategoriesCache[category] = registeredControlsCategories[category].is_opened || false;
       }
       categoryOpened = openedCategoriesCache[category];

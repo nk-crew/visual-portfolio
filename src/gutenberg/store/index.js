@@ -14,10 +14,10 @@ import './utils';
 
 const { registerStore } = wp.data;
 
-registerStore( 'visual-portfolio', {
-    reducer,
-    selectors,
-    actions,
-    controls,
-    resolvers,
-} );
+registerStore('visual-portfolio', {
+  reducer,
+  selectors,
+  actions,
+  controls,
+  resolvers,
+});

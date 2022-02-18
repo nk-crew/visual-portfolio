@@ -6,8 +6,8 @@ const $ = window.jQuery;
 // Init minimal paged pagination.
 $(document).on('init.vpf loadedNewItems.vpf', (event, self) => {
   if (
-    event.namespace !== 'vpf' ||
-    self.options.pagination !== 'paged' ||
+    'vpf' !== event.namespace ||
+    'paged' !== self.options.pagination ||
     !self.$pagination.children('.vp-pagination__style-minimal').length
   ) {
     return;

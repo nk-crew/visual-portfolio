@@ -7,7 +7,7 @@ $body.on('click', '.vpf-review-plugin-notice-dismiss', function (e) {
   const type = $this.attr('data-vpf-review-action');
 
   // Don't prevent click on Yes link, as it is URL for rate.
-  if (type !== 'yes') {
+  if ('yes' !== type) {
     e.preventDefault();
   }
 

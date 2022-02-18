@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /*
  * Visual Portfolio custom scrollbar extension.
  */
@@ -11,10 +10,10 @@ const allowScrollbar = !/Mac|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|
   navigator.userAgent
 );
 
-if (allowScrollbar && typeof SimpleBar !== 'undefined') {
+if (allowScrollbar && 'undefined' !== typeof SimpleBar) {
   // Extend VP class.
   $doc.on('extendClass.vpf', (event, VP) => {
-    if (event.namespace !== 'vpf') {
+    if ('vpf' !== event.namespace) {
       return;
     }
 
@@ -60,7 +59,7 @@ if (allowScrollbar && typeof SimpleBar !== 'undefined') {
 
   // Add Items.
   $doc.on('addItems.vpf', (event, self, $items, removeExisting) => {
-    if (event.namespace !== 'vpf') {
+    if ('vpf' !== event.namespace) {
       return;
     }
 
@@ -73,7 +72,7 @@ if (allowScrollbar && typeof SimpleBar !== 'undefined') {
 
   // Init.
   $doc.on('init.vpf', (event, self) => {
-    if (event.namespace !== 'vpf') {
+    if ('vpf' !== event.namespace) {
       return;
     }
 
@@ -82,7 +81,7 @@ if (allowScrollbar && typeof SimpleBar !== 'undefined') {
 
   // Destroy.
   $doc.on('destroy.vpf', (event, self) => {
-    if (event.namespace !== 'vpf') {
+    if ('vpf' !== event.namespace) {
       return;
     }
 
@@ -91,11 +90,11 @@ if (allowScrollbar && typeof SimpleBar !== 'undefined') {
 
   // Init Swiper duplicated slides scrollbars.
   $doc.on('initSwiper.vpf', (event, self) => {
-    if (event.namespace !== 'vpf') {
+    if ('vpf' !== event.namespace) {
       return;
     }
 
-    if (self.options.sliderLoop === 'true') {
+    if ('true' === self.options.sliderLoop) {
       self.initCustomScrollbar();
     }
   });

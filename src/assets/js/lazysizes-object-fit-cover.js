@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /* eslint-disable wrap-iife */
 (function (window, factory) {
   const globalInstall = function () {
@@ -25,7 +24,7 @@
     calculateSize(element, width) {
       const CSS = getCSS(element);
 
-      if (CSS && CSS.objectFit && CSS.objectFit === 'cover') {
+      if (CSS && CSS.objectFit && 'cover' === CSS.objectFit) {
         const blockHeight = parseInt(element.getAttribute('height'), 10);
         const blockWidth = parseInt(element.getAttribute('width'), 10);
 

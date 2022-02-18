@@ -9,10 +9,10 @@ const { jQuery: $, vc } = window;
 
 $(() => {
   // shortcode frontend editor
-  if (typeof vc !== 'undefined') {
+  if ('undefined' !== typeof vc) {
     // on shortcode add and update events
     vc.events.on('shortcodes:add shortcodeView:updated', (e) => {
-      if (e.settings.base !== 'visual_portfolio') {
+      if ('visual_portfolio' !== e.settings.base) {
         return;
       }
 
@@ -21,7 +21,7 @@ $(() => {
 
       if (jQframe) {
         const $vp = jQframe(e.view.el).children('.vp-portfolio');
-        if ($vp.length && typeof $vp.vpf !== 'undefined') {
+        if ($vp.length && 'undefined' !== typeof $vp.vpf) {
           $vp.vpf();
         }
       }

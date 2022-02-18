@@ -6,7 +6,7 @@ const { jQuery: $, objectFitImages } = window;
 const $doc = $(document);
 
 // enable object-fit
-if (typeof objectFitImages !== 'undefined') {
+if ('undefined' !== typeof objectFitImages) {
   // ofi and lazysizes conflicted, so we need to run lazysizes
   // first and then run ofi polyfill.
   objectFitImages('.vp-portfolio img:not(.vp-lazyload)');

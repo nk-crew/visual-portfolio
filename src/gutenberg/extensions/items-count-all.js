@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /**
  * External dependencies
  */
@@ -25,7 +24,7 @@ addFilter(
   'vpf.editor.controls-render',
   'vpf/editor/controls-render/customize-controls',
   (render, data) => {
-    if (data.name === 'items_count') {
+    if ('items_count' === data.name) {
       const { description, attributes, onChange } = data;
 
       const renderControlHelp = description ? <RawHTML>{description}</RawHTML> : false;
@@ -41,10 +40,10 @@ addFilter(
             <ButtonGroup>
               <Button
                 isSmall
-                isPrimary={controlVal !== -1}
-                isPressed={controlVal !== -1}
+                isPrimary={-1 !== controlVal}
+                isPressed={-1 !== controlVal}
                 onClick={() => {
-                  if (controlVal === -1) {
+                  if (-1 === controlVal) {
                     onChange(parseFloat(data.default || 6));
                   }
                 }}
@@ -53,12 +52,12 @@ addFilter(
               </Button>
               <Button
                 isSmall
-                isPrimary={controlVal === -1}
-                isPressed={controlVal === -1}
+                isPrimary={-1 === controlVal}
+                isPressed={-1 === controlVal}
                 onClick={() => {
-                  // eslint-disable-next-line no-alert
                   if (
-                    controlVal !== -1 &&
+                    -1 !== controlVal &&
+                    // eslint-disable-next-line no-alert
                     window.confirm(
                       __(
                         'Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries.',
@@ -74,7 +73,7 @@ addFilter(
               </Button>
             </ButtonGroup>
           </div>
-          {controlVal !== -1 ? (
+          {-1 !== controlVal ? (
             <Fragment>
               <br />
               <TextControl

@@ -35,7 +35,7 @@ function prepareImage(img) {
   };
 
   // Prepare thumbnail for all images except GIF, since GIFs animated only in full size.
-  if (!img.mime || img.mime !== 'image/gif') {
+  if (!img.mime || 'image/gif' !== img.mime) {
     if (img.sizes && img.sizes.large && img.sizes.large.url) {
       imgData.imgThumbnailUrl = img.sizes.large.url;
     } else if (img.sizes && img.sizes.medium && img.sizes.medium.url) {
@@ -452,7 +452,7 @@ addFilter(
   'vpf.editor.controls-render-data',
   'vpf/editor/controls-render-data/images-categories-suggestions',
   (data) => {
-    if (data.name === 'images') {
+    if ('images' === data.name) {
       const categories = [];
 
       // find all used categories.
@@ -460,7 +460,7 @@ addFilter(
         data.attributes.images.forEach((image) => {
           if (image.categories && image.categories.length) {
             image.categories.forEach((cat) => {
-              if (categories.indexOf(cat) === -1) {
+              if (-1 === categories.indexOf(cat)) {
                 categories.push(cat);
               }
             });
@@ -474,7 +474,6 @@ addFilter(
         data.image_controls.categories &&
         data.image_controls.categories.options
       ) {
-        // eslint-disable-next-line no-param-reassign
         data.image_controls.categories.options = categories.map((val) => ({
           label: val,
           value: val,

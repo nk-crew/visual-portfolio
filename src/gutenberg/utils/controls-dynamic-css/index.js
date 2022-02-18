@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /**
  * Internal dependencies
  */
@@ -27,24 +26,24 @@ export function prepareStylesFromParams(selector, value, params) {
 
   if (
     !selector ||
-    typeof value === 'undefined' ||
-    value === '' ||
-    value === null ||
-    typeof params.property === 'undefined'
+    'undefined' === typeof value ||
+    '' === value ||
+    null === value ||
+    'undefined' === typeof params.property
   ) {
     return result;
   }
 
   // Value mask.
-  if (typeof params.mask !== 'undefined') {
+  if ('undefined' !== typeof params.mask) {
     value = params.mask.replace('$', value);
   }
 
   // Custom selector mask.
-  if (typeof params.element !== 'undefined' && /\$/g.test(params.element)) {
+  if ('undefined' !== typeof params.element && /\$/g.test(params.element)) {
     selector = params.element.replace('$', selector);
   } else {
-    selector += typeof params.element !== 'undefined' ? ` ${params.element}` : '';
+    selector += 'undefined' !== typeof params.element ? ` ${params.element}` : '';
   }
 
   // Prepare CSS.
@@ -62,8 +61,8 @@ export function prepareStylesFromParams(selector, value, params) {
  */
 export function hasDynamicCSS(controlName) {
   return (
-    typeof registeredControls[controlName] !== 'undefined' &&
-    typeof registeredControls[controlName].style !== 'undefined' &&
+    'undefined' !== typeof registeredControls[controlName] &&
+    'undefined' !== typeof registeredControls[controlName].style &&
     registeredControls[controlName].style.length
   );
 }
@@ -79,9 +78,9 @@ export default function getDynamicCSS(options) {
   let result = '';
   let selector = '';
 
-  if (typeof options.block_id !== 'undefined' && options.block_id) {
+  if ('undefined' !== typeof options.block_id && options.block_id) {
     selector = options.block_id;
-  } else if (typeof options.id !== 'undefined' && options.id) {
+  } else if ('undefined' !== typeof options.id && options.id) {
     selector = options.id;
   }
   if (!selector) {
@@ -93,10 +92,10 @@ export default function getDynamicCSS(options) {
   // Controls styles.
   Object.keys(registeredControls).forEach((k) => {
     const control = registeredControls[k];
-    let allow = typeof control.style !== 'undefined' && control.style;
+    let allow = 'undefined' !== typeof control.style && control.style;
 
     // Check condition.
-    if (allow && typeof control.condition !== 'undefined' && control.condition.length) {
+    if (allow && 'undefined' !== typeof control.condition && control.condition.length) {
       allow = conditionCheck(control.condition, options);
     }
 
@@ -106,7 +105,7 @@ export default function getDynamicCSS(options) {
         let val = options[control.name];
 
         // Prepare Aspect Ratio control value.
-        if (control.type && control.type === 'aspect_ratio' && val) {
+        if (control.type && 'aspect_ratio' === control.type && val) {
           const ratioArray = val.split(':');
 
           if (ratioArray[0] && ratioArray[1]) {
@@ -120,7 +119,7 @@ export default function getDynamicCSS(options) {
   });
 
   // Custom CSS.
-  if (typeof options.custom_css !== 'undefined' && options.custom_css) {
+  if ('undefined' !== typeof options.custom_css && options.custom_css) {
     let customCss = options.custom_css;
 
     // Decode.

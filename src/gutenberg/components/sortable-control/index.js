@@ -87,8 +87,8 @@ export default class SortableControl extends Component {
 
     let value = defaultOptions;
 
-    if (typeof this.props.value !== 'undefined') {
-      if (typeof this.props.value === 'string') {
+    if ('undefined' !== typeof this.props.value) {
+      if ('string' === typeof this.props.value) {
         value = JSON.parse(this.props.value);
       } else {
         value = this.props.value;
@@ -110,7 +110,7 @@ export default class SortableControl extends Component {
 
     let classes = 'vpf-component-sortable';
 
-    classes = disabledOptions.length > 0 ? `${classes} vpf-dragging-has-disabled-options` : classes;
+    classes = 0 < disabledOptions.length ? `${classes} vpf-dragging-has-disabled-options` : classes;
 
     return (
       <div>
@@ -131,7 +131,7 @@ export default class SortableControl extends Component {
           useDragHandle
           helperClass="vpf-component-sortable-item-dragging"
         />
-        {disabledOptions.length > 0 ? (
+        {0 < disabledOptions.length ? (
           <ul className="vpf-component-sortable-disabled">
             {disabledOptions.map((el) => (
               <li key={`disabled-item-${el}`}>

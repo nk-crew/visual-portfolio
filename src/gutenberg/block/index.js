@@ -20,7 +20,7 @@ const { name } = metadata;
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 
-const hasMediaCategory = getCategories().some((category) => category.slug === 'media');
+const hasMediaCategory = getCategories().some((category) => 'media' === category.slug);
 
 const settings = {
   ...metadata,

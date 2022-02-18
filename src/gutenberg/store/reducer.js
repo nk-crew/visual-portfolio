@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 function reducer(state = { layouts: [] }, action = {}) {
   switch (action.type) {
     case 'SET_PORTFOLIO_LAYOUTS':

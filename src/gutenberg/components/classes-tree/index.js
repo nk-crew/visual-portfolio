@@ -139,7 +139,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
     let { isCollapsed } = this.state;
 
     // check if collapsed by default.
-    if (isCollapsed === null && node && node.classList && node.classList.length) {
+    if (null === isCollapsed && node && node.classList && node.classList.length) {
       node.classList.forEach((className) => {
         if (collapseByClass && collapseByClass.test(className)) {
           isCollapsed = true;
@@ -220,7 +220,6 @@ ClassesTree.TreeItem = class TreeItem extends Component {
             &gt;
           </div>
         </li>
-        {/* eslint-disable indent */}
         {node.children.length && this.isCollapsed()
           ? node.children.map((childNode) => {
               if (childNode) {

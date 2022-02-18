@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /**
  * WordPress dependencies
  */
@@ -12,7 +11,7 @@ addFilter(
   'vpf/editor/controls-on-change/classic-icon-with-overlay',
   (newAttributes, control, val, attributes) => {
     if (
-      control.name === 'items_style_default__show_icon' &&
+      'items_style_default__show_icon' === control.name &&
       val &&
       !attributes.items_style_default__bg_color
     ) {

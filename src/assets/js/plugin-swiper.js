@@ -12,7 +12,7 @@ const { screenSizes } = window.VPData;
 
 // Extend VP class.
 $(document).on('extendClass.vpf', (event, VP) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -21,11 +21,10 @@ $(document).on('extendClass.vpf', (event, VP) => {
    *
    * @param {mixed} options - slider options.
    */
-  // eslint-disable-next-line no-param-reassign
   VP.prototype.initSwiper = function (options = false) {
     const self = this;
 
-    if (self.options.layout === 'slider' && typeof window.Swiper !== 'undefined') {
+    if ('slider' === self.options.layout && 'undefined' !== typeof window.Swiper) {
       const $parent = self.$items_wrap.parent();
 
       $parent.addClass('swiper-container');
@@ -36,7 +35,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
       let slidesPerView = self.options.sliderSlidesPerView || 3;
       const breakPoints = {};
 
-      if (self.options.sliderEffect === 'fade') {
+      if ('fade' === self.options.sliderEffect) {
         slidesPerView = 1;
       }
 
@@ -44,8 +43,8 @@ $(document).on('extendClass.vpf', (event, VP) => {
         let count = slidesPerView;
         let currentPoint = Math.min(screenSizes.length - 1, count - 1);
 
-        for (; currentPoint >= 0; currentPoint -= 1) {
-          if (count > 0 && typeof screenSizes[currentPoint] !== 'undefined') {
+        for (; 0 <= currentPoint; currentPoint -= 1) {
+          if (0 < count && 'undefined' !== typeof screenSizes[currentPoint]) {
             breakPoints[screenSizes[currentPoint] + 1] = {
               slidesPerView: count,
             };
@@ -56,35 +55,34 @@ $(document).on('extendClass.vpf', (event, VP) => {
         slidesPerView = count || 1;
       }
 
-      // eslint-disable-next-line no-param-reassign
       options = options || {
         speed: (parseFloat(self.options.sliderSpeed) || 0) * 1000,
-        autoHeight: self.options.sliderItemsHeight === 'auto',
+        autoHeight: 'auto' === self.options.sliderItemsHeight,
         effect: self.options.sliderEffect || 'slide',
         spaceBetween: parseFloat(self.options.itemsGap) || 0,
-        centeredSlides: self.options.sliderCenteredSlides === 'true',
-        freeMode: self.options.sliderFreeMode === 'true',
-        freeModeSticky: self.options.sliderFreeModeSticky === 'true',
-        loop: self.options.sliderLoop === 'true',
-        autoplay: parseFloat(self.options.sliderAutoplay) > 0 && {
+        centeredSlides: 'true' === self.options.sliderCenteredSlides,
+        freeMode: 'true' === self.options.sliderFreeMode,
+        freeModeSticky: 'true' === self.options.sliderFreeModeSticky,
+        loop: 'true' === self.options.sliderLoop,
+        autoplay: 0 < parseFloat(self.options.sliderAutoplay) && {
           delay: parseFloat(self.options.sliderAutoplay) * 1000,
           disableOnInteraction: false,
         },
-        navigation: self.options.sliderArrows === 'true' && {
+        navigation: 'true' === self.options.sliderArrows && {
           nextEl: '.vp-portfolio__items-arrow-next',
           prevEl: '.vp-portfolio__items-arrow-prev',
         },
-        pagination: self.options.sliderBullets === 'true' && {
+        pagination: 'true' === self.options.sliderBullets && {
           el: '.vp-portfolio__items-bullets',
           clickable: true,
-          dynamicBullets: self.options.sliderBulletsDynamic === 'true',
+          dynamicBullets: 'true' === self.options.sliderBulletsDynamic,
           renderBullet(index, className) {
             return `<span class="${className}" data-bullet-index="${index}" data-bullet-number="${
               index + 1
             }"></span>`;
           },
         },
-        mousewheel: self.options.sliderMousewheel === 'true',
+        mousewheel: 'true' === self.options.sliderMousewheel,
         slidesPerView,
         breakpoints: breakPoints,
         // Since Swiper 5.0 this option is removed and it is `true` by default, but in older versions it was `false`.
@@ -95,26 +93,24 @@ $(document).on('extendClass.vpf', (event, VP) => {
       };
 
       // fix fade items collapse (mostly in Default items style).
-      if (options.effect === 'fade') {
-        // eslint-disable-next-line no-param-reassign
+      if ('fade' === options.effect) {
         options.fadeEffect = { crossFade: true };
       }
 
       // fix first load slide position (seems like a conflict with lazySizes)
       // issue: https://github.com/nk-crew/visual-portfolio/issues/54
-      if (options.speed === 0) {
-        // eslint-disable-next-line no-param-reassign
+      if (0 === options.speed) {
         options.speed = 1;
       }
       let positionFix = 0;
-      // eslint-disable-next-line no-param-reassign
+
       options.on = {
         transitionEnd() {
-          if (positionFix === 0) {
+          if (0 === positionFix) {
             positionFix = 1;
             this.setTransition(1);
             this.setTranslate(this.translate + 0.1);
-          } else if (positionFix === 1) {
+          } else if (1 === positionFix) {
             positionFix = 2;
             this.slideReset();
           }
@@ -150,8 +146,8 @@ $(document).on('extendClass.vpf', (event, VP) => {
           let count = thumbnailsPerView;
           let currentPoint = Math.min(screenSizes.length - 1, count - 1);
 
-          for (; currentPoint >= 0; currentPoint -= 1) {
-            if (count > 0 && typeof screenSizes[currentPoint] !== 'undefined') {
+          for (; 0 <= currentPoint; currentPoint -= 1) {
+            if (0 < count && 'undefined' !== typeof screenSizes[currentPoint]) {
               thumbnailsBreakPoints[screenSizes[currentPoint] + 1] = {
                 slidesPerView: count,
               };
@@ -163,7 +159,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
         }
 
         const swiperThumbs = new window.Swiper($thumbsParent[0], {
-          autoHeight: self.options.sliderThumbnailsHeight === 'auto',
+          autoHeight: 'auto' === self.options.sliderThumbnailsHeight,
           effect: 'slide',
           spaceBetween: parseFloat(self.options.sliderThumbnailsGap) || 0,
           loop: false,
@@ -194,7 +190,6 @@ $(document).on('extendClass.vpf', (event, VP) => {
           },
         });
 
-        // eslint-disable-next-line no-param-reassign
         options.thumbs = {
           swiper: swiperThumbs,
         };
@@ -205,8 +200,8 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
       // autoplay hover pause.
       if (
-        self.options.sliderAutoplayHoverPause === 'true' &&
-        parseFloat(self.options.sliderAutoplay) > 0
+        'true' === self.options.sliderAutoplayHoverPause &&
+        0 < parseFloat(self.options.sliderAutoplay)
       ) {
         self.$item.on(`mouseenter.vpf-uid-${self.uid}`, '.swiper-container', () => {
           $parent[0].swiper.autoplay.stop();
@@ -223,7 +218,6 @@ $(document).on('extendClass.vpf', (event, VP) => {
   /**
    * Destroy Swiper plugin
    */
-  // eslint-disable-next-line no-param-reassign
   VP.prototype.destroySwiper = function () {
     const self = this;
     const $parent = self.$items_wrap.parent();
@@ -272,7 +266,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
 // Add Items.
 $(document).on('addItems.vpf', (event, self, $items, removeExisting, $newVP) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -318,7 +312,7 @@ $(document).on('addItems.vpf', (event, self, $items, removeExisting, $newVP) => 
 
 // Init.
 $(document).on('init.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 
@@ -327,7 +321,7 @@ $(document).on('init.vpf', (event, self) => {
 
 // Destroy.
 $(document).on('destroy.vpf', (event, self) => {
-  if (event.namespace !== 'vpf') {
+  if ('vpf' !== event.namespace) {
     return;
   }
 

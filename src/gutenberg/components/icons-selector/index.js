@@ -112,7 +112,7 @@ export default class IconsSelector extends Component {
 
     const { options, ajaxStatus } = this.state;
 
-    const isLoading = ajaxStatus && ajaxStatus === 'progress';
+    const isLoading = ajaxStatus && 'progress' === ajaxStatus;
 
     if (isLoading) {
       return (

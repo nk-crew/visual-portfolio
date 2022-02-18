@@ -122,7 +122,7 @@ export default class IconsSelector extends Component {
     const { extended } = this.props;
 
     if (extended) {
-      return `${vertical && vertical !== 'center' ? `${vertical}-` : ''}${horizontal}`;
+      return `${vertical && 'center' !== vertical ? `${vertical}-` : ''}${horizontal}`;
     }
 
     return horizontal;

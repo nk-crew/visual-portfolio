@@ -24,7 +24,7 @@ export default class AspectRatio extends Component {
     super(...args);
 
     this.state = {
-      isCustom: typeof DEFAULT_RATIOS[this.props.value] === 'undefined',
+      isCustom: 'undefined' === typeof DEFAULT_RATIOS[this.props.value],
     };
 
     this.updatePart = this.updatePart.bind(this);
@@ -90,7 +90,7 @@ export default class AspectRatio extends Component {
         <SelectControl
           value={isCustom ? 'custom' : value}
           onChange={(val) => {
-            if (val === 'custom') {
+            if ('custom' === val) {
               this.setState({
                 isCustom: true,
               });

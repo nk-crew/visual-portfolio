@@ -77,7 +77,7 @@ class IframePreview extends Component {
         checkOrigin: false,
         onMessage({ message }) {
           // select current block on click message.
-          if (message === 'clicked') {
+          if ('clicked' === message) {
             wp.data.dispatch('core/block-editor').selectBlock(clientId);
 
             window.focus();
@@ -164,7 +164,7 @@ class IframePreview extends Component {
     Object.keys(newAttributes).forEach((name) => {
       const val = newAttributes[name];
 
-      if (typeof oldAttributes[name] === 'undefined' || oldAttributes[name] !== val) {
+      if ('undefined' === typeof oldAttributes[name] || oldAttributes[name] !== val) {
         changedAttributes[name] = val;
       }
     });
@@ -277,12 +277,12 @@ class IframePreview extends Component {
       readOnly: true,
     };
 
-    if (typeof val === 'number') {
+    if ('number' === typeof val) {
       params.type = 'number';
-    } else if (typeof val === 'boolean') {
+    } else if ('boolean' === typeof val) {
       params.type = 'number';
       params.value = val ? 1 : 0;
-    } else if (typeof val === 'object' && val !== null) {
+    } else if ('object' === typeof val && null !== val) {
       return (
         <Fragment>
           {Object.keys(val).map((i) => (
@@ -323,7 +323,7 @@ class IframePreview extends Component {
             <input type="hidden" name="vp_preview_post_type" value={postType} readOnly />
             <input type="hidden" name="vp_preview_post_id" value={postId} readOnly />
 
-            {contentSource === 'saved' ? (
+            {'saved' === contentSource ? (
               <input type="text" name="vp_id" value={id} readOnly />
             ) : (
               <Fragment>
@@ -339,7 +339,6 @@ class IframePreview extends Component {
             title="vp-preview"
             id={uniqueId}
             name={uniqueId}
-            // eslint-disable-next-line
             allowtransparency="true"
             ref={this.frameRef}
           />

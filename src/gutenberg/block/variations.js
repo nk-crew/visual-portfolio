@@ -16,7 +16,6 @@ export default Object.keys(registeredControls.layout.options).map((name) => {
     name: data.value,
     attributes: { layout: data.value },
     title: data.title,
-    /* eslint-disable indent */
     icon: data.icon
       ? {
           foreground: '#2540CC',

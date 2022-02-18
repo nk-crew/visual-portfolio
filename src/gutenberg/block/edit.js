@@ -51,7 +51,7 @@ export default class BlockEdit extends Component {
 
     // Set some starter attributes for different content sources.
     // And hide the setup wizard.
-    if (setupWizard === 'true' && contentSource) {
+    if ('true' === setupWizard && contentSource) {
       switch (contentSource) {
         case 'images':
           if (images && images.length) {
@@ -97,7 +97,7 @@ export default class BlockEdit extends Component {
     let { content_source: contentSource } = attributes;
 
     // Saved layouts by default displaying Portfolio source.
-    if (contentSource === 'portfolio') {
+    if ('portfolio' === contentSource) {
       contentSource = '';
     }
 
@@ -107,7 +107,7 @@ export default class BlockEdit extends Component {
         {contentSource ? (
           <Fragment>
             {Object.keys(registeredControlsCategories).map((name) => {
-              if (name === 'content-source') {
+              if ('content-source' === name) {
                 return null;
               }
 
@@ -146,7 +146,7 @@ export default class BlockEdit extends Component {
     }
 
     // Display block preview.
-    if (previewExample === 'true') {
+    if ('true' === previewExample) {
       return (
         <div className="vpf-example-preview">
           <img
@@ -159,11 +159,11 @@ export default class BlockEdit extends Component {
 
     return (
       <Fragment>
-        {setupWizard !== 'true' ? (
+        {'true' !== setupWizard ? (
           <InspectorControls>{this.renderControls(this.props)}</InspectorControls>
         ) : null}
         <div className={className}>
-          {setupWizard !== 'true' ? (
+          {'true' !== setupWizard ? (
             <IframePreview {...this.props} />
           ) : (
             <div className="vpf-setup-wizard">

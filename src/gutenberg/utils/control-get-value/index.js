@@ -14,7 +14,7 @@ export default function controlGetValue(name, attributes) {
 
   // Parse arrays and objects.
   // Example `images[3].format`.
-  if (typeof val === 'undefined' && /[\[\.]/g.test(name)) {
+  if ('undefined' === typeof val && /[\[\.]/g.test(name)) {
     // Find parts, used for objects.
     // Example `images.format`
     const valObjectParts = name.split('.');
@@ -29,7 +29,7 @@ export default function controlGetValue(name, attributes) {
 
           if (valArrayParts && valArrayParts.length) {
             valArrayParts.forEach((arrPart) => {
-              if (arrPart !== '') {
+              if ('' !== arrPart) {
                 if (`${parseInt(arrPart, 10)}` === arrPart) {
                   valParts.push(parseInt(arrPart, 10));
                 } else {
@@ -48,7 +48,7 @@ export default function controlGetValue(name, attributes) {
         let currentVal = attributes;
 
         valParts.forEach((partName) => {
-          if (currentVal && typeof currentVal[partName] !== 'undefined') {
+          if (currentVal && 'undefined' !== typeof currentVal[partName]) {
             currentVal = currentVal[partName];
           } else {
             currentVal = undefined;
