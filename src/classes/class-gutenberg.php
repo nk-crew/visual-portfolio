@@ -86,6 +86,12 @@ class Visual_Portfolio_Gutenberg_Block {
                         );
                     }
                     break;
+                case 'sortable':
+                    $attributes[ $control['name'] ]['type']  = 'array';
+                    $attributes[ $control['name'] ]['items'] = array(
+                        'type' => 'string',
+                    );
+                    break;
                 case 'gallery':
                     $attributes[ $control['name'] ]['type']  = 'array';
                     $attributes[ $control['name'] ]['items'] = array(

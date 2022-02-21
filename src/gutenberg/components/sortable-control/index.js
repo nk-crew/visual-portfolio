@@ -42,7 +42,7 @@ const SortableItem = SortableElement(({ element, sourceOptions, props, state, co
             updateValue.splice(findIndex, 1);
             disabledOptions.push(element);
 
-            onChange(JSON.stringify(updateValue));
+            onChange(updateValue);
             controlObject.setState({
               value: updateValue,
               disabledOptions,
@@ -81,24 +81,14 @@ export default class SortableControl extends Component {
   constructor(...args) {
     super(...args);
 
-    const { options, defaultVal } = this.props;
+    const { options, value, defaultVal } = this.props;
 
     const defaultOptions = defaultVal || Object.keys(options);
-
-    let value = defaultOptions;
-
-    if ('undefined' !== typeof this.props.value) {
-      if ('string' === typeof this.props.value) {
-        value = JSON.parse(this.props.value);
-      } else {
-        value = this.props.value;
-      }
-    }
 
     const disabledOptions = Object.keys(options).filter((findValue) => !value.includes(findValue));
 
     this.state = {
-      value,
+      value: 'undefined' !== typeof value ? value : defaultOptions,
       disabledOptions,
     };
   }
@@ -123,7 +113,7 @@ export default class SortableControl extends Component {
           controlObject={this}
           onSortEnd={({ oldIndex, newIndex }) => {
             const updateValue = arrayMove([...value], oldIndex, newIndex);
-            onChange(JSON.stringify(updateValue));
+            onChange(updateValue);
             this.setState({
               value: updateValue,
             });
@@ -144,7 +134,7 @@ export default class SortableControl extends Component {
                       disabledOptions.splice(findIndex, 1);
                       updateValue.push(el);
 
-                      onChange(JSON.stringify(updateValue));
+                      onChange(updateValue);
                       this.setState({
                         value: updateValue,
                         disabledOptions,
