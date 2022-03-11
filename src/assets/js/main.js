@@ -822,22 +822,6 @@ class VP {
   }
 }
 
-// fix for Elementor popup gallery.
-// https://github.com/nk-crew/visual-portfolio/issues/103
-if ($('.elementor').length) {
-  $(document).on('init.vpf addItems.vpf', (event, vpObject) => {
-    if ('vpf' !== event.namespace) {
-      return;
-    }
-
-    vpObject.$item.find('.vp-portfolio__item a').each(function () {
-      if (/\.(png|jpe?g|gif|svg)(\?.*)?$/i.test(this.href)) {
-        $(this).attr('data-elementor-open-lightbox', 'no');
-      }
-    });
-  });
-}
-
 // extend VP object.
 $(document).trigger('extendClass.vpf', [VP]);
 
