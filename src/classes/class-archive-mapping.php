@@ -78,7 +78,9 @@ class Visual_Portfolio_Archive_Mapping {
      * @return array
      */
     public function add_filter_items( $terms, $vp_options ) {
-        if ( get_post_meta( get_the_ID(), '_vp_post_type_mapped', true ) ) {
+        // phpcs:ignore
+        $post_id = $_REQUEST['vp_preview_post_id'] ?? get_the_ID() ?? null;
+        if ( get_post_meta( $post_id, '_vp_post_type_mapped', true ) && null !== $post_id ) {
 
             $query_opts = Visual_Portfolio_Get::get_query_params( $vp_options, true );
             // Get active item.
