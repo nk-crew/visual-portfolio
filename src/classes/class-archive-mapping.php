@@ -48,6 +48,7 @@ class Visual_Portfolio_Archive_Mapping {
         add_action( 'admin_init', array( $this, 'permalink_settings_init' ) );
         add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
         add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
+        add_filter( 'vpf_extend_filter_items', array( $this, 'add_filter_items' ), 10, 2 );
     }
 
     /**
@@ -67,6 +68,57 @@ class Visual_Portfolio_Archive_Mapping {
         }
 
         self::create_archive_page();
+    }
+
+    /**
+     * Add filter items.
+     *
+     * @param array $terms - Current terms.
+     * @param array $vp_options - Current vp_list options.
+     * @return array
+     */
+    public function add_filter_items( $terms, $vp_options ) {
+        if ( get_post_meta( get_the_ID(), '_vp_post_type_mapped', true ) ) {
+
+            $query_opts = Visual_Portfolio_Get::get_query_params( $vp_options, true );
+            // Get active item.
+            $active_item     = Visual_Portfolio_Get::get_filter_active_item( $query_opts );
+            $portfolio_query = new WP_Query(
+                array(
+                    'post_type'      => 'portfolio',
+                    'posts_per_page' => -1,
+                )
+            );
+            $term_items      = Visual_Portfolio_Get::get_posts_terms( $portfolio_query, $active_item );
+
+            // Add 'All' active item.
+            if ( ! empty( $term_items['terms'] ) && $vp_options['filter_text_all'] ) {
+                array_unshift(
+                    $term_items['terms'],
+                    array(
+                        'filter'      => '*',
+                        'label'       => $vp_options['filter_text_all'],
+                        'description' => false,
+                        'count'       => false,
+                        'id'          => 0,
+                        'parent'      => 0,
+                        'active'      => ! $term_items['there_is_active'],
+                        'url'         => Visual_Portfolio_Get::get_pagenum_link(
+                            array(
+                                'vp_filter' => '',
+                                'vp_page'   => 1,
+                            )
+                        ),
+                        'class'       => 'vp-filter__item' . ( ! $term_items['there_is_active'] ? ' vp-filter__item-active' : '' ),
+                    )
+                );
+            }
+            if ( ! empty( $term_items['terms'] ) ) {
+                $terms = $term_items['terms'];
+            }
+        }
+
+        return $terms;
     }
 
     /**
