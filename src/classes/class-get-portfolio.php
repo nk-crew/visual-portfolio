@@ -1177,7 +1177,7 @@ class Visual_Portfolio_Get {
      *
      * @return array
      */
-    private static function get_query_params( $options, $for_filter = false, $layout_id = false ) {
+    public static function get_query_params( $options, $for_filter = false, $layout_id = false ) {
         $options    = apply_filters( 'vpf_extend_options_before_query_args', $options, $layout_id );
         $query_opts = array();
         $is_images  = 'images' === $options['content_source'];
@@ -1635,158 +1635,24 @@ class Visual_Portfolio_Get {
             return;
         }
 
-        $terms           = array();
-        $there_is_active = false;
-        $is_images       = 'images' === $vp_options['content_source'];
-        $is_social       = 'social-stream' === $vp_options['content_source'];
+        $is_images  = 'images' === $vp_options['content_source'];
+        $is_social  = 'social-stream' === $vp_options['content_source'];
+        $query_opts = self::get_query_params( $vp_options, true );
 
         // Get active item.
-        $active_item = false;
-
-        $query_opts = self::get_query_params( $vp_options, true );
-        // phpcs:ignore
-        if ( ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
-            // phpcs:ignore
-            $active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
-        }
+        $active_item = self::get_filter_active_item( $query_opts );
 
         if ( $is_images || $is_social ) {
-            // calculate categories count.
-            $categories_count = array();
-            foreach ( $query_opts['images'] as $img ) {
-                if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
-                    foreach ( $img['categories'] as $cat ) {
-                        $categories_count[ $cat ] = ( isset( $categories_count[ $cat ] ) ? $categories_count[ $cat ] : 0 ) + 1;
-                    }
-                }
-            }
-
-            foreach ( $query_opts['images'] as $img ) {
-                if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
-                    foreach ( $img['categories'] as $cat ) {
-                        $slug = self::create_slug( $cat );
-                        $url  = self::get_pagenum_link(
-                            array(
-                                'vp_filter' => rawurlencode( $slug ),
-                                'vp_page'   => 1,
-                            )
-                        );
-
-                        // add in terms array.
-                        $terms[ $slug ] = array(
-                            'filter'      => $slug,
-                            'label'       => $cat,
-                            'description' => '',
-                            'count'       => isset( $categories_count[ $cat ] ) && $categories_count[ $cat ] ? $categories_count[ $cat ] : '',
-                            'taxonomy'    => 'category',
-                            'id'          => 0,
-                            'parent'      => 0,
-                            'active'      => $active_item === $slug,
-                            'url'         => $url,
-                            'class'       => 'vp-filter__item' . ( $active_item === $slug ? ' vp-filter__item-active' : '' ),
-                        );
-
-                        if ( $active_item === $slug ) {
-                            $there_is_active = true;
-                        }
-                    }
-                }
-            }
+            $term_items = self::get_images_terms( $query_opts, $active_item );
         } else {
-            /**
-             * TODO: make caching using set_transient function. Info here - https://wordpress.stackexchange.com/a/145960
-             */
-            $term_ids        = array();
-            $term_taxonomies = array();
-
-            // stupid hack as wp_reset_postdata() function is not working for me...
-            $old_post        = $GLOBALS['post'];
             $portfolio_query = new WP_Query( $query_opts );
-            while ( $portfolio_query->have_posts() ) {
-                $portfolio_query->the_post();
-                $all_taxonomies = get_object_taxonomies( get_post() );
-
-                foreach ( $all_taxonomies as $cat ) {
-                    // allow only specific taxonomies for filter.
-                    if ( ! self::allow_taxonomies_for_filter( $cat ) ) {
-                        continue;
-                    }
-
-                    // Retrieve terms.
-                    $category = get_the_terms( get_post(), $cat );
-                    if ( ! $category ) {
-                        continue;
-                    }
-
-                    // Prepare each terms array.
-                    foreach ( $category as $key => $cat_item ) {
-                        if ( ! in_array( $cat_item->term_id, $term_ids, true ) ) {
-                            $term_ids[] = $cat_item->term_id;
-                        }
-                        if ( ! in_array( $cat_item->taxonomy, $term_taxonomies, true ) ) {
-                            $term_taxonomies[] = $cat_item->taxonomy;
-                        }
-                    }
-                }
-            }
-
-            $portfolio_query->reset_postdata();
-
-            // Sometimes, when we use WPBakery Page Builder, without this reset output is wrong.
-            wp_reset_postdata();
-
-            // stupid hack as wp_reset_postdata() function is not working in some situations...
-            // phpcs:ignore
-            $GLOBALS['post'] = $old_post;
-
-            // Get all available terms and then pick only needed by ID
-            // we need this to support reordering plugins.
-            $all_terms = get_terms(
-                array(
-                    'taxonomy'   => $term_taxonomies,
-                    'hide_empty' => true,
-                )
-            );
-
-            if ( isset( $all_terms ) && is_array( $all_terms ) ) {
-                foreach ( $all_terms as $term ) {
-                    if ( in_array( $term->term_id, $term_ids, true ) ) {
-                        $unique_name = rawurlencode( $term->taxonomy . ':' ) . $term->slug;
-
-                        $url = self::get_pagenum_link(
-                            array(
-                                'vp_filter' => $unique_name,
-                                'vp_page'   => 1,
-                            )
-                        );
-
-                        $is_active = rawurldecode( $unique_name ) === $active_item;
-
-                        $terms[ $unique_name ] = array(
-                            'filter'      => $term->slug,
-                            'label'       => $term->name,
-                            'description' => $term->description,
-                            'count'       => $term->count,
-                            'taxonomy'    => $term->taxonomy,
-                            'id'          => $term->term_id,
-                            'parent'      => $term->parent,
-                            'active'      => $is_active,
-                            'url'         => $url,
-                            'class'       => 'vp-filter__item' . ( $is_active ? ' vp-filter__item-active' : '' ),
-                        );
-
-                        if ( $is_active ) {
-                            $there_is_active = true;
-                        }
-                    }
-                }
-            }
+            $term_items      = self::get_posts_terms( $portfolio_query, $active_item );
         }
 
         // Add 'All' active item.
-        if ( ! empty( $terms ) && $vp_options['filter_text_all'] ) {
+        if ( ! empty( $term_items['terms'] ) && $vp_options['filter_text_all'] ) {
             array_unshift(
-                $terms,
+                $term_items['terms'],
                 array(
                     'filter'      => '*',
                     'label'       => $vp_options['filter_text_all'],
@@ -1794,20 +1660,20 @@ class Visual_Portfolio_Get {
                     'count'       => false,
                     'id'          => 0,
                     'parent'      => 0,
-                    'active'      => ! $there_is_active,
+                    'active'      => ! $term_items['there_is_active'],
                     'url'         => self::get_pagenum_link(
                         array(
                             'vp_filter' => '',
                             'vp_page'   => 1,
                         )
                     ),
-                    'class'       => 'vp-filter__item' . ( ! $there_is_active ? ' vp-filter__item-active' : '' ),
+                    'class'       => 'vp-filter__item' . ( ! $term_items['there_is_active'] ? ' vp-filter__item-active' : '' ),
                 )
             );
         }
 
         // No filters available.
-        if ( empty( $terms ) ) {
+        if ( empty( $term_items['terms'] ) ) {
             return;
         }
 
@@ -1850,7 +1716,7 @@ class Visual_Portfolio_Get {
                     ),
                 )
              */
-            'items'      => apply_filters( 'vpf_extend_filter_items', $terms, $vp_options ),
+            'items'      => apply_filters( 'vpf_extend_filter_items', $term_items['terms'], $vp_options ),
             'show_count' => $vp_options['filter_show_count'],
             'opts'       => $filter_options,
             'vp_opts'    => $vp_options,
@@ -1878,6 +1744,187 @@ class Visual_Portfolio_Get {
         ?>
         </div>
         <?php
+    }
+
+    /**
+     * Get post terms.
+     *
+     * @param WP_Query $portfolio_query - The WordPress Portfolio Query class.
+     * @param boolean  $active_item - Actime filter item.
+     * @return array
+     */
+    public static function get_posts_terms( $portfolio_query, $active_item ) {
+        /**
+         * TODO: make caching using set_transient function. Info here - https://wordpress.stackexchange.com/a/145960
+         */
+        $term_ids        = array();
+        $term_taxonomies = array();
+        $terms           = array();
+        $there_is_active = false;
+
+        // stupid hack as wp_reset_postdata() function is not working for me...
+        $old_post = $GLOBALS['post'];
+        while ( $portfolio_query->have_posts() ) {
+            $portfolio_query->the_post();
+            $all_taxonomies = get_object_taxonomies( get_post() );
+
+            foreach ( $all_taxonomies as $cat ) {
+                // allow only specific taxonomies for filter.
+                if ( ! self::allow_taxonomies_for_filter( $cat ) ) {
+                    continue;
+                }
+
+                // Retrieve terms.
+                $category = get_the_terms( get_post(), $cat );
+                if ( ! $category ) {
+                    continue;
+                }
+
+                // Prepare each terms array.
+                foreach ( $category as $key => $cat_item ) {
+                    if ( ! in_array( $cat_item->term_id, $term_ids, true ) ) {
+                        $term_ids[] = $cat_item->term_id;
+                    }
+                    if ( ! in_array( $cat_item->taxonomy, $term_taxonomies, true ) ) {
+                        $term_taxonomies[] = $cat_item->taxonomy;
+                    }
+                }
+            }
+        }
+
+        $portfolio_query->reset_postdata();
+
+        // Sometimes, when we use WPBakery Page Builder, without this reset output is wrong.
+        wp_reset_postdata();
+
+        // stupid hack as wp_reset_postdata() function is not working in some situations...
+        // phpcs:ignore
+        $GLOBALS['post'] = $old_post;
+
+        // Get all available terms and then pick only needed by ID
+        // we need this to support reordering plugins.
+        $all_terms = get_terms(
+            array(
+                'taxonomy'   => $term_taxonomies,
+                'hide_empty' => true,
+            )
+        );
+
+        if ( isset( $all_terms ) && is_array( $all_terms ) ) {
+            foreach ( $all_terms as $term ) {
+                if ( in_array( $term->term_id, $term_ids, true ) ) {
+                    $unique_name = rawurlencode( $term->taxonomy . ':' ) . $term->slug;
+
+                    $url = self::get_pagenum_link(
+                        array(
+                            'vp_filter' => $unique_name,
+                            'vp_page'   => 1,
+                        )
+                    );
+
+                    $is_active = rawurldecode( $unique_name ) === $active_item;
+
+                    $terms[ $unique_name ] = array(
+                        'filter'      => $term->slug,
+                        'label'       => $term->name,
+                        'description' => $term->description,
+                        'count'       => $term->count,
+                        'taxonomy'    => $term->taxonomy,
+                        'id'          => $term->term_id,
+                        'parent'      => $term->parent,
+                        'active'      => $is_active,
+                        'url'         => $url,
+                        'class'       => 'vp-filter__item' . ( $is_active ? ' vp-filter__item-active' : '' ),
+                    );
+
+                    if ( $is_active ) {
+                        $there_is_active = true;
+                    }
+                }
+            }
+        }
+
+        return array(
+            'terms'           => $terms,
+            'there_is_active' => $there_is_active,
+        );
+    }
+
+    /**
+     * Get images terms.
+     *
+     * @param array   $query_opts - Query array params.
+     * @param boolean $active_item - Active filter item.
+     * @return array
+     */
+    public static function get_images_terms( $query_opts, $active_item ) {
+        $terms           = array();
+        $there_is_active = false;
+        // calculate categories count.
+        $categories_count = array();
+        foreach ( $query_opts['images'] as $img ) {
+            if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
+                foreach ( $img['categories'] as $cat ) {
+                    $categories_count[ $cat ] = ( isset( $categories_count[ $cat ] ) ? $categories_count[ $cat ] : 0 ) + 1;
+                }
+            }
+        }
+
+        foreach ( $query_opts['images'] as $img ) {
+            if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
+                foreach ( $img['categories'] as $cat ) {
+                    $slug = self::create_slug( $cat );
+                    $url  = self::get_pagenum_link(
+                        array(
+                            'vp_filter' => rawurlencode( $slug ),
+                            'vp_page'   => 1,
+                        )
+                    );
+
+                    // add in terms array.
+                    $terms[ $slug ] = array(
+                        'filter'      => $slug,
+                        'label'       => $cat,
+                        'description' => '',
+                        'count'       => isset( $categories_count[ $cat ] ) && $categories_count[ $cat ] ? $categories_count[ $cat ] : '',
+                        'taxonomy'    => 'category',
+                        'id'          => 0,
+                        'parent'      => 0,
+                        'active'      => $active_item === $slug,
+                        'url'         => $url,
+                        'class'       => 'vp-filter__item' . ( $active_item === $slug ? ' vp-filter__item-active' : '' ),
+                    );
+
+                    if ( $active_item === $slug ) {
+                        $there_is_active = true;
+                    }
+                }
+            }
+        }
+
+        return array(
+            'terms'           => $terms,
+            'there_is_active' => $there_is_active,
+        );
+    }
+
+    /**
+     * Get filter active item.
+     *
+     * @param array $query_opts - Query array params.
+     * @return boolean
+     */
+    public static function get_filter_active_item( $query_opts ) {
+        // Get active item.
+        $active_item = false;
+
+        // phpcs:ignore
+        if ( ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
+            // phpcs:ignore
+            $active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
+        }
+
+        return $active_item;
     }
 
     /**
