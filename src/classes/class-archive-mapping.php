@@ -641,7 +641,9 @@ class Visual_Portfolio_Archive_Mapping {
      * @return void
      */
     public static function create_archive_page( $custom_slug = 'portfolio' ) {
-        if ( ! get_option( '_vp_add_archive_page' ) ) {
+        if ( ! get_option( '_vp_add_archive_page' ) && ! get_option( '_vp_trying_to_add_archive_page' ) ) {
+
+            add_option( '_vp_trying_to_add_archive_page', true );
 
             $args = array(
                 'post_title'    => esc_html__( 'Portfolio', '@@text_domain' ),
