@@ -203,8 +203,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
    */
   VP.prototype.initPopupGallery = function () {
     const self = this;
-
-    if (!self.options.itemsClickAction || 'popup_gallery' !== self.options.itemsClickAction) {
+    if (!self.options.itemsClickAction || 'url' === self.options.itemsClickAction) {
       return;
     }
 
@@ -212,7 +211,6 @@ $(document).on('extendClass.vpf', (event, VP) => {
     if (self.isPreview()) {
       return;
     }
-
     // click action
     // `a.vp-portfolio__item-overlay` added as fallback for old templates, used in themes.
     self.$item.on(
@@ -262,7 +260,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
   VP.prototype.destroyPopupGallery = function () {
     const self = this;
 
-    if (!self.options.itemsClickAction || 'popup_gallery' !== self.options.itemsClickAction) {
+    if (!self.options.itemsClickAction || 'url' === self.options.itemsClickAction) {
       return;
     }
 
