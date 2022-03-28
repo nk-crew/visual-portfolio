@@ -2200,6 +2200,11 @@ class Visual_Portfolio_Admin {
                         'title' => esc_html__( 'Popup', '@@text_domain' ),
                         'icon'  => '<svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6.75" y="14.25" width="13.5" height="13.5" rx="1.25" transform="rotate(-90 6.75 14.25)" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M2 19L4.29088 16.7396" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5L5.51523 15.5152L5.5 18" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     ),
+                    array(
+                        'value' => 'advanced',
+                        'title' => esc_html__( 'Advanced', '@@text_domain' ),
+                        'icon'  => '<svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6.75" y="14.25" width="13.5" height="13.5" rx="1.25" transform="rotate(-90 6.75 14.25)" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M2 19L4.29088 16.7396" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5L5.51523 15.5152L5.5 18" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    ),
                 ),
             )
         );
@@ -2301,6 +2306,21 @@ class Visual_Portfolio_Admin {
                     array(
                         'control' => 'items_click_action',
                         'value'   => 'popup_gallery',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'items-click-action',
+                'type'        => 'pro_note',
+                'name'        => 'items_click_action_advanced_pro_note',
+                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
+                'description' => esc_html__( 'Advanced settings for posts and images.', '@@text_domain' ),
+                'condition'   => array(
+                    array(
+                        'control' => 'items_click_action',
+                        'value'   => 'advanced',
                     ),
                 ),
             )
