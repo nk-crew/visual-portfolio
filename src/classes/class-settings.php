@@ -591,10 +591,17 @@ class Visual_Portfolio_Settings {
                     'desc'    => esc_html__( 'When you display pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`.', '@@text_domain' ),
                     'type'    => 'textarea',
                     'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? '' : '
+/* Hide header and footer in standard themes */
 .vp-popup-iframe #site-header,
 .vp-popup-iframe #masthead,
 .vp-popup-iframe #site-footer,
 .vp-popup-iframe #colophon {
+    display: none;
+}
+
+/* Hide header and footer in Twenty Twenty-Two theme (Full Site Editing) */
+.vp-popup-iframe .wp-site-blocks > header.wp-block-template-part,
+.vp-popup-iframe .wp-site-blocks > footer.wp-block-template-part {
     display: none;
 }',
                     'is_pro'  => true,
