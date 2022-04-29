@@ -23,10 +23,8 @@ const DragHandle = sortableHandle(() => (
   </span>
 ));
 
-const SortableItem = SortableElement(({ element, sourceOptions, props, state, controlObject }) => {
+const SortableItem = SortableElement(({ element, sourceOptions, items, props }) => {
   const { allowDisablingOptions, onChange } = props;
-
-  const { value, disabledOptions } = state;
 
   const label = sourceOptions[element];
   return (
@@ -37,16 +35,11 @@ const SortableItem = SortableElement(({ element, sourceOptions, props, state, co
         <Button
           className="vpf-component-sortable-delete"
           onClick={() => {
-            const updateValue = value;
-            const findIndex = value.indexOf(element);
+            const updateValue = [...items];
+            const findIndex = items.indexOf(element);
             updateValue.splice(findIndex, 1);
-            disabledOptions.push(element);
 
             onChange(updateValue);
-            controlObject.setState({
-              value: updateValue,
-              disabledOptions,
-            });
           }}
         >
           -
@@ -56,47 +49,33 @@ const SortableItem = SortableElement(({ element, sourceOptions, props, state, co
   );
 });
 
-const SortableList = SortableContainer(
-  ({ items, sourceOptions, classes, props, state, controlObject }) => (
-    <ul className={classes}>
-      {items.map((value, index) => (
-        <SortableItem
-          key={`item-${value}`}
-          index={index}
-          element={value}
-          sourceOptions={sourceOptions}
-          props={props}
-          state={state}
-          controlObject={controlObject}
-        />
-      ))}
-    </ul>
-  )
-);
+const SortableList = SortableContainer(({ items, sourceOptions, classes, props }) => (
+  <ul className={classes}>
+    {items.map((value, index) => (
+      <SortableItem
+        key={`item-${value}`}
+        index={index}
+        element={value}
+        sourceOptions={sourceOptions}
+        props={props}
+        items={items}
+      />
+    ))}
+  </ul>
+));
 
 /**
  * Component Class
  */
 export default class SortableControl extends Component {
-  constructor(...args) {
-    super(...args);
+  render() {
+    const { options, defaultOptions, allowDisablingOptions, onChange } = this.props;
 
-    const { options, value, defaultVal } = this.props;
+    let { value } = this.props;
 
-    const defaultOptions = defaultVal || Object.keys(options);
+    value = 'undefined' !== typeof value ? value : defaultOptions;
 
     const disabledOptions = Object.keys(options).filter((findValue) => !value.includes(findValue));
-
-    this.state = {
-      value: 'undefined' !== typeof value ? value : defaultOptions,
-      disabledOptions,
-    };
-  }
-
-  render() {
-    const { options, allowDisablingOptions, onChange } = this.props;
-
-    const { value, disabledOptions } = this.state;
 
     let classes = 'vpf-component-sortable';
 
@@ -109,14 +88,9 @@ export default class SortableControl extends Component {
           sourceOptions={options}
           classes={classes}
           props={this.props}
-          state={this.state}
-          controlObject={this}
           onSortEnd={({ oldIndex, newIndex }) => {
             const updateValue = arrayMove([...value], oldIndex, newIndex);
             onChange(updateValue);
-            this.setState({
-              value: updateValue,
-            });
           }}
           useDragHandle
           helperClass="vpf-component-sortable-item-dragging"
@@ -129,16 +103,11 @@ export default class SortableControl extends Component {
                   <Button
                     className="vpf-component-sortable-add"
                     onClick={() => {
-                      const updateValue = value;
-                      const findIndex = disabledOptions.indexOf(el);
-                      disabledOptions.splice(findIndex, 1);
+                      const updateValue = [...value];
+
                       updateValue.push(el);
 
                       onChange(updateValue);
-                      this.setState({
-                        value: updateValue,
-                        disabledOptions,
-                      });
                     }}
                   >
                     +
