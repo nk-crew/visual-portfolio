@@ -27,6 +27,12 @@ class Visual_Portfolio_Supported_Themes {
         $result = false;
 
         switch ( get_template() ) {
+            case 'twentytwentytwo':
+                $result = array(
+                    'name' => 'vpf-twentytwentytwo',
+                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-twentytwentytwo.min.css',
+                );
+                break;
             case 'twentytwentyone':
                 $result = array(
                     'name' => 'vpf-twentytwentyone',
