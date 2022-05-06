@@ -32,13 +32,16 @@ $templates_data = array(
     'allow_links' => ! $args['url'],
 );
 
-$link_data = array(
-    'href'     => $args['url'],
-    'target'   => $args['url_target'],
-    'rel'      => $args['url_rel'],
-    'fallback' => 'span',
-    'class'    => 'vp-portfolio__item-meta',
-    'tabindex' => '-1',
+$link_data = array_merge(
+    array(
+        'href'     => $args['url'],
+        'target'   => $args['url_target'],
+        'rel'      => $args['url_rel'],
+        'fallback' => 'span',
+        'class'    => 'vp-portfolio__item-meta',
+        'tabindex' => '-1',
+    ),
+    $templates_data
 );
 
 ?>
