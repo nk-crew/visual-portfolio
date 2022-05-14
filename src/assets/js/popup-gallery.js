@@ -18,24 +18,103 @@ const VPPopupAPI = {
   vendors: [
     {
       vendor: 'youtube',
-      embedUrl: 'https://www.youtube.com/embed/{{video_id}}',
+      embedUrl: 'https://www.youtube.com/embed/{{video_id}}?{{params}}',
       pattern:
-        /(https?:\/\/)?(www.)?(youtube\.com|youtu\.be|youtube-nocookie\.com)\/(?:embed\/|v\/|watch\?v=|watch\?list=(.*)&v=|watch\?(.*[^&]&)v=)?((\w|-){11})(&list=(\w+)&?)?/,
+        /(https?:\/\/)?(www.)?(youtube\.com|youtu\.be|youtube-nocookie\.com)\/(?:embed\/|v\/|watch\?v=|watch\?list=(.*)&v=|watch\?(.*[^&]&)v=)?((\w|-){11})(&list=(\w+)&?)?(.*)/,
       patternIndex: 6,
+      params: {
+        autoplay: 1,
+        autohide: 1,
+        fs: 1,
+        rel: 0,
+        hd: 1,
+        wmode: 'transparent',
+        enablejsapi: 1,
+        html5: 1,
+      },
+      paramsIndex: 10,
     },
     {
       vendor: 'vimeo',
-      embedUrl: 'https://player.vimeo.com/video/{{video_id}}',
+      embedUrl: 'https://player.vimeo.com/video/{{video_id}}?{{params}}',
       // eslint-disable-next-line no-useless-escape
       pattern:
-        /https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/,
+        /https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)(.*)/,
       patternIndex: 3,
+      params: {
+        autoplay: 1,
+        hd: 1,
+        show_title: 1,
+        show_byline: 1,
+        show_portrait: 0,
+        fullscreen: 1,
+      },
+      paramsIndex: 4,
     },
   ],
 
   init() {},
   open() {},
   close() {},
+
+  /**
+   * Parse query parameters.
+   * Thanks to https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+   *
+   * @param {string} query - query string.
+   *
+   * @returns {string}
+   */
+  getQueryStringParams(query) {
+    return query
+      ? (/^[?#]/.test(query) ? query.slice(1) : query).split('&').reduce((params, param) => {
+          const [key, value] = param.split('=');
+          params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+          return params;
+        }, {})
+      : {};
+  },
+
+  /**
+   * Prepare params from parsed URL.
+   *
+   * @param {object} match - url match data.
+   * @param {object} vendorData - vendor data.
+   *
+   * @returns {string}
+   */
+  prepareParams(match, vendorData) {
+    let result = '';
+
+    // Prepare default params.
+    const params = vendorData.params || {};
+
+    // Parse params from URL.
+    if (vendorData.paramsIndex && match && match[vendorData.paramsIndex]) {
+      const newParams = VPPopupAPI.getQueryStringParams(match[vendorData.paramsIndex]);
+
+      if (newParams && 'object' === typeof newParams) {
+        Object.keys(newParams).forEach((key) => {
+          if (key && newParams[key]) {
+            params[key] = newParams[key];
+          }
+        });
+      }
+    }
+
+    if (params && Object.keys(params).length) {
+      Object.keys(params).forEach((key) => {
+        if (key && params[key]) {
+          if (result) {
+            result += '&';
+          }
+          result += `${key}=${params[key]}`;
+        }
+      });
+    }
+
+    return result;
+  },
 
   /**
    * Parse video URL and return object with data
@@ -62,6 +141,7 @@ const VPPopupAPI = {
             embedUrl = embedUrl.replace(/{{video_id}}/g, videoId);
             embedUrl = embedUrl.replace(/{{video_url}}/g, url);
             embedUrl = embedUrl.replace(/{{video_url_encoded}}/g, encodeURIComponent(url));
+            embedUrl = embedUrl.replace(/{{params}}/g, VPPopupAPI.prepareParams(match, vendorData));
 
             const width = vendorData.width || 1920;
             const height = vendorData.height || 1080;
