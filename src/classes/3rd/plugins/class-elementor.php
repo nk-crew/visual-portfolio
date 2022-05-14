@@ -67,8 +67,6 @@ class Visual_Portfolio_3rd_Elementor {
                         return;
                     }
 
-                    console.log($items);
-
                     addDataAttribute($items);
                 });
             })(window.jQuery);
