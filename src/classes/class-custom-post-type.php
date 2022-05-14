@@ -397,36 +397,41 @@ class Visual_Portfolio_Custom_Post_Type {
         }
 
         ?>
-        <div class="notice notice-info vpf-saved-layouts-notice">
-            <h2>
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <?php echo esc_html__( 'When to use Saved Layouts', '@@text_domain' ); ?>
-            </h2>
-            <p>
-                <?php
-                echo wp_kses_post(
-                    sprintf(
-                        // translators: %1$s - url to documentation.
-                        // translators: %2$s - plugin name.
-                        __( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', '@@text_domain' ),
-                        'https://visualportfolio.co/documentation/portfolio-blocks/',
-                        visual_portfolio()->plugin_name
-                    )
-                );
-                ?>
-            </p>
-            <p>
-                <?php
-                // translators: %s - url to documentation.
-                echo wp_kses_post( sprintf( __( 'To reuse blocks, you can use the built-in Gutenberg feature - <a href="%s" target="_blank">Reusable Blocks</a>.', '@@text_domain' ), 'https://www.wpbeginner.com/beginners-guide/how-to-create-a-reusable-block-in-wordpress/' ) );
-                ?>
-            </p>
-            <p>
-                <?php
-                // translators: %s - url to documentation.
-                echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders only (such as Elementor, WPBakery Page Builder, etc), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', '@@text_domain' ), 'https://visualportfolio.co/documentation/saved-layouts-and-shortcodes/' ) );
-                ?>
-            </p>
+        <div class="notice notice-info vpf-admin-notice">
+            <div class="vpf-admin-notice-icon">
+                <i class="dashicons-visual-portfolio"></i>
+            </div>
+            <div class="vpf-admin-notice-content">
+                <h3>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <?php echo esc_html__( 'When to use Saved Layouts', '@@text_domain' ); ?>
+                </h3>
+                <p>
+                    <?php
+                    echo wp_kses_post(
+                        sprintf(
+                            // translators: %1$s - url to documentation.
+                            // translators: %2$s - plugin name.
+                            __( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', '@@text_domain' ),
+                            'https://visualportfolio.co/documentation/portfolio-blocks/',
+                            visual_portfolio()->plugin_name
+                        )
+                    );
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    // translators: %s - url to documentation.
+                    echo wp_kses_post( sprintf( __( 'To reuse blocks, you can use the built-in Gutenberg feature - <a href="%s" target="_blank">Reusable Blocks</a>.', '@@text_domain' ), 'https://www.wpbeginner.com/beginners-guide/how-to-create-a-reusable-block-in-wordpress/' ) );
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    // translators: %s - url to documentation.
+                    echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders only (such as Elementor, WPBakery Page Builder, etc), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', '@@text_domain' ), 'https://visualportfolio.co/documentation/saved-layouts-and-shortcodes/' ) );
+                    ?>
+                </p>
+            </div>
         </div>
         <?php
     }

@@ -62,7 +62,10 @@ class Visual_Portfolio_Ask_Review_Notice {
             return;
         }
 
-        $message = '<p>';
+        $message = '';
+
+        $message .= '<h3>' . esc_html__( 'Are You Satisfied Using Visual Portfolio?', '@@text_domain' ) . '</h3>';
+        $message .= '<p>';
 
         // Translators: placeholder is the plugin name.
         $message .= sprintf( esc_html__( 'Hey, we noticed you\'ve been using %s for more than two weeks now – that\'s awesome!', '@@text_domain' ), '<strong>' . _x( 'Visual Portfolio', 'plugin name inside the review notice', '@@text_domain' ) . '</strong>' );
@@ -76,11 +79,16 @@ class Visual_Portfolio_Ask_Review_Notice {
             </p>';
 
         ?>
-        <div class="notice notice-info" id="vpf-review-plugin-notice">
-            <?php
-            // phpcs:ignore
-            echo $message;
-            ?>
+        <div class="notice notice-info vpf-admin-notice" id="vpf-review-plugin-notice">
+            <div class="vpf-admin-notice-icon">
+                <i class="dashicons-visual-portfolio"></i>
+            </div>
+            <div class="vpf-admin-notice-content">
+                <?php
+                // phpcs:ignore
+                echo $message;
+                ?>
+            </div>
         </div>
         <?php
     }
