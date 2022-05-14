@@ -64,7 +64,7 @@ class Visual_Portfolio_Ask_Review_Notice {
 
         $message = '';
 
-        $message .= '<h3>' . esc_html__( 'Are You Satisfied Using Visual Portfolio?', '@@text_domain' ) . '</h3>';
+        $message .= '<h3>' . esc_html__( 'Satisfied using Visual Portfolio?', '@@text_domain' ) . '</h3>';
         $message .= '<p>';
 
         // Translators: placeholder is the plugin name.
