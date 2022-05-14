@@ -13,7 +13,7 @@ const { elementorFrontend, VPAdminElementorVariables: variables } = window;
 const $ = window.jQuery;
 const $wnd = $(window);
 
-$(window).on('elementor/frontend/init', ($data) => {
+$wnd.on('elementor/frontend/init', ($data) => {
   if (!variables) {
     return;
   }
@@ -61,6 +61,15 @@ $(window).on('elementor/frontend/init', ($data) => {
       $frame.iFrameResize({
         onInit() {
           maybeResizePreviews();
+        },
+        onMessage({ message }) {
+          // select current block on click message.
+          if ('clicked' === message) {
+            // Select current widget to display settings.
+            $frame.closest('.elementor-element').find('.elementor-editor-element-edit').click();
+
+            window.focus();
+          }
         },
       });
     }
