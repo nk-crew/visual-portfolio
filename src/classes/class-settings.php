@@ -611,11 +611,11 @@ class Visual_Portfolio_Settings {
                 array(
                     'name'    => 'pro_info',
                     'desc'    => '
-                        <div class="vpf-settings-info-pro">
-                            <h3>' . esc_html__( 'Pro Feature', '@@text_domain' ) . '</h3>
+                        <div class="vpf-pro-note vpf-settings-info-pro">
+                            <h3>' . esc_html__( 'Premium Only', '@@text_domain' ) . '</h3>
                             <div>
                                 <p>' . esc_html__( 'Protect your works using watermarks', '@@text_domain' ) . '</p>
-                                <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=plugin&utm_medium=settings_page&utm_campaign=watermarks&utm_content=@@plugin_version">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
+                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=settings_page&utm_campaign=watermarks&utm_content=@@plugin_version">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
                             </div>
                         </div>
                     ',
@@ -626,11 +626,11 @@ class Visual_Portfolio_Settings {
                 array(
                     'name'    => 'pro_info',
                     'desc'    => '
-                        <div class="vpf-settings-info-pro">
-                            <h3>' . esc_html__( 'Pro Feature', '@@text_domain' ) . '</h3>
+                        <div class="vpf-pro-note vpf-settings-info-pro">
+                            <h3>' . esc_html__( 'Premium Only', '@@text_domain' ) . '</h3>
                             <div>
                                 <p>' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ) . '</p>
-                                <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=plugin&utm_medium=settings_page&utm_campaign=social_feeds&utm_content=@@plugin_version">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
+                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=settings_page&utm_campaign=social_feeds&utm_content=@@plugin_version">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
                             </div>
                         </div>
                     ',
@@ -641,11 +641,11 @@ class Visual_Portfolio_Settings {
                 array(
                     'name'    => 'pro_info',
                     'desc'    => '
-                        <div class="vpf-settings-info-pro">
-                            <h3>' . esc_html__( 'Pro Feature', '@@text_domain' ) . '</h3>
+                        <div class="vpf-pro-note">
+                            <h3>' . esc_html__( 'Premium Only', '@@text_domain' ) . '</h3>
                             <div>
                                 <p>' . esc_html__( 'Remove our plugin brand and logos from Front and Admin areas', '@@text_domain' ) . '</p>
-                                <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=plugin&utm_medium=settings_page&utm_campaign=white_label&utm_content=@@plugin_version">' . esc_html__( 'Read More', '@@text_domain' ) . '</a>
+                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=settings_page&utm_campaign=white_label&utm_content=@@plugin_version">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
                             </div>
                         </div>
                     ',

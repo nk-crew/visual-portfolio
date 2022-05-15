@@ -776,7 +776,7 @@ $grid_sm: 600px !default;
 }
 
 /**
- * PRO Info for Settings and Proofing page.
+ * PRO Notices.
  */
 .portfolio_page_visual-portfolio-settings,
 .portfolio_page_vpf_proofing_page {
@@ -784,33 +784,69 @@ $grid_sm: 600px !default;
   .social_pro_info > th {
     display: none;
   }
+}
 
-  .vpf-settings-info-pro {
-    max-width: 240px;
-    padding: 20px;
-    text-align: center;
-    background-color: #fff;
-    border: 2px solid #2540cc;
+$pro_note_radius: 5px;
+$pro_note_border_size: 2px;
 
-    h3 {
-      margin-top: 0;
-      margin-bottom: 13px;
-      font-size: 15px;
-    }
+.vpf-pro-note {
+  position: relative;
+  max-width: 260px;
+  padding: 20px;
+  font-size: 13px;
+  background: linear-gradient(to left, #743ad5, #d53a9d);
+  border-radius: $pro_note_radius;
 
-    p {
-      margin-bottom: 13px;
-      font-size: 13px;
+  &::before {
+    position: absolute;
+    top: $pro_note_border_size;
+    right: $pro_note_border_size;
+    bottom: $pro_note_border_size;
+    left: $pro_note_border_size;
+    z-index: 0;
+    display: block;
+    content: "";
+    background-color: #fff6fc;
+    border-radius: $pro_note_radius - $pro_note_border_size;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #d53a9d;
+    text-transform: none;
+  }
+
+  p {
+    margin-bottom: 10px !important;
+    font-size: inherit !important;
+  }
+
+  ul {
+    list-style: none;
+
+    li::before {
+      display: inline;
+      margin-bottom: 5px;
+      content: "- ";
     }
   }
 
-  .vpf-settings-info-pro-button {
+  &-button {
     display: inline-block;
     padding: 7px 15px;
     margin-top: 5px;
     text-decoration: none;
-    background: #2540cc;
+    background: linear-gradient(to left, #743ad5, #d53a9d);
     border-radius: 3px;
+    transition: 0.2s filter ease, 0.2s transform ease;
 
     &,
     &:hover,
@@ -821,7 +857,8 @@ $grid_sm: 600px !default;
 
     &:hover,
     &:focus {
-      background: color.adjust(#2540cc, $lightness: 5%);
+      filter: contrast(1.5) drop-shadow(0px 3px 3px rgba(213, 58, 157, 30%));
+      transform: translateY(-1px);
     }
   }
 }

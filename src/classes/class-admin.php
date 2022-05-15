@@ -224,7 +224,7 @@ class Visual_Portfolio_Admin {
             }
 
             // phpcs:ignore
-            wp_redirect( 'https://visualportfolio.co/pro/?utm_source=plugin&utm_medium=' . esc_attr( $medium ) . '&utm_campaign=go_pro&utm_content=@@plugin_version' );
+            wp_redirect( 'https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=' . esc_attr( $medium ) . '&utm_campaign=go_pro&utm_content=@@plugin_version' );
             exit();
         }
     }
@@ -920,8 +920,13 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                            'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
+                            'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                            'description' => '<ul>
+                                                <li>' . esc_html__( 'Instagram-like filters for images', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'New modern styles', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'Additional hover effects', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
+                                            </ul>',
                         ),
                     ),
                 ),
@@ -982,8 +987,13 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                            'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
+                            'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                            'description' => '<ul>
+                                                <li>' . esc_html__( 'Instagram-like filters for images', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'New modern styles', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'Additional hover effects', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
+                                            </ul>',
                         ),
                     ),
                 ),
@@ -1033,8 +1043,13 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                            'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
+                            'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                            'description' => '<ul>
+                                                <li>' . esc_html__( 'Instagram-like filters for images', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'New modern styles', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'Additional hover effects', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
+                                            </ul>',
                         ),
                     ),
                 ),
@@ -1142,8 +1157,13 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                            'description' => esc_html__( 'Instagram-like filters for your images', '@@text_domain' ),
+                            'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                            'description' => '<ul>
+                                                <li>' . esc_html__( 'Instagram-like filters for images', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'New modern styles', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'Additional hover effects', '@@text_domain' ) . '</li>
+                                                <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
+                                            </ul>',
                         ),
                     ),
                 ),
@@ -1553,8 +1573,15 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-source-post-based',
                 'type'        => 'pro_note',
                 'name'        => 'additional_query_settings_pro',
-                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                'description' => esc_html__( 'Additional query settings.', '@@text_domain' ),
+                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                'description' => esc_html__( 'Additional query settings, such as:', '@@text_domain' ) . '
+                                <ul>
+                                    <li>' . esc_html__( 'Filter by specific author', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'Filter by publish date range', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'Exclude posts without thumbnail', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'Custom queries', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
+                                </ul>',
             )
         );
 
@@ -1634,6 +1661,16 @@ class Visual_Portfolio_Admin {
                         'type'    => 'text',
                         'label'   => esc_html__( 'Author URL', '@@text_domain' ),
                         'default' => '',
+                    ),
+                    'image_settings_pro_note' => array(
+                        'type'        => 'pro_note',
+                        'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                        'description' => '<ul>
+                                            <li>' . esc_html__( 'Support for Audio format', '@@text_domain' ) . '</li>
+                                            <li>' . esc_html__( 'Custom image for Popup', '@@text_domain' ) . '</li>
+                                            <li>' . esc_html__( 'Custom image for hover state', '@@text_domain' ) . '</li>
+                                            <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
+                                        </ul>',
                     ),
                 ),
                 'default'         => array(
@@ -1720,7 +1757,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-protection',
                 'type'        => 'pro_note',
                 'name'        => 'protection_pro_note',
-                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
+                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
                 'description' => esc_html__( 'Protect your works using watermarks, password, and age gate', '@@text_domain' ),
                 'condition'   => array(
                     array(
@@ -1740,8 +1777,8 @@ class Visual_Portfolio_Admin {
                 'category'    => 'content-source-social-stream',
                 'type'        => 'pro_note',
                 'name'        => 'social_pro_note',
-                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                'description' => esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ),
+                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                'description' => esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ),
             )
         );
 
@@ -2245,6 +2282,21 @@ class Visual_Portfolio_Admin {
                 ),
             )
         );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'items-click-action',
+                'type'        => 'pro_note',
+                'name'        => 'items_click_action_url_pro_note',
+                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                'description' => esc_html__( 'Link URL click priority', '@@text_domain' ),
+                'condition'   => array(
+                    array(
+                        'control' => 'items_click_action',
+                        'value'   => 'url',
+                    ),
+                ),
+            )
+        );
 
         // popup.
         Visual_Portfolio_Controls::register(
@@ -2299,9 +2351,14 @@ class Visual_Portfolio_Admin {
             array(
                 'category'    => 'items-click-action',
                 'type'        => 'pro_note',
-                'name'        => 'items_click_action_pro_note',
-                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                'description' => esc_html__( 'Display pages in popup iframe, not just images.', '@@text_domain' ),
+                'name'        => 'items_click_action_popup_pro_note',
+                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                'description' => '<ul>
+                                    <li>' . esc_html__( 'Manage media object priority', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'Display pages in popup iframe, not only images', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'Popup media item deep linking', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
+                                </ul>',
                 'condition'   => array(
                     array(
                         'control' => 'items_click_action',
@@ -2315,8 +2372,8 @@ class Visual_Portfolio_Admin {
                 'category'    => 'items-click-action',
                 'type'        => 'pro_note',
                 'name'        => 'items_click_action_advanced_pro_note',
-                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
-                'description' => esc_html__( 'Advanced settings for posts and images.', '@@text_domain' ),
+                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                'description' => esc_html__( 'Deeply customize actions of clicks on different types of items and links.', '@@text_domain' ),
                 'condition'   => array(
                     array(
                         'control' => 'items_click_action',
@@ -2650,7 +2707,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'search',
                 'type'        => 'pro_note',
                 'name'        => 'search_pro_note',
-                'label'       => esc_html__( 'Pro Feature', '@@text_domain' ),
+                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
                 'description' => esc_html__( 'The search module is only available for Pro users.', '@@text_domain' ),
             )
         );

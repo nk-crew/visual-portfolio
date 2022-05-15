@@ -88,7 +88,7 @@ class Visual_Portfolio_Welcome_Screen {
                     <div>
                         <?php
                         // translators: %s - pro link.
-                        echo sprintf( esc_html__( 'Want to get more power with Pro? Visit %s', '@@text_domain' ), '<a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=go_pro_head&utm_content=@@plugin_version">visualportfolio.co/pro</a>' );
+                        echo sprintf( esc_html__( 'Want to get more power with Pro? Visit %s', '@@text_domain' ), '<a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=go_pro_head&utm_content=@@plugin_version">visualportfolio.co/pricing</a>' );
                         ?>
                     </div>
                 </div>
@@ -169,7 +169,7 @@ class Visual_Portfolio_Welcome_Screen {
                     <li><?php echo esc_html__( 'White Label', '@@text_domain' ); ?></li>
                     <li><?php echo esc_html__( 'And much more...', '@@text_domain' ); ?></li>
                 </ul>
-                <a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=go_pro_foot&utm_content=@@plugin_version"><?php echo esc_html__( 'Upgrade to PRO Now', '@@text_domain' ); ?></a>
+                <a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=go_pro_foot&utm_content=@@plugin_version"><?php echo esc_html__( 'Upgrade to PRO Now', '@@text_domain' ); ?></a>
             </div>
         </div>
         <?php

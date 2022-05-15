@@ -455,9 +455,9 @@ ControlsRender.Control = function (props) {
           <ProNote.Button
             target="_blank"
             rel="noopener noreferrer"
-            href={`https://visualportfolio.co/pro/?utm_source=plugin&utm_medium=block_settings&utm_campaign=${props.name}&utm_content=@@plugin_version`}
+            href={`https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=block_settings&utm_campaign=${props.name}&utm_content=@@plugin_version`}
           >
-            {__('Read More', '@@text_domain')}
+            {__('Go Pro', '@@text_domain')}
           </ProNote.Button>
         </ProNote>
       );

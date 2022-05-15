@@ -133,7 +133,7 @@ Visual Portfolio gives you a wide range of filters and actions to customize ever
 
 ### 🔥 Visual Portfolio Pro ###
 
-> The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [**Learn more about Visual Portfolio Pro**](https://visualportfolio.co/pro/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
+> The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [**Learn more about Visual Portfolio Pro**](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
 >
 > In order to maintain the free version of the plugin on an ongoing basis, and to provide quick and effective support for free, we offer a Pro version of the plugin. The Pro version allows you to:
 
@@ -192,7 +192,7 @@ Makes URL automatically change when you open popup and you can easily link to a 
 * **White Label**
 Possibility to use your brand name and logo instead of our "Visual Portfolio".
 
-[**Find much more portfolio and gallery features of Visual Portfolio Pro today!**](https://visualportfolio.co/pro/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
+[**Find much more portfolio and gallery features of Visual Portfolio Pro today!**](https://visualportfolio.co/pricing/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
 
 ### 🌟 More Features ###
 
@@ -655,7 +655,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 = 2.3.0 =
 
-* added Pro version support [https://visualportfolio.co/pro/](https://visualportfolio.co/pro/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* added Pro version support [https://visualportfolio.co/pricing/](https://visualportfolio.co/pricing/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * added overlay support for Classic gallery style
 * added options to change meta color, links color and links hover color for all items styles
 * added options to show gallery items overlay on hover only, on default state only and always

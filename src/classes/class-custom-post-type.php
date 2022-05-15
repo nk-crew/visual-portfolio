@@ -774,14 +774,14 @@ class Visual_Portfolio_Custom_Post_Type {
                 <tbody>
                     <tr class="pro_info vpf-setting-type-html">
                         <td>
-                            <div class="vpf-settings-info-pro">
+                            <div class="vpf-pro-note vpf-settings-info-pro">
                                 <h3>
-                                    <?php echo esc_html__( 'Pro Feature', '@@text_domain' ); ?>
+                                    <?php echo esc_html__( 'Premium Only', '@@text_domain' ); ?>
                                 </h3>
                                 <div>
                                     <p><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', '@@text_domain' ); ?></p>
-                                    <a class="vpf-settings-info-pro-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pro/?utm_source=plugin&amp;utm_medium=settings_page&amp;utm_campaign=proofing&amp;utm_content=@@plugin_version">
-                                    <?php echo esc_html__( 'Read More', '@@text_domain' ); ?>
+                                    <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&amp;utm_medium=settings_page&amp;utm_campaign=proofing&amp;utm_content=@@plugin_version">
+                                    <?php echo esc_html__( 'Go Pro', '@@text_domain' ); ?>
                                     </a>
                                 </div>
                             </div>
