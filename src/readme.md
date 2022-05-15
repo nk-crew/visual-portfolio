@@ -3,7 +3,7 @@
 * Contributors: nko
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
 * Requires at least: 5.8
-* Tested up to: 5.9
+* Tested up to: 6.0
 * Requires PHP: 7.2
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
@@ -313,6 +313,24 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 2.16.0 =
+
+* tested with WordPress 6.0
+* added compatibility styles for Twenty Twenty Two theme
+* added support for additional popup URL parameters for Youtube and Vimeo. You can add options like autoplay and show controls. For supported parameters look at official embed documentation of Youtube <https://developers.google.com/youtube/player_parameters#Parameters> and Vimeo <https://vimeo.zendesk.com/hc/en-us/articles/360001494447-Player-parameters-overview>
+* added PHP filter `vpf_include_template_args`
+* improved enqueueing block assets and custom styles in FSE themes
+* fixed fallback for inline custom styles (some styles broke the code and cause an error)
+* fixed error with an archive portfolio page, when the server does not allow creating it and our code trying to create it again and again
+* fixed wrong CSS variable usage in sort dropdown
+* fixed Elementor lightbox conflict when load more items in Visual Portfolio galleries
+* fixed Elementor widget deprecation warning
+* fixed Elementor widget open settings when click on it in the editor
+* moved Elementor compatibility code to separate script, so when Elementor is not installed, this script is not loading
+* changed blocks to use API v2
+* dropped IE support
+* minor changes
 
 = 2.15.6 =
 
