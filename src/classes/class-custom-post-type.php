@@ -413,7 +413,7 @@ class Visual_Portfolio_Custom_Post_Type {
                             // translators: %1$s - url to documentation.
                             // translators: %2$s - plugin name.
                             __( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', '@@text_domain' ),
-                            'https://visualportfolio.co/documentation/portfolio-blocks/',
+                            'https://visualportfolio.co/docs/portfolio-blocks/',
                             visual_portfolio()->plugin_name
                         )
                     );
@@ -428,7 +428,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 <p>
                     <?php
                     // translators: %s - url to documentation.
-                    echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', '@@text_domain' ), 'https://visualportfolio.co/documentation/saved-layouts-and-shortcodes/' ) );
+                    echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', '@@text_domain' ), 'https://visualportfolio.co/docs/saved-layouts-and-shortcodes/' ) );
                     ?>
                 </p>
             </div>
@@ -736,7 +736,7 @@ class Visual_Portfolio_Custom_Post_Type {
             esc_html__( 'Documentation', '@@text_domain' ),
             esc_html__( 'Documentation', '@@text_domain' ),
             'manage_options',
-            'https://visualportfolio.co/documentation/getting-started/?utm_source=plugin&utm_medium=admin_menu&utm_campaign=docs&utm_content=@@plugin_version'
+            'https://visualportfolio.co/docs/getting-started/?utm_source=plugin&utm_medium=admin_menu&utm_campaign=docs&utm_content=@@plugin_version'
         );
     }
 

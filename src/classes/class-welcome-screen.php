@@ -147,7 +147,7 @@ class Visual_Portfolio_Welcome_Screen {
 
                 <div class="vpf-welcome-content-buttons">
                     <a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=more_features&utm_content=@@plugin_version"><?php echo esc_html__( 'More Features', '@@text_domain' ); ?></a>
-                    <a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/documentation/getting-started/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=docs&utm_content=@@plugin_version"><?php echo esc_html__( 'Documentation', '@@text_domain' ); ?></a>
+                    <a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/docs/getting-started/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=docs&utm_content=@@plugin_version"><?php echo esc_html__( 'Documentation', '@@text_domain' ); ?></a>
                 </div>
             </div>
 

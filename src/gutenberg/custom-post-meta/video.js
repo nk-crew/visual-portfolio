@@ -150,7 +150,7 @@ class VpVideoComponent extends Component {
             )}
             &nbsp;
             <a
-              href="https://visualportfolio.co/documentation/portfolio-items/video-portfolio-item/#supported-video-vendors"
+              href="https://visualportfolio.co/docs/portfolio-items/video-portfolio-item/#supported-video-vendors"
               target="_blank"
               rel="noopener noreferrer"
             >
