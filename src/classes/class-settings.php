@@ -587,8 +587,8 @@ class Visual_Portfolio_Settings {
                 ),
                 array(
                     'name'    => 'pages_iframe_custom_css',
-                    'label'   => esc_html__( 'Pages iFrame Custom CSS', '@@text_domain' ),
-                    'desc'    => esc_html__( 'When you display pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`.', '@@text_domain' ),
+                    'label'   => esc_html__( 'Quick View Custom CSS', '@@text_domain' ),
+                    'desc'    => esc_html__( 'When you display posts and pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`.', '@@text_domain' ),
                     'type'    => 'textarea',
                     'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? '' : '
 /* Hide header and footer in standard themes */

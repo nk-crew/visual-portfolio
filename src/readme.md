@@ -183,7 +183,7 @@ Requests properly cached and links preloaded before you click.
 * **Advanced Query Settings**
 Filter by Author, Date Range, Ignore Sticky Posts, exclude posts without Featured Image, and much more...
 
-* **Popup Gallery for Posts and Pages**
+* **Quick View for Posts and Pages**
 Display posts and pages in popup iframe, not only image and video galleries. It's like works preview in Dribbble and Behance, but on your own site.
 
 * **Popup Gallery Deep Linking**

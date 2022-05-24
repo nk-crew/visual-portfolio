@@ -2355,7 +2355,7 @@ class Visual_Portfolio_Admin {
                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
                 'description' => '<ul>
                                     <li>' . esc_html__( 'Manage media object priority', '@@text_domain' ) . '</li>
-                                    <li>' . esc_html__( 'Display pages in popup iframe, not only images', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'Quick View for posts and pages', '@@text_domain' ) . '</li>
                                     <li>' . esc_html__( 'Popup media item deep linking', '@@text_domain' ) . '</li>
                                     <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
                                 </ul>',
