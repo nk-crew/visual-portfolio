@@ -6,6 +6,7 @@
   "title": "Visual Portfolio",
   "description": "Display galleries, posts and portfolio grids.",
   "keywords": ["gallery", "images", "posts", "portfolio", "vpf"],
+  "textdomain": "@@text_domain",
   "supports": {
     "anchor": true,
     "className": true,
