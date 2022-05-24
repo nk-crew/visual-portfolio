@@ -171,6 +171,9 @@ Communicate with your clients in a modern way:
   2. **Send to a Client** - Send photos collection to your client for proofing. The client will be able to leave comments on individual photos and communicate with you.
   3. **Get Approval** - Once the client approves the selection, you will be able to see the selected photos and copy filenames for post-production.
 
+* **Advanced Click Actions**
+Manually configure how to open specific item types and filter clicking on title or on image.
+
 * **Responsive Breakpoints Settings**
 Manually control the screen sizes, which used by the automatic responsive function to adapt your gallery layouts.
 
