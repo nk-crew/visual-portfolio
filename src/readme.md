@@ -137,7 +137,7 @@ Visual Portfolio gives you a wide range of filters and actions to customize ever
 >
 > In order to maintain the free version of the plugin on an ongoing basis, and to provide quick and effective support for free, we offer a Pro version of the plugin. The Pro version allows you to:
 
-* **Social Integrations**
+* **Social Feeds**
 Automatically fetch posts from your social networks to display in gallery on your site.
 
   * [Instagram](https://visualportfolio.co/social-instagram/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
