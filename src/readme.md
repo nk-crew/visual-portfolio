@@ -1,4 +1,4 @@
-# Visual Portfolio, Photo Gallery & Posts Grid #
+# Visual Portfolio, Photo Gallery & Post Grid #
 
 * Contributors: nko
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
@@ -16,7 +16,7 @@ Modern photo gallery and portfolio plugin with advanced layouts editor. Clean ga
 **Gallery & Portfolio Plugin For WordPress**
 ★★★★★<br>
 
-**Portfolio websites are the most popular nowadays.** We created [**Visual Portfolio, Photo Gallery & Posts Grid WordPress plugin**](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head), to help every creative, agency, and photographers get access to the powerful tools they need to showcase their beautiful works and attract more love from their potential and existing customers.
+**Portfolio websites are the most popular nowadays.** We created [**Visual Portfolio, Photo Gallery & Post Grid WordPress plugin**](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head), to help every creative, agency, and photographers get access to the powerful tools they need to showcase their beautiful works and attract more love from their potential and existing customers.
 
 [youtube https://youtu.be/354pybu91aQ]
 
