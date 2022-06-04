@@ -231,7 +231,7 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public function settings() {
         /* translators: %s: Home URL */
-        echo wp_kses_post( wpautop( sprintf( __( 'If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories.', '@@text_domain' ), esc_url( home_url( '/' ) ) ) ) );
+        echo wp_kses_post( wpautop( sprintf( __( 'If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>cod%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories. We also recommend you use the <code>%%portfolio_page_slug%%</code> slug, which will automatically use the slug of you Portfolio Archive page.', '@@text_domain' ), esc_url( home_url( '/' ) ) ) ) );
 
         $page_slug    = '%portfolio_page_slug%';
         $default_slug = _x( 'portfolio', 'default-slug', '@@text_domain' );
