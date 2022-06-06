@@ -1827,7 +1827,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'    => 'content-source-general',
-                'type'        => 'text',
+                'type'        => 'textarea',
                 'placeholder' => esc_html__( 'Notice', '@@text_domain' ),
                 'name'        => 'no_items_notice',
                 'default'     => esc_html__( 'No items were found matching your selection.', '@@text_domain' ),
@@ -2922,7 +2922,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'    => 'pagination',
-                'type'        => 'text',
+                'type'        => 'textarea',
                 'name'        => 'pagination_infinite_text_end_list',
                 'default'     => esc_attr__( 'You’ve reached the end of the list', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'End of the list text', '@@text_domain' ),
@@ -2979,7 +2979,7 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'    => 'pagination',
-                'type'        => 'text',
+                'type'        => 'textarea',
                 'name'        => 'pagination_load_more_text_end_list',
                 'default'     => esc_attr__( 'You’ve reached the end of the list', '@@text_domain' ),
                 'placeholder' => esc_attr__( 'End of the list text', '@@text_domain' ),
