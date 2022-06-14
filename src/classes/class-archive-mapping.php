@@ -516,7 +516,7 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public function unset_pagination_archive_page( $options ) {
         global $wp_query;
-        if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
+        if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) && 'current_query' === $options['posts_source'] ) {
             $is_page_archive = $wp_query->query_vars['vp_page_archive'] ?? false;
             if ( $is_page_archive ) {
                 foreach ( $options['layout_elements'] as $position => $container ) {
