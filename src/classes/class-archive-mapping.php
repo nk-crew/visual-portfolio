@@ -49,6 +49,7 @@ class Visual_Portfolio_Archive_Mapping {
         add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
         add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
         add_filter( 'vpf_extend_filter_items', array( $this, 'add_filter_items' ), 10, 2 );
+        add_filter( 'the_title', array( $this, 'set_archive_title' ), 10, 2 );
     }
 
     /**
@@ -68,6 +69,32 @@ class Visual_Portfolio_Archive_Mapping {
         }
 
         self::create_archive_page();
+    }
+
+    /**
+     * Change Title for Archive Taxonomy pages.
+     *
+     * @param string $title - Post title.
+     * @param int    $id - Post ID.
+     * @return string
+     */
+    public function set_archive_title( $title, $id ) {
+        if ( get_post_meta( $id, '_vp_post_type_mapped', true ) ) {
+            global $wp_query;
+
+            if ( isset( $wp_query->query['vp_category'] ) ) {
+                $category = get_term_by( 'slug', $wp_query->query['vp_category'], 'portfolio_category' );
+                // translators: %s - taxonomy name.
+                $title = sprintf( esc_html__( 'Portfolio Category: %s', '@@text_domain' ), esc_html( ucfirst( $category->name ) ) );
+            }
+
+            if ( isset( $wp_query->query['portfolio_tag'] ) ) {
+                $tag = get_term_by( 'slug', $wp_query->query['portfolio_tag'], 'portfolio_tag' );
+                // translators: %s - taxonomy name.
+                $title = sprintf( esc_html__( 'Portfolio Tag: %s', '@@text_domain' ), esc_html( ucfirst( $tag->name ) ) );
+            }
+        }
+        return $title;
     }
 
     /**
