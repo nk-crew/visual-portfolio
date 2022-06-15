@@ -79,20 +79,15 @@ $(document).on('addItems.vpf', (event, self, $items, removeExisting) => {
     return;
   }
 
-  // Sometimes new loaded items can't be recalculated properly.
-  // For example, when enabled SG Optimizer lazy loading.
-  // Timeout solves this problem.
-  setTimeout(() => {
-    if (removeExisting) {
-      self.destroyFjGallery();
-      self.$items_wrap.find('.vp-portfolio__item-wrap').remove();
-      self.$items_wrap.prepend($items);
-      self.initFjGallery();
-    } else {
-      self.$items_wrap.append($items);
-      self.initFjGallery('appendImages', $items);
-    }
-  }, 0);
+  if (removeExisting) {
+    self.destroyFjGallery();
+    self.$items_wrap.find('.vp-portfolio__item-wrap').remove();
+    self.$items_wrap.prepend($items);
+    self.initFjGallery();
+  } else {
+    self.$items_wrap.append($items);
+    self.initFjGallery('appendImages', $items);
+  }
 });
 
 // Init.
