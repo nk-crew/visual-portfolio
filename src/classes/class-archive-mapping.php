@@ -49,6 +49,7 @@ class Visual_Portfolio_Archive_Mapping {
         add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
         add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
         add_filter( 'vpf_extend_filter_items', array( $this, 'add_filter_items' ), 10, 2 );
+        add_filter( 'the_title', array( $this, 'set_archive_title' ), 10, 2 );
     }
 
     /**
@@ -71,6 +72,32 @@ class Visual_Portfolio_Archive_Mapping {
     }
 
     /**
+     * Change Title for Archive Taxonomy pages.
+     *
+     * @param string $title - Post title.
+     * @param int    $id - Post ID.
+     * @return string
+     */
+    public function set_archive_title( $title, $id ) {
+        if ( get_post_meta( $id, '_vp_post_type_mapped', true ) ) {
+            global $wp_query;
+
+            if ( isset( $wp_query->query['vp_category'] ) ) {
+                $category = get_term_by( 'slug', $wp_query->query['vp_category'], 'portfolio_category' );
+                // translators: %s - taxonomy name.
+                $title = sprintf( esc_html__( 'Portfolio Category: %s', '@@text_domain' ), esc_html( ucfirst( $category->name ) ) );
+            }
+
+            if ( isset( $wp_query->query['portfolio_tag'] ) ) {
+                $tag = get_term_by( 'slug', $wp_query->query['portfolio_tag'], 'portfolio_tag' );
+                // translators: %s - taxonomy name.
+                $title = sprintf( esc_html__( 'Portfolio Tag: %s', '@@text_domain' ), esc_html( ucfirst( $tag->name ) ) );
+            }
+        }
+        return $title;
+    }
+
+    /**
      * Add filter items.
      *
      * @param array $terms - Current terms.
@@ -80,7 +107,7 @@ class Visual_Portfolio_Archive_Mapping {
     public function add_filter_items( $terms, $vp_options ) {
         // phpcs:ignore
         $post_id = $_REQUEST['vp_preview_post_id'] ?? get_the_ID() ?? null;
-        if ( get_post_meta( $post_id, '_vp_post_type_mapped', true ) && null !== $post_id ) {
+        if ( get_post_meta( $post_id, '_vp_post_type_mapped', true ) && null !== $post_id && 'current_query' === $vp_options['posts_source'] ) {
 
             $query_opts = Visual_Portfolio_Get::get_query_params( $vp_options, true );
             // Get active item.
@@ -516,7 +543,7 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public function unset_pagination_archive_page( $options ) {
         global $wp_query;
-        if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
+        if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) && 'current_query' === $options['posts_source'] ) {
             $is_page_archive = $wp_query->query_vars['vp_page_archive'] ?? false;
             if ( $is_page_archive ) {
                 foreach ( $options['layout_elements'] as $position => $container ) {
