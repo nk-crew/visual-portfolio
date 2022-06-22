@@ -108,7 +108,7 @@ class Visual_Portfolio_Sitemap {
                                         while ( $portfolio_query->have_posts() ) {
                                             $portfolio_query->the_post();
 
-                                            $image_id = 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() );
+                                            $image_id = apply_filters( 'vpf_parse_sitemap_image_id_from_blocks', 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ), get_the_ID() );
 
                                             $image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
 
@@ -150,7 +150,7 @@ class Visual_Portfolio_Sitemap {
             }
         }
 
-        return $block_images;
+        return apply_filters( 'vpf_parse_sitemap_images_from_blocks', $block_images, $post_id );
     }
 }
 new Visual_Portfolio_Sitemap();
