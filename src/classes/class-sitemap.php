@@ -14,6 +14,8 @@ class Visual_Portfolio_Sitemap {
      */
     public function __construct() {
         add_filter( 'aioseo_sitemap_posts', array( $this, 'add_images_to_aioseo_sitemap' ), 10, 2 );
+        add_filter( 'rank_math/sitemap/urlimages', array( $this, 'add_images_to_sitemap' ), 10, 2 );
+        add_filter( 'wpseo_sitemap_urlimages', array( $this, 'add_images_to_sitemap' ), 10, 2 );
     }
 
     /**
@@ -56,6 +58,22 @@ class Visual_Portfolio_Sitemap {
         }
 
         return $entries;
+    }
+
+    /**
+     * Add sitemap images for Rank Math and Yoast SEO.
+     *
+     * @param array $images - Sitemap Images for current Post.
+     * @param int   $post_id - Post ID.
+     * @return array
+     */
+    public function add_images_to_sitemap( $images, $post_id ) {
+        $block_images = $this->parse_images_from_blocks( $post_id );
+        if ( ! empty( $block_images ) ) {
+            $images = array_merge( $images, $block_images );
+        }
+
+        return $images;
     }
 
     /**
