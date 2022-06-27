@@ -18,7 +18,7 @@ class Visual_Portfolio_Custom_Post_Meta {
      */
     public static function init() {
         // add post formats.
-        add_action( 'after_setup_theme', array( __CLASS__, 'add_video_post_format' ), 99 );
+        add_action( 'after_setup_theme', array( __CLASS__, 'add_extra_post_format' ), 99 );
         add_action( 'init', array( __CLASS__, 'register_post_meta' ) );
         add_action( 'add_meta_boxes', array( __CLASS__, 'add_post_format_metaboxes' ), 1 );
         add_action( 'save_post', array( __CLASS__, 'save_post_format_metaboxes' ) );
@@ -43,10 +43,10 @@ class Visual_Portfolio_Custom_Post_Meta {
     /**
      * Add video post format.
      */
-    public static function add_video_post_format() {
+    public static function add_extra_post_format() {
         global $_wp_theme_features;
 
-        $formats = array( 'video' );
+        $formats = array( 'image', 'video' );
 
         // Add existing formats.
         if ( isset( $_wp_theme_features['post-formats'] ) && isset( $_wp_theme_features['post-formats'][0] ) ) {
