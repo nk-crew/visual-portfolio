@@ -456,7 +456,8 @@ $grid_sm: 600px !default;
 /**
  * Settings
  */
-.portfolio_page_visual-portfolio-settings {
+.portfolio_page_visual-portfolio-settings,
+.toplevel_page_visual-portfolio-settings {
   $settings_nav_width: 220px !default;
   $settings_content_height: 340px !default;
 
@@ -779,6 +780,7 @@ $grid_sm: 600px !default;
  * PRO Notices.
  */
 .portfolio_page_visual-portfolio-settings,
+.toplevel_page_visual-portfolio-settings,
 .portfolio_page_vpf_proofing_page {
   // Settings info Pro.
   .social_pro_info > th {
@@ -915,7 +917,8 @@ $escaped-svg-characters: (
   @return $string;
 }
 
-.portfolio_page_visual-portfolio-welcome {
+.portfolio_page_visual-portfolio-welcome,
+.toplevel_page_visual-portfolio-welcome {
   background-color: #fff;
 }
 

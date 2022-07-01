@@ -41,7 +41,7 @@ class Visual_Portfolio_Welcome_Screen {
         }
 
         // Redirect to welcome page.
-        wp_safe_redirect( add_query_arg( array( 'page' => 'visual-portfolio-welcome' ), admin_url( 'edit.php?post_type=portfolio' ) ) );
+        wp_safe_redirect( add_query_arg( array( 'page' => 'visual-portfolio-welcome' ), admin_url( Visual_Portfolio_Custom_Post_Type::$menu_slug ) ) );
     }
 
     /**
@@ -49,7 +49,7 @@ class Visual_Portfolio_Welcome_Screen {
      */
     public function welcome_screen_page() {
         add_submenu_page(
-            'edit.php?post_type=portfolio',
+            Visual_Portfolio_Custom_Post_Type::$menu_slug,
             esc_html__( 'Visual Portfolio Welcome Screen', '@@text_domain' ),
             esc_html__( 'Visual Portfolio Welcome Screen', '@@text_domain' ),
             'manage_options',
@@ -62,7 +62,7 @@ class Visual_Portfolio_Welcome_Screen {
      * Remove welcome screen page from admin menu.
      */
     public function welcome_screen_remove_page() {
-        remove_submenu_page( 'edit.php?post_type=portfolio', 'visual-portfolio-welcome' );
+        remove_submenu_page( Visual_Portfolio_Custom_Post_Type::$menu_slug, 'visual-portfolio-welcome' );
     }
 
     /**

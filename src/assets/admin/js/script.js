@@ -85,3 +85,20 @@ $body.on('change input', '.vp-input[name="_vp_format_video_url"]', function () {
 
   runAjaxVideoOembed($this);
 });
+
+/**
+ * When attempting to disable registration of portfolio post type,
+ * We inform the user of the possible consequences and provide them with the opportunity to cancel this operation.
+ */
+$body.on('change', "input[name='vp_general[register_portfolio_post_type]']", function () {
+  // Does some stuff and logs the event to the console
+  if (!$(this).is(':checked')) {
+    // eslint-disable-next-line no-restricted-globals, no-alert
+    const confirmation = confirm(
+      "Are you sure you want to turn off the Portfolio custom post type and related taxonomies? Make sure you don't use this post type on your site, otherwise you might see errors on the frontend."
+    );
+    if (!confirmation) {
+      $(this).prop('checked', true);
+    }
+  }
+});

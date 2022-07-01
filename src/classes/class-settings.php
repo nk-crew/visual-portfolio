@@ -106,6 +106,7 @@ class Visual_Portfolio_Settings {
      * @return void
      */
     public static function admin_init() {
+        self::redirect_if_toggle_unregistered_portfolio_post_type();
         // set the settings.
         self::$settings_api->set_sections( self::get_settings_sections() );
         self::$settings_api->set_fields( self::get_settings_fields() );
@@ -120,8 +121,9 @@ class Visual_Portfolio_Settings {
      * @return void
      */
     public static function admin_menu() {
+        remove_submenu_page( 'visual-portfolio-settings', 'visual-portfolio-settings' );
         add_submenu_page(
-            'edit.php?post_type=portfolio',
+            Visual_Portfolio_Custom_Post_Type::$menu_slug,
             esc_html__( 'Settings', '@@text_domain' ),
             esc_html__( 'Settings', '@@text_domain' ),
             'manage_options',
@@ -131,13 +133,46 @@ class Visual_Portfolio_Settings {
     }
 
     /**
+     * Redirect to actual admin page if unregistered portfolio post type.
+     *
+     * @return void
+     */
+    public static function redirect_if_toggle_unregistered_portfolio_post_type() {
+        global $pagenow;
+        $register_portfolio_post_type = Visual_Portfolio_Custom_Post_Type::$register_portfolio_post_type;
+        // phpcs:disable
+        if (
+            $register_portfolio_post_type &&
+            'admin.php' === $pagenow &&
+            isset( $_GET['page'] ) &&
+            'visual-portfolio-settings' === $_GET['page']
+        ) {
+            wp_redirect( admin_url( '/edit.php?post_type=portfolio&page=visual-portfolio-settings' ) );
+            exit;
+        }
+
+        if (
+            ! $register_portfolio_post_type &&
+            'edit.php' === $pagenow &&
+            isset( $_GET['page'] ) &&
+            'visual-portfolio-settings' === $_GET['page'] &&
+            isset( $_GET['post_type'] ) &&
+            'portfolio' === $_GET['post_type']
+        ) {
+            wp_redirect( admin_url( '/admin.php?page=visual-portfolio-settings' ) );
+            exit;
+        }
+        // phpcs:enable
+    }
+
+    /**
      * Enqueue archive select2 ajax script.
      *
      * @param  string $page - Current admin page.
      * @return void
      */
     public static function admin_enqueue_scripts( $page ) {
-        if ( 'portfolio_page_@@text_domain-settings' === $page ) {
+        if ( 'portfolio_page_@@text_domain-settings' === $page || 'toplevel_page_@@text_domain-settings' === $page ) {
             wp_enqueue_script( '@@text_domain-archive-page-selector', visual_portfolio()->plugin_url . 'assets/admin/js/archive-page-selector.min.js', array( 'jquery', 'select2' ), '@@plugin_version', true );
         }
     }
@@ -199,19 +234,36 @@ class Visual_Portfolio_Settings {
         $settings_fields = array(
             'vp_general' => array(
                 array(
+                    'name'      => 'register_portfolio_post_type',
+                    'label'     => esc_html__( 'Register Portfolio post type', '@@text_domain' ),
+                    'desc'      => esc_html__( 'Use custom post type to showcase your works', '@@text_domain' ),
+                    'type'      => 'toggle',
+                    'default'   => 'on',
+                ),
+                array(
                     'name'              => 'portfolio_archive_page',
                     'label'             => esc_html__( 'Archive Page', '@@text_domain' ),
                     'desc'              => esc_html__( 'Base page of your portfolio, where will be placed your works archive.', '@@text_domain' ),
                     'type'              => 'select',
                     'options'           => self::get_pages_list(),
                     'sanitize_callback' => array( 'Visual_Portfolio_Archive_Mapping', 'save_archive_page_option' ),
+                    'condition'         => array(
+                        array(
+                            'control' => '[type="checkbox"][name="vp_general[register_portfolio_post_type]"]',
+                        ),
+                    ),
                 ),
                 array(
-                    'name'    => 'filter_taxonomies',
-                    'label'   => esc_html__( 'Filter Taxonomies', '@@text_domain' ),
-                    'desc'    => esc_html__( 'You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by "," separating values. Example: "product_cat,product_tag"', '@@text_domain' ),
-                    'type'    => 'text',
-                    'default' => '',
+                    'name'      => 'filter_taxonomies',
+                    'label'     => esc_html__( 'Filter Taxonomies', '@@text_domain' ),
+                    'desc'      => esc_html__( 'You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by "," separating values. Example: "product_cat,product_tag"', '@@text_domain' ),
+                    'type'      => 'text',
+                    'default'   => '',
+                    'condition' => array(
+                        array(
+                            'control' => '[type="checkbox"][name="vp_general[register_portfolio_post_type]"]',
+                        ),
+                    ),
                 ),
                 array(
                     'name'    => 'no_image',

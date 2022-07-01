@@ -14,9 +14,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Custom_Post_Type {
     /**
+     * Option of register portfolio post type.
+     *
+     * @var string
+     */
+    public static $register_portfolio_post_type;
+
+    /**
+     * Menu slug.
+     *
+     * @var string
+     */
+    public static $menu_slug;
+
+    /**
      * Visual_Portfolio_Custom_Post_Type constructor.
      */
     public function __construct() {
+        self::set_settings_of_register_portfolio_post_type();
         // custom post types.
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
         add_action( 'restrict_manage_posts', array( $this, 'filter_custom_post_by_taxonomies' ), 10 );
@@ -60,6 +75,16 @@ class Visual_Portfolio_Custom_Post_Type {
     }
 
     /**
+     * Set settings of register portfolio post type.
+     *
+     * @return void
+     */
+    public static function set_settings_of_register_portfolio_post_type() {
+        self::$register_portfolio_post_type = Visual_Portfolio_Settings::get_option( 'register_portfolio_post_type', 'vp_general' );
+        self::$menu_slug                    = self::$register_portfolio_post_type ? 'edit.php?post_type=portfolio' : 'visual-portfolio-settings';
+    }
+
+    /**
      * Add custom post type
      */
     public function add_custom_post_type() {
@@ -68,98 +93,100 @@ class Visual_Portfolio_Custom_Post_Type {
         $permalinks  = Visual_Portfolio_Archive_Mapping::get_permalink_structure( true );
 
         // portfolio items post type.
-        register_post_type(
-            'portfolio',
-            array(
-                'labels'             => array(
-                    'name'               => _x( 'Portfolio Items', 'Post Type General Name', '@@text_domain' ),
-                    'singular_name'      => _x( 'Portfolio Item', 'Post Type Singular Name', '@@text_domain' ),
-                    'menu_name'          => visual_portfolio()->plugin_name,
-                    'parent_item_colon'  => __( 'Parent Portfolio Item', '@@text_domain' ),
-                    'all_items'          => __( 'Portfolio Items', '@@text_domain' ),
-                    'view_item'          => __( 'View Portfolio Item', '@@text_domain' ),
-                    'add_new_item'       => __( 'Add New Portfolio Item', '@@text_domain' ),
-                    'add_new'            => __( 'Add New', '@@text_domain' ),
-                    'edit_item'          => __( 'Edit Portfolio Item', '@@text_domain' ),
-                    'update_item'        => __( 'Update Portfolio Item', '@@text_domain' ),
-                    'search_items'       => __( 'Search Portfolio Item', '@@text_domain' ),
-                    'not_found'          => __( 'Not Found', '@@text_domain' ),
-                    'not_found_in_trash' => __( 'Not found in Trash', '@@text_domain' ),
-                ),
-                'public'             => true,
-                'publicly_queryable' => true,
-                'has_archive'        => $custom_slug,
-                'show_ui'            => true,
+        if ( self::$register_portfolio_post_type ) {
+            register_post_type(
+                'portfolio',
+                array(
+                    'labels'             => array(
+                        'name'               => _x( 'Portfolio Items', 'Post Type General Name', '@@text_domain' ),
+                        'singular_name'      => _x( 'Portfolio Item', 'Post Type Singular Name', '@@text_domain' ),
+                        'menu_name'          => visual_portfolio()->plugin_name,
+                        'parent_item_colon'  => __( 'Parent Portfolio Item', '@@text_domain' ),
+                        'all_items'          => __( 'Portfolio Items', '@@text_domain' ),
+                        'view_item'          => __( 'View Portfolio Item', '@@text_domain' ),
+                        'add_new_item'       => __( 'Add New Portfolio Item', '@@text_domain' ),
+                        'add_new'            => __( 'Add New', '@@text_domain' ),
+                        'edit_item'          => __( 'Edit Portfolio Item', '@@text_domain' ),
+                        'update_item'        => __( 'Update Portfolio Item', '@@text_domain' ),
+                        'search_items'       => __( 'Search Portfolio Item', '@@text_domain' ),
+                        'not_found'          => __( 'Not Found', '@@text_domain' ),
+                        'not_found_in_trash' => __( 'Not found in Trash', '@@text_domain' ),
+                    ),
+                    'public'             => true,
+                    'publicly_queryable' => true,
+                    'has_archive'        => $custom_slug,
+                    'show_ui'            => true,
 
-                // adding to custom menu manually.
-                'show_in_menu'       => true,
-                'show_in_admin_bar'  => true,
-                'show_in_rest'       => true,
-                'menu_icon'          => 'dashicons-visual-portfolio',
-                'taxonomies'         => array(
-                    'portfolio_category',
-                    'portfolio_tag',
-                ),
-                'map_meta_cap'       => true,
-                'capability_type'    => 'portfolio',
-                'rewrite'            => array(
-                    'slug'       => $permalinks['portfolio_base'],
-                    'with_front' => false,
-                ),
-                'supports'           => array(
-                    'title',
-                    'editor',
-                    'author',
-                    'thumbnail',
-                    'comments',
-                    'revisions',
-                    'excerpt',
-                    'post-formats',
-                    'page-attributes',
-                ),
-            )
-        );
+                    // adding to custom menu manually.
+                    'show_in_menu'       => true,
+                    'show_in_admin_bar'  => true,
+                    'show_in_rest'       => true,
+                    'menu_icon'          => 'dashicons-visual-portfolio',
+                    'taxonomies'         => array(
+                        'portfolio_category',
+                        'portfolio_tag',
+                    ),
+                    'map_meta_cap'       => true,
+                    'capability_type'    => 'portfolio',
+                    'rewrite'            => array(
+                        'slug'       => $permalinks['portfolio_base'],
+                        'with_front' => false,
+                    ),
+                    'supports'           => array(
+                        'title',
+                        'editor',
+                        'author',
+                        'thumbnail',
+                        'comments',
+                        'revisions',
+                        'excerpt',
+                        'post-formats',
+                        'page-attributes',
+                    ),
+                )
+            );
 
-        register_taxonomy(
-            'portfolio_category',
-            'portfolio',
-            array(
-                'label'              => esc_html__( 'Portfolio Categories', '@@text_domain' ),
-                'labels'             => array(
-                    'menu_name' => esc_html__( 'Categories', '@@text_domain' ),
-                ),
-                'rewrite'            => array(
-                    'slug' => $permalinks['category_base'],
-                ),
-                'hierarchical'       => true,
-                'publicly_queryable' => true,
-                'show_in_nav_menus'  => true,
-                'show_in_rest'       => true,
-                'show_admin_column'  => true,
-                'map_meta_cap'       => true,
-                'capability_type'    => 'portfolio',
-            )
-        );
-        register_taxonomy(
-            'portfolio_tag',
-            'portfolio',
-            array(
-                'label'              => esc_html__( 'Portfolio Tags', '@@text_domain' ),
-                'labels'             => array(
-                    'menu_name' => esc_html__( 'Tags', '@@text_domain' ),
-                ),
-                'rewrite'            => array(
-                    'slug' => $permalinks['tag_base'],
-                ),
-                'hierarchical'       => false,
-                'publicly_queryable' => true,
-                'show_in_nav_menus'  => true,
-                'show_in_rest'       => true,
-                'show_admin_column'  => true,
-                'map_meta_cap'       => true,
-                'capability_type'    => 'portfolio',
-            )
-        );
+            register_taxonomy(
+                'portfolio_category',
+                'portfolio',
+                array(
+                    'label'              => esc_html__( 'Portfolio Categories', '@@text_domain' ),
+                    'labels'             => array(
+                        'menu_name' => esc_html__( 'Categories', '@@text_domain' ),
+                    ),
+                    'rewrite'            => array(
+                        'slug' => $permalinks['category_base'],
+                    ),
+                    'hierarchical'       => true,
+                    'publicly_queryable' => true,
+                    'show_in_nav_menus'  => true,
+                    'show_in_rest'       => true,
+                    'show_admin_column'  => true,
+                    'map_meta_cap'       => true,
+                    'capability_type'    => 'portfolio',
+                )
+            );
+            register_taxonomy(
+                'portfolio_tag',
+                'portfolio',
+                array(
+                    'label'              => esc_html__( 'Portfolio Tags', '@@text_domain' ),
+                    'labels'             => array(
+                        'menu_name' => esc_html__( 'Tags', '@@text_domain' ),
+                    ),
+                    'rewrite'            => array(
+                        'slug' => $permalinks['tag_base'],
+                    ),
+                    'hierarchical'       => false,
+                    'publicly_queryable' => true,
+                    'show_in_nav_menus'  => true,
+                    'show_in_rest'       => true,
+                    'show_admin_column'  => true,
+                    'map_meta_cap'       => true,
+                    'capability_type'    => 'portfolio',
+                )
+            );
+        }
 
         // portfolio lists post type.
         register_post_type(
@@ -185,7 +212,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 'show_ui'         => true,
 
                 // adding to custom menu manually.
-                'show_in_menu'    => 'edit.php?post_type=portfolio',
+                'show_in_menu'    => self::$menu_slug,
                 'show_in_rest'    => true,
                 'map_meta_cap'    => true,
                 'capability_type' => 'vp_list',
@@ -728,11 +755,11 @@ class Visual_Portfolio_Custom_Post_Type {
      */
     public function admin_menu() {
         // Remove Add New submenu item.
-        remove_submenu_page( 'edit.php?post_type=portfolio', 'post-new.php?post_type=portfolio' );
+        remove_submenu_page( self::$menu_slug, 'post-new.php?post_type=portfolio' );
 
         // Documentation menu link.
         add_submenu_page(
-            'edit.php?post_type=portfolio',
+            self::$menu_slug,
             esc_html__( 'Documentation', '@@text_domain' ),
             esc_html__( 'Documentation', '@@text_domain' ),
             'manage_options',
@@ -748,7 +775,7 @@ class Visual_Portfolio_Custom_Post_Type {
     public function add_proofing_admin_menu() {
         // Proofing menu link.
         add_submenu_page(
-            'edit.php?post_type=portfolio',
+            self::$menu_slug,
             esc_html__( 'Proofing', '@@text_domain' ),
             esc_html__( 'Proofing', '@@text_domain' ),
             'manage_options',

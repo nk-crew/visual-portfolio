@@ -26,6 +26,7 @@ class Visual_Portfolio_Admin {
         add_filter( 'plugin_action_links_' . visual_portfolio()->plugin_basename, array( $this, 'add_go_pro_link_plugins_page' ) );
         add_action( 'admin_init', array( $this, 'go_pro_redirect' ) );
         add_action( 'admin_menu', array( $this, 'pro_admin_menu' ), 12 );
+        add_action( 'admin_menu', array( $this, 'add_menu_if_portfolio_post_type_unregistered' ), 7 );
 
         // register controls.
         add_action( 'init', array( $this, 'register_controls' ), 9 );
@@ -34,6 +35,24 @@ class Visual_Portfolio_Admin {
 
         // ajax actions.
         add_action( 'wp_ajax_vp_find_oembed', array( $this, 'ajax_find_oembed' ) );
+    }
+
+    /**
+     * Add hight level Portfolio admin menu if portfolio post type unregistered.
+     *
+     * @return void
+     */
+    public function add_menu_if_portfolio_post_type_unregistered() {
+        if ( ! Visual_Portfolio_Custom_Post_Type::$register_portfolio_post_type ) {
+            add_menu_page(
+                'Visual Portfolio',
+                'Visual Portfolio',
+                'manage_options',
+                'visual-portfolio-settings',
+                array( 'Visual_Portfolio_Settings', 'print_settings_page' ),
+                'dashicons-visual-portfolio'
+            );
+        }
     }
 
     /**
@@ -124,7 +143,7 @@ class Visual_Portfolio_Admin {
 
         global $submenu, $submenu_file, $plugin_page;
 
-        $parent_slug = 'edit.php?post_type=portfolio';
+        $parent_slug = Visual_Portfolio_Custom_Post_Type::$menu_slug;
         $tabs        = array();
 
         // Generate array of navigation items.
@@ -236,7 +255,7 @@ class Visual_Portfolio_Admin {
      */
     public function pro_admin_menu() {
         add_submenu_page(
-            'edit.php?post_type=portfolio',
+            Visual_Portfolio_Custom_Post_Type::$menu_slug,
             '',
             '<span class="dashicons dashicons-star-filled" style="font-size: 17px"></span> ' . esc_html__( 'Go Pro', '@@text_domain' ),
             'manage_options',
