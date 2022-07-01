@@ -235,8 +235,8 @@ class Visual_Portfolio_Settings {
             'vp_general' => array(
                 array(
                     'name'      => 'register_portfolio_post_type',
-                    'label'     => esc_html__( 'Register Portfolio post type', '@@text_domain' ),
-                    'desc'      => esc_html__( 'Use custom post type to showcase your works', '@@text_domain' ),
+                    'label'     => esc_html__( 'Register Portfolio Post Type', '@@text_domain' ),
+                    'desc'      => esc_html__( 'Add custom post type `portfolio` to showcase your works.', '@@text_domain' ),
                     'type'      => 'toggle',
                     'default'   => 'on',
                 ),
@@ -259,11 +259,6 @@ class Visual_Portfolio_Settings {
                     'desc'      => esc_html__( 'You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by "," separating values. Example: "product_cat,product_tag"', '@@text_domain' ),
                     'type'      => 'text',
                     'default'   => '',
-                    'condition' => array(
-                        array(
-                            'control' => '[type="checkbox"][name="vp_general[register_portfolio_post_type]"]',
-                        ),
-                    ),
                 ),
                 array(
                     'name'    => 'no_image',
