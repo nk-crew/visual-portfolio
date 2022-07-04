@@ -66,9 +66,11 @@ The gallery block with live preview includes a lot of design settings that are p
 
 ### 📁 Portfolio Post Type ###
 
-Custom post type `portfolio` will ensure all your portfolios to keep in a single post type. In this way, you can distinguish your portfolios from other post types. Taxonomies are used to categorize your portfolio types, it will help you to group and sort your portfolios. Moreover, you can use these portfolios as a source for your showcase gallery using Visual Portfolio block.
+Optional custom post type `portfolio` will ensure all your portfolios to keep in a single post type. In this way, you can distinguish your portfolios from other post types. Taxonomies are used to categorize your portfolio types, it will help you to group and sort your portfolios. Moreover, you can use these portfolios as a source for your showcase gallery using Visual Portfolio block.
 
 Customize and rename Portfolio archive templates using visual gallery and page builder [https://visualportfolio.co/docs/portfolio-archive/](https://visualportfolio.co/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=archive)
+
+In case you want to use Visual Portfolio plugin for photo gallery only you can disable custom post type registration.
 
 ### 💎 Posts Query Builder ###
 
@@ -122,6 +124,8 @@ Supported Audio Vendors:
 ### 📈 SEO-Friendly ###
 
 Visual Portfolio plugin is built keeping SEO and performance in mind by defining proper structure and tags. Furthermore, due to optimization, it is lightweight and fast when it comes to page load.
+
+In addition our plugin add images in the sitemap for `All In One SEO`, `Rank Math`, and `Yoast SEO` plugins
 
 ### 🏳️ Multilingual ###
 
@@ -316,6 +320,16 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 2.17.0 =
+
+* added possibility to prevent registering Portfolio post type. Helpful when you want to use our plugin for photo gallery only
+* added support for images in sitemap for `All In One SEO`, `Rank Math`, and `Yoast SEO` plugins
+* added correct title for Portfolio Archive Taxonomy pages: `Portfolio Category: %s` and `Portfolio Tag: %s`
+* added support for `image` post format even if the theme does not
+* fixed gallery filter category output on Portfolio Archive page
+* fixed wrong image size calculation in Justified gallery when naturalWidth return null or zero (mostly on iOs devices)
+* renamed `Popup Iframe` feature to `Quick View`
 
 = 2.16.0 =
 
