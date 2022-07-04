@@ -45,12 +45,13 @@ class Visual_Portfolio_Admin {
     public function add_menu_if_portfolio_post_type_unregistered() {
         if ( ! Visual_Portfolio_Custom_Post_Type::$register_portfolio_post_type ) {
             add_menu_page(
-                'Visual Portfolio',
-                'Visual Portfolio',
+                visual_portfolio()->plugin_name,
+                visual_portfolio()->plugin_name,
                 'manage_options',
                 'visual-portfolio-settings',
                 array( 'Visual_Portfolio_Settings', 'print_settings_page' ),
-                'dashicons-visual-portfolio'
+                'dashicons-visual-portfolio',
+                25
             );
         }
     }
