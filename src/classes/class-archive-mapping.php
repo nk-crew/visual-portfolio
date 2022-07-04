@@ -33,23 +33,25 @@ class Visual_Portfolio_Archive_Mapping {
      * Visual_Portfolio_Archive_Mapping constructor.
      */
     public function __construct() {
-        add_action( 'init', array( $this, 'init' ), 9 );
-        add_action( 'pre_post_update', array( $this, 'pre_page_update' ), 10, 2 );
-        add_action( 'deleted_post', array( $this, 'delete_archive_page' ), 10, 1 );
-        add_action( 'trashed_post', array( $this, 'delete_archive_page' ), 10, 1 );
-        add_action( 'update_option_vp_general', array( $this, 'flush_rewrite_rules_after_update' ), 10, 3 );
-        add_action( 'vpf_extend_query_args', array( $this, 'extend_query_args' ), 10, 2 );
-        add_filter( 'vpf_layout_element_options', array( $this, 'unset_pagination_archive_page' ), 10, 1 );
+        if ( Visual_Portfolio_Custom_Post_Type::$register_portfolio_post_type ) {
+            add_action( 'init', array( $this, 'init' ), 9 );
+            add_action( 'pre_post_update', array( $this, 'pre_page_update' ), 10, 2 );
+            add_action( 'deleted_post', array( $this, 'delete_archive_page' ), 10, 1 );
+            add_action( 'trashed_post', array( $this, 'delete_archive_page' ), 10, 1 );
+            add_action( 'update_option_vp_general', array( $this, 'flush_rewrite_rules_after_update' ), 10, 3 );
+            add_action( 'vpf_extend_query_args', array( $this, 'extend_query_args' ), 10, 2 );
+            add_filter( 'vpf_layout_element_options', array( $this, 'unset_pagination_archive_page' ), 10, 1 );
 
-        // Add a post display state for special Portfolio Archive page.
-        add_filter( 'display_post_states', array( $this, 'add_display_post_states' ), 10, 2 );
+            // Add a post display state for special Portfolio Archive page.
+            add_filter( 'display_post_states', array( $this, 'add_display_post_states' ), 10, 2 );
 
-        // Add Permalinks.
-        add_action( 'admin_init', array( $this, 'permalink_settings_init' ) );
-        add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
-        add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
-        add_filter( 'vpf_extend_filter_items', array( $this, 'add_filter_items' ), 10, 2 );
-        add_filter( 'the_title', array( $this, 'set_archive_title' ), 10, 2 );
+            // Add Permalinks.
+            add_action( 'admin_init', array( $this, 'permalink_settings_init' ) );
+            add_action( 'admin_init', array( $this, 'permalink_settings_save' ), 12 );
+            add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
+            add_filter( 'vpf_extend_filter_items', array( $this, 'add_filter_items' ), 10, 2 );
+            add_filter( 'the_title', array( $this, 'set_archive_title' ), 10, 2 );
+        }
     }
 
     /**
