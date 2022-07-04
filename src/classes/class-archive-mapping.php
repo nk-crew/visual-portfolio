@@ -109,7 +109,12 @@ class Visual_Portfolio_Archive_Mapping {
     public function add_filter_items( $terms, $vp_options ) {
         // phpcs:ignore
         $post_id = $_REQUEST['vp_preview_post_id'] ?? get_the_ID() ?? null;
-        if ( get_post_meta( $post_id, '_vp_post_type_mapped', true ) && null !== $post_id && 'current_query' === $vp_options['posts_source'] ) {
+        if (
+            get_post_meta( $post_id, '_vp_post_type_mapped', true ) &&
+            null !== $post_id &&
+            'current_query' === $vp_options['posts_source'] &&
+            'post-based' === $vp_options['content_source']
+        ) {
 
             $query_opts = Visual_Portfolio_Get::get_query_params( $vp_options, true );
             // Get active item.
