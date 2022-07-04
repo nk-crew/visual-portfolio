@@ -133,10 +133,17 @@ class Visual_Portfolio_Admin {
 
         $screen = get_current_screen();
 
+        $is_settings = ( isset( $screen->post_type ) && isset( $screen->id ) && 'toplevel_page_visual-portfolio-settings' === $screen->id ) ? true : false;
+
         // Determine if the current page being viewed is "Lazy Blocks" related.
         if (
             ! isset( $screen->post_type ) ||
-            ( 'portfolio' !== $screen->post_type && 'vp_lists' !== $screen->post_type && 'vp_proofing' !== $screen->post_type ) ||
+            (
+                'portfolio' !== $screen->post_type &&
+                'vp_lists' !== $screen->post_type &&
+                'vp_proofing' !== $screen->post_type &&
+                ! $is_settings
+            ) ||
             ( isset( $screen->is_block_editor ) && $screen->is_block_editor() )
         ) {
             return;
