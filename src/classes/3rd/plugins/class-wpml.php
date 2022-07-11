@@ -16,10 +16,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_3rd_WPML {
     /**
+     * Archive Page.
+     *
+     * @var int $archive_page
+     */
+    private $archive_page = null;
+
+    /**
      * Visual_Portfolio_3rd_WPML constructor.
      */
     public function __construct() {
         global $iclTranslationManagement;
+
+        if ( class_exists( 'SitePress' ) ) {
+            add_action( 'init', array( $this, 'init' ), 9 );
+        }
 
         if ( ! isset( $iclTranslationManagement ) ) {
             return;
@@ -27,6 +38,49 @@ class Visual_Portfolio_3rd_WPML {
 
         add_filter( 'vpf_registered_controls', array( $this, 'make_control_translatable' ) );
         add_filter( 'vpf_extend_options_before_query_args', array( $this, 'prepare_custom_query_taxonomies' ) );
+    }
+
+    /**
+     * Initialize archive.
+     *
+     * @see __construct
+     */
+    public function init() {
+        $this->archive_page = Visual_Portfolio_Settings::get_option( 'portfolio_archive_page', 'vp_general' );
+        if ( isset( $this->archive_page ) && ! empty( $this->archive_page ) ) {
+            add_action( 'wp_insert_post', array( $this, 'set_archive_meta' ), 10, 3 );
+        }
+    }
+
+    /**
+     * Set Archive Meta.
+     *
+     * @param int     $post_id - Post ID.
+     * @param WP_Post $post - Post Object.
+     * @param bool    $update - Whether this is an existing post being updated.
+     * @return void
+     */
+    public function set_archive_meta( $post_id, $post, $update ) {
+        $translate_page_id = self::get_object_id( $this->archive_page );
+        if ( $translate_page_id === $post_id ) {
+            visual_portfolio()->defer_flush_rewrite_rules();
+
+            update_post_meta( (int) $post_id, '_vp_post_type_mapped', 'portfolio' );
+        }
+    }
+
+    /**
+     * Get wpml object ID.
+     *
+     * @param int $post_id - Post ID.
+     * @return int
+     */
+    public static function get_object_id( $post_id ) {
+        if ( class_exists( 'SitePress' ) ) {
+            // phpcs:ignore
+            return apply_filters( 'wpml_object_id', $post_id, 'page', true );
+        }
+        return $post_id;
     }
 
     /**

@@ -231,6 +231,8 @@ class Visual_Portfolio_Archive_Mapping {
             $permalinks['portfolio_base'] = str_replace( '%portfolio_page_slug%', self::get_portfolio_slug(), $permalinks['portfolio_base'] );
         }
 
+        $permalinks['portfolio_base'] = ltrim( $permalinks['portfolio_base'], '/\\' );
+
         $permalinks['portfolio_base'] = untrailingslashit( $permalinks['portfolio_base'] );
         $permalinks['category_base']  = untrailingslashit( $permalinks['category_base'] );
         $permalinks['tag_base']       = untrailingslashit( $permalinks['tag_base'] );
@@ -450,6 +452,7 @@ class Visual_Portfolio_Archive_Mapping {
 
         if ( is_post_type_archive( $post_type ) && '' !== $this->archive_page && $query->is_main_query() ) {
             $post_id = absint( $this->archive_page );
+            $post_id = Visual_Portfolio_3rd_WPML::get_object_id( $post_id );
             $query->set( 'post_type', 'page' );
             $query->set( 'page_id', $post_id );
             $query->set( 'original_archive_type', 'page' );

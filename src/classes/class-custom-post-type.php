@@ -142,6 +142,7 @@ class Visual_Portfolio_Custom_Post_Type {
                         'excerpt',
                         'post-formats',
                         'page-attributes',
+                        'custom-fields',
                     ),
                 )
             );
