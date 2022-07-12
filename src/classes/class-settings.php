@@ -123,7 +123,7 @@ class Visual_Portfolio_Settings {
     public static function admin_menu() {
         remove_submenu_page( 'visual-portfolio-settings', 'visual-portfolio-settings' );
         add_submenu_page(
-            Visual_Portfolio_Custom_Post_Type::$menu_slug,
+            Visual_Portfolio_Custom_Post_Type::get_menu_slug(),
             esc_html__( 'Settings', '@@text_domain' ),
             esc_html__( 'Settings', '@@text_domain' ),
             'manage_options',
@@ -139,7 +139,7 @@ class Visual_Portfolio_Settings {
      */
     public static function redirect_if_toggle_unregistered_portfolio_post_type() {
         global $pagenow;
-        $register_portfolio_post_type = Visual_Portfolio_Custom_Post_Type::$register_portfolio_post_type;
+        $register_portfolio_post_type = Visual_Portfolio_Custom_Post_Type::portfolio_post_type_is_registered();
         // phpcs:disable
         if (
             $register_portfolio_post_type &&

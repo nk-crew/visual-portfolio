@@ -33,8 +33,23 @@ class Visual_Portfolio_Archive_Mapping {
      * Visual_Portfolio_Archive_Mapping constructor.
      */
     public function __construct() {
-        if ( Visual_Portfolio_Custom_Post_Type::$register_portfolio_post_type ) {
-            add_action( 'init', array( $this, 'init' ), 9 );
+        add_action( 'init', array( $this, 'init' ), 9 );
+    }
+
+    /**
+     * Initialize archive.
+     *
+     * @see __construct
+     */
+    public function init() {
+        $this->archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
+        $this->permalinks   = self::get_permalink_structure();
+
+        if ( isset( $this->archive_page ) && ! empty( $this->archive_page ) && Visual_Portfolio_Custom_Post_Type::portfolio_post_type_is_registered() ) {
+
+            $this->init_rewrite_rules();
+
+            add_action( 'pre_get_posts', array( $this, 'maybe_override_archive' ) );
             add_action( 'pre_post_update', array( $this, 'pre_page_update' ), 10, 2 );
             add_action( 'deleted_post', array( $this, 'delete_archive_page' ), 10, 1 );
             add_action( 'trashed_post', array( $this, 'delete_archive_page' ), 10, 1 );
@@ -51,23 +66,6 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
             add_filter( 'vpf_extend_filter_items', array( $this, 'add_filter_items' ), 10, 2 );
             add_filter( 'the_title', array( $this, 'set_archive_title' ), 10, 2 );
-        }
-    }
-
-    /**
-     * Initialize archive.
-     *
-     * @see __construct
-     */
-    public function init() {
-        $this->archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
-        $this->permalinks   = self::get_permalink_structure();
-
-        if ( isset( $this->archive_page ) && ! empty( $this->archive_page ) ) {
-
-            $this->init_rewrite_rules();
-
-            add_action( 'pre_get_posts', array( $this, 'maybe_override_archive' ) );
         }
 
         self::create_archive_page();

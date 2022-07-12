@@ -43,7 +43,7 @@ class Visual_Portfolio_Admin {
      * @return void
      */
     public function add_menu_if_portfolio_post_type_unregistered() {
-        if ( ! Visual_Portfolio_Custom_Post_Type::$register_portfolio_post_type ) {
+        if ( ! Visual_Portfolio_Custom_Post_Type::portfolio_post_type_is_registered() ) {
             add_menu_page(
                 visual_portfolio()->plugin_name,
                 visual_portfolio()->plugin_name,
@@ -151,7 +151,7 @@ class Visual_Portfolio_Admin {
 
         global $submenu, $submenu_file, $plugin_page;
 
-        $parent_slug = Visual_Portfolio_Custom_Post_Type::$menu_slug;
+        $parent_slug = Visual_Portfolio_Custom_Post_Type::get_menu_slug();
         $tabs        = array();
 
         // Generate array of navigation items.
@@ -263,7 +263,7 @@ class Visual_Portfolio_Admin {
      */
     public function pro_admin_menu() {
         add_submenu_page(
-            Visual_Portfolio_Custom_Post_Type::$menu_slug,
+            Visual_Portfolio_Custom_Post_Type::get_menu_slug(),
             '',
             '<span class="dashicons dashicons-star-filled" style="font-size: 17px"></span> ' . esc_html__( 'Go Pro', '@@text_domain' ),
             'manage_options',

@@ -14,24 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Custom_Post_Type {
     /**
-     * Option of register portfolio post type.
-     *
-     * @var string
-     */
-    public static $register_portfolio_post_type;
-
-    /**
-     * Menu slug.
-     *
-     * @var string
-     */
-    public static $menu_slug;
-
-    /**
      * Visual_Portfolio_Custom_Post_Type constructor.
      */
     public function __construct() {
-        self::set_settings_of_register_portfolio_post_type();
         // custom post types.
         add_action( 'init', array( $this, 'add_custom_post_type' ) );
         add_action( 'restrict_manage_posts', array( $this, 'filter_custom_post_by_taxonomies' ), 10 );
@@ -75,13 +60,21 @@ class Visual_Portfolio_Custom_Post_Type {
     }
 
     /**
-     * Set settings of register portfolio post type.
+     * Get menu slug.
      *
-     * @return void
+     * @return string
      */
-    public static function set_settings_of_register_portfolio_post_type() {
-        self::$register_portfolio_post_type = Visual_Portfolio_Settings::get_option( 'register_portfolio_post_type', 'vp_general' );
-        self::$menu_slug                    = self::$register_portfolio_post_type ? 'edit.php?post_type=portfolio' : 'visual-portfolio-settings';
+    public static function get_menu_slug() {
+        return self::portfolio_post_type_is_registered() ? 'edit.php?post_type=portfolio' : 'visual-portfolio-settings';
+    }
+
+    /**
+     * Return true if portfolio post type is registered.
+     *
+     * @return bool
+     */
+    public static function portfolio_post_type_is_registered() {
+        return Visual_Portfolio_Settings::get_option( 'register_portfolio_post_type', 'vp_general' );
     }
 
     /**
@@ -93,7 +86,7 @@ class Visual_Portfolio_Custom_Post_Type {
         $permalinks  = Visual_Portfolio_Archive_Mapping::get_permalink_structure( true );
 
         // portfolio items post type.
-        if ( self::$register_portfolio_post_type ) {
+        if ( self::portfolio_post_type_is_registered() ) {
             register_post_type(
                 'portfolio',
                 array(
@@ -213,7 +206,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 'show_ui'         => true,
 
                 // adding to custom menu manually.
-                'show_in_menu'    => self::$menu_slug,
+                'show_in_menu'    => self::get_menu_slug(),
                 'show_in_rest'    => true,
                 'map_meta_cap'    => true,
                 'capability_type' => 'vp_list',
@@ -756,11 +749,11 @@ class Visual_Portfolio_Custom_Post_Type {
      */
     public function admin_menu() {
         // Remove Add New submenu item.
-        remove_submenu_page( self::$menu_slug, 'post-new.php?post_type=portfolio' );
+        remove_submenu_page( self::get_menu_slug(), 'post-new.php?post_type=portfolio' );
 
         // Documentation menu link.
         add_submenu_page(
-            self::$menu_slug,
+            self::get_menu_slug(),
             esc_html__( 'Documentation', '@@text_domain' ),
             esc_html__( 'Documentation', '@@text_domain' ),
             'manage_options',
@@ -776,7 +769,7 @@ class Visual_Portfolio_Custom_Post_Type {
     public function add_proofing_admin_menu() {
         // Proofing menu link.
         add_submenu_page(
-            self::$menu_slug,
+            self::get_menu_slug(),
             esc_html__( 'Proofing', '@@text_domain' ),
             esc_html__( 'Proofing', '@@text_domain' ),
             'manage_options',
