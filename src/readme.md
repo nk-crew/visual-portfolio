@@ -321,6 +321,12 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.17.1 =
+
+* added categories classes to items, when used Images content source
+* fixed PRO settings output bug
+* fixed a possible error, when $id is not provided in the `the_title` filter
+
 = 2.17.0 =
 
 * added possibility to prevent registering Portfolio post type. Helpful when you want to use our plugin for photo gallery only
