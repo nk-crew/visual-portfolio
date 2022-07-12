@@ -14,6 +14,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Custom_Post_Type {
     /**
+     * Option of register portfolio post type.
+     *
+     * @deprecated deprecated since version 2.17.1
+     * @var string
+     */
+    public static $register_portfolio_post_type = true;
+
+    /**
+     * Menu slug.
+     *
+     * @deprecated deprecated since version 2.17.1
+     * @var string
+     */
+    public static $menu_slug = 'edit.php?post_type=portfolio';
+
+    /**
      * Visual_Portfolio_Custom_Post_Type constructor.
      */
     public function __construct() {
@@ -57,6 +73,20 @@ class Visual_Portfolio_Custom_Post_Type {
 
         // show admin menu dropdown with available portfolios on the current page.
         add_action( 'wp_before_admin_bar_render', array( $this, 'wp_before_admin_bar_render' ) );
+
+        // add backward compatibility with old Pro version.
+        add_action( 'init', array( __CLASS__, 'set_settings_of_register_portfolio_post_type' ) );
+    }
+
+    /**
+     * Set settings of register portfolio post type.
+     *
+     * @deprecated deprecated since version 2.17.1
+     * @return void
+     */
+    public static function set_settings_of_register_portfolio_post_type() {
+        self::$register_portfolio_post_type = Visual_Portfolio_Settings::get_option( 'register_portfolio_post_type', 'vp_general' );
+        self::$menu_slug                    = self::$register_portfolio_post_type ? 'edit.php?post_type=portfolio' : 'visual-portfolio-settings';
     }
 
     /**
