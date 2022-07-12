@@ -78,8 +78,8 @@ class Visual_Portfolio_Archive_Mapping {
      * @param int    $id - Post ID.
      * @return string
      */
-    public function set_archive_title( $title, $id ) {
-        if ( get_post_meta( $id, '_vp_post_type_mapped', true ) ) {
+    public function set_archive_title( $title, $id = 0 ) {
+        if ( $id && get_post_meta( $id, '_vp_post_type_mapped', true ) ) {
             global $wp_query;
 
             if ( isset( $wp_query->query['vp_category'] ) ) {
