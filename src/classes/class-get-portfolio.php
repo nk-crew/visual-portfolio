@@ -2141,6 +2141,13 @@ class Visual_Portfolio_Get {
             // post_class functionality.
             $args['class'] = join( ' ', get_post_class( $args['class'], $args['post_id'] ) );
         }
+
+        if ( ! $is_posts && is_array( $args['categories'] ) && ! empty( $args['categories'] ) ) {
+            foreach ( $args['categories'] as $category ) {
+                $args['class'] .= ' category-' . $category['slug'];
+            }
+        }
+
         if ( $args['uid'] ) {
             $args['class'] .= ' vp-portfolio__item-uid-' . esc_attr( $args['uid'] );
         }
