@@ -78,9 +78,39 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'post_type_link', array( $this, 'portfolio_permalink_replacements' ), 1, 2 );
             add_filter( 'vpf_extend_filter_items', array( $this, 'add_filter_items' ), 10, 2 );
             add_filter( 'the_title', array( $this, 'set_archive_title' ), 10, 2 );
+            add_filter( 'body_class', array( $this, 'add_body_archive_classes' ), 10, 2 );
         }
 
         self::create_archive_page();
+    }
+
+    /**
+     * Filters the list of CSS body class names for the current archive.
+     *
+     * @param array  $classes - An array of body class names.
+     * @param string $class   - An array of additional class names added to the body.
+     * @return string
+     */
+    public function add_body_archive_classes( $classes, $class ) {
+        // phpcs:ignore
+        $post_id = $_REQUEST['vp_preview_post_id'] ?? get_the_ID() ?? null;
+        if (
+            get_post_meta( $post_id, '_vp_post_type_mapped', true ) &&
+            null !== $post_id
+        ) {
+            $classes[] = 'visual-portfolio-archive';
+            $classes[] = 'archive';
+            $classes[] = 'post-type-archive';
+
+            $unused_classes = array( 'single', 'single-page', 'page', 'postid-' . $post_id, 'page-id-' . $post_id );
+            foreach ( $unused_classes as $unused_class ) {
+                $founding_key = array_search( $unused_class, $classes, true );
+                if ( false !== $founding_key ) {
+                    unset( $classes[ $founding_key ] );
+                }
+            }
+        }
+        return $classes;
     }
 
     /**
