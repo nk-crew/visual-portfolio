@@ -254,6 +254,19 @@ class Visual_Portfolio_Settings {
                     ),
                 ),
                 array(
+                    'name'        => 'archive_page_items_per_page',
+                    'label'       => esc_html__( 'Archive Page Items Per Page', '@@text_domain' ),
+                    'type'        => 'number',
+                    'min'         => -1,
+                    'max'         => 9999,
+                    'default'     => 6,
+                    'condition'   => array(
+                        array(
+                            'control' => '[type="checkbox"][name="vp_general[register_portfolio_post_type]"]',
+                        ),
+                    ),
+                ),
+                array(
                     'name'      => 'filter_taxonomies',
                     'label'     => esc_html__( 'Filter Taxonomies', '@@text_domain' ),
                     'desc'      => esc_html__( 'You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by "," separating values. Example: "product_cat,product_tag"', '@@text_domain' ),

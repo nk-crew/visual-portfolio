@@ -23,6 +23,13 @@ class Visual_Portfolio_Archive_Mapping {
     private $archive_page = null;
 
     /**
+     * Posts per page.
+     *
+     * @var integer
+     */
+    private $posts_per_page = -1;
+
+    /**
      * Permalink settings.
      *
      * @var array
@@ -42,12 +49,17 @@ class Visual_Portfolio_Archive_Mapping {
      * @see __construct
      */
     public function init() {
-        $this->archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
-        $this->permalinks   = self::get_permalink_structure();
+        $this->archive_page   = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
+        $this->posts_per_page = Settings::get_option( 'archive_page_items_per_page', 'vp_general' );
+        $this->permalinks     = self::get_permalink_structure();
 
         if ( isset( $this->archive_page ) && ! empty( $this->archive_page ) && Visual_Portfolio_Custom_Post_Type::portfolio_post_type_is_registered() ) {
 
             $this->init_rewrite_rules();
+
+            if ( -1 === (int) $this->posts_per_page ) {
+                $this->posts_per_page = 9999;
+            }
 
             add_action( 'pre_get_posts', array( $this, 'maybe_override_archive' ) );
             add_action( 'pre_post_update', array( $this, 'pre_page_update' ), 10, 2 );
@@ -538,6 +550,7 @@ class Visual_Portfolio_Archive_Mapping {
                 }
 
                 unset( $args['p'] );
+                $args['posts_per_page'] = $this->posts_per_page;
             }
         }
         return $args;
