@@ -3338,7 +3338,8 @@ selector p {
         } else {
             $the_query = new WP_Term_Query(
                 array(
-                    'include' => $selected_ids,
+                    'include'    => $selected_ids,
+                    'hide_empty' => false,
                 )
             );
         }
