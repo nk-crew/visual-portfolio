@@ -1496,7 +1496,12 @@ class Visual_Portfolio_Get {
 
                     // Taxonomies.
                     if ( ! empty( $options['posts_taxonomies'] ) && ! isset( $query_opts['tax_query'] ) ) {
-                        $terms_list = get_terms( get_object_taxonomies( is_array( $query_opts['post_type'] ) ? $query_opts['post_type'] : array( $query_opts['post_type'] ) ) );
+                        $terms_list = get_terms(
+                            get_object_taxonomies( is_array( $query_opts['post_type'] ) ? $query_opts['post_type'] : array( $query_opts['post_type'] ) ),
+                            array(
+                                'hide_empty' => false,
+                            )
+                        );
 
                         // phpcs:ignore
                         $query_opts['tax_query'] = array(
