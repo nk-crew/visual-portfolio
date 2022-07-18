@@ -94,19 +94,19 @@ class Visual_Portfolio_Archive_Mapping {
     public function add_body_archive_classes( $classes, $class ) {
         // phpcs:ignore
         $post_id = $_REQUEST['vp_preview_post_id'] ?? get_the_ID() ?? null;
-        if (
-            get_post_meta( $post_id, '_vp_post_type_mapped', true ) &&
-            null !== $post_id
-        ) {
-            $classes[] = 'visual-portfolio-archive';
-            $classes[] = 'archive';
-            $classes[] = 'post-type-archive';
+        if ( $post_id ) {
+            $is_mapped = get_post_meta( $post_id, '_vp_post_type_mapped', true );
+            if ( $is_mapped ) {
+                $classes[] = 'visual-portfolio-archive';
+                $classes[] = 'archive';
+                $classes[] = 'post-type-archive';
 
-            $unused_classes = array( 'single', 'single-page', 'page', 'postid-' . $post_id, 'page-id-' . $post_id );
-            foreach ( $unused_classes as $unused_class ) {
-                $founding_key = array_search( $unused_class, $classes, true );
-                if ( false !== $founding_key ) {
-                    unset( $classes[ $founding_key ] );
+                $unused_classes = array( 'single', 'single-page', 'page', 'postid-' . $post_id, 'page-id-' . $post_id );
+                foreach ( $unused_classes as $unused_class ) {
+                    $founding_key = array_search( $unused_class, $classes, true );
+                    if ( false !== $founding_key ) {
+                        unset( $classes[ $founding_key ] );
+                    }
                 }
             }
         }
