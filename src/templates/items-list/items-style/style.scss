@@ -35,7 +35,6 @@
     background-color: var(--vp-items-style-default--overlay__background-color);
     opacity: 0;
     transition: var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
-    will-change: opacity;
   }
 
   // Transitions
@@ -50,7 +49,6 @@
 
   .vp-portfolio__item-img img {
     transition: var(--vp-items-style-default-transition-duration) transform var(--vp-items-style-default-transition-easing), var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
-    will-change: transform, opacity;
   }
 
   .vp-portfolio__item:hover,

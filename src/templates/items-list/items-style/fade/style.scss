@@ -33,7 +33,6 @@
     background-color: var(--vp-items-style-fade--overlay__background-color);
     opacity: 0;
     transition: var(--vp-items-style-fade-transition-duration) opacity var(--vp-items-style-fade-transition-easing);
-    will-change: opacity;
   }
 
   // fix some themes figcaption styles.
@@ -83,7 +82,6 @@
       transition-duration: var(--vp-items-style-fade--meta-staggering__transition-duration);
       transition-property: opacity, transform;
       transform: translateY(10px);
-      will-change: transform, opacity;
     }
 
     > :last-child {
@@ -184,7 +182,6 @@
     // https://github.com/nk-crew/visual-portfolio/issues/92
     z-index: 1;
     transition: var(--vp-items-style-fade-transition-duration) transform var(--vp-items-style-fade-transition-easing), var(--vp-items-style-fade-transition-duration) opacity var(--vp-items-style-fade-transition-easing);
-    will-change: transform, opacity;
   }
 
   // Overlay

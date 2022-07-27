@@ -24,7 +24,6 @@
 
 .vp-portfolio__items {
   transition: var(--vp-transition-duration) height var(--vp-transition-easing), var(--vp-transition-duration) transform var(--vp-transition-easing);
-  will-change: height, transform;
 }
 
 .vp-portfolio::after,
@@ -51,7 +50,6 @@
   visibility: hidden;
   opacity: 0;
   transition: var(--vp-transition-duration) opacity, var(--vp-transition-duration) visibility;
-  will-change: opacity, visibility;
 }
 
 .vp-portfolio > :last-child {
@@ -191,7 +189,6 @@
   visibility: visible;
   opacity: 1;
   transition: var(--vp-transition-duration) opacity, var(--vp-transition-duration) visibility;
-  will-change: opacity, visibility;
 }
 
 .vp-portfolio__preloader {
