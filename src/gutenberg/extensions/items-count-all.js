@@ -35,7 +35,13 @@ addFilter(
       const controlVal = parseInt(controlGetValue(data.name, attributes), 10);
 
       render = (
-        <BaseControl label={data.label} help={renderControlHelp} className={renderControlClassName}>
+        <BaseControl
+          // we should use key prop, since `vpf.editor.controls-render` will use the result in array.
+          key={`control-${data.name}-${data.label}`}
+          label={data.label}
+          help={renderControlHelp}
+          className={renderControlClassName}
+        >
           <div>
             <ButtonGroup>
               <Button
