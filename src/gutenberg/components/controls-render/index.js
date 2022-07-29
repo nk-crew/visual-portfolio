@@ -208,7 +208,9 @@ ControlsRender.Control = function (props) {
   let renderControl = '';
   let renderControlLabel = props.label;
   let renderControlAfter = '';
-  let renderControlHelp = props.description ? <RawHTML>{props.description}</RawHTML> : false;
+  let renderControlHelp = props.description ? (
+    <RawHTML className="components-base-control__help">{props.description}</RawHTML>
+  ) : null;
   const renderControlClassName = classnames('vpf-control-wrap', `vpf-control-wrap-${props.type}`);
   const controlVal = controlGetValue(props.name, attributes);
 
@@ -451,7 +453,7 @@ ControlsRender.Control = function (props) {
     case 'pro_note':
       renderControl = (
         <ProNote title={renderControlLabel}>
-          {renderControlHelp ? <p>{renderControlHelp}</p> : ''}
+          {renderControlHelp || ''}
           <ProNote.Button
             target="_blank"
             rel="noopener noreferrer"
@@ -500,12 +502,9 @@ ControlsRender.Control = function (props) {
 
   return (
     <Fragment>
-      <BaseControl
-        label={renderControlLabel}
-        help={renderControlHelp}
-        className={renderControlClassName}
-      >
+      <BaseControl label={renderControlLabel} className={renderControlClassName}>
         <div>{renderControl}</div>
+        {renderControlHelp}
       </BaseControl>
       {renderControlAfter}
     </Fragment>

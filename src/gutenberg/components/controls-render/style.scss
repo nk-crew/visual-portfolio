@@ -1,5 +1,10 @@
 .vpf-control-wrap {
-  .components-base-control__help {
+  > .components-base-control__help,
+  > .components-base-control__field > .components-base-control__help {
+    margin-bottom: 1em;
+    font-size: 12px;
+    font-style: normal;
+    color: rgb(117, 117, 117);
     word-break: break-word;
   }
 
