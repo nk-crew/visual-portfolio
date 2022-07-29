@@ -139,8 +139,8 @@ const SortableItem = function (props) {
           onClick={() => {
             const newImages = [...items];
 
-            if (newImages[index]) {
-              newImages.splice(index, 1);
+            if (newImages[index - 1]) {
+              newImages.splice(index - 1, 1);
 
               onChange(newImages);
             }
@@ -189,9 +189,9 @@ const SortableItem = function (props) {
                     onChange={(val) => {
                       const newImages = [...items];
 
-                      if (newImages[index]) {
-                        newImages[index] = {
-                          ...newImages[index],
+                      if (newImages[index - 1]) {
+                        newImages[index - 1] = {
+                          ...newImages[index - 1],
                           focalPoint: val,
                         };
 
@@ -203,11 +203,11 @@ const SortableItem = function (props) {
                     onSelect={(image) => {
                       const newImages = [...items];
 
-                      if (newImages[index]) {
+                      if (newImages[index - 1]) {
                         const imgData = prepareImage(image);
 
-                        newImages[index] = {
-                          ...newImages[index],
+                        newImages[index - 1] = {
+                          ...newImages[index - 1],
                           ...imgData,
                         };
 
@@ -225,8 +225,8 @@ const SortableItem = function (props) {
                     onClick={() => {
                       const newImages = [...items];
 
-                      if (newImages[index]) {
-                        newImages.splice(index, 1);
+                      if (newImages[index - 1]) {
+                        newImages.splice(index - 1, 1);
 
                         onChange(newImages);
                       }
@@ -248,7 +248,7 @@ const SortableItem = function (props) {
                 const newCondition = [];
 
                 // prepare name.
-                const imgControlName = `${controlName}[${index}].${name}`;
+                const imgControlName = `${controlName}[${index - 1}].${name}`;
 
                 // prepare conditions for the current item.
                 if (imageControls[name].condition.length) {
@@ -258,7 +258,7 @@ const SortableItem = function (props) {
                     if (newData.control && /SELF/g.test(newData.control)) {
                       newData.control = newData.control.replace(
                         /SELF/g,
-                        `${controlName}[${index}]`
+                        `${controlName}[${index - 1}]`
                       );
                     }
 
@@ -269,14 +269,14 @@ const SortableItem = function (props) {
                 return applyFilters(
                   'vpf.editor.gallery-controls-render',
                   <ControlsRender.Control
-                    key={`${img.id || img.imgThumbnailUrl || img.imgUrl}-${index}-${name}`}
+                    key={`${img.id || img.imgThumbnailUrl || img.imgUrl}-${index - 1}-${name}`}
                     attributes={props.attributes}
                     onChange={(val) => {
                       const newImages = [...items];
 
-                      if (newImages[index]) {
-                        newImages[index] = {
-                          ...newImages[index],
+                      if (newImages[index - 1]) {
+                        newImages[index - 1] = {
+                          ...newImages[index - 1],
                           [name]: val,
                         };
 
