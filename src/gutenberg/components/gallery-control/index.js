@@ -56,12 +56,32 @@ function prepareImage(img) {
   return imgData;
 }
 
-function prepareImages(images) {
+/**
+ * Prepare selected images array using our format.
+ * Use the current images set with already user data on images.
+ *
+ * @param {array} images - new images set.
+ * @param {array} currentImages - current images set.
+ * @returns {array}
+ */
+function prepareImages(images, currentImages) {
   const result = [];
+  const currentImagesIds =
+    currentImages && Object.keys(currentImages).length ? currentImages.map((img) => img.id) : [];
 
   if (images && images.length) {
     images.forEach((img) => {
-      const imgData = prepareImage(img);
+      let currentImgData = false;
+
+      if (currentImagesIds.length) {
+        const currentId = currentImagesIds.indexOf(img.id);
+
+        if (-1 < currentId && currentImages[currentId]) {
+          currentImgData = currentImages[currentId];
+        }
+      }
+
+      const imgData = currentImgData || prepareImage(img);
 
       result.push(imgData);
     });
@@ -365,9 +385,8 @@ const SortableList = function (props) {
 
       <MediaUpload
         multiple
-        gallery
         onSelect={(images) => {
-          onChange(prepareImages(images));
+          onChange(prepareImages(images, items));
         }}
         allowedTypes={ALLOWED_MEDIA_TYPES}
         value={items && items.length ? items.map((img) => img.id) : false}
