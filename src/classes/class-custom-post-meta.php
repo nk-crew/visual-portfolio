@@ -62,7 +62,12 @@ class Visual_Portfolio_Custom_Post_Meta {
      */
     public static function register_post_meta() {
         $post_type_names = array_keys( get_post_types() );
+
         foreach ( $post_type_names as $post_type ) {
+            if ( ! is_post_type_viewable( $post_type ) ) {
+                continue;
+            }
+
             // Register meta for all post types.
             register_meta(
                 'post',
