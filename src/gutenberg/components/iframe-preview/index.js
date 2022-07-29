@@ -290,6 +290,8 @@ class IframePreview extends Component {
           ))}
         </Fragment>
       );
+    } else {
+      params.value = params.value || '';
     }
 
     return <input {...params} />;
