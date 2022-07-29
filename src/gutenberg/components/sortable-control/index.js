@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { SortableContainer, SortableElement, sortableHandle, arrayMove } from 'react-sortable-hoc';
+import classnames from 'classnames/dedupe';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 /**
  * WordPress dependencies
@@ -10,26 +18,45 @@ const { Component } = wp.element;
 
 const { Button } = wp.components;
 
-const DragHandle = sortableHandle(() => (
-  <span>
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 4.99976H8V6.99976H10V4.99976Z" fill="currentColor" />
-      <path d="M10 10.9998H8V12.9998H10V10.9998Z" fill="currentColor" />
-      <path d="M10 16.9998H8V18.9998H10V16.9998Z" fill="currentColor" />
-      <path d="M16 4.99976H14V6.99976H16V4.99976Z" fill="currentColor" />
-      <path d="M16 10.9998H14V12.9998H16V10.9998Z" fill="currentColor" />
-      <path d="M16 16.9998H14V18.9998H16V16.9998Z" fill="currentColor" />
-    </svg>
-  </span>
-));
-
-const SortableItem = SortableElement(({ element, sourceOptions, items, props }) => {
+const SortableItem = function ({ id, element, sourceOptions, items, props }) {
   const { allowDisablingOptions, onChange } = props;
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, isSorting } =
+    useSortable({
+      id,
+    });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition: isSorting ? transition : '',
+  };
 
   const label = sourceOptions[element];
   return (
-    <li>
-      <DragHandle />
+    <li
+      className={classnames(
+        'vpf-component-sortable-item',
+        isDragging ? 'vpf-component-sortable-item-dragging' : ''
+      )}
+      ref={setNodeRef}
+      style={style}
+    >
+      <span {...attributes} {...listeners}>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M10 4.99976H8V6.99976H10V4.99976Z" fill="currentColor" />
+          <path d="M10 10.9998H8V12.9998H10V10.9998Z" fill="currentColor" />
+          <path d="M10 16.9998H8V18.9998H10V16.9998Z" fill="currentColor" />
+          <path d="M16 4.99976H14V6.99976H16V4.99976Z" fill="currentColor" />
+          <path d="M16 10.9998H14V12.9998H16V10.9998Z" fill="currentColor" />
+          <path d="M16 16.9998H14V18.9998H16V16.9998Z" fill="currentColor" />
+        </svg>
+      </span>
       {label}
       {allowDisablingOptions ? (
         <Button
@@ -55,22 +82,40 @@ const SortableItem = SortableElement(({ element, sourceOptions, items, props }) 
       ) : null}
     </li>
   );
-});
+};
 
-const SortableList = SortableContainer(({ items, sourceOptions, classes, props }) => (
-  <ul className={classes}>
-    {items.map((value, index) => (
-      <SortableItem
-        key={`item-${value}`}
-        index={index}
-        element={value}
-        sourceOptions={sourceOptions}
-        props={props}
-        items={items}
-      />
-    ))}
-  </ul>
-));
+const SortableList = function ({ items, sourceOptions, classes, onSortEnd, props }) {
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  return (
+    <ul className={classes}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={(event) => {
+          const { active, over } = event;
+
+          if (active.id !== over.id) {
+            onSortEnd(items.indexOf(active.id), items.indexOf(over.id));
+          }
+        }}
+      >
+        <SortableContext items={items} strategy={verticalListSortingStrategy}>
+          {items.map((value) => (
+            <SortableItem
+              key={`item-${value}`}
+              id={value}
+              element={value}
+              sourceOptions={sourceOptions}
+              props={props}
+              items={items}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
+    </ul>
+  );
+};
 
 /**
  * Component Class
@@ -84,10 +129,10 @@ export default class SortableControl extends Component {
     value = 'undefined' !== typeof value ? value : defaultOptions;
 
     const disabledOptions = Object.keys(options).filter((findValue) => !value.includes(findValue));
-
-    let classes = 'vpf-component-sortable';
-
-    classes = 0 < disabledOptions.length ? `${classes} vpf-dragging-has-disabled-options` : classes;
+    const classes = classnames(
+      'vpf-component-sortable',
+      0 < disabledOptions.length ? 'vpf-dragging-has-disabled-options' : ''
+    );
 
     return (
       <div>
@@ -96,12 +141,10 @@ export default class SortableControl extends Component {
           sourceOptions={options}
           classes={classes}
           props={this.props}
-          onSortEnd={({ oldIndex, newIndex }) => {
-            const updateValue = arrayMove([...value], oldIndex, newIndex);
+          onSortEnd={(oldIndex, newIndex) => {
+            const updateValue = arrayMove(value, oldIndex, newIndex);
             onChange(updateValue);
           }}
-          useDragHandle
-          helperClass="vpf-component-sortable-item-dragging"
         />
         {0 < disabledOptions.length ? (
           <ul className="vpf-component-sortable-disabled">

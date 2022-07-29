@@ -2,7 +2,10 @@
 /**
  * External dependencies
  */
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+import classnames from 'classnames/dedupe';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 /**
  * Internal dependencies
@@ -17,11 +20,9 @@ const { __ } = wp.i18n;
 
 const { applyFilters, addFilter } = wp.hooks;
 
-const { Fragment, Component, useState, createRef } = wp.element;
+const { Fragment, useState } = wp.element;
 
-const { Button, Modal, FocalPointPicker, withNotices } = wp.components;
-
-const { compose, withInstanceId } = wp.compose;
+const { Button, Modal, FocalPointPicker } = wp.components;
 
 const { MediaUpload, MediaUploadCheck } = wp.blockEditor;
 
@@ -69,34 +70,28 @@ function prepareImages(images) {
   return result;
 }
 
-function arrayMove(arr, oldIndex, newIndex) {
-  if (newIndex >= arr.length) {
-    let k = newIndex - arr.length + 1;
-
-    while (k) {
-      k -= 1;
-      arr.push(undefined);
-    }
-  }
-
-  arr.splice(newIndex, 0, arr.splice(oldIndex, 1)[0]);
-
-  return arr;
-}
-
-const SortableItem = SortableElement((props) => {
+const SortableItem = function (props) {
   const {
     img,
     items,
-    idx,
+    index,
     onChange,
     imageControls,
     controlName,
-    attributes,
     focalPoint,
     clientId,
     isSetupWizard,
   } = props;
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, isSorting } =
+    useSortable({
+      id: props.id,
+    });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition: isSorting ? transition : '',
+  };
 
   const [isOpen, setOpen] = useState(false);
   const openModal = () => setOpen(true);
@@ -104,7 +99,16 @@ const SortableItem = SortableElement((props) => {
 
   return (
     <Fragment>
-      <div className="vpf-component-gallery-control-item">
+      <div
+        className={classnames(
+          'vpf-component-gallery-control-item',
+          isDragging ? 'vpf-component-gallery-control-item-dragging' : ''
+        )}
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+      >
         <Button
           className="vpf-component-gallery-control-item-button"
           onClick={openModal}
@@ -135,8 +139,8 @@ const SortableItem = SortableElement((props) => {
           onClick={() => {
             const newImages = [...items];
 
-            if (newImages[idx]) {
-              newImages.splice(idx, 1);
+            if (newImages[index]) {
+              newImages.splice(index, 1);
 
               onChange(newImages);
             }
@@ -185,9 +189,9 @@ const SortableItem = SortableElement((props) => {
                     onChange={(val) => {
                       const newImages = [...items];
 
-                      if (newImages[idx]) {
-                        newImages[idx] = {
-                          ...newImages[idx],
+                      if (newImages[index]) {
+                        newImages[index] = {
+                          ...newImages[index],
                           focalPoint: val,
                         };
 
@@ -199,11 +203,11 @@ const SortableItem = SortableElement((props) => {
                     onSelect={(image) => {
                       const newImages = [...items];
 
-                      if (newImages[idx]) {
+                      if (newImages[index]) {
                         const imgData = prepareImage(image);
 
-                        newImages[idx] = {
-                          ...newImages[idx],
+                        newImages[index] = {
+                          ...newImages[index],
                           ...imgData,
                         };
 
@@ -221,8 +225,8 @@ const SortableItem = SortableElement((props) => {
                     onClick={() => {
                       const newImages = [...items];
 
-                      if (newImages[idx]) {
-                        newImages.splice(idx, 1);
+                      if (newImages[index]) {
+                        newImages.splice(index, 1);
 
                         onChange(newImages);
                       }
@@ -244,7 +248,7 @@ const SortableItem = SortableElement((props) => {
                 const newCondition = [];
 
                 // prepare name.
-                const imgControlName = `${controlName}[${idx}].${name}`;
+                const imgControlName = `${controlName}[${index}].${name}`;
 
                 // prepare conditions for the current item.
                 if (imageControls[name].condition.length) {
@@ -252,7 +256,10 @@ const SortableItem = SortableElement((props) => {
                     const newData = { ...data };
 
                     if (newData.control && /SELF/g.test(newData.control)) {
-                      newData.control = newData.control.replace(/SELF/g, `${controlName}[${idx}]`);
+                      newData.control = newData.control.replace(
+                        /SELF/g,
+                        `${controlName}[${index}]`
+                      );
                     }
 
                     newCondition.push(newData);
@@ -262,14 +269,14 @@ const SortableItem = SortableElement((props) => {
                 return applyFilters(
                   'vpf.editor.gallery-controls-render',
                   <ControlsRender.Control
-                    key={`${img.id || img.imgThumbnailUrl || img.imgUrl}-${idx}-${name}`}
-                    attributes={attributes}
+                    key={`${img.id || img.imgThumbnailUrl || img.imgUrl}-${index}-${name}`}
+                    attributes={props.attributes}
                     onChange={(val) => {
                       const newImages = [...items];
 
-                      if (newImages[idx]) {
-                        newImages[idx] = {
-                          ...newImages[idx],
+                      if (newImages[index]) {
+                        newImages[index] = {
+                          ...newImages[index],
                           [name]: val,
                         };
 
@@ -293,33 +300,68 @@ const SortableItem = SortableElement((props) => {
       ) : null}
     </Fragment>
   );
-});
-const SortableList = SortableContainer((props) => {
-  const { items, onChange, imageControls, controlName, attributes, focalPoint, isSetupWizard } =
-    props;
+};
+
+const SortableList = function (props) {
+  const {
+    items,
+    onChange,
+    onSortEnd,
+    imageControls,
+    controlName,
+    attributes,
+    focalPoint,
+    isSetupWizard,
+  } = props;
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   // Automatically open images selector when first time select Images in Setup Wizard.
   const [isOpenedInSetupWizard, setOpenOnSetupWizard] = useState(!isSetupWizard);
   const openOnSetupWizard = () => setOpenOnSetupWizard(true);
 
+  const sortableItems = [];
+
+  if (items && items.length) {
+    items.forEach((data, i) => {
+      sortableItems.push({
+        id: i + 1,
+        data,
+      });
+    });
+  }
+
   return (
     <div className="vpf-component-gallery-control-items">
-      {items.map((img, idx) => (
-        <SortableItem
-          // eslint-disable-next-line react/no-array-index-key
-          key={`lzb-constructor-controls-items-sortable-${idx}`}
-          index={idx}
-          img={img}
-          idx={idx}
-          items={items}
-          onChange={onChange}
-          imageControls={imageControls}
-          controlName={controlName}
-          attributes={attributes}
-          focalPoint={focalPoint}
-          isSetupWizard={isSetupWizard}
-        />
-      ))}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={(event) => {
+          const { active, over } = event;
+
+          if (active.id !== over.id) {
+            onSortEnd(active.id - 1, over.id - 1);
+          }
+        }}
+      >
+        <SortableContext items={sortableItems} strategy={rectSortingStrategy}>
+          {sortableItems.map(({ data, id }) => (
+            <SortableItem
+              key={`vpf-component-gallery-control-items-sortable-${id}`}
+              index={id}
+              id={id}
+              img={data}
+              items={items}
+              onChange={onChange}
+              imageControls={imageControls}
+              controlName={controlName}
+              attributes={attributes}
+              focalPoint={focalPoint}
+              isSetupWizard={isSetupWizard}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
 
       <MediaUpload
         multiple
@@ -360,92 +402,56 @@ const SortableList = SortableContainer((props) => {
       />
     </div>
   );
-});
+};
 
 /**
  * Component Class
  */
-class GalleryControl extends Component {
-  constructor(...args) {
-    super(...args);
+export default function GalleryControl(props) {
+  const {
+    imageControls,
+    attributes,
+    name: controlName,
+    value,
+    onChange,
+    focalPoint,
+    isSetupWizard,
+  } = props;
 
-    this.state = {
-      hasError: false,
-    };
-    // eslint-disable-next-line react/no-unused-class-component-methods
-    this.sortRef = createRef();
+  const filteredValue = value.filter((img) => img.id);
 
-    this.onUploadError = this.onUploadError.bind(this);
-  }
-
-  onUploadError(message) {
-    const { noticeOperations } = this.props;
-    noticeOperations.removeAllNotices();
-    noticeOperations.createErrorNotice(message);
-  }
-
-  render() {
-    const self = this;
-    const {
-      imageControls,
-      attributes,
-      name: controlName,
-      value,
-      onChange,
-      focalPoint,
-      isSetupWizard,
-    } = this.props;
-
-    const filteredValue = value.filter((img) => img.id);
-
-    return (
-      <div className="vpf-component-gallery-control">
-        <MediaUpload
-          onSelect={(images) => {
-            this.setState({ hasError: false });
-            onChange(prepareImages(images));
-          }}
-          allowedTypes={ALLOWED_MEDIA_TYPES}
-          multiple
-          value={
-            filteredValue && Object.keys(filteredValue).length
-              ? filteredValue.map((img) => img.id)
-              : []
-          }
-          render={() => (
-            <SortableList
-              ref={self.sortRef}
-              items={filteredValue}
-              onChange={onChange}
-              imageControls={imageControls}
-              controlName={controlName}
-              attributes={attributes}
-              focalPoint={focalPoint}
-              isSetupWizard={isSetupWizard}
-              axis="xy"
-              distance={3}
-              onSortEnd={({ oldIndex, newIndex }) => {
-                const newImages = arrayMove([...filteredValue], oldIndex, newIndex);
-                onChange(newImages);
-              }}
-              helperClass="vpf-component-gallery-control-items-sortable"
-              helperContainer={() => {
-                if (self.sortRef && self.sortRef.current && self.sortRef.current.container) {
-                  return self.sortRef.current.container;
-                }
-
-                // sometimes container ref disappears, so we can find dom element manually.
-                return document.body;
-              }}
-            />
-          )}
-        />
-      </div>
-    );
-  }
+  return (
+    <div className="vpf-component-gallery-control">
+      <MediaUpload
+        onSelect={(images) => {
+          onChange(prepareImages(images));
+        }}
+        allowedTypes={ALLOWED_MEDIA_TYPES}
+        multiple
+        value={
+          filteredValue && Object.keys(filteredValue).length
+            ? filteredValue.map((img) => img.id)
+            : []
+        }
+        render={() => (
+          <SortableList
+            items={filteredValue}
+            onChange={onChange}
+            imageControls={imageControls}
+            controlName={controlName}
+            attributes={attributes}
+            focalPoint={focalPoint}
+            isSetupWizard={isSetupWizard}
+            onSortEnd={(oldIndex, newIndex) => {
+              const newImages = arrayMove(filteredValue, oldIndex, newIndex);
+              onChange(newImages);
+            }}
+          />
+        )}
+      />
+    </div>
+  );
 }
-
-export default compose([withInstanceId, withNotices])(GalleryControl);
 
 // add list of all categories to gallery images.
 addFilter(

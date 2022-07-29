@@ -1,17 +1,13 @@
 .vpf-component-gallery-control {
   .vpf-component-gallery-control-items {
     position: relative;
-    width: calc(100% + 15px);
-    margin-top: -15px;
-    margin-bottom: 15px;
-    margin-left: -15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
 
     .vpf-component-gallery-control-item {
       position: relative;
       display: inline-block;
-      width: calc(33.33% - 15px);
-      margin-top: 15px;
-      margin-left: 15px;
 
       .vpf-component-gallery-control-item-button {
         position: relative;
@@ -83,6 +79,11 @@
       opacity: 0;
       transition: 0.2s opacity, 0.2s background-color;
 
+      &:hover,
+      &:focus {
+        background-color: #d51515;
+      }
+
       svg {
         width: 70%;
         height: auto;
@@ -95,11 +96,27 @@
     }
   }
 
+  .vpf-component-gallery-control-item-dragging {
+    z-index: 2;
+
+    .vpf-component-gallery-control-item-button {
+      img {
+        opacity: 1;
+      }
+
+      svg {
+        display: none;
+      }
+    }
+
+    .vpf-component-gallery-control-item-remove {
+      display: none;
+    }
+  }
+
   .vpf-component-gallery-control-item-add.components-button {
+    grid-column: 1 / -1;
     justify-content: center;
-    width: calc(100% - 15px);
-    margin-top: 15px;
-    margin-left: 15px;
     border: 1px solid $gray-900;
 
     > span {
