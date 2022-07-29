@@ -365,11 +365,12 @@ const SortableList = function (props) {
 
       <MediaUpload
         multiple
+        gallery
         onSelect={(images) => {
-          onChange([...items, ...prepareImages(images)]);
+          onChange(prepareImages(images));
         }}
         allowedTypes={ALLOWED_MEDIA_TYPES}
-        value={false}
+        value={items && items.length ? items.map((img) => img.id) : false}
         render={({ open }) => {
           if (!isOpenedInSetupWizard) {
             openOnSetupWizard();
@@ -387,15 +388,23 @@ const SortableList = function (props) {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                width="24"
-                height="24"
+                height="20"
+                width="20"
                 role="img"
                 aria-hidden="true"
                 focusable="false"
               >
-                <path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
+                {items && items.length ? (
+                  <path d="M9 14h10l-3.45-4.5-2.3 3-1.55-2Zm-1 4q-.825 0-1.412-.587Q6 16.825 6 16V4q0-.825.588-1.413Q7.175 2 8 2h12q.825 0 1.413.587Q22 3.175 22 4v12q0 .825-.587 1.413Q20.825 18 20 18Zm0-2h12V4H8v12Zm-4 6q-.825 0-1.412-.587Q2 20.825 2 20V6h2v14h14v2ZM8 4v12V4Z" />
+                ) : (
+                  <path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
+                )}
               </svg>
-              <span>{__('Add Images', '@@text_domain')}</span>
+              <span>
+                {items && items.length
+                  ? __('Edit Gallery', '@@text_domain')
+                  : __('Add Images', '@@text_domain')}
+              </span>
             </Button>
           );
         }}
