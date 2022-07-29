@@ -70,7 +70,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
      */
     public function get_layouts_permission() {
         if ( ! current_user_can( 'read_posts' ) ) {
-            return $this->error( 'vpf_data_cannot_read', esc_html__( 'Sorry, you are not allowed to read saved layouts data.', '@@text_domain' ) );
+            return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to read saved layouts data.', '@@text_domain' ), true );
         }
 
         return true;
@@ -116,7 +116,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
      */
     public function update_layout_permission() {
         if ( ! current_user_can( 'edit_posts' ) ) {
-            return $this->error( 'vpf_data_cannot_read', esc_html__( 'Sorry, you are not allowed to edit saved layouts data.', '@@text_domain' ) );
+            return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to edit saved layouts data.', '@@text_domain' ), true );
         }
 
         return true;
@@ -160,7 +160,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
             }
         }
 
-        return $this->success( $meta );
+        return $this->success( true );
     }
 
     /**
@@ -182,11 +182,16 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
     /**
      * Error rest.
      *
-     * @param mixed $code     error code.
-     * @param mixed $response response data.
+     * @param mixed   $code       error code.
+     * @param mixed   $response   response data.
+     * @param boolean $true_error use true error response to stop the code processing.
      * @return mixed
      */
-    public function error( $code, $response ) {
+    public function error( $code, $response, $true_error = false ) {
+        if ( $true_error ) {
+            return new WP_Error( $code, $response, array( 'status' => 401 ) );
+        }
+
         return new WP_REST_Response(
             array(
                 'error'      => true,
