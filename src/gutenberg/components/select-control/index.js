@@ -235,18 +235,16 @@ export default class VpfSelectControl extends Component {
   prepareOptions(options) {
     return Object.keys(options || {}).map((val) => {
       const option = options[val];
-
-      if ('object' === typeof option) {
-        return {
-          value: option.value,
-          label: option.label,
-        };
-      }
-
-      return {
+      let result = {
         value: val,
         label: options[val],
       };
+
+      if ('object' === typeof option) {
+        result = { ...option };
+      }
+
+      return result;
     });
   }
 
@@ -328,6 +326,9 @@ export default class VpfSelectControl extends Component {
       selectProps.getHelperDimensions = ({ node }) => node.getBoundingClientRect();
       selectProps.components.MultiValue = SortableMultiValue;
       selectProps.components.MultiValueLabel = SortableMultiValueLabel;
+
+      // prevent closing options dropdown after select.
+      selectProps.closeMenuOnSelect = false;
     }
 
     // Creatable select.
