@@ -321,6 +321,22 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.18.0 =
+
+* added possibility to change items count on Portfolio archive page in the plugin settings
+* added portfolio archive page classes to the `<body>` tag
+* improved Gallery sortable component in block settings
+* improved Gallery component image popup in block settings to display Title and Description loaded dynamically from the Source settings
+* changed Gallery component `Add Images` button to `Edit Gallery` button. You are not allowed to insert duplicate photos in a single gallery
+* prevent closing multiple posts block option dropdown when selected value. Easier to select multiple posts from dropdown
+* fixed security vulnerability - rest call wrong permission check
+* fixed Taxonomy selector error with empty taxonomy
+* fixed displaying posts when empty Taxonomy selected in the query options
+* fixed some JS errors and warnings in the Gutenberg editor
+* removed custom meta settings from non-viewable post types
+* removed `will-change` styles usage
+* minor changes
+
 = 2.17.1 =
 
 * added categories classes to items, when used Images content source
