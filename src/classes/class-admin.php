@@ -1625,26 +1625,12 @@ class Visual_Portfolio_Admin {
                 'focal_point'     => true,
                 'image_controls'  => array(
                     'title' => array(
-                        'type'      => 'text',
-                        'label'     => esc_html__( 'Title', '@@text_domain' ),
-                        'condition' => array(
-                            array(
-                                'control'  => 'images_titles_source',
-                                'operator' => '===',
-                                'value'    => 'custom',
-                            ),
-                        ),
+                        'type'  => 'text',
+                        'label' => esc_html__( 'Title', '@@text_domain' ),
                     ),
                     'description' => array(
-                        'type'      => 'textarea',
-                        'label'     => esc_html__( 'Description', '@@text_domain' ),
-                        'condition' => array(
-                            array(
-                                'control'  => 'images_descriptions_source',
-                                'operator' => '===',
-                                'value'    => 'custom',
-                            ),
-                        ),
+                        'type'  => 'textarea',
+                        'label' => esc_html__( 'Description', '@@text_domain' ),
                     ),
                     'categories' => array(
                         'type'      => 'select',

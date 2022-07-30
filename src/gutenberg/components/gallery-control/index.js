@@ -13,12 +13,16 @@ import { CSS } from '@dnd-kit/utilities';
 // eslint-disable-next-line import/no-cycle
 import ControlsRender from '../controls-render';
 
+// Extensions.
+import './extensions/dynamic-categories';
+import './extensions/image-title-and-desription';
+
 /**
  * WordPress dependencies
  */
 const { __ } = wp.i18n;
 
-const { applyFilters, addFilter } = wp.hooks;
+const { applyFilters } = wp.hooks;
 
 const { Fragment, useState } = wp.element;
 
@@ -311,7 +315,13 @@ const SortableItem = function (props) {
                     isSetupWizard={isSetupWizard}
                   />,
                   imageControls[name],
-                  props
+                  props,
+                  {
+                    name,
+                    fullName: imgControlName,
+                    index: index - 1,
+                    condition: newCondition,
+                  }
                 );
               })}
             </div>
@@ -480,41 +490,3 @@ export default function GalleryControl(props) {
     </div>
   );
 }
-
-// add list of all categories to gallery images.
-addFilter(
-  'vpf.editor.controls-render-data',
-  'vpf/editor/controls-render-data/images-categories-suggestions',
-  (data) => {
-    if ('images' === data.name) {
-      const categories = [];
-
-      // find all used categories.
-      if (data.attributes.images && data.attributes.images.length) {
-        data.attributes.images.forEach((image) => {
-          if (image.categories && image.categories.length) {
-            image.categories.forEach((cat) => {
-              if (-1 === categories.indexOf(cat)) {
-                categories.push(cat);
-              }
-            });
-          }
-        });
-      }
-
-      if (
-        categories.length &&
-        data.image_controls &&
-        data.image_controls.categories &&
-        data.image_controls.categories.options
-      ) {
-        data.image_controls.categories.options = categories.map((val) => ({
-          label: val,
-          value: val,
-        }));
-      }
-    }
-
-    return data;
-  }
-);
