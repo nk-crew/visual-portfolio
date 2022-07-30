@@ -94,6 +94,10 @@ addFilter('vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-r
       case 'list_name':
       case 'stretch':
       case 'custom_css':
+      case 'items_click_action_url_target':
+      case 'items_click_action_url_rel':
+      case 'items_click_action_popup_title_source':
+      case 'items_click_action_popup_description_source':
         // no reload
         break;
       default:
