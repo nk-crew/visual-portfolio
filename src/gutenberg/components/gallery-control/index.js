@@ -394,7 +394,7 @@ const SortableList = function (props) {
       </DndContext>
 
       <MediaUpload
-        multiple
+        multiple="add"
         onSelect={(images) => {
           onChange(prepareImages(images, items));
         }}
@@ -465,7 +465,7 @@ export default function GalleryControl(props) {
           onChange(prepareImages(images));
         }}
         allowedTypes={ALLOWED_MEDIA_TYPES}
-        multiple
+        multiple="add"
         value={
           filteredValue && Object.keys(filteredValue).length
             ? filteredValue.map((img) => img.id)
