@@ -168,8 +168,6 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
                     }
 
                     update_post_meta( $post_id, $prefixed_name, $result );
-                } else {
-                    update_post_meta( $post_id, $prefixed_name, false );
                 }
             }
         }
