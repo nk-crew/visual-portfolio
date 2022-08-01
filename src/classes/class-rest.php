@@ -69,11 +69,17 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
      * @return mixed
      */
     public function get_layouts_permission() {
-        if ( ! current_user_can( 'read_posts' ) ) {
-            return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to read saved layouts data.', '@@text_domain' ), true );
+        if ( current_user_can( 'edit_posts' ) ) {
+            return true;
         }
 
-        return true;
+        foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+            if ( current_user_can( $post_type->cap->edit_posts ) ) {
+                return true;
+            }
+        }
+
+        return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get list of saved layouts.', '@@text_domain' ), true );
     }
 
     /**
@@ -112,10 +118,18 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
     /**
      * Update layout data permission.
      *
-     * @return mixed
+     * @param WP_REST_Request $request Full details about the request.
+     *
+     * @return true|WP_Error
      */
-    public function update_layout_permission() {
-        if ( ! current_user_can( 'edit_posts' ) ) {
+    public function update_layout_permission( $request ) {
+        $post_id = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
+
+        if ( ! $post_id ) {
+            return $this->error( 'post_id_required', esc_html__( 'Post ID is required for this request.', '@@text_domain' ), true );
+        }
+
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
             return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to edit saved layouts data.', '@@text_domain' ), true );
         }
 
