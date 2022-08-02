@@ -107,6 +107,8 @@ const SortableItem = function (props) {
     isSetupWizard,
   } = props;
 
+  const idx = index - 1;
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, isSorting } =
     useSortable({
       id: props.id,
@@ -163,8 +165,8 @@ const SortableItem = function (props) {
           onClick={() => {
             const newImages = [...items];
 
-            if (newImages[index - 1]) {
-              newImages.splice(index - 1, 1);
+            if (newImages[idx]) {
+              newImages.splice(idx, 1);
 
               onChange(newImages);
             }
@@ -213,9 +215,9 @@ const SortableItem = function (props) {
                     onChange={(val) => {
                       const newImages = [...items];
 
-                      if (newImages[index - 1]) {
-                        newImages[index - 1] = {
-                          ...newImages[index - 1],
+                      if (newImages[idx]) {
+                        newImages[idx] = {
+                          ...newImages[idx],
                           focalPoint: val,
                         };
 
@@ -227,11 +229,11 @@ const SortableItem = function (props) {
                     onSelect={(image) => {
                       const newImages = [...items];
 
-                      if (newImages[index - 1]) {
+                      if (newImages[idx]) {
                         const imgData = prepareImage(image);
 
-                        newImages[index - 1] = {
-                          ...newImages[index - 1],
+                        newImages[idx] = {
+                          ...newImages[idx],
                           ...imgData,
                         };
 
@@ -249,8 +251,8 @@ const SortableItem = function (props) {
                     onClick={() => {
                       const newImages = [...items];
 
-                      if (newImages[index - 1]) {
-                        newImages.splice(index - 1, 1);
+                      if (newImages[idx]) {
+                        newImages.splice(idx, 1);
 
                         onChange(newImages);
                       }
@@ -272,7 +274,7 @@ const SortableItem = function (props) {
                 const newCondition = [];
 
                 // prepare name.
-                const imgControlName = `${controlName}[${index - 1}].${name}`;
+                const imgControlName = `${controlName}[${idx}].${name}`;
 
                 // prepare conditions for the current item.
                 if (imageControls[name].condition.length) {
@@ -280,10 +282,7 @@ const SortableItem = function (props) {
                     const newData = { ...data };
 
                     if (newData.control && /SELF/g.test(newData.control)) {
-                      newData.control = newData.control.replace(
-                        /SELF/g,
-                        `${controlName}[${index - 1}]`
-                      );
+                      newData.control = newData.control.replace(/SELF/g, `${controlName}[${idx}]`);
                     }
 
                     newCondition.push(newData);
@@ -293,14 +292,14 @@ const SortableItem = function (props) {
                 return applyFilters(
                   'vpf.editor.gallery-controls-render',
                   <ControlsRender.Control
-                    key={`${img.id || img.imgThumbnailUrl || img.imgUrl}-${index - 1}-${name}`}
+                    key={`${img.id || img.imgThumbnailUrl || img.imgUrl}-${idx}-${name}`}
                     attributes={props.attributes}
                     onChange={(val) => {
                       const newImages = [...items];
 
-                      if (newImages[index - 1]) {
-                        newImages[index - 1] = {
-                          ...newImages[index - 1],
+                      if (newImages[idx]) {
+                        newImages[idx] = {
+                          ...newImages[idx],
                           [name]: val,
                         };
 
@@ -319,7 +318,7 @@ const SortableItem = function (props) {
                   {
                     name,
                     fullName: imgControlName,
-                    index: index - 1,
+                    index: idx,
                     condition: newCondition,
                   }
                 );
