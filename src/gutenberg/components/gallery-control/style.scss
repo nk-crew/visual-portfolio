@@ -114,9 +114,28 @@
     }
   }
 
-  .vpf-component-gallery-control-item-add.components-button {
+  .vpf-component-gallery-control-item-fullwidth {
     grid-column: 1 / -1;
     justify-content: center;
+  }
+
+  .vpf-component-gallery-control-item-pagination {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+
+    span {
+      font-size: 12px;
+      color: #8a8a8a;
+    }
+
+    .vpf-component-gallery-control-item-pagination-buttons {
+      display: flex;
+    }
+  }
+
+  .vpf-component-gallery-control-item-add.components-button {
     border: 1px solid $gray-900;
 
     > span {

@@ -20,7 +20,7 @@ import './extensions/image-title-and-desription';
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
+const { __, _n, sprintf } = wp.i18n;
 
 const { applyFilters } = wp.hooks;
 
@@ -349,19 +349,76 @@ const SortableList = function (props) {
   const [isOpenedInSetupWizard, setOpenOnSetupWizard] = useState(!isSetupWizard);
   const openOnSetupWizard = () => setOpenOnSetupWizard(true);
 
+  const [showingItems, setShowingItems] = useState(18);
+
   const sortableItems = [];
 
   if (items && items.length) {
     items.forEach((data, i) => {
-      sortableItems.push({
-        id: i + 1,
-        data,
-      });
+      if (i < showingItems) {
+        sortableItems.push({
+          id: i + 1,
+          data,
+        });
+      }
     });
   }
 
+  const editGalleryButton = (
+    <MediaUpload
+      multiple="add"
+      onSelect={(images) => {
+        onChange(prepareImages(images, items));
+
+        if (images && images.length > showingItems) {
+          setShowingItems(images.length);
+        }
+      }}
+      allowedTypes={ALLOWED_MEDIA_TYPES}
+      value={items && items.length ? items.map((img) => img.id) : false}
+      render={({ open }) => {
+        if (!isOpenedInSetupWizard) {
+          openOnSetupWizard();
+          open();
+        }
+
+        return (
+          <Button
+            className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-add"
+            onClick={(event) => {
+              event.stopPropagation();
+              open();
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              height="20"
+              width="20"
+              role="img"
+              aria-hidden="true"
+              focusable="false"
+            >
+              {items && items.length ? (
+                <path d="M9 14h10l-3.45-4.5-2.3 3-1.55-2Zm-1 4q-.825 0-1.412-.587Q6 16.825 6 16V4q0-.825.588-1.413Q7.175 2 8 2h12q.825 0 1.413.587Q22 3.175 22 4v12q0 .825-.587 1.413Q20.825 18 20 18Zm0-2h12V4H8v12Zm-4 6q-.825 0-1.412-.587Q2 20.825 2 20V6h2v14h14v2ZM8 4v12V4Z" />
+              ) : (
+                <path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
+              )}
+            </svg>
+            <span>
+              {items && items.length
+                ? __('Edit Gallery', '@@text_domain')
+                : __('Add Images', '@@text_domain')}
+            </span>
+          </Button>
+        );
+      }}
+    />
+  );
+
   return (
     <div className="vpf-component-gallery-control-items">
+      {items && items.length && 9 < items.length ? editGalleryButton : null}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -392,51 +449,46 @@ const SortableList = function (props) {
         </SortableContext>
       </DndContext>
 
-      <MediaUpload
-        multiple="add"
-        onSelect={(images) => {
-          onChange(prepareImages(images, items));
-        }}
-        allowedTypes={ALLOWED_MEDIA_TYPES}
-        value={items && items.length ? items.map((img) => img.id) : false}
-        render={({ open }) => {
-          if (!isOpenedInSetupWizard) {
-            openOnSetupWizard();
-            open();
-          }
-
-          return (
-            <Button
-              className="vpf-component-gallery-control-item-add"
-              onClick={(event) => {
-                event.stopPropagation();
-                open();
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                height="20"
-                width="20"
-                role="img"
-                aria-hidden="true"
-                focusable="false"
+      {items && items.length ? (
+        <span className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-pagination">
+          <span>
+            {sprintf(
+              _n(
+                'Showing %s of %s Image',
+                'Showing %s of %s Images',
+                items.length,
+                '@@text_domain'
+              ),
+              showingItems > items.length ? items.length : showingItems,
+              items.length
+            )}
+          </span>
+          {items.length > showingItems ? (
+            <div className="vpf-component-gallery-control-item-pagination-buttons">
+              <Button
+                isSecondary
+                isSmall
+                onClick={() => {
+                  setShowingItems(showingItems + 18);
+                }}
               >
-                {items && items.length ? (
-                  <path d="M9 14h10l-3.45-4.5-2.3 3-1.55-2Zm-1 4q-.825 0-1.412-.587Q6 16.825 6 16V4q0-.825.588-1.413Q7.175 2 8 2h12q.825 0 1.413.587Q22 3.175 22 4v12q0 .825-.587 1.413Q20.825 18 20 18Zm0-2h12V4H8v12Zm-4 6q-.825 0-1.412-.587Q2 20.825 2 20V6h2v14h14v2ZM8 4v12V4Z" />
-                ) : (
-                  <path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
-                )}
-              </svg>
-              <span>
-                {items && items.length
-                  ? __('Edit Gallery', '@@text_domain')
-                  : __('Add Images', '@@text_domain')}
-              </span>
-            </Button>
-          );
-        }}
-      />
+                {__('Show More', '@@text_domain')}
+              </Button>
+              <Button
+                isLink
+                isSmall
+                onClick={() => {
+                  setShowingItems(items.length);
+                }}
+              >
+                {__('Show All', '@@text_domain')}
+              </Button>
+            </div>
+          ) : null}
+        </span>
+      ) : null}
+
+      {editGalleryButton}
     </div>
   );
 };
