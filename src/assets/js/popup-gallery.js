@@ -299,6 +299,10 @@ $(document).on('extendClass.vpf', (event, VP) => {
       function (e) {
         const $this = $(this);
 
+        if (e.isDefaultPrevented()) {
+          return;
+        }
+
         if (!$this.closest('.vp-portfolio__item-wrap').find('.vp-portfolio__item-popup').length) {
           return;
         }
@@ -422,6 +426,10 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
         p > a
     `,
     function (e) {
+      if (e.isDefaultPrevented()) {
+        return;
+      }
+
       if (!this.childNodes.length) {
         return;
       }
