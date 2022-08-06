@@ -94,7 +94,37 @@
   z-index: 2;
 }
 
-// Admin toolbar.
+/*
+ * Admin Menu.
+ * We need to use additional ID `#toplevel...` because when disabled
+ * Portfolio Archive in settings, the menu ID changes.
+ */
+#menu-posts-portfolio,
+#toplevel_page_visual-portfolio-settings { // stylelint-disable-line selector-id-pattern
+  #adminmenu & ul.wp-submenu-wrap li {
+    clear: both;
+  }
+
+  li:not(:last-child) a[href^="edit-tags.php?taxonomy=portfolio_tag&post_type=portfolio"]::after,
+  li:not(:last-child) a[href^="edit.php?post_type=portfolio&page=vpf_proofing_page"]::after,
+  li:not(:last-child) a[href^="edit.php?post_type=vp_proofing"]::after {
+    display: block;
+    float: left;
+    width: calc(100% + 26px);
+    margin: 13px -15px 8px;
+    content: "";
+    border-bottom: 1px solid rgba(255, 255, 255, 10%);
+
+    @media screen and (max-width: 782px) {
+      width: calc(100% + 30px);
+      margin: 20px -20px 8px;
+    }
+  }
+}
+
+/*
+ * Admin Toolbar.
+ */
 .vpf-admin-toolbar {
   background-color: #fff;
   border-bottom: 1px solid #d7dbde;
