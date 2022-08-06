@@ -8,6 +8,46 @@
 @use "sass:string";
 @use "sass:color";
 
+$escaped-svg-characters: (
+  ("<", "%3c"),
+  (">", "%3e"),
+  ("#", "%23"),
+  ("(", "%28"),
+  (")", "%29"),
+) !default;
+
+// Replace `$search` with `$replace` in `$string`
+// Used on our SVG icon backgrounds for custom forms.
+// -
+// @author Hugo Giraudel
+// @param {String} $string - Initial string
+// @param {String} $search - Substring to replace
+// @param {String} $replace ('') - New value
+// @return {String} - Updated string
+@function str-replace($string, $search, $replace: "") {
+  $index: string.index($string, $search);
+
+  @if $index {
+    @return string.slice($string, 1, $index - 1) + $replace + str-replace(string.slice($string, $index + string.length($search)), $search, $replace);
+  }
+
+  @return $string;
+}
+
+// See https://codepen.io/kevinweber/pen/dXWoRw
+// -
+// Requires the use of quotes around data URIs.
+
+@function escape-svg($string) {
+  @if string.index($string, "data:image/svg+xml") {
+    @each $char, $encoded in $escaped-svg-characters {
+      $string: str-replace($string, $char, $encoded);
+    }
+  }
+
+  @return $string;
+}
+
 /*
  * Go Pro menu link
  */
@@ -342,21 +382,13 @@ $grid_sm: 600px !default;
     top: 50%;
     left: 50%;
     display: block;
-    width: 20px;
-    height: 20px;
-    margin-top: -10px;
-    margin-left: -10px;
-    /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-    font-family: dashicons;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 1;
-    text-align: center;
-    text-decoration: inherit;
-    content: "\f128";
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    width: 18px;
+    height: 18px;
+    margin-top: -9px;
+    margin-left: -9px;
+    content: "";
+    background-image: url("#{escape-svg('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="1.25" stroke="#a2a2a2" stroke-width="1.5"/><path d="M1 15.5L6 12L10 14L14.5 10L19 13" stroke="#a2a2a2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>')}");
+    background-size: cover;
   }
 }
 
@@ -907,46 +939,6 @@ $pro_note_border_size: 2px;
 /**
  * Welcome Screen.
  */
-$escaped-svg-characters: (
-  ("<", "%3c"),
-  (">", "%3e"),
-  ("#", "%23"),
-  ("(", "%28"),
-  (")", "%29"),
-) !default;
-
-// Replace `$search` with `$replace` in `$string`
-// Used on our SVG icon backgrounds for custom forms.
-// -
-// @author Hugo Giraudel
-// @param {String} $string - Initial string
-// @param {String} $search - Substring to replace
-// @param {String} $replace ('') - New value
-// @return {String} - Updated string
-@function str-replace($string, $search, $replace: "") {
-  $index: string.index($string, $search);
-
-  @if $index {
-    @return string.slice($string, 1, $index - 1) + $replace + str-replace(string.slice($string, $index + string.length($search)), $search, $replace);
-  }
-
-  @return $string;
-}
-
-// See https://codepen.io/kevinweber/pen/dXWoRw
-// -
-// Requires the use of quotes around data URIs.
-
-@function escape-svg($string) {
-  @if string.index($string, "data:image/svg+xml") {
-    @each $char, $encoded in $escaped-svg-characters {
-      $string: str-replace($string, $char, $encoded);
-    }
-  }
-
-  @return $string;
-}
-
 .portfolio_page_visual-portfolio-welcome,
 .toplevel_page_visual-portfolio-welcome {
   background-color: #fff;
