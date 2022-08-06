@@ -223,57 +223,6 @@ $escaped-svg-characters: (
 }
 
 /**
- * Grid
- */
-$grid_gap: 15px !default;
-$grid_sm: 600px !default;
-
-.vp-row {
-  box-sizing: border-box;
-  display: flex;
-  flex: 0 1 auto;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-right: -$grid_gap;
-  margin-left: -$grid_gap;
-}
-
-.vp-col-1,
-.vp-col-2,
-.vp-col-3,
-.vp-col-4,
-.vp-col-5,
-.vp-col-6,
-.vp-col-7,
-.vp-col-8,
-.vp-col-9,
-.vp-col-10,
-.vp-col-11,
-.vp-col-12 {
-  box-sizing: border-box;
-  flex: 0 0 auto;
-  padding-right: $grid_gap;
-  padding-left: $grid_gap;
-  // margin-bottom: $grid_gap * 2;
-}
-
-@for $i from 1 through 12 {
-  .vp-col-#{$i} {
-    flex-basis: math.div(100% * $i, 12);
-    max-width: math.div(100% * $i, 12);
-  }
-}
-
-.vp-col-clearfix {
-  flex-basis: 100%;
-  max-width: 100%;
-
-  .vp-control-html {
-    margin-bottom: 0;
-  }
-}
-
-/**
  * oEmbed preview
  */
 .vp-oembed-preview {
