@@ -199,6 +199,7 @@ class Visual_Portfolio_Gutenberg_Block {
                 'nonce'               => wp_create_nonce( 'vp-ajax-nonce' ),
                 'plugin_name'         => visual_portfolio()->plugin_name,
                 'plugin_url'          => visual_portfolio()->plugin_url,
+                'admin_url'           => get_admin_url(),
                 'controls'            => Visual_Portfolio_Controls::get_registered_array(),
                 'controls_categories' => Visual_Portfolio_Controls::get_registered_categories(),
             )

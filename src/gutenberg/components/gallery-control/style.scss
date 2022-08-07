@@ -155,8 +155,41 @@
 .vpf-component-gallery-control-item-modal {
   max-width: 540px;
 
-  .editor-post-featured-image {
+  .vpf-component-gallery-control-item-modal-image-info {
     margin-bottom: 30px;
+
+    img {
+      max-height: 150px;
+    }
+  }
+
+  .vpf-component-gallery-control-item-modal-image-additional-info {
+    margin-top: 30px;
+
+    > .components-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 10px;
+      color: #7d7d7d;
+      text-decoration: none;
+      background-color: #ebebeb;
+
+      svg {
+        width: 13px;
+        margin-left: 10px;
+      }
+    }
+
+    > div {
+      margin-top: 20px;
+    }
+
+    .vpf-component-gallery-control-item-modal-image-additional-info-copied {
+      margin-left: 10px;
+      color: #15b11d;
+    }
   }
 
   @media screen and (min-width: 600px) {
@@ -164,15 +197,23 @@
     gap: 30px;
     align-items: flex-start;
 
-    > div {
+    .vpf-component-gallery-control-item-modal-image-info {
       position: sticky;
       top: 30px;
       flex: 1;
+      width: 230px;
       margin-bottom: 0;
 
       + div {
         width: 280px;
       }
+    }
+
+    .vpf-component-gallery-control-item-modal-image-info-sticky-bottom {
+      position: sticky;
+      top: auto;
+      bottom: 30px;
+      margin-top: auto;
     }
   }
 }

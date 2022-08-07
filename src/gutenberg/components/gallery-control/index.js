@@ -24,13 +24,22 @@ const { __, _n, sprintf } = wp.i18n;
 
 const { applyFilters } = wp.hooks;
 
+const { useSelect } = wp.data;
+
 const { Fragment, useState } = wp.element;
 
-const { Button, Modal, FocalPointPicker } = wp.components;
+const { TextControl, Button, Modal, FocalPointPicker } = wp.components;
 
 const { MediaUpload, MediaUploadCheck } = wp.blockEditor;
 
+const { VPGutenbergVariables } = window;
+
 const ALLOWED_MEDIA_TYPES = ['image'];
+
+function getHumanFileSize(size) {
+  const i = Math.floor(Math.log(size) / Math.log(1024));
+  return `${(size / 1024 ** i).toFixed(2) * 1} ${['B', 'KB', 'MB', 'GB', 'TB'][i]}`;
+}
 
 function prepareImage(img) {
   const imgData = {
@@ -93,6 +102,166 @@ function prepareImages(images, currentImages) {
 
   return result;
 }
+
+const SelectedImageData = function (props) {
+  const { showFocalPoint, focalPoint, imgId, imgUrl, onChangeFocalPoint, onChangeImage } = props;
+
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const { imageData } = useSelect(
+    (select) => {
+      const { getMedia } = select('core');
+
+      if (!imgId) {
+        return {};
+      }
+
+      const imgData = getMedia(imgId);
+
+      if (!imgData) {
+        return {};
+      }
+
+      return {
+        imageData: imgData,
+      };
+    },
+    [showMoreInfo, imgId]
+  );
+
+  return (
+    <MediaUploadCheck>
+      <div
+        className={`vpf-component-gallery-control-item-modal-image-info editor-post-featured-image ${
+          showMoreInfo ? 'vpf-component-gallery-control-item-modal-image-info-sticky-bottom' : ''
+        }`}
+      >
+        {showFocalPoint ? (
+          <FocalPointPicker
+            url={imageData?.source_url || imgUrl}
+            value={focalPoint}
+            dimensions={{
+              width: imageData?.media_details?.width || 80,
+              height: imageData?.media_details?.height || 80,
+            }}
+            onChange={(val) => {
+              onChangeFocalPoint(val);
+            }}
+          />
+        ) : null}
+        <MediaUpload
+          onSelect={(image) => {
+            const imgData = prepareImage(image);
+            onChangeImage(imgData);
+          }}
+          allowedTypes={ALLOWED_MEDIA_TYPES}
+          render={({ open }) => (
+            <Button onClick={open} isSecondary>
+              {__('Replace Image', '@@text_domain')}
+            </Button>
+          )}
+        />
+        <Button
+          onClick={() => {
+            onChangeImage(false);
+          }}
+          isLink
+          isDestructive
+        >
+          {__('Remove Image from Gallery', '@@text_domain')}
+        </Button>
+        <div className="vpf-component-gallery-control-item-modal-image-additional-info">
+          <Button
+            onClick={() => {
+              setShowMoreInfo(!showMoreInfo);
+            }}
+            isLink
+          >
+            {showMoreInfo
+              ? __('Hide Additional Info', '@@text_domain')
+              : __('Show Additional Info', '@@text_domain')}
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 4L14 10L8 16"
+                stroke="currentColor"
+                fill="none"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                transform={`rotate(${showMoreInfo ? '-' : ''}90 10 10)`}
+              />
+            </svg>
+          </Button>
+          {showMoreInfo ? (
+            <Fragment>
+              <div>
+                <strong>{__('File name:', '@@text_domain')}</strong>{' '}
+                {imageData?.source_url.split('/').pop() || '-'}
+                <br /> <strong>{__('File type:', '@@text_domain')}</strong>{' '}
+                {imageData?.mime_type || '-'}
+                <br /> <strong>{__('File size:', '@text_domain')}</strong>{' '}
+                {imageData?.media_details?.filesize
+                  ? getHumanFileSize(imageData.media_details.filesize)
+                  : '-'}
+                {imageData?.media_details?.width ? (
+                  <Fragment>
+                    <br /> <strong>{__('Dimensions:', '@text_domain')}</strong>{' '}
+                    {imageData.media_details.width} by {imageData.media_details.height} pixels
+                  </Fragment>
+                ) : null}
+              </div>
+              <div>
+                <TextControl
+                  label={__('File URL:', '@@text_domain')}
+                  value={imageData?.source_url || ''}
+                  readOnly
+                />
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(imageData?.source_url || '').then(() => {
+                      setLinkCopied(true);
+                    });
+                  }}
+                  isSecondary
+                  isSmall
+                >
+                  {__('Copy URL to Clipboard', '@@text_domain')}
+                </Button>
+                {linkCopied ? (
+                  <span className="vpf-component-gallery-control-item-modal-image-additional-info-copied">
+                    {__('Copied!', '@@text_domain')}
+                  </span>
+                ) : null}
+              </div>
+              {imageData?.link ? (
+                <div>
+                  <a href={imageData?.link} target="_blank" rel="noreferrer">
+                    {__('View attachment page', '@@text_domain')}
+                  </a>
+                  {' | '}
+                  <a
+                    href={`${VPGutenbergVariables.admin_url}post.php?post=${imageData.id}&action=edit`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {__('Edit more details', '@@text_domain')}
+                  </a>
+                </div>
+              ) : null}
+            </Fragment>
+          ) : null}
+        </div>
+      </div>
+    </MediaUploadCheck>
+  );
+};
 
 const SortableItem = function (props) {
   const {
@@ -207,65 +376,46 @@ const SortableItem = function (props) {
         >
           <div className="vpf-component-gallery-control-item-modal">
             {focalPoint && img.id ? (
-              <MediaUploadCheck>
-                <div className="editor-post-featured-image">
-                  <FocalPointPicker
-                    url={img.imgThumbnailUrl || img.imgUrl}
-                    value={img.focalPoint}
-                    onChange={(val) => {
-                      const newImages = [...items];
+              <SelectedImageData
+                showFocalPoint={focalPoint}
+                focalPoint={img.focalPoint}
+                imgId={img.id}
+                imgUrl={img.imgThumbnailUrl || img.imgUrl}
+                onChangeFocalPoint={(val) => {
+                  const newImages = [...items];
 
-                      if (newImages[idx]) {
-                        newImages[idx] = {
-                          ...newImages[idx],
-                          focalPoint: val,
-                        };
+                  if (newImages[idx]) {
+                    newImages[idx] = {
+                      ...newImages[idx],
+                      focalPoint: val,
+                    };
 
-                        onChange(newImages);
-                      }
-                    }}
-                  />
-                  <MediaUpload
-                    onSelect={(image) => {
-                      const newImages = [...items];
+                    onChange(newImages);
+                  }
+                }}
+                onChangeImage={(imgData) => {
+                  const newImages = [...items];
 
-                      if (newImages[idx]) {
-                        const imgData = prepareImage(image);
+                  if (!newImages[idx]) {
+                    return;
+                  }
 
-                        newImages[idx] = {
-                          ...newImages[idx],
-                          ...imgData,
-                        };
+                  if (false === imgData) {
+                    newImages.splice(idx, 1);
 
-                        onChange(newImages);
-                      }
-                    }}
-                    allowedTypes={ALLOWED_MEDIA_TYPES}
-                    render={({ open }) => (
-                      <Button onClick={open} isSecondary>
-                        {__('Replace Image', '@@text_domain')}
-                      </Button>
-                    )}
-                  />
-                  <Button
-                    onClick={() => {
-                      const newImages = [...items];
+                    onChange(newImages);
 
-                      if (newImages[idx]) {
-                        newImages.splice(idx, 1);
+                    closeModal();
+                  } else {
+                    newImages[idx] = {
+                      ...newImages[idx],
+                      ...imgData,
+                    };
 
-                        onChange(newImages);
-                      }
-
-                      closeModal();
-                    }}
-                    isLink
-                    isDestructive
-                  >
-                    {__('Remove Image', '@@text_domain')}
-                  </Button>
-                </div>
-              </MediaUploadCheck>
+                    onChange(newImages);
+                  }
+                }}
+              />
             ) : (
               ''
             )}
