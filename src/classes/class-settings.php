@@ -310,7 +310,7 @@ class Visual_Portfolio_Settings {
                     'placeholder' => (string) $default_breakpoints['xl'],
                     'default'     => (float) $default_breakpoints['xl'],
                     // translators: %1$s - default breakpoint.
-                    'desc'        => sprintf( wp_kses_post( __( 'Sets the breakpoint on extra large screen sizes (Default: %1$spx).', '@@text_domain' ) ), $default_breakpoints['xl'] ),
+                    'desc'        => sprintf( esc_html__( 'Sets the breakpoint on extra large screen sizes (Default: %1$spx).', '@@text_domain' ), $default_breakpoints['xl'] ),
                     'is_pro'      => true,
                 ),
                 array(
@@ -322,7 +322,7 @@ class Visual_Portfolio_Settings {
                     'placeholder' => (string) $default_breakpoints['lg'],
                     'default'     => (float) $default_breakpoints['lg'],
                     // translators: %1$s - default breakpoint.
-                    'desc'        => sprintf( wp_kses_post( __( 'Sets the breakpoint on large screen sizes (Default: %1$spx).', '@@text_domain' ) ), $default_breakpoints['lg'] ),
+                    'desc'        => sprintf( esc_html__( 'Sets the breakpoint on large screen sizes (Default: %1$spx).', '@@text_domain' ), $default_breakpoints['lg'] ),
                     'is_pro'      => true,
                 ),
                 array(
@@ -334,7 +334,7 @@ class Visual_Portfolio_Settings {
                     'placeholder' => (string) $default_breakpoints['md'],
                     'default'     => (float) $default_breakpoints['md'],
                     // translators: %1$s - default breakpoint.
-                    'desc'        => sprintf( wp_kses_post( __( 'Sets the breakpoint on medium screen sizes (Default: %1$spx).', '@@text_domain' ) ), $default_breakpoints['md'] ),
+                    'desc'        => sprintf( esc_html__( 'Sets the breakpoint on medium screen sizes (Default: %1$spx).', '@@text_domain' ), $default_breakpoints['md'] ),
                     'is_pro'      => true,
                 ),
                 array(
@@ -346,7 +346,7 @@ class Visual_Portfolio_Settings {
                     'placeholder' => (string) $default_breakpoints['sm'],
                     'default'     => (float) $default_breakpoints['sm'],
                     // translators: %1$s - default breakpoint.
-                    'desc'        => sprintf( wp_kses_post( __( 'Sets the breakpoint on small screen sizes (Default: %1$spx).', '@@text_domain' ) ), $default_breakpoints['sm'] ),
+                    'desc'        => sprintf( esc_html__( 'Sets the breakpoint on small screen sizes (Default: %1$spx).', '@@text_domain' ), $default_breakpoints['sm'] ),
                     'is_pro'      => true,
                 ),
                 array(
@@ -358,7 +358,7 @@ class Visual_Portfolio_Settings {
                     'placeholder' => (string) $default_breakpoints['xs'],
                     'default'     => (float) $default_breakpoints['xs'],
                     // translators: %1$s - default breakpoint.
-                    'desc'        => sprintf( wp_kses_post( __( 'Sets the breakpoint on extra small screen sizes (Default: %1$spx).', '@@text_domain' ) ), $default_breakpoints['xs'] ),
+                    'desc'        => sprintf( esc_html__( 'Sets the breakpoint on extra small screen sizes (Default: %1$spx).', '@@text_domain' ), $default_breakpoints['xs'] ),
                     'is_pro'      => true,
                 ),
             ),
@@ -375,6 +375,20 @@ class Visual_Portfolio_Settings {
                         // translators: %s - plugin brand name.
                         'vp'   => sprintf( esc_html__( '%s Only', '@@text_domain' ), visual_portfolio()->plugin_name ),
                         'full' => esc_html__( 'All images', '@@text_domain' ),
+                    ),
+                ),
+                array(
+                    'name'        => 'lazy_loading_excludes',
+                    'label'       => esc_html__( 'Lazy Loading Excludes', '@@text_domain' ),
+                    // translators: %s - doc url.
+                    // translators: %s - link text.
+                    'desc'        => sprintf( __( 'Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href="%1$s">%2$s</a>', '@@text_domain' ), 'https://visualportfolio.co/docs/settings/images/', esc_html__( 'More info', '@@text_domain' ) ),
+                    'type'        => 'textarea',
+                    'placeholder' => "image-example.webp\nslider-image-classname",
+                    'condition'   => array(
+                        array(
+                            'control'  => '[name="vp_images[lazy_loading]"]',
+                        ),
                     ),
                 ),
 

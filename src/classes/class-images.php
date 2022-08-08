@@ -35,6 +35,13 @@ class Visual_Portfolio_Images {
     public static $allow_wp_lazyload = false;
 
     /**
+     * The list of exclusions from the plugin settings.
+     *
+     * @var array
+     */
+    public static $lazyload_user_exclusions = array();
+
+    /**
      * Visual_Portfolio_Images constructor.
      */
     public static function construct() {
@@ -110,6 +117,13 @@ class Visual_Portfolio_Images {
         // Check for plugin settings.
         if ( ! self::$allow_vp_lazyload && ! self::$allow_wp_lazyload ) {
             return;
+        }
+
+        $lazyload_exclusions = Visual_Portfolio_Settings::get_option( 'lazy_loading_excludes', 'vp_images' );
+        if ( $lazyload_exclusions ) {
+            self::$lazyload_user_exclusions = explode( "\n", $lazyload_exclusions );
+
+            add_filter( 'vpf_lazyload_skip_image_with_attributes', 'Visual_Portfolio_Images::add_lazyload_exclusions', 10, 2 );
         }
 
         if ( self::$allow_wp_lazyload ) {
@@ -250,6 +264,7 @@ class Visual_Portfolio_Images {
                 'lazyload',
                 'lazy-load',
                 'skip-lazy',
+                'no-lazy',
                 'gazette-featured-content-thumbnail',
             );
 
@@ -258,13 +273,32 @@ class Visual_Portfolio_Images {
              */
             $blocked_classes = apply_filters( 'vpf_lazyload_images_blocked_classes', $blocked_classes );
 
-            if ( ! is_array( $blocked_classes ) || empty( $blocked_classes ) ) {
-                return false;
+            if ( is_array( $blocked_classes ) && ! empty( $blocked_classes ) ) {
+                foreach ( $blocked_classes as $class ) {
+                    if ( false !== strpos( $attributes['class'], $class ) ) {
+                        return true;
+                    }
+                }
             }
+        }
 
-            foreach ( $blocked_classes as $class ) {
-                if ( false !== strpos( $attributes['class'], $class ) ) {
-                    return true;
+        // Check for blocked src.
+        if ( ! empty( $attributes['src'] ) ) {
+            $blocked_src = array(
+                '/wpcf7_captcha/',
+                'timthumb.php?src',
+            );
+
+            /**
+             * Allow plugins and themes to tell lazy images to skip an image with a given class.
+             */
+            $blocked_src = apply_filters( 'vpf_lazyload_images_blocked_src', $blocked_src );
+
+            if ( is_array( $blocked_src ) && ! empty( $blocked_src ) ) {
+                foreach ( $blocked_src as $src ) {
+                    if ( false !== strpos( $attributes['src'], $src ) ) {
+                        return true;
+                    }
                 }
             }
         }
@@ -276,7 +310,12 @@ class Visual_Portfolio_Images {
             'data-srcset',
             'data-lazy-original',
             'data-lazy-src',
+            'data-lazysrc',
             'data-lazyload',
+            'data-bgposition',
+            'data-envira-src',
+            'fullurl',
+            'lazy-slider-img',
         );
 
         /**
@@ -308,6 +347,33 @@ class Visual_Portfolio_Images {
         }
 
         return false;
+    }
+
+    /**
+     * Skip lazy loading using exclusion settings.
+     *
+     * @param Boolean $return - default return value.
+     * @param Array   $attributes - image attributes.
+     *
+     * @return Boolean
+     */
+    public static function add_lazyload_exclusions( $return, $attributes ) {
+        if ( ! empty( self::$lazyload_user_exclusions ) && ! empty( $attributes ) ) {
+            $full_attributes_string = '';
+
+            foreach ( $attributes as $k => $attr ) {
+                $full_attributes_string .= ' ' . $k . '="' . $attr . '"';
+            }
+
+            foreach ( self::$lazyload_user_exclusions as $exclusion ) {
+                if ( $exclusion && false !== strpos( $full_attributes_string, $exclusion ) ) {
+                    // `true` means - exclude this image from lazy loading.
+                    return true;
+                }
+            }
+        }
+
+        return $return;
     }
 
     /**
