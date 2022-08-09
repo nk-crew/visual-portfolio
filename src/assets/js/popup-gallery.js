@@ -187,7 +187,7 @@ const VPPopupAPI = {
     let videoData;
 
     // Find all gallery items
-    // Prevent Swiper slider duplicates.
+    // Skip Swiper slider duplicates.
     // Previously we also used the `:not(.swiper-slide-duplicate-active)`, but it contains a valid first slide.
     $gallery.find('.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)').each(function () {
       $meta = $(this).find('.vp-portfolio__item-popup');
@@ -313,8 +313,8 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
         e.preventDefault();
 
-        // Find all gallery items
-        // Prevent Swiper slider duplicates.
+        // Get gallery item index.
+        // Use Swiper data-attribute to support slide duplicates.
         if ($itemWrap.attr('data-swiper-slide-index')) {
           index = parseInt($itemWrap.attr('data-swiper-slide-index'), 10);
         } else {
