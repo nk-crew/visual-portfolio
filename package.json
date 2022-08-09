@@ -62,7 +62,7 @@
     "react-sortable-hoc": "^2.0.0",
     "shorthash": "0.0.2",
     "simplebar": "^5.3.6",
-    "swiper": "^6.8.4",
+    "swiper": "^8.3.2",
     "throttle-debounce": "^3.0.1"
   }
 }

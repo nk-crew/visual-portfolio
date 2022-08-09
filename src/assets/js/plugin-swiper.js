@@ -10,6 +10,27 @@ const $ = window.jQuery;
 
 const { screenSizes } = window.VPData;
 
+function getSwiperVersion(Swiper) {
+  let ver = 8;
+
+  // in version 8 added new parameter `maxBackfaceHiddenSlides`.
+  if ('undefined' === typeof Swiper.defaults.maxBackfaceHiddenSlides) {
+    ver = 7;
+  }
+
+  // in version 7 added new parameter `rewind`.
+  if ('undefined' === typeof Swiper.defaults.rewind) {
+    ver = 6;
+  }
+
+  // in version 6 added new parameter `loopPreventsSlide`.
+  if ('undefined' === typeof Swiper.defaults.loopPreventsSlide) {
+    ver = 5;
+  }
+
+  return ver;
+}
+
 // Extend VP class.
 $(document).on('extendClass.vpf', (event, VP) => {
   if ('vpf' !== event.namespace) {
@@ -27,7 +48,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
     if ('slider' === self.options.layout && 'undefined' !== typeof window.Swiper) {
       const $parent = self.$items_wrap.parent();
 
-      $parent.addClass('swiper-container');
+      $parent.addClass('swiper');
       self.$items_wrap.addClass('swiper-wrapper');
       self.$items_wrap.children().addClass('swiper-slide');
 
@@ -55,15 +76,23 @@ $(document).on('extendClass.vpf', (event, VP) => {
         slidesPerView = count || 1;
       }
 
+      let optionsThumbs = false;
+      let $thumbsParent = false;
       options = options || {
         speed: (parseFloat(self.options.sliderSpeed) || 0) * 1000,
         autoHeight: 'auto' === self.options.sliderItemsHeight,
         effect: self.options.sliderEffect || 'slide',
         spaceBetween: parseFloat(self.options.itemsGap) || 0,
         centeredSlides: 'true' === self.options.sliderCenteredSlides,
-        freeMode: 'true' === self.options.sliderFreeMode,
-        freeModeSticky: 'true' === self.options.sliderFreeModeSticky,
+        freeMode: {
+          enabled: 'true' === self.options.sliderFreeMode,
+          sticky: 'true' === self.options.sliderFreeModeSticky,
+        },
         loop: 'true' === self.options.sliderLoop,
+        // This feature is cool, but not working properly when loop enabled
+        // and fast clicking on previous button is not working properly
+        // https://github.com/nolimits4web/swiper/issues/5945
+        // loopPreventsSlide: false,
         autoplay: 0 < parseFloat(self.options.sliderAutoplay) && {
           delay: parseFloat(self.options.sliderAutoplay) * 1000,
           disableOnInteraction: false,
@@ -85,11 +114,12 @@ $(document).on('extendClass.vpf', (event, VP) => {
         mousewheel: 'true' === self.options.sliderMousewheel,
         slidesPerView,
         breakpoints: breakPoints,
-        // Since Swiper 5.0 this option is removed and it is `true` by default, but in older versions it was `false`.
-        // So we need to keep it as a fallback.
-        breakpointsInverse: true,
         keyboard: true,
         grabCursor: true,
+        preloadImages: false,
+
+        // fixes text selection when swipe in the items gap.
+        touchEventsTarget: 'container',
       };
 
       // fix fade items collapse (mostly in Default items style).
@@ -132,9 +162,9 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
       // thumbnails.
       if (self.$slider_thumbnails_wrap.length) {
-        const $thumbsParent = self.$slider_thumbnails_wrap.parent();
+        $thumbsParent = self.$slider_thumbnails_wrap.parent();
 
-        $thumbsParent.addClass('swiper-container');
+        $thumbsParent.addClass('swiper');
         self.$slider_thumbnails_wrap.addClass('swiper-wrapper');
         self.$slider_thumbnails_wrap.children().addClass('swiper-slide');
 
@@ -158,23 +188,30 @@ $(document).on('extendClass.vpf', (event, VP) => {
           thumbnailsPerView = count || 1;
         }
 
-        const swiperThumbs = new window.Swiper($thumbsParent[0], {
+        optionsThumbs = {
           autoHeight: 'auto' === self.options.sliderThumbnailsHeight,
           effect: 'slide',
           spaceBetween: parseFloat(self.options.sliderThumbnailsGap) || 0,
           loop: false,
-          freeMode: true,
-          freeModeSticky: true,
+          // This feature is cool, but not working properly when loop enabled
+          // and fast clicking on previous button is not working properly
+          // https://github.com/nolimits4web/swiper/issues/5945
+          // loopPreventsSlide: false,
+          freeMode: {
+            enabled: true,
+            sticky: true,
+          },
           loopedSlides: 5,
           slidesPerView: thumbnailsPerView,
           breakpoints: thumbnailsBreakPoints,
-          // Since Swiper 5.0 this option is removed and it is `true` by default, but in older versions it was `false`.
-          // So we need to keep it as a fallback.
-          breakpointsInverse: true,
           keyboard: true,
           grabCursor: true,
           watchSlidesVisibility: true,
           watchSlidesProgress: true,
+          preloadImages: false,
+
+          // fixed text selection when swipe in the items gap.
+          touchEventsTarget: 'container',
           on: {
             // These events used to add fixes for
             // conflict with custom cursor movement.
@@ -188,25 +225,63 @@ $(document).on('extendClass.vpf', (event, VP) => {
               self.emitEvent('swiperTouchEnd', [swiper, e]);
             },
           },
-        });
+        };
+      }
+
+      // Fallbacks for old Swiper versions.
+      (() => {
+        const swiperVersion = getSwiperVersion(window.Swiper);
+        const isThumbsEnabled = optionsThumbs && $thumbsParent && $thumbsParent[0];
+
+        // Since v7 used container class `swiper`, we should also add old `swiper-container` class.
+        if (7 > swiperVersion) {
+          $parent.addClass('swiper-container');
+
+          if (isThumbsEnabled) {
+            $thumbsParent.addClass('swiper-container');
+          }
+        }
+
+        // Since v7 freeMode options moved under `freeMode` object.
+        if (7 > swiperVersion) {
+          options.freeModeSticky = options.freeMode.sticky;
+          options.freeMode = options.freeMode.enabled;
+
+          if (isThumbsEnabled) {
+            optionsThumbs.freeModeSticky = optionsThumbs.freeMode.sticky;
+            optionsThumbs.freeMode = optionsThumbs.freeMode.enabled;
+          }
+        }
+
+        // Since v5 `breakpointsInverse` option is removed and it is now `true` by default, but in older versions it was `false`.
+        if (5 <= swiperVersion) {
+          options.breakpointsInverse = true;
+
+          if (isThumbsEnabled) {
+            optionsThumbs.breakpointsInverse = true;
+          }
+        }
+      })();
+
+      // Init Swiper.
+      if (optionsThumbs && $thumbsParent && $thumbsParent[0]) {
+        const swiperThumbs = new window.Swiper($thumbsParent[0], optionsThumbs);
 
         options.thumbs = {
           swiper: swiperThumbs,
         };
       }
-
-      // init swiper.
       const instance = new window.Swiper($parent[0], options);
 
-      // autoplay hover pause.
+      // Autoplay Hover Pause.
       if (
         'true' === self.options.sliderAutoplayHoverPause &&
         0 < parseFloat(self.options.sliderAutoplay)
       ) {
-        self.$item.on(`mouseenter.vpf-uid-${self.uid}`, '.swiper-container', () => {
+        self.$item.on(`mouseenter.vpf-uid-${self.uid}`, '.swiper', () => {
           $parent[0].swiper.autoplay.stop();
         });
-        self.$item.on(`mouseleave.vpf-uid-${self.uid}`, '.swiper-container', () => {
+        self.$item.on(`mouseleave.vpf-uid-${self.uid}`, '.swiper', () => {
           $parent[0].swiper.autoplay.start();
         });
       }
@@ -234,7 +309,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
     if (ThumbsSwiper) {
       ThumbsSwiper.destroy();
 
-      $thumbsParent.removeClass('swiper-container');
+      $thumbsParent.removeClass('swiper');
       self.$slider_thumbnails_wrap.removeClass('swiper-wrapper');
       self.$slider_thumbnails_wrap.children().removeClass('swiper-slide');
 
@@ -245,7 +320,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
     if (SliderSwiper) {
       SliderSwiper.destroy();
 
-      $parent.removeClass('swiper-container');
+      $parent.removeClass('swiper');
       self.$items_wrap.removeClass('swiper-wrapper');
       self.$items_wrap.children().removeClass('swiper-slide');
 
