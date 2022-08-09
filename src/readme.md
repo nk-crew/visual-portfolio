@@ -321,6 +321,26 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.19.0 =
+
+* added stricter permission check for rest route `update_layout`
+* allow to call rest route `get_layouts` to all users, who can edit posts
+* added settings to exclude images from lazy loading by attribute <https://visualportfolio.co/docs/settings/images/>
+* improved Gallery images selection - you can now select images without holding Ctrl/Shift keys
+* improved Gallery control - added pagination to prevent overwhelming block settings
+* improved Gallery control - added additional info to selected image popup (such as source file URL, file size, etc...)
+* improved Visual Portfolio admin menu styles by adding dividers
+* updated Swiper to the latest version 8.3.2
+* fixed popup gallery open if default prevented already (fixed conflict with slider Free Scroll)
+* fixed conflict with Cloudflare's Rocket Loader in block iframe preview
+* fixed Slider text selection when trying to drag in the gap
+* fixed Slider displaying images in a row before Swiper init
+* fixed wrong popup gallery items parsing when Slider layout used
+* fixed images little "blink" effect when swipe Slider to the left
+* fixed Saved Layouts editor block control 'NaN' value when select an empty value
+* fixed Saved Layouts API reset meta data if you don't provided all available attributes in your request
+* minor changes
+
 = 2.18.0 =
 
 * added possibility to change items count on Portfolio archive page in the plugin settings
