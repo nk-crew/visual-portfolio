@@ -188,83 +188,80 @@ const VPPopupAPI = {
 
     // Find all gallery items
     // Prevent Swiper slider duplicates.
-    $gallery
-      .find(
-        '.vp-portfolio__item-wrap:not(.swiper-slide-duplicate):not(.swiper-slide-duplicate-active)'
-      )
-      .each(function () {
-        $meta = $(this).find('.vp-portfolio__item-popup');
+    // Previously we also used the `:not(.swiper-slide-duplicate-active)`, but it contains a valid first slide.
+    $gallery.find('.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)').each(function () {
+      $meta = $(this).find('.vp-portfolio__item-popup');
 
-        if ($meta && $meta.length) {
-          size = ($meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
-          video = $meta.attr('data-vp-popup-video');
-          videoData = false;
+      if ($meta && $meta.length) {
+        size = ($meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
+        video = $meta.attr('data-vp-popup-video');
+        videoData = false;
 
-          if (video) {
-            videoData = VPPopupAPI.parseVideo(video, $meta.attr('data-vp-popup-poster'));
-          }
-
-          if (videoData) {
-            item = {
-              type: 'embed',
-              el: this,
-              poster: videoData.poster,
-              src: videoData.embedUrl,
-              embed: videoData.embed,
-              width: videoData.width || 1920,
-              height: videoData.height || 1080,
-            };
-          } else {
-            // create slide object
-            item = {
-              type: 'image',
-              el: this,
-              src: $meta.attr('data-vp-popup-img'),
-              srcset: $meta.attr('data-vp-popup-img-srcset'),
-              width: parseInt(size[0], 10),
-              height: parseInt(size[1], 10),
-            };
-
-            const srcSmall = $meta.attr('data-vp-popup-sm-img') || item.src;
-            if (srcSmall) {
-              const smallSize = (
-                $meta.attr('data-vp-popup-sm-img-size') ||
-                $meta.attr('data-vp-popup-img-size') ||
-                '1920x1080'
-              ).split('x');
-
-              item.srcSmall = srcSmall;
-              item.srcSmallWidth = parseInt(smallSize[0], 10);
-              item.srcSmallHeight = parseInt(smallSize[1], 10);
-            }
-
-            const srcMedium = $meta.attr('data-vp-popup-md-img') || item.src;
-            if (srcMedium) {
-              const mediumSize = (
-                $meta.attr('data-vp-popup-md-img-size') ||
-                $meta.attr('data-vp-popup-img-size') ||
-                '1920x1080'
-              ).split('x');
-
-              item.srcMedium = srcMedium;
-              item.srcMediumWidth = parseInt(mediumSize[0], 10);
-              item.srcMediumHeight = parseInt(mediumSize[1], 10);
-            }
-
-            const $captionTitle = $meta.children('.vp-portfolio__item-popup-title').get(0);
-            const $captionDescription = $meta
-              .children('.vp-portfolio__item-popup-description')
-              .get(0);
-            if ($captionTitle || $captionDescription) {
-              item.caption =
-                ($captionTitle ? $captionTitle.outerHTML : '') +
-                ($captionDescription ? $captionDescription.outerHTML : '');
-            }
-          }
-
-          items.push(item);
+        if (video) {
+          videoData = VPPopupAPI.parseVideo(video, $meta.attr('data-vp-popup-poster'));
         }
-      });
+
+        if (videoData) {
+          item = {
+            type: 'embed',
+            el: this,
+            poster: videoData.poster,
+            src: videoData.embedUrl,
+            embed: videoData.embed,
+            width: videoData.width || 1920,
+            height: videoData.height || 1080,
+          };
+        } else {
+          // create slide object
+          item = {
+            type: 'image',
+            el: this,
+            src: $meta.attr('data-vp-popup-img'),
+            srcset: $meta.attr('data-vp-popup-img-srcset'),
+            width: parseInt(size[0], 10),
+            height: parseInt(size[1], 10),
+          };
+
+          const srcSmall = $meta.attr('data-vp-popup-sm-img') || item.src;
+          if (srcSmall) {
+            const smallSize = (
+              $meta.attr('data-vp-popup-sm-img-size') ||
+              $meta.attr('data-vp-popup-img-size') ||
+              '1920x1080'
+            ).split('x');
+
+            item.srcSmall = srcSmall;
+            item.srcSmallWidth = parseInt(smallSize[0], 10);
+            item.srcSmallHeight = parseInt(smallSize[1], 10);
+          }
+
+          const srcMedium = $meta.attr('data-vp-popup-md-img') || item.src;
+          if (srcMedium) {
+            const mediumSize = (
+              $meta.attr('data-vp-popup-md-img-size') ||
+              $meta.attr('data-vp-popup-img-size') ||
+              '1920x1080'
+            ).split('x');
+
+            item.srcMedium = srcMedium;
+            item.srcMediumWidth = parseInt(mediumSize[0], 10);
+            item.srcMediumHeight = parseInt(mediumSize[1], 10);
+          }
+
+          const $captionTitle = $meta.children('.vp-portfolio__item-popup-title').get(0);
+          const $captionDescription = $meta
+            .children('.vp-portfolio__item-popup-description')
+            .get(0);
+          if ($captionTitle || $captionDescription) {
+            item.caption =
+              ($captionTitle ? $captionTitle.outerHTML : '') +
+              ($captionDescription ? $captionDescription.outerHTML : '');
+          }
+        }
+
+        items.push(item);
+      }
+    });
 
     return items;
   },
@@ -295,40 +292,33 @@ $(document).on('extendClass.vpf', (event, VP) => {
     // `a.vp-portfolio__item-overlay` added as fallback for old templates, used in themes.
     self.$item.on(
       `click.vpf-uid-${self.uid}`,
-      '.vp-portfolio__item a.vp-portfolio__item-meta, .vp-portfolio__item .vp-portfolio__item-img > a, .vp-portfolio__item .vp-portfolio__item-meta-title > a, .vp-portfolio__item a.vp-portfolio__item-overlay',
+      `
+        .vp-portfolio__item a.vp-portfolio__item-meta,
+        .vp-portfolio__item .vp-portfolio__item-img > a,
+        .vp-portfolio__item .vp-portfolio__item-meta-title > a,
+        .vp-portfolio__item a.vp-portfolio__item-overlay
+      `,
       function (e) {
-        const $this = $(this);
-
         if (e.isDefaultPrevented()) {
           return;
         }
 
-        if (!$this.closest('.vp-portfolio__item-wrap').find('.vp-portfolio__item-popup').length) {
+        const $this = $(this);
+        const $itemWrap = $this.closest('.vp-portfolio__item-wrap');
+        let index = 0;
+
+        if (!$itemWrap.find('.vp-portfolio__item-popup').length) {
           return;
         }
 
         e.preventDefault();
 
-        let index = -1;
-        const clicked = $this.closest('.vp-portfolio__item')[0];
-
         // Find all gallery items
         // Prevent Swiper slider duplicates.
-        self.$item
-          .find(
-            '.vp-portfolio__item-wrap:not(.swiper-slide-duplicate):not(.swiper-slide-duplicate-active) .vp-portfolio__item-popup'
-          )
-          .each(function (idx) {
-            if (
-              -1 === index &&
-              $(this).closest('.vp-portfolio__item-wrap').find('.vp-portfolio__item')[0] === clicked
-            ) {
-              index = idx;
-            }
-          });
-
-        if (0 > index) {
-          index = 0;
+        if ($itemWrap.attr('data-swiper-slide-index')) {
+          index = parseInt($itemWrap.attr('data-swiper-slide-index'), 10);
+        } else {
+          index = $itemWrap.index();
         }
 
         const items = VPPopupAPI.parseGallery(self.$item);
@@ -415,15 +405,15 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
   $(document).on(
     'click',
     `
-        .wp-block-image > a,
-        .wp-block-image > figure > a,
-        .wp-block-gallery .blocks-gallery-item > figure > a,
-        .wp-block-gallery .wp-block-image > a,
-        .wp-block-media-text > figure > a,
-        .gallery .gallery-icon > a,
-        figure.wp-caption > a,
-        figure.tiled-gallery__item > a,
-        p > a
+      .wp-block-image > a,
+      .wp-block-image > figure > a,
+      .wp-block-gallery .blocks-gallery-item > figure > a,
+      .wp-block-gallery .wp-block-image > a,
+      .wp-block-media-text > figure > a,
+      .gallery .gallery-icon > a,
+      figure.wp-caption > a,
+      figure.tiled-gallery__item > a,
+      p > a
     `,
     function (e) {
       if (e.isDefaultPrevented()) {
