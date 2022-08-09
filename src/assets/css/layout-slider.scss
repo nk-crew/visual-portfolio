@@ -4,7 +4,27 @@
  * Visual Portfolio layout Slider.
  */
 [data-vp-layout="slider"] {
-  .vp-portfolio__item-img-wrap,
+  // Initial styles before Swiper init.
+  .vp-portfolio__items-wrap:not(.swiper) .vp-portfolio__items,
+  .vp-portfolio__thumbnails-wrap:not(.swiper) .vp-portfolio__thumbnails {
+    position: relative;
+    box-sizing: content-box;
+    display: flex;
+  }
+
+  .vp-portfolio__items-wrap:not(.swiper) .vp-portfolio__items .vp-portfolio__item-wrap,
+  .vp-portfolio__thumbnails-wrap:not(.swiper) .vp-portfolio__thumbnails .vp-portfolio__thumbnail-wrap {
+    width: calc(100% / var(--vp-layout-slider__initial-slides-per-view, 8));
+    min-width: calc(100% / var(--vp-layout-slider__initial-slides-per-view, 8));
+  }
+
+  @for $i from 1 through 8 {
+    &[data-vp-slider-slides-per-view="#{$i}"] .vp-portfolio__items-wrap:not(.swiper),
+    &[data-vp-slider-thumbnails-per-view="#{$i}"] .vp-portfolio__thumbnails-wrap:not(.swiper) {
+      --vp-layout-slider__initial-slides-per-view: #{$i};
+    }
+  }
+
   .vp-portfolio__thumbnail-img-wrap {
     position: relative;
     display: block;
