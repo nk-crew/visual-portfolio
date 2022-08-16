@@ -141,7 +141,14 @@ class Visual_Portfolio_Settings_API {
 
                 if ( $is_pro ) {
                     $class_name .= ' vpf-settings-control-pro';
-                    $label .= '<a class="vpf-settings-control-pro-label" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=settings_page&utm_campaign=' . esc_attr( $name ) . '&utm_content=@@plugin_version">?<span>' . esc_html__( 'This feature is available in the Pro plugin only.', '@@text_domain' ) . '</span></a>';
+                    $go_pro_url = Visual_Portfolio_Admin::get_pro_url(
+                        array(
+                            'utm_source'   => 'plugin',
+                            'utm_medium'   => 'settings_page',
+                            'utm_campaign' => esc_attr( $name ),
+                        )
+                    );
+                    $label .= '<a class="vpf-settings-control-pro-label" target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_url ) . '">?<span>' . esc_html__( 'This feature is available in the Pro plugin only.', '@@text_domain' ) . '</span></a>';
                 }
 
                 $args = array(

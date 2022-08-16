@@ -24,9 +24,11 @@ class Visual_Portfolio_Admin {
 
         // Pro link.
         add_filter( 'plugin_action_links_' . visual_portfolio()->plugin_basename, array( $this, 'add_go_pro_link_plugins_page' ) );
-        add_action( 'admin_init', array( $this, 'go_pro_redirect' ) );
         add_action( 'admin_menu', array( $this, 'pro_admin_menu' ), 12 );
         add_action( 'admin_menu', array( $this, 'add_menu_if_portfolio_post_type_unregistered' ), 7 );
+
+        // Add Pro links to menu.
+        add_action( 'admin_menu', array( $this, 'add_go_pro_url' ), 100 );
 
         // register controls.
         add_action( 'init', array( $this, 'register_controls' ), 9 );
@@ -205,8 +207,7 @@ class Visual_Portfolio_Admin {
                     '<a class="vpf-admin-toolbar-tab%s" href="%s">%s</a>',
                     ! empty( $tab['is_active'] ) ? ' is-active' : '',
                     esc_url( $tab['url'] ),
-                    // phpcs:ignore
-                    $tab['text']
+                    wp_kses_post( $tab['text'] )
                 );
             }
             ?>
@@ -225,35 +226,44 @@ class Visual_Portfolio_Admin {
         return array_merge(
             $links,
             array(
-                '<a target="_blank" href="admin.php?page=visual_portfolio_go_pro&utm_medium=plugins_list">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>',
+                '<a target="_blank" href="' . self::get_pro_url( array( 'utm_source' => 'plugins_list' ) ) . '">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>',
             )
         );
     }
 
     /**
-     * Go Pro.
-     * Redirect to the Pro purchase page.
+     * Get url to pro plugin version.
+     *
+     * @param array $args - Arguments of link.
+     * @return string
      */
-    public function go_pro_redirect() {
-        // phpcs:ignore
-        if ( ! isset( $_GET['page'] ) || empty( $_GET['page'] ) ) {
-            return;
+    public static function get_pro_url( $args = array() ) {
+        $args       = array_merge(
+            array(
+                'sub_path'     => 'pricing',
+                'utm_source'   => 'utm_source',
+                'utm_medium'   => 'admin_menu',
+                'utm_campaign' => 'go_pro',
+                'utm_content'  => '@@plugin_version',
+            ),
+            $args
+        );
+        $url        = 'https://visualportfolio.co/';
+        $first_flag = true;
+
+        if ( isset( $args['sub_path'] ) && ! empty( $args['sub_path'] ) ) {
+            $url .= $args['sub_path'] . '/';
         }
 
-        // phpcs:ignore
-        if ( 'visual_portfolio_go_pro' === $_GET['page'] ) {
-            $medium = 'admin_menu';
-
-            // phpcs:ignore
-            if ( isset( $_GET['utm_medium'] ) ) {
-                // phpcs:ignore
-                $medium = $_GET['utm_medium'];
+        foreach ( $args as $key => $value ) {
+            if ( 'sub_path' !== $key && ! empty( $value ) ) {
+                $url       .= ( $first_flag ? '?' : '&' );
+                $url       .= $key . '=' . $value;
+                $first_flag = false;
             }
-
-            // phpcs:ignore
-            wp_redirect( 'https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=' . esc_attr( $medium ) . '&utm_campaign=go_pro&utm_content=@@plugin_version' );
-            exit();
         }
+
+        return $url;
     }
 
     /**
@@ -267,9 +277,26 @@ class Visual_Portfolio_Admin {
             '',
             '<span class="dashicons dashicons-star-filled" style="font-size: 17px"></span> ' . esc_html__( 'Go Pro', '@@text_domain' ),
             'manage_options',
-            'visual_portfolio_go_pro',
-            array( $this, 'go_pro_redirect' )
+            'visual_portfolio_go_pro'
         );
+    }
+
+    /**
+     * Add go pro links to admin menu.
+     *
+     * @return void
+     */
+    public function add_go_pro_url() {
+        global $submenu;
+        $menu_slug = Visual_Portfolio_Custom_Post_Type::get_menu_slug();
+
+        $plugin_submenu = &$submenu[ $menu_slug ];
+
+        foreach ( $plugin_submenu as $key => $submenu_item ) {
+            if ( 'visual_portfolio_go_pro' === $submenu_item[2] ) {
+                $plugin_submenu[ $key ][2] = self::get_pro_url();
+            }
+        }
     }
 
     /**

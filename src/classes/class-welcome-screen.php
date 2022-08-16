@@ -72,7 +72,38 @@ class Visual_Portfolio_Welcome_Screen {
         if ( function_exists( 'print_emoji_detection_script' ) ) {
             print_emoji_detection_script();
         }
-
+        $go_pro_links = array(
+            'head'          => Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'utm_source'   => 'plugin',
+                    'utm_medium'   => 'welcome_page',
+                    'utm_campaign' => 'go_pro_head',
+                )
+            ),
+            'more_features' => Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'sub_path'     => '',
+                    'utm_source'   => 'plugin',
+                    'utm_medium'   => 'welcome_page',
+                    'utm_campaign' => 'more_features',
+                )
+            ),
+            'docs'          => Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'sub_path'     => 'docs/getting-started',
+                    'utm_source'   => 'plugin',
+                    'utm_medium'   => 'welcome_page',
+                    'utm_campaign' => 'docs',
+                )
+            ),
+            'foot'          => Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'utm_source'   => 'plugin',
+                    'utm_medium'   => 'settings_page',
+                    'utm_campaign' => 'go_pro_foot',
+                )
+            ),
+        );
         ?>
         <div class="vpf-welcome-screen">
             <div class="vpf-welcome-head">
@@ -88,7 +119,7 @@ class Visual_Portfolio_Welcome_Screen {
                     <div>
                         <?php
                         // translators: %s - pro link.
-                        echo sprintf( esc_html__( 'Want to get more power with Pro? Visit %s', '@@text_domain' ), '<a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=go_pro_head&utm_content=@@plugin_version">visualportfolio.co/pricing</a>' );
+                        echo sprintf( esc_html__( 'Want to get more power with Pro? Visit %s', '@@text_domain' ), '<a target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_links['head'] ) . '">visualportfolio.co/pricing</a>' );
                         ?>
                     </div>
                 </div>
@@ -146,8 +177,8 @@ class Visual_Portfolio_Welcome_Screen {
                 <hr>
 
                 <div class="vpf-welcome-content-buttons">
-                    <a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=more_features&utm_content=@@plugin_version"><?php echo esc_html__( 'More Features', '@@text_domain' ); ?></a>
-                    <a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/docs/getting-started/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=docs&utm_content=@@plugin_version"><?php echo esc_html__( 'Documentation', '@@text_domain' ); ?></a>
+                    <a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $go_pro_links['more_features'] ); ?>"><?php echo esc_html__( 'More Features', '@@text_domain' ); ?></a>
+                    <a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $go_pro_links['docs'] ); ?>"><?php echo esc_html__( 'Documentation', '@@text_domain' ); ?></a>
                 </div>
             </div>
 
@@ -169,7 +200,7 @@ class Visual_Portfolio_Welcome_Screen {
                     <li><?php echo esc_html__( 'White Label', '@@text_domain' ); ?></li>
                     <li><?php echo esc_html__( 'And much more...', '@@text_domain' ); ?></li>
                 </ul>
-                <a target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=welcome_page&utm_campaign=go_pro_foot&utm_content=@@plugin_version"><?php echo esc_html__( 'Upgrade to PRO Now', '@@text_domain' ); ?></a>
+                <a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $go_pro_links['foot'] ); ?>"><?php echo esc_html__( 'Upgrade to PRO Now', '@@text_domain' ); ?></a>
             </div>
         </div>
         <?php

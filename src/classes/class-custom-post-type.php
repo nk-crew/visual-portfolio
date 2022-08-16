@@ -787,7 +787,13 @@ class Visual_Portfolio_Custom_Post_Type {
             esc_html__( 'Documentation', '@@text_domain' ),
             esc_html__( 'Documentation', '@@text_domain' ),
             'manage_options',
-            'https://visualportfolio.co/docs/getting-started/?utm_source=plugin&utm_medium=admin_menu&utm_campaign=docs&utm_content=@@plugin_version'
+            Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'sub_path'     => 'docs/getting-started',
+                    'utm_source'   => 'plugin',
+                    'utm_campaign' => 'docs',
+                )
+            )
         );
     }
 
@@ -820,6 +826,13 @@ class Visual_Portfolio_Custom_Post_Type {
 
         // phpcs:ignore
         if ( 'vpf_proofing_page' === $_GET['page'] ) {
+            $pro_url = Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'utm_source'   => 'plugin',
+                    'utm_medium'   => 'settings_page',
+                    'utm_campaign' => 'proofing',
+                )
+            );
             ?>
             <table class="form-table" role="presentation">
                 <tbody>
@@ -831,7 +844,7 @@ class Visual_Portfolio_Custom_Post_Type {
                                 </h3>
                                 <div>
                                     <p><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', '@@text_domain' ); ?></p>
-                                    <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&amp;utm_medium=settings_page&amp;utm_campaign=proofing&amp;utm_content=@@plugin_version">
+                                    <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $pro_url ); ?>">
                                     <?php echo esc_html__( 'Go Pro', '@@text_domain' ); ?>
                                     </a>
                                 </div>

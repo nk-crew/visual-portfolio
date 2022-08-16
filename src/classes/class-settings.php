@@ -230,6 +230,29 @@ class Visual_Portfolio_Settings {
         }
 
         $default_breakpoints = Visual_Portfolio_Breakpoints::get_default_breakpoints();
+        $go_pro_links        = array(
+            'watermarks'  => Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'utm_source'   => 'plugin',
+                    'utm_medium'   => 'settings_page',
+                    'utm_campaign' => 'watermarks',
+                )
+            ),
+            'social'      => Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'utm_source'   => 'plugin',
+                    'utm_medium'   => 'settings_page',
+                    'utm_campaign' => 'social_feeds',
+                )
+            ),
+            'white_label' => Visual_Portfolio_Admin::get_pro_url(
+                array(
+                    'utm_source'   => 'plugin',
+                    'utm_medium'   => 'settings_page',
+                    'utm_campaign' => 'white_label',
+                )
+            ),
+        );
 
         $settings_fields = array(
             'vp_general' => array(
@@ -689,7 +712,7 @@ class Visual_Portfolio_Settings {
                             <h3>' . esc_html__( 'Premium Only', '@@text_domain' ) . '</h3>
                             <div>
                                 <p>' . esc_html__( 'Protect your works using watermarks', '@@text_domain' ) . '</p>
-                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=settings_page&utm_campaign=watermarks&utm_content=@@plugin_version">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
+                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_links['watermarks'] ) . '">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
                             </div>
                         </div>
                     ',
@@ -704,7 +727,7 @@ class Visual_Portfolio_Settings {
                             <h3>' . esc_html__( 'Premium Only', '@@text_domain' ) . '</h3>
                             <div>
                                 <p>' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ) . '</p>
-                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=settings_page&utm_campaign=social_feeds&utm_content=@@plugin_version">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
+                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_links['social'] ) . '">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
                             </div>
                         </div>
                     ',
@@ -719,7 +742,7 @@ class Visual_Portfolio_Settings {
                             <h3>' . esc_html__( 'Premium Only', '@@text_domain' ) . '</h3>
                             <div>
                                 <p>' . esc_html__( 'Remove our plugin brand and logos from Front and Admin areas', '@@text_domain' ) . '</p>
-                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=settings_page&utm_campaign=white_label&utm_content=@@plugin_version">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
+                                <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_links['white_label'] ) . '">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>
                             </div>
                         </div>
                     ',
