@@ -218,4 +218,14 @@
       justify-content: flex-end;
     }
   }
+
+  // Fix for slider image displaying bug.
+  // Image is not displaying properly in the slider when:
+  // - selected Classic items style
+  // - used Dynamic items height in Slider settings
+  [data-vp-layout="slider"] & .vp-portfolio__item-img-wrap {
+    position: relative;
+    padding-top: 0.01px;
+    padding-bottom: 0.01px;
+  }
 }
