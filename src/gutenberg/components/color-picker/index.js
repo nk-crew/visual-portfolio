@@ -57,7 +57,7 @@ export default class ColorPicker extends Component {
         renderContent={() => (
           <div className="vpf-component-color-picker">
             <WPColorPicker
-              color={value}
+              color={value || ''}
               onChangeComplete={(color) => {
                 let colorString;
 
@@ -83,7 +83,7 @@ export default class ColorPicker extends Component {
                 className="vpf-component-color-picker-palette"
               >
                 <ColorPalette
-                  value={value}
+                  value={value || ''}
                   onChange={(color) => {
                     onChange(color || '');
 
