@@ -115,6 +115,8 @@
 }
 
 [data-vp-layout="slider"] .vp-portfolio__item-wrap {
+  // In some plugins there is a style with `display: flex`, which breaks our items.
+  display: block;
   float: none;
   padding: 0 !important;
   margin-top: 0 !important;
