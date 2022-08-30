@@ -3403,8 +3403,7 @@ selector p {
             wp_die();
         }
 
-        // phpcs:ignore
-        echo json_encode( $oembed );
+        echo wp_json_encode( $oembed );
 
         wp_die();
     }
