@@ -8,5 +8,13 @@
     "phpcs": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
     "phpcbf": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
     "wp": "\"vendor/wp-cli/wp-cli/bin/wp\""
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+        "dealerdirect/phpcodesniffer-composer-installer": true,
+        "phpcompatibility/phpcompatibility-wp": true,
+        "wp-coding-standards/wpcs": true
+    }
   }
 }
