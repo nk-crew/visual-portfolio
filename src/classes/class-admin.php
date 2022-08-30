@@ -1645,7 +1645,7 @@ class Visual_Portfolio_Admin {
                                     <li>' . esc_html__( 'Filter by specific author', '@@text_domain' ) . '</li>
                                     <li>' . esc_html__( 'Filter by publish date range', '@@text_domain' ) . '</li>
                                     <li>' . esc_html__( 'Exclude posts without thumbnail', '@@text_domain' ) . '</li>
-                                    <li>' . esc_html__( 'Custom queries', '@@text_domain' ) . '</li>
+                                    <li>' . esc_html__( 'Exclude sticky posts', '@@text_domain' ) . '</li>
                                     <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
                                 </ul>',
             )

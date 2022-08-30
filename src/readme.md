@@ -2,6 +2,7 @@
 
 * Contributors: nko
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
+* Donate link: https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 5.8
 * Tested up to: 6.0
 * Requires PHP: 7.2
@@ -320,6 +321,13 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 2.19.1 =
+
+* fixed Classic style image displaying bug in slider with dynamic height option
+* fixed Color Picker error in custom Item Styles
+* fixed Swiper slides displaying conflicts, which comes from some 3rd-party plugins
+* minor changes
 
 = 2.19.0 =
 
