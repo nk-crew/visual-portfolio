@@ -2560,8 +2560,7 @@ class Visual_Portfolio_Get {
         // - /index.php/%postname% .
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         if ( isset( $_SERVER['REQUEST_URI'] ) && $_SERVER['REQUEST_URI'] ) {
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-            $current_url = $_SERVER['REQUEST_URI'];
+            $current_url = esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
         } else {
             $current_url = trailingslashit( home_url( $wp->request ) );
 
