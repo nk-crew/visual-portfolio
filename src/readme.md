@@ -322,6 +322,13 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.19.1 =
+
+* fixed Classic style image displaying bug in slider with dynamic height option
+* fixed Color Picker error in custom Item Styles
+* fixed Swiper slides displaying conflicts, which comes from some 3rd-party plugins
+* minor changes
+
 = 2.19.0 =
 
 * added stricter permission check for rest route `update_layout`
