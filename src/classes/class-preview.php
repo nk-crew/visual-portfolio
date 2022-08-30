@@ -242,7 +242,7 @@ class Visual_Portfolio_Preview {
             'visual-portfolio-preview',
             'vp_preview_post_data',
             // phpcs:disable WordPress.Security.NonceVerification.Missing
-            isset( $_POST ) && ! empty( $_POST ) ? $_POST : array()
+            isset( $_POST ) && ! empty( $_POST ) ? Visual_Portfolio_Security::sanitize_attributes( $_POST ) : array()
         );
 
         $class_name = 'vp-preview-wrapper';
