@@ -181,6 +181,11 @@ class Visual_Portfolio_Admin {
                     $tab['url'] = add_query_arg( array( 'page' => $sub_item[2] ), $parent_slug );
                 }
 
+                // Fixed Settings tab url if Portfolio Post Type disabled.
+                if ( 'visual-portfolio-settings' === $parent_slug && 'visual-portfolio-settings' === $sub_item[2] ) {
+                    $tab['url'] = 'admin.php?page=' . $parent_slug;
+                }
+
                 // Detect active state.
                 if ( $submenu_file === $sub_item[2] || $plugin_page === $sub_item[2] ) {
                     $tab['is_active'] = true;
