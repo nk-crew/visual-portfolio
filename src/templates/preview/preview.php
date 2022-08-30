@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="entry-content">
             <div id="vp_preview" class="<?php echo esc_attr( $args['class_name'] ); ?>">
                 <?php
-                    // phpcs:ignore
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                     echo Visual_Portfolio_Get::get( $args['options'] );
                 ?>
             </div>

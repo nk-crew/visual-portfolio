@@ -18,29 +18,35 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$attributes = ' ';
-
 if ( isset( $href ) && $href ) {
-    $attributes .= 'href="' . esc_url( $href ) . '" ';
-
-    if ( isset( $target ) && $target ) {
-        $attributes .= 'target="' . esc_attr( $target ) . '" ';
-    }
-    if ( isset( $rel ) && $rel ) {
-        $attributes .= 'rel="' . esc_attr( $rel ) . '" ';
-    }
-    if ( isset( $tabindex ) && $tabindex ) {
-        $attributes .= 'tabindex="' . esc_attr( $tabindex ) . '" ';
-    }
-}
-if ( isset( $class ) && $class ) {
-    $attributes .= 'class="' . esc_attr( $class ) . '" ';
-}
-
-if ( isset( $href ) && $href ) {
-    // phpcs:ignore
-    echo '<a ' . $attributes . '>';
+    ?>
+    <a
+        href="<?php echo esc_url( $href ); ?>"
+        <?php
+        if ( isset( $target ) && $target ) {
+            echo 'target="' . esc_attr( $target ) . '" ';
+        }
+        if ( isset( $rel ) && $rel ) {
+            echo 'rel="' . esc_attr( $rel ) . '" ';
+        }
+        if ( isset( $tabindex ) && $tabindex ) {
+            echo 'tabindex="' . esc_attr( $tabindex ) . '" ';
+        }
+        if ( isset( $class ) && $class ) {
+            echo 'class="' . esc_attr( $class ) . '" ';
+        }
+        ?>
+    >
+    <?php
 } elseif ( isset( $fallback ) && $fallback ) {
-    // phpcs:ignore
-    echo '<' . esc_html( $fallback ) . ' ' . $attributes . '>';
+    ?>
+    <
+        <?php
+        echo esc_html( $fallback );
+        if ( isset( $class ) && $class ) {
+            echo ' class="' . esc_attr( $class ) . '" ';
+        }
+        ?>
+    >
+    <?php
 }
