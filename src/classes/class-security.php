@@ -100,6 +100,28 @@ class Visual_Portfolio_Security {
 
             $allowedtags = array_merge( $allowedtags, $kses_defaults, $kses_svg );
         }
+
+        if ( 'vp_image' === $context ) {
+            $kses_defaults = wp_kses_allowed_html( 'post' );
+
+            $kses_image = array(
+                'img' => array(
+                    'width'       => true,
+                    'height'      => true,
+                    'src'         => true,
+                    'class'       => true,
+                    'alt'         => true,
+                    'loading'     => true,
+                    'srcset'      => true,
+                    'data-src'    => true,
+                    'data-srcset' => true,
+                    'data-sizes'  => true,
+                    'sizes'       => true,
+                ),
+            );
+
+            $allowedtags = array_merge( $allowedtags, $kses_defaults, $kses_image );
+        }
         return $allowedtags;
     }
     /**
@@ -209,6 +231,16 @@ class Visual_Portfolio_Security {
      */
     public static function wp_kses_popup( $popup ) {
         return wp_kses( $popup, 'vp_popup' );
+    }
+
+    /**
+     * Escape Image.
+     *
+     * @param string $image - Unclear Image.
+     * @return string
+     */
+    public static function wp_kses_image( $image ) {
+        return wp_kses( $image, 'vp_image' );
     }
 
     /**
