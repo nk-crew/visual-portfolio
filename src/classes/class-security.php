@@ -358,6 +358,12 @@ class Visual_Portfolio_Security {
         if ( ! empty( $attributes ) ) {
             $controls = Visual_Portfolio_Controls::get_registered_array();
             foreach ( $attributes as $key => $attribute ) {
+                if ( 0 === strpos( $key, 'vp_' ) ) {
+                    $key                = preg_replace( '/^vp_/', '', $key );
+                    $mode               = 'preview';
+                    $attributes[ $key ] = $attribute;
+                    unset( $attributes[ 'vp_' . $key ] );
+                }
                 $sanitize_callback = $controls[ $key ]['sanitize_callback'] ?? false;
                 if ( $sanitize_callback ) {
                     $finding_class = strripos( $sanitize_callback, '::' );
@@ -434,6 +440,13 @@ class Visual_Portfolio_Security {
                             $attributes[ $key ] = sanitize_text_field( wp_unslash( $attribute ) );
                             break;
                     }
+                }
+            }
+
+            if ( isset( $mode ) && 'preview' === $mode ) {
+                foreach ( $attributes as $key => $attribute ) {
+                    $attributes[ 'vp_' . $key ] = $attribute;
+                    unset( $attributes[ $key ] );
                 }
             }
         }
