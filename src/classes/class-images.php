@@ -538,7 +538,7 @@ class Visual_Portfolio_Images {
 
         // We need to use base64 to prevent rare cases when users use plugins
         // that replaces http to https in xmlns attribute.
-        // phpcs:ignore
+        // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
         $placeholder = base64_encode( '<svg width="' . $width . '" height="' . $height . '" viewBox="0 0 ' . $width . ' ' . $height . '" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>' );
 
         $escape_search  = array( '<', '>', '#', '"' );

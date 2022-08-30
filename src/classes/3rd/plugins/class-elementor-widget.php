@@ -123,8 +123,9 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
 
     /**
      * Adds different input fields to allow the user to change and customize the widget settings.
+     *
+     * @return void
      */
-    // phpcs:ignore
     protected function register_controls() {
         // get all visual-portfolio post types.
         // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408 .
@@ -196,7 +197,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
         ?>
         <div
             <?php
-                // phpcs:ignore
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 echo $this->get_render_attribute_string( 'wrapper' );
             ?>
         >

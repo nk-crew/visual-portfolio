@@ -217,7 +217,6 @@ class Visual_Portfolio_Custom_Post_Meta {
 
         foreach ( $meta as $item ) {
             if ( isset( $_POST[ $item ] ) ) {
-                // phpcs:ignore
                 if ( is_array( $_POST[ $item ] ) ) {
                     $result = array_map( 'sanitize_text_field', wp_unslash( $_POST[ $item ] ) );
                 } else {

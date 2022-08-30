@@ -1,4 +1,4 @@
-const { jQuery: $, ajaxurl } = window;
+const { jQuery: $, ajaxurl, VPAdminVariables } = window;
 
 // multiple select with AJAX search
 $('select[name="vp_general[portfolio_archive_page]"]').select2({
@@ -10,6 +10,7 @@ $('select[name="vp_general[portfolio_archive_page]"]').select2({
       return {
         q: params.term, // search query
         selected: this[0].value,
+        nonce: VPAdminVariables.nonce,
         action: 'vp_get_pages_list', // AJAX action for admin-ajax.php
       };
     },

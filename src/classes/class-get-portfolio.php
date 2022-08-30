@@ -76,7 +76,7 @@ class Visual_Portfolio_Get {
      * @return array
      */
     public static function get_all_layouts() {
-        // phpcs:ignore
+        // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
         /*
          * Example:
             array(
@@ -93,7 +93,7 @@ class Visual_Portfolio_Get {
         // Extend specific layout controls.
         foreach ( $layouts as $name => $layout ) {
             if ( isset( $layout['controls'] ) ) {
-                // phpcs:ignore
+                // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
                 /*
                  * Example:
                     array(
@@ -113,7 +113,7 @@ class Visual_Portfolio_Get {
      * @return array
      */
     public static function get_all_items_styles() {
-        // phpcs:ignore
+        // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
         /*
          * Example:
             array(
@@ -143,7 +143,7 @@ class Visual_Portfolio_Get {
         // Extend specific item style controls.
         foreach ( $items_styles as $name => $style ) {
             if ( isset( $style['controls'] ) ) {
-                // phpcs:ignore
+                // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
                 /*
                  * Example:
                     array(
@@ -206,17 +206,20 @@ class Visual_Portfolio_Get {
      * Check if portfolio showed in preview mode.
      */
     public static function is_preview() {
-        // phpcs:disable
-        $frame = isset( $_POST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame'] ) ) : false;
-        $id    = isset( $_POST['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
+        $frame = false;
+        if ( isset( $_POST['vp_preview_nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['vp_preview_nonce'] ), 'vp-ajax-nonce' ) ) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+            $frame = isset( $_POST['vp_preview_frame'] ) ? Visual_Portfolio_Security::sanitize_boolean( $_POST['vp_preview_frame'] ) : false;
+            $id    = isset( $_POST['vp_preview_frame_id'] ) ? sanitize_text_field( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
 
-        // Elementor preview.
-        if ( ! $frame && ! $id && isset( $_REQUEST['vp_preview_type'] ) && 'elementor' === $_REQUEST['vp_preview_type'] ) {
-            $frame = isset( $_REQUEST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_REQUEST['vp_preview_frame'] ) ) : false;
+            // Elementor preview.
+            if ( ! $frame && ! $id && isset( $_REQUEST['vp_preview_type'] ) && 'elementor' === $_REQUEST['vp_preview_type'] ) {
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+                $frame = isset( $_REQUEST['vp_preview_frame'] ) ? Visual_Portfolio_Security::sanitize_boolean( $_REQUEST['vp_preview_frame'] ) : false;
+            }
         }
-        // phpcs:enable
 
-        return 'true' === $frame;
+        return $frame;
     }
 
     /**
@@ -518,7 +521,7 @@ class Visual_Portfolio_Get {
             }
         }
 
-        // phpcs:ignore
+        // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
         /*
          * Example:
             array(
@@ -764,7 +767,7 @@ class Visual_Portfolio_Get {
             wp_reset_postdata();
 
             // stupid hack as wp_reset_postdata() function is not working in some situations...
-            // phpcs:ignore
+            // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
             $GLOBALS['post'] = $old_post;
         }
 
@@ -1036,7 +1039,9 @@ class Visual_Portfolio_Get {
         <div class="<?php echo esc_attr( $class_name ); ?>">
         <?php
 
-        // phpcs:ignore
+        // In this case, pluggable pagination, filters and sorting templates are displayed.
+        // Included templates are cleared and passed as a ready-made cleared string in the callback function called above.
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo $elements_content;
 
         ?>
@@ -1132,8 +1137,8 @@ class Visual_Portfolio_Get {
      * @return int
      */
     private static function get_current_page_number() {
-        // phpcs:ignore
-        return max( 1, isset( $_GET['vp_page'] ) ? (int) $_GET['vp_page'] : 1 );
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.NonceVerification
+        return max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
     }
 
     /**
@@ -1154,16 +1159,15 @@ class Visual_Portfolio_Get {
         }
 
         // Get vpf_random_seed from request variable if it exists.
-        // phpcs:ignore
+        // phpcs:ignore WordPress.Security.NonceVerification
         if ( isset( $_REQUEST['vpf_random_seed'] ) && is_numeric( $_REQUEST['vpf_random_seed'] ) ) {
-            // phpcs:ignore
-            self::$rand_seed_session = (int) $_REQUEST['vpf_random_seed'];
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.NonceVerification
+            self::$rand_seed_session = Visual_Portfolio_Security::sanitize_number( $_REQUEST['vpf_random_seed'] );
         }
 
         // Set new vpf_random_seed if none exists.
         if ( ! self::$rand_seed_session ) {
-            // phpcs:ignore
-            self::$rand_seed_session = rand();
+            self::$rand_seed_session = wp_rand();
         }
 
         return self::$rand_seed_session;
@@ -1208,9 +1212,9 @@ class Visual_Portfolio_Get {
             // Load certain taxonomies.
             $images = array();
 
-            // phpcs:ignore
+            // phpcs:ignore WordPress.Security.NonceVerification
             if ( ! $for_filter && ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
-                // phpcs:ignore
+                // phpcs:ignore WordPress.Security.NonceVerification
                 $category = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
 
                 foreach ( $options['images'] as $img ) {
@@ -1299,9 +1303,9 @@ class Visual_Portfolio_Get {
             }
 
             // custom sorting.
-            // phpcs:ignore
+            // phpcs:ignore WordPress.Security.NonceVerification
             if ( isset( $_GET['vp_sort'] ) ) {
-                // phpcs:ignore
+                // phpcs:ignore WordPress.Security.NonceVerification
                 $custom_get_order = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
 
                 switch ( $custom_get_order ) {
@@ -1348,12 +1352,9 @@ class Visual_Portfolio_Get {
                         // We don't need to randomize order for filter,
                         // because filter list will be always changed once AJAX loaded.
                         if ( ! $for_filter ) {
-                            // phpcs:ignore
-                            mt_srand( self::get_rand_seed_session() );
-
                             for ( $i = count( $images ) - 1; $i > 0; $i-- ) {
-                                // phpcs:ignore
-                                $j            = @mt_rand( 0, $i );
+                                // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                                $j            = @wp_rand( 0, $i );
                                 $tmp          = $images[ $i ];
                                 $images[ $i ] = $images[ $j ];
                                 $images[ $j ] = $tmp;
@@ -1503,7 +1504,7 @@ class Visual_Portfolio_Get {
                             )
                         );
 
-                        // phpcs:ignore
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
                         $query_opts['tax_query'] = array(
                             // We save strings like 'or', 'and'
                             // but to use it we need these strings in uppercase.
@@ -1558,9 +1559,9 @@ class Visual_Portfolio_Get {
             }
 
             // Custom sorting.
-            // phpcs:ignore
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             if ( isset( $_GET['vp_sort'] ) ) {
-                // phpcs:ignore
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                 $custom_get_order       = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
                 $custom_order           = false;
                 $custom_order_direction = false;
@@ -1588,14 +1589,14 @@ class Visual_Portfolio_Get {
             }
 
             // Load certain taxonomies using custom filter.
-            // phpcs:ignore
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             if ( ! $for_filter && ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
-                // phpcs:ignore
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                 $taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
                 $taxonomies = explode( ':', $taxonomies );
 
                 if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
-                    // phpcs:ignore
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
                     $query_opts['tax_query'] = array(
                         'relation' => 'AND',
                         array(
@@ -1702,7 +1703,7 @@ class Visual_Portfolio_Get {
 
         $args = array(
             'class'      => 'vp-filter',
-            // phpcs:ignore
+            // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
             /*
              * Example:
                 array(
@@ -1804,7 +1805,7 @@ class Visual_Portfolio_Get {
         wp_reset_postdata();
 
         // stupid hack as wp_reset_postdata() function is not working in some situations...
-        // phpcs:ignore
+        // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
         $GLOBALS['post'] = $old_post;
 
         // Get all available terms and then pick only needed by ID
@@ -1924,9 +1925,9 @@ class Visual_Portfolio_Get {
         // Get active item.
         $active_item = false;
 
-        // phpcs:ignore
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ( ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
         }
 
@@ -1948,9 +1949,9 @@ class Visual_Portfolio_Get {
         // Get active item.
         $active_item = false;
 
-        // phpcs:ignore
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ( isset( $_GET['vp_sort'] ) ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
         }
 
@@ -2070,7 +2071,7 @@ class Visual_Portfolio_Get {
         $set_post_object = $is_posts && isset( $args['post_id'] ) && $args['post_id'];
 
         if ( $set_post_object ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
             $post = get_post( $args['post_id'] );
 
             setup_postdata( $post );
@@ -2086,8 +2087,7 @@ class Visual_Portfolio_Get {
         if ( isset( $args['opts']['show_date'] ) ) {
             if ( 'human' === $args['opts']['show_date'] ) {
                 // translators: %s - published in human format.
-                // phpcs:ignore
-                $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( mysql2date( 'U', $args['published_time'], true ), current_time( 'timestamp' ) ) );
+                $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( mysql2date( 'U', $args['published_time'], true ), current_time( 'timestamp' ) ) ); //phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
             } elseif ( $args['opts']['show_date'] ) {
                 $args['published'] = mysql2date( $args['opts']['date_format'] ? $args['opts']['date_format'] : 'F j, Y', $args['published_time'], true );
             }
@@ -2172,16 +2172,16 @@ class Visual_Portfolio_Get {
             $attrs['style'] = '--vp-images__object-position: ' . esc_attr( 100 * floatval( $args['focal_point']['x'] ) ) . '% ' . esc_attr( 100 * floatval( $args['focal_point']['y'] ) ) . '%;';
         }
 
-        $attrs        = apply_filters( 'vpf_each_item_tag_attrs', $attrs, $args );
-        $attrs_string = '';
-
-        foreach ( $attrs as $name => $val ) {
-            $attrs_string .= ( $attrs_string ? ' ' : '' ) . esc_attr( $name ) . '="' . esc_attr( $val ) . '"';
-        }
-
+        $attrs = apply_filters( 'vpf_each_item_tag_attrs', $attrs, $args );
         ?>
 
-        <<?php echo esc_attr( $tag_name ); ?> <?php echo $attrs_string; // phpcs:ignore ?>>
+        <<?php echo esc_attr( $tag_name ); ?>
+        <?php
+        foreach ( $attrs as $name => $val ) {
+            echo esc_attr( $name ) . '="' . esc_attr( $val ) . '" ';
+        }
+        ?>
+        >
             <?php self::item_popup_data( $args ); ?>
             <?php do_action( 'vpf_before_each_item', $args ); ?>
             <figure class="vp-portfolio__item">
@@ -2238,8 +2238,8 @@ class Visual_Portfolio_Get {
 
         $popup_output = apply_filters( 'vpf_popup_output', $popup_output, $args );
 
-        // phpcs:ignore
-        echo $popup_output;
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo Visual_Portfolio_Security::wp_kses_popup( $popup_output );
     }
 
     /**
@@ -2439,83 +2439,8 @@ class Visual_Portfolio_Get {
                     }
                 }
 
-                $pagination_links = paginate_links(
-                    array(
-                        'base'      => esc_url_raw(
-                            str_replace(
-                                999999999,
-                                '%#%',
-                                remove_query_arg(
-                                    'add-to-cart',
-                                    self::get_pagenum_link(
-                                        array(
-                                            'vp_page' => 999999999,
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                        'format'    => '',
-                        'type'      => 'array',
-                        'current'   => $args['start_page'],
-                        'total'     => $args['max_pages'],
-                        'prev_text' => '&lt;',
-                        'next_text' => '&gt;',
-                        'end_size'  => 1,
-                        'mid_size'  => 2,
-                    )
-                );
-
                 // parse html string and make arrays.
-                $filtered_links = array();
-                if ( $pagination_links ) {
-                    foreach ( $pagination_links as $link ) {
-                        $tag_data = self::extract_tags( $link, array( 'a', 'span' ) );
-                        $tag_data = ! empty( $tag_data ) ? $tag_data[0] : $tag_data;
-
-                        if ( ! empty( $tag_data ) ) {
-                            $atts  = isset( $tag_data['attributes'] ) ? $tag_data['attributes'] : false;
-                            $href  = $atts && isset( $atts['href'] ) ? $atts['href'] : false;
-                            $class = $atts && isset( $atts['class'] ) ? $atts['class'] : '';
-                            $label = isset( $tag_data['contents'] ) ? $tag_data['contents'] : false;
-
-                            $arr = array(
-                                'url'           => $href,
-                                'label'         => $label,
-                                'class'         => 'vp-pagination__item',
-                                'active'        => strpos( $class, 'current' ) !== false,
-                                'is_prev_arrow' => strpos( $class, 'prev' ) !== false,
-                                'is_next_arrow' => strpos( $class, 'next' ) !== false,
-                                'is_dots'       => strpos( $class, 'dots' ) !== false,
-                            );
-
-                            if ( $arr['active'] ) {
-                                $arr['class'] .= ' vp-pagination__item-active';
-                            }
-                            if ( $arr['is_prev_arrow'] ) {
-                                $arr['class'] .= ' vp-pagination__item-prev';
-                            }
-                            if ( $arr['is_next_arrow'] ) {
-                                $arr['class'] .= ' vp-pagination__item-next';
-                            }
-                            if ( $arr['is_dots'] ) {
-                                $arr['class'] .= ' vp-pagination__item-dots';
-                            }
-
-                            // skip arrows if disabled.
-                            if ( ! $vp_options['pagination_paged__show_arrows'] && ( $arr['is_prev_arrow'] || $arr['is_next_arrow'] ) ) {
-                                continue;
-                            }
-
-                            // skip numbers if disabled.
-                            if ( ! $vp_options['pagination_paged__show_numbers'] && ! $arr['is_prev_arrow'] && ! $arr['is_next_arrow'] ) {
-                                continue;
-                            }
-
-                            $filtered_links[] = $arr;
-                        }
-                    }
-                }
+                $filtered_links = self::get_pagination_links( $args, $vp_options );
 
                 if ( ! empty( $filtered_links ) ) {
                     $args['items'] = $filtered_links;
@@ -2528,6 +2453,95 @@ class Visual_Portfolio_Get {
         ?>
         </div>
         <?php
+    }
+
+    /**
+     * Get pagination links.
+     *
+     * @param array $args - Block Arguments.
+     * @param array $vp_options - Block Options.
+     * @return array
+     */
+    public static function get_pagination_links( $args, $vp_options ) {
+        $pagination_links = paginate_links(
+            array(
+                'base'      => esc_url_raw(
+                    str_replace(
+                        999999999,
+                        '%#%',
+                        remove_query_arg(
+                            'add-to-cart',
+                            self::get_pagenum_link(
+                                array(
+                                    'vp_page' => 999999999,
+                                )
+                            )
+                        )
+                    )
+                ),
+                'format'    => '',
+                'type'      => 'array',
+                'current'   => $args['start_page'],
+                'total'     => $args['max_pages'],
+                'prev_text' => '&lt;',
+                'next_text' => '&gt;',
+                'end_size'  => 1,
+                'mid_size'  => 2,
+            )
+        );
+
+        // parse html string and make arrays.
+        $filtered_links = array();
+        if ( $pagination_links ) {
+            foreach ( $pagination_links as $link ) {
+                $tag_data = self::extract_tags( $link, array( 'a', 'span' ) );
+                $tag_data = ! empty( $tag_data ) ? $tag_data[0] : $tag_data;
+
+                if ( ! empty( $tag_data ) ) {
+                    $atts  = isset( $tag_data['attributes'] ) ? $tag_data['attributes'] : false;
+                    $href  = $atts && isset( $atts['href'] ) ? $atts['href'] : false;
+                    $class = $atts && isset( $atts['class'] ) ? $atts['class'] : '';
+                    $label = isset( $tag_data['contents'] ) ? $tag_data['contents'] : false;
+
+                    $arr = array(
+                        'url'           => $href,
+                        'label'         => $label,
+                        'class'         => 'vp-pagination__item',
+                        'active'        => strpos( $class, 'current' ) !== false,
+                        'is_prev_arrow' => strpos( $class, 'prev' ) !== false,
+                        'is_next_arrow' => strpos( $class, 'next' ) !== false,
+                        'is_dots'       => strpos( $class, 'dots' ) !== false,
+                    );
+
+                    if ( $arr['active'] ) {
+                        $arr['class'] .= ' vp-pagination__item-active';
+                    }
+                    if ( $arr['is_prev_arrow'] ) {
+                        $arr['class'] .= ' vp-pagination__item-prev';
+                    }
+                    if ( $arr['is_next_arrow'] ) {
+                        $arr['class'] .= ' vp-pagination__item-next';
+                    }
+                    if ( $arr['is_dots'] ) {
+                        $arr['class'] .= ' vp-pagination__item-dots';
+                    }
+
+                    // skip arrows if disabled.
+                    if ( ! $vp_options['pagination_paged__show_arrows'] && ( $arr['is_prev_arrow'] || $arr['is_next_arrow'] ) ) {
+                        continue;
+                    }
+
+                    // skip numbers if disabled.
+                    if ( ! $vp_options['pagination_paged__show_numbers'] && ! $arr['is_prev_arrow'] && ! $arr['is_next_arrow'] ) {
+                        continue;
+                    }
+
+                    $filtered_links[] = $arr;
+                }
+            }
+        }
+
+        return $filtered_links;
     }
 
     /**
@@ -2544,16 +2558,16 @@ class Visual_Portfolio_Get {
         // We should use REQUEST_URI in case if the user used non-default permalinks.
         // For example, this one:
         // - /index.php/%postname% .
-        // phpcs:ignore
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         if ( isset( $_SERVER['REQUEST_URI'] ) && $_SERVER['REQUEST_URI'] ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             $current_url = $_SERVER['REQUEST_URI'];
         } else {
             $current_url = trailingslashit( home_url( $wp->request ) );
 
-            // phpcs:ignore
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             if ( ! empty( $_GET ) ) {
-                // phpcs:ignore
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                 $current_url = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( $_GET ) ), $current_url );
             }
         }

@@ -90,6 +90,7 @@ class Visual_Portfolio_Preview {
             'VPAdminGutenbergVariables',
             array(
                 'preview_url' => $preview_url,
+                'nonce'       => wp_create_nonce( 'vp-ajax-nonce' ),
             )
         );
         wp_localize_script(
@@ -97,6 +98,7 @@ class Visual_Portfolio_Preview {
             'VPAdminElementorVariables',
             array(
                 'preview_url' => $preview_url,
+                'nonce'       => wp_create_nonce( 'vp-ajax-nonce' ),
             )
         );
     }
@@ -105,22 +107,20 @@ class Visual_Portfolio_Preview {
      * Check if the page is preview.
      */
     public function is_preview_check() {
-        // phpcs:ignore
-        if ( ! isset( $_GET['vp_preview'] ) ) {
-            return false;
+        $frame = false;
+        if ( isset( $_GET['vp_preview'] ) && isset( $_REQUEST['vp_preview_nonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['vp_preview_nonce'] ), 'vp-ajax-nonce' ) ) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+            $frame = isset( $_POST['vp_preview_frame'] ) ? Visual_Portfolio_Security::sanitize_boolean( $_POST['vp_preview_frame'] ) : false;
+            $id    = isset( $_POST['vp_preview_frame_id'] ) ? sanitize_text_field( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
+
+            // Elementor preview.
+            if ( ! $frame && ! $id && isset( $_REQUEST['vp_preview_type'] ) && 'elementor' === $_REQUEST['vp_preview_type'] ) {
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+                $frame = isset( $_REQUEST['vp_preview_frame'] ) ? Visual_Portfolio_Security::sanitize_boolean( $_REQUEST['vp_preview_frame'] ) : false;
+            }
         }
 
-        // phpcs:disable
-        $frame = isset( $_POST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame'] ) ) : false;
-        $id    = isset( $_POST['vp_preview_frame_id'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
-
-        // Elementor preview.
-        if ( ! $frame && ! $id && isset( $_REQUEST['vp_preview_type'] ) && 'elementor' === $_REQUEST['vp_preview_type'] ) {
-            $frame = isset( $_REQUEST['vp_preview_frame'] ) ? esc_attr( wp_unslash( $_REQUEST['vp_preview_frame'] ) ) : false;
-        }
-        // phpcs:enable
-
-        $this->preview_enabled = 'true' === $frame;
+        $this->preview_enabled = $frame;
     }
 
     /**
@@ -182,27 +182,27 @@ class Visual_Portfolio_Preview {
     public function do_not_cache() {
         // Disable cache plugins.
         if ( ! defined( 'DONOTCACHEPAGE' ) ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
             define( 'DONOTCACHEPAGE', true );
         }
 
         if ( ! defined( 'DONOTCACHEDB' ) ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
             define( 'DONOTCACHEDB', true );
         }
 
         if ( ! defined( 'DONOTMINIFY' ) ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
             define( 'DONOTMINIFY', true );
         }
 
         if ( ! defined( 'DONOTCDN' ) ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
             define( 'DONOTCDN', true );
         }
 
         if ( ! defined( 'DONOTCACHCEOBJECT' ) ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
             define( 'DONOTCACHCEOBJECT', true );
         }
 
@@ -241,15 +241,14 @@ class Visual_Portfolio_Preview {
         wp_localize_script(
             'visual-portfolio-preview',
             'vp_preview_post_data',
-            // phpcs:ignore
+            // phpcs:disable WordPress.Security.NonceVerification.Missing
             isset( $_POST ) && ! empty( $_POST ) ? $_POST : array()
         );
 
         $class_name = 'vp-preview-wrapper';
 
         // preview type.
-        // phpcs:ignore
-        $type = isset( $_POST['vp_preview_type'] ) ? esc_attr( wp_unslash( $_POST['vp_preview_type'] ) ) : false;
+        $type = isset( $_POST['vp_preview_type'] ) ? sanitize_text_field( wp_unslash( $_POST['vp_preview_type'] ) ) : false;
 
         if ( $type ) {
             $class_name .= ' vp-preview-type-' . $type;
@@ -257,10 +256,7 @@ class Visual_Portfolio_Preview {
 
         // Prepare portfolio post options.
         $options = array();
-
-        // phpcs:disable
         if ( isset( $_POST ) && ! empty( $_POST ) ) {
-            // phpcs:ignore
             foreach ( $_POST as $name => $val ) {
                 if ( strpos( $name, 'vp_' ) === 0 ) {
                     $options[ preg_replace( '/^vp_/', '', $name ) ] = $val;
@@ -269,10 +265,13 @@ class Visual_Portfolio_Preview {
         }
 
         // Elementor widget preview.
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
         if ( isset( $_REQUEST['vp_preview_type'] ) && 'elementor' === $_REQUEST['vp_preview_type'] && isset( $_REQUEST['vp_preview_frame_id'] ) ) {
-            $options[ 'id' ] = esc_attr( wp_unslash( $_REQUEST['vp_preview_frame_id'] ) );
+            $options['id'] = sanitize_text_field( wp_unslash( $_REQUEST['vp_preview_frame_id'] ) );
         }
-        // phpcs:enable
+        // phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
+
+        $options = Visual_Portfolio_Security::sanitize_attributes( $options );
 
         // Register assets.
         Visual_Portfolio_Assets::enqueue( $options );

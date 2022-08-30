@@ -287,7 +287,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 printf(
                     '<option value="%1$s" %2$s>%3$s (%4$s)</option>',
                     esc_attr( $term->slug ),
-                    // phpcs:ignore
+                    // phpcs:ignore WordPress.Security.NonceVerification
                     isset( $_GET[ $taxonomy_slug ] ) && $_GET[ $taxonomy_slug ] === $term->slug ? ' selected="selected"' : '',
                     esc_html( $term->name ),
                     esc_html( $term->count )
@@ -534,8 +534,8 @@ class Visual_Portfolio_Custom_Post_Type {
                 }
 
                 echo '<a href="' . esc_url( get_edit_post_link() ) . '" class="vp-portfolio-list__icon">';
-                // phpcs:ignore
-                echo $icon;
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo Visual_Portfolio_Security::wp_kses_svg( $icon );
                 echo '</a>';
             }
         }
@@ -562,12 +562,12 @@ class Visual_Portfolio_Custom_Post_Type {
                 'social-stream' => esc_html__( 'Social', '@@text_domain' ),
             );
 
-            // phpcs:ignore
-            $selected_layout = isset( $_GET['vp_layout'] ) ? $_GET['vp_layout'] : '';
-            // phpcs:ignore
-            $selected_items_style = isset( $_GET['vp_items_style'] ) ? $_GET['vp_items_style'] : '';
-            // phpcs:ignore
-            $selected_content_source = isset( $_GET['vp_content_source'] ) ? $_GET['vp_content_source'] : '';
+            // phpcs:ignore WordPress.Security.NonceVerification
+            $selected_layout = isset( $_GET['vp_layout'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_layout'] ) ) : '';
+            // phpcs:ignore WordPress.Security.NonceVerification
+            $selected_items_style = isset( $_GET['vp_items_style'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_items_style'] ) ) : '';
+            // phpcs:ignore WordPress.Security.NonceVerification
+            $selected_content_source = isset( $_GET['vp_content_source'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_content_source'] ) ) : '';
 
             ?>
             <select name="vp_layout" id="filter-by-vp_layout">
@@ -617,12 +617,12 @@ class Visual_Portfolio_Custom_Post_Type {
         if ( 'edit.php' === $pagenow && isset( $q_vars['post_type'] ) && 'vp_lists' === $q_vars['post_type'] ) {
             $meta_query = array();
 
-            // phpcs:ignore
-            $filter_layout = isset( $_GET['vp_layout'] ) ? $_GET['vp_layout'] : '';
-            // phpcs:ignore
-            $filter_items_style = isset( $_GET['vp_items_style'] ) ? $_GET['vp_items_style'] : '';
-            // phpcs:ignore
-            $filter_content_source = isset( $_GET['vp_content_source'] ) ? $_GET['vp_content_source'] : '';
+            // phpcs:ignore WordPress.Security.NonceVerification
+            $filter_layout = isset( $_GET['vp_layout'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_layout'] ) ) : '';
+            // phpcs:ignore WordPress.Security.NonceVerification
+            $filter_items_style = isset( $_GET['vp_items_style'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_items_style'] ) ) : '';
+            // phpcs:ignore WordPress.Security.NonceVerification
+            $filter_content_source = isset( $_GET['vp_content_source'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_content_source'] ) ) : '';
 
             if ( $filter_layout ) {
                 $meta_query[] = array(
@@ -644,7 +644,7 @@ class Visual_Portfolio_Custom_Post_Type {
             }
 
             if ( ! empty( $meta_query ) ) {
-                // phpcs:ignore
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
                 $q_vars['meta_query'] = $meta_query;
             }
         }
@@ -819,12 +819,12 @@ class Visual_Portfolio_Custom_Post_Type {
      * Render of proofing page.
      */
     public function go_proofing_pro_page() {
-        // phpcs:ignore
+        // phpcs:ignore WordPress.Security.NonceVerification
         if ( ! isset( $_GET['page'] ) || empty( $_GET['page'] ) ) {
             return;
         }
 
-        // phpcs:ignore
+        // phpcs:ignore WordPress.Security.NonceVerification
         if ( 'vpf_proofing_page' === $_GET['page'] ) {
             $pro_url = Visual_Portfolio_Admin::get_pro_url(
                 array(

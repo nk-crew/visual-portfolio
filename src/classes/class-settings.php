@@ -140,14 +140,14 @@ class Visual_Portfolio_Settings {
     public static function redirect_if_toggle_unregistered_portfolio_post_type() {
         global $pagenow;
         $register_portfolio_post_type = Visual_Portfolio_Custom_Post_Type::portfolio_post_type_is_registered();
-        // phpcs:disable
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
         if (
             $register_portfolio_post_type &&
             'admin.php' === $pagenow &&
             isset( $_GET['page'] ) &&
             'visual-portfolio-settings' === $_GET['page']
         ) {
-            wp_redirect( admin_url( '/edit.php?post_type=portfolio&page=visual-portfolio-settings' ) );
+            wp_safe_redirect( admin_url( '/edit.php?post_type=portfolio&page=visual-portfolio-settings' ) );
             exit;
         }
 
@@ -159,10 +159,10 @@ class Visual_Portfolio_Settings {
             isset( $_GET['post_type'] ) &&
             'portfolio' === $_GET['post_type']
         ) {
-            wp_redirect( admin_url( '/admin.php?page=visual-portfolio-settings' ) );
+            wp_safe_redirect( admin_url( '/admin.php?page=visual-portfolio-settings' ) );
             exit;
         }
-        // phpcs:enable
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
     }
 
     /**
@@ -173,7 +173,14 @@ class Visual_Portfolio_Settings {
      */
     public static function admin_enqueue_scripts( $page ) {
         if ( 'portfolio_page_@@text_domain-settings' === $page || 'toplevel_page_@@text_domain-settings' === $page ) {
+            $data_init = array(
+                'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
+            );
+
             wp_enqueue_script( '@@text_domain-archive-page-selector', visual_portfolio()->plugin_url . 'assets/admin/js/archive-page-selector.min.js', array( 'jquery', 'select2' ), '@@plugin_version', true );
+
+            wp_localize_script( '@@text_domain-archive-page-selector', 'VPAdminVariables', $data_init );
+
         }
     }
 
@@ -824,33 +831,33 @@ class Visual_Portfolio_Settings {
      * @return void
      */
     public static function get_posts_ajax_callback() {
-        $return     = array();
-        $query_opts = array(
-            'post_status'            => 'publish',
-            'ignore_sticky_posts'    => 1,
-            'posts_per_page'         => 50,
-            'post_type'              => 'page',
-            'update_post_meta_cache' => false,
-            'update_post_term_cache' => false,
-        );
+        if ( isset( $_REQUEST['nonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['nonce'] ), 'vp-ajax-nonce' ) ) {
+            $return     = array();
+            $query_opts = array(
+                'post_status'            => 'publish',
+                'ignore_sticky_posts'    => 1,
+                'posts_per_page'         => 50,
+                'post_type'              => 'page',
+                'update_post_meta_cache' => false,
+                'update_post_term_cache' => false,
+            );
 
-        // phpcs:disable
-        if ( isset( $_GET['q'] ) && $_GET['q'] ) {
-            $query_opts['s'] = $_GET['q'];
-        }
-        // phpcs:enable
-
-        $search_results = new WP_Query( $query_opts );
-
-        if ( $search_results->have_posts() ) {
-            while ( $search_results->have_posts() ) {
-                $search_results->the_post();
-                $title    = ( mb_strlen( $search_results->post->post_title ) > 50 ) ? mb_substr( $search_results->post->post_title, 0, 49 ) . '...' : $search_results->post->post_title;
-                $return[] = array( $search_results->post->ID, $title );
+            if ( isset( $_GET['q'] ) && ! empty( $_GET['q'] ) ) {
+                $query_opts['s'] = sanitize_text_field( wp_unslash( $_GET['q'] ) );
             }
-        }
 
-        echo wp_json_encode( $return );
+            $search_results = new WP_Query( $query_opts );
+
+            if ( $search_results->have_posts() ) {
+                while ( $search_results->have_posts() ) {
+                    $search_results->the_post();
+                    $title    = ( mb_strlen( $search_results->post->post_title ) > 50 ) ? mb_substr( $search_results->post->post_title, 0, 49 ) . '...' : $search_results->post->post_title;
+                    $return[] = array( $search_results->post->ID, $title );
+                }
+            }
+
+            echo wp_json_encode( $return );
+        }
 
         die;
     }

@@ -35,7 +35,7 @@ class Visual_Portfolio_Welcome_Screen {
         delete_transient( '_visual_portfolio_welcome_screen_activation_redirect' );
 
         // Bail if activating from network, or bulk.
-        // phpcs:ignore
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ( is_network_admin() || isset( $_GET['activate-multi'] ) ) {
             return;
         }

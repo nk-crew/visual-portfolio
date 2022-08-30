@@ -91,8 +91,18 @@ class Visual_Portfolio_Archive_Mapping {
      * @return string
      */
     public function add_body_archive_classes( $classes ) {
-        // phpcs:ignore
-        $post_id = $_REQUEST['vp_preview_post_id'] ?? get_the_ID() ?? null;
+        if (
+            isset( $_REQUEST['vp_preview_post_id'] ) &&
+            ! empty( $_REQUEST['vp_preview_post_id'] ) &&
+            isset( $_REQUEST['vp_preview_nonce'] ) &&
+            ! empty( $_REQUEST['vp_preview_nonce'] ) &&
+            wp_verify_nonce( sanitize_key( $_REQUEST['vp_preview_nonce'] ), 'vp-ajax-nonce' )
+        ) {
+            $post_id = intval( $_REQUEST['vp_preview_post_id'] );
+        }
+
+        $post_id = $post_id ?? get_the_ID() ?? null;
+
         if ( $post_id && get_post_meta( $post_id, '_vp_post_type_mapped', true ) ) {
             $classes[] = 'visual-portfolio-archive';
             $classes[] = 'archive';
@@ -143,8 +153,18 @@ class Visual_Portfolio_Archive_Mapping {
      * @return array
      */
     public function add_filter_items( $terms, $vp_options ) {
-        // phpcs:ignore
-        $post_id = $_REQUEST['vp_preview_post_id'] ?? get_the_ID() ?? null;
+        if (
+            isset( $_REQUEST['vp_preview_post_id'] ) &&
+            ! empty( $_REQUEST['vp_preview_post_id'] ) &&
+            isset( $_REQUEST['vp_preview_nonce'] ) &&
+            ! empty( $_REQUEST['vp_preview_nonce'] ) &&
+            wp_verify_nonce( sanitize_key( $_REQUEST['vp_preview_nonce'] ), 'vp-ajax-nonce' )
+        ) {
+            $post_id = intval( $_REQUEST['vp_preview_post_id'] );
+        }
+
+        $post_id = $post_id ?? get_the_ID() ?? null;
+
         if (
             $post_id &&
             get_post_meta( $post_id, '_vp_post_type_mapped', true ) &&
@@ -379,23 +399,20 @@ class Visual_Portfolio_Archive_Mapping {
         }
 
         // We need to save the options ourselves; settings api does not trigger save for the permalinks page.
-        // phpcs:ignore
-        if ( isset( $_POST['permalink_structure'], $_POST['vp-permalinks-nonce'], $_POST['vp_category_slug'], $_POST['vp_tag_slug'] ) && wp_verify_nonce( wp_unslash( $_POST['vp-permalinks-nonce'] ), 'vp-permalinks' ) ) {
-
-            $permalinks = (array) get_option( 'portfolio_permalinks', array() );
-            // phpcs:ignore
-            $permalinks['category_base'] = wp_unslash( $_POST['vp_category_slug'] );
-            // phpcs:ignore
-            $permalinks['tag_base']      = wp_unslash( $_POST['vp_tag_slug'] );
+        if (
+            isset( $_POST['permalink_structure'], $_POST['vp-permalinks-nonce'], $_POST['vp_category_slug'], $_POST['vp_tag_slug'] ) &&
+            wp_verify_nonce( sanitize_key( $_POST['vp-permalinks-nonce'] ), 'vp-permalinks' )
+        ) {
+            $permalinks                  = (array) get_option( 'portfolio_permalinks', array() );
+            $permalinks['category_base'] = sanitize_text_field( wp_unslash( $_POST['vp_category_slug'] ) );
+            $permalinks['tag_base']      = sanitize_text_field( wp_unslash( $_POST['vp_tag_slug'] ) );
 
             // Generate portfolio base.
-            // phpcs:ignore
-            $portfolio_base = isset( $_POST['portfolio_permalink'] ) ? wp_unslash( $_POST['portfolio_permalink'] ) : '';
+            $portfolio_base = isset( $_POST['portfolio_permalink'] ) ? sanitize_option( 'permalink_structure', wp_unslash( $_POST['portfolio_permalink'] ) ) : '';
 
             if ( 'custom' === $portfolio_base ) {
                 if ( isset( $_POST['portfolio_permalink_structure'] ) ) {
-                    // phpcs:ignore
-                    $portfolio_base = preg_replace( '#/+#', '/', '/' . str_replace( '#', '', trim( wp_unslash( $_POST['portfolio_permalink_structure'] ) ) ) );
+                    $portfolio_base = preg_replace( '#/+#', '/', '/' . str_replace( '#', '', trim( sanitize_option( 'permalink_structure', wp_unslash( $_POST['portfolio_permalink_structure'] ) ) ) ) );
                 } else {
                     $portfolio_base = '/';
                 }
@@ -513,16 +530,12 @@ class Visual_Portfolio_Archive_Mapping {
                 ! empty( $query->query['vp_category'] ) &&
                 (
                     (
-                        // phpcs:ignore
-                        isset( $_GET['vp_filter'] ) &&
-                        // phpcs:ignore
-                        ! empty( $_GET['vp_filter'] )
+                        // phpcs:ignore WordPress.Security.NonceVerification
+                        isset( $_GET['vp_filter'] ) && ! empty( $_GET['vp_filter'] )
                     ) ||
                     (
-                        // phpcs:ignore
-                        isset( $_REQUEST['vpf_ajax_call'] ) &&
-                        // phpcs:ignore
-                        $_REQUEST['vpf_ajax_call']
+                        // phpcs:ignore WordPress.Security.NonceVerification
+                        isset( $_REQUEST['vpf_ajax_call'] ) && settype( sanitize_text_field( wp_unslash( $_REQUEST['vpf_ajax_call'] ) ), 'bool' )
                     )
                 )
             ) {
@@ -533,10 +546,8 @@ class Visual_Portfolio_Archive_Mapping {
                 isset( $query->query['vp_page_query'] ) &&
                 ! empty( $query->query['vp_page_query'] ) &&
                 (
-                    // phpcs:ignore
-                    isset( $_REQUEST['vpf_ajax_call'] ) &&
-                    // phpcs:ignore
-                    $_REQUEST['vpf_ajax_call']
+                    // phpcs:ignore WordPress.Security.NonceVerification
+                    isset( $_REQUEST['vpf_ajax_call'] ) && settype( sanitize_text_field( wp_unslash( $_REQUEST['vpf_ajax_call'] ) ), 'bool' )
                 )
             ) {
                 unset( $query->query['vp_page_query'] );
@@ -553,8 +564,17 @@ class Visual_Portfolio_Archive_Mapping {
      * @return array
      */
     public function extend_query_args( $args, $options ) {
-        // phpcs:ignore
-        $post_id = $_REQUEST['vp_preview_post_id'] ?? $args['page_id'] ?? null;
+        if (
+            isset( $_REQUEST['vp_preview_post_id'] ) &&
+            ! empty( $_REQUEST['vp_preview_post_id'] ) &&
+            isset( $_REQUEST['vp_preview_nonce'] ) &&
+            ! empty( $_REQUEST['vp_preview_nonce'] ) &&
+            wp_verify_nonce( sanitize_key( $_REQUEST['vp_preview_nonce'] ), 'vp-ajax-nonce' )
+        ) {
+            $post_id = intval( $_REQUEST['vp_preview_post_id'] );
+        }
+
+        $post_id = $post_id ?? $args['page_id'] ?? null;
 
         if ( $post_id && 'current_query' === $options['posts_source'] ) {
             $post_meta = get_post_meta( (int) $post_id, '_vp_post_type_mapped', true );
@@ -598,8 +618,10 @@ class Visual_Portfolio_Archive_Mapping {
                         $key = array_search( 'pagination', $container['elements'], true );
                         if ( false !== $key && isset( $options['pagination'] ) ) {
                             if ( 'paged' === $options['pagination'] || is_tax() ) {
-                                // phpcs:ignore
-                                $options['start_page'] = $wp_query->query_vars['vp_page_query'] ?? $_REQUEST['vp_page'] ?? 1;
+                                // phpcs:ignore WordPress.Security.NonceVerification
+                                $vp_page = isset( $_REQUEST['vp_page'] ) && ! empty( $_REQUEST['vp_page'] ) ? sanitize_option( 'posts_per_page', wp_unslash( $_REQUEST['vp_page'] ) ) : null;
+
+                                $options['start_page'] = $wp_query->query_vars['vp_page_query'] ?? $vp_page ?? 1;
                             } else {
                                 unset( $options['layout_elements'][ $position ]['elements'][ $key ] );
                             }
@@ -704,8 +726,14 @@ class Visual_Portfolio_Archive_Mapping {
      */
     private static function delete_post_type_mapped_meta() {
         global $wpdb;
-        $query = "delete from {$wpdb->postmeta} where meta_key = '_vp_post_type_mapped'";
-        $wpdb->query( $query ); // phpcs:ignore
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM %s
+                WHERE meta_key = '_vp_post_type_mapped'",
+                $wpdb->postmeta
+            )
+        );
     }
 
     /**

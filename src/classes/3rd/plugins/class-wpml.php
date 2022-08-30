@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
+// phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 /**
  * Class Visual_Portfolio_3rd_WPML
@@ -77,7 +77,6 @@ class Visual_Portfolio_3rd_WPML {
      */
     public static function get_object_id( $post_id ) {
         if ( class_exists( 'SitePress' ) ) {
-            // phpcs:ignore
             return apply_filters( 'wpml_object_id', $post_id, 'page', true );
         }
         return $post_id;
@@ -157,8 +156,7 @@ class Visual_Portfolio_3rd_WPML {
                 $taxonomy_data = get_term( $taxonomy );
 
                 if ( isset( $taxonomy_data->taxonomy ) ) {
-                    // phpcs:ignore
-                    $options['posts_taxonomies'][$k] = apply_filters( 'wpml_object_id', $taxonomy, $taxonomy_data->taxonomy, true );
+                    $options['posts_taxonomies'][ $k ] = apply_filters( 'wpml_object_id', $taxonomy, $taxonomy_data->taxonomy, true );
                 }
             }
         }

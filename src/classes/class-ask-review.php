@@ -61,33 +61,35 @@ class Visual_Portfolio_Ask_Review_Notice {
         if ( ! $this->is_notice_allowed() ) {
             return;
         }
-
-        $message = '';
-
-        $message .= '<h3>' . esc_html__( 'Satisfied using Visual Portfolio?', '@@text_domain' ) . '</h3>';
-        $message .= '<p>';
-
-        // Translators: placeholder is the plugin name.
-        $message .= sprintf( esc_html__( 'Hey, we noticed you\'ve been using %s for more than two weeks now – that\'s awesome!', '@@text_domain' ), '<strong>' . _x( 'Visual Portfolio', 'plugin name inside the review notice', '@@text_domain' ) . '</strong>' );
-        $message .= '<br>';
-
-        $message .= esc_html__( 'Could you please do us a BIG favor and give it a rating on WordPress.org to help us spread the word and boost our motivation?', '@@text_domain' ) . '</p>
-            <p>
-                <a href="https://wordpress.org/support/plugin/visual-portfolio/reviews/?filter=5#new-post" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="yes" target="_blank" rel="noopener noreferrer"><strong>' . esc_html__( 'Yes, you deserve it', '@@text_domain' ) . '</strong></a><br>
-                <a href="#" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="later">' . esc_html__( 'No, maybe later', '@@text_domain' ) . '</a><br>
-                <a href="#" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="already">' . esc_html__( 'I already did', '@@text_domain' ) . '</a>
-            </p>';
-
         ?>
         <div class="notice notice-info vpf-admin-notice" id="vpf-review-plugin-notice">
             <div class="vpf-admin-notice-icon">
                 <i class="dashicons-visual-portfolio"></i>
             </div>
             <div class="vpf-admin-notice-content">
-                <?php
-                // phpcs:ignore
-                echo $message;
-                ?>
+                <h3><?php esc_html_e( 'Satisfied using Visual Portfolio?', '@@text_domain' ); ?></h3>
+                <p>
+                    <?php
+                        // translators: %s - Plugin name.
+                        printf( esc_html__( 'Hey, we noticed you\'ve been using %s for more than two weeks now – that\'s awesome!', '@@text_domain' ), '<strong>' . _x( 'Visual Portfolio', 'plugin name inside the review notice', '@@text_domain' ) . '</strong>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    ?>
+                    <br>
+                    <?php esc_html_e( 'Could you please do us a BIG favor and give it a rating on WordPress.org to help us spread the word and boost our motivation?', '@@text_domain' ); ?>
+                </p>
+                <p>
+                    <a href="https://wordpress.org/support/plugin/visual-portfolio/reviews/?filter=5#new-post" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="yes" target="_blank" rel="noopener noreferrer">
+                        <strong>
+                            <?php esc_html_e( 'Yes, you deserve it', '@@text_domain' ); ?>
+                        </strong>
+                    </a>
+                    <br>
+                    <a href="#" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="later">
+                        <?php esc_html_e( 'No, maybe later', '@@text_domain' ); ?>
+                    </a><br>
+                    <a href="#" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="already">
+                        <?php esc_html_e( 'I already did', '@@text_domain' ); ?>
+                    </a>
+                </p>
             </div>
         </div>
         <?php

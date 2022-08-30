@@ -20,7 +20,7 @@ class Visual_Portfolio_Templates {
         $args = apply_filters( 'vpf_include_template_args', $args, $template_name );
 
         if ( ! empty( $args ) && is_array( $args ) ) {
-	        // phpcs:ignore
+	        // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
             extract( $args );
         }
 

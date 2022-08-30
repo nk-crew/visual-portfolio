@@ -52,7 +52,7 @@ class Visual_Portfolio_Image_Placeholder {
 
         // try to move to /visual-portfolio/ directory.
         if ( ! file_exists( $upload_dir['basedir'] . '/visual-portfolio' ) ) {
-            // phpcs:ignore
+            // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
             @mkdir( $upload_dir['basedir'] . '/visual-portfolio', 0755, true );
         }
         if ( ! file_exists( $upload_dir['basedir'] . '/visual-portfolio' ) ) {

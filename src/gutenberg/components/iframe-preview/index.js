@@ -324,6 +324,7 @@ class IframePreview extends Component {
             <input type="hidden" name="vp_preview_type" value="gutenberg" readOnly />
             <input type="hidden" name="vp_preview_post_type" value={postType} readOnly />
             <input type="hidden" name="vp_preview_post_id" value={postId} readOnly />
+            <input type="hidden" name="vp_preview_nonce" value={variables.nonce} readOnly />
 
             {'saved' === contentSource ? (
               <input type="text" name="vp_id" value={id} readOnly />

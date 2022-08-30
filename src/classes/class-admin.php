@@ -414,7 +414,7 @@ class Visual_Portfolio_Admin {
                                         'value' => '4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
                                     ),
                                 ),
-                                // phpcs:ignore
+                                // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
                                 /*
                                  * Example:
                                     array(
@@ -2029,7 +2029,6 @@ class Visual_Portfolio_Admin {
         /**
          * Items Style
          */
-        // phpcs:ignore
         $items_styles = Visual_Portfolio_Get::get_all_items_styles();
 
         // Styles selector.
@@ -2539,7 +2538,7 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
             ),
-            // phpcs:ignore
+            // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
             /*
              * Example:
                 array(
@@ -2557,7 +2556,7 @@ class Visual_Portfolio_Admin {
         // Extend specific filter controls.
         foreach ( $filters as $name => $filter ) {
             if ( isset( $filter['controls'] ) ) {
-                // phpcs:ignore
+                // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
                 /*
                  * Example:
                     array(
@@ -2668,7 +2667,7 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
             ),
-            // phpcs:ignore
+            // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
             /*
              * Example:
                 array(
@@ -2686,7 +2685,7 @@ class Visual_Portfolio_Admin {
         // Extend specific sort controls.
         foreach ( $sorts as $name => $sort ) {
             if ( isset( $sort['controls'] ) ) {
-                // phpcs:ignore
+                // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
                 /*
                  * Example:
                     array(
@@ -2783,7 +2782,7 @@ class Visual_Portfolio_Admin {
                     'controls' => array(),
                 ),
             ),
-            // phpcs:ignore
+            // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
             /*
              * Example:
                 array(
@@ -2801,7 +2800,7 @@ class Visual_Portfolio_Admin {
         // Extend specific pagination controls.
         foreach ( $pagination as $name => $pagin ) {
             if ( isset( $pagin['controls'] ) ) {
-                // phpcs:ignore
+                // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
                 /*
                  * Example:
                     array(

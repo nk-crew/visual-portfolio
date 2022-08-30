@@ -52,7 +52,9 @@ $wnd.on('elementor/frontend/init', ($data) => {
     const id = $block.attr('data-id');
     const iframeURL = `${
       variables.preview_url + (variables.preview_url.split('?')[1] ? '&' : '?')
-    }vp_preview_frame=true&vp_preview_type=elementor&vp_preview_frame_id=${id}`;
+    }vp_preview_frame=true&vp_preview_type=elementor&vp_preview_frame_id=${id}&vp_preview_nonce=${
+      variables.nonce
+    }`;
 
     $frame.attr('src', iframeURL);
 

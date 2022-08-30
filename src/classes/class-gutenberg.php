@@ -151,18 +151,17 @@ class Visual_Portfolio_Gutenberg_Block {
         if ( $attributes['className'] ) {
             $class_name .= ' ' . $attributes['className'];
         }
-
-        $html_atts = 'class="' . esc_attr( $class_name ) . '"';
-
-        // Ghost Kit animate on scroll support.
-        if ( isset( $attributes['ghostkitSR'] ) && $attributes['ghostkitSR'] ) {
-            $html_atts .= ' data-ghostkit-sr="' . esc_attr( $attributes['ghostkitSR'] ) . '"';
-        }
-
         ?>
-        <div <?php echo $html_atts; // phpcs:ignore ?>>
+        <div
+        <?php
+            echo ' class="' . esc_attr( $class_name ) . '"';
+            // Ghost Kit animate on scroll support.
+            echo isset( $attributes['ghostkitSR'] ) && $attributes['ghostkitSR'] ? ' data-ghostkit-sr="' . esc_attr( $attributes['ghostkitSR'] ) . '"' : '';
+        ?>
+        >
             <?php
-            // phpcs:ignore
+            // The function returns clean data because it includes templates that use escaping functions before output.
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             echo Visual_Portfolio_Get::get( $attributes );
             ?>
         </div>

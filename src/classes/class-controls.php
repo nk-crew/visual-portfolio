@@ -48,61 +48,62 @@ class Visual_Portfolio_Controls {
      */
     private static $default_args = array(
         // category for registered fields.
-        'category'         => '',
+        'category'          => '',
 
-        'type'             => 'text',
-        'label'            => false,
-        'description'      => false,
-        'name'             => '',
-        'value'            => '',
-        'value_callback'   => '',
-        'placeholder'      => '',
-        'readonly'         => false,
+        'type'              => 'text',
+        'label'             => false,
+        'description'       => false,
+        'name'              => '',
+        'value'             => '',
+        'value_callback'    => '',
+        'sanitize_callback' => '',
+        'placeholder'       => '',
+        'readonly'          => false,
 
         // control-specific args.
         // notice.
-        'status'           => 'info',
+        'status'            => 'info',
         // select.
-        'options'          => array(),
-        'searchable'       => false,
-        'multiple'         => false,
-        'creatable'        => false,
+        'options'           => array(),
+        'searchable'        => false,
+        'multiple'          => false,
+        'creatable'         => false,
         // range.
-        'min'              => '',
-        'max'              => '',
-        'step'             => '1',
+        'min'               => '',
+        'max'               => '',
+        'step'              => '1',
         // textarea.
-        'cols'             => '',
-        'rows'             => '',
+        'cols'              => '',
+        'rows'              => '',
         // color.
-        'alpha'            => false,
+        'alpha'             => false,
         // align.
-        'extended'         => false,
+        'extended'          => false,
         // code editor.
-        'mode'             => 'css',
-        'max_lines'        => 20,
-        'min_lines'        => 5,
-        'allow_modal'      => true,
-        'classes_tree'     => false,
-        'encode'           => false,
-        'code_placeholder' => '',
+        'mode'              => 'css',
+        'max_lines'         => 20,
+        'min_lines'         => 5,
+        'allow_modal'       => true,
+        'classes_tree'      => false,
+        'encode'            => false,
+        'code_placeholder'  => '',
         // elements selector.
-        'locations'        => array(),
+        'locations'         => array(),
         // gallery.
-        'focal_point'      => false,
+        'focal_point'       => false,
 
         // hint.
-        'hint'             => false,
-        'hint_place'       => 'top',
+        'hint'              => false,
+        'hint_place'        => 'top',
 
         // display in setup wizard.
-        'setup_wizard'     => false,
+        'setup_wizard'      => false,
 
         // support for WPML.
-        'wpml'             => false,
+        'wpml'              => false,
 
         // condition.
-        'condition'        => array(
+        'condition'         => array(
             /**
              * Array of arrays with data:
              *  'control'  - control name.
@@ -112,7 +113,7 @@ class Visual_Portfolio_Controls {
         ),
 
         // style.
-        'style'            => array(
+        'style'             => array(
             /**
              * Array of arrays with data:
              *  'element'  - CSS selector string (.vp-portfolio__item, .vp-portfolio__item-overlay, etc).
@@ -121,8 +122,8 @@ class Visual_Portfolio_Controls {
              */
         ),
 
-        'class'            => '',
-        'wrapper_class'    => '',
+        'class'             => '',
+        'wrapper_class'     => '',
     );
 
     /**
@@ -153,8 +154,8 @@ class Visual_Portfolio_Controls {
                 isset( $control['value_callback'] ) &&
                 is_callable( $control['value_callback'] )
             ) {
-                // phpcs:ignore
-                $attributes = isset( $_POST['vp_attributes'] ) ? $_POST['vp_attributes'] : array();
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+                $attributes = isset( $_POST['vp_attributes'] ) ? Visual_Portfolio_Security::sanitize_attributes( $_POST['vp_attributes'] ) : array();
                 $found      = true;
                 $result     = call_user_func( $control['value_callback'], $attributes, $control );
                 break;
@@ -162,16 +163,14 @@ class Visual_Portfolio_Controls {
         }
 
         if ( null === $found ) {
-            // phpcs:ignore
-            echo json_encode(
+            echo wp_json_encode(
                 array(
                     'response' => esc_attr__( 'Dynamic control callback function is not found.', '@@text_domain' ),
                     'error'    => true,
                 )
             );
         } else {
-            // phpcs:ignore
-            echo json_encode(
+            echo wp_json_encode(
                 array(
                     'response' => $result,
                     'success'  => true,
@@ -226,7 +225,7 @@ class Visual_Portfolio_Controls {
                 $img_controls = array();
 
                 // Extend.
-                // phpcs:ignore
+                // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
                 /*
                 * Example:
                     array(

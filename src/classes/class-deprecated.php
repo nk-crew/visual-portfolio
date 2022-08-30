@@ -103,12 +103,12 @@ class Visual_Portfolio_Deprecations {
 
                 // Apply filters.
                 if ( 'filter' === $hook_data['type'] ) {
-                    // phpcs:ignore
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
                     $args[0] = apply_filters_ref_array( $hook_data['deprecated'], $args );
 
                     // Or do action.
                 } else {
-                    // phpcs:ignore
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
                     do_action_ref_array( $hook_data['deprecated'], $args );
                 }
             }

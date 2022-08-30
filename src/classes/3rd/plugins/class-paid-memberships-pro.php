@@ -29,7 +29,7 @@ class Visual_Portfolio_3rd_Paid_Memberships_Pro {
             return;
         }
 
-        // phpcs:ignore
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ( ! isset( $_GET['vp_preview'] ) ) {
             return;
         }
