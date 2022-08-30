@@ -173,6 +173,7 @@ class Visual_Portfolio {
         // Deprecations run before all features.
         require_once $this->plugin_path . 'classes/class-deprecated.php';
 
+        require_once $this->plugin_path . 'classes/class-security.php';
         require_once $this->plugin_path . 'gutenberg/utils/control-condition-check/index.php';
         require_once $this->plugin_path . 'gutenberg/utils/control-get-value/index.php';
         require_once $this->plugin_path . 'gutenberg/utils/controls-dynamic-css/index.php';
