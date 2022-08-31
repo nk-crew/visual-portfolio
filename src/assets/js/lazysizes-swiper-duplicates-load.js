@@ -28,7 +28,7 @@
 
   const swiperDuplicatesLoad = {
     getSlideData(element) {
-      const $el = element.closest('.vp-portfolio__item-wrap.swiper-slide');
+      const $el = element.closest('.swiper-slide');
       const slideIndex = $el ? $el.getAttribute('data-swiper-slide-index') : false;
 
       return {
@@ -46,7 +46,9 @@
         );
 
         $siblingDuplicates.forEach((el) => {
-          const $images = el.querySelectorAll('img.vp-lazyload');
+          // We should also get images in `loading` state, because in some rare situations
+          // duplicated images by default has this class and not displaying correctly.
+          const $images = el.querySelectorAll('img.vp-lazyload, img.vp-lazyloading');
 
           if ($images) {
             $images.forEach(($img) => {
