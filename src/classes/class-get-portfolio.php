@@ -567,21 +567,6 @@ class Visual_Portfolio_Get {
             'filter'             => '',
             'video'              => '',
             'image_id'           => '',
-            // wp_kses allowed attributes for image
-            // extended in class-images for lazyloading support.
-            //
-            // DEPRECATED, but we should keep it, as a lot of custom user templates may still use it.
-            'image_allowed_html' => array(
-                'img' => array(
-                    'src'    => array(),
-                    'srcset' => array(),
-                    'sizes'  => array(),
-                    'alt'    => array(),
-                    'class'  => array(),
-                    'width'  => array(),
-                    'height' => array(),
-                ),
-            ),
             'img_size_popup'     => $img_size_popup,
             'img_size_md_popup'  => $img_size_md_popup,
             'img_size_sm_popup'  => $img_size_sm_popup,
@@ -590,6 +575,7 @@ class Visual_Portfolio_Get {
             'opts'               => $style_options,
             'vp_opts'            => $options,
         );
+
         $items = array();
 
         if ( ( $is_images || $is_social ) &&
@@ -2049,7 +2035,6 @@ class Visual_Portfolio_Get {
      *      'filter' - filters string.
      *      'video' - video url.
      *      'image_id' - image id.
-     *      'image_allowed_html' - image allowed attributes for wp_kses.
      *      'img_size_popup' - image size for popup.
      *      'img_size_md_popup' - md image size for popup.
      *      'img_size_sm_popup' - sm image size for popup.
@@ -2079,9 +2064,6 @@ class Visual_Portfolio_Get {
 
         // prepare image.
         $args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '' );
-
-        // fallback for old templates versions.
-        $args['image_noscript'] = '';
 
         // prepare date.
         if ( isset( $args['opts']['show_date'] ) ) {

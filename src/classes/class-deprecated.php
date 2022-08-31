@@ -24,13 +24,21 @@ class Visual_Portfolio_Deprecations {
      * Visual_Portfolio_Deprecations constructor.
      */
     public function __construct() {
-        // Deprecated filters in v2.9.0.
+        // Deprecated filters since v2.9.0.
         $this->add_deprecated_filter( 'vpf_print_layout_control_args', '2.9.0', 'vpf_registered_control_args' );
         $this->add_deprecated_filter( 'vpf_get_layout_option', '2.9.0', 'vpf_control_value' );
         $this->add_deprecated_filter( 'vpf_extend_popup_image', '2.9.0', 'vpf_popup_image_data' );
         $this->add_deprecated_filter( 'vpf_extend_custom_popup_image', '2.9.0', 'vpf_popup_custom_image_data' );
         $this->add_deprecated_filter( 'vpf_print_popup_data', '2.9.0', 'vpf_popup_output' );
         $this->add_deprecated_filter( 'vpf_wp_get_attachment_image_extend', '2.9.0', 'vpf_wp_get_attachment_image' );
+
+        // Deprecated image args for wp kses since v2.10.4.
+        // Since v2.20.0 we are using the `vp_image` kses.
+        add_filter( 'vpf_image_item_args', array( $this, 'deprecated_image_kses_args' ), 9 );
+        add_filter( 'vpf_post_item_args', array( $this, 'deprecated_image_kses_args' ), 9 );
+
+        // Deprecated image noscript argument since v2.6.0.
+        add_filter( 'vpf_each_item_args', array( $this, 'deprecated_noscript_args' ), 9 );
     }
 
     /**
@@ -116,6 +124,58 @@ class Visual_Portfolio_Deprecations {
 
         // Return first arg.
         return $args[0];
+    }
+
+    /**
+     * Allowed attributes for wp_kses used in vp images.
+     *
+     * @param array $args vp item args.
+     *
+     * @return array
+     */
+    public function deprecated_image_kses_args( $args ) {
+        if ( ! isset( $args['image_allowed_html'] ) ) {
+            $args['image_allowed_html'] = array();
+        }
+        if ( ! isset( $args['image_allowed_html']['img'] ) ) {
+            $args['image_allowed_html']['img'] = array();
+        }
+
+        $args['image_allowed_html']['noscript'] = array();
+        $args['image_allowed_html']['img']      = array_merge(
+            $args['image_allowed_html']['img'],
+            array(
+                'src'          => array(),
+                'srcset'       => array(),
+                'sizes'        => array(),
+                'alt'          => array(),
+                'class'        => array(),
+                'width'        => array(),
+                'height'       => array(),
+
+                // Lazy loading attributes.
+                'loading'      => array(),
+                'data-src'     => array(),
+                'data-sizes'   => array(),
+                'data-srcset'  => array(),
+                'data-no-lazy' => array(),
+            )
+        );
+
+        return $args;
+    }
+
+    /**
+     * Add noscript string to prevent errors in old templates.
+     *
+     * @param array $args vp item args.
+     *
+     * @return array
+     */
+    public function deprecated_noscript_args( $args ) {
+        $args['image_noscript'] = '';
+
+        return $args;
     }
 }
 

@@ -137,8 +137,6 @@ class Visual_Portfolio_Images {
         add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::process_image_attributes', 9999 );
 
         add_action( 'wp_kses_allowed_html', 'Visual_Portfolio_Images::allow_lazy_attributes' );
-        add_filter( 'vpf_image_item_args', 'Visual_Portfolio_Images::vp_kses_allow_lazy_attributes', 15 );
-        add_filter( 'vpf_post_item_args', 'Visual_Portfolio_Images::vp_kses_allow_lazy_attributes', 15 );
         add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
         add_action( 'wp_head', 'Visual_Portfolio_Images::add_nojs_fallback' );
 
@@ -194,30 +192,6 @@ class Visual_Portfolio_Images {
         $allowed_tags['img'] = $img_attributes;
 
         return $allowed_tags;
-    }
-
-    /**
-     * Allow attributes of Lazy Load for wp_kses used in vp images.
-     *
-     * @param array $args vp item args.
-     *
-     * @return array
-     */
-    public static function vp_kses_allow_lazy_attributes( $args ) {
-        $args['image_allowed_html']['noscript'] = array();
-
-        $args['image_allowed_html']['img'] = array_merge(
-            $args['image_allowed_html']['img'],
-            array(
-                'loading'      => array(),
-                'data-src'     => array(),
-                'data-sizes'   => array(),
-                'data-srcset'  => array(),
-                'data-no-lazy' => array(),
-            )
-        );
-
-        return $args;
     }
 
     /**
