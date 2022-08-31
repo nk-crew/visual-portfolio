@@ -11,10 +11,6 @@
   },
   "config": {
     "sort-packages": true,
-    "allow-plugins": {
-        "dealerdirect/phpcodesniffer-composer-installer": true,
-        "phpcompatibility/phpcompatibility-wp": true,
-        "wp-coding-standards/wpcs": true
-    }
+    "allow-plugins": true
   }
 }
