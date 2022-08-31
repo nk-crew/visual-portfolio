@@ -71,7 +71,7 @@ class Visual_Portfolio_Ask_Review_Notice {
                 <p>
                     <?php
                         // translators: %s - Plugin name.
-                        printf( esc_html__( 'Hey, we noticed you\'ve been using %s for more than two weeks now – that\'s awesome!', '@@text_domain' ), '<strong>' . _x( 'Visual Portfolio', 'plugin name inside the review notice', '@@text_domain' ) . '</strong>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        echo wp_kses_post( sprintf( __( 'Hey, we noticed you\'ve been using %s for more than two weeks now – that\'s awesome!', '@@text_domain' ), '<strong>' . _x( 'Visual Portfolio', 'plugin name inside the review notice', '@@text_domain' ) . '</strong>' ) );
                     ?>
                     <br>
                     <?php esc_html_e( 'Could you please do us a BIG favor and give it a rating on WordPress.org to help us spread the word and boost our motivation?', '@@text_domain' ); ?>
