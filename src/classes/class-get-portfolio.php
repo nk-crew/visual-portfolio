@@ -2222,8 +2222,7 @@ class Visual_Portfolio_Get {
 
         $popup_output = apply_filters( 'vpf_popup_output', $popup_output, $args );
 
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        echo Visual_Portfolio_Security::wp_kses_popup( $popup_output );
+        echo wp_kses( $popup_output, 'vp_popup' );
     }
 
     /**

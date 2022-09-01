@@ -534,8 +534,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 }
 
                 echo '<a href="' . esc_url( get_edit_post_link() ) . '" class="vp-portfolio-list__icon">';
-                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                echo Visual_Portfolio_Security::wp_kses_svg( $icon );
+                echo wp_kses( $icon, 'vp_svg' );
                 echo '</a>';
             }
         }
