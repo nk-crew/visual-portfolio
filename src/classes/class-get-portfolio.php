@@ -1338,9 +1338,11 @@ class Visual_Portfolio_Get {
                         // We don't need to randomize order for filter,
                         // because filter list will be always changed once AJAX loaded.
                         if ( ! $for_filter ) {
+                            // phpcs:ignore WordPress.WP.AlternativeFunctions.rand_seeding_mt_srand
+                            mt_srand( self::get_rand_seed_session() );
                             for ( $i = count( $images ) - 1; $i > 0; $i-- ) {
-                                // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                                $j            = @wp_rand( 0, $i );
+                                // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.rand_mt_rand
+                                $j            = @mt_rand( 0, $i );
                                 $tmp          = $images[ $i ];
                                 $images[ $i ] = $images[ $j ];
                                 $images[ $j ] = $tmp;
