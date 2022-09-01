@@ -33,33 +33,20 @@ class Visual_Portfolio_Security {
         if ( 'vp_popup' === $context ) {
             $kses_defaults = wp_kses_allowed_html( 'post' );
 
-            $kses_popup_attrs = array(
-                'class'                     => true,
-                'style'                     => true,
-                'data-vp-popup-img'         => true,
-                'data-vp-popup-img-srcset'  => true,
-                'data-vp-popup-img-size'    => true,
-                'data-vp-popup-md-img'      => true,
-                'data-vp-popup-md-img-size' => true,
-                'data-vp-popup-sm-img'      => true,
-                'data-vp-popup-sm-img-size' => true,
-                'data-vp-popup-video'       => true,
-                'data-vp-popup-poster'      => true,
-                'data-vp-popup-audio'       => true,
-                'data-vp-popup-item-forma'  => true,
-                'data-vp-popup-page'        => true,
-            );
-
             $kses_popup = array(
-                'div' => $kses_popup_attrs,
+                'div' => array(
+                    'class'  => true,
+                    'style'  => true,
+
+                    // Most data for the popup is saved in the data attributes.
+                    'data-*' => true,
+                ),
             );
 
-            $allowedtags = array_merge( $allowedtags, $kses_defaults, $kses_popup );
+            return array_merge( $allowedtags, $kses_defaults, $kses_popup );
         }
 
         if ( 'vp_svg' === $context ) {
-            $kses_defaults = wp_kses_allowed_html( 'post' );
-
             $kses_svg_attrs = array(
                 'x'               => true,
                 'y'               => true,
@@ -98,30 +85,41 @@ class Visual_Portfolio_Security {
                 ),
             );
 
-            $allowedtags = array_merge( $allowedtags, $kses_defaults, $kses_svg );
+            return $kses_svg;
         }
 
         if ( 'vp_image' === $context ) {
-            $kses_defaults = wp_kses_allowed_html( 'post' );
-
             $kses_image = array(
                 'img' => array(
-                    'width'       => true,
-                    'height'      => true,
-                    'src'         => true,
-                    'class'       => true,
-                    'alt'         => true,
-                    'loading'     => true,
-                    'srcset'      => true,
-                    'data-src'    => true,
-                    'data-srcset' => true,
-                    'data-sizes'  => true,
-                    'sizes'       => true,
+                    'alt'      => true,
+                    'align'    => true,
+                    'border'   => true,
+                    'class'    => true,
+                    'height'   => true,
+                    'hspace'   => true,
+                    'loading'  => true,
+                    'longdesc' => true,
+                    'vspace'   => true,
+                    'src'      => true,
+                    'srcset'   => true,
+                    'sizes'    => true,
+                    'usemap'   => true,
+                    'width'    => true,
+
+                    // Lazy loading data is saved in the data attributes.
+                    'data-*'   => true,
+                ),
+                'figure' => array(
+                    'align'  => true,
+                ),
+                'figcaption' => array(
+                    'align'  => true,
                 ),
             );
 
-            $allowedtags = array_merge( $allowedtags, $kses_defaults, $kses_image );
+            return $kses_image;
         }
+
         return $allowedtags;
     }
     /**
@@ -211,36 +209,6 @@ class Visual_Portfolio_Security {
         }
 
         return $attribute;
-    }
-
-    /**
-     * Escape SVG Icon.
-     *
-     * @param string $svg - Unclear SVG Icon.
-     * @return string
-     */
-    public static function wp_kses_svg( $svg ) {
-        return wp_kses( $svg, 'vp_svg' );
-    }
-
-    /**
-     * Escape Popup HTML.
-     *
-     * @param string $popup - Unclear popup.
-     * @return string
-     */
-    public static function wp_kses_popup( $popup ) {
-        return wp_kses( $popup, 'vp_popup' );
-    }
-
-    /**
-     * Escape Image.
-     *
-     * @param string $image - Unclear Image.
-     * @return string
-     */
-    public static function wp_kses_image( $image ) {
-        return wp_kses( $image, 'vp_image' );
     }
 
     /**
