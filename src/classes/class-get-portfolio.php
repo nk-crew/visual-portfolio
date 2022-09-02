@@ -2262,6 +2262,8 @@ class Visual_Portfolio_Get {
                         'sm_height'        => $img_sm_meta[2],
                         'item_title'       => $args['title'],
                         'item_description' => $args['content'],
+                        'item_author'      => $args['author'],
+                        'item_author_url'  => $args['author_url'],
                     )
                 );
             } elseif ( $args['image_id'] ) {
@@ -2273,6 +2275,9 @@ class Visual_Portfolio_Get {
                 }
                 if ( $popup_image && ! isset( $popup_image['item_description'] ) ) {
                     $popup_image['item_description'] = $popup_image['description'];
+                }
+                if ( $popup_image && ! isset( $popup_image['item_author'] ) ) {
+                    $popup_image['item_author'] = $popup_image['author'];
                 }
             }
         }
@@ -2310,8 +2315,14 @@ class Visual_Portfolio_Get {
                     <?php
                 }
                 if ( isset( $popup_image[ $description_source ] ) && $popup_image[ $description_source ] ) {
+                    $content = $popup_image[ $description_source ];
+
+                    if ( 'item_author' === $description_source && $popup_image['item_author_url'] ) {
+                        $content = '<a href="' . esc_url( $popup_image['item_author_url'] ) . '">' . $content . '</a>';
+                    }
+
                     ?>
-                    <div class="vp-portfolio__item-popup-description"><?php echo wp_kses_post( $popup_image[ $description_source ] ); ?></div>
+                    <div class="vp-portfolio__item-popup-description"><?php echo wp_kses_post( $content ); ?></div>
                     <?php
                 }
                 ?>
