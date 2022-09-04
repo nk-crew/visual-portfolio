@@ -19,8 +19,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # We claim to support from 7.2+
-        php: ['7.2', '7.3', '7.4', '8.0', '8.1']
+        # We claim to support from 7.2+, but Mockery supports from 7.3+ only
+        php: ['7.3', '7.4', '8.0', '8.1']
         os: [ubuntu-latest]
 
     steps:
