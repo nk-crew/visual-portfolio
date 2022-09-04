@@ -8,3 +8,6 @@
 npm-debug.log
 .phpcs.xml
 phpcs.xml
+
+# phpunit
+.phpunit.result.cache

@@ -1,18 +1,28 @@
-name: Deploy to WordPress.org
+name: PHPUnit
 
 env:
   COMPOSER_VERSION: '2'
   COMPOSER_CACHE: '${{ github.workspace }}/.composer-cache'
 
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  phpunit:
+    name: PHP ${{ matrix.php }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # We claim to support from 7.2+
+        php: ['7.2', '7.3', '7.4', '8.0', '8.1']
+        os: [ubuntu-latest]
+
     steps:
       - name: Checkout
         uses: actions/checkout@master
@@ -32,20 +42,15 @@ jobs:
       - name: Set PHP Version
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: ${{ matrix.php }}
           coverage: none
           tools: composer:v2
 
       - name: Install NPM and Composer Dependencies
         run: npm install
 
-      - name: Run Production Task
-        run: npm run production
+      - name: Run Build Task
+        run: npm run build
 
-      - name: WordPress Plugin Deploy
-        uses: nk-o/action-wordpress-plugin-deploy@master
-        env:
-          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-          SOURCE_DIR: dist/visual-portfolio/
-          SLUG: visual-portfolio
+      - name: PHPUnit
+        run: npm run test:unit

@@ -15,6 +15,7 @@
     "css-lint-fix": "stylelint --fix --custom-syntax postcss-scss \"src/**/*.scss\"",
     "js-lint": "eslint src/",
     "js-lint-fix": "eslint --fix src/",
+    "test:unit": "composer test:unit",
     "prepare": "husky install",
     "postinstall": "composer install"
   },
