@@ -90,7 +90,8 @@ class Visual_Portfolio_Security {
 
         if ( 'vp_image' === $context ) {
             $kses_image = array(
-                'img' => array(
+                'noscript'   => true,
+                'img'        => array(
                     'alt'      => true,
                     'align'    => true,
                     'border'   => true,
@@ -109,7 +110,7 @@ class Visual_Portfolio_Security {
                     // Lazy loading data is saved in the data attributes.
                     'data-*'   => true,
                 ),
-                'figure' => array(
+                'figure'     => array(
                     'align'  => true,
                 ),
                 'figcaption' => array(

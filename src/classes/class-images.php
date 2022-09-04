@@ -92,6 +92,31 @@ class Visual_Portfolio_Images {
     }
 
     /**
+     * Get blocked attributes to prevent our images lazy loading.
+     */
+    public static function get_image_blocked_attributes() {
+        $blocked_attributes = array(
+            'data-skip-lazy',
+            'data-no-lazy',
+            'data-src',
+            'data-srcset',
+            'data-lazy-original',
+            'data-lazy-src',
+            'data-lazysrc',
+            'data-lazyload',
+            'data-bgposition',
+            'data-envira-src',
+            'fullurl',
+            'lazy-slider-img',
+        );
+
+        /**
+         * Allow plugins and themes to tell lazy images to skip an image with a given attribute.
+         */
+        return apply_filters( 'vpf_lazyload_images_blocked_attributes', $blocked_attributes );
+    }
+
+    /**
      * Init Lazyload
      */
     public static function init_lazyload() {
@@ -133,8 +158,6 @@ class Visual_Portfolio_Images {
             add_filter( 'widget_text', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
             add_filter( 'get_image_tag', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
         }
-
-        add_filter( 'wp_get_attachment_image_attributes', 'Visual_Portfolio_Images::process_image_attributes', 9999 );
 
         add_action( 'wp_kses_allowed_html', 'Visual_Portfolio_Images::allow_lazy_attributes' );
         add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
@@ -277,40 +300,12 @@ class Visual_Portfolio_Images {
             }
         }
 
-        $blocked_attributes = array(
-            'data-skip-lazy',
-            'data-no-lazy',
-            'data-src',
-            'data-srcset',
-            'data-lazy-original',
-            'data-lazy-src',
-            'data-lazysrc',
-            'data-lazyload',
-            'data-bgposition',
-            'data-envira-src',
-            'fullurl',
-            'lazy-slider-img',
-        );
-
-        /**
-         * Allow plugins and themes to tell lazy images to skip an image with a given attribute.
-         */
-        $blocked_attributes = apply_filters( 'vpf_lazyload_images_blocked_attributes', $blocked_attributes );
+        $blocked_attributes = self::get_image_blocked_attributes();
 
         foreach ( $blocked_attributes as $attr ) {
             if ( isset( $attributes[ $attr ] ) ) {
                 return true;
             }
-        }
-
-        // Skip lazy load from VPF images if option disabled.
-        if ( ! self::$allow_vp_lazyload && self::$image_processing ) {
-            return true;
-        }
-
-        // Skip lazy load from WordPress images if option disabled.
-        if ( ! self::$allow_wp_lazyload && ! self::$image_processing ) {
-            return true;
         }
 
         /**
@@ -367,12 +362,18 @@ class Visual_Portfolio_Images {
 
         $old_attributes = self::flatten_kses_hair_data( $old_attributes_kses_hair );
 
-        // If we didn't add lazy attributes, just return the original image source.
+        // Return original image if image is already lazy loaded.
         if ( ! empty( $old_attributes['class'] ) && false !== strpos( $old_attributes['class'], 'vp-lazyload' ) ) {
             return $matches[0];
         }
 
-        $new_attributes     = self::process_image_attributes( $old_attributes );
+        $new_attributes = self::process_image_attributes( $old_attributes );
+
+        // Return original image if new attributes does not contains the lazyload class.
+        if ( empty( $new_attributes['class'] ) || false === strpos( $new_attributes['class'], 'vp-lazyload' ) ) {
+            return $matches[0];
+        }
+
         $new_attributes_str = self::build_attributes_string( $new_attributes );
 
         return sprintf( '<noscript>%1$s</noscript><img %2$s>', $matches[0], $new_attributes_str );
@@ -387,6 +388,16 @@ class Visual_Portfolio_Images {
      * @return array The updated image attributes array with lazy load attributes.
      */
     public static function process_image_attributes( $attributes ) {
+        // Skip lazy load from VPF images if option disabled.
+        if ( ! self::$allow_vp_lazyload && self::$image_processing ) {
+            return $attributes;
+        }
+
+        // Skip lazy load from WordPress images if option disabled.
+        if ( ! self::$allow_wp_lazyload && ! self::$image_processing ) {
+            return $attributes;
+        }
+
         if ( empty( $attributes['src'] ) ) {
             return $attributes;
         }
@@ -441,7 +452,8 @@ class Visual_Portfolio_Images {
         $attributes['loading'] = 'eager';
 
         // Add custom classname.
-        $attributes['class'] = sprintf( '%s vp-lazyload', empty( $attributes['class'] ) ? '' : $attributes['class'] );
+        $attributes['class']  = empty( $attributes['class'] ) ? '' : ( $attributes['class'] . ' ' );
+        $attributes['class'] .= 'vp-lazyload';
 
         /**
          * Allow plugins and themes to override the attributes on the image before the content is updated.
@@ -490,6 +502,11 @@ class Visual_Portfolio_Images {
             $attr['class'] .= ( $attr['class'] ? ' ' : '' ) . 'wp-image-' . $attachment_id;
 
             $image = wp_get_attachment_image( $attachment_id, $size, $icon, $attr );
+        }
+
+        // Maybe prepare lazy load output.
+        if ( self::$allow_vp_lazyload ) {
+            $image = self::add_image_placeholders( $image );
         }
 
         self::$image_processing = false;
@@ -548,7 +565,7 @@ class Visual_Portfolio_Images {
      *
      * @return string
      */
-    private static function build_attributes_string( $attributes ) {
+    public static function build_attributes_string( $attributes ) {
         $string = array();
 
         foreach ( $attributes as $name => $value ) {
