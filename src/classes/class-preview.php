@@ -231,6 +231,8 @@ class Visual_Portfolio_Preview {
         add_filter( 'show_admin_bar', '__return_false' );
 
         // Avoid Cloudflare's Rocket Loader lazy load the editor iframe.
+        // TODO: we also need an additional filter, which is not available in the WP yet:
+        // https://github.com/WordPress/wordpress-develop/pull/1759 .
         add_filter( 'script_loader_tag', array( $this, 'rocket_loader_filter' ) );
 
         // Enqueue assets.

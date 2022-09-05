@@ -340,7 +340,6 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * improved Visual Portfolio admin menu styles by adding dividers
 * updated Swiper to the latest version 8.3.2
 * fixed popup gallery open if default prevented already (fixed conflict with slider Free Scroll)
-* fixed conflict with Cloudflare's Rocket Loader in block iframe preview
 * fixed Slider text selection when trying to drag in the gap
 * fixed Slider displaying images in a row before Swiper init
 * fixed wrong popup gallery items parsing when Slider layout used
