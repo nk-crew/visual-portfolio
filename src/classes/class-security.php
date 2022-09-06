@@ -229,7 +229,11 @@ class Visual_Portfolio_Security {
      */
     public static function sanitize_number( $attribute ) {
         $attribute = preg_replace( '/[^0-9.-]/', '', wp_unslash( $attribute ) );
-        if ( false === strpos( $attribute, '.' ) ) {
+
+        // We should keep an empty string, because we allow resetting certain attributes.
+        if ( '' === $attribute ) {
+            $attribute = '';
+        } elseif ( false === strpos( $attribute, '.' ) ) {
             $attribute = intval( $attribute );
         } else {
             $attribute = (float) $attribute;
