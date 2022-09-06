@@ -17,19 +17,20 @@ class Visual_Portfolio_Security {
      * Visual_Portfolio_Security constructor.
      */
     public function __construct() {
-        add_filter( 'wp_kses_allowed_html', array( $this, 'allowed_html' ), 9, 2 );
+        add_filter( 'wp_kses_allowed_html', array( $this, 'wp_kses_vp_popup' ), 9, 2 );
+        add_filter( 'wp_kses_allowed_html', array( $this, 'wp_kses_vp_svg' ), 9, 2 );
+        add_filter( 'wp_kses_allowed_html', array( $this, 'wp_kses_vp_image' ), 9, 2 );
     }
 
     /**
-     * Returns an array of allowed HTML tags and attributes for a given context.
+     * Returns allowed HTML tags and attributes for Popup.
      *
      * @param string       $allowedtags - Allow Tags for current context.
-     * @param string|array $context - The context for which to retrieve tags. Allowed values are 'post',
-     *                              'strip', 'data', 'entities', or the name of a field filter such as
-     *                              'pre_user_description', or an array of allowed HTML elements and attributes.
-     * @return array Array of allowed HTML tags and their allowed attributes.
+     * @param string|array $context - tags context.
+     *
+     * @return array
      */
-    public function allowed_html( $allowedtags, $context ) {
+    public function wp_kses_vp_popup( $allowedtags, $context ) {
         if ( 'vp_popup' === $context ) {
             $kses_defaults = wp_kses_allowed_html( 'post' );
 
@@ -46,6 +47,18 @@ class Visual_Portfolio_Security {
             return array_merge( $allowedtags, $kses_defaults, $kses_popup );
         }
 
+        return $allowedtags;
+    }
+
+    /**
+     * Returns allowed HTML tags and attributes for Svg.
+     *
+     * @param string       $allowedtags - Allow Tags for current context.
+     * @param string|array $context - tags context.
+     *
+     * @return array
+     */
+    public function wp_kses_vp_svg( $allowedtags, $context ) {
         if ( 'vp_svg' === $context ) {
             $kses_svg_attrs = array(
                 'x'               => true,
@@ -88,6 +101,18 @@ class Visual_Portfolio_Security {
             return $kses_svg;
         }
 
+        return $allowedtags;
+    }
+
+    /**
+     * Returns allowed HTML tags and attributes for Svg.
+     *
+     * @param string       $allowedtags - Allow Tags for current context.
+     * @param string|array $context - tags context.
+     *
+     * @return array
+     */
+    public function wp_kses_vp_image( $allowedtags, $context ) {
         if ( 'vp_image' === $context ) {
             $kses_image = array(
                 'noscript'   => true,
@@ -123,6 +148,7 @@ class Visual_Portfolio_Security {
 
         return $allowedtags;
     }
+
     /**
      * Sanitize hidden attribute.
      *
