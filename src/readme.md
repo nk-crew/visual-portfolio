@@ -322,6 +322,19 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.20.0 =
+
+* !important - this update contains a lot of code rewrites regarding the security improvements, and some parts may not work as expected. Please, let us know as soon as possible, if something stopped working after this update. We have tested it in all our sites, but some rare cases may still stop working.
+* added code for data sanitization in places, where we missed it
+* added nonces usage to prevent possible hacker attacks
+* added support for Swiper duplicates images lazy loading in 3rd-party carousels
+* added Author to the Popup Title and Description sources
+* improved lazy loading script
+  * prevent adding noscript when image does not have vp-lazyload class after processing (for example, when skipped from adding lazy loading)
+  * prevent processing earlier if setting is disabled - faster code execution
+  * restored missing noscript for lazy images inside Visual Portfolio galleries
+* fixed Settings tab URL if Portfolio Post Type disabled
+
 = 2.19.1 =
 
 * fixed Classic style image displaying bug in slider with dynamic height option
