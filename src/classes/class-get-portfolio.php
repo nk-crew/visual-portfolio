@@ -2270,13 +2270,13 @@ class Visual_Portfolio_Get {
 
                 // Check items title and description availability.
                 if ( $popup_image && ! isset( $popup_image['item_title'] ) ) {
-                    $popup_image['item_title'] = $popup_image['title'];
+                    $popup_image['item_title'] = $popup_image['title'] ?? '';
                 }
                 if ( $popup_image && ! isset( $popup_image['item_description'] ) ) {
-                    $popup_image['item_description'] = $popup_image['description'];
+                    $popup_image['item_description'] = $popup_image['description'] ?? '';
                 }
                 if ( $popup_image && ! isset( $popup_image['item_author'] ) ) {
-                    $popup_image['item_author'] = $popup_image['author'];
+                    $popup_image['item_author'] = $popup_image['author'] ?? '';
                 }
             }
         }
