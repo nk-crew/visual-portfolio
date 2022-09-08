@@ -1014,8 +1014,7 @@ class Visual_Portfolio_Get {
             }
             do_action( 'vpf_layout_elements', $options, $element, $position );
         }
-        $elements_content = ob_get_contents();
-        ob_end_clean();
+        $elements_content = ob_get_clean();
 
         if ( ! $elements_content ) {
             return;
