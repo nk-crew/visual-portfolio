@@ -12,7 +12,6 @@
     "test:unit": "./vendor/bin/phpunit"
   },
   "config": {
-    "sort-packages": true,
     "allow-plugins": true
   }
 }
