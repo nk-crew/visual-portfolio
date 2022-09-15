@@ -356,27 +356,32 @@ class Visual_Portfolio_Images {
         $old_attributes_str       = $matches[2];
         $old_attributes_kses_hair = wp_kses_hair( $old_attributes_str, wp_allowed_protocols() );
 
+        $fallback = $matches[0];
+
         if ( empty( $old_attributes_kses_hair['src'] ) ) {
-            return $matches[0];
+            return $fallback;
         }
 
         $old_attributes = self::flatten_kses_hair_data( $old_attributes_kses_hair );
 
         // Return original image if image is already lazy loaded.
         if ( ! empty( $old_attributes['class'] ) && false !== strpos( $old_attributes['class'], 'vp-lazyload' ) ) {
-            return $matches[0];
+            return $fallback;
         }
 
         $new_attributes = self::process_image_attributes( $old_attributes );
 
         // Return original image if new attributes does not contains the lazyload class.
         if ( empty( $new_attributes['class'] ) || false === strpos( $new_attributes['class'], 'vp-lazyload' ) ) {
-            return $matches[0];
+            return $fallback;
         }
+
+        // Skip 3rd-party lazy loading from noscript img tag.
+        $fallback = str_replace( ' src="', ' data-skip-lazy src="', $fallback );
 
         $new_attributes_str = self::build_attributes_string( $new_attributes );
 
-        return sprintf( '<noscript>%1$s</noscript><img %2$s>', $matches[0], $new_attributes_str );
+        return sprintf( '<noscript>%1$s</noscript><img %2$s>', $fallback, $new_attributes_str );
     }
 
     /**
