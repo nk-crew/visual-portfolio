@@ -322,6 +322,13 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.20.1 =
+
+* fixed 3rd-party lazy loading scripts add lazy attributes to noscript img tags
+* fixed noscript styles loading when used optimization plugins
+* fixed conflict with Elementor lightbox when used optimization plugins
+* fixed undefined author field usage
+
 = 2.20.0 =
 
 * !important - this update contains a lot of code rewrites regarding the security improvements, and some parts may not work as expected. Please, let us know as soon as possible, if something stopped working after this update. We have tested it in all our sites, but some rare cases may still stop working.
