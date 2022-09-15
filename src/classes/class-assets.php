@@ -47,7 +47,7 @@ class Visual_Portfolio_Assets {
         add_action( 'wp_head', array( $this, 'localize_global_data' ) );
 
         // noscript tag.
-        add_filter( 'style_loader_tag', array( $this, 'style_loader_tag_noscript' ), 10, 2 );
+        add_action( 'wp_head', array( $this, 'add_noscript_styles' ) );
 
         // parse shortcodes from post content.
         add_filter( 'wp', array( $this, 'maybe_parse_shortcodes_from_content' ), 10 );
@@ -128,7 +128,6 @@ class Visual_Portfolio_Assets {
         do_action( 'vpf_before_assets_enqueue', $options, $options['id'] );
 
         self::store_used_assets( 'visual-portfolio', true, 'style', 9 );
-        self::store_used_assets( 'visual-portfolio-noscript', true, 'style', 9 );
         self::store_used_assets( 'visual-portfolio-notices-default', true, 'style', 9 );
         self::store_used_assets(
             'visual-portfolio-notices-default',
@@ -399,7 +398,6 @@ class Visual_Portfolio_Assets {
         // Visual Portfolio CSS.
         $vp_styles = array(
             'visual-portfolio'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
-            'visual-portfolio-noscript'         => array( 'assets/css/noscript.min.css', array( 'visual-portfolio' ) ),
             'visual-portfolio-elementor'        => array( 'assets/css/elementor.min.css', array( 'visual-portfolio' ) ),
             'visual-portfolio-lazyload'         => array( 'assets/css/lazyload.min.css', array() ),
             'visual-portfolio-custom-scrollbar' => array( 'assets/css/custom-scrollbar.min.css', array( 'simplebar' ) ),
@@ -650,17 +648,31 @@ class Visual_Portfolio_Assets {
     }
 
     /**
-     * Add noscript tag to styles.
-     *
-     * @param  string $tag    The tag we want to wrap around.
-     * @param  string $handle The handle of the tag.
-     * @return string         The wrapped around tag.
+     * Add noscript styles.
+     * Previously we used the `style_loader_tag` filter to add noscript to enqueued CSS,
+     * but it is not working properly with optimizations plugins.
      */
-    public function style_loader_tag_noscript( $tag, $handle ) {
-        if ( 'visual-portfolio-noscript' === $handle ) {
-            $tag = '<noscript>' . $tag . '</noscript>';
+    public function add_noscript_styles() {
+        $styles      = '';
+        $styles_path = visual_portfolio()->plugin_path . '/assets/css/noscript.min.css';
+
+        if ( file_exists( $styles_path ) ) {
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+            $styles = file_get_contents( $styles_path );
+            $styles = str_replace( '&gt;', '>', $styles );
         }
-        return $tag;
+
+        if ( ! $styles ) {
+            return;
+        }
+
+        ?>
+        <noscript>
+            <style type="text/css">
+                <?php echo wp_kses( $styles, array( '\'', '\"' ) ); ?>
+            </style>
+        </noscript>
+        <?php
     }
 
     /**
