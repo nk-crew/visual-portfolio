@@ -57,7 +57,7 @@ class ClassImages extends TestCase {
 
         $this->mock_wp_kses_hair( $image_string, 2 );
         $this->assertEquals(
-            '<noscript>' . $image_string . '</noscript>' . $lazy_string,
+            $this->get_noscript_image( $image_string ) . $lazy_string,
             Visual_Portfolio_Images::add_image_placeholders(
                 $image_string
             )
@@ -66,7 +66,7 @@ class ClassImages extends TestCase {
         // With tags.
         $this->assertEquals(
             '<p>Hello</p>
-                <div><noscript>' . $image_string . '</noscript>' . $lazy_string . '</div>
+                <div>' . $this->get_noscript_image( $image_string ) . $lazy_string . '</div>
                 <p>test image</p>',
             Visual_Portfolio_Images::add_image_placeholders(
                 '<p>Hello</p>
@@ -90,7 +90,7 @@ class ClassImages extends TestCase {
 
         $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
-            '<noscript>' . $image_string . '</noscript>' . $lazy_string,
+            $this->get_noscript_image( $image_string ) . $lazy_string,
             Visual_Portfolio_Images::add_image_placeholders(
                 $image_string
             )
@@ -111,7 +111,7 @@ class ClassImages extends TestCase {
 
         $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
-            '<noscript>' . $image_string . '</noscript>' . $lazy_string,
+            $this->get_noscript_image( $image_string ) . $lazy_string,
             Visual_Portfolio_Images::add_image_placeholders(
                 $image_string
             )
@@ -169,7 +169,7 @@ class ClassImages extends TestCase {
             )
         );
         $this->assertEquals(
-            '<noscript>' . $image_string . '</noscript>' . $lazy_string,
+            $this->get_noscript_image( $image_string ) . $lazy_string,
             Visual_Portfolio_Images::get_attachment_image( 9999 )
         );
     }
@@ -246,6 +246,18 @@ class ClassImages extends TestCase {
                 'return' => $this->img_to_wp_kses_hair( $image_string ),
             )
         );
+    }
+
+    /**
+     * Prepare noscript image string.
+     *
+     * @param string $image_string - image string.
+     */
+    public function get_noscript_image( $image_string ) {
+        // Skip 3rd-party lazy loading from noscript img tag.
+        $image_string = str_replace( ' src="', ' data-skip-lazy src="', $image_string );
+
+        return '<noscript>' . $image_string . '</noscript>';
     }
 
     /**
