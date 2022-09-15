@@ -14,11 +14,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_3rd_Elementor {
     /**
+     * Lightbox fix added.
+     *
+     * @var boolean
+     */
+    public $lightbox_fix_added = false;
+
+    /**
      * Visual_Portfolio_3rd_Elementor constructor.
      */
     public function __construct() {
         add_action( 'elementor/widgets/widgets_registered', array( $this, 'widgets_registered' ) );
+
+        // We should also try to include this script in the footer,
+        // since caching plugins place jQuery in the footer, and our script depends on it.
         add_action( 'wp_body_open', array( $this, 'maybe_fix_elementor_lightobx_conflict' ) );
+        add_action( 'wp_footer', array( $this, 'maybe_fix_elementor_lightobx_conflict' ), 20 );
     }
 
     /**
@@ -40,9 +51,23 @@ class Visual_Portfolio_3rd_Elementor {
             return;
         }
 
+        // We should check it, as we are trying to inject this script twice.
+        if ( $this->lightbox_fix_added ) {
+            return;
+        }
+
+        if ( ! wp_script_is( 'jquery', 'enqueued' ) ) {
+            return;
+        }
+
+        $this->lightbox_fix_added = true;
+
         ?>
         <script>
             (function($) {
+                if (!$) {
+                    return;
+                }
                 if (!$('.elementor-page').length) {
                     return;
                 }
