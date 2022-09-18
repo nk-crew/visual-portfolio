@@ -238,23 +238,20 @@ class Visual_Portfolio_Settings {
 
         $default_breakpoints = Visual_Portfolio_Breakpoints::get_default_breakpoints();
         $go_pro_links        = array(
-            'watermarks'  => Visual_Portfolio_Admin::get_pro_url(
+            'watermarks'  => Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
-                    'utm_source'   => 'plugin',
                     'utm_medium'   => 'settings_page',
                     'utm_campaign' => 'watermarks',
                 )
             ),
-            'social'      => Visual_Portfolio_Admin::get_pro_url(
+            'social'      => Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
-                    'utm_source'   => 'plugin',
                     'utm_medium'   => 'settings_page',
                     'utm_campaign' => 'social_feeds',
                 )
             ),
-            'white_label' => Visual_Portfolio_Admin::get_pro_url(
+            'white_label' => Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
-                    'utm_source'   => 'plugin',
                     'utm_medium'   => 'settings_page',
                     'utm_campaign' => 'white_label',
                 )

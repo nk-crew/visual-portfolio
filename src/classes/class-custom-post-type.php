@@ -786,10 +786,9 @@ class Visual_Portfolio_Custom_Post_Type {
             esc_html__( 'Documentation', '@@text_domain' ),
             esc_html__( 'Documentation', '@@text_domain' ),
             'manage_options',
-            Visual_Portfolio_Admin::get_pro_url(
+            Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
                     'sub_path'     => 'docs/getting-started',
-                    'utm_source'   => 'plugin',
                     'utm_campaign' => 'docs',
                 )
             )
@@ -825,9 +824,8 @@ class Visual_Portfolio_Custom_Post_Type {
 
         // phpcs:ignore WordPress.Security.NonceVerification
         if ( 'vpf_proofing_page' === $_GET['page'] ) {
-            $pro_url = Visual_Portfolio_Admin::get_pro_url(
+            $pro_url = Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
-                    'utm_source'   => 'plugin',
                     'utm_medium'   => 'settings_page',
                     'utm_campaign' => 'proofing',
                 )

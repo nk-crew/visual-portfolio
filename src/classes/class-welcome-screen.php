@@ -73,32 +73,28 @@ class Visual_Portfolio_Welcome_Screen {
             print_emoji_detection_script();
         }
         $go_pro_links = array(
-            'head'          => Visual_Portfolio_Admin::get_pro_url(
+            'head'          => Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
-                    'utm_source'   => 'plugin',
                     'utm_medium'   => 'welcome_page',
                     'utm_campaign' => 'go_pro_head',
                 )
             ),
-            'more_features' => Visual_Portfolio_Admin::get_pro_url(
+            'more_features' => Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
                     'sub_path'     => '',
-                    'utm_source'   => 'plugin',
                     'utm_medium'   => 'welcome_page',
                     'utm_campaign' => 'more_features',
                 )
             ),
-            'docs'          => Visual_Portfolio_Admin::get_pro_url(
+            'docs'          => Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
                     'sub_path'     => 'docs/getting-started',
-                    'utm_source'   => 'plugin',
                     'utm_medium'   => 'welcome_page',
                     'utm_campaign' => 'docs',
                 )
             ),
-            'foot'          => Visual_Portfolio_Admin::get_pro_url(
+            'foot'          => Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
-                    'utm_source'   => 'plugin',
                     'utm_medium'   => 'settings_page',
                     'utm_campaign' => 'go_pro_foot',
                 )

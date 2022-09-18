@@ -141,9 +141,8 @@ class Visual_Portfolio_Settings_API {
 
                 if ( $is_pro ) {
                     $class_name .= ' vpf-settings-control-pro';
-                    $go_pro_url = Visual_Portfolio_Admin::get_pro_url(
+                    $go_pro_url = Visual_Portfolio_Admin::get_plugin_site_url(
                         array(
-                            'utm_source'   => 'plugin',
                             'utm_medium'   => 'settings_page',
                             'utm_campaign' => esc_attr( $name ),
                         )

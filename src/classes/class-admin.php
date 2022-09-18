@@ -231,22 +231,22 @@ class Visual_Portfolio_Admin {
         return array_merge(
             $links,
             array(
-                '<a target="_blank" href="' . self::get_pro_url( array( 'utm_source' => 'plugins_list' ) ) . '">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>',
+                '<a target="_blank" href="' . self::get_plugin_site_url( array( 'utm_medium' => 'plugins_list' ) ) . '">' . esc_html__( 'Go Pro', '@@text_domain' ) . '</a>',
             )
         );
     }
 
     /**
-     * Get url to pro plugin version.
+     * Get URL to main site with UTM tags.
      *
      * @param array $args - Arguments of link.
      * @return string
      */
-    public static function get_pro_url( $args = array() ) {
+    public static function get_plugin_site_url( $args = array() ) {
         $args       = array_merge(
             array(
                 'sub_path'     => 'pricing',
-                'utm_source'   => 'utm_source',
+                'utm_source'   => 'plugin',
                 'utm_medium'   => 'admin_menu',
                 'utm_campaign' => 'go_pro',
                 'utm_content'  => '@@plugin_version',
@@ -299,7 +299,7 @@ class Visual_Portfolio_Admin {
 
         foreach ( $plugin_submenu as $key => $submenu_item ) {
             if ( 'visual_portfolio_go_pro' === $submenu_item[2] ) {
-                $plugin_submenu[ $key ][2] = self::get_pro_url();
+                $plugin_submenu[ $key ][2] = self::get_plugin_site_url( array( 'utm_medium' => 'admin_menu' ) );
             }
         }
     }
