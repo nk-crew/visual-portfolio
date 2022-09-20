@@ -23,7 +23,8 @@ $inline_meta = $opts['show_author'] && $args['author'] ||
 $show_meta = $inline_meta ||
     $opts['show_title'] && $args['title'] ||
     $opts['show_excerpt'] && $args['excerpt'] ||
-    $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] );
+    $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] ) ||
+    $opts['show_read_more'] && $opts['read_more_label'];
 
 $templates_data = array(
     'args'        => $args,
