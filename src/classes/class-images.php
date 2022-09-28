@@ -162,9 +162,6 @@ class Visual_Portfolio_Images {
         add_action( 'wp_kses_allowed_html', 'Visual_Portfolio_Images::allow_lazy_attributes' );
         add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
         add_action( 'wp_head', 'Visual_Portfolio_Images::add_nojs_fallback' );
-
-        // ignore Jetpack lazy.
-        add_filter( 'jetpack_lazy_images_skip_image_with_attributes', 'Visual_Portfolio_Images::jetpack_lazy_images_skip_image_with_attributes', 15, 2 );
     }
 
     /**
@@ -632,18 +629,6 @@ class Visual_Portfolio_Images {
             );
         </script>
         <?php
-    }
-
-    /**
-     * Skip Jetpack lazy loading.
-     *
-     * @param boolean $return     skip lazy Jetpack.
-     * @param array   $attributes image attributes.
-     *
-     * @return boolean
-     */
-    public static function jetpack_lazy_images_skip_image_with_attributes( $return, $attributes ) {
-        return isset( $attributes['data-src'] );
     }
 }
 Visual_Portfolio_Images::construct();
