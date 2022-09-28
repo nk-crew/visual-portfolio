@@ -223,9 +223,10 @@
   // Image is not displaying properly in the slider when:
   // - selected Classic items style
   // - used Dynamic items height in Slider settings
+  // - we should use value at least 0.01px, since on Apple devices it is not working properly
   [data-vp-layout="slider"] & .vp-portfolio__item-img-wrap {
     position: relative;
-    padding-top: 0.01px;
-    padding-bottom: 0.01px;
+    padding-top: 0.02px;
+    padding-bottom: 0.02px;
   }
 }
