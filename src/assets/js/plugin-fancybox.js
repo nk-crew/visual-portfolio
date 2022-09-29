@@ -10,6 +10,19 @@ const { __, settingsPopupGallery } = VPData;
 const $doc = $(document);
 const $window = $(window);
 
+function getItemByIndex($gallery, index) {
+  const $item = $gallery
+    .find('.vp-portfolio__item-wrap > .vp-portfolio__item-popup')
+    .eq(index)
+    .closest('.vp-portfolio__item-wrap');
+
+  if (!$item.length) {
+    return false;
+  }
+
+  return $item;
+}
+
 if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
   let fancyboxInstance;
 
@@ -140,6 +153,13 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
       },
 
       beforeClose() {
+        // Focus current item in the gallery to resolve accessibility issue.
+        const $currentItem = getItemByIndex(self.$item, fancyboxInstance.currIndex);
+
+        if ($currentItem) {
+          $currentItem.find('.vp-portfolio__item-img > a').focus();
+        }
+
         fancyboxInstance = false;
       },
     };

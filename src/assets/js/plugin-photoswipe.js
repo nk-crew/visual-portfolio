@@ -64,6 +64,19 @@ function resizeVideo(data, curItem) {
   });
 }
 
+function getItemByIndex($gallery, index) {
+  const $item = $gallery
+    .find('.vp-portfolio__item-wrap > .vp-portfolio__item-popup')
+    .eq(index)
+    .closest('.vp-portfolio__item-wrap');
+
+  if (!$item.length) {
+    return false;
+  }
+
+  return $item;
+}
+
 if (PhotoSwipe && VPPopupAPI) {
   let pswpInstance;
 
@@ -392,16 +405,26 @@ if (PhotoSwipe && VPPopupAPI) {
       }
     });
 
-    // remove video block
+    // destroy event.
     pswpInstance.listen('destroy', function () {
       const data = this;
 
-      if (data && data.itemHolders.length) {
-        data.itemHolders.forEach((val) => {
-          if (val.el) {
-            $(val.el).find('.vp-pswp-video').remove();
-          }
-        });
+      if (data) {
+        // Remove video block.
+        if (data.itemHolders.length) {
+          data.itemHolders.forEach((val) => {
+            if (val.el) {
+              $(val.el).find('.vp-pswp-video').remove();
+            }
+          });
+        }
+
+        // Focus current item in the gallery to resolve accessibility issue.
+        const $currentItem = getItemByIndex(self.$item, data.getCurrentIndex());
+
+        if ($currentItem) {
+          $currentItem.find('.vp-portfolio__item-img > a').focus();
+        }
       }
 
       pswpInstance = false;
