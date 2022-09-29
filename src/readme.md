@@ -322,6 +322,13 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.20.2 =
+
+* improved accessibility - focus gallery item in after closing popup
+* fixed images displaying in Carousel with Classic style on Apple devices
+* fixed Jetpack lazy loading when new items loaded in Visual Portfolio gallery using pagination or filters
+* fixed displaying Read More button in Classic style, when all other meta disabled
+
 = 2.20.1 =
 
 * fixed 3rd-party lazy loading scripts add lazy attributes to noscript img tags
