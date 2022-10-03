@@ -322,6 +322,11 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.20.3 =
+
+* fixed error when close popup gallery opened from the native gallery block
+* fixed focus current item in the native gallery block when closing popup gallery
+
 = 2.20.2 =
 
 * improved accessibility - focus gallery item in after closing popup
