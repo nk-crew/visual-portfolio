@@ -64,19 +64,6 @@ function resizeVideo(data, curItem) {
   });
 }
 
-function getItemByIndex($gallery, index) {
-  const $item = $gallery
-    .find('.vp-portfolio__item-wrap > .vp-portfolio__item-popup')
-    .eq(index)
-    .closest('.vp-portfolio__item-wrap');
-
-  if (!$item.length) {
-    return false;
-  }
-
-  return $item;
-}
-
 if (PhotoSwipe && VPPopupAPI) {
   let pswpInstance;
 
@@ -419,11 +406,10 @@ if (PhotoSwipe && VPPopupAPI) {
           });
         }
 
-        // Focus current item in the gallery to resolve accessibility issue.
-        const $currentItem = getItemByIndex(self.$item, data.getCurrentIndex());
+        const currentItemData = items[data.getCurrentIndex()];
 
-        if ($currentItem) {
-          $currentItem.find('.vp-portfolio__item-img > a').focus();
+        if (currentItemData) {
+          VPPopupAPI.maybeFocusGalleryItem(currentItemData);
         }
       }
 

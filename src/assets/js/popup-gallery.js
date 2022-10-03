@@ -265,6 +265,23 @@ const VPPopupAPI = {
 
     return items;
   },
+
+  /**
+   * Try to focus gallery item link.
+   * Used when popup gallery is closed.
+   *
+   * @param {object} data - data of the current item
+   */
+  maybeFocusGalleryItem(data) {
+    // Focus native gallery item.
+    if (data.linkEl) {
+      $(data.linkEl).focus();
+
+      // Focus Visual Portfolio gallery item.
+    } else if (data.el) {
+      $(data.el).find('.vp-portfolio__item-img > a').focus();
+    }
+  },
 };
 
 window.VPPopupAPI = VPPopupAPI;
