@@ -202,6 +202,10 @@ class Visual_Portfolio {
         require_once $this->plugin_path . 'classes/class-supported-themes.php';
         require_once $this->plugin_path . 'classes/class-archive-mapping.php';
         require_once $this->plugin_path . 'classes/class-sitemap.php';
+        require_once $this->plugin_path . 'classes/blocks/class-block.php';
+        require_once $this->plugin_path . 'classes/blocks/pagination/class-block-pagination.php';
+        require_once $this->plugin_path . 'classes/blocks/sort/class-block-sort.php';
+        require_once $this->plugin_path . 'classes/blocks/filter/class-block-filter.php';
 
         // 3rd code integration.
         require_once $this->plugin_path . 'classes/3rd/plugins/class-a3-lazy-load.php';

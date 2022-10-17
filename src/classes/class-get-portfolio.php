@@ -1083,15 +1083,7 @@ class Visual_Portfolio_Get {
      * @return string
      */
     public static function get_sort( $atts = array() ) {
-        $options = self::get_options( $atts );
-
-        $options = array_merge(
-            $options,
-            array(
-                'sort'       => $atts['type'],
-                'sort_align' => $atts['align'],
-            )
-        );
+        $options = self::get_sort_options( $atts );
 
         // generate unique ID.
         $uid = ++self::$sort_id;
@@ -1113,6 +1105,26 @@ class Visual_Portfolio_Get {
         <?php
 
         return ob_get_clean();
+    }
+
+    /**
+     * Get Sort options by block Attributes.
+     *
+     * @param array $atts - Block Attributes.
+     * @return array
+     */
+    public static function get_sort_options( $atts = array() ) {
+        $options = self::get_options( $atts );
+
+        $options = array_merge(
+            $options,
+            array(
+                'sort'       => $atts['type'],
+                'sort_align' => $atts['align'],
+            )
+        );
+
+        return $options;
     }
 
     /**
@@ -1629,42 +1641,7 @@ class Visual_Portfolio_Get {
             return;
         }
 
-        $is_images  = 'images' === $vp_options['content_source'];
-        $is_social  = 'social-stream' === $vp_options['content_source'];
-        $query_opts = self::get_query_params( $vp_options, true );
-
-        // Get active item.
-        $active_item = self::get_filter_active_item( $query_opts );
-
-        if ( $is_images || $is_social ) {
-            $term_items = self::get_images_terms( $query_opts, $active_item );
-        } else {
-            $portfolio_query = new WP_Query( $query_opts );
-            $term_items      = self::get_posts_terms( $portfolio_query, $active_item );
-        }
-
-        // Add 'All' active item.
-        if ( ! empty( $term_items['terms'] ) && $vp_options['filter_text_all'] ) {
-            array_unshift(
-                $term_items['terms'],
-                array(
-                    'filter'      => '*',
-                    'label'       => $vp_options['filter_text_all'],
-                    'description' => false,
-                    'count'       => false,
-                    'id'          => 0,
-                    'parent'      => 0,
-                    'active'      => ! $term_items['there_is_active'],
-                    'url'         => self::get_pagenum_link(
-                        array(
-                            'vp_filter' => '',
-                            'vp_page'   => 1,
-                        )
-                    ),
-                    'class'       => 'vp-filter__item' . ( ! $term_items['there_is_active'] ? ' vp-filter__item-active' : '' ),
-                )
-            );
-        }
+        $term_items = self::get_filter_items( $vp_options );
 
         // No filters available.
         if ( empty( $term_items['terms'] ) ) {
@@ -1738,6 +1715,53 @@ class Visual_Portfolio_Get {
         ?>
         </div>
         <?php
+    }
+
+    /**
+     * Get Filter Items.
+     *
+     * @param array $vp_options - Block Options.
+     * @return array
+     */
+    public static function get_filter_items( $vp_options ) {
+        $is_images  = 'images' === $vp_options['content_source'];
+        $is_social  = 'social-stream' === $vp_options['content_source'];
+        $query_opts = self::get_query_params( $vp_options, true );
+
+        // Get active item.
+        $active_item = self::get_filter_active_item( $query_opts );
+
+        if ( $is_images || $is_social ) {
+            $term_items = self::get_images_terms( $query_opts, $active_item );
+        } else {
+            $portfolio_query = new WP_Query( $query_opts );
+            $term_items      = self::get_posts_terms( $portfolio_query, $active_item );
+        }
+
+        // Add 'All' active item.
+        if ( ! empty( $term_items['terms'] ) && $vp_options['filter_text_all'] ) {
+            array_unshift(
+                $term_items['terms'],
+                array(
+                    'filter'      => '*',
+                    'label'       => $vp_options['filter_text_all'],
+                    'description' => false,
+                    'count'       => false,
+                    'id'          => 0,
+                    'parent'      => 0,
+                    'active'      => ! $term_items['there_is_active'],
+                    'url'         => self::get_pagenum_link(
+                        array(
+                            'vp_filter' => '',
+                            'vp_page'   => 1,
+                        )
+                    ),
+                    'class'       => 'vp-filter__item' . ( ! $term_items['there_is_active'] ? ' vp-filter__item-active' : '' ),
+                )
+            );
+        }
+
+        return $term_items;
     }
 
     /**
@@ -1931,49 +1955,7 @@ class Visual_Portfolio_Get {
             return;
         }
 
-        $terms = array();
-
-        // Get active item.
-        $active_item = false;
-
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        if ( isset( $_GET['vp_sort'] ) ) {
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-            $active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
-        }
-
-        $sort_items = apply_filters(
-            'vpf_extend_sort_items',
-            array(
-                ''           => esc_html__( 'Default sorting', '@@text_domain' ),
-                'date_desc'  => esc_html__( 'Sort by date (newest)', '@@text_domain' ),
-                'date'       => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
-                'title'      => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
-                'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
-            ),
-            $vp_options
-        );
-
-        foreach ( $sort_items as $slug => $label ) {
-            $url = self::get_pagenum_link(
-                array(
-                    'vp_sort' => rawurlencode( $slug ),
-                    'vp_page' => 1,
-                )
-            );
-
-            $is_active = ! $active_item && ! $slug ? true : $active_item === $slug;
-
-            // add in terms array.
-            $terms[ $slug ] = array(
-                'sort'        => $slug,
-                'label'       => $label,
-                'description' => '',
-                'active'      => $is_active,
-                'url'         => $url,
-                'class'       => 'vp-sort__item' . ( $is_active ? ' vp-sort__item-active' : '' ),
-            );
-        }
+        $terms = self::get_sort_items( $vp_options );
 
         // get options for the current sort.
         $sort_options      = array();
@@ -2021,6 +2003,60 @@ class Visual_Portfolio_Get {
         ?>
         </div>
         <?php
+    }
+
+    /**
+     * Get Sort Items.
+     *
+     * @param array $vp_options - Current vp_list options.
+     * @return array
+     */
+    public static function get_sort_items( $vp_options ) {
+        $terms = array();
+
+        // Get active item.
+        $active_item = false;
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( isset( $_GET['vp_sort'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
+        }
+
+        $sort_items = apply_filters(
+            'vpf_extend_sort_items',
+            array(
+                ''           => esc_html__( 'Default sorting', '@@text_domain' ),
+                'date_desc'  => esc_html__( 'Sort by date (newest)', '@@text_domain' ),
+                'date'       => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
+                'title'      => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
+                'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
+            ),
+            $vp_options
+        );
+
+        foreach ( $sort_items as $slug => $label ) {
+            $url = self::get_pagenum_link(
+                array(
+                    'vp_sort' => rawurlencode( $slug ),
+                    'vp_page' => 1,
+                )
+            );
+
+            $is_active = ! $active_item && ! $slug ? true : $active_item === $slug;
+
+            // add in terms array.
+            $terms[ $slug ] = array(
+                'sort'        => $slug,
+                'label'       => $label,
+                'description' => '',
+                'active'      => $is_active,
+                'url'         => $url,
+                'class'       => 'vp-sort__item' . ( $is_active ? ' vp-sort__item-active' : '' ),
+            );
+        }
+
+        return $terms;
     }
 
     /**

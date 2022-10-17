@@ -281,14 +281,38 @@ class Visual_Portfolio_Preview {
         // Custom styles.
         visual_portfolio()->include_template_style( 'visual-portfolio-preview', 'preview/style', array(), '@@plugin_version' );
 
-        // Output template.
-        visual_portfolio()->include_template(
-            'preview/preview',
-            array(
-                'options'    => $options,
-                'class_name' => $class_name,
-            )
-        );
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
+        if ( isset( $_REQUEST['vp_layout_type'] ) ) {
+            $layout_type = sanitize_text_field( wp_unslash( $_REQUEST['vp_layout_type'] ) );
+            // phpcs:enable WordPress.Security.NonceVerification.Recommended
+            switch ( $layout_type ) {
+                case 'pagination':
+                    visual_portfolio()->include_template_style( 'visual-portfolio-pagination-minimal', 'items-list/pagination/minimal/style', array(), '@@plugin_version' );
+                    visual_portfolio()->include_template_style( 'visual-portfolio-pagination', 'items-list/pagination/style', array(), '@@plugin_version' );
+                    $gallery_attributes = json_decode( $options['gallery_attributes'], true );
+                    $options            = array_merge(
+                        $options,
+                        $gallery_attributes
+                    );
+                    visual_portfolio()->include_template(
+                        'preview/pagination',
+                        array(
+                            'options'    => $options,
+                            'class_name' => $class_name,
+                        )
+                    );
+                    break;
+            }
+        } else {
+            // Output preview template.
+            visual_portfolio()->include_template(
+                'preview/preview',
+                array(
+                    'options'    => $options,
+                    'class_name' => $class_name,
+                )
+            );
+        }
     }
 
     /**

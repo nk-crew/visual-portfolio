@@ -1,0 +1,100 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "visual-portfolio/pagination",
+  "category": "media",
+  "title": "Visual Portfolio Pagination",
+  "description": "Display pagination for galleries, posts and portfolio grids.",
+  "keywords": ["gallery", "images", "posts", "portfolio", "vpf", "pagination"],
+  "textdomain": "@@text_domain",
+  "supports": {
+    "anchor": true,
+    "className": true,
+    "html": false,
+    "align": true
+  },
+  "attributes": {
+    "block_id": {
+      "type": "string"
+    },
+    "layout_type": {
+      "type": "string"
+    },
+    "gallery_block_id": {
+      "type": "string"
+    },
+    "align": {
+      "type": "string"
+    },
+    "className": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "pagination_style": {
+      "type": "string",
+      "default": "minimal"
+    },
+    "pagination_infinite_notice": {
+      "type": "string"
+    },
+    "pagination_infinite_texts": {
+      "type": "string"
+    },
+    "pagination_load_more_texts": {
+      "type": "string"
+    },
+    "pagination": {
+      "type": "string",
+      "default": "load-more"
+    },
+    "pagination_infinite_text_load": {
+      "type": "string",
+      "default": "Load More"
+    },
+    "pagination_infinite_text_loading": {
+      "type": "string",
+      "default": "Loading More..."
+    },
+    "pagination_infinite_text_end_list": {
+      "type": "string",
+      "default": "You’ve reached the end of the list"
+    },
+    "pagination_load_more_text_load": {
+      "type": "string",
+      "default": "Load More"
+    },
+    "pagination_load_more_text_loading": {
+      "type": "string",
+      "default": "Loading More..."
+    },
+    "pagination_load_more_text_end_list": {
+      "type": "string",
+      "default": "You’ve reached the end of the list"
+    },
+    "pagination_paged__show_arrows": {
+      "type": "boolean",
+      "default": true
+    },
+    "pagination_paged__show_numbers": {
+      "type": "boolean",
+      "default": true
+    },
+    "pagination_paged__scroll_top": {
+      "type": "boolean",
+      "default": true
+    },
+    "pagination_paged__scroll_top_offset": {
+      "type": "number",
+      "default": 30
+    },
+    "pagination_hide_on_end": {
+      "type": "boolean",
+      "default": false
+    },
+    "gallery_attributes": {
+      "type": "string"
+    }
+  }
+}

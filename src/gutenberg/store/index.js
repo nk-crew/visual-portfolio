@@ -10,6 +10,7 @@ import * as actions from './actions';
 import * as controls from './controls';
 import * as resolvers from './resolvers';
 import './components';
+import './hooks';
 import './utils';
 
 const { registerStore } = wp.data;

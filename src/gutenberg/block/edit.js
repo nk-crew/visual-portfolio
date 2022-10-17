@@ -8,6 +8,7 @@ import classnames from 'classnames/dedupe';
  */
 import ControlsRender from '../components/controls-render';
 import IframePreview from '../components/iframe-preview';
+import getParseBlocks from '../utils/get-parse-blocks';
 
 /**
  * WordPress dependencies
@@ -81,10 +82,30 @@ export default function BlockEdit(props) {
     }
   }, []);
 
+  const parsedBlocks = getParseBlocks('visual-portfolio/block');
+
   // Set some starter attributes for different content sources.
   // And hide the setup wizard.
   useEffect(() => {
     if ('true' === setupWizard && contentSource) {
+      let blockCount = 0;
+      let blockName = '';
+      parsedBlocks.forEach((block) => {
+        if (block.attributes.content_source === contentSource) {
+          blockCount += 1;
+        }
+      });
+      switch (contentSource) {
+        case 'post-based':
+          blockName = 'Posts';
+          break;
+        case 'social-stream':
+          blockName = 'Social';
+          break;
+        default:
+          blockName = 'Image';
+          break;
+      }
       switch (contentSource) {
         case 'images':
           if (images && images.length) {
@@ -92,6 +113,7 @@ export default function BlockEdit(props) {
               setup_wizard: '',
               items_count: -1,
               items_click_action: 'popup_gallery',
+              gallery_name: `${blockName} Gallery #${blockCount}`,
             });
           }
           break;
@@ -112,6 +134,7 @@ export default function BlockEdit(props) {
                 align: 'center',
               },
             },
+            gallery_name: `${blockName} Gallery #${blockCount}`,
           });
           break;
         default:

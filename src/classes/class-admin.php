@@ -1254,6 +1254,10 @@ class Visual_Portfolio_Admin {
          */
         Visual_Portfolio_Controls::register_categories(
             array(
+                'gallery-name'                 => array(
+                    'title'     => esc_html__( 'Gallery Name', '@@text_domain' ),
+                    'is_opened' => true,
+                ),
                 'content-source'               => array(
                     'title'     => esc_html__( 'Content Source', '@@text_domain' ),
                     'is_opened' => true,
@@ -1325,6 +1329,15 @@ class Visual_Portfolio_Admin {
                 'type'    => 'hidden',
                 'name'    => 'setup_wizard',
                 'default' => '',
+            )
+        );
+
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'  => 'gallery-name',
+                'type'      => 'text',
+                'name'      => 'gallery_name',
+                'default'   => '',
             )
         );
 

@@ -429,6 +429,7 @@ class VP {
   initEvents() {
     const self = this;
     const evp = `.vpf-uid-${self.uid}`;
+    const pagination = `.vp-gallery-id-${self.id}`;
 
     // Stretch
     function stretch() {
@@ -501,6 +502,46 @@ class VP {
         }
       });
 
+    $(pagination).on(`click`, '.vp-pagination .vp-pagination__item a', function (e) {
+      e.preventDefault();
+      const $this = $(this);
+      const $pagination = $this.closest('.vp-pagination');
+      const $paginationType = $pagination.attr('data-vp-pagination-type');
+
+      if ($pagination.hasClass('vp-pagination__no-more') && 'paged' !== $paginationType) {
+        return;
+      }
+
+      self.loadNewItems($this.attr('href'), 'paged' === $paginationType);
+
+      // Scroll to top
+      if ('paged' === $paginationType && $pagination.hasClass('vp-pagination__scroll-top')) {
+        const $adminBar = $('#wpadminbar');
+        const currentTop = window.pageYOffset || document.documentElement.scrollTop;
+        let { top } = self.$item.offset();
+
+        // Custom user offset.
+        if ($pagination.attr('data-vp-pagination-scroll-top')) {
+          top -= parseInt($pagination.attr('data-vp-pagination-scroll-top'), 10) || 0;
+        }
+
+        // Admin bar offset.
+        if ($adminBar.length && 'fixed' === $adminBar.css('position')) {
+          top -= $adminBar.outerHeight();
+        }
+
+        // Limit max offset.
+        top = Math.max(0, top);
+
+        if (currentTop > top) {
+          window.scrollTo({
+            top,
+            behavior: 'smooth',
+          });
+        }
+      }
+    });
+
     // on pagination click
     self.$item.on(`click${evp}`, '.vp-pagination .vp-pagination__item a', function (e) {
       e.preventDefault();
@@ -570,7 +611,10 @@ class VP {
         });
       }
     }
-    if ('infinite' === self.options.pagination) {
+    if (
+      'infinite' === self.options.pagination ||
+      'infinite' === $(pagination).find('.vp-pagination').attr('data-vp-pagination-type')
+    ) {
       $wnd.on(`load${evp} scroll${evp} resize${evp} orientationchange${evp}`, () => {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
@@ -716,6 +760,7 @@ class VP {
    */
   replaceItems(content, removeExisting, cb) {
     const self = this;
+    const pagination = `.vp-gallery-id-${self.id}`;
 
     if (!content) {
       return;
@@ -792,6 +837,19 @@ class VP {
       // update pagination
       if (self.$pagination.length) {
         self.$pagination.html($newVP.find('.vp-portfolio__pagination-wrap').html());
+      }
+
+      if ($(pagination).length) {
+        // TODO: Replace these ajax on content.
+        // Now there is nothing inside the content variable except for the desired gallery block.
+        // Need to extend ajax in loadNewItems method.
+        $.ajax({
+          method: 'POST',
+          url: self.href,
+          complete(response) {
+            $(pagination).html($(response.responseText).find(pagination).html());
+          },
+        });
       }
 
       self.addItems($(newItems), removeExisting, $newVP);

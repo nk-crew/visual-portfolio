@@ -22,6 +22,7 @@ import './extensions/stretch-for-saved-only';
  */
 import './block';
 import './block-saved';
+import './blocks/pagination';
 
 /**
  * WordPress dependencies

@@ -53,37 +53,38 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
     }
 
     maybeCreateBlockId() {
-      if ('visual-portfolio/block' !== this.props.blockName) {
-        return;
-      }
+      if (
+        'visual-portfolio/block' === this.props.blockName ||
+        'visual-portfolio/pagination' === this.props.blockName
+      ) {
+        const { setAttributes, attributes, clientId } = this.props;
 
-      const { setAttributes, attributes, clientId } = this.props;
+        const { block_id: blockId } = attributes;
 
-      const { block_id: blockId } = attributes;
+        if (!blockId || usedIds[blockId] !== clientId) {
+          let newBlockId = '';
 
-      if (!blockId || usedIds[blockId] !== clientId) {
-        let newBlockId = '';
+          // check if ID already exist.
+          let tryCount = 10;
+          while (
+            !newBlockId ||
+            ('undefined' !== typeof usedIds[newBlockId] &&
+              usedIds[newBlockId] !== clientId &&
+              0 < tryCount)
+          ) {
+            newBlockId = shorthash.unique(clientId);
+            tryCount -= 1;
+          }
 
-        // check if ID already exist.
-        let tryCount = 10;
-        while (
-          !newBlockId ||
-          ('undefined' !== typeof usedIds[newBlockId] &&
-            usedIds[newBlockId] !== clientId &&
-            0 < tryCount)
-        ) {
-          newBlockId = shorthash.unique(clientId);
-          tryCount -= 1;
-        }
+          if (newBlockId && 'undefined' === typeof usedIds[newBlockId]) {
+            usedIds[newBlockId] = clientId;
+          }
 
-        if (newBlockId && 'undefined' === typeof usedIds[newBlockId]) {
-          usedIds[newBlockId] = clientId;
-        }
-
-        if (newBlockId !== blockId) {
-          setAttributes({
-            block_id: newBlockId,
-          });
+          if (newBlockId !== blockId) {
+            setAttributes({
+              block_id: newBlockId,
+            });
+          }
         }
       }
     }

@@ -61,6 +61,17 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
                 'permission_callback' => array( $this, 'update_layout_permission' ),
             )
         );
+
+        // Get layout attributes.
+        register_rest_route(
+            $namespace,
+            '/get_layout_attributes/',
+            array(
+                'methods'             => 'POST',
+                'callback'            => array( $this, 'get_layout_attributes' ),
+                'permission_callback' => array( $this, 'get_layout_attributes_permission' ),
+            )
+        );
     }
 
     /**
@@ -80,6 +91,46 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         }
 
         return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get list of saved layouts.', '@@text_domain' ), true );
+    }
+
+    /**
+     * Get layout attributes permission.
+     *
+     * @return mixed
+     */
+    public function get_layout_attributes_permission() {
+        if ( current_user_can( 'edit_posts' ) ) {
+            return true;
+        }
+
+        foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+            if ( current_user_can( $post_type->cap->edit_posts ) ) {
+                return true;
+            }
+        }
+
+        return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get layout attributes.', '@@text_domain' ), true );
+    }
+
+    /**
+     * Get layout attributes.
+     *
+     * @param WP_REST_Request $request Full details about the request.
+     *
+     * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+     */
+    public function get_layout_attributes( $request ) {
+        $current_route         = '/' . rest_get_url_prefix() . $request->get_route();
+        $pagination_attributes = Visual_Portfolio_Pagination_Block::get_pagination_attributes( $request, $current_route );
+        $sort_attributes       = Visual_Portfolio_Sort_Block::get_sort_attributes( $request, $current_route );
+        $filter_attributes     = Visual_Portfolio_Filter_Block::get_filter_attributes( $request, $current_route );
+        $layout_attributes     = array(
+            'pagination' => $pagination_attributes,
+            'sort'       => $sort_attributes,
+            'filter'     => $filter_attributes,
+        );
+
+        return $this->success( $layout_attributes );
     }
 
     /**
