@@ -330,15 +330,27 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
         e.preventDefault();
 
+        const items = VPPopupAPI.parseGallery(self.$item);
+
         // Get gallery item index.
         // Use Swiper data-attribute to support slide duplicates.
         if ($itemWrap.attr('data-swiper-slide-index')) {
           index = parseInt($itemWrap.attr('data-swiper-slide-index'), 10);
         } else {
           index = $itemWrap.index();
+          // fixed Wrong popup image if custom URL used
+          $this
+            .closest('.vp-portfolio__items')
+            .find('.vp-portfolio__item-wrap .vp-portfolio__item-popup')
+            .each((key, item) => {
+              if (
+                'undefined' !== typeof $(item.closest('.vp-portfolio__item-wrap'))[0] &&
+                $(item.closest('.vp-portfolio__item-wrap'))[0] === $($itemWrap)[0]
+              ) {
+                index = key;
+              }
+            });
         }
-
-        const items = VPPopupAPI.parseGallery(self.$item);
 
         VPPopupAPI.open(items, index, self);
       }
