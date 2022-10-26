@@ -2165,7 +2165,11 @@ class Visual_Portfolio_Get {
         }
         ?>
         >
-            <?php self::item_popup_data( $args ); ?>
+            <?php
+            if ( $args['vp_opts']['items_click_action'] ) {
+                self::item_popup_data( $args );
+            }
+            ?>
             <?php do_action( 'vpf_before_each_item', $args ); ?>
             <figure class="vp-portfolio__item">
                 <?php
