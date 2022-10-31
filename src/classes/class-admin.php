@@ -297,9 +297,11 @@ class Visual_Portfolio_Admin {
 
         $plugin_submenu = &$submenu[ $menu_slug ];
 
-        foreach ( $plugin_submenu as $key => $submenu_item ) {
-            if ( 'visual_portfolio_go_pro' === $submenu_item[2] ) {
-                $plugin_submenu[ $key ][2] = self::get_plugin_site_url( array( 'utm_medium' => 'admin_menu' ) );
+        if ( is_array( $plugin_submenu ) && ! empty( $plugin_submenu ) ) {
+            foreach ( $plugin_submenu as $key => $submenu_item ) {
+                if ( 'visual_portfolio_go_pro' === $submenu_item[2] ) {
+                    $plugin_submenu[ $key ][2] = self::get_plugin_site_url( array( 'utm_medium' => 'admin_menu' ) );
+                }
             }
         }
     }
