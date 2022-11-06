@@ -2339,8 +2339,10 @@ class Visual_Portfolio_Get {
                 'popup/video-popup-data',
                 array(
                     'video_data'  => $video_data,
-                    'args'        => $args,
-                    'opts'        => $args['vp_opts'],
+
+                    // We need to check existence of args to prevent possible conflicts.
+                    'args'        => isset( $args ) ? $args : null,
+                    'opts'        => isset( $args['vp_opts'] ) ? $args['vp_opts'] : null,
                 )
             );
 
