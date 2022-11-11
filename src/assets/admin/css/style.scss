@@ -51,9 +51,9 @@ $escaped-svg-characters: (
 /*
  * Go Pro menu link
  */
-#adminmenu a[href*="utm_campaign=go_pro"],
-.wp-list-table.plugins a[href*="utm_campaign=go_pro"],
-.vpf-admin-toolbar a[href*="utm_campaign=go_pro"] {
+#adminmenu a[href*="https://visualportfolio.co/pricing/"],
+.wp-list-table.plugins a[href*="https://visualportfolio.co/pricing/"],
+.vpf-admin-toolbar a[href*="https://visualportfolio.co/pricing/"] {
   font-weight: 700;
   color: #11b916;
 
