@@ -305,6 +305,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
     if (self.isPreview()) {
       return;
     }
+
     // click action
     // `a.vp-portfolio__item-overlay` added as fallback for old templates, used in themes.
     self.$item.on(
@@ -338,18 +339,13 @@ $(document).on('extendClass.vpf', (event, VP) => {
           index = parseInt($itemWrap.attr('data-swiper-slide-index'), 10);
         } else {
           index = $itemWrap.index();
-          // fixed Wrong popup image if custom URL used
-          $this
-            .closest('.vp-portfolio__items')
-            .find('.vp-portfolio__item-wrap .vp-portfolio__item-popup')
-            .each((key, item) => {
-              if (
-                'undefined' !== typeof $(item.closest('.vp-portfolio__item-wrap'))[0] &&
-                $(item.closest('.vp-portfolio__item-wrap'))[0] === $($itemWrap)[0]
-              ) {
-                index = key;
-              }
-            });
+
+          // Fixed wrong popup image if custom URL used.
+          items.forEach((item, idx) => {
+            if (item.el === $itemWrap[0]) {
+              index = idx;
+            }
+          });
         }
 
         VPPopupAPI.open(items, index, self);
