@@ -674,21 +674,41 @@ class Visual_Portfolio_Settings {
                     ),
                 ),
 
-                // Misc settings.
+                // Quick View settings.
                 array(
-                    'name'  => 'popup_misc_title',
-                    'label' => esc_html__( 'Misc', '@@text_domain' ),
+                    'name'  => 'popup_quick_view_title',
+                    'label' => esc_html__( 'Quick View', '@@text_domain' ),
                     'type'  => 'section_title',
                 ),
                 array(
-                    'name'    => 'background_color',
-                    'label'   => esc_html__( 'Background Color', '@@text_domain' ),
-                    'type'    => 'color',
-                    'default' => '#1e1e1e',
+                    'name'      => 'popup_quick_view_action_internal_links',
+                    'label'     => esc_html__( 'Internal links', '@@text_domain' ),
+                    'type'      => 'select',
+                    'default'   => 'blank',
+                    'options'   => array(
+                        'blank' => esc_html__( 'Open in new tab', '@@text_domain' ),
+                        'self'  => esc_html__( 'Open in current tab', '@@text_domain' ),
+                        'frame' => esc_html__( 'Open in frame', '@@text_domain' ),
+                        'block' => esc_html__( 'Block click', '@@text_domain' ),
+                    ),
+                    'is_pro'    => true,
+                ),
+                array(
+                    'name'      => 'popup_quick_view_action_external_links',
+                    'label'     => esc_html__( 'External links', '@@text_domain' ),
+                    'type'      => 'select',
+                    'default'   => 'blank',
+                    'options'   => array(
+                        'blank' => esc_html__( 'Open in new tab', '@@text_domain' ),
+                        'self'  => esc_html__( 'Open in current tab', '@@text_domain' ),
+                        'frame' => esc_html__( 'Open in frame', '@@text_domain' ),
+                        'block' => esc_html__( 'Block click', '@@text_domain' ),
+                    ),
+                    'is_pro'    => true,
                 ),
                 array(
                     'name'    => 'pages_iframe_custom_css',
-                    'label'   => esc_html__( 'Quick View Custom CSS', '@@text_domain' ),
+                    'label'   => esc_html__( 'Custom CSS', '@@text_domain' ),
                     'desc'    => esc_html__( 'When you display posts and pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`.', '@@text_domain' ),
                     'type'    => 'textarea',
                     'default' => ! class_exists( 'Visual_Portfolio_Pro' ) ? '' : '
@@ -706,6 +726,19 @@ class Visual_Portfolio_Settings {
     display: none;
 }',
                     'is_pro'  => true,
+                ),
+
+                // Misc settings.
+                array(
+                    'name'  => 'popup_misc_title',
+                    'label' => esc_html__( 'Misc', '@@text_domain' ),
+                    'type'  => 'section_title',
+                ),
+                array(
+                    'name'    => 'background_color',
+                    'label'   => esc_html__( 'Background Color', '@@text_domain' ),
+                    'type'    => 'color',
+                    'default' => '#1e1e1e',
                 ),
             ),
             'vp_watermarks' => array(
