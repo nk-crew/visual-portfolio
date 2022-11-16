@@ -34,37 +34,9 @@ class Visual_Portfolio_3rd_Jetpack {
             return;
         }
 
-        $wp_scripts->registered[ $jetpack_ll_handler ]->deps[] = 'jquery';
+        wp_register_script( 'visual-portfolio-3rd-jetpack', visual_portfolio()->plugin_url . 'assets/js/3rd/plugin-jetpack.min.js', array( 'jquery' ), '@@plugin_version', true );
 
-        wp_add_inline_script(
-            $jetpack_ll_handler,
-            '(function($){
-                if ( !$ ) {
-                    return;
-                }
-
-                var jetpackLazyImagesLoadEvent;
-                try {
-                    jetpackLazyImagesLoadEvent = new Event( "jetpack-lazy-images-load", {
-                        bubbles: true,
-                        cancelable: true
-                    } );
-                } catch ( e ) {
-                    jetpackLazyImagesLoadEvent = document.createEvent( "Event" )
-                    jetpackLazyImagesLoadEvent.initEvent( "jetpack-lazy-images-load", true, true );
-                }
-
-                // Fix AJAX loaded images.
-                $( document ).on( "loadedNewItems.vpf", function ( event, self, $items, removeExisting ) {
-                    if ( "vpf" !== event.namespace ) {
-                        return;
-                    }
-
-                    $("body").get( 0 ).dispatchEvent( jetpackLazyImagesLoadEvent );
-                } );
-            }(window.jQuery));',
-            'before'
-        );
+        $wp_scripts->registered[ $jetpack_ll_handler ]->deps[] = 'visual-portfolio-3rd-jetpack';
     }
 
     /**
