@@ -190,6 +190,7 @@ class Visual_Portfolio_Gutenberg_Block {
                 'admin_url'           => get_admin_url(),
                 'controls'            => Visual_Portfolio_Controls::get_registered_array(),
                 'controls_categories' => Visual_Portfolio_Controls::get_registered_categories(),
+                'items_count_notice'  => get_option( 'visual_portfolio_items_count_notice_state', 'show' ),
             )
         );
 

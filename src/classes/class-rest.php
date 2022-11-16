@@ -61,6 +61,17 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
                 'permission_callback' => array( $this, 'update_layout_permission' ),
             )
         );
+
+        // Update gallery items count notice state.
+        register_rest_route(
+            $namespace,
+            '/update_gallery_items_count_notice_state/',
+            array(
+                'methods'             => WP_REST_Server::EDITABLE,
+                'callback'            => array( $this, 'update_gallery_items_count_notice_state' ),
+                'permission_callback' => array( $this, 'update_gallery_items_count_notice_state_permission' ),
+            )
+        );
     }
 
     /**
@@ -171,6 +182,40 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
                 }
             }
         }
+
+        return $this->success( true );
+    }
+
+    /**
+     * Update gallery items count notice state permission.
+     *
+     * @param WP_REST_Request $request Full details about the request.
+     *
+     * @return true|WP_Error
+     */
+    public function update_gallery_items_count_notice_state_permission( $request ) {
+        $post_id = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
+
+        if ( ! $post_id || ! current_user_can( 'manage_options' ) ) {
+            return $this->error( 'user_dont_have_permission', esc_html__( 'User don\'t have permissions to change options.', '@@text_domain' ), true );
+        }
+
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            return $this->error( 'user_dont_have_permission', esc_html__( 'User don\'t have permissions to change options.', '@@text_domain' ), true );
+        }
+
+        return true;
+    }
+
+    /**
+     * Update layout data.
+     *
+     * @param WP_REST_Request $request Full details about the request.
+     *
+     * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+     */
+    public function update_gallery_items_count_notice_state( $request ) {
+        update_option( 'visual_portfolio_items_count_notice_state', $request->get_param( 'notice_state' ) );
 
         return $this->success( true );
     }
