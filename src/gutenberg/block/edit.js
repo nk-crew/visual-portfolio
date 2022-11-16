@@ -23,6 +23,7 @@ const {
   plugin_url: pluginUrl,
   controls_categories: registeredControlsCategories,
 } = window.VPGutenbergVariables;
+const NOTICE_LIMIT = parseInt(window.VPGutenbergVariables.items_count_notice_limit, 10);
 
 function renderControls(props, isSetupWizard = false) {
   const { attributes } = props;
@@ -85,19 +86,45 @@ export default function BlockEdit(props) {
   // And hide the setup wizard.
   useEffect(() => {
     if ('true' === setupWizard && contentSource) {
+      let newAttributes = {};
+
       switch (contentSource) {
         case 'images':
+          // Hide setup wizard once user select images.
           if (images && images.length) {
-            setAttributes({
+            newAttributes = {
               setup_wizard: '',
               items_count: -1,
               items_click_action: 'popup_gallery',
-            });
+            };
+
+            // Add infinite scroll to the gallery when user adds a lot of images.
+            if ('slider' !== layout && images.length > NOTICE_LIMIT) {
+              newAttributes = {
+                ...newAttributes,
+                items_count: NOTICE_LIMIT,
+                layout_elements: {
+                  top: {
+                    elements: [],
+                    align: 'center',
+                  },
+                  items: {
+                    elements: ['items'],
+                  },
+                  bottom: {
+                    elements: ['pagination'],
+                    align: 'center',
+                  },
+                },
+                pagination: 'infinite',
+                pagination_hide_on_end: true,
+              };
+            }
           }
           break;
         case 'post-based':
         case 'social-stream':
-          setAttributes({
+          newAttributes = {
             setup_wizard: '',
             layout_elements: {
               top: {
@@ -112,14 +139,16 @@ export default function BlockEdit(props) {
                 align: 'center',
               },
             },
-          });
+          };
           break;
         default:
-          setAttributes({
+          newAttributes = {
             setup_wizard: '',
-          });
+          };
           break;
       }
+
+      setAttributes(newAttributes);
     }
   }, [setupWizard, contentSource, images]);
 

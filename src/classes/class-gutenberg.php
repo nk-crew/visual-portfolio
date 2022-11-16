@@ -184,13 +184,14 @@ class Visual_Portfolio_Gutenberg_Block {
             'visual-portfolio-gutenberg',
             'VPGutenbergVariables',
             array(
-                'nonce'               => wp_create_nonce( 'vp-ajax-nonce' ),
-                'plugin_name'         => visual_portfolio()->plugin_name,
-                'plugin_url'          => visual_portfolio()->plugin_url,
-                'admin_url'           => get_admin_url(),
-                'controls'            => Visual_Portfolio_Controls::get_registered_array(),
-                'controls_categories' => Visual_Portfolio_Controls::get_registered_categories(),
-                'items_count_notice'  => get_option( 'visual_portfolio_items_count_notice_state', 'show' ),
+                'nonce'                     => wp_create_nonce( 'vp-ajax-nonce' ),
+                'plugin_name'               => visual_portfolio()->plugin_name,
+                'plugin_url'                => visual_portfolio()->plugin_url,
+                'admin_url'                 => get_admin_url(),
+                'controls'                  => Visual_Portfolio_Controls::get_registered_array(),
+                'controls_categories'       => Visual_Portfolio_Controls::get_registered_categories(),
+                'items_count_notice'        => get_option( 'visual_portfolio_items_count_notice_state', 'show' ),
+                'items_count_notice_limit'  => 40,
             )
         );
 

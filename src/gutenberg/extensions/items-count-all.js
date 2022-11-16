@@ -27,8 +27,8 @@ const { apiFetch } = wp;
 
 const { VPGutenbergVariables } = window;
 
-const NOTICE_LIMIT = 40;
-const DISPLAY_NOTICE_AFTER = 49;
+const NOTICE_LIMIT = parseInt(VPGutenbergVariables.items_count_notice_limit, 10);
+const DISPLAY_NOTICE_AFTER = NOTICE_LIMIT + 5;
 
 function getNoticeState() {
   return VPGutenbergVariables.items_count_notice;
