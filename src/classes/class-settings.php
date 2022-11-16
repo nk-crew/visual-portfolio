@@ -684,7 +684,7 @@ class Visual_Portfolio_Settings {
                     'name'      => 'popup_quick_view_internal_links_target',
                     'label'     => esc_html__( 'Internal Links', '@@text_domain' ),
                     'type'      => 'select',
-                    'default'   => 'blank',
+                    'default'   => '_blank',
                     'options'   => array(
                         '_blank'        => esc_html__( 'Open in New Tab', '@@text_domain' ),
                         '_top'          => esc_html__( 'Open in Current Tab', '@@text_domain' ),
@@ -697,7 +697,7 @@ class Visual_Portfolio_Settings {
                     'name'      => 'popup_quick_view_external_links_target',
                     'label'     => esc_html__( 'External Links', '@@text_domain' ),
                     'type'      => 'select',
-                    'default'   => 'blank',
+                    'default'   => '_blank',
                     'options'   => array(
                         '_blank'        => esc_html__( 'Open in New Tab', '@@text_domain' ),
                         '_top'          => esc_html__( 'Open in Current Tab', '@@text_domain' ),
