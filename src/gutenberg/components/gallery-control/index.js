@@ -519,10 +519,6 @@ const SortableList = function (props) {
       multiple="add"
       onSelect={(images) => {
         onChange(prepareImages(images, items));
-
-        if (images && images.length > showingItems) {
-          setShowingItems(images.length);
-        }
       }}
       allowedTypes={ALLOWED_MEDIA_TYPES}
       value={items && items.length ? items.map((img) => img.id) : false}
