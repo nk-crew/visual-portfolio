@@ -12,6 +12,7 @@
   select {
     display: block;
     min-width: var(--vp-filter-dropdown--items__min-width);
+    height: var(--vp-filter-dropdown--items__height);
     padding: var(--vp-filter-dropdown--items__padding-v) var(--vp-filter-dropdown--items__padding-h);
     padding-right: calc(var(--vp-filter-dropdown--items__padding-right) + var(--vp-filter-dropdown--items__arrow-size));
     margin-top: var(--vp-filter-dropdown--items__gap);
