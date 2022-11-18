@@ -1,5 +1,10 @@
 /* eslint-disable max-classes-per-file */
 /**
+ * External dependencies
+ */
+import * as clipboard from 'clipboard-polyfill';
+
+/**
  * Internal dependencies
  */
 import '../store';
@@ -22,9 +27,9 @@ const { apiFetch } = wp;
 
 const { applyFilters } = wp.hooks;
 
-const { Fragment, Component } = wp.element;
+const { Fragment, Component, useState } = wp.element;
 
-const { PanelBody } = wp.components;
+const { PanelBody, Button } = wp.components;
 
 const { withSelect, withDispatch } = wp.data;
 
@@ -34,30 +39,83 @@ const { compose } = wp.compose;
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 
+let copiedTimeout;
+
+function ShortcodeRender(props) {
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <div className="vpf-layout-shortcode-copy">
+      <strong>{props.label}:</strong>
+      <div>
+        <pre>{props.content}</pre>
+        <Button
+          isSmall
+          onClick={() => {
+            clipboard.writeText(props.content);
+
+            setCopied(true);
+
+            clearTimeout(copiedTimeout);
+
+            copiedTimeout = setTimeout(() => {
+              setCopied(false);
+            }, 450);
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
+            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
+          </svg>
+          {copied ? (
+            <div className="vpf-layout-shortcode-copied">{__('Copied!', '@@text_domain')}</div>
+          ) : null}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 /**
  * Layouts Editor block
  */
 class LayoutsEditorBlock extends Component {
-  // eslint-disable-next-line class-methods-use-this
-  onShortcodeClick(event) {
-    window.getSelection().selectAllChildren(event.target);
-  }
+  constructor(...args) {
+    super(...args);
 
-  // fix the problem with Gutenberg shortcode transform (allowed only plain text pasted).
-  // eslint-disable-next-line class-methods-use-this
-  onShortcodeCopy(event) {
-    // fix the problem with Gutenberg shortcode transform (allowed only plain text pasted).
-    const copyText = window
-      .getSelection()
-      .toString()
-      .replace(/[\n\r]+/g, '');
-
-    event.clipboardData.setData('text/plain', copyText);
-    event.preventDefault();
+    this.state = {
+      additionalShortcodes: false,
+    };
   }
 
   render() {
     const { postId, blockData, updateBlockData, clientId } = this.props;
+    const { additionalShortcodes } = this.state;
+
+    let shortcodes = [
+      {
+        label: __('This Saved Layout', '@@text_domain'),
+        content: `[visual_portfolio id="${postId}"]`,
+      },
+      {
+        label: __('Filter', '@@text_domain'),
+        content: `[visual_portfolio_filter id="${postId}" type="minimal" align="center" show_count="false" text_all="All"]`,
+        isOptional: true,
+      },
+      {
+        label: __('Sort', '@@text_domain'),
+        content: `[visual_portfolio_sort id="${postId}" type="minimal" align="center"]`,
+        isOptional: true,
+      },
+    ];
+
+    shortcodes = applyFilters('vpf.layouts-editor.shortcodes-list', shortcodes, this);
 
     return (
       <Fragment>
@@ -68,59 +126,34 @@ class LayoutsEditorBlock extends Component {
                 'To output this saved layout and its components you can use the following shortcodes:'
               )}
             </p>
+            {shortcodes.map((data) => {
+              if (data.isOptional) {
+                return null;
+              }
 
-            <p>
-              {__('Layout:', '@@text_domain')}
-              <br />
-              <code
-                role="button"
-                tabIndex="0"
-                aria-hidden="true"
-                onClick={this.onShortcodeClick}
-                onCopy={this.onShortcodeCopy}
-                onCut={this.onShortcodeCopy}
+              return <ShortcodeRender key={`shortcode-${data.label}`} {...data} />;
+            })}
+            {additionalShortcodes ? (
+              <Fragment>
+                {shortcodes.map((data) => {
+                  if (!data.isOptional) {
+                    return null;
+                  }
+
+                  return <ShortcodeRender key={`shortcode-${data.label}`} {...data} />;
+                })}
+                {applyFilters('vpf.layouts-editor.shortcodes', '', this)}
+              </Fragment>
+            ) : (
+              <Button
+                isLink
+                onClick={() => {
+                  this.setState({ additionalShortcodes: !additionalShortcodes });
+                }}
               >
-                [visual_portfolio id=&quot;
-                {postId}
-                &quot;]
-              </code>
-            </p>
-
-            <p>
-              {__('Filter (optional):', '@@text_domain')}
-              <br />
-              <code
-                role="button"
-                tabIndex="0"
-                aria-hidden="true"
-                onClick={this.onShortcodeClick}
-                onCopy={this.onShortcodeCopy}
-                onCut={this.onShortcodeCopy}
-              >
-                [visual_portfolio_filter id=&quot;
-                {postId}
-                &quot;]
-              </code>
-            </p>
-
-            <p>
-              {__('Sort (optional):', '@@text_domain')}
-              <br />
-              <code
-                role="button"
-                tabIndex="0"
-                aria-hidden="true"
-                onClick={this.onShortcodeClick}
-                onCopy={this.onShortcodeCopy}
-                onCut={this.onShortcodeCopy}
-              >
-                [visual_portfolio_sort id=&quot;
-                {postId}
-                &quot;]
-              </code>
-            </p>
-
-            {applyFilters('vpf.layouts-editor.shortcodes', '', this)}
+                {__('Show Additional Shortcodes', '@@text_domain')}
+              </Button>
+            )}
           </PanelBody>
         </InspectorControls>
         <BlockEdit
