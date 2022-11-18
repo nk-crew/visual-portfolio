@@ -1048,10 +1048,11 @@ class Visual_Portfolio_Get {
             $options,
             array(
                 'filter'            => $atts['type'],
-                'filter_align'      => $atts['align'],
                 'filter_show_count' => 'true' === $atts['show_count'],
             )
         );
+
+        $align = $atts['align'] ?? 'center';
 
         // generate unique ID.
         $uid = ++self::$filter_id;
@@ -1067,8 +1068,10 @@ class Visual_Portfolio_Get {
         ob_start();
 
         ?>
-        <div class="<?php echo esc_attr( $class ); ?>">
-            <?php self::filter( $options ); ?>
+        <div class="vp-portfolio__layout-elements vp-portfolio__layout-elements-align-<?php echo esc_attr( $align ); ?>">
+            <div class="<?php echo esc_attr( $class ); ?>">
+                <?php self::filter( $options ); ?>
+            </div>
         </div>
         <?php
 
@@ -1088,10 +1091,11 @@ class Visual_Portfolio_Get {
         $options = array_merge(
             $options,
             array(
-                'sort'       => $atts['type'],
-                'sort_align' => $atts['align'],
+                'sort' => $atts['type'],
             )
         );
+
+        $align = $atts['align'] ?? 'center';
 
         // generate unique ID.
         $uid = ++self::$sort_id;
@@ -1107,8 +1111,10 @@ class Visual_Portfolio_Get {
         ob_start();
 
         ?>
-        <div class="<?php echo esc_attr( $class ); ?>">
-            <?php self::sort( $options ); ?>
+        <div class="vp-portfolio__layout-elements vp-portfolio__layout-elements-align-<?php echo esc_attr( $align ); ?>">
+            <div class="<?php echo esc_attr( $class ); ?>">
+                <?php self::sort( $options ); ?>
+            </div>
         </div>
         <?php
 
