@@ -3,7 +3,8 @@
     "wp-coding-standards/wpcs": "^2.3",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
-    "10up/wp_mock": "^0.4"
+    "10up/wp_mock": "^0.4",
+    "php-stubs/wordpress-stubs": "^6.1"
   },
   "scripts": {
     "phpcs": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
