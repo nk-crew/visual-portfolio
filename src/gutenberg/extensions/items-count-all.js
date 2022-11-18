@@ -138,7 +138,7 @@ function ItemsCountControl({ data }) {
       label={
         <Fragment>
           {data.label}
-          {'hide' === getNoticeState() && shouldDisplayNotice(controlVal, data) ? (
+          {'hide' === getNoticeState() && shouldDisplayNotice(controlVal, attributes) ? (
             <Button
               onClick={() => {
                 updateNoticeState(postId);
@@ -221,7 +221,7 @@ function ItemsCountControl({ data }) {
           />
         </Fragment>
       ) : null}
-      {'show' === getNoticeState() && shouldDisplayNotice(controlVal, data) ? (
+      {'show' === getNoticeState() && shouldDisplayNotice(controlVal, attributes) ? (
         <div>
           <CountNotice
             postId={postId}
