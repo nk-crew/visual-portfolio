@@ -55,6 +55,7 @@ class Visual_Portfolio_Shortcode {
                 'type'       => 'default',
                 'align'      => 'center',
                 'show_count' => false,
+                'text_all'   => esc_attr__( 'All', '@@text_domain' ),
                 'class'      => '',
             ),
             $atts

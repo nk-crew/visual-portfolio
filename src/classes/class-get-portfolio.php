@@ -1049,6 +1049,7 @@ class Visual_Portfolio_Get {
             array(
                 'filter'            => $atts['type'],
                 'filter_show_count' => 'true' === $atts['show_count'],
+                'filter_text_all'   => $atts['text_all'] ?? esc_attr__( 'All', '@@text_domain' ),
             )
         );
 
