@@ -146,7 +146,12 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
           VPPopupAPI.maybeFocusGalleryItem(currentItemData);
         }
 
+        self.emitEvent('beforeCloseFancybox', [options, items, fancyboxInstance]);
+
         fancyboxInstance = false;
+      },
+      beforeShow(e, instance) {
+        self.emitEvent('beforeShowFancybox', [e, instance]);
       },
     };
 

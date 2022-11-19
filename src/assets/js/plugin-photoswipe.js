@@ -373,6 +373,8 @@ if (PhotoSwipe && VPPopupAPI) {
 
     pswpInstance.listen('afterChange', function () {
       resizeVideo(this);
+
+      self.emitEvent('afterChangePhotoSwipe', [this, pswpInstance]);
     });
 
     // disable video play if no active.
@@ -390,6 +392,8 @@ if (PhotoSwipe && VPPopupAPI) {
           }
         });
       }
+
+      self.emitEvent('beforeChangePhotoSwipe', [data, pswpInstance]);
     });
 
     // destroy event.
@@ -411,6 +415,8 @@ if (PhotoSwipe && VPPopupAPI) {
         if (currentItemData) {
           VPPopupAPI.maybeFocusGalleryItem(currentItemData);
         }
+
+        self.emitEvent('beforeClosePhotoSwipe', [options, items, pswpInstance]);
       }
 
       pswpInstance = false;
