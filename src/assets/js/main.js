@@ -567,31 +567,6 @@ class VP {
       }
     );
 
-    // infinite loading
-    let scrollTimeout;
-    const scrollThreshold = 400;
-    function checkVisibilityAndLoad() {
-      const rect = self.$item[0].getBoundingClientRect();
-
-      if (0 < rect.bottom && rect.bottom - scrollThreshold <= window.innerHeight) {
-        self.loadNewItems(self.options.nextPageUrl, false, () => {
-          clearTimeout(scrollTimeout);
-          scrollTimeout = setTimeout(() => {
-            checkVisibilityAndLoad();
-          }, 300);
-        });
-      }
-    }
-    if ('infinite' === self.options.pagination) {
-      $wnd.on(`load${evp} scroll${evp} resize${evp} orientationchange${evp}`, () => {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-          checkVisibilityAndLoad();
-        }, 60);
-      });
-      checkVisibilityAndLoad();
-    }
-
     // resized container
     self.$item.on(`transitionend${evp}`, '.vp-portfolio__items', (e) => {
       if (e.currentTarget === e.target) {
@@ -614,7 +589,7 @@ class VP {
     self.$filter.off(evp);
     self.$sort.off(evp);
 
-    // destroy infinite load events
+    // destroy window events
     $wnd.off(evp);
 
     self.emitEvent('destroyEvents');

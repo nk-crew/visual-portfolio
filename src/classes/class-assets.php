@@ -248,6 +248,11 @@ class Visual_Portfolio_Assets {
                 $pagination_style_pref = '/' . $options['pagination_style'];
             }
 
+            // Infinite scroll pagination script.
+            if ( 'infinite' === $options['pagination'] ) {
+                self::store_used_assets( 'visual-portfolio-pagination-infinite', true, 'script' );
+            }
+
             // Minimal page pagination helpful script.
             if ( 'minimal' === $options['pagination_style'] && 'paged' === $options['pagination'] ) {
                 self::store_used_assets( 'visual-portfolio-pagination-minimal-paged', true, 'script' );
@@ -516,6 +521,12 @@ class Visual_Portfolio_Assets {
             ),
             'visual-portfolio-items-style-fly' => array(
                 'assets/js/items-style-fly.min.js',
+                array(
+                    'jquery',
+                ),
+            ),
+            'visual-portfolio-pagination-infinite' => array(
+                'assets/js/pagination-infinite.min.js',
                 array(
                     'jquery',
                 ),
