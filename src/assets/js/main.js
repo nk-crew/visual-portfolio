@@ -569,11 +569,11 @@ class VP {
 
     // infinite loading
     let scrollTimeout;
-    const bottomPosToLoad = 250;
+    const scrollThreshold = 400;
     function checkVisibilityAndLoad() {
       const rect = self.$item[0].getBoundingClientRect();
 
-      if (0 < rect.bottom && rect.bottom - bottomPosToLoad <= window.innerHeight) {
+      if (0 < rect.bottom && rect.bottom - scrollThreshold <= window.innerHeight) {
         self.loadNewItems(self.options.nextPageUrl, false, () => {
           clearTimeout(scrollTimeout);
           scrollTimeout = setTimeout(() => {
