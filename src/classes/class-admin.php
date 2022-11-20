@@ -906,10 +906,8 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'        => 'text',
                             'name'        => 'read_more_label',
-                            'placeholder' => 'Read More',
                             'default'     => 'Read More',
-                            'hint'        => esc_attr__( 'Read More Button Label', '@@text_domain' ),
-                            'hint_place'  => 'left',
+                            'description' => esc_attr__( 'Read More button label', '@@text_domain' ),
                             'wpml'        => true,
                             'condition'   => array(
                                 array(
@@ -1918,13 +1916,12 @@ class Visual_Portfolio_Admin {
 
         Visual_Portfolio_Controls::register(
             array(
-                'category'   => 'content-source-general',
-                'type'       => 'checkbox',
-                'alongside'  => esc_html__( 'Stretch', '@@text_domain' ),
-                'name'       => 'stretch',
-                'default'    => false,
-                'hint'       => esc_attr__( 'Break container and display it wide', '@@text_domain' ),
-                'hint_place' => 'left',
+                'category'    => 'content-source-general',
+                'type'        => 'checkbox',
+                'alongside'   => esc_html__( 'Stretch', '@@text_domain' ),
+                'name'        => 'stretch',
+                'default'     => false,
+                'description' => esc_attr__( 'Break container and display it wide. This option helpful for 3rd-party page builders, in the Gutenberg themes you can use the built in Wide and Fullwidth features.', '@@text_domain' ),
             )
         );
 
@@ -2128,10 +2125,8 @@ class Visual_Portfolio_Admin {
                             $new_fields[] = array(
                                 'type'        => 'text',
                                 'name'        => 'date_format',
-                                'placeholder' => 'F j, Y',
                                 'default'     => 'F j, Y',
-                                'hint'        => esc_attr__( "Date format \r\n Example: F j, Y", '@@text_domain' ),
-                                'hint_place'  => 'left',
+                                'description' => esc_attr__( 'Date format example: F j, Y', '@@text_domain' ),
                                 'wpml'        => true,
                                 'condition'   => array(
                                     array(
@@ -2913,43 +2908,12 @@ class Visual_Portfolio_Admin {
         );
         Visual_Portfolio_Controls::register(
             array(
-                'category'  => 'pagination',
-                'type'      => 'html',
-                'label'     => esc_html__( 'Texts', '@@text_domain' ),
-                'name'      => 'pagination_infinite_texts',
-                'condition' => array(
-                    array(
-                        'control'  => 'pagination',
-                        'operator' => '==',
-                        'value'    => 'infinite',
-                    ),
-                ),
-            )
-        );
-        Visual_Portfolio_Controls::register(
-            array(
-                'category'  => 'pagination',
-                'type'      => 'html',
-                'label'     => esc_html__( 'Texts', '@@text_domain' ),
-                'name'      => 'pagination_load_more_texts',
-                'condition' => array(
-                    array(
-                        'control'  => 'pagination',
-                        'operator' => '==',
-                        'value'    => 'load-more',
-                    ),
-                ),
-            )
-        );
-        Visual_Portfolio_Controls::register(
-            array(
                 'category'    => 'pagination',
                 'type'        => 'text',
+                'label'       => esc_html__( 'Texts', '@@text_domain' ),
                 'name'        => 'pagination_infinite_text_load',
                 'default'     => esc_attr__( 'Load More', '@@text_domain' ),
-                'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
-                'hint_place'  => 'left',
+                'description' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'wpml'        => true,
                 'condition'   => array(
                     array(
@@ -2966,9 +2930,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'text',
                 'name'        => 'pagination_infinite_text_loading',
                 'default'     => esc_attr__( 'Loading More...', '@@text_domain' ),
-                'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
-                'hint_place'  => 'left',
+                'description' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'wpml'        => true,
                 'condition'   => array(
                     array(
@@ -2985,9 +2947,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'textarea',
                 'name'        => 'pagination_infinite_text_end_list',
                 'default'     => esc_attr__( 'You’ve reached the end of the list', '@@text_domain' ),
-                'placeholder' => esc_attr__( 'End of the list text', '@@text_domain' ),
-                'hint'        => esc_attr__( 'End of the list text', '@@text_domain' ),
-                'hint_place'  => 'left',
+                'description' => esc_attr__( 'End of the list text', '@@text_domain' ),
                 'wpml'        => true,
                 'condition'   => array(
                     array(
@@ -3002,11 +2962,10 @@ class Visual_Portfolio_Admin {
             array(
                 'category'    => 'pagination',
                 'type'        => 'text',
+                'label'       => esc_html__( 'Texts', '@@text_domain' ),
                 'name'        => 'pagination_load_more_text_load',
                 'default'     => esc_attr__( 'Load More', '@@text_domain' ),
-                'placeholder' => esc_attr__( 'Load more button label', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Load more button label', '@@text_domain' ),
-                'hint_place'  => 'left',
+                'description' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'wpml'        => true,
                 'condition'   => array(
                     array(
@@ -3023,9 +2982,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'text',
                 'name'        => 'pagination_load_more_text_loading',
                 'default'     => esc_attr__( 'Loading More...', '@@text_domain' ),
-                'placeholder' => esc_attr__( 'Loading more button label', '@@text_domain' ),
-                'hint'        => esc_attr__( 'Loading more button label', '@@text_domain' ),
-                'hint_place'  => 'left',
+                'description' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'wpml'        => true,
                 'condition'   => array(
                     array(
@@ -3042,9 +2999,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'textarea',
                 'name'        => 'pagination_load_more_text_end_list',
                 'default'     => esc_attr__( 'You’ve reached the end of the list', '@@text_domain' ),
-                'placeholder' => esc_attr__( 'End of the list text', '@@text_domain' ),
-                'hint'        => esc_attr__( 'End of the list text', '@@text_domain' ),
-                'hint_place'  => 'left',
+                'description' => esc_attr__( 'End of the list text', '@@text_domain' ),
                 'wpml'        => true,
                 'condition'   => array(
                     array(
@@ -3130,6 +3085,22 @@ class Visual_Portfolio_Admin {
                         'control'  => 'pagination',
                         'operator' => '!=',
                         'value'    => 'paged',
+                    ),
+                ),
+            )
+        );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category'    => 'pagination',
+                'type'        => 'pro_note',
+                'name'        => 'pagination_infinite_additional_options_pro_note',
+                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                'description' => '<p>' . esc_html__( 'Adjust the loading threshold, limit the number of automatic loads and run the infinite scroll only after the Load button click.', '@@text_domain' ) . '</p>',
+                'condition'   => array(
+                    array(
+                        'control'  => 'pagination',
+                        'operator' => '==',
+                        'value'    => 'infinite',
                     ),
                 ),
             )
