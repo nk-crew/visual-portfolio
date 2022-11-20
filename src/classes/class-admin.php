@@ -1817,7 +1817,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'pro_note',
                 'name'        => 'protection_pro_note',
                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                'description' => esc_html__( 'Protect your works using watermarks, password, and age gate', '@@text_domain' ),
+                'description' => '<p>' . esc_html__( 'Protect your works using watermarks, password, and age gate', '@@text_domain' ) . '</p>',
                 'condition'   => array(
                     array(
                         'control'  => 'content_source',
@@ -1837,7 +1837,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'pro_note',
                 'name'        => 'social_pro_note',
                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                'description' => esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ),
+                'description' => '<p>' . esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', '@@text_domain' ) . '</p>',
             )
         );
 
@@ -2346,7 +2346,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'pro_note',
                 'name'        => 'items_click_action_url_pro_note',
                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                'description' => esc_html__( 'Link URL click priority', '@@text_domain' ),
+                'description' => '<p>' . esc_html__( 'Link URL click priority', '@@text_domain' ) . '</p>',
                 'condition'   => array(
                     array(
                         'control' => 'items_click_action',
@@ -2433,7 +2433,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'pro_note',
                 'name'        => 'items_click_action_advanced_pro_note',
                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                'description' => esc_html__( 'Deeply customize actions of clicks on different types of items and links.', '@@text_domain' ),
+                'description' => '<p>' . esc_html__( 'Deeply customize actions of clicks on different types of items and links.', '@@text_domain' ) . '</p>',
                 'condition'   => array(
                     array(
                         'control' => 'items_click_action',
@@ -2768,7 +2768,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'pro_note',
                 'name'        => 'search_pro_note',
                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                'description' => esc_html__( 'The search module is only available for Pro users.', '@@text_domain' ),
+                'description' => '<p>' . esc_html__( 'The search module is only available for Pro users.', '@@text_domain' ) . '</p>',
             )
         );
 
@@ -3145,7 +3145,6 @@ class Visual_Portfolio_Admin {
                 'name'             => 'custom_css',
                 'max_lines'        => 20,
                 'min_lines'        => 5,
-                'mode'             => 'css',
                 'mode'             => 'css',
                 'allow_modal'      => true,
                 'classes_tree'     => true,
