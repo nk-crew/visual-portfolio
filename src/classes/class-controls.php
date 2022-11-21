@@ -53,6 +53,7 @@ class Visual_Portfolio_Controls {
         'type'              => 'text',
         'label'             => false,
         'description'       => false,
+        'group'             => false,
         'name'              => '',
         'value'             => '',
         'value_callback'    => '',
