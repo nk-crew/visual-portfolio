@@ -78,6 +78,20 @@ class Visual_Portfolio_Assets {
     }
 
     /**
+     * Remove stored assets. May be used for advanced functionality.
+     *
+     * @param string $name - asset name.
+     * @param string $type - assets type [script|style|template_style].
+     */
+    public static function remove_stored_assets( $name, $type = 'script' ) {
+        if ( ! isset( self::$stored_assets[ $type ][ $name ] ) ) {
+            return;
+        }
+
+        unset( self::$stored_assets[ $type ][ $name ] );
+    }
+
+    /**
      * Enqueue stored assets.
      *
      * @param string $type - assets type [script|style|template_style].
