@@ -504,6 +504,7 @@ class Visual_Portfolio_Admin {
                             'type'    => 'range',
                             'label'   => esc_html__( 'Row Height', '@@text_domain' ),
                             'name'    => 'row_height',
+                            'group'   => 'justified_row_height',
                             'min'     => 100,
                             'max'     => 1000,
                             'default' => 200,
@@ -512,6 +513,7 @@ class Visual_Portfolio_Admin {
                             'type'    => 'range',
                             'label'   => esc_html__( 'Row Height Tolerance', '@@text_domain' ),
                             'name'    => 'row_height_tolerance',
+                            'group'   => 'justified_row_height',
                             'min'     => 0,
                             'max'     => 1,
                             'step'    => 0.05,
@@ -605,6 +607,7 @@ class Visual_Portfolio_Admin {
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Items Height', '@@text_domain' ),
                             'name'    => 'items_height_type',
+                            'group'   => 'slider_items_height',
                             'default' => 'dynamic',
                             'options' => array(
                                 'auto'    => esc_html__( 'Auto', '@@text_domain' ),
@@ -615,6 +618,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'      => 'number',
                             'name'      => 'items_height_static',
+                            'group'     => 'slider_items_height',
                             'min'       => 30,
                             'max'       => 800,
                             'default'   => 300,
@@ -629,6 +633,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'      => 'number',
                             'name'      => 'items_height_dynamic',
+                            'group'     => 'slider_items_height',
                             'min'       => 10,
                             'max'       => 300,
                             'default'   => 80,
@@ -646,6 +651,7 @@ class Visual_Portfolio_Admin {
                             'placeholder' => esc_attr__( '300px, 80vh', '@@text_domain' ),
                             'description' => esc_html__( 'Values with `vh` units will not be visible in preview.', '@@text_domain' ),
                             'name'        => 'items_min_height',
+                            'group'       => 'slider_items_height',
                             'default'     => '',
                             'condition'   => array(
                                 array(
@@ -659,6 +665,7 @@ class Visual_Portfolio_Admin {
                             'type'      => 'radio',
                             'label'     => esc_html__( 'Slides Per View', '@@text_domain' ),
                             'name'      => 'slides_per_view_type',
+                            'group'     => 'slider_slides_per_view',
                             'default'   => 'custom',
                             'options'   => array(
                                 'auto'   => esc_html__( 'Auto', '@@text_domain' ),
@@ -675,6 +682,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'      => 'number',
                             'name'      => 'slides_per_view_custom',
+                            'group'     => 'slider_slides_per_view',
                             'min'       => 1,
                             'max'       => 6,
                             'default'   => 3,
@@ -714,12 +722,14 @@ class Visual_Portfolio_Admin {
                             'type'      => 'checkbox',
                             'alongside' => esc_html__( 'Free Scroll', '@@text_domain' ),
                             'name'      => 'free_mode',
+                            'group'     => 'slider_free_mode',
                             'default'   => false,
                         ),
                         array(
                             'type'      => 'checkbox',
                             'alongside' => esc_html__( 'Free Scroll Sticky', '@@text_domain' ),
                             'name'      => 'free_mode_sticky',
+                            'group'     => 'slider_free_mode',
                             'default'   => false,
                             'condition' => array(
                                 array(
@@ -737,12 +747,14 @@ class Visual_Portfolio_Admin {
                             'type'      => 'checkbox',
                             'alongside' => esc_html__( 'Display Bullets', '@@text_domain' ),
                             'name'      => 'bullets',
+                            'group'     => 'slider_bullets',
                             'default'   => false,
                         ),
                         array(
                             'type'      => 'checkbox',
                             'alongside' => esc_html__( 'Dynamic Bullets', '@@text_domain' ),
                             'name'      => 'bullets_dynamic',
+                            'group'     => 'slider_bullets',
                             'default'   => false,
                             'condition' => array(
                                 array(
@@ -760,12 +772,14 @@ class Visual_Portfolio_Admin {
                             'type'      => 'checkbox',
                             'alongside' => esc_html__( 'Display Thumbnails', '@@text_domain' ),
                             'name'      => 'thumbnails',
+                            'group'     => 'slider_thumbnails',
                             'default'   => false,
                         ),
                         array(
                             'type'      => 'range',
                             'label'     => esc_html__( 'Thumbnails Gap', '@@text_domain' ),
                             'name'      => 'thumbnails_gap',
+                            'group'     => 'slider_thumbnails',
                             'default'   => 15,
                             'min'       => 0,
                             'max'       => 150,
@@ -779,6 +793,7 @@ class Visual_Portfolio_Admin {
                             'type'      => 'radio',
                             'label'     => esc_html__( 'Thumbnails Height', '@@text_domain' ),
                             'name'      => 'thumbnails_height_type',
+                            'group'     => 'slider_thumbnails',
                             'default'   => 'static',
                             'options'   => array(
                                 'auto'    => esc_html__( 'Auto', '@@text_domain' ),
@@ -794,6 +809,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'      => 'number',
                             'name'      => 'thumbnails_height_static',
+                            'group'     => 'slider_thumbnails',
                             'min'       => 10,
                             'max'       => 400,
                             'default'   => 100,
@@ -811,6 +827,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'      => 'number',
                             'name'      => 'thumbnails_height_dynamic',
+                            'group'     => 'slider_thumbnails',
                             'min'       => 10,
                             'max'       => 200,
                             'default'   => 30,
@@ -829,6 +846,7 @@ class Visual_Portfolio_Admin {
                             'type'      => 'radio',
                             'label'     => esc_html__( 'Thumbnails Per View', '@@text_domain' ),
                             'name'      => 'thumbnails_per_view_type',
+                            'group'     => 'slider_thumbnails',
                             'default'   => 'custom',
                             'options'   => array(
                                 'auto'   => esc_html__( 'Auto', '@@text_domain' ),
@@ -843,6 +861,7 @@ class Visual_Portfolio_Admin {
                         array(
                             'type'      => 'number',
                             'name'      => 'thumbnails_per_view_custom',
+                            'group'     => 'slider_thumbnails',
                             'min'       => 1,
                             'max'       => 14,
                             'default'   => 8,
@@ -921,6 +940,7 @@ class Visual_Portfolio_Admin {
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
                             'name'    => 'show_overlay',
+                            'group'   => 'items_style_overlay',
                             'default' => 'hover',
                             'options' => array(
                                 'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
@@ -932,6 +952,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
                             'name'  => 'bg_color',
+                            'group' => 'items_style_overlay',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -944,6 +965,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
                             'name'  => 'text_color',
+                            'group' => 'items_style_overlay',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -956,6 +978,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Caption Text Color', '@@text_domain' ),
                             'name'  => 'meta_text_color',
+                            'group' => 'items_style_caption',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -968,6 +991,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Caption Links Color', '@@text_domain' ),
                             'name'  => 'meta_links_color',
+                            'group' => 'items_style_caption',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -980,6 +1004,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Caption Links Hover Color', '@@text_domain' ),
                             'name'  => 'meta_links_hover_color',
+                            'group' => 'items_style_caption',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1024,6 +1049,7 @@ class Visual_Portfolio_Admin {
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
                             'name'    => 'show_overlay',
+                            'group'   => 'items_style_overlay',
                             'default' => 'hover',
                             'options' => array(
                                 'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
@@ -1035,6 +1061,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
                             'name'  => 'bg_color',
+                            'group' => 'items_style_overlay',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1047,6 +1074,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
                             'name'  => 'text_color',
+                            'group' => 'items_style_overlay',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1091,6 +1119,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
                             'name'  => 'bg_color',
+                            'group' => 'items_style_overlay',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1103,6 +1132,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
                             'name'  => 'text_color',
+                            'group' => 'items_style_overlay',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1147,6 +1177,7 @@ class Visual_Portfolio_Admin {
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Display Caption', '@@text_domain' ),
                             'name'    => 'show_overlay',
+                            'group'   => 'items_style_caption',
                             'default' => 'hover',
                             'options' => array(
                                 'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
@@ -1158,6 +1189,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Caption Background Color', '@@text_domain' ),
                             'name'  => 'bg_color',
+                            'group' => 'items_style_caption',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1170,6 +1202,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Caption Text Color', '@@text_domain' ),
                             'name'  => 'text_color',
+                            'group' => 'items_style_caption',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1182,6 +1215,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Caption Links Color', '@@text_domain' ),
                             'name'  => 'links_color',
+                            'group' => 'items_style_caption',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1194,6 +1228,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Caption Links Hover Color', '@@text_domain' ),
                             'name'  => 'links_hover_color',
+                            'group' => 'items_style_caption',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1206,6 +1241,7 @@ class Visual_Portfolio_Admin {
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Display Image Overlay', '@@text_domain' ),
                             'name'    => 'show_img_overlay',
+                            'group'   => 'items_style_overlay',
                             'default' => 'hover',
                             'options' => array(
                                 'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
@@ -1217,6 +1253,7 @@ class Visual_Portfolio_Admin {
                             'type'  => 'color',
                             'label' => esc_html__( 'Image Overlay Background Color', '@@text_domain' ),
                             'name'  => 'img_overlay_bg_color',
+                            'group' => 'items_style_overlay',
                             'alpha' => true,
                             'style' => array(
                                 array(
@@ -1465,6 +1502,7 @@ class Visual_Portfolio_Admin {
                 'type'           => 'select',
                 'label'          => esc_html__( 'Taxonomies', '@@text_domain' ),
                 'name'           => 'posts_taxonomies',
+                'group'          => 'posts_taxonomies',
                 'default'        => array(),
                 'value_callback' => array( $this, 'find_taxonomies_select_control' ),
                 'searchable'     => true,
@@ -1494,6 +1532,7 @@ class Visual_Portfolio_Admin {
                 'type'          => 'radio',
                 'label'         => esc_html__( 'Taxonomies Relation', '@@text_domain' ),
                 'name'          => 'posts_taxonomies_relation',
+                'group'         => 'posts_taxonomies',
                 'default'       => 'or',
                 'options'       => array(
                     'or'  => esc_html__( 'OR', '@@text_domain' ),
@@ -1524,6 +1563,7 @@ class Visual_Portfolio_Admin {
                 'type'          => 'select',
                 'label'         => esc_html__( 'Order by', '@@text_domain' ),
                 'name'          => 'posts_order_by',
+                'group'         => 'posts_order',
                 'default'       => 'post_date',
                 'options'       => array(
                     'post_date'     => esc_html__( 'Date', '@@text_domain' ),
@@ -1557,6 +1597,7 @@ class Visual_Portfolio_Admin {
                 // translators: %2$s - link text.
                 'description'   => wp_kses_post( sprintf( __( 'Menu Order is typically used in combination with one of these plugins: <a href="%1$s" target="_blank">%2$s</a>', '@@text_domain' ), 'https://wordpress.org/plugins/search/post+order/', 'Post Order Plugins' ) ),
                 'name'          => 'posts_order_direction_notice',
+                'group'         => 'posts_order',
                 'condition'     => array(
                     array(
                         'control'  => 'posts_order_by',
@@ -1582,6 +1623,7 @@ class Visual_Portfolio_Admin {
                 'type'          => 'radio',
                 'label'         => esc_html__( 'Order Direction', '@@text_domain' ),
                 'name'          => 'posts_order_direction',
+                'group'         => 'posts_order',
                 'default'       => 'desc',
                 'options'       => array(
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
@@ -1749,6 +1791,7 @@ class Visual_Portfolio_Admin {
                 'type'          => 'select',
                 'label'         => esc_html__( 'Titles Source', '@@text_domain' ),
                 'name'          => 'images_titles_source',
+                'group'         => 'images_titles_source',
                 'default'       => 'custom',
                 'options'       => array(
                     'none'        => esc_html__( 'None', '@@text_domain' ),
@@ -1766,6 +1809,7 @@ class Visual_Portfolio_Admin {
                 'type'          => 'select',
                 'label'         => esc_html__( 'Descriptions Source', '@@text_domain' ),
                 'name'          => 'images_descriptions_source',
+                'group'         => 'images_titles_source',
                 'default'       => 'custom',
                 'options'       => array(
                     'none'        => esc_html__( 'None', '@@text_domain' ),
@@ -1783,6 +1827,7 @@ class Visual_Portfolio_Admin {
                 'type'          => 'select',
                 'label'         => esc_html__( 'Order by', '@@text_domain' ),
                 'name'          => 'images_order_by',
+                'group'         => 'images_order',
                 'default'       => 'default',
                 'options'       => array(
                     'default' => esc_html__( 'Default', '@@text_domain' ),
@@ -1798,6 +1843,7 @@ class Visual_Portfolio_Admin {
                 'type'          => 'radio',
                 'label'         => esc_html__( 'Order Direction', '@@text_domain' ),
                 'name'          => 'images_order_direction',
+                'group'         => 'images_order',
                 'default'       => 'asc',
                 'options'       => array(
                     'asc'  => esc_html__( 'ASC', '@@text_domain' ),
@@ -1874,6 +1920,7 @@ class Visual_Portfolio_Admin {
                 'type'     => 'buttons',
                 'label'    => esc_html__( 'No Items Action', '@@text_domain' ),
                 'name'     => 'no_items_action',
+                'group'    => 'no_items_action',
                 'default'  => 'notice',
                 'options'  => array(
                     'notice' => esc_html__( 'Notice', '@@text_domain' ),
@@ -1887,6 +1934,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'textarea',
                 'placeholder' => esc_html__( 'Notice', '@@text_domain' ),
                 'name'        => 'no_items_notice',
+                'group'       => 'no_items_action',
                 'default'     => esc_html__( 'No items were found matching your selection.', '@@text_domain' ),
                 'wpml'        => true,
                 'condition'   => array(
@@ -1904,6 +1952,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'html',
                 'description' => esc_html__( 'Note: you will see the notice in the preview. Block will be hidden in the site frontend.', '@@text_domain' ),
                 'name'        => 'no_items_action_hide_info',
+                'group'       => 'no_items_action',
                 'condition'   => array(
                     array(
                         'control'  => 'no_items_action',
@@ -1991,6 +2040,7 @@ class Visual_Portfolio_Admin {
                 'type'     => 'range',
                 'label'    => esc_html__( 'Gap', '@@text_domain' ),
                 'name'     => 'items_gap',
+                'group'    => 'layout_items_gap',
                 'default'  => 15,
                 'min'      => 0,
                 'max'      => 200,
@@ -2010,6 +2060,7 @@ class Visual_Portfolio_Admin {
                 'label'       => esc_html__( 'Vertical Gap', '@@text_domain' ),
                 'description' => esc_html__( 'When empty, used Gap option', '@@text_domain' ),
                 'name'        => 'items_gap_vertical',
+                'group'       => 'layout_items_gap',
                 'default'     => '',
                 'min'         => 0,
                 'max'         => 200,
@@ -2094,12 +2145,14 @@ class Visual_Portfolio_Admin {
                                 'type'      => 'checkbox',
                                 'alongside' => esc_html__( 'Display Categories', '@@text_domain' ),
                                 'name'      => 'show_categories',
+                                'group'     => 'items_style_categories',
                                 'default'   => true,
                             );
                             $new_fields[] = array(
                                 'type'      => 'range',
                                 'label'     => esc_html__( 'Categories Count', '@@text_domain' ),
                                 'name'      => 'categories_count',
+                                'group'     => 'items_style_categories',
                                 'min'       => 1,
                                 'max'       => 20,
                                 'default'   => 1,
@@ -2115,6 +2168,7 @@ class Visual_Portfolio_Admin {
                                 'type'    => 'radio',
                                 'label'   => esc_html__( 'Display Date', '@@text_domain' ),
                                 'name'    => 'show_date',
+                                'group'   => 'items_style_date',
                                 'default' => 'false',
                                 'options' => array(
                                     'false' => esc_html__( 'Hide', '@@text_domain' ),
@@ -2125,6 +2179,7 @@ class Visual_Portfolio_Admin {
                             $new_fields[] = array(
                                 'type'        => 'text',
                                 'name'        => 'date_format',
+                                'group'       => 'items_style_date',
                                 'default'     => 'F j, Y',
                                 'description' => esc_attr__( 'Date format example: F j, Y', '@@text_domain' ),
                                 'wpml'        => true,
@@ -2190,12 +2245,14 @@ class Visual_Portfolio_Admin {
                                 'type'      => 'checkbox',
                                 'alongside' => esc_html__( 'Display Excerpt', '@@text_domain' ),
                                 'name'      => 'show_excerpt',
+                                'group'     => 'items_style_excerpt',
                                 'default'   => false,
                             );
                             $new_fields[] = array(
                                 'type'      => 'number',
                                 'label'     => esc_html__( 'Excerpt Words Count', '@@text_domain' ),
                                 'name'      => 'excerpt_words_count',
+                                'group'     => 'items_style_excerpt',
                                 'default'   => 15,
                                 'min'       => 1,
                                 'max'       => 200,
@@ -2306,6 +2363,7 @@ class Visual_Portfolio_Admin {
                 'type'      => 'radio',
                 'label'     => esc_html__( 'Target', '@@text_domain' ),
                 'name'      => 'items_click_action_url_target',
+                'group'     => 'items_click_action_target',
                 'default'   => '',
                 'options'   => array(
                     ''       => esc_html__( 'Default', '@@text_domain' ),
@@ -2326,6 +2384,7 @@ class Visual_Portfolio_Admin {
                 'type'      => 'text',
                 'label'     => esc_html__( 'Rel', '@@text_domain' ),
                 'name'      => 'items_click_action_url_rel',
+                'group'     => 'items_click_action_target',
                 'default'   => '',
                 'condition' => array(
                     array(
@@ -2358,6 +2417,7 @@ class Visual_Portfolio_Admin {
                 'type'      => 'select',
                 'label'     => esc_html__( 'Title Source', '@@text_domain' ),
                 'name'      => 'items_click_action_popup_title_source',
+                'group'     => 'popup_title_source',
                 'default'   => 'title',
                 'options'   => array(
                     'none'             => esc_html__( 'None', '@@text_domain' ),
@@ -2383,6 +2443,7 @@ class Visual_Portfolio_Admin {
                 'type'      => 'select',
                 'label'     => esc_html__( 'Description Source', '@@text_domain' ),
                 'name'      => 'items_click_action_popup_description_source',
+                'group'     => 'popup_title_source',
                 'default'   => 'description',
                 'options'   => array(
                     'none'             => esc_html__( 'None', '@@text_domain' ),
@@ -2912,6 +2973,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'text',
                 'label'       => esc_html__( 'Texts', '@@text_domain' ),
                 'name'        => 'pagination_infinite_text_load',
+                'group'       => 'pagination_texts',
                 'default'     => esc_attr__( 'Load More', '@@text_domain' ),
                 'description' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'wpml'        => true,
@@ -2929,6 +2991,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'pagination',
                 'type'        => 'text',
                 'name'        => 'pagination_infinite_text_loading',
+                'group'       => 'pagination_texts',
                 'default'     => esc_attr__( 'Loading More...', '@@text_domain' ),
                 'description' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'wpml'        => true,
@@ -2946,6 +3009,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'pagination',
                 'type'        => 'textarea',
                 'name'        => 'pagination_infinite_text_end_list',
+                'group'       => 'pagination_texts',
                 'default'     => esc_attr__( 'You’ve reached the end of the list', '@@text_domain' ),
                 'description' => esc_attr__( 'End of the list text', '@@text_domain' ),
                 'wpml'        => true,
@@ -2964,6 +3028,7 @@ class Visual_Portfolio_Admin {
                 'type'        => 'text',
                 'label'       => esc_html__( 'Texts', '@@text_domain' ),
                 'name'        => 'pagination_load_more_text_load',
+                'group'       => 'pagination_texts',
                 'default'     => esc_attr__( 'Load More', '@@text_domain' ),
                 'description' => esc_attr__( 'Load more button label', '@@text_domain' ),
                 'wpml'        => true,
@@ -2981,6 +3046,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'pagination',
                 'type'        => 'text',
                 'name'        => 'pagination_load_more_text_loading',
+                'group'       => 'pagination_texts',
                 'default'     => esc_attr__( 'Loading More...', '@@text_domain' ),
                 'description' => esc_attr__( 'Loading more button label', '@@text_domain' ),
                 'wpml'        => true,
@@ -2998,6 +3064,7 @@ class Visual_Portfolio_Admin {
                 'category'    => 'pagination',
                 'type'        => 'textarea',
                 'name'        => 'pagination_load_more_text_end_list',
+                'group'       => 'pagination_texts',
                 'default'     => esc_attr__( 'You’ve reached the end of the list', '@@text_domain' ),
                 'description' => esc_attr__( 'End of the list text', '@@text_domain' ),
                 'wpml'        => true,
@@ -3046,6 +3113,7 @@ class Visual_Portfolio_Admin {
                 'type'      => 'checkbox',
                 'alongside' => esc_html__( 'Scroll to Top', '@@text_domain' ),
                 'name'      => 'pagination_paged__scroll_top',
+                'group'     => 'pagination_scroll_top',
                 'default'   => true,
                 'condition' => array(
                     array(
@@ -3061,6 +3129,7 @@ class Visual_Portfolio_Admin {
                 'type'      => 'number',
                 'label'     => esc_html__( 'Scroll to Top Offset', '@@text_domain' ),
                 'name'      => 'pagination_paged__scroll_top_offset',
+                'group'     => 'pagination_scroll_top',
                 'default'   => 30,
                 'condition' => array(
                     array(

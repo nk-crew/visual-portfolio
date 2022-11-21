@@ -33,7 +33,7 @@ import SortableControl from '../sortable-control';
  */
 const { __ } = wp.i18n;
 
-const { Component, Fragment, RawHTML } = wp.element;
+const { Component, Fragment, RawHTML, useState, useEffect, useRef } = wp.element;
 
 const { applyFilters } = wp.hooks;
 
@@ -199,6 +199,8 @@ class ControlsRender extends Component {
  */
 ControlsRender.Control = function (props) {
   const { attributes, onChange, isSetupWizard } = props;
+  const $ref = useRef();
+  const [positionInGroup, setPositionInGroup] = useState('');
 
   // Conditions check.
   if (!ControlsRender.AllowRender(props, isSetupWizard)) {
@@ -211,8 +213,50 @@ ControlsRender.Control = function (props) {
   let renderControlHelp = props.description ? (
     <RawHTML className="components-base-control__help">{props.description}</RawHTML>
   ) : null;
-  const renderControlClassName = classnames('vpf-control-wrap', `vpf-control-wrap-${props.type}`);
+  let renderControlClassName = classnames('vpf-control-wrap', `vpf-control-wrap-${props.type}`);
   const controlVal = controlGetValue(props.name, attributes);
+
+  if (props.group) {
+    renderControlClassName = classnames(
+      renderControlClassName,
+      'vpf-control-with-group',
+      `vpf-control-group-${props.group}`,
+      positionInGroup ? `vpf-control-group-position-${positionInGroup}` : false
+    );
+  }
+
+  useEffect(() => {
+    if (props.group && $ref.current) {
+      const $element = $ref.current.parentElement.parentElement;
+      const $prevSibling = $element.previousElementSibling;
+      const $nextSibling = $element.nextElementSibling;
+
+      let isStart = false;
+      let isEnd = false;
+
+      if ($prevSibling) {
+        isStart = !$prevSibling.classList.contains(`vpf-control-group-${props.group}`);
+      }
+
+      if ($nextSibling) {
+        isEnd = !$nextSibling.classList.contains(`vpf-control-group-${props.group}`);
+      }
+
+      let newPosition = '';
+
+      if (isStart && isEnd) {
+        // skip
+      } else if (isStart) {
+        newPosition = 'start';
+      } else if (isEnd) {
+        newPosition = 'end';
+      }
+
+      if (positionInGroup !== newPosition) {
+        setPositionInGroup(newPosition);
+      }
+    }
+  }, [$ref, props.group, controlVal]);
 
   // Specific controls.
   switch (props.type) {
@@ -500,13 +544,26 @@ ControlsRender.Control = function (props) {
     );
   }
 
+  // TODO: use this filter for custom controls.
+  const data = applyFilters(
+    'vpf.editor.controls-render-inner-data',
+    {
+      renderControl,
+      renderControlHelp,
+      renderControlAfter,
+    },
+    { props, controlVal }
+  );
+
   return (
     <Fragment>
+      {'start' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
       <BaseControl label={renderControlLabel} className={renderControlClassName}>
-        <div>{renderControl}</div>
-        {renderControlHelp}
+        <div ref={$ref}>{data.renderControl}</div>
+        {data.renderControlHelp}
       </BaseControl>
-      {renderControlAfter}
+      {data.renderControlAfter}
+      {'end' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
     </Fragment>
   );
 };
