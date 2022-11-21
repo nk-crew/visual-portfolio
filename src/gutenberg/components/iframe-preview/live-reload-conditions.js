@@ -67,37 +67,8 @@ addFilter('vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-r
 
         break;
       }
-      case 'filter_align':
-        data.$framePortfolio
-          .find('.vp-filter')
-          .removeClass('vp-filter__align-center vp-filter__align-left vp-filter__align-right')
-          .addClass(`vp-filter__align-${val}`);
-
-        break;
-      case 'sort_align':
-        data.$framePortfolio
-          .find('.vp-sort')
-          .removeClass('vp-sort__align-center vp-sort__align-left vp-sort__align-right')
-          .addClass(`vp-sort__align-${val}`);
-
-        break;
-      case 'pagination_align':
-        data.$framePortfolio
-          .find('.vp-pagination')
-          .removeClass(
-            'vp-pagination__align-center vp-pagination__align-left vp-pagination__align-right'
-          )
-          .addClass(`vp-pagination__align-${val}`);
-
-        break;
       // prevent some options reload
       case 'list_name':
-      case 'stretch':
-      case 'custom_css':
-      case 'items_click_action_url_target':
-      case 'items_click_action_url_rel':
-      case 'items_click_action_popup_title_source':
-      case 'items_click_action_popup_description_source':
         // no reload
         break;
       default:
