@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <?php
     if ( isset( $image_data[ $title_source ] ) && $image_data[ $title_source ] ) {
         ?>
-        <h3 class="vp-portfolio__item-popup-title"><?php echo esc_html( $image_data[ $title_source ] ); ?></h3>
+        <h3 class="vp-portfolio__item-popup-title"><?php echo wp_kses_post( $image_data[ $title_source ] ); ?></h3>
         <?php
     }
     if ( isset( $image_data[ $description_source ] ) && $image_data[ $description_source ] ) {
