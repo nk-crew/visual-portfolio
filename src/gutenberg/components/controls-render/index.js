@@ -231,20 +231,17 @@ ControlsRender.Control = function (props) {
       const $prevSibling = $element.previousElementSibling;
       const $nextSibling = $element.nextElementSibling;
 
-      let isStart = false;
-      let isEnd = false;
-
-      if ($prevSibling) {
-        isStart = !$prevSibling.classList.contains(`vpf-control-group-${props.group}`);
-      }
-
-      if ($nextSibling) {
-        isEnd = !$nextSibling.classList.contains(`vpf-control-group-${props.group}`);
-      }
+      const isGroupEnabled =
+        ($prevSibling && $prevSibling.classList.contains(`vpf-control-group-${props.group}`)) ||
+        ($nextSibling && $nextSibling.classList.contains(`vpf-control-group-${props.group}`));
+      const isStart =
+        $prevSibling && !$prevSibling.classList.contains(`vpf-control-group-${props.group}`);
+      const isEnd =
+        $nextSibling && !$nextSibling.classList.contains(`vpf-control-group-${props.group}`);
 
       let newPosition = '';
 
-      if (isStart && isEnd) {
+      if (!isGroupEnabled) {
         // skip
       } else if (isStart) {
         newPosition = 'start';
