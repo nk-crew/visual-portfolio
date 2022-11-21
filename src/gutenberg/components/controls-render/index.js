@@ -235,9 +235,13 @@ ControlsRender.Control = function (props) {
         ($prevSibling && $prevSibling.classList.contains(`vpf-control-group-${props.group}`)) ||
         ($nextSibling && $nextSibling.classList.contains(`vpf-control-group-${props.group}`));
       const isStart =
-        $prevSibling && !$prevSibling.classList.contains(`vpf-control-group-${props.group}`);
+        $prevSibling &&
+        !$prevSibling.classList.contains(`vpf-control-group-${props.group}`) &&
+        $prevSibling.classList.contains(`vpf-control-wrap`);
       const isEnd =
-        $nextSibling && !$nextSibling.classList.contains(`vpf-control-group-${props.group}`);
+        $nextSibling &&
+        !$nextSibling.classList.contains(`vpf-control-group-${props.group}`) &&
+        $prevSibling.classList.contains(`vpf-control-wrap`);
 
       let newPosition = '';
 
