@@ -26,7 +26,7 @@ const { applyFilters } = wp.hooks;
 
 const { useSelect } = wp.data;
 
-const { Fragment, useState } = wp.element;
+const { useState } = wp.element;
 
 const { TextControl, Button, Modal, FocalPointPicker } = wp.components;
 
@@ -200,7 +200,7 @@ const SelectedImageData = function (props) {
             </svg>
           </Button>
           {showMoreInfo ? (
-            <Fragment>
+            <>
               <div>
                 <strong>{__('File name:', '@@text_domain')}</strong>{' '}
                 {imageData?.source_url.split('/').pop() || '-'}
@@ -211,10 +211,10 @@ const SelectedImageData = function (props) {
                   ? getHumanFileSize(imageData.media_details.filesize)
                   : '-'}
                 {imageData?.media_details?.width ? (
-                  <Fragment>
+                  <>
                     <br /> <strong>{__('Dimensions:', '@text_domain')}</strong>{' '}
                     {imageData.media_details.width} by {imageData.media_details.height} pixels
-                  </Fragment>
+                  </>
                 ) : null}
               </div>
               <div>
@@ -255,7 +255,7 @@ const SelectedImageData = function (props) {
                   </a>
                 </div>
               ) : null}
-            </Fragment>
+            </>
           ) : null}
         </div>
       </div>
@@ -293,7 +293,7 @@ const SortableItem = function (props) {
   const closeModal = () => setOpen(false);
 
   return (
-    <Fragment>
+    <>
       <div
         className={classnames(
           'vpf-component-gallery-control-item',
@@ -477,7 +477,7 @@ const SortableItem = function (props) {
           </div>
         </Modal>
       ) : null}
-    </Fragment>
+    </>
   );
 };
 

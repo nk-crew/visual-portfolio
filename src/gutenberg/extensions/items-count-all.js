@@ -19,7 +19,7 @@ const { addFilter } = wp.hooks;
 
 const { useSelect } = wp.data;
 
-const { RawHTML, Fragment, useState } = wp.element;
+const { RawHTML, useState } = wp.element;
 
 const { BaseControl, ButtonGroup, Button, TextControl } = wp.components;
 
@@ -136,7 +136,7 @@ function ItemsCountControl({ data }) {
   return (
     <BaseControl
       label={
-        <Fragment>
+        <>
           {data.label}
           {'hide' === getNoticeState() && shouldDisplayNotice(controlVal, attributes) ? (
             <Button
@@ -166,7 +166,7 @@ function ItemsCountControl({ data }) {
               </svg>
             </Button>
           ) : null}
-        </Fragment>
+        </>
       }
       help={renderControlHelp}
       className={renderControlClassName}
@@ -209,7 +209,7 @@ function ItemsCountControl({ data }) {
         </ButtonGroup>
       </div>
       {-1 !== controlVal ? (
-        <Fragment>
+        <>
           <br />
           <TextControl
             type="number"
@@ -219,7 +219,7 @@ function ItemsCountControl({ data }) {
             value={controlVal}
             onChange={(val) => onChange(parseFloat(val))}
           />
-        </Fragment>
+        </>
       ) : null}
       {'show' === getNoticeState() && shouldDisplayNotice(controlVal, attributes) ? (
         <div>

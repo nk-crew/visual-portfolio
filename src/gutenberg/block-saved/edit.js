@@ -15,8 +15,6 @@ import SelectControl from '../components/select-control';
  */
 const { __, sprintf } = wp.i18n;
 
-const { Fragment } = wp.element;
-
 const { Placeholder, Spinner, PanelBody, Button } = wp.components;
 
 const { useSelect } = wp.data;
@@ -65,7 +63,7 @@ export default function BlockEdit(props) {
     }
 
     return (
-      <Fragment>
+      <>
         {!portfolioLayoutsSelect ? <Spinner /> : ''}
         {portfolioLayoutsSelect && Object.keys(portfolioLayoutsSelect).length ? (
           <div className="vpf-component-layout-select">
@@ -107,7 +105,7 @@ export default function BlockEdit(props) {
         {portfolioLayoutsSelect && !Object.keys(portfolioLayoutsSelect).length
           ? __('No saved layouts found.')
           : ''}
-      </Fragment>
+      </>
     );
   }
 

@@ -7,7 +7,7 @@ import * as clipboard from 'clipboard-polyfill';
 /**
  * WordPress dependencies
  */
-const { Component, Fragment } = wp.element;
+const { Component } = wp.element;
 
 // generate dom tree.
 function getNodeTree(node) {
@@ -198,7 +198,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
             {node.nodeName.toLowerCase()}
             {/* eslint-disable-next-line react/no-danger */}
             {classes.length ? (
-              <Fragment>
+              <>
                 {' class="'}
                 {classes.map((className) => (
                   <button
@@ -213,7 +213,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
                   </button>
                 ))}
                 {'" '}
-              </Fragment>
+              </>
             ) : (
               ''
             )}

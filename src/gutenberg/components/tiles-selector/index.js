@@ -15,7 +15,7 @@ import ToggleModal from '../toggle-modal';
  */
 const { __ } = wp.i18n;
 
-const { Component, Fragment } = wp.element;
+const { Component } = wp.element;
 
 const { Button } = wp.components;
 
@@ -69,7 +69,7 @@ export default class TilesSelector extends Component {
     }
 
     return (
-      <Fragment>
+      <>
         <Masonry
           elementType="div"
           data-tiles-preview={tilesType}
@@ -84,7 +84,7 @@ export default class TilesSelector extends Component {
           ))}
         </Masonry>
         <StylesRender>{styles}</StylesRender>
-      </Fragment>
+      </>
     );
   }
 

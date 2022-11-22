@@ -293,11 +293,11 @@ class IframePreview extends Component {
       params.value = val ? 1 : 0;
     } else if ('object' === typeof val && null !== val) {
       return (
-        <Fragment>
+        <>
           {Object.keys(val).map((i) => (
             <Fragment key={`${name}[${i}]`}>{this.printInput(`${name}[${i}]`, val[i])}</Fragment>
           ))}
-        </Fragment>
+        </>
       );
     } else {
       params.value = params.value || '';
@@ -338,13 +338,13 @@ class IframePreview extends Component {
             {'saved' === contentSource ? (
               <input type="text" name="vp_id" value={id} readOnly />
             ) : (
-              <Fragment>
+              <>
                 {Object.keys(attributes).map((k) => {
                   const val = attributes[k];
 
                   return <Fragment key={`vp_${k}`}>{this.printInput(`vp_${k}`, val)}</Fragment>;
                 })}
-              </Fragment>
+              </>
             )}
           </form>
           <iframe

@@ -33,7 +33,7 @@ import SortableControl from '../sortable-control';
  */
 const { __ } = wp.i18n;
 
-const { Component, Fragment, RawHTML, useState, useEffect, useRef } = wp.element;
+const { Component, RawHTML, useState, useEffect, useRef } = wp.element;
 
 const { applyFilters } = wp.hooks;
 
@@ -160,7 +160,7 @@ class ControlsRender extends Component {
       <PanelBody
         title={
           categoryTitle ? (
-            <Fragment>
+            <>
               {categoryIcon ? (
                 <span className="vpf-control-category-title-icon">
                   <RawHTML>{categoryIcon}</RawHTML>
@@ -172,7 +172,7 @@ class ControlsRender extends Component {
               ) : (
                 ''
               )}
-            </Fragment>
+            </>
           ) : (
             false
           )
@@ -306,6 +306,7 @@ ControlsRender.Control = function (props) {
           value={controlVal}
           options={props.options}
           onChange={(val) => onChange(val)}
+          isSetupWizard={isSetupWizard}
         />
       );
       break;
@@ -383,10 +384,10 @@ ControlsRender.Control = function (props) {
               <div>{renderControl}</div>
             </BaseControl>
             {props.classes_tree ? (
-              <Fragment>
+              <>
                 <p>{__('Classes Tree:', '@@text_domain')}</p>
                 <ClassesTree {...props} />
-              </Fragment>
+              </>
             ) : (
               ''
             )}
@@ -557,7 +558,7 @@ ControlsRender.Control = function (props) {
   );
 
   return (
-    <Fragment>
+    <>
       {'start' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
       <BaseControl label={renderControlLabel} className={renderControlClassName}>
         <div ref={$ref}>{data.renderControl}</div>
@@ -565,7 +566,7 @@ ControlsRender.Control = function (props) {
       </BaseControl>
       {data.renderControlAfter}
       {'end' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
-    </Fragment>
+    </>
   );
 };
 

@@ -7,7 +7,7 @@ const { withInstanceId, compose } = wp.compose;
 
 const { withSelect, withDispatch } = wp.data;
 
-const { Fragment, Component } = wp.element;
+const { Component } = wp.element;
 
 const { PanelRow, FocalPointPicker } = wp.components;
 
@@ -115,10 +115,10 @@ addFilter(
   (OriginalComponent) =>
     function (props) {
       return (
-        <Fragment>
+        <>
           <VpImageFocalPoint />
           <OriginalComponent {...props} />
-        </Fragment>
+        </>
       );
     }
 );

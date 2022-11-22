@@ -27,7 +27,7 @@ const { apiFetch } = wp;
 
 const { applyFilters } = wp.hooks;
 
-const { Fragment, Component, useState } = wp.element;
+const { Component, useState } = wp.element;
 
 const { PanelBody, Button } = wp.components;
 
@@ -118,7 +118,7 @@ class LayoutsEditorBlock extends Component {
     shortcodes = applyFilters('vpf.layouts-editor.shortcodes-list', shortcodes, this);
 
     return (
-      <Fragment>
+      <>
         <InspectorControls>
           <PanelBody title={__('Shortcodes', '@@text_domain')}>
             <p>
@@ -134,7 +134,7 @@ class LayoutsEditorBlock extends Component {
               return <ShortcodeRender key={`shortcode-${data.label}`} {...data} />;
             })}
             {additionalShortcodes ? (
-              <Fragment>
+              <>
                 {shortcodes.map((data) => {
                   if (!data.isOptional) {
                     return null;
@@ -143,7 +143,7 @@ class LayoutsEditorBlock extends Component {
                   return <ShortcodeRender key={`shortcode-${data.label}`} {...data} />;
                 })}
                 {applyFilters('vpf.layouts-editor.shortcodes', '', this)}
-              </Fragment>
+              </>
             ) : (
               <Button
                 isLink
@@ -166,7 +166,7 @@ class LayoutsEditorBlock extends Component {
           }}
           clientId={clientId}
         />
-      </Fragment>
+      </>
     );
   }
 }
