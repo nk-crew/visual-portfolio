@@ -7,25 +7,20 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import ControlsRender from '../components/controls-render';
+import SetupWizard from '../components/setup-wizard';
 import IframePreview from '../components/iframe-preview';
 
 /**
  * WordPress dependencies
  */
-const { useEffect, Fragment } = wp.element;
-
-const { __ } = wp.i18n;
+const { useEffect } = wp.element;
 
 const { useBlockProps, InspectorControls } = wp.blockEditor;
 
-const {
-  plugin_name: pluginName,
-  plugin_url: pluginUrl,
-  controls_categories: registeredControlsCategories,
-} = window.VPGutenbergVariables;
-const NOTICE_LIMIT = parseInt(window.VPGutenbergVariables.items_count_notice_limit, 10);
+const { plugin_url: pluginUrl, controls_categories: registeredControlsCategories } =
+  window.VPGutenbergVariables;
 
-function renderControls(props, isSetupWizard = false) {
+function renderControls(props) {
   const { attributes } = props;
 
   let { content_source: contentSource } = attributes;
@@ -36,24 +31,22 @@ function renderControls(props, isSetupWizard = false) {
   }
 
   return (
-    <Fragment>
-      <ControlsRender category="content-source" {...props} isSetupWizard={isSetupWizard} />
+    <>
+      <ControlsRender category="content-source" {...props} />
+
+      {/* Display all settings once selected Content Source */}
       {contentSource ? (
-        <Fragment>
+        <>
           {Object.keys(registeredControlsCategories).map((name) => {
             if ('content-source' === name) {
               return null;
             }
 
-            return (
-              <ControlsRender key={name} category={name} {...props} isSetupWizard={isSetupWizard} />
-            );
+            return <ControlsRender key={name} category={name} {...props} />;
           })}
-        </Fragment>
-      ) : (
-        ''
-      )}
-    </Fragment>
+        </>
+      ) : null}
+    </>
   );
 }
 
@@ -69,7 +62,6 @@ export default function BlockEdit(props) {
     setup_wizard: setupWizard,
     preview_image_example: previewExample,
     layout,
-    images,
     ghostkitClassname,
   } = attributes;
 
@@ -81,76 +73,6 @@ export default function BlockEdit(props) {
       });
     }
   }, []);
-
-  // Set some starter attributes for different content sources.
-  // And hide the setup wizard.
-  useEffect(() => {
-    if ('true' === setupWizard && contentSource) {
-      let newAttributes = {};
-
-      switch (contentSource) {
-        case 'images':
-          // Hide setup wizard once user select images.
-          if (images && images.length) {
-            newAttributes = {
-              setup_wizard: '',
-              items_count: -1,
-              items_click_action: 'popup_gallery',
-            };
-
-            // Add infinite scroll to the gallery when user adds a lot of images.
-            if ('slider' !== layout && images.length > NOTICE_LIMIT) {
-              newAttributes = {
-                ...newAttributes,
-                items_count: NOTICE_LIMIT,
-                layout_elements: {
-                  top: {
-                    elements: [],
-                    align: 'center',
-                  },
-                  items: {
-                    elements: ['items'],
-                  },
-                  bottom: {
-                    elements: ['pagination'],
-                    align: 'center',
-                  },
-                },
-                pagination: 'infinite',
-                pagination_hide_on_end: true,
-              };
-            }
-          }
-          break;
-        case 'post-based':
-        case 'social-stream':
-          newAttributes = {
-            setup_wizard: '',
-            layout_elements: {
-              top: {
-                elements: [],
-                align: 'center',
-              },
-              items: {
-                elements: ['items'],
-              },
-              bottom: {
-                elements: ['pagination'],
-                align: 'center',
-              },
-            },
-          };
-          break;
-        default:
-          newAttributes = {
-            setup_wizard: '',
-          };
-          break;
-      }
-
-      setAttributes(newAttributes);
-    }
-  }, [setupWizard, contentSource, images]);
 
   let className = '';
 
@@ -177,19 +99,13 @@ export default function BlockEdit(props) {
 
   return (
     <div {...blockProps}>
-      {'true' !== setupWizard ? (
-        <Fragment>
+      {'true' === setupWizard ? (
+        <SetupWizard {...props} />
+      ) : (
+        <>
           <InspectorControls>{renderControls(props)}</InspectorControls>
           <IframePreview {...props} />
-        </Fragment>
-      ) : (
-        <div className="vpf-setup-wizard">
-          <div className="vpf-setup-wizard-title">{pluginName}</div>
-          <div className="vpf-setup-wizard-description">
-            {__('Select content source for this layout', '@@text_domain')}
-          </div>
-          {renderControls(props, true)}
-        </div>
+        </>
       )}
     </div>
   );

@@ -496,9 +496,7 @@ const SortableList = function (props) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   // Automatically open images selector when first time select Images in Setup Wizard.
-  const [isOpenedInSetupWizard, setOpenOnSetupWizard] = useState(!isSetupWizard);
-  const openOnSetupWizard = () => setOpenOnSetupWizard(true);
-
+  const [isOpenedInSetupWizard, setOpenInSetupWizard] = useState(!isSetupWizard);
   const [showingItems, setShowingItems] = useState(18);
 
   const sortableItems = [];
@@ -523,8 +521,8 @@ const SortableList = function (props) {
       allowedTypes={ALLOWED_MEDIA_TYPES}
       value={items && items.length ? items.map((img) => img.id) : false}
       render={({ open }) => {
-        if (!isOpenedInSetupWizard) {
-          openOnSetupWizard();
+        if (!isOpenedInSetupWizard && (!items || !items.length)) {
+          setOpenInSetupWizard(true);
           open();
         }
 

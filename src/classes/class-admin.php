@@ -913,9 +913,10 @@ class Visual_Portfolio_Admin {
             array(
                 // Classic.
                 'default' => array(
-                    'title'            => esc_html__( 'Classic', '@@text_domain' ),
-                    'icon'             => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="5.89285" y1="22.25" x2="14.1071" y2="22.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
-                    'builtin_controls' => array(
+                    'title'                => esc_html__( 'Classic', '@@text_domain' ),
+                    'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="5.89285" y1="22.25" x2="14.1071" y2="22.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
+                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-classic.png',
+                    'builtin_controls'     => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
                         'show_categories'        => true,
@@ -928,7 +929,7 @@ class Visual_Portfolio_Admin {
                         'show_icons'             => true,
                         'align'                  => true,
                     ),
-                    'controls'         => array(
+                    'controls'             => array(
                         array(
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
@@ -1047,9 +1048,10 @@ class Visual_Portfolio_Admin {
 
                 // Fade.
                 'fade' => array(
-                    'title'            => esc_html__( 'Fade', '@@text_domain' ),
-                    'icon'             => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="5.89285" y1="10.25" x2="14.1071" y2="10.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'builtin_controls' => array(
+                    'title'                => esc_html__( 'Fade', '@@text_domain' ),
+                    'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="5.89285" y1="10.25" x2="14.1071" y2="10.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-fade.png',
+                    'builtin_controls'     => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
                         'show_categories'        => true,
@@ -1062,7 +1064,7 @@ class Visual_Portfolio_Admin {
                         'show_icons'             => true,
                         'align'                  => 'extended',
                     ),
-                    'controls'         => array(
+                    'controls'             => array(
                         array(
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
@@ -1117,9 +1119,10 @@ class Visual_Portfolio_Admin {
 
                 // Fly.
                 'fly' => array(
-                    'title'            => esc_html__( 'Fly', '@@text_domain' ),
-                    'icon'             => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="9.8875" x2="4.39286" y2="9.8875" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="10.4643" y1="0.75" x2="10.4643" y2="19.375" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'builtin_controls' => array(
+                    'title'                => esc_html__( 'Fly', '@@text_domain' ),
+                    'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="9.8875" x2="4.39286" y2="9.8875" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="10.4643" y1="0.75" x2="10.4643" y2="19.375" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-fly.png',
+                    'builtin_controls'     => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
                         'show_categories'        => true,
@@ -1132,7 +1135,7 @@ class Visual_Portfolio_Admin {
                         'show_icons'             => true,
                         'align'                  => 'extended',
                     ),
-                    'controls'         => array(
+                    'controls'             => array(
                         array(
                             'type'  => 'color',
                             'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
@@ -1175,9 +1178,10 @@ class Visual_Portfolio_Admin {
 
                 // Emerge.
                 'emerge' => array(
-                    'title'            => esc_html__( 'Emerge', '@@text_domain' ),
-                    'icon'             => '<svg width="21" height="23" viewBox="0 0 21 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="19.283" y2="-0.75" transform="matrix(0.998303 0.0582344 -0.0575156 0.998345 0 13.225)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="5.89285" y1="16.2125" x2="14.1071" y2="16.2125" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'builtin_controls' => array(
+                    'title'                => esc_html__( 'Emerge', '@@text_domain' ),
+                    'icon'                 => '<svg width="21" height="23" viewBox="0 0 21 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="19.283" y2="-0.75" transform="matrix(0.998303 0.0582344 -0.0575156 0.998345 0 13.225)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="5.89285" y1="16.2125" x2="14.1071" y2="16.2125" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-emerge.png',
+                    'builtin_controls'     => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
                         'show_categories'        => true,
@@ -1190,7 +1194,7 @@ class Visual_Portfolio_Admin {
                         'show_icons'             => false,
                         'align'                  => true,
                     ),
-                    'controls'         => array(
+                    'controls'             => array(
                         array(
                             'type'    => 'radio',
                             'label'   => esc_html__( 'Display Caption', '@@text_domain' ),
@@ -1395,19 +1399,22 @@ class Visual_Portfolio_Admin {
                 'default'      => '',
                 'options'      => array(
                     'post-based' => array(
-                        'value' => 'post-based',
-                        'title' => esc_html__( 'Posts', '@@text_domain' ),
-                        'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M15.5 4.5H11.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 8H11.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 11.5H11.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 15H4.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><mask id="path-7-inside-1" fill="white"><rect x="3.5" y="3.5" width="6" height="8.8" rx="1"/></mask><rect x="3.5" y="3.5" width="6" height="8.8" rx="1" stroke="currentColor" stroke-width="3" mask="url(#path-7-inside-1)"/></svg>',
+                        'value'       => 'post-based',
+                        'title'       => esc_html__( 'Posts', '@@text_domain' ),
+                        'icon'        => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.5" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M15.5 4.5H11.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 8H11.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 11.5H11.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 15H4.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><mask id="path-7-inside-1" fill="white"><rect x="3.5" y="3.5" width="6" height="8.8" rx="1"/></mask><rect x="3.5" y="3.5" width="6" height="8.8" rx="1" stroke="currentColor" stroke-width="3" mask="url(#path-7-inside-1)"/></svg>',
+                        'icon_wizard' => '<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M39.6 1.64999H4.39999C2.88121 1.64999 1.64999 2.88121 1.64999 4.39999V39.6C1.64999 41.1188 2.88121 42.35 4.39999 42.35H39.6C41.1188 42.35 42.35 41.1188 42.35 39.6V4.39999C42.35 2.88121 41.1188 1.64999 39.6 1.64999Z" stroke="currentColor" stroke-width="2"/><path d="M34.1 9.89999H25.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M34.1 17.6H25.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M34.1 25.3H25.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M34.1 33H9.89999" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><mask id="mask0_4892_2370" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="7" y="7" width="14" height="21"><path d="M18.7 7.7H9.90001C8.68499 7.7 7.70001 8.68497 7.70001 9.9V24.86C7.70001 26.075 8.68499 27.06 9.90001 27.06H18.7C19.915 27.06 20.9 26.075 20.9 24.86V9.9C20.9 8.68497 19.915 7.7 18.7 7.7Z" fill="white"/></mask><g mask="url(#mask0_4892_2370)"><path d="M18.7 7.7H9.90001C8.68499 7.7 7.70001 8.68497 7.70001 9.9V24.86C7.70001 26.075 8.68499 27.06 9.90001 27.06H18.7C19.915 27.06 20.9 26.075 20.9 24.86V9.9C20.9 8.68497 19.915 7.7 18.7 7.7Z" stroke="currentColor" stroke-width="4"/></g></svg>',
                     ),
                     'images' => array(
-                        'value' => 'images',
-                        'title' => esc_html__( 'Images', '@@text_domain' ),
-                        'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.0428 14.3315V1.71123C16.0428 0.748663 15.2941 0 14.3315 0H1.71123C0.748663 0 0 0.748663 0 1.71123V14.3315C0 15.2941 0.748663 16.0428 1.71123 16.0428H14.3315C15.2941 16.0428 16.0428 15.2941 16.0428 14.3315ZM1.60428 1.71123C1.60428 1.60428 1.71123 1.60428 1.71123 1.60428H14.3315C14.4385 1.60428 14.4385 1.71123 14.4385 1.71123V9.62567L11.9786 7.80749C11.6578 7.59358 11.3369 7.59358 11.016 7.80749L7.91444 10.0535L5.34759 8.87701C5.13369 8.77005 4.81283 8.77005 4.59893 8.87701L1.49733 10.4813V1.71123H1.60428ZM1.60428 14.3315V12.4064L5.02674 10.5882L7.59358 11.8717C7.80749 11.9786 8.12834 11.9786 8.4492 11.7647L11.4438 9.62567L14.4385 11.7647V14.4385C14.4385 14.5455 14.3315 14.5455 14.3315 14.5455H1.71123C1.71123 14.4385 1.60428 14.3315 1.60428 14.3315Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M19.25 5.75C19.6642 5.75 20 6.08579 20 6.5C20 6.91421 20 17.25 20 17.25C20 18.7688 18.7688 20 17.25 20H4.27C3.85579 20 3.52 19.6642 3.52 19.25C3.52 18.8358 3.85579 18.5 4.27 18.5H17.25C17.9404 18.5 18.5 17.9404 18.5 17.25C18.5 17.25 18.5 6.91421 18.5 6.5C18.5 6.08579 18.8358 5.75 19.25 5.75Z" fill="currentColor"/></svg>',
+                        'value'       => 'images',
+                        'title'       => esc_html__( 'Images', '@@text_domain' ),
+                        'icon'        => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.0428 14.3315V1.71123C16.0428 0.748663 15.2941 0 14.3315 0H1.71123C0.748663 0 0 0.748663 0 1.71123V14.3315C0 15.2941 0.748663 16.0428 1.71123 16.0428H14.3315C15.2941 16.0428 16.0428 15.2941 16.0428 14.3315ZM1.60428 1.71123C1.60428 1.60428 1.71123 1.60428 1.71123 1.60428H14.3315C14.4385 1.60428 14.4385 1.71123 14.4385 1.71123V9.62567L11.9786 7.80749C11.6578 7.59358 11.3369 7.59358 11.016 7.80749L7.91444 10.0535L5.34759 8.87701C5.13369 8.77005 4.81283 8.77005 4.59893 8.87701L1.49733 10.4813V1.71123H1.60428ZM1.60428 14.3315V12.4064L5.02674 10.5882L7.59358 11.8717C7.80749 11.9786 8.12834 11.9786 8.4492 11.7647L11.4438 9.62567L14.4385 11.7647V14.4385C14.4385 14.5455 14.3315 14.5455 14.3315 14.5455H1.71123C1.71123 14.4385 1.60428 14.3315 1.60428 14.3315Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M19.25 5.75C19.6642 5.75 20 6.08579 20 6.5C20 6.91421 20 17.25 20 17.25C20 18.7688 18.7688 20 17.25 20H4.27C3.85579 20 3.52 19.6642 3.52 19.25C3.52 18.8358 3.85579 18.5 4.27 18.5H17.25C17.9404 18.5 18.5 17.9404 18.5 17.25C18.5 17.25 18.5 6.91421 18.5 6.5C18.5 6.08579 18.8358 5.75 19.25 5.75Z" fill="currentColor"/></svg>',
+                        'icon_wizard' => '<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M42.1667 14.6667V36.6667C42.1667 39.7043 39.7043 42.1667 36.6667 42.1667H14.6667" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M1.83334 26.5833V29.3333C1.83334 32.371 4.29579 34.8333 7.33334 34.8333H29.3333C32.371 34.8333 34.8333 32.371 34.8333 29.3333V24.75M1.83334 26.5833V7.33333C1.83334 4.29577 4.29579 1.83333 7.33334 1.83333H29.3333C32.371 1.83333 34.8333 4.29577 34.8333 7.33333V24.75M1.83334 26.5833L11 22L18.3333 26.5833L27.5 19.25L34.8333 24.75" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
                     ),
                     'social-stream' => array(
-                        'value' => 'social-stream',
-                        'title' => esc_html__( 'Social', '@@text_domain' ),
-                        'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.1429 6.57142C16.563 6.57142 17.7143 5.42015 17.7143 3.99999C17.7143 2.57983 16.563 1.42856 15.1429 1.42856C13.7227 1.42856 12.5714 2.57983 12.5714 3.99999C12.5714 5.42015 13.7227 6.57142 15.1429 6.57142Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.85715 12.5714C6.27731 12.5714 7.42858 11.4201 7.42858 9.99999C7.42858 8.57983 6.27731 7.42856 4.85715 7.42856C3.43699 7.42856 2.28572 8.57983 2.28572 9.99999C2.28572 11.4201 3.43699 12.5714 4.85715 12.5714Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.1429 18.5714C16.563 18.5714 17.7143 17.4201 17.7143 16C17.7143 14.5798 16.563 13.4286 15.1429 13.4286C13.7227 13.4286 12.5714 14.5798 12.5714 16C12.5714 17.4201 13.7227 18.5714 15.1429 18.5714Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.14285 11.4286L12.8571 14.5714" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.8571 5.42856L7.14285 8.57141" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                        'value'       => 'social-stream',
+                        'title'       => esc_html__( 'Social', '@@text_domain' ),
+                        'icon'        => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.1429 6.57142C16.563 6.57142 17.7143 5.42015 17.7143 3.99999C17.7143 2.57983 16.563 1.42856 15.1429 1.42856C13.7227 1.42856 12.5714 2.57983 12.5714 3.99999C12.5714 5.42015 13.7227 6.57142 15.1429 6.57142Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.85715 12.5714C6.27731 12.5714 7.42858 11.4201 7.42858 9.99999C7.42858 8.57983 6.27731 7.42856 4.85715 7.42856C3.43699 7.42856 2.28572 8.57983 2.28572 9.99999C2.28572 11.4201 3.43699 12.5714 4.85715 12.5714Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.1429 18.5714C16.563 18.5714 17.7143 17.4201 17.7143 16C17.7143 14.5798 16.563 13.4286 15.1429 13.4286C13.7227 13.4286 12.5714 14.5798 12.5714 16C12.5714 17.4201 13.7227 18.5714 15.1429 18.5714Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.14285 11.4286L12.8571 14.5714" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.8571 5.42856L7.14285 8.57141" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                        'icon_wizard' => '<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M29.2286 16.5143C31.5008 16.5143 33.3429 14.6722 33.3429 12.4C33.3429 10.1277 31.5008 8.28569 29.2286 8.28569C26.9563 8.28569 25.1142 10.1277 25.1142 12.4C25.1142 14.6722 26.9563 16.5143 29.2286 16.5143Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.7715 26.1142C15.0437 26.1142 16.8857 24.2722 16.8857 22C16.8857 19.7277 15.0437 17.8857 12.7715 17.8857C10.4992 17.8857 8.65717 19.7277 8.65717 22C8.65717 24.2722 10.4992 26.1142 12.7715 26.1142Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M29.2286 35.7142C31.5008 35.7142 33.3429 33.8722 33.3429 31.6C33.3429 29.3277 31.5008 27.4858 29.2286 27.4858C26.9563 27.4858 25.1142 29.3277 25.1142 31.6C25.1142 33.8722 26.9563 35.7142 29.2286 35.7142Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.4286 24.2858L25.5714 29.3142" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M25.5714 14.6857L16.4286 19.7143" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="1" y="1" width="42" height="42" rx="3" stroke="currentColor" stroke-width="2"/></svg>',
                     ),
                 ),
             )
@@ -2112,19 +2119,21 @@ class Visual_Portfolio_Admin {
         $items_styles_selector = array();
         foreach ( $items_styles as $name => $style ) {
             $items_styles_selector[ $name ] = array(
-                'value' => $name,
-                'title' => $style['title'],
-                'icon'  => isset( $style['icon'] ) ? $style['icon'] : '',
+                'value'                => $name,
+                'title'                => $style['title'],
+                'icon'                 => isset( $style['icon'] ) ? $style['icon'] : '',
+                'image_preview_wizard' => isset( $style['image_preview_wizard'] ) ? $style['image_preview_wizard'] : '',
             );
         }
 
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'items-style',
-                'type'     => 'icons_selector',
-                'name'     => 'items_style',
-                'default'  => 'fade',
-                'options'  => $items_styles_selector,
+                'category'     => 'items-style',
+                'type'         => 'icons_selector',
+                'name'         => 'items_style',
+                'default'      => 'fade',
+                'options'      => $items_styles_selector,
+                'setup_wizard' => true,
             )
         );
 
@@ -2669,11 +2678,12 @@ class Visual_Portfolio_Admin {
         }
         Visual_Portfolio_Controls::register(
             array(
-                'category' => 'filter',
-                'type'     => 'icons_selector',
-                'name'     => 'filter',
-                'default'  => 'minimal',
-                'options'  => $filters_selector,
+                'category'     => 'filter',
+                'type'         => 'icons_selector',
+                'name'         => 'filter',
+                'default'      => 'minimal',
+                'options'      => $filters_selector,
+                'setup_wizard' => true,
             )
         );
 
@@ -2954,12 +2964,12 @@ class Visual_Portfolio_Admin {
 
         Visual_Portfolio_Controls::register(
             array(
-                'category'  => 'pagination',
-                'label'     => esc_html__( 'Type', '@@text_domain' ),
-                'type'      => 'icons_selector',
-                'name'      => 'pagination',
-                'default'   => 'load-more',
-                'options'   => array(
+                'category' => 'pagination',
+                'label'    => esc_html__( 'Type', '@@text_domain' ),
+                'type'     => 'icons_selector',
+                'name'     => 'pagination',
+                'default'  => 'load-more',
+                'options'  => array(
                     array(
                         'value' => 'paged',
                         'title' => esc_html__( 'Paged', '@@text_domain' ),
