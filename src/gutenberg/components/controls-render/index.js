@@ -228,8 +228,16 @@ ControlsRender.Control = function (props) {
   useEffect(() => {
     if (props.group && $ref.current) {
       const $element = $ref.current.parentElement.parentElement;
-      const $prevSibling = $element.previousElementSibling;
-      const $nextSibling = $element.nextElementSibling;
+      let $prevSibling = $element.previousElementSibling;
+      let $nextSibling = $element.nextElementSibling;
+
+      // Skip separator.
+      while ($prevSibling && $prevSibling.classList.contains('vpf-control-group-separator')) {
+        $prevSibling = $prevSibling.previousElementSibling;
+      }
+      while ($nextSibling && $nextSibling.classList.contains('vpf-control-group-separator')) {
+        $nextSibling = $nextSibling.nextElementSibling;
+      }
 
       const isGroupEnabled =
         ($prevSibling && $prevSibling.classList.contains(`vpf-control-group-${props.group}`)) ||
