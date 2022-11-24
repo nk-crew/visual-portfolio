@@ -202,28 +202,7 @@ ControlsRender.Control = function (props) {
   const $ref = useRef();
   const [positionInGroup, setPositionInGroup] = useState('');
 
-  // Conditions check.
-  if (!ControlsRender.AllowRender(props, isSetupWizard)) {
-    return null;
-  }
-
-  let renderControl = '';
-  let renderControlLabel = props.label;
-  let renderControlAfter = '';
-  let renderControlHelp = props.description ? (
-    <RawHTML className="components-base-control__help">{props.description}</RawHTML>
-  ) : null;
-  let renderControlClassName = classnames('vpf-control-wrap', `vpf-control-wrap-${props.type}`);
   const controlVal = controlGetValue(props.name, attributes);
-
-  if (props.group) {
-    renderControlClassName = classnames(
-      renderControlClassName,
-      'vpf-control-with-group',
-      `vpf-control-group-${props.group}`,
-      positionInGroup ? `vpf-control-group-position-${positionInGroup}` : false
-    );
-  }
 
   useEffect(() => {
     if (props.group && $ref.current) {
@@ -266,6 +245,28 @@ ControlsRender.Control = function (props) {
       }
     }
   }, [$ref, props.group, controlVal]);
+
+  // Conditions check.
+  if (!ControlsRender.AllowRender(props, isSetupWizard)) {
+    return null;
+  }
+
+  let renderControl = '';
+  let renderControlLabel = props.label;
+  let renderControlAfter = '';
+  let renderControlHelp = props.description ? (
+    <RawHTML className="components-base-control__help">{props.description}</RawHTML>
+  ) : null;
+  let renderControlClassName = classnames('vpf-control-wrap', `vpf-control-wrap-${props.type}`);
+
+  if (props.group) {
+    renderControlClassName = classnames(
+      renderControlClassName,
+      'vpf-control-with-group',
+      `vpf-control-group-${props.group}`,
+      positionInGroup ? `vpf-control-group-position-${positionInGroup}` : false
+    );
+  }
 
   // Specific controls.
   switch (props.type) {
