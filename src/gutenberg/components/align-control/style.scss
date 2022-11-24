@@ -58,7 +58,7 @@
 
     &.vpf-component-align-control-active {
       > span {
-        background-color: #1e1e1e;
+        background-color: var(--wp-admin-theme-color);
         opacity: 1;
       }
 
