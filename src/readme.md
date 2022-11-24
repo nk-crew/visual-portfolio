@@ -322,6 +322,10 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.21.1 =
+
+* fixed JS error when open WordPress images in Lightbox
+
 = 2.21.0 =
 
 * added templates for popup data in `/templates/popup/`, so developers can override it now in the theme templates
