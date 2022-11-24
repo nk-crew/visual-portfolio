@@ -322,6 +322,31 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.21.0 =
+
+* added templates for popup data in `/templates/popup/`, so developers can override it now in the theme templates
+* added auto height to filter/sort dropdown
+* added support for HTML tags in the popup title
+* added groups for controls for better UI
+* added more steps in the block Setup Wizard
+* added Wide alignment to newly added blocks by default
+* added a notice for large galleries to use Infinite pagination for better performance
+* added Items Per Page limit and Infinite pagination to the gallery when user adds more than 40 images in the Setup Wizard
+* added support for align option in Filter and Sort shortcodes
+* added `text_all` attribute to Filter shortcode
+* improved shortcodes UI in Saved Layouts
+* changed default Infinite pagination threshold from 250px to 400px
+* fixed wrong popup image displaying when custom URL used
+* fixed post featured image focal point save error
+* fixed Elementor widget in Safari can't select layout
+* fixed Jetpack lazy loading re-layout Masonry conflict
+* fixed displaying popup data in HTML when click action disabled
+* fixed duplicated portfolio page in Archive settings
+* fixed PHP warning when Editors open admin screen or when plugin first time active
+* fixed multiple select controls sanitize
+* fixed Go Pro link style conflict with 3rd-party URLs
+* minor changes and fixes
+
 = 2.20.3 =
 
 * fixed error when close popup gallery opened from the native gallery block
