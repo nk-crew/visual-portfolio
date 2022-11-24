@@ -322,9 +322,10 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
-= 2.21.1 =
+= 2.21.2 =
 
 * fixed JS error when open WordPress images in Lightbox
+* fixed JS error when changing gallery image data
 
 = 2.21.0 =
 
