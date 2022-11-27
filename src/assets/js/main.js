@@ -722,11 +722,13 @@ class VP {
       const newItems = $newVP.find('.vp-portfolio__items').html();
       const nothingFound = $newVP.hasClass('vp-portfolio-not-found');
 
+      // We should clean up notices here, as they may be cloned over and over.
+      self.$item.find('.vp-notice').remove();
+
       if (nothingFound) {
         self.$item.find('.vp-portfolio__items-wrap').before($newVP.find('.vp-notice').clone());
         self.$item.addClass('vp-portfolio-not-found');
       } else {
-        self.$item.find('.vp-notice').remove();
         self.$item.removeClass('vp-portfolio-not-found');
       }
 
