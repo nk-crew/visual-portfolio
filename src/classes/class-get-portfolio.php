@@ -1089,13 +1089,7 @@ class Visual_Portfolio_Get {
     public static function get_sort( $atts = array() ) {
         $options = self::get_sort_options( $atts );
 
-        $options = array_merge(
-            $options,
-            array(
-                'sort'       => $atts['type'],
-                'sort_align' => $atts['align'],
-            )
-        );
+        $align = $atts['align'] ?? 'center';
 
         // generate unique ID.
         $uid = ++self::$sort_id;
