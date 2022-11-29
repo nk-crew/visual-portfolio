@@ -114,7 +114,7 @@ export default function BlockEdit(props) {
         gallery_attributes: JSON.stringify(galleryPaginationAttributes),
       });
     }
-  }, [galleryPaginationAttributes]);
+  }, [galleryPaginationAttributes, galleryAttributes]);
 
   // add custom classname.
   if (ghostkitClassname) {

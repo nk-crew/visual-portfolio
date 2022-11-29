@@ -67,6 +67,9 @@ addFilter('vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-r
 
         break;
       }
+      case 'gallery_attributes':
+        reload = true;
+        break;
       // prevent some options reload
       case 'list_name':
         // no reload
