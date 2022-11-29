@@ -26,7 +26,7 @@ const { applyFilters } = wp.hooks;
 
 const { useSelect } = wp.data;
 
-const { Fragment, useState } = wp.element;
+const { useState } = wp.element;
 
 const { TextControl, Button, Modal, FocalPointPicker } = wp.components;
 
@@ -200,7 +200,7 @@ const SelectedImageData = function (props) {
             </svg>
           </Button>
           {showMoreInfo ? (
-            <Fragment>
+            <>
               <div>
                 <strong>{__('File name:', '@@text_domain')}</strong>{' '}
                 {imageData?.source_url.split('/').pop() || '-'}
@@ -211,10 +211,10 @@ const SelectedImageData = function (props) {
                   ? getHumanFileSize(imageData.media_details.filesize)
                   : '-'}
                 {imageData?.media_details?.width ? (
-                  <Fragment>
+                  <>
                     <br /> <strong>{__('Dimensions:', '@text_domain')}</strong>{' '}
                     {imageData.media_details.width} by {imageData.media_details.height} pixels
-                  </Fragment>
+                  </>
                 ) : null}
               </div>
               <div>
@@ -255,7 +255,7 @@ const SelectedImageData = function (props) {
                   </a>
                 </div>
               ) : null}
-            </Fragment>
+            </>
           ) : null}
         </div>
       </div>
@@ -293,7 +293,7 @@ const SortableItem = function (props) {
   const closeModal = () => setOpen(false);
 
   return (
-    <Fragment>
+    <>
       <div
         className={classnames(
           'vpf-component-gallery-control-item',
@@ -477,7 +477,7 @@ const SortableItem = function (props) {
           </div>
         </Modal>
       ) : null}
-    </Fragment>
+    </>
   );
 };
 
@@ -496,9 +496,7 @@ const SortableList = function (props) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   // Automatically open images selector when first time select Images in Setup Wizard.
-  const [isOpenedInSetupWizard, setOpenOnSetupWizard] = useState(!isSetupWizard);
-  const openOnSetupWizard = () => setOpenOnSetupWizard(true);
-
+  const [isOpenedInSetupWizard, setOpenInSetupWizard] = useState(!isSetupWizard);
   const [showingItems, setShowingItems] = useState(18);
 
   const sortableItems = [];
@@ -519,16 +517,12 @@ const SortableList = function (props) {
       multiple="add"
       onSelect={(images) => {
         onChange(prepareImages(images, items));
-
-        if (images && images.length > showingItems) {
-          setShowingItems(images.length);
-        }
       }}
       allowedTypes={ALLOWED_MEDIA_TYPES}
       value={items && items.length ? items.map((img) => img.id) : false}
       render={({ open }) => {
-        if (!isOpenedInSetupWizard) {
-          openOnSetupWizard();
+        if (!isOpenedInSetupWizard && (!items || !items.length)) {
+          setOpenInSetupWizard(true);
           open();
         }
 

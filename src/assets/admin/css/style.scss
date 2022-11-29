@@ -51,9 +51,9 @@ $escaped-svg-characters: (
 /*
  * Go Pro menu link
  */
-#adminmenu a[href*="utm_campaign=go_pro"],
-.wp-list-table.plugins a[href*="utm_campaign=go_pro"],
-.vpf-admin-toolbar a[href*="utm_campaign=go_pro"] {
+#adminmenu a[href*="https://visualportfolio.co/pricing/"],
+.wp-list-table.plugins a[href*="https://visualportfolio.co/pricing/"],
+.vpf-admin-toolbar a[href*="https://visualportfolio.co/pricing/"] {
   font-weight: 700;
   color: #11b916;
 
@@ -807,6 +807,7 @@ $pro_note_border_size: 2px;
   max-width: 260px;
   padding: 20px;
   font-size: 13px;
+  color: #b65e96;
   background: linear-gradient(to left, #743ad5, #d53a9d);
   border-radius: $pro_note_radius;
 

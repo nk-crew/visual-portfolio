@@ -4,7 +4,7 @@
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
 * Donate link: https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 5.8
-* Tested up to: 6.0
+* Tested up to: 6.1
 * Requires PHP: 7.2
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
@@ -321,6 +321,36 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 2.21.2 =
+
+* fixed JS error when open WordPress images in Lightbox
+* fixed JS error when changing gallery image data
+
+= 2.21.0 =
+
+* added templates for popup data in `/templates/popup/`, so developers can override it now in the theme templates
+* added auto height to filter/sort dropdown
+* added support for HTML tags in the popup title
+* added groups for controls for better UI
+* added more steps in the block Setup Wizard
+* added Wide alignment to newly added blocks by default
+* added a notice for large galleries to use Infinite pagination for better performance
+* added Items Per Page limit and Infinite pagination to the gallery when user adds more than 40 images in the Setup Wizard
+* added support for align option in Filter and Sort shortcodes
+* added `text_all` attribute to Filter shortcode
+* improved shortcodes UI in Saved Layouts
+* changed default Infinite pagination threshold from 250px to 400px
+* fixed wrong popup image displaying when custom URL used
+* fixed post featured image focal point save error
+* fixed Elementor widget in Safari can't select layout
+* fixed Jetpack lazy loading re-layout Masonry conflict
+* fixed displaying popup data in HTML when click action disabled
+* fixed duplicated portfolio page in Archive settings
+* fixed PHP warning when Editors open admin screen or when plugin first time active
+* fixed multiple select controls sanitize
+* fixed Go Pro link style conflict with 3rd-party URLs
+* minor changes and fixes
 
 = 2.20.3 =
 

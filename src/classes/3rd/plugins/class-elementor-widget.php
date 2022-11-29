@@ -109,6 +109,28 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
     }
 
     /**
+     * We should add the prefix to all options, because Select2 conflicts with the Safari for some reason.
+     *
+     * @param String $option - option value.
+     *
+     * @return String
+     */
+    public function set_option_prefix( $option ) {
+        return 'post-id-' . $option;
+    }
+
+    /**
+     * Remove prefix from the option.
+     *
+     * @param String $option - prefixed option value.
+     *
+     * @return String
+     */
+    public function unset_option_prefix( $option ) {
+        return str_replace( 'post-id-', '', $option );
+    }
+
+    /**
      * Get style dependencies.
      *
      * @return array Widget style dependencies.
@@ -139,9 +161,11 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
             )
         );
 
-        $options = array();
+        $options = array(
+            '' => esc_html__( '-- Select Layout --', '@@text_domain' ),
+        );
         foreach ( $vp_query as $post ) {
-            $options[ $post->ID ] = '#' . $post->ID . ' - ' . $post->post_title;
+            $options[ $this->set_option_prefix( $post->ID ) ] = '#' . $post->ID . ' - ' . $post->post_title;
         }
 
         $this->start_controls_section(
@@ -155,7 +179,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
         $this->add_control(
             'saved_id',
             array(
-                'label'   => esc_html__( 'Select Layout', '@@text_domain' ),
+                'label'   => esc_html__( 'Saved Layout', '@@text_domain' ),
                 'type'    => \Elementor\Controls_Manager::SELECT2,
                 'options' => $options,
                 'dynamic' => array(
@@ -173,7 +197,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
     protected function render() {
         $settings = array_merge(
             array(
-                'saved_id' => false,
+                'saved_id' => '',
                 'class'    => '',
             ),
             $this->get_settings_for_display()
@@ -189,7 +213,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
                 'wrapper',
                 array(
                     'class'   => 'visual-portfolio-elementor-preview',
-                    'data-id' => $settings['saved_id'],
+                    'data-id' => $this->unset_option_prefix( $settings['saved_id'] ),
                 )
             );
         }
@@ -204,7 +228,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
             <?php if ( $this->is_preview_mode() ) : ?>
                 <iframe allowtransparency="true"></iframe>
             <?php else : ?>
-                <?php echo do_shortcode( '[visual_portfolio id="' . esc_attr( $settings['saved_id'] ) . '"]' ); ?>
+                <?php echo do_shortcode( '[visual_portfolio id="' . esc_attr( $this->unset_option_prefix( $settings['saved_id'] ) ) . '"]' ); ?>
             <?php endif; ?>
         </div>
         <?php

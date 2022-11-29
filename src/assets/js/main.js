@@ -184,8 +184,14 @@ class VP {
     self.emitEvent('init');
 
     if (self.id) {
-      $(`.vp-single-filter.vp-id-${self.id}`).addClass('vp-single-filter__ready');
-      $(`.vp-single-sort.vp-id-${self.id}`).addClass('vp-single-sort__ready');
+      $(`.vp-single-filter.vp-id-${self.id}`)
+        .addClass('vp-single-filter__ready')
+        .parent('.vp-portfolio__layout-elements')
+        .addClass('vp-portfolio__layout-elements__ready');
+      $(`.vp-single-sort.vp-id-${self.id}`)
+        .addClass('vp-single-sort__ready')
+        .parent('.vp-portfolio__layout-elements')
+        .addClass('vp-portfolio__layout-elements__ready');
     }
 
     // resized
@@ -244,8 +250,14 @@ class VP {
     self.$item.removeClass('vp-portfolio__ready');
 
     if (self.id) {
-      $(`.vp-single-filter.vp-id-${self.id}`).removeClass('vp-single-filter__ready');
-      $(`.vp-single-sort.vp-id-${self.id}`).removeClass('vp-single-sort__ready');
+      $(`.vp-single-filter.vp-id-${self.id}`)
+        .removeClass('vp-single-filter__ready')
+        .parent('.vp-portfolio__layout-elements')
+        .removeClass('vp-portfolio__layout-elements__ready');
+      $(`.vp-single-sort.vp-id-${self.id}`)
+        .removeClass('vp-single-sort__ready')
+        .parent('.vp-portfolio__layout-elements')
+        .removeClass('vp-portfolio__layout-elements__ready');
     }
 
     // destroy events
@@ -611,10 +623,7 @@ class VP {
         });
       }
     }
-    if (
-      'infinite' === self.options.pagination ||
-      'infinite' === $(pagination).find('.vp-pagination').attr('data-vp-pagination-type')
-    ) {
+    if ('infinite' === self.options.pagination) {
       $wnd.on(`load${evp} scroll${evp} resize${evp} orientationchange${evp}`, () => {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
@@ -646,7 +655,7 @@ class VP {
     self.$filter.off(evp);
     self.$sort.off(evp);
 
-    // destroy infinite load events
+    // destroy window events
     $wnd.off(evp);
 
     self.emitEvent('destroyEvents');

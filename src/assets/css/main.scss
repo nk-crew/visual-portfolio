@@ -252,6 +252,11 @@
   }
 }
 
+.vp-portfolio__layout-elements__ready {
+  visibility: visible;
+  opacity: 1;
+}
+
 .vp-single-filter.vp-single-filter__ready {
   .vp-portfolio__filter-wrap {
     visibility: visible;

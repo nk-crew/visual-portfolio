@@ -15,7 +15,7 @@ import ControlsRender from '../controls-render';
  */
 const { __ } = wp.i18n;
 
-const { Component, Fragment, useState } = wp.element;
+const { Component, useState } = wp.element;
 
 const { PanelBody, Button, DropdownMenu, Dropdown, Modal, Toolbar, ToolbarButton } = wp.components;
 
@@ -85,7 +85,7 @@ function ElementsSelectorOptions(props) {
   const closeModal = () => setOpen(false);
 
   return (
-    <Fragment>
+    <>
       <button
         type="button"
         aria-expanded={isOpen}
@@ -170,7 +170,7 @@ function ElementsSelectorOptions(props) {
           ) : null}
         </Modal>
       ) : null}
-    </Fragment>
+    </>
   );
 }
 
@@ -334,7 +334,7 @@ export default class ElementsSelector extends Component {
               }
               controls={Object.keys(availableElements).map((optionName) => ({
                 title: (
-                  <Fragment>
+                  <>
                     {availableElements[optionName].title}
                     {availableElements[optionName].is_pro ? (
                       <span className="vpf-component-elements-selector-control-location-options-title-pro">
@@ -343,7 +343,7 @@ export default class ElementsSelector extends Component {
                     ) : (
                       ''
                     )}
-                  </Fragment>
+                  </>
                 ),
                 onClick() {
                   if (availableElements[optionName].is_pro) {

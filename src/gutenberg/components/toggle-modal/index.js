@@ -6,7 +6,7 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-const { Component, Fragment } = wp.element;
+const { Component } = wp.element;
 
 const { Button, Modal } = wp.components;
 
@@ -28,7 +28,7 @@ export default class ToggleModal extends Component {
     const { isOpened } = this.state;
 
     return (
-      <Fragment>
+      <>
         <Button isSecondary onClick={() => this.setState({ isOpened: !isOpened })}>
           {buttonLabel}
         </Button>
@@ -46,7 +46,7 @@ export default class ToggleModal extends Component {
         ) : (
           ''
         )}
-      </Fragment>
+      </>
     );
   }
 }

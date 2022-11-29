@@ -33,7 +33,7 @@ import SortableControl from '../sortable-control';
  */
 const { __ } = wp.i18n;
 
-const { Component, Fragment, RawHTML } = wp.element;
+const { Component, RawHTML, useState, useEffect, useRef } = wp.element;
 
 const { applyFilters } = wp.hooks;
 
@@ -160,7 +160,7 @@ class ControlsRender extends Component {
       <PanelBody
         title={
           categoryTitle ? (
-            <Fragment>
+            <>
               {categoryIcon ? (
                 <span className="vpf-control-category-title-icon">
                   <RawHTML>{categoryIcon}</RawHTML>
@@ -172,7 +172,7 @@ class ControlsRender extends Component {
               ) : (
                 ''
               )}
-            </Fragment>
+            </>
           ) : (
             false
           )
@@ -199,6 +199,52 @@ class ControlsRender extends Component {
  */
 ControlsRender.Control = function (props) {
   const { attributes, onChange, isSetupWizard } = props;
+  const $ref = useRef();
+  const [positionInGroup, setPositionInGroup] = useState('');
+
+  const controlVal = controlGetValue(props.name, attributes);
+
+  useEffect(() => {
+    if (props.group && $ref.current) {
+      const $element = $ref.current.parentElement.parentElement;
+      let $prevSibling = $element.previousElementSibling;
+      let $nextSibling = $element.nextElementSibling;
+
+      // Skip separator.
+      while ($prevSibling && $prevSibling.classList.contains('vpf-control-group-separator')) {
+        $prevSibling = $prevSibling.previousElementSibling;
+      }
+      while ($nextSibling && $nextSibling.classList.contains('vpf-control-group-separator')) {
+        $nextSibling = $nextSibling.nextElementSibling;
+      }
+
+      const isGroupEnabled =
+        ($prevSibling && $prevSibling.classList.contains(`vpf-control-group-${props.group}`)) ||
+        ($nextSibling && $nextSibling.classList.contains(`vpf-control-group-${props.group}`));
+      const isStart =
+        $prevSibling &&
+        !$prevSibling.classList.contains(`vpf-control-group-${props.group}`) &&
+        $prevSibling.classList.contains(`vpf-control-wrap`);
+      const isEnd =
+        $nextSibling &&
+        !$nextSibling.classList.contains(`vpf-control-group-${props.group}`) &&
+        $prevSibling.classList.contains(`vpf-control-wrap`);
+
+      let newPosition = '';
+
+      if (!isGroupEnabled) {
+        // skip
+      } else if (isStart) {
+        newPosition = 'start';
+      } else if (isEnd) {
+        newPosition = 'end';
+      }
+
+      if (positionInGroup !== newPosition) {
+        setPositionInGroup(newPosition);
+      }
+    }
+  }, [$ref, props.group, controlVal]);
 
   // Conditions check.
   if (!ControlsRender.AllowRender(props, isSetupWizard)) {
@@ -211,8 +257,16 @@ ControlsRender.Control = function (props) {
   let renderControlHelp = props.description ? (
     <RawHTML className="components-base-control__help">{props.description}</RawHTML>
   ) : null;
-  const renderControlClassName = classnames('vpf-control-wrap', `vpf-control-wrap-${props.type}`);
-  const controlVal = controlGetValue(props.name, attributes);
+  let renderControlClassName = classnames('vpf-control-wrap', `vpf-control-wrap-${props.type}`);
+
+  if (props.group) {
+    renderControlClassName = classnames(
+      renderControlClassName,
+      'vpf-control-with-group',
+      `vpf-control-group-${props.group}`,
+      positionInGroup ? `vpf-control-group-position-${positionInGroup}` : false
+    );
+  }
 
   // Specific controls.
   switch (props.type) {
@@ -261,6 +315,7 @@ ControlsRender.Control = function (props) {
           value={controlVal}
           options={props.options}
           onChange={(val) => onChange(val)}
+          isSetupWizard={isSetupWizard}
         />
       );
       break;
@@ -338,10 +393,10 @@ ControlsRender.Control = function (props) {
               <div>{renderControl}</div>
             </BaseControl>
             {props.classes_tree ? (
-              <Fragment>
+              <>
                 <p>{__('Classes Tree:', '@@text_domain')}</p>
                 <ClassesTree {...props} />
-              </Fragment>
+              </>
             ) : (
               ''
             )}
@@ -500,14 +555,27 @@ ControlsRender.Control = function (props) {
     );
   }
 
+  // TODO: use this filter for custom controls.
+  const data = applyFilters(
+    'vpf.editor.controls-render-inner-data',
+    {
+      renderControl,
+      renderControlHelp,
+      renderControlAfter,
+    },
+    { props, controlVal }
+  );
+
   return (
-    <Fragment>
+    <>
+      {'start' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
       <BaseControl label={renderControlLabel} className={renderControlClassName}>
-        <div>{renderControl}</div>
-        {renderControlHelp}
+        <div ref={$ref}>{data.renderControl}</div>
+        {data.renderControlHelp}
       </BaseControl>
-      {renderControlAfter}
-    </Fragment>
+      {data.renderControlAfter}
+      {'end' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
+    </>
   );
 };
 

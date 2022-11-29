@@ -7,25 +7,21 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import ControlsRender from '../components/controls-render';
+import SetupWizard from '../components/setup-wizard';
 import IframePreview from '../components/iframe-preview';
 import getParseBlocks from '../utils/get-parse-blocks';
 
 /**
  * WordPress dependencies
  */
-const { useEffect, Fragment } = wp.element;
-
-const { __ } = wp.i18n;
+const { useEffect } = wp.element;
 
 const { useBlockProps, InspectorControls } = wp.blockEditor;
 
-const {
-  plugin_name: pluginName,
-  plugin_url: pluginUrl,
-  controls_categories: registeredControlsCategories,
-} = window.VPGutenbergVariables;
+const { plugin_url: pluginUrl, controls_categories: registeredControlsCategories } =
+  window.VPGutenbergVariables;
 
-function renderControls(props, isSetupWizard = false) {
+function renderControls(props) {
   const { attributes } = props;
 
   let { content_source: contentSource } = attributes;
@@ -36,24 +32,22 @@ function renderControls(props, isSetupWizard = false) {
   }
 
   return (
-    <Fragment>
-      <ControlsRender category="content-source" {...props} isSetupWizard={isSetupWizard} />
+    <>
+      <ControlsRender category="content-source" {...props} />
+
+      {/* Display all settings once selected Content Source */}
       {contentSource ? (
-        <Fragment>
+        <>
           {Object.keys(registeredControlsCategories).map((name) => {
             if ('content-source' === name) {
               return null;
             }
 
-            return (
-              <ControlsRender key={name} category={name} {...props} isSetupWizard={isSetupWizard} />
-            );
+            return <ControlsRender key={name} category={name} {...props} />;
           })}
-        </Fragment>
-      ) : (
-        ''
-      )}
-    </Fragment>
+        </>
+      ) : null}
+    </>
   );
 }
 
@@ -171,19 +165,13 @@ export default function BlockEdit(props) {
 
   return (
     <div {...blockProps}>
-      {'true' !== setupWizard ? (
-        <Fragment>
+      {'true' === setupWizard ? (
+        <SetupWizard {...props} />
+      ) : (
+        <>
           <InspectorControls>{renderControls(props)}</InspectorControls>
           <IframePreview {...props} />
-        </Fragment>
-      ) : (
-        <div className="vpf-setup-wizard">
-          <div className="vpf-setup-wizard-title">{pluginName}</div>
-          <div className="vpf-setup-wizard-description">
-            {__('Select content source for this layout', '@@text_domain')}
-          </div>
-          {renderControls(props, true)}
-        </div>
+        </>
       )}
     </div>
   );

@@ -78,6 +78,20 @@ class Visual_Portfolio_Assets {
     }
 
     /**
+     * Remove stored assets. May be used for advanced functionality.
+     *
+     * @param string $name - asset name.
+     * @param string $type - assets type [script|style|template_style].
+     */
+    public static function remove_stored_assets( $name, $type = 'script' ) {
+        if ( ! isset( self::$stored_assets[ $type ][ $name ] ) ) {
+            return;
+        }
+
+        unset( self::$stored_assets[ $type ][ $name ] );
+    }
+
+    /**
      * Enqueue stored assets.
      *
      * @param string $type - assets type [script|style|template_style].
@@ -246,6 +260,11 @@ class Visual_Portfolio_Assets {
 
             if ( 'default' !== $options['pagination_style'] ) {
                 $pagination_style_pref = '/' . $options['pagination_style'];
+            }
+
+            // Infinite scroll pagination script.
+            if ( 'infinite' === $options['pagination'] ) {
+                self::store_used_assets( 'visual-portfolio-pagination-infinite', true, 'script' );
             }
 
             // Minimal page pagination helpful script.
@@ -516,6 +535,12 @@ class Visual_Portfolio_Assets {
             ),
             'visual-portfolio-items-style-fly' => array(
                 'assets/js/items-style-fly.min.js',
+                array(
+                    'jquery',
+                ),
+            ),
+            'visual-portfolio-pagination-infinite' => array(
+                'assets/js/pagination-infinite.min.js',
                 array(
                     'jquery',
                 ),

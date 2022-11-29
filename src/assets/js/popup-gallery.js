@@ -305,6 +305,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
     if (self.isPreview()) {
       return;
     }
+
     // click action
     // `a.vp-portfolio__item-overlay` added as fallback for old templates, used in themes.
     self.$item.on(
@@ -321,26 +322,41 @@ $(document).on('extendClass.vpf', (event, VP) => {
         }
 
         const $this = $(this);
-        const $itemWrap = $this.closest('.vp-portfolio__item-wrap');
-        let index = 0;
+        let $itemWrap = $this.closest('.vp-portfolio__item-wrap');
+
+        // Use Swiper data-attribute to support slide duplicates.
+        if (
+          $itemWrap.hasClass('swiper-slide-duplicate') &&
+          $itemWrap.attr('data-swiper-slide-index')
+        ) {
+          $itemWrap = self.$item.find(
+            `[data-swiper-slide-index="${$itemWrap.attr(
+              'data-swiper-slide-index'
+            )}"].swiper-slide:not(.swiper-slide-duplicate)`
+          );
+        }
 
         if (!$itemWrap.find('.vp-portfolio__item-popup').length) {
           return;
         }
 
-        e.preventDefault();
+        const items = VPPopupAPI.parseGallery(self.$item);
+        let index = -1;
 
         // Get gallery item index.
-        // Use Swiper data-attribute to support slide duplicates.
-        if ($itemWrap.attr('data-swiper-slide-index')) {
-          index = parseInt($itemWrap.attr('data-swiper-slide-index'), 10);
-        } else {
-          index = $itemWrap.index();
+        // We should check all items with gallery data to prevent
+        // issue with items and custom URL used.
+        items.forEach((item, idx) => {
+          if (item.el === $itemWrap[0]) {
+            index = idx;
+          }
+        });
+
+        // Let's open popup once item index found.
+        if (-1 !== index) {
+          e.preventDefault();
+          VPPopupAPI.open(items, index, self);
         }
-
-        const items = VPPopupAPI.parseGallery(self.$item);
-
-        VPPopupAPI.open(items, index, self);
       }
     );
   };

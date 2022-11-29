@@ -53,12 +53,14 @@ class Visual_Portfolio_Controls {
         'type'              => 'text',
         'label'             => false,
         'description'       => false,
+        'group'             => false,
         'name'              => '',
         'value'             => '',
-        'value_callback'    => '',
-        'sanitize_callback' => '',
         'placeholder'       => '',
         'readonly'          => false,
+        'value_callback'    => '',
+        'sanitize_callback' => '',
+        'reload_iframe'     => true,
 
         // control-specific args.
         // notice.
@@ -92,7 +94,7 @@ class Visual_Portfolio_Controls {
         // gallery.
         'focal_point'       => false,
 
-        // hint.
+        // hint, deprecated.
         'hint'              => false,
         'hint_place'        => 'top',
 

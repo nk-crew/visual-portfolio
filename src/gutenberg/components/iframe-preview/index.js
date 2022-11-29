@@ -17,8 +17,11 @@ import classnames from 'classnames/dedupe';
 import './live-reload-conditions';
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
 
-const $ = window.jQuery;
-const variables = window.VPAdminGutenbergVariables;
+const {
+  jQuery: $,
+  VPAdminGutenbergVariables: variables,
+  VPGutenbergVariables: { controls: registeredControls },
+} = window;
 
 /**
  * WordPress dependencies
@@ -172,9 +175,15 @@ class IframePreview extends Component {
     if (Object.keys(changedAttributes).length) {
       let reload = false;
 
-      // Don't reload if block has dynamic styles.
       Object.keys(changedAttributes).forEach((name) => {
-        reload = reload || !hasDynamicCSS(name);
+        // Don't reload if block has dynamic styles.
+        const hasStyles = hasDynamicCSS(name);
+
+        // Don't reload if reloading disabled in control attributes.
+        const hasReloadAttribute =
+          registeredControls[name] && registeredControls[name].reload_iframe;
+
+        reload = reload || (!hasStyles && hasReloadAttribute);
       });
 
       const data = applyFilters('vpf.editor.changed-attributes', {
@@ -284,11 +293,11 @@ class IframePreview extends Component {
       params.value = val ? 1 : 0;
     } else if ('object' === typeof val && null !== val) {
       return (
-        <Fragment>
+        <>
           {Object.keys(val).map((i) => (
             <Fragment key={`${name}[${i}]`}>{this.printInput(`${name}[${i}]`, val[i])}</Fragment>
           ))}
-        </Fragment>
+        </>
       );
     } else {
       params.value = params.value || '';
@@ -329,13 +338,13 @@ class IframePreview extends Component {
             {'saved' === contentSource ? (
               <input type="text" name="vp_id" value={id} readOnly />
             ) : (
-              <Fragment>
+              <>
                 {Object.keys(attributes).map((k) => {
                   const val = attributes[k];
 
                   return <Fragment key={`vp_${k}`}>{this.printInput(`vp_${k}`, val)}</Fragment>;
                 })}
-              </Fragment>
+              </>
             )}
           </form>
           <iframe

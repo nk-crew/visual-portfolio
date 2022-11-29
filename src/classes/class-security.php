@@ -434,8 +434,12 @@ class Visual_Portfolio_Security {
                             $multiple = isset( $controls[ $key ]['multiple'] ) && ! empty( $controls[ $key ]['multiple'] ) ? $controls[ $key ]['multiple'] : false;
 
                             if ( $multiple ) {
-                                foreach ( $attributes[ $key ] as $attribute_key => $value ) {
-                                    $attributes[ $key ][ $attribute_key ] = self::sanitize_selector( $value );
+                                $attributes[ $key ] = $attributes[ $key ] ?? $controls[ $key ]['default'] ?? array();
+
+                                if ( is_array( $attributes[ $key ] ) && ! empty( $attributes[ $key ] ) ) {
+                                    foreach ( $attributes[ $key ] as $attribute_key => $value ) {
+                                        $attributes[ $key ][ $attribute_key ] = self::sanitize_selector( $value );
+                                    }
                                 }
                             } else {
                                 $attributes[ $key ] = self::sanitize_selector( $attributes[ $key ] );

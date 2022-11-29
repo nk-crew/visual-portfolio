@@ -108,7 +108,7 @@ export default class IconsSelector extends Component {
   }
 
   render() {
-    const { value, onChange } = this.props;
+    const { controlName, value, onChange, isSetupWizard } = this.props;
 
     const { options, ajaxStatus } = this.state;
 
@@ -123,9 +123,18 @@ export default class IconsSelector extends Component {
     }
 
     return (
-      <div className="vpf-component-icon-selector">
+      <div className="vpf-component-icon-selector" data-control-name={controlName}>
         {Object.keys(options || {}).map((k) => {
           const option = options[k];
+          let { icon } = option;
+
+          if (isSetupWizard) {
+            if (option.image_preview_wizard) {
+              icon = `<img src="${option.image_preview_wizard}" alt="${option.title} Preview">`;
+            } else if (option.icon_wizard) {
+              icon = option.icon_wizard;
+            }
+          }
 
           return (
             <Button
@@ -137,7 +146,7 @@ export default class IconsSelector extends Component {
                 option.className
               )}
             >
-              {option.icon ? <RawHTML>{option.icon}</RawHTML> : ''}
+              {icon ? <RawHTML>{icon}</RawHTML> : ''}
               {option.title ? <span>{option.title}</span> : ''}
             </Button>
           );

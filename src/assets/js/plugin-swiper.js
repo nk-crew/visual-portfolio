@@ -6,7 +6,8 @@ import isNumber from 'is-number';
 /*
  * Visual Portfolio plugin Swiper extension.
  */
-const $ = window.jQuery;
+const { jQuery: $ } = window;
+const $doc = $(document);
 
 const { screenSizes } = window.VPData;
 
@@ -32,7 +33,7 @@ function getSwiperVersion(Swiper) {
 }
 
 // Extend VP class.
-$(document).on('extendClass.vpf', (event, VP) => {
+$doc.on('extendClass.vpf', (event, VP) => {
   if ('vpf' !== event.namespace) {
     return;
   }
@@ -340,7 +341,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
 });
 
 // Add Items.
-$(document).on('addItems.vpf', (event, self, $items, removeExisting, $newVP) => {
+$doc.on('addItems.vpf', (event, self, $items, removeExisting, $newVP) => {
   if ('vpf' !== event.namespace) {
     return;
   }
@@ -386,7 +387,7 @@ $(document).on('addItems.vpf', (event, self, $items, removeExisting, $newVP) => 
 });
 
 // Init.
-$(document).on('init.vpf', (event, self) => {
+$doc.on('init.vpf', (event, self) => {
   if ('vpf' !== event.namespace) {
     return;
   }
@@ -395,7 +396,7 @@ $(document).on('init.vpf', (event, self) => {
 });
 
 // Destroy.
-$(document).on('destroy.vpf', (event, self) => {
+$doc.on('destroy.vpf', (event, self) => {
   if ('vpf' !== event.namespace) {
     return;
   }

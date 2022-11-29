@@ -92,10 +92,10 @@ class Visual_Portfolio_Custom_Post_Meta {
                             'type'       => 'object',
                             'properties' => array(
                                 'x' => array(
-                                    'type' => 'string',
+                                    'type' => 'number',
                                 ),
                                 'y' => array(
-                                    'type' => 'string',
+                                    'type' => 'number',
                                 ),
                             ),
                         ),

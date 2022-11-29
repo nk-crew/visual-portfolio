@@ -21,11 +21,11 @@ $('select[name="vp_general[portfolio_archive_page]"]').select2({
 
       // add selected value.
       if (data && data[0] && data[0].selected) {
+        alreadyAddedID = Number(data[0].id);
         options.push({
-          id: data[0].id,
+          id: alreadyAddedID,
           text: data[0].text,
         });
-        alreadyAddedID = data[0].id;
       }
 
       // parse new options.

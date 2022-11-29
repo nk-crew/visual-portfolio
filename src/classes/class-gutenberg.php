@@ -132,8 +132,6 @@ class Visual_Portfolio_Gutenberg_Block {
      * @return string
      */
     public function block_render( $attributes ) {
-        ob_start();
-
         $attributes = array_merge(
             array(
                 'align'     => '',
@@ -151,23 +149,14 @@ class Visual_Portfolio_Gutenberg_Block {
         if ( $attributes['className'] ) {
             $class_name .= ' ' . $attributes['className'];
         }
-        ?>
-        <div
-        <?php
-            echo ' class="' . esc_attr( $class_name ) . '"';
-            // Ghost Kit animate on scroll support.
-            echo isset( $attributes['ghostkitSR'] ) && $attributes['ghostkitSR'] ? ' data-ghostkit-sr="' . esc_attr( $attributes['ghostkitSR'] ) . '"' : '';
-        ?>
-        >
-            <?php
-            // The function returns clean data because it includes templates that use escaping functions before output.
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-            echo Visual_Portfolio_Get::get( $attributes );
-            ?>
-        </div>
-        <?php
 
-        return ob_get_clean();
+        $result = '<div class="' . esc_attr( $class_name ) . '"' . ( isset( $attributes['ghostkitSR'] ) && $attributes['ghostkitSR'] ? ' data-ghostkit-sr="' . esc_attr( $attributes['ghostkitSR'] ) . '"' : '' ) . '>';
+
+        $result .= Visual_Portfolio_Get::get( $attributes );
+
+        $result .= '</div>';
+
+        return $result;
     }
 
     /**
@@ -195,12 +184,14 @@ class Visual_Portfolio_Gutenberg_Block {
             'visual-portfolio-gutenberg',
             'VPGutenbergVariables',
             array(
-                'nonce'               => wp_create_nonce( 'vp-ajax-nonce' ),
-                'plugin_name'         => visual_portfolio()->plugin_name,
-                'plugin_url'          => visual_portfolio()->plugin_url,
-                'admin_url'           => get_admin_url(),
-                'controls'            => Visual_Portfolio_Controls::get_registered_array(),
-                'controls_categories' => Visual_Portfolio_Controls::get_registered_categories(),
+                'nonce'                     => wp_create_nonce( 'vp-ajax-nonce' ),
+                'plugin_name'               => visual_portfolio()->plugin_name,
+                'plugin_url'                => visual_portfolio()->plugin_url,
+                'admin_url'                 => get_admin_url(),
+                'controls'                  => Visual_Portfolio_Controls::get_registered_array(),
+                'controls_categories'       => Visual_Portfolio_Controls::get_registered_categories(),
+                'items_count_notice'        => get_option( 'visual_portfolio_items_count_notice_state', 'show' ),
+                'items_count_notice_limit'  => 40,
             )
         );
 

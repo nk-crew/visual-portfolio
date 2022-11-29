@@ -1048,10 +1048,12 @@ class Visual_Portfolio_Get {
             $options,
             array(
                 'filter'            => $atts['type'],
-                'filter_align'      => $atts['align'],
                 'filter_show_count' => 'true' === $atts['show_count'],
+                'filter_text_all'   => $atts['text_all'] ?? esc_attr__( 'All', '@@text_domain' ),
             )
         );
+
+        $align = $atts['align'] ?? 'center';
 
         // generate unique ID.
         $uid = ++self::$filter_id;
@@ -1067,8 +1069,10 @@ class Visual_Portfolio_Get {
         ob_start();
 
         ?>
-        <div class="<?php echo esc_attr( $class ); ?>">
-            <?php self::filter( $options ); ?>
+        <div class="vp-portfolio__layout-elements vp-portfolio__layout-elements-align-<?php echo esc_attr( $align ); ?>">
+            <div class="<?php echo esc_attr( $class ); ?>">
+                <?php self::filter( $options ); ?>
+            </div>
         </div>
         <?php
 
@@ -1085,6 +1089,14 @@ class Visual_Portfolio_Get {
     public static function get_sort( $atts = array() ) {
         $options = self::get_sort_options( $atts );
 
+        $options = array_merge(
+            $options,
+            array(
+                'sort'       => $atts['type'],
+                'sort_align' => $atts['align'],
+            )
+        );
+
         // generate unique ID.
         $uid = ++self::$sort_id;
         $uid = hash( 'crc32b', $uid . $options['id'] );
@@ -1099,8 +1111,10 @@ class Visual_Portfolio_Get {
         ob_start();
 
         ?>
-        <div class="<?php echo esc_attr( $class ); ?>">
-            <?php self::sort( $options ); ?>
+        <div class="vp-portfolio__layout-elements vp-portfolio__layout-elements-align-<?php echo esc_attr( $align ); ?>">
+            <div class="<?php echo esc_attr( $class ); ?>">
+                <?php self::sort( $options ); ?>
+            </div>
         </div>
         <?php
 
@@ -2201,7 +2215,11 @@ class Visual_Portfolio_Get {
         }
         ?>
         >
-            <?php self::item_popup_data( $args ); ?>
+            <?php
+            if ( $args['vp_opts']['items_click_action'] ) {
+                self::item_popup_data( $args );
+            }
+            ?>
             <?php do_action( 'vpf_before_each_item', $args ); ?>
             <figure class="vp-portfolio__item">
                 <?php
@@ -2252,7 +2270,7 @@ class Visual_Portfolio_Get {
         if ( $popup_image ) {
             $popup_output = self::popup_image_output( $popup_image, $args );
         } elseif ( $popup_video ) {
-            $popup_output = self::popup_video_output( $popup_video );
+            $popup_output = self::popup_video_output( $popup_video, $args );
         }
 
         $popup_output = apply_filters( 'vpf_popup_output', $popup_output, $args );
@@ -2322,71 +2340,65 @@ class Visual_Portfolio_Get {
     /**
      * Print image popup.
      *
-     * @param array $popup_image - item popup image data.
+     * @param array $image_data - item popup image data.
      * @param array $args  - item args.
+     *
      * @return string|bool
      */
-    public static function popup_image_output( $popup_image, $args ) {
+    public static function popup_image_output( $image_data, $args ) {
         $popup_output = false;
-        if ( $popup_image ) {
+
+        if ( $image_data ) {
+            ob_start();
+
             $title_source       = $args['vp_opts']['items_click_action_popup_title_source'] ? $args['vp_opts']['items_click_action_popup_title_source'] : '';
             $description_source = $args['vp_opts']['items_click_action_popup_description_source'] ? $args['vp_opts']['items_click_action_popup_description_source'] : '';
-            ob_start();
-            ?>
-            <div class="vp-portfolio__item-popup"
-                style="display: none;"
-                data-vp-popup-img="<?php echo esc_url( $popup_image['url'] ); ?>"
-                data-vp-popup-img-srcset="<?php echo esc_attr( $popup_image['srcset'] ); ?>"
-                data-vp-popup-img-size="<?php echo esc_attr( $popup_image['width'] . 'x' . $popup_image['height'] ); ?>"
-                data-vp-popup-md-img="<?php echo esc_url( $popup_image['md_url'] ); ?>"
-                data-vp-popup-md-img-size="<?php echo esc_attr( $popup_image['md_width'] . 'x' . $popup_image['md_height'] ); ?>"
-                data-vp-popup-sm-img="<?php echo esc_url( $popup_image['sm_url'] ); ?>"
-                data-vp-popup-sm-img-size="<?php echo esc_attr( $popup_image['sm_width'] . 'x' . $popup_image['sm_height'] ); ?>"
-            >
-                <?php
-                if ( isset( $popup_image[ $title_source ] ) && $popup_image[ $title_source ] ) {
-                    ?>
-                    <h3 class="vp-portfolio__item-popup-title"><?php echo esc_html( $popup_image[ $title_source ] ); ?></h3>
-                    <?php
-                }
-                if ( isset( $popup_image[ $description_source ] ) && $popup_image[ $description_source ] ) {
-                    $content = $popup_image[ $description_source ];
 
-                    if ( 'item_author' === $description_source && $popup_image['item_author_url'] ) {
-                        $content = '<a href="' . esc_url( $popup_image['item_author_url'] ) . '">' . $content . '</a>';
-                    }
+            visual_portfolio()->include_template(
+                'popup/image-popup-data',
+                array(
+                    'title_source'       => $title_source,
+                    'description_source' => $description_source,
+                    'image_data'         => $image_data,
+                    'args'               => $args,
+                    'opts'               => $args['vp_opts'],
+                )
+            );
 
-                    ?>
-                    <div class="vp-portfolio__item-popup-description"><?php echo wp_kses_post( $content ); ?></div>
-                    <?php
-                }
-                ?>
-            </div>
-            <?php
             $popup_output = ob_get_clean();
         }
+
         return $popup_output;
     }
 
     /**
      * Print video popup.
      *
-     * @param array $popup_video - item popup video data.
+     * @param array $video_data - item popup video data.
+     * @param array $args  - item args.
+     *
      * @return string|bool
      */
-    public static function popup_video_output( $popup_video ) {
+    public static function popup_video_output( $video_data, $args ) {
         $popup_output = false;
-        if ( $popup_video ) {
+
+        if ( $video_data ) {
             ob_start();
-            ?>
-            <div class="vp-portfolio__item-popup"
-                style="display: none;"
-                data-vp-popup-video="<?php echo esc_url( $popup_video['url'] ); ?>"
-                data-vp-popup-poster="<?php echo $popup_video['poster'] ? esc_url( $popup_video['poster'] ) : ''; ?>"
-            ></div>
-            <?php
+
+            visual_portfolio()->include_template(
+                'popup/video-popup-data',
+                array(
+                    'video_data'  => $video_data,
+
+                    // We need to check existence of args to prevent possible conflicts.
+                    'args'        => isset( $args ) ? $args : null,
+                    'opts'        => isset( $args['vp_opts'] ) ? $args['vp_opts'] : null,
+                )
+            );
+
             $popup_output = ob_get_clean();
         }
+
         return $popup_output;
     }
 

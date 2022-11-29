@@ -1,25 +1,82 @@
 .vpf-component-align-control {
-  .components-accessible-toolbar {
-    border-color: #d7dade;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  max-width: 160px;
+  border: 1px solid #d7dade;
 
-  .vpf-component-align-control-separator {
-    width: auto;
-    padding: 0;
-    pointer-events: none;
-    border: none;
-    border-right: 1px solid #d7dade;
-  }
+  button {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
 
-  // This hacky selector is used to override standard styles.
-  .components-toolbar-button.has-icon.has-icon {
-    min-width: 40px;
-    padding-right: 10px;
-    padding-left: 10px;
+    > span {
+      width: 20px;
+      height: 2px;
+      background-color: #ccc;
+      border-radius: 2px;
+      opacity: 0;
 
-    &::before {
-      right: 4px;
-      left: 4px;
+      &:nth-child(1) {
+        width: 20px;
+      }
+
+      &:nth-child(2) {
+        width: 26px;
+      }
+
+      &:nth-child(3) {
+        width: 14px;
+      }
+    }
+
+    &::after {
+      position: absolute;
+      top: calc(50% - 1.5px);
+      left: calc(50% - 1.5px);
+      display: block;
+      width: 3px;
+      height: 3px;
+      content: "";
+      background-color: #ccc;
+    }
+
+    &:hover,
+    &:focus {
+      > span {
+        background-color: #ccc;
+        opacity: 1;
+      }
+
+      &::after {
+        opacity: 0;
+      }
+    }
+
+    &.vpf-component-align-control-active {
+      > span {
+        background-color: var(--wp-admin-theme-color);
+        opacity: 1;
+      }
+
+      &::after {
+        opacity: 0;
+      }
+    }
+
+    &.vpf-component-align-control-left,
+    &.vpf-component-align-control-top-left,
+    &.vpf-component-align-control-bottom-left {
+      align-items: flex-start;
+    }
+
+    &.vpf-component-align-control-right,
+    &.vpf-component-align-control-top-right,
+    &.vpf-component-align-control-bottom-right {
+      align-items: flex-end;
     }
   }
 }
