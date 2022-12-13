@@ -1819,7 +1819,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'      => 'content-source-images',
                 'type'          => 'select',
-                'label'         => esc_html__( 'Titles Source', '@@text_domain' ),
+                'label'         => esc_html__( 'Items Title Source', '@@text_domain' ),
                 'name'          => 'images_titles_source',
                 'group'         => 'images_titles_source',
                 'default'       => 'custom',
@@ -1837,7 +1837,7 @@ class Visual_Portfolio_Admin {
             array(
                 'category'      => 'content-source-images',
                 'type'          => 'select',
-                'label'         => esc_html__( 'Descriptions Source', '@@text_domain' ),
+                'label'         => esc_html__( 'Items Description Source', '@@text_domain' ),
                 'name'          => 'images_descriptions_source',
                 'group'         => 'images_titles_source',
                 'default'       => 'custom',
