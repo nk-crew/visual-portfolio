@@ -295,6 +295,10 @@ class Visual_Portfolio_Admin {
         global $submenu;
         $menu_slug = Visual_Portfolio_Custom_Post_Type::get_menu_slug();
 
+        if ( ! isset( $submenu[ $menu_slug ] ) ) {
+            return;
+        }
+
         $plugin_submenu = &$submenu[ $menu_slug ];
 
         if ( is_array( $plugin_submenu ) && ! empty( $plugin_submenu ) ) {

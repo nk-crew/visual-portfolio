@@ -2593,9 +2593,8 @@ class Visual_Portfolio_Get {
         // We should use REQUEST_URI in case if the user used non-default permalinks.
         // For example, this one:
         // - /index.php/%postname% .
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-        if ( isset( $_SERVER['REQUEST_URI'] ) && $_SERVER['REQUEST_URI'] ) {
-            $current_url = esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+        if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
+            $current_url = esc_url_raw( wp_unslash( ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
         } else {
             $current_url = trailingslashit( home_url( $wp->request ) );
 
