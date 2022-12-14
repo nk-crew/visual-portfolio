@@ -49,7 +49,15 @@ class Visual_Portfolio_Block {
      * @return void
      */
     public static function get_block_attributes( $post_id, $block_id ) {
-        $content                  = get_post_field( 'post_content', $post_id );
+        $content         = get_post_field( 'post_content', $post_id );
+        $block_templates = array_merge( get_block_templates(), get_block_templates( array(), 'wp_template_part' ) );
+
+        if ( is_array( $block_templates ) && ! empty( $block_templates ) ) {
+            foreach ( $block_templates as $template ) {
+                $content = $content . $template->content;
+            }
+        }
+
         $blocks                   = parse_blocks( $content );
         $post_blocks              = self::parse_blocks( $blocks );
         $finding_block_attributes = false;

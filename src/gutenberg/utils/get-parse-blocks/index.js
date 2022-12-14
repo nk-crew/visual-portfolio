@@ -10,9 +10,21 @@ function getParseInnerBlocks(blocks, blockNames) {
   return allBlocks;
 }
 
+function getBlocks(select) {
+  const widgetAreas = select('core/block-editor').getBlocks();
+  const blocks = widgetAreas.map((widgetArea) => {
+    const innerBlocks = select('core/block-editor').getBlocks(widgetArea.clientId);
+    return {
+      ...widgetArea,
+      innerBlocks,
+    };
+  });
+  return blocks;
+}
+
 export default function getParseBlocks(blockNames) {
   const { findingBlocks } = wp.data.useSelect((select) => {
-    const blocks = select('core/block-editor').getBlocks();
+    const blocks = getBlocks(select);
     const postBlocks = getParseInnerBlocks(blocks, blockNames);
     return {
       findingBlocks: postBlocks,
