@@ -8,7 +8,7 @@ import classnames from 'classnames/dedupe';
  */
 import ControlsRender from '../../components/controls-render';
 import IframePreview from '../../components/iframe-preview';
-import useVpfGalleryPaginationAttributes from '../../hooks/use-gallery-pagination-attributes';
+import usePortfolioPaginationAttributes from '../../hooks/use-portfolio-pagination-attributes';
 import SelectControl from '../../components/select-control';
 import getParseBlocks from '../../utils/get-parse-blocks';
 
@@ -99,7 +99,7 @@ export default function BlockEdit(props) {
     gallery_attributes: galleryAttributes,
   } = attributes;
 
-  const galleryPaginationAttributes = useVpfGalleryPaginationAttributes(galleryBlockId);
+  const galleryPaginationAttributes = usePortfolioPaginationAttributes(galleryBlockId);
 
   let className = '';
 

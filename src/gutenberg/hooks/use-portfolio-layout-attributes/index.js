@@ -1,11 +1,11 @@
 import md5 from 'md5';
 
-import useVpfGalleryAttributes from '../use-gallery-attributes';
+import usePortfolioBlockAttributes from '../use-portfolio-block-attributes';
 
 const { useEffect, useRef, useState } = wp.element;
 
-export default function useVpfGalleryLayoutAttributes(galleryId) {
-  const findingAttributes = useVpfGalleryAttributes(galleryId);
+export default function usePortfolioLayoutAttributes(galleryId) {
+  const findingAttributes = usePortfolioBlockAttributes(galleryId);
   const postId = wp.data.select('core/editor').getCurrentPostId();
   const hash = md5(postId + JSON.stringify(findingAttributes));
   const url = '/visual-portfolio/v1/get_layout_attributes/';

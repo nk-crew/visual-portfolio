@@ -1,14 +1,14 @@
 /**
  * Internal dependencies
  */
-import useVpfGalleryAttributes from '../../hooks/use-gallery-attributes';
-import useVpfGalleryLayoutAttributes from '../../hooks/use-gallery-layout-attributes';
-import useVpfGalleryPaginationAttributes from '../../hooks/use-gallery-pagination-attributes';
+import usePortfolioBlockAttributes from '../../hooks/use-portfolio-block-attributes';
+import usePortfolioLayoutAttributes from '../../hooks/use-portfolio-layout-attributes';
+import usePortfolioPaginationAttributes from '../../hooks/use-portfolio-pagination-attributes';
 
 export function get() {
   return {
-    useVpfGalleryLayoutAttributes,
-    useVpfGalleryAttributes,
-    useVpfGalleryPaginationAttributes,
+    usePortfolioLayoutAttributes,
+    usePortfolioBlockAttributes,
+    usePortfolioPaginationAttributes,
   };
 }
