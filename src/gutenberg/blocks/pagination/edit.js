@@ -15,11 +15,13 @@ import getParseBlocks from '../../utils/get-parse-blocks';
 /**
  * WordPress dependencies
  */
-const { useEffect } = wp.element;
+const { useEffect, Fragment } = wp.element;
 
 const { __ } = wp.i18n;
 
 const { useBlockProps, InspectorControls } = wp.blockEditor;
+
+const { PanelBody } = wp.components;
 
 function renderControls(props) {
   const { attributes, setAttributes } = props;
@@ -80,7 +82,6 @@ function renderControls(props) {
         }
         isMultiple={false}
       />
-      <ControlsRender category="pagination" showPanel={false} {...props} />
     </div>
   );
 }
@@ -125,10 +126,26 @@ export default function BlockEdit(props) {
     className,
   });
 
+  const RenderControls = renderControls(props);
+
   return (
     <div {...blockProps}>
-      <InspectorControls>{renderControls(props)}</InspectorControls>
-      <IframePreview {...props} />
+      {'undefined' !== typeof galleryBlockId && galleryAttributes ? (
+        <>
+          <InspectorControls>
+            <PanelBody title={<span>{__('Settings', '@@text_domain')}</span>} initialOpen>
+              {RenderControls}
+              <ControlsRender category="pagination" showPanel={false} {...props} />
+            </PanelBody>
+          </InspectorControls>
+          <IframePreview {...props} />
+        </>
+      ) : (
+        <Fragment>
+          <div>{__('Please select Gallery Block ID', '@@text_domain')}</div>
+          {RenderControls}
+        </Fragment>
+      )}
     </div>
   );
 }
