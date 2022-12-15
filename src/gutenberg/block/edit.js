@@ -62,6 +62,7 @@ export default function BlockEdit(props) {
     content_source: contentSource,
     setup_wizard: setupWizard,
     preview_image_example: previewExample,
+    gallery_name: galleryName,
     layout,
     images,
     ghostkitClassname,
@@ -81,7 +82,7 @@ export default function BlockEdit(props) {
   // Set some starter attributes for different content sources.
   // And hide the setup wizard.
   useEffect(() => {
-    if ('true' === setupWizard && contentSource) {
+    if ('true' === setupWizard && contentSource && '' === galleryName) {
       let blockCount = 0;
       let blockName = '';
       parsedBlocks.forEach((block) => {
@@ -104,9 +105,6 @@ export default function BlockEdit(props) {
         case 'images':
           if (images && images.length) {
             setAttributes({
-              setup_wizard: '',
-              items_count: -1,
-              items_click_action: 'popup_gallery',
               gallery_name: `${blockName} Gallery #${blockCount}`,
             });
           }
@@ -114,27 +112,10 @@ export default function BlockEdit(props) {
         case 'post-based':
         case 'social-stream':
           setAttributes({
-            setup_wizard: '',
-            layout_elements: {
-              top: {
-                elements: [],
-                align: 'center',
-              },
-              items: {
-                elements: ['items'],
-              },
-              bottom: {
-                elements: ['pagination'],
-                align: 'center',
-              },
-            },
             gallery_name: `${blockName} Gallery #${blockCount}`,
           });
           break;
         default:
-          setAttributes({
-            setup_wizard: '',
-          });
           break;
       }
     }
