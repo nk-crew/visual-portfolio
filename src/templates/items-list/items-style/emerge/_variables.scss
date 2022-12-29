@@ -64,4 +64,8 @@
   // Transitions.
   --vp-items-style-emerge-transition-duration: var(--vp-interactive__transition-duration);
   --vp-items-style-emerge-transition-easing: var(--vp-interactive__transition-easing);
+
+  // Overlay Show Transition.
+  --vp-items-style-emerge--overlay__transition-duration: var(--vp-items-style-emerge-transition-duration);
+  --vp-items-style-emerge--overlay__transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }

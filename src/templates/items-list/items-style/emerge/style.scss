@@ -56,7 +56,7 @@
     max-height: 100%;
     color: var(--vp-items-style-emerge--overlay__color);
     background-color: var(--vp-items-style-emerge--overlay__background-color);
-    transition: var(--vp-items-style-emerge-transition-duration) transform cubic-bezier(0.25, 0.46, 0.45, 0.94), var(--vp-items-style-emerge-transition-duration) clip-path cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: var(--vp-items-style-emerge--overlay__transition-duration) transform var(--vp-items-style-emerge--overlay__transition-easing), var(--vp-items-style-emerge--overlay__transition-duration) clip-path var(--vp-items-style-emerge--overlay__transition-easing);
     transform: translateY(100%);
 
     @supports (clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%)) {
