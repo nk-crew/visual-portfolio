@@ -1,8 +1,4 @@
 /* eslint-disable max-classes-per-file */
-/**
- * External dependencies
- */
-import * as clipboard from 'clipboard-polyfill';
 
 /**
  * WordPress dependencies
@@ -206,7 +202,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
                     type="button"
                     className="vpf-component-classes-tree-node-class"
                     onClick={() => {
-                      clipboard.writeText(className);
+                      navigator.clipboard.writeText(className);
                     }}
                   >
                     {className}
