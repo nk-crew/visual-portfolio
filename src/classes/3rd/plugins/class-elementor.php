@@ -24,7 +24,7 @@ class Visual_Portfolio_3rd_Elementor {
      * Visual_Portfolio_3rd_Elementor constructor.
      */
     public function __construct() {
-        add_action( 'elementor/widgets/widgets_registered', array( $this, 'widgets_registered' ) );
+        add_action( 'elementor/widgets/register', array( $this, 'register_widget' ) );
 
         // We should also try to include this script in the footer,
         // since caching plugins place jQuery in the footer, and our script depends on it.
@@ -35,10 +35,10 @@ class Visual_Portfolio_3rd_Elementor {
     /**
      * Register widget
      */
-    public function widgets_registered() {
+    public function register_widget() {
         require_once visual_portfolio()->plugin_path . 'classes/3rd/plugins/class-elementor-widget.php';
 
-        \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new Visual_Portfolio_3rd_Elementor_Widget() );
+        \Elementor\Plugin::instance()->widgets_manager->register( new Visual_Portfolio_3rd_Elementor_Widget() );
     }
 
     /**
