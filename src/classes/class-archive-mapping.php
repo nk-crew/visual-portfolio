@@ -330,11 +330,11 @@ class Visual_Portfolio_Archive_Mapping {
         $current_base = trailingslashit( $this->permalinks['portfolio_base'] );
         $structures   = array(
             0  => '',
-            1  => '/' . trailingslashit( $page_slug ),
-            2  => '/' . trailingslashit( $page_slug ) . trailingslashit( '%portfolio_category%' ),
+            1  => trailingslashit( $page_slug ),
+            2  => trailingslashit( $page_slug ) . trailingslashit( '%portfolio_category%' ),
 
             // Only used in the html output in the settings.
-            99 => '/' . trailingslashit( $default_slug ),
+            99 => trailingslashit( $default_slug ),
         );
 
         ?>
