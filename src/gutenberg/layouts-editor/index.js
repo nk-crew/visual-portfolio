@@ -1,8 +1,4 @@
 /* eslint-disable max-classes-per-file */
-/**
- * External dependencies
- */
-import * as clipboard from 'clipboard-polyfill';
 
 /**
  * Internal dependencies
@@ -52,15 +48,15 @@ function ShortcodeRender(props) {
         <Button
           isSmall
           onClick={() => {
-            clipboard.writeText(props.content);
+            navigator.clipboard.writeText(props.content).then(() => {
+              setCopied(true);
 
-            setCopied(true);
+              clearTimeout(copiedTimeout);
 
-            clearTimeout(copiedTimeout);
-
-            copiedTimeout = setTimeout(() => {
-              setCopied(false);
-            }, 450);
+              copiedTimeout = setTimeout(() => {
+                setCopied(false);
+              }, 450);
+            });
           }}
         >
           <svg

@@ -330,11 +330,11 @@ class Visual_Portfolio_Archive_Mapping {
         $current_base = trailingslashit( $this->permalinks['portfolio_base'] );
         $structures   = array(
             0  => '',
-            1  => '/' . trailingslashit( $page_slug ),
-            2  => '/' . trailingslashit( $page_slug ) . trailingslashit( '%portfolio_category%' ),
+            1  => trailingslashit( $page_slug ),
+            2  => trailingslashit( $page_slug ) . trailingslashit( '%portfolio_category%' ),
 
             // Only used in the html output in the settings.
-            99 => '/' . trailingslashit( $default_slug ),
+            99 => trailingslashit( $default_slug ),
         );
 
         ?>
@@ -408,7 +408,15 @@ class Visual_Portfolio_Archive_Mapping {
             $permalinks['tag_base']      = sanitize_text_field( wp_unslash( $_POST['vp_tag_slug'] ) );
 
             // Generate portfolio base.
-            $portfolio_base = isset( $_POST['portfolio_permalink'] ) ? sanitize_option( 'permalink_structure', wp_unslash( $_POST['portfolio_permalink'] ) ) : '';
+            // After WordPress update to 6.1 version we encountered an error saving permalinks.
+            // Thus, the data stored in permalinks is now checked for the presence of % symbols in their strings.
+            // When validating a 'custom' value, there is no percentage in this line, which generates an error.
+            // Text of error: A structure tag is required when using custom permalinks.
+            // This has now been fixed by adding a strict check on the 'custom' value.
+            $portfolio_base = isset( $_POST['portfolio_permalink'] ) &&
+                            'custom' !== $_POST['portfolio_permalink'] ?
+                            sanitize_option( 'permalink_structure', wp_unslash( $_POST['portfolio_permalink'] ) ) :
+                            ( isset( $_POST['portfolio_permalink'] ) ? 'custom' : '' );
 
             if ( 'custom' === $portfolio_base ) {
                 if ( isset( $_POST['portfolio_permalink_structure'] ) ) {

@@ -20,7 +20,7 @@ const VPPopupAPI = {
       vendor: 'youtube',
       embedUrl: 'https://www.youtube.com/embed/{{video_id}}?{{params}}',
       pattern:
-        /(https?:\/\/)?(www.)?(youtube\.com|youtu\.be|youtube-nocookie\.com)\/(?:embed\/|v\/|watch\?v=|watch\?list=(.*)&v=|watch\?(.*[^&]&)v=)?((\w|-){11})(&list=(\w+)&?)?(.*)/,
+        /(https?:\/\/)?(www.)?(youtube\.com|youtu\.be|youtube-nocookie\.com)\/(?:embed\/|shorts\/|v\/|watch\?v=|watch\?list=(.*)&v=|watch\?(.*[^&]&)v=)?((\w|-){11})(&list=(\w+)&?)?(.*)/,
       patternIndex: 6,
       params: {
         autoplay: 1,
@@ -33,6 +33,32 @@ const VPPopupAPI = {
         html5: 1,
       },
       paramsIndex: 10,
+      embedCallback(url, match) {
+        let result = false;
+        const vendorData = this;
+        const videoId =
+          match && match[vendorData.patternIndex] ? match[vendorData.patternIndex] : false;
+
+        if (videoId) {
+          const isShorts = /\/shorts\//.test(url);
+
+          const width = isShorts ? 476 : 1920;
+          const height = isShorts ? 847 : 1080;
+
+          result = VPPopupAPI.embedCallback(
+            {
+              ...vendorData,
+              width,
+              height,
+            },
+            videoId,
+            url,
+            match
+          );
+        }
+
+        return result;
+      },
     },
     {
       vendor: 'vimeo',
@@ -117,6 +143,40 @@ const VPPopupAPI = {
   },
 
   /**
+   * Prepare data for embed.
+   *
+   * @param {Object} vendorData current video vendor data.
+   * @param {String} videoId parsed video ID.
+   * @param {String} url video URL provided.
+   * @param {Object|Boolean} match URL match data.
+   *
+   * @returns {Object}
+   */
+  embedCallback(vendorData, videoId, url, match = false) {
+    let { embedUrl } = vendorData;
+    embedUrl = embedUrl.replace(/{{video_id}}/g, videoId);
+    embedUrl = embedUrl.replace(/{{video_url}}/g, url);
+    embedUrl = embedUrl.replace(/{{video_url_encoded}}/g, encodeURIComponent(url));
+    embedUrl = embedUrl.replace(
+      /{{params}}/g,
+      match ? VPPopupAPI.prepareParams(match, vendorData) : ''
+    );
+
+    const width = vendorData.width || 1920;
+    const height = vendorData.height || 1080;
+
+    return {
+      vendor: vendorData.vendor,
+      id: videoId,
+      embed: `<iframe width="${width}" height="${height}" src="${embedUrl}" scrolling="no" frameborder="0" allowTransparency="true" allow="accelerometer; autoplay; clipboard-write; fullscreen; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
+      embedUrl,
+      url,
+      width,
+      height,
+    };
+  },
+
+  /**
    * Parse video URL and return object with data
    *
    * @param {string} url - video url.
@@ -134,41 +194,32 @@ const VPPopupAPI = {
           match && match[vendorData.patternIndex] ? match[vendorData.patternIndex] : false;
 
         if (videoId) {
+          // Custom embed callback.
           if (vendorData.embedCallback) {
             result = vendorData.embedCallback(url, match, poster);
+
+            // Predefined embed callback.
           } else {
-            let { embedUrl } = vendorData;
-            embedUrl = embedUrl.replace(/{{video_id}}/g, videoId);
-            embedUrl = embedUrl.replace(/{{video_url}}/g, url);
-            embedUrl = embedUrl.replace(/{{video_url_encoded}}/g, encodeURIComponent(url));
-            embedUrl = embedUrl.replace(/{{params}}/g, VPPopupAPI.prepareParams(match, vendorData));
-
-            const width = vendorData.width || 1920;
-            const height = vendorData.height || 1080;
-
-            result = {
-              vendor: vendorData.vendor,
-              id: videoId,
-              embed: `<iframe width="${width}" height="${height}" src="${embedUrl}" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`,
-              embedUrl,
-              url,
-              width,
-              height,
-            };
+            result = VPPopupAPI.embedCallback(vendorData, videoId, url, match);
           }
         }
       }
     });
 
-    return (
-      result || {
-        vendor: 'unknown',
-        id: url,
+    // Unknown vendor.
+    if (!result) {
+      result = VPPopupAPI.embedCallback(
+        {
+          vendor: 'unknown',
+          embedUrl: url,
+        },
         url,
-        embedUrl: url,
-        embed: `<iframe width="1920" height="1080" src="${url}" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`,
-      }
-    );
+        url,
+        false
+      );
+    }
+
+    return result;
   },
 
   /**

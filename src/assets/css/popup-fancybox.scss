@@ -21,6 +21,11 @@
     }
   }
 
+  // removed white background to improve vertical videos displaying.
+  .fancybox-slide--iframe .fancybox-content {
+    background: none;
+  }
+
   // Caption.
   .fancybox-caption__body {
     font-size: 12px;
