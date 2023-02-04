@@ -325,10 +325,10 @@ class Visual_Portfolio_Images {
     /**
      * Skip lazy loading using exclusion settings.
      *
-     * @param Boolean $return - default return value.
-     * @param Array   $attributes - image attributes.
+     * @param boolean $return - default return value.
+     * @param array   $attributes - image attributes.
      *
-     * @return Boolean
+     * @return boolean
      */
     public static function add_lazyload_exclusions( $return, $attributes ) {
         if ( ! empty( self::$lazyload_user_exclusions ) && ! empty( $attributes ) ) {
