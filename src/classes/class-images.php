@@ -48,6 +48,14 @@ class Visual_Portfolio_Images {
         add_action( 'wp', 'Visual_Portfolio_Images::init_lazyload' );
         add_action( 'after_setup_theme', 'Visual_Portfolio_Images::add_image_sizes' );
         add_filter( 'image_size_names_choose', 'Visual_Portfolio_Images::image_size_names_choose' );
+
+        /**
+         * Allow `data:` inside image src attribute.
+         * Don't place this hook inside the `wp` hook.
+         *
+         * @link https://wordpress.org/support/topic/lazy-load-404-error-with-image-like-png/#post-16439422
+         */
+        add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
     }
 
     /**
@@ -160,7 +168,6 @@ class Visual_Portfolio_Images {
         }
 
         add_action( 'wp_kses_allowed_html', 'Visual_Portfolio_Images::allow_lazy_attributes' );
-        add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
         add_action( 'wp_head', 'Visual_Portfolio_Images::add_nojs_fallback' );
     }
 
