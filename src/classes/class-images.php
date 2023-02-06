@@ -608,7 +608,7 @@ class Visual_Portfolio_Images {
             $src    = preg_replace( '~-[0-9]+x[0-9]+(?=\..{2,6})~', '', $attributes['src'] );
             $img_id = attachment_url_to_postid( $src );
 
-            // Sometimes, when the uploaded image larger than max-size, this images scaled and filename changed to `NAME-scaled.EXT`.
+            // Sometimes, when the uploaded image larger than max-size, this image scaled and filename changed to `NAME-scaled.EXT`.
             if ( ! $img_id ) {
                 $src    = preg_replace( '~-[0-9]+x[0-9]+(?=\..{2,6})~', '-scaled', $attributes['src'] );
                 $img_id = attachment_url_to_postid( $src );
