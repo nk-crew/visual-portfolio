@@ -3,6 +3,22 @@
  */
 const $ = window.jQuery;
 
+function setImgWidth($el) {
+  if ($el && 1 < $el.height) {
+    $el.style.width = `${$el.height}px`;
+  }
+}
+
+// We need to use resize observer because for some reason in the Preview
+// and on some mobile devices image height is 1px.
+const resizeObserver = new ResizeObserver((entries) => {
+  entries.forEach(({ target }) => {
+    if (target) {
+      setImgWidth(target);
+    }
+  });
+});
+
 // Init minimal paged pagination.
 $(document).on('init.vpf loadedNewItems.vpf', (event, self) => {
   if (
@@ -22,10 +38,10 @@ $(document).on('init.vpf loadedNewItems.vpf', (event, self) => {
     $img = $(
       '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">'
     );
-    $activeItem.prepend($img);
-  }
 
-  $img.css({
-    width: $img.height(),
-  });
+    resizeObserver.observe($img[0]);
+    $activeItem.prepend($img);
+
+    setImgWidth($img[0]);
+  }
 });
