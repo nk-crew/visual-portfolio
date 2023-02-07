@@ -668,8 +668,18 @@ class VP {
     const self = this;
     const { randomSeed } = self.options;
 
-    if (self.loading || !url || self.href === url) {
+    if (
+      (self.loading && 'undefined' === typeof self.loading.readyState) ||
+      !url ||
+      self.href === url
+    ) {
       return;
+    }
+
+    // Abort previous AJAX loader to prevent conflict.
+    // We need it mostly for Search feature, because users can type also when already in loading state.
+    if (self.loading && self.loading.readyState && self.loading.abort) {
+      self.loading.abort();
     }
 
     const ajaxData = {
@@ -691,7 +701,7 @@ class VP {
 
     self.emitEvent('startLoadingNewItems', [url, ajaxData]);
 
-    $.ajax(ajaxData);
+    self.loading = $.ajax(ajaxData);
   }
 
   /**
