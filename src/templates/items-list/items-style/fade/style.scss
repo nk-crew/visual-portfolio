@@ -26,7 +26,9 @@
     left: 0;
 
     // Fix FireFox image blinking
-    // https://github.com/nk-crew/visual-portfolio/issues/92
+    // @link https://github.com/nk-crew/visual-portfolio/issues/92
+    // -
+    // Also fix conflict with Hover Image in the Pro plugin.
     z-index: 2;
     color: var(--vp-items-style-fade--overlay__color);
     text-decoration: var(--vp-items-style-fade--overlay__text-decoration);

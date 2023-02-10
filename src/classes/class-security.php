@@ -25,7 +25,7 @@ class Visual_Portfolio_Security {
     /**
      * Returns allowed HTML tags and attributes for Popup.
      *
-     * @param string       $allowedtags - Allow Tags for current context.
+     * @param string|array $allowedtags - Allow Tags for current context.
      * @param string|array $context - tags context.
      *
      * @return array
@@ -53,7 +53,7 @@ class Visual_Portfolio_Security {
     /**
      * Returns allowed HTML tags and attributes for Svg.
      *
-     * @param string       $allowedtags - Allow Tags for current context.
+     * @param string|array $allowedtags - Allow Tags for current context.
      * @param string|array $context - tags context.
      *
      * @return array
@@ -107,7 +107,7 @@ class Visual_Portfolio_Security {
     /**
      * Returns allowed HTML tags and attributes for Svg.
      *
-     * @param string       $allowedtags - Allow Tags for current context.
+     * @param string|array $allowedtags - Allow Tags for current context.
      * @param string|array $context - tags context.
      *
      * @return array

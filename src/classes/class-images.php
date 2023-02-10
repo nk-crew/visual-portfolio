@@ -48,6 +48,14 @@ class Visual_Portfolio_Images {
         add_action( 'wp', 'Visual_Portfolio_Images::init_lazyload' );
         add_action( 'after_setup_theme', 'Visual_Portfolio_Images::add_image_sizes' );
         add_filter( 'image_size_names_choose', 'Visual_Portfolio_Images::image_size_names_choose' );
+
+        /**
+         * Allow `data:` inside image src attribute.
+         * Don't place this hook inside the `wp` hook.
+         *
+         * @link https://wordpress.org/support/topic/lazy-load-404-error-with-image-like-png/#post-16439422
+         */
+        add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
     }
 
     /**
@@ -160,7 +168,6 @@ class Visual_Portfolio_Images {
         }
 
         add_action( 'wp_kses_allowed_html', 'Visual_Portfolio_Images::allow_lazy_attributes' );
-        add_filter( 'kses_allowed_protocols', 'Visual_Portfolio_Images::kses_allowed_protocols', 15 );
         add_action( 'wp_head', 'Visual_Portfolio_Images::add_nojs_fallback' );
     }
 
@@ -318,10 +325,10 @@ class Visual_Portfolio_Images {
     /**
      * Skip lazy loading using exclusion settings.
      *
-     * @param Boolean $return - default return value.
-     * @param Array   $attributes - image attributes.
+     * @param boolean $return - default return value.
+     * @param array   $attributes - image attributes.
      *
-     * @return Boolean
+     * @return boolean
      */
     public static function add_lazyload_exclusions( $return, $attributes ) {
         if ( ! empty( self::$lazyload_user_exclusions ) && ! empty( $attributes ) ) {
@@ -601,7 +608,7 @@ class Visual_Portfolio_Images {
             $src    = preg_replace( '~-[0-9]+x[0-9]+(?=\..{2,6})~', '', $attributes['src'] );
             $img_id = attachment_url_to_postid( $src );
 
-            // Sometimes, when the uploaded image larger than max-size, this images scaled and filename changed to `NAME-scaled.EXT`.
+            // Sometimes, when the uploaded image larger than max-size, this image scaled and filename changed to `NAME-scaled.EXT`.
             if ( ! $img_id ) {
                 $src    = preg_replace( '~-[0-9]+x[0-9]+(?=\..{2,6})~', '-scaled', $attributes['src'] );
                 $img_id = attachment_url_to_postid( $src );
