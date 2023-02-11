@@ -124,7 +124,7 @@ function ItemsCountControl({ data }) {
 
   const { postId } = useSelect(
     (select) => ({
-      postId: select('core/editor').getCurrentPostId(),
+      postId: select('core/editor')?.getCurrentPostId() || false,
     }),
     []
   );
