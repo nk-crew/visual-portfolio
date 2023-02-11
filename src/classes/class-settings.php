@@ -529,7 +529,7 @@ class Visual_Portfolio_Settings {
                     'label'   => esc_html__( 'Use Deep Linking URL to Share Images', '@@text_domain' ),
                     'desc'    => esc_html__( 'Check to share Deep Linking URLs when sharing images. When disabled, all galleries will share direct links to image files.', '@@text_domain' ),
                     'type'    => 'toggle',
-                    'default' => 'off',
+                    'default' => class_exists( 'Visual_Portfolio_Pro' ) ? 'on' : 'off',
                     'is_pro'  => true,
                 ),
 
