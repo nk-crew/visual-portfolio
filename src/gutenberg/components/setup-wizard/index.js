@@ -137,6 +137,16 @@ export default function SetupWizard(props) {
         // no default
       }
 
+      // Prepare better default settings for Popup.
+      // We can't change defaults of registered controls because it may break existing user galleries.
+      // This is why we change it here, in the Setup Wizard.
+      newAttributes = {
+        ...newAttributes,
+        items_click_action_popup_title_source: 'item_title',
+        items_click_action_popup_description_source: 'item_description',
+        items_click_action_popup_deep_link_pid: 'filename',
+      };
+
       setAttributes(newAttributes);
       setAllowNextStep(true);
     }
