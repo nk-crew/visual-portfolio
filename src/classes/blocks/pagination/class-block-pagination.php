@@ -101,6 +101,9 @@ class Visual_Portfolio_Pagination_Block extends Visual_Portfolio_Block {
 
         $gallery_attributes = self::get_pagination_attributes( $block_attributes, get_permalink( get_the_ID() ) );
 
+        // generate unique ID.
+        $uid   = ++self::$id;
+        $uid   = hash( 'crc32b', $uid . $attributes['block_id'] );
         $attributes = array_merge(
             array(
                 'align'     => '',
@@ -110,7 +113,7 @@ class Visual_Portfolio_Pagination_Block extends Visual_Portfolio_Block {
             $gallery_attributes
         );
 
-        $class_name = 'wp-block-visual-portfolio';
+        $class_name = 'wp-block-visual-portfolio vp-portfolio vp-uid-' . $uid;
         $align_class = '';
 
         if ( $attributes['align'] ) {
