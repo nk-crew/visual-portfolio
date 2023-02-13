@@ -15,6 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Pagination_Block extends Visual_Portfolio_Block {
     /**
+     * ID of the current printed pagination
+     *
+     * @var int
+     */
+    private static $id = 0;
+
+    /**
      * Visual_Portfolio_Pagination_Block constructor.
      */
     public function __construct() {
@@ -68,7 +75,8 @@ class Visual_Portfolio_Pagination_Block extends Visual_Portfolio_Block {
         register_block_type(
             visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination',
             array(
-                'render_callback' => array( $this, 'block_render' ),
+                //'render_callback' => array( $this, 'block_render' ),
+                'render_callback' => array( Visual_Portfolio_Pagination_Block::class, 'block_render' ),
             )
         );
     }
@@ -80,7 +88,7 @@ class Visual_Portfolio_Pagination_Block extends Visual_Portfolio_Block {
      *
      * @return string
      */
-    public function block_render( $attributes ) {
+    public static function block_render( $attributes ) {
         visual_portfolio()->include_template_style( 'visual-portfolio-pagination-minimal', 'items-list/pagination/minimal/style', array(), '@@plugin_version' );
         visual_portfolio()->include_template_style( 'visual-portfolio-pagination', 'items-list/pagination/style', array(), '@@plugin_version' );
 
@@ -103,9 +111,10 @@ class Visual_Portfolio_Pagination_Block extends Visual_Portfolio_Block {
         );
 
         $class_name = 'wp-block-visual-portfolio';
+        $align_class = '';
 
         if ( $attributes['align'] ) {
-            $class_name .= ' align' . $attributes['align'];
+            $align_class = ' vp-portfolio__layout-elements-align-' . $attributes['align'];
         }
 
         if ( $attributes['className'] ) {
@@ -123,10 +132,12 @@ class Visual_Portfolio_Pagination_Block extends Visual_Portfolio_Block {
             echo isset( $attributes['ghostkitSR'] ) && $attributes['ghostkitSR'] ? ' data-ghostkit-sr="' . esc_attr( $attributes['ghostkitSR'] ) . '"' : '';
         ?>
         >
-            <?php
-            // The function returns clean data because it includes templates that use escaping functions before output.
-            Visual_Portfolio_Get::pagination( $attributes );
-            ?>
+            <div class="vp-portfolio__layout-elements vp-portfolio__layout-elements-bottom<?php echo esc_attr( $align_class ); ?>">
+                <?php
+                // The function returns clean data because it includes templates that use escaping functions before output.
+                Visual_Portfolio_Get::pagination( $attributes );
+                ?>
+            </div>
         </div>
         <?php
 

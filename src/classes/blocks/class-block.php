@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Visual_Portfolio_Pagination_Block
+ * Class Visual_Portfolio_Block
  */
 class Visual_Portfolio_Block {
     /**

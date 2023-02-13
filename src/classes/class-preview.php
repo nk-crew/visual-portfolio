@@ -294,25 +294,18 @@ class Visual_Portfolio_Preview {
                         $options,
                         $gallery_attributes
                     );
-                    visual_portfolio()->include_template(
-                        'preview/pagination',
-                        array(
-                            'options'    => $options,
-                            'class_name' => $class_name,
-                        )
-                    );
                     break;
             }
-        } else {
-            // Output preview template.
-            visual_portfolio()->include_template(
-                'preview/preview',
-                array(
-                    'options'    => $options,
-                    'class_name' => $class_name,
-                )
-            );
         }
+
+        // Output preview template.
+        visual_portfolio()->include_template(
+            'preview/preview',
+            array(
+                'options'    => $options,
+                'class_name' => $class_name,
+            )
+        );
     }
 
     /**
@@ -324,6 +317,27 @@ class Visual_Portfolio_Preview {
      */
     public function rocket_loader_filter( $tag ) {
         return str_replace( '<script', '<script data-cfasync="false"', $tag );
+    }
+
+    /**
+     * Get Block render by options.
+     *
+     * @param array $options - Block Options.
+     * @return string|boolean
+     */
+    public static function get_block( $options ) {
+        $layout_type = $options['layout_type'] ?? false;
+        $result      = false;
+        switch ( $layout_type ) {
+            case 'pagination':
+                $result = Visual_Portfolio_Pagination_Block::block_render( $options );
+                break;
+            default:
+            case false:
+                $result = Visual_Portfolio_Get::get( $options );
+                break;
+        }
+        return $result;
     }
 }
 
