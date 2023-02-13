@@ -34,7 +34,9 @@ class Visual_Portfolio_Custom_Post_Type {
      */
     public function __construct() {
         // custom post types.
-        add_action( 'init', array( $this, 'add_custom_post_type' ) );
+        // We have to use priority < 10 to add compatibility for 'post-terms' block.
+        // @link https://github.com/WordPress/gutenberg/blob/7880f08f57ac9275c21129d1f7e1f56af40bea87/packages/block-library/src/post-terms/index.php#L61-L110.
+        add_action( 'init', array( $this, 'add_custom_post_type' ), 9 );
         add_action( 'restrict_manage_posts', array( $this, 'filter_custom_post_by_taxonomies' ), 10 );
 
         // custom post roles.

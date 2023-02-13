@@ -466,6 +466,8 @@ class VP {
     }
 
     // add helper focus class
+    // TODO: change to CSS :has() when will be widely available
+    // @link https://caniuse.com/?search=%3Ahas
     self.$item.on(`focus${evp}`, '.vp-portfolio__item a', function () {
       $(this).closest('.vp-portfolio__item').addClass('vp-portfolio__item-focus');
     });

@@ -322,6 +322,25 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 2.22.0 =
+
+* added support for Youtube Shorts in popup
+* added possibility to start AJAX loading when already in loading state (fixes the Search module conflict with concurrent requests)
+* added support for displaying Portfolio Categories and Portfolio Tags in the `post-terms` block
+* fixed filter, sort and pagination URLs to display absolute URLs
+* fixed creating notices over on over again if no items found after AJAX requests
+* fixed deprecated Elementor warnings
+* fixed saving permalink error in WordPress 6.1
+* fixed src `data:` escaping in lazy load images
+* fixed minimal pagination active item wrong circle size
+* fixed Fly overlay z-index when add Hover Image from Pro plugin
+* fixed block crash in the Widgets and Templates editor
+* fixed go pro link error when no Visual Portfolio admin menu exists
+* changed defaults for popup title and description sources
+* removed white background from Fancybox popup for better support vertical videos
+* removed `clipboard-polyfill` and use native `navigator.clipboard.writeText` instead
+* minor changes
+
 = 2.21.2 =
 
 * fixed JS error when open WordPress images in Lightbox
