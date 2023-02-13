@@ -589,6 +589,7 @@ class Visual_Portfolio_Assets {
      */
     public function localize_global_data() {
         $data = array(
+            'version'              => '@@plugin_version',
             '__'                   => array(
                 // translators: %s - plugin name.
                 'couldnt_retrieve_vp'  => sprintf( __( 'Couldn\'t retrieve %s ID.', '@@text_domain' ), visual_portfolio()->plugin_name ),
