@@ -516,11 +516,19 @@ class VP {
         }
       });
 
-    $(pagination).on(`click`, '.vp-pagination .vp-pagination__item a', function (e) {
+    /**
+     * Pagination click action.
+     *
+     * @param {*} e - Event.
+     * @param {*} thisObject - This Object.
+     * @returns
+     */
+    function paginationClick(e, thisObject) {
       e.preventDefault();
-      const $this = $(this);
+      const $this = $(thisObject);
       const $pagination = $this.closest('.vp-pagination');
-      const $paginationType = $pagination.attr('data-vp-pagination-type');
+      const $paginationType =
+        self.options.pagination ?? $pagination.attr('data-vp-pagination-type');
 
       if ($pagination.hasClass('vp-pagination__no-more') && 'paged' !== $paginationType) {
         return;
@@ -554,49 +562,15 @@ class VP {
           });
         }
       }
+    }
+
+    $(pagination).on(`click`, '.vp-pagination .vp-pagination__item a', function (e) {
+      paginationClick(e, this);
     });
 
     // on pagination click
     self.$item.on(`click${evp}`, '.vp-pagination .vp-pagination__item a', function (e) {
-      e.preventDefault();
-      const $this = $(this);
-      const $pagination = $this.closest('.vp-pagination');
-
-      if ($pagination.hasClass('vp-pagination__no-more') && 'paged' !== self.options.pagination) {
-        return;
-      }
-
-      self.loadNewItems($this.attr('href'), 'paged' === self.options.pagination);
-
-      // Scroll to top
-      if (
-        'paged' === self.options.pagination &&
-        $pagination.hasClass('vp-pagination__scroll-top')
-      ) {
-        const $adminBar = $('#wpadminbar');
-        const currentTop = window.pageYOffset || document.documentElement.scrollTop;
-        let { top } = self.$item.offset();
-
-        // Custom user offset.
-        if ($pagination.attr('data-vp-pagination-scroll-top')) {
-          top -= parseInt($pagination.attr('data-vp-pagination-scroll-top'), 10) || 0;
-        }
-
-        // Admin bar offset.
-        if ($adminBar.length && 'fixed' === $adminBar.css('position')) {
-          top -= $adminBar.outerHeight();
-        }
-
-        // Limit max offset.
-        top = Math.max(0, top);
-
-        if (currentTop > top) {
-          window.scrollTo({
-            top,
-            behavior: 'smooth',
-          });
-        }
-      }
+      paginationClick(e, this);
     });
 
     // on categories of item click
