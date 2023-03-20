@@ -68,9 +68,12 @@ class Visual_Portfolio_3rd_Elementor {
                 if (!$) {
                     return;
                 }
-                if (!$('.elementor-page').length) {
-                    return;
-                }
+
+                // Previously we added this code on Elementor pages only,
+                // but sometimes Lightbox enabled globally and it still conflicting with our galleries.
+                // if (!$('.elementor-page').length) {
+                //     return;
+                // }
 
                 function addDataAttribute($items) {
                     $items.find('.vp-portfolio__item a:not([data-elementor-open-lightbox])').each(function () {
