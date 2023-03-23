@@ -86,19 +86,22 @@ class Visual_Portfolio_Archive_Mapping {
     }
 
     /**
-     * Maybe redirect canonical Portfolio Archive Page if page set as front page.
+     * Maybe redirect canonical Portfolio Archive Page.
+     * When registering a post, standard rules for overwriting archives are created,
+     * Which do not suit us for a number of reasons. To catch redirects according to these standard rules, we need the following function.
+     * This function controls requests to standard portfolio pages of archives, taxonomies and pagination, and, depending on the settings of permalinks,
+     * Allows or disables the standard redirect.
      *
      * @param string $redirect_url - Redirect URL.
      * @param string $requested_url - Requested URL.
      * @return string|bool
      */
     public function maybe_redirect_canonical_links( $redirect_url, $requested_url ) {
+        $queried_object = get_queried_object();
         if (
             untrailingslashit( $redirect_url ) === untrailingslashit( get_home_url() ) &&
             (int) get_option( 'page_on_front' ) === (int) $this->archive_page
         ) {
-
-            $queried_object       = get_queried_object();
             $is_category_redirect = strpos( $requested_url, $this->permalinks['category_base'] ) !== false;
             $is_tag_redirect      = strpos( $requested_url, $this->permalinks['tag_base'] ) !== false;
             $is_portfolio_archive = ! $is_category_redirect &&
@@ -113,6 +116,13 @@ class Visual_Portfolio_Archive_Mapping {
             }
 
             if ( $is_category_redirect || $is_tag_redirect || $parse_page_from_link > 0 ) {
+                $redirect_url = false;
+            }
+        } elseif ( isset( $queried_object ) && (int) $queried_object->ID === (int) $this->archive_page ) {
+
+            $parse_page_from_link = intval( untrailingslashit( str_replace( trailingslashit( $redirect_url ) . 'page/', '', $requested_url ) ) );
+
+            if ( $parse_page_from_link > 0 ) {
                 $redirect_url = false;
             }
         }
@@ -682,6 +692,13 @@ class Visual_Portfolio_Archive_Mapping {
         global $wp_query;
         if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) && 'current_query' === $options['posts_source'] ) {
             $is_page_archive = $wp_query->query_vars['vp_page_archive'] ?? false;
+            /**
+             * Also check the standard rewrite requests and find out if the page is an archive.
+             */
+            $is_page_archive = isset( $wp_query->query_vars['paged'] ) &&
+                            isset( $wp_query->query_vars['original_archive_id'] ) &&
+                            'portfolio' === $wp_query->query_vars['original_archive_id'] ? true : $is_page_archive;
+
             if ( $is_page_archive ) {
                 foreach ( $options['layout_elements'] as $position => $container ) {
                     if ( ! empty( $container['elements'] ) ) {
@@ -691,7 +708,7 @@ class Visual_Portfolio_Archive_Mapping {
                                 // phpcs:ignore WordPress.Security.NonceVerification
                                 $vp_page = isset( $_REQUEST['vp_page'] ) && ! empty( $_REQUEST['vp_page'] ) ? sanitize_option( 'posts_per_page', wp_unslash( $_REQUEST['vp_page'] ) ) : null;
 
-                                $options['start_page'] = $wp_query->query_vars['vp_page_query'] ?? $vp_page ?? 1;
+                                $options['start_page'] = $wp_query->query_vars['vp_page_query'] ?? $wp_query->query_vars['paged'] ?? $vp_page ?? 1;
                             } else {
                                 unset( $options['layout_elements'][ $position ]['elements'][ $key ] );
                             }
