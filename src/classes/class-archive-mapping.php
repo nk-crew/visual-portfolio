@@ -546,7 +546,17 @@ class Visual_Portfolio_Archive_Mapping {
             }
         }
 
-        if ( is_post_type_archive( $post_type ) && '' !== $this->archive_page && $query->is_main_query() ) {
+        if (
+            (
+                is_post_type_archive( $post_type ) ||
+                (
+                    (int) get_option( 'page_on_front' ) === (int) $this->archive_page &&
+                    isset( $object_id ) &&
+                    (int) $object_id === (int) $this->archive_page
+                )
+            ) &&
+            '' !== $this->archive_page && $query->is_main_query()
+        ) {
             $post_id = absint( $this->archive_page );
             $post_id = Visual_Portfolio_3rd_WPML::get_object_id( $post_id );
             $query->set( 'post_type', 'page' );
