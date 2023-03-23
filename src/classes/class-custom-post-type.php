@@ -113,9 +113,9 @@ class Visual_Portfolio_Custom_Post_Type {
      * Add custom post type
      */
     public function add_custom_post_type() {
-
-        $custom_slug = Visual_Portfolio_Archive_Mapping::get_portfolio_slug();
-        $permalinks  = Visual_Portfolio_Archive_Mapping::get_permalink_structure( true );
+        $archive_page = Visual_Portfolio_Settings::get_option( 'portfolio_archive_page', 'vp_general' );
+        $custom_slug  = (int) get_option( 'page_on_front' ) === (int) $archive_page ? '/' : Visual_Portfolio_Archive_Mapping::get_portfolio_slug();
+        $permalinks   = Visual_Portfolio_Archive_Mapping::get_permalink_structure( true );
 
         // portfolio items post type.
         if ( self::portfolio_post_type_is_registered() ) {

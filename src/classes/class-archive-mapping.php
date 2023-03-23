@@ -79,9 +79,44 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'vpf_extend_filter_items', array( $this, 'add_filter_items' ), 10, 2 );
             add_filter( 'the_title', array( $this, 'set_archive_title' ), 10, 2 );
             add_filter( 'body_class', array( $this, 'add_body_archive_classes' ), 10, 1 );
+            add_filter( 'redirect_canonical', array( $this, 'maybe_redirect_canonical_links' ), 10, 2 );
         }
 
         self::create_archive_page();
+    }
+
+    /**
+     * Maybe redirect canonical Portfolio Archive Page if page set as front page.
+     *
+     * @param string $redirect_url - Redirect URL.
+     * @param string $requested_url - Requested URL.
+     * @return string|bool
+     */
+    public function maybe_redirect_canonical_links( $redirect_url, $requested_url ) {
+        if (
+            untrailingslashit( $redirect_url ) === untrailingslashit( get_home_url() ) &&
+            (int) get_option( 'page_on_front' ) === (int) $this->archive_page
+        ) {
+
+            $queried_object       = get_queried_object();
+            $is_category_redirect = strpos( $requested_url, $this->permalinks['category_base'] ) !== false;
+            $is_tag_redirect      = strpos( $requested_url, $this->permalinks['tag_base'] ) !== false;
+            $is_portfolio_archive = ! $is_category_redirect &&
+                                    ! $is_tag_redirect &&
+                                    strpos( $requested_url, $this->permalinks['portfolio_base'] ) !== false &&
+                                    isset( $queried_object ) &&
+                                    (int) $queried_object->ID === (int) $this->archive_page;
+            $parse_page_from_link = intval( untrailingslashit( str_replace( trailingslashit( $redirect_url ) . 'page/', '', $requested_url ) ) );
+
+            if ( $is_portfolio_archive ) {
+                $redirect_url = get_home_url();
+            }
+
+            if ( $is_category_redirect || $is_tag_redirect || $parse_page_from_link > 0 ) {
+                $redirect_url = false;
+            }
+        }
+        return $redirect_url;
     }
 
     /**
