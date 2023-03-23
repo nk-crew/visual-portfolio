@@ -490,9 +490,26 @@ class Visual_Portfolio_Archive_Mapping {
             'index.php?post_type=portfolio&vp_page_archive=1&vp_page_query=$matches[1]',
             'top'
         );
+        if ( (int) get_option( 'page_on_front' ) === (int) $this->archive_page ) {
+            add_rewrite_rule(
+                '^page/?([0-9]{1,})/?',
+                'index.php?post_type=portfolio&vp_page_archive=1&vp_page_query=$matches[1]',
+                'top'
+            );
+        }
+        add_rewrite_rule(
+            '^' . $this->permalinks['category_base'] . '/([^/]*)/page/?([0-9]{1,})/?',
+            'index.php?post_type=portfolio&vp_page_archive=1&vp_category=$matches[1]&vp_page_query=$matches[2]',
+            'top'
+        );
         add_rewrite_rule(
             '^' . $this->permalinks['category_base'] . '/([^/]*)/?',
             'index.php?post_type=portfolio&vp_page_archive=1&vp_category=$matches[1]',
+            'top'
+        );
+        add_rewrite_rule(
+            '^' . $this->permalinks['tag_base'] . '/([^/]*)/page/?([0-9]{1,})/?',
+            'index.php?post_type=portfolio&vp_page_archive=1&portfolio_tag=$matches[1]&vp_page_query=$matches[2]',
             'top'
         );
         add_rewrite_rule(
