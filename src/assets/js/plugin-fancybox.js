@@ -157,6 +157,11 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
           self.emitEvent('beforeShowFancybox', [e, instance]);
         }
       },
+      afterShow(e, instance) {
+        if (self) {
+          self.emitEvent('afterShowFancybox', [e, instance]);
+        }
+      },
     };
 
     if (self) {
