@@ -229,4 +229,10 @@
     padding-top: 0.02px;
     padding-bottom: 0.02px;
   }
+
+  // Fix caption width in slider when used automatic slide width.
+  [data-vp-slider-slides-per-view="auto"] & .vp-portfolio__item-overlay {
+    width: 0;
+    min-width: 100%;
+  }
 }

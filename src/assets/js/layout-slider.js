@@ -2,11 +2,30 @@
  * External dependencies.
  */
 import isNumber from 'is-number';
+import { throttle } from 'throttle-debounce';
 
 /*
  * Visual Portfolio layout Slider.
  */
 const $ = window.jQuery;
+
+// Listen for slider width change to calculate dynamic height of images.
+const dynamicHeightObserver = new ResizeObserver(
+  throttle(100, (entries) => {
+    entries.forEach(({ target }) => {
+      if (target && target.vpf) {
+        const self = target.vpf;
+
+        const calculatedHeight =
+          (self.$item.width() * parseFloat(self.options.sliderItemsHeight)) / 100;
+
+        target
+          .querySelector('.vp-portfolio__items-wrap')
+          .style.setProperty('--vp-layout-slider--auto-items__height', `${calculatedHeight}px`);
+      }
+    });
+  })
+);
 
 // Init Layout.
 $(document).on('initLayout.vpf', (event, self) => {
@@ -46,56 +65,33 @@ $(document).on('initLayout.vpf', (event, self) => {
         itemsWidth = '100%';
       }
 
-      // dynamic.
+      // Calculate dynamic height.
+      // Previously we tried the pure CSS solution, but there was couple bugs like:
+      // - Classic styles items wrong height
+      // - FireFox wrong images width render
       if (itemsHeight.indexOf('%') === itemsHeight.length - 1) {
-        self.addStyle(`.vp-portfolio__${type}-wrap::before`, {
-          content: '""',
-          display: 'block',
-          width: '100%',
-          'margin-top': itemsHeight,
-        });
-        self.addStyle(`.vp-portfolio__${type}`, {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-        });
-        self.addStyle(`.vp-portfolio__${typeSingle}-wrap`, {
-          width: 'auto',
-          height: 'true' === self.options.sliderBullets ? 'calc( 100% - 25px )' : '100%',
-        });
-        self.addStyle(
-          `.vp-portfolio__${typeSingle}, .vp-portfolio__${typeSingle}-img-wrap, .vp-portfolio__${typeSingle}-img, .vp-portfolio__${typeSingle}-wrap .vp-portfolio__${typeSingle} .vp-portfolio__${typeSingle}-img a, .vp-portfolio__${typeSingle}-wrap .vp-portfolio__${typeSingle} .vp-portfolio__${typeSingle}-img img`,
-          {
-            width: itemsWidth,
-            height: '100%',
-          }
-        );
+        dynamicHeightObserver.observe(self.$item[0]);
 
-        // min height.
-        if (itemsMinHeight) {
-          self.addStyle(`.vp-portfolio__${type}-wrap`, {
-            'min-height': itemsMinHeight,
-          });
-        }
-
-        // static.
+        // Static height.
       } else {
-        self.addStyle(`.vp-portfolio__${typeSingle}-wrap`, {
-          width: 'auto',
+        self.addStyle(`.vp-portfolio__${type}-wrap`, {
+          '--vp-layout-slider--auto-items__height': itemsHeight,
         });
-        self.addStyle(`.vp-portfolio__${typeSingle} .vp-portfolio__${typeSingle}-img img`, {
-          width: itemsWidth,
-          height: itemsHeight,
-        });
+      }
 
-        // min height.
-        if (itemsMinHeight) {
-          self.addStyle(`.vp-portfolio__${typeSingle} .vp-portfolio__${typeSingle}-img img`, {
-            'min-height': itemsMinHeight,
-          });
-        }
+      self.addStyle(`.vp-portfolio__${typeSingle}-wrap`, {
+        width: 'auto',
+      });
+      self.addStyle(`.vp-portfolio__${typeSingle} .vp-portfolio__${typeSingle}-img img`, {
+        width: itemsWidth,
+        height: 'var(--vp-layout-slider--auto-items__height)',
+      });
+
+      // min height.
+      if (itemsMinHeight) {
+        self.addStyle(`.vp-portfolio__${typeSingle} .vp-portfolio__${typeSingle}-img img`, {
+          'min-height': itemsMinHeight,
+        });
       }
     } else {
       self.addStyle(`.vp-portfolio__${typeSingle}-img-wrap::before`, {
