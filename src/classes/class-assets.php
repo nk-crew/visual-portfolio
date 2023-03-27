@@ -395,8 +395,8 @@ class Visual_Portfolio_Assets {
                 wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper-5-3-6/swiper.min.css', array(), '5.3.6' );
                 wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper-5-3-6/swiper.min.js', array(), '5.3.6', true );
             } else {
-                wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '8.3.2' );
-                wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '8.3.2', true );
+                wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '8.4.7' );
+                wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '8.4.7', true );
             }
         }
 
