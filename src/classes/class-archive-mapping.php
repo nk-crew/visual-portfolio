@@ -616,6 +616,19 @@ class Visual_Portfolio_Archive_Mapping {
                 unset( $query->query['vp_page_query'] );
                 unset( $query->query_vars['vp_page_query'] );
             }
+
+            if ( isset( $query->query['portfolio_tag'] ) && isset( $query->query['vp_page_archive'] ) ) {
+                /**
+                 * Fix WordPress Notices for Tag Taxonomy.
+                 * If not set post type from queried object, header auto classes not set and generate notice error.
+                 */
+                $query->is_page        = false;
+                $query->is_tag         = true;
+                $post                  = new stdClass();
+                $post->post_type       = $post_type;
+                $post->ID              = $post_id;
+                $query->queried_object = new WP_Post( $post );
+            }
         }
     }
 
