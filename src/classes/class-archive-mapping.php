@@ -606,23 +606,6 @@ class Visual_Portfolio_Archive_Mapping {
             }
 
             if (
-                isset( $query->query['vp_category'] ) &&
-                ! empty( $query->query['vp_category'] ) &&
-                (
-                    (
-                        // phpcs:ignore WordPress.Security.NonceVerification
-                        isset( $_GET['vp_filter'] ) && ! empty( $_GET['vp_filter'] )
-                    ) ||
-                    (
-                        // phpcs:ignore WordPress.Security.NonceVerification
-                        isset( $_REQUEST['vpf_ajax_call'] ) && settype( sanitize_text_field( wp_unslash( $_REQUEST['vpf_ajax_call'] ) ), 'bool' )
-                    )
-                )
-            ) {
-                $query->set( 'vp_filter', '' );
-            }
-
-            if (
                 isset( $query->query['vp_page_query'] ) &&
                 ! empty( $query->query['vp_page_query'] ) &&
                 (
