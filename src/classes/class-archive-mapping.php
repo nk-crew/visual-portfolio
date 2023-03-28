@@ -80,9 +80,57 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'the_title', array( $this, 'set_archive_title' ), 10, 2 );
             add_filter( 'body_class', array( $this, 'add_body_archive_classes' ), 10, 1 );
             add_filter( 'redirect_canonical', array( $this, 'maybe_redirect_canonical_links' ), 10, 2 );
+            add_filter( 'pre_get_shortlink', array( $this, 'remove_taxanomy_shortlinks' ), 10, 4 );
         }
 
         self::create_archive_page();
+    }
+
+    /**
+     * Remove Taxonomy Shortlinks.
+     *
+     * @param bool|string $shortlink   - Short-circuit return value. Either false or a URL string.
+     * @param int         $id          - Post ID, or 0 for the current post.
+     * @param string      $context     - The context for the link. One of 'post' or 'query'.
+     * @param bool        $allow_slugs - Whether to allow post slugs in the shortlink.
+     * @return bool|string
+     */
+    public function remove_taxanomy_shortlinks( $shortlink, $id, $context, $allow_slugs ) {
+        if ( 0 === $id && 'query' === $context && ! $shortlink ) {
+            $shortlink = $this->remove_taxanomy_shortlink_by_slug( get_query_var( 'vp_category' ) ) ??
+            $this->remove_taxanomy_shortlink_by_slug( get_query_var( 'portfolio_tag' ), 'portfolio_tag' ) ??
+            false;
+        }
+
+        return $shortlink;
+    }
+
+    /**
+     * Remove Taxonomy Shortlink by Taxonomy slug.
+     *
+     * @param string      $slug - Taxonomy slug.
+     * @param string      $taxonomy - Name of Taxonomy.
+     * @param bool|string $shortlink - Short-circuit return value. Either false or a URL string.
+     * @return bool|string
+     */
+    private function remove_taxanomy_shortlink_by_slug( $slug, $taxonomy = 'portfolio_category', $shortlink = false ) {
+        if ( $slug && ! empty( $slug ) ) {
+            $terms = get_terms(
+                array(
+                    'slug' => $slug,
+                )
+            );
+            if ( ! empty( $terms ) && is_array( $terms ) ) {
+                foreach ( $terms as $term ) {
+                    if ( $taxonomy === $term->taxonomy && $slug === $term->slug ) {
+                        $shortlink = '';
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $shortlink;
     }
 
     /**
