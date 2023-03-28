@@ -509,12 +509,12 @@ class Visual_Portfolio_Archive_Mapping {
         }
         add_rewrite_rule(
             '^' . $this->permalinks['category_base'] . '/([^/]*)/page/?([0-9]{1,})/?',
-            'index.php?post_type=portfolio&vp_page_archive=1&vp_category=$matches[1]&vp_page_query=$matches[2]',
+            'index.php?post_type=portfolio&vp_page_archive=1&portfolio_category=$matches[1]&vp_category=$matches[1]&vp_page_query=$matches[2]',
             'top'
         );
         add_rewrite_rule(
             '^' . $this->permalinks['category_base'] . '/([^/]*)/?',
-            'index.php?post_type=portfolio&vp_page_archive=1&vp_category=$matches[1]',
+            'index.php?post_type=portfolio&vp_page_archive=1&portfolio_category=$matches[1]&vp_category=$matches[1]&vp_page_query=1',
             'top'
         );
         add_rewrite_rule(
@@ -524,7 +524,7 @@ class Visual_Portfolio_Archive_Mapping {
         );
         add_rewrite_rule(
             '^' . $this->permalinks['tag_base'] . '/([^/]*)/?',
-            'index.php?post_type=portfolio&vp_page_archive=1&portfolio_tag=$matches[1]',
+            'index.php?post_type=portfolio&vp_page_archive=1&portfolio_tag=$matches[1]&vp_page_query=1',
             'top'
         );
     }
@@ -704,7 +704,10 @@ class Visual_Portfolio_Archive_Mapping {
                                 // phpcs:ignore WordPress.Security.NonceVerification
                                 $vp_page = isset( $_REQUEST['vp_page'] ) && ! empty( $_REQUEST['vp_page'] ) ? sanitize_option( 'posts_per_page', wp_unslash( $_REQUEST['vp_page'] ) ) : null;
 
-                                $options['start_page'] = $wp_query->query_vars['vp_page_query'] ?? $wp_query->query_vars['paged'] ?? $vp_page ?? 1;
+                                $options['start_page'] = $wp_query->query_vars['vp_page_query'] ?? $vp_page ?? $wp_query->query_vars['paged'] ?? 1;
+                                if ( 0 === $options['start_page'] && 0 === $wp_query->query_vars['paged'] ) {
+                                    $options['start_page'] = 1;
+                                }
                             } else {
                                 unset( $options['layout_elements'][ $position ]['elements'][ $key ] );
                             }
