@@ -389,15 +389,8 @@ class Visual_Portfolio_Assets {
 
         // Swiper.
         if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            // Add legacy swiper version in order to support Elementor plugin.
-            // https://wordpress.org/support/topic/visual-portfolio-elementor-issue/.
-            if ( class_exists( '\Elementor\Plugin' ) ) {
-                wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper-5-3-6/swiper.min.css', array(), '5.3.6' );
-                wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper-5-3-6/swiper.min.js', array(), '5.3.6', true );
-            } else {
-                wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '8.4.7' );
-                wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '8.4.7', true );
-            }
+            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '8.4.7' );
+            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '8.4.7', true );
         }
 
         // Simplebar.
