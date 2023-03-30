@@ -823,6 +823,9 @@ class Visual_Portfolio_Archive_Mapping {
 
     /**
      * Rewrite Flush Rules after update front page option.
+     * We need this because when we set the Portfolio page as Front Page
+     * and then change this option back, our portfolio archive no longer displays the correct portfolio query.
+     * We have to refresh permalinks manually.
      *
      * @param  array  $old_value - Old value before update.
      * @param  array  $value - New value after update.
