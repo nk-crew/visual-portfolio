@@ -66,6 +66,7 @@ class Visual_Portfolio_Archive_Mapping {
             add_action( 'deleted_post', array( $this, 'delete_archive_page' ), 10, 1 );
             add_action( 'trashed_post', array( $this, 'delete_archive_page' ), 10, 1 );
             add_action( 'update_option_vp_general', array( $this, 'flush_rewrite_rules_after_update' ), 10, 3 );
+            add_action( 'update_option_page_on_front', array( $this, 'flush_rewrite_rules_after_update_front_page' ), 10, 3 );
             add_action( 'vpf_extend_query_args', array( $this, 'extend_query_args' ), 10, 2 );
             add_filter( 'vpf_layout_element_options', array( $this, 'unset_pagination_archive_page' ), 10, 1 );
 
@@ -817,6 +818,20 @@ class Visual_Portfolio_Archive_Mapping {
             Settings::update_option( 'portfolio_archive_page', 'vp_general', '' );
 
             self::delete_post_type_mapped_meta();
+        }
+    }
+
+    /**
+     * Rewrite Flush Rules after update front page option.
+     *
+     * @param  array  $old_value - Old value before update.
+     * @param  array  $value - New value after update.
+     * @param  string $option - Name of option.
+     * @return void
+     */
+    public function flush_rewrite_rules_after_update_front_page( $old_value, $value, $option ) {
+        if ( 'page_on_front' === $option ) {
+            visual_portfolio()->defer_flush_rewrite_rules();
         }
     }
 
