@@ -228,7 +228,7 @@ ControlsRender.Control = function (props) {
       const isEnd =
         $nextSibling &&
         !$nextSibling.classList.contains(`vpf-control-group-${props.group}`) &&
-        $prevSibling.classList.contains(`vpf-control-wrap`);
+        $nextSibling.classList.contains(`vpf-control-wrap`);
 
       let newPosition = '';
 
