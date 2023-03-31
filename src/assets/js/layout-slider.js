@@ -94,8 +94,11 @@ $(document).on('initLayout.vpf', (event, self) => {
         });
       }
     } else {
+      // We have to use this hack with Before to support Dynamic height.
+      // Also, previously we used the `margin-top`,
+      // but it is not working correctly with Items Mininmal Height option.
       self.addStyle(`.vp-portfolio__${typeSingle}-img-wrap::before`, {
-        'margin-top': itemsHeight,
+        'padding-top': itemsHeight,
       });
       self.addStyle(`.vp-portfolio__${typeSingle}-img img`, {
         position: 'absolute',
@@ -118,7 +121,7 @@ $(document).on('initLayout.vpf', (event, self) => {
 
       // min height.
       if (itemsMinHeight) {
-        self.addStyle(`.vp-portfolio__${typeSingle}-img-wrap`, {
+        self.addStyle(`.vp-portfolio__${typeSingle}-img-wrap::before`, {
           'min-height': itemsMinHeight,
         });
       }
