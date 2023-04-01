@@ -315,6 +315,7 @@ ControlsRender.Control = function (props) {
           value={controlVal}
           options={props.options}
           onChange={(val) => onChange(val)}
+          collapseRows={props.collapse_rows || false}
           isSetupWizard={isSetupWizard}
         />
       );

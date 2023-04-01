@@ -1433,6 +1433,7 @@ class Visual_Portfolio_Admin {
                 'type'           => 'icons_selector',
                 'name'           => 'posts_source',
                 'default'        => 'portfolio',
+                'collapse_rows'  => 1,
                 'value_callback' => array( $this, 'find_post_types_options' ),
             )
         );
@@ -2132,12 +2133,13 @@ class Visual_Portfolio_Admin {
 
         Visual_Portfolio_Controls::register(
             array(
-                'category'     => 'items-style',
-                'type'         => 'icons_selector',
-                'name'         => 'items_style',
-                'default'      => 'fade',
-                'options'      => $items_styles_selector,
-                'setup_wizard' => true,
+                'category'      => 'items-style',
+                'type'          => 'icons_selector',
+                'name'          => 'items_style',
+                'default'       => 'fade',
+                'collapse_rows' => 1,
+                'options'       => $items_styles_selector,
+                'setup_wizard'  => true,
             )
         );
 
