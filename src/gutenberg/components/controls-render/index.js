@@ -561,8 +561,10 @@ ControlsRender.Control = function (props) {
     'vpf.editor.controls-render-inner-data',
     {
       renderControl,
+      renderControlLabel,
       renderControlHelp,
       renderControlAfter,
+      renderControlClassName,
     },
     { props, controlVal }
   );
@@ -570,7 +572,7 @@ ControlsRender.Control = function (props) {
   return (
     <>
       {'start' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
-      <BaseControl label={renderControlLabel} className={renderControlClassName}>
+      <BaseControl label={data.renderControlLabel} className={data.renderControlClassName}>
         <div ref={$ref}>{data.renderControl}</div>
         {data.renderControlHelp}
       </BaseControl>
