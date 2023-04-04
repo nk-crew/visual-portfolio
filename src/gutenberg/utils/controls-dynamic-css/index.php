@@ -29,9 +29,9 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
             return $result;
         }
 
-        $selector = '.vp-id-' . $selector;
-
-        $registered = Visual_Portfolio_Controls::get_registered_array();
+        $selector             = '.vp-id-' . $selector;
+        $registered           = Visual_Portfolio_Controls::get_registered_array();
+        $control_styles_array = array();
 
         // Controls styles.
         foreach ( $registered as $k => $control ) {
@@ -56,9 +56,31 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
                         }
                     }
 
-                    $result .= self::prepare_styles_from_params( $selector, $val, $data );
+                    $styles_array = self::prepare_styles_from_params( $selector, $val, $data );
+
+                    if ( $styles_array ) {
+                        $control_styles_array = array_merge_recursive(
+                            $control_styles_array,
+                            array(
+                                $styles_array['selector'] => array(
+                                    $styles_array['property'] => $styles_array['value'],
+                                ),
+                            )
+                        );
+                    }
                 }
             }
+        }
+
+        // Prepare CSS of controls.
+        foreach ( $control_styles_array as $selector => $styles ) {
+            $result .= $selector . " {\n";
+
+            foreach ( $styles as $prop => $val ) {
+                $result .= "  {$prop}: {$val};\n";
+            }
+
+            $result .= "}\n";
         }
 
         // Custom CSS.
@@ -100,10 +122,8 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
      * @return string
      */
     public static function prepare_styles_from_params( $selector, $value, $params ) {
-        $result = '';
-
         if ( ! $selector || ! isset( $value ) || '' === $value || null === $value || ! isset( $params['property'] ) ) {
-            return $result;
+            return false;
         }
 
         // Value mask.
@@ -120,9 +140,10 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
 
         $property = $params['property'];
 
-        // Prepare CSS.
-        $result = "${selector} { ${property}: ${value}; } ";
-
-        return $result;
+        return array(
+            'selector' => $selector,
+            'property' => $property,
+            'value'    => $value,
+        );
     }
 }

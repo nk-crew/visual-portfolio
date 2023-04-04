@@ -22,8 +22,6 @@ const { controls: registeredControls } = window.VPGutenbergVariables;
  * @returns {String}
  */
 export function prepareStylesFromParams(selector, value, params) {
-  let result = '';
-
   if (
     !selector ||
     'undefined' === typeof value ||
@@ -31,7 +29,7 @@ export function prepareStylesFromParams(selector, value, params) {
     null === value ||
     'undefined' === typeof params.property
   ) {
-    return result;
+    return false;
   }
 
   // Value mask.
@@ -46,10 +44,11 @@ export function prepareStylesFromParams(selector, value, params) {
     selector += 'undefined' !== typeof params.element ? ` ${params.element}` : '';
   }
 
-  // Prepare CSS.
-  result = `${selector} { ${params.property}: ${value}; } `;
-
-  return result;
+  return {
+    selector,
+    property: params.property,
+    value,
+  };
 }
 
 /**
@@ -88,6 +87,7 @@ export default function getDynamicCSS(options) {
   }
 
   selector = `.vp-id-${selector}`;
+  let controlStylesObject = {};
 
   // Controls styles.
   Object.keys(registeredControls).forEach((k) => {
@@ -113,9 +113,32 @@ export default function getDynamicCSS(options) {
           }
         }
 
-        result += prepareStylesFromParams(selector, val, data);
+        const stylesObject = prepareStylesFromParams(selector, val, data);
+
+        if (stylesObject) {
+          controlStylesObject = {
+            ...controlStylesObject,
+            ...{
+              [stylesObject.selector]: {
+                ...(controlStylesObject?.[stylesObject.selector] || {}),
+                [stylesObject.property]: stylesObject.value,
+              },
+            },
+          };
+        }
       });
     }
+  });
+
+  // Prepare CSS of controls.
+  Object.keys(controlStylesObject).forEach((sel) => {
+    result += `${sel} {\n`;
+
+    Object.keys(controlStylesObject[sel]).forEach((prop) => {
+      result += `  ${prop}: ${controlStylesObject[sel][prop]};\n`;
+    });
+
+    result += `}\n`;
   });
 
   // Custom CSS.
