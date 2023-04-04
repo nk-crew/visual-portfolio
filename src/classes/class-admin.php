@@ -223,7 +223,7 @@ class Visual_Portfolio_Admin {
     /**
      * Add Go Pro link to plugins page.
      *
-     * @param Array $links - available links.
+     * @param array $links - available links.
      *
      * @return array
      */
@@ -1347,12 +1347,12 @@ class Visual_Portfolio_Admin {
                     'icon'      => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="7.35714" height="5.35714" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="11.8929" y="13.8928" width="7.35714" height="5.35715" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="11.8929" y="0.75" width="7.35714" height="9.35714" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><rect x="0.75" y="9.89285" width="7.35714" height="9.35715" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
                 ),
                 'items-style'                  => array(
-                    'title'     => esc_html__( 'Items Style', '@@text_domain' ),
+                    'title'     => esc_html__( 'Skin', '@@text_domain' ),
                     'is_opened' => false,
                     'icon'      => '<svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="19.283" y2="-0.75" transform="matrix(0.998303 0.0582344 -0.0575156 0.998345 0 13.225)" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent"/><line x1="5.89285" y1="16.2125" x2="14.1071" y2="16.2125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent"/></svg>',
                 ),
                 'items-click-action'           => array(
-                    'title'     => esc_html__( 'Items Click Action', '@@text_domain' ),
+                    'title'     => esc_html__( 'Click Action', '@@text_domain' ),
                     'is_opened' => false,
                     'icon'      => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.9857 10.718L2.83729 12.8686M13.933 13.9327L11.9062 19L7.85261 7.85198L19 11.9058L13.933 13.9327ZM13.933 13.9327L19 19L13.933 13.9327ZM6.01633 1L6.80374 3.93598L6.01633 1ZM3.93683 6.80305L1 6.0156L3.93683 6.80305ZM12.8689 2.83537L10.7185 4.98592L12.8689 2.83537Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent"/></svg>',
                 ),
