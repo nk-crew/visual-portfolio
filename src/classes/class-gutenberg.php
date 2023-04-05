@@ -60,13 +60,23 @@ class Visual_Portfolio_Gutenberg_Block {
                 continue;
             }
 
-            if ( 'html' === $control['type'] ) {
+            if ( 'html' === $control['type'] || 'notice' === $control['type'] || 'pro_note' === $control['type'] ) {
                 continue;
             }
 
-            $attributes[ $control['name'] ] = array(
-                'type' => 'string',
+            $attribute_data = apply_filters(
+                'vpf_register_block_attribute_data',
+                array(
+                    'type' => 'string',
+                ),
+                $control
             );
+
+            if ( ! $attribute_data ) {
+                continue;
+            }
+
+            $attributes[ $control['name'] ] = $attribute_data;
 
             switch ( $control['type'] ) {
                 case 'checkbox':
@@ -104,16 +114,18 @@ class Visual_Portfolio_Gutenberg_Block {
                         'type' => 'object',
                     );
                     break;
-                case 'notice':
-                case 'pro_note':
-                    unset( $attributes[ $control['name'] ] );
-                    break;
             }
 
             if ( isset( $control['default'] ) ) {
                 $attributes[ $control['name'] ]['default'] = $control['default'];
             }
         }
+
+        $attributes = apply_filters(
+            'vpf_register_block_attributes',
+            $attributes,
+            $controls
+        );
 
         register_block_type(
             visual_portfolio()->plugin_path . 'gutenberg/block',
