@@ -8,28 +8,28 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 5px;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    height: 42px;
+    padding: 10px 16px;
 
     > span {
       width: 20px;
       height: 2px;
       background-color: #ccc;
-      border-radius: 2px;
       opacity: 0;
 
       &:nth-child(1) {
-        width: 20px;
+        width: 12px;
       }
 
       &:nth-child(2) {
-        width: 26px;
+        width: 18px;
       }
 
       &:nth-child(3) {
-        width: 14px;
+        width: 8px;
       }
     }
 
