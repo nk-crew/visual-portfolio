@@ -46,6 +46,7 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
             if ( $allow ) {
                 foreach ( $control['style'] as $data ) {
                     $val = $options[ $control['name'] ];
+                    $val = apply_filters( 'vpf_controls_dynamic_css_value', $val, $options, $control, $selector, $data );
 
                     // Prepare Aspect Ratio control value.
                     if ( isset( $control['type'] ) && 'aspect_ratio' === $control['type'] && $val ) {
@@ -57,15 +58,12 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
                     }
 
                     $styles_array = self::prepare_styles_from_params( $selector, $val, $data );
+                    $styles_array = apply_filters( 'vpf_controls_dynamic_css_styles_array', $styles_array, $selector, $val, $data, $options, $control );
 
                     if ( $styles_array ) {
                         $control_styles_array = array_merge_recursive(
                             $control_styles_array,
-                            array(
-                                $styles_array['selector'] => array(
-                                    $styles_array['property'] => $styles_array['value'],
-                                ),
-                            )
+                            $styles_array
                         );
                     }
                 }
@@ -119,7 +117,7 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
      * @param mixed  $value Property value.
      * @param array  $params Output params.
      *
-     * @return string
+     * @return array|bool
      */
     public static function prepare_styles_from_params( $selector, $value, $params ) {
         if ( ! $selector || ! isset( $value ) || '' === $value || null === $value || ! isset( $params['property'] ) ) {
@@ -141,9 +139,9 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
         $property = $params['property'];
 
         return array(
-            'selector' => $selector,
-            'property' => $property,
-            'value'    => $value,
+            $selector => array(
+                $property => $value,
+            ),
         );
     }
 }

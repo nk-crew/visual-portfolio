@@ -167,7 +167,7 @@ class Visual_Portfolio_Gutenberg_Block {
         wp_enqueue_script(
             'visual-portfolio-gutenberg',
             plugins_url( '../gutenberg/index.min.js', __FILE__ ),
-            array( 'wp-i18n', 'wp-element', 'wp-components', 'jquery' ),
+            array( 'wp-i18n', 'wp-element', 'wp-components', 'jquery', 'lodash' ),
             '@@plugin_version',
             true
         );

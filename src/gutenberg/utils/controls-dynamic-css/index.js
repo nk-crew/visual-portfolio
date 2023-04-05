@@ -4,6 +4,10 @@
 import conditionCheck from '../control-condition-check';
 import { maybeDecode } from '../encode-decode';
 
+const { merge } = window.lodash;
+
+const { applyFilters } = wp.hooks;
+
 const { controls: registeredControls } = window.VPGutenbergVariables;
 
 /**
@@ -45,9 +49,9 @@ export function prepareStylesFromParams(selector, value, params) {
   }
 
   return {
-    selector,
-    property: params.property,
-    value,
+    [selector]: {
+      [params.property]: value,
+    },
   };
 }
 
@@ -103,6 +107,14 @@ export default function getDynamicCSS(options) {
     if (allow) {
       control.style.forEach((data) => {
         let val = options[control.name];
+        val = applyFilters(
+          'vpf.editor.controls-dynamic-css-value',
+          val,
+          options,
+          control,
+          selector,
+          data
+        );
 
         // Prepare Aspect Ratio control value.
         if (control.type && 'aspect_ratio' === control.type && val) {
@@ -113,18 +125,19 @@ export default function getDynamicCSS(options) {
           }
         }
 
-        const stylesObject = prepareStylesFromParams(selector, val, data);
+        let stylesObject = prepareStylesFromParams(selector, val, data);
+        stylesObject = applyFilters(
+          'vpf.editor.controls-dynamic-css-styles-object',
+          stylesObject,
+          selector,
+          val,
+          data,
+          options,
+          control
+        );
 
         if (stylesObject) {
-          controlStylesObject = {
-            ...controlStylesObject,
-            ...{
-              [stylesObject.selector]: {
-                ...(controlStylesObject?.[stylesObject.selector] || {}),
-                [stylesObject.property]: stylesObject.value,
-              },
-            },
-          };
+          controlStylesObject = merge(controlStylesObject, stylesObject);
         }
       });
     }
