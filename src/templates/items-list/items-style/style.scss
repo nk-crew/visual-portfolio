@@ -5,15 +5,15 @@
  */
 .vp-portfolio__items-style-default {
   .vp-portfolio__item a {
-    color: var(--vp-items-style-default--links__color);
-    text-decoration: var(--vp-items-style-default--links__text-decoration);
+    color: var(--vp-items-style-default--meta_links__color);
+    text-decoration: var(--vp-items-style-default--meta_links__text-decoration);
     outline: none;
     box-shadow: none;
     transition: var(--vp-items-style-default-transition-duration) color var(--vp-items-style-default-transition-easing);
 
     &:hover,
     &:focus {
-      color: var(--vp-items-style-default--links-hover__color);
+      color: var(--vp-items-style-default--meta_links-hover__color);
     }
   }
 

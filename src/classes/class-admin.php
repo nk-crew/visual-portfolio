@@ -921,7 +921,6 @@ class Visual_Portfolio_Admin {
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="5.89285" y1="22.25" x2="14.1071" y2="22.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
                     'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-classic.png',
                     'builtin_controls'     => array(
-                        'images_rounded_corners' => true,
                         'show_title'             => true,
                         'show_categories'        => true,
                         'show_date'              => true,
@@ -930,112 +929,17 @@ class Visual_Portfolio_Admin {
                         'show_views_count'       => true,
                         'show_reading_time'      => true,
                         'show_excerpt'           => true,
+                        'show_read_more'         => true,
                         'show_icons'             => true,
+                        'images_rounded_corners' => true,
+                        'overlay'                => true,
+                        'caption'                => array(
+                            'name' => 'meta',
+                        ),
+                        'typography'             => true,
                         'align'                  => true,
                     ),
                     'controls'             => array(
-                        array(
-                            'type'    => 'radio',
-                            'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
-                            'name'    => 'show_read_more',
-                            'default' => 'false',
-                            'options' => array(
-                                'false'    => esc_html__( 'Hide', '@@text_domain' ),
-                                'true'     => esc_html__( 'Always Display', '@@text_domain' ),
-                                'more_tag' => esc_html__( 'Display when used `More tag` in the post', '@@text_domain' ),
-                            ),
-                        ),
-                        array(
-                            'type'        => 'text',
-                            'name'        => 'read_more_label',
-                            'default'     => 'Read More',
-                            'description' => esc_attr__( 'Read More button label', '@@text_domain' ),
-                            'wpml'        => true,
-                            'condition'   => array(
-                                array(
-                                    'control'  => 'show_read_more',
-                                    'operator' => '!=',
-                                    'value'    => 'false',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'    => 'radio',
-                            'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
-                            'name'    => 'show_overlay',
-                            'group'   => 'items_style_overlay',
-                            'default' => 'hover',
-                            'options' => array(
-                                'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
-                                'default' => esc_html__( 'Default State Only', '@@text_domain' ),
-                                'always'  => esc_html__( 'Always', '@@text_domain' ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'  => 'bg_color',
-                            'group' => 'items_style_overlay',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-default',
-                                    'property' => '--vp-items-style-default--overlay__background-color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'  => 'text_color',
-                            'group' => 'items_style_overlay',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-default',
-                                    'property' => '--vp-items-style-default--overlay__color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Caption Text Color', '@@text_domain' ),
-                            'name'  => 'meta_text_color',
-                            'group' => 'items_style_caption',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-default',
-                                    'property' => '--vp-items-style-default--meta__color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Caption Links Color', '@@text_domain' ),
-                            'name'  => 'meta_links_color',
-                            'group' => 'items_style_caption',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-default',
-                                    'property' => '--vp-items-style-default--links__color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Caption Links Hover Color', '@@text_domain' ),
-                            'name'  => 'meta_links_hover_color',
-                            'group' => 'items_style_caption',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-default',
-                                    'property' => '--vp-items-style-default--links-hover__color',
-                                ),
-                            ),
-                        ),
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
@@ -1056,7 +960,6 @@ class Visual_Portfolio_Admin {
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="5.89285" y1="10.25" x2="14.1071" y2="10.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-fade.png',
                     'builtin_controls'     => array(
-                        'images_rounded_corners' => true,
                         'show_title'             => true,
                         'show_categories'        => true,
                         'show_date'              => true,
@@ -1065,48 +968,15 @@ class Visual_Portfolio_Admin {
                         'show_views_count'       => true,
                         'show_reading_time'      => true,
                         'show_excerpt'           => true,
+                        'show_read_more'         => false,
                         'show_icons'             => true,
+                        'images_rounded_corners' => true,
+                        'overlay'                => true,
+                        'caption'                => false,
+                        'typography'             => true,
                         'align'                  => 'extended',
                     ),
                     'controls'             => array(
-                        array(
-                            'type'    => 'radio',
-                            'label'   => esc_html__( 'Display Overlay', '@@text_domain' ),
-                            'name'    => 'show_overlay',
-                            'group'   => 'items_style_overlay',
-                            'default' => 'hover',
-                            'options' => array(
-                                'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
-                                'default' => esc_html__( 'Default State Only', '@@text_domain' ),
-                                'always'  => esc_html__( 'Always', '@@text_domain' ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'  => 'bg_color',
-                            'group' => 'items_style_overlay',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fade',
-                                    'property' => '--vp-items-style-fade--overlay__background-color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'  => 'text_color',
-                            'group' => 'items_style_overlay',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fade',
-                                    'property' => '--vp-items-style-fade--overlay__color',
-                                ),
-                            ),
-                        ),
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
@@ -1127,7 +997,6 @@ class Visual_Portfolio_Admin {
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="9.8875" x2="4.39286" y2="9.8875" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="10.4643" y1="0.75" x2="10.4643" y2="19.375" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-fly.png',
                     'builtin_controls'     => array(
-                        'images_rounded_corners' => true,
                         'show_title'             => true,
                         'show_categories'        => true,
                         'show_date'              => true,
@@ -1136,36 +1005,17 @@ class Visual_Portfolio_Admin {
                         'show_views_count'       => true,
                         'show_reading_time'      => true,
                         'show_excerpt'           => true,
+                        'show_read_more'         => false,
                         'show_icons'             => true,
+                        'images_rounded_corners' => true,
+                        'overlay'                => array(
+                            'states' => false,
+                        ),
+                        'caption'                => false,
+                        'typography'             => true,
                         'align'                  => 'extended',
                     ),
                     'controls'             => array(
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Background Color', '@@text_domain' ),
-                            'name'  => 'bg_color',
-                            'group' => 'items_style_overlay',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fly',
-                                    'property' => '--vp-items-style-fly--overlay__background-color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Overlay Text Color', '@@text_domain' ),
-                            'name'  => 'text_color',
-                            'group' => 'items_style_overlay',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-fly',
-                                    'property' => '--vp-items-style-fly--overlay__color',
-                                ),
-                            ),
-                        ),
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
@@ -1186,7 +1036,6 @@ class Visual_Portfolio_Admin {
                     'icon'                 => '<svg width="21" height="23" viewBox="0 0 21 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="19.283" y2="-0.75" transform="matrix(0.998303 0.0582344 -0.0575156 0.998345 0 13.225)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="5.89285" y1="16.2125" x2="14.1071" y2="16.2125" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-emerge.png',
                     'builtin_controls'     => array(
-                        'images_rounded_corners' => true,
                         'show_title'             => true,
                         'show_categories'        => true,
                         'show_date'              => true,
@@ -1195,99 +1044,25 @@ class Visual_Portfolio_Admin {
                         'show_views_count'       => true,
                         'show_reading_time'      => true,
                         'show_excerpt'           => true,
+                        'show_read_more'         => false,
                         'show_icons'             => false,
+                        'images_rounded_corners' => true,
+                        'overlay'                => array(
+                            'label' => esc_html__( 'Caption', '@@text_domain' ),
+                            'links' => true,
+                        ),
+                        'caption'                => array(
+                            'name'         => 'img_overlay',
+                            'css_var_name' => 'img-overlay',
+                            'label'        => esc_html__( 'Image Overlay', '@@text_domain' ),
+                            'background'   => true,
+                            'text'         => false,
+                            'links'        => false,
+                        ),
+                        'typography'             => true,
                         'align'                  => true,
                     ),
                     'controls'             => array(
-                        array(
-                            'type'    => 'radio',
-                            'label'   => esc_html__( 'Display Caption', '@@text_domain' ),
-                            'name'    => 'show_overlay',
-                            'group'   => 'items_style_caption',
-                            'default' => 'hover',
-                            'options' => array(
-                                'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
-                                'default' => esc_html__( 'Default State Only', '@@text_domain' ),
-                                'always'  => esc_html__( 'Always', '@@text_domain' ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Caption Background Color', '@@text_domain' ),
-                            'name'  => 'bg_color',
-                            'group' => 'items_style_caption',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-emerge',
-                                    'property' => '--vp-items-style-emerge--overlay__background-color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Caption Text Color', '@@text_domain' ),
-                            'name'  => 'text_color',
-                            'group' => 'items_style_caption',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-emerge',
-                                    'property' => '--vp-items-style-emerge--overlay__color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Caption Links Color', '@@text_domain' ),
-                            'name'  => 'links_color',
-                            'group' => 'items_style_caption',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-emerge',
-                                    'property' => '--vp-items-style-emerge--links__color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Caption Links Hover Color', '@@text_domain' ),
-                            'name'  => 'links_hover_color',
-                            'group' => 'items_style_caption',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-emerge',
-                                    'property' => '--vp-items-style-emerge--links-hover__color',
-                                ),
-                            ),
-                        ),
-                        array(
-                            'type'    => 'radio',
-                            'label'   => esc_html__( 'Display Image Overlay', '@@text_domain' ),
-                            'name'    => 'show_img_overlay',
-                            'group'   => 'items_style_overlay',
-                            'default' => 'hover',
-                            'options' => array(
-                                'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
-                                'default' => esc_html__( 'Default State Only', '@@text_domain' ),
-                                'always'  => esc_html__( 'Always', '@@text_domain' ),
-                            ),
-                        ),
-                        array(
-                            'type'  => 'color',
-                            'label' => esc_html__( 'Image Overlay Background Color', '@@text_domain' ),
-                            'name'  => 'img_overlay_bg_color',
-                            'group' => 'items_style_overlay',
-                            'alpha' => true,
-                            'style' => array(
-                                array(
-                                    'element'  => '.vp-portfolio__items-style-emerge',
-                                    'property' => '--vp-items-style-emerge--img-overlay__background-color',
-                                ),
-                            ),
-                        ),
                         array(
                             'type'        => 'pro_note',
                             'name'        => 'additional_style_settings_pro',
@@ -2142,33 +1917,92 @@ class Visual_Portfolio_Admin {
                 'setup_wizard'  => true,
             )
         );
+        Visual_Portfolio_Controls::register(
+            array(
+                'category' => 'items-style',
+                'type'     => 'category_tabs',
+                'name'     => 'items_style_subcategory',
+                'options'  => array(
+                    array(
+                        'title'    => esc_html__( 'General', '@@text_domain' ),
+                        'icon'     => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M10.289 4.836A1 1 0 0111.275 4h1.306a1 1 0 01.987.836l.244 1.466c.787.26 1.503.679 2.108 1.218l1.393-.522a1 1 0 011.216.437l.653 1.13a1 1 0 01-.23 1.273l-1.148.944a6.025 6.025 0 010 2.435l1.149.946a1 1 0 01.23 1.272l-.653 1.13a1 1 0 01-1.216.437l-1.394-.522c-.605.54-1.32.958-2.108 1.218l-.244 1.466a1 1 0 01-.987.836h-1.306a1 1 0 01-.986-.836l-.244-1.466a5.995 5.995 0 01-2.108-1.218l-1.394.522a1 1 0 01-1.217-.436l-.653-1.131a1 1 0 01.23-1.272l1.149-.946a6.026 6.026 0 010-2.435l-1.148-.944a1 1 0 01-.23-1.272l.653-1.131a1 1 0 011.217-.437l1.393.522a5.994 5.994 0 012.108-1.218l.244-1.466zM14.929 12a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"></path></svg>',
+                        'category' => 'items-style-general',
+                    ),
+                    array(
+                        'title'    => esc_html__( 'Appearance', '@@text_domain' ),
+                        'icon'     => '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" aria-hidden="true" focusable="false"><path d="M12 4c-4.4 0-8 3.6-8 8v.1c0 4.1 3.2 7.5 7.2 7.9h.8c4.4 0 8-3.6 8-8s-3.6-8-8-8zm0 15V5c3.9 0 7 3.1 7 7s-3.1 7-7 7z"></path></svg>',
+                        'category' => 'items-style-appearance',
+                    ),
+                    array(
+                        'title'    => esc_html__( 'Text', '@@text_domain' ),
+                        'icon'     => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 96 960 960"><path d="M577.694 878.306v-520h-200v-84.612h484.612v84.612h-200v520h-84.612Zm-360 0v-320h-120v-84.612h324.612v84.612h-120v320h-84.612Z"></path></svg>',
+                        'category' => 'items-style-text',
+                    ),
+                    array(
+                        'title'    => esc_html__( 'Advanced', '@@text_domain' ),
+                        'icon'     => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 96 960 960"><path d="M530.001 445.999v-59.998h120v-160h59.998v160h120v59.998H530.001Zm120 480V546.001h59.998v379.998h-59.998Zm-400 0v-160h-120v-59.998h299.998v59.998h-120v160h-59.998Zm0-320V226.001h59.998v379.998h-59.998Z"/></svg>',
+                        'category' => 'items-style-advanced',
+                    ),
+                ),
+            )
+        );
+
+        $builtin_default_options = array(
+            'show_title'             => true,
+            'show_categories'        => true,
+            'show_date'              => true,
+            'show_author'            => true,
+            'show_comments_count'    => true,
+            'show_views_count'       => true,
+            'show_reading_time'      => true,
+            'show_excerpt'           => true,
+            'show_read_more'         => true,
+            'show_icons'             => true,
+            'images_rounded_corners' => true,
+            'overlay'                => array(
+                'label'      => esc_html__( 'Overlay', '@@text_domain' ),
+                'states'     => true,
+                'background' => true,
+                'text'       => true,
+                'links'      => false,
+            ),
+            'caption'                => array(
+                'name'         => 'caption',
+                'label'        => esc_html__( 'Caption', '@@text_domain' ),
+                'css_var_name' => false,
+                'states'       => false,
+                'background'   => false,
+                'text'         => true,
+                'links'        => true,
+            ),
+
+            // All available align values: true|false|'extended'.
+            'align'                  => true,
+        );
+        $builtin_default_options = apply_filters( 'vpf_items_style_builtin_controls_options', $builtin_default_options );
 
         // styles builtin options.
         foreach ( $items_styles as $name => $style ) {
-            $new_fields = array();
+            $builtin_fields = array();
+
             if ( isset( $style['builtin_controls'] ) ) {
-                foreach ( $style['builtin_controls'] as $control_name => $val ) {
-                    if ( ! $val ) {
+                foreach ( $builtin_default_options as $option_name => $default_options ) {
+                    if ( ! isset( $style['builtin_controls'][ $option_name ] ) || ! $style['builtin_controls'][ $option_name ] ) {
                         continue;
                     }
-                    switch ( $control_name ) {
-                        case 'images_rounded_corners':
-                            $new_fields[] = array(
-                                'type'    => 'range',
-                                'label'   => esc_html__( 'Images Rounded Corners', '@@text_domain' ),
-                                'name'    => 'images_rounded_corners',
-                                'min'     => 0,
-                                'max'     => 100,
-                                'default' => 0,
-                                'style'   => array(
-                                    array(
-                                        'element'  => '.vp-portfolio__items-style-' . $name,
-                                        'property' => '--vp-items-style-' . $name . '--image__border-radius',
-                                        'mask'     => '$px',
-                                    ),
-                                ),
-                            );
-                            break;
+
+                    $options = $default_options;
+
+                    if ( is_array( $options ) && is_array( $style['builtin_controls'][ $option_name ] ) ) {
+                        $options = $this->array_merge_recursive_ex( $options, $style['builtin_controls'][ $option_name ] );
+                    } elseif ( ! is_array( $options ) ) {
+                        $options = $style['builtin_controls'][ $option_name ];
+                    }
+
+                    $new_fields = array();
+
+                    switch ( $option_name ) {
+                        // General.
                         case 'show_title':
                             $new_fields[] = array(
                                 'type'      => 'checkbox',
@@ -2300,6 +2134,35 @@ class Visual_Portfolio_Admin {
                                 ),
                             );
                             break;
+                        case 'show_read_more':
+                            $new_fields[] = array(
+                                'type'    => 'radio',
+                                'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
+                                'name'    => 'show_read_more',
+                                'group'   => 'items_style_read_more',
+                                'default' => 'false',
+                                'options' => array(
+                                    'false'    => esc_html__( 'Hide', '@@text_domain' ),
+                                    'true'     => esc_html__( 'Always Display', '@@text_domain' ),
+                                    'more_tag' => esc_html__( 'Display when used `More tag` in the post', '@@text_domain' ),
+                                ),
+                            );
+                            $new_fields[] = array(
+                                'type'        => 'text',
+                                'name'        => 'read_more_label',
+                                'group'       => 'items_style_read_more',
+                                'default'     => 'Read More',
+                                'description' => esc_attr__( 'Read More button label', '@@text_domain' ),
+                                'wpml'        => true,
+                                'condition'   => array(
+                                    array(
+                                        'control'  => 'show_read_more',
+                                        'operator' => '!=',
+                                        'value'    => 'false',
+                                    ),
+                                ),
+                            );
+                            break;
                         case 'show_icons':
                             $new_fields[] = array(
                                 'type'      => 'checkbox',
@@ -2308,20 +2171,231 @@ class Visual_Portfolio_Admin {
                                 'default'   => false,
                             );
                             break;
+
+                        // Appearance - Images.
+                        case 'images_rounded_corners':
+                            $new_fields[] = array(
+                                'type'     => 'range',
+                                'category' => 'items-style-appearance',
+                                'label'    => esc_html__( 'Image Rounded Corners', '@@text_domain' ),
+                                'name'     => 'images_rounded_corners',
+                                'group'    => 'items_style_images',
+                                'min'      => 0,
+                                'max'      => 100,
+                                'default'  => 0,
+                                'style'    => array(
+                                    array(
+                                        'element'  => '.vp-portfolio__items-style-' . $name,
+                                        'property' => '--vp-items-style-' . $name . '--image__border-radius',
+                                        'mask'     => '$px',
+                                    ),
+                                ),
+                            );
+                            break;
+
+                        // Appearance - Overlay.
+                        case 'overlay':
+                            if ( $options['states'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'select',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Display ', '@@text_domain' ) . $options['label'],
+                                    'name'     => 'show_overlay',
+                                    'group'    => 'items_style_overlay',
+                                    'default'  => 'hover',
+                                    'options'  => array(
+                                        'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
+                                        'default' => esc_html__( 'Default State Only', '@@text_domain' ),
+                                        'always'  => esc_html__( 'Always', '@@text_domain' ),
+                                    ),
+                                );
+                            }
+                            if ( $options['background'] || $options['text'] || $options['links'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'html',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => $options['label'] . esc_html__( ' Colors', '@@text_domain' ),
+                                    'name'     => 'overlay_color_label__',
+                                    'group'    => 'items_style_overlay',
+                                );
+                            }
+                            if ( $options['background'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'color',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Background', '@@text_domain' ),
+                                    'name'     => 'bg_color',
+                                    'group'    => 'items_style_overlay',
+                                    'alpha'    => true,
+                                    'style'    => array(
+                                        array(
+                                            'element'  => '.vp-portfolio__items-style-' . $name,
+                                            'property' => '--vp-items-style-' . $name . '--overlay__background-color',
+                                        ),
+                                    ),
+                                );
+                            }
+                            if ( $options['text'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'color',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Text', '@@text_domain' ),
+                                    'name'     => 'text_color',
+                                    'group'    => 'items_style_overlay',
+                                    'alpha'    => true,
+                                    'style'    => array(
+                                        array(
+                                            'element'  => '.vp-portfolio__items-style-' . $name,
+                                            'property' => '--vp-items-style-' . $name . '--overlay__color',
+                                        ),
+                                    ),
+                                );
+                            }
+                            if ( $options['links'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'color',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Links', '@@text_domain' ),
+                                    'name'     => 'links_color',
+                                    'group'    => 'items_style_overlay',
+                                    'alpha'    => true,
+                                    'style'    => array(
+                                        array(
+                                            'element'  => '.vp-portfolio__items-style-' . $name,
+                                            'property' => '--vp-items-style-' . $name . '--links__color',
+                                        ),
+                                    ),
+                                );
+                                $new_fields[] = array(
+                                    'type'     => 'color',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Links Hover', '@@text_domain' ),
+                                    'name'     => 'links_hover_color',
+                                    'group'    => 'items_style_overlay',
+                                    'alpha'    => true,
+                                    'style'    => array(
+                                        array(
+                                            'element'  => '.vp-portfolio__items-style-' . $name,
+                                            'property' => '--vp-items-style-' . $name . '--links-hover__color',
+                                        ),
+                                    ),
+                                );
+                            }
+                            break;
+
+                        // Appearance - Caption.
+                        case 'caption':
+                            if ( ! $options['css_var_name'] ) {
+                                $options['css_var_name'] = $options['name'];
+                            }
+
+                            if ( $options['states'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'select',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Display ', '@@text_domain' ) . $options['label'],
+                                    'name'     => 'show_' . $options['name'],
+                                    'group'    => 'items_style_caption',
+                                    'default'  => 'hover',
+                                    'options'  => array(
+                                        'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
+                                        'default' => esc_html__( 'Default State Only', '@@text_domain' ),
+                                        'always'  => esc_html__( 'Always', '@@text_domain' ),
+                                    ),
+                                );
+                            }
+                            if ( $options['background'] || $options['text'] || $options['links'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'html',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => $options['label'] . esc_html__( ' Colors', '@@text_domain' ),
+                                    'name'     => 'caption_color_label__',
+                                    'group'    => 'items_style_caption',
+                                );
+                            }
+                            if ( $options['background'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'color',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( ' Background', '@@text_domain' ),
+                                    'name'     => $options['name'] . '_bg_color',
+                                    'group'    => 'items_style_caption',
+                                    'alpha'    => true,
+                                    'style'    => array(
+                                        array(
+                                            'element'  => '.vp-portfolio__items-style-' . $name,
+                                            'property' => '--vp-items-style-' . $name . '--' . $options['css_var_name'] . '__background-color',
+                                        ),
+                                    ),
+                                );
+                            }
+                            if ( $options['text'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'color',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Text', '@@text_domain' ),
+                                    'name'     => $options['name'] . '_text_color',
+                                    'group'    => 'items_style_caption',
+                                    'alpha'    => true,
+                                    'style'    => array(
+                                        array(
+                                            'element'  => '.vp-portfolio__items-style-' . $name,
+                                            'property' => '--vp-items-style-' . $name . '--' . $options['css_var_name'] . '__color',
+                                        ),
+                                    ),
+                                );
+                            }
+                            if ( $options['links'] ) {
+                                $new_fields[] = array(
+                                    'type'     => 'color',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Links', '@@text_domain' ),
+                                    'name'     => $options['name'] . '_links_color',
+                                    'group'    => 'items_style_caption',
+                                    'alpha'    => true,
+                                    'style'    => array(
+                                        array(
+                                            'element'  => '.vp-portfolio__items-style-' . $name,
+                                            'property' => '--vp-items-style-' . $name . '--' . $options['css_var_name'] . '_links__color',
+                                        ),
+                                    ),
+                                );
+                                $new_fields[] = array(
+                                    'type'     => 'color',
+                                    'category' => 'items-style-appearance',
+                                    'label'    => esc_html__( 'Links Hover', '@@text_domain' ),
+                                    'name'     => $options['name'] . '_links_hover_color',
+                                    'group'    => 'items_style_caption',
+                                    'alpha'    => true,
+                                    'style'    => array(
+                                        array(
+                                            'element'  => '.vp-portfolio__items-style-' . $name,
+                                            'property' => '--vp-items-style-' . $name . '--' . $options['css_var_name'] . '_links-hover__color',
+                                        ),
+                                    ),
+                                );
+                            }
+                            break;
+
+                        // Text.
                         case 'align':
                             $new_fields[] = array(
                                 'type'     => 'align',
+                                'category' => 'items-style-text',
                                 'label'    => esc_html__( 'Caption Align', '@@text_domain' ),
                                 'name'     => 'align',
+                                'group'    => 'items_style_align',
                                 'default'  => 'center',
-                                'extended' => 'extended' === $val,
+                                'extended' => 'extended' === $options,
                             );
                             break;
                         // no default.
                     }
+
+                    $builtin_fields = array_merge( $builtin_fields, apply_filters( 'vpf_items_style_builtin_controls', $new_fields, $option_name, $options, $name, $style ) );
                 }
             }
-            $items_styles[ $name ]['controls'] = array_merge( $new_fields, isset( $style['controls'] ) ? $style['controls'] : array() );
+            $items_styles[ $name ]['controls'] = array_merge( $builtin_fields, isset( $style['controls'] ) ? $style['controls'] : array() );
         }
 
         // styles options.
@@ -2330,20 +2404,28 @@ class Visual_Portfolio_Admin {
                 continue;
             }
             foreach ( $style['controls'] as $field ) {
-                $field['category'] = 'items-style';
+                $field['category'] = $field['category'] ?? 'items-style-general';
                 $field['name']     = 'items_style_' . $name . '__' . $field['name'];
 
                 // condition names prefix fix.
                 if ( isset( $field['condition'] ) ) {
-                    foreach ( $field['condition'] as $k => $cond ) {
-                        if ( isset( $cond['control'] ) ) {
-                            if ( strpos( $cond['control'], 'GLOBAL_' ) === 0 ) {
-                                $field['condition'][ $k ]['control'] = str_replace( 'GLOBAL_', '', $cond['control'] );
+                    $loop_over_conditions = function( $field_cond ) use ( &$loop_over_conditions, $name ) {
+                        if ( is_array( $field_cond ) && ! isset( $field_cond['control'] ) ) {
+                            foreach ( $field_cond as $k => $inner_cond ) {
+                                $field_cond[ $k ] = $loop_over_conditions( $inner_cond );
+                            }
+                        } elseif ( isset( $field_cond['control'] ) ) {
+                            if ( strpos( $field_cond['control'], 'GLOBAL_' ) === 0 ) {
+                                $field_cond['control'] = str_replace( 'GLOBAL_', '', $field_cond['control'] );
                             } else {
-                                $field['condition'][ $k ]['control'] = 'items_style_' . $name . '__' . $cond['control'];
+                                $field_cond['control'] = 'items_style_' . $name . '__' . $field_cond['control'];
                             }
                         }
-                    }
+
+                        return $field_cond;
+                    };
+
+                    $field['condition'] = $loop_over_conditions( $field['condition'] );
                 }
 
                 $field['condition'] = array_merge(
@@ -3494,6 +3576,34 @@ selector p {
         echo wp_json_encode( $oembed );
 
         wp_die();
+    }
+
+    /**
+     * Merge 2 arrays recursive.
+     *
+     * @link https://stackoverflow.com/questions/25712099/php-multidimensional-array-merge-recursive
+     *
+     * @param array $array1 - first array.
+     * @param array $array2 - second array.
+     *
+     * @return array
+     */
+    public function array_merge_recursive_ex( array $array1, array $array2 ) {
+        $merged = $array1;
+
+        foreach ( $array2 as $key => & $value ) {
+            if ( is_array( $value ) && isset( $merged[ $key ] ) && is_array( $merged[ $key ] ) ) {
+                $merged[ $key ] = $this->array_merge_recursive_ex( $merged[ $key ], $value );
+            } elseif ( is_numeric( $key ) ) {
+                if ( ! in_array( $value, $merged, true ) ) {
+                    $merged[] = $value;
+                }
+            } else {
+                $merged[ $key ] = $value;
+            }
+        }
+
+        return $merged;
     }
 }
 

@@ -3,9 +3,9 @@
  */
 .vp-portfolio__items-style-default {
   // Links.
-  --vp-items-style-default--links__color: inherit;
-  --vp-items-style-default--links__text-decoration: none;
-  --vp-items-style-default--links-hover__color: var(--vp-color-brand);
+  --vp-items-style-default--meta_links__color: inherit;
+  --vp-items-style-default--meta_links__text-decoration: none;
+  --vp-items-style-default--meta_links-hover__color: var(--vp-color-brand);
 
   // Image.
   --vp-items-style-default--image__border-radius: 0;

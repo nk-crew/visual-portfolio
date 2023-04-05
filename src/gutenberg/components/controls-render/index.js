@@ -8,6 +8,7 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
+import TabsControl from '../tabs-control';
 import IconsSelector from '../icons-selector';
 import CodeEditor from '../code-editor';
 import TilesSelector from '../tiles-selector';
@@ -125,6 +126,7 @@ class ControlsRender extends Component {
             {...controlData}
             clientId={clientId}
             isSetupWizard={isSetupWizard}
+            renderProps={this.props}
           />,
           controlData,
           this.props
@@ -270,6 +272,17 @@ ControlsRender.Control = function (props) {
 
   // Specific controls.
   switch (props.type) {
+    case 'category_tabs':
+      renderControl = (
+        <TabsControl controlName={props.name} options={props.options}>
+          {(tab) => {
+            return (
+              <ControlsRender {...props.renderProps} category={tab.name} categoryToggle={false} />
+            );
+          }}
+        </TabsControl>
+      );
+      break;
     case 'html':
       renderControl = <RawHTML>{props.default}</RawHTML>;
       break;
