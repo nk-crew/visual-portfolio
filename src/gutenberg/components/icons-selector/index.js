@@ -125,77 +125,79 @@ export default class IconsSelector extends Component {
       );
     }
 
+    const optionsArray = Object.keys(options);
+    const fromIndex = optionsArray.indexOf(value);
+
     const itemsPerRow = isSetupWizard ? 5 : 3;
-    const allowCollapsing = false !== collapseRows;
+    const allowedItems = collapseRows * itemsPerRow;
+    const allowCollapsing = false !== collapseRows && optionsArray.length > allowedItems;
+    const visibleCollapsedItems = allowedItems - 1;
 
-    let modifiedOptions = { ...(options || {}) };
-
-    // Move the selected option to start of the list when it is collapsed.
-    if (allowCollapsing && collapsed && 'undefined' !== typeof modifiedOptions[value]) {
-      const { [value]: valObject, ...restOptions } = modifiedOptions;
-      modifiedOptions = { [value]: valObject, ...restOptions };
+    // Move the selected option to the end of collapsed list
+    // in case this item is not visible.
+    if (allowCollapsing && collapsed && fromIndex >= visibleCollapsedItems) {
+      const toIndex = visibleCollapsedItems - 1;
+      const element = optionsArray[fromIndex];
+      optionsArray.splice(fromIndex, 1);
+      optionsArray.splice(toIndex, 0, element);
     }
 
     return (
-      <>
-        <div
-          className={classnames(
-            'vpf-component-icon-selector',
-            allowCollapsing ? 'vpf-component-icon-selector-allow-collapsing' : ''
-          )}
-          data-control-name={controlName}
-        >
-          {Object.keys(modifiedOptions || {})
-            .filter((elm, i) => {
-              if (allowCollapsing) {
-                return collapsed ? i < itemsPerRow : true;
-              }
-              return true;
-            })
-            .map((k) => {
-              const option = modifiedOptions[k];
-              let { icon } = option;
+      <div
+        className={classnames(
+          'vpf-component-icon-selector',
+          allowCollapsing ? 'vpf-component-icon-selector-allow-collapsing' : ''
+        )}
+        data-control-name={controlName}
+      >
+        {optionsArray
+          .filter((elm, i) => {
+            if (allowCollapsing) {
+              return collapsed ? i < visibleCollapsedItems : true;
+            }
+            return true;
+          })
+          .map((k) => {
+            const option = options[k];
+            let { icon } = option;
 
-              if (isSetupWizard) {
-                if (option.image_preview_wizard) {
-                  icon = `<img src="${option.image_preview_wizard}" alt="${option.title} Preview">`;
-                } else if (option.icon_wizard) {
-                  icon = option.icon_wizard;
-                }
+            if (isSetupWizard) {
+              if (option.image_preview_wizard) {
+                icon = `<img src="${option.image_preview_wizard}" alt="${option.title} Preview">`;
+              } else if (option.icon_wizard) {
+                icon = option.icon_wizard;
               }
+            }
 
-              return (
-                <Button
-                  key={`icon-selector-${option.title}-${option.value}`}
-                  onClick={() => onChange(option.value)}
-                  className={classnames(
-                    'vpf-component-icon-selector-item',
-                    value === option.value ? 'vpf-component-icon-selector-item-active' : '',
-                    option.className
-                  )}
-                >
-                  {icon ? <RawHTML>{icon}</RawHTML> : ''}
-                  {option.title ? <span>{option.title}</span> : ''}
-                </Button>
-              );
-            })}
-        </div>
+            return (
+              <Button
+                key={`icon-selector-${option.title}-${option.value}`}
+                onClick={() => onChange(option.value)}
+                className={classnames(
+                  'vpf-component-icon-selector-item',
+                  value === option.value ? 'vpf-component-icon-selector-item-active' : '',
+                  option.className
+                )}
+              >
+                {icon ? <RawHTML>{icon}</RawHTML> : ''}
+                {option.title ? <span>{option.title}</span> : ''}
+              </Button>
+            );
+          })}
         {allowCollapsing ? (
-          <div
+          <Button
+            onClick={() => {
+              this.setState({
+                collapsed: !collapsed,
+              });
+            }}
             className={classnames(
-              'vpf-component-icon-selector-collapse-button',
-              collapsed ? '' : 'vpf-component-icon-selector-collapse-button-expanded'
+              'vpf-component-icon-selector-item',
+              'vpf-component-icon-selector-item-collapse',
+              collapsed ? '' : 'vpf-component-icon-selector-item-expanded'
             )}
           >
-            <button
-              type="button"
-              onClick={() => {
-                this.setState({
-                  collapsed: !collapsed,
-                });
-              }}
-            >
-              {collapsed ? __('Show More', '@@text_domain') : __('Show Less', '@@text_domain')}
+            <div className="vpf-component-icon-selector-item-collapse">
               <svg
                 width="11"
                 height="6"
@@ -205,10 +207,11 @@ export default class IconsSelector extends Component {
               >
                 <path d="M10 1.25L5.5 4.75L1 1.25" stroke="currentColor" strokeWidth="1" />
               </svg>
-            </button>
-          </div>
+            </div>
+            <span>{collapsed ? __('More', '@@text_domain') : __('Less', '@@text_domain')}</span>
+          </Button>
         ) : null}
-      </>
+      </div>
     );
   }
 }
