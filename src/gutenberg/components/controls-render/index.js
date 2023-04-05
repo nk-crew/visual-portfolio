@@ -450,8 +450,14 @@ ControlsRender.Control = function (props) {
       break;
     case 'color':
       renderControl = (
-        <ColorPicker value={controlVal} alpha={props.alpha} onChange={(val) => onChange(val)} />
+        <ColorPicker
+          label={renderControlLabel}
+          value={controlVal}
+          alpha={props.alpha}
+          onChange={(val) => onChange(val)}
+        />
       );
+      renderControlLabel = false;
       break;
     case 'date':
       renderControl = <DatePicker value={controlVal} onChange={(val) => onChange(val)} />;

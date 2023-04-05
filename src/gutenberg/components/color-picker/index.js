@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames/dedupe';
+
+/**
  * WordPress dependencies
  */
 const WPColorPicker = wp.components.ColorPicker;
@@ -7,7 +12,7 @@ const { Component } = wp.element;
 
 const { __ } = wp.i18n;
 
-const { Dropdown, Tooltip, BaseControl } = wp.components;
+const { Dropdown, Button, BaseControl } = wp.components;
 
 const { ColorPalette } = wp.blockEditor;
 
@@ -27,32 +32,36 @@ export default class ColorPicker extends Component {
 
   render() {
     const {
+      label,
       value,
       onChange,
       alpha = false,
       colorPalette = true,
-      hint = __('Custom Color Picker', '@@text_domain'),
       afterDropdownContent,
     } = this.props;
 
     return (
       <Dropdown
-        position="bottom left"
         className="vpf-component-color-picker__dropdown"
         contentClassName="vpf-component-color-picker__dropdown-content"
+        popoverProps={{
+          placement: 'left-start',
+          offset: 36,
+          shift: true,
+        }}
         renderToggle={({ isOpen, onToggle }) => (
-          <Tooltip text={hint}>
-            <button
-              type="button"
-              aria-expanded={isOpen}
-              className="vpf-component-color-toggle"
-              onClick={onToggle}
-              aria-label={hint}
-              style={{ color: value || '' }}
-            >
-              <span />
-            </button>
-          </Tooltip>
+          <Button
+            className={classnames(
+              'vpf-component-color-toggle',
+              isOpen ? 'vpf-component-color-toggle-active' : ''
+            )}
+            onClick={onToggle}
+          >
+            <span className="vpf-component-color-toggle-indicator">
+              <span style={{ color: value || '' }} />
+            </span>
+            <span className="vpf-component-color-toggle-label">{label}</span>
+          </Button>
         )}
         renderContent={() => (
           <div className="vpf-component-color-picker">
