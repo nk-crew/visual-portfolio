@@ -1055,6 +1055,7 @@ class Visual_Portfolio_Admin {
                             'name'         => 'img_overlay',
                             'css_var_name' => 'img-overlay',
                             'label'        => esc_html__( 'Image Overlay', '@@text_domain' ),
+                            'states'       => true,
                             'background'   => true,
                             'text'         => false,
                             'links'        => false,
