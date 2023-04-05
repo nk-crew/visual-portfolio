@@ -251,9 +251,13 @@ export default class ElementsSelector extends Component {
 
     return (
       <Dropdown
-        position="bottom left"
         className="vpf-component-elements-selector-align__dropdown"
         contentClassName="vpf-component-elements-selector-align__dropdown-content"
+        popoverProps={{
+          placement: 'left-start',
+          offset: 36,
+          shift: true,
+        }}
         renderToggle={({ isOpen, onToggle }) => (
           <button
             type="button"
