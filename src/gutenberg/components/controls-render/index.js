@@ -179,10 +179,11 @@ class ControlsRender extends Component {
             false
           )
         }
-        initialOpen={categoryOpened}
         onToggle={() => {
           openedCategoriesCache[category] = !categoryOpened;
         }}
+        initialOpen={categoryOpened}
+        scrollAfterOpen
       >
         {result}
       </PanelBody>
