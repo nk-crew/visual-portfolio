@@ -98,24 +98,9 @@ class Visual_Portfolio_Archive_Mapping {
      * @return array
      */
     public function converting_paginate_links_to_friendly_url( $arr, $args, $vp_options ) {
-        global $wp_query;
-        $post_id = get_the_ID() ?? null;
-
         // Determine if a page is an archive.
         if (
-            (
-                isset( $wp_query->query['vp_page_archive'] ) ||
-                (
-                    isset( $wp_query->query_vars['original_archive_id'] ) &&
-                    'portfolio' === $wp_query->query_vars['original_archive_id']
-                ) ||
-                (
-                    $post_id &&
-                    get_post_meta( $post_id, '_vp_post_type_mapped', true )
-                )
-            ) &&
-            'post-based' === $vp_options['content_source'] &&
-            'current_query' === $vp_options['posts_source'] &&
+            $this->is_archive( $vp_options ) &&
             isset( $arr ) &&
             ! empty( $arr )
         ) {
@@ -159,26 +144,12 @@ class Visual_Portfolio_Archive_Mapping {
      * @return array
      */
     public function converting_data_next_page_to_friendly_url( $data_attrs, $options, $style_options ) {
-        global $wp_query;
-        $post_id = get_the_ID() ?? null;
-
         // Determine if a page is an archive.
         if (
-            (
-                isset( $wp_query->query['vp_page_archive'] ) ||
-                (
-                    isset( $wp_query->query_vars['original_archive_id'] ) &&
-                    'portfolio' === $wp_query->query_vars['original_archive_id']
-                ) ||
-                (
-                    $post_id &&
-                    get_post_meta( $post_id, '_vp_post_type_mapped', true )
-                )
-            ) &&
-            'post-based' === $options['content_source'] &&
-            'current_query' === $options['posts_source'] &&
+            $this->is_archive( $options ) &&
             isset( $data_attrs['data-vp-next-page-url'] )
         ) {
+            global $wp_query;
             $current_page  = $wp_query->query['paged'] ?? $wp_query->query['vp_page_query'] ?? 1;
             $next_page_url = $data_attrs['data-vp-next-page-url'];
             $next_page     = (int) $current_page === $options['max_pages'] ? false : ( $current_page ? $current_page + 1 : false );
@@ -361,14 +332,7 @@ class Visual_Portfolio_Archive_Mapping {
             $post_id = intval( $_REQUEST['vp_preview_post_id'] );
         }
 
-        $post_id = $post_id ?? get_the_ID() ?? null;
-
-        if (
-            $post_id &&
-            get_post_meta( $post_id, '_vp_post_type_mapped', true ) &&
-            'current_query' === $vp_options['posts_source'] &&
-            'post-based' === $vp_options['content_source']
-        ) {
+        if ( $this->is_archive( $vp_options, $post_id ) ) {
 
             $query_opts = Visual_Portfolio_Get::get_query_params( $vp_options, true );
             // Get active item.
@@ -1171,6 +1135,31 @@ class Visual_Portfolio_Archive_Mapping {
         }
 
         return $link;
+    }
+
+    /**
+     * Check if post is Archive.
+     *
+     * @param array $options - Block Options.
+     * @param int   $post_id - Post ID.
+     * @return boolean
+     */
+    public function is_archive( $options, $post_id = null ) {
+        global $wp_query;
+        $post_id = $post_id ?? get_the_ID() ?? null;
+        return (
+                isset( $wp_query->query['vp_page_archive'] ) ||
+                (
+                    isset( $wp_query->query_vars['original_archive_id'] ) &&
+                    'portfolio' === $wp_query->query_vars['original_archive_id']
+                ) ||
+                (
+                    $post_id &&
+                    get_post_meta( $post_id, '_vp_post_type_mapped', true )
+                )
+            ) &&
+            'post-based' === $options['content_source'] &&
+            'current_query' === $options['posts_source'];
     }
 }
 new Visual_Portfolio_Archive_Mapping();
