@@ -808,18 +808,6 @@ class Visual_Portfolio_Archive_Mapping {
                 $query->set( 'vp_filter', 'portfolio_category:' . $query->query['vp_category'] );
             }
 
-            if (
-                isset( $query->query['vp_page_query'] ) &&
-                ! empty( $query->query['vp_page_query'] ) &&
-                (
-                    // phpcs:ignore WordPress.Security.NonceVerification
-                    isset( $_REQUEST['vpf_ajax_call'] ) && settype( sanitize_text_field( wp_unslash( $_REQUEST['vpf_ajax_call'] ) ), 'bool' )
-                )
-            ) {
-                unset( $query->query['vp_page_query'] );
-                unset( $query->query_vars['vp_page_query'] );
-            }
-
             if ( isset( $query->query['portfolio_tag'] ) && isset( $query->query['vp_page_archive'] ) ) {
                 /**
                  * Fix WordPress Notices for Tag Taxonomy.
