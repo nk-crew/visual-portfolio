@@ -26,15 +26,15 @@
 
   // Caption.
   .vp-portfolio__item-caption a {
-    color: var(--vp-items-style-default--caption_links__color);
-    text-decoration: var(--vp-items-style-default--caption_links__text-decoration);
+    color: var(--vp-items-style-default--caption-links__color);
+    text-decoration: var(--vp-items-style-default--caption-links__text-decoration);
     outline: none;
     box-shadow: none;
     transition: var(--vp-items-style-default-transition-duration) color var(--vp-items-style-default-transition-easing);
 
     &:hover,
     &:focus {
-      color: var(--vp-items-style-default--caption_links-hover__color);
+      color: var(--vp-items-style-default--caption-links-hover__color);
     }
   }
 
@@ -89,7 +89,7 @@
   // fix some themes figcaption styles.
   figcaption.vp-portfolio__item-caption {
     font-style: inherit;
-    color: var(--vp-items-style-default--meta__color);
+    color: var(--vp-items-style-default--caption__color);
   }
 
   // meta

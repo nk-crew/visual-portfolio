@@ -2537,7 +2537,7 @@ class Visual_Portfolio_Admin {
                                             'style'    => array(
                                                 array(
                                                     'element'  => '.vp-portfolio__items-style-' . $style_name,
-                                                    'property' => '--vp-items-style-' . $style_name . '--' . $opt_name . '_links__color',
+                                                    'property' => '--vp-items-style-' . $style_name . '--' . $opt_name . '-links__color',
                                                 ),
                                             ),
                                         );
@@ -2550,7 +2550,7 @@ class Visual_Portfolio_Admin {
                                             'style'    => array(
                                                 array(
                                                     'element'  => '.vp-portfolio__items-style-' . $style_name,
-                                                    'property' => '--vp-items-style-' . $style_name . '--' . $opt_name . '_links-hover__color',
+                                                    'property' => '--vp-items-style-' . $style_name . '--' . $opt_name . '-links-hover__color',
                                                 ),
                                             ),
                                         );
