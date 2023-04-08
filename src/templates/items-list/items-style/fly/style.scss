@@ -71,13 +71,13 @@
     justify-content: center;
     width: 100%;
     min-height: 100%;
-    padding: var(--vp-items-style-fly--meta__padding);
+    padding: var(--vp-items-style-fly--overlay__padding);
     color: inherit;
 
     > * {
       max-width: 100%;
       margin-top: 0;
-      margin-bottom: var(--vp-items-style-fly--meta-items__gap);
+      margin-bottom: var(--vp-items-style-fly--overlay-items__gap);
     }
 
     > :last-child {

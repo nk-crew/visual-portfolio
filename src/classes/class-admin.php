@@ -1043,12 +1043,12 @@ class Visual_Portfolio_Admin {
                         'dimensions' => array(
                             array(
                                 'name'    => 'overlay_padding',
-                                'css_var' => 'meta__padding',
+                                'css_var' => 'overlay__padding',
                                 'label'   => esc_html__( 'Overlay Padding', '@@text_domain' ),
                             ),
                             array(
                                 'name'    => 'overlay_items_gap',
-                                'css_var' => 'meta-items__gap',
+                                'css_var' => 'overlay-items__gap',
                                 'label'   => esc_html__( 'Overlay Items Gap', '@@text_domain' ),
                             ),
                         ),
@@ -1116,12 +1116,12 @@ class Visual_Portfolio_Admin {
                         'dimensions' => array(
                             array(
                                 'name'    => 'overlay_padding',
-                                'css_var' => 'meta__padding',
+                                'css_var' => 'overlay__padding',
                                 'label'   => esc_html__( 'Overlay Padding', '@@text_domain' ),
                             ),
                             array(
                                 'name'    => 'overlay_items_gap',
-                                'css_var' => 'meta-items__gap',
+                                'css_var' => 'overlay-items__gap',
                                 'label'   => esc_html__( 'Overlay Items Gap', '@@text_domain' ),
                             ),
                         ),

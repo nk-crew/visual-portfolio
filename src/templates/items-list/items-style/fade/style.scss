@@ -78,7 +78,7 @@
     > * {
       max-width: 100%;
       margin-top: 0;
-      margin-bottom: var(--vp-items-style-fade--meta-items__gap);
+      margin-bottom: var(--vp-items-style-fade--overlay-items__gap);
       opacity: 0;
       transition-delay: calc(var(--vp-items-style-fade--meta-staggering__transition-delay) * var(--vp-items-style-fade--meta-staggering__index));
       transition-timing-function: var(--vp-items-style-fade--meta-staggering__transition-easing);

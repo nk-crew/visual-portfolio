@@ -15,6 +15,7 @@
   --vp-items-style-emerge--caption__padding: 1.5em 2em;
   --vp-items-style-emerge--caption__color: #fff;
   --vp-items-style-emerge--caption__background-color: #000;
+  --vp-items-style-emerge--caption-items__gap: 1.5em;
   --vp-items-style-emerge--caption-skew__height: 20px;
   --vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew__height);
   --vp-items-style-emerge--caption-skew__clip-right: var(--vp-items-style-emerge--caption-skew__height);
@@ -25,9 +26,6 @@
   --vp-items-style-emerge--caption-links__color: inherit;
   --vp-items-style-emerge--caption-links__text-decoration: none;
   --vp-items-style-emerge--caption-links-hover__color: var(--vp-color-brand);
-
-  // Meta.
-  --vp-items-style-emerge--meta-items__gap: 1.5em;
 
   // Meta Categories.
   --vp-items-style-emerge--meta-categories__font-size: 0.9em;
