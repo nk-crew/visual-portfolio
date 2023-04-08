@@ -82,9 +82,84 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'body_class', array( $this, 'add_body_archive_classes' ), 10, 1 );
             add_filter( 'redirect_canonical', array( $this, 'maybe_redirect_canonical_links' ), 10, 2 );
             add_filter( 'pre_get_shortlink', array( $this, 'remove_taxanomy_shortlinks' ), 10, 4 );
+            add_filter( 'vpf_extend_portfolio_data_attributes', array( $this, 'converting_data_next_page_to_friendly_url' ), 10, 3 );
+            add_filter( 'vpf_pagination_filtered_links', array( $this, 'converting_paginate_links_to_friendly_url' ), 10, 3 );
         }
 
         self::create_archive_page();
+    }
+
+    /**
+     * Converting pagination archive links to friendly URL.
+     *
+     * @param array $arr - Array with paginate arguments.
+     * @param array $args - Block Arguments.
+     * @param array $vp_options - Block Options.
+     * @return array
+     */
+    public function converting_paginate_links_to_friendly_url( $arr, $args, $vp_options ) {
+        // Determine if a page is an archive.
+        if (
+            $this->is_archive( $vp_options ) &&
+            isset( $arr ) &&
+            ! empty( $arr )
+        ) {
+            if ( $arr['url'] ) {
+                // Parsing the content of links.
+                preg_match( '/vp_filter=([^&]*)/', $arr['url'], $match_filter );
+                preg_match( '/' . $this->permalinks['category_base'] . '\/[^\/]+\//', $arr['url'], $match_category );
+                /**
+                 * Change category links to friendly.
+                 * For example, a link like: example.com/?vp_filter=portfolio_category:test
+                 * Has been converted to: example.com/portfolio-category/test/
+                 * In this case, the path to the category is determined by the permalink settings.
+                 */
+                if ( is_array( $match_filter ) && ! empty( $match_filter ) ) {
+                    $taxonomies = explode( ':', rawurldecode( $match_filter[1] ) );
+                    if ( is_array( $taxonomies ) && 'portfolio_category' === $taxonomies[0] ) {
+                        $category_slug = $taxonomies[1];
+                        $base_page     = $this->get_relative_archive_link();
+                        $base_page     = '' === $base_page ? '/?' : '/' . $base_page . '?';
+                        $arr['url']    = str_replace( $base_page, '/' . $this->permalinks['category_base'] . '/' . $category_slug . '/?', $arr['url'] );
+                    }
+                }
+
+                $arr['url'] = $this->converting_paginate_link_to_friendly_url( $arr['url'] );
+
+                // Clear vp_filter GET variable in the link.
+                if ( strpos( $arr['url'], 'vp_filter' ) !== false ) {
+                    $arr['url'] = remove_query_arg( 'vp_filter', $arr['url'] );
+                }
+            }
+        }
+        return $arr;
+    }
+
+    /**
+     * Converting data next page on archive page to friendly URL.
+     *
+     * @param array $data_attrs    - Data Block Attributes.
+     * @param array $options       - Block Options.
+     * @param array $style_options - Block Style Options.
+     * @return array
+     */
+    public function converting_data_next_page_to_friendly_url( $data_attrs, $options, $style_options ) {
+        // Determine if a page is an archive.
+        if (
+            $this->is_archive( $options ) &&
+            isset( $data_attrs['data-vp-next-page-url'] )
+        ) {
+            global $wp_query;
+            $current_page  = $wp_query->query['paged'] ?? $wp_query->query['vp_page_query'] ?? 1;
+            $next_page_url = $data_attrs['data-vp-next-page-url'];
+            $next_page     = (int) $current_page === $options['max_pages'] ? false : ( $current_page ? $current_page + 1 : false );
+
+            $next_page_url = $this->converting_paginate_link_to_friendly_url( $next_page_url, $next_page );
+
+            $data_attrs['data-vp-next-page-url'] = $next_page ? $next_page_url : '';
+        }
+
+        return $data_attrs;
     }
 
     /**
@@ -257,14 +332,7 @@ class Visual_Portfolio_Archive_Mapping {
             $post_id = intval( $_REQUEST['vp_preview_post_id'] );
         }
 
-        $post_id = $post_id ?? get_the_ID() ?? null;
-
-        if (
-            $post_id &&
-            get_post_meta( $post_id, '_vp_post_type_mapped', true ) &&
-            'current_query' === $vp_options['posts_source'] &&
-            'post-based' === $vp_options['content_source']
-        ) {
+        if ( $this->is_archive( $vp_options, $post_id ) ) {
 
             $query_opts = Visual_Portfolio_Get::get_query_params( $vp_options, true );
             // Get active item.
@@ -301,6 +369,56 @@ class Visual_Portfolio_Archive_Mapping {
             }
             if ( ! empty( $term_items['terms'] ) ) {
                 $terms = $term_items['terms'];
+                foreach ( $terms as $key => $term ) {
+                    // Parsing the content of links.
+                    preg_match( '/vp_filter=([^&]*)/', $term['url'], $match_filter );
+                    preg_match( '/' . $this->permalinks['category_base'] . '\/[^\/]+\//', $term['url'], $match_category );
+                    preg_match( '/' . $this->permalinks['tag_base'] . '\/[^\/]+\//', $term['url'], $match_tag );
+
+                    $base_page = $this->get_relative_archive_link();
+
+                    /**
+                     * We clear the link from taxonomies to replace them with the base archive page.
+                     * For example: example.com/portfolio-category/test/?vp_filter=portfolio_category%3Aanother-category
+                     * To example.com/?vp_filter=portfolio_category%3Aanother-category
+                     */
+                    $changed_part_of_link = ! empty( $match_category ) ? $match_category[0] : ( ! empty( $match_tag ) ? $match_tag[0] : '' );
+                    $link                 = str_replace( $changed_part_of_link, $base_page, $term['url'] );
+
+                    if ( is_array( $match_filter ) && ! empty( $match_filter ) ) {
+                        // We extract the contents of the filter and form a new link.
+                        $taxonomies = explode( ':', rawurldecode( $match_filter[1] ) );
+                        if ( is_array( $taxonomies ) && 'portfolio_category' === $taxonomies[0] ) {
+                            $category_slug = $taxonomies[1];
+                            if ( strpos( $link, 'vp_filter' ) !== false ) {
+                                $link = remove_query_arg( 'vp_filter', $link );
+                            }
+                            $link = trailingslashit( $link );
+
+                            if ( '' === $base_page ) {
+                                $link = $link . $this->permalinks['category_base'] . '/' . $category_slug . '/';
+                            } else {
+                                $link = str_replace( $base_page, $this->permalinks['category_base'] . '/' . $category_slug . '/', $link );
+                            }
+
+                            /**
+                             * In the case where the base page of the archive is the home page,
+                             * when loading taxonomy pages with pagination and filter,
+                             * the order of the link may be violated.
+                             * For example like this: example.com/page/2/portfolio-category/test/
+                             *
+                             * In this case, we fix the link by checking its structure.
+                             * We then rearrange the contents of the link and transform it into the following form: example.com/portfolio-category/test/page/2/
+                             */
+                            preg_match( '/page\/(\d+)\/' . $this->permalinks['category_base'] . '\/[^\/]+\//', $link, $invalid_format );
+
+                            if ( is_array( $invalid_format ) && ! empty( $invalid_format ) ) {
+                                $link = str_replace( $invalid_format[0], $this->permalinks['category_base'] . '/' . $category_slug . '/page/' . $invalid_format[1] . '/', $link );
+                            }
+                        }
+                    }
+                    $terms[ $key ]['url'] = $link;
+                }
             }
         }
 
@@ -654,18 +772,6 @@ class Visual_Portfolio_Archive_Mapping {
                 $query->set( 'vp_filter', 'portfolio_category:' . $query->query['vp_category'] );
             }
 
-            if (
-                isset( $query->query['vp_page_query'] ) &&
-                ! empty( $query->query['vp_page_query'] ) &&
-                (
-                    // phpcs:ignore WordPress.Security.NonceVerification
-                    isset( $_REQUEST['vpf_ajax_call'] ) && settype( sanitize_text_field( wp_unslash( $_REQUEST['vpf_ajax_call'] ) ), 'bool' )
-                )
-            ) {
-                unset( $query->query['vp_page_query'] );
-                unset( $query->query_vars['vp_page_query'] );
-            }
-
             if ( isset( $query->query['portfolio_tag'] ) && isset( $query->query['vp_page_archive'] ) ) {
                 /**
                  * Fix WordPress Notices for Tag Taxonomy.
@@ -971,6 +1077,89 @@ class Visual_Portfolio_Archive_Mapping {
         }
 
         return $custom_slug;
+    }
+
+    /**
+     * Get Relative Archive Link.
+     *
+     * @return string
+     */
+    private function get_relative_archive_link() {
+        $object_id = get_queried_object_id();
+
+        if (
+            (int) get_option( 'page_on_front' ) === (int) $this->archive_page &&
+            isset( $object_id ) &&
+            (int) $object_id === (int) $this->archive_page
+        ) {
+            $relative = '';
+        } else {
+            $relative = self::get_portfolio_slug() . '/';
+        }
+
+        return $relative;
+    }
+
+    /**
+     * Change pagination links to friendly.
+     * For example, a link like: example.com/?vp_page=2
+     * Has been converted to: example.com/page/2/
+     *
+     * If the link already contains a page structure and GET parameters, then the conversion takes place as follows.
+     * For example, a link like: example.com/page/2/?vp_page=3
+     * Has been converted to: example.com/page/3/
+     *
+     * @param string     $link - Paginate link.
+     * @param string|int $num_page - Changed number of page.
+     * @return string
+     */
+    private function converting_paginate_link_to_friendly_url( $link, $num_page = null ) {
+        // Parsing the content of links.
+        preg_match( '/vp_page=(\d+)/', $link, $match_vp_page );
+        preg_match( '/page\/(\d+)/', $link, $match_page );
+
+        if ( empty( $num_page ) && is_array( $match_vp_page ) && ! empty( $match_vp_page ) ) {
+            $num_page = $match_vp_page[1];
+        }
+
+        if ( ! empty( $num_page ) && is_array( $match_page ) && ! empty( $match_page ) ) {
+            $link = str_replace( $match_page[0], 'page/' . $num_page, $link );
+        }
+
+        if ( ! empty( $num_page ) && empty( $match_page ) ) {
+            $link = str_replace( '/?', '/page/' . $num_page . '/?', $link );
+        }
+
+        if ( strpos( $link, 'vp_page' ) !== false ) {
+            $link = remove_query_arg( 'vp_page', $link );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Check if post is Archive.
+     *
+     * @param array $options - Block Options.
+     * @param int   $post_id - Post ID.
+     * @return boolean
+     */
+    public function is_archive( $options, $post_id = null ) {
+        global $wp_query;
+        $post_id = $post_id ?? get_the_ID() ?? null;
+        return (
+                isset( $wp_query->query['vp_page_archive'] ) ||
+                (
+                    isset( $wp_query->query_vars['original_archive_id'] ) &&
+                    'portfolio' === $wp_query->query_vars['original_archive_id']
+                ) ||
+                (
+                    $post_id &&
+                    get_post_meta( $post_id, '_vp_post_type_mapped', true )
+                )
+            ) &&
+            'post-based' === $options['content_source'] &&
+            'current_query' === $options['posts_source'];
     }
 }
 new Visual_Portfolio_Archive_Mapping();
