@@ -34,7 +34,7 @@ $link_data = array(
         );
         ?>
 
-        <div class="vp-portfolio__item-img-overlay">
+        <div class="vp-portfolio__item-overlay">
             <?php
             // Show Icon.
             visual_portfolio()->include_template(

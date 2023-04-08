@@ -35,7 +35,7 @@ $templates_data = array(
 
 ?>
 
-<figcaption class="vp-portfolio__item-caption vp-portfolio__item-align-<?php echo esc_attr( $align ); ?>">
+<figcaption class="vp-portfolio__item-caption vp-portfolio__item-caption-text-align-<?php echo esc_attr( $align ); ?>">
     <?php if ( $show_meta ) : ?>
         <div class="vp-portfolio__item-meta-wrap vp-portfolio__custom-scrollbar">
             <div class="vp-portfolio__item-meta">

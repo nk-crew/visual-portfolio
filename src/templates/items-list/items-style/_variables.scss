@@ -2,19 +2,20 @@
  * Items Style Default CSS Variables
  */
 .vp-portfolio__items-style-default {
-  // Links.
-  --vp-items-style-default--meta_links__color: inherit;
-  --vp-items-style-default--meta_links__text-decoration: none;
-  --vp-items-style-default--meta_links-hover__color: var(--vp-color-brand);
 
   // Image.
   --vp-items-style-default--image__border-radius: 0;
   --vp-items-style-default--image-hover__transform: scale(1.05);
 
-  // Meta.
-  --vp-items-style-default--meta__color: inherit;
-  --vp-items-style-default--meta__padding: 1.5em 2em;
-  --vp-items-style-default--meta-items__gap: 1.5em;
+  // Caption.
+  --vp-items-style-default--caption__color: inherit;
+  --vp-items-style-default--caption__padding: 1.5em 2em;
+  --vp-items-style-default--caption-items__gap: 1.5em;
+
+  // Caption links.
+  --vp-items-style-default--caption_links__color: inherit;
+  --vp-items-style-default--caption_links__text-decoration: none;
+  --vp-items-style-default--caption_links-hover__color: var(--vp-color-brand);
 
   // Overlay.
   --vp-items-style-default--overlay__color: #fff;

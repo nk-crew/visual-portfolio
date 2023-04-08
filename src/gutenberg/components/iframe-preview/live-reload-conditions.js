@@ -43,15 +43,7 @@ addFilter('vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-r
       case 'items_style_default__align':
       case 'items_style_fade__align':
       case 'items_style_fly__align':
-      case 'items_style_emerge__align':
-      case 'items_style_default__caption_text_align':
-      case 'items_style_fade__caption_text_align':
-      case 'items_style_fly__caption_text_align':
-      case 'items_style_emerge__caption_text_align':
-      case 'items_style_default__overlay_text_align':
-      case 'items_style_fade__overlay_text_align':
-      case 'items_style_fly__overlay_text_align':
-      case 'items_style_emerge__overlay_text_align': {
+      case 'items_style_emerge__align': {
         let allAlignClasses = '';
 
         [
@@ -72,6 +64,64 @@ addFilter('vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-r
           .find('.vp-portfolio__item-overlay')
           .removeClass(allAlignClasses)
           .addClass(`vp-portfolio__item-align-${val}`);
+
+        break;
+      }
+      case 'items_style_default__caption_text_align':
+      case 'items_style_fade__caption_text_align':
+      case 'items_style_fly__caption_text_align':
+      case 'items_style_emerge__caption_text_align': {
+        let allAlignClasses = '';
+
+        [
+          'left',
+          'center',
+          'right',
+          'top-left',
+          'top-center',
+          'top-right',
+          'bottom-left',
+          'bottom-center',
+          'bottom-right',
+        ].forEach((alignName) => {
+          allAlignClasses += `${
+            allAlignClasses ? ' ' : ''
+          }vp-portfolio__item-caption-text-align-${alignName}`;
+        });
+
+        data.$framePortfolio
+          .find('.vp-portfolio__item-caption')
+          .removeClass(allAlignClasses)
+          .addClass(`vp-portfolio__item-caption-text-align-${val}`);
+
+        break;
+      }
+      case 'items_style_default__overlay_text_align':
+      case 'items_style_fade__overlay_text_align':
+      case 'items_style_fly__overlay_text_align':
+      case 'items_style_emerge__overlay_text_align': {
+        let allAlignClasses = '';
+
+        [
+          'left',
+          'center',
+          'right',
+          'top-left',
+          'top-center',
+          'top-right',
+          'bottom-left',
+          'bottom-center',
+          'bottom-right',
+        ].forEach((alignName) => {
+          allAlignClasses += `${
+            allAlignClasses ? ' ' : ''
+          }vp-portfolio__item-overlay-text-align-${alignName}`;
+        });
+
+        data.$framePortfolio
+          .find('.vp-portfolio__item-overlay')
+          .removeClass(allAlignClasses)
+          .addClass(`vp-portfolio__item-overlay-text-align-${val}`);
 
         break;
       }

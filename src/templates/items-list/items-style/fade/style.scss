@@ -64,7 +64,7 @@
     justify-content: center;
     width: 100%;
     min-height: 100%;
-    padding: var(--vp-items-style-fade--meta__padding);
+    padding: var(--vp-items-style-fade--overlay__padding);
     color: inherit;
     text-align: center;
 
@@ -242,7 +242,7 @@
   }
 
   // align
-  .vp-portfolio__item-align-center .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-center .vp-portfolio__item-meta {
     align-items: center;
     text-align: center;
 
@@ -252,7 +252,7 @@
     }
   }
 
-  .vp-portfolio__item-align-left .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-left .vp-portfolio__item-meta {
     align-items: flex-start;
     text-align: left;
 
@@ -262,7 +262,7 @@
     }
   }
 
-  .vp-portfolio__item-align-right .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-right .vp-portfolio__item-meta {
     align-items: flex-end;
     text-align: right;
 
@@ -272,7 +272,7 @@
     }
   }
 
-  .vp-portfolio__item-align-top-center .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-top-center .vp-portfolio__item-meta {
     align-items: center;
     justify-content: flex-start;
     text-align: center;
@@ -283,7 +283,7 @@
     }
   }
 
-  .vp-portfolio__item-align-top-left .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-top-left .vp-portfolio__item-meta {
     align-items: flex-start;
     justify-content: flex-start;
     text-align: left;
@@ -294,7 +294,7 @@
     }
   }
 
-  .vp-portfolio__item-align-top-right .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-top-right .vp-portfolio__item-meta {
     align-items: flex-end;
     justify-content: flex-start;
     text-align: right;
@@ -305,7 +305,7 @@
     }
   }
 
-  .vp-portfolio__item-align-bottom-center .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-bottom-center .vp-portfolio__item-meta {
     align-items: center;
     justify-content: flex-end;
     text-align: center;
@@ -316,7 +316,7 @@
     }
   }
 
-  .vp-portfolio__item-align-bottom-left .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-bottom-left .vp-portfolio__item-meta {
     align-items: flex-start;
     justify-content: flex-end;
     text-align: left;
@@ -327,7 +327,7 @@
     }
   }
 
-  .vp-portfolio__item-align-bottom-right .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-bottom-right .vp-portfolio__item-meta {
     align-items: flex-end;
     justify-content: flex-end;
     text-align: right;

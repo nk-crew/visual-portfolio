@@ -4,20 +4,7 @@
  * Default items style
  */
 .vp-portfolio__items-style-default {
-  .vp-portfolio__item a {
-    color: var(--vp-items-style-default--meta_links__color);
-    text-decoration: var(--vp-items-style-default--meta_links__text-decoration);
-    outline: none;
-    box-shadow: none;
-    transition: var(--vp-items-style-default-transition-duration) color var(--vp-items-style-default-transition-easing);
-
-    &:hover,
-    &:focus {
-      color: var(--vp-items-style-default--meta_links-hover__color);
-    }
-  }
-
-  .vp-portfolio__item-img-overlay {
+  .vp-portfolio__item-overlay {
     position: absolute;
     top: 0;
     right: 0;
@@ -35,6 +22,20 @@
     background-color: var(--vp-items-style-default--overlay__background-color);
     opacity: 0;
     transition: var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
+  }
+
+  // Caption.
+  .vp-portfolio__item-caption a {
+    color: var(--vp-items-style-default--caption_links__color);
+    text-decoration: var(--vp-items-style-default--caption_links__text-decoration);
+    outline: none;
+    box-shadow: none;
+    transition: var(--vp-items-style-default-transition-duration) color var(--vp-items-style-default-transition-easing);
+
+    &:hover,
+    &:focus {
+      color: var(--vp-items-style-default--caption_links-hover__color);
+    }
   }
 
   // Transitions
@@ -61,32 +62,32 @@
   // Overlay
   &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
   &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
-    .vp-portfolio__item-img-overlay {
+    .vp-portfolio__item-overlay {
       opacity: 1;
     }
   }
 
   &.vp-portfolio__items-show-overlay-default {
-    .vp-portfolio__item-img-overlay {
+    .vp-portfolio__item-overlay {
       opacity: 1;
     }
 
     .vp-portfolio__item:hover,
     .vp-portfolio__item-focus {
-      .vp-portfolio__item-img-overlay {
+      .vp-portfolio__item-overlay {
         opacity: 0;
       }
     }
   }
 
   &.vp-portfolio__items-show-overlay-always {
-    .vp-portfolio__item-img-overlay {
+    .vp-portfolio__item-overlay {
       opacity: 1;
     }
   }
 
   // fix some themes figcaption styles.
-  figcaption.vp-portfolio__item-overlay {
+  figcaption.vp-portfolio__item-caption {
     font-style: inherit;
     color: var(--vp-items-style-default--meta__color);
   }
@@ -193,7 +194,7 @@
   }
 
   // align
-  .vp-portfolio__item-align-left {
+  .vp-portfolio__item-caption-text-align-left {
     text-align: left;
 
     .vp-portfolio__item-meta-categories,
@@ -202,7 +203,7 @@
     }
   }
 
-  .vp-portfolio__item-align-center {
+  .vp-portfolio__item-caption-text-align-center {
     text-align: center;
 
     .vp-portfolio__item-meta-categories,
@@ -211,7 +212,7 @@
     }
   }
 
-  .vp-portfolio__item-align-right {
+  .vp-portfolio__item-caption-text-align-right {
     text-align: right;
 
     .vp-portfolio__item-meta-categories,
@@ -232,7 +233,7 @@
   }
 
   // Fix caption width in slider when used automatic slide width.
-  [data-vp-slider-slides-per-view="auto"] & .vp-portfolio__item-overlay {
+  [data-vp-slider-slides-per-view="auto"] & .vp-portfolio__item-caption {
     width: 0;
     min-width: 100%;
   }
