@@ -1200,12 +1200,12 @@ class Visual_Portfolio_Admin {
                         'dimensions' => array(
                             array(
                                 'name'    => 'caption_padding',
-                                'css_var' => 'overlay__padding',
+                                'css_var' => 'caption__padding',
                                 'label'   => esc_html__( 'Caption Padding', '@@text_domain' ),
                             ),
                             array(
                                 'name'    => 'caption_items_gap',
-                                'css_var' => 'meta-items__gap',
+                                'css_var' => 'caption-items__gap',
                                 'label'   => esc_html__( 'Caption Items Gap', '@@text_domain' ),
                             ),
                         ),
