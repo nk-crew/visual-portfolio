@@ -1,0 +1,28 @@
+.vpf-component-collapse-control {
+  margin: 0 -16px;
+  margin-bottom: -16px;
+
+  .vpf-component-collapse-control-toggle {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 10px 16px;
+    font-weight: 500;
+
+    svg {
+      margin-left: auto;
+    }
+  }
+
+  .vpf-component-collapse-control-active svg {
+    transform: rotate(180deg);
+  }
+
+  .components-panel__body {
+    border-top: none;
+  }
+
+  .components-panel__body:has(+ .vpf-component-collapse-control-toggle) {
+    padding-bottom: 0;
+  }
+}

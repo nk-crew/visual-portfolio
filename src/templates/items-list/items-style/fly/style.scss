@@ -71,11 +71,12 @@
     justify-content: center;
     width: 100%;
     min-height: 100%;
-    padding: var(--vp-items-style-fly--meta__padding-v) var(--vp-items-style-fly--meta__padding-h);
+    padding: var(--vp-items-style-fly--meta__padding);
     color: inherit;
 
     > * {
       max-width: 100%;
+      margin-top: 0;
       margin-bottom: var(--vp-items-style-fly--meta-items__gap);
     }
 

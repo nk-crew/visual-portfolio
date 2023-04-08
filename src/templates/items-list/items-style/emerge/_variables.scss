@@ -2,30 +2,29 @@
  * Items Style Emerge CSS Variables
  */
 .vp-portfolio__items-style-emerge {
-  // Links.
-  --vp-items-style-emerge--links__color: inherit;
-  --vp-items-style-emerge--links__text-decoration: none;
-  --vp-items-style-emerge--links-hover__color: var(--vp-color-brand);
-
   // Image.
   --vp-items-style-emerge--image__border-radius: 0;
   --vp-items-style-emerge--image__transform: translateY(0);
   --vp-items-style-emerge--image-hover__transform: translateY(-10px);
 
   // Image Overlay.
-  --vp-items-style-emerge--img-overlay__background-color: transparent;
+  --vp-items-style-emerge--overlay__background-color: transparent;
 
-  // Overlay.
-  --vp-items-style-emerge--overlay__min-height: 40px;
-  --vp-items-style-emerge--overlay__padding-v: 1.5em;
-  --vp-items-style-emerge--overlay__padding-h: 2em;
-  --vp-items-style-emerge--overlay__color: #fff;
-  --vp-items-style-emerge--overlay__background-color: #000;
-  --vp-items-style-emerge--overlay-skew__height: 20px;
-  --vp-items-style-emerge--overlay-skew__clip-left: var(--vp-items-style-emerge--overlay-skew__height);
-  --vp-items-style-emerge--overlay-skew__clip-right: var(--vp-items-style-emerge--overlay-skew__height);
-  --vp-items-style-emerge--overlay-skew-hover__clip-left: 0;
-  --vp-items-style-emerge--overlay-skew-hover__clip-right: var(--vp-items-style-emerge--overlay-skew__height);
+  // Caption.
+  --vp-items-style-emerge--caption__min-height: 40px;
+  --vp-items-style-emerge--caption__padding: 1.5em 2em;
+  --vp-items-style-emerge--caption__color: #fff;
+  --vp-items-style-emerge--caption__background-color: #000;
+  --vp-items-style-emerge--caption-skew__height: 20px;
+  --vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew__height);
+  --vp-items-style-emerge--caption-skew__clip-right: var(--vp-items-style-emerge--caption-skew__height);
+  --vp-items-style-emerge--caption-skew-hover__clip-left: 0;
+  --vp-items-style-emerge--caption-skew-hover__clip-right: var(--vp-items-style-emerge--caption-skew__height);
+
+  // Caption Links.
+  --vp-items-style-emerge--caption-links__color: inherit;
+  --vp-items-style-emerge--caption-links__text-decoration: none;
+  --vp-items-style-emerge--caption-links-hover__color: var(--vp-color-brand);
 
   // Meta.
   --vp-items-style-emerge--meta-items__gap: 1.5em;
@@ -65,7 +64,7 @@
   --vp-items-style-emerge-transition-duration: var(--vp-interactive__transition-duration);
   --vp-items-style-emerge-transition-easing: var(--vp-interactive__transition-easing);
 
-  // Overlay Show Transition.
-  --vp-items-style-emerge--overlay__transition-duration: var(--vp-items-style-emerge-transition-duration);
-  --vp-items-style-emerge--overlay__transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  // Caption Show Transition.
+  --vp-items-style-emerge--caption__transition-duration: var(--vp-items-style-emerge-transition-duration);
+  --vp-items-style-emerge--caption__transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }

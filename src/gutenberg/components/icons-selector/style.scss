@@ -39,7 +39,8 @@
   }
 }
 
-.vpf-control-wrap-icons_selector:has(+ .vpf-control-wrap-category_tabs) {
+.vpf-control-wrap-icons_selector:has(+ .vpf-control-wrap-category_tabs),
+.vpf-control-wrap-icons_selector:has(+ .vpf-control-wrap-category_collapse) {
   margin-bottom: 0;
 }
 

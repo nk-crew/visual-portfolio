@@ -32,6 +32,11 @@ class Visual_Portfolio_Deprecations {
         $this->add_deprecated_filter( 'vpf_print_popup_data', '2.9.0', 'vpf_popup_output' );
         $this->add_deprecated_filter( 'vpf_wp_get_attachment_image_extend', '2.9.0', 'vpf_wp_get_attachment_image' );
 
+        // Deprecated some builtin_controls for skins v2.23.0.
+        add_filter( 'vpf_extend_items_styles', array( $this, 'deprecated_items_styles_builtin_controls_config' ), 20 );
+        add_filter( 'vpf_items_style_builtin_controls', array( $this, 'deprecated_items_styles_builtin_controls' ), 20, 5 );
+        add_filter( 'vpf_get_options', array( $this, 'deprecated_items_styles_attributes' ), 20, 2 );
+
         // Deprecated image args for wp kses since v2.10.4.
         // Since v2.20.0 we are using the `vp_image` kses.
         add_filter( 'vpf_image_item_args', array( $this, 'deprecated_image_kses_args' ), 9 );
@@ -124,6 +129,98 @@ class Visual_Portfolio_Deprecations {
 
         // Return first arg.
         return $args[0];
+    }
+
+    /**
+     * Replace some old builtin_controls for skins.
+     *
+     * @param array $skins - all registered skins.
+     *
+     * @return array
+     */
+    public function deprecated_items_styles_builtin_controls_config( $skins ) {
+        $move_to_general = array( 'show_title', 'show_categories', 'show_date', 'show_author', 'show_comments_count', 'show_views_count', 'show_reading_time', 'show_excerpt', 'show_read_more', 'show_icons' );
+
+        foreach ( $skins as &$skin ) {
+            if ( isset( $skin['builtin_controls'] ) ) {
+                // Add 'general' controls.
+                foreach ( $move_to_general as $opt ) {
+                    if ( ! isset( $skin['builtin_controls'][ $opt ] ) ) {
+                        continue;
+                    }
+
+                    if ( ! isset( $skin['builtin_controls']['general'] ) ) {
+                        $skin['builtin_controls']['general'] = array();
+                    }
+
+                    $skin['builtin_controls']['general'][ str_replace( 'show_', '', $opt ) ] = $skin['builtin_controls'][ $opt ];
+
+                    unset( $skin['builtin_controls'][ $opt ] );
+                }
+
+                // Add 'images' controls.
+                if ( isset( $skin['builtin_controls']['images_rounded_corners'] ) ) {
+                    if ( ! isset( $skin['builtin_controls']['image'] ) ) {
+                        $skin['builtin_controls']['image'] = array(
+                            'border_radius' => $skin['builtin_controls']['images_rounded_corners'],
+                        );
+                    }
+
+                    unset( $skin['builtin_controls']['images_rounded_corners'] );
+                }
+            }
+        }
+
+        return $skins;
+    }
+
+    /**
+     * Add controls for old builtin_controls config.
+     *
+     * @param array  $fields - builtin fields.
+     * @param string $option_name - option name.
+     * @param array  $options - builtin field options.
+     * @param string $style_name - items style name.
+     * @param string $style - items style data.
+     *
+     * @return array
+     */
+    public function deprecated_items_styles_builtin_controls( $fields, $option_name, $options, $style_name, $style ) {
+        if ( 'align' === $option_name ) {
+            $fields[] = array(
+                'type'     => 'align',
+                'category' => 'items-style-caption',
+                'label'    => esc_html__( 'Caption Align', '@@text_domain' ),
+                'name'     => 'align',
+                'group'    => 'items_style_align',
+                'default'  => 'center',
+                'options'  => 'extended' === $options ? 'box' : 'horizontal',
+            );
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Add attributes to block rendering as a fallback
+     * to prevent errors in changed templates.
+     *
+     * @param array $options - block options.
+     * @param array $attrs - block attributes.
+     *
+     * @return array
+     */
+    public function deprecated_items_styles_attributes( $options, $attrs ) {
+        $styles = array( 'default', 'fade', 'fly', 'emerge' );
+
+        foreach ( $styles as $style ) {
+            // Restore align option.
+            if ( ! isset( $options[ 'items_style_' . $style . '__align' ] ) ) {
+                $options[ 'items_style_' . $style . '__align' ] = $attrs[ 'items_style_' . $style . '__align' ] ?? 'center';
+            }
+        }
+
+        return $options;
     }
 
     /**

@@ -9,6 +9,7 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import TabsControl from '../tabs-control';
+import CollapseControl from '../collapse-control';
 import IconsSelector from '../icons-selector';
 import CodeEditor from '../code-editor';
 import TilesSelector from '../tiles-selector';
@@ -284,6 +285,25 @@ ControlsRender.Control = function (props) {
         </TabsControl>
       );
       break;
+    case 'category_collapse':
+      renderControl = (
+        <CollapseControl
+          controlName={props.name}
+          options={props.options}
+          initialOpen={props.initialOpen}
+        >
+          {(tab) => {
+            return (
+              <ControlsRender
+                {...props.renderProps}
+                category={tab.category}
+                categoryToggle={false}
+              />
+            );
+          }}
+        </CollapseControl>
+      );
+      break;
     case 'html':
       renderControl = <RawHTML>{props.default}</RawHTML>;
       break;
@@ -358,7 +378,7 @@ ControlsRender.Control = function (props) {
       renderControl = (
         <AlignControl
           value={controlVal}
-          extended={props.extended}
+          options={props.options || 'horizontal'}
           onChange={(val) => onChange(val)}
         />
       );

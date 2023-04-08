@@ -43,7 +43,15 @@ addFilter('vpf.editor.changed-attributes', 'vpf/editor/changed-attributes/live-r
       case 'items_style_default__align':
       case 'items_style_fade__align':
       case 'items_style_fly__align':
-      case 'items_style_emerge__align': {
+      case 'items_style_emerge__align':
+      case 'items_style_default__caption_text_align':
+      case 'items_style_fade__caption_text_align':
+      case 'items_style_fly__caption_text_align':
+      case 'items_style_emerge__caption_text_align':
+      case 'items_style_default__overlay_text_align':
+      case 'items_style_fade__overlay_text_align':
+      case 'items_style_fly__overlay_text_align':
+      case 'items_style_emerge__overlay_text_align': {
         let allAlignClasses = '';
 
         [

@@ -26,6 +26,8 @@ $show_meta = $inline_meta ||
     $opts['show_excerpt'] && $args['excerpt'] ||
     $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] );
 
+$align = $opts['overlay_text_align'] ?? $opts['align'] ?? 'center';
+
 $templates_data = array(
     'args'        => $args,
     'opts'        => $opts,
@@ -46,7 +48,7 @@ $link_data = array_merge(
 
 ?>
 
-<figcaption class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
+<figcaption class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $align ); ?>">
     <div class="vp-portfolio__item-meta-wrap vp-portfolio__custom-scrollbar">
         <?php visual_portfolio()->include_template( 'global/link-start', $link_data ); ?>
 

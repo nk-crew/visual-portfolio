@@ -64,7 +64,7 @@
     justify-content: center;
     width: 100%;
     min-height: 100%;
-    padding: var(--vp-items-style-fade--meta__padding-v) var(--vp-items-style-fade--meta__padding-h);
+    padding: var(--vp-items-style-fade--meta__padding);
     color: inherit;
     text-align: center;
 
@@ -77,6 +77,7 @@
 
     > * {
       max-width: 100%;
+      margin-top: 0;
       margin-bottom: var(--vp-items-style-fade--meta-items__gap);
       opacity: 0;
       transition-delay: calc(var(--vp-items-style-fade--meta-staggering__transition-delay) * var(--vp-items-style-fade--meta-staggering__index));

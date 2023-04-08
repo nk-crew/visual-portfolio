@@ -11,11 +11,11 @@ const { Button, Tooltip } = wp.components;
 /**
  * Component Class
  */
-export default function IconsSelector(props) {
-  const { extended, value, onChange } = props;
+export default function AlignControl(props) {
+  const { options, value, onChange } = props;
 
   let controlsArray = ['left', 'center', 'right'];
-  if (extended) {
+  if ('box' === options) {
     controlsArray = [
       'top-left',
       'top-center',
