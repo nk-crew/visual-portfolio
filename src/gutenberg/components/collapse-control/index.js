@@ -6,7 +6,7 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-const { useState } = wp.element;
+const { Fragment, useState } = wp.element;
 
 const { Button } = wp.components;
 
@@ -22,7 +22,7 @@ export default function CollapseControl(props) {
     <div className="vpf-component-collapse-control">
       {options.map((option) => {
         return (
-          <>
+          <Fragment key={option.category}>
             <Button
               onClick={() => {
                 setCollapsed(option.category === collapsed ? '' : option.category);
@@ -46,7 +46,7 @@ export default function CollapseControl(props) {
               </svg>
             </Button>
             {option.category === collapsed ? children(option) : null}
-          </>
+          </Fragment>
         );
       })}
     </div>
