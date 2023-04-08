@@ -65,6 +65,10 @@ class Visual_Portfolio_Migrations {
     public function get_migrations() {
         return array(
             array(
+                'version' => '2.23.0',
+                'cb'      => array( $this, 'v_2_23_0' ),
+            ),
+            array(
                 'version' => '2.15.0',
                 'cb'      => array( $this, 'v_2_15_0' ),
             ),
@@ -81,6 +85,73 @@ class Visual_Portfolio_Migrations {
                 'cb'      => array( $this, 'v_1_11_0' ),
             ),
         );
+    }
+
+    /**
+     * Add new attributes and values from old attributes.
+     */
+    public function v_2_23_0() {
+        // Get all available Layouts.
+        // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408.
+        $layouts_query = get_posts(
+            array(
+                'post_type'      => 'vp_lists',
+                'posts_per_page' => -1,
+                'paged'          => -1,
+            )
+        );
+
+        $attributes_to_change = array(
+            // Align.
+            'items_style_default__align'                   => 'items_style_default__caption_text_align',
+            'items_style_fade__align'                      => 'items_style_fade__overlay_text_align',
+            'items_style_fly__align'                       => 'items_style_fly__overlay_text_align',
+            'items_style_emerge__align'                    => 'items_style_emerge__caption_text_align',
+            'items_style_caption_move__align'              => 'items_style_caption_move__caption_text_align',
+
+            // Color.
+            'items_style_default__bg_color'                => 'items_style_default__overlay_bg_color',
+            'items_style_default__text_color'              => 'items_style_default__overlay_text_color',
+            'items_style_fade__bg_color'                   => 'items_style_fade__overlay_bg_color',
+            'items_style_fade__text_color'                 => 'items_style_fade__overlay_text_color',
+            'items_style_fly__bg_color'                    => 'items_style_fly__overlay_bg_color',
+            'items_style_fly__text_color'                  => 'items_style_fly__overlay_text_color',
+            'items_style_emerge__bg_color'                 => 'items_style_emerge__caption_bg_color',
+            'items_style_emerge__links_color'              => 'items_style_emerge__caption_links_color',
+            'items_style_emerge__links_hover_color'        => 'items_style_emerge__caption_links_hover_color',
+            'items_style_emerge__text_color'               => 'items_style_emerge__caption_text_color',
+            'items_style_emerge__img_overlay_bg_color'     => 'items_style_emerge__overlay_bg_color',
+            'items_style_caption-move__bg_color'           => 'items_style_caption-move__caption_bg_color',
+            'items_style_caption-move__text_color'         => 'items_style_caption-move__caption_text_color',
+            'items_style_caption-move__img_overlay_bg_color' => 'items_style_caption-move__overlay_bg_color',
+            'items_style_caption-move__overlay_text_color' => 'items_style_caption-move__overlay_text_color',
+
+            // Move Under Image.
+            'items_style_fade__move_overlay_under_image'   => 'items_style_fade__overlay_under_image',
+            'items_style_fly__move_overlay_under_image'    => 'items_style_fly__overlay_under_image',
+            'items_style_emerge__move_overlay_under_image' => 'items_style_emerge__caption_under_image',
+            'items_style_caption-move__move_overlay_under_image' => 'items_style_caption-move__caption_under_image',
+        );
+
+        if ( $layouts_query ) {
+            foreach ( $layouts_query as $post ) {
+                // Change Portfolio content source to Post with custom post type Portfolio.
+                if ( 'portfolio' === get_post_meta( $post->ID, 'vp_content_source', true ) ) {
+                    update_post_meta( $post->ID, 'vp_content_source', 'post-based' );
+                    update_post_meta( $post->ID, 'vp_posts_source', 'portfolio' );
+                }
+
+                foreach ( $attributes_to_change as $old_attr => $new_attr ) {
+                    $old_val = get_post_meta( $post->ID, 'vp_' . $old_attr, true );
+                    $new_val = get_post_meta( $post->ID, 'vp_' . $new_attr, true );
+
+                    if ( $old_val && ! $new_val ) {
+                        update_post_meta( $post->ID, 'vp_' . $new_attr, $old_val );
+                    }
+                }
+            }
+            wp_reset_postdata();
+        }
     }
 
     /**
