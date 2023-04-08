@@ -20,6 +20,7 @@
     color: var(--vp-items-style-default--overlay__color);
     text-decoration: var(--vp-items-style-default--overlay__text-decoration);
     background-color: var(--vp-items-style-default--overlay__background-color);
+    mix-blend-mode: var(--vp-items-style-default--overlay__mix-blend-mode);
     opacity: 0;
     transition: var(--vp-items-style-default-transition-duration) opacity var(--vp-items-style-default-transition-easing);
   }

@@ -937,15 +937,16 @@ class Visual_Portfolio_Admin {
                             'border_radius' => true,
                         ),
                         'overlay'    => array(
-                            'label'      => esc_html__( 'Overlay', '@@text_domain' ),
-                            'states'     => true,
-                            'text_align' => false,
+                            'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+                            'states'         => true,
+                            'text_align'     => false,
+
+                            // Pro.
+                            'mix_blend_mode' => true,
                         ),
                         'caption'    => array(
                             'label'       => esc_html__( 'Caption', '@@text_domain' ),
                             'states'      => false,
-
-                            // All available align values: 'horizontal'|'vertical'|'box'.
                             'text_align'  => 'horizontal',
                         ),
                         'colors'     => array(
@@ -1018,14 +1019,13 @@ class Visual_Portfolio_Admin {
                             'border_radius' => true,
                         ),
                         'overlay'    => array(
-                            'label'       => esc_html__( 'Overlay', '@@text_domain' ),
-                            'states'      => true,
-
-                            // All available align values: 'horizontal'|'vertical'|'box'.
-                            'text_align'  => 'box',
+                            'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+                            'states'         => true,
+                            'text_align'     => 'box',
 
                             // Pro.
-                            'under_image' => true,
+                            'under_image'    => true,
+                            'mix_blend_mode' => true,
                         ),
                         'caption'    => false,
                         'colors'     => array(
@@ -1091,14 +1091,13 @@ class Visual_Portfolio_Admin {
                             'border_radius' => true,
                         ),
                         'overlay'    => array(
-                            'label'       => esc_html__( 'Overlay', '@@text_domain' ),
-                            'states'      => false,
-
-                            // All available align values: 'horizontal'|'vertical'|'box'.
-                            'text_align'  => 'box',
+                            'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+                            'states'         => false,
+                            'text_align'     => 'box',
 
                             // Pro.
-                            'under_image' => true,
+                            'under_image'    => true,
+                            'mix_blend_mode' => true,
                         ),
                         'caption'    => false,
                         'colors'     => array(
@@ -1164,19 +1163,21 @@ class Visual_Portfolio_Admin {
                             'border_radius' => true,
                         ),
                         'overlay'    => array(
-                            'label'      => esc_html__( 'Overlay', '@@text_domain' ),
-                            'states'     => true,
-                            'text_align' => false,
-                        ),
-                        'caption'    => array(
-                            'label'       => esc_html__( 'Caption', '@@text_domain' ),
-                            'states'      => true,
-
-                            // All available align values: 'horizontal'|'vertical'|'box'.
-                            'text_align'  => 'horizontal',
+                            'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+                            'states'         => true,
+                            'text_align'     => false,
 
                             // Pro.
-                            'under_image' => true,
+                            'mix_blend_mode' => true,
+                        ),
+                        'caption'    => array(
+                            'label'          => esc_html__( 'Caption', '@@text_domain' ),
+                            'states'         => true,
+                            'text_align'     => 'horizontal',
+
+                            // Pro.
+                            'under_image'    => true,
+                            'mix_blend_mode' => true,
                         ),
                         'colors'     => array(
                             array(
@@ -2131,24 +2132,26 @@ class Visual_Portfolio_Admin {
                 'border_radius' => true,
             ),
             'overlay'    => array(
-                'label'       => esc_html__( 'Overlay', '@@text_domain' ),
-                'states'      => true,
+                'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+                'states'         => true,
 
                 // All available align values: 'horizontal'|'vertical'|'box'.
-                'text_align'  => 'box',
+                'text_align'     => 'box',
 
                 // Pro.
-                'under_image' => false,
+                'under_image'    => false,
+                'mix_blend_mode' => false,
             ),
             'caption'    => array(
-                'label'       => esc_html__( 'Caption', '@@text_domain' ),
-                'states'      => true,
+                'label'          => esc_html__( 'Caption', '@@text_domain' ),
+                'states'         => true,
 
                 // All available align values: 'horizontal'|'vertical'|'box'.
-                'text_align'  => 'horizontal',
+                'text_align'     => 'horizontal',
 
                 // Pro.
-                'under_image' => false,
+                'under_image'    => false,
+                'mix_blend_mode' => false,
             ),
             'colors'     => array(
                 array(

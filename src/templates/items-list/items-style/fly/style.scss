@@ -41,6 +41,7 @@
     text-align: center;
     text-decoration: var(--vp-items-style-fly--overlay__text-decoration);
     background-color: var(--vp-items-style-fly--overlay__background-color);
+    mix-blend-mode: var(--vp-items-style-fly--overlay__mix-blend-mode);
     transform: translateY(-100%) translateX(-100%);
   }
 
