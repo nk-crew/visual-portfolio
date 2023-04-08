@@ -1199,6 +1199,11 @@ class Visual_Portfolio_Admin {
                         'typography' => true,
                         'dimensions' => array(
                             array(
+                                'name'    => 'caption_skew_size',
+                                'css_var' => 'caption-skew__height',
+                                'label'   => esc_html__( 'Caption Skew Size', '@@text_domain' ),
+                            ),
+                            array(
                                 'name'    => 'caption_padding',
                                 'css_var' => 'caption__padding',
                                 'label'   => esc_html__( 'Caption Padding', '@@text_domain' ),
