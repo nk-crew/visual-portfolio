@@ -536,6 +536,9 @@ class Visual_Portfolio_Get {
         if ( isset( $style_options['show_overlay'] ) && $style_options['show_overlay'] ) {
             $items_class .= ' vp-portfolio__items-show-overlay-' . $style_options['show_overlay'];
         }
+        if ( isset( $style_options['show_caption'] ) && $style_options['show_caption'] ) {
+            $items_class .= ' vp-portfolio__items-show-caption-' . $style_options['show_caption'];
+        }
 
         if ( isset( $style_options['show_img_overlay'] ) && $style_options['show_img_overlay'] ) {
             $items_class .= ' vp-portfolio__items-show-img-overlay-' . $style_options['show_img_overlay'];
