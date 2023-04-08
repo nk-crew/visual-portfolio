@@ -2243,7 +2243,7 @@ class Visual_Portfolio_Admin {
 
                             if ( isset( $options['date'] ) && $options['date'] ) {
                                 $new_fields[] = array(
-                                    'type'    => 'radio',
+                                    'type'    => 'select',
                                     'label'   => esc_html__( 'Display Date', '@@text_domain' ),
                                     'name'    => 'show_date',
                                     'group'   => 'items_style_date',
@@ -2349,7 +2349,7 @@ class Visual_Portfolio_Admin {
 
                             if ( isset( $options['read_more'] ) && $options['read_more'] ) {
                                 $new_fields[] = array(
-                                    'type'    => 'radio',
+                                    'type'    => 'select',
                                     'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
                                     'name'    => 'show_read_more',
                                     'group'   => 'items_style_read_more',
