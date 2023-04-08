@@ -95,11 +95,11 @@
   // meta
   .vp-portfolio__item-meta {
     position: relative;
-    padding: var(--vp-items-style-default--meta__padding);
+    padding: var(--vp-items-style-default--caption__padding);
 
     > * {
       margin-top: 0;
-      margin-bottom: var(--vp-items-style-default--meta-items__gap);
+      margin-bottom: var(--vp-items-style-default--caption-items__gap);
     }
 
     > :last-child {
