@@ -983,17 +983,7 @@ class Visual_Portfolio_Admin {
                         'animation'  => true,
                     ),
                     'controls'             => array(
-                        array(
-                            'type'        => 'pro_note',
-                            'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                            'description' => '<ul>
-                                                <li>' . esc_html__( 'Instagram-like filters for images', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'New modern styles', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'Additional hover effects', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
-                                            </ul>',
-                        ),
+                        // Nothing here yet, all options are in builtin controls.
                     ),
                 ),
 
@@ -1055,17 +1045,7 @@ class Visual_Portfolio_Admin {
                         'animation'  => true,
                     ),
                     'controls'             => array(
-                        array(
-                            'type'        => 'pro_note',
-                            'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                            'description' => '<ul>
-                                                <li>' . esc_html__( 'Instagram-like filters for images', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'New modern styles', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'Additional hover effects', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
-                                            </ul>',
-                        ),
+                        // Nothing here yet, all options are in builtin controls.
                     ),
                 ),
 
@@ -1127,17 +1107,7 @@ class Visual_Portfolio_Admin {
                         'animation'  => true,
                     ),
                     'controls'             => array(
-                        array(
-                            'type'        => 'pro_note',
-                            'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                            'description' => '<ul>
-                                                <li>' . esc_html__( 'Instagram-like filters for images', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'New modern styles', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'Additional hover effects', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
-                                            </ul>',
-                        ),
+                        // Nothing here yet, all options are in builtin controls.
                     ),
                 ),
 
@@ -1218,17 +1188,7 @@ class Visual_Portfolio_Admin {
                         'animation'  => true,
                     ),
                     'controls'             => array(
-                        array(
-                            'type'        => 'pro_note',
-                            'name'        => 'additional_style_settings_pro',
-                            'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                            'description' => '<ul>
-                                                <li>' . esc_html__( 'Instagram-like filters for images', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'New modern styles', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'Additional hover effects', '@@text_domain' ) . '</li>
-                                                <li>' . esc_html__( 'etc...', '@@text_domain' ) . '</li>
-                                            </ul>',
-                        ),
+                        // Nothing here yet, all options are in builtin controls.
                     ),
                 ),
             ),
@@ -2388,6 +2348,13 @@ class Visual_Portfolio_Admin {
                                     'default'   => false,
                                 );
                             }
+
+                            $new_fields[] = array(
+                                'type'        => 'pro_note',
+                                'name'        => 'additional_general_skin_settings_pro',
+                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                'description' => 'Choose from a variety of additional contemporary Skins',
+                            );
                             break;
 
                         // Image.
@@ -2411,6 +2378,14 @@ class Visual_Portfolio_Admin {
                                     ),
                                 );
                             }
+
+                            $new_fields[] = array(
+                                'type'        => 'pro_note',
+                                'category'    => 'items-style-image',
+                                'name'        => 'additional_image_skin_settings_pro',
+                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                'description' => 'Incorporate Instagram-esque filters on images and apply blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
+                            );
                             break;
 
                         // Overlay.
@@ -2439,9 +2414,25 @@ class Visual_Portfolio_Admin {
                                     'name'     => 'overlay_text_align',
                                     'group'    => 'items_style_overlay',
                                     'default'  => 'center',
-
-                                    // All available align options: 'horizontal'|'vertical'|'box'.
                                     'options'  => $options['text_align'],
+                                );
+                            }
+
+                            if ( 'fade' === $style_name || 'fly' === $style_name || 'emerge' === $style_name ) {
+                                $new_fields[] = array(
+                                    'type'        => 'pro_note',
+                                    'category'    => 'items-style-overlay',
+                                    'name'        => 'additional_overlay_skin_settings_pro',
+                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                    'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible. Incorporate Instagram-esque filters on images and apply blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
+                                );
+                            } else {
+                                $new_fields[] = array(
+                                    'type'        => 'pro_note',
+                                    'category'    => 'items-style-overlay',
+                                    'name'        => 'additional_overlay_skin_settings_pro',
+                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                    'description' => 'Incorporate Instagram-esque filters on images and apply blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
                                 );
                             }
                             break;
@@ -2475,6 +2466,16 @@ class Visual_Portfolio_Admin {
 
                                     // All available align options: 'horizontal'|'vertical'|'box'.
                                     'options'  => $options['text_align'],
+                                );
+                            }
+
+                            if ( 'fade' === $style_name || 'fly' === $style_name || 'emerge' === $style_name ) {
+                                $new_fields[] = array(
+                                    'type'        => 'pro_note',
+                                    'category'    => 'items-style-caption',
+                                    'name'        => 'additional_caption_skin_settings_pro',
+                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                    'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible',
                                 );
                             }
                             break;
@@ -2560,6 +2561,39 @@ class Visual_Portfolio_Admin {
                                     }
                                 }
                             }
+                            break;
+
+                        // Typography.
+                        case 'typography':
+                            $new_fields[] = array(
+                                'type'        => 'pro_note',
+                                'category'    => 'items-style-typography',
+                                'name'        => 'additional_typography_skin_settings_pro',
+                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                'description' => 'Manage fonts, sizing, and appearance of distinct text components within the Skin',
+                            );
+                            break;
+
+                        // Dimensions.
+                        case 'dimensions':
+                            $new_fields[] = array(
+                                'type'        => 'pro_note',
+                                'category'    => 'items-style-dimensions',
+                                'name'        => 'additional_dimensions_skin_settings_pro',
+                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                'description' => 'Adjust padding for overlays and captions, as well as the spacing between caption elements',
+                            );
+                            break;
+
+                        // Animation.
+                        case 'animation':
+                            $new_fields[] = array(
+                                'type'        => 'pro_note',
+                                'category'    => 'items-style-animation',
+                                'name'        => 'additional_animation_skin_settings_pro',
+                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                'description' => 'Customize hover effects and transitions',
+                            );
                             break;
                         // no default.
                     }
