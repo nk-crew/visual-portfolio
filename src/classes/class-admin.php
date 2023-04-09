@@ -935,6 +935,7 @@ class Visual_Portfolio_Admin {
                         ),
                         'image'      => array(
                             'border_radius' => true,
+                            'css_filter'    => true,
                         ),
                         'overlay'    => array(
                             'label'          => esc_html__( 'Overlay', '@@text_domain' ),
@@ -1007,6 +1008,7 @@ class Visual_Portfolio_Admin {
                         ),
                         'image'      => array(
                             'border_radius' => true,
+                            'css_filter'    => true,
                         ),
                         'overlay'    => array(
                             'label'          => esc_html__( 'Overlay', '@@text_domain' ),
@@ -1069,6 +1071,7 @@ class Visual_Portfolio_Admin {
                         ),
                         'image'      => array(
                             'border_radius' => true,
+                            'css_filter'    => true,
                         ),
                         'overlay'    => array(
                             'label'          => esc_html__( 'Overlay', '@@text_domain' ),
@@ -1131,6 +1134,7 @@ class Visual_Portfolio_Admin {
                         ),
                         'image'      => array(
                             'border_radius' => true,
+                            'css_filter'    => true,
                         ),
                         'overlay'    => array(
                             'label'          => esc_html__( 'Overlay', '@@text_domain' ),
@@ -2090,6 +2094,7 @@ class Visual_Portfolio_Admin {
             ),
             'image'      => array(
                 'border_radius' => true,
+                'css_filter'    => false,
             ),
             'overlay'    => array(
                 'label'          => esc_html__( 'Overlay', '@@text_domain' ),
