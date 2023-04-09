@@ -52,7 +52,11 @@ const {
   RadioControl,
   ToggleControl,
   RangeControl,
+  UnitControl: __stableUnitControl,
+  __experimentalUnitControl,
 } = wp.components;
+
+const UnitControl = __stableUnitControl || __experimentalUnitControl;
 
 const { controls: registeredControls, controls_categories: registeredControlsCategories } =
   window.VPGutenbergVariables;
@@ -527,6 +531,18 @@ ControlsRender.Control = function (props) {
           step={props.step}
           value={parseFloat(controlVal)}
           onChange={(val) => onChange(parseFloat(val))}
+        />
+      );
+      renderControlLabel = false;
+      break;
+    case 'unit':
+      renderControl = (
+        <UnitControl
+          label={renderControlLabel}
+          value={controlVal}
+          onChange={(val) => onChange(val)}
+          labelPosition="edge"
+          __unstableInputWidth="70px"
         />
       );
       renderControlLabel = false;

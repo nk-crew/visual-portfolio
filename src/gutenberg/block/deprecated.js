@@ -44,6 +44,14 @@ const V2_23_0_ATTRIBUTES = {
     'items_style_caption-move__caption_under_image',
 };
 
+const V2_23_0_BORDER_RADIUS = [
+  'items_style_default__images_rounded_corners',
+  'items_style_fade__images_rounded_corners',
+  'items_style_fly__images_rounded_corners',
+  'items_style_emerge__images_rounded_corners',
+  'items_style_caption_move__images_rounded_corners',
+];
+
 export default [
   // v2.23.0
   // Changed items style builtin_controls structure.
@@ -54,6 +62,13 @@ export default [
         const attrs = {};
         Object.keys(V2_23_0_ATTRIBUTES).forEach((k) => {
           attrs[k] = { type: 'string' };
+        });
+        return attrs;
+      })(),
+      ...(() => {
+        const attrs = {};
+        V2_23_0_BORDER_RADIUS.forEach((k) => {
+          attrs[k] = { type: 'number', default: 0 };
         });
         return attrs;
       })(),
@@ -71,6 +86,12 @@ export default [
         }
       });
 
+      V2_23_0_BORDER_RADIUS.forEach((k) => {
+        if ('number' === typeof newAttributes[k]) {
+          newAttributes[k] = `${newAttributes[k]}px`;
+        }
+      });
+
       return [newAttributes, []];
     },
     isEligible(attrs) {
@@ -79,6 +100,12 @@ export default [
 
       keys.forEach((key) => {
         if (!eligible && key in attrs) {
+          eligible = true;
+        }
+      });
+
+      V2_23_0_BORDER_RADIUS.forEach((k) => {
+        if (!eligible && 'number' === typeof attrs[k]) {
           eligible = true;
         }
       });

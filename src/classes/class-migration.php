@@ -136,6 +136,14 @@ class Visual_Portfolio_Migrations {
             'items_style_caption-move__move_overlay_under_image' => 'items_style_caption-move__caption_under_image',
         );
 
+        $attributes_border_radius = array(
+            'items_style_default__images_rounded_corners',
+            'items_style_fade__images_rounded_corners',
+            'items_style_fly__images_rounded_corners',
+            'items_style_emerge__images_rounded_corners',
+            'items_style_caption_move__images_rounded_corners',
+        );
+
         if ( $layouts_query ) {
             foreach ( $layouts_query as $post ) {
                 // Change Portfolio content source to Post with custom post type Portfolio.
@@ -150,6 +158,14 @@ class Visual_Portfolio_Migrations {
 
                     if ( $old_val && ! $new_val ) {
                         update_post_meta( $post->ID, 'vp_' . $new_attr, $old_val );
+                    }
+                }
+
+                foreach ( $attributes_border_radius as $attr_name ) {
+                    $attr_val = get_post_meta( $post->ID, 'vp_' . $attr_name, true );
+
+                    if ( is_numeric( $attr_val ) ) {
+                        update_post_meta( $post->ID, 'vp_' . $attr_name, $attr_val . 'px' );
                     }
                 }
             }

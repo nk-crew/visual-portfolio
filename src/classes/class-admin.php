@@ -2366,19 +2366,16 @@ class Visual_Portfolio_Admin {
                         case 'image':
                             if ( isset( $options['border_radius'] ) && $options['border_radius'] ) {
                                 $new_fields[] = array(
-                                    'type'     => 'range',
+                                    'type'     => 'unit',
                                     'category' => 'items-style-image',
                                     'label'    => esc_html__( 'Border Radius', '@@text_domain' ),
                                     'name'     => 'images_rounded_corners',
                                     'group'    => 'items_style_images',
-                                    'min'      => 0,
-                                    'max'      => 100,
-                                    'default'  => 0,
+                                    'default'  => '',
                                     'style'    => array(
                                         array(
                                             'element'  => '.vp-portfolio__items-style-' . $style_name,
                                             'property' => '--vp-items-style-' . $style_name . '--image__border-radius',
-                                            'mask'     => '$px',
                                         ),
                                     ),
                                 );
