@@ -45,7 +45,14 @@ export default function CollapseControl(props) {
                 <path d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z" />
               </svg>
             </Button>
-            {option.category === collapsed ? children(option) : null}
+            <div
+              className={classnames(
+                'vpf-component-collapse-control-content',
+                option.category === collapsed ? 'vpf-component-collapse-control-content-active' : ''
+              )}
+            >
+              {children(option)}
+            </div>
           </Fragment>
         );
       })}

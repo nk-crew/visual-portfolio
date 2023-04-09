@@ -2,6 +2,7 @@
   margin: 0 -16px;
   margin-bottom: -16px;
 
+  // Toggle.
   .vpf-component-collapse-control-toggle {
     display: flex;
     gap: 6px;
@@ -18,6 +19,22 @@
     transform: rotate(180deg);
   }
 
+  // Content.
+  .vpf-component-collapse-control-content {
+    display: none;
+  }
+
+  .vpf-component-collapse-control-content-active {
+    display: block;
+  }
+
+  // Hide toggle and content when it is empty.
+  .vpf-component-collapse-control-toggle:has(+ .vpf-component-collapse-control-content:empty),
+  .vpf-component-collapse-control-content:empty {
+    display: none;
+  }
+
+  // Fix panel padding.
   .components-panel__body {
     border-top: none;
   }
