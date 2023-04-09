@@ -842,7 +842,7 @@ class Visual_Portfolio_Custom_Post_Type {
                                     <?php echo esc_html__( 'Premium Only', '@@text_domain' ); ?>
                                 </h3>
                                 <div>
-                                    <p><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', '@@text_domain' ); ?></p>
+                                    <p class="vpf-pro-note-description"><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', '@@text_domain' ); ?></p>
                                     <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $pro_url ); ?>">
                                     <?php echo esc_html__( 'Go Pro', '@@text_domain' ); ?>
                                     </a>
