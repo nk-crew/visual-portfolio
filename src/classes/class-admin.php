@@ -2401,7 +2401,7 @@ class Visual_Portfolio_Admin {
                                 'category'    => 'items-style-image',
                                 'name'        => 'additional_image_skin_settings_pro',
                                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                'description' => 'Incorporate Instagram-esque filters on images and apply blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
+                                'description' => 'Apply Instagram-like filters and change image hover transitions for both default and hover states',
                             );
                             break;
 
@@ -2441,7 +2441,7 @@ class Visual_Portfolio_Admin {
                                     'category'    => 'items-style-overlay',
                                     'name'        => 'additional_overlay_skin_settings_pro',
                                     'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                    'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible. Incorporate Instagram-esque filters on images and apply blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
+                                    'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible. Apply Instagram-like filters on images and select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
                                 );
                             } else {
                                 $new_fields[] = array(
@@ -2449,7 +2449,7 @@ class Visual_Portfolio_Admin {
                                     'category'    => 'items-style-overlay',
                                     'name'        => 'additional_overlay_skin_settings_pro',
                                     'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                    'description' => 'Incorporate Instagram-esque filters on images and apply blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
+                                    'description' => 'Apply Instagram-like filters on images and select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
                                 );
                             }
                             break;
