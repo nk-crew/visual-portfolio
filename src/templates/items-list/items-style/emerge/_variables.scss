@@ -4,7 +4,7 @@
 .vp-portfolio__items-style-emerge {
   // Image.
   --vp-items-style-emerge--image__border-radius: 0;
-  --vp-items-style-emerge--image__transform: translateY(0);
+  --vp-items-style-emerge--image__transform: none;
   --vp-items-style-emerge--image-hover__transform: translateY(-10px);
 
   // Image Overlay.
@@ -61,8 +61,8 @@
   // Transitions.
   --vp-items-style-emerge-transition-duration: var(--vp-interactive__transition-duration);
   --vp-items-style-emerge-transition-easing: var(--vp-interactive__transition-easing);
-
-  // Caption Show Transition.
+  --vp-items-style-emerge--image__transition-duration: var(--vp-items-style-emerge-transition-duration);
+  --vp-items-style-emerge--image__transition-easing: var(--vp-items-style-emerge-transition-easing);
   --vp-items-style-emerge--caption__transition-duration: var(--vp-items-style-emerge-transition-duration);
   --vp-items-style-emerge--caption__transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }

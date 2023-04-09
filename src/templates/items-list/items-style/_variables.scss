@@ -2,9 +2,9 @@
  * Items Style Default CSS Variables
  */
 .vp-portfolio__items-style-default {
-
   // Image.
   --vp-items-style-default--image__border-radius: 0;
+  --vp-items-style-default--image-transform: none;
   --vp-items-style-default--image-hover__transform: scale(1.05);
 
   // Caption.
@@ -52,4 +52,8 @@
   // Transitions.
   --vp-items-style-default-transition-duration: var(--vp-interactive__transition-duration);
   --vp-items-style-default-transition-easing: var(--vp-interactive__transition-easing);
+  --vp-items-style-default--image__transition-duration: var(--vp-items-style-default-transition-duration);
+  --vp-items-style-default--image__transition-easing: var(--vp-items-style-default-transition-easing);
+  --vp-items-style-default--overlay__transition-duration: var(--vp-items-style-default-transition-duration);
+  --vp-items-style-default--overlay__transition-easing: var(--vp-items-style-default-transition-easing);
 }

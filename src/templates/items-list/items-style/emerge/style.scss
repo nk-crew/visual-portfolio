@@ -10,6 +10,9 @@
     // https://github.com/nk-crew/visual-portfolio/issues/150
     z-index: 0;
     border-radius: var(--vp-items-style-emerge--image__border-radius);
+    transition-timing-function: var(--vp-items-style-emerge--image__transition-easing);
+    transition-duration: var(--vp-items-style-emerge--image__transition-duration);
+    transition-property: border-radius;
   }
 
   // Overlay
@@ -195,7 +198,10 @@
 
   // Transitions
   .vp-portfolio__item-img img {
-    transition: transform var(--vp-items-style-emerge-transition-duration) var(--vp-items-style-emerge-transition-easing), opacity var(--vp-items-style-emerge-transition-duration) var(--vp-items-style-emerge-transition-easing);
+    transition-timing-function: var(--vp-items-style-emerge--image__transition-easing);
+    transition-duration: var(--vp-items-style-emerge--image__transition-duration);
+    transition-property: opacity, transform;
+    transform: var(--vp-items-style-emerge--image__transform);
   }
 
   // Show Overlay and Caption.

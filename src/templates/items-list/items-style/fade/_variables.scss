@@ -7,6 +7,7 @@
 
   // Image.
   --vp-items-style-fade--image__border-radius: 0;
+  --vp-items-style-fade--image__transform: none;
   --vp-items-style-fade--image-hover__transform: scale(1.05);
 
   // Overlay.
@@ -53,4 +54,8 @@
   // Transitions.
   --vp-items-style-fade-transition-duration: var(--vp-interactive__transition-duration);
   --vp-items-style-fade-transition-easing: var(--vp-interactive__transition-easing);
+  --vp-items-style-fade--image__transition-duration: var(--vp-items-style-fade-transition-duration);
+  --vp-items-style-fade--image__transition-easing: var(--vp-items-style-fade-transition-easing);
+  --vp-items-style-fade--overlay__transition-duration: var(--vp-items-style-fade-transition-duration);
+  --vp-items-style-fade--overlay__transition-easing: var(--vp-items-style-fade-transition-easing);
 }

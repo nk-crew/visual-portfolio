@@ -4,14 +4,6 @@
  * Fly items style
  */
 .vp-portfolio__items-style-fly {
-  .vp-portfolio__item {
-
-    // fix for safari border-radius.
-    // https://github.com/nk-crew/visual-portfolio/issues/150
-    z-index: 0;
-    border-radius: var(--vp-items-style-fly--image__border-radius);
-  }
-
   .vp-portfolio__item a {
     text-decoration: var(--vp-items-style-fly--links__text-decoration);
     outline: none;
@@ -168,6 +160,36 @@
 
     > * {
       opacity: var(--vp-items-style-fly--meta-excerpt__opacity);
+    }
+  }
+
+  // Image
+  .vp-portfolio__item {
+
+    // fix for safari border-radius.
+    // https://github.com/nk-crew/visual-portfolio/issues/150
+    z-index: 0;
+    border-radius: var(--vp-items-style-fly--image__border-radius);
+    transition-timing-function: var(--vp-items-style-fly--image__transition-easing);
+    transition-duration: var(--vp-items-style-fly--image__transition-duration);
+    transition-property: border-radius;
+  }
+
+  .vp-portfolio__item-img img {
+
+    // Fix FireFox image blinking
+    // https://github.com/nk-crew/visual-portfolio/issues/92
+    z-index: 1;
+    transition-timing-function: var(--vp-items-style-fly--image__transition-easing);
+    transition-duration: var(--vp-items-style-fly--image__transition-duration);
+    transition-property: opacity, transform;
+    transform: var(--vp-items-style-fly--image__transform);
+  }
+
+  .vp-portfolio__item:hover,
+  .vp-portfolio__item-focus {
+    .vp-portfolio__item-img img {
+      transform: var(--vp-items-style-fly--image-hover__transform);
     }
   }
 

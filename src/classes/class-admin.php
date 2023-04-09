@@ -935,7 +935,10 @@ class Visual_Portfolio_Admin {
                         ),
                         'image'      => array(
                             'border_radius' => true,
+
+                            // Pro.
                             'css_filter'    => true,
+                            'transform'     => true,
                         ),
                         'overlay'    => array(
                             'label'          => esc_html__( 'Overlay', '@@text_domain' ),
@@ -1008,7 +1011,10 @@ class Visual_Portfolio_Admin {
                         ),
                         'image'      => array(
                             'border_radius' => true,
+
+                            // Pro.
                             'css_filter'    => true,
+                            'transform'     => true,
                         ),
                         'overlay'    => array(
                             'label'          => esc_html__( 'Overlay', '@@text_domain' ),
@@ -1071,7 +1077,10 @@ class Visual_Portfolio_Admin {
                         ),
                         'image'      => array(
                             'border_radius' => true,
+
+                            // Pro.
                             'css_filter'    => true,
+                            'transform'     => true,
                         ),
                         'overlay'    => array(
                             'label'          => esc_html__( 'Overlay', '@@text_domain' ),
@@ -1134,7 +1143,10 @@ class Visual_Portfolio_Admin {
                         ),
                         'image'      => array(
                             'border_radius' => true,
+
+                            // Pro.
                             'css_filter'    => true,
+                            'transform'     => true,
                         ),
                         'overlay'    => array(
                             'label'          => esc_html__( 'Overlay', '@@text_domain' ),
@@ -2094,7 +2106,10 @@ class Visual_Portfolio_Admin {
             ),
             'image'      => array(
                 'border_radius' => true,
+
+                // Pro.
                 'css_filter'    => false,
+                'transform'     => false,
             ),
             'overlay'    => array(
                 'label'          => esc_html__( 'Overlay', '@@text_domain' ),
