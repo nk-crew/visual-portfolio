@@ -29,6 +29,11 @@
       opacity: 0.04;
     }
   }
+
+  // Remove default Gutenberg box shadow.
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+  }
 }
 %vpf-icons-selector-item-active {
   color: var(--wp-admin-theme-color);
