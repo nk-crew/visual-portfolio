@@ -978,7 +978,6 @@ class Visual_Portfolio_Admin {
 
                         // Pro.
                         'typography' => true,
-                        'animation'  => true,
                     ),
                     'controls'             => array(
                         // Nothing here yet, all options are in builtin controls.
@@ -1036,7 +1035,6 @@ class Visual_Portfolio_Admin {
 
                         // Pro.
                         'typography' => true,
-                        'animation'  => true,
                     ),
                     'controls'             => array(
                         // Nothing here yet, all options are in builtin controls.
@@ -1094,7 +1092,6 @@ class Visual_Portfolio_Admin {
 
                         // Pro.
                         'typography' => true,
-                        'animation'  => true,
                     ),
                     'controls'             => array(
                         // Nothing here yet, all options are in builtin controls.
@@ -1166,7 +1163,6 @@ class Visual_Portfolio_Admin {
 
                         // Pro.
                         'typography' => true,
-                        'animation'  => true,
                     ),
                     'controls'             => array(
                         // Nothing here yet, all options are in builtin controls.
@@ -2037,16 +2033,12 @@ class Visual_Portfolio_Admin {
                         'category' => 'items-style-caption',
                     ),
                     array(
-                        'title'    => esc_html__( 'Typography', '@@text_domain' ),
-                        'category' => 'items-style-typography',
-                    ),
-                    array(
                         'title'    => esc_html__( 'Colors', '@@text_domain' ),
                         'category' => 'items-style-colors',
                     ),
                     array(
-                        'title'    => esc_html__( 'Animation', '@@text_domain' ),
-                        'category' => 'items-style-animation',
+                        'title'    => esc_html__( 'Typography', '@@text_domain' ),
+                        'category' => 'items-style-typography',
                     ),
                 ),
             )
@@ -2119,7 +2111,6 @@ class Visual_Portfolio_Admin {
                 ),
             ),
             'typography' => true,
-            'animation'  => true,
         );
         $builtin_default_options = apply_filters( 'vpf_items_style_builtin_controls_options', $builtin_default_options );
 
@@ -2347,10 +2338,26 @@ class Visual_Portfolio_Admin {
 
                         // Image.
                         case 'image':
+                            $new_fields[] = array(
+                                'type'     => 'category_toggle_group',
+                                'category' => 'items-style-image',
+                                'name'     => 'items_style_image_states',
+                                'options'  => array(
+                                    array(
+                                        'title'    => esc_html__( 'Default', '@@text_domain' ),
+                                        'category' => 'items-style-image-default',
+                                    ),
+                                    array(
+                                        'title'    => esc_html__( 'Hover', '@@text_domain' ),
+                                        'category' => 'items-style-image-hover',
+                                    ),
+                                ),
+                            );
+
                             if ( isset( $options['border_radius'] ) && $options['border_radius'] ) {
                                 $new_fields[] = array(
                                     'type'     => 'unit',
-                                    'category' => 'items-style-image',
+                                    'category' => 'items-style-image-default',
                                     'label'    => esc_html__( 'Border Radius', '@@text_domain' ),
                                     'name'     => 'images_rounded_corners',
                                     'group'    => 'items_style_images',
@@ -2369,7 +2376,7 @@ class Visual_Portfolio_Admin {
                                 'category'    => 'items-style-image',
                                 'name'        => 'additional_image_skin_settings_pro',
                                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                'description' => 'Apply Instagram-like filters and change image hover transitions for both default and hover states',
+                                'description' => 'Apply Instagram-like filters, change image transform and border radius for both default and hover states',
                             );
                             break;
 
@@ -2556,17 +2563,6 @@ class Visual_Portfolio_Admin {
                                 'name'        => 'additional_typography_skin_settings_pro',
                                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
                                 'description' => 'Manage fonts, sizing, and appearance of distinct text components within the Skin',
-                            );
-                            break;
-
-                        // Animation.
-                        case 'animation':
-                            $new_fields[] = array(
-                                'type'        => 'pro_note',
-                                'category'    => 'items-style-animation',
-                                'name'        => 'additional_animation_skin_settings_pro',
-                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                'description' => 'Customize hover effects and transitions',
                             );
                             break;
                         // no default.

@@ -9,6 +9,7 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import TabsControl from '../tabs-control';
+import ToggleGroupControl from '../toggle-group-control';
 import CollapseControl from '../collapse-control';
 import IconsSelector from '../icons-selector';
 import CodeEditor from '../code-editor';
@@ -287,6 +288,21 @@ ControlsRender.Control = function (props) {
             );
           }}
         </TabsControl>
+      );
+      break;
+    case 'category_toggle_group':
+      renderControl = (
+        <ToggleGroupControl controlName={props.name} options={props.options}>
+          {(group) => {
+            return (
+              <ControlsRender
+                {...props.renderProps}
+                category={group.category}
+                categoryToggle={false}
+              />
+            );
+          }}
+        </ToggleGroupControl>
       );
       break;
     case 'category_collapse':

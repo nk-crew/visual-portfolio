@@ -69,7 +69,14 @@ class Visual_Portfolio_Gutenberg_Block {
                 continue;
             }
 
-            if ( 'html' === $control['type'] || 'notice' === $control['type'] || 'pro_note' === $control['type'] ) {
+            if (
+                'html' === $control['type'] ||
+                'notice' === $control['type'] ||
+                'pro_note' === $control['type'] ||
+                'category_tabs' === $control['type'] ||
+                'category_toggle_group' === $control['type'] ||
+                'category_collapse' === $control['type']
+            ) {
                 continue;
             }
 
