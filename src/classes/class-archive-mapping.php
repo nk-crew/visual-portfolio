@@ -332,7 +332,7 @@ class Visual_Portfolio_Archive_Mapping {
             $post_id = intval( $_REQUEST['vp_preview_post_id'] );
         }
 
-        if ( $this->is_archive( $vp_options, $post_id ) ) {
+        if ( $this->is_archive( $vp_options, $post_id ?? null ) ) {
 
             $query_opts = Visual_Portfolio_Get::get_query_params( $vp_options, true );
             // Get active item.
