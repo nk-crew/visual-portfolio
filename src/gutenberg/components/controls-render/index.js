@@ -8,6 +8,9 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
+import TabsControl from '../tabs-control';
+import ToggleGroupControl from '../toggle-group-control';
+import CollapseControl from '../collapse-control';
 import IconsSelector from '../icons-selector';
 import CodeEditor from '../code-editor';
 import TilesSelector from '../tiles-selector';
@@ -50,7 +53,11 @@ const {
   RadioControl,
   ToggleControl,
   RangeControl,
+  UnitControl: __stableUnitControl,
+  __experimentalUnitControl,
 } = wp.components;
+
+const UnitControl = __stableUnitControl || __experimentalUnitControl;
 
 const { controls: registeredControls, controls_categories: registeredControlsCategories } =
   window.VPGutenbergVariables;
@@ -125,6 +132,7 @@ class ControlsRender extends Component {
             {...controlData}
             clientId={clientId}
             isSetupWizard={isSetupWizard}
+            renderProps={this.props}
           />,
           controlData,
           this.props
@@ -177,10 +185,11 @@ class ControlsRender extends Component {
             false
           )
         }
-        initialOpen={categoryOpened}
         onToggle={() => {
           openedCategoriesCache[category] = !categoryOpened;
         }}
+        initialOpen={categoryOpened}
+        scrollAfterOpen
       >
         {result}
       </PanelBody>
@@ -228,7 +237,7 @@ ControlsRender.Control = function (props) {
       const isEnd =
         $nextSibling &&
         !$nextSibling.classList.contains(`vpf-control-group-${props.group}`) &&
-        $prevSibling.classList.contains(`vpf-control-wrap`);
+        $nextSibling.classList.contains(`vpf-control-wrap`);
 
       let newPosition = '';
 
@@ -270,6 +279,51 @@ ControlsRender.Control = function (props) {
 
   // Specific controls.
   switch (props.type) {
+    case 'category_tabs':
+      renderControl = (
+        <TabsControl controlName={props.name} options={props.options}>
+          {(tab) => {
+            return (
+              <ControlsRender {...props.renderProps} category={tab.name} categoryToggle={false} />
+            );
+          }}
+        </TabsControl>
+      );
+      break;
+    case 'category_toggle_group':
+      renderControl = (
+        <ToggleGroupControl controlName={props.name} options={props.options}>
+          {(group) => {
+            return (
+              <ControlsRender
+                {...props.renderProps}
+                category={group.category}
+                categoryToggle={false}
+              />
+            );
+          }}
+        </ToggleGroupControl>
+      );
+      break;
+    case 'category_collapse':
+      renderControl = (
+        <CollapseControl
+          controlName={props.name}
+          options={props.options}
+          initialOpen={props.initialOpen}
+        >
+          {(tab) => {
+            return (
+              <ControlsRender
+                {...props.renderProps}
+                category={tab.category}
+                categoryToggle={false}
+              />
+            );
+          }}
+        </CollapseControl>
+      );
+      break;
     case 'html':
       renderControl = <RawHTML>{props.default}</RawHTML>;
       break;
@@ -315,6 +369,7 @@ ControlsRender.Control = function (props) {
           value={controlVal}
           options={props.options}
           onChange={(val) => onChange(val)}
+          collapseRows={props.collapse_rows || false}
           isSetupWizard={isSetupWizard}
         />
       );
@@ -343,7 +398,7 @@ ControlsRender.Control = function (props) {
       renderControl = (
         <AlignControl
           value={controlVal}
-          extended={props.extended}
+          options={props.options || 'horizontal'}
           onChange={(val) => onChange(val)}
         />
       );
@@ -449,8 +504,14 @@ ControlsRender.Control = function (props) {
       break;
     case 'color':
       renderControl = (
-        <ColorPicker value={controlVal} alpha={props.alpha} onChange={(val) => onChange(val)} />
+        <ColorPicker
+          label={renderControlLabel}
+          value={controlVal}
+          alpha={props.alpha}
+          onChange={(val) => onChange(val)}
+        />
       );
+      renderControlLabel = false;
       break;
     case 'date':
       renderControl = <DatePicker value={controlVal} onChange={(val) => onChange(val)} />;
@@ -486,6 +547,18 @@ ControlsRender.Control = function (props) {
           step={props.step}
           value={parseFloat(controlVal)}
           onChange={(val) => onChange(parseFloat(val))}
+        />
+      );
+      renderControlLabel = false;
+      break;
+    case 'unit':
+      renderControl = (
+        <UnitControl
+          label={renderControlLabel}
+          value={controlVal}
+          onChange={(val) => onChange(val)}
+          labelPosition="edge"
+          __unstableInputWidth="70px"
         />
       );
       renderControlLabel = false;
@@ -560,8 +633,10 @@ ControlsRender.Control = function (props) {
     'vpf.editor.controls-render-inner-data',
     {
       renderControl,
+      renderControlLabel,
       renderControlHelp,
       renderControlAfter,
+      renderControlClassName,
     },
     { props, controlVal }
   );
@@ -569,7 +644,7 @@ ControlsRender.Control = function (props) {
   return (
     <>
       {'start' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
-      <BaseControl label={renderControlLabel} className={renderControlClassName}>
+      <BaseControl label={data.renderControlLabel} className={data.renderControlClassName}>
         <div ref={$ref}>{data.renderControl}</div>
         {data.renderControlHelp}
       </BaseControl>

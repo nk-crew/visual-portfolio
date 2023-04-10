@@ -799,29 +799,24 @@ $escaped-svg-characters: (
   }
 }
 
-$pro_note_radius: 5px;
-$pro_note_border_size: 2px;
-
 .vpf-pro-note {
   position: relative;
-  max-width: 260px;
+  max-width: 280px;
   padding: 20px;
   font-size: 13px;
   color: #b65e96;
-  background: linear-gradient(to left, #743ad5, #d53a9d);
-  border-radius: $pro_note_radius;
+  background: linear-gradient(to left, rgba(#743ad5, 20%), rgba(#d53a9d, 20%));
 
   &::before {
     position: absolute;
-    top: $pro_note_border_size;
-    right: $pro_note_border_size;
-    bottom: $pro_note_border_size;
-    left: $pro_note_border_size;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
     z-index: 0;
     display: block;
     content: "";
     background-color: #fff6fc;
-    border-radius: $pro_note_radius - $pro_note_border_size;
   }
 
   > * {
@@ -831,19 +826,19 @@ $pro_note_border_size: 2px;
 
   h3 {
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     color: #d53a9d;
     text-transform: none;
   }
 
   p {
-    margin-bottom: 10px !important;
     font-size: inherit !important;
   }
 
   ul {
+    margin: 0;
     list-style: none;
 
     li::before {
@@ -853,10 +848,14 @@ $pro_note_border_size: 2px;
     }
   }
 
+  .vpf-pro-note-description,
+  .components-base-control__help {
+    margin: 1em 0;
+  }
+
   &-button {
     display: inline-block;
     padding: 7px 15px;
-    margin-top: 5px;
     text-decoration: none;
     background: linear-gradient(to left, #743ad5, #d53a9d);
     border-radius: 3px;
@@ -873,6 +872,18 @@ $pro_note_border_size: 2px;
     &:focus {
       filter: contrast(1.5) drop-shadow(0px 3px 3px rgba(213, 58, 157, 30%));
       transform: translateY(-1px);
+    }
+  }
+
+  // Notice inside inspector.
+  .block-editor-block-inspector & {
+    padding: 20px 16px;
+    margin-right: -16px;
+    margin-left: -16px;
+
+    &::before {
+      right: 0;
+      left: 0;
     }
   }
 }

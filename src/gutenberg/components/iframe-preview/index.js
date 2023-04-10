@@ -36,6 +36,21 @@ const { Spinner } = wp.components;
 
 let uniqueIdCount = 1;
 
+const { isEqual, uniq } = window._;
+
+function getUpdatedKeys(oldData, newData) {
+  const keys = uniq([...Object.keys(oldData), ...Object.keys(newData)]);
+  const changedKeys = [];
+
+  keys.forEach((k) => {
+    if (!isEqual(oldData[k], newData[k])) {
+      changedKeys.push(k);
+    }
+  });
+
+  return changedKeys;
+}
+
 /**
  * Component Class
  */
@@ -162,13 +177,12 @@ class IframePreview extends Component {
     const frame = this.frameRef.current;
 
     const changedAttributes = {};
+    const changedAttributeKeys = getUpdatedKeys(oldAttributes, newAttributes);
 
-    // change changed attributes.
-    Object.keys(newAttributes).forEach((name) => {
-      const val = newAttributes[name];
-
-      if ('undefined' === typeof oldAttributes[name] || oldAttributes[name] !== val) {
-        changedAttributes[name] = val;
+    // check changed attributes.
+    changedAttributeKeys.forEach((name) => {
+      if ('undefined' !== typeof newAttributes[name]) {
+        changedAttributes[name] = newAttributes[name];
       }
     });
 

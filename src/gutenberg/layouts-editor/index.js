@@ -116,7 +116,7 @@ class LayoutsEditorBlock extends Component {
     return (
       <>
         <InspectorControls>
-          <PanelBody title={__('Shortcodes', '@@text_domain')}>
+          <PanelBody title={__('Shortcodes', '@@text_domain')} scrollAfterOpen>
             <p>
               {__(
                 'To output this saved layout and its components you can use the following shortcodes:'

@@ -26,6 +26,8 @@ $show_meta = $inline_meta ||
     $opts['show_categories'] && $args['categories'] && ! empty( $args['categories'] ) ||
     $opts['show_read_more'] && $opts['read_more_label'];
 
+$align = $opts['caption_text_align'] ?? $opts['align'] ?? 'center';
+
 $templates_data = array(
     'args'        => $args,
     'opts'        => $opts,
@@ -34,7 +36,7 @@ $templates_data = array(
 
 ?>
 
-<figcaption class="vp-portfolio__item-overlay vp-portfolio__item-align-<?php echo esc_attr( $opts['align'] ); ?>">
+<figcaption class="vp-portfolio__item-caption vp-portfolio__item-caption-text-align-<?php echo esc_attr( $align ); ?>">
     <?php if ( $show_meta ) : ?>
         <div class="vp-portfolio__item-meta">
             <?php

@@ -4,22 +4,9 @@
  * Visual Portfolio styles for Fancybox.
  */
 .vp-fancybox {
+  top: var(--wp-admin--admin-bar--height, 0px);
   z-index: var(--vp-popup__z-index);
-
-  // fixed top position when WP admin bar showed.
-  body.admin-bar & {
-    top: 32px;
-    height: calc(100% - 32px);
-
-    @media screen and (max-width: 782px) {
-      top: 42px;
-      height: calc(100% - 42px);
-    }
-    @media screen and (max-width: 600px) {
-      top: 0;
-      height: 100%;
-    }
-  }
+  height: calc(100% - var(--wp-admin--admin-bar--height, 0px));
 
   // removed white background to improve vertical videos displaying.
   .fancybox-slide--iframe .fancybox-content {

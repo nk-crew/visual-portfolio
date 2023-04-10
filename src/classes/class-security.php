@@ -397,7 +397,8 @@ class Visual_Portfolio_Security {
                 }
                 $sanitize_callback = $controls[ $key ]['sanitize_callback'] ?? false;
                 if ( $sanitize_callback ) {
-                    $finding_class = strripos( $sanitize_callback, '::' );
+                    $finding_class = is_string( $sanitize_callback ) && strripos( $sanitize_callback, '::' );
+
                     if ( false === $finding_class && is_callable( array( __CLASS__, $sanitize_callback ) ) ) {
                         $attributes[ $key ] = call_user_func( array( __CLASS__, $sanitize_callback ), $attribute );
                     } else {

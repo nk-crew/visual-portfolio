@@ -4,14 +4,6 @@
  * Fly items style
  */
 .vp-portfolio__items-style-fly {
-  .vp-portfolio__item {
-
-    // fix for safari border-radius.
-    // https://github.com/nk-crew/visual-portfolio/issues/150
-    z-index: 0;
-    border-radius: var(--vp-items-style-fly--image__border-radius);
-  }
-
   .vp-portfolio__item a {
     text-decoration: var(--vp-items-style-fly--links__text-decoration);
     outline: none;
@@ -36,17 +28,19 @@
     // -
     // Also fix conflict with Hover Image in the Pro plugin.
     z-index: 2;
+    margin: var(--vp-items-style-fly--overlay__margin);
     overflow: hidden;
     color: var(--vp-items-style-fly--overlay__color);
     text-align: center;
     text-decoration: var(--vp-items-style-fly--overlay__text-decoration);
     background-color: var(--vp-items-style-fly--overlay__background-color);
+    border-radius: var(--vp-items-style-fly--overlay__border-radius);
     transform: translateY(-100%) translateX(-100%);
   }
 
   // fix some themes figcaption styles.
   figcaption.vp-portfolio__item-overlay {
-    margin: 0;
+    margin: var(--vp-items-style-fly--overlay__margin);
     font-style: inherit;
     color: var(--vp-items-style-fly--overlay__color);
   }
@@ -71,12 +65,13 @@
     justify-content: center;
     width: 100%;
     min-height: 100%;
-    padding: var(--vp-items-style-fly--meta__padding-v) var(--vp-items-style-fly--meta__padding-h);
+    padding: var(--vp-items-style-fly--overlay__padding);
     color: inherit;
 
     > * {
       max-width: 100%;
-      margin-bottom: var(--vp-items-style-fly--meta-items__gap);
+      margin-top: 0;
+      margin-bottom: var(--vp-items-style-fly--overlay-items__gap);
     }
 
     > :last-child {
@@ -170,8 +165,38 @@
     }
   }
 
+  // Image
+  .vp-portfolio__item {
+
+    // fix for safari border-radius.
+    // https://github.com/nk-crew/visual-portfolio/issues/150
+    z-index: 0;
+    border-radius: var(--vp-items-style-fly--image__border-radius);
+    transition-timing-function: var(--vp-items-style-fly--image__transition-easing);
+    transition-duration: var(--vp-items-style-fly--image__transition-duration);
+    transition-property: border-radius;
+  }
+
+  .vp-portfolio__item-img img {
+
+    // Fix FireFox image blinking
+    // https://github.com/nk-crew/visual-portfolio/issues/92
+    z-index: 1;
+    transition-timing-function: var(--vp-items-style-fly--image__transition-easing);
+    transition-duration: var(--vp-items-style-fly--image__transition-duration);
+    transition-property: opacity, transform;
+    transform: var(--vp-items-style-fly--image__transform);
+  }
+
+  .vp-portfolio__item:hover,
+  .vp-portfolio__item-focus {
+    .vp-portfolio__item-img img {
+      transform: var(--vp-items-style-fly--image-hover__transform);
+    }
+  }
+
   // align
-  .vp-portfolio__item-align-center .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-center .vp-portfolio__item-meta {
     align-items: center;
     text-align: center;
 
@@ -181,7 +206,7 @@
     }
   }
 
-  .vp-portfolio__item-align-left .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-left .vp-portfolio__item-meta {
     align-items: flex-start;
     text-align: left;
 
@@ -191,7 +216,7 @@
     }
   }
 
-  .vp-portfolio__item-align-right .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-right .vp-portfolio__item-meta {
     align-items: flex-end;
     text-align: right;
 
@@ -201,7 +226,7 @@
     }
   }
 
-  .vp-portfolio__item-align-top-center .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-top-center .vp-portfolio__item-meta {
     align-items: center;
     justify-content: flex-start;
     text-align: center;
@@ -212,7 +237,7 @@
     }
   }
 
-  .vp-portfolio__item-align-top-left .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-top-left .vp-portfolio__item-meta {
     align-items: flex-start;
     justify-content: flex-start;
     text-align: left;
@@ -223,7 +248,7 @@
     }
   }
 
-  .vp-portfolio__item-align-top-right .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-top-right .vp-portfolio__item-meta {
     align-items: flex-end;
     justify-content: flex-start;
     text-align: right;
@@ -234,7 +259,7 @@
     }
   }
 
-  .vp-portfolio__item-align-bottom-center .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-bottom-center .vp-portfolio__item-meta {
     align-items: center;
     justify-content: flex-end;
     text-align: center;
@@ -245,7 +270,7 @@
     }
   }
 
-  .vp-portfolio__item-align-bottom-left .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-bottom-left .vp-portfolio__item-meta {
     align-items: flex-start;
     justify-content: flex-end;
     text-align: left;
@@ -256,7 +281,7 @@
     }
   }
 
-  .vp-portfolio__item-align-bottom-right .vp-portfolio__item-meta {
+  .vp-portfolio__item-overlay-text-align-bottom-right .vp-portfolio__item-meta {
     align-items: flex-end;
     justify-content: flex-end;
     text-align: right;

@@ -34,7 +34,7 @@ $link_data = array(
         );
         ?>
 
-        <div class="vp-portfolio__item-img-overlay"></div>
+        <div class="vp-portfolio__item-overlay"></div>
 
         <?php visual_portfolio()->include_template( 'global/link-end', $link_data ); ?>
     </div>

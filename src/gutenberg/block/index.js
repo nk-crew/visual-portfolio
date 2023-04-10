@@ -8,6 +8,12 @@ import edit from './edit';
 import save from './save';
 import variations from './variations';
 import transforms from './transforms';
+import deprecated from './deprecated';
+
+/**
+ * Global dependencies
+ */
+const { attributes } = window.VPGutenbergVariables;
 
 /**
  * WordPress dependencies
@@ -18,6 +24,7 @@ const { name } = metadata;
 
 const settings = {
   ...metadata,
+  attributes,
   icon: {
     foreground: '#2540CC',
     src: <ElementIcon width="20" height="20" />,
@@ -39,6 +46,7 @@ const settings = {
   edit,
   save,
   transforms,
+  deprecated,
 };
 
 registerBlockType(name, settings);

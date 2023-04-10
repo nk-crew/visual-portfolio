@@ -4,6 +4,10 @@
 import conditionCheck from '../control-condition-check';
 import { maybeDecode } from '../encode-decode';
 
+const { merge } = window.lodash;
+
+const { applyFilters } = wp.hooks;
+
 const { controls: registeredControls } = window.VPGutenbergVariables;
 
 /**
@@ -22,8 +26,6 @@ const { controls: registeredControls } = window.VPGutenbergVariables;
  * @returns {String}
  */
 export function prepareStylesFromParams(selector, value, params) {
-  let result = '';
-
   if (
     !selector ||
     'undefined' === typeof value ||
@@ -31,7 +33,7 @@ export function prepareStylesFromParams(selector, value, params) {
     null === value ||
     'undefined' === typeof params.property
   ) {
-    return result;
+    return false;
   }
 
   // Value mask.
@@ -46,10 +48,11 @@ export function prepareStylesFromParams(selector, value, params) {
     selector += 'undefined' !== typeof params.element ? ` ${params.element}` : '';
   }
 
-  // Prepare CSS.
-  result = `${selector} { ${params.property}: ${value}; } `;
-
-  return result;
+  return {
+    [selector]: {
+      [params.property]: value,
+    },
+  };
 }
 
 /**
@@ -88,6 +91,7 @@ export default function getDynamicCSS(options) {
   }
 
   selector = `.vp-id-${selector}`;
+  let controlStylesObject = {};
 
   // Controls styles.
   Object.keys(registeredControls).forEach((k) => {
@@ -103,6 +107,14 @@ export default function getDynamicCSS(options) {
     if (allow) {
       control.style.forEach((data) => {
         let val = options[control.name];
+        val = applyFilters(
+          'vpf.editor.controls-dynamic-css-value',
+          val,
+          options,
+          control,
+          selector,
+          data
+        );
 
         // Prepare Aspect Ratio control value.
         if (control.type && 'aspect_ratio' === control.type && val) {
@@ -113,9 +125,33 @@ export default function getDynamicCSS(options) {
           }
         }
 
-        result += prepareStylesFromParams(selector, val, data);
+        let stylesObject = prepareStylesFromParams(selector, val, data);
+        stylesObject = applyFilters(
+          'vpf.editor.controls-dynamic-css-styles-object',
+          stylesObject,
+          selector,
+          val,
+          data,
+          options,
+          control
+        );
+
+        if (stylesObject) {
+          controlStylesObject = merge(controlStylesObject, stylesObject);
+        }
       });
     }
+  });
+
+  // Prepare CSS of controls.
+  Object.keys(controlStylesObject).forEach((sel) => {
+    result += `${sel} {\n`;
+
+    Object.keys(controlStylesObject[sel]).forEach((prop) => {
+      result += `  ${prop}: ${controlStylesObject[sel][prop]};\n`;
+    });
+
+    result += `}\n`;
   });
 
   // Custom CSS.
