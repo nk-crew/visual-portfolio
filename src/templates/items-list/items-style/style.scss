@@ -17,9 +17,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: var(--vp-items-style-default--overlay__margin);
     color: var(--vp-items-style-default--overlay__color);
     text-decoration: var(--vp-items-style-default--overlay__text-decoration);
     background-color: var(--vp-items-style-default--overlay__background-color);
+    border-radius: var(--vp-items-style-default--overlay__border-radius);
     opacity: 0;
     transition-timing-function: var(--vp-items-style-default--overlay__transition-easing);
     transition-duration: var(--vp-items-style-default--overlay__transition-duration);

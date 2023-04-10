@@ -33,9 +33,11 @@
     // -
     // Also fix conflict with Hover Image in the Pro plugin.
     z-index: 2;
+    margin: var(--vp-items-style-fade--overlay__margin);
     color: var(--vp-items-style-fade--overlay__color);
     text-decoration: var(--vp-items-style-fade--overlay__text-decoration);
     background-color: var(--vp-items-style-fade--overlay__background-color);
+    border-radius: var(--vp-items-style-fade--overlay__border-radius);
     opacity: 0;
     transition-timing-function: var(--vp-items-style-fade--overlay__transition-easing);
     transition-duration: var(--vp-items-style-fade--overlay__transition-duration);
@@ -45,7 +47,7 @@
 
   // fix some themes figcaption styles.
   figcaption.vp-portfolio__item-overlay {
-    margin: 0;
+    margin: var(--vp-items-style-fade--overlay__margin);
     font-style: inherit;
     color: var(--vp-items-style-fade--overlay__color);
   }

@@ -946,12 +946,18 @@ class Visual_Portfolio_Admin {
                             'text_align'     => false,
 
                             // Pro.
+                            'border_radius'  => true,
+                            'margin'         => true,
                             'mix_blend_mode' => true,
                         ),
                         'caption'    => array(
                             'label'       => esc_html__( 'Caption', '@@text_domain' ),
                             'states'      => false,
                             'text_align'  => 'horizontal',
+
+                            // Pro.
+                            'padding'     => true,
+                            'items_gap'   => true,
                         ),
                         'colors'     => array(
                             array(
@@ -972,18 +978,6 @@ class Visual_Portfolio_Admin {
 
                         // Pro.
                         'typography' => true,
-                        'dimensions' => array(
-                            array(
-                                'name'    => 'caption_padding',
-                                'css_var' => 'caption__padding',
-                                'label'   => esc_html__( 'Caption Padding', '@@text_domain' ),
-                            ),
-                            array(
-                                'name'    => 'caption_items_gap',
-                                'css_var' => 'caption-items__gap',
-                                'label'   => esc_html__( 'Caption Items Gap', '@@text_domain' ),
-                            ),
-                        ),
                         'animation'  => true,
                     ),
                     'controls'             => array(
@@ -1022,6 +1016,10 @@ class Visual_Portfolio_Admin {
                             'text_align'     => 'box',
 
                             // Pro.
+                            'border_radius'  => true,
+                            'padding'        => true,
+                            'margin'         => true,
+                            'items_gap'      => true,
                             'under_image'    => true,
                             'mix_blend_mode' => true,
                         ),
@@ -1038,18 +1036,6 @@ class Visual_Portfolio_Admin {
 
                         // Pro.
                         'typography' => true,
-                        'dimensions' => array(
-                            array(
-                                'name'    => 'overlay_padding',
-                                'css_var' => 'overlay__padding',
-                                'label'   => esc_html__( 'Overlay Padding', '@@text_domain' ),
-                            ),
-                            array(
-                                'name'    => 'overlay_items_gap',
-                                'css_var' => 'overlay-items__gap',
-                                'label'   => esc_html__( 'Overlay Items Gap', '@@text_domain' ),
-                            ),
-                        ),
                         'animation'  => true,
                     ),
                     'controls'             => array(
@@ -1088,6 +1074,10 @@ class Visual_Portfolio_Admin {
                             'text_align'     => 'box',
 
                             // Pro.
+                            'border_radius'  => true,
+                            'padding'        => true,
+                            'margin'         => true,
+                            'items_gap'      => true,
                             'under_image'    => true,
                             'mix_blend_mode' => true,
                         ),
@@ -1104,18 +1094,6 @@ class Visual_Portfolio_Admin {
 
                         // Pro.
                         'typography' => true,
-                        'dimensions' => array(
-                            array(
-                                'name'    => 'overlay_padding',
-                                'css_var' => 'overlay__padding',
-                                'label'   => esc_html__( 'Overlay Padding', '@@text_domain' ),
-                            ),
-                            array(
-                                'name'    => 'overlay_items_gap',
-                                'css_var' => 'overlay-items__gap',
-                                'label'   => esc_html__( 'Overlay Items Gap', '@@text_domain' ),
-                            ),
-                        ),
                         'animation'  => true,
                     ),
                     'controls'             => array(
@@ -1154,6 +1132,8 @@ class Visual_Portfolio_Admin {
                             'text_align'     => false,
 
                             // Pro.
+                            'border_radius'  => true,
+                            'margin'         => true,
                             'mix_blend_mode' => true,
                         ),
                         'caption'    => array(
@@ -1162,6 +1142,8 @@ class Visual_Portfolio_Admin {
                             'text_align'     => 'horizontal',
 
                             // Pro.
+                            'padding'        => true,
+                            'items_gap'      => true,
                             'under_image'    => true,
                             'mix_blend_mode' => true,
                         ),
@@ -1184,23 +1166,6 @@ class Visual_Portfolio_Admin {
 
                         // Pro.
                         'typography' => true,
-                        'dimensions' => array(
-                            array(
-                                'name'    => 'caption_skew_size',
-                                'css_var' => 'caption-skew__height',
-                                'label'   => esc_html__( 'Caption Skew Size', '@@text_domain' ),
-                            ),
-                            array(
-                                'name'    => 'caption_padding',
-                                'css_var' => 'caption__padding',
-                                'label'   => esc_html__( 'Caption Padding', '@@text_domain' ),
-                            ),
-                            array(
-                                'name'    => 'caption_items_gap',
-                                'css_var' => 'caption-items__gap',
-                                'label'   => esc_html__( 'Caption Items Gap', '@@text_domain' ),
-                            ),
-                        ),
                         'animation'  => true,
                     ),
                     'controls'             => array(
@@ -2080,10 +2045,6 @@ class Visual_Portfolio_Admin {
                         'category' => 'items-style-colors',
                     ),
                     array(
-                        'title'    => esc_html__( 'Dimensions', '@@text_domain' ),
-                        'category' => 'items-style-dimensions',
-                    ),
-                    array(
                         'title'    => esc_html__( 'Animation', '@@text_domain' ),
                         'category' => 'items-style-animation',
                     ),
@@ -2119,6 +2080,10 @@ class Visual_Portfolio_Admin {
                 'text_align'     => 'box',
 
                 // Pro.
+                'border_radius'  => false,
+                'padding'        => false,
+                'margin'         => false,
+                'items_gap'      => false,
                 'under_image'    => false,
                 'mix_blend_mode' => false,
             ),
@@ -2130,6 +2095,10 @@ class Visual_Portfolio_Admin {
                 'text_align'     => 'horizontal',
 
                 // Pro.
+                'border_radius'  => false,
+                'padding'        => false,
+                'margin'         => false,
+                'items_gap'      => false,
                 'under_image'    => false,
                 'mix_blend_mode' => false,
             ),
@@ -2150,7 +2119,6 @@ class Visual_Portfolio_Admin {
                 ),
             ),
             'typography' => true,
-            'dimensions' => true,
             'animation'  => true,
         );
         $builtin_default_options = apply_filters( 'vpf_items_style_builtin_controls_options', $builtin_default_options );
@@ -2492,7 +2460,7 @@ class Visual_Portfolio_Admin {
                                     'category'    => 'items-style-caption',
                                     'name'        => 'additional_caption_skin_settings_pro',
                                     'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                    'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible',
+                                    'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible. Adjust caption paddings, margins and border radius, as well as the spacing between caption elements.',
                                 );
                             }
                             break;
@@ -2588,17 +2556,6 @@ class Visual_Portfolio_Admin {
                                 'name'        => 'additional_typography_skin_settings_pro',
                                 'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
                                 'description' => 'Manage fonts, sizing, and appearance of distinct text components within the Skin',
-                            );
-                            break;
-
-                        // Dimensions.
-                        case 'dimensions':
-                            $new_fields[] = array(
-                                'type'        => 'pro_note',
-                                'category'    => 'items-style-dimensions',
-                                'name'        => 'additional_dimensions_skin_settings_pro',
-                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                'description' => 'Adjust padding for overlays and captions, as well as the spacing between caption elements',
                             );
                             break;
 

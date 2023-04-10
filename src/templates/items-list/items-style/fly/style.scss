@@ -28,17 +28,19 @@
     // -
     // Also fix conflict with Hover Image in the Pro plugin.
     z-index: 2;
+    margin: var(--vp-items-style-fly--overlay__margin);
     overflow: hidden;
     color: var(--vp-items-style-fly--overlay__color);
     text-align: center;
     text-decoration: var(--vp-items-style-fly--overlay__text-decoration);
     background-color: var(--vp-items-style-fly--overlay__background-color);
+    border-radius: var(--vp-items-style-fly--overlay__border-radius);
     transform: translateY(-100%) translateX(-100%);
   }
 
   // fix some themes figcaption styles.
   figcaption.vp-portfolio__item-overlay {
-    margin: 0;
+    margin: var(--vp-items-style-fly--overlay__margin);
     font-style: inherit;
     color: var(--vp-items-style-fly--overlay__color);
   }

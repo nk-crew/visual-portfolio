@@ -29,7 +29,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: var(--vp-items-style-emerge--overlay__margin);
     background-color: var(--vp-items-style-emerge--overlay__background-color);
+    border-radius: var(--vp-items-style-emerge--overlay__border-radius);
     opacity: 0;
     transition: var(--vp-items-style-emerge-transition-duration) opacity var(--vp-items-style-emerge-transition-easing);
   }
