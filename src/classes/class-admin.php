@@ -2229,13 +2229,11 @@ class Visual_Portfolio_Admin {
                         // Overlay / Caption.
                         case 'overlay':
                         case 'caption':
-                            $category_title = 'caption' === $category_name ? esc_html__( 'Caption', '@@text_domain' ) : esc_html__( 'Overlay', '@@text_domain' );
-
                             if ( isset( $options['states'] ) && $options['states'] ) {
                                 $new_fields[] = array(
                                     'type'     => 'select',
                                     'category' => 'items-style-' . $category_name,
-                                    'label'    => esc_html__( 'Display ', '@@text_domain' ) . $category_title,
+                                    'label'    => esc_html__( 'Display', '@@text_domain' ),
                                     'name'     => 'show_' . $category_name,
                                     'group'    => 'items_style_' . $category_name,
                                     'default'  => 'hover',
