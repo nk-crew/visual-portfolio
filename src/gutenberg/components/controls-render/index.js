@@ -11,6 +11,7 @@ import classnames from 'classnames/dedupe';
 import TabsControl from '../tabs-control';
 import ToggleGroupControl from '../toggle-group-control';
 import CollapseControl from '../collapse-control';
+import NavigatorControl from '../navigator-control';
 import IconsSelector from '../icons-selector';
 import CodeEditor from '../code-editor';
 import TilesSelector from '../tiles-selector';
@@ -322,6 +323,21 @@ ControlsRender.Control = function (props) {
             );
           }}
         </CollapseControl>
+      );
+      break;
+    case 'category_navigator':
+      renderControl = (
+        <NavigatorControl controlName={props.name} options={props.options}>
+          {(tab) => {
+            return (
+              <ControlsRender
+                {...props.renderProps}
+                category={tab.category}
+                categoryToggle={false}
+              />
+            );
+          }}
+        </NavigatorControl>
       );
       break;
     case 'html':

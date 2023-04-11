@@ -75,7 +75,8 @@ class Visual_Portfolio_Gutenberg_Block {
                 'pro_note' === $control['type'] ||
                 'category_tabs' === $control['type'] ||
                 'category_toggle_group' === $control['type'] ||
-                'category_collapse' === $control['type']
+                'category_collapse' === $control['type'] ||
+                'category_navigator' === $control['type']
             ) {
                 continue;
             }

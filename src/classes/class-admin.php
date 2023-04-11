@@ -921,63 +921,74 @@ class Visual_Portfolio_Admin {
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="5.89285" y1="22.25" x2="14.1071" y2="22.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
                     'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-classic.png',
                     'builtin_controls'     => array(
-                        'general'    => array(
-                            'title'          => true,
-                            'categories'     => true,
-                            'date'           => true,
-                            'author'         => true,
-                            'comments_count' => true,
-                            'views_count'    => true,
-                            'reading_time'   => true,
-                            'excerpt'        => true,
-                            'read_more'      => true,
-                            'icons'          => true,
-                        ),
-                        'image'      => array(
+                        'image'   => array(
                             'border_radius' => true,
-
-                            // Pro.
-                            'css_filter'    => true,
-                            'transform'     => true,
+                            'transform'     => true, // Pro.
+                            'css_filter'    => true, // Pro.
                         ),
-                        'overlay'    => array(
-                            'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+                        'overlay' => array(
                             'states'         => true,
                             'text_align'     => false,
 
-                            // Pro.
-                            'border_radius'  => true,
-                            'margin'         => true,
-                            'mix_blend_mode' => true,
-                        ),
-                        'caption'    => array(
-                            'label'       => esc_html__( 'Caption', '@@text_domain' ),
-                            'states'      => false,
-                            'text_align'  => 'horizontal',
-
-                            // Pro.
-                            'padding'     => true,
-                            'items_gap'   => true,
-                        ),
-                        'colors'     => array(
-                            array(
-                                'name'       => 'overlay',
-                                'label'      => esc_html__( 'Overlay', '@@text_domain' ),
-                                'background' => true,
-                                'text'       => true,
-                                'links'      => false,
+                            // Elements.
+                            'elements'       => array(
+                                'icons' => true,
                             ),
-                            array(
-                                'name'       => 'caption',
-                                'label'      => esc_html__( 'Caption', '@@text_domain' ),
-                                'background' => false,
-                                'text'       => true,
-                                'links'      => true,
+
+                            // Colors.
+                            'colors'         => array(
+                                'background'     => true,
+                                'text'           => true,
+                                'links'          => false,
+                                'mix_blend_mode' => true,    // Pro.
+                            ),
+
+                            // Dimensions Pro.
+                            'dimensions'     => array(
+                                'border_radius'  => true,
+                                'margin'         => true,
                             ),
                         ),
+                        'caption' => array(
+                            'states'         => false,
+                            'text_align'     => 'horizontal',
 
-                        // Pro.
-                        'typography' => true,
+                            // Elements.
+                            'elements'       => array(
+                                'title'          => true,
+                                'categories'     => true,
+                                'date'           => true,
+                                'author'         => true,
+                                'comments_count' => true,
+                                'views_count'    => true,
+                                'reading_time'   => true,
+                                'excerpt'        => true,
+                                'read_more'      => true,
+                            ),
+
+                            // Colors.
+                            'colors'         => array(
+                                'background'   => false,
+                                'text'         => true,
+                                'links'        => true,
+                            ),
+
+                            // Typography Pro.
+                            'typography'     => array(
+                                'base'     => true,
+                                'title'    => true,
+                                'category' => true,
+                                'meta'     => true,
+                                'button'   => true,
+                            ),
+
+                            // Dimensions Pro.
+                            'dimensions'     => array(
+                                'padding'    => true,
+                                'items_gap'  => true,
+                                'typography' => true,
+                            ),
+                        ),
                     ),
                     'controls'             => array(
                         // Nothing here yet, all options are in builtin controls.
@@ -990,51 +1001,58 @@ class Visual_Portfolio_Admin {
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="5.89285" y1="10.25" x2="14.1071" y2="10.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-fade.png',
                     'builtin_controls'     => array(
-                        'general'    => array(
-                            'title'          => true,
-                            'categories'     => true,
-                            'date'           => true,
-                            'author'         => true,
-                            'comments_count' => true,
-                            'views_count'    => true,
-                            'reading_time'   => true,
-                            'excerpt'        => true,
-                            'read_more'      => false,
-                            'icons'          => true,
-                        ),
-                        'image'      => array(
+                        'image'   => array(
                             'border_radius' => true,
-
-                            // Pro.
-                            'css_filter'    => true,
-                            'transform'     => true,
+                            'transform'     => true, // Pro.
+                            'css_filter'    => true, // Pro.
                         ),
-                        'overlay'    => array(
-                            'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+                        'overlay' => array(
                             'states'         => true,
+
+                            // All available align values: 'horizontal'|'vertical'|'box'.
                             'text_align'     => 'box',
 
-                            // Pro.
-                            'border_radius'  => true,
-                            'padding'        => true,
-                            'margin'         => true,
-                            'items_gap'      => true,
-                            'under_image'    => true,
-                            'mix_blend_mode' => true,
-                        ),
-                        'caption'    => false,
-                        'colors'     => array(
-                            array(
-                                'name'       => 'overlay',
-                                'label'      => esc_html__( 'Overlay', '@@text_domain' ),
-                                'background' => true,
-                                'text'       => true,
-                                'links'      => false,
+                            'under_image'    => true, // Pro.
+
+                            // Elements.
+                            'elements'       => array(
+                                'title'          => true,
+                                'categories'     => true,
+                                'date'           => true,
+                                'author'         => true,
+                                'comments_count' => true,
+                                'views_count'    => true,
+                                'reading_time'   => true,
+                                'excerpt'        => true,
+                                'read_more'      => false,
+                                'icons'          => true,
+                            ),
+
+                            // Colors.
+                            'colors'         => array(
+                                'background'     => true,
+                                'text'           => true,
+                                'links'          => false,
+                                'mix_blend_mode' => true,    // Pro.
+                            ),
+
+                            // Typography Pro.
+                            'typography'     => array(
+                                'base'     => true,
+                                'title'    => true,
+                                'category' => true,
+                                'meta'     => true,
+                            ),
+
+                            // Dimensions Pro.
+                            'dimensions'     => array(
+                                'border_radius'  => true,
+                                'padding'        => true,
+                                'margin'         => true,
+                                'items_gap'      => true,
                             ),
                         ),
-
-                        // Pro.
-                        'typography' => true,
+                        'caption' => false,
                     ),
                     'controls'             => array(
                         // Nothing here yet, all options are in builtin controls.
@@ -1047,51 +1065,58 @@ class Visual_Portfolio_Admin {
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="9.8875" x2="4.39286" y2="9.8875" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="10.4643" y1="0.75" x2="10.4643" y2="19.375" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-fly.png',
                     'builtin_controls'     => array(
-                        'general'    => array(
-                            'title'          => true,
-                            'categories'     => true,
-                            'date'           => true,
-                            'author'         => true,
-                            'comments_count' => true,
-                            'views_count'    => true,
-                            'reading_time'   => true,
-                            'excerpt'        => true,
-                            'read_more'      => false,
-                            'icons'          => true,
-                        ),
-                        'image'      => array(
+                        'image'   => array(
                             'border_radius' => true,
-
-                            // Pro.
-                            'css_filter'    => true,
-                            'transform'     => true,
+                            'transform'     => true, // Pro.
+                            'css_filter'    => true, // Pro.
                         ),
-                        'overlay'    => array(
-                            'label'          => esc_html__( 'Overlay', '@@text_domain' ),
-                            'states'         => false,
+                        'overlay' => array(
+                            'states'         => true,
+
+                            // All available align values: 'horizontal'|'vertical'|'box'.
                             'text_align'     => 'box',
 
-                            // Pro.
-                            'border_radius'  => true,
-                            'padding'        => true,
-                            'margin'         => true,
-                            'items_gap'      => true,
-                            'under_image'    => true,
-                            'mix_blend_mode' => true,
-                        ),
-                        'caption'    => false,
-                        'colors'     => array(
-                            array(
-                                'name'       => 'overlay',
-                                'label'      => esc_html__( 'Overlay', '@@text_domain' ),
-                                'background' => true,
-                                'text'       => true,
-                                'links'      => false,
+                            'under_image'    => true, // Pro.
+
+                            // Elements.
+                            'elements'       => array(
+                                'title'          => true,
+                                'categories'     => true,
+                                'date'           => true,
+                                'author'         => true,
+                                'comments_count' => true,
+                                'views_count'    => true,
+                                'reading_time'   => true,
+                                'excerpt'        => true,
+                                'read_more'      => false,
+                                'icons'          => true,
+                            ),
+
+                            // Colors.
+                            'colors'         => array(
+                                'background'     => true,
+                                'text'           => true,
+                                'links'          => false,
+                                'mix_blend_mode' => true,    // Pro.
+                            ),
+
+                            // Typography Pro.
+                            'typography'     => array(
+                                'base'     => true,
+                                'title'    => true,
+                                'category' => true,
+                                'meta'     => true,
+                            ),
+
+                            // Dimensions Pro.
+                            'dimensions'     => array(
+                                'border_radius'  => true,
+                                'padding'        => true,
+                                'margin'         => true,
+                                'items_gap'      => true,
                             ),
                         ),
-
-                        // Pro.
-                        'typography' => true,
+                        'caption' => false,
                     ),
                     'controls'             => array(
                         // Nothing here yet, all options are in builtin controls.
@@ -1104,65 +1129,72 @@ class Visual_Portfolio_Admin {
                     'icon'                 => '<svg width="21" height="23" viewBox="0 0 21 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="19.283" y2="-0.75" transform="matrix(0.998303 0.0582344 -0.0575156 0.998345 0 13.225)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="5.89285" y1="16.2125" x2="14.1071" y2="16.2125" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                     'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-emerge.png',
                     'builtin_controls'     => array(
-                        'general'    => array(
-                            'title'          => true,
-                            'categories'     => true,
-                            'date'           => true,
-                            'author'         => true,
-                            'comments_count' => true,
-                            'views_count'    => true,
-                            'reading_time'   => true,
-                            'excerpt'        => true,
-                            'read_more'      => false,
-                            'icons'          => false,
-                        ),
-                        'image'      => array(
+                        'image'   => array(
                             'border_radius' => true,
-
-                            // Pro.
-                            'css_filter'    => true,
-                            'transform'     => true,
+                            'transform'     => true, // Pro.
+                            'css_filter'    => true, // Pro.
                         ),
-                        'overlay'    => array(
-                            'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+                        'overlay' => array(
                             'states'         => true,
-                            'text_align'     => false,
 
-                            // Pro.
-                            'border_radius'  => true,
-                            'margin'         => true,
-                            'mix_blend_mode' => true,
+                            // Colors.
+                            'colors'         => array(
+                                'background'     => true,
+                                'text'           => false,
+                                'links'          => false,
+                                'mix_blend_mode' => true,    // Pro.
+                            ),
+
+                            // Dimensions Pro.
+                            'dimensions'     => array(
+                                'border_radius'  => true,
+                                'margin'         => true,
+                            ),
                         ),
-                        'caption'    => array(
-                            'label'          => esc_html__( 'Caption', '@@text_domain' ),
+                        'caption' => array(
                             'states'         => true,
+
+                            // All available align values: 'horizontal'|'vertical'|'box'.
                             'text_align'     => 'horizontal',
 
-                            // Pro.
-                            'padding'        => true,
-                            'items_gap'      => true,
-                            'under_image'    => true,
-                            'mix_blend_mode' => true,
-                        ),
-                        'colors'     => array(
-                            array(
-                                'name'       => 'overlay',
-                                'label'      => esc_html__( 'Overlay', '@@text_domain' ),
-                                'background' => true,
-                                'text'       => false,
-                                'links'      => false,
-                            ),
-                            array(
-                                'name'       => 'caption',
-                                'label'      => esc_html__( 'Caption', '@@text_domain' ),
-                                'background' => true,
-                                'text'       => true,
-                                'links'      => true,
-                            ),
-                        ),
+                            'under_image'    => true, // Pro.
 
-                        // Pro.
-                        'typography' => true,
+                            // Elements.
+                            'elements'       => array(
+                                'title'          => true,
+                                'categories'     => true,
+                                'date'           => true,
+                                'author'         => true,
+                                'comments_count' => true,
+                                'views_count'    => true,
+                                'reading_time'   => true,
+                                'excerpt'        => true,
+                                'read_more'      => false,
+                                'icons'          => false,
+                            ),
+
+                            // Colors.
+                            'colors'         => array(
+                                'background'     => true,
+                                'text'           => true,
+                                'links'          => true,
+                                'mix_blend_mode' => true,   // Pro.
+                            ),
+
+                            // Typography Pro.
+                            'typography'     => array(
+                                'base'     => true,
+                                'title'    => true,
+                                'category' => true,
+                                'meta'     => true,
+                            ),
+
+                            // Dimensions Pro.
+                            'dimensions'     => array(
+                                'padding'   => true,
+                                'items_gap' => true,
+                            ),
+                        ),
                     ),
                     'controls'             => array(
                         // Nothing here yet, all options are in builtin controls.
@@ -2012,14 +2044,10 @@ class Visual_Portfolio_Admin {
         Visual_Portfolio_Controls::register(
             array(
                 'category'    => 'items-style',
-                'type'        => 'category_collapse',
+                'type'        => 'category_navigator',
                 'name'        => 'items_style_subcategory',
                 'initialOpen' => 'items-style-general',
                 'options'     => array(
-                    array(
-                        'title'    => esc_html__( 'General', '@@text_domain' ),
-                        'category' => 'items-style-general',
-                    ),
                     array(
                         'title'    => esc_html__( 'Image', '@@text_domain' ),
                         'category' => 'items-style-image',
@@ -2032,85 +2060,110 @@ class Visual_Portfolio_Admin {
                         'title'    => esc_html__( 'Caption', '@@text_domain' ),
                         'category' => 'items-style-caption',
                     ),
-                    array(
-                        'title'    => esc_html__( 'Colors', '@@text_domain' ),
-                        'category' => 'items-style-colors',
-                    ),
-                    array(
-                        'title'    => esc_html__( 'Typography', '@@text_domain' ),
-                        'category' => 'items-style-typography',
-                    ),
                 ),
             )
         );
 
         $builtin_default_options = array(
-            'general'    => array(
-                'title'          => true,
-                'categories'     => true,
-                'date'           => true,
-                'author'         => true,
-                'comments_count' => true,
-                'views_count'    => true,
-                'reading_time'   => true,
-                'excerpt'        => true,
-                'read_more'      => true,
-                'icons'          => true,
-            ),
-            'image'      => array(
+            'image'   => array(
                 'border_radius' => true,
-
-                // Pro.
-                'css_filter'    => false,
-                'transform'     => false,
+                'transform'     => false, // Pro.
+                'css_filter'    => false, // Pro.
             ),
-            'overlay'    => array(
-                'label'          => esc_html__( 'Overlay', '@@text_domain' ),
+            'overlay' => array(
                 'states'         => true,
 
                 // All available align values: 'horizontal'|'vertical'|'box'.
                 'text_align'     => 'box',
 
-                // Pro.
-                'border_radius'  => false,
-                'padding'        => false,
-                'margin'         => false,
-                'items_gap'      => false,
-                'under_image'    => false,
-                'mix_blend_mode' => false,
+                'under_image'    => false, // Pro.
+
+                // Elements.
+                'elements'       => array(
+                    'title'          => false,
+                    'categories'     => false,
+                    'date'           => false,
+                    'author'         => false,
+                    'comments_count' => false,
+                    'views_count'    => false,
+                    'reading_time'   => false,
+                    'excerpt'        => false,
+                    'read_more'      => false,
+                    'icons'          => false,
+                ),
+
+                // Colors.
+                'colors'         => array(
+                    'background'     => true,
+                    'text'           => true,
+                    'links'          => false,
+                    'mix_blend_mode' => false,   // Pro.
+                ),
+
+                // Typography Pro.
+                'typography'     => array(
+                    'base'     => false,
+                    'title'    => false,
+                    'category' => false,
+                    'meta'     => false,
+                    'button'   => false,
+                ),
+
+                // Dimensions Pro.
+                'dimensions'     => array(
+                    'border_radius'  => false,
+                    'padding'        => false,
+                    'margin'         => false,
+                    'items_gap'      => false,
+                ),
             ),
-            'caption'    => array(
-                'label'          => esc_html__( 'Caption', '@@text_domain' ),
+            'caption' => array(
                 'states'         => true,
 
                 // All available align values: 'horizontal'|'vertical'|'box'.
                 'text_align'     => 'horizontal',
 
-                // Pro.
-                'border_radius'  => false,
-                'padding'        => false,
-                'margin'         => false,
-                'items_gap'      => false,
-                'under_image'    => false,
-                'mix_blend_mode' => false,
-            ),
-            'colors'     => array(
-                array(
-                    'name'       => 'overlay',
-                    'label'      => esc_html__( 'Overlay', '@@text_domain' ),
-                    'background' => true,
-                    'text'       => true,
-                    'links'      => false,
+                'under_image'    => false, // Pro.
+
+                // Elements.
+                'elements'       => array(
+                    'title'          => false,
+                    'categories'     => false,
+                    'date'           => false,
+                    'author'         => false,
+                    'comments_count' => false,
+                    'views_count'    => false,
+                    'reading_time'   => false,
+                    'excerpt'        => false,
+                    'read_more'      => false,
+                    'icons'          => false,
                 ),
-                array(
-                    'name'         => 'caption',
-                    'label'        => esc_html__( 'Caption', '@@text_domain' ),
-                    'background'   => false,
-                    'text'         => true,
-                    'links'        => true,
+
+                // Colors.
+                'colors'         => array(
+                    'background'     => false,
+                    'text'           => true,
+                    'links'          => true,
+                    'mix_blend_mode' => false,   // Pro.
+                ),
+
+                // Typography Pro.
+                'typography'     => array(
+                    'base'     => false,
+                    'title'    => false,
+                    'category' => false,
+                    'meta'     => false,
+                    'button'   => false,
+                ),
+
+                // Dimensions Pro.
+                'dimensions'     => array(
+                    'border_radius'  => false,
+                    'padding'        => false,
+                    'margin'         => false,
+                    'items_gap'      => false,
                 ),
             ),
-            'typography' => true,
         );
         $builtin_default_options = apply_filters( 'vpf_items_style_builtin_controls_options', $builtin_default_options );
 
@@ -2118,224 +2171,17 @@ class Visual_Portfolio_Admin {
         foreach ( $items_styles as $style_name => $style ) {
             $builtin_fields = array();
 
-            if ( isset( $style['builtin_controls'] ) ) {
-                foreach ( $builtin_default_options as $option_name => $default_options ) {
-                    if ( ! isset( $style['builtin_controls'][ $option_name ] ) || ! $style['builtin_controls'][ $option_name ] ) {
+            if ( ! empty( $style['builtin_controls'] ) ) {
+                foreach ( $builtin_default_options as $category_name => $default_options ) {
+                    if ( empty( $style['builtin_controls'][ $category_name ] ) || ! $style['builtin_controls'][ $category_name ] ) {
                         continue;
                     }
 
-                    $style_options = $style['builtin_controls'][ $option_name ];
-                    $options       = $default_options;
-
-                    // In case if style option is array of array we have to remove defaults.
-                    if (
-                        is_array( $options ) &&
-                        is_array( $style_options ) &&
-                        isset( $style_options[0] ) &&
-                        is_array( $style_options[0] )
-                    ) {
-                        $options = $style_options;
-
-                        // In case if default option is not array we have to use style option.
-                    } elseif ( ! is_array( $options ) ) {
-                        $options = $style_options;
-
-                        // In case if option is array of options, we have to merge defaults and style options.
-                    } elseif ( is_array( $options ) && is_array( $style_options ) ) {
-                        $options = $this->array_merge_recursive_ex( $options, $style_options );
-                    }
+                    $options = $style['builtin_controls'][ $category_name ];
 
                     $new_fields = array();
 
-                    switch ( $option_name ) {
-                        // General.
-                        case 'general':
-                            if ( isset( $options['title'] ) && $options['title'] ) {
-                                $new_fields[] = array(
-                                    'type'      => 'checkbox',
-                                    'alongside' => esc_html__( 'Display Title', '@@text_domain' ),
-                                    'name'      => 'show_title',
-                                    'default'   => true,
-                                );
-                            }
-
-                            if ( isset( $options['categories'] ) && $options['categories'] ) {
-                                $new_fields[] = array(
-                                    'type'      => 'checkbox',
-                                    'alongside' => esc_html__( 'Display Categories', '@@text_domain' ),
-                                    'name'      => 'show_categories',
-                                    'group'     => 'items_style_categories',
-                                    'default'   => true,
-                                );
-                                $new_fields[] = array(
-                                    'type'      => 'range',
-                                    'label'     => esc_html__( 'Categories Count', '@@text_domain' ),
-                                    'name'      => 'categories_count',
-                                    'group'     => 'items_style_categories',
-                                    'min'       => 1,
-                                    'max'       => 20,
-                                    'default'   => 1,
-                                    'condition' => array(
-                                        array(
-                                            'control' => 'show_categories',
-                                        ),
-                                    ),
-                                );
-                            }
-
-                            if ( isset( $options['date'] ) && $options['date'] ) {
-                                $new_fields[] = array(
-                                    'type'    => 'select',
-                                    'label'   => esc_html__( 'Display Date', '@@text_domain' ),
-                                    'name'    => 'show_date',
-                                    'group'   => 'items_style_date',
-                                    'default' => 'false',
-                                    'options' => array(
-                                        'false' => esc_html__( 'Hide', '@@text_domain' ),
-                                        'true'  => esc_html__( 'Default', '@@text_domain' ),
-                                        'human' => esc_html__( 'Human Format', '@@text_domain' ),
-                                    ),
-                                );
-                                $new_fields[] = array(
-                                    'type'        => 'text',
-                                    'name'        => 'date_format',
-                                    'group'       => 'items_style_date',
-                                    'default'     => 'F j, Y',
-                                    'description' => esc_attr__( 'Date format example: F j, Y', '@@text_domain' ),
-                                    'wpml'        => true,
-                                    'condition'   => array(
-                                        array(
-                                            'control' => 'show_date',
-                                        ),
-                                    ),
-                                );
-                            }
-
-                            if ( isset( $options['author'] ) && $options['author'] ) {
-                                $new_fields[] = array(
-                                    'type'      => 'checkbox',
-                                    'alongside' => esc_html__( 'Display Author', '@@text_domain' ),
-                                    'name'      => 'show_author',
-                                    'default'   => false,
-                                );
-                            }
-
-                            if ( isset( $options['comments_count'] ) && $options['comments_count'] ) {
-                                $new_fields[] = array(
-                                    'type'      => 'checkbox',
-                                    'alongside' => esc_html__( 'Display Comments Count', '@@text_domain' ),
-                                    'name'      => 'show_comments_count',
-                                    'default'   => false,
-                                    'condition' => array(
-                                        array(
-                                            'control' => 'GLOBAL_content_source',
-                                            'value'   => 'post-based',
-                                        ),
-                                    ),
-                                );
-                            }
-
-                            if ( isset( $options['views_count'] ) && $options['views_count'] ) {
-                                $new_fields[] = array(
-                                    'type'      => 'checkbox',
-                                    'alongside' => esc_html__( 'Display Views Count', '@@text_domain' ),
-                                    'name'      => 'show_views_count',
-                                    'default'   => false,
-                                    'condition' => array(
-                                        array(
-                                            'control' => 'GLOBAL_content_source',
-                                            'value'   => 'post-based',
-                                        ),
-                                    ),
-                                );
-                            }
-
-                            if ( isset( $options['reading_time'] ) && $options['reading_time'] ) {
-                                $new_fields[] = array(
-                                    'type'      => 'checkbox',
-                                    'alongside' => esc_html__( 'Display Reading Time', '@@text_domain' ),
-                                    'name'      => 'show_reading_time',
-                                    'default'   => false,
-                                    'condition' => array(
-                                        array(
-                                            'control' => 'GLOBAL_content_source',
-                                            'value'   => 'post-based',
-                                        ),
-                                    ),
-                                );
-                            }
-
-                            if ( isset( $options['excerpt'] ) && $options['excerpt'] ) {
-                                $new_fields[] = array(
-                                    'type'      => 'checkbox',
-                                    'alongside' => esc_html__( 'Display Excerpt', '@@text_domain' ),
-                                    'name'      => 'show_excerpt',
-                                    'group'     => 'items_style_excerpt',
-                                    'default'   => false,
-                                );
-                                $new_fields[] = array(
-                                    'type'      => 'number',
-                                    'label'     => esc_html__( 'Excerpt Words Count', '@@text_domain' ),
-                                    'name'      => 'excerpt_words_count',
-                                    'group'     => 'items_style_excerpt',
-                                    'default'   => 15,
-                                    'min'       => 1,
-                                    'max'       => 200,
-                                    'condition' => array(
-                                        array(
-                                            'control' => 'show_excerpt',
-                                        ),
-                                    ),
-                                );
-                            }
-
-                            if ( isset( $options['read_more'] ) && $options['read_more'] ) {
-                                $new_fields[] = array(
-                                    'type'    => 'select',
-                                    'label'   => esc_html__( 'Display Read More Button', '@@text_domain' ),
-                                    'name'    => 'show_read_more',
-                                    'group'   => 'items_style_read_more',
-                                    'default' => 'false',
-                                    'options' => array(
-                                        'false'    => esc_html__( 'Hide', '@@text_domain' ),
-                                        'true'     => esc_html__( 'Always Display', '@@text_domain' ),
-                                        'more_tag' => esc_html__( 'Display when used `More tag` in the post', '@@text_domain' ),
-                                    ),
-                                );
-                                $new_fields[] = array(
-                                    'type'        => 'text',
-                                    'name'        => 'read_more_label',
-                                    'group'       => 'items_style_read_more',
-                                    'default'     => 'Read More',
-                                    'description' => esc_attr__( 'Read More button label', '@@text_domain' ),
-                                    'wpml'        => true,
-                                    'condition'   => array(
-                                        array(
-                                            'control'  => 'show_read_more',
-                                            'operator' => '!=',
-                                            'value'    => 'false',
-                                        ),
-                                    ),
-                                );
-                            }
-
-                            if ( isset( $options['icons'] ) && $options['icons'] ) {
-                                $new_fields[] = array(
-                                    'type'      => 'checkbox',
-                                    'alongside' => esc_html__( 'Display Icon', '@@text_domain' ),
-                                    'name'      => 'show_icon',
-                                    'default'   => false,
-                                );
-                            }
-
-                            $new_fields[] = array(
-                                'type'        => 'pro_note',
-                                'name'        => 'additional_general_skin_settings_pro',
-                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                'description' => 'Choose from a variety of additional contemporary Skins',
-                            );
-                            break;
-
+                    switch ( $category_name ) {
                         // Image.
                         case 'image':
                             $new_fields[] = array(
@@ -2380,15 +2226,18 @@ class Visual_Portfolio_Admin {
                             );
                             break;
 
-                        // Overlay.
+                        // Overlay / Caption.
                         case 'overlay':
+                        case 'caption':
+                            $category_title = 'caption' === $category_name ? esc_html__( 'Caption', '@@text_domain' ) : esc_html__( 'Overlay', '@@text_domain' );
+
                             if ( isset( $options['states'] ) && $options['states'] ) {
                                 $new_fields[] = array(
                                     'type'     => 'select',
-                                    'category' => 'items-style-overlay',
-                                    'label'    => esc_html__( 'Display ', '@@text_domain' ) . $options['label'],
-                                    'name'     => 'show_overlay',
-                                    'group'    => 'items_style_overlay',
+                                    'category' => 'items-style-' . $category_name,
+                                    'label'    => esc_html__( 'Display ', '@@text_domain' ) . $category_title,
+                                    'name'     => 'show_' . $category_name,
+                                    'group'    => 'items_style_' . $category_name,
                                     'default'  => 'hover',
                                     'options'  => array(
                                         'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
@@ -2401,66 +2250,343 @@ class Visual_Portfolio_Admin {
                             if ( isset( $options['text_align'] ) && $options['text_align'] ) {
                                 $new_fields[] = array(
                                     'type'     => 'align',
-                                    'category' => 'items-style-overlay',
+                                    'category' => 'items-style-' . $category_name,
                                     'label'    => esc_html__( 'Text Align', '@@text_domain' ),
-                                    'name'     => 'overlay_text_align',
-                                    'group'    => 'items_style_overlay',
+                                    'name'     => $category_name . '_text_align',
+                                    'group'    => 'items_style_' . $category_name,
                                     'default'  => 'center',
                                     'options'  => $options['text_align'],
                                 );
                             }
 
+                            $new_fields[] = array(
+                                'type'     => 'category_collapse',
+                                'category' => 'items-style-' . $category_name,
+                                'name'     => 'items_style_' . $category_name . '_subcategory',
+                                'options'  => array(
+                                    array(
+                                        'title'    => esc_html__( 'Elements', '@@text_domain' ),
+                                        'category' => 'items-style-' . $category_name . '-elements',
+                                    ),
+                                    array(
+                                        'title'    => esc_html__( 'Colors', '@@text_domain' ),
+                                        'category' => 'items-style-' . $category_name . '-colors',
+                                    ),
+                                    array(
+                                        'title'    => esc_html__( 'Typography', '@@text_domain' ),
+                                        'category' => 'items-style-' . $category_name . '-typography',
+                                    ),
+                                    array(
+                                        'title'    => esc_html__( 'Dimensions', '@@text_domain' ),
+                                        'category' => 'items-style-' . $category_name . '-dimensions',
+                                    ),
+                                ),
+                            );
+
+                            // Elements.
+                            if ( ! empty( $options['elements'] ) ) {
+                                $elements = $options['elements'];
+
+                                if ( isset( $elements['title'] ) && $elements['title'] ) {
+                                    $new_fields[] = array(
+                                        'type'      => 'checkbox',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'alongside' => esc_html__( 'Display Title', '@@text_domain' ),
+                                        'name'      => 'show_title',
+                                        'default'   => true,
+                                    );
+                                }
+
+                                if ( isset( $elements['categories'] ) && $elements['categories'] ) {
+                                    $new_fields[] = array(
+                                        'type'      => 'checkbox',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'alongside' => esc_html__( 'Display Categories', '@@text_domain' ),
+                                        'name'      => 'show_categories',
+                                        'group'     => 'items_style_categories',
+                                        'default'   => true,
+                                    );
+                                    $new_fields[] = array(
+                                        'type'      => 'range',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'label'     => esc_html__( 'Categories Count', '@@text_domain' ),
+                                        'name'      => 'categories_count',
+                                        'group'     => 'items_style_categories',
+                                        'min'       => 1,
+                                        'max'       => 20,
+                                        'default'   => 1,
+                                        'condition' => array(
+                                            array(
+                                                'control' => 'show_categories',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( isset( $elements['date'] ) && $elements['date'] ) {
+                                    $new_fields[] = array(
+                                        'type'     => 'select',
+                                        'category' => 'items-style-' . $category_name . '-elements',
+                                        'label'    => esc_html__( 'Display Date', '@@text_domain' ),
+                                        'name'     => 'show_date',
+                                        'group'    => 'items_style_date',
+                                        'default'  => 'false',
+                                        'options'  => array(
+                                            'false' => esc_html__( 'Hide', '@@text_domain' ),
+                                            'true'  => esc_html__( 'Default', '@@text_domain' ),
+                                            'human' => esc_html__( 'Human Format', '@@text_domain' ),
+                                        ),
+                                    );
+                                    $new_fields[] = array(
+                                        'type'        => 'text',
+                                        'category'    => 'items-style-' . $category_name . '-elements',
+                                        'name'        => 'date_format',
+                                        'group'       => 'items_style_date',
+                                        'default'     => 'F j, Y',
+                                        'description' => esc_attr__( 'Date format example: F j, Y', '@@text_domain' ),
+                                        'wpml'        => true,
+                                        'condition'   => array(
+                                            array(
+                                                'control' => 'show_date',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( isset( $elements['author'] ) && $elements['author'] ) {
+                                    $new_fields[] = array(
+                                        'type'      => 'checkbox',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'alongside' => esc_html__( 'Display Author', '@@text_domain' ),
+                                        'name'      => 'show_author',
+                                        'default'   => false,
+                                    );
+                                }
+
+                                if ( isset( $elements['comments_count'] ) && $elements['comments_count'] ) {
+                                    $new_fields[] = array(
+                                        'type'      => 'checkbox',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'alongside' => esc_html__( 'Display Comments Count', '@@text_domain' ),
+                                        'name'      => 'show_comments_count',
+                                        'default'   => false,
+                                        'condition' => array(
+                                            array(
+                                                'control' => 'GLOBAL_content_source',
+                                                'value'   => 'post-based',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( isset( $elements['views_count'] ) && $elements['views_count'] ) {
+                                    $new_fields[] = array(
+                                        'type'      => 'checkbox',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'alongside' => esc_html__( 'Display Views Count', '@@text_domain' ),
+                                        'name'      => 'show_views_count',
+                                        'default'   => false,
+                                        'condition' => array(
+                                            array(
+                                                'control' => 'GLOBAL_content_source',
+                                                'value'   => 'post-based',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( isset( $elements['reading_time'] ) && $elements['reading_time'] ) {
+                                    $new_fields[] = array(
+                                        'type'      => 'checkbox',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'alongside' => esc_html__( 'Display Reading Time', '@@text_domain' ),
+                                        'name'      => 'show_reading_time',
+                                        'default'   => false,
+                                        'condition' => array(
+                                            array(
+                                                'control' => 'GLOBAL_content_source',
+                                                'value'   => 'post-based',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( isset( $elements['excerpt'] ) && $elements['excerpt'] ) {
+                                    $new_fields[] = array(
+                                        'type'      => 'checkbox',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'alongside' => esc_html__( 'Display Excerpt', '@@text_domain' ),
+                                        'name'      => 'show_excerpt',
+                                        'group'     => 'items_style_excerpt',
+                                        'default'   => false,
+                                    );
+                                    $new_fields[] = array(
+                                        'type'      => 'number',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'label'     => esc_html__( 'Excerpt Words Count', '@@text_domain' ),
+                                        'name'      => 'excerpt_words_count',
+                                        'group'     => 'items_style_excerpt',
+                                        'default'   => 15,
+                                        'min'       => 1,
+                                        'max'       => 200,
+                                        'condition' => array(
+                                            array(
+                                                'control' => 'show_excerpt',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( isset( $elements['read_more'] ) && $elements['read_more'] ) {
+                                    $new_fields[] = array(
+                                        'type'     => 'select',
+                                        'category' => 'items-style-' . $category_name . '-elements',
+                                        'label'    => esc_html__( 'Display Read More Button', '@@text_domain' ),
+                                        'name'     => 'show_read_more',
+                                        'group'    => 'items_style_read_more',
+                                        'default'  => 'false',
+                                        'options'  => array(
+                                            'false'    => esc_html__( 'Hide', '@@text_domain' ),
+                                            'true'     => esc_html__( 'Always Display', '@@text_domain' ),
+                                            'more_tag' => esc_html__( 'Display when used `More tag` in the post', '@@text_domain' ),
+                                        ),
+                                    );
+                                    $new_fields[] = array(
+                                        'type'        => 'text',
+                                        'category'    => 'items-style-' . $category_name . '-elements',
+                                        'name'        => 'read_more_label',
+                                        'group'       => 'items_style_read_more',
+                                        'default'     => 'Read More',
+                                        'description' => esc_attr__( 'Read More button label', '@@text_domain' ),
+                                        'wpml'        => true,
+                                        'condition'   => array(
+                                            array(
+                                                'control'  => 'show_read_more',
+                                                'operator' => '!=',
+                                                'value'    => 'false',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( isset( $elements['icons'] ) && $elements['icons'] ) {
+                                    $new_fields[] = array(
+                                        'type'      => 'checkbox',
+                                        'category'  => 'items-style-' . $category_name . '-elements',
+                                        'alongside' => esc_html__( 'Display Icon', '@@text_domain' ),
+                                        'name'      => 'show_icon',
+                                        'default'   => false,
+                                    );
+                                }
+
+                                $new_fields[] = array(
+                                    'type'        => 'pro_note',
+                                    'category'    => 'items-style-' . $category_name . '-elements',
+                                    'name'        => 'additional_general_skin_settings_pro',
+                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                    'description' => 'Choose from a variety of additional contemporary Skins',
+                                );
+                            }
+
+                            // Colors.
+                            if ( ! empty( $options['colors'] ) ) {
+                                $has_background = isset( $options['colors']['background'] ) && $options['colors']['background'];
+                                $has_text       = isset( $options['colors']['text'] ) && $options['colors']['text'];
+                                $has_links      = isset( $options['colors']['links'] ) && $options['colors']['links'];
+
+                                if ( $has_background ) {
+                                    $new_fields[] = array(
+                                        'type'     => 'color',
+                                        'category' => 'items-style-' . $category_name . '-colors',
+                                        'label'    => esc_html__( 'Background', '@@text_domain' ),
+                                        'name'     => $category_name . '_bg_color',
+                                        'alpha'    => true,
+                                        'style'    => array(
+                                            array(
+                                                'element'  => '.vp-portfolio__items-style-' . $style_name,
+                                                'property' => '--vp-items-style-' . $style_name . '--' . $category_name . '__background-color',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( $has_text ) {
+                                    $new_fields[] = array(
+                                        'type'     => 'color',
+                                        'category' => 'items-style-' . $category_name . '-colors',
+                                        'label'    => esc_html__( 'Text', '@@text_domain' ),
+                                        'name'     => $category_name . '_text_color',
+                                        'alpha'    => true,
+                                        'style'    => array(
+                                            array(
+                                                'element'  => '.vp-portfolio__items-style-' . $style_name,
+                                                'property' => '--vp-items-style-' . $style_name . '--' . $category_name . '__color',
+                                            ),
+                                        ),
+                                    );
+                                }
+
+                                if ( $has_links ) {
+                                    $new_fields[] = array(
+                                        'type'     => 'color',
+                                        'category' => 'items-style-' . $category_name . '-colors',
+                                        'label'    => esc_html__( 'Links', '@@text_domain' ),
+                                        'name'     => $category_name . '_links_color',
+                                        'alpha'    => true,
+                                        'style'    => array(
+                                            array(
+                                                'element'  => '.vp-portfolio__items-style-' . $style_name,
+                                                'property' => '--vp-items-style-' . $style_name . '--' . $category_name . '-links__color',
+                                            ),
+                                        ),
+                                    );
+                                    $new_fields[] = array(
+                                        'type'     => 'color',
+                                        'category' => 'items-style-' . $category_name . '-colors',
+                                        'label'    => esc_html__( 'Links Hover', '@@text_domain' ),
+                                        'name'     => $category_name . '_links_hover_color',
+                                        'alpha'    => true,
+                                        'style'    => array(
+                                            array(
+                                                'element'  => '.vp-portfolio__items-style-' . $style_name,
+                                                'property' => '--vp-items-style-' . $style_name . '--' . $category_name . '-links-hover__color',
+                                            ),
+                                        ),
+                                    );
+                                }
+                            }
+
+                            // Typography.
+                            if ( ! empty( $options['typography'] ) ) {
+                                $new_fields[] = array(
+                                    'type'        => 'pro_note',
+                                    'category'    => 'items-style-' . $category_name . '-typography',
+                                    'name'        => 'additional_' . $category_name . '_typography_skin_settings_pro',
+                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                    'description' => 'Manage fonts, sizing, and appearance of distinct text components within the Skin',
+                                );
+                            }
+
+                            // Overlay Pro notices.
                             if ( 'fade' === $style_name || 'fly' === $style_name || 'emerge' === $style_name ) {
                                 $new_fields[] = array(
                                     'type'        => 'pro_note',
-                                    'category'    => 'items-style-overlay',
-                                    'name'        => 'additional_overlay_skin_settings_pro',
+                                    'category'    => 'items-style-' . $category_name,
+                                    'name'        => 'additional_' . $category_name . '_skin_settings_pro',
                                     'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
                                     'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible. Apply Instagram-like filters on images and select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
                                 );
                             } else {
                                 $new_fields[] = array(
                                     'type'        => 'pro_note',
-                                    'category'    => 'items-style-overlay',
-                                    'name'        => 'additional_overlay_skin_settings_pro',
+                                    'category'    => 'items-style-' . $category_name,
+                                    'name'        => 'additional_' . $category_name . '_skin_settings_pro',
                                     'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
                                     'description' => 'Apply Instagram-like filters on images and select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
                                 );
                             }
-                            break;
 
-                        // Caption.
-                        case 'caption':
-                            if ( isset( $options['states'] ) && $options['states'] ) {
-                                $new_fields[] = array(
-                                    'type'     => 'select',
-                                    'category' => 'items-style-caption',
-                                    'label'    => esc_html__( 'Display ', '@@text_domain' ) . $options['label'],
-                                    'name'     => 'show_caption',
-                                    'group'    => 'items_style_caption',
-                                    'default'  => 'hover',
-                                    'options'  => array(
-                                        'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
-                                        'default' => esc_html__( 'Default State Only', '@@text_domain' ),
-                                        'always'  => esc_html__( 'Always', '@@text_domain' ),
-                                    ),
-                                );
-                            }
-
-                            if ( isset( $options['text_align'] ) && $options['text_align'] ) {
-                                $new_fields[] = array(
-                                    'type'     => 'align',
-                                    'category' => 'items-style-caption',
-                                    'label'    => esc_html__( 'Text Align', '@@text_domain' ),
-                                    'name'     => 'caption_text_align',
-                                    'group'    => 'items_style_caption',
-                                    'default'  => 'center',
-
-                                    // All available align options: 'horizontal'|'vertical'|'box'.
-                                    'options'  => $options['text_align'],
-                                );
-                            }
-
+                            // Caption Pro notices.
                             if ( 'fade' === $style_name || 'fly' === $style_name || 'emerge' === $style_name ) {
                                 $new_fields[] = array(
                                     'type'        => 'pro_note',
@@ -2471,104 +2597,10 @@ class Visual_Portfolio_Admin {
                                 );
                             }
                             break;
-
-                        // Colors.
-                        case 'colors':
-                            if ( is_array( $options ) ) {
-                                foreach ( $options as $opts ) {
-                                    $opt_name       = $opts['name'];
-                                    $has_label      = isset( $opts['label'] ) && $opts['label'];
-                                    $has_background = isset( $opts['background'] ) && $opts['background'];
-                                    $has_text       = isset( $opts['text'] ) && $opts['text'];
-                                    $has_links      = isset( $opts['links'] ) && $opts['links'];
-
-                                    if ( $has_label && ( $has_background || $has_text || $has_links ) ) {
-                                        $new_fields[] = array(
-                                            'type'     => 'html',
-                                            'category' => 'items-style-colors',
-                                            'label'    => $opts['label'] . esc_html__( ' Colors', '@@text_domain' ),
-                                            'name'     => $opt_name . '_color_label__',
-                                        );
-                                    }
-
-                                    if ( $has_background ) {
-                                        $new_fields[] = array(
-                                            'type'     => 'color',
-                                            'category' => 'items-style-colors',
-                                            'label'    => esc_html__( 'Background', '@@text_domain' ),
-                                            'name'     => $opt_name . '_bg_color',
-                                            'alpha'    => true,
-                                            'style'    => array(
-                                                array(
-                                                    'element'  => '.vp-portfolio__items-style-' . $style_name,
-                                                    'property' => '--vp-items-style-' . $style_name . '--' . $opt_name . '__background-color',
-                                                ),
-                                            ),
-                                        );
-                                    }
-
-                                    if ( $has_text ) {
-                                        $new_fields[] = array(
-                                            'type'     => 'color',
-                                            'category' => 'items-style-colors',
-                                            'label'    => esc_html__( 'Text', '@@text_domain' ),
-                                            'name'     => $opt_name . '_text_color',
-                                            'alpha'    => true,
-                                            'style'    => array(
-                                                array(
-                                                    'element'  => '.vp-portfolio__items-style-' . $style_name,
-                                                    'property' => '--vp-items-style-' . $style_name . '--' . $opt_name . '__color',
-                                                ),
-                                            ),
-                                        );
-                                    }
-
-                                    if ( $has_links ) {
-                                        $new_fields[] = array(
-                                            'type'     => 'color',
-                                            'category' => 'items-style-colors',
-                                            'label'    => esc_html__( 'Links', '@@text_domain' ),
-                                            'name'     => $opt_name . '_links_color',
-                                            'alpha'    => true,
-                                            'style'    => array(
-                                                array(
-                                                    'element'  => '.vp-portfolio__items-style-' . $style_name,
-                                                    'property' => '--vp-items-style-' . $style_name . '--' . $opt_name . '-links__color',
-                                                ),
-                                            ),
-                                        );
-                                        $new_fields[] = array(
-                                            'type'     => 'color',
-                                            'category' => 'items-style-colors',
-                                            'label'    => esc_html__( 'Links Hover', '@@text_domain' ),
-                                            'name'     => $opt_name . '_links_hover_color',
-                                            'alpha'    => true,
-                                            'style'    => array(
-                                                array(
-                                                    'element'  => '.vp-portfolio__items-style-' . $style_name,
-                                                    'property' => '--vp-items-style-' . $style_name . '--' . $opt_name . '-links-hover__color',
-                                                ),
-                                            ),
-                                        );
-                                    }
-                                }
-                            }
-                            break;
-
-                        // Typography.
-                        case 'typography':
-                            $new_fields[] = array(
-                                'type'        => 'pro_note',
-                                'category'    => 'items-style-typography',
-                                'name'        => 'additional_typography_skin_settings_pro',
-                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                'description' => 'Manage fonts, sizing, and appearance of distinct text components within the Skin',
-                            );
-                            break;
                         // no default.
                     }
 
-                    $builtin_fields = array_merge( $builtin_fields, apply_filters( 'vpf_items_style_builtin_controls', $new_fields, $option_name, $options, $style_name, $style ) );
+                    $builtin_fields = array_merge( $builtin_fields, apply_filters( 'vpf_items_style_builtin_controls', $new_fields, $category_name, $options, $style_name, $style ) );
                 }
             }
             $items_styles[ $style_name ]['controls'] = array_merge( $builtin_fields, isset( $style['controls'] ) ? $style['controls'] : array() );
