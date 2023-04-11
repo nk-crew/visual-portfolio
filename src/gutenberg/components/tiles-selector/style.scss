@@ -7,17 +7,15 @@ $tiles_selector_button_padding: 10px !default;
     @extend %vpf-icons-selector-item;
 
     position: relative;
+    display: flex;
     flex-direction: row;
+    align-items: flex-start;
     width: 33.33%;
     height: auto;
+    aspect-ratio: 1 / 1.25;
+    padding: 0;
     overflow: hidden;
     background: #efefef !important;
-
-    &::after {
-      display: block;
-      margin-top: 125%;
-      content: "";
-    }
   }
 
   .vpf-tiles-preview-button-active {
@@ -25,11 +23,10 @@ $tiles_selector_button_padding: 10px !default;
   }
 
   [data-tiles-preview] {
-    position: absolute !important;
-    top: $tiles_selector_button_padding - $tiles_selector_gap;
-    right: $tiles_selector_button_padding;
-    left: $tiles_selector_button_padding - $tiles_selector_gap;
     flex: 1;
+    margin-top: $tiles_selector_button_padding - $tiles_selector_gap;
+    margin-right: $tiles_selector_button_padding;
+    margin-left: $tiles_selector_button_padding - $tiles_selector_gap;
   }
 
   .vpf-tiles-preview-item-wrap {
