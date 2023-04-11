@@ -2216,10 +2216,7 @@ class Visual_Portfolio_Get {
 
         if ( isset( $args['allow_popup'] ) && $args['allow_popup'] ) {
             if ( isset( $args['format_video_url'] ) && $args['format_video_url'] ) {
-                $popup_video = array(
-                    'url'    => $args['format_video_url'],
-                    'poster' => wp_get_attachment_image_url( $args['image_id'], 'full' ),
-                );
+                $popup_video = self::get_popup_video( $args );
             } else {
                 $img_id = $args['image_id'] ? $args['image_id'] : $args['no_image'];
 
@@ -2298,6 +2295,24 @@ class Visual_Portfolio_Get {
     }
 
     /**
+     * Get item popup video data.
+     *
+     * @param array $args - item args.
+     *
+     * @return array
+     */
+    public static function get_popup_video( $args ) {
+        return array(
+            'url'              => $args['format_video_url'],
+            'poster'           => wp_get_attachment_image_url( $args['image_id'], 'full' ),
+            'item_title'       => $args['title'] ?? null,
+            'item_description' => $args['content'] ?? null,
+            'item_author'      => $args['author'] ?? null,
+            'item_author_url'  => $args['author_url'] ?? null,
+        );
+    }
+
+    /**
      * Print image popup.
      *
      * @param array $image_data - item popup image data.
@@ -2345,14 +2360,19 @@ class Visual_Portfolio_Get {
         if ( $video_data ) {
             ob_start();
 
+            $title_source       = $args['vp_opts']['items_click_action_popup_title_source'] ? $args['vp_opts']['items_click_action_popup_title_source'] : '';
+            $description_source = $args['vp_opts']['items_click_action_popup_description_source'] ? $args['vp_opts']['items_click_action_popup_description_source'] : '';
+
             visual_portfolio()->include_template(
                 'popup/video-popup-data',
                 array(
-                    'video_data'  => $video_data,
+                    'title_source'       => $title_source,
+                    'description_source' => $description_source,
+                    'video_data'         => $video_data,
 
                     // We need to check existence of args to prevent possible conflicts.
-                    'args'        => isset( $args ) ? $args : null,
-                    'opts'        => isset( $args['vp_opts'] ) ? $args['vp_opts'] : null,
+                    'args'               => isset( $args ) ? $args : null,
+                    'opts'               => isset( $args['vp_opts'] ) ? $args['vp_opts'] : null,
                 )
             );
 

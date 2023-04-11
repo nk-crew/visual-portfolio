@@ -298,16 +298,14 @@ const VPPopupAPI = {
             item.srcMediumWidth = parseInt(mediumSize[0], 10);
             item.srcMediumHeight = parseInt(mediumSize[1], 10);
           }
+        }
 
-          const $captionTitle = $meta.children('.vp-portfolio__item-popup-title').get(0);
-          const $captionDescription = $meta
-            .children('.vp-portfolio__item-popup-description')
-            .get(0);
-          if ($captionTitle || $captionDescription) {
-            item.caption =
-              ($captionTitle ? $captionTitle.outerHTML : '') +
-              ($captionDescription ? $captionDescription.outerHTML : '');
-          }
+        const $captionTitle = $meta.children('.vp-portfolio__item-popup-title').get(0);
+        const $captionDescription = $meta.children('.vp-portfolio__item-popup-description').get(0);
+        if ($captionTitle || $captionDescription) {
+          item.caption =
+            ($captionTitle ? $captionTitle.outerHTML : '') +
+            ($captionDescription ? $captionDescription.outerHTML : '');
         }
 
         items.push(item);

@@ -27,6 +27,7 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
           opts: {
             width: item.width,
             height: item.height,
+            caption: item.caption,
           },
         });
       } else if ('embed' === item.type && item.embed) {
@@ -36,6 +37,7 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
           opts: {
             width: item.width,
             height: item.height,
+            caption: item.caption,
           },
         });
       } else {

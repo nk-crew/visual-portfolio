@@ -134,6 +134,7 @@ if (PhotoSwipe && VPPopupAPI) {
           html: `<div class="vp-pswp-video"><div>${item.embed}</div></div>`,
           vw: item.width || 0,
           vh: item.height || 0,
+          title: item.caption,
         });
       } else {
         finalItems.push({
