@@ -2557,7 +2557,7 @@ class Visual_Portfolio_Get {
                         continue;
                     }
 
-                    $filtered_links[] = apply_filters( 'vpf_pagination_filtered_links', $arr, $args, $vp_options );
+                    $filtered_links[] = apply_filters( 'vpf_pagination_item_data', $arr, $args, $vp_options );
                 }
             }
         }

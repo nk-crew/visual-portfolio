@@ -83,7 +83,7 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'redirect_canonical', array( $this, 'maybe_redirect_canonical_links' ), 10, 2 );
             add_filter( 'pre_get_shortlink', array( $this, 'remove_taxanomy_shortlinks' ), 10, 4 );
             add_filter( 'vpf_extend_portfolio_data_attributes', array( $this, 'converting_data_next_page_to_friendly_url' ), 10, 3 );
-            add_filter( 'vpf_pagination_filtered_links', array( $this, 'converting_paginate_links_to_friendly_url' ), 10, 3 );
+            add_filter( 'vpf_pagination_item_data', array( $this, 'converting_paginate_links_to_friendly_url' ), 10, 3 );
         }
 
         self::create_archive_page();
