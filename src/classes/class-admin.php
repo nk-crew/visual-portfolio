@@ -2605,7 +2605,7 @@ class Visual_Portfolio_Admin {
                                     'category'    => 'items-style-' . $category_name . '-dimensions',
                                     'name'        => 'additional_' . $category_name . '_dimensions_skin_settings_pro',
                                     'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                    'description' => 'Adjust element spacing and dimensions such as ' . $category_title . ' ' . implode( ', ', $dimensions_list ),
+                                    'description' => 'Adjust element spacing and dimensions such as ' . implode( ', ', $dimensions_list ),
                                 );
                             }
                             break;
