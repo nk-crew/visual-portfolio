@@ -2610,7 +2610,7 @@ class Visual_Portfolio_Admin {
                 continue;
             }
             foreach ( $style['controls'] as $field ) {
-                $field['category'] = $field['category'] ?? 'items-style-general';
+                $field['category'] = $field['category'] ?? 'items-style';
                 $field['name']     = 'items_style_' . $style_name . '__' . $field['name'];
 
                 // condition names prefix fix.
@@ -3782,34 +3782,6 @@ selector p {
         echo wp_json_encode( $oembed );
 
         wp_die();
-    }
-
-    /**
-     * Merge 2 arrays recursive.
-     *
-     * @link https://stackoverflow.com/questions/25712099/php-multidimensional-array-merge-recursive
-     *
-     * @param array $array1 - first array.
-     * @param array $array2 - second array.
-     *
-     * @return array
-     */
-    public function array_merge_recursive_ex( array $array1, array $array2 ) {
-        $merged = $array1;
-
-        foreach ( $array2 as $key => & $value ) {
-            if ( is_array( $value ) && isset( $merged[ $key ] ) && is_array( $merged[ $key ] ) ) {
-                $merged[ $key ] = $this->array_merge_recursive_ex( $merged[ $key ], $value );
-            } elseif ( is_numeric( $key ) ) {
-                if ( ! in_array( $value, $merged, true ) ) {
-                    $merged[] = $value;
-                }
-            } else {
-                $merged[ $key ] = $value;
-            }
-        }
-
-        return $merged;
     }
 }
 

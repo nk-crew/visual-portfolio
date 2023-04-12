@@ -65,8 +65,8 @@ class Visual_Portfolio_Migrations {
     public function get_migrations() {
         return array(
             array(
-                'version' => '2.23.0',
-                'cb'      => array( $this, 'v_2_23_0' ),
+                'version' => '3.0.0',
+                'cb'      => array( $this, 'v_3_0_0' ),
             ),
             array(
                 'version' => '2.15.0',
@@ -90,7 +90,7 @@ class Visual_Portfolio_Migrations {
     /**
      * Add new attributes and values from old attributes.
      */
-    public function v_2_23_0() {
+    public function v_3_0_0() {
         // Get all available Layouts.
         // Don't use WP_Query on the admin side https://core.trac.wordpress.org/ticket/18408.
         $layouts_query = get_posts(

@@ -53,7 +53,7 @@ const V2_23_0_BORDER_RADIUS = [
 ];
 
 export default [
-  // v2.23.0
+  // v3.0.0
   // Changed items style builtin_controls structure.
   {
     attributes: {

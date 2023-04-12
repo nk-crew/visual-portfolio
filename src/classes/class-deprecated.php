@@ -32,9 +32,9 @@ class Visual_Portfolio_Deprecations {
         $this->add_deprecated_filter( 'vpf_print_popup_data', '2.9.0', 'vpf_popup_output' );
         $this->add_deprecated_filter( 'vpf_wp_get_attachment_image_extend', '2.9.0', 'vpf_wp_get_attachment_image' );
 
-        // Deprecated some builtin_controls for skins v2.23.0.
-        add_filter( 'vpf_extend_items_styles', array( $this, 'deprecated_items_styles_builtin_controls_config' ), 20 );
-        add_filter( 'vpf_items_style_builtin_controls', array( $this, 'deprecated_items_styles_builtin_controls' ), 20, 5 );
+        // Deprecated some builtin_controls for skins v3.0.0.
+        add_filter( 'vpf_items_style_builtin_controls_options', array( $this, 'deprecated_vpf_items_style_builtin_controls_options' ), 20 );
+        add_filter( 'vpf_items_style_builtin_controls', array( $this, 'deprecated_vpf_items_style_builtin_controls' ), 20, 4 );
         add_filter( 'vpf_get_options', array( $this, 'deprecated_items_styles_attributes' ), 20, 2 );
 
         // Deprecated image args for wp kses since v2.10.4.
@@ -76,7 +76,7 @@ class Visual_Portfolio_Deprecations {
      */
     public function add_deprecated_action( $deprecated, $version, $replacement ) {
         // Store replacement data.
-        $hooks[] = array(
+        $this->hooks[] = array(
             'type'        => 'action',
             'deprecated'  => $deprecated,
             'replacement' => $replacement,
@@ -132,70 +132,209 @@ class Visual_Portfolio_Deprecations {
     }
 
     /**
-     * Replace some old builtin_controls for skins.
+     * Restore some old builtin_controls for skins.
      *
-     * @param array $skins - all registered skins.
+     * @param array $builtin_controls - builtin default controls.
      *
      * @return array
      */
-    public function deprecated_items_styles_builtin_controls_config( $skins ) {
-        $move_to_general = array( 'show_title', 'show_categories', 'show_date', 'show_author', 'show_comments_count', 'show_views_count', 'show_reading_time', 'show_excerpt', 'show_read_more', 'show_icons' );
-
-        foreach ( $skins as &$skin ) {
-            if ( isset( $skin['builtin_controls'] ) ) {
-                // Add 'general' controls.
-                foreach ( $move_to_general as $opt ) {
-                    if ( ! isset( $skin['builtin_controls'][ $opt ] ) ) {
-                        continue;
-                    }
-
-                    if ( ! isset( $skin['builtin_controls']['general'] ) ) {
-                        $skin['builtin_controls']['general'] = array();
-                    }
-
-                    $skin['builtin_controls']['general'][ str_replace( 'show_', '', $opt ) ] = $skin['builtin_controls'][ $opt ];
-
-                    unset( $skin['builtin_controls'][ $opt ] );
-                }
-
-                // Add 'images' controls.
-                if ( isset( $skin['builtin_controls']['images_rounded_corners'] ) ) {
-                    if ( ! isset( $skin['builtin_controls']['image'] ) ) {
-                        $skin['builtin_controls']['image'] = array(
-                            'border_radius' => $skin['builtin_controls']['images_rounded_corners'],
-                        );
-                    }
-
-                    unset( $skin['builtin_controls']['images_rounded_corners'] );
-                }
-            }
-        }
-
-        return $skins;
+    public function deprecated_vpf_items_style_builtin_controls_options( $builtin_controls ) {
+        return array_merge(
+            $builtin_controls,
+            array(
+                'images_rounded_corners' => true,
+                'show_title'             => true,
+                'show_categories'        => true,
+                'show_date'              => true,
+                'show_author'            => true,
+                'show_comments_count'    => true,
+                'show_views_count'       => true,
+                'show_reading_time'      => true,
+                'show_excerpt'           => true,
+                'show_icons'             => true,
+                'align'                  => true,
+            )
+        );
     }
 
     /**
-     * Add controls for old builtin_controls config.
+     * Restore some old builtin_controls for skins.
      *
      * @param array  $fields - builtin fields.
      * @param string $option_name - option name.
      * @param array  $options - builtin field options.
      * @param string $style_name - items style name.
-     * @param string $style - items style data.
      *
      * @return array
      */
-    public function deprecated_items_styles_builtin_controls( $fields, $option_name, $options, $style_name, $style ) {
-        if ( 'align' === $option_name ) {
-            $fields[] = array(
-                'type'     => 'align',
-                'category' => 'items-style-caption',
-                'label'    => esc_html__( 'Caption Align', '@@text_domain' ),
-                'name'     => 'align',
-                'group'    => 'items_style_align',
-                'default'  => 'center',
-                'options'  => 'extended' === $options ? 'box' : 'horizontal',
-            );
+    public function deprecated_vpf_items_style_builtin_controls( $fields, $option_name, $options, $style_name ) {
+        switch ( $option_name ) {
+            case 'images_rounded_corners':
+                $fields[] = array(
+                    'type'    => 'range',
+                    'label'   => esc_html__( 'Images Rounded Corners', '@@text_domain' ),
+                    'name'    => 'images_rounded_corners',
+                    'min'     => 0,
+                    'max'     => 100,
+                    'default' => 0,
+                    'style'   => array(
+                        array(
+                            'element'  => '.vp-portfolio__items-style-' . $style_name,
+                            'property' => '--vp-items-style-' . $style_name . '--image__border-radius',
+                            'mask'     => '$px',
+                        ),
+                    ),
+                );
+                break;
+            case 'show_title':
+                $fields[] = array(
+                    'type'      => 'checkbox',
+                    'alongside' => esc_html__( 'Display Title', '@@text_domain' ),
+                    'name'      => 'show_title',
+                    'default'   => true,
+                );
+                break;
+            case 'show_categories':
+                $fields[] = array(
+                    'type'      => 'checkbox',
+                    'alongside' => esc_html__( 'Display Categories', '@@text_domain' ),
+                    'name'      => 'show_categories',
+                    'group'     => 'items_style_categories',
+                    'default'   => true,
+                );
+                $fields[] = array(
+                    'type'      => 'range',
+                    'label'     => esc_html__( 'Categories Count', '@@text_domain' ),
+                    'name'      => 'categories_count',
+                    'group'     => 'items_style_categories',
+                    'min'       => 1,
+                    'max'       => 20,
+                    'default'   => 1,
+                    'condition' => array(
+                        array(
+                            'control' => 'show_categories',
+                        ),
+                    ),
+                );
+                break;
+            case 'show_date':
+                $fields[] = array(
+                    'type'    => 'radio',
+                    'label'   => esc_html__( 'Display Date', '@@text_domain' ),
+                    'name'    => 'show_date',
+                    'group'   => 'items_style_date',
+                    'default' => 'false',
+                    'options' => array(
+                        'false' => esc_html__( 'Hide', '@@text_domain' ),
+                        'true'  => esc_html__( 'Default', '@@text_domain' ),
+                        'human' => esc_html__( 'Human Format', '@@text_domain' ),
+                    ),
+                );
+                $fields[] = array(
+                    'type'        => 'text',
+                    'name'        => 'date_format',
+                    'group'       => 'items_style_date',
+                    'default'     => 'F j, Y',
+                    'description' => esc_attr__( 'Date format example: F j, Y', '@@text_domain' ),
+                    'wpml'        => true,
+                    'condition'   => array(
+                        array(
+                            'control' => 'show_date',
+                        ),
+                    ),
+                );
+                break;
+            case 'show_author':
+                $fields[] = array(
+                    'type'      => 'checkbox',
+                    'alongside' => esc_html__( 'Display Author', '@@text_domain' ),
+                    'name'      => 'show_author',
+                    'default'   => false,
+                );
+                break;
+            case 'show_comments_count':
+                $fields[] = array(
+                    'type'      => 'checkbox',
+                    'alongside' => esc_html__( 'Display Comments Count', '@@text_domain' ),
+                    'name'      => 'show_comments_count',
+                    'default'   => false,
+                    'condition' => array(
+                        array(
+                            'control' => 'GLOBAL_content_source',
+                            'value'   => 'post-based',
+                        ),
+                    ),
+                );
+                break;
+            case 'show_views_count':
+                $fields[] = array(
+                    'type'      => 'checkbox',
+                    'alongside' => esc_html__( 'Display Views Count', '@@text_domain' ),
+                    'name'      => 'show_views_count',
+                    'default'   => false,
+                    'condition' => array(
+                        array(
+                            'control' => 'GLOBAL_content_source',
+                            'value'   => 'post-based',
+                        ),
+                    ),
+                );
+                break;
+            case 'show_reading_time':
+                $fields[] = array(
+                    'type'      => 'checkbox',
+                    'alongside' => esc_html__( 'Display Reading Time', '@@text_domain' ),
+                    'name'      => 'show_reading_time',
+                    'default'   => false,
+                    'condition' => array(
+                        array(
+                            'control' => 'GLOBAL_content_source',
+                            'value'   => 'post-based',
+                        ),
+                    ),
+                );
+                break;
+            case 'show_excerpt':
+                $fields[] = array(
+                    'type'      => 'checkbox',
+                    'alongside' => esc_html__( 'Display Excerpt', '@@text_domain' ),
+                    'name'      => 'show_excerpt',
+                    'group'     => 'items_style_excerpt',
+                    'default'   => false,
+                );
+                $fields[] = array(
+                    'type'      => 'number',
+                    'label'     => esc_html__( 'Excerpt Words Count', '@@text_domain' ),
+                    'name'      => 'excerpt_words_count',
+                    'group'     => 'items_style_excerpt',
+                    'default'   => 15,
+                    'min'       => 1,
+                    'max'       => 200,
+                    'condition' => array(
+                        array(
+                            'control' => 'show_excerpt',
+                        ),
+                    ),
+                );
+                break;
+            case 'show_icons':
+                $fields[] = array(
+                    'type'      => 'checkbox',
+                    'alongside' => esc_html__( 'Display Icon', '@@text_domain' ),
+                    'name'      => 'show_icon',
+                    'default'   => false,
+                );
+                break;
+            case 'align':
+                $fields[] = array(
+                    'type'     => 'align',
+                    'label'    => esc_html__( 'Caption Align', '@@text_domain' ),
+                    'name'     => 'align',
+                    'default'  => 'center',
+                    'extended' => 'extended' === $options,
+                );
+                break;
+            // no default.
         }
 
         return $fields;
