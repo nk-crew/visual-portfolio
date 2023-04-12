@@ -278,67 +278,124 @@ ControlsRender.Control = function (props) {
     );
   }
 
+  const categoryControlOptions = [];
+
+  // Check if category is empty.
+  if (
+    ('category_tabs' === props.type ||
+      'category_toggle_group' === props.type ||
+      'category_collapse' === props.type ||
+      'category_navigator' === props.type) &&
+    props.options &&
+    props.options.length
+  ) {
+    props.options.forEach((opt) => {
+      const isEmpty = ControlsRender.isCategoryEmpty({
+        ...props.renderProps,
+        category: opt.category,
+        categoryToggle: false,
+      });
+
+      if (!isEmpty) {
+        categoryControlOptions.push(opt);
+      }
+    });
+  }
+
   // Specific controls.
   switch (props.type) {
     case 'category_tabs':
-      renderControl = (
-        <TabsControl controlName={props.name} options={props.options}>
-          {(tab) => {
-            return (
-              <ControlsRender {...props.renderProps} category={tab.name} categoryToggle={false} />
-            );
-          }}
-        </TabsControl>
-      );
+      if (categoryControlOptions.length) {
+        renderControl = (
+          <TabsControl
+            controlName={props.name}
+            options={categoryControlOptions}
+            key={categoryControlOptions}
+          >
+            {(tab) => {
+              return (
+                <ControlsRender {...props.renderProps} category={tab.name} categoryToggle={false} />
+              );
+            }}
+          </TabsControl>
+        );
+      } else {
+        renderControl = null;
+      }
+
       break;
     case 'category_toggle_group':
-      renderControl = (
-        <ToggleGroupControl controlName={props.name} options={props.options}>
-          {(group) => {
-            return (
-              <ControlsRender
-                {...props.renderProps}
-                category={group.category}
-                categoryToggle={false}
-              />
-            );
-          }}
-        </ToggleGroupControl>
-      );
+      if (categoryControlOptions.length) {
+        renderControl = (
+          <ToggleGroupControl
+            controlName={props.name}
+            options={categoryControlOptions}
+            key={categoryControlOptions}
+          >
+            {(group) => {
+              return (
+                <ControlsRender
+                  {...props.renderProps}
+                  category={group.category}
+                  categoryToggle={false}
+                />
+              );
+            }}
+          </ToggleGroupControl>
+        );
+      } else {
+        renderControl = null;
+      }
+
       break;
     case 'category_collapse':
-      renderControl = (
-        <CollapseControl
-          controlName={props.name}
-          options={props.options}
-          initialOpen={props.initialOpen}
-        >
-          {(tab) => {
-            return (
-              <ControlsRender
-                {...props.renderProps}
-                category={tab.category}
-                categoryToggle={false}
-              />
-            );
-          }}
-        </CollapseControl>
-      );
+      if (categoryControlOptions.length) {
+        renderControl = (
+          <CollapseControl
+            controlName={props.name}
+            initialOpen={props.initialOpen}
+            options={categoryControlOptions}
+            key={categoryControlOptions}
+          >
+            {(tab) => {
+              return (
+                <ControlsRender
+                  {...props.renderProps}
+                  category={tab.category}
+                  categoryToggle={false}
+                />
+              );
+            }}
+          </CollapseControl>
+        );
+      } else {
+        renderControl = null;
+      }
+
       break;
     case 'category_navigator':
-      renderControl = (
-        <NavigatorControl controlName={props.name} options={props.options}>
-          {(tab) => {
-            return (
-              <ControlsRender
-                {...props.renderProps}
-                category={tab.category}
-                categoryToggle={false}
-              />
-            );
-          }}
-        </NavigatorControl>
-      );
+      if (categoryControlOptions.length) {
+        renderControl = (
+          <NavigatorControl
+            controlName={props.name}
+            options={categoryControlOptions}
+            key={categoryControlOptions}
+          >
+            {(tab) => {
+              return (
+                <ControlsRender
+                  {...props.renderProps}
+                  category={tab.category}
+                  categoryToggle={false}
+                />
+              );
+            }}
+          </NavigatorControl>
+        );
+      } else {
+        renderControl = null;
+      }
+
       break;
     case 'html':
       renderControl = <RawHTML>{props.default}</RawHTML>;
@@ -691,6 +748,53 @@ ControlsRender.AllowRender = function (props, isSetupWizard = false) {
   }
 
   return true;
+};
+
+/**
+ * Check if category does not contains controls.
+ */
+ControlsRender.isCategoryEmpty = function (props) {
+  const { category, attributes, setAttributes, controls, isSetupWizard } = props;
+
+  const usedControls = controls || registeredControls;
+  let isEmpty = true;
+
+  Object.keys(usedControls).forEach((name) => {
+    if (!isEmpty) {
+      return;
+    }
+
+    const control = usedControls[name];
+
+    if (category && (!control.category || category !== control.category)) {
+      return;
+    }
+
+    const controlData = applyFilters('vpf.editor.controls-render-data', {
+      attributes,
+      setAttributes,
+      onChange: (val) => {
+        const newAttrs = applyFilters(
+          'vpf.editor.controls-on-change',
+          { [control.name]: val },
+          control,
+          val,
+          attributes
+        );
+        setAttributes(newAttrs);
+      },
+      ...control,
+    });
+
+    // Conditions check.
+    if (!ControlsRender.AllowRender(controlData, isSetupWizard)) {
+      return;
+    }
+
+    isEmpty = false;
+  });
+
+  return isEmpty;
 };
 
 export default ControlsRender;
