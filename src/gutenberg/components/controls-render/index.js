@@ -714,6 +714,11 @@ ControlsRender.Control = function (props) {
     { props, controlVal }
   );
 
+  // Prevent rendering.
+  if (null === data.renderControl) {
+    return null;
+  }
+
   return (
     <>
       {'start' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
