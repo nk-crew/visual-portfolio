@@ -2189,8 +2189,8 @@ class Visual_Portfolio_Admin {
                                 'name'     => 'items_style_image_states',
                                 'options'  => array(
                                     array(
-                                        'title'    => esc_html__( 'Default', '@@text_domain' ),
-                                        'category' => 'items-style-image-default',
+                                        'title'    => esc_html__( 'Normal', '@@text_domain' ),
+                                        'category' => 'items-style-image-normal',
                                     ),
                                     array(
                                         'title'    => esc_html__( 'Hover', '@@text_domain' ),
@@ -2202,7 +2202,7 @@ class Visual_Portfolio_Admin {
                             if ( isset( $options['border_radius'] ) && $options['border_radius'] ) {
                                 $new_fields[] = array(
                                     'type'     => 'unit',
-                                    'category' => 'items-style-image-default',
+                                    'category' => 'items-style-image-normal',
                                     'label'    => esc_html__( 'Border Radius', '@@text_domain' ),
                                     'name'     => 'images_rounded_corners',
                                     'default'  => '',
@@ -2218,7 +2218,7 @@ class Visual_Portfolio_Admin {
                             if ( isset( $options['transform'] ) && $options['transform'] && isset( $options['css_filter'] ) && $options['css_filter'] ) {
                                 $new_fields[] = array(
                                     'type'        => 'pro_note',
-                                    'category'    => 'items-style-image-default',
+                                    'category'    => 'items-style-image-normal',
                                     'name'        => 'additional_image_skin_settings_pro',
                                     'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
                                     'description' => 'Apply Instagram-like filters, change image transform',
