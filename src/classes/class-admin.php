@@ -986,7 +986,6 @@ class Visual_Portfolio_Admin {
                             'dimensions'     => array(
                                 'padding'    => true,
                                 'items_gap'  => true,
-                                'typography' => true,
                             ),
                         ),
                     ),
@@ -2217,13 +2216,22 @@ class Visual_Portfolio_Admin {
                                 );
                             }
 
-                            $new_fields[] = array(
-                                'type'        => 'pro_note',
-                                'category'    => 'items-style-image',
-                                'name'        => 'additional_image_skin_settings_pro',
-                                'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                'description' => 'Apply Instagram-like filters, change image transform and border radius for both default and hover states',
-                            );
+                            if ( isset( $options['transform'] ) && $options['transform'] && isset( $options['css_filter'] ) && $options['css_filter'] ) {
+                                $new_fields[] = array(
+                                    'type'        => 'pro_note',
+                                    'category'    => 'items-style-image-default',
+                                    'name'        => 'additional_image_skin_settings_pro',
+                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                    'description' => 'Apply Instagram-like filters, change image transform',
+                                );
+                                $new_fields[] = array(
+                                    'type'        => 'pro_note',
+                                    'category'    => 'items-style-image-hover',
+                                    'name'        => 'additional_image_hover_skin_settings_pro',
+                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                    'description' => 'Apply Instagram-like filters, change image transform and border radius for both default and hover states',
+                                );
+                            }
                             break;
 
                         // Overlay / Caption.
@@ -2476,14 +2484,6 @@ class Visual_Portfolio_Admin {
                                         'default'   => false,
                                     );
                                 }
-
-                                $new_fields[] = array(
-                                    'type'        => 'pro_note',
-                                    'category'    => 'items-style-' . $category_name . '-elements',
-                                    'name'        => 'additional_general_skin_settings_pro',
-                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                    'description' => 'Choose from a variety of additional contemporary Skins',
-                                );
                             }
 
                             // Colors.
@@ -2491,6 +2491,7 @@ class Visual_Portfolio_Admin {
                                 $has_background = isset( $options['colors']['background'] ) && $options['colors']['background'];
                                 $has_text       = isset( $options['colors']['text'] ) && $options['colors']['text'];
                                 $has_links      = isset( $options['colors']['links'] ) && $options['colors']['links'];
+                                $has_blend_mode = isset( $options['colors']['mix_blend_mode'] ) && $options['colors']['mix_blend_mode'];
 
                                 if ( $has_background ) {
                                     $new_fields[] = array(
@@ -2552,6 +2553,17 @@ class Visual_Portfolio_Admin {
                                         ),
                                     );
                                 }
+
+                                // Mix Blend Mode Pro.
+                                if ( $has_blend_mode ) {
+                                    $new_fields[] = array(
+                                        'type'        => 'pro_note',
+                                        'category'    => 'items-style-' . $category_name . '-colors',
+                                        'name'        => 'additional_' . $category_name . '_mix_blend_mode_skin_settings_pro',
+                                        'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
+                                        'description' => 'Select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
+                                    );
+                                }
                             }
 
                             // Typography.
@@ -2565,33 +2577,35 @@ class Visual_Portfolio_Admin {
                                 );
                             }
 
-                            // Overlay Pro notices.
-                            if ( 'fade' === $style_name || 'fly' === $style_name || 'emerge' === $style_name ) {
-                                $new_fields[] = array(
-                                    'type'        => 'pro_note',
-                                    'category'    => 'items-style-' . $category_name,
-                                    'name'        => 'additional_' . $category_name . '_skin_settings_pro',
-                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                    'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible. Apply Instagram-like filters on images and select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
-                                );
-                            } else {
-                                $new_fields[] = array(
-                                    'type'        => 'pro_note',
-                                    'category'    => 'items-style-' . $category_name,
-                                    'name'        => 'additional_' . $category_name . '_skin_settings_pro',
-                                    'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                    'description' => 'Apply Instagram-like filters on images and select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
-                                );
-                            }
+                            // Dimensions.
+                            if ( ! empty( $options['dimensions'] ) ) {
+                                $has_border_radius = isset( $options['dimensions']['border_radius'] ) && $options['dimensions']['border_radius'];
+                                $has_padding       = isset( $options['dimensions']['padding'] ) && $options['dimensions']['padding'];
+                                $has_margin        = isset( $options['dimensions']['margin'] ) && $options['dimensions']['margin'];
+                                $has_items_gap     = isset( $options['dimensions']['items_gap'] ) && $options['dimensions']['items_gap'];
+                                $category_title    = 'caption' === $category_name ? esc_attr__( 'caption', '@@text_domain' ) : esc_attr__( 'overlay', '@@text_domain' );
 
-                            // Caption Pro notices.
-                            if ( 'fade' === $style_name || 'fly' === $style_name || 'emerge' === $style_name ) {
+                                $dimensions_list = array();
+
+                                if ( $has_border_radius ) {
+                                    $dimensions_list[] = 'border radius';
+                                }
+                                if ( $has_padding ) {
+                                    $dimensions_list[] = 'padding';
+                                }
+                                if ( $has_margin ) {
+                                    $dimensions_list[] = 'margin';
+                                }
+                                if ( $has_items_gap ) {
+                                    $dimensions_list[] = 'gap between elements';
+                                }
+
                                 $new_fields[] = array(
                                     'type'        => 'pro_note',
-                                    'category'    => 'items-style-caption',
-                                    'name'        => 'additional_caption_skin_settings_pro',
+                                    'category'    => 'items-style-' . $category_name . '-dimensions',
+                                    'name'        => 'additional_' . $category_name . '_dimensions_skin_settings_pro',
                                     'label'       => esc_html__( 'Premium Only', '@@text_domain' ),
-                                    'description' => 'Enhance caption display on mobile devices, where hovering over images is unfeasible. Adjust caption paddings, margins and border radius, as well as the spacing between caption elements.',
+                                    'description' => 'Adjust element spacing and dimensions such as ' . $category_title . ' ' . implode( ', ', $dimensions_list ),
                                 );
                             }
                             break;
@@ -2601,6 +2615,7 @@ class Visual_Portfolio_Admin {
                     $builtin_fields = array_merge( $builtin_fields, apply_filters( 'vpf_items_style_builtin_controls', $new_fields, $category_name, $options, $style_name, $style ) );
                 }
             }
+
             $items_styles[ $style_name ]['controls'] = array_merge( $builtin_fields, isset( $style['controls'] ) ? $style['controls'] : array() );
         }
 
