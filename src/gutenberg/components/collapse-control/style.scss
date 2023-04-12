@@ -1,5 +1,9 @@
 .vpf-component-collapse-control {
-  margin: -16px;
+  margin-top: 0;
+  margin-top: -10px;
+  margin-right: -16px;
+  margin-bottom: -10px;
+  margin-left: -16px;
 
   // Toggle.
   .vpf-component-collapse-control-toggle {
@@ -32,23 +36,11 @@
     display: block;
   }
 
-  // Hide toggle and content when it is empty.
-  .vpf-component-collapse-control-toggle:has(+ .vpf-component-collapse-control-content:empty),
-  .vpf-component-collapse-control-content:empty {
-    display: none;
-  }
-
   // Fix panel styles.
   .components-panel__body {
     padding-top: 10px;
     padding-bottom: 10px;
     border-top: none;
-  }
-
-  // Fix for separator width.
-  .vpf-control-group-separator {
-    margin-right: 0;
-    margin-left: 0;
   }
 
   .components-panel__body:has(+ .vpf-component-collapse-control-toggle) {

@@ -63,17 +63,11 @@
 
 // Group controls.
 .vpf-control-group-separator {
-  margin-top: -8px;
-  margin-bottom: 12px;
+  margin-bottom: 18px;
   border-bottom: 1px solid #e0e0e0;
 
   + .vpf-control-group-separator {
     display: none;
-  }
-
-  .block-editor-block-inspector & {
-    margin-right: -16px;
-    margin-left: -16px;
   }
 
   .vpf-component-modal &,

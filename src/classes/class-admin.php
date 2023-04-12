@@ -2205,7 +2205,6 @@ class Visual_Portfolio_Admin {
                                     'category' => 'items-style-image-default',
                                     'label'    => esc_html__( 'Border Radius', '@@text_domain' ),
                                     'name'     => 'images_rounded_corners',
-                                    'group'    => 'items_style_images',
                                     'default'  => '',
                                     'style'    => array(
                                         array(
@@ -2243,7 +2242,6 @@ class Visual_Portfolio_Admin {
                                     'category' => 'items-style-' . $category_name,
                                     'label'    => esc_html__( 'Display', '@@text_domain' ),
                                     'name'     => 'show_' . $category_name,
-                                    'group'    => 'items_style_' . $category_name,
                                     'default'  => 'hover',
                                     'options'  => array(
                                         'hover'   => esc_html__( 'Hover State Only', '@@text_domain' ),
@@ -2259,7 +2257,6 @@ class Visual_Portfolio_Admin {
                                     'category' => 'items-style-' . $category_name,
                                     'label'    => esc_html__( 'Text Align', '@@text_domain' ),
                                     'name'     => $category_name . '_text_align',
-                                    'group'    => 'items_style_' . $category_name,
                                     'default'  => 'center',
                                     'options'  => $options['text_align'],
                                 );

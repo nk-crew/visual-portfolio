@@ -827,7 +827,7 @@ $escaped-svg-characters: (
   h3 {
     margin-top: 0;
     margin-bottom: 0;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: #d53a9d;
     text-transform: none;
@@ -872,18 +872,6 @@ $escaped-svg-characters: (
     &:focus {
       filter: contrast(1.5) drop-shadow(0px 3px 3px rgba(213, 58, 157, 30%));
       transform: translateY(-1px);
-    }
-  }
-
-  // Notice inside inspector.
-  .block-editor-block-inspector & {
-    padding: 20px 16px;
-    margin-right: -16px;
-    margin-left: -16px;
-
-    &::before {
-      right: 0;
-      left: 0;
     }
   }
 }

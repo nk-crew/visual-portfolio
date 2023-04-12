@@ -49,6 +49,10 @@
   margin-bottom: 0;
 }
 
+.vpf-control-wrap-icons_selector:has(+ .vpf-control-wrap-category_navigator) {
+  margin-bottom: 16px;
+}
+
 .vpf-component-icon-selector {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
