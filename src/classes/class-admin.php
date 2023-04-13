@@ -975,11 +975,12 @@ class Visual_Portfolio_Admin {
 
                             // Typography Pro.
                             'typography'     => array(
-                                'base'     => true,
-                                'title'    => true,
-                                'category' => true,
-                                'meta'     => true,
-                                'button'   => true,
+                                'base'        => true,
+                                'title'       => true,
+                                'category'    => true,
+                                'meta'        => true,
+                                'description' => true,
+                                'button'      => true,
                             ),
 
                             // Dimensions Pro.
@@ -1037,10 +1038,11 @@ class Visual_Portfolio_Admin {
 
                             // Typography Pro.
                             'typography'     => array(
-                                'base'     => true,
-                                'title'    => true,
-                                'category' => true,
-                                'meta'     => true,
+                                'base'        => true,
+                                'title'       => true,
+                                'category'    => true,
+                                'meta'        => true,
+                                'description' => true,
                             ),
 
                             // Dimensions Pro.
@@ -1101,10 +1103,11 @@ class Visual_Portfolio_Admin {
 
                             // Typography Pro.
                             'typography'     => array(
-                                'base'     => true,
-                                'title'    => true,
-                                'category' => true,
-                                'meta'     => true,
+                                'base'        => true,
+                                'title'       => true,
+                                'category'    => true,
+                                'meta'        => true,
+                                'description' => true,
                             ),
 
                             // Dimensions Pro.
@@ -1182,10 +1185,11 @@ class Visual_Portfolio_Admin {
 
                             // Typography Pro.
                             'typography'     => array(
-                                'base'     => true,
-                                'title'    => true,
-                                'category' => true,
-                                'meta'     => true,
+                                'base'        => true,
+                                'title'       => true,
+                                'category'    => true,
+                                'meta'        => true,
+                                'description' => true,
                             ),
 
                             // Dimensions Pro.
@@ -2101,11 +2105,12 @@ class Visual_Portfolio_Admin {
 
                 // Typography Pro.
                 'typography'     => array(
-                    'base'     => false,
-                    'title'    => false,
-                    'category' => false,
-                    'meta'     => false,
-                    'button'   => false,
+                    'base'        => false,
+                    'title'       => false,
+                    'category'    => false,
+                    'meta'        => false,
+                    'description' => false,
+                    'button'      => false,
                 ),
 
                 // Dimensions Pro.
@@ -2148,11 +2153,12 @@ class Visual_Portfolio_Admin {
 
                 // Typography Pro.
                 'typography'     => array(
-                    'base'     => false,
-                    'title'    => false,
-                    'category' => false,
-                    'meta'     => false,
-                    'button'   => false,
+                    'base'        => false,
+                    'title'       => false,
+                    'category'    => false,
+                    'meta'        => false,
+                    'description' => false,
+                    'button'      => false,
                 ),
 
                 // Dimensions Pro.
