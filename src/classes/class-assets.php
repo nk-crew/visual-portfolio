@@ -121,7 +121,9 @@ class Visual_Portfolio_Assets {
                 if ( 'script' === $type ) {
                     wp_enqueue_script( $name, '', array(), '@@plugin_version', true );
                 } elseif ( is_string( $data['value'] ) ) {
-                    visual_portfolio()->include_template_style( $name, $data['value'], array(), '@@plugin_version' );
+                    // Don't provide version for template style,
+                    // it will be added automatically using `filemtime`.
+                    visual_portfolio()->include_template_style( $name, $data['value'], array() );
                 } else {
                     wp_enqueue_style( $name, '', array(), '@@plugin_version' );
                 }

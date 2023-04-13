@@ -52,23 +52,31 @@ class Visual_Portfolio_Templates {
      * @return string
      */
     public static function find_template_styles( $template_name ) {
-        $template = '';
+        $template         = '';
+        $template_version = '';
 
         if ( file_exists( get_stylesheet_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
             // Child Theme (or just theme).
-            $template = trailingslashit( get_stylesheet_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
+            $template         = trailingslashit( get_stylesheet_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
+            $template_version = filemtime( get_stylesheet_directory() . '/visual-portfolio/' . $template_name . '.css' );
         } elseif ( file_exists( get_template_directory() . '/visual-portfolio/' . $template_name . '.css' ) ) {
             // Parent Theme (when parent exists).
-            $template = trailingslashit( get_template_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
+            $template         = trailingslashit( get_template_directory_uri() ) . 'visual-portfolio/' . $template_name . '.css';
+            $template_version = filemtime( get_template_directory() . '/visual-portfolio/' . $template_name . '.css' );
         } elseif ( visual_portfolio()->pro_plugin_path && file_exists( visual_portfolio()->pro_plugin_path . 'templates/' . $template_name . '.css' ) ) {
             // PRO plugin folder.
-            $template = visual_portfolio()->pro_plugin_url . 'templates/' . $template_name . '.css';
+            $template         = visual_portfolio()->pro_plugin_url . 'templates/' . $template_name . '.css';
+            $template_version = filemtime( visual_portfolio()->pro_plugin_path . 'templates/' . $template_name . '.css' );
         } elseif ( file_exists( visual_portfolio()->plugin_path . 'templates/' . $template_name . '.css' ) ) {
             // Default file in plugin folder.
-            $template = visual_portfolio()->plugin_url . 'templates/' . $template_name . '.css';
+            $template         = visual_portfolio()->plugin_url . 'templates/' . $template_name . '.css';
+            $template_version = filemtime( visual_portfolio()->plugin_path . 'templates/' . $template_name . '.css' );
         }
 
-        return $template;
+        return array(
+            'path'    => $template,
+            'version' => $template_version,
+        );
     }
 
     /**
@@ -85,16 +93,24 @@ class Visual_Portfolio_Templates {
         $is_min   = false;
 
         // maybe find minified style.
-        if ( ! $template ) {
+        if ( ! $template['path'] ) {
             $template = visual_portfolio()->find_template_styles( $template_name . '.min' );
             $is_min   = true;
         }
 
-        // Allow 3rd party plugin filter template file from their plugin.
-        $template = apply_filters( 'vpf_include_template_style', $template, $template_name, $deps, $ver, $media );
+        // Get dynamic version.
+        if ( ! $ver && $template['version'] ) {
+            $ver = $template['version'];
+        }
+        if ( ! $ver ) {
+            $ver = '@@plugin_version';
+        }
 
-        if ( $template ) {
-            wp_enqueue_style( $handle, $template, $deps, $ver, $media );
+        // Allow 3rd party plugin filter template file from their plugin.
+        $template['path'] = apply_filters( 'vpf_include_template_style', $template['path'], $template_name, $deps, $ver, $media );
+
+        if ( $template['path'] ) {
+            wp_enqueue_style( $handle, $template['path'], $deps, $ver, $media );
             wp_style_add_data( $handle, 'rtl', 'replace' );
 
             if ( $is_min ) {
