@@ -51,15 +51,15 @@ Our gallery plugin shipped with popular layouts such as Masonry and Justified (F
 * [Grid Gallery](https://visualportfolio.co/grid/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
 * [Slider Gallery](https://visualportfolio.co/slider/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts) (Fade, Carousel, Coverflow)
 
-### 🎨 Visual Effects ###
+### 🎨 Prebuilt Skins ###
 
-Showcase your portfolio items ang gallery images with clean and beautiful visual styles. See it in action:
+Showcase your portfolio items ang gallery images with clean and beautiful skins. See it in action:
 
-* [Classic Style](https://visualportfolio.co/masonry/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
-* [Fade Effect](https://visualportfolio.co/tiles-paged-pagination/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
-* [Emerge Effect](https://visualportfolio.co/masonry-infinite-scroll/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
-* [Fly Effect](https://visualportfolio.co/tiles-popup-gallery/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
-* [Caption Move Effect](https://visualportfolio.co/masonry-caption-move/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Classic](https://visualportfolio.co/masonry/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Fade](https://visualportfolio.co/tiles-paged-pagination/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Emerge](https://visualportfolio.co/masonry-infinite-scroll/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Fly](https://visualportfolio.co/tiles-popup-gallery/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Caption Move](https://visualportfolio.co/masonry-caption-move/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
 
 ### ⚙️ Easy to Customize ###
 
@@ -142,6 +142,18 @@ Visual Portfolio gives you a wide range of filters and actions to customize ever
 >
 > In order to maintain the free version of the plugin on an ongoing basis, and to provide quick and effective support for free, we offer a Pro version of the plugin. The Pro version allows you to:
 
+* **Advanced Skin Settings**
+  * **Image Filters and Blend Mode** – apply Instagram-like filters on images for Normal and Hover states
+  * **Transformations** - control the image transformation and border radius for Normal and Hover states
+  * **Typography** – control every text part of gallery captions and overlays
+  * **Dimensions** – controls paddings, margins and border radius of captions and overlays
+
+* **Stylish Interaction Effects**
+
+  * [Hover Tilt Effect](https://visualportfolio.co/justified-tilt-effect/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects)
+  * [Custom Hover Image](https://visualportfolio.co/custom-hover-image-animated-gif/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects) - useful for animated GIFs
+  * [Caption Move Skin](https://visualportfolio.co/masonry-caption-move/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects)
+
 * **Social Feeds**
 Automatically fetch posts from your social networks to display in gallery on your site.
 
@@ -156,12 +168,6 @@ Automatically fetch posts from your social networks to display in gallery on you
   * [Twitch](https://visualportfolio.co/social-twitch/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [RSS](https://visualportfolio.co/social-medium-rss/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * VK (Vkontakte)
-
-* **Stylish interaction effects**
-
-  * [Hover Tilt Effect](https://visualportfolio.co/justified-tilt-effect/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects)
-  * [Custom Hover Image](https://visualportfolio.co/custom-hover-image-animated-gif/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects) - useful for animated GIFs
-  * [Caption Move Style](https://visualportfolio.co/masonry-caption-move/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects)
 
 * [**Theft Protection**](https://visualportfolio.co/theft-protection/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_protection)
 
@@ -181,9 +187,6 @@ Manually configure how to open specific item types and filter clicking on title 
 
 * **Responsive Breakpoints Settings**
 Manually control the screen sizes, which used by the automatic responsive function to adapt your gallery layouts.
-
-* **Instagram-like Image Filters**
-Improve visual look of you gallery images by adding filters on your normal or hovered images.
 
 * **AJAX Improvements**
 Requests properly cached and links preloaded before you click.
@@ -322,6 +325,51 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+= 3.0.0 =
+
+* IMPORTANT - there may be breaking changes for some of your galleries. Please, don't forget to make a backup and test the plugin on a staging site before updating it on production
+  * completely reworked Skin options and some UI elements of block controls this helped us to structure deep Skin customizations such as:
+    * Typography control
+    * Dimensions control (overlay padding, caption items gap, etc)
+    * Blend Mode for overlay
+    * Image transform for normal and hover states
+    * Image border radius for normal and hover states
+  * for most galleries you just need to open the page editor and re-save your post, the new gallery features will be automatically merged
+  * in case your custom plugin or theme adds custom Skins and use `builtin_controls`, the author of the plugin/theme should change these configs
+    * look at the Classic Skin controls for example - <https://github.com/nk-crew/visual-portfolio/blob/ed78efe85cb2b84fb2fb729ccda7a950b492c745/src/classes/class-admin.php#L923-L991>
+    * we have fallbacks for old configurations, but consider to change it, as in the next major release these fallbacks will be removed
+* changed the structure of Skin templates - use classes and CSS variables with `overlay` and `caption` names where appropriate
+* added caption support for popup in video items
+* improved controls dynamic CSS rendering - merge all styles with same selector with better formatting
+* improved filter and pagination URLs to friendly on portfolio archive page (good for SEO)
+* updated Swiper to v8.4.7
+* changed template styles version - use dynamic value based on `filemtime` function return
+* fixed portfolio category archives redirect when portfolio archive set as Front Page
+* fixed pagination on portfolio taxonomy archive pages
+* fixed canonical tags usage on portfolio category archives (fixes problems with SEO)
+* fixed wrong Current Query generated when changed Portfolio on Front Page setting
+* fixed Carousel dynamic items height with Classic Style wrong items width
+* fixed Carousel dynamic items height with FireFox wrong items width
+* fixed Carousel items height incorrect size when used Items Height and Minimal Height options
+* fixed conflict with Elementor new Swiper library (added in Elementor v3.11.0)
+* fixed Elementor double lightbox on the pages, which does not use the Elementor page builder
+* removed hardcoded CSS for popup top position based on admin bar height, use `--wp-admin--admin-bar--height` variable instead
+* fixed error when using an array in control `sanitize_callback` (only in custom user controls)
+* renamed `Items Style` → `Skin`
+* renamed `Items Click Action` → `Click Action`
+* new hooks for developers:
+  * added more data to `vpf.editor.controls-render-inner-data` JS filter
+  * PHP `vpf_register_block_attribute_data`
+  * PHP `vpf_register_block_attributes`
+  * PHP `vpf_items_style_builtin_controls`
+  * PHP `vpf_pagination_item_data`
+  * PHP `vpf_controls_dynamic_css_value`
+  * PHP `vpf_controls_dynamic_css_styles_array`
+  * JS `vpf.editor.controls-dynamic-css-value`
+  * JS `vpf.editor.controls-dynamic-css-styles-object`
+  * jQuery `afterShowFancybox`
+* minor changes
+
 = 2.22.0 =
 
 * added support for Youtube Shorts in popup
@@ -406,7 +454,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 = 2.19.1 =
 
 * fixed Classic style image displaying bug in slider with dynamic height option
-* fixed Color Picker error in custom Item Styles
+* fixed Color Picker error in custom Skins
 * fixed Swiper slides displaying conflicts, which comes from some 3rd-party plugins
 * minor changes
 
@@ -715,7 +763,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 * added option to change No Items notice
 * removed changing opacity of items while AJAX loading
-* fixed (finally!) wrong items position when used Default Items Style + Justified Layout
+* fixed (finally!) wrong items position when used Classic Skin + Justified Layout
 * fixed wrong preview iframe URL on WP Multisite
 * fixed Ghost Kit animate on scroll extension compatibility <https://ghostkit.io/extensions/animate-on-scroll/>
 * fixed duplicates in popup gallery, when used carousel with loop
@@ -795,7 +843,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 = 2.5.0 =
 
-* added Image Overlay setting on Emerge Style
+* added Image Overlay setting on Emerge Skin
 * added support for images filters in Pro plugin version [https://visualportfolio.co/masonry-image-filters/](https://visualportfolio.co/masonry-image-filters/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * changed Emerge image transform from scale to translateY
 * fixed filter displaying in FireFox
@@ -923,7 +971,7 @@ Log:
 * changed all styles to use CSS Variables
 * changed items styles default overlay background color to black
 * changed Layouts editor old interface to Gutenberg
-* changed default Items Style to Fade
+* changed default Skin to Fade
 * changed tiles responsive styles from margin to padding (better for developers)
 * changed `sr-only` classname usage to `vp-screen-reader-text`
 * changed registered image sizes height limitation
@@ -937,7 +985,7 @@ Log:
 * fixed swiper fade effect slide width
 * moved all SVG icons to separate templates to let developers overwrite it <https://github.com/nk-crew/visual-portfolio/tree/master/src/templates/icons>
 * renamed `Portfolio Layouts` to `Saved`
-* renamed `Default` Items Styles, Filter, Sort and Pagination to `Classic`
+* renamed `Default` Skin, Filter, Sort and Pagination to `Classic`
 * a lot of minor changes
 
 = 1.16.2 =
@@ -1188,7 +1236,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 * added setting for custom taxonomies to show in portfolio filter
 * added support for WooCommerce categories in portfolio filter
 * added settings for the title and description popup gallery caption
-* added Read More button option for Default Items Style
+* added Read More button option for Classic Skin
 * added dropdown in top admin menu with the list of available portfolios on this page
 * added generation placeholders on the fly (no more need to regenerate thumbnails to get placeholder)
 * fixed popup image title color (were dark)
