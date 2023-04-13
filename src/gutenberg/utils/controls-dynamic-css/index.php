@@ -71,8 +71,8 @@ class Visual_Portfolio_Controls_Dynamic_CSS {
         }
 
         // Prepare CSS of controls.
-        foreach ( $control_styles_array as $selector => $styles ) {
-            $result .= $selector . " {\n";
+        foreach ( $control_styles_array as $sel => $styles ) {
+            $result .= $sel . " {\n";
 
             foreach ( $styles as $prop => $val ) {
                 $result .= "  {$prop}: {$val};\n";
