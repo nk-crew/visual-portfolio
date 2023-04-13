@@ -975,7 +975,6 @@ class Visual_Portfolio_Admin {
 
                             // Typography Pro.
                             'typography'     => array(
-                                'base'        => true,
                                 'title'       => true,
                                 'category'    => true,
                                 'meta'        => true,
@@ -1038,7 +1037,6 @@ class Visual_Portfolio_Admin {
 
                             // Typography Pro.
                             'typography'     => array(
-                                'base'        => true,
                                 'title'       => true,
                                 'category'    => true,
                                 'meta'        => true,
@@ -1103,7 +1101,6 @@ class Visual_Portfolio_Admin {
 
                             // Typography Pro.
                             'typography'     => array(
-                                'base'        => true,
                                 'title'       => true,
                                 'category'    => true,
                                 'meta'        => true,
@@ -1185,7 +1182,6 @@ class Visual_Portfolio_Admin {
 
                             // Typography Pro.
                             'typography'     => array(
-                                'base'        => true,
                                 'title'       => true,
                                 'category'    => true,
                                 'meta'        => true,
@@ -2105,7 +2101,6 @@ class Visual_Portfolio_Admin {
 
                 // Typography Pro.
                 'typography'     => array(
-                    'base'        => false,
                     'title'       => false,
                     'category'    => false,
                     'meta'        => false,
@@ -2153,7 +2148,6 @@ class Visual_Portfolio_Admin {
 
                 // Typography Pro.
                 'typography'     => array(
-                    'base'        => false,
                     'title'       => false,
                     'category'    => false,
                     'meta'        => false,
