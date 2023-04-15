@@ -260,7 +260,15 @@ export default class VpfSelectControl extends Component {
       // Test opened menu items:
       // menuIsOpen: true,
       className: 'vpf-component-select',
-      styles: selectStyles,
+      styles: {
+        ...selectStyles,
+        menuPortal: (styles) => {
+          return {
+            ...styles,
+            zIndex: 1000000,
+          };
+        },
+      },
       menuPortalTarget: document.body,
       components: {
         // eslint-disable-next-line react/no-unstable-nested-components
