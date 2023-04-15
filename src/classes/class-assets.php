@@ -585,6 +585,7 @@ class Visual_Portfolio_Assets {
     public function localize_global_data() {
         $data = array(
             'version'              => '@@plugin_version',
+            'pro'                  => false,
             '__'                   => array(
                 // translators: %s - plugin name.
                 'couldnt_retrieve_vp'  => sprintf( __( 'Couldn\'t retrieve %s ID.', '@@text_domain' ), visual_portfolio()->plugin_name ),
@@ -641,6 +642,8 @@ class Visual_Portfolio_Assets {
             // Screen sizes (breakpoints) for responsive feature: xs, sm, md, lg, xl.
             'screenSizes'          => Visual_Portfolio_Breakpoints::get_breakpoints(),
         );
+
+        $data = apply_filters( 'vpf_global_data', $data );
 
         echo "<script type='text/javascript'>\n";
         echo "/* <![CDATA[ */\n";
