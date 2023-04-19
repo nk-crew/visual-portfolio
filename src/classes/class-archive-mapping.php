@@ -100,7 +100,7 @@ class Visual_Portfolio_Archive_Mapping {
     public function converting_paginate_links_to_friendly_url( $arr, $args, $vp_options ) {
         // Determine if a page is an archive.
         if (
-            $this->is_archive( $vp_options ) &&
+            self::is_archive( $vp_options ) &&
             isset( $arr ) &&
             ! empty( $arr )
         ) {
@@ -146,7 +146,7 @@ class Visual_Portfolio_Archive_Mapping {
     public function converting_data_next_page_to_friendly_url( $data_attrs, $options, $style_options ) {
         // Determine if a page is an archive.
         if (
-            $this->is_archive( $options ) &&
+            self::is_archive( $options ) &&
             isset( $data_attrs['data-vp-next-page-url'] )
         ) {
             global $wp_query;
@@ -332,7 +332,7 @@ class Visual_Portfolio_Archive_Mapping {
             $post_id = intval( $_REQUEST['vp_preview_post_id'] );
         }
 
-        if ( $this->is_archive( $vp_options, $post_id ?? null ) ) {
+        if ( self::is_archive( $vp_options, $post_id ?? null ) ) {
 
             $query_opts = Visual_Portfolio_Get::get_query_params( $vp_options, true );
             // Get active item.
@@ -1144,7 +1144,7 @@ class Visual_Portfolio_Archive_Mapping {
      * @param int   $post_id - Post ID.
      * @return boolean
      */
-    public function is_archive( $options, $post_id = null ) {
+    public static function is_archive( $options, $post_id = null ) {
         global $wp_query;
         $post_id = $post_id ?? get_the_ID() ?? null;
         return (
