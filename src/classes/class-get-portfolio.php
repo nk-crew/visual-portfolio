@@ -2176,7 +2176,7 @@ class Visual_Portfolio_Get {
         ?>
         >
             <?php
-            if ( $args['vp_opts']['items_click_action'] ) {
+            if ( $args['vp_opts']['items_click_action'] && 'url' !== $args['vp_opts']['items_click_action'] ) {
                 self::item_popup_data( $args );
             }
             ?>
