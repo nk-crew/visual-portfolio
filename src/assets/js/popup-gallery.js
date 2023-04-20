@@ -9,6 +9,8 @@ const { VPData } = window;
 
 const { settingsPopupGallery } = VPData;
 
+const templatesSupport = 'content' in document.createElement('template');
+
 /*
  * Global Popup Gallery API.
  */
@@ -223,6 +225,37 @@ const VPPopupAPI = {
   },
 
   /**
+   * Parse gallery item popup data.
+   *
+   * @param {element} itemElement - gallery item
+   */
+  parseItem(itemElement) {
+    let result = false;
+
+    const $dataElement = itemElement && itemElement.querySelector('.vp-portfolio__item-popup');
+
+    if ($dataElement) {
+      result = {
+        $dataElement,
+        $content: $dataElement,
+        data: $dataElement.dataset,
+      };
+
+      // Support for <template> tag.
+      if (templatesSupport && 'TEMPLATE' === $dataElement.nodeName && $dataElement.content) {
+        result.$content = $dataElement.content;
+      }
+
+      result.$title = result?.$content?.querySelector('.vp-portfolio__item-popup-title');
+      result.$description = result?.$content?.querySelector(
+        '.vp-portfolio__item-popup-description'
+      );
+    }
+
+    return result;
+  },
+
+  /**
    * Parse gallery
    *
    * @param {jQuery} $gallery - gallery element.
@@ -231,7 +264,6 @@ const VPPopupAPI = {
    */
   parseGallery($gallery) {
     const items = [];
-    let $meta;
     let size;
     let item;
     let video;
@@ -241,15 +273,15 @@ const VPPopupAPI = {
     // Skip Swiper slider duplicates.
     // Previously we also used the `:not(.swiper-slide-duplicate-active)`, but it contains a valid first slide.
     $gallery.find('.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)').each(function () {
-      $meta = $(this).find('.vp-portfolio__item-popup');
+      const itemData = VPPopupAPI.parseItem(this);
 
-      if ($meta && $meta.length) {
-        size = ($meta.attr('data-vp-popup-img-size') || '1920x1080').split('x');
-        video = $meta.attr('data-vp-popup-video');
+      if (itemData) {
+        size = (itemData?.data?.vpPopupImgSize || '1920x1080').split('x');
+        video = itemData?.data?.vpPopupVideo;
         videoData = false;
 
         if (video) {
-          videoData = VPPopupAPI.parseVideo(video, $meta.attr('data-vp-popup-poster'));
+          videoData = VPPopupAPI.parseVideo(video, itemData?.data?.vpPopupPoster);
         }
 
         if (videoData) {
@@ -267,17 +299,17 @@ const VPPopupAPI = {
           item = {
             type: 'image',
             el: this,
-            src: $meta.attr('data-vp-popup-img'),
-            srcset: $meta.attr('data-vp-popup-img-srcset'),
+            src: itemData?.data?.vpPopupImg,
+            srcset: itemData?.data?.vpPopupImgSrcset,
             width: parseInt(size[0], 10),
             height: parseInt(size[1], 10),
           };
 
-          const srcSmall = $meta.attr('data-vp-popup-sm-img') || item.src;
+          const srcSmall = itemData?.data?.vpPopupSmImg || item.src;
           if (srcSmall) {
             const smallSize = (
-              $meta.attr('data-vp-popup-sm-img-size') ||
-              $meta.attr('data-vp-popup-img-size') ||
+              itemData?.data?.vpPopupSmImgSize ||
+              itemData?.data?.vpPopupImgSize ||
               '1920x1080'
             ).split('x');
 
@@ -286,11 +318,11 @@ const VPPopupAPI = {
             item.srcSmallHeight = parseInt(smallSize[1], 10);
           }
 
-          const srcMedium = $meta.attr('data-vp-popup-md-img') || item.src;
+          const srcMedium = itemData?.data?.vpPopupMdImg || item.src;
           if (srcMedium) {
             const mediumSize = (
-              $meta.attr('data-vp-popup-md-img-size') ||
-              $meta.attr('data-vp-popup-img-size') ||
+              itemData?.data?.vpPopupMdImgSize ||
+              itemData?.data?.vpPopupImgSize ||
               '1920x1080'
             ).split('x');
 
@@ -300,12 +332,9 @@ const VPPopupAPI = {
           }
         }
 
-        const $captionTitle = $meta.children('.vp-portfolio__item-popup-title').get(0);
-        const $captionDescription = $meta.children('.vp-portfolio__item-popup-description').get(0);
-        if ($captionTitle || $captionDescription) {
+        if (itemData?.$title || itemData?.$description) {
           item.caption =
-            ($captionTitle ? $captionTitle.outerHTML : '') +
-            ($captionDescription ? $captionDescription.outerHTML : '');
+            (itemData?.$title?.outerHTML || '') + (itemData?.$description?.outerHTML || '');
         }
 
         items.push(item);

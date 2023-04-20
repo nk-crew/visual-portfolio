@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<div class="vp-portfolio__item-popup"
+<template class="vp-portfolio__item-popup"
     style="display: none;"
     data-vp-popup-video="<?php echo esc_url( $video_data['url'] ); ?>"
     data-vp-popup-poster="<?php echo $video_data['poster'] ? esc_url( $video_data['poster'] ) : ''; ?>"
@@ -42,4 +42,4 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php
     }
     ?>
-</div>
+</template>

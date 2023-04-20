@@ -35,7 +35,14 @@ class Visual_Portfolio_Security {
             $kses_defaults = wp_kses_allowed_html( 'post' );
 
             $kses_popup = array(
-                'div' => array(
+                'template' => array(
+                    'class'  => true,
+                    'style'  => true,
+
+                    // Most data for the popup is saved in the data attributes.
+                    'data-*' => true,
+                ),
+                'div'      => array(
                     'class'  => true,
                     'style'  => true,
 

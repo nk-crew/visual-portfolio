@@ -18,8 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
-
-<div class="vp-portfolio__item-popup"
+<template class="vp-portfolio__item-popup"
     style="display: none;"
     data-vp-popup-img="<?php echo esc_url( $image_data['url'] ); ?>"
     data-vp-popup-img-srcset="<?php echo esc_attr( $image_data['srcset'] ); ?>"
@@ -47,4 +46,4 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php
     }
     ?>
-</div>
+</template>
