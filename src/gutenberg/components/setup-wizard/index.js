@@ -142,8 +142,10 @@ export default function SetupWizard(props) {
       // This is why we change it here, in the Setup Wizard.
       newAttributes = {
         ...newAttributes,
-        items_click_action_popup_title_source: 'item_title',
-        items_click_action_popup_description_source: 'item_description',
+        items_click_action_popup_title_source:
+          'post-based' === contentSource ? 'title' : 'item_title',
+        items_click_action_popup_description_source:
+          'post-based' === contentSource ? 'description' : 'item_description',
         items_click_action_popup_deep_link_pid: 'filename',
       };
 
