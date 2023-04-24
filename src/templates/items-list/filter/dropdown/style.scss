@@ -6,17 +6,16 @@
 .vp-filter__style-dropdown {
   display: flex;
   flex-wrap: wrap;
-  margin-top: calc(-1 * var(--vp-filter-dropdown--items__gap));
-  margin-left: calc(-1 * var(--vp-filter-dropdown--items__gap));
+  gap: var(--vp-filter-dropdown--items__gap);
 
   select {
     display: block;
+    flex: 0 0 auto;
     min-width: var(--vp-filter-dropdown--items__min-width);
+    max-width: 100%;
     height: var(--vp-filter-dropdown--items__height);
     padding: var(--vp-filter-dropdown--items__padding-v) var(--vp-filter-dropdown--items__padding-h);
     padding-right: calc(var(--vp-filter-dropdown--items__padding-right) + var(--vp-filter-dropdown--items__arrow-size));
-    margin-top: var(--vp-filter-dropdown--items__gap);
-    margin-left: var(--vp-filter-dropdown--items__gap);
     font-size: var(--vp-filter-dropdown--items__font-size);
     font-weight: var(--vp-filter-dropdown--items__font-weight);
     line-height: var(--vp-filter-dropdown--items__line-height);
