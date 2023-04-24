@@ -34,8 +34,8 @@
     text-decoration: var(--vp-items-style-default--caption-links__text-decoration);
     outline: none;
     box-shadow: none;
-    transition-timing-function: var(--vp-items-style-default-transition-duration);
-    transition-duration: var(--vp-items-style-default-transition-easing);
+    transition-timing-function: var(--vp-items-style-default-transition-easing);
+    transition-duration: var(--vp-items-style-default-transition-duration);
     transition-property: color, opacity, transform;
 
     &:hover,
