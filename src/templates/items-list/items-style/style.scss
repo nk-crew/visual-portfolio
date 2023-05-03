@@ -20,7 +20,7 @@
     margin: var(--vp-items-style-default--overlay__margin);
     color: var(--vp-items-style-default--overlay__color);
     text-decoration: var(--vp-items-style-default--overlay__text-decoration);
-    background-color: var(--vp-items-style-default--overlay__background-color);
+    background: var(--vp-items-style-default--overlay__background);
     border-radius: var(--vp-items-style-default--overlay__border-radius);
     opacity: 0;
     transition-timing-function: var(--vp-items-style-default--overlay__transition-easing);

@@ -33,7 +33,7 @@
     color: var(--vp-items-style-fly--overlay__color);
     text-align: center;
     text-decoration: var(--vp-items-style-fly--overlay__text-decoration);
-    background-color: var(--vp-items-style-fly--overlay__background-color);
+    background: var(--vp-items-style-fly--overlay__background);
     border-radius: var(--vp-items-style-fly--overlay__border-radius);
     transform: translateY(-100%) translateX(-100%);
   }

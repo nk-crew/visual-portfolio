@@ -2497,10 +2497,11 @@ class Visual_Portfolio_Admin {
                                         'label'    => esc_html__( 'Background', '@@text_domain' ),
                                         'name'     => $category_name . '_bg_color',
                                         'alpha'    => true,
+                                        'gradient' => true,
                                         'style'    => array(
                                             array(
                                                 'element'  => '.vp-portfolio__items-style-' . $style_name,
-                                                'property' => '--vp-items-style-' . $style_name . '--' . $category_name . '__background-color',
+                                                'property' => '--vp-items-style-' . $style_name . '--' . $category_name . '__background',
                                             ),
                                         ),
                                     );

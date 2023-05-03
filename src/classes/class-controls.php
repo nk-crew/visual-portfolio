@@ -79,6 +79,7 @@ class Visual_Portfolio_Controls {
         'rows'              => '',
         // color.
         'alpha'             => false,
+        'gradient'          => false,
         // align.
         'extended'          => false,
         // code editor.

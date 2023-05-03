@@ -8,7 +8,7 @@
   --vp-items-style-emerge--image-hover__transform: translateY(-10px);
 
   // Image Overlay.
-  --vp-items-style-emerge--overlay__background-color: rgba(0, 0, 0, 20%);
+  --vp-items-style-emerge--overlay__background: rgba(0, 0, 0, 20%);
   --vp-items-style-emerge--overlay__margin: 0;
   --vp-items-style-emerge--overlay__border-radius: 0;
 
@@ -16,7 +16,7 @@
   --vp-items-style-emerge--caption__min-height: 40px;
   --vp-items-style-emerge--caption__padding: 1.5em 2em;
   --vp-items-style-emerge--caption__color: #fff;
-  --vp-items-style-emerge--caption__background-color: #000;
+  --vp-items-style-emerge--caption__background: #000;
   --vp-items-style-emerge--caption-items__gap: 1.5em;
   --vp-items-style-emerge--caption-skew__height: 20px;
   --vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew__height);

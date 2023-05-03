@@ -581,6 +581,7 @@ ControlsRender.Control = function (props) {
           label={renderControlLabel}
           value={controlVal}
           alpha={props.alpha}
+          gradient={props.gradient}
           onChange={(val) => onChange(val)}
         />
       );

@@ -36,7 +36,7 @@
     margin: var(--vp-items-style-fade--overlay__margin);
     color: var(--vp-items-style-fade--overlay__color);
     text-decoration: var(--vp-items-style-fade--overlay__text-decoration);
-    background-color: var(--vp-items-style-fade--overlay__background-color);
+    background: var(--vp-items-style-fade--overlay__background);
     border-radius: var(--vp-items-style-fade--overlay__border-radius);
     opacity: 0;
     transition-timing-function: var(--vp-items-style-fade--overlay__transition-easing);
