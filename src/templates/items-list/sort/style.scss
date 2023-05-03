@@ -6,8 +6,7 @@
 .vp-sort__style-default {
   display: flex;
   flex-wrap: wrap;
-  margin-top: calc(-1 * var(--vp-sort-default--items__gap));
-  margin-left: calc(-1 * var(--vp-sort-default--items__gap));
+  gap: var(--vp-sort-default--items__gap);
 
   .vp-sort__item a {
     outline: none;
@@ -29,8 +28,7 @@
 
   .vp-sort__item {
     flex: 0 0 auto;
-    margin-top: var(--vp-sort-default--items__gap);
-    margin-left: var(--vp-sort-default--items__gap);
+    max-width: 100%;
     text-align: center;
 
     > * {

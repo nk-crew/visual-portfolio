@@ -6,8 +6,7 @@
 .vp-filter__style-default {
   display: flex;
   flex-wrap: wrap;
-  margin-top: calc(-1 * var(--vp-filter-default--items__gap));
-  margin-left: calc(-1 * var(--vp-filter-default--items__gap));
+  gap: var(--vp-filter-default--items__gap);
 
   .vp-filter__item a {
     outline: none;
@@ -29,8 +28,7 @@
 
   .vp-filter__item {
     flex: 0 0 auto;
-    margin-top: var(--vp-filter-default--items__gap);
-    margin-left: var(--vp-filter-default--items__gap);
+    max-width: 100%;
     text-align: center;
 
     > * {

@@ -148,14 +148,7 @@
 .vp-portfolio__layout-elements {
   display: flex;
   flex-wrap: wrap;
-  width: calc(100% + var(--vp-elements__gap));
-  margin-top: calc(-1 * var(--vp-elements__gap));
-  margin-left: calc(-1 * var(--vp-elements__gap));
-
-  > * {
-    margin-top: var(--vp-elements__gap);
-    margin-left: var(--vp-elements__gap);
-  }
+  gap: var(--vp-elements__gap);
 
   &-align-left {
     justify-content: flex-start;
