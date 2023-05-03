@@ -8,15 +8,14 @@ const {
   __experimentalNavigatorScreen,
   NavigatorButton: __stableNavigatorButton,
   __experimentalNavigatorButton,
-  NavigatorToParentButton: __stableNavigatorToParentButton,
-  __experimentalNavigatorToParentButton,
+  NavigatorBackButton: __stableNavigatorBackButton,
+  __experimentalNavigatorBackButton,
 } = wp.components;
 
 const NavigatorProvider = __stableNavigatorProvider || __experimentalNavigatorProvider;
 const NavigatorScreen = __stableNavigatorScreen || __experimentalNavigatorScreen;
 const NavigatorButton = __stableNavigatorButton || __experimentalNavigatorButton;
-const NavigatorToParentButton =
-  __stableNavigatorToParentButton || __experimentalNavigatorToParentButton;
+const NavigatorBackButton = __stableNavigatorBackButton || __experimentalNavigatorBackButton;
 
 /**
  * Component Class
@@ -50,7 +49,7 @@ export default function NavigatorControl(props) {
         return (
           <NavigatorScreen key={option.category} path={`/${option.category}`}>
             <div className="vpf-component-navigator-control-screen-title">
-              <NavigatorToParentButton>
+              <NavigatorBackButton>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -61,7 +60,7 @@ export default function NavigatorControl(props) {
                 >
                   <path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z" />
                 </svg>
-              </NavigatorToParentButton>
+              </NavigatorBackButton>
               <span>{option.title}</span>
             </div>
             {children(option)}
