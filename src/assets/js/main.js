@@ -32,6 +32,7 @@ function windowResizeEmit() {
 const visibilityData = {};
 let shouldCheckVisibility = false;
 let checkVisibilityTimeout = false;
+let isFocusVisible = false;
 
 // fix portfolio inside Tabs and Accordions
 // check visibility by timer https://stackoverflow.com/questions/19669786/check-if-element-is-visible-in-dom/33456469
@@ -89,6 +90,52 @@ $(document).on('inited.vpf', (event) => {
 
   checkVisibility();
 });
+
+/**
+ * If the most recent user interaction was via the keyboard;
+ * and the key press did not include a meta, alt/option, or control key;
+ * then the modality is keyboard. Otherwise, the modality is not keyboard.
+ */
+document.addEventListener(
+  'keydown',
+  function (e) {
+    if (e.metaKey || e.altKey || e.ctrlKey) {
+      return;
+    }
+
+    isFocusVisible = true;
+  },
+  true
+);
+
+/**
+ * If at any point a user clicks with a pointing device, ensure that we change
+ * the modality away from keyboard.
+ * This avoids the situation where a user presses a key on an already focused
+ * element, and then clicks on a different element, focusing it with a
+ * pointing device, while we still think we're in keyboard modality.
+ */
+document.addEventListener(
+  'mousedown',
+  () => {
+    isFocusVisible = false;
+  },
+  true
+);
+document.addEventListener(
+  'pointerdown',
+  () => {
+    isFocusVisible = false;
+  },
+  true
+);
+document.addEventListener(
+  'touchstart',
+  () => {
+    isFocusVisible = false;
+  },
+  true
+);
 
 /**
  * Main VP class
@@ -468,10 +515,18 @@ class VP {
     // TODO: change to CSS :has() when will be widely available
     // @link https://caniuse.com/?search=%3Ahas
     self.$item.on(`focus${evp}`, '.vp-portfolio__item a', function () {
-      $(this).closest('.vp-portfolio__item').addClass('vp-portfolio__item-focus');
+      const $item = $(this).closest('.vp-portfolio__item');
+
+      $item.addClass('vp-portfolio__item-focus');
+
+      if (isFocusVisible) {
+        $item.addClass('vp-portfolio__item-focus-visible');
+      }
     });
     self.$item.on(`blur${evp}`, '.vp-portfolio__item a', function () {
-      $(this).closest('.vp-portfolio__item').removeClass('vp-portfolio__item-focus');
+      $(this)
+        .closest('.vp-portfolio__item')
+        .removeClass('vp-portfolio__item-focus vp-portfolio__item-focus-visible');
     });
 
     // on filter click

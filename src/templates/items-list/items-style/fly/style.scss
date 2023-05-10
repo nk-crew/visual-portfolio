@@ -11,7 +11,7 @@
   }
 
   // display overlay on item focus.
-  .vp-portfolio__item-focus .vp-portfolio__item-overlay {
+  .vp-portfolio__item-focus-visible .vp-portfolio__item-overlay {
     transition: transform 0.2s ease-in-out 0 !important;
     transform: translateX(0%) translateY(0%) translateZ(0) !important;
   }
@@ -191,7 +191,7 @@
   }
 
   .vp-portfolio__item:hover,
-  .vp-portfolio__item-focus {
+  .vp-portfolio__item-focus-visible {
     .vp-portfolio__item-img img {
       transform: var(--vp-items-style-fly--image-hover__transform);
     }

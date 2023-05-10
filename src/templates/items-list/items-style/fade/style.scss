@@ -202,7 +202,7 @@
 
   // Overlay
   .vp-portfolio__item:hover,
-  .vp-portfolio__item-focus {
+  .vp-portfolio__item-focus-visible {
     .vp-portfolio__item-img img {
       transform: var(--vp-items-style-fade--image-hover__transform);
     }
@@ -210,7 +210,7 @@
 
   // Overlay
   &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
-  &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
+  &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus-visible {
     .vp-portfolio__item-overlay {
       opacity: 1;
     }
@@ -232,7 +232,7 @@
     }
 
     .vp-portfolio__item:hover,
-    .vp-portfolio__item-focus {
+    .vp-portfolio__item-focus-visible {
       .vp-portfolio__item-overlay {
         opacity: 0;
       }

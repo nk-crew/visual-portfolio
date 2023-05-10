@@ -210,7 +210,7 @@
 
   // Show Overlay and Caption.
   &.vp-portfolio__items-show-caption-hover .vp-portfolio__item:hover,
-  &.vp-portfolio__items-show-caption-hover .vp-portfolio__item-focus {
+  &.vp-portfolio__items-show-caption-hover .vp-portfolio__item-focus-visible {
     .vp-portfolio__item-caption {
       --vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew-hover__clip-left);
       --vp-items-style-emerge--caption-skew__clip-right: var(--vp-items-style-emerge--caption-skew-hover__clip-right);
@@ -225,7 +225,7 @@
   }
 
   &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
-  &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus {
+  &.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus-visible {
     .vp-portfolio__item-overlay {
       opacity: 1;
     }
@@ -249,7 +249,7 @@
     }
 
     .vp-portfolio__item:hover,
-    .vp-portfolio__item-focus {
+    .vp-portfolio__item-focus-visible {
       .vp-portfolio__item-caption {
         --vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew__height);
         --vp-items-style-emerge--caption-skew__clip-right: var(--vp-items-style-emerge--caption-skew__height);
@@ -274,7 +274,7 @@
     }
 
     .vp-portfolio__item:hover,
-    .vp-portfolio__item-focus {
+    .vp-portfolio__item-focus-visible {
       .vp-portfolio__item-overlay {
         opacity: 0;
       }
