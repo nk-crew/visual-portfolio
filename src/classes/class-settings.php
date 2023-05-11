@@ -550,6 +550,15 @@ class Visual_Portfolio_Settings {
                     'default' => 'on',
                 ),
 
+                // Restore Focus.
+                array(
+                    'name'    => 'restore_focus',
+                    'label'   => esc_html__( 'Restore Focus', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Restore focus on the last active item after Popup is closed.', '@@text_domain' ),
+                    'type'    => 'toggle',
+                    'default' => 'on',
+                ),
+
                 // UI Elements.
                 array(
                     'name'  => 'popup_ui_elements_title',

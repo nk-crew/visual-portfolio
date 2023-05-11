@@ -351,6 +351,10 @@ const VPPopupAPI = {
    * @param {object} data - data of the current item
    */
   maybeFocusGalleryItem(data) {
+    if (!settingsPopupGallery.restore_focus) {
+      return;
+    }
+
     // Focus native gallery item.
     if (data.linkEl) {
       $(data.linkEl).focus();
