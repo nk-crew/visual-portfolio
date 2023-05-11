@@ -690,6 +690,14 @@ class Visual_Portfolio_Settings {
                     'type'  => 'section_title',
                 ),
                 array(
+                    'name'    => 'popup_quick_view_show_url_button',
+                    'label'   => esc_html__( 'Display URL Button', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Button with page URL will be placed in the popup toolbar.', '@@text_domain' ),
+                    'type'    => 'toggle',
+                    'default' => 'on',
+                    'is_pro'  => true,
+                ),
+                array(
                     'name'      => 'popup_quick_view_internal_links_target',
                     'label'     => esc_html__( 'Internal Links', '@@text_domain' ),
                     'type'      => 'select',
