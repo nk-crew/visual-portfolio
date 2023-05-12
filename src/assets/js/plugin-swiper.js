@@ -83,6 +83,10 @@ $doc.on('extendClass.vpf', (event, VP) => {
         speed: (parseFloat(self.options.sliderSpeed) || 0) * 1000,
         autoHeight: 'auto' === self.options.sliderItemsHeight,
         effect: self.options.sliderEffect || 'slide',
+        // fix fade items collapse (mostly in Default items style).
+        fadeEffect: {
+          crossFade: true,
+        },
         spaceBetween: parseFloat(self.options.itemsGap) || 0,
         centeredSlides: 'true' === self.options.sliderCenteredSlides,
         freeMode: {
@@ -122,11 +126,6 @@ $doc.on('extendClass.vpf', (event, VP) => {
         // fixes text selection when swipe in the items gap.
         touchEventsTarget: 'container',
       };
-
-      // fix fade items collapse (mostly in Default items style).
-      if ('fade' === options.effect) {
-        options.fadeEffect = { crossFade: true };
-      }
 
       // fix first load slide position (seems like a conflict with lazySizes)
       // issue: https://github.com/nk-crew/visual-portfolio/issues/54
