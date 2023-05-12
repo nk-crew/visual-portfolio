@@ -325,19 +325,34 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
+> v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
+
+= 3.1.0 =
+
+* added support for gradients in overlay backgrounds
+* added `Restore Focus` setting to the Popup gallery
+* added support for GET variables `vp_page`, `vp_filter`, `vp_sort`, `vp_search` in canonical and short links
+* added PHP filter `vpf_global_data`
+* changed CSS to use Gap instead of hack with margins
+* changed popup data `<div>` to `<template>`. We need this change for 3 reasons:
+  * prevent popup data from indexing
+  * prevent a lot of not needed content rendering
+  * in some cases this content causes bugs with layout styles
+* changed default popup title and description source for Posts content. Use Image title and description, and not the post title and content
+* changed overlay displaying from `focus` to `focus-visible`
+* fixed Popup data displaying even when Click Action is URL
+* fixed transition caption transition CSS variable name in the Classic skin
+* fixed Skin editor error on WP 6.0 because of using `NavigatorToParentButton` component
+* fixed Select control dropdown is not visible in editor when opened popup
+
 = 3.0.0 =
 
-* IMPORTANT - there may be breaking changes for some of your galleries. Please, don't forget to make a backup and test the plugin on a staging site before updating it on production
-  * completely reworked Skin options and some UI elements of block controls this helped us to structure deep Skin customizations such as:
-    * Typography control
-    * Dimensions control (overlay padding, caption items gap, etc)
-    * Blend Mode for overlay
-    * Image transform for normal and hover states
-    * Image border radius for normal and hover states
-  * for most galleries you just need to open the page editor and re-save your post, the new gallery features will be automatically merged
-  * in case your custom plugin or theme adds custom Skins and use `builtin_controls`, the author of the plugin/theme should change these configs
-    * look at the Classic Skin controls for example - <https://github.com/nk-crew/visual-portfolio/blob/ed78efe85cb2b84fb2fb729ccda7a950b492c745/src/classes/class-admin.php#L923-L991>
-    * we have fallbacks for old configurations, but consider to change it, as in the next major release these fallbacks will be removed
+* completely reworked Skin options and some UI elements of block controls this helped us to structure deep Skin customizations such as:
+  * Typography control
+  * Dimensions control (overlay padding, caption items gap, etc)
+  * Blend Mode for overlay
+  * Image transform for normal and hover states
+  * Image border radius for normal and hover states
 * changed the structure of Skin templates - use classes and CSS variables with `overlay` and `caption` names where appropriate
 * added caption support for popup in video items
 * improved controls dynamic CSS rendering - merge all styles with same selector with better formatting
