@@ -557,9 +557,9 @@ class Visual_Portfolio_Admin {
                     ),
                 ),
 
-                // Slider / Carousel.
+                // Slider.
                 'slider' => array(
-                    'title'    => esc_html__( 'Carousel', '@@text_domain' ),
+                    'title'    => esc_html__( 'Slider', '@@text_domain' ),
                     'icon'     => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4.25" y="14.8214" width="11.6429" height="11.5" rx="1.25" transform="rotate(-90 4.25 14.8214)" stroke="currentColor" stroke-width="1.5" fill="transparent"/><path d="M2 4.5V13.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 4.5V13.5" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="17.25" r="0.75" fill="currentColor"/><circle cx="11.5" cy="17.25" r="0.75" fill="currentColor"/></svg>',
                     'controls' => array(
                         array(

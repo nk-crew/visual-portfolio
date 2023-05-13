@@ -29,7 +29,7 @@ Create beautiful, clean, and powerful photo galleries and portfolio layouts usin
 
 Build your portfolio and gallery blocks with no coding knowledge. Thanks to Gutenberg page builder you are able to create and customize galleries visually.
 
-Convenient visual block editor with support to various layouts such as Masonry, Justified, Tiles, Grid, and Carousel. A **well thought out design, powerful features, and years of development** by the nK team make Visual Portfolio a game-changing Portfolio and Gallery plugin that will level the WordPress showcases playing field in your favor to help increase visitors engagement.
+Convenient visual block editor with support to various layouts such as Masonry, Justified, Tiles, Grid, Slider and Carousel. A **well thought out design, powerful features, and years of development** by the nK team make Visual Portfolio a game-changing Portfolio and Gallery plugin that will level the WordPress showcases playing field in your favor to help increase visitors engagement.
 
 ### 🚀 Optimized to be Fast as Native ###
 
@@ -363,9 +363,9 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed pagination on portfolio taxonomy archive pages
 * fixed canonical tags usage on portfolio category archives (fixes problems with SEO)
 * fixed wrong Current Query generated when changed Portfolio on Front Page setting
-* fixed Carousel dynamic items height with Classic Style wrong items width
-* fixed Carousel dynamic items height with FireFox wrong items width
-* fixed Carousel items height incorrect size when used Items Height and Minimal Height options
+* fixed Slider dynamic items height with Classic Style wrong items width
+* fixed Slider dynamic items height with FireFox wrong items width
+* fixed Slider items height incorrect size when used Items Height and Minimal Height options
 * fixed conflict with Elementor new Swiper library (added in Elementor v3.11.0)
 * fixed Elementor double lightbox on the pages, which does not use the Elementor page builder
 * removed hardcoded CSS for popup top position based on admin bar height, use `--wp-admin--admin-bar--height` variable instead
@@ -442,7 +442,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 = 2.20.2 =
 
 * improved accessibility - focus gallery item in after closing popup
-* fixed images displaying in Carousel with Classic style on Apple devices
+* fixed images displaying in Slider with Classic style on Apple devices
 * fixed Jetpack lazy loading when new items loaded in Visual Portfolio gallery using pagination or filters
 * fixed displaying Read More button in Classic style, when all other meta disabled
 

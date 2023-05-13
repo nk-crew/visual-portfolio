@@ -937,7 +937,7 @@ class Visual_Portfolio_Get {
         <?php
 
         /**
-         * Carousel thumbnails.
+         * Slider thumbnails.
          */
         if ( 'slider' === $options['layout'] && $options['slider_thumbnails'] ) {
             $slider_thumbnails = array();
