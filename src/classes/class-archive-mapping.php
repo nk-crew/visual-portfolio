@@ -231,7 +231,7 @@ class Visual_Portfolio_Archive_Mapping {
             $is_portfolio_archive = ! $is_category_redirect &&
                                     ! $is_tag_redirect &&
                                     strpos( $requested_url, $this->permalinks['portfolio_base'] ) !== false &&
-                                    isset( $queried_object ) &&
+                                    isset( $queried_object->ID ) &&
                                     (int) $queried_object->ID === (int) $this->archive_page;
             $parse_page_from_link = intval( untrailingslashit( str_replace( trailingslashit( $redirect_url ) . 'page/', '', $requested_url ) ) );
 
@@ -242,7 +242,7 @@ class Visual_Portfolio_Archive_Mapping {
             if ( $is_category_redirect || $is_tag_redirect || $parse_page_from_link > 0 ) {
                 $redirect_url = false;
             }
-        } elseif ( isset( $queried_object ) && (int) $queried_object->ID === (int) $this->archive_page ) {
+        } elseif ( isset( $queried_object->ID ) && (int) $queried_object->ID === (int) $this->archive_page ) {
 
             $parse_page_from_link = intval( untrailingslashit( str_replace( trailingslashit( $redirect_url ) . 'page/', '', $requested_url ) ) );
 
