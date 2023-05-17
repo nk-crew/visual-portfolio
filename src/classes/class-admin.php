@@ -2048,6 +2048,10 @@ class Visual_Portfolio_Admin {
                 'initialOpen' => 'items-style-general',
                 'options'     => array(
                     array(
+                        'title'    => esc_html__( 'General', '@@text_domain' ),
+                        'category' => 'items-style-general',
+                    ),
+                    array(
                         'title'    => esc_html__( 'Image', '@@text_domain' ),
                         'category' => 'items-style-image',
                     ),
