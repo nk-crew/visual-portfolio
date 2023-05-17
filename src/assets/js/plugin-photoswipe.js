@@ -327,9 +327,18 @@ if (PhotoSwipe && VPPopupAPI) {
     });
 
     pswpInstance.listen('gettingData', (idx, item) => {
+      // Prepare iframes.
       if (item.html) {
+        // -- Iframe Autoplay - Part 1 --
+        // Disable autoplay parameter in iframes on inactive slides.
+        // Mostly for Youtube and Vimeo to prevent video playing in background.
+        // Later we add autoplay only to active slides.
+        item.html = item.html.replace(/autoplay=1/, 'autoplay=0');
+
         return;
       }
+
+      // Prepare image sizes.
       if (useLargeImages && item.o) {
         if (item.o.src) {
           item.src = item.o.src;
@@ -383,14 +392,20 @@ if (PhotoSwipe && VPPopupAPI) {
     // disable video play if no active.
     pswpInstance.listen('beforeChange', function () {
       const data = this;
+
+      // -- Iframe Autoplay - Part 2 --
+      // Set autoplay to 1 on active slides and to 0 on inactive.
       if (data && data.itemHolders.length) {
         const currentIndex = data.getCurrentIndex();
 
         data.itemHolders.forEach((val) => {
-          if (val.el && val.index !== currentIndex) {
-            const $iframe = $(val.el).find('.vp-pswp-video iframe');
-            if ($iframe.length) {
-              $iframe.attr('src', $iframe.attr('src'));
+          const $iframe = val.el ? $(val.el).find('.vp-pswp-video iframe') : false;
+
+          if ($iframe && $iframe.length) {
+            if (val.index === currentIndex) {
+              $iframe.attr('src', $iframe.attr('src').replace(/autoplay=0/, 'autoplay=1'));
+            } else {
+              $iframe.attr('src', $iframe.attr('src').replace(/autoplay=1/, 'autoplay=0'));
             }
           }
         });
