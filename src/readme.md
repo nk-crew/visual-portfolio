@@ -327,6 +327,11 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
+= 3.1.1 =
+
+* fixed Archive mapping PHP notice when no Archive Page ID available
+* renamed Carousel → Slider
+
 = 3.1.0 =
 
 * added support for gradients in overlay backgrounds
