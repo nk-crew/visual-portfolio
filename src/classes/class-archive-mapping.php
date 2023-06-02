@@ -84,9 +84,48 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'pre_get_shortlink', array( $this, 'remove_taxanomy_shortlinks' ), 10, 4 );
             add_filter( 'vpf_extend_portfolio_data_attributes', array( $this, 'converting_data_next_page_to_friendly_url' ), 10, 3 );
             add_filter( 'vpf_pagination_item_data', array( $this, 'converting_paginate_links_to_friendly_url' ), 10, 3 );
+            add_filter( 'vpf_pagination_load_more_and_infinite_data', array( $this, 'converting_load_more_and_infinite_paginate_next_page_to_friendly_url' ), 10, 2 );
         }
 
         self::create_archive_page();
+    }
+
+    /**
+     * Converting next page attribute to friendly URL.
+     *
+     * @param array  $args - Block Arguments.
+     * @param array  $options - Block Options.
+     * @param string $next_page_attribute - Name of converting Attribute.
+     * @return array
+     */
+    private function converting_next_page_to_friendly_url( $args, $options, $next_page_attribute = 'next_page_url' ) {
+        // Determine if a page is an archive.
+        if (
+            self::is_archive( $options ) &&
+            isset( $args[ $next_page_attribute ] )
+        ) {
+            global $wp_query;
+            $current_page  = $wp_query->query['paged'] ?? $wp_query->query['vp_page_query'] ?? 1;
+            $next_page_url = $args[ $next_page_attribute ];
+            $next_page     = (int) $current_page === $options['max_pages'] ? false : ( $current_page ? $current_page + 1 : false );
+
+            $next_page_url = $this->converting_paginate_link_to_friendly_url( $next_page_url, $next_page );
+
+            $args[ $next_page_attribute ] = $next_page ? $next_page_url : '';
+        }
+
+        return $args;
+    }
+
+    /**
+     * Converting next page for Load More and Infinite on archive page to friendly URL.
+     *
+     * @param array $args - Block Arguments.
+     * @param array $vp_options - Block Options.
+     * @return array
+     */
+    public function converting_load_more_and_infinite_paginate_next_page_to_friendly_url( $args, $vp_options ) {
+        return $this->converting_next_page_to_friendly_url( $args, $vp_options );
     }
 
     /**
@@ -144,22 +183,7 @@ class Visual_Portfolio_Archive_Mapping {
      * @return array
      */
     public function converting_data_next_page_to_friendly_url( $data_attrs, $options, $style_options ) {
-        // Determine if a page is an archive.
-        if (
-            self::is_archive( $options ) &&
-            isset( $data_attrs['data-vp-next-page-url'] )
-        ) {
-            global $wp_query;
-            $current_page  = $wp_query->query['paged'] ?? $wp_query->query['vp_page_query'] ?? 1;
-            $next_page_url = $data_attrs['data-vp-next-page-url'];
-            $next_page     = (int) $current_page === $options['max_pages'] ? false : ( $current_page ? $current_page + 1 : false );
-
-            $next_page_url = $this->converting_paginate_link_to_friendly_url( $next_page_url, $next_page );
-
-            $data_attrs['data-vp-next-page-url'] = $next_page ? $next_page_url : '';
-        }
-
-        return $data_attrs;
+        return $this->converting_next_page_to_friendly_url( $data_attrs, $options, 'data-vp-next-page-url' );
     }
 
     /**
