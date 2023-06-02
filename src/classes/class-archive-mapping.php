@@ -863,8 +863,6 @@ class Visual_Portfolio_Archive_Mapping {
                                 if ( 0 === $options['start_page'] && 0 === $wp_query->query_vars['paged'] ) {
                                     $options['start_page'] = 1;
                                 }
-                            } else {
-                                unset( $options['layout_elements'][ $position ]['elements'][ $key ] );
                             }
                         }
                     }
