@@ -2418,6 +2418,8 @@ class Visual_Portfolio_Get {
             'vp_opts'       => $vp_options,
         );
 
+        $args = apply_filters( 'vpf_pagination_args', $args, $vp_options );
+
         // No more posts.
         if ( ! $args['next_page_url'] ) {
             $args['class'] .= ' vp-pagination__no-more';
@@ -2446,7 +2448,6 @@ class Visual_Portfolio_Get {
                 }
 
                 if ( ! $vp_options['pagination_hide_on_end'] || $args['next_page_url'] ) {
-                    $args = apply_filters( 'vpf_pagination_load_more_and_infinite_data', $args, $vp_options );
                     visual_portfolio()->include_template( 'items-list/pagination' . $pagination_style_pref . '/' . $vp_options['pagination'], $args );
                 }
 

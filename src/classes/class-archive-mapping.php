@@ -84,7 +84,7 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'pre_get_shortlink', array( $this, 'remove_taxanomy_shortlinks' ), 10, 4 );
             add_filter( 'vpf_extend_portfolio_data_attributes', array( $this, 'converting_data_next_page_to_friendly_url' ), 10, 3 );
             add_filter( 'vpf_pagination_item_data', array( $this, 'converting_paginate_links_to_friendly_url' ), 10, 3 );
-            add_filter( 'vpf_pagination_load_more_and_infinite_data', array( $this, 'converting_load_more_and_infinite_paginate_next_page_to_friendly_url' ), 10, 2 );
+            add_filter( 'vpf_pagination_args', array( $this, 'converting_load_more_and_infinite_paginate_next_page_to_friendly_url' ), 10, 2 );
         }
 
         self::create_archive_page();
@@ -111,7 +111,7 @@ class Visual_Portfolio_Archive_Mapping {
 
             $next_page_url = $this->converting_paginate_link_to_friendly_url( $next_page_url, $next_page );
 
-            $args[ $next_page_attribute ] = $next_page ? $next_page_url : '';
+            $args[ $next_page_attribute ] = $next_page ? $next_page_url : false;
         }
 
         return $args;
@@ -125,7 +125,10 @@ class Visual_Portfolio_Archive_Mapping {
      * @return array
      */
     public function converting_load_more_and_infinite_paginate_next_page_to_friendly_url( $args, $vp_options ) {
-        return $this->converting_next_page_to_friendly_url( $args, $vp_options );
+        if ( 'infinite' === $vp_options['pagination'] || 'load-more' === $vp_options['pagination'] ) {
+            $args = $this->converting_next_page_to_friendly_url( $args, $vp_options );
+        }
+        return $args;
     }
 
     /**
