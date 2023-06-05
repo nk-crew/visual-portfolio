@@ -327,10 +327,18 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
+= 3.1.2 =
+
+* renamed `Portfolio Items` to `Projects`
+* fixed playing videos in background in PhotoSwipe
+* fixed portfolio archive hidden pagination in some cases
+* fixed portfolio archive friendly URL in load more button
+* fixed portfolio archive filter and sort paged URLs
+
 = 3.1.1 =
 
 * fixed Archive mapping PHP notice when no Archive Page ID available
-* renamed Carousel → Slider
+* renamed `Carousel` to `Slider`
 
 = 3.1.0 =
 
