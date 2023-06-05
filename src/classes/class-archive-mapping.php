@@ -444,6 +444,13 @@ class Visual_Portfolio_Archive_Mapping {
                             }
                         }
                     }
+                    // Clear pagination parameters from filter link.
+                    preg_match( '/page\/(\d+)\//', $link, $match_page );
+
+                    if ( is_array( $match_page ) && ! empty( $match_page ) ) {
+                        $link = str_replace( $match_page[0], '', $link );
+                    }
+
                     $terms[ $key ]['url'] = $link;
                 }
             }
