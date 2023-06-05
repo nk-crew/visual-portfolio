@@ -117,23 +117,23 @@ class Visual_Portfolio_Custom_Post_Type {
         $custom_slug  = (int) get_option( 'page_on_front' ) === (int) $archive_page ? '/' : Visual_Portfolio_Archive_Mapping::get_portfolio_slug();
         $permalinks   = Visual_Portfolio_Archive_Mapping::get_permalink_structure( true );
 
-        // portfolio items post type.
+        // portfolio post type / project post type.
         if ( self::portfolio_post_type_is_registered() ) {
             register_post_type(
                 'portfolio',
                 array(
                     'labels'             => array(
-                        'name'               => _x( 'Portfolio Items', 'Post Type General Name', '@@text_domain' ),
-                        'singular_name'      => _x( 'Portfolio Item', 'Post Type Singular Name', '@@text_domain' ),
+                        'name'               => _x( 'Projects', 'Post Type General Name', '@@text_domain' ),
+                        'singular_name'      => _x( 'Project', 'Post Type Singular Name', '@@text_domain' ),
                         'menu_name'          => visual_portfolio()->plugin_name,
-                        'parent_item_colon'  => __( 'Parent Portfolio Item', '@@text_domain' ),
-                        'all_items'          => __( 'Portfolio Items', '@@text_domain' ),
-                        'view_item'          => __( 'View Portfolio Item', '@@text_domain' ),
-                        'add_new_item'       => __( 'Add New Portfolio Item', '@@text_domain' ),
+                        'parent_item_colon'  => __( 'Parent Project', '@@text_domain' ),
+                        'all_items'          => __( 'Projects', '@@text_domain' ),
+                        'view_item'          => __( 'View Project', '@@text_domain' ),
+                        'add_new_item'       => __( 'Add New Project', '@@text_domain' ),
                         'add_new'            => __( 'Add New', '@@text_domain' ),
-                        'edit_item'          => __( 'Edit Portfolio Item', '@@text_domain' ),
-                        'update_item'        => __( 'Update Portfolio Item', '@@text_domain' ),
-                        'search_items'       => __( 'Search Portfolio Item', '@@text_domain' ),
+                        'edit_item'          => __( 'Edit Project', '@@text_domain' ),
+                        'update_item'        => __( 'Update Project', '@@text_domain' ),
+                        'search_items'       => __( 'Search Project', '@@text_domain' ),
                         'not_found'          => __( 'Not Found', '@@text_domain' ),
                         'not_found_in_trash' => __( 'Not found in Trash', '@@text_domain' ),
                     ),
@@ -222,7 +222,7 @@ class Visual_Portfolio_Custom_Post_Type {
                     'name'               => _x( 'Saved Layouts', 'Post Type General Name', '@@text_domain' ),
                     'singular_name'      => _x( 'Saved Layout', 'Post Type Singular Name', '@@text_domain' ),
                     'menu_name'          => visual_portfolio()->plugin_name,
-                    'parent_item_colon'  => __( 'Parent Portfolio Item', '@@text_domain' ),
+                    'parent_item_colon'  => __( 'Parent Project', '@@text_domain' ),
                     'all_items'          => __( 'Saved Layouts', '@@text_domain' ),
                     'view_item'          => __( 'View Saved Layout', '@@text_domain' ),
                     'add_new_item'       => __( 'Add New Saved Layout', '@@text_domain' ),

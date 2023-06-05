@@ -144,7 +144,7 @@ class Visual_Portfolio_Welcome_Screen {
                     <li>
                         <span>🎨</span>
                         <strong><?php echo esc_html__( 'Visual Effects', '@@text_domain' ); ?></strong>
-                        <p><?php echo esc_html__( 'Showcase your portfolio items ang gallery images with clean and beautiful visual styles.', '@@text_domain' ); ?></p>
+                        <p><?php echo esc_html__( 'Showcase your projects ang gallery images with clean and beautiful visual styles.', '@@text_domain' ); ?></p>
                     </li>
 
                     <li>

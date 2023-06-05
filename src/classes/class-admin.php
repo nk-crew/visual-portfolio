@@ -1666,7 +1666,7 @@ class Visual_Portfolio_Admin {
                         'type'        => 'text',
                         'label'       => esc_html__( 'Video URL', '@@text_domain' ),
                         'placeholder' => esc_html__( 'https://...', '@@text_domain' ),
-                        'description' => esc_html__( 'Full list of supported links', '@@text_domain' ) . '&nbsp;<a href="https://visualportfolio.co/docs/portfolio-items/video-portfolio-item/#supported-video-vendors" target="_blank" rel="noopener noreferrer">' . esc_html__( 'see here', '@@text_domain' ) . '</a>',
+                        'description' => esc_html__( 'Full list of supported links', '@@text_domain' ) . '&nbsp;<a href="https://visualportfolio.co/docs/projects/video-project/#supported-video-vendors" target="_blank" rel="noopener noreferrer">' . esc_html__( 'see here', '@@text_domain' ) . '</a>',
                         'condition'   => array(
                             array(
                                 'control' => 'SELF.format',

@@ -53,7 +53,7 @@ Our gallery plugin shipped with popular layouts such as Masonry and Justified (F
 
 ### 🎨 Prebuilt Skins ###
 
-Showcase your portfolio items ang gallery images with clean and beautiful skins. See it in action:
+Showcase your projects ang gallery images with clean and beautiful skins. See it in action:
 
 * [Classic](https://visualportfolio.co/masonry/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
 * [Fade](https://visualportfolio.co/tiles-paged-pagination/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
@@ -227,7 +227,7 @@ Users may sort gallery items by date and title.
 Our plugin automatically displays the animated GIFs in photo galleries. Also, you can show the animated GIFs on mouseover with the Pro plugin.
 
 * **Items Gutters**
-Manually adjust the spacing between gallery and portfolio items.
+Manually adjust the spacing between gallery images and projects.
 
 * **Images Lazy Loading**
 Images lazy loading boost your page loading speed. You don't need to worry about it, just use your beautiful images in the gallery, Visual Portfolio will do all the work for you.
@@ -260,7 +260,7 @@ All available features you can find on the [plugin's site](https://visualportfol
 
 1. Gutenberg Blocks
 2. Gutenberg Block Settings
-3. Portfolio Items Admin
+3. Projects Admin
 
 ## Installation ##
 
@@ -300,7 +300,7 @@ Yes, you can batch upload entire photo galleries at one time thanks to WordPress
 
 Yes, you can use 3 type of pagination when displaying photo galleries or posts. Choose the number of photos to display and select Paged, Load More or Infinite Loading pagination. Examples with all gallery pagination types are [available on the Visual Portfolio website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
-### Can I filter images and portfolio items by categories? ####
+### Can I filter images and projects by categories? ####
 
 Yes, our plugin has built in support for AJAX Filter by items categories. See a couple of examples:
 
@@ -1086,7 +1086,7 @@ Log:
 
 * updated FontAwesome
 * fixed portfolio gallery inside Tabs and Accordions
-* fixed Editor role capabilities (add a possibility to manage portfolio items)
+* fixed Editor role capabilities (add a possibility to manage projects)
 * fixed published date output for Content Source -> Images
 * fixed Gutenberg block list of all available layouts
 
@@ -1094,7 +1094,7 @@ Log:
 
 * added Fancybox support
 * added option to avoid posts duplication
-* added posts classes (such as hentry) on portfolio items
+* added posts classes (such as hentry) on projects
 * added options to load images title and description automatically from meta data
 * added support for WP Smush and WP Rocket lazy loading options
 * added Items Minimal Height option for Slider layout
@@ -1162,7 +1162,7 @@ Log:
 * added Order by and Order direction for Images Content Source
 * added Pause on Mouse Over option in Slider with Autoplay
 * added Free Scroll Sticky option in Slider
-* added figure and figcaption tags in portfolio items in layouts
+* added figure and figcaption tags in projects in layouts
 * added 'author' supports to portfolio posts to display in your galleries
 * added new jQuery events 'beforeInitIsotope', 'beforeInitFjGallery', 'beforeInitSwiper', so the options could be changed before plugins init
 * changed meta blocks top margin
@@ -1304,7 +1304,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 * added support for custom controls styles (developers could create their own controls and add custom styles). Read FAQ for more information
 * added custom control options in filter templates (helpful for developers)
 * added pagination style and possibility to extend it from 3rd-party code
-* added portfolio item comments number data for templates
+* added project comments number data for templates
 * added 'resized' event for developers
 * always enqueued main style on all pages
 * changed carousel arrows shadow
@@ -1394,7 +1394,7 @@ Note: Don't forget to clear cache after plugin update. Changed portfolios with p
 * added support for oEmbed videos (YouTube and Vimeo supported)
 * added settings for popup gallery
 * added share button in popup gallery
-* added "Edit Portfolio Item" button in admin menu on frontend
+* added "Edit Project" button in admin menu on frontend
 * added option to show filter items count
 * added option to show published date in human format
 * added notice if no items found
