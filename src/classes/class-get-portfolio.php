@@ -1965,11 +1965,16 @@ class Visual_Portfolio_Get {
         );
 
         foreach ( $sort_items as $slug => $label ) {
-            $url = self::get_pagenum_link(
-                array(
-                    'vp_sort' => rawurlencode( $slug ),
-                    'vp_page' => 1,
-                )
+            $url = apply_filters(
+                'vpf_extend_sort_item_url',
+                self::get_pagenum_link(
+                    array(
+                        'vp_sort' => rawurlencode( $slug ),
+                        'vp_page' => 1,
+                    )
+                ),
+                $slug,
+                $vp_options
             );
 
             $is_active = ! $active_item && ! $slug ? true : $active_item === $slug;

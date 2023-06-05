@@ -85,9 +85,52 @@ class Visual_Portfolio_Archive_Mapping {
             add_filter( 'vpf_extend_portfolio_data_attributes', array( $this, 'converting_data_next_page_to_friendly_url' ), 10, 3 );
             add_filter( 'vpf_pagination_item_data', array( $this, 'converting_paginate_links_to_friendly_url' ), 10, 3 );
             add_filter( 'vpf_pagination_args', array( $this, 'converting_load_more_and_infinite_paginate_next_page_to_friendly_url' ), 10, 2 );
+            add_filter( 'vpf_extend_sort_item_url', array( $this, 'remove_page_url_from_sort_item_url' ), 10, 3 );
         }
 
         self::create_archive_page();
+    }
+
+    /**
+     * Remove page url from sort item url.
+     *
+     * @param string $url - Sort url.
+     * @param string $slug - Sort slug.
+     * @param array  $vp_options - Block Options.
+     * @return string
+     */
+    public function remove_page_url_from_sort_item_url( $url, $slug, $vp_options ) {
+        if (
+            isset( $_REQUEST['vp_preview_post_id'] ) &&
+            ! empty( $_REQUEST['vp_preview_post_id'] ) &&
+            isset( $_REQUEST['vp_preview_nonce'] ) &&
+            ! empty( $_REQUEST['vp_preview_nonce'] ) &&
+            wp_verify_nonce( sanitize_key( $_REQUEST['vp_preview_nonce'] ), 'vp-ajax-nonce' )
+        ) {
+            $post_id = intval( $_REQUEST['vp_preview_post_id'] );
+        }
+
+        if ( self::is_archive( $vp_options, $post_id ?? null ) ) {
+            $url = $this->remove_page_url( $url );
+        }
+
+        return $url;
+    }
+
+    /**
+     * Remove /page/<num> from url.
+     *
+     * @param string $url - uncleared url.
+     * @return string
+     */
+    private function remove_page_url( $url ) {
+        // Clear pagination parameters from filter link.
+        preg_match( '/page\/(\d+)\//', $url, $match_page );
+
+        if ( is_array( $match_page ) && ! empty( $match_page ) ) {
+            $url = str_replace( $match_page[0], '', $url );
+        }
+        return $url;
     }
 
     /**
@@ -444,12 +487,8 @@ class Visual_Portfolio_Archive_Mapping {
                             }
                         }
                     }
-                    // Clear pagination parameters from filter link.
-                    preg_match( '/page\/(\d+)\//', $link, $match_page );
 
-                    if ( is_array( $match_page ) && ! empty( $match_page ) ) {
-                        $link = str_replace( $match_page[0], '', $link );
-                    }
+                    $link = $this->remove_page_url( $link );
 
                     $terms[ $key ]['url'] = $link;
                 }
