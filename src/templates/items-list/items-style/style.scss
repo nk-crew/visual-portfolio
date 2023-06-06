@@ -18,10 +18,10 @@
     align-items: center;
     justify-content: center;
     margin: var(--vp-items-style-default--overlay__margin);
+    clip-path: inset(0 round var(--vp-items-style-default--overlay__border-radius));
     color: var(--vp-items-style-default--overlay__color);
     text-decoration: var(--vp-items-style-default--overlay__text-decoration);
     background: var(--vp-items-style-default--overlay__background);
-    border-radius: var(--vp-items-style-default--overlay__border-radius);
     opacity: 0;
     transition-timing-function: var(--vp-items-style-default--overlay__transition-easing);
     transition-duration: var(--vp-items-style-default--overlay__transition-duration);
@@ -51,10 +51,10 @@
     // https://github.com/nk-crew/visual-portfolio/issues/150
     z-index: 0;
     overflow: hidden;
-    border-radius: var(--vp-items-style-default--image__border-radius);
+    clip-path: inset(0 round var(--vp-items-style-default--image__border-radius));
     transition-timing-function: var(--vp-items-style-default--image__transition-easing);
     transition-duration: var(--vp-items-style-default--image__transition-duration);
-    transition-property: border-radius;
+    transition-property: clip-path;
   }
 
   .vp-portfolio__item-img img {

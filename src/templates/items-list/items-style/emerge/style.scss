@@ -9,10 +9,10 @@
     // fix for safari border-radius.
     // https://github.com/nk-crew/visual-portfolio/issues/150
     z-index: 0;
-    border-radius: var(--vp-items-style-emerge--image__border-radius);
+    clip-path: inset(0 round var(--vp-items-style-emerge--image__border-radius));
     transition-timing-function: var(--vp-items-style-emerge--image__transition-easing);
     transition-duration: var(--vp-items-style-emerge--image__transition-duration);
-    transition-property: border-radius;
+    transition-property: clip-path;
   }
 
   // Overlay
@@ -30,8 +30,8 @@
     align-items: center;
     justify-content: center;
     margin: var(--vp-items-style-emerge--overlay__margin);
+    clip-path: inset(0 round var(--vp-items-style-emerge--overlay__border-radius));
     background: var(--vp-items-style-emerge--overlay__background);
-    border-radius: var(--vp-items-style-emerge--overlay__border-radius);
     opacity: 0;
     transition: var(--vp-items-style-emerge-transition-duration) opacity var(--vp-items-style-emerge-transition-easing);
   }
