@@ -30,11 +30,11 @@
     z-index: 2;
     margin: var(--vp-items-style-fly--overlay__margin);
     overflow: hidden;
+    clip-path: inset(0 round var(--vp-items-style-fly--overlay__border-radius));
     color: var(--vp-items-style-fly--overlay__color);
     text-align: center;
     text-decoration: var(--vp-items-style-fly--overlay__text-decoration);
     background: var(--vp-items-style-fly--overlay__background);
-    border-radius: var(--vp-items-style-fly--overlay__border-radius);
     transform: translateY(-100%) translateX(-100%);
   }
 
@@ -173,10 +173,10 @@
     // fix for safari border-radius.
     // https://github.com/nk-crew/visual-portfolio/issues/150
     z-index: 0;
-    border-radius: var(--vp-items-style-fly--image__border-radius);
+    clip-path: inset(0 round var(--vp-items-style-fly--image__border-radius));
     transition-timing-function: var(--vp-items-style-fly--image__transition-easing);
     transition-duration: var(--vp-items-style-fly--image__transition-duration);
-    transition-property: border-radius;
+    transition-property: clip-path;
   }
 
   .vp-portfolio__item-img img {

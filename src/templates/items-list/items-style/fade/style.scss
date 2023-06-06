@@ -9,10 +9,10 @@
     // fix for safari border-radius.
     // https://github.com/nk-crew/visual-portfolio/issues/150
     z-index: 0;
-    border-radius: var(--vp-items-style-fade--image__border-radius);
+    clip-path: inset(0 round var(--vp-items-style-fade--image__border-radius));
     transition-timing-function: var(--vp-items-style-fade--image__transition-easing);
     transition-duration: var(--vp-items-style-fade--image__transition-duration);
-    transition-property: border-radius;
+    transition-property: clip-path;
   }
 
   .vp-portfolio__item a {
@@ -34,10 +34,10 @@
     // Also fix conflict with Hover Image in the Pro plugin.
     z-index: 2;
     margin: var(--vp-items-style-fade--overlay__margin);
+    clip-path: inset(0 round var(--vp-items-style-fade--overlay__border-radius));
     color: var(--vp-items-style-fade--overlay__color);
     text-decoration: var(--vp-items-style-fade--overlay__text-decoration);
     background: var(--vp-items-style-fade--overlay__background);
-    border-radius: var(--vp-items-style-fade--overlay__border-radius);
     opacity: 0;
     transition-timing-function: var(--vp-items-style-fade--overlay__transition-easing);
     transition-duration: var(--vp-items-style-fade--overlay__transition-duration);
