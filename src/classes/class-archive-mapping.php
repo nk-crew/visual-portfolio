@@ -1151,6 +1151,26 @@ class Visual_Portfolio_Archive_Mapping {
     }
 
     /**
+     * Get Portfolio Archive Label.
+     *
+     * @return string
+     */
+    public static function get_portfolio_label() {
+        // When deleting the archive page, we leave the old slug without overwriting the permalinks.
+        // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
+        $custom_slug = _x( 'Portfolio', 'default-label', '@@text_domain' );
+
+        $archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
+
+        if ( isset( $archive_page ) && ! empty( $archive_page ) ) {
+            // If there is a selected page of archives, we substitute its slug.
+            $custom_slug = get_post_field( 'post_title', $archive_page );
+        }
+
+        return $custom_slug;
+    }
+
+    /**
      * Get Relative Archive Link.
      *
      * @return string

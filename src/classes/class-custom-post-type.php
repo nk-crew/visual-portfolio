@@ -115,6 +115,7 @@ class Visual_Portfolio_Custom_Post_Type {
     public function add_custom_post_type() {
         $archive_page = Visual_Portfolio_Settings::get_option( 'portfolio_archive_page', 'vp_general' );
         $custom_slug  = (int) get_option( 'page_on_front' ) === (int) $archive_page ? '/' : Visual_Portfolio_Archive_Mapping::get_portfolio_slug();
+        $custom_label = Visual_Portfolio_Archive_Mapping::get_portfolio_label();
         $permalinks   = Visual_Portfolio_Archive_Mapping::get_permalink_structure( true );
 
         // portfolio post type / project post type.
@@ -123,7 +124,15 @@ class Visual_Portfolio_Custom_Post_Type {
                 'portfolio',
                 array(
                     'labels'             => array(
-                        'name'               => _x( 'Projects', 'Post Type General Name', '@@text_domain' ),
+                        // We have to use label from the actual Portfolio page
+                        // because 3rd-party breadcrumbs will display this name and it is
+                        // required to show breadcrumbs like:
+                        //
+                        // Home > Portfolio > Project Name
+                        //
+                        // Instead of this one:
+                        // Home > Projects > Project Name.
+                        'name'               => $custom_label,
                         'singular_name'      => _x( 'Project', 'Post Type Singular Name', '@@text_domain' ),
                         'menu_name'          => visual_portfolio()->plugin_name,
                         'parent_item_colon'  => __( 'Parent Project', '@@text_domain' ),
