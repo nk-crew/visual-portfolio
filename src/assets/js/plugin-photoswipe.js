@@ -262,8 +262,23 @@ if (PhotoSwipe && VPPopupAPI) {
         if (isMouseClick) {
           // is mouse click on image or zoom icon
 
+          // Click to zoom disabled.
+          if (!settingsPopupGallery.click_to_zoom) {
+            return item.initialZoomLevel;
+          }
+
+          // In case the image is vertically wide, zoom it to fit screen width only.
+          // - check if original image size is wider than screen
+          // - check if zoomed out image in less than 25% of the screen width
+          if (
+            item.w > window.innerWidth &&
+            0.25 > (item.w * item.initialZoomLevel) / window.innerWidth
+          ) {
+            return window.innerWidth / item.w;
+          }
+
           // zoom to original
-          return settingsPopupGallery.click_to_zoom ? 1 : item.initialZoomLevel;
+          return 1;
 
           // e.g. for 1400px image:
           // 0.5 - zooms to 700px
