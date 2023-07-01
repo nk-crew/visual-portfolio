@@ -327,6 +327,13 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
+= 3.1.3 =
+
+* improved PhotoSwipe popup zoom for large vertical images
+* changed 'Projects' CPT label to portfolio page name
+* changed images and overlay border-radius to clip-path (better performance)
+* fixed unexpected JS error when Sortable control have an undefined value (happens in Advanced Click Action for a single user after migration from older plugin version)
+
 = 3.1.2 =
 
 * renamed `Portfolio Items` to `Projects`
