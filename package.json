@@ -16,7 +16,7 @@
     "test:e2e": "playwright test --config tests/e2e/playwright.config.js",
     "test:e2e:ui": "playwright test --config tests/e2e/playwright.config.js --ui",
     "pretest:unit:php": "wp-env start",
-    "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio/src' tests-wordpress vendor/bin/phpunit -c phpunit.xml.dist --verbose",
+    "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio' tests-wordpress vendor/bin/phpunit -c phpunit.xml.dist --verbose",
     "lint": "concurrently \"npm run lint:js\" \"npm run lint:css\"",
     "lint:css": "stylelint --custom-syntax postcss-scss \"src/**/*.scss\"",
     "lint:js": "eslint src/",
