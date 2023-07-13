@@ -95,7 +95,7 @@ class IframePreview extends Component {
         checkOrigin: false,
         onMessage({ message }) {
           // select current block on click message.
-          if ('clicked' === message) {
+          if (message === 'clicked') {
             wp.data.dispatch('core/block-editor').selectBlock(clientId);
 
             window.focus();
@@ -181,7 +181,7 @@ class IframePreview extends Component {
 
     // check changed attributes.
     changedAttributeKeys.forEach((name) => {
-      if ('undefined' !== typeof newAttributes[name]) {
+      if (typeof newAttributes[name] !== 'undefined') {
         changedAttributes[name] = newAttributes[name];
       }
     });
@@ -300,12 +300,12 @@ class IframePreview extends Component {
       readOnly: true,
     };
 
-    if ('number' === typeof val) {
+    if (typeof val === 'number') {
       params.type = 'number';
-    } else if ('boolean' === typeof val) {
+    } else if (typeof val === 'boolean') {
       params.type = 'number';
       params.value = val ? 1 : 0;
-    } else if ('object' === typeof val && null !== val) {
+    } else if (typeof val === 'object' && val !== null) {
       return (
         <>
           {Object.keys(val).map((i) => (
@@ -349,7 +349,7 @@ class IframePreview extends Component {
             <input type="hidden" name="vp_preview_post_id" value={postId} readOnly />
             <input type="hidden" name="vp_preview_nonce" value={variables.nonce} readOnly />
 
-            {'saved' === contentSource ? (
+            {contentSource === 'saved' ? (
               <input type="text" name="vp_id" value={id} readOnly />
             ) : (
               <>
@@ -365,6 +365,7 @@ class IframePreview extends Component {
             title="vp-preview"
             id={uniqueId}
             name={uniqueId}
+            // eslint-disable-next-line react/no-unknown-property
             allowtransparency="true"
             ref={this.frameRef}
           />

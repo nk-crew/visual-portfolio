@@ -46,7 +46,7 @@ const SortableMultiValue = SortableElement((props) => {
 
 function arrayMove(array, from, to) {
   array = array.slice();
-  array.splice(0 > to ? array.length + to : to, 0, array.splice(from, 1)[0]);
+  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
   return array;
 }
 
@@ -111,7 +111,7 @@ export default class VpfSelectControl extends Component {
     let result = null;
 
     if (isMultiple) {
-      if ((!value && 'string' !== typeof value) || !value.length) {
+      if ((!value && typeof value !== 'string') || !value.length) {
         return result;
       }
 
@@ -121,7 +121,7 @@ export default class VpfSelectControl extends Component {
         result.push(this.findValueData(innerVal));
       });
     } else {
-      if (!value && 'string' !== typeof value) {
+      if (!value && typeof value !== 'string') {
         return result;
       }
 
@@ -152,7 +152,7 @@ export default class VpfSelectControl extends Component {
         const data = options[val];
 
         if (val === findVal) {
-          if ('string' === typeof data) {
+          if (typeof data === 'string') {
             result.label = data;
           } else {
             result = data;
@@ -240,7 +240,7 @@ export default class VpfSelectControl extends Component {
         label: options[val],
       };
 
-      if ('object' === typeof option) {
+      if (typeof option === 'object') {
         result = { ...option };
       }
 
@@ -254,7 +254,7 @@ export default class VpfSelectControl extends Component {
     const { ajaxStatus } = this.state;
 
     const isAsync = !!callback && isSearchable;
-    const isLoading = ajaxStatus && 'progress' === ajaxStatus;
+    const isLoading = ajaxStatus && ajaxStatus === 'progress';
 
     const selectProps = {
       // Test opened menu items:
@@ -277,7 +277,7 @@ export default class VpfSelectControl extends Component {
 
           return (
             <Option {...optionProps}>
-              {'undefined' !== typeof data.img ? (
+              {typeof data.img !== 'undefined' ? (
                 <div className="vpf-component-select-option-img">
                   {data.img ? <img src={data.img} alt={data.label} /> : ''}
                 </div>

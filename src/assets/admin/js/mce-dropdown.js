@@ -5,7 +5,7 @@
  */
 const { tinymce, VPTinyMCEData } = window;
 
-if ('undefined' !== typeof VPTinyMCEData && VPTinyMCEData.layouts.length) {
+if (typeof VPTinyMCEData !== 'undefined' && VPTinyMCEData.layouts.length) {
   const options = [
     {
       text: '',

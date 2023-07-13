@@ -126,14 +126,14 @@ export default class SortableControl extends Component {
 
     let { value } = this.props;
 
-    if ('undefined' === typeof value) {
-      value = 'undefined' !== typeof defaultOptions ? defaultOptions : [];
+    if (typeof value === 'undefined') {
+      value = typeof defaultOptions !== 'undefined' ? defaultOptions : [];
     }
 
     const disabledOptions = Object.keys(options).filter((findValue) => !value.includes(findValue));
     const classes = classnames(
       'vpf-component-sortable',
-      0 < disabledOptions.length ? 'vpf-dragging-has-disabled-options' : ''
+      disabledOptions.length > 0 ? 'vpf-dragging-has-disabled-options' : ''
     );
 
     return (
@@ -148,7 +148,7 @@ export default class SortableControl extends Component {
             onChange(updateValue);
           }}
         />
-        {0 < disabledOptions.length ? (
+        {disabledOptions.length > 0 ? (
           <ul className="vpf-component-sortable-disabled">
             {disabledOptions.map((el) => (
               <li key={`disabled-item-${el}`}>

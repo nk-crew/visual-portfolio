@@ -29,21 +29,21 @@ const dynamicHeightObserver = new ResizeObserver(
 
 // Init Layout.
 $(document).on('initLayout.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
-  if ('slider' !== self.options.layout) {
+  if (self.options.layout !== 'slider') {
     return;
   }
 
   ['items', 'thumbnails'].forEach((type) => {
     let itemsHeight =
-      'items' === type ? self.options.sliderItemsHeight : self.options.sliderThumbnailsHeight;
-    let itemsMinHeight = 'items' === type ? self.options.sliderItemsMinHeight : 0;
+      type === 'items' ? self.options.sliderItemsHeight : self.options.sliderThumbnailsHeight;
+    let itemsMinHeight = type === 'items' ? self.options.sliderItemsMinHeight : 0;
     const typeSingle = type.replace(/s$/g, '');
 
-    if ('auto' === itemsHeight) {
+    if (itemsHeight === 'auto') {
       return;
     }
 
@@ -55,13 +55,13 @@ $(document).on('initLayout.vpf', (event, self) => {
     }
 
     const itemsPerView =
-      'items' === type ? self.options.sliderSlidesPerView : self.options.sliderThumbnailsPerView;
+      type === 'items' ? self.options.sliderSlidesPerView : self.options.sliderThumbnailsPerView;
 
-    if ('auto' === itemsPerView) {
+    if (itemsPerView === 'auto') {
       // fix fade slider items width.
       // https://github.com/nk-crew/visual-portfolio/issues/95.
       let itemsWidth = 'auto';
-      if ('items' === type && 'fade' === self.options.sliderEffect) {
+      if (type === 'items' && self.options.sliderEffect === 'fade') {
         itemsWidth = '100%';
       }
 

@@ -88,7 +88,7 @@ class ControlsRender extends Component {
     // content source conditions.
     if (
       /^content-source-/g.test(category) &&
-      'content-source-general' !== category &&
+      category !== 'content-source-general' &&
       `content-source-${attributes.content_source}` !== category
     ) {
       return null;
@@ -146,12 +146,12 @@ class ControlsRender extends Component {
     let categoryPro = false;
     let categoryOpened = !categoryToggle;
 
-    if (categoryToggle && 'undefined' !== typeof registeredControlsCategories[category]) {
+    if (categoryToggle && typeof registeredControlsCategories[category] !== 'undefined') {
       categoryTitle = registeredControlsCategories[category].title;
       categoryIcon = registeredControlsCategories[category].icon || false;
       categoryPro = !!registeredControlsCategories[category].is_pro;
 
-      if ('undefined' === typeof openedCategoriesCache[category]) {
+      if (typeof openedCategoriesCache[category] === 'undefined') {
         openedCategoriesCache[category] = registeredControlsCategories[category].is_opened || false;
       }
       categoryOpened = openedCategoriesCache[category];
@@ -282,10 +282,10 @@ ControlsRender.Control = function (props) {
 
   // Check if category is empty.
   if (
-    ('category_tabs' === props.type ||
-      'category_toggle_group' === props.type ||
-      'category_collapse' === props.type ||
-      'category_navigator' === props.type) &&
+    (props.type === 'category_tabs' ||
+      props.type === 'category_toggle_group' ||
+      props.type === 'category_collapse' ||
+      props.type === 'category_navigator') &&
     props.options &&
     props.options.length
   ) {
@@ -716,19 +716,19 @@ ControlsRender.Control = function (props) {
   );
 
   // Prevent rendering.
-  if (null === data.renderControl) {
+  if (data.renderControl === null) {
     return null;
   }
 
   return (
     <>
-      {'start' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
+      {positionInGroup === 'start' ? <div className="vpf-control-group-separator" /> : null}
       <BaseControl label={data.renderControlLabel} className={data.renderControlClassName}>
         <div ref={$ref}>{data.renderControl}</div>
         {data.renderControlHelp}
       </BaseControl>
       {data.renderControlAfter}
-      {'end' === positionInGroup ? <div className="vpf-control-group-separator" /> : null}
+      {positionInGroup === 'end' ? <div className="vpf-control-group-separator" /> : null}
     </>
   );
 };

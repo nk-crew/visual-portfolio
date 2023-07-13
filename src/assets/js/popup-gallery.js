@@ -121,7 +121,7 @@ const VPPopupAPI = {
     if (vendorData.paramsIndex && match && match[vendorData.paramsIndex]) {
       const newParams = VPPopupAPI.getQueryStringParams(match[vendorData.paramsIndex]);
 
-      if (newParams && 'object' === typeof newParams) {
+      if (newParams && typeof newParams === 'object') {
         Object.keys(newParams).forEach((key) => {
           if (key && newParams[key]) {
             params[key] = newParams[key];
@@ -242,7 +242,7 @@ const VPPopupAPI = {
       };
 
       // Support for <template> tag.
-      if (templatesSupport && 'TEMPLATE' === $dataElement.nodeName && $dataElement.content) {
+      if (templatesSupport && $dataElement.nodeName === 'TEMPLATE' && $dataElement.content) {
         result.$content = $dataElement.content;
       }
 
@@ -370,7 +370,7 @@ window.VPPopupAPI = VPPopupAPI;
 
 // Extend VP class.
 $(document).on('extendClass.vpf', (event, VP) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -379,7 +379,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
    */
   VP.prototype.initPopupGallery = function () {
     const self = this;
-    if (!self.options.itemsClickAction || 'url' === self.options.itemsClickAction) {
+    if (!self.options.itemsClickAction || self.options.itemsClickAction === 'url') {
       return;
     }
 
@@ -435,7 +435,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
         });
 
         // Let's open popup once item index found.
-        if (-1 !== index) {
+        if (index !== -1) {
           e.preventDefault();
           VPPopupAPI.open(items, index, self);
         }
@@ -449,7 +449,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
   VP.prototype.destroyPopupGallery = function () {
     const self = this;
 
-    if (!self.options.itemsClickAction || 'url' === self.options.itemsClickAction) {
+    if (!self.options.itemsClickAction || self.options.itemsClickAction === 'url') {
       return;
     }
 
@@ -461,7 +461,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
 // Init.
 $(document).on('init.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -470,7 +470,7 @@ $(document).on('init.vpf', (event, self) => {
 
 // Destroy.
 $(document).on('destroy.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -491,7 +491,7 @@ function parseImgData(link) {
   let caption = $link.next('figcaption');
 
   // <noscript> tag used in plugins, that adds lazy loading
-  if ('NOSCRIPT' === img.nodeName && link.childNodes[1]) {
+  if (img.nodeName === 'NOSCRIPT' && link.childNodes[1]) {
     // eslint-disable-next-line prefer-destructuring
     img = link.childNodes[1];
   }
@@ -542,14 +542,14 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
       let imageNode = this.childNodes[0];
 
       // <noscript> tag used in plugins, that adds lazy loading
-      if ('NOSCRIPT' === imageNode.nodeName && this.childNodes[1]) {
+      if (imageNode.nodeName === 'NOSCRIPT' && this.childNodes[1]) {
         // eslint-disable-next-line prefer-destructuring
         imageNode = this.childNodes[1];
       }
 
       // check if child node is <img> or <picture> tag.
       // <picture> tag used in plugins, that adds WebP support
-      if ('IMG' !== imageNode.nodeName && 'PICTURE' !== imageNode.nodeName) {
+      if (imageNode.nodeName !== 'IMG' && imageNode.nodeName !== 'PICTURE') {
         return;
       }
 

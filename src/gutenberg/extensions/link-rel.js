@@ -9,11 +9,11 @@ addFilter(
   'vpf.editor.controls-on-change',
   'vpf/editor/controls-on-change/link-rel',
   (newAttributes, control, val, attributes) => {
-    if ('items_click_action_url_target' === control.name) {
-      if ('_blank' === val && !attributes.items_click_action_url_rel) {
+    if (control.name === 'items_click_action_url_target') {
+      if (val === '_blank' && !attributes.items_click_action_url_rel) {
         newAttributes.items_click_action_url_rel = NOOPENER_DEFAULT;
       }
-      if ('_blank' !== val && NOOPENER_DEFAULT === attributes.items_click_action_url_rel) {
+      if (val !== '_blank' && NOOPENER_DEFAULT === attributes.items_click_action_url_rel) {
         newAttributes.items_click_action_url_rel = '';
       }
     }

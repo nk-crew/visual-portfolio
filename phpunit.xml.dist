@@ -1,22 +1,15 @@
-<?xml version="1.0"?>
 <phpunit
-  bootstrap="tests/bootstrap.php"
-  backupGlobals="false"
-  colors="true"
-  processIsolation="true"
-  convertErrorsToExceptions="true"
-  convertNoticesToExceptions="true"
-  convertWarningsToExceptions="true"
-  verbose="true"
-  >
-  <testsuites>
-    <testsuite name="Visual Portfolio">
-      <directory prefix="test-" suffix=".php">./tests/unit/</directory>
-      <exclude>./tests/unit/test-sample.php</exclude>
-    </testsuite>
-  </testsuites>
-	<php>
-    <ini name="display_errors" value="On" />
-    <ini name="display_startup_errors" value="On" />
-  </php>
+	bootstrap="tests/phpunit/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+>
+	<testsuites>
+		<testsuite name="phpunit">
+			<directory prefix="test-" suffix=".php">./tests/phpunit/unit/</directory>
+      <exclude>./tests/phpunit/unit/test-sample.php</exclude>
+		</testsuite>
+	</testsuites>
 </phpunit>

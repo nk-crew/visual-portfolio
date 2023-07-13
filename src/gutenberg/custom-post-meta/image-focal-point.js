@@ -27,7 +27,7 @@ class VpImageFocalPointComponent extends Component {
 
       previewUrl = thumbnailData.source_url;
 
-      if (!thumbnailData.mime_type || 'image/gif' !== thumbnailData.mime_type) {
+      if (!thumbnailData.mime_type || thumbnailData.mime_type !== 'image/gif') {
         if (
           thumbnailData.media_details &&
           thumbnailData.media_details.sizes &&

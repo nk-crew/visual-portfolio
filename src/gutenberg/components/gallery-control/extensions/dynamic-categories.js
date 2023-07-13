@@ -7,7 +7,7 @@ addFilter(
   'vpf.editor.controls-render-data',
   'vpf/editor/controls-render-data/images-categories-suggestions',
   (data) => {
-    if ('images' === data.name) {
+    if (data.name === 'images') {
       const categories = [];
 
       // find all used categories.
@@ -15,7 +15,7 @@ addFilter(
         data.attributes.images.forEach((image) => {
           if (image.categories && image.categories.length) {
             image.categories.forEach((cat) => {
-              if (-1 === categories.indexOf(cat)) {
+              if (categories.indexOf(cat) === -1) {
                 categories.push(cat);
               }
             });

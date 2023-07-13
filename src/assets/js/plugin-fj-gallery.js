@@ -5,7 +5,7 @@ const $ = window.jQuery;
 
 // Extend VP class.
 $(document).on('extendClass.vpf', (event, VP) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -18,15 +18,15 @@ $(document).on('extendClass.vpf', (event, VP) => {
   VP.prototype.initFjGallery = function (options = false, additional = null) {
     const self = this;
 
-    if (self.$items_wrap.fjGallery && 'justified' === self.options.layout) {
+    if (self.$items_wrap.fjGallery && self.options.layout === 'justified') {
       const initOptions =
-        false !== options
+        options !== false
           ? options
           : {
               gutter: {
                 horizontal: parseFloat(self.options.itemsGap) || 0,
                 vertical:
-                  '' !== self.options.itemsGapVertical
+                  self.options.itemsGapVertical !== ''
                     ? parseFloat(self.options.itemsGapVertical) || 0
                     : parseFloat(self.options.itemsGap) || 0,
               },
@@ -40,7 +40,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
               transitionDuration: '0.3s',
             };
 
-      if (0 === initOptions.maxRowsCount) {
+      if (initOptions.maxRowsCount === 0) {
         initOptions.maxRowsCount = Number.POSITIVE_INFINITY;
       }
 
@@ -69,7 +69,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
 // Add Items.
 $(document).on('addItems.vpf', (event, self, $items, removeExisting) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -92,7 +92,7 @@ $(document).on('addItems.vpf', (event, self, $items, removeExisting) => {
 
 // Init.
 $(document).on('init.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -101,7 +101,7 @@ $(document).on('init.vpf', (event, self) => {
 
 // Images Loaded.
 $(document).on('imagesLoaded.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -112,7 +112,7 @@ $(document).on('imagesLoaded.vpf', (event, self) => {
 
 // Destroy.
 $(document).on('destroy.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 

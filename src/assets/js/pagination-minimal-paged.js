@@ -4,7 +4,7 @@
 const $ = window.jQuery;
 
 function setImgWidth($el) {
-  if ($el && 1 < $el.height) {
+  if ($el && $el.height > 1) {
     $el.style.width = `${$el.height}px`;
   }
 }
@@ -22,8 +22,8 @@ const resizeObserver = new ResizeObserver((entries) => {
 // Init minimal paged pagination.
 $(document).on('init.vpf loadedNewItems.vpf', (event, self) => {
   if (
-    'vpf' !== event.namespace ||
-    'paged' !== self.options.pagination ||
+    event.namespace !== 'vpf' ||
+    self.options.pagination !== 'paged' ||
     !self.$pagination.children('.vp-pagination__style-minimal').length
   ) {
     return;

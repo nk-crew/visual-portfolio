@@ -29,8 +29,8 @@ export default {
             imgThumbnailUrl: img.attributes.url,
             title: img.attributes.caption,
             url:
-              ('custom' === img.attributes.linkDestination ||
-                'attachment' === img.attributes.linkDestination) &&
+              (img.attributes.linkDestination === 'custom' ||
+                img.attributes.linkDestination === 'attachment') &&
               img.attributes.href
                 ? img.attributes.href
                 : '',
@@ -51,7 +51,7 @@ export default {
           layout: 'masonry',
           items_style_fly__align: 'bottom-center',
           masonry_columns: parseInt(attributes.columns, 10) || 3,
-          items_click_action: 'none' === attributes.linkTo && !isNewGallery ? 'false' : 'url',
+          items_click_action: attributes.linkTo === 'none' && !isNewGallery ? 'false' : 'url',
           images,
           className,
         });
@@ -85,13 +85,13 @@ export default {
           posts_taxonomies: categories ? [categories] : false,
           items_count: postsToShow,
           layout: 'grid',
-          grid_columns: 'grid' === postLayout ? columns : 1,
+          grid_columns: postLayout === 'grid' ? columns : 1,
           items_style: 'default',
           items_style_default__show_categories: false,
           items_style_default__show_date: displayPostDate ? 'true' : 'false',
           items_style_default__show_excerpt: displayPostContent,
           items_style_default__excerpt_words_count:
-            'full_post' === displayPostContentRadio ? 100 : excerptLength,
+            displayPostContentRadio === 'full_post' ? 100 : excerptLength,
           items_style_default__align: 'left',
           items_style_default__show_read_more: displayPostContent ? 'true' : 'false',
           className,

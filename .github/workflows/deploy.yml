@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
 
       - name: Set Cache Directories
         run: |
@@ -36,8 +36,8 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      - name: Install NPM and Composer Dependencies
-        run: npm install
+      - name: Setup Node.js and install dependencies
+        uses: ./.github/setup-node
 
       - name: Run Production Task
         run: npm run production

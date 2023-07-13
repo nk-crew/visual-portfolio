@@ -5,19 +5,17 @@
  * @package Visual Portfolio
  */
 
-use \WP_Mock\Tools\TestCase;
-
 /**
  * Sample test case.
  */
-class SampleTest extends TestCase {
+class SampleTest extends WP_UnitTestCase {
     /**
      * Set up our mocked WP functions. Rather than setting up a database we can mock the returns of core WordPress functions.
      *
      * @return void
      */
-    public function setUp(): void {
-        \WP_Mock::setUp();
+    public function set_up() {
+        parent::set_up();
     }
 
     /**
@@ -25,8 +23,8 @@ class SampleTest extends TestCase {
      *
      * @return void
      */
-    public function tearDown(): void {
-        \WP_Mock::tearDown();
+    public function tear_down() {
+		parent::tear_down();
     }
 
     /**

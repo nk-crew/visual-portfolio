@@ -46,11 +46,11 @@ function RenderTitleAndDescriptionImageControls(props) {
     // no default
   }
 
-  const ThisControl = 'title' === name ? TextControl : TextareaControl;
+  const ThisControl = name === 'title' ? TextControl : TextareaControl;
 
   return (
     <ThisControl
-      className={`vpf-control-wrap vpf-control-wrap-${'title' === name ? 'text' : 'textarea'}`}
+      className={`vpf-control-wrap vpf-control-wrap-${name === 'title' ? 'text' : 'textarea'}`}
       key={`${img.id || img.imgThumbnailUrl || img.imgUrl}-${index}-${name}`}
       label={data.label}
       value={text}
@@ -69,12 +69,12 @@ addFilter(
     const { name, index } = controlData;
 
     if (
-      ('title' === name &&
+      (name === 'title' &&
         attributes.images_titles_source &&
-        'custom' !== attributes.images_titles_source) ||
-      ('description' === name &&
+        attributes.images_titles_source !== 'custom') ||
+      (name === 'description' &&
         attributes.images_descriptions_source &&
-        'custom' !== attributes.images_descriptions_source)
+        attributes.images_descriptions_source !== 'custom')
     ) {
       control = (
         <RenderTitleAndDescriptionImageControls

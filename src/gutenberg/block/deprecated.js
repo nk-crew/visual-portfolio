@@ -87,7 +87,7 @@ export default [
       });
 
       V2_23_0_BORDER_RADIUS.forEach((k) => {
-        if ('number' === typeof newAttributes[k]) {
+        if (typeof newAttributes[k] === 'number') {
           newAttributes[k] = `${newAttributes[k]}px`;
         }
       });
@@ -105,7 +105,7 @@ export default [
       });
 
       V2_23_0_BORDER_RADIUS.forEach((k) => {
-        if (!eligible && 'number' === typeof attrs[k]) {
+        if (!eligible && typeof attrs[k] === 'number') {
           eligible = true;
         }
       });

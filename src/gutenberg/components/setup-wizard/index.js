@@ -24,19 +24,19 @@ function renderControls(props, category) {
 
 function hasLayoutElement(element, attributes) {
   const { layout_elements: layoutElements } = attributes;
-  const checkIn = 'filter' === element ? 'top' : 'bottom';
+  const checkIn = element === 'filter' ? 'top' : 'bottom';
 
   return (
-    'undefined' !== typeof layoutElements[checkIn] &&
+    typeof layoutElements[checkIn] !== 'undefined' &&
     layoutElements[checkIn]?.elements.includes(element)
   );
 }
 
 function toggleLayoutElement(element, attributes) {
   const { layout_elements: layoutElements } = attributes;
-  const checkIn = 'filter' === element ? 'top' : 'bottom';
+  const checkIn = element === 'filter' ? 'top' : 'bottom';
 
-  if ('undefined' === typeof layoutElements[checkIn] || !layoutElements[checkIn]?.elements) {
+  if (typeof layoutElements[checkIn] === 'undefined' || !layoutElements[checkIn]?.elements) {
     return layoutElements;
   }
 
@@ -92,7 +92,7 @@ export default function SetupWizard(props) {
             };
 
             // Add infinite scroll to the gallery when user adds a lot of images.
-            if ('slider' !== layout && images.length > NOTICE_LIMIT) {
+            if (layout !== 'slider' && images.length > NOTICE_LIMIT) {
               newAttributes = {
                 ...newAttributes,
                 items_count: NOTICE_LIMIT,
@@ -143,9 +143,9 @@ export default function SetupWizard(props) {
       newAttributes = {
         ...newAttributes,
         items_click_action_popup_title_source:
-          'post-based' === contentSource ? 'title' : 'item_title',
+          contentSource === 'post-based' ? 'title' : 'item_title',
         items_click_action_popup_description_source:
-          'post-based' === contentSource ? 'description' : 'item_description',
+          contentSource === 'post-based' ? 'description' : 'item_description',
         items_click_action_popup_deep_link_pid: 'filename',
       };
 
@@ -219,10 +219,10 @@ export default function SetupWizard(props) {
             <div>
               <ToggleControl
                 label={__('Popup Gallery', '@@text_domain')}
-                checked={'popup_gallery' === clickAction}
+                checked={clickAction === 'popup_gallery'}
                 onChange={() => {
                   setAttributes({
-                    items_click_action: 'popup_gallery' === clickAction ? 'url' : 'popup_gallery',
+                    items_click_action: clickAction === 'popup_gallery' ? 'url' : 'popup_gallery',
                   });
                 }}
               />
@@ -240,7 +240,7 @@ export default function SetupWizard(props) {
                 isLink
                 onClick={() => {
                   // Skip Setup
-                  if (0 === step) {
+                  if (step === 0) {
                     setAttributes({
                       setup_wizard: '',
                       content_source: attributes.contentSource || 'images',
@@ -252,7 +252,7 @@ export default function SetupWizard(props) {
                   }
                 }}
               >
-                {0 === step
+                {step === 0
                   ? __('Skip Setup', '@@text_domain')
                   : __('Previous Step', '@@text_domain')}
               </Button>
@@ -265,7 +265,7 @@ export default function SetupWizard(props) {
                 isPrimary
                 disabled={!allowNextStep}
                 onClick={() => {
-                  if (2 === step) {
+                  if (step === 2) {
                     setAttributes({ setup_wizard: '' });
                   } else {
                     setStep(step + 1);

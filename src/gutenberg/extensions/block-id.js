@@ -37,7 +37,7 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
       const { attributes, clientId } = this.props;
 
       // fix duplicated classes after block clone.
-      if (clientId && attributes.block_id && 'undefined' === typeof usedIds[attributes.block_id]) {
+      if (clientId && attributes.block_id && typeof usedIds[attributes.block_id] === 'undefined') {
         usedIds[attributes.block_id] = clientId;
       }
 
@@ -53,7 +53,7 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
     }
 
     maybeCreateBlockId() {
-      if ('visual-portfolio/block' !== this.props.blockName) {
+      if (this.props.blockName !== 'visual-portfolio/block') {
         return;
       }
 
@@ -68,15 +68,15 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
         let tryCount = 10;
         while (
           !newBlockId ||
-          ('undefined' !== typeof usedIds[newBlockId] &&
+          (typeof usedIds[newBlockId] !== 'undefined' &&
             usedIds[newBlockId] !== clientId &&
-            0 < tryCount)
+            tryCount > 0)
         ) {
           newBlockId = shorthash.unique(clientId);
           tryCount -= 1;
         }
 
-        if (newBlockId && 'undefined' === typeof usedIds[newBlockId]) {
+        if (newBlockId && typeof usedIds[newBlockId] === 'undefined') {
           usedIds[newBlockId] = clientId;
         }
 

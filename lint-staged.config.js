@@ -14,7 +14,7 @@ function excludeVendor(lint) {
 }
 
 module.exports = {
-  'src/**/*.php': excludeVendor('composer run-script phpcs'),
+  'src/**/*.php': excludeVendor('composer run-script lint'),
   'src/**/*.css': excludeVendor('stylelint'),
   'src/**/*.scss': excludeVendor('stylelint --custom-syntax postcss-scss'),
   'src/**/*.js': excludeVendor('eslint'),

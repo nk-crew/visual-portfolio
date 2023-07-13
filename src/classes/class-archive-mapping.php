@@ -204,7 +204,7 @@ class Visual_Portfolio_Archive_Mapping {
                     if ( is_array( $taxonomies ) && 'portfolio_category' === $taxonomies[0] ) {
                         $category_slug = $taxonomies[1];
                         $base_page     = $this->get_relative_archive_link();
-                        $base_page     = '' === $base_page ? '/?' : '/' . $base_page . '?';
+                        $base_page     = ( '' === $base_page || '/' ) ? '/?' : '/' . $base_page . '?';
                         $arr['url']    = str_replace( $base_page, '/' . $this->permalinks['category_base'] . '/' . $category_slug . '/?', $arr['url'] );
                     }
                 }

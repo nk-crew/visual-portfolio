@@ -13,5 +13,9 @@ indent_style = space
 [*.php]
 indent_size = 4
 
+[*.yml]
+indent_style = space
+indent_size = 2
+
 [*.md]
 trim_trailing_whitespace = false

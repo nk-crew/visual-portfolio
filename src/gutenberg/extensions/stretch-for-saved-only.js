@@ -8,7 +8,7 @@ addFilter(
   'vpf.editor.controls-render-data',
   'vpf/editor/controls-render-data/customize-controls',
   (data) => {
-    if ('stretch' === data.name && !window.VPSavedLayoutVariables) {
+    if (data.name === 'stretch' && !window.VPSavedLayoutVariables) {
       data = {
         ...data,
         skip: true,

@@ -8,7 +8,7 @@ const { screenSizes } = window.VPData;
 
 // Init Options.
 $(document).on('initOptions.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -24,11 +24,11 @@ $(document).on('initOptions.vpf', (event, self) => {
 
 // Init Layout.
 $(document).on('initLayout.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
-  if ('masonry' !== self.options.layout) {
+  if (self.options.layout !== 'masonry') {
     return;
   }
 
@@ -41,8 +41,8 @@ $(document).on('initLayout.vpf', (event, self) => {
   let count = self.options.masonryColumns - 1;
   let currentPoint = Math.min(screenSizes.length - 1, count);
 
-  for (; 0 <= currentPoint; currentPoint -= 1) {
-    if (0 < count && 'undefined' !== typeof screenSizes[currentPoint]) {
+  for (; currentPoint >= 0; currentPoint -= 1) {
+    if (count > 0 && typeof screenSizes[currentPoint] !== 'undefined') {
       self.addStyle(
         '.vp-portfolio__item-wrap',
         {

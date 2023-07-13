@@ -62,7 +62,7 @@ function stepsWizard(props) {
     };
   }, [$ref.current]);
 
-  return 'undefined' !== typeof children[newStep] ? (
+  return typeof children[newStep] !== 'undefined' ? (
     <div
       ref={$ref}
       className={classnames(

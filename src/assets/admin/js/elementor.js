@@ -66,7 +66,7 @@ $wnd.on('elementor/frontend/init', ($data) => {
         },
         onMessage({ message }) {
           // select current block on click message.
-          if ('clicked' === message) {
+          if (message === 'clicked') {
             // Select current widget to display settings.
             $frame.closest('.elementor-element').find('.elementor-editor-element-edit').click();
 

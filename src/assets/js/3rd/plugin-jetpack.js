@@ -15,7 +15,7 @@ try {
 
 // Fix AJAX loaded images.
 $(document).on('loadedNewItems.vpf', function (event) {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 

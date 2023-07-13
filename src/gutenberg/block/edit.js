@@ -26,7 +26,7 @@ function renderControls(props) {
   let { content_source: contentSource } = attributes;
 
   // Saved layouts by default displaying Portfolio source.
-  if ('portfolio' === contentSource) {
+  if (contentSource === 'portfolio') {
     contentSource = '';
   }
 
@@ -38,7 +38,7 @@ function renderControls(props) {
       {contentSource ? (
         <>
           {Object.keys(registeredControlsCategories).map((name) => {
-            if ('content-source' === name) {
+            if (name === 'content-source') {
               return null;
             }
 
@@ -82,7 +82,7 @@ export default function BlockEdit(props) {
   }
 
   // Display block preview.
-  if ('true' === previewExample) {
+  if (previewExample === 'true') {
     return (
       <div className="vpf-example-preview">
         <img
@@ -99,7 +99,7 @@ export default function BlockEdit(props) {
 
   return (
     <div {...blockProps}>
-      {'true' === setupWizard ? (
+      {setupWizard === 'true' ? (
         <SetupWizard {...props} />
       ) : (
         <>

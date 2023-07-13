@@ -11,7 +11,7 @@ const { screenSizes } = window.VPData;
 //
 // * fixes grid items position in FireFox - https://wordpress.org/support/topic/gallery-difference-between-firefox-and-all-other-browsers/
 //
-if ('undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isotope.LayoutMode) {
+if (typeof window.Isotope !== 'undefined' && typeof window.Isotope.LayoutMode !== 'undefined') {
   const VPRows = window.Isotope.LayoutMode.create('vpRows');
   const proto = VPRows.prototype;
 
@@ -43,7 +43,7 @@ if ('undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isoto
     const excess = this.columnWidth - (containerWidth % this.columnWidth);
 
     // if overshoot is less than a pixel, round up, otherwise floor it
-    const mathMethod = excess && 1 > excess ? 'round' : 'floor';
+    const mathMethod = excess && excess < 1 ? 'round' : 'floor';
 
     cols = Math[mathMethod](cols);
     this.cols = Math.max(cols, 1);
@@ -76,14 +76,14 @@ if ('undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isoto
 
     // how many columns does this brick span
     const remainder = item.size.outerWidth % this.columnWidth;
-    const mathMethod = remainder && 1 > remainder ? 'round' : 'ceil';
+    const mathMethod = remainder && remainder < 1 ? 'round' : 'ceil';
 
     // round if off by 1 pixel, otherwise use ceil
     let colSpan = Math[mathMethod](item.size.outerWidth / this.columnWidth);
     colSpan = Math.min(colSpan, this.cols);
 
     let col = this.horizontalColIndex % this.cols;
-    const isOver = 1 < colSpan && col + colSpan > this.cols;
+    const isOver = colSpan > 1 && col + colSpan > this.cols;
 
     // shift to next row if item can't fit on current row
     col = isOver ? 0 : col;
@@ -95,7 +95,7 @@ if ('undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isoto
     const itemWidth = item.size.outerWidth + this.gutter;
 
     // if this element cannot fit in the current row
-    if (0 !== this.x && 1 === this.horizontalColIndex) {
+    if (this.x !== 0 && this.horizontalColIndex === 1) {
       this.x = 0;
       this.y = this.maxY;
     }
@@ -118,7 +118,7 @@ if ('undefined' !== typeof window.Isotope && 'undefined' !== typeof window.Isoto
 
 // Init Options.
 $(document).on('initOptions.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -134,11 +134,11 @@ $(document).on('initOptions.vpf', (event, self) => {
 
 // Init Layout.
 $(document).on('initLayout.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
-  if ('grid' !== self.options.layout) {
+  if (self.options.layout !== 'grid') {
     return;
   }
 
@@ -151,8 +151,8 @@ $(document).on('initLayout.vpf', (event, self) => {
   let count = self.options.gridColumns - 1;
   let currentPoint = Math.min(screenSizes.length - 1, count);
 
-  for (; 0 <= currentPoint; currentPoint -= 1) {
-    if (0 < count && 'undefined' !== typeof screenSizes[currentPoint]) {
+  for (; currentPoint >= 0; currentPoint -= 1) {
+    if (count > 0 && typeof screenSizes[currentPoint] !== 'undefined') {
       self.addStyle(
         '.vp-portfolio__item-wrap',
         {
@@ -167,11 +167,11 @@ $(document).on('initLayout.vpf', (event, self) => {
 
 // Change Isotope Layout Mode.
 $(document).on('beforeInitIsotope.vpf', (event, self, initOptions) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
-  if ('grid' !== self.options.layout) {
+  if (self.options.layout !== 'grid') {
     return;
   }
 

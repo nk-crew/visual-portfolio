@@ -24,7 +24,7 @@
     calculateSize(element, width) {
       const CSS = getCSS(element);
 
-      if (CSS && CSS.objectFit && 'cover' === CSS.objectFit) {
+      if (CSS && CSS.objectFit && CSS.objectFit === 'cover') {
         const blockHeight = parseInt(element.getAttribute('height'), 10);
         const blockWidth = parseInt(element.getAttribute('width'), 10);
 

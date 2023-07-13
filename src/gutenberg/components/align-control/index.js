@@ -15,7 +15,7 @@ export default function AlignControl(props) {
   const { options, value, onChange } = props;
 
   let controlsArray = ['left', 'center', 'right'];
-  if ('box' === options) {
+  if (options === 'box') {
     controlsArray = [
       'top-left',
       'top-center',

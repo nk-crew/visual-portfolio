@@ -54,7 +54,7 @@ class VpVideoComponent extends Component {
 
     const { getMeta, postFormat } = this.props;
 
-    if ('video' !== postFormat) {
+    if (postFormat !== 'video') {
       return;
     }
 
@@ -92,7 +92,7 @@ class VpVideoComponent extends Component {
           oembedHTML: '',
         };
 
-        if (json && 'undefined' !== typeof json.html) {
+        if (json && typeof json.html !== 'undefined') {
           newState.oembedHTML = json.html;
         }
         this.setState(newState);
@@ -107,7 +107,7 @@ class VpVideoComponent extends Component {
 
     const { oembedHTML } = this.state;
 
-    if ('video' !== postFormat) {
+    if (postFormat !== 'video') {
       return null;
     }
 

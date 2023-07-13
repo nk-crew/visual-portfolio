@@ -10,10 +10,10 @@ const allowScrollbar = !/Mac|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|
   navigator.userAgent
 );
 
-if (allowScrollbar && 'undefined' !== typeof SimpleBar) {
+if (allowScrollbar && typeof SimpleBar !== 'undefined') {
   // Extend VP class.
   $doc.on('extendClass.vpf', (event, VP) => {
-    if ('vpf' !== event.namespace) {
+    if (event.namespace !== 'vpf') {
       return;
     }
 
@@ -59,7 +59,7 @@ if (allowScrollbar && 'undefined' !== typeof SimpleBar) {
 
   // Add Items.
   $doc.on('addItems.vpf', (event, self, $items, removeExisting) => {
-    if ('vpf' !== event.namespace) {
+    if (event.namespace !== 'vpf') {
       return;
     }
 
@@ -72,7 +72,7 @@ if (allowScrollbar && 'undefined' !== typeof SimpleBar) {
 
   // Init.
   $doc.on('init.vpf', (event, self) => {
-    if ('vpf' !== event.namespace) {
+    if (event.namespace !== 'vpf') {
       return;
     }
 
@@ -81,7 +81,7 @@ if (allowScrollbar && 'undefined' !== typeof SimpleBar) {
 
   // Destroy.
   $doc.on('destroy.vpf', (event, self) => {
-    if ('vpf' !== event.namespace) {
+    if (event.namespace !== 'vpf') {
       return;
     }
 
@@ -90,11 +90,11 @@ if (allowScrollbar && 'undefined' !== typeof SimpleBar) {
 
   // Init Swiper duplicated slides scrollbars.
   $doc.on('initSwiper.vpf', (event, self) => {
-    if ('vpf' !== event.namespace) {
+    if (event.namespace !== 'vpf') {
       return;
     }
 
-    if ('true' === self.options.sliderLoop) {
+    if (self.options.sliderLoop === 'true') {
       self.initCustomScrollbar();
     }
   });

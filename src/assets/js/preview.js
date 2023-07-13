@@ -37,7 +37,7 @@ document.addEventListener(
 
 // add dynamic data to AJAX calls.
 $doc.on('startLoadingNewItems.vpf', (event, vpObject, url, ajaxData) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 

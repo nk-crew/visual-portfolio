@@ -5,7 +5,7 @@ const $ = window.jQuery;
 
 // Init Options.
 $(document).on('initOptions.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 

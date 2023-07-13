@@ -36,7 +36,7 @@ export default class TilesSelector extends Component {
     let styles = '';
 
     // remove last empty item
-    if ('undefined' !== typeof settings[settings.length - 1] && !settings[settings.length - 1]) {
+    if (typeof settings[settings.length - 1] !== 'undefined' && !settings[settings.length - 1]) {
       settings.pop();
     }
 
@@ -55,11 +55,11 @@ export default class TilesSelector extends Component {
         const h = parseFloat(size[1]) || 1;
 
         let itemSelector = '.vpf-tiles-preview-item-wrap';
-        if (1 < settings.length) {
+        if (settings.length > 1) {
           itemSelector += `:nth-of-type(${settings.length}n+${k + 1})`;
         }
 
-        if (w && 1 !== w) {
+        if (w && w !== 1) {
           styles += `${selector} ${itemSelector} { width: ${(w * 100) / columns}%; }`;
         }
         styles += `${selector} ${itemSelector} .vpf-tiles-preview-item::after { padding-top: ${

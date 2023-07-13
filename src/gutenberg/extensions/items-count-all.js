@@ -46,7 +46,7 @@ const maybeUpdateNoticeStateMeta = debounce(3000, (postId) => {
 });
 
 function updateNoticeState(postId) {
-  const newState = 'hide' === getNoticeState() ? 'show' : 'hide';
+  const newState = getNoticeState() === 'hide' ? 'show' : 'hide';
 
   VPGutenbergVariables.items_count_notice = newState;
 
@@ -106,12 +106,12 @@ function shouldDisplayNotice(count, attributes) {
   let display = false;
 
   // When selected images number is lower, then needed, don't display notice, even is count is large.
-  if ('images' === attributes.content_source) {
+  if (attributes.content_source === 'images') {
     display =
       attributes?.images?.length > DISPLAY_NOTICE_AFTER &&
-      (count > DISPLAY_NOTICE_AFTER || -1 === count);
+      (count > DISPLAY_NOTICE_AFTER || count === -1);
   } else {
-    display = count > DISPLAY_NOTICE_AFTER || -1 === count;
+    display = count > DISPLAY_NOTICE_AFTER || count === -1;
   }
 
   return display;
@@ -138,7 +138,7 @@ function ItemsCountControl({ data }) {
       label={
         <>
           {data.label}
-          {'hide' === getNoticeState() && shouldDisplayNotice(controlVal, attributes) ? (
+          {getNoticeState() === 'hide' && shouldDisplayNotice(controlVal, attributes) ? (
             <Button
               onClick={() => {
                 updateNoticeState(postId);
@@ -175,10 +175,10 @@ function ItemsCountControl({ data }) {
         <ButtonGroup>
           <Button
             isSmall
-            isPrimary={-1 !== controlVal}
-            isPressed={-1 !== controlVal}
+            isPrimary={controlVal !== -1}
+            isPressed={controlVal !== -1}
             onClick={() => {
-              if (-1 === controlVal) {
+              if (controlVal === -1) {
                 onChange(parseFloat(data.default || 6));
               }
             }}
@@ -187,11 +187,11 @@ function ItemsCountControl({ data }) {
           </Button>
           <Button
             isSmall
-            isPrimary={-1 === controlVal}
-            isPressed={-1 === controlVal}
+            isPrimary={controlVal === -1}
+            isPressed={controlVal === -1}
             onClick={() => {
               if (
-                -1 !== controlVal &&
+                controlVal !== -1 &&
                 // eslint-disable-next-line no-alert
                 window.confirm(
                   __(
@@ -208,7 +208,7 @@ function ItemsCountControl({ data }) {
           </Button>
         </ButtonGroup>
       </div>
-      {-1 !== controlVal ? (
+      {controlVal !== -1 ? (
         <>
           <br />
           <TextControl
@@ -221,7 +221,7 @@ function ItemsCountControl({ data }) {
           />
         </>
       ) : null}
-      {'show' === getNoticeState() && shouldDisplayNotice(controlVal, attributes) ? (
+      {getNoticeState() === 'show' && shouldDisplayNotice(controlVal, attributes) ? (
         <div>
           <CountNotice
             postId={postId}
@@ -240,7 +240,7 @@ addFilter(
   'vpf.editor.controls-render',
   'vpf/editor/controls-render/customize-controls',
   (render, data) => {
-    if ('items_count' !== data.name) {
+    if (data.name !== 'items_count') {
       return render;
     }
 

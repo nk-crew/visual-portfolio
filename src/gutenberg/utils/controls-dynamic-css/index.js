@@ -28,24 +28,24 @@ const { controls: registeredControls } = window.VPGutenbergVariables;
 export function prepareStylesFromParams(selector, value, params) {
   if (
     !selector ||
-    'undefined' === typeof value ||
-    '' === value ||
-    null === value ||
-    'undefined' === typeof params.property
+    typeof value === 'undefined' ||
+    value === '' ||
+    value === null ||
+    typeof params.property === 'undefined'
   ) {
     return false;
   }
 
   // Value mask.
-  if ('undefined' !== typeof params.mask) {
+  if (typeof params.mask !== 'undefined') {
     value = params.mask.replace('$', value);
   }
 
   // Custom selector mask.
-  if ('undefined' !== typeof params.element && /\$/g.test(params.element)) {
+  if (typeof params.element !== 'undefined' && /\$/g.test(params.element)) {
     selector = params.element.replace('$', selector);
   } else {
-    selector += 'undefined' !== typeof params.element ? ` ${params.element}` : '';
+    selector += typeof params.element !== 'undefined' ? ` ${params.element}` : '';
   }
 
   return {
@@ -64,8 +64,8 @@ export function prepareStylesFromParams(selector, value, params) {
  */
 export function hasDynamicCSS(controlName) {
   return (
-    'undefined' !== typeof registeredControls[controlName] &&
-    'undefined' !== typeof registeredControls[controlName].style &&
+    typeof registeredControls[controlName] !== 'undefined' &&
+    typeof registeredControls[controlName].style !== 'undefined' &&
     registeredControls[controlName].style.length
   );
 }
@@ -81,9 +81,9 @@ export default function getDynamicCSS(options) {
   let result = '';
   let selector = '';
 
-  if ('undefined' !== typeof options.block_id && options.block_id) {
+  if (typeof options.block_id !== 'undefined' && options.block_id) {
     selector = options.block_id;
-  } else if ('undefined' !== typeof options.id && options.id) {
+  } else if (typeof options.id !== 'undefined' && options.id) {
     selector = options.id;
   }
   if (!selector) {
@@ -96,10 +96,10 @@ export default function getDynamicCSS(options) {
   // Controls styles.
   Object.keys(registeredControls).forEach((k) => {
     const control = registeredControls[k];
-    let allow = 'undefined' !== typeof control.style && control.style;
+    let allow = typeof control.style !== 'undefined' && control.style;
 
     // Check condition.
-    if (allow && 'undefined' !== typeof control.condition && control.condition.length) {
+    if (allow && typeof control.condition !== 'undefined' && control.condition.length) {
       allow = conditionCheck(control.condition, options);
     }
 
@@ -117,7 +117,7 @@ export default function getDynamicCSS(options) {
         );
 
         // Prepare Aspect Ratio control value.
-        if (control.type && 'aspect_ratio' === control.type && val) {
+        if (control.type && control.type === 'aspect_ratio' && val) {
           const ratioArray = val.split(':');
 
           if (ratioArray[0] && ratioArray[1]) {
@@ -155,7 +155,7 @@ export default function getDynamicCSS(options) {
   });
 
   // Custom CSS.
-  if ('undefined' !== typeof options.custom_css && options.custom_css) {
+  if (typeof options.custom_css !== 'undefined' && options.custom_css) {
     let customCss = options.custom_css;
 
     // Decode.

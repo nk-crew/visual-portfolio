@@ -11,7 +11,7 @@ addFilter(
   'vpf/editor/controls-on-change/classic-icon-with-overlay',
   (newAttributes, control, val, attributes) => {
     if (
-      'items_style_default__show_icon' === control.name &&
+      control.name === 'items_style_default__show_icon' &&
       val &&
       !attributes.items_style_default__bg_color
     ) {

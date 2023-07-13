@@ -10,7 +10,7 @@ const { __, settingsPopupGallery } = VPData;
 const $doc = $(document);
 const $window = $(window);
 
-if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
+if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
   let fancyboxInstance;
 
   // Extend Popup API.
@@ -20,7 +20,7 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
 
     // prepare items for fancybox api.
     items.forEach((item) => {
-      if ('embed' === item.type && item.src) {
+      if (item.type === 'embed' && item.src) {
         finalItems.push({
           type: 'iframe',
           src: item.src,
@@ -30,7 +30,7 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
             caption: item.caption,
           },
         });
-      } else if ('embed' === item.type && item.embed) {
+      } else if (item.type === 'embed' && item.embed) {
         finalItems.push({
           type: 'html',
           src: item.embed,
@@ -121,7 +121,7 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
 
       // Clicked on the content
       clickContent(current) {
-        return 'image' === current.type && settingsPopupGallery.click_to_zoom ? 'zoom' : false;
+        return current.type === 'image' && settingsPopupGallery.click_to_zoom ? 'zoom' : false;
       },
 
       lang: 'wordpress',
@@ -172,7 +172,7 @@ if ('undefined' !== typeof $.fancybox && VPPopupAPI) {
 
     // Disable Loop if only 1 item in gallery.
     // We need this because Fancybox still let us scroll gallery using keyboard.
-    if (1 === items.length) {
+    if (items.length === 1) {
       options.loop = false;
     }
 

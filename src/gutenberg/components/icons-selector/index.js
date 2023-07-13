@@ -115,7 +115,7 @@ export default class IconsSelector extends Component {
 
     const { options, ajaxStatus, collapsed } = this.state;
 
-    const isLoading = ajaxStatus && 'progress' === ajaxStatus;
+    const isLoading = ajaxStatus && ajaxStatus === 'progress';
 
     if (isLoading) {
       return (
@@ -130,7 +130,7 @@ export default class IconsSelector extends Component {
 
     const itemsPerRow = isSetupWizard ? 5 : 3;
     const allowedItems = collapseRows * itemsPerRow;
-    const allowCollapsing = false !== collapseRows && optionsArray.length > allowedItems;
+    const allowCollapsing = collapseRows !== false && optionsArray.length > allowedItems;
     const visibleCollapsedItems = allowedItems - 1;
 
     // Move the selected option to the end of collapsed list

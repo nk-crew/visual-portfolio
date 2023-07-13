@@ -15,17 +15,17 @@ function getSwiperVersion(Swiper) {
   let ver = 8;
 
   // in version 8 added new parameter `maxBackfaceHiddenSlides`.
-  if ('undefined' === typeof Swiper.defaults.maxBackfaceHiddenSlides) {
+  if (typeof Swiper.defaults.maxBackfaceHiddenSlides === 'undefined') {
     ver = 7;
   }
 
   // in version 7 added new parameter `rewind`.
-  if ('undefined' === typeof Swiper.defaults.rewind) {
+  if (typeof Swiper.defaults.rewind === 'undefined') {
     ver = 6;
   }
 
   // in version 6 added new parameter `loopPreventsSlide`.
-  if ('undefined' === typeof Swiper.defaults.loopPreventsSlide) {
+  if (typeof Swiper.defaults.loopPreventsSlide === 'undefined') {
     ver = 5;
   }
 
@@ -34,7 +34,7 @@ function getSwiperVersion(Swiper) {
 
 // Extend VP class.
 $doc.on('extendClass.vpf', (event, VP) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -46,7 +46,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
   VP.prototype.initSwiper = function (options = false) {
     const self = this;
 
-    if ('slider' === self.options.layout && 'undefined' !== typeof window.Swiper) {
+    if (self.options.layout === 'slider' && typeof window.Swiper !== 'undefined') {
       const $parent = self.$items_wrap.parent();
 
       $parent.addClass('swiper');
@@ -57,7 +57,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
       let slidesPerView = self.options.sliderSlidesPerView || 3;
       const breakPoints = {};
 
-      if ('fade' === self.options.sliderEffect) {
+      if (self.options.sliderEffect === 'fade') {
         slidesPerView = 1;
       }
 
@@ -65,8 +65,8 @@ $doc.on('extendClass.vpf', (event, VP) => {
         let count = slidesPerView;
         let currentPoint = Math.min(screenSizes.length - 1, count - 1);
 
-        for (; 0 <= currentPoint; currentPoint -= 1) {
-          if (0 < count && 'undefined' !== typeof screenSizes[currentPoint]) {
+        for (; currentPoint >= 0; currentPoint -= 1) {
+          if (count > 0 && typeof screenSizes[currentPoint] !== 'undefined') {
             breakPoints[screenSizes[currentPoint] + 1] = {
               slidesPerView: count,
             };
@@ -81,42 +81,42 @@ $doc.on('extendClass.vpf', (event, VP) => {
       let $thumbsParent = false;
       options = options || {
         speed: (parseFloat(self.options.sliderSpeed) || 0) * 1000,
-        autoHeight: 'auto' === self.options.sliderItemsHeight,
+        autoHeight: self.options.sliderItemsHeight === 'auto',
         effect: self.options.sliderEffect || 'slide',
         // fix fade items collapse (mostly in Default items style).
         fadeEffect: {
           crossFade: true,
         },
         spaceBetween: parseFloat(self.options.itemsGap) || 0,
-        centeredSlides: 'true' === self.options.sliderCenteredSlides,
+        centeredSlides: self.options.sliderCenteredSlides === 'true',
         freeMode: {
-          enabled: 'true' === self.options.sliderFreeMode,
-          sticky: 'true' === self.options.sliderFreeModeSticky,
+          enabled: self.options.sliderFreeMode === 'true',
+          sticky: self.options.sliderFreeModeSticky === 'true',
         },
-        loop: 'true' === self.options.sliderLoop,
+        loop: self.options.sliderLoop === 'true',
         // This feature is cool, but not working properly when loop enabled
         // and fast clicking on previous button is not working properly
         // https://github.com/nolimits4web/swiper/issues/5945
         // loopPreventsSlide: false,
-        autoplay: 0 < parseFloat(self.options.sliderAutoplay) && {
+        autoplay: parseFloat(self.options.sliderAutoplay) > 0 && {
           delay: parseFloat(self.options.sliderAutoplay) * 1000,
           disableOnInteraction: false,
         },
-        navigation: 'true' === self.options.sliderArrows && {
+        navigation: self.options.sliderArrows === 'true' && {
           nextEl: '.vp-portfolio__items-arrow-next',
           prevEl: '.vp-portfolio__items-arrow-prev',
         },
-        pagination: 'true' === self.options.sliderBullets && {
+        pagination: self.options.sliderBullets === 'true' && {
           el: '.vp-portfolio__items-bullets',
           clickable: true,
-          dynamicBullets: 'true' === self.options.sliderBulletsDynamic,
+          dynamicBullets: self.options.sliderBulletsDynamic === 'true',
           renderBullet(index, className) {
             return `<span class="${className}" data-bullet-index="${index}" data-bullet-number="${
               index + 1
             }"></span>`;
           },
         },
-        mousewheel: 'true' === self.options.sliderMousewheel,
+        mousewheel: self.options.sliderMousewheel === 'true',
         slidesPerView,
         breakpoints: breakPoints,
         keyboard: true,
@@ -129,18 +129,18 @@ $doc.on('extendClass.vpf', (event, VP) => {
 
       // fix first load slide position (seems like a conflict with lazySizes)
       // issue: https://github.com/nk-crew/visual-portfolio/issues/54
-      if (0 === options.speed) {
+      if (options.speed === 0) {
         options.speed = 1;
       }
       let positionFix = 0;
 
       options.on = {
         transitionEnd() {
-          if (0 === positionFix) {
+          if (positionFix === 0) {
             positionFix = 1;
             this.setTransition(1);
             this.setTranslate(this.translate + 0.1);
-          } else if (1 === positionFix) {
+          } else if (positionFix === 1) {
             positionFix = 2;
             this.slideReset();
           }
@@ -176,8 +176,8 @@ $doc.on('extendClass.vpf', (event, VP) => {
           let count = thumbnailsPerView;
           let currentPoint = Math.min(screenSizes.length - 1, count - 1);
 
-          for (; 0 <= currentPoint; currentPoint -= 1) {
-            if (0 < count && 'undefined' !== typeof screenSizes[currentPoint]) {
+          for (; currentPoint >= 0; currentPoint -= 1) {
+            if (count > 0 && typeof screenSizes[currentPoint] !== 'undefined') {
               thumbnailsBreakPoints[screenSizes[currentPoint] + 1] = {
                 slidesPerView: count,
               };
@@ -189,7 +189,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
         }
 
         optionsThumbs = {
-          autoHeight: 'auto' === self.options.sliderThumbnailsHeight,
+          autoHeight: self.options.sliderThumbnailsHeight === 'auto',
           effect: 'slide',
           spaceBetween: parseFloat(self.options.sliderThumbnailsGap) || 0,
           loop: false,
@@ -234,7 +234,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
         const isThumbsEnabled = optionsThumbs && $thumbsParent && $thumbsParent[0];
 
         // Since v7 used container class `swiper`, we should also add old `swiper-container` class.
-        if (7 > swiperVersion) {
+        if (swiperVersion < 7) {
           $parent.addClass('swiper-container');
 
           if (isThumbsEnabled) {
@@ -243,7 +243,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
         }
 
         // Since v7 freeMode options moved under `freeMode` object.
-        if (7 > swiperVersion) {
+        if (swiperVersion < 7) {
           options.freeModeSticky = options.freeMode.sticky;
           options.freeMode = options.freeMode.enabled;
 
@@ -254,7 +254,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
         }
 
         // Since v5 `breakpointsInverse` option is removed and it is now `true` by default, but in older versions it was `false`.
-        if (5 <= swiperVersion) {
+        if (swiperVersion >= 5) {
           options.breakpointsInverse = true;
 
           if (isThumbsEnabled) {
@@ -275,8 +275,8 @@ $doc.on('extendClass.vpf', (event, VP) => {
 
       // Autoplay Hover Pause.
       if (
-        'true' === self.options.sliderAutoplayHoverPause &&
-        0 < parseFloat(self.options.sliderAutoplay)
+        self.options.sliderAutoplayHoverPause === 'true' &&
+        parseFloat(self.options.sliderAutoplay) > 0
       ) {
         self.$item.on(`mouseenter.vpf-uid-${self.uid}`, '.swiper', () => {
           $parent[0].swiper.autoplay.stop();
@@ -341,7 +341,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
 
 // Add Items.
 $doc.on('addItems.vpf', (event, self, $items, removeExisting, $newVP) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -387,7 +387,7 @@ $doc.on('addItems.vpf', (event, self, $items, removeExisting, $newVP) => {
 
 // Init.
 $doc.on('init.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -396,7 +396,7 @@ $doc.on('init.vpf', (event, self) => {
 
 // Destroy.
 $doc.on('destroy.vpf', (event, self) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 

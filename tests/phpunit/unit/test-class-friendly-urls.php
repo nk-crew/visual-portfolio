@@ -5,12 +5,10 @@
  * @package Visual Portfolio
  */
 
-use \WP_Mock\Tools\TestCase;
-
 /**
  * Sample test case.
  */
-class ClassFriendlyUrls extends TestCase {
+class ClassFriendlyUrls extends WP_UnitTestCase {
     /**
      * Testing Visual_Portfolio_Archive_Mapping class.
      *
@@ -23,9 +21,9 @@ class ClassFriendlyUrls extends TestCase {
      *
      * @return void
      */
-    public function setUp(): void {
+    public function set_up() {
+		parent::set_up();
         $this->mapping_object = new Visual_Portfolio_Archive_Mapping();
-        \WP_Mock::setUp();
     }
 
     /**
@@ -33,8 +31,8 @@ class ClassFriendlyUrls extends TestCase {
      *
      * @return void
      */
-    public function tearDown(): void {
-        \WP_Mock::tearDown();
+    public function tear_down() {
+        parent::tear_down();
     }
 
     /**
@@ -44,7 +42,6 @@ class ClassFriendlyUrls extends TestCase {
      */
     public function get_predefined_options() {
         global $wp_query;
-        $wp_query             = new stdClass();
         $wp_query->query      = array(
             'vp_page_archive' => true,
         );

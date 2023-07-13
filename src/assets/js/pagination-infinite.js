@@ -9,7 +9,7 @@ const $wnd = $(window);
 
 // Init infinite scroll pagination.
 $(document).on('initEvents.vpf', (event, self) => {
-  if ('vpf' !== event.namespace || 'infinite' !== self.options.pagination) {
+  if (event.namespace !== 'vpf' || self.options.pagination !== 'infinite') {
     return;
   }
 
@@ -25,7 +25,7 @@ $(document).on('initEvents.vpf', (event, self) => {
 
     const rect = self.$item[0].getBoundingClientRect();
 
-    if (0 < rect.bottom && rect.bottom - scrollThreshold <= window.innerHeight) {
+    if (rect.bottom > 0 && rect.bottom - scrollThreshold <= window.innerHeight) {
       self.loadNewItems(self.options.nextPageUrl, false, () => {
         setTimeout(() => {
           visibilityCheckBusy = false;

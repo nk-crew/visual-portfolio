@@ -199,6 +199,7 @@ registerBlockType('visual-portfolio/saved-editor', {
       >
         <mask
           id="mask0"
+          // eslint-disable-next-line react/no-unknown-property
           mask-type="alpha"
           maskUnits="userSpaceOnUse"
           x="9"
@@ -293,7 +294,7 @@ class UpdateEditor extends Component {
       return;
     }
 
-    if ('text' === editorMode) {
+    if (editorMode === 'text') {
       switchEditorMode();
     }
   }
@@ -309,7 +310,7 @@ class UpdateEditor extends Component {
     const { resetBlocks, insertBlocks, blocks } = this.props;
 
     const isValidList =
-      1 === blocks.length && blocks[0] && 'visual-portfolio/saved-editor' === blocks[0].name;
+      blocks.length === 1 && blocks[0] && blocks[0].name === 'visual-portfolio/saved-editor';
 
     if (!isValidList) {
       this.blocksRestoreBusy = true;
@@ -326,7 +327,7 @@ class UpdateEditor extends Component {
     const { selectedBlock, blocks, selectBlock } = this.props;
 
     // if selected block, do nothing.
-    if (selectedBlock && 'visual-portfolio/saved-editor' === selectedBlock.name) {
+    if (selectedBlock && selectedBlock.name === 'visual-portfolio/saved-editor') {
       return;
     }
 
@@ -338,7 +339,7 @@ class UpdateEditor extends Component {
 
     let selectBlockId = '';
     blocks.forEach((blockData) => {
-      if ('visual-portfolio/saved-editor' === blockData.name) {
+      if (blockData.name === 'visual-portfolio/saved-editor') {
         selectBlockId = blockData.clientId;
       }
     });

@@ -17,7 +17,7 @@ const $wnd = $(window);
  * Emit Resize Event.
  */
 function windowResizeEmit() {
-  if ('function' === typeof window.Event) {
+  if (typeof window.Event === 'function') {
     // modern browsers
     window.dispatchEvent(new window.Event('resize'));
   } else {
@@ -60,10 +60,10 @@ function checkVisibility() {
 
       const currentState = visibilityData[vpf.uid] || 'none';
 
-      visibilityData[vpf.uid] = null === this.offsetParent ? 'hidden' : 'visible';
+      visibilityData[vpf.uid] = this.offsetParent === null ? 'hidden' : 'visible';
 
       // changed from hidden to visible.
-      if ('hidden' === currentState && 'visible' === visibilityData[vpf.uid]) {
+      if (currentState === 'hidden' && visibilityData[vpf.uid] === 'visible') {
         isVisibilityChanged = true;
       }
     });
@@ -82,7 +82,7 @@ function checkVisibility() {
 
 // run check function only after portfolio inited.
 $(document).on('inited.vpf', (event) => {
-  if ('vpf' !== event.namespace) {
+  if (event.namespace !== 'vpf') {
     return;
   }
 
@@ -336,13 +336,13 @@ class VP {
       self.stylesList = {};
     }
 
-    if ('undefined' === typeof self.stylesList[uid]) {
+    if (typeof self.stylesList[uid] === 'undefined') {
       self.stylesList[uid] = {};
     }
-    if ('undefined' === typeof self.stylesList[uid][media]) {
+    if (typeof self.stylesList[uid][media] === 'undefined') {
       self.stylesList[uid][media] = {};
     }
-    if ('undefined' === typeof self.stylesList[uid][media][selector]) {
+    if (typeof self.stylesList[uid][media][selector] === 'undefined') {
       self.stylesList[uid][media][selector] = {};
     }
 
@@ -368,14 +368,14 @@ class VP {
       self.stylesList = {};
     }
 
-    if ('undefined' !== typeof self.stylesList[uid] && !selector) {
+    if (typeof self.stylesList[uid] !== 'undefined' && !selector) {
       self.stylesList[uid] = {};
     }
 
     if (
-      'undefined' !== typeof self.stylesList[uid] &&
-      'undefined' !== typeof self.stylesList[uid][media] &&
-      'undefined' !== typeof self.stylesList[uid][media][selector] &&
+      typeof self.stylesList[uid] !== 'undefined' &&
+      typeof self.stylesList[uid][media] !== 'undefined' &&
+      typeof self.stylesList[uid][media][selector] !== 'undefined' &&
       selector
     ) {
       delete self.stylesList[uid][media][selector];
@@ -399,7 +399,7 @@ class VP {
     }
 
     // create string with styles
-    if ('undefined' !== typeof self.stylesList[uid]) {
+    if (typeof self.stylesList[uid] !== 'undefined') {
       Object.keys(self.stylesList[uid]).forEach((m) => {
         // media
         if (m) {
@@ -472,7 +472,7 @@ class VP {
     const dataOptions = self.$item[0].dataset;
     const pureDataOptions = {};
     Object.keys(dataOptions).forEach((k) => {
-      if (k && 'vp' === k.substring(0, 2)) {
+      if (k && k.substring(0, 2) === 'vp') {
         pureDataOptions[self.firstToLowerCase(k.substring(2))] = dataOptions[k];
       }
     });
@@ -576,15 +576,15 @@ class VP {
       const $this = $(this);
       const $pagination = $this.closest('.vp-pagination');
 
-      if ($pagination.hasClass('vp-pagination__no-more') && 'paged' !== self.options.pagination) {
+      if ($pagination.hasClass('vp-pagination__no-more') && self.options.pagination !== 'paged') {
         return;
       }
 
-      self.loadNewItems($this.attr('href'), 'paged' === self.options.pagination);
+      self.loadNewItems($this.attr('href'), self.options.pagination === 'paged');
 
       // Scroll to top
       if (
-        'paged' === self.options.pagination &&
+        self.options.pagination === 'paged' &&
         $pagination.hasClass('vp-pagination__scroll-top')
       ) {
         const $adminBar = $('#wpadminbar');
@@ -597,7 +597,7 @@ class VP {
         }
 
         // Admin bar offset.
-        if ($adminBar.length && 'fixed' === $adminBar.css('position')) {
+        if ($adminBar.length && $adminBar.css('position') === 'fixed') {
           top -= $adminBar.outerHeight();
         }
 
@@ -726,7 +726,7 @@ class VP {
     const { randomSeed } = self.options;
 
     if (
-      (self.loading && 'undefined' === typeof self.loading.readyState) ||
+      (self.loading && typeof self.loading.readyState === 'undefined') ||
       !url ||
       self.href === url
     ) {
@@ -744,7 +744,7 @@ class VP {
       url,
       data: {
         vpf_ajax_call: true,
-        vpf_random_seed: 'undefined' !== typeof randomSeed ? randomSeed : false,
+        vpf_random_seed: typeof randomSeed !== 'undefined' ? randomSeed : false,
       },
       complete({ responseText }) {
         self.href = url;
@@ -886,11 +886,11 @@ const plugin = function (options, ...args) {
   let ret;
 
   this.each(function () {
-    if ('undefined' !== typeof ret) {
+    if (typeof ret !== 'undefined') {
       return;
     }
 
-    if ('object' === typeof options || 'undefined' === typeof options) {
+    if (typeof options === 'object' || typeof options === 'undefined') {
       if (!this.vpf) {
         this.vpf = new VP($(this), options);
       }
@@ -899,7 +899,7 @@ const plugin = function (options, ...args) {
     }
   });
 
-  return 'undefined' !== typeof ret ? ret : this;
+  return typeof ret !== 'undefined' ? ret : this;
 };
 plugin.constructor = VP;
 

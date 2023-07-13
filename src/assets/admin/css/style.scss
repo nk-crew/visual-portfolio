@@ -139,6 +139,7 @@ $escaped-svg-characters: (
  * We need to use additional ID `#toplevel...` because when disabled
  * Portfolio Archive in settings, the menu ID changes.
  */
+/* stylelint-disable-next-line selector-id-pattern */
 #menu-posts-portfolio,
 #toplevel_page_visual-portfolio-settings { // stylelint-disable-line selector-id-pattern
   #adminmenu & ul.wp-submenu-wrap li {
@@ -361,7 +362,7 @@ $escaped-svg-characters: (
       display: none;
     }
 
-    tr:not(.inline-edit-row):not(.no-items) {
+    tr:not(.inline-edit-row, .no-items) {
       td.column-portfolio_post_thumbs,
       td.column-vp_lists_post_icon {
         float: left;

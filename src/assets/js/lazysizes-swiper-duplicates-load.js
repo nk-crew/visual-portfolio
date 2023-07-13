@@ -23,7 +23,7 @@
 
   const getSiblings = (el, filter) =>
     [...el.parentNode.children].filter(
-      (child) => 1 === child.nodeType && child !== el && (!filter || child.matches(filter))
+      (child) => child.nodeType === 1 && child !== el && (!filter || child.matches(filter))
     );
 
   const swiperDuplicatesLoad = {

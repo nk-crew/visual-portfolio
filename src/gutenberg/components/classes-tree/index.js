@@ -135,7 +135,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
     let { isCollapsed } = this.state;
 
     // check if collapsed by default.
-    if (null === isCollapsed && node && node.classList && node.classList.length) {
+    if (isCollapsed === null && node && node.classList && node.classList.length) {
       node.classList.forEach((className) => {
         if (collapseByClass && collapseByClass.test(className)) {
           isCollapsed = true;
@@ -220,6 +220,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
           ? node.children.map((childNode) => {
               if (childNode) {
                 return (
+                  // eslint-disable-next-line react/jsx-key
                   <li className="vpf-component-classes-tree-child">
                     <ClassesTree.TreeItem {...this.props} node={childNode} />
                   </li>

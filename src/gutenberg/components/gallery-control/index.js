@@ -49,7 +49,7 @@ function prepareImage(img) {
   };
 
   // Prepare thumbnail for all images except GIF, since GIFs animated only in full size.
-  if (!img.mime || 'image/gif' !== img.mime) {
+  if (!img.mime || img.mime !== 'image/gif') {
     if (img.sizes && img.sizes.large && img.sizes.large.url) {
       imgData.imgThumbnailUrl = img.sizes.large.url;
     } else if (img.sizes && img.sizes.medium && img.sizes.medium.url) {
@@ -89,7 +89,7 @@ function prepareImages(images, currentImages) {
       if (currentImagesIds.length) {
         const currentId = currentImagesIds.indexOf(img.id);
 
-        if (-1 < currentId && currentImages[currentId]) {
+        if (currentId > -1 && currentImages[currentId]) {
           currentImgData = currentImages[currentId];
         }
       }
@@ -400,7 +400,7 @@ const SortableItem = function (props) {
                     return;
                   }
 
-                  if (false === imgData) {
+                  if (imgData === false) {
                     newImages.splice(idx, 1);
 
                     onChange(newImages);
@@ -562,7 +562,7 @@ const SortableList = function (props) {
 
   return (
     <div className="vpf-component-gallery-control-items">
-      {items && items.length && 9 < items.length ? editGalleryButton : null}
+      {items && items.length && items.length > 9 ? editGalleryButton : null}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

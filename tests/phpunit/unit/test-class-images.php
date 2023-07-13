@@ -5,30 +5,10 @@
  * @package Visual Portfolio
  */
 
-use \WP_Mock\Tools\TestCase;
-
 /**
  * Sample test case.
  */
-class ClassImages extends TestCase {
-    /**
-     * Set up our mocked WP functions. Rather than setting up a database we can mock the returns of core WordPress functions.
-     *
-     * @return void
-     */
-    public function setUp(): void {
-        \WP_Mock::setUp();
-    }
-
-    /**
-     * Tear down WP Mock.
-     *
-     * @return void
-     */
-    public function tearDown(): void {
-        \WP_Mock::tearDown();
-    }
-
+class ClassImages extends WP_UnitTestCase {
     /**
      * Different sizes for base64 placeholder.
      */
@@ -55,7 +35,6 @@ class ClassImages extends TestCase {
         $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10">';
         $lazy_string  = '<img src="' . $placeholder . '" alt="Test Image" width="10" height="10" data-src="image.jpg" data-sizes="auto" loading="eager" class="vp-lazyload">';
 
-        $this->mock_wp_kses_hair( $image_string, 2 );
         $this->assertEquals(
             $this->get_noscript_image( $image_string ) . $lazy_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -88,7 +67,6 @@ class ClassImages extends TestCase {
         $image_string = '<img loading="lazy" src="image.jpg" alt="Test Image" width="10" height="10">';
         $lazy_string  = '<img loading="eager" src="' . $placeholder . '" alt="Test Image" width="10" height="10" data-src="image.jpg" data-sizes="auto" class="vp-lazyload">';
 
-        $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
             $this->get_noscript_image( $image_string ) . $lazy_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -109,7 +87,6 @@ class ClassImages extends TestCase {
         $image_string = '<img loading="lazy" src="image.jpg" srcset="image.jpg 2x" sizes="100vw" alt="Test Image" width="10" height="10">';
         $lazy_string  = '<img loading="eager" src="image.jpg" srcset="' . $placeholder . '" alt="Test Image" width="10" height="10" data-src="image.jpg" data-srcset="image.jpg 2x" data-sizes="auto" class="vp-lazyload">';
 
-        $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
             $this->get_noscript_image( $image_string ) . $lazy_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -127,7 +104,6 @@ class ClassImages extends TestCase {
         Visual_Portfolio_Images::$allow_wp_lazyload = false;
 
         $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10">';
-        $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
             $image_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -140,7 +116,6 @@ class ClassImages extends TestCase {
 
         // Images in content.
         $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10">';
-        $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
             $image_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -149,28 +124,21 @@ class ClassImages extends TestCase {
         );
 
         // Visual Portfolio image.
-        $placeholder  = Visual_Portfolio_Images::get_image_placeholder( 10, 10 );
-        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" class="wp-image-9999">';
-        $lazy_string  = '<img src="' . $placeholder . '" alt="Test Image" width="10" height="10" class="wp-image-9999 vp-lazyload" data-src="image.jpg" data-sizes="auto" loading="eager">';
+        $placeholder  = Visual_Portfolio_Images::get_image_placeholder( 150, 150 );
 
-        $this->mock_wp_kses_hair( $image_string, 1 );
-        \WP_Mock::userFunction(
-            'get_post_mime_type',
-            array(
-                'times'  => 1,
-                'return' => 'image/jpg',
-            )
-        );
-        \WP_Mock::userFunction(
-            'wp_get_attachment_image',
-            array(
-                'times'  => 1,
-                'return' => $image_string,
-            )
-        );
+        // Added Real Image to WordPress.
+        $image_url = dirname( dirname( __FILE__ ) ) . '/fixtures/image.png';
+        $attach_id = $this->wp_insert_attachment( $image_url );
+
+        // Image is added to WordPress.
+        $this->assertTrue( is_int( $attach_id ) );
+
+        $image_string = '<img width="150" height="150" src="' . esc_url( wp_get_attachment_image_url( $attach_id ) ) . '" class="wp-image-' . esc_attr( $attach_id ) . '" alt="" decoding="async" loading="lazy" />';
+        $lazy_string  = '<img width="150" height="150" src="' . $placeholder . '" class="wp-image-' . $attach_id  . ' vp-lazyload" alt decoding="async" loading="eager" data-src="' . esc_url( wp_get_attachment_image_url( $attach_id ) ) . '" data-sizes="auto">';
+
         $this->assertEquals(
             $this->get_noscript_image( $image_string ) . $lazy_string,
-            Visual_Portfolio_Images::get_attachment_image( 9999 )
+            Visual_Portfolio_Images::get_attachment_image( $attach_id )
         );
     }
 
@@ -184,7 +152,6 @@ class ClassImages extends TestCase {
 
         // Skip `data-no-lazy` attribute.
         $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" data-no-lazy="true">';
-        $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
             $image_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -194,7 +161,6 @@ class ClassImages extends TestCase {
 
         // Skip `vp-lazyload` class name. Means - already lazy loaded.
         $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" class="vp-lazyload">';
-        $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
             $image_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -204,7 +170,6 @@ class ClassImages extends TestCase {
 
         // Skip `no-lazy` class name.
         $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" class="no-lazy">';
-        $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
             $image_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -214,7 +179,6 @@ class ClassImages extends TestCase {
 
         // Skip Contact Form 7 captcha image URL.
         $image_string = '<img src="https://example.com/wp-content/wpcf7_captcha/image.jpg" width="10" height="10">';
-        $this->mock_wp_kses_hair( $image_string, 1 );
         $this->assertEquals(
             $image_string,
             Visual_Portfolio_Images::add_image_placeholders(
@@ -233,22 +197,6 @@ class ClassImages extends TestCase {
     }
 
     /**
-     * Prepare mock of wp_kses_hair function, which is used in Lazy Loading calls.
-     *
-     * @param string $image_string - image string.
-     * @param int    $times - times to mock the function.
-     */
-    public function mock_wp_kses_hair( $image_string, $times ) {
-        \WP_Mock::userFunction(
-            'wp_kses_hair',
-            array(
-                'times'  => $times,
-                'return' => $this->img_to_wp_kses_hair( $image_string ),
-            )
-        );
-    }
-
-    /**
      * Prepare noscript image string.
      *
      * @param string $image_string - image string.
@@ -261,26 +209,46 @@ class ClassImages extends TestCase {
     }
 
     /**
-     * Convert image string to the `wp_kses_hair` schema array.
-     * !Pretty limited! Use it for a single <img> tag only and with attributes with values only.
+     * Added Image to WordPress.
      *
-     * @param string $image_string - image string.
-     *
-     * @return array
+     * @param string $image_url - Absolutely path to Image.
+     * @return bool|int
      */
-    public function img_to_wp_kses_hair( $image_string ) {
-        $attrs = array();
+    public function wp_insert_attachment( $image_url ) {
+        $upload_dir = wp_upload_dir();
 
-        preg_match_all( '/(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?/', $image_string, $match );
+        $image_data = file_get_contents( $image_url );
 
-        if ( ! empty( $match[1] ) && ! empty( $match[2] ) ) {
-            foreach ( $match[1] as $k => $name ) {
-                $attrs[ $name ] = array(
-                    'value' => $match[2][ $k ],
-                );
-            }
+        $filename = basename( $image_url );
+
+        if ( wp_mkdir_p( $upload_dir['path'] ) ) {
+        $file = $upload_dir['path'] . '/' . $filename;
+        }
+        else {
+        $file = $upload_dir['basedir'] . '/' . $filename;
         }
 
-        return $attrs;
+        file_put_contents( $file, $image_data );
+
+        $wp_filetype = wp_check_filetype( $filename, null );
+
+        $attachment = array(
+        'post_mime_type' => $wp_filetype['type'],
+        'post_title' => sanitize_file_name( $filename ),
+        'post_content' => '',
+        'post_status' => 'inherit'
+        );
+
+        $attach_id = wp_insert_attachment( $attachment, $file );
+
+        if ( ! is_wp_error( $attach_id ) ) {
+            require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+            $attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+
+            wp_update_attachment_metadata( $attach_id, $attach_data );
+        }
+
+        return is_wp_error( $attach_id ) ? false : $attach_id;
     }
 }

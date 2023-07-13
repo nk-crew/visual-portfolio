@@ -135,7 +135,7 @@ function ElementsSelectorOptions(props) {
               categoryToggle={false}
             />
           ) : null}
-          {'items' !== optionName ? (
+          {optionName !== 'items' ? (
             <PanelBody>
               <Button
                 isLink
@@ -201,8 +201,8 @@ export default class ElementsSelector extends Component {
       const data = options[name];
 
       if (
-        (!data.allowed_locations || -1 !== data.allowed_locations.indexOf(location)) &&
-        -1 === elements.indexOf(name)
+        (!data.allowed_locations || data.allowed_locations.indexOf(location) !== -1) &&
+        elements.indexOf(name) === -1
       ) {
         availableElements[name] = data;
       }
@@ -356,7 +356,7 @@ export default class ElementsSelector extends Component {
 
                   const newElements = [...locationData.elements];
 
-                  if (-1 === newElements.indexOf(optionName)) {
+                  if (newElements.indexOf(optionName) === -1) {
                     newElements.push(optionName);
 
                     onChange({
