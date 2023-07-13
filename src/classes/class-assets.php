@@ -406,7 +406,7 @@ class Visual_Portfolio_Assets {
             wp_register_script( 'lazysizes-config', visual_portfolio()->plugin_url . 'assets/js/lazysizes-cfg.min.js', array(), '@@plugin_version', true );
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
             wp_register_script( 'lazysizes-swiper-duplicates-load', visual_portfolio()->plugin_url . 'assets/js/lazysizes-swiper-duplicates-load.min.js', array(), '@@plugin_version', true );
-            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array( 'lazysizes-config', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load' ), '5.2.2', true );
+            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array( 'lazysizes-config', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load' ), '5.3.2', true );
         }
 
         // Visual Portfolio CSS.
