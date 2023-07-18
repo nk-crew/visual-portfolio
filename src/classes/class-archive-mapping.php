@@ -1057,11 +1057,8 @@ class Visual_Portfolio_Archive_Mapping {
         global $wpdb;
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM %s
-                WHERE meta_key = '_vp_post_type_mapped'",
-                $wpdb->postmeta
-            )
+            "DELETE FROM $wpdb->postmeta
+            WHERE meta_key = '_vp_post_type_mapped'"
         );
     }
 
