@@ -20,7 +20,7 @@
     "lint": "concurrently \"npm run lint:js\" \"npm run lint:css\"",
     "lint:css": "stylelint --custom-syntax postcss-scss \"src/**/*.scss\"",
     "lint:js": "eslint src/",
-    "prelint:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio/src' cli composer update --no-interaction",
+    "prelint:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio' cli composer install --no-interaction",
     "lint:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio/src' cli composer run-script lint",
     "format:css": "stylelint --fix --custom-syntax postcss-scss \"src/**/*.scss\"",
     "format:js": "eslint --fix src/",
