@@ -201,9 +201,9 @@ class Visual_Portfolio_Preview {
             define( 'DONOTCDN', true );
         }
 
-        if ( ! defined( 'DONOTCACHCEOBJECT' ) ) {
+        if ( ! defined( 'DONOTCACHEOBJECT' ) ) {
             // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
-            define( 'DONOTCACHCEOBJECT', true );
+            define( 'DONOTCACHEOBJECT', true );
         }
 
         // Set the headers to prevent caching for the different browsers.
