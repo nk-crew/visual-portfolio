@@ -4,7 +4,7 @@
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
 * Donate link: https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 6.0
-* Tested up to: 6.2
+* Tested up to: 6.3
 * Requires PHP: 7.2
 * Stable tag: @@plugin_version
 * License: GPLv2 or later
