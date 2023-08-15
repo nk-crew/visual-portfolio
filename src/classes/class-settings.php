@@ -321,6 +321,31 @@ class Visual_Portfolio_Settings {
                     'is_pro'  => true,
                 ),
 
+                // Social Logs.
+                array(
+                    'name'    => 'social_logs',
+                    'label'   => esc_html__( 'Social Logs', '@@text_domain' ),
+                    'desc'    => esc_html__( 'Enable Social Logs for Twitch (Beta)', '@@text_domain' ),
+                    'type'    => 'toggle',
+                    'default' => class_exists( 'Visual_Portfolio_Pro' ) ? 'on' : 'off',
+                    'is_pro'  => true,
+                ),
+                array(
+                    'name'        => 'social_logs_max_limit',
+                    'label'       => esc_html__( 'Logs Limit', '@@text_domain' ),
+                    'type'        => 'number',
+                    'min'         => 50,
+                    'max'         => 1000,
+                    'default'     => 100,
+                    'desc'        => esc_html__( 'Sets the maximum logs limit.', '@@text_domain' ),
+                    'is_pro'      => true,
+                    'condition'   => array(
+                        array(
+                            'control' => '[type="checkbox"][name="vp_general[social_logs]"]',
+                        ),
+                    ),
+                ),
+
                 // Breakpoints.
                 array(
                     'name'   => 'breakpoints_title',
