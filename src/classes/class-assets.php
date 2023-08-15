@@ -151,6 +151,13 @@ class Visual_Portfolio_Assets {
             'template_style'
         );
 
+        self::store_used_assets( 'visual-portfolio-errors-default', true, 'style', 9 );
+        self::store_used_assets(
+            'visual-portfolio-errors-default',
+            'errors/style',
+            'template_style'
+        );
+
         // Additional styles for Elementor.
         if ( class_exists( '\Elementor\Plugin' ) ) {
             self::store_used_assets( 'visual-portfolio-elementor', true, 'style', 9 );

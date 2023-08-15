@@ -772,6 +772,13 @@ class Visual_Portfolio_Get {
             }
         }
 
+        $errors = array();
+
+        if ( isset( $query_opts['error'] ) && ! empty( $query_opts['error'] ) && ( $is_preview || is_admin_bar_showing() ) ) {
+            $class   .= ' vp-portfolio-errors';
+            $errors[] = $query_opts['error'];
+        }
+
         $result = array(
             'options'           => $options,
             'style_options'     => $style_options,
@@ -780,6 +787,7 @@ class Visual_Portfolio_Get {
             'items_class'       => $items_class,
             'items'             => $items,
             'notices'           => $notices,
+            'errors'            => $errors,
             'img_size_popup'    => $img_size_popup,
             'img_size_md_popup' => $img_size_md_popup,
             'img_size_sm_popup' => $img_size_sm_popup,
@@ -814,6 +822,7 @@ class Visual_Portfolio_Get {
         $items         = $config['items'];
         $items_class   = $config['items_class'];
         $notices       = $config['notices'];
+        $errors        = $config['errors'];
 
         // Insert styles and scripts.
         Visual_Portfolio_Assets::enqueue( $atts );
@@ -855,6 +864,16 @@ class Visual_Portfolio_Get {
                 'class'         => $class,
             )
         );
+
+        if ( ! empty( $errors ) ) {
+            ?>
+                <?php
+                foreach ( $errors as $error ) {
+                    self::error( $error );
+                }
+                ?>
+            <?php
+        }
 
         do_action( 'vpf_after_wrapper_start', $options, $style_options );
 
@@ -1625,6 +1644,23 @@ class Visual_Portfolio_Get {
             'notices/notices',
             array(
                 'notice' => $notice,
+            )
+        );
+    }
+
+    /**
+     * Print error
+     *
+     * @param string $error error string.
+     */
+    public static function error( $error ) {
+        if ( ! $error ) {
+            return;
+        }
+        visual_portfolio()->include_template(
+            'errors/errors',
+            array(
+                'error' => $error,
             )
         );
     }
