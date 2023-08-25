@@ -2,7 +2,7 @@
 /**
  * Archive Mapping.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -372,13 +372,13 @@ class Visual_Portfolio_Archive_Mapping {
             if ( isset( $wp_query->query['vp_category'] ) ) {
                 $category = get_term_by( 'slug', $wp_query->query['vp_category'], 'portfolio_category' );
                 // translators: %s - taxonomy name.
-                $title = sprintf( esc_html__( 'Portfolio Category: %s', '@@text_domain' ), esc_html( ucfirst( $category->name ) ) );
+                $title = sprintf( esc_html__( 'Portfolio Category: %s', 'visual-portfolio' ), esc_html( ucfirst( $category->name ) ) );
             }
 
             if ( isset( $wp_query->query['portfolio_tag'] ) ) {
                 $tag = get_term_by( 'slug', $wp_query->query['portfolio_tag'], 'portfolio_tag' );
                 // translators: %s - taxonomy name.
-                $title = sprintf( esc_html__( 'Portfolio Tag: %s', '@@text_domain' ), esc_html( ucfirst( $tag->name ) ) );
+                $title = sprintf( esc_html__( 'Portfolio Tag: %s', 'visual-portfolio' ), esc_html( ucfirst( $tag->name ) ) );
             }
         }
         return $title;
@@ -506,33 +506,33 @@ class Visual_Portfolio_Archive_Mapping {
     public function permalink_settings_init() {
         add_settings_section(
             'portfolio-permalink',
-            esc_html__( 'Portfolio permalinks', '@@text_domain' ),
+            esc_html__( 'Portfolio permalinks', 'visual-portfolio' ),
             array( $this, 'settings' ),
             'permalink'
         );
 
         add_settings_field(
             'vp_category_slug',
-            esc_html__( 'Portfolio category base', '@@text_domain' ),
+            esc_html__( 'Portfolio category base', 'visual-portfolio' ),
             array( $this, 'slug_input' ),
             'permalink',
             'optional',
             array(
                 'id'          => 'vp_category_slug',
-                'placeholder' => esc_attr_x( 'portfolio-category', 'slug', '@@text_domain' ),
+                'placeholder' => esc_attr_x( 'portfolio-category', 'slug', 'visual-portfolio' ),
                 'value'       => 'category_base',
             )
         );
 
         add_settings_field(
             'vp_tag_slug',
-            esc_html__( 'Portfolio tag base', '@@text_domain' ),
+            esc_html__( 'Portfolio tag base', 'visual-portfolio' ),
             array( $this, 'slug_input' ),
             'permalink',
             'optional',
             array(
                 'id'          => 'vp_tag_slug',
-                'placeholder' => esc_attr_x( 'portfolio-tag', 'slug', '@@text_domain' ),
+                'placeholder' => esc_attr_x( 'portfolio-tag', 'slug', 'visual-portfolio' ),
                 'value'       => 'tag_base',
             )
         );
@@ -557,8 +557,8 @@ class Visual_Portfolio_Archive_Mapping {
             array_filter( $saved_permalinks ),
             array(
                 'portfolio_base'         => '%portfolio_page_slug%',
-                'category_base'          => _x( 'portfolio-category', 'slug', '@@text_domain' ),
-                'tag_base'               => _x( 'portfolio-tag', 'slug', '@@text_domain' ),
+                'category_base'          => _x( 'portfolio-category', 'slug', 'visual-portfolio' ),
+                'tag_base'               => _x( 'portfolio-tag', 'slug', 'visual-portfolio' ),
                 'attribute_base'         => '',
             )
         );
@@ -608,10 +608,10 @@ class Visual_Portfolio_Archive_Mapping {
      */
     public function settings() {
         /* translators: %s: Home URL */
-        echo wp_kses_post( wpautop( sprintf( __( 'If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories. We also recommend you use the <code>%%portfolio_page_slug%%</code> slug, which will automatically use the slug of you Portfolio Archive page.', '@@text_domain' ), esc_url( home_url( '/' ) ) ) ) );
+        echo wp_kses_post( wpautop( sprintf( __( 'If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories. We also recommend you use the <code>%%portfolio_page_slug%%</code> slug, which will automatically use the slug of you Portfolio Archive page.', 'visual-portfolio' ), esc_url( home_url( '/' ) ) ) ) );
 
         $page_slug    = '%portfolio_page_slug%';
-        $default_slug = _x( 'portfolio', 'default-slug', '@@text_domain' );
+        $default_slug = _x( 'portfolio', 'default-slug', 'visual-portfolio' );
         $current_base = trailingslashit( $this->permalinks['portfolio_base'] );
         $structures   = array(
             0  => '',
@@ -626,22 +626,22 @@ class Visual_Portfolio_Archive_Mapping {
         <table class="form-table vp-permalink-structure">
             <tbody>
                 <tr>
-                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[0] ); ?>" class="vp-permalink-radio" <?php checked( $structures[99], $current_base ); ?> /> <?php esc_html_e( 'Default', '@@text_domain' ); ?></label></th>
+                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[0] ); ?>" class="vp-permalink-radio" <?php checked( $structures[99], $current_base ); ?> /> <?php esc_html_e( 'Default', 'visual-portfolio' ); ?></label></th>
                     <td><code class="default-example"><?php echo esc_html( home_url() ); ?>/?portfolio=sample-portfolio</code> <code class="non-default-example"><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $default_slug ); ?>/sample-portfolio/</code></td>
                 </tr>
                 <tr>
-                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[1] ); ?>" class="vp-permalink-radio" <?php checked( $structures[1], $current_base ); ?> /> <?php esc_html_e( 'Portfolio base', '@@text_domain' ); ?></label></th>
+                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[1] ); ?>" class="vp-permalink-radio" <?php checked( $structures[1], $current_base ); ?> /> <?php esc_html_e( 'Portfolio base', 'visual-portfolio' ); ?></label></th>
                     <td><code><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $page_slug ); ?>/sample-portfolio/</code></td>
                 </tr>
                 <tr>
-                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[2] ); ?>" class="vp-permalink-radio" <?php checked( $structures[2], $current_base ); ?> /> <?php esc_html_e( 'Portfolio base with category', '@@text_domain' ); ?></label></th>
+                    <th><label><input name="portfolio_permalink" type="radio" value="<?php echo esc_attr( $structures[2] ); ?>" class="vp-permalink-radio" <?php checked( $structures[2], $current_base ); ?> /> <?php esc_html_e( 'Portfolio base with category', 'visual-portfolio' ); ?></label></th>
                     <td><code><?php echo esc_html( home_url() ); ?>/<?php echo esc_html( $page_slug ); ?>/portfolio-category/sample-portfolio/</code></td>
                 </tr>
                 <tr>
                     <th><label><input name="portfolio_permalink" id="portfolio_custom_selection" type="radio" value="custom" class="tog" <?php checked( in_array( $current_base, $structures, true ), false ); ?> />
-                        <?php esc_html_e( 'Custom base', '@@text_domain' ); ?></label></th>
+                        <?php esc_html_e( 'Custom base', 'visual-portfolio' ); ?></label></th>
                     <td>
-                        <input name="portfolio_permalink_structure" id="portfolio_permalink_structure" type="text" value="<?php echo esc_attr( $current_base ? $current_base : '' ); ?>" class="regular-text code"> <span class="description"><?php esc_html_e( 'Enter a custom base to use. A base must be set or WordPress will use default instead.', '@@text_domain' ); ?></span>
+                        <input name="portfolio_permalink_structure" id="portfolio_permalink_structure" type="text" value="<?php echo esc_attr( $current_base ? $current_base : '' ); ?>" class="regular-text code"> <span class="description"><?php esc_html_e( 'Enter a custom base to use. A base must be set or WordPress will use default instead.', 'visual-portfolio' ); ?></span>
                     </td>
                 </tr>
             </tbody>
@@ -715,7 +715,7 @@ class Visual_Portfolio_Archive_Mapping {
                     $portfolio_base = '/%portfolio_page_slug%' . $portfolio_base;
                 }
             } elseif ( empty( $portfolio_base ) ) {
-                $portfolio_base = '/' . _x( 'portfolio', 'default-slug', '@@text_domain' );
+                $portfolio_base = '/' . _x( 'portfolio', 'default-slug', 'visual-portfolio' );
             }
 
             $permalinks['portfolio_base'] = $portfolio_base;
@@ -1074,7 +1074,7 @@ class Visual_Portfolio_Archive_Mapping {
             add_option( '_vp_trying_to_add_archive_page', true );
 
             $args = array(
-                'post_title'    => esc_html__( 'Portfolio', '@@text_domain' ),
+                'post_title'    => esc_html__( 'Portfolio', 'visual-portfolio' ),
                 'post_status'   => 'publish',
                 'post_type'     => 'page',
                 'post_name'     => $custom_slug,
@@ -1121,7 +1121,7 @@ class Visual_Portfolio_Archive_Mapping {
             // If successful, returns the post type slug.
             $post_type = get_post_meta( $post->ID, '_vp_post_type_mapped', true );
             if ( $post_type && ! empty( $post_type ) ) {
-                $post_states[] = esc_html__( 'Portfolio Page', '@@text_domain' );
+                $post_states[] = esc_html__( 'Portfolio Page', 'visual-portfolio' );
             }
         }
         return $post_states;
@@ -1135,7 +1135,7 @@ class Visual_Portfolio_Archive_Mapping {
     public static function get_portfolio_slug() {
         // When deleting the archive page, we leave the old slug without overwriting the permalinks.
         // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-        $custom_slug = _x( 'portfolio', 'default-slug', '@@text_domain' );
+        $custom_slug = _x( 'portfolio', 'default-slug', 'visual-portfolio' );
 
         $archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
 
@@ -1155,7 +1155,7 @@ class Visual_Portfolio_Archive_Mapping {
     public static function get_portfolio_label() {
         // When deleting the archive page, we leave the old slug without overwriting the permalinks.
         // In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-        $custom_slug = _x( 'Portfolio', 'default-label', '@@text_domain' );
+        $custom_slug = _x( 'Portfolio', 'default-label', 'visual-portfolio' );
 
         $archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
 

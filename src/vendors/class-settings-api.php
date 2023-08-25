@@ -147,7 +147,7 @@ class Visual_Portfolio_Settings_API {
                             'utm_campaign' => esc_attr( $name ),
                         )
                     );
-                    $label .= '<a class="vpf-settings-control-pro-label" target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_url ) . '">?<span>' . esc_html__( 'This feature is available in the Pro plugin only.', '@@text_domain' ) . '</span></a>';
+                    $label .= '<a class="vpf-settings-control-pro-label" target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_url ) . '">?<span>' . esc_html__( 'This feature is available in the Pro plugin only.', 'visual-portfolio' ) . '</span></a>';
                 }
 
                 $args = array(

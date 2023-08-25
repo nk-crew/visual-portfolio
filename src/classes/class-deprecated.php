@@ -2,7 +2,7 @@
 /**
  * Deprecations.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -172,7 +172,7 @@ class Visual_Portfolio_Deprecations {
             case 'images_rounded_corners':
                 $fields[] = array(
                     'type'    => 'range',
-                    'label'   => esc_html__( 'Images Rounded Corners', '@@text_domain' ),
+                    'label'   => esc_html__( 'Images Rounded Corners', 'visual-portfolio' ),
                     'name'    => 'images_rounded_corners',
                     'min'     => 0,
                     'max'     => 100,
@@ -189,7 +189,7 @@ class Visual_Portfolio_Deprecations {
             case 'show_title':
                 $fields[] = array(
                     'type'      => 'checkbox',
-                    'alongside' => esc_html__( 'Display Title', '@@text_domain' ),
+                    'alongside' => esc_html__( 'Display Title', 'visual-portfolio' ),
                     'name'      => 'show_title',
                     'default'   => true,
                 );
@@ -197,14 +197,14 @@ class Visual_Portfolio_Deprecations {
             case 'show_categories':
                 $fields[] = array(
                     'type'      => 'checkbox',
-                    'alongside' => esc_html__( 'Display Categories', '@@text_domain' ),
+                    'alongside' => esc_html__( 'Display Categories', 'visual-portfolio' ),
                     'name'      => 'show_categories',
                     'group'     => 'items_style_categories',
                     'default'   => true,
                 );
                 $fields[] = array(
                     'type'      => 'range',
-                    'label'     => esc_html__( 'Categories Count', '@@text_domain' ),
+                    'label'     => esc_html__( 'Categories Count', 'visual-portfolio' ),
                     'name'      => 'categories_count',
                     'group'     => 'items_style_categories',
                     'min'       => 1,
@@ -220,14 +220,14 @@ class Visual_Portfolio_Deprecations {
             case 'show_date':
                 $fields[] = array(
                     'type'    => 'radio',
-                    'label'   => esc_html__( 'Display Date', '@@text_domain' ),
+                    'label'   => esc_html__( 'Display Date', 'visual-portfolio' ),
                     'name'    => 'show_date',
                     'group'   => 'items_style_date',
                     'default' => 'false',
                     'options' => array(
-                        'false' => esc_html__( 'Hide', '@@text_domain' ),
-                        'true'  => esc_html__( 'Default', '@@text_domain' ),
-                        'human' => esc_html__( 'Human Format', '@@text_domain' ),
+                        'false' => esc_html__( 'Hide', 'visual-portfolio' ),
+                        'true'  => esc_html__( 'Default', 'visual-portfolio' ),
+                        'human' => esc_html__( 'Human Format', 'visual-portfolio' ),
                     ),
                 );
                 $fields[] = array(
@@ -235,7 +235,7 @@ class Visual_Portfolio_Deprecations {
                     'name'        => 'date_format',
                     'group'       => 'items_style_date',
                     'default'     => 'F j, Y',
-                    'description' => esc_attr__( 'Date format example: F j, Y', '@@text_domain' ),
+                    'description' => esc_attr__( 'Date format example: F j, Y', 'visual-portfolio' ),
                     'wpml'        => true,
                     'condition'   => array(
                         array(
@@ -247,7 +247,7 @@ class Visual_Portfolio_Deprecations {
             case 'show_author':
                 $fields[] = array(
                     'type'      => 'checkbox',
-                    'alongside' => esc_html__( 'Display Author', '@@text_domain' ),
+                    'alongside' => esc_html__( 'Display Author', 'visual-portfolio' ),
                     'name'      => 'show_author',
                     'default'   => false,
                 );
@@ -255,7 +255,7 @@ class Visual_Portfolio_Deprecations {
             case 'show_comments_count':
                 $fields[] = array(
                     'type'      => 'checkbox',
-                    'alongside' => esc_html__( 'Display Comments Count', '@@text_domain' ),
+                    'alongside' => esc_html__( 'Display Comments Count', 'visual-portfolio' ),
                     'name'      => 'show_comments_count',
                     'default'   => false,
                     'condition' => array(
@@ -269,7 +269,7 @@ class Visual_Portfolio_Deprecations {
             case 'show_views_count':
                 $fields[] = array(
                     'type'      => 'checkbox',
-                    'alongside' => esc_html__( 'Display Views Count', '@@text_domain' ),
+                    'alongside' => esc_html__( 'Display Views Count', 'visual-portfolio' ),
                     'name'      => 'show_views_count',
                     'default'   => false,
                     'condition' => array(
@@ -283,7 +283,7 @@ class Visual_Portfolio_Deprecations {
             case 'show_reading_time':
                 $fields[] = array(
                     'type'      => 'checkbox',
-                    'alongside' => esc_html__( 'Display Reading Time', '@@text_domain' ),
+                    'alongside' => esc_html__( 'Display Reading Time', 'visual-portfolio' ),
                     'name'      => 'show_reading_time',
                     'default'   => false,
                     'condition' => array(
@@ -297,14 +297,14 @@ class Visual_Portfolio_Deprecations {
             case 'show_excerpt':
                 $fields[] = array(
                     'type'      => 'checkbox',
-                    'alongside' => esc_html__( 'Display Excerpt', '@@text_domain' ),
+                    'alongside' => esc_html__( 'Display Excerpt', 'visual-portfolio' ),
                     'name'      => 'show_excerpt',
                     'group'     => 'items_style_excerpt',
                     'default'   => false,
                 );
                 $fields[] = array(
                     'type'      => 'number',
-                    'label'     => esc_html__( 'Excerpt Words Count', '@@text_domain' ),
+                    'label'     => esc_html__( 'Excerpt Words Count', 'visual-portfolio' ),
                     'name'      => 'excerpt_words_count',
                     'group'     => 'items_style_excerpt',
                     'default'   => 15,
@@ -320,7 +320,7 @@ class Visual_Portfolio_Deprecations {
             case 'show_icons':
                 $fields[] = array(
                     'type'      => 'checkbox',
-                    'alongside' => esc_html__( 'Display Icon', '@@text_domain' ),
+                    'alongside' => esc_html__( 'Display Icon', 'visual-portfolio' ),
                     'name'      => 'show_icon',
                     'default'   => false,
                 );
@@ -328,7 +328,7 @@ class Visual_Portfolio_Deprecations {
             case 'align':
                 $fields[] = array(
                     'type'     => 'align',
-                    'label'    => esc_html__( 'Caption Align', '@@text_domain' ),
+                    'label'    => esc_html__( 'Caption Align', 'visual-portfolio' ),
                     'name'     => 'align',
                     'default'  => 'center',
                     'extended' => 'extended' === $options,

@@ -2,7 +2,7 @@
 /**
  * Shortcode for Visual Composer
  *
- * @package @@plugin_name/vc
+ * @package visual-portfolio/vc
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +35,7 @@ class Visual_Portfolio_3rd_VC {
      */
     public function admin_enqueue_scripts( $page ) {
         if ( 'post.php' === $page || 'post-new.php' === $page ) {
-            wp_enqueue_script( 'visual-portfolio-vc-frontend', visual_portfolio()->plugin_url . 'assets/admin/js/vc-frontend.min.js', array( 'jquery' ), '@@plugin_version', true );
+            wp_enqueue_script( 'visual-portfolio-vc-frontend', visual_portfolio()->plugin_url . 'assets/admin/js/vc-frontend.min.js', array( 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
         }
     }
 
@@ -70,7 +70,7 @@ class Visual_Portfolio_3rd_VC {
                     'params'   => array(
                         array(
                             'type'        => 'dropdown',
-                            'heading'     => esc_html__( 'Select Layout', '@@text_domain' ),
+                            'heading'     => esc_html__( 'Select Layout', 'visual-portfolio' ),
                             'param_name'  => 'id',
                             'value'       => $data_vc,
                             'description' => '',
@@ -78,16 +78,16 @@ class Visual_Portfolio_3rd_VC {
                         ),
                         array(
                             'type'        => 'textfield',
-                            'heading'     => esc_html__( 'Custom Classes', '@@text_domain' ),
+                            'heading'     => esc_html__( 'Custom Classes', 'visual-portfolio' ),
                             'param_name'  => 'class',
                             'value'       => '',
                             'description' => '',
                         ),
                         array(
                             'type'       => 'css_editor',
-                            'heading'    => esc_html__( 'CSS', '@@text_domain' ),
+                            'heading'    => esc_html__( 'CSS', 'visual-portfolio' ),
                             'param_name' => 'vc_css',
-                            'group'      => esc_html__( 'Design Options', '@@text_domain' ),
+                            'group'      => esc_html__( 'Design Options', 'visual-portfolio' ),
                         ),
                     ),
                 )

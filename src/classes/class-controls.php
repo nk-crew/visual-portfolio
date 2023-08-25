@@ -2,7 +2,7 @@
 /**
  * Controls
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -168,7 +168,7 @@ class Visual_Portfolio_Controls {
         if ( null === $found ) {
             echo wp_json_encode(
                 array(
-                    'response' => esc_attr__( 'Dynamic control callback function is not found.', '@@text_domain' ),
+                    'response' => esc_attr__( 'Dynamic control callback function is not found.', 'visual-portfolio' ),
                     'error'    => true,
                 )
             );
@@ -234,11 +234,11 @@ class Visual_Portfolio_Controls {
                     array(
                         'title' => array(
                             'type'  => 'text',
-                            'label' => esc_html__( 'Title', '@@text_domain' ),
+                            'label' => esc_html__( 'Title', 'visual-portfolio' ),
                         ),
                         'description' => array(
                             'type'  => 'textarea',
-                            'label' => esc_html__( 'Description', '@@text_domain' ),
+                            'label' => esc_html__( 'Description', 'visual-portfolio' ),
                         ),
                     )
                 */

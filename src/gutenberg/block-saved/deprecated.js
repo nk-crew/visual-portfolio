@@ -4,42 +4,42 @@
 const { RawHTML } = wp.element;
 
 export default [
-  // v1.16.1
-  {
-    attributes: {
-      id: {
-        type: 'string',
-      },
-    },
-    ghostkit: {
-      supports: {
-        spacings: true,
-        display: true,
-        scrollReveal: true,
-      },
-    },
-    supports: {
-      anchor: true,
-      className: true,
-      html: false,
-      align: ['wide', 'full'],
-    },
-    save({ attributes }) {
-      const { id, className } = attributes;
+	// v1.16.1
+	{
+		attributes: {
+			id: {
+				type: 'string',
+			},
+		},
+		ghostkit: {
+			supports: {
+				spacings: true,
+				display: true,
+				scrollReveal: true,
+			},
+		},
+		supports: {
+			anchor: true,
+			className: true,
+			html: false,
+			align: ['wide', 'full'],
+		},
+		save({ attributes }) {
+			const { id, className } = attributes;
 
-      let result = '[visual_portfolio';
+			let result = '[visual_portfolio';
 
-      if (id) {
-        result += ` id="${id}"`;
-      }
+			if (id) {
+				result += ` id="${id}"`;
+			}
 
-      if (className) {
-        result += ` class="${className}"`;
-      }
+			if (className) {
+				result += ` class="${className}"`;
+			}
 
-      result += ']';
+			result += ']';
 
-      return <RawHTML>{result}</RawHTML>;
-    },
-  },
+			return <RawHTML>{result}</RawHTML>;
+		},
+	},
 ];

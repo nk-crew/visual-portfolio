@@ -2,7 +2,7 @@
 /**
  * Jetpack Plugin.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -34,7 +34,7 @@ class Visual_Portfolio_3rd_Jetpack {
             return;
         }
 
-        wp_register_script( 'visual-portfolio-3rd-jetpack', visual_portfolio()->plugin_url . 'assets/js/3rd/plugin-jetpack.min.js', array( 'jquery' ), '@@plugin_version', true );
+        wp_register_script( 'visual-portfolio-3rd-jetpack', visual_portfolio()->plugin_url . 'assets/js/3rd/plugin-jetpack.min.js', array( 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
 
         $wp_scripts->registered[ $jetpack_ll_handler ]->deps[] = 'visual-portfolio-3rd-jetpack';
     }

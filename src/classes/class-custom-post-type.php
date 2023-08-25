@@ -2,7 +2,7 @@
 /**
  * Register Custom Post Types.
  *
- * @package @@plugin_name/admin
+ * @package visual-portfolio/admin
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -133,18 +133,18 @@ class Visual_Portfolio_Custom_Post_Type {
                         // Instead of this one:
                         // Home > Projects > Project Name.
                         'name'               => $custom_label,
-                        'singular_name'      => _x( 'Project', 'Post Type Singular Name', '@@text_domain' ),
+                        'singular_name'      => _x( 'Project', 'Post Type Singular Name', 'visual-portfolio' ),
                         'menu_name'          => visual_portfolio()->plugin_name,
-                        'parent_item_colon'  => __( 'Parent Project', '@@text_domain' ),
-                        'all_items'          => __( 'Projects', '@@text_domain' ),
-                        'view_item'          => __( 'View Project', '@@text_domain' ),
-                        'add_new_item'       => __( 'Add New Project', '@@text_domain' ),
-                        'add_new'            => __( 'Add New', '@@text_domain' ),
-                        'edit_item'          => __( 'Edit Project', '@@text_domain' ),
-                        'update_item'        => __( 'Update Project', '@@text_domain' ),
-                        'search_items'       => __( 'Search Project', '@@text_domain' ),
-                        'not_found'          => __( 'Not Found', '@@text_domain' ),
-                        'not_found_in_trash' => __( 'Not found in Trash', '@@text_domain' ),
+                        'parent_item_colon'  => __( 'Parent Project', 'visual-portfolio' ),
+                        'all_items'          => __( 'Projects', 'visual-portfolio' ),
+                        'view_item'          => __( 'View Project', 'visual-portfolio' ),
+                        'add_new_item'       => __( 'Add New Project', 'visual-portfolio' ),
+                        'add_new'            => __( 'Add New', 'visual-portfolio' ),
+                        'edit_item'          => __( 'Edit Project', 'visual-portfolio' ),
+                        'update_item'        => __( 'Update Project', 'visual-portfolio' ),
+                        'search_items'       => __( 'Search Project', 'visual-portfolio' ),
+                        'not_found'          => __( 'Not Found', 'visual-portfolio' ),
+                        'not_found_in_trash' => __( 'Not found in Trash', 'visual-portfolio' ),
                     ),
                     'public'             => true,
                     'publicly_queryable' => true,
@@ -185,9 +185,9 @@ class Visual_Portfolio_Custom_Post_Type {
                 'portfolio_category',
                 'portfolio',
                 array(
-                    'label'              => esc_html__( 'Portfolio Categories', '@@text_domain' ),
+                    'label'              => esc_html__( 'Portfolio Categories', 'visual-portfolio' ),
                     'labels'             => array(
-                        'menu_name' => esc_html__( 'Categories', '@@text_domain' ),
+                        'menu_name' => esc_html__( 'Categories', 'visual-portfolio' ),
                     ),
                     'rewrite'            => array(
                         'slug' => $permalinks['category_base'],
@@ -205,9 +205,9 @@ class Visual_Portfolio_Custom_Post_Type {
                 'portfolio_tag',
                 'portfolio',
                 array(
-                    'label'              => esc_html__( 'Portfolio Tags', '@@text_domain' ),
+                    'label'              => esc_html__( 'Portfolio Tags', 'visual-portfolio' ),
                     'labels'             => array(
-                        'menu_name' => esc_html__( 'Tags', '@@text_domain' ),
+                        'menu_name' => esc_html__( 'Tags', 'visual-portfolio' ),
                     ),
                     'rewrite'            => array(
                         'slug' => $permalinks['tag_base'],
@@ -228,19 +228,19 @@ class Visual_Portfolio_Custom_Post_Type {
             'vp_lists',
             array(
                 'labels'          => array(
-                    'name'               => _x( 'Saved Layouts', 'Post Type General Name', '@@text_domain' ),
-                    'singular_name'      => _x( 'Saved Layout', 'Post Type Singular Name', '@@text_domain' ),
+                    'name'               => _x( 'Saved Layouts', 'Post Type General Name', 'visual-portfolio' ),
+                    'singular_name'      => _x( 'Saved Layout', 'Post Type Singular Name', 'visual-portfolio' ),
                     'menu_name'          => visual_portfolio()->plugin_name,
-                    'parent_item_colon'  => __( 'Parent Project', '@@text_domain' ),
-                    'all_items'          => __( 'Saved Layouts', '@@text_domain' ),
-                    'view_item'          => __( 'View Saved Layout', '@@text_domain' ),
-                    'add_new_item'       => __( 'Add New Saved Layout', '@@text_domain' ),
-                    'add_new'            => __( 'Add New', '@@text_domain' ),
-                    'edit_item'          => __( 'Edit Saved Layout', '@@text_domain' ),
-                    'update_item'        => __( 'Update Saved Layout', '@@text_domain' ),
-                    'search_items'       => __( 'Search Saved Layout', '@@text_domain' ),
-                    'not_found'          => __( 'Not Found', '@@text_domain' ),
-                    'not_found_in_trash' => __( 'Not found in Trash', '@@text_domain' ),
+                    'parent_item_colon'  => __( 'Parent Project', 'visual-portfolio' ),
+                    'all_items'          => __( 'Saved Layouts', 'visual-portfolio' ),
+                    'view_item'          => __( 'View Saved Layout', 'visual-portfolio' ),
+                    'add_new_item'       => __( 'Add New Saved Layout', 'visual-portfolio' ),
+                    'add_new'            => __( 'Add New', 'visual-portfolio' ),
+                    'edit_item'          => __( 'Edit Saved Layout', 'visual-portfolio' ),
+                    'update_item'        => __( 'Update Saved Layout', 'visual-portfolio' ),
+                    'search_items'       => __( 'Search Saved Layout', 'visual-portfolio' ),
+                    'not_found'          => __( 'Not Found', 'visual-portfolio' ),
+                    'not_found_in_trash' => __( 'Not found in Trash', 'visual-portfolio' ),
                 ),
                 'public'          => false,
                 'has_archive'     => false,
@@ -293,7 +293,7 @@ class Visual_Portfolio_Custom_Post_Type {
             // Display filter HTML.
             echo '<select name="' . esc_attr( $taxonomy_slug ) . '" id="' . esc_attr( $taxonomy_slug ) . '" class="postform">';
             // translators: %s - taxonomy name.
-            echo '<option value="">' . sprintf( esc_html__( 'Show All %s', '@@text_domain' ), esc_html( $taxonomy_name ) ) . '</option>';
+            echo '<option value="">' . sprintf( esc_html__( 'Show All %s', 'visual-portfolio' ), esc_html( $taxonomy_name ) ) . '</option>';
             foreach ( $terms as $term ) {
                 printf(
                     '<option value="%1$s" %2$s>%3$s (%4$s)</option>',
@@ -318,7 +318,7 @@ class Visual_Portfolio_Custom_Post_Type {
 
         global $wp_version;
 
-        $check_string = 'Plugin: @@plugin_version WP: ' . $wp_version;
+        $check_string = 'Plugin: ' . VISUAL_PORTFOLIO_VERSION . ' WP: ' . $wp_version;
 
         if ( get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
             return;
@@ -334,12 +334,12 @@ class Visual_Portfolio_Custom_Post_Type {
 
         $wp_roles->add_role(
             'portfolio_manager',
-            __( 'Portfolio Manager', '@@text_domain' ),
+            __( 'Portfolio Manager', 'visual-portfolio' ),
             $author->capabilities
         );
         $wp_roles->add_role(
             'portfolio_author',
-            __( 'Portfolio Author', '@@text_domain' ),
+            __( 'Portfolio Author', 'visual-portfolio' ),
             $author->capabilities
         );
 
@@ -424,7 +424,7 @@ class Visual_Portfolio_Custom_Post_Type {
      */
     public function add_portfolio_img_column( $columns = array() ) {
         $column_meta = array(
-            'portfolio_post_thumbs' => esc_html__( 'Thumbnail', '@@text_domain' ),
+            'portfolio_post_thumbs' => esc_html__( 'Thumbnail', 'visual-portfolio' ),
         );
 
         // insert after first column.
@@ -466,7 +466,7 @@ class Visual_Portfolio_Custom_Post_Type {
             <div class="vpf-admin-notice-content">
                 <h3>
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <?php echo esc_html__( 'When to use Saved Layouts', '@@text_domain' ); ?>
+                    <?php echo esc_html__( 'When to use Saved Layouts', 'visual-portfolio' ); ?>
                 </h3>
                 <p>
                     <?php
@@ -474,7 +474,7 @@ class Visual_Portfolio_Custom_Post_Type {
                         sprintf(
                             // translators: %1$s - url to documentation.
                             // translators: %2$s - plugin name.
-                            __( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', '@@text_domain' ),
+                            __( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', 'visual-portfolio' ),
                             'https://visualportfolio.co/docs/portfolio-blocks/',
                             visual_portfolio()->plugin_name
                         )
@@ -484,13 +484,13 @@ class Visual_Portfolio_Custom_Post_Type {
                 <p>
                     <?php
                     // translators: %s - url to documentation.
-                    echo wp_kses_post( sprintf( __( 'To reuse blocks, you can use the built-in Gutenberg feature - <a href="%s" target="_blank">Reusable Blocks</a>.', '@@text_domain' ), 'https://www.wpbeginner.com/beginners-guide/how-to-create-a-reusable-block-in-wordpress/' ) );
+                    echo wp_kses_post( sprintf( __( 'To reuse blocks, you can use the built-in Gutenberg feature - <a href="%s" target="_blank">Reusable Blocks</a>.', 'visual-portfolio' ), 'https://www.wpbeginner.com/beginners-guide/how-to-create-a-reusable-block-in-wordpress/' ) );
                     ?>
                 </p>
                 <p>
                     <?php
                     // translators: %s - url to documentation.
-                    echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', '@@text_domain' ), 'https://visualportfolio.co/docs/saved-layouts-and-shortcodes/' ) );
+                    echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', 'visual-portfolio' ), 'https://visualportfolio.co/docs/saved-layouts-and-shortcodes/' ) );
                     ?>
                 </p>
             </div>
@@ -508,7 +508,7 @@ class Visual_Portfolio_Custom_Post_Type {
     public function add_vp_lists_custom_columns( $columns = array() ) {
         // Icon column.
         $column_icon = array(
-            'vp_lists_post_icon' => esc_html__( 'Icon', '@@text_domain' ),
+            'vp_lists_post_icon' => esc_html__( 'Icon', 'visual-portfolio' ),
         );
 
         // insert after first column.
@@ -516,7 +516,7 @@ class Visual_Portfolio_Custom_Post_Type {
 
         // Shortcode column.
         $column_shortcode = array(
-            'vp_lists_post_shortcode' => esc_html__( 'Shortcode', '@@text_domain' ),
+            'vp_lists_post_shortcode' => esc_html__( 'Shortcode', 'visual-portfolio' ),
         );
 
         // insert before last column.
@@ -567,9 +567,9 @@ class Visual_Portfolio_Custom_Post_Type {
             $all_layouts         = Visual_Portfolio_Get::get_all_layouts();
             $all_items_styles    = Visual_Portfolio_Get::get_all_items_styles();
             $all_content_sources = array(
-                'post-based'    => esc_html__( 'Posts', '@@text_domain' ),
-                'images'        => esc_html__( 'Images', '@@text_domain' ),
-                'social-stream' => esc_html__( 'Social', '@@text_domain' ),
+                'post-based'    => esc_html__( 'Posts', 'visual-portfolio' ),
+                'images'        => esc_html__( 'Images', 'visual-portfolio' ),
+                'social-stream' => esc_html__( 'Social', 'visual-portfolio' ),
             );
 
             // phpcs:ignore WordPress.Security.NonceVerification
@@ -581,7 +581,7 @@ class Visual_Portfolio_Custom_Post_Type {
 
             ?>
             <select name="vp_layout" id="filter-by-vp_layout">
-                <option value="0"><?php echo esc_html__( 'All layouts', '@@text_domain' ); ?></option>
+                <option value="0"><?php echo esc_html__( 'All layouts', 'visual-portfolio' ); ?></option>
                 <?php
                 foreach ( $all_layouts as $name => $data ) {
                     ?>
@@ -591,7 +591,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 ?>
             </select>
             <select name="vp_items_style" id="filter-by-vp_items_style">
-                <option value="0"><?php echo esc_html__( 'All styles', '@@text_domain' ); ?></option>
+                <option value="0"><?php echo esc_html__( 'All styles', 'visual-portfolio' ); ?></option>
                 <?php
                 foreach ( $all_items_styles as $name => $data ) {
                     ?>
@@ -601,7 +601,7 @@ class Visual_Portfolio_Custom_Post_Type {
                 ?>
             </select>
             <select name="vp_content_source" id="filter-by-vp_content_source">
-                <option value="0"><?php echo esc_html__( 'All sources', '@@text_domain' ); ?></option>
+                <option value="0"><?php echo esc_html__( 'All sources', 'visual-portfolio' ); ?></option>
                 <?php
                 foreach ( $all_content_sources as $name => $title ) {
                     ?>
@@ -794,8 +794,8 @@ class Visual_Portfolio_Custom_Post_Type {
         // Documentation menu link.
         add_submenu_page(
             self::get_menu_slug(),
-            esc_html__( 'Documentation', '@@text_domain' ),
-            esc_html__( 'Documentation', '@@text_domain' ),
+            esc_html__( 'Documentation', 'visual-portfolio' ),
+            esc_html__( 'Documentation', 'visual-portfolio' ),
             'manage_options',
             Visual_Portfolio_Admin::get_plugin_site_url(
                 array(
@@ -815,8 +815,8 @@ class Visual_Portfolio_Custom_Post_Type {
         // Proofing menu link.
         add_submenu_page(
             self::get_menu_slug(),
-            esc_html__( 'Proofing', '@@text_domain' ),
-            esc_html__( 'Proofing', '@@text_domain' ),
+            esc_html__( 'Proofing', 'visual-portfolio' ),
+            esc_html__( 'Proofing', 'visual-portfolio' ),
             'manage_options',
             'vpf_proofing_page',
             array( $this, 'go_proofing_pro_page' )
@@ -848,12 +848,12 @@ class Visual_Portfolio_Custom_Post_Type {
                         <td>
                             <div class="vpf-pro-note vpf-settings-info-pro">
                                 <h3>
-                                    <?php echo esc_html__( 'Premium Only', '@@text_domain' ); ?>
+                                    <?php echo esc_html__( 'Premium Only', 'visual-portfolio' ); ?>
                                 </h3>
                                 <div>
-                                    <p class="vpf-pro-note-description"><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', '@@text_domain' ); ?></p>
+                                    <p class="vpf-pro-note-description"><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', 'visual-portfolio' ); ?></p>
                                     <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $pro_url ); ?>">
-                                    <?php echo esc_html__( 'Go Pro', '@@text_domain' ); ?>
+                                    <?php echo esc_html__( 'Go Pro', 'visual-portfolio' ); ?>
                                     </a>
                                 </div>
                             </div>

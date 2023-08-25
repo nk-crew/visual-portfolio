@@ -4,6 +4,8 @@
 **/*.php
 **/*.yml
 node_modules
+src/assets/vendor
 dist
+build
 vendor
 vendors

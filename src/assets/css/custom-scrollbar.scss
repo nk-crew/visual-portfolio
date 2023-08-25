@@ -2,9 +2,9 @@
  * Visual Portfolio custom scrollbar.
  */
 .vp-portfolio__custom-scrollbar {
-  --vp-custom-scrollbar__background-color: #888;
+	--vp-custom-scrollbar__background-color: #888;
 
-  .simplebar-scrollbar::before {
-    background-color: var(--vp-custom-scrollbar__background-color);
-  }
+	.simplebar-scrollbar::before {
+		background-color: var(--vp-custom-scrollbar__background-color);
+	}
 }

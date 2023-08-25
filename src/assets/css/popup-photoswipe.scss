@@ -4,96 +4,96 @@
  * Visual Portfolio styles for PhotoSwipe.
  */
 .vp-pswp {
-  top: var(--wp-admin--admin-bar--height, 0px);
-  z-index: var(--vp-popup__z-index);
-  height: calc(100% - var(--wp-admin--admin-bar--height, 0px));
+	top: var(--wp-admin--admin-bar--height, 0);
+	z-index: var(--vp-popup__z-index);
+	height: calc(100% - var(--wp-admin--admin-bar--height, 0px));
 
-  .pswp__caption {
-    background-color: rgba(0, 0, 0, 75%);
+	.pswp__caption {
+		background-color: rgba(0, 0, 0, 75%);
 
-    > div {
-      max-width: 600px;
-      font-size: 12px;
-      color: #fff;
-    }
+		> div {
+			max-width: 600px;
+			font-size: 12px;
+			color: #fff;
+		}
 
-    h3 {
-      color: inherit;
-    }
+		h3 {
+			color: inherit;
+		}
 
-    a {
-      color: inherit;
+		a {
+			color: inherit;
 
-      &:hover {
-        opacity: 0.8;
-      }
-    }
+			&:hover {
+				opacity: 0.8;
+			}
+		}
 
-    .vp-portfolio__item-meta-title {
-      margin-top: 0;
-      margin-bottom: 3px;
-      font-size: 14px;
-      color: inherit;
+		.vp-portfolio__item-meta-title {
+			margin-top: 0;
+			margin-bottom: 3px;
+			font-size: 14px;
+			color: inherit;
 
-      a {
-        text-decoration: none;
-      }
-    }
-  }
+			a {
+				text-decoration: none;
+			}
+		}
+	}
 
-  .pswp__preloader {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-  }
+	.pswp__preloader {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		z-index: 1;
+	}
 
-  .vp-pswp-video {
-    position: relative;
-    z-index: 1045;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 1920px;
-    height: 100%;
-    margin: 0 auto;
-    line-height: 0;
-    text-align: left;
-    vertical-align: middle;
+	.vp-pswp-video {
+		position: relative;
+		z-index: 1045;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		max-width: 1920px;
+		height: 100%;
+		margin: 0 auto;
+		line-height: 0;
+		text-align: left;
+		vertical-align: middle;
 
-    > div {
-      position: relative;
-      width: 100%;
-      height: 0;
-      padding-bottom: 56.25%;
+		> div {
+			position: relative;
+			width: 100%;
+			height: 0;
+			padding-bottom: 56.25%;
 
-      iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-      }
+			iframe {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+			}
 
-      video,
-      audio {
-        position: absolute;
-        // stylelint-disable-next-line declaration-no-important
-        width: 100% !important;
-        // stylelint-disable-next-line declaration-no-important
-        height: 100% !important;
-        margin: 0;
-      }
+			video,
+			audio {
+				position: absolute;
+				// stylelint-disable-next-line declaration-no-important
+				width: 100% !important;
+				// stylelint-disable-next-line declaration-no-important
+				height: 100% !important;
+				margin: 0;
+			}
 
-      audio {
-        padding: 20px;
-      }
-    }
-  }
+			audio {
+				padding: 20px;
+			}
+		}
+	}
 
-  // Default cursor when click to zoom option disabled.
-  &.vp-pswp-no-zoom .pswp__img {
-    cursor: default;
-  }
+	// Default cursor when click to zoom option disabled.
+	&.vp-pswp-no-zoom .pswp__img {
+		cursor: default;
+	}
 }

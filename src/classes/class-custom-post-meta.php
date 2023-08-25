@@ -2,7 +2,7 @@
 /**
  * Add custom meta data to posts.
  *
- * @package @@plugin_name/admin
+ * @package visual-portfolio/admin
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -142,7 +142,7 @@ class Visual_Portfolio_Custom_Post_Meta {
 
         add_meta_box(
             'vp_format_video',
-            esc_html__( 'Video', '@@text_domain' ),
+            esc_html__( 'Video', 'visual-portfolio' ),
             array( __CLASS__, 'add_video_format_metabox' ),
             null,
             'side',
@@ -181,7 +181,7 @@ class Visual_Portfolio_Custom_Post_Meta {
         ?>
 
         <p></p>
-        <input class="vp-input" name="_vp_format_video_url" type="url" id="_vp_format_video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="<?php echo esc_attr__( 'https://', '@@text_domain' ); ?>">
+        <input class="vp-input" name="_vp_format_video_url" type="url" id="_vp_format_video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="<?php echo esc_attr__( 'https://', 'visual-portfolio' ); ?>">
         <div class="vp-oembed-preview">
             <?php
             if ( $oembed_html ) {
@@ -389,7 +389,7 @@ class Visual_Portfolio_Custom_Post_Meta {
 
         // When reading time is 0, return it as `< 1` instead of `0`.
         if ( 1 > $reading_time ) {
-            $reading_time = esc_html__( '< 1', '@@text_domain' );
+            $reading_time = esc_html__( '< 1', 'visual-portfolio' );
         } else {
             $reading_time = ceil( $reading_time );
         }

@@ -6,7 +6,7 @@
   "title": "Visual Portfolio Saved Layout",
   "description": "Display saved Visual Portfolio layouts.",
   "keywords": ["saved", "portfolio", "vpf"],
-  "textdomain": "@@text_domain",
+  "textdomain": "visual-portfolio",
   "supports": {
     "anchor": true,
     "className": true,

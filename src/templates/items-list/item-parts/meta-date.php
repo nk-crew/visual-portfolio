@@ -5,7 +5,7 @@
  * @var $args
  * @var $opts
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
@@ -23,7 +23,7 @@ if ( ! $opts['show_date'] ) {
 <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-date">
     <span class="vp-portfolio__item-meta-part-icon">
         <span class="vp-screen-reader-text">
-            <?php echo esc_html__( 'Date', '@@text_domain' ); ?>
+            <?php echo esc_html__( 'Date', 'visual-portfolio' ); ?>
         </span>
         <?php visual_portfolio()->include_template( 'icons/calendar' ); ?>
     </span>

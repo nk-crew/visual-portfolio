@@ -2,7 +2,7 @@
 /**
  * Parse controls data and generate styles output.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 /**

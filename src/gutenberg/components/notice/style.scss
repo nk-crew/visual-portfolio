@@ -1,18 +1,18 @@
 .vpf-component-notice {
-  margin-top: 20px;
-  margin-right: 0;
-  margin-left: 0;
+	margin-top: 20px;
+	margin-right: 0;
+	margin-left: 0;
 
-  &.is-info {
-    color: $blue-50;
-    background-color: rgba($blue-30, 0.1);
+	&.is-info {
+		color: $blue-50;
+		background-color: rgba($blue-30, 0.1);
 
-    p {
-      color: inherit;
-    }
-  }
+		p {
+			color: inherit;
+		}
+	}
 
-  p:last-of-type {
-    margin-bottom: 0 !important;
-  }
+	p:last-of-type {
+		margin-bottom: 0 !important;
+	}
 }

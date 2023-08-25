@@ -6,16 +6,18 @@ const { useEffect } = wp.element;
 /**
  * Render dynamic styles for editor.
  *
- * @returns {Null} nothing.
+ * @param  root0
+ * @param  root0.children
+ * @return {null} nothing.
  */
 export default function StylesRender({ children }) {
-  useEffect(() => {
-    const node = document.createElement('style');
-    node.innerHTML = children;
-    document.body.appendChild(node);
+	useEffect(() => {
+		const node = document.createElement('style');
+		node.innerHTML = children;
+		document.body.appendChild(node);
 
-    return () => document.body.removeChild(node);
-  }, [children]);
+		return () => document.body.removeChild(node);
+	}, [children]);
 
-  return null;
+	return null;
 }

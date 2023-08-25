@@ -1,0 +1,1 @@
+!function(){const{jQuery:o,vc:e}=window;o((()=>{void 0!==e&&e.events.on("shortcodes:add shortcodeView:updated",(o=>{if("visual_portfolio"!==o.settings.base)return;const t=e.$frame[0].contentWindow,n=!!t&&t.jQuery;if(n){const e=n(o.view.el).children(".vp-portfolio");e.length&&void 0!==e.vpf&&e.vpf()}}))}))}();

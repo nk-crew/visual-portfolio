@@ -2,7 +2,7 @@
 /**
  * Assets static and dynamic.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -119,13 +119,13 @@ class Visual_Portfolio_Assets {
         foreach ( self::$stored_assets[ $type ] as $name => $data ) {
             if ( isset( $data['value'] ) && $data['value'] ) {
                 if ( 'script' === $type ) {
-                    wp_enqueue_script( $name, '', array(), '@@plugin_version', true );
+                    wp_enqueue_script( $name, '', array(), VISUAL_PORTFOLIO_VERSION, true );
                 } elseif ( is_string( $data['value'] ) ) {
                     // Don't provide version for template style,
                     // it will be added automatically using `filemtime`.
                     visual_portfolio()->include_template_style( $name, $data['value'], array() );
                 } else {
-                    wp_enqueue_style( $name, '', array(), '@@plugin_version' );
+                    wp_enqueue_style( $name, '', array(), VISUAL_PORTFOLIO_VERSION );
                 }
 
                 self::$stored_assets[ $type ]['value'] = false;
@@ -301,13 +301,13 @@ class Visual_Portfolio_Assets {
 
             // Enqueue custom CSS.
             if ( $dynamic_styles_inline_style ) {
-                wp_register_style( $controls_css_handle, false, array(), '@@plugin_version' );
+                wp_register_style( $controls_css_handle, false, array(), VISUAL_PORTFOLIO_VERSION );
                 wp_enqueue_style( $controls_css_handle );
                 wp_add_inline_style( $controls_css_handle, $dynamic_styles ? $dynamic_styles : ' ' );
 
                 // Enqueue JS instead of CSS when rendering in <body> to prevent W3C errors.
             } elseif ( ! wp_script_is( $controls_css_handle, 'enqueued' ) ) {
-                wp_register_script( $controls_css_handle, false, array(), '@@plugin_version', true );
+                wp_register_script( $controls_css_handle, false, array(), VISUAL_PORTFOLIO_VERSION, true );
                 wp_enqueue_script( $controls_css_handle );
                 wp_add_inline_script(
                     $controls_css_handle,
@@ -410,9 +410,9 @@ class Visual_Portfolio_Assets {
 
         // LazySizes.
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
-            wp_register_script( 'lazysizes-config', visual_portfolio()->plugin_url . 'assets/js/lazysizes-cfg.min.js', array(), '@@plugin_version', true );
+            wp_register_script( 'lazysizes-config', visual_portfolio()->plugin_url . 'assets/js/lazysizes-cfg.min.js', array(), VISUAL_PORTFOLIO_VERSION, true );
             wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
-            wp_register_script( 'lazysizes-swiper-duplicates-load', visual_portfolio()->plugin_url . 'assets/js/lazysizes-swiper-duplicates-load.min.js', array(), '@@plugin_version', true );
+            wp_register_script( 'lazysizes-swiper-duplicates-load', visual_portfolio()->plugin_url . 'assets/js/lazysizes-swiper-duplicates-load.min.js', array(), VISUAL_PORTFOLIO_VERSION, true );
             wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array( 'lazysizes-config', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load' ), '5.3.2', true );
         }
 
@@ -432,7 +432,7 @@ class Visual_Portfolio_Assets {
         );
 
         foreach ( $vp_styles as $name => $data ) {
-            wp_register_style( $name, visual_portfolio()->plugin_url . $data[0], $data[1], '@@plugin_version' );
+            wp_register_style( $name, visual_portfolio()->plugin_url . $data[0], $data[1], VISUAL_PORTFOLIO_VERSION );
             wp_style_add_data( $name, 'rtl', 'replace' );
             wp_style_add_data( $name, 'suffix', '.min' );
         }
@@ -556,7 +556,7 @@ class Visual_Portfolio_Assets {
         );
 
         foreach ( $vp_scripts as $name => $data ) {
-            wp_register_script( $name, visual_portfolio()->plugin_url . $data[0], $data[1], '@@plugin_version', true );
+            wp_register_script( $name, visual_portfolio()->plugin_url . $data[0], $data[1], VISUAL_PORTFOLIO_VERSION, true );
         }
 
         do_action( 'vpf_after_assets_register' );
@@ -591,33 +591,33 @@ class Visual_Portfolio_Assets {
      */
     public function localize_global_data() {
         $data = array(
-            'version'              => '@@plugin_version',
+            'version'              => VISUAL_PORTFOLIO_VERSION,
             'pro'                  => false,
             '__'                   => array(
                 // translators: %s - plugin name.
-                'couldnt_retrieve_vp'  => sprintf( __( 'Couldn\'t retrieve %s ID.', '@@text_domain' ), visual_portfolio()->plugin_name ),
+                'couldnt_retrieve_vp'  => sprintf( __( 'Couldn\'t retrieve %s ID.', 'visual-portfolio' ), visual_portfolio()->plugin_name ),
 
-                'pswp_close'           => esc_attr__( 'Close (Esc)', '@@text_domain' ),
-                'pswp_share'           => esc_attr__( 'Share', '@@text_domain' ),
-                'pswp_fs'              => esc_attr__( 'Toggle fullscreen', '@@text_domain' ),
-                'pswp_zoom'            => esc_attr__( 'Zoom in/out', '@@text_domain' ),
-                'pswp_prev'            => esc_attr__( 'Previous (arrow left)', '@@text_domain' ),
-                'pswp_next'            => esc_attr__( 'Next (arrow right)', '@@text_domain' ),
-                'pswp_share_fb'        => esc_attr__( 'Share on Facebook', '@@text_domain' ),
-                'pswp_share_tw'        => esc_attr__( 'Tweet', '@@text_domain' ),
-                'pswp_share_pin'       => esc_attr__( 'Pin it', '@@text_domain' ),
+                'pswp_close'           => esc_attr__( 'Close (Esc)', 'visual-portfolio' ),
+                'pswp_share'           => esc_attr__( 'Share', 'visual-portfolio' ),
+                'pswp_fs'              => esc_attr__( 'Toggle fullscreen', 'visual-portfolio' ),
+                'pswp_zoom'            => esc_attr__( 'Zoom in/out', 'visual-portfolio' ),
+                'pswp_prev'            => esc_attr__( 'Previous (arrow left)', 'visual-portfolio' ),
+                'pswp_next'            => esc_attr__( 'Next (arrow right)', 'visual-portfolio' ),
+                'pswp_share_fb'        => esc_attr__( 'Share on Facebook', 'visual-portfolio' ),
+                'pswp_share_tw'        => esc_attr__( 'Tweet', 'visual-portfolio' ),
+                'pswp_share_pin'       => esc_attr__( 'Pin it', 'visual-portfolio' ),
 
-                'fancybox_close'       => esc_attr__( 'Close', '@@text_domain' ),
-                'fancybox_next'        => esc_attr__( 'Next', '@@text_domain' ),
-                'fancybox_prev'        => esc_attr__( 'Previous', '@@text_domain' ),
-                'fancybox_error'       => __( 'The requested content cannot be loaded. <br /> Please try again later.', '@@text_domain' ),
-                'fancybox_play_start'  => esc_attr__( 'Start slideshow', '@@text_domain' ),
-                'fancybox_play_stop'   => esc_attr__( 'Pause slideshow', '@@text_domain' ),
-                'fancybox_full_screen' => esc_attr__( 'Full screen', '@@text_domain' ),
-                'fancybox_thumbs'      => esc_attr__( 'Thumbnails', '@@text_domain' ),
-                'fancybox_download'    => esc_attr__( 'Download', '@@text_domain' ),
-                'fancybox_share'       => esc_attr__( 'Share', '@@text_domain' ),
-                'fancybox_zoom'        => esc_attr__( 'Zoom', '@@text_domain' ),
+                'fancybox_close'       => esc_attr__( 'Close', 'visual-portfolio' ),
+                'fancybox_next'        => esc_attr__( 'Next', 'visual-portfolio' ),
+                'fancybox_prev'        => esc_attr__( 'Previous', 'visual-portfolio' ),
+                'fancybox_error'       => __( 'The requested content cannot be loaded. <br /> Please try again later.', 'visual-portfolio' ),
+                'fancybox_play_start'  => esc_attr__( 'Start slideshow', 'visual-portfolio' ),
+                'fancybox_play_stop'   => esc_attr__( 'Pause slideshow', 'visual-portfolio' ),
+                'fancybox_full_screen' => esc_attr__( 'Full screen', 'visual-portfolio' ),
+                'fancybox_thumbs'      => esc_attr__( 'Thumbnails', 'visual-portfolio' ),
+                'fancybox_download'    => esc_attr__( 'Download', 'visual-portfolio' ),
+                'fancybox_share'       => esc_attr__( 'Share', 'visual-portfolio' ),
+                'fancybox_zoom'        => esc_attr__( 'Zoom', 'visual-portfolio' ),
             ),
             'settingsPopupGallery' => array(
                 // Default WordPress Images.

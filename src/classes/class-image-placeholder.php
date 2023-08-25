@@ -2,7 +2,7 @@
 /**
  * Image placeholder.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

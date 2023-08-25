@@ -2,7 +2,7 @@
 /**
  * Get portfolio list
  *
- * @package @@plugin_name/get
+ * @package visual-portfolio/get
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -118,7 +118,7 @@ class Visual_Portfolio_Get {
          * Example:
             array(
                 'new_items_style' => array(
-                    'title'            => esc_html__( 'New Items Style', '@@text_domain' ),
+                    'title'            => esc_html__( 'New Items Style', 'visual-portfolio' ),
                     'builtin_controls' => array(
                         'images_rounded_corners' => true,
                         'show_title'             => true,
@@ -1071,7 +1071,7 @@ class Visual_Portfolio_Get {
             array(
                 'filter'            => $atts['type'],
                 'filter_show_count' => 'true' === $atts['show_count'],
-                'filter_text_all'   => $atts['text_all'] ?? esc_attr__( 'All', '@@text_domain' ),
+                'filter_text_all'   => $atts['text_all'] ?? esc_attr__( 'All', 'visual-portfolio' ),
             )
         );
 
@@ -1991,11 +1991,11 @@ class Visual_Portfolio_Get {
         $sort_items = apply_filters(
             'vpf_extend_sort_items',
             array(
-                ''           => esc_html__( 'Default sorting', '@@text_domain' ),
-                'date_desc'  => esc_html__( 'Sort by date (newest)', '@@text_domain' ),
-                'date'       => esc_html__( 'Sort by date (oldest)', '@@text_domain' ),
-                'title'      => esc_html__( 'Sort by title (A-Z)', '@@text_domain' ),
-                'title_desc' => esc_html__( 'Sort by title (Z-A)', '@@text_domain' ),
+                ''           => esc_html__( 'Default sorting', 'visual-portfolio' ),
+                'date_desc'  => esc_html__( 'Sort by date (newest)', 'visual-portfolio' ),
+                'date'       => esc_html__( 'Sort by date (oldest)', 'visual-portfolio' ),
+                'title'      => esc_html__( 'Sort by title (A-Z)', 'visual-portfolio' ),
+                'title_desc' => esc_html__( 'Sort by title (Z-A)', 'visual-portfolio' ),
             ),
             $vp_options
         );
@@ -2121,7 +2121,7 @@ class Visual_Portfolio_Get {
         if ( isset( $args['opts']['show_date'] ) ) {
             if ( 'human' === $args['opts']['show_date'] ) {
                 // translators: %s - published in human format.
-                $args['published'] = sprintf( esc_html__( '%s ago', '@@text_domain' ), human_time_diff( mysql2date( 'U', $args['published_time'], true ), current_time( 'timestamp' ) ) ); //phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
+                $args['published'] = sprintf( esc_html__( '%s ago', 'visual-portfolio' ), human_time_diff( mysql2date( 'U', $args['published_time'], true ), current_time( 'timestamp' ) ) ); //phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
             } elseif ( $args['opts']['show_date'] ) {
                 $args['published'] = mysql2date( $args['opts']['date_format'] ? $args['opts']['date_format'] : 'F j, Y', $args['published_time'], true );
             }

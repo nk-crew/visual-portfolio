@@ -2,6 +2,7 @@
   "core": null,
   "themes": ["https://downloads.wordpress.org/theme/twentytwentythree.zip"],
   "plugins": ["."],
+  "phpVersion": "8.1",
   "env": {
     "tests": {
       "mappings": {

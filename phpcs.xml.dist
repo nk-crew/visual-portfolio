@@ -20,6 +20,7 @@
     <exclude-pattern>/tests/_missing-wp-functions.php</exclude-pattern>
     <exclude-pattern>/tests/bootstrap.php</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/build/*</exclude-pattern>
 
 
     <!-- Only check the PHP files. JS files are checked separately with JSCS and JSHint. -->
@@ -82,23 +83,12 @@
     -->
 
     <!-- Set the minimum supported WP version to WP 5.4. -->
-    <config name="minimum_supported_wp_version" value="5.4"/>
+    <config name="minimum_supported_wp_version" value="6.0"/>
 
     <!-- Prevent error about filename with Class -->
     <rule ref="WordPress.Files.FileName">
         <properties>
             <property name="strict_class_file_names" value="false" />
-        </properties>
-    </rule>
-
-
-    <!-- Verify that all gettext calls use the correct text domain. -->
-    <rule ref="WordPress.WP.I18n">
-        <properties>
-            <property name="text_domain" type="array">
-                <!-- This placeholder domain will be replaced automatically on each release. -->
-                <element value="@@text_domain"/>
-            </property>
         </properties>
     </rule>
 

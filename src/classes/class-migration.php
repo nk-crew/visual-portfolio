@@ -2,7 +2,7 @@
 /**
  * Migrations
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ class Visual_Portfolio_Migrations {
      *
      * @var string
      */
-    protected $version = '@@plugin_version';
+    protected $version = VISUAL_PORTFOLIO_VERSION;
 
     /**
      * Initial version.

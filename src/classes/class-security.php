@@ -2,7 +2,7 @@
 /**
  * Security sanitization and validation of data
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

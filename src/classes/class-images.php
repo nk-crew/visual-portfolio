@@ -2,7 +2,7 @@
 /**
  * Prepare placeholder and lazy load.
  *
- * @package @@plugin_name/images
+ * @package visual-portfolio/images
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -91,10 +91,10 @@ class Visual_Portfolio_Images {
         return array_merge(
             $sizes,
             array(
-                'vp_sm' => esc_html__( 'Small (VP)', '@@text_domain' ),
-                'vp_md' => esc_html__( 'Medium (VP)', '@@text_domain' ),
-                'vp_lg' => esc_html__( 'Large (VP)', '@@text_domain' ),
-                'vp_xl' => esc_html__( 'Extra Large (VP)', '@@text_domain' ),
+                'vp_sm' => esc_html__( 'Small (VP)', 'visual-portfolio' ),
+                'vp_md' => esc_html__( 'Medium (VP)', 'visual-portfolio' ),
+                'vp_lg' => esc_html__( 'Large (VP)', 'visual-portfolio' ),
+                'vp_xl' => esc_html__( 'Extra Large (VP)', 'visual-portfolio' ),
             )
         );
     }

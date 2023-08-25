@@ -2,7 +2,7 @@
 /**
  * Supported Images in Sitemap (SEO).
  *
- * @package @@plugin_name/sitemap
+ * @package visual-portfolio/sitemap
  */
 
 /**

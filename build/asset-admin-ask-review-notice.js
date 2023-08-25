@@ -1,0 +1,1 @@
+!function(){const{jQuery:e,ajaxurl:i,VPAskReviewNotice:n}=window;e("body").on("click",".vpf-review-plugin-notice-dismiss",(function(t){const o=e(this),s=o.attr("data-vpf-review-action");"yes"!==s&&t.preventDefault(),o.closest(".notice").slideUp("slow"),e.post(i,{action:"vpf_dismiss_ask_review_notice",type:s,nonce:n.nonce})}))}();

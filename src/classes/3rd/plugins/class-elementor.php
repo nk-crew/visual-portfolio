@@ -2,7 +2,7 @@
 /**
  * Class for Elementor
  *
- * @package @@plugin_name/elementor
+ * @package visual-portfolio/elementor
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

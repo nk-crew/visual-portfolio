@@ -23,30 +23,30 @@ const { registerBlockType } = wp.blocks;
 const { name } = metadata;
 
 const settings = {
-  ...metadata,
-  attributes,
-  icon: {
-    foreground: '#2540CC',
-    src: <ElementIcon width="20" height="20" />,
-  },
-  ghostkit: {
-    supports: {
-      styles: true,
-      spacings: true,
-      display: true,
-      scrollReveal: true,
-    },
-  },
-  example: {
-    attributes: {
-      preview_image_example: 'true',
-    },
-  },
-  variations,
-  edit,
-  save,
-  transforms,
-  deprecated,
+	...metadata,
+	attributes,
+	icon: {
+		foreground: '#2540CC',
+		src: <ElementIcon width="20" height="20" />,
+	},
+	ghostkit: {
+		supports: {
+			styles: true,
+			spacings: true,
+			display: true,
+			scrollReveal: true,
+		},
+	},
+	example: {
+		attributes: {
+			preview_image_example: 'true',
+		},
+	},
+	variations,
+	edit,
+	save,
+	transforms,
+	deprecated,
 };
 
 registerBlockType(name, settings);

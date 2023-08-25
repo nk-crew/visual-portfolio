@@ -6,7 +6,7 @@
  * @var $style_options
  * @var $class
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

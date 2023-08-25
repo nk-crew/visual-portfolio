@@ -2,7 +2,7 @@
 /**
  * Widget for Elementor
  *
- * @package @@plugin_name/elementor
+ * @package visual-portfolio/elementor
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,9 +33,9 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
 
         if ( $this->is_preview_mode() ) {
             wp_register_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/js/iframeResizer.min.js', '', '4.2.11', true );
-            wp_register_script( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/js/elementor.min.js', array( 'elementor-frontend', 'iframe-resizer', 'jquery' ), '@@plugin_version', true );
+            wp_register_script( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/js/elementor.min.js', array( 'elementor-frontend', 'iframe-resizer', 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
 
-            wp_register_style( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/css/elementor.min.css', array(), '@@plugin_version' );
+            wp_register_style( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'assets/admin/css/elementor.min.css', array(), VISUAL_PORTFOLIO_VERSION );
             wp_style_add_data( 'visual-portfolio-elementor', 'rtl', 'replace' );
             wp_style_add_data( 'visual-portfolio-elementor', 'suffix', '.min' );
         }
@@ -162,7 +162,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
         );
 
         $options = array(
-            '' => esc_html__( '-- Select Layout --', '@@text_domain' ),
+            '' => esc_html__( '-- Select Layout --', 'visual-portfolio' ),
         );
         foreach ( $vp_query as $post ) {
             $options[ $this->set_option_prefix( $post->ID ) ] = '#' . $post->ID . ' - ' . $post->post_title;
@@ -171,7 +171,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
         $this->start_controls_section(
             'content_section',
             array(
-                'label' => __( 'General', '@@text_domain' ),
+                'label' => __( 'General', 'visual-portfolio' ),
                 'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
             )
         );
@@ -179,7 +179,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
         $this->add_control(
             'saved_id',
             array(
-                'label'   => esc_html__( 'Saved Layout', '@@text_domain' ),
+                'label'   => esc_html__( 'Saved Layout', 'visual-portfolio' ),
                 'type'    => \Elementor\Controls_Manager::SELECT2,
                 'options' => $options,
                 'dynamic' => array(

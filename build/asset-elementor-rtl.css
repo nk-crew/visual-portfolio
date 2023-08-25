@@ -1,0 +1,1 @@
+.elementor [data-vp-layout=grid] .vp-portfolio__items .vp-portfolio__item-wrap .vp-portfolio__item,.elementor [data-vp-layout=masonry] .vp-portfolio__items .vp-portfolio__item-wrap .vp-portfolio__item,.elementor [data-vp-layout=tiles] .vp-portfolio__items .vp-portfolio__item-wrap .vp-portfolio__item{margin-right:var(--vp-items__gap);margin-top:var(--vp-items__gap-vertical)}

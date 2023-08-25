@@ -2,7 +2,7 @@
 /**
  * Supported themes.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -92,7 +92,7 @@ class Visual_Portfolio_Supported_Themes {
     public function wp_enqueue_scripts() {
         $theme_compat = $this->get_theme_compatibility_style();
         if ( $theme_compat ) {
-            wp_enqueue_style( $theme_compat['name'], $theme_compat['url'], array(), '@@plugin_version' );
+            wp_enqueue_style( $theme_compat['name'], $theme_compat['url'], array(), VISUAL_PORTFOLIO_VERSION );
             wp_style_add_data( $theme_compat['name'], 'rtl', 'replace' );
             wp_style_add_data( $theme_compat['name'], 'suffix', '.min' );
         }

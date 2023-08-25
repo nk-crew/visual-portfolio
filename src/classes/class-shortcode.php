@@ -2,7 +2,7 @@
 /**
  * Shortcode
  *
- * @package @@plugin_name/shortcode
+ * @package visual-portfolio/shortcode
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -55,7 +55,7 @@ class Visual_Portfolio_Shortcode {
                 'type'       => 'default',
                 'align'      => 'center',
                 'show_count' => false,
-                'text_all'   => esc_attr__( 'All', '@@text_domain' ),
+                'text_all'   => esc_attr__( 'All', 'visual-portfolio' ),
                 'class'      => '',
             ),
             $atts

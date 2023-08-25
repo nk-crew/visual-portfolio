@@ -2,7 +2,7 @@
 /**
  * Encode/Decode helper functions.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

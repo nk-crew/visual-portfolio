@@ -2,7 +2,7 @@
 /**
  * Control condition check.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 /**

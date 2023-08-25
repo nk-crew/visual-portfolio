@@ -32,6 +32,6 @@ const { plugin_name: pluginName } = window.VPGutenbergVariables;
 
 // Collection.
 registerBlockCollection('visual-portfolio', {
-  title: pluginName,
-  icon: <ElementIcon width="20" height="20" />,
+	title: pluginName,
+	icon: <ElementIcon width="20" height="20" />,
 });

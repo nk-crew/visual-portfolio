@@ -2,7 +2,7 @@
 /**
  * Methods to work with templates.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 /**
@@ -103,7 +103,7 @@ class Visual_Portfolio_Templates {
             $ver = $template['version'];
         }
         if ( ! $ver ) {
-            $ver = '@@plugin_version';
+            $ver = VISUAL_PORTFOLIO_VERSION;
         }
 
         // Allow 3rd party plugin filter template file from their plugin.

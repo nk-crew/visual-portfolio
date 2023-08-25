@@ -2,7 +2,7 @@
 /**
  * Register some fields for WPML.
  *
- * @package @@plugin_name/preview
+ * @package visual-portfolio/preview
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

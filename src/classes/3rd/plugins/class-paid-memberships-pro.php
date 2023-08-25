@@ -2,7 +2,7 @@
 /**
  * Paid Memberships Pro Plugin.
  *
- * @package @@plugin_name/pmp
+ * @package visual-portfolio/pmp
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

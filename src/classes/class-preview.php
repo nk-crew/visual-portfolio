@@ -2,7 +2,7 @@
 /**
  * Register fake page for portfolio preview.
  *
- * @package @@plugin_name/preview
+ * @package visual-portfolio/preview
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -237,7 +237,7 @@ class Visual_Portfolio_Preview {
 
         // Enqueue assets.
         wp_enqueue_script( 'iframe-resizer-content', visual_portfolio()->plugin_url . 'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js', array(), '4.2.11', true );
-        wp_enqueue_script( 'visual-portfolio-preview', visual_portfolio()->plugin_url . 'assets/js/preview.min.js', array( 'jquery', 'iframe-resizer-content' ), '@@plugin_version', true );
+        wp_enqueue_script( 'visual-portfolio-preview', visual_portfolio()->plugin_url . 'assets/js/preview.min.js', array( 'jquery', 'iframe-resizer-content' ), VISUAL_PORTFOLIO_VERSION, true );
 
         // Post data for script.
         wp_localize_script(
@@ -279,7 +279,7 @@ class Visual_Portfolio_Preview {
         Visual_Portfolio_Assets::enqueue( $options );
 
         // Custom styles.
-        visual_portfolio()->include_template_style( 'visual-portfolio-preview', 'preview/style', array(), '@@plugin_version' );
+        visual_portfolio()->include_template_style( 'visual-portfolio-preview', 'preview/style', array(), VISUAL_PORTFOLIO_VERSION );
 
         // Output template.
         visual_portfolio()->include_template(

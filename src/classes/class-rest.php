@@ -2,7 +2,7 @@
 /**
  * Rest API functions
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,7 +90,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
             }
         }
 
-        return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get list of saved layouts.', '@@text_domain' ), true );
+        return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get list of saved layouts.', 'visual-portfolio' ), true );
     }
 
     /**
@@ -122,7 +122,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         if ( ! empty( $layouts ) ) {
             return $this->success( $layouts );
         } else {
-            return $this->error( 'no_layouts_found', __( 'Layouts not found.', '@@text_domain' ) );
+            return $this->error( 'no_layouts_found', __( 'Layouts not found.', 'visual-portfolio' ) );
         }
     }
 
@@ -137,11 +137,11 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         $post_id = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
 
         if ( ! $post_id ) {
-            return $this->error( 'post_id_required', esc_html__( 'Post ID is required for this request.', '@@text_domain' ), true );
+            return $this->error( 'post_id_required', esc_html__( 'Post ID is required for this request.', 'visual-portfolio' ), true );
         }
 
         if ( ! current_user_can( 'edit_post', $post_id ) ) {
-            return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to edit saved layouts data.', '@@text_domain' ), true );
+            return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to edit saved layouts data.', 'visual-portfolio' ), true );
         }
 
         return true;
@@ -197,11 +197,11 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
         $post_id = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
 
         if ( ! $post_id || ! current_user_can( 'manage_options' ) ) {
-            return $this->error( 'user_dont_have_permission', esc_html__( 'User don\'t have permissions to change options.', '@@text_domain' ), true );
+            return $this->error( 'user_dont_have_permission', esc_html__( 'User don\'t have permissions to change options.', 'visual-portfolio' ), true );
         }
 
         if ( ! current_user_can( 'edit_post', $post_id ) ) {
-            return $this->error( 'user_dont_have_permission', esc_html__( 'User don\'t have permissions to change options.', '@@text_domain' ), true );
+            return $this->error( 'user_dont_have_permission', esc_html__( 'User don\'t have permissions to change options.', 'visual-portfolio' ), true );
         }
 
         return true;

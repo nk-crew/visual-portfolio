@@ -2,7 +2,7 @@
 /**
  * Ask Review Notice.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -67,27 +67,27 @@ class Visual_Portfolio_Ask_Review_Notice {
                 <i class="dashicons-visual-portfolio"></i>
             </div>
             <div class="vpf-admin-notice-content">
-                <h3><?php esc_html_e( 'Satisfied using Visual Portfolio?', '@@text_domain' ); ?></h3>
+                <h3><?php esc_html_e( 'Satisfied using Visual Portfolio?', 'visual-portfolio' ); ?></h3>
                 <p>
                     <?php
                         // translators: %s - Plugin name.
-                        echo wp_kses_post( sprintf( __( 'Hey, we noticed you\'ve been using %s for more than two weeks now – that\'s awesome!', '@@text_domain' ), '<strong>' . _x( 'Visual Portfolio', 'plugin name inside the review notice', '@@text_domain' ) . '</strong>' ) );
+                        echo wp_kses_post( sprintf( __( 'Hey, we noticed you\'ve been using %s for more than two weeks now – that\'s awesome!', 'visual-portfolio' ), '<strong>' . _x( 'Visual Portfolio', 'plugin name inside the review notice', 'visual-portfolio' ) . '</strong>' ) );
                     ?>
                     <br>
-                    <?php esc_html_e( 'Could you please do us a BIG favor and give it a rating on WordPress.org to help us spread the word and boost our motivation?', '@@text_domain' ); ?>
+                    <?php esc_html_e( 'Could you please do us a BIG favor and give it a rating on WordPress.org to help us spread the word and boost our motivation?', 'visual-portfolio' ); ?>
                 </p>
                 <p>
                     <a href="https://wordpress.org/support/plugin/visual-portfolio/reviews/?filter=5#new-post" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="yes" target="_blank" rel="noopener noreferrer">
                         <strong>
-                            <?php esc_html_e( 'Yes, you deserve it', '@@text_domain' ); ?>
+                            <?php esc_html_e( 'Yes, you deserve it', 'visual-portfolio' ); ?>
                         </strong>
                     </a>
                     <br>
                     <a href="#" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="later">
-                        <?php esc_html_e( 'No, maybe later', '@@text_domain' ); ?>
+                        <?php esc_html_e( 'No, maybe later', 'visual-portfolio' ); ?>
                     </a><br>
                     <a href="#" class="vpf-review-plugin-notice-dismiss" data-vpf-review-action="already">
-                        <?php esc_html_e( 'I already did', '@@text_domain' ); ?>
+                        <?php esc_html_e( 'I already did', 'visual-portfolio' ); ?>
                     </a>
                 </p>
             </div>
@@ -103,7 +103,7 @@ class Visual_Portfolio_Ask_Review_Notice {
             return;
         }
 
-        wp_enqueue_script( 'visual-portfolio-ask-review-notice', visual_portfolio()->plugin_url . 'assets/admin/js/ask-review-notice.min.js', array( 'jquery' ), '@@plugin_version', true );
+        wp_enqueue_script( 'visual-portfolio-ask-review-notice', visual_portfolio()->plugin_url . 'assets/admin/js/ask-review-notice.min.js', array( 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
         wp_localize_script(
             'visual-portfolio-ask-review-notice',
             'VPAskReviewNotice',

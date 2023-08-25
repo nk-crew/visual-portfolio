@@ -3,7 +3,7 @@
  * Thrive Architect Theme Builder.
  * This builder overrides page output and we can't enqueue inline dynamic styles using `wp_add_inline_style`
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

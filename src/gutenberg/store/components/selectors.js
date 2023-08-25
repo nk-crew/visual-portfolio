@@ -9,15 +9,15 @@ import ToggleModal from '../../components/toggle-modal';
 import ControlsRender from '../../components/controls-render';
 
 export function get() {
-  return {
-    ColorPicker,
-    ClassesTree,
-    ControlsRender,
-    VPDatePicker,
-    ElementsSelector,
-    IconsSelector,
-    VpfSelectControl,
-    SpinnerComponent,
-    ToggleModal,
-  };
+	return {
+		ColorPicker,
+		ClassesTree,
+		ControlsRender,
+		VPDatePicker,
+		ElementsSelector,
+		IconsSelector,
+		VpfSelectControl,
+		SpinnerComponent,
+		ToggleModal,
+	};
 }

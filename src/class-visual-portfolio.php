@@ -2,18 +2,22 @@
 /**
  * Plugin Name:  Visual Portfolio, Posts & Image Gallery
  * Description:  Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block.
- * Version:      @@plugin_version
+ * Version:      3.1.3
  * Author:       Visual Portfolio Team
  * Author URI:   https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
  * License:      GPLv2 or later
  * License URI:  https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:  @@text_domain
+ * Text Domain:  visual-portfolio
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
+}
+
+if ( ! defined( 'VISUAL_PORTFOLIO_VERSION' ) ) {
+    define( 'VISUAL_PORTFOLIO_VERSION', '3.1.3' );
 }
 
 /**
@@ -92,7 +96,7 @@ class Visual_Portfolio {
      * Init options
      */
     public function init() {
-        $this->plugin_name     = esc_html__( 'Visual Portfolio', '@@text_domain' );
+        $this->plugin_name     = esc_html__( 'Visual Portfolio', 'visual-portfolio' );
         $this->plugin_basename = plugin_basename( __FILE__ );
         $this->plugin_path     = plugin_dir_path( __FILE__ );
         $this->plugin_url      = plugin_dir_url( __FILE__ );
@@ -103,7 +107,7 @@ class Visual_Portfolio {
         }
 
         // load textdomain.
-        load_plugin_textdomain( '@@text_domain', false, basename( dirname( __FILE__ ) ) . '/languages' );
+        load_plugin_textdomain( 'visual-portfolio', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
         // Hooks.
         add_action( 'init', array( $this, 'run_deferred_rewrite_rules' ), 20 );

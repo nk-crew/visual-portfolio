@@ -6,8 +6,8 @@ import * as controls from './controls';
 const { registerStore } = wp.data;
 
 registerStore('visual-portfolio/saved-layout-data', {
-  reducer,
-  selectors,
-  actions,
-  controls,
+	reducer,
+	selectors,
+	actions,
+	controls,
 });

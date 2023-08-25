@@ -7,7 +7,7 @@
  * @var $thumbnails
  * @var $img_size
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound

@@ -6,7 +6,7 @@
  * @var $opts
  * @var $allow_links
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
@@ -29,7 +29,7 @@ $link_data   = array(
 <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-comments">
     <span class="vp-portfolio__item-meta-part-icon">
         <span class="vp-screen-reader-text">
-            <?php echo esc_html__( 'Comments', '@@text_domain' ); ?>
+            <?php echo esc_html__( 'Comments', 'visual-portfolio' ); ?>
         </span>
         <?php visual_portfolio()->include_template( 'icons/message' ); ?>
     </span>
@@ -38,10 +38,10 @@ $link_data   = array(
         visual_portfolio()->include_template( 'global/link-start', $link_data );
 
         if ( ! $args['comments_count'] ) {
-            echo esc_html__( 'No Comments', '@@text_domain' );
+            echo esc_html__( 'No Comments', 'visual-portfolio' );
         } else {
             // translators: %s Number of comments.
-            echo esc_html( sprintf( _n( '%s Comment', '%s Comments', $args['comments_count'], '@@text_domain' ), number_format_i18n( (int) $args['comments_count'] ) ) );
+            echo esc_html( sprintf( _n( '%s Comment', '%s Comments', $args['comments_count'], 'visual-portfolio' ), number_format_i18n( (int) $args['comments_count'] ) ) );
         }
 
         visual_portfolio()->include_template( 'global/link-end', $link_data );

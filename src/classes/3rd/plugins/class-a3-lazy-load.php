@@ -2,7 +2,7 @@
 /**
  * A3 Lazy Load Plugin.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
