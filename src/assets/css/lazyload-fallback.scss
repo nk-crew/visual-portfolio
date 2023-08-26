@@ -1,27 +1,12 @@
-@import "./variables-lazyload";
-
 /*
- * Visual Portfolio Lazyload Images
+ * Visual Portfolio Lazyload Images fallback for old browsers
+ * which does not support CSS :has()
  */
-
-// LazyLoad image
-img.vp-lazyload,
-img.vp-lazyloaded,
-img.vp-lazypreload,
-img.vp-lazyloading {
-  opacity: 0;
-  transition: var(--vp-lazyload-transition-duration) opacity;
-}
-
-img.vp-lazyloaded {
-  opacity: 1;
-}
-
 :is(.vp-portfolio__item-img, .vp-portfolio__thumbnail-img) {
   // Extra check for lazy loading class on the inner image
   // to make sure image will be lazy loaded by Visual Portfolio.
-  &:has(img:is(.vp-lazyload, .vp-lazyloading, .vp-lazyloaded))::before,
-  &:has(img:is(.vp-lazyload, .vp-lazyloading, .vp-lazyloaded))::after {
+  &:is(.vp-has-lazyload, .vp-has-lazyloading, .vp-has-lazyloaded)::before,
+  &:is(.vp-has-lazyload, .vp-has-lazyloading, .vp-has-lazyloaded)::after {
     position: absolute;
     top: 0;
     right: 0;
@@ -36,30 +21,19 @@ img.vp-lazyloaded {
     transition: var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) opacity, var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) visibility;
   }
 
-  &:has(img.vp-lazyloading)::before,
-  &:has(img.vp-lazyloading)::after {
+  &:is(.vp-has-lazyloading)::before,
+  &:is(.vp-has-lazyloading)::after {
     animation: vp-lazyload-placeholder var(--vp-lazyload-images__animation-duration) linear infinite;
   }
 
-  &:has(img.vp-lazyload)::before {
+  &:is(.vp-has-lazyload)::before {
     background: var(--vp-lazyload-images__background-second);
     animation-delay: var(--vp-lazyload-images__animation-second-delay);
   }
 
-  &:has(img.vp-lazyloaded)::before,
-  &:has(img.vp-lazyloaded)::after {
+  &:is(.vp-has-lazyloaded)::before,
+  &:is(.vp-has-lazyloaded)::after {
     visibility: hidden;
-    opacity: 0;
-  }
-}
-
-@keyframes vp-lazyload-placeholder {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
     opacity: 0;
   }
 }
