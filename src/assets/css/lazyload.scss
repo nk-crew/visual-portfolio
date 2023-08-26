@@ -2,6 +2,8 @@
 
 /*
  * Visual Portfolio Lazyload Images
+ *
+ * - :first-of-type is used to prevent conflicts with hover image (Pro feature)
  */
 
 // LazyLoad image
@@ -20,8 +22,8 @@ img.vp-lazyloaded {
 :is(.vp-portfolio__item-img, .vp-portfolio__thumbnail-img) {
   // Extra check for lazy loading class on the inner image
   // to make sure image will be lazy loaded by Visual Portfolio.
-  &:has(img:is(.vp-lazyload, .vp-lazyloading, .vp-lazyloaded))::before,
-  &:has(img:is(.vp-lazyload, .vp-lazyloading, .vp-lazyloaded))::after {
+  &:has(img:first-of-type:is(.vp-lazyload, .vp-lazyloading, .vp-lazyloaded))::before,
+  &:has(img:first-of-type:is(.vp-lazyload, .vp-lazyloading, .vp-lazyloaded))::after {
     position: absolute;
     top: 0;
     right: 0;
@@ -36,18 +38,18 @@ img.vp-lazyloaded {
     transition: var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) opacity, var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) visibility;
   }
 
-  &:has(img.vp-lazyloading)::before,
-  &:has(img.vp-lazyloading)::after {
+  &:has(img:first-of-type.vp-lazyloading)::before,
+  &:has(img:first-of-type.vp-lazyloading)::after {
     animation: vp-lazyload-placeholder var(--vp-lazyload-images__animation-duration) linear infinite;
   }
 
-  &:has(img.vp-lazyload)::before {
+  &:has(img:first-of-type.vp-lazyload)::before {
     background: var(--vp-lazyload-images__background-second);
     animation-delay: var(--vp-lazyload-images__animation-second-delay);
   }
 
-  &:has(img.vp-lazyloaded)::before,
-  &:has(img.vp-lazyloaded)::after {
+  &:has(img:first-of-type.vp-lazyloaded)::before,
+  &:has(img:first-of-type.vp-lazyloaded)::after {
     visibility: hidden;
     opacity: 0;
   }
