@@ -2,15 +2,17 @@
  * Visual Portfolio images lazy load.
  */
 
-// recalculate image size if parent is <picture>
+// Recalculate image size if parent is <picture>
 document.addEventListener('lazybeforesizes', (e) => {
   // for some reason sometimes e.detail is undefined, so we need to check it.
   if (!e.detail || !e.detail.width || !e.target) {
     return;
   }
 
-  if (e.target.closest(':not(picture)')) {
-    e.detail.width = e.target.clientWidth || e.detail.width;
+  const parent = e.target.closest(':not(picture)');
+
+  if (parent) {
+    e.detail.width = parent.clientWidth || e.detail.width;
   }
 });
 
