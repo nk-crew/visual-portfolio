@@ -29,9 +29,9 @@
     "postinstall": "composer install"
   },
   "devDependencies": {
-    "@playwright/test": "^1.35.1",
-    "@wordpress/e2e-test-utils-playwright": "^0.3.0",
-    "@wordpress/env": "^8.2.0",
+    "@playwright/test": "^1.37.0",
+    "@wordpress/e2e-test-utils-playwright": "^0.7.0",
+    "@wordpress/env": "^8.5.0",
     "@babel/node": "^7.16.8",
     "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
     "@babel/plugin-transform-react-jsx": "^7.16.7",
