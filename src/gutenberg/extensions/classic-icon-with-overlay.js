@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-const { addFilter } = wp.hooks;
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Add overlay automatically for Classic style, when Display Icon option enabled.

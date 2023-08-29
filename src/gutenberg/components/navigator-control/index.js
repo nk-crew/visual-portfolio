@@ -1,16 +1,16 @@
 /**
  * WordPress dependencies
  */
-const {
-	NavigatorProvider: __stableNavigatorProvider,
+import {
+	NavigatorProvider as __stableNavigatorProvider,
 	__experimentalNavigatorProvider,
-	NavigatorScreen: __stableNavigatorScreen,
+	NavigatorScreen as __stableNavigatorScreen,
 	__experimentalNavigatorScreen,
-	NavigatorButton: __stableNavigatorButton,
+	NavigatorButton as __stableNavigatorButton,
 	__experimentalNavigatorButton,
-	NavigatorBackButton: __stableNavigatorBackButton,
+	NavigatorBackButton as __stableNavigatorBackButton,
 	__experimentalNavigatorBackButton,
-} = wp.components;
+} from '@wordpress/components';
 
 const NavigatorProvider =
 	__stableNavigatorProvider || __experimentalNavigatorProvider;

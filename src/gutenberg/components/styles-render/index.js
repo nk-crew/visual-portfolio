@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-const { useEffect } = wp.element;
+import { useEffect } from '@wordpress/element';
 
 /**
  * Render dynamic styles for editor.

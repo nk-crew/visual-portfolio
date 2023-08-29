@@ -6,7 +6,7 @@ import './style.scss';
 /**
  * External dependencies
  */
-import { throttle, debounce } from 'throttle-debounce';
+import { throttle, debounce } from '@wordpress/compose';
 import rafSchd from 'raf-schd';
 import iframeResizer from 'iframe-resizer/js/iframeResizer';
 import classnames from 'classnames/dedupe';
@@ -26,13 +26,13 @@ const {
 /**
  * WordPress dependencies
  */
-const { applyFilters } = wp.hooks;
+import { applyFilters } from '@wordpress/hooks';
 
-const { Component, Fragment, createRef } = wp.element;
+import { Component, Fragment, createRef } from '@wordpress/element';
 
-const { withSelect } = wp.data;
+import { withSelect } from '@wordpress/data';
 
-const { Spinner } = wp.components;
+import { Spinner } from '@wordpress/components';
 
 let uniqueIdCount = 1;
 

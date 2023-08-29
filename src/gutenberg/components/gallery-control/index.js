@@ -31,17 +31,22 @@ import './extensions/image-title-and-desription';
 /**
  * WordPress dependencies
  */
-const { __, _n, sprintf } = wp.i18n;
+import { __, _n, sprintf } from '@wordpress/i18n';
 
-const { applyFilters } = wp.hooks;
+import { applyFilters } from '@wordpress/hooks';
 
-const { useSelect } = wp.data;
+import { useSelect } from '@wordpress/data';
 
-const { useState } = wp.element;
+import { useState } from '@wordpress/element';
 
-const { TextControl, Button, Modal, FocalPointPicker } = wp.components;
+import {
+	TextControl,
+	Button,
+	Modal,
+	FocalPointPicker,
+} from '@wordpress/components';
 
-const { MediaUpload, MediaUploadCheck } = wp.blockEditor;
+import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 
 const { VPGutenbergVariables } = window;
 

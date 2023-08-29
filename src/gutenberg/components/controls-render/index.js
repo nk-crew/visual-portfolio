@@ -36,13 +36,17 @@ import SortableControl from '../sortable-control';
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const { Component, RawHTML, useState, useEffect, useRef } = wp.element;
+import {
+	Component,
+	RawHTML,
+	useState,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
 
-const { applyFilters } = wp.hooks;
-
-const {
+import {
 	PanelBody,
 	Tooltip,
 	Notice,
@@ -55,9 +59,11 @@ const {
 	RadioControl,
 	ToggleControl,
 	RangeControl,
-	UnitControl: __stableUnitControl,
+	UnitControl as __stableUnitControl,
 	__experimentalUnitControl,
-} = wp.components;
+} from '@wordpress/components';
+
+import { applyFilters } from '@wordpress/hooks';
 
 const UnitControl = __stableUnitControl || __experimentalUnitControl;
 

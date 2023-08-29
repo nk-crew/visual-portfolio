@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
-const { SelectControl, TextControl } = wp.components;
+import { SelectControl, TextControl } from '@wordpress/components';
 
 const DEFAULT_RATIOS = {
 	'': __('Auto', 'visual-portfolio'),

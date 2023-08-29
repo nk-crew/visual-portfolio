@@ -1,17 +1,17 @@
 /**
  * WordPress Dependencies
  */
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const { withInstanceId, compose } = wp.compose;
+import { withInstanceId, compose } from '@wordpress/compose';
 
-const { withSelect, withDispatch } = wp.data;
+import { withSelect, withDispatch } from '@wordpress/data';
 
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
-const { PanelRow, FocalPointPicker } = wp.components;
+import { PanelRow, FocalPointPicker } from '@wordpress/components';
 
-const { addFilter } = wp.hooks;
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Component

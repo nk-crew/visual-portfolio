@@ -13,25 +13,25 @@ import BlockEdit from '../block/edit';
  */
 const { jQuery: $ } = window;
 
-const { registerBlockType, createBlock } = wp.blocks;
+import { registerBlockType, createBlock } from '@wordpress/blocks';
 
-const { registerPlugin } = wp.plugins;
+import { registerPlugin } from '@wordpress/plugins';
 
-const { __, sprintf } = wp.i18n;
+import { __, sprintf } from '@wordpress/i18n';
 
-const { apiFetch } = wp;
+import apiFetch from '@wordpress/api-fetch';
 
-const { applyFilters } = wp.hooks;
+import { applyFilters } from '@wordpress/hooks';
 
-const { Component, useState } = wp.element;
+import { Component, useState } from '@wordpress/element';
 
-const { PanelBody, Button } = wp.components;
+import { PanelBody, Button } from '@wordpress/components';
 
-const { withSelect, withDispatch } = wp.data;
+import { withSelect, withDispatch } from '@wordpress/data';
 
-const { InspectorControls } = wp.blockEditor;
+import { InspectorControls } from '@wordpress/block-editor';
 
-const { compose } = wp.compose;
+import { compose } from '@wordpress/compose';
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 

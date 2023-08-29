@@ -13,17 +13,22 @@ import controlGetValue from '../utils/control-get-value';
 /**
  * WordPress dependencies
  */
-const { __, sprintf } = wp.i18n;
+import { __, sprintf } from '@wordpress/i18n';
 
-const { addFilter } = wp.hooks;
+import { addFilter } from '@wordpress/hooks';
 
-const { useSelect } = wp.data;
+import { useSelect } from '@wordpress/data';
 
-const { RawHTML, useState } = wp.element;
+import { RawHTML, useState } from '@wordpress/element';
 
-const { BaseControl, ButtonGroup, Button, TextControl } = wp.components;
+import {
+	BaseControl,
+	ButtonGroup,
+	Button,
+	TextControl,
+} from '@wordpress/components';
 
-const { apiFetch } = wp;
+import apiFetch from '@wordpress/api-fetch';
 
 const { VPGutenbergVariables } = window;
 

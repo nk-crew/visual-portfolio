@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-const { Fragment, useState } = wp.element;
+import { Fragment, useState } from '@wordpress/element';
 
-const {
-	ToggleGroupControl: __stableToggleGroupControl,
-	ToggleGroupControlOption: __stableToggleGroupControlOption,
+import {
+	ToggleGroupControl as __stableToggleGroupControl,
+	ToggleGroupControlOption as __stableToggleGroupControlOption,
 	__experimentalToggleGroupControl,
 	__experimentalToggleGroupControlOption,
-} = wp.components;
+} from '@wordpress/components';
 
 const ToggleGroupControl =
 	__stableToggleGroupControl || __experimentalToggleGroupControl;

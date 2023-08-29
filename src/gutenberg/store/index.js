@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import { createReduxStore, register } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
@@ -12,12 +14,12 @@ import * as resolvers from './resolvers';
 import './components';
 import './utils';
 
-const { registerStore } = wp.data;
-
-registerStore('visual-portfolio', {
-	reducer,
+const store = createReduxStore('visual-portfolio', {
 	selectors,
 	actions,
 	controls,
 	resolvers,
+	reducer,
 });
+
+register(store);

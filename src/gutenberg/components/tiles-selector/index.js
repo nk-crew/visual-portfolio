@@ -13,11 +13,11 @@ import ToggleModal from '../toggle-modal';
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
-const { Button } = wp.components;
+import { Button } from '@wordpress/components';
 
 /**
  * Component Class

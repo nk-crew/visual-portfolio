@@ -1,7 +1,7 @@
 /*
  * Infinite Scroll pagination.
  */
-import { throttle } from 'throttle-debounce';
+import { throttle } from '@wordpress/compose';
 import rafSchd from 'raf-schd';
 
 const { jQuery: $ } = window;

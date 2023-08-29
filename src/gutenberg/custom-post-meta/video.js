@@ -7,19 +7,19 @@ import rafSchd from 'raf-schd';
 /**
  * WordPress Dependencies
  */
-const { __, sprintf } = wp.i18n;
+import { __, sprintf } from '@wordpress/i18n';
 
-const { withInstanceId, compose } = wp.compose;
+import { withInstanceId, compose } from '@wordpress/compose';
 
-const { withSelect, withDispatch } = wp.data;
+import { withSelect, withDispatch } from '@wordpress/data';
 
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
-const { PanelRow, TextControl } = wp.components;
+import { PanelRow, TextControl } from '@wordpress/components';
 
-const { PluginDocumentSettingPanel } = wp.editPost || {};
+import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 
-const { registerPlugin } = wp.plugins;
+import { registerPlugin } from '@wordpress/plugins';
 
 const { jQuery: $, ajaxurl, VPGutenbergMetaVariables } = window;
 

@@ -8,11 +8,11 @@ import classnames from 'classnames/dedupe';
  */
 const { jQuery: $, ajaxurl, VPGutenbergVariables } = window;
 
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const { Component, RawHTML } = wp.element;
+import { Component, RawHTML } from '@wordpress/element';
 
-const { Button, Spinner } = wp.components;
+import { Button, Spinner } from '@wordpress/components';
 
 const cachedOptions = {};
 

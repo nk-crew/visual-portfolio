@@ -6,9 +6,9 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-const { Fragment, useState } = wp.element;
+import { Fragment, useState } from '@wordpress/element';
 
-const { Button } = wp.components;
+import { Button } from '@wordpress/components';
 
 /**
  * Component Class

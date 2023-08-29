@@ -6,13 +6,13 @@ import shorthash from 'shorthash';
 /**
  * WordPress dependencies
  */
-const { addFilter } = wp.hooks;
+import { addFilter } from '@wordpress/hooks';
 
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
-const { createHigherOrderComponent } = wp.compose;
+import { createHigherOrderComponent } from '@wordpress/compose';
 
-const { withSelect } = wp.data;
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies

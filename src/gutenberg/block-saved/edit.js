@@ -13,13 +13,13 @@ import SelectControl from '../components/select-control';
 /**
  * WordPress dependencies
  */
-const { __, sprintf } = wp.i18n;
+import { __, sprintf } from '@wordpress/i18n';
 
-const { Placeholder, Spinner, PanelBody, Button } = wp.components;
+import { Placeholder, Spinner, PanelBody, Button } from '@wordpress/components';
 
-const { useSelect } = wp.data;
+import { useSelect } from '@wordpress/data';
 
-const { useBlockProps, InspectorControls } = wp.blockEditor;
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 

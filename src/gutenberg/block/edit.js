@@ -13,9 +13,9 @@ import IframePreview from '../components/iframe-preview';
 /**
  * WordPress dependencies
  */
-const { useEffect } = wp.element;
+import { useEffect } from '@wordpress/element';
 
-const { useBlockProps, InspectorControls } = wp.blockEditor;
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 
 const {
 	plugin_url: pluginUrl,

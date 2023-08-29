@@ -3,7 +3,7 @@
 /**
  * WordPress dependencies
  */
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
 // generate dom tree.
 function getNodeTree(node) {

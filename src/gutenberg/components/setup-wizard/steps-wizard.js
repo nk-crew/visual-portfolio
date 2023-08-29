@@ -2,12 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
-import { throttle } from 'throttle-debounce';
+import { throttle } from '@wordpress/compose';
 
 /**
  * WordPress dependencies
  */
-const { useEffect, useState, useRef, useCallback } = wp.element;
+import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 
 function stepsWizard(props) {
 	const { step, children } = props;

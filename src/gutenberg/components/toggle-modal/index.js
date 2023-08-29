@@ -6,9 +6,9 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
-const { Button, Modal } = wp.components;
+import { Button, Modal } from '@wordpress/components';
 
 /**
  * Component Class

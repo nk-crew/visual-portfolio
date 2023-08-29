@@ -26,7 +26,7 @@ import './block-saved';
 /**
  * WordPress dependencies
  */
-const { registerBlockCollection } = wp.blocks;
+import { registerBlockCollection } from '@wordpress/blocks';
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 

@@ -6,15 +6,17 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-const { useSelect } = wp.data;
+import { useSelect } from '@wordpress/data';
 
-const { Dropdown, Button, TabPanel, ColorPalette, GradientPicker } =
-	wp.components;
+import {
+	Dropdown,
+	Button,
+	TabPanel,
+	ColorPalette,
+	GradientPicker,
+} from '@wordpress/components';
 
-const {
-	__experimentalUseMultipleOriginColorsAndGradients:
-		useMultipleOriginColorsAndGradients,
-} = wp.blockEditor;
+import { __experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients } from '@wordpress/block-editor';
 
 function useColors() {
 	// New way to get colors and gradients.

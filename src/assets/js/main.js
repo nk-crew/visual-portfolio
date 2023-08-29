@@ -1,7 +1,7 @@
 /*
  * Visual Portfolio main script.
  */
-import { throttle } from 'throttle-debounce';
+import { throttle } from '@wordpress/compose';
 import rafSchd from 'raf-schd';
 
 /**

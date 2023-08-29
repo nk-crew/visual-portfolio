@@ -20,9 +20,9 @@ import { CSS } from '@dnd-kit/utilities';
 /**
  * WordPress dependencies
  */
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
-const { Button } = wp.components;
+import { Button } from '@wordpress/components';
 
 const SortableItem = function ({ id, element, sourceOptions, items, props }) {
 	const { allowDisablingOptions, onChange } = props;

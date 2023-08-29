@@ -10,7 +10,7 @@ import deprecated from './deprecated';
 /**
  * WordPress dependencies
  */
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 
 const { name } = metadata;
 

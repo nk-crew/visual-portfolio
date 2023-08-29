@@ -13,11 +13,11 @@ import ControlsRender from '../controls-render';
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const { Component, useState } = wp.element;
+import { Component, useState } from '@wordpress/element';
 
-const {
+import {
 	PanelBody,
 	Button,
 	DropdownMenu,
@@ -25,7 +25,7 @@ const {
 	Modal,
 	Toolbar,
 	ToolbarButton,
-} = wp.components;
+} from '@wordpress/components';
 
 const alignIcons = {
 	left: (

@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-const { Component } = wp.element;
+import { Component } from '@wordpress/element';
 
-const { Spinner } = wp.components;
+import { Spinner } from '@wordpress/components';
 
 /**
  * Component Class

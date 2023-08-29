@@ -6,7 +6,7 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-const { Button, Tooltip } = wp.components;
+import { Button, Tooltip } from '@wordpress/components';
 
 /**
  * Component Class

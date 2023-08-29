@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-const { RawHTML } = wp.element;
+import { RawHTML } from '@wordpress/element';
 
 export default [
 	// v1.16.1

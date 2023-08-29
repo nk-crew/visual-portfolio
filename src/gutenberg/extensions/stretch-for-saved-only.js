@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-const { addFilter } = wp.hooks;
+import { addFilter } from '@wordpress/hooks';
 
 // Allow Stretch control on Saved Layouts editor only.
 addFilter(

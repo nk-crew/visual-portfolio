@@ -8,11 +8,11 @@ import StepsWizard from './steps-wizard';
 /**
  * WordPress dependencies
  */
-const { useEffect, useState } = wp.element;
+import { useEffect, useState } from '@wordpress/element';
 
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const { ToggleControl, Button } = wp.components;
+import { ToggleControl, Button } from '@wordpress/components';
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 

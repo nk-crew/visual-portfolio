@@ -2,7 +2,7 @@
  * Name    : Visual Portfolio
  * Author  : nK https://nkdev.info
  */
-import { debounce } from 'throttle-debounce';
+import { debounce } from '@wordpress/compose';
 import rafSchd from 'raf-schd';
 
 const { jQuery: $, ajaxurl, VPAdminVariables } = window;

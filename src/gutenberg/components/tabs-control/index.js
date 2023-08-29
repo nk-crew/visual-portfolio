@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-const { Component, RawHTML } = wp.element;
+import { Component, RawHTML } from '@wordpress/element';
 
-const { TabPanel } = wp.components;
+import { TabPanel } from '@wordpress/components';
 
 /**
  * Component Class
