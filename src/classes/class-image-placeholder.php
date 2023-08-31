@@ -47,7 +47,7 @@ class Visual_Portfolio_Image_Placeholder {
 
         // Upload placeholder image to Media Library.
         $upload_dir = wp_upload_dir();
-        $source     = visual_portfolio()->plugin_path . '/assets/images/placeholder.png';
+        $source     = visual_portfolio()->plugin_path . '/src/assets/images/placeholder.png';
         $filename   = $upload_dir['basedir'] . '/visual-portfolio/placeholder.png';
 
         // try to move to /visual-portfolio/ directory.

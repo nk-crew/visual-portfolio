@@ -96,7 +96,7 @@ export default function BlockEdit(props) {
 		return (
 			<div className="vpf-example-preview">
 				<img
-					src={`${pluginUrl}/assets/admin/images/example-${layout}.png`}
+					src={`${pluginUrl}/src/assets/admin/images/example-${layout}.png`}
 					alt={`Preview of ${layout} layout`}
 				/>
 			</div>

@@ -66,9 +66,9 @@ class Visual_Portfolio_Admin {
             'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
         );
 
-        wp_enqueue_script( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'assets/admin/js/script.min.js', array( 'jquery', 'wp-data' ), VISUAL_PORTFOLIO_VERSION, true );
+        wp_enqueue_script( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'build/asset-admin-script.js', array( 'jquery', 'wp-data' ), VISUAL_PORTFOLIO_VERSION, true );
         wp_localize_script( 'visual-portfolio-admin', 'VPAdminVariables', $data_init );
-        wp_enqueue_style( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'assets/admin/css/style.min.css', array(), VISUAL_PORTFOLIO_VERSION );
+        wp_enqueue_style( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'build/style-asset-admin.css', array(), VISUAL_PORTFOLIO_VERSION );
         wp_style_add_data( 'visual-portfolio-admin', 'rtl', 'replace' );
         wp_style_add_data( 'visual-portfolio-admin', 'suffix', '.min' );
     }
@@ -82,8 +82,8 @@ class Visual_Portfolio_Admin {
         );
 
         if ( 'vp_lists' === get_post_type() ) {
-            wp_enqueue_script( 'visual-portfolio-saved-layouts', visual_portfolio()->plugin_url . 'gutenberg/layouts-editor.min.js', array( 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
-            wp_enqueue_style( 'visual-portfolio-saved-layouts', visual_portfolio()->plugin_url . 'gutenberg/layouts-editor.min.css', array(), VISUAL_PORTFOLIO_VERSION );
+            wp_enqueue_script( 'visual-portfolio-saved-layouts', visual_portfolio()->plugin_url . 'build/layouts-editor-script.js', array( 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
+            wp_enqueue_style( 'visual-portfolio-saved-layouts', visual_portfolio()->plugin_url . 'build/layouts-editor-style.css', array(), VISUAL_PORTFOLIO_VERSION );
             wp_style_add_data( 'visual-portfolio-saved-layouts', 'rtl', 'replace' );
             wp_style_add_data( 'visual-portfolio-saved-layouts', 'suffix', '.min' );
 
@@ -919,7 +919,7 @@ class Visual_Portfolio_Admin {
                 'default' => array(
                     'title'                => esc_html__( 'Classic', 'visual-portfolio' ),
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="5.89285" y1="22.25" x2="14.1071" y2="22.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
-                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-classic.png',
+                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/src/assets/admin/images/items-style-preview-classic.png',
                     'builtin_controls'     => array(
                         'image'   => array(
                             'border_radius' => true,
@@ -998,7 +998,7 @@ class Visual_Portfolio_Admin {
                 'fade' => array(
                     'title'                => esc_html__( 'Fade', 'visual-portfolio' ),
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="5.89285" y1="10.25" x2="14.1071" y2="10.25" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-fade.png',
+                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/src/assets/admin/images/items-style-preview-fade.png',
                     'builtin_controls'     => array(
                         'image'   => array(
                             'border_radius' => true,
@@ -1062,7 +1062,7 @@ class Visual_Portfolio_Admin {
                 'fly' => array(
                     'title'                => esc_html__( 'Fly', 'visual-portfolio' ),
                     'icon'                 => '<svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="9.8875" x2="4.39286" y2="9.8875" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="10.4643" y1="0.75" x2="10.4643" y2="19.375" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-fly.png',
+                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/src/assets/admin/images/items-style-preview-fly.png',
                     'builtin_controls'     => array(
                         'image'   => array(
                             'border_radius' => true,
@@ -1126,7 +1126,7 @@ class Visual_Portfolio_Admin {
                 'emerge' => array(
                     'title'                => esc_html__( 'Emerge', 'visual-portfolio' ),
                     'icon'                 => '<svg width="21" height="23" viewBox="0 0 21 23" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="0.75" width="18.5" height="18.625" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="transparent"/><line x1="0.75" y1="-0.75" x2="19.283" y2="-0.75" transform="matrix(0.998303 0.0582344 -0.0575156 0.998345 0 13.225)" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><line x1="5.89285" y1="16.2125" x2="14.1071" y2="16.2125" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/assets/admin/images/items-style-preview-emerge.png',
+                    'image_preview_wizard' => visual_portfolio()->plugin_url . '/src/assets/admin/images/items-style-preview-emerge.png',
                     'builtin_controls'     => array(
                         'image'   => array(
                             'border_radius' => true,

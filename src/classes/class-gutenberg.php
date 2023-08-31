@@ -160,7 +160,7 @@ class Visual_Portfolio_Gutenberg_Block {
         $attributes = $this->get_block_attributes();
 
         register_block_type(
-            visual_portfolio()->plugin_path . 'gutenberg/block',
+            visual_portfolio()->plugin_path . 'build/gutenberg/block',
             array(
                 'render_callback' => array( $this, 'block_render' ),
                 'attributes'      => $attributes,

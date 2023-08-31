@@ -28,13 +28,13 @@ class Visual_Portfolio_Templates {
         $template = locate_template( array( '/visual-portfolio/' . $template_name . '.php' ) );
 
         // pro plugin template.
-        if ( ! $template && visual_portfolio()->pro_plugin_path && file_exists( visual_portfolio()->pro_plugin_path . 'templates/' . $template_name . '.php' ) ) {
-            $template = visual_portfolio()->pro_plugin_path . 'templates/' . $template_name . '.php';
+        if ( ! $template && visual_portfolio()->pro_plugin_path && file_exists( visual_portfolio()->pro_plugin_path . 'src/templates/' . $template_name . '.php' ) ) {
+            $template = visual_portfolio()->pro_plugin_path . 'src/templates/' . $template_name . '.php';
         }
 
         // default template.
         if ( ! $template ) {
-            $template = visual_portfolio()->plugin_path . 'templates/' . $template_name . '.php';
+            $template = visual_portfolio()->plugin_path . 'src/templates/' . $template_name . '.php';
         }
 
         // Allow 3rd party plugin filter template file from their plugin.
@@ -69,8 +69,8 @@ class Visual_Portfolio_Templates {
             $template_version = filemtime( visual_portfolio()->pro_plugin_path . 'templates/' . $template_name . '.css' );
         } elseif ( file_exists( visual_portfolio()->plugin_path . 'templates/' . $template_name . '.css' ) ) {
             // Default file in plugin folder.
-            $template         = visual_portfolio()->plugin_url . 'templates/' . $template_name . '.css';
-            $template_version = filemtime( visual_portfolio()->plugin_path . 'templates/' . $template_name . '.css' );
+            $template         = visual_portfolio()->plugin_url . 'src/templates/' . $template_name . '.css';
+            $template_version = filemtime( visual_portfolio()->plugin_path . 'src/templates/' . $template_name . '.css' );
         }
 
         return array(

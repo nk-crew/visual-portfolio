@@ -375,60 +375,60 @@ class Visual_Portfolio_Assets {
 
         // Isotope.
         if ( apply_filters( 'vpf_enqueue_plugin_isotope', true ) ) {
-            wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'assets/vendor/isotope-layout/dist/isotope.pkgd.min.js', array( 'jquery' ), '3.0.6', true );
+            wp_register_script( 'isotope', visual_portfolio()->plugin_url . 'build/asset-vendor-isotope.js', array( 'jquery' ), '3.0.6', true );
         }
 
         // fjGallery.
         if ( apply_filters( 'vpf_enqueue_plugin_flickr_justified_gallery', true ) ) {
-            wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js', array( 'jquery' ), '2.1.2', true );
+            wp_register_script( 'flickr-justified-gallery', visual_portfolio()->plugin_url . 'build/asset-vendor-fjGallery-script.js', array( 'jquery' ), '2.1.2', true );
         }
 
         // PhotoSwipe.
         if ( 'photoswipe' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_photoswipe', true ) ) {
-            wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/photoswipe.css', array(), '4.1.3' );
-            wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/default-skin/default-skin.css', array( 'photoswipe' ), '4.1.3' );
-            wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/photoswipe.min.js', array( 'jquery' ), '4.1.3', true );
-            wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'assets/vendor/photoswipe/dist/photoswipe-ui-default.min.js', array( 'jquery', 'photoswipe' ), '4.1.3', true );
+            wp_register_style( 'photoswipe', visual_portfolio()->plugin_url . 'build/asset-vendor-photoswipe-style.css', array(), '4.1.3' );
+            wp_register_style( 'photoswipe-default-skin', visual_portfolio()->plugin_url . 'build/asset-vendor-default-skin-style.css', array( 'photoswipe' ), '4.1.3' );
+            wp_register_script( 'photoswipe', visual_portfolio()->plugin_url . 'build/asset-vendor-photoswipe-script.js', array( 'jquery' ), '4.1.3', true );
+            wp_register_script( 'photoswipe-ui-default', visual_portfolio()->plugin_url . 'build/asset-vendor-photoswipe-ui-default-script.js', array( 'jquery', 'photoswipe' ), '4.1.3', true );
 
             // Fancybox.
         } elseif ( 'fancybox' === $popup_vendor && apply_filters( 'vpf_enqueue_plugin_fancybox', true ) ) {
-            wp_register_style( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/dist/jquery.fancybox.min.css', array(), '3.5.7' );
-            wp_register_script( 'fancybox', visual_portfolio()->plugin_url . 'assets/vendor/fancybox/dist/jquery.fancybox.min.js', array( 'jquery' ), '3.5.7', true );
+            wp_register_style( 'fancybox', visual_portfolio()->plugin_url . 'build/asset-vendor-fancybox-style.css', array(), '3.5.7' );
+            wp_register_script( 'fancybox', visual_portfolio()->plugin_url . 'build/asset-vendor-fancybox-script.js', array( 'jquery' ), '3.5.7', true );
         }
 
         // Swiper.
         if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '8.4.7' );
-            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '8.4.7', true );
+            wp_register_style( 'swiper', visual_portfolio()->plugin_url . 'build/asset-vendor-swiper-bundle-style.css', array(), '8.4.7' );
+            wp_register_script( 'swiper', visual_portfolio()->plugin_url . 'build/asset-vendor-swiper-bundle-script.js', array(), '8.4.7', true );
         }
 
         // Simplebar.
         if ( apply_filters( 'vpf_enqueue_plugin_simplebar', true ) ) {
-            wp_register_style( 'simplebar', visual_portfolio()->plugin_url . 'assets/vendor/simplebar/dist/simplebar.min.css', array(), '5.3.0' );
-            wp_register_script( 'simplebar', visual_portfolio()->plugin_url . 'assets/vendor/simplebar/dist/simplebar.min.js', array(), '5.3.0', true );
+            wp_register_style( 'simplebar', visual_portfolio()->plugin_url . 'build/asset-vendor-simplebar-style.css', array(), '5.3.0' );
+            wp_register_script( 'simplebar', visual_portfolio()->plugin_url . 'vuild/asset-vendor-simplebar-script.js', array(), '5.3.0', true );
         }
 
         // LazySizes.
         if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
-            wp_register_script( 'lazysizes-config', visual_portfolio()->plugin_url . 'assets/js/lazysizes-cfg.min.js', array(), VISUAL_PORTFOLIO_VERSION, true );
-            wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'assets/js/lazysizes-object-fit-cover.min.js', array(), '4.1.0', true );
-            wp_register_script( 'lazysizes-swiper-duplicates-load', visual_portfolio()->plugin_url . 'assets/js/lazysizes-swiper-duplicates-load.min.js', array(), VISUAL_PORTFOLIO_VERSION, true );
-            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'assets/vendor/lazysizes/lazysizes.min.js', array( 'lazysizes-config', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load' ), '5.3.2', true );
+            wp_register_script( 'lazysizes-config', visual_portfolio()->plugin_url . 'build/asset-lazysizes-cfg-script.js', array(), VISUAL_PORTFOLIO_VERSION, true );
+            wp_register_script( 'lazysizes-object-fit-cover', visual_portfolio()->plugin_url . 'build/asset-lazysizes-object-fit-cover-script.js', array(), '4.1.0', true );
+            wp_register_script( 'lazysizes-swiper-duplicates-load', visual_portfolio()->plugin_url . 'build/asset-lazysizes-swiper-duplicates-load-script.js', array(), VISUAL_PORTFOLIO_VERSION, true );
+            wp_register_script( 'lazysizes', visual_portfolio()->plugin_url . 'build/asset-vendor-lazysizes-script.js', array( 'lazysizes-config', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load' ), '5.3.2', true );
         }
 
         // Visual Portfolio CSS.
         $vp_styles = array(
-            'visual-portfolio'                  => array( 'assets/css/main.min.css', $vp_style_deps ),
-            'visual-portfolio-elementor'        => array( 'assets/css/elementor.min.css', array( 'visual-portfolio' ) ),
-            'visual-portfolio-lazyload'         => array( 'assets/css/lazyload.min.css', array() ),
-            'visual-portfolio-custom-scrollbar' => array( 'assets/css/custom-scrollbar.min.css', array( 'simplebar' ) ),
-            'visual-portfolio-layout-justified' => array( 'assets/css/layout-justified.min.css', array( 'visual-portfolio' ) ),
-            'visual-portfolio-layout-slider'    => array( 'assets/css/layout-slider.min.css', array( 'visual-portfolio', 'swiper' ) ),
-            'visual-portfolio-layout-masonry'   => array( 'assets/css/layout-masonry.min.css', array( 'visual-portfolio' ) ),
-            'visual-portfolio-layout-grid'      => array( 'assets/css/layout-grid.min.css', array( 'visual-portfolio' ) ),
-            'visual-portfolio-layout-tiles'     => array( 'assets/css/layout-tiles.min.css', array( 'visual-portfolio' ) ),
-            'visual-portfolio-popup-fancybox'   => array( 'assets/css/popup-fancybox.min.css', array( 'visual-portfolio', 'fancybox' ) ),
-            'visual-portfolio-popup-photoswipe' => array( 'assets/css/popup-photoswipe.min.css', array( 'visual-portfolio', 'photoswipe-default-skin' ) ),
+            'visual-portfolio'                  => array( 'build/asset-main.css', $vp_style_deps ),
+            'visual-portfolio-elementor'        => array( 'build/asset-elementor.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-lazyload'         => array( 'build/asset-lazyload.css', array() ),
+            'visual-portfolio-custom-scrollbar' => array( 'build/asset-custom-scrollbar.css', array( 'simplebar' ) ),
+            'visual-portfolio-layout-justified' => array( 'build/asset-layout-justified.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-layout-slider'    => array( 'build/asset-layout-slider.css', array( 'visual-portfolio', 'swiper' ) ),
+            'visual-portfolio-layout-masonry'   => array( 'build/asset-layout-masonry.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-layout-grid'      => array( 'build/asset-layout-grid.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-layout-tiles'     => array( 'build/asset-layout-tiles.css', array( 'visual-portfolio' ) ),
+            'visual-portfolio-popup-fancybox'   => array( 'build/asset-popup-fancybox.css', array( 'visual-portfolio', 'fancybox' ) ),
+            'visual-portfolio-popup-photoswipe' => array( 'build/asset-popup-photoswipe.css', array( 'visual-portfolio', 'photoswipe-default-skin' ) ),
         );
 
         foreach ( $vp_styles as $name => $data ) {
@@ -440,52 +440,52 @@ class Visual_Portfolio_Assets {
         // Visual Portfolio JS.
         $vp_scripts = array(
             'visual-portfolio' => array(
-                'assets/js/main.min.js',
+                'build/asset-main-script.js',
                 $vp_deps,
             ),
             'visual-portfolio-plugin-isotope' => array(
-                'assets/js/plugin-isotope.min.js',
+                'build/asset-plugin-isotope-script.js',
                 array(
                     'jquery',
                     'isotope',
                 ),
             ),
             'visual-portfolio-plugin-fj-gallery' => array(
-                'assets/js/plugin-fj-gallery.min.js',
+                'build/asset-plugin-fj-gallery-script.js',
                 array(
                     'jquery',
                     'flickr-justified-gallery',
                 ),
             ),
             'visual-portfolio-plugin-swiper' => array(
-                'assets/js/plugin-swiper.min.js',
+                'build/asset-plugin-swiper-script.js',
                 array(
                     'jquery',
                     'swiper',
                 ),
             ),
             'visual-portfolio-custom-scrollbar' => array(
-                'assets/js/custom-scrollbar.min.js',
+                'build/asset-custom-scrollbar-script.js',
                 array(
                     'jquery',
                     'simplebar',
                 ),
             ),
             'visual-portfolio-lazyload' => array(
-                'assets/js/lazyload.min.js',
+                'build/asset-lazyload-script.js',
                 array(
                     'jquery',
                     'lazysizes',
                 ),
             ),
             'visual-portfolio-popup-gallery' => array(
-                'assets/js/popup-gallery.min.js',
+                'build/asset-popup-gallery-script.js',
                 array(
                     'jquery',
                 ),
             ),
             'visual-portfolio-plugin-photoswipe' => array(
-                'assets/js/plugin-photoswipe.min.js',
+                'build/asset-plugin-photoswipe-script.js',
                 array(
                     'jquery',
                     'photoswipe-ui-default',
@@ -493,7 +493,7 @@ class Visual_Portfolio_Assets {
                 ),
             ),
             'visual-portfolio-plugin-fancybox' => array(
-                'assets/js/plugin-fancybox.min.js',
+                'build/asset-plugin-fancybox-script.js',
                 array(
                     'jquery',
                     'fancybox',
@@ -501,54 +501,54 @@ class Visual_Portfolio_Assets {
                 ),
             ),
             'visual-portfolio-layout-masonry' => array(
-                'assets/js/layout-masonry.min.js',
+                'build/asset-layout-masonry-script.js',
                 array(
                     'jquery',
                     'visual-portfolio-plugin-isotope',
                 ),
             ),
             'visual-portfolio-layout-grid' => array(
-                'assets/js/layout-grid.min.js',
+                'build/asset-layout-grid-script.js',
                 array(
                     'jquery',
                     'visual-portfolio-plugin-isotope',
                 ),
             ),
             'visual-portfolio-layout-tiles' => array(
-                'assets/js/layout-tiles.min.js',
+                'build/asset-layout-tiles-script.js',
                 array(
                     'jquery',
                     'visual-portfolio-plugin-isotope',
                 ),
             ),
             'visual-portfolio-layout-justified' => array(
-                'assets/js/layout-justified.min.js',
+                'build/asset-layout-justified-script.js',
                 array(
                     'jquery',
                     'visual-portfolio-plugin-fj-gallery',
                 ),
             ),
             'visual-portfolio-layout-slider' => array(
-                'assets/js/layout-slider.min.js',
+                'build/asset-layout-slider-script.js',
                 array(
                     'jquery',
                     'visual-portfolio-plugin-swiper',
                 ),
             ),
             'visual-portfolio-items-style-fly' => array(
-                'assets/js/items-style-fly.min.js',
+                'build/asset-items-style-fly-script.js',
                 array(
                     'jquery',
                 ),
             ),
             'visual-portfolio-pagination-infinite' => array(
-                'assets/js/pagination-infinite.min.js',
+                'build/asset-pagination-infinite-script.js',
                 array(
                     'jquery',
                 ),
             ),
             'visual-portfolio-pagination-minimal-paged' => array(
-                'assets/js/pagination-minimal-paged.min.js',
+                'build/asset-pagination-minimal-paged-script.js',
                 array(
                     'jquery',
                 ),
@@ -686,7 +686,7 @@ class Visual_Portfolio_Assets {
      */
     public function add_noscript_styles() {
         $styles      = '';
-        $styles_path = visual_portfolio()->plugin_path . '/assets/css/noscript.min.css';
+        $styles_path = visual_portfolio()->plugin_path . '/build/asset-noscript.css';
 
         if ( file_exists( $styles_path ) ) {
             // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
