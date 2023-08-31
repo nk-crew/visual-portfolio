@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-const { resolve } = require('path');
+const { basename, dirname, resolve } = require('path');
 
 const glob = require('glob');
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
@@ -18,7 +18,7 @@ const entryAssetsJs = glob
 			matchForRename !== null &&
 			typeof matchForRename[1] !== 'undefined'
 		) {
-			entries[`asset-${matchForRename[1]}`] = resolve(
+			entries[`asset-${matchForRename[1]}-script`] = resolve(
 				process.cwd(),
 				entry
 			);
@@ -47,11 +47,11 @@ const rootDir = './src';
 
 const vendorFiles = [
   './src/assets/vendor/**/*.js',
-  './src/assets/vendor/**/*.js.map',
+  //'./src/assets/vendor/**/*.js.map',
   './node_modules/@fancyapps/*fancybox/dist/jquery.fancybox.min.js',
   './node_modules/@fancyapps/*fancybox/dist/jquery.fancybox.min.css',
   './node_modules/*flickr-justified-gallery/dist/fjGallery.min.js',
-  './node_modules/*flickr-justified-gallery/dist/fjGallery.min.js.map',
+  //'./node_modules/*flickr-justified-gallery/dist/fjGallery.min.js.map',
   './node_modules/*flickr-justified-gallery/dist/fjGallery.css',
   './node_modules/*iframe-resizer/js/iframeResizer.contentWindow.min.js',
   //'./node_modules/*iframe-resizer/js/iframeResizer.contentWindow.map',
@@ -69,7 +69,7 @@ const vendorFiles = [
   './node_modules/*simplebar/dist/simplebar.min.js',
   './node_modules/*simplebar/dist/simplebar.min.css',
   './node_modules/*swiper/swiper-bundle.min.js',
-  './node_modules/*swiper/swiper-bundle.min.js.map',
+  //'./node_modules/*swiper/swiper-bundle.min.js.map',
   './node_modules/*swiper/swiper-bundle.min.css',
 ];
 
@@ -83,7 +83,9 @@ const entryAssetsVendors = glob
       matchForRename !== null &&
       typeof matchForRename[1] !== 'undefined'
     ) {
-      entries[`asset-vendor-${matchForRename[1]}`] = resolve(
+      let endingName = item === '.min.js' || item === '.js' || '.pkgd.min.js' ? '-script' : '';
+      endingName = item === '.min.css' || item === '.css' ? '-style' : endingName;
+      entries[`asset-vendor-${matchForRename[1]}${endingName}`] = resolve(
         process.cwd(),
         entry
       );
@@ -111,42 +113,49 @@ const entryAssetsCss = glob
   return entries;
 }, {});
 
+const entryTemplatesCss = glob
+.sync(
+  [
+    './src/templates/**/style.scss',
+    './src/templates/**/**/style.scss',
+    './src/templates/**/**/**/style.scss',
+    './src/templates/**/index.scss',
+    './src/templates/**/**/index.scss',
+    './src/templates/**/**/**/index.scss',
+  ]
+)
+.reduce(function (entries, entry) {
+  const template = entry.replace('src/', '').replace('.scss', '');
+  entries[template] = resolve(
+    process.cwd(),
+    entry
+  );
+  return entries;
+}, {});
+
 const newConfig = {
   ...defaultConfig,
-/*
-  module: {
-		...defaultConfig.module,
-		rules: [
-			...defaultConfig.module.rules,
-      {
-        test: /\.svg$/,
-        use: {
-            loader: 'svg-url-loader',
-            options: {
-                encoding: 'base64'
-            }
-        }
-      },
-		],
-	},*/
   ...
   {
     entry: {
       // JS.
       'gutenberg-index': resolve(process.cwd(), 'src/gutenberg', 'index.js'),
       'custom-post-meta': resolve(process.cwd(), 'src/gutenberg', 'custom-post-meta.js'),
-      'layouts-editor': resolve(process.cwd(), 'src/gutenberg', 'layouts-editor.js'),
+      'layouts-editor-script': resolve(process.cwd(), 'src/gutenberg', 'layouts-editor.js'),
       // Assets JS.
       ...entryAssetsJs,
       // Assets Admin JS.
       ...entryAssetsAdminJs,
+      // Assets Vendors.
       ...entryAssetsVendors,
       'asset-plugin-jetpack': resolve(process.cwd(), 'src/assets/js/3rd', 'plugin-jetpack.js'),
       // SCSS.
       'gutenberg': resolve(process.cwd(), 'src/gutenberg', 'style.scss'),
-      'layouts-editor': resolve(process.cwd(), 'src/gutenberg', 'layouts-editor.scss'),
+      'layouts-editor-style': resolve(process.cwd(), 'src/gutenberg', 'layouts-editor.scss'),
       // Assets.
       ...entryAssetsCss,
+      // Templates.
+      ...entryTemplatesCss,
       // Admin Assets.
       'asset-admin-elementor': resolve(process.cwd(), 'src/assets/admin/css', 'elementor.scss'),
       'asset-admin': resolve(process.cwd(), 'src/assets/admin/css', 'style.scss'),
@@ -161,6 +170,33 @@ const newConfig = {
       filename: `[name]-rtl.css`,
     }),
   ],
+  optimization: {
+    ...defaultConfig.optimization,
+    splitChunks: {
+			cacheGroups: {
+        ...defaultConfig.optimization.splitChunks.cacheGroups,
+				style: {
+					type: 'css/mini-extract',
+					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
+					chunks: 'all',
+					enforce: true,
+					name( _, chunks, cacheGroupKey ) {
+						const chunkName = chunks[ 0 ].name;
+            let cssOutput = `${ dirname(
+							chunkName
+						) }/${ cacheGroupKey }-${ basename( chunkName ) }`;
+
+            if ( chunkName.indexOf('templates/') > -1 && cacheGroupKey === 'style') {
+              cssOutput = `${ dirname(
+                chunkName
+              ) }/${ basename( chunkName ) }`;
+            }
+						return cssOutput;
+					},
+				},
+			},
+		},
+  },
 };
 
 // Production only.

@@ -1,0 +1,1 @@
+(0,window.jQuery)(document).on("initOptions.vpf",((e,i)=>{"vpf"===e.namespace&&(i.defaults.justifiedRowHeight=250,i.defaults.justifiedRowHeightTolerance=.25,i.options.justifiedRowHeight||(i.options.justifiedRowHeight=i.defaults.justifiedRowHeight),i.options.justifiedRowHeightTolerance||(i.options.justifiedRowHeightTolerance=i.defaults.justifiedRowHeightTolerance))}));
