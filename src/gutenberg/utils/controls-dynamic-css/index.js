@@ -6,7 +6,7 @@ import { maybeDecode } from '../encode-decode';
 
 const { merge } = window.lodash;
 
-const { applyFilters } = wp.hooks;
+import { applyFilters } from '@wordpress/hooks';
 
 const { controls: registeredControls } = window.VPGutenbergVariables;
 

@@ -6,7 +6,8 @@ import './style.scss';
 /**
  * External dependencies
  */
-import { throttle, debounce } from '@wordpress/compose';
+//import { throttle, debounce } from '@wordpress/compose';
+import { throttle, debounce } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
 import iframeResizer from 'iframe-resizer/js/iframeResizer';
 import classnames from 'classnames/dedupe';
@@ -30,7 +31,7 @@ import { applyFilters } from '@wordpress/hooks';
 
 import { Component, Fragment, createRef } from '@wordpress/element';
 
-import { withSelect } from '@wordpress/data';
+import { withSelect, dispatch } from '@wordpress/data';
 
 import { Spinner } from '@wordpress/components';
 
@@ -105,9 +106,7 @@ class IframePreview extends Component {
 				onMessage({ message }) {
 					// select current block on click message.
 					if (message === 'clicked') {
-						wp.data
-							.dispatch('core/block-editor')
-							.selectBlock(clientId);
+						dispatch('core/block-editor').selectBlock(clientId);
 
 						window.focus();
 					}

@@ -6,7 +6,7 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
-import ElementIcon from '../../assets/admin/images/icon-gutenberg.svg';
+import { ReactComponent as ElementIcon } from '../../assets/admin/images/icon-gutenberg.svg';
 import IframePreview from '../components/iframe-preview';
 import SelectControl from '../components/select-control';
 

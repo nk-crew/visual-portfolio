@@ -177,7 +177,7 @@ class Visual_Portfolio_Settings {
                 'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
             );
 
-            wp_enqueue_script( 'visual-portfolio-archive-page-selector', visual_portfolio()->plugin_url . 'assets/admin/js/archive-page-selector.min.js', array( 'jquery', 'select2' ), VISUAL_PORTFOLIO_VERSION, true );
+            wp_enqueue_script( 'visual-portfolio-archive-page-selector', visual_portfolio()->plugin_url . 'build/assets/admin/js/archive-page-selector.js', array( 'jquery', 'select2' ), VISUAL_PORTFOLIO_VERSION, true );
 
             wp_localize_script( 'visual-portfolio-archive-page-selector', 'VPAdminVariables', $data_init );
 

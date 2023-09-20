@@ -1,7 +1,8 @@
 /*
  * Visual Portfolio plugin Isotope extension.
  */
-import { throttle, debounce } from '@wordpress/compose';
+//import { throttle, debounce } from '@wordpress/compose';
+import { throttle, debounce } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
 
 const $ = window.jQuery;

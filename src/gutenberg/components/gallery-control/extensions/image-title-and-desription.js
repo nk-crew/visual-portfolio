@@ -1,13 +1,13 @@
 /**
  * Change Title and Description controls when used dynamic source option.
  */
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const { addFilter } = wp.hooks;
+import { addFilter } from '@wordpress/hooks';
 
-const { useSelect } = wp.data;
+import { useSelect } from '@wordpress/data';
 
-const { TextControl, TextareaControl } = wp.components;
+import { TextControl, TextareaControl } from '@wordpress/components';
 
 function RenderTitleAndDescriptionImageControls(props) {
 	const { data, textSource, img, name, index } = props;

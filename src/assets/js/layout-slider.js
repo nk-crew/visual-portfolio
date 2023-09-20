@@ -2,7 +2,8 @@
  * External dependencies.
  */
 import isNumber from 'is-number';
-import { throttle } from '@wordpress/compose';
+//import { throttle } from '@wordpress/compose';
+import { throttle } from 'throttle-debounce';
 
 /*
  * Visual Portfolio layout Slider.

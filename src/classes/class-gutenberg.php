@@ -212,14 +212,14 @@ class Visual_Portfolio_Gutenberg_Block {
         // Block.
         wp_enqueue_script(
             'visual-portfolio-gutenberg',
-            plugins_url( '../gutenberg/index.min.js', __FILE__ ),
-            array( 'wp-i18n', 'wp-element', 'wp-components', 'jquery', 'lodash' ),
+            visual_portfolio()->plugin_url . 'build/gutenberg/index.js',
+            array( 'wp-i18n', 'wp-element', 'wp-components', 'jquery', 'lodash', 'react', 'react-dom', 'wp-api-fetch', 'wp-block-editor', 'wp-blocks', 'wp-compose', 'wp-data', 'wp-date', 'wp-hooks', 'wp-react-refresh-runtime' ),
             VISUAL_PORTFOLIO_VERSION,
             true
         );
         wp_enqueue_style(
             'visual-portfolio-gutenberg',
-            plugins_url( '../gutenberg/style.min.css', __FILE__ ),
+            visual_portfolio()->plugin_url . 'build/gutenberg/style.css',
             array(),
             VISUAL_PORTFOLIO_VERSION
         );
@@ -246,8 +246,8 @@ class Visual_Portfolio_Gutenberg_Block {
         // Meta.
         wp_enqueue_script(
             'visual-portfolio-gutenberg-custom-post-meta',
-            plugins_url( '../gutenberg/custom-post-meta.min.js', __FILE__ ),
-            array( 'wp-i18n', 'wp-element', 'wp-components', 'wp-plugins', 'jquery' ),
+            visual_portfolio()->plugin_url . 'build/gutenberg/custom-post-meta.js',
+            array( 'wp-i18n', 'wp-element', 'wp-components', 'wp-plugins', 'jquery', 'wp-compose', 'wp-data', 'wp-edit-post', 'wp-hooks', 'wp-react-refresh-runtime' ),
             VISUAL_PORTFOLIO_VERSION,
             true
         );

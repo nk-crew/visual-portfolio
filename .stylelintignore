@@ -1,6 +1,8 @@
 **/*.js
 **/*.jsx
 **/*.min.css
+**/*style.css
+**/*style-rtl.css
 **/*.build.css
 node_modules
 src/assets/vendor

@@ -19,5 +19,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'Visual_Portfolio' ) ) :
-    require_once dirname( __FILE__ ) . '/dist/visual-portfolio/class-visual-portfolio.php';
+    require_once dirname( __FILE__ ) . '/class-visual-portfolio.php';
 endif;

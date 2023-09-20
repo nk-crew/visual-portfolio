@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
-import { throttle } from '@wordpress/compose';
+//import { throttle } from '@wordpress/compose';
+import { throttle } from 'throttle-debounce';
 
 /**
  * WordPress dependencies

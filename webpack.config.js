@@ -5,128 +5,150 @@ const { basename, dirname, resolve } = require('path');
 
 const glob = require('glob');
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const RtlCssPlugin = require('rtlcss-webpack-plugin');
 const isProduction = process.env.NODE_ENV === 'production';
+const FileManagerPlugin = require('filemanager-webpack-plugin');
+
+const {
+	getWordPressSrcDirectory,
+} = require( '@wordpress/scripts/utils' );
+
+const vendorFiles = [
+  {
+    source: 'node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js',
+    destination: 'src/assets/vendor/fancybox/dist/jquery.fancybox.min.js',
+  },
+  {
+    source: 'node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css',
+    destination: 'src/assets/vendor/fancybox/dist/jquery.fancybox.min.css',
+  },
+  {
+    source: 'node_modules/flickr-justified-gallery/dist/fjGallery.min.js',
+    destination: 'src/assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js',
+  },
+  {
+    source: 'node_modules/flickr-justified-gallery/dist/fjGallery.min.js.map',
+    destination: 'src/assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js.map',
+  },
+  {
+    source: 'node_modules/flickr-justified-gallery/dist/fjGallery.css',
+    destination: 'src/assets/vendor/flickr-justified-gallery/dist/fjGallery.css',
+  },
+  {
+    source: 'node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js',
+    destination: 'src/assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js',
+  },
+  {
+    source: 'node_modules/iframe-resizer/js/iframeResizer.contentWindow.map',
+    destination: 'src/assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.map',
+  },
+  {
+    source: 'node_modules/iframe-resizer/js/iframeResizer.min.js',
+    destination: 'src/assets/vendor/iframe-resizer/js/iframeResizer.min.js',
+  },
+  {
+    source: 'node_modules/iframe-resizer/js/iframeResizer.map',
+    destination: 'src/assets/vendor/iframe-resizer/js/iframeResizer.map',
+  },
+  {
+    source: 'node_modules/isotope-layout/dist/isotope.pkgd.min.js',
+    destination: 'src/assets/vendor/isotope-layout/dist/isotope.pkgd.min.js',
+  },
+  {
+    source: 'node_modules/lazysizes/lazysizes.min.js',
+    destination: 'src/assets/vendor/lazysizes/lazysizes.min.js',
+  },
+  {
+    source: 'node_modules/photoswipe/dist/photoswipe.min.js',
+    destination: 'src/assets/vendor/photoswipe/dist/photoswipe.min.js',
+  },
+  {
+    source: 'node_modules/photoswipe/dist/photoswipe-ui-default.min.js',
+    destination: 'src/assets/vendor/photoswipe/dist/photoswipe-ui-default.min.js',
+  },
+  {
+    source: 'node_modules/photoswipe/dist/photoswipe.css',
+    destination: 'src/assets/vendor/photoswipe/dist/photoswipe.css',
+  },
+  {
+    source: 'node_modules/photoswipe/dist/default-skin/default-skin.css',
+    destination: 'src/assets/vendor/photoswipe/dist/default-skin/default-skin.css',
+  },
+  {
+    source: 'node_modules/photoswipe/dist/default-skin/default-skin.png',
+    destination: 'src/assets/vendor/photoswipe/dist/default-skin/default-skin.png',
+  },
+  {
+    source: 'node_modules/photoswipe/dist/default-skin/default-skin.svg',
+    destination: 'src/assets/vendor/photoswipe/dist/default-skin/default-skin.svg',
+  },
+  {
+    source: 'node_modules/photoswipe/dist/default-skin/preloader.gif',
+    destination: 'src/assets/vendor/photoswipe/dist/default-skin/preloader.gif',
+  },
+  {
+    source: 'node_modules/simplebar/dist/simplebar.min.js',
+    destination: 'src/assets/vendor/simplebar/dist/simplebar.min.js',
+  },
+  {
+    source: 'node_modules/simplebar/dist/simplebar.min.css',
+    destination: 'src/assets/vendor/simplebar/dist/simplebar.min.css',
+  },
+  {
+    source: 'node_modules/swiper/swiper-bundle.min.js',
+    destination: 'src/assets/vendor/swiper/swiper-bundle.min.js',
+  },
+  {
+    source: 'node_modules/swiper/swiper-bundle.min.js.map',
+    destination: 'src/assets/vendor/swiper/swiper-bundle.min.js.map',
+  },
+  {
+    source: 'node_modules/swiper/swiper-bundle.min.css',
+    destination: 'src/assets/vendor/swiper/swiper-bundle.min.css',
+  },
+];
+
+defaultConfig.module.rules[2].use[1].options['url'] = false;
 
 // Prepare JS for assets.
 const entryAssetsJs = glob
-	.sync('./src/assets/js/**.js')
-	.reduce(function (entries, entry) {
-		const matchForRename = /js\/([\w\d-]+).js$/g.exec(entry);
-		if (
-			matchForRename !== null &&
-			typeof matchForRename[1] !== 'undefined'
-		) {
-			entries[`asset-${matchForRename[1]}-script`] = resolve(
-				process.cwd(),
-				entry
-			);
-		}
-
-		return entries;
-	}, {});
-
-const entryAssetsAdminJs = glob
-.sync('./src/assets/admin/js/**.js')
-.reduce(function (entries, entry) {
-  const matchForRename = /js\/([\w\d-]+).js$/g.exec(entry);
-  if (
-    matchForRename !== null &&
-    typeof matchForRename[1] !== 'undefined'
-  ) {
-    entries[`asset-admin-${matchForRename[1]}`] = resolve(
-      process.cwd(),
-      entry
-    );
-  }
-
-  return entries;
-}, {});
-const rootDir = './src';
-
-const vendorFiles = [
-  './src/assets/vendor/**/*.js',
-  //'./src/assets/vendor/**/*.js.map',
-  './node_modules/@fancyapps/*fancybox/dist/jquery.fancybox.min.js',
-  './node_modules/@fancyapps/*fancybox/dist/jquery.fancybox.min.css',
-  './node_modules/*flickr-justified-gallery/dist/fjGallery.min.js',
-  //'./node_modules/*flickr-justified-gallery/dist/fjGallery.min.js.map',
-  './node_modules/*flickr-justified-gallery/dist/fjGallery.css',
-  './node_modules/*iframe-resizer/js/iframeResizer.contentWindow.min.js',
-  //'./node_modules/*iframe-resizer/js/iframeResizer.contentWindow.map',
-  './node_modules/*iframe-resizer/js/iframeResizer.min.js',
-  //'./node_modules/*iframe-resizer/js/iframeResizer.map',
-  './node_modules/*isotope-layout/dist/isotope.pkgd.min.js',
-  './node_modules/*lazysizes/lazysizes.min.js',
-  './node_modules/*photoswipe/dist/photoswipe.min.js',
-  './node_modules/*photoswipe/dist/photoswipe-ui-default.min.js',
-  './node_modules/*photoswipe/dist/photoswipe.css',
-  './node_modules/*photoswipe/dist/default-skin/default-skin.css',
-  './node_modules/*photoswipe/dist/default-skin/default-skin.png',
-  //'./node_modules/*photoswipe/dist/default-skin/default-skin.svg',
-  './node_modules/*photoswipe/dist/default-skin/preloader.gif',
-  './node_modules/*simplebar/dist/simplebar.min.js',
-  './node_modules/*simplebar/dist/simplebar.min.css',
-  './node_modules/*swiper/swiper-bundle.min.js',
-  //'./node_modules/*swiper/swiper-bundle.min.js.map',
-  './node_modules/*swiper/swiper-bundle.min.css',
-];
-
-const entryAssetsVendors = glob
-.sync(vendorFiles)
-.reduce(function (entries, entry) {
-  const patternEnd = ['.min.js.map', '.pkgd.min.js', '.min.js', '.js.map','.min.css', '.map', '.js', '.css', '.png', '.svg', '.gif'];
-  for (const item of patternEnd) {
-    const matchForRename = new RegExp(`([\\w\\d-]+)${item}$`, 'g').exec(entry);
-    if (
-      matchForRename !== null &&
-      typeof matchForRename[1] !== 'undefined'
-    ) {
-      let endingName = item === '.min.js' || item === '.js' || '.pkgd.min.js' ? '-script' : '';
-      endingName = item === '.min.css' || item === '.css' ? '-style' : endingName;
-      entries[`asset-vendor-${matchForRename[1]}${endingName}`] = resolve(
-        process.cwd(),
-        entry
-      );
-      break;
-    }
-  }
-
-  return entries;
-}, {});
-
-const entryAssetsCss = glob
-.sync('./src/assets/css/**.scss')
-.reduce(function (entries, entry) {
-  const matchForRename = /css\/([\w\d-]+).scss$/g.exec(entry);
-  if (
-    matchForRename !== null &&
-    typeof matchForRename[1] !== 'undefined'
-  ) {
-    entries[`asset-${matchForRename[1]}`] = resolve(
-      process.cwd(),
-      entry
-    );
-  }
-
-  return entries;
-}, {});
-
-const entryTemplatesCss = glob
 .sync(
   [
-    './src/templates/**/style.scss',
-    './src/templates/**/**/style.scss',
-    './src/templates/**/**/**/style.scss',
-    './src/templates/**/index.scss',
-    './src/templates/**/**/index.scss',
-    './src/templates/**/**/**/index.scss',
+    './src/assets/js/**.js',
+    './src/assets/admin/js/**.js',
+    './src/gutenberg/index.js',
+    './src/gutenberg/custom-post-meta.js',
+    './src/gutenberg/layouts-editor.js',
+    './src/assets/js/3rd/plugin-jetpack.js',
   ]
 )
 .reduce(function (entries, entry) {
-  const template = entry.replace('src/', '').replace('.scss', '');
-  entries[template] = resolve(
+  const name = entry.replace('.js', '').replace('src/', '');
+  entries[name] = resolve(
+    process.cwd(),
+    entry
+  );
+  return entries;
+}, {});
+
+// Prepare CSS for assets.
+const entryAssetsCss = glob
+.sync(
+  [
+    './src/assets/css/**.scss',
+    './src/assets/admin/css/**.scss',
+    './src/templates/**/style.scss',
+    './src/templates/**/**/style.scss',
+    './src/templates/**/**/**/style.scss',
+    './src/gutenberg/style.scss',
+    './src/gutenberg/layouts-editor.scss',
+  ]
+)
+.reduce(function (entries, entry) {
+  const name = entry.replace('.scss', '').replace('src/', '');
+  entries[name] = resolve(
     process.cwd(),
     entry
   );
@@ -138,38 +160,103 @@ const newConfig = {
   ...
   {
     entry: {
-      // JS.
-      'gutenberg-index': resolve(process.cwd(), 'src/gutenberg', 'index.js'),
-      'custom-post-meta': resolve(process.cwd(), 'src/gutenberg', 'custom-post-meta.js'),
-      'layouts-editor-script': resolve(process.cwd(), 'src/gutenberg', 'layouts-editor.js'),
       // Assets JS.
       ...entryAssetsJs,
-      // Assets Admin JS.
-      ...entryAssetsAdminJs,
-      // Assets Vendors.
-      ...entryAssetsVendors,
-      'asset-plugin-jetpack': resolve(process.cwd(), 'src/assets/js/3rd', 'plugin-jetpack.js'),
-      // SCSS.
-      'gutenberg': resolve(process.cwd(), 'src/gutenberg', 'style.scss'),
-      'layouts-editor-style': resolve(process.cwd(), 'src/gutenberg', 'layouts-editor.scss'),
-      // Assets.
+      // Assets CSS.
       ...entryAssetsCss,
-      // Templates.
-      ...entryTemplatesCss,
-      // Admin Assets.
-      'asset-admin-elementor': resolve(process.cwd(), 'src/assets/admin/css', 'elementor.scss'),
-      'asset-admin': resolve(process.cwd(), 'src/assets/admin/css', 'style.scss'),
     },
 
     // Display minimum info in terminal.
     stats: 'minimal',
+  },
+  module: {
+    ...defaultConfig.module,
+    rules: [
+      ...defaultConfig.module.rules,
+    ],
   },
   plugins: [
     ...defaultConfig.plugins,
     new RtlCssPlugin({
       filename: `[name]-rtl.css`,
     }),
-  ],
+    new CopyWebpackPlugin( {
+			patterns: [
+				{
+					from: '**/block.json',
+					context: getWordPressSrcDirectory(),
+					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
+				},
+			],
+		} ),
+    new FileManagerPlugin({
+      events: {
+        onEnd: {
+          copy: [
+            {
+              source: 'build/templates',
+              destination: 'src/templates',
+              options: {
+                flat: false,
+                preserveTimestamps: true,
+                overwrite: true,
+                force: true,
+              },
+            },
+            ...vendorFiles,
+          ],
+          delete: [
+            'build/templates',
+            'src/templates/**/*.css.map',
+            'src/templates/**/*.js',
+            'src/templates/**/*.js.map',
+            'src/templates/**/*.asset.php'
+          ],
+        },
+      },
+      runOnceInWatchMode: false,
+      runTasksInSeries: true,
+    }),
+  ].filter( Boolean ),
+  watchOptions: {
+   ignored: [
+    '**/templates/**/*.css',
+    '**/templates/**/*.css.map',
+    '**/templates/**/*.js',
+    '**/templates/**/*.js.map',
+    '**/templates/**/*.asset.php',
+    '**/vendor/**'
+   ],
+  },
   optimization: {
     ...defaultConfig.optimization,
     splitChunks: {
@@ -186,9 +273,9 @@ const newConfig = {
 							chunkName
 						) }/${ cacheGroupKey }-${ basename( chunkName ) }`;
 
-            if ( chunkName.indexOf('templates/') > -1 && cacheGroupKey === 'style') {
+            if ( ( chunkName.indexOf('templates/') > -1 || chunkName.indexOf('admin/css/') > -1 || chunkName.indexOf('gutenberg/') > -1 ) && cacheGroupKey === 'style') {
               cssOutput = `${ dirname(
-                chunkName
+                chunkName.replace('src/', '')
               ) }/${ basename( chunkName ) }`;
             }
 						return cssOutput;
@@ -218,5 +305,40 @@ if (!isProduction) {
   // @thanks https://github.com/webpack/webpack-dev-server/issues/2792#issuecomment-806983882
   newConfig.optimization.runtimeChunk = 'single';
 }
+
+
+newConfig.module.rules = newConfig.module.rules.map((rule) => {
+  if (/svg/.test(rule.test)) {
+    return { ...rule, exclude: /\.svg$/i };
+  }
+
+  return rule;
+});
+
+newConfig.module.rules.push({
+  test: /\.svg$/,
+  use: [
+    {
+      loader: '@svgr/webpack',
+      options: {
+        svgoConfig: {
+          plugins: [
+            {
+              name: 'preset-default',
+              params: {
+                overrides: {
+                  removeViewBox: false
+                },
+              },
+            },
+          ]
+        }
+      }
+    },
+    {
+      loader: 'url-loader',
+    }
+  ],
+});
 
 module.exports = newConfig;

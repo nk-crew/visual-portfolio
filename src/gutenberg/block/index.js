@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import ElementIcon from '../../assets/admin/images/icon-gutenberg.svg';
+import { ReactComponent as ElementIcon } from '../../assets/admin/images/icon-gutenberg.svg';
 
 import metadata from './block.json';
 import edit from './edit';

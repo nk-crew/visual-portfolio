@@ -66,9 +66,9 @@ class Visual_Portfolio_Admin {
             'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
         );
 
-        wp_enqueue_script( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'build/asset-admin-script.js', array( 'jquery', 'wp-data' ), VISUAL_PORTFOLIO_VERSION, true );
+        wp_enqueue_script( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'build/assets/admin/js/script.js', array( 'jquery', 'wp-data', 'wp-compose', 'wp-react-refresh-runtime' ), VISUAL_PORTFOLIO_VERSION, true );
         wp_localize_script( 'visual-portfolio-admin', 'VPAdminVariables', $data_init );
-        wp_enqueue_style( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'build/style-asset-admin.css', array(), VISUAL_PORTFOLIO_VERSION );
+        wp_enqueue_style( 'visual-portfolio-admin', visual_portfolio()->plugin_url . 'build/assets/admin/css/style.css', array(), VISUAL_PORTFOLIO_VERSION );
         wp_style_add_data( 'visual-portfolio-admin', 'rtl', 'replace' );
         wp_style_add_data( 'visual-portfolio-admin', 'suffix', '.min' );
     }
@@ -82,8 +82,8 @@ class Visual_Portfolio_Admin {
         );
 
         if ( 'vp_lists' === get_post_type() ) {
-            wp_enqueue_script( 'visual-portfolio-saved-layouts', visual_portfolio()->plugin_url . 'build/layouts-editor-script.js', array( 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
-            wp_enqueue_style( 'visual-portfolio-saved-layouts', visual_portfolio()->plugin_url . 'build/layouts-editor-style.css', array(), VISUAL_PORTFOLIO_VERSION );
+            wp_enqueue_script( 'visual-portfolio-saved-layouts', visual_portfolio()->plugin_url . 'build/gutenberg/layouts-editor.js', array( 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
+            wp_enqueue_style( 'visual-portfolio-saved-layouts', visual_portfolio()->plugin_url . 'build/gutenberg/layouts-editor.css', array(), VISUAL_PORTFOLIO_VERSION );
             wp_style_add_data( 'visual-portfolio-saved-layouts', 'rtl', 'replace' );
             wp_style_add_data( 'visual-portfolio-saved-layouts', 'suffix', '.min' );
 

@@ -4,7 +4,8 @@
  * Name    : Visual Portfolio
  * Author  : nK https://nkdev.info
  */
-import { throttle } from '@wordpress/compose';
+//import { throttle } from '@wordpress/compose';
+import { throttle } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
 
 const { elementorFrontend, VPAdminElementorVariables: variables } = window;

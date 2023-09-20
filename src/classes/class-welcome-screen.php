@@ -103,7 +103,7 @@ class Visual_Portfolio_Welcome_Screen {
         ?>
         <div class="vpf-welcome-screen">
             <div class="vpf-welcome-head">
-                <img class="vpf-welcome-head-background" src="<?php echo esc_url( visual_portfolio()->plugin_url . 'assets/admin/images/admin-welcome-background.jpg' ); ?>" alt="<?php echo esc_attr__( 'Visual Portfolio', 'visual-portfolio' ); ?>">
+                <img class="vpf-welcome-head-background" src="<?php echo esc_url( visual_portfolio()->plugin_url . 'src/assets/admin/images/admin-welcome-background.jpg' ); ?>" alt="<?php echo esc_attr__( 'Visual Portfolio', 'visual-portfolio' ); ?>">
                 <h2 class="vpf-welcome-head-logo">
                     <i class="dashicons-visual-portfolio"></i>
                     <?php echo esc_html__( 'Visual Portfolio', 'visual-portfolio' ); ?>

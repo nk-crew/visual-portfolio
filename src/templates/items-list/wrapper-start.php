@@ -31,6 +31,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 >
     <div class="vp-portfolio__preloader-wrap">
         <div class="vp-portfolio__preloader">
-            <img loading="eager" src="<?php echo esc_url( visual_portfolio()->plugin_url . 'assets/images/logo-dark.svg' ); ?>" alt="<?php echo esc_attr__( 'Visual Portfolio, Posts & Image Gallery for WordPress', 'visual-portfolio' ); ?>" width="20" height="20" data-skip-lazy>
+            <img loading="eager" src="<?php echo esc_url( visual_portfolio()->plugin_url . 'src/assets/images/logo-dark.svg' ); ?>" alt="<?php echo esc_attr__( 'Visual Portfolio, Posts & Image Gallery for WordPress', 'visual-portfolio' ); ?>" width="20" height="20" data-skip-lazy>
         </div>
     </div>

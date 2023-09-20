@@ -67,7 +67,7 @@ class Visual_Portfolio_Templates {
             // PRO plugin folder.
             $template         = visual_portfolio()->pro_plugin_url . 'templates/' . $template_name . '.css';
             $template_version = filemtime( visual_portfolio()->pro_plugin_path . 'templates/' . $template_name . '.css' );
-        } elseif ( file_exists( visual_portfolio()->plugin_path . 'templates/' . $template_name . '.css' ) ) {
+        } elseif ( file_exists( visual_portfolio()->plugin_path . 'src/templates/' . $template_name . '.css' ) ) {
             // Default file in plugin folder.
             $template         = visual_portfolio()->plugin_url . 'src/templates/' . $template_name . '.css';
             $template_version = filemtime( visual_portfolio()->plugin_path . 'src/templates/' . $template_name . '.css' );
