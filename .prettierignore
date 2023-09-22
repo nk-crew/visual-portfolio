@@ -6,6 +6,7 @@
 node_modules
 src/assets/vendor
 dist
+dist-zip
 build
 vendor
 vendors

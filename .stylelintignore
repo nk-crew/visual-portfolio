@@ -7,6 +7,7 @@
 node_modules
 src/assets/vendor
 dist
+duist-zip
 build
 vendor
 vendors
