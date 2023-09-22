@@ -30,55 +30,55 @@ class Visual_Portfolio_Supported_Themes {
             case 'twentytwentytwo':
                 $result = array(
                     'name' => 'vpf-twentytwentytwo',
-                    'url'  => visual_portfolio()->plugin_url . 'build/assets/css/theme-twentytwentytwo.css',
+                    'url'  => 'build/assets/css/theme-twentytwentytwo',
                 );
                 break;
             case 'twentytwentyone':
                 $result = array(
                     'name' => 'vpf-twentytwentyone',
-                    'url'  => visual_portfolio()->plugin_url . 'build/assets/css/theme-twentytwentyone.css',
+                    'url'  => 'build/assets/css/theme-twentytwentyone',
                 );
                 break;
             case 'twentytwenty':
                 $result = array(
                     'name' => 'vpf-twentytwenty',
-                    'url'  => visual_portfolio()->plugin_url . 'build/assets/css/theme-twentytwenty.css',
+                    'url'  => 'build/assets/css/theme-twentytwenty',
                 );
                 break;
             case 'twentynineteen':
                 $result = array(
                     'name' => 'vpf-twentynineteen',
-                    'url'  => visual_portfolio()->plugin_url . 'build/assets/css/theme-twentynineteen.css',
+                    'url'  => 'build/assets/css/theme-twentynineteen',
                 );
                 break;
             case 'twentyseventeen':
                 $result = array(
                     'name' => 'vpf-twentyseventeen',
-                    'url'  => visual_portfolio()->plugin_url . 'build/assets/css/theme-twentyseventeen.css',
+                    'url'  => 'build/assets/css/theme-twentyseventeen',
                 );
                 break;
             case 'twentysixteen':
                 $result = array(
                     'name' => 'vpf-twentysixteen',
-                    'url'  => visual_portfolio()->plugin_url . 'build/assets/css/theme-twentysixteen.css',
+                    'url'  => 'build/assets/css/theme-twentysixteen',
                 );
                 break;
             case 'twentyfifteen':
                 $result = array(
                     'name' => 'vpf-twentyfifteen',
-                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-twentyfifteen.css',
+                    'url'  => 'assets/css/theme-twentyfifteen',
                 );
                 break;
             case 'airtifact':
                 $result = array(
                     'name' => 'vpf-airtifact',
-                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-airtifact.css',
+                    'url'  => 'assets/css/theme-airtifact',
                 );
                 break;
             case 'betheme':
                 $result = array(
                     'name' => 'vpf-betheme',
-                    'url'  => visual_portfolio()->plugin_url . 'assets/css/theme-betheme.css',
+                    'url'  => 'assets/css/theme-betheme',
                 );
                 break;
         }
@@ -92,7 +92,7 @@ class Visual_Portfolio_Supported_Themes {
     public function wp_enqueue_scripts() {
         $theme_compat = $this->get_theme_compatibility_style();
         if ( $theme_compat ) {
-            wp_enqueue_style( $theme_compat['name'], $theme_compat['url'], array(), VISUAL_PORTFOLIO_VERSION );
+            Visual_Portfolio_Assets::enqueue_style( $theme_compat['name'], $theme_compat['url'] );
             wp_style_add_data( $theme_compat['name'], 'rtl', 'replace' );
             wp_style_add_data( $theme_compat['name'], 'suffix', '.min' );
         }

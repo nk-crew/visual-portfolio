@@ -32,10 +32,10 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
         parent::__construct( $data, $args );
 
         if ( $this->is_preview_mode() ) {
-            wp_register_script( 'iframe-resizer', visual_portfolio()->plugin_url . 'build/assets/vendor/iframe-resizer/js/iframeResizer.js', '', '4.2.11', true );
-            wp_register_script( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'build/assets/admin/js/elementor.js', array( 'elementor-frontend', 'iframe-resizer', 'jquery' ), VISUAL_PORTFOLIO_VERSION, true );
+            Visual_Portfolio_Assets::register_script( 'iframe-resizer', 'build/assets/vendor/iframe-resizer/js/iframeResizer', array(), '4.2.11' );
+            Visual_Portfolio_Assets::register_script( 'visual-portfolio-elementor', 'build/assets/admin/js/elementor', array( 'elementor-frontend', 'iframe-resizer', 'jquery' ) );
 
-            wp_register_style( 'visual-portfolio-elementor', visual_portfolio()->plugin_url . 'build/assets/admin/css/elementor.css', array(), VISUAL_PORTFOLIO_VERSION );
+            Visual_Portfolio_Assets::register_style( 'visual-portfolio-elementor', 'build/assets/admin/css/elementor' );
             wp_style_add_data( 'visual-portfolio-elementor', 'rtl', 'replace' );
             wp_style_add_data( 'visual-portfolio-elementor', 'suffix', '.min' );
         }

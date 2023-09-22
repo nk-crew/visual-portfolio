@@ -47,10 +47,10 @@ class Visual_Portfolio_Settings_API {
         wp_enqueue_media();
         wp_enqueue_script( 'wp-color-picker' );
         wp_enqueue_script( 'jquery' );
-        wp_enqueue_script( 'conditionize', visual_portfolio()->plugin_url . 'src/assets/vendor/conditionize/conditionize.min.js', array( 'jquery' ), '1.0.5' );
+        Visual_Portfolio_Assets::enqueue_script( 'conditionize', 'src/assets/vendor/conditionize/conditionize.min', array( 'jquery' ), '1.0.5' );
 
-        wp_enqueue_style( 'select2', visual_portfolio()->plugin_url . 'src/assets/vendor/select2/select2.min.css', array(), '4.0.13' );
-        wp_enqueue_script( 'select2', visual_portfolio()->plugin_url . 'src/assets/vendor/select2/select2.min.js', array( 'jquery' ), '4.0.13' );
+        Visual_Portfolio_Assets::enqueue_style( 'select2', 'src/assets/vendor/select2/select2.min', array(), '4.0.13' );
+        Visual_Portfolio_Assets::enqueue_script( 'select2', 'src/assets/vendor/select2/select2.min', array( 'jquery' ), '4.0.13' );
     }
 
     /**
