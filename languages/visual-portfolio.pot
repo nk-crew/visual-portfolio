@@ -1,0 +1,2395 @@
+# Copyright (C) 2023 Visual Portfolio Team
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.1.3\n"
+"Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
+"Last-Translator: Visual Portfolio\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2023-09-22T08:27:57+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: visual-portfolio\n"
+
+#. Plugin Name of the plugin
+msgid "Visual Portfolio, Posts & Image Gallery"
+msgstr ""
+
+#. Description of the plugin
+msgid "Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block."
+msgstr ""
+
+#. Author of the plugin
+msgid "Visual Portfolio Team"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline"
+msgstr ""
+
+#: class-visual-portfolio.php:99
+#: src/classes/class-welcome-screen.php:106
+#: src/classes/class-welcome-screen.php:109
+msgid "Visual Portfolio"
+msgstr ""
+
+#: src/classes/3rd/plugins/class-elementor-widget.php:165
+msgid "-- Select Layout --"
+msgstr ""
+
+#: src/classes/3rd/plugins/class-elementor-widget.php:174
+#: src/classes/class-admin.php:2051
+#: src/classes/class-settings.php:196
+msgid "General"
+msgstr ""
+
+#: src/classes/3rd/plugins/class-elementor-widget.php:182
+msgid "Saved Layout"
+msgstr ""
+
+#: src/classes/3rd/plugins/class-vc.php:73
+msgid "Select Layout"
+msgstr ""
+
+#: src/classes/3rd/plugins/class-vc.php:81
+msgid "Custom Classes"
+msgstr ""
+
+#: src/classes/3rd/plugins/class-vc.php:88
+msgid "CSS"
+msgstr ""
+
+#: src/classes/3rd/plugins/class-vc.php:90
+msgid "Design Options"
+msgstr ""
+
+#: src/classes/class-admin.php:119
+msgid "and"
+msgstr ""
+
+#: src/classes/class-admin.php:234
+#: src/classes/class-admin.php:283
+#: src/classes/class-custom-post-type.php:856
+#: src/classes/class-settings.php:794
+#: src/classes/class-settings.php:809
+#: src/classes/class-settings.php:824
+#: src/gutenberg/components/controls-render/index.js:742
+msgid "Go Pro"
+msgstr ""
+
+#: src/classes/class-admin.php:325
+#: src/gutenberg/components/tiles-selector/index.js:106
+msgid "Tiles"
+msgstr ""
+
+#: src/classes/class-admin.php:341
+msgid "Tiles Preview"
+msgstr ""
+
+#: src/classes/class-admin.php:449
+msgid "Masonry"
+msgstr ""
+
+#: src/classes/class-admin.php:454
+#: src/classes/class-admin.php:484
+msgid "Columns"
+msgstr ""
+
+#: src/classes/class-admin.php:463
+#: src/classes/class-admin.php:493
+msgid "Images Aspect Ratio"
+msgstr ""
+
+#: src/classes/class-admin.php:479
+msgid "Grid"
+msgstr ""
+
+#: src/classes/class-admin.php:509
+msgid "Justified"
+msgstr ""
+
+#: src/classes/class-admin.php:514
+msgid "Row Height"
+msgstr ""
+
+#: src/classes/class-admin.php:524
+msgid "Row Height Tolerance"
+msgstr ""
+
+#: src/classes/class-admin.php:535
+msgid "Max Rows Count"
+msgstr ""
+
+#: src/classes/class-admin.php:536
+msgid "Limit the number of rows to display. 0 means - unlimited."
+msgstr ""
+
+#: src/classes/class-admin.php:546
+msgid "Last Row Align"
+msgstr ""
+
+#: src/classes/class-admin.php:551
+msgid "Left"
+msgstr ""
+
+#: src/classes/class-admin.php:552
+msgid "Center"
+msgstr ""
+
+#: src/classes/class-admin.php:553
+msgid "Right"
+msgstr ""
+
+#: src/classes/class-admin.php:554
+#: src/classes/class-admin.php:1856
+#: src/classes/class-admin.php:2342
+#: src/classes/class-admin.php:2456
+#: src/classes/class-deprecated.php:228
+msgid "Hide"
+msgstr ""
+
+#: src/classes/class-admin.php:562
+msgid "Slider"
+msgstr ""
+
+#: src/classes/class-admin.php:567
+msgid "Effect"
+msgstr ""
+
+#: src/classes/class-admin.php:574
+msgid "Slide"
+msgstr ""
+
+#: src/classes/class-admin.php:579
+msgid "Coverflow"
+msgstr ""
+
+#: src/classes/class-admin.php:584
+#: src/classes/class-admin.php:999
+msgid "Fade"
+msgstr ""
+
+#: src/classes/class-admin.php:591
+msgid "Speed (in Seconds)"
+msgstr ""
+
+#: src/classes/class-admin.php:601
+msgid "Autoplay (in Seconds)"
+msgstr ""
+
+#: src/classes/class-admin.php:611
+msgid "Pause on Mouse Over"
+msgstr ""
+
+#: src/classes/class-admin.php:625
+msgid "Items Height"
+msgstr ""
+
+#: src/classes/class-admin.php:630
+#: src/classes/class-admin.php:688
+#: src/classes/class-admin.php:821
+#: src/classes/class-admin.php:874
+#: src/gutenberg/components/aspect-ratio/index.js:11
+msgid "Auto"
+msgstr ""
+
+#: src/classes/class-admin.php:631
+#: src/classes/class-admin.php:822
+msgid "Static (px)"
+msgstr ""
+
+#: src/classes/class-admin.php:632
+#: src/classes/class-admin.php:823
+msgid "Dynamic (%)"
+msgstr ""
+
+#: src/classes/class-admin.php:667
+msgid "Items Minimal Height"
+msgstr ""
+
+#: src/classes/class-admin.php:668
+msgid "300px, 80vh"
+msgstr ""
+
+#: src/classes/class-admin.php:669
+msgid "Values with `vh` units will not be visible in preview."
+msgstr ""
+
+#: src/classes/class-admin.php:683
+msgid "Slides Per View"
+msgstr ""
+
+#: src/classes/class-admin.php:689
+#: src/classes/class-admin.php:875
+#: src/classes/class-admin.php:1727
+#: src/classes/class-admin.php:1745
+#: src/gutenberg/components/aspect-ratio/index.js:16
+msgid "Custom"
+msgstr ""
+
+#: src/classes/class-admin.php:721
+msgid "Centered Slides"
+msgstr ""
+
+#: src/classes/class-admin.php:735
+#: src/classes/class-settings.php:564
+msgid "Loop"
+msgstr ""
+
+#: src/classes/class-admin.php:742
+msgid "Free Scroll"
+msgstr ""
+
+#: src/classes/class-admin.php:750
+msgid "Free Scroll Sticky"
+msgstr ""
+
+#: src/classes/class-admin.php:763
+#: src/classes/class-admin.php:3431
+#: src/classes/class-settings.php:595
+msgid "Display Arrows"
+msgstr ""
+
+#: src/classes/class-admin.php:769
+msgid "Display Bullets"
+msgstr ""
+
+#: src/classes/class-admin.php:776
+msgid "Dynamic Bullets"
+msgstr ""
+
+#: src/classes/class-admin.php:789
+msgid "Mousewheel Control"
+msgstr ""
+
+#: src/classes/class-admin.php:795
+#: src/classes/class-settings.php:635
+msgid "Display Thumbnails"
+msgstr ""
+
+#: src/classes/class-admin.php:802
+msgid "Thumbnails Gap"
+msgstr ""
+
+#: src/classes/class-admin.php:816
+msgid "Thumbnails Height"
+msgstr ""
+
+#: src/classes/class-admin.php:869
+msgid "Thumbnails Per View"
+msgstr ""
+
+#: src/classes/class-admin.php:920
+#: src/classes/class-admin.php:2940
+#: src/classes/class-admin.php:3070
+#: src/classes/class-admin.php:3192
+msgid "Classic"
+msgstr ""
+
+#: src/classes/class-admin.php:1063
+msgid "Fly"
+msgstr ""
+
+#: src/classes/class-admin.php:1127
+msgid "Emerge"
+msgstr ""
+
+#: src/classes/class-admin.php:1219
+msgid "Content Source"
+msgstr ""
+
+#: src/classes/class-admin.php:1223
+msgid "Posts Settings"
+msgstr ""
+
+#: src/classes/class-admin.php:1228
+msgid "Images Settings"
+msgstr ""
+
+#: src/classes/class-admin.php:1233
+msgid "Social Stream Settings"
+msgstr ""
+
+#: src/classes/class-admin.php:1238
+msgid "General Settings"
+msgstr ""
+
+#: src/classes/class-admin.php:1243
+msgid "Layout"
+msgstr ""
+
+#: src/classes/class-admin.php:1248
+msgid "Skin"
+msgstr ""
+
+#: src/classes/class-admin.php:1253
+msgid "Click Action"
+msgstr ""
+
+#: src/classes/class-admin.php:1258
+msgid "Protection"
+msgstr ""
+
+#: src/classes/class-admin.php:1263
+#: src/classes/class-settings.php:753
+#: src/gutenberg/components/controls-render/index.js:572
+msgid "Custom CSS"
+msgstr ""
+
+#: src/classes/class-admin.php:1305
+#: src/classes/class-custom-post-type.php:570
+msgid "Posts"
+msgstr ""
+
+#: src/classes/class-admin.php:1311
+#: src/classes/class-custom-post-type.php:571
+#: src/classes/class-settings.php:201
+msgid "Images"
+msgstr ""
+
+#: src/classes/class-admin.php:1317
+#: src/classes/class-custom-post-type.php:572
+msgid "Social"
+msgstr ""
+
+#: src/classes/class-admin.php:1348
+#: src/classes/class-admin.php:3602
+msgid "Custom Query"
+msgstr ""
+
+#. translators: %1$s - escaped url.
+#: src/classes/class-admin.php:1350
+msgid "Build custom query according to WordPress Codex. See example here <a href=\"%1$s\">%1$s</a>."
+msgstr ""
+
+#: src/classes/class-admin.php:1367
+msgid "Post Types"
+msgstr ""
+
+#: src/classes/class-admin.php:1384
+msgid "Specific Posts"
+msgstr ""
+
+#: src/classes/class-admin.php:1402
+msgid "Excluded Posts"
+msgstr ""
+
+#: src/classes/class-admin.php:1431
+msgid "Taxonomies"
+msgstr ""
+
+#: src/classes/class-admin.php:1461
+msgid "Taxonomies Relation"
+msgstr ""
+
+#: src/classes/class-admin.php:1466
+msgid "OR"
+msgstr ""
+
+#: src/classes/class-admin.php:1467
+msgid "AND"
+msgstr ""
+
+#: src/classes/class-admin.php:1492
+#: src/classes/class-admin.php:1757
+msgid "Order by"
+msgstr ""
+
+#: src/classes/class-admin.php:1497
+#: src/templates/items-list/item-parts/meta-date.php:26
+msgid "Date"
+msgstr ""
+
+#: src/classes/class-admin.php:1498
+#: src/classes/class-admin.php:1644
+#: src/classes/class-admin.php:1764
+msgid "Title"
+msgstr ""
+
+#: src/classes/class-admin.php:1499
+msgid "ID"
+msgstr ""
+
+#: src/classes/class-admin.php:1500
+msgid "Comments Count"
+msgstr ""
+
+#: src/classes/class-admin.php:1501
+msgid "Modified"
+msgstr ""
+
+#: src/classes/class-admin.php:1502
+msgid "Menu Order"
+msgstr ""
+
+#: src/classes/class-admin.php:1503
+#: src/classes/class-admin.php:3597
+msgid "Manual Selection"
+msgstr ""
+
+#: src/classes/class-admin.php:1504
+#: src/classes/class-admin.php:1765
+msgid "Random"
+msgstr ""
+
+#. translators: %2$s - link text.
+#: src/classes/class-admin.php:1526
+msgid "Menu Order is typically used in combination with one of these plugins: <a href=\"%1$s\" target=\"_blank\">%2$s</a>"
+msgstr ""
+
+#: src/classes/class-admin.php:1552
+#: src/classes/class-admin.php:1773
+msgid "Order Direction"
+msgstr ""
+
+#: src/classes/class-admin.php:1557
+#: src/classes/class-admin.php:1778
+msgid "ASC"
+msgstr ""
+
+#: src/classes/class-admin.php:1558
+#: src/classes/class-admin.php:1779
+msgid "DESC"
+msgstr ""
+
+#: src/classes/class-admin.php:1578
+msgid "Avoid Duplicates"
+msgstr ""
+
+#: src/classes/class-admin.php:1579
+msgid "Enable to avoid duplicate posts from showing up. This only affects the frontend"
+msgstr ""
+
+#: src/classes/class-admin.php:1589
+msgid "Offset"
+msgstr ""
+
+#: src/classes/class-admin.php:1590
+msgid "Use this setting to skip over posts (e.g. `2` to skip over 2 posts)"
+msgstr ""
+
+#: src/classes/class-admin.php:1618
+#: src/classes/class-admin.php:1695
+#: src/classes/class-admin.php:1792
+#: src/classes/class-admin.php:1812
+#: src/classes/class-admin.php:2227
+#: src/classes/class-admin.php:2234
+#: src/classes/class-admin.php:2565
+#: src/classes/class-admin.php:2577
+#: src/classes/class-admin.php:2609
+#: src/classes/class-admin.php:2746
+#: src/classes/class-admin.php:2817
+#: src/classes/class-admin.php:2837
+#: src/classes/class-admin.php:3173
+#: src/classes/class-admin.php:3515
+#: src/classes/class-custom-post-type.php:851
+#: src/classes/class-settings.php:791
+#: src/classes/class-settings.php:806
+#: src/classes/class-settings.php:821
+msgid "Premium Only"
+msgstr ""
+
+#: src/classes/class-admin.php:1619
+msgid "Additional query settings, such as:"
+msgstr ""
+
+#: src/classes/class-admin.php:1621
+msgid "Filter by specific author"
+msgstr ""
+
+#: src/classes/class-admin.php:1622
+msgid "Filter by publish date range"
+msgstr ""
+
+#: src/classes/class-admin.php:1623
+msgid "Exclude posts without thumbnail"
+msgstr ""
+
+#: src/classes/class-admin.php:1624
+msgid "Exclude sticky posts"
+msgstr ""
+
+#: src/classes/class-admin.php:1625
+#: src/classes/class-admin.php:1700
+#: src/classes/class-admin.php:2822
+msgid "etc..."
+msgstr ""
+
+#: src/classes/class-admin.php:1648
+msgid "Description"
+msgstr ""
+
+#: src/classes/class-admin.php:1652
+#: src/classes/class-custom-post-type.php:190
+msgid "Categories"
+msgstr ""
+
+#: src/classes/class-admin.php:1658
+msgid "Format"
+msgstr ""
+
+#: src/classes/class-admin.php:1661
+msgid "Standard"
+msgstr ""
+
+#: src/classes/class-admin.php:1662
+#: src/classes/class-custom-post-meta.php:145
+#: src/gutenberg/custom-post-meta/video.js:120
+msgid "Video"
+msgstr ""
+
+#: src/classes/class-admin.php:1667
+#: src/gutenberg/custom-post-meta/video.js:166
+msgid "Video URL"
+msgstr ""
+
+#: src/classes/class-admin.php:1668
+#: src/classes/class-admin.php:1681
+msgid "https://..."
+msgstr ""
+
+#: src/classes/class-admin.php:1669
+msgid "Full list of supported links"
+msgstr ""
+
+#: src/classes/class-admin.php:1669
+#: src/gutenberg/custom-post-meta/video.js:160
+msgid "see here"
+msgstr ""
+
+#: src/classes/class-admin.php:1679
+#: src/classes/class-admin.php:2684
+msgid "URL"
+msgstr ""
+
+#: src/classes/class-admin.php:1680
+msgid "By default used full image url, you can use custom one"
+msgstr ""
+
+#: src/classes/class-admin.php:1685
+msgid "Author Name"
+msgstr ""
+
+#: src/classes/class-admin.php:1690
+msgid "Author URL"
+msgstr ""
+
+#: src/classes/class-admin.php:1697
+msgid "Support for Audio format"
+msgstr ""
+
+#: src/classes/class-admin.php:1698
+msgid "Custom image for Popup"
+msgstr ""
+
+#: src/classes/class-admin.php:1699
+msgid "Custom image for hover state"
+msgstr ""
+
+#: src/classes/class-admin.php:1721
+msgid "Items Title Source"
+msgstr ""
+
+#: src/classes/class-admin.php:1726
+#: src/classes/class-admin.php:1744
+#: src/classes/class-admin.php:2768
+#: src/classes/class-admin.php:2795
+msgid "None"
+msgstr ""
+
+#: src/classes/class-admin.php:1728
+#: src/classes/class-admin.php:1746
+#: src/classes/class-admin.php:2769
+#: src/classes/class-admin.php:2796
+msgid "Image Title"
+msgstr ""
+
+#: src/classes/class-admin.php:1729
+#: src/classes/class-admin.php:1747
+#: src/classes/class-admin.php:2770
+#: src/classes/class-admin.php:2797
+msgid "Image Caption"
+msgstr ""
+
+#: src/classes/class-admin.php:1730
+#: src/classes/class-admin.php:1748
+#: src/classes/class-admin.php:2771
+#: src/classes/class-admin.php:2798
+msgid "Image Alt"
+msgstr ""
+
+#: src/classes/class-admin.php:1731
+#: src/classes/class-admin.php:1749
+#: src/classes/class-admin.php:2772
+#: src/classes/class-admin.php:2799
+msgid "Image Description"
+msgstr ""
+
+#: src/classes/class-admin.php:1739
+msgid "Items Description Source"
+msgstr ""
+
+#: src/classes/class-admin.php:1762
+#: src/classes/class-admin.php:2343
+#: src/classes/class-admin.php:2712
+#: src/classes/class-archive-mapping.php:629
+#: src/classes/class-deprecated.php:229
+msgid "Default"
+msgstr ""
+
+#: src/classes/class-admin.php:1763
+msgid "Uploaded"
+msgstr ""
+
+#: src/classes/class-admin.php:1793
+msgid "Protect your works using watermarks, password, and age gate"
+msgstr ""
+
+#: src/classes/class-admin.php:1813
+msgid "Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc..."
+msgstr ""
+
+#: src/classes/class-admin.php:1824
+msgid "Items Per Page"
+msgstr ""
+
+#: src/classes/class-admin.php:1850
+msgid "No Items Action"
+msgstr ""
+
+#: src/classes/class-admin.php:1855
+#: src/classes/class-admin.php:1864
+msgid "Notice"
+msgstr ""
+
+#: src/classes/class-admin.php:1867
+msgid "No items were found matching your selection."
+msgstr ""
+
+#: src/classes/class-admin.php:1882
+msgid "Note: you will see the notice in the preview. Block will be hidden in the site frontend."
+msgstr ""
+
+#: src/classes/class-admin.php:1899
+msgid "Stretch"
+msgstr ""
+
+#: src/classes/class-admin.php:1903
+msgid "Break container and display it wide. This option helpful for 3rd-party page builders, in the Gutenberg themes you can use the built in Wide and Fullwidth features."
+msgstr ""
+
+#: src/classes/class-admin.php:1971
+msgid "Gap"
+msgstr ""
+
+#: src/classes/class-admin.php:1991
+msgid "Vertical Gap"
+msgstr ""
+
+#: src/classes/class-admin.php:1992
+msgid "When empty, used Gap option"
+msgstr ""
+
+#: src/classes/class-admin.php:2055
+msgid "Image"
+msgstr ""
+
+#: src/classes/class-admin.php:2059
+msgid "Overlay"
+msgstr ""
+
+#: src/classes/class-admin.php:2063
+msgid "Caption"
+msgstr ""
+
+#: src/classes/class-admin.php:2196
+msgid "Normal"
+msgstr ""
+
+#: src/classes/class-admin.php:2200
+msgid "Hover"
+msgstr ""
+
+#: src/classes/class-admin.php:2210
+msgid "Border Radius"
+msgstr ""
+
+#: src/classes/class-admin.php:2247
+msgid "Display"
+msgstr ""
+
+#: src/classes/class-admin.php:2251
+msgid "Hover State Only"
+msgstr ""
+
+#: src/classes/class-admin.php:2252
+msgid "Default State Only"
+msgstr ""
+
+#: src/classes/class-admin.php:2253
+msgid "Always"
+msgstr ""
+
+#: src/classes/class-admin.php:2262
+msgid "Text Align"
+msgstr ""
+
+#: src/classes/class-admin.php:2275
+msgid "Elements"
+msgstr ""
+
+#: src/classes/class-admin.php:2279
+msgid "Colors"
+msgstr ""
+
+#: src/classes/class-admin.php:2283
+msgid "Typography"
+msgstr ""
+
+#: src/classes/class-admin.php:2287
+msgid "Dimensions"
+msgstr ""
+
+#: src/classes/class-admin.php:2301
+#: src/classes/class-deprecated.php:192
+msgid "Display Title"
+msgstr ""
+
+#: src/classes/class-admin.php:2311
+#: src/classes/class-deprecated.php:200
+msgid "Display Categories"
+msgstr ""
+
+#: src/classes/class-admin.php:2319
+#: src/classes/class-deprecated.php:207
+msgid "Categories Count"
+msgstr ""
+
+#: src/classes/class-admin.php:2337
+#: src/classes/class-deprecated.php:223
+msgid "Display Date"
+msgstr ""
+
+#: src/classes/class-admin.php:2344
+#: src/classes/class-deprecated.php:230
+msgid "Human Format"
+msgstr ""
+
+#: src/classes/class-admin.php:2353
+#: src/classes/class-deprecated.php:238
+msgid "Date format example: F j, Y"
+msgstr ""
+
+#: src/classes/class-admin.php:2367
+#: src/classes/class-deprecated.php:250
+msgid "Display Author"
+msgstr ""
+
+#: src/classes/class-admin.php:2377
+#: src/classes/class-deprecated.php:258
+msgid "Display Comments Count"
+msgstr ""
+
+#: src/classes/class-admin.php:2393
+#: src/classes/class-deprecated.php:272
+msgid "Display Views Count"
+msgstr ""
+
+#: src/classes/class-admin.php:2409
+#: src/classes/class-deprecated.php:286
+msgid "Display Reading Time"
+msgstr ""
+
+#: src/classes/class-admin.php:2425
+#: src/classes/class-deprecated.php:300
+msgid "Display Excerpt"
+msgstr ""
+
+#: src/classes/class-admin.php:2433
+#: src/classes/class-deprecated.php:307
+msgid "Excerpt Words Count"
+msgstr ""
+
+#: src/classes/class-admin.php:2451
+msgid "Display Read More Button"
+msgstr ""
+
+#: src/classes/class-admin.php:2457
+msgid "Always Display"
+msgstr ""
+
+#: src/classes/class-admin.php:2458
+msgid "Display when used `More tag` in the post"
+msgstr ""
+
+#: src/classes/class-admin.php:2467
+msgid "Read More button label"
+msgstr ""
+
+#: src/classes/class-admin.php:2483
+#: src/classes/class-deprecated.php:323
+msgid "Display Icon"
+msgstr ""
+
+#: src/classes/class-admin.php:2501
+msgid "Background"
+msgstr ""
+
+#: src/classes/class-admin.php:2518
+msgid "Text"
+msgstr ""
+
+#: src/classes/class-admin.php:2534
+msgid "Links"
+msgstr ""
+
+#: src/classes/class-admin.php:2547
+msgid "Links Hover"
+msgstr ""
+
+#: src/classes/class-admin.php:2588
+msgid "caption"
+msgstr ""
+
+#: src/classes/class-admin.php:2588
+msgid "overlay"
+msgstr ""
+
+#: src/classes/class-admin.php:2679
+#: src/classes/class-settings.php:426
+msgid "Disabled"
+msgstr ""
+
+#: src/classes/class-admin.php:2689
+msgid "Popup"
+msgstr ""
+
+#: src/classes/class-admin.php:2694
+msgid "Advanced"
+msgstr ""
+
+#: src/classes/class-admin.php:2706
+msgid "Target"
+msgstr ""
+
+#: src/classes/class-admin.php:2713
+msgid "New Tab (_blank)"
+msgstr ""
+
+#: src/classes/class-admin.php:2714
+msgid "Top Frame (_top)"
+msgstr ""
+
+#: src/classes/class-admin.php:2728
+msgid "Rel"
+msgstr ""
+
+#: src/classes/class-admin.php:2747
+msgid "Link URL click priority"
+msgstr ""
+
+#: src/classes/class-admin.php:2762
+msgid "Title Source"
+msgstr ""
+
+#: src/classes/class-admin.php:2773
+#: src/classes/class-admin.php:2800
+msgid "Item Title"
+msgstr ""
+
+#: src/classes/class-admin.php:2774
+#: src/classes/class-admin.php:2801
+msgid "Item Description"
+msgstr ""
+
+#: src/classes/class-admin.php:2775
+#: src/classes/class-admin.php:2802
+msgid "Item Author"
+msgstr ""
+
+#: src/classes/class-admin.php:2789
+msgid "Description Source"
+msgstr ""
+
+#: src/classes/class-admin.php:2819
+msgid "Manage media object priority"
+msgstr ""
+
+#: src/classes/class-admin.php:2820
+msgid "Quick View for posts and pages"
+msgstr ""
+
+#: src/classes/class-admin.php:2821
+msgid "Popup media item deep linking"
+msgstr ""
+
+#: src/classes/class-admin.php:2838
+msgid "Deeply customize actions of clicks on different types of items and links."
+msgstr ""
+
+#: src/classes/class-admin.php:2858
+msgid "Start"
+msgstr ""
+
+#: src/classes/class-admin.php:2867
+msgid "Middle"
+msgstr ""
+
+#: src/classes/class-admin.php:2870
+msgid "End"
+msgstr ""
+
+#: src/classes/class-admin.php:2894
+#: src/gutenberg/components/setup-wizard/index.js:216
+#: src/gutenberg/layouts-editor/index.js:108
+msgid "Filter"
+msgstr ""
+
+#: src/classes/class-admin.php:2900
+#: src/gutenberg/layouts-editor/index.js:113
+msgid "Sort"
+msgstr ""
+
+#: src/classes/class-admin.php:2906
+msgid "Search"
+msgstr ""
+
+#: src/classes/class-admin.php:2912
+msgid "Layout Items"
+msgstr ""
+
+#: src/classes/class-admin.php:2917
+#: src/gutenberg/components/setup-wizard/index.js:230
+msgid "Pagination"
+msgstr ""
+
+#: src/classes/class-admin.php:2933
+#: src/classes/class-admin.php:3063
+#: src/classes/class-admin.php:3185
+msgid "Minimal"
+msgstr ""
+
+#: src/classes/class-admin.php:2947
+#: src/classes/class-admin.php:3077
+msgid "Dropdown"
+msgstr ""
+
+#: src/classes/class-admin.php:3040
+msgid "Display Count"
+msgstr ""
+
+#: src/classes/class-admin.php:3049
+msgid "All Button Text"
+msgstr ""
+
+#: src/classes/class-admin.php:3051
+#: src/classes/class-get-portfolio.php:1074
+#: src/classes/class-shortcode.php:58
+msgid "All"
+msgstr ""
+
+#: src/classes/class-admin.php:3174
+msgid "The search module is only available for Pro users."
+msgstr ""
+
+#: src/classes/class-admin.php:3279
+msgid "Type"
+msgstr ""
+
+#: src/classes/class-admin.php:3286
+msgid "Paged"
+msgstr ""
+
+#: src/classes/class-admin.php:3291
+#: src/classes/class-admin.php:3324
+#: src/classes/class-admin.php:3379
+msgid "Load More"
+msgstr ""
+
+#: src/classes/class-admin.php:3296
+msgid "Infinite"
+msgstr ""
+
+#: src/classes/class-admin.php:3306
+msgid "Note: you will see the \"Load More\" pagination in the preview. \"Infinite\" pagination will be visible on the site."
+msgstr ""
+
+#: src/classes/class-admin.php:3321
+#: src/classes/class-admin.php:3376
+msgid "Texts"
+msgstr ""
+
+#: src/classes/class-admin.php:3325
+#: src/classes/class-admin.php:3380
+msgid "Load more button label"
+msgstr ""
+
+#: src/classes/class-admin.php:3342
+#: src/classes/class-admin.php:3397
+msgid "Loading More..."
+msgstr ""
+
+#: src/classes/class-admin.php:3343
+#: src/classes/class-admin.php:3398
+msgid "Loading more button label"
+msgstr ""
+
+#: src/classes/class-admin.php:3360
+#: src/classes/class-admin.php:3415
+msgid "You’ve reached the end of the list"
+msgstr ""
+
+#: src/classes/class-admin.php:3361
+#: src/classes/class-admin.php:3416
+msgid "End of the list text"
+msgstr ""
+
+#: src/classes/class-admin.php:3446
+msgid "Display Numbers"
+msgstr ""
+
+#: src/classes/class-admin.php:3461
+msgid "Scroll to Top"
+msgstr ""
+
+#: src/classes/class-admin.php:3478
+msgid "Scroll to Top Offset"
+msgstr ""
+
+#: src/classes/class-admin.php:3498
+msgid "Hide on Reached End"
+msgstr ""
+
+#: src/classes/class-admin.php:3516
+msgid "Adjust the loading threshold, limit the number of automatic loads and run the infinite scroll only after the Load button click."
+msgstr ""
+
+#: src/classes/class-admin.php:3545
+msgid "Use <code>selector</code> rule to change block styles."
+msgstr ""
+
+#: src/classes/class-admin.php:3546
+msgid "Example:"
+msgstr ""
+
+#: src/classes/class-admin.php:3592
+msgid "Post Types Set"
+msgstr ""
+
+#: src/classes/class-admin.php:3607
+msgid "Current Query"
+msgstr ""
+
+#. translators: %s - taxonomy name.
+#: src/classes/class-archive-mapping.php:375
+msgid "Portfolio Category: %s"
+msgstr ""
+
+#. translators: %s - taxonomy name.
+#: src/classes/class-archive-mapping.php:381
+msgid "Portfolio Tag: %s"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:509
+msgid "Portfolio permalinks"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:516
+msgid "Portfolio category base"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:522
+#: src/classes/class-archive-mapping.php:560
+msgctxt "slug"
+msgid "portfolio-category"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:529
+msgid "Portfolio tag base"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:535
+#: src/classes/class-archive-mapping.php:561
+msgctxt "slug"
+msgid "portfolio-tag"
+msgstr ""
+
+#. translators: %s: Home URL
+#: src/classes/class-archive-mapping.php:611
+msgid "If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories. We also recommend you use the <code>%%portfolio_page_slug%%</code> slug, which will automatically use the slug of you Portfolio Archive page."
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:614
+#: src/classes/class-archive-mapping.php:718
+#: src/classes/class-archive-mapping.php:1138
+msgctxt "default-slug"
+msgid "portfolio"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:633
+msgid "Portfolio base"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:637
+msgid "Portfolio base with category"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:642
+msgid "Custom base"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:644
+msgid "Enter a custom base to use. A base must be set or WordPress will use default instead."
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:1077
+msgid "Portfolio"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:1124
+msgid "Portfolio Page"
+msgstr ""
+
+#: src/classes/class-archive-mapping.php:1158
+msgctxt "default-label"
+msgid "Portfolio"
+msgstr ""
+
+#: src/classes/class-ask-review.php:70
+msgid "Satisfied using Visual Portfolio?"
+msgstr ""
+
+#. translators: %s - Plugin name.
+#: src/classes/class-ask-review.php:74
+msgid "Hey, we noticed you've been using %s for more than two weeks now – that's awesome!"
+msgstr ""
+
+#. translators: %s - Plugin name.
+#: src/classes/class-ask-review.php:74
+msgctxt "plugin name inside the review notice"
+msgid "Visual Portfolio"
+msgstr ""
+
+#: src/classes/class-ask-review.php:77
+msgid "Could you please do us a BIG favor and give it a rating on WordPress.org to help us spread the word and boost our motivation?"
+msgstr ""
+
+#: src/classes/class-ask-review.php:82
+msgid "Yes, you deserve it"
+msgstr ""
+
+#: src/classes/class-ask-review.php:87
+msgid "No, maybe later"
+msgstr ""
+
+#: src/classes/class-ask-review.php:90
+msgid "I already did"
+msgstr ""
+
+#. translators: %s - plugin name.
+#: src/classes/class-assets.php:721
+msgid "Couldn't retrieve %s ID."
+msgstr ""
+
+#: src/classes/class-assets.php:723
+msgid "Close (Esc)"
+msgstr ""
+
+#: src/classes/class-assets.php:724
+#: src/classes/class-assets.php:742
+msgid "Share"
+msgstr ""
+
+#: src/classes/class-assets.php:725
+msgid "Toggle fullscreen"
+msgstr ""
+
+#: src/classes/class-assets.php:726
+msgid "Zoom in/out"
+msgstr ""
+
+#: src/classes/class-assets.php:727
+msgid "Previous (arrow left)"
+msgstr ""
+
+#: src/classes/class-assets.php:728
+msgid "Next (arrow right)"
+msgstr ""
+
+#: src/classes/class-assets.php:729
+msgid "Share on Facebook"
+msgstr ""
+
+#: src/classes/class-assets.php:730
+msgid "Tweet"
+msgstr ""
+
+#: src/classes/class-assets.php:731
+msgid "Pin it"
+msgstr ""
+
+#: src/classes/class-assets.php:733
+msgid "Close"
+msgstr ""
+
+#: src/classes/class-assets.php:734
+msgid "Next"
+msgstr ""
+
+#: src/classes/class-assets.php:735
+msgid "Previous"
+msgstr ""
+
+#: src/classes/class-assets.php:736
+msgid "The requested content cannot be loaded. <br /> Please try again later."
+msgstr ""
+
+#: src/classes/class-assets.php:737
+msgid "Start slideshow"
+msgstr ""
+
+#: src/classes/class-assets.php:738
+msgid "Pause slideshow"
+msgstr ""
+
+#: src/classes/class-assets.php:739
+msgid "Full screen"
+msgstr ""
+
+#: src/classes/class-assets.php:740
+msgid "Thumbnails"
+msgstr ""
+
+#: src/classes/class-assets.php:741
+msgid "Download"
+msgstr ""
+
+#: src/classes/class-assets.php:743
+msgid "Zoom"
+msgstr ""
+
+#: src/classes/class-controls.php:171
+msgid "Dynamic control callback function is not found."
+msgstr ""
+
+#: src/classes/class-custom-post-meta.php:184
+msgid "https://"
+msgstr ""
+
+#: src/classes/class-custom-post-meta.php:392
+msgid "< 1"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:136
+msgctxt "Post Type Singular Name"
+msgid "Project"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:138
+#: src/classes/class-custom-post-type.php:234
+msgid "Parent Project"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:139
+msgid "Projects"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:140
+msgid "View Project"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:141
+msgid "Add New Project"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:142
+#: src/classes/class-custom-post-type.php:238
+msgid "Add New"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:143
+msgid "Edit Project"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:144
+msgid "Update Project"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:145
+msgid "Search Project"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:146
+#: src/classes/class-custom-post-type.php:242
+msgid "Not Found"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:147
+#: src/classes/class-custom-post-type.php:243
+msgid "Not found in Trash"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:188
+msgid "Portfolio Categories"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:208
+msgid "Portfolio Tags"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:210
+msgid "Tags"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:231
+msgctxt "Post Type General Name"
+msgid "Saved Layouts"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:232
+msgctxt "Post Type Singular Name"
+msgid "Saved Layout"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:235
+msgid "Saved Layouts"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:236
+msgid "View Saved Layout"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:237
+msgid "Add New Saved Layout"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:239
+msgid "Edit Saved Layout"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:240
+msgid "Update Saved Layout"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:241
+msgid "Search Saved Layout"
+msgstr ""
+
+#. translators: %s - taxonomy name.
+#: src/classes/class-custom-post-type.php:296
+msgid "Show All %s"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:337
+msgid "Portfolio Manager"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:342
+msgid "Portfolio Author"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:427
+msgid "Thumbnail"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:469
+msgid "When to use Saved Layouts"
+msgstr ""
+
+#. translators: %2$s - plugin name.
+#: src/classes/class-custom-post-type.php:477
+msgid "If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href=\"%1$s\" target=\"_blank\">%2$s Blocks</a>."
+msgstr ""
+
+#. translators: %s - url to documentation.
+#: src/classes/class-custom-post-type.php:487
+msgid "To reuse blocks, you can use the built-in Gutenberg feature - <a href=\"%s\" target=\"_blank\">Reusable Blocks</a>."
+msgstr ""
+
+#. translators: %s - url to documentation.
+#: src/classes/class-custom-post-type.php:493
+msgid "Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href=\"%s\" target=\"_blank\">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks."
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:511
+msgid "Icon"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:519
+msgid "Shortcode"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:584
+msgid "All layouts"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:594
+msgid "All styles"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:604
+msgid "All sources"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:797
+#: src/classes/class-custom-post-type.php:798
+#: src/classes/class-welcome-screen.php:177
+msgid "Documentation"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:818
+#: src/classes/class-custom-post-type.php:819
+msgid "Proofing"
+msgstr ""
+
+#: src/classes/class-custom-post-type.php:854
+msgid "Send a collection of photographs to your client for approval."
+msgstr ""
+
+#: src/classes/class-deprecated.php:175
+msgid "Images Rounded Corners"
+msgstr ""
+
+#: src/classes/class-deprecated.php:331
+msgid "Caption Align"
+msgstr ""
+
+#: src/classes/class-get-portfolio.php:1994
+msgid "Default sorting"
+msgstr ""
+
+#: src/classes/class-get-portfolio.php:1995
+msgid "Sort by date (newest)"
+msgstr ""
+
+#: src/classes/class-get-portfolio.php:1996
+msgid "Sort by date (oldest)"
+msgstr ""
+
+#: src/classes/class-get-portfolio.php:1997
+msgid "Sort by title (A-Z)"
+msgstr ""
+
+#: src/classes/class-get-portfolio.php:1998
+msgid "Sort by title (Z-A)"
+msgstr ""
+
+#. translators: %s - published in human format.
+#: src/classes/class-get-portfolio.php:2124
+msgid "%s ago"
+msgstr ""
+
+#: src/classes/class-images.php:94
+msgid "Small (VP)"
+msgstr ""
+
+#: src/classes/class-images.php:95
+msgid "Medium (VP)"
+msgstr ""
+
+#: src/classes/class-images.php:96
+msgid "Large (VP)"
+msgstr ""
+
+#: src/classes/class-images.php:97
+msgid "Extra Large (VP)"
+msgstr ""
+
+#: src/classes/class-rest.php:93
+msgid "Sorry, you are not allowed to get list of saved layouts."
+msgstr ""
+
+#: src/classes/class-rest.php:125
+msgid "Layouts not found."
+msgstr ""
+
+#: src/classes/class-rest.php:140
+msgid "Post ID is required for this request."
+msgstr ""
+
+#: src/classes/class-rest.php:144
+msgid "Sorry, you are not allowed to edit saved layouts data."
+msgstr ""
+
+#: src/classes/class-rest.php:200
+#: src/classes/class-rest.php:204
+msgid "User don't have permissions to change options."
+msgstr ""
+
+#: src/classes/class-settings.php:127
+#: src/classes/class-settings.php:128
+#: src/classes/class-settings.php:847
+#: src/gutenberg/components/elements-selector/index.js:136
+msgid "Settings"
+msgstr ""
+
+#: src/classes/class-settings.php:206
+msgid "Popup & Lightbox"
+msgstr ""
+
+#: src/classes/class-settings.php:211
+msgid "Watermarks"
+msgstr ""
+
+#: src/classes/class-settings.php:216
+#: src/classes/class-welcome-screen.php:188
+msgid "Social Feeds"
+msgstr ""
+
+#: src/classes/class-settings.php:221
+#: src/classes/class-welcome-screen.php:196
+msgid "White Label"
+msgstr ""
+
+#: src/classes/class-settings.php:265
+msgid "Register Portfolio Post Type"
+msgstr ""
+
+#: src/classes/class-settings.php:266
+msgid "Add custom post type `portfolio` to showcase your works."
+msgstr ""
+
+#: src/classes/class-settings.php:272
+msgid "Archive Page"
+msgstr ""
+
+#: src/classes/class-settings.php:273
+msgid "Base page of your portfolio, where will be placed your works archive."
+msgstr ""
+
+#: src/classes/class-settings.php:285
+msgid "Archive Page Items Per Page"
+msgstr ""
+
+#: src/classes/class-settings.php:298
+msgid "Filter Taxonomies"
+msgstr ""
+
+#: src/classes/class-settings.php:299
+msgid "You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by \",\" separating values. Example: \"product_cat,product_tag\""
+msgstr ""
+
+#: src/classes/class-settings.php:305
+msgid "Placeholder Image"
+msgstr ""
+
+#: src/classes/class-settings.php:306
+msgid "This image used on items in layouts where image is not specified."
+msgstr ""
+
+#: src/classes/class-settings.php:310
+msgid "Choose image"
+msgstr ""
+
+#: src/classes/class-settings.php:317
+msgid "AJAX Cache and Preload"
+msgstr ""
+
+#: src/classes/class-settings.php:318
+msgid "Reduce AJAX calls request time."
+msgstr ""
+
+#: src/classes/class-settings.php:327
+msgid "Social Logs"
+msgstr ""
+
+#: src/classes/class-settings.php:328
+msgid "Enable Social Logs for Twitch (Beta)"
+msgstr ""
+
+#: src/classes/class-settings.php:335
+msgid "Logs Limit"
+msgstr ""
+
+#: src/classes/class-settings.php:340
+msgid "Sets the maximum logs limit."
+msgstr ""
+
+#: src/classes/class-settings.php:352
+msgid "Responsive Breakpoints"
+msgstr ""
+
+#: src/classes/class-settings.php:358
+#: src/classes/class-settings.php:476
+msgid "Extra Large"
+msgstr ""
+
+#. translators: %1$s - default breakpoint.
+#: src/classes/class-settings.php:365
+msgid "Sets the breakpoint on extra large screen sizes (Default: %1$spx)."
+msgstr ""
+
+#: src/classes/class-settings.php:370
+#: src/classes/class-settings.php:469
+#: src/classes/class-settings.php:503
+msgid "Large"
+msgstr ""
+
+#. translators: %1$s - default breakpoint.
+#: src/classes/class-settings.php:377
+msgid "Sets the breakpoint on large screen sizes (Default: %1$spx)."
+msgstr ""
+
+#: src/classes/class-settings.php:382
+#: src/classes/class-settings.php:462
+#: src/classes/class-settings.php:496
+msgid "Medium"
+msgstr ""
+
+#. translators: %1$s - default breakpoint.
+#: src/classes/class-settings.php:389
+msgid "Sets the breakpoint on medium screen sizes (Default: %1$spx)."
+msgstr ""
+
+#: src/classes/class-settings.php:394
+#: src/classes/class-settings.php:455
+#: src/classes/class-settings.php:489
+msgid "Small"
+msgstr ""
+
+#. translators: %1$s - default breakpoint.
+#: src/classes/class-settings.php:401
+msgid "Sets the breakpoint on small screen sizes (Default: %1$spx)."
+msgstr ""
+
+#: src/classes/class-settings.php:406
+msgid "Extra Small"
+msgstr ""
+
+#. translators: %1$s - default breakpoint.
+#: src/classes/class-settings.php:413
+msgid "Sets the breakpoint on extra small screen sizes (Default: %1$spx)."
+msgstr ""
+
+#: src/classes/class-settings.php:420
+msgid "Lazy Loading"
+msgstr ""
+
+#. translators: %s - plugin brand name.
+#: src/classes/class-settings.php:422
+msgid "Enable lazy loading for %s layouts only or for the whole website."
+msgstr ""
+
+#. translators: %s - plugin brand name.
+#: src/classes/class-settings.php:428
+msgid "%s Only"
+msgstr ""
+
+#. translators: %s - plugin brand name.
+#: src/classes/class-settings.php:429
+msgid "All images"
+msgstr ""
+
+#: src/classes/class-settings.php:434
+msgid "Lazy Loading Excludes"
+msgstr ""
+
+#. translators: %s - link text.
+#: src/classes/class-settings.php:437
+msgid "Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href=\"%1$s\">%2$s</a>"
+msgstr ""
+
+#. translators: %s - link text.
+#: src/classes/class-settings.php:437
+msgid "More info"
+msgstr ""
+
+#: src/classes/class-settings.php:449
+msgid "Layouts Image Sizes"
+msgstr ""
+
+#: src/classes/class-settings.php:450
+msgid "Image sizes used in portfolio layouts."
+msgstr ""
+
+#: src/classes/class-settings.php:483
+msgid "Lightbox Image Sizes"
+msgstr ""
+
+#: src/classes/class-settings.php:484
+msgid "Image sizes used in lightbox images."
+msgstr ""
+
+#. translators: %s: regenerate thumbnails url.
+#: src/classes/class-settings.php:511
+msgid "After publishing your changes, new image sizes may not be shown until you <a href=\"%s\" target=\"_blank\">Regenerate Thumbnails</a>."
+msgstr ""
+
+#: src/classes/class-settings.php:519
+msgid "Vendor Script"
+msgstr ""
+
+#: src/classes/class-settings.php:522
+msgid "Fancybox"
+msgstr ""
+
+#: src/classes/class-settings.php:523
+msgid "PhotoSwipe"
+msgstr ""
+
+#: src/classes/class-settings.php:531
+msgid "Lightbox for WordPress Images"
+msgstr ""
+
+#: src/classes/class-settings.php:532
+msgid "Enable lightbox for WordPress native galleries and images."
+msgstr ""
+
+#: src/classes/class-settings.php:546
+msgid "Deep Linking"
+msgstr ""
+
+#: src/classes/class-settings.php:547
+msgid "Makes URL automatically change to reflect the current opened popup, and you can easily link directly to that image or video."
+msgstr ""
+
+#: src/classes/class-settings.php:554
+msgid "Use Deep Linking URL to Share Images"
+msgstr ""
+
+#: src/classes/class-settings.php:555
+msgid "Check to share Deep Linking URLs when sharing images. When disabled, all galleries will share direct links to image files."
+msgstr ""
+
+#: src/classes/class-settings.php:573
+msgid "Click to Zoom"
+msgstr ""
+
+#: src/classes/class-settings.php:581
+msgid "Restore Focus"
+msgstr ""
+
+#: src/classes/class-settings.php:582
+msgid "Restore focus on the last active item after Popup is closed."
+msgstr ""
+
+#: src/classes/class-settings.php:590
+msgid "UI Elements"
+msgstr ""
+
+#: src/classes/class-settings.php:596
+msgid "Arrows to navigate between images."
+msgstr ""
+
+#: src/classes/class-settings.php:602
+msgid "Display Images Counter"
+msgstr ""
+
+#: src/classes/class-settings.php:603
+msgid "On the top left corner will be showed images counter."
+msgstr ""
+
+#: src/classes/class-settings.php:609
+msgid "Display Zoom Button"
+msgstr ""
+
+#: src/classes/class-settings.php:615
+msgid "Display Fullscreen Button"
+msgstr ""
+
+#: src/classes/class-settings.php:621
+msgid "Display Share Button"
+msgstr ""
+
+#: src/classes/class-settings.php:627
+msgid "Display Close Button"
+msgstr ""
+
+#: src/classes/class-settings.php:648
+msgid "Thumbnails Opened At Startup"
+msgstr ""
+
+#: src/classes/class-settings.php:665
+msgid "Thumbnails Position"
+msgstr ""
+
+#: src/classes/class-settings.php:669
+msgid "Vertical"
+msgstr ""
+
+#: src/classes/class-settings.php:670
+msgid "Horizontal"
+msgstr ""
+
+#: src/classes/class-settings.php:686
+msgid "Display Download Button"
+msgstr ""
+
+#: src/classes/class-settings.php:699
+msgid "Display Slideshow"
+msgstr ""
+
+#: src/classes/class-settings.php:714
+msgid "Quick View"
+msgstr ""
+
+#: src/classes/class-settings.php:719
+msgid "Display URL Button"
+msgstr ""
+
+#: src/classes/class-settings.php:720
+msgid "Button with page URL will be placed in the popup toolbar."
+msgstr ""
+
+#: src/classes/class-settings.php:727
+msgid "Internal Links"
+msgstr ""
+
+#: src/classes/class-settings.php:731
+#: src/classes/class-settings.php:744
+msgid "Open in New Tab"
+msgstr ""
+
+#: src/classes/class-settings.php:732
+#: src/classes/class-settings.php:745
+msgid "Open in Current Tab"
+msgstr ""
+
+#: src/classes/class-settings.php:733
+#: src/classes/class-settings.php:746
+msgid "Open in Frame (not recommended)"
+msgstr ""
+
+#: src/classes/class-settings.php:734
+#: src/classes/class-settings.php:747
+msgid "Prevent Click"
+msgstr ""
+
+#: src/classes/class-settings.php:740
+msgid "External Links"
+msgstr ""
+
+#: src/classes/class-settings.php:754
+msgid "When you display posts and pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`."
+msgstr ""
+
+#: src/classes/class-settings.php:776
+msgid "Misc"
+msgstr ""
+
+#: src/classes/class-settings.php:781
+msgid "Background Color"
+msgstr ""
+
+#: src/classes/class-settings.php:793
+msgid "Protect your works using watermarks"
+msgstr ""
+
+#: src/classes/class-settings.php:808
+msgid "Social feeds such as Instagram, Youtube, Flickr, Twitter, etc..."
+msgstr ""
+
+#: src/classes/class-settings.php:823
+msgid "Remove our plugin brand and logos from Front and Admin areas"
+msgstr ""
+
+#: src/classes/class-settings.php:891
+msgid "-- Select Page --"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:53
+#: src/classes/class-welcome-screen.php:54
+msgid "Visual Portfolio Welcome Screen"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:111
+msgid "Thank you for choosing Visual Portfolio - The Modern Gallery, Posts Grid and Portfolio Plugin for WordPress."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:114
+msgid "You're using free Visual Portfolio plugin. Enjoy! 🙂"
+msgstr ""
+
+#. translators: %s - pro link.
+#: src/classes/class-welcome-screen.php:118
+msgid "Want to get more power with Pro? Visit %s"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:125
+msgid "Main Features & Solutions"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:130
+msgid "Visual Gallery Builder"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:131
+msgid "Build your portfolio and gallery blocks with no coding knowledge. Thanks to Gutenberg page builder you are able to create and customize galleries visually."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:135
+msgid "Optimized to be Fast as Native"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:136
+msgid "Due to the modular code structure, all scripts and styles are loaded only when they are needed for the current page that displays your gallery."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:141
+msgid "Layouts"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:142
+msgid "Our gallery plugin shipped with popular layouts such as Masonry and Justified (Flickr)."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:146
+msgid "Visual Effects"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:147
+msgid "Showcase your projects ang gallery images with clean and beautiful visual styles."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:152
+msgid "Easy to Customize"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:153
+msgid "The gallery block with live preview includes a lot of design settings that are point-and-click, no coding knowledge required."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:157
+msgid "Posts Query Builder"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:158
+msgid "Display posts, portfolios, and any other post types, filter by taxonomies, author, date ranges, and much more options."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:163
+msgid "Powerful Lightbox"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:164
+msgid "Visual Portfolio uses scripts for lightboxes that is high performance, mobile optimized and retina-ready."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:168
+msgid "Video and 🎵 Audio Support"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:169
+msgid "Present not only photos, but also audios and videos within a single gallery."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:176
+msgid "More Features"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:183
+msgid "Upgrade to Visual Portfolio Pro"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:185
+msgid "and Get More Power!"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:189
+msgid "Stylish Effects"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:190
+msgid "Watermarks Protection"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:191
+msgid "Age Gate Protection"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:192
+msgid "Instagram-like Image Filters"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:193
+msgid "Advanced Query Settings"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:194
+msgid "Popup for Posts and Pages"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:195
+msgid "Popup Deep Linking"
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:197
+msgid "And much more..."
+msgstr ""
+
+#: src/classes/class-welcome-screen.php:199
+msgid "Upgrade to PRO Now"
+msgstr ""
+
+#: src/templates/items-list/item-parts/meta-author.php:32
+msgid "Author"
+msgstr ""
+
+#. translators: %s - author name.
+#: src/templates/items-list/item-parts/meta-author.php:50
+msgid "By %s"
+msgstr ""
+
+#: src/templates/items-list/item-parts/meta-comments.php:32
+msgid "Comments"
+msgstr ""
+
+#: src/templates/items-list/item-parts/meta-comments.php:41
+msgid "No Comments"
+msgstr ""
+
+#. translators: %s Number of comments.
+#: src/templates/items-list/item-parts/meta-comments.php:44
+msgid "%s Comment"
+msgid_plural "%s Comments"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/templates/items-list/item-parts/meta-reading-time.php:26
+msgid "Reading Time"
+msgstr ""
+
+#. translators: %s Reading time minutes.
+#: src/templates/items-list/item-parts/meta-reading-time.php:35
+msgid "%s Min Read"
+msgid_plural "%s Mins Read"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/templates/items-list/item-parts/meta-views.php:26
+msgid "Views"
+msgstr ""
+
+#. translators: %s Number of views.
+#: src/templates/items-list/item-parts/meta-views.php:33
+msgid "%s View"
+msgid_plural "%s Views"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/templates/items-list/layouts/slider/arrows.php:17
+msgid "Previous Slide"
+msgstr ""
+
+#: src/templates/items-list/layouts/slider/arrows.php:20
+msgid "Next Slide"
+msgstr ""
+
+#: src/templates/items-list/wrapper-start.php:34
+msgid "Visual Portfolio, Posts & Image Gallery for WordPress"
+msgstr ""
+
+#: src/gutenberg/block-saved/edit.js:50
+msgid "--- Select Layout ---"
+msgstr ""
+
+#: src/gutenberg/block-saved/edit.js:155
+msgid "Saved %s"
+msgstr ""
+
+#: src/gutenberg/components/aspect-ratio/index.js:12
+msgid "Wide 16:9"
+msgstr ""
+
+#: src/gutenberg/components/aspect-ratio/index.js:13
+msgid "Ultra Wide 21:9"
+msgstr ""
+
+#: src/gutenberg/components/aspect-ratio/index.js:14
+msgid "TV 4:3"
+msgstr ""
+
+#: src/gutenberg/components/aspect-ratio/index.js:15
+msgid "Classic Film 3:2"
+msgstr ""
+
+#: src/gutenberg/components/aspect-ratio/index.js:116
+msgid "Width"
+msgstr ""
+
+#: src/gutenberg/components/aspect-ratio/index.js:122
+msgid "Height"
+msgstr ""
+
+#: src/gutenberg/components/controls-render/index.js:205
+#: src/gutenberg/components/elements-selector/index.js:402
+msgid "PRO"
+msgstr ""
+
+#: src/gutenberg/components/controls-render/index.js:573
+msgid "Open in Modal"
+msgstr ""
+
+#: src/gutenberg/components/controls-render/index.js:594
+msgid "Classes Tree:"
+msgstr ""
+
+#: src/gutenberg/components/date-picker/index.js:31
+msgid "Select Date"
+msgstr ""
+
+#: src/gutenberg/components/date-picker/index.js:45
+msgid "Reset Date"
+msgstr ""
+
+#: src/gutenberg/components/elements-selector/index.js:170
+msgid "Are you sure you want to remove the element?"
+msgstr ""
+
+#: src/gutenberg/components/elements-selector/index.js:191
+msgid "Remove"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/extensions/image-title-and-desription.js:32
+msgid "Loaded automatically from the image Title"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/extensions/image-title-and-desription.js:39
+msgid "Loaded automatically from the image Caption"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/extensions/image-title-and-desription.js:46
+msgid "Loaded automatically from the image Alt"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/extensions/image-title-and-desription.js:53
+msgid "Loaded automatically from the image Description"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:195
+msgid "Replace Image"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:206
+msgid "Remove Image from Gallery"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:216
+msgid "Hide Additional Info"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:217
+msgid "Show Additional Info"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:242
+msgid "File name:"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:247
+msgid "File type:"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:272
+msgid "File URL:"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:290
+msgid "Copy URL to Clipboard"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:297
+#: src/gutenberg/layouts-editor/index.js:77
+msgid "Copied!"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:308
+msgid "View attachment page"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:319
+msgid "Edit more details"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:441
+msgid "Image Settings"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:648
+msgid "Edit Gallery"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:649
+msgid "Add Images"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:701
+msgid "Showing %s of %s Image"
+msgid_plural "Showing %s of %s Images"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/gutenberg/components/gallery-control/index.js:723
+msgid "Show More"
+msgstr ""
+
+#: src/gutenberg/components/gallery-control/index.js:732
+msgid "Show All"
+msgstr ""
+
+#: src/gutenberg/components/icons-selector/index.js:237
+msgid "More"
+msgstr ""
+
+#: src/gutenberg/components/icons-selector/index.js:238
+msgid "Less"
+msgstr ""
+
+#: src/gutenberg/components/select-control/index.js:340
+msgid "Type to search…"
+msgstr ""
+
+#: src/gutenberg/components/select-control/index.js:341
+msgid "Select…"
+msgstr ""
+
+#: src/gutenberg/components/select-control/index.js:369
+msgid "Type and press Enter…"
+msgstr ""
+
+#: src/gutenberg/components/setup-wizard/index.js:180
+msgid "Set the common settings in the setup wizard,<br />more options will be available in the block settings.<br />Select the Content Source first:"
+msgstr ""
+
+#: src/gutenberg/components/setup-wizard/index.js:193
+msgid "Items Style"
+msgstr ""
+
+#: src/gutenberg/components/setup-wizard/index.js:199
+msgid "Select one of the featured styles to get started.<br />More style settings will be available in the block settings."
+msgstr ""
+
+#: src/gutenberg/components/setup-wizard/index.js:211
+msgid "Additional Settings"
+msgstr ""
+
+#: src/gutenberg/components/setup-wizard/index.js:247
+msgid "Popup Gallery"
+msgstr ""
+
+#: src/gutenberg/components/setup-wizard/index.js:287
+msgid "Skip Setup"
+msgstr ""
+
+#: src/gutenberg/components/setup-wizard/index.js:288
+msgid "Previous Step"
+msgstr ""
+
+#: src/gutenberg/components/setup-wizard/index.js:313
+msgid "Continue"
+msgstr ""
+
+#: src/gutenberg/components/tiles-selector/index.js:107
+msgid "Edit Tiles"
+msgstr ""
+
+#: src/gutenberg/custom-post-meta/image-focal-point.js:76
+msgid "Focal point will be used in Visual Portfolio layouts only."
+msgstr ""
+
+#: src/gutenberg/custom-post-meta/video.js:148
+msgid "Video will be used in %s layouts only. Full list of supported links"
+msgstr ""
+
+#: src/gutenberg/extensions/items-count-all.js:72
+msgid "Using large galleries may <u>decrease page loading speed</u>. We recommend you add these improvements:"
+msgstr ""
+
+#: src/gutenberg/extensions/items-count-all.js:83
+msgid "Set the items per page to <u>less than %d</u>"
+msgstr ""
+
+#: src/gutenberg/extensions/items-count-all.js:94
+msgid "Add <em>`Load More`</em> or <em>`Infinite Scroll`</em> pagination for best results."
+msgstr ""
+
+#: src/gutenberg/extensions/items-count-all.js:109
+msgid "Ok, I understand"
+msgstr ""
+
+#: src/gutenberg/extensions/items-count-all.js:206
+msgid "Custom Count"
+msgstr ""
+
+#: src/gutenberg/extensions/items-count-all.js:217
+msgid "Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries."
+msgstr ""
+
+#: src/gutenberg/extensions/items-count-all.js:227
+msgid "All Items"
+msgstr ""
+
+#: src/gutenberg/layouts-editor/index.js:104
+msgid "This Saved Layout"
+msgstr ""
+
+#: src/gutenberg/layouts-editor/index.js:129
+msgid "Shortcodes"
+msgstr ""
+
+#: src/gutenberg/layouts-editor/index.js:179
+msgid "Show Additional Shortcodes"
+msgstr ""
+
+#: src/gutenberg/layouts-editor/index.js:224
+msgid "%s Editor"
+msgstr ""
+
+#: src/gutenberg/layouts-editor/index.js:226
+msgid "Edit saved %s layouts."
+msgstr ""
+
+#: src/gutenberg/block-saved/block.json
+msgctxt "block title"
+msgid "Visual Portfolio Saved Layout"
+msgstr ""
+
+#: src/gutenberg/block-saved/block.json
+msgctxt "block description"
+msgid "Display saved Visual Portfolio layouts."
+msgstr ""
+
+#: src/gutenberg/block-saved/block.json
+msgctxt "block keyword"
+msgid "saved"
+msgstr ""
+
+#: src/gutenberg/block-saved/block.json
+#: src/gutenberg/block/block.json
+msgctxt "block keyword"
+msgid "portfolio"
+msgstr ""
+
+#: src/gutenberg/block-saved/block.json
+#: src/gutenberg/block/block.json
+msgctxt "block keyword"
+msgid "vpf"
+msgstr ""
+
+#: src/gutenberg/block/block.json
+msgctxt "block title"
+msgid "Visual Portfolio"
+msgstr ""
+
+#: src/gutenberg/block/block.json
+msgctxt "block description"
+msgid "Display galleries, posts and portfolio grids."
+msgstr ""
+
+#: src/gutenberg/block/block.json
+msgctxt "block keyword"
+msgid "gallery"
+msgstr ""
+
+#: src/gutenberg/block/block.json
+msgctxt "block keyword"
+msgid "images"
+msgstr ""
+
+#: src/gutenberg/block/block.json
+msgctxt "block keyword"
+msgid "posts"
+msgstr ""
