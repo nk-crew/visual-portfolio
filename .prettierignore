@@ -5,6 +5,7 @@
 **/*.yml
 node_modules
 src/assets/vendor
+src/templates/**/*.css
 dist
 dist-zip
 build

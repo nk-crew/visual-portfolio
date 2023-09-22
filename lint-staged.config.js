@@ -8,6 +8,7 @@ function excludeVendor( lint ) {
 			'!**/vendor/**/*',
 			'!**/build/**/*',
 			'!**/dist/**/*',
+      '!**/templates/**/*',
 		] );
 
 		if ( files && files.length ) {
