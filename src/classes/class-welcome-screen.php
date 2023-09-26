@@ -23,7 +23,7 @@ class Visual_Portfolio_Welcome_Screen {
     }
 
     /**
-     * Check if we can display notice.
+     * Redirect to Welcome page after activation.
      */
     public function redirect_to_welcome_screen() {
         // Bail if no activation redirect.

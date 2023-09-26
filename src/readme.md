@@ -128,7 +128,7 @@ Visual Portfolio plugin is built keeping SEO and performance in mind by defining
 
 In addition our plugin add images in the sitemap for `All In One SEO`, `Rank Math`, and `Yoast SEO` plugins
 
-### 🏳️ Multilingual ###
+### 🏳️ Multilingual & Translation Ready ###
 
 Visual Portfolio adds a new layer of compatibility for [WPML](https://wpml.org/). All blocks are compatible with it and ready for translation. [https://visualportfolio.co/docs/multilingual/](https://visualportfolio.co/docs/multilingual/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=wpml)
 
