@@ -1,4 +1,4 @@
-import { debounce } from '@wordpress/compose';
+import { debounce } from 'throttle-debounce';
 
 const { jQuery: $ } = window;
 
