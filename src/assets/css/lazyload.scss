@@ -2,6 +2,8 @@
 
 /*
  * Visual Portfolio Lazyload Images
+ *
+ * - :first-of-type is used to prevent conflicts with hover image (Pro feature)
  */
 
 // LazyLoad image
@@ -17,52 +19,41 @@ img.vp-lazyloaded {
 	opacity: 1;
 }
 
-.vp-portfolio__item-img::before,
-.vp-portfolio__thumbnail-img::before,
-.vp-portfolio__item-img::after,
-.vp-portfolio__thumbnail-img::after {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	// Fixed possible bug with inaccessible links on images in the Classic style.
-	pointer-events: none;
-	visibility: visible;
-	content: "";
-	background: var(--vp-lazyload-images__background);
-	opacity: 1;
-	transition: var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) opacity, var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) visibility;
-}
+:is(.vp-portfolio__item-img, .vp-portfolio__thumbnail-img) {
+	// Extra check for lazy loading class on the inner image
+	// to make sure image will be lazy loaded by Visual Portfolio.
+	&:has(img:first-of-type:is(.vp-lazyload, .vp-lazyloading, .vp-lazyloaded))::before {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		// Fixed possible bug with inaccessible links on images in the Classic style.
+		pointer-events: none;
+		visibility: visible;
+		content: "";
+		background-image: var(--vp-lazyload-images__background);
+		background-size: var(--vp-lazyload-images__background-size);
+		opacity: 1;
+		transition: var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) opacity, var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) visibility;
+	}
 
-.vp-portfolio__item-img-lazyloading::before,
-.vp-portfolio__thumbnail-img-lazyloading::before,
-.vp-portfolio__item-img-lazyloading::after,
-.vp-portfolio__thumbnail-img-lazyloading::after {
-	animation: vp-lazyload-placeholder var(--vp-lazyload-images__animation-duration) linear infinite;
-}
+	&:has(img:first-of-type.vp-lazyloading)::before {
+		animation: vp-lazyload-placeholder var(--vp-lazyload-images__animation-duration) ease-in-out infinite;
+	}
 
-.vp-portfolio__item-img::before,
-.vp-portfolio__thumbnail-img::before {
-	background: var(--vp-lazyload-images__background-second);
-	animation-delay: var(--vp-lazyload-images__animation-second-delay);
-}
-
-.vp-portfolio__item-img-lazyloaded::before,
-.vp-portfolio__thumbnail-img-lazyloaded::before,
-.vp-portfolio__item-img-lazyloaded::after,
-.vp-portfolio__thumbnail-img-lazyloaded::after {
-	visibility: hidden;
-	opacity: 0;
+	&:has(img:first-of-type.vp-lazyloaded)::before {
+		visibility: hidden;
+		opacity: 0;
+	}
 }
 
 @keyframes vp-lazyload-placeholder {
-	0%,
-	100% {
-		opacity: 1;
+	0% {
+		background-position: 200% 0;
 	}
 
-	50% {
-		opacity: 0;
+	100% {
+		background-position: -200% 0;
 	}
 }

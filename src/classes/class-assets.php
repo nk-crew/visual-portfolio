@@ -482,6 +482,9 @@ class Visual_Portfolio_Assets {
 
         self::store_used_assets( 'visual-portfolio-lazyload', true, 'script' );
         self::store_used_assets( 'visual-portfolio-lazyload', true, 'style' );
+
+        // lazy load fallback.
+        add_action( 'wp_head', 'Visual_Portfolio_Assets::add_lazyload_fallback_script' );
     }
 
     /**
@@ -597,7 +600,6 @@ class Visual_Portfolio_Assets {
             'visual-portfolio-lazyload' => array(
                 'build/assets/js/lazyload',
                 array(
-                    'jquery',
                     'lazysizes',
                 ),
             ),
@@ -827,6 +829,34 @@ class Visual_Portfolio_Assets {
                 <?php echo wp_kses( $styles, array( '\'', '\"' ) ); ?>
             </style>
         </noscript>
+        <?php
+    }
+
+    /**
+     * Add fallback for lazyloading.
+     */
+    public static function add_lazyload_fallback_script() {
+        $css_url = visual_portfolio()->plugin_url . 'assets/css/lazyload-fallback.min.css?ver=@@plugin_version';
+        $js_url  = visual_portfolio()->plugin_url . 'assets/js/lazyload-fallback.min.js?ver=@@plugin_version';
+
+        ?>
+        <script>
+            (function(){
+                // Check if fallback is not necessary.
+                if ( CSS.supports('selector(:has(div))') ) {
+                    return;
+                }
+
+                var linkTag = document.createElement("link");
+                linkTag.setAttribute('rel', 'stylesheet');
+                linkTag.setAttribute('href', '<?php echo esc_url( $css_url ); ?>');
+                document.head.appendChild(linkTag);
+
+                var scriptTag = document.createElement("script");
+                scriptTag.setAttribute('src', '<?php echo esc_url( $js_url ); ?>');
+                document.head.appendChild(scriptTag);
+            }());
+        </script>
         <?php
     }
 
