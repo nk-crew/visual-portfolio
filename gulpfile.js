@@ -36,6 +36,7 @@ const zipFiles = [
 	'class-visual-portfolio.php',
 	'LICENSE.txt',
 	'README.md',
+  'readme.txt',
 ];
 
 // Bump current version number.
