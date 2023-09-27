@@ -16,106 +16,112 @@ const { getWordPressSrcDirectory } = require('@wordpress/scripts/utils');
 const vendorFiles = [
 	{
 		source: 'node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js',
-		destination: 'src/assets/vendor/fancybox/dist/jquery.fancybox.min.js',
+		destination: 'assets/vendor/fancybox/dist/jquery.fancybox.min.js',
 	},
 	{
 		source: 'node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css',
-		destination: 'src/assets/vendor/fancybox/dist/jquery.fancybox.min.css',
+		destination: 'assets/vendor/fancybox/dist/jquery.fancybox.min.css',
 	},
 	{
 		source: 'node_modules/flickr-justified-gallery/dist/fjGallery.min.js',
 		destination:
-			'src/assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js',
+			'assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js',
 	},
 	{
 		source: 'node_modules/flickr-justified-gallery/dist/fjGallery.min.js.map',
 		destination:
-			'src/assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js.map',
+			'assets/vendor/flickr-justified-gallery/dist/fjGallery.min.js.map',
 	},
 	{
 		source: 'node_modules/flickr-justified-gallery/dist/fjGallery.css',
 		destination:
-			'src/assets/vendor/flickr-justified-gallery/dist/fjGallery.css',
+			'assets/vendor/flickr-justified-gallery/dist/fjGallery.css',
 	},
 	{
 		source: 'node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js',
 		destination:
-			'src/assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js',
+			'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js',
 	},
 	{
 		source: 'node_modules/iframe-resizer/js/iframeResizer.contentWindow.map',
 		destination:
-			'src/assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.map',
+			'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.map',
 	},
 	{
 		source: 'node_modules/iframe-resizer/js/iframeResizer.min.js',
-		destination: 'src/assets/vendor/iframe-resizer/js/iframeResizer.min.js',
+		destination: 'assets/vendor/iframe-resizer/js/iframeResizer.min.js',
 	},
 	{
 		source: 'node_modules/iframe-resizer/js/iframeResizer.map',
-		destination: 'src/assets/vendor/iframe-resizer/js/iframeResizer.map',
+		destination: 'assets/vendor/iframe-resizer/js/iframeResizer.map',
 	},
 	{
 		source: 'node_modules/isotope-layout/dist/isotope.pkgd.min.js',
-		destination:
-			'src/assets/vendor/isotope-layout/dist/isotope.pkgd.min.js',
+		destination: 'assets/vendor/isotope-layout/dist/isotope.pkgd.min.js',
 	},
 	{
 		source: 'node_modules/lazysizes/lazysizes.min.js',
-		destination: 'src/assets/vendor/lazysizes/lazysizes.min.js',
+		destination: 'assets/vendor/lazysizes/lazysizes.min.js',
 	},
 	{
 		source: 'node_modules/photoswipe/dist/photoswipe.min.js',
-		destination: 'src/assets/vendor/photoswipe/dist/photoswipe.min.js',
+		destination: 'assets/vendor/photoswipe/dist/photoswipe.min.js',
 	},
 	{
 		source: 'node_modules/photoswipe/dist/photoswipe-ui-default.min.js',
 		destination:
-			'src/assets/vendor/photoswipe/dist/photoswipe-ui-default.min.js',
+			'assets/vendor/photoswipe/dist/photoswipe-ui-default.min.js',
 	},
 	{
 		source: 'node_modules/photoswipe/dist/photoswipe.css',
-		destination: 'src/assets/vendor/photoswipe/dist/photoswipe.css',
+		destination: 'assets/vendor/photoswipe/dist/photoswipe.css',
 	},
 	{
 		source: 'node_modules/photoswipe/dist/default-skin/default-skin.css',
 		destination:
-			'src/assets/vendor/photoswipe/dist/default-skin/default-skin.css',
+			'assets/vendor/photoswipe/dist/default-skin/default-skin.css',
 	},
 	{
 		source: 'node_modules/photoswipe/dist/default-skin/default-skin.png',
 		destination:
-			'src/assets/vendor/photoswipe/dist/default-skin/default-skin.png',
+			'assets/vendor/photoswipe/dist/default-skin/default-skin.png',
 	},
 	{
 		source: 'node_modules/photoswipe/dist/default-skin/default-skin.svg',
 		destination:
-			'src/assets/vendor/photoswipe/dist/default-skin/default-skin.svg',
+			'assets/vendor/photoswipe/dist/default-skin/default-skin.svg',
 	},
 	{
 		source: 'node_modules/photoswipe/dist/default-skin/preloader.gif',
-		destination:
-			'src/assets/vendor/photoswipe/dist/default-skin/preloader.gif',
+		destination: 'assets/vendor/photoswipe/dist/default-skin/preloader.gif',
 	},
 	{
 		source: 'node_modules/simplebar/dist/simplebar.min.js',
-		destination: 'src/assets/vendor/simplebar/dist/simplebar.min.js',
+		destination: 'assets/vendor/simplebar/dist/simplebar.min.js',
 	},
 	{
 		source: 'node_modules/simplebar/dist/simplebar.min.css',
-		destination: 'src/assets/vendor/simplebar/dist/simplebar.min.css',
+		destination: 'assets/vendor/simplebar/dist/simplebar.min.css',
 	},
 	{
 		source: 'node_modules/swiper/swiper-bundle.min.js',
-		destination: 'src/assets/vendor/swiper/swiper-bundle.min.js',
+		destination: 'assets/vendor/swiper/swiper-bundle.min.js',
 	},
 	{
 		source: 'node_modules/swiper/swiper-bundle.min.js.map',
-		destination: 'src/assets/vendor/swiper/swiper-bundle.min.js.map',
+		destination: 'assets/vendor/swiper/swiper-bundle.min.js.map',
 	},
 	{
 		source: 'node_modules/swiper/swiper-bundle.min.css',
-		destination: 'src/assets/vendor/swiper/swiper-bundle.min.css',
+		destination: 'assets/vendor/swiper/swiper-bundle.min.css',
+	},
+	{
+		source: 'assets/admin/images',
+		destination: 'build/assets/admin/images',
+	},
+	{
+		source: 'assets/images',
+		destination: 'build/assets/images',
 	},
 ];
 
@@ -124,15 +130,15 @@ defaultConfig.module.rules[2].use[1].options.url = false;
 // Prepare JS for assets.
 const entryAssetsJs = glob
 	.sync([
-		'./src/assets/js/**.js',
-		'./src/assets/admin/js/**.js',
-		'./src/gutenberg/index.js',
-		'./src/gutenberg/custom-post-meta.js',
-		'./src/gutenberg/layouts-editor.js',
-		'./src/assets/js/3rd/plugin-jetpack.js',
+		'./assets/js/**.js',
+		'./assets/admin/js/**.js',
+		'./gutenberg/index.js',
+		'./gutenberg/custom-post-meta.js',
+		'./gutenberg/layouts-editor-script.js',
+		'./assets/js/3rd/plugin-jetpack.js',
 	])
 	.reduce(function (entries, entry) {
-		const name = entry.replace('.js', '').replace('src/', '');
+		const name = entry.replace('.js', '');
 		entries[name] = resolve(process.cwd(), entry);
 		return entries;
 	}, {});
@@ -140,22 +146,22 @@ const entryAssetsJs = glob
 // Prepare CSS for assets.
 const entryAssetsCss = glob
 	.sync([
-		'./src/assets/css/**.scss',
-		'./src/assets/admin/css/**.scss',
-		'./src/templates/**/style.scss',
-		'./src/templates/**/**/style.scss',
-		'./src/templates/**/**/**/style.scss',
-		'./src/gutenberg/style.scss',
-		'./src/gutenberg/layouts-editor.scss',
+		'./assets/css/**.scss',
+		'./assets/admin/css/**.scss',
+		'./templates/**/style.scss',
+		'./templates/**/**/style.scss',
+		'./templates/**/**/**/style.scss',
+		'./gutenberg/style.scss',
+		'./gutenberg/layouts-editor-style.scss',
 	])
 	.reduce(function (entries, entry) {
-		const name = entry.replace('.scss', '').replace('src/', '');
-    const matchForExclude = name.includes('_variables');
+		const name = entry.replace('.scss', '');
+		const matchForExclude = name.includes('_variables');
 
-    if ( ! matchForExclude ) {
-      entries[name] = resolve(process.cwd(), entry);
-    }
-    return entries;
+		if (!matchForExclude) {
+			entries[name] = resolve(process.cwd(), entry);
+		}
+		return entries;
 	}, {});
 
 const newConfig = {
@@ -224,7 +230,7 @@ const newConfig = {
 					copy: [
 						{
 							source: 'build/templates',
-							destination: 'src/templates',
+							destination: 'templates',
 							options: {
 								flat: false,
 								preserveTimestamps: true,
@@ -236,10 +242,10 @@ const newConfig = {
 					],
 					delete: [
 						'build/templates',
-						'src/templates/**/*.css.map',
-						'src/templates/**/*.js',
-						'src/templates/**/*.js.map',
-						'src/templates/**/*.asset.php',
+						'templates/**/*.css.map',
+						'templates/**/*.js',
+						'templates/**/*.js.map',
+						'templates/**/*.asset.php',
 					],
 				},
 			},
@@ -268,7 +274,8 @@ const newConfig = {
 					chunks: 'all',
 					enforce: true,
 					name(_, chunks, cacheGroupKey) {
-						const chunkName = chunks[0].name;
+						const chunkName =
+							chunks[chunks.length > 1 ? 1 : 0].name;
 						let cssOutput = `${dirname(
 							chunkName
 						)}/${cacheGroupKey}-${basename(chunkName)}`;
@@ -279,9 +286,18 @@ const newConfig = {
 								chunkName.indexOf('gutenberg/') > -1) &&
 							cacheGroupKey === 'style'
 						) {
+							cssOutput = `${dirname(chunkName)}/${basename(
+								chunkName
+							)}`;
+						}
+
+						if (
+							chunkName.indexOf('layouts-editor') > -1 &&
+							cacheGroupKey === 'style'
+						) {
 							cssOutput = `${dirname(
-								chunkName.replace('src/', '')
-							)}/${basename(chunkName)}`;
+								chunkName
+							)}/${cacheGroupKey}-${basename(chunkName)}`;
 						}
 						return cssOutput;
 					},

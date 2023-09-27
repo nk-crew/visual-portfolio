@@ -1,18 +1,19 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-const micromatch = require( 'micromatch' );
+const micromatch = require('micromatch');
 
-function excludeVendor( lint ) {
-	return ( filenames ) => {
-		const files = micromatch( filenames, [
+function excludeVendor(lint) {
+	return (filenames) => {
+		const files = micromatch(filenames, [
 			'!**/.*',
 			'!**/vendor/**/*',
 			'!**/build/**/*',
 			'!**/dist/**/*',
-      '!**/templates/**/*',
-		] );
+			'!**/dist-zip/**/*',
+			'!**/templates/**/*',
+		]);
 
-		if ( files && files.length ) {
-			return `${ lint } ${ files.join( ' ' ) }`;
+		if (files && files.length) {
+			return `${lint} ${files.join(' ')}`;
 		}
 
 		return [];
@@ -20,7 +21,7 @@ function excludeVendor( lint ) {
 }
 
 module.exports = {
-	'src/**/*.php': excludeVendor( 'composer run-script lint' ),
-	'src/**/*.{css,scss}': excludeVendor( 'wp-scripts lint-style' ),
-	'src/**/*.{js,jsx}': excludeVendor( 'wp-scripts lint-js' ),
+	'**/*.php': excludeVendor('composer run-script lint'),
+	'**/*.{css,scss}': excludeVendor('wp-scripts lint-style'),
+	'**/*.{js,jsx}': excludeVendor('wp-scripts lint-js'),
 };

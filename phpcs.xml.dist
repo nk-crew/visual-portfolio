@@ -12,8 +12,8 @@
     #############################################################################
     -->
 
-    <!-- Check the /src/ directory and the directories below it. -->
-    <file>./src/</file>
+    <!-- Check the plugin directory and the directories below it. -->
+    <file>.</file>
     <exclude-pattern>./tests/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/vendors/*</exclude-pattern>

@@ -175,62 +175,62 @@ class Visual_Portfolio {
      */
     private function include_dependencies() {
         // Deprecations run before all features.
-        require_once $this->plugin_path . 'src/classes/class-deprecated.php';
+        require_once $this->plugin_path . 'classes/class-deprecated.php';
 
-        require_once $this->plugin_path . 'src/classes/class-security.php';
-        require_once $this->plugin_path . 'src/gutenberg/utils/control-condition-check/index.php';
-        require_once $this->plugin_path . 'src/gutenberg/utils/control-get-value/index.php';
-        require_once $this->plugin_path . 'src/gutenberg/utils/controls-dynamic-css/index.php';
-        require_once $this->plugin_path . 'src/gutenberg/utils/encode-decode/index.php';
-        require_once $this->plugin_path . 'src/classes/class-templates.php';
-        require_once $this->plugin_path . 'src/classes/class-parse-blocks.php';
-        require_once $this->plugin_path . 'src/classes/class-assets.php';
-        require_once $this->plugin_path . 'src/classes/class-breakpoints.php';
-        require_once $this->plugin_path . 'src/classes/class-image-placeholder.php';
+        require_once $this->plugin_path . 'classes/class-security.php';
+        require_once $this->plugin_path . 'gutenberg/utils/control-condition-check/index.php';
+        require_once $this->plugin_path . 'gutenberg/utils/control-get-value/index.php';
+        require_once $this->plugin_path . 'gutenberg/utils/controls-dynamic-css/index.php';
+        require_once $this->plugin_path . 'gutenberg/utils/encode-decode/index.php';
+        require_once $this->plugin_path . 'classes/class-templates.php';
+        require_once $this->plugin_path . 'classes/class-parse-blocks.php';
+        require_once $this->plugin_path . 'classes/class-assets.php';
+        require_once $this->plugin_path . 'classes/class-breakpoints.php';
+        require_once $this->plugin_path . 'classes/class-image-placeholder.php';
 
         // this settings class order is required.
-        require_once $this->plugin_path . 'src/classes/class-settings.php';
-        require_once $this->plugin_path . 'src/classes/class-welcome-screen.php';
-        require_once $this->plugin_path . 'src/classes/class-ask-review.php';
-        require_once $this->plugin_path . 'src/classes/class-images.php';
-        require_once $this->plugin_path . 'src/classes/class-rest.php';
-        require_once $this->plugin_path . 'src/classes/class-get-portfolio.php';
-        require_once $this->plugin_path . 'src/classes/class-gutenberg.php';
-        require_once $this->plugin_path . 'src/classes/class-gutenberg-saved.php';
-        require_once $this->plugin_path . 'src/classes/class-shortcode.php';
-        require_once $this->plugin_path . 'src/classes/class-preview.php';
-        require_once $this->plugin_path . 'src/classes/class-custom-post-type.php';
-        require_once $this->plugin_path . 'src/classes/class-custom-post-meta.php';
-        require_once $this->plugin_path . 'src/classes/class-admin.php';
-        require_once $this->plugin_path . 'src/classes/class-controls.php';
-        require_once $this->plugin_path . 'src/classes/class-supported-themes.php';
-        require_once $this->plugin_path . 'src/classes/class-archive-mapping.php';
-        require_once $this->plugin_path . 'src/classes/class-sitemap.php';
-        require_once $this->plugin_path . 'src/classes/class-seo-optimization.php';
+        require_once $this->plugin_path . 'classes/class-settings.php';
+        require_once $this->plugin_path . 'classes/class-welcome-screen.php';
+        require_once $this->plugin_path . 'classes/class-ask-review.php';
+        require_once $this->plugin_path . 'classes/class-images.php';
+        require_once $this->plugin_path . 'classes/class-rest.php';
+        require_once $this->plugin_path . 'classes/class-get-portfolio.php';
+        require_once $this->plugin_path . 'classes/class-gutenberg.php';
+        require_once $this->plugin_path . 'classes/class-gutenberg-saved.php';
+        require_once $this->plugin_path . 'classes/class-shortcode.php';
+        require_once $this->plugin_path . 'classes/class-preview.php';
+        require_once $this->plugin_path . 'classes/class-custom-post-type.php';
+        require_once $this->plugin_path . 'classes/class-custom-post-meta.php';
+        require_once $this->plugin_path . 'classes/class-admin.php';
+        require_once $this->plugin_path . 'classes/class-controls.php';
+        require_once $this->plugin_path . 'classes/class-supported-themes.php';
+        require_once $this->plugin_path . 'classes/class-archive-mapping.php';
+        require_once $this->plugin_path . 'classes/class-sitemap.php';
+        require_once $this->plugin_path . 'classes/class-seo-optimization.php';
 
         // 3rd code integration.
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-a3-lazy-load.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-divi.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-elementor.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-ewww-image-optimizer.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-imagify.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-jetpack.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-lazy-loading-responsive-images.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-paid-memberships-pro.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-sg-cachepress.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-tinymce.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-vc.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-wp-rocket.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-wpml.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-rank-math.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-yoast.php';
-        require_once $this->plugin_path . 'src/classes/3rd/plugins/class-all-in-one-seo.php';
-        require_once $this->plugin_path . 'src/classes/3rd/themes/class-avada.php';
-        require_once $this->plugin_path . 'src/classes/3rd/themes/class-enfold.php';
-        require_once $this->plugin_path . 'src/classes/3rd/themes/class-thrive-architect.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-a3-lazy-load.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-divi.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-elementor.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-ewww-image-optimizer.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-imagify.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-jetpack.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-lazy-loading-responsive-images.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-paid-memberships-pro.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-sg-cachepress.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-tinymce.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-vc.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-wp-rocket.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-wpml.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-rank-math.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-yoast.php';
+        require_once $this->plugin_path . 'classes/3rd/plugins/class-all-in-one-seo.php';
+        require_once $this->plugin_path . 'classes/3rd/themes/class-avada.php';
+        require_once $this->plugin_path . 'classes/3rd/themes/class-enfold.php';
+        require_once $this->plugin_path . 'classes/3rd/themes/class-thrive-architect.php';
 
         // Migration run after all features.
-        require_once $this->plugin_path . 'src/classes/class-migration.php';
+        require_once $this->plugin_path . 'classes/class-migration.php';
     }
 
     /**

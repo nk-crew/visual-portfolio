@@ -3,8 +3,8 @@
 **/*.min.css
 **/*.build.css
 node_modules
-src/assets/vendor
-src/templates/**/*.css
+assets/vendor
+templates/**/*.css
 dist
 duist-zip
 build
