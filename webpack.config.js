@@ -150,8 +150,12 @@ const entryAssetsCss = glob
 	])
 	.reduce(function (entries, entry) {
 		const name = entry.replace('.scss', '').replace('src/', '');
-		entries[name] = resolve(process.cwd(), entry);
-		return entries;
+    const matchForExclude = name.includes('_variables');
+
+    if ( ! matchForExclude ) {
+      entries[name] = resolve(process.cwd(), entry);
+    }
+    return entries;
 	}, {});
 
 const newConfig = {
