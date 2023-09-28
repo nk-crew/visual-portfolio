@@ -9,15 +9,15 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 if ( ! $opts['show_read_more'] || ! $opts['read_more_label'] ) {
-    return;
+	return;
 }
 
 ?>
 
 <a class="vp-portfolio__item-meta-read-more" href="<?php echo esc_url( $opts['read_more_url'] ); ?>">
-    <?php echo esc_html( $opts['read_more_label'] ); ?>
+	<?php echo esc_html( $opts['read_more_label'] ); ?>
 </a>

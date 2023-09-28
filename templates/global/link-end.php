@@ -11,11 +11,11 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 if ( isset( $href ) && $href ) {
-    echo '</a>';
+	echo '</a>';
 } elseif ( isset( $fallback ) && $fallback ) {
-    echo '</' . esc_html( $fallback ) . '>';
+	echo '</' . esc_html( $fallback ) . '>';
 }

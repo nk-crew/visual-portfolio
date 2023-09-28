@@ -11,23 +11,23 @@
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 if ( ! $opts['show_date'] ) {
-    return;
+	return;
 }
 
 ?>
 
 <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-date">
-    <span class="vp-portfolio__item-meta-part-icon">
-        <span class="vp-screen-reader-text">
-            <?php echo esc_html__( 'Date', '@@text_domain' ); ?>
-        </span>
-        <?php visual_portfolio()->include_template( 'icons/calendar' ); ?>
-    </span>
-    <span class="vp-portfolio__item-meta-part-text">
-        <?php echo esc_html( $args['published'] ); ?>
-    </span>
+	<span class="vp-portfolio__item-meta-part-icon">
+		<span class="vp-screen-reader-text">
+			<?php echo esc_html__( 'Date', '@@text_domain' ); ?>
+		</span>
+		<?php visual_portfolio()->include_template( 'icons/calendar' ); ?>
+	</span>
+	<span class="vp-portfolio__item-meta-part-text">
+		<?php echo esc_html( $args['published'] ); ?>
+	</span>
 </div>

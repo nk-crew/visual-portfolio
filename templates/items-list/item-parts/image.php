@@ -8,10 +8,10 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 if ( ! isset( $args['image'] ) || ! $args['image'] ) {
-    return;
+	return;
 }
 echo wp_kses( $args['image'], 'vp_image' );

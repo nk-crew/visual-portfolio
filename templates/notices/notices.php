@@ -7,11 +7,11 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 ?>
 
 <div class="vp-notice">
-    <?php echo esc_html( $args['notice'] ); ?>
+	<?php echo esc_html( $args['notice'] ); ?>
 </div>

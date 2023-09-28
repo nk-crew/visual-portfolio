@@ -9,17 +9,17 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 if ( ! $opts['show_excerpt'] || ! $args['excerpt'] ) {
-    return;
+	return;
 }
 
 ?>
 
 <div class="vp-portfolio__item-meta-excerpt">
-    <div>
-        <?php echo wp_kses_post( $args['excerpt'] ); ?>
-    </div>
+	<div>
+		<?php echo wp_kses_post( $args['excerpt'] ); ?>
+	</div>
 </div>

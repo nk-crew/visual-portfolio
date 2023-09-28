@@ -10,21 +10,21 @@
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 ?>
 
 <div class="<?php echo esc_attr( $args['class'] ); ?> vp-sort__style-minimal">
-    <?php
-    foreach ( $args['items'] as $item ) {
-        ?>
-        <div class="<?php echo esc_attr( $item['class'] ); ?>">
-            <a href="<?php echo esc_url( $item['url'] ); ?>" data-vp-sort="<?php echo esc_attr( $item['sort'] ); ?>">
-                <?php echo esc_html( $item['label'] ); ?>
-            </a>
-        </div>
-        <?php
-    }
-    ?>
+	<?php
+	foreach ( $args['items'] as $item ) {
+		?>
+		<div class="<?php echo esc_attr( $item['class'] ); ?>">
+			<a href="<?php echo esc_url( $item['url'] ); ?>" data-vp-sort="<?php echo esc_attr( $item['sort'] ); ?>">
+				<?php echo esc_html( $item['label'] ); ?>
+			</a>
+		</div>
+		<?php
+	}
+	?>
 </div>
