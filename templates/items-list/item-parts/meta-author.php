@@ -29,7 +29,7 @@ $link_data   = array(
 <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-author">
 	<span class="vp-portfolio__item-meta-part-icon">
 		<span class="vp-screen-reader-text">
-			<?php echo esc_html__( 'Author', '@@text_domain' ); ?>
+			<?php echo esc_html__( 'Author', 'visual-portfolio' ); ?>
 		</span>
 		<?php
 		if ( $args['author_avatar'] ) {
@@ -47,7 +47,7 @@ $link_data   = array(
 		<?php
 		printf(
 			// translators: %s - author name.
-			esc_html__( 'By %s', '@@text_domain' ),
+			esc_html__( 'By %s', 'visual-portfolio' ),
 			$link_data['href'] ? '<a href="' . esc_url( $link_data['href'] ) . '">' . esc_html( $args['author'] ) . '</a>' : esc_html( $args['author'] )
 		);
 		?>
