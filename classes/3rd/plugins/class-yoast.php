@@ -17,11 +17,8 @@ class Visual_Portfolio_3rd_Yoast {
 	 * Visual_Portfolio_3rd_Yoast constructor.
 	 */
 	public function __construct() {
-        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		if ( in_array( 'wordpress-seo/wp-seo.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
-			// Fixed canonical links.
-			add_filter( 'wpseo_canonical', array( $this, 'canonical' ), 12, 1 );
-		}
+		// Fixed canonical links.
+		add_filter( 'wpseo_canonical', array( $this, 'canonical' ), 12, 1 );
 	}
 
 	/**

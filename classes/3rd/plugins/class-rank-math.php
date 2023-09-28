@@ -17,14 +17,6 @@ class Visual_Portfolio_3rd_Rank_Math {
 	 * Visual_Portfolio_3rd_Rank_Math constructor.
 	 */
 	public function __construct() {
-		if ( ! function_exists( 'is_plugin_active' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
-		if ( ! class_exists( 'RankMath' ) || ! is_plugin_active( 'seo-by-rank-math/rank-math.php' ) ) {
-			return;
-		}
-
 		// Fixed canonical links.
 		add_filter( 'rank_math/frontend/canonical', array( $this, 'canonical' ) );
 	}

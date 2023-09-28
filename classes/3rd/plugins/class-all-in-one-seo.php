@@ -17,11 +17,8 @@ class Visual_Portfolio_3rd_All_In_One_Seo {
 	 * Visual_Portfolio_3rd_All_In_One_Seo constructor.
 	 */
 	public function __construct() {
-        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		if ( in_array( 'all-in-one-seo-pack/all_in_one_seo_pack.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
-			// Fixed canonical links.
-			add_filter( 'aioseo_canonical_url', array( $this, 'canonical' ) );
-		}
+		// Fixed canonical links.
+		add_filter( 'aioseo_canonical_url', array( $this, 'canonical' ) );
 	}
 
 	/**
