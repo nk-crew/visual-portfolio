@@ -156,11 +156,12 @@ const entryAssetsCss = glob
 	])
 	.reduce(function (entries, entry) {
 		const name = entry.replace('.scss', '');
-		const matchForExclude = name.includes('_variables');
+		const matchForExclude = /\/_\S+/g.exec(name);
 
-		if (!matchForExclude) {
+		if (matchForExclude === null) {
 			entries[name] = resolve(process.cwd(), entry);
 		}
+
 		return entries;
 	}, {});
 
