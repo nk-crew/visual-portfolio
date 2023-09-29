@@ -2,7 +2,7 @@
 /**
  * Yoast SEO Plugin.
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

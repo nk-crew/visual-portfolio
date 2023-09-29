@@ -836,8 +836,8 @@ class Visual_Portfolio_Assets {
 	 * Add fallback for lazyloading.
 	 */
 	public static function add_lazyload_fallback_script() {
-		$css_url = visual_portfolio()->plugin_url . 'assets/css/lazyload-fallback.min.css?ver=@@plugin_version';
-		$js_url  = visual_portfolio()->plugin_url . 'assets/js/lazyload-fallback.min.js?ver=@@plugin_version';
+		$css_url = visual_portfolio()->plugin_url . 'assets/css/lazyload-fallback.min.css?ver=' . VISUAL_PORTFOLIO_VERSION;
+		$js_url  = visual_portfolio()->plugin_url . 'assets/js/lazyload-fallback.min.js?ver=' . VISUAL_PORTFOLIO_VERSION;
 
 		?>
 		<script>

@@ -3,7 +3,7 @@
  * Preview template.
  *
  * @var $args
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

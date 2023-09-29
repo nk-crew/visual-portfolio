@@ -5,7 +5,7 @@
  * @var $args
  * @var $opts
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

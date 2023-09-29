@@ -8,7 +8,7 @@
  * @var $args
  * @var $opts
  *
- * @package @@plugin_name
+ * @package visual-portfolio
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
