@@ -35,7 +35,6 @@ const zipFiles = [
 	'vendors/**/*',
 	'build/**/*',
 	'languages/**/*',
-	'vendor/**/*',
 	'index.php',
 	'class-visual-portfolio.php',
 	'LICENSE.txt',
