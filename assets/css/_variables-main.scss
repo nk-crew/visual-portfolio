@@ -1,0 +1,47 @@
+/**
+ * Global CSS Variables
+ */
+:root {
+	// Main colors.
+	--vp-color-brand: #2540cc;
+	--vp-color-gray: #6c7781;
+	--vp-color-gray-darken: #4b4b4b;
+	--vp-color-gray-light: #e8e8e8;
+	--vp-color-gray-lighten: #f7f7f7;
+	--vp-color-red: #b71515;
+
+	// Radius.
+	--vp-border-radius: 5px;
+
+	// Gap.
+	--vp-items__gap: 0;
+
+	// Transitions.
+	--vp-transition-duration: 0.3s;
+	--vp-transition-easing: ease-in-out;
+	--vp-interactive__transition-duration: 0.2s;
+	--vp-interactive__transition-easing: ease-in-out;
+}
+
+// Vertical gap.
+.vp-portfolio__items {
+	--vp-items__gap-vertical: var(--vp-items__gap);
+}
+
+.vp-portfolio {
+	--vp-wrap__min-height: 114px;
+	--vp-elements__gap: 20px;
+
+	// Images.
+	--vp-images__object-fit: cover;
+	--vp-images__object-position: 50% 50%;
+}
+
+.vp-spinner {
+	--vp-spinner__color: currentcolor;
+	--vp-spinner__size: 20px;
+	--vp-spinner__border-size: 2px;
+	--vp-spinner__speed: 0.3s;
+	--vp-spinner--background__color: var(--vp-spinner__color);
+	--vp-spinner--background__opacity: 0.3;
+}

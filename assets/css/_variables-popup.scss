@@ -1,0 +1,17 @@
+/**
+ * Popup Galleries CSS Variables
+ */
+.vp-pswp,
+.vp-fancybox {
+	--vp-popup__z-index: 1500;
+
+	// Thumbnails.
+	--vp-popup--thumbnails__size: 160px;
+	--vp-popup--thumbnails__aspect-ratio: 10 / 7;
+	--vp-popup--thumbnails__background-color: #1e1e1e;
+	--vp-popup--thumbnails--items__border-color: var(--vp-color-brand);
+	--vp-popup--thumbnails--scrollbar__size: 7px;
+	--vp-popup--thumbnails--scrollbar-track__background-color: #1f1f1f;
+	--vp-popup--thumbnails--scrollbar-thumb__background-color: #424242;
+	--vp-popup--thumbnails--scrollbar-thumb__border-radius: 10px;
+}

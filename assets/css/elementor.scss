@@ -1,0 +1,13 @@
+/*
+ * Additional styles to fix Elementor page builder conflicts.
+ */
+
+// Gaps.
+[data-vp-layout="grid"],
+[data-vp-layout="masonry"],
+[data-vp-layout="tiles"] {
+	.elementor & .vp-portfolio__items .vp-portfolio__item-wrap .vp-portfolio__item {
+		margin-top: var(--vp-items__gap-vertical);
+		margin-left: var(--vp-items__gap);
+	}
+}

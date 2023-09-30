@@ -1,0 +1,10 @@
+/*
+ * Visual Portfolio layout Justified.
+ */
+[data-vp-layout="justified"] {
+	.vp-portfolio__item-wrap {
+		top: 0;
+		left: 0;
+		float: left;
+	}
+}

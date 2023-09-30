@@ -1,0 +1,31 @@
+/**
+ * Sort Default CSS Variables
+ */
+.vp-sort__style-default {
+	// Items.
+	--vp-sort-default--items__gap: 10px;
+	--vp-sort-default--items__min-width: 40px;
+	--vp-sort-default--items__padding-v: 0.7em;
+	--vp-sort-default--items__padding-h: 1.3em;
+	--vp-sort-default--items__font-size: 0.9em;
+	--vp-sort-default--items__font-weight: 600;
+	--vp-sort-default--items__line-height: 1.4;
+	--vp-sort-default--items__text-decoration: none;
+	--vp-sort-default--items__text-transform: uppercase;
+	--vp-sort-default--items__letter-spacing: 0.015em;
+	--vp-sort-default--items__color: var(--vp-color-gray);
+	--vp-sort-default--items__background-color: var(--vp-color-gray-lighten);
+	--vp-sort-default--items__border-radius: var(--vp-border-radius);
+	--vp-sort-default--items-hover__color: var(--vp-color-gray-darken);
+	--vp-sort-default--items-hover__background-color: var(--vp-color-gray-light);
+	--vp-sort-default--items-active__color: #fff;
+	--vp-sort-default--items-active__background-color: var(--vp-color-brand);
+
+	// Items Count.
+	--vp-sort-default--items-count__offset: 8px;
+	--vp-sort-default--items-count__font-size: 0.6em;
+
+	// Transitions.
+	--vp-sort-default-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-sort-default-transition-easing: var(--vp-interactive__transition-easing);
+}

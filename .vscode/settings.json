@@ -4,8 +4,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[php]": {
-    "editor.defaultFormatter": null,
-    "editor.formatOnSave": false
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
   },
   "editor.formatOnSave": true,
 
@@ -26,5 +26,11 @@
   ],
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+
+	"search.exclude": {
+			"**/.git": true,
+			"**/node_modules": true,
+			"**/build": true
+	},
 }

@@ -1,0 +1,296 @@
+@import "./variables";
+
+/**
+ * Fly items style
+ */
+.vp-portfolio__items-style-fly {
+	.vp-portfolio__item a {
+		text-decoration: var(--vp-items-style-fly--links__text-decoration);
+		outline: none;
+		box-shadow: none;
+	}
+
+	// display overlay on item focus.
+	.vp-portfolio__item-focus-visible .vp-portfolio__item-overlay {
+		transition: transform 0.2s ease-in-out 0 !important;
+		transform: translateX(0%) translateY(0%) translateZ(0) !important;
+	}
+
+	.vp-portfolio__item-overlay {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+
+		// Fix FireFox image blinking
+		// @link https://github.com/nk-crew/visual-portfolio/issues/92
+		// -
+		// Also fix conflict with Hover Image in the Pro plugin.
+		z-index: 2;
+		margin: var(--vp-items-style-fly--overlay__margin);
+		overflow: hidden;
+		clip-path: inset(0 round var(--vp-items-style-fly--overlay__border-radius));
+		color: var(--vp-items-style-fly--overlay__color);
+		text-align: center;
+		text-decoration: var(--vp-items-style-fly--overlay__text-decoration);
+		background: var(--vp-items-style-fly--overlay__background);
+		transform: translateY(-100%) translateX(-100%);
+	}
+
+	// fix some themes figcaption styles.
+	figcaption.vp-portfolio__item-overlay {
+		margin: var(--vp-items-style-fly--overlay__margin);
+		font-style: inherit;
+		color: var(--vp-items-style-fly--overlay__color);
+	}
+
+	// meta
+	.vp-portfolio__item-meta-wrap {
+		width: 100%;
+		height: 100%;
+		overflow: auto;
+
+		.simplebar-content {
+			display: flex;
+			min-height: 100%;
+		}
+	}
+
+	.vp-portfolio__item-meta {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		min-height: 100%;
+		padding: var(--vp-items-style-fly--overlay__padding);
+		color: inherit;
+
+		> * {
+			max-width: 100%;
+			margin-top: 0;
+			margin-bottom: var(--vp-items-style-fly--overlay-items__gap);
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.vp-portfolio__item-meta-icon {
+		font-size: var(--vp-items-style-fly--meta-icon__font-size);
+	}
+
+	.vp-portfolio__item-meta-categories {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: var(--vp-items-style-fly--meta-categories__gap);
+		max-width: 100%;
+		font-size: var(--vp-items-style-fly--meta-categories__font-size);
+		font-weight: var(--vp-items-style-fly--meta-categories__font-weight);
+		text-transform: var(--vp-items-style-fly--meta-categories__text-transform);
+
+		.vp-portfolio__item-meta-category {
+			display: flex;
+			flex: 0 0 auto;
+			max-width: 100%;
+			opacity: var(--vp-items-style-fly--meta-categories__opacity);
+
+			@if variable-exists(rtl) and $rtl {
+				&::before {
+					content: var(--vp-items-style-fly--meta-categories__separator);
+				}
+
+				&:first-of-type::before {
+					content: none;
+				}
+			} @else {
+				&::after {
+					content: var(--vp-items-style-fly--meta-categories__separator);
+				}
+
+				&:last-of-type::after {
+					content: none;
+				}
+			}
+
+			a {
+				max-width: 100%;
+				text-decoration: var(--vp-items-style-fly--meta-categories__text-decoration);
+			}
+		}
+	}
+
+	.vp-portfolio__item-meta-title {
+		margin-right: 0;
+		margin-left: 0;
+		font-size: var(--vp-items-style-fly--meta-title__font-size);
+		color: inherit;
+	}
+
+	.vp-portfolio__item-meta-inline {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--vp-items-style-fly--meta-inline__gap);
+		align-items: center;
+		justify-content: center;
+		font-weight: var(--vp-items-style-fly--meta-inline__font-weight);
+		line-height: var(--vp-items-style-fly--meta-inline__line-height);
+
+		> * {
+			opacity: var(--vp-items-style-fly--meta-inline__font-opacity);
+		}
+	}
+
+	.vp-portfolio__item-meta-part-icon {
+		margin-right: var(--vp-items-style-fly--meta-part-icon__offset);
+	}
+
+	.vp-portfolio__item-meta-author {
+		display: flex;
+		align-items: center;
+
+		img {
+			width: 1em;
+			height: auto;
+			border-radius: 1em;
+		}
+	}
+
+	.vp-portfolio__item-meta-excerpt {
+		line-height: var(--vp-items-style-fly--meta-excerpt__line-height);
+
+		> * {
+			opacity: var(--vp-items-style-fly--meta-excerpt__opacity);
+		}
+	}
+
+	// Image
+	.vp-portfolio__item {
+
+		// fix for safari border-radius.
+		// https://github.com/nk-crew/visual-portfolio/issues/150
+		z-index: 0;
+		clip-path: inset(0 round var(--vp-items-style-fly--image__border-radius));
+		transition-timing-function: var(--vp-items-style-fly--image__transition-easing);
+		transition-duration: var(--vp-items-style-fly--image__transition-duration);
+		transition-property: clip-path;
+	}
+
+	.vp-portfolio__item-img img {
+
+		// Fix FireFox image blinking
+		// https://github.com/nk-crew/visual-portfolio/issues/92
+		z-index: 1;
+		transition-timing-function: var(--vp-items-style-fly--image__transition-easing);
+		transition-duration: var(--vp-items-style-fly--image__transition-duration);
+		transition-property: opacity, transform;
+		transform: var(--vp-items-style-fly--image__transform);
+	}
+
+	.vp-portfolio__item:hover,
+	.vp-portfolio__item-focus-visible {
+		.vp-portfolio__item-img img {
+			transform: var(--vp-items-style-fly--image-hover__transform);
+		}
+	}
+
+	// align
+	.vp-portfolio__item-overlay-text-align-center .vp-portfolio__item-meta {
+		align-items: center;
+		text-align: center;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: center;
+		}
+	}
+
+	.vp-portfolio__item-overlay-text-align-left .vp-portfolio__item-meta {
+		align-items: flex-start;
+		text-align: left;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-start;
+		}
+	}
+
+	.vp-portfolio__item-overlay-text-align-right .vp-portfolio__item-meta {
+		align-items: flex-end;
+		text-align: right;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-end;
+		}
+	}
+
+	.vp-portfolio__item-overlay-text-align-top-center .vp-portfolio__item-meta {
+		align-items: center;
+		justify-content: flex-start;
+		text-align: center;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: center;
+		}
+	}
+
+	.vp-portfolio__item-overlay-text-align-top-left .vp-portfolio__item-meta {
+		align-items: flex-start;
+		justify-content: flex-start;
+		text-align: left;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-start;
+		}
+	}
+
+	.vp-portfolio__item-overlay-text-align-top-right .vp-portfolio__item-meta {
+		align-items: flex-end;
+		justify-content: flex-start;
+		text-align: right;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-end;
+		}
+	}
+
+	.vp-portfolio__item-overlay-text-align-bottom-center .vp-portfolio__item-meta {
+		align-items: center;
+		justify-content: flex-end;
+		text-align: center;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: center;
+		}
+	}
+
+	.vp-portfolio__item-overlay-text-align-bottom-left .vp-portfolio__item-meta {
+		align-items: flex-start;
+		justify-content: flex-end;
+		text-align: left;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-start;
+		}
+	}
+
+	.vp-portfolio__item-overlay-text-align-bottom-right .vp-portfolio__item-meta {
+		align-items: flex-end;
+		justify-content: flex-end;
+		text-align: right;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-end;
+		}
+	}
+}

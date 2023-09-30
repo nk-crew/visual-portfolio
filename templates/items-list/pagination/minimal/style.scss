@@ -1,0 +1,131 @@
+@import "./variables";
+
+/**
+ * Minimal pagination style
+ */
+.vp-pagination__style-minimal {
+	display: flex;
+	flex-wrap: wrap;
+
+	.vp-pagination__item a {
+		outline: none;
+		box-shadow: none;
+	}
+
+	// align
+	.vp-portfolio__layout-elements-align-left & {
+		justify-content: flex-start;
+	}
+
+	.vp-portfolio__layout-elements-align-center & {
+		justify-content: center;
+	}
+
+	.vp-portfolio__layout-elements-align-right & {
+		justify-content: flex-end;
+	}
+
+	.vp-pagination__item {
+		flex: 0 0 auto;
+		text-align: center;
+
+		> * {
+			display: block;
+			padding: var(--vp-pagination-minimal--items__padding-v) var(--vp-pagination-minimal--items__padding-h);
+			font-size: var(--vp-pagination-minimal--items__font-size);
+			font-weight: var(--vp-pagination-minimal--items__font-weight);
+			line-height: var(--vp-pagination-minimal--items__line-height);
+			color: var(--vp-pagination-minimal--items__color);
+			text-decoration: var(--vp-pagination-minimal--items__text-decoration);
+			text-transform: var(--vp-pagination-minimal--items__text-transform);
+			letter-spacing: var(--vp-pagination-minimal--items__letter-spacing);
+			transition: var(--vp-pagination-minimal-transition-duration) color var(--vp-pagination-minimal-transition-easing);
+		}
+
+		> a:hover,
+		> a:focus {
+			color: var(--vp-pagination-minimal--items-hover__color);
+		}
+
+		&.vp-pagination__item-active {
+			--vp-pagination-minimal--items__color: var(--vp-pagination-minimal--items-active__color);
+			--vp-pagination-minimal--items-hover__color: var(--vp-pagination-minimal--items-active__color);
+
+			> * {
+				cursor: default;
+			}
+		}
+	}
+
+	// show/hide labels
+	.vp-pagination__load-more > .vp-pagination__load-more-no-more,
+	.vp-pagination__load-more > .vp-pagination__load-more-loading,
+	.vp-portfolio__loading & .vp-pagination__load-more > span,
+	&.vp-pagination__no-more .vp-pagination__load-more > span,
+	.vp-portfolio__loading &.vp-pagination__no-more .vp-pagination__load-more > .vp-pagination__load-more-no-more {
+		display: none;
+	}
+
+	.vp-pagination__load-more > span,
+	.vp-portfolio__loading & .vp-pagination__load-more > .vp-pagination__load-more-loading,
+	&.vp-pagination__no-more .vp-pagination__load-more > .vp-pagination__load-more-no-more {
+		display: block;
+	}
+
+	// disable no more and loading buttons
+	&.vp-pagination__no-more .vp-pagination__load-more,
+	.vp-portfolio__loading & .vp-pagination__load-more {
+		pointer-events: none;
+		cursor: default;
+		background-color: transparent;
+		border: none;
+		transition: none;
+	}
+
+	&.vp-pagination__no-more .vp-pagination__load-more {
+		opacity: 0.5;
+	}
+
+	// Paged.
+	&[data-vp-pagination-type="paged"] .vp-pagination__item-active {
+		position: relative;
+		margin-right: var(--vp-pagination-minimal-paged--items-active__margin-h);
+		margin-left: var(--vp-pagination-minimal-paged--items-active__margin-h);
+
+		// We use this image for the hack to make active item circle instead of square.
+		// <img> added in script /assets/js/pagination-minimal-paged.js
+		> img {
+			width: auto;
+			max-width: none;
+			height: 100%;
+			padding: 0;
+			text-align: left;
+			opacity: 0;
+
+			+ span {
+				position: absolute;
+				top: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				min-width: 0;
+				height: 100%;
+				padding: var(--vp-pagination-minimal-paged--items-active__padding-v) var(--vp-pagination-minimal-paged--items-active__padding-h);
+				color: var(--vp-pagination-minimal-paged--items-active__color);
+				background-color: var(--vp-pagination-minimal-paged--items-active__background-color);
+				border-radius: var(--vp-pagination-minimal-paged--items-active__border-radius);
+			}
+		}
+	}
+
+	// Paged for RTL.
+	@if variable-exists(rtl) and $rtl {
+		&[data-vp-pagination-type="paged"] {
+			.vp-pagination__item-next svg,
+			.vp-pagination__item-prev svg {
+				transform: scaleX(-1);
+			}
+		}
+	}
+}

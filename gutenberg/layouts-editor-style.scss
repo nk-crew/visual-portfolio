@@ -1,0 +1,99 @@
+/*
+ * Visual Portfolio Layouts Editor styles.
+ */
+
+.post-type-vp_lists {
+	.block-editor-block-list__breadcrumb,
+	.edit-post-layout__footer {
+		display: none;
+	}
+
+	// remove outline from block.
+	.block-editor-block-list__block::before,
+	.block-editor-block-contextual-toolbar,
+	.block-editor-block-list__insertion-point {
+		display: none;
+	}
+
+	// Remove writing container.
+	.block-editor-writing-flow__click-redirect {
+		display: none;
+	}
+
+	// Shortcodes settings.
+	.vpf-layout-shortcode-copy {
+		> div {
+			position: relative;
+		}
+
+		> strong {
+			display: block;
+			padding-top: 0;
+			font-size: 11px;
+			font-weight: 500;
+			line-height: 1.4;
+			text-transform: uppercase;
+		}
+
+		pre {
+			padding: 10px;
+			padding-right: 40px;
+			margin-top: 0.5em;
+			margin-bottom: 1.1em;
+			overflow: auto;
+			font-size: 12px;
+			background-color: #ebebeb;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+		}
+
+		.components-button {
+			position: absolute;
+			top: 6px;
+			right: 0;
+			background-color: #ebebeb;
+			opacity: 0;
+			transition: 0.2s opacity;
+		}
+
+		.components-button:hover,
+		.components-button:focus,
+		pre:hover + .components-button {
+			opacity: 1;
+		}
+	}
+
+	// Copied element
+	.vpf-layout-shortcode-copied {
+		position: absolute;
+		bottom: 100%;
+		left: 0;
+		padding: 4px 6px;
+		margin-left: 50%;
+		color: #fff;
+		background: #000;
+		border-radius: 3px;
+		opacity: 0;
+		transform: translateY(5px) translateX(-50%);
+		animation: 0.4s vpf-layout-shortcode-copied linear;
+	}
+
+	@keyframes vpf-layout-shortcode-copied {
+		0% {
+			opacity: 0;
+			transition-timing-function: ease-out;
+			transform: translateY(5px) translateX(-50%);
+		}
+
+		50% {
+			opacity: 1;
+			transform: translateY(-5px) translateX(-50%);
+		}
+
+		100% {
+			opacity: 0;
+			transition-timing-function: ease-in;
+			transform: translateY(-15px) translateX(-50%);
+		}
+	}
+}

@@ -1,0 +1,28 @@
+/*
+ * Visual Portfolio Noscript
+ * Loaded inline in class-assets.php -> add_noscript_styles
+ */
+
+// preloader
+.vp-portfolio__preloader-wrap {
+	display: none;
+}
+
+// hidden items before load.
+.vp-portfolio__items-wrap,
+.vp-portfolio__filter-wrap,
+.vp-portfolio__sort-wrap,
+.vp-portfolio__pagination-wrap {
+	visibility: visible;
+	opacity: 1;
+}
+
+// image tag without script
+.vp-portfolio__item .vp-portfolio__item-img noscript + img {
+	display: none;
+}
+
+// Slider thumbnails
+.vp-portfolio__thumbnails-wrap {
+	display: none;
+}

@@ -1,0 +1,344 @@
+@import "./variables";
+
+/**
+ * Emerge items style
+ */
+.vp-portfolio__items-style-emerge {
+	.vp-portfolio__item {
+
+		// fix for safari border-radius.
+		// https://github.com/nk-crew/visual-portfolio/issues/150
+		z-index: 0;
+		clip-path: inset(0 round var(--vp-items-style-emerge--image__border-radius));
+		transition-timing-function: var(--vp-items-style-emerge--image__transition-easing);
+		transition-duration: var(--vp-items-style-emerge--image__transition-duration);
+		transition-property: clip-path;
+	}
+
+	// Overlay
+	.vp-portfolio__item-overlay {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+
+		// Fix FireFox image blinking
+		// https://github.com/nk-crew/visual-portfolio/issues/92
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: var(--vp-items-style-emerge--overlay__margin);
+		clip-path: inset(0 round var(--vp-items-style-emerge--overlay__border-radius));
+		background: var(--vp-items-style-emerge--overlay__background);
+		opacity: 0;
+		transition: var(--vp-items-style-emerge-transition-duration) opacity var(--vp-items-style-emerge-transition-easing);
+	}
+
+	// Caption
+	.vp-portfolio__item-caption {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+
+		// Fix FireFox image blinking
+		// @link https://github.com/nk-crew/visual-portfolio/issues/92
+		// -
+		// Also fix conflict with Hover Image in the Pro plugin.
+		z-index: 2;
+		display: flex;
+		width: 100%;
+		min-height: 50px;
+		max-height: 100%;
+		color: var(--vp-items-style-emerge--caption__color);
+		background: var(--vp-items-style-emerge--caption__background);
+		transition: var(--vp-items-style-emerge--caption__transition-duration) transform var(--vp-items-style-emerge--caption__transition-easing), var(--vp-items-style-emerge--caption__transition-duration) clip-path var(--vp-items-style-emerge--caption__transition-easing);
+		transform: translateY(100%);
+
+		@supports (clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%)) {
+			padding-top: var(--vp-items-style-emerge--caption-skew__height);
+			clip-path: polygon(0 var(--vp-items-style-emerge--caption-skew__clip-left), 100% var(--vp-items-style-emerge--caption-skew__clip-right), 100% 100%, 0% 100%);
+		}
+
+		a {
+			color: var(--vp-items-style-emerge--caption-links__color);
+			text-decoration: var(--vp-items-style-emerge--caption-links__text-decoration);
+			outline: none;
+			box-shadow: none;
+
+			&:hover,
+			&:focus {
+				color: var(--vp-items-style-emerge--caption-links-hover__color);
+			}
+		}
+	}
+
+	// fix some themes figcaption styles.
+	figcaption.vp-portfolio__item-caption {
+		font-style: inherit;
+	}
+
+	// meta
+	.vp-portfolio__item-meta-wrap {
+		flex: 1;
+		width: 100%;
+		height: 100%;
+		overflow: auto;
+	}
+
+	.vp-portfolio__item-meta {
+		width: 100%;
+		max-height: 100%;
+		padding: var(--vp-items-style-emerge--caption__padding);
+		color: inherit;
+
+		// Indexes for staggering.
+		@for $i from 1 through 6 {
+			> :nth-child(#{$i}) {
+				--vp-items-style-emerge--meta-staggering__index: #{$i};
+			}
+		}
+
+		> * {
+			margin-top: 0;
+			margin-bottom: var(--vp-items-style-emerge--caption-items__gap);
+			opacity: 0;
+			transition-delay: calc(var(--vp-items-style-emerge--meta-staggering__transition-delay) * var(--vp-items-style-emerge--meta-staggering__index));
+			transition-timing-function: var(--vp-items-style-emerge--meta-staggering__transition-easing);
+			transition-duration: var(--vp-items-style-emerge--meta-staggering__transition-duration);
+			transition-property: opacity, transform;
+			transform: translateY(10px);
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.vp-portfolio__item-meta-categories {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: var(--vp-items-style-emerge--meta-categories__gap);
+		max-width: 100%;
+		font-size: var(--vp-items-style-emerge--meta-categories__font-size);
+		font-weight: var(--vp-items-style-emerge--meta-categories__font-weight);
+		text-transform: var(--vp-items-style-emerge--meta-categories__text-transform);
+
+		.vp-portfolio__item-meta-category {
+			display: flex;
+			flex: 0 0 auto;
+			max-width: 100%;
+			opacity: var(--vp-items-style-emerge--meta-categories__opacity);
+
+			@if variable-exists(rtl) and $rtl {
+				&::before {
+					content: var(--vp-items-style-emerge--meta-categories__separator);
+				}
+
+				&:first-of-type::before {
+					content: none;
+				}
+			} @else {
+				&::after {
+					content: var(--vp-items-style-emerge--meta-categories__separator);
+				}
+
+				&:last-of-type::after {
+					content: none;
+				}
+			}
+
+			a {
+				max-width: 100%;
+				text-decoration: var(--vp-items-style-emerge--meta-categories__text-decoration);
+			}
+		}
+	}
+
+	.vp-portfolio__item-meta-title {
+		margin-right: 0;
+		margin-left: 0;
+		font-size: var(--vp-items-style-emerge--meta-title__font-size);
+		color: inherit;
+	}
+
+	.vp-portfolio__item-meta-inline {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--vp-items-style-emerge--meta-inline__gap);
+		align-items: center;
+		justify-content: center;
+		font-weight: var(--vp-items-style-emerge--meta-inline__font-weight);
+		line-height: var(--vp-items-style-emerge--meta-inline__line-height);
+
+		> * {
+			opacity: var(--vp-items-style-emerge--meta-inline__font-opacity);
+		}
+	}
+
+	.vp-portfolio__item-meta-part-icon {
+		margin-right: var(--vp-items-style-emerge--meta-part-icon__offset);
+	}
+
+	.vp-portfolio__item-meta-author {
+		display: flex;
+		align-items: center;
+
+		img {
+			width: 1em;
+			height: auto;
+			border-radius: 1em;
+		}
+	}
+
+	.vp-portfolio__item-meta-excerpt {
+		line-height: var(--vp-items-style-emerge--meta-excerpt__line-height);
+
+		> div {
+			opacity: var(--vp-items-style-emerge--meta-excerpt__opacity);
+		}
+	}
+
+	// Transitions
+	.vp-portfolio__item-img img {
+		transition-timing-function: var(--vp-items-style-emerge--image__transition-easing);
+		transition-duration: var(--vp-items-style-emerge--image__transition-duration);
+		transition-property: opacity, transform;
+		transform: var(--vp-items-style-emerge--image__transform);
+	}
+
+	// Show Overlay and Caption.
+	&.vp-portfolio__items-show-caption-hover .vp-portfolio__item:hover,
+	&.vp-portfolio__items-show-caption-hover .vp-portfolio__item-focus-visible {
+		.vp-portfolio__item-caption {
+			--vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew-hover__clip-left);
+			--vp-items-style-emerge--caption-skew__clip-right: var(--vp-items-style-emerge--caption-skew-hover__clip-right);
+
+			transform: translateY(0);
+		}
+
+		.vp-portfolio__item-meta > * {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	&.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
+	&.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus-visible {
+		.vp-portfolio__item-overlay {
+			opacity: 1;
+		}
+
+		.vp-portfolio__item-img img {
+			transform: var(--vp-items-style-emerge--image-hover__transform);
+		}
+	}
+
+	&.vp-portfolio__items-show-caption-default {
+		.vp-portfolio__item-caption {
+			--vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew-hover__clip-left);
+			--vp-items-style-emerge--caption-skew__clip-right: var(--vp-items-style-emerge--caption-skew-hover__clip-right);
+
+			transform: translateY(0);
+		}
+
+		.vp-portfolio__item-meta > * {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.vp-portfolio__item:hover,
+		.vp-portfolio__item-focus-visible {
+			.vp-portfolio__item-caption {
+				--vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew__height);
+				--vp-items-style-emerge--caption-skew__clip-right: var(--vp-items-style-emerge--caption-skew__height);
+
+				transform: translateY(100%);
+			}
+
+			.vp-portfolio__item-meta > * {
+				opacity: 0;
+				transform: translateY(10px);
+			}
+		}
+	}
+
+	&.vp-portfolio__items-show-overlay-default {
+		.vp-portfolio__item-overlay {
+			opacity: 1;
+		}
+
+		.vp-portfolio__item-img img {
+			transform: var(--vp-items-style-emerge--image-hover__transform);
+		}
+
+		.vp-portfolio__item:hover,
+		.vp-portfolio__item-focus-visible {
+			.vp-portfolio__item-overlay {
+				opacity: 0;
+			}
+
+			.vp-portfolio__item-img img {
+				transform: var(--vp-items-style-emerge--image__transform);
+			}
+		}
+	}
+
+	&.vp-portfolio__items-show-caption-always {
+		.vp-portfolio__item-caption {
+			--vp-items-style-emerge--caption-skew__clip-left: var(--vp-items-style-emerge--caption-skew-hover__clip-left);
+			--vp-items-style-emerge--caption-skew__clip-right: var(--vp-items-style-emerge--caption-skew-hover__clip-right);
+
+			transform: translateY(0);
+		}
+
+		.vp-portfolio__item-meta > * {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	&.vp-portfolio__items-show-overlay-always {
+		.vp-portfolio__item-overlay {
+			opacity: 1;
+		}
+
+		.vp-portfolio__item-img img {
+			transform: var(--vp-items-style-emerge--image-hover__transform);
+		}
+	}
+
+	// fix align for gutenberg block.
+	figcaption.vp-portfolio__item-meta {
+		text-align: inherit;
+	}
+
+	// align
+	.vp-portfolio__item-caption-text-align-left {
+		text-align: left;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-start;
+		}
+	}
+
+	.vp-portfolio__item-caption-text-align-center {
+		text-align: center;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: center;
+		}
+	}
+
+	.vp-portfolio__item-caption-text-align-right {
+		text-align: right;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-end;
+		}
+	}
+}

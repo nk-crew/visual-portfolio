@@ -1,0 +1,1634 @@
+{
+   "domain": "visual-portfolio",
+   "locale_data": {
+      "visual-portfolio": {
+         "": {
+            "domain": "visual-portfolio"
+         },
+         "Visual Portfolio, Posts & Image Gallery": [
+            ""
+         ],
+         "Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block.": [
+            ""
+         ],
+         "Visual Portfolio Team": [
+            ""
+         ],
+         "https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline": [
+            ""
+         ],
+         "Visual Portfolio": [
+            ""
+         ],
+         "-- Select Layout --": [
+            ""
+         ],
+         "General": [
+            ""
+         ],
+         "Saved Layout": [
+            ""
+         ],
+         "Select Layout": [
+            ""
+         ],
+         "Custom Classes": [
+            ""
+         ],
+         "CSS": [
+            ""
+         ],
+         "Design Options": [
+            ""
+         ],
+         "and": [
+            ""
+         ],
+         "Go Pro": [
+            ""
+         ],
+         "Tiles": [
+            ""
+         ],
+         "Tiles Preview": [
+            ""
+         ],
+         "Masonry": [
+            ""
+         ],
+         "Columns": [
+            ""
+         ],
+         "Images Aspect Ratio": [
+            ""
+         ],
+         "Grid": [
+            ""
+         ],
+         "Justified": [
+            ""
+         ],
+         "Row Height": [
+            ""
+         ],
+         "Row Height Tolerance": [
+            ""
+         ],
+         "Max Rows Count": [
+            ""
+         ],
+         "Limit the number of rows to display. 0 means - unlimited.": [
+            ""
+         ],
+         "Last Row Align": [
+            ""
+         ],
+         "Left": [
+            ""
+         ],
+         "Center": [
+            ""
+         ],
+         "Right": [
+            ""
+         ],
+         "Hide": [
+            ""
+         ],
+         "Slider": [
+            ""
+         ],
+         "Effect": [
+            ""
+         ],
+         "Slide": [
+            ""
+         ],
+         "Coverflow": [
+            ""
+         ],
+         "Fade": [
+            ""
+         ],
+         "Speed (in Seconds)": [
+            ""
+         ],
+         "Autoplay (in Seconds)": [
+            ""
+         ],
+         "Pause on Mouse Over": [
+            ""
+         ],
+         "Items Height": [
+            ""
+         ],
+         "Auto": [
+            ""
+         ],
+         "Static (px)": [
+            ""
+         ],
+         "Dynamic (%)": [
+            ""
+         ],
+         "Items Minimal Height": [
+            ""
+         ],
+         "300px, 80vh": [
+            ""
+         ],
+         "Values with `vh` units will not be visible in preview.": [
+            ""
+         ],
+         "Slides Per View": [
+            ""
+         ],
+         "Custom": [
+            ""
+         ],
+         "Centered Slides": [
+            ""
+         ],
+         "Loop": [
+            ""
+         ],
+         "Free Scroll": [
+            ""
+         ],
+         "Free Scroll Sticky": [
+            ""
+         ],
+         "Display Arrows": [
+            ""
+         ],
+         "Display Bullets": [
+            ""
+         ],
+         "Dynamic Bullets": [
+            ""
+         ],
+         "Mousewheel Control": [
+            ""
+         ],
+         "Display Thumbnails": [
+            ""
+         ],
+         "Thumbnails Gap": [
+            ""
+         ],
+         "Thumbnails Height": [
+            ""
+         ],
+         "Thumbnails Per View": [
+            ""
+         ],
+         "Classic": [
+            ""
+         ],
+         "Fly": [
+            ""
+         ],
+         "Emerge": [
+            ""
+         ],
+         "Content Source": [
+            ""
+         ],
+         "Posts Settings": [
+            ""
+         ],
+         "Images Settings": [
+            ""
+         ],
+         "Social Stream Settings": [
+            ""
+         ],
+         "General Settings": [
+            ""
+         ],
+         "Layout": [
+            ""
+         ],
+         "Skin": [
+            ""
+         ],
+         "Click Action": [
+            ""
+         ],
+         "Protection": [
+            ""
+         ],
+         "Custom CSS": [
+            ""
+         ],
+         "Posts": [
+            ""
+         ],
+         "Images": [
+            ""
+         ],
+         "Social": [
+            ""
+         ],
+         "Custom Query": [
+            ""
+         ],
+         "Build custom query according to WordPress Codex. See example here <a href=\"%1$s\">%1$s</a>.": [
+            ""
+         ],
+         "Post Types": [
+            ""
+         ],
+         "Specific Posts": [
+            ""
+         ],
+         "Excluded Posts": [
+            ""
+         ],
+         "Taxonomies": [
+            ""
+         ],
+         "Taxonomies Relation": [
+            ""
+         ],
+         "OR": [
+            ""
+         ],
+         "AND": [
+            ""
+         ],
+         "Order by": [
+            ""
+         ],
+         "Date": [
+            ""
+         ],
+         "Title": [
+            ""
+         ],
+         "ID": [
+            ""
+         ],
+         "Comments Count": [
+            ""
+         ],
+         "Modified": [
+            ""
+         ],
+         "Menu Order": [
+            ""
+         ],
+         "Manual Selection": [
+            ""
+         ],
+         "Random": [
+            ""
+         ],
+         "Menu Order is typically used in combination with one of these plugins: <a href=\"%1$s\" target=\"_blank\">%2$s</a>": [
+            ""
+         ],
+         "Order Direction": [
+            ""
+         ],
+         "ASC": [
+            ""
+         ],
+         "DESC": [
+            ""
+         ],
+         "Avoid Duplicates": [
+            ""
+         ],
+         "Enable to avoid duplicate posts from showing up. This only affects the frontend": [
+            ""
+         ],
+         "Offset": [
+            ""
+         ],
+         "Use this setting to skip over posts (e.g. `2` to skip over 2 posts)": [
+            ""
+         ],
+         "Premium Only": [
+            ""
+         ],
+         "Additional query settings, such as:": [
+            ""
+         ],
+         "Filter by specific author": [
+            ""
+         ],
+         "Filter by publish date range": [
+            ""
+         ],
+         "Exclude posts without thumbnail": [
+            ""
+         ],
+         "Exclude sticky posts": [
+            ""
+         ],
+         "etc...": [
+            ""
+         ],
+         "Description": [
+            ""
+         ],
+         "Categories": [
+            ""
+         ],
+         "Format": [
+            ""
+         ],
+         "Standard": [
+            ""
+         ],
+         "Video": [
+            ""
+         ],
+         "Video URL": [
+            ""
+         ],
+         "https://...": [
+            ""
+         ],
+         "Full list of supported links": [
+            ""
+         ],
+         "see here": [
+            ""
+         ],
+         "URL": [
+            ""
+         ],
+         "By default used full image url, you can use custom one": [
+            ""
+         ],
+         "Author Name": [
+            ""
+         ],
+         "Author URL": [
+            ""
+         ],
+         "Support for Audio format": [
+            ""
+         ],
+         "Custom image for Popup": [
+            ""
+         ],
+         "Custom image for hover state": [
+            ""
+         ],
+         "Items Title Source": [
+            ""
+         ],
+         "None": [
+            ""
+         ],
+         "Image Title": [
+            ""
+         ],
+         "Image Caption": [
+            ""
+         ],
+         "Image Alt": [
+            ""
+         ],
+         "Image Description": [
+            ""
+         ],
+         "Items Description Source": [
+            ""
+         ],
+         "Default": [
+            ""
+         ],
+         "Uploaded": [
+            ""
+         ],
+         "Protect your works using watermarks, password, and age gate": [
+            ""
+         ],
+         "Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc...": [
+            ""
+         ],
+         "Items Per Page": [
+            ""
+         ],
+         "No Items Action": [
+            ""
+         ],
+         "Notice": [
+            ""
+         ],
+         "No items were found matching your selection.": [
+            ""
+         ],
+         "Note: you will see the notice in the preview. Block will be hidden in the site frontend.": [
+            ""
+         ],
+         "Stretch": [
+            ""
+         ],
+         "Break container and display it wide. This option helpful for 3rd-party page builders, in the Gutenberg themes you can use the built in Wide and Fullwidth features.": [
+            ""
+         ],
+         "Gap": [
+            ""
+         ],
+         "Vertical Gap": [
+            ""
+         ],
+         "When empty, used Gap option": [
+            ""
+         ],
+         "Image": [
+            ""
+         ],
+         "Overlay": [
+            ""
+         ],
+         "Caption": [
+            ""
+         ],
+         "Normal": [
+            ""
+         ],
+         "Hover": [
+            ""
+         ],
+         "Border Radius": [
+            ""
+         ],
+         "Display": [
+            ""
+         ],
+         "Hover State Only": [
+            ""
+         ],
+         "Default State Only": [
+            ""
+         ],
+         "Always": [
+            ""
+         ],
+         "Text Align": [
+            ""
+         ],
+         "Elements": [
+            ""
+         ],
+         "Colors": [
+            ""
+         ],
+         "Typography": [
+            ""
+         ],
+         "Dimensions": [
+            ""
+         ],
+         "Display Title": [
+            ""
+         ],
+         "Display Categories": [
+            ""
+         ],
+         "Categories Count": [
+            ""
+         ],
+         "Display Date": [
+            ""
+         ],
+         "Human Format": [
+            ""
+         ],
+         "Date format example: F j, Y": [
+            ""
+         ],
+         "Display Author": [
+            ""
+         ],
+         "Display Comments Count": [
+            ""
+         ],
+         "Display Views Count": [
+            ""
+         ],
+         "Display Reading Time": [
+            ""
+         ],
+         "Display Excerpt": [
+            ""
+         ],
+         "Excerpt Words Count": [
+            ""
+         ],
+         "Display Read More Button": [
+            ""
+         ],
+         "Always Display": [
+            ""
+         ],
+         "Display when used `More tag` in the post": [
+            ""
+         ],
+         "Read More button label": [
+            ""
+         ],
+         "Display Icon": [
+            ""
+         ],
+         "Background": [
+            ""
+         ],
+         "Text": [
+            ""
+         ],
+         "Links": [
+            ""
+         ],
+         "Links Hover": [
+            ""
+         ],
+         "caption": [
+            ""
+         ],
+         "overlay": [
+            ""
+         ],
+         "Disabled": [
+            ""
+         ],
+         "Popup": [
+            ""
+         ],
+         "Advanced": [
+            ""
+         ],
+         "Target": [
+            ""
+         ],
+         "New Tab (_blank)": [
+            ""
+         ],
+         "Top Frame (_top)": [
+            ""
+         ],
+         "Rel": [
+            ""
+         ],
+         "Link URL click priority": [
+            ""
+         ],
+         "Title Source": [
+            ""
+         ],
+         "Item Title": [
+            ""
+         ],
+         "Item Description": [
+            ""
+         ],
+         "Item Author": [
+            ""
+         ],
+         "Description Source": [
+            ""
+         ],
+         "Manage media object priority": [
+            ""
+         ],
+         "Quick View for posts and pages": [
+            ""
+         ],
+         "Popup media item deep linking": [
+            ""
+         ],
+         "Deeply customize actions of clicks on different types of items and links.": [
+            ""
+         ],
+         "Start": [
+            ""
+         ],
+         "Middle": [
+            ""
+         ],
+         "End": [
+            ""
+         ],
+         "Filter": [
+            ""
+         ],
+         "Sort": [
+            ""
+         ],
+         "Search": [
+            ""
+         ],
+         "Layout Items": [
+            ""
+         ],
+         "Pagination": [
+            ""
+         ],
+         "Minimal": [
+            ""
+         ],
+         "Dropdown": [
+            ""
+         ],
+         "Display Count": [
+            ""
+         ],
+         "All Button Text": [
+            ""
+         ],
+         "All": [
+            ""
+         ],
+         "The search module is only available for Pro users.": [
+            ""
+         ],
+         "Type": [
+            ""
+         ],
+         "Paged": [
+            ""
+         ],
+         "Load More": [
+            ""
+         ],
+         "Infinite": [
+            ""
+         ],
+         "Note: you will see the \"Load More\" pagination in the preview. \"Infinite\" pagination will be visible on the site.": [
+            ""
+         ],
+         "Texts": [
+            ""
+         ],
+         "Load more button label": [
+            ""
+         ],
+         "Loading More...": [
+            ""
+         ],
+         "Loading more button label": [
+            ""
+         ],
+         "You’ve reached the end of the list": [
+            ""
+         ],
+         "End of the list text": [
+            ""
+         ],
+         "Display Numbers": [
+            ""
+         ],
+         "Scroll to Top": [
+            ""
+         ],
+         "Scroll to Top Offset": [
+            ""
+         ],
+         "Hide on Reached End": [
+            ""
+         ],
+         "Adjust the loading threshold, limit the number of automatic loads and run the infinite scroll only after the Load button click.": [
+            ""
+         ],
+         "Use <code>selector</code> rule to change block styles.": [
+            ""
+         ],
+         "Example:": [
+            ""
+         ],
+         "Post Types Set": [
+            ""
+         ],
+         "Current Query": [
+            ""
+         ],
+         "Portfolio Category: %s": [
+            ""
+         ],
+         "Portfolio Tag: %s": [
+            ""
+         ],
+         "Portfolio permalinks": [
+            ""
+         ],
+         "Portfolio category base": [
+            ""
+         ],
+         "Portfolio tag base": [
+            ""
+         ],
+         "If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories. We also recommend you use the <code>%%portfolio_page_slug%%</code> slug, which will automatically use the slug of you Portfolio Archive page.": [
+            ""
+         ],
+         "Portfolio base": [
+            ""
+         ],
+         "Portfolio base with category": [
+            ""
+         ],
+         "Custom base": [
+            ""
+         ],
+         "Enter a custom base to use. A base must be set or WordPress will use default instead.": [
+            ""
+         ],
+         "Portfolio": [
+            ""
+         ],
+         "Portfolio Page": [
+            ""
+         ],
+         "Satisfied using Visual Portfolio?": [
+            ""
+         ],
+         "Hey, we noticed you've been using %s for more than two weeks now – that's awesome!": [
+            ""
+         ],
+         "Could you please do us a BIG favor and give it a rating on WordPress.org to help us spread the word and boost our motivation?": [
+            ""
+         ],
+         "Yes, you deserve it": [
+            ""
+         ],
+         "No, maybe later": [
+            ""
+         ],
+         "I already did": [
+            ""
+         ],
+         "Couldn't retrieve %s ID.": [
+            ""
+         ],
+         "Close (Esc)": [
+            ""
+         ],
+         "Share": [
+            ""
+         ],
+         "Toggle fullscreen": [
+            ""
+         ],
+         "Zoom in/out": [
+            ""
+         ],
+         "Previous (arrow left)": [
+            ""
+         ],
+         "Next (arrow right)": [
+            ""
+         ],
+         "Share on Facebook": [
+            ""
+         ],
+         "Tweet": [
+            ""
+         ],
+         "Pin it": [
+            ""
+         ],
+         "Close": [
+            ""
+         ],
+         "Next": [
+            ""
+         ],
+         "Previous": [
+            ""
+         ],
+         "The requested content cannot be loaded. <br /> Please try again later.": [
+            ""
+         ],
+         "Start slideshow": [
+            ""
+         ],
+         "Pause slideshow": [
+            ""
+         ],
+         "Full screen": [
+            ""
+         ],
+         "Thumbnails": [
+            ""
+         ],
+         "Download": [
+            ""
+         ],
+         "Zoom": [
+            ""
+         ],
+         "Dynamic control callback function is not found.": [
+            ""
+         ],
+         "https://": [
+            ""
+         ],
+         "< 1": [
+            ""
+         ],
+         "Parent Project": [
+            ""
+         ],
+         "Projects": [
+            ""
+         ],
+         "View Project": [
+            ""
+         ],
+         "Add New Project": [
+            ""
+         ],
+         "Add New": [
+            ""
+         ],
+         "Edit Project": [
+            ""
+         ],
+         "Update Project": [
+            ""
+         ],
+         "Search Project": [
+            ""
+         ],
+         "Not Found": [
+            ""
+         ],
+         "Not found in Trash": [
+            ""
+         ],
+         "Portfolio Categories": [
+            ""
+         ],
+         "Portfolio Tags": [
+            ""
+         ],
+         "Tags": [
+            ""
+         ],
+         "Saved Layouts": [
+            ""
+         ],
+         "View Saved Layout": [
+            ""
+         ],
+         "Add New Saved Layout": [
+            ""
+         ],
+         "Edit Saved Layout": [
+            ""
+         ],
+         "Update Saved Layout": [
+            ""
+         ],
+         "Search Saved Layout": [
+            ""
+         ],
+         "Show All %s": [
+            ""
+         ],
+         "Portfolio Manager": [
+            ""
+         ],
+         "Portfolio Author": [
+            ""
+         ],
+         "Thumbnail": [
+            ""
+         ],
+         "When to use Saved Layouts": [
+            ""
+         ],
+         "If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href=\"%1$s\" target=\"_blank\">%2$s Blocks</a>.": [
+            ""
+         ],
+         "To reuse blocks, you can use the built-in Gutenberg feature - <a href=\"%s\" target=\"_blank\">Reusable Blocks</a>.": [
+            ""
+         ],
+         "Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href=\"%s\" target=\"_blank\">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.": [
+            ""
+         ],
+         "Icon": [
+            ""
+         ],
+         "Shortcode": [
+            ""
+         ],
+         "All layouts": [
+            ""
+         ],
+         "All styles": [
+            ""
+         ],
+         "All sources": [
+            ""
+         ],
+         "Documentation": [
+            ""
+         ],
+         "Proofing": [
+            ""
+         ],
+         "Send a collection of photographs to your client for approval.": [
+            ""
+         ],
+         "Images Rounded Corners": [
+            ""
+         ],
+         "Caption Align": [
+            ""
+         ],
+         "Default sorting": [
+            ""
+         ],
+         "Sort by date (newest)": [
+            ""
+         ],
+         "Sort by date (oldest)": [
+            ""
+         ],
+         "Sort by title (A-Z)": [
+            ""
+         ],
+         "Sort by title (Z-A)": [
+            ""
+         ],
+         "%s ago": [
+            ""
+         ],
+         "Small (VP)": [
+            ""
+         ],
+         "Medium (VP)": [
+            ""
+         ],
+         "Large (VP)": [
+            ""
+         ],
+         "Extra Large (VP)": [
+            ""
+         ],
+         "Sorry, you are not allowed to get list of saved layouts.": [
+            ""
+         ],
+         "Layouts not found.": [
+            ""
+         ],
+         "Post ID is required for this request.": [
+            ""
+         ],
+         "Sorry, you are not allowed to edit saved layouts data.": [
+            ""
+         ],
+         "User don't have permissions to change options.": [
+            ""
+         ],
+         "Settings": [
+            ""
+         ],
+         "Popup & Lightbox": [
+            ""
+         ],
+         "Watermarks": [
+            ""
+         ],
+         "Social Feeds": [
+            ""
+         ],
+         "White Label": [
+            ""
+         ],
+         "Register Portfolio Post Type": [
+            ""
+         ],
+         "Add custom post type `portfolio` to showcase your works.": [
+            ""
+         ],
+         "Archive Page": [
+            ""
+         ],
+         "Base page of your portfolio, where will be placed your works archive.": [
+            ""
+         ],
+         "Archive Page Items Per Page": [
+            ""
+         ],
+         "Filter Taxonomies": [
+            ""
+         ],
+         "You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by \",\" separating values. Example: \"product_cat,product_tag\"": [
+            ""
+         ],
+         "Placeholder Image": [
+            ""
+         ],
+         "This image used on items in layouts where image is not specified.": [
+            ""
+         ],
+         "Choose image": [
+            ""
+         ],
+         "AJAX Cache and Preload": [
+            ""
+         ],
+         "Reduce AJAX calls request time.": [
+            ""
+         ],
+         "Social Logs": [
+            ""
+         ],
+         "Enable Social Logs for Twitch (Beta)": [
+            ""
+         ],
+         "Logs Limit": [
+            ""
+         ],
+         "Sets the maximum logs limit.": [
+            ""
+         ],
+         "Responsive Breakpoints": [
+            ""
+         ],
+         "Extra Large": [
+            ""
+         ],
+         "Sets the breakpoint on extra large screen sizes (Default: %1$spx).": [
+            ""
+         ],
+         "Large": [
+            ""
+         ],
+         "Sets the breakpoint on large screen sizes (Default: %1$spx).": [
+            ""
+         ],
+         "Medium": [
+            ""
+         ],
+         "Sets the breakpoint on medium screen sizes (Default: %1$spx).": [
+            ""
+         ],
+         "Small": [
+            ""
+         ],
+         "Sets the breakpoint on small screen sizes (Default: %1$spx).": [
+            ""
+         ],
+         "Extra Small": [
+            ""
+         ],
+         "Sets the breakpoint on extra small screen sizes (Default: %1$spx).": [
+            ""
+         ],
+         "Lazy Loading": [
+            ""
+         ],
+         "Enable lazy loading for %s layouts only or for the whole website.": [
+            ""
+         ],
+         "%s Only": [
+            ""
+         ],
+         "All images": [
+            ""
+         ],
+         "Lazy Loading Excludes": [
+            ""
+         ],
+         "Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href=\"%1$s\">%2$s</a>": [
+            ""
+         ],
+         "More info": [
+            ""
+         ],
+         "Layouts Image Sizes": [
+            ""
+         ],
+         "Image sizes used in portfolio layouts.": [
+            ""
+         ],
+         "Lightbox Image Sizes": [
+            ""
+         ],
+         "Image sizes used in lightbox images.": [
+            ""
+         ],
+         "After publishing your changes, new image sizes may not be shown until you <a href=\"%s\" target=\"_blank\">Regenerate Thumbnails</a>.": [
+            ""
+         ],
+         "Vendor Script": [
+            ""
+         ],
+         "Fancybox": [
+            ""
+         ],
+         "PhotoSwipe": [
+            ""
+         ],
+         "Lightbox for WordPress Images": [
+            ""
+         ],
+         "Enable lightbox for WordPress native galleries and images.": [
+            ""
+         ],
+         "Deep Linking": [
+            ""
+         ],
+         "Makes URL automatically change to reflect the current opened popup, and you can easily link directly to that image or video.": [
+            ""
+         ],
+         "Use Deep Linking URL to Share Images": [
+            ""
+         ],
+         "Check to share Deep Linking URLs when sharing images. When disabled, all galleries will share direct links to image files.": [
+            ""
+         ],
+         "Click to Zoom": [
+            ""
+         ],
+         "Restore Focus": [
+            ""
+         ],
+         "Restore focus on the last active item after Popup is closed.": [
+            ""
+         ],
+         "UI Elements": [
+            ""
+         ],
+         "Arrows to navigate between images.": [
+            ""
+         ],
+         "Display Images Counter": [
+            ""
+         ],
+         "On the top left corner will be showed images counter.": [
+            ""
+         ],
+         "Display Zoom Button": [
+            ""
+         ],
+         "Display Fullscreen Button": [
+            ""
+         ],
+         "Display Share Button": [
+            ""
+         ],
+         "Display Close Button": [
+            ""
+         ],
+         "Thumbnails Opened At Startup": [
+            ""
+         ],
+         "Thumbnails Position": [
+            ""
+         ],
+         "Vertical": [
+            ""
+         ],
+         "Horizontal": [
+            ""
+         ],
+         "Display Download Button": [
+            ""
+         ],
+         "Display Slideshow": [
+            ""
+         ],
+         "Quick View": [
+            ""
+         ],
+         "Display URL Button": [
+            ""
+         ],
+         "Button with page URL will be placed in the popup toolbar.": [
+            ""
+         ],
+         "Internal Links": [
+            ""
+         ],
+         "Open in New Tab": [
+            ""
+         ],
+         "Open in Current Tab": [
+            ""
+         ],
+         "Open in Frame (not recommended)": [
+            ""
+         ],
+         "Prevent Click": [
+            ""
+         ],
+         "External Links": [
+            ""
+         ],
+         "When you display posts and pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`.": [
+            ""
+         ],
+         "Misc": [
+            ""
+         ],
+         "Background Color": [
+            ""
+         ],
+         "Protect your works using watermarks": [
+            ""
+         ],
+         "Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...": [
+            ""
+         ],
+         "Remove our plugin brand and logos from Front and Admin areas": [
+            ""
+         ],
+         "-- Select Page --": [
+            ""
+         ],
+         "Visual Portfolio Welcome Screen": [
+            ""
+         ],
+         "Thank you for choosing Visual Portfolio - The Modern Gallery, Posts Grid and Portfolio Plugin for WordPress.": [
+            ""
+         ],
+         "You're using free Visual Portfolio plugin. Enjoy! 🙂": [
+            ""
+         ],
+         "Want to get more power with Pro? Visit %s": [
+            ""
+         ],
+         "Main Features & Solutions": [
+            ""
+         ],
+         "Visual Gallery Builder": [
+            ""
+         ],
+         "Build your portfolio and gallery blocks with no coding knowledge. Thanks to Gutenberg page builder you are able to create and customize galleries visually.": [
+            ""
+         ],
+         "Optimized to be Fast as Native": [
+            ""
+         ],
+         "Due to the modular code structure, all scripts and styles are loaded only when they are needed for the current page that displays your gallery.": [
+            ""
+         ],
+         "Layouts": [
+            ""
+         ],
+         "Our gallery plugin shipped with popular layouts such as Masonry and Justified (Flickr).": [
+            ""
+         ],
+         "Visual Effects": [
+            ""
+         ],
+         "Showcase your projects ang gallery images with clean and beautiful visual styles.": [
+            ""
+         ],
+         "Easy to Customize": [
+            ""
+         ],
+         "The gallery block with live preview includes a lot of design settings that are point-and-click, no coding knowledge required.": [
+            ""
+         ],
+         "Posts Query Builder": [
+            ""
+         ],
+         "Display posts, portfolios, and any other post types, filter by taxonomies, author, date ranges, and much more options.": [
+            ""
+         ],
+         "Powerful Lightbox": [
+            ""
+         ],
+         "Visual Portfolio uses scripts for lightboxes that is high performance, mobile optimized and retina-ready.": [
+            ""
+         ],
+         "Video and 🎵 Audio Support": [
+            ""
+         ],
+         "Present not only photos, but also audios and videos within a single gallery.": [
+            ""
+         ],
+         "More Features": [
+            ""
+         ],
+         "Upgrade to Visual Portfolio Pro": [
+            ""
+         ],
+         "and Get More Power!": [
+            ""
+         ],
+         "Stylish Effects": [
+            ""
+         ],
+         "Watermarks Protection": [
+            ""
+         ],
+         "Age Gate Protection": [
+            ""
+         ],
+         "Instagram-like Image Filters": [
+            ""
+         ],
+         "Advanced Query Settings": [
+            ""
+         ],
+         "Popup for Posts and Pages": [
+            ""
+         ],
+         "Popup Deep Linking": [
+            ""
+         ],
+         "And much more...": [
+            ""
+         ],
+         "Upgrade to PRO Now": [
+            ""
+         ],
+         "Author": [
+            ""
+         ],
+         "By %s": [
+            ""
+         ],
+         "Comments": [
+            ""
+         ],
+         "No Comments": [
+            ""
+         ],
+         "%s Comment": [
+            "",
+            "%s Comments"
+         ],
+         "Reading Time": [
+            ""
+         ],
+         "%s Min Read": [
+            "",
+            "%s Mins Read"
+         ],
+         "Views": [
+            ""
+         ],
+         "%s View": [
+            "",
+            "%s Views"
+         ],
+         "Previous Slide": [
+            ""
+         ],
+         "Next Slide": [
+            ""
+         ],
+         "Visual Portfolio, Posts & Image Gallery for WordPress": [
+            ""
+         ],
+         "--- Select Layout ---": [
+            ""
+         ],
+         "Saved %s": [
+            ""
+         ],
+         "Wide 16:9": [
+            ""
+         ],
+         "Ultra Wide 21:9": [
+            ""
+         ],
+         "TV 4:3": [
+            ""
+         ],
+         "Classic Film 3:2": [
+            ""
+         ],
+         "Width": [
+            ""
+         ],
+         "Height": [
+            ""
+         ],
+         "PRO": [
+            ""
+         ],
+         "Open in Modal": [
+            ""
+         ],
+         "Classes Tree:": [
+            ""
+         ],
+         "Select Date": [
+            ""
+         ],
+         "Reset Date": [
+            ""
+         ],
+         "Are you sure you want to remove the element?": [
+            ""
+         ],
+         "Remove": [
+            ""
+         ],
+         "Loaded automatically from the image Title": [
+            ""
+         ],
+         "Loaded automatically from the image Caption": [
+            ""
+         ],
+         "Loaded automatically from the image Alt": [
+            ""
+         ],
+         "Loaded automatically from the image Description": [
+            ""
+         ],
+         "Replace Image": [
+            ""
+         ],
+         "Remove Image from Gallery": [
+            ""
+         ],
+         "Hide Additional Info": [
+            ""
+         ],
+         "Show Additional Info": [
+            ""
+         ],
+         "File name:": [
+            ""
+         ],
+         "File type:": [
+            ""
+         ],
+         "File URL:": [
+            ""
+         ],
+         "Copy URL to Clipboard": [
+            ""
+         ],
+         "Copied!": [
+            ""
+         ],
+         "View attachment page": [
+            ""
+         ],
+         "Edit more details": [
+            ""
+         ],
+         "Image Settings": [
+            ""
+         ],
+         "Edit Gallery": [
+            ""
+         ],
+         "Add Images": [
+            ""
+         ],
+         "Showing %s of %s Image": [
+            "",
+            "Showing %s of %s Images"
+         ],
+         "Show More": [
+            ""
+         ],
+         "Show All": [
+            ""
+         ],
+         "More": [
+            ""
+         ],
+         "Less": [
+            ""
+         ],
+         "Type to search…": [
+            ""
+         ],
+         "Select…": [
+            ""
+         ],
+         "Type and press Enter…": [
+            ""
+         ],
+         "Set the common settings in the setup wizard,<br />more options will be available in the block settings.<br />Select the Content Source first:": [
+            ""
+         ],
+         "Items Style": [
+            ""
+         ],
+         "Select one of the featured styles to get started.<br />More style settings will be available in the block settings.": [
+            ""
+         ],
+         "Additional Settings": [
+            ""
+         ],
+         "Popup Gallery": [
+            ""
+         ],
+         "Skip Setup": [
+            ""
+         ],
+         "Previous Step": [
+            ""
+         ],
+         "Continue": [
+            ""
+         ],
+         "Edit Tiles": [
+            ""
+         ],
+         "Focal point will be used in Visual Portfolio layouts only.": [
+            ""
+         ],
+         "Video will be used in %s layouts only. Full list of supported links": [
+            ""
+         ],
+         "Using large galleries may <u>decrease page loading speed</u>. We recommend you add these improvements:": [
+            ""
+         ],
+         "Set the items per page to <u>less than %d</u>": [
+            ""
+         ],
+         "Add <em>`Load More`</em> or <em>`Infinite Scroll`</em> pagination for best results.": [
+            ""
+         ],
+         "Ok, I understand": [
+            ""
+         ],
+         "Custom Count": [
+            ""
+         ],
+         "Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries.": [
+            ""
+         ],
+         "All Items": [
+            ""
+         ],
+         "This Saved Layout": [
+            ""
+         ],
+         "Shortcodes": [
+            ""
+         ],
+         "Show Additional Shortcodes": [
+            ""
+         ],
+         "%s Editor": [
+            ""
+         ],
+         "Edit saved %s layouts.": [
+            ""
+         ],
+         "slug\u0004portfolio-category": [
+            ""
+         ],
+         "slug\u0004portfolio-tag": [
+            ""
+         ],
+         "default-slug\u0004portfolio": [
+            ""
+         ],
+         "default-label\u0004Portfolio": [
+            ""
+         ],
+         "plugin name inside the review notice\u0004Visual Portfolio": [
+            ""
+         ],
+         "Post Type Singular Name\u0004Project": [
+            ""
+         ],
+         "Post Type Singular Name\u0004Saved Layout": [
+            ""
+         ],
+         "Post Type General Name\u0004Saved Layouts": [
+            ""
+         ],
+         "block title\u0004Visual Portfolio Saved Layout": [
+            ""
+         ],
+         "block title\u0004Visual Portfolio": [
+            ""
+         ],
+         "block description\u0004Display saved Visual Portfolio layouts.": [
+            ""
+         ],
+         "block description\u0004Display galleries, posts and portfolio grids.": [
+            ""
+         ],
+         "block keyword\u0004saved": [
+            ""
+         ],
+         "block keyword\u0004portfolio": [
+            ""
+         ],
+         "block keyword\u0004vpf": [
+            ""
+         ],
+         "block keyword\u0004gallery": [
+            ""
+         ],
+         "block keyword\u0004images": [
+            ""
+         ],
+         "block keyword\u0004posts": [
+            ""
+         ]
+      }
+   }
+}

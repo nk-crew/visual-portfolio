@@ -1,0 +1,14 @@
+/**
+ * Errors CSS Variables
+ */
+.vp-error {
+	--vp-error_margin-b: 1em;
+	--vp-error__padding-v: 1em;
+	--vp-error__padding-h: 1.3em;
+	--vp-error__color: var(--vp-color-red);
+	--vp-error__background-color: var(--vp-color-gray-lighten);
+	--vp-error__border-width: 1px;
+	--vp-error__border-left-width: 3px;
+	--vp-error__border-color: var(--vp-color-red);
+	--vp-error__border-radius: var(--vp-border-radius);
+}

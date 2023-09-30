@@ -1,0 +1,29 @@
+/**
+ * Filter Dropdown CSS Variables
+ */
+.vp-filter__style-dropdown {
+	// Items.
+	--vp-filter-dropdown--items__gap: 6px;
+	--vp-filter-dropdown--items__min-width: 40px;
+	--vp-filter-dropdown--items__padding-v: 0.7em;
+	--vp-filter-dropdown--items__padding-h: 1.3em;
+	--vp-filter-dropdown--items__padding-right: 0.75em;
+	--vp-filter-dropdown--items__font-size: 0.9em;
+	--vp-filter-dropdown--items__font-weight: 600;
+	--vp-filter-dropdown--items__line-height: 1.4;
+	--vp-filter-dropdown--items__text-decoration: none;
+	--vp-filter-dropdown--items__text-transform: uppercase;
+	--vp-filter-dropdown--items__letter-spacing: 0.015em;
+	--vp-filter-dropdown--items__height: auto;
+	--vp-filter-dropdown--items__color: var(--vp-color-gray);
+	--vp-filter-dropdown--items__background-color: var(--vp-color-gray-lighten);
+	--vp-filter-dropdown--items__border-radius: var(--vp-border-radius);
+	--vp-filter-dropdown--items__arrow: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e);
+	--vp-filter-dropdown--items__arrow-size: 0.6em;
+	--vp-filter-dropdown--items-hover__color: var(--vp-color-gray-darken);
+	--vp-filter-dropdown--items-hover__background-color: var(--vp-color-gray-light);
+
+	// Transitions.
+	--vp-filter-dropdown-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-filter-dropdown-transition-easing: var(--vp-interactive__transition-easing);
+}

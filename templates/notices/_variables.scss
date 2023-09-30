@@ -1,0 +1,13 @@
+/**
+ * Notices CSS Variables
+ */
+.vp-notice {
+	--vp-notice__padding-v: 1em;
+	--vp-notice__padding-h: 1.3em;
+	--vp-notice__color: var(--vp-color-brand);
+	--vp-notice__background-color: var(--vp-color-gray-lighten);
+	--vp-notice__border-width: 1px;
+	--vp-notice__border-left-width: 3px;
+	--vp-notice__border-color: var(--vp-color-brand);
+	--vp-notice__border-radius: var(--vp-border-radius);
+}

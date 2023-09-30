@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "visual-portfolio/saved",
+  "category": "media",
+  "title": "Visual Portfolio Saved Layout",
+  "description": "Display saved Visual Portfolio layouts.",
+  "keywords": ["saved", "portfolio", "vpf"],
+  "textdomain": "visual-portfolio",
+  "supports": {
+    "anchor": true,
+    "className": true,
+    "html": false,
+    "align": ["wide", "full"]
+  }
+}

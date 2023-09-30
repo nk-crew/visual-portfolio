@@ -1,0 +1,88 @@
+@import "./variables-popup";
+
+/*
+ * Visual Portfolio styles for Fancybox.
+ */
+.vp-fancybox {
+	top: var(--wp-admin--admin-bar--height, 0);
+	z-index: var(--vp-popup__z-index);
+	height: calc(100% - var(--wp-admin--admin-bar--height, 0px));
+
+	// removed white background to improve vertical videos displaying.
+	.fancybox-slide--iframe .fancybox-content {
+		background: none;
+	}
+
+	// Caption.
+	.fancybox-caption__body {
+		font-size: 12px;
+		color: #fff;
+
+		h3 {
+			color: inherit;
+		}
+
+		a {
+			color: inherit;
+
+			&:hover {
+				opacity: 0.8;
+			}
+		}
+
+		.vp-portfolio__item-meta-title {
+			margin-top: 0;
+			margin-bottom: 3px;
+			font-size: 14px;
+			color: inherit;
+
+			a {
+				text-decoration: none;
+			}
+		}
+	}
+
+	// Thumbnails.
+	.fancybox-thumbs {
+		width: var(--vp-popup--thumbnails__size);
+		background: var(--vp-popup--thumbnails__background-color);
+	}
+
+	&.fancybox-show-thumbs .fancybox-inner {
+		right: var(--vp-popup--thumbnails__size);
+	}
+
+	.fancybox-thumbs__list a {
+		width: var(--vp-popup--thumbnails__size);
+		max-width: calc(100% - 4px);
+		height: calc(var(--vp-popup--thumbnails__size) / calc(var(--vp-popup--thumbnails__aspect-ratio)));
+
+		&::before {
+			border: 2px solid var(--vp-popup--thumbnails--items__border-color);
+		}
+
+		@supports (aspect-ratio: 16 / 9) {
+			width: calc(100% - 4px);
+			max-width: none;
+			height: auto;
+			max-height: none;
+			aspect-ratio: var(--vp-popup--thumbnails__aspect-ratio);
+		}
+	}
+
+	.fancybox-thumbs-y .fancybox-thumbs__list {
+		&::-webkit-scrollbar {
+			width: var(--vp-popup--thumbnails--scrollbar__size);
+		}
+
+		&::-webkit-scrollbar-track {
+			background: var(--vp-popup--thumbnails--scrollbar-track__background-color);
+			box-shadow: none;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background: var(--vp-popup--thumbnails--scrollbar-thumb__background-color);
+			border-radius: var(--vp-popup--thumbnails--scrollbar-thumb__border-radius);
+		}
+	}
+}

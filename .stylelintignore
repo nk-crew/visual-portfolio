@@ -3,6 +3,10 @@
 **/*.min.css
 **/*.build.css
 node_modules
+assets/vendor
+templates/**/*.css
 dist
+duist-zip
+build
 vendor
 vendors

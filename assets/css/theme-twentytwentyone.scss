@@ -1,0 +1,25 @@
+// Fix headings margin.
+.entry-content .vp-portfolio__item-meta-title {
+	margin-top: 0;
+}
+
+// Fix caption margin.
+.vp-portfolio__item figcaption {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+// Fix preview background color.
+.vp-preview-body {
+	background: none;
+}
+
+// Fix images size.
+// https://github.com/WordPress/twentytwentyone/blob/trunk/inc/template-functions.php#L405-L447.
+[data-vp-layout="tiles"] .vp-portfolio__item-img img,
+[data-vp-masonry-images-aspect-ratio*=":"] .vp-portfolio__item-img img,
+[data-vp-grid-images-aspect-ratio*=":"] .vp-portfolio__item-img img {
+	width: 100% !important;
+	max-width: none !important;
+	height: 100% !important;
+}

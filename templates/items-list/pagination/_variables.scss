@@ -1,0 +1,27 @@
+/**
+ * Pagination Default CSS Variables
+ */
+.vp-pagination__style-default {
+	// Items.
+	--vp-pagination-default--items__gap: 10px;
+	--vp-pagination-default--items__min-width: 40px;
+	--vp-pagination-default--items__padding-v: 0.7em;
+	--vp-pagination-default--items__padding-h: 1.3em;
+	--vp-pagination-default--items__font-size: 0.9em;
+	--vp-pagination-default--items__font-weight: 600;
+	--vp-pagination-default--items__line-height: 1.4;
+	--vp-pagination-default--items__text-decoration: none;
+	--vp-pagination-default--items__text-transform: uppercase;
+	--vp-pagination-default--items__letter-spacing: 0.015em;
+	--vp-pagination-default--items__color: var(--vp-color-gray);
+	--vp-pagination-default--items__background-color: var(--vp-color-gray-lighten);
+	--vp-pagination-default--items__border-radius: var(--vp-border-radius);
+	--vp-pagination-default--items-hover__color: var(--vp-color-gray-darken);
+	--vp-pagination-default--items-hover__background-color: var(--vp-color-gray-light);
+	--vp-pagination-default--items-active__color: #fff;
+	--vp-pagination-default--items-active__background-color: var(--vp-color-brand);
+
+	// Transitions.
+	--vp-pagination-default-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-pagination-default-transition-easing: var(--vp-interactive__transition-easing);
+}

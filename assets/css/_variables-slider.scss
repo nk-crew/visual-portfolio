@@ -1,0 +1,38 @@
+/**
+ * Slider CSS Variables
+ */
+.vp-portfolio {
+	// Arrows.
+	--vp-layout-slider--arrows__width: 2em;
+	--vp-layout-slider--arrows__height: 2em;
+	--vp-layout-slider--arrows__offset: 10px;
+	--vp-layout-slider--arrows__compensation: 10px;
+	--vp-layout-slider--arrows__color: var(--vp-color-gray);
+	--vp-layout-slider--arrows__background-color: #fff;
+	--vp-layout-slider--arrows__border-radius: 50%;
+	--vp-layout-slider--arrows__box-shadow: 0 0 7px 2px rgba(0, 0, 0, 4%);
+	--vp-layout-slider--arrows__opacity: 0.5;
+	--vp-layout-slider--arrows-hover__box-shadow: 0 2px 15px 2px rgba(0, 0, 0, 4%);
+	--vp-layout-slider--arrows-hover__opacity: 1;
+
+	// Bullets.
+	--vp-layout-slider--bullets__margin-top: 2em;
+	--vp-layout-slider--bullets__width: 0.4em;
+	--vp-layout-slider--bullets__height: 0.4em;
+	--vp-layout-slider--bullets__gap: 0.4em;
+	--vp-layout-slider--bullets__compensation: 4px;
+	--vp-layout-slider--bullets__background-color: currentcolor;
+	--vp-layout-slider--bullets__border-radius: 50%;
+	--vp-layout-slider--bullets__opacity: 0.2;
+	--vp-layout-slider--bullets-hover__opacity: 0.5;
+	--vp-layout-slider--bullets-active__opacity: 1;
+
+	// Thumbnails.
+	--vp-layout-slider--thumbnails__opacity: 0.5;
+	--vp-layout-slider--thumbnails-hover__opacity: 1;
+	--vp-layout-slider--thumbnails-active__opacity: 1;
+
+	// Transitions.
+	--vp-layout-slider__transition-duration: var(--vp-interactive__transition-duration);
+	--vp-layout-slider__transition-easing: var(--vp-interactive__transition-easing);
+}

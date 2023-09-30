@@ -1,0 +1,13 @@
+@import "./variables";
+
+/**
+ * Notices style
+ */
+.vp-notice {
+	padding: var(--vp-notice__padding-v) var(--vp-notice__padding-h);
+	color: var(--vp-notice__color);
+	background-color: var(--vp-notice__background-color);
+	border: var(--vp-notice__border-width) solid var(--vp-notice__border-color);
+	border-left-width: var(--vp-notice__border-left-width);
+	border-radius: var(--vp-notice__border-radius);
+}

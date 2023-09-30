@@ -1,0 +1,31 @@
+/**
+ * Filter Default CSS Variables
+ */
+.vp-filter__style-default {
+	// Items.
+	--vp-filter-default--items__gap: 10px;
+	--vp-filter-default--items__min-width: 40px;
+	--vp-filter-default--items__padding-v: 0.7em;
+	--vp-filter-default--items__padding-h: 1.3em;
+	--vp-filter-default--items__font-size: 0.9em;
+	--vp-filter-default--items__font-weight: 600;
+	--vp-filter-default--items__line-height: 1.4;
+	--vp-filter-default--items__text-decoration: none;
+	--vp-filter-default--items__text-transform: uppercase;
+	--vp-filter-default--items__letter-spacing: 0.015em;
+	--vp-filter-default--items__color: var(--vp-color-gray);
+	--vp-filter-default--items__background-color: var(--vp-color-gray-lighten);
+	--vp-filter-default--items__border-radius: var(--vp-border-radius);
+	--vp-filter-default--items-hover__color: var(--vp-color-gray-darken);
+	--vp-filter-default--items-hover__background-color: var(--vp-color-gray-light);
+	--vp-filter-default--items-active__color: #fff;
+	--vp-filter-default--items-active__background-color: var(--vp-color-brand);
+
+	// Items Count.
+	--vp-filter-default--items-count__offset: 8px;
+	--vp-filter-default--items-count__font-size: 0.6em;
+
+	// Transitions.
+	--vp-filter-default-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-filter-default-transition-easing: var(--vp-interactive__transition-easing);
+}

@@ -1,0 +1,36 @@
+// Fix headings margin.
+.entry-content .vp-portfolio__item-meta-title {
+	margin-top: 0;
+}
+
+// Fix preview background color.
+.vp-preview-body {
+	background: none;
+}
+
+// Fix font family.
+.vp-filter__item,
+.vp-sort__item,
+.vp-sort select,
+.vp-portfolio__item-meta-category,
+.vp-pagination__item {
+	font-family: "Noto Sans", sans-serif;
+}
+
+// Fix links border.
+.vp-portfolio__item-meta-title,
+.vp-filter__item,
+.vp-sort__item,
+.vp-portfolio__item-meta-category,
+.vp-pagination__item,
+.vp-portfolio__item-img {
+	.entry-content & a {
+		border: none;
+	}
+}
+
+// Fix figcaption padding.
+.wp-block-visual-portfolio[class^="wp-block-"].vp-portfolio__items-style-fade figcaption,
+.wp-block-visual-portfolio[class^="wp-block-"].vp-portfolio__items-style-fly figcaption {
+	padding: 0;
+}

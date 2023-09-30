@@ -4,6 +4,10 @@
 **/*.php
 **/*.yml
 node_modules
+assets/vendor
+templates/**/*.css
 dist
+dist-zip
+build
 vendor
 vendors

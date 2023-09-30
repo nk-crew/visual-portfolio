@@ -1,0 +1,30 @@
+/**
+ * Sort Dropdown CSS Variables
+ */
+.vp-sort__style-dropdown {
+	// Items.
+	--vp-sort-dropdown--items__gap: 6px;
+	--vp-sort-dropdown--items__min-width: 40px;
+	--vp-sort-dropdown--items__min-height: 2.7929em;
+	--vp-sort-dropdown--items__padding-v: 0.7em;
+	--vp-sort-dropdown--items__padding-h: 1.3em;
+	--vp-sort-dropdown--items__padding-right: 0.75em;
+	--vp-sort-dropdown--items__font-size: 0.9em;
+	--vp-sort-dropdown--items__font-weight: 600;
+	--vp-sort-dropdown--items__line-height: 1.4;
+	--vp-sort-dropdown--items__text-decoration: none;
+	--vp-sort-dropdown--items__text-transform: uppercase;
+	--vp-sort-dropdown--items__letter-spacing: 0.015em;
+	--vp-sort-dropdown--items__height: auto;
+	--vp-sort-dropdown--items__color: var(--vp-color-gray);
+	--vp-sort-dropdown--items__background-color: var(--vp-color-gray-lighten);
+	--vp-sort-dropdown--items__border-radius: var(--vp-border-radius);
+	--vp-sort-dropdown--items__arrow: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e);
+	--vp-sort-dropdown--items__arrow-size: 0.6em;
+	--vp-sort-dropdown--items-hover__color: var(--vp-color-gray-darken);
+	--vp-sort-dropdown--items-hover__background-color: var(--vp-color-gray-light);
+
+	// Transitions.
+	--vp-sort-dropdown-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-sort-dropdown-transition-easing: var(--vp-interactive__transition-easing);
+}

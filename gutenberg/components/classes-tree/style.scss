@@ -1,0 +1,126 @@
+@use "sass:color";
+
+$dom_tree_color_bg_node_class: #dcdfe6 !default;
+$dom_tree_color_text_node_class: #595d67 !default;
+
+/**
+ * DOM Tree
+ */
+.vpf-component-classes-tree-help code {
+	display: inline-block;
+	padding: 2px 6px;
+	line-height: 1.2;
+	color: $dom_tree_color_text_node_class;
+	cursor: pointer;
+	background-color: $dom_tree_color_bg_node_class;
+	border-radius: 3px;
+	transition: 0.15s background-color, 0.15s color;
+
+	&:hover {
+		color: color.adjust($dom_tree_color_text_node_class, $lightness: -20%);
+		background-color: color.adjust($dom_tree_color_bg_node_class, $lightness: -10%);
+	}
+}
+
+.vpf-component-classes-tree {
+	padding: 15px;
+	padding-top: 1px;
+	padding-bottom: 0;
+	padding-left: 0;
+	font-family: monospace;
+	color: #67666d;
+	background-color: #f9f9fa;
+	border: 1px solid #ddd;
+
+	.spinner {
+		float: none;
+		margin-top: 15px;
+		margin-bottom: 15px;
+	}
+
+	ul {
+		position: relative;
+		padding-left: 15px;
+		list-style: none;
+	}
+
+	// Node
+	.vpf-component-classes-tree-node > div {
+		position: relative;
+		display: inline-block;
+		line-height: 1.6;
+	}
+
+	// Node Class
+	.vpf-component-classes-tree-node-class {
+		display: inline;
+		padding: 2px 6px;
+		line-height: 1.2;
+		color: $dom_tree_color_text_node_class;
+		cursor: pointer;
+		background-color: $dom_tree_color_bg_node_class;
+		border: none;
+		border-radius: 3px;
+		transition: 0.15s background-color, 0.15s color;
+
+		&:hover {
+			color: color.adjust($dom_tree_color_text_node_class, $lightness: -20%);
+			background-color: color.adjust($dom_tree_color_bg_node_class, $lightness: -10%);
+		}
+
+		+ .vpf-component-classes-tree-node-class {
+			margin-left: 5px;
+		}
+	}
+
+	// Collapse
+	.vpf-component-classes-tree-node-collapse {
+		position: relative;
+		top: -1px;
+		display: inline-block;
+		padding: 0;
+		margin-right: 5px;
+		cursor: pointer;
+		border: none;
+		border-top: 6px solid;
+		border-right: 4px solid transparent;
+		border-left: 4px solid transparent;
+
+		&::after {
+			position: absolute;
+			top: -12px;
+			right: -10px;
+			bottom: -7px;
+			left: -10px;
+			display: block;
+			content: "";
+		}
+	}
+
+	.is-collapsed .vpf-component-classes-tree-node-collapse {
+		transform: rotate(-90deg);
+	}
+
+	// Hover
+	.vpf-component-classes-tree-child {
+		position: relative;
+
+		&::before {
+			position: absolute;
+			top: -3px;
+			right: 0;
+			bottom: -3px;
+			left: 8px;
+			display: block;
+			content: "";
+			background-color: #f0f0f1;
+			border-radius: 4px;
+			opacity: 0;
+			transition: 0.2s opacity;
+		}
+	}
+
+	.vpf-component-classes-tree-node:hover ~ .vpf-component-classes-tree-child::before {
+		opacity: 1;
+	}
+}

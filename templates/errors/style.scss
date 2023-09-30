@@ -1,0 +1,14 @@
+@import "./variables";
+
+/**
+ * Errors style
+ */
+.vp-error {
+	padding: var(--vp-error__padding-v) var(--vp-error__padding-h);
+	margin-bottom: var(--vp-error_margin-b);
+	color: var(--vp-error__color);
+	background-color: var(--vp-error__background-color);
+	border: var(--vp-error__border-width) solid var(--vp-error__border-color);
+	border-left-width: var(--vp-error__border-left-width);
+	border-radius: var(--vp-error__border-radius);
+}

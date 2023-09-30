@@ -1,0 +1,13 @@
+/**
+ * Elementor Preview Styles
+ */
+.visual-portfolio-elementor-preview {
+	position: relative;
+	overflow: hidden;
+	pointer-events: none;
+
+	iframe {
+		max-width: none;
+		min-height: 20px;
+	}
+}

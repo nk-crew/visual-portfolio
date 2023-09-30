@@ -1,0 +1,286 @@
+@use "sass:color";
+
+$brand_color: #2540cc !default;
+
+.vpf-setup-wizard {
+	--wp-admin-theme-color: #{$brand_color};
+
+	padding: 20px;
+	padding-top: 50px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	color: #000;
+	text-align: center;
+	background-color: #fff;
+	border: 1px solid #7e7e7e;
+	border-radius: 6px;
+
+	// Hide default Gutenberg outline and use our own.
+	.wp-block-visual-portfolio-block.is-selected:has(> &) {
+		&::after {
+			content: none !important;
+		}
+
+		.vpf-setup-wizard {
+			border-color: $brand_color;
+		}
+	}
+
+	> div {
+		max-width: 520px;
+		margin: 0 auto;
+	}
+
+	.vpf-setup-wizard-title {
+		margin-bottom: 15px;
+		font-size: 18px;
+		font-weight: 500;
+	}
+
+	.vpf-setup-wizard-description {
+		font-size: 14px;
+		opacity: 0.75;
+	}
+
+	.vpf-setup-wizard-panel {
+		margin-top: 25px;
+	}
+
+	// Pagination.
+	.vpf-setup-wizard-pagination {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		max-width: none;
+		margin-top: 40px;
+	}
+
+	.vpf-setup-wizard-pagination-progress {
+		width: 130px;
+		height: 2px;
+		background-color: #eaeaea;
+
+		> div {
+			height: 2px;
+			background-color: $brand_color;
+			transition: 0.3s width ease;
+		}
+	}
+
+	.vpf-setup-wizard-pagination-button {
+		display: flex;
+		justify-content: flex-start;
+		min-width: 100px;
+
+		.components-button {
+			height: 34px;
+			padding: 6px 20px;
+
+			&.is-link {
+				padding: 0;
+				font-weight: 400;
+				color: #b9b9b9;
+				text-decoration: none;
+
+				&:hover,
+				&:focus {
+					color: $brand_color;
+				}
+			}
+		}
+
+		.components-button.is-primary {
+			background-color: $brand_color;
+
+			&:disabled {
+				background-color: $brand_color;
+				border-color: $brand_color;
+
+				svg {
+					color: #fff;
+					opacity: 0.4;
+				}
+			}
+
+			&:hover:not(:disabled) {
+				background: color.adjust($brand_color, $lightness: -10%);
+			}
+
+			&:focus:not(:disabled) {
+				box-shadow: inset 0 0 0 1px #fff, 0 0 0 1.5px $brand_color;
+			}
+		}
+	}
+
+	.vpf-setup-wizard-pagination-button-end {
+		justify-content: flex-end;
+	}
+
+	// Icons Selector
+	.vpf-component-icon-selector {
+		display: flex;
+		justify-content: center;
+
+		.vpf-component-icon-selector-item {
+			padding: 15px 20px;
+			background: none !important;
+			border-color: #fff;
+
+			svg {
+				width: 44px;
+				max-width: 44px;
+				height: 44px;
+				color: #2b2b2b;
+				transition: 0.2s color;
+			}
+
+			span {
+				font-size: 0.95em;
+				font-weight: 500;
+				text-transform: initial;
+				transition: 0.2s color;
+			}
+
+			&:hover,
+			&:focus {
+				svg,
+				span {
+					color: #1e1e1e;
+				}
+			}
+
+			&.vpf-component-icon-selector-item-active {
+				border-color: $brand_color !important;
+				box-shadow: 0 0 0 1px $brand_color !important;
+
+				svg,
+				span {
+					color: $brand_color;
+				}
+			}
+		}
+	}
+
+	// Step 0: Content Source Selector
+	&-step-0 {
+		// Gallery Control
+		.vpf-component-gallery-control .vpf-component-gallery-control-items {
+			grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+		}
+	}
+
+	// Step 1: Items Style Selector
+	&-step-1 .vpf-component-icon-selector {
+		gap: 20px;
+		padding-bottom: 30px;
+		margin-top: 35px;
+
+		// Limit to 4 items.
+		> .vpf-component-icon-selector-item:nth-child(4) ~ * {
+			display: none;
+		}
+
+		.vpf-component-icon-selector-item {
+			position: relative;
+			flex: 1;
+			padding: 0;
+			background: #eee !important;
+			border: none !important;
+			border-radius: 6px;
+
+			&::before {
+				display: block;
+				width: 100%;
+				padding-top: 100%;
+				content: "";
+			}
+
+			img {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+				border-radius: 6px;
+			}
+
+			svg {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translateX(-50%) translateY(-50%);
+			}
+
+			&:hover,
+			&:focus {
+				border-color: none !important;
+				box-shadow: 0 0 0 1.5px #fff, 0 0 0 3.5px #000 !important;
+			}
+
+			&.vpf-component-icon-selector-item-active {
+				border-color: none !important;
+				box-shadow: 0 0 0 1.5px #fff, 0 0 0 3.5px $brand_color !important;
+			}
+
+			> span {
+				position: absolute;
+				top: calc(100% + 5px);
+				opacity: 0;
+				transition: 0.2s ease;
+				transform: translateY(-4px);
+			}
+
+			&:hover,
+			&:focus,
+			&.vpf-component-icon-selector-item-active {
+				> span {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+		}
+	}
+
+	// Step 2: Layout Elements
+	&-step-2 {
+		.vpf-setup-wizard-layout-elements {
+			> div {
+				padding: 25px 0;
+
+				+ div {
+					border-top: 1px solid #ececec;
+				}
+			}
+
+			.components-toggle-control__label {
+				font-size: 16px;
+				font-weight: 500;
+			}
+		}
+	}
+
+	.spinner,
+	.components-base-control,
+	.components-base-control__field {
+		margin: 0;
+	}
+}
+
+// Steps Wizard.
+.vpf-component-steps-wizard {
+	opacity: 1;
+	transition: 0.3s opacity, 0.3s transform, 0.3s height;
+	transform: translateX(0);
+
+	&-animate-right {
+		opacity: 0;
+		transition: 0.3s height;
+		transform: translateX(40px);
+	}
+
+	&-animate-left {
+		opacity: 0;
+		transition: 0.3s height;
+		transform: translateX(-40px);
+	}
+}

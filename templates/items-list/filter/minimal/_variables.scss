@@ -1,0 +1,25 @@
+/**
+ * Filter Minimal CSS Variables
+ */
+.vp-filter__style-minimal {
+	// Items.
+	--vp-filter-minimal--items__padding-v: 0.7em;
+	--vp-filter-minimal--items__padding-h: 1em;
+	--vp-filter-minimal--items__font-size: 0.9em;
+	--vp-filter-minimal--items__font-weight: 600;
+	--vp-filter-minimal--items__line-height: 1.4;
+	--vp-filter-minimal--items__text-decoration: none;
+	--vp-filter-minimal--items__text-transform: uppercase;
+	--vp-filter-minimal--items__letter-spacing: 0.015em;
+	--vp-filter-minimal--items__color: inherit;
+	--vp-filter-minimal--items-hover__color: var(--vp-color-brand);
+	--vp-filter-minimal--items-active__color: var(--vp-color-brand);
+
+	// Items Count.
+	--vp-filter-minimal--items-count__offset: 8px;
+	--vp-filter-minimal--items-count__font-size: 0.6em;
+
+	// Transitions.
+	--vp-filter-minimal-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-filter-minimal-transition-easing: var(--vp-interactive__transition-easing);
+}

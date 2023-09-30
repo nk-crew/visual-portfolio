@@ -1,0 +1,254 @@
+@import "./variables";
+
+/**
+ * Default items style
+ */
+.vp-portfolio__items-style-default {
+	.vp-portfolio__item-overlay {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+
+		// Fix FireFox image blinking
+		// https://github.com/nk-crew/visual-portfolio/issues/92
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: var(--vp-items-style-default--overlay__margin);
+		clip-path: inset(0 round var(--vp-items-style-default--overlay__border-radius));
+		color: var(--vp-items-style-default--overlay__color);
+		text-decoration: var(--vp-items-style-default--overlay__text-decoration);
+		background: var(--vp-items-style-default--overlay__background);
+		opacity: 0;
+		transition-timing-function: var(--vp-items-style-default--overlay__transition-easing);
+		transition-duration: var(--vp-items-style-default--overlay__transition-duration);
+		transition-property: opacity, transform;
+	}
+
+	// Caption.
+	.vp-portfolio__item-caption a {
+		color: var(--vp-items-style-default--caption-links__color);
+		text-decoration: var(--vp-items-style-default--caption-links__text-decoration);
+		outline: none;
+		box-shadow: none;
+		transition-timing-function: var(--vp-items-style-default-transition-easing);
+		transition-duration: var(--vp-items-style-default-transition-duration);
+		transition-property: color, opacity, transform;
+
+		&:hover,
+		&:focus {
+			color: var(--vp-items-style-default--caption-links-hover__color);
+		}
+	}
+
+	// Transitions
+	.vp-portfolio__item-img {
+
+		// fix for safari border-radius.
+		// https://github.com/nk-crew/visual-portfolio/issues/150
+		z-index: 0;
+		overflow: hidden;
+		clip-path: inset(0 round var(--vp-items-style-default--image__border-radius));
+		transition-timing-function: var(--vp-items-style-default--image__transition-easing);
+		transition-duration: var(--vp-items-style-default--image__transition-duration);
+		transition-property: clip-path;
+	}
+
+	.vp-portfolio__item-img img {
+		transition-timing-function: var(--vp-items-style-default--image__transition-easing);
+		transition-duration: var(--vp-items-style-default--image__transition-duration);
+		transition-property: opacity, transform;
+		transform: var(--vp-items-style-default--image__transform);
+	}
+
+	.vp-portfolio__item:hover,
+	.vp-portfolio__item-focus-visible {
+		.vp-portfolio__item-img img {
+			transform: var(--vp-items-style-default--image-hover__transform);
+		}
+	}
+
+	// Overlay
+	&.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
+	&.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus-visible {
+		.vp-portfolio__item-overlay {
+			opacity: 1;
+		}
+	}
+
+	&.vp-portfolio__items-show-overlay-default {
+		.vp-portfolio__item-overlay {
+			opacity: 1;
+		}
+
+		.vp-portfolio__item:hover,
+		.vp-portfolio__item-focus-visible {
+			.vp-portfolio__item-overlay {
+				opacity: 0;
+			}
+		}
+	}
+
+	&.vp-portfolio__items-show-overlay-always {
+		.vp-portfolio__item-overlay {
+			opacity: 1;
+		}
+	}
+
+	// fix some themes figcaption styles.
+	figcaption.vp-portfolio__item-caption {
+		font-style: inherit;
+		color: var(--vp-items-style-default--caption__color);
+	}
+
+	// meta
+	.vp-portfolio__item-meta {
+		position: relative;
+		padding: var(--vp-items-style-default--caption__padding);
+
+		> * {
+			margin-top: 0;
+			margin-bottom: var(--vp-items-style-default--caption-items__gap);
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.vp-portfolio__item-meta-icon {
+		font-size: var(--vp-items-style-default--meta-icon__font-size);
+	}
+
+	.vp-portfolio__item-meta-categories {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: var(--vp-items-style-default--meta-categories__gap);
+		max-width: 100%;
+		font-size: var(--vp-items-style-default--meta-categories__font-size);
+		font-weight: var(--vp-items-style-default--meta-categories__font-weight);
+		text-transform: var(--vp-items-style-default--meta-categories__text-transform);
+
+		.vp-portfolio__item-meta-category {
+			display: flex;
+			flex: 0 0 auto;
+			max-width: 100%;
+			opacity: var(--vp-items-style-default--meta-categories__opacity);
+
+			@if variable-exists(rtl) and $rtl {
+				&::before {
+					content: var(--vp-items-style-default--meta-categories__separator);
+				}
+
+				&:first-of-type::before {
+					content: none;
+				}
+			} @else {
+				&::after {
+					content: var(--vp-items-style-default--meta-categories__separator);
+				}
+
+				&:last-of-type::after {
+					content: none;
+				}
+			}
+
+			a {
+				max-width: 100%;
+				text-decoration: var(--vp-items-style-default--meta-categories__text-decoration);
+			}
+		}
+	}
+
+	.vp-portfolio__item-meta-title {
+		margin-right: 0;
+		margin-left: 0;
+		font-size: var(--vp-items-style-default--meta-title__font-size);
+	}
+
+	.vp-portfolio__item-meta-inline {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--vp-items-style-default--meta-inline__gap);
+		align-items: center;
+		justify-content: center;
+		font-weight: var(--vp-items-style-default--meta-inline__font-weight);
+		line-height: var(--vp-items-style-default--meta-inline__line-height);
+
+		> * {
+			opacity: var(--vp-items-style-default--meta-inline__font-opacity);
+		}
+	}
+
+	.vp-portfolio__item-meta-part-icon {
+		margin-right: var(--vp-items-style-default--meta-part-icon__offset);
+	}
+
+	.vp-portfolio__item-meta-author {
+		display: flex;
+		align-items: center;
+
+		img {
+			width: 1em;
+			height: auto;
+			border-radius: 1em;
+		}
+	}
+
+	.vp-portfolio__item-meta-excerpt {
+		line-height: var(--vp-items-style-default--meta-excerpt__line-height);
+		opacity: var(--vp-items-style-default--meta-excerpt__opacity);
+	}
+
+	.vp-portfolio__item-meta-read-more {
+		display: inline-block;
+	}
+
+	// align
+	.vp-portfolio__item-caption-text-align-left {
+		text-align: left;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-start;
+		}
+	}
+
+	.vp-portfolio__item-caption-text-align-center {
+		text-align: center;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: center;
+		}
+	}
+
+	.vp-portfolio__item-caption-text-align-right {
+		text-align: right;
+
+		.vp-portfolio__item-meta-categories,
+		.vp-portfolio__item-meta-inline {
+			justify-content: flex-end;
+		}
+	}
+
+	// Fix for slider image displaying bug.
+	// Image is not displaying properly in the slider when:
+	// - selected Classic items style
+	// - used Dynamic items height in Slider settings
+	// - we should use value at least 0.01px, since on Apple devices it is not working properly
+	[data-vp-layout="slider"] & .vp-portfolio__item-img-wrap {
+		position: relative;
+		padding-top: 0.02px;
+		padding-bottom: 0.02px;
+	}
+
+	// Fix caption width in slider when used automatic slide width.
+	[data-vp-slider-slides-per-view="auto"] & .vp-portfolio__item-caption {
+		width: 0;
+		min-width: 100%;
+	}
+}

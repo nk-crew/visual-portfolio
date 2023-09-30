@@ -1,0 +1,11 @@
+// Fix headings margin.
+.vp-portfolio__item-meta-title {
+	margin-top: 0;
+}
+
+// Fix top and bottom padding of main content in the popup iframe.
+.vp-popup-iframe .wp-site-blocks > main {
+	padding-top: 80px;
+	padding-bottom: 80px;
+	margin-top: 0;
+}

@@ -1,0 +1,21 @@
+.vpf-component-modal {
+	&.vpf-component-modal-size-sm {
+		width: 100%;
+		max-width: 360px;
+	}
+
+	@media (min-width: 600px) {
+		&.vpf-component-modal-size-md {
+			width: 100%;
+			max-width: 600px;
+		}
+	}
+
+	// size
+	@media (min-width: 840px) {
+		&.vpf-component-modal-size-lg {
+			width: 100%;
+			max-width: 800px;
+		}
+	}
+}

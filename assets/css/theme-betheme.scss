@@ -1,0 +1,33 @@
+// Fix popup buttons styles.
+// https://wordpress.org/support/topic/your-plugin-does-not-load-the-css-correctly/
+.vp-pswp {
+	.pswp__button,
+	.pswp__button--arrow--left::before,
+	.pswp__button--arrow--right::before,
+	.pswp__button:hover,
+	.pswp__button--arrow--left:hover::before,
+	.pswp__button--arrow--right:hover::before {
+		padding: 0;
+		background-color: transparent;
+		border: none;
+		border-radius: 0;
+	}
+}
+
+.vp-fancybox {
+	.fancybox-button,
+	.fancybox-button:hover {
+		background-color: rgba(30, 30, 30, 60%);
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+
+		&::after {
+			content: none;
+		}
+	}
+
+	.fancybox-button:not(:hover) {
+		color: #ccc !important;
+	}
+}

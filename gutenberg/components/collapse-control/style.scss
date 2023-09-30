@@ -1,0 +1,49 @@
+.vpf-component-collapse-control {
+	margin-top: 0;
+	margin-top: -10px;
+	margin-right: -16px;
+	margin-bottom: -10px;
+	margin-left: -16px;
+
+	// Toggle.
+	.vpf-component-collapse-control-toggle {
+		display: flex;
+		gap: 6px;
+		width: 100%;
+		padding: 10px 16px;
+		font-weight: 500;
+
+		// Remove default Gutenberg box shadow.
+		&:focus:not(:focus-visible) {
+			box-shadow: none;
+		}
+
+		svg {
+			margin-left: auto;
+		}
+	}
+
+	.vpf-component-collapse-control-active svg {
+		transform: rotate(180deg);
+	}
+
+	// Content.
+	.vpf-component-collapse-control-content {
+		display: none;
+	}
+
+	.vpf-component-collapse-control-content-active {
+		display: block;
+	}
+
+	// Fix panel styles.
+	.components-panel__body {
+		padding-top: 10px;
+		padding-bottom: 10px;
+		border-top: none;
+	}
+
+	.components-panel__body:has(+ .vpf-component-collapse-control-toggle) {
+		padding-bottom: 0;
+	}
+}

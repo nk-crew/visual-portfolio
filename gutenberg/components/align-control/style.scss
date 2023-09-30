@@ -1,0 +1,82 @@
+.vpf-component-align-control {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	max-width: 160px;
+	border: 1px solid #d7dade;
+
+	button {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+		align-items: center;
+		justify-content: center;
+		height: 42px;
+		padding: 10px 16px;
+
+		> span {
+			width: 20px;
+			height: 2px;
+			background-color: #ccc;
+			opacity: 0;
+
+			&:nth-child(1) {
+				width: 12px;
+			}
+
+			&:nth-child(2) {
+				width: 18px;
+			}
+
+			&:nth-child(3) {
+				width: 8px;
+			}
+		}
+
+		&::after {
+			position: absolute;
+			top: calc(50% - 1.5px);
+			left: calc(50% - 1.5px);
+			display: block;
+			width: 3px;
+			height: 3px;
+			content: "";
+			background-color: #ccc;
+		}
+
+		&:hover,
+		&:focus {
+			> span {
+				background-color: #ccc;
+				opacity: 1;
+			}
+
+			&::after {
+				opacity: 0;
+			}
+		}
+
+		&.vpf-component-align-control-active {
+			> span {
+				background-color: var(--wp-admin-theme-color);
+				opacity: 1;
+			}
+
+			&::after {
+				opacity: 0;
+			}
+		}
+
+		&.vpf-component-align-control-left,
+		&.vpf-component-align-control-top-left,
+		&.vpf-component-align-control-bottom-left {
+			align-items: flex-start;
+		}
+
+		&.vpf-component-align-control-right,
+		&.vpf-component-align-control-top-right,
+		&.vpf-component-align-control-bottom-right {
+			align-items: flex-end;
+		}
+	}
+}

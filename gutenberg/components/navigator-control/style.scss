@@ -1,0 +1,68 @@
+.vpf-control-wrap + .vpf-control-wrap-category_navigator {
+	padding-top: 10px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.vpf-control-wrap-category_navigator:has(+ .vpf-control-wrap) {
+	padding-bottom: 4px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.vpf-component-navigator-control {
+	// Fix overflow problem.
+	margin: -16px;
+
+	> .components-navigator-screen {
+		padding: 16px;
+	}
+
+	// Toggle.
+	.vpf-component-navigator-control-toggles > button {
+		display: flex;
+		gap: 6px;
+		width: 100%;
+		padding: 10px 0;
+		font-weight: 500;
+
+		svg {
+			margin-left: auto;
+		}
+
+		// Remove default Gutenberg box shadow.
+		&:focus:not(:focus-visible) {
+			box-shadow: none;
+		}
+	}
+
+	// Screen title.
+	.vpf-component-navigator-control-screen-title {
+		display: flex;
+		align-items: center;
+		font-weight: 500;
+
+		button {
+			padding: 6px;
+			margin-left: -12px;
+
+			// Remove default Gutenberg box shadow.
+			&:focus:not(:focus-visible) {
+				box-shadow: none;
+			}
+		}
+	}
+
+	// Screen content.
+	.components-navigator-screen > .components-panel__body {
+		padding: 16px 0;
+		padding-bottom: 0;
+	}
+
+	// Fix panel padding.
+	.components-panel__body {
+		border-top: none;
+	}
+
+	.components-panel__body:has(+ .vpf-component-collapse-control-toggle) {
+		padding-bottom: 0;
+	}
+}

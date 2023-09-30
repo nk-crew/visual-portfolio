@@ -1,0 +1,29 @@
+/**
+ * Pagination Minimal CSS Variables
+ */
+.vp-pagination__style-minimal {
+	// Items.
+	--vp-pagination-minimal--items__padding-v: 0.7em;
+	--vp-pagination-minimal--items__padding-h: 1em;
+	--vp-pagination-minimal--items__font-size: 0.9em;
+	--vp-pagination-minimal--items__font-weight: 600;
+	--vp-pagination-minimal--items__line-height: 1.4;
+	--vp-pagination-minimal--items__text-decoration: none;
+	--vp-pagination-minimal--items__text-transform: uppercase;
+	--vp-pagination-minimal--items__letter-spacing: 0.015em;
+	--vp-pagination-minimal--items__color: inherit;
+	--vp-pagination-minimal--items-hover__color: var(--vp-color-brand);
+	--vp-pagination-minimal--items-active__color: var(--vp-color-brand);
+
+	// Items Paged.
+	--vp-pagination-minimal-paged--items-active__padding-v: var(--vp-pagination-minimal--items__padding-v);
+	--vp-pagination-minimal-paged--items-active__padding-h: var(--vp-pagination-minimal--items__padding-v);
+	--vp-pagination-minimal-paged--items-active__margin-h: calc(var(--vp-pagination-minimal--items__padding-h) / 3);
+	--vp-pagination-minimal-paged--items-active__color: #fff;
+	--vp-pagination-minimal-paged--items-active__background-color: var(--vp-color-brand);
+	--vp-pagination-minimal-paged--items-active__border-radius: 50%;
+
+	// Transitions.
+	--vp-pagination-minimal-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-pagination-minimal-transition-easing: var(--vp-interactive__transition-easing);
+}

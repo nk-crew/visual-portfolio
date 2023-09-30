@@ -1,0 +1,32 @@
+/**
+ * Editor Styles
+ */
+
+// Placeholder.
+.components-placeholder.vpf-setup-wizard-saved {
+	flex-wrap: wrap;
+
+	.components-placeholder__fieldset {
+		display: block;
+		flex: 0 0 100%;
+		margin-top: 15px;
+	}
+}
+
+// Saved layout selector.
+.vpf-component-layout-select {
+	display: flex;
+
+	.vpf-component-select {
+		flex: 1;
+	}
+
+	.components-button {
+		height: 32px;
+		margin-left: 4px;
+
+		svg {
+			fill: none;
+		}
+	}
+}

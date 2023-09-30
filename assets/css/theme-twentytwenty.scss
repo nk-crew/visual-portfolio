@@ -1,0 +1,56 @@
+// Fix headings margin.
+.entry-content .vp-portfolio__item-meta-title {
+	margin-top: 0;
+}
+
+// Fix caption margin.
+.vp-portfolio__item figcaption {
+	margin-top: 0;
+}
+
+// Fix preview background color.
+.vp-preview-body {
+	background: none;
+}
+
+// Fix font family.
+.vp-filter__item,
+.vp-sort__item,
+.vp-sort select,
+.vp-portfolio__item-meta-category,
+.vp-pagination__item {
+	font-family: "Inter var", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+// Filters, Sort and Pagination.
+.vp-filter__style-default {
+	--vp-filter-default--items__font-size: 0.7em;
+}
+
+.vp-filter__style-minimal {
+	--vp-filter-minimal--items__font-size: 0.7em;
+}
+
+.vp-filter__style-dropdown {
+	--vp-filter-dropdown--items__font-size: 0.7em;
+}
+
+.vp-sort__style-default {
+	--vp-sort-default--items__font-size: 0.7em;
+}
+
+.vp-sort__style-minimal {
+	--vp-sort-minimal--items__font-size: 0.7em;
+}
+
+.vp-sort__style-dropdown {
+	--vp-sort-dropdown--items__font-size: 0.7em;
+}
+
+.vp-pagination__style-default {
+	--vp-pagination-default--items__font-size: 0.7em;
+}
+
+.vp-pagination__style-minimal {
+	--vp-pagination-minimal--items__font-size: 0.7em;
+}

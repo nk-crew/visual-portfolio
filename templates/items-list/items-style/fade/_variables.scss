@@ -1,0 +1,63 @@
+/**
+ * Items Style Fade CSS Variables
+ */
+.vp-portfolio__items-style-fade {
+	// Links.
+	--vp-items-style-fade--links__text-decoration: none;
+
+	// Image.
+	--vp-items-style-fade--image__border-radius: 0;
+	--vp-items-style-fade--image__transform: none;
+	--vp-items-style-fade--image-hover__transform: scale(1.05);
+
+	// Overlay.
+	--vp-items-style-fade--overlay__text-decoration: none;
+	--vp-items-style-fade--overlay__color: #fff;
+	--vp-items-style-fade--overlay__background: #000;
+	--vp-items-style-fade--overlay__border-radius: 0;
+	--vp-items-style-fade--overlay__padding: 2em;
+	--vp-items-style-fade--overlay__margin: 0;
+	--vp-items-style-fade--overlay-items__gap: 1.5em;
+
+	// Meta Icon.
+	--vp-items-style-fade--meta-icon__font-size: 2em;
+
+	// Meta Categories.
+	--vp-items-style-fade--meta-categories__font-size: 0.9em;
+	--vp-items-style-fade--meta-categories__font-weight: 500;
+	--vp-items-style-fade--meta-categories__text-transform: uppercase;
+	--vp-items-style-fade--meta-categories__text-decoration: none;
+	--vp-items-style-fade--meta-categories__opacity: 0.8;
+	--vp-items-style-fade--meta-categories__gap: 0 0.4em;
+	--vp-items-style-fade--meta-categories__separator: ", ";
+
+	// Meta Inline.
+	--vp-items-style-fade--meta-inline__font-weight: 400;
+	--vp-items-style-fade--meta-inline__line-height: 2;
+	--vp-items-style-fade--meta-inline__font-opacity: 0.8;
+	--vp-items-style-fade--meta-inline__gap: 0 1em;
+
+	// Meta Parts.
+	--vp-items-style-fade--meta-part-icon__offset: 0.5em;
+
+	// Meta Title.
+	--vp-items-style-fade--meta-title__font-size: 1.3em;
+
+	// Meta Excerpt.
+	--vp-items-style-fade--meta-excerpt__line-height: 1.5;
+	--vp-items-style-fade--meta-excerpt__opacity: 0.8;
+
+	// Meta Staggering Animation.
+	--vp-items-style-fade--meta-staggering__index: 1;
+	--vp-items-style-fade--meta-staggering__transition-duration: 0.25s;
+	--vp-items-style-fade--meta-staggering__transition-delay: 0.07s;
+	--vp-items-style-fade--meta-staggering__transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+	// Transitions.
+	--vp-items-style-fade-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-items-style-fade-transition-easing: var(--vp-interactive__transition-easing);
+	--vp-items-style-fade--image__transition-duration: var(--vp-items-style-fade-transition-duration);
+	--vp-items-style-fade--image__transition-easing: var(--vp-items-style-fade-transition-easing);
+	--vp-items-style-fade--overlay__transition-duration: var(--vp-items-style-fade-transition-duration);
+	--vp-items-style-fade--overlay__transition-easing: var(--vp-items-style-fade-transition-easing);
+}

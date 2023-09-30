@@ -1,0 +1,61 @@
+/**
+ * Items Style Default CSS Variables
+ */
+.vp-portfolio__items-style-default {
+	// Image.
+	--vp-items-style-default--image__border-radius: 0;
+	--vp-items-style-default--image-transform: none;
+	--vp-items-style-default--image-hover__transform: scale(1.05);
+
+	// Caption.
+	--vp-items-style-default--caption__color: inherit;
+	--vp-items-style-default--caption__padding: 1.5em 2em;
+	--vp-items-style-default--caption-items__gap: 1.5em;
+
+	// Caption links.
+	--vp-items-style-default--caption-links__color: inherit;
+	--vp-items-style-default--caption-links__text-decoration: none;
+	--vp-items-style-default--caption-links-hover__color: var(--vp-color-brand);
+
+	// Overlay.
+	--vp-items-style-default--overlay__color: #fff;
+	--vp-items-style-default--overlay__background: rgba(0, 0, 0, 20%);
+	--vp-items-style-default--overlay__border-radius: 0;
+	--vp-items-style-default--overlay__margin: 0;
+
+	// Meta Icon.
+	--vp-items-style-default--meta-icon__font-size: 2em;
+
+	// Meta Categories.
+	--vp-items-style-default--meta-categories__font-size: 0.9em;
+	--vp-items-style-default--meta-categories__font-weight: 500;
+	--vp-items-style-default--meta-categories__text-transform: uppercase;
+	--vp-items-style-default--meta-categories__text-decoration: none;
+	--vp-items-style-default--meta-categories__opacity: 0.8;
+	--vp-items-style-default--meta-categories__gap: 0 0.4em;
+	--vp-items-style-default--meta-categories__separator: ", ";
+
+	// Meta Inline.
+	--vp-items-style-default--meta-inline__font-weight: 400;
+	--vp-items-style-default--meta-inline__line-height: 2;
+	--vp-items-style-default--meta-inline__font-opacity: 0.8;
+	--vp-items-style-default--meta-inline__gap: 0 1em;
+
+	// Meta Parts.
+	--vp-items-style-default--meta-part-icon__offset: 0.5em;
+
+	// Meta Title.
+	--vp-items-style-default--meta-title__font-size: 1.3em;
+
+	// Meta Excerpt.
+	--vp-items-style-default--meta-excerpt__line-height: 1.5;
+	--vp-items-style-default--meta-excerpt__opacity: 0.8;
+
+	// Transitions.
+	--vp-items-style-default-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-items-style-default-transition-easing: var(--vp-interactive__transition-easing);
+	--vp-items-style-default--image__transition-duration: var(--vp-items-style-default-transition-duration);
+	--vp-items-style-default--image__transition-easing: var(--vp-items-style-default-transition-easing);
+	--vp-items-style-default--overlay__transition-duration: var(--vp-items-style-default-transition-duration);
+	--vp-items-style-default--overlay__transition-easing: var(--vp-items-style-default-transition-easing);
+}

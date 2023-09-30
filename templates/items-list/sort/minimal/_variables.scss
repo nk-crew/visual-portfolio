@@ -1,0 +1,25 @@
+/**
+ * Sort Minimal CSS Variables
+ */
+.vp-sort__style-minimal {
+	// Items.
+	--vp-sort-minimal--items__padding-v: 0.7em;
+	--vp-sort-minimal--items__padding-h: 1em;
+	--vp-sort-minimal--items__font-size: 0.9em;
+	--vp-sort-minimal--items__font-weight: 600;
+	--vp-sort-minimal--items__line-height: 1.4;
+	--vp-sort-minimal--items__text-decoration: none;
+	--vp-sort-minimal--items__text-transform: uppercase;
+	--vp-sort-minimal--items__letter-spacing: 0.015em;
+	--vp-sort-minimal--items__color: inherit;
+	--vp-sort-minimal--items-hover__color: var(--vp-color-brand);
+	--vp-sort-minimal--items-active__color: var(--vp-color-brand);
+
+	// Items Count.
+	--vp-sort-minimal--items-count__offset: 8px;
+	--vp-sort-minimal--items-count__font-size: 0.6em;
+
+	// Transitions.
+	--vp-sort-minimal-transition-duration: var(--vp-interactive__transition-duration);
+	--vp-sort-minimal-transition-easing: var(--vp-interactive__transition-easing);
+}

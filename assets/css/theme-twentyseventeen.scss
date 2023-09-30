@@ -1,0 +1,30 @@
+// Fix links border.
+.entry-content .vp-portfolio {
+	a,
+	a:hover,
+	a:focus {
+		box-shadow: none;
+	}
+}
+
+// Fix headings padding and font.
+.entry-content .vp-portfolio__item-meta-title {
+	padding-top: 0;
+	font-family: "Libre Franklin", "Helvetica Neue", helvetica, arial, sans-serif;
+	font-weight: 600;
+}
+
+// Fix for figcaption in block.
+.wp-block-visual-portfolio[class^="wp-block-"]:not(.wp-block-gallery) figcaption {
+	margin-bottom: 0;
+	font-style: inherit;
+	text-align: center;
+}
+
+// Fix color on hover.
+.vp-portfolio__items-style-fade .vp-portfolio__item-meta:hover,
+.vp-portfolio__items-style-fade .vp-portfolio__item-meta:focus,
+.vp-portfolio__items-style-fly .vp-portfolio__item-meta:hover,
+.vp-portfolio__items-style-fly .vp-portfolio__item-meta:focus {
+	color: inherit;
+}

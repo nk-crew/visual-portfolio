@@ -1,0 +1,23 @@
+// Fix links decoration.
+.entry .entry-content .vp-portfolio a {
+	text-decoration: none;
+}
+
+// Fix headings margin.
+.entry-content .vp-portfolio__item-meta-title {
+	margin-top: 0;
+}
+
+// Fix headings decorators.
+.vp-portfolio__item-meta-title::before {
+	content: none;
+}
+
+// Fix font family.
+.vp-filter__item,
+.vp-sort__item,
+.vp-sort select,
+.vp-portfolio__item-meta-category,
+.vp-pagination__item {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}

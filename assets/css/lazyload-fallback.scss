@@ -1,0 +1,32 @@
+/*
+ * Visual Portfolio Lazyload Images fallback for old browsers
+ * which does not support CSS :has()
+ */
+:is(.vp-portfolio__item-img, .vp-portfolio__thumbnail-img) {
+	// Extra check for lazy loading class on the inner image
+	// to make sure image will be lazy loaded by Visual Portfolio.
+	&:is(.vp-has-lazyload, .vp-has-lazyloading, .vp-has-lazyloaded)::before {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		// Fixed possible bug with inaccessible links on images in the Classic style.
+		pointer-events: none;
+		visibility: visible;
+		content: "";
+		background-image: var(--vp-lazyload-images__background);
+		background-size: var(--vp-lazyload-images__background-size);
+		opacity: 1;
+		transition: var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) opacity, var(--vp-lazyload-transition-duration) var(--vp-lazyload-transition-duration) visibility;
+	}
+
+	&:is(.vp-has-lazyloading)::before {
+		animation: vp-lazyload-placeholder var(--vp-lazyload-images__animation-duration) linear infinite;
+	}
+
+	&:is(.vp-has-lazyloaded)::before {
+		visibility: hidden;
+		opacity: 0;
+	}
+}

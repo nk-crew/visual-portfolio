@@ -1,0 +1,45 @@
+.visual-portfolio-gutenberg-preview {
+	position: relative;
+	min-height: 40px;
+	overflow: hidden;
+
+	iframe {
+		position: absolute;
+		width: 100%;
+		max-width: none !important;
+		margin: 0;
+	}
+}
+
+// Loading.
+.visual-portfolio-gutenberg-preview-loading {
+	min-height: 150px;
+
+	&::after {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		display: block;
+		content: "";
+		background-color: rgba(139, 139, 150, 10%);
+	}
+
+	iframe {
+		opacity: 0;
+	}
+
+	> .visual-portfolio-gutenberg-preview-inner {
+		position: absolute;
+	}
+
+	> .components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		z-index: 10;
+		margin: 0;
+		transform: translateX(-50%) translateY(-50%);
+	}
+}
