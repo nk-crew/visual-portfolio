@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-const { basename, dirname, resolve } = require('path');
+const path = require('path');
 
 const glob = require('glob');
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
@@ -139,7 +139,7 @@ const entryAssetsJs = glob
 	])
 	.reduce(function (entries, entry) {
 		const name = entry.replace('.js', '');
-		entries[name] = resolve(process.cwd(), entry);
+		entries[name] = path.resolve(process.cwd(), entry);
 		return entries;
 	}, {});
 
@@ -154,13 +154,16 @@ const entryAssetsCss = glob
 		'./gutenberg/style.scss',
 		'./gutenberg/layouts-editor-style.scss',
 	])
+	.filter((entry) => {
+		const filename = path.basename(entry);
+
+		// Exclude file names started with _
+		return !/^_/.test(filename);
+	})
 	.reduce(function (entries, entry) {
 		const name = entry.replace('.scss', '');
-		const matchForExclude = /\/_\S+/g.exec(name);
 
-		if (matchForExclude === null) {
-			entries[name] = resolve(process.cwd(), entry);
-		}
+		entries[name] = path.resolve(process.cwd(), entry);
 
 		return entries;
 	}, {});
@@ -194,11 +197,11 @@ const newConfig = {
 					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
 					transform(content, absoluteFrom) {
-						const convertExtension = (path) => {
-							return path.replace(/\.(j|t)sx?$/, '.js');
+						const convertExtension = (p) => {
+							return p.replace(/\.(j|t)sx?$/, '.js');
 						};
 
-						if (basename(absoluteFrom) === 'block.json') {
+						if (path.basename(absoluteFrom) === 'block.json') {
 							const blockJson = JSON.parse(content.toString());
 							['viewScript', 'script', 'editorScript'].forEach(
 								(key) => {
@@ -277,9 +280,9 @@ const newConfig = {
 					name(_, chunks, cacheGroupKey) {
 						const chunkName =
 							chunks[chunks.length > 1 ? 1 : 0].name;
-						let cssOutput = `${dirname(
+						let cssOutput = `${path.dirname(
 							chunkName
-						)}/${cacheGroupKey}-${basename(chunkName)}`;
+						)}/${cacheGroupKey}-${path.basename(chunkName)}`;
 
 						if (
 							(chunkName.indexOf('templates/') > -1 ||
@@ -287,18 +290,18 @@ const newConfig = {
 								chunkName.indexOf('gutenberg/') > -1) &&
 							cacheGroupKey === 'style'
 						) {
-							cssOutput = `${dirname(chunkName)}/${basename(
+							cssOutput = `${path.dirname(
 								chunkName
-							)}`;
+							)}/${path.basename(chunkName)}`;
 						}
 
 						if (
 							chunkName.indexOf('layouts-editor') > -1 &&
 							cacheGroupKey === 'style'
 						) {
-							cssOutput = `${dirname(
+							cssOutput = `${path.dirname(
 								chunkName
-							)}/${cacheGroupKey}-${basename(chunkName)}`;
+							)}/${cacheGroupKey}-${path.basename(chunkName)}`;
 						}
 						return cssOutput;
 					},
