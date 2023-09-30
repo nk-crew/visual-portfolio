@@ -1,9 +1,5 @@
 name: Deploy to WordPress.org
 
-env:
-  COMPOSER_VERSION: '2'
-  COMPOSER_CACHE: '${{ github.workspace }}/.composer-cache'
-
 on:
   workflow_dispatch:
   push:
@@ -14,38 +10,24 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set Cache Directories
-        run: |
-          composer config -g cache-dir "${{ env.COMPOSER_CACHE }}"
-
-      - name: Prepare Composer Cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.COMPOSER_CACHE }}
-          key: composer-${{ env.COMPOSER_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-${{ env.COMPOSER_VERSION }}-
-
-      - name: Set PHP Version
+      - name: Disable xDebug - fixes PHP Fatal Error for `i18n make-pot`
         uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
           coverage: none
-          tools: composer:v2
 
       - name: Setup Node.js and install dependencies
         uses: ./.github/setup-node
 
       - name: Run Production Task
-        run: npm run production
+        run: npm run build:prod
 
       - name: WordPress Plugin Deploy
         uses: nk-o/action-wordpress-plugin-deploy@master
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-          SOURCE_DIR: dist/visual-portfolio/
+          SOURCE_DIR: dist-zip/visual-portfolio/
           SLUG: visual-portfolio
