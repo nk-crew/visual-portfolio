@@ -9,63 +9,33 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 import { Component } from '@wordpress/element';
 
-import { PanelRow, FocalPointPicker } from '@wordpress/components';
-
 import { addFilter } from '@wordpress/hooks';
+
+import {
+	PanelRow,
+	UnitControl as __stableUnitControl,
+	__experimentalUnitControl,
+} from '@wordpress/components';
+
+const UnitControl = __stableUnitControl || __experimentalUnitControl;
 
 /**
  * Component
  */
 class VpImageFocalPointComponent extends Component {
 	render() {
-		const { getMeta, thumbnailData, updateMeta } = this.props;
+		const { getMeta, featuredImageId, updateMeta } = this.props;
 
-		let previewUrl = '';
-
-		if (thumbnailData) {
-			const mediaSize = 'post-thumbnail';
-
-			previewUrl = thumbnailData.source_url;
-
-			if (
-				!thumbnailData.mime_type ||
-				thumbnailData.mime_type !== 'image/gif'
-			) {
-				if (
-					thumbnailData.media_details &&
-					thumbnailData.media_details.sizes &&
-					thumbnailData.media_details.sizes[mediaSize]
-				) {
-					// use mediaSize when available
-					previewUrl =
-						thumbnailData.media_details.sizes[mediaSize].source_url;
-				} else {
-					// get fallbackMediaSize if mediaSize is not available
-					const fallbackMediaSize = 'thumbnail';
-
-					if (
-						thumbnailData.media_details &&
-						thumbnailData.media_details.sizes &&
-						thumbnailData.media_details.sizes[fallbackMediaSize]
-					) {
-						// use fallbackMediaSize when mediaSize is not available
-						previewUrl =
-							thumbnailData.media_details.sizes[fallbackMediaSize]
-								.source_url;
-					}
-				}
-			}
-		}
-
-		if (!previewUrl) {
+		if (!featuredImageId) {
 			return null;
 		}
 
 		let focalPoint = getMeta('_vp_image_focal_point');
+
 		if (!focalPoint || !focalPoint.x || !focalPoint.y) {
 			focalPoint = {
-				x: '0.5',
-				y: '0.5',
+				x: 0.5,
+				y: 0.5,
 			};
 		}
 
@@ -74,18 +44,39 @@ class VpImageFocalPointComponent extends Component {
 				<PanelRow>
 					<p className="description">
 						{__(
-							'Focal point will be used in Visual Portfolio layouts only.',
+							'Focal point will be used in Visual Portfolio layouts only:',
 							'visual-portfolio'
 						)}
 					</p>
 				</PanelRow>
 				<PanelRow>
-					<FocalPointPicker
-						url={previewUrl}
-						value={focalPoint}
+					<UnitControl
+						label={__('Left', 'visual-portfolio')}
+						value={100 * focalPoint.x + '%'}
 						onChange={(val) => {
-							updateMeta('_vp_image_focal_point', val);
+							const newFocalPoint = { ...focalPoint };
+							newFocalPoint.x = parseFloat(val) / 100;
+
+							updateMeta('_vp_image_focal_point', newFocalPoint);
 						}}
+						min={0}
+						max={100}
+						step={1}
+						units={[{ value: '%', label: '%' }]}
+					/>
+					<UnitControl
+						label={__('Top', 'visual-portfolio')}
+						value={100 * focalPoint.y + '%'}
+						onChange={(val) => {
+							const newFocalPoint = { ...focalPoint };
+							newFocalPoint.y = parseFloat(val) / 100;
+
+							updateMeta('_vp_image_focal_point', newFocalPoint);
+						}}
+						min={0}
+						max={100}
+						step={1}
+						units={[{ value: '%', label: '%' }]}
 					/>
 				</PanelRow>
 			</div>
@@ -97,16 +88,11 @@ const VpImageFocalPoint = compose([
 	withSelect((select) => {
 		const { getEditedPostAttribute } = select('core/editor');
 
-		const { getMedia } = select('core');
-
 		const featuredImageId = getEditedPostAttribute('featured_media');
 		const meta = getEditedPostAttribute('meta') || {};
-		const thumbnailData = featuredImageId
-			? getMedia(featuredImageId)
-			: null;
 
 		return {
-			thumbnailData,
+			featuredImageId,
 			getMeta(name) {
 				return meta[name];
 			},
@@ -127,8 +113,8 @@ addFilter(
 		function (props) {
 			return (
 				<>
-					<VpImageFocalPoint />
 					<OriginalComponent {...props} />
+					<VpImageFocalPoint />
 				</>
 			);
 		}

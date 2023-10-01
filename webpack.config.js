@@ -170,17 +170,16 @@ const entryAssetsCss = glob
 
 const newConfig = {
 	...defaultConfig,
-	...{
-		entry: {
-			// Assets JS.
-			...entryAssetsJs,
-			// Assets CSS.
-			...entryAssetsCss,
-		},
-
-		// Display minimum info in terminal.
-		stats: 'minimal',
+	entry: {
+		// Assets JS.
+		...entryAssetsJs,
+		// Assets CSS.
+		...entryAssetsCss,
 	},
+
+	// Display minimum info in terminal.
+	stats: 'minimal',
+
 	module: {
 		...defaultConfig.module,
 		rules: [...defaultConfig.module.rules],

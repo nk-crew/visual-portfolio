@@ -3,7 +3,7 @@
 * Contributors: nko
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
 * Donate link: https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
-* Requires at least: 6.0
+* Requires at least: 6.2
 * Tested up to: 6.3
 * Requires PHP: 7.2
 * Stable tag: 3.1.3
