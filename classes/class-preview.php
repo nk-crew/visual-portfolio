@@ -38,6 +38,8 @@ class Visual_Portfolio_Preview {
 		add_action( 'template_redirect', array( $this, 'template_redirect' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 11 );
 
+		// Localize script in editor, FSE, and Elementor.
+		add_action( 'enqueue_block_assets', array( $this, 'localize_scripts' ), 9 );
 		add_action( 'wp_print_scripts', array( $this, 'localize_scripts' ), 9 );
 	}
 
@@ -82,6 +84,10 @@ class Visual_Portfolio_Preview {
 	 * Localize scripts with preview URL.
 	 */
 	public function localize_scripts() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
 		$preview_url = $this->get_preview_url();
 
 		// Localize scripts.
