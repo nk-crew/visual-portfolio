@@ -270,19 +270,14 @@ $escaped-svg-characters: (
  * Post featured image focal point meta.
  */
 .vpf-post-image-focal-point-panel {
-	.components-focal-point-picker_position-display-container {
-		.components-base-control__label {
-			max-width: 100%;
-		}
+	margin-top: 20px;
 
-		.components-base-control {
-			margin-bottom: 0;
-		}
+	> .components-panel__row {
+		gap: 15px;
 	}
 
-	// hide default image preview.
-	~ .editor-post-featured-image .editor-post-featured-image__preview {
-		display: none;
+	.components-input-control {
+		flex: 1;
 	}
 }
 
