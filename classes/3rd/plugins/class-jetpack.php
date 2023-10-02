@@ -34,7 +34,7 @@ class Visual_Portfolio_3rd_Jetpack {
 			return;
 		}
 
-		Visual_Portfolio_Assets::register_script( 'visual-portfolio-3rd-jetpack', 'assets/js/3rd/plugin-jetpack.min', array( 'jquery' ) );
+		Visual_Portfolio_Assets::register_script( 'visual-portfolio-3rd-jetpack', 'build/assets/js/3rd/plugin-jetpack', array( 'jquery' ) );
 
 		$wp_scripts->registered[ $jetpack_ll_handler ]->deps[] = 'visual-portfolio-3rd-jetpack';
 	}

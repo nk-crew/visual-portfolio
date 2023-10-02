@@ -27,6 +27,9 @@ $(document).on('loadedNewItems.vpf', function (event) {
 });
 
 // Fix masonry reloading when Jetpack images lazy loaded.
+// https://github.com/Automattic/jetpack/issues/9595
+//
+// p.s. it looks like this fix is not working at all in Safari browser.
 const runReLayout = debounce(200, ($gallery) => {
 	$gallery.vpf('imagesLoaded');
 });
