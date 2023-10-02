@@ -93,6 +93,17 @@ class ClassImages extends WP_UnitTestCase {
                 $image_string
             )
         );
+
+		// When srcset exists, but it is empty.
+        $image_string = '<img loading="lazy" src="image.jpg" srcset alt="Test Image" width="10" height="10">';
+        $lazy_string  = '<img loading="eager" src="' . $placeholder . '" srcset alt="Test Image" width="10" height="10" data-src="image.jpg" data-sizes="auto" class="vp-lazyload">';
+
+        $this->assertEquals(
+            $this->get_noscript_image( $image_string ) . $lazy_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            )
+        );
     }
 
     /**
