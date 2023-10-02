@@ -437,7 +437,7 @@ class Visual_Portfolio_Images {
 
 		$attributes['data-src'] = $attributes['src'];
 
-		if ( isset( $attributes['srcset'] ) ) {
+		if ( ! empty( $attributes['srcset'] ) ) {
 			$attributes['data-srcset'] = $attributes['srcset'];
 
 			if ( $placeholder ) {
