@@ -3607,6 +3607,22 @@ selector p {
 			'icon'  => '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.7678 0.91749L10.7678 0.917496L10.7707 0.919154L17.7678 4.91831C17.7682 4.91856 17.7687 4.91882 17.7691 4.91907C17.9584 5.02866 18.1156 5.186 18.225 5.37541C18.3347 5.56526 18.3926 5.78064 18.3929 5.99995V14.0001C18.3926 14.2194 18.3347 14.4347 18.225 14.6246C18.1156 14.814 17.9583 14.9714 17.769 15.081C17.7686 15.0812 17.7682 15.0814 17.7678 15.0817L10.7707 19.0808L10.7678 19.0825C10.5778 19.1922 10.3622 19.25 10.1429 19.25C9.92346 19.25 9.70793 19.1922 9.51791 19.0825L9.51501 19.0808L2.51791 15.0817C2.5175 15.0814 2.51708 15.0812 2.51667 15.081C2.32739 14.9714 2.17015 14.814 2.06067 14.6246C1.95102 14.4348 1.89314 14.2196 1.89285 14.0004V5.99959C1.89314 5.78041 1.95102 5.56516 2.06067 5.37541C2.17014 5.186 2.32736 5.02865 2.5166 4.91907C2.51704 4.91881 2.51747 4.91856 2.51791 4.91831L9.51501 0.919154L9.51502 0.91916L9.51791 0.91749C9.70793 0.807761 9.92346 0.75 10.1429 0.75C10.3622 0.75 10.5778 0.807761 10.7678 0.91749Z" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1449 18.9286V9.42857" stroke="currentColor" stroke-width="1.5" fill="transparent" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.1159 4.78261L10.1449 9.42029L2.02899 4.78261" stroke="currentColor" stroke-width="1.5" fill="transparent"/></svg>',
 		);
 
+		$post_types_selector = array_merge(
+			$post_types_selector,
+			// phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Squiz.Commenting.BlockComment.NoEmptyLineBefore
+			/*
+			 * Example:
+				array(
+					'new_post_source' => array(
+						'value' => 'new_post_source',
+						'title' => esc_html__( 'New Post Source', 'visual-portfolio' ),
+						'icon'  => '',
+					),
+				)
+			 */
+			apply_filters( 'vpf_extend_posts_source', array() )
+		);
+
 		return array(
 			'options' => $post_types_selector,
 		);
