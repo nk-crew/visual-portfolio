@@ -4,6 +4,7 @@ import './live-reload-conditions';
 import classnames from 'classnames/dedupe';
 import iframeResizer from 'iframe-resizer/js/iframeResizer';
 import $ from 'jquery';
+import { isEqual, uniq } from 'lodash';
 import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
@@ -18,7 +19,6 @@ const {
 	VPAdminGutenbergVariables: variables,
 	VPGutenbergVariables: { controls: registeredControls },
 } = window;
-const { isEqual, uniq } = window._;
 
 let uniqueIdCount = 1;
 
