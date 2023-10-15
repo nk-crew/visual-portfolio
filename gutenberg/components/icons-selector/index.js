@@ -1,19 +1,11 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
 import $ from 'jquery';
 
-/**
- * WordPress dependencies
- */
-const { ajaxurl, VPGutenbergVariables } = window;
-
+import { Button, Spinner } from '@wordpress/components';
+import { Component, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { Component, RawHTML } from '@wordpress/element';
-
-import { Button, Spinner } from '@wordpress/components';
+const { ajaxurl, VPGutenbergVariables } = window;
 
 const cachedOptions = {};
 

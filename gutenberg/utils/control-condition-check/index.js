@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import controlGetValue from '../control-get-value';
 
 /**

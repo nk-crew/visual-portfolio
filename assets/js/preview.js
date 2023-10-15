@@ -1,7 +1,3 @@
-/*!
- * Name    : Visual Portfolio
- * Author  : nK https://nkdev.info
- */
 import $ from 'jquery';
 
 const $body = $('body');

@@ -1,12 +1,7 @@
-/*
- * Visual Portfolio plugin Fancybox extension.
- */
 import $ from 'jquery';
 
 const { VPData, VPPopupAPI } = window;
-
 const { __, settingsPopupGallery } = VPData;
-
 const $doc = $(document);
 const $window = $(window);
 

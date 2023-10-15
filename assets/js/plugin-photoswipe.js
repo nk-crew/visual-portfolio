@@ -1,12 +1,6 @@
-/*
- * External dependencies.
- */
 import isNumber from 'is-number';
 import $ from 'jquery';
 
-/*
- * Visual Portfolio plugin Photoswipe extension.
- */
 const {
 	Image,
 	VPData,
@@ -14,7 +8,6 @@ const {
 	PhotoSwipe,
 	PhotoSwipeUI_Default: PhotoSwipeUIDefault,
 } = window;
-
 const { __, settingsPopupGallery } = VPData;
 
 function resizeVideo(data, curItem) {

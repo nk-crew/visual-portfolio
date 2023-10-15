@@ -1,15 +1,8 @@
-/*!
- * Additional js for Elementor
- *
- * Name    : Visual Portfolio
- * Author  : nK https://nkdev.info
- */
 import $ from 'jquery';
-import { throttle } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
+import { throttle } from 'throttle-debounce';
 
 const { elementorFrontend, VPAdminElementorVariables: variables } = window;
-
 const $wnd = $(window);
 
 $wnd.on('elementor/frontend/init', ($data) => {

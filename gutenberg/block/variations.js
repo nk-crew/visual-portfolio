@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { RawHTML } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
 const { controls: registeredControls } = window.VPGutenbergVariables;
 
 export default Object.keys(registeredControls.layout.options).map((name) => {

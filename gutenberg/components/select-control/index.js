@@ -1,33 +1,23 @@
-/**
- * External dependencies
- */
-import { debounce } from 'throttle-debounce';
+import selectStyles from 'gutenberg-react-select-styles';
+import $ from 'jquery';
 import rafSchd from 'raf-schd';
 import Select, { components } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import CreatableSelect from 'react-select/creatable';
-import selectStyles from 'gutenberg-react-select-styles';
 import {
 	SortableContainer,
 	SortableElement,
 	sortableHandle,
 } from 'react-sortable-hoc';
-import $ from 'jquery';
+import { debounce } from 'throttle-debounce';
+
+import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 const { Option } = components;
 
-/**
- * WordPress dependencies
- */
 const { ajaxurl, VPGutenbergVariables } = window;
 
-import { __ } from '@wordpress/i18n';
-
-import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 const cachedOptions = {};
 
 const SortableSelect = SortableContainer(Select);

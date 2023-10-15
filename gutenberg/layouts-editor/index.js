@@ -1,38 +1,20 @@
-/**
- * External dependencies
- */
-import $ from 'jquery';
-
-/**
- * Internal dependencies
- */
 import '../store';
 import './store';
 
-import BlockEdit from '../block/edit';
-
-/**
- * WordPress dependencies
- */
-import { registerBlockType, createBlock } from '@wordpress/blocks';
-
-import { registerPlugin } from '@wordpress/plugins';
-
-import { __, sprintf } from '@wordpress/i18n';
+import $ from 'jquery';
 
 import apiFetch from '@wordpress/api-fetch';
-
-import { applyFilters } from '@wordpress/hooks';
-
-import { Component, useState } from '@wordpress/element';
-
-import { PanelBody, Button } from '@wordpress/components';
-
-import { withSelect, withDispatch } from '@wordpress/data';
-
 import { InspectorControls } from '@wordpress/block-editor';
-
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import { Button, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { Component, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
+import { __, sprintf } from '@wordpress/i18n';
+import { registerPlugin } from '@wordpress/plugins';
+
+import BlockEdit from '../block/edit';
 
 const { navigator, VPGutenbergVariables } = window;
 

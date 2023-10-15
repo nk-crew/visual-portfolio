@@ -1,6 +1,3 @@
-/*
- * Minimal Paged pagination.
- */
 import $ from 'jquery';
 
 const { ResizeObserver } = window;

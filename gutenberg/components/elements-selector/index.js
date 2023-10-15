@@ -1,29 +1,18 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
 
-/**
- * Internal dependencies
- */
-import ControlsRender from '../controls-render';
-
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-import { Component, useState } from '@wordpress/element';
-
 import {
-	PanelBody,
 	Button,
-	DropdownMenu,
 	Dropdown,
+	DropdownMenu,
 	Modal,
+	PanelBody,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
+import { Component, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+import ControlsRender from '../controls-render';
 
 const alignIcons = {
 	left: (

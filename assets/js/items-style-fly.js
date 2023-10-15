@@ -1,6 +1,3 @@
-/*
- * Visual Portfolio items style Fly.
- */
 import $ from 'jquery';
 
 const $wnd = $(window);

@@ -1,6 +1,3 @@
-/*
- * Visual Portfolio layout Grid.
- */
 import $ from 'jquery';
 
 const { screenSizes } = window.VPData;

@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import { request } from '@playwright/test';
 
-/**
- * WordPress dependencies
- */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 async function globalSetup(config) {

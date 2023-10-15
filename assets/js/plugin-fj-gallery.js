@@ -1,6 +1,3 @@
-/*
- * Visual Portfolio plugin fjGallery extension.
- */
 import $ from 'jquery';
 
 // Extend VP class.

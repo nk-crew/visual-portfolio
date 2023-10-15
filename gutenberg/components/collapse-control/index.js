@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
 
-/**
- * WordPress dependencies
- */
-import { Fragment, useState } from '@wordpress/element';
-
 import { Button } from '@wordpress/components';
+import { Fragment, useState } from '@wordpress/element';
 
 /**
  * Component Class

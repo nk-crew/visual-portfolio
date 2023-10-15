@@ -1,9 +1,6 @@
-/*
- * Visual Portfolio custom scrollbar extension.
- */
 import $ from 'jquery';
-const { SimpleBar, navigator } = window;
 
+const { SimpleBar, navigator } = window;
 const $doc = $(document);
 
 // Don't run on Mac and mobile devices.

@@ -1,6 +1,3 @@
-/*
- * Visual Portfolio layout Tiles.
- */
 import $ from 'jquery';
 
 const { screenSizes } = window.VPData;

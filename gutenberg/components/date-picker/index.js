@@ -1,16 +1,10 @@
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
-
-import { __ } from '@wordpress/i18n';
-
+import { Button, DatePicker, Dropdown } from '@wordpress/components';
 import {
 	__experimentalGetSettings as getSettings,
 	dateI18n,
 } from '@wordpress/date';
-
-import { Dropdown, Button, DatePicker } from '@wordpress/components';
+import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Component Class

@@ -1,21 +1,13 @@
-/**
- * WordPress Dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-import { withInstanceId, compose } from '@wordpress/compose';
-
-import { withSelect, withDispatch } from '@wordpress/data';
-
-import { Component } from '@wordpress/element';
-
-import { addFilter } from '@wordpress/hooks';
-
 import {
+	__experimentalUnitControl,
 	PanelRow,
 	UnitControl as __stableUnitControl,
-	__experimentalUnitControl,
 } from '@wordpress/components';
+import { compose, withInstanceId } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { Component } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
 
 const UnitControl = __stableUnitControl || __experimentalUnitControl;
 

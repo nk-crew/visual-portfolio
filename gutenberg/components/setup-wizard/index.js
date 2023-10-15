@@ -1,18 +1,9 @@
-/**
- * Internal dependencies
- */
-import ControlsRender from '../controls-render';
-
-import StepsWizard from './steps-wizard';
-
-/**
- * WordPress dependencies
- */
+import { Button, ToggleControl } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
-
 import { __ } from '@wordpress/i18n';
 
-import { ToggleControl, Button } from '@wordpress/components';
+import ControlsRender from '../controls-render';
+import StepsWizard from './steps-wizard';
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 

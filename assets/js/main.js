@@ -1,17 +1,9 @@
-/*
- * Visual Portfolio main script.
- */
-import { throttle } from 'throttle-debounce';
-import rafSchd from 'raf-schd';
 import $ from 'jquery';
+import rafSchd from 'raf-schd';
+import { throttle } from 'throttle-debounce';
 
-/**
- * Global Variables
- */
 const { VPData } = window;
-
 const { __ } = VPData;
-
 const $wnd = $(window);
 
 /**

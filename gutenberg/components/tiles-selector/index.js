@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
 import Masonry from 'react-masonry-component';
 
-/**
- * Internal dependencies
- */
-import StylesRender from '../styles-render';
-import ToggleModal from '../toggle-modal';
-
-/**
- * WordPress dependencies
- */
+import { Button } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { Component } from '@wordpress/element';
-
-import { Button } from '@wordpress/components';
+import StylesRender from '../styles-render';
+import ToggleModal from '../toggle-modal';
 
 /**
  * Component Class

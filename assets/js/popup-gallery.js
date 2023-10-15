@@ -1,12 +1,7 @@
-/*
- * Popup gallery with global API.
- */
 import $ from 'jquery';
 
 const { VPData } = window;
-
 const { settingsPopupGallery } = VPData;
-
 const templatesSupport = 'content' in document.createElement('template');
 
 /*

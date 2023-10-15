@@ -1,7 +1,3 @@
-/*!
- * Name    : Visual Portfolio
- * Author  : nK https://nkdev.info
- */
 const { tinymce, VPTinyMCEData } = window;
 
 if (typeof VPTinyMCEData !== 'undefined' && VPTinyMCEData.layouts.length) {

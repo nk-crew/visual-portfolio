@@ -1,7 +1,6 @@
 import $ from 'jquery';
 
 const { ajaxurl, VPAskReviewNotice } = window;
-
 const $body = $('body');
 
 $body.on('click', '.vpf-review-plugin-notice-dismiss', function (e) {

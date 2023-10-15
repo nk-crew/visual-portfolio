@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 
 const { navigator } = window;

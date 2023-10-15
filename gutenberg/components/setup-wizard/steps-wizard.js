@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
-//import { throttle } from '@wordpress/compose';
 import { throttle } from 'throttle-debounce';
 
-/**
- * WordPress dependencies
- */
-import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 const { MutationObserver } = window;
 

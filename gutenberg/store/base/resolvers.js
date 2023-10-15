@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import * as actions from './actions';
 
 export function* getPortfolioLayouts() {

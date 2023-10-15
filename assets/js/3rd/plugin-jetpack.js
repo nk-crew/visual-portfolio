@@ -1,5 +1,5 @@
-import { debounce } from 'throttle-debounce';
 import $ from 'jquery';
+import { debounce } from 'throttle-debounce';
 
 let jetpackLazyImagesLoadEvent;
 try {

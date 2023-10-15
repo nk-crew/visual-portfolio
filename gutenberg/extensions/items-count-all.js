@@ -1,34 +1,20 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
 import { debounce } from 'throttle-debounce';
 
-/**
- * Internal dependencies
- */
-import Notice from '../components/notice';
-import controlGetValue from '../utils/control-get-value';
-
-/**
- * WordPress dependencies
- */
-import { __, sprintf } from '@wordpress/i18n';
-
-import { addFilter } from '@wordpress/hooks';
-
-import { useSelect } from '@wordpress/data';
-
-import { RawHTML, useState } from '@wordpress/element';
-
+import apiFetch from '@wordpress/api-fetch';
 import {
 	BaseControl,
-	ButtonGroup,
 	Button,
+	ButtonGroup,
 	TextControl,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { RawHTML, useState } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
+import { __, sprintf } from '@wordpress/i18n';
 
-import apiFetch from '@wordpress/api-fetch';
+import Notice from '../components/notice';
+import controlGetValue from '../utils/control-get-value';
 
 const { VPGutenbergVariables } = window;
 

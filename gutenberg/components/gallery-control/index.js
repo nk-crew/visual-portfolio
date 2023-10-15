@@ -1,50 +1,35 @@
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
+import './extensions/dynamic-categories';
+import './extensions/image-title-and-desription';
+
 import {
-	DndContext,
 	closestCenter,
+	DndContext,
 	PointerSensor,
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	SortableContext,
-	rectSortingStrategy,
-	useSortable,
 	arrayMove,
+	rectSortingStrategy,
+	SortableContext,
+	useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
-/**
- * Internal dependencies
- */
-import ControlsRender from '../controls-render';
-
-// Extensions.
-import './extensions/dynamic-categories';
-import './extensions/image-title-and-desription';
-
-/**
- * WordPress dependencies
- */
-import { __, _n, sprintf } from '@wordpress/i18n';
-
-import { applyFilters } from '@wordpress/hooks';
-
-import { useSelect } from '@wordpress/data';
-
-import { useState } from '@wordpress/element';
-
-import {
-	TextControl,
-	Button,
-	Modal,
-	FocalPointPicker,
-} from '@wordpress/components';
+import classnames from 'classnames/dedupe';
 
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	Button,
+	FocalPointPicker,
+	Modal,
+	TextControl,
+} from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
+import { __, _n, sprintf } from '@wordpress/i18n';
+
+import ControlsRender from '../controls-render';
 
 const { navigator, VPGutenbergVariables } = window;
 

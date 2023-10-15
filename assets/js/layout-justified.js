@@ -1,6 +1,3 @@
-/*
- * Visual Portfolio layout Justified.
- */
 import $ from 'jquery';
 
 // Init Options.

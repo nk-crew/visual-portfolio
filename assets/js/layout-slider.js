@@ -1,15 +1,8 @@
-/*
- * External dependencies.
- */
 import isNumber from 'is-number';
-import { throttle } from 'throttle-debounce';
 import $ from 'jquery';
+import { throttle } from 'throttle-debounce';
 
 const { ResizeObserver } = window;
-
-/*
- * Visual Portfolio layout Slider.
- */
 
 // Listen for slider width change to calculate dynamic height of images.
 const dynamicHeightObserver = new ResizeObserver(
