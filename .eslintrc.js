@@ -9,4 +9,7 @@ module.exports = {
 		'react-hooks/rules-of-hooks': 0,
 		'jsdoc/check-param-names': 0,
 	},
+	settings: {
+		'import/core-modules': ['jquery', 'lodash'],
+	},
 };

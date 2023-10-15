@@ -2,7 +2,7 @@
 /*
  * Visual Portfolio layout Masonry.
  */
-const $ = window.jQuery;
+import $ from 'jquery';
 
 const { screenSizes } = window.VPData;
 

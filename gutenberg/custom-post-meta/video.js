@@ -3,6 +3,7 @@
  */
 import { debounce } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
+import $ from 'jquery';
 
 /**
  * WordPress Dependencies
@@ -21,7 +22,7 @@ import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 
 import { registerPlugin } from '@wordpress/plugins';
 
-const { jQuery: $, ajaxurl, VPGutenbergMetaVariables } = window;
+const { ajaxurl, VPGutenbergMetaVariables } = window;
 
 /**
  * Component

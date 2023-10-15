@@ -2,12 +2,11 @@
  * External dependencies.
  */
 import isNumber from 'is-number';
+import $ from 'jquery';
 
 /*
  * Visual Portfolio plugin Photoswipe extension.
  */
-const $ = window.jQuery;
-
 const {
 	VPData,
 	VPPopupAPI,

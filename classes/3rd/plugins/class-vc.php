@@ -35,7 +35,7 @@ class Visual_Portfolio_3rd_VC {
 	 */
 	public function admin_enqueue_scripts( $page ) {
 		if ( 'post.php' === $page || 'post-new.php' === $page ) {
-			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-vc-frontend', 'build/assets/admin/js/vc-frontend', array( 'jquery' ) );
+			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-vc-frontend', 'build/assets/admin/js/vc-frontend' );
 		}
 	}
 

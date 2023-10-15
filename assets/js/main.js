@@ -1,14 +1,14 @@
 /*
  * Visual Portfolio main script.
  */
-//import { throttle } from '@wordpress/compose';
 import { throttle } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
+import $ from 'jquery';
 
 /**
  * Global Variables
  */
-const { jQuery: $, VPData } = window;
+const { VPData } = window;
 
 const { __ } = VPData;
 

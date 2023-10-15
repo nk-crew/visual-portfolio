@@ -2,10 +2,11 @@
  * Name    : Visual Portfolio
  * Author  : nK https://nkdev.info
  */
-import { debounce } from '@wordpress/compose';
 import rafSchd from 'raf-schd';
+import $ from 'jquery';
+import { debounce } from '@wordpress/compose';
 
-const { jQuery: $, ajaxurl, VPAdminVariables } = window;
+const { ajaxurl, VPAdminVariables } = window;
 
 const $body = $('body');
 

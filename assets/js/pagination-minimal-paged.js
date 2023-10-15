@@ -1,7 +1,7 @@
 /*
  * Minimal Paged pagination.
  */
-const $ = window.jQuery;
+import $ from 'jquery';
 
 function setImgWidth($el) {
 	if ($el && $el.height > 1) {

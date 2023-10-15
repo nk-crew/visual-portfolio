@@ -12,13 +12,14 @@ import {
 	SortableElement,
 	sortableHandle,
 } from 'react-sortable-hoc';
+import $ from 'jquery';
 
 const { Option } = components;
 
 /**
  * WordPress dependencies
  */
-const { jQuery: $, ajaxurl, VPGutenbergVariables } = window;
+const { ajaxurl, VPGutenbergVariables } = window;
 
 import { __ } from '@wordpress/i18n';
 

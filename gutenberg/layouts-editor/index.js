@@ -1,4 +1,8 @@
 /* eslint-disable max-classes-per-file */
+/**
+ * External dependencies
+ */
+import $ from 'jquery';
 
 /**
  * Internal dependencies
@@ -11,8 +15,6 @@ import BlockEdit from '../block/edit';
 /**
  * WordPress dependencies
  */
-const { jQuery: $ } = window;
-
 import { registerBlockType, createBlock } from '@wordpress/blocks';
 
 import { registerPlugin } from '@wordpress/plugins';
@@ -457,7 +459,7 @@ class UpdateEditor extends Component {
 				},
 			}).catch((response) => {
 				// eslint-disable-next-line
-        console.log(response);
+				console.log(response);
 			});
 		}
 	}

@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import $ from 'jquery';
 
 /**
  * WordPress dependencies
  */
-const { jQuery: $, ajaxurl, VPGutenbergVariables } = window;
+const { ajaxurl, VPGutenbergVariables } = window;
 
 import { __ } from '@wordpress/i18n';
 

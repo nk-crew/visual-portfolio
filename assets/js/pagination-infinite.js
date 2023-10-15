@@ -4,8 +4,8 @@
 //import { throttle } from '@wordpress/compose';
 import { throttle } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
+import $ from 'jquery';
 
-const { jQuery: $ } = window;
 const $wnd = $(window);
 
 // Init infinite scroll pagination.

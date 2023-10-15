@@ -1,4 +1,6 @@
-const { jQuery: $, ajaxurl, VPAskReviewNotice } = window;
+import $ from 'jquery';
+
+const { ajaxurl, VPAskReviewNotice } = window;
 
 const $body = $('body');
 

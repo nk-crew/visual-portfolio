@@ -1,10 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { merge } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import conditionCheck from '../control-condition-check';
 import { maybeDecode } from '../encode-decode';
-
-const { merge } = window.lodash;
 
 import { applyFilters } from '@wordpress/hooks';
 

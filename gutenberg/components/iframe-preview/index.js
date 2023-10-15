@@ -11,6 +11,7 @@ import { throttle, debounce } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
 import iframeResizer from 'iframe-resizer/js/iframeResizer';
 import classnames from 'classnames/dedupe';
+import $ from 'jquery';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import './live-reload-conditions';
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
 
 const {
-	jQuery: $,
 	VPAdminGutenbergVariables: variables,
 	VPGutenbergVariables: { controls: registeredControls },
 } = window;

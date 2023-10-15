@@ -4,8 +4,8 @@
 //import { throttle, debounce } from '@wordpress/compose';
 import { throttle, debounce } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
+import $ from 'jquery';
 
-const $ = window.jQuery;
 const $wnd = $(window);
 const $doc = $(document);
 

@@ -3,7 +3,7 @@
 /*
  * Popup gallery with global API.
  */
-const $ = window.jQuery;
+import $ from 'jquery';
 
 const { VPData } = window;
 

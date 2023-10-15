@@ -2,13 +2,12 @@
  * External dependencies.
  */
 import isNumber from 'is-number';
-//import { throttle } from '@wordpress/compose';
 import { throttle } from 'throttle-debounce';
+import $ from 'jquery';
 
 /*
  * Visual Portfolio layout Slider.
  */
-const $ = window.jQuery;
 
 // Listen for slider width change to calculate dynamic height of images.
 // eslint-disable-next-line no-undef
