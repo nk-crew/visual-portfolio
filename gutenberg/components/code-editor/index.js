@@ -1,11 +1,13 @@
+// It is required to load react-ace first.
+// eslint-disable-next-line simple-import-sort/imports
+import AceEditor from 'react-ace';
+
 import 'ace-builds/src-noconflict/mode-css';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/snippets/css';
 import 'ace-builds/src-noconflict/snippets/javascript';
 import 'ace-builds/src-noconflict/snippets/text';
 import 'ace-builds/src-noconflict/ext-language_tools';
-
-import AceEditor from 'react-ace';
 
 import { Component } from '@wordpress/element';
 
