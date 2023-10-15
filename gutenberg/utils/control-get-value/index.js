@@ -1,5 +1,3 @@
-/* eslint-disable no-useless-escape */
-
 /**
  * Get control value.
  * Supported array names like `images[3].format`

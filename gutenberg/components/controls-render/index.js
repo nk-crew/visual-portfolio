@@ -1,6 +1,3 @@
-/* eslint-disable @wordpress/no-base-control-with-label-without-id */
-/* eslint-disable no-useless-escape */
-
 /**
  * External dependencies
  */
@@ -19,9 +16,7 @@ import TilesSelector from '../tiles-selector';
 import AlignControl from '../align-control';
 import AspectRatio from '../aspect-ratio';
 import SelectControl from '../select-control';
-// eslint-disable-next-line import/no-cycle
 import ElementsSelector from '../elements-selector';
-// eslint-disable-next-line import/no-cycle
 import GalleryControl from '../gallery-control';
 import ColorPicker from '../color-picker';
 import DatePicker from '../date-picker';
@@ -296,8 +291,7 @@ ControlsRender.Control = function (props) {
 				setPositionInGroup(newPosition);
 			}
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [$ref, props.group, controlVal]);
+	}, [$ref, props.group, controlVal, positionInGroup]);
 
 	// Conditions check.
 	if (!ControlsRender.AllowRender(props, isSetupWizard)) {
@@ -575,6 +569,7 @@ ControlsRender.Control = function (props) {
 						size="md"
 					>
 						<BaseControl
+							id={`vpf-custom-css-${props.label || props.name}`}
 							label={props.label}
 							help={
 								props.description ? (
@@ -807,6 +802,7 @@ ControlsRender.Control = function (props) {
 				<div className="vpf-control-group-separator" />
 			) : null}
 			<BaseControl
+				id={`vpf-control-group-${props.name}`}
 				label={data.renderControlLabel}
 				className={data.renderControlClassName}
 			>

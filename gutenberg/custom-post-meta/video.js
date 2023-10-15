@@ -174,7 +174,6 @@ class VpVideoComponent extends Component {
 					/>
 				</PanelRow>
 				<PanelRow>
-					{/* eslint-disable-next-line react/no-danger */}
 					<div
 						className="vp-oembed-preview"
 						dangerouslySetInnerHTML={{ __html: oembedHTML }}

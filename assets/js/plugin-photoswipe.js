@@ -8,10 +8,11 @@ import $ from 'jquery';
  * Visual Portfolio plugin Photoswipe extension.
  */
 const {
+	Image,
 	VPData,
 	VPPopupAPI,
 	PhotoSwipe,
-	PhotoSwipeUI_Default, // eslint-disable-line camelcase
+	PhotoSwipeUI_Default: PhotoSwipeUIDefault,
 } = window;
 
 const { __, settingsPopupGallery } = VPData;
@@ -312,7 +313,7 @@ if (PhotoSwipe && VPPopupAPI) {
 		// Pass data to PhotoSwipe and initialize it
 		pswpInstance = new PhotoSwipe(
 			pswpElement,
-			PhotoSwipeUI_Default,
+			PhotoSwipeUIDefault,
 			finalItems,
 			options
 		);
@@ -396,7 +397,6 @@ if (PhotoSwipe && VPPopupAPI) {
 
 		pswpInstance.listen('imageLoadComplete', (idx, item) => {
 			if (item.h < 1 || item.w < 1) {
-				// eslint-disable-next-line no-undef
 				const img = new Image();
 
 				img.onload = () => {

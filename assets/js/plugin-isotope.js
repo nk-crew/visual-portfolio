@@ -6,6 +6,8 @@ import { throttle, debounce } from 'throttle-debounce';
 import rafSchd from 'raf-schd';
 import $ from 'jquery';
 
+const { getComputedStyle } = window;
+
 const $wnd = $(window);
 const $doc = $(document);
 
@@ -34,7 +36,6 @@ $doc.on('extendClass.vpf', (event, VP) => {
 			SUPPORTED_LAYOUTS.includes(self.options.layout)
 		) {
 			const isRtl =
-				// eslint-disable-next-line no-undef
 				getComputedStyle(self.$items_wrap[0]).direction === 'rtl';
 
 			const initOptions = options || {

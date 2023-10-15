@@ -17,15 +17,15 @@ function compare(left, operator, right) {
 
 	switch (operator) {
 		case '==':
-			// eslint-disable-next-line
-      checkResult = left == right;
+			// eslint-disable-next-line eqeqeq
+			checkResult = left == right;
 			break;
 		case '===':
 			checkResult = left === right;
 			break;
 		case '!=':
-			// eslint-disable-next-line
-      checkResult = left != right;
+			// eslint-disable-next-line eqeqeq
+			checkResult = left != right;
 			break;
 		case '!==':
 			checkResult = left !== right;

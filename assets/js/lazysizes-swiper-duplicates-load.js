@@ -1,4 +1,3 @@
-/* eslint-disable wrap-iife */
 /**
  * Load duplicated Swiper slides to prevent images "blink" effect after swipe.
  *

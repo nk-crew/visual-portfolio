@@ -166,8 +166,7 @@ export default function SetupWizard(props) {
 			setAttributes(newAttributes);
 			setAllowNextStep(true);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [contentSource, images]);
+	}, [contentSource, images, layout, setAttributes]);
 
 	return (
 		<div className={`vpf-setup-wizard vpf-setup-wizard-step-${step}`}>
@@ -177,7 +176,6 @@ export default function SetupWizard(props) {
 					<div className="vpf-setup-wizard-title">{pluginName}</div>
 					<div
 						className="vpf-setup-wizard-description"
-						// eslint-disable-next-line react/no-danger
 						dangerouslySetInnerHTML={{
 							__html: __(
 								'Set the common settings in the setup wizard,<br />more options will be available in the block settings.<br />Select the Content Source first:',
@@ -196,7 +194,6 @@ export default function SetupWizard(props) {
 					</div>
 					<div
 						className="vpf-setup-wizard-description"
-						// eslint-disable-next-line react/no-danger
 						dangerouslySetInnerHTML={{
 							__html: __(
 								'Select one of the featured styles to get started.<br />More style settings will be available in the block settings.',

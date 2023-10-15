@@ -67,7 +67,6 @@ function CountNotice(props) {
 	return (
 		<Notice status="warning" isDismissible={false}>
 			<p
-				// eslint-disable-next-line react/no-danger
 				dangerouslySetInnerHTML={{
 					__html: __(
 						'Using large galleries may <u>decrease page loading speed</u>. We recommend you add these improvements:',
@@ -77,7 +76,6 @@ function CountNotice(props) {
 			/>
 			<ol className="ol-decimal">
 				<li
-					// eslint-disable-next-line react/no-danger
 					dangerouslySetInnerHTML={{
 						__html: sprintf(
 							__(
@@ -89,7 +87,6 @@ function CountNotice(props) {
 					}}
 				/>
 				<li
-					// eslint-disable-next-line react/no-danger
 					dangerouslySetInnerHTML={{
 						__html: __(
 							'Add <em>`Load More`</em> or <em>`Infinite Scroll`</em> pagination for best results.',
@@ -152,8 +149,8 @@ function ItemsCountControl({ data }) {
 	const controlVal = parseInt(controlGetValue(data.name, attributes), 10);
 
 	return (
-		// eslint-disable-next-line @wordpress/no-base-control-with-label-without-id
 		<BaseControl
+			id="vpf-control-items-count-all"
 			label={
 				<>
 					{data.label}

@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 /**
  * External dependencies
  */
@@ -35,7 +34,9 @@ import { InspectorControls } from '@wordpress/block-editor';
 
 import { compose } from '@wordpress/compose';
 
-const { plugin_name: pluginName } = window.VPGutenbergVariables;
+const { navigator, VPGutenbergVariables } = window;
+
+const { plugin_name: pluginName } = VPGutenbergVariables;
 
 let copiedTimeout;
 
@@ -50,7 +51,6 @@ function ShortcodeRender(props) {
 				<Button
 					isSmall
 					onClick={() => {
-						// eslint-disable-next-line no-undef
 						navigator.clipboard
 							.writeText(props.content)
 							.then(() => {
@@ -458,7 +458,7 @@ class UpdateEditor extends Component {
 					post_id: postId,
 				},
 			}).catch((response) => {
-				// eslint-disable-next-line
+				// eslint-disable-next-line no-console
 				console.log(response);
 			});
 		}

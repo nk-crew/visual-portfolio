@@ -85,7 +85,7 @@ class IframePreview extends Component {
 			rafSchd(this.maybeResizePreviews)
 		);
 		this.updateIframeHeight = this.updateIframeHeight.bind(this);
-		// eslint-disable-next-line react/no-unused-class-component-methods
+
 		this.updateIframeHeightThrottle = throttle(
 			100,
 			rafSchd(this.updateIframeHeight)

@@ -1,6 +1,3 @@
-/* stylelint-disable selector-id-pattern */
-/* stylelint-disable declaration-no-important */
-
 /**
  * Preview style
  */
@@ -18,6 +15,7 @@ body::before {
 	display: none;
 }
 
+/* stylelint-disable-next-line selector-id-pattern */
 #vp_preview {
 	position: relative;
 	z-index: 99999;

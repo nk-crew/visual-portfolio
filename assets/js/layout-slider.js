@@ -5,12 +5,13 @@ import isNumber from 'is-number';
 import { throttle } from 'throttle-debounce';
 import $ from 'jquery';
 
+const { ResizeObserver } = window;
+
 /*
  * Visual Portfolio layout Slider.
  */
 
 // Listen for slider width change to calculate dynamic height of images.
-// eslint-disable-next-line no-undef
 const dynamicHeightObserver = new ResizeObserver(
 	throttle(100, (entries) => {
 		entries.forEach(({ target }) => {
@@ -48,14 +49,14 @@ $(document).on('initLayout.vpf', (event, self) => {
 			type === 'items'
 				? self.options.sliderItemsHeight
 				: self.options.sliderThumbnailsHeight;
-		let itemsMinHeight =
-			type === 'items' ? self.options.sliderItemsMinHeight : 0;
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const typeSingle = type.replace(/s$/g, '');
 
 		if (itemsHeight === 'auto') {
 			return;
 		}
+
+		const typeSingle = type.replace(/s$/g, '');
+		let itemsMinHeight =
+			type === 'items' ? self.options.sliderItemsMinHeight : 0;
 
 		itemsHeight = isNumber(itemsHeight) ? `${itemsHeight}px` : itemsHeight;
 

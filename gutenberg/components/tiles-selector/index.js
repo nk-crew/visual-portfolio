@@ -29,7 +29,6 @@ export default class TilesSelector extends Component {
 		this.renderPreview = this.renderPreview.bind(this);
 	}
 
-	// eslint-disable-next-line class-methods-use-this
 	renderPreview(tilesType) {
 		const settings = tilesType.split(/[:|]/);
 		const selector = `[data-tiles-preview="${tilesType}"]`;

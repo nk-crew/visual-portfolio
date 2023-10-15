@@ -242,7 +242,6 @@ export default class VpfSelectControl extends Component {
 	 *
 	 * @return {Object} - prepared options.
 	 */
-	// eslint-disable-next-line class-methods-use-this
 	prepareOptions(options) {
 		return Object.keys(options || {}).map((val) => {
 			const option = options[val];
@@ -283,7 +282,6 @@ export default class VpfSelectControl extends Component {
 			},
 			menuPortalTarget: document.body,
 			components: {
-				// eslint-disable-next-line react/no-unstable-nested-components
 				Option(optionProps) {
 					const { data } = optionProps;
 

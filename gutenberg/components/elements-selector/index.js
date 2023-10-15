@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-curly-newline */
 /**
  * External dependencies
  */
@@ -7,7 +6,6 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
-// eslint-disable-next-line import/no-cycle
 import ControlsRender from '../controls-render';
 
 /**
@@ -163,7 +161,6 @@ function ElementsSelectorOptions(props) {
 									marginTop: '5px',
 								}}
 								onClick={() => {
-									// eslint-disable-next-line no-alert
 									if (
 										// eslint-disable-next-line no-alert
 										window.confirm(

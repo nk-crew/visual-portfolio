@@ -1,5 +1,3 @@
-/* eslint-disable class-methods-use-this */
-
 /*
  * Popup gallery with global API.
  */
@@ -67,7 +65,6 @@ const VPPopupAPI = {
 		{
 			vendor: 'vimeo',
 			embedUrl: 'https://player.vimeo.com/video/{{video_id}}?{{params}}',
-			// eslint-disable-next-line no-useless-escape
 			pattern:
 				/https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)(.*)/,
 			patternIndex: 3,
@@ -535,7 +532,6 @@ function parseImgData(link) {
 
 	// <noscript> tag used in plugins, that adds lazy loading
 	if (img.nodeName === 'NOSCRIPT' && link.childNodes[1]) {
-		// eslint-disable-next-line prefer-destructuring
 		img = link.childNodes[1];
 	}
 
@@ -586,7 +582,6 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
 
 			// <noscript> tag used in plugins, that adds lazy loading
 			if (imageNode.nodeName === 'NOSCRIPT' && this.childNodes[1]) {
-				// eslint-disable-next-line prefer-destructuring
 				imageNode = this.childNodes[1];
 			}
 

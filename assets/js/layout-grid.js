@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 /*
  * Visual Portfolio layout Grid.
  */
