@@ -180,6 +180,13 @@ const newConfig = {
 	// Display minimum info in terminal.
 	stats: 'minimal',
 
+	performance: {
+		// Disable performance hints in console about too large chunks for Gutenberg assets.
+		assetFilter(assetFilename) {
+			return !assetFilename.startsWith('gutenberg/');
+		},
+	},
+
 	module: {
 		...defaultConfig.module,
 		rules: [...defaultConfig.module.rules],
