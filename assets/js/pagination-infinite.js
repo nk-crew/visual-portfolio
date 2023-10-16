@@ -1,11 +1,7 @@
-/*
- * Infinite Scroll pagination.
- */
-//import { throttle } from '@wordpress/compose';
-import { throttle } from 'throttle-debounce';
+import $ from 'jquery';
 import rafSchd from 'raf-schd';
+import { throttle } from 'throttle-debounce';
 
-const { jQuery: $ } = window;
 const $wnd = $(window);
 
 // Init infinite scroll pagination.

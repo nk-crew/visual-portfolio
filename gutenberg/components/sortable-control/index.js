@@ -1,28 +1,23 @@
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
+import './style.scss';
+
 import {
-	DndContext,
 	closestCenter,
+	DndContext,
 	PointerSensor,
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	SortableContext,
-	verticalListSortingStrategy,
-	useSortable,
 	arrayMove,
+	SortableContext,
+	useSortable,
+	verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
+import classnames from 'classnames/dedupe';
 
 import { Button } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 const SortableItem = function ({ id, element, sourceOptions, items, props }) {
 	const { allowDisablingOptions, onChange } = props;

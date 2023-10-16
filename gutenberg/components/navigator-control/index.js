@@ -1,15 +1,14 @@
-/**
- * WordPress dependencies
- */
+import './style.scss';
+
 import {
-	NavigatorProvider as __stableNavigatorProvider,
-	__experimentalNavigatorProvider,
-	NavigatorScreen as __stableNavigatorScreen,
-	__experimentalNavigatorScreen,
-	NavigatorButton as __stableNavigatorButton,
-	__experimentalNavigatorButton,
-	NavigatorBackButton as __stableNavigatorBackButton,
 	__experimentalNavigatorBackButton,
+	__experimentalNavigatorButton,
+	__experimentalNavigatorProvider,
+	__experimentalNavigatorScreen,
+	NavigatorBackButton as __stableNavigatorBackButton,
+	NavigatorButton as __stableNavigatorButton,
+	NavigatorProvider as __stableNavigatorProvider,
+	NavigatorScreen as __stableNavigatorScreen,
 } from '@wordpress/components';
 
 const NavigatorProvider =

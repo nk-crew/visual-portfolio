@@ -1,12 +1,7 @@
-/**
- * External dependencies
- */
+import { defineConfig, devices } from '@playwright/test';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { defineConfig, devices } from '@playwright/test';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||

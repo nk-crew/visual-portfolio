@@ -1,27 +1,16 @@
-/**
- * External Dependencies
- */
-import { debounce } from 'throttle-debounce';
+import $ from 'jquery';
 import rafSchd from 'raf-schd';
-
-/**
- * WordPress Dependencies
- */
-import { __, sprintf } from '@wordpress/i18n';
-
-import { withInstanceId, compose } from '@wordpress/compose';
-
-import { withSelect, withDispatch } from '@wordpress/data';
-
-import { Component } from '@wordpress/element';
+import { debounce } from 'throttle-debounce';
 
 import { PanelRow, TextControl } from '@wordpress/components';
-
+import { compose, withInstanceId } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-
+import { Component } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 
-const { jQuery: $, ajaxurl, VPGutenbergMetaVariables } = window;
+const { ajaxurl, VPGutenbergMetaVariables } = window;
 
 /**
  * Component
@@ -173,7 +162,6 @@ class VpVideoComponent extends Component {
 					/>
 				</PanelRow>
 				<PanelRow>
-					{/* eslint-disable-next-line react/no-danger */}
 					<div
 						className="vp-oembed-preview"
 						dangerouslySetInnerHTML={{ __html: oembedHTML }}

@@ -1,12 +1,9 @@
-/**
- * Internal dependencies
- */
-import conditionCheck from '../control-condition-check';
-import { maybeDecode } from '../encode-decode';
-
-const { merge } = window.lodash;
+import { merge } from 'lodash';
 
 import { applyFilters } from '@wordpress/hooks';
+
+import conditionCheck from '../control-condition-check';
+import { maybeDecode } from '../encode-decode';
 
 const { controls: registeredControls } = window.VPGutenbergVariables;
 

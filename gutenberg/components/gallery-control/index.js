@@ -1,54 +1,38 @@
-/* eslint-disable react/no-unused-state */
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
+import './style.scss';
+import './extensions/dynamic-categories';
+import './extensions/image-title-and-desription';
+
 import {
-	DndContext,
 	closestCenter,
+	DndContext,
 	PointerSensor,
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	SortableContext,
-	rectSortingStrategy,
-	useSortable,
 	arrayMove,
+	rectSortingStrategy,
+	SortableContext,
+	useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
-/**
- * Internal dependencies
- */
-// eslint-disable-next-line import/no-cycle
-import ControlsRender from '../controls-render';
-
-// Extensions.
-import './extensions/dynamic-categories';
-import './extensions/image-title-and-desription';
-
-/**
- * WordPress dependencies
- */
-import { __, _n, sprintf } from '@wordpress/i18n';
-
-import { applyFilters } from '@wordpress/hooks';
-
-import { useSelect } from '@wordpress/data';
-
-import { useState } from '@wordpress/element';
-
-import {
-	TextControl,
-	Button,
-	Modal,
-	FocalPointPicker,
-} from '@wordpress/components';
+import classnames from 'classnames/dedupe';
 
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	Button,
+	FocalPointPicker,
+	Modal,
+	TextControl,
+} from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
-const { VPGutenbergVariables } = window;
+import ControlsRender from '../controls-render';
+
+const { navigator, VPGutenbergVariables } = window;
 
 const ALLOWED_MEDIA_TYPES = ['image'];
 
@@ -142,12 +126,11 @@ const SelectedImageData = function (props) {
 
 	const { imageData } = useSelect(
 		(select) => {
-			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-			const { getMedia } = select('core');
-
 			if (!imgId) {
 				return {};
 			}
+
+			const { getMedia } = select('core');
 
 			const imgData = getMedia(imgId);
 
@@ -276,7 +259,6 @@ const SelectedImageData = function (props) {
 								/>
 								<Button
 									onClick={() => {
-										// eslint-disable-next-line no-undef
 										navigator.clipboard
 											.writeText(
 												imageData?.source_url || ''
@@ -696,21 +678,18 @@ const SortableList = function (props) {
 			{items && items.length ? (
 				<span className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-pagination">
 					<span>
-						{
-							// eslint-disable-next-line @wordpress/valid-sprintf
-							sprintf(
-								_n(
-									'Showing %s of %s Image',
-									'Showing %s of %s Images',
-									items.length,
-									'visual-portfolio'
-								),
-								showingItems > items.length
-									? items.length
-									: showingItems,
-								items.length
-							)
-						}
+						{sprintf(
+							_n(
+								'Showing %1$s of %2$s Image',
+								'Showing %1$s of %2$s Images',
+								items.length,
+								'visual-portfolio'
+							),
+							showingItems > items.length
+								? items.length
+								: showingItems,
+							items.length
+						)}
 					</span>
 					{items.length > showingItems ? (
 						<div className="vpf-component-gallery-control-item-pagination-buttons">

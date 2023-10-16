@@ -1,8 +1,8 @@
+import { addFilter } from '@wordpress/hooks';
+
 /**
  * Add list of all categories to gallery images.
  */
-import { addFilter } from '@wordpress/hooks';
-
 addFilter(
 	'vpf.editor.controls-render-data',
 	'vpf/editor/controls-render-data/images-categories-suggestions',

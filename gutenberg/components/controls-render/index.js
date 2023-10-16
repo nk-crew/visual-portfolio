@@ -1,69 +1,54 @@
-/* eslint-disable @wordpress/no-base-control-with-label-without-id */
-/* eslint-disable no-useless-escape */
+import './style.scss';
 
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
 
-/**
- * Internal dependencies
- */
-import TabsControl from '../tabs-control';
-import ToggleGroupControl from '../toggle-group-control';
-import CollapseControl from '../collapse-control';
-import NavigatorControl from '../navigator-control';
-import IconsSelector from '../icons-selector';
-import CodeEditor from '../code-editor';
-import TilesSelector from '../tiles-selector';
-import AlignControl from '../align-control';
-import AspectRatio from '../aspect-ratio';
-import SelectControl from '../select-control';
-// eslint-disable-next-line import/no-cycle
-import ElementsSelector from '../elements-selector';
-// eslint-disable-next-line import/no-cycle
-import GalleryControl from '../gallery-control';
-import ColorPicker from '../color-picker';
-import DatePicker from '../date-picker';
-import ClassesTree from '../classes-tree';
-import ToggleModal from '../toggle-modal';
-import ProNote from '../pro-note';
-import controlConditionCheck from '../../utils/control-condition-check';
-import controlGetValue from '../../utils/control-get-value';
-import { maybeEncode, maybeDecode } from '../../utils/encode-decode';
-import SortableControl from '../sortable-control';
-
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
+import {
+	__experimentalUnitControl,
+	BaseControl,
+	Button,
+	ButtonGroup,
+	CheckboxControl,
+	Notice,
+	PanelBody,
+	RadioControl,
+	RangeControl,
+	TextareaControl,
+	TextControl,
+	ToggleControl,
+	Tooltip,
+	UnitControl as __stableUnitControl,
+} from '@wordpress/components';
 import {
 	Component,
 	RawHTML,
-	useState,
 	useEffect,
 	useRef,
+	useState,
 } from '@wordpress/element';
-
-import {
-	PanelBody,
-	Tooltip,
-	Notice,
-	BaseControl,
-	ButtonGroup,
-	Button,
-	TextControl,
-	TextareaControl,
-	CheckboxControl,
-	RadioControl,
-	ToggleControl,
-	RangeControl,
-	UnitControl as __stableUnitControl,
-	__experimentalUnitControl,
-} from '@wordpress/components';
-
 import { applyFilters } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
+
+import controlConditionCheck from '../../utils/control-condition-check';
+import controlGetValue from '../../utils/control-get-value';
+import { maybeDecode, maybeEncode } from '../../utils/encode-decode';
+import AlignControl from '../align-control';
+import AspectRatio from '../aspect-ratio';
+import ClassesTree from '../classes-tree';
+import CodeEditor from '../code-editor';
+import CollapseControl from '../collapse-control';
+import ColorPicker from '../color-picker';
+import DatePicker from '../date-picker';
+import ElementsSelector from '../elements-selector';
+import GalleryControl from '../gallery-control';
+import IconsSelector from '../icons-selector';
+import NavigatorControl from '../navigator-control';
+import ProNote from '../pro-note';
+import SelectControl from '../select-control';
+import SortableControl from '../sortable-control';
+import TabsControl from '../tabs-control';
+import TilesSelector from '../tiles-selector';
+import ToggleGroupControl from '../toggle-group-control';
+import ToggleModal from '../toggle-modal';
 
 const UnitControl = __stableUnitControl || __experimentalUnitControl;
 
@@ -296,8 +281,7 @@ ControlsRender.Control = function (props) {
 				setPositionInGroup(newPosition);
 			}
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [$ref, props.group, controlVal]);
+	}, [$ref, props.group, controlVal, positionInGroup]);
 
 	// Conditions check.
 	if (!ControlsRender.AllowRender(props, isSetupWizard)) {
@@ -575,6 +559,7 @@ ControlsRender.Control = function (props) {
 						size="md"
 					>
 						<BaseControl
+							id={`vpf-custom-css-${props.label || props.name}`}
 							label={props.label}
 							help={
 								props.description ? (
@@ -807,6 +792,7 @@ ControlsRender.Control = function (props) {
 				<div className="vpf-control-group-separator" />
 			) : null}
 			<BaseControl
+				id={`vpf-control-group-${props.name}`}
 				label={data.renderControlLabel}
 				className={data.renderControlClassName}
 			>

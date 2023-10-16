@@ -1,7 +1,5 @@
-/*
- * Visual Portfolio items style Fly.
- */
-const $ = window.jQuery;
+import $ from 'jquery';
+
 const $wnd = $(window);
 
 /**

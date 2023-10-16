@@ -491,7 +491,7 @@ class Visual_Portfolio_Assets {
 	 * Register scripts that will be used in the future when portfolio will be printed.
 	 */
 	public function register_scripts() {
-		$vp_deps       = array( 'jquery', 'imagesloaded' );
+		$vp_deps       = array( 'imagesloaded' );
 		$vp_style_deps = array();
 
 		$popup_vendor = Visual_Portfolio_Settings::get_option( 'vendor', 'vp_popup_gallery' );
@@ -571,29 +571,24 @@ class Visual_Portfolio_Assets {
 			'visual-portfolio-plugin-isotope' => array(
 				'build/assets/js/plugin-isotope',
 				array(
-					'jquery',
 					'isotope',
-					'wp-compose',
 				),
 			),
 			'visual-portfolio-plugin-fj-gallery' => array(
 				'build/assets/js/plugin-fj-gallery',
 				array(
-					'jquery',
 					'flickr-justified-gallery',
 				),
 			),
 			'visual-portfolio-plugin-swiper' => array(
 				'build/assets/js/plugin-swiper',
 				array(
-					'jquery',
 					'swiper',
 				),
 			),
 			'visual-portfolio-custom-scrollbar' => array(
 				'build/assets/js/custom-scrollbar',
 				array(
-					'jquery',
 					'simplebar',
 				),
 			),
@@ -605,14 +600,10 @@ class Visual_Portfolio_Assets {
 			),
 			'visual-portfolio-popup-gallery' => array(
 				'build/assets/js/popup-gallery',
-				array(
-					'jquery',
-				),
 			),
 			'visual-portfolio-plugin-photoswipe' => array(
 				'build/assets/js/plugin-photoswipe',
 				array(
-					'jquery',
 					'photoswipe-ui-default',
 					'visual-portfolio-popup-gallery',
 				),
@@ -620,7 +611,6 @@ class Visual_Portfolio_Assets {
 			'visual-portfolio-plugin-fancybox' => array(
 				'build/assets/js/plugin-fancybox',
 				array(
-					'jquery',
 					'fancybox',
 					'visual-portfolio-popup-gallery',
 				),
@@ -628,60 +618,46 @@ class Visual_Portfolio_Assets {
 			'visual-portfolio-layout-masonry' => array(
 				'build/assets/js/layout-masonry',
 				array(
-					'jquery',
 					'visual-portfolio-plugin-isotope',
 				),
 			),
 			'visual-portfolio-layout-grid' => array(
 				'build/assets/js/layout-grid',
 				array(
-					'jquery',
 					'visual-portfolio-plugin-isotope',
 				),
 			),
 			'visual-portfolio-layout-tiles' => array(
 				'build/assets/js/layout-tiles',
 				array(
-					'jquery',
 					'visual-portfolio-plugin-isotope',
 				),
 			),
 			'visual-portfolio-layout-justified' => array(
 				'build/assets/js/layout-justified',
 				array(
-					'jquery',
 					'visual-portfolio-plugin-fj-gallery',
 				),
 			),
 			'visual-portfolio-layout-slider' => array(
 				'build/assets/js/layout-slider',
 				array(
-					'jquery',
 					'visual-portfolio-plugin-swiper',
 				),
 			),
 			'visual-portfolio-items-style-fly' => array(
 				'build/assets/js/items-style-fly',
-				array(
-					'jquery',
-				),
 			),
 			'visual-portfolio-pagination-infinite' => array(
 				'build/assets/js/pagination-infinite',
-				array(
-					'jquery',
-				),
 			),
 			'visual-portfolio-pagination-minimal-paged' => array(
 				'build/assets/js/pagination-minimal-paged',
-				array(
-					'jquery',
-				),
 			),
 		);
 
 		foreach ( $vp_scripts as $name => $data ) {
-			self::register_script( $name, $data[0], $data[1] );
+			self::register_script( $name, $data[0], $data[1] ?? array() );
 		}
 
 		do_action( 'vpf_after_assets_register' );

@@ -1,17 +1,9 @@
-/*
- * Visual Portfolio main script.
- */
-//import { throttle } from '@wordpress/compose';
-import { throttle } from 'throttle-debounce';
+import $ from 'jquery';
 import rafSchd from 'raf-schd';
+import { throttle } from 'throttle-debounce';
 
-/**
- * Global Variables
- */
-const { jQuery: $, VPData } = window;
-
+const { VPData } = window;
 const { __ } = VPData;
-
 const $wnd = $(window);
 
 /**
@@ -458,7 +450,6 @@ class VP {
 	 * @param {string} str string to transform
 	 * @return {string} result string
 	 */
-	// eslint-disable-next-line class-methods-use-this
 	firstToLowerCase(str) {
 		return str.substr(0, 1).toLowerCase() + str.substr(1);
 	}

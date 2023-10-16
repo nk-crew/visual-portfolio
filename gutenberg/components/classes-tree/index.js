@@ -1,9 +1,8 @@
-/* eslint-disable max-classes-per-file */
+import './style.scss';
 
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
+
+const { navigator } = window;
 
 // generate dom tree.
 function getNodeTree(node) {
@@ -190,7 +189,6 @@ ClassesTree.TreeItem = class TreeItem extends Component {
 				>
 					<div>
 						{node.children.length ? (
-							// eslint-disable-next-line jsx-a11y/control-has-associated-label
 							<button
 								type="button"
 								className="vpf-component-classes-tree-node-collapse"
@@ -205,7 +203,6 @@ ClassesTree.TreeItem = class TreeItem extends Component {
 						)}
 						&lt;
 						{node.nodeName.toLowerCase()}
-						{/* eslint-disable-next-line react/no-danger */}
 						{classes.length ? (
 							<>
 								{' class="'}
@@ -215,7 +212,6 @@ ClassesTree.TreeItem = class TreeItem extends Component {
 										type="button"
 										className="vpf-component-classes-tree-node-class"
 										onClick={() => {
-											// eslint-disable-next-line no-undef
 											navigator.clipboard.writeText(
 												className
 											);

@@ -1,31 +1,20 @@
-/* eslint-disable react/jsx-curly-newline */
-/**
- * External dependencies
- */
+import './style.scss';
+
 import classnames from 'classnames/dedupe';
 
-/**
- * Internal dependencies
- */
-// eslint-disable-next-line import/no-cycle
-import ControlsRender from '../controls-render';
-
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-import { Component, useState } from '@wordpress/element';
-
 import {
-	PanelBody,
 	Button,
-	DropdownMenu,
 	Dropdown,
+	DropdownMenu,
 	Modal,
+	PanelBody,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
+import { Component, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+import ControlsRender from '../controls-render';
 
 const alignIcons = {
 	left: (
@@ -163,7 +152,6 @@ function ElementsSelectorOptions(props) {
 									marginTop: '5px',
 								}}
 								onClick={() => {
-									// eslint-disable-next-line no-alert
 									if (
 										// eslint-disable-next-line no-alert
 										window.confirm(

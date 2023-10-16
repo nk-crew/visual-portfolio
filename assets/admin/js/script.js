@@ -1,12 +1,9 @@
-/*!
- * Name    : Visual Portfolio
- * Author  : nK https://nkdev.info
- */
-import { debounce } from '@wordpress/compose';
+import $ from 'jquery';
 import rafSchd from 'raf-schd';
 
-const { jQuery: $, ajaxurl, VPAdminVariables } = window;
+import { debounce } from '@wordpress/compose';
 
+const { ajaxurl, VPAdminVariables } = window;
 const $body = $('body');
 
 // select shortcode text in input

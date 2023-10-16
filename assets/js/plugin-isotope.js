@@ -1,11 +1,8 @@
-/*
- * Visual Portfolio plugin Isotope extension.
- */
-//import { throttle, debounce } from '@wordpress/compose';
-import { throttle, debounce } from 'throttle-debounce';
+import $ from 'jquery';
 import rafSchd from 'raf-schd';
+import { debounce, throttle } from 'throttle-debounce';
 
-const $ = window.jQuery;
+const { getComputedStyle } = window;
 const $wnd = $(window);
 const $doc = $(document);
 
@@ -34,7 +31,6 @@ $doc.on('extendClass.vpf', (event, VP) => {
 			SUPPORTED_LAYOUTS.includes(self.options.layout)
 		) {
 			const isRtl =
-				// eslint-disable-next-line no-undef
 				getComputedStyle(self.$items_wrap[0]).direction === 'rtl';
 
 			const initOptions = options || {

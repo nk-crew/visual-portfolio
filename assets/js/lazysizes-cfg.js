@@ -1,6 +1,3 @@
-/*
- * Visual Portfolio images lazy load.
- */
 window.lazySizesConfig = window.lazySizesConfig || {};
 
 window.lazySizesConfig = {

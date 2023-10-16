@@ -1,7 +1,4 @@
-/*
- * Visual Portfolio layout Justified.
- */
-const $ = window.jQuery;
+import $ from 'jquery';
 
 // Init Options.
 $(document).on('initOptions.vpf', (event, self) => {

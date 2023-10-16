@@ -1,23 +1,14 @@
-/**
- * External dependencies
- */
+import './style.scss';
+
 import classnames from 'classnames/dedupe';
 import Masonry from 'react-masonry-component';
 
-/**
- * Internal dependencies
- */
-import StylesRender from '../styles-render';
-import ToggleModal from '../toggle-modal';
-
-/**
- * WordPress dependencies
- */
+import { Button } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { Component } from '@wordpress/element';
-
-import { Button } from '@wordpress/components';
+import StylesRender from '../styles-render';
+import ToggleModal from '../toggle-modal';
 
 /**
  * Component Class
@@ -29,7 +20,6 @@ export default class TilesSelector extends Component {
 		this.renderPreview = this.renderPreview.bind(this);
 	}
 
-	// eslint-disable-next-line class-methods-use-this
 	renderPreview(tilesType) {
 		const settings = tilesType.split(/[:|]/);
 		const selector = `[data-tiles-preview="${tilesType}"]`;

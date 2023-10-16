@@ -1,14 +1,9 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
-//import { throttle } from '@wordpress/compose';
 import { throttle } from 'throttle-debounce';
 
-/**
- * WordPress dependencies
- */
-import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+
+const { MutationObserver } = window;
 
 function stepsWizard(props) {
 	const { step, children } = props;
@@ -35,8 +30,7 @@ function stepsWizard(props) {
 		if (step !== newStep) {
 			setNewStep(step);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [step]);
+	}, [step, newStep]);
 
 	useEffect(() => {
 		maybeUpdateHeight();
@@ -50,7 +44,6 @@ function stepsWizard(props) {
 			maybeUpdateHeight();
 		});
 
-		// eslint-disable-next-line no-undef
 		const observer = new MutationObserver(calculateHeight);
 
 		observer.observe($element, {

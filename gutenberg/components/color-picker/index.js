@@ -1,22 +1,16 @@
-/**
- * External dependencies
- */
+import './style.scss';
+
 import classnames from 'classnames/dedupe';
 
-/**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
-
-import {
-	Dropdown,
-	Button,
-	TabPanel,
-	ColorPalette,
-	GradientPicker,
-} from '@wordpress/components';
-
 import { __experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients } from '@wordpress/block-editor';
+import {
+	Button,
+	ColorPalette,
+	Dropdown,
+	GradientPicker,
+	TabPanel,
+} from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 function useColors() {
 	// New way to get colors and gradients.

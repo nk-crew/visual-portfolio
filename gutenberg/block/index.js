@@ -1,25 +1,16 @@
-/**
- * Internal dependencies
- */
-import { ReactComponent as ElementIcon } from '../../assets/admin/images/icon-gutenberg.svg';
+import './style.scss';
 
-import metadata from './block.json';
-import edit from './edit';
-import save from './save';
-import variations from './variations';
-import transforms from './transforms';
-import deprecated from './deprecated';
-
-/**
- * Global dependencies
- */
-const { attributes } = window.VPGutenbergVariables;
-
-/**
- * WordPress dependencies
- */
 import { registerBlockType } from '@wordpress/blocks';
 
+import { ReactComponent as ElementIcon } from '../../assets/admin/images/icon-gutenberg.svg';
+import metadata from './block.json';
+import deprecated from './deprecated';
+import edit from './edit';
+import save from './save';
+import transforms from './transforms';
+import variations from './variations';
+
+const { attributes } = window.VPGutenbergVariables;
 const { name } = metadata;
 
 const settings = {

@@ -1,7 +1,6 @@
-/*
- * Minimal Paged pagination.
- */
-const $ = window.jQuery;
+import $ from 'jquery';
+
+const { ResizeObserver } = window;
 
 function setImgWidth($el) {
 	if ($el && $el.height > 1) {
@@ -11,7 +10,6 @@ function setImgWidth($el) {
 
 // We need to use resize observer because for some reason in the Preview
 // and on some mobile devices image height is 1px.
-// eslint-disable-next-line no-undef
 const resizeObserver = new ResizeObserver((entries) => {
 	entries.forEach(({ target }) => {
 		if (target) {

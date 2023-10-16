@@ -1,6 +1,14 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll.stylelint": true,
+    "source.fixAll.eslint": true,
+  },
+
   "editor.defaultFormatter": null,
   "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[php]": {
@@ -13,9 +21,6 @@
   "css.validate": false,
   "less.validate": false,
 
-  "editor.codeActionsOnSave": {
-    "source.fixAll.stylelint": true
-  },
   "stylelint.validate": [
     "css",
     "scss"
@@ -24,9 +29,6 @@
     "css",
     "scss"
   ],
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
 
 	"search.exclude": {
 			"**/.git": true,

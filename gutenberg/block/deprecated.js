@@ -1,11 +1,5 @@
-/**
- * Internal dependencies
- */
 import save from './save';
 
-/**
- * Global dependencies
- */
 const { attributes } = window.VPGutenbergVariables;
 
 const V2_23_0_ATTRIBUTES = {

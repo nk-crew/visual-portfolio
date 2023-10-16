@@ -1,22 +1,9 @@
-/**
- * External dependencies
- */
 import shorthash from 'shorthash';
 
-/**
- * WordPress dependencies
- */
-import { addFilter } from '@wordpress/hooks';
-
-import { Component } from '@wordpress/element';
-
 import { createHigherOrderComponent } from '@wordpress/compose';
-
 import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { Component } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 
 // List of used IDs to prevent duplicates.
 const usedIds = {};

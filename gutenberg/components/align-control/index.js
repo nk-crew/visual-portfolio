@@ -1,11 +1,7 @@
-/**
- * External dependencies
- */
+import './style.scss';
+
 import classnames from 'classnames/dedupe';
 
-/**
- * WordPress dependencies
- */
 import { Button, Tooltip } from '@wordpress/components';
 
 /**

@@ -1,14 +1,7 @@
-/*
- * External dependencies.
- */
 import isNumber from 'is-number';
+import $ from 'jquery';
 
-/*
- * Visual Portfolio plugin Swiper extension.
- */
-const { jQuery: $ } = window;
 const $doc = $(document);
-
 const { screenSizes } = window.VPData;
 
 function getSwiperVersion(Swiper) {

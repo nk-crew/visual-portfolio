@@ -1,14 +1,11 @@
-/*
- * Visual Portfolio custom scrollbar extension.
- */
-const { jQuery: $, SimpleBar } = window;
+import $ from 'jquery';
 
+const { SimpleBar, navigator } = window;
 const $doc = $(document);
 
 // Don't run on Mac and mobile devices.
 const allowScrollbar =
 	!/Mac|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-		// eslint-disable-next-line no-undef
 		navigator.userAgent
 	);
 
@@ -33,7 +30,6 @@ if (allowScrollbar && typeof SimpleBar !== 'undefined') {
 					const instance = SimpleBar.instances.get(this);
 
 					if (!instance) {
-						// eslint-disable-next-line no-new
 						new SimpleBar(this);
 					}
 				});

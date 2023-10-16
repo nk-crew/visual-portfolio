@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
 
-/**
- * Internal dependencies
- */
-import ControlsRender from '../components/controls-render';
-import SetupWizard from '../components/setup-wizard';
-import IframePreview from '../components/iframe-preview';
-
-/**
- * WordPress dependencies
- */
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
-import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
+import ControlsRender from '../components/controls-render';
+import IframePreview from '../components/iframe-preview';
+import SetupWizard from '../components/setup-wizard';
 
 const {
 	plugin_url: pluginUrl,

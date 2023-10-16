@@ -1,39 +1,22 @@
-/* eslint-disable max-classes-per-file */
-
-/**
- * Internal dependencies
- */
-import '../store';
+import './style.scss';
 import './store';
 
-import BlockEdit from '../block/edit';
-
-/**
- * WordPress dependencies
- */
-const { jQuery: $ } = window;
-
-import { registerBlockType, createBlock } from '@wordpress/blocks';
-
-import { registerPlugin } from '@wordpress/plugins';
-
-import { __, sprintf } from '@wordpress/i18n';
+import $ from 'jquery';
 
 import apiFetch from '@wordpress/api-fetch';
-
-import { applyFilters } from '@wordpress/hooks';
-
-import { Component, useState } from '@wordpress/element';
-
-import { PanelBody, Button } from '@wordpress/components';
-
-import { withSelect, withDispatch } from '@wordpress/data';
-
 import { InspectorControls } from '@wordpress/block-editor';
-
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import { Button, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { Component, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
+import { __, sprintf } from '@wordpress/i18n';
+import { registerPlugin } from '@wordpress/plugins';
 
-const { plugin_name: pluginName } = window.VPGutenbergVariables;
+const { navigator, VPGutenbergVariables } = window;
+
+const { plugin_name: pluginName } = VPGutenbergVariables;
 
 let copiedTimeout;
 
@@ -48,7 +31,6 @@ function ShortcodeRender(props) {
 				<Button
 					isSmall
 					onClick={() => {
-						// eslint-disable-next-line no-undef
 						navigator.clipboard
 							.writeText(props.content)
 							.then(() => {
@@ -96,7 +78,13 @@ class LayoutsEditorBlock extends Component {
 	}
 
 	render() {
-		const { postId, blockData, updateBlockData, clientId } = this.props;
+		const {
+			postId,
+			blockData,
+			updateBlockData,
+			clientId,
+			VisualPortfolioBlockEdit,
+		} = this.props;
 		const { additionalShortcodes } = this.state;
 
 		let shortcodes = [
@@ -184,7 +172,7 @@ class LayoutsEditorBlock extends Component {
 						)}
 					</PanelBody>
 				</InspectorControls>
-				<BlockEdit
+				<VisualPortfolioBlockEdit
 					attributes={{
 						...blockData,
 						block_id: blockData.id || clientId,
@@ -205,10 +193,14 @@ const LayoutsEditorBlockWithSelect = compose([
 			'visual-portfolio/saved-layout-data'
 		).getBlockData();
 		const postId = select('core/editor').getCurrentPostId();
+		const VisualPortfolioBlockEdit =
+			select('core/blocks').getBlockType('visual-portfolio/block')
+				?.edit || (() => null);
 
 		return {
 			postId,
 			blockData,
+			VisualPortfolioBlockEdit,
 		};
 	}),
 	withDispatch((dispatch) => ({
@@ -456,8 +448,8 @@ class UpdateEditor extends Component {
 					post_id: postId,
 				},
 			}).catch((response) => {
-				// eslint-disable-next-line
-        console.log(response);
+				// eslint-disable-next-line no-console
+				console.log(response);
 			});
 		}
 	}

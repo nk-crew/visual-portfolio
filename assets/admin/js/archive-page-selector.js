@@ -1,4 +1,6 @@
-const { jQuery: $, ajaxurl, VPAdminVariables } = window;
+import $ from 'jquery';
+
+const { ajaxurl, VPAdminVariables } = window;
 
 // multiple select with AJAX search
 $('select[name="vp_general[portfolio_archive_page]"]').select2({

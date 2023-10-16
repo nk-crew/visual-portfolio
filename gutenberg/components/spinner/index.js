@@ -1,9 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
+import './style.scss';
 
 import { Spinner } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Component Class

@@ -9,9 +9,8 @@
 /**
  * External dependencies
  */
-import fs from 'fs';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import filenamify from 'filenamify';
+import fs from 'fs';
 
 // Remove "steps" to prevent stringify circular structure.
 function formatTestResult(testResult) {

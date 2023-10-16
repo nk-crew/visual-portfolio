@@ -1,25 +1,13 @@
-/**
- * External dependencies
- */
 import classnames from 'classnames/dedupe';
 
-/**
- * Internal dependencies
- */
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { Button, PanelBody, Placeholder, Spinner } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+
 import { ReactComponent as ElementIcon } from '../../assets/admin/images/icon-gutenberg.svg';
 import IframePreview from '../components/iframe-preview';
 import SelectControl from '../components/select-control';
-
-/**
- * WordPress dependencies
- */
-import { __, sprintf } from '@wordpress/i18n';
-
-import { Placeholder, Spinner, PanelBody, Button } from '@wordpress/components';
-
-import { useSelect } from '@wordpress/data';
-
-import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 

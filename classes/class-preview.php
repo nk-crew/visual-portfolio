@@ -243,7 +243,7 @@ class Visual_Portfolio_Preview {
 
 		// Enqueue assets.
 		Visual_Portfolio_Assets::enqueue_script( 'iframe-resizer-content', 'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min', array(), '4.2.11' );
-		Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-preview', 'build/assets/js/preview', array( 'jquery', 'iframe-resizer-content' ) );
+		Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-preview', 'build/assets/js/preview', array( 'iframe-resizer-content' ) );
 		// Post data for script.
 		wp_localize_script(
 			'visual-portfolio-preview',

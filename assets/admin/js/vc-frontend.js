@@ -1,10 +1,6 @@
-/*!
- * Additional js for frontend VC
- *
- * Name    : Visual Portfolio
- * Author  : nK https://nkdev.info
- */
-const { jQuery: $, vc } = window;
+import $ from 'jquery';
+
+const { vc } = window;
 
 $(() => {
 	// shortcode frontend editor

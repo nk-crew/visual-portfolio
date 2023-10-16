@@ -1,8 +1,5 @@
-/*!
- * Name    : Visual Portfolio
- * Author  : nK https://nkdev.info
- */
-const $ = window.jQuery;
+import $ from 'jquery';
+
 const $body = $('body');
 const $doc = $(document);
 const $preview = $('#vp_preview');

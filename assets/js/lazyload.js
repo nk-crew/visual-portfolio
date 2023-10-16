@@ -1,7 +1,3 @@
-/*
- * Visual Portfolio images lazy load.
- */
-
 // Recalculate image size if parent is <picture>
 document.addEventListener('lazybeforesizes', (e) => {
 	// for some reason sometimes e.detail is undefined, so we need to check it.

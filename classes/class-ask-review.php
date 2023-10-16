@@ -103,7 +103,7 @@ class Visual_Portfolio_Ask_Review_Notice {
 			return;
 		}
 
-		Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-ask-review-notice', 'build/assets/admin/js/ask-review-notice', array( 'jquery' ) );
+		Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-ask-review-notice', 'build/assets/admin/js/ask-review-notice' );
 		wp_localize_script(
 			'visual-portfolio-ask-review-notice',
 			'VPAskReviewNotice',

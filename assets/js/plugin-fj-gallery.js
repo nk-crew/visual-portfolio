@@ -1,7 +1,4 @@
-/*
- * Visual Portfolio plugin fjGallery extension.
- */
-const $ = window.jQuery;
+import $ from 'jquery';
 
 // Extend VP class.
 $(document).on('extendClass.vpf', (event, VP) => {

@@ -1,7 +1,3 @@
-/* eslint-disable max-classes-per-file */
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 
 /**

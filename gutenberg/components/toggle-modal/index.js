@@ -1,14 +1,9 @@
-/**
- * External dependencies
- */
+import './style.scss';
+
 import classnames from 'classnames/dedupe';
 
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
-
 import { Button, Modal } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Component Class

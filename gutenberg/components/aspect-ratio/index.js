@@ -1,11 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-import { Component } from '@wordpress/element';
+import './style.scss';
 
 import { SelectControl, TextControl } from '@wordpress/components';
+import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 const DEFAULT_RATIOS = {
 	'': __('Auto', 'visual-portfolio'),
@@ -37,7 +34,6 @@ export default class AspectRatio extends Component {
 	 *
 	 * @return {Array}
 	 */
-	// eslint-disable-next-line class-methods-use-this
 	parseParts(val) {
 		let left = '';
 		let right = '';
@@ -45,10 +41,7 @@ export default class AspectRatio extends Component {
 		if (val && /:/g.test(val)) {
 			const parts = val.split(':');
 
-			// eslint-disable-next-line prefer-destructuring
-			left = parts[0];
-			// eslint-disable-next-line prefer-destructuring
-			right = parts[1];
+			[left, right] = parts;
 		}
 
 		return [left, right];

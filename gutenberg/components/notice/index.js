@@ -1,11 +1,7 @@
-/**
- * External dependencies
- */
+import './style.scss';
+
 import classnames from 'classnames/dedupe';
 
-/**
- * WordPress dependencies
- */
 import { Notice } from '@wordpress/components';
 
 /**

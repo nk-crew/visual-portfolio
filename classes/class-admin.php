@@ -66,7 +66,7 @@ class Visual_Portfolio_Admin {
 			'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
 		);
 
-		Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-admin', 'build/assets/admin/js/script', array( 'jquery', 'wp-data', 'wp-compose' ) );
+		Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-admin', 'build/assets/admin/js/script' );
 		wp_localize_script( 'visual-portfolio-admin', 'VPAdminVariables', $data_init );
 		Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-admin', 'build/assets/admin/css/style' );
 		wp_style_add_data( 'visual-portfolio-admin', 'rtl', 'replace' );
@@ -82,8 +82,8 @@ class Visual_Portfolio_Admin {
 		);
 
 		if ( 'vp_lists' === get_post_type() ) {
-			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor-script', array( 'jquery' ) );
-			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor-style' );
+			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor' );
+			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-saved-layouts', 'build/gutenberg/style-layouts-editor' );
 			wp_style_add_data( 'visual-portfolio-saved-layouts', 'rtl', 'replace' );
 			wp_style_add_data( 'visual-portfolio-saved-layouts', 'suffix', '.min' );
 

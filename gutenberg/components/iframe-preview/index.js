@@ -1,43 +1,26 @@
-/**
- * Import CSS
- */
 import './style.scss';
-
-/**
- * External dependencies
- */
-//import { throttle, debounce } from '@wordpress/compose';
-import { throttle, debounce } from 'throttle-debounce';
-import rafSchd from 'raf-schd';
-import iframeResizer from 'iframe-resizer/js/iframeResizer';
-import classnames from 'classnames/dedupe';
-
-/**
- * Internal dependencies
- */
 import './live-reload-conditions';
+
+import classnames from 'classnames/dedupe';
+import iframeResizer from 'iframe-resizer/js/iframeResizer';
+import $ from 'jquery';
+import { isEqual, uniq } from 'lodash';
+import rafSchd from 'raf-schd';
+import { debounce, throttle } from 'throttle-debounce';
+
+import { Spinner } from '@wordpress/components';
+import { dispatch, withSelect } from '@wordpress/data';
+import { Component, createRef, Fragment } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
+
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
 
 const {
-	jQuery: $,
 	VPAdminGutenbergVariables: variables,
 	VPGutenbergVariables: { controls: registeredControls },
 } = window;
 
-/**
- * WordPress dependencies
- */
-import { applyFilters } from '@wordpress/hooks';
-
-import { Component, Fragment, createRef } from '@wordpress/element';
-
-import { withSelect, dispatch } from '@wordpress/data';
-
-import { Spinner } from '@wordpress/components';
-
 let uniqueIdCount = 1;
-
-const { isEqual, uniq } = window._;
 
 function getUpdatedKeys(oldData, newData) {
 	const keys = uniq([...Object.keys(oldData), ...Object.keys(newData)]);
@@ -85,7 +68,7 @@ class IframePreview extends Component {
 			rafSchd(this.maybeResizePreviews)
 		);
 		this.updateIframeHeight = this.updateIframeHeight.bind(this);
-		// eslint-disable-next-line react/no-unused-class-component-methods
+
 		this.updateIframeHeightThrottle = throttle(
 			100,
 			rafSchd(this.updateIframeHeight)

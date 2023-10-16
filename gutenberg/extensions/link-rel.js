@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 
 const NOOPENER_DEFAULT = 'noopener noreferrer';

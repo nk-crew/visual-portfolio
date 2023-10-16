@@ -1,4 +1,3 @@
-/* eslint-disable wrap-iife */
 (function (window, factory) {
 	const globalInstall = function () {
 		factory(window.lazySizes);
