@@ -82,8 +82,8 @@ class Visual_Portfolio_Admin {
 		);
 
 		if ( 'vp_lists' === get_post_type() ) {
-			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor-script' );
-			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor-style' );
+			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor' );
+			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-saved-layouts', 'build/gutenberg/style-layouts-editor' );
 			wp_style_add_data( 'visual-portfolio-saved-layouts', 'rtl', 'replace' );
 			wp_style_add_data( 'visual-portfolio-saved-layouts', 'suffix', '.min' );
 

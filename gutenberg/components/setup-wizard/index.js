@@ -1,3 +1,5 @@
+import './style.scss';
+
 import { Button, ToggleControl } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';

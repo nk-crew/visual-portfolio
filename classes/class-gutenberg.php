@@ -216,7 +216,7 @@ class Visual_Portfolio_Gutenberg_Block {
 		);
 		Visual_Portfolio_Assets::enqueue_style(
 			'visual-portfolio-gutenberg',
-			'build/gutenberg/style'
+			'build/gutenberg/index'
 		);
 		wp_style_add_data( 'visual-portfolio-gutenberg', 'rtl', 'replace' );
 		wp_style_add_data( 'visual-portfolio-gutenberg', 'suffix', '.min' );

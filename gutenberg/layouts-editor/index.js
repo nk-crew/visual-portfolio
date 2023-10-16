@@ -1,4 +1,4 @@
-import '../store';
+import './style.scss';
 import './store';
 
 import $ from 'jquery';
@@ -13,8 +13,6 @@ import { Component, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
-
-import BlockEdit from '../block/edit';
 
 const { navigator, VPGutenbergVariables } = window;
 
@@ -80,7 +78,13 @@ class LayoutsEditorBlock extends Component {
 	}
 
 	render() {
-		const { postId, blockData, updateBlockData, clientId } = this.props;
+		const {
+			postId,
+			blockData,
+			updateBlockData,
+			clientId,
+			VisualPortfolioBlockEdit,
+		} = this.props;
 		const { additionalShortcodes } = this.state;
 
 		let shortcodes = [
@@ -168,7 +172,7 @@ class LayoutsEditorBlock extends Component {
 						)}
 					</PanelBody>
 				</InspectorControls>
-				<BlockEdit
+				<VisualPortfolioBlockEdit
 					attributes={{
 						...blockData,
 						block_id: blockData.id || clientId,
@@ -189,10 +193,14 @@ const LayoutsEditorBlockWithSelect = compose([
 			'visual-portfolio/saved-layout-data'
 		).getBlockData();
 		const postId = select('core/editor').getCurrentPostId();
+		const VisualPortfolioBlockEdit =
+			select('core/blocks').getBlockType('visual-portfolio/block')
+				?.edit || (() => null);
 
 		return {
 			postId,
 			blockData,
+			VisualPortfolioBlockEdit,
 		};
 	}),
 	withDispatch((dispatch) => ({

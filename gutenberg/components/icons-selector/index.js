@@ -1,3 +1,5 @@
+import './style.scss';
+
 import classnames from 'classnames/dedupe';
 import $ from 'jquery';
 

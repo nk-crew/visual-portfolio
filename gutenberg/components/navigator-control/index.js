@@ -1,3 +1,5 @@
+import './style.scss';
+
 import {
 	__experimentalNavigatorBackButton,
 	__experimentalNavigatorButton,

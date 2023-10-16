@@ -132,10 +132,10 @@ const entryAssetsJs = glob
 	.sync([
 		'./assets/js/**.js',
 		'./assets/admin/js/**.js',
+		'./assets/js/3rd/plugin-jetpack.js',
 		'./gutenberg/index.js',
 		'./gutenberg/custom-post-meta.js',
-		'./gutenberg/layouts-editor-script.js',
-		'./assets/js/3rd/plugin-jetpack.js',
+		'./gutenberg/layouts-editor.js',
 	])
 	.reduce(function (entries, entry) {
 		const name = entry.replace('.js', '');
@@ -151,8 +151,6 @@ const entryAssetsCss = glob
 		'./templates/**/style.scss',
 		'./templates/**/**/style.scss',
 		'./templates/**/**/**/style.scss',
-		'./gutenberg/style.scss',
-		'./gutenberg/layouts-editor-style.scss',
 	])
 	.filter((entry) => {
 		const filename = path.basename(entry);

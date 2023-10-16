@@ -9,6 +9,8 @@ import 'ace-builds/src-noconflict/snippets/javascript';
 import 'ace-builds/src-noconflict/snippets/text';
 import 'ace-builds/src-noconflict/ext-language_tools';
 
+import './style.scss';
+
 import { Component } from '@wordpress/element';
 
 /**

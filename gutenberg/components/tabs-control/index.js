@@ -1,3 +1,5 @@
+import './style.scss';
+
 import { TabPanel } from '@wordpress/components';
 import { Component, RawHTML } from '@wordpress/element';
 

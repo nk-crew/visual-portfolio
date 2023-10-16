@@ -6,6 +6,7 @@ import './extensions/items-count-all';
 import './extensions/link-rel';
 import './extensions/stretch-for-saved-only';
 import './store';
+import './components/dropdown';
 
 import { registerBlockCollection } from '@wordpress/blocks';
 

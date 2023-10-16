@@ -1,3 +1,5 @@
+import './style.scss';
+
 import { registerBlockType } from '@wordpress/blocks';
 
 import { ReactComponent as ElementIcon } from '../../assets/admin/images/icon-gutenberg.svg';

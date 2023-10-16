@@ -1,3 +1,5 @@
+import './style.scss';
+
 import selectStyles from 'gutenberg-react-select-styles';
 import $ from 'jquery';
 import rafSchd from 'raf-schd';

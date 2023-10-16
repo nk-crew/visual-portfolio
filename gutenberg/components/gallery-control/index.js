@@ -1,3 +1,4 @@
+import './style.scss';
 import './extensions/dynamic-categories';
 import './extensions/image-title-and-desription';
 

@@ -1,3 +1,5 @@
+import './style.scss';
+
 import classnames from 'classnames/dedupe';
 
 import { __experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients } from '@wordpress/block-editor';
