@@ -1,12 +1,12 @@
 import './style.scss';
 
 import classnames from 'classnames/dedupe';
-import Masonry from 'react-masonry-component';
 
 import { Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import MasonryWrapper from '../masonry-wrapper';
 import StylesRender from '../styles-render';
 import ToggleModal from '../toggle-modal';
 
@@ -69,8 +69,8 @@ export default class TilesSelector extends Component {
 
 		return (
 			<>
-				<Masonry
-					elementType="div"
+				<StylesRender>{styles}</StylesRender>
+				<MasonryWrapper
 					data-tiles-preview={tilesType}
 					options={{
 						transitionDuration: 0,
@@ -81,8 +81,7 @@ export default class TilesSelector extends Component {
 							<div className="vpf-tiles-preview-item" />
 						</div>
 					))}
-				</Masonry>
-				<StylesRender>{styles}</StylesRender>
+				</MasonryWrapper>
 			</>
 		);
 	}

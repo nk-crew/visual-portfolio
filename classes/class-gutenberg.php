@@ -212,7 +212,8 @@ class Visual_Portfolio_Gutenberg_Block {
 		// Block.
 		Visual_Portfolio_Assets::enqueue_script(
 			'visual-portfolio-gutenberg',
-			'build/gutenberg/index'
+			'build/gutenberg/index',
+			array( 'masonry' )
 		);
 		Visual_Portfolio_Assets::enqueue_style(
 			'visual-portfolio-gutenberg',
