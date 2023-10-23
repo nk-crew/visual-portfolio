@@ -287,11 +287,14 @@ const newConfig = {
 						let cssOutput = `${path.dirname(
 							chunkName
 						)}/${cacheGroupKey}-${path.basename(chunkName)}`;
+						const foundingChunk = chunkName
+							.split(path.win32.sep)
+							.join(path.posix.sep);
 
 						if (
-							(chunkName.indexOf('templates/') > -1 ||
-								chunkName.indexOf('admin/css/') > -1 ||
-								chunkName.indexOf('gutenberg/') > -1) &&
+							(foundingChunk.indexOf('templates/') > -1 ||
+								foundingChunk.indexOf('admin/css/') > -1 ||
+								foundingChunk.indexOf('gutenberg/') > -1) &&
 							cacheGroupKey === 'style'
 						) {
 							cssOutput = `${path.dirname(
