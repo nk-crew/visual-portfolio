@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">
+    <defs>
+        <style>
+            .cls-1 {
+            fill: #555d66;
+            }
+        </style>
+    </defs>
+    <rect id="BR" class="cls-1" y="6" width="7" height="9"/>
+    <rect id="BL" class="cls-1" x="8" y="10" width="7" height="5"/>
+    <rect id="TR" class="cls-1" width="7" height="5"/>
+    <rect id="TL" class="cls-1" x="8" width="7" height="9"/>
+</svg>

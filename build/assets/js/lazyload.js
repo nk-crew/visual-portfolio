@@ -1,0 +1,1 @@
+document.addEventListener("lazybeforesizes",(e=>{if(!e.detail||!e.detail.width||!e.target)return;const t=e.target.closest(":not(picture)");t&&(e.detail.width=t.clientWidth||e.detail.width)})),document.addEventListener("lazybeforeunveil",(e=>{const t=e.target.previousElementSibling;t&&t.matches("noscript")&&t.remove()}));

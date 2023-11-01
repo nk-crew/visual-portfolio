@@ -4,7 +4,6 @@
 .idea
 /dist
 /dist-zip
-/build
 /vendor
 /node_modules
 npm-debug.log
