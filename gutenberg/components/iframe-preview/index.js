@@ -250,7 +250,11 @@ class IframePreview extends Component {
 	 * Resize frame to properly work with @media.
 	 */
 	maybeResizePreviews() {
-		const contentWidth = $('.editor-styles-wrapper').width();
+		const contentWidth = $(
+			'.editor-styles-wrapper, .edit-post-visual-editor__content-area'
+		)
+			.eq(0)
+			.width();
 
 		if (!contentWidth || !this.frameRef.current) {
 			return;
