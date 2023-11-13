@@ -548,12 +548,6 @@
          "Links Hover": [
             ""
          ],
-         "caption": [
-            ""
-         ],
-         "overlay": [
-            ""
-         ],
          "Disabled": [
             ""
          ],
@@ -935,6 +929,12 @@
          "Send a collection of photographs to your client for approval.": [
             ""
          ],
+         "Visual Portfolio and Visual Portfolio Pro should not be active at the same time. We've automatically deactivated Visual Portfolio.": [
+            ""
+         ],
+         "Visual Portfolio and Visual Portfolio Pro should not be active at the same time. We've automatically deactivated Visual Portfolio Pro.": [
+            ""
+         ],
          "Images Rounded Corners": [
             ""
          ],
@@ -1035,18 +1035,6 @@
             ""
          ],
          "Reduce AJAX calls request time.": [
-            ""
-         ],
-         "Social Logs": [
-            ""
-         ],
-         "Enable Social Logs for Twitch (Beta)": [
-            ""
-         ],
-         "Logs Limit": [
-            ""
-         ],
-         "Sets the maximum logs limit.": [
             ""
          ],
          "Responsive Breakpoints": [
@@ -1481,9 +1469,9 @@
          "Add Images": [
             ""
          ],
-         "Showing %s of %s Image": [
+         "Showing %1$s of %2$s Image": [
             "",
-            "Showing %s of %s Images"
+            "Showing %1$s of %2$s Images"
          ],
          "Show More": [
             ""
@@ -1533,7 +1521,10 @@
          "Edit Tiles": [
             ""
          ],
-         "Focal point will be used in Visual Portfolio layouts only.": [
+         "Focal point will be used in Visual Portfolio layouts only:": [
+            ""
+         ],
+         "Top": [
             ""
          ],
          "Video will be used in %s layouts only. Full list of supported links": [
