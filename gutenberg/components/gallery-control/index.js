@@ -424,9 +424,7 @@ const SortableItem = function (props) {
 					title={__('Image Settings', 'visual-portfolio')}
 					onRequestClose={(e) => {
 						if (
-							e.relatedTarget &&
-							e.relatedTarget.classList &&
-							e.relatedTarget.classList.contains('media-modal')
+							e?.relatedTarget?.classList?.contains('media-modal')
 						) {
 							// Don't close modal if opened media modal.
 						} else {

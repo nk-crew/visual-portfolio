@@ -40,7 +40,7 @@ class Visual_Portfolio_Control_Get_Value {
 							foreach ( $val_array_parts as $arr_part ) {
 								if ( '' !== $arr_part ) {
 									$arr_part_int = (int) $arr_part;
-									if ( "${$arr_part_int}" === $arr_part ) {
+									if ( "$arr_part_int" === $arr_part ) {
 										$val_parts[] = $arr_part_int;
 									} else {
 										$val_parts[] = $arr_part;
