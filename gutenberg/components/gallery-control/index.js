@@ -92,19 +92,23 @@ function prepareImages(images, currentImages) {
 
 	if (images && images.length) {
 		images.forEach((img) => {
-			let currentImgData = false;
+			// We have to check for image URL, because when the image is removed from the
+			// system, it should be removed from our block as well after re-save.
+			if (img.url) {
+				let currentImgData = false;
 
-			if (currentImagesIds.length) {
-				const currentId = currentImagesIds.indexOf(img.id);
+				if (currentImagesIds.length) {
+					const currentId = currentImagesIds.indexOf(img.id);
 
-				if (currentId > -1 && currentImages[currentId]) {
-					currentImgData = currentImages[currentId];
+					if (currentId > -1 && currentImages[currentId]) {
+						currentImgData = currentImages[currentId];
+					}
 				}
+
+				const imgData = currentImgData || prepareImage(img);
+
+				result.push(imgData);
 			}
-
-			const imgData = currentImgData || prepareImage(img);
-
-			result.push(imgData);
 		});
 	}
 
