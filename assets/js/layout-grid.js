@@ -175,7 +175,7 @@ $(document).on('beforeInitIsotope.vpf', (event, self, initOptions) => {
 		return;
 	}
 
-	if (self.options.layout !== 'grid') {
+	if (self.options.layout !== 'grid' || typeof initOptions !== 'object') {
 		return;
 	}
 
