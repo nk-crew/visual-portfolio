@@ -36,8 +36,8 @@ $templates_data = array(
 
 ?>
 
-<figcaption class="vp-portfolio__item-caption vp-portfolio__item-caption-text-align-<?php echo esc_attr( $align ); ?>">
-	<?php if ( $show_meta ) : ?>
+<?php if ( $show_meta ) : ?>
+	<figcaption class="vp-portfolio__item-caption vp-portfolio__item-caption-text-align-<?php echo esc_attr( $align ); ?>">
 		<div class="vp-portfolio__item-meta">
 			<?php
 			// Categories.
@@ -56,5 +56,5 @@ $templates_data = array(
 			visual_portfolio()->include_template( 'items-list/item-parts/read-more', $templates_data );
 			?>
 		</div>
-	<?php endif; ?>
-</figcaption>
+	</figcaption>
+<?php endif; ?>

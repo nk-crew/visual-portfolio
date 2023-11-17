@@ -46,14 +46,12 @@ $link_data = array_merge(
 	$templates_data
 );
 
-?>
+if ( $show_meta ) : ?>
+	<figcaption class="vp-portfolio__item-overlay vp-portfolio__item-overlay-text-align-<?php echo esc_attr( $align ); ?>">
+		<div class="vp-portfolio__item-meta-wrap vp-portfolio__custom-scrollbar">
+			<?php
+			visual_portfolio()->include_template( 'global/link-start', $link_data );
 
-<figcaption class="vp-portfolio__item-overlay vp-portfolio__item-overlay-text-align-<?php echo esc_attr( $align ); ?>">
-	<div class="vp-portfolio__item-meta-wrap vp-portfolio__custom-scrollbar">
-		<?php visual_portfolio()->include_template( 'global/link-start', $link_data ); ?>
-
-		<?php
-		if ( $show_meta ) {
 			// Icon.
 			visual_portfolio()->include_template( 'items-list/item-parts/icon', $templates_data );
 
@@ -68,9 +66,15 @@ $link_data = array_merge(
 
 			// Excerpt.
 			visual_portfolio()->include_template( 'items-list/item-parts/excerpt', $templates_data );
-		}
-		?>
 
+			visual_portfolio()->include_template( 'global/link-end', $link_data );
+			?>
+		</div>
+	</figcaption>
+<?php else : ?>
+	<div class="vp-portfolio__item-overlay">
+		<?php visual_portfolio()->include_template( 'global/link-start', $link_data ); ?>
 		<?php visual_portfolio()->include_template( 'global/link-end', $link_data ); ?>
 	</div>
-</figcaption>
+	<?php
+endif;
