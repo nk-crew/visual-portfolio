@@ -1249,26 +1249,26 @@ class Visual_Portfolio_Archive_Mapping {
 	}
 
 	/**
-	 * Get Canonical Term Link.
+	 * Get Current Term Link.
 	 * This feature is used in third-party SEO plugins.
 	 *
-	 * @param string $canonical - Current Canonical link.
+	 * @param WP_Query $query - Term Query to get term link.
 	 * @return string
 	 */
-	public static function get_canonical_term_link( $canonical ) {
+	public static function get_current_term_link( $query = null ) {
 		global $wp_query;
 
-		if ( isset( $wp_query->query['vp_category'] ) ) {
-			$category  = get_term_by( 'slug', $wp_query->query['vp_category'], 'portfolio_category' );
-			$canonical = get_term_link( $category );
-		}
+		$query = $query ?? $wp_query;
 
-		if ( isset( $wp_query->query['portfolio_tag'] ) ) {
-			$tag       = get_term_by( 'slug', $wp_query->query['portfolio_tag'], 'portfolio_tag' );
+		if ( isset( $query->query['portfolio_category'] ) ) {
+			$category  = get_term_by( 'slug', $query->query['portfolio_category'], 'portfolio_category' );
+			$canonical = get_term_link( $category );
+		} elseif ( isset( $query->query['portfolio_tag'] ) ) {
+			$tag       = get_term_by( 'slug', $query->query['portfolio_tag'], 'portfolio_tag' );
 			$canonical = get_term_link( $tag );
 		}
 
-		return $canonical;
+		return $canonical ?? null;
 	}
 }
 new Visual_Portfolio_Archive_Mapping();

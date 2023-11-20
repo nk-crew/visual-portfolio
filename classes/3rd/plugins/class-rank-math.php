@@ -28,8 +28,8 @@ class Visual_Portfolio_3rd_Rank_Math {
 	 * @return string
 	 */
 	public function canonical( $canonical ) {
-		$canonical = Visual_Portfolio_Archive_Mapping::get_canonical_term_link( $canonical );
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$canonical = Visual_Portfolio_Archive_Mapping::get_current_term_link() ?? $canonical;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		foreach ( $_GET as $key => $value ) {
 			if ( 'vp_page' === $key || 'vp_filter' === $key || 'vp_sort' === $key || 'vp_search' === $key ) {
                 // phpcs:ignore WordPress.Security.NonceVerification.Recommended

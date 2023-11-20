@@ -28,7 +28,7 @@ class Visual_Portfolio_3rd_All_In_One_Seo {
 	 * @return string
 	 */
 	public function canonical( $canonical ) {
-		$canonical = Visual_Portfolio_Archive_Mapping::get_canonical_term_link( $canonical );
+		$canonical = Visual_Portfolio_Archive_Mapping::get_current_term_link() ?? $canonical;
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		foreach ( $_GET as $key => $value ) {
 			if ( 'vp_page' === $key || 'vp_filter' === $key || 'vp_sort' === $key || 'vp_search' === $key ) {
