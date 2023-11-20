@@ -1247,5 +1247,28 @@ class Visual_Portfolio_Archive_Mapping {
 			'post-based' === $options['content_source'] &&
 			'current_query' === $options['posts_source'];
 	}
+
+	/**
+	 * Get Canonical Term Link.
+	 * This feature is used in third-party SEO plugins.
+	 *
+	 * @param string $canonical - Current Canonical link.
+	 * @return string
+	 */
+	public static function get_canonical_term_link( $canonical ) {
+		global $wp_query;
+
+		if ( isset( $wp_query->query['vp_category'] ) ) {
+			$category  = get_term_by( 'slug', $wp_query->query['vp_category'], 'portfolio_category' );
+			$canonical = get_term_link( $category );
+		}
+
+		if ( isset( $wp_query->query['portfolio_tag'] ) ) {
+			$tag       = get_term_by( 'slug', $wp_query->query['portfolio_tag'], 'portfolio_tag' );
+			$canonical = get_term_link( $tag );
+		}
+
+		return $canonical;
+	}
 }
 new Visual_Portfolio_Archive_Mapping();
