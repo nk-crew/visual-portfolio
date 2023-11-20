@@ -1,9 +1,9 @@
 import classnames from 'classnames/dedupe';
-import { throttle } from 'throttle-debounce';
+import { debounce } from 'throttle-debounce';
 
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
-const { MutationObserver } = window;
+const { ResizeObserver, MutationObserver } = window;
 
 function stepsWizard(props) {
 	const { step, children } = props;
@@ -40,13 +40,17 @@ function stepsWizard(props) {
 	useEffect(() => {
 		const $element = $ref.current;
 
-		const calculateHeight = throttle(100, () => {
+		const calculateHeight = debounce(100, () => {
 			maybeUpdateHeight();
 		});
 
-		const observer = new MutationObserver(calculateHeight);
+		// Resize observer is used to properly set height
+		// when selected images, saved post and reloaded page.
+		const resizeObserver = new ResizeObserver(calculateHeight);
+		const mutationObserver = new MutationObserver(calculateHeight);
 
-		observer.observe($element, {
+		resizeObserver.observe($element);
+		mutationObserver.observe($element, {
 			attributes: true,
 			characterData: true,
 			childList: true,
@@ -56,7 +60,8 @@ function stepsWizard(props) {
 		});
 
 		return () => {
-			observer.disconnect();
+			resizeObserver.disconnect();
+			mutationObserver.disconnect();
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [$ref.current]);
