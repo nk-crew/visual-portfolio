@@ -731,6 +731,9 @@ class Visual_Portfolio_Archive_Mapping {
 		$slug = get_post_field( 'post_name', $this->archive_page );
 		add_rewrite_tag( '%vp_page_query%', '([^&]+)' );
 		add_rewrite_tag( '%vp_page_archive%', '([^&]+)' );
+		// We've added this custom category tag for cases where categories are used in conjunction with pagination on archive and other taxonomy pages,
+		// So as not to change the base category portfolio tag.
+		// If you replace the base portfolio_category, the page will cyclically reload and reset to the main archives page.
 		add_rewrite_tag( '%vp_category%', '([^&]+)' );
 
 		add_rewrite_rule(
