@@ -178,6 +178,7 @@ export default function SetupWizard(props) {
 					/>
 					{renderControls(props, 'content-source')}
 					{renderControls(props, 'content-source-images')}
+					{renderControls(props, 'content-source-social-stream')}
 				</StepsWizard.Step>
 
 				{/* Step 1: Items Style */}

@@ -1,0 +1,83 @@
+
+.vpf-pro-note {
+	position: relative;
+	max-width: 280px;
+	padding: 20px;
+	font-size: 13px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	color: #b65e96;
+	background: linear-gradient(to left, rgba(#743ad5, 20%), rgba(#d53a9d, 20%));
+
+	.vpf-setup-wizard-panel & {
+		margin: 0 auto;
+	}
+
+	&::before {
+		position: absolute;
+		top: 1px;
+		right: 1px;
+		bottom: 1px;
+		left: 1px;
+		z-index: 0;
+		display: block;
+		content: "";
+		background-color: #fff6fc;
+	}
+
+	> * {
+		position: relative;
+		z-index: 1;
+	}
+
+	h3 {
+		margin-top: 0;
+		margin-bottom: 0;
+		font-size: 13px;
+		font-weight: 600;
+		font-family: inherit;
+		color: #d53a9d;
+		text-transform: none;
+	}
+
+	p {
+		font-size: inherit !important;
+	}
+
+	ul {
+		margin: 0;
+		list-style: none;
+
+		li::before {
+			display: inline;
+			margin-bottom: 5px;
+			content: "- ";
+		}
+	}
+
+	.vpf-pro-note-description,
+	.components-base-control__help {
+		margin: 1em 0;
+	}
+
+	&-button {
+		display: inline-block;
+		padding: 7px 15px;
+		text-decoration: none;
+		background: linear-gradient(to left, #743ad5, #d53a9d);
+		border-radius: 3px;
+		transition: 0.2s filter ease, 0.2s transform ease;
+
+		&,
+		&:hover,
+		&:focus,
+		&:active {
+			color: #fff;
+		}
+
+		&:hover,
+		&:focus {
+			filter: contrast(1.5) drop-shadow(0 3px 3px rgba(213, 58, 157, 30%));
+			transform: translateY(-1px);
+		}
+	}
+}

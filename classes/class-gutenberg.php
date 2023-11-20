@@ -32,7 +32,7 @@ class Visual_Portfolio_Gutenberg_Block {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_block' ), 11 );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_block_editor_assets' ) );
 	}
 
 	/**
@@ -207,6 +207,10 @@ class Visual_Portfolio_Gutenberg_Block {
 	 * Enqueue script for Gutenberg editor
 	 */
 	public function enqueue_block_editor_assets() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
 		$attributes = $this->get_block_attributes();
 
 		// Block.

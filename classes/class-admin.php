@@ -18,7 +18,7 @@ class Visual_Portfolio_Admin {
 	 */
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'saved_layouts_editor_enqueue_scripts' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'saved_layouts_editor_enqueue_scripts' ) );
 		add_action( 'in_admin_header', array( $this, 'in_admin_header' ) );
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
@@ -77,6 +77,10 @@ class Visual_Portfolio_Admin {
 	 * Enqueue styles and scripts on saved layouts editor.
 	 */
 	public function saved_layouts_editor_enqueue_scripts() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
 		$data_init = array(
 			'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
 		);
@@ -1806,11 +1810,12 @@ class Visual_Portfolio_Admin {
 		 */
 		Visual_Portfolio_Controls::register(
 			array(
-				'category'    => 'content-source-social-stream',
-				'type'        => 'pro_note',
-				'name'        => 'social_pro_note',
-				'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description' => '<p>' . esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', 'visual-portfolio' ) . '</p>',
+				'category'     => 'content-source-social-stream',
+				'type'         => 'pro_note',
+				'name'         => 'social_pro_note',
+				'label'        => esc_html__( 'Premium Only', 'visual-portfolio' ),
+				'description'  => '<p>' . esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', 'visual-portfolio' ) . '</p>',
+				'setup_wizard' => true,
 			)
 		);
 

@@ -1,3 +1,5 @@
+import './style.scss';
+
 import { Component } from '@wordpress/element';
 
 /**
