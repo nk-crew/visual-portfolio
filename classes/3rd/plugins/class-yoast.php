@@ -19,6 +19,9 @@ class Visual_Portfolio_3rd_Yoast {
 	public function __construct() {
 		// Fixed canonical links.
 		add_filter( 'wpseo_canonical', array( $this, 'canonical' ), 12, 1 );
+		add_filter( 'wpseo_opengraph_url', array( $this, 'canonical' ), 12, 1 );
+		add_filter( 'wpseo_schema_webpage', array( $this, 'graph_schema' ), 12, 4 );
+		add_filter( 'wpseo_opengraph_title', array( $this, 'graph_title' ), 12, 1 );
 	}
 
 	/**
@@ -37,6 +40,29 @@ class Visual_Portfolio_3rd_Yoast {
 			}
 		}
 		return $canonical;
+	}
+
+	/**
+	 * Allows changing graph piece output.
+	 *
+	 * @param array $graph_piece - The graph piece to filter.
+	 * @return array
+	 */
+	public function graph_schema( $graph_piece ) {
+		$graph_piece['@id']  = $this->canonical( $graph_piece['@id'] );
+		$graph_piece['url']  = $this->canonical( $graph_piece['url'] );
+		$graph_piece['name'] = Visual_Portfolio_Archive_Mapping::get_current_term_title() ?? $graph_piece['name'];
+		return $graph_piece;
+	}
+
+	/**
+	 * Allow changing the Yoast SEO generated title.
+	 *
+	 * @param string $title - Current Graph Title.
+	 * @return string
+	 */
+	public function graph_title( $title ) {
+		return Visual_Portfolio_Archive_Mapping::get_current_term_title() ?? $title;
 	}
 }
 new Visual_Portfolio_3rd_Yoast();

@@ -1273,5 +1273,30 @@ class Visual_Portfolio_Archive_Mapping {
 
 		return $canonical ?? null;
 	}
+
+	/**
+	 * Get Current Term Title.
+	 * This feature is used in third-party SEO plugins.
+	 *
+	 * @param WP_Query $query - Term Query to get term link.
+	 * @return string
+	 */
+	public static function get_current_term_title( $query = null ) {
+		global $wp_query;
+
+		$query = $query ?? $wp_query;
+
+		if ( isset( $query->query['portfolio_category'] ) ) {
+			$category = get_term_by( 'slug', $query->query['portfolio_category'], 'portfolio_category' );
+			// translators: %s - taxonomy name.
+			$title = sprintf( esc_html__( 'Portfolio Category: %s', 'visual-portfolio' ), esc_html( ucfirst( $category->name ) ) );
+		} elseif ( isset( $query->query['portfolio_tag'] ) ) {
+			$tag = get_term_by( 'slug', $query->query['portfolio_tag'], 'portfolio_tag' );
+			// translators: %s - taxonomy name.
+			$title = sprintf( esc_html__( 'Portfolio Tag: %s', 'visual-portfolio' ), esc_html( ucfirst( $tag->name ) ) );
+		}
+
+		return $title ?? null;
+	}
 }
 new Visual_Portfolio_Archive_Mapping();
