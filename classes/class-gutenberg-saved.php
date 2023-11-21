@@ -59,6 +59,15 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
 			)
 		);
 
+		if ( 'vp_lists' === get_post_type() ) {
+			register_block_type(
+				visual_portfolio()->plugin_path . 'gutenberg/layouts-editor',
+				array(
+					'attributes' => $attributes,
+				)
+			);
+		}
+
 		// Fallback.
 		register_block_type(
 			'nk/visual-portfolio',

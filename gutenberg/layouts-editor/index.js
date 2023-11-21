@@ -8,15 +8,20 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { Button, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
+import {
+	useDispatch,
+	useSelect,
+	withDispatch,
+	withSelect,
+} from '@wordpress/data';
 import { Component, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 
-const { navigator, VPGutenbergVariables } = window;
+import metadata from './block.json';
 
-const { plugin_name: pluginName } = VPGutenbergVariables;
+const { navigator } = window;
 
 let copiedTimeout;
 
@@ -67,157 +72,134 @@ function ShortcodeRender(props) {
 
 /**
  * Layouts Editor block
+ *
+ * @param props
  */
-class LayoutsEditorBlock extends Component {
-	constructor(...args) {
-		super(...args);
+function LayoutsEditorBlock(props) {
+	const { clientId } = props;
 
-		this.state = {
-			additionalShortcodes: false,
-		};
-	}
+	const [additionalShortcodes, setAdditionalShortcodes] = useState(false);
 
-	render() {
-		const {
-			postId,
-			blockData,
-			updateBlockData,
-			clientId,
-			VisualPortfolioBlockEdit,
-		} = this.props;
-		const { additionalShortcodes } = this.state;
+	const { postId, blockData, VisualPortfolioBlockEdit } = useSelect(
+		(select) => {
+			const { getBlockData } = select(
+				'visual-portfolio/saved-layout-data'
+			);
+			const { getCurrentPostId } = select('core/editor');
+			const { getBlockType } = select('core/blocks');
 
-		let shortcodes = [
-			{
-				label: __('This Saved Layout', 'visual-portfolio'),
-				content: `[visual_portfolio id="${postId}"]`,
-			},
-			{
-				label: __('Filter', 'visual-portfolio'),
-				content: `[visual_portfolio_filter id="${postId}" type="minimal" align="center" show_count="false" text_all="All"]`,
-				isOptional: true,
-			},
-			{
-				label: __('Sort', 'visual-portfolio'),
-				content: `[visual_portfolio_sort id="${postId}" type="minimal" align="center"]`,
-				isOptional: true,
-			},
-		];
+			return {
+				postId: getCurrentPostId(),
+				blockData: getBlockData(),
+				VisualPortfolioBlockEdit:
+					getBlockType('visual-portfolio/block')?.edit ||
+					(() => null),
+			};
+		}
+	);
 
-		shortcodes = applyFilters(
-			'vpf.layouts-editor.shortcodes-list',
-			shortcodes,
-			this
-		);
+	const { updateBlockData } = useDispatch(
+		'visual-portfolio/saved-layout-data'
+	);
 
-		return (
-			<>
-				<InspectorControls>
-					<PanelBody
-						title={__('Shortcodes', 'visual-portfolio')}
-						scrollAfterOpen
-					>
-						<p>
-							{__(
-								'To output this saved layout and its components you can use the following shortcodes:'
-							)}
-						</p>
-						{shortcodes.map((data) => {
-							if (data.isOptional) {
-								return null;
-							}
+	let shortcodes = [
+		{
+			label: __('This Saved Layout', 'visual-portfolio'),
+			content: `[visual_portfolio id="${postId}"]`,
+		},
+		{
+			label: __('Filter', 'visual-portfolio'),
+			content: `[visual_portfolio_filter id="${postId}" type="minimal" align="center" show_count="false" text_all="All"]`,
+			isOptional: true,
+		},
+		{
+			label: __('Sort', 'visual-portfolio'),
+			content: `[visual_portfolio_sort id="${postId}" type="minimal" align="center"]`,
+			isOptional: true,
+		},
+	];
 
-							return (
-								<ShortcodeRender
-									key={`shortcode-${data.label}`}
-									{...data}
-								/>
-							);
-						})}
-						{additionalShortcodes ? (
-							<>
-								{shortcodes.map((data) => {
-									if (!data.isOptional) {
-										return null;
-									}
+	shortcodes = applyFilters(
+		'vpf.layouts-editor.shortcodes-list',
+		shortcodes,
+		{ props, postId, blockData, updateBlockData, VisualPortfolioBlockEdit }
+	);
 
-									return (
-										<ShortcodeRender
-											key={`shortcode-${data.label}`}
-											{...data}
-										/>
-									);
-								})}
-								{applyFilters(
-									'vpf.layouts-editor.shortcodes',
-									'',
-									this
-								)}
-							</>
-						) : (
-							<Button
-								isLink
-								onClick={() => {
-									this.setState({
-										additionalShortcodes:
-											!additionalShortcodes,
-									});
-								}}
-							>
-								{__(
-									'Show Additional Shortcodes',
-									'visual-portfolio'
-								)}
-							</Button>
+	return (
+		<>
+			<InspectorControls>
+				<PanelBody
+					title={__('Shortcodes', 'visual-portfolio')}
+					scrollAfterOpen
+				>
+					<p>
+						{__(
+							'To output this saved layout and its components you can use the following shortcodes:'
 						)}
-					</PanelBody>
-				</InspectorControls>
-				<VisualPortfolioBlockEdit
-					attributes={{
-						...blockData,
-						block_id: blockData.id || clientId,
-					}}
-					setAttributes={(data) => {
-						updateBlockData(data);
-					}}
-					clientId={clientId}
-				/>
-			</>
-		);
-	}
+					</p>
+					{shortcodes.map((data) => {
+						if (data.isOptional) {
+							return null;
+						}
+
+						return (
+							<ShortcodeRender
+								key={`shortcode-${data.label}`}
+								{...data}
+							/>
+						);
+					})}
+					{additionalShortcodes ? (
+						<>
+							{shortcodes.map((data) => {
+								if (!data.isOptional) {
+									return null;
+								}
+
+								return (
+									<ShortcodeRender
+										key={`shortcode-${data.label}`}
+										{...data}
+									/>
+								);
+							})}
+							{applyFilters(
+								'vpf.layouts-editor.shortcodes',
+								'',
+								this
+							)}
+						</>
+					) : (
+						<Button
+							isLink
+							onClick={() => {
+								setAdditionalShortcodes(!additionalShortcodes);
+							}}
+						>
+							{__(
+								'Show Additional Shortcodes',
+								'visual-portfolio'
+							)}
+						</Button>
+					)}
+				</PanelBody>
+			</InspectorControls>
+			<VisualPortfolioBlockEdit
+				attributes={{
+					...blockData,
+					block_id: blockData.id || clientId,
+				}}
+				setAttributes={(data) => {
+					updateBlockData(data);
+				}}
+				clientId={clientId}
+			/>
+		</>
+	);
 }
 
-const LayoutsEditorBlockWithSelect = compose([
-	withSelect((select) => {
-		const blockData = select(
-			'visual-portfolio/saved-layout-data'
-		).getBlockData();
-		const postId = select('core/editor').getCurrentPostId();
-		const VisualPortfolioBlockEdit =
-			select('core/blocks').getBlockType('visual-portfolio/block')
-				?.edit || (() => null);
-
-		return {
-			postId,
-			blockData,
-			VisualPortfolioBlockEdit,
-		};
-	}),
-	withDispatch((dispatch) => ({
-		updateBlockData(data) {
-			dispatch('visual-portfolio/saved-layout-data').updateBlockData(
-				data
-			);
-		},
-	})),
-])(LayoutsEditorBlock);
-
 registerBlockType('visual-portfolio/saved-editor', {
-	title: sprintf(__('%s Editor', 'visual-portfolio'), pluginName),
-	description: sprintf(
-		__('Edit saved %s layouts.', 'visual-portfolio'),
-		pluginName
-	),
+	...metadata,
 	icon: {
 		foreground: '#2540CC',
 		src: (
@@ -277,17 +259,7 @@ registerBlockType('visual-portfolio/saved-editor', {
 			</svg>
 		),
 	},
-	category: 'common',
-	supports: {
-		html: false,
-		className: false,
-		customClassName: false,
-		anchor: false,
-		inserter: false,
-	},
-
-	edit: LayoutsEditorBlockWithSelect,
-
+	edit: LayoutsEditorBlock,
 	save() {
 		return null;
 	},

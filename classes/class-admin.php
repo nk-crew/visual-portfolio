@@ -81,10 +81,6 @@ class Visual_Portfolio_Admin {
 			return;
 		}
 
-		$data_init = array(
-			'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
-		);
-
 		if ( 'vp_lists' === get_post_type() ) {
 			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor' );
 			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-saved-layouts', 'build/gutenberg/style-layouts-editor' );
@@ -92,6 +88,9 @@ class Visual_Portfolio_Admin {
 			wp_style_add_data( 'visual-portfolio-saved-layouts', 'suffix', '.min' );
 
 			$block_data = Visual_Portfolio_Get::get_options( array( 'id' => get_the_ID() ) );
+			$data_init  = array(
+				'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
+			);
 
 			wp_localize_script(
 				'visual-portfolio-saved-layouts',

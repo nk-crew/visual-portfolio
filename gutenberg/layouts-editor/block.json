@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/saved-editor",
+	"category": "common",
+	"title": "Visual Portfolio Editor",
+	"description": "Edit saved Visual Portfolio layouts.",
+	"textdomain": "visual-portfolio",
+	"supports": {
+		"anchor": false,
+		"className": false,
+		"customClassName": false,
+		"html": false,
+		"inserter": false
+	}
+}
