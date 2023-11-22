@@ -1,7 +1,7 @@
 import './style.scss';
 
 import { Button, ToggleControl } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import ControlsRender from '../controls-render';
@@ -79,87 +79,90 @@ export default function SetupWizard(props) {
 
 	// Set some starter attributes for different content sources.
 	// And hide the setup wizard.
-	useEffect(() => {
-		if (contentSource) {
-			let newAttributes = {};
+	const setStarterAttributes = useCallback(() => {
+		let newAttributes = {};
 
-			switch (contentSource) {
-				case 'images':
-					// Hide setup wizard once user select images.
-					if (images && images.length) {
-						newAttributes = {
-							...newAttributes,
-							items_count: -1,
-							items_click_action: 'popup_gallery',
-						};
-
-						// Add infinite scroll to the gallery when user adds a lot of images.
-						if (
-							layout !== 'slider' &&
-							images.length > NOTICE_LIMIT
-						) {
-							newAttributes = {
-								...newAttributes,
-								items_count: NOTICE_LIMIT,
-								layout_elements: {
-									top: {
-										elements: [],
-										align: 'center',
-									},
-									items: {
-										elements: ['items'],
-									},
-									bottom: {
-										elements: ['pagination'],
-										align: 'center',
-									},
-								},
-								pagination: 'infinite',
-								pagination_hide_on_end: true,
-							};
-						}
-					}
-					break;
-				case 'post-based':
-				case 'social-stream':
+		switch (contentSource) {
+			case 'images':
+				// Hide setup wizard once user select images.
+				if (images && images.length) {
 					newAttributes = {
 						...newAttributes,
-						layout_elements: {
-							top: {
-								elements: [],
-								align: 'center',
-							},
-							items: {
-								elements: ['items'],
-							},
-							bottom: {
-								elements: ['pagination'],
-								align: 'center',
-							},
-						},
+						items_count: -1,
+						items_click_action: 'popup_gallery',
 					};
-					break;
-				// no default
-			}
 
-			// Prepare better default settings for Popup.
-			// We can't change defaults of registered controls because it may break existing user galleries.
-			// This is why we change it here, in the Setup Wizard.
-			newAttributes = {
-				...newAttributes,
-				items_click_action_popup_title_source:
-					contentSource === 'post-based' ? 'title' : 'item_title',
-				items_click_action_popup_description_source:
-					contentSource === 'post-based'
-						? 'description'
-						: 'item_description',
-				items_click_action_popup_deep_link_pid: 'filename',
-			};
-
-			setAttributes(newAttributes);
-			setAllowNextStep(true);
+					// Add infinite scroll to the gallery when user adds a lot of images.
+					if (layout !== 'slider' && images.length > NOTICE_LIMIT) {
+						newAttributes = {
+							...newAttributes,
+							items_count: NOTICE_LIMIT,
+							layout_elements: {
+								top: {
+									elements: [],
+									align: 'center',
+								},
+								items: {
+									elements: ['items'],
+								},
+								bottom: {
+									elements: ['pagination'],
+									align: 'center',
+								},
+							},
+							pagination: 'infinite',
+							pagination_hide_on_end: true,
+						};
+					}
+				}
+				break;
+			case 'post-based':
+			case 'social-stream':
+				newAttributes = {
+					...newAttributes,
+					layout_elements: {
+						top: {
+							elements: [],
+							align: 'center',
+						},
+						items: {
+							elements: ['items'],
+						},
+						bottom: {
+							elements: ['pagination'],
+							align: 'center',
+						},
+					},
+				};
+				break;
+			// no default
 		}
+
+		// Prepare better default settings for Popup.
+		// We can't change defaults of registered controls because it may break existing user galleries.
+		// This is why we change it here, in the Setup Wizard.
+		newAttributes = {
+			...newAttributes,
+			items_click_action_popup_title_source:
+				contentSource === 'post-based' ? 'title' : 'item_title',
+			items_click_action_popup_description_source:
+				contentSource === 'post-based'
+					? 'description'
+					: 'item_description',
+			items_click_action_popup_deep_link_pid: 'filename',
+		};
+
+		setAttributes(newAttributes);
+		setAllowNextStep(true);
 	}, [contentSource, images, layout, setAttributes]);
+
+	useEffect(() => {
+		if (contentSource) {
+			setStarterAttributes();
+		}
+		// We have to check for contentSource change here because we don't want to run this on every render.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [contentSource]);
 
 	return (
 		<div className={`vpf-setup-wizard vpf-setup-wizard-step-${step}`}>
