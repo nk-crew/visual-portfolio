@@ -1294,9 +1294,50 @@ class Visual_Portfolio_Archive_Mapping {
 			$tag = get_term_by( 'slug', $query->query['portfolio_tag'], 'portfolio_tag' );
 			// translators: %s - taxonomy name.
 			$title = sprintf( esc_html__( 'Portfolio Tag: %s', 'visual-portfolio' ), esc_html( ucfirst( $tag->name ) ) );
+		} elseif (
+			! is_front_page() &&
+			isset( $wp_query->query_vars['original_archive_id'] ) &&
+			'portfolio' === $wp_query->query_vars['original_archive_id']
+		) {
+			$title = get_the_title();
 		}
 
 		return $title ?? null;
+	}
+
+	/**
+	 * Optimize url by supported GET variables: vp_page, vp_filter, vp_sort and vp_search.
+	 *
+	 * @param string $canonical - Not optimized URL.
+	 * @return string
+	 */
+	public static function get_canonical( $canonical ) {
+		$canonical = self::get_current_term_link() ?? $canonical;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		foreach ( $_GET as $key => $value ) {
+			if ( 'vp_page' === $key || 'vp_filter' === $key || 'vp_sort' === $key || 'vp_search' === $key ) {
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$canonical = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( array( $key => $value ) ) ), $canonical );
+			}
+		}
+		return $canonical;
+	}
+
+	/**
+	 * Optimize and get canonical anchor url by supported GET variables: vp_page, vp_filter, vp_sort and vp_search.
+	 * Also check term link and replaced it.
+	 *
+	 * @param string $url - Not optimized URL.
+	 * @return string
+	 */
+	public static function get_canonical_anchor( $url ) {
+		$parse_url = parse_url( $url );
+		if ( isset( $parse_url['fragment'] ) ) {
+			$url = str_contains( $url, '#' . $parse_url['fragment'] ) ?
+			str_replace( '#' . $parse_url['fragment'], '', self::get_canonical( $url ) ) . '#' . $parse_url['fragment'] :
+			self::get_canonical( $url );
+		}
+		return $url;
 	}
 }
 new Visual_Portfolio_Archive_Mapping();
