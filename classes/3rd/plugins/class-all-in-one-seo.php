@@ -18,25 +18,35 @@ class Visual_Portfolio_3rd_All_In_One_Seo {
 	 */
 	public function __construct() {
 		// Fixed canonical links.
-		add_filter( 'aioseo_canonical_url', array( $this, 'canonical' ) );
+		add_filter( 'aioseo_canonical_url', array( 'Visual_Portfolio_Archive_Mapping', 'get_canonical' ) );
+		add_filter( 'aioseo_schema_output', array( $this, 'graph_schema_output' ) );
 	}
 
 	/**
-	 * Optimize url by supported GET variables: vp_page, vp_filter, vp_sort and vp_search.
+	 * Allows changing graph output.
 	 *
-	 * @param string $canonical - Not optimized URL.
-	 * @return string
+	 * @param array $graph - Graph output array.
+	 * @return array
 	 */
-	public function canonical( $canonical ) {
-		$canonical = Visual_Portfolio_Archive_Mapping::get_current_term_link() ?? $canonical;
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		foreach ( $_GET as $key => $value ) {
-			if ( 'vp_page' === $key || 'vp_filter' === $key || 'vp_sort' === $key || 'vp_search' === $key ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$canonical = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( array( $key => $value ) ) ), $canonical );
+	public function graph_schema_output( $graph ) {
+		if ( isset( $graph ) && ! empty( $graph ) && is_array( $graph ) ) {
+			foreach ( $graph as $key => $graph_item ) {
+				if ( isset( $graph_item['@type'] ) ) {
+					switch ( $graph_item['@type'] ) {
+						case 'BreadcrumbList':
+							$graph[ $key ]['@id'] = Visual_Portfolio_Archive_Mapping::get_canonical_anchor( $graph_item['@id'] );
+							break;
+						case 'WebPage':
+						case 'CollectionPage':
+							$graph[ $key ]['@id']               = Visual_Portfolio_Archive_Mapping::get_canonical_anchor( $graph_item['@id'] );
+							$graph[ $key ]['url']               = Visual_Portfolio_Archive_Mapping::get_canonical( $graph_item['@id'] );
+							$graph[ $key ]['breadcrumb']['@id'] = Visual_Portfolio_Archive_Mapping::get_canonical_anchor( $graph_item['@id'] );
+							break;
+					}
+				}
 			}
 		}
-		return $canonical;
+		return $graph;
 	}
 }
 new Visual_Portfolio_3rd_All_In_One_Seo();
