@@ -18,25 +18,19 @@ class Visual_Portfolio_3rd_Rank_Math {
 	 */
 	public function __construct() {
 		// Fixed canonical links.
-		add_filter( 'rank_math/frontend/canonical', array( $this, 'canonical' ) );
+		add_filter( 'rank_math/frontend/canonical', array( 'Visual_Portfolio_Archive_Mapping', 'get_canonical' ) );
+		add_filter( 'rank_math/frontend/title', array( $this, 'get_title' ) );
+		add_filter( 'rank_math/opengraph/facebook/og_title', array( $this, 'get_title' ) );
 	}
 
 	/**
-	 * Optimize url by supported GET variables: vp_page, vp_filter, vp_sort and vp_search.
+	 * Allow changing the Rank Math generated title.
 	 *
-	 * @param string $canonical - Not optimized URL.
+	 * @param string $title - Current Page Title.
 	 * @return string
 	 */
-	public function canonical( $canonical ) {
-		$canonical = Visual_Portfolio_Archive_Mapping::get_current_term_link() ?? $canonical;
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		foreach ( $_GET as $key => $value ) {
-			if ( 'vp_page' === $key || 'vp_filter' === $key || 'vp_sort' === $key || 'vp_search' === $key ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$canonical = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( array( $key => $value ) ) ), $canonical );
-			}
-		}
-		return $canonical;
+	public function get_title( $title ) {
+		return Visual_Portfolio_Archive_Mapping::get_current_term_title() ?? $title;
 	}
 }
 new Visual_Portfolio_3rd_Rank_Math();
