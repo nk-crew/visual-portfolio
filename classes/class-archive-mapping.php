@@ -86,6 +86,7 @@ class Visual_Portfolio_Archive_Mapping {
 			add_filter( 'vpf_pagination_item_data', array( $this, 'converting_paginate_links_to_friendly_url' ), 10, 3 );
 			add_filter( 'vpf_pagination_args', array( $this, 'converting_load_more_and_infinite_paginate_next_page_to_friendly_url' ), 10, 2 );
 			add_filter( 'vpf_extend_sort_item_url', array( $this, 'remove_page_url_from_sort_item_url' ), 10, 3 );
+			add_filter( 'vpf_each_item_args', array( $this, 'convert_category_on_item_meta_to_friendly_url' ), 10, 1 );
 		}
 
 		self::create_archive_page();
@@ -443,50 +444,10 @@ class Visual_Portfolio_Archive_Mapping {
 					preg_match( '/' . $this->permalinks['category_base'] . '\/[^\/]+\//', $term['url'], $match_category );
 					preg_match( '/' . $this->permalinks['tag_base'] . '\/[^\/]+\//', $term['url'], $match_tag );
 
-					$base_page = $this->get_relative_archive_link();
-
-					/**
-					 * We clear the link from taxonomies to replace them with the base archive page.
-					 * For example: example.com/portfolio-category/test/?vp_filter=portfolio_category%3Aanother-category
-					 * To example.com/?vp_filter=portfolio_category%3Aanother-category
-					 */
+					$base_page            = $this->get_relative_archive_link();
 					$changed_part_of_link = ! empty( $match_category ) ? $match_category[0] : ( ! empty( $match_tag ) ? $match_tag[0] : '' );
 					$link                 = str_replace( $changed_part_of_link, $base_page, $term['url'] );
-
-					if ( is_array( $match_filter ) && ! empty( $match_filter ) ) {
-						// We extract the contents of the filter and form a new link.
-						$taxonomies = explode( ':', rawurldecode( $match_filter[1] ) );
-						if ( is_array( $taxonomies ) && 'portfolio_category' === $taxonomies[0] ) {
-							$category_slug = $taxonomies[1];
-							if ( strpos( $link, 'vp_filter' ) !== false ) {
-								$link = remove_query_arg( 'vp_filter', $link );
-							}
-							$link = trailingslashit( $link );
-
-							if ( '' === $base_page ) {
-								$link = $link . $this->permalinks['category_base'] . '/' . $category_slug . '/';
-							} else {
-								$link = str_replace( $base_page, $this->permalinks['category_base'] . '/' . $category_slug . '/', $link );
-							}
-
-							/**
-							 * In the case where the base page of the archive is the home page,
-							 * when loading taxonomy pages with pagination and filter,
-							 * the order of the link may be violated.
-							 * For example like this: example.com/page/2/portfolio-category/test/
-							 *
-							 * In this case, we fix the link by checking its structure.
-							 * We then rearrange the contents of the link and transform it into the following form: example.com/portfolio-category/test/page/2/
-							 */
-							preg_match( '/page\/(\d+)\/' . $this->permalinks['category_base'] . '\/[^\/]+\//', $link, $invalid_format );
-
-							if ( is_array( $invalid_format ) && ! empty( $invalid_format ) ) {
-								$link = str_replace( $invalid_format[0], $this->permalinks['category_base'] . '/' . $category_slug . '/page/' . $invalid_format[1] . '/', $link );
-							}
-						}
-					}
-
-					$link = $this->remove_page_url( $link );
+					$link                 = $this->convert_category_to_friendly_url( $link );
 
 					$terms[ $key ]['url'] = $link;
 				}
@@ -1224,6 +1185,82 @@ class Visual_Portfolio_Archive_Mapping {
 		}
 
 		return $link;
+	}
+
+	/**
+	 * Change category url to friendly.
+	 * We clear the link from taxonomies to replace them with the base archive page.
+	 * For example: example.com/portfolio-category/test/?vp_filter=portfolio_category%3Aanother-category
+	 * To example.com/portfolio-category/another-category
+	 *
+	 * @param  string $category_url - Category Url.
+	 * @return string
+	 */
+	private function convert_category_to_friendly_url( $category_url ) {
+		preg_match( '/vp_filter=([^&]*)/', $category_url, $match_filter );
+		$base_page = $this->get_relative_archive_link();
+
+		if ( is_array( $match_filter ) && ! empty( $match_filter ) ) {
+			// We extract the contents of the filter and form a new link.
+			$taxonomies = explode( ':', rawurldecode( $match_filter[1] ) );
+			if ( is_array( $taxonomies ) && 'portfolio_category' === $taxonomies[0] ) {
+				$category_slug = $taxonomies[1];
+				if ( strpos( $category_url, 'vp_filter' ) !== false ) {
+					$category_url = remove_query_arg( 'vp_filter', $category_url );
+				}
+				$category_url = trailingslashit( $category_url );
+
+				if ( '' === $base_page ) {
+					$category_url = $category_url . $this->permalinks['category_base'] . '/' . $category_slug . '/';
+				} else {
+					$category_url = str_replace( $base_page, $this->permalinks['category_base'] . '/' . $category_slug . '/', $category_url );
+				}
+
+				/**
+				 * In the case where the base page of the archive is the home page,
+				 * when loading taxonomy pages with pagination and filter,
+				 * the order of the link may be violated.
+				 * For example like this: example.com/page/2/portfolio-category/test/
+				 *
+				 * In this case, we fix the link by checking its structure.
+				 * We then rearrange the contents of the link and transform it into the following form: example.com/portfolio-category/test/page/2/
+				 */
+				preg_match( '/page\/(\d+)\/' . $this->permalinks['category_base'] . '\/[^\/]+\//', $category_url, $invalid_format );
+
+				if ( is_array( $invalid_format ) && ! empty( $invalid_format ) ) {
+					$category_url = str_replace( $invalid_format[0], $this->permalinks['category_base'] . '/' . $category_slug . '/page/' . $invalid_format[1] . '/', $category_url );
+				}
+			}
+		}
+
+		return $this->remove_page_url( $category_url );
+	}
+
+	/**
+	 * Converting item category url on meta to friendly url.
+	 *
+	 * @param array $args - Item arguments.
+	 * @return array
+	 */
+	public function convert_category_on_item_meta_to_friendly_url( $args ) {
+		if (
+			! empty( $args['opts']['show_categories'] ) &&
+			$args['opts']['show_categories'] &&
+			! empty( $args['categories'] ) &&
+			is_array( $args['categories'] ) &&
+			! empty( $args['post_id'] ) &&
+			! empty( $args['vp_opts'] )
+		) {
+			$is_archive = self::is_archive( $args['vp_opts'], $args['post_id'] );
+
+			if ( $is_archive ) {
+				foreach ( $args['categories'] as $key => $category ) {
+					$args['categories'][ $key ]['url'] = $this->convert_category_to_friendly_url( $category['url'] );
+				}
+			}
+		}
+
+		return $args;
 	}
 
 	/**
