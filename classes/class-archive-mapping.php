@@ -1252,6 +1252,24 @@ class Visual_Portfolio_Archive_Mapping {
 	}
 
 	/**
+	 * Check if post is Archive category.
+	 *
+	 * @return boolean
+	 */
+	public static function is_category() {
+		global $wp_query;
+
+		return isset( $wp_query->query['portfolio_category'] ) &&
+			isset( $wp_query->query_vars['page_id'] ) &&
+			self::is_archive(
+				array(
+					'content_source' => 'post-based',
+					'posts_source'   => 'current_query',
+				)
+			);
+	}
+
+	/**
 	 * Get Current Term Link.
 	 * This feature is used in third-party SEO plugins.
 	 *
