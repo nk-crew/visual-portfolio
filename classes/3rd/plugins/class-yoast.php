@@ -37,9 +37,9 @@ class Visual_Portfolio_3rd_Yoast {
 		$webpage_graph_piece['breadcrumb']['@id'] = Visual_Portfolio_Archive_Mapping::get_canonical_anchor( $webpage_graph_piece['breadcrumb']['@id'] );
 		$webpage_graph_piece['name']              = Visual_Portfolio_Archive_Mapping::get_current_term_title() ?? $webpage_graph_piece['name'];
 
-		if ( isset( $webpage_graph_piece['potentialAction'] ) && ! empty( $webpage_graph_piece['potentialAction'] ) ) {
+		if ( ! empty( $webpage_graph_piece['potentialAction'] ) ) {
 			foreach ( $webpage_graph_piece['potentialAction'] as $key => $potential_action ) {
-				if ( isset( $potential_action['target'] ) && isset( $potential_action['@type'] ) && 'ReadAction' === $potential_action['@type'] ) {
+				if ( isset( $potential_action['target'] ) && ! is_array( $potential_action['target'] ) && isset( $potential_action['@type'] ) && 'ReadAction' === $potential_action['@type'] ) {
 					$webpage_graph_piece['potentialAction'][ $key ]['target'] = Visual_Portfolio_Archive_Mapping::get_canonical( $potential_action['target'] );
 				}
 			}
