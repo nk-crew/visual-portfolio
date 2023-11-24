@@ -2304,7 +2304,30 @@ class Visual_Portfolio_Admin {
 										'category'  => 'items-style-' . $category_name . '-elements',
 										'alongside' => esc_html__( 'Display Title', 'visual-portfolio' ),
 										'name'      => 'show_title',
+										'group'     => 'items_style_title',
 										'default'   => true,
+									);
+									$new_fields[] = array(
+										'type'      => 'select',
+										'category'  => 'items-style-' . $category_name . '-elements',
+										'label'     => esc_html__( 'Title Tag', 'visual-portfolio' ),
+										'name'      => 'title_tag',
+										'group'     => 'items_style_title',
+										'default'   => 'h2',
+										'options'   => array(
+											'div' => '<div>',
+											'h1'  => '<h1>',
+											'h2'  => '<h2>',
+											'h3'  => '<h3>',
+											'h4'  => '<h4>',
+											'h5'  => '<h5>',
+											'h6'  => '<h6>',
+										),
+										'condition' => array(
+											array(
+												'control' => 'show_title',
+											),
+										),
 									);
 								}
 

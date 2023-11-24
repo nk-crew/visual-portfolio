@@ -19,6 +19,7 @@ if ( ! $opts['show_title'] || ! $args['title'] ) {
 	return;
 }
 
+$title_tag   = $opts['title_tag'] ?? 'h2';
 $allow_links = isset( $allow_links ) ? $allow_links : false;
 $link_data   = array(
 	'href'   => $allow_links ? $args['url'] : false,
@@ -28,10 +29,10 @@ $link_data   = array(
 
 ?>
 
-<h2 class="vp-portfolio__item-meta-title">
+<<?php echo esc_attr( $title_tag ); ?> class="vp-portfolio__item-meta-title">
 	<?php
 	visual_portfolio()->include_template( 'global/link-start', $link_data );
 	echo wp_kses_post( $args['title'] );
 	visual_portfolio()->include_template( 'global/link-end', $link_data );
 	?>
-</h2>
+</<?php echo esc_attr( $title_tag ); ?>>
