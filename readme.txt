@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.4
 * Requires PHP: 7.2
-* Stable tag: 3.1.3
+* Stable tag: 3.2.0
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -327,14 +327,47 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
-= 3.1.3 =
+= 3.2.0 - 25 November 2023 =
+
+#### Free + Pro:
+
+* added support for proper SEO meta URLs in Portfolio archives and Filtered pages in Yoast SEO, AIOSEO, Rank Math
+* added Skin option to change item title tag
+* added `vpf_extend_posts_source` filter
+* added check for image existence when resave the gallery from the popup
+* added check for caption is empty and don't print the figcaption
+* added support for new Ghost Kit extensions
+* updated blocks apiVersion to 3 to allow iframe usage in editor
+* fixed PHP 8.* warning
+* fixed lazy loading script styles added event when 3rd-party lazy loading used
+* fixed lazy loading without srcset
+* fixed lazy loading placeholder displaying when used Hover image
+* fixed width calculation for lazy loading and picture tag
+* fixed lazysizes script version number
+* fixed lazy loading conflict with WP Rocket Delay JS setting
+* fixed typo in `DONOTCACHEOBJECT` constant
+* fixed featured image focal point control conflict in WP 6.3
+* fixed Grid layout preview JS error in editor
+* simplified lazy loading placeholder animation
+* changed lazy loading styles to use modern :has() CSS (with fallback for old browsers)
+* removed jQuery usage from lazy loading script
+
+#### Pro:
+
+* IMPORTANT: changed the Pro plugin to standalone, which is not requires the Free version installed anymore
+* added Setup Wizard support to all Social Account controls
+* fixed Share URL and paged gallery wrong URL
+* fixed mime detection for images in Flickr social feeds
+* fixed init conditionize script once opened Social settings panel
+
+= 3.1.3 - 1 July 2023 =
 
 * improved PhotoSwipe popup zoom for large vertical images
 * changed 'Projects' CPT label to portfolio page name
 * changed images and overlay border-radius to clip-path (better performance)
 * fixed unexpected JS error when Sortable control have an undefined value (happens in Advanced Click Action for a single user after migration from older plugin version)
 
-= 3.1.2 =
+= 3.1.2 - 6 June 2023 =
 
 * renamed `Portfolio Items` to `Projects`
 * fixed playing videos in background in PhotoSwipe
@@ -342,12 +375,12 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed portfolio archive friendly URL in load more button
 * fixed portfolio archive filter and sort paged URLs
 
-= 3.1.1 =
+= 3.1.1 - 17 May 2023 =
 
 * fixed Archive mapping PHP notice when no Archive Page ID available
 * renamed `Carousel` to `Slider`
 
-= 3.1.0 =
+= 3.1.0 - 12 May 2023 =
 
 * added support for gradients in overlay backgrounds
 * added `Restore Focus` setting to the Popup gallery
@@ -365,7 +398,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed Skin editor error on WP 6.0 because of using `NavigatorToParentButton` component
 * fixed Select control dropdown is not visible in editor when opened popup
 
-= 3.0.0 =
+= 3.0.0 - 13 April 2023 =
 
 * completely reworked Skin options and some UI elements of block controls this helped us to structure deep Skin customizations such as:
   * Typography control
