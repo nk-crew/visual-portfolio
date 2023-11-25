@@ -8,10 +8,9 @@ import edit from './edit';
 import save from './save';
 import transforms from './transforms';
 
-const { name } = metadata;
+const { name, title } = metadata;
 
 const settings = {
-	...metadata,
 	icon: {
 		foreground: '#2540CC',
 		src: (
@@ -71,14 +70,6 @@ const settings = {
 			</svg>
 		),
 	},
-	ghostkit: {
-		supports: {
-			styles: true,
-			spacings: true,
-			display: true,
-			scrollReveal: true,
-		},
-	},
 	edit,
 	save,
 	transforms,
@@ -89,9 +80,10 @@ registerBlockType(name, settings);
 // Fallback.
 registerBlockType('nk/visual-portfolio', {
 	...settings,
+	title,
 	name: 'nk/visual-portfolio',
 	supports: {
-		...settings.supports,
+		...metadata.supports,
 		inserter: false,
 	},
 	deprecated,

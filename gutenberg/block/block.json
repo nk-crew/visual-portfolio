@@ -8,6 +8,7 @@
 	"keywords": ["gallery", "images", "posts", "portfolio", "vpf"],
 	"textdomain": "visual-portfolio",
 	"supports": {
+		"ghostkit": true,
 		"anchor": true,
 		"className": true,
 		"html": false,

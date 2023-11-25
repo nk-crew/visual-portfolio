@@ -25,57 +25,58 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_block' ), 11 );
+		add_action( 'admin_init', array( $this, 'register_block_layouts_editor' ), 11 );
 	}
 
 	/**
 	 * Register Block.
 	 */
 	public function register_block() {
-		if ( ! function_exists( 'register_block_type' ) ) {
+		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			return;
 		}
 
-		// Default attributes.
-		$attributes = array(
-			'id' => array(
-				'type' => 'string',
-			),
-			'align' => array(
-				'type' => 'string',
-			),
-			'className' => array(
-				'type' => 'string',
-			),
-			'anchor' => array(
-				'type' => 'string',
-			),
-		);
-
-		register_block_type(
+		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/block-saved',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
-				'attributes'      => $attributes,
 			)
 		);
 
-		if ( 'vp_lists' === get_post_type() ) {
-			register_block_type(
-				visual_portfolio()->plugin_path . 'gutenberg/layouts-editor/block',
-				array(
-					'attributes' => $attributes,
-				)
-			);
-		}
-
 		// Fallback.
-		register_block_type(
+		register_block_type_from_metadata(
 			'nk/visual-portfolio',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
-				'attributes'      => $attributes,
+				'attributes'      => array(
+					'id' => array(
+						'type' => 'string',
+					),
+					'align' => array(
+						'type' => 'string',
+					),
+					'className' => array(
+						'type' => 'string',
+					),
+					'anchor' => array(
+						'type' => 'string',
+					),
+				),
 			)
 		);
+	}
+
+	/**
+	 * Register Block for Layouts Editor.
+	 */
+	public function register_block_layouts_editor() {
+		global $pagenow;
+
+		if ( 'post.php' === $pagenow && isset( $_GET['post'] ) && 'vp_lists' === get_post_type( $_GET['post'] ) ) {
+			register_block_type_from_metadata(
+				visual_portfolio()->plugin_path . 'gutenberg/layouts-editor/block'
+			);
+		}
 	}
 
 	/**

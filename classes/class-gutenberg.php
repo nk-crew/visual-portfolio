@@ -153,13 +153,13 @@ class Visual_Portfolio_Gutenberg_Block {
 	 * Register Block.
 	 */
 	public function register_block() {
-		if ( ! function_exists( 'register_block_type' ) ) {
+		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			return;
 		}
 
 		$attributes = $this->get_block_attributes();
 
-		register_block_type(
+		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/block',
 			array(
 				'render_callback' => array( $this, 'block_render' ),

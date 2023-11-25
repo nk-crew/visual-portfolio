@@ -8,13 +8,6 @@ export default [
 				type: 'string',
 			},
 		},
-		ghostkit: {
-			supports: {
-				spacings: true,
-				display: true,
-				scrollReveal: true,
-			},
-		},
 		supports: {
 			anchor: true,
 			className: true,

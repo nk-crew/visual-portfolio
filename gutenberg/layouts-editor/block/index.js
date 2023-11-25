@@ -6,8 +6,6 @@ import { useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
-import metadata from './block.json';
-
 const { navigator } = window;
 
 let copiedTimeout;
@@ -186,7 +184,6 @@ function LayoutsEditorBlock(props) {
 }
 
 registerBlockType('visual-portfolio/saved-editor', {
-	...metadata,
 	icon: {
 		foreground: '#2540CC',
 		src: (

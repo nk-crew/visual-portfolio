@@ -10,23 +10,12 @@ import save from './save';
 import transforms from './transforms';
 import variations from './variations';
 
-const { attributes } = window.VPGutenbergVariables;
 const { name } = metadata;
 
 const settings = {
-	...metadata,
-	attributes,
 	icon: {
 		foreground: '#2540CC',
 		src: <ElementIcon width="20" height="20" />,
-	},
-	ghostkit: {
-		supports: {
-			styles: true,
-			spacings: true,
-			display: true,
-			scrollReveal: true,
-		},
 	},
 	example: {
 		attributes: {
