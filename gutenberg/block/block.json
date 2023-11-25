@@ -10,7 +10,7 @@
 	"supports": {
 		"ghostkit": true,
 		"anchor": true,
-		"className": true,
+		"className": false,
 		"html": false,
 		"align": ["wide", "full"]
 	}

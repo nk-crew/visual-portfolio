@@ -2,7 +2,7 @@
 /**
  * Gutenberg block.
  *
- * @package ghostkit
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -87,8 +87,6 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
 	 * @return string
 	 */
 	public function block_render( $attributes ) {
-		ob_start();
-
 		$attributes = array_merge(
 			array(
 				'id'        => '',
@@ -108,29 +106,13 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
 
 		$class_name = 'wp-block-visual-portfolio';
 
-		if ( $attributes['align'] ) {
-			$class_name .= ' align' . $attributes['align'];
-		}
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => $class_name,
+			)
+		);
 
-		if ( $attributes['className'] ) {
-			$class_name .= ' ' . $attributes['className'];
-		}
-		?>
-		<div
-		<?php
-			echo ' class="' . esc_attr( $class_name ) . '"';
-			echo isset( $attributes['ghostkitSR'] ) && $attributes['ghostkitSR'] ? ' data-ghostkit-sr="' . esc_attr( $attributes['ghostkitSR'] ) . '"' : '';
-		?>
-		>
-			<?php
-			// The function returns clean data because it includes templates that use escaping functions before output.
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo Visual_Portfolio_Get::get( array( 'id' => $attributes['id'] ) );
-			?>
-		</div>
-		<?php
-
-		return ob_get_clean();
+		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, Visual_Portfolio_Get::get( array( 'id' => $attributes['id'] ) ) );
 	}
 }
 new Visual_Portfolio_Gutenberg_Saved_Block();

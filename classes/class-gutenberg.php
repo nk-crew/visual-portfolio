@@ -2,7 +2,7 @@
 /**
  * Gutenberg block.
  *
- * @package ghostkit
+ * @package visual-portfolio
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -186,21 +186,13 @@ class Visual_Portfolio_Gutenberg_Block {
 
 		$class_name = 'wp-block-visual-portfolio';
 
-		if ( $attributes['align'] ) {
-			$class_name .= ' align' . $attributes['align'];
-		}
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => $class_name,
+			)
+		);
 
-		if ( $attributes['className'] ) {
-			$class_name .= ' ' . $attributes['className'];
-		}
-
-		$result = '<div class="' . esc_attr( $class_name ) . '"' . ( isset( $attributes['ghostkitSR'] ) && $attributes['ghostkitSR'] ? ' data-ghostkit-sr="' . esc_attr( $attributes['ghostkitSR'] ) . '"' : '' ) . '>';
-
-		$result .= Visual_Portfolio_Get::get( $attributes );
-
-		$result .= '</div>';
-
-		return $result;
+		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, Visual_Portfolio_Get::get( $attributes ) );
 	}
 
 	/**

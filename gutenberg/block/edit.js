@@ -1,5 +1,3 @@
-import classnames from 'classnames/dedupe';
-
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
@@ -62,7 +60,6 @@ export default function BlockEdit(props) {
 		setup_wizard: setupWizard,
 		preview_image_example: previewExample,
 		layout,
-		ghostkitClassname,
 	} = attributes;
 
 	// Display setup wizard on mount.
@@ -74,13 +71,6 @@ export default function BlockEdit(props) {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	let className = '';
-
-	// add custom classname.
-	if (ghostkitClassname) {
-		className = classnames(className, ghostkitClassname);
-	}
 
 	// Display block preview.
 	if (previewExample === 'true') {
@@ -94,9 +84,7 @@ export default function BlockEdit(props) {
 		);
 	}
 
-	const blockProps = useBlockProps({
-		className,
-	});
+	const blockProps = useBlockProps();
 
 	return (
 		<div {...blockProps}>

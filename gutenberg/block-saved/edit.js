@@ -1,5 +1,3 @@
-import classnames from 'classnames/dedupe';
-
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { Button, PanelBody, Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -19,7 +17,7 @@ const { plugin_name: pluginName } = window.VPGutenbergVariables;
 export default function BlockEdit(props) {
 	const { clientId, setAttributes, attributes } = props;
 
-	const { id, ghostkitClassname } = attributes;
+	const { id } = attributes;
 
 	const { portfolioLayouts } = useSelect(
 		(select) => ({
@@ -111,16 +109,7 @@ export default function BlockEdit(props) {
 		);
 	}
 
-	let className = '';
-
-	// add custom classname.
-	if (ghostkitClassname) {
-		className = classnames(className, ghostkitClassname);
-	}
-
-	const blockProps = useBlockProps({
-		className,
-	});
+	const blockProps = useBlockProps();
 
 	return (
 		<div {...blockProps}>

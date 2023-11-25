@@ -1,9 +1,9 @@
 import './style.scss';
 
-import { registerBlockType } from '@wordpress/blocks';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
 
 import metadata from './block.json';
-import deprecated from './deprecated';
 import edit from './edit';
 import save from './save';
 import transforms from './transforms';
@@ -82,9 +82,32 @@ registerBlockType('nk/visual-portfolio', {
 	...settings,
 	title,
 	name: 'nk/visual-portfolio',
+	attributes: {
+		id: {
+			type: 'string',
+		},
+		align: {
+			type: 'string',
+		},
+		className: {
+			type: 'string',
+		},
+		anchor: {
+			type: 'string',
+		},
+	},
+	edit: (props) => {
+		const { replaceBlocks } = useDispatch('core/block-editor');
+
+		replaceBlocks(
+			[props.clientId],
+			createBlock('visual-portfolio/saved', props.attributes || {})
+		);
+
+		return null;
+	},
 	supports: {
 		...metadata.supports,
 		inserter: false,
 	},
-	deprecated,
 });
