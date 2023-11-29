@@ -81,20 +81,25 @@ class Visual_Portfolio_Assets {
 	 * Get .asset.php file data.
 	 *
 	 * @param string $filepath asset file path.
+	 * @param string $filetype asset file type [style|script].
 	 *
 	 * @return array
 	 */
-	public static function get_asset_file( $filepath ) {
-		$asset_path = visual_portfolio()->plugin_path . '/' . $filepath . '.asset.php';
+	public static function get_asset_file( $filepath, $filetype = '' ) {
+		$asset_path = visual_portfolio()->plugin_path . '/' . str_replace( '.min', '', $filepath ) . '.asset.php';
 
 		if ( file_exists( $asset_path ) ) {
             // phpcs:ignore WPThemeReview.CoreFunctionality.FileInclude.FileIncludeFound
 			return include $asset_path;
+		} elseif ( ! empty( $filetype ) ) {
+			$file_ext       = 'style' === $filetype ? 'css' : 'js';
+			$full_file_path = visual_portfolio()->plugin_path . '/' . $filepath . '.' . $file_ext;
+			$file_version   = file_exists( $full_file_path ) ? filemtime( $full_file_path ) : null;
 		}
 
 		return array(
 			'dependencies' => array(),
-			'version'      => VISUAL_PORTFOLIO_VERSION,
+			'version'      => $file_version ?? VISUAL_PORTFOLIO_VERSION,
 		);
 	}
 
@@ -108,7 +113,7 @@ class Visual_Portfolio_Assets {
 	 * @param boolean $in_footer render in footer.
 	 */
 	public static function register_script( $name, $path, $dependencies = array(), $version = null, $in_footer = true ) {
-		$script_data = self::get_asset_file( $path );
+		$script_data = self::get_asset_file( $path, 'script' );
 
 		if ( ! empty( $dependencies ) ) {
 			$script_data['dependencies'] = array_unique(
@@ -152,7 +157,7 @@ class Visual_Portfolio_Assets {
 	 * @param string $version asset version.
 	 */
 	public static function register_style( $name, $path, $dependencies = array(), $version = null ) {
-		$style_data = self::get_asset_file( $path );
+		$style_data = self::get_asset_file( $path, 'style' );
 
 		wp_register_style(
 			$name,
