@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.2.1\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.2.2\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-11-29T09:05:33+00:00\n"
+"POT-Creation-Date: 2023-11-29T13:35:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: visual-portfolio\n"
@@ -1189,84 +1189,84 @@ msgid "I already did"
 msgstr ""
 
 #. translators: %s - plugin name.
-#: classes/class-assets.php:699
+#: classes/class-assets.php:704
 msgid "Couldn't retrieve %s ID."
 msgstr ""
 
-#: classes/class-assets.php:701
+#: classes/class-assets.php:706
 msgid "Close (Esc)"
 msgstr ""
 
-#: classes/class-assets.php:702
-#: classes/class-assets.php:720
+#: classes/class-assets.php:707
+#: classes/class-assets.php:725
 msgid "Share"
 msgstr ""
 
-#: classes/class-assets.php:703
+#: classes/class-assets.php:708
 msgid "Toggle fullscreen"
 msgstr ""
 
-#: classes/class-assets.php:704
+#: classes/class-assets.php:709
 msgid "Zoom in/out"
 msgstr ""
 
-#: classes/class-assets.php:705
+#: classes/class-assets.php:710
 msgid "Previous (arrow left)"
 msgstr ""
 
-#: classes/class-assets.php:706
+#: classes/class-assets.php:711
 msgid "Next (arrow right)"
 msgstr ""
 
-#: classes/class-assets.php:707
+#: classes/class-assets.php:712
 msgid "Share on Facebook"
 msgstr ""
 
-#: classes/class-assets.php:708
+#: classes/class-assets.php:713
 msgid "Tweet"
 msgstr ""
 
-#: classes/class-assets.php:709
+#: classes/class-assets.php:714
 msgid "Pin it"
 msgstr ""
 
-#: classes/class-assets.php:711
+#: classes/class-assets.php:716
 msgid "Close"
 msgstr ""
 
-#: classes/class-assets.php:712
+#: classes/class-assets.php:717
 msgid "Next"
 msgstr ""
 
-#: classes/class-assets.php:713
+#: classes/class-assets.php:718
 msgid "Previous"
 msgstr ""
 
-#: classes/class-assets.php:714
+#: classes/class-assets.php:719
 msgid "The requested content cannot be loaded. <br /> Please try again later."
 msgstr ""
 
-#: classes/class-assets.php:715
+#: classes/class-assets.php:720
 msgid "Start slideshow"
 msgstr ""
 
-#: classes/class-assets.php:716
+#: classes/class-assets.php:721
 msgid "Pause slideshow"
 msgstr ""
 
-#: classes/class-assets.php:717
+#: classes/class-assets.php:722
 msgid "Full screen"
 msgstr ""
 
-#: classes/class-assets.php:718
+#: classes/class-assets.php:723
 msgid "Thumbnails"
 msgstr ""
 
-#: classes/class-assets.php:719
+#: classes/class-assets.php:724
 msgid "Download"
 msgstr ""
 
-#: classes/class-assets.php:721
+#: classes/class-assets.php:726
 msgid "Zoom"
 msgstr ""
 
