@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.1.3\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.2.1\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-11-13T10:52:26+00:00\n"
+"POT-Creation-Date: 2023-11-29T09:05:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: visual-portfolio\n"
@@ -30,7 +30,7 @@ msgstr ""
 msgid "https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline"
 msgstr ""
 
-#: class-visual-portfolio.php:99
+#: class-visual-portfolio.php:100
 #: classes/class-welcome-screen.php:106
 #: classes/class-welcome-screen.php:109
 msgid "Visual Portfolio"
@@ -41,7 +41,7 @@ msgid "-- Select Layout --"
 msgstr ""
 
 #: classes/3rd/plugins/class-elementor-widget.php:174
-#: classes/class-admin.php:2051
+#: classes/class-admin.php:2055
 #: classes/class-settings.php:197
 msgid "General"
 msgstr ""
@@ -66,12 +66,12 @@ msgstr ""
 msgid "Design Options"
 msgstr ""
 
-#: classes/class-admin.php:119
+#: classes/class-admin.php:122
 msgid "and"
 msgstr ""
 
-#: classes/class-admin.php:234
-#: classes/class-admin.php:283
+#: classes/class-admin.php:237
+#: classes/class-admin.php:286
 #: classes/class-custom-post-type.php:856
 #: classes/class-settings.php:770
 #: classes/class-settings.php:785
@@ -80,412 +80,412 @@ msgstr ""
 msgid "Go Pro"
 msgstr ""
 
-#: classes/class-admin.php:325
+#: classes/class-admin.php:328
 #: gutenberg/components/tiles-selector/index.js:95
 msgid "Tiles"
 msgstr ""
 
-#: classes/class-admin.php:341
+#: classes/class-admin.php:344
 msgid "Tiles Preview"
 msgstr ""
 
-#: classes/class-admin.php:449
+#: classes/class-admin.php:452
 msgid "Masonry"
 msgstr ""
 
-#: classes/class-admin.php:454
-#: classes/class-admin.php:484
+#: classes/class-admin.php:457
+#: classes/class-admin.php:487
 msgid "Columns"
 msgstr ""
 
-#: classes/class-admin.php:463
-#: classes/class-admin.php:493
+#: classes/class-admin.php:466
+#: classes/class-admin.php:496
 msgid "Images Aspect Ratio"
 msgstr ""
 
-#: classes/class-admin.php:479
+#: classes/class-admin.php:482
 msgid "Grid"
 msgstr ""
 
-#: classes/class-admin.php:509
+#: classes/class-admin.php:512
 msgid "Justified"
 msgstr ""
 
-#: classes/class-admin.php:514
+#: classes/class-admin.php:517
 msgid "Row Height"
 msgstr ""
 
-#: classes/class-admin.php:524
+#: classes/class-admin.php:527
 msgid "Row Height Tolerance"
 msgstr ""
 
-#: classes/class-admin.php:535
+#: classes/class-admin.php:538
 msgid "Max Rows Count"
 msgstr ""
 
-#: classes/class-admin.php:536
+#: classes/class-admin.php:539
 msgid "Limit the number of rows to display. 0 means - unlimited."
 msgstr ""
 
-#: classes/class-admin.php:546
+#: classes/class-admin.php:549
 msgid "Last Row Align"
 msgstr ""
 
-#: classes/class-admin.php:551
+#: classes/class-admin.php:554
 #: gutenberg/custom-post-meta/image-focal-point.js:46
 msgid "Left"
 msgstr ""
 
-#: classes/class-admin.php:552
+#: classes/class-admin.php:555
 msgid "Center"
 msgstr ""
 
-#: classes/class-admin.php:553
+#: classes/class-admin.php:556
 msgid "Right"
 msgstr ""
 
-#: classes/class-admin.php:554
-#: classes/class-admin.php:1856
-#: classes/class-admin.php:2342
-#: classes/class-admin.php:2456
+#: classes/class-admin.php:557
+#: classes/class-admin.php:1860
+#: classes/class-admin.php:2369
+#: classes/class-admin.php:2483
 #: classes/class-deprecated.php:228
 msgid "Hide"
 msgstr ""
 
-#: classes/class-admin.php:562
+#: classes/class-admin.php:565
 msgid "Slider"
 msgstr ""
 
-#: classes/class-admin.php:567
+#: classes/class-admin.php:570
 msgid "Effect"
 msgstr ""
 
-#: classes/class-admin.php:574
+#: classes/class-admin.php:577
 msgid "Slide"
 msgstr ""
 
-#: classes/class-admin.php:579
+#: classes/class-admin.php:582
 msgid "Coverflow"
 msgstr ""
 
-#: classes/class-admin.php:584
-#: classes/class-admin.php:999
+#: classes/class-admin.php:587
+#: classes/class-admin.php:1002
 msgid "Fade"
 msgstr ""
 
-#: classes/class-admin.php:591
+#: classes/class-admin.php:594
 msgid "Speed (in Seconds)"
 msgstr ""
 
-#: classes/class-admin.php:601
+#: classes/class-admin.php:604
 msgid "Autoplay (in Seconds)"
 msgstr ""
 
-#: classes/class-admin.php:611
+#: classes/class-admin.php:614
 msgid "Pause on Mouse Over"
 msgstr ""
 
-#: classes/class-admin.php:625
+#: classes/class-admin.php:628
 msgid "Items Height"
 msgstr ""
 
-#: classes/class-admin.php:630
-#: classes/class-admin.php:688
-#: classes/class-admin.php:821
-#: classes/class-admin.php:874
+#: classes/class-admin.php:633
+#: classes/class-admin.php:691
+#: classes/class-admin.php:824
+#: classes/class-admin.php:877
 #: gutenberg/components/aspect-ratio/index.js:8
 msgid "Auto"
 msgstr ""
 
-#: classes/class-admin.php:631
-#: classes/class-admin.php:822
+#: classes/class-admin.php:634
+#: classes/class-admin.php:825
 msgid "Static (px)"
 msgstr ""
 
-#: classes/class-admin.php:632
-#: classes/class-admin.php:823
+#: classes/class-admin.php:635
+#: classes/class-admin.php:826
 msgid "Dynamic (%)"
 msgstr ""
 
-#: classes/class-admin.php:667
+#: classes/class-admin.php:670
 msgid "Items Minimal Height"
 msgstr ""
 
-#: classes/class-admin.php:668
+#: classes/class-admin.php:671
 msgid "300px, 80vh"
 msgstr ""
 
-#: classes/class-admin.php:669
+#: classes/class-admin.php:672
 msgid "Values with `vh` units will not be visible in preview."
 msgstr ""
 
-#: classes/class-admin.php:683
+#: classes/class-admin.php:686
 msgid "Slides Per View"
 msgstr ""
 
-#: classes/class-admin.php:689
-#: classes/class-admin.php:875
-#: classes/class-admin.php:1727
-#: classes/class-admin.php:1745
+#: classes/class-admin.php:692
+#: classes/class-admin.php:878
+#: classes/class-admin.php:1730
+#: classes/class-admin.php:1748
 #: gutenberg/components/aspect-ratio/index.js:13
 msgid "Custom"
 msgstr ""
 
-#: classes/class-admin.php:721
+#: classes/class-admin.php:724
 msgid "Centered Slides"
 msgstr ""
 
-#: classes/class-admin.php:735
+#: classes/class-admin.php:738
 #: classes/class-settings.php:540
 msgid "Loop"
 msgstr ""
 
-#: classes/class-admin.php:742
+#: classes/class-admin.php:745
 msgid "Free Scroll"
 msgstr ""
 
-#: classes/class-admin.php:750
+#: classes/class-admin.php:753
 msgid "Free Scroll Sticky"
 msgstr ""
 
-#: classes/class-admin.php:763
-#: classes/class-admin.php:3430
+#: classes/class-admin.php:766
+#: classes/class-admin.php:3457
 #: classes/class-settings.php:571
 msgid "Display Arrows"
 msgstr ""
 
-#: classes/class-admin.php:769
+#: classes/class-admin.php:772
 msgid "Display Bullets"
 msgstr ""
 
-#: classes/class-admin.php:776
+#: classes/class-admin.php:779
 msgid "Dynamic Bullets"
 msgstr ""
 
-#: classes/class-admin.php:789
+#: classes/class-admin.php:792
 msgid "Mousewheel Control"
 msgstr ""
 
-#: classes/class-admin.php:795
+#: classes/class-admin.php:798
 #: classes/class-settings.php:611
 msgid "Display Thumbnails"
 msgstr ""
 
-#: classes/class-admin.php:802
+#: classes/class-admin.php:805
 msgid "Thumbnails Gap"
 msgstr ""
 
-#: classes/class-admin.php:816
+#: classes/class-admin.php:819
 msgid "Thumbnails Height"
 msgstr ""
 
-#: classes/class-admin.php:869
+#: classes/class-admin.php:872
 msgid "Thumbnails Per View"
 msgstr ""
 
-#: classes/class-admin.php:920
-#: classes/class-admin.php:2939
-#: classes/class-admin.php:3069
-#: classes/class-admin.php:3191
+#: classes/class-admin.php:923
+#: classes/class-admin.php:2966
+#: classes/class-admin.php:3096
+#: classes/class-admin.php:3218
 msgid "Classic"
 msgstr ""
 
-#: classes/class-admin.php:1063
+#: classes/class-admin.php:1066
 msgid "Fly"
 msgstr ""
 
-#: classes/class-admin.php:1127
+#: classes/class-admin.php:1130
 msgid "Emerge"
 msgstr ""
 
-#: classes/class-admin.php:1219
+#: classes/class-admin.php:1222
 msgid "Content Source"
 msgstr ""
 
-#: classes/class-admin.php:1223
+#: classes/class-admin.php:1226
 msgid "Posts Settings"
 msgstr ""
 
-#: classes/class-admin.php:1228
+#: classes/class-admin.php:1231
 msgid "Images Settings"
 msgstr ""
 
-#: classes/class-admin.php:1233
+#: classes/class-admin.php:1236
 msgid "Social Stream Settings"
 msgstr ""
 
-#: classes/class-admin.php:1238
+#: classes/class-admin.php:1241
 msgid "General Settings"
 msgstr ""
 
-#: classes/class-admin.php:1243
+#: classes/class-admin.php:1246
 msgid "Layout"
 msgstr ""
 
-#: classes/class-admin.php:1248
+#: classes/class-admin.php:1251
 msgid "Skin"
 msgstr ""
 
-#: classes/class-admin.php:1253
+#: classes/class-admin.php:1256
 msgid "Click Action"
 msgstr ""
 
-#: classes/class-admin.php:1258
+#: classes/class-admin.php:1261
 msgid "Protection"
 msgstr ""
 
-#: classes/class-admin.php:1263
+#: classes/class-admin.php:1266
 #: classes/class-settings.php:729
 #: gutenberg/components/controls-render/index.js:557
 msgid "Custom CSS"
 msgstr ""
 
-#: classes/class-admin.php:1305
+#: classes/class-admin.php:1308
 #: classes/class-custom-post-type.php:570
 msgid "Posts"
 msgstr ""
 
-#: classes/class-admin.php:1311
+#: classes/class-admin.php:1314
 #: classes/class-custom-post-type.php:571
 #: classes/class-settings.php:202
 msgid "Images"
 msgstr ""
 
-#: classes/class-admin.php:1317
+#: classes/class-admin.php:1320
 #: classes/class-custom-post-type.php:572
 msgid "Social"
 msgstr ""
 
-#: classes/class-admin.php:1348
-#: classes/class-admin.php:3601
+#: classes/class-admin.php:1351
+#: classes/class-admin.php:3628
 msgid "Custom Query"
 msgstr ""
 
 #. translators: %1$s - escaped url.
-#: classes/class-admin.php:1350
+#: classes/class-admin.php:1353
 msgid "Build custom query according to WordPress Codex. See example here <a href=\"%1$s\">%1$s</a>."
 msgstr ""
 
-#: classes/class-admin.php:1367
+#: classes/class-admin.php:1370
 msgid "Post Types"
 msgstr ""
 
-#: classes/class-admin.php:1384
+#: classes/class-admin.php:1387
 msgid "Specific Posts"
 msgstr ""
 
-#: classes/class-admin.php:1402
+#: classes/class-admin.php:1405
 msgid "Excluded Posts"
 msgstr ""
 
-#: classes/class-admin.php:1431
+#: classes/class-admin.php:1434
 msgid "Taxonomies"
 msgstr ""
 
-#: classes/class-admin.php:1461
+#: classes/class-admin.php:1464
 msgid "Taxonomies Relation"
 msgstr ""
 
-#: classes/class-admin.php:1466
+#: classes/class-admin.php:1469
 msgid "OR"
 msgstr ""
 
-#: classes/class-admin.php:1467
+#: classes/class-admin.php:1470
 msgid "AND"
 msgstr ""
 
-#: classes/class-admin.php:1492
-#: classes/class-admin.php:1757
+#: classes/class-admin.php:1495
+#: classes/class-admin.php:1760
 msgid "Order by"
 msgstr ""
 
-#: classes/class-admin.php:1497
+#: classes/class-admin.php:1500
 #: templates/items-list/item-parts/meta-date.php:26
 msgid "Date"
 msgstr ""
 
-#: classes/class-admin.php:1498
-#: classes/class-admin.php:1644
-#: classes/class-admin.php:1764
+#: classes/class-admin.php:1501
+#: classes/class-admin.php:1647
+#: classes/class-admin.php:1767
 msgid "Title"
 msgstr ""
 
-#: classes/class-admin.php:1499
+#: classes/class-admin.php:1502
 msgid "ID"
 msgstr ""
 
-#: classes/class-admin.php:1500
+#: classes/class-admin.php:1503
 msgid "Comments Count"
 msgstr ""
 
-#: classes/class-admin.php:1501
+#: classes/class-admin.php:1504
 msgid "Modified"
 msgstr ""
 
-#: classes/class-admin.php:1502
+#: classes/class-admin.php:1505
 msgid "Menu Order"
 msgstr ""
 
-#: classes/class-admin.php:1503
-#: classes/class-admin.php:3596
+#: classes/class-admin.php:1506
+#: classes/class-admin.php:3623
 msgid "Manual Selection"
 msgstr ""
 
-#: classes/class-admin.php:1504
-#: classes/class-admin.php:1765
+#: classes/class-admin.php:1507
+#: classes/class-admin.php:1768
 msgid "Random"
 msgstr ""
 
 #. translators: %2$s - link text.
-#: classes/class-admin.php:1526
+#: classes/class-admin.php:1529
 msgid "Menu Order is typically used in combination with one of these plugins: <a href=\"%1$s\" target=\"_blank\">%2$s</a>"
 msgstr ""
 
-#: classes/class-admin.php:1552
-#: classes/class-admin.php:1773
+#: classes/class-admin.php:1555
+#: classes/class-admin.php:1776
 msgid "Order Direction"
 msgstr ""
 
-#: classes/class-admin.php:1557
-#: classes/class-admin.php:1778
+#: classes/class-admin.php:1560
+#: classes/class-admin.php:1781
 msgid "ASC"
 msgstr ""
 
-#: classes/class-admin.php:1558
-#: classes/class-admin.php:1779
+#: classes/class-admin.php:1561
+#: classes/class-admin.php:1782
 msgid "DESC"
 msgstr ""
 
-#: classes/class-admin.php:1578
+#: classes/class-admin.php:1581
 msgid "Avoid Duplicates"
 msgstr ""
 
-#: classes/class-admin.php:1579
+#: classes/class-admin.php:1582
 msgid "Enable to avoid duplicate posts from showing up. This only affects the frontend"
 msgstr ""
 
-#: classes/class-admin.php:1589
+#: classes/class-admin.php:1592
 msgid "Offset"
 msgstr ""
 
-#: classes/class-admin.php:1590
+#: classes/class-admin.php:1593
 msgid "Use this setting to skip over posts (e.g. `2` to skip over 2 posts)"
 msgstr ""
 
-#: classes/class-admin.php:1618
-#: classes/class-admin.php:1695
-#: classes/class-admin.php:1792
-#: classes/class-admin.php:1812
-#: classes/class-admin.php:2227
-#: classes/class-admin.php:2234
-#: classes/class-admin.php:2565
-#: classes/class-admin.php:2577
-#: classes/class-admin.php:2608
-#: classes/class-admin.php:2745
-#: classes/class-admin.php:2816
-#: classes/class-admin.php:2836
-#: classes/class-admin.php:3172
-#: classes/class-admin.php:3514
+#: classes/class-admin.php:1621
+#: classes/class-admin.php:1698
+#: classes/class-admin.php:1795
+#: classes/class-admin.php:1815
+#: classes/class-admin.php:2231
+#: classes/class-admin.php:2238
+#: classes/class-admin.php:2592
+#: classes/class-admin.php:2604
+#: classes/class-admin.php:2635
+#: classes/class-admin.php:2772
+#: classes/class-admin.php:2843
+#: classes/class-admin.php:2863
+#: classes/class-admin.php:3199
+#: classes/class-admin.php:3541
 #: classes/class-custom-post-type.php:851
 #: classes/class-settings.php:767
 #: classes/class-settings.php:782
@@ -493,660 +493,666 @@ msgstr ""
 msgid "Premium Only"
 msgstr ""
 
-#: classes/class-admin.php:1619
+#: classes/class-admin.php:1622
 msgid "Additional query settings, such as:"
 msgstr ""
 
-#: classes/class-admin.php:1621
+#: classes/class-admin.php:1624
 msgid "Filter by specific author"
 msgstr ""
 
-#: classes/class-admin.php:1622
+#: classes/class-admin.php:1625
 msgid "Filter by publish date range"
 msgstr ""
 
-#: classes/class-admin.php:1623
+#: classes/class-admin.php:1626
 msgid "Exclude posts without thumbnail"
 msgstr ""
 
-#: classes/class-admin.php:1624
+#: classes/class-admin.php:1627
 msgid "Exclude sticky posts"
 msgstr ""
 
-#: classes/class-admin.php:1625
-#: classes/class-admin.php:1700
-#: classes/class-admin.php:2821
+#: classes/class-admin.php:1628
+#: classes/class-admin.php:1703
+#: classes/class-admin.php:2848
 msgid "etc..."
 msgstr ""
 
-#: classes/class-admin.php:1648
+#: classes/class-admin.php:1651
 msgid "Description"
 msgstr ""
 
-#: classes/class-admin.php:1652
+#: classes/class-admin.php:1655
 #: classes/class-custom-post-type.php:190
 msgid "Categories"
 msgstr ""
 
-#: classes/class-admin.php:1658
+#: classes/class-admin.php:1661
 msgid "Format"
 msgstr ""
 
-#: classes/class-admin.php:1661
+#: classes/class-admin.php:1664
 msgid "Standard"
 msgstr ""
 
-#: classes/class-admin.php:1662
+#: classes/class-admin.php:1665
 #: classes/class-custom-post-meta.php:146
 #: gutenberg/custom-post-meta/video.js:109
 msgid "Video"
 msgstr ""
 
-#: classes/class-admin.php:1667
+#: classes/class-admin.php:1670
 #: gutenberg/custom-post-meta/video.js:155
 msgid "Video URL"
 msgstr ""
 
-#: classes/class-admin.php:1668
-#: classes/class-admin.php:1681
+#: classes/class-admin.php:1671
+#: classes/class-admin.php:1684
 msgid "https://..."
 msgstr ""
 
-#: classes/class-admin.php:1669
+#: classes/class-admin.php:1672
 msgid "Full list of supported links"
 msgstr ""
 
-#: classes/class-admin.php:1669
+#: classes/class-admin.php:1672
 #: gutenberg/custom-post-meta/video.js:149
 msgid "see here"
 msgstr ""
 
-#: classes/class-admin.php:1679
-#: classes/class-admin.php:2683
+#: classes/class-admin.php:1682
+#: classes/class-admin.php:2710
 msgid "URL"
 msgstr ""
 
-#: classes/class-admin.php:1680
+#: classes/class-admin.php:1683
 msgid "By default used full image url, you can use custom one"
 msgstr ""
 
-#: classes/class-admin.php:1685
+#: classes/class-admin.php:1688
 msgid "Author Name"
 msgstr ""
 
-#: classes/class-admin.php:1690
+#: classes/class-admin.php:1693
 msgid "Author URL"
 msgstr ""
 
-#: classes/class-admin.php:1697
+#: classes/class-admin.php:1700
 msgid "Support for Audio format"
 msgstr ""
 
-#: classes/class-admin.php:1698
+#: classes/class-admin.php:1701
 msgid "Custom image for Popup"
 msgstr ""
 
-#: classes/class-admin.php:1699
+#: classes/class-admin.php:1702
 msgid "Custom image for hover state"
 msgstr ""
 
-#: classes/class-admin.php:1721
+#: classes/class-admin.php:1724
 msgid "Items Title Source"
-msgstr ""
-
-#: classes/class-admin.php:1726
-#: classes/class-admin.php:1744
-#: classes/class-admin.php:2767
-#: classes/class-admin.php:2794
-msgid "None"
-msgstr ""
-
-#: classes/class-admin.php:1728
-#: classes/class-admin.php:1746
-#: classes/class-admin.php:2768
-#: classes/class-admin.php:2795
-msgid "Image Title"
 msgstr ""
 
 #: classes/class-admin.php:1729
 #: classes/class-admin.php:1747
-#: classes/class-admin.php:2769
-#: classes/class-admin.php:2796
-msgid "Image Caption"
-msgstr ""
-
-#: classes/class-admin.php:1730
-#: classes/class-admin.php:1748
-#: classes/class-admin.php:2770
-#: classes/class-admin.php:2797
-msgid "Image Alt"
+#: classes/class-admin.php:2794
+#: classes/class-admin.php:2821
+msgid "None"
 msgstr ""
 
 #: classes/class-admin.php:1731
 #: classes/class-admin.php:1749
-#: classes/class-admin.php:2771
+#: classes/class-admin.php:2795
+#: classes/class-admin.php:2822
+msgid "Image Title"
+msgstr ""
+
+#: classes/class-admin.php:1732
+#: classes/class-admin.php:1750
+#: classes/class-admin.php:2796
+#: classes/class-admin.php:2823
+msgid "Image Caption"
+msgstr ""
+
+#: classes/class-admin.php:1733
+#: classes/class-admin.php:1751
+#: classes/class-admin.php:2797
+#: classes/class-admin.php:2824
+msgid "Image Alt"
+msgstr ""
+
+#: classes/class-admin.php:1734
+#: classes/class-admin.php:1752
 #: classes/class-admin.php:2798
+#: classes/class-admin.php:2825
 msgid "Image Description"
 msgstr ""
 
-#: classes/class-admin.php:1739
+#: classes/class-admin.php:1742
 msgid "Items Description Source"
 msgstr ""
 
-#: classes/class-admin.php:1762
-#: classes/class-admin.php:2343
-#: classes/class-admin.php:2711
-#: classes/class-archive-mapping.php:627
+#: classes/class-admin.php:1765
+#: classes/class-admin.php:2370
+#: classes/class-admin.php:2738
+#: classes/class-archive-mapping.php:588
 #: classes/class-deprecated.php:229
 msgid "Default"
 msgstr ""
 
-#: classes/class-admin.php:1763
+#: classes/class-admin.php:1766
 msgid "Uploaded"
 msgstr ""
 
-#: classes/class-admin.php:1793
+#: classes/class-admin.php:1796
 msgid "Protect your works using watermarks, password, and age gate"
 msgstr ""
 
-#: classes/class-admin.php:1813
+#: classes/class-admin.php:1816
 msgid "Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc..."
 msgstr ""
 
-#: classes/class-admin.php:1824
+#: classes/class-admin.php:1828
 msgid "Items Per Page"
 msgstr ""
 
-#: classes/class-admin.php:1850
+#: classes/class-admin.php:1854
 msgid "No Items Action"
 msgstr ""
 
-#: classes/class-admin.php:1855
-#: classes/class-admin.php:1864
+#: classes/class-admin.php:1859
+#: classes/class-admin.php:1868
 msgid "Notice"
 msgstr ""
 
-#: classes/class-admin.php:1867
+#: classes/class-admin.php:1871
 msgid "No items were found matching your selection."
 msgstr ""
 
-#: classes/class-admin.php:1882
+#: classes/class-admin.php:1886
 msgid "Note: you will see the notice in the preview. Block will be hidden in the site frontend."
 msgstr ""
 
-#: classes/class-admin.php:1899
+#: classes/class-admin.php:1903
 msgid "Stretch"
 msgstr ""
 
-#: classes/class-admin.php:1903
+#: classes/class-admin.php:1907
 msgid "Break container and display it wide. This option helpful for 3rd-party page builders, in the Gutenberg themes you can use the built in Wide and Fullwidth features."
 msgstr ""
 
-#: classes/class-admin.php:1971
+#: classes/class-admin.php:1975
 msgid "Gap"
 msgstr ""
 
-#: classes/class-admin.php:1991
+#: classes/class-admin.php:1995
 msgid "Vertical Gap"
 msgstr ""
 
-#: classes/class-admin.php:1992
+#: classes/class-admin.php:1996
 msgid "When empty, used Gap option"
 msgstr ""
 
-#: classes/class-admin.php:2055
+#: classes/class-admin.php:2059
 msgid "Image"
 msgstr ""
 
-#: classes/class-admin.php:2059
+#: classes/class-admin.php:2063
 msgid "Overlay"
 msgstr ""
 
-#: classes/class-admin.php:2063
+#: classes/class-admin.php:2067
 msgid "Caption"
 msgstr ""
 
-#: classes/class-admin.php:2196
+#: classes/class-admin.php:2200
 msgid "Normal"
 msgstr ""
 
-#: classes/class-admin.php:2200
+#: classes/class-admin.php:2204
 msgid "Hover"
 msgstr ""
 
-#: classes/class-admin.php:2210
+#: classes/class-admin.php:2214
 msgid "Border Radius"
 msgstr ""
 
-#: classes/class-admin.php:2247
+#: classes/class-admin.php:2251
 msgid "Display"
 msgstr ""
 
-#: classes/class-admin.php:2251
+#: classes/class-admin.php:2255
 msgid "Hover State Only"
 msgstr ""
 
-#: classes/class-admin.php:2252
+#: classes/class-admin.php:2256
 msgid "Default State Only"
 msgstr ""
 
-#: classes/class-admin.php:2253
+#: classes/class-admin.php:2257
 msgid "Always"
 msgstr ""
 
-#: classes/class-admin.php:2262
+#: classes/class-admin.php:2266
 msgid "Text Align"
 msgstr ""
 
-#: classes/class-admin.php:2275
+#: classes/class-admin.php:2279
 msgid "Elements"
 msgstr ""
 
-#: classes/class-admin.php:2279
+#: classes/class-admin.php:2283
 msgid "Colors"
 msgstr ""
 
-#: classes/class-admin.php:2283
+#: classes/class-admin.php:2287
 msgid "Typography"
 msgstr ""
 
-#: classes/class-admin.php:2287
+#: classes/class-admin.php:2291
 msgid "Dimensions"
 msgstr ""
 
-#: classes/class-admin.php:2301
+#: classes/class-admin.php:2305
 #: classes/class-deprecated.php:192
 msgid "Display Title"
 msgstr ""
 
-#: classes/class-admin.php:2311
+#: classes/class-admin.php:2313
+msgid "Title Tag"
+msgstr ""
+
+#: classes/class-admin.php:2338
 #: classes/class-deprecated.php:200
 msgid "Display Categories"
 msgstr ""
 
-#: classes/class-admin.php:2319
+#: classes/class-admin.php:2346
 #: classes/class-deprecated.php:207
 msgid "Categories Count"
 msgstr ""
 
-#: classes/class-admin.php:2337
+#: classes/class-admin.php:2364
 #: classes/class-deprecated.php:223
 msgid "Display Date"
 msgstr ""
 
-#: classes/class-admin.php:2344
+#: classes/class-admin.php:2371
 #: classes/class-deprecated.php:230
 msgid "Human Format"
 msgstr ""
 
-#: classes/class-admin.php:2353
+#: classes/class-admin.php:2380
 #: classes/class-deprecated.php:238
 msgid "Date format example: F j, Y"
 msgstr ""
 
-#: classes/class-admin.php:2367
+#: classes/class-admin.php:2394
 #: classes/class-deprecated.php:250
 msgid "Display Author"
 msgstr ""
 
-#: classes/class-admin.php:2377
+#: classes/class-admin.php:2404
 #: classes/class-deprecated.php:258
 msgid "Display Comments Count"
 msgstr ""
 
-#: classes/class-admin.php:2393
+#: classes/class-admin.php:2420
 #: classes/class-deprecated.php:272
 msgid "Display Views Count"
 msgstr ""
 
-#: classes/class-admin.php:2409
+#: classes/class-admin.php:2436
 #: classes/class-deprecated.php:286
 msgid "Display Reading Time"
 msgstr ""
 
-#: classes/class-admin.php:2425
+#: classes/class-admin.php:2452
 #: classes/class-deprecated.php:300
 msgid "Display Excerpt"
 msgstr ""
 
-#: classes/class-admin.php:2433
+#: classes/class-admin.php:2460
 #: classes/class-deprecated.php:307
 msgid "Excerpt Words Count"
 msgstr ""
 
-#: classes/class-admin.php:2451
+#: classes/class-admin.php:2478
 msgid "Display Read More Button"
 msgstr ""
 
-#: classes/class-admin.php:2457
+#: classes/class-admin.php:2484
 msgid "Always Display"
 msgstr ""
 
-#: classes/class-admin.php:2458
+#: classes/class-admin.php:2485
 msgid "Display when used `More tag` in the post"
 msgstr ""
 
-#: classes/class-admin.php:2467
+#: classes/class-admin.php:2494
 msgid "Read More button label"
 msgstr ""
 
-#: classes/class-admin.php:2483
+#: classes/class-admin.php:2510
 #: classes/class-deprecated.php:323
 msgid "Display Icon"
 msgstr ""
 
-#: classes/class-admin.php:2501
+#: classes/class-admin.php:2528
 msgid "Background"
 msgstr ""
 
-#: classes/class-admin.php:2518
+#: classes/class-admin.php:2545
 msgid "Text"
 msgstr ""
 
-#: classes/class-admin.php:2534
+#: classes/class-admin.php:2561
 msgid "Links"
 msgstr ""
 
-#: classes/class-admin.php:2547
+#: classes/class-admin.php:2574
 msgid "Links Hover"
 msgstr ""
 
-#: classes/class-admin.php:2678
+#: classes/class-admin.php:2705
 #: classes/class-settings.php:402
 msgid "Disabled"
 msgstr ""
 
-#: classes/class-admin.php:2688
+#: classes/class-admin.php:2715
 msgid "Popup"
 msgstr ""
 
-#: classes/class-admin.php:2693
+#: classes/class-admin.php:2720
 msgid "Advanced"
 msgstr ""
 
-#: classes/class-admin.php:2705
+#: classes/class-admin.php:2732
 msgid "Target"
 msgstr ""
 
-#: classes/class-admin.php:2712
+#: classes/class-admin.php:2739
 msgid "New Tab (_blank)"
 msgstr ""
 
-#: classes/class-admin.php:2713
+#: classes/class-admin.php:2740
 msgid "Top Frame (_top)"
 msgstr ""
 
-#: classes/class-admin.php:2727
+#: classes/class-admin.php:2754
 msgid "Rel"
 msgstr ""
 
-#: classes/class-admin.php:2746
+#: classes/class-admin.php:2773
 msgid "Link URL click priority"
 msgstr ""
 
-#: classes/class-admin.php:2761
+#: classes/class-admin.php:2788
 msgid "Title Source"
 msgstr ""
 
-#: classes/class-admin.php:2772
 #: classes/class-admin.php:2799
+#: classes/class-admin.php:2826
 msgid "Item Title"
 msgstr ""
 
-#: classes/class-admin.php:2773
 #: classes/class-admin.php:2800
+#: classes/class-admin.php:2827
 msgid "Item Description"
 msgstr ""
 
-#: classes/class-admin.php:2774
 #: classes/class-admin.php:2801
+#: classes/class-admin.php:2828
 msgid "Item Author"
 msgstr ""
 
-#: classes/class-admin.php:2788
+#: classes/class-admin.php:2815
 msgid "Description Source"
 msgstr ""
 
-#: classes/class-admin.php:2818
+#: classes/class-admin.php:2845
 msgid "Manage media object priority"
 msgstr ""
 
-#: classes/class-admin.php:2819
+#: classes/class-admin.php:2846
 msgid "Quick View for posts and pages"
 msgstr ""
 
-#: classes/class-admin.php:2820
+#: classes/class-admin.php:2847
 msgid "Popup media item deep linking"
 msgstr ""
 
-#: classes/class-admin.php:2837
+#: classes/class-admin.php:2864
 msgid "Deeply customize actions of clicks on different types of items and links."
 msgstr ""
 
-#: classes/class-admin.php:2857
+#: classes/class-admin.php:2884
 msgid "Start"
 msgstr ""
 
-#: classes/class-admin.php:2866
+#: classes/class-admin.php:2893
 msgid "Middle"
 msgstr ""
 
-#: classes/class-admin.php:2869
+#: classes/class-admin.php:2896
 msgid "End"
 msgstr ""
 
-#: classes/class-admin.php:2893
-#: gutenberg/components/setup-wizard/index.js:208
-#: gutenberg/layouts-editor/index.js:96
+#: classes/class-admin.php:2920
+#: gutenberg/components/setup-wizard/index.js:212
+#: gutenberg/layouts-editor/block/index.js:96
 msgid "Filter"
 msgstr ""
 
-#: classes/class-admin.php:2899
-#: gutenberg/layouts-editor/index.js:101
+#: classes/class-admin.php:2926
+#: gutenberg/layouts-editor/block/index.js:101
 msgid "Sort"
 msgstr ""
 
-#: classes/class-admin.php:2905
+#: classes/class-admin.php:2932
 msgid "Search"
 msgstr ""
 
-#: classes/class-admin.php:2911
+#: classes/class-admin.php:2938
 msgid "Layout Items"
 msgstr ""
 
-#: classes/class-admin.php:2916
-#: gutenberg/components/setup-wizard/index.js:222
+#: classes/class-admin.php:2943
+#: gutenberg/components/setup-wizard/index.js:226
 msgid "Pagination"
 msgstr ""
 
-#: classes/class-admin.php:2932
-#: classes/class-admin.php:3062
-#: classes/class-admin.php:3184
+#: classes/class-admin.php:2959
+#: classes/class-admin.php:3089
+#: classes/class-admin.php:3211
 msgid "Minimal"
 msgstr ""
 
-#: classes/class-admin.php:2946
-#: classes/class-admin.php:3076
+#: classes/class-admin.php:2973
+#: classes/class-admin.php:3103
 msgid "Dropdown"
 msgstr ""
 
-#: classes/class-admin.php:3039
+#: classes/class-admin.php:3066
 msgid "Display Count"
 msgstr ""
 
-#: classes/class-admin.php:3048
+#: classes/class-admin.php:3075
 msgid "All Button Text"
 msgstr ""
 
-#: classes/class-admin.php:3050
+#: classes/class-admin.php:3077
 #: classes/class-get-portfolio.php:1073
 #: classes/class-shortcode.php:58
 msgid "All"
 msgstr ""
 
-#: classes/class-admin.php:3173
+#: classes/class-admin.php:3200
 msgid "The search module is only available for Pro users."
 msgstr ""
 
-#: classes/class-admin.php:3278
+#: classes/class-admin.php:3305
 msgid "Type"
 msgstr ""
 
-#: classes/class-admin.php:3285
+#: classes/class-admin.php:3312
 msgid "Paged"
 msgstr ""
 
-#: classes/class-admin.php:3290
-#: classes/class-admin.php:3323
-#: classes/class-admin.php:3378
+#: classes/class-admin.php:3317
+#: classes/class-admin.php:3350
+#: classes/class-admin.php:3405
 msgid "Load More"
 msgstr ""
 
-#: classes/class-admin.php:3295
+#: classes/class-admin.php:3322
 msgid "Infinite"
 msgstr ""
 
-#: classes/class-admin.php:3305
+#: classes/class-admin.php:3332
 msgid "Note: you will see the \"Load More\" pagination in the preview. \"Infinite\" pagination will be visible on the site."
 msgstr ""
 
-#: classes/class-admin.php:3320
-#: classes/class-admin.php:3375
+#: classes/class-admin.php:3347
+#: classes/class-admin.php:3402
 msgid "Texts"
 msgstr ""
 
-#: classes/class-admin.php:3324
-#: classes/class-admin.php:3379
+#: classes/class-admin.php:3351
+#: classes/class-admin.php:3406
 msgid "Load more button label"
 msgstr ""
 
-#: classes/class-admin.php:3341
-#: classes/class-admin.php:3396
+#: classes/class-admin.php:3368
+#: classes/class-admin.php:3423
 msgid "Loading More..."
 msgstr ""
 
-#: classes/class-admin.php:3342
-#: classes/class-admin.php:3397
+#: classes/class-admin.php:3369
+#: classes/class-admin.php:3424
 msgid "Loading more button label"
 msgstr ""
 
-#: classes/class-admin.php:3359
-#: classes/class-admin.php:3414
+#: classes/class-admin.php:3386
+#: classes/class-admin.php:3441
 msgid "You’ve reached the end of the list"
 msgstr ""
 
-#: classes/class-admin.php:3360
-#: classes/class-admin.php:3415
+#: classes/class-admin.php:3387
+#: classes/class-admin.php:3442
 msgid "End of the list text"
 msgstr ""
 
-#: classes/class-admin.php:3445
+#: classes/class-admin.php:3472
 msgid "Display Numbers"
 msgstr ""
 
-#: classes/class-admin.php:3460
+#: classes/class-admin.php:3487
 msgid "Scroll to Top"
 msgstr ""
 
-#: classes/class-admin.php:3477
+#: classes/class-admin.php:3504
 msgid "Scroll to Top Offset"
 msgstr ""
 
-#: classes/class-admin.php:3497
+#: classes/class-admin.php:3524
 msgid "Hide on Reached End"
 msgstr ""
 
-#: classes/class-admin.php:3515
+#: classes/class-admin.php:3542
 msgid "Adjust the loading threshold, limit the number of automatic loads and run the infinite scroll only after the Load button click."
 msgstr ""
 
-#: classes/class-admin.php:3544
+#: classes/class-admin.php:3571
 msgid "Use <code>selector</code> rule to change block styles."
 msgstr ""
 
-#: classes/class-admin.php:3545
+#: classes/class-admin.php:3572
 msgid "Example:"
 msgstr ""
 
-#: classes/class-admin.php:3591
+#: classes/class-admin.php:3618
 msgid "Post Types Set"
 msgstr ""
 
-#: classes/class-admin.php:3606
+#: classes/class-admin.php:3633
 msgid "Current Query"
 msgstr ""
 
 #. translators: %s - taxonomy name.
-#: classes/class-archive-mapping.php:373
+#: classes/class-archive-mapping.php:374
+#: classes/class-archive-mapping.php:1347
 msgid "Portfolio Category: %s"
 msgstr ""
 
 #. translators: %s - taxonomy name.
-#: classes/class-archive-mapping.php:379
+#: classes/class-archive-mapping.php:380
+#: classes/class-archive-mapping.php:1351
 msgid "Portfolio Tag: %s"
 msgstr ""
 
-#: classes/class-archive-mapping.php:507
+#: classes/class-archive-mapping.php:468
 msgid "Portfolio permalinks"
 msgstr ""
 
-#: classes/class-archive-mapping.php:514
+#: classes/class-archive-mapping.php:475
 msgid "Portfolio category base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:520
-#: classes/class-archive-mapping.php:558
+#: classes/class-archive-mapping.php:481
+#: classes/class-archive-mapping.php:519
 msgctxt "slug"
 msgid "portfolio-category"
 msgstr ""
 
-#: classes/class-archive-mapping.php:527
+#: classes/class-archive-mapping.php:488
 msgid "Portfolio tag base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:533
-#: classes/class-archive-mapping.php:559
+#: classes/class-archive-mapping.php:494
+#: classes/class-archive-mapping.php:520
 msgctxt "slug"
 msgid "portfolio-tag"
 msgstr ""
 
 #. translators: %s: Home URL
-#: classes/class-archive-mapping.php:609
+#: classes/class-archive-mapping.php:570
 msgid "If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories. We also recommend you use the <code>%%portfolio_page_slug%%</code> slug, which will automatically use the slug of you Portfolio Archive page."
 msgstr ""
 
-#: classes/class-archive-mapping.php:612
-#: classes/class-archive-mapping.php:716
-#: classes/class-archive-mapping.php:1136
+#: classes/class-archive-mapping.php:573
+#: classes/class-archive-mapping.php:677
+#: classes/class-archive-mapping.php:1100
 msgctxt "default-slug"
 msgid "portfolio"
 msgstr ""
 
-#: classes/class-archive-mapping.php:631
+#: classes/class-archive-mapping.php:592
 msgid "Portfolio base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:635
+#: classes/class-archive-mapping.php:596
 msgid "Portfolio base with category"
 msgstr ""
 
-#: classes/class-archive-mapping.php:640
+#: classes/class-archive-mapping.php:601
 msgid "Custom base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:642
+#: classes/class-archive-mapping.php:603
 msgid "Enter a custom base to use. A base must be set or WordPress will use default instead."
 msgstr ""
 
-#: classes/class-archive-mapping.php:1075
+#: classes/class-archive-mapping.php:1039
 msgid "Portfolio"
 msgstr ""
 
-#: classes/class-archive-mapping.php:1122
+#: classes/class-archive-mapping.php:1086
 msgid "Portfolio Page"
 msgstr ""
 
-#: classes/class-archive-mapping.php:1156
+#: classes/class-archive-mapping.php:1120
 msgctxt "default-label"
 msgid "Portfolio"
 msgstr ""
@@ -2067,11 +2073,11 @@ msgstr ""
 msgid "Visual Portfolio, Posts & Image Gallery for WordPress"
 msgstr ""
 
-#: gutenberg/block-saved/edit.js:38
+#: gutenberg/block-saved/edit.js:36
 msgid "--- Select Layout ---"
 msgstr ""
 
-#: gutenberg/block-saved/edit.js:143
+#: gutenberg/block-saved/edit.js:132
 msgid "Saved %s"
 msgstr ""
 
@@ -2100,7 +2106,7 @@ msgid "Height"
 msgstr ""
 
 #: gutenberg/components/controls-render/index.js:190
-#: gutenberg/components/elements-selector/index.js:390
+#: gutenberg/components/elements-selector/index.js:388
 msgid "PRO"
 msgstr ""
 
@@ -2120,11 +2126,11 @@ msgstr ""
 msgid "Reset Date"
 msgstr ""
 
-#: gutenberg/components/elements-selector/index.js:158
+#: gutenberg/components/elements-selector/index.js:156
 msgid "Are you sure you want to remove the element?"
 msgstr ""
 
-#: gutenberg/components/elements-selector/index.js:179
+#: gutenberg/components/elements-selector/index.js:177
 msgid "Remove"
 msgstr ""
 
@@ -2144,74 +2150,74 @@ msgstr ""
 msgid "Loaded automatically from the image Description"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:179
+#: gutenberg/components/gallery-control/index.js:183
 msgid "Replace Image"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:190
+#: gutenberg/components/gallery-control/index.js:194
 msgid "Remove Image from Gallery"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:200
+#: gutenberg/components/gallery-control/index.js:204
 msgid "Hide Additional Info"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:201
+#: gutenberg/components/gallery-control/index.js:205
 msgid "Show Additional Info"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:226
+#: gutenberg/components/gallery-control/index.js:230
 msgid "File name:"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:231
+#: gutenberg/components/gallery-control/index.js:235
 msgid "File type:"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:256
+#: gutenberg/components/gallery-control/index.js:260
 msgid "File URL:"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:273
+#: gutenberg/components/gallery-control/index.js:277
 msgid "Copy URL to Clipboard"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:280
-#: gutenberg/layouts-editor/index.js:59
+#: gutenberg/components/gallery-control/index.js:284
+#: gutenberg/layouts-editor/block/index.js:49
 msgid "Copied!"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:291
+#: gutenberg/components/gallery-control/index.js:295
 msgid "View attachment page"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:302
+#: gutenberg/components/gallery-control/index.js:306
 msgid "Edit more details"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:424
+#: gutenberg/components/gallery-control/index.js:428
 msgid "Image Settings"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:631
+#: gutenberg/components/gallery-control/index.js:633
 msgid "Edit Gallery"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:632
+#: gutenberg/components/gallery-control/index.js:634
 msgid "Add Images"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:682
+#: gutenberg/components/gallery-control/index.js:684
 msgid "Showing %1$s of %2$s Image"
 msgid_plural "Showing %1$s of %2$s Images"
 msgstr[0] ""
 msgstr[1] ""
 
-#: gutenberg/components/gallery-control/index.js:703
+#: gutenberg/components/gallery-control/index.js:705
 msgid "Show More"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:712
+#: gutenberg/components/gallery-control/index.js:714
 msgid "Show All"
 msgstr ""
 
@@ -2235,35 +2241,35 @@ msgstr ""
 msgid "Type and press Enter…"
 msgstr ""
 
-#: gutenberg/components/setup-wizard/index.js:173
+#: gutenberg/components/setup-wizard/index.js:176
 msgid "Set the common settings in the setup wizard,<br />more options will be available in the block settings.<br />Select the Content Source first:"
 msgstr ""
 
-#: gutenberg/components/setup-wizard/index.js:186
+#: gutenberg/components/setup-wizard/index.js:190
 msgid "Items Style"
 msgstr ""
 
-#: gutenberg/components/setup-wizard/index.js:191
+#: gutenberg/components/setup-wizard/index.js:195
 msgid "Select one of the featured styles to get started.<br />More style settings will be available in the block settings."
 msgstr ""
 
-#: gutenberg/components/setup-wizard/index.js:203
+#: gutenberg/components/setup-wizard/index.js:207
 msgid "Additional Settings"
 msgstr ""
 
-#: gutenberg/components/setup-wizard/index.js:239
+#: gutenberg/components/setup-wizard/index.js:243
 msgid "Popup Gallery"
 msgstr ""
 
-#: gutenberg/components/setup-wizard/index.js:279
+#: gutenberg/components/setup-wizard/index.js:283
 msgid "Skip Setup"
 msgstr ""
 
-#: gutenberg/components/setup-wizard/index.js:280
+#: gutenberg/components/setup-wizard/index.js:284
 msgid "Previous Step"
 msgstr ""
 
-#: gutenberg/components/setup-wizard/index.js:305
+#: gutenberg/components/setup-wizard/index.js:309
 msgid "Continue"
 msgstr ""
 
@@ -2311,24 +2317,16 @@ msgstr ""
 msgid "All Items"
 msgstr ""
 
-#: gutenberg/layouts-editor/index.js:92
+#: gutenberg/layouts-editor/block/index.js:92
 msgid "This Saved Layout"
 msgstr ""
 
-#: gutenberg/layouts-editor/index.js:117
+#: gutenberg/layouts-editor/block/index.js:117
 msgid "Shortcodes"
 msgstr ""
 
-#: gutenberg/layouts-editor/index.js:167
+#: gutenberg/layouts-editor/block/index.js:164
 msgid "Show Additional Shortcodes"
-msgstr ""
-
-#: gutenberg/layouts-editor/index.js:216
-msgid "%s Editor"
-msgstr ""
-
-#: gutenberg/layouts-editor/index.js:218
-msgid "Edit saved %s layouts."
 msgstr ""
 
 #: gutenberg/block-saved/block.json
@@ -2381,4 +2379,14 @@ msgstr ""
 #: gutenberg/block/block.json
 msgctxt "block keyword"
 msgid "posts"
+msgstr ""
+
+#: gutenberg/layouts-editor/block/block.json
+msgctxt "block title"
+msgid "Visual Portfolio Editor"
+msgstr ""
+
+#: gutenberg/layouts-editor/block/block.json
+msgctxt "block description"
+msgid "Edit saved Visual Portfolio layouts."
 msgstr ""

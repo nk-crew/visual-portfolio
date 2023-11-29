@@ -488,6 +488,9 @@
          "Display Title": [
             ""
          ],
+         "Title Tag": [
+            ""
+         ],
          "Display Categories": [
             ""
          ],
@@ -1560,12 +1563,6 @@
          "Show Additional Shortcodes": [
             ""
          ],
-         "%s Editor": [
-            ""
-         ],
-         "Edit saved %s layouts.": [
-            ""
-         ],
          "slug\u0004portfolio-category": [
             ""
          ],
@@ -1596,10 +1593,16 @@
          "block title\u0004Visual Portfolio": [
             ""
          ],
+         "block title\u0004Visual Portfolio Editor": [
+            ""
+         ],
          "block description\u0004Display saved Visual Portfolio layouts.": [
             ""
          ],
          "block description\u0004Display galleries, posts and portfolio grids.": [
+            ""
+         ],
+         "block description\u0004Edit saved Visual Portfolio layouts.": [
             ""
          ],
          "block keyword\u0004saved": [
