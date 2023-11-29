@@ -102,7 +102,8 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			$this->plugin_path     = plugin_dir_path( __FILE__ );
 			$this->plugin_url      = plugin_dir_url( __FILE__ );
 
-			if ( defined( 'VISUAL_PORTFOLIO_PRO' ) ) {
+			// Check for new standalone Pro plugin and for old Pro addon plugin for back compatibility.
+			if ( defined( 'VISUAL_PORTFOLIO_PRO' ) || function_exists( 'visual_portfolio_pro' ) ) {
 				$this->pro_plugin_path = plugin_dir_path( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
 				$this->pro_plugin_url  = plugin_dir_url( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
 			}
