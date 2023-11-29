@@ -40,7 +40,7 @@ class Visual_Portfolio_Preview {
 
 		// Localize script in editor, FSE, and Elementor.
 		add_action( 'enqueue_block_assets', array( $this, 'localize_scripts' ) );
-		add_action( 'wp_print_scripts', array( $this, 'localize_scripts' ), 9 );
+		add_action( 'wp_print_scripts', array( $this, 'localize_elementor_scripts' ), 9 );
 	}
 
 	/**
@@ -99,6 +99,19 @@ class Visual_Portfolio_Preview {
 				'nonce'       => wp_create_nonce( 'vp-ajax-nonce' ),
 			)
 		);
+	}
+
+	/**
+	 * Localize scripts with preview URL for Elementor.
+	 */
+	public function localize_elementor_scripts() {
+		if ( ! wp_script_is( 'visual-portfolio-elementor', 'registered' ) ) {
+			return;
+		}
+
+		$preview_url = $this->get_preview_url();
+
+		// Localize scripts.
 		wp_localize_script(
 			'visual-portfolio-elementor',
 			'VPAdminElementorVariables',
@@ -242,7 +255,7 @@ class Visual_Portfolio_Preview {
 		add_filter( 'script_loader_tag', array( $this, 'rocket_loader_filter' ) );
 
 		// Enqueue assets.
-		Visual_Portfolio_Assets::enqueue_script( 'iframe-resizer-content', 'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min', array(), '4.2.11' );
+		Visual_Portfolio_Assets::enqueue_script( 'iframe-resizer-content', 'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min', array(), '4.3.7' );
 		Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-preview', 'build/assets/js/preview', array( 'iframe-resizer-content' ) );
 		// Post data for script.
 		wp_localize_script(
