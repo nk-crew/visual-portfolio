@@ -14,8 +14,8 @@ class Visual_Portfolio_Sitemap {
 	 */
 	public function __construct() {
 		add_filter( 'aioseo_sitemap_posts', array( $this, 'add_images_to_aioseo_sitemap' ), 10, 1 );
-		add_filter( 'rank_math/sitemap/urlimages', array( $this, 'add_images_to_sitemap' ), 10, 1 );
-		add_filter( 'wpseo_sitemap_urlimages', array( $this, 'add_images_to_sitemap' ), 10, 1 );
+		add_filter( 'rank_math/sitemap/urlimages', array( $this, 'add_images_to_sitemap' ), 10, 2 );
+		add_filter( 'wpseo_sitemap_urlimages', array( $this, 'add_images_to_sitemap' ), 10, 2 );
 	}
 
 	/**
