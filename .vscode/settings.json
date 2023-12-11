@@ -1,9 +1,8 @@
 {
   "editor.codeActionsOnSave": {
-    "source.fixAll.stylelint": true,
-    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": "explicit",
+    "source.fixAll.eslint": "explicit"
   },
-
   "editor.defaultFormatter": null,
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -16,11 +15,9 @@
     "editor.defaultFormatter": null
   },
   "editor.formatOnSave": true,
-
   "scss.validate": false,
   "css.validate": false,
   "less.validate": false,
-
   "stylelint.validate": [
     "css",
     "scss"
@@ -29,10 +26,9 @@
     "css",
     "scss"
   ],
-
-	"search.exclude": {
-			"**/.git": true,
-			"**/node_modules": true,
-			"**/build": true
-	},
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/build": true
+  },
 }
