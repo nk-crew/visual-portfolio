@@ -72,7 +72,10 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
 	public function register_block_layouts_editor() {
 		global $pagenow;
 
-		if ( 'post.php' === $pagenow && isset( $_GET['post'] ) && 'vp_lists' === get_post_type( $_GET['post'] ) ) {
+		if (
+			'post.php' === $pagenow && isset( $_GET['post'] ) && 'vp_lists' === get_post_type( $_GET['post'] ) ||
+			'post-new.php' === $pagenow && isset( $_GET['post_type'] ) && 'vp_lists' === $_GET['post_type']
+		) {
 			register_block_type_from_metadata(
 				visual_portfolio()->plugin_path . 'gutenberg/layouts-editor/block'
 			);
