@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.4
 * Requires PHP: 7.2
-* Stable tag: 3.2.2
+* Stable tag: 3.2.3
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -327,16 +327,16 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
-= 3.2.2 - 29 Nov, 2023 =
+= 3.2.3 - 12 Dec, 2023 =
 
-#### Free + Pro:
+* fixed displaying editor block when creating new Saved Layout
+
+= 3.2.2 - 29 Nov, 2023 =
 
 * added support for asset file change time when enqueue without .asset.php - better support for caching plugins
 * fixed Elementor preview stopped working
 
 = 3.2.1 - 29 Nov, 2023 =
-
-#### Free + Pro:
 
 * fixed Pro plugin path and url detection - now it should work correctly when Free plugin is removed
 * fixed sitemap fatal error
