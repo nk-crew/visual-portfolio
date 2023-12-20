@@ -40,6 +40,7 @@ const zipFiles = [
 	'LICENSE.txt',
 	'README.md',
 	'readme.txt',
+	'wpml-config.xml',
 ];
 
 // Bump current version number.
