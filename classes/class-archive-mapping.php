@@ -1095,6 +1095,35 @@ class Visual_Portfolio_Archive_Mapping {
 	}
 
 	/**
+	 * Get Unset Portfolio Page.
+	 *
+	 * @return int|bool
+	 */
+	public static function get_unset_archive_page() {
+		$query_opts = array(
+			'post_status'            => 'publish',
+			'ignore_sticky_posts'    => 1,
+			'posts_per_page'         => 50,
+			'post_type'              => 'page',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'meta_key'               => '_vp_post_type_mapped',
+		);
+
+		$search_results = new WP_Query( $query_opts );
+
+		if ( $search_results->have_posts() ) {
+			while ( $search_results->have_posts() ) {
+				$search_results->the_post();
+				$post_id = $search_results->post->ID;
+				break;
+			}
+		}
+
+		return $post_id ?? false;
+	}
+
+	/**
 	 * Add a post display state for special Portfolio Archive page in the pages list table.
 	 *
 	 * @param array   $post_states - An array of post display states.
