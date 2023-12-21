@@ -1065,8 +1065,8 @@ class Visual_Portfolio_Archive_Mapping {
 				'post_name'     => $custom_slug,
 			);
 
-			// Insert the post into the database.
-			$post_id = wp_insert_post( $args );
+			// Check page if Archive Exist and set as Portfolio page or Insert the post into the database.
+			$post_id = self::get_unset_archive_page() ?? wp_insert_post( $args );
 
 			if ( ! is_wp_error( $post_id ) ) {
 
