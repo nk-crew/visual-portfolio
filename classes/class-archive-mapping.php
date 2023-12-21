@@ -87,9 +87,32 @@ class Visual_Portfolio_Archive_Mapping {
 			add_filter( 'vpf_pagination_args', array( $this, 'converting_load_more_and_infinite_paginate_next_page_to_friendly_url' ), 10, 2 );
 			add_filter( 'vpf_extend_sort_item_url', array( $this, 'remove_page_url_from_sort_item_url' ), 10, 3 );
 			add_filter( 'vpf_each_item_args', array( $this, 'convert_category_on_item_meta_to_friendly_url' ), 10, 1 );
+			add_filter( 'wxr_importer.pre_process.post', array( $this, 'exclude_import_demo_portfolio_if_page_already_exist' ), 12, 2 );
 		}
 
-		self::create_archive_page();
+		if ( empty( $this->archive_page ) && Visual_Portfolio_Custom_Post_Type::portfolio_post_type_is_registered() ) {
+			self::create_archive_page();
+		}
+	}
+
+	/**
+	 * Exclude import portfolio archive page for themes import if archive already exist.
+	 *
+	 * @param array $data - Current import post data.
+	 * @param array $meta - Current import post meta.
+	 * @return array
+	 */
+	public function exclude_import_demo_portfolio_if_page_already_exist( $data, $meta ) {
+		if (
+			isset( $data['post_type'] ) &&
+			'page' === $data['post_type'] &&
+			! empty( $meta ) &&
+			false !== array_search( '_vp_post_type_mapped', array_column( $meta, 'key' ), true )
+		) {
+			return array();
+		}
+
+		return $data;
 	}
 
 	/**
