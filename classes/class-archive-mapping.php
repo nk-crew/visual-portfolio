@@ -94,7 +94,8 @@ class Visual_Portfolio_Archive_Mapping {
 	}
 
 	/**
-	 * Fixed taxonomy titles on Portfolio Menu Item.
+	 * Restore Portfolio menu item title on taxonomy pages,
+	 * because we replace it in method `set_archive_title`.
 	 *
 	 * @param array $sorted_menu_items - The menu items, sorted by each menu item's menu order.
 	 * @return array
