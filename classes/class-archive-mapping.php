@@ -87,9 +87,40 @@ class Visual_Portfolio_Archive_Mapping {
 			add_filter( 'vpf_pagination_args', array( $this, 'converting_load_more_and_infinite_paginate_next_page_to_friendly_url' ), 10, 2 );
 			add_filter( 'vpf_extend_sort_item_url', array( $this, 'remove_page_url_from_sort_item_url' ), 10, 3 );
 			add_filter( 'vpf_each_item_args', array( $this, 'convert_category_on_item_meta_to_friendly_url' ), 10, 1 );
+			add_filter( 'wp_nav_menu_objects', array( $this, 'wp_nav_menu_objects' ), 10 );
 		}
 
 		self::create_archive_page();
+	}
+
+	/**
+	 * Restore Portfolio menu item title on taxonomy pages,
+	 * because we replace it in method `set_archive_title`.
+	 *
+	 * @param array $sorted_menu_items - The menu items, sorted by each menu item's menu order.
+	 * @return array
+	 */
+	public function wp_nav_menu_objects( $sorted_menu_items ) {
+		global $wp_query;
+
+		if (
+			(
+				isset( $wp_query->query['portfolio_category'] ) ||
+				isset( $wp_query->query['portfolio_tag'] )
+			) &&
+			! empty( $sorted_menu_items ) &&
+			is_array( $sorted_menu_items )
+		) {
+			foreach ( $sorted_menu_items as $item ) {
+				if ( (int) $item->object_id === (int) $this->archive_page && self::get_current_term_title( $wp_query ) === $item->title ) {
+					$post = get_post( $this->archive_page );
+					if ( is_object( $post ) ) {
+						$item->title = $post->post_title;
+					}
+				}
+			}
+		}
+		return $sorted_menu_items;
 	}
 
 	/**
