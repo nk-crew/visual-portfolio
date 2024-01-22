@@ -1054,7 +1054,7 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return void
 	 */
 	public static function create_archive_page( $custom_slug = 'portfolio' ) {
-		if ( ! get_option( '_vp_add_archive_page' ) && ! get_option( '_vp_trying_to_add_archive_page' ) ) {
+		if ( ! get_option( '_vp_add_archive_page', false ) && ! get_option( '_vp_trying_to_add_archive_page', false ) ) {
 
 			add_option( '_vp_trying_to_add_archive_page', true );
 
@@ -1068,7 +1068,7 @@ class Visual_Portfolio_Archive_Mapping {
 			// Check page if Archive Exist and set as Portfolio page or Insert the post into the database.
 			$post_id = self::get_unset_archive_page() ?? wp_insert_post( $args );
 
-			if ( ! is_wp_error( $post_id ) ) {
+			if ( ! is_wp_error( $post_id ) && ! empty( $post_id ) ) {
 
 				Settings::update_option( 'portfolio_archive_page', 'vp_general', $post_id );
 
@@ -1097,7 +1097,7 @@ class Visual_Portfolio_Archive_Mapping {
 	/**
 	 * Get Unset Portfolio Page.
 	 *
-	 * @return int|bool
+	 * @return int
 	 */
 	public static function get_unset_archive_page() {
 		$query_opts = array(
@@ -1120,7 +1120,7 @@ class Visual_Portfolio_Archive_Mapping {
 			}
 		}
 
-		return $post_id ?? false;
+		return $post_id ?? null;
 	}
 
 	/**
