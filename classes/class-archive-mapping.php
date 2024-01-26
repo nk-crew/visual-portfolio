@@ -87,10 +87,33 @@ class Visual_Portfolio_Archive_Mapping {
 			add_filter( 'vpf_pagination_args', array( $this, 'converting_load_more_and_infinite_paginate_next_page_to_friendly_url' ), 10, 2 );
 			add_filter( 'vpf_extend_sort_item_url', array( $this, 'remove_page_url_from_sort_item_url' ), 10, 3 );
 			add_filter( 'vpf_each_item_args', array( $this, 'convert_category_on_item_meta_to_friendly_url' ), 10, 1 );
+			add_filter( 'wxr_importer.pre_process.post', array( $this, 'exclude_import_demo_portfolio_if_page_already_exist' ), 12, 2 );
 			add_filter( 'wp_nav_menu_objects', array( $this, 'wp_nav_menu_objects' ), 10 );
 		}
 
-		self::create_archive_page();
+		if ( empty( $this->archive_page ) && Visual_Portfolio_Custom_Post_Type::portfolio_post_type_is_registered() ) {
+			self::create_archive_page();
+		}
+	}
+
+	/**
+	 * Exclude import portfolio archive page for themes import if archive already exist.
+	 *
+	 * @param array $data - Current import post data.
+	 * @param array $meta - Current import post meta.
+	 * @return array
+	 */
+	public function exclude_import_demo_portfolio_if_page_already_exist( $data, $meta ) {
+		if (
+			isset( $data['post_type'] ) &&
+			'page' === $data['post_type'] &&
+			! empty( $meta ) &&
+			false !== array_search( '_vp_post_type_mapped', array_column( $meta, 'key' ), true )
+		) {
+			return array();
+		}
+
+		return $data;
 	}
 
 	/**
@@ -1062,7 +1085,7 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return void
 	 */
 	public static function create_archive_page( $custom_slug = 'portfolio' ) {
-		if ( ! get_option( '_vp_add_archive_page' ) && ! get_option( '_vp_trying_to_add_archive_page' ) ) {
+		if ( ! get_option( '_vp_add_archive_page', false ) && ! get_option( '_vp_trying_to_add_archive_page', false ) ) {
 
 			add_option( '_vp_trying_to_add_archive_page', true );
 
@@ -1073,10 +1096,10 @@ class Visual_Portfolio_Archive_Mapping {
 				'post_name'     => $custom_slug,
 			);
 
-			// Insert the post into the database.
-			$post_id = wp_insert_post( $args );
+			// Check page if Archive Exist and set as Portfolio page or Insert the post into the database.
+			$post_id = self::get_unset_archive_page() ?? wp_insert_post( $args );
 
-			if ( ! is_wp_error( $post_id ) ) {
+			if ( ! is_wp_error( $post_id ) && ! empty( $post_id ) ) {
 
 				Settings::update_option( 'portfolio_archive_page', 'vp_general', $post_id );
 
@@ -1100,6 +1123,35 @@ class Visual_Portfolio_Archive_Mapping {
 				add_option( '_vp_add_archive_page', $post_id );
 			}
 		}
+	}
+
+	/**
+	 * Get Unset Portfolio Page.
+	 *
+	 * @return int
+	 */
+	public static function get_unset_archive_page() {
+		$query_opts = array(
+			'post_status'            => 'publish',
+			'ignore_sticky_posts'    => 1,
+			'posts_per_page'         => 50,
+			'post_type'              => 'page',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'meta_key'               => '_vp_post_type_mapped',
+		);
+
+		$search_results = new WP_Query( $query_opts );
+
+		if ( $search_results->have_posts() ) {
+			while ( $search_results->have_posts() ) {
+				$search_results->the_post();
+				$post_id = $search_results->post->ID;
+				break;
+			}
+		}
+
+		return $post_id ?? null;
 	}
 
 	/**

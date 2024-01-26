@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Visual Portfolio Team
+# Copyright (C) 2024 Visual Portfolio Team
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-12-11T21:26:45+00:00\n"
+"POT-Creation-Date: 2024-01-26T09:12:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: visual-portfolio\n"
@@ -636,7 +636,7 @@ msgstr ""
 #: classes/class-admin.php:1765
 #: classes/class-admin.php:2370
 #: classes/class-admin.php:2738
-#: classes/class-archive-mapping.php:588
+#: classes/class-archive-mapping.php:611
 #: classes/class-deprecated.php:229
 msgid "Default"
 msgstr ""
@@ -1081,78 +1081,78 @@ msgid "Current Query"
 msgstr ""
 
 #. translators: %s - taxonomy name.
-#: classes/class-archive-mapping.php:374
-#: classes/class-archive-mapping.php:1347
+#: classes/class-archive-mapping.php:397
+#: classes/class-archive-mapping.php:1399
 msgid "Portfolio Category: %s"
 msgstr ""
 
 #. translators: %s - taxonomy name.
-#: classes/class-archive-mapping.php:380
-#: classes/class-archive-mapping.php:1351
+#: classes/class-archive-mapping.php:403
+#: classes/class-archive-mapping.php:1403
 msgid "Portfolio Tag: %s"
 msgstr ""
 
-#: classes/class-archive-mapping.php:468
+#: classes/class-archive-mapping.php:491
 msgid "Portfolio permalinks"
 msgstr ""
 
-#: classes/class-archive-mapping.php:475
+#: classes/class-archive-mapping.php:498
 msgid "Portfolio category base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:481
-#: classes/class-archive-mapping.php:519
+#: classes/class-archive-mapping.php:504
+#: classes/class-archive-mapping.php:542
 msgctxt "slug"
 msgid "portfolio-category"
 msgstr ""
 
-#: classes/class-archive-mapping.php:488
+#: classes/class-archive-mapping.php:511
 msgid "Portfolio tag base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:494
-#: classes/class-archive-mapping.php:520
+#: classes/class-archive-mapping.php:517
+#: classes/class-archive-mapping.php:543
 msgctxt "slug"
 msgid "portfolio-tag"
 msgstr ""
 
 #. translators: %s: Home URL
-#: classes/class-archive-mapping.php:570
+#: classes/class-archive-mapping.php:593
 msgid "If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories. We also recommend you use the <code>%%portfolio_page_slug%%</code> slug, which will automatically use the slug of you Portfolio Archive page."
 msgstr ""
 
-#: classes/class-archive-mapping.php:573
-#: classes/class-archive-mapping.php:677
-#: classes/class-archive-mapping.php:1100
+#: classes/class-archive-mapping.php:596
+#: classes/class-archive-mapping.php:700
+#: classes/class-archive-mapping.php:1152
 msgctxt "default-slug"
 msgid "portfolio"
 msgstr ""
 
-#: classes/class-archive-mapping.php:592
+#: classes/class-archive-mapping.php:615
 msgid "Portfolio base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:596
+#: classes/class-archive-mapping.php:619
 msgid "Portfolio base with category"
 msgstr ""
 
-#: classes/class-archive-mapping.php:601
+#: classes/class-archive-mapping.php:624
 msgid "Custom base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:603
+#: classes/class-archive-mapping.php:626
 msgid "Enter a custom base to use. A base must be set or WordPress will use default instead."
 msgstr ""
 
-#: classes/class-archive-mapping.php:1039
+#: classes/class-archive-mapping.php:1062
 msgid "Portfolio"
 msgstr ""
 
-#: classes/class-archive-mapping.php:1086
+#: classes/class-archive-mapping.php:1138
 msgid "Portfolio Page"
 msgstr ""
 
-#: classes/class-archive-mapping.php:1120
+#: classes/class-archive-mapping.php:1172
 msgctxt "default-label"
 msgid "Portfolio"
 msgstr ""
