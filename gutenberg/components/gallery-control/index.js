@@ -587,16 +587,18 @@ const SortableItem = function (props) {
 							'vpf-component-gallery-control-item-toolbar-checked'
 					)}
 				>
-					<CheckboxControl
-						className={
-							'vpf-component-gallery-control-item-checkbox'
-						}
-						title={__('Select', 'visual-portfolio')}
-						checked={isChecked}
-						onChange={(val) => {
-							onCheck(val);
-						}}
-					/>
+					{!isSetupWizard ? (
+						<CheckboxControl
+							className={
+								'vpf-component-gallery-control-item-checkbox'
+							}
+							title={__('Select', 'visual-portfolio')}
+							checked={isChecked}
+							onChange={(val) => {
+								onCheck(val);
+							}}
+						/>
+					) : null}
 					<Button
 						className="vpf-component-gallery-control-item-edit"
 						onClick={openModal}
@@ -837,7 +839,7 @@ const SortableList = function (props) {
 			{items && items.length && items.length > 9
 				? editGalleryButton
 				: null}
-			{items?.length ? (
+			{items?.length && !isSetupWizard ? (
 				<div className="vpf-component-gallery-control-item-fullwidth">
 					<div className="vpf-component-gallery-control-item-bulk-actions">
 						<CheckboxControl
@@ -955,7 +957,7 @@ const SortableList = function (props) {
 					) : null}
 				</div>
 			) : null}
-			{bulkEditOpen ? (
+			{bulkEditOpen && !isSetupWizard ? (
 				<ImageEditModal
 					title={__('Bulk Image Settings', 'visual-portfolio')}
 					img={{
