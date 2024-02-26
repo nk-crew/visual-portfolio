@@ -36,10 +36,16 @@ $doc.on('extendClass.vpf', (event, VP) => {
 			const initOptions = options || {
 				itemSelector: '.vp-portfolio__item-wrap',
 				layoutMode: 'masonry',
-				// masonry: {
-				//     horizontalOrder: true
-				// },
+				masonry:
+					self.options.layout === 'masonry'
+						? {
+								// Use proper order for row items in Masonry layout only.
+								// Tiles layout may not work as expected with this option.
+								horizontalOrder: true,
+						  }
+						: {},
 				transitionDuration: '0.3s',
+				stagger: '0.03s',
 				percentPosition: true,
 				originLeft: !isRtl,
 
