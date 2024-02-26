@@ -548,6 +548,7 @@ const SortableItem = function (props) {
 	const idx = index - 1;
 
 	const {
+		attributes: sortableAttributes,
 		listeners,
 		setNodeRef,
 		transform,
@@ -577,7 +578,7 @@ const SortableItem = function (props) {
 				)}
 				ref={setNodeRef}
 				style={style}
-				{...attributes}
+				{...sortableAttributes}
 				{...listeners}
 			>
 				<div
