@@ -17,24 +17,29 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import classnames from 'classnames/dedupe';
+import { isEqual } from 'lodash';
 
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import {
 	Button,
+	CheckboxControl,
 	FocalPointPicker,
 	Modal,
+	SelectControl,
 	TextControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import ControlsRender from '../controls-render';
+import getAllCategories from './utils/get-all-categories';
 
 const { navigator, VPGutenbergVariables } = window;
 
 const ALLOWED_MEDIA_TYPES = ['image'];
+const UNCATEGORIZED_VALUE = '------';
 
 function getHumanFileSize(size) {
 	const i = Math.floor(Math.log(size) / Math.log(1024));
@@ -110,6 +115,33 @@ function prepareImages(images, currentImages) {
 				result.push(imgData);
 			}
 		});
+	}
+
+	return result;
+}
+
+function getItemIndexByImageId(items, imgId) {
+	return items.findIndex((img) => img.id === imgId);
+}
+
+function getBulkImagesDefaultValue(allItems, selectedItems, optionName) {
+	let result = null;
+
+	if (selectedItems && selectedItems.length) {
+		const selectedItemsData = allItems.filter((img) =>
+			selectedItems.includes(img.id)
+		);
+
+		if (selectedItemsData.length) {
+			result = selectedItemsData[0][optionName];
+
+			selectedItemsData.forEach((img) => {
+				// Use isEqual to properly compare objects and arrays.
+				if (result && !isEqual(result, img[optionName])) {
+					result = null;
+				}
+			});
+		}
 	}
 
 	return result;
@@ -318,6 +350,184 @@ const SelectedImageData = function (props) {
 	);
 };
 
+const ImageEditModal = function (props) {
+	const {
+		idx,
+		title,
+		img,
+		onChange,
+		onRemove,
+		imageControls,
+		controlName,
+		focalPoint,
+		clientId,
+		isSetupWizard,
+		isBulkEdit,
+		bulkItems,
+		close,
+		attributes,
+	} = props;
+
+	let focalPointVal = img?.focalPoint;
+	let focalPointImageIdx = idx;
+
+	// Find same focalPoint value from bulk items if available.
+	if (idx === -1 && bulkItems?.length && attributes?.[controlName]) {
+		const bulkValue = getBulkImagesDefaultValue(
+			attributes[controlName],
+			bulkItems,
+			'focalPoint'
+		);
+
+		if (bulkValue) {
+			focalPointImageIdx = getItemIndexByImageId(
+				attributes[controlName],
+				bulkItems[0]
+			);
+
+			if (focalPointImageIdx >= 0) {
+				focalPointVal =
+					attributes[controlName]?.[focalPointImageIdx]?.focalPoint;
+			}
+		}
+	}
+
+	return (
+		<Modal
+			title={title}
+			onRequestClose={(e) => {
+				if (e?.relatedTarget?.classList?.contains('media-modal')) {
+					// Don't close modal if opened media modal.
+				} else {
+					close(e);
+				}
+			}}
+		>
+			<div className="vpf-component-gallery-control-item-modal">
+				{focalPoint && img?.id ? (
+					<SelectedImageData
+						showFocalPoint={focalPoint}
+						focalPoint={focalPointVal}
+						imgId={img?.id}
+						imgUrl={img.imgThumbnailUrl || img.imgUrl}
+						onChangeFocalPoint={(val) => {
+							onChange({ focalPoint: val });
+						}}
+						onChangeImage={(imgData) => {
+							if (imgData === false) {
+								onRemove();
+							} else {
+								onChange(imgData);
+							}
+						}}
+					/>
+				) : null}
+
+				{/* Display focal point if no image ID available (used for bulk editor with image placeholder) */}
+				{focalPoint && !img?.id && img?.imgThumbnailUrl ? (
+					<div className="vpf-component-gallery-control-item-modal-image-info">
+						<FocalPointPicker
+							url={img.imgThumbnailUrl}
+							value={focalPointVal}
+							onChange={(val) => {
+								onChange({ focalPoint: val });
+							}}
+						/>
+					</div>
+				) : null}
+				<div>
+					{Object.keys(imageControls).map((name) => {
+						const newCondition = [];
+
+						// Hide controls if it's bulk edit and control is not allowed for bulk edit.
+						if (
+							isBulkEdit &&
+							!imageControls[name].allow_bulk_edit
+						) {
+							return null;
+						}
+
+						let imageIdx = idx;
+
+						// Find same control value from bulk items if available.
+						if (
+							idx === -1 &&
+							bulkItems?.length &&
+							attributes?.[controlName]
+						) {
+							const bulkValue = getBulkImagesDefaultValue(
+								attributes[controlName],
+								bulkItems,
+								name
+							);
+
+							if (bulkValue) {
+								imageIdx = getItemIndexByImageId(
+									attributes[controlName],
+									bulkItems[0]
+								);
+							}
+						}
+
+						// prepare name.
+						const imgControlName = `${controlName}[${imageIdx}].${name}`;
+
+						// prepare conditions for the current item.
+						if (imageControls[name].condition.length) {
+							imageControls[name].condition.forEach((data) => {
+								const newData = { ...data };
+
+								if (
+									newData.control &&
+									/SELF/g.test(newData.control)
+								) {
+									newData.control = newData.control.replace(
+										/SELF/g,
+										`${controlName}[${imageIdx}]`
+									);
+								}
+
+								newCondition.push(newData);
+							});
+						}
+
+						return applyFilters(
+							'vpf.editor.gallery-controls-render',
+							<ControlsRender.Control
+								key={`${
+									img?.id ||
+									img?.imgThumbnailUrl ||
+									img?.imgUrl
+								}-${imageIdx}-${name}`}
+								attributes={attributes}
+								onChange={(val) => {
+									onChange({
+										[name]: val,
+									});
+								}}
+								{...imageControls[name]}
+								name={imgControlName}
+								value={img?.[name]}
+								condition={newCondition}
+								clientId={clientId}
+								isSetupWizard={isSetupWizard}
+							/>,
+							imageControls[name],
+							props,
+							{
+								name,
+								fullName: imgControlName,
+								index: imageIdx,
+								condition: newCondition,
+							}
+						);
+					})}
+				</div>
+			</div>
+		</Modal>
+	);
+};
+
 const SortableItem = function (props) {
 	const {
 		img,
@@ -329,12 +539,15 @@ const SortableItem = function (props) {
 		focalPoint,
 		clientId,
 		isSetupWizard,
+		isMuffled,
+		isChecked,
+		onCheck,
+		attributes,
 	} = props;
 
 	const idx = index - 1;
 
 	const {
-		attributes,
 		listeners,
 		setNodeRef,
 		transform,
@@ -359,15 +572,110 @@ const SortableItem = function (props) {
 			<div
 				className={classnames(
 					'vpf-component-gallery-control-item',
-					isDragging
-						? 'vpf-component-gallery-control-item-dragging'
-						: ''
+					isDragging && 'vpf-component-gallery-control-item-dragging',
+					isMuffled && 'vpf-component-gallery-control-item-muffled'
 				)}
 				ref={setNodeRef}
 				style={style}
 				{...attributes}
 				{...listeners}
 			>
+				<div
+					className={classnames(
+						'vpf-component-gallery-control-item-toolbar',
+						isChecked &&
+							'vpf-component-gallery-control-item-toolbar-checked'
+					)}
+				>
+					<CheckboxControl
+						className={
+							'vpf-component-gallery-control-item-checkbox'
+						}
+						title={__('Select', 'visual-portfolio')}
+						checked={isChecked}
+						onChange={(val) => {
+							onCheck(val);
+						}}
+					/>
+					<Button
+						className="vpf-component-gallery-control-item-edit"
+						onClick={openModal}
+						aria-expanded={isOpen}
+					>
+						<svg
+							width="20"
+							height="20"
+							viewBox="0 0 20 20"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								fillRule="evenodd"
+								clipRule="evenodd"
+								d="M9.80483 1H10.1952C10.6658 1 11.1171 1.18964 11.4498 1.52721C11.7825 1.86477 11.9695 2.32261 11.9695 2.8V2.962C11.9698 3.27765 12.0519 3.58767 12.2077 3.86095C12.3634 4.13424 12.5872 4.36117 12.8566 4.519L13.2381 4.744C13.5078 4.90198 13.8138 4.98515 14.1253 4.98515C14.4367 4.98515 14.7427 4.90198 15.0124 4.744L15.1455 4.672C15.5527 4.43374 16.0364 4.3691 16.4904 4.49228C16.9445 4.61546 17.3319 4.91638 17.5674 5.329L17.7626 5.671C17.9975 6.08404 18.0612 6.57475 17.9398 7.0354C17.8184 7.49605 17.5217 7.889 17.115 8.128L16.9819 8.209C16.7112 8.36759 16.4865 8.59594 16.3307 8.87094C16.1749 9.14594 16.0935 9.45782 16.0948 9.775V10.225C16.0935 10.5422 16.1749 10.8541 16.3307 11.1291C16.4865 11.4041 16.7112 11.6324 16.9819 11.791L17.115 11.863C17.5217 12.102 17.8184 12.4949 17.9398 12.9556C18.0612 13.4163 17.9975 13.907 17.7626 14.32L17.5674 14.671C17.3319 15.0836 16.9445 15.3845 16.4904 15.5077C16.0364 15.6309 15.5527 15.5663 15.1455 15.328L15.0124 15.256C14.7427 15.098 14.4367 15.0148 14.1253 15.0148C13.8138 15.0148 13.5078 15.098 13.2381 15.256L12.8566 15.481C12.5872 15.6388 12.3634 15.8658 12.2077 16.139C12.0519 16.4123 11.9698 16.7223 11.9695 17.038V17.2C11.9695 17.6774 11.7825 18.1352 11.4498 18.4728C11.1171 18.8104 10.6658 19 10.1952 19H9.80483C9.33425 19 8.88295 18.8104 8.5502 18.4728C8.21745 18.1352 8.03051 17.6774 8.03051 17.2V17.038C8.03019 16.7223 7.94806 16.4123 7.79235 16.139C7.63663 15.8658 7.41282 15.6388 7.14336 15.481L6.76188 15.256C6.49215 15.098 6.18618 15.0148 5.87472 15.0148C5.56327 15.0148 5.2573 15.098 4.98757 15.256L4.8545 15.328C4.44735 15.5663 3.96365 15.6309 3.50957 15.5077C3.05549 15.3845 2.66815 15.0836 2.43256 14.671L2.23739 14.329C2.00252 13.916 1.93881 13.4253 2.06023 12.9646C2.18165 12.5039 2.47828 12.111 2.88501 11.872L3.01808 11.791C3.28885 11.6324 3.5135 11.4041 3.66929 11.1291C3.82508 10.8541 3.90648 10.5422 3.90524 10.225V9.766C3.90337 9.45187 3.8205 9.14372 3.66486 8.87215C3.50923 8.60058 3.28625 8.37506 3.01808 8.218L2.88501 8.128C2.47828 7.889 2.18165 7.49605 2.06023 7.0354C1.93881 6.57475 2.00252 6.08404 2.23739 5.671L2.43256 5.329C2.66815 4.91638 3.05549 4.61546 3.50957 4.49228C3.96365 4.3691 4.44735 4.43374 4.8545 4.672L4.98757 4.744C5.2573 4.90198 5.56327 4.98515 5.87472 4.98515C6.18618 4.98515 6.49215 4.90198 6.76188 4.744L7.14336 4.519C7.41282 4.36117 7.63663 4.13424 7.79235 3.86095C7.94806 3.58767 8.03019 3.27765 8.03051 2.962V2.8C8.03051 2.32261 8.21745 1.86477 8.5502 1.52721C8.88295 1.18964 9.33425 1 9.80483 1ZM13 10C13 11.6569 11.6569 13 10 13C8.34315 13 7 11.6569 7 10C7 8.34315 8.34315 7 10 7C11.6569 7 13 8.34315 13 10Z"
+								fill="currentColor"
+							/>
+						</svg>
+					</Button>
+					<Button
+						className="vpf-component-gallery-control-item-remove"
+						onClick={() => {
+							const newImages = [...items];
+
+							if (newImages[idx]) {
+								newImages.splice(idx, 1);
+
+								onChange(newImages);
+							}
+						}}
+					>
+						<svg
+							width="20"
+							height="20"
+							viewBox="0 0 20 20"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M3 5.76471H17.1176"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+							<path
+								d="M15.2353 5.76471V16.4706C15.2353 17.2353 14.4958 18 13.7563 18H6.36135C5.62185 18 4.88235 17.2353 4.88235 16.4706V5.76471"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								fill="none"
+							/>
+							<path
+								d="M6.76471 5.76471V3.88235C6.76471 2.94118 7.58824 2 8.41177 2H11.7059C12.5294 2 13.3529 2.94118 13.3529 3.88235V5.76471"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								fill="none"
+							/>
+							<path
+								d="M8.64706 9.52942V14.2353"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+							<path
+								d="M11.4706 9.52942V14.2353"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+						</svg>
+					</Button>
+				</div>
 				<Button
 					className="vpf-component-gallery-control-item-button"
 					onClick={openModal}
@@ -378,179 +686,46 @@ const SortableItem = function (props) {
 						alt={img.alt || img.imgThumbnailUrl || img.imgUrl}
 						loading="lazy"
 					/>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
-						<circle cx="12" cy="12" r="3" />
-						<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-					</svg>
 				</Button>
-				<Button
-					className="vpf-component-gallery-control-item-remove"
-					onClick={() => {
+			</div>
+			{isOpen ? (
+				<ImageEditModal
+					title={__('Image Settings', 'visual-portfolio')}
+					img={img}
+					idx={idx}
+					onChange={(val) => {
+						const newImages = [...items];
+
+						if (newImages[idx]) {
+							newImages[idx] = {
+								...newImages[idx],
+								...val,
+							};
+
+							onChange(newImages);
+						}
+					}}
+					onRemove={() => {
 						const newImages = [...items];
 
 						if (newImages[idx]) {
 							newImages.splice(idx, 1);
 
 							onChange(newImages);
+
+							closeModal();
 						}
 					}}
-				>
-					<svg
-						width="20"
-						height="20"
-						viewBox="0 0 20 20"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M3.5 5.5H7.5M16.5 5.5H12.5M12.5 5.5V2.5H7.5V5.5M12.5 5.5H7.5M5 8.5L6 17H14L15 8.5"
-							stroke="currentColor"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							fill="transparent"
-						/>
-					</svg>
-				</Button>
-			</div>
-			{isOpen ? (
-				<Modal
-					title={__('Image Settings', 'visual-portfolio')}
-					onRequestClose={(e) => {
-						if (
-							e?.relatedTarget?.classList?.contains('media-modal')
-						) {
-							// Don't close modal if opened media modal.
-						} else {
-							closeModal(e);
-						}
+					imageControls={imageControls}
+					controlName={controlName}
+					attributes={attributes}
+					focalPoint={focalPoint}
+					clientId={clientId}
+					isSetupWizard={isSetupWizard}
+					close={() => {
+						closeModal();
 					}}
-				>
-					<div className="vpf-component-gallery-control-item-modal">
-						{focalPoint && img.id ? (
-							<SelectedImageData
-								showFocalPoint={focalPoint}
-								focalPoint={img.focalPoint}
-								imgId={img.id}
-								imgUrl={img.imgThumbnailUrl || img.imgUrl}
-								onChangeFocalPoint={(val) => {
-									const newImages = [...items];
-
-									if (newImages[idx]) {
-										newImages[idx] = {
-											...newImages[idx],
-											focalPoint: val,
-										};
-
-										onChange(newImages);
-									}
-								}}
-								onChangeImage={(imgData) => {
-									const newImages = [...items];
-
-									if (!newImages[idx]) {
-										return;
-									}
-
-									if (imgData === false) {
-										newImages.splice(idx, 1);
-
-										onChange(newImages);
-
-										closeModal();
-									} else {
-										newImages[idx] = {
-											...newImages[idx],
-											...imgData,
-										};
-
-										onChange(newImages);
-									}
-								}}
-							/>
-						) : (
-							''
-						)}
-						<div>
-							{Object.keys(imageControls).map((name) => {
-								const newCondition = [];
-
-								// prepare name.
-								const imgControlName = `${controlName}[${idx}].${name}`;
-
-								// prepare conditions for the current item.
-								if (imageControls[name].condition.length) {
-									imageControls[name].condition.forEach(
-										(data) => {
-											const newData = { ...data };
-
-											if (
-												newData.control &&
-												/SELF/g.test(newData.control)
-											) {
-												newData.control =
-													newData.control.replace(
-														/SELF/g,
-														`${controlName}[${idx}]`
-													);
-											}
-
-											newCondition.push(newData);
-										}
-									);
-								}
-
-								return applyFilters(
-									'vpf.editor.gallery-controls-render',
-									<ControlsRender.Control
-										key={`${
-											img.id ||
-											img.imgThumbnailUrl ||
-											img.imgUrl
-										}-${idx}-${name}`}
-										attributes={props.attributes}
-										onChange={(val) => {
-											const newImages = [...items];
-
-											if (newImages[idx]) {
-												newImages[idx] = {
-													...newImages[idx],
-													[name]: val,
-												};
-
-												onChange(newImages);
-											}
-										}}
-										{...imageControls[name]}
-										name={imgControlName}
-										value={img[name]}
-										condition={newCondition}
-										clientId={clientId}
-										isSetupWizard={isSetupWizard}
-									/>,
-									imageControls[name],
-									props,
-									{
-										name,
-										fullName: imgControlName,
-										index: idx,
-										condition: newCondition,
-									}
-								);
-							})}
-						</div>
-					</div>
-				</Modal>
+				/>
 			) : null}
 		</>
 	);
@@ -566,6 +741,7 @@ const SortableList = function (props) {
 		attributes,
 		focalPoint,
 		isSetupWizard,
+		clientId,
 	} = props;
 
 	const sensors = useSensors(
@@ -577,9 +753,26 @@ const SortableList = function (props) {
 		!isSetupWizard
 	);
 	const [showingItems, setShowingItems] = useState(18);
+	const [filterCategory, setFilterCategory] = useState('');
+	const [checkedItems, setCheckedItems] = useState([]);
+
+	const [bulkEditOpen, setBulkEditOpen] = useState(false);
+
+	const categories = getAllCategories(items);
+
+	useEffect(() => {
+		if (
+			filterCategory &&
+			filterCategory !== UNCATEGORIZED_VALUE &&
+			(!categories ||
+				!categories.length ||
+				!categories.includes(filterCategory))
+		) {
+			setFilterCategory('');
+		}
+	}, [filterCategory, categories]);
 
 	const sortableItems = [];
-
 	if (items && items.length) {
 		items.forEach((data, i) => {
 			if (i < showingItems) {
@@ -644,6 +837,158 @@ const SortableList = function (props) {
 			{items && items.length && items.length > 9
 				? editGalleryButton
 				: null}
+			{items?.length ? (
+				<div className="vpf-component-gallery-control-item-fullwidth">
+					<div className="vpf-component-gallery-control-item-bulk-actions">
+						<CheckboxControl
+							title={__('Select All', 'visual-portfolio')}
+							checked={items.length === checkedItems.length}
+							onChange={() => {
+								if (items.length === checkedItems.length) {
+									setCheckedItems([]);
+								} else {
+									setCheckedItems(items.map((img) => img.id));
+								}
+							}}
+						/>
+						<SelectControl
+							title={__('Bulk Actions', 'visual-portfolio')}
+							value={filterCategory}
+							disabled={!checkedItems.length}
+							options={[
+								{
+									label: __(
+										'Bulk actions',
+										'visual-portfolio'
+									),
+									value: '',
+								},
+								{
+									label: __('Edit', 'visual-portfolio'),
+									value: 'edit',
+								},
+								{
+									label: __('Delete', 'visual-portfolio'),
+									value: 'delete',
+								},
+							]}
+							onChange={(val) => {
+								if (
+									val === 'delete' &&
+									// eslint-disable-next-line no-alert
+									window.confirm(
+										__(
+											'Are you sure you want to remove selected items?',
+											'visual-portfolio'
+										)
+									)
+								) {
+									onChange(
+										items.filter(
+											(img) =>
+												!checkedItems.includes(img.id)
+										)
+									);
+									setCheckedItems([]);
+								} else if (val === 'edit') {
+									setBulkEditOpen(true);
+								}
+							}}
+						/>
+					</div>
+					{categories?.length ? (
+						<div className="vpf-component-gallery-control-item-filter">
+							<SelectControl
+								title={__(
+									'Filter by Category',
+									'visual-portfolio'
+								)}
+								value={filterCategory}
+								options={[
+									{
+										label: __('All', 'visual-portfolio'),
+										value: '',
+									},
+									{
+										label: __(
+											'Uncategorized',
+											'visual-portfolio'
+										),
+										value: UNCATEGORIZED_VALUE,
+									},
+									...categories.map((val) => ({
+										label: val,
+										value: val,
+									})),
+								]}
+								onChange={(val) => {
+									setFilterCategory(val);
+								}}
+							/>
+							<svg
+								width="20"
+								height="20"
+								viewBox="0 0 20 20"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M3 6H17"
+									stroke="black"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+								/>
+								<path
+									d="M6 10L14 10"
+									stroke="black"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+								/>
+								<path
+									d="M8 14L12 14"
+									stroke="black"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+								/>
+							</svg>
+						</div>
+					) : null}
+				</div>
+			) : null}
+			{bulkEditOpen ? (
+				<ImageEditModal
+					title={__('Bulk Image Settings', 'visual-portfolio')}
+					img={{
+						imgThumbnailUrl: `${VPGutenbergVariables.plugin_url}assets/images/placeholder.png`,
+					}}
+					idx={-1}
+					onChange={(val) => {
+						const newImages = [...items];
+
+						newImages.forEach((img, i) => {
+							if (checkedItems.includes(img.id)) {
+								newImages[i] = {
+									...img,
+									...val,
+								};
+							}
+						});
+
+						onChange(newImages);
+					}}
+					imageControls={imageControls}
+					controlName={controlName}
+					attributes={attributes}
+					focalPoint={focalPoint}
+					clientId={clientId}
+					isSetupWizard={isSetupWizard}
+					isBulkEdit
+					bulkItems={checkedItems}
+					close={() => {
+						setBulkEditOpen(false);
+					}}
+				/>
+			) : null}
 			<DndContext
 				sensors={sensors}
 				collisionDetection={closestCenter}
@@ -659,21 +1004,50 @@ const SortableList = function (props) {
 					items={sortableItems}
 					strategy={rectSortingStrategy}
 				>
-					{sortableItems.map(({ data, id }) => (
-						<SortableItem
-							key={`vpf-component-gallery-control-items-sortable-${id}`}
-							index={id}
-							id={id}
-							img={data}
-							items={items}
-							onChange={onChange}
-							imageControls={imageControls}
-							controlName={controlName}
-							attributes={attributes}
-							focalPoint={focalPoint}
-							isSetupWizard={isSetupWizard}
-						/>
-					))}
+					{sortableItems.map(({ data, id }) => {
+						let isMuffled = false;
+
+						if (filterCategory === UNCATEGORIZED_VALUE) {
+							isMuffled = !data?.categories?.length;
+						} else if (filterCategory) {
+							isMuffled = data?.categories?.length
+								? !data.categories.includes(filterCategory)
+								: true;
+						}
+
+						return (
+							<SortableItem
+								key={`vpf-component-gallery-control-items-sortable-${id}`}
+								index={id}
+								id={id}
+								img={data}
+								items={items}
+								onChange={onChange}
+								imageControls={imageControls}
+								controlName={controlName}
+								attributes={attributes}
+								focalPoint={focalPoint}
+								isSetupWizard={isSetupWizard}
+								isMuffled={isMuffled}
+								clientId={clientId}
+								isChecked={checkedItems.includes(data.id)}
+								onCheck={() => {
+									if (checkedItems.includes(data.id)) {
+										setCheckedItems(
+											checkedItems.filter(
+												(val) => val !== data.id
+											)
+										);
+									} else {
+										setCheckedItems([
+											...checkedItems,
+											data.id,
+										]);
+									}
+								}}
+							/>
+						);
+					})}
 				</SortableContext>
 			</DndContext>
 
@@ -737,6 +1111,7 @@ export default function GalleryControl(props) {
 		onChange,
 		focalPoint,
 		isSetupWizard,
+		clientId,
 	} = props;
 
 	const filteredValue = value.filter((img) => img.id);
@@ -762,6 +1137,7 @@ export default function GalleryControl(props) {
 						controlName={controlName}
 						attributes={attributes}
 						focalPoint={focalPoint}
+						clientId={clientId}
 						isSetupWizard={isSetupWizard}
 						onSortEnd={(oldIndex, newIndex) => {
 							const newImages = arrayMove(

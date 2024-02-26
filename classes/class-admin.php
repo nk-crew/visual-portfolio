@@ -1651,19 +1651,21 @@ class Visual_Portfolio_Admin {
 						'label' => esc_html__( 'Description', 'visual-portfolio' ),
 					),
 					'categories' => array(
-						'type'      => 'select',
-						'label'     => esc_html__( 'Categories', 'visual-portfolio' ),
-						'multiple'  => true,
-						'creatable' => true,
+						'type'            => 'select',
+						'label'           => esc_html__( 'Categories', 'visual-portfolio' ),
+						'multiple'        => true,
+						'creatable'       => true,
+						'allow_bulk_edit' => true,
 					),
 					'format' => array(
-						'type'    => 'select',
-						'label'   => esc_html__( 'Format', 'visual-portfolio' ),
-						'default' => 'standard',
-						'options' => array(
+						'type'            => 'select',
+						'label'           => esc_html__( 'Format', 'visual-portfolio' ),
+						'default'         => 'standard',
+						'options'         => array(
 							'standard' => esc_html__( 'Standard', 'visual-portfolio' ),
 							'video'    => esc_html__( 'Video', 'visual-portfolio' ),
 						),
+						'allow_bulk_edit' => true,
 					),
 					'video_url' => array(
 						'type'        => 'text',
@@ -1684,14 +1686,16 @@ class Visual_Portfolio_Admin {
 						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
 					),
 					'author' => array(
-						'type'    => 'text',
-						'label'   => esc_html__( 'Author Name', 'visual-portfolio' ),
-						'default' => '',
+						'type'            => 'text',
+						'label'           => esc_html__( 'Author Name', 'visual-portfolio' ),
+						'default'         => '',
+						'allow_bulk_edit' => true,
 					),
 					'author_url' => array(
-						'type'    => 'text',
-						'label'   => esc_html__( 'Author URL', 'visual-portfolio' ),
-						'default' => '',
+						'type'            => 'text',
+						'label'           => esc_html__( 'Author URL', 'visual-portfolio' ),
+						'default'         => '',
+						'allow_bulk_edit' => true,
 					),
 					'image_settings_pro_note' => array(
 						'type'        => 'pro_note',

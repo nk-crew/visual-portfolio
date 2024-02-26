@@ -19,7 +19,7 @@
 				padding: 0;
 				padding-bottom: 100%;
 				overflow: hidden;
-				background-color: #f7f7f7 !important;
+				background-color: rgba(#000, 0.1) !important;
 				border-radius: 5px;
 				box-shadow: none !important;
 				transition: 0.2s background-color;
@@ -33,67 +33,137 @@
 					object-fit: cover;
 					border: 1px solid #efefef;
 					border-radius: 5px;
-					transition: 0.2s opacity;
+					transition: 0.2s filter;
 				}
 
-				svg {
-					position: absolute;
-					top: 50%;
-					left: 50%;
-					width: 20px;
-					height: 20px;
-					margin-top: -10px;
-					margin-left: -10px;
-					color: #fff;
-					opacity: 0;
-					fill: none;
-					transition: 0.2s opacity;
-				}
-
-				&:hover,
-				&:focus {
-					background-color: #000 !important;
-
-					img {
-						opacity: 0.6;
-					}
-
-					svg {
-						opacity: 1;
-					}
+				&:hover img,
+				&:focus img {
+					filter: opacity(1) brightness(0.4) grayscale(0);
 				}
 			}
 		}
 
-		.vpf-component-gallery-control-item-remove {
+		// Muffled item after category filter.
+		.vpf-component-gallery-control-item-muffled .vpf-component-gallery-control-item-button {
+			img {
+				filter: opacity(0.2) brightness(1) grayscale(1);
+			}
+		}
+
+		// Bulk actions
+		.vpf-component-gallery-control-item-bulk-actions {
+			display: flex;
+
+			.components-base-control,
+			.components-base-control__field {
+				margin: 0;
+			}
+			.components-checkbox-control__input-container {
+				margin-right: 5px;
+			}
+
+			.components-select-control {
+				margin-top: -5px;
+				margin-bottom: -5px;
+			}
+
+			.components-input-control__container[disabled]:has(select:not(:hover, :focus)) {
+				background-color: transparent;
+			}
+
+			select {
+				max-width: 120px;
+
+				&:not(:hover, :focus) ~ .components-input-control__backdrop {
+					border-color: transparent;
+				}
+			}
+		}
+
+		.vpf-component-gallery-control-item-bulk-actions .components-checkbox-control,
+		.vpf-component-gallery-control-item-checkbox {
+			margin: 0;
+
+			[type="checkbox"],
+			.components-checkbox-control__input-container {
+				width: 16px;
+				min-width: 16px;
+				height: 16px;
+			}
+			.components-checkbox-control__checked {
+				width: 20px;
+				height: 20px;
+			}
+
+			[type="checkbox"],
+			.components-base-control,
+			.components-base-control__field {
+				margin: 0;
+			}
+		}
+
+		.vpf-component-gallery-control-item-toolbar {
 			position: absolute;
-			top: -5px;
-			right: -5px;
+			left: 4px;
+			top: 4px;
+			right: 4px;
 			display: flex;
 			align-items: center;
-			justify-content: center;
-			width: 20px;
+			justify-content: space-between;
 			height: 20px;
 			padding: 0;
-			color: #fff;
-			background-color: #272727;
-			border-radius: 20px;
+			color: #272727;
+			background-color: #fff;
+			border-radius: 3px;
 			opacity: 0;
-			transition: 0.2s opacity, 0.2s background-color;
+			transition: 0.2s opacity;
+			z-index: 1;
+			box-shadow: 0 0 3px rgba(0, 0, 0, 40%);
 
-			&:hover,
-			&:focus {
-				background-color: #d51515;
+			> * {
+				padding: 2px;
+				height: 16px;
 			}
 
 			svg {
-				width: 70%;
+				width: 16px;
 				height: auto;
+			}
+
+			.vpf-component-gallery-control-item-remove {
+				&:hover,
+				&:focus {
+					color: #d51515;
+				}
+			}
+
+			.vpf-component-gallery-control-item-checkbox {
+				margin: 0;
+
+				[type="checkbox"],
+				.components-checkbox-control__input-container {
+					width: 14px;
+					min-width: 14px;
+					height: 14px;
+					margin: 0;
+				}
+				.components-checkbox-control__checked {
+					width: 18px;
+					height: 18px;
+				}
+
+				.components-checkbox-control__input-container {
+					display: flex;
+					margin-top: -1px;
+				}
 			}
 		}
 
-		.vpf-component-gallery-control-item:hover .vpf-component-gallery-control-item-remove,
-		.vpf-component-gallery-control-item:focus .vpf-component-gallery-control-item-remove {
+		.vpf-component-gallery-control-item .vpf-component-gallery-control-item-toolbar-checked,
+		.vpf-component-gallery-control-item:hover .vpf-component-gallery-control-item-checkbox,
+		.vpf-component-gallery-control-item:focus .vpf-component-gallery-control-item-checkbox,
+		.vpf-component-gallery-control-item:hover .vpf-component-gallery-control-item-toolbar,
+		.vpf-component-gallery-control-item:focus .vpf-component-gallery-control-item-toolbar {
 			opacity: 1;
 		}
 	}
@@ -111,14 +181,39 @@
 			}
 		}
 
-		.vpf-component-gallery-control-item-remove {
+		.vpf-component-gallery-control-item-toolbar {
 			display: none;
 		}
 	}
 
 	.vpf-component-gallery-control-item-fullwidth {
+		display: flex;
 		grid-column: 1 / -1;
 		justify-content: center;
+	}
+
+	.vpf-component-gallery-control-item-filter {
+		position: relative;
+		width: 24px;
+		height: 24px;
+		margin-left: auto;
+
+		> .components-base-control {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			opacity: 0;
+
+			select {
+				width: 24px;
+				height: 24px;
+				min-height: 24px;
+				padding: 0;
+			}
+		}
 	}
 
 	.vpf-component-gallery-control-item-pagination {
