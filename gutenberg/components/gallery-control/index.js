@@ -1011,7 +1011,7 @@ const SortableList = function (props) {
 						let isMuffled = false;
 
 						if (filterCategory === UNCATEGORIZED_VALUE) {
-							isMuffled = !data?.categories?.length;
+							isMuffled = data?.categories?.length;
 						} else if (filterCategory) {
 							isMuffled = data?.categories?.length
 								? !data.categories.includes(filterCategory)
