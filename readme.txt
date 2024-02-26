@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.4
 * Requires PHP: 7.2
-* Stable tag: 3.2.3
+* Stable tag: 3.2.4
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -327,24 +327,39 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
-= 3.2.3 - 12 Dec, 2023 =
+= 3.2.4 - Feb 26, 2024 =
+
+* Free + Pro:
+* added stagger delay for Masonry, Grid and Tiles layouts
+* added proper horizontal order for Masonry layout
+* added possibility to edit gallery images in bulk
+* added gallery images filter by category in editor
+* fixed Portfolio menu item name change when on Taxonomy archive page
+* fixed duplicating Portfolio page after WordPress XML file import
+
+* Pro:
+* added Twitch avatar caching to fix missing link
+* added possibility to add any block on Proofing pages
+* fixed Grid vertical align option
+* minor fixes
+
+= 3.2.3 - Dec 12, 2023 =
 
 * fixed displaying editor block when creating new Saved Layout
 
-= 3.2.2 - 29 Nov, 2023 =
+= 3.2.2 - Nov 29, 2023 =
 
 * added support for asset file change time when enqueue without .asset.php - better support for caching plugins
 * fixed Elementor preview stopped working
 
-= 3.2.1 - 29 Nov, 2023 =
+= 3.2.1 - Nov 29, 2023 =
 
 * fixed Pro plugin path and url detection - now it should work correctly when Free plugin is removed
 * fixed sitemap fatal error
 
-= 3.2.0 - 25 Nov, 2023 =
+= 3.2.0 - Nov 25, 2023 =
 
-#### Free + Pro:
-
+* Free + Pro:
 * added support for proper SEO meta URLs in Portfolio archives and Filtered pages in Yoast SEO, AIOSEO, Rank Math
 * added Skin option to change item title tag
 * added `vpf_extend_posts_source` filter
@@ -366,22 +381,21 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * changed lazy loading styles to use modern :has() CSS (with fallback for old browsers)
 * removed jQuery usage from lazy loading script
 
-#### Pro:
-
+* Pro:
 * IMPORTANT: changed the Pro plugin to standalone, which is not requires the Free version installed anymore
 * added Setup Wizard support to all Social Account controls
 * fixed Share URL and paged gallery wrong URL
 * fixed mime detection for images in Flickr social feeds
 * fixed init conditionize script once opened Social settings panel
 
-= 3.1.3 - 1 Jul, 2023 =
+= 3.1.3 - Jul 1, 2023 =
 
 * improved PhotoSwipe popup zoom for large vertical images
 * changed 'Projects' CPT label to portfolio page name
 * changed images and overlay border-radius to clip-path (better performance)
 * fixed unexpected JS error when Sortable control have an undefined value (happens in Advanced Click Action for a single user after migration from older plugin version)
 
-= 3.1.2 - 6 Jun, 2023 =
+= 3.1.2 - Jun 6, 2023 =
 
 * renamed `Portfolio Items` to `Projects`
 * fixed playing videos in background in PhotoSwipe
@@ -389,12 +403,12 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed portfolio archive friendly URL in load more button
 * fixed portfolio archive filter and sort paged URLs
 
-= 3.1.1 - 17 May, 2023 =
+= 3.1.1 - May 17, 2023 =
 
 * fixed Archive mapping PHP notice when no Archive Page ID available
 * renamed `Carousel` to `Slider`
 
-= 3.1.0 - 12 May, 2023 =
+= 3.1.0 - May 12, 2023 =
 
 * added support for gradients in overlay backgrounds
 * added `Restore Focus` setting to the Popup gallery
@@ -412,7 +426,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed Skin editor error on WP 6.0 because of using `NavigatorToParentButton` component
 * fixed Select control dropdown is not visible in editor when opened popup
 
-= 3.0.0 - 13 Apr, 2023 =
+= 3.0.0 - Apr 13, 2023 =
 
 * completely reworked Skin options and some UI elements of block controls this helped us to structure deep Skin customizations such as:
   * Typography control
@@ -452,7 +466,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
   * jQuery `afterShowFancybox`
 * minor changes
 
-= 2.22.0 - 12 Feb, 2023 =
+= 2.22.0 - Feb 12, 2023 =
 
 * added support for Youtube Shorts in popup
 * added possibility to start AJAX loading when already in loading state (fixes the Search module conflict with concurrent requests)
@@ -471,12 +485,12 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * removed `clipboard-polyfill` and use native `navigator.clipboard.writeText` instead
 * minor changes
 
-= 2.21.2 - 25 Nov, 2022 =
+= 2.21.2 - Nov 25, 2022 =
 
 * fixed JS error when open WordPress images in Lightbox
 * fixed JS error when changing gallery image data
 
-= 2.21.0 - 24 Nov, 2022 =
+= 2.21.0 - Nov 24, 2022 =
 
 * added templates for popup data in `/templates/popup/`, so developers can override it now in the theme templates
 * added auto height to filter/sort dropdown
@@ -501,26 +515,26 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed Go Pro link style conflict with 3rd-party URLs
 * minor changes and fixes
 
-= 2.20.3 - 3 Oct, 2022 =
+= 2.20.3 - Oct 3, 2022 =
 
 * fixed error when close popup gallery opened from the native gallery block
 * fixed focus current item in the native gallery block when closing popup gallery
 
-= 2.20.2 - 29 Sep, 2022 =
+= 2.20.2 - Sep 29, 2022 =
 
 * improved accessibility - focus gallery item in after closing popup
 * fixed images displaying in Slider with Classic style on Apple devices
 * fixed Jetpack lazy loading when new items loaded in Visual Portfolio gallery using pagination or filters
 * fixed displaying Read More button in Classic style, when all other meta disabled
 
-= 2.20.1 - 15 Sep, 2022 =
+= 2.20.1 - Sep 15, 2022 =
 
 * fixed 3rd-party lazy loading scripts add lazy attributes to noscript img tags
 * fixed noscript styles loading when used optimization plugins
 * fixed conflict with Elementor lightbox when used optimization plugins
 * fixed undefined author field usage
 
-= 2.20.0 - 6 Sep, 2022 =
+= 2.20.0 - Sep 6, 2022 =
 
 * !important - this update contains a lot of code rewrites regarding the security improvements, and some parts may not work as expected. Please, let us know as soon as possible, if something stopped working after this update. We have tested it in all our sites, but some rare cases may still stop working.
 * added code for data sanitization in places, where we missed it
