@@ -623,7 +623,9 @@ $escaped-svg-characters: (
 			pointer-events: none;
 		}
 
-		.description {
+		.description,
+		.vp-toggle-field-slider-round,
+		select {
 			opacity: 0.3;
 		}
 
@@ -664,13 +666,19 @@ $escaped-svg-characters: (
 			}
 		}
 
-		// Hide pro control info from individual breakpoint settings.
-		&.breakpoint_xs .vpf-settings-control-pro-label,
-		&.breakpoint_sm .vpf-settings-control-pro-label,
-		&.breakpoint_md .vpf-settings-control-pro-label,
-		&.breakpoint_lg .vpf-settings-control-pro-label,
-		&.breakpoint_xl .vpf-settings-control-pro-label {
-			display: none;
+		// Hide pro control info from individual settings, which has sections.
+		&.breakpoint_xs,
+		&.breakpoint_sm,
+		&.breakpoint_md,
+		&.breakpoint_lg,
+		&.breakpoint_xl,
+		&.popup_quick_view_show_url_button,
+		&.popup_quick_view_internal_links_target,
+		&.popup_quick_view_external_links_target,
+		&.pages_iframe_custom_css {
+			.vpf-settings-control-pro-label {
+				display: none;
+			}
 		}
 	}
 

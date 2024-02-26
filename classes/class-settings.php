@@ -686,9 +686,10 @@ class Visual_Portfolio_Settings {
 
 				// Quick View settings.
 				array(
-					'name'  => 'popup_quick_view_title',
-					'label' => esc_html__( 'Quick View', 'visual-portfolio' ),
-					'type'  => 'section_title',
+					'name'   => 'popup_quick_view_title',
+					'label'  => esc_html__( 'Quick View', 'visual-portfolio' ),
+					'type'   => 'section_title',
+					'is_pro' => true,
 				),
 				array(
 					'name'    => 'popup_quick_view_show_url_button',
