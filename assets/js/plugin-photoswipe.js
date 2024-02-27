@@ -79,6 +79,13 @@ if (PhotoSwipe && VPPopupAPI) {
                         <button class="pswp__button pswp__button--close" title="${
 							__.pswp_close
 						}"></button>
+                        <a href="#" class="pswp__button pswp__button--download${
+							settingsPopupGallery.show_download_button
+								? ''
+								: ' pswp__element--disabled'
+						}" title="${__.pswp_download}" download>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.62 17.09V19H5.38v-1.91zm-2.97-6.96L17 11.45l-5 4.87-5-4.87 1.36-1.32 2.68 2.64V5h1.92v7.77z"></path></svg>
+						</a>
                         <button class="pswp__button pswp__button--share" title="${
 							__.pswp_share
 						}"></button>
@@ -408,6 +415,23 @@ if (PhotoSwipe && VPPopupAPI) {
 		});
 
 		pswpInstance.listen('afterChange', function () {
+			// Download button.
+			const $downloadButton = settingsPopupGallery.show_download_button
+				? this.template.querySelector('.pswp__button--download')
+				: false;
+
+			if ($downloadButton) {
+				if (this.currItem.html) {
+					$downloadButton.classList.add('pswp__element--disabled');
+				} else {
+					$downloadButton.classList.remove('pswp__element--disabled');
+					$downloadButton.setAttribute(
+						'href',
+						this.currItem?.o?.src || this.currItem?.m?.src
+					);
+				}
+			}
+
 			resizeVideo(this);
 
 			if (self) {

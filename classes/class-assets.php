@@ -712,6 +712,7 @@ class Visual_Portfolio_Assets {
 				'pswp_share_fb'        => esc_attr__( 'Share on Facebook', 'visual-portfolio' ),
 				'pswp_share_tw'        => esc_attr__( 'Tweet', 'visual-portfolio' ),
 				'pswp_share_pin'       => esc_attr__( 'Pin it', 'visual-portfolio' ),
+				'pswp_download'        => esc_attr__( 'Download', 'visual-portfolio' ),
 
 				'fancybox_close'       => esc_attr__( 'Close', 'visual-portfolio' ),
 				'fancybox_next'        => esc_attr__( 'Next', 'visual-portfolio' ),

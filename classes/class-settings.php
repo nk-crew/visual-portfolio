@@ -599,6 +599,12 @@ class Visual_Portfolio_Settings {
 					'default' => 'on',
 				),
 				array(
+					'name'    => 'show_download_button',
+					'label'   => esc_html__( 'Display Download Button', 'visual-portfolio' ),
+					'type'    => 'toggle',
+					'default' => 'off',
+				),
+				array(
 					'name'    => 'show_close_button',
 					'label'   => esc_html__( 'Display Close Button', 'visual-portfolio' ),
 					'type'    => 'toggle',
@@ -650,19 +656,6 @@ class Visual_Portfolio_Settings {
 						array(
 							'control' => '[type="checkbox"][name="vp_popup_gallery[show_thumbs]"]',
 						),
-						array(
-							'control'  => '[name="vp_popup_gallery[vendor]"]',
-							'operator' => '===',
-							'value'    => 'fancybox',
-						),
-					),
-				),
-				array(
-					'name'      => 'show_download_button',
-					'label'     => esc_html__( 'Display Download Button', 'visual-portfolio' ),
-					'type'      => 'toggle',
-					'default'   => 'off',
-					'condition' => array(
 						array(
 							'control'  => '[name="vp_popup_gallery[vendor]"]',
 							'operator' => '===',

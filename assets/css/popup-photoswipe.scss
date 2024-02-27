@@ -94,4 +94,18 @@
 	&.vp-pswp-no-zoom .pswp__img {
 		cursor: default;
 	}
+
+	// Custom download button.
+	.pswp__button--download {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: none;
+
+		svg {
+			fill: #fff;
+			width: 26px;
+			height: 26px;
+		}
+	}
 }
