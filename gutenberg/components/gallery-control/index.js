@@ -40,6 +40,7 @@ const { navigator, VPGutenbergVariables } = window;
 
 const ALLOWED_MEDIA_TYPES = ['image'];
 const UNCATEGORIZED_VALUE = '------';
+const ITEMS_COUNT_DEFAULT = 18;
 
 function getHumanFileSize(size) {
 	const i = Math.floor(Math.log(size) / Math.log(1024));
@@ -755,11 +756,34 @@ const SortableList = function (props) {
 	const [isOpenedInSetupWizard, setOpenInSetupWizard] = useState(
 		!isSetupWizard
 	);
-	const [showingItems, setShowingItems] = useState(18);
+	const [showingItems, setShowingItems] = useState(ITEMS_COUNT_DEFAULT);
 	const [filterCategory, setFilterCategory] = useState('');
 	const [checkedItems, setCheckedItems] = useState([]);
-
+	const [lastChecked, setLastChecked] = useState(false);
 	const [bulkEditOpen, setBulkEditOpen] = useState(false);
+	const [shiftHeld, setShiftHeld] = useState(false);
+
+	useEffect(() => {
+		function downHandler({ key }) {
+			if (key === 'Shift') {
+				setShiftHeld(true);
+			}
+		}
+
+		function upHandler({ key }) {
+			if (key === 'Shift') {
+				setShiftHeld(false);
+			}
+		}
+
+		window.addEventListener('keydown', downHandler);
+		window.addEventListener('keyup', upHandler);
+
+		return () => {
+			window.removeEventListener('keydown', downHandler);
+			window.removeEventListener('keyup', upHandler);
+		};
+	}, []);
 
 	const categories = getAllCategories(items);
 
@@ -852,6 +876,7 @@ const SortableList = function (props) {
 								} else {
 									setCheckedItems(items.map((img) => img.id));
 								}
+								setLastChecked(false);
 							}}
 						/>
 						<SelectControl
@@ -893,6 +918,7 @@ const SortableList = function (props) {
 										)
 									);
 									setCheckedItems([]);
+									setLastChecked(false);
 								} else if (val === 'edit') {
 									setBulkEditOpen(true);
 								}
@@ -1035,18 +1061,67 @@ const SortableList = function (props) {
 								clientId={clientId}
 								isChecked={checkedItems.includes(data.id)}
 								onCheck={() => {
-									if (checkedItems.includes(data.id)) {
-										setCheckedItems(
-											checkedItems.filter(
-												(val) => val !== data.id
-											)
+									// Check/uncheck multiple items with shift key.
+									if (shiftHeld && lastChecked) {
+										const start = items.findIndex(
+											(img) => img.id === lastChecked
 										);
-									} else {
-										setCheckedItems([
+										const end = items.findIndex(
+											(img) => img.id === data.id
+										);
+										const newCheckedItems = [
 											...checkedItems,
-											data.id,
-										]);
+										];
+										const currentChecked =
+											checkedItems.includes(data.id);
+
+										const increment = start < end ? 1 : -1;
+										for (
+											let i = start;
+											i !== end + increment;
+											i += increment
+										) {
+											const imgId = items[i].id;
+											const index =
+												newCheckedItems.indexOf(imgId);
+
+											// Remove checked item.
+											if (currentChecked) {
+												if (index !== -1) {
+													newCheckedItems.splice(
+														index,
+														1
+													);
+												}
+
+												// Add checked item.
+											} else if (index === -1) {
+												newCheckedItems.push(imgId);
+											}
+										}
+
+										setCheckedItems(newCheckedItems);
+
+										// Check/uncheck single item.
+									} else {
+										setCheckedItems((prevCheckedItems) => {
+											if (
+												prevCheckedItems.includes(
+													data.id
+												)
+											) {
+												return prevCheckedItems.filter(
+													(val) => val !== data.id
+												);
+											}
+											return [
+												...prevCheckedItems,
+												data.id,
+											];
+										});
 									}
+
+									setLastChecked(data.id);
 								}}
 							/>
 						);
