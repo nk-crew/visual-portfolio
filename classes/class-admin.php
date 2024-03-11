@@ -524,7 +524,7 @@ class Visual_Portfolio_Admin {
 							'label'         => esc_html__( 'Row Height', 'visual-portfolio' ),
 							'name'          => 'row_height',
 							'group'         => 'justified_row_height',
-							'min'           => 100,
+							'min'           => 20,
 							'max'           => 1000,
 							'default'       => 200,
 							'reload_iframe' => false,
