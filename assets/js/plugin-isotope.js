@@ -41,7 +41,9 @@ $doc.on('extendClass.vpf', (event, VP) => {
 						? {
 								// Use proper order for row items in Masonry layout only.
 								// Tiles layout may not work as expected with this option.
-								horizontalOrder: true,
+								horizontalOrder:
+									self.options.masonryHorizontalOrder ===
+									'true',
 						  }
 						: {},
 				transitionDuration: '0.3s',

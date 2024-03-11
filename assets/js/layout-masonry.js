@@ -9,6 +9,7 @@ $(document).on('initOptions.vpf', (event, self) => {
 	}
 
 	self.defaults.masonryColumns = 3;
+	self.defaults.masonryHorizontalOrder = 'false';
 
 	if (!self.options.masonryColumns) {
 		self.options.masonryColumns = self.defaults.masonryColumns;

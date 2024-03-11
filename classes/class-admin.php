@@ -474,6 +474,13 @@ class Visual_Portfolio_Admin {
 								),
 							),
 						),
+						array(
+							'type'        => 'checkbox',
+							'alongside'   => esc_html__( 'Horizontal Order', 'visual-portfolio' ),
+							'description' => esc_html__( 'It arranges items to (mostly) maintain horizontal left-to-right order. You must experiment with this option with your gallery, as it may not work as expected in some cases.', 'visual-portfolio' ),
+							'name'        => 'horizontal_order',
+							'default'     => false,
+						),
 					),
 				),
 

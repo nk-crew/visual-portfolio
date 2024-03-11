@@ -417,6 +417,10 @@ class Visual_Portfolio_Get {
 			if ( $options['masonry_images_aspect_ratio'] ) {
 				$data_attrs['data-vp-masonry-images-aspect-ratio'] = $options['masonry_images_aspect_ratio'];
 			}
+
+			if ( $options['masonry_horizontal_order'] ) {
+				$data_attrs['data-vp-masonry-horizontal-order'] = 'true';
+			}
 		}
 		if ( 'grid' === $options['layout'] || $is_preview ) {
 			$data_attrs['data-vp-grid-columns'] = $options['grid_columns'];
