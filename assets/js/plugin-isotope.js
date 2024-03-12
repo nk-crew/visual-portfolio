@@ -103,7 +103,10 @@ $doc.on('addItems.vpf', (event, self, $items, removeExisting) => {
 		self.$items_wrap.append($items).isotope('appended', $items);
 	}
 
-	// idk why, but with timeout isotope recalculate all items fine.
+	// Idk why, but with timeout isotope recalculate all items fine.
+	// if we run only re-layout inside the timeout, there will be visible image blinking.
+	// So, we need to make these 2 calls.
+	self.initIsotope('layout');
 	setTimeout(() => {
 		self.initIsotope('layout');
 	}, 0);
