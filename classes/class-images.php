@@ -45,7 +45,10 @@ class Visual_Portfolio_Images {
 	 * Visual_Portfolio_Images constructor.
 	 */
 	public static function construct() {
-		add_action( 'wp', 'Visual_Portfolio_Images::init_lazyload' );
+		// Previously we used `wp` hook, but it's too late for some cases.
+		// For example, we have to add hte lazy loading attributes to featured images retrieved in the AJAX callback.
+		add_action( 'wp_loaded', 'Visual_Portfolio_Images::init_lazyload' );
+
 		add_action( 'after_setup_theme', 'Visual_Portfolio_Images::add_image_sizes' );
 		add_filter( 'image_size_names_choose', 'Visual_Portfolio_Images::image_size_names_choose' );
 
@@ -129,7 +132,8 @@ class Visual_Portfolio_Images {
 	 */
 	public static function init_lazyload() {
 		// Don't lazy load for feeds, previews and admin side.
-		if ( is_feed() || is_preview() || is_admin() ) {
+		// But allows lazy loading in AJAX request.
+		if ( is_feed() || is_preview() || ( is_admin() && ! wp_doing_ajax() ) ) {
 			return;
 		}
 
