@@ -4,17 +4,36 @@ All notable changes to this project will be documented in this file.
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
+= 3.3.0 - Mar 13, 2024 =
+
+* **Free + Pro:**
+* added support for Download button in PhotoSwipe
+* added Horizontal Order option to Masonry layout
+* added support for lazy loading inside AJAX callbacks
+* added support for WooCommerce images lazy loading
+* improved block gallery images in editor - allow selecting images with shift key pressed
+* changed Justified Row Height option minimum threshold to 20
+* fixed gallery images in block editor Uncategorized filter
+* fixed image blinking after filter in Masonry, Tiles and Grid layouts
+* removed stagger delay from Masonry, Tiles and Grid layouts because it is not working properly in large galleries
+* minor improvements
+<br />
+
+* **Pro:**
+* fixed Overlay Under Image option in Emerge and Caption Move styles
+
 = 3.2.4 - Feb 26, 2024 =
 
-* Free + Pro:
+* **Free + Pro:**
 * added stagger delay for Masonry, Grid and Tiles layouts
 * added proper horizontal order for Masonry layout
 * added possibility to edit gallery images in bulk
 * added gallery images filter by category in editor
 * fixed Portfolio menu item name change when on Taxonomy archive page
 * fixed duplicating Portfolio page after WordPress XML file import
+<br />
 
-* Pro:
+* **Pro:**
 * added Twitch avatar caching to fix missing link
 * added possibility to add any block on Proofing pages
 * fixed Grid vertical align option
@@ -36,7 +55,7 @@ All notable changes to this project will be documented in this file.
 
 = 3.2.0 - Nov 25, 2023 =
 
-* Free + Pro:
+* **Free + Pro:**
 * added support for proper SEO meta URLs in Portfolio archives and Filtered pages in Yoast SEO, AIOSEO, Rank Math
 * added Skin option to change item title tag
 * added `vpf_extend_posts_source` filter
@@ -57,8 +76,9 @@ All notable changes to this project will be documented in this file.
 * simplified lazy loading placeholder animation
 * changed lazy loading styles to use modern :has() CSS (with fallback for old browsers)
 * removed jQuery usage from lazy loading script
+<br />
 
-* Pro:
+* **Pro:**
 * IMPORTANT: changed the Pro plugin to standalone, which is not requires the Free version installed anymore
 * added Setup Wizard support to all Social Account controls
 * fixed Share URL and paged gallery wrong URL

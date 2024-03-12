@@ -62,6 +62,12 @@
          "Images Aspect Ratio": [
             ""
          ],
+         "Horizontal Order": [
+            ""
+         ],
+         "It arranges items to (mostly) maintain horizontal left-to-right order. You must experiment with this option with your gallery, as it may not work as expected in some cases.": [
+            ""
+         ],
          "Grid": [
             ""
          ],
@@ -788,6 +794,9 @@
          "Pin it": [
             ""
          ],
+         "Download": [
+            ""
+         ],
          "Close": [
             ""
          ],
@@ -810,9 +819,6 @@
             ""
          ],
          "Thumbnails": [
-            ""
-         ],
-         "Download": [
             ""
          ],
          "Zoom": [
@@ -1166,6 +1172,9 @@
          "Display Share Button": [
             ""
          ],
+         "Display Download Button": [
+            ""
+         ],
          "Display Close Button": [
             ""
          ],
@@ -1179,9 +1188,6 @@
             ""
          ],
          "Horizontal": [
-            ""
-         ],
-         "Display Download Button": [
             ""
          ],
          "Display Slideshow": [
@@ -1463,6 +1469,9 @@
          "Edit more details": [
             ""
          ],
+         "Select": [
+            ""
+         ],
          "Image Settings": [
             ""
          ],
@@ -1470,6 +1479,33 @@
             ""
          ],
          "Add Images": [
+            ""
+         ],
+         "Select All": [
+            ""
+         ],
+         "Bulk Actions": [
+            ""
+         ],
+         "Bulk actions": [
+            ""
+         ],
+         "Edit": [
+            ""
+         ],
+         "Delete": [
+            ""
+         ],
+         "Are you sure you want to remove selected items?": [
+            ""
+         ],
+         "Filter by Category": [
+            ""
+         ],
+         "Uncategorized": [
+            ""
+         ],
+         "Bulk Image Settings": [
             ""
          ],
          "Showing %1$s of %2$s Image": [
