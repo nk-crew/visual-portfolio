@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
-= 3.3.0 - Mar 13, 2024 =
+= 3.3.1 - Mar 13, 2024 =
 
 * **Free + Pro:**
 * added support for Download button in PhotoSwipe

@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.4
 * Requires PHP: 7.2
-* Stable tag: 3.3.0
+* Stable tag: 3.3.1
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -327,7 +327,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
-= 3.3.0 - Mar 13, 2024 =
+= 3.3.1 - Mar 13, 2024 =
 
 * **Free + Pro:**
 * added support for Download button in PhotoSwipe
