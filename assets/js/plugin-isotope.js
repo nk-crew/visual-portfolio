@@ -47,7 +47,10 @@ $doc.on('extendClass.vpf', (event, VP) => {
 						  }
 						: {},
 				transitionDuration: '0.3s',
-				stagger: '0.03s',
+				// We don't use stagger anymore because it is not
+				// working properly in a large galleries.
+				// When screen resized, latest items transition is too big and it looks ugly.
+				// stagger: '0.03s',
 				percentPosition: true,
 				originLeft: !isRtl,
 
