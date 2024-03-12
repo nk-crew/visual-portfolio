@@ -169,6 +169,11 @@ class Visual_Portfolio_Images {
 			add_filter( 'get_avatar', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
 			add_filter( 'widget_text', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
 			add_filter( 'get_image_tag', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
+
+			// WooCommerce support.
+			add_filter( 'woocommerce_placeholder_img', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
+			add_filter( 'woocommerce_product_get_image', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
+			add_filter( 'woocommerce_single_product_image_thumbnail_html', 'Visual_Portfolio_Images::add_image_placeholders', 9999 );
 		}
 
 		add_action( 'wp_kses_allowed_html', 'Visual_Portfolio_Images::allow_lazy_attributes' );
