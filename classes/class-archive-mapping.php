@@ -503,6 +503,23 @@ class Visual_Portfolio_Archive_Mapping {
 					$link                 = str_replace( $changed_part_of_link, $base_page, $term['url'] );
 					$link                 = $this->convert_category_to_friendly_url( $link );
 
+					/**
+					 * When the portfolio archive page is set as the main page
+					 * The filter with All the elements breaks
+					 * A link of this type: mysite.com/portfolio/
+					 * Must be forced to this: mysite.com
+					 */
+					if (
+						'*' === $term['filter'] &&
+						(int) get_option( 'page_on_front' ) === (int) $this->archive_page
+					) {
+						$portfolio_slug = self::get_portfolio_slug();
+
+						if ( ! empty( $portfolio_slug ) ) {
+							$link = str_replace( $portfolio_slug . '/', '', $link );
+						}
+					}
+
 					$terms[ $key ]['url'] = $link;
 				}
 			}
