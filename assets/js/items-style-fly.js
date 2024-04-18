@@ -136,7 +136,7 @@ $(document).on('initEvents.vpf', (event, self) => {
 					transition: 'none',
 					transform: `translateX(${endX}) translateY(${endY}) translateZ(0)`,
 				});
-				// Trigger a reflow, flushing the CSS changes. This need to fix some glithes in Safari and Firefox.
+				// Trigger a reflow, flushing the CSS changes. This need to fix some glitches in Safari and Firefox.
 				// Info here - https://stackoverflow.com/questions/11131875/what-is-the-cleanest-way-to-disable-css-transition-effects-temporarily
 				// eslint-disable-next-line no-unused-expressions
 				$overlay[0].offsetHeight;
