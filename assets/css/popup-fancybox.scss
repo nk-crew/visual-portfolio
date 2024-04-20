@@ -53,20 +53,14 @@
 	}
 
 	.fancybox-thumbs__list a {
-		width: var(--vp-popup--thumbnails__size);
-		max-width: calc(100% - 4px);
-		height: calc(var(--vp-popup--thumbnails__size) / calc(var(--vp-popup--thumbnails__aspect-ratio)));
+		width: calc(100% - 4px);
+		max-width: none;
+		height: auto;
+		max-height: none;
+		aspect-ratio: var(--vp-popup--thumbnails__aspect-ratio);
 
 		&::before {
 			border: 2px solid var(--vp-popup--thumbnails--items__border-color);
-		}
-
-		@supports (aspect-ratio: 16 / 9) {
-			width: calc(100% - 4px);
-			max-width: none;
-			height: auto;
-			max-height: none;
-			aspect-ratio: var(--vp-popup--thumbnails__aspect-ratio);
 		}
 	}
 
