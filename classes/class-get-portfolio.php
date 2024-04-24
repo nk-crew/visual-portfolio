@@ -1268,12 +1268,16 @@ class Visual_Portfolio_Get {
 			// prepare titles and descriptions.
 			foreach ( $images as $k => $img ) {
 				$img_meta = array(
-					'title'       => '',
-					'description' => '',
-					'caption'     => '',
-					'alt'         => '',
-					'none'        => '',
-					'date'        => '',
+					'title'             => '',
+					'image_title'       => '',
+					'image_description' => '',
+					'image_caption'     => '',
+					'image_alt'         => '',
+					'description'       => '',
+					'caption'           => '',
+					'alt'               => '',
+					'none'              => '',
+					'date'              => '',
 				);
 
 				// Find current attachment post data.
@@ -1301,10 +1305,22 @@ class Visual_Portfolio_Get {
 						$images[ $k ]['title'] = isset( $img_meta[ $options['images_titles_source'] ] ) ? $img_meta[ $options['images_titles_source'] ] : '';
 					}
 
+					// image title.
+					$images[ $k ]['image_title'] = isset( $img_meta['title'] ) ? $img_meta['title'] : '';
+
 					// description.
 					if ( 'custom' !== $options['images_descriptions_source'] ) {
 						$images[ $k ]['description'] = isset( $img_meta[ $options['images_descriptions_source'] ] ) ? $img_meta[ $options['images_descriptions_source'] ] : '';
 					}
+
+					// image description.
+					$images[ $k ]['image_description'] = isset( $img_meta['description'] ) ? $img_meta['description'] : '';
+
+					// image caption.
+					$images[ $k ]['image_caption'] = isset( $img_meta['caption'] ) ? $img_meta['caption'] : '';
+
+					// image alt.
+					$images[ $k ]['image_alt'] = isset( $img_meta['alt'] ) ? $img_meta['alt'] : '';
 
 					// add published date.
 					$images[ $k ]['published_time'] = get_the_date( 'Y-m-d H:i:s', $attachment );
@@ -1346,12 +1362,37 @@ class Visual_Portfolio_Get {
 				switch ( $custom_order ) {
 					case 'date':
 					case 'title':
+					case 'description':
+					case 'image_title':
+					case 'caption':
+					case 'alt':
+					case 'image_description':
 						$sort_tmp   = array();
 						$new_images = array();
 						$sort_by    = 'date';
 
 						if ( 'title' === $custom_order ) {
 							$sort_by = 'title';
+						}
+
+						if ( 'description' === $custom_order ) {
+							$sort_by = 'description';
+						}
+
+						if ( 'image_title' === $custom_order ) {
+							$sort_by = 'image_title';
+						}
+
+						if ( 'caption' === $custom_order ) {
+							$sort_by = 'image_caption';
+						}
+
+						if ( 'alt' === $custom_order ) {
+							$sort_by = 'image_alt';
+						}
+
+						if ( 'image_description' === $custom_order ) {
+							$sort_by = 'image_description';
 						}
 
 						foreach ( $images as &$ma ) {
