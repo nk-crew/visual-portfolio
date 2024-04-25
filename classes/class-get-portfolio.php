@@ -1302,25 +1302,25 @@ class Visual_Portfolio_Get {
 
 					// title.
 					if ( 'custom' !== $options['images_titles_source'] ) {
-						$images[ $k ]['title'] = isset( $img_meta[ $options['images_titles_source'] ] ) ? $img_meta[ $options['images_titles_source'] ] : '';
+						$images[ $k ]['title'] = $img_meta[ $options['images_titles_source'] ] ?? '';
 					}
 
 					// image title.
-					$images[ $k ]['image_title'] = isset( $img_meta['title'] ) ? $img_meta['title'] : '';
+					$images[ $k ]['image_title'] = $img_meta['title'] ?? '';
 
 					// description.
 					if ( 'custom' !== $options['images_descriptions_source'] ) {
-						$images[ $k ]['description'] = isset( $img_meta[ $options['images_descriptions_source'] ] ) ? $img_meta[ $options['images_descriptions_source'] ] : '';
+						$images[ $k ]['description'] = $img_meta[ $options['images_descriptions_source'] ] ?? '';
 					}
 
 					// image description.
-					$images[ $k ]['image_description'] = isset( $img_meta['description'] ) ? $img_meta['description'] : '';
+					$images[ $k ]['image_description'] = $img_meta['description'] ?? '';
 
 					// image caption.
-					$images[ $k ]['image_caption'] = isset( $img_meta['caption'] ) ? $img_meta['caption'] : '';
+					$images[ $k ]['image_caption'] = $img_meta['caption'] ?? '';
 
 					// image alt.
-					$images[ $k ]['image_alt'] = isset( $img_meta['alt'] ) ? $img_meta['alt'] : '';
+					$images[ $k ]['image_alt'] = $img_meta['alt'] ?? '';
 
 					// add published date.
 					$images[ $k ]['published_time'] = get_the_date( 'Y-m-d H:i:s', $attachment );
@@ -1364,39 +1364,14 @@ class Visual_Portfolio_Get {
 					case 'title':
 					case 'description':
 					case 'image_title':
-					case 'caption':
-					case 'alt':
+					case 'image_caption':
+					case 'image_alt':
 					case 'image_description':
 						$sort_tmp   = array();
 						$new_images = array();
-						$sort_by    = 'date';
-
-						if ( 'title' === $custom_order ) {
-							$sort_by = 'title';
-						}
-
-						if ( 'description' === $custom_order ) {
-							$sort_by = 'description';
-						}
-
-						if ( 'image_title' === $custom_order ) {
-							$sort_by = 'image_title';
-						}
-
-						if ( 'caption' === $custom_order ) {
-							$sort_by = 'image_caption';
-						}
-
-						if ( 'alt' === $custom_order ) {
-							$sort_by = 'image_alt';
-						}
-
-						if ( 'image_description' === $custom_order ) {
-							$sort_by = 'image_description';
-						}
 
 						foreach ( $images as &$ma ) {
-							$sort_tmp[] = &$ma[ $sort_by ];
+							$sort_tmp[] = &$ma[ $custom_order ];
 						}
 
 						array_multisort( $sort_tmp, $images );
