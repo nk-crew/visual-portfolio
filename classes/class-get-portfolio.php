@@ -1367,19 +1367,43 @@ class Visual_Portfolio_Get {
 					case 'image_caption':
 					case 'image_alt':
 					case 'image_description':
-						$sort_tmp   = array();
-						$new_images = array();
+						/**
+						 * We've reworked this code to work correctly with empty sortable values.
+						 * Now images with filled values ​​will be sorted first.
+						 * And empty images will be inserted later at the very end of the array.
+						 */
+						$sort_tmp       = array();
+						$new_images     = array();
+						$empty_elements = array();
 
-						foreach ( $images as &$ma ) {
-							$sort_tmp[] = &$ma[ $custom_order ];
+						// Separate empty elements from non-empty elements and sort non-empty elements.
+						foreach ( $images as $key => &$ma ) {
+							if ( empty( $ma[ $custom_order ] ) ) {
+								$empty_elements[ $key ] = $ma;
+							} else {
+								$sort_tmp[ $key ] = $ma[ $custom_order ];
+							}
 						}
 
-						array_multisort( $sort_tmp, $images );
-						foreach ( $images as &$ma ) {
-							$new_images[] = $ma;
+						// Sort non-empty elements while preserving keys.
+						if ( 'desc' === $custom_order_direction ) {
+							arsort( $sort_tmp );
+						} else {
+							asort( $sort_tmp );
 						}
 
-						$images = $new_images;
+						// Reorder the images array based on sorted keys.
+						foreach ( array_keys( $sort_tmp ) as $key ) {
+							$new_images[ $key ] = $images[ $key ];
+						}
+
+						// Append empty elements at the end of the sorted array.
+						foreach ( $empty_elements as $empty_element ) {
+							$new_images[] = $empty_element;
+						}
+
+						// Assign the sorted images back to the original variable.
+						$images = array_values( $new_images );
 						break;
 					case 'rand':
 						// We don't need to randomize order for filter,
@@ -1396,10 +1420,11 @@ class Visual_Portfolio_Get {
 							}
 						}
 
+						if ( 'desc' === $custom_order_direction ) {
+							$images = array_reverse( $images );
+						}
+
 						break;
-				}
-				if ( 'desc' === $custom_order_direction ) {
-					$images = array_reverse( $images );
 				}
 			}
 
