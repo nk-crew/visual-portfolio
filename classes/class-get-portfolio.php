@@ -1372,38 +1372,22 @@ class Visual_Portfolio_Get {
 						 * Now images with filled values ​​will be sorted first.
 						 * And empty images will be inserted later at the very end of the array.
 						 */
-						$sort_tmp       = array();
-						$new_images     = array();
-						$empty_elements = array();
+						$non_empty_images = array();
+						$empty_images     = array();
+						$sort_keys        = array();
 
-						// Separate empty elements from non-empty elements and sort non-empty elements.
-						foreach ( $images as $key => &$ma ) {
-							if ( empty( $ma[ $custom_order ] ) ) {
-								$empty_elements[ $key ] = $ma;
+						foreach ( $images as $image ) {
+							if ( empty( $image[ $custom_order ] ) ) {
+								$empty_images[] = $image;
 							} else {
-								$sort_tmp[ $key ] = $ma[ $custom_order ];
+								$non_empty_images[] = $image;
+								$sort_keys[]        = $image[ $custom_order ];
 							}
 						}
 
-						// Sort non-empty elements while preserving keys.
-						if ( 'desc' === $custom_order_direction ) {
-							arsort( $sort_tmp );
-						} else {
-							asort( $sort_tmp );
-						}
+						array_multisort( $sort_keys, 'desc' === $custom_order_direction ? SORT_DESC : SORT_ASC, $non_empty_images );
 
-						// Reorder the images array based on sorted keys.
-						foreach ( array_keys( $sort_tmp ) as $key ) {
-							$new_images[ $key ] = $images[ $key ];
-						}
-
-						// Append empty elements at the end of the sorted array.
-						foreach ( $empty_elements as $empty_element ) {
-							$new_images[] = $empty_element;
-						}
-
-						// Assign the sorted images back to the original variable.
-						$images = array_values( $new_images );
+						$images = array_merge( $non_empty_images, $empty_images );
 						break;
 					case 'rand':
 						// We don't need to randomize order for filter,
