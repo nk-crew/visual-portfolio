@@ -1268,12 +1268,16 @@ class Visual_Portfolio_Get {
 			// prepare titles and descriptions.
 			foreach ( $images as $k => $img ) {
 				$img_meta = array(
-					'title'       => '',
-					'description' => '',
-					'caption'     => '',
-					'alt'         => '',
-					'none'        => '',
-					'date'        => '',
+					'title'             => '',
+					'image_title'       => '',
+					'image_description' => '',
+					'image_caption'     => '',
+					'image_alt'         => '',
+					'description'       => '',
+					'caption'           => '',
+					'alt'               => '',
+					'none'              => '',
+					'date'              => '',
 				);
 
 				// Find current attachment post data.
@@ -1298,13 +1302,25 @@ class Visual_Portfolio_Get {
 
 					// title.
 					if ( 'custom' !== $options['images_titles_source'] ) {
-						$images[ $k ]['title'] = isset( $img_meta[ $options['images_titles_source'] ] ) ? $img_meta[ $options['images_titles_source'] ] : '';
+						$images[ $k ]['title'] = $img_meta[ $options['images_titles_source'] ] ?? '';
 					}
+
+					// image title.
+					$images[ $k ]['image_title'] = $img_meta['title'] ?? '';
 
 					// description.
 					if ( 'custom' !== $options['images_descriptions_source'] ) {
-						$images[ $k ]['description'] = isset( $img_meta[ $options['images_descriptions_source'] ] ) ? $img_meta[ $options['images_descriptions_source'] ] : '';
+						$images[ $k ]['description'] = $img_meta[ $options['images_descriptions_source'] ] ?? '';
 					}
+
+					// image description.
+					$images[ $k ]['image_description'] = $img_meta['description'] ?? '';
+
+					// image caption.
+					$images[ $k ]['image_caption'] = $img_meta['caption'] ?? '';
+
+					// image alt.
+					$images[ $k ]['image_alt'] = $img_meta['alt'] ?? '';
 
 					// add published date.
 					$images[ $k ]['published_time'] = get_the_date( 'Y-m-d H:i:s', $attachment );
@@ -1346,24 +1362,32 @@ class Visual_Portfolio_Get {
 				switch ( $custom_order ) {
 					case 'date':
 					case 'title':
-						$sort_tmp   = array();
-						$new_images = array();
-						$sort_by    = 'date';
+					case 'description':
+					case 'image_title':
+					case 'image_caption':
+					case 'image_alt':
+					case 'image_description':
+						/**
+						 * We've reworked this code to work correctly with empty sortable values.
+						 * Now images with filled values ​​will be sorted first.
+						 * And empty images will be inserted later at the very end of the array.
+						 */
+						$non_empty_images = array();
+						$empty_images     = array();
+						$sort_keys        = array();
 
-						if ( 'title' === $custom_order ) {
-							$sort_by = 'title';
+						foreach ( $images as $image ) {
+							if ( empty( $image[ $custom_order ] ) ) {
+								$empty_images[] = $image;
+							} else {
+								$non_empty_images[] = $image;
+								$sort_keys[]        = $image[ $custom_order ];
+							}
 						}
 
-						foreach ( $images as &$ma ) {
-							$sort_tmp[] = &$ma[ $sort_by ];
-						}
+						array_multisort( $sort_keys, 'desc' === $custom_order_direction ? SORT_DESC : SORT_ASC, $non_empty_images );
 
-						array_multisort( $sort_tmp, $images );
-						foreach ( $images as &$ma ) {
-							$new_images[] = $ma;
-						}
-
-						$images = $new_images;
+						$images = array_merge( $non_empty_images, $empty_images );
 						break;
 					case 'rand':
 						// We don't need to randomize order for filter,
@@ -1380,10 +1404,11 @@ class Visual_Portfolio_Get {
 							}
 						}
 
+						if ( 'desc' === $custom_order_direction ) {
+							$images = array_reverse( $images );
+						}
+
 						break;
-				}
-				if ( 'desc' === $custom_order_direction ) {
-					$images = array_reverse( $images );
 				}
 			}
 

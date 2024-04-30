@@ -1773,10 +1773,15 @@ class Visual_Portfolio_Admin {
 				'group'         => 'images_order',
 				'default'       => 'default',
 				'options'       => array(
-					'default' => esc_html__( 'Default', 'visual-portfolio' ),
-					'date'    => esc_html__( 'Uploaded', 'visual-portfolio' ),
-					'title'   => esc_html__( 'Title', 'visual-portfolio' ),
-					'rand'    => esc_html__( 'Random', 'visual-portfolio' ),
+					'default'           => esc_html__( 'Default', 'visual-portfolio' ),
+					'title'             => esc_html__( 'Item Title', 'visual-portfolio' ),
+					'description'       => esc_html__( 'Item Description', 'visual-portfolio' ),
+					'image_title'       => esc_html__( 'Image Title', 'visual-portfolio' ),
+					'image_caption'     => esc_html__( 'Image Caption', 'visual-portfolio' ),
+					'image_alt'         => esc_html__( 'Image Alt', 'visual-portfolio' ),
+					'image_description' => esc_html__( 'Image Description', 'visual-portfolio' ),
+					'date'              => esc_html__( 'Image Uploaded', 'visual-portfolio' ),
+					'rand'              => esc_html__( 'Random', 'visual-portfolio' ),
 				),
 			)
 		);
