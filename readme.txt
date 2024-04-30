@@ -4,9 +4,9 @@
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
 * Donate link: https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 6.2
-* Tested up to: 6.4
+* Tested up to: 6.5
 * Requires PHP: 7.2
-* Stable tag: 3.3.1
+* Stable tag: 3.3.2
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -326,6 +326,20 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 ## Changelog ##
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
+
+= 3.3.2 - Apr 30, 2024 =
+
+* **Free + Pro:**
+* add more sort options in image galleries: Item Title, Item Description, Image Title, Image Description, Image Caption, Image Alt
+* improved image gallery sort code - images with empty field will be always placed after items with non-empty field
+* fixed the behavior of the "All" filters link when the portfolio archive page set as the home page
+<br />
+
+* **Pro:**
+* fixed Skin typography settings error in WP 6.5
+* fixed image gallery non-working Hover and Custom Popup settings when you change it
+* fixed horizontal thumbnails displaying in Fancybox
+* fixed displaying Pro plugin settings opacity
 
 = 3.3.1 - Mar 13, 2024 =
 

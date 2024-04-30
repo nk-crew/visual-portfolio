@@ -407,7 +407,13 @@
          "Default": [
             ""
          ],
-         "Uploaded": [
+         "Item Title": [
+            ""
+         ],
+         "Item Description": [
+            ""
+         ],
+         "Image Uploaded": [
             ""
          ],
          "Protect your works using watermarks, password, and age gate": [
@@ -582,12 +588,6 @@
             ""
          ],
          "Title Source": [
-            ""
-         ],
-         "Item Title": [
-            ""
-         ],
-         "Item Description": [
             ""
          ],
          "Item Author": [
