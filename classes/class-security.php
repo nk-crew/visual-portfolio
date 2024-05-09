@@ -212,9 +212,21 @@ class Visual_Portfolio_Security {
 	 * Sanitize selector attribute.
 	 *
 	 * @param int|float|string $attribute - Unclear Selector Attribute.
+	 * @param array            $control - Array of control parameters.
 	 * @return int|float|string
 	 */
-	public static function sanitize_selector( $attribute ) {
+	public static function sanitize_selector( $attribute, $control ) {
+		$option_keys = implode( '|', array_keys( $control['options'] ) );
+
+		$pattern = '/(' . $option_keys . ')/';
+
+		/**
+		 * Checking a selector for invalid options.
+		 */
+		if ( ! preg_match( $pattern, $attribute ) && isset( $attribute ) ) {
+			$attribute = $control['default'] ?? '';
+		}
+
 		if ( is_numeric( $attribute ) ) {
 			if ( false === strpos( $attribute, '.' ) ) {
 				$attribute = intval( $attribute );
@@ -446,11 +458,11 @@ class Visual_Portfolio_Security {
 
 								if ( is_array( $attributes[ $key ] ) && ! empty( $attributes[ $key ] ) ) {
 									foreach ( $attributes[ $key ] as $attribute_key => $value ) {
-										$attributes[ $key ][ $attribute_key ] = self::sanitize_selector( $value );
+										$attributes[ $key ][ $attribute_key ] = self::sanitize_selector( $value, $controls[ $key ] );
 									}
 								}
 							} else {
-								$attributes[ $key ] = self::sanitize_selector( $attributes[ $key ] );
+								$attributes[ $key ] = self::sanitize_selector( $attributes[ $key ], $controls[ $key ] );
 							}
 							break;
 						case 'elements_selector':
