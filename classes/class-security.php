@@ -247,7 +247,7 @@ class Visual_Portfolio_Security {
 	 * @return int|float
 	 */
 	public static function sanitize_number( $attribute ) {
-		$attribute = preg_replace( '/[^0-9.-]/', '', wp_unslash( $attribute ) );
+		$attribute = preg_replace( '/[^0-9.-]/', '', (string) wp_unslash( $attribute ) );
 
 		// We should keep an empty string, because we allow resetting certain attributes.
 		if ( '' === $attribute ) {
