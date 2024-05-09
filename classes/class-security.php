@@ -495,6 +495,14 @@ class Visual_Portfolio_Security {
 							$attributes[ $key ] = sanitize_text_field( wp_unslash( $attribute ) );
 							break;
 					}
+
+					// fix bool values.
+					if ( 'false' === $attributes[ $key ] ) {
+						$attributes[ $key ] = false;
+					}
+					if ( 'true' === $attributes[ $key ] ) {
+						$attributes[ $key ] = true;
+					}
 				}
 			}
 
