@@ -216,14 +216,10 @@ class Visual_Portfolio_Security {
 	 * @return int|float|string
 	 */
 	public static function sanitize_selector( $attribute, $control ) {
-		$option_keys = implode( '|', array_keys( $control['options'] ) );
-
-		$pattern = '/(' . $option_keys . ')/';
-
 		/**
 		 * Checking a selector for invalid options.
 		 */
-		if ( ! preg_match( $pattern, $attribute ) && isset( $attribute ) ) {
+		if ( ! array_key_exists( $attribute, $control['options'] ) ) {
 			$attribute = $control['default'] ?? '';
 		}
 
