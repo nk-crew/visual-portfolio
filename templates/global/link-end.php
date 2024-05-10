@@ -17,5 +17,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( isset( $href ) && $href ) {
 	echo '</a>';
 } elseif ( isset( $fallback ) && $fallback ) {
-	echo '</' . esc_html( $fallback ) . '>';
+	echo '</' . tag_escape( $fallback ) . '>';
 }
