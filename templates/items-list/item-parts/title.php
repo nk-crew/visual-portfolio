@@ -29,10 +29,10 @@ $link_data   = array(
 
 ?>
 
-<<?php echo esc_attr( $title_tag ); ?> class="vp-portfolio__item-meta-title">
+<<?php echo tag_escape( $title_tag ); ?> class="vp-portfolio__item-meta-title">
 	<?php
 	visual_portfolio()->include_template( 'global/link-start', $link_data );
 	echo wp_kses_post( $args['title'] );
 	visual_portfolio()->include_template( 'global/link-end', $link_data );
 	?>
-</<?php echo esc_attr( $title_tag ); ?>>
+</<?php echo tag_escape( $title_tag ); ?>>
