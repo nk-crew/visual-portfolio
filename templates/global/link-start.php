@@ -40,7 +40,7 @@ if ( isset( $href ) && $href ) {
 	<?php
 } elseif ( isset( $fallback ) && $fallback ) {
 	?>
-	<<?php echo esc_html( $fallback ); ?>
+	<<?php echo tag_escape( $fallback ); ?>
 		<?php
 		if ( isset( $class ) && $class ) {
 			echo ' class="' . esc_attr( $class ) . '" ';

@@ -212,9 +212,17 @@ class Visual_Portfolio_Security {
 	 * Sanitize selector attribute.
 	 *
 	 * @param int|float|string $attribute - Unclear Selector Attribute.
+	 * @param array            $control - Array of control parameters.
 	 * @return int|float|string
 	 */
-	public static function sanitize_selector( $attribute ) {
+	public static function sanitize_selector( $attribute, $control ) {
+		/**
+		 * Checking a selector for invalid options.
+		 */
+		if ( ! array_key_exists( $attribute, $control['options'] ) ) {
+			$attribute = $control['default'] ?? '';
+		}
+
 		if ( is_numeric( $attribute ) ) {
 			if ( false === strpos( $attribute, '.' ) ) {
 				$attribute = intval( $attribute );
@@ -235,7 +243,7 @@ class Visual_Portfolio_Security {
 	 * @return int|float
 	 */
 	public static function sanitize_number( $attribute ) {
-		$attribute = preg_replace( '/[^0-9.-]/', '', wp_unslash( $attribute ) );
+		$attribute = preg_replace( '/[^0-9.-]/', '', (string) wp_unslash( $attribute ) );
 
 		// We should keep an empty string, because we allow resetting certain attributes.
 		if ( '' === $attribute ) {
@@ -446,11 +454,11 @@ class Visual_Portfolio_Security {
 
 								if ( is_array( $attributes[ $key ] ) && ! empty( $attributes[ $key ] ) ) {
 									foreach ( $attributes[ $key ] as $attribute_key => $value ) {
-										$attributes[ $key ][ $attribute_key ] = self::sanitize_selector( $value );
+										$attributes[ $key ][ $attribute_key ] = self::sanitize_selector( $value, $controls[ $key ] );
 									}
 								}
 							} else {
-								$attributes[ $key ] = self::sanitize_selector( $attributes[ $key ] );
+								$attributes[ $key ] = self::sanitize_selector( $attributes[ $key ], $controls[ $key ] );
 							}
 							break;
 						case 'elements_selector':
@@ -482,6 +490,14 @@ class Visual_Portfolio_Security {
 						default:
 							$attributes[ $key ] = sanitize_text_field( wp_unslash( $attribute ) );
 							break;
+					}
+
+					// fix bool values.
+					if ( 'false' === $attributes[ $key ] ) {
+						$attributes[ $key ] = false;
+					}
+					if ( 'true' === $attributes[ $key ] ) {
+						$attributes[ $key ] = true;
 					}
 				}
 			}
