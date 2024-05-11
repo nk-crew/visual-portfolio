@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.5
 * Requires PHP: 7.2
-* Stable tag: 3.3.3
+* Stable tag: 3.3.4
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -327,9 +327,13 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
+= 3.3.4 - May 11, 2024 =
+
+* fixed dynamic selector block options rendering on the frontend.
+
 = 3.3.3 - May 11, 2024 =
 
-* fix custom title tag XSS vulnerability (properly escape the custom tag and prevent using non-predefined values)
+* fixed custom title tag XSS vulnerability (properly escape the custom tag and prevent using non-predefined values)
 
 = 3.3.2 - Apr 30, 2024 =
 
