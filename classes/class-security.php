@@ -218,8 +218,14 @@ class Visual_Portfolio_Security {
 	public static function sanitize_selector( $attribute, $control ) {
 		/**
 		 * Checking a selector for invalid options.
+		 * Exclude multiple and dynamically callback selectors.
 		 */
-		if ( ! array_key_exists( $attribute, $control['options'] ) ) {
+		if (
+			empty( $control['value_callback'] ) &&
+			! empty( $control['options'] ) &&
+			! $control['multiple'] &&
+			! array_key_exists( $attribute, $control['options'] )
+		) {
 			$attribute = $control['default'] ?? '';
 		}
 
