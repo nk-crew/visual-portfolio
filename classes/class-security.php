@@ -223,7 +223,9 @@ class Visual_Portfolio_Security {
 		if (
 			empty( $control['value_callback'] ) &&
 			! empty( $control['options'] ) &&
-			! $control['multiple'] &&
+			is_array( $control['options'] ) &&
+			! is_array( $attribute ) &&
+			! is_object( $attribute ) &&
 			! array_key_exists( $attribute, $control['options'] )
 		) {
 			$attribute = $control['default'] ?? '';
