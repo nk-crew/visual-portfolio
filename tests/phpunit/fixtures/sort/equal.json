@@ -1,0 +1,20 @@
+[
+	{
+		"id": "19",
+		"imgUrl": "test.gif",
+		"imgThumbnailUrl": "test-1024x679.jpg",
+		"title": "test-title"
+	},
+	{
+		"id": "9",
+		"imgUrl": "test.jpeg",
+		"imgThumbnailUrl": "test-150x150.jpeg",
+		"title": "test-title"
+	},
+	{
+		"id": "25",
+		"imgUrl": "test.png",
+		"imgThumbnailUrl": "test.png",
+		"title": "test-title"
+	}
+]
