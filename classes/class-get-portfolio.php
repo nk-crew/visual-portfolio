@@ -1191,6 +1191,16 @@ class Visual_Portfolio_Get {
 	 * @return array
 	 */
 	public static function sort_array_by_field( $array, $field, $order = 'desc' ) {
+		/**
+		 * We add a service key to the properties of array elements to sort fields of equal value by keys.
+		 * This is only necessary when sorting in descending order.
+		 */
+		if ( 'desc' === $order ) {
+			foreach ( $array as $key => &$element ) {
+				$element['service_key'] = $key;
+			}
+		}
+
 		usort(
 			$array,
 			function ( $a, $b ) use ( $field, $order ) {
@@ -1205,10 +1215,27 @@ class Visual_Portfolio_Get {
 					return -1; // Place empty b fields at the end.
 				}
 
-				// Normal comparison.
-				return 'desc' === $order ? $b[ $field ] <=> $a[ $field ] : $a[ $field ] <=> $b[ $field ];
+				// Primary comparison by field values.
+				$comparsion = 'desc' === $order ? $b[ $field ] <=> $a[ $field ] : $a[ $field ] <=> $b[ $field ];
+				if ( 0 !== $comparsion ) {
+					return $comparsion;
+				}
+
+				// Secondary comparison by keys when values are equal.
+				if ( 'desc' === $order ) {
+					return $b['service_key'] <=> $a['service_key']; // Replace 'service_key' with the actual key field name.
+				}
+
+				return 0; // No secondary sorting needed for ascending order or equal values.
 			}
 		);
+
+		// Clearing the array of service keys.
+		if ( 'desc' === $order ) {
+			foreach ( $array as $key => &$element ) {
+				unset( $element['service_key'] );
+			}
+		}
 
 		return $array;
 	}
