@@ -1188,9 +1188,9 @@ class Visual_Portfolio_Get {
 	 * @param array  $array - Sortable array.
 	 * @param string $field - Array field by which sorting will take place.
 	 * @param string $order - Sorting order (asc and desc).
-	 * @return void
+	 * @return array
 	 */
-	public static function sort_by_field( &$array, $field, $order = 'desc' ) {
+	public static function sort_array_by_field( $array, $field, $order = 'desc' ) {
 		usort(
 			$array,
 			function ( $a, $b ) use ( $field, $order ) {
@@ -1209,6 +1209,8 @@ class Visual_Portfolio_Get {
 				return 'desc' === $order ? $b[ $field ] <=> $a[ $field ] : $a[ $field ] <=> $b[ $field ];
 			}
 		);
+
+		return $array;
 	}
 
 	/**
@@ -1393,7 +1395,7 @@ class Visual_Portfolio_Get {
 						 * Now images with filled values ​​will be sorted first.
 						 * And empty images will be inserted later at the very end of the array.
 						 */
-						self::sort_by_field( $images, $custom_order, $custom_order_direction );
+						$images = self::sort_array_by_field( $images, $custom_order, $custom_order_direction );
 						break;
 					case 'rand':
 						// We don't need to randomize order for filter,
