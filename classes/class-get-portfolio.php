@@ -1183,6 +1183,23 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
+	 * Sort associative array by custom field.
+	 *
+	 * @param array  $array - Sortable array.
+	 * @param string $field - Array field by which sorting will take place.
+	 * @param string $order - Sorting order (asc and desc).
+	 * @return void
+	 */
+	public static function sort_by_field( &$array, $field, $order = 'desc' ) {
+		usort(
+			$array,
+			function ( $a, $b ) use ( $field, $order ) {
+				return 'desc' === $order ? $b[ $field ] <=> $a[ $field ] : $a[ $field ] <=> $b[ $field ];
+			}
+		);
+	}
+
+	/**
 	 * Get query params array.
 	 *
 	 * @param array $options portfolio options.
@@ -1366,18 +1383,16 @@ class Visual_Portfolio_Get {
 						 */
 						$non_empty_images = array();
 						$empty_images     = array();
-						$sort_keys        = array();
 
 						foreach ( $images as $image ) {
 							if ( empty( $image[ $custom_order ] ) ) {
 								$empty_images[] = $image;
 							} else {
 								$non_empty_images[] = $image;
-								$sort_keys[]        = $image[ $custom_order ];
 							}
 						}
 
-						array_multisort( $sort_keys, 'desc' === $custom_order_direction ? SORT_DESC : SORT_ASC, $non_empty_images );
+						self::sort_by_field( $non_empty_images, $custom_order, $custom_order_direction );
 
 						$images = array_merge( $non_empty_images, $empty_images );
 						break;
