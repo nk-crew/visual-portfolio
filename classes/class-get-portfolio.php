@@ -1194,6 +1194,18 @@ class Visual_Portfolio_Get {
 		usort(
 			$array,
 			function ( $a, $b ) use ( $field, $order ) {
+				// Handle empty fields by placing them at the end of the array.
+				if ( empty( $a[ $field ] ) && empty( $b[ $field ] ) ) {
+					return 0; // Preserve the order of empty fields.
+				}
+				if ( empty( $a[ $field ] ) ) {
+					return 1; // Place empty a fields at the end.
+				}
+				if ( empty( $b[ $field ] ) ) {
+					return -1; // Place empty b fields at the end.
+				}
+
+				// Normal comparison.
 				return 'desc' === $order ? $b[ $field ] <=> $a[ $field ] : $a[ $field ] <=> $b[ $field ];
 			}
 		);
@@ -1381,20 +1393,7 @@ class Visual_Portfolio_Get {
 						 * Now images with filled values ​​will be sorted first.
 						 * And empty images will be inserted later at the very end of the array.
 						 */
-						$non_empty_images = array();
-						$empty_images     = array();
-
-						foreach ( $images as $image ) {
-							if ( empty( $image[ $custom_order ] ) ) {
-								$empty_images[] = $image;
-							} else {
-								$non_empty_images[] = $image;
-							}
-						}
-
-						self::sort_by_field( $non_empty_images, $custom_order, $custom_order_direction );
-
-						$images = array_merge( $non_empty_images, $empty_images );
+						self::sort_by_field( $images, $custom_order, $custom_order_direction );
 						break;
 					case 'rand':
 						// We don't need to randomize order for filter,
