@@ -510,7 +510,7 @@ class Visual_Portfolio_Assets {
 
 		// fjGallery.
 		if ( apply_filters( 'vpf_enqueue_plugin_flickr_justified_gallery', true ) ) {
-			self::register_script( 'flickr-justified-gallery', 'assets/vendor/flickr-justified-gallery/dist/fjGallery.min', array( 'jquery' ), '2.1.2' );
+			self::register_script( 'flickr-justified-gallery', 'assets/vendor/flickr-justified-gallery/dist/fjGallery.min', array( 'jquery' ), '2.2.0' );
 		}
 
 		// PhotoSwipe.

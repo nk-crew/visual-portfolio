@@ -255,7 +255,7 @@ class Visual_Portfolio_Preview {
 		add_filter( 'script_loader_tag', array( $this, 'rocket_loader_filter' ) );
 
 		// Enqueue assets.
-		Visual_Portfolio_Assets::enqueue_script( 'iframe-resizer-content', 'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min', array(), '4.3.7' );
+		Visual_Portfolio_Assets::enqueue_script( 'iframe-resizer-content', 'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min', array(), '4.3.11' );
 		Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-preview', 'build/assets/js/preview', array( 'iframe-resizer-content' ) );
 		// Post data for script.
 		wp_localize_script(
