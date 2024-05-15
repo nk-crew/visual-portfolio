@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
+= 3.3.5 - May 15, 2024 =
+
+* fixed PHP warning from `array_key_exists` function
+* fixed wrong attribute output for select control with bool value
+* fixed gallery sorting algorithm, now it should work correctly
+
 = 3.3.4 - May 11, 2024 =
 
 * fixed dynamic selector block options rendering on the frontend.

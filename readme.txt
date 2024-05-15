@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.5
 * Requires PHP: 7.2
-* Stable tag: 3.3.4
+* Stable tag: 3.3.5
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -326,6 +326,12 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 ## Changelog ##
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
+
+= 3.3.5 - May 15, 2024 =
+
+* fixed PHP warning from `array_key_exists` function
+* fixed wrong attribute output for select control with bool value
+* fixed gallery sorting algorithm, now it should work correctly
 
 = 3.3.4 - May 11, 2024 =
 
