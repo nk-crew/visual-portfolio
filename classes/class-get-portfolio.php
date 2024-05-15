@@ -1184,11 +1184,6 @@ class Visual_Portfolio_Get {
 
 	/**
 	 * Sort associative array by custom field.
-	 * In some cases,
-	 * The function may sort elements with the same values ​​differently in php 7 and php 8.
-	 * This is due to the following change in how the usort function works.
-	 * If two members compare as equal, they retain their original order.
-	 * Prior to PHP 8.0.0, their relative order in the sorted array was undefined.
 	 *
 	 * @param array  $array - Sortable array.
 	 * @param string $field - Array field by which sorting will take place.
@@ -1209,6 +1204,13 @@ class Visual_Portfolio_Get {
 			}
 		}
 
+		/**
+		 * In some cases,
+		 * The function may sort elements with the same values ​​differently in php 7 and php 8.
+		 * This is due to the following change in how the usort function works.
+		 * If two members compare as equal, they retain their original order.
+		 * Prior to PHP 8.0.0, their relative order in the sorted array was undefined.
+		 */
 		usort(
 			$array,
 			function ( $a, $b ) use ( $field, $order ) {
