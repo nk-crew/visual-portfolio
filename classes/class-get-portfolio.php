@@ -1191,6 +1191,9 @@ class Visual_Portfolio_Get {
 	 * @return array
 	 */
 	public static function sort_array_by_field( $array, $field, $order = 'desc' ) {
+		$array_with_empty_fields     = array();
+		$array_with_not_empty_fields = array();
+
 		/**
 		 * We add a service key to the properties of array elements to sort fields of equal value by keys.
 		 * This is only necessary when sorting in descending order.
@@ -1204,29 +1207,19 @@ class Visual_Portfolio_Get {
 		usort(
 			$array,
 			function ( $a, $b ) use ( $field, $order ) {
-				// Handle empty fields by placing them at the end of the array.
-				if ( empty( $a[ $field ] ) && empty( $b[ $field ] ) ) {
-					return 0; // Preserve the order of empty fields.
-				}
-				if ( empty( $a[ $field ] ) ) {
-					return 1; // Place empty a fields at the end.
-				}
-				if ( empty( $b[ $field ] ) ) {
-					return -1; // Place empty b fields at the end.
-				}
-
 				// Primary comparison by field values.
-				$comparsion = 'desc' === $order ? $b[ $field ] <=> $a[ $field ] : $a[ $field ] <=> $b[ $field ];
+				$comparsion = 'asc' === $order ? strcmp( $a[ $field ], $b[ $field ] ) : strcmp( $b[ $field ], $a[ $field ] );
+
 				if ( 0 !== $comparsion ) {
 					return $comparsion;
 				}
 
 				// Secondary comparison by keys when values are equal.
 				if ( 'desc' === $order ) {
-					return $b['service_key'] <=> $a['service_key']; // Replace 'service_key' with the actual key field name.
+					return strcmp( $b['service_key'], $a['service_key'] );
 				}
 
-				return 0; // No secondary sorting needed for ascending order or equal values.
+				return 0;
 			}
 		);
 
@@ -1236,6 +1229,16 @@ class Visual_Portfolio_Get {
 				unset( $element['service_key'] );
 			}
 		}
+
+		foreach ( $array as $item ) {
+			if ( empty( $item[ $field ] ) ) {
+				$array_with_empty_fields[] = $item;
+			} else {
+				$array_with_not_empty_fields[] = $item;
+			}
+		}
+
+		$array = array_merge( $array_with_not_empty_fields, $array_with_empty_fields );
 
 		return $array;
 	}
