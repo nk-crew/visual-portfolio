@@ -13,7 +13,7 @@ class ClassSort extends WP_UnitTestCase {
 	 * Get fixture for test.
 	 *
 	 * @param string $filename - name of json file
-	 * @return string
+	 * @return array
 	 */
 	public function get_json_array( $filename ) {
 		$filepath = dirname( dirname( __FILE__ ) ) . '/fixtures/sort/' . $filename . '.json';
@@ -54,12 +54,12 @@ class ClassSort extends WP_UnitTestCase {
 	 */
 	public function test_sort_empty() {
 		$empty_array        = $this->get_json_array( 'empty' );
-		$empty_sorted_array = $this->get_json_array( 'empty-sorted' );
+		$empty_sorted_array = $this->get_json_array( 'empty-desc' );
 		$sorted_array_asc   = Visual_Portfolio_Get::sort_array_by_field( $empty_array, 'title', 'asc' );
 		$sorted_array_desc  = Visual_Portfolio_Get::sort_array_by_field( $empty_array, 'title', 'desc' );
 
 		$this->assertEquals(
-            $empty_sorted_array,
+            $empty_array,
 			$sorted_array_asc
         );
 
