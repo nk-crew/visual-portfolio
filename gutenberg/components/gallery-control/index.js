@@ -275,7 +275,7 @@ const SelectedImageData = function (props) {
 								{imageData?.media_details?.filesize
 									? getHumanFileSize(
 											imageData.media_details.filesize
-									  )
+										)
 									: '-'}
 								{imageData?.media_details?.width ? (
 									<>
@@ -753,9 +753,8 @@ const SortableList = function (props) {
 	);
 
 	// Automatically open images selector when first time select Images in Setup Wizard.
-	const [isOpenedInSetupWizard, setOpenInSetupWizard] = useState(
-		!isSetupWizard
-	);
+	const [isOpenedInSetupWizard, setOpenInSetupWizard] =
+		useState(!isSetupWizard);
 	const [showingItems, setShowingItems] = useState(ITEMS_COUNT_DEFAULT);
 	const [filterCategory, setFilterCategory] = useState('');
 	const [checkedItems, setCheckedItems] = useState([]);

@@ -44,7 +44,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
 								horizontalOrder:
 									self.options.masonryHorizontalOrder ===
 									'true',
-						  }
+							}
 						: {},
 				transitionDuration: '0.3s',
 				// We don't use stagger anymore because it is not

@@ -353,7 +353,7 @@ export default class ElementsSelector extends Component {
 									optionName={optionName}
 									parentProps={this.props}
 								/>
-						  ))
+							))
 						: null}
 					{Object.keys(availableElements).length ? (
 						<DropdownMenu

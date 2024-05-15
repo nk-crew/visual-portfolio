@@ -242,7 +242,7 @@ ClassesTree.TreeItem = class TreeItem extends Component {
 								);
 							}
 							return null;
-					  })
+						})
 					: ''}
 			</ul>
 		);

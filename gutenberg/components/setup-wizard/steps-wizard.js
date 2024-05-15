@@ -74,7 +74,7 @@ function stepsWizard(props) {
 				step !== newStep
 					? `vpf-component-steps-wizard-animate-${
 							newStep > step ? 'left' : 'right'
-					  }`
+						}`
 					: false
 			)}
 			style={height ? { height } : {}}

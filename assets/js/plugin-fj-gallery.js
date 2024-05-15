@@ -27,9 +27,9 @@ $(document).on('extendClass.vpf', (event, VP) => {
 									self.options.itemsGapVertical !== ''
 										? parseFloat(
 												self.options.itemsGapVertical
-										  ) || 0
+											) || 0
 										: parseFloat(self.options.itemsGap) ||
-										  0,
+											0,
 							},
 							rowHeight:
 								parseFloat(self.options.justifiedRowHeight) ||
@@ -48,7 +48,7 @@ $(document).on('extendClass.vpf', (event, VP) => {
 							itemSelector: '.vp-portfolio__item-wrap',
 							imageSelector: '.vp-portfolio__item-img img',
 							transitionDuration: '0.3s',
-					  };
+						};
 
 			if (initOptions.maxRowsCount === 0) {
 				initOptions.maxRowsCount = Number.POSITIVE_INFINITY;

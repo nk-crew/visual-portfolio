@@ -38,9 +38,8 @@ export default function BlockEdit(props) {
 			Object.keys(portfolioLayouts).forEach((key) => {
 				const val = portfolioLayouts[key];
 
-				portfolioLayoutsSelect[
-					` ${val.id}`
-				] = `${val.title} (#${val.id})`;
+				portfolioLayoutsSelect[` ${val.id}`] =
+					`${val.title} (#${val.id})`;
 
 				if (id && parseInt(id, 10) === val.id) {
 					currentItemUrl = val.edit_url;

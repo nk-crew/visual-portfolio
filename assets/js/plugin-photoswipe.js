@@ -156,7 +156,7 @@ if (PhotoSwipe && VPPopupAPI) {
 									h: item.srcMediumHeight || 0,
 								},
 								msrc: item.srcMedium,
-						  }
+							}
 						: {}),
 				});
 			}

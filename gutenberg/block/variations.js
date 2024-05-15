@@ -16,7 +16,7 @@ export default Object.keys(registeredControls.layout.options).map((name) => {
 			? {
 					foreground: '#2540CC',
 					src: <RawHTML>{data.icon}</RawHTML>,
-			  }
+				}
 			: null,
 	};
 }) || [];
