@@ -68,7 +68,7 @@ jobs:
       WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js and install dependencies
         uses: ./.github/setup-node
@@ -94,7 +94,7 @@ jobs:
       # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
       # passing a custom cache suffix ensures that the cache is flushed at least once per week.
       - name: Install Composer dependencies
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v3
         with:
           custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
@@ -162,7 +162,7 @@ jobs:
     if: ${{ github.repository == 'nk-crew/visual-portfolio' || github.event_name == 'pull_request' }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js and install dependencies
         uses: ./.github/setup-node
@@ -181,7 +181,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -197,7 +197,7 @@ jobs:
         run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
       - name: Cache PHPCS scan cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .cache/phpcs.json
           key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -205,7 +205,7 @@ jobs:
       # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
       # passing a custom cache suffix ensures that the cache is flushed at least once per week.
       - name: Install Composer dependencies
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v3
         with:
           custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 
