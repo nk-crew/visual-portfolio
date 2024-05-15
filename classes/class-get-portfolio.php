@@ -1200,7 +1200,7 @@ class Visual_Portfolio_Get {
 		 */
 		if ( 'desc' === $order ) {
 			foreach ( $array as $key => &$element ) {
-				$element['service_key'] = $key;
+				$element['__VP_SORT_ID__'] = $key;
 			}
 		}
 
@@ -1216,7 +1216,7 @@ class Visual_Portfolio_Get {
 
 				// Secondary comparison by keys when values are equal.
 				if ( 'desc' === $order ) {
-					return strcmp( $b['service_key'], $a['service_key'] );
+					return strcmp( $b['__VP_SORT_ID__'], $a['__VP_SORT_ID__'] );
 				}
 
 				return 0;
@@ -1226,7 +1226,7 @@ class Visual_Portfolio_Get {
 		// Clearing the array of service keys.
 		if ( 'desc' === $order ) {
 			foreach ( $array as $key => &$element ) {
-				unset( $element['service_key'] );
+				unset( $element['__VP_SORT_ID__'] );
 			}
 		}
 
