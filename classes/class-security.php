@@ -222,13 +222,9 @@ class Visual_Portfolio_Security {
 		 */
 		if (
 			empty( $control['value_callback'] ) &&
-			! empty( $control['options'] ) &&
-			is_array( $control['options'] ) &&
-			! is_array( $attribute ) &&
-			! is_object( $attribute ) &&
-			! array_key_exists( $attribute, $control['options'] )
+			! isset( $control['options'][ $attribute ] )
 		) {
-			$attribute = $control['default'] ?? '';
+			$attribute = self::reset_control_attribute_to_default( $attribute, $control );
 		}
 
 		if ( is_numeric( $attribute ) ) {
@@ -239,6 +235,40 @@ class Visual_Portfolio_Security {
 			}
 		} else {
 			$attribute = sanitize_text_field( wp_unslash( $attribute ) );
+		}
+
+		return $attribute;
+	}
+
+	/**
+	 * Reset the value of the control attribute to the default value.
+	 * Also check the attribute for a boolean value,
+	 * And if the default value contains a string like 'true' or 'false',
+	 * We reset the attribute to a boolean state
+	 *
+	 * @param int|float|string|bool $attribute - Attribute.
+	 * @param array                 $control - Array of control parameters.
+	 * @return int|float|string|bool
+	 */
+	public static function reset_control_attribute_to_default( $attribute, $control ) {
+		if ( ! is_bool( $attribute ) ) {
+			$attribute = $control['default'] ?? '';
+		}
+
+		if (
+			is_bool( $attribute ) &&
+			isset( $control['default'] ) &&
+			'false' === $control['default']
+		) {
+			$attribute = false;
+		}
+
+		if (
+			is_bool( $attribute ) &&
+			isset( $control['default'] ) &&
+			'true' === $control['default']
+		) {
+			$attribute = true;
 		}
 
 		return $attribute;
