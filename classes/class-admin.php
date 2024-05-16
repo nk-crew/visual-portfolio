@@ -1773,7 +1773,7 @@ class Visual_Portfolio_Admin {
 				'group'         => 'images_order',
 				'default'       => 'default',
 				'options'       => array(
-					'default'           => esc_html__( 'Default', 'visual-portfolio' ),
+					'default'           => esc_html__( 'Manual', 'visual-portfolio' ),
 					'title'             => esc_html__( 'Item Title', 'visual-portfolio' ),
 					'description'       => esc_html__( 'Item Description', 'visual-portfolio' ),
 					'image_title'       => esc_html__( 'Image Title', 'visual-portfolio' ),
