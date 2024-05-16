@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.5
 * Requires PHP: 7.2
-* Stable tag: 3.3.5
+* Stable tag: 3.3.6
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -327,6 +327,16 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
+= 3.3.6 - May 16, 2024 =
+
+* **Free + Pro:**
+* fixed DESC order for "Manual" and "Rand" image orders
+* rename "Default" order to "Manual"
+
+* **Pro:**
+* fixed Hover CSS Filter styles loading if there is no Default CSS Filter provided
+* fixed custom image URL in the gallery, applied from the first item to all other items
+
 = 3.3.5 - May 15, 2024 =
 
 * fixed PHP warning from `array_key_exists` function
@@ -347,7 +357,6 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * add more sort options in image galleries: Item Title, Item Description, Image Title, Image Description, Image Caption, Image Alt
 * improved image gallery sort code - images with empty field will be always placed after items with non-empty field
 * fixed the behavior of the "All" filters link when the portfolio archive page set as the home page
-<br />
 
 * **Pro:**
 * fixed Skin typography settings error in WP 6.5
@@ -368,7 +377,6 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed image blinking after filter in Masonry, Tiles and Grid layouts
 * removed stagger delay from Masonry, Tiles and Grid layouts because it is not working properly in large galleries
 * minor improvements
-<br />
 
 * **Pro:**
 * fixed Overlay Under Image option in Emerge and Caption Move styles
@@ -382,7 +390,6 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * added gallery images filter by category in editor
 * fixed Portfolio menu item name change when on Taxonomy archive page
 * fixed duplicating Portfolio page after WordPress XML file import
-<br />
 
 * **Pro:**
 * added Twitch avatar caching to fix missing link
@@ -427,7 +434,6 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * simplified lazy loading placeholder animation
 * changed lazy loading styles to use modern :has() CSS (with fallback for old browsers)
 * removed jQuery usage from lazy loading script
-<br />
 
 * **Pro:**
 * IMPORTANT: changed the Pro plugin to standalone, which is not requires the Free version installed anymore
