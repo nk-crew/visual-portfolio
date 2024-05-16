@@ -1454,8 +1454,10 @@ class Visual_Portfolio_Get {
 
 				if (
 					'desc' === $custom_order_direction &&
-					'rand' === $custom_order &&
-					'default' === $custom_order
+					(
+						'rand' === $custom_order ||
+						'default' === $custom_order
+					)
 				) {
 					$images = array_reverse( $images );
 				}
