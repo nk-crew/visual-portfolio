@@ -1449,11 +1449,15 @@ class Visual_Portfolio_Get {
 							}
 						}
 
-						if ( 'desc' === $custom_order_direction ) {
-							$images = array_reverse( $images );
-						}
-
 						break;
+				}
+
+				if (
+					'desc' === $custom_order_direction &&
+					'rand' === $custom_order &&
+					'default' === $custom_order
+				) {
+					$images = array_reverse( $images );
 				}
 			}
 
