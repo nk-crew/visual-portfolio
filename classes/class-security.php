@@ -221,8 +221,22 @@ class Visual_Portfolio_Security {
 		 * Exclude multiple and dynamically callback selectors.
 		 */
 		if (
-			empty( $control['value_callback'] ) &&
-			! isset( $control['options'][ $attribute ] )
+			(
+				empty( $control['value_callback'] ) &&
+				! isset( $control['options'][ $attribute ] ) &&
+				! is_bool( $attribute )
+			) ||
+			is_bool( $attribute ) &&
+			(
+				(
+					true === $attribute &&
+					! isset( $control['options']['true'] )
+				) ||
+				(
+					false === $attribute &&
+					! isset( $control['options']['false'] )
+				)
+			)
 		) {
 			$attribute = self::reset_control_attribute_to_default( $attribute, $control );
 		}
