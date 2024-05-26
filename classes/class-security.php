@@ -222,7 +222,15 @@ class Visual_Portfolio_Security {
 		 */
 		if (
 			empty( $control['value_callback'] ) &&
-			! isset( $control['options'][ $attribute ] )
+			! isset( $control['options'][ $attribute ] ) &&
+			(
+				// Additional check for bool and values 'true', 'false'.
+				! is_bool( $attribute ) ||
+				(
+					is_bool( $attribute ) &&
+					! isset( $control['options'][ $attribute ? 'true' : 'false' ] )
+				)
+			)
 		) {
 			$attribute = self::reset_control_attribute_to_default( $attribute, $control );
 		}
