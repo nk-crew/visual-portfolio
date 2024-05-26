@@ -221,20 +221,14 @@ class Visual_Portfolio_Security {
 		 * Exclude multiple and dynamically callback selectors.
 		 */
 		if (
+			empty( $control['value_callback'] ) &&
+			! isset( $control['options'][ $attribute ] ) &&
 			(
-				empty( $control['value_callback'] ) &&
-				! isset( $control['options'][ $attribute ] ) &&
-				! is_bool( $attribute )
-			) ||
-			is_bool( $attribute ) &&
-			(
+				// Additional check for bool and values 'true', 'false'.
+				! is_bool( $attribute ) ||
 				(
-					true === $attribute &&
-					! isset( $control['options']['true'] )
-				) ||
-				(
-					false === $attribute &&
-					! isset( $control['options']['false'] )
+					is_bool( $attribute ) &&
+					! isset( $control['options'][ $attribute ? 'true' : 'false' ] )
 				)
 			)
 		) {
