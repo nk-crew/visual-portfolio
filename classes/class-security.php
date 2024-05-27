@@ -406,6 +406,7 @@ class Visual_Portfolio_Security {
 									$attribute[ $key ][ $attribute_key ] = null;
 								}
 								break;
+							case 'id':
 							case 'custom_popup_image':
 							case 'hover_image':
 								$attribute[ $key ][ $attribute_key ] = self::sanitize_number( $media_attribute );
@@ -422,13 +423,6 @@ class Visual_Portfolio_Security {
 							case 'title':
 							case 'description':
 								$attribute[ $key ][ $attribute_key ] = wp_kses_post( wp_unslash( $media_attribute ) );
-								break;
-							case 'id':
-								if ( is_int( $media_attribute ) ) {
-									$attribute[ $key ][ $attribute_key ] = self::sanitize_number( $media_attribute );
-								} else {
-									$attribute[ $key ][ $attribute_key ] = sanitize_text_field( wp_unslash( $media_attribute ) );
-								}
 								break;
 							case 'author':
 							case 'format':
