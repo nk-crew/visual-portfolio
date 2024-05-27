@@ -424,6 +424,12 @@ class Visual_Portfolio_Security {
 								$attribute[ $key ][ $attribute_key ] = wp_kses_post( wp_unslash( $media_attribute ) );
 								break;
 							case 'id':
+								if ( is_int( $media_attribute ) ) {
+									$attribute[ $key ][ $attribute_key ] = self::sanitize_number( $media_attribute );
+								} else {
+									$attribute[ $key ][ $attribute_key ] = sanitize_text_field( wp_unslash( $media_attribute ) );
+								}
+								break;
 							case 'author':
 							case 'format':
 							case 'deep_link_pid':
