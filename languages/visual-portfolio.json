@@ -404,7 +404,7 @@
          "Items Description Source": [
             ""
          ],
-         "Default": [
+         "Manual": [
             ""
          ],
          "Item Title": [
@@ -510,6 +510,9 @@
             ""
          ],
          "Display Date": [
+            ""
+         ],
+         "Default": [
             ""
          ],
          "Human Format": [
