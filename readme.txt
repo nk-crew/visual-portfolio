@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.5
 * Requires PHP: 7.2
-* Stable tag: 3.3.7
+* Stable tag: 3.3.8
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -326,6 +326,11 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 ## Changelog ##
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
+
+= 3.3.8 - May 29, 2024 =
+
+* **Pro:**
+* fixed click action on gallery items with a custom URL in saved layouts
 
 = 3.3.7 - May 27, 2024 =
 

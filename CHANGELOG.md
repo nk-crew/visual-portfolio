@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 > v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
+= 3.3.8 - May 29, 2024 =
+
+* **Pro:**
+* fixed click action on gallery items with a custom URL in saved layouts
+
 = 3.3.7 - May 27, 2024 =
 
 * fixed displaying date on gallery items
