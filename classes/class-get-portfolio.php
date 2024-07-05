@@ -1432,6 +1432,10 @@ class Visual_Portfolio_Get {
 						 * Now images with filled values ​​will be sorted first.
 						 * And empty images will be inserted later at the very end of the array.
 						 */
+						if ( 'date' === $custom_order ) {
+							$custom_order = 'published_time';
+						}
+
 						$images = self::sort_array_by_field( $images, $custom_order, $custom_order_direction );
 						break;
 					case 'rand':
