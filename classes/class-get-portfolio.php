@@ -1427,6 +1427,10 @@ class Visual_Portfolio_Get {
 					case 'image_caption':
 					case 'image_alt':
 					case 'image_description':
+						if ( 'date' === $custom_order ) {
+							$custom_order = 'published_time';
+						}
+
 						/**
 						 * We've reworked this code to work correctly with empty sortable values.
 						 * Now images with filled values ​​will be sorted first.
