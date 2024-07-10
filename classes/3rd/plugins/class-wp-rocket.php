@@ -31,7 +31,7 @@ class Visual_Portfolio_3rd_WP_Rocket {
 	 * @return array
 	 */
 	public function rocket_delay_js_exclusions( $excluded ) {
-		$excluded[] = 'visual-portfolio/assets/js/lazysizes';
+		$excluded[] = 'visual-portfolio/build/assets/js/lazysizes';
 
 		return $excluded;
 	}
