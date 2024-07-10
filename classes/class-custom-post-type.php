@@ -475,7 +475,7 @@ class Visual_Portfolio_Custom_Post_Type {
 							// translators: %1$s - url to documentation.
 							// translators: %2$s - plugin name.
 							__( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', 'visual-portfolio' ),
-							'https://visualportfolio.co/docs/portfolio-blocks/',
+							'https://visualportfolio.co/docs/gallery-blocks/',
 							visual_portfolio()->plugin_name
 						)
 					);
