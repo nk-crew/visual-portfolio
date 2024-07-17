@@ -4,9 +4,9 @@
 * Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
 * Donate link: https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 6.2
-* Tested up to: 6.5
+* Tested up to: 6.6
 * Requires PHP: 7.2
-* Stable tag: 3.3.8
+* Stable tag: 3.3.9
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -325,7 +325,11 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
-> v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
+= 3.3.9 - Jul 17, 2024 =
+
+* fixed Sort by Date option not working correctly
+* fixed PHP warning when image was removed from Media library but still exists in the gallery
+* fixed WPRocket delay JS conflict with lazyloading
 
 = 3.3.8 - May 29, 2024 =
 
@@ -479,6 +483,8 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed transition caption transition CSS variable name in the Classic skin
 * fixed Skin editor error on WP 6.0 because of using `NavigatorToParentButton` component
 * fixed Select control dropdown is not visible in editor when opened popup
+
+> v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
 = 3.0.0 - Apr 13, 2023 =
 
@@ -642,111 +648,5 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * removed custom meta settings from non-viewable post types
 * removed `will-change` styles usage
 * minor changes
-
-= 2.17.1 =
-
-* added categories classes to items, when used Images content source
-* fixed PRO settings output bug
-* fixed a possible error, when $id is not provided in the `the_title` filter
-
-= 2.17.0 =
-
-* added possibility to prevent registering Portfolio post type. Helpful when you want to use our plugin for photo gallery only
-* added support for images in sitemap for `All In One SEO`, `Rank Math`, and `Yoast SEO` plugins
-* added correct title for Portfolio Archive Taxonomy pages: `Portfolio Category: %s` and `Portfolio Tag: %s`
-* added support for `image` post format even if the theme does not
-* fixed gallery filter category output on Portfolio Archive page
-* fixed wrong image size calculation in Justified gallery when naturalWidth return null or zero (mostly on iOs devices)
-* renamed `Popup Iframe` feature to `Quick View`
-
-= 2.16.0 =
-
-* tested with WordPress 6.0
-* added compatibility styles for Twenty Twenty Two theme
-* added support for additional popup URL parameters for Youtube and Vimeo. You can add options like autoplay and show controls. For supported parameters look at official embed documentation of Youtube <https://developers.google.com/youtube/player_parameters#Parameters> and Vimeo <https://vimeo.zendesk.com/hc/en-us/articles/360001494447-Player-parameters-overview>
-* added PHP filter `vpf_include_template_args`
-* improved enqueueing block assets and custom styles in FSE themes
-* fixed fallback for inline custom styles (some styles broke the code and cause an error)
-* fixed error with an archive portfolio page, when the server does not allow creating it and our code trying to create it again and again
-* fixed wrong CSS variable usage in sort dropdown
-* fixed Elementor lightbox conflict when load more items in Visual Portfolio galleries
-* fixed Elementor widget deprecation warning
-* fixed Elementor widget open settings when click on it in the editor
-* moved Elementor compatibility code to separate script, so when Elementor is not installed, this script is not loading
-* changed blocks to use API v2
-* dropped IE support
-* minor changes
-
-= 2.15.6 =
-
-* tested with WordPress 5.9
-* added promo Youtube video in the plugin description on wordpress.org
-* added a quick check to create_slug function - if slug for some reason is empty, return the label. This function is used to create slugs categories, added in the image galleries.
-* added block previews when adding it to the Gutenberg editor
-* improved styles of the block setup wizard
-* improved styles of the welcome screen
-* improved styles of image settings popup
-* improved styles of Layout section in the block settings
-* improved styles of color picker component
-* improved styles of align control component
-* fixed classes tree displaying in the block custom CSS modal
-
-= 2.15.5 =
-
-* fixed conflict with SG Optimizer lazy loading
-* fixed conflict with Architect page builder (added hacky fix for our inline styles)
-* fixed conflict with Avada lazy loading
-* fixed color picker styles in the latest Gutenberg
-* fixed slow loading of Gallery control in editor UI (now uses lazy loading)
-
-= 2.15.4 =
-
-* added encoding for block custom CSS to prevent conflicts with Gutenberg attributes sanitization
-* fixed blocks assets rendering inside custom content locations (for example, widgets area)
-* fixed some react warnings
-* minor changes
-
-= 2.15.3 =
-
-* fixed standard Gallery block transformation errors
-
-= 2.15.2 =
-
-* fixed pagination working in galleries placed on the Homepage
-* fixed possible bug with translated strings in JS files
-
-= 2.15.1 =
-
-* fixed category filter working in galleries placed on the Homepage
-* fixed massive updating post meta, when running `get_posts()` when using WPBakery shortcode (and in other similar places)
-
-= 2.15.0 =
-
-* added support for Portfolio post type archives. Read more [https://visualportfolio.co/docs/portfolio-archive/](https://visualportfolio.co/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
-  * added customizable archive by using custom Page with Portfolio block inside
-  * added support for Category and Tags archives
-  * added permalink settings to `Settings > Permalinks`. Read more [https://visualportfolio.co/docs/settings/permalinks/](https://visualportfolio.co/docs/settings/permalinks/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
-* added compatibility for standard galleries in WordPress 5.9
-* fixed Saved Layouts editor title click in WordPress 5.9
-
-= 2.14.1 =
-
-* added justified options `Max Rows Count` and `Last Row Align`
-* fixed huge galleries with Justified layout crash on iOs devices
-* fixed popup styles conflict in BeTheme
-
-= 2.14.0 =
-
-* IMPORTANT - there may be breaking changes for some of your galleries. Please, don't forget to make a backup and test the plugin on a staging site before updating it on production
-* added possibility to display post title and content in the image lightboxes (select the sources in the click action settings)
-* added support for posters in video and audio popups (added automatically)
-* slightly improved performance, when using the Taxonomies option
-* changed required PHP version to 7.2
-* changed required WordPress version to 5.8
-* fixed conflict with WPML and Taxonomies option
-* fixed AJAX loading pagination with custom permalink "/index.php/%postname%"
-* fixed js error in the new widgets editor
-* fixed rare conflict with theme styles and our images figure tag
-* removed sessions usage for randomly ordered galleries. Better for cached pages with caching plugins. If you want to use the caching plugin and random option, you will need to disable caching for the page, where used this random gallery
 
 Further changelog entries can be found in the [CHANGELOG.md](https://github.com/nk-crew/visual-portfolio/blob/master/CHANGELOG.md) file.

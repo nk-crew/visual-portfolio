@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-> v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
+= 3.3.9 - Jul 17, 2024 =
+
+* fixed Sort by Date option not working correctly
+* fixed PHP warning when image was removed from Media library but still exists in the gallery
+* fixed WPRocket delay JS conflict with lazyloading
 
 = 3.3.8 - May 29, 2024 =
 
@@ -156,6 +160,8 @@ All notable changes to this project will be documented in this file.
 * fixed transition caption transition CSS variable name in the Classic skin
 * fixed Skin editor error on WP 6.0 because of using `NavigatorToParentButton` component
 * fixed Select control dropdown is not visible in editor when opened popup
+
+> v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
 
 = 3.0.0 - Apr 13, 2023 =
 
