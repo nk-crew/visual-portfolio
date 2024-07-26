@@ -238,11 +238,13 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return array
 	 */
 	public function converting_paginate_links_to_friendly_url( $arr, $args, $vp_options ) {
+		$permalink_structure = get_option( 'permalink_structure' );
 		// Determine if a page is an archive.
 		if (
 			self::is_archive( $vp_options ) &&
 			isset( $arr ) &&
-			! empty( $arr )
+			! empty( $arr ) &&
+			! empty( $permalink_structure )
 		) {
 			if ( $arr['url'] ) {
 				// Parsing the content of links.
@@ -1264,24 +1266,28 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return string
 	 */
 	private function converting_paginate_link_to_friendly_url( $link, $num_page = null ) {
-		// Parsing the content of links.
-		preg_match( '/vp_page=(\d+)/', $link, $match_vp_page );
-		preg_match( '/page\/(\d+)/', $link, $match_page );
+		$permalink_structure = get_option( 'permalink_structure' );
 
-		if ( empty( $num_page ) && is_array( $match_vp_page ) && ! empty( $match_vp_page ) ) {
-			$num_page = $match_vp_page[1];
-		}
+		if ( ! empty( $permalink_structure ) ) {
+			// Parsing the content of links.
+			preg_match( '/vp_page=(\d+)/', $link, $match_vp_page );
+			preg_match( '/page\/(\d+)/', $link, $match_page );
 
-		if ( ! empty( $num_page ) && is_array( $match_page ) && ! empty( $match_page ) ) {
-			$link = str_replace( $match_page[0], 'page/' . $num_page, $link );
-		}
+			if ( empty( $num_page ) && is_array( $match_vp_page ) && ! empty( $match_vp_page ) ) {
+				$num_page = $match_vp_page[1];
+			}
 
-		if ( ! empty( $num_page ) && empty( $match_page ) ) {
-			$link = str_replace( '/?', '/page/' . $num_page . '/?', $link );
-		}
+			if ( ! empty( $num_page ) && is_array( $match_page ) && ! empty( $match_page ) ) {
+				$link = str_replace( $match_page[0], 'page/' . $num_page, $link );
+			}
 
-		if ( strpos( $link, 'vp_page' ) !== false ) {
-			$link = remove_query_arg( 'vp_page', $link );
+			if ( ! empty( $num_page ) && empty( $match_page ) ) {
+				$link = str_replace( '/?', '/page/' . $num_page . '/?', $link );
+			}
+
+			if ( strpos( $link, 'vp_page' ) !== false ) {
+				$link = remove_query_arg( 'vp_page', $link );
+			}
 		}
 
 		return $link;
@@ -1298,9 +1304,10 @@ class Visual_Portfolio_Archive_Mapping {
 	 */
 	private function convert_category_to_friendly_url( $category_url ) {
 		preg_match( '/vp_filter=([^&]*)/', $category_url, $match_filter );
-		$base_page = $this->get_relative_archive_link();
+		$base_page           = $this->get_relative_archive_link();
+		$permalink_structure = get_option( 'permalink_structure' );
 
-		if ( is_array( $match_filter ) && ! empty( $match_filter ) ) {
+		if ( is_array( $match_filter ) && ! empty( $match_filter ) && ! empty( $permalink_structure ) ) {
 			// We extract the contents of the filter and form a new link.
 			$taxonomies = explode( ':', rawurldecode( $match_filter[1] ) );
 			if ( is_array( $taxonomies ) && 'portfolio_category' === $taxonomies[0] ) {
