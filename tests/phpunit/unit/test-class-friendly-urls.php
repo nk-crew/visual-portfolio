@@ -53,6 +53,7 @@ class ClassFriendlyUrls extends WP_UnitTestCase {
             'content_source' => 'post-based',
             'posts_source'   => 'current_query',
         );
+		update_option( 'permalink_structure', '/%postname%/' );
 
         return $block_options;
     }
