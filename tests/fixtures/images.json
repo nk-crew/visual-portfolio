@@ -1,0 +1,109 @@
+[
+	{
+		"filename": "image-300x200.jpeg",
+		"alt": "Alt of image 300 on 200",
+		"caption": "Caption  of image 300 on 200",
+		"description": "Description  of image 300 on 200",
+		"imageSettings": {
+			"title": "Alternative title of 300 on 200",
+			"description": "Alternative description  of image 300 on 200",
+			"format": "video",
+			"videoUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
+		},
+		"postTitle": "Portfolio 1 test post"
+	},
+	{
+		"filename": "image-600x1920.jpeg",
+		"alt": "Alt of image 600 on 1920",
+		"caption": "Caption  of image 600 on 1920",
+		"description": "Description  of image 600 on 1920",
+		"imageSettings": {
+			"title": "Alternative title of 600 on 1920",
+			"description": "Alternative description  of image 600 on 1920",
+			"format": "standard",
+			"url": "https://visualportfolio.co/"
+		},
+		"postTitle": "Portfolio 2 test post"
+	},
+	{
+		"filename": "image-800x600.png",
+		"alt": "Alt of image 800 on 600",
+		"caption": "Caption  of image 800 on 600",
+		"description": "Description  of image 800 on 600",
+		"imageSettings": {
+			"title": "Alternative title of 800 on 600",
+			"description": "Alternative description  of image 800 on 600",
+			"format": "standard"
+		},
+		"postTitle": "Portfolio 3 test post"
+	},
+	{
+		"filename": "image-800x1200.jpeg",
+		"alt": "Alt of image 800 on 1200",
+		"caption": "Caption  of image 800 on 1200",
+		"description": "Description  of image 800 on 1200",
+		"imageSettings": {
+			"title": "Alternative title of 800 on 1200",
+			"description": "Alternative description  of image 800 on 1200",
+			"format": "standard",
+			"url": "postLink"
+		},
+		"postTitle": "Portfolio 4 test post"
+	},
+	{
+		"filename": "image-1600x1200.jpeg",
+		"alt": "Alt of image 1600 on 1200",
+		"caption": "Caption  of image 1600 on 1200",
+		"description": "Description  of image 1600 on 1200",
+		"imageSettings": {
+			"title": "Alternative title of 1600 on 1200",
+			"description": "Alternative description  of image 1600 on 1200"
+		},
+		"postTitle": "Portfolio 5 test post"
+	},
+	{
+		"filename": "image-1920x600.jpeg",
+		"alt": "Alt of image 1920 on 600",
+		"caption": "Caption  of image 1920 on 600",
+		"description": "Description  of image 1920 on 600",
+		"imageSettings": {
+			"title": "Alternative title of 1920 on 600",
+			"description": "Alternative description  of image 1920 on 600",
+			"format": "video",
+			"videoUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
+		},
+		"postTitle": "Portfolio 6 test post"
+	},
+	{
+		"filename": "image-1920x1080.jpeg",
+		"alt": "Alt of image 1920 on 1080",
+		"caption": "Caption  of image 1920 on 1080",
+		"title": "Image Title of 1920 on 1080",
+		"description": "Description  of image 1920 on 1080",
+		"postTitle": "Portfolio 7 test post"
+	},
+	{
+		"filename": "image-2000x2000.jpeg",
+		"alt": "Alt of image 2000 on 2000",
+		"caption": "Caption  of image 2000 on 2000",
+		"title": "Image Title of 2000 on 2000",
+		"description": "Description  of image 2000 on 2000",
+		"postTitle": "Portfolio 8 test post"
+	},
+	{
+		"filename": "image-3840x2160.jpeg",
+		"alt": "Alt of image 3840 on 2160",
+		"caption": "Caption  of image 3840 on 2160",
+		"title": "Image Title of 3840 on 2160",
+		"description": "Description  of image 3840 on 2160",
+		"postTitle": "Portfolio 9 test post"
+	},
+	{
+		"filename": "image-3840x2560.jpeg",
+		"alt": "Alt of image 3840 on 2560",
+		"caption": "Caption  of image 3840 on 2560",
+		"title": "Image Title of 3840 on 2560",
+		"description": "Description  of image 3840 on 2560",
+		"postTitle": "Portfolio 10 test post"
+	}
+]
