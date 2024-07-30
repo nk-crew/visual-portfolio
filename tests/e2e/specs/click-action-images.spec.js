@@ -21,6 +21,56 @@ test.describe('click action gallery images', () => {
 		await requestUtils.deleteAllPages();
 	});
 
+	async function preparePopupFixture(size, property, key) {
+		if (
+			typeof expectedPopupPreset[key][property] === 'string' &&
+			expectedPopupPreset[key][property].includes(size)
+		) {
+			switch (size) {
+				case '2000x2000':
+					expectedPopupPreset[key][property] = expectedPopupPreset[
+						key
+					][property].replace('.jpeg', '-1920x1920.jpeg');
+					break;
+				case '3840x2160':
+					expectedPopupPreset[key][property] = expectedPopupPreset[
+						key
+					][property].replace('scaled.jpeg', '1920x1080.jpeg');
+					break;
+				case '3840x2560':
+					expectedPopupPreset[key][property] = expectedPopupPreset[
+						key
+					][property].replace('scaled.jpeg', '1920x1280.jpeg');
+					break;
+			}
+		}
+	}
+
+	async function prepareUrlFixture(size, property, key) {
+		if (
+			typeof expectedUrlPreset[key][property] === 'string' &&
+			expectedUrlPreset[key][property].includes(size)
+		) {
+			switch (size) {
+				case '2000x2000':
+					expectedUrlPreset[key][property] = expectedUrlPreset[key][
+						property
+					].replace('.jpeg', '-1920x1920.jpeg');
+					break;
+				case '3840x2160':
+					expectedUrlPreset[key][property] = expectedUrlPreset[key][
+						property
+					].replace('scaled.jpeg', '1920x1080.jpeg');
+					break;
+				case '3840x2560':
+					expectedUrlPreset[key][property] = expectedUrlPreset[key][
+						property
+					].replace('scaled.jpeg', '1920x1280.jpeg');
+					break;
+			}
+		}
+	}
+
 	test('check disabled click action', async ({
 		page,
 		admin,
@@ -171,6 +221,22 @@ test.describe('click action gallery images', () => {
 				);
 
 				expectedUrlPreset[key].titleUrl = foundImage.url;
+			}
+
+			if (object.titleUrl.includes('image')) {
+				const foundImage = await findAsyncSequential(
+					images,
+					async (x) => x.title === object.title
+				);
+
+				expectedUrlPreset[key].titleUrl = foundImage.imgUrl;
+
+				const match = foundImage.imgUrl.match(/(\d+x\d+)/);
+
+				if (match) {
+					const size = match[0];
+					await prepareUrlFixture(size, 'titleUrl', key);
+				}
 			}
 		});
 
@@ -329,6 +395,35 @@ test.describe('click action gallery images', () => {
 				);
 
 				expectedPopupPreset[key].titleUrl = foundImage.url;
+			}
+
+			if (object.titleUrl.includes('image')) {
+				const foundImage = await findAsyncSequential(
+					images,
+					async (x) => x.title === object.title
+				);
+
+				expectedPopupPreset[key].titleUrl = foundImage.imgUrl;
+			}
+
+			if (
+				typeof object.imageUrl === 'string' &&
+				object.imageUrl.includes('image')
+			) {
+				const foundImage = await findAsyncSequential(
+					images,
+					async (x) => x.title === object.title
+				);
+
+				expectedPopupPreset[key].imageUrl = foundImage.imgUrl;
+
+				const match = foundImage.imgUrl.match(/(\d+x\d+)/);
+
+				if (match) {
+					const size = match[0];
+					await preparePopupFixture(size, 'titleUrl', key);
+					await preparePopupFixture(size, 'imageUrl', key);
+				}
 			}
 		});
 
