@@ -15,9 +15,10 @@ import { getWordpressImages } from '../utils/get-wordpress-images';
 
 test.describe('archive pages', () => {
 	test.beforeEach(async ({ requestUtils }) => {
-		await requestUtils.activatePlugin(
-			'visual-portfolio-posts-amp-image-gallery'
-		);
+		const pluginName = process.env.CORE
+			? 'visual-portfolio-pro'
+			: 'visual-portfolio-posts-amp-image-gallery';
+		await requestUtils.activatePlugin(pluginName);
 		await requestUtils.deleteAllMedia();
 		await requestUtils.deleteAllPages();
 		await requestUtils.deleteAllPosts();

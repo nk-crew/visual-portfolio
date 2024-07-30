@@ -12,9 +12,10 @@ import { getWordpressImages } from '../utils/get-wordpress-images';
 
 test.describe('added images to block', () => {
 	test.beforeEach(async ({ requestUtils }) => {
-		await requestUtils.activatePlugin(
-			'visual-portfolio-posts-amp-image-gallery'
-		);
+		const pluginName = process.env.CORE
+			? 'visual-portfolio-pro'
+			: 'visual-portfolio-posts-amp-image-gallery';
+		await requestUtils.activatePlugin(pluginName);
 		await requestUtils.deleteAllMedia();
 		await requestUtils.deleteAllPages();
 	});
