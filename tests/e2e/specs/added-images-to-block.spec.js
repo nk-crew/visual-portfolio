@@ -24,6 +24,17 @@ test.describe('added images to block', () => {
 		await requestUtils.deleteAllPages();
 	});
 
+	/**
+	 * We create a gallery block and add pictures to it manually or automatically.
+	 *
+	 * @param {RequestUtils} requestUtils       Playwright utilities for interacting with the WordPress REST API.
+	 * @param {Page}         page               Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Admin}        admin              End to end test utilities for WordPress admin’s user interface.
+	 * @param {Editor}       editor             End to end test utilities for the WordPress Block Editor.
+	 * @param {boolean}      programmatically   Flag for setting manual or automatic adding of pictures to the block.
+	 * @param {boolean}      alternativeSetting Flag for setting alternative meta settings for test images.
+	 * @return {{images: {format: string, video_url: string, url: string}[]}}
+	 */
 	async function generateGalleryBeforeEachTest(
 		requestUtils,
 		page,

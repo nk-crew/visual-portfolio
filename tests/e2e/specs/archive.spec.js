@@ -31,6 +31,12 @@ test.describe('archive pages', () => {
 		await deleteAllPortfolio({ requestUtils });
 	});
 
+	/**
+	 * Deleting all categories of portfolio posts.
+	 *
+	 * @param {Admin} admin End to end test utilities for WordPress admin’s user interface.
+	 * @param {Page}  page  Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 */
 	async function deletePortfolioCategories(admin, page) {
 		await admin.visitAdminPage(
 			'edit-tags.php?taxonomy=portfolio_category&post_type=portfolio'
@@ -45,6 +51,12 @@ test.describe('archive pages', () => {
 		}
 	}
 
+	/**
+	 * Deleting all tags of portfolio posts.
+	 *
+	 * @param {Admin} admin End to end test utilities for WordPress admin’s user interface.
+	 * @param {Page}  page  Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 */
 	async function deletePortfolioTags(admin, page) {
 		await admin.visitAdminPage(
 			'edit-tags.php?taxonomy=portfolio_tag&post_type=portfolio'
@@ -59,6 +71,11 @@ test.describe('archive pages', () => {
 		}
 	}
 
+	/**
+	 * We get all archive items from the archive page on the front end within the current pagination or selected category.
+	 *
+	 * @param {Page} page Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 */
 	async function getArchiveItems(page) {
 		const archiveItems = [];
 		const items = page.locator(
@@ -113,6 +130,16 @@ test.describe('archive pages', () => {
 		return archiveItems;
 	}
 
+	/**
+	 * We create portfolio posts for the archives page.
+	 * We fill these posts with pictures, titles, descriptions and other necessary meta data.
+	 * We also set tags and categories.
+	 *
+	 * @param {RequestUtils} requestUtils Playwright utilities for interacting with the WordPress REST API.
+	 * @param {Page}         page         Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Admin}        admin        End to end test utilities for WordPress admin’s user interface.
+	 * @param {Editor}       editor       End to end test utilities for the WordPress Block Editor.
+	 */
 	async function createPortfolioPosts(requestUtils, page, admin, editor) {
 		const images = await getWordpressImages({
 			requestUtils,
@@ -242,6 +269,16 @@ test.describe('archive pages', () => {
 		}
 	}
 
+	/**
+	 * We create an archives page and place a block with archive settings on it.
+	 * We select the number of elements displayed on the page, skin and pagination display.
+	 * Setting the display of the category filter.
+	 *
+	 * @param {Page}   page   Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Admin}  admin  End to end test utilities for WordPress admin’s user interface.
+	 * @param {Editor} editor End to end test utilities for the WordPress Block Editor.
+	 * @return {{archiveID: number, archiveUrl: string}} Return object with archive page ID and archive URL.
+	 */
 	async function createArchivePage(page, admin, editor) {
 		await admin.createNewPost({
 			title: 'Portfolio',
@@ -301,6 +338,12 @@ test.describe('archive pages', () => {
 		};
 	}
 
+	/**
+	 * Install the previously created archives page in the plugin settings.
+	 *
+	 * @param {Admin} admin End to end test utilities for WordPress admin’s user interface.
+	 * @param {Page}  page  Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 */
 	async function setArchiveSettings(admin, page) {
 		await admin.visitAdminPage('edit.php?post_type=portfolio');
 
@@ -314,6 +357,41 @@ test.describe('archive pages', () => {
 		await page.getByRole('button', { name: 'Save Changes' }).click();
 	}
 
+	/**
+	 * We receive an array of objects with archive elements in the process of querying the layout on the front-end side.
+	 * This array will be used as a comparison array against the expected result.
+	 * During the survey process, we also collect information about the current state of pagination,
+	 * Understanding what page we are on and what elements surround us.
+	 *
+	 * @param {Page} page Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @return {
+	 * {
+	 * 	items:
+	 * 		{
+	 * 			url: any, categories: any, title: any, description: any
+	 * 		}[],
+	 * 		pagination: (
+	 * 			{
+	 * 				text: any,
+	 * 				active: boolean
+	 * 			} |
+	 * 			{
+	 * 				url: any,
+	 * 				text: any,
+	 * 				standard: boolean
+	 * 			} |
+	 * 			{
+	 * 				text: any,
+	 * 				dots: boolean
+	 * 			} |
+	 * 			{
+	 * 				url: any,
+	 * 				nextPage: boolean
+	 * 			}
+	 * 		)[]
+	 * }
+	 * []}
+	 */
 	async function getReceivedArchive(page) {
 		const pageCounts = 5;
 		const receivedArchive = [];
@@ -407,6 +485,15 @@ test.describe('archive pages', () => {
 		return receivedArchive;
 	}
 
+	/**
+	 * We receive an array of objects with category elements in the process of querying the layout on the front-end side.
+	 * This array will be used as a comparison array against the expected result.
+	 * During the survey process, we also collect information about the current state of pagination,
+	 * Understanding what page we are on and what elements surround us.
+	 *
+	 * @param {Page} page Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @return {{title: any, url: any, items: never[]}[]}
+	 */
 	async function getReceivedCategories(page) {
 		const filterItems = page
 			.locator('.vp-filter .vp-filter__item')

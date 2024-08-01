@@ -8,6 +8,15 @@ const path = require('path');
  */
 import imagePaths from '../../fixtures/images.json';
 
+/**
+ *
+ * @param {RequestUtils} requestUtils       Playwright utilities for interacting with the WordPress REST API.
+ * @param {Page}         page               Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+ * @param {Admin}        admin              End to end test utilities for WordPress admin’s user interface.
+ * @param {Editor}       editor             End to end test utilities for the WordPress Block Editor.
+ * @param {boolean}      alternativeSetting Set alternative meta settings for test images.
+ * @return {{images: {format: string, video_url: string, url: string}[]}}
+ */
 export async function getWordpressImages({
 	requestUtils,
 	page,
@@ -21,6 +30,7 @@ export async function getWordpressImages({
 	if (alternativeSetting) {
 		const currentPage = page.url();
 
+		// Create a post for a image that has a link to an internal WordPress post.
 		await admin.createNewPost({
 			title: 'Sample Test Page',
 			postType: 'page',
@@ -40,6 +50,7 @@ export async function getWordpressImages({
 			.first()
 			.click();
 
+		// Remember the link to the post for future use inside the meta image.
 		postLink = page.url();
 
 		await page.goto(currentPage);
@@ -48,12 +59,14 @@ export async function getWordpressImages({
 	images = await Promise.all(
 		imagePaths.map(async (object) => {
 			const filepath = path.join('tests/fixtures/', object.filename);
+			// Upload image to WordPress gallery.
 			const media = await requestUtils.uploadMedia(filepath);
 
 			const periodIndex = object.filename.indexOf('.');
 
 			let image = {};
 
+			// We collect all the meta data of the image and write it to an array.
 			let title =
 				periodIndex !== -1
 					? object.filename.substring(0, periodIndex)

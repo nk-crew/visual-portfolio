@@ -22,6 +22,14 @@ test.describe('click action gallery images', () => {
 		await requestUtils.deleteAllPages();
 	});
 
+	/**
+	 * We prepare the fixture for popup comparison.
+	 * We correct the paths to the images to be current, loaded into the WordPress system.
+	 *
+	 * @param {string} size     Image Resolution.
+	 * @param {string} property Image property.
+	 * @param {number} key      Key of Image object.
+	 */
 	async function preparePopupFixture(size, property, key) {
 		if (
 			typeof expectedPopupPreset[key][property] === 'string' &&
@@ -47,6 +55,14 @@ test.describe('click action gallery images', () => {
 		}
 	}
 
+	/**
+	 * We prepare the fixture for url comparison.
+	 * We correct the paths to the images to be current, loaded into the WordPress system.
+	 *
+	 * @param {string} size     Image Resolution.
+	 * @param {string} property Image property.
+	 * @param {number} key      Key of Image object.
+	 */
 	async function prepareUrlFixture(size, property, key) {
 		if (
 			typeof expectedUrlPreset[key][property] === 'string' &&
