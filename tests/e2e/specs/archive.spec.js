@@ -314,6 +314,7 @@ test.describe('archive pages', () => {
 				hasText: 'Categories Count',
 			})
 			.locator('input.components-input-control__input')
+			.first()
 			.fill('3');
 
 		await page.getByLabel('Display Excerpt').check();
@@ -351,7 +352,7 @@ test.describe('archive pages', () => {
 			.locator('#menu-posts-portfolio')
 			.getByRole('link', { name: 'Settings' })
 			.click();
-		await page.getByRole('textbox', { name: '-- Select Page --' }).click();
+		await page.locator('.select2-container').click();
 		await page.getByRole('option', { name: 'Portfolio' }).click();
 		await page.getByLabel('Archive Page Items Per Page').fill('2');
 		await page.getByRole('button', { name: 'Save Changes' }).click();

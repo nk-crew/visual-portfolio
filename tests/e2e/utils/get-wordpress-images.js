@@ -15,6 +15,7 @@ import imagePaths from '../../fixtures/images.json';
  * @param {Admin}        admin              End to end test utilities for WordPress admin’s user interface.
  * @param {Editor}       editor             End to end test utilities for the WordPress Block Editor.
  * @param {boolean}      alternativeSetting Set alternative meta settings for test images.
+ * @param {boolean}      usingInPro         Set if using in pro plugin.
  * @return {{images: {format: string, video_url: string, url: string}[]}}
  */
 export async function getWordpressImages({
@@ -23,6 +24,7 @@ export async function getWordpressImages({
 	admin,
 	editor,
 	alternativeSetting = false,
+	usingInPro = false,
 }) {
 	let images = [];
 	let postLink = '';
@@ -56,9 +58,14 @@ export async function getWordpressImages({
 		await page.goto(currentPage);
 	}
 
+	const imagePath =
+		process.env.CORE || usingInPro
+			? 'core-plugin/tests/fixtures/'
+			: 'tests/fixtures/';
+
 	images = await Promise.all(
 		imagePaths.map(async (object) => {
-			const filepath = path.join('tests/fixtures/', object.filename);
+			const filepath = path.join(imagePath, object.filename);
 			// Upload image to WordPress gallery.
 			const media = await requestUtils.uploadMedia(filepath);
 
