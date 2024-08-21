@@ -630,6 +630,18 @@ test.describe('archive pages', () => {
 
 		// check Archive Category filter
 		expect(receivedCategories).toEqual(expectedArchiveCategoryDefault);
+
+		/**
+		 * Set Post Name Permalink Settings.
+		 * Without this stupid change, hooks for deleting posts and images stop working.
+		 * This happens due to the fact that the removal methods use a link to access the API.
+		 * For example this type: wp-json/wp/v2/media
+		 * This link will not be available. It stops working if the permalink settings are set to Plain.
+		 * In this case, when calling the method, the request contains a 404 error.
+		 */
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByLabel('Post name').check();
+		await page.getByRole('button', { name: 'Save Changes' }).click();
 	});
 
 	test('check archive page with default pagination and category filter (post name permalinks)', async ({
