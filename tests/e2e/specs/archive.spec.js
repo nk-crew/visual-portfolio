@@ -401,15 +401,19 @@ test.describe('archive pages', () => {
 		while (currentCount < pageCounts) {
 			const archivePagination = [];
 
-			await page.waitForTimeout(700);
+			await page.waitForTimeout(1000);
 
 			const archiveItems = await getArchiveItems(page);
 
-			const pagination = page.locator(
+			await page.waitForTimeout(1000);
+
+			const pagination = await page.locator(
 				'.vp-portfolio__layout-elements .vp-pagination'
 			);
 
-			const paginationItems = pagination.locator('.vp-pagination__item');
+			const paginationItems = await pagination.locator(
+				'.vp-pagination__item'
+			);
 
 			for (const paginationItem of await paginationItems.all()) {
 				const classes = await paginationItem.getAttribute('class');
