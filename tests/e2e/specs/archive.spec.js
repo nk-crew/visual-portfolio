@@ -401,7 +401,7 @@ test.describe('archive pages', () => {
 		while (currentCount < pageCounts) {
 			const archivePagination = [];
 
-			await page.waitForTimeout(1000);
+			await page.waitForTimeout(2000);
 
 			const archiveItems = await getArchiveItems(page);
 
@@ -482,8 +482,6 @@ test.describe('archive pages', () => {
 						'.vp-pagination__item.vp-pagination__item-next > a'
 					)
 					.click();
-
-				await page.waitForTimeout(700);
 			}
 		}
 

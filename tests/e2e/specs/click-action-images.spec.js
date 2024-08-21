@@ -279,7 +279,7 @@ test.describe('click action gallery images', () => {
 
 		await page.waitForTimeout(2000);
 
-		const galleryImages = page
+		const galleryImages = await page
 			.frame('vpf-preview-1')
 			.locator('.vp-portfolio__items .vp-portfolio__item-wrap');
 
@@ -293,7 +293,7 @@ test.describe('click action gallery images', () => {
 			const popup = await galleryImage
 				.locator('.vp-portfolio__item-popup')
 				.count();
-			const title = galleryImage.locator(
+			const title = await galleryImage.locator(
 				'.vp-portfolio__item-meta-title > a'
 			);
 			const titleText = await title.innerText();
@@ -321,8 +321,10 @@ test.describe('click action gallery images', () => {
 			.first()
 			.click();
 
+		await page.waitForTimeout(2000);
+
 		// Check Frontend.
-		const galleryFrontendImages = page.locator(
+		const galleryFrontendImages = await page.locator(
 			'.vp-portfolio__items .vp-portfolio__item-wrap'
 		);
 
@@ -332,7 +334,7 @@ test.describe('click action gallery images', () => {
 			const popup = await galleryImage
 				.locator('.vp-portfolio__item-popup')
 				.count();
-			const title = galleryImage.locator(
+			const title = await galleryImage.locator(
 				'.vp-portfolio__item-meta-title > a'
 			);
 			const titleText = await title.innerText();
@@ -434,7 +436,7 @@ test.describe('click action gallery images', () => {
 					async (x) => x.title === object.title
 				);
 
-				expectedPopupPreset[key].imageUrl = foundImage.imgUrl;
+				expectedPopupPreset[key].imageUrl = await foundImage.imgUrl;
 
 				const match = foundImage.imgUrl.match(/(\d+x\d+)/);
 
@@ -466,7 +468,7 @@ test.describe('click action gallery images', () => {
 
 		await page.waitForTimeout(3000);
 
-		const galleryImages = page
+		const galleryImages = await page
 			.frame('vpf-preview-1')
 			.locator('.vp-portfolio__items .vp-portfolio__item-wrap');
 
@@ -477,14 +479,16 @@ test.describe('click action gallery images', () => {
 			/**
 			 * Check the layout and collect an array with information about items.
 			 */
-			const popup = galleryImage.locator('.vp-portfolio__item-popup');
+			const popup = await galleryImage.locator(
+				'.vp-portfolio__item-popup'
+			);
 			const isVideoPopup = await galleryImage
 				.locator('[data-vp-popup-video]')
 				.count();
 			const isImagePopup = await galleryImage
 				.locator('[data-vp-popup-img]')
 				.count();
-			const title = galleryImage.locator(
+			const title = await galleryImage.locator(
 				'.vp-portfolio__item-meta-title > a'
 			);
 			const titleText = await title.innerText();
@@ -525,8 +529,10 @@ test.describe('click action gallery images', () => {
 			.first()
 			.click();
 
+		await page.waitForTimeout(3000);
+
 		// Check Frontend.
-		const galleryFrontendImages = page.locator(
+		const galleryFrontendImages = await page.locator(
 			'.vp-portfolio__items .vp-portfolio__item-wrap'
 		);
 
@@ -540,7 +546,7 @@ test.describe('click action gallery images', () => {
 			const isImagePopup = await galleryImage
 				.locator('[data-vp-popup-img]')
 				.count();
-			const title = galleryImage.locator(
+			const title = await galleryImage.locator(
 				'.vp-portfolio__item-meta-title > a'
 			);
 			const titleText = await title.innerText();
