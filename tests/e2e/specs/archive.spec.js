@@ -78,7 +78,7 @@ test.describe('archive pages', () => {
 	 */
 	async function getArchiveItems(page) {
 		const archiveItems = [];
-		const items = page.locator(
+		const items = await page.locator(
 			'.vp-portfolio__items article.vp-portfolio__item-wrap'
 		);
 
@@ -87,7 +87,7 @@ test.describe('archive pages', () => {
 			const url = await item
 				.locator('.vp-portfolio__item-img > a')
 				.getAttribute('href');
-			const categoriesWrapper = item.locator(
+			const categoriesWrapper = await item.locator(
 				'.vp-portfolio__item-meta .vp-portfolio__item-meta-categories > .vp-portfolio__item-meta-category'
 			);
 
@@ -180,7 +180,7 @@ test.describe('archive pages', () => {
 
 			await page.getByRole('tab', { name: 'Media Library' }).click();
 
-			const imageContainer = page.locator(
+			const imageContainer = await page.locator(
 				'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[data-id="' +
 					foundImage.id +
 					'"]'
@@ -500,7 +500,7 @@ test.describe('archive pages', () => {
 	 * @return {{title: any, url: any, items: never[]}[]}
 	 */
 	async function getReceivedCategories(page) {
-		const filterItems = page
+		const filterItems = await page
 			.locator('.vp-filter .vp-filter__item')
 			.filter({ hasNotText: 'All' });
 		const receivedCategories = [];
