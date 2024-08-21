@@ -248,11 +248,13 @@ test.describe('click action gallery images', () => {
 
 				expectedUrlPreset[key].titleUrl = foundImage.imgUrl;
 
-				const match = foundImage.imgUrl.match(/(\d+x\d+)/);
+				if (typeof process.env.CORE === 'undefined') {
+					const match = foundImage.imgUrl.match(/(\d+x\d+)/);
 
-				if (match) {
-					const size = match[0];
-					await prepareUrlFixture(size, 'titleUrl', key);
+					if (match) {
+						const size = match[0];
+						await prepareUrlFixture(size, 'titleUrl', key);
+					}
 				}
 			}
 		});
