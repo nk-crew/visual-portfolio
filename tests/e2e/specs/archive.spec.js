@@ -352,7 +352,9 @@ test.describe('archive pages', () => {
 			.locator('#menu-posts-portfolio')
 			.getByRole('link', { name: 'Settings' })
 			.click();
-		await page.locator('.select2-container').click();
+		await page
+			.locator('.portfolio_archive_page .select2-container')
+			.click();
 		await page.getByRole('option', { name: 'Portfolio' }).click();
 		await page.getByLabel('Archive Page Items Per Page').fill('2');
 		await page.getByRole('button', { name: 'Save Changes' }).click();
