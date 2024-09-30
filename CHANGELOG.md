@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.3.10 - Sep 30, 2024 =
+
+* fixed possible XSS via stored HTML and Fancybox script
+
 = 3.3.9 - Jul 17, 2024 =
 
 * fixed Sort by Date option not working correctly
