@@ -216,6 +216,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'classes/3rd/plugins/class-divi.php';
 			require_once $this->plugin_path . 'classes/3rd/plugins/class-elementor.php';
 			require_once $this->plugin_path . 'classes/3rd/plugins/class-ewww-image-optimizer.php';
+			require_once $this->plugin_path . 'classes/3rd/plugins/class-fancybox.php';
 			require_once $this->plugin_path . 'classes/3rd/plugins/class-imagify.php';
 			require_once $this->plugin_path . 'classes/3rd/plugins/class-jetpack.php';
 			require_once $this->plugin_path . 'classes/3rd/plugins/class-lazy-loading-responsive-images.php';
