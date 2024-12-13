@@ -1,12 +1,8 @@
 @use "sass:math";
 
 // Group label.
-.vpf-control-wrap-html:has(+ .vpf-control-wrap-color) {
-	margin-bottom: -8px;
-}
-
 .vpf-control-wrap-color:has(+ .vpf-control-wrap-color) {
-	margin-bottom: -9px;
+	margin-bottom: 0;
 
 	.vpf-component-color-toggle {
 		border-bottom: none;

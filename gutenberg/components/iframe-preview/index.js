@@ -422,15 +422,10 @@ class IframePreview extends Component {
 }
 
 export default withSelect((select) => {
-	const { __experimentalGetPreviewDeviceType } =
-		select('core/edit-post') || {};
-
-	const { getCurrentPost } = select('core/editor') || {};
+	const { getDeviceType, getCurrentPost } = select('core/editor') || {};
 
 	return {
-		previewDeviceType: __experimentalGetPreviewDeviceType
-			? __experimentalGetPreviewDeviceType()
-			: 'desktop',
+		previewDeviceType: getDeviceType ? getDeviceType() : 'desktop',
 		postType: getCurrentPost ? getCurrentPost().type : 'standard',
 		postId: getCurrentPost ? getCurrentPost().id : 'widgets',
 	};

@@ -5,7 +5,7 @@ import { debounce } from 'throttle-debounce';
 import { PanelRow, TextControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
@@ -159,6 +159,8 @@ class VpVideoComponent extends Component {
 						}}
 						type="url"
 						placeholder="https://"
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 					/>
 				</PanelRow>
 				<PanelRow>

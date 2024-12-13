@@ -19,7 +19,7 @@ export default class VPDatePicker extends Component {
 		return (
 			<Dropdown
 				renderToggle={({ onToggle }) => (
-					<Button isSecondary isSmall onClick={onToggle}>
+					<Button variant="secondary" onClick={onToggle}>
 						{value
 							? dateI18n(resolvedFormat, value)
 							: __('Select Date', 'visual-portfolio')}
@@ -30,8 +30,7 @@ export default class VPDatePicker extends Component {
 						<DatePicker currentDate={value} onChange={onChange} />
 						{value ? (
 							<Button
-								isSecondary
-								isSmall
+								variant="secondary"
 								onClick={() => {
 									onChange('');
 								}}

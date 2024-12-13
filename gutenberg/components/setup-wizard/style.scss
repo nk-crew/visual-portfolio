@@ -122,7 +122,6 @@ $brand_color: #2540cc !default;
 
 		.vpf-component-icon-selector-item {
 			padding: 15px 20px;
-			background: none !important;
 			border-color: #fff;
 
 			svg {
@@ -184,7 +183,7 @@ $brand_color: #2540cc !default;
 			flex: 1;
 			padding: 0;
 			background: #eee !important;
-			border: none !important;
+			outline: none;
 			border-radius: 6px;
 
 			&::before {
@@ -213,12 +212,10 @@ $brand_color: #2540cc !default;
 
 			&:hover,
 			&:focus {
-				border-color: none !important;
 				box-shadow: 0 0 0 1.5px #fff, 0 0 0 3.5px #000 !important;
 			}
 
 			&.vpf-component-icon-selector-item-active {
-				border-color: none !important;
 				box-shadow: 0 0 0 1.5px #fff, 0 0 0 3.5px $brand_color !important;
 			}
 

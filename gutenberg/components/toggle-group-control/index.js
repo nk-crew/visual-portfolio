@@ -32,6 +32,8 @@ export default function ToggleGroupCustomControl(props) {
 					setCollapsed(val);
 				}}
 				isBlock
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
 			>
 				{options.map((option) => {
 					return (

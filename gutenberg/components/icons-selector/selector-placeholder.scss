@@ -5,29 +5,14 @@
 	margin: 0;
 	color: #000;
 	border-radius: 2px;
-	transition: 0.1s color ease-in-out;
-
-	&::after {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		pointer-events: none;
-		content: "";
-		background: var(--wp-admin-theme-color);
-		border-radius: 2px;
-		opacity: 0;
-		transition: 0.1s opacity ease-in-out;
-	}
+	background-color: transparent;
+	outline: 1px solid transparent;
+	transition: 0.15s color ease-in-out, 0.15s background-color ease-in-out, 0.15s border ease-in-out, 0.15s box-shadow ease-in-out, 0.15s outline ease-in-out;
 
 	&:hover,
 	&:focus {
 		color: var(--wp-admin-theme-color);
-
-		&::after {
-			opacity: 0.04;
-		}
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.05);
 	}
 
 	// Remove default Gutenberg box shadow.
@@ -37,9 +22,6 @@
 }
 %vpf-icons-selector-item-active {
 	color: var(--wp-admin-theme-color);
-	outline: 1px solid var(--wp-admin-theme-color);
-
-	&::after {
-		opacity: 0.04;
-	}
+	background-color: rgba(var(--wp-admin-theme-color--rgb), 0.05);
+	outline: 1px solid var(--wp-admin-theme-color) !important;
 }

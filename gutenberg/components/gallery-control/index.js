@@ -203,6 +203,7 @@ const SelectedImageData = function (props) {
 						onChange={(val) => {
 							onChangeFocalPoint(val);
 						}}
+						__nextHasNoMarginBottom
 					/>
 				) : null}
 				<MediaUpload
@@ -212,7 +213,7 @@ const SelectedImageData = function (props) {
 					}}
 					allowedTypes={ALLOWED_MEDIA_TYPES}
 					render={({ open }) => (
-						<Button onClick={open} isSecondary>
+						<Button onClick={open} variant="secondary">
 							{__('Replace Image', 'visual-portfolio')}
 						</Button>
 					)}
@@ -293,6 +294,8 @@ const SelectedImageData = function (props) {
 									label={__('File URL:', 'visual-portfolio')}
 									value={imageData?.source_url || ''}
 									readOnly
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
 								/>
 								<Button
 									onClick={() => {
@@ -304,8 +307,7 @@ const SelectedImageData = function (props) {
 												setLinkCopied(true);
 											});
 									}}
-									isSecondary
-									isSmall
+									variant="secondary"
 								>
 									{__(
 										'Copy URL to Clipboard',
@@ -433,6 +435,7 @@ const ImageEditModal = function (props) {
 							onChange={(val) => {
 								onChange({ focalPoint: val });
 							}}
+							__nextHasNoMarginBottom
 						/>
 					</div>
 				) : null}
@@ -575,20 +578,15 @@ const SortableItem = function (props) {
 				className={classnames(
 					'vpf-component-gallery-control-item',
 					isDragging && 'vpf-component-gallery-control-item-dragging',
-					isMuffled && 'vpf-component-gallery-control-item-muffled'
+					isMuffled && 'vpf-component-gallery-control-item-muffled',
+					isChecked && 'vpf-component-gallery-control-item-checked'
 				)}
 				ref={setNodeRef}
 				style={style}
 				{...sortableAttributes}
 				{...listeners}
 			>
-				<div
-					className={classnames(
-						'vpf-component-gallery-control-item-toolbar',
-						isChecked &&
-							'vpf-component-gallery-control-item-toolbar-checked'
-					)}
-				>
+				<div className="vpf-component-gallery-control-item-toolbar">
 					{!isSetupWizard ? (
 						<CheckboxControl
 							className={
@@ -599,6 +597,7 @@ const SortableItem = function (props) {
 							onChange={(val) => {
 								onCheck(val);
 							}}
+							__nextHasNoMarginBottom
 						/>
 					) : null}
 					<Button
@@ -616,8 +615,7 @@ const SortableItem = function (props) {
 							<path
 								fillRule="evenodd"
 								clipRule="evenodd"
-								d="M9.80483 1H10.1952C10.6658 1 11.1171 1.18964 11.4498 1.52721C11.7825 1.86477 11.9695 2.32261 11.9695 2.8V2.962C11.9698 3.27765 12.0519 3.58767 12.2077 3.86095C12.3634 4.13424 12.5872 4.36117 12.8566 4.519L13.2381 4.744C13.5078 4.90198 13.8138 4.98515 14.1253 4.98515C14.4367 4.98515 14.7427 4.90198 15.0124 4.744L15.1455 4.672C15.5527 4.43374 16.0364 4.3691 16.4904 4.49228C16.9445 4.61546 17.3319 4.91638 17.5674 5.329L17.7626 5.671C17.9975 6.08404 18.0612 6.57475 17.9398 7.0354C17.8184 7.49605 17.5217 7.889 17.115 8.128L16.9819 8.209C16.7112 8.36759 16.4865 8.59594 16.3307 8.87094C16.1749 9.14594 16.0935 9.45782 16.0948 9.775V10.225C16.0935 10.5422 16.1749 10.8541 16.3307 11.1291C16.4865 11.4041 16.7112 11.6324 16.9819 11.791L17.115 11.863C17.5217 12.102 17.8184 12.4949 17.9398 12.9556C18.0612 13.4163 17.9975 13.907 17.7626 14.32L17.5674 14.671C17.3319 15.0836 16.9445 15.3845 16.4904 15.5077C16.0364 15.6309 15.5527 15.5663 15.1455 15.328L15.0124 15.256C14.7427 15.098 14.4367 15.0148 14.1253 15.0148C13.8138 15.0148 13.5078 15.098 13.2381 15.256L12.8566 15.481C12.5872 15.6388 12.3634 15.8658 12.2077 16.139C12.0519 16.4123 11.9698 16.7223 11.9695 17.038V17.2C11.9695 17.6774 11.7825 18.1352 11.4498 18.4728C11.1171 18.8104 10.6658 19 10.1952 19H9.80483C9.33425 19 8.88295 18.8104 8.5502 18.4728C8.21745 18.1352 8.03051 17.6774 8.03051 17.2V17.038C8.03019 16.7223 7.94806 16.4123 7.79235 16.139C7.63663 15.8658 7.41282 15.6388 7.14336 15.481L6.76188 15.256C6.49215 15.098 6.18618 15.0148 5.87472 15.0148C5.56327 15.0148 5.2573 15.098 4.98757 15.256L4.8545 15.328C4.44735 15.5663 3.96365 15.6309 3.50957 15.5077C3.05549 15.3845 2.66815 15.0836 2.43256 14.671L2.23739 14.329C2.00252 13.916 1.93881 13.4253 2.06023 12.9646C2.18165 12.5039 2.47828 12.111 2.88501 11.872L3.01808 11.791C3.28885 11.6324 3.5135 11.4041 3.66929 11.1291C3.82508 10.8541 3.90648 10.5422 3.90524 10.225V9.766C3.90337 9.45187 3.8205 9.14372 3.66486 8.87215C3.50923 8.60058 3.28625 8.37506 3.01808 8.218L2.88501 8.128C2.47828 7.889 2.18165 7.49605 2.06023 7.0354C1.93881 6.57475 2.00252 6.08404 2.23739 5.671L2.43256 5.329C2.66815 4.91638 3.05549 4.61546 3.50957 4.49228C3.96365 4.3691 4.44735 4.43374 4.8545 4.672L4.98757 4.744C5.2573 4.90198 5.56327 4.98515 5.87472 4.98515C6.18618 4.98515 6.49215 4.90198 6.76188 4.744L7.14336 4.519C7.41282 4.36117 7.63663 4.13424 7.79235 3.86095C7.94806 3.58767 8.03019 3.27765 8.03051 2.962V2.8C8.03051 2.32261 8.21745 1.86477 8.5502 1.52721C8.88295 1.18964 9.33425 1 9.80483 1ZM13 10C13 11.6569 11.6569 13 10 13C8.34315 13 7 11.6569 7 10C7 8.34315 8.34315 7 10 7C11.6569 7 13 8.34315 13 10Z"
-								fill="currentColor"
+								d="M8.11459 1.9405C8.15924 1.67781 8.29774 1.43913 8.50542 1.26692C8.71311 1.0947 8.97653 1.00012 9.24883 1H10.7512C11.0237 0.999856 11.2874 1.09432 11.4953 1.26655C11.7032 1.43879 11.8419 1.67762 11.8866 1.9405L12.1672 3.58975C13.0726 3.88225 13.8962 4.35363 14.5922 4.96L16.1946 4.37275C16.4495 4.27963 16.73 4.27793 16.9861 4.36794C17.2422 4.45796 17.4574 4.63385 17.5934 4.86438L18.3446 6.13562C18.4811 6.3663 18.5294 6.63688 18.481 6.89916C18.4325 7.16144 18.2904 7.39837 18.08 7.56775L16.7594 8.62975C16.9501 9.53336 16.9501 10.4655 16.7594 11.3691L18.0812 12.4334C18.2913 12.6027 18.4332 12.8394 18.4816 13.1014C18.5301 13.3635 18.4819 13.6338 18.3457 13.8644L17.5946 15.1356C17.4585 15.3661 17.2434 15.542 16.9872 15.6321C16.7311 15.7221 16.4507 15.7204 16.1957 15.6273L14.5922 15.04C13.8962 15.6475 13.0737 16.1177 12.1672 16.4102L11.8866 18.0595C11.8419 18.3224 11.7032 18.5612 11.4953 18.7334C11.2874 18.9057 11.0237 19.0001 10.7512 19H9.24883C8.97653 18.9999 8.71311 18.9053 8.50542 18.7331C8.29774 18.5609 8.15924 18.3222 8.11459 18.0595L7.83391 16.4102C6.93828 16.1205 6.11295 15.6541 5.40898 15.04L3.80541 15.6273C3.55045 15.7208 3.26983 15.7228 3.01348 15.633C2.75714 15.5432 2.54168 15.3673 2.40544 15.1367L1.65427 13.8644C1.51807 13.6338 1.46991 13.3635 1.51836 13.1014C1.5668 12.8394 1.70871 12.6027 1.91885 12.4334L3.24059 11.3691C3.04998 10.4655 3.04998 9.53336 3.24059 8.62975L1.92 7.56775C1.70986 7.39843 1.56795 7.1617 1.51951 6.89968C1.47106 6.63765 1.51922 6.36732 1.65542 6.13675L2.40659 4.86438C2.54265 4.6336 2.75803 4.45752 3.01439 4.3675C3.27076 4.27747 3.55147 4.27933 3.80656 4.37275L5.40898 4.96C6.11293 4.34583 6.93826 3.87946 7.83391 3.58975L8.11459 1.9405ZM13.4522 10C13.4522 10.4432 13.3629 10.8821 13.1895 11.2916C13.0161 11.701 12.7619 12.0731 12.4414 12.3865C12.1209 12.6999 11.7405 12.9485 11.3218 13.1181C10.9031 13.2877 10.4543 13.375 10.0011 13.375C9.54795 13.375 9.0992 13.2877 8.6805 13.1181C8.2618 12.9485 7.88136 12.6999 7.56091 12.3865C7.24045 12.0731 6.98625 11.701 6.81282 11.2916C6.63939 10.8821 6.55012 10.4432 6.55012 10C6.55012 9.10489 6.91371 8.24645 7.56091 7.61351C8.2081 6.98058 9.08588 6.625 10.0011 6.625C10.9164 6.625 11.7942 6.98058 12.4414 7.61351C13.0886 8.24645 13.4522 9.10489 13.4522 10Z"
 							/>
 						</svg>
 					</Button>
@@ -641,41 +639,9 @@ const SortableItem = function (props) {
 							xmlns="http://www.w3.org/2000/svg"
 						>
 							<path
-								d="M3 5.76471H17.1176"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-							<path
-								d="M15.2353 5.76471V16.4706C15.2353 17.2353 14.4958 18 13.7563 18H6.36135C5.62185 18 4.88235 17.2353 4.88235 16.4706V5.76471"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								fill="none"
-							/>
-							<path
-								d="M6.76471 5.76471V3.88235C6.76471 2.94118 7.58824 2 8.41177 2H11.7059C12.5294 2 13.3529 2.94118 13.3529 3.88235V5.76471"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								fill="none"
-							/>
-							<path
-								d="M8.64706 9.52942V14.2353"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-							<path
-								d="M11.4706 9.52942V14.2353"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-								strokeLinejoin="round"
+								fillRule="evenodd"
+								clipRule="evenodd"
+								d="M10 2.68771C9.46811 2.68755 8.94926 2.84978 8.51493 3.15204C8.08059 3.4543 7.75215 3.88173 7.57486 4.37542H12.4251C12.2477 3.88182 11.9192 3.45449 11.4849 3.15225C11.0506 2.85001 10.5319 2.68772 10 2.68771ZM10 1C9.01207 1.00001 8.05446 1.33596 7.28915 1.95102C6.52384 2.56608 5.9978 3.4225 5.8 4.37542H2V6.06313H3.45143L4.38629 16.186C4.4573 16.955 4.81782 17.6701 5.39702 18.1908C5.97622 18.7114 6.73224 19.0001 7.51657 19H12.4846C13.2685 18.9998 14.0241 18.7112 14.603 18.1908C15.182 17.6704 15.5424 16.9558 15.6137 16.1871L16.5486 6.06313H18V4.37542H14.2C14.0022 3.4225 13.4762 2.56608 12.7108 1.95102C11.9455 1.33596 10.9879 1.00001 10 1ZM14.8274 6.06313H5.17257L6.09371 16.033C6.12595 16.3826 6.2898 16.7077 6.55307 16.9444C6.81635 17.1811 7.16002 17.3123 7.51657 17.3123H12.4846C12.8411 17.3123 13.1848 17.1811 13.4481 16.9444C13.7113 16.7077 13.8752 16.3826 13.9074 16.033L14.8274 6.06313Z"
 							/>
 						</svg>
 					</Button>
@@ -842,7 +808,7 @@ const SortableList = function (props) {
 							focusable="false"
 						>
 							{items && items.length ? (
-								<path d="M9 14h10l-3.45-4.5-2.3 3-1.55-2Zm-1 4q-.825 0-1.412-.587Q6 16.825 6 16V4q0-.825.588-1.413Q7.175 2 8 2h12q.825 0 1.413.587Q22 3.175 22 4v12q0 .825-.587 1.413Q20.825 18 20 18Zm0-2h12V4H8v12Zm-4 6q-.825 0-1.412-.587Q2 20.825 2 20V6h2v14h14v2ZM8 4v12V4Z" />
+								<path d="m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z" />
 							) : (
 								<path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
 							)}
@@ -869,6 +835,10 @@ const SortableList = function (props) {
 						<CheckboxControl
 							title={__('Select All', 'visual-portfolio')}
 							checked={items.length === checkedItems.length}
+							indeterminate={
+								checkedItems.length > 0 &&
+								items.length !== checkedItems.length
+							}
 							onChange={() => {
 								if (items.length === checkedItems.length) {
 									setCheckedItems([]);
@@ -877,6 +847,7 @@ const SortableList = function (props) {
 								}
 								setLastChecked(false);
 							}}
+							__nextHasNoMarginBottom
 						/>
 						<SelectControl
 							title={__('Bulk Actions', 'visual-portfolio')}
@@ -922,6 +893,8 @@ const SortableList = function (props) {
 									setBulkEditOpen(true);
 								}
 							}}
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
 						/>
 					</div>
 					{categories?.length ? (
@@ -952,31 +925,18 @@ const SortableList = function (props) {
 								onChange={(val) => {
 									setFilterCategory(val);
 								}}
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
 							/>
 							<svg
 								width="20"
 								height="20"
 								viewBox="0 0 20 20"
-								fill="none"
 								xmlns="http://www.w3.org/2000/svg"
 							>
 								<path
-									d="M3 6H17"
-									stroke="black"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-								/>
-								<path
-									d="M6 10L14 10"
-									stroke="black"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-								/>
-								<path
-									d="M8 14L12 14"
-									stroke="black"
-									strokeWidth="1.5"
-									strokeLinecap="round"
+									d="M8 16H12V14.5652H8V16ZM4 5V6.43478H16V5H4ZM6 11.2174H14V9.78261H6V11.2174Z"
+									fill="currentColor"
 								/>
 							</svg>
 						</div>
@@ -1147,8 +1107,7 @@ const SortableList = function (props) {
 					{items.length > showingItems ? (
 						<div className="vpf-component-gallery-control-item-pagination-buttons">
 							<Button
-								isSecondary
-								isSmall
+								variant="secondary"
 								onClick={() => {
 									setShowingItems(showingItems + 18);
 								}}
@@ -1157,7 +1116,6 @@ const SortableList = function (props) {
 							</Button>
 							<Button
 								isLink
-								isSmall
 								onClick={() => {
 									setShowingItems(items.length);
 								}}

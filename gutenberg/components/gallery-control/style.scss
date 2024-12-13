@@ -5,7 +5,7 @@
 		position: relative;
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
-		gap: 15px;
+		gap: 10px;
 
 		.vpf-component-gallery-control-item {
 			position: relative;
@@ -24,6 +24,19 @@
 				box-shadow: none !important;
 				transition: 0.2s background-color;
 
+				&::before {
+					content: "";
+					display: block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+					border-radius: 5px;
+					z-index: 1;
+				}
+
 				img {
 					position: absolute;
 					top: 0;
@@ -31,14 +44,30 @@
 					width: 100%;
 					height: 100%;
 					object-fit: cover;
-					border: 1px solid #efefef;
 					border-radius: 5px;
 					transition: 0.2s filter;
 				}
+			}
+		}
 
-				&:hover img,
-				&:focus img {
-					filter: opacity(1) brightness(0.4) grayscale(0);
+		.vpf-component-gallery-control-item-checked {
+			.vpf-component-gallery-control-item-button::before {
+				box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
+				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			}
+
+			&:not(:hover):not(:focus) {
+				.vpf-component-gallery-control-item-toolbar {
+					opacity: 1;
+					background: none;
+					box-shadow: none;
+				}
+				.vpf-component-gallery-control-item-checkbox {
+					opacity: 1;
+
+					~ * {
+						opacity: 0;
+					}
 				}
 			}
 		}
@@ -53,7 +82,9 @@
 		// Bulk actions
 		.vpf-component-gallery-control-item-bulk-actions {
 			display: flex;
+			margin-bottom: 5px;
 			margin-right: auto;
+			align-items: center;
 
 			.components-base-control,
 			.components-base-control__field {
@@ -74,6 +105,8 @@
 
 			select {
 				max-width: 120px;
+				height: 30px;
+				min-height: 30px;
 
 				&:not(:hover, :focus) ~ .components-input-control__backdrop {
 					border-color: transparent;
@@ -118,7 +151,7 @@
 			border-radius: 3px;
 			opacity: 0;
 			transition: 0.2s opacity;
-			z-index: 1;
+			z-index: 2;
 			box-shadow: 0 0 3px rgba(0, 0, 0, 40%);
 
 			> * {
@@ -160,9 +193,6 @@
 			}
 		}
 
-		.vpf-component-gallery-control-item .vpf-component-gallery-control-item-toolbar-checked,
-		.vpf-component-gallery-control-item:hover .vpf-component-gallery-control-item-checkbox,
-		.vpf-component-gallery-control-item:focus .vpf-component-gallery-control-item-checkbox,
 		.vpf-component-gallery-control-item:hover .vpf-component-gallery-control-item-toolbar,
 		.vpf-component-gallery-control-item:focus .vpf-component-gallery-control-item-toolbar {
 			opacity: 1;
@@ -195,8 +225,8 @@
 
 	.vpf-component-gallery-control-item-filter {
 		position: relative;
-		width: 24px;
-		height: 24px;
+		width: 20px;
+		height: 20px;
 		margin-left: auto;
 
 		> .components-base-control {
@@ -209,9 +239,9 @@
 			opacity: 0;
 
 			select {
-				width: 24px;
-				height: 24px;
-				min-height: 24px;
+				width: 20px;
+				height: 20px;
+				min-height: 20px;
 				padding: 0;
 			}
 		}
@@ -238,9 +268,7 @@
 
 		> span {
 			margin-left: 0.5em;
-			font-size: 0.9em;
-			font-weight: 700;
-			text-transform: uppercase;
+			font-weight: 500;
 		}
 	}
 }

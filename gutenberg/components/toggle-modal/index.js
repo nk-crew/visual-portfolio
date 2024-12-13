@@ -25,7 +25,7 @@ export default class ToggleModal extends Component {
 		return (
 			<>
 				<Button
-					isSecondary
+					variant="secondary"
 					onClick={() => this.setState({ isOpened: !isOpened })}
 				>
 					{buttonLabel}
