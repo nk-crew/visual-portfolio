@@ -17,11 +17,13 @@ $tiles_selector_button_padding: 10px !default;
 		aspect-ratio: 1 / 1.25;
 		padding: 0;
 		overflow: hidden;
-		background: #efefef !important;
+		background-color: #efefef;
 	}
 
 	.vpf-tiles-preview-button-active {
 		@extend %vpf-icons-selector-item-active;
+
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.05);
 	}
 
 	[data-tiles-preview] {
