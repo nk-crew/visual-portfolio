@@ -147,7 +147,6 @@ function ItemsCountControl({ data }) {
 								updateNoticeState(postId);
 								setMaybeReRender(maybeReRender + 1);
 							}}
-							isSmall
 							style={{
 								position: 'absolute',
 								marginTop: '-5px',
@@ -173,12 +172,12 @@ function ItemsCountControl({ data }) {
 			}
 			help={renderControlHelp}
 			className={renderControlClassName}
+			__nextHasNoMarginBottom
 		>
 			<div>
 				<ButtonGroup>
 					<Button
-						isSmall
-						isPrimary={controlVal !== -1}
+						variant={controlVal !== -1 ? 'primary' : ''}
 						isPressed={controlVal !== -1}
 						onClick={() => {
 							if (controlVal === -1) {
@@ -189,8 +188,7 @@ function ItemsCountControl({ data }) {
 						{__('Custom Count', 'visual-portfolio')}
 					</Button>
 					<Button
-						isSmall
-						isPrimary={controlVal === -1}
+						variant={controlVal === -1 ? 'primary' : ''}
 						isPressed={controlVal === -1}
 						onClick={() => {
 							if (
@@ -221,6 +219,8 @@ function ItemsCountControl({ data }) {
 						step={data.step}
 						value={controlVal}
 						onChange={(val) => onChange(parseFloat(val))}
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 					/>
 				</>
 			) : null}

@@ -203,6 +203,7 @@ const SelectedImageData = function (props) {
 						onChange={(val) => {
 							onChangeFocalPoint(val);
 						}}
+						__nextHasNoMarginBottom
 					/>
 				) : null}
 				<MediaUpload
@@ -212,7 +213,7 @@ const SelectedImageData = function (props) {
 					}}
 					allowedTypes={ALLOWED_MEDIA_TYPES}
 					render={({ open }) => (
-						<Button onClick={open} isSecondary>
+						<Button onClick={open} variant="secondary">
 							{__('Replace Image', 'visual-portfolio')}
 						</Button>
 					)}
@@ -293,6 +294,8 @@ const SelectedImageData = function (props) {
 									label={__('File URL:', 'visual-portfolio')}
 									value={imageData?.source_url || ''}
 									readOnly
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
 								/>
 								<Button
 									onClick={() => {
@@ -304,8 +307,7 @@ const SelectedImageData = function (props) {
 												setLinkCopied(true);
 											});
 									}}
-									isSecondary
-									isSmall
+									variant="secondary"
 								>
 									{__(
 										'Copy URL to Clipboard',
@@ -433,6 +435,7 @@ const ImageEditModal = function (props) {
 							onChange={(val) => {
 								onChange({ focalPoint: val });
 							}}
+							__nextHasNoMarginBottom
 						/>
 					</div>
 				) : null}
@@ -599,6 +602,7 @@ const SortableItem = function (props) {
 							onChange={(val) => {
 								onCheck(val);
 							}}
+							__nextHasNoMarginBottom
 						/>
 					) : null}
 					<Button
@@ -877,6 +881,7 @@ const SortableList = function (props) {
 								}
 								setLastChecked(false);
 							}}
+							__nextHasNoMarginBottom
 						/>
 						<SelectControl
 							title={__('Bulk Actions', 'visual-portfolio')}
@@ -922,6 +927,8 @@ const SortableList = function (props) {
 									setBulkEditOpen(true);
 								}
 							}}
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
 						/>
 					</div>
 					{categories?.length ? (
@@ -952,6 +959,8 @@ const SortableList = function (props) {
 								onChange={(val) => {
 									setFilterCategory(val);
 								}}
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
 							/>
 							<svg
 								width="20"
@@ -1147,8 +1156,7 @@ const SortableList = function (props) {
 					{items.length > showingItems ? (
 						<div className="vpf-component-gallery-control-item-pagination-buttons">
 							<Button
-								isSecondary
-								isSmall
+								variant="secondary"
 								onClick={() => {
 									setShowingItems(showingItems + 18);
 								}}
@@ -1157,7 +1165,6 @@ const SortableList = function (props) {
 							</Button>
 							<Button
 								isLink
-								isSmall
 								onClick={() => {
 									setShowingItems(items.length);
 								}}

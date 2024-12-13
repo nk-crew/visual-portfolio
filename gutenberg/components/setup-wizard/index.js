@@ -219,6 +219,7 @@ export default function SetupWizard(props) {
 										),
 									});
 								}}
+								__nextHasNoMarginBottom
 							/>
 						</div>
 						<div>
@@ -236,6 +237,7 @@ export default function SetupWizard(props) {
 										),
 									});
 								}}
+								__nextHasNoMarginBottom
 							/>
 						</div>
 						<div>
@@ -250,6 +252,7 @@ export default function SetupWizard(props) {
 												: 'popup_gallery',
 									});
 								}}
+								__nextHasNoMarginBottom
 							/>
 						</div>
 					</div>
@@ -296,7 +299,7 @@ export default function SetupWizard(props) {
 						</div>
 						<div className="vpf-setup-wizard-pagination-button vpf-setup-wizard-pagination-button-end">
 							<Button
-								isPrimary
+								variant="primary"
 								disabled={!allowNextStep}
 								onClick={() => {
 									if (step === 2) {

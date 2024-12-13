@@ -19,7 +19,6 @@ function ShortcodeRender(props) {
 			<div>
 				<pre>{props.content}</pre>
 				<Button
-					isSmall
 					onClick={() => {
 						navigator.clipboard
 							.writeText(props.content)

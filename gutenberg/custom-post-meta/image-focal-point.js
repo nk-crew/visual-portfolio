@@ -55,6 +55,8 @@ class VpImageFocalPointComponent extends Component {
 						max={100}
 						step={1}
 						units={[{ value: '%', label: '%' }]}
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 					/>
 					<UnitControl
 						label={__('Top', 'visual-portfolio')}
@@ -69,6 +71,8 @@ class VpImageFocalPointComponent extends Component {
 						max={100}
 						step={1}
 						units={[{ value: '%', label: '%' }]}
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 					/>
 				</PanelRow>
 			</div>

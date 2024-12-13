@@ -102,6 +102,8 @@ export default class AspectRatio extends Component {
 						label: DEFAULT_RATIOS[ratio],
 						value: ratio,
 					}))}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 				{isCustom ? (
 					<div className="vpf-component-aspect-ratio-custom">
@@ -110,12 +112,16 @@ export default class AspectRatio extends Component {
 							type="number"
 							value={parts[0]}
 							onChange={(val) => this.updatePart(val, true)}
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
 						/>
 						<TextControl
 							label={__('Height', 'visual-portfolio')}
 							type="number"
 							value={parts[1]}
 							onChange={(val) => this.updatePart(val, false)}
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
 						/>
 					</div>
 				) : (

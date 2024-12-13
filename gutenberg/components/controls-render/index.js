@@ -369,6 +369,8 @@ ControlsRender.Control = function (props) {
 						controlName={props.name}
 						options={categoryControlOptions}
 						key={categoryControlOptions}
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 					>
 						{(group) => {
 							return (
@@ -459,8 +461,7 @@ ControlsRender.Control = function (props) {
 				<ButtonGroup>
 					{Object.keys(props.options || {}).map((val) => (
 						<Button
-							isSmall
-							isPrimary={controlVal === val}
+							variant={controlVal === val ? 'primary' : ''}
 							isPressed={controlVal === val}
 							key={val}
 							onClick={() => onChange(val)}
@@ -572,6 +573,7 @@ ControlsRender.Control = function (props) {
 								'vpf-control-wrap',
 								`vpf-control-wrap-${props.type}`
 							)}
+							__nextHasNoMarginBottom
 						>
 							<div>{renderControl}</div>
 						</BaseControl>
@@ -595,6 +597,8 @@ ControlsRender.Control = function (props) {
 					step={props.step}
 					value={parseFloat(controlVal)}
 					onChange={(val) => onChange(parseFloat(val))}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			);
 			break;
@@ -604,6 +608,7 @@ ControlsRender.Control = function (props) {
 					checked={controlVal}
 					label={props.alongside}
 					onChange={(val) => onChange(val)}
+					__nextHasNoMarginBottom
 				/>
 			);
 			break;
@@ -613,6 +618,7 @@ ControlsRender.Control = function (props) {
 					checked={controlVal}
 					label={props.alongside}
 					onChange={(val) => onChange(val)}
+					__nextHasNoMarginBottom
 				/>
 			);
 			break;
@@ -656,6 +662,7 @@ ControlsRender.Control = function (props) {
 					label={renderControlLabel}
 					value={controlVal}
 					onChange={(val) => onChange(val)}
+					__nextHasNoMarginBottom
 				/>
 			);
 			renderControlLabel = false;
@@ -667,6 +674,8 @@ ControlsRender.Control = function (props) {
 					type="url"
 					value={controlVal}
 					onChange={(val) => onChange(val)}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			);
 			renderControlLabel = false;
@@ -681,6 +690,8 @@ ControlsRender.Control = function (props) {
 					step={props.step}
 					value={parseFloat(controlVal)}
 					onChange={(val) => onChange(parseFloat(val))}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			);
 			renderControlLabel = false;
@@ -693,6 +704,8 @@ ControlsRender.Control = function (props) {
 					onChange={(val) => onChange(val)}
 					labelPosition="edge"
 					__unstableInputWidth="70px"
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			);
 			renderControlLabel = false;
@@ -703,6 +716,8 @@ ControlsRender.Control = function (props) {
 					type="hidden"
 					value={controlVal}
 					onChange={(val) => onChange(val)}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			);
 			break;
@@ -754,6 +769,8 @@ ControlsRender.Control = function (props) {
 					label={renderControlLabel}
 					value={controlVal}
 					onChange={(val) => onChange(val)}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			);
 			renderControlLabel = false;
@@ -795,6 +812,7 @@ ControlsRender.Control = function (props) {
 				id={`vpf-control-group-${props.name}`}
 				label={data.renderControlLabel}
 				className={data.renderControlClassName}
+				__nextHasNoMarginBottom
 			>
 				<div ref={$ref}>{data.renderControl}</div>
 				{data.renderControlHelp}
