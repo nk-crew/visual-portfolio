@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.10\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.11\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-13T11:24:24+00:00\n"
+"POT-Creation-Date: 2024-12-15T18:41:58+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: visual-portfolio\n"
@@ -1005,7 +1005,7 @@ msgstr ""
 #: classes/class-admin.php:3093
 #: classes/class-get-portfolio.php:1069
 #: classes/class-shortcode.php:58
-#: gutenberg/components/gallery-control/index.js:944
+#: gutenberg/components/gallery-control/index.js:910
 msgid "All"
 msgstr ""
 
@@ -2217,69 +2217,69 @@ msgstr ""
 msgid "Edit more details"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:600
+#: gutenberg/components/gallery-control/index.js:595
 msgid "Select"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:701
+#: gutenberg/components/gallery-control/index.js:663
 msgid "Image Settings"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:856
+#: gutenberg/components/gallery-control/index.js:818
 msgid "Edit Gallery"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:857
+#: gutenberg/components/gallery-control/index.js:819
 msgid "Add Images"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:874
+#: gutenberg/components/gallery-control/index.js:836
 msgid "Select All"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:887
+#: gutenberg/components/gallery-control/index.js:853
 msgid "Bulk Actions"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:892
+#: gutenberg/components/gallery-control/index.js:858
 msgid "Bulk actions"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:899
+#: gutenberg/components/gallery-control/index.js:865
 msgid "Edit"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:903
+#: gutenberg/components/gallery-control/index.js:869
 msgid "Delete"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:912
+#: gutenberg/components/gallery-control/index.js:878
 msgid "Are you sure you want to remove selected items?"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:937
+#: gutenberg/components/gallery-control/index.js:903
 msgid "Filter by Category"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:948
+#: gutenberg/components/gallery-control/index.js:914
 msgid "Uncategorized"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:997
+#: gutenberg/components/gallery-control/index.js:948
 msgid "Bulk Image Settings"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1144
+#: gutenberg/components/gallery-control/index.js:1095
 msgid "Showing %1$s of %2$s Image"
 msgid_plural "Showing %1$s of %2$s Images"
 msgstr[0] ""
 msgstr[1] ""
 
-#: gutenberg/components/gallery-control/index.js:1164
+#: gutenberg/components/gallery-control/index.js:1115
 msgid "Show More"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1172
+#: gutenberg/components/gallery-control/index.js:1123
 msgid "Show All"
 msgstr ""
 

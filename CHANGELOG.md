@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.3.11 - Dec 15, 2024 =
+
+* added WP 6.7 compatibility
+* fixed id attribute rendering
+* fixed some styles in editor
+* **Pro:**
+* fixed Advanced Click Actions sometimes not properly displaying a Popup
+* fixed title display error in popup caption
+* fixed Instagram integration - you must reconnect to use the Instagram API instead of deprecated Instagram Basic Display API. Learn more: <https://visualportfolio.co/docs/social-feeds/instagram/>
+
 = 3.3.10 - Sep 30, 2024 =
 
 * fixed possible XSS via stored HTML and Fancybox script

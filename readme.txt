@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.7
 * Requires PHP: 7.2
-* Stable tag: 3.3.10
+* Stable tag: 3.3.11
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -324,6 +324,16 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.3.11 - Dec 15, 2024 =
+
+* added WP 6.7 compatibility
+* fixed id attribute rendering
+* fixed some styles in editor
+* **Pro:**
+* fixed Advanced Click Actions sometimes not properly displaying a Popup
+* fixed title display error in popup caption
+* fixed Instagram integration - you must reconnect to use the Instagram API instead of deprecated Instagram Basic Display API. Learn more: <https://visualportfolio.co/docs/social-feeds/instagram/>
 
 = 3.3.10 - Sep 30, 2024 =
 
