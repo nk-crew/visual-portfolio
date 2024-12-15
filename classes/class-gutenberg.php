@@ -178,6 +178,7 @@ class Visual_Portfolio_Gutenberg_Block {
 	public function block_render( $attributes ) {
 		$attributes = array_merge(
 			array(
+				'anchor'    => '',
 				'align'     => '',
 				'className' => '',
 			),
@@ -188,6 +189,7 @@ class Visual_Portfolio_Gutenberg_Block {
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
+				'id'    => $attributes['anchor'],
 				'class' => $class_name,
 			)
 		);
