@@ -29,7 +29,7 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
@@ -41,6 +41,53 @@ const { navigator, VPGutenbergVariables } = window;
 const ALLOWED_MEDIA_TYPES = ['image'];
 const UNCATEGORIZED_VALUE = '------';
 const ITEMS_COUNT_DEFAULT = 18;
+
+function MediaUploadButton({ open, items, isSetupWizard }) {
+	const hasOpenedModal = useRef(false);
+
+	// Automatically open the media modal on the first render
+	useEffect(() => {
+		if (
+			!hasOpenedModal.current &&
+			isSetupWizard &&
+			(!items || !items.length)
+		) {
+			open();
+			hasOpenedModal.current = true; // Ensure it only opens once
+		}
+	}, [isSetupWizard, items, open]);
+
+	return (
+		<Button
+			className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-add"
+			onClick={(event) => {
+				event.stopPropagation();
+				open();
+			}}
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"
+				height="20"
+				width="20"
+				role="img"
+				aria-hidden="true"
+				focusable="false"
+			>
+				{items && items.length ? (
+					<path d="m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z" />
+				) : (
+					<path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
+				)}
+			</svg>
+			<span>
+				{items && items.length
+					? __('Edit Gallery', 'visual-portfolio')
+					: __('Add Images', 'visual-portfolio')}
+			</span>
+		</Button>
+	);
+}
 
 function getHumanFileSize(size) {
 	const i = Math.floor(Math.log(size) / Math.log(1024));
@@ -718,9 +765,6 @@ const SortableList = function (props) {
 		useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
 	);
 
-	// Automatically open images selector when first time select Images in Setup Wizard.
-	const [isOpenedInSetupWizard, setOpenInSetupWizard] =
-		useState(!isSetupWizard);
 	const [showingItems, setShowingItems] = useState(ITEMS_COUNT_DEFAULT);
 	const [filterCategory, setFilterCategory] = useState('');
 	const [checkedItems, setCheckedItems] = useState([]);
@@ -784,43 +828,13 @@ const SortableList = function (props) {
 			}}
 			allowedTypes={ALLOWED_MEDIA_TYPES}
 			value={items && items.length ? items.map((img) => img.id) : false}
-			render={({ open }) => {
-				if (!isOpenedInSetupWizard && (!items || !items.length)) {
-					setOpenInSetupWizard(true);
-					open();
-				}
-
-				return (
-					<Button
-						className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-add"
-						onClick={(event) => {
-							event.stopPropagation();
-							open();
-						}}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							height="20"
-							width="20"
-							role="img"
-							aria-hidden="true"
-							focusable="false"
-						>
-							{items && items.length ? (
-								<path d="m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z" />
-							) : (
-								<path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
-							)}
-						</svg>
-						<span>
-							{items && items.length
-								? __('Edit Gallery', 'visual-portfolio')
-								: __('Add Images', 'visual-portfolio')}
-						</span>
-					</Button>
-				);
-			}}
+			render={({ open }) => (
+				<MediaUploadButton
+					open={open}
+					items={items}
+					isSetupWizard={isSetupWizard}
+				/>
+			)}
 		/>
 	);
 
