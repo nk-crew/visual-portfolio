@@ -49,7 +49,7 @@ class Visual_Portfolio_Admin {
 			add_menu_page(
 				visual_portfolio()->plugin_name,
 				visual_portfolio()->plugin_name,
-				'manage_options',
+				'edit_vp_lists',
 				'visual-portfolio-settings',
 				array( 'Visual_Portfolio_Settings', 'print_settings_page' ),
 				'dashicons-visual-portfolio',
