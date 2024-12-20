@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.11\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.12\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-18T13:09:05+00:00\n"
+"POT-Creation-Date: 2024-12-20T12:32:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: visual-portfolio\n"
@@ -1486,28 +1486,28 @@ msgstr ""
 msgid "Caption Align"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2079
+#: classes/class-get-portfolio.php:2087
 msgid "Default sorting"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2080
+#: classes/class-get-portfolio.php:2088
 msgid "Sort by date (newest)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2081
+#: classes/class-get-portfolio.php:2089
 msgid "Sort by date (oldest)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2082
+#: classes/class-get-portfolio.php:2090
 msgid "Sort by title (A-Z)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2083
+#: classes/class-get-portfolio.php:2091
 msgid "Sort by title (Z-A)"
 msgstr ""
 
 #. translators: %s - published in human format.
-#: classes/class-get-portfolio.php:2209
+#: classes/class-get-portfolio.php:2217
 msgid "%s ago"
 msgstr ""
 

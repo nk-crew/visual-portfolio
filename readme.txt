@@ -1,12 +1,12 @@
 # Visual Portfolio, Photo Gallery & Post Grid #
 
 * Contributors: visualportfolio, nko
-* Tags: portfolio, gallery, photo gallery, image gallery, wordpress gallery plugin
+* Tags: portfolio, gallery, gallery block, image gallery, wordpress gallery plugin
 * Donate link: https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 6.2
 * Tested up to: 6.7
 * Requires PHP: 7.2
-* Stable tag: 3.3.11
+* Stable tag: 3.3.12
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -324,6 +324,12 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.3.12 - Dec 20, 2024 =
+
+* fixed order by Image Title when both Title Source and Description Source is set to None
+* fixed Portfolio Manager role editing Saved Layouts when Project custom post type disabled
+* fixed image selection popup in block editor JS error
 
 = 3.3.11 - Dec 15, 2024 =
 

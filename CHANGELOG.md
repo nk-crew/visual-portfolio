@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.3.12 - Dec 20, 2024 =
+
+* fixed order by Image Title when both Title Source and Description Source is set to None
+* fixed Portfolio Manager role editing Saved Layouts when Project custom post type disabled
+* fixed image selection popup in block editor JS error
+
 = 3.3.11 - Dec 15, 2024 =
 
 * added WP 6.7 compatibility
