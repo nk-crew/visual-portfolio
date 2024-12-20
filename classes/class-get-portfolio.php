@@ -1353,7 +1353,15 @@ class Visual_Portfolio_Get {
 
 				if ( $attachment ) {
 					// get image meta if needed.
-					if ( 'none' !== $options['images_titles_source'] || 'none' !== $options['images_descriptions_source'] ) {
+					if (
+						'none' !== $options['images_titles_source'] ||
+						'none' !== $options['images_descriptions_source'] ||
+
+						'image_title' === $options['images_order_by'] ||
+						'image_caption' === $options['images_order_by'] ||
+						'image_alt' === $options['images_order_by'] ||
+						'image_description' === $options['images_order_by']
+					) {
 						if ( $attachment && 'attachment' === $attachment->post_type ) {
 							$img_meta['title']       = $attachment->post_title;
 							$img_meta['description'] = $attachment->post_content;
