@@ -184,9 +184,11 @@ test.describe('added images to saved layout', () => {
 					}
 				)
 				.click();
-		}
 
-		await page.getByRole('checkbox', { name: 'Display Excerpt' }).check();
+			await page
+				.getByRole('checkbox', { name: 'Display Excerpt' })
+				.check();
+		}
 
 		await page.waitForTimeout(500);
 
