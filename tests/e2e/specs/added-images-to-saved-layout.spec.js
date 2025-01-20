@@ -10,6 +10,12 @@ import imageFixtures from '../../fixtures/images.json';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 
+/**
+ * TODO: The test needs to be redone in the future.
+ * Currently, saved layouts cannot be modified using Gutenberg methods
+ * Because the block on the layout page is hardcoded,
+ * Preventing the addition of other blocks.
+ */
 test.describe('added images to saved layout', () => {
 	test.beforeEach(async ({ requestUtils }) => {
 		const pluginName = process.env.CORE
