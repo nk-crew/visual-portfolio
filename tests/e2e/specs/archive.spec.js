@@ -6,9 +6,11 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 import expectedArchiveCategoryDefault from '../../fixtures/archive/expected-category-default.json';
 import expectedArchiveCategoryPostName from '../../fixtures/archive/expected-category-post-name.json';
 import expectedArchiveDefault from '../../fixtures/archive/expected-default.json';
+import expectedArchiveInfinityDefault from '../../fixtures/archive/expected-infinity-default.json';
 import expectedArchiveLoadMoreDefault from '../../fixtures/archive/expected-load-more-default.json';
 import expectedArchivePostName from '../../fixtures/archive/expected-post-name-permalinks.json';
 import expectedArchivePostNameLoadMore from '../../fixtures/archive/expected-post-name-permalinks-load-more.json';
+import expectedArchivePostNameInfinity from '../../fixtures/archive/expected-post-name-premalinks-infinity.json';
 import portfolioPosts from '../../fixtures/archive/portfolio-posts.json';
 import imageFixtures from '../../fixtures/images.json';
 import { deleteAllPortfolio } from '../utils/delete-all-portfolio';
@@ -85,7 +87,7 @@ test.describe('archive pages', () => {
 		);
 
 		for (const item of await items.all()) {
-			await page.waitForTimeout(700);
+			await page.waitForTimeout(1000);
 			const url = await item
 				.locator('.vp-portfolio__item-img > a')
 				.getAttribute('href');
@@ -319,7 +321,7 @@ test.describe('archive pages', () => {
 			case 'loadMore':
 				await page.getByRole('button', { name: 'Load More' }).click();
 				break;
-			case 'Inf':
+			case 'inf':
 				await page.getByRole('button', { name: 'Infinite' }).click();
 				break;
 		}
@@ -511,27 +513,24 @@ test.describe('archive pages', () => {
 								text: paginationText,
 							});
 						}
-
-						break;
-					case 'Inf':
-						await page
-							.getByRole('button', { name: 'Infinite' })
-							.click();
 						break;
 				}
 			}
 
-			receivedArchive.push({
-				items: archiveItems,
-				pagination: archivePagination,
-			});
+			if (typePagination === 'paged' || typePagination === 'loadMore') {
+				receivedArchive.push({
+					items: archiveItems,
+					pagination: archivePagination,
+				});
+			}
 
 			currentCount++;
 
 			if (
-				await pagination
+				(await pagination
 					.locator('.vp-pagination__item.vp-pagination__item-next')
-					.count()
+					.count()) &&
+				typePagination === 'paged'
 			) {
 				await pagination
 					.locator(
@@ -541,7 +540,10 @@ test.describe('archive pages', () => {
 			}
 
 			if (
-				await pagination.locator('a.vp-pagination__load-more').count()
+				(await pagination
+					.locator('a.vp-pagination__load-more')
+					.count()) &&
+				(typePagination === 'loadMore' || typePagination === 'inf')
 			) {
 				const nextPageAttribute = await pagination
 					.locator('a.vp-pagination__load-more')
@@ -550,6 +552,16 @@ test.describe('archive pages', () => {
 					await pagination
 						.locator('a.vp-pagination__load-more')
 						.click();
+				}
+
+				if (
+					typePagination === 'inf' &&
+					nextPageAttribute === '' &&
+					currentCount === 5
+				) {
+					receivedArchive.push({
+						items: archiveItems,
+					});
 				}
 			}
 		}
@@ -621,6 +633,8 @@ test.describe('archive pages', () => {
 					}
 					break;
 				case 'loadMore':
+				case 'inf':
+					await page.waitForTimeout(500);
 					if (
 						await pagination
 							.locator('a.vp-pagination__load-more')
@@ -1004,6 +1018,157 @@ test.describe('archive pages', () => {
 			page,
 			'loadMore'
 		);
+
+		await page.waitForTimeout(500);
+
+		// check Archive Category filter
+		expect(receivedCategories).toEqual(expectedArchiveCategoryPostName);
+	});
+
+	test('check archive page with infinity pagination and category filter (plain permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await deletePortfolioCategories(admin, page);
+		await deletePortfolioTags(admin, page);
+
+		await createPortfolioPosts(requestUtils, page, admin, editor);
+
+		// Set Permalink Settings.
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByLabel('Plain').check();
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+
+		const { archiveID, archiveUrl } = await createArchivePage(
+			page,
+			admin,
+			editor,
+			'inf'
+		);
+
+		await setArchiveSettings(admin, page);
+
+		// prepare Fixtures.
+		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
+		let fixtureKey = 0;
+		for (const expectedArchiveItem of expectedArchiveInfinityDefault) {
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveItem.items) {
+				expectedArchiveInfinityDefault[fixtureKey].items[itemKey].url =
+					testBaseUrl + expectedItem.url;
+				itemKey++;
+			}
+
+			fixtureKey++;
+		}
+
+		fixtureKey = 0;
+		for (const expectedArchiveCategoryItem of expectedArchiveCategoryDefault) {
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveCategoryItem.items) {
+				expectedArchiveCategoryDefault[fixtureKey].items[itemKey].url =
+					testBaseUrl + expectedItem.url;
+				itemKey++;
+			}
+			const fixtureUrl = testBaseUrl + expectedArchiveCategoryItem.url;
+			expectedArchiveCategoryDefault[fixtureKey].url = fixtureUrl.replace(
+				'/?page_id=000',
+				'/?page_id=' + archiveID
+			);
+
+			fixtureKey++;
+		}
+
+		await page.goto(archiveUrl);
+
+		const receivedArchive = await getReceivedArchive(page, 'inf');
+
+		// check Archive page
+		expect(receivedArchive).toEqual(expectedArchiveInfinityDefault);
+
+		const receivedCategories = await getReceivedCategories(page, 'inf');
+
+		await page.waitForTimeout(500);
+
+		// check Archive Category filter
+		expect(receivedCategories).toEqual(expectedArchiveCategoryDefault);
+
+		/**
+		 * Set Post Name Permalink Settings.
+		 * Without this stupid change, hooks for deleting posts and images stop working.
+		 * This happens due to the fact that the removal methods use a link to access the API.
+		 * For example this type: wp-json/wp/v2/media
+		 * This link will not be available. It stops working if the permalink settings are set to Plain.
+		 * In this case, when calling the method, the request contains a 404 error.
+		 */
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByLabel('Post name').check();
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+	});
+
+	test('check archive page with infinity pagination and category filter (post name permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await deletePortfolioCategories(admin, page);
+		await deletePortfolioTags(admin, page);
+
+		await createPortfolioPosts(requestUtils, page, admin, editor);
+
+		// Set Permalink Settings.
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByLabel('Post name').check();
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+
+		const { archiveUrl } = await createArchivePage(
+			page,
+			admin,
+			editor,
+			'inf'
+		);
+
+		await setArchiveSettings(admin, page);
+
+		// prepare Fixtures.
+		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
+		let fixtureKey = 0;
+		for (const expectedArchiveItem of expectedArchivePostNameInfinity) {
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveItem.items) {
+				expectedArchivePostNameInfinity[fixtureKey].items[itemKey].url =
+					testBaseUrl + expectedItem.url;
+				itemKey++;
+			}
+
+			fixtureKey++;
+		}
+
+		fixtureKey = 0;
+		for (const expectedArchiveCategoryItem of expectedArchiveCategoryPostName) {
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveCategoryItem.items) {
+				expectedArchiveCategoryPostName[fixtureKey].items[itemKey].url =
+					testBaseUrl + expectedItem.url;
+				itemKey++;
+			}
+			expectedArchiveCategoryPostName[fixtureKey].url =
+				testBaseUrl + expectedArchiveCategoryItem.url;
+
+			fixtureKey++;
+		}
+
+		await page.goto(archiveUrl);
+
+		const receivedArchive = await getReceivedArchive(page, 'inf');
+
+		// check Archive page
+		expect(receivedArchive).toEqual(expectedArchivePostNameInfinity);
+
+		const receivedCategories = await getReceivedCategories(page, 'inf');
 
 		await page.waitForTimeout(500);
 
