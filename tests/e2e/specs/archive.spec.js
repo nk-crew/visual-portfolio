@@ -6,7 +6,9 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 import expectedArchiveCategoryDefault from '../../fixtures/archive/expected-category-default.json';
 import expectedArchiveCategoryPostName from '../../fixtures/archive/expected-category-post-name.json';
 import expectedArchiveDefault from '../../fixtures/archive/expected-default.json';
+import expectedArchiveLoadMoreDefault from '../../fixtures/archive/expected-load-more-default.json';
 import expectedArchivePostName from '../../fixtures/archive/expected-post-name-permalinks.json';
+import expectedArchivePostNameLoadMore from '../../fixtures/archive/expected-post-name-permalinks-load-more.json';
 import portfolioPosts from '../../fixtures/archive/portfolio-posts.json';
 import imageFixtures from '../../fixtures/images.json';
 import { deleteAllPortfolio } from '../utils/delete-all-portfolio';
@@ -274,12 +276,18 @@ test.describe('archive pages', () => {
 	 * We select the number of elements displayed on the page, skin and pagination display.
 	 * Setting the display of the category filter.
 	 *
-	 * @param {Page}   page   Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
-	 * @param {Admin}  admin  End to end test utilities for WordPress admin’s user interface.
-	 * @param {Editor} editor End to end test utilities for the WordPress Block Editor.
+	 * @param {Page}   page           Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Admin}  admin          End to end test utilities for WordPress admin’s user interface.
+	 * @param {Editor} editor         End to end test utilities for the WordPress Block Editor.
+	 * @param {string} typePagination Type of Pagination.
 	 * @return {{archiveID: number, archiveUrl: string}} Return object with archive page ID and archive URL.
 	 */
-	async function createArchivePage(page, admin, editor) {
+	async function createArchivePage(
+		page,
+		admin,
+		editor,
+		typePagination = 'paged'
+	) {
 		await admin.createNewPost({
 			title: 'Portfolio',
 			postType: 'page',
@@ -303,7 +311,19 @@ test.describe('archive pages', () => {
 		await page.getByRole('button', { name: 'Current Query' }).click();
 		await page.getByRole('button', { name: 'Layout' }).click();
 		await page.getByRole('button', { name: 'Pagination' }).click();
-		await page.getByRole('button', { name: 'Paged' }).click();
+
+		switch (typePagination) {
+			case 'paged':
+				await page.getByRole('button', { name: 'Paged' }).click();
+				break;
+			case 'loadMore':
+				await page.getByRole('button', { name: 'Load More' }).click();
+				break;
+			case 'Inf':
+				await page.getByRole('button', { name: 'Infinite' }).click();
+				break;
+		}
+
 		await page.getByLabel('Close', { exact: true }).click();
 		await page.getByRole('button', { name: 'Skin' }).click();
 		await page.getByRole('button', { name: 'Caption' }).click();
@@ -366,7 +386,8 @@ test.describe('archive pages', () => {
 	 * During the survey process, we also collect information about the current state of pagination,
 	 * Understanding what page we are on and what elements surround us.
 	 *
-	 * @param {Page} page Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Page}   page           Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {string} typePagination Type of Pagination.
 	 * @return {
 	 * {
 	 * 	items:
@@ -395,7 +416,7 @@ test.describe('archive pages', () => {
 	 * }
 	 * []}
 	 */
-	async function getReceivedArchive(page) {
+	async function getReceivedArchive(page, typePagination = 'paged') {
 		const pageCounts = 5;
 		const receivedArchive = [];
 		let currentCount = 0;
@@ -420,50 +441,83 @@ test.describe('archive pages', () => {
 			for (const paginationItem of await paginationItems.all()) {
 				const classes = await paginationItem.getAttribute('class');
 
-				if (
-					classes === 'vp-pagination__item vp-pagination__item-active'
-				) {
-					const activeElement = await paginationItem.innerText();
-					archivePagination.push({
-						text: activeElement,
-						active: true,
-					});
-				}
+				switch (typePagination) {
+					case 'paged':
+						if (
+							classes ===
+							'vp-pagination__item vp-pagination__item-active'
+						) {
+							const activeElement =
+								await paginationItem.innerText();
+							archivePagination.push({
+								text: activeElement,
+								active: true,
+							});
+						}
 
-				if (classes === 'vp-pagination__item') {
-					const paginationLink = await paginationItem
-						.locator('a')
-						.getAttribute('href');
-					const paginationText = await paginationItem
-						.locator('a')
-						.innerText();
-					archivePagination.push({
-						url: paginationLink,
-						text: paginationText,
-						standard: true,
-					});
-				}
+						if (classes === 'vp-pagination__item') {
+							const paginationLink = await paginationItem
+								.locator('a')
+								.getAttribute('href');
+							const paginationText = await paginationItem
+								.locator('a')
+								.innerText();
+							archivePagination.push({
+								url: paginationLink,
+								text: paginationText,
+								standard: true,
+							});
+						}
 
-				if (
-					classes === 'vp-pagination__item vp-pagination__item-dots'
-				) {
-					const dotsText = await paginationItem.innerText();
-					archivePagination.push({
-						text: dotsText,
-						dots: true,
-					});
-				}
+						if (
+							classes ===
+							'vp-pagination__item vp-pagination__item-dots'
+						) {
+							const dotsText = await paginationItem.innerText();
+							archivePagination.push({
+								text: dotsText,
+								dots: true,
+							});
+						}
 
-				if (
-					classes === 'vp-pagination__item vp-pagination__item-next'
-				) {
-					const nextPaginationLink = await paginationItem
-						.locator('a')
-						.getAttribute('href');
-					archivePagination.push({
-						url: nextPaginationLink,
-						nextPage: true,
-					});
+						if (
+							classes ===
+							'vp-pagination__item vp-pagination__item-next'
+						) {
+							const nextPaginationLink = await paginationItem
+								.locator('a')
+								.getAttribute('href');
+							archivePagination.push({
+								url: nextPaginationLink,
+								nextPage: true,
+							});
+						}
+						break;
+					case 'loadMore':
+						if (
+							classes === 'vp-pagination__item' &&
+							(await pagination
+								.locator('.vp-pagination__no-more')
+								.count()) === 0
+						) {
+							const paginationLink = await paginationItem
+								.locator('a')
+								.getAttribute('href');
+							const paginationText = await paginationItem
+								.locator('a')
+								.innerText();
+							archivePagination.push({
+								url: paginationLink,
+								text: paginationText,
+							});
+						}
+
+						break;
+					case 'Inf':
+						await page
+							.getByRole('button', { name: 'Infinite' })
+							.click();
+						break;
 				}
 			}
 
@@ -485,6 +539,19 @@ test.describe('archive pages', () => {
 					)
 					.click();
 			}
+
+			if (
+				await pagination.locator('a.vp-pagination__load-more').count()
+			) {
+				const nextPageAttribute = await pagination
+					.locator('a.vp-pagination__load-more')
+					.getAttribute('href');
+				if (nextPageAttribute !== '') {
+					await pagination
+						.locator('a.vp-pagination__load-more')
+						.click();
+				}
+			}
 		}
 
 		return receivedArchive;
@@ -496,10 +563,11 @@ test.describe('archive pages', () => {
 	 * During the survey process, we also collect information about the current state of pagination,
 	 * Understanding what page we are on and what elements surround us.
 	 *
-	 * @param {Page} page Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Page}   page           Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {string} typePagination Type of Pagination.
 	 * @return {{title: any, url: any, items: never[]}[]}
 	 */
-	async function getReceivedCategories(page) {
+	async function getReceivedCategories(page, typePagination = 'paged') {
 		const filterItems = await page
 			.locator('.vp-filter .vp-filter__item')
 			.filter({ hasNotText: 'All' });
@@ -525,22 +593,52 @@ test.describe('archive pages', () => {
 
 			await page.waitForTimeout(700);
 
-			let archiveItems = await getArchiveItems(page);
-
 			const pagination = page.locator(
 				'.vp-portfolio__layout-elements .vp-pagination'
 			);
 
-			if (archiveItems.length === 2 && (await pagination.count())) {
-				await pagination
-					.locator(
-						'.vp-pagination__item.vp-pagination__item-next > a'
-					)
-					.click();
+			let archiveItems;
 
-				await page.waitForTimeout(500);
+			switch (typePagination) {
+				case 'paged':
+					archiveItems = await getArchiveItems(page);
 
-				archiveItems = archiveItems.concat(await getArchiveItems(page));
+					if (
+						archiveItems.length === 2 &&
+						(await pagination.count())
+					) {
+						await pagination
+							.locator(
+								'.vp-pagination__item.vp-pagination__item-next > a'
+							)
+							.click();
+
+						await page.waitForTimeout(500);
+
+						archiveItems = archiveItems.concat(
+							await getArchiveItems(page)
+						);
+					}
+					break;
+				case 'loadMore':
+					if (
+						await pagination
+							.locator('a.vp-pagination__load-more')
+							.count()
+					) {
+						const nextPageAttribute = await pagination
+							.locator('a.vp-pagination__load-more')
+							.getAttribute('href');
+						if (nextPageAttribute !== '') {
+							await pagination
+								.locator('a.vp-pagination__load-more')
+								.click();
+							await page.waitForTimeout(500);
+						}
+					}
+
+					archiveItems = await getArchiveItems(page);
+					break;
 			}
 
 			receivedCategories[categoryKey].items = archiveItems;
@@ -716,6 +814,196 @@ test.describe('archive pages', () => {
 		expect(receivedArchive).toEqual(expectedArchivePostName);
 
 		const receivedCategories = await getReceivedCategories(page);
+
+		await page.waitForTimeout(500);
+
+		// check Archive Category filter
+		expect(receivedCategories).toEqual(expectedArchiveCategoryPostName);
+	});
+
+	test('check archive page with load more pagination and category filter (plain permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await deletePortfolioCategories(admin, page);
+		await deletePortfolioTags(admin, page);
+
+		await createPortfolioPosts(requestUtils, page, admin, editor);
+
+		// Set Permalink Settings.
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByLabel('Plain').check();
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+
+		const { archiveID, archiveUrl } = await createArchivePage(
+			page,
+			admin,
+			editor,
+			'loadMore'
+		);
+
+		await setArchiveSettings(admin, page);
+
+		// prepare Fixtures.
+		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
+		let fixtureKey = 0;
+		for (const expectedArchiveItem of expectedArchiveLoadMoreDefault) {
+			let paginationKey = 0;
+			for (const expectedPaginationItem of expectedArchiveItem.pagination) {
+				if (
+					typeof expectedPaginationItem.url !== 'undefined' &&
+					expectedPaginationItem.url !== ''
+				) {
+					const fixtureUrl = testBaseUrl + expectedPaginationItem.url;
+
+					expectedArchiveLoadMoreDefault[fixtureKey].pagination[
+						paginationKey
+					].url = fixtureUrl.replace(
+						'/?page_id=0000',
+						'/?page_id=' + archiveID
+					);
+				}
+				paginationKey++;
+			}
+
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveItem.items) {
+				expectedArchiveLoadMoreDefault[fixtureKey].items[itemKey].url =
+					testBaseUrl + expectedItem.url;
+				itemKey++;
+			}
+
+			fixtureKey++;
+		}
+
+		fixtureKey = 0;
+		for (const expectedArchiveCategoryItem of expectedArchiveCategoryDefault) {
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveCategoryItem.items) {
+				expectedArchiveCategoryDefault[fixtureKey].items[itemKey].url =
+					testBaseUrl + expectedItem.url;
+				itemKey++;
+			}
+			const fixtureUrl = testBaseUrl + expectedArchiveCategoryItem.url;
+			expectedArchiveCategoryDefault[fixtureKey].url = fixtureUrl.replace(
+				'/?page_id=000',
+				'/?page_id=' + archiveID
+			);
+
+			fixtureKey++;
+		}
+
+		await page.goto(archiveUrl);
+
+		const receivedArchive = await getReceivedArchive(page, 'loadMore');
+
+		// check Archive page
+		expect(receivedArchive).toEqual(expectedArchiveLoadMoreDefault);
+
+		const receivedCategories = await getReceivedCategories(
+			page,
+			'loadMore'
+		);
+
+		await page.waitForTimeout(500);
+
+		// check Archive Category filter
+		expect(receivedCategories).toEqual(expectedArchiveCategoryDefault);
+
+		/**
+		 * Set Post Name Permalink Settings.
+		 * Without this stupid change, hooks for deleting posts and images stop working.
+		 * This happens due to the fact that the removal methods use a link to access the API.
+		 * For example this type: wp-json/wp/v2/media
+		 * This link will not be available. It stops working if the permalink settings are set to Plain.
+		 * In this case, when calling the method, the request contains a 404 error.
+		 */
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByLabel('Post name').check();
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+	});
+
+	test('check archive page with load more pagination and category filter (post name permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await deletePortfolioCategories(admin, page);
+		await deletePortfolioTags(admin, page);
+
+		await createPortfolioPosts(requestUtils, page, admin, editor);
+
+		// Set Permalink Settings.
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByLabel('Post name').check();
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+
+		const { archiveUrl } = await createArchivePage(
+			page,
+			admin,
+			editor,
+			'loadMore'
+		);
+
+		await setArchiveSettings(admin, page);
+
+		// prepare Fixtures.
+		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
+		let fixtureKey = 0;
+		for (const expectedArchiveItem of expectedArchivePostNameLoadMore) {
+			let paginationKey = 0;
+			for (const expectedPaginationItem of expectedArchiveItem.pagination) {
+				if (
+					typeof expectedPaginationItem.url !== 'undefined' &&
+					expectedPaginationItem.url !== ''
+				) {
+					const fixtureUrl = testBaseUrl + expectedPaginationItem.url;
+
+					expectedArchivePostNameLoadMore[fixtureKey].pagination[
+						paginationKey
+					].url = fixtureUrl;
+				}
+				paginationKey++;
+			}
+
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveItem.items) {
+				expectedArchivePostNameLoadMore[fixtureKey].items[itemKey].url =
+					testBaseUrl + expectedItem.url;
+				itemKey++;
+			}
+
+			fixtureKey++;
+		}
+
+		fixtureKey = 0;
+		for (const expectedArchiveCategoryItem of expectedArchiveCategoryPostName) {
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveCategoryItem.items) {
+				expectedArchiveCategoryPostName[fixtureKey].items[itemKey].url =
+					testBaseUrl + expectedItem.url;
+				itemKey++;
+			}
+			expectedArchiveCategoryPostName[fixtureKey].url =
+				testBaseUrl + expectedArchiveCategoryItem.url;
+
+			fixtureKey++;
+		}
+
+		await page.goto(archiveUrl);
+
+		const receivedArchive = await getReceivedArchive(page, 'loadMore');
+
+		// check Archive page
+		expect(receivedArchive).toEqual(expectedArchivePostNameLoadMore);
+
+		const receivedCategories = await getReceivedCategories(
+			page,
+			'loadMore'
+		);
 
 		await page.waitForTimeout(500);
 
