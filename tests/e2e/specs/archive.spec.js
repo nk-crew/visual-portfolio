@@ -38,11 +38,11 @@ test.describe('archive pages', () => {
 	});
 
 	test.afterAll(async ({ requestUtils }) => {
+		await deleteAllPortfolioTaxonomies(requestUtils);
+		await deleteAllPortfolio({ requestUtils });
 		await requestUtils.deleteAllMedia();
 		await requestUtils.deleteAllPages();
 		await requestUtils.deleteAllPosts();
-		await deleteAllPortfolioTaxonomies(requestUtils);
-		await deleteAllPortfolio({ requestUtils });
 	});
 
 	/**
@@ -57,7 +57,6 @@ test.describe('archive pages', () => {
 			// Get all terms for the specified taxonomy
 			const terms = await requestUtils.rest({
 				path: `/wp/v2/${taxonomy}?context=view`,
-				method: 'POST',
 				params: { per_page: 100 }, // Adjust as necessary for your needs
 			});
 
