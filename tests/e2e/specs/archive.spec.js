@@ -23,7 +23,9 @@ import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 
 test.describe('archive pages', () => {
-	test.beforeEach(async ({ requestUtils }) => {
+	test.beforeEach(async ({ admin, page, requestUtils }) => {
+		await setPermalinkSettings(admin, page, 'Post name');
+		await page.waitForTimeout(1500);
 		const pluginName = process.env.CORE
 			? 'visual-portfolio-pro'
 			: 'visual-portfolio-posts-amp-image-gallery';
