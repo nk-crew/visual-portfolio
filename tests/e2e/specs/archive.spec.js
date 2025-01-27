@@ -771,8 +771,10 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
+		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
 		await setPermalinkSettings(admin, page, 'Plain');
+		await page.waitForTimeout(1500);
 
 		const { archiveID, archiveUrl } = await createArchivePage(
 			page,
@@ -809,7 +811,9 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
+		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+		await page.waitForTimeout(1500);
 
 		const { archiveUrl } = await createArchivePage(page, admin, editor);
 		await setArchiveSettings(admin, page);
@@ -840,7 +844,9 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
+		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+		await page.waitForTimeout(1500);
 		await setPermalinkSettings(admin, page, 'Plain');
 
 		const { archiveID, archiveUrl } = await createArchivePage(
@@ -888,7 +894,9 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
+		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+		await page.waitForTimeout(1500);
 
 		const { archiveUrl } = await createArchivePage(
 			page,
@@ -933,7 +941,9 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
+		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+		await page.waitForTimeout(1500);
 		await setPermalinkSettings(admin, page, 'Plain');
 
 		const { archiveID, archiveUrl } = await createArchivePage(
@@ -978,7 +988,9 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
+		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+		await page.waitForTimeout(1500);
 
 		const { archiveUrl } = await createArchivePage(
 			page,
