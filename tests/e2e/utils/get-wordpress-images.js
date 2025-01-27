@@ -63,6 +63,22 @@ export async function getWordpressImages({
 			? 'core-plugin/tests/fixtures/'
 			: 'tests/fixtures/';
 
+	async function uploadMediaWithRetry(filepath, retries = 5) {
+		for (let attempt = 1; attempt <= retries; attempt++) {
+			try {
+				return await requestUtils.uploadMedia(filepath);
+			} catch (error) {
+				if (attempt === retries) {
+					throw error; // Re-throw the error if all attempts fail
+				}
+				// Wait before retrying
+				await new Promise((resolve) =>
+					setTimeout(resolve, 1000 * attempt)
+				);
+			}
+		}
+	}
+
 	async function fetchMediaList() {
 		return await requestUtils.rest({
 			path: '/wp/v2/media',
@@ -93,7 +109,7 @@ export async function getWordpressImages({
 
 			// If the image doesn't exist, upload it
 			if (!media) {
-				media = await requestUtils.uploadMedia(filepath);
+				media = await uploadMediaWithRetry(filepath);
 			}
 
 			const periodIndex = object.filename.indexOf('.');
