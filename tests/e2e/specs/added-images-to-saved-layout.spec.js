@@ -104,7 +104,8 @@ test.describe('added images to saved layout', () => {
 
 				const foundFixture = await findAsyncSequential(
 					imageFixtures,
-					async (x) => x.description === foundImage.description
+					async (x) =>
+						x.description === (await foundImage.description)
 				);
 
 				if (typeof (await foundFixture) !== 'undefined') {
