@@ -56,8 +56,8 @@ test.describe('archive pages', () => {
 		try {
 			// Get all terms for the specified taxonomy
 			const terms = await requestUtils.rest({
-				path: `/wp/v2/${taxonomy}`,
-				method: 'GET',
+				path: `/wp/v2/${taxonomy}?context=view`,
+				method: 'POST',
 				params: { per_page: 100 }, // Adjust as necessary for your needs
 			});
 
