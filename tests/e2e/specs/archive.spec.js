@@ -60,16 +60,30 @@ test.describe('archive pages', () => {
 				params: { per_page: 100 }, // Adjust as necessary for your needs
 			});
 
+			// Check if the response is an error
+			if (!Array.isArray(terms)) {
+				throw new Error(
+					`Failed to retrieve terms for taxonomy "${taxonomy}". Response: ${JSON.stringify(terms)}`
+				);
+			}
+
 			// Iterate over each term and delete it
-			for (const term of terms) {
-				await requestUtils.rest({
-					path: `/wp/v2/${taxonomy}/${term.id}`,
-					method: 'DELETE',
-					params: { force: true }, // Force delete to bypass trash
-				});
+			for (const term of await terms) {
+				try {
+					await requestUtils.rest({
+						path: `/wp/v2/${taxonomy}/${term.id}`,
+						method: 'DELETE',
+						params: { force: true }, // Force delete to bypass trash
+					});
+				} catch (deleteError) {
+					console.log(
+						`Error deleting term with ID ${term.id}:`,
+						deleteError
+					);
+				}
 			}
 		} catch (error) {
-			console.error(`Error deleting ${taxonomy} terms:`, error);
+			console.log(`Error deleting ${taxonomy} terms:`, error);
 		}
 	}
 
@@ -582,36 +596,59 @@ test.describe('archive pages', () => {
 					? '/wp/v2/portfolio_category'
 					: '/wp/v2/portfolio_tag';
 
-			// Fetch existing terms
-			const existingTerms = await requestUtils.rest({
-				path: endpoint + '?context=view',
-				params: { per_page: 100 },
-			});
-
-			// Check if the term already exists
-			let term = existingTerms.find(
-				(t) => t.name.toLowerCase() === name.toLowerCase()
-			);
-			if (term) {
-				console.log(
-					`Term "${name}" already exists with ID: ${term.id}`
-				);
-				return term.id; // Return the existing term ID
-			}
-
-			// If the term doesn't exist, create it
 			try {
-				term = await requestUtils.rest({
-					path: endpoint,
-					method: 'POST',
-					data: { name },
+				// Fetch existing terms
+				const existingTerms = await requestUtils.rest({
+					path: `${endpoint}?context=view`,
+					params: { per_page: 100 },
 				});
-				console.log(
-					`Term "${name}" created successfully with ID: ${term.id}`
+
+				// Ensure existingTerms is an array before proceeding
+				if (!Array.isArray(existingTerms)) {
+					throw new Error(
+						`Failed to retrieve terms for taxonomy "${type}". Response: ${JSON.stringify(existingTerms)}`
+					);
+				}
+
+				// Check if the term already exists
+				let term = existingTerms.find(
+					(t) => t.name.toLowerCase() === name.toLowerCase()
 				);
-				return term.id;
+				if (term) {
+					console.log(
+						`Term "${name}" already exists with ID: ${term.id}`
+					);
+					return term.id; // Return the existing term ID
+				}
+
+				// If the term doesn't exist, create it
+				try {
+					term = await requestUtils.rest({
+						path: endpoint,
+						method: 'POST',
+						data: { name },
+					});
+
+					// Check if the term creation was successful
+					if (term && term.id) {
+						console.log(
+							`Term "${name}" created successfully with ID: ${term.id}`
+						);
+						return term.id;
+					}
+
+					throw new Error(
+						`Unexpected response while creating term "${name}": ${JSON.stringify(term)}`
+					);
+				} catch (error) {
+					console.error(`Failed to create ${type} "${name}":`, error);
+					return null;
+				}
 			} catch (error) {
-				console.error(`Failed to create ${type} "${name}":`, error);
+				console.error(
+					`Error retrieving or creating term "${name}":`,
+					error
+				);
 				return null;
 			}
 		}
