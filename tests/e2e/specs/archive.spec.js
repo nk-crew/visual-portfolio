@@ -617,13 +617,32 @@ test.describe('archive pages', () => {
 					: '/wp/v2/portfolio_tag';
 
 			try {
-				// Fetch existing terms with retry
-				const existingTerms = await retryRequest(() =>
+				const RestLogs = await retryRequest(() =>
 					requestUtils.rest({
-						path: `${endpoint}?context=view`,
-						params: { per_page: 100 },
+						path: '/wp/v2',
 					})
 				);
+
+				console.log('Rest Logs: ');
+				console.log(RestLogs);
+				// Fetch existing terms with retry
+				let existingTerms;
+
+				if (type === 'portfolio_category') {
+					existingTerms = await retryRequest(() =>
+						requestUtils.rest({
+							path: '/wp/v2/portfolio_category?context=view',
+							params: { per_page: 100 },
+						})
+					);
+				} else {
+					existingTerms = await retryRequest(() =>
+						requestUtils.rest({
+							path: '/wp/v2/portfolio_tag?context=view',
+							params: { per_page: 100 },
+						})
+					);
+				}
 
 				// Ensure existingTerms is an array before proceeding
 				if (!Array.isArray(existingTerms)) {
