@@ -580,14 +580,34 @@ test.describe('archive pages', () => {
 		editor,
 		requestUtils
 	) {
+		// Retry mechanism for REST API calls in case of an error.
+		async function retryRequest(fn, retries = 3, delay = 1000) {
+			for (let attempt = 1; attempt <= retries; attempt++) {
+				try {
+					return await fn();
+				} catch (error) {
+					if (attempt === retries) {
+						throw error; // If it's the last attempt, rethrow the error
+					}
+					console.warn(
+						`Attempt ${attempt} failed. Retrying in ${delay}ms...`,
+						error
+					);
+					await new Promise((resolve) => setTimeout(resolve, delay)); // Wait before retrying
+				}
+			}
+		}
+
 		// Retrieve existing posts, categories, and tags
-		const existingPosts = await requestUtils.rest({
-			path: '/wp/v2/portfolio',
-			params: {
-				per_page: 100,
-				status: 'publish,future,draft,pending,private,trash',
-			},
-		});
+		const existingPosts = await retryRequest(() =>
+			requestUtils.rest({
+				path: '/wp/v2/portfolio',
+				params: {
+					per_page: 100,
+					status: 'publish,future,draft,pending,private,trash',
+				},
+			})
+		);
 
 		// eslint-disable-next-line no-shadow
 		async function getOrCreateTerm(name, type) {
@@ -597,11 +617,13 @@ test.describe('archive pages', () => {
 					: '/wp/v2/portfolio_tag';
 
 			try {
-				// Fetch existing terms
-				const existingTerms = await requestUtils.rest({
-					path: `${endpoint}?context=view`,
-					params: { per_page: 100 },
-				});
+				// Fetch existing terms with retry
+				const existingTerms = await retryRequest(() =>
+					requestUtils.rest({
+						path: `${endpoint}?context=view`,
+						params: { per_page: 100 },
+					})
+				);
 
 				// Ensure existingTerms is an array before proceeding
 				if (!Array.isArray(existingTerms)) {
@@ -623,11 +645,14 @@ test.describe('archive pages', () => {
 
 				// If the term doesn't exist, create it
 				try {
-					term = await requestUtils.rest({
-						path: endpoint,
-						method: 'POST',
-						data: { name },
-					});
+					// Fetch existing terms with retry
+					term = await retryRequest(() =>
+						requestUtils.rest({
+							path: endpoint,
+							method: 'POST',
+							data: { name },
+						})
+					);
 
 					// Check if the term creation was successful
 					if (term && term.id) {
@@ -711,11 +736,13 @@ test.describe('archive pages', () => {
 
 				// Create the post in WordPress
 				try {
-					await requestUtils.rest({
-						path: '/wp/v2/portfolio',
-						method: 'POST',
-						data: newPostData,
-					});
+					await retryRequest(() =>
+						requestUtils.rest({
+							path: '/wp/v2/portfolio',
+							method: 'POST',
+							data: newPostData,
+						})
+					);
 					console.log(`Post "${post.title}" created successfully.`);
 				} catch (error) {
 					console.error(
