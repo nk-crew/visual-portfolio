@@ -22,6 +22,8 @@ import { deleteAllPortfolio } from '../utils/delete-all-portfolio';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 
+const logsEnabled = process.env.LOGS || false;
+
 test.describe('archive pages', () => {
 	test.beforeEach(async ({ admin, page, requestUtils }) => {
 		await setPermalinkSettings(admin, page, 'Post name');
@@ -56,8 +58,14 @@ test.describe('archive pages', () => {
 		try {
 			// Get all terms for the specified taxonomy
 			const terms = await requestUtils.rest({
-				path: `/wp/v2/${taxonomy}?context=view`,
-				params: { per_page: 100 }, // Adjust as necessary for your needs
+				path: `/wp/v2/${taxonomy}`,
+				method: 'GET',
+				params: {
+					// Adjust as necessary for your needs
+					per_page: 100,
+					context: 'view',
+					hide_empty: false,
+				},
 			});
 
 			// Check if the response is an error
@@ -641,9 +649,11 @@ test.describe('archive pages', () => {
 					(t) => t.name.toLowerCase() === name.toLowerCase()
 				);
 				if (term) {
-					console.log(
-						`Term "${name}" already exists with ID: ${term.id}`
-					);
+					if (logsEnabled) {
+						console.log(
+							`Term "${name}" already exists with ID: ${term.id}`
+						);
+					}
 					return term.id; // Return the existing term ID
 				}
 
@@ -757,7 +767,7 @@ test.describe('archive pages', () => {
 
 				// Increment the date for the next post
 				currentDate.setMinutes(currentDate.getMinutes() + 1);
-			} else {
+			} else if (logsEnabled) {
 				console.log(`Post "${post.title}" already exists.`);
 			}
 		}
