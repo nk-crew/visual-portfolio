@@ -27,7 +27,6 @@ const logsEnabled = process.env.LOGS || false;
 test.describe('archive pages', () => {
 	test.beforeEach(async ({ admin, page, requestUtils }) => {
 		await setPermalinkSettings(admin, page, 'Post name');
-		await page.waitForTimeout(1500);
 		const pluginName = process.env.CORE
 			? 'visual-portfolio-pro'
 			: 'visual-portfolio-posts-amp-image-gallery';
@@ -35,16 +34,20 @@ test.describe('archive pages', () => {
 	});
 
 	test.afterEach(async ({ requestUtils }) => {
-		await requestUtils.deleteAllPages();
-		await requestUtils.deleteAllPosts();
+		await Promise.all([
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllPosts(),
+		]);
 	});
 
 	test.afterAll(async ({ requestUtils }) => {
-		await deleteAllPortfolioTaxonomies(requestUtils);
-		await deleteAllPortfolio({ requestUtils });
-		await requestUtils.deleteAllMedia();
-		await requestUtils.deleteAllPages();
-		await requestUtils.deleteAllPosts();
+		await Promise.all([
+			deleteAllPortfolioTaxonomies(requestUtils),
+			deleteAllPortfolio({ requestUtils }),
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllPosts(),
+		]);
 	});
 
 	/**
@@ -114,51 +117,91 @@ test.describe('archive pages', () => {
 	async function getArchiveItems(page) {
 		const archiveItems = [];
 		const items = await page.locator(
-			'.vp-portfolio__items article.vp-portfolio__item-wrap'
+			'.vp-portfolio__ready .vp-portfolio__items article.vp-portfolio__item-wrap'
 		);
 
-		for (const item of await items.all()) {
-			const url = await item
-				.locator('.vp-portfolio__item-img > a[href]')
-				.getAttribute('href');
-			const categoriesWrapper = await item.locator(
-				'.vp-portfolio__item-meta .vp-portfolio__item-meta-categories > .vp-portfolio__item-meta-category'
-			);
+		// Log the count of items found
+		const itemCount = await items.count();
+		console.log(`Found ${itemCount} items on the page`);
 
-			if (await categoriesWrapper.count()) {
-				const categories = [];
-				for (const categoryWrap of await categoriesWrapper.all()) {
-					const category = await categoryWrap
-						.locator('a')
-						.innerText();
-					const categoryUrl = await categoryWrap
-						.locator('a')
-						.getAttribute('href');
-					categories.push({
-						category,
-						categoryUrl,
-					});
+		for (let i = 0; i < itemCount; i++) {
+			try {
+				const item = await items.nth(i);
+
+				// Check if the element exists before waiting for visibility
+				const imgExists = await item
+					.locator('.vp-portfolio__item-img')
+					.count();
+				if (imgExists === 0) {
+					console.log(`Image not found for item ${i + 1}`);
+					continue;
 				}
+
+				// Wait for the image to be visible
+				await item
+					.locator('.vp-portfolio__item-img')
+					.waitFor({ state: 'visible', timeout: 15000 });
+
+				const url = await item
+					.locator('.vp-portfolio__item-img > a[href]')
+					.getAttribute('href');
+
+				const categoriesWrapper = await item.locator(
+					'.vp-portfolio__item-meta .vp-portfolio__item-meta-categories > .vp-portfolio__item-meta-category'
+				);
+
+				const categories = [];
+				if (await categoriesWrapper.count()) {
+					for (const categoryWrap of await categoriesWrapper.all()) {
+						const category = await categoryWrap
+							.locator('a')
+							.innerText();
+						const categoryUrl = await categoryWrap
+							.locator('a')
+							.getAttribute('href');
+						categories.push({
+							category,
+							categoryUrl,
+						});
+					}
+				}
+
+				const title = await item
+					.locator('.vp-portfolio__item-meta-title > a')
+					.innerText();
+
+				// Check if the description element exists and is visible
+				const descriptionLocator = item.locator(
+					'.vp-portfolio__item-meta-excerpt > div'
+				);
+				const descriptionExists = await descriptionLocator.count();
+				let description = '';
+				if (descriptionExists > 0) {
+					try {
+						// Attempt to get the description text
+						description = await descriptionLocator.innerText({
+							timeout: 1000,
+						});
+					} catch (error) {
+						console.log(
+							`Description not visible for item ${i + 1}, skipping description extraction.`
+						);
+					}
+				} else {
+					console.log(`Description not found for item ${i + 1}`);
+				}
+
+				archiveItems.push({
+					url,
+					categories: categories.length > 0 ? categories : false,
+					title,
+					description,
+				});
+
+				console.log(`Extracted item: ${title}, URL: ${url}`);
+			} catch (error) {
+				console.error('Error extracting item:', error);
 			}
-
-			const title = await item
-				.locator('.vp-portfolio__item-meta-title > a')
-				.innerText();
-
-			const description = await item
-				.locator('.vp-portfolio__item-meta-excerpt > div')
-				.innerText();
-
-			archiveItems.push({
-				url,
-				categories:
-					typeof categories !== 'undefined'
-						? // eslint-disable-next-line no-undef
-							categories
-						: false,
-				title,
-				description,
-			});
 		}
 
 		return archiveItems;
@@ -273,6 +316,49 @@ test.describe('archive pages', () => {
 		await page.getByRole('button', { name: 'Save Changes' }).click();
 	}
 
+	// This function ensures that the page is fully loaded before any data collection begins.
+	async function awaitPageLoading(page) {
+		// Ensure the page is fully loaded before collecting data
+		await page.waitForSelector('.vp-portfolio__ready', {
+			state: 'attached',
+			timeout: 15000,
+		});
+		await page.waitForLoadState('networkidle');
+		await page.waitForLoadState('domcontentloaded');
+	}
+
+	// This function handles pagination by clicking the appropriate button to content.
+	async function clickToPagination(
+		page,
+		pagination,
+		typePagination = 'paged'
+	) {
+		const button =
+			typePagination === 'paged'
+				? '.vp-pagination__item.vp-pagination__item-next > a'
+				: 'a.vp-pagination__load-more';
+		await Promise.all([
+			page
+				.waitForSelector('.vp-portfolio__ready', {
+					state: 'detached',
+					timeout: 500,
+				})
+				.catch(() => {
+					/* ignore if it doesn’t detach */
+				}),
+			page.waitForSelector('.vp-portfolio__ready', {
+				state: 'attached',
+				timeout: 15000,
+			}),
+			pagination
+				.locator(button)
+				.click()
+				.catch(() => {
+					/* ignore if it doesn’t detach */
+				}),
+		]);
+	}
+
 	/**
 	 * We receive an array of objects with archive elements in the process of querying the layout on the front-end side.
 	 * This array will be used as a comparison array against the expected result.
@@ -316,12 +402,13 @@ test.describe('archive pages', () => {
 
 		while (currentCount < pageCounts) {
 			const archivePagination = [];
-
-			await page.waitForTimeout(2000);
+			// Ensure the page is fully loaded before collecting data
+			await awaitPageLoading(page);
 
 			const archiveItems = await getArchiveItems(page);
-
-			await page.waitForTimeout(1000);
+			console.log(
+				`Page ${currentCount + 1}: Retrieved ${archiveItems.length} items`
+			);
 
 			const pagination = await page.locator(
 				'.vp-portfolio__layout-elements .vp-pagination'
@@ -408,26 +495,45 @@ test.describe('archive pages', () => {
 				}
 			}
 
-			if (typePagination === 'paged' || typePagination === 'loadMore') {
-				receivedArchive.push({
-					items: archiveItems,
-					pagination: archivePagination,
-				});
+			if (archiveItems.length > 0 && typePagination !== 'inf') {
+				// Check for duplicates before adding
+				for (const item of archiveItems) {
+					if (
+						!receivedArchive.some((existingItem) =>
+							existingItem.items.some(
+								(existing) => existing.url === item.url
+							)
+						)
+					) {
+						receivedArchive.push({
+							items: archiveItems,
+							pagination: archivePagination,
+						});
+					} else {
+						console.log(
+							`Duplicate item detected: ${item.title}, URL: ${item.url}`
+						);
+					}
+				}
 			}
 
 			currentCount++;
 
-			if (
-				(await pagination
-					.locator('.vp-pagination__item.vp-pagination__item-next')
-					.count()) &&
-				typePagination === 'paged'
-			) {
-				await pagination
-					.locator(
-						'.vp-pagination__item.vp-pagination__item-next > a'
-					)
-					.click();
+			const nextPageExists = await pagination
+				.locator('.vp-pagination__item.vp-pagination__item-next > a')
+				.isVisible();
+			if (nextPageExists && typePagination === 'paged') {
+				console.log('Navigating to the next page...');
+				try {
+					// Click the next page button and immediately wait for the class to be detached and attached again
+					await clickToPagination(page, pagination);
+
+					console.log(`Navigated to page ${currentCount + 1}`);
+				} catch (error) {
+					console.error('Error navigating to the next page:', error);
+				}
+			} else if (!nextPageExists && typePagination !== 'paged') {
+				console.log('No more pages to navigate.');
 			}
 
 			if (
@@ -436,30 +542,27 @@ test.describe('archive pages', () => {
 					.count()) &&
 				(typePagination === 'loadMore' || typePagination === 'inf')
 			) {
-				// Ensure the element is visible and stable before interacting
 				await page.waitForSelector('a.vp-pagination__load-more', {
 					state: 'visible',
 				});
 
-				// Optional: Scroll into view to ensure visibility
 				await page
 					.locator('a.vp-pagination__load-more')
 					.scrollIntoViewIfNeeded();
-
-				// Add a delay to allow any animations or transitions to complete
-				await page.waitForTimeout(500);
 
 				const nextPageAttribute = await pagination
 					.locator('a.vp-pagination__load-more')
 					.getAttribute('href');
 				if (nextPageAttribute !== '') {
 					try {
-						await pagination
-							.locator('a.vp-pagination__load-more')
-							.click();
+						console.log('Loading more items...');
+						await clickToPagination(
+							page,
+							pagination,
+							typePagination
+						);
 					} catch (error) {
 						console.error('Error clicking "Load More":', error);
-						// Retry logic or further error handling can be implemented here
 					}
 				}
 
@@ -507,18 +610,31 @@ test.describe('archive pages', () => {
 		let categoryKey = 0;
 
 		for (const category of receivedCategories) {
-			await page
-				.locator('.vp-filter .vp-filter__item')
-				.filter({ hasText: category.title })
-				.click();
-
-			await page.waitForTimeout(700);
+			await Promise.all([
+				awaitPageLoading(page),
+				page
+					.waitForSelector('.vp-portfolio__ready', {
+						state: 'detached',
+						timeout: 500,
+					})
+					.catch(() => {
+						/* ignore if it doesn’t detach */
+					}),
+				page.waitForSelector('.vp-portfolio__ready', {
+					state: 'attached',
+					timeout: 15000,
+				}),
+				page
+					.locator('.vp-filter .vp-filter__item')
+					.filter({ hasText: category.title })
+					.click(),
+			]);
 
 			const pagination = page.locator(
 				'.vp-portfolio__layout-elements .vp-pagination'
 			);
 
-			let archiveItems;
+			let archiveItems = [];
 
 			switch (typePagination) {
 				case 'paged':
@@ -528,13 +644,9 @@ test.describe('archive pages', () => {
 						archiveItems.length === 2 &&
 						(await pagination.count())
 					) {
-						await pagination
-							.locator(
-								'.vp-pagination__item.vp-pagination__item-next > a'
-							)
-							.click();
+						await clickToPagination(page, pagination);
 
-						await page.waitForTimeout(500);
+						await awaitPageLoading(page);
 
 						archiveItems = archiveItems.concat(
 							await getArchiveItems(page)
@@ -543,7 +655,6 @@ test.describe('archive pages', () => {
 					break;
 				case 'loadMore':
 				case 'inf':
-					await page.waitForTimeout(500);
 					if (
 						await pagination
 							.locator('a.vp-pagination__load-more')
@@ -553,14 +664,21 @@ test.describe('archive pages', () => {
 							.locator('a.vp-pagination__load-more')
 							.getAttribute('href');
 						if (nextPageAttribute !== '') {
-							await pagination
-								.locator('a.vp-pagination__load-more')
-								.click();
-							await page.waitForTimeout(500);
+							await clickToPagination(
+								page,
+								pagination,
+								typePagination
+							);
+
+							await awaitPageLoading(page);
 						}
 					}
 
-					archiveItems = await getArchiveItems(page);
+					// Wait for archiveItems to be filled
+					while (archiveItems.length === 0) {
+						await page.waitForTimeout(100); // Wait for 100ms before checking again
+						archiveItems = (await getArchiveItems(page)) || [];
+					}
 					break;
 			}
 
@@ -714,15 +832,20 @@ test.describe('archive pages', () => {
 				// Get or create portfolio category and tag IDs
 				const categoryIds = post.categories
 					? await Promise.all(
-							post.categories.map((name) =>
-								getOrCreateTerm(name, 'portfolio_category')
+							post.categories.map(
+								async (name) =>
+									await getOrCreateTerm(
+										name,
+										'portfolio_category'
+									)
 							)
 						)
 					: [];
 				const tagIds = post.tags
 					? await Promise.all(
-							post.tags.map((name) =>
-								getOrCreateTerm(name, 'portfolio_tag')
+							post.tags.map(
+								async (name) =>
+									await getOrCreateTerm(name, 'portfolio_tag')
 							)
 						)
 					: [];
@@ -785,7 +908,6 @@ test.describe('archive pages', () => {
 		await admin.visitAdminPage('options-permalink.php');
 		await page.getByLabel(type).check();
 		await page.getByRole('button', { name: 'Save Changes' }).click();
-		await page.waitForTimeout(2000);
 	}
 
 	/**
@@ -827,6 +949,27 @@ test.describe('archive pages', () => {
 					'/?page_id=000',
 					'/?page_id=' + archiveID
 				);
+
+				// Update category URLs if they exist
+				if (Array.isArray(expectedItem.categories)) {
+					let categoryKey = 0;
+					for (const category of expectedItem.categories) {
+						if (
+							typeof category.categoryUrl !== 'undefined' &&
+							category.categoryUrl !== ''
+						) {
+							const categoryUrl =
+								testBaseUrl + category.categoryUrl;
+							fixtureData[fixtureKey].items[itemKey].categories[
+								categoryKey
+							].categoryUrl = categoryUrl.replace(
+								'/?page_id=0000',
+								'/?page_id=' + archiveID
+							);
+						}
+						categoryKey++;
+					}
+				}
 				itemKey++;
 			}
 
@@ -850,10 +993,8 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
-		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
 		await setPermalinkSettings(admin, page, 'Plain');
-		await page.waitForTimeout(1500);
 
 		const { archiveID, archiveUrl } = await createArchivePage(
 			page,
@@ -876,7 +1017,6 @@ test.describe('archive pages', () => {
 		expect(receivedArchive).toEqual(expectedArchiveDefault);
 
 		const receivedCategories = await getReceivedCategories(page);
-		await page.waitForTimeout(500);
 
 		expect(receivedCategories).toEqual(expectedArchiveCategoryDefault);
 
@@ -890,9 +1030,7 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
-		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
-		await page.waitForTimeout(1500);
 
 		const { archiveUrl } = await createArchivePage(page, admin, editor);
 		await setArchiveSettings(admin, page);
@@ -911,7 +1049,6 @@ test.describe('archive pages', () => {
 		expect(receivedArchive).toEqual(expectedArchivePostName);
 
 		const receivedCategories = await getReceivedCategories(page);
-		await page.waitForTimeout(500);
 
 		expect(receivedCategories).toEqual(expectedArchiveCategoryPostName);
 	});
@@ -923,9 +1060,7 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
-		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
-		await page.waitForTimeout(1500);
 		await setPermalinkSettings(admin, page, 'Plain');
 
 		const { archiveID, archiveUrl } = await createArchivePage(
@@ -957,7 +1092,6 @@ test.describe('archive pages', () => {
 			page,
 			'loadMore'
 		);
-		await page.waitForTimeout(500);
 
 		expect(receivedCategories).toEqual(
 			expectedArchiveCategoryLoadMoreDefault
@@ -973,9 +1107,7 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
-		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
-		await page.waitForTimeout(1500);
 
 		const { archiveUrl } = await createArchivePage(
 			page,
@@ -1006,7 +1138,6 @@ test.describe('archive pages', () => {
 			page,
 			'loadMore'
 		);
-		await page.waitForTimeout(500);
 
 		expect(receivedCategories).toEqual(
 			expectedArchiveCategoryLoadMorePostName
@@ -1020,9 +1151,7 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
-		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
-		await page.waitForTimeout(1500);
 		await setPermalinkSettings(admin, page, 'Plain');
 
 		const { archiveID, archiveUrl } = await createArchivePage(
@@ -1051,7 +1180,6 @@ test.describe('archive pages', () => {
 		expect(receivedArchive).toEqual(expectedArchiveInfinityDefault);
 
 		const receivedCategories = await getReceivedCategories(page, 'inf');
-		await page.waitForTimeout(500);
 
 		expect(receivedCategories).toEqual(
 			expectedArchiveCategoryInfinityDefault
@@ -1067,9 +1195,7 @@ test.describe('archive pages', () => {
 		requestUtils,
 	}) => {
 		await setPermalinkSettings(admin, page, 'Post name');
-		await page.waitForTimeout(1500);
 		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
-		await page.waitForTimeout(1500);
 
 		const { archiveUrl } = await createArchivePage(
 			page,
@@ -1097,7 +1223,6 @@ test.describe('archive pages', () => {
 		expect(receivedArchive).toEqual(expectedArchivePostNameInfinity);
 
 		const receivedCategories = await getReceivedCategories(page, 'inf');
-		await page.waitForTimeout(500);
 
 		expect(receivedCategories).toEqual(
 			expectedArchiveCategoryInfinityPostName
