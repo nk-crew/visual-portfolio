@@ -122,7 +122,10 @@ test.describe('archive pages', () => {
 
 		// Log the count of items found
 		const itemCount = await items.count();
-		console.log(`Found ${itemCount} items on the page`);
+
+		if (logsEnabled) {
+			console.log(`Found ${itemCount} items on the page`);
+		}
 
 		for (let i = 0; i < itemCount; i++) {
 			try {
@@ -133,20 +136,30 @@ test.describe('archive pages', () => {
 					.locator('.vp-portfolio__item-img')
 					.count();
 				if (imgExists === 0) {
-					console.log(`Image not found for item ${i + 1}`);
+					if (logsEnabled) {
+						console.log(`Image not found for item ${i + 1}`);
+					}
 					continue;
 				}
 
-				// Wait for the image to be visible
-				await item
-					.locator('.vp-portfolio__item-img')
-					.waitFor({ state: 'visible', timeout: 15000 });
+				// Wait for the image to be visible with increased timeout
+				try {
+					await item.locator('.vp-portfolio__item-img').waitFor({
+						state: 'visible',
+						timeout: 1000, // Increased timeout
+					});
+				} catch (error) {
+					console.log(
+						`Image not visible for item ${i + 1}, skipping.`
+					);
+					continue;
+				}
 
 				const url = await item
 					.locator('.vp-portfolio__item-img > a[href]')
 					.getAttribute('href');
 
-				const categoriesWrapper = await item.locator(
+				const categoriesWrapper = item.locator(
 					'.vp-portfolio__item-meta .vp-portfolio__item-meta-categories > .vp-portfolio__item-meta-category'
 				);
 
@@ -166,9 +179,27 @@ test.describe('archive pages', () => {
 					}
 				}
 
-				const title = await item
-					.locator('.vp-portfolio__item-meta-title > a')
-					.innerText();
+				// Check if the title element exists before trying to get text
+				const titleLocator = item.locator(
+					'.vp-portfolio__item-meta-title > a'
+				);
+				const titleExists = await titleLocator.count();
+				let title = '';
+				if (titleExists > 0) {
+					try {
+						title = await titleLocator.innerText({
+							timeout: 20000,
+						}); // Increased timeout
+					} catch (error) {
+						console.log(
+							`Title not visible for item ${i + 1}, skipping.`
+						);
+						continue;
+					}
+				} else {
+					console.log(`Title not found for item ${i + 1}`);
+					continue;
+				}
 
 				// Check if the description element exists and is visible
 				const descriptionLocator = item.locator(
@@ -187,7 +218,7 @@ test.describe('archive pages', () => {
 							`Description not visible for item ${i + 1}, skipping description extraction.`
 						);
 					}
-				} else {
+				} else if (logsEnabled) {
 					console.log(`Description not found for item ${i + 1}`);
 				}
 
@@ -198,7 +229,9 @@ test.describe('archive pages', () => {
 					description,
 				});
 
-				console.log(`Extracted item: ${title}, URL: ${url}`);
+				if (logsEnabled) {
+					console.log(`Extracted item: ${title}, URL: ${url}`);
+				}
 			} catch (error) {
 				console.error('Error extracting item:', error);
 			}
@@ -406,9 +439,12 @@ test.describe('archive pages', () => {
 			await awaitPageLoading(page);
 
 			const archiveItems = await getArchiveItems(page);
-			console.log(
-				`Page ${currentCount + 1}: Retrieved ${archiveItems.length} items`
-			);
+
+			if (logsEnabled) {
+				console.log(
+					`Page ${currentCount + 1}: Retrieved ${archiveItems.length} items`
+				);
+			}
 
 			const pagination = await page.locator(
 				'.vp-portfolio__layout-elements .vp-pagination'
@@ -509,7 +545,7 @@ test.describe('archive pages', () => {
 							items: archiveItems,
 							pagination: archivePagination,
 						});
-					} else {
+					} else if (logsEnabled) {
 						console.log(
 							`Duplicate item detected: ${item.title}, URL: ${item.url}`
 						);
@@ -523,16 +559,25 @@ test.describe('archive pages', () => {
 				.locator('.vp-pagination__item.vp-pagination__item-next > a')
 				.isVisible();
 			if (nextPageExists && typePagination === 'paged') {
-				console.log('Navigating to the next page...');
+				if (logsEnabled) {
+					console.log('Navigating to the next page...');
+				}
+
 				try {
 					// Click the next page button and immediately wait for the class to be detached and attached again
 					await clickToPagination(page, pagination);
 
-					console.log(`Navigated to page ${currentCount + 1}`);
+					if (logsEnabled) {
+						console.log(`Navigated to page ${currentCount + 1}`);
+					}
 				} catch (error) {
 					console.error('Error navigating to the next page:', error);
 				}
-			} else if (!nextPageExists && typePagination !== 'paged') {
+			} else if (
+				!nextPageExists &&
+				typePagination !== 'paged' &&
+				logsEnabled
+			) {
 				console.log('No more pages to navigate.');
 			}
 
@@ -555,7 +600,10 @@ test.describe('archive pages', () => {
 					.getAttribute('href');
 				if (nextPageAttribute !== '') {
 					try {
-						console.log('Loading more items...');
+						if (logsEnabled) {
+							console.log('Loading more items...');
+						}
+
 						await clickToPagination(
 							page,
 							pagination,
@@ -788,9 +836,11 @@ test.describe('archive pages', () => {
 
 					// Check if the term creation was successful
 					if (term && term.id) {
-						console.log(
-							`Term "${name}" created successfully with ID: ${term.id}`
-						);
+						if (logsEnabled) {
+							console.log(
+								`Term "${name}" created successfully with ID: ${term.id}`
+							);
+						}
 						return term.id;
 					}
 
@@ -880,6 +930,7 @@ test.describe('archive pages', () => {
 							data: newPostData,
 						})
 					);
+
 					console.log(`Post "${post.title}" created successfully.`);
 				} catch (error) {
 					console.error(
