@@ -1317,10 +1317,20 @@ class Visual_Portfolio_Archive_Mapping {
 				}
 				$category_url = trailingslashit( $category_url );
 
-				if ( '' === $base_page ) {
-					$category_url = $category_url . $this->permalinks['category_base'] . '/' . $category_slug . '/';
+				// Replace the existing category part with the new category slug.
+				if ( strpos( $category_url, 'portfolio-category/' ) !== false ) {
+					$category_url = preg_replace(
+						'#(portfolio-category/)[^/]+/#',
+						'${1}' . $category_slug . '/',
+						$category_url
+					);
 				} else {
-					$category_url = str_replace( $base_page, $this->permalinks['category_base'] . '/' . $category_slug . '/', $category_url );
+					// If the category base is not found, append it manually.
+					if ( '' === $base_page ) {
+						$category_url = $category_url . $this->permalinks['category_base'] . '/' . $category_slug . '/';
+					} else {
+						$category_url = str_replace( $base_page, $this->permalinks['category_base'] . '/' . $category_slug . '/', $category_url );
+					}
 				}
 
 				/**
