@@ -3,7 +3,12 @@
 	  "items": [
 		{
 		  "url": "/?portfolio=portfolio-10-test-post",
-		  "categories": false,
+		  "categories": [
+			{
+			  "category": "PESTO",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Apesto"
+			}
+		  ],
 		  "title": "Portfolio 10 test post",
 		  "description": "Curabitur mollis convallis congue. Pellentesque vel lobortis diam. Morbi et sagittis mi, mollis vehicula dui. Maecenas arcu justo, facilisis non."
 		},
@@ -48,13 +53,23 @@
 	  "items": [
 		{
 		  "url": "/?portfolio=portfolio-8-test-post",
-		  "categories": false,
+		  "categories": [
+			{
+			  "category": "SEA",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asea"
+			}
+		  ],
 		  "title": "Portfolio 8 test post",
 		  "description": "Morbi id justo tortor. Morbi semper faucibus ligula, ut porttitor velit facilisis eget. Aliquam eleifend dignissim neque nec placerat. Nulla."
 		},
 		{
 		  "url": "/?portfolio=portfolio-7-test-post",
-		  "categories": false,
+		  "categories": [
+			{
+			  "category": "OCEAN",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			}
+		  ],
 		  "title": "Portfolio 7 test post",
 		  "description": "Nulla tincidunt arcu in dictum elementum. Quisque fringilla venenatis nulla ut sollicitudin. Praesent facilisis a libero laoreet viverra. Nunc placerat."
 		}
@@ -100,7 +115,12 @@
 		},
 		{
 		  "url": "/?portfolio=portfolio-5-test-post",
-		  "categories": false,
+		  "categories": [
+			{
+			  "category": "OCEAN",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			}
+		  ],
 		  "title": "Portfolio 5 test post",
 		  "description": "Morbi tincidunt aliquet velit vitae imperdiet. Curabitur ex mauris, pharetra sit amet varius in, iaculis at libero. Interdum et malesuada."
 		}
@@ -140,13 +160,27 @@
 	  "items": [
 		{
 		  "url": "/?portfolio=portfolio-4-test-post",
-		  "categories": false,
+		  "categories": [
+			{
+			  "category": "CAR",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			}
+		  ],
 		  "title": "Portfolio 4 test post",
 		  "description": "Aenean vel arcu enim. Aliquam sed rutrum erat, porta mattis lorem. Nulla scelerisque eu ligula eget dictum. Phasellus orci nisi."
 		},
 		{
 		  "url": "/?portfolio=portfolio-3-test-post",
-		  "categories": false,
+		  "categories": [
+			{
+			  "category": "CAR",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			},
+			{
+			  "category": "OCEAN",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			}
+		  ],
 		  "title": "Portfolio 3 test post",
 		  "description": "Aliquam sed pretium purus. Cras viverra viverra felis. Ut vitae massa felis. Curabitur tempus vitae eros eu feugiat. Ut molestie."
 		}
@@ -186,13 +220,39 @@
 	  "items": [
 		{
 		  "url": "/?portfolio=portfolio-2-test-post",
-		  "categories": false,
+		  "categories": [
+			{
+			  "category": "BICYCLE",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Abicycle"
+			},
+			{
+			  "category": "CAR",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			},
+			{
+			  "category": "SOMETHING",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asomething"
+			}
+		  ],
 		  "title": "Portfolio 2 test post",
 		  "description": "Nam at nibh feugiat, semper nisl vel, porttitor nibh. Aliquam massa diam, tincidunt nec lobortis a, fermentum vitae elit. Fusce."
 		},
 		{
 		  "url": "/?portfolio=portfolio-1-test-post",
-		  "categories": false,
+		  "categories": [
+			{
+			  "category": "OCEAN",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			},
+			{
+			  "category": "SEA",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asea"
+			},
+			{
+			  "category": "SOMETHING",
+			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asomething"
+			}
+		  ],
 		  "title": "Portfolio 1 test post",
 		  "description": "TMauris id tincidunt urna, ut mattis mauris. Curabitur in massa vel felis pretium aliquet vitae ut elit. Aenean at volutpat."
 		}
