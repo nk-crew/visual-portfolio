@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * WordPress dependencies
  */
@@ -250,37 +251,39 @@ test.describe('added images to block', () => {
 		);
 
 		for (const image of await imageList.elementHandles()) {
-			if (
-				typeof images.find(
-					async (x) => x.id === (await image.getAttribute('data-id'))
-				).imgUrl !== 'undefined'
-			) {
-				await image.click();
+			const dataId = await image.getAttribute('data-id');
+			const foundImage = await findAsyncSequential(
+				images,
+				async (x) => x.id === Number(dataId)
+			);
 
-				const imageID = await image.getAttribute('data-id');
-
-				const foundImage = await findAsyncSequential(
-					images,
-					async (x) => x.id === Number(imageID)
-				);
-
+			if (foundImage) {
 				const foundFixture = await findAsyncSequential(
 					imageFixtures,
-					async (x) =>
-						x.description === (await foundImage.description)
+					async (x) => x.description === foundImage.description
 				);
 
-				await page
-					.locator('#attachment-details-alt-text')
-					.fill(await foundFixture.alt);
+				if (foundFixture) {
+					await image.click();
 
-				await page
-					.locator('#attachment-details-caption')
-					.fill(await foundFixture.caption);
+					await page
+						.locator('#attachment-details-alt-text')
+						.fill(foundFixture.alt);
 
-				await page
-					.locator('#attachment-details-description')
-					.fill(await foundFixture.description);
+					await page
+						.locator('#attachment-details-caption')
+						.fill(foundFixture.caption);
+
+					await page
+						.locator('#attachment-details-description')
+						.fill(foundFixture.description);
+				} else {
+					console.warn(
+						`No matching fixture found for image with ID: ${dataId}`
+					);
+				}
+			} else {
+				console.warn(`No matching image found for data-id: ${dataId}`);
 			}
 		}
 
