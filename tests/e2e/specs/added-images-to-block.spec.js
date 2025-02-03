@@ -266,20 +266,21 @@ test.describe('added images to block', () => {
 
 				const foundFixture = await findAsyncSequential(
 					imageFixtures,
-					async (x) => x.description === foundImage.description
+					async (x) =>
+						x.description === (await foundImage.description)
 				);
 
 				await page
 					.locator('#attachment-details-alt-text')
-					.fill(foundFixture.alt);
+					.fill(await foundFixture.alt);
 
 				await page
 					.locator('#attachment-details-caption')
-					.fill(foundFixture.caption);
+					.fill(await foundFixture.caption);
 
 				await page
 					.locator('#attachment-details-description')
-					.fill(foundFixture.description);
+					.fill(await foundFixture.description);
 			}
 		}
 
