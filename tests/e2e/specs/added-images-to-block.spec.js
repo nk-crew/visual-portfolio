@@ -16,12 +16,21 @@ test.describe('added images to block', () => {
 			? 'visual-portfolio-pro'
 			: 'visual-portfolio-posts-amp-image-gallery';
 		await requestUtils.activatePlugin(pluginName);
-		await requestUtils.deleteAllMedia();
-		await requestUtils.deleteAllPages();
 	});
+
 	test.afterEach(async ({ requestUtils }) => {
-		await requestUtils.deleteAllMedia();
-		await requestUtils.deleteAllPages();
+		await Promise.all([
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllPosts(),
+		]);
+	});
+
+	test.afterAll(async ({ requestUtils }) => {
+		await Promise.all([
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllPosts(),
+		]);
 	});
 
 	/**
