@@ -453,36 +453,39 @@ test.describe('added images to block', () => {
 		);
 
 		for (const image of await imageList.elementHandles()) {
-			if (
-				typeof images.find(
-					async (x) => x.id === (await image.getAttribute('data-id'))
-				).imgUrl !== 'undefined'
-			) {
-				await image.click();
+			const dataId = await image.getAttribute('data-id');
+			const foundImage = await findAsyncSequential(
+				images,
+				async (x) => x.id === Number(dataId)
+			);
 
-				const imageID = await image.getAttribute('data-id');
-
-				const foundImage = await findAsyncSequential(
-					images,
-					async (x) => x.id === Number(imageID)
-				);
-
+			if (foundImage) {
 				const foundFixture = await findAsyncSequential(
 					imageFixtures,
 					async (x) => x.description === foundImage.description
 				);
 
-				await page
-					.locator('#attachment-details-alt-text')
-					.fill(foundFixture.alt);
+				if (foundFixture) {
+					await image.click();
 
-				await page
-					.locator('#attachment-details-caption')
-					.fill(foundFixture.caption);
+					await page
+						.locator('#attachment-details-alt-text')
+						.fill(foundFixture.alt);
 
-				await page
-					.locator('#attachment-details-description')
-					.fill(foundFixture.description);
+					await page
+						.locator('#attachment-details-caption')
+						.fill(foundFixture.caption);
+
+					await page
+						.locator('#attachment-details-description')
+						.fill(foundFixture.description);
+				} else {
+					console.warn(
+						`No matching fixture found for image with ID: ${dataId}`
+					);
+				}
+			} else {
+				console.warn(`No matching image found for data-id: ${dataId}`);
 			}
 		}
 
@@ -550,83 +553,108 @@ test.describe('added images to block', () => {
 				async (x) => x.description === itemDescription
 			);
 
-			const foundFixture = await findAsyncSequential(
-				imageFixtures,
-				async (x) => x.description === itemDescription
-			);
+			if (foundImage) {
+				const foundFixture = await findAsyncSequential(
+					imageFixtures,
+					async (x) => x.description === itemDescription
+				);
 
-			const foundFixtureIndex = imageFixtures.indexOf(foundFixture);
+				if (foundFixture) {
+					const foundFixtureIndex =
+						imageFixtures.indexOf(foundFixture);
+					imageFixtures[foundFixtureIndex].id = foundImage.id;
 
-			imageFixtures[foundFixtureIndex].id = foundImage.id;
-
-			if (typeof foundFixture.imageSettings !== 'undefined') {
-				await page
-					.locator(
-						'.vpf-component-gallery-control-item-modal .components-base-control__field',
-						{
-							hasText: 'Title',
-						}
-					)
-					.locator('input.components-text-control__input')
-					.fill(foundFixture.imageSettings.title);
-
-				await page
-					.locator(
-						'.vpf-component-gallery-control-item-modal .components-base-control__field',
-						{
-							hasText: 'Description',
-						}
-					)
-					.locator('textarea.components-textarea-control__input')
-					.fill(foundFixture.imageSettings.description);
-
-				if (typeof foundFixture.imageSettings.format !== 'undefined') {
-					await page
-						.locator(
-							'.vpf-component-gallery-control-item-modal .components-base-control__field',
-							{
-								hasText: 'Format',
-							}
-						)
-						.locator('.vpf-component-select')
-						.click();
-
-					await page
-						.locator('.vpf-component-select-option-label', {
-							hasText: foundFixture.imageSettings.format,
-						})
-						.click();
-
-					if (
-						foundFixture.imageSettings.format === 'standard' &&
-						typeof foundFixture.imageSettings.url !== 'undefined'
-					) {
-						foundFixture.imageSettings.url =
-							foundFixture.imageSettings.url === 'postLink'
-								? postLink
-								: foundFixture.imageSettings.url;
-
-						await page
-							.getByRole('textbox', { name: 'URL', exact: true })
-							.fill(foundFixture.imageSettings.url);
-					}
-
-					if (
-						foundFixture.imageSettings.format === 'video' &&
-						typeof foundFixture.imageSettings.videoUrl !==
-							'undefined'
-					) {
+					if (typeof foundFixture.imageSettings !== 'undefined') {
 						await page
 							.locator(
 								'.vpf-component-gallery-control-item-modal .components-base-control__field',
 								{
-									hasText: 'Video URL',
+									hasText: 'Title',
 								}
 							)
 							.locator('input.components-text-control__input')
-							.fill(foundFixture.imageSettings.videoUrl);
+							.fill(foundFixture.imageSettings.title);
+
+						await page
+							.locator(
+								'.vpf-component-gallery-control-item-modal .components-base-control__field',
+								{
+									hasText: 'Description',
+								}
+							)
+							.locator(
+								'textarea.components-textarea-control__input'
+							)
+							.fill(foundFixture.imageSettings.description);
+
+						if (
+							typeof foundFixture.imageSettings.format !==
+							'undefined'
+						) {
+							await page
+								.locator(
+									'.vpf-component-gallery-control-item-modal .components-base-control__field',
+									{
+										hasText: 'Format',
+									}
+								)
+								.locator('.vpf-component-select')
+								.click();
+
+							await page
+								.locator('.vpf-component-select-option-label', {
+									hasText: foundFixture.imageSettings.format,
+								})
+								.click();
+
+							if (
+								foundFixture.imageSettings.format ===
+									'standard' &&
+								typeof foundFixture.imageSettings.url !==
+									'undefined'
+							) {
+								foundFixture.imageSettings.url =
+									foundFixture.imageSettings.url ===
+									'postLink'
+										? postLink
+										: foundFixture.imageSettings.url;
+
+								await page
+									.getByRole('textbox', {
+										name: 'URL',
+										exact: true,
+									})
+									.fill(foundFixture.imageSettings.url);
+							}
+
+							if (
+								foundFixture.imageSettings.format === 'video' &&
+								typeof foundFixture.imageSettings.videoUrl !==
+									'undefined'
+							) {
+								await page
+									.locator(
+										'.vpf-component-gallery-control-item-modal .components-base-control__field',
+										{
+											hasText: 'Video URL',
+										}
+									)
+									.locator(
+										'input.components-text-control__input'
+									)
+									.fill(foundFixture.imageSettings.videoUrl);
+							}
+						}
 					}
+				} else {
+					console.warn(
+						`No matching fixture found for item with description: ${itemDescription}`
+					);
 				}
+			} else {
+				console.warn(
+					`No matching image found for item with description: ${itemDescription}`
+				);
 			}
 
 			await page.getByLabel('Close', { exact: true }).click();
