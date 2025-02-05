@@ -16,7 +16,7 @@ import imagePaths from '../../fixtures/images.json';
  * @param {Editor}       editor             End to end test utilities for the WordPress Block Editor.
  * @param {boolean}      alternativeSetting Set alternative meta settings for test images.
  * @param {boolean}      usingInPro         Set if using in pro plugin.
- * @return {{images: {format: string, video_url: string, url: string}[]}}
+ * @return {{images: {id: number, imgUrl: string, imgThumbnailUrl: string, title: string, description: string, format: string, video_url: string, url: string}[]}}
  */
 export async function getWordpressImages({
 	requestUtils,
@@ -63,11 +63,54 @@ export async function getWordpressImages({
 			? 'core-plugin/tests/fixtures/'
 			: 'tests/fixtures/';
 
+	async function uploadMediaWithRetry(filepath, retries = 5) {
+		for (let attempt = 1; attempt <= retries; attempt++) {
+			try {
+				return await requestUtils.uploadMedia(filepath);
+			} catch (error) {
+				if (attempt === retries) {
+					throw error; // Re-throw the error if all attempts fail
+				}
+				// Wait before retrying
+				await new Promise((resolve) =>
+					setTimeout(resolve, 1000 * attempt)
+				);
+			}
+		}
+	}
+
+	async function fetchMediaList() {
+		return await requestUtils.rest({
+			path: '/wp/v2/media',
+			params: {
+				per_page: 100,
+			},
+		});
+	}
+
+	function removeFileExtension(filename) {
+		return filename.replace(/\.[^/.]+$/, '');
+	}
+
+	// Function to check if an image already exists and return its details
+	async function getExistingMediaDetails(filename) {
+		const existingMedia = await fetchMediaList();
+		return existingMedia.find(
+			(media) => media.slug === removeFileExtension(filename)
+		);
+	}
+
 	images = await Promise.all(
 		imagePaths.map(async (object) => {
 			const filepath = path.join(imagePath, object.filename);
-			// Upload image to WordPress gallery.
-			const media = await requestUtils.uploadMedia(filepath);
+
+			// Check if the image already exists and retrieve its details
+			let media = await getExistingMediaDetails(object.filename);
+
+			// If the image doesn't exist, upload it
+			if (!media) {
+				media = await uploadMediaWithRetry(filepath);
+			}
 
 			const periodIndex = object.filename.indexOf('.');
 

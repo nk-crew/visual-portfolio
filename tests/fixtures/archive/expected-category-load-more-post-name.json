@@ -1,22 +1,22 @@
 [
 	{
 	  "title": "bicycle",
-	  "url": "/?page_id=000&vp_filter=portfolio_category%3Abicycle",
+	  "url": "/portfolio-category/bicycle/",
 	  "items": [
 		{
-		  "url": "/?portfolio=portfolio-2-test-post",
+		  "url": "/portfolio/portfolio-2-test-post/",
 		  "categories": [
 			{
 			  "category": "BICYCLE",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Abicycle"
+			  "categoryUrl": "/portfolio-category/bicycle/"
 			},
 			{
 			  "category": "CAR",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			  "categoryUrl": "/portfolio-category/car/"
 			},
 			{
 			  "category": "SOMETHING",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asomething"
+			  "categoryUrl": "/portfolio-category/something/"
 			}
 		  ],
 		  "title": "Portfolio 2 test post",
@@ -26,48 +26,48 @@
 	},
 	{
 	  "title": "car",
-	  "url": "/?page_id=000&vp_filter=portfolio_category%3Acar",
+	  "url": "/portfolio-category/car/",
 	  "items": [
 		{
-		  "url": "/?portfolio=portfolio-4-test-post",
+		  "url": "/portfolio/portfolio-4-test-post/",
 		  "categories": [
 			{
 			  "category": "CAR",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			  "categoryUrl": "/portfolio-category/car/"
 			}
 		  ],
 		  "title": "Portfolio 4 test post",
 		  "description": "Aenean vel arcu enim. Aliquam sed rutrum erat, porta mattis lorem. Nulla scelerisque eu ligula eget dictum. Phasellus orci nisi."
 		},
 		{
-		  "url": "/?portfolio=portfolio-3-test-post",
+		  "url": "/portfolio/portfolio-3-test-post/",
 		  "categories": [
 			{
 			  "category": "CAR",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			  "categoryUrl": "/portfolio-category/car/"
 			},
 			{
 			  "category": "OCEAN",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			  "categoryUrl": "/portfolio-category/ocean/"
 			}
 		  ],
 		  "title": "Portfolio 3 test post",
 		  "description": "Aliquam sed pretium purus. Cras viverra viverra felis. Ut vitae massa felis. Curabitur tempus vitae eros eu feugiat. Ut molestie."
 		},
 		{
-		  "url": "/?portfolio=portfolio-2-test-post",
+		  "url": "/portfolio/portfolio-2-test-post/",
 		  "categories": [
 			{
 			  "category": "BICYCLE",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Abicycle"
+			  "categoryUrl": "/portfolio-category/bicycle/"
 			},
 			{
 			  "category": "CAR",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			  "categoryUrl": "/portfolio-category/car/"
 			},
 			{
 			  "category": "SOMETHING",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asomething"
+			  "categoryUrl": "/portfolio-category/something/"
 			}
 		  ],
 		  "title": "Portfolio 2 test post",
@@ -77,59 +77,59 @@
 	},
 	{
 	  "title": "ocean",
-	  "url": "/?page_id=000&vp_filter=portfolio_category%3Aocean",
+	  "url": "/portfolio-category/ocean/",
 	  "items": [
 		{
-		  "url": "/?portfolio=portfolio-7-test-post",
+		  "url": "/portfolio/portfolio-7-test-post/",
 		  "categories": [
 			{
 			  "category": "OCEAN",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			  "categoryUrl": "/portfolio-category/ocean/"
 			}
 		  ],
 		  "title": "Portfolio 7 test post",
 		  "description": "Nulla tincidunt arcu in dictum elementum. Quisque fringilla venenatis nulla ut sollicitudin. Praesent facilisis a libero laoreet viverra. Nunc placerat."
 		},
 		{
-		  "url": "/?portfolio=portfolio-5-test-post",
+		  "url": "/portfolio/portfolio-5-test-post/",
 		  "categories": [
 			{
 			  "category": "OCEAN",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			  "categoryUrl": "/portfolio-category/ocean/"
 			}
 		  ],
 		  "title": "Portfolio 5 test post",
 		  "description": "Morbi tincidunt aliquet velit vitae imperdiet. Curabitur ex mauris, pharetra sit amet varius in, iaculis at libero. Interdum et malesuada."
 		},
 		{
-		  "url": "/?portfolio=portfolio-3-test-post",
+		  "url": "/portfolio/portfolio-3-test-post/",
 		  "categories": [
 			{
 			  "category": "CAR",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			  "categoryUrl": "/portfolio-category/car/"
 			},
 			{
 			  "category": "OCEAN",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			  "categoryUrl": "/portfolio-category/ocean/"
 			}
 		  ],
 		  "title": "Portfolio 3 test post",
 		  "description": "Aliquam sed pretium purus. Cras viverra viverra felis. Ut vitae massa felis. Curabitur tempus vitae eros eu feugiat. Ut molestie."
 		},
 		{
-		  "url": "/?portfolio=portfolio-1-test-post",
+		  "url": "/portfolio/portfolio-1-test-post/",
 		  "categories": [
 			{
 			  "category": "OCEAN",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			  "categoryUrl": "/portfolio-category/ocean/"
 			},
 			{
 			  "category": "SEA",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asea"
+			  "categoryUrl": "/portfolio-category/sea/"
 			},
 			{
 			  "category": "SOMETHING",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asomething"
+			  "categoryUrl": "/portfolio-category/something/"
 			}
 		  ],
 		  "title": "Portfolio 1 test post",
@@ -139,14 +139,14 @@
 	},
 	{
 	  "title": "pesto",
-	  "url": "/?page_id=000&vp_filter=portfolio_category%3Apesto",
+	  "url": "/portfolio-category/pesto/",
 	  "items": [
 		{
-		  "url": "/?portfolio=portfolio-10-test-post",
+		  "url": "/portfolio/portfolio-10-test-post/",
 		  "categories": [
 			{
 			  "category": "PESTO",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Apesto"
+			  "categoryUrl": "/portfolio-category/pesto/"
 			}
 		  ],
 		  "title": "Portfolio 10 test post",
@@ -156,33 +156,33 @@
 	},
 	{
 	  "title": "sea",
-	  "url": "/?page_id=000&vp_filter=portfolio_category%3Asea",
+	  "url": "/portfolio-category/sea/",
 	  "items": [
 		{
-		  "url": "/?portfolio=portfolio-8-test-post",
+		  "url": "/portfolio/portfolio-8-test-post/",
 		  "categories": [
 			{
 			  "category": "SEA",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asea"
+			  "categoryUrl": "/portfolio-category/sea/"
 			}
 		  ],
 		  "title": "Portfolio 8 test post",
 		  "description": "Morbi id justo tortor. Morbi semper faucibus ligula, ut porttitor velit facilisis eget. Aliquam eleifend dignissim neque nec placerat. Nulla."
 		},
 		{
-		  "url": "/?portfolio=portfolio-1-test-post",
+		  "url": "/portfolio/portfolio-1-test-post/",
 		  "categories": [
 			{
 			  "category": "OCEAN",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			  "categoryUrl": "/portfolio-category/ocean/"
 			},
 			{
 			  "category": "SEA",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asea"
+			  "categoryUrl": "/portfolio-category/sea/"
 			},
 			{
 			  "category": "SOMETHING",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asomething"
+			  "categoryUrl": "/portfolio-category/something/"
 			}
 		  ],
 		  "title": "Portfolio 1 test post",
@@ -192,41 +192,41 @@
 	},
 	{
 	  "title": "something",
-	  "url": "/?page_id=000&vp_filter=portfolio_category%3Asomething",
+	  "url": "/portfolio-category/something/",
 	  "items": [
 		{
-		  "url": "/?portfolio=portfolio-2-test-post",
+		  "url": "/portfolio/portfolio-2-test-post/",
 		  "categories": [
 			{
 			  "category": "BICYCLE",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Abicycle"
+			  "categoryUrl": "/portfolio-category/bicycle/"
 			},
 			{
 			  "category": "CAR",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Acar"
+			  "categoryUrl": "/portfolio-category/car/"
 			},
 			{
 			  "category": "SOMETHING",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asomething"
+			  "categoryUrl": "/portfolio-category/something/"
 			}
 		  ],
 		  "title": "Portfolio 2 test post",
 		  "description": "Nam at nibh feugiat, semper nisl vel, porttitor nibh. Aliquam massa diam, tincidunt nec lobortis a, fermentum vitae elit. Fusce."
 		},
 		{
-		  "url": "/?portfolio=portfolio-1-test-post",
+		  "url": "/portfolio/portfolio-1-test-post/",
 		  "categories": [
 			{
 			  "category": "OCEAN",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Aocean"
+			  "categoryUrl": "/portfolio-category/ocean/"
 			},
 			{
 			  "category": "SEA",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asea"
+			  "categoryUrl": "/portfolio-category/sea/"
 			},
 			{
 			  "category": "SOMETHING",
-			  "categoryUrl": "/?page_id=0000&vp_filter=portfolio_category%3Asomething"
+			  "categoryUrl": "/portfolio-category/something/"
 			}
 		  ],
 		  "title": "Portfolio 1 test post",
@@ -234,4 +234,4 @@
 		}
 	  ]
 	}
-  ]
+]

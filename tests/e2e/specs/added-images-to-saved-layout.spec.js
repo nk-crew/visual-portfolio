@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * WordPress dependencies
  */
@@ -11,7 +10,13 @@ import imageFixtures from '../../fixtures/images.json';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 
-test.describe('added images to block', () => {
+/**
+ * TODO: The test needs to be redone in the future.
+ * Currently, saved layouts cannot be modified using Gutenberg methods
+ * Because the block on the layout page is hardcoded,
+ * Preventing the addition of other blocks.
+ */
+test.describe('added images to saved layout', () => {
 	test.beforeEach(async ({ requestUtils }) => {
 		const pluginName = process.env.CORE
 			? 'visual-portfolio-pro'
@@ -33,7 +38,6 @@ test.describe('added images to block', () => {
 			requestUtils.deleteAllPosts(),
 		]);
 	});
-
 	/**
 	 * We create a gallery block and add pictures to it manually or automatically.
 	 *
@@ -41,8 +45,8 @@ test.describe('added images to block', () => {
 	 * @param {Page}         page               Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
 	 * @param {Admin}        admin              End to end test utilities for WordPress admin’s user interface.
 	 * @param {Editor}       editor             End to end test utilities for the WordPress Block Editor.
-	 * @param {boolean}      programmatically   Flag for setting manual or automatic adding of pictures to the block.
 	 * @param {boolean}      alternativeSetting Flag for setting alternative meta settings for test images.
+	 * @param                checkImageSettings
 	 * @return {{images: {format: string, video_url: string, url: string}[]}}
 	 */
 	async function generateGalleryBeforeEachTest(
@@ -50,17 +54,10 @@ test.describe('added images to block', () => {
 		page,
 		admin,
 		editor,
-		programmatically = false,
-		alternativeSetting = false
+		alternativeSetting = false,
+		checkImageSettings = false
 	) {
 		await admin.visitAdminPage('edit.php');
-
-		await admin.createNewPost({
-			title: 'Test Adding Images to a Block Programmatically',
-			postType: 'page',
-			showWelcomeGuide: false,
-			legacyCanvas: true,
-		});
 
 		const images = await getWordpressImages({
 			requestUtils,
@@ -70,44 +67,18 @@ test.describe('added images to block', () => {
 			alternativeSetting,
 		});
 
-		let attributes = {
-			setup_wizard: 'false',
-			content_source: 'images',
-		};
-
-		if (programmatically) {
-			attributes = {
-				...attributes,
-				images,
-			};
-		}
-
-		await editor.insertBlock({
-			name: 'visual-portfolio/block',
-			attributes,
+		await admin.createNewPost({
+			title: 'Test Adding Images to Saved Layout',
+			postType: 'vp_lists',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
 		});
-
-		return images;
-	}
-
-	test('added images to a block manually', async ({
-		page,
-		admin,
-		editor,
-		requestUtils,
-	}) => {
-		const images = await generateGalleryBeforeEachTest(
-			requestUtils,
-			page,
-			admin,
-			editor
-		);
 
 		await page
 			.locator(
-				'button.components-button.vpf-component-gallery-control-item-add',
+				'button.components-button.vpf-component-icon-selector-item',
 				{
-					hasText: 'Add Images',
+					hasText: 'Images',
 				}
 			)
 			.click();
@@ -118,7 +89,9 @@ test.describe('added images to block', () => {
 			})
 			.click();
 
-		const imageList = page.locator(
+		await page.waitForTimeout(500);
+
+		const imageList = await page.locator(
 			'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"]'
 		);
 
@@ -129,143 +102,21 @@ test.describe('added images to block', () => {
 				).imgUrl !== 'undefined'
 			) {
 				await image.click();
-			}
-		}
 
-		await page
-			.locator('button.button.media-button.media-button-select', {
-				hasText: 'Select',
-			})
-			.click();
+				const imageID = await image.getAttribute('data-id');
 
-		await page
-			.locator('.components-base-control__field', {
-				hasText: 'Items Per Page',
-			})
-			.locator('input.components-text-control__input')
-			.fill('10');
-
-		await page.waitForTimeout(500);
-
-		// Check images on backend editor.
-		for (const image of images) {
-			await expect(
-				page.frame('vpf-preview-1').locator('.wp-image-' + image.id)
-			).toBeVisible();
-		}
-
-		// Publish Post.
-		await editor.publishPost();
-
-		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
-
-		// Check images on frontend.
-		for (const image of images) {
-			await expect(page.locator('.wp-image-' + image.id)).toBeVisible();
-		}
-	});
-
-	test('added images to a block programmatically', async ({
-		page,
-		admin,
-		editor,
-		requestUtils,
-	}) => {
-		const images = await generateGalleryBeforeEachTest(
-			requestUtils,
-			page,
-			admin,
-			editor,
-			true
-		);
-
-		await page
-			.locator('.components-base-control__field', {
-				hasText: 'Items Per Page',
-			})
-			.locator('input.components-text-control__input')
-			.fill('10');
-
-		await page.waitForTimeout(500);
-
-		// Check images on backend editor.
-		for (const image of images) {
-			await expect(
-				page.frame('vpf-preview-1').locator('.wp-image-' + image.id)
-			).toBeVisible();
-		}
-
-		// Publish Post.
-		await editor.publishPost();
-
-		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
-
-		// Check images on frontend.
-		for (const image of images) {
-			await expect(page.locator('.wp-image-' + image.id)).toBeVisible();
-		}
-	});
-
-	test('checking image settings', async ({
-		page,
-		admin,
-		editor,
-		requestUtils,
-	}) => {
-		const images = await generateGalleryBeforeEachTest(
-			requestUtils,
-			page,
-			admin,
-			editor
-		);
-
-		await page
-			.locator(
-				'button.components-button.vpf-component-gallery-control-item-add',
-				{
-					hasText: 'Add Images',
-				}
-			)
-			.click();
-
-		await page
-			.locator('button#menu-item-browse', {
-				hasText: 'Media Library',
-			})
-			.click();
-
-		const imageList = page.locator(
-			'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"]'
-		);
-
-		for (const image of await imageList.elementHandles()) {
-			const dataId = await image.getAttribute('data-id');
-			const foundImage = await findAsyncSequential(
-				images,
-				async (x) => x.id === Number(dataId)
-			);
-
-			if (foundImage) {
-				const foundFixture = await findAsyncSequential(
-					imageFixtures,
-					async (x) => x.description === foundImage.description
+				const foundImage = await findAsyncSequential(
+					images,
+					async (x) => x.id === Number(imageID)
 				);
 
-				if (foundFixture) {
-					await image.click();
+				const foundFixture = await findAsyncSequential(
+					imageFixtures,
+					async (x) =>
+						x.description === (await foundImage.description)
+				);
 
+				if (typeof (await foundFixture) !== 'undefined') {
 					await page
 						.locator('#attachment-details-alt-text')
 						.fill(foundFixture.alt);
@@ -277,13 +128,7 @@ test.describe('added images to block', () => {
 					await page
 						.locator('#attachment-details-description')
 						.fill(foundFixture.description);
-				} else {
-					console.warn(
-						`No matching fixture found for image with ID: ${dataId}`
-					);
 				}
-			} else {
-				console.warn(`No matching image found for data-id: ${dataId}`);
 			}
 		}
 
@@ -294,15 +139,8 @@ test.describe('added images to block', () => {
 			.click();
 
 		await page
-			.locator('.components-base-control__field', {
-				hasText: 'Items Per Page',
-			})
-			.locator('input.components-text-control__input')
-			.fill('10');
-
-		await page
-			.locator('button.components-button.components-panel__body-toggle', {
-				hasText: 'Skin',
+			.locator('button.components-button.is-primary', {
+				hasText: 'Continue',
 			})
 			.click();
 
@@ -316,21 +154,154 @@ test.describe('added images to block', () => {
 			.click();
 
 		await page
-			.locator('button.components-button.components-navigator-button', {
-				hasText: 'Caption',
+			.locator('button.components-button.is-primary', {
+				hasText: 'Continue',
 			})
 			.click();
 
 		await page
-			.locator(
-				'button.components-button.vpf-component-collapse-control-toggle',
-				{
-					hasText: 'Elements',
-				}
-			)
+			.locator('button.components-button.is-primary', {
+				hasText: 'Continue',
+			})
 			.click();
 
-		await page.getByRole('checkbox', { name: 'Display Excerpt' }).check();
+		await page
+			.locator('.components-base-control__field', {
+				hasText: 'Items Per Page',
+			})
+			.locator('input.components-text-control__input')
+			.fill('10');
+
+		if (checkImageSettings) {
+			await page
+				.locator(
+					'button.components-button.components-panel__body-toggle',
+					{
+						hasText: 'Skin',
+					}
+				)
+				.click();
+
+			await page
+				.locator(
+					'button.components-button.components-navigator-button',
+					{
+						hasText: 'Caption',
+					}
+				)
+				.click();
+
+			await page
+				.locator(
+					'button.components-button.vpf-component-collapse-control-toggle',
+					{
+						hasText: 'Elements',
+					}
+				)
+				.click();
+
+			await page
+				.getByRole('checkbox', { name: 'Display Excerpt' })
+				.check();
+		}
+
+		await page.waitForTimeout(500);
+
+		// Check images on backend editor.
+		for (const image of await images) {
+			await expect(
+				page
+					.frameLocator('[title="vp-preview"]')
+					.locator('.wp-image-' + image.id)
+			).toBeVisible();
+		}
+
+		// Publish Post.
+		await editor.publishPost();
+
+		let postID = await page.locator('input[name="post_ID"]').inputValue();
+		postID = typeof postID === 'string' ? parseInt(postID, 10) : null;
+
+		return { postID, images };
+	}
+
+	test('added images to a saved layout manually', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		const { images, postID } = await generateGalleryBeforeEachTest(
+			requestUtils,
+			page,
+			admin,
+			editor
+		);
+
+		await admin.createNewPost({
+			title: 'Test Saved Layout',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/saved',
+			attributes: { id: String(postID) },
+		});
+
+		await page.waitForTimeout(500);
+
+		// Check images on backend editor.
+		for (const image of images) {
+			await expect(
+				page.frame('vpf-preview-1').locator('.wp-image-' + image.id)
+			).toBeVisible();
+		}
+
+		// Publish Post.
+		await editor.publishPost();
+
+		// Go to published post.
+		await page
+			.locator('.components-button', {
+				hasText: 'View Page',
+			})
+			.first()
+			.click();
+
+		// Check images on frontend.
+		for (const image of await images) {
+			await expect(page.locator('.wp-image-' + image.id)).toBeVisible();
+		}
+	});
+
+	test('checking image settings on saved layout', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		const { images, postID } = await generateGalleryBeforeEachTest(
+			requestUtils,
+			page,
+			admin,
+			editor,
+			false,
+			true
+		);
+
+		await admin.createNewPost({
+			title: 'Test Saved Layout (image settings)',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/saved',
+			attributes: { id: String(postID) },
+		});
 
 		await page.waitForTimeout(500);
 
@@ -395,7 +366,7 @@ test.describe('added images to block', () => {
 		}
 	});
 
-	test('checking alternative image settings', async ({
+	test('checking alternative image settings on saved layout', async ({
 		page,
 		admin,
 		editor,
@@ -426,113 +397,14 @@ test.describe('added images to block', () => {
 
 		await page.goto(currentPage);
 
-		const images = await generateGalleryBeforeEachTest(
+		const { images, postID } = await generateGalleryBeforeEachTest(
 			requestUtils,
 			page,
 			admin,
-			editor
+			editor,
+			false,
+			true
 		);
-
-		await page
-			.locator(
-				'button.components-button.vpf-component-gallery-control-item-add',
-				{
-					hasText: 'Add Images',
-				}
-			)
-			.click();
-
-		await page
-			.locator('button#menu-item-browse', {
-				hasText: 'Media Library',
-			})
-			.click();
-
-		const imageList = page.locator(
-			'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"]'
-		);
-
-		for (const image of await imageList.elementHandles()) {
-			const dataId = await image.getAttribute('data-id');
-			const foundImage = await findAsyncSequential(
-				images,
-				async (x) => x.id === Number(dataId)
-			);
-
-			if (foundImage) {
-				const foundFixture = await findAsyncSequential(
-					imageFixtures,
-					async (x) => x.description === foundImage.description
-				);
-
-				if (foundFixture) {
-					await image.click();
-
-					await page
-						.locator('#attachment-details-alt-text')
-						.fill(foundFixture.alt);
-
-					await page
-						.locator('#attachment-details-caption')
-						.fill(foundFixture.caption);
-
-					await page
-						.locator('#attachment-details-description')
-						.fill(foundFixture.description);
-				} else {
-					console.warn(
-						`No matching fixture found for image with ID: ${dataId}`
-					);
-				}
-			} else {
-				console.warn(`No matching image found for data-id: ${dataId}`);
-			}
-		}
-
-		await page
-			.locator('button.button.media-button.media-button-select', {
-				hasText: 'Select',
-			})
-			.click();
-
-		await page
-			.locator('.components-base-control__field', {
-				hasText: 'Items Per Page',
-			})
-			.locator('input.components-text-control__input')
-			.fill('10');
-
-		await page
-			.locator('button.components-button.components-panel__body-toggle', {
-				hasText: 'Skin',
-			})
-			.click();
-
-		await page
-			.locator(
-				'button.components-button.vpf-component-icon-selector-item',
-				{
-					hasText: 'Classic',
-				}
-			)
-			.click();
-
-		await page
-			.locator('button.components-button.components-navigator-button', {
-				hasText: 'Caption',
-			})
-			.click();
-
-		await page
-			.locator(
-				'button.components-button.vpf-component-collapse-control-toggle',
-				{
-					hasText: 'Elements',
-				}
-			)
-			.click();
-
-		await page.getByRole('checkbox', { name: 'Display Excerpt' }).check();
 
 		const galleryControlItems = page.locator(
 			'.vpf-component-gallery-control-items .vpf-component-gallery-control-item'
@@ -553,108 +425,83 @@ test.describe('added images to block', () => {
 				async (x) => x.description === itemDescription
 			);
 
-			if (foundImage) {
-				const foundFixture = await findAsyncSequential(
-					imageFixtures,
-					async (x) => x.description === itemDescription
-				);
+			const foundFixture = await findAsyncSequential(
+				imageFixtures,
+				async (x) => x.description === itemDescription
+			);
 
-				if (foundFixture) {
-					const foundFixtureIndex =
-						imageFixtures.indexOf(foundFixture);
-					imageFixtures[foundFixtureIndex].id = foundImage.id;
+			const foundFixtureIndex = imageFixtures.indexOf(foundFixture);
 
-					if (typeof foundFixture.imageSettings !== 'undefined') {
+			imageFixtures[foundFixtureIndex].id = foundImage.id;
+
+			if (typeof foundFixture.imageSettings !== 'undefined') {
+				await page
+					.locator(
+						'.vpf-component-gallery-control-item-modal .components-base-control__field',
+						{
+							hasText: 'Title',
+						}
+					)
+					.locator('input.components-text-control__input')
+					.fill(foundFixture.imageSettings.title);
+
+				await page
+					.locator(
+						'.vpf-component-gallery-control-item-modal .components-base-control__field',
+						{
+							hasText: 'Description',
+						}
+					)
+					.locator('textarea.components-textarea-control__input')
+					.fill(foundFixture.imageSettings.description);
+
+				if (typeof foundFixture.imageSettings.format !== 'undefined') {
+					await page
+						.locator(
+							'.vpf-component-gallery-control-item-modal .components-base-control__field',
+							{
+								hasText: 'Format',
+							}
+						)
+						.locator('.vpf-component-select')
+						.click();
+
+					await page
+						.locator('.vpf-component-select-option-label', {
+							hasText: foundFixture.imageSettings.format,
+						})
+						.click();
+
+					if (
+						foundFixture.imageSettings.format === 'standard' &&
+						typeof foundFixture.imageSettings.url !== 'undefined'
+					) {
+						foundFixture.imageSettings.url =
+							foundFixture.imageSettings.url === 'postLink'
+								? postLink
+								: foundFixture.imageSettings.url;
+
+						await page
+							.getByRole('textbox', { name: 'URL', exact: true })
+							.fill(foundFixture.imageSettings.url);
+					}
+
+					if (
+						foundFixture.imageSettings.format === 'video' &&
+						typeof foundFixture.imageSettings.videoUrl !==
+							'undefined'
+					) {
 						await page
 							.locator(
 								'.vpf-component-gallery-control-item-modal .components-base-control__field',
 								{
-									hasText: 'Title',
+									hasText: 'Video URL',
 								}
 							)
 							.locator('input.components-text-control__input')
-							.fill(foundFixture.imageSettings.title);
-
-						await page
-							.locator(
-								'.vpf-component-gallery-control-item-modal .components-base-control__field',
-								{
-									hasText: 'Description',
-								}
-							)
-							.locator(
-								'textarea.components-textarea-control__input'
-							)
-							.fill(foundFixture.imageSettings.description);
-
-						if (
-							typeof foundFixture.imageSettings.format !==
-							'undefined'
-						) {
-							await page
-								.locator(
-									'.vpf-component-gallery-control-item-modal .components-base-control__field',
-									{
-										hasText: 'Format',
-									}
-								)
-								.locator('.vpf-component-select')
-								.click();
-
-							await page
-								.locator('.vpf-component-select-option-label', {
-									hasText: foundFixture.imageSettings.format,
-								})
-								.click();
-
-							if (
-								foundFixture.imageSettings.format ===
-									'standard' &&
-								typeof foundFixture.imageSettings.url !==
-									'undefined'
-							) {
-								foundFixture.imageSettings.url =
-									foundFixture.imageSettings.url ===
-									'postLink'
-										? postLink
-										: foundFixture.imageSettings.url;
-
-								await page
-									.getByRole('textbox', {
-										name: 'URL',
-										exact: true,
-									})
-									.fill(foundFixture.imageSettings.url);
-							}
-
-							if (
-								foundFixture.imageSettings.format === 'video' &&
-								typeof foundFixture.imageSettings.videoUrl !==
-									'undefined'
-							) {
-								await page
-									.locator(
-										'.vpf-component-gallery-control-item-modal .components-base-control__field',
-										{
-											hasText: 'Video URL',
-										}
-									)
-									.locator(
-										'input.components-text-control__input'
-									)
-									.fill(foundFixture.imageSettings.videoUrl);
-							}
-						}
+							.fill(foundFixture.imageSettings.videoUrl);
 					}
-				} else {
-					console.warn(
-						`No matching fixture found for item with description: ${itemDescription}`
-					);
 				}
-			} else {
-				console.warn(
-					`No matching image found for item with description: ${itemDescription}`
-				);
 			}
 
 			await page.getByLabel('Close', { exact: true }).click();
@@ -663,14 +510,14 @@ test.describe('added images to block', () => {
 		// Check image attributes on backend editor.
 		for (const image of imageFixtures) {
 			const imageContainer = page
-				.frame('vpf-preview-1')
+				.frameLocator('[title="vp-preview"]')
 				.locator('.wp-image-' + image.id);
 			await expect(imageContainer).toBeVisible();
 
 			if (typeof image.imageSettings !== 'undefined') {
 				await expect(
 					page
-						.frame('vpf-preview-1')
+						.frameLocator('[title="vp-preview"]')
 						.locator('.vp-portfolio__item-meta-excerpt', {
 							hasText: image.imageSettings.description,
 						})
@@ -678,7 +525,7 @@ test.describe('added images to block', () => {
 
 				await expect(
 					page
-						.frame('vpf-preview-1')
+						.frameLocator('[title="vp-preview"]')
 						.locator('.vp-portfolio__item-meta-title > a', {
 							hasText: image.imageSettings.title,
 						})
@@ -692,7 +539,7 @@ test.describe('added images to block', () => {
 					) {
 						await expect(
 							page
-								.frame('vpf-preview-1')
+								.frameLocator('[title="vp-preview"]')
 								.locator('.vp-portfolio__item-meta-title > a', {
 									hasText: image.imageSettings.title,
 								})
@@ -700,7 +547,7 @@ test.describe('added images to block', () => {
 
 						await expect(
 							page
-								.frame('vpf-preview-1')
+								.frameLocator('[title="vp-preview"]')
 								.getByRole('link', { name: image.alt })
 						).toHaveAttribute('href', image.imageSettings.url);
 					}
@@ -711,7 +558,7 @@ test.describe('added images to block', () => {
 					) {
 						await expect(
 							page
-								.frame('vpf-preview-1')
+								.frameLocator('[title="vp-preview"]')
 								.locator('.vp-portfolio__item-meta-title > a', {
 									hasText: image.imageSettings.title,
 								})
@@ -719,7 +566,7 @@ test.describe('added images to block', () => {
 
 						await expect(
 							page
-								.frame('vpf-preview-1')
+								.frameLocator('[title="vp-preview"]')
 								.getByRole('link', { name: image.alt })
 						).toHaveAttribute('href', image.imageSettings.videoUrl);
 					}
@@ -727,7 +574,7 @@ test.describe('added images to block', () => {
 			} else {
 				await expect(
 					page
-						.frame('vpf-preview-1')
+						.frameLocator('[title="vp-preview"]')
 						.locator('.vp-portfolio__item-meta-excerpt', {
 							hasText: image.description,
 						})
@@ -735,9 +582,33 @@ test.describe('added images to block', () => {
 			}
 
 			await expect(
-				page.frame('vpf-preview-1').getByAltText(image.alt)
+				page
+					.frameLocator('[title="vp-preview"]')
+					.getByAltText(image.alt)
 			).toBeVisible();
 		}
+
+		// Save Layout.
+		await page
+			.locator('button.components-button.editor-post-publish-button', {
+				hasText: 'Save',
+			})
+			.first()
+			.click();
+
+		await admin.createNewPost({
+			title: 'Test Saved Layout (alternative image settings)',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/saved',
+			attributes: { id: String(postID) },
+		});
+
+		await page.waitForTimeout(500);
 
 		// Publish Post.
 		await editor.publishPost();

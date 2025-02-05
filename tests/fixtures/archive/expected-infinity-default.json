@@ -17,40 +17,7 @@
 		  "categories": false,
 		  "title": "Portfolio 9 test post",
 		  "description": "Quisque tristique, velit et auctor ultrices, ante diam faucibus tellus, quis sodales leo nulla eu ante. Sed condimentum dolor gravida."
-		}
-	  ],
-	  "pagination": [
-		{
-		  "text": "1",
-		  "active": true
 		},
-		{
-		  "url": "/?page_id=0000&vp_page=2",
-		  "text": "2",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=3",
-		  "text": "3",
-		  "standard": true
-		},
-		{
-		  "text": "…",
-		  "dots": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=5",
-		  "text": "5",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=2",
-		  "nextPage": true
-		}
-	  ]
-	},
-	{
-	  "items": [
 		{
 		  "url": "/?portfolio=portfolio-8-test-post",
 		  "categories": [
@@ -72,41 +39,7 @@
 		  ],
 		  "title": "Portfolio 7 test post",
 		  "description": "Nulla tincidunt arcu in dictum elementum. Quisque fringilla venenatis nulla ut sollicitudin. Praesent facilisis a libero laoreet viverra. Nunc placerat."
-		}
-	  ],
-	  "pagination": [
-		{
-		  "url": "/?page_id=0000&vp_page=1",
-		  "text": "1",
-		  "standard": true
 		},
-		{
-		  "text": "2",
-		  "active": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=3",
-		  "text": "3",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=4",
-		  "text": "4",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=5",
-		  "text": "5",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=3",
-		  "nextPage": true
-		}
-	  ]
-	},
-	{
-	  "items": [
 		{
 		  "url": "/?portfolio=portfolio-6-test-post",
 		  "categories": false,
@@ -123,41 +56,7 @@
 		  ],
 		  "title": "Portfolio 5 test post",
 		  "description": "Morbi tincidunt aliquet velit vitae imperdiet. Curabitur ex mauris, pharetra sit amet varius in, iaculis at libero. Interdum et malesuada."
-		}
-	  ],
-	  "pagination": [
-		{
-		  "url": "/?page_id=0000&vp_page=1",
-		  "text": "1",
-		  "standard": true
 		},
-		{
-		  "url": "/?page_id=0000&vp_page=2",
-		  "text": "2",
-		  "standard": true
-		},
-		{
-		  "text": "3",
-		  "active": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=4",
-		  "text": "4",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=5",
-		  "text": "5",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=4",
-		  "nextPage": true
-		}
-	  ]
-	},
-	{
-	  "items": [
 		{
 		  "url": "/?portfolio=portfolio-4-test-post",
 		  "categories": [
@@ -183,41 +82,7 @@
 		  ],
 		  "title": "Portfolio 3 test post",
 		  "description": "Aliquam sed pretium purus. Cras viverra viverra felis. Ut vitae massa felis. Curabitur tempus vitae eros eu feugiat. Ut molestie."
-		}
-	  ],
-	  "pagination": [
-		{
-		  "url": "/?page_id=0000&vp_page=1",
-		  "text": "1",
-		  "standard": true
 		},
-		{
-		  "url": "/?page_id=0000&vp_page=2",
-		  "text": "2",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=3",
-		  "text": "3",
-		  "standard": true
-		},
-		{
-		  "text": "4",
-		  "active": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=5",
-		  "text": "5",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=5",
-		  "nextPage": true
-		}
-	  ]
-	},
-	{
-	  "items": [
 		{
 		  "url": "/?portfolio=portfolio-2-test-post",
 		  "categories": [
@@ -256,31 +121,6 @@
 		  "title": "Portfolio 1 test post",
 		  "description": "TMauris id tincidunt urna, ut mattis mauris. Curabitur in massa vel felis pretium aliquet vitae ut elit. Aenean at volutpat."
 		}
-	  ],
-	  "pagination": [
-		{
-		  "url": "/?page_id=0000&vp_page=1",
-		  "text": "1",
-		  "standard": true
-		},
-		{
-		  "text": "…",
-		  "dots": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=3",
-		  "text": "3",
-		  "standard": true
-		},
-		{
-		  "url": "/?page_id=0000&vp_page=4",
-		  "text": "4",
-		  "standard": true
-		},
-		{
-		  "text": "5",
-		  "active": true
-		}
 	  ]
 	}
-  ]
+]

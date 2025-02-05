@@ -1,74 +1,112 @@
+/* eslint-disable no-console */
 /**
  * WordPress dependencies
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import expectedArchiveCategoryDefault from '../../fixtures/archive/expected-category-default.json';
+import expectedArchiveCategoryInfinityDefault from '../../fixtures/archive/expected-category-infinity-default.json';
+import expectedArchiveCategoryInfinityPostName from '../../fixtures/archive/expected-category-infinity-post-name.json';
+import expectedArchiveCategoryLoadMoreDefault from '../../fixtures/archive/expected-category-load-more-default.json';
+import expectedArchiveCategoryLoadMorePostName from '../../fixtures/archive/expected-category-load-more-post-name.json';
 import expectedArchiveCategoryPostName from '../../fixtures/archive/expected-category-post-name.json';
 import expectedArchiveDefault from '../../fixtures/archive/expected-default.json';
+import expectedArchiveInfinityDefault from '../../fixtures/archive/expected-infinity-default.json';
+import expectedArchiveLoadMoreDefault from '../../fixtures/archive/expected-load-more-default.json';
 import expectedArchivePostName from '../../fixtures/archive/expected-post-name-permalinks.json';
+import expectedArchivePostNameLoadMore from '../../fixtures/archive/expected-post-name-permalinks-load-more.json';
+import expectedArchivePostNameInfinity from '../../fixtures/archive/expected-post-name-premalinks-infinity.json';
 import portfolioPosts from '../../fixtures/archive/portfolio-posts.json';
 import imageFixtures from '../../fixtures/images.json';
 import { deleteAllPortfolio } from '../utils/delete-all-portfolio';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 
+const logsEnabled = process.env.LOGS || false;
+
 test.describe('archive pages', () => {
-	test.beforeEach(async ({ requestUtils }) => {
+	test.beforeEach(async ({ admin, page, requestUtils }) => {
+		await setPermalinkSettings(admin, page, 'Post name');
 		const pluginName = process.env.CORE
 			? 'visual-portfolio-pro'
 			: 'visual-portfolio-posts-amp-image-gallery';
 		await requestUtils.activatePlugin(pluginName);
-		await requestUtils.deleteAllMedia();
-		await requestUtils.deleteAllPages();
-		await requestUtils.deleteAllPosts();
-		await deleteAllPortfolio({ requestUtils });
 	});
+
 	test.afterEach(async ({ requestUtils }) => {
-		await requestUtils.deleteAllMedia();
-		await requestUtils.deleteAllPages();
-		await requestUtils.deleteAllPosts();
-		await deleteAllPortfolio({ requestUtils });
+		await Promise.all([
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllPosts(),
+		]);
+	});
+
+	test.afterAll(async ({ requestUtils }) => {
+		await Promise.all([
+			deleteAllPortfolioTaxonomies(requestUtils),
+			deleteAllPortfolio({ requestUtils }),
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllPosts(),
+		]);
 	});
 
 	/**
-	 * Deleting all categories of portfolio posts.
+	 * Asynchronously deletes all terms associated with a specified taxonomy in a WordPress site.
+	 * Utilizes the requestUtils.rest method to interact with the WordPress REST API.
 	 *
-	 * @param {Admin} admin End to end test utilities for WordPress admin’s user interface.
-	 * @param {Page}  page  Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Object} requestUtils - An object that provides utility methods for making REST API requests.
+	 * @param {string} taxonomy     - A string representing the taxonomy from which terms should be deleted (e.g., 'portfolio_category', 'portfolio_tag').
 	 */
-	async function deletePortfolioCategories(admin, page) {
-		await admin.visitAdminPage(
-			'edit-tags.php?taxonomy=portfolio_category&post_type=portfolio'
-		);
+	async function deletePortfolioTaxonomyTerms(requestUtils, taxonomy) {
+		try {
+			// Get all terms for the specified taxonomy
+			const terms = await requestUtils.rest({
+				path: `/wp/v2/${taxonomy}`,
+				method: 'GET',
+				params: {
+					// Adjust as necessary for your needs
+					per_page: 100,
+					context: 'view',
+					hide_empty: false,
+				},
+			});
 
-		if ((await page.locator('#the-list > tr').count()) > 1) {
-			await page.locator('#cb-select-all-1').check();
-			await page
-				.locator('#bulk-action-selector-top')
-				.selectOption('delete');
-			await page.locator('#doaction').click();
+			// Check if the response is an error
+			if (!Array.isArray(terms)) {
+				throw new Error(
+					`Failed to retrieve terms for taxonomy "${taxonomy}". Response: ${JSON.stringify(terms)}`
+				);
+			}
+
+			// Iterate over each term and delete it
+			for (const term of await terms) {
+				try {
+					await requestUtils.rest({
+						path: `/wp/v2/${taxonomy}/${term.id}`,
+						method: 'DELETE',
+						params: { force: true }, // Force delete to bypass trash
+					});
+				} catch (deleteError) {
+					console.log(
+						`Error deleting term with ID ${term.id}:`,
+						deleteError
+					);
+				}
+			}
+		} catch (error) {
+			console.log(`Error deleting ${taxonomy} terms:`, error);
 		}
 	}
 
 	/**
-	 * Deleting all tags of portfolio posts.
+	 * Asynchronously deletes all terms from 'portfolio_category' and 'portfolio_tag' taxonomies.
+	 * Serves as a usage example for deletePortfolioTaxonomyTerms.
 	 *
-	 * @param {Admin} admin End to end test utilities for WordPress admin’s user interface.
-	 * @param {Page}  page  Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Object} requestUtils - An object that provides utility methods for making REST API requests.
 	 */
-	async function deletePortfolioTags(admin, page) {
-		await admin.visitAdminPage(
-			'edit-tags.php?taxonomy=portfolio_tag&post_type=portfolio'
-		);
-
-		if ((await page.locator('#the-list > tr').count()) > 1) {
-			await page.locator('#cb-select-all-1').check();
-			await page
-				.locator('#bulk-action-selector-top')
-				.selectOption('delete');
-			await page.locator('#doaction').click();
-		}
+	async function deleteAllPortfolioTaxonomies(requestUtils) {
+		await deletePortfolioTaxonomyTerms(requestUtils, 'portfolio_category');
+		await deletePortfolioTaxonomyTerms(requestUtils, 'portfolio_tag');
 	}
 
 	/**
@@ -79,194 +117,127 @@ test.describe('archive pages', () => {
 	async function getArchiveItems(page) {
 		const archiveItems = [];
 		const items = await page.locator(
-			'.vp-portfolio__items article.vp-portfolio__item-wrap'
+			'.vp-portfolio__ready .vp-portfolio__items article.vp-portfolio__item-wrap'
 		);
 
-		for (const item of await items.all()) {
-			await page.waitForTimeout(700);
-			const url = await item
-				.locator('.vp-portfolio__item-img > a')
-				.getAttribute('href');
-			const categoriesWrapper = await item.locator(
-				'.vp-portfolio__item-meta .vp-portfolio__item-meta-categories > .vp-portfolio__item-meta-category'
-			);
+		// Log the count of items found
+		const itemCount = await items.count();
 
-			if (await categoriesWrapper.count()) {
-				const categories = [];
-				for (const categoryWrap of await categoriesWrapper.all()) {
-					const category = await categoryWrap
-						.locator('a')
-						.innerText();
-					const categoryUrl = await categoryWrap
-						.locator('a')
-						.getAttribute('href');
-					categories.push({
-						category,
-						categoryUrl,
-					});
+		if (logsEnabled) {
+			console.log(`Found ${itemCount} items on the page`);
+		}
+
+		for (let i = 0; i < itemCount; i++) {
+			try {
+				const item = await items.nth(i);
+
+				// Check if the element exists before waiting for visibility
+				const imgExists = await item
+					.locator('.vp-portfolio__item-img')
+					.count();
+				if (imgExists === 0) {
+					if (logsEnabled) {
+						console.log(`Image not found for item ${i + 1}`);
+					}
+					continue;
 				}
+
+				// Wait for the image to be visible with increased timeout
+				try {
+					await item.locator('.vp-portfolio__item-img').waitFor({
+						state: 'visible',
+						timeout: 1000, // Increased timeout
+					});
+				} catch (error) {
+					console.log(
+						`Image not visible for item ${i + 1}, skipping.`
+					);
+					continue;
+				}
+
+				const url = await item
+					.locator('.vp-portfolio__item-img > a[href]')
+					.getAttribute('href');
+
+				const categoriesWrapper = item.locator(
+					'.vp-portfolio__item-meta .vp-portfolio__item-meta-categories > .vp-portfolio__item-meta-category'
+				);
+
+				const categories = [];
+				if (await categoriesWrapper.count()) {
+					for (const categoryWrap of await categoriesWrapper.all()) {
+						const category = await categoryWrap
+							.locator('a')
+							.innerText();
+						const categoryUrl = await categoryWrap
+							.locator('a')
+							.getAttribute('href');
+						categories.push({
+							category,
+							categoryUrl,
+						});
+					}
+				}
+
+				// Check if the title element exists before trying to get text
+				const titleLocator = item.locator(
+					'.vp-portfolio__item-meta-title > a'
+				);
+				const titleExists = await titleLocator.count();
+				let title = '';
+				if (titleExists > 0) {
+					try {
+						title = await titleLocator.innerText({
+							timeout: 20000,
+						}); // Increased timeout
+					} catch (error) {
+						console.log(
+							`Title not visible for item ${i + 1}, skipping.`
+						);
+						continue;
+					}
+				} else {
+					console.log(`Title not found for item ${i + 1}`);
+					continue;
+				}
+
+				// Check if the description element exists and is visible
+				const descriptionLocator = item.locator(
+					'.vp-portfolio__item-meta-excerpt > div'
+				);
+				const descriptionExists = await descriptionLocator.count();
+				let description = '';
+				if (descriptionExists > 0) {
+					try {
+						// Attempt to get the description text
+						description = await descriptionLocator.innerText({
+							timeout: 1000,
+						});
+					} catch (error) {
+						console.log(
+							`Description not visible for item ${i + 1}, skipping description extraction.`
+						);
+					}
+				} else if (logsEnabled) {
+					console.log(`Description not found for item ${i + 1}`);
+				}
+
+				archiveItems.push({
+					url,
+					categories: categories.length > 0 ? categories : false,
+					title,
+					description,
+				});
+
+				if (logsEnabled) {
+					console.log(`Extracted item: ${title}, URL: ${url}`);
+				}
+			} catch (error) {
+				console.error('Error extracting item:', error);
 			}
-
-			const title = await item
-				.locator('.vp-portfolio__item-meta-title > a')
-				.innerText();
-
-			const description = await item
-				.locator('.vp-portfolio__item-meta-excerpt > div')
-				.innerText();
-
-			archiveItems.push({
-				url,
-				categories:
-					typeof categories !== 'undefined'
-						? // eslint-disable-next-line no-undef
-							categories
-						: false,
-				title,
-				description,
-			});
 		}
 
 		return archiveItems;
-	}
-
-	/**
-	 * We create portfolio posts for the archives page.
-	 * We fill these posts with pictures, titles, descriptions and other necessary meta data.
-	 * We also set tags and categories.
-	 *
-	 * @param {RequestUtils} requestUtils Playwright utilities for interacting with the WordPress REST API.
-	 * @param {Page}         page         Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
-	 * @param {Admin}        admin        End to end test utilities for WordPress admin’s user interface.
-	 * @param {Editor}       editor       End to end test utilities for the WordPress Block Editor.
-	 */
-	async function createPortfolioPosts(requestUtils, page, admin, editor) {
-		const images = await getWordpressImages({
-			requestUtils,
-			page,
-			admin,
-			editor,
-		});
-
-		let key = 0;
-		for (const post of portfolioPosts) {
-			await admin.createNewPost(post);
-
-			const foundFixtureImage = await findAsyncSequential(
-				imageFixtures,
-				async (x) => x.postTitle === post.title
-			);
-
-			const foundImage = await findAsyncSequential(
-				images,
-				async (x) => x.description === foundFixtureImage.description
-			);
-
-			const featuredExpandedPanel = page.getByRole('button', {
-				name: 'Featured image',
-				exact: true,
-				expanded: false,
-			});
-
-			const isFeaturedPanelExpanded = await featuredExpandedPanel.count();
-
-			if (isFeaturedPanelExpanded) {
-				await featuredExpandedPanel.click();
-			}
-
-			await page
-				.getByRole('button', { name: 'Set featured image' })
-				.click();
-
-			await page.getByRole('tab', { name: 'Media Library' }).click();
-
-			const imageContainer = await page.locator(
-				'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[data-id="' +
-					foundImage.id +
-					'"]'
-			);
-
-			await imageContainer.click();
-
-			await page
-				.getByRole('button', { name: 'Set featured image' })
-				.click();
-
-			const categoriesExpandedPanel = page.getByRole('button', {
-				name: 'Categories',
-				exact: true,
-				expanded: false,
-			});
-
-			const isCategoriesPanelExpanded =
-				await categoriesExpandedPanel.count();
-
-			if (isCategoriesPanelExpanded) {
-				await categoriesExpandedPanel.click();
-			}
-
-			if (typeof post.categories !== 'undefined') {
-				for (const category of post.categories) {
-					const isVisibleCategoryField =
-						page.getByLabel('New Category Name');
-
-					if (!(await isVisibleCategoryField.isVisible())) {
-						await page
-							.getByRole('button', { name: 'Add New Category' })
-							.first()
-							.click();
-					}
-
-					if (await isVisibleCategoryField.isVisible()) {
-						await isVisibleCategoryField.fill(category);
-						await page
-							.getByLabel('Project')
-							.locator('form')
-							.getByRole('button', { name: 'Add New Category' })
-							.click();
-					}
-
-					await page.waitForTimeout(500);
-				}
-			}
-
-			const tagsExpandedPanel = page.getByRole('button', {
-				name: 'Tags',
-				exact: true,
-				expanded: false,
-			});
-
-			const isTagsExpandedPanel = await tagsExpandedPanel.count();
-
-			if (isTagsExpandedPanel) {
-				await tagsExpandedPanel.click();
-			}
-
-			if (typeof post.tags !== 'undefined') {
-				for (const tag of post.tags) {
-					await page.getByLabel('Add New Tag').fill(tag);
-					await page.getByLabel('Add New Tag').press('Enter');
-				}
-			}
-
-			//await page.waitForTimeout(500);
-
-			// Publish Post.
-			await editor.publishPost();
-
-			// Go to published post.
-			await page
-				.locator('.components-button', {
-					hasText: 'View Project',
-				})
-				.first()
-				.click();
-
-			const postLink = page.url();
-
-			portfolioPosts[key].postLink = postLink;
-			key = key + 1;
-		}
 	}
 
 	/**
@@ -274,12 +245,18 @@ test.describe('archive pages', () => {
 	 * We select the number of elements displayed on the page, skin and pagination display.
 	 * Setting the display of the category filter.
 	 *
-	 * @param {Page}   page   Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
-	 * @param {Admin}  admin  End to end test utilities for WordPress admin’s user interface.
-	 * @param {Editor} editor End to end test utilities for the WordPress Block Editor.
+	 * @param {Page}   page           Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Admin}  admin          End to end test utilities for WordPress admin’s user interface.
+	 * @param {Editor} editor         End to end test utilities for the WordPress Block Editor.
+	 * @param {string} typePagination Type of Pagination.
 	 * @return {{archiveID: number, archiveUrl: string}} Return object with archive page ID and archive URL.
 	 */
-	async function createArchivePage(page, admin, editor) {
+	async function createArchivePage(
+		page,
+		admin,
+		editor,
+		typePagination = 'paged'
+	) {
 		await admin.createNewPost({
 			title: 'Portfolio',
 			postType: 'page',
@@ -303,7 +280,19 @@ test.describe('archive pages', () => {
 		await page.getByRole('button', { name: 'Current Query' }).click();
 		await page.getByRole('button', { name: 'Layout' }).click();
 		await page.getByRole('button', { name: 'Pagination' }).click();
-		await page.getByRole('button', { name: 'Paged' }).click();
+
+		switch (typePagination) {
+			case 'paged':
+				await page.getByRole('button', { name: 'Paged' }).click();
+				break;
+			case 'loadMore':
+				await page.getByRole('button', { name: 'Load More' }).click();
+				break;
+			case 'inf':
+				await page.getByRole('button', { name: 'Infinite' }).click();
+				break;
+		}
+
 		await page.getByLabel('Close', { exact: true }).click();
 		await page.getByRole('button', { name: 'Skin' }).click();
 		await page.getByRole('button', { name: 'Caption' }).click();
@@ -360,13 +349,57 @@ test.describe('archive pages', () => {
 		await page.getByRole('button', { name: 'Save Changes' }).click();
 	}
 
+	// This function ensures that the page is fully loaded before any data collection begins.
+	async function awaitPageLoading(page) {
+		// Ensure the page is fully loaded before collecting data
+		await page.waitForSelector('.vp-portfolio__ready', {
+			state: 'attached',
+			timeout: 15000,
+		});
+		await page.waitForLoadState('networkidle');
+		await page.waitForLoadState('domcontentloaded');
+	}
+
+	// This function handles pagination by clicking the appropriate button to content.
+	async function clickToPagination(
+		page,
+		pagination,
+		typePagination = 'paged'
+	) {
+		const button =
+			typePagination === 'paged'
+				? '.vp-pagination__item.vp-pagination__item-next > a'
+				: 'a.vp-pagination__load-more';
+		await Promise.all([
+			page
+				.waitForSelector('.vp-portfolio__ready', {
+					state: 'detached',
+					timeout: 500,
+				})
+				.catch(() => {
+					/* ignore if it doesn’t detach */
+				}),
+			page.waitForSelector('.vp-portfolio__ready', {
+				state: 'attached',
+				timeout: 15000,
+			}),
+			pagination
+				.locator(button)
+				.click()
+				.catch(() => {
+					/* ignore if it doesn’t detach */
+				}),
+		]);
+	}
+
 	/**
 	 * We receive an array of objects with archive elements in the process of querying the layout on the front-end side.
 	 * This array will be used as a comparison array against the expected result.
 	 * During the survey process, we also collect information about the current state of pagination,
 	 * Understanding what page we are on and what elements surround us.
 	 *
-	 * @param {Page} page Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Page}   page           Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {string} typePagination Type of Pagination.
 	 * @return {
 	 * {
 	 * 	items:
@@ -395,19 +428,23 @@ test.describe('archive pages', () => {
 	 * }
 	 * []}
 	 */
-	async function getReceivedArchive(page) {
+	async function getReceivedArchive(page, typePagination = 'paged') {
 		const pageCounts = 5;
 		const receivedArchive = [];
 		let currentCount = 0;
 
 		while (currentCount < pageCounts) {
 			const archivePagination = [];
-
-			await page.waitForTimeout(2000);
+			// Ensure the page is fully loaded before collecting data
+			await awaitPageLoading(page);
 
 			const archiveItems = await getArchiveItems(page);
 
-			await page.waitForTimeout(1000);
+			if (logsEnabled) {
+				console.log(
+					`Page ${currentCount + 1}: Retrieved ${archiveItems.length} items`
+				);
+			}
 
 			const pagination = await page.locator(
 				'.vp-portfolio__layout-elements .vp-pagination'
@@ -420,70 +457,172 @@ test.describe('archive pages', () => {
 			for (const paginationItem of await paginationItems.all()) {
 				const classes = await paginationItem.getAttribute('class');
 
-				if (
-					classes === 'vp-pagination__item vp-pagination__item-active'
-				) {
-					const activeElement = await paginationItem.innerText();
-					archivePagination.push({
-						text: activeElement,
-						active: true,
-					});
-				}
+				switch (typePagination) {
+					case 'paged':
+						if (
+							classes ===
+							'vp-pagination__item vp-pagination__item-active'
+						) {
+							const activeElement =
+								await paginationItem.innerText();
+							archivePagination.push({
+								text: activeElement,
+								active: true,
+							});
+						}
 
-				if (classes === 'vp-pagination__item') {
-					const paginationLink = await paginationItem
-						.locator('a')
-						.getAttribute('href');
-					const paginationText = await paginationItem
-						.locator('a')
-						.innerText();
-					archivePagination.push({
-						url: paginationLink,
-						text: paginationText,
-						standard: true,
-					});
-				}
+						if (classes === 'vp-pagination__item') {
+							const paginationLink = await paginationItem
+								.locator('a')
+								.getAttribute('href');
+							const paginationText = await paginationItem
+								.locator('a')
+								.innerText();
+							archivePagination.push({
+								url: paginationLink,
+								text: paginationText,
+								standard: true,
+							});
+						}
 
-				if (
-					classes === 'vp-pagination__item vp-pagination__item-dots'
-				) {
-					const dotsText = await paginationItem.innerText();
-					archivePagination.push({
-						text: dotsText,
-						dots: true,
-					});
-				}
+						if (
+							classes ===
+							'vp-pagination__item vp-pagination__item-dots'
+						) {
+							const dotsText = await paginationItem.innerText();
+							archivePagination.push({
+								text: dotsText,
+								dots: true,
+							});
+						}
 
-				if (
-					classes === 'vp-pagination__item vp-pagination__item-next'
-				) {
-					const nextPaginationLink = await paginationItem
-						.locator('a')
-						.getAttribute('href');
-					archivePagination.push({
-						url: nextPaginationLink,
-						nextPage: true,
-					});
+						if (
+							classes ===
+							'vp-pagination__item vp-pagination__item-next'
+						) {
+							const nextPaginationLink = await paginationItem
+								.locator('a')
+								.getAttribute('href');
+							archivePagination.push({
+								url: nextPaginationLink,
+								nextPage: true,
+							});
+						}
+						break;
+					case 'loadMore':
+						if (
+							classes === 'vp-pagination__item' &&
+							(await pagination
+								.locator('.vp-pagination__no-more')
+								.count()) === 0
+						) {
+							const paginationLink = await paginationItem
+								.locator('a')
+								.getAttribute('href');
+							const paginationText = await paginationItem
+								.locator('a')
+								.innerText();
+							archivePagination.push({
+								url: paginationLink,
+								text: paginationText,
+							});
+						}
+						break;
 				}
 			}
 
-			receivedArchive.push({
-				items: archiveItems,
-				pagination: archivePagination,
-			});
+			if (archiveItems.length > 0 && typePagination !== 'inf') {
+				// Check for duplicates before adding
+				for (const item of archiveItems) {
+					if (
+						!receivedArchive.some((existingItem) =>
+							existingItem.items.some(
+								(existing) => existing.url === item.url
+							)
+						)
+					) {
+						receivedArchive.push({
+							items: archiveItems,
+							pagination: archivePagination,
+						});
+					} else if (logsEnabled) {
+						console.log(
+							`Duplicate item detected: ${item.title}, URL: ${item.url}`
+						);
+					}
+				}
+			}
 
 			currentCount++;
 
-			if (
-				await pagination
-					.locator('.vp-pagination__item.vp-pagination__item-next')
-					.count()
+			const nextPageExists = await pagination
+				.locator('.vp-pagination__item.vp-pagination__item-next > a')
+				.isVisible();
+			if (nextPageExists && typePagination === 'paged') {
+				if (logsEnabled) {
+					console.log('Navigating to the next page...');
+				}
+
+				try {
+					// Click the next page button and immediately wait for the class to be detached and attached again
+					await clickToPagination(page, pagination);
+
+					if (logsEnabled) {
+						console.log(`Navigated to page ${currentCount + 1}`);
+					}
+				} catch (error) {
+					console.error('Error navigating to the next page:', error);
+				}
+			} else if (
+				!nextPageExists &&
+				typePagination !== 'paged' &&
+				logsEnabled
 			) {
-				await pagination
-					.locator(
-						'.vp-pagination__item.vp-pagination__item-next > a'
-					)
-					.click();
+				console.log('No more pages to navigate.');
+			}
+
+			if (
+				(await pagination
+					.locator('a.vp-pagination__load-more')
+					.count()) &&
+				(typePagination === 'loadMore' || typePagination === 'inf')
+			) {
+				await page.waitForSelector('a.vp-pagination__load-more', {
+					state: 'visible',
+				});
+
+				await page
+					.locator('a.vp-pagination__load-more')
+					.scrollIntoViewIfNeeded();
+
+				const nextPageAttribute = await pagination
+					.locator('a.vp-pagination__load-more')
+					.getAttribute('href');
+				if (nextPageAttribute !== '') {
+					try {
+						if (logsEnabled) {
+							console.log('Loading more items...');
+						}
+
+						await clickToPagination(
+							page,
+							pagination,
+							typePagination
+						);
+					} catch (error) {
+						console.error('Error clicking "Load More":', error);
+					}
+				}
+
+				if (
+					typePagination === 'inf' &&
+					nextPageAttribute === '' &&
+					currentCount === 5
+				) {
+					receivedArchive.push({
+						items: archiveItems,
+					});
+				}
 			}
 		}
 
@@ -496,10 +635,11 @@ test.describe('archive pages', () => {
 	 * During the survey process, we also collect information about the current state of pagination,
 	 * Understanding what page we are on and what elements surround us.
 	 *
-	 * @param {Page} page Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Page}   page           Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {string} typePagination Type of Pagination.
 	 * @return {{title: any, url: any, items: never[]}[]}
 	 */
-	async function getReceivedCategories(page) {
+	async function getReceivedCategories(page, typePagination = 'paged') {
 		const filterItems = await page
 			.locator('.vp-filter .vp-filter__item')
 			.filter({ hasNotText: 'All' });
@@ -518,29 +658,76 @@ test.describe('archive pages', () => {
 		let categoryKey = 0;
 
 		for (const category of receivedCategories) {
-			await page
-				.locator('.vp-filter .vp-filter__item')
-				.filter({ hasText: category.title })
-				.click();
-
-			await page.waitForTimeout(700);
-
-			let archiveItems = await getArchiveItems(page);
+			await Promise.all([
+				awaitPageLoading(page),
+				page
+					.waitForSelector('.vp-portfolio__ready', {
+						state: 'detached',
+						timeout: 500,
+					})
+					.catch(() => {
+						/* ignore if it doesn’t detach */
+					}),
+				page.waitForSelector('.vp-portfolio__ready', {
+					state: 'attached',
+					timeout: 15000,
+				}),
+				page
+					.locator('.vp-filter .vp-filter__item')
+					.filter({ hasText: category.title })
+					.click(),
+			]);
 
 			const pagination = page.locator(
 				'.vp-portfolio__layout-elements .vp-pagination'
 			);
 
-			if (archiveItems.length === 2 && (await pagination.count())) {
-				await pagination
-					.locator(
-						'.vp-pagination__item.vp-pagination__item-next > a'
-					)
-					.click();
+			let archiveItems = [];
 
-				await page.waitForTimeout(500);
+			switch (typePagination) {
+				case 'paged':
+					archiveItems = await getArchiveItems(page);
 
-				archiveItems = archiveItems.concat(await getArchiveItems(page));
+					if (
+						archiveItems.length === 2 &&
+						(await pagination.count())
+					) {
+						await clickToPagination(page, pagination);
+
+						await awaitPageLoading(page);
+
+						archiveItems = archiveItems.concat(
+							await getArchiveItems(page)
+						);
+					}
+					break;
+				case 'loadMore':
+				case 'inf':
+					if (
+						await pagination
+							.locator('a.vp-pagination__load-more')
+							.count()
+					) {
+						const nextPageAttribute = await pagination
+							.locator('a.vp-pagination__load-more')
+							.getAttribute('href');
+						if (nextPageAttribute !== '') {
+							await clickToPagination(
+								page,
+								pagination,
+								typePagination
+							);
+
+							await awaitPageLoading(page);
+						}
+					}
+
+					// Wait for archiveItems to be filled
+					while (archiveItems.length === 0) {
+						await page.waitForTimeout(100); // Wait for 100ms before checking again
+						archiveItems = (await getArchiveItems(page)) || [];
+					}
+					break;
 			}
 
 			receivedCategories[categoryKey].items = archiveItems;
@@ -551,101 +738,340 @@ test.describe('archive pages', () => {
 		return receivedCategories;
 	}
 
+	/**
+	 * We create portfolio posts for the archives page.
+	 * We fill these posts with pictures, titles, descriptions and other necessary meta data.
+	 * We also set tags and categories.
+	 *
+	 * @param {Page}         page         Provides methods to interact with a single tab in a Browser, or an extension background page in Chromium.
+	 * @param {Admin}        admin        End to end test utilities for WordPress admin’s user interface.
+	 * @param {Editor}       editor       End to end test utilities for the WordPress Block Editor.
+	 * @param {RequestUtils} requestUtils Playwright utilities for interacting with the WordPress REST API.
+	 */
+	async function maybeCreatePortfolioPosts(
+		page,
+		admin,
+		editor,
+		requestUtils
+	) {
+		// Retry mechanism for REST API calls in case of an error.
+		async function retryRequest(fn, retries = 3, delay = 1000) {
+			for (let attempt = 1; attempt <= retries; attempt++) {
+				try {
+					return await fn();
+				} catch (error) {
+					if (attempt === retries) {
+						throw error; // If it's the last attempt, rethrow the error
+					}
+					console.warn(
+						`Attempt ${attempt} failed. Retrying in ${delay}ms...`,
+						error
+					);
+					await new Promise((resolve) => setTimeout(resolve, delay)); // Wait before retrying
+				}
+			}
+		}
+
+		// Retrieve existing posts, categories, and tags
+		const existingPosts = await retryRequest(() =>
+			requestUtils.rest({
+				path: '/wp/v2/portfolio',
+				params: {
+					per_page: 100,
+					status: 'publish,future,draft,pending,private,trash',
+				},
+			})
+		);
+
+		// eslint-disable-next-line no-shadow
+		async function getOrCreateTerm(name, type) {
+			const endpoint =
+				type === 'portfolio_category'
+					? '/wp/v2/portfolio_category'
+					: '/wp/v2/portfolio_tag';
+
+			try {
+				const existingTerms = await retryRequest(() =>
+					requestUtils.rest({
+						path: endpoint,
+						method: 'GET',
+						params: {
+							per_page: 100,
+							context: 'view',
+							hide_empty: false,
+						},
+					})
+				);
+
+				// Ensure existingTerms is an array before proceeding
+				if (!Array.isArray(existingTerms)) {
+					throw new Error(
+						`Failed to retrieve terms for taxonomy "${type}". Response: ${JSON.stringify(existingTerms)}`
+					);
+				}
+
+				// Check if the term already exists
+				let term = existingTerms.find(
+					(t) => t.name.toLowerCase() === name.toLowerCase()
+				);
+				if (term) {
+					if (logsEnabled) {
+						console.log(
+							`Term "${name}" already exists with ID: ${term.id}`
+						);
+					}
+					return term.id; // Return the existing term ID
+				}
+
+				// If the term doesn't exist, create it
+				try {
+					// Fetch existing terms with retry
+					term = await retryRequest(() =>
+						requestUtils.rest({
+							path: endpoint,
+							method: 'POST',
+							data: { name },
+						})
+					);
+
+					// Check if the term creation was successful
+					if (term && term.id) {
+						if (logsEnabled) {
+							console.log(
+								`Term "${name}" created successfully with ID: ${term.id}`
+							);
+						}
+						return term.id;
+					}
+
+					throw new Error(
+						`Unexpected response while creating term "${name}": ${JSON.stringify(term)}`
+					);
+				} catch (error) {
+					console.error(`Failed to create ${type} "${name}":`, error);
+					return null;
+				}
+			} catch (error) {
+				console.error(
+					`Error retrieving or creating term "${name}":`,
+					error
+				);
+				return null;
+			}
+		}
+
+		// Function to check if a post exists
+		const postExists = (title) => {
+			return existingPosts.some((post) => post.title.rendered === title);
+		};
+
+		const images = await getWordpressImages({
+			requestUtils,
+			page,
+			admin,
+			editor,
+		});
+
+		// Get the current date and time
+		const currentDate = new Date();
+		currentDate.setMinutes(currentDate.getMinutes() - 10);
+
+		// Iterate over each post in the fixture
+		for (const post of await portfolioPosts) {
+			if (!postExists(post.title)) {
+				// Get or create portfolio category and tag IDs
+				const categoryIds = post.categories
+					? await Promise.all(
+							post.categories.map(
+								async (name) =>
+									await getOrCreateTerm(
+										name,
+										'portfolio_category'
+									)
+							)
+						)
+					: [];
+				const tagIds = post.tags
+					? await Promise.all(
+							post.tags.map(
+								async (name) =>
+									await getOrCreateTerm(name, 'portfolio_tag')
+							)
+						)
+					: [];
+
+				const foundFixtureImage = await findAsyncSequential(
+					imageFixtures,
+					async (x) => x.postTitle === post.title
+				);
+
+				const foundImage = await findAsyncSequential(
+					images,
+					async (x) => x.description === foundFixtureImage.description
+				);
+
+				// Prepare data for new post
+				const newPostData = {
+					title: post.title,
+					content: post.content,
+					status: 'publish', // or 'draft' based on your needs
+					portfolio_category: categoryIds.filter((id) => id), // Filter out nulls
+					portfolio_tag: tagIds.filter((id) => id), // Filter out nulls
+					featured_media: foundImage.id,
+					date: currentDate.toISOString(),
+				};
+
+				// Create the post in WordPress
+				try {
+					await retryRequest(() =>
+						requestUtils.rest({
+							path: '/wp/v2/portfolio',
+							method: 'POST',
+							data: newPostData,
+						})
+					);
+
+					console.log(`Post "${post.title}" created successfully.`);
+				} catch (error) {
+					console.error(
+						`Failed to create post "${post.title}":`,
+						error
+					);
+				}
+
+				// Increment the date for the next post
+				currentDate.setMinutes(currentDate.getMinutes() + 1);
+			} else if (logsEnabled) {
+				console.log(`Post "${post.title}" already exists.`);
+			}
+		}
+	}
+
+	/**
+	 * Configures permalink settings in a WordPress admin interface.
+	 * Navigates to the permalink settings page, selects a specific permalink structure, and saves the changes.
+	 *
+	 * @param {Object} admin - The admin interface object for navigation.
+	 * @param {Object} page  - The page interaction object, typically from a browser automation tool.
+	 * @param {string} type  - The type of permalink structure to select.
+	 */
+	async function setPermalinkSettings(admin, page, type) {
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByLabel(type).check();
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+	}
+
+	/**
+	 * Prepares fixture data by updating URLs to include a specific archive ID.
+	 * Modifies pagination, item, and category URLs for testing purposes.
+	 *
+	 * @param {Array}  fixtureData - The fixture data to be prepared, containing pagination and item URLs.
+	 * @param {string} archiveID   - The unique identifier for the archive to replace placeholder IDs.
+	 * @param {string} testBaseUrl - The base URL for the test environment.
+	 */
+	async function prepareFixtures(fixtureData, archiveID, testBaseUrl) {
+		let fixtureKey = 0;
+		for (const expectedArchiveItem of fixtureData) {
+			// Update pagination URLs if they exist
+			if (Array.isArray(expectedArchiveItem.pagination)) {
+				let paginationKey = 0;
+				for (const expectedPaginationItem of expectedArchiveItem.pagination) {
+					if (
+						typeof expectedPaginationItem.url !== 'undefined' &&
+						expectedPaginationItem.url !== ''
+					) {
+						const fixtureUrl =
+							testBaseUrl + expectedPaginationItem.url;
+						fixtureData[fixtureKey].pagination[paginationKey].url =
+							fixtureUrl.replace(
+								'/?page_id=0000',
+								'/?page_id=' + archiveID
+							);
+					}
+					paginationKey++;
+				}
+			}
+
+			// Update item URLs
+			let itemKey = 0;
+			for (const expectedItem of expectedArchiveItem.items) {
+				const fixtureUrl = testBaseUrl + expectedItem.url;
+				fixtureData[fixtureKey].items[itemKey].url = fixtureUrl.replace(
+					'/?page_id=000',
+					'/?page_id=' + archiveID
+				);
+
+				// Update category URLs if they exist
+				if (Array.isArray(expectedItem.categories)) {
+					let categoryKey = 0;
+					for (const category of expectedItem.categories) {
+						if (
+							typeof category.categoryUrl !== 'undefined' &&
+							category.categoryUrl !== ''
+						) {
+							const categoryUrl =
+								testBaseUrl + category.categoryUrl;
+							fixtureData[fixtureKey].items[itemKey].categories[
+								categoryKey
+							].categoryUrl = categoryUrl.replace(
+								'/?page_id=0000',
+								'/?page_id=' + archiveID
+							);
+						}
+						categoryKey++;
+					}
+				}
+				itemKey++;
+			}
+
+			// Update category URLs if they exist
+			if (expectedArchiveItem.url) {
+				const fixtureUrl = testBaseUrl + expectedArchiveItem.url;
+				fixtureData[fixtureKey].url = fixtureUrl.replace(
+					'/?page_id=000',
+					'/?page_id=' + archiveID
+				);
+			}
+
+			fixtureKey++;
+		}
+	}
+
 	test('check archive page with default pagination and category filter (plain permalinks)', async ({
 		page,
 		admin,
 		editor,
 		requestUtils,
 	}) => {
-		await deletePortfolioCategories(admin, page);
-		await deletePortfolioTags(admin, page);
-
-		await createPortfolioPosts(requestUtils, page, admin, editor);
-
-		// Set Permalink Settings.
-		await admin.visitAdminPage('options-permalink.php');
-		await page.getByLabel('Plain').check();
-		await page.getByRole('button', { name: 'Save Changes' }).click();
+		await setPermalinkSettings(admin, page, 'Post name');
+		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+		await setPermalinkSettings(admin, page, 'Plain');
 
 		const { archiveID, archiveUrl } = await createArchivePage(
 			page,
 			admin,
 			editor
 		);
-
 		await setArchiveSettings(admin, page);
 
-		// prepare Fixtures.
 		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
-		let fixtureKey = 0;
-		for (const expectedArchiveItem of expectedArchiveDefault) {
-			let paginationKey = 0;
-			for (const expectedPaginationItem of expectedArchiveItem.pagination) {
-				if (typeof expectedPaginationItem.url !== 'undefined') {
-					const fixtureUrl = testBaseUrl + expectedPaginationItem.url;
-
-					expectedArchiveDefault[fixtureKey].pagination[
-						paginationKey
-					].url = fixtureUrl.replace(
-						'/?page_id=0000',
-						'/?page_id=' + archiveID
-					);
-				}
-				paginationKey++;
-			}
-
-			let itemKey = 0;
-			for (const expectedItem of expectedArchiveItem.items) {
-				expectedArchiveDefault[fixtureKey].items[itemKey].url =
-					testBaseUrl + expectedItem.url;
-				itemKey++;
-			}
-
-			fixtureKey++;
-		}
-
-		fixtureKey = 0;
-		for (const expectedArchiveCategoryItem of expectedArchiveCategoryDefault) {
-			let itemKey = 0;
-			for (const expectedItem of expectedArchiveCategoryItem.items) {
-				expectedArchiveCategoryDefault[fixtureKey].items[itemKey].url =
-					testBaseUrl + expectedItem.url;
-				itemKey++;
-			}
-			const fixtureUrl = testBaseUrl + expectedArchiveCategoryItem.url;
-			expectedArchiveCategoryDefault[fixtureKey].url = fixtureUrl.replace(
-				'/?page_id=000',
-				'/?page_id=' + archiveID
-			);
-
-			fixtureKey++;
-		}
+		await prepareFixtures(expectedArchiveDefault, archiveID, testBaseUrl);
+		await prepareFixtures(
+			expectedArchiveCategoryDefault,
+			archiveID,
+			testBaseUrl
+		);
 
 		await page.goto(archiveUrl);
-
 		const receivedArchive = await getReceivedArchive(page);
 
-		// check Archive page
 		expect(receivedArchive).toEqual(expectedArchiveDefault);
 
 		const receivedCategories = await getReceivedCategories(page);
 
-		await page.waitForTimeout(500);
-
-		// check Archive Category filter
 		expect(receivedCategories).toEqual(expectedArchiveCategoryDefault);
 
-		/**
-		 * Set Post Name Permalink Settings.
-		 * Without this stupid change, hooks for deleting posts and images stop working.
-		 * This happens due to the fact that the removal methods use a link to access the API.
-		 * For example this type: wp-json/wp/v2/media
-		 * This link will not be available. It stops working if the permalink settings are set to Plain.
-		 * In this case, when calling the method, the request contains a 404 error.
-		 */
-		await admin.visitAdminPage('options-permalink.php');
-		await page.getByLabel('Post name').check();
-		await page.getByRole('button', { name: 'Save Changes' }).click();
+		await setPermalinkSettings(admin, page, 'Post name');
 	});
 
 	test('check archive page with default pagination and category filter (post name permalinks)', async ({
@@ -654,72 +1080,203 @@ test.describe('archive pages', () => {
 		editor,
 		requestUtils,
 	}) => {
-		await deletePortfolioCategories(admin, page);
-		await deletePortfolioTags(admin, page);
-
-		await createPortfolioPosts(requestUtils, page, admin, editor);
-
-		// Set Permalink Settings.
-		await admin.visitAdminPage('options-permalink.php');
-		await page.getByLabel('Post name').check();
-		await page.getByRole('button', { name: 'Save Changes' }).click();
+		await setPermalinkSettings(admin, page, 'Post name');
+		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
 
 		const { archiveUrl } = await createArchivePage(page, admin, editor);
-
 		await setArchiveSettings(admin, page);
 
-		// prepare Fixtures.
 		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
-		let fixtureKey = 0;
-		for (const expectedArchiveItem of expectedArchivePostName) {
-			let paginationKey = 0;
-			for (const expectedPaginationItem of expectedArchiveItem.pagination) {
-				if (typeof expectedPaginationItem.url !== 'undefined') {
-					const fixtureUrl = testBaseUrl + expectedPaginationItem.url;
-
-					expectedArchivePostName[fixtureKey].pagination[
-						paginationKey
-					].url = fixtureUrl;
-				}
-				paginationKey++;
-			}
-
-			let itemKey = 0;
-			for (const expectedItem of expectedArchiveItem.items) {
-				expectedArchivePostName[fixtureKey].items[itemKey].url =
-					testBaseUrl + expectedItem.url;
-				itemKey++;
-			}
-
-			fixtureKey++;
-		}
-
-		fixtureKey = 0;
-		for (const expectedArchiveCategoryItem of expectedArchiveCategoryPostName) {
-			let itemKey = 0;
-			for (const expectedItem of expectedArchiveCategoryItem.items) {
-				expectedArchiveCategoryPostName[fixtureKey].items[itemKey].url =
-					testBaseUrl + expectedItem.url;
-				itemKey++;
-			}
-			expectedArchiveCategoryPostName[fixtureKey].url =
-				testBaseUrl + expectedArchiveCategoryItem.url;
-
-			fixtureKey++;
-		}
+		await prepareFixtures(expectedArchivePostName, null, testBaseUrl);
+		await prepareFixtures(
+			expectedArchiveCategoryPostName,
+			null,
+			testBaseUrl
+		);
 
 		await page.goto(archiveUrl);
-
 		const receivedArchive = await getReceivedArchive(page);
 
-		// check Archive page
 		expect(receivedArchive).toEqual(expectedArchivePostName);
 
 		const receivedCategories = await getReceivedCategories(page);
 
-		await page.waitForTimeout(500);
-
-		// check Archive Category filter
 		expect(receivedCategories).toEqual(expectedArchiveCategoryPostName);
+	});
+
+	test('check archive page with load more pagination and category filter (plain permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await setPermalinkSettings(admin, page, 'Post name');
+		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+		await setPermalinkSettings(admin, page, 'Plain');
+
+		const { archiveID, archiveUrl } = await createArchivePage(
+			page,
+			admin,
+			editor,
+			'loadMore'
+		);
+		await setArchiveSettings(admin, page);
+
+		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
+		await prepareFixtures(
+			expectedArchiveLoadMoreDefault,
+			archiveID,
+			testBaseUrl
+		);
+		await prepareFixtures(
+			expectedArchiveCategoryLoadMoreDefault,
+			archiveID,
+			testBaseUrl
+		);
+
+		await page.goto(archiveUrl);
+		const receivedArchive = await getReceivedArchive(page, 'loadMore');
+
+		expect(receivedArchive).toEqual(expectedArchiveLoadMoreDefault);
+
+		const receivedCategories = await getReceivedCategories(
+			page,
+			'loadMore'
+		);
+
+		expect(receivedCategories).toEqual(
+			expectedArchiveCategoryLoadMoreDefault
+		);
+
+		await setPermalinkSettings(admin, page, 'Post name');
+	});
+
+	test('check archive page with load more pagination and category filter (post name permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await setPermalinkSettings(admin, page, 'Post name');
+		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+
+		const { archiveUrl } = await createArchivePage(
+			page,
+			admin,
+			editor,
+			'loadMore'
+		);
+		await setArchiveSettings(admin, page);
+
+		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
+		await prepareFixtures(
+			expectedArchivePostNameLoadMore,
+			null,
+			testBaseUrl
+		);
+		await prepareFixtures(
+			expectedArchiveCategoryLoadMorePostName,
+			null,
+			testBaseUrl
+		);
+
+		await page.goto(archiveUrl);
+		const receivedArchive = await getReceivedArchive(page, 'loadMore');
+
+		expect(receivedArchive).toEqual(expectedArchivePostNameLoadMore);
+
+		const receivedCategories = await getReceivedCategories(
+			page,
+			'loadMore'
+		);
+
+		expect(receivedCategories).toEqual(
+			expectedArchiveCategoryLoadMorePostName
+		);
+	});
+
+	test('check archive page with infinity pagination and category filter (plain permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await setPermalinkSettings(admin, page, 'Post name');
+		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+		await setPermalinkSettings(admin, page, 'Plain');
+
+		const { archiveID, archiveUrl } = await createArchivePage(
+			page,
+			admin,
+			editor,
+			'inf'
+		);
+		await setArchiveSettings(admin, page);
+
+		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
+		await prepareFixtures(
+			expectedArchiveInfinityDefault,
+			archiveID,
+			testBaseUrl
+		);
+		await prepareFixtures(
+			expectedArchiveCategoryInfinityDefault,
+			archiveID,
+			testBaseUrl
+		);
+
+		await page.goto(archiveUrl);
+		const receivedArchive = await getReceivedArchive(page, 'inf');
+
+		expect(receivedArchive).toEqual(expectedArchiveInfinityDefault);
+
+		const receivedCategories = await getReceivedCategories(page, 'inf');
+
+		expect(receivedCategories).toEqual(
+			expectedArchiveCategoryInfinityDefault
+		);
+
+		await setPermalinkSettings(admin, page, 'Post name');
+	});
+
+	test('check archive page with infinity pagination and category filter (post name permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await setPermalinkSettings(admin, page, 'Post name');
+		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+
+		const { archiveUrl } = await createArchivePage(
+			page,
+			admin,
+			editor,
+			'inf'
+		);
+		await setArchiveSettings(admin, page);
+
+		const testBaseUrl = process.env.PLAYWRIGHT_TEST_BASE_URL;
+		await prepareFixtures(
+			expectedArchivePostNameInfinity,
+			null,
+			testBaseUrl
+		);
+		await prepareFixtures(
+			expectedArchiveCategoryInfinityPostName,
+			null,
+			testBaseUrl
+		);
+
+		await page.goto(archiveUrl);
+		const receivedArchive = await getReceivedArchive(page, 'inf');
+
+		expect(receivedArchive).toEqual(expectedArchivePostNameInfinity);
+
+		const receivedCategories = await getReceivedCategories(page, 'inf');
+
+		expect(receivedCategories).toEqual(
+			expectedArchiveCategoryInfinityPostName
+		);
 	});
 });

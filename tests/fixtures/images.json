@@ -38,7 +38,7 @@
 		"postTitle": "Portfolio 3 test post"
 	},
 	{
-		"filename": "image-800x1200.jpeg",
+		"filename": "image-800x1200.webp",
 		"alt": "Alt of image 800 on 1200",
 		"caption": "Caption  of image 800 on 1200",
 		"description": "Description  of image 800 on 1200",
@@ -62,7 +62,7 @@
 		"postTitle": "Portfolio 5 test post"
 	},
 	{
-		"filename": "image-1920x600.jpeg",
+		"filename": "image-1920x600.gif",
 		"alt": "Alt of image 1920 on 600",
 		"caption": "Caption  of image 1920 on 600",
 		"description": "Description  of image 1920 on 600",

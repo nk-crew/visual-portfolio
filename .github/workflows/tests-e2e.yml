@@ -43,3 +43,46 @@ jobs:
       - name: Run the tests
         run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e
+
+      - name: Archive debug artifacts (screenshots, traces)
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        if: ${{ !cancelled() }}
+        with:
+            name: failures-artifacts--${{ matrix.part }}
+            path: artifacts/test-results
+            if-no-files-found: ignore
+
+      - name: Archive flaky tests report
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        if: ${{ !cancelled() }}
+        with:
+            name: flaky-tests-report--${{ matrix.part }}
+            path: flaky-tests
+            if-no-files-found: ignore
+
+  merge-artifacts:
+    name: Merge Artifacts
+    if: ${{ !cancelled() }}
+    needs: [playwright]
+    runs-on: ubuntu-latest
+    outputs:
+        has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
+    steps:
+        - name: Merge failures artifacts
+          uses: actions/upload-artifact/merge@v4
+          # Don't fail the job if there aren't any artifacts to merge.
+          continue-on-error: true
+          with:
+              name: failures-artifacts
+              # Retain the merged artifacts in case of a rerun.
+              pattern: failures-artifacts*
+              delete-merged: true
+
+        - name: Merge flaky tests reports
+          id: merge-flaky-tests-reports
+          uses: actions/upload-artifact/merge@v4
+          continue-on-error: true
+          with:
+              name: flaky-tests-report
+              pattern: flaky-tests-report*
+              delete-merged: true
