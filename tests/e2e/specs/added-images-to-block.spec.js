@@ -123,12 +123,14 @@ test.describe('added images to block', () => {
 		);
 
 		for (const image of await imageList.elementHandles()) {
-			if (
-				typeof images.find(
-					async (x) => x.id === (await image.getAttribute('data-id'))
-				).imgUrl !== 'undefined'
-			) {
+			const imageId = await image.getAttribute('data-id');
+			const foundImage = images.find((x) => x.id.toString() === imageId);
+			if (foundImage && typeof foundImage.imgUrl !== 'undefined') {
 				await image.click();
+				// Check if the image is selected by looking for a class change or attribute update
+				await image.evaluate((node) =>
+					node.classList.contains('selected')
+				);
 			}
 		}
 
