@@ -1,0 +1,61 @@
+<?php
+/**
+ * Block Loop.
+ *
+ * @package visual-portfolio
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Visual Portfolio Loop block.
+ */
+class Visual_Portfolio_Block_Loop {
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		add_action( 'init', array( $this, 'register_block' ), 11 );
+	}
+
+	/**
+	 * Register Block.
+	 */
+	public function register_block() {
+		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
+			return;
+		}
+
+		register_block_type_from_metadata(
+			visual_portfolio()->plugin_path . 'gutenberg/blocks/loop',
+			array(
+				'render_callback' => array( $this, 'block_render' ),
+				'attributes'      => Visual_Portfolio_Gutenberg::get_block_attributes(),
+			)
+		);
+	}
+
+	/**
+	 * Block output
+	 *
+	 * @param array  $attributes - block attributes.
+	 * @param string $content    - block content.
+	 *
+	 * @return string
+	 */
+	public function block_render( $attributes, $content ) {
+		$wrapper_attributes = get_block_wrapper_attributes();
+
+		// Parse inner blocks content.
+		$inner_blocks_content = do_blocks( $content );
+
+		return sprintf(
+			'<div %1$s>%2$s</div>',
+			$wrapper_attributes,
+			$inner_blocks_content
+		);
+	}
+}
+new Visual_Portfolio_Block_Loop();
