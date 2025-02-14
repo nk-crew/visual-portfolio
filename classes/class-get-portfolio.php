@@ -1478,7 +1478,11 @@ class Visual_Portfolio_Get {
 			}
 
 			// pages count.
-			$query_opts['max_num_pages'] = ceil( count( $images ) / $count );
+			if ( ! empty( $images ) ) {
+				$query_opts['max_num_pages'] = ceil( count( $images ) / $count );
+			} else {
+				$query_opts['max_num_pages'] = 0;
+			}
 
 			$start_from_item = ( $paged - 1 ) * $count;
 			$end_on_item     = $start_from_item + $count;
