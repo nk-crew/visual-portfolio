@@ -1,5 +1,6 @@
 import './block';
 import './block-saved';
+import './blocks/loop';
 import './extensions/block-id';
 import './extensions/classic-icon-with-overlay';
 import './extensions/items-count-all';
