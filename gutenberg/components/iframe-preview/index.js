@@ -9,7 +9,7 @@ import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
 import { Spinner } from '@wordpress/components';
-import { dispatch, withSelect } from '@wordpress/data';
+import { dispatch, select, subscribe, withSelect } from '@wordpress/data';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
@@ -47,6 +47,7 @@ class IframePreview extends Component {
 			uniqueId: `vpf-preview-${uniqueIdCount}`,
 			currentIframeHeight: 0,
 			latestIframeHeight: 0,
+			blockPosition: null,
 		};
 
 		uniqueIdCount += 1;
@@ -74,12 +75,24 @@ class IframePreview extends Component {
 			rafSchd(this.updateIframeHeight)
 		);
 		this.printInput = this.printInput.bind(this);
+
+		this.trackBlockPosition = this.trackBlockPosition.bind(this);
 	}
 
 	componentDidMount() {
 		const self = this;
 
 		const { clientId } = self.props;
+
+		// Set initial block position
+		this.setState({
+			blockPosition: this.getBlockPosition(clientId),
+		});
+
+		// Subscribe to block position changes
+		this.unsubscribe = subscribe(() => {
+			this.trackBlockPosition(clientId);
+		});
 
 		iframeResizer(
 			{
@@ -113,6 +126,11 @@ class IframePreview extends Component {
 	}
 
 	componentWillUnmount() {
+		// Unsubscribe from block position tracking
+		if (this.unsubscribe) {
+			this.unsubscribe();
+		}
+
 		this.frameRef.current.removeEventListener('load', this.onFrameLoad);
 		window.removeEventListener('resize', this.maybeResizePreviewsThrottle);
 
@@ -246,6 +264,33 @@ class IframePreview extends Component {
 			this.busyReload = false;
 		} else {
 			this.busyReload = false;
+		}
+	}
+
+	// Add new methods to track block position
+	getBlockPosition(clientId) {
+		const { getBlockIndex, getBlockRootClientId } =
+			select('core/block-editor');
+		const rootClientId = getBlockRootClientId(clientId);
+		return getBlockIndex(clientId, rootClientId);
+	}
+
+	trackBlockPosition(clientId) {
+		const newPosition = this.getBlockPosition(clientId);
+
+		if (this.state.blockPosition !== newPosition) {
+			this.setState(
+				{
+					blockPosition: newPosition,
+					loading: true,
+				},
+				() => {
+					// Reload the iframe with a slight delay to ensure DOM is updated
+					setTimeout(() => {
+						this.maybeReload();
+					}, 100);
+				}
+			);
 		}
 	}
 
@@ -463,14 +508,13 @@ class IframePreview extends Component {
 	}
 }
 
-export default withSelect((select) => {
+export default withSelect((selectEditor) => {
 	const {
 		getDeviceType,
 		getCurrentPost,
 		getBlockIndex,
 		getBlockRootClientId,
-	} = select('core/editor') || {};
-
+	} = selectEditor('core/editor') || {};
 	return {
 		previewDeviceType: getDeviceType ? getDeviceType() : 'desktop',
 		postType: getCurrentPost ? getCurrentPost().type : 'standard',
