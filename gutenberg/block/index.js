@@ -10,7 +10,7 @@ import save from './save';
 import transforms from './transforms';
 import variations from './variations';
 
-const { name } = metadata;
+const { name, usesContext } = metadata;
 
 const settings = {
 	icon: {
@@ -27,6 +27,7 @@ const settings = {
 	save,
 	transforms,
 	deprecated,
+	usesContext,
 };
 
 registerBlockType(name, settings);
