@@ -189,22 +189,26 @@ class IframePreview extends Component {
 		// Prepare combined data objects (context takes priority)
 		const oldData = {
 			...oldAttributes,
-			...Object.fromEntries(
-				Object.entries(oldContext).map(([key, value]) => [
-					key.replace('visual-portfolio/', ''),
-					value,
-				])
-			),
+			...(oldContext
+				? Object.fromEntries(
+						Object.entries(oldContext).map(([key, value]) => [
+							key.replace('visual-portfolio/', ''),
+							value,
+						])
+					)
+				: {}),
 		};
 
 		const newData = {
 			...newAttributes,
-			...Object.fromEntries(
-				Object.entries(newContext).map(([key, value]) => [
-					key.replace('visual-portfolio/', ''),
-					value,
-				])
-			),
+			...(newContext
+				? Object.fromEntries(
+						Object.entries(newContext).map(([key, value]) => [
+							key.replace('visual-portfolio/', ''),
+							value,
+						])
+					)
+				: {}),
 		};
 
 		const changedAttributes = {};
@@ -397,7 +401,7 @@ class IframePreview extends Component {
 	}
 
 	render() {
-		const { attributes, postType, postId, context } = this.props;
+		const { attributes, postType, postId, context = {} } = this.props;
 
 		const { loading, uniqueId, currentIframeHeight, latestIframeHeight } =
 			this.state;
@@ -412,13 +416,15 @@ class IframePreview extends Component {
 			formData[`vp_${key}`] = attributes[key];
 		});
 
-		// Then override with context values (they take priority)
-		Object.entries(context).forEach(([key, value]) => {
-			if (key.startsWith('visual-portfolio/')) {
-				const formKey = `vp_${key.replace('visual-portfolio/', '')}`;
-				formData[formKey] = value;
-			}
-		});
+		if (context) {
+			// Then override with context values (they take priority)
+			Object.entries(context).forEach(([key, value]) => {
+				if (key.startsWith('visual-portfolio/')) {
+					const formKey = `vp_${key.replace('visual-portfolio/', '')}`;
+					formData[formKey] = value;
+				}
+			});
+		}
 
 		// Use context content_source if available, fallback to attributes
 		const effectiveContentSource =

@@ -44,7 +44,9 @@ function renderControls(props) {
 	}
 
 	// Use context value if available, otherwise use contentSource from attributes
-	contentSource = context['visual-portfolio/content_source'] || contentSource;
+	contentSource =
+		(context && context['visual-portfolio/content_source']) ||
+		contentSource;
 
 	const isChildOfLoop = checkIsChildOfLoopBlock(clientId);
 	const filteredCategories = filterControlCategories(
