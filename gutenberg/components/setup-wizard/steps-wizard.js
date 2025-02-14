@@ -15,13 +15,16 @@ function stepsWizard(props) {
 	const maybeUpdateHeight = useCallback(() => {
 		let newHeight = 0;
 
-		$ref.current.childNodes.forEach(($child) => {
-			const styles = window.getComputedStyle($child);
-			const margin =
-				parseFloat(styles.marginTop) + parseFloat(styles.marginBottom);
+		if ($ref.current.childNodes !== null) {
+			$ref.current.childNodes.forEach(($child) => {
+				const styles = window.getComputedStyle($child);
+				const margin =
+					parseFloat(styles.marginTop) +
+					parseFloat(styles.marginBottom);
 
-			newHeight += Math.ceil($child.offsetHeight + margin);
-		});
+				newHeight += Math.ceil($child.offsetHeight + margin);
+			});
+		}
 
 		setHeight(`${newHeight}px`);
 	}, [$ref]);
