@@ -46,7 +46,12 @@ class Visual_Portfolio_Block_Loop {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content ) {
-		$wrapper_attributes = get_block_wrapper_attributes();
+		$config             = Visual_Portfolio_Get::get_output_config( $attributes );
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => $config['class'],
+			)
+		);
 
 		// Parse inner blocks content.
 		$inner_blocks_content = do_blocks( $content );

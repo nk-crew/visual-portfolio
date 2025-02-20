@@ -72,6 +72,162 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 				'permission_callback' => array( $this, 'update_gallery_items_count_notice_state_permission' ),
 			)
 		);
+
+		// Get filter items.
+		register_rest_route(
+			$namespace,
+			'/get_filter_items/',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_filter_items' ),
+				'permission_callback' => array( $this, 'get_filter_items_permission' ),
+				'args'                => array(
+					'content_source' => array(
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'block_id' => array(
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'posts_source' => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'posts_taxonomies' => array(
+						'type'              => 'array',
+						'sanitize_callback' => function( $taxonomies ) {
+							return array_map( 'absint', (array) $taxonomies );
+						},
+					),
+					'images' => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Get filter items.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_filter_items( $request ) {
+		$content_source = $request->get_param( 'content_source' );
+		$block_id       = $request->get_param( 'block_id' );
+
+		if ( ! $content_source || ! $block_id ) {
+			return $this->error(
+				'missing_params',
+				esc_html__( 'Required parameters are missing.', 'visual-portfolio' )
+			);
+		}
+
+		$options = array(
+			'id'             => $block_id,
+			'content_source' => $content_source,
+		);
+
+		// Add additional parameters based on content source.
+		if ( 'post-based' === $content_source ) {
+			$options['posts_source']              = $request->get_param( 'posts_source' );
+			$options['posts_taxonomies']          = $request->get_param( 'posts_taxonomies' );
+			$options['posts_taxonomies_relation'] = $request->get_param( 'posts_taxonomies_relation' );
+			$options['posts_order_by']            = $request->get_param( 'posts_order_by' );
+			$options['posts_order_direction']     = $request->get_param( 'posts_order_direction' );
+		} elseif ( 'images' === $content_source ) {
+			$images                                = $request->get_param( 'images' );
+			$options['images']                     = is_string( $images ) ? json_decode( $images, true ) : $images;
+			$options['images_titles_source']       = $request->get_param( 'images_titles_source' );
+			$options['images_descriptions_source'] = $request->get_param( 'images_descriptions_source' );
+			$options['images_order_by']            = $request->get_param( 'images_order_by' );
+			$options['images_order_direction']     = $request->get_param( 'images_order_direction' );
+			$options['items_count']                = 6;
+		}
+
+		// Get query parameters.
+		$query_opts = Visual_Portfolio_Get::get_query_params( $options, true );
+
+		// Get active filter item.
+		$active_item = Visual_Portfolio_Get::get_filter_active_item( $query_opts );
+
+		// Get filter items.
+		if ( 'images' === $content_source || 'social-stream' === $content_source ) {
+			$term_items = Visual_Portfolio_Get::get_images_terms( $query_opts, $active_item );
+		} else {
+			$portfolio_query = new WP_Query( $query_opts );
+			$term_items      = Visual_Portfolio_Get::get_posts_terms( $portfolio_query, $active_item );
+		}
+
+		// Helper function to generate filter URLs.
+		$get_filter_url = function( $filter = '' ) {
+			$url = home_url();
+
+			if ( $filter ) {
+				$url = add_query_arg( 'vp_filter', rawurlencode( $filter ), $url );
+			}
+
+			return add_query_arg( 'vp_page', 1, $url );
+		};
+
+		// Prepare response.
+		$response = array();
+
+		// Add 'All' item.
+		$response[] = array(
+			'filter'      => '*',
+			'label'       => esc_html__( 'All', 'visual-portfolio' ),
+			'description' => '',
+			'count'       => false,
+			'active'      => ! $active_item,
+			'url'         => $get_filter_url(),
+			'taxonomy'    => '',
+			'id'          => 0,
+			'parent'      => 0,
+		);
+
+		// Add term items.
+		if ( ! empty( $term_items['terms'] ) ) {
+			foreach ( $term_items['terms'] as $term ) {
+				$response[] = array(
+					'filter'      => $term['filter'],
+					'label'       => $term['label'],
+					'description' => $term['description'],
+					'count'       => $term['count'],
+					'active'      => $term['active'],
+					'url'         => $get_filter_url( $term['filter'] ),
+					'taxonomy'    => $term['taxonomy'] ?? '',
+					'id'          => $term['id'],
+					'parent'      => $term['parent'],
+				);
+			}
+		}
+
+		return $this->success( $response );
+	}
+
+	/**
+	 * Get filter items permission.
+	 *
+	 * @return mixed
+	 */
+	public function get_filter_items_permission() {
+		if ( current_user_can( 'edit_posts' ) ) {
+			return true;
+		}
+
+		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+			if ( current_user_can( $post_type->cap->edit_posts ) ) {
+				return true;
+			}
+		}
+
+		return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get filter items.', 'visual-portfolio' ), true );
 	}
 
 	/**

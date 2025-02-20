@@ -1,0 +1,26 @@
+/* stylelint-disable no-duplicate-selectors */
+// style.scss
+
+// Import variables and other styles
+@import "../../../assets/css/variables-main";
+@import "../../../templates/items-list/filter/style.scss";
+@import "../../../templates/items-list/filter/minimal/style.scss";
+@import "../../../templates/items-list/filter/dropdown/style.scss";
+
+// Common styles for all filter types
+.wp-block-visual-portfolio-filter {
+	margin: 0;
+	padding: 0;
+}
+
+// Additional styles for editor
+.wp-block-visual-portfolio-filter {
+	.block-editor-block-list__layout {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.block-editor-block-list__block {
+		margin: 0;
+	}
+}

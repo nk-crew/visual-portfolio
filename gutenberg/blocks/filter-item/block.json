@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "visual-portfolio/filter-item",
+    "title": "Filter Item",
+    "category": "media",
+    "parent": ["visual-portfolio/filter"],
+    "description": "Individual filter item.",
+    "textdomain": "visual-portfolio",
+    "usesContext": [
+        "visual-portfolio/filter_style",
+        "visual-portfolio/filter_show_count",
+        "visual-portfolio/filter_text_all"
+    ],
+    "supports": {
+        "html": false,
+        "spacing": true
+    },
+    "attributes": {
+        "text": {
+            "type": "string",
+            "default": ""
+        },
+        "filter": {
+            "type": "string",
+            "default": "*"
+        },
+        "isAll": {
+            "type": "boolean",
+            "default": false
+        },
+        "url": {
+            "type": "string",
+            "default": ""
+        },
+        "taxonomyId": {
+            "type": "number",
+            "default": 0
+        },
+        "parentId": {
+            "type": "number",
+            "default": 0
+        },
+        "isActive": {
+            "type": "boolean",
+            "default": false
+        },
+        "count": {
+            "type": "number",
+            "default": 0
+        }
+    }
+}

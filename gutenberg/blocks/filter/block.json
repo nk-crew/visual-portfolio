@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "visual-portfolio/filter",
+    "title": "Portfolio Filter",
+    "category": "media",
+    "description": "Displays filter buttons for the gallery loop.",
+    "textdomain": "visual-portfolio",
+    "supports": {
+		"html": false,
+        "spacing": true,
+        "align": true,
+		"lock": true
+    },
+    "usesContext": [
+		"visual-portfolio/block_id",
+		"visual-portfolio/content_source",
+		"visual-portfolio/images",
+		"visual-portfolio/images_descriptions_source",
+		"visual-portfolio/images_order_by",
+		"visual-portfolio/images_order_direction",
+		"visual-portfolio/images_titles_source",
+		"visual-portfolio/items_count",
+		"visual-portfolio/post_types_set",
+		"visual-portfolio/posts_avoid_duplicate_posts",
+		"visual-portfolio/posts_custom_query",
+		"visual-portfolio/posts_excluded_ids",
+		"visual-portfolio/posts_ids",
+		"visual-portfolio/posts_offset",
+		"visual-portfolio/posts_order_by",
+		"visual-portfolio/posts_order_direction",
+		"visual-portfolio/posts_source",
+		"visual-portfolio/posts_taxonomies",
+		"visual-portfolio/posts_taxonomies_relation",
+		"visual-portfolio/setup_wizard",
+		"visual-portfolio/sort",
+		"visual-portfolio/stretch"
+    ],
+	"providesContext": {
+		"visual-portfolio/filter_style": "filter",
+		"visual-portfolio/filter_show_count": "filter_show_count",
+		"visual-portfolio/filter_text_all": "filter_text_all"
+	},
+    "attributes": {
+        "lock": {
+            "type": "object",
+            "default": {
+                "move": true,
+                "remove": true
+            }
+        },
+        "filter": {
+            "type": "string",
+            "default": "minimal"
+        },
+        "filter_show_count": {
+            "type": "boolean",
+            "default": false
+        },
+        "filter_text_all": {
+            "type": "string",
+            "default": "All"
+        }
+    }
+}

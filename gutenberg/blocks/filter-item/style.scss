@@ -1,0 +1,46 @@
+.wp-block-visual-portfolio-filter {
+	.vp-filter__items {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--vp-filter-default--items__gap);
+	}
+
+	// Editor-specific styles
+	&.is-selected,
+	&.has-child-selected {
+		.vp-filter__item {
+			cursor: move;
+		}
+	}
+
+	// Dragging state
+	.is-dragging {
+		opacity: 0.5;
+	}
+
+	// Dropzone indication
+	.block-editor-block-list__layout {
+		position: relative;
+
+		&::after {
+			/* stylelint-disable-next-line string-quotes */
+			content: '';
+			position: absolute;
+			pointer-events: none;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			border: 2px dashed transparent;
+			transition: border-color 0.2s ease;
+		}
+	}
+
+	/* stylelint-disable-next-line no-duplicate-selectors */
+	&.is-selected,
+	&.has-child-selected {
+		.block-editor-block-list__layout::after {
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
+}

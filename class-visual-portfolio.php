@@ -215,6 +215,8 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'classes/blocks/block/index.php';
 			require_once $this->plugin_path . 'classes/blocks/loop/index.php';
 			require_once $this->plugin_path . 'classes/blocks/block-saved/index.php';
+			require_once $this->plugin_path . 'classes/blocks/filter-item/index.php';
+			require_once $this->plugin_path . 'classes/blocks/filter/index.php';
 
 			require_once $this->plugin_path . 'classes/class-shortcode.php';
 			require_once $this->plugin_path . 'classes/class-preview.php';

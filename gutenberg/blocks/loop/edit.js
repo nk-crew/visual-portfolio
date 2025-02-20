@@ -74,8 +74,6 @@ export default function BlockEdit(props) {
 
 	const { preview_image_example: previewExample, layout } = attributes;
 
-	//console.log(attributes);
-
 	// Display block preview.
 	if (previewExample === 'true') {
 		return (
