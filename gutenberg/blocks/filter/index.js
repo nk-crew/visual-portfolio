@@ -226,7 +226,7 @@ const Edit = ({ attributes, setAttributes, context, clientId }) => {
 									: item.label,
 								filter: item.filter,
 								isAll,
-								url: item.url,
+								url: generateFilterUrl(item.filter),
 								taxonomyId: item.id,
 								parentId: item.parent,
 								isActive: item.active,

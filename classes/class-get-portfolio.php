@@ -796,10 +796,11 @@ class Visual_Portfolio_Get {
 	 * Print portfolio by post ID or options
 	 *
 	 * @param array $atts options for portfolio list to print.
+	 * @param bool  $has_parent_context block has parent context.
 	 *
 	 * @return string
 	 */
-	public static function get( $atts = array() ) {
+	public static function get( $atts = array(), $has_parent_context = false ) {
 		$config = self::get_output_config( $atts );
 
 		if ( ! $config ) {
@@ -818,6 +819,14 @@ class Visual_Portfolio_Get {
 		$items_class   = $config['items_class'];
 		$notices       = $config['notices'];
 		$errors        = $config['errors'];
+
+		if ( $has_parent_context ) {
+			// Remove vp-uid-* and vp-id-* classes using regular expressions.
+			$class = preg_replace( '/\s*vp-uid-[^\s]+|\s*vp-id-[^\s]+/', '', $class );
+
+			// Optional: Clean up any multiple spaces that might result.
+			$class = preg_replace( '/\s+/', ' ', trim( $class ) );
+		}
 
 		// Insert styles and scripts.
 		Visual_Portfolio_Assets::enqueue( $atts );
