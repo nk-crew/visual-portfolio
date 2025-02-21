@@ -245,10 +245,11 @@ class Visual_Portfolio_Get {
 	 * Prepare config, that will be used for output.
 	 *
 	 * @param array $atts options for portfolio list to print.
+	 * @param bool  $has_parent_context block has parent context.
 	 *
 	 * @return array|bool
 	 */
-	public static function get_output_config( $atts = array() ) {
+	public static function get_output_config( $atts = array(), $has_parent_context = false ) {
 		if ( ! is_array( $atts ) ) {
 			return '';
 		}
@@ -263,13 +264,18 @@ class Visual_Portfolio_Get {
 
 		self::$used_layouts[] = $options['id'];
 
-		// generate unique ID.
-		$uid   = ++self::$id;
-		$uid   = hash( 'crc32b', $uid . $options['id'] );
-		$class = 'vp-portfolio vp-uid-' . $uid;
+		$class = 'vp-portfolio';
 
-		// Add ID to class.
-		$class .= ' vp-id-' . $options['id'];
+		// generate unique ID.
+		$uid = ++self::$id;
+		$uid = hash( 'crc32b', $uid . $options['id'] );
+
+		if ( ! $has_parent_context ) {
+			$class .= ' vp-uid-' . $uid;
+
+			// Add ID to class.
+			$class .= ' vp-id-' . $options['id'];
+		}
 
 		// Add custom class.
 		if ( isset( $atts['class'] ) ) {
@@ -801,7 +807,7 @@ class Visual_Portfolio_Get {
 	 * @return string
 	 */
 	public static function get( $atts = array(), $has_parent_context = false ) {
-		$config = self::get_output_config( $atts );
+		$config = self::get_output_config( $atts, $has_parent_context );
 
 		if ( ! $config ) {
 			return '';
@@ -819,14 +825,6 @@ class Visual_Portfolio_Get {
 		$items_class   = $config['items_class'];
 		$notices       = $config['notices'];
 		$errors        = $config['errors'];
-
-		if ( $has_parent_context ) {
-			// Remove vp-uid-* and vp-id-* classes using regular expressions.
-			$class = preg_replace( '/\s*vp-uid-[^\s]+|\s*vp-id-[^\s]+/', '', $class );
-
-			// Optional: Clean up any multiple spaces that might result.
-			$class = preg_replace( '/\s+/', ' ', trim( $class ) );
-		}
 
 		// Insert styles and scripts.
 		Visual_Portfolio_Assets::enqueue( $atts );
