@@ -120,6 +120,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	public function get_filter_items( $request ) {
 		$content_source = $request->get_param( 'content_source' );
 		$block_id       = $request->get_param( 'block_id' );
+		$post_id        = $request->get_param( 'post_id' );
 
 		if ( ! $content_source || ! $block_id ) {
 			return $this->error(
@@ -165,14 +166,21 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		}
 
 		// Helper function to generate filter URLs.
-		$get_filter_url = function( $filter = '' ) {
-			$url = home_url();
+		$get_filter_url = function( $filter = '' ) use ( $post_id ) {
+			// Get the permalink of the current post.
+			$url = get_permalink( $post_id );
 
-			if ( $filter ) {
+			// If no valid URL found, fallback to home URL.
+			if ( ! $url ) {
+				$url = home_url();
+			}
+
+			// Add new filter parameter if it exists.
+			if ( $filter && '*' !== $filter ) {
 				$url = add_query_arg( 'vp_filter', rawurlencode( $filter ), $url );
 			}
 
-			return add_query_arg( 'vp_page', 1, $url );
+			return $url;
 		};
 
 		// Prepare response.

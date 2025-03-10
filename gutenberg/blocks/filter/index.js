@@ -36,22 +36,18 @@ const Edit = ({ attributes, setAttributes, context, clientId }) => {
 		'visual-portfolio/images': images,
 	} = context;
 
-	const {
-		currentBlocks,
-		hasInnerBlocks,
-		selectedBlockClientId,
-		currentPostUrl,
-	} = useSelect(
-		(select) => ({
-			currentBlocks: select(blockEditorStore).getBlocks(clientId),
-			hasInnerBlocks:
-				select(blockEditorStore).getBlocks(clientId).length > 0,
-			selectedBlockClientId:
-				select(blockEditorStore).getSelectedBlockClientId(),
-			currentPostUrl: select('core/editor')?.getCurrentPost()?.link,
-		}),
-		[clientId]
-	);
+	const { currentBlocks, hasInnerBlocks, selectedBlockClientId, postId } =
+		useSelect(
+			(select) => ({
+				currentBlocks: select(blockEditorStore).getBlocks(clientId),
+				hasInnerBlocks:
+					select(blockEditorStore).getBlocks(clientId).length > 0,
+				selectedBlockClientId:
+					select(blockEditorStore).getSelectedBlockClientId(),
+				postId: select('core/editor')?.getCurrentPostId(),
+			}),
+			[clientId]
+		);
 
 	const { replaceInnerBlocks, selectBlock } = useDispatch(blockEditorStore);
 
@@ -106,6 +102,7 @@ const Edit = ({ attributes, setAttributes, context, clientId }) => {
 				postsSource,
 				postsTaxonomies,
 				images,
+				postId,
 			};
 
 			if (!previousContextRef.current) {
@@ -143,6 +140,7 @@ const Edit = ({ attributes, setAttributes, context, clientId }) => {
 				let queryArgs = {
 					content_source: contentSource,
 					block_id: blockId,
+					post_id: postId,
 				};
 
 				if (contentSource === 'post-based') {
@@ -163,26 +161,6 @@ const Edit = ({ attributes, setAttributes, context, clientId }) => {
 				});
 
 				if (response?.success) {
-					// Generate URLs helper function
-					const generateFilterUrl = (filter) => {
-						if (!currentPostUrl) {
-							return '#';
-						}
-
-						const url = new URL(currentPostUrl);
-
-						// Remove existing filter and page parameters
-						url.searchParams.delete('vp_filter');
-						url.searchParams.delete('vp_page');
-
-						// Add new parameters
-						if (filter && filter !== '*') {
-							url.searchParams.set('vp_filter', filter);
-						}
-						url.searchParams.set('vp_page', '1');
-
-						return url.toString();
-					};
 					const updatedBlocks = [];
 					const processedFilters = new Set();
 
@@ -204,7 +182,7 @@ const Edit = ({ attributes, setAttributes, context, clientId }) => {
 										: newData.label,
 									filter: newData.filter,
 									isAll,
-									url: generateFilterUrl(newData.filter),
+									url: newData.url,
 									taxonomyId: newData.id,
 									parentId: newData.parent,
 									isActive: newData.active,
@@ -226,7 +204,7 @@ const Edit = ({ attributes, setAttributes, context, clientId }) => {
 									: item.label,
 								filter: item.filter,
 								isAll,
-								url: generateFilterUrl(item.filter),
+								url: item.url,
 								taxonomyId: item.id,
 								parentId: item.parent,
 								isActive: item.active,
@@ -272,7 +250,7 @@ const Edit = ({ attributes, setAttributes, context, clientId }) => {
 		attributes.filter_text_all,
 		replaceInnerBlocks,
 		selectBlock,
-		currentPostUrl,
+		postId,
 	]);
 
 	const blockProps = useBlockProps({
