@@ -46,26 +46,6 @@ class Visual_Portfolio_Block_Filter {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content, $block ) {
-		// Get attributes with defaults from block.json.
-		$filter_style = isset( $attributes['filter'] ) ? $attributes['filter'] : 'minimal';
-		$show_count   = isset( $attributes['filter_show_count'] ) ? $attributes['filter_show_count'] : false;
-
-		// Store base filter assets.
-		Visual_Portfolio_Assets::store_used_assets(
-			'visual-portfolio-filter',
-			'items-list/filter/style',
-			'template_style'
-		);
-
-		// Store style-specific assets if not default.
-		if ( 'default' !== $filter_style ) {
-			Visual_Portfolio_Assets::store_used_assets(
-				'visual-portfolio-filter-' . $filter_style,
-				'items-list/filter/' . $filter_style . '/style',
-				'template_style'
-			);
-		}
-
 		// Get items from inner blocks.
 		$items = array();
 		if ( isset( $block->inner_blocks ) ) {
@@ -88,39 +68,13 @@ class Visual_Portfolio_Block_Filter {
 			}
 		}
 
-		// Prepare template arguments.
-		$args = array(
-			'class'      => 'vp-filter',
-			'items'      => $items,
-			'show_count' => $show_count,
-			'opts'       => $attributes,
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class'  => 'vp-portfolio__filter-wrap',
+			)
 		);
 
-		// Try to load style-specific template.
-		if ( 'default' !== $filter_style ) {
-			ob_start();
-			echo '<div class="vp-portfolio__filter-wrap">';
-			visual_portfolio()->include_template(
-				'items-list/filter/' . $filter_style . '/filter',
-				$args
-			);
-			echo '</div>';
-			$output = ob_get_clean();
-
-			if ( ! empty( $output ) ) {
-				return $output;
-			}
-		}
-
-		// Fallback to default template.
-		ob_start();
-		echo '<div class="vp-portfolio__filter-wrap">';
-		visual_portfolio()->include_template(
-			'items-list/filter/filter',
-			$args
-		);
-		echo '</div>';
-		return ob_get_clean();
+		return '<div ' . $wrapper_attributes . '>' . $content . '</div>';
 	}
 }
 new Visual_Portfolio_Block_Filter();

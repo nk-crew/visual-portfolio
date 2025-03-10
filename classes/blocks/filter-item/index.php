@@ -74,10 +74,16 @@ class Visual_Portfolio_Block_Filter_Item {
 			);
 		}
 
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class'  => 'vp-filter__item' . ( $is_active ? ' vp-filter__item-active' : '' ),
+			)
+		);
+
 		// For other styles.
 		return sprintf(
-			'<div class="vp-filter__item%1$s"><a href="%2$s" data-vp-filter="%3$s">%4$s%5$s</a></div>',
-			$is_active ? ' vp-filter__item-active' : '',
+			'<div %1$s><a href="%2$s" data-vp-filter="%3$s">%4$s%5$s</a></div>',
+			$wrapper_attributes,
 			esc_url( $url ),
 			esc_attr( $filter ),
 			esc_html( $text ),
