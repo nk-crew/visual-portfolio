@@ -1,18 +1,59 @@
 {
-    "$schema": "https://schemas.wp.org/trunk/block.json",
-    "apiVersion": 3,
-    "name": "visual-portfolio/filter",
-    "title": "Portfolio Filter",
-    "category": "media",
-    "description": "Displays filter buttons for the gallery loop.",
-    "textdomain": "visual-portfolio",
-    "supports": {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/filter",
+	"title": "Portfolio Filter",
+	"category": "media",
+	"description": "Displays filter buttons for the gallery loop.",
+	"textdomain": "visual-portfolio",
+	"supports": {
+		"lock": true,
 		"html": false,
-        "spacing": true,
-        "align": true,
-		"lock": true
-    },
-    "usesContext": [
+		"className": false,
+		"anchor": true,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"blockGap": ["horizontal", "vertical"],
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"usesContext": [
 		"visual-portfolio/block_id",
 		"visual-portfolio/content_source",
 		"visual-portfolio/images",
@@ -35,31 +76,31 @@
 		"visual-portfolio/setup_wizard",
 		"visual-portfolio/sort",
 		"visual-portfolio/stretch"
-    ],
+	],
 	"providesContext": {
 		"visual-portfolio/filter_style": "filter",
 		"visual-portfolio/filter_show_count": "filter_show_count",
 		"visual-portfolio/filter_text_all": "filter_text_all"
 	},
-    "attributes": {
-        "lock": {
-            "type": "object",
-            "default": {
-                "move": true,
-                "remove": true
-            }
-        },
-        "filter": {
-            "type": "string",
-            "default": "minimal"
-        },
-        "filter_show_count": {
-            "type": "boolean",
-            "default": false
-        },
-        "filter_text_all": {
-            "type": "string",
-            "default": "All"
-        }
-    }
+	"attributes": {
+		"lock": {
+			"type": "object",
+			"default": {
+				"move": true,
+				"remove": true
+			}
+		},
+		"filter": {
+			"type": "string",
+			"default": "minimal"
+		},
+		"filter_show_count": {
+			"type": "boolean",
+			"default": false
+		},
+		"filter_text_all": {
+			"type": "string",
+			"default": "All"
+		}
+	}
 }

@@ -1,53 +1,119 @@
 {
-    "$schema": "https://schemas.wp.org/trunk/block.json",
-    "apiVersion": 3,
-    "name": "visual-portfolio/filter-item",
-    "title": "Filter Item",
-    "category": "media",
-    "parent": ["visual-portfolio/filter"],
-    "description": "Individual filter item.",
-    "textdomain": "visual-portfolio",
-    "usesContext": [
-        "visual-portfolio/filter_style",
-        "visual-portfolio/filter_show_count",
-        "visual-portfolio/filter_text_all"
-    ],
-    "supports": {
-        "html": false,
-        "spacing": true
-    },
-    "attributes": {
-        "text": {
-            "type": "string",
-            "default": ""
-        },
-        "filter": {
-            "type": "string",
-            "default": "*"
-        },
-        "isAll": {
-            "type": "boolean",
-            "default": false
-        },
-        "url": {
-            "type": "string",
-            "default": ""
-        },
-        "taxonomyId": {
-            "type": "number",
-            "default": 0
-        },
-        "parentId": {
-            "type": "number",
-            "default": 0
-        },
-        "isActive": {
-            "type": "boolean",
-            "default": false
-        },
-        "count": {
-            "type": "number",
-            "default": 0
-        }
-    }
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/filter-item",
+	"title": "Filter Item",
+	"category": "media",
+	"parent": ["visual-portfolio/filter"],
+	"description": "Individual filter item.",
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"visual-portfolio/filter_style",
+		"visual-portfolio/filter_show_count",
+		"visual-portfolio/filter_text_all"
+	],
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": false,
+		"alignWide": false,
+		"color": {
+			"__experimentalSkipSerialization": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"__experimentalSkipSerialization": [
+				"fontSize",
+				"lineHeight",
+				"fontFamily",
+				"fontWeight",
+				"fontStyle",
+				"textTransform",
+				"textDecoration",
+				"letterSpacing"
+			],
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"reusable": false,
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
+		"spacing": {
+			"__experimentalSkipSerialization": true,
+			"padding": ["horizontal", "vertical"],
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"styles": [
+		{ "name": "minimal", "label": "Minimal", "isDefault": true },
+		{ "name": "fill", "label": "Fill" },
+		{ "name": "outline", "label": "Outline" }
+	],
+	"attributes": {
+		"text": {
+			"type": "string",
+			"default": ""
+		},
+		"filter": {
+			"type": "string",
+			"default": "*"
+		},
+		"isAll": {
+			"type": "boolean",
+			"default": false
+		},
+		"url": {
+			"type": "string",
+			"default": ""
+		},
+		"taxonomyId": {
+			"type": "number",
+			"default": 0
+		},
+		"parentId": {
+			"type": "number",
+			"default": 0
+		},
+		"isActive": {
+			"type": "boolean",
+			"default": false
+		},
+		"count": {
+			"type": "number",
+			"default": 0
+		}
+	}
 }
