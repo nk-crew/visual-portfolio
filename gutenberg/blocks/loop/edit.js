@@ -3,6 +3,9 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 import ControlsRender from '../../components/controls-render';
 
@@ -70,9 +73,37 @@ function renderControls(props) {
  * @param props
  */
 export default function BlockEdit(props) {
-	const { attributes } = props;
+	const { attributes, clientId } = props;
 
 	const { preview_image_example: previewExample, layout } = attributes;
+
+	// Get inner blocks
+	const { innerBlocks } = useSelect(
+		(select) => ({
+			innerBlocks: select('core/block-editor').getBlocks(clientId),
+		}),
+		[clientId]
+	);
+
+	const { replaceInnerBlocks } = useDispatch('core/block-editor');
+
+	// Initialize blocks when the loop block is first added
+	useEffect(() => {
+		if (innerBlocks.length === 0) {
+			const filterBlock = createBlock('visual-portfolio/filter', {}, [
+				createBlock('visual-portfolio/filter-item', {
+					text: 'All',
+					isAll: true,
+					url: '#',
+					isActive: true,
+				}),
+			]);
+
+			const galleryBlock = createBlock('visual-portfolio/block', {});
+
+			replaceInnerBlocks(clientId, [filterBlock, galleryBlock], false);
+		}
+	}, []);
 
 	// Display block preview.
 	if (previewExample === 'true') {
