@@ -1,7 +1,7 @@
 import {
-	InnerBlocks,
 	InspectorControls,
 	useBlockProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -119,32 +119,37 @@ export default function BlockEdit(props) {
 
 	const blockProps = useBlockProps();
 
-	const TEMPLATE = [
-		[
-			'visual-portfolio/filter',
-			{},
-			[
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'vp-loop-content',
+		},
+		{
+			template: [
 				[
-					'visual-portfolio/filter-item',
-					{
-						text: 'All',
-						isAll: true,
-						url: '#',
-						isActive: true,
-					},
+					'visual-portfolio/filter',
+					{},
+					[
+						[
+							'visual-portfolio/filter-item',
+							{
+								text: 'All',
+								isAll: true,
+								url: '#',
+								isActive: true,
+							},
+						],
+					],
 				],
+				['visual-portfolio/block', {}],
 			],
-		],
-		['visual-portfolio/block', {}],
-	];
+		}
+	);
 
 	return (
 		<div {...blockProps}>
 			<>
 				<InspectorControls>{renderControls(props)}</InspectorControls>
-				<div className="vp-loop-content">
-					<InnerBlocks template={TEMPLATE} />
-				</div>
+				<div {...innerBlocksProps} />
 			</>
 		</div>
 	);
