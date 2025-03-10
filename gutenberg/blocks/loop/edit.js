@@ -88,12 +88,31 @@ export default function BlockEdit(props) {
 
 	const blockProps = useBlockProps();
 
+	const TEMPLATE = [
+		[
+			'visual-portfolio/filter',
+			{},
+			[
+				[
+					'visual-portfolio/filter-item',
+					{
+						text: 'All',
+						isAll: true,
+						url: '#',
+						isActive: true,
+					},
+				],
+			],
+		],
+		['visual-portfolio/block', {}],
+	];
+
 	return (
 		<div {...blockProps}>
 			<>
 				<InspectorControls>{renderControls(props)}</InspectorControls>
-				<div {...props}>
-					<InnerBlocks />
+				<div className="vp-loop-content">
+					<InnerBlocks template={TEMPLATE} />
 				</div>
 			</>
 		</div>
