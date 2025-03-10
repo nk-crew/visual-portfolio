@@ -88,7 +88,7 @@ function renderControls(props) {
  * @param props
  */
 export default function BlockEdit(props) {
-	const { attributes, setAttributes, context } = props;
+	const { attributes, setAttributes, context, clientId } = props;
 
 	const {
 		block_id: blockIdFromAttributes,
@@ -108,9 +108,11 @@ export default function BlockEdit(props) {
 	const contentSource =
 		contentSourceFromContext || contentSourceFromAttributes;
 
+	const isChildOfLoop = checkIsChildOfLoopBlock(clientId);
+
 	// Display setup wizard on mount.
 	useEffect(() => {
-		if (!setupWizard && (!blockId || !contentSource)) {
+		if (!setupWizard && (!blockId || !contentSource) && !isChildOfLoop) {
 			setAttributes({
 				setup_wizard: 'true',
 			});

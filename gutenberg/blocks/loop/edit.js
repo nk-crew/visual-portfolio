@@ -73,9 +73,14 @@ function renderControls(props) {
  * @param props
  */
 export default function BlockEdit(props) {
-	const { attributes, clientId } = props;
+	const { attributes, clientId, setAttributes } = props;
 
-	const { preview_image_example: previewExample, layout } = attributes;
+	const {
+		preview_image_example: previewExample,
+		layout,
+		content_source: contentSource,
+		posts_source: postsSource,
+	} = attributes;
 
 	// Get inner blocks
 	const { innerBlocks } = useSelect(
@@ -103,7 +108,24 @@ export default function BlockEdit(props) {
 
 			replaceInnerBlocks(clientId, [filterBlock, galleryBlock], false);
 		}
-	}, []);
+	}, [
+		clientId,
+		innerBlocks.length,
+		replaceInnerBlocks,
+		contentSource,
+		setAttributes,
+		postsSource,
+	]);
+
+	// Set default contentSource
+	useEffect(() => {
+		if (!contentSource || contentSource === '') {
+			setAttributes({
+				content_source: 'post-based',
+				posts_source: 'portfolio',
+			});
+		}
+	}, [contentSource, postsSource, setAttributes, clientId]);
 
 	// Display block preview.
 	if (previewExample === 'true') {
