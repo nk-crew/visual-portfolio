@@ -41,11 +41,11 @@ class Visual_Portfolio_Block_Loop {
 	 * Block output
 	 *
 	 * @param array  $attributes - block attributes.
-	 * @param string $content    - block content.
+	 * @param string $inner_blocks - inner blocks.
 	 *
 	 * @return string
 	 */
-	public function block_render( $attributes, $content ) {
+	public function block_render( $attributes, $inner_blocks ) {
 		$config             = Visual_Portfolio_Get::get_output_config( $attributes );
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
@@ -53,13 +53,10 @@ class Visual_Portfolio_Block_Loop {
 			)
 		);
 
-		// Parse inner blocks content.
-		$inner_blocks_content = do_blocks( $content );
-
 		return sprintf(
 			'<div %1$s>%2$s</div>',
 			$wrapper_attributes,
-			$inner_blocks_content
+			$inner_blocks
 		);
 	}
 }

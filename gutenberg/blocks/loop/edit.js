@@ -6,6 +6,7 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 import ControlsRender from '../../components/controls-render';
 
@@ -97,7 +98,7 @@ export default function BlockEdit(props) {
 		if (innerBlocks.length === 0) {
 			const filterBlock = createBlock('visual-portfolio/filter', {}, [
 				createBlock('visual-portfolio/filter-item', {
-					text: 'All',
+					text: __('All', 'visual-portfolio'),
 					isAll: true,
 					url: '#',
 					isActive: true,
@@ -169,10 +170,8 @@ export default function BlockEdit(props) {
 
 	return (
 		<div {...blockProps}>
-			<>
-				<InspectorControls>{renderControls(props)}</InspectorControls>
-				<div {...innerBlocksProps} />
-			</>
+			<InspectorControls>{renderControls(props)}</InspectorControls>
+			<div {...innerBlocksProps} />
 		</div>
 	);
 }
