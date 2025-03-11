@@ -7,12 +7,9 @@
 	"parent": ["visual-portfolio/filter"],
 	"description": "Individual filter item.",
 	"textdomain": "visual-portfolio",
-	"usesContext": [
-		"visual-portfolio/filter_style",
-		"visual-portfolio/filter_show_count",
-		"visual-portfolio/filter_text_all"
-	],
+	"usesContext": ["visual-portfolio-filter/showCount"],
 	"supports": {
+		"lock": true,
 		"html": false,
 		"anchor": true,
 		"align": false,
@@ -77,12 +74,14 @@
 			"clientNavigation": true
 		}
 	},
-	"styles": [
-		{ "name": "minimal", "label": "Minimal", "isDefault": true },
-		{ "name": "fill", "label": "Fill" },
-		{ "name": "outline", "label": "Outline" }
-	],
 	"attributes": {
+		"lock": {
+			"type": "object",
+			"default": {
+				"move": true,
+				"remove": true
+			}
+		},
 		"text": {
 			"type": "string",
 			"default": ""
@@ -115,5 +114,6 @@
 			"type": "number",
 			"default": 0
 		}
-	}
+	},
+	"style": "visual-portfolio-block-filter-item"
 }

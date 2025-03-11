@@ -1,1 +1,45 @@
-// Empty for now.
+.wp-block-visual-portfolio-filter-item {
+	text-decoration: none;
+
+	&:hover,
+	&:focus,
+	&.is-active {
+		text-decoration: underline;
+	}
+}
+
+// Fill style.
+.wp-block-visual-portfolio-filter.is-style-fill {
+	.wp-block-visual-portfolio-filter-item {
+		background-color: #efefef;
+		border-radius: 0.3em;
+		padding: 0.2em 0.7em;
+		transition: 0.2s color, 0.2s background-color;
+
+		&:hover,
+		&:focus,
+		&.is-active {
+			background-color: var(--vp-color-brand);
+			color: #fff;
+			text-decoration: none;
+		}
+	}
+}
+
+// Outline style.
+.wp-block-visual-portfolio-filter.is-style-outline {
+	.wp-block-visual-portfolio-filter-item {
+		border: 1px solid;
+		border-radius: 0.3em;
+		padding: 0.2em 0.7em;
+		transition: 0.2s color, 0.2s border-color;
+
+		&:hover,
+		&:focus,
+		&.is-active {
+			border-color: var(--vp-color-brand);
+			color: var(--vp-color-brand);
+			text-decoration: none;
+		}
+	}
+}

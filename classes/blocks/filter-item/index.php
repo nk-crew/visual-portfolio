@@ -28,6 +28,9 @@ class Visual_Portfolio_Block_Filter_Item {
 			return;
 		}
 
+		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-filter-item', 'build/gutenberg/blocks/filter-item/style' );
+		wp_style_add_data( 'visual-portfolio-block-filter-item', 'rtl', 'replace' );
+
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter-item',
 			array(
@@ -54,38 +57,22 @@ class Visual_Portfolio_Block_Filter_Item {
 		$count     = isset( $attributes['count'] ) ? (int) $attributes['count'] : 0;
 
 		// Get context values.
-		$filter_style = isset( $block->context['visual-portfolio/filter_style'] )
-			? $block->context['visual-portfolio/filter_style']
-			: 'minimal';
-		$show_count   = isset( $block->context['visual-portfolio/filter_show_count'] )
-			? $block->context['visual-portfolio/filter_show_count']
+		$show_count = isset( $block->context['visual-portfolio/showCount'] )
+			? $block->context['visual-portfolio/showCount']
 			: false;
-
-		// For dropdown style.
-		if ( 'dropdown' === $filter_style ) {
-			return sprintf(
-				'<option class="vp-filter__item%1$s" value="%2$s" data-vp-url="%3$s" data-vp-filter="%2$s"%4$s>%5$s%6$s</option>',
-				$is_active ? ' vp-filter__item-active' : '',
-				esc_attr( $filter ),
-				esc_url( $url ),
-				$is_active ? ' selected="selected"' : '',
-				esc_html( $text ),
-				$show_count && $count ? ' (' . esc_html( $count ) . ')' : ''
-			);
-		}
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class'  => 'vp-filter__item' . ( $is_active ? ' vp-filter__item-active' : '' ),
+				'class'          => $is_active ? 'is-active' : '',
+				'href'           => esc_url( $url ),
+				'data-vp-filter' => esc_attr( $filter ),
 			)
 		);
 
 		// For other styles.
 		return sprintf(
-			'<div %1$s><a href="%2$s" data-vp-filter="%3$s">%4$s%5$s</a></div>',
+			'<a %1$s>%2$s%3$s</a>',
 			$wrapper_attributes,
-			esc_url( $url ),
-			esc_attr( $filter ),
 			esc_html( $text ),
 			$show_count && $count ? '<span class="vp-filter__item-count">' . esc_html( $count ) . '</span>' : ''
 		);

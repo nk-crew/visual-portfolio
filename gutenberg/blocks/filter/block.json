@@ -7,9 +7,7 @@
 	"description": "Displays filter buttons for the gallery loop.",
 	"textdomain": "visual-portfolio",
 	"supports": {
-		"lock": true,
 		"html": false,
-		"className": false,
 		"anchor": true,
 		"align": ["wide", "full"],
 		"color": {
@@ -78,29 +76,19 @@
 		"visual-portfolio/stretch"
 	],
 	"providesContext": {
-		"visual-portfolio/filter_style": "filter",
-		"visual-portfolio/filter_show_count": "filter_show_count",
-		"visual-portfolio/filter_text_all": "filter_text_all"
+		"visual-portfolio-filter/showCount": "showCount"
 	},
+	"styles": [
+		{ "name": "minimal", "label": "Minimal", "isDefault": true },
+		{ "name": "fill", "label": "Fill" },
+		{ "name": "outline", "label": "Outline" }
+	],
 	"attributes": {
-		"lock": {
-			"type": "object",
-			"default": {
-				"move": true,
-				"remove": true
-			}
-		},
-		"filter": {
-			"type": "string",
-			"default": "minimal"
-		},
-		"filter_show_count": {
+		"showCount": {
 			"type": "boolean",
 			"default": false
-		},
-		"filter_text_all": {
-			"type": "string",
-			"default": "All"
 		}
-	}
+	},
+	"style": "visual-portfolio-block-filter",
+	"editorStyle": "visual-portfolio-block-filter-editor"
 }
