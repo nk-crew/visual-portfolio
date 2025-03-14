@@ -166,7 +166,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		}
 
 		// Helper function to generate filter URLs.
-		$get_filter_url = function( $filter = '' ) use ( $post_id ) {
+		$get_filter_url = function( $filter = '', $taxonomy = '' ) use ( $post_id, $content_source ) {
 			// Get the permalink of the current post.
 			$url = get_permalink( $post_id );
 
@@ -177,7 +177,13 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 
 			// Add new filter parameter if it exists.
 			if ( $filter && '*' !== $filter ) {
-				$url = add_query_arg( 'vp_filter', rawurlencode( $filter ), $url );
+				if ( 'images' === $content_source || 'social-stream' === $content_source ) {
+					$url = add_query_arg( 'vp_filter', rawurlencode( $filter ), $url );
+				}
+				if ( 'post-based' === $content_source ) {
+					$post_filter = rawurlencode( $taxonomy . ':' ) . $filter;
+					$url         = add_query_arg( 'vp_filter', $post_filter, $url );
+				}
 			}
 
 			return $url;
@@ -208,7 +214,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 					'description' => $term['description'],
 					'count'       => $term['count'],
 					'active'      => $term['active'],
-					'url'         => $get_filter_url( $term['filter'] ),
+					'url'         => $get_filter_url( $term['filter'], $term['taxonomy'] ),
 					'taxonomy'    => $term['taxonomy'] ?? '',
 					'id'          => $term['id'],
 					'parent'      => $term['parent'],
