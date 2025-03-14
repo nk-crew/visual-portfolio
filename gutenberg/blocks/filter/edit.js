@@ -62,7 +62,7 @@ export default function BlockEdit({
 
 			if (!previousContextRef.current) {
 				previousContextRef.current = currentContext;
-				return false;
+				return true;
 			}
 
 			const hasChanged = !isEqual(
