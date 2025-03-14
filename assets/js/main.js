@@ -166,6 +166,7 @@ class VP {
 		self.$pagination = $item.find('.vp-portfolio__pagination-wrap');
 		self.$filter = $item.find('.vp-portfolio__filter-wrap');
 		self.$sort = $item.find('.vp-portfolio__sort-wrap');
+		self.$block_wrap = $item.find('.vp-portfolio-wrapper');
 
 		// find single filter block.
 		if (self.id) {
@@ -179,6 +180,10 @@ class VP {
 			self.$sort = self.$sort.add(
 				`.vp-single-sort.vp-id-${self.id} .vp-portfolio__sort-wrap`
 			);
+		}
+
+		if (self.$filter.length === 0) {
+			self.$filter = $item.find('.wp-block-visual-portfolio-filter');
 		}
 
 		// user options
@@ -549,6 +554,23 @@ class VP {
 		});
 
 		// on filter click
+		self.$filter.on(
+			`click${evp}`,
+			'a.wp-block-visual-portfolio-filter-item',
+			function (e) {
+				e.preventDefault();
+				const $this = $(this);
+				if (!self.loading) {
+					$this
+						.closest('.wp-block-visual-portfolio-filter-item')
+						.addClass('is-active')
+						.siblings()
+						.removeClass('is-active');
+				}
+				self.loadNewItems($this.attr('href'), true);
+			}
+		);
+
 		self.$filter.on(
 			`click${evp}`,
 			'.vp-filter .vp-filter__item a',
