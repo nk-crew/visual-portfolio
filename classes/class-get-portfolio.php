@@ -264,17 +264,22 @@ class Visual_Portfolio_Get {
 
 		self::$used_layouts[] = $options['id'];
 
-		$class = 'vp-portfolio';
+		$class = '';
 
 		// generate unique ID.
 		$uid = ++self::$id;
 		$uid = hash( 'crc32b', $uid . $options['id'] );
 
 		if ( ! $has_parent_context ) {
+			$class .= 'vp-portfolio';
 			$class .= ' vp-uid-' . $uid;
 
 			// Add ID to class.
 			$class .= ' vp-id-' . $options['id'];
+		}
+
+		if ( $has_parent_context ) {
+			$class .= 'vp-portfolio-wrapper';
 		}
 
 		// Add custom class.
