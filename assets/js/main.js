@@ -475,7 +475,12 @@ class VP {
 		}
 
 		// prepare data options
-		const dataOptions = self.$item[0].dataset;
+		let dataOptions = self.$item[0].dataset;
+
+		if (Object.keys(dataOptions).length === 0) {
+			dataOptions = self.$block_wrap[0].dataset;
+		}
+
 		const pureDataOptions = {};
 		Object.keys(dataOptions).forEach((k) => {
 			if (k && k.substring(0, 2) === 'vp') {
