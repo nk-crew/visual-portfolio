@@ -480,10 +480,20 @@ class VP {
 		}
 
 		// prepare data options
-		let dataOptions = self.$item[0].dataset;
+		const dataOptions = {};
 
-		if (Object.keys(dataOptions).length === 0) {
-			dataOptions = self.$block_wrap[0].dataset;
+		// Copy properties from self.$block_wrap[0].dataset if it exists
+		if (
+			self.$block_wrap &&
+			self.$block_wrap[0] &&
+			self.$block_wrap[0].dataset
+		) {
+			Object.assign(dataOptions, self.$block_wrap[0].dataset);
+		}
+
+		// Copy properties from self.$item[0].dataset if it exists, potentially overwriting duplicates
+		if (self.$item && self.$item[0] && self.$item[0].dataset) {
+			Object.assign(dataOptions, self.$item[0].dataset);
 		}
 
 		const pureDataOptions = {};
