@@ -210,8 +210,14 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'classes/class-images.php';
 			require_once $this->plugin_path . 'classes/class-rest.php';
 			require_once $this->plugin_path . 'classes/class-get-portfolio.php';
+
 			require_once $this->plugin_path . 'classes/class-gutenberg.php';
-			require_once $this->plugin_path . 'classes/class-gutenberg-saved.php';
+			require_once $this->plugin_path . 'gutenberg/block/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/loop/index.php';
+			require_once $this->plugin_path . 'gutenberg/block-saved/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/filter-item/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/filter/index.php';
+
 			require_once $this->plugin_path . 'classes/class-shortcode.php';
 			require_once $this->plugin_path . 'classes/class-preview.php';
 			require_once $this->plugin_path . 'classes/class-custom-post-type.php';

@@ -9,7 +9,7 @@ import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
 import { Spinner } from '@wordpress/components';
-import { dispatch, withSelect } from '@wordpress/data';
+import { dispatch, select, subscribe, withSelect } from '@wordpress/data';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
@@ -47,6 +47,7 @@ class IframePreview extends Component {
 			uniqueId: `vpf-preview-${uniqueIdCount}`,
 			currentIframeHeight: 0,
 			latestIframeHeight: 0,
+			blockPosition: null,
 		};
 
 		uniqueIdCount += 1;
@@ -74,12 +75,24 @@ class IframePreview extends Component {
 			rafSchd(this.updateIframeHeight)
 		);
 		this.printInput = this.printInput.bind(this);
+
+		this.trackBlockPosition = this.trackBlockPosition.bind(this);
 	}
 
 	componentDidMount() {
 		const self = this;
 
 		const { clientId } = self.props;
+
+		// Set initial block position
+		this.setState({
+			blockPosition: this.getBlockPosition(clientId),
+		});
+
+		// Subscribe to block position changes
+		this.unsubscribe = subscribe(() => {
+			this.trackBlockPosition(clientId);
+		});
 
 		iframeResizer(
 			{
@@ -113,6 +126,11 @@ class IframePreview extends Component {
 	}
 
 	componentWillUnmount() {
+		// Unsubscribe from block position tracking
+		if (this.unsubscribe) {
+			this.unsubscribe();
+		}
+
 		this.frameRef.current.removeEventListener('load', this.onFrameLoad);
 		window.removeEventListener('resize', this.maybeResizePreviewsThrottle);
 
@@ -163,22 +181,43 @@ class IframePreview extends Component {
 		}
 		this.busyReload = true;
 
-		const { attributes: newAttributes } = this.props;
-
-		const { attributes: oldAttributes } = prevProps;
+		const { attributes: newAttributes, context: newContext } = this.props;
+		const { attributes: oldAttributes, context: oldContext } = prevProps;
 
 		const frame = this.frameRef.current;
 
-		const changedAttributes = {};
-		const changedAttributeKeys = getUpdatedKeys(
-			oldAttributes,
-			newAttributes
-		);
+		// Prepare combined data objects (context takes priority)
+		const oldData = {
+			...oldAttributes,
+			...(oldContext
+				? Object.fromEntries(
+						Object.entries(oldContext).map(([key, value]) => [
+							key.replace('visual-portfolio/', ''),
+							value,
+						])
+					)
+				: {}),
+		};
 
-		// check changed attributes.
+		const newData = {
+			...newAttributes,
+			...(newContext
+				? Object.fromEntries(
+						Object.entries(newContext).map(([key, value]) => [
+							key.replace('visual-portfolio/', ''),
+							value,
+						])
+					)
+				: {}),
+		};
+
+		const changedAttributes = {};
+		const changedAttributeKeys = getUpdatedKeys(oldData, newData);
+
+		// check changed attributes
 		changedAttributeKeys.forEach((name) => {
-			if (typeof newAttributes[name] !== 'undefined') {
-				changedAttributes[name] = newAttributes[name];
+			if (typeof newData[name] !== 'undefined') {
+				changedAttributes[name] = newData[name];
 			}
 		});
 
@@ -214,11 +253,11 @@ class IframePreview extends Component {
 				}
 
 				// Insert dynamic CSS.
-				if (frame.iFrameResizer && newAttributes.block_id) {
+				if (frame.iFrameResizer && newData.block_id) {
 					frame.iFrameResizer.sendMessage({
 						name: 'dynamic-css',
-						blockId: newAttributes.block_id,
-						styles: getDynamicCSS(newAttributes),
+						blockId: newData.block_id,
+						styles: getDynamicCSS(newData),
 					});
 				}
 			}
@@ -232,6 +271,33 @@ class IframePreview extends Component {
 		}
 	}
 
+	// Add new methods to track block position
+	getBlockPosition(clientId) {
+		const { getBlockIndex, getBlockRootClientId } =
+			select('core/block-editor');
+		const rootClientId = getBlockRootClientId(clientId);
+		return getBlockIndex(clientId, rootClientId);
+	}
+
+	trackBlockPosition(clientId) {
+		const newPosition = this.getBlockPosition(clientId);
+
+		if (this.state.blockPosition !== newPosition) {
+			this.setState(
+				{
+					blockPosition: newPosition,
+					loading: true,
+				},
+				() => {
+					// Reload the iframe with a slight delay to ensure DOM is updated
+					setTimeout(() => {
+						this.maybeReload();
+					}, 100);
+				}
+			);
+		}
+	}
+
 	maybeReload() {
 		let latestIframeHeight = 0;
 
@@ -239,11 +305,17 @@ class IframePreview extends Component {
 			latestIframeHeight = this.state.currentIframeHeight;
 		}
 
-		this.setState({
-			loading: true,
-			latestIframeHeight,
-		});
-		this.formRef.current.submit();
+		this.setState(
+			{
+				loading: true,
+				latestIframeHeight,
+			},
+			() => {
+				if (this.formRef.current) {
+					this.formRef.current.submit();
+				}
+			}
+		);
 	}
 
 	/**
@@ -329,12 +401,35 @@ class IframePreview extends Component {
 	}
 
 	render() {
-		const { attributes, postType, postId } = this.props;
+		const { attributes, postType, postId, context = {} } = this.props;
 
 		const { loading, uniqueId, currentIframeHeight, latestIframeHeight } =
 			this.state;
 
-		const { id, content_source: contentSource } = attributes;
+		const { id, content_source: attributesContentSource } = attributes;
+
+		// Collect all data into a single object, prioritizing context values
+		const formData = {};
+
+		// First, process attributes
+		Object.keys(attributes).forEach((key) => {
+			formData[`vp_${key}`] = attributes[key];
+		});
+
+		if (context) {
+			// Then override with context values (they take priority)
+			Object.entries(context).forEach(([key, value]) => {
+				if (key.startsWith('visual-portfolio/')) {
+					const formKey = `vp_${key.replace('visual-portfolio/', '')}`;
+					formData[formKey] = value;
+				}
+			});
+		}
+
+		// Use context content_source if available, fallback to attributes
+		const effectiveContentSource =
+			context['visual-portfolio/content_source'] ||
+			attributesContentSource;
 
 		return (
 			<div
@@ -385,7 +480,7 @@ class IframePreview extends Component {
 							readOnly
 						/>
 
-						{contentSource === 'saved' ? (
+						{effectiveContentSource === 'saved' ? (
 							<input
 								type="text"
 								name="vp_id"
@@ -394,15 +489,13 @@ class IframePreview extends Component {
 							/>
 						) : (
 							<>
-								{Object.keys(attributes).map((k) => {
-									const val = attributes[k];
-
-									return (
-										<Fragment key={`vp_${k}`}>
-											{this.printInput(`vp_${k}`, val)}
+								{Object.entries(formData).map(
+									([key, value]) => (
+										<Fragment key={key}>
+											{this.printInput(key, value)}
 										</Fragment>
-									);
-								})}
+									)
+								)}
 							</>
 						)}
 					</form>
@@ -421,12 +514,18 @@ class IframePreview extends Component {
 	}
 }
 
-export default withSelect((select) => {
-	const { getDeviceType, getCurrentPost } = select('core/editor') || {};
-
+export default withSelect((selectEditor) => {
+	const {
+		getDeviceType,
+		getCurrentPost,
+		getBlockIndex,
+		getBlockRootClientId,
+	} = selectEditor('core/editor') || {};
 	return {
 		previewDeviceType: getDeviceType ? getDeviceType() : 'desktop',
 		postType: getCurrentPost ? getCurrentPost().type : 'standard',
 		postId: getCurrentPost ? getCurrentPost().id : 'widgets',
+		getBlockIndex,
+		getBlockRootClientId,
 	};
 })(IframePreview);
