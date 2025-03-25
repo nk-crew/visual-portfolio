@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.3.13 - Mar 25, 2024 =
+
+* fixed broken Swiper when installed Elementor 3.28
+* fixed rare bug with displaying category links on archive pages
+* **Pro:**
+* added support for more Audio formats in popup Audio links (https://visualportfolio.co/docs/projects/project-formats/#supported-audio-platforms)
+* added support for more Video formats in popup Video links (https://visualportfolio.co/docs/projects/project-formats/#supported-video-platforms)
+* fixed wrong infinity scroll loading when permalinks set to Plain
+* fixed GIF hover image reset when hovering on inner overlay elements
+
 = 3.3.12 - Dec 20, 2024 =
 
 * fixed order by Image Title when both Title Source and Description Source is set to None
