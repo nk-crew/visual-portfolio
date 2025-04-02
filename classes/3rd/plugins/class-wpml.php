@@ -120,20 +120,6 @@ class Visual_Portfolio_3rd_WPML {
 			}
 		}
 
-		// Images meta array.
-		if ( ! isset( $iclTranslationManagement->settings['custom_fields_attributes_whitelist']['vp_images'] ) ) {
-			$iclTranslationManagement->settings['custom_fields_attributes_whitelist']['vp_images'] = array(
-				'*' => array(
-					'title'       => array(),
-					'description' => array(),
-					'author'      => array(),
-					'categories'  => array(),
-				),
-			);
-
-			$allow_save = true;
-		}
-
 		if ( $allow_save ) {
 			$iclTranslationManagement->save_settings();
 		}

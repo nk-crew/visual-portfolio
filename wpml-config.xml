@@ -1,36 +1,50 @@
 <wpml-config>
-    <gutenberg-blocks>
-        <gutenberg-block type="visual-portfolio/block" translate="1">
-            <key name="images">
-                <key name="*">
-                    <key name="title" />
-                    <key name="description" />
-                    <key name="author" />
-                    <key name="categories" />
-                </key>
-            </key>
-            <key name="no_items_notice" />
-            <key name="items_style_default__date_format" />
-            <key name="items_style_default__read_more_label" />
-            <key name="items_style_fade__date_format" />
-            <key name="items_style_fly__date_format" />
-            <key name="items_style_emerge__date_format" />
-            <key name="filter_text_all" />
-            <key name="pagination_infinite_text_load" />
-            <key name="pagination_infinite_text_loading" />
-            <key name="pagination_infinite_text_end_list" />
-            <key name="pagination_load_more_text_load" />
-            <key name="pagination_load_more_text_loading" />
-            <key name="pagination_load_more_text_end_list" />
-        </gutenberg-block>
-    </gutenberg-blocks>
+	<gutenberg-blocks>
+		<gutenberg-block type="visual-portfolio/block" translate="1">
+			<key name="images">
+				<key name="*">
+					<key name="title" />
+					<key name="description" />
+					<key name="author" />
+					<key name="categories" />
+				</key>
+			</key>
+			<key name="no_items_notice" />
+			<key name="items_style_default__date_format" />
+			<key name="items_style_default__read_more_label" />
+			<key name="items_style_fade__date_format" />
+			<key name="items_style_fly__date_format" />
+			<key name="items_style_emerge__date_format" />
+			<key name="filter_text_all" />
+			<key name="pagination_infinite_text_load" />
+			<key name="pagination_infinite_text_loading" />
+			<key name="pagination_infinite_text_end_list" />
+			<key name="pagination_load_more_text_load" />
+			<key name="pagination_load_more_text_loading" />
+			<key name="pagination_load_more_text_end_list" />
+		</gutenberg-block>
+	</gutenberg-blocks>
 
-    <custom-types>
-        <custom-type translate="1">portfolio</custom-type>
-        <custom-type translate="1">vp_lists</custom-type>
-    </custom-types>
-    <taxonomies>
-        <taxonomy translate="1">portfolio_category</taxonomy>
-        <taxonomy translate="1">portfolio_tag</taxonomy>
-    </taxonomies>
+	<custom-types>
+		<custom-type translate="1">portfolio</custom-type>
+		<custom-type translate="1">vp_lists</custom-type>
+	</custom-types>
+	<taxonomies>
+		<taxonomy translate="1">portfolio_category</taxonomy>
+		<taxonomy translate="1">portfolio_tag</taxonomy>
+	</taxonomies>
+
+	<custom-fields>
+		<custom-field action="translate">vp_images</custom-field>
+	</custom-fields>
+	<custom-fields-texts>
+		<key name="vp_images">
+		<key name="*">
+			<key name="title" />
+			<key name="description" />
+			<key name="author" />
+			<key name="categories" />
+		</key>
+		</key>
+	</custom-fields-texts>
 </wpml-config>
