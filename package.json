@@ -76,6 +76,7 @@
 		"@dnd-kit/utilities": "^3.2.0",
 		"@fancyapps/fancybox": "^3.5.7",
 		"@wordpress/base-styles": "^2.0.1",
+		"@wordpress/icons": "^9.49.0",
 		"ace-builds": "^1.22.0",
 		"classnames": "^2.3.2",
 		"copy-webpack-plugin": "^11.0.0",
