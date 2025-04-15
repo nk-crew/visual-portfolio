@@ -36,6 +36,8 @@ const allowedBlockAttributes = [
 	'setup_wizard',
 	'sort',
 	'stretch',
+	'maxPages',
+	'image_categories',
 ];
 
 function filterAttributes(nonFilteredAttributes) {
@@ -60,7 +62,17 @@ const blockContext = createBlockContext(allowedBlockAttributes);
 const settings = {
 	title,
 	category,
-	attributes: filteredAttributes,
+	attributes: {
+		...filteredAttributes,
+		maxPages: {
+			type: 'number',
+			default: 1,
+		},
+		image_categories: {
+			type: 'array',
+			default: [],
+		},
+	},
 	icon: {
 		foreground: '#2540CC',
 		src: <ElementIcon width="20" height="20" />,
