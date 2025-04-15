@@ -32,6 +32,7 @@ export default function BlockEdit({
 		'visual-portfolio/posts_source': postsSource,
 		'visual-portfolio/posts_taxonomies': postsTaxonomies,
 		'visual-portfolio/images': images,
+		'visual-portfolio/items_count': itemsCount,
 	} = context;
 
 	const { currentBlocks, hasInnerBlocks, selectedBlockClientId, postId } =
@@ -96,6 +97,7 @@ export default function BlockEdit({
 					content_source: contentSource,
 					block_id: blockId,
 					post_id: postId,
+					items_count: itemsCount,
 				};
 
 				if (contentSource === 'post-based') {
@@ -200,6 +202,7 @@ export default function BlockEdit({
 		replaceInnerBlocks,
 		selectBlock,
 		postId,
+		itemsCount,
 	]);
 
 	const blockProps = useBlockProps({
