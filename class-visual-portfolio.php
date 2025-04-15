@@ -217,6 +217,12 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'gutenberg/block-saved/index.php';
 			require_once $this->plugin_path . 'gutenberg/blocks/filter-item/index.php';
 			require_once $this->plugin_path . 'gutenberg/blocks/filter/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-next/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-numbers/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-previous/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-load-more/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-infinite/index.php';
 
 			require_once $this->plugin_path . 'classes/class-shortcode.php';
 			require_once $this->plugin_path . 'classes/class-preview.php';

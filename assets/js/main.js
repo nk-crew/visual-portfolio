@@ -186,6 +186,10 @@ class VP {
 			self.$filter = $item.find('.wp-block-visual-portfolio-filter');
 		}
 
+		if (self.$pagination.length === 0) {
+			self.$pagination = $item.find('.vp-pagination');
+		}
+
 		// user options
 		self.userOptions = userOptions;
 
@@ -629,68 +633,89 @@ class VP {
 				}
 			);
 
-		// on pagination click
+		// Function to handle scrolling to top
+		function scrollToTop($pagination) {
+			if (
+				self.options.pagination === 'paged' &&
+				$pagination.hasClass('vp-pagination__scroll-top')
+			) {
+				const $adminBar = $('#wpadminbar');
+				const currentTop =
+					window.pageYOffset || document.documentElement.scrollTop;
+				let { top } = self.$item.offset();
+
+				// Custom user offset
+				if ($pagination.attr('data-vp-pagination-scroll-top')) {
+					top -=
+						parseInt(
+							$pagination.attr('data-vp-pagination-scroll-top'),
+							10
+						) || 0;
+				}
+
+				// Admin bar offset
+				if ($adminBar.length && $adminBar.css('position') === 'fixed') {
+					top -= $adminBar.outerHeight();
+				}
+
+				// Limit max offset
+				top = Math.max(0, top);
+
+				if (currentTop > top) {
+					window.scrollTo({
+						top,
+						behavior: 'smooth',
+					});
+				}
+			}
+		}
+
+		// Function to handle pagination click
+		function handlePaginationClick(e) {
+			e.preventDefault();
+
+			const $this = $(this);
+			const $pagination = $this.closest('.vp-pagination');
+
+			// For the first handler, set pagination to 'paged'
+			if (
+				this.closest(
+					'.vp-pagination-number, .vp-pagination-next, .vp-pagination-prev'
+				)
+			) {
+				self.options.pagination = 'paged';
+			}
+
+			if (this.closest('.vp-pagination-load-more')) {
+				self.options.pagination = 'load-more';
+			}
+
+			if (
+				$pagination.hasClass('vp-pagination__no-more') &&
+				self.options.pagination !== 'paged'
+			) {
+				return;
+			}
+
+			self.loadNewItems(
+				$this.attr('href'),
+				self.options.pagination === 'paged'
+			);
+
+			scrollToTop($pagination);
+		}
+
+		// Attach event handlers with optimized selectors
+		self.$pagination.on(
+			`click${evp}`,
+			'.vp-pagination-number a, .vp-pagination-next a.vp-pagination-next-link, .vp-pagination-prev a.vp-pagination-prev-link',
+			handlePaginationClick
+		);
+
 		self.$item.on(
 			`click${evp}`,
 			'.vp-pagination .vp-pagination__item a',
-			function (e) {
-				e.preventDefault();
-				const $this = $(this);
-				const $pagination = $this.closest('.vp-pagination');
-
-				if (
-					$pagination.hasClass('vp-pagination__no-more') &&
-					self.options.pagination !== 'paged'
-				) {
-					return;
-				}
-
-				self.loadNewItems(
-					$this.attr('href'),
-					self.options.pagination === 'paged'
-				);
-
-				// Scroll to top
-				if (
-					self.options.pagination === 'paged' &&
-					$pagination.hasClass('vp-pagination__scroll-top')
-				) {
-					const $adminBar = $('#wpadminbar');
-					const currentTop =
-						window.pageYOffset ||
-						document.documentElement.scrollTop;
-					let { top } = self.$item.offset();
-
-					// Custom user offset.
-					if ($pagination.attr('data-vp-pagination-scroll-top')) {
-						top -=
-							parseInt(
-								$pagination.attr(
-									'data-vp-pagination-scroll-top'
-								),
-								10
-							) || 0;
-					}
-
-					// Admin bar offset.
-					if (
-						$adminBar.length &&
-						$adminBar.css('position') === 'fixed'
-					) {
-						top -= $adminBar.outerHeight();
-					}
-
-					// Limit max offset.
-					top = Math.max(0, top);
-
-					if (currentTop > top) {
-						window.scrollTo({
-							top,
-							behavior: 'smooth',
-						});
-					}
-				}
-			}
+			handlePaginationClick
 		);
 
 		// on categories of item click
@@ -940,9 +965,15 @@ class VP {
 
 			// update pagination
 			if (self.$pagination.length) {
-				self.$pagination.html(
-					$newVP.find('.vp-portfolio__pagination-wrap').html()
-				);
+				let paginationContent = $newVP
+					.find('.vp-portfolio__pagination-wrap')
+					.html();
+
+				if (!paginationContent) {
+					paginationContent = $newVP.find('.vp-pagination').html();
+				}
+
+				self.$pagination.html(paginationContent);
 			}
 
 			self.addItems($(newItems), removeExisting, $newVP);
