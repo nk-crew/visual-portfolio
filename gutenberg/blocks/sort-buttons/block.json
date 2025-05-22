@@ -1,0 +1,71 @@
+{
+    "apiVersion": 2,
+    "name": "visual-portfolio/sort-buttons",
+    "category": "visual-portfolio",
+	"parent": ["visual-portfolio/loop"],
+    "attributes": {
+        "sortType": {
+            "type": "string",
+            "default": "default"
+        },
+		"align": {
+			"type": "string",
+			"default": "left"
+		}
+    },
+    "styles": [
+        { "name": "minimal", "label": "Minimal", "isDefault": true },
+        { "name": "classic", "label": "Classic" }
+    ],
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"blockGap": ["horizontal", "vertical"],
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"editorStyle": "visual-portfolio-block-sort-buttons-editor",
+  	"style": "visual-portfolio-block-sort-buttons",
+	"providesContext": {
+		"visual-portfolio/sort-buttons-style": "className"
+	}
+}
+

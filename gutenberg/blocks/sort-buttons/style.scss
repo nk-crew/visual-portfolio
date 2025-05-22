@@ -1,0 +1,65 @@
+/**
+* Sort Buttons Block styles - base styles for the container
+*/
+
+/* Define all color variables at root level for global access */
+:root {
+	/* Button specific variables */
+	--vp-sort-btn-gap: 10px;
+	--vp-sort-btn-min-width: 40px;
+	--vp-sort-btn-padding-v: 0.7em;
+	--vp-sort-btn-padding-h: 1.3em;
+	--vp-sort-btn-font-size: 0.9em;
+	--vp-sort-btn-font-weight: 600;
+	--vp-sort-btn-line-height: 1.4;
+	--vp-sort-btn-text-transform: uppercase;
+	--vp-sort-btn-letter-spacing: 0.015em;
+}
+
+/* Now import style variations */
+@import "./style-classic.scss";
+@import "./style-minimal.scss";
+
+.vp-sort {
+	display: flex;
+	flex-wrap: wrap;
+	margin-bottom: 2em;
+
+	/* Alignment styles */
+	&.vp-sort-align-left {
+		justify-content: flex-start;
+	}
+
+	&.vp-sort-align-center {
+		justify-content: center;
+	}
+
+	&.vp-sort-align-right {
+		justify-content: flex-end;
+	}
+
+	&.is-content-justification-center {
+		justify-content: center;
+	}
+
+	&.is-content-justification-right {
+		justify-content: flex-end;
+	}
+
+	&.is-content-justification-left {
+		justify-content: flex-start;
+	}
+
+	&.is-content-justification-space-between {
+		justify-content: space-between;
+	}
+}
+
+/* Add gap for frontend-rendered sort buttons */
+.vp-sort.is-style-classic .vp-sort__item {
+	margin: 0 5px 5px 0;
+}
+
+.vp-sort.is-style-minimal .vp-sort__item {
+	margin: 0 5px;
+}

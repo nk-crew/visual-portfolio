@@ -1,0 +1,29 @@
+/**
+* Editor styles for sort dropdown
+*/
+
+.editor-styles-wrapper {
+	.vp-sort-dropdown {
+		/* Add outline in editor for better visibility */
+		&.is-selected {
+			outline: 1px dashed #ddd;
+		}
+
+		select {
+			/* Prevent dropdown from opening in editor */
+			pointer-events: none;
+		}
+	}
+
+	/* Styles for the sortable control in the inspector */
+	.vp-sort-options-container {
+		margin-bottom: 16px;
+	}
+
+	.vp-sort-active-note {
+		color: #757575;
+		font-size: 12px;
+		margin-top: 8px;
+		font-style: italic;
+	}
+}
