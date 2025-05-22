@@ -2,10 +2,10 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/filter-item",
-	"title": "Filter Item",
+	"title": "Filter Item (Experimental)",
 	"category": "media",
+	"description": "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.",
 	"parent": ["visual-portfolio/filter"],
-	"description": "Individual filter item.",
 	"textdomain": "visual-portfolio",
 	"usesContext": ["visual-portfolio-filter/showCount"],
 	"supports": {
@@ -42,20 +42,14 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalWritingMode": true,
-			"__experimentalDefaultControls": {
-				"fontSize": true
-			}
+			"__experimentalDefaultControls": { "fontSize": true }
 		},
 		"reusable": false,
-		"shadow": {
-			"__experimentalSkipSerialization": true
-		},
+		"shadow": { "__experimentalSkipSerialization": true },
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": ["horizontal", "vertical"],
-			"__experimentalDefaultControls": {
-				"padding": true
-			}
+			"__experimentalDefaultControls": { "padding": true }
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -70,50 +64,21 @@
 				"width": true
 			}
 		},
-		"interactivity": {
-			"clientNavigation": true
-		}
+		"interactivity": { "clientNavigation": true }
 	},
 	"attributes": {
 		"lock": {
 			"type": "object",
-			"default": {
-				"move": true,
-				"remove": true
-			}
+			"default": { "move": true, "remove": true }
 		},
-		"text": {
-			"type": "string",
-			"default": ""
-		},
-		"filter": {
-			"type": "string",
-			"default": "*"
-		},
-		"isAll": {
-			"type": "boolean",
-			"default": false
-		},
-		"url": {
-			"type": "string",
-			"default": ""
-		},
-		"taxonomyId": {
-			"type": "number",
-			"default": 0
-		},
-		"parentId": {
-			"type": "number",
-			"default": 0
-		},
-		"isActive": {
-			"type": "boolean",
-			"default": false
-		},
-		"count": {
-			"type": "number",
-			"default": 0
-		}
+		"text": { "type": "string", "default": "" },
+		"filter": { "type": "string", "default": "*" },
+		"isAll": { "type": "boolean", "default": false },
+		"url": { "type": "string", "default": "" },
+		"taxonomyId": { "type": "number", "default": 0 },
+		"parentId": { "type": "number", "default": 0 },
+		"isActive": { "type": "boolean", "default": false },
+		"count": { "type": "number", "default": 0 }
 	},
 	"style": "visual-portfolio-block-filter-item"
 }

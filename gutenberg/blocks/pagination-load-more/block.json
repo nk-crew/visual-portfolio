@@ -1,30 +1,19 @@
 {
 	"apiVersion": 2,
 	"name": "visual-portfolio/pagination-load-more",
-	"title": "VP Pagination Load More",
-	"description": "Displays a load more button for pagination.",
+	"title": "Pagination Load More (Experimental)",
+	"description": "Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.",
 	"category": "visual-portfolio",
-	"parent": [
-	  "visual-portfolio/loop"
-	],
+	"parent": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
 	"supports": {
-	  "html": false,
-	  "reusable": false,
-	  "interactivity": {
-		"clientNavigation": true
-	  }
+		"html": false,
+		"reusable": false,
+		"interactivity": { "clientNavigation": true }
 	},
 	"styles": [
-	  {
-		"name": "minimal",
-		"label": "Minimal",
-		"isDefault": true
-	  },
-	  {
-		"name": "classic",
-		"label": "Classic"
-	  }
+		{ "name": "minimal", "label": "Minimal", "isDefault": true },
+		{ "name": "classic", "label": "Classic" }
 	],
 	"usesContext": [
 		"visual-portfolio/block_id",
@@ -52,23 +41,14 @@
 		"visual-portfolio/maxPages"
 	],
 	"attributes": {
-	  "label": {
-		"type": "string",
-		"default": "Load More"
-	  },
-	  "loadingLabel": {
-		"type": "string",
-		"default": "Loading..."
-	  },
-	  "endListLabel": {
-		"type": "string",
-		"default": "You've reached the end of the list"
-	  },
-	  "showLoadingText": {
-		"type": "boolean",
-		"default": true
-	  }
+		"label": { "type": "string", "default": "Load More" },
+		"loadingLabel": { "type": "string", "default": "Loading..." },
+		"endListLabel": {
+			"type": "string",
+			"default": "You've reached the end of the list"
+		},
+		"showLoadingText": { "type": "boolean", "default": true }
 	},
 	"style": "visual-portfolio-block-pagination-load-more",
 	"editorStyle": "visual-portfolio-block-pagination-load-more-editor"
-  }
+}

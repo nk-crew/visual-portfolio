@@ -1,10 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "visual-portfolio/pagination-previous",
-	"title": "VP Pagination Previous",
+	"title": "Pagination Previous (Experimental)",
 	"category": "visual-portfolio",
 	"parent": ["visual-portfolio/paged-pagination"],
-	"description": "Displays the previous page link.",
+	"description": "Displays the previous page link. Block is experimental and will change in future releases. Please use with caution.",
 	"textdomain": "visual-portfolio",
 	"usesContext": [
 		"visual-portfolio/block_id",
@@ -31,15 +31,6 @@
 		"visual-portfolio/stretch",
 		"visual-portfolio/maxPages"
 	],
-	"attributes": {
-		"label": {
-		"type": "string",
-		"default": "Previous"
-		}
-	},
-	"supports": {
-		"html": false,
-		"reusable": false,
-		"className": false
-	}
+	"attributes": { "label": { "type": "string", "default": "Previous" } },
+	"supports": { "html": false, "reusable": false, "className": false }
 }

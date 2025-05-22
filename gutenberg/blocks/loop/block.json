@@ -3,8 +3,8 @@
 	"apiVersion": 3,
 	"name": "visual-portfolio/loop",
 	"category": "media",
-	"title": "Gallery Loop",
-	"description": "Display gallery loop.",
+	"title": "Gallery Loop (Experimental)",
+	"description": "Display gallery loop. Block is experimental and will change in future releases. Please use with caution.",
 	"keywords": [
 		"gallery",
 		"images",
@@ -16,33 +16,13 @@
 	],
 	"textdomain": "visual-portfolio",
 	"attributes": {
-		"block_id": {
-			"type": "string"
-		},
-		"content_source": {
-			"type": "string",
-			"default": ""
-		},
-		"setup_wizard": {
-			"type": "string",
-			"default": "false"
-		},
-		"preview_image_example": {
-			"type": "string",
-			"default": "false"
-		},
-		"layout": {
-			"type": "string",
-			"default": "default"
-		},
-		"maxPages": {
-			"type": "number",
-			"default": 1
-		},
-		"image_categories": {
-			"type": "array",
-			"default": []
-		}
+		"block_id": { "type": "string" },
+		"content_source": { "type": "string", "default": "" },
+		"setup_wizard": { "type": "string", "default": "false" },
+		"preview_image_example": { "type": "string", "default": "false" },
+		"layout": { "type": "string", "default": "default" },
+		"maxPages": { "type": "number", "default": 1 },
+		"image_categories": { "type": "array", "default": [] }
 	},
 	"supports": {
 		"ghostkit": true,
@@ -59,25 +39,19 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
-			"__experimentalDefaultControls": {
-				"fontSize": true
-			}
+			"__experimentalDefaultControls": { "fontSize": true }
 		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
-			"blockGap": {
-				"__experimentalDefault": "1.25em"
-			},
+			"blockGap": { "__experimentalDefault": "1.25em" },
 			"__experimentalDefaultControls": {
 				"blockGap": true,
 				"padding": false,
 				"margin": false
 			}
 		},
-		"interactivity": {
-			"clientNavigation": true
-		},
+		"interactivity": { "clientNavigation": true },
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,

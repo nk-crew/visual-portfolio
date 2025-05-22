@@ -1,24 +1,15 @@
 {
 	"apiVersion": 2,
 	"name": "visual-portfolio/pagination-infinite",
-	"title": "VP Pagination Infinite",
+	"title": "Pagination Infinite (Experimental)",
 	"category": "visual-portfolio",
 	"parent": ["visual-portfolio/loop"],
-	"description": "Displays infinite scroll pagination for Visual Portfolio loop.",
+	"description": "Displays infinite scroll pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.",
 	"textdomain": "visual-portfolio",
 	"attributes": {
-		"showLoadingText": {
-			"type": "boolean",
-			"default": true
-		},
-		"loadingLabel": {
-			"type": "string",
-			"default": "Loading..."
-		},
-		"loadMoreLabel": {
-			"type": "string",
-			"default": "Load More"
-		},
+		"showLoadingText": { "type": "boolean", "default": true },
+		"loadingLabel": { "type": "string", "default": "Loading..." },
+		"loadMoreLabel": { "type": "string", "default": "Load More" },
 		"endListLabel": {
 			"type": "string",
 			"default": "You've reached the end of the list"
@@ -50,15 +41,13 @@
 		"visual-portfolio/maxPages"
 	],
 	"supports": {
-	  "html": false,
-	  "interactivity": {
-		"clientNavigation": true
-	  }
+		"html": false,
+		"interactivity": { "clientNavigation": true }
 	},
 	"styles": [
-        { "name": "minimal", "label": "Minimal", "isDefault": true },
-        { "name": "classic", "label": "Classic" }
-    ],
+		{ "name": "minimal", "label": "Minimal", "isDefault": true },
+		{ "name": "classic", "label": "Classic" }
+	],
 	"style": "visual-portfolio-block-pagination-infinite",
 	"editorStyle": "visual-portfolio-block-pagination-infinite-editor"
 }

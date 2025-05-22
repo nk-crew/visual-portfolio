@@ -1,10 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "visual-portfolio/pagination-numbers",
-	"title": "VP Pagination Numbers",
+	"title": "Pagination Numbers (Experimental)",
 	"category": "visual-portfolio",
 	"parent": ["visual-portfolio/paged-pagination"],
-	"description": "Displays page numbers for navigation.",
+	"description": "Displays page numbers for navigation. Block is experimental and will change in future releases. Please use with caution.",
 	"textdomain": "visual-portfolio",
 	"usesContext": [
 		"visual-portfolio/block_id",
@@ -31,9 +31,5 @@
 		"visual-portfolio/stretch",
 		"visual-portfolio/maxPages"
 	],
-	"supports": {
-	  "html": false,
-	  "reusable": false,
-	  "className": false
-	}
-  }
+	"supports": { "html": false, "reusable": false, "className": false }
+}
