@@ -1,8 +1,8 @@
 [
 	{
-	  "title": "Alternative title of 1920 on 600",
-	  "isPopup": false,
-	  "titleUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
+		"title": "Alternative title of 1920 on 600",
+		"isPopup": false,
+		"titleUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
 	},
 	{
 		"title": "Image Title of 3840 on 2160",
@@ -35,18 +35,18 @@
 		"titleUrl": "/?page_id"
 	},
 	{
-	  "title": "Image Title of 1920 on 1080",
-	  "isPopup": false,
-	  "titleUrl": "/wp-content/uploads/0000/00/image-1920x1080-1.jpeg"
+		"title": "Image Title of 1920 on 1080",
+		"isPopup": false,
+		"titleUrl": "/wp-content/uploads/0000/00/image-1920x1080-1.jpeg"
 	},
 	{
 		"title": "Alternative title of 600 on 1920",
 		"isPopup": false,
-		"titleUrl": "https://visualportfolio.co/"
+		"titleUrl": "https://visualportfolio.com/"
 	},
 	{
 		"title": "Image Title of 2000 on 2000",
 		"isPopup": false,
 		"titleUrl": "/wp-content/uploads/0000/00/image-2000x2000-1-1920x1920.jpeg"
 	}
-  ]
+]

@@ -31,7 +31,7 @@ msgstr ""
 
 #. Author URI of the plugin
 #: class-visual-portfolio.php
-msgid "https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline"
+msgid "https://visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline"
 msgstr ""
 
 #: class-visual-portfolio.php:123

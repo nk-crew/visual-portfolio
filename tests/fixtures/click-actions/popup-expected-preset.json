@@ -1,72 +1,72 @@
 [
 	{
-	  "title": "Alternative title of 300 on 200",
-	  "isPopup": true,
-	  "titleUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio",
-	  "imageUrl": false,
-	  "videoUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
+		"title": "Alternative title of 300 on 200",
+		"isPopup": true,
+		"titleUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio",
+		"imageUrl": false,
+		"videoUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
 	},
 	{
-	  "title": "Alternative title of 600 on 1920",
-	  "isPopup": false,
-	  "titleUrl": "https://visualportfolio.co/",
-	  "imageUrl": false,
-	  "videoUrl": false
+		"title": "Alternative title of 600 on 1920",
+		"isPopup": false,
+		"titleUrl": "https://visualportfolio.com/",
+		"imageUrl": false,
+		"videoUrl": false
 	},
 	{
-	  "title": "Alternative title of 800 on 600",
-	  "isPopup": true,
-	  "titleUrl": "/wp-content/uploads/0000/00/image-800x600-2.png",
-	  "imageUrl": "/wp-content/uploads/0000/00/image-800x600-2.png",
-	  "videoUrl": false
+		"title": "Alternative title of 800 on 600",
+		"isPopup": true,
+		"titleUrl": "/wp-content/uploads/0000/00/image-800x600-2.png",
+		"imageUrl": "/wp-content/uploads/0000/00/image-800x600-2.png",
+		"videoUrl": false
 	},
 	{
-	  "title": "Alternative title of 800 on 1200",
-	  "isPopup": false,
-	  "titleUrl": "/?page_id=3534",
-	  "imageUrl": false,
-	  "videoUrl": false
+		"title": "Alternative title of 800 on 1200",
+		"isPopup": false,
+		"titleUrl": "/?page_id=3534",
+		"imageUrl": false,
+		"videoUrl": false
 	},
 	{
-	  "title": "Alternative title of 1600 on 1200",
-	  "isPopup": true,
-	  "titleUrl": "/wp-content/uploads/0000/00/image-1600x1200-2.jpeg",
-	  "imageUrl": "/wp-content/uploads/0000/00/image-1600x1200-2.jpeg",
-	  "videoUrl": false
+		"title": "Alternative title of 1600 on 1200",
+		"isPopup": true,
+		"titleUrl": "/wp-content/uploads/0000/00/image-1600x1200-2.jpeg",
+		"imageUrl": "/wp-content/uploads/0000/00/image-1600x1200-2.jpeg",
+		"videoUrl": false
 	},
 	{
-	  "title": "Alternative title of 1920 on 600",
-	  "isPopup": true,
-	  "titleUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio",
-	  "imageUrl": false,
-	  "videoUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
+		"title": "Alternative title of 1920 on 600",
+		"isPopup": true,
+		"titleUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio",
+		"imageUrl": false,
+		"videoUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
 	},
 	{
-	  "title": "Image Title of 1920 on 1080",
-	  "isPopup": true,
-	  "titleUrl": "/wp-content/uploads/0000/00/image-1920x1080-2.jpeg",
-	  "imageUrl": "/wp-content/uploads/0000/00/image-1920x1080-2.jpeg",
-	  "videoUrl": false
+		"title": "Image Title of 1920 on 1080",
+		"isPopup": true,
+		"titleUrl": "/wp-content/uploads/0000/00/image-1920x1080-2.jpeg",
+		"imageUrl": "/wp-content/uploads/0000/00/image-1920x1080-2.jpeg",
+		"videoUrl": false
 	},
 	{
-	  "title": "Image Title of 2000 on 2000",
-	  "isPopup": true,
-	  "titleUrl": "/wp-content/uploads/0000/00/image-2000x2000-2-1920x1920.jpeg",
-	  "imageUrl": "/wp-content/uploads/0000/00/image-2000x2000-2-1920x1920.jpeg",
-	  "videoUrl": false
+		"title": "Image Title of 2000 on 2000",
+		"isPopup": true,
+		"titleUrl": "/wp-content/uploads/0000/00/image-2000x2000-2-1920x1920.jpeg",
+		"imageUrl": "/wp-content/uploads/0000/00/image-2000x2000-2-1920x1920.jpeg",
+		"videoUrl": false
 	},
 	{
-	  "title": "Image Title of 3840 on 2160",
-	  "isPopup": true,
-	  "titleUrl": "/wp-content/uploads/0000/00/image-3840x2160-2-1920x1080.jpeg",
-	  "imageUrl": "/wp-content/uploads/0000/00/image-3840x2160-2-1920x1080.jpeg",
-	  "videoUrl": false
+		"title": "Image Title of 3840 on 2160",
+		"isPopup": true,
+		"titleUrl": "/wp-content/uploads/0000/00/image-3840x2160-2-1920x1080.jpeg",
+		"imageUrl": "/wp-content/uploads/0000/00/image-3840x2160-2-1920x1080.jpeg",
+		"videoUrl": false
 	},
 	{
-	  "title": "Image Title of 3840 on 2560",
-	  "isPopup": true,
-	  "titleUrl": "/wp-content/uploads/0000/00/image-3840x2560-2-1920x1280.jpeg",
-	  "imageUrl": "/wp-content/uploads/0000/00/image-3840x2560-2-1920x1280.jpeg",
-	  "videoUrl": false
+		"title": "Image Title of 3840 on 2560",
+		"isPopup": true,
+		"titleUrl": "/wp-content/uploads/0000/00/image-3840x2560-2-1920x1280.jpeg",
+		"imageUrl": "/wp-content/uploads/0000/00/image-3840x2560-2-1920x1280.jpeg",
+		"videoUrl": false
 	}
 ]

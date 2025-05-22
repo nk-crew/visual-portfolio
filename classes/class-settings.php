@@ -410,7 +410,7 @@ class Visual_Portfolio_Settings {
 					'label'       => esc_html__( 'Lazy Loading Excludes', 'visual-portfolio' ),
 					// translators: %s - doc url.
 					// translators: %s - link text.
-					'desc'        => sprintf( __( 'Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href="%1$s">%2$s</a>', 'visual-portfolio' ), 'https://visualportfolio.co/docs/settings/images/', esc_html__( 'More info', 'visual-portfolio' ) ),
+					'desc'        => sprintf( __( 'Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href="%1$s">%2$s</a>', 'visual-portfolio' ), 'https://visualportfolio.com/docs/settings/images/', esc_html__( 'More info', 'visual-portfolio' ) ),
 					'type'        => 'textarea',
 					'placeholder' => "image-example.webp\nslider-image-classname",
 					'condition'   => array(
