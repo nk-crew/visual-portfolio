@@ -1,0 +1,24 @@
+{
+    "apiVersion": 2,
+    "name": "visual-portfolio/sort-button",
+    "category": "visual-portfolio",
+    "parent": ["visual-portfolio/sort-buttons"],
+    "attributes": {
+        "label": {
+            "type": "string",
+            "default": "Default"
+        },
+        "value": {
+            "type": "string",
+			"pattern": "^[a-zA-Z0-9_-]*$",
+            "default": "default"
+        },
+        "active": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+	"usesContext": ["visual-portfolio/sort-buttons-style"],
+	"editorStyle": "visual-portfolio-block-sort-button-editor",
+  	"style": "visual-portfolio-block-sort-button"
+}

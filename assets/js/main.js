@@ -190,6 +190,10 @@ class VP {
 			self.$pagination = $item.find('.vp-pagination');
 		}
 
+		if (self.$sort.length === 0) {
+			self.$sort = $item.find('.vp-sort');
+		}
+
 		// user options
 		self.userOptions = userOptions;
 
@@ -621,7 +625,7 @@ class VP {
 			.add(self.$sort)
 			.on(
 				`change${evp}`,
-				'.vp-filter select, .vp-sort select',
+				'.vp-filter select, .vp-sort select, .vp-sort-dropdown select',
 				function () {
 					const $this = $(this);
 					const value = $this.val();
