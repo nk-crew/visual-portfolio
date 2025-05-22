@@ -1,5 +1,17 @@
 import './block';
 import './block-saved';
+import './blocks/loop';
+import './blocks/filter';
+import './blocks/filter-item';
+import './blocks/pagination';
+import './blocks/pagination-infinite';
+import './blocks/pagination-load-more';
+import './blocks/pagination-next';
+import './blocks/pagination-numbers';
+import './blocks/pagination-previous';
+import './blocks/sort-buttons';
+import './blocks/sort-dropdown';
+import './blocks/sort-button';
 import './extensions/block-id';
 import './extensions/classic-icon-with-overlay';
 import './extensions/items-count-all';

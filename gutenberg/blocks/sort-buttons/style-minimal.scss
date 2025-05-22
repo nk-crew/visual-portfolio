@@ -1,0 +1,27 @@
+/**
+* Minimal sort style for buttons
+*/
+.vp-sort.is-style-minimal {
+	/* Frontend styles */
+	.vp-sort__item a,
+	.vp-sort__item button.vp-sort__item-button {
+		padding: var(--vp-sort-btn-padding-v) var(--vp-sort-btn-padding-h);
+		font-size: var(--vp-sort-btn-font-size);
+		font-weight: var(--vp-sort-btn-font-weight);
+		line-height: var(--vp-sort-btn-line-height);
+		text-transform: var(--vp-sort-btn-text-transform);
+		letter-spacing: var(--vp-sort-btn-letter-spacing);
+		color: inherit;
+		background-color: transparent;
+
+		&:hover,
+		&:focus {
+			color: var(--vp-color-brand);
+		}
+	}
+
+	.vp-sort__item-active a,
+	.vp-sort__item.vp-sort__item-active button.vp-sort__item-button {
+		color: var(--vp-color-brand);
+	}
+}

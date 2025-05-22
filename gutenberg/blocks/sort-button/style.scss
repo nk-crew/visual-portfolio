@@ -1,0 +1,21 @@
+/**
+* Sort Button Block styles
+*/
+
+/* Frontend styles */
+.vp-sort__item {
+	flex: 0 0 auto;
+	max-width: 100%;
+	text-align: center;
+
+	a {
+		display: block;
+		text-decoration: none;
+		font-size: 0.9em;
+		font-weight: 600;
+		line-height: 1.4;
+		text-transform: uppercase;
+		letter-spacing: 0.015em;
+		transition: var(--vp-transition-duration, 0.2s) color var(--vp-transition-easing, ease-in-out), var(--vp-transition-duration, 0.2s) background-color var(--vp-transition-easing, ease-in-out);
+	}
+}

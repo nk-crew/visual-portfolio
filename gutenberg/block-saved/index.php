@@ -1,6 +1,6 @@
 <?php
 /**
- * Gutenberg block.
+ * Saved layout block render and register.
  *
  * @package visual-portfolio
  */

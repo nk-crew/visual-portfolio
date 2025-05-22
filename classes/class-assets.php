@@ -51,7 +51,7 @@ class Visual_Portfolio_Assets {
 
 		// parse shortcodes from post content.
 		add_filter( 'wp', array( $this, 'maybe_parse_shortcodes_from_content' ), 10 );
-		add_action( 'vpf_parse_blocks', array( $this, 'maybe_parse_blocks_from_content' ), 11 );
+		add_action( 'vpf_parse_blocks', array( $this, 'maybe_parse_blocks_from_content' ), 11, 4 );
 
 		// enqueue runtime.
 		add_action( 'enqueue_block_editor_assets', 'Visual_Portfolio_Assets::enqueue_runtime', 11 );
@@ -911,12 +911,18 @@ class Visual_Portfolio_Assets {
 	/**
 	 * Parse blocks from content.
 	 *
-	 * @param array $blocks - blocks list.
+	 * @param array   $blocks - blocks array.
+	 * @param string  $location - blocks location [content,widget].
+	 * @param boolean $is_reusable - is from reusable block.
+	 * @param boolean $is_inner_blocks - is from inner blocks.
 	 */
-	public function maybe_parse_blocks_from_content( $blocks ) {
+	public function maybe_parse_blocks_from_content( $blocks, $location, $is_reusable, $is_inner_blocks ) {
 		if ( empty( $blocks ) ) {
 			return;
 		}
+
+		// Store the current loop block ID in a static variable.
+		static $current_loop_id = null;
 
 		foreach ( $blocks as $block ) {
 			// Block.
@@ -927,7 +933,6 @@ class Visual_Portfolio_Assets {
 				isset( $block['attrs']['block_id'] )
 			) {
 				self::enqueue( $block['attrs'] );
-
 				// Saved block.
 			} elseif (
 				isset( $block['blockName'] ) &&
@@ -938,6 +943,39 @@ class Visual_Portfolio_Assets {
 				isset( $block['attrs']['id'] )
 			) {
 				self::enqueue( $block['attrs'] );
+
+				// Loop block - store its ID for nested blocks.
+			} elseif (
+				isset( $block['blockName'] ) &&
+				'visual-portfolio/loop' === $block['blockName'] &&
+				isset( $block['attrs']['content_source'] ) &&
+				isset( $block['attrs']['block_id'] )
+			) {
+				self::enqueue( $block['attrs'] );
+
+				// Store the loop block ID before processing inner blocks.
+				$current_loop_id = $block['attrs']['block_id'];
+
+				// Nested block inside loop.
+			} elseif (
+				isset( $block['blockName'] ) &&
+				'visual-portfolio/block' === $block['blockName'] &&
+				$is_inner_blocks &&
+				$current_loop_id
+			) {
+				// If we have a parent loop ID, use it for the nested block.
+				$block['attrs']             = isset( $block['attrs'] ) ? $block['attrs'] : array();
+				$block['attrs']['block_id'] = $current_loop_id;
+				self::enqueue( $block['attrs'] );
+			}
+
+			// Reset the loop ID if we're done processing the loop block's children.
+			if (
+				isset( $block['blockName'] ) &&
+				'visual-portfolio/loop' === $block['blockName'] &&
+				$current_loop_id === $block['attrs']['block_id']
+			) {
+				$current_loop_id = null;
 			}
 		}
 	}
