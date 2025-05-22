@@ -983,6 +983,12 @@
          "Extra Large (VP)": [
             ""
          ],
+         "Required parameters are missing.": [
+            ""
+         ],
+         "Sorry, you are not allowed to get filter items.": [
+            ""
+         ],
          "Sorry, you are not allowed to get list of saved layouts.": [
             ""
          ],
@@ -1343,6 +1349,12 @@
          "Upgrade to PRO Now": [
             ""
          ],
+         "Loading...": [
+            ""
+         ],
+         "You ve reached the end of the list": [
+            ""
+         ],
          "Author": [
             ""
          ],
@@ -1386,6 +1398,159 @@
             ""
          ],
          "Saved %s": [
+            ""
+         ],
+         "Add filter text…": [
+            ""
+         ],
+         "Loading filters…": [
+            ""
+         ],
+         "Show Loading Text": [
+            ""
+         ],
+         "Loading Label": [
+            ""
+         ],
+         "End of List Text": [
+            ""
+         ],
+         "Pagination will be displayed when the number of pages is more than 1.": [
+            ""
+         ],
+         "VP Pagination Infinite": [
+            ""
+         ],
+         "Displays infinite scroll pagination for Visual Portfolio loop.": [
+            ""
+         ],
+         "infinite": [
+            ""
+         ],
+         "scroll": [
+            ""
+         ],
+         "pagination": [
+            ""
+         ],
+         "vp": [
+            ""
+         ],
+         "VP Pagination Load More": [
+            ""
+         ],
+         "Displays load more button pagination for Visual Portfolio loop.": [
+            ""
+         ],
+         "load more": [
+            ""
+         ],
+         "Next Label": [
+            ""
+         ],
+         "VP Pagination Next": [
+            ""
+         ],
+         "Displays the next page link.": [
+            ""
+         ],
+         "next": [
+            ""
+         ],
+         "VP Pagination Numbers": [
+            ""
+         ],
+         "Displays page numbers for navigation.": [
+            ""
+         ],
+         "numbers": [
+            ""
+         ],
+         "Previous Label": [
+            ""
+         ],
+         "VP Pagination Previous": [
+            ""
+         ],
+         "Displays the previous page link.": [
+            ""
+         ],
+         "previous": [
+            ""
+         ],
+         "Paged Pagination": [
+            ""
+         ],
+         "Displays paged pagination for Visual Portfolio loop.": [
+            ""
+         ],
+         "pages": [
+            ""
+         ],
+         "Button Settings": [
+            ""
+         ],
+         "Sort Value": [
+            ""
+         ],
+         "Value used for sorting (e.g., date_asc, title_desc)": [
+            ""
+         ],
+         "Active": [
+            ""
+         ],
+         "Button Label": [
+            ""
+         ],
+         "Sort Button": [
+            ""
+         ],
+         "Individual button for sorting portfolio items.": [
+            ""
+         ],
+         "Date Asc": [
+            ""
+         ],
+         "Date Desc": [
+            ""
+         ],
+         "Add sorting options to your portfolio with buttons.": [
+            ""
+         ],
+         "sort": [
+            ""
+         ],
+         "order": [
+            ""
+         ],
+         "Title Asc": [
+            ""
+         ],
+         "Title Desc": [
+            ""
+         ],
+         "Date Ascending": [
+            ""
+         ],
+         "Date Descending": [
+            ""
+         ],
+         "Title Ascending": [
+            ""
+         ],
+         "Title Descending": [
+            ""
+         ],
+         "Switch to Buttons": [
+            ""
+         ],
+         "Sort Options": [
+            ""
+         ],
+         "The first option in the list is the active one.": [
+            ""
+         ],
+         "Add sorting options to your portfolio.": [
             ""
          ],
          "Wide 16:9": [
@@ -1632,6 +1797,33 @@
          "block title\u0004Visual Portfolio": [
             ""
          ],
+         "block title\u0004Filter Item (Experimental)": [
+            ""
+         ],
+         "block title\u0004Portfolio Filter (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Loop (Experimental)": [
+            ""
+         ],
+         "block title\u0004Pagination Infinite (Experimental)": [
+            ""
+         ],
+         "block title\u0004Pagination Load More (Experimental)": [
+            ""
+         ],
+         "block title\u0004Pagination Next (Experimental)": [
+            ""
+         ],
+         "block title\u0004Pagination Numbers (Experimental)": [
+            ""
+         ],
+         "block title\u0004Pagination Previous (Experimental)": [
+            ""
+         ],
+         "block title\u0004Paged Pagination (Experimental)": [
+            ""
+         ],
          "block title\u0004Visual Portfolio Editor": [
             ""
          ],
@@ -1639,6 +1831,33 @@
             ""
          ],
          "block description\u0004Display galleries, posts and portfolio grids.": [
+            ""
+         ],
+         "block description\u0004Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Display gallery loop. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays infinite scroll pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays the next page link. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays page numbers for navigation. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays the previous page link. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays paged pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "block description\u0004Edit saved Visual Portfolio layouts.": [
@@ -1660,6 +1879,24 @@
             ""
          ],
          "block keyword\u0004posts": [
+            ""
+         ],
+         "block keyword\u0004loop": [
+            ""
+         ],
+         "block keyword\u0004query": [
+            ""
+         ],
+         "block style label\u0004Minimal": [
+            ""
+         ],
+         "block style label\u0004Fill": [
+            ""
+         ],
+         "block style label\u0004Outline": [
+            ""
+         ],
+         "block style label\u0004Classic": [
             ""
          ]
       }
