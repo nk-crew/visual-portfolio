@@ -121,7 +121,11 @@ class Visual_Portfolio_3rd_Elementor {
 
 		// Since the Elementor assets methods like `get_css_assets_url` are protected
 		// and we can't use it directly, we prepare assets URLs manually.
-		$e_swiper_latest       = \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_swiper_latest' );
+		// Since Elementor 3.28.0, they have added support for the latest version of Swiper library.
+		//
+		// @link https://github.com/elementor/elementor/commit/33e96605426ad2895f81f29868b3feed0d0f048d.
+		// @link https://wordpress.org/support/topic/problem-with-elementor-3-28/.
+		$e_swiper_latest       = version_compare( ELEMENTOR_VERSION, '3.28.0', '>=' ) || \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_swiper_latest' );
 		$e_swiper_asset_path   = $e_swiper_latest ? 'assets/lib/swiper/v8/' : 'assets/lib/swiper/';
 		$e_swiper_version      = $e_swiper_latest ? '8.4.5' : '5.3.6';
 		$e_file_name           = 'swiper';
