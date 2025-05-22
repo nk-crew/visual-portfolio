@@ -33,7 +33,7 @@
 		"format:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio' cli composer run-script format",
 		"make-pot": "composer wp -- i18n make-pot ./ ./languages/visual-portfolio.pot --skip-audit --exclude=vendor,vendors,node_modules,build,dist-zip --headers='{\"Last-Translator\":\"Visual Portfolio\",\"Report-Msgid-Bugs-To\":\"https://github.com/nk-crew/visual-portfolio/issues\"}'",
 		"make-json": "po2json ./languages/visual-portfolio.pot ./languages/visual-portfolio.json --format=jed1.x --pretty --domain=visual-portfolio",
-		"prepare": "husky install",
+		"prepare": "husky",
 		"postinstall": "composer install"
 	},
 	"devDependencies": {
@@ -57,7 +57,7 @@
 		"gulp": "^5.0.0",
 		"gulp-change-file-content": "^1.0.1",
 		"gulp-zip": "^4.2.0",
-		"husky": "^8.0.3",
+		"husky": "^9.1.7",
 		"json-file": "^0.1.0",
 		"lint-staged": "^13.2.2",
 		"md5": "^2.3.0",
