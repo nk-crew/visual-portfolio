@@ -775,7 +775,7 @@ class Visual_Portfolio_Settings {
                         <div class="vpf-pro-note vpf-settings-info-pro">
                             <h3>' . esc_html__( 'Premium Only', 'visual-portfolio' ) . '</h3>
                             <div>
-                                <p class="vpf-pro-note-description">' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', 'visual-portfolio' ) . '</p>
+                                <p class="vpf-pro-note-description">' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, X, etc...', 'visual-portfolio' ) . '</p>
                                 <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_links['social'] ) . '">' . esc_html__( 'Go Pro', 'visual-portfolio' ) . '</a>
                             </div>
                         </div>

@@ -80,3 +80,11 @@
 		}
 	}
 }
+
+.fancybox-share__button--x {
+	background: #000;
+
+	&:hover {
+		background: #292929;
+	}
+}

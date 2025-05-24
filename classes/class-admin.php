@@ -1829,7 +1829,7 @@ class Visual_Portfolio_Admin {
 				'type'         => 'pro_note',
 				'name'         => 'social_pro_note',
 				'label'        => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description'  => '<p>' . esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', 'visual-portfolio' ) . '</p>',
+				'description'  => '<p>' . esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, X, etc...', 'visual-portfolio' ) . '</p>',
 				'setup_wizard' => true,
 			)
 		);

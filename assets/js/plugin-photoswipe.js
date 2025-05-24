@@ -182,9 +182,9 @@ if (PhotoSwipe && VPPopupAPI) {
 					url: 'https://www.facebook.com/sharer/sharer.php?u={{url}}',
 				},
 				{
-					id: 'twitter',
-					label: __.pswp_share_tw,
-					url: 'https://twitter.com/intent/tweet?text={{text}}&url={{url}}',
+					id: 'x',
+					label: __.pswp_share_x,
+					url: 'https://x.com/intent/tweet?text={{text}}&url={{url}}',
 				},
 				{
 					id: 'pinterest',

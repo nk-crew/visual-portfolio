@@ -91,7 +91,7 @@ Visual Portfolio uses only modern solutions, and lightboxes are not an exception
 
 **Smart Loading** <br> Gallery images are responsive and loaded progressively using lazy loading on demand.
 
-**Social Sharing** <br> You can allow users to share photos on Facebook, Twitter, and Pinterest with social sharing buttons.
+**Social Sharing** <br> You can allow users to share photos on Facebook, X, and Pinterest with social sharing buttons.
 
 ### 📹 Video and 🎵 Audio Support ###
 
@@ -161,7 +161,7 @@ Automatically fetch posts from your social networks to display in gallery on you
   * [Youtube](https://www.visualportfolio.com/social-youtube/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [Vimeo](https://www.visualportfolio.com/social-vimeo/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [Unsplash](https://www.visualportfolio.com/social-unsplash/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Twitter](https://www.visualportfolio.com/social-twitter/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [X](https://www.visualportfolio.com/social-x/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [Flickr](https://www.visualportfolio.com/social-flickr/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [Google Photos](https://www.visualportfolio.com/social-google-photos/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [Dribbble](https://www.visualportfolio.com/social-dribbble/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
