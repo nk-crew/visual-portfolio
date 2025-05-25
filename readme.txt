@@ -4,9 +4,9 @@
 * Tags: portfolio, gallery, gallery block, image gallery, wordpress gallery plugin
 * Donate link: https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 6.2
-* Tested up to: 6.7
+* Tested up to: 6.8
 * Requires PHP: 7.2
-* Stable tag: 3.3.13
+* Stable tag: 3.3.14
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -324,6 +324,17 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.3.14 - May 25, 2024 =
+
+* tested with WordPress 6.8
+* fixed WPML error in Saved Layouts
+* changed links from visualportfolio.co to www.visualportfolio.com
+* rename Twitter to X
+* **Pro:**
+* migrate Pro plugin from Paddle to LemonSqueezy
+  * added support for affiliate links
+* fixed _load_textdomain_just_in_time notice
 
 = 3.3.13 - Mar 25, 2024 =
 

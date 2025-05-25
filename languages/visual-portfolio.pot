@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.13\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.14\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-25T07:20:46+00:00\n"
+"POT-Creation-Date: 2025-05-25T11:30:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: visual-portfolio\n"
@@ -673,7 +673,7 @@ msgid "Protect your works using watermarks, password, and age gate"
 msgstr ""
 
 #: classes/class-admin.php:1832
-msgid "Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc..."
+msgid "Display social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
 #: classes/class-admin.php:1844
@@ -1219,7 +1219,7 @@ msgid "Close (Esc)"
 msgstr ""
 
 #: classes/class-assets.php:707
-#: classes/class-assets.php:726
+#: classes/class-assets.php:727
 msgid "Share"
 msgstr ""
 
@@ -1248,47 +1248,51 @@ msgid "Tweet"
 msgstr ""
 
 #: classes/class-assets.php:714
-msgid "Pin it"
+msgid "X"
 msgstr ""
 
 #: classes/class-assets.php:715
-#: classes/class-assets.php:725
+msgid "Pin it"
+msgstr ""
+
+#: classes/class-assets.php:716
+#: classes/class-assets.php:726
 msgid "Download"
 msgstr ""
 
-#: classes/class-assets.php:717
+#: classes/class-assets.php:718
 msgid "Close"
 msgstr ""
 
-#: classes/class-assets.php:718
+#: classes/class-assets.php:719
 msgid "Next"
 msgstr ""
 
-#: classes/class-assets.php:719
+#: classes/class-assets.php:720
 msgid "Previous"
 msgstr ""
 
-#: classes/class-assets.php:720
+#: classes/class-assets.php:721
 msgid "The requested content cannot be loaded. <br /> Please try again later."
 msgstr ""
 
-#: classes/class-assets.php:721
+#: classes/class-assets.php:722
 msgid "Start slideshow"
 msgstr ""
 
-#: classes/class-assets.php:722
+#: classes/class-assets.php:723
 msgid "Pause slideshow"
 msgstr ""
 
-#: classes/class-assets.php:723
+#: classes/class-assets.php:724
 msgid "Full screen"
 msgstr ""
 
-#: classes/class-assets.php:724
+#: classes/class-assets.php:725
 msgid "Thumbnails"
 msgstr ""
 
-#: classes/class-assets.php:727
+#: classes/class-assets.php:728
 msgid "Zoom"
 msgstr ""
 
@@ -1892,7 +1896,7 @@ msgid "Protect your works using watermarks"
 msgstr ""
 
 #: classes/class-settings.php:778
-msgid "Social feeds such as Instagram, Youtube, Flickr, Twitter, etc..."
+msgid "Social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
 #: classes/class-settings.php:793

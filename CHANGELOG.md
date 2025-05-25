@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.3.14 - May 25, 2024 =
+
+* tested with WordPress 6.8
+* fixed WPML error in Saved Layouts
+* changed links from visualportfolio.co to www.visualportfolio.com
+* rename Twitter to X
+* **Pro:**
+* migrate Pro plugin from Paddle to LemonSqueezy
+  * added support for affiliate links
+* fixed _load_textdomain_just_in_time notice
+
 = 3.3.13 - Mar 25, 2024 =
 
 * fixed broken Swiper when installed Elementor 3.28
