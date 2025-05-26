@@ -142,7 +142,7 @@ class VpVideoComponent extends Component {
 						)}
 						&nbsp;
 						<a
-							href="https://visualportfolio.co/docs/projects/project-formats/#supported-video-platforms"
+							href="https://www.visualportfolio.com/docs/projects/project-formats/#supported-video-platforms"
 							target="_blank"
 							rel="noopener noreferrer"
 						>

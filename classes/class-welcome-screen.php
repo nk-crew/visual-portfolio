@@ -115,7 +115,7 @@ class Visual_Portfolio_Welcome_Screen {
 					<div>
 						<?php
 						// translators: %s - pro link.
-						echo sprintf( esc_html__( 'Want to get more power with Pro? Visit %s', 'visual-portfolio' ), '<a target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_links['head'] ) . '">visualportfolio.co/pricing</a>' );
+						echo sprintf( esc_html__( 'Want to get more power with Pro? Visit %s', 'visual-portfolio' ), '<a target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_links['head'] ) . '">visualportfolio.com/pricing</a>' );
 						?>
 					</div>
 				</div>

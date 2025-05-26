@@ -1,6 +1,6 @@
 <h1 align="center">
-  <a href="https://visualportfolio.co/">
-    <img src="https://visualportfolio.co/wp-content/uploads/2022/02/logo.svg" height="40" alt="Visual Portfolio - WordPress Gallery Plugin">
+  <a href="https://www.visualportfolio.com/">
+    <img src="https://www.visualportfolio.com/wp-content/uploads/2022/02/logo.svg" height="40" alt="Visual Portfolio - WordPress Gallery Plugin">
   </a>
 </h1>
 
@@ -14,7 +14,7 @@
 <p align="center">Modern gallery and portfolio plugin with advanced layouts editor for WordPress.</p>
 
 <p align="center">
-  <a href="https://visualportfolio.co/">Website</a> &nbsp; <a href="https://visualportfolio.co/docs/getting-started/">Documentation</a> &nbsp; <a href="https://wordpress.org/plugins/visual-portfolio/">WordPress Plugin</a> &nbsp; <a href="https://visualportfolio.co/pricing/">Pro Version</a>
+  <a href="https://www.visualportfolio.com/">Website</a> &nbsp; <a href="https://www.visualportfolio.com/docs/getting-started/">Documentation</a> &nbsp; <a href="https://wordpress.org/plugins/visual-portfolio/">WordPress Plugin</a> &nbsp; <a href="https://www.visualportfolio.com/pricing/">Pro Version</a>
 </p>
 
 ## Overview

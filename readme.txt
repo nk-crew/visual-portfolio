@@ -2,11 +2,11 @@
 
 * Contributors: visualportfolio, nko
 * Tags: portfolio, gallery, gallery block, image gallery, wordpress gallery plugin
-* Donate link: https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
+* Donate link: https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 6.2
-* Tested up to: 6.7
+* Tested up to: 6.8
 * Requires PHP: 7.2
-* Stable tag: 3.3.13
+* Stable tag: 3.3.14
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -17,11 +17,11 @@ Modern photo gallery and portfolio plugin with advanced layouts editor. Clean ga
 **Gallery & Portfolio Plugin For WordPress**
 ★★★★★<br>
 
-**Portfolio websites are the most popular nowadays.** We created [**Visual Portfolio, Photo Gallery & Post Grid WordPress plugin**](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head), to help every creative, agency, and photographers get access to the powerful tools they need to showcase their beautiful works and attract more love from their potential and existing customers.
+**Portfolio websites are the most popular nowadays.** We created [**Visual Portfolio, Photo Gallery & Post Grid WordPress plugin**](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head), to help every creative, agency, and photographers get access to the powerful tools they need to showcase their beautiful works and attract more love from their potential and existing customers.
 
 [youtube https://youtu.be/354pybu91aQ]
 
-[See Live Demo](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) | [Documentation](https://visualportfolio.co/docs/getting-started/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) | [GitHub](https://github.com/nk-crew/visual-portfolio)
+[See Live Demo](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) | [Documentation](https://www.visualportfolio.com/docs/getting-started/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) | [GitHub](https://github.com/nk-crew/visual-portfolio)
 
 Create beautiful, clean, and powerful photo galleries and portfolio layouts using the Visual Portfolio gallery plugin. It is easy for simple photo galleries, but powerful enough for professionals. Whether you're a photographer, agency, or anything in between, **Visual Portfolio will boost your online presence**.
 
@@ -45,21 +45,21 @@ Smart adaptive image sizes fully supported in any gallery, created with Visual P
 
 Our gallery plugin shipped with popular layouts such as Masonry and Justified (Flickr). Every feature optimized and works seamlessly with all of these layouts, you just need to set up and go with no headache. See it in action:
 
-* [Masonry Gallery](https://visualportfolio.co/masonry-image-filters/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
-* [Justified (Flickr) Gallery](https://visualportfolio.co/justified-tilt-effect/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
-* [Tiles Gallery](https://visualportfolio.co/tiles-custom-color/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
-* [Grid Gallery](https://visualportfolio.co/grid/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
-* [Slider Gallery](https://visualportfolio.co/slider/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts) (Fade, Carousel, Coverflow)
+* [Masonry Gallery](https://www.visualportfolio.com/masonry-image-filters/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
+* [Justified (Flickr) Gallery](https://www.visualportfolio.com/justified-tilt-effect/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
+* [Tiles Gallery](https://www.visualportfolio.com/tiles-custom-color/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
+* [Grid Gallery](https://www.visualportfolio.com/grid/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts)
+* [Slider Gallery](https://www.visualportfolio.com/slider/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=layouts) (Fade, Carousel, Coverflow)
 
 ### 🎨 Prebuilt Skins ###
 
 Showcase your projects ang gallery images with clean and beautiful skins. See it in action:
 
-* [Classic](https://visualportfolio.co/masonry/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
-* [Fade](https://visualportfolio.co/tiles-paged-pagination/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
-* [Emerge](https://visualportfolio.co/masonry-infinite-scroll/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
-* [Fly](https://visualportfolio.co/tiles-popup-gallery/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
-* [Caption Move](https://visualportfolio.co/masonry-caption-move/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Classic](https://www.visualportfolio.com/masonry/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Fade](https://www.visualportfolio.com/tiles-paged-pagination/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Emerge](https://www.visualportfolio.com/masonry-infinite-scroll/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Fly](https://www.visualportfolio.com/tiles-popup-gallery/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
+* [Caption Move](https://www.visualportfolio.com/masonry-caption-move/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
 
 ### ⚙️ Easy to Customize ###
 
@@ -69,7 +69,7 @@ The gallery block with live preview includes a lot of design settings that are p
 
 Optional custom post type `portfolio` will ensure all your portfolios to keep in a single post type. In this way, you can distinguish your portfolios from other post types. Taxonomies are used to categorize your portfolio types, it will help you to group and sort your portfolios. Moreover, you can use these portfolios as a source for your showcase gallery using Visual Portfolio block.
 
-Customize and rename Portfolio archive templates using visual gallery and page builder [https://visualportfolio.co/docs/portfolio-archive/](https://visualportfolio.co/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=archive)
+Customize and rename Portfolio archive templates using visual gallery and page builder [https://www.visualportfolio.com/docs/portfolio-archive/](https://www.visualportfolio.com/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=archive)
 
 In case you want to use Visual Portfolio plugin for photo gallery only you can disable custom post type registration.
 
@@ -91,7 +91,7 @@ Visual Portfolio uses only modern solutions, and lightboxes are not an exception
 
 **Smart Loading** <br> Gallery images are responsive and loaded progressively using lazy loading on demand.
 
-**Social Sharing** <br> You can allow users to share photos on Facebook, Twitter, and Pinterest with social sharing buttons.
+**Social Sharing** <br> You can allow users to share photos on Facebook, X, and Pinterest with social sharing buttons.
 
 ### 📹 Video and 🎵 Audio Support ###
 
@@ -130,7 +130,7 @@ In addition our plugin add images in the sitemap for `All In One SEO`, `Rank Mat
 
 ### 🏳️ Multilingual & Translation Ready ###
 
-Visual Portfolio adds a new layer of compatibility for [WPML](https://wpml.org/). All blocks are compatible with it and ready for translation. [https://visualportfolio.co/docs/multilingual/](https://visualportfolio.co/docs/multilingual/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=wpml)
+Visual Portfolio adds a new layer of compatibility for [WPML](https://wpml.org/). All blocks are compatible with it and ready for translation. [https://www.visualportfolio.com/docs/multilingual/](https://www.visualportfolio.com/docs/multilingual/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=wpml)
 
 ### 🛠 Built For Developers ###
 
@@ -138,7 +138,7 @@ Visual Portfolio gives you a wide range of filters and actions to customize ever
 
 ### 🔥 Visual Portfolio Pro ###
 
-> The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [**Learn more about Visual Portfolio Pro**](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
+> The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [**Learn more about Visual Portfolio Pro**](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
 >
 > In order to maintain the free version of the plugin on an ongoing basis, and to provide quick and effective support for free, we offer a Pro version of the plugin. The Pro version allows you to:
 
@@ -150,32 +150,32 @@ Visual Portfolio gives you a wide range of filters and actions to customize ever
 
 * **Stylish Interaction Effects**
 
-  * [Hover Tilt Effect](https://visualportfolio.co/justified-tilt-effect/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects)
-  * [Custom Hover Image](https://visualportfolio.co/custom-hover-image-animated-gif/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects) - useful for animated GIFs
-  * [Caption Move Skin](https://visualportfolio.co/masonry-caption-move/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects)
+  * [Hover Tilt Effect](https://www.visualportfolio.com/justified-tilt-effect/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects)
+  * [Custom Hover Image](https://www.visualportfolio.com/custom-hover-image-animated-gif/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects) - useful for animated GIFs
+  * [Caption Move Skin](https://www.visualportfolio.com/masonry-caption-move/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_effects)
 
 * **Social Feeds**
 Automatically fetch posts from your social networks to display in gallery on your site.
 
-  * [Instagram](https://visualportfolio.co/social-instagram/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Youtube](https://visualportfolio.co/social-youtube/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Vimeo](https://visualportfolio.co/social-vimeo/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Unsplash](https://visualportfolio.co/social-unsplash/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Twitter](https://visualportfolio.co/social-twitter/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Flickr](https://visualportfolio.co/social-flickr/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Google Photos](https://visualportfolio.co/social-google-photos/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Dribbble](https://visualportfolio.co/social-dribbble/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Twitch](https://visualportfolio.co/social-twitch/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [RSS](https://visualportfolio.co/social-medium-rss/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [Instagram](https://www.visualportfolio.com/social-instagram/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [Youtube](https://www.visualportfolio.com/social-youtube/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [Vimeo](https://www.visualportfolio.com/social-vimeo/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [Unsplash](https://www.visualportfolio.com/social-unsplash/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [X](https://www.visualportfolio.com/social-x/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [Flickr](https://www.visualportfolio.com/social-flickr/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [Google Photos](https://www.visualportfolio.com/social-google-photos/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [Dribbble](https://www.visualportfolio.com/social-dribbble/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [Twitch](https://www.visualportfolio.com/social-twitch/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
+  * [RSS](https://www.visualportfolio.com/social-medium-rss/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * VK (Vkontakte)
 
-* [**Theft Protection**](https://visualportfolio.co/theft-protection/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_protection)
+* [**Theft Protection**](https://www.visualportfolio.com/theft-protection/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_protection)
 
   * **Watermarks** - add your logo on top of your images to make them harder to steal
   * **Password Form** - add a password to gallery blocks and send it to your clients
   * **Age Gate** - Protect visitors from viewing adult content
 
-* [**Photos Proofing**](https://visualportfolio.co/docs/proofing/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_proofing)
+* [**Photos Proofing**](https://www.visualportfolio.com/docs/proofing/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_proofing)
 Communicate with your clients in a modern way:
 
   1. **Create Proofing Gallery** - Easily create a gallery with photos, as you did before. Change styling, layout, etc. if you want.
@@ -203,7 +203,7 @@ Makes URL automatically change when you open popup and you can easily link to a 
 * **White Label**
 Possibility to use your brand name and logo instead of our "Visual Portfolio".
 
-[**Find much more portfolio and gallery features of Visual Portfolio Pro today!**](https://visualportfolio.co/pricing/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
+[**Find much more portfolio and gallery features of Visual Portfolio Pro today!**](https://www.visualportfolio.com/pricing/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
 
 ### 🌟 More Features ###
 
@@ -254,7 +254,7 @@ Visual Portfolio and Galleries are completely responsive and mobile ready – la
 Deeply customize the look of your gallery using custom CSS and CSS Variables.
 
 * **... And Much More**
-All available features you can find on the [plugin's site](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=more_features) and [documentation](https://visualportfolio.co/docs/getting-started/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=docs).
+All available features you can find on the [plugin's site](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=more_features) and [documentation](https://www.visualportfolio.com/docs/getting-started/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=docs).
 
 ## Screenshots ##
 
@@ -278,7 +278,7 @@ The manual installation method involves downloading our Visual Portfolio plugin 
 
 ### Does Visual Portfolio has documentation? ####
 
-Yes, our plugin has documentation to easily get started with galleries. Read it here - [Visual Portfolio Documentation](https://visualportfolio.co/docs/getting-started/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs)
+Yes, our plugin has documentation to easily get started with galleries. Read it here - [Visual Portfolio Documentation](https://www.visualportfolio.com/docs/getting-started/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs)
 
 ### What themes does Visual Portfolio support? ####
 
@@ -290,7 +290,7 @@ That is recommended. Visual Portfolio is designed to be an all in one Gallery an
 
 ### Are the galleries mobile friendly? ####
 
-Yes, Visual Portfolio built with mobile optimization in mind. It will automatically fit your screen size, so you don't need to worry about. Furthermore, we prepared lazy loading, which significantly increases page loading speed. Before making a decision, just check by yourself how [Visual Portfolio works on mobile devices](https://visualportfolio.co/masonry/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
+Yes, Visual Portfolio built with mobile optimization in mind. It will automatically fit your screen size, so you don't need to worry about. Furthermore, we prepared lazy loading, which significantly increases page loading speed. Before making a decision, just check by yourself how [Visual Portfolio works on mobile devices](https://www.visualportfolio.com/masonry/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ### Can I upload multiple images at once? ####
 
@@ -298,14 +298,14 @@ Yes, you can batch upload entire photo galleries at one time thanks to WordPress
 
 ### Is there pagination for photo galleries? ####
 
-Yes, you can use 3 type of pagination when displaying photo galleries or posts. Choose the number of photos to display and select Paged, Load More or Infinite Loading pagination. Examples with all gallery pagination types are [available on the Visual Portfolio website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
+Yes, you can use 3 type of pagination when displaying photo galleries or posts. Choose the number of photos to display and select Paged, Load More or Infinite Loading pagination. Examples with all gallery pagination types are [available on the Visual Portfolio website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ### Can I filter images and projects by categories? ####
 
 Yes, our plugin has built in support for AJAX Filter by items categories. See a couple of examples:
 
-* [Category filtering with links](https://visualportfolio.co/grid/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs)
-* [Category filtering + Sort with Select](https://visualportfolio.co/filterable-and-sortable/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs)
+* [Category filtering with links](https://www.visualportfolio.com/grid/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs)
+* [Category filtering + Sort with Select](https://www.visualportfolio.com/filterable-and-sortable/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs)
 
 ### Can I add an external links to galleries? ####
 
@@ -313,7 +313,7 @@ Yes, you can add external links to your gallery items.
 
 ### Is Visual Portfolio developers friendly? ####
 
-Yes, we prepared a lot of filters and actions for developers, so you can easily extend default functionality for your need. [Read here more info for developers](https://visualportfolio.co/docs/developers/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
+Yes, we prepared a lot of filters and actions for developers, so you can easily extend default functionality for your need. [Read here more info for developers](https://www.visualportfolio.com/docs/developers/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ### Is Visual Portfolio translation ready? ####
 
@@ -321,17 +321,28 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 
 ### More Information ####
 
-For more information, feel free to visit [Visual Portfolio official website](https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
+For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.3.14 - May 25, 2024 =
+
+* tested with WordPress 6.8
+* fixed WPML error in Saved Layouts
+* changed links from visualportfolio.co to www.visualportfolio.com
+* rename Twitter to X
+* **Pro:**
+* migrate Pro plugin from Paddle to LemonSqueezy
+  * added support for affiliate links
+* fixed _load_textdomain_just_in_time notice
 
 = 3.3.13 - Mar 25, 2024 =
 
 * fixed broken Swiper when installed Elementor 3.28
 * fixed rare bug with displaying category links on archive pages
 * **Pro:**
-* added support for more Audio formats in popup Audio links (https://visualportfolio.co/docs/projects/project-formats/#supported-audio-platforms)
-* added support for more Video formats in popup Video links (https://visualportfolio.co/docs/projects/project-formats/#supported-video-platforms)
+* added support for more Audio formats in popup Audio links (https://www.visualportfolio.com/docs/projects/project-formats/#supported-audio-platforms)
+* added support for more Video formats in popup Video links (https://www.visualportfolio.com/docs/projects/project-formats/#supported-video-platforms)
 * fixed wrong infinity scroll loading when permalinks set to Plain
 * fixed GIF hover image reset when hovering on inner overlay elements
 
@@ -349,7 +360,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * **Pro:**
 * fixed Advanced Click Actions sometimes not properly displaying a Popup
 * fixed title display error in popup caption
-* fixed Instagram integration - you must reconnect to use the Instagram API instead of deprecated Instagram Basic Display API. Learn more: <https://visualportfolio.co/docs/social-feeds/instagram/>
+* fixed Instagram integration - you must reconnect to use the Instagram API instead of deprecated Instagram Basic Display API. Learn more: <https://www.visualportfolio.com/docs/social-feeds/instagram/>
 
 = 3.3.10 - Sep 30, 2024 =
 
@@ -514,7 +525,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed Skin editor error on WP 6.0 because of using `NavigatorToParentButton` component
 * fixed Select control dropdown is not visible in editor when opened popup
 
-> v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
+> v3 Migration Guide – <https://www.visualportfolio.com/docs/troubleshooting/migration-to-v3/>
 
 = 3.0.0 - Apr 13, 2023 =
 
@@ -648,7 +659,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 * added stricter permission check for rest route `update_layout`
 * allow to call rest route `get_layouts` to all users, who can edit posts
-* added settings to exclude images from lazy loading by attribute <https://visualportfolio.co/docs/settings/images/>
+* added settings to exclude images from lazy loading by attribute <https://www.visualportfolio.com/docs/settings/images/>
 * improved Gallery images selection - you can now select images without holding Ctrl/Shift keys
 * improved Gallery control - added pagination to prevent overwhelming block settings
 * improved Gallery control - added additional info to selected image popup (such as source file URL, file size, etc...)

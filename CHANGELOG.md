@@ -2,13 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.3.14 - May 25, 2024 =
+
+* tested with WordPress 6.8
+* fixed WPML error in Saved Layouts
+* changed links from visualportfolio.co to www.visualportfolio.com
+* rename Twitter to X
+* **Pro:**
+* migrate Pro plugin from Paddle to LemonSqueezy
+  * added support for affiliate links
+* fixed _load_textdomain_just_in_time notice
+
 = 3.3.13 - Mar 25, 2024 =
 
 * fixed broken Swiper when installed Elementor 3.28
 * fixed rare bug with displaying category links on archive pages
 * **Pro:**
-* added support for more Audio formats in popup Audio links (https://visualportfolio.co/docs/projects/project-formats/#supported-audio-platforms)
-* added support for more Video formats in popup Video links (https://visualportfolio.co/docs/projects/project-formats/#supported-video-platforms)
+* added support for more Audio formats in popup Audio links (https://www.visualportfolio.com/docs/projects/project-formats/#supported-audio-platforms)
+* added support for more Video formats in popup Video links (https://www.visualportfolio.com/docs/projects/project-formats/#supported-video-platforms)
 * fixed wrong infinity scroll loading when permalinks set to Plain
 * fixed GIF hover image reset when hovering on inner overlay elements
 
@@ -26,7 +37,7 @@ All notable changes to this project will be documented in this file.
 * **Pro:**
 * fixed Advanced Click Actions sometimes not properly displaying a Popup
 * fixed title display error in popup caption
-* fixed Instagram integration - you must reconnect to use the Instagram API instead of deprecated Instagram Basic Display API. Learn more: <https://visualportfolio.co/docs/social-feeds/instagram/>
+* fixed Instagram integration - you must reconnect to use the Instagram API instead of deprecated Instagram Basic Display API. Learn more: <https://www.visualportfolio.com/docs/social-feeds/instagram/>
 
 = 3.3.10 - Sep 30, 2024 =
 
@@ -191,7 +202,7 @@ All notable changes to this project will be documented in this file.
 * fixed Skin editor error on WP 6.0 because of using `NavigatorToParentButton` component
 * fixed Select control dropdown is not visible in editor when opened popup
 
-> v3 Migration Guide – <https://visualportfolio.co/docs/troubleshooting/migration-to-v3/>
+> v3 Migration Guide – <https://www.visualportfolio.com/docs/troubleshooting/migration-to-v3/>
 
 = 3.0.0 - Apr 13, 2023 =
 
@@ -325,7 +336,7 @@ All notable changes to this project will be documented in this file.
 
 * added stricter permission check for rest route `update_layout`
 * allow to call rest route `get_layouts` to all users, who can edit posts
-* added settings to exclude images from lazy loading by attribute <https://visualportfolio.co/docs/settings/images/>
+* added settings to exclude images from lazy loading by attribute <https://www.visualportfolio.com/docs/settings/images/>
 * improved Gallery images selection - you can now select images without holding Ctrl/Shift keys
 * improved Gallery control - added pagination to prevent overwhelming block settings
 * improved Gallery control - added additional info to selected image popup (such as source file URL, file size, etc...)
@@ -435,10 +446,10 @@ All notable changes to this project will be documented in this file.
 
 = 2.15.0 =
 
-* added support for Portfolio post type archives. Read more [https://visualportfolio.co/docs/portfolio-archive/](https://visualportfolio.co/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* added support for Portfolio post type archives. Read more [https://www.visualportfolio.com/docs/portfolio-archive/](https://www.visualportfolio.com/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
   * added customizable archive by using custom Page with Portfolio block inside
   * added support for Category and Tags archives
-  * added permalink settings to `Settings > Permalinks`. Read more [https://visualportfolio.co/docs/settings/permalinks/](https://visualportfolio.co/docs/settings/permalinks/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+  * added permalink settings to `Settings > Permalinks`. Read more [https://www.visualportfolio.com/docs/settings/permalinks/](https://www.visualportfolio.com/docs/settings/permalinks/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * added compatibility for standard galleries in WordPress 5.9
 * fixed Saved Layouts editor title click in WordPress 5.9
 
@@ -478,7 +489,7 @@ All notable changes to this project will be documented in this file.
 
 = 2.13.0 =
 
-* added Photo Proofing support in Pro plugin [https://visualportfolio.co/docs/proofing/](https://visualportfolio.co/docs/proofing/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* added Photo Proofing support in Pro plugin [https://www.visualportfolio.com/docs/proofing/](https://www.visualportfolio.com/docs/proofing/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * improved image loading placeholder animation
 * changed aspect-ratio base64 placeholders to full-size in lazyloading images
 * hide the Items Per Page option when selected Current Query
@@ -606,7 +617,7 @@ All notable changes to this project will be documented in this file.
 
 = 2.9.0 =
 
-* improved plugin documentation [https://visualportfolio.co/docs/getting-started/](https://visualportfolio.co/docs/getting-started/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog). Added more pages with detailed descriptions
+* improved plugin documentation [https://www.visualportfolio.com/docs/getting-started/](https://www.visualportfolio.com/docs/getting-started/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog). Added more pages with detailed descriptions
 * added Breakpoints settings in Pro plugin to control responsive screen sizes, on which responsive features stack
 * added option to completely hide the block if no items found
 * updated WPBakery shortcode icon
@@ -640,11 +651,11 @@ All notable changes to this project will be documented in this file.
 
 = 2.8.0 =
 
-* added support for Custom Hover image in Pro version [https://visualportfolio.co/custom-hover-image-animated-gif/](https://visualportfolio.co/custom-hover-image-animated-gif/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* added support for Custom Hover image in Pro version [https://www.visualportfolio.com/custom-hover-image-animated-gif/](https://www.visualportfolio.com/custom-hover-image-animated-gif/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * added Vertical Gap option
 * added icons to all categories toggles in editor
 * added Popup Gallery setting to disable "Click to Zoom"
-* added PHP filters to extend items: `vpf_each_item_tag_name` and `vpf_each_item_tag_attrs` [https://visualportfolio.co/docs/developers/wordpress-filters/](https://visualportfolio.co/docs/developers/wordpress-filters/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* added PHP filters to extend items: `vpf_each_item_tag_name` and `vpf_each_item_tag_attrs` [https://www.visualportfolio.com/docs/developers/wordpress-filters/](https://www.visualportfolio.com/docs/developers/wordpress-filters/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * changed preloader animation (SVG logo with spinner)
 * changed item icon when click action is not popup gallery (display image icon instead of zoom)
 * changed photo gallery and layout settings dropdowns to modals
@@ -707,7 +718,7 @@ All notable changes to this project will be documented in this file.
 = 2.5.0 =
 
 * added Image Overlay setting on Emerge Skin
-* added support for images filters in Pro plugin version [https://visualportfolio.co/masonry-image-filters/](https://visualportfolio.co/masonry-image-filters/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* added support for images filters in Pro plugin version [https://www.visualportfolio.com/masonry-image-filters/](https://www.visualportfolio.com/masonry-image-filters/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * changed Emerge image transform from scale to translateY
 * fixed filter displaying in FireFox
 * fixed custom scrollbar initialization after ajax load
@@ -731,7 +742,7 @@ All notable changes to this project will be documented in this file.
 
 = 2.3.0 =
 
-* added Pro version support [https://visualportfolio.co/pricing/](https://visualportfolio.co/pricing/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* added Pro version support [https://www.visualportfolio.com/pricing/](https://www.visualportfolio.com/pricing/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * added overlay support for Classic gallery style
 * added options to change meta color, links color and links hover color for all items styles
 * added options to show gallery items overlay on hover only, on default state only and always
@@ -806,7 +817,7 @@ All notable changes to this project will be documented in this file.
 Migration Notes:
 
 * If you extended portfolio options using PHP, you will need to remove `vp_` prefix from your custom options. Example - <https://github.com/nk-crew/visual-portfolio/blob/master/src/classes/class-admin.php#L854-L865>
-* If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - [https://visualportfolio.co/docs/developers/css-variables/](https://visualportfolio.co/docs/developers/css-variables/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* If you overwrite templates and styles, you will need to change your styles to work with CSS variables (at least variables for overlay colors) - [https://www.visualportfolio.com/docs/developers/css-variables/](https://www.visualportfolio.com/docs/developers/css-variables/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * If you overwrite templates with meta, you may see no icons displayed. Icons output changed and now it works like this - <https://github.com/nk-crew/visual-portfolio/blob/master/src/templates/items-list/items-style/fade/meta.php#L55-L68>
 
 Log:
@@ -904,7 +915,7 @@ Log:
 
 = 1.14.1 =
 
-* added jQuery events for PhotoSwipe and Fancybox [https://visualportfolio.co/docs/developers/jquery-events/](https://visualportfolio.co/docs/developers/jquery-events/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
+* added jQuery events for PhotoSwipe and Fancybox [https://www.visualportfolio.com/docs/developers/jquery-events/](https://www.visualportfolio.com/docs/developers/jquery-events/?utm_source=wordpress.org&utm_medium=changelog&utm_campaign=changelog)
 * fixed carousel responsive bug since new Swiper v5
 
 = 1.14.0 =

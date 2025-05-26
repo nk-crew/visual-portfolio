@@ -410,7 +410,7 @@ class Visual_Portfolio_Settings {
 					'label'       => esc_html__( 'Lazy Loading Excludes', 'visual-portfolio' ),
 					// translators: %s - doc url.
 					// translators: %s - link text.
-					'desc'        => sprintf( __( 'Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href="%1$s">%2$s</a>', 'visual-portfolio' ), 'https://visualportfolio.co/docs/settings/images/', esc_html__( 'More info', 'visual-portfolio' ) ),
+					'desc'        => sprintf( __( 'Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href="%1$s">%2$s</a>', 'visual-portfolio' ), 'https://www.visualportfolio.com/docs/settings/images/', esc_html__( 'More info', 'visual-portfolio' ) ),
 					'type'        => 'textarea',
 					'placeholder' => "image-example.webp\nslider-image-classname",
 					'condition'   => array(
@@ -775,7 +775,7 @@ class Visual_Portfolio_Settings {
                         <div class="vpf-pro-note vpf-settings-info-pro">
                             <h3>' . esc_html__( 'Premium Only', 'visual-portfolio' ) . '</h3>
                             <div>
-                                <p class="vpf-pro-note-description">' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', 'visual-portfolio' ) . '</p>
+                                <p class="vpf-pro-note-description">' . esc_html__( 'Social feeds such as Instagram, Youtube, Flickr, X, etc...', 'visual-portfolio' ) . '</p>
                                 <a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="' . esc_url( $go_pro_links['social'] ) . '">' . esc_html__( 'Go Pro', 'visual-portfolio' ) . '</a>
                             </div>
                         </div>

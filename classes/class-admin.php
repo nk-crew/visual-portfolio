@@ -119,7 +119,7 @@ class Visual_Portfolio_Admin {
 
 		// Determine if the current page being viewed is "Visual Portfolio" related.
 		if ( isset( $screen->post_type ) && ( 'portfolio' === $screen->post_type || 'vp_lists' === $screen->post_type || 'vp_proofing' === $screen->post_type ) ) {
-			$footer_text = esc_attr__( 'and', 'visual-portfolio' ) . ' <a href="https://visualportfolio.co/" target="_blank">' . visual_portfolio()->plugin_name . '</a>';
+			$footer_text = esc_attr__( 'and', 'visual-portfolio' ) . ' <a href="https://www.visualportfolio.com/" target="_blank">' . visual_portfolio()->plugin_name . '</a>';
 
 			// Use RegExp to append "Visual Portfolio" after the <a> element allowing translations to read correctly.
 			return preg_replace( '/(<a[\S\s]+?\/a>)/', '$1 ' . $footer_text, $text, 1 );
@@ -256,7 +256,7 @@ class Visual_Portfolio_Admin {
 			),
 			$args
 		);
-		$url        = 'https://visualportfolio.co/';
+		$url        = 'https://www.visualportfolio.com/';
 		$first_flag = true;
 
 		if ( isset( $args['sub_path'] ) && ! empty( $args['sub_path'] ) ) {
@@ -1357,7 +1357,7 @@ class Visual_Portfolio_Admin {
 				'type'          => 'textarea',
 				'label'         => esc_html__( 'Custom Query', 'visual-portfolio' ),
 				// translators: %1$s - escaped url.
-				'description'   => sprintf( wp_kses( __( 'Build custom query according to WordPress Codex. See example here <a href="%1$s">%1$s</a>.', 'visual-portfolio' ), $allowed_protocols ), esc_url( 'https://visualportfolio.co/docs/gallery-blocks/content-source/posts/#custom-query' ) ),
+				'description'   => sprintf( wp_kses( __( 'Build custom query according to WordPress Codex. See example here <a href="%1$s">%1$s</a>.', 'visual-portfolio' ), $allowed_protocols ), esc_url( 'https://www.visualportfolio.com/docs/gallery-blocks/content-source/posts/#custom-query' ) ),
 				'name'          => 'posts_custom_query',
 				'default'       => '',
 				'cols'          => 30,
@@ -1678,7 +1678,7 @@ class Visual_Portfolio_Admin {
 						'type'        => 'text',
 						'label'       => esc_html__( 'Video URL', 'visual-portfolio' ),
 						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
-						'description' => esc_html__( 'Full list of supported links', 'visual-portfolio' ) . '&nbsp;<a href="https://visualportfolio.co/docs/projects/project-formats/#supported-video-platforms" target="_blank" rel="noopener noreferrer">' . esc_html__( 'see here', 'visual-portfolio' ) . '</a>',
+						'description' => esc_html__( 'Full list of supported links', 'visual-portfolio' ) . '&nbsp;<a href="https://www.visualportfolio.com/docs/projects/project-formats/#supported-video-platforms" target="_blank" rel="noopener noreferrer">' . esc_html__( 'see here', 'visual-portfolio' ) . '</a>',
 						'condition'   => array(
 							array(
 								'control' => 'SELF.format',
@@ -1829,7 +1829,7 @@ class Visual_Portfolio_Admin {
 				'type'         => 'pro_note',
 				'name'         => 'social_pro_note',
 				'label'        => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description'  => '<p>' . esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc...', 'visual-portfolio' ) . '</p>',
+				'description'  => '<p>' . esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, X, etc...', 'visual-portfolio' ) . '</p>',
 				'setup_wizard' => true,
 			)
 		);

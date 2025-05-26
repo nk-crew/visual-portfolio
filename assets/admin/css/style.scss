@@ -1,6 +1,6 @@
 /*!
  * Name    : Visual Portfolio
- * Author  : nK https://nkdev.info
+ * Author  : Visual Portfolio Team <https://www.visualportfolio.com>"
  */
 
 @use "sass:math";
@@ -49,9 +49,9 @@ $escaped-svg-characters: (
 
 @import "../../../gutenberg/components/pro-note/style.scss";
 
-#adminmenu a[href*="https://visualportfolio.co/pricing/"],
-.wp-list-table.plugins a[href*="https://visualportfolio.co/pricing/"],
-.vpf-admin-toolbar a[href*="https://visualportfolio.co/pricing/"] {
+#adminmenu a[href*="https://www.visualportfolio.com/pricing/"],
+.wp-list-table.plugins a[href*="https://www.visualportfolio.com/pricing/"],
+.vpf-admin-toolbar a[href*="https://www.visualportfolio.com/pricing/"] {
 	font-weight: 700;
 	color: #11b916;
 

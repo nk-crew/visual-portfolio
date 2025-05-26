@@ -738,7 +738,7 @@ ControlsRender.Control = function (props) {
 					<ProNote.Button
 						target="_blank"
 						rel="noopener noreferrer"
-						href={`https://visualportfolio.co/pricing/?utm_source=plugin&utm_medium=block_settings&utm_campaign=${props.name}&utm_content=${pluginVersion}`}
+						href={`https://www.visualportfolio.com/pricing/?utm_source=plugin&utm_medium=block_settings&utm_campaign=${props.name}&utm_content=${pluginVersion}`}
 					>
 						{__('Go Pro', 'visual-portfolio')}
 					</ProNote.Button>

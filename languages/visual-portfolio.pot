@@ -2,7 +2,7 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.13\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.14\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr ""
 
 #. Author URI of the plugin
 #: class-visual-portfolio.php
-msgid "https://visualportfolio.co/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline"
+msgid "https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline"
 msgstr ""
 
 #: class-visual-portfolio.php:123
@@ -674,7 +674,7 @@ msgid "Protect your works using watermarks, password, and age gate"
 msgstr ""
 
 #: classes/class-admin.php:1832
-msgid "Display social feeds such as Instagram, Youtube, Flickr, Twitter, etc..."
+msgid "Display social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
 #: classes/class-admin.php:1844
@@ -1235,7 +1235,7 @@ msgid "Close (Esc)"
 msgstr ""
 
 #: classes/class-assets.php:707
-#: classes/class-assets.php:726
+#: classes/class-assets.php:727
 msgid "Share"
 msgstr ""
 
@@ -1264,18 +1264,23 @@ msgid "Tweet"
 msgstr ""
 
 #: classes/class-assets.php:714
-msgid "Pin it"
+msgid "X"
 msgstr ""
 
 #: classes/class-assets.php:715
-#: classes/class-assets.php:725
+msgid "Pin it"
+msgstr ""
+
+#: classes/class-assets.php:716
+#: classes/class-assets.php:726
 msgid "Download"
 msgstr ""
 
-#: classes/class-assets.php:717
+#: classes/class-assets.php:718
 msgid "Close"
 msgstr ""
 
+<<<<<<< HEAD
 #: classes/class-assets.php:718
 #: gutenberg/blocks/pagination-next/index.php:80
 msgid "Next"
@@ -1283,30 +1288,37 @@ msgstr ""
 
 #: classes/class-assets.php:719
 #: gutenberg/blocks/pagination-previous/index.php:65
-msgid "Previous"
+=======
+#: classes/class-assets.php:719
+msgid "Next"
 msgstr ""
 
 #: classes/class-assets.php:720
-msgid "The requested content cannot be loaded. <br /> Please try again later."
+>>>>>>> origin/master
+msgid "Previous"
 msgstr ""
 
 #: classes/class-assets.php:721
-msgid "Start slideshow"
+msgid "The requested content cannot be loaded. <br /> Please try again later."
 msgstr ""
 
 #: classes/class-assets.php:722
-msgid "Pause slideshow"
+msgid "Start slideshow"
 msgstr ""
 
 #: classes/class-assets.php:723
-msgid "Full screen"
+msgid "Pause slideshow"
 msgstr ""
 
 #: classes/class-assets.php:724
+msgid "Full screen"
+msgstr ""
+
+#: classes/class-assets.php:725
 msgid "Thumbnails"
 msgstr ""
 
-#: classes/class-assets.php:727
+#: classes/class-assets.php:728
 msgid "Zoom"
 msgstr ""
 
@@ -1927,7 +1939,7 @@ msgid "Protect your works using watermarks"
 msgstr ""
 
 #: classes/class-settings.php:778
-msgid "Social feeds such as Instagram, Youtube, Flickr, Twitter, etc..."
+msgid "Social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
 #: classes/class-settings.php:793

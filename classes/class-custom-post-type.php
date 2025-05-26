@@ -475,7 +475,7 @@ class Visual_Portfolio_Custom_Post_Type {
 							// translators: %1$s - url to documentation.
 							// translators: %2$s - plugin name.
 							__( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', 'visual-portfolio' ),
-							'https://visualportfolio.co/docs/gallery-blocks/',
+							'https://www.visualportfolio.com/docs/gallery-blocks/',
 							visual_portfolio()->plugin_name
 						)
 					);
@@ -490,7 +490,7 @@ class Visual_Portfolio_Custom_Post_Type {
 				<p>
 					<?php
 					// translators: %s - url to documentation.
-					echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', 'visual-portfolio' ), 'https://visualportfolio.co/docs/saved-layouts-and-shortcodes/' ) );
+					echo wp_kses_post( sprintf( __( 'Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href="%s" target="_blank">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.', 'visual-portfolio' ), 'https://www.visualportfolio.com/docs/saved-layouts-and-shortcodes/' ) );
 					?>
 				</p>
 			</div>
