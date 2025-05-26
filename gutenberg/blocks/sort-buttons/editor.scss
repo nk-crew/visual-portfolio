@@ -6,58 +6,25 @@
 @import "./style.scss";
 @import "../../../assets/css/variables-main";
 
-/* Additional editor-specific styles with matching selectors */
+/* Editor-specific styles for both classic and minimal styles */
 .editor-styles-wrapper {
-
-	/* Make sure we match the frontend class names */
-	.wp-block-visual-portfolio-sort-buttons.is-style-classic {
-		/* Add this class to match frontend selectors */
-		&.vp-sort.is-style-classic,
-		/* Original editor selector */
-		& {
-			.vp-sort__item.vp-sort__item-active a,
-			.vp-sort__item.vp-sort__item-active button.vp-sort__item-button {
-				color: #fff;
-				background-color: var(--vp-color-brand, #118bee);
-			}
+	/* Classic style in editor */
+	.is-style-classic {
+		.wp-block-visual-portfolio-sort-button.vp-sort__item-active {
+			color: #fff !important;
+			background-color: var(--vp-color-brand, #118bee) !important;
 		}
 	}
 
-	.vp-sort {
-		display: flex !important;
-		flex-wrap: wrap !important;
-		gap: var(--vp-sort-btn-gap);
-		margin-bottom: 2em;
-
-		/* Alignment styles */
-		&.vp-sort-align-left {
-			justify-content: flex-start !important;
-		}
-
-		&.vp-sort-align-center {
-			justify-content: center !important;
-		}
-
-		&.vp-sort-align-right {
-			justify-content: flex-end !important;
-		}
-
-		/* Add outline in editor for better visibility */
-		&.is-selected {
-			outline: 1px dashed #ddd;
+	/* Minimal style in editor */
+	.is-style-minimal {
+		.wp-block-visual-portfolio-sort-button.vp-sort__item-active {
+			color: var(--vp-color-brand, #118bee) !important;
 		}
 	}
 }
 
 /* Button styling for accessibility */
-.vp-sort__item-button {
-	display: block;
-	width: 100%;
-	appearance: none;
-	border: none;
-	text-align: inherit;
-	font-size: inherit;
-	font-family: inherit;
-	cursor: pointer;
+.wp-block-visual-portfolio-sort-button {
 	text-decoration: none;
 }

@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 export default function Edit({ attributes, clientId }) {
-	const { sortType, className } = attributes;
+	const { sortType } = attributes;
 
 	const { hasInnerBlocks } = useSelect(
 		(select) => {
@@ -52,32 +52,19 @@ export default function Edit({ attributes, clientId }) {
 	];
 
 	const blockProps = useBlockProps({
-		className: `vp-sort vp-sort-${sortType} vp-sort-style-${attributes.className?.includes('is-style-') ? attributes.className.replace(/.*is-style-(\S+).*/, '$1') : 'minimal'}`,
+		className: `wp-block-visual-portfolio-sort vp-sort vp-sort-${sortType} vp-sort-style-${attributes.className?.includes('is-style-') ? attributes.className.replace(/.*is-style-(\S+).*/, '$1') : 'minimal'}`,
 	});
-
-	// In the Edit function, add the following:
-	const currentStyle = className?.includes('is-style-')
-		? className.replace(/.*is-style-(\S+).*/, '$1')
-		: 'minimal';
 
 	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		template: !hasInnerBlocks ? TEMPLATE : null,
 		orientation: 'horizontal',
 		renderAppender: false,
-		__experimentalSettings: {
-			// Pass the style to child blocks
-			__unstableProvideBlockContext: {
-				'visual-portfolio/sort-buttons-style': currentStyle,
-			},
-		},
 	});
 
 	return (
 		<>
-			<div {...blockProps}>
-				<div {...innerBlocksProps} />
-			</div>
+			<div {...innerBlocksProps} />
 		</>
 	);
 }

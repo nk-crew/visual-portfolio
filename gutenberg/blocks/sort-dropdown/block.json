@@ -17,34 +17,7 @@
             "default": true
         },
         "sortOptions": {
-            "type": "array",
-            "default": [
-                {
-                    "label": "Default",
-                    "value": "default",
-                    "active": true
-                },
-                {
-                    "label": "Date Asc",
-                    "value": "date_asc",
-                    "active": false
-                },
-                {
-                    "label": "Date Desc",
-                    "value": "date_desc",
-                    "active": false
-                },
-                {
-                    "label": "Title Asc",
-                    "value": "title_asc",
-                    "active": false
-                },
-                {
-                    "label": "Title Desc",
-                    "value": "title_desc",
-                    "active": false
-                }
-            ]
+            "type": "array"
         }
     },
 	"supports": {

@@ -21,9 +21,8 @@ const validateSortValue = (value) => {
 	return pattern.test(value) ? value : 'default';
 };
 
-export default function Edit({ attributes, setAttributes, context }) {
+export default function Edit({ attributes, setAttributes }) {
 	const { label, value, active } = attributes;
-	const parentStyle = context['visual-portfolio/sort-buttons-style'];
 
 	// Sanitize value when component loads
 	const sanitizedValue = validateSortValue(attributes.value);
@@ -46,15 +45,11 @@ export default function Edit({ attributes, setAttributes, context }) {
 		// If invalid, don't update the state
 	};
 
-	// If the parent has a style class, extract the actual style name
-	const styleClass = parentStyle?.includes('is-style-')
-		? parentStyle.replace(/.*is-style-(\S+).*/, '$1')
-		: 'minimal';
-
 	const blockProps = useBlockProps({
-		className: `vp-sort__item${active ? ' vp-sort__item-active' : ''}`,
+		className: `${active ? ' vp-sort__item-active' : ''}`,
+		href: `?vp_sort=${sanitizedValue}`,
+		onClick: (e) => e.preventDefault(),
 		'data-vp-sort': sanitizedValue,
-		'data-parent-style': styleClass, // Optional: for debugging
 	});
 
 	return (
@@ -79,21 +74,14 @@ export default function Edit({ attributes, setAttributes, context }) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div {...blockProps}>
-				<button
-					type="button"
-					className="vp-sort__item-button"
-					onClick={(e) => e.preventDefault()}
-					data-vp-sort={sanitizedValue}
-				>
-					<RichText
-						tagName="span"
-						value={label}
-						onChange={(val) => setAttributes({ label: val })}
-						placeholder={__('Button Label', 'visual-portfolio')}
-					/>
-				</button>
-			</div>
+			<a {...blockProps}>
+				<RichText
+					tagName="span"
+					value={label}
+					onChange={(val) => setAttributes({ label: val })}
+					placeholder={__('Button Label', 'visual-portfolio')}
+				/>
+			</a>
 		</>
 	);
 }

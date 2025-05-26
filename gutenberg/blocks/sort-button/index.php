@@ -47,40 +47,30 @@ class Visual_Portfolio_Block_Sort_Button {
 	 *
 	 * @param array  $attributes - block attributes.
 	 * @param string $content - block content.
-	 * @param object $block - block instance.
 	 *
 	 * @return string
 	 */
-	public function block_render( $attributes, $content, $block ) {
-		// Get attributes with defaults.
-		$label  = isset( $attributes['label'] ) ? $attributes['label'] : __( 'Default sorting', 'visual-portfolio' );
-		$value  = isset( $attributes['value'] ) ? $attributes['value'] : '';
-		$active = isset( $attributes['active'] ) && $attributes['active'];
+	public function block_render( $attributes, $content ) {
+		// Get value attribute.
+		$value = isset( $attributes['value'] ) ? $attributes['value'] : '';
 
-		// Validate the sort value.
-		if ( ! empty( $value ) && ! preg_match( '/^[a-zA-Z0-9_-]*$/', $value ) ) {
-			$value = '';
+		// Check if the vp_sort GET parameter matches this button's value.
+		$is_active = isset( $_GET['vp_sort'] ) && $_GET['vp_sort'] === $value;
+
+		// Modify content based on active state.
+		if ( $is_active ) {
+			// Add the active class if the GET parameter matches.
+			if ( strpos( $content, 'vp-sort__item-active' ) === false ) {
+				$content = str_replace( 'class="', 'class="vp-sort__item-active ', $content );
+			}
 		}
 
-		// Generate the URL for sorting.
-		$current_url = remove_query_arg( 'vp_sort' );
-		$sort_url    = $value ? add_query_arg( 'vp_sort', $value, $current_url ) : $current_url;
+		if ( ! $is_active && isset( $_GET['vp_sort'] ) ) {
+			// Remove the active class if it was set but GET parameter doesn't match.
+			$content = str_replace( 'vp-sort__item-active', '', $content );
+		}
 
-		$active_class = $active ? ' vp-sort__item-active' : '';
-
-		// Get parent block style.
-		$parent_style = isset( $block->context['visual-portfolio/sort-buttons-style'] ) ? $block->context['visual-portfolio/sort-buttons-style'] : 'minimal';
-
-		// Enqueue appropriate style.
-		wp_enqueue_style( 'visual-portfolio-block-sort-buttons-' . $parent_style );
-
-		return sprintf(
-			'<div class="vp-sort__item%1$s"><a href="%2$s" data-vp-sort="%3$s">%4$s</a></div>',
-			esc_attr( $active_class ),
-			esc_url( $sort_url ),
-			esc_attr( $value ),
-			esc_html( $label )
-		);
+		return $content;
 	}
 }
 new Visual_Portfolio_Block_Sort_Button();

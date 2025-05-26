@@ -1,14 +1,13 @@
 /**
- * Sort Button Block Editor styles
- */
+* Sort Button Block Editor styles
+*/
 
 /* This will ensure our editor styles use the same variables as the frontend */
 @import "./style.scss";
 
 /* Additional editor-specific styles with higher specificity */
 .editor-styles-wrapper .wp-block-visual-portfolio-sort-buttons {
-	&.is-style-classic .vp-sort__item a,
-	&.is-style-classic .vp-sort__item button.vp-sort__item-button {
+	&.is-style-classic .wp-block-visual-portfolio-sort-button {
 		min-width: 40px !important;
 		padding: 0.7em 1.3em !important;
 		color: var(--vp-color-gray, #777) !important;
@@ -20,16 +19,14 @@
 			color: var(--vp-color-gray-darken, #333) !important;
 			background-color: var(--vp-color-gray-light, #e8e8e8) !important;
 		}
+
+		&.vp-sort__item-active {
+			color: #fff !important;
+			background-color: var(--vp-color-brand, #118bee) !important;
+		}
 	}
 
-	&.is-style-classic .vp-sort__item.vp-sort__item-active a,
-	&.is-style-classic .vp-sort__item.vp-sort__item-active button.vp-sort__item-button {
-		color: #fff !important;
-		background-color: var(--vp-color-brand, #118bee) !important;
-	}
-
-	&.is-style-minimal .vp-sort__item a,
-	&.is-style-minimal .vp-sort__item button.vp-sort__item-button {
+	&.is-style-minimal .wp-block-visual-portfolio-sort-button {
 		padding: 0.7em 1em !important;
 		color: inherit !important;
 		background-color: transparent !important;
@@ -38,23 +35,15 @@
 		&:focus {
 			color: var(--vp-color-brand, #118bee) !important;
 		}
-	}
 
-	&.is-style-minimal .vp-sort__item.vp-sort__item-active a,
-	&.is-style-minimal .vp-sort__item.vp-sort__item-active button.vp-sort__item-button {
-		color: var(--vp-color-brand, #118bee) !important;
+		&.vp-sort__item-active {
+			color: var(--vp-color-brand, #118bee) !important;
+		}
 	}
 }
 
 /* Button styling for accessibility */
-.vp-sort__item-button {
-	display: block;
-	width: 100%;
-	appearance: none;
-	border: none;
-	text-align: inherit;
-	font-size: inherit;
-	font-family: inherit;
-	cursor: pointer;
+.wp-block-visual-portfolio-sort-button {
 	text-decoration: none;
+	cursor: pointer;
 }

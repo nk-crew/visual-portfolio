@@ -4,9 +4,9 @@
 .vp-sort.is-style-classic {
 	gap: var(--vp-sort-btn-gap);
 
-	/* Frontend styles */
-	.vp-sort__item a,
-	.vp-sort__item button.vp-sort__item-button {
+	/* Frontend styles for all buttons */
+	.wp-block-visual-portfolio-sort-button,
+	a[data-vp-sort] {
 		min-width: var(--vp-sort-btn-min-width);
 		padding: var(--vp-sort-btn-padding-v) var(--vp-sort-btn-padding-h);
 		font-size: var(--vp-sort-btn-font-size);
@@ -23,12 +23,10 @@
 			color: var(--vp-color-gray-darken);
 			background-color: var(--vp-color-gray-light);
 		}
-	}
-
-	/* Make sure both selectors are consistent */
-	.vp-sort__item.vp-sort__item-active a,
-	.vp-sort__item.vp-sort__item-active button.vp-sort__item-button {
-		color: #fff;
-		background-color: var(--vp-color-brand, #118bee);
+		/* Active state directly on button */
+		&.vp-sort__item-active {
+			color: #fff;
+			background-color: var(--vp-color-brand, #118bee);
+		}
 	}
 }

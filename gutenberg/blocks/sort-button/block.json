@@ -1,6 +1,8 @@
 {
-    "apiVersion": 2,
+    "apiVersion": 3,
     "name": "visual-portfolio/sort-button",
+	"title": "Portfolio Sort Button (Experimental)",
+	"description": "Individual button for sorting portfolio items",
     "category": "visual-portfolio",
     "parent": ["visual-portfolio/sort-buttons"],
     "attributes": {
@@ -18,7 +20,6 @@
             "default": false
         }
     },
-	"usesContext": ["visual-portfolio/sort-buttons-style"],
 	"editorStyle": "visual-portfolio-block-sort-button-editor",
   	"style": "visual-portfolio-block-sort-button"
 }

@@ -1,6 +1,8 @@
 {
-    "apiVersion": 2,
+    "apiVersion": 3,
     "name": "visual-portfolio/sort-buttons",
+	"title": "Portfolio Sort Buttons (Experimental)",
+	"description": "Add sorting options to your portfolio with buttons.",
     "category": "visual-portfolio",
 	"parent": ["visual-portfolio/loop"],
     "attributes": {
@@ -63,9 +65,6 @@
 		}
 	},
 	"editorStyle": "visual-portfolio-block-sort-buttons-editor",
-  	"style": "visual-portfolio-block-sort-buttons",
-	"providesContext": {
-		"visual-portfolio/sort-buttons-style": "className"
-	}
+  	"style": "visual-portfolio-block-sort-buttons"
 }
 

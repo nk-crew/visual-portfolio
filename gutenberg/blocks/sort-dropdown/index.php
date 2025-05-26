@@ -102,7 +102,7 @@ class Visual_Portfolio_Block_Sort_Dropdown {
 			$active_class = $is_active ? ' vp-sort__item-active' : '';
 
 			$options_html .= sprintf(
-				'<option class="vp-sort__item%1$s" data-vp-url="%2$s" data-vp-sort="%3$s" value="%3$s"%4$s>%5$s</option>',
+				'<option class="%1$s" data-vp-url="%2$s" data-vp-sort="%3$s" value="%3$s"%4$s>%5$s</option>',
 				esc_attr( $active_class ),
 				esc_url( $sort_url ),
 				esc_attr( $sort_value ),

@@ -607,18 +607,27 @@ class VP {
 		);
 
 		// on sort click
-		self.$sort.on(`click${evp}`, '.vp-sort .vp-sort__item a', function (e) {
-			e.preventDefault();
-			const $this = $(this);
-			if (!self.loading) {
-				$this
-					.closest('.vp-sort__item')
-					.addClass('vp-sort__item-active')
-					.siblings()
-					.removeClass('vp-sort__item-active');
+		self.$sort.on(
+			`click${evp}`,
+			'.vp-sort .vp-sort__item a, a.wp-block-visual-portfolio-sort-button',
+			function (e) {
+				e.preventDefault();
+				const $this = $(this);
+				if (!self.loading) {
+					$this
+						.closest('.vp-sort__item')
+						.addClass('vp-sort__item-active')
+						.siblings()
+						.removeClass('vp-sort__item-active');
+					$this
+						.closest('.wp-block-visual-portfolio-sort-button')
+						.addClass('vp-sort__item-active')
+						.siblings()
+						.removeClass('vp-sort__item-active');
+				}
+				self.loadNewItems($this.attr('href'), true);
 			}
-			self.loadNewItems($this.attr('href'), true);
-		});
+		);
 
 		// on filter/sort select change
 		self.$filter
