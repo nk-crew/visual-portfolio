@@ -151,6 +151,8 @@ const entryAssetsCss = glob
 		'./templates/**/style.scss',
 		'./templates/**/**/style.scss',
 		'./templates/**/**/**/style.scss',
+		'./gutenberg/blocks/**/style.scss',
+		'./gutenberg/blocks/**/editor.scss',
 	])
 	.filter((entry) => {
 		const filename = path.basename(entry);

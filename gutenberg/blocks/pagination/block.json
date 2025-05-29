@@ -1,0 +1,56 @@
+{
+	"apiVersion": 2,
+	"name": "visual-portfolio/paged-pagination",
+	"title": "Paged Pagination (Experimental)",
+	"category": "visual-portfolio",
+	"description": "Displays paged pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.",
+	"parent": ["visual-portfolio/loop"],
+	"textdomain": "visual-portfolio",
+	"attributes": {
+		"paginationType": { "type": "string", "default": "default" }
+	},
+	"usesContext": ["visual-portfolio/maxPages"],
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"blockGap": ["horizontal", "vertical"],
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"__experimentalDefaultControls": { "blockGap": true }
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": { "type": "flex" }
+		},
+		"interactivity": { "clientNavigation": true }
+	},
+	"styles": [
+		{ "name": "minimal", "label": "Minimal", "isDefault": true },
+		{ "name": "classic", "label": "Classic" }
+	],
+	"style": "visual-portfolio-block-pagination",
+	"editorStyle": "visual-portfolio-block-pagination-editor"
+}

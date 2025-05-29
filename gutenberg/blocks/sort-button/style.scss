@@ -1,0 +1,59 @@
+/**
+* Sort Button Block styles
+*/
+
+/* Frontend styles */
+.wp-block-visual-portfolio-sort-button {
+	flex: 0 0 auto;
+	max-width: 100%;
+	text-align: center;
+	display: block;
+	text-decoration: none;
+	font-size: 0.9em;
+	font-weight: 600;
+	line-height: 1.4;
+	text-transform: uppercase;
+	letter-spacing: 0.015em;
+	transition: var(--vp-transition-duration, 0.2s) color var(--vp-transition-easing, ease-in-out), var(--vp-transition-duration, 0.2s) background-color var(--vp-transition-easing, ease-in-out);
+	& > a {
+		text-decoration: none;
+	}
+}
+
+/* Style for Classic buttons */
+.is-style-classic .wp-block-visual-portfolio-sort-button {
+	min-width: 40px;
+	padding: 0.7em 1.3em;
+	color: var(--vp-color-gray, #777);
+	background-color: var(--vp-color-gray-lighten, #f5f5f5);
+	border-radius: var(--vp-border-radius, 5px);
+
+	&:hover,
+	&:focus {
+		color: var(--vp-color-gray-darken, #333);
+		background-color: var(--vp-color-gray-light, #e8e8e8);
+	}
+
+	/* Active state for classic style */
+	&.is-active {
+		color: #fff;
+		background-color: var(--vp-color-brand, #118bee);
+	}
+}
+
+/* Style for Minimal buttons */
+.is-style-minimal .wp-block-visual-portfolio-sort-button {
+	padding: 0.7em 1em;
+	color: inherit;
+	background-color: transparent;
+
+	&:hover,
+	&:focus {
+		color: var(--vp-color-brand, #118bee);
+	}
+
+	/* Active state for minimal style */
+	&.is-active {
+		color: var(--vp-color-brand, #118bee);
+	}
+}

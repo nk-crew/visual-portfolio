@@ -1,0 +1,72 @@
+{
+    "apiVersion": 2,
+    "name": "visual-portfolio/sort-dropdown",
+    "category": "visual-portfolio",
+	"parent": ["visual-portfolio/loop"],
+    "attributes": {
+        "sortType": {
+            "type": "string",
+            "default": "dropdown"
+        },
+        "align": {
+            "type": "string",
+            "default": "center"
+        },
+        "showIcon": {
+            "type": "boolean",
+            "default": true
+        },
+        "sortOptions": {
+            "type": "array"
+        }
+    },
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"allowVerticalAlignment": false,
+			"allowOrientation": false,
+			"allowCustomContentAndWideSize": false,
+			"default": {
+				"type": "flex"
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"editorStyle": "visual-portfolio-block-sort-dropdown-editor",
+	"style": "visual-portfolio-block-sort-dropdown"
+}

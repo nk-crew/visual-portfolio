@@ -1,0 +1,215 @@
+// Add this to each block's editor.scss file
+.vp-transform-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+
+	.vp-transform-button {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: calc(50% - 4px);
+		height: 70px;
+		border: 1px solid #ccc;
+		border-radius: 2px;
+
+		&:hover {
+			background-color: #f0f0f0;
+		}
+
+		.components-icon {
+			margin-bottom: 8px;
+		}
+	}
+}
+
+/**
+* Pagination Styles for Minimal and Classic
+*/
+
+/* Base pagination styles shared across both types */
+.vp-pagination.vp-pagination-type-paged {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+
+	a {
+		text-decoration: none;
+		outline: none;
+		box-shadow: none;
+	}
+
+	.vp-pagination-number a,
+	.vp-pagination-prev a,
+	.vp-pagination-next a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s ease;
+	}
+}
+
+/* Minimal Style */
+.vp-pagination-style-minimal {
+	.vp-pagination-numbers {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 5px;
+	}
+
+	.vp-pagination-number {
+		a {
+			min-width: 30px;
+			padding: 5px;
+			color: #666;
+			font-size: 16px;
+			font-weight: normal;
+
+			&:hover {
+				color: #000;
+			}
+		}
+
+		&.vp-pagination-number-active a {
+			position: relative;
+			color: #000;
+			font-weight: bold;
+
+			&::after {
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 50%;
+				width: 6px;
+				height: 2px;
+				transform: translateX(-50%);
+				background-color: currentColor;
+			}
+		}
+	}
+
+	.vp-pagination-number-ellipsis {
+		padding: 5px;
+		color: #666;
+	}
+
+	.vp-pagination-prev,
+	.vp-pagination-next {
+		a {
+			color: #666;
+			font-size: 14px;
+
+			&:hover {
+				color: #000;
+			}
+		}
+	}
+
+	.vp-pagination-prev-icon,
+	.vp-pagination-next-icon {
+		font-size: 18px;
+	}
+
+	.vp-pagination-prev-label,
+	.vp-pagination-next-label {
+		padding: 0 5px;
+	}
+}
+
+/* Classic Style */
+.vp-pagination-style-classic {
+	.vp-pagination-numbers {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.vp-pagination-number {
+		a {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 36px;
+			height: 36px;
+			padding: 0 8px;
+			color: #333;
+			font-size: 15px;
+			font-weight: 500;
+			background-color: #f5f5f5;
+			border-radius: 4px;
+
+			&:hover {
+				background-color: #e5e5e5;
+			}
+		}
+
+		&.vp-pagination-number-active a {
+			color: #fff;
+			background-color: #2271b1;
+
+			&:hover {
+				background-color: #135e96;
+			}
+		}
+	}
+
+	.vp-pagination-number-ellipsis {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 8px;
+		color: #333;
+	}
+
+	.vp-pagination-prev,
+	.vp-pagination-next {
+		a {
+			display: flex;
+			align-items: center;
+			height: 36px;
+			padding: 0 12px;
+			color: #333;
+			font-size: 14px;
+			background-color: #f5f5f5;
+			border-radius: 4px;
+
+			&:hover {
+				background-color: #e5e5e5;
+			}
+		}
+	}
+
+	.vp-pagination-prev-icon,
+	.vp-pagination-next-icon {
+		font-size: 18px;
+	}
+
+	.vp-pagination-prev-label,
+	.vp-pagination-next-label {
+		padding: 0 5px;
+	}
+}
+
+/* RTL Support for both styles */
+html[dir="rtl"] {
+	.vp-pagination-style-minimal,
+	.vp-pagination-style-classic {
+		.vp-pagination-prev-icon,
+		.vp-pagination-next-icon {
+			transform: scaleX(-1);
+		}
+	}
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.vp-pagination-style-minimal,
+	.vp-pagination-style-classic {
+		.vp-pagination-prev-label,
+		.vp-pagination-next-label {
+			display: none;
+		}
+	}
+}
