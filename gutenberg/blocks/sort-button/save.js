@@ -1,13 +1,25 @@
-import { useBlockProps } from '@wordpress/block-editor';
+import classnames from 'classnames/dedupe';
+
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function BlockSave({ attributes }) {
 	const { label, value, active } = attributes;
 
 	const blockProps = useBlockProps.save({
-		className: `${active ? ' vp-sort__item-active' : ''}`,
-		href: `?vp_sort=${value}`,
+		className: classnames({
+			'is-active': active,
+		}),
 		'data-vp-sort': value,
 	});
 
-	return <a {...blockProps}>{label}</a>;
+	return (
+		<div {...blockProps}>
+			<RichText.Content
+				tagName={'a'}
+				type={'button'}
+				href={`?vp_sort=${value}`}
+				value={label}
+			/>
+		</div>
+	);
 }

@@ -37,7 +37,7 @@ addFilter(
 				sortOptions.map((option) => {
 					return createBlock('visual-portfolio/sort-button', {
 						label: option.label || 'Default',
-						value: option.value || 'default',
+						value: option.value || '',
 						active: option.active || false,
 					});
 				})
@@ -54,7 +54,7 @@ addFilter(
 			// Extract sort options from button blocks
 			const sortOptions = innerBlocks.map((block) => ({
 				label: block.attributes.label || 'Default',
-				value: block.attributes.value || 'default',
+				value: block.attributes.value || '',
 				active: block.attributes.active || false,
 			}));
 
@@ -65,7 +65,7 @@ addFilter(
 					: [
 							{
 								label: 'Default',
-								value: 'default',
+								value: '',
 								active: true,
 							},
 						],
@@ -112,7 +112,7 @@ const SortVariationHandler = (props) => {
 					sortOptions.map((option) => {
 						return createBlock('visual-portfolio/sort-button', {
 							label: option.label || 'Default',
-							value: option.value || 'default',
+							value: option.value || '',
 							active: option.active || false,
 						});
 					})
@@ -149,7 +149,7 @@ const SortVariationHandler = (props) => {
 						sortType: 'dropdown',
 						sortOptions: [
 							{
-								label: 'Default',
+								label: '',
 								value: 'default',
 								active: true,
 							},

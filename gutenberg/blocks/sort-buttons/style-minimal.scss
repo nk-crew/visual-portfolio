@@ -1,10 +1,9 @@
 /**
 * Minimal sort style for buttons
 */
-.vp-sort.is-style-minimal {
+.is-style-minimal {
 	/* Frontend styles for all buttons */
-	.wp-block-visual-portfolio-sort-button,
-	a[data-vp-sort] {
+	.wp-block-visual-portfolio-sort-button > a {
 		padding: var(--vp-sort-btn-padding-v) var(--vp-sort-btn-padding-h);
 		font-size: var(--vp-sort-btn-font-size);
 		font-weight: var(--vp-sort-btn-font-weight);
@@ -18,9 +17,10 @@
 		&:focus {
 			color: var(--vp-color-brand);
 		}
-		/* Active state directly on button */
-		&.vp-sort__item-active {
-			color: var(--vp-color-brand);
-		}
+	}
+
+	/* Active state directly on button */
+	.wp-block-visual-portfolio-sort-button.is-active > a {
+		color: var(--vp-color-brand);
 	}
 }

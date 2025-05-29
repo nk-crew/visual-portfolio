@@ -20,7 +20,7 @@
 			background-color: var(--vp-color-gray-light, #e8e8e8) !important;
 		}
 
-		&.vp-sort__item-active {
+		&.is-active {
 			color: #fff !important;
 			background-color: var(--vp-color-brand, #118bee) !important;
 		}
@@ -36,7 +36,7 @@
 			color: var(--vp-color-brand, #118bee) !important;
 		}
 
-		&.vp-sort__item-active {
+		&.is-active {
 			color: var(--vp-color-brand, #118bee) !important;
 		}
 	}

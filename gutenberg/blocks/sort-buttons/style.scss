@@ -20,59 +20,30 @@
 @import "./style-classic.scss";
 @import "./style-minimal.scss";
 
-.vp-sort {
-	display: flex;
-	flex-wrap: wrap;
-	margin-bottom: 2em;
+/* Base button styles */
+.wp-block-visual-portfolio-sort-button {
+	margin: 0 5px 5px 0;
+	text-decoration: none;
+	display: block;
+	font-size: 0.9em;
+	font-weight: 600;
+	line-height: 1.4;
+	text-transform: uppercase;
+	letter-spacing: 0.015em;
+	transition: var(--vp-transition-duration, 0.2s) color var(--vp-transition-easing, ease-in-out), var(--vp-transition-duration, 0.2s) background-color var(--vp-transition-easing, ease-in-out);
 
-	/* Alignment styles */
-	&.vp-sort-align-left {
-		justify-content: flex-start;
-	}
-
-	&.vp-sort-align-center {
-		justify-content: center;
-	}
-
-	&.vp-sort-align-right {
-		justify-content: flex-end;
-	}
-
-	&.is-content-justification-center {
-		justify-content: center;
-	}
-
-	&.is-content-justification-right {
-		justify-content: flex-end;
-	}
-
-	&.is-content-justification-left {
-		justify-content: flex-start;
-	}
-
-	&.is-content-justification-space-between {
-		justify-content: space-between;
-	}
-
-	/* Base button styles */
-	.wp-block-visual-portfolio-sort-button {
-		margin: 0 5px 5px 0;
-		text-decoration: none;
-		display: block;
-		font-size: 0.9em;
-		font-weight: 600;
-		line-height: 1.4;
-		text-transform: uppercase;
-		letter-spacing: 0.015em;
-		transition: var(--vp-transition-duration, 0.2s) color var(--vp-transition-easing, ease-in-out), var(--vp-transition-duration, 0.2s) background-color var(--vp-transition-easing, ease-in-out);
+	&.is-layout-flex {
+		display: flex;
+		flex-wrap: wrap;
+		margin-bottom: 2em;
 	}
 }
 
 /* Style-specific margins */
-.vp-sort.is-style-classic .wp-block-visual-portfolio-sort-button {
+.is-style-classic .wp-block-visual-portfolio-sort-button {
 	margin: 0 5px 5px 0;
 }
 
-.vp-sort.is-style-minimal .wp-block-visual-portfolio-sort-button {
+.is-style-minimal .wp-block-visual-portfolio-sort-button {
 	margin: 0 5px;
 }

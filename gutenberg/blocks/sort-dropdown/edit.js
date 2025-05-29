@@ -29,16 +29,16 @@ const sortValueLabels = {
 
 // Available sort options for the dropdown
 const availableSortOptions = [
-	{ label: __('Default', 'visual-portfolio'), value: 'default' },
-	{ label: __('Date Ascending', 'visual-portfolio'), value: 'date_asc' },
+	{ label: __('Default', 'visual-portfolio'), value: '' },
+	{ label: __('Date Ascending', 'visual-portfolio'), value: 'date' },
 	{ label: __('Date Descending', 'visual-portfolio'), value: 'date_desc' },
 	{ label: __('Title Ascending', 'visual-portfolio'), value: 'title_asc' },
 	{ label: __('Title Descending', 'visual-portfolio'), value: 'title_desc' },
 ];
 
 const defaultSortOptions = [
-	{ label: sortValueLabels.default, value: 'default', active: true },
-	{ label: sortValueLabels.date_asc, value: 'date_asc', active: false },
+	{ label: sortValueLabels.default, value: '', active: true },
+	{ label: sortValueLabels.date_asc, value: 'date', active: false },
 	{ label: sortValueLabels.date_desc, value: 'date_desc', active: false },
 	{ label: sortValueLabels.title_asc, value: 'title_asc', active: false },
 	{ label: sortValueLabels.title_desc, value: 'title_desc', active: false },
@@ -68,7 +68,7 @@ export default function Edit({ attributes, setAttributes, clientId }) {
 				sortOptions.map((option) => {
 					return createBlock('visual-portfolio/sort-button', {
 						label: option.label || 'Default',
-						value: option.value || 'default',
+						value: option.value || '',
 						active: option.active || false,
 					});
 				})
@@ -142,7 +142,7 @@ export default function Edit({ attributes, setAttributes, clientId }) {
 				const extractedOptions = blockInstance.innerBlocks.map(
 					(block, index) => ({
 						label: block.attributes.label || 'Default',
-						value: block.attributes.value || 'default',
+						value: block.attributes.value || '',
 						active: block.attributes.active || index === 0,
 					})
 				);

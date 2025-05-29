@@ -191,7 +191,9 @@ class VP {
 		}
 
 		if (self.$sort.length === 0) {
-			self.$sort = $item.find('.vp-sort');
+			self.$sort = $item.find(
+				'.vp-sort, .wp-block-visual-portfolio-sort-buttons'
+			);
 		}
 
 		// user options
@@ -609,7 +611,7 @@ class VP {
 		// on sort click
 		self.$sort.on(
 			`click${evp}`,
-			'.vp-sort .vp-sort__item a, a.wp-block-visual-portfolio-sort-button',
+			'.vp-sort .vp-sort__item a, .wp-block-visual-portfolio-sort-button > a',
 			function (e) {
 				e.preventDefault();
 				const $this = $(this);
@@ -621,9 +623,9 @@ class VP {
 						.removeClass('vp-sort__item-active');
 					$this
 						.closest('.wp-block-visual-portfolio-sort-button')
-						.addClass('vp-sort__item-active')
+						.addClass('is-active')
 						.siblings()
-						.removeClass('vp-sort__item-active');
+						.removeClass('is-active');
 				}
 				self.loadNewItems($this.attr('href'), true);
 			}

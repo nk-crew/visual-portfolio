@@ -15,11 +15,13 @@
 	text-transform: uppercase;
 	letter-spacing: 0.015em;
 	transition: var(--vp-transition-duration, 0.2s) color var(--vp-transition-easing, ease-in-out), var(--vp-transition-duration, 0.2s) background-color var(--vp-transition-easing, ease-in-out);
+	& > a {
+		text-decoration: none;
+	}
 }
 
 /* Style for Classic buttons */
-.vp-sort.is-style-classic .wp-block-visual-portfolio-sort-button,
-.vp-sort.vp-sort-style-classic .wp-block-visual-portfolio-sort-button {
+.is-style-classic .wp-block-visual-portfolio-sort-button {
 	min-width: 40px;
 	padding: 0.7em 1.3em;
 	color: var(--vp-color-gray, #777);
@@ -33,15 +35,14 @@
 	}
 
 	/* Active state for classic style */
-	&.vp-sort__item-active {
+	&.is-active {
 		color: #fff;
 		background-color: var(--vp-color-brand, #118bee);
 	}
 }
 
 /* Style for Minimal buttons */
-.vp-sort.is-style-minimal .wp-block-visual-portfolio-sort-button,
-.vp-sort.vp-sort-style-minimal .wp-block-visual-portfolio-sort-button {
+.is-style-minimal .wp-block-visual-portfolio-sort-button {
 	padding: 0.7em 1em;
 	color: inherit;
 	background-color: transparent;
@@ -52,7 +53,7 @@
 	}
 
 	/* Active state for minimal style */
-	&.vp-sort__item-active {
+	&.is-active {
 		color: var(--vp-color-brand, #118bee);
 	}
 }

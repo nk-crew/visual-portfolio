@@ -1,12 +1,11 @@
 /**
 * Classic sort style for buttons
 */
-.vp-sort.is-style-classic {
+.is-style-classic {
 	gap: var(--vp-sort-btn-gap);
 
 	/* Frontend styles for all buttons */
-	.wp-block-visual-portfolio-sort-button,
-	a[data-vp-sort] {
+	.wp-block-visual-portfolio-sort-button > a {
 		min-width: var(--vp-sort-btn-min-width);
 		padding: var(--vp-sort-btn-padding-v) var(--vp-sort-btn-padding-h);
 		font-size: var(--vp-sort-btn-font-size);
@@ -23,10 +22,10 @@
 			color: var(--vp-color-gray-darken);
 			background-color: var(--vp-color-gray-light);
 		}
-		/* Active state directly on button */
-		&.vp-sort__item-active {
-			color: #fff;
-			background-color: var(--vp-color-brand, #118bee);
-		}
+	}
+	/* Active state directly on button */
+	.wp-block-visual-portfolio-sort-button.is-active > a {
+		color: #fff;
+		background-color: var(--vp-color-brand, #118bee);
 	}
 }

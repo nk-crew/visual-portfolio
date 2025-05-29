@@ -60,14 +60,14 @@ class Visual_Portfolio_Block_Sort_Button {
 		// Modify content based on active state.
 		if ( $is_active ) {
 			// Add the active class if the GET parameter matches.
-			if ( strpos( $content, 'vp-sort__item-active' ) === false ) {
-				$content = str_replace( 'class="', 'class="vp-sort__item-active ', $content );
+			if ( strpos( $content, 'is-active' ) === false ) {
+				$content = str_replace( 'class="', 'class="is-active ', $content );
 			}
 		}
 
 		if ( ! $is_active && isset( $_GET['vp_sort'] ) ) {
 			// Remove the active class if it was set but GET parameter doesn't match.
-			$content = str_replace( 'vp-sort__item-active', '', $content );
+			$content = str_replace( 'is-active', '', $content );
 		}
 
 		return $content;

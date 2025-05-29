@@ -4,7 +4,7 @@
 /**
  * Internal dependencies
  */
-//import './editor.scss';
+import classnames from 'classnames/dedupe';
 
 import {
 	InspectorControls,
@@ -46,8 +46,9 @@ export default function Edit({ attributes, setAttributes }) {
 	};
 
 	const blockProps = useBlockProps({
-		className: `${active ? ' vp-sort__item-active' : ''}`,
-		href: `?vp_sort=${sanitizedValue}`,
+		className: classnames({
+			'is-active': active,
+		}),
 		onClick: (e) => e.preventDefault(),
 		'data-vp-sort': sanitizedValue,
 	});
@@ -74,14 +75,14 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<a {...blockProps}>
+			<div {...blockProps}>
 				<RichText
-					tagName="span"
+					tagName={'span'}
 					value={label}
 					onChange={(val) => setAttributes({ label: val })}
 					placeholder={__('Button Label', 'visual-portfolio')}
 				/>
-			</a>
+			</div>
 		</>
 	);
 }
