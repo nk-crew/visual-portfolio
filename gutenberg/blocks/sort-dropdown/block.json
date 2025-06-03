@@ -1,5 +1,5 @@
 {
-    "apiVersion": 2,
+    "apiVersion": 3,
     "name": "visual-portfolio/sort-dropdown",
     "category": "visual-portfolio",
 	"parent": ["visual-portfolio/loop"],
@@ -8,22 +8,22 @@
             "type": "string",
             "default": "dropdown"
         },
-        "align": {
-            "type": "string",
-            "default": "center"
-        },
         "showIcon": {
             "type": "boolean",
             "default": true
         },
         "sortOptions": {
             "type": "array"
-        }
+        },
+		"align": {
+			"type": "string",
+			"default": "right"
+		}
     },
 	"supports": {
 		"html": false,
 		"anchor": true,
-		"align": ["wide", "full"],
+		"align": true,
 		"color": {
 			"text": true,
 			"gradients": true,
@@ -47,6 +47,7 @@
 			}
 		},
 		"spacing": {
+			"blockGap": ["horizontal", "vertical"],
 			"padding": true,
 			"margin": ["top", "bottom"],
 			"__experimentalDefaultControls": {
@@ -59,6 +60,7 @@
 			"allowVerticalAlignment": false,
 			"allowOrientation": false,
 			"allowCustomContentAndWideSize": false,
+			"allowJustification": true,
 			"default": {
 				"type": "flex"
 			}

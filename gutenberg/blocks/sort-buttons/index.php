@@ -31,10 +31,6 @@ class Visual_Portfolio_Block_Sort_Buttons {
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-sort-buttons', 'build/gutenberg/blocks/sort-buttons/style' );
 		wp_style_add_data( 'visual-portfolio-block-sort-buttons', 'rtl', 'replace' );
 
-		// Register style variants.
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-sort-buttons-minimal', 'build/gutenberg/blocks/sort-buttons/style-minimal' );
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-sort-buttons-classic', 'build/gutenberg/blocks/sort-buttons/style-classic' );
-
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-sort-buttons-editor', 'build/gutenberg/blocks/sort-buttons/editor' );
 		wp_style_add_data( 'visual-portfolio-block-sort-buttons-editor', 'rtl', 'replace' );
 

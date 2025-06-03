@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	BlockAlignmentToolbar,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
@@ -45,7 +44,7 @@ const defaultSortOptions = [
 ];
 
 export default function Edit({ attributes, setAttributes, clientId }) {
-	const { sortType, sortOptions = [] } = attributes;
+	const { sortOptions = [] } = attributes;
 
 	const { replaceBlock } = useDispatch('core/block-editor');
 
@@ -62,7 +61,6 @@ export default function Edit({ attributes, setAttributes, clientId }) {
 				'visual-portfolio/sort-buttons',
 				{
 					sortType: 'default',
-					align: attributes.align || 'center',
 				},
 				// Map each sort option to a button block
 				sortOptions.map((option) => {
@@ -158,13 +156,8 @@ export default function Edit({ attributes, setAttributes, clientId }) {
 		}
 	}, []);
 
-	// Get the current alignment setting
-	const { align = 'center' } = attributes;
-
 	// Get block props with appropriate class names
-	const blockProps = useBlockProps({
-		className: `vp-sort vp-sort-${sortType} vp-sort-align-${align}`,
-	});
+	const blockProps = useBlockProps();
 
 	return (
 		<>
@@ -177,13 +170,6 @@ export default function Edit({ attributes, setAttributes, clientId }) {
 						disabled={!sortOptions.length}
 					/>
 				</ToolbarGroup>
-
-				{/* Use BlockAlignmentToolbar for wide/full alignment options */}
-				<BlockAlignmentToolbar
-					value={align}
-					onChange={(newAlign) => setAttributes({ align: newAlign })}
-					controls={['wide', 'full']} // Only allow wide and full as specified in supports
-				/>
 			</BlockControls>
 
 			<InspectorControls>

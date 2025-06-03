@@ -8,10 +8,9 @@ import './editor.scss';
 
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit({ clientId, setAttributes }) {
+export default function Edit({ clientId }) {
 	const { hasInnerBlocks } = useSelect(
 		(select) => {
 			const { getBlocks } = select('core/block-editor');
@@ -21,30 +20,6 @@ export default function Edit({ clientId, setAttributes }) {
 		},
 		[clientId]
 	);
-
-	// Get current block attributes including className
-	const { className } = useSelect(
-		(select) => {
-			const { getBlockAttributes } = select('core/block-editor');
-			return getBlockAttributes(clientId) || {};
-		},
-		[clientId]
-	);
-
-	// Ensure default style is applied on first load
-	useEffect(() => {
-		if (
-			!className ||
-			(!className.includes('is-style-minimal') &&
-				!className.includes('is-style-classic'))
-		) {
-			setAttributes({
-				className: className
-					? `${className} is-style-minimal`
-					: 'is-style-minimal',
-			});
-		}
-	}, [className, setAttributes]);
 
 	const ALLOWED_BLOCKS = ['visual-portfolio/sort-button'];
 	const TEMPLATE = [

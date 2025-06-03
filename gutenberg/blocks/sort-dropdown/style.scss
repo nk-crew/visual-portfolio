@@ -27,19 +27,6 @@
 	flex-wrap: wrap;
 	margin-bottom: 2em;
 
-	/* Alignment styles */
-	&.vp-sort-align-left {
-		justify-content: flex-start;
-	}
-
-	&.vp-sort-align-center {
-		justify-content: center;
-	}
-
-	&.vp-sort-align-right {
-		justify-content: flex-end;
-	}
-
 	select {
 		display: block;
 		flex: 0 0 auto;

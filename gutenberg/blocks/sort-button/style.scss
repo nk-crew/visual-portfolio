@@ -1,59 +1,50 @@
 /**
 * Sort Button Block styles
 */
+@import "../../../assets/css/variables-main";
 
-/* Frontend styles */
 .wp-block-visual-portfolio-sort-button {
-	flex: 0 0 auto;
-	max-width: 100%;
-	text-align: center;
-	display: block;
 	text-decoration: none;
-	font-size: 0.9em;
-	font-weight: 600;
-	line-height: 1.4;
-	text-transform: uppercase;
-	letter-spacing: 0.015em;
-	transition: var(--vp-transition-duration, 0.2s) color var(--vp-transition-easing, ease-in-out), var(--vp-transition-duration, 0.2s) background-color var(--vp-transition-easing, ease-in-out);
-	& > a {
-		text-decoration: none;
+
+	&:hover,
+	&:focus,
+	&.is-active {
+		text-decoration: underline;
 	}
 }
 
-/* Style for Classic buttons */
-.is-style-classic .wp-block-visual-portfolio-sort-button {
-	min-width: 40px;
-	padding: 0.7em 1.3em;
-	color: var(--vp-color-gray, #777);
-	background-color: var(--vp-color-gray-lighten, #f5f5f5);
-	border-radius: var(--vp-border-radius, 5px);
+// Fill style.
+.wp-block-visual-portfolio-sort-buttons.is-style-fill {
+	.wp-block-visual-portfolio-sort-button {
+		background-color: #efefef;
+		border-radius: 0.3em;
+		padding: 0.2em 0.7em;
+		transition: 0.2s color, 0.2s background-color;
 
-	&:hover,
-	&:focus {
-		color: var(--vp-color-gray-darken, #333);
-		background-color: var(--vp-color-gray-light, #e8e8e8);
-	}
-
-	/* Active state for classic style */
-	&.is-active {
-		color: #fff;
-		background-color: var(--vp-color-brand, #118bee);
+		&:hover,
+		&:focus,
+		&.is-active {
+			background-color: var(--vp-color-brand);
+			color: #fff;
+			text-decoration: none;
+		}
 	}
 }
 
-/* Style for Minimal buttons */
-.is-style-minimal .wp-block-visual-portfolio-sort-button {
-	padding: 0.7em 1em;
-	color: inherit;
-	background-color: transparent;
+// Outline style.
+.wp-block-visual-portfolio-sort-buttons.is-style-outline {
+	.wp-block-visual-portfolio-sort-button {
+		border: 1px solid;
+		border-radius: 0.3em;
+		padding: 0.2em 0.7em;
+		transition: 0.2s color, 0.2s border-color;
 
-	&:hover,
-	&:focus {
-		color: var(--vp-color-brand, #118bee);
-	}
-
-	/* Active state for minimal style */
-	&.is-active {
-		color: var(--vp-color-brand, #118bee);
+		&:hover,
+		&:focus,
+		&.is-active {
+			border-color: var(--vp-color-brand);
+			color: var(--vp-color-brand);
+			text-decoration: none;
+		}
 	}
 }

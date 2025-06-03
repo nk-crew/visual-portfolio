@@ -15,10 +15,11 @@
 			"default": "left"
 		}
     },
-    "styles": [
-        { "name": "minimal", "label": "Minimal", "isDefault": true },
-        { "name": "classic", "label": "Classic" }
-    ],
+	"styles": [
+		{ "name": "minimal", "label": "Minimal", "isDefault": true },
+		{ "name": "fill", "label": "Fill" },
+		{ "name": "outline", "label": "Outline" }
+	],
 	"supports": {
 		"html": false,
 		"anchor": true,

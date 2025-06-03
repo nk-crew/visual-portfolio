@@ -22,6 +22,8 @@ export default function Save({ attributes }) {
 						<option
 							key={option.value}
 							value={option.value}
+							data-vp-sort={option.value}
+							data-vp-url={`?vp_sort=${option.value}`}
 							selected={option.active ? 'selected' : undefined}
 						>
 							{option.label}
