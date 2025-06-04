@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.14\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.15\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-05-25T11:30:04+00:00\n"
+"POT-Creation-Date: 2025-06-04T20:40:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: visual-portfolio\n"
@@ -1695,7 +1695,6 @@ msgstr ""
 msgid "%s Only"
 msgstr ""
 
-#. translators: %s - plugin brand name.
 #: classes/class-settings.php:405
 msgid "All images"
 msgstr ""
