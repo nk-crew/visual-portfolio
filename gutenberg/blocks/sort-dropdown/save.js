@@ -1,21 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 export default function Save({ attributes }) {
 	const {
-		sortType,
-		align,
 		sortOptions = defaultSortOptions, // Use default sort options if none provided
 	} = attributes;
 
-	const blockProps = useBlockProps.save({
-		className: `vp-sort vp-sort-${sortType} vp-sort-align-${align}`,
-	});
+	const blockProps = useBlockProps.save();
+	const innerBlocksProps = useInnerBlocksProps.save(blockProps);
 
 	return (
-		<div {...blockProps}>
+		<div {...innerBlocksProps}>
 			<div className="vp-sort-dropdown">
 				<select className="vp-sort-dropdown-select">
 					{sortOptions.map((option) => (

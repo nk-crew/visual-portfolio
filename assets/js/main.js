@@ -192,7 +192,7 @@ class VP {
 
 		if (self.$sort.length === 0) {
 			self.$sort = $item.find(
-				'.vp-sort, .wp-block-visual-portfolio-sort-buttons'
+				'.vp-sort, .wp-block-visual-portfolio-sort-buttons, .wp-block-visual-portfolio-sort-dropdown'
 			);
 		}
 

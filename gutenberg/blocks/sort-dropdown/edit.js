@@ -5,6 +5,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { PanelBody, ToolbarButton, ToolbarGroup } from '@wordpress/components';
@@ -158,6 +159,7 @@ export default function Edit({ attributes, setAttributes, clientId }) {
 
 	// Get block props with appropriate class names
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(blockProps, {});
 
 	return (
 		<>
@@ -201,7 +203,7 @@ export default function Edit({ attributes, setAttributes, clientId }) {
 				</PanelBody>
 			</InspectorControls>
 
-			<div {...blockProps}>
+			<div {...innerBlocksProps}>
 				<div className="vp-sort-dropdown">
 					<select className="vp-sort-dropdown-select">
 						{sortOptions.map((option, index) => (

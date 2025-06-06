@@ -1,6 +1,8 @@
 {
     "apiVersion": 3,
     "name": "visual-portfolio/sort-dropdown",
+	"title": "Portfolio Sort Dropdown (Experimental)",
+	"description": "Add sorting options to your portfolio",
     "category": "visual-portfolio",
 	"parent": ["visual-portfolio/loop"],
     "attributes": {
@@ -14,16 +16,11 @@
         },
         "sortOptions": {
             "type": "array"
-        },
-		"align": {
-			"type": "string",
-			"default": "right"
-		}
+        }
     },
 	"supports": {
 		"html": false,
 		"anchor": true,
-		"align": true,
 		"color": {
 			"text": true,
 			"gradients": true,
