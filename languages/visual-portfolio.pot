@@ -2,7 +2,7 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.14\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.3.15\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1280,7 +1280,6 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-<<<<<<< HEAD
 #: classes/class-assets.php:718
 #: gutenberg/blocks/pagination-next/index.php:80
 msgid "Next"
@@ -1288,13 +1287,7 @@ msgstr ""
 
 #: classes/class-assets.php:719
 #: gutenberg/blocks/pagination-previous/index.php:65
-=======
-#: classes/class-assets.php:719
-msgid "Next"
-msgstr ""
 
-#: classes/class-assets.php:720
->>>>>>> origin/master
 msgid "Previous"
 msgstr ""
 
@@ -1738,7 +1731,6 @@ msgstr ""
 msgid "%s Only"
 msgstr ""
 
-#. translators: %s - plugin brand name.
 #: classes/class-settings.php:405
 msgid "All images"
 msgstr ""

@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.8
 * Requires PHP: 7.2
-* Stable tag: 3.3.14
+* Stable tag: 3.3.15
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -325,7 +325,18 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
-= 3.3.14 - May 25, 2024 =
+= 3.3.15 - Jun 4, 2025 =
+
+* fixed broken css and js urls for lazyload fallback (used in legacy browsers only)
+* **Pro:**
+* updated used X API to v2
+* fixed Google Photos integration API errors
+* fixed X integration caching issue
+* fixed social integration download image resolution conversion during compression
+* fixed click action for item with custom popup image
+* fixed updater caching issue that sometimes caused Forbidden errors
+
+= 3.3.14 - May 25, 2025 =
 
 * tested with WordPress 6.8
 * fixed WPML error in Saved Layouts
@@ -336,7 +347,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
   * added support for affiliate links
 * fixed _load_textdomain_just_in_time notice
 
-= 3.3.13 - Mar 25, 2024 =
+= 3.3.13 - Mar 25, 2025 =
 
 * fixed broken Swiper when installed Elementor 3.28
 * fixed rare bug with displaying category links on archive pages
