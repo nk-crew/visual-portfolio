@@ -1,11 +1,12 @@
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-load-more",
 	"title": "Pagination Load More (Experimental)",
 	"description": "Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.",
 	"category": "visual-portfolio",
 	"parent": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
+	"icon": "download",
 	"supports": {
 		"html": false,
 		"reusable": false,

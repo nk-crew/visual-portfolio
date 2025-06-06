@@ -8,7 +8,6 @@ import './pagination-hooks';
 
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
 
 import metadata from './block.json';
 import edit from './edit';
@@ -19,35 +18,10 @@ import variations from './variations';
  * Register block
  */
 registerBlockType(metadata.name, {
-	title: __('Paged Pagination', 'visual-portfolio'),
-	description: __(
-		'Displays paged pagination for Visual Portfolio loop.',
-		'visual-portfolio'
-	),
-	category: 'visual-portfolio',
-	icon: 'ellipsis',
-	attributes: {
-		paginationType: {
-			type: 'string',
-			default: 'default',
-		},
-	},
-	keywords: [
-		__('pagination', 'visual-portfolio'),
-		__('pages', 'visual-portfolio'),
-		__('vp', 'visual-portfolio'),
-	],
-	supports: metadata.supports,
-	usesContext: ['visual-portfolio/maxPages'],
+	...metadata,
 	edit,
 	save,
 	variations,
-	styles: [
-		{ name: 'minimal', label: 'Minimal', isDefault: true },
-		{ name: 'classic', label: 'Classic' },
-	],
-	style: 'visual-portfolio-block-pagination',
-	editorStyle: 'visual-portfolio-block-pagination-editor',
 });
 
 // Add a filter to handle variation selection.

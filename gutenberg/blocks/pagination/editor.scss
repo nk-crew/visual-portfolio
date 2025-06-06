@@ -29,7 +29,7 @@
 */
 
 /* Base pagination styles shared across both types */
-.vp-pagination.vp-pagination-type-paged {
+.wp-block-visual-portfolio-paged-pagination {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -52,7 +52,8 @@
 }
 
 /* Minimal Style */
-.vp-pagination-style-minimal {
+.is-style-minimal,
+.wp-block-visual-portfolio-paged-pagination {
 	.vp-pagination-numbers {
 		display: flex;
 		flex-wrap: wrap;
@@ -119,7 +120,7 @@
 }
 
 /* Classic Style */
-.vp-pagination-style-classic {
+.is-style-classic {
 	.vp-pagination-numbers {
 		display: flex;
 		flex-wrap: wrap;
@@ -194,8 +195,8 @@
 
 /* RTL Support for both styles */
 html[dir="rtl"] {
-	.vp-pagination-style-minimal,
-	.vp-pagination-style-classic {
+	.is-style-minimal,
+	.is-style-classic {
 		.vp-pagination-prev-icon,
 		.vp-pagination-next-icon {
 			transform: scaleX(-1);
@@ -205,8 +206,8 @@ html[dir="rtl"] {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-	.vp-pagination-style-minimal,
-	.vp-pagination-style-classic {
+	.is-style-minimal,
+	.is-style-classic {
 		.vp-pagination-prev-label,
 		.vp-pagination-next-label {
 			display: none;

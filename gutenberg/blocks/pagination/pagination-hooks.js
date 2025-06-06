@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { useEffect, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 // Register a filter for handling pagination block variations
@@ -12,6 +13,7 @@ function registerPaginationVariationHandler() {
 		(BlockEdit) => {
 			return (props) => {
 				const { name, attributes, setAttributes, clientId } = props;
+				const hasProcessedRef = useRef(false);
 
 				// Only handle our pagination blocks
 				if (
@@ -22,16 +24,24 @@ function registerPaginationVariationHandler() {
 					return <BlockEdit {...props} />;
 				}
 
-				// Check if paginationType has changed and needs a transformation
-				if (
-					name === 'visual-portfolio/paged-pagination' &&
-					attributes.paginationType !== 'default'
-				) {
+				// Use useEffect to handle block transformations and attribute updates
+				useEffect(() => {
+					// Prevent infinite loops
+					if (hasProcessedRef.current) {
+						return;
+					}
+
 					const { replaceBlock } =
 						wp.data.dispatch('core/block-editor');
 
-					if (attributes.paginationType === 'load-more') {
-						setTimeout(() => {
+					// Handle paged-pagination block transformations
+					if (
+						name === 'visual-portfolio/paged-pagination' &&
+						attributes.paginationType !== 'default'
+					) {
+						hasProcessedRef.current = true;
+
+						if (attributes.paginationType === 'load-more') {
 							replaceBlock(
 								clientId,
 								createBlock(
@@ -42,9 +52,7 @@ function registerPaginationVariationHandler() {
 									}
 								)
 							);
-						}, 0);
-					} else if (attributes.paginationType === 'infinity') {
-						setTimeout(() => {
+						} else if (attributes.paginationType === 'infinity') {
 							replaceBlock(
 								clientId,
 								createBlock(
@@ -55,20 +63,22 @@ function registerPaginationVariationHandler() {
 									}
 								)
 							);
-						}, 0);
-					}
+						}
 
-					// Reset paginationType to prevent infinite loop
-					setAttributes({ paginationType: 'default' });
-				} else if (
-					name === 'visual-portfolio/pagination-load-more' &&
-					attributes.paginationType !== 'load-more'
-				) {
-					const { replaceBlock } =
-						wp.data.dispatch('core/block-editor');
-
-					if (attributes.paginationType === 'default') {
+						// Reset paginationType after transformation
 						setTimeout(() => {
+							setAttributes({ paginationType: 'default' });
+							hasProcessedRef.current = false;
+						}, 100);
+					}
+					// Handle load-more pagination block transformations
+					else if (
+						name === 'visual-portfolio/pagination-load-more' &&
+						attributes.paginationType !== 'load-more'
+					) {
+						hasProcessedRef.current = true;
+
+						if (attributes.paginationType === 'default') {
 							replaceBlock(
 								clientId,
 								createBlock(
@@ -89,9 +99,7 @@ function registerPaginationVariationHandler() {
 									]
 								)
 							);
-						}, 0);
-					} else if (attributes.paginationType === 'infinity') {
-						setTimeout(() => {
+						} else if (attributes.paginationType === 'infinity') {
 							replaceBlock(
 								clientId,
 								createBlock(
@@ -104,20 +112,22 @@ function registerPaginationVariationHandler() {
 									}
 								)
 							);
-						}, 0);
-					}
+						}
 
-					// Reset paginationType to prevent infinite loop
-					setAttributes({ paginationType: 'load-more' });
-				} else if (
-					name === 'visual-portfolio/pagination-infinite' &&
-					attributes.paginationType !== 'infinity'
-				) {
-					const { replaceBlock } =
-						wp.data.dispatch('core/block-editor');
-
-					if (attributes.paginationType === 'default') {
+						// Reset paginationType after transformation
 						setTimeout(() => {
+							setAttributes({ paginationType: 'load-more' });
+							hasProcessedRef.current = false;
+						}, 100);
+					}
+					// Handle infinite pagination block transformations
+					else if (
+						name === 'visual-portfolio/pagination-infinite' &&
+						attributes.paginationType !== 'infinity'
+					) {
+						hasProcessedRef.current = true;
+
+						if (attributes.paginationType === 'default') {
 							replaceBlock(
 								clientId,
 								createBlock(
@@ -138,9 +148,7 @@ function registerPaginationVariationHandler() {
 									]
 								)
 							);
-						}, 0);
-					} else if (attributes.paginationType === 'load-more') {
-						setTimeout(() => {
+						} else if (attributes.paginationType === 'load-more') {
 							replaceBlock(
 								clientId,
 								createBlock(
@@ -153,12 +161,21 @@ function registerPaginationVariationHandler() {
 									}
 								)
 							);
-						}, 0);
-					}
+						}
 
-					// Reset paginationType to prevent infinite loop
-					setAttributes({ paginationType: 'infinity' });
-				}
+						// Reset paginationType after transformation
+						setTimeout(() => {
+							setAttributes({ paginationType: 'infinity' });
+							hasProcessedRef.current = false;
+						}, 100);
+					}
+				}, [
+					name,
+					attributes.paginationType,
+					clientId,
+					setAttributes,
+					attributes.loadingLabel,
+				]);
 
 				return <BlockEdit {...props} />;
 			};

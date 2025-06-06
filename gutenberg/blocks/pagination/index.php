@@ -35,10 +35,7 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		wp_style_add_data( 'visual-portfolio-block-pagination-editor', 'rtl', 'replace' );
 
 		register_block_type_from_metadata(
-			visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination',
-			array(
-				'render_callback' => array( $this, 'block_render' ),
-			)
+			visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination'
 		);
 	}
 
@@ -94,46 +91,6 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		}
 
 		return $max_pages;
-	}
-
-	/**
-	 * Block output
-	 *
-	 * @param array  $attributes - block attributes.
-	 * @param string $content - block content.
-	 * @param object $block - block instance.
-	 *
-	 * @return string
-	 */
-	public function block_render( $attributes, $content, $block ) {
-		// Get block style.
-		$block_style = '';
-
-		// Parse the class name from block attributes to get the style.
-		if ( isset( $block->attributes['className'] ) && strpos( $block->attributes['className'], 'is-style-' ) !== false ) {
-			// Extract style name from className (e.g., "is-style-classic" becomes "classic").
-			preg_match( '/is-style-([^\s]+)/', $block->attributes['className'], $matches );
-			if ( isset( $matches[1] ) ) {
-				$block_style = $matches[1];
-			}
-		}
-
-		// If no specific style found in className, use the default "minimal".
-		if ( empty( $block_style ) ) {
-			$block_style = 'minimal';
-		}
-
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => 'vp-pagination vp-pagination-type-paged vp-pagination-style-' . $block_style,
-			)
-		);
-
-		return sprintf(
-			'<div %1$s>%2$s</div>',
-			$wrapper_attributes,
-			$content
-		);
 	}
 }
 new Visual_Portfolio_Block_Paged_Pagination();

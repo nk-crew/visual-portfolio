@@ -1,8 +1,9 @@
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-previous",
 	"title": "Pagination Previous (Experimental)",
 	"category": "visual-portfolio",
+	"icon": "arrow-left-alt2",
 	"parent": ["visual-portfolio/paged-pagination"],
 	"description": "Displays the previous page link. Block is experimental and will change in future releases. Please use with caution.",
 	"textdomain": "visual-portfolio",

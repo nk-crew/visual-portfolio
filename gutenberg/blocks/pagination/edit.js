@@ -24,11 +24,11 @@ const TEMPLATE = [
 	['visual-portfolio/pagination-next'],
 ];
 
-export default function PagedPaginationEdit({ context, attributes }) {
+export default function PagedPaginationEdit({ context }) {
 	const { 'visual-portfolio/maxPages': maxPages = 1 } = context;
 
 	const blockProps = useBlockProps({
-		className: `vp-pagination vp-pagination-type-paged vp-pagination-style-${attributes.className?.includes('is-style-') ? attributes.className.replace(/.*is-style-(\S+).*/, '$1') : 'minimal'}`,
+		className: `vp-pagination`,
 	});
 
 	const innerBlocksProps = useInnerBlocksProps(blockProps, {

@@ -6,19 +6,8 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 export default function save({ attributes }) {
 	const { label, loadingLabel, endListLabel, showLoadingText } = attributes;
 
-	// Determine style class based on className
-	let styleClass = 'vp-pagination__style-minimal'; // Default style
-
-	if (attributes.className) {
-		if (attributes.className.includes('is-style-classic')) {
-			styleClass = 'vp-pagination__style-default';
-		} else if (attributes.className.includes('is-style-minimal')) {
-			styleClass = 'vp-pagination__style-minimal';
-		}
-	}
-
 	const blockProps = useBlockProps.save({
-		className: `vp-pagination ${styleClass}`,
+		className: `vp-pagination`,
 	});
 
 	return (

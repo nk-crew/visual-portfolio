@@ -205,9 +205,7 @@ export default function BlockEdit({
 		itemsCount,
 	]);
 
-	const blockProps = useBlockProps({
-		className: `wp-block-visual-portfolio-filter`,
-	});
+	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{},

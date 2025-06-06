@@ -1,7 +1,8 @@
 /**
  * Pagination Minimal CSS Variables
  */
-.vp-pagination__style-minimal {
+.is-style-minimal,
+.wp-block-visual-portfolio-pagination-infinite {
 	// Items.
 	--vp-pagination-minimal--items__padding-v: 0.7em;
 	--vp-pagination-minimal--items__padding-h: 1em;
@@ -38,7 +39,7 @@
 /**
  * Pagination Default CSS Variables
  */
-.vp-pagination__style-default {
+.is-style-classic {
 	// Items.
 	--vp-pagination-default--items__gap: 10px;
 	--vp-pagination-default--items__min-width: 40px;
@@ -74,8 +75,9 @@
 }
 
 
-.vp-pagination__style-default,
-.vp-pagination__style-minimal {
+.is-style-classic,
+.is-style-minimal,
+.wp-block-visual-portfolio-pagination-infinite {
 	// Include essential styles from both CSS files to make the editor preview match the frontend
 	display: flex;
 	flex-wrap: wrap;

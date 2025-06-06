@@ -1,11 +1,12 @@
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-infinite",
 	"title": "Pagination Infinite (Experimental)",
 	"category": "visual-portfolio",
 	"parent": ["visual-portfolio/loop"],
 	"description": "Displays infinite scroll pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.",
 	"textdomain": "visual-portfolio",
+	"icon": "update",
 	"attributes": {
 		"showLoadingText": { "type": "boolean", "default": true },
 		"loadingLabel": { "type": "string", "default": "Loading..." },

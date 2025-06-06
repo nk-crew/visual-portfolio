@@ -56,21 +56,6 @@ class Visual_Portfolio_Block_Pagination_Infinite {
 	public function block_render( $attributes, $content, $block ) {
 		$max_pages = Visual_Portfolio_Block_Paged_Pagination::get_max_pages( $block->context );
 
-		// Determine style (classic or minimal).
-		$style_class = '';
-		if ( isset( $attributes['className'] ) ) {
-			if ( strpos( $attributes['className'], 'is-style-classic' ) !== false ) {
-				$style_class = 'vp-pagination__style-default';
-			} elseif ( strpos( $attributes['className'], 'is-style-minimal' ) !== false ) {
-				$style_class = 'vp-pagination__style-minimal';
-			}
-		}
-
-		// Default to minimal style if none specified.
-		if ( empty( $style_class ) ) {
-			$style_class = 'vp-pagination__style-minimal';
-		}
-
 		// Get attributes with defaults.
 		$loading_label     = isset( $attributes['loadingLabel'] ) ? $attributes['loadingLabel'] : __( 'Loading...', 'visual-portfolio' );
 		$show_loading_text = isset( $attributes['showLoadingText'] ) ? $attributes['showLoadingText'] : true;
@@ -110,7 +95,7 @@ class Visual_Portfolio_Block_Pagination_Infinite {
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class' => 'vp-pagination ' . $style_class . $no_more_class,
+				'class' => 'vp-pagination ' . $no_more_class,
 			)
 		);
 
