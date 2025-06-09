@@ -4,13 +4,13 @@
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 
+import variations from '../pagination/variations';
 import metadata from './block.json';
 /**
  * Internal dependencies
  */
 import edit from './edit';
 import save from './save';
-import variations from './variations';
 
 /**
  * Register block
