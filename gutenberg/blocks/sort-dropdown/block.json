@@ -3,7 +3,7 @@
     "name": "visual-portfolio/sort-dropdown",
 	"title": "Portfolio Sort Dropdown (Experimental)",
 	"description": "Add sorting options to your portfolio",
-    "category": "visual-portfolio",
+    "category": "media",
 	"parent": ["visual-portfolio/loop"],
     "attributes": {
         "sortType": {

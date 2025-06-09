@@ -3,7 +3,7 @@
     "name": "visual-portfolio/sort-buttons",
 	"title": "Portfolio Sort Buttons (Experimental)",
 	"description": "Add sorting options to your portfolio with buttons.",
-    "category": "visual-portfolio",
+    "category": "media",
 	"parent": ["visual-portfolio/loop"],
     "attributes": {
         "sortType": {

@@ -3,7 +3,7 @@
     "name": "visual-portfolio/sort-button",
 	"title": "Portfolio Sort Button (Experimental)",
 	"description": "Individual button for sorting portfolio items",
-    "category": "visual-portfolio",
+    "category": "media",
     "parent": ["visual-portfolio/sort-buttons"],
     "attributes": {
         "label": {
