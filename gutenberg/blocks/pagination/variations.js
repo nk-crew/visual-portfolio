@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 export default [
 	{
 		name: 'paged',
-		title: __('Paged'),
+		title: __('Paged Pagination (Experimental)'),
 		description: __('Paged pagination block.'),
 		attributes: { paginationType: 'default' },
 		isDefault: true,
@@ -14,7 +14,7 @@ export default [
 	},
 	{
 		name: 'load-more',
-		title: __('Load More'),
+		title: __('Pagination Load More (Experimental)'),
 		description: __('Load more pagination.'),
 		attributes: { paginationType: 'load-more' },
 		scope: ['block', 'transform'],
@@ -24,7 +24,7 @@ export default [
 	},
 	{
 		name: 'infinity',
-		title: __('Infinity'),
+		title: __('Pagination Infinite (Experimental)'),
 		description: __('Infinity pagination.'),
 		attributes: { paginationType: 'infinity' },
 		scope: ['block', 'transform'],
