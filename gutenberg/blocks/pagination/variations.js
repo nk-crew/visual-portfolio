@@ -7,7 +7,7 @@ export default [
 		description: __('Paged pagination block.'),
 		attributes: { paginationType: 'default' },
 		isDefault: true,
-		scope: ['block', 'inserter', 'transform'],
+		scope: ['block', 'transform'],
 		isActive: (blockAttributes) =>
 			blockAttributes.paginationType === 'default',
 		icon: 'ellipsis',
@@ -17,7 +17,7 @@ export default [
 		title: __('Load More'),
 		description: __('Load more pagination.'),
 		attributes: { paginationType: 'load-more' },
-		scope: ['block', 'inserter', 'transform'],
+		scope: ['block', 'transform'],
 		isActive: (blockAttributes) =>
 			blockAttributes.paginationType === 'load-more',
 		icon: 'download',
@@ -27,7 +27,7 @@ export default [
 		title: __('Infinity'),
 		description: __('Infinity pagination.'),
 		attributes: { paginationType: 'infinity' },
-		scope: ['block', 'inserter', 'transform'],
+		scope: ['block', 'transform'],
 		isActive: (blockAttributes) =>
 			blockAttributes.paginationType === 'infinity',
 		icon: 'update',
