@@ -5,6 +5,7 @@
 	"description": "Add sorting options to your portfolio",
     "category": "media",
 	"parent": ["visual-portfolio/loop"],
+	"icon": "menu",
     "attributes": {
         "sortType": {
             "type": "string",

@@ -5,6 +5,7 @@
 	"description": "Add sorting options to your portfolio with buttons.",
     "category": "media",
 	"parent": ["visual-portfolio/loop"],
+	"icon": "button",
     "attributes": {
         "sortType": {
             "type": "string",
