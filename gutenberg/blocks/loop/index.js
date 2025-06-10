@@ -80,6 +80,7 @@ const settings = {
 	example: {
 		attributes: {
 			preview_image_example: 'true',
+			layout: 'justified',
 		},
 	},
 	edit,
