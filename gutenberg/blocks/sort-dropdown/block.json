@@ -1,24 +1,25 @@
 {
-    "apiVersion": 3,
-    "name": "visual-portfolio/sort-dropdown",
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/sort-dropdown",
 	"title": "Portfolio Sort Dropdown (Experimental)",
 	"description": "Add sorting options to your portfolio",
-    "category": "media",
+	"category": "media",
 	"parent": ["visual-portfolio/loop"],
 	"icon": "menu",
-    "attributes": {
-        "sortType": {
-            "type": "string",
-            "default": "dropdown"
-        },
-        "showIcon": {
-            "type": "boolean",
-            "default": true
-        },
-        "sortOptions": {
-            "type": "array"
-        }
-    },
+	"attributes": {
+		"sortType": {
+			"type": "string",
+			"default": "dropdown"
+		},
+		"showIcon": {
+			"type": "boolean",
+			"default": true
+		},
+		"sortOptions": {
+			"type": "array"
+		}
+	},
 	"supports": {
 		"html": false,
 		"anchor": true,
