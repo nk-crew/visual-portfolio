@@ -84,7 +84,8 @@
 	},
 	"example": {
 		"attributes": {
-			"preview_image_example": true
+			"preview_image_example": true,
+			"layout": "justified"
 		}
 	},
 	"providesContext": {
