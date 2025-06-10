@@ -1,21 +1,22 @@
 {
-    "apiVersion": 3,
-    "name": "visual-portfolio/sort-buttons",
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/sort-buttons",
 	"title": "Portfolio Sort Buttons (Experimental)",
 	"description": "Add sorting options to your portfolio with buttons.",
-    "category": "media",
+	"category": "media",
 	"parent": ["visual-portfolio/loop"],
 	"icon": "button",
-    "attributes": {
-        "sortType": {
-            "type": "string",
-            "default": "default"
-        },
+	"attributes": {
+		"sortType": {
+			"type": "string",
+			"default": "default"
+		},
 		"align": {
 			"type": "string",
 			"default": "left"
 		}
-    },
+	},
 	"styles": [
 		{ "name": "minimal", "label": "Minimal", "isDefault": true },
 		{ "name": "fill", "label": "Fill" },
@@ -67,6 +68,5 @@
 		}
 	},
 	"editorStyle": "visual-portfolio-block-sort-buttons-editor",
-  	"style": "visual-portfolio-block-sort-buttons"
+	"style": "visual-portfolio-block-sort-buttons"
 }
-
