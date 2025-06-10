@@ -314,13 +314,6 @@ export default function BlockEdit(props) {
 					],
 				],
 			],
-			allowedBlocks: [
-				'visual-portfolio/filter',
-				'visual-portfolio/block',
-				'visual-portfolio/paged-pagination',
-				'visual-portfolio/pagination-infinite',
-				'visual-portfolio/pagination-load-more',
-			],
 		}
 	);
 

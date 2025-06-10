@@ -16,13 +16,36 @@
 	],
 	"textdomain": "visual-portfolio",
 	"attributes": {
-		"block_id": { "type": "string" },
-		"content_source": { "type": "string", "default": "" },
-		"setup_wizard": { "type": "string", "default": "false" },
-		"preview_image_example": { "type": "string", "default": "false" },
 		"layout": { "type": "string", "default": "default" },
 		"maxPages": { "type": "number", "default": 1 },
-		"image_categories": { "type": "array", "default": [] }
+		"image_categories": { "type": "array", "default": [] },
+		"align": { "type": "string" },
+		"anchor": { "type": "string" },
+		"block_id": { "type": "string" },
+		"className": { "type": "string" },
+		"content_source": { "type": "string", "default": "" },
+		"custom_css": { "type": "string", "default": "" },
+		"images": { "type": "array", "default": [], "items": { "type": "object" } },
+		"images_descriptions_source": { "type": "string", "default": "custom" },
+		"images_order_by": { "type": "string", "default": "default" },
+		"images_order_direction": { "type": "string", "default": "asc" },
+		"images_titles_source": { "type": "string", "default": "custom" },
+		"items_count": { "type": "number", "default": 6 },
+		"post_types_set": { "type": "array", "default": ["post"], "items": { "type": "string" } },
+		"posts_avoid_duplicate_posts": { "type": "boolean", "default": false },
+		"posts_custom_query": { "type": "string", "default": "" },
+		"posts_excluded_ids": { "type": "array", "default": [], "items": { "type": "string" } },
+		"posts_ids": { "type": "array", "default": [], "items": { "type": "string" } },
+		"posts_offset": { "type": "number" },
+		"posts_order_by": { "type": "string", "default": "post_date" },
+		"posts_order_direction": { "type": "string", "default": "desc" },
+		"posts_source": { "type": "string", "default": "portfolio" },
+		"posts_taxonomies": { "type": "array", "default": [], "items": { "type": "string" } },
+		"posts_taxonomies_relation": { "type": "string", "default": "or" },
+		"preview_image_example": { "type": "string", "default": "" },
+		"setup_wizard": { "type": "string", "default": "" },
+		"sort": { "type": "string", "default": "dropdown" },
+		"stretch": { "type": "boolean", "default": false }
 	},
 	"supports": {
 		"ghostkit": true,
@@ -59,15 +82,26 @@
 			"style": true
 		}
 	},
+	"example": {
+		"attributes": {
+			"preview_image_example": true
+		}
+	},
 	"providesContext": {
+		"visual-portfolio/align": "align",
+		"visual-portfolio/anchor": "anchor",
 		"visual-portfolio/block_id": "block_id",
+		"visual-portfolio/className": "className",
 		"visual-portfolio/content_source": "content_source",
+		"visual-portfolio/custom_css": "custom_css",
+		"visual-portfolio/image_categories": "image_categories",
 		"visual-portfolio/images": "images",
 		"visual-portfolio/images_descriptions_source": "images_descriptions_source",
 		"visual-portfolio/images_order_by": "images_order_by",
 		"visual-portfolio/images_order_direction": "images_order_direction",
 		"visual-portfolio/images_titles_source": "images_titles_source",
 		"visual-portfolio/items_count": "items_count",
+		"visual-portfolio/maxPages": "maxPages",
 		"visual-portfolio/post_types_set": "post_types_set",
 		"visual-portfolio/posts_avoid_duplicate_posts": "posts_avoid_duplicate_posts",
 		"visual-portfolio/posts_custom_query": "posts_custom_query",
@@ -79,9 +113,9 @@
 		"visual-portfolio/posts_source": "posts_source",
 		"visual-portfolio/posts_taxonomies": "posts_taxonomies",
 		"visual-portfolio/posts_taxonomies_relation": "posts_taxonomies_relation",
+		"visual-portfolio/preview_image_example": "preview_image_example",
 		"visual-portfolio/setup_wizard": "setup_wizard",
 		"visual-portfolio/sort": "sort",
-		"visual-portfolio/stretch": "stretch",
-		"visual-portfolio/maxPages": "maxPages"
+		"visual-portfolio/stretch": "stretch"
 	}
 }
