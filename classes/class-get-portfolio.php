@@ -1279,7 +1279,7 @@ class Visual_Portfolio_Get {
 		$is_images  = 'images' === $options['content_source'];
 
 		$paged = 0;
-		if ( $options['pagination'] || $is_images ) {
+		if ( isset( $options['pagination'] ) || $is_images ) {
 			$paged = self::get_current_page_number();
 		}
 		$count = intval( $options['items_count'] );
@@ -1664,7 +1664,7 @@ class Visual_Portfolio_Get {
 					}
 
 					// Offset.
-					if ( $options['posts_offset'] ) {
+					if ( isset( $options['posts_offset'] ) && $options['posts_offset'] ) {
 						$query_opts['offset'] = $options['posts_offset'] + ( $paged - 1 ) * $count;
 					}
 				}
