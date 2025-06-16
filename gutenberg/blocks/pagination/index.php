@@ -47,50 +47,57 @@ class Visual_Portfolio_Block_Paged_Pagination {
 	 */
 	public static function get_max_pages( $context ) {
 		// Get context values.
-		$max_pages = isset( $context['visual-portfolio/maxPages'] )
-		? $context['visual-portfolio/maxPages']
-		: 1;
+		$max_pages = $context['visual-portfolio/maxPages'] ?? 1;
 
 		// Check if filtering is applied.
-		$filter_applied = isset( $_GET['vp_filter'] ) && ! empty( $_GET['vp_filter'] );
-
-		// If filter is applied, we need to recalculate max_pages.
-		if ( $filter_applied ) {
-			$rest_api = new Visual_Portfolio_Rest();
-			// Get the filter value.
-			$filter = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
-
-			// Create request data from block context.
-			$request_data = array(
-				'content_source' => $context['visual-portfolio/content_source'] ?? 'post-based',
-				'items_count'    => (int) ( $context['visual-portfolio/items_count'] ?? 6 ),
-				'vp_filter'      => $filter,
-			);
-
-			// Map relevant block context to request parameters.
-			$context_mapping = array(
-				'visual-portfolio/id'                     => 'id',
-				'visual-portfolio/posts_source'           => 'posts_source',
-				'visual-portfolio/posts_taxonomies'       => 'posts_taxonomies',
-				'visual-portfolio/posts_order_by'         => 'posts_order_by',
-				'visual-portfolio/posts_order_direction'  => 'posts_order_direction',
-				'visual-portfolio/posts_ids'              => 'posts_ids',
-				'visual-portfolio/posts_excluded_ids'     => 'posts_excluded_ids',
-				'visual-portfolio/images'                 => 'images',
-				'visual-portfolio/images_order_by'        => 'images_order_by',
-				'visual-portfolio/images_order_direction' => 'images_order_direction',
-			);
-
-			foreach ( $context_mapping as $context_key => $param_key ) {
-				if ( isset( $context[ $context_key ] ) ) {
-					$request_data[ $param_key ] = $context[ $context_key ];
-				}
-			}
-
-			$max_pages = $rest_api->calculate_max_pages( $request_data );
+		if ( empty( $_GET['vp_filter'] ) ) {
+			return $max_pages;
 		}
 
-		return $max_pages;
+		// If filter is applied, we need to recalculate max_pages.
+		$rest_api = new Visual_Portfolio_Rest();
+
+		// Create base request data.
+		$request_data = array(
+			'content_source' => $context['visual-portfolio/content_source'] ?? 'post-based',
+			'items_count'    => (int) ( $context['visual-portfolio/items_count'] ?? 6 ),
+			'vp_filter'      => sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) ),
+		);
+
+		// Universal mapping: convert all visual-portfolio/* context keys to request parameters.
+		$request_data = array_merge( $request_data, self::map_context_to_request( $context ) );
+
+		return $rest_api->calculate_max_pages( $request_data );
+	}
+
+	/**
+	 * Universal context mapping helper
+	 *
+	 * @param array $context - Block context.
+	 * @return array - Mapped request data
+	 */
+	private static function map_context_to_request( $context ) {
+		$request_data = array();
+		$prefix       = 'visual-portfolio/';
+
+		foreach ( $context as $key => $value ) {
+			// Skip if key doesn't start with our prefix.
+			if ( strpos( $key, $prefix ) !== 0 ) {
+				continue;
+			}
+
+			// Convert context key to request parameter key.
+			$param_key = str_replace( $prefix, '', $key );
+
+			// Skip keys we already handle in the main function.
+			if ( in_array( $param_key, array( 'maxPages', 'content_source', 'items_count' ), true ) ) {
+				continue;
+			}
+
+			$request_data[ $param_key ] = $value;
+		}
+
+		return $request_data;
 	}
 }
 new Visual_Portfolio_Block_Paged_Pagination();

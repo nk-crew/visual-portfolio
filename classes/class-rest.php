@@ -137,99 +137,55 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 * @return int $max_pages Response max pages data.
 	 */
 	public function calculate_max_pages( $params ) {
-		// Get essential parameters.
-		$content_source = isset( $params['content_source'] ) ? $params['content_source'] : '';
-		$items_count    = isset( $params['items_count'] ) ? (int) $params['items_count'] : 0;
+		$params = Visual_Portfolio_Security::validate_calculate_max_pages_params( $params );
 
-		// Check for filter parameter from request or query string.
-		$filter = isset( $params['vp_filter'] ) ? $params['vp_filter'] : '';
-		if ( empty( $filter ) && isset( $_GET['vp_filter'] ) ) {
-			$filter = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
+		$content_source = $params['content_source'] ?? '';
+		$items_count    = (int) ( $params['items_count'] ?? 0 );
+
+		// Add filter from GET if not in params.
+		if ( empty( $params['vp_filter'] ) && ! empty( $_GET['vp_filter'] ) ) {
+			$params['vp_filter'] = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
 		}
 
-		// Add filter to params if it exists.
-		if ( ! empty( $filter ) ) {
-			$params['vp_filter'] = $filter;
-		}
-
-		// Process images parameter if it's a string.
-		if ( 'images' === $content_source && isset( $params['images'] ) && is_string( $params['images'] ) ) {
-			if ( 0 === strpos( $params['images'], '[' ) ) {
-				$decoded_images = json_decode( $params['images'], true );
-				if ( JSON_ERROR_NONE === json_last_error() ) {
-					$params['images'] = $decoded_images;
-				}
+		// Decode JSON images if needed.
+		if ( 'images' === $content_source &&
+			is_string( $params['images'] ?? '' ) &&
+			0 === strpos( $params['images'], '[' ) ) {
+			$decoded = json_decode( $params['images'], true );
+			if ( JSON_ERROR_NONE === json_last_error() ) {
+				$params['images'] = $decoded;
 			}
 		}
 
-		// Create options array for query.
-		$options = array(
-			'content_source' => $content_source,
-			'items_count'    => $items_count,
+		// Get query options and calculate max pages.
+		$options = array_merge(
+			array(
+				'content_source' => $content_source,
+				'items_count'    => $items_count,
+			),
+			$params
 		);
 
-		// Map relevant parameters based on content source.
-		$parameter_mapping = array(
-			'post-based' => array(
-				'posts_source',
-				'posts_ids',
-				'posts_excluded_ids',
-				'posts_offset',
-				'posts_order_by',
-				'posts_order_direction',
-				'posts_taxonomies',
-				'posts_taxonomies_relation',
-				'posts_custom_query',
-				'post_types_set',
-			),
-			'images'     => array(
-				'images',
-				'images_order_by',
-				'images_order_direction',
-			),
-		);
-
-		// Add all relevant parameters to options.
-		if ( isset( $parameter_mapping[ $content_source ] ) ) {
-			foreach ( $parameter_mapping[ $content_source ] as $param ) {
-				if ( isset( $params[ $param ] ) ) {
-					$options[ $param ] = $params[ $param ];
-				}
-			}
-		}
-
-		// Add filter parameter if it exists.
-		if ( ! empty( $filter ) ) {
-			$options['vp_filter'] = $filter;
-		}
-
-		// Get query parameters.
 		$query_opts = Visual_Portfolio_Get::get_query_params( $options, false );
 
-		// Default max pages.
-		$max_pages = 1;
-
-		// Calculate max pages based on content source.
-		if ( 'post-based' === $content_source ) {
-			if ( isset( $query_opts['max_num_pages'] ) ) {
-				$max_pages = $query_opts['max_num_pages'];
-			} else {
-				// Create a custom query.
-				$query     = new WP_Query( $query_opts );
-				$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
-			}
-		} elseif ( 'images' === $content_source ) {
-			// Use max_num_pages if available.
-			if ( isset( $query_opts['max_num_pages'] ) ) {
-				$max_pages = $query_opts['max_num_pages'];
-			} elseif ( isset( $query_opts['images'] ) ) {
-				// Fallback to manual calculation if needed.
-				$max_pages = ceil( count( $query_opts['images'] ) / $items_count );
-			}
+		if ( isset( $query_opts['max_num_pages'] ) ) {
+			return max( 1, $query_opts['max_num_pages'] );
 		}
 
-		// Ensure max_pages is at least 1.
-		return max( 1, $max_pages );
+		switch ( $content_source ) {
+			case 'post-based':
+				$query     = new WP_Query( $query_opts );
+				$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
+				return max( 1, $max_pages );
+
+			case 'images':
+			case 'social-stream':
+				$images_count = count( $query_opts['images'] ?? array() );
+				return max( 1, ceil( $images_count / $items_count ) );
+
+			default:
+				return 1;
+		}
 	}
 
 	/**

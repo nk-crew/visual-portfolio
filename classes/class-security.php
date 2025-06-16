@@ -557,5 +557,81 @@ class Visual_Portfolio_Security {
 		}
 		return $attributes;
 	}
+
+	/**
+	 * Get allowed parameters configuration
+	 */
+	private static function get_allowed_params_config() {
+		return array(
+			'align'                         => 'string',
+			'anchor'                        => 'string',
+			'block_id'                      => 'string',
+			'className'                     => 'string',
+			'content_source'                => array( 'string', '' ),
+			'custom_css'                    => array( 'string', '' ),
+			'image_categories'              => array( 'array', array() ),
+			'images'                        => array( 'array', array() ),
+			'images_descriptions_source'    => array( 'string', 'custom' ),
+			'images_order_by'               => array( 'string', 'default' ),
+			'images_order_direction'        => array( 'string', 'asc' ),
+			'images_titles_source'          => array( 'string', 'custom' ),
+			'items_count'                   => array( 'number', 6 ),
+			'maxPages'                      => array( 'number', 1 ),
+			'post_types_set'                => array( 'array', array( 'post' ) ),
+			'posts_avoid_duplicate_posts'   => array( 'boolean', false ),
+			'posts_custom_query'            => array( 'string', '' ),
+			'posts_excluded_ids'            => array( 'array', array() ),
+			'posts_ids'                     => array( 'array', array() ),
+			'posts_offset'                  => 'number',
+			'posts_order_by'                => array( 'string', 'post_date' ),
+			'posts_order_direction'         => array( 'string', 'desc' ),
+			'posts_source'                  => array( 'string', 'portfolio' ),
+			'posts_taxonomies'              => array( 'array', array() ),
+			'posts_taxonomies_relation'     => array( 'string', 'or' ),
+			'preview_image_example'         => array( 'string', '' ),
+			'setup_wizard'                  => array( 'string', '' ),
+			'sort'                          => array( 'string', 'dropdown' ),
+			'stretch'                       => array( 'boolean', false ),
+		);
+	}
+
+	/**
+	 * Validate and filter parameters for calculate_max_pages function with type checking.
+	 *
+	 * @param array $params - Raw input parameters that may contain invalid keys or wrong types.
+	 * @return array
+	 */
+	public static function validate_calculate_max_pages_params( $params ) {
+		$allowed_params  = self::get_allowed_params_config();
+		$filtered_params = array();
+
+		foreach ( $params as $key => $value ) {
+			if ( ! isset( $allowed_params[ $key ] ) ) {
+				continue;
+			}
+
+			$config  = $allowed_params[ $key ];
+			$type    = is_array( $config ) ? $config[0] : $config;
+			$default = is_array( $config ) && isset( $config[1] ) ? $config[1] : null;
+
+			$validated_value = match ( $type ) {
+				'string' => is_scalar( $value ) ? (string) $value : $default,
+				'number' => is_numeric( $value ) ? ( is_float( $value ) ? (float) $value : (int) $value ) : $default,
+				'boolean' => is_bool( $value ) ? $value : ( is_numeric( $value ) ? (bool) $value : $default ),
+				'array' => is_array( $value ) ? $value : (
+					is_string( $value ) && str_starts_with( $value, '[' ) ?
+						( json_decode( $value, true ) ? json_decode( $value, true ) : $default ) :
+						( null !== $default ? $default : array() )
+				),
+				default => $default
+			};
+
+			if ( null !== $validated_value || null !== $default ) {
+				$filtered_params[ $key ] = $validated_value;
+			}
+		}
+
+		return $filtered_params;
+	}
 }
 new Visual_Portfolio_Security();

@@ -40,7 +40,11 @@
 		"visual-portfolio/setup_wizard",
 		"visual-portfolio/sort",
 		"visual-portfolio/stretch",
-		"visual-portfolio/maxPages"
+		"visual-portfolio/maxPages",
+		"visual-portfolio/align",
+		"visual-portfolio/anchor",
+		"visual-portfolio/image_categories",
+		"visual-portfolio/preview_image_example"
 	],
 	"attributes": {
 		"label": { "type": "string", "default": "Load More" },
