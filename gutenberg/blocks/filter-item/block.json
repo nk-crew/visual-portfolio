@@ -15,7 +15,6 @@
 		"align": false,
 		"alignWide": false,
 		"color": {
-			"__experimentalSkipSerialization": true,
 			"gradients": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -23,16 +22,6 @@
 			}
 		},
 		"typography": {
-			"__experimentalSkipSerialization": [
-				"fontSize",
-				"lineHeight",
-				"fontFamily",
-				"fontWeight",
-				"fontStyle",
-				"textTransform",
-				"textDecoration",
-				"letterSpacing"
-			],
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
@@ -45,9 +34,7 @@
 			"__experimentalDefaultControls": { "fontSize": true }
 		},
 		"reusable": false,
-		"shadow": { "__experimentalSkipSerialization": true },
 		"spacing": {
-			"__experimentalSkipSerialization": true,
 			"padding": ["horizontal", "vertical"],
 			"__experimentalDefaultControls": { "padding": true }
 		},
@@ -56,7 +43,6 @@
 			"radius": true,
 			"style": true,
 			"width": true,
-			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
 				"radius": true,
@@ -78,7 +64,8 @@
 		"taxonomyId": { "type": "number", "default": 0 },
 		"parentId": { "type": "number", "default": 0 },
 		"isActive": { "type": "boolean", "default": false },
-		"count": { "type": "number", "default": 0 }
+		"count": { "type": "number", "default": 0 },
+		"style": { "type": "object" }
 	},
 	"style": "visual-portfolio-block-filter-item"
 }

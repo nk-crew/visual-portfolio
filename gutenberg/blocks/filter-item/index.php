@@ -35,6 +35,9 @@ class Visual_Portfolio_Block_Filter_Item {
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter-item',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
+				'supports'        => array(
+					'html' => false,
+				),
 			)
 		);
 	}
@@ -49,33 +52,113 @@ class Visual_Portfolio_Block_Filter_Item {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content, $block ) {
-		// Get attributes with defaults from block.json.
-		$text      = isset( $attributes['text'] ) ? $attributes['text'] : '';
+		// Extract attributes with defaults.
 		$filter    = isset( $attributes['filter'] ) ? $attributes['filter'] : '*';
+		$count     = isset( $attributes['count'] ) ? intval( $attributes['count'] ) : 0;
+		$is_all    = isset( $attributes['isAll'] ) ? $attributes['isAll'] : false;
+		$text      = isset( $attributes['text'] ) ? $attributes['text'] : '';
 		$url       = isset( $attributes['url'] ) ? $attributes['url'] : '';
 		$is_active = isset( $attributes['isActive'] ) ? $attributes['isActive'] : false;
-		$count     = isset( $attributes['count'] ) ? (int) $attributes['count'] : 0;
 
-		// Get context values.
-		$show_count = isset( $block->context['visual-portfolio/showCount'] )
-			? $block->context['visual-portfolio/showCount']
-			: false;
+		// Get showCount from parent block context.
+		$show_count = false;
+		if ( isset( $block->context['visual-portfolio-filter/showCount'] ) ) {
+			$show_count = $block->context['visual-portfolio-filter/showCount'];
+		}
 
+		// Get current filter from URL and extract the actual value.
+		$current_filter = '';
+		if ( isset( $_GET['vp_filter'] ) && ! empty( $_GET['vp_filter'] ) ) {
+			$is_active      = false;
+			$current_filter = sanitize_text_field( urldecode( $_GET['vp_filter'] ) );
+			// Remove taxonomy prefix (e.g., 'portfolio_category:mountains' -> 'mountains').
+			if ( false !== strpos( $current_filter, ':' ) ) {
+				$parts          = explode( ':', $current_filter );
+				$current_filter = end( $parts );
+			}
+		}
+
+		// Determine if this item should be active.
+		$should_be_active = false;
+
+		if ( '*' === $filter ) {
+			// "All" filter is active only when no filter is set in URL
+			$should_be_active = empty( $current_filter );
+		} else {
+			// Specific filter is active when it matches the URL parameter.
+			$should_be_active = ( ! empty( $current_filter ) && $current_filter === $filter );
+
+			if ( ! $should_be_active ) {
+				$should_be_active = $is_active;
+			}
+		}
+
+		$classes = isset( $attributes['className'] ) ? explode( ' ', $attributes['className'] ) : array();
+
+		// Build CSS classes array - start fresh.
+		$classes[] = 'wp-block-visual-portfolio-filter-item';
+
+		if ( $should_be_active ) {
+			$classes[] = 'is-active';
+		}
+
+		// Background color preset.
+		if ( isset( $attributes['backgroundColor'] ) && ! empty( $attributes['backgroundColor'] ) ) {
+			$classes[] = 'has-' . $attributes['backgroundColor'] . '-background-color';
+			$classes[] = 'has-background';
+		}
+
+		// Get block wrapper attributes but override the class completely.
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class'          => $is_active ? 'is-active' : '',
-				'href'           => esc_url( $url ),
-				'data-vp-filter' => esc_attr( $filter ),
+				'data-vp-filter' => $filter,
+				'class'          => implode( ' ', $classes ),
 			)
 		);
 
-		// For other styles.
-		return sprintf(
-			'<a %1$s>%2$s%3$s</a>',
-			$wrapper_attributes,
-			esc_html( $text ),
-			$show_count && $count ? '<span class="vp-filter__item-count">' . esc_html( $count ) . '</span>' : ''
+		// Replace any existing class attribute with our controlled classes.
+		$wrapper_attributes = preg_replace(
+			'/class="[^"]*"/',
+			'class="' . esc_attr( implode( ' ', $classes ) ) . '"',
+			$wrapper_attributes
 		);
+
+		// If no class attribute existed, add it.
+		if ( strpos( $wrapper_attributes, 'class=' ) === false ) {
+			$wrapper_attributes = 'class="' . esc_attr( implode( ' ', $classes ) ) . '" ' . $wrapper_attributes;
+		}
+
+		$styles = '';
+		if ( function_exists( 'wp_style_engine_get_styles' ) && isset( $attributes['style'] ) ) {
+			$style_engine = wp_style_engine_get_styles( $attributes['style'] );
+
+			if ( ! empty( $style_engine['css'] ) ) {
+				$styles = ' style="' . esc_attr( $style_engine['css'] ) . '"';
+			}
+		}
+
+		// Build the count display.
+		$count_html = '';
+		if ( $show_count && ! $is_all && $count > 0 ) {
+			$count_html = '<span class="vp-filter__item-count">(' . $count . ')</span>';
+		}
+
+		// Build the complete HTML output.
+		$link_attributes = '';
+		if ( ! empty( $url ) ) {
+			$link_attributes = ' href="' . esc_url( $url ) . '"';
+		}
+
+		$html = sprintf(
+			'<div %s%s><a%s>%s</a>%s</div>',
+			$wrapper_attributes,
+			$styles,
+			$link_attributes,
+			wp_kses_post( $text ),
+			$count_html
+		);
+
+		return $html;
 	}
 }
 new Visual_Portfolio_Block_Filter_Item();

@@ -576,7 +576,7 @@ class VP {
 		// on filter click
 		self.$filter.on(
 			`click${evp}`,
-			'a.wp-block-visual-portfolio-filter-item',
+			'.wp-block-visual-portfolio-filter-item > a',
 			function (e) {
 				e.preventDefault();
 				const $this = $(this);

@@ -203,7 +203,23 @@ export default function BlockEdit({
 		selectBlock,
 		postId,
 		itemsCount,
+		attributes.showCount,
 	]);
+
+	useEffect(() => {
+		if (hasInnerBlocks && !isLoading) {
+			// Force re-render of inner blocks when showCount changes
+			const updatedBlocks = currentBlocks.map((block) => ({
+				...block,
+				attributes: {
+					...block.attributes,
+					// This will trigger a re-render
+					__timestamp: Date.now(),
+				},
+			}));
+			replaceInnerBlocks(clientId, updatedBlocks, false);
+		}
+	}, [attributes.showCount]);
 
 	const blockProps = useBlockProps();
 
@@ -223,7 +239,7 @@ export default function BlockEdit({
 				<PanelBody>
 					<ToggleControl
 						label={__('Display Count', 'visual-portfolio')}
-						value={attributes.showCount}
+						checked={attributes.showCount}
 						onChange={() =>
 							setAttributes({ showCount: !attributes.showCount })
 						}
