@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/sort-dropdown",
-	"title": "Portfolio Sort Dropdown (Experimental)",
+	"title": "Gallery Sort Dropdown (Experimental)",
 	"description": "Add sorting options to your portfolio",
 	"category": "media",
 	"parent": ["visual-portfolio/loop"],

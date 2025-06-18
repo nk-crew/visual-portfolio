@@ -30,7 +30,7 @@ addFilter(
 	'visual-portfolio/pagination-variations',
 	(transformedBlock, originalBlock) => {
 		// Only handle our pagination block.
-		if (originalBlock.name !== 'visual-portfolio/paged-pagination') {
+		if (originalBlock.name !== 'visual-portfolio/pagination') {
 			return transformedBlock;
 		}
 

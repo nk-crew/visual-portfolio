@@ -2,10 +2,10 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-previous",
-	"title": "Pagination Previous (Experimental)",
+	"title": "Gallery Pagination Previous (Experimental)",
 	"category": "media",
 	"icon": "arrow-left-alt2",
-	"parent": ["visual-portfolio/paged-pagination"],
+	"parent": ["visual-portfolio/pagination"],
 	"description": "Displays the previous page link. Block is experimental and will change in future releases. Please use with caution.",
 	"textdomain": "visual-portfolio",
 	"usesContext": [
@@ -29,8 +29,6 @@
 		"visual-portfolio/posts_taxonomies",
 		"visual-portfolio/posts_taxonomies_relation",
 		"visual-portfolio/setup_wizard",
-		"visual-portfolio/sort",
-		"visual-portfolio/stretch",
 		"visual-portfolio/maxPages"
 	],
 	"attributes": { "label": { "type": "string", "default": "Previous" } },

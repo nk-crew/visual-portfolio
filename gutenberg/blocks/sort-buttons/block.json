@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/sort-buttons",
-	"title": "Portfolio Sort Buttons (Experimental)",
+	"title": "Gallery Sort Buttons (Experimental)",
 	"description": "Add sorting options to your portfolio with buttons.",
 	"category": "media",
 	"parent": ["visual-portfolio/loop"],

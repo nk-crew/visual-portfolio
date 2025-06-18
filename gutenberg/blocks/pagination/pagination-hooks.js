@@ -17,7 +17,7 @@ function registerPaginationVariationHandler() {
 
 				// Only handle our pagination blocks
 				if (
-					name !== 'visual-portfolio/paged-pagination' &&
+					name !== 'visual-portfolio/pagination' &&
 					name !== 'visual-portfolio/pagination-load-more' &&
 					name !== 'visual-portfolio/pagination-infinite'
 				) {
@@ -34,9 +34,9 @@ function registerPaginationVariationHandler() {
 					const { replaceBlock } =
 						wp.data.dispatch('core/block-editor');
 
-					// Handle paged-pagination block transformations
+					// Handle pagination block transformations
 					if (
-						name === 'visual-portfolio/paged-pagination' &&
+						name === 'visual-portfolio/pagination' &&
 						attributes.paginationType !== 'default'
 					) {
 						hasProcessedRef.current = true;
@@ -82,7 +82,7 @@ function registerPaginationVariationHandler() {
 							replaceBlock(
 								clientId,
 								createBlock(
-									'visual-portfolio/paged-pagination',
+									'visual-portfolio/pagination',
 									{
 										paginationType: 'default',
 									},
@@ -131,7 +131,7 @@ function registerPaginationVariationHandler() {
 							replaceBlock(
 								clientId,
 								createBlock(
-									'visual-portfolio/paged-pagination',
+									'visual-portfolio/pagination',
 									{
 										paginationType: 'default',
 									},

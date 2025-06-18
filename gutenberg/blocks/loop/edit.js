@@ -197,7 +197,7 @@ export default function BlockEdit(props) {
 
 				// Pagination block with components
 				createBlock(
-					'visual-portfolio/paged-pagination',
+					'visual-portfolio/pagination',
 					{ paginationType: 'default' },
 					[
 						createBlock('visual-portfolio/pagination-previous'),
@@ -305,7 +305,7 @@ export default function BlockEdit(props) {
 				],
 				['visual-portfolio/block', {}],
 				[
-					'visual-portfolio/paged-pagination',
+					'visual-portfolio/pagination',
 					{ paginationType: 'default' },
 					[
 						['visual-portfolio/pagination-previous'],

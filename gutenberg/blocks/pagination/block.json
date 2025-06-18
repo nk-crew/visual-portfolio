@@ -1,8 +1,8 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "visual-portfolio/paged-pagination",
-	"title": "Paged Pagination (Experimental)",
+	"name": "visual-portfolio/pagination",
+	"title": "Gallery Pagination (Experimental)",
 	"category": "media",
 	"description": "Displays paged pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.",
 	"parent": ["visual-portfolio/loop"],

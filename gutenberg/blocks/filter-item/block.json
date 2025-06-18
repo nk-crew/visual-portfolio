@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/filter-item",
-	"title": "Filter Item (Experimental)",
+	"title": "Gallery Filter Item (Experimental)",
 	"category": "media",
 	"description": "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.",
 	"parent": ["visual-portfolio/filter"],

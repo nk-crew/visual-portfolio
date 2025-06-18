@@ -43,9 +43,7 @@
 		"posts_taxonomies": { "type": "array", "default": [], "items": { "type": "string" } },
 		"posts_taxonomies_relation": { "type": "string", "default": "or" },
 		"preview_image_example": { "type": "string", "default": "" },
-		"setup_wizard": { "type": "string", "default": "" },
-		"sort": { "type": "string", "default": "dropdown" },
-		"stretch": { "type": "boolean", "default": false }
+		"setup_wizard": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"ghostkit": true,
@@ -89,10 +87,7 @@
 		}
 	},
 	"providesContext": {
-		"visual-portfolio/align": "align",
-		"visual-portfolio/anchor": "anchor",
 		"visual-portfolio/block_id": "block_id",
-		"visual-portfolio/className": "className",
 		"visual-portfolio/content_source": "content_source",
 		"visual-portfolio/custom_css": "custom_css",
 		"visual-portfolio/image_categories": "image_categories",
@@ -115,8 +110,6 @@
 		"visual-portfolio/posts_taxonomies": "posts_taxonomies",
 		"visual-portfolio/posts_taxonomies_relation": "posts_taxonomies_relation",
 		"visual-portfolio/preview_image_example": "preview_image_example",
-		"visual-portfolio/setup_wizard": "setup_wizard",
-		"visual-portfolio/sort": "sort",
-		"visual-portfolio/stretch": "stretch"
+		"visual-portfolio/setup_wizard": "setup_wizard"
 	}
 }

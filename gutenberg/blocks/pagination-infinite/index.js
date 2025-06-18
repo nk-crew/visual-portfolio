@@ -37,7 +37,7 @@ addFilter(
 		// Check if we need to transform to a different block type
 		if (attributes.paginationType === 'default') {
 			return createBlock(
-				'visual-portfolio/paged-pagination',
+				'visual-portfolio/pagination',
 				{
 					paginationType: 'default',
 				},

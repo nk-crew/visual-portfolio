@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/filter",
-	"title": "Portfolio Filter (Experimental)",
+	"title": "Gallery Filter (Experimental)",
 	"category": "media",
 	"description": "Displays filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.",
 	"parent": ["visual-portfolio/loop"],
@@ -64,9 +64,7 @@
 		"visual-portfolio/posts_source",
 		"visual-portfolio/posts_taxonomies",
 		"visual-portfolio/posts_taxonomies_relation",
-		"visual-portfolio/setup_wizard",
-		"visual-portfolio/sort",
-		"visual-portfolio/stretch"
+		"visual-portfolio/setup_wizard"
 	],
 	"providesContext": { "visual-portfolio-filter/showCount": "showCount" },
 	"styles": [

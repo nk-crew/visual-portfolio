@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-numbers",
-	"title": "Pagination Numbers (Experimental)",
+	"title": "Gallery Pagination Numbers (Experimental)",
 	"category": "media",
-	"parent": ["visual-portfolio/paged-pagination"],
+	"parent": ["visual-portfolio/pagination"],
 	"description": "Displays page numbers for navigation. Block is experimental and will change in future releases. Please use with caution.",
 	"icon": "ellipsis",
 	"textdomain": "visual-portfolio",
@@ -29,8 +29,6 @@
 		"visual-portfolio/posts_taxonomies",
 		"visual-portfolio/posts_taxonomies_relation",
 		"visual-portfolio/setup_wizard",
-		"visual-portfolio/sort",
-		"visual-portfolio/stretch",
 		"visual-portfolio/maxPages"
 	],
 	"supports": { "html": false, "reusable": false, "className": false }
