@@ -1279,7 +1279,7 @@ class Visual_Portfolio_Get {
 		$is_images  = 'images' === $options['content_source'];
 
 		$paged = 0;
-		if ( isset( $options['pagination'] ) || $is_images ) {
+		if ( ( isset( $options['pagination'] ) && $options['pagination'] ) || $is_images ) {
 			$paged = self::get_current_page_number();
 		}
 		$count = intval( $options['items_count'] );
