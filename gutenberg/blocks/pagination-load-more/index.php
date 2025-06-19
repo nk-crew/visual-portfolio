@@ -24,10 +24,6 @@ class Visual_Portfolio_Block_Pagination_Load_More {
 	 * Register Block.
 	 */
 	public function register_block() {
-		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
-			return;
-		}
-
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-pagination-load-more', 'build/gutenberg/blocks/pagination-load-more/editor' );
 		wp_style_add_data( 'visual-portfolio-block-pagination-load-more', 'rtl', 'replace' );
 

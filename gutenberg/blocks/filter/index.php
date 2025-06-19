@@ -24,10 +24,6 @@ class Visual_Portfolio_Block_Filter {
 	 * Register Block.
 	 */
 	public function register_block() {
-		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
-			return;
-		}
-
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-filter', 'build/gutenberg/blocks/filter/style' );
 		wp_style_add_data( 'visual-portfolio-block-filter', 'rtl', 'replace' );
 

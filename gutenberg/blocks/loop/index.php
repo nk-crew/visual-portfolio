@@ -24,15 +24,10 @@ class Visual_Portfolio_Block_Loop {
 	 * Register Block.
 	 */
 	public function register_block() {
-		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
-			return;
-		}
-
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/loop',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
-				'attributes'      => Visual_Portfolio_Gutenberg::get_block_attributes(),
 			)
 		);
 	}

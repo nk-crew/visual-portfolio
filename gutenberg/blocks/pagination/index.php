@@ -24,10 +24,6 @@ class Visual_Portfolio_Block_Paged_Pagination {
 	 * Register Block.
 	 */
 	public function register_block() {
-		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
-			return;
-		}
-
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-pagination', 'build/gutenberg/blocks/pagination/style' );
 		wp_style_add_data( 'visual-portfolio-block-pagination', 'rtl', 'replace' );
 
