@@ -27,13 +27,18 @@ export default function BlockEdit({
 	const initialLoadDone = useRef(false);
 
 	const {
-		'visual-portfolio/block_id': blockId,
-		'visual-portfolio/content_source': contentSource,
-		'visual-portfolio/posts_source': postsSource,
-		'visual-portfolio/posts_taxonomies': postsTaxonomies,
-		'visual-portfolio/images': images,
-		'visual-portfolio/items_count': itemsCount,
+		'visual-portfolio/blockId': blockId,
+		'visual-portfolio/queryType': contentSource,
+		'visual-portfolio/baseQuery': baseQuery,
+		'visual-portfolio/imagesQuery': imagesQuery,
+		'visual-portfolio/postsQuery': postsQuery,
 	} = context;
+
+	const images = imagesQuery.images;
+	const postsSource = postsQuery.source;
+	const postsTaxonomies = postsQuery.taxonomies;
+
+	const itemsCount = baseQuery?.perPage || 6;
 
 	const { currentBlocks, hasInnerBlocks, selectedBlockClientId, postId } =
 		useSelect(

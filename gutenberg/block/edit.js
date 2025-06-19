@@ -4,7 +4,6 @@ import { useEffect } from '@wordpress/element';
 import ControlsRender from '../components/controls-render';
 import IframePreview from '../components/iframe-preview';
 import SetupWizard from '../components/setup-wizard';
-import { checkIsChildOfLoopBlock } from '../utils/is-child-of-loop-block';
 
 const {
 	plugin_url: pluginUrl,
@@ -33,8 +32,8 @@ function filterControlCategories(categories, isChildOfLoop) {
 	);
 }
 
-function renderControls(props) {
-	const { attributes, clientId, context } = props;
+function renderControls(props, isChildOfLoop) {
+	const { attributes, context } = props;
 
 	let { content_source: contentSource } = attributes;
 
@@ -45,10 +44,8 @@ function renderControls(props) {
 
 	// Use context value if available, otherwise use contentSource from attributes
 	contentSource =
-		(context && context['visual-portfolio/content_source']) ||
-		contentSource;
+		(context && context['visual-portfolio/queryType']) || contentSource;
 
-	const isChildOfLoop = checkIsChildOfLoopBlock(clientId);
 	const filteredCategories = filterControlCategories(
 		registeredControlsCategories,
 		isChildOfLoop
@@ -88,7 +85,7 @@ function renderControls(props) {
  * @param props
  */
 export default function BlockEdit(props) {
-	const { attributes, setAttributes, context, clientId } = props;
+	const { attributes, setAttributes, context } = props;
 
 	const {
 		block_id: blockIdFromAttributes,
@@ -99,8 +96,8 @@ export default function BlockEdit(props) {
 	} = attributes;
 
 	const {
-		'visual-portfolio/block_id': blockIdFromContext,
-		'visual-portfolio/content_source': contentSourceFromContext,
+		'visual-portfolio/blockId': blockIdFromContext,
+		'visual-portfolio/queryType': contentSourceFromContext,
 	} = context || {};
 
 	// Use context values if they exist, otherwise fall back to attributes
@@ -108,7 +105,7 @@ export default function BlockEdit(props) {
 	const contentSource =
 		contentSourceFromContext || contentSourceFromAttributes;
 
-	const isChildOfLoop = checkIsChildOfLoopBlock(clientId);
+	const isChildOfLoop = !!blockIdFromContext;
 
 	// Display setup wizard on mount.
 	useEffect(() => {
@@ -141,7 +138,7 @@ export default function BlockEdit(props) {
 			) : (
 				<>
 					<InspectorControls>
-						{renderControls(props)}
+						{renderControls(props, isChildOfLoop)}
 					</InspectorControls>
 					<IframePreview {...props} />
 				</>

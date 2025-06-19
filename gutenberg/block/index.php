@@ -57,7 +57,7 @@ class Visual_Portfolio_Block {
 		);
 
 		// Check if block has parent context.
-		$has_parent_context = isset( $block->context['visual-portfolio/block_id'] );
+		$has_parent_context = isset( $block->context['visual-portfolio/blockId'] );
 
 		// Transform context to attributes.
 		$context_attributes = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );

@@ -47,7 +47,7 @@ class Visual_Portfolio_Block_Paged_Pagination {
 	 */
 	public static function get_max_pages( $context ) {
 		// Get context values.
-		$max_pages = $context['visual-portfolio/maxPages'] ?? 1;
+		$max_pages = $context['visual-portfolio/baseQuery']['maxPages'] ?? 1;
 
 		// Check if filtering is applied.
 		if ( empty( $_GET['vp_filter'] ) ) {
@@ -57,10 +57,12 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		// If filter is applied, we need to recalculate max_pages.
 		$rest_api = new Visual_Portfolio_Rest();
 
+		$base_query = $context['visual-portfolio/baseQuery'] ?? null;
+
 		// Create base request data.
 		$request_data = array(
-			'content_source' => $context['visual-portfolio/content_source'] ?? 'post-based',
-			'items_count'    => (int) ( $context['visual-portfolio/items_count'] ?? 6 ),
+			'content_source' => $context['visual-portfolio/queryType'] ?? 'post-based',
+			'items_count'    => (int) ( $base_query['perPage'] ?? 6 ),
 			'vp_filter'      => sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) ),
 		);
 

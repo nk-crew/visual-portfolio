@@ -17,33 +17,45 @@
 	"textdomain": "visual-portfolio",
 	"attributes": {
 		"layout": { "type": "string", "default": "default" },
-		"maxPages": { "type": "number", "default": 1 },
-		"image_categories": { "type": "array", "default": [] },
-		"align": { "type": "string" },
-		"anchor": { "type": "string" },
 		"block_id": { "type": "string" },
-		"className": { "type": "string" },
-		"content_source": { "type": "string", "default": "" },
-		"custom_css": { "type": "string", "default": "" },
-		"images": { "type": "array", "default": [], "items": { "type": "object" } },
-		"images_descriptions_source": { "type": "string", "default": "custom" },
-		"images_order_by": { "type": "string", "default": "default" },
-		"images_order_direction": { "type": "string", "default": "asc" },
-		"images_titles_source": { "type": "string", "default": "custom" },
-		"items_count": { "type": "number", "default": 6 },
-		"post_types_set": { "type": "array", "default": ["post"], "items": { "type": "string" } },
-		"posts_avoid_duplicate_posts": { "type": "boolean", "default": false },
-		"posts_custom_query": { "type": "string", "default": "" },
-		"posts_excluded_ids": { "type": "array", "default": [], "items": { "type": "string" } },
-		"posts_ids": { "type": "array", "default": [], "items": { "type": "string" } },
-		"posts_offset": { "type": "number" },
-		"posts_order_by": { "type": "string", "default": "post_date" },
-		"posts_order_direction": { "type": "string", "default": "desc" },
-		"posts_source": { "type": "string", "default": "portfolio" },
-		"posts_taxonomies": { "type": "array", "default": [], "items": { "type": "string" } },
-		"posts_taxonomies_relation": { "type": "string", "default": "or" },
-		"preview_image_example": { "type": "string", "default": "" },
-		"setup_wizard": { "type": "string", "default": "" }
+		"queryType": { "type": "string", "default": "posts" },
+		"baseQuery": {
+			"type": "object",
+			"default": {
+				"perPage": 6,
+				"maxPages": 1
+			}
+		},
+		"postsQuery": {
+			"type": "object",
+			"default": {
+				"source": "portfolio",
+				"postTypesSet": ["post"],
+				"ids": [],
+				"excludeIds": [],
+				"order": "desc",
+				"orderBy": "post_date",
+				"offset": 0,
+				"taxonomies": [],
+				"taxonomiesRelation": "or",
+				"avoidDuplicates": false,
+				"customQuery": ""
+			}
+		},
+		"imagesQuery": {
+			"type": "object",
+			"default": {
+				"images": [],
+				"categories": [],
+				"orderBy": "default",
+				"order": "asc",
+				"titlesSource": "custom",
+				"descriptionsSource": "custom"
+			}
+		},
+		"customCss": { "type": "string", "default": "" },
+		"previewImageExample": { "type": "string", "default": "" },
+		"setupWizard": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"ghostkit": true,
@@ -87,29 +99,10 @@
 		}
 	},
 	"providesContext": {
-		"visual-portfolio/block_id": "block_id",
-		"visual-portfolio/content_source": "content_source",
-		"visual-portfolio/custom_css": "custom_css",
-		"visual-portfolio/image_categories": "image_categories",
-		"visual-portfolio/images": "images",
-		"visual-portfolio/images_descriptions_source": "images_descriptions_source",
-		"visual-portfolio/images_order_by": "images_order_by",
-		"visual-portfolio/images_order_direction": "images_order_direction",
-		"visual-portfolio/images_titles_source": "images_titles_source",
-		"visual-portfolio/items_count": "items_count",
-		"visual-portfolio/maxPages": "maxPages",
-		"visual-portfolio/post_types_set": "post_types_set",
-		"visual-portfolio/posts_avoid_duplicate_posts": "posts_avoid_duplicate_posts",
-		"visual-portfolio/posts_custom_query": "posts_custom_query",
-		"visual-portfolio/posts_excluded_ids": "posts_excluded_ids",
-		"visual-portfolio/posts_ids": "posts_ids",
-		"visual-portfolio/posts_offset": "posts_offset",
-		"visual-portfolio/posts_order_by": "posts_order_by",
-		"visual-portfolio/posts_order_direction": "posts_order_direction",
-		"visual-portfolio/posts_source": "posts_source",
-		"visual-portfolio/posts_taxonomies": "posts_taxonomies",
-		"visual-portfolio/posts_taxonomies_relation": "posts_taxonomies_relation",
-		"visual-portfolio/preview_image_example": "preview_image_example",
-		"visual-portfolio/setup_wizard": "setup_wizard"
+		"visual-portfolio/blockId": "block_id",
+		"visual-portfolio/queryType": "queryType",
+		"visual-portfolio/baseQuery": "baseQuery",
+		"visual-portfolio/postsQuery": "postsQuery",
+		"visual-portfolio/imagesQuery": "imagesQuery"
 	}
 }

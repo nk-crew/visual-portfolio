@@ -156,40 +156,19 @@ class Visual_Portfolio_Gutenberg {
 		$transformed_attributes = array();
 		$namespace_prefix       = $namespace . '/';
 
-		// Get block attributes to determine proper types.
-		$block_attributes = self::get_block_attributes();
-
 		foreach ( $context as $key => $value ) {
 			// Check if the context key belongs to our namespace.
 			if ( strpos( $key, $namespace_prefix ) === 0 ) {
 				// Remove namespace from key.
 				$attribute_key = str_replace( $namespace_prefix, '', $key );
 
-				// Get default value based on attribute definition.
-				$default_value = '';
-				if ( isset( $block_attributes[ $attribute_key ] ) ) {
-					switch ( $block_attributes[ $attribute_key ]['type'] ) {
-						case 'array':
-							$default_value = array();
-							break;
-						case 'object':
-							$default_value = new stdClass();
-							break;
-						case 'number':
-							$default_value = 0;
-							break;
-						case 'boolean':
-							$default_value = false;
-							break;
-						default:
-							$default_value = '';
-					}
-				}
-
 				// Add to transformed attributes.
-				$transformed_attributes[ $attribute_key ] = $value ?? $default_value;
+				$transformed_attributes[ $attribute_key ] = $value;
 			}
 		}
+
+		// Convert modern attributes to legacy format.
+		$transformed_attributes = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $transformed_attributes, true );
 
 		return $transformed_attributes;
 	}

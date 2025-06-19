@@ -6,7 +6,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import ControlsRender from '../../components/controls-render';
@@ -26,25 +26,6 @@ const ALLOWED_CONTROL_CATEGORIES = [
 	'custom_css',
 ];
 
-// Mapping of camelCase to snake_case attribute names
-const PAGINATION_ATTRIBUTE_MAPPING = {
-	contentSource: 'content_source',
-	postsSource: 'posts_source',
-	itemsCount: 'items_count',
-	images: 'images',
-	postTypesSet: 'post_types_set',
-	postsIds: 'posts_ids',
-	postsExcludedIds: 'posts_excluded_ids',
-	postsOffset: 'posts_offset',
-	postsOrderBy: 'posts_order_by',
-	postsOrderDirection: 'posts_order_direction',
-	postsTaxonomies: 'posts_taxonomies',
-	postsTaxonomiesRelation: 'posts_taxonomies_relation',
-	postsAvoidDuplicatePosts: 'posts_avoid_duplicate_posts',
-	postsCustomQuery: 'posts_custom_query',
-	imageCategories: 'image_categories',
-};
-
 function filterControlCategories(categories) {
 	return Object.fromEntries(
 		Object.entries(categories).filter(([key]) =>
@@ -55,32 +36,29 @@ function filterControlCategories(categories) {
 
 function renderControls(props) {
 	const { attributes } = props;
-	let { content_source: contentSource } = attributes;
-
-	// Saved layouts by default displaying Portfolio source.
-	if (contentSource === 'portfolio') {
-		contentSource = '';
-	}
+	const { queryType } = attributes;
 
 	return (
 		<>
-			<ControlsRender category="content-source" {...props} />
+			<ControlsRender
+				isModernBlock
+				category="content-source"
+				{...props}
+			/>
 
-			{contentSource && (
-				<>
-					{Object.keys(
-						filterControlCategories(registeredControlsCategories)
-					)
-						.filter((name) => name !== 'content-source')
-						.map((name) => (
-							<ControlsRender
-								key={name}
-								category={name}
-								{...props}
-							/>
-						))}
-				</>
-			)}
+			{queryType &&
+				Object.keys(
+					filterControlCategories(registeredControlsCategories)
+				)
+					.filter((name) => name !== 'content-source')
+					.map((name) => (
+						<ControlsRender
+							isModernBlock
+							key={name}
+							category={name}
+							{...props}
+						/>
+					))}
 		</>
 	);
 }
@@ -101,35 +79,16 @@ function debounce(func, wait) {
 export default function BlockEdit(props) {
 	const { attributes, clientId, setAttributes } = props;
 
+	const {
+		layout,
+		queryType,
+		baseQuery,
+		imagesQuery,
+		preview_image_example: previewExample,
+	} = attributes;
+
 	// Create a ref to track previous attribute values
 	const prevAttributesRef = useRef({});
-
-	// Extract needed attributes with destructuring
-	const { preview_image_example: previewExample, layout } = attributes;
-
-	// Create a memoized object with all pagination-related attributes
-	const relevantAttributes = useMemo(() => {
-		// Extract all pagination attributes from attributes object
-		const result = {};
-
-		// Add all mapped attributes (both camelCase and snake_case versions)
-		Object.entries(PAGINATION_ATTRIBUTE_MAPPING).forEach(
-			([camelKey, snakeKey]) => {
-				// Use the camelCase key in our result object
-				result[camelKey] = attributes[snakeKey];
-			}
-		);
-
-		// Add block ID
-		result.block_id = clientId;
-
-		return result;
-	}, [attributes, clientId]);
-
-	// Extract commonly used values for convenience
-	const contentSource = relevantAttributes.contentSource;
-	const itemsCount = relevantAttributes.itemsCount;
-	const images = relevantAttributes.images;
 
 	// Get inner blocks
 	const { innerBlocks } = useSelect(
@@ -143,7 +102,7 @@ export default function BlockEdit(props) {
 
 	// Function to update maxPages via REST API
 	const updateMaxPages = debounce(async () => {
-		if (!contentSource || !itemsCount) {
+		if (!queryType || !baseQuery.perPage) {
 			return;
 		}
 
@@ -170,7 +129,12 @@ export default function BlockEdit(props) {
 
 			// Update maxPages attribute if available in response
 			if (response?.max_pages !== undefined) {
-				setAttributes({ maxPages: parseInt(response.max_pages, 10) });
+				setAttributes({
+					baseQuery: {
+						...baseQuery,
+						maxPages: parseInt(response.max_pages, 10),
+					},
+				});
 			}
 		} catch (error) {
 			// eslint-disable-next-line no-console
@@ -211,42 +175,32 @@ export default function BlockEdit(props) {
 		}
 	}, [clientId, innerBlocks.length, replaceInnerBlocks]);
 
-	// Set default contentSource
-	useEffect(() => {
-		if (!contentSource || contentSource === '') {
-			setAttributes({
-				content_source: 'post-based',
-				posts_source: 'portfolio',
-			});
-		}
-	}, [contentSource, setAttributes]);
-
 	// Update maxPages when relevant attributes change
 	useEffect(() => {
-		if (!contentSource || !itemsCount) {
+		if (!queryType || !baseQuery.perPage) {
 			return;
 		}
 
 		// Compare with previous values to avoid unnecessary API calls
 		const prevAttrs = prevAttributesRef.current;
-		const hasChanged = Object.keys(relevantAttributes).some(
+		const hasChanged = Object.keys(attributes).some(
 			(key) =>
 				JSON.stringify(prevAttrs[key]) !==
-				JSON.stringify(relevantAttributes[key])
+				JSON.stringify(attributes[key])
 		);
 
 		if (hasChanged) {
 			updateMaxPages();
-			prevAttributesRef.current = { ...relevantAttributes };
+			prevAttributesRef.current = { ...attributes };
 		}
-	}, [relevantAttributes, contentSource, itemsCount, updateMaxPages]);
+	}, [attributes, queryType, baseQuery.perPage, updateMaxPages]);
 
 	useEffect(() => {
-		if (contentSource === 'images' && Array.isArray(images)) {
+		if (queryType === 'images' && Array.isArray(imagesQuery.images)) {
 			// Extract all categories from images
 			const newCategories = new Set();
 
-			images.forEach((image) => {
+			imagesQuery.images.forEach((image) => {
 				if (image.categories && Array.isArray(image.categories)) {
 					image.categories.forEach((category) => {
 						newCategories.add(category);
@@ -258,17 +212,22 @@ export default function BlockEdit(props) {
 			const newCategoriesArray = Array.from(newCategories);
 
 			// Check if the new categories are different from the current ones
-			const currentCategories = attributes.image_categories || [];
+			const currentCategories = imagesQuery.categories || [];
 			const categoriesChanged =
 				JSON.stringify(currentCategories) !==
 				JSON.stringify(newCategoriesArray);
 
-			// Update the image_categories attribute if there are changes
+			// Update the imagesQuery.categories attribute if there are changes
 			if (categoriesChanged) {
-				setAttributes({ image_categories: newCategoriesArray });
+				setAttributes({
+					imagesQuery: {
+						...imagesQuery,
+						categories: newCategoriesArray,
+					},
+				});
 			}
 		}
-	}, [images, contentSource, setAttributes, attributes.image_categories]);
+	}, [queryType, setAttributes, imagesQuery]);
 
 	// Display block preview if needed
 	if (previewExample === 'true') {

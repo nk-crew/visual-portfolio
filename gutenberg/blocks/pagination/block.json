@@ -11,7 +11,7 @@
 	"attributes": {
 		"paginationType": { "type": "string", "default": "default" }
 	},
-	"usesContext": ["visual-portfolio/maxPages"],
+	"usesContext": ["visual-portfolio/baseQuery"],
 	"supports": {
 		"html": false,
 		"anchor": true,

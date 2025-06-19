@@ -20,7 +20,9 @@ export default function PaginationLoadMoreEdit({
 	context,
 }) {
 	const { label, loadingLabel, endListLabel, showLoadingText } = attributes;
-	const { 'visual-portfolio/maxPages': maxPages = 1 } = context;
+	const { 'visual-portfolio/baseQuery': baseQuery } = context;
+
+	const maxPages = baseQuery?.maxPages || 1;
 
 	const blockProps = useBlockProps({
 		className: `vp-pagination`,

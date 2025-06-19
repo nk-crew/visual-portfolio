@@ -14,6 +14,7 @@ import { Component, createRef, Fragment } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
+import { convertModernToLegacy } from '../../utils/convert-legacy-attributes';
 
 const {
 	VPAdminGutenbergVariables: variables,
@@ -181,43 +182,45 @@ class IframePreview extends Component {
 		}
 		this.busyReload = true;
 
-		const { attributes: newAttributes, context: newContext } = this.props;
-		const { attributes: oldAttributes, context: oldContext } = prevProps;
-
 		const frame = this.frameRef.current;
 
-		// Prepare combined data objects (context takes priority)
-		const oldData = {
-			...oldAttributes,
-			...(oldContext
-				? Object.fromEntries(
-						Object.entries(oldContext).map(([key, value]) => [
-							key.replace('visual-portfolio/', ''),
-							value,
-						])
-					)
-				: {}),
+		const newContext = this.props.context
+			? Object.fromEntries(
+					Object.entries(this.props.context).map(([key, value]) => [
+						key.replace('visual-portfolio/', ''),
+						value,
+					])
+				)
+			: {};
+		const oldContext = prevProps.context
+			? Object.fromEntries(
+					Object.entries(prevProps.context).map(([key, value]) => [
+						key.replace('visual-portfolio/', ''),
+						value,
+					])
+				)
+			: {};
+
+		const newAttributes = {
+			...this.props.attributes,
+			...convertModernToLegacy(newContext),
 		};
 
-		const newData = {
-			...newAttributes,
-			...(newContext
-				? Object.fromEntries(
-						Object.entries(newContext).map(([key, value]) => [
-							key.replace('visual-portfolio/', ''),
-							value,
-						])
-					)
-				: {}),
+		const oldAttributes = {
+			...prevProps.attributes,
+			...convertModernToLegacy(oldContext),
 		};
 
 		const changedAttributes = {};
-		const changedAttributeKeys = getUpdatedKeys(oldData, newData);
+		const changedAttributeKeys = getUpdatedKeys(
+			oldAttributes,
+			newAttributes
+		);
 
 		// check changed attributes
 		changedAttributeKeys.forEach((name) => {
-			if (typeof newData[name] !== 'undefined') {
-				changedAttributes[name] = newData[name];
+			if (typeof newAttributes[name] !== 'undefined') {
+				changedAttributes[name] = newAttributes[name];
 			}
 		});
 
@@ -253,11 +256,11 @@ class IframePreview extends Component {
 				}
 
 				// Insert dynamic CSS.
-				if (frame.iFrameResizer && newData.block_id) {
+				if (frame.iFrameResizer && newAttributes.block_id) {
 					frame.iFrameResizer.sendMessage({
 						name: 'dynamic-css',
-						blockId: newData.block_id,
-						styles: getDynamicCSS(newData),
+						blockId: newAttributes.block_id,
+						styles: getDynamicCSS(newAttributes),
 					});
 				}
 			}
@@ -401,20 +404,14 @@ class IframePreview extends Component {
 	}
 
 	render() {
-		const { attributes, postType, postId, context = {} } = this.props;
+		const { postType, postId, context = {} } = this.props;
 
 		const { loading, uniqueId, currentIframeHeight, latestIframeHeight } =
 			this.state;
 
-		const { id, content_source: attributesContentSource } = attributes;
-
 		// Collect all data into a single object, prioritizing context values
 		const formData = {};
-
-		// First, process attributes
-		Object.keys(attributes).forEach((key) => {
-			formData[`vp_${key}`] = attributes[key];
-		});
+		let contextAttributes = {};
 
 		if (context) {
 			// Then override with context values (they take priority)
@@ -424,12 +421,25 @@ class IframePreview extends Component {
 					formData[formKey] = value;
 				}
 			});
+			contextAttributes = Object.fromEntries(
+				Object.entries(this.props.context).map(([key, value]) => [
+					key.replace('visual-portfolio/', ''),
+					value,
+				])
+			);
 		}
 
-		// Use context content_source if available, fallback to attributes
-		const effectiveContentSource =
-			context['visual-portfolio/content_source'] ||
-			attributesContentSource;
+		const attributes = {
+			...this.props.attributes,
+			...convertModernToLegacy(contextAttributes),
+		};
+
+		const { id, content_source: contentSource } = attributes;
+
+		// Convert attributes for form submission.
+		Object.keys(attributes).forEach((key) => {
+			formData[`vp_${key}`] = attributes[key];
+		});
 
 		return (
 			<div
@@ -480,7 +490,7 @@ class IframePreview extends Component {
 							readOnly
 						/>
 
-						{effectiveContentSource === 'saved' ? (
+						{contentSource === 'saved' ? (
 							<input
 								type="text"
 								name="vp_id"

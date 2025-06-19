@@ -137,6 +137,9 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 * @return int $max_pages Response max pages data.
 	 */
 	public function calculate_max_pages( $params ) {
+		// Convert modern params to legacy format.
+		$params = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params );
+
 		$params = Visual_Portfolio_Security::validate_calculate_max_pages_params( $params );
 
 		$content_source = $params['content_source'] ?? '';
