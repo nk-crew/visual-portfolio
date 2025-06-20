@@ -24,9 +24,6 @@ class Visual_Portfolio_Block_Pagination_Numbers {
 	 * Register Block.
 	 */
 	public function register_block() {
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-pagination-numbers', 'build/gutenberg/blocks/pagination-numbers/style' );
-		wp_style_add_data( 'visual-portfolio-block-pagination-numbers', 'rtl', 'replace' );
-
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination-numbers',
 			array(
@@ -52,11 +49,7 @@ class Visual_Portfolio_Block_Pagination_Numbers {
 			return '';
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => 'vp-pagination-numbers',
-			)
-		);
+		$wrapper_attributes = get_block_wrapper_attributes();
 
 		// Get current page.
 		$current_page = max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
@@ -68,6 +61,7 @@ class Visual_Portfolio_Block_Pagination_Numbers {
 			array(
 				'start_page' => $current_page,
 				'max_pages'  => $max_pages,
+				'mid_size'   => $attributes['midSize'],
 			),
 			array(
 				'pagination_paged__show_arrows'  => false,
@@ -81,16 +75,26 @@ class Visual_Portfolio_Block_Pagination_Numbers {
 		// Iterate over pagination links.
 		foreach ( $pagination_links as $link ) {
 			if ( $link['is_dots'] ) {
-				$output .= '<span class="vp-pagination-number-ellipsis">...</span>';
+				$output .= '<span class="wp-block-visual-portfolio-pagination-dots">...</span>';
 			} else {
-				$active_class = $link['active'] ? ' vp-pagination-number-active' : '';
-				$url          = $link['url'] ? esc_url( $link['url'] ) : '#';
-				$output      .= sprintf(
-					'<span class="vp-pagination-number%1$s"><a href="%2$s" data-vp-pagination="%3$s">%3$s</a></span>',
-					$active_class,
-					$url,
-					esc_html( $link['label'] )
-				);
+				$url = $link['url'] ? esc_url( $link['url'] ) : '#';
+
+				if ( $link['active'] ) {
+					$output .= sprintf(
+						'<span aria-label="%1$s" aria-current="page" class="is-active">%2$s</span>',
+						// translators: %s page number.
+						sprintf( esc_attr__( 'Page %s', 'visual-portfolio' ), $link['label'] ),
+						esc_html( $link['label'] )
+					);
+				} else {
+					$output .= sprintf(
+						'<a aria-label="%1$s" href="%2$s" data-vp-pagination="%3$s">%3$s</a>',
+						// translators: %s page number.
+						sprintf( esc_attr__( 'Page %s', 'visual-portfolio' ), $link['label'] ),
+						$url,
+						esc_html( $link['label'] )
+					);
+				}
 			}
 		}
 

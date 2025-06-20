@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-/**
- * Internal dependencies
- */
-import './editor.scss';
-
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Block constants
@@ -24,14 +18,8 @@ const TEMPLATE = [
 	['visual-portfolio/pagination-next'],
 ];
 
-export default function PagedPaginationEdit({ context }) {
-	const { 'visual-portfolio/baseQuery': baseQuery } = context;
-
-	const maxPages = baseQuery?.maxPages || 1;
-
-	const blockProps = useBlockProps({
-		className: `vp-pagination`,
-	});
+export default function PagedPaginationEdit() {
+	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
@@ -40,20 +28,5 @@ export default function PagedPaginationEdit({ context }) {
 		renderAppender: false,
 	});
 
-	return (
-		<>
-			{maxPages > 1 ? (
-				<div {...innerBlocksProps} />
-			) : (
-				<div {...blockProps}>
-					<div className="vp-pagination-info">
-						{__(
-							'Pagination will be displayed when the number of pages is more than 1.',
-							'visual-portfolio'
-						)}
-					</div>
-				</div>
-			)}
-		</>
-	);
+	return <div {...innerBlocksProps} />;
 }

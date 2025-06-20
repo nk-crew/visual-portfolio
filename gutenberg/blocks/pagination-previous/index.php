@@ -24,9 +24,6 @@ class Visual_Portfolio_Block_Pagination_Previous {
 	 * Register Block.
 	 */
 	public function register_block() {
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-pagination-previous', 'build/gutenberg/blocks/pagination-previous/style' );
-		wp_style_add_data( 'visual-portfolio-block-pagination-previous', 'rtl', 'replace' );
-
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination-previous',
 			array(
@@ -52,20 +49,26 @@ class Visual_Portfolio_Block_Pagination_Previous {
 			return '';
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => 'vp-pagination-prev',
-			)
-		);
-
-		$label = isset( $attributes['label'] ) ? $attributes['label'] : '« ' . __( 'Previous', 'visual-portfolio' );
-
 		// Get current page.
 		$current_page = max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
 
 		// If on the first page, don't show the previous link.
 		if ( $current_page <= 1 ) {
 			return '';
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes();
+		$show_label         = $attributes['showLabel'] ?? true;
+		$default_label      = esc_html__( 'Previous', 'visual-portfolio' );
+		$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
+		$label              = $show_label ? $label_text : '';
+		$show_arrow         = $attributes['showArrow'] ?? true;
+
+		if ( ! $label ) {
+			$wrapper_attributes .= ' aria-label="' . $label_text . '"';
+		}
+		if ( $show_arrow ) {
+			$label = '<span class="wp-block-visual-portfolio-pagination-previous-arrow" aria-hidden="true">&lsaquo;</span>' . $label;
 		}
 
 		$pagination_links = Visual_Portfolio_Get::get_pagination_links(
@@ -88,15 +91,11 @@ class Visual_Portfolio_Block_Pagination_Previous {
 			}
 		}
 
-		// Disable link if on first page.
-		$disabled_class = $current_page <= 1 ? ' vp-pagination-disabled' : '';
-
 		return sprintf(
-			'<div %1$s><a href="%2$s" class="vp-pagination-prev-link%3$s" data-vp-pagination="prev"><span class="vp-pagination-prev-icon">←</span><span class="vp-pagination-prev-label">%4$s</span></a></div>',
-			$wrapper_attributes,
+			'<a href="%1$s" data-vp-pagination="prev" %2$s>%3$s</a>',
 			$prev_link,
-			$disabled_class,
-			esc_html( $label )
+			$wrapper_attributes,
+			$label
 		);
 	}
 }

@@ -1,38 +1,66 @@
 /**
  * WordPress dependencies
  */
-/**
- * Internal dependencies
- */
-import './editor.scss';
-
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, TextControl } from '@wordpress/components';
+import {
+	InspectorControls,
+	PlainText,
+	useBlockProps,
+} from '@wordpress/block-editor';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function PaginationNextEdit({ attributes, setAttributes }) {
-	const { label } = attributes;
-
-	const blockProps = useBlockProps({
-		className: 'vp-pagination-next',
-	});
+	const { label, showLabel, showArrow } = attributes;
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={__('Settings', 'visual-portfolio')}>
-					<TextControl
-						label={__('Next Label', 'visual-portfolio')}
-						value={label}
-						onChange={(value) => setAttributes({ label: value })}
+				<PanelBody>
+					<ToggleControl
+						label={__('Show label text', 'visual-portfolio')}
+						checked={showLabel}
+						onChange={() =>
+							setAttributes({ showLabel: !showLabel })
+						}
+						disabled={!showArrow && showLabel}
+					/>
+					<ToggleControl
+						label={__('Show arrow', 'visual-portfolio')}
+						checked={showArrow}
+						onChange={() =>
+							setAttributes({ showArrow: !showArrow })
+						}
+						disabled={!showLabel && showArrow}
 					/>
 				</PanelBody>
 			</InspectorControls>
 
-			<div {...blockProps}>
-				<span className="vp-pagination-next-label">{label}</span>
-				<span className="vp-pagination-next-icon">→</span>
-			</div>
+			<a
+				href="#pagination-next-pseudo-link"
+				onClick={(event) => event.preventDefault()}
+				{...useBlockProps()}
+			>
+				{showLabel && (
+					<PlainText
+						__experimentalVersion={2}
+						tagName="span"
+						aria-label={__('Next page link')}
+						placeholder={__('Next')}
+						value={label}
+						onChange={(newLabel) =>
+							setAttributes({ label: newLabel })
+						}
+					/>
+				)}
+				{showArrow && (
+					<span
+						className="wp-block-visual-portfolio-pagination-next-arrow"
+						aria-hidden
+					>
+						&rsaquo;
+					</span>
+				)}
+			</a>
 		</>
 	);
 }

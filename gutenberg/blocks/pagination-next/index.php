@@ -24,9 +24,6 @@ class Visual_Portfolio_Block_Pagination_Next {
 	 * Register Block.
 	 */
 	public function register_block() {
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-pagination-next', 'build/gutenberg/blocks/pagination-next/editor' );
-		wp_style_add_data( 'visual-portfolio-block-pagination-next', 'rtl', 'replace' );
-
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination-next',
 			array(
@@ -55,11 +52,19 @@ class Visual_Portfolio_Block_Pagination_Next {
 			return '';
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => 'vp-pagination-next',
-			)
-		);
+		$wrapper_attributes = get_block_wrapper_attributes();
+		$show_label         = $attributes['showLabel'] ?? true;
+		$default_label      = esc_html__( 'Next', 'visual-portfolio' );
+		$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
+		$label              = $show_label ? $label_text : '';
+		$show_arrow         = $attributes['showArrow'] ?? true;
+
+		if ( ! $label ) {
+			$wrapper_attributes .= ' aria-label="' . $label_text . '"';
+		}
+		if ( $show_arrow ) {
+			$label = $label . '<span class="wp-block-visual-portfolio-pagination-next-arrow" aria-hidden="true">&rsaquo;</span>';
+		}
 
 		$pagination_links = Visual_Portfolio_Get::get_pagination_links(
 			array(
@@ -72,9 +77,6 @@ class Visual_Portfolio_Block_Pagination_Next {
 			)
 		);
 
-		// Default label for the next button.
-		$label = isset( $attributes['label'] ) ? $attributes['label'] : __( 'Next', 'visual-portfolio' );
-
 		// Find the next page link from the pagination links.
 		$next_link = '#';
 		foreach ( $pagination_links as $link ) {
@@ -84,15 +86,11 @@ class Visual_Portfolio_Block_Pagination_Next {
 			}
 		}
 
-		// Disable link if on last page.
-		$disabled_class = $current_page >= $max_pages ? ' vp-pagination-disabled' : '';
-
 		return sprintf(
-			'<div %1$s><a href="%2$s" class="vp-pagination-next-link%3$s" data-vp-pagination="next"><span class="vp-pagination-next-label">%4$s</span><span class="vp-pagination-next-icon">→</span></a></div>',
-			$wrapper_attributes,
+			'<a href="%1$s" data-vp-pagination="next" %2$s>%3$s</a>',
 			$next_link,
-			$disabled_class,
-			esc_html( $label )
+			$wrapper_attributes,
+			$label
 		);
 	}
 }

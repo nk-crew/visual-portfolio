@@ -15,5 +15,37 @@
 		"visual-portfolio/postsQuery",
 		"visual-portfolio/imagesQuery"
 	],
-	"supports": { "html": false, "reusable": false, "className": false }
+	"attributes": {
+		"midSize": {
+			"type": "number",
+			"default": 2
+		}
+	},
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"color": {
+			"gradients": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	}
 }

@@ -8,7 +8,6 @@ import metadata from './block.json';
  * Internal dependencies
  */
 import edit from './edit';
-import save from './save';
 
 /**
  * Register block
@@ -16,5 +15,4 @@ import save from './save';
 registerBlockType(metadata.name, {
 	...metadata,
 	edit,
-	save,
 });

@@ -2660,8 +2660,8 @@ class Visual_Portfolio_Get {
 				'total'     => $args['max_pages'],
 				'prev_text' => '&lt;',
 				'next_text' => '&gt;',
-				'end_size'  => 1,
-				'mid_size'  => 2,
+				'end_size'  => $args['end_size'] ?? 1,
+				'mid_size'  => $args['mid_size'] ?? 2,
 			)
 		);
 

@@ -31,7 +31,10 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		wp_style_add_data( 'visual-portfolio-block-pagination-editor', 'rtl', 'replace' );
 
 		register_block_type_from_metadata(
-			visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination'
+			visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination',
+			array(
+				'render_callback' => array( $this, 'block_render' ),
+			)
 		);
 	}
 
@@ -96,6 +99,32 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		}
 
 		return $request_data;
+	}
+
+	/**
+	 * Block output
+	 *
+	 * @param array  $attributes - block attributes.
+	 * @param string $content - block content.
+	 *
+	 * @return string
+	 */
+	public function block_render( $attributes, $content ) {
+		if ( empty( trim( $content ) ) ) {
+			return '';
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'aria-label' => esc_attr__( 'Pagination', 'visual-portfolio' ),
+			)
+		);
+
+		return sprintf(
+			'<nav %1$s>%2$s</nav>',
+			$wrapper_attributes,
+			$content
+		);
 	}
 }
 new Visual_Portfolio_Block_Paged_Pagination();

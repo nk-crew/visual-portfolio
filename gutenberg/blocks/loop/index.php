@@ -36,23 +36,21 @@ class Visual_Portfolio_Block_Loop {
 	 * Block output
 	 *
 	 * @param array  $attributes - block attributes.
-	 * @param string $inner_blocks - inner blocks.
+	 * @param string $content - block render.
 	 *
 	 * @return string
 	 */
-	public function block_render( $attributes, $inner_blocks ) {
-		$config             = Visual_Portfolio_Get::get_output_config( $attributes );
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => $config['class'],
-			)
-		);
+	public function block_render( $attributes, $content ) {
+		$config = Visual_Portfolio_Get::get_output_config( $attributes );
 
-		return sprintf(
-			'<div %1$s>%2$s</div>',
-			$wrapper_attributes,
-			$inner_blocks
-		);
+		$processor = new WP_HTML_Tag_Processor( $content );
+		$processor->next_tag( 'div' );
+
+		$new_classname = $processor->get_attribute( 'class' ) . ' ' . $config['class'];
+
+		$processor->set_attribute( 'class', $new_classname );
+
+		return $processor->get_updated_html();
 	}
 }
 new Visual_Portfolio_Block_Loop();
