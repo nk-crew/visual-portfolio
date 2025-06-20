@@ -4,7 +4,7 @@
 	"name": "visual-portfolio/pagination-infinite",
 	"title": "Gallery Pagination Infinite (Experimental)",
 	"category": "media",
-	"parent": ["visual-portfolio/loop"],
+	"ancestor": ["visual-portfolio/loop"],
 	"description": "Displays infinite scroll pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.",
 	"textdomain": "visual-portfolio",
 	"icon": "update",

@@ -4,7 +4,7 @@
 	"name": "visual-portfolio/pagination-next",
 	"title": "Gallery Pagination Next (Experimental)",
 	"category": "media",
-	"parent": ["visual-portfolio/pagination"],
+	"ancestor": ["visual-portfolio/pagination"],
 	"description": "Displays the next page link. Block is experimental and will change in future releases. Please use with caution.",
 	"icon": "arrow-right-alt2",
 	"textdomain": "visual-portfolio",

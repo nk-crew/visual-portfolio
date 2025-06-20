@@ -4,7 +4,7 @@
 	"name": "visual-portfolio/pagination-numbers",
 	"title": "Gallery Pagination Numbers (Experimental)",
 	"category": "media",
-	"parent": ["visual-portfolio/pagination"],
+	"ancestor": ["visual-portfolio/pagination"],
 	"description": "Displays page numbers for navigation. Block is experimental and will change in future releases. Please use with caution.",
 	"icon": "ellipsis",
 	"textdomain": "visual-portfolio",

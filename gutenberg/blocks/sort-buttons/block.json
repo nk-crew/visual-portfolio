@@ -5,7 +5,7 @@
 	"title": "Gallery Sort Buttons (Experimental)",
 	"description": "Add sorting options to your portfolio with buttons.",
 	"category": "media",
-	"parent": ["visual-portfolio/loop"],
+	"ancestor": ["visual-portfolio/loop"],
 	"icon": "button",
 	"attributes": {
 		"sortType": {

@@ -5,7 +5,7 @@
 	"title": "Gallery Filter (Experimental)",
 	"category": "media",
 	"description": "Displays filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.",
-	"parent": ["visual-portfolio/loop"],
+	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
 	"supports": {
 		"html": false,

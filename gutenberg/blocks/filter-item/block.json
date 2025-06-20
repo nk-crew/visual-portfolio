@@ -5,7 +5,7 @@
 	"title": "Gallery Filter Item (Experimental)",
 	"category": "media",
 	"description": "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.",
-	"parent": ["visual-portfolio/filter"],
+	"ancestor": ["visual-portfolio/filter"],
 	"textdomain": "visual-portfolio",
 	"usesContext": ["visual-portfolio-filter/showCount"],
 	"supports": {

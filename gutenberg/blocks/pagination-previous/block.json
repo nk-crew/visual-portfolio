@@ -5,7 +5,7 @@
 	"title": "Gallery Pagination Previous (Experimental)",
 	"category": "media",
 	"icon": "arrow-left-alt2",
-	"parent": ["visual-portfolio/pagination"],
+	"ancestor": ["visual-portfolio/pagination"],
 	"description": "Displays the previous page link. Block is experimental and will change in future releases. Please use with caution.",
 	"textdomain": "visual-portfolio",
 	"usesContext": [

@@ -5,7 +5,7 @@
 	"title": "Gallery Sort Dropdown (Experimental)",
 	"description": "Add sorting options to your portfolio",
 	"category": "media",
-	"parent": ["visual-portfolio/loop"],
+	"ancestor": ["visual-portfolio/loop"],
 	"icon": "menu",
 	"attributes": {
 		"sortType": {

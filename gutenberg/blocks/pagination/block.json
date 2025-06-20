@@ -5,7 +5,7 @@
 	"title": "Gallery Pagination (Experimental)",
 	"category": "media",
 	"description": "Displays paged pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.",
-	"parent": ["visual-portfolio/loop"],
+	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
 	"icon": "ellipsis",
 	"attributes": {

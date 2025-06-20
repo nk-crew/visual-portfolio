@@ -5,7 +5,7 @@
 	"title": "Gallery Sort Button (Experimental)",
 	"description": "Individual button for sorting portfolio items",
 	"category": "media",
-	"parent": ["visual-portfolio/sort-buttons"],
+	"ancestor": ["visual-portfolio/sort-buttons"],
 	"attributes": {
 		"label": {
 			"type": "string",
