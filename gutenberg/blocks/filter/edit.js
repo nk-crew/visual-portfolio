@@ -98,6 +98,7 @@ export default function BlockEdit({
 
 			try {
 				const endpoint = '/visual-portfolio/v1/get_filter_items/';
+
 				let queryArgs = {
 					content_source: contentSource,
 					block_id: blockId,
@@ -105,7 +106,7 @@ export default function BlockEdit({
 					items_count: itemsCount,
 				};
 
-				if (contentSource === 'post-based') {
+				if (contentSource === 'posts') {
 					queryArgs = {
 						...queryArgs,
 						posts_source: postsSource,

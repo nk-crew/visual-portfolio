@@ -243,7 +243,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		);
 
 		// Add additional parameters based on content source.
-		if ( 'post-based' === $content_source ) {
+		if ( 'posts' === $content_source ) {
 			$options['posts_source']              = $request->get_param( 'posts_source' );
 			$options['posts_taxonomies']          = $request->get_param( 'posts_taxonomies' );
 			$options['posts_taxonomies_relation'] = $request->get_param( 'posts_taxonomies_relation' );
@@ -288,7 +288,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 				if ( 'images' === $content_source || 'social-stream' === $content_source ) {
 					$url = add_query_arg( 'vp_filter', rawurlencode( $filter ), $url );
 				}
-				if ( 'post-based' === $content_source ) {
+				if ( 'posts' === $content_source ) {
 					$post_filter = rawurlencode( $taxonomy . ':' ) . $filter;
 					$url         = add_query_arg( 'vp_filter', $post_filter, $url );
 				}

@@ -398,7 +398,10 @@ class Visual_Portfolio_Get {
 
 		if (
 			(
-				'post-based' === $options['content_source'] &&
+				(
+					'post-based' === $options['content_source'] ||
+					'posts' === $options['content_source']
+				) &&
 				'rand' === $options['posts_order_by']
 			) ||
 			(
@@ -1527,7 +1530,7 @@ class Visual_Portfolio_Get {
 			}
 
 			// Post based.
-			if ( 'post-based' === $options['content_source'] ) {
+			if ( 'post-based' === $options['content_source'] || 'posts' === $options['content_source'] ) {
 				// Exclude IDs.
 				if ( ! empty( $options['posts_excluded_ids'] ) ) {
 					$query_opts['post__not_in'] = $options['posts_excluded_ids'];
@@ -2207,7 +2210,7 @@ class Visual_Portfolio_Get {
 	private static function each_item( $args ) {
 		global $post;
 
-		$is_posts = 'post-based' === $args['vp_opts']['content_source'] || 'portfolio' === $args['vp_opts']['content_source'];
+		$is_posts = 'post-based' === $args['vp_opts']['content_source'] || 'posts' === $options['content_source'] || 'portfolio' === $args['vp_opts']['content_source'];
 
 		// In older plugin versions we used the query objects in these templates.
 		// And some theme authors used these data to run wp functions to output posts data.
