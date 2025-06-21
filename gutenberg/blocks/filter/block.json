@@ -52,12 +52,7 @@
 		"visual-portfolio/imagesQuery"
 	],
 	"providesContext": { "visual-portfolio-filter/showCount": "showCount" },
-	"styles": [
-		{ "name": "minimal", "label": "Minimal", "isDefault": true },
-		{ "name": "fill", "label": "Fill" },
-		{ "name": "outline", "label": "Outline" }
-	],
+	"styles": [{ "name": "fill", "label": "Fill" }],
 	"attributes": { "showCount": { "type": "boolean", "default": false } },
-	"style": "visual-portfolio-block-filter",
-	"editorStyle": "visual-portfolio-block-filter-editor"
+	"style": "visual-portfolio-block-filter"
 }

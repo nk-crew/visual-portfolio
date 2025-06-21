@@ -16,7 +16,11 @@ export default function BlockEdit({ attributes, setAttributes, context }) {
 	});
 
 	return (
-		<div {...blockProps}>
+		<a
+			href="#filter-pseudo-link"
+			onClick={(event) => event.preventDefault()}
+			{...blockProps}
+		>
 			<RichText
 				tagName="span"
 				value={text}
@@ -25,8 +29,10 @@ export default function BlockEdit({ attributes, setAttributes, context }) {
 				allowedFormats={[]}
 			/>
 			{showCount && !isAll && count > 0 && (
-				<span className="vp-filter__item-count">{`(${count})`}</span>
+				<span className="wp-block-visual-portfolio-filter-count">
+					{count}
+				</span>
 			)}
-		</div>
+		</a>
 	);
 }

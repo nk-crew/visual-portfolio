@@ -66,6 +66,5 @@
 		"isActive": { "type": "boolean", "default": false },
 		"count": { "type": "number", "default": 0 },
 		"style": { "type": "object" }
-	},
-	"style": "visual-portfolio-block-filter-item"
+	}
 }

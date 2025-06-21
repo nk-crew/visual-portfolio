@@ -24,9 +24,6 @@ class Visual_Portfolio_Block_Filter_Item {
 	 * Register Block.
 	 */
 	public function register_block() {
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-filter-item', 'build/gutenberg/blocks/filter-item/style' );
-		wp_style_add_data( 'visual-portfolio-block-filter-item', 'rtl', 'replace' );
-
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter-item',
 			array(
@@ -64,6 +61,7 @@ class Visual_Portfolio_Block_Filter_Item {
 		if ( isset( $_GET['vp_filter'] ) && ! empty( $_GET['vp_filter'] ) ) {
 			$is_active      = false;
 			$current_filter = sanitize_text_field( urldecode( $_GET['vp_filter'] ) );
+
 			// Remove taxonomy prefix (e.g., 'portfolio_category:mountains' -> 'mountains').
 			if ( false !== strpos( $current_filter, ':' ) ) {
 				$parts          = explode( ':', $current_filter );
@@ -86,72 +84,60 @@ class Visual_Portfolio_Block_Filter_Item {
 			}
 		}
 
-		$classes = isset( $attributes['className'] ) ? explode( ' ', $attributes['className'] ) : array();
-
-		// Build CSS classes array - start fresh.
-		$classes[] = 'wp-block-visual-portfolio-filter-item';
-
-		if ( $should_be_active ) {
-			$classes[] = 'is-active';
-		}
-
-		// Background color preset.
-		if ( isset( $attributes['backgroundColor'] ) && ! empty( $attributes['backgroundColor'] ) ) {
-			$classes[] = 'has-' . $attributes['backgroundColor'] . '-background-color';
-			$classes[] = 'has-background';
-		}
-
 		// Get block wrapper attributes but override the class completely.
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'data-vp-filter' => $filter,
-				'class'          => implode( ' ', $classes ),
+				'class'          => $should_be_active ? 'is-active' : '',
 			)
 		);
 
-		// Replace any existing class attribute with our controlled classes.
-		$wrapper_attributes = preg_replace(
-			'/class="[^"]*"/',
-			'class="' . esc_attr( implode( ' ', $classes ) ) . '"',
-			$wrapper_attributes
-		);
-
-		// If no class attribute existed, add it.
-		if ( strpos( $wrapper_attributes, 'class=' ) === false ) {
-			$wrapper_attributes = 'class="' . esc_attr( implode( ' ', $classes ) ) . '" ' . $wrapper_attributes;
-		}
-
-		$styles = '';
-		if ( function_exists( 'wp_style_engine_get_styles' ) && isset( $attributes['style'] ) ) {
-			$style_engine = wp_style_engine_get_styles( $attributes['style'] );
-
-			if ( ! empty( $style_engine['css'] ) ) {
-				$styles = ' style="' . esc_attr( $style_engine['css'] ) . '"';
-			}
-		}
+		$output_text = $text;
 
 		// Build the count display.
-		$count_html = '';
 		if ( $show_count && ! $is_all && $count > 0 ) {
-			$count_html = '<span class="vp-filter__item-count">(' . $count . ')</span>';
+			$output_text = $output_text . '<span class="wp-block-visual-portfolio-filter-count">' . $count . '</span>';
 		}
 
-		// Build the complete HTML output.
-		$link_attributes = '';
+		$output = '';
+
+		$filter_link = '#';
 		if ( ! empty( $url ) ) {
-			$link_attributes = ' href="' . esc_url( $url ) . '"';
+			$filter_link = esc_url( $url );
 		}
 
-		$html = sprintf(
-			'<div %s%s><a%s>%s</a>%s</div>',
-			$wrapper_attributes,
-			$styles,
-			$link_attributes,
-			wp_kses_post( $text ),
-			$count_html
-		);
+		if ( $should_be_active ) {
+			$aria_label = '*' === $filter ? esc_attr__( 'Currently displaying all items', 'visual-portfolio' ) : sprintf(
+				// translators: %1$s filter name, %2$s item count.
+				esc_attr__( 'Currently filtering by %1$s, %2$s items', 'visual-portfolio' ),
+				esc_attr( $text ),
+				$count
+			);
 
-		return $html;
+			$output = sprintf(
+				'<span aria-label="%1$s" aria-current="page" %2$s>%3$s</span>',
+				$aria_label,
+				$wrapper_attributes,
+				$output_text
+			);
+		} else {
+			$aria_label = '*' === $filter ? esc_attr__( 'Display all items', 'visual-portfolio' ) : sprintf(
+				// translators: %1$s filter name, %2$s item count.
+				esc_attr__( 'Filter by %1$s, %2$s items', 'visual-portfolio' ),
+				esc_attr( $text ),
+				$count
+			);
+
+			$output = sprintf(
+				'<a aria-label="%1$s" href="%2$s" data-vp-filter="%3$s" %4$s>%5$s</a>',
+				$aria_label,
+				$filter_link,
+				$filter,
+				$wrapper_attributes,
+				$output_text
+			);
+		}
+
+		return $output;
 	}
 }
 new Visual_Portfolio_Block_Filter_Item();

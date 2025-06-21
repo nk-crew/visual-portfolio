@@ -229,15 +229,12 @@ export default function BlockEdit({
 
 	const blockProps = useBlockProps();
 
-	const innerBlocksProps = useInnerBlocksProps(
-		{},
-		{
-			allowedBlocks: ALLOWED_BLOCKS,
-			orientation: 'horizontal',
-			renderAppender: false,
-			templateLock: false, // Changed from 'all' to false to allow moving
-		}
-	);
+	const innerBlocksProps = useInnerBlocksProps(blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		orientation: 'horizontal',
+		renderAppender: false,
+		templateLock: false, // Changed from 'all' to false to allow moving
+	});
 
 	return (
 		<>
@@ -252,18 +249,13 @@ export default function BlockEdit({
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div {...blockProps}>
-				{isLoading ? (
-					<div className="vp-filter__loading">
-						<Spinner />
-						<span>
-							{__('Loading filters…', 'visual-portfolio')}
-						</span>
-					</div>
-				) : (
-					<div {...innerBlocksProps} />
-				)}
-			</div>
+			{isLoading ? (
+				<div {...blockProps}>
+					<Spinner />
+				</div>
+			) : (
+				<div {...innerBlocksProps} />
+			)}
 		</>
 	);
 }

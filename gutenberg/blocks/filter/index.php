@@ -27,11 +27,37 @@ class Visual_Portfolio_Block_Filter {
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-filter', 'build/gutenberg/blocks/filter/style' );
 		wp_style_add_data( 'visual-portfolio-block-filter', 'rtl', 'replace' );
 
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-filter-editor', 'build/gutenberg/blocks/filter/style' );
-		wp_style_add_data( 'visual-portfolio-block-filter-editor', 'rtl', 'replace' );
-
 		register_block_type_from_metadata(
-			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter'
+			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter',
+			array(
+				'render_callback' => array( $this, 'block_render' ),
+			)
+		);
+	}
+
+	/**
+	 * Block output
+	 *
+	 * @param array  $attributes - block attributes.
+	 * @param string $content - block content.
+	 *
+	 * @return string
+	 */
+	public function block_render( $attributes, $content ) {
+		if ( empty( trim( $content ) ) ) {
+			return '';
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'aria-label' => esc_attr__( 'Filter', 'visual-portfolio' ),
+			)
+		);
+
+		return sprintf(
+			'<nav %1$s>%2$s</nav>',
+			$wrapper_attributes,
+			$content
 		);
 	}
 }
