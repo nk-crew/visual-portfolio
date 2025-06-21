@@ -1,6 +1,6 @@
 <?php
 /**
- * Gutenberg block.
+ * Saved layout block render and register.
  *
  * @package visual-portfolio
  */
@@ -32,10 +32,6 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
 	 * Register Block.
 	 */
 	public function register_block() {
-		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
-			return;
-		}
-
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/block-saved',
 			array(

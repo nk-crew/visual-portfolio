@@ -1,0 +1,58 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/filter",
+	"title": "Gallery Filter (Experimental)",
+	"category": "media",
+	"description": "Displays filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/loop"],
+	"textdomain": "visual-portfolio",
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"blockGap": ["horizontal", "vertical"],
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"__experimentalDefaultControls": { "blockGap": true }
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": { "type": "flex" }
+		},
+		"interactivity": { "clientNavigation": true }
+	},
+	"usesContext": [
+		"visual-portfolio/blockId",
+		"visual-portfolio/queryType",
+		"visual-portfolio/baseQuery",
+		"visual-portfolio/postsQuery",
+		"visual-portfolio/imagesQuery"
+	],
+	"providesContext": { "visual-portfolio-filter/showCount": "showCount" },
+	"styles": [{ "name": "fill", "label": "Fill" }],
+	"attributes": { "showCount": { "type": "boolean", "default": false } },
+	"style": "visual-portfolio-block-filter"
+}

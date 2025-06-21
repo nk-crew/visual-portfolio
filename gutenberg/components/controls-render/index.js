@@ -30,6 +30,10 @@ import { __ } from '@wordpress/i18n';
 
 import controlConditionCheck from '../../utils/control-condition-check';
 import controlGetValue from '../../utils/control-get-value';
+import {
+	convertLegacyToModern,
+	convertModernToLegacy,
+} from '../../utils/convert-legacy-attributes';
 import { maybeDecode, maybeEncode } from '../../utils/encode-decode';
 import AlignControl from '../align-control';
 import AspectRatio from '../aspect-ratio';
@@ -68,17 +72,37 @@ class ControlsRender extends Component {
 		const {
 			category,
 			categoryToggle = true,
-			attributes,
-			setAttributes,
 			controls,
 			clientId,
 			isSetupWizard,
+			isModernBlock = false,
 			showPanel = true,
 		} = this.props;
 
-		if (!attributes) {
+		if (!this.props.attributes) {
 			return null;
 		}
+
+		// Convert attributes if legacy controls used inside modern blocks.
+		const attributes = isModernBlock
+			? convertModernToLegacy(this.props.attributes)
+			: this.props.attributes;
+		const setAttributes = (newAttrs) => {
+			if (isModernBlock) {
+				newAttrs = convertLegacyToModern(newAttrs);
+
+				Object.keys(newAttrs).forEach((key) => {
+					if (typeof newAttrs[key] === 'object') {
+						newAttrs[key] = {
+							...this.props.attributes[key],
+							...newAttrs[key],
+						};
+					}
+				});
+			}
+
+			this.props.setAttributes(newAttrs);
+		};
 
 		// content source conditions.
 		if (
