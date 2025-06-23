@@ -7,7 +7,6 @@
 	"category": "media",
 	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
-	"icon": "download",
 	"supports": {
 		"html": false,
 		"reusable": false,

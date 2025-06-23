@@ -7,7 +7,8 @@ export default function BlockEdit({ attributes, setAttributes, context }) {
 	const { text, isActive, isAll, count } = attributes;
 
 	// Get context values with fallbacks
-	const showCount = context?.['visual-portfolio-filter/showCount'] || false;
+	const showCount =
+		context?.['visual-portfolio-filter-by-category/showCount'] || false;
 
 	const blockProps = useBlockProps({
 		className: classnames({
@@ -25,11 +26,11 @@ export default function BlockEdit({ attributes, setAttributes, context }) {
 				tagName="span"
 				value={text}
 				onChange={(newText) => setAttributes({ text: newText })}
-				placeholder={__('Add filter text…', 'visual-portfolio')}
+				placeholder={__('Add category text…', 'visual-portfolio')}
 				allowedFormats={[]}
 			/>
 			{showCount && !isAll && count > 0 && (
-				<span className="wp-block-visual-portfolio-filter-count">
+				<span className="wp-block-visual-portfolio-filter-by-category-count">
 					{count}
 				</span>
 			)}

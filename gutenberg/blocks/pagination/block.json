@@ -12,7 +12,6 @@
 		"visual-portfolio/pagination-next"
 	],
 	"textdomain": "visual-portfolio",
-	"icon": "ellipsis",
 	"attributes": {
 		"paginationType": { "type": "string", "default": "default" }
 	},

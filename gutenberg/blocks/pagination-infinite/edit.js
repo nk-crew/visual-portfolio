@@ -25,9 +25,7 @@ export default function PaginationInfiniteEdit({
 
 	const maxPages = baseQuery?.maxPages || 1;
 
-	const blockProps = useBlockProps({
-		className: `vp-pagination`,
-	});
+	const blockProps = useBlockProps();
 
 	return (
 		<>

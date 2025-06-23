@@ -2,11 +2,10 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/sort-buttons",
-	"title": "Gallery Sort Buttons (Experimental)",
+	"title": "Sort Buttons (Experimental)",
 	"description": "Add sorting options to your portfolio with buttons.",
 	"category": "media",
 	"ancestor": ["visual-portfolio/loop"],
-	"icon": "button",
 	"attributes": {
 		"sortType": {
 			"type": "string",

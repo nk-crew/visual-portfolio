@@ -1,10 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "visual-portfolio/filter",
-	"title": "Gallery Filter (Experimental)",
+	"name": "visual-portfolio/filter-by-category",
+	"title": "Filter by Category (Experimental)",
 	"category": "media",
-	"description": "Displays filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Displays category filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
 	"supports": {
@@ -51,8 +51,10 @@
 		"visual-portfolio/postsQuery",
 		"visual-portfolio/imagesQuery"
 	],
-	"providesContext": { "visual-portfolio-filter/showCount": "showCount" },
+	"providesContext": {
+		"visual-portfolio-filter-by-category/showCount": "showCount"
+	},
 	"styles": [{ "name": "fill", "label": "Fill" }],
 	"attributes": { "showCount": { "type": "boolean", "default": false } },
-	"style": "visual-portfolio-block-filter"
+	"style": "visual-portfolio-block-filter-by-category"
 }

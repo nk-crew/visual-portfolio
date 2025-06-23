@@ -9,6 +9,7 @@ import './pagination-hooks';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 
+import { ReactComponent as BlockIcon } from '../../block-icons/pagination.svg';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
@@ -19,6 +20,10 @@ import variations from './variations';
  */
 registerBlockType(metadata.name, {
 	...metadata,
+	icon: {
+		foreground: '#2540CC',
+		src: <BlockIcon width="20" height="20" />,
+	},
 	edit,
 	save,
 	variations,

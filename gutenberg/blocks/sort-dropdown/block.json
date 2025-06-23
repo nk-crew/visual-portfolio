@@ -2,11 +2,10 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/sort-dropdown",
-	"title": "Gallery Sort Dropdown (Experimental)",
+	"title": "Sort Dropdown (Experimental)",
 	"description": "Add sorting options to your portfolio",
 	"category": "media",
 	"ancestor": ["visual-portfolio/loop"],
-	"icon": "menu",
 	"attributes": {
 		"sortType": {
 			"type": "string",

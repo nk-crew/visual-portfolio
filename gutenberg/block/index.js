@@ -2,7 +2,7 @@ import './style.scss';
 
 import { registerBlockType } from '@wordpress/blocks';
 
-import { ReactComponent as ElementIcon } from '../../assets/admin/images/icon-gutenberg.svg';
+import { ReactComponent as BlockIcon } from '../block-icons/visual-portfolio.svg';
 import metadata from './block.json';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -15,7 +15,7 @@ const { name, usesContext } = metadata;
 const settings = {
 	icon: {
 		foreground: '#2540CC',
-		src: <ElementIcon width="20" height="20" />,
+		src: <BlockIcon width="20" height="20" />,
 	},
 	example: {
 		attributes: {

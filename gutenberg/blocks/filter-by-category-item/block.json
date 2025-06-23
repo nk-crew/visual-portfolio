@@ -1,13 +1,13 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "visual-portfolio/filter-item",
-	"title": "Gallery Filter Item (Experimental)",
+	"name": "visual-portfolio/filter-by-category-item",
+	"title": "Filter by Category Item (Experimental)",
 	"category": "media",
 	"description": "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.",
-	"ancestor": ["visual-portfolio/filter"],
+	"ancestor": ["visual-portfolio/filter-by-category"],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["visual-portfolio-filter/showCount"],
+	"usesContext": ["visual-portfolio-filter-by-category/showCount"],
 	"supports": {
 		"lock": true,
 		"html": false,

@@ -24,9 +24,7 @@ export default function PaginationLoadMoreEdit({
 
 	const maxPages = baseQuery?.maxPages || 1;
 
-	const blockProps = useBlockProps({
-		className: `vp-pagination`,
-	});
+	const blockProps = useBlockProps();
 
 	return (
 		<>

@@ -90,7 +90,7 @@ class Visual_Portfolio_Block_Pagination_Load_More {
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class' => 'vp-pagination ' . $no_more_class,
+				'class' => $no_more_class,
 			)
 		);
 

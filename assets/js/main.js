@@ -183,11 +183,15 @@ class VP {
 		}
 
 		if (self.$filter.length === 0) {
-			self.$filter = $item.find('.wp-block-visual-portfolio-filter');
+			self.$filter = $item.find(
+				'.wp-block-visual-portfolio-filter-by-category'
+			);
 		}
 
 		if (self.$pagination.length === 0) {
-			self.$pagination = $item.find('.vp-pagination');
+			self.$pagination = $item.find(
+				'.vp-pagination, .wp-block-visual-portfolio-pagination'
+			);
 		}
 
 		if (self.$sort.length === 0) {
@@ -576,13 +580,15 @@ class VP {
 		// on filter click
 		self.$filter.on(
 			`click${evp}`,
-			'.wp-block-visual-portfolio-filter-item > a',
+			'.wp-block-visual-portfolio-filter-by-category-item > a',
 			function (e) {
 				e.preventDefault();
 				const $this = $(this);
 				if (!self.loading) {
 					$this
-						.closest('.wp-block-visual-portfolio-filter-item')
+						.closest(
+							'.wp-block-visual-portfolio-filter-by-category-item'
+						)
 						.addClass('is-active')
 						.siblings()
 						.removeClass('is-active');
@@ -690,12 +696,14 @@ class VP {
 			e.preventDefault();
 
 			const $this = $(this);
-			const $pagination = $this.closest('.vp-pagination');
+			const $pagination = $this.closest(
+				'.vp-pagination, .wp-block-visual-portfolio-pagination'
+			);
 
 			// For the first handler, set pagination to 'paged'
 			if (
 				this.closest(
-					'.vp-pagination-number, .vp-pagination-next, .vp-pagination-prev'
+					'.vp-pagination-number, .wp-block-visual-portfolio-pagination-next, .wp-block-visual-portfolio-pagination-previous'
 				)
 			) {
 				self.options.pagination = 'paged';
@@ -723,7 +731,7 @@ class VP {
 		// Attach event handlers with optimized selectors
 		self.$pagination.on(
 			`click${evp}`,
-			'.vp-pagination-number a, .vp-pagination-next a.vp-pagination-next-link, .vp-pagination-prev a.vp-pagination-prev-link',
+			'.vp-pagination-number a, .wp-block-visual-portfolio-pagination-next, .wp-block-visual-portfolio-pagination-previous',
 			handlePaginationClick
 		);
 
@@ -985,7 +993,11 @@ class VP {
 					.html();
 
 				if (!paginationContent) {
-					paginationContent = $newVP.find('.vp-pagination').html();
+					paginationContent = $newVP
+						.find(
+							'.vp-pagination, .wp-block-visual-portfolio-pagination'
+						)
+						.html();
 				}
 
 				self.$pagination.html(paginationContent);

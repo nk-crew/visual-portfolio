@@ -1,6 +1,6 @@
 <?php
 /**
- * Block Filter.
+ * Block Filter by Category.
  *
  * @package visual-portfolio
  */
@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Visual Portfolio Filter block.
+ * Visual Portfolio Filter by Category block.
  */
-class Visual_Portfolio_Block_Filter {
+class Visual_Portfolio_Block_Filter_By_Category {
 	/**
 	 * Constructor.
 	 */
@@ -24,11 +24,11 @@ class Visual_Portfolio_Block_Filter {
 	 * Register Block.
 	 */
 	public function register_block() {
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-filter', 'build/gutenberg/blocks/filter/style' );
-		wp_style_add_data( 'visual-portfolio-block-filter', 'rtl', 'replace' );
+		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-filter-by-category', 'build/gutenberg/blocks/filter-by-category/style' );
+		wp_style_add_data( 'visual-portfolio-block-filter-by-category', 'rtl', 'replace' );
 
 		register_block_type_from_metadata(
-			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter',
+			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter-by-category',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
 			)
@@ -50,7 +50,7 @@ class Visual_Portfolio_Block_Filter {
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'aria-label' => esc_attr__( 'Filter', 'visual-portfolio' ),
+				'aria-label' => esc_attr__( 'Category filter', 'visual-portfolio' ),
 			)
 		);
 
@@ -61,4 +61,4 @@ class Visual_Portfolio_Block_Filter {
 		);
 	}
 }
-new Visual_Portfolio_Block_Filter();
+new Visual_Portfolio_Block_Filter_By_Category();

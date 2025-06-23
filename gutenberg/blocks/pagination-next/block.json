@@ -6,7 +6,6 @@
 	"category": "media",
 	"ancestor": ["visual-portfolio/pagination"],
 	"description": "Displays the next page link. Block is experimental and will change in future releases. Please use with caution.",
-	"icon": "arrow-right-alt2",
 	"textdomain": "visual-portfolio",
 	"usesContext": [
 		"visual-portfolio/blockId",

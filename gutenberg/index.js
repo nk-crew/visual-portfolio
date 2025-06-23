@@ -1,8 +1,8 @@
 import './block';
 import './block-saved';
 import './blocks/loop';
-import './blocks/filter';
-import './blocks/filter-item';
+import './blocks/filter-by-category';
+import './blocks/filter-by-category-item';
 import './blocks/pagination';
 import './blocks/pagination-infinite';
 import './blocks/pagination-load-more';

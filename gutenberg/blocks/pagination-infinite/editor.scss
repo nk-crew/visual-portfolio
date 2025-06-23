@@ -1,8 +1,7 @@
 /**
  * Pagination Minimal CSS Variables
  */
-.is-style-minimal,
-.wp-block-visual-portfolio-pagination-infinite {
+.wp-block-visual-portfolio-pagination-infinite.is-style-minimal {
 	// Items.
 	--vp-pagination-minimal--items__padding-v: 0.7em;
 	--vp-pagination-minimal--items__padding-h: 1em;
@@ -39,7 +38,7 @@
 /**
  * Pagination Default CSS Variables
  */
-.is-style-classic {
+.wp-block-visual-portfolio-pagination-infinite.is-style-classic {
 	// Items.
 	--vp-pagination-default--items__gap: 10px;
 	--vp-pagination-default--items__min-width: 40px;

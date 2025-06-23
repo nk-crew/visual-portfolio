@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
-const ALLOWED_BLOCKS = ['visual-portfolio/filter-item'];
+const ALLOWED_BLOCKS = ['visual-portfolio/filter-by-category-item'];
 
 export default function BlockEdit({
 	attributes,
@@ -157,17 +157,20 @@ export default function BlockEdit({
 						.filter((item) => !processedFilters.has(item.filter))
 						.map((item) => {
 							const isAll = item.filter === '*';
-							return createBlock('visual-portfolio/filter-item', {
-								text: isAll
-									? __('All', 'visual-portfolio')
-									: item.label,
-								filter: item.filter,
-								url: item.url,
-								taxonomyId: item.id,
-								parentId: item.parent,
-								isActive: item.active,
-								count: item.count || 0,
-							});
+							return createBlock(
+								'visual-portfolio/filter-by-category-item',
+								{
+									text: isAll
+										? __('All', 'visual-portfolio')
+										: item.label,
+									filter: item.filter,
+									url: item.url,
+									taxonomyId: item.id,
+									parentId: item.parent,
+									isActive: item.active,
+									count: item.count || 0,
+								}
+							);
 						});
 
 					// Combine updated blocks with new ones

@@ -147,8 +147,8 @@ export default function BlockEdit(props) {
 		if (innerBlocks.length === 0) {
 			const blocks = [
 				// Filter block with "All" item
-				createBlock('visual-portfolio/filter', {}, [
-					createBlock('visual-portfolio/filter-item', {
+				createBlock('visual-portfolio/filter-by-category', {}, [
+					createBlock('visual-portfolio/filter-by-category-item', {
 						text: __('All', 'visual-portfolio'),
 						isAll: true,
 						url: '#',
@@ -248,11 +248,11 @@ export default function BlockEdit(props) {
 		{
 			template: [
 				[
-					'visual-portfolio/filter',
+					'visual-portfolio/filter-by-category',
 					{},
 					[
 						[
-							'visual-portfolio/filter-item',
+							'visual-portfolio/filter-by-category-item',
 							{
 								text: 'All',
 								isAll: true,

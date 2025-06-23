@@ -1,6 +1,6 @@
 <?php
 /**
- * Block Filter Item.
+ * Block Filter by Category Item.
  *
  * @package visual-portfolio
  */
@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Visual Portfolio Filter item block.
+ * Visual Portfolio Filter by Category Item block.
  */
-class Visual_Portfolio_Block_Filter_Item {
+class Visual_Portfolio_Block_Filter_By_Category_Item {
 	/**
 	 * Constructor.
 	 */
@@ -25,7 +25,7 @@ class Visual_Portfolio_Block_Filter_Item {
 	 */
 	public function register_block() {
 		register_block_type_from_metadata(
-			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter-item',
+			visual_portfolio()->plugin_path . 'gutenberg/blocks/filter-by-category-item',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
 			)
@@ -52,8 +52,8 @@ class Visual_Portfolio_Block_Filter_Item {
 
 		// Get showCount from parent block context.
 		$show_count = false;
-		if ( isset( $block->context['visual-portfolio-filter/showCount'] ) ) {
-			$show_count = $block->context['visual-portfolio-filter/showCount'];
+		if ( isset( $block->context['visual-portfolio-filter-by-category/showCount'] ) ) {
+			$show_count = $block->context['visual-portfolio-filter-by-category/showCount'];
 		}
 
 		// Get current filter from URL and extract the actual value.
@@ -95,7 +95,7 @@ class Visual_Portfolio_Block_Filter_Item {
 
 		// Build the count display.
 		if ( $show_count && ! $is_all && $count > 0 ) {
-			$output_text = $output_text . '<span class="wp-block-visual-portfolio-filter-count">' . $count . '</span>';
+			$output_text = $output_text . '<span class="wp-block-visual-portfolio-filter-by-category-count">' . $count . '</span>';
 		}
 
 		$output = '';
@@ -140,4 +140,4 @@ class Visual_Portfolio_Block_Filter_Item {
 		return $output;
 	}
 }
-new Visual_Portfolio_Block_Filter_Item();
+new Visual_Portfolio_Block_Filter_By_Category_Item();

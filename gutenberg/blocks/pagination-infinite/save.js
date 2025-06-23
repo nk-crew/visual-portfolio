@@ -7,9 +7,7 @@ export default function save({ attributes }) {
 	const { loadingLabel, showLoadingText, loadMoreLabel, endListLabel } =
 		attributes;
 
-	const blockProps = useBlockProps.save({
-		className: `vp-pagination`,
-	});
+	const blockProps = useBlockProps.save();
 
 	return (
 		<div className="vp-portfolio__pagination-wrap">
