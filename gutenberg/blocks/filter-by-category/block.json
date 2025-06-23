@@ -41,8 +41,7 @@
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": { "type": "flex" }
-		},
-		"interactivity": { "clientNavigation": true }
+		}
 	},
 	"usesContext": [
 		"visual-portfolio/blockId",

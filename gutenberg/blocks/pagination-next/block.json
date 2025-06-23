@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-next",
-	"title": "Gallery Pagination Next (Experimental)",
+	"title": "Pagination Next (Experimental)",
 	"category": "media",
 	"ancestor": ["visual-portfolio/pagination"],
 	"description": "Displays the next page link. Block is experimental and will change in future releases. Please use with caution.",
@@ -41,9 +41,6 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		},
-		"interactivity": {
-			"clientNavigation": true
 		}
 	}
 }

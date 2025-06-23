@@ -196,7 +196,7 @@ class VP {
 
 		if (self.$sort.length === 0) {
 			self.$sort = $item.find(
-				'.vp-sort, .wp-block-visual-portfolio-sort-buttons, .wp-block-visual-portfolio-sort-dropdown'
+				'.vp-sort, .wp-block-visual-portfolio-sort'
 			);
 		}
 
@@ -615,44 +615,29 @@ class VP {
 		);
 
 		// on sort click
-		self.$sort.on(
-			`click${evp}`,
-			'.vp-sort .vp-sort__item a, .wp-block-visual-portfolio-sort-button > a',
-			function (e) {
-				e.preventDefault();
-				const $this = $(this);
-				if (!self.loading) {
-					$this
-						.closest('.vp-sort__item')
-						.addClass('vp-sort__item-active')
-						.siblings()
-						.removeClass('vp-sort__item-active');
-					$this
-						.closest('.wp-block-visual-portfolio-sort-button')
-						.addClass('is-active')
-						.siblings()
-						.removeClass('is-active');
-				}
-				self.loadNewItems($this.attr('href'), true);
+		self.$sort.on(`click${evp}`, '.vp-sort .vp-sort__item a', function (e) {
+			e.preventDefault();
+			const $this = $(this);
+			if (!self.loading) {
+				$this
+					.closest('.vp-sort__item')
+					.addClass('vp-sort__item-active')
+					.siblings()
+					.removeClass('vp-sort__item-active');
 			}
-		);
+			self.loadNewItems($this.attr('href'), true);
+		});
 
 		// on filter/sort select change
-		self.$filter
-			.add(self.$sort)
-			.on(
-				`change${evp}`,
-				'.vp-filter select, .vp-sort select, .vp-sort-dropdown select',
-				function () {
-					const $this = $(this);
-					const value = $this.val();
-					const $option = $this.find(`[value="${value}"]`);
+		self.$filter.add(self.$sort).on(`change${evp}`, 'select', function () {
+			const $this = $(this);
+			const value = $this.val();
+			const $option = $this.find(`[value="${value}"][data-vp-url]`);
 
-					if ($option.length) {
-						self.loadNewItems($option.attr('data-vp-url'), true);
-					}
-				}
-			);
+			if ($option.length) {
+				self.loadNewItems($option.attr('data-vp-url'), true);
+			}
+		});
 
 		// Function to handle scrolling to top
 		function scrollToTop($pagination) {

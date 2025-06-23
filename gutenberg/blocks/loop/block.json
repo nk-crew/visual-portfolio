@@ -84,7 +84,6 @@
 				"margin": false
 			}
 		},
-		"interactivity": { "clientNavigation": true },
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,

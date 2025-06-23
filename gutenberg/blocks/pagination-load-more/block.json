@@ -2,15 +2,14 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-load-more",
-	"title": "Gallery Pagination Load More (Experimental)",
+	"title": "Pagination Load More (Experimental)",
 	"description": "Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.",
 	"category": "media",
 	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
 	"supports": {
 		"html": false,
-		"reusable": false,
-		"interactivity": { "clientNavigation": true }
+		"reusable": false
 	},
 	"styles": [
 		{ "name": "minimal", "label": "Minimal", "isDefault": true },

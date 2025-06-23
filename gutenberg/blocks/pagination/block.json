@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/pagination",
-	"title": "Gallery Pagination (Experimental)",
+	"title": "Pagination (Experimental)",
 	"category": "media",
-	"description": "Displays paged pagination for Visual Portfolio loop. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Displays paged pagination for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/loop"],
 	"allowedBlocks": [
 		"visual-portfolio/pagination-previous",
@@ -49,8 +49,7 @@
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": { "type": "flex" }
-		},
-		"interactivity": { "clientNavigation": true }
+		}
 	},
 	"styles": [{ "name": "fill", "label": "Fill" }],
 	"style": "visual-portfolio-block-pagination",

@@ -224,9 +224,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'gutenberg/blocks/pagination-previous/index.php';
 			require_once $this->plugin_path . 'gutenberg/blocks/pagination-load-more/index.php';
 			require_once $this->plugin_path . 'gutenberg/blocks/pagination-infinite/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/sort-button/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/sort-buttons/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/sort-dropdown/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/sort/index.php';
 
 			require_once $this->plugin_path . 'classes/class-shortcode.php';
 			require_once $this->plugin_path . 'classes/class-preview.php';
