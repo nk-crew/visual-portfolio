@@ -166,7 +166,45 @@ const entryAssetsCss = glob
 		return entries;
 	}, {});
 
-const newConfig = {
+// JSX Runtime Polyfill Configuration
+const reactJSXRuntimePolyfill = {
+	mode: isProduction ? 'production' : 'development',
+	entry: {
+		'react-jsx-runtime': {
+			import: 'react/jsx-runtime',
+		},
+	},
+	output: {
+		path: path.resolve(__dirname, 'temp'), // Temporary folder
+		filename: 'react-jsx-runtime.js',
+		library: {
+			name: 'ReactJSXRuntime',
+			type: 'window',
+		},
+		clean: true, // Clean temp folder
+	},
+	externals: {
+		react: 'React',
+	},
+	module: {
+		rules: [
+			{
+				test: /\.jsx?$/,
+				exclude: /node_modules/,
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: ['@babel/preset-react'],
+					},
+				},
+			},
+		],
+	},
+	stats: 'minimal',
+	plugins: [],
+};
+
+const mainConfig = {
 	...defaultConfig,
 	entry: {
 		// Assets JS.
@@ -247,6 +285,11 @@ const newConfig = {
 							},
 						},
 						...vendorFiles,
+						// Copy JSX runtime from temp to build
+						{
+							source: 'temp/react-jsx-runtime.js',
+							destination: 'build/react-jsx-runtime.js',
+						},
 					],
 					delete: [
 						'build/templates',
@@ -254,6 +297,8 @@ const newConfig = {
 						'templates/**/*.js',
 						'templates/**/*.js.map',
 						'templates/**/*.asset.php',
+						// Clean up temp folder
+						'temp',
 					],
 				},
 			},
@@ -316,37 +361,44 @@ const newConfig = {
 			},
 		},
 	},
+
+	externals: {
+		...defaultConfig.externals,
+		'react/jsx-runtime': 'window.ReactJSXRuntime',
+	},
 };
 
 // Production only.
 if (isProduction) {
 	// Remove JS files created for styles
 	// to prevent enqueue it on production.
-	newConfig.plugins = [new RemoveEmptyScriptsPlugin(), ...newConfig.plugins];
+	mainConfig.plugins = [
+		new RemoveEmptyScriptsPlugin(),
+		...mainConfig.plugins,
+	];
 }
 
 // Development only.
 if (!isProduction) {
-	newConfig.devServer = {
-		...newConfig.devServer,
-		// Support for dev server on all domains.
+	// Support for dev server on all domains.
+	mainConfig.devServer = {
+		...mainConfig.devServer,
 		allowedHosts: 'all',
 	};
 
 	// Fix HMR is not working with multiple entries.
 	// @thanks https://github.com/webpack/webpack-dev-server/issues/2792#issuecomment-806983882
-	newConfig.optimization.runtimeChunk = 'single';
+	mainConfig.optimization.runtimeChunk = 'single';
 }
 
-newConfig.module.rules = newConfig.module.rules.map((rule) => {
+mainConfig.module.rules = mainConfig.module.rules.map((rule) => {
 	if (/svg/.test(rule.test)) {
 		return { ...rule, exclude: /\.svg$/i };
 	}
-
 	return rule;
 });
 
-newConfig.module.rules.push({
+mainConfig.module.rules.push({
 	test: /\.svg$/,
 	use: [
 		{
@@ -372,4 +424,4 @@ newConfig.module.rules.push({
 	],
 });
 
-module.exports = newConfig;
+module.exports = [reactJSXRuntimePolyfill, mainConfig];
