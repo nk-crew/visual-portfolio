@@ -404,7 +404,7 @@ class IframePreview extends Component {
 	}
 
 	render() {
-		const { postType, postId, context = {} } = this.props;
+		const { postType, postId, context } = this.props;
 
 		const { loading, uniqueId, currentIframeHeight, latestIframeHeight } =
 			this.state;
@@ -421,6 +421,7 @@ class IframePreview extends Component {
 					formData[formKey] = value;
 				}
 			});
+
 			contextAttributes = Object.fromEntries(
 				Object.entries(this.props.context).map(([key, value]) => [
 					key.replace('visual-portfolio/', ''),
