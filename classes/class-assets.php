@@ -68,12 +68,42 @@ class Visual_Portfolio_Assets {
 	}
 
 	/**
+	 * Check if React JSX Runtime file available and WordPress version requires it.
+	 *
+	 * @return boolean
+	 */
+	public static function is_react_jsx_runtime_support() {
+		global $wp_version;
+
+		// Check if WordPress has built-in JSX runtime support.
+		$has_core_jsx_runtime = version_compare( $wp_version, '6.6', '>=' ) &&
+							file_exists( ABSPATH . WPINC . '/js/dist/react-jsx-runtime.min.js' );
+
+		// Check if our polyfill file exists.
+		$polyfill_exists = file_exists( visual_portfolio()->plugin_path . '/build/react-jsx-runtime.js' );
+
+		// We need our polyfill if WordPress doesn't have JSX runtime and our file exists.
+		return ! $has_core_jsx_runtime && $polyfill_exists;
+	}
+
+	/**
 	 * Enqueue runtime script.
 	 */
 	public static function enqueue_runtime() {
 		// HMR Webpack.
 		if ( self::is_webpack_hmr_support() ) {
 			self::enqueue_script( 'visual-portfolio-runtime', 'build/runtime', array(), null, false );
+		}
+
+		// React JSX Runtime polyfill for WordPress < 6.6.
+		if ( self::is_react_jsx_runtime_support() ) {
+			self::register_script(
+				'react-jsx-runtime',
+				'build/react-jsx-runtime',
+				array( 'react' ),
+				'18.3.0',
+				true
+			);
 		}
 	}
 
