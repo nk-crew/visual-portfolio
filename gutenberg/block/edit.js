@@ -65,10 +65,15 @@ function renderControls(props, isChildOfLoop) {
 							return null;
 						}
 
+						// Open Layouts category by default when not in Loop context.
+						const categoryInitialOpen =
+							isChildOfLoop && name === 'layout-elements';
+
 						return (
 							<ControlsRender
 								key={name}
 								category={name}
+								categoryInitialOpen={categoryInitialOpen}
 								{...props}
 							/>
 						);

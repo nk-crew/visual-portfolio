@@ -72,6 +72,7 @@ class ControlsRender extends Component {
 		const {
 			category,
 			categoryToggle = true,
+			categoryInitialOpen = false,
 			controls,
 			clientId,
 			isSetupWizard,
@@ -169,7 +170,7 @@ class ControlsRender extends Component {
 		let categoryTitle = categoryToggle ? category : false;
 		let categoryIcon = false;
 		let categoryPro = false;
-		let categoryOpened = !categoryToggle;
+		let categoryOpened = categoryInitialOpen || !categoryToggle;
 
 		if (
 			categoryToggle &&
@@ -183,7 +184,7 @@ class ControlsRender extends Component {
 				openedCategoriesCache[category] =
 					registeredControlsCategories[category].is_opened || false;
 			}
-			categoryOpened = openedCategoriesCache[category];
+			categoryOpened = categoryOpened || openedCategoriesCache[category];
 		}
 
 		if (isSetupWizard) {
