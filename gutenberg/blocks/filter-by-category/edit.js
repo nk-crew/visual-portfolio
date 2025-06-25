@@ -14,8 +14,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
-const ALLOWED_BLOCKS = ['visual-portfolio/filter-by-category-item'];
-
 export default function BlockEdit({
 	attributes,
 	setAttributes,
@@ -233,7 +231,6 @@ export default function BlockEdit({
 	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps(blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
 		renderAppender: false,
 		templateLock: false, // Changed from 'all' to false to allow moving

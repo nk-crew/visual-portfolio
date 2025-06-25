@@ -44,8 +44,8 @@ export default function PaginationNextEdit({ attributes, setAttributes }) {
 					<PlainText
 						__experimentalVersion={2}
 						tagName="span"
-						aria-label={__('Next page link')}
-						placeholder={__('Next')}
+						aria-label={__('Next page link', 'visual-portfolio')}
+						placeholder={__('Next', 'visual-portfolio')}
 						value={label}
 						onChange={(newLabel) =>
 							setAttributes({ label: newLabel })

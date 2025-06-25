@@ -2,10 +2,10 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-numbers",
-	"title": "Pagination Numbers (Experimental)",
+	"title": "Numbers",
 	"category": "media",
 	"ancestor": ["visual-portfolio/pagination"],
-	"description": "Displays page numbers for navigation. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Displays page numbers for pagination.",
 	"textdomain": "visual-portfolio",
 	"usesContext": [
 		"visual-portfolio/blockId",

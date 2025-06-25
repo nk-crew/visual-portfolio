@@ -10,12 +10,8 @@ const ALLOWED_BLOCKS = [
 	'visual-portfolio/pagination-previous',
 	'visual-portfolio/pagination-numbers',
 	'visual-portfolio/pagination-next',
-];
-
-const TEMPLATE = [
-	['visual-portfolio/pagination-previous'],
-	['visual-portfolio/pagination-numbers'],
-	['visual-portfolio/pagination-next'],
+	'visual-portfolio/pagination-load-more',
+	'visual-portfolio/pagination-infinite',
 ];
 
 export default function PagedPaginationEdit() {
@@ -23,9 +19,7 @@ export default function PagedPaginationEdit() {
 
 	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		template: TEMPLATE,
 		orientation: 'horizontal',
-		renderAppender: false,
 	});
 
 	return <div {...innerBlocksProps} />;

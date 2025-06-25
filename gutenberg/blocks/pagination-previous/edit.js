@@ -52,8 +52,11 @@ export default function PaginationPreviousEdit({ attributes, setAttributes }) {
 					<PlainText
 						__experimentalVersion={2}
 						tagName="span"
-						aria-label={__('Previous page link')}
-						placeholder={__('Previous')}
+						aria-label={__(
+							'Previous page link',
+							'visual-portfolio'
+						)}
+						placeholder={__('Previous', 'visual-portfolio')}
 						value={label}
 						onChange={(newLabel) =>
 							setAttributes({ label: newLabel })

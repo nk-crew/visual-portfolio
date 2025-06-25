@@ -160,15 +160,11 @@ export default function BlockEdit(props) {
 				createBlock('visual-portfolio/block', {}),
 
 				// Pagination block with components
-				createBlock(
-					'visual-portfolio/pagination',
-					{ paginationType: 'default' },
-					[
-						createBlock('visual-portfolio/pagination-previous'),
-						createBlock('visual-portfolio/pagination-numbers'),
-						createBlock('visual-portfolio/pagination-next'),
-					]
-				),
+				createBlock('visual-portfolio/pagination', {}, [
+					createBlock('visual-portfolio/pagination-previous'),
+					createBlock('visual-portfolio/pagination-numbers'),
+					createBlock('visual-portfolio/pagination-next'),
+				]),
 			];
 
 			replaceInnerBlocks(clientId, blocks, false);
@@ -265,7 +261,7 @@ export default function BlockEdit(props) {
 				['visual-portfolio/block', {}],
 				[
 					'visual-portfolio/pagination',
-					{ paginationType: 'default' },
+					{},
 					[
 						['visual-portfolio/pagination-previous'],
 						['visual-portfolio/pagination-numbers'],

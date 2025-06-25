@@ -6,6 +6,7 @@
 	"category": "media",
 	"description": "Displays category filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/loop"],
+	"allowedBlocks": ["visual-portfolio/filter-by-category-item"],
 	"textdomain": "visual-portfolio",
 	"supports": {
 		"html": false,

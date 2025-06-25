@@ -2,19 +2,11 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/pagination-load-more",
-	"title": "Pagination Load More (Experimental)",
-	"description": "Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.",
+	"title": "Load More",
+	"description": "Displays a load more button for pagination.",
 	"category": "media",
-	"ancestor": ["visual-portfolio/loop"],
+	"ancestor": ["visual-portfolio/pagination"],
 	"textdomain": "visual-portfolio",
-	"supports": {
-		"html": false,
-		"reusable": false
-	},
-	"styles": [
-		{ "name": "minimal", "label": "Minimal", "isDefault": true },
-		{ "name": "classic", "label": "Classic" }
-	],
 	"usesContext": [
 		"visual-portfolio/blockId",
 		"visual-portfolio/queryType",
@@ -23,14 +15,31 @@
 		"visual-portfolio/imagesQuery"
 	],
 	"attributes": {
-		"label": { "type": "string", "default": "Load More" },
-		"loadingLabel": { "type": "string", "default": "Loading..." },
-		"endListLabel": {
-			"type": "string",
-			"default": "You've reached the end of the list"
-		},
-		"showLoadingText": { "type": "boolean", "default": true }
+		"label": { "type": "string" },
+		"loadingLabel": { "type": "string" }
 	},
-	"style": "visual-portfolio-block-pagination-load-more",
-	"editorStyle": "visual-portfolio-block-pagination-load-more-editor"
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"color": {
+			"gradients": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	}
 }

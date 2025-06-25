@@ -57,7 +57,7 @@ class Visual_Portfolio_Block_Paged_Pagination {
 
 		// Create base request data.
 		$request_data = array(
-			'content_source' => $context['visual-portfolio/queryType'] ?? 'post-based',
+			'content_source' => $context['visual-portfolio/queryType'] ?? 'posts',
 			'items_count'    => (int) ( $base_query['perPage'] ?? 6 ),
 			'vp_filter'      => sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) ),
 		);

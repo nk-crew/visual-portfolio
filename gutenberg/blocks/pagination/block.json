@@ -2,19 +2,18 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/pagination",
-	"title": "Pagination (Experimental)",
+	"title": "Pagination Wrapper (Experimental)",
 	"category": "media",
-	"description": "Displays paged pagination for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Displays pagination wrapper which can include paged, load more and infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/loop"],
 	"allowedBlocks": [
 		"visual-portfolio/pagination-previous",
 		"visual-portfolio/pagination-numbers",
-		"visual-portfolio/pagination-next"
+		"visual-portfolio/pagination-next",
+		"visual-portfolio/pagination-load-more",
+		"visual-portfolio/pagination-infinite"
 	],
 	"textdomain": "visual-portfolio",
-	"attributes": {
-		"paginationType": { "type": "string", "default": "default" }
-	},
 	"supports": {
 		"html": false,
 		"anchor": true,
@@ -53,5 +52,4 @@
 	},
 	"styles": [{ "name": "fill", "label": "Fill" }],
 	"style": "visual-portfolio-block-pagination",
-	"editorStyle": "visual-portfolio-block-pagination-editor"
 }
