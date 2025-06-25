@@ -475,12 +475,7 @@ class VP {
 		}
 
 		// prepare data options
-		const dataOptions = {};
-
-		// Copy properties from self.$item[0].dataset if it exists, potentially overwriting duplicates
-		if (self.$item && self.$item[0] && self.$item[0].dataset) {
-			Object.assign(dataOptions, self.$item[0].dataset);
-		}
+		const dataOptions = self.$item[0].dataset;
 
 		const pureDataOptions = {};
 		Object.keys(dataOptions).forEach((k) => {

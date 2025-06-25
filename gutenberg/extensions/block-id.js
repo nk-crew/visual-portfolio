@@ -5,8 +5,6 @@ import { withSelect } from '@wordpress/data';
 import { Component } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
-import { checkIsChildOfLoopBlock } from '../utils/is-child-of-loop-block';
-
 // List of used IDs to prevent duplicates.
 const usedIds = {};
 
@@ -46,43 +44,37 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
 		}
 
 		maybeCreateBlockId() {
-			if (
-				this.props.blockName === 'visual-portfolio/block' ||
-				this.props.blockName === 'visual-portfolio/loop'
-			) {
-				const { setAttributes, attributes, clientId } = this.props;
+			if (this.props.blockName !== 'visual-portfolio/block') {
+				return;
+			}
 
-				if (!checkIsChildOfLoopBlock(clientId)) {
-					const { block_id: blockId } = attributes;
+			const { setAttributes, attributes, clientId } = this.props;
 
-					if (!blockId || usedIds[blockId] !== clientId) {
-						let newBlockId = '';
+			const { block_id: blockId } = attributes;
 
-						// check if ID already exist.
-						let tryCount = 10;
-						while (
-							!newBlockId ||
-							(typeof usedIds[newBlockId] !== 'undefined' &&
-								usedIds[newBlockId] !== clientId &&
-								tryCount > 0)
-						) {
-							newBlockId = shorthash.unique(clientId);
-							tryCount -= 1;
-						}
+			if (!blockId || usedIds[blockId] !== clientId) {
+				let newBlockId = '';
 
-						if (
-							newBlockId &&
-							typeof usedIds[newBlockId] === 'undefined'
-						) {
-							usedIds[newBlockId] = clientId;
-						}
+				// check if ID already exist.
+				let tryCount = 10;
+				while (
+					!newBlockId ||
+					(typeof usedIds[newBlockId] !== 'undefined' &&
+						usedIds[newBlockId] !== clientId &&
+						tryCount > 0)
+				) {
+					newBlockId = shorthash.unique(clientId);
+					tryCount -= 1;
+				}
 
-						if (newBlockId !== blockId) {
-							setAttributes({
-								block_id: newBlockId,
-							});
-						}
-					}
+				if (newBlockId && typeof usedIds[newBlockId] === 'undefined') {
+					usedIds[newBlockId] = clientId;
+				}
+
+				if (newBlockId !== blockId) {
+					setAttributes({
+						block_id: newBlockId,
+					});
 				}
 			}
 		}

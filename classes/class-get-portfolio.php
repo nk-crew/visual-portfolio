@@ -263,8 +263,6 @@ class Visual_Portfolio_Get {
 
 		self::$used_layouts[] = $options['id'];
 
-		$class = '';
-
 		// generate unique ID.
 		$uid   = ++self::$id;
 		$uid   = hash( 'crc32b', $uid . $options['id'] );
