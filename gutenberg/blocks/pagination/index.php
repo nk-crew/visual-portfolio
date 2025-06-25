@@ -109,9 +109,9 @@ class Visual_Portfolio_Block_Paged_Pagination {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content ) {
-		if ( empty( trim( $content ) ) ) {
-			return '';
-		}
+		// We should always render the block, even if no content is provided.
+		// This prevents ajax loading from breaking when there is no block available.
+		$no_content = empty( trim( $content ) );
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
@@ -122,7 +122,7 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			$wrapper_attributes,
-			$content
+			$no_content ? '' : $content
 		);
 	}
 }
