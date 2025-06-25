@@ -4,10 +4,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 import ControlsRender from '../../components/controls-render';
 
@@ -90,16 +87,6 @@ export default function BlockEdit(props) {
 	// Create a ref to track previous attribute values
 	const prevAttributesRef = useRef({});
 
-	// Get inner blocks
-	const { innerBlocks } = useSelect(
-		(select) => ({
-			innerBlocks: select('core/block-editor').getBlocks(clientId),
-		}),
-		[clientId]
-	);
-
-	const { replaceInnerBlocks } = useDispatch('core/block-editor');
-
 	// Function to update maxPages via REST API
 	const updateMaxPages = debounce(async () => {
 		if (!queryType || !baseQuery.perPage) {
@@ -141,35 +128,6 @@ export default function BlockEdit(props) {
 			console.error('Error fetching max pages:', error);
 		}
 	}, 500);
-
-	// Initialize blocks when the loop block is first added
-	useEffect(() => {
-		if (innerBlocks.length === 0) {
-			const blocks = [
-				// Filter block with "All" item
-				createBlock('visual-portfolio/filter-by-category', {}, [
-					createBlock('visual-portfolio/filter-by-category-item', {
-						text: __('All', 'visual-portfolio'),
-						isAll: true,
-						url: '#',
-						isActive: true,
-					}),
-				]),
-
-				// Gallery block
-				createBlock('visual-portfolio/block', {}),
-
-				// Pagination block with components
-				createBlock('visual-portfolio/pagination', {}, [
-					createBlock('visual-portfolio/pagination-previous'),
-					createBlock('visual-portfolio/pagination-numbers'),
-					createBlock('visual-portfolio/pagination-next'),
-				]),
-			];
-
-			replaceInnerBlocks(clientId, blocks, false);
-		}
-	}, [clientId, innerBlocks.length, replaceInnerBlocks]);
 
 	// Update maxPages when relevant attributes change
 	useEffect(() => {
@@ -240,7 +198,7 @@ export default function BlockEdit(props) {
 	// Set up block props
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: 'vp-loop-content' },
+		{},
 		{
 			template: [
 				[
@@ -258,7 +216,7 @@ export default function BlockEdit(props) {
 						],
 					],
 				],
-				['visual-portfolio/block', {}],
+				['visual-portfolio/block', { setup_wizard: 'false' }],
 				[
 					'visual-portfolio/pagination',
 					{},
