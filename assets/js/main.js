@@ -166,7 +166,6 @@ class VP {
 		self.$pagination = $item.find('.vp-portfolio__pagination-wrap');
 		self.$filter = $item.find('.vp-portfolio__filter-wrap');
 		self.$sort = $item.find('.vp-portfolio__sort-wrap');
-		self.$block_wrap = $item.find('.vp-portfolio-wrapper');
 
 		// find single filter block.
 		if (self.id) {
@@ -477,15 +476,6 @@ class VP {
 
 		// prepare data options
 		const dataOptions = {};
-
-		// Copy properties from self.$block_wrap[0].dataset if it exists
-		if (
-			self.$block_wrap &&
-			self.$block_wrap[0] &&
-			self.$block_wrap[0].dataset
-		) {
-			Object.assign(dataOptions, self.$block_wrap[0].dataset);
-		}
 
 		// Copy properties from self.$item[0].dataset if it exists, potentially overwriting duplicates
 		if (self.$item && self.$item[0] && self.$item[0].dataset) {

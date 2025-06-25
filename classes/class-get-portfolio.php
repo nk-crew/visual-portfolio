@@ -245,11 +245,10 @@ class Visual_Portfolio_Get {
 	 * Prepare config, that will be used for output.
 	 *
 	 * @param array $atts options for portfolio list to print.
-	 * @param bool  $has_parent_context block has parent context.
 	 *
 	 * @return array|bool
 	 */
-	public static function get_output_config( $atts = array(), $has_parent_context = false ) {
+	public static function get_output_config( $atts = array() ) {
 		if ( ! is_array( $atts ) ) {
 			return '';
 		}
@@ -267,20 +266,12 @@ class Visual_Portfolio_Get {
 		$class = '';
 
 		// generate unique ID.
-		$uid = ++self::$id;
-		$uid = hash( 'crc32b', $uid . $options['id'] );
+		$uid   = ++self::$id;
+		$uid   = hash( 'crc32b', $uid . $options['id'] );
+		$class = 'vp-portfolio vp-uid-' . $uid;
 
-		if ( ! $has_parent_context ) {
-			$class .= 'vp-portfolio';
-			$class .= ' vp-uid-' . $uid;
-
-			// Add ID to class.
-			$class .= ' vp-id-' . $options['id'];
-		}
-
-		if ( $has_parent_context ) {
-			$class .= 'vp-portfolio-wrapper';
-		}
+		// Add ID to class.
+		$class .= ' vp-id-' . $options['id'];
 
 		// Add custom class.
 		if ( isset( $atts['class'] ) ) {
@@ -398,9 +389,7 @@ class Visual_Portfolio_Get {
 
 		if (
 			(
-				(
-					'post-based' === $options['content_source']
-				) &&
+				'post-based' === $options['content_source'] &&
 				'rand' === $options['posts_order_by']
 			) ||
 			(
@@ -809,12 +798,11 @@ class Visual_Portfolio_Get {
 	 * Print portfolio by post ID or options
 	 *
 	 * @param array $atts options for portfolio list to print.
-	 * @param bool  $has_parent_context block has parent context.
 	 *
 	 * @return string
 	 */
-	public static function get( $atts = array(), $has_parent_context = false ) {
-		$config = self::get_output_config( $atts, $has_parent_context );
+	public static function get( $atts = array() ) {
+		$config = self::get_output_config( $atts );
 
 		if ( ! $config ) {
 			return '';

@@ -5,7 +5,8 @@ const $doc = $(document);
 $doc.on('click', '.wp-block-visual-portfolio-filter-by-category a', (e) => {
 	const $current = $(e.currentTarget);
 	const $loop = $current.closest('.wp-block-visual-portfolio-loop');
-	const vpf = $loop?.[0]?.vpf;
+	const $legacyBlock = $loop.find('.vp-portfolio');
+	const vpf = $legacyBlock?.[0]?.vpf;
 
 	if (!vpf) {
 		return;

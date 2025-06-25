@@ -128,10 +128,9 @@ class Visual_Portfolio_Block_Filter_By_Category_Item {
 			);
 
 			$output = sprintf(
-				'<a aria-label="%1$s" href="%2$s" data-vp-filter="%3$s" %4$s>%5$s</a>',
+				'<a aria-label="%1$s" href="%2$s" %3$s>%4$s</a>',
 				$aria_label,
 				$filter_link,
-				$filter,
 				$wrapper_attributes,
 				$output_text
 			);

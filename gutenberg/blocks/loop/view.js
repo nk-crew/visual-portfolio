@@ -14,14 +14,19 @@ $doc.on('loadedNewItems.vpf', function (event, vpObject, $newVP) {
 		return;
 	}
 
-	if (!vpObject.$item.hasClass('wp-block-visual-portfolio-loop')) {
+	if (!vpObject.$item.closest('.wp-block-visual-portfolio-loop').length) {
 		return;
 	}
 
+	const $currentLoop = vpObject.$item.closest(
+		'.wp-block-visual-portfolio-loop'
+	);
+	const $newLoop = $newVP.closest('.wp-block-visual-portfolio-loop');
+
 	// For each block type, find and replace them maintaining order
 	blockSelectors.forEach((selector) => {
-		const $currentBlocks = vpObject.$item.find(selector);
-		const $newBlocks = $newVP.find(selector);
+		const $currentBlocks = $currentLoop.find(selector);
+		const $newBlocks = $newLoop.find(selector);
 
 		// Replace each block in order
 		$currentBlocks.each(function (index) {

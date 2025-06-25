@@ -52,9 +52,6 @@ class Visual_Portfolio_Block {
 			$attributes
 		);
 
-		// Check if block has parent context.
-		$has_parent_context = isset( $block->context['visual-portfolio/blockId'] );
-
 		// Transform context to attributes.
 		$context_attributes = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );
 
@@ -70,7 +67,7 @@ class Visual_Portfolio_Block {
 			)
 		);
 
-		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, Visual_Portfolio_Get::get( $merged_attributes, $has_parent_context ) );
+		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, Visual_Portfolio_Get::get( $merged_attributes ) );
 	}
 }
 new Visual_Portfolio_Block();

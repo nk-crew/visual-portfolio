@@ -77,7 +77,7 @@ class Visual_Portfolio_Block_Sort {
 
 			$is_active = ! $active_item && ! $slug ? true : $active_item === $slug;
 
-			$content .= '<option data-vp-url="' . esc_url( $url ) . '" data-vp-sort="' . esc_attr( $slug ) . '" value="' . esc_attr( $slug ) . '" ' . selected( $is_active, true, false ) . '>';
+			$content .= '<option data-vp-url="' . esc_url( $url ) . '" value="' . esc_attr( $slug ) . '" ' . selected( $is_active, true, false ) . '>';
 			$content .= esc_html( $label );
 			$content .= '</option>';
 		}
