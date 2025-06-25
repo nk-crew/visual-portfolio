@@ -76,7 +76,7 @@ class Visual_Portfolio_Block_Pagination_Infinite {
 		}
 
 		return sprintf(
-			'<a href="%1$s" %2$s>%3$s<span class="wp-block-visual-portfolio-pagination-load-more-loading"><span class="vp-spinner"></span><span class="vp-screen-reader-text">%4$s</span></span></a>',
+			'<a href="%1$s" %2$s><span>%3$s</span><span class="wp-block-visual-portfolio-pagination-load-more-loading"><span class="vp-spinner"></span><span class="vp-screen-reader-text">%4$s</span></span></a>',
 			$next_link,
 			$wrapper_attributes,
 			wp_kses_post( $label ),

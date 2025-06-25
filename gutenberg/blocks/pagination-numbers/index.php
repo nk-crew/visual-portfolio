@@ -88,7 +88,7 @@ class Visual_Portfolio_Block_Pagination_Numbers {
 					);
 				} else {
 					$output .= sprintf(
-						'<a aria-label="%1$s" href="%2$s" data-vp-pagination="%3$s">%3$s</a>',
+						'<a aria-label="%1$s" href="%2$s">%3$s</a>',
 						// translators: %s page number.
 						sprintf( esc_attr__( 'Page %s', 'visual-portfolio' ), $link['label'] ),
 						$url,

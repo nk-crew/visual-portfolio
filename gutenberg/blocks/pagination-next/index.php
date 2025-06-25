@@ -87,7 +87,7 @@ class Visual_Portfolio_Block_Pagination_Next {
 		}
 
 		return sprintf(
-			'<a href="%1$s" data-vp-pagination="next" %2$s>%3$s</a>',
+			'<a href="%1$s" %2$s>%3$s</a>',
 			$next_link,
 			$wrapper_attributes,
 			$label

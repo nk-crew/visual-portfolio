@@ -103,5 +103,6 @@
 		"visual-portfolio/baseQuery": "baseQuery",
 		"visual-portfolio/postsQuery": "postsQuery",
 		"visual-portfolio/imagesQuery": "imagesQuery"
-	}
+	},
+	"viewScript": "visual-portfolio-block-loop"
 }

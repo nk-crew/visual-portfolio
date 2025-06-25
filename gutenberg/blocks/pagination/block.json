@@ -52,4 +52,5 @@
 	},
 	"styles": [{ "name": "fill", "label": "Fill" }],
 	"style": "visual-portfolio-block-pagination",
+	"viewScript": "visual-portfolio-block-pagination"
 }

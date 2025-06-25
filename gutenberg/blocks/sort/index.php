@@ -27,6 +27,8 @@ class Visual_Portfolio_Block_Sort {
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-sort', 'build/gutenberg/blocks/sort/style' );
 		wp_style_add_data( 'visual-portfolio-block-sort', 'rtl', 'replace' );
 
+		Visual_Portfolio_Assets::register_script( 'visual-portfolio-block-sort', 'build/gutenberg/blocks/sort/view' );
+
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/sort',
 			array(

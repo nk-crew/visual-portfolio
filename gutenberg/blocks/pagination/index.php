@@ -27,6 +27,8 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-pagination', 'build/gutenberg/blocks/pagination/style' );
 		wp_style_add_data( 'visual-portfolio-block-pagination', 'rtl', 'replace' );
 
+		Visual_Portfolio_Assets::register_script( 'visual-portfolio-block-pagination', 'build/gutenberg/blocks/pagination/view' );
+
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/pagination',
 			array(

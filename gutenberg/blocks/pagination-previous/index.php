@@ -92,7 +92,7 @@ class Visual_Portfolio_Block_Pagination_Previous {
 		}
 
 		return sprintf(
-			'<a href="%1$s" data-vp-pagination="prev" %2$s>%3$s</a>',
+			'<a href="%1$s" %2$s>%3$s</a>',
 			$prev_link,
 			$wrapper_attributes,
 			$label

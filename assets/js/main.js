@@ -182,24 +182,6 @@ class VP {
 			);
 		}
 
-		if (self.$filter.length === 0) {
-			self.$filter = $item.find(
-				'.wp-block-visual-portfolio-filter-by-category'
-			);
-		}
-
-		if (self.$pagination.length === 0) {
-			self.$pagination = $item.find(
-				'.vp-pagination, .wp-block-visual-portfolio-pagination'
-			);
-		}
-
-		if (self.$sort.length === 0) {
-			self.$sort = $item.find(
-				'.vp-sort, .wp-block-visual-portfolio-sort'
-			);
-		}
-
 		// user options
 		self.userOptions = userOptions;
 
@@ -577,26 +559,6 @@ class VP {
 				);
 		});
 
-		// on filter click
-		self.$filter.on(
-			`click${evp}`,
-			'.wp-block-visual-portfolio-filter-by-category-item > a',
-			function (e) {
-				e.preventDefault();
-				const $this = $(this);
-				if (!self.loading) {
-					$this
-						.closest(
-							'.wp-block-visual-portfolio-filter-by-category-item'
-						)
-						.addClass('is-active')
-						.siblings()
-						.removeClass('is-active');
-				}
-				self.loadNewItems($this.attr('href'), true);
-			}
-		);
-
 		self.$filter.on(
 			`click${evp}`,
 			'.vp-filter .vp-filter__item a',
@@ -629,15 +591,23 @@ class VP {
 		});
 
 		// on filter/sort select change
-		self.$filter.add(self.$sort).on(`change${evp}`, 'select', function () {
-			const $this = $(this);
-			const value = $this.val();
-			const $option = $this.find(`[value="${value}"][data-vp-url]`);
+		self.$filter
+			.add(self.$sort)
+			.on(
+				`change${evp}`,
+				'.vp-filter select, .vp-sort select',
+				function () {
+					const $this = $(this);
+					const value = $this.val();
+					const $option = $this.find(
+						`[value="${value}"][data-vp-url]`
+					);
 
-			if ($option.length) {
-				self.loadNewItems($option.attr('data-vp-url'), true);
-			}
-		});
+					if ($option.length) {
+						self.loadNewItems($option.attr('data-vp-url'), true);
+					}
+				}
+			);
 
 		// Function to handle scrolling to top
 		function scrollToTop($pagination) {
@@ -676,54 +646,30 @@ class VP {
 			}
 		}
 
-		// Function to handle pagination click
-		function handlePaginationClick(e) {
-			e.preventDefault();
-
-			const $this = $(this);
-			const $pagination = $this.closest(
-				'.vp-pagination, .wp-block-visual-portfolio-pagination'
-			);
-
-			// For the first handler, set pagination to 'paged'
-			if (
-				this.closest(
-					'.vp-pagination-number, .wp-block-visual-portfolio-pagination-next, .wp-block-visual-portfolio-pagination-previous'
-				)
-			) {
-				self.options.pagination = 'paged';
-			}
-
-			if (this.closest('.vp-pagination-load-more')) {
-				self.options.pagination = 'load-more';
-			}
-
-			if (
-				$pagination.hasClass('vp-pagination__no-more') &&
-				self.options.pagination !== 'paged'
-			) {
-				return;
-			}
-
-			self.loadNewItems(
-				$this.attr('href'),
-				self.options.pagination === 'paged'
-			);
-
-			scrollToTop($pagination);
-		}
-
-		// Attach event handlers with optimized selectors
-		self.$pagination.on(
-			`click${evp}`,
-			'.vp-pagination-number a, .wp-block-visual-portfolio-pagination-next, .wp-block-visual-portfolio-pagination-previous',
-			handlePaginationClick
-		);
-
+		// Handle pagination click
 		self.$item.on(
 			`click${evp}`,
 			'.vp-pagination .vp-pagination__item a',
-			handlePaginationClick
+			function (e) {
+				e.preventDefault();
+
+				const $this = $(this);
+				const $pagination = $this.closest('.vp-pagination');
+
+				if (
+					$pagination.hasClass('vp-pagination__no-more') &&
+					self.options.pagination !== 'paged'
+				) {
+					return;
+				}
+
+				self.loadNewItems(
+					$this.attr('href'),
+					self.options.pagination === 'paged'
+				);
+
+				scrollToTop($pagination);
+			}
 		);
 
 		// on categories of item click
@@ -973,19 +919,9 @@ class VP {
 
 			// update pagination
 			if (self.$pagination.length) {
-				let paginationContent = $newVP
-					.find('.vp-portfolio__pagination-wrap')
-					.html();
-
-				if (!paginationContent) {
-					paginationContent = $newVP
-						.find(
-							'.vp-pagination, .wp-block-visual-portfolio-pagination'
-						)
-						.html();
-				}
-
-				self.$pagination.html(paginationContent);
+				self.$pagination.html(
+					$newVP.find('.vp-portfolio__pagination-wrap').html()
+				);
 			}
 
 			self.addItems($(newItems), removeExisting, $newVP);

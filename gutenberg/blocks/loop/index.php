@@ -24,6 +24,8 @@ class Visual_Portfolio_Block_Loop {
 	 * Register Block.
 	 */
 	public function register_block() {
+		Visual_Portfolio_Assets::register_script( 'visual-portfolio-block-loop', 'build/gutenberg/blocks/loop/view' );
+
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/loop',
 			array(

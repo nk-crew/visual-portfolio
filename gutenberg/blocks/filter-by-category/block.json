@@ -56,5 +56,6 @@
 	},
 	"styles": [{ "name": "fill", "label": "Fill" }],
 	"attributes": { "showCount": { "type": "boolean", "default": false } },
-	"style": "visual-portfolio-block-filter-by-category"
+	"style": "visual-portfolio-block-filter-by-category",
+	"viewScript": "visual-portfolio-block-filter-by-category"
 }

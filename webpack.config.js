@@ -133,6 +133,7 @@ const entryAssetsJs = glob
 		'./assets/js/**.js',
 		'./assets/admin/js/**.js',
 		'./assets/js/3rd/plugin-jetpack.js',
+		'./gutenberg/**/view.js',
 		'./gutenberg/index.js',
 		'./gutenberg/custom-post-meta.js',
 		'./gutenberg/layouts-editor.js',

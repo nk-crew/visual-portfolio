@@ -20,6 +20,17 @@
 	display: none;
 }
 
+.vp-portfolio__loading {
+	.wp-block-visual-portfolio-pagination-load-more-loading,
+	.wp-block-visual-portfolio-pagination-infinite-loading {
+		display: block;
+	}
+	.wp-block-visual-portfolio-pagination-load-more > :first-child,
+	.wp-block-visual-portfolio-pagination-infinite > :first-child {
+		display: none;
+	}
+}
+
 // Numbers block
 .wp-block-visual-portfolio-pagination-numbers {
 	display: flex;

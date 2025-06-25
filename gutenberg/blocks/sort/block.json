@@ -37,5 +37,6 @@
 			"margin": ["top", "bottom"]
 		}
 	},
-	"style": "visual-portfolio-block-sort"
+	"style": "visual-portfolio-block-sort",
+	"viewScript": "visual-portfolio-block-sort"
 }
