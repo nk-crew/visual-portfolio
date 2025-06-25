@@ -619,17 +619,27 @@ class Visual_Portfolio_Security {
 			$type    = is_array( $config ) ? $config[0] : $config;
 			$default = is_array( $config ) && isset( $config[1] ) ? $config[1] : null;
 
-			$validated_value = match ( $type ) {
-				'string' => is_scalar( $value ) ? (string) $value : $default,
-				'number' => is_numeric( $value ) ? ( is_float( $value ) ? (float) $value : (int) $value ) : $default,
-				'boolean' => is_bool( $value ) ? $value : ( is_numeric( $value ) ? (bool) $value : $default ),
-				'array' => is_array( $value ) ? $value : (
-					is_string( $value ) && str_starts_with( $value, '[' ) ?
-						( json_decode( $value, true ) ? json_decode( $value, true ) : $default ) :
-						( null !== $default ? $default : array() )
-				),
-				default => $default
-			};
+			switch ( $type ) {
+				case 'string':
+					$validated_value = is_scalar( $value ) ? (string) $value : $default;
+					break;
+				case 'number':
+					$validated_value = is_numeric( $value ) ? ( is_float( $value ) ? (float) $value : (int) $value ) : $default;
+					break;
+				case 'boolean':
+					$validated_value = is_bool( $value ) ? $value : ( is_numeric( $value ) ? (bool) $value : $default );
+					break;
+				case 'array':
+					$validated_value = is_array( $value ) ? $value : (
+						is_string( $value ) && strpos( $value, '[' ) === 0 ?
+							( json_decode( $value, true ) ? json_decode( $value, true ) : $default ) :
+							( null !== $default ? $default : array() )
+					);
+					break;
+				default:
+					$validated_value = $default;
+					break;
+			}
 
 			if ( null !== $validated_value || null !== $default ) {
 				$filtered_params[ $key ] = $validated_value;
