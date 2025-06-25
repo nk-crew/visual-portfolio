@@ -2,7 +2,6 @@
 const ATTRIBUTE_MAPPINGS = {
 	// Direct mappings (modern.key -> legacy.key)
 	direct: {
-		blockId: 'block_id',
 		queryType: 'content_source',
 	},
 

@@ -8,7 +8,6 @@
 	"description": "Displays page numbers for pagination.",
 	"textdomain": "visual-portfolio",
 	"usesContext": [
-		"visual-portfolio/blockId",
 		"visual-portfolio/queryType",
 		"visual-portfolio/baseQuery",
 		"visual-portfolio/postsQuery",

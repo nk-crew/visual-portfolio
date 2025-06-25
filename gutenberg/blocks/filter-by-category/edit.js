@@ -25,7 +25,6 @@ export default function BlockEdit({
 	const initialLoadDone = useRef(false);
 
 	const {
-		'visual-portfolio/blockId': blockId,
 		'visual-portfolio/queryType': contentSource,
 		'visual-portfolio/baseQuery': baseQuery,
 		'visual-portfolio/imagesQuery': imagesQuery,
@@ -56,7 +55,6 @@ export default function BlockEdit({
 	useEffect(() => {
 		const hasContextChanged = () => {
 			const currentContext = {
-				blockId,
 				contentSource,
 				postsSource,
 				postsTaxonomies,
@@ -87,7 +85,7 @@ export default function BlockEdit({
 				return;
 			}
 
-			if (!blockId || (!hasContextChanged() && hasInnerBlocks)) {
+			if (!hasContextChanged() && hasInnerBlocks) {
 				setIsLoading(false);
 				return;
 			}
@@ -99,7 +97,6 @@ export default function BlockEdit({
 
 				let queryArgs = {
 					content_source: contentSource,
-					block_id: blockId,
 					post_id: postId,
 					items_count: itemsCount,
 				};
@@ -197,7 +194,6 @@ export default function BlockEdit({
 
 		fetchFilterItems();
 	}, [
-		blockId,
 		contentSource,
 		postsSource,
 		postsTaxonomies,

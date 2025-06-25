@@ -18,7 +18,6 @@ class Visual_Portfolio_Convert_Attributes {
 	private static $attribute_mappings = array(
 		// Direct mappings (modern.key -> legacy.key).
 		'direct' => array(
-			'blockId'   => 'block_id',
 			'queryType' => 'content_source',
 		),
 		// Nested mappings (modern.parent.child -> legacy.key).

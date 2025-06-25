@@ -87,11 +87,6 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'block_id' => array(
-						'required'          => true,
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
-					),
 					'posts_source' => array(
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -227,10 +222,9 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 */
 	public function get_filter_items( $request ) {
 		$content_source = $request->get_param( 'content_source' );
-		$block_id       = $request->get_param( 'block_id' );
 		$post_id        = $request->get_param( 'post_id' );
 
-		if ( ! $content_source || ! $block_id ) {
+		if ( ! $content_source ) {
 			return $this->error(
 				'missing_params',
 				esc_html__( 'Required parameters are missing.', 'visual-portfolio' )
@@ -238,7 +232,6 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		}
 
 		$options = array(
-			'id'             => $block_id,
 			'content_source' => $content_source,
 		);
 

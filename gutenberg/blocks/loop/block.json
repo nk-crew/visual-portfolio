@@ -98,7 +98,6 @@
 		}
 	},
 	"providesContext": {
-		"visual-portfolio/blockId": "block_id",
 		"visual-portfolio/queryType": "queryType",
 		"visual-portfolio/baseQuery": "baseQuery",
 		"visual-portfolio/postsQuery": "postsQuery",

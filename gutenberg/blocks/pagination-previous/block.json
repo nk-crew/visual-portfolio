@@ -8,7 +8,6 @@
 	"description": "Displays the previous page link.",
 	"textdomain": "visual-portfolio",
 	"usesContext": [
-		"visual-portfolio/blockId",
 		"visual-portfolio/queryType",
 		"visual-portfolio/baseQuery",
 		"visual-portfolio/postsQuery",

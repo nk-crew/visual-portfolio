@@ -88,24 +88,21 @@ export default function BlockEdit(props) {
 	const { attributes, setAttributes, context } = props;
 
 	const {
-		block_id: blockIdFromAttributes,
+		block_id: blockId,
 		content_source: contentSourceFromAttributes,
 		setup_wizard: setupWizard,
 		preview_image_example: previewExample,
 		layout,
 	} = attributes;
 
-	const {
-		'visual-portfolio/blockId': blockIdFromContext,
-		'visual-portfolio/queryType': contentSourceFromContext,
-	} = context || {};
+	const { 'visual-portfolio/queryType': contentSourceFromContext } =
+		context || {};
 
 	// Use context values if they exist, otherwise fall back to attributes
-	const blockId = blockIdFromContext || blockIdFromAttributes;
 	const contentSource =
 		contentSourceFromContext || contentSourceFromAttributes;
 
-	const isChildOfLoop = !!blockIdFromContext;
+	const isChildOfLoop = !!contentSourceFromContext;
 
 	// Display setup wizard on mount.
 	useEffect(() => {

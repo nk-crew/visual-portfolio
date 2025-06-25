@@ -15,7 +15,6 @@
 		"align": ["wide", "full"]
 	},
 	"usesContext": [
-		"visual-portfolio/blockId",
 		"visual-portfolio/queryType",
 		"visual-portfolio/baseQuery",
 		"visual-portfolio/postsQuery",
