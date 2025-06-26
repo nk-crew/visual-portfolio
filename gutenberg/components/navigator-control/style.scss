@@ -4,8 +4,15 @@
 }
 
 .vpf-control-wrap-category_navigator:has(+ .vpf-control-wrap) {
-	padding-bottom: 4px;
+	padding-bottom: 10px;
 	border-bottom: 1px solid #e0e0e0;
+}
+
+.vpf-control-wrap-category_navigator:has(+ .vpf-control-wrap-category_navigator) {
+	margin-bottom: 0;
+}
+.vpf-control-wrap-category_navigator + .vpf-control-wrap-category_navigator {
+	border-top: none;
 }
 
 .vpf-component-navigator-control {
