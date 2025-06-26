@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.3.16 - Jun 26, 2025 =
+
+* started our way to transition to modern blocks. Added new **experimental** blocks:
+  * DON'T USE THESE BLOCKS ON PRODUCTION! Development is still in progress and we may break these blocks.
+  * Gallery Loop
+  * Filter by Category
+  * Pagination Wrapper
+    * Infinite
+    * Load More
+    * Next
+    * Previous
+    * Numbers
+  * Sort
+* **Pro:**
+* fixed proofing gallery hash links in comments
+* minor fixes
+
 = 3.3.15 - Jun 4, 2025 =
 
 * fixed broken css and js urls for lazyload fallback (used in legacy browsers only)
