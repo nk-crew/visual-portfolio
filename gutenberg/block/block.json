@@ -15,9 +15,9 @@
 		"align": ["wide", "full"]
 	},
 	"usesContext": [
-		"visual-portfolio/queryType",
-		"visual-portfolio/baseQuery",
-		"visual-portfolio/postsQuery",
-		"visual-portfolio/imagesQuery"
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery"
 	]
 }

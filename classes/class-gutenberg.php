@@ -148,7 +148,7 @@ class Visual_Portfolio_Gutenberg {
 	 * @param string $namespace Context namespace.
 	 * @return array
 	 */
-	public static function transform_context_to_attributes( $context, $namespace = 'visual-portfolio' ) {
+	public static function transform_context_to_attributes( $context, $namespace = 'vp' ) {
 		if ( empty( $context ) || ! is_array( $context ) ) {
 			return array();
 		}

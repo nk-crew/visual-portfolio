@@ -5,10 +5,10 @@ const $doc = $(document);
 
 $doc.on(
 	'click',
-	'.wp-block-visual-portfolio-pagination-previous, .wp-block-visual-portfolio-pagination-next, .wp-block-visual-portfolio-pagination-numbers a, .wp-block-visual-portfolio-pagination-load-more, .wp-block-visual-portfolio-pagination-infinite',
+	'.vp-block-pagination-previous, .vp-block-pagination-next, .vp-block-pagination-numbers a, .vp-block-pagination-load-more, .vp-block-pagination-infinite',
 	(e) => {
 		const $current = $(e.currentTarget);
-		const $loop = $current.closest('.wp-block-visual-portfolio-loop');
+		const $loop = $current.closest('.vp-block-loop');
 		const $legacyBlock = $loop.find('.vp-portfolio');
 		const vpf = $legacyBlock?.[0]?.vpf;
 
@@ -19,12 +19,9 @@ $doc.on(
 		e.preventDefault();
 
 		const isPaged =
-			$current.hasClass(
-				'wp-block-visual-portfolio-pagination-previous'
-			) ||
-			$current.hasClass('wp-block-visual-portfolio-pagination-next') ||
-			!!$current.parent('.wp-block-visual-portfolio-pagination-numbers')
-				.length;
+			$current.hasClass('vp-block-pagination-previous') ||
+			$current.hasClass('vp-block-pagination-next') ||
+			!!$current.parent('.vp-block-pagination-numbers').length;
 
 		vpf.loadNewItems($current.attr('href'), isPaged);
 	}
@@ -38,10 +35,7 @@ $doc.on('loadedNewItems.vpf', function (event, vpObject) {
 		return;
 	}
 
-	if (
-		!vpObject.$item.find('wp-block-visual-portfolio-pagination-infinite')
-			.length
-	) {
+	if (!vpObject.$item.find('vp-block-pagination-infinite').length) {
 		return;
 	}
 
@@ -49,7 +43,7 @@ $doc.on('loadedNewItems.vpf', function (event, vpObject) {
 	// Use setTimeout to allow DOM to settle after content insertion
 	setTimeout(() => {
 		const $infinitePagination = vpObject.$item.find(
-			'.wp-block-visual-portfolio-pagination-infinite.is-intersecting:first'
+			'.vp-block-pagination-infinite.is-intersecting:first'
 		);
 
 		if ($infinitePagination.length && $infinitePagination.attr('href')) {
@@ -78,9 +72,7 @@ const infiniteObserver = new window.IntersectionObserver(
 					// Mark as intersecting and trigger loading
 					entry.target.classList.add('is-intersecting');
 
-					const loop = entry.target.closest(
-						'.wp-block-visual-portfolio-loop'
-					);
+					const loop = entry.target.closest('.vp-block-loop');
 					const legacyBlock = loop?.querySelector('.vp-portfolio');
 					const vpf = legacyBlock?.vpf;
 
@@ -103,7 +95,7 @@ const infiniteObserver = new window.IntersectionObserver(
 const initInfiniteThrottled = throttle(() => {
 	document
 		.querySelectorAll(
-			'.wp-block-visual-portfolio-pagination-infinite[href]:not(.is-handled)'
+			'.vp-block-pagination-infinite[href]:not(.is-handled)'
 		)
 		.forEach((element) => {
 			element.classList.add('is-handled');

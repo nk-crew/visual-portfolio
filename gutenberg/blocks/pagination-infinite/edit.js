@@ -11,7 +11,7 @@ export default function Edit({ attributes, setAttributes }) {
 		<a
 			href="#pagination-load-more-pseudo-link"
 			onClick={(event) => event.preventDefault()}
-			{...useBlockProps()}
+			{...useBlockProps({ className: 'vp-block-pagination-infinite' })}
 		>
 			<PlainText
 				__experimentalVersion={2}

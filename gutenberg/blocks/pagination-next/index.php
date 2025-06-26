@@ -52,7 +52,11 @@ class Visual_Portfolio_Block_Pagination_Next {
 			return '';
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes();
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => 'vp-block-pagination-next',
+			)
+		);
 		$show_label         = $attributes['showLabel'] ?? true;
 		$default_label      = esc_html__( 'Next', 'visual-portfolio' );
 		$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
@@ -63,7 +67,7 @@ class Visual_Portfolio_Block_Pagination_Next {
 			$wrapper_attributes .= ' aria-label="' . $label_text . '"';
 		}
 		if ( $show_arrow ) {
-			$label = $label . '<span class="wp-block-visual-portfolio-pagination-next-arrow" aria-hidden="true">&rsaquo;</span>';
+			$label = $label . '<span class="vp-block-pagination-next-arrow" aria-hidden="true">&rsaquo;</span>';
 		}
 
 		$pagination_links = Visual_Portfolio_Get::get_pagination_links(

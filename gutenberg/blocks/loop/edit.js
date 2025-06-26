@@ -196,7 +196,7 @@ export default function BlockEdit(props) {
 	}
 
 	// Set up block props
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps({ className: 'vp-block-loop' });
 	const innerBlocksProps = useInnerBlocksProps(
 		{},
 		{

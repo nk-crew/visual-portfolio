@@ -58,9 +58,9 @@
 		"setupWizard": { "type": "string", "default": "" }
 	},
 	"supports": {
-		"ghostkit": true,
-		"anchor": true,
 		"html": false,
+		"className": false,
+		"anchor": true,
 		"align": ["wide", "full"],
 		"layout": true,
 		"typography": {
@@ -98,10 +98,10 @@
 		}
 	},
 	"providesContext": {
-		"visual-portfolio/queryType": "queryType",
-		"visual-portfolio/baseQuery": "baseQuery",
-		"visual-portfolio/postsQuery": "postsQuery",
-		"visual-portfolio/imagesQuery": "imagesQuery"
+		"vp/queryType": "queryType",
+		"vp/baseQuery": "baseQuery",
+		"vp/postsQuery": "postsQuery",
+		"vp/imagesQuery": "imagesQuery"
 	},
 	"viewScript": "visual-portfolio-block-loop"
 }

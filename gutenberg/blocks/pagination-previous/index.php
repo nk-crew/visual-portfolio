@@ -57,7 +57,11 @@ class Visual_Portfolio_Block_Pagination_Previous {
 			return '';
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes();
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => 'vp-block-pagination-previous',
+			)
+		);
 		$show_label         = $attributes['showLabel'] ?? true;
 		$default_label      = esc_html__( 'Previous', 'visual-portfolio' );
 		$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
@@ -68,7 +72,7 @@ class Visual_Portfolio_Block_Pagination_Previous {
 			$wrapper_attributes .= ' aria-label="' . $label_text . '"';
 		}
 		if ( $show_arrow ) {
-			$label = '<span class="wp-block-visual-portfolio-pagination-previous-arrow" aria-hidden="true">&lsaquo;</span>' . $label;
+			$label = '<span class="vp-block-pagination-previous-arrow" aria-hidden="true">&lsaquo;</span>' . $label;
 		}
 
 		$pagination_links = Visual_Portfolio_Get::get_pagination_links(

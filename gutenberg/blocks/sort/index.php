@@ -46,7 +46,11 @@ class Visual_Portfolio_Block_Sort {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content ) {
-		$wrapper_attributes = get_block_wrapper_attributes();
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => 'vp-block-sort',
+			)
+		);
 
 		$content = '';
 

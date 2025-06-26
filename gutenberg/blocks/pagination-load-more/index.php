@@ -53,7 +53,11 @@ class Visual_Portfolio_Block_Pagination_Load_More {
 		// Get current page.
 		$current_page = max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
 
-		$wrapper_attributes = get_block_wrapper_attributes();
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => 'vp-block-pagination-load-more',
+			)
+		);
 
 		$pagination_links = Visual_Portfolio_Get::get_pagination_links(
 			array(
@@ -76,7 +80,7 @@ class Visual_Portfolio_Block_Pagination_Load_More {
 		}
 
 		return sprintf(
-			'<a href="%1$s" %2$s><span>%3$s</span><span class="wp-block-visual-portfolio-pagination-load-more-loading"><span class="vp-spinner"></span><span class="vp-screen-reader-text">%4$s</span></span></a>',
+			'<a href="%1$s" %2$s><span>%3$s</span><span class="vp-block-pagination-load-more-loading"><span class="vp-spinner"></span><span class="vp-screen-reader-text">%4$s</span></span></a>',
 			$next_link,
 			$wrapper_attributes,
 			wp_kses_post( $label ),

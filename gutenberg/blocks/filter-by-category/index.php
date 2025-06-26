@@ -52,6 +52,7 @@ class Visual_Portfolio_Block_Filter_By_Category {
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
+				'class'      => 'vp-block-filter-by-category',
 				'aria-label' => esc_attr__( 'Category filter', 'visual-portfolio' ),
 			)
 		);

@@ -31,11 +31,7 @@ const previewPaginationNumbers = (midSize, lastItem) => {
 
 	// Dots.
 	paginationItems.push(
-		createPaginationItem(
-			'...',
-			'span',
-			'wp-block-visual-portfolio-pagination-dots'
-		)
+		createPaginationItem('...', 'span', 'vp-block-pagination-dots')
 	);
 
 	// Last pagination item.
@@ -50,7 +46,7 @@ export default function PaginationNumbersEdit({
 	context,
 }) {
 	const { midSize } = attributes;
-	const { 'visual-portfolio/baseQuery': baseQuery } = context;
+	const { 'vp/baseQuery': baseQuery } = context;
 
 	const maxPages = baseQuery?.maxPages || 1;
 	const paginationNumbers = previewPaginationNumbers(
@@ -81,7 +77,11 @@ export default function PaginationNumbersEdit({
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div {...useBlockProps()}>{paginationNumbers}</div>
+			<div
+				{...useBlockProps({ className: 'vp-block-pagination-numbers' })}
+			>
+				{paginationNumbers}
+			</div>
 		</>
 	);
 }

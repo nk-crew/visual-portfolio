@@ -45,7 +45,7 @@ class Visual_Portfolio_Block_Paged_Pagination {
 	 */
 	public static function get_max_pages( $context ) {
 		// Get context values.
-		$max_pages = $context['visual-portfolio/baseQuery']['maxPages'] ?? 1;
+		$max_pages = $context['vp/baseQuery']['maxPages'] ?? 1;
 
 		// Check if filtering is applied.
 		if ( empty( $_GET['vp_filter'] ) ) {
@@ -55,11 +55,11 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		// If filter is applied, we need to recalculate max_pages.
 		$rest_api = new Visual_Portfolio_Rest();
 
-		$base_query = $context['visual-portfolio/baseQuery'] ?? null;
+		$base_query = $context['vp/baseQuery'] ?? null;
 
 		// Create base request data.
 		$request_data = array(
-			'content_source' => $context['visual-portfolio/queryType'] ?? 'posts',
+			'content_source' => $context['vp/queryType'] ?? 'posts',
 			'items_count'    => (int) ( $base_query['perPage'] ?? 6 ),
 			'vp_filter'      => sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) ),
 		);
@@ -78,7 +78,7 @@ class Visual_Portfolio_Block_Paged_Pagination {
 	 */
 	private static function map_context_to_request( $context ) {
 		$request_data = array();
-		$prefix       = 'visual-portfolio/';
+		$prefix       = 'vp/';
 
 		foreach ( $context as $key => $value ) {
 			// Skip if key doesn't start with our prefix.
@@ -115,6 +115,7 @@ class Visual_Portfolio_Block_Paged_Pagination {
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
+				'class'      => 'vp-block-pagination',
 				'aria-label' => esc_attr__( 'Pagination', 'visual-portfolio' ),
 			)
 		);

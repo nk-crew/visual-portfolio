@@ -43,8 +43,7 @@ function renderControls(props, isChildOfLoop) {
 	}
 
 	// Use context value if available, otherwise use contentSource from attributes
-	contentSource =
-		(context && context['visual-portfolio/queryType']) || contentSource;
+	contentSource = (context && context['vp/queryType']) || contentSource;
 
 	const filteredCategories = filterControlCategories(
 		registeredControlsCategories,
@@ -100,8 +99,7 @@ export default function BlockEdit(props) {
 		layout,
 	} = attributes;
 
-	const { 'visual-portfolio/queryType': contentSourceFromContext } =
-		context || {};
+	const { 'vp/queryType': contentSourceFromContext } = context || {};
 
 	// Use context values if they exist, otherwise fall back to attributes
 	const contentSource =

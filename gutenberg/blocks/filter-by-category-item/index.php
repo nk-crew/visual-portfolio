@@ -87,7 +87,7 @@ class Visual_Portfolio_Block_Filter_By_Category_Item {
 		// Get block wrapper attributes but override the class completely.
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class'          => $should_be_active ? 'is-active' : '',
+				'class' => 'vp-block-filter-by-category-item' . ( $should_be_active ? ' is-active' : '' ),
 			)
 		);
 
@@ -95,7 +95,7 @@ class Visual_Portfolio_Block_Filter_By_Category_Item {
 
 		// Build the count display.
 		if ( $show_count && ! $is_all && $count > 0 ) {
-			$output_text = $output_text . '<span class="wp-block-visual-portfolio-filter-by-category-count">' . $count . '</span>';
+			$output_text = $output_text . '<span class="vp-block-filter-by-category-count">' . $count . '</span>';
 		}
 
 		$output = '';

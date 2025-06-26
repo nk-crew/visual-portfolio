@@ -49,7 +49,11 @@ class Visual_Portfolio_Block_Pagination_Numbers {
 			return '';
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes();
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => 'vp-block-pagination-numbers',
+			)
+		);
 
 		// Get current page.
 		$current_page = max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
@@ -75,7 +79,7 @@ class Visual_Portfolio_Block_Pagination_Numbers {
 		// Iterate over pagination links.
 		foreach ( $pagination_links as $link ) {
 			if ( $link['is_dots'] ) {
-				$output .= '<span class="wp-block-visual-portfolio-pagination-dots">...</span>';
+				$output .= '<span class="vp-block-pagination-dots">...</span>';
 			} else {
 				$url = $link['url'] ? esc_url( $link['url'] ) : '#';
 

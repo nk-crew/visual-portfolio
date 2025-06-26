@@ -38,11 +38,13 @@ export default function PaginationPreviousEdit({ attributes, setAttributes }) {
 			<a
 				href="#pagination-previous-pseudo-link"
 				onClick={(event) => event.preventDefault()}
-				{...useBlockProps()}
+				{...useBlockProps({
+					className: 'vp-block-pagination-previous',
+				})}
 			>
 				{showArrow && (
 					<span
-						className="wp-block-visual-portfolio-pagination-previous-arrow"
+						className="vp-block-pagination-previous-arrow"
 						aria-hidden
 					>
 						&lsaquo;

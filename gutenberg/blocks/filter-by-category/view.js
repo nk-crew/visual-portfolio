@@ -2,9 +2,9 @@ import $ from 'jquery';
 
 const $doc = $(document);
 
-$doc.on('click', '.wp-block-visual-portfolio-filter-by-category a', (e) => {
+$doc.on('click', '.vp-block-filter-by-category a', (e) => {
 	const $current = $(e.currentTarget);
-	const $loop = $current.closest('.wp-block-visual-portfolio-loop');
+	const $loop = $current.closest('.vp-block-loop');
 	const $legacyBlock = $loop.find('.vp-portfolio');
 	const vpf = $legacyBlock?.[0]?.vpf;
 

@@ -10,6 +10,7 @@
 	"textdomain": "visual-portfolio",
 	"supports": {
 		"html": false,
+		"className": false,
 		"anchor": true,
 		"align": ["wide", "full"],
 		"color": {
@@ -45,10 +46,10 @@
 		}
 	},
 	"usesContext": [
-		"visual-portfolio/queryType",
-		"visual-portfolio/baseQuery",
-		"visual-portfolio/postsQuery",
-		"visual-portfolio/imagesQuery"
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery"
 	],
 	"providesContext": {
 		"visual-portfolio-filter-by-category/showCount": "showCount"

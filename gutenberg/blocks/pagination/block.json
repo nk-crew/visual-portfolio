@@ -16,6 +16,7 @@
 	"textdomain": "visual-portfolio",
 	"supports": {
 		"html": false,
+		"className": false,
 		"anchor": true,
 		"align": ["wide", "full"],
 		"color": {

@@ -15,7 +15,7 @@ $brand_color: #2540cc !default;
 	border-radius: 6px;
 
 	// Hide default Gutenberg outline and use our own.
-	.wp-block-visual-portfolio-block.is-selected:has(> &) {
+	.vp-block-block.is-selected:has(> &) {
 		&::after {
 			content: none !important;
 		}

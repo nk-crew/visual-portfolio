@@ -187,7 +187,7 @@ class IframePreview extends Component {
 		const newContext = this.props.context
 			? Object.fromEntries(
 					Object.entries(this.props.context).map(([key, value]) => [
-						key.replace('visual-portfolio/', ''),
+						key.replace('vp/', ''),
 						value,
 					])
 				)
@@ -195,7 +195,7 @@ class IframePreview extends Component {
 		const oldContext = prevProps.context
 			? Object.fromEntries(
 					Object.entries(prevProps.context).map(([key, value]) => [
-						key.replace('visual-portfolio/', ''),
+						key.replace('vp/', ''),
 						value,
 					])
 				)
@@ -416,15 +416,15 @@ class IframePreview extends Component {
 		if (context) {
 			// Then override with context values (they take priority)
 			Object.entries(context).forEach(([key, value]) => {
-				if (key.startsWith('visual-portfolio/')) {
-					const formKey = `vp_${key.replace('visual-portfolio/', '')}`;
+				if (key.startsWith('vp/')) {
+					const formKey = `vp_${key.replace('vp/', '')}`;
 					formData[formKey] = value;
 				}
 			});
 
 			contextAttributes = Object.fromEntries(
 				Object.entries(this.props.context).map(([key, value]) => [
-					key.replace('visual-portfolio/', ''),
+					key.replace('vp/', ''),
 					value,
 				])
 			);

@@ -11,6 +11,7 @@
 	"supports": {
 		"lock": true,
 		"html": false,
+		"className": false,
 		"anchor": true,
 		"align": false,
 		"alignWide": false,

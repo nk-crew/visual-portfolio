@@ -8,10 +8,10 @@
 	"ancestor": ["visual-portfolio/pagination"],
 	"textdomain": "visual-portfolio",
 	"usesContext": [
-		"visual-portfolio/queryType",
-		"visual-portfolio/baseQuery",
-		"visual-portfolio/postsQuery",
-		"visual-portfolio/imagesQuery"
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery"
 	],
 	"attributes": {
 		"label": { "type": "string" },
@@ -20,6 +20,7 @@
 	"supports": {
 		"reusable": false,
 		"html": false,
+		"className": false,
 		"color": {
 			"gradients": true,
 			"text": false,

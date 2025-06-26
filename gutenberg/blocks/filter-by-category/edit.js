@@ -25,10 +25,10 @@ export default function BlockEdit({
 	const initialLoadDone = useRef(false);
 
 	const {
-		'visual-portfolio/queryType': contentSource,
-		'visual-portfolio/baseQuery': baseQuery,
-		'visual-portfolio/imagesQuery': imagesQuery,
-		'visual-portfolio/postsQuery': postsQuery,
+		'vp/queryType': contentSource,
+		'vp/baseQuery': baseQuery,
+		'vp/imagesQuery': imagesQuery,
+		'vp/postsQuery': postsQuery,
 	} = context;
 
 	const images = imagesQuery.images;
@@ -224,7 +224,9 @@ export default function BlockEdit({
 		}
 	}, [attributes.showCount]);
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps({
+		className: 'vp-block-filter-by-category',
+	});
 
 	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		orientation: 'horizontal',

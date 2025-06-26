@@ -38,7 +38,7 @@ export default function PaginationNextEdit({ attributes, setAttributes }) {
 			<a
 				href="#pagination-next-pseudo-link"
 				onClick={(event) => event.preventDefault()}
-				{...useBlockProps()}
+				{...useBlockProps({ className: 'vp-block-pagination-next' })}
 			>
 				{showLabel && (
 					<PlainText
@@ -54,7 +54,7 @@ export default function PaginationNextEdit({ attributes, setAttributes }) {
 				)}
 				{showArrow && (
 					<span
-						className="wp-block-visual-portfolio-pagination-next-arrow"
+						className="vp-block-pagination-next-arrow"
 						aria-hidden
 					>
 						&rsaquo;

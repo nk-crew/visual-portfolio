@@ -1,11 +1,11 @@
 // Pagination block.
-.wp-block-visual-portfolio-filter-by-category {
+.vp-block-filter-by-category {
 	font-size: var(--wp--preset--font-size--medium, 1rem);
 	font-weight: 500;
 }
 
 // Count.
-.wp-block-visual-portfolio-filter-by-category-count {
+.vp-block-filter-by-category-count {
 	display: inline-block;
 	margin-left: 0.6ch;
 
@@ -19,7 +19,7 @@
 
 // Fill style.
 .is-style-fill {
-	&.wp-block-visual-portfolio-filter-by-category {
+	&.vp-block-filter-by-category {
 		gap: 0;
 
 		a {
@@ -27,7 +27,7 @@
 		}
 	}
 
-	.wp-block-visual-portfolio-filter-by-category-item {
+	.vp-block-filter-by-category-item {
 		border-radius: 9999px;
 		padding: 0.3em 0.8em;
 		background-color: transparent;

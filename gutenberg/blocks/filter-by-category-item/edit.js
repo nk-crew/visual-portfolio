@@ -11,7 +11,7 @@ export default function BlockEdit({ attributes, setAttributes, context }) {
 		context?.['visual-portfolio-filter-by-category/showCount'] || false;
 
 	const blockProps = useBlockProps({
-		className: classnames({
+		className: classnames('vp-block-filter-by-category-item', {
 			'is-active': isActive,
 		}),
 	});
@@ -30,7 +30,7 @@ export default function BlockEdit({ attributes, setAttributes, context }) {
 				allowedFormats={[]}
 			/>
 			{showCount && !isAll && count > 0 && (
-				<span className="wp-block-visual-portfolio-filter-by-category-count">
+				<span className="vp-block-filter-by-category-count">
 					{count}
 				</span>
 			)}

@@ -4,9 +4,9 @@ const $doc = $(document);
 
 // Define the block selectors we need to replace after ajax loading.
 const blockSelectors = [
-	'.wp-block-visual-portfolio-filter-by-category',
-	'.wp-block-visual-portfolio-sort',
-	'.wp-block-visual-portfolio-pagination',
+	'.vp-block-filter-by-category',
+	'.vp-block-sort',
+	'.vp-block-pagination',
 ];
 
 $doc.on('loadedNewItems.vpf', function (event, vpObject, $newVP) {
@@ -14,14 +14,12 @@ $doc.on('loadedNewItems.vpf', function (event, vpObject, $newVP) {
 		return;
 	}
 
-	if (!vpObject.$item.closest('.wp-block-visual-portfolio-loop').length) {
+	if (!vpObject.$item.closest('.vp-block-loop').length) {
 		return;
 	}
 
-	const $currentLoop = vpObject.$item.closest(
-		'.wp-block-visual-portfolio-loop'
-	);
-	const $newLoop = $newVP.closest('.wp-block-visual-portfolio-loop');
+	const $currentLoop = vpObject.$item.closest('.vp-block-loop');
+	const $newLoop = $newVP.closest('.vp-block-loop');
 
 	// For each block type, find and replace them maintaining order
 	blockSelectors.forEach((selector) => {

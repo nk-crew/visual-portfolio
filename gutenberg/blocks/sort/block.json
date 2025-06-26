@@ -9,6 +9,7 @@
 	"textdomain": "visual-portfolio",
 	"supports": {
 		"html": false,
+		"className": false,
 		"anchor": true,
 		"color": {
 			"text": true,
