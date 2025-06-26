@@ -196,6 +196,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'gutenberg/utils/control-condition-check/index.php';
 			require_once $this->plugin_path . 'gutenberg/utils/control-get-value/index.php';
 			require_once $this->plugin_path . 'gutenberg/utils/controls-dynamic-css/index.php';
+			require_once $this->plugin_path . 'gutenberg/utils/convert-legacy-attributes/index.php';
 			require_once $this->plugin_path . 'gutenberg/utils/encode-decode/index.php';
 			require_once $this->plugin_path . 'classes/class-templates.php';
 			require_once $this->plugin_path . 'classes/class-parse-blocks.php';
@@ -210,8 +211,21 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'classes/class-images.php';
 			require_once $this->plugin_path . 'classes/class-rest.php';
 			require_once $this->plugin_path . 'classes/class-get-portfolio.php';
+
 			require_once $this->plugin_path . 'classes/class-gutenberg.php';
-			require_once $this->plugin_path . 'classes/class-gutenberg-saved.php';
+			require_once $this->plugin_path . 'gutenberg/block/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/loop/index.php';
+			require_once $this->plugin_path . 'gutenberg/block-saved/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/filter-by-category-item/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/filter-by-category/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-next/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-numbers/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-previous/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-load-more/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/pagination-infinite/index.php';
+			require_once $this->plugin_path . 'gutenberg/blocks/sort/index.php';
+
 			require_once $this->plugin_path . 'classes/class-shortcode.php';
 			require_once $this->plugin_path . 'classes/class-preview.php';
 			require_once $this->plugin_path . 'classes/class-custom-post-type.php';

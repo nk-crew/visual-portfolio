@@ -986,6 +986,12 @@
          "Extra Large (VP)": [
             ""
          ],
+         "Required parameters are missing.": [
+            ""
+         ],
+         "Sorry, you are not allowed to get filter items.": [
+            ""
+         ],
          "Sorry, you are not allowed to get list of saved layouts.": [
             ""
          ],
@@ -1346,6 +1352,27 @@
          "Upgrade to PRO Now": [
             ""
          ],
+         "Currently displaying all items": [
+            ""
+         ],
+         "Currently filtering by %1$s, %2$s items": [
+            ""
+         ],
+         "Display all items": [
+            ""
+         ],
+         "Filter by %1$s, %2$s items": [
+            ""
+         ],
+         "Category filter": [
+            ""
+         ],
+         "Loading...": [
+            ""
+         ],
+         "Page %s": [
+            ""
+         ],
          "Author": [
             ""
          ],
@@ -1389,6 +1416,24 @@
             ""
          ],
          "Saved %s": [
+            ""
+         ],
+         "Add category text…": [
+            ""
+         ],
+         "Load more link": [
+            ""
+         ],
+         "Show label text": [
+            ""
+         ],
+         "Show arrow": [
+            ""
+         ],
+         "Next page link": [
+            ""
+         ],
+         "Previous page link": [
             ""
          ],
          "Wide 16:9": [
@@ -1635,6 +1680,36 @@
          "block title\u0004Visual Portfolio": [
             ""
          ],
+         "block title\u0004Filter by Category Item (Experimental)": [
+            ""
+         ],
+         "block title\u0004Filter by Category (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Loop (Experimental)": [
+            ""
+         ],
+         "block title\u0004Infinite": [
+            ""
+         ],
+         "block title\u0004Load More": [
+            ""
+         ],
+         "block title\u0004Next": [
+            ""
+         ],
+         "block title\u0004Numbers": [
+            ""
+         ],
+         "block title\u0004Previous": [
+            ""
+         ],
+         "block title\u0004Pagination Wrapper (Experimental)": [
+            ""
+         ],
+         "block title\u0004Sort (Experimental)": [
+            ""
+         ],
          "block title\u0004Visual Portfolio Editor": [
             ""
          ],
@@ -1642,6 +1717,36 @@
             ""
          ],
          "block description\u0004Display galleries, posts and portfolio grids.": [
+            ""
+         ],
+         "block description\u0004Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays category filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Display gallery loop. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays a infinite scroll trigger for pagination.": [
+            ""
+         ],
+         "block description\u0004Displays a load more button for pagination.": [
+            ""
+         ],
+         "block description\u0004Displays the next page link.": [
+            ""
+         ],
+         "block description\u0004Displays page numbers for pagination.": [
+            ""
+         ],
+         "block description\u0004Displays the previous page link.": [
+            ""
+         ],
+         "block description\u0004Displays pagination wrapper which can include paged, load more and infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays sort options for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "block description\u0004Edit saved Visual Portfolio layouts.": [
@@ -1663,6 +1768,15 @@
             ""
          ],
          "block keyword\u0004posts": [
+            ""
+         ],
+         "block keyword\u0004loop": [
+            ""
+         ],
+         "block keyword\u0004query": [
+            ""
+         ],
+         "block style label\u0004Fill": [
             ""
          ]
       }

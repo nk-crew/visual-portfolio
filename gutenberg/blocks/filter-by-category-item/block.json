@@ -1,0 +1,69 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/filter-by-category-item",
+	"title": "Filter by Category Item (Experimental)",
+	"category": "media",
+	"description": "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/filter-by-category"],
+	"textdomain": "visual-portfolio",
+	"usesContext": ["visual-portfolio-filter-by-category/showCount"],
+	"supports": {
+		"lock": true,
+		"html": false,
+		"anchor": true,
+		"align": false,
+		"alignWide": false,
+		"color": {
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"reusable": false,
+		"spacing": {
+			"padding": ["horizontal", "vertical"],
+			"__experimentalDefaultControls": { "padding": true }
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		}
+	},
+	"attributes": {
+		"lock": {
+			"type": "object",
+			"default": { "move": true, "remove": true }
+		},
+		"text": { "type": "string", "default": "" },
+		"filter": { "type": "string", "default": "*" },
+		"isAll": { "type": "boolean", "default": false },
+		"url": { "type": "string", "default": "" },
+		"taxonomyId": { "type": "number", "default": 0 },
+		"parentId": { "type": "number", "default": 0 },
+		"isActive": { "type": "boolean", "default": false },
+		"count": { "type": "number", "default": 0 },
+		"style": { "type": "object" }
+	}
+}

@@ -14,6 +14,7 @@ import {
 import { Component, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { checkIsChildOfLoopBlock } from '../../utils/is-child-of-loop-block';
 import ControlsRender from '../controls-render';
 
 const alignIcons = {
@@ -87,9 +88,24 @@ function ElementsSelectorOptions(props) {
 		parentProps,
 	} = props;
 
+	const { clientId } = parentProps.props;
+
 	const [isOpen, setOpen] = useState(false);
 	const openModal = () => setOpen(true);
 	const closeModal = () => setOpen(false);
+
+	const isChildOfLoop = checkIsChildOfLoopBlock(clientId);
+
+	if (isChildOfLoop) {
+		return options[optionName] && options[optionName].category ? (
+			<ControlsRender
+				{...parentProps.props}
+				category={'layouts'}
+				categoryToggle={false}
+				showPanel={false}
+			/>
+		) : null;
+	}
 
 	return (
 		<>
@@ -116,7 +132,8 @@ function ElementsSelectorOptions(props) {
 					/>
 				</svg>
 			</button>
-			{isOpen ? (
+
+			{isOpen && (
 				<Modal
 					title={`${
 						options[optionName]
@@ -128,20 +145,21 @@ function ElementsSelectorOptions(props) {
 							e?.relatedTarget?.classList?.contains('media-modal')
 						) {
 							// Don't close modal if opened media modal.
-						} else {
-							closeModal(e);
+							return;
 						}
+						closeModal(e);
 					}}
 					className="vpf-component-elements-selector-modal"
 				>
-					{options[optionName] && options[optionName].category ? (
+					{options[optionName] && options[optionName].category && (
 						<ControlsRender
 							{...parentProps.props}
 							category={options[optionName].category}
 							categoryToggle={false}
 						/>
-					) : null}
-					{optionName !== 'items' ? (
+					)}
+
+					{optionName !== 'items' && (
 						<PanelBody>
 							<Button
 								isLink
@@ -182,9 +200,9 @@ function ElementsSelectorOptions(props) {
 								}`}
 							</Button>
 						</PanelBody>
-					) : null}
+					)}
 				</Modal>
-			) : null}
+			)}
 		</>
 	);
 }
@@ -310,10 +328,33 @@ export default class ElementsSelector extends Component {
 	}
 
 	renderLocation(location) {
-		const { value, onChange, options } = this.props;
+		const { value, onChange, options, props } = this.props;
+		const { clientId } = props;
 
 		const locationData = this.getLocationData(location);
 		const { availableElements } = locationData;
+
+		// Remove elements selector if gallery is child of loop block.
+		// This needed because we have all elements as separate blocks.
+		if (checkIsChildOfLoopBlock(clientId)) {
+			return (
+				locationData.elements.length > 0 &&
+				locationData.elements
+					.filter((optionName) => optionName === 'items')
+					.map((optionName) => (
+						<ElementsSelectorOptions
+							key={optionName + location}
+							location={location}
+							locationData={locationData}
+							value={value}
+							onChange={onChange}
+							options={options}
+							optionName={optionName}
+							parentProps={this.props}
+						/>
+					))
+			);
+		}
 
 		return (
 			<div

@@ -476,6 +476,7 @@ class VP {
 
 		// prepare data options
 		const dataOptions = self.$item[0].dataset;
+
 		const pureDataOptions = {};
 		Object.keys(dataOptions).forEach((k) => {
 			if (k && k.substring(0, 2) === 'vp') {
@@ -543,7 +544,6 @@ class VP {
 				);
 		});
 
-		// on filter click
 		self.$filter.on(
 			`click${evp}`,
 			'.vp-filter .vp-filter__item a',
@@ -584,7 +584,9 @@ class VP {
 				function () {
 					const $this = $(this);
 					const value = $this.val();
-					const $option = $this.find(`[value="${value}"]`);
+					const $option = $this.find(
+						`[value="${value}"][data-vp-url]`
+					);
 
 					if ($option.length) {
 						self.loadNewItems($option.attr('data-vp-url'), true);
@@ -592,12 +594,50 @@ class VP {
 				}
 			);
 
-		// on pagination click
+		// Function to handle scrolling to top
+		function scrollToTop($pagination) {
+			if (
+				self.options.pagination === 'paged' &&
+				$pagination.hasClass('vp-pagination__scroll-top')
+			) {
+				const $adminBar = $('#wpadminbar');
+				const currentTop =
+					window.pageYOffset || document.documentElement.scrollTop;
+				let { top } = self.$item.offset();
+
+				// Custom user offset
+				if ($pagination.attr('data-vp-pagination-scroll-top')) {
+					top -=
+						parseInt(
+							$pagination.attr('data-vp-pagination-scroll-top'),
+							10
+						) || 0;
+				}
+
+				// Admin bar offset
+				if ($adminBar.length && $adminBar.css('position') === 'fixed') {
+					top -= $adminBar.outerHeight();
+				}
+
+				// Limit max offset
+				top = Math.max(0, top);
+
+				if (currentTop > top) {
+					window.scrollTo({
+						top,
+						behavior: 'smooth',
+					});
+				}
+			}
+		}
+
+		// Handle pagination click
 		self.$item.on(
 			`click${evp}`,
 			'.vp-pagination .vp-pagination__item a',
 			function (e) {
 				e.preventDefault();
+
 				const $this = $(this);
 				const $pagination = $this.closest('.vp-pagination');
 
@@ -613,46 +653,7 @@ class VP {
 					self.options.pagination === 'paged'
 				);
 
-				// Scroll to top
-				if (
-					self.options.pagination === 'paged' &&
-					$pagination.hasClass('vp-pagination__scroll-top')
-				) {
-					const $adminBar = $('#wpadminbar');
-					const currentTop =
-						window.pageYOffset ||
-						document.documentElement.scrollTop;
-					let { top } = self.$item.offset();
-
-					// Custom user offset.
-					if ($pagination.attr('data-vp-pagination-scroll-top')) {
-						top -=
-							parseInt(
-								$pagination.attr(
-									'data-vp-pagination-scroll-top'
-								),
-								10
-							) || 0;
-					}
-
-					// Admin bar offset.
-					if (
-						$adminBar.length &&
-						$adminBar.css('position') === 'fixed'
-					) {
-						top -= $adminBar.outerHeight();
-					}
-
-					// Limit max offset.
-					top = Math.max(0, top);
-
-					if (currentTop > top) {
-						window.scrollTo({
-							top,
-							behavior: 'smooth',
-						});
-					}
-				}
+				scrollToTop($pagination);
 			}
 		);
 

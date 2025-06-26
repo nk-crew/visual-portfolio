@@ -1,0 +1,46 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/pagination-numbers",
+	"title": "Numbers",
+	"category": "media",
+	"ancestor": ["visual-portfolio/pagination"],
+	"description": "Displays page numbers for pagination.",
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"visual-portfolio/queryType",
+		"visual-portfolio/baseQuery",
+		"visual-portfolio/postsQuery",
+		"visual-portfolio/imagesQuery"
+	],
+	"attributes": {
+		"midSize": {
+			"type": "number",
+			"default": 2
+		}
+	},
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"color": {
+			"gradients": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	}
+}

@@ -912,7 +912,7 @@ class Visual_Portfolio_Assets {
 	/**
 	 * Parse blocks from content.
 	 *
-	 * @param array $blocks - blocks list.
+	 * @param array $blocks - blocks array.
 	 */
 	public function maybe_parse_blocks_from_content( $blocks ) {
 		if ( empty( $blocks ) ) {

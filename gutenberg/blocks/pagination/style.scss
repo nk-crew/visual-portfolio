@@ -1,0 +1,78 @@
+// Pagination block.
+.wp-block-visual-portfolio-pagination {
+	font-size: var(--wp--preset--font-size--medium, 1rem);
+	font-weight: 500;
+}
+
+// Previous and next blocks.
+.wp-block-visual-portfolio-pagination-next-arrow {
+	display: inline-block;
+	margin-left: 0.6ch;
+}
+.wp-block-visual-portfolio-pagination-previous-arrow {
+	display: inline-block;
+	margin-right: 0.6ch;
+}
+
+// Load more and infinite blocks.
+.wp-block-visual-portfolio-pagination-load-more-loading,
+.wp-block-visual-portfolio-pagination-infinite-loading {
+	display: none;
+}
+
+.vp-portfolio__loading {
+	.wp-block-visual-portfolio-pagination-load-more-loading,
+	.wp-block-visual-portfolio-pagination-infinite-loading {
+		display: block;
+	}
+	.wp-block-visual-portfolio-pagination-load-more > :first-child,
+	.wp-block-visual-portfolio-pagination-infinite > :first-child {
+		display: none;
+	}
+}
+
+// Numbers block
+.wp-block-visual-portfolio-pagination-numbers {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4ch;
+}
+
+// Fill style.
+.is-style-fill {
+	.wp-block-visual-portfolio-pagination-next,
+	.wp-block-visual-portfolio-pagination-previous {
+		border-radius: 9999px;
+		padding: 0.3em 0.8em;
+		background-color: color-mix(in srgb, currentColor 7%, transparent);
+		text-decoration: none;
+		font-weight: 400;
+
+		&:hover,
+		&:focus {
+			background-color: color-mix(in srgb, currentColor 10%, transparent);
+		}
+	}
+
+	.wp-block-visual-portfolio-pagination-numbers {
+		align-items: center;
+		font-weight: 400;
+		gap: 0.6ch;
+
+		a {
+			text-decoration: none;
+
+			&:hover,
+			&:focus {
+				opacity: 0.6;
+			}
+		}
+
+		.is-active {
+			border-radius: 9999px;
+			padding: 0.3em 0.8em;
+			background-color: color-mix(in srgb, currentColor 7%, transparent);
+			text-decoration: none;
+		}
+	}
+}

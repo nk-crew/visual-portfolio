@@ -133,6 +133,7 @@ const entryAssetsJs = glob
 		'./assets/js/**.js',
 		'./assets/admin/js/**.js',
 		'./assets/js/3rd/plugin-jetpack.js',
+		'./gutenberg/**/view.js',
 		'./gutenberg/index.js',
 		'./gutenberg/custom-post-meta.js',
 		'./gutenberg/layouts-editor.js',
@@ -151,6 +152,8 @@ const entryAssetsCss = glob
 		'./templates/**/style.scss',
 		'./templates/**/**/style.scss',
 		'./templates/**/**/**/style.scss',
+		'./gutenberg/blocks/**/style.scss',
+		'./gutenberg/blocks/**/editor.scss',
 	])
 	.filter((entry) => {
 		const filename = path.basename(entry);

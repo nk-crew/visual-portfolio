@@ -1,0 +1,107 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop",
+	"category": "media",
+	"title": "Gallery Loop (Experimental)",
+	"description": "Display gallery loop. Block is experimental and will change in future releases. Please use with caution.",
+	"keywords": [
+		"gallery",
+		"images",
+		"posts",
+		"portfolio",
+		"vpf",
+		"loop",
+		"query"
+	],
+	"textdomain": "visual-portfolio",
+	"attributes": {
+		"layout": { "type": "string", "default": "default" },
+		"block_id": { "type": "string" },
+		"queryType": { "type": "string", "default": "posts" },
+		"baseQuery": {
+			"type": "object",
+			"default": {
+				"perPage": 6,
+				"maxPages": 1
+			}
+		},
+		"postsQuery": {
+			"type": "object",
+			"default": {
+				"source": "portfolio",
+				"postTypesSet": ["post"],
+				"ids": [],
+				"excludeIds": [],
+				"order": "desc",
+				"orderBy": "post_date",
+				"offset": 0,
+				"taxonomies": [],
+				"taxonomiesRelation": "or",
+				"avoidDuplicates": false,
+				"customQuery": ""
+			}
+		},
+		"imagesQuery": {
+			"type": "object",
+			"default": {
+				"images": [],
+				"categories": [],
+				"orderBy": "default",
+				"order": "asc",
+				"titlesSource": "custom",
+				"descriptionsSource": "custom"
+			}
+		},
+		"customCss": { "type": "string", "default": "" },
+		"previewImageExample": { "type": "string", "default": "" },
+		"setupWizard": { "type": "string", "default": "" }
+	},
+	"supports": {
+		"ghostkit": true,
+		"anchor": true,
+		"html": false,
+		"align": ["wide", "full"],
+		"layout": true,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"blockGap": { "__experimentalDefault": "1.25em" },
+			"__experimentalDefaultControls": {
+				"blockGap": true,
+				"padding": false,
+				"margin": false
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		}
+	},
+	"example": {
+		"attributes": {
+			"preview_image_example": true,
+			"layout": "justified"
+		}
+	},
+	"providesContext": {
+		"visual-portfolio/queryType": "queryType",
+		"visual-portfolio/baseQuery": "baseQuery",
+		"visual-portfolio/postsQuery": "postsQuery",
+		"visual-portfolio/imagesQuery": "imagesQuery"
+	},
+	"viewScript": "visual-portfolio-block-loop"
+}

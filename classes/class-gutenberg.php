@@ -1,6 +1,6 @@
 <?php
 /**
- * Gutenberg block.
+ * Gutenberg utilities and enqueue block assets.
  *
  * @package visual-portfolio
  */
@@ -10,28 +10,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Visual_Portfolio_Gutenberg_Block
+ * Class Visual_Portfolio_Gutenberg
  */
-class Visual_Portfolio_Gutenberg_Block {
+class Visual_Portfolio_Gutenberg {
 	/**
 	 * Cached block attributes, we will use it when register block in PHP and in JS.
 	 *
 	 * @var array
 	 */
-	public $cached_attributes = array();
+	private static $cached_attributes = array();
 
 	/**
-	 * Registered controls, that will be used in Gutenberg block.
-	 *
-	 * @var array
-	 */
-	public $registered_controls = array();
-
-	/**
-	 * Visual_Portfolio_Gutenberg_Block constructor.
+	 * Constructor.
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'register_block' ), 11 );
 		add_action( 'enqueue_block_assets', array( $this, 'enqueue_block_editor_assets' ) );
 	}
 
@@ -40,9 +32,9 @@ class Visual_Portfolio_Gutenberg_Block {
 	 *
 	 * @return array
 	 */
-	public function get_block_attributes() {
-		if ( ! empty( $this->cached_attributes ) ) {
-			return $this->cached_attributes;
+	public static function get_block_attributes() {
+		if ( ! empty( self::$cached_attributes ) ) {
+			return self::$cached_attributes;
 		}
 
 		// Default attributes.
@@ -144,57 +136,41 @@ class Visual_Portfolio_Gutenberg_Block {
 			$controls
 		);
 
-		$this->cached_attributes = $attributes;
+		self::$cached_attributes = $attributes;
 
-		return $this->cached_attributes;
+		return self::$cached_attributes;
 	}
 
 	/**
-	 * Register Block.
+	 * Transform block context to attributes array.
+	 *
+	 * @param array  $context Block context.
+	 * @param string $namespace Context namespace.
+	 * @return array
 	 */
-	public function register_block() {
-		if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
-			return;
+	public static function transform_context_to_attributes( $context, $namespace = 'visual-portfolio' ) {
+		if ( empty( $context ) || ! is_array( $context ) ) {
+			return array();
 		}
 
-		$attributes = $this->get_block_attributes();
+		$transformed_attributes = array();
+		$namespace_prefix       = $namespace . '/';
 
-		register_block_type_from_metadata(
-			visual_portfolio()->plugin_path . 'gutenberg/block',
-			array(
-				'render_callback' => array( $this, 'block_render' ),
-				'attributes'      => $attributes,
-			)
-		);
-	}
+		foreach ( $context as $key => $value ) {
+			// Check if the context key belongs to our namespace.
+			if ( strpos( $key, $namespace_prefix ) === 0 ) {
+				// Remove namespace from key.
+				$attribute_key = str_replace( $namespace_prefix, '', $key );
 
-	/**
-	 * Block output
-	 *
-	 * @param array $attributes - block attributes.
-	 *
-	 * @return string
-	 */
-	public function block_render( $attributes ) {
-		$attributes = array_merge(
-			array(
-				'anchor'    => '',
-				'align'     => '',
-				'className' => '',
-			),
-			$attributes
-		);
+				// Add to transformed attributes.
+				$transformed_attributes[ $attribute_key ] = $value;
+			}
+		}
 
-		$class_name = 'wp-block-visual-portfolio';
+		// Convert modern attributes to legacy format.
+		$transformed_attributes = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $transformed_attributes, true );
 
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'id'    => $attributes['anchor'],
-				'class' => $class_name,
-			)
-		);
-
-		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, Visual_Portfolio_Get::get( $attributes ) );
+		return $transformed_attributes;
 	}
 
 	/**
@@ -205,7 +181,7 @@ class Visual_Portfolio_Gutenberg_Block {
 			return;
 		}
 
-		$attributes = $this->get_block_attributes();
+		$attributes = self::get_block_attributes();
 
 		// Block.
 		Visual_Portfolio_Assets::enqueue_script(
@@ -253,4 +229,5 @@ class Visual_Portfolio_Gutenberg_Block {
 		);
 	}
 }
-new Visual_Portfolio_Gutenberg_Block();
+
+new Visual_Portfolio_Gutenberg();

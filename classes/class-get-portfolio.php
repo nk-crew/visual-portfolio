@@ -1267,7 +1267,7 @@ class Visual_Portfolio_Get {
 		$is_images  = 'images' === $options['content_source'];
 
 		$paged = 0;
-		if ( $options['pagination'] || $is_images ) {
+		if ( ( isset( $options['pagination'] ) && $options['pagination'] ) || $is_images ) {
 			$paged = self::get_current_page_number();
 		}
 		$count = intval( $options['items_count'] );
@@ -1478,7 +1478,11 @@ class Visual_Portfolio_Get {
 			}
 
 			// pages count.
-			$query_opts['max_num_pages'] = ceil( count( $images ) / $count );
+			if ( ! empty( $images ) ) {
+				$query_opts['max_num_pages'] = ceil( count( $images ) / $count );
+			} else {
+				$query_opts['max_num_pages'] = 0;
+			}
 
 			$start_from_item = ( $paged - 1 ) * $count;
 			$end_on_item     = $start_from_item + $count;
@@ -1648,7 +1652,7 @@ class Visual_Portfolio_Get {
 					}
 
 					// Offset.
-					if ( $options['posts_offset'] ) {
+					if ( isset( $options['posts_offset'] ) && $options['posts_offset'] ) {
 						$query_opts['offset'] = $options['posts_offset'] + ( $paged - 1 ) * $count;
 					}
 				}
@@ -2642,8 +2646,8 @@ class Visual_Portfolio_Get {
 				'total'     => $args['max_pages'],
 				'prev_text' => '&lt;',
 				'next_text' => '&gt;',
-				'end_size'  => 1,
-				'mid_size'  => 2,
+				'end_size'  => $args['end_size'] ?? 1,
+				'mid_size'  => $args['mid_size'] ?? 2,
 			)
 		);
 
