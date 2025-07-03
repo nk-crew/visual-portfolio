@@ -117,7 +117,7 @@ class Visual_Portfolio_SEO_Optimization {
 				isset( $_GET['vp_sort'] ) ||
 				isset( $_GET['vp_search'] ) ||
 				// For paginated content beyond page 1.
-			( isset( $_GET['vp_page'] ) && (int) $_GET['vp_page'] > 1 )
+				( isset( $_GET['vp_page'] ) && (int) $_GET['vp_page'] > 1 )
 			)
 		) {
 			echo '<meta name="robots" content="noindex, follow" />' . "\n";
