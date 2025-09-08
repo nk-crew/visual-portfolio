@@ -163,7 +163,6 @@ Automatically fetch posts from your social networks to display in gallery on you
   * [Unsplash](https://www.visualportfolio.com/social-unsplash/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [X](https://www.visualportfolio.com/social-x/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [Flickr](https://www.visualportfolio.com/social-flickr/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
-  * [Google Photos](https://www.visualportfolio.com/social-google-photos/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [Dribbble](https://www.visualportfolio.com/social-dribbble/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [Twitch](https://www.visualportfolio.com/social-twitch/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
   * [RSS](https://www.visualportfolio.com/social-medium-rss/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_social_feeds)
