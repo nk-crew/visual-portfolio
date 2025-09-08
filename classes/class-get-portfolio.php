@@ -1898,12 +1898,14 @@ class Visual_Portfolio_Get {
 		$term_taxonomies = array();
 		$terms           = array();
 		$there_is_active = false;
+		$term_counts     = array(); // Track actual counts from query results.
 
 		// stupid hack as wp_reset_postdata() function is not working for me...
 		$old_post = $GLOBALS['post'];
 		while ( $portfolio_query->have_posts() ) {
 			$portfolio_query->the_post();
-			$all_taxonomies = get_object_taxonomies( get_post() );
+			$current_post_id = get_the_ID();
+			$all_taxonomies  = get_object_taxonomies( get_post() );
 
 			foreach ( $all_taxonomies as $cat ) {
 				// allow only specific taxonomies for filter.
@@ -1924,6 +1926,14 @@ class Visual_Portfolio_Get {
 					}
 					if ( ! in_array( $cat_item->taxonomy, $term_taxonomies, true ) ) {
 						$term_taxonomies[] = $cat_item->taxonomy;
+					}
+					// Count posts for this term based on actual query results.
+					// Use post ID to avoid double-counting the same post for the same term.
+					if ( ! isset( $term_counts[ $cat_item->term_id ] ) ) {
+						$term_counts[ $cat_item->term_id ] = array();
+					}
+					if ( ! in_array( $current_post_id, $term_counts[ $cat_item->term_id ], true ) ) {
+						$term_counts[ $cat_item->term_id ][] = $current_post_id;
 					}
 				}
 			}
@@ -1965,7 +1975,7 @@ class Visual_Portfolio_Get {
 						'filter'      => $term->slug,
 						'label'       => $term->name,
 						'description' => $term->description,
-						'count'       => $term->count,
+						'count'       => isset( $term_counts[ $term->term_id ] ) ? count( $term_counts[ $term->term_id ] ) : 0,
 						'taxonomy'    => $term->taxonomy,
 						'id'          => $term->term_id,
 						'parent'      => $term->parent,
