@@ -3,6 +3,7 @@
  * Plugin Name:  Visual Portfolio, Posts & Image Gallery
  * Description:  Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block.
  * Version:      3.3.16
+ * Plugin URI:   https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
  * Author:       Visual Portfolio Team
  * Author URI:   https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
  * License:      GPLv2 or later
