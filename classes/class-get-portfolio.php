@@ -1270,7 +1270,7 @@ class Visual_Portfolio_Get {
 		if ( ( isset( $options['pagination'] ) && $options['pagination'] ) || $is_images ) {
 			$paged = self::get_current_page_number();
 		}
-		$count = intval( $options['items_count'] );
+		$count = isset( $options['items_count'] ) ? intval( $options['items_count'] ) : 6;
 
 		if ( $is_images ) {
 			$query_opts['images'] = array();
@@ -1901,7 +1901,7 @@ class Visual_Portfolio_Get {
 		$term_counts     = array(); // Track actual counts from query results.
 
 		// stupid hack as wp_reset_postdata() function is not working for me...
-		$old_post = $GLOBALS['post'];
+		$old_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
 		while ( $portfolio_query->have_posts() ) {
 			$portfolio_query->the_post();
 			$current_post_id = get_the_ID();
