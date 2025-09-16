@@ -134,6 +134,9 @@ class Visual_Portfolio_Controls {
 	 */
 	public function __construct() {
 		add_action( 'wp_ajax_vp_dynamic_control_callback', array( $this, 'ajax_dynamic_control_callback' ) );
+
+		// Add filter to fix boolean string values for Saved Layout posts.
+		add_filter( 'vpf_control_value', array( $this, 'fix_boolean_string_values_for_saved_layouts' ), 10, 3 );
 	}
 
 	/**
@@ -270,6 +273,51 @@ class Visual_Portfolio_Controls {
 	}
 
 	/**
+	 * Check if a field requires string boolean conversion for Saved Layout posts.
+	 *
+	 * Some form controls use string boolean values ('false', 'true') instead of actual booleans
+	 * for their dropdown options. This is specifically needed for Saved Layout posts (vp_lists)
+	 * that store values in WordPress post meta.
+	 *
+	 * Background:
+	 * - Saved Layout posts (post_type: 'vp_lists') store control values in post meta
+	 * - During retrieval, WordPress may convert stored values to different types
+	 * - Controls like "Display Date" and "Display Read More Button" use string options:
+	 *   'false' => 'Hide', 'true' => 'Always Display', etc.
+	 * - The frontend React components expect these exact string values to display correctly
+	 * - Without this fix, values get converted to boolean false/true, causing dropdowns
+	 *   to show "Select..." instead of the correct selected option
+	 *
+	 * Note: Regular Gutenberg block posts store data directly in block content and don't need this fix.
+	 *
+	 * @param string   $field_name - The control field name to check.
+	 * @param int|bool $post_id - The post ID (false for non-post contexts).
+	 *
+	 * @return bool True if field needs string boolean conversion for Saved Layouts.
+	 */
+	private static function is_boolean_string_field_for_saved_layout( $field_name, $post_id = false ) {
+		// Only apply to Saved Layout posts (vp_lists post type).
+		if ( ! $post_id || 'vp_lists' !== get_post_type( $post_id ) ) {
+			return false;
+		}
+
+		// List of field name patterns that use string boolean values.
+		$boolean_string_field_patterns = array(
+			'__show_date',      // Display Date control: 'false' => 'Hide', 'true' => 'Default', 'human' => 'Human Format'.
+			'__show_read_more', // Display Read More Button: 'false' => 'Hide', 'true' => 'Always Display', 'more_tag' => 'More tag'.
+		);
+
+		// Check if field name ends with any of the patterns.
+		foreach ( $boolean_string_field_patterns as $pattern ) {
+			if ( substr( $field_name, -strlen( $pattern ) ) === $pattern ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get registered control value.
 	 *
 	 * @param string   $name - field name.
@@ -333,14 +381,6 @@ class Visual_Portfolio_Controls {
 			}
 		}
 
-		// fix bool values.
-		if ( 'false' === $result ) {
-			$result = false;
-		}
-		if ( 'true' === $result ) {
-			$result = true;
-		}
-
 		if ( 'custom_css' === $name && $result ) {
 			// Decode.
 			$result = visual_portfolio_decode( $result );
@@ -350,6 +390,42 @@ class Visual_Portfolio_Controls {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Fix boolean string values for Saved Layout posts.
+	 *
+	 * Handles conversion between boolean and string representations for dropdown controls
+	 * in Saved Layout posts. This ensures proper display of selected options in the UI.
+	 *
+	 * @param mixed  $value   The control value.
+	 * @param string $name    The control name.
+	 * @param int    $post_id The post ID.
+	 *
+	 * @return mixed The filtered value.
+	 */
+	public static function fix_boolean_string_values_for_saved_layouts( $value, $name, $post_id ) {
+		// Determine if this field requires string booleans (for Saved Layout dropdown controls).
+		$needs_string_booleans = self::is_boolean_string_field_for_saved_layout( $name, $post_id );
+
+		if ( $needs_string_booleans ) {
+			// Convert various falsy/truthy values to string 'false'/'true' for dropdown compatibility.
+			if ( false === $value || '0' === $value || 0 === $value || '' === $value ) {
+				$value = 'false';
+			} elseif ( true === $value || '1' === $value || 1 === $value ) {
+				$value = 'true';
+			}
+			// Keep existing string values ('false', 'true', 'more_tag', 'human', etc.) as is.
+		} else {
+			// Convert string booleans to actual boolean values for all other fields.
+			if ( 'false' === $value ) {
+				$value = false;
+			} elseif ( 'true' === $value ) {
+				$value = true;
+			}
+		}
+
+		return $value;
 	}
 }
 
