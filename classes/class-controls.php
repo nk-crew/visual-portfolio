@@ -303,8 +303,16 @@ class Visual_Portfolio_Controls {
 
 		// List of field name patterns that use string boolean values.
 		$boolean_string_field_patterns = array(
-			'__show_date',      // Display Date control: 'false' => 'Hide', 'true' => 'Default', 'human' => 'Human Format'.
-			'__show_read_more', // Display Read More Button: 'false' => 'Hide', 'true' => 'Always Display', 'more_tag' => 'More tag'.
+			'__show_date',         // Display Date control: 'false' => 'Hide', 'true' => 'Default', 'human' => 'Human Format'.
+			'__show_read_more',    // Display Read More Button: 'false' => 'Hide', 'true' => 'Always Display', 'more_tag' => 'More tag'.
+			'__show_categories',   // Display Categories control: similar boolean select pattern.
+			'__show_excerpt',      // Display Excerpt control: boolean select.
+			'__show_arrows',       // Pagination arrows control: boolean select.
+			'__show_numbers',      // Pagination numbers control: boolean select.
+			'__show_title',        // Display Title control: boolean select.
+			'__show_author',       // Display Author control: boolean select.
+			'__show_icon',         // Display Icon control: boolean select.
+			'__show_count',        // Display Count control: boolean select.
 		);
 
 		// Check if field name ends with any of the patterns.
