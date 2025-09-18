@@ -344,7 +344,7 @@ test.describe('archive pages', () => {
 		await page
 			.locator('.portfolio_archive_page .select2-container')
 			.click();
-		await page.getByRole('option', { name: 'Portfolio' }).click();
+		await page.getByRole('option', { name: 'Portfolio' }).first().click();
 		await page.getByLabel('Archive Page Items Per Page').fill('2');
 		await page.getByRole('button', { name: 'Save Changes' }).click();
 	}
@@ -1278,5 +1278,511 @@ test.describe('archive pages', () => {
 		expect(receivedCategories).toEqual(
 			expectedArchiveCategoryInfinityPostName
 		);
+	});
+
+	/**
+	 * Validates RSS feed content against fixture content with flexible matching options.
+	 *
+	 * @param {string}  actualContent          - The actual RSS XML content.
+	 * @param {string}  fixtureContent         - The expected RSS XML content from fixture.
+	 * @param {Object}  options                - Validation options.
+	 * @param {boolean} options.checkItemCount - Whether to check exact item count.
+	 * @param {boolean} options.checkTitles    - Whether to check that expected titles are present.
+	 */
+	function validateRSSAgainstFixture(
+		actualContent,
+		fixtureContent,
+		options = {}
+	) {
+		const actual = parseRSSFeed(actualContent);
+		const expected = parseRSSFeed(fixtureContent);
+
+		// Validate basic RSS structure
+		expect(actual.title).toBeTruthy();
+		expect(actual.link).toBeTruthy();
+
+		// Check item count if requested
+		if (options.checkItemCount) {
+			expect(actual.items.length).toBe(expected.items.length);
+		} else if (expected.items.length > 0) {
+			// At least check that we have items if expected
+			expect(actual.items.length).toBeGreaterThan(0);
+		}
+
+		// Check that expected titles are present (subset check)
+		if (options.checkTitles && expected.items.length > 0) {
+			const actualTitles = actual.items.map((item) => item.title);
+			const expectedTitles = expected.items.map((item) => item.title);
+
+			for (const title of expectedTitles) {
+				expect(actualTitles).toContain(title);
+			}
+		}
+
+		// Validate RSS structure for all items
+		for (const item of actual.items) {
+			expect(item.title).toBeTruthy();
+			expect(item.description).toBeTruthy();
+			expect(item.link).toBeTruthy();
+			expect(item.pubDate).toBeTruthy();
+			expect(item.guid).toBeTruthy();
+		}
+	}
+
+	/**
+	 * Parse RSS XML and extract feed data using simple regex-based parsing.
+	 *
+	 * @param {string} xmlContent - The RSS XML content to parse.
+	 * @return {Object} Parsed RSS feed data.
+	 */
+	function parseRSSFeed(xmlContent) {
+		// Simple RSS parser for testing using regex
+		const items = [];
+
+		// Extract channel info
+		const titleMatch = xmlContent.match(/<title[^>]*>(.*?)<\/title>/);
+		const descriptionMatch = xmlContent.match(
+			/<description[^>]*>(.*?)<\/description>/
+		);
+		const linkMatch = xmlContent.match(/<link[^>]*>(.*?)<\/link>/);
+
+		const title = titleMatch ? titleMatch[1].replace(/&[^;]+;/g, '') : '';
+		const description = descriptionMatch
+			? descriptionMatch[1].replace(/&[^;]+;/g, '')
+			: '';
+		const link = linkMatch ? linkMatch[1].replace(/&[^;]+;/g, '') : '';
+
+		// Extract items
+		const itemMatches = xmlContent.match(/<item>(.*?)<\/item>/gs);
+		if (itemMatches) {
+			for (const itemContent of itemMatches) {
+				const itemTitleMatch = itemContent.match(
+					/<title[^>]*>(.*?)<\/title>/
+				);
+				const itemDescriptionMatch = itemContent.match(
+					/<description[^>]*>(.*?)<\/description>/
+				);
+				const itemLinkMatch = itemContent.match(
+					/<link[^>]*>(.*?)<\/link>/
+				);
+				const itemPubDateMatch = itemContent.match(
+					/<pubDate[^>]*>(.*?)<\/pubDate>/
+				);
+				const itemGuidMatch = itemContent.match(
+					/<guid[^>]*>(.*?)<\/guid>/
+				);
+
+				items.push({
+					title: itemTitleMatch
+						? itemTitleMatch[1]
+								.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1')
+								.replace(/&[^;]+;/g, '')
+						: '',
+					description: itemDescriptionMatch
+						? itemDescriptionMatch[1]
+								.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1')
+								.replace(/&[^;]+;/g, '')
+						: '',
+					link: itemLinkMatch
+						? itemLinkMatch[1].replace(/&[^;]+;/g, '')
+						: '',
+					pubDate: itemPubDateMatch ? itemPubDateMatch[1] : '',
+					guid: itemGuidMatch
+						? itemGuidMatch[1].replace(/&[^;]+;/g, '')
+						: '',
+				});
+			}
+		}
+
+		return {
+			title,
+			description,
+			link,
+			items,
+		};
+	}
+
+	/**
+	 * Creates a limited set of portfolio posts specifically for RSS feed testing.
+	 *
+	 * @param {Page}         page         Provides methods to interact with a single tab in a Browser.
+	 * @param {Admin}        admin        End to end test utilities for WordPress admin's user interface.
+	 * @param {Editor}       editor       End to end test utilities for the WordPress Block Editor.
+	 * @param {RequestUtils} requestUtils Playwright utilities for interacting with the WordPress REST API.
+	 */
+	async function createPortfolioPostsForFeed(
+		page,
+		admin,
+		editor,
+		requestUtils
+	) {
+		// Retry mechanism for REST API calls
+		async function retryRequest(fn, retries = 3, delay = 1000) {
+			for (let attempt = 1; attempt <= retries; attempt++) {
+				try {
+					return await fn();
+				} catch (error) {
+					if (attempt === retries) {
+						throw error;
+					}
+					if (logsEnabled) {
+						console.warn(
+							`Attempt ${attempt} failed. Retrying in ${delay}ms...`,
+							error
+						);
+					}
+					await new Promise((resolve) => setTimeout(resolve, delay));
+				}
+			}
+		}
+
+		// Get or create taxonomy terms
+		async function getOrCreateTerm(name, type) {
+			const endpoint =
+				type === 'portfolio_category'
+					? '/wp/v2/portfolio_category'
+					: '/wp/v2/portfolio_tag';
+
+			try {
+				const existingTerms = await retryRequest(() =>
+					requestUtils.rest({
+						path: endpoint,
+						method: 'GET',
+						params: {
+							per_page: 100,
+							context: 'view',
+							hide_empty: false,
+						},
+					})
+				);
+
+				if (!Array.isArray(existingTerms)) {
+					throw new Error(
+						`Failed to retrieve terms for taxonomy "${type}". Response: ${JSON.stringify(existingTerms)}`
+					);
+				}
+
+				let term = existingTerms.find(
+					(t) => t.name.toLowerCase() === name.toLowerCase()
+				);
+				if (term) {
+					if (logsEnabled) {
+						console.log(
+							`Term "${name}" already exists with ID: ${term.id}`
+						);
+					}
+					return term.id;
+				}
+
+				term = await retryRequest(() =>
+					requestUtils.rest({
+						path: endpoint,
+						method: 'POST',
+						data: { name },
+					})
+				);
+
+				if (term && term.id) {
+					if (logsEnabled) {
+						console.log(
+							`Term "${name}" created successfully with ID: ${term.id}`
+						);
+					}
+					return term.id;
+				}
+
+				throw new Error(
+					`Unexpected response while creating term "${name}": ${JSON.stringify(term)}`
+				);
+			} catch (error) {
+				console.error(
+					`Error retrieving or creating term "${name}":`,
+					error
+				);
+				return null;
+			}
+		}
+
+		const images = await getWordpressImages({
+			requestUtils,
+			page,
+			admin,
+			editor,
+		});
+
+		const currentDate = new Date();
+		currentDate.setMinutes(currentDate.getMinutes() - 10);
+
+		// Create only first 3 posts for RSS feed test
+		for (let i = 0; i < 3; i++) {
+			const post = portfolioPosts[i];
+
+			const categoryIds = post.categories
+				? await Promise.all(
+						post.categories.map(
+							async (name) =>
+								await getOrCreateTerm(
+									name,
+									'portfolio_category'
+								)
+						)
+					)
+				: [];
+			const tagIds = post.tags
+				? await Promise.all(
+						post.tags.map(
+							async (name) =>
+								await getOrCreateTerm(name, 'portfolio_tag')
+						)
+					)
+				: [];
+
+			const foundFixtureImage = await findAsyncSequential(
+				imageFixtures,
+				async (x) => x.postTitle === post.title
+			);
+
+			const foundImage = await findAsyncSequential(
+				images,
+				async (x) => x.description === foundFixtureImage.description
+			);
+
+			const newPostData = {
+				title: post.title,
+				content: post.content,
+				status: 'publish',
+				portfolio_category: categoryIds.filter((id) => id),
+				portfolio_tag: tagIds.filter((id) => id),
+				featured_media: foundImage.id,
+				date: currentDate.toISOString(),
+			};
+
+			try {
+				await retryRequest(() =>
+					requestUtils.rest({
+						path: '/wp/v2/portfolio',
+						method: 'POST',
+						data: newPostData,
+					})
+				);
+
+				if (logsEnabled) {
+					console.log(`Post "${post.title}" created successfully.`);
+				}
+			} catch (error) {
+				console.error(`Failed to create post "${post.title}":`, error);
+			}
+
+			currentDate.setMinutes(currentDate.getMinutes() + 1);
+		}
+	}
+
+	test('should generate RSS feed for portfolio archive', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		// Create and configure archive page first
+		const { archiveUrl } = await createArchivePage(page, admin, editor);
+		await setArchiveSettings(admin, page);
+
+		// Create portfolio posts
+		await createPortfolioPostsForFeed(page, admin, editor, requestUtils);
+
+		// Test the main portfolio RSS feed using archiveUrl
+		const feedUrl = archiveUrl.replace(/\/$/, '') + '/feed/';
+
+		const response = await page.goto(feedUrl);
+
+		// Check if we get XML content
+		const content = await response.text();
+
+		// Basic XML validation
+		expect(content).toContain('<?xml');
+		expect(content).toContain('<rss');
+		expect(content).toContain('<channel>');
+		expect(content).toContain('</channel>');
+		expect(content).toContain('</rss>');
+
+		// Load expected RSS feed fixture
+		const fs = require('fs');
+		const path = require('path');
+		const fixturePath = path.join(
+			__dirname,
+			'../../fixtures/archive/expected-rss-feed.xml'
+		);
+		const expectedContent = fs.readFileSync(fixturePath, 'utf8');
+
+		if (logsEnabled) {
+			console.log(
+				'RSS feed content (first 1000 chars):',
+				content.substring(0, 1000)
+			);
+			const feedData = parseRSSFeed(content);
+			console.log(
+				'RSS feed titles found:',
+				feedData.items.map((item) => item.title)
+			);
+		}
+
+		// Validate RSS feed against fixture
+		validateRSSAgainstFixture(content, expectedContent, {
+			checkTitles: true, // Check that expected titles are present
+		});
+
+		if (logsEnabled) {
+			const feedData = parseRSSFeed(content);
+			console.log('RSS Feed parsed successfully:', {
+				title: feedData.title,
+				itemCount: feedData.items.length,
+				items: feedData.items.map((item) => item.title),
+			});
+		}
+	});
+
+	test('should generate RSS feed for portfolio category', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		// Create and configure archive page first
+		const { archiveUrl } = await createArchivePage(page, admin, editor);
+		await setArchiveSettings(admin, page);
+
+		// Flush rewrite rules by visiting Permalinks page
+		await admin.visitAdminPage('options-permalink.php');
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+
+		// Create portfolio posts
+		await createPortfolioPostsForFeed(page, admin, editor, requestUtils);
+
+		// Test category RSS feed - extract base URL from archiveUrl
+		const urlParts = new URL(archiveUrl);
+		const baseUrl = `${urlParts.protocol}//${urlParts.host}`;
+		const categoryFeedUrl = `${baseUrl}/portfolio-category/ocean/feed/`;
+
+		// Use a direct fetch request instead of page.goto to avoid browser session issues
+		// Try multiple times as category feeds may take longer to be ready
+		let response;
+		let content;
+		let attempt = 0;
+		const maxAttempts = 3;
+
+		while (attempt < maxAttempts) {
+			attempt++;
+			response = await page.request.get(categoryFeedUrl);
+			content = await response.text();
+
+			if (logsEnabled) {
+				console.log(
+					`Category feed attempt ${attempt} - response status:`,
+					response.status()
+				);
+				console.log(
+					`Category feed attempt ${attempt} - content (first 200 chars):`,
+					content.substring(0, 200)
+				);
+			}
+
+			// If we get XML, break out of the retry loop
+			if (
+				content.includes('<?xml') &&
+				!content.includes('<!DOCTYPE html>')
+			) {
+				break;
+			}
+
+			// Wait between attempts
+			if (attempt < maxAttempts) {
+				await page.waitForTimeout(2000);
+			}
+		}
+
+		// Basic XML validation - if we still get HTML after retries, fail with clear message
+		if (content.includes('<!DOCTYPE html>')) {
+			throw new Error(
+				`Expected RSS XML feed but got HTML page after ${maxAttempts} attempts. URL: ${categoryFeedUrl}`
+			);
+		}
+
+		// Basic XML validation
+		expect(content).toContain('<?xml');
+		expect(content).toContain('<rss');
+		expect(content).toContain('<channel>');
+
+		// Load expected ocean category RSS feed fixture
+		const fs = require('fs');
+		const path = require('path');
+		const fixturePath = path.join(
+			__dirname,
+			'../../fixtures/archive/expected-rss-feed-ocean-category.xml'
+		);
+		const expectedContent = fs.readFileSync(fixturePath, 'utf8');
+
+		// Validate RSS feed against fixture
+		validateRSSAgainstFixture(content, expectedContent, {
+			checkTitles: true, // Check that expected ocean category titles are present
+		});
+
+		if (logsEnabled) {
+			const feedData = parseRSSFeed(content);
+			console.log('Category RSS Feed parsed successfully:', {
+				title: feedData.title,
+				itemCount: feedData.items.length,
+				items: feedData.items.map((item) => item.title),
+			});
+		}
+	});
+
+	test('should handle RSS feed when no posts exist', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		// Delete any existing portfolio posts from previous tests
+		await deleteAllPortfolio({ requestUtils });
+
+		// Create and configure archive page first (but no posts)
+		const { archiveUrl } = await createArchivePage(page, admin, editor);
+		await setArchiveSettings(admin, page);
+		// Test RSS feed with no portfolio posts using archiveUrl
+		const feedUrl = archiveUrl.replace(/\/$/, '') + '/feed/';
+
+		const response = await page.goto(feedUrl);
+
+		// Check if we get valid XML even with no posts
+		const content = await response.text();
+
+		// Basic XML validation
+		expect(content).toContain('<?xml');
+		expect(content).toContain('<rss');
+		expect(content).toContain('<channel>');
+		expect(content).toContain('</channel>');
+		expect(content).toContain('</rss>');
+
+		// Load expected empty RSS feed fixture
+		const fs = require('fs');
+		const path = require('path');
+		const fixturePath = path.join(
+			__dirname,
+			'../../fixtures/archive/expected-rss-feed-empty.xml'
+		);
+		const expectedContent = fs.readFileSync(fixturePath, 'utf8');
+
+		// Validate RSS feed against fixture
+		validateRSSAgainstFixture(content, expectedContent, {
+			checkItemCount: true, // Should be exactly 0 items
+		});
+
+		if (logsEnabled) {
+			const feedData = parseRSSFeed(content);
+			console.log('Empty RSS Feed handled correctly:', {
+				title: feedData.title,
+				itemCount: feedData.items.length,
+			});
+		}
 	});
 });
