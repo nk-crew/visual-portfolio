@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
+
+<channel>
+	<title>Portfolio - Test Site</title>
+	<atom:link href="http://localhost:8889/portfolio/feed/" rel="self" type="application/rss+xml" />
+	<link>http://localhost:8889/portfolio/</link>
+	<description>Portfolio archive feed</description>
+	<lastBuildDate>Mon, 01 Jan 2024 12:00:00 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4</generator>
+
+	<item>
+		<title><![CDATA[Portfolio 1 test post]]></title>
+		<link>http://localhost:8889/portfolio/portfolio-1-test-post/</link>
+		<comments>http://localhost:8889/portfolio/portfolio-1-test-post/#comments</comments>
+		<dc:creator><![CDATA[admin]]></dc:creator>
+		<pubDate>Mon, 01 Jan 2024 11:50:00 +0000</pubDate>
+		<category><![CDATA[sea]]></category>
+		<category><![CDATA[ocean]]></category>
+		<category><![CDATA[something]]></category>
+		<guid isPermaLink="false">http://localhost:8889/?post_type=portfolio&#038;p=123</guid>
+		<description><![CDATA[TMauris id tincidunt urna, ut mattis mauris. Curabitur in massa vel felis pretium aliquet vitae ut elit. Aenean at volutpat.]]></description>
+		<content:encoded><![CDATA[<p>TMauris id tincidunt urna, ut mattis mauris. Curabitur in massa vel felis pretium aliquet vitae ut elit. Aenean at volutpat.</p>]]></content:encoded>
+		<wfw:commentRss>http://localhost:8889/portfolio/portfolio-1-test-post/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+	</item>
+
+	<item>
+		<title><![CDATA[Portfolio 2 test post]]></title>
+		<link>http://localhost:8889/portfolio/portfolio-2-test-post/</link>
+		<comments>http://localhost:8889/portfolio/portfolio-2-test-post/#comments</comments>
+		<dc:creator><![CDATA[admin]]></dc:creator>
+		<pubDate>Mon, 01 Jan 2024 11:51:00 +0000</pubDate>
+		<category><![CDATA[bicycle]]></category>
+		<category><![CDATA[car]]></category>
+		<category><![CDATA[something]]></category>
+		<guid isPermaLink="false">http://localhost:8889/?post_type=portfolio&#038;p=124</guid>
+		<description><![CDATA[Nam at nibh feugiat, semper nisl vel, porttitor nibh. Aliquam massa diam, tincidunt nec lobortis a, fermentum vitae elit. Fusce.]]></description>
+		<content:encoded><![CDATA[<p>Nam at nibh feugiat, semper nisl vel, porttitor nibh. Aliquam massa diam, tincidunt nec lobortis a, fermentum vitae elit. Fusce.</p>]]></content:encoded>
+		<wfw:commentRss>http://localhost:8889/portfolio/portfolio-2-test-post/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+	</item>
+
+	<item>
+		<title><![CDATA[Portfolio 3 test post]]></title>
+		<link>http://localhost:8889/portfolio/portfolio-3-test-post/</link>
+		<comments>http://localhost:8889/portfolio/portfolio-3-test-post/#comments</comments>
+		<dc:creator><![CDATA[admin]]></dc:creator>
+		<pubDate>Mon, 01 Jan 2024 11:52:00 +0000</pubDate>
+		<category><![CDATA[car]]></category>
+		<category><![CDATA[ocean]]></category>
+		<guid isPermaLink="false">http://localhost:8889/?post_type=portfolio&#038;p=125</guid>
+		<description><![CDATA[Aliquam sed pretium purus. Cras viverra viverra felis. Ut vitae massa felis. Curabitur tempus vitae eros eu feugiat. Ut molestie.]]></description>
+		<content:encoded><![CDATA[<p>Aliquam sed pretium purus. Cras viverra viverra felis. Ut vitae massa felis. Curabitur tempus vitae eros eu feugiat. Ut molestie.</p>]]></content:encoded>
+		<wfw:commentRss>http://localhost:8889/portfolio/portfolio-3-test-post/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+	</item>
+
+</channel>
+</rss>
