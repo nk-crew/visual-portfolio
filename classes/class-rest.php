@@ -232,7 +232,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		}
 
 		$options = array(
-			'content_source' => $content_source,
+			'content_source' => ( 'posts' === $content_source ) ? 'post-based' : $content_source,
 		);
 
 		// Add additional parameters based on content source.
