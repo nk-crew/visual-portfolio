@@ -168,7 +168,8 @@ class Visual_Portfolio_Gutenberg {
 		}
 
 		// Only convert to legacy format with defaults if we found namespace attributes.
-		// This prevents default values from being injected when block is in patterns.
+		// This check prevents attributes from being filled with default values.
+		// When there is no valid context matching the namespace.
 		if ( ! empty( $transformed_attributes ) ) {
 			$transformed_attributes = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $transformed_attributes, true );
 		}
