@@ -389,6 +389,14 @@ class Visual_Portfolio_Controls {
 			}
 		}
 
+		// fix bool values.
+		if ( 'false' === $result ) {
+			$result = false;
+		}
+		if ( 'true' === $result ) {
+			$result = true;
+		}
+
 		if ( 'custom_css' === $name && $result ) {
 			// Decode.
 			$result = visual_portfolio_decode( $result );
