@@ -78,33 +78,9 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			$namespace,
 			'/get_filter_items/',
 			array(
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'get_filter_items' ),
 				'permission_callback' => array( $this, 'get_filter_items_permission' ),
-				'args'                => array(
-					'content_source' => array(
-						'required'          => true,
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'posts_source' => array(
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'posts_taxonomies' => array(
-						'type'              => 'array',
-						'sanitize_callback' => function( $taxonomies ) {
-							if ( null === $taxonomies || '' === $taxonomies ) {
-								return array();
-							}
-							return array_map( 'absint', (array) $taxonomies );
-						},
-					),
-					'images' => array(
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
-					),
-				),
 			)
 		);
 
@@ -224,7 +200,19 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_filter_items( $request ) {
-		$content_source = $request->get_param( 'content_source' );
+		// Get parameters from either query params or request body.
+		$params = $request->get_params();
+
+		// If this is a POST request, also check for JSON body data.
+		if ( 'POST' === $request->get_method() ) {
+			$json_params = $request->get_json_params();
+			if ( ! empty( $json_params ) ) {
+				$params = array_merge( $params, $json_params );
+			}
+		}
+
+		$params         = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params );
+		$content_source = $params['content_source'] ?? false;
 		$post_id        = $request->get_param( 'post_id' );
 
 		if ( ! $content_source ) {
@@ -234,25 +222,42 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			);
 		}
 
+		// Define allowed parameters for each content source.
+		$source_configs = array(
+			'post-based' => array(
+				'posts_source',
+				'post_types_set',
+				'posts_taxonomies',
+				'posts_taxonomies_relation',
+				'posts_order_by',
+				'posts_order_direction',
+			),
+			'images' => array(
+				'images',
+				'images_titles_source',
+				'images_descriptions_source',
+				'images_order_by',
+				'images_order_direction',
+				'items_count',
+			),
+		);
+
+		// Build options array.
 		$options = array(
 			'content_source' => $content_source,
 		);
 
-		// Add additional parameters based on content source.
-		if ( 'posts' === $content_source ) {
-			$options['posts_source']              = $request->get_param( 'posts_source' );
-			$options['posts_taxonomies']          = $request->get_param( 'posts_taxonomies' );
-			$options['posts_taxonomies_relation'] = $request->get_param( 'posts_taxonomies_relation' );
-			$options['posts_order_by']            = $request->get_param( 'posts_order_by' );
-			$options['posts_order_direction']     = $request->get_param( 'posts_order_direction' );
-		} elseif ( 'images' === $content_source ) {
-			$images                                = $request->get_param( 'images' );
-			$options['images']                     = is_string( $images ) ? json_decode( $images, true ) : $images;
-			$options['images_titles_source']       = $request->get_param( 'images_titles_source' );
-			$options['images_descriptions_source'] = $request->get_param( 'images_descriptions_source' );
-			$options['images_order_by']            = $request->get_param( 'images_order_by' );
-			$options['images_order_direction']     = $request->get_param( 'images_order_direction' );
-			$options['items_count']                = $request->get_param( 'items_count' );
+		if ( isset( $source_configs[ $content_source ] ) ) {
+			// Filter and add only relevant parameters.
+			$allowed_keys    = array_flip( $source_configs[ $content_source ] );
+			$filtered_params = array_intersect_key( $params, $allowed_keys );
+			$options         = array_merge( $options, $filtered_params );
+		} else {
+			return $this->error(
+				'invalid_content_source',
+				/* translators: %s: Invalid content source type */
+				sprintf( esc_html__( 'Invalid content source: %s', 'visual-portfolio' ), esc_html( $content_source ) )
+			);
 		}
 
 		// Get query parameters.
@@ -284,7 +289,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 				if ( 'images' === $content_source || 'social-stream' === $content_source ) {
 					$url = add_query_arg( 'vp_filter', rawurlencode( $filter ), $url );
 				}
-				if ( 'posts' === $content_source ) {
+				if ( 'post-based' === $content_source ) {
 					$post_filter = rawurlencode( $taxonomy . ':' ) . $filter;
 					$url         = add_query_arg( 'vp_filter', $post_filter, $url );
 				}
