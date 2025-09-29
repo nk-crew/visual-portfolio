@@ -94,6 +94,9 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 					'posts_taxonomies' => array(
 						'type'              => 'array',
 						'sanitize_callback' => function( $taxonomies ) {
+							if ( null === $taxonomies || '' === $taxonomies ) {
+								return array();
+							}
 							return array_map( 'absint', (array) $taxonomies );
 						},
 					),

@@ -120,11 +120,15 @@ export default class VpfSelectControl extends Component {
 				result.push(this.findValueData(innerVal));
 			});
 		} else {
-			if (!value && typeof value !== 'string') {
+			// Handle boolean false properly - it's a valid value.
+			if (value === null || value === undefined || value === '') {
 				return result;
 			}
 
-			result = this.findValueData(value);
+			// Convert boolean to string if needed for the dropdown.
+			const valueToFind =
+				typeof value === 'boolean' ? String(value) : value;
+			result = this.findValueData(valueToFind);
 		}
 
 		return result;
