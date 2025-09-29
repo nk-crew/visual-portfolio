@@ -167,8 +167,12 @@ class Visual_Portfolio_Gutenberg {
 			}
 		}
 
-		// Convert modern attributes to legacy format.
-		$transformed_attributes = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $transformed_attributes, true );
+		// Only convert to legacy format with defaults if we found namespace attributes.
+		// This check prevents attributes from being filled with default values.
+		// When there is no valid context matching the namespace.
+		if ( ! empty( $transformed_attributes ) ) {
+			$transformed_attributes = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $transformed_attributes, true );
+		}
 
 		return $transformed_attributes;
 	}
