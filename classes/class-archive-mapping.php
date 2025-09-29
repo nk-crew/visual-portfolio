@@ -782,6 +782,27 @@ class Visual_Portfolio_Archive_Mapping {
 				'top'
 			);
 		}
+		// Add feed rewrite rules for portfolio archive.
+		add_rewrite_rule(
+			'^' . $slug . '/feed/?$',
+			'index.php?post_type=portfolio&feed=rss2',
+			'top'
+		);
+
+		// Add feed rewrite rules for portfolio categories.
+		add_rewrite_rule(
+			'^' . $this->permalinks['category_base'] . '/([^/]*)/feed/?$',
+			'index.php?post_type=portfolio&portfolio_category=$matches[1]&feed=rss2',
+			'top'
+		);
+
+		// Add feed rewrite rules for portfolio tags.
+		add_rewrite_rule(
+			'^' . $this->permalinks['tag_base'] . '/([^/]*)/feed/?$',
+			'index.php?post_type=portfolio&portfolio_tag=$matches[1]&feed=rss2',
+			'top'
+		);
+
 		add_rewrite_rule(
 			'^' . $this->permalinks['category_base'] . '/([^/]*)/page/?([0-9]{1,})/?',
 			'index.php?post_type=portfolio&vp_page_archive=1&portfolio_category=$matches[1]&vp_category=$matches[1]&vp_page_query=$matches[2]',
@@ -837,6 +858,11 @@ class Visual_Portfolio_Archive_Mapping {
 			return;
 		}
 
+		// Skip override for any feeds to ensure RSS feeds work properly.
+		if ( is_feed() ) {
+			return;
+		}
+
 		$post_type = 'portfolio';
 
 		// Maybe Redirect.
@@ -857,7 +883,7 @@ class Visual_Portfolio_Archive_Mapping {
 					(int) $object_id === (int) $this->archive_page
 				)
 			) &&
-			'' !== $this->archive_page && $query->is_main_query()
+			'' !== $this->archive_page && $query->is_main_query() && ! is_feed()
 		) {
 			$post_id = absint( $this->archive_page );
 			$post_id = Visual_Portfolio_3rd_WPML::get_object_id( $post_id );

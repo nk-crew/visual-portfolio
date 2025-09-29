@@ -165,6 +165,7 @@ class Visual_Portfolio_Custom_Post_Type {
 					'rewrite'            => array(
 						'slug'       => $permalinks['portfolio_base'],
 						'with_front' => false,
+						'feeds'      => true,
 					),
 					'supports'           => array(
 						'title',
@@ -190,7 +191,8 @@ class Visual_Portfolio_Custom_Post_Type {
 						'menu_name' => esc_html__( 'Categories', 'visual-portfolio' ),
 					),
 					'rewrite'            => array(
-						'slug' => $permalinks['category_base'],
+						'slug'  => $permalinks['category_base'],
+						'feeds' => true,
 					),
 					'hierarchical'       => true,
 					'publicly_queryable' => true,
@@ -210,7 +212,8 @@ class Visual_Portfolio_Custom_Post_Type {
 						'menu_name' => esc_html__( 'Tags', 'visual-portfolio' ),
 					),
 					'rewrite'            => array(
-						'slug' => $permalinks['tag_base'],
+						'slug'  => $permalinks['tag_base'],
+						'feeds' => true,
 					),
 					'hierarchical'       => false,
 					'publicly_queryable' => true,
