@@ -12,7 +12,6 @@ import { PanelBody, Spinner, ToggleControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 
 export default function BlockEdit({
 	attributes,
@@ -25,7 +24,7 @@ export default function BlockEdit({
 	const initialLoadDone = useRef(false);
 
 	const {
-		'vp/queryType': contentSource,
+		'vp/queryType': queryType,
 		'vp/baseQuery': baseQuery,
 		'vp/imagesQuery': imagesQuery,
 		'vp/postsQuery': postsQuery,
@@ -55,7 +54,9 @@ export default function BlockEdit({
 	useEffect(() => {
 		const hasContextChanged = () => {
 			const currentContext = {
-				contentSource,
+				queryType,
+				postsQuery,
+				imagesQuery,
 				postsSource,
 				postsTaxonomies,
 				images,
@@ -93,29 +94,22 @@ export default function BlockEdit({
 			setIsLoading(true);
 
 			try {
-				const endpoint = '/visual-portfolio/v1/get_filter_items/';
-
-				let queryArgs = {
-					content_source: contentSource,
+				const requestData = {
+					baseQuery,
+					imagesQuery,
 					post_id: postId,
-					items_count: itemsCount,
+					postsQuery,
+					queryType,
 				};
 
-				if (contentSource === 'posts') {
-					queryArgs = {
-						...queryArgs,
-						posts_source: postsSource,
-						posts_taxonomies: postsTaxonomies,
-					};
-				} else if (contentSource === 'images') {
-					queryArgs = {
-						...queryArgs,
-						images: JSON.stringify(images),
-					};
-				}
+				// Add block ID
+				requestData.block_id = clientId;
 
+				// Make API request with data in the body
 				const response = await apiFetch({
-					path: addQueryArgs(endpoint, queryArgs),
+					path: '/visual-portfolio/v1/get_filter_items/',
+					method: 'POST',
+					data: requestData, // Send data in request body instead of URL
 				});
 
 				if (response?.success) {
@@ -194,7 +188,7 @@ export default function BlockEdit({
 
 		fetchFilterItems();
 	}, [
-		contentSource,
+		queryType,
 		postsSource,
 		postsTaxonomies,
 		images,
@@ -207,6 +201,9 @@ export default function BlockEdit({
 		postId,
 		itemsCount,
 		attributes.showCount,
+		baseQuery,
+		imagesQuery,
+		postsQuery,
 	]);
 
 	useEffect(() => {
