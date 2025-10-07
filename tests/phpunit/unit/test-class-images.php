@@ -208,6 +208,60 @@ class ClassImages extends WP_UnitTestCase {
     }
 
     /**
+     * Skip lazy loading with attribute-value pairs.
+     */
+    public function test_lazy_loading_skip_attribute_with_value() {
+        // Enable lazy load in settings.
+        Visual_Portfolio_Images::$allow_wp_lazyload = true;
+        Visual_Portfolio_Images::$allow_vp_lazyload = true;
+
+        // Skip `fetchpriority="high"` attribute-value pair.
+        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" fetchpriority="high">';
+        $this->assertEquals(
+            $image_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'Images with fetchpriority="high" should be skipped from lazy loading'
+        );
+
+        // Do NOT skip `fetchpriority="low"` - different value should be lazy loaded.
+        $placeholder  = Visual_Portfolio_Images::get_image_placeholder( 10, 10 );
+        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" fetchpriority="low">';
+        $lazy_string  = '<img src="' . $placeholder . '" alt="Test Image" width="10" height="10" fetchpriority="low" data-src="image.jpg" data-sizes="auto" loading="eager" class="vp-lazyload">';
+
+        $this->assertEquals(
+            $this->get_noscript_image( $image_string ) . $lazy_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'Images with fetchpriority="low" should be lazy loaded'
+        );
+
+        // Do NOT skip `fetchpriority="auto"` - different value should be lazy loaded.
+        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" fetchpriority="auto">';
+        $lazy_string  = '<img src="' . $placeholder . '" alt="Test Image" width="10" height="10" fetchpriority="auto" data-src="image.jpg" data-sizes="auto" loading="eager" class="vp-lazyload">';
+
+        $this->assertEquals(
+            $this->get_noscript_image( $image_string ) . $lazy_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'Images with fetchpriority="auto" should be lazy loaded'
+        );
+
+        // Verify backward compatibility - attribute name only (data-no-lazy) still works.
+        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" data-no-lazy="anything">';
+        $this->assertEquals(
+            $image_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'Images with data-no-lazy attribute (any value) should be skipped'
+        );
+    }
+
+    /**
      * Prepare noscript image string.
      *
      * @param string $image_string - image string.
