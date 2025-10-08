@@ -58,6 +58,12 @@ import { debounce } from 'throttle-debounce';
 
 			// Debounced callback to restore classes via unveil if vp-lazyloaded is removed.
 			const restoreLazyloadedClass = debounce(50, () => {
+				// Check if element is still in the DOM before processing.
+				if (!document.contains(img)) {
+					this.disconnectObserver(img);
+					return;
+				}
+
 				if (!img.classList.contains('vp-lazyloaded')) {
 					unveil(img);
 				}
@@ -83,6 +89,30 @@ import { debounce } from 'throttle-debounce';
 
 			// Store observer reference.
 			observerMap.set(img, observer);
+
+			// Clean up observer when element is removed from DOM.
+			// Use Intersection Observer to detect when element is disconnected.
+			const cleanupObserver = new window.IntersectionObserver(
+				(entries) => {
+					entries.forEach((entry) => {
+						// When element is no longer intersecting and not in document, clean up.
+						if (!entry.isIntersecting && !document.contains(img)) {
+							this.disconnectObserver(img);
+							cleanupObserver.disconnect();
+						}
+					});
+				},
+				{ threshold: 0 }
+			);
+
+			cleanupObserver.observe(img);
+		},
+		disconnectObserver(img) {
+			const observer = observerMap.get(img);
+			if (observer) {
+				observer.disconnect();
+				observerMap.delete(img);
+			}
 		},
 	};
 
