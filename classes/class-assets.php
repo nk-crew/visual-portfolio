@@ -148,14 +148,20 @@ class Visual_Portfolio_Assets {
 	/**
 	 * Enqueue script.
 	 *
-	 * @param string  $name asset name.
-	 * @param string  $path file path.
-	 * @param array   $dependencies asset dependencies.
-	 * @param string  $version asset version.
-	 * @param boolean $in_footer render in footer.
+	 * @param string     $name asset name.
+	 * @param string     $path file path.
+	 * @param array      $dependencies asset dependencies.
+	 * @param string     $version asset version.
+	 * @param array|bool $args {
+	 *     Optional. An array of additional script loading strategies. Default empty array.
+	 *     Otherwise, it may be a boolean in which case it determines whether the script is printed in the footer. Default false.
+	 *
+	 *     @type string    $strategy     Optional. If provided, may be either 'defer' or 'async'.
+	 *     @type bool      $in_footer    Optional. Whether to print the script in the footer. Default 'false'.
+	 * }
 	 */
-	public static function enqueue_script( $name, $path, $dependencies = array(), $version = null, $in_footer = true ) {
-		self::register_script( $name, $path, $dependencies, $version, $in_footer );
+	public static function enqueue_script( $name, $path, $dependencies = array(), $version = null, $args = array() ) {
+		self::register_script( $name, $path, $dependencies, $version, $args );
 
 		wp_enqueue_script( $name );
 	}
