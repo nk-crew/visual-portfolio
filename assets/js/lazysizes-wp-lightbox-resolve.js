@@ -101,7 +101,7 @@ import { debounce } from 'throttle-debounce';
 
 		// Only allow for image blocks with lightbox enabled.
 		// Watch for class changes to prevent WP Lightbox from removing vp-lazyloaded.
-		if (e.target.parentNode.classList.contains('wp-lightbox-container')) {
+		if (e.target.parentNode?.classList.contains('wp-lightbox-container')) {
 			wpLightboxResolve.observeClassChanges(e.target);
 		}
 	});
