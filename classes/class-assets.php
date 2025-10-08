@@ -106,13 +106,25 @@ class Visual_Portfolio_Assets {
 	/**
 	 * Register script.
 	 *
-	 * @param string  $name asset name.
-	 * @param string  $path file path.
-	 * @param array   $dependencies asset dependencies.
-	 * @param string  $version asset version.
-	 * @param boolean $in_footer render in footer.
+	 * @param string     $name asset name.
+	 * @param string     $path file path.
+	 * @param array      $dependencies asset dependencies.
+	 * @param string     $version asset version.
+	 * @param array|bool $args {
+	 *     Optional. An array of additional script loading strategies. Default empty array.
+	 *     Otherwise, it may be a boolean in which case it determines whether the script is printed in the footer. Default false.
+	 *
+	 *     @type string    $strategy     Optional. If provided, may be either 'defer' or 'async'.
+	 *     @type bool      $in_footer    Optional. Whether to print the script in the footer. Default 'false'.
+	 * }
 	 */
-	public static function register_script( $name, $path, $dependencies = array(), $version = null, $in_footer = true ) {
+	public static function register_script( $name, $path, $dependencies = array(), $version = null, $args = array() ) {
+		if ( ! is_array( $args ) ) {
+			$args = array(
+				'in_footer' => (bool) $args,
+			);
+		}
+
 		$script_data = self::get_asset_file( $path, 'script' );
 
 		if ( ! empty( $dependencies ) ) {
@@ -129,21 +141,27 @@ class Visual_Portfolio_Assets {
 			visual_portfolio()->plugin_url . $path . '.js',
 			$script_data['dependencies'],
 			$version ?? $script_data['version'],
-			$in_footer
+			$args
 		);
 	}
 
 	/**
 	 * Enqueue script.
 	 *
-	 * @param string  $name asset name.
-	 * @param string  $path file path.
-	 * @param array   $dependencies asset dependencies.
-	 * @param string  $version asset version.
-	 * @param boolean $in_footer render in footer.
+	 * @param string     $name asset name.
+	 * @param string     $path file path.
+	 * @param array      $dependencies asset dependencies.
+	 * @param string     $version asset version.
+	 * @param array|bool $args {
+	 *     Optional. An array of additional script loading strategies. Default empty array.
+	 *     Otherwise, it may be a boolean in which case it determines whether the script is printed in the footer. Default false.
+	 *
+	 *     @type string    $strategy     Optional. If provided, may be either 'defer' or 'async'.
+	 *     @type bool      $in_footer    Optional. Whether to print the script in the footer. Default 'false'.
+	 * }
 	 */
-	public static function enqueue_script( $name, $path, $dependencies = array(), $version = null, $in_footer = true ) {
-		self::register_script( $name, $path, $dependencies, $version, $in_footer );
+	public static function enqueue_script( $name, $path, $dependencies = array(), $version = null, $args = array() ) {
+		self::register_script( $name, $path, $dependencies, $version, $args );
 
 		wp_enqueue_script( $name );
 	}
@@ -488,6 +506,8 @@ class Visual_Portfolio_Assets {
 		self::store_used_assets( 'visual-portfolio-lazyload', true, 'script' );
 		self::store_used_assets( 'visual-portfolio-lazyload', true, 'style' );
 
+		self::store_used_assets( 'lazysizes', true, 'script' );
+
 		// lazy load fallback.
 		add_action( 'wp_head', 'Visual_Portfolio_Assets::add_lazyload_fallback_script' );
 	}
@@ -538,19 +558,10 @@ class Visual_Portfolio_Assets {
 			self::register_script( 'simplebar', 'assets/vendor/simplebar/dist/simplebar.min', array(), '5.3.0' );
 		}
 
-		// LazySizes.
-		if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
-			self::register_script( 'lazysizes-config', 'build/assets/js/lazysizes-cfg', array() );
-			self::register_script( 'lazysizes-object-fit-cover', 'build/assets/js/lazysizes-object-fit-cover', array(), '4.1.0' );
-			self::register_script( 'lazysizes-swiper-duplicates-load', 'build/assets/js/lazysizes-swiper-duplicates-load', array() );
-			self::register_script( 'lazysizes', 'assets/vendor/lazysizes/lazysizes.min', array( 'lazysizes-config', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load' ), '5.3.2' );
-		}
-
 		// Visual Portfolio CSS.
 		$vp_styles = array(
 			'visual-portfolio'                  => array( 'build/assets/css/main', $vp_style_deps ),
 			'visual-portfolio-elementor'        => array( 'build/assets/css/elementor', array( 'visual-portfolio' ) ),
-			'visual-portfolio-lazyload'         => array( 'build/assets/css/lazyload', array() ),
 			'visual-portfolio-custom-scrollbar' => array( 'build/assets/css/custom-scrollbar', array( 'simplebar' ) ),
 			'visual-portfolio-layout-justified' => array( 'build/assets/css/layout-justified', array( 'visual-portfolio' ) ),
 			'visual-portfolio-layout-slider'    => array( 'build/assets/css/layout-slider', array( 'visual-portfolio', 'swiper' ) ),
@@ -560,12 +571,6 @@ class Visual_Portfolio_Assets {
 			'visual-portfolio-popup-fancybox'   => array( 'build/assets/css/popup-fancybox', array( 'visual-portfolio', 'fancybox' ) ),
 			'visual-portfolio-popup-photoswipe' => array( 'build/assets/css/popup-photoswipe', array( 'visual-portfolio', 'photoswipe-default-skin' ) ),
 		);
-
-		foreach ( $vp_styles as $name => $data ) {
-			self::register_style( $name, $data[0], $data[1] );
-			wp_style_add_data( $name, 'rtl', 'replace' );
-			wp_style_add_data( $name, 'suffix', '.min' );
-		}
 
 		// Visual Portfolio JS.
 		$vp_scripts = array(
@@ -595,12 +600,6 @@ class Visual_Portfolio_Assets {
 				'build/assets/js/custom-scrollbar',
 				array(
 					'simplebar',
-				),
-			),
-			'visual-portfolio-lazyload' => array(
-				'build/assets/js/lazyload',
-				array(
-					'lazysizes',
 				),
 			),
 			'visual-portfolio-popup-gallery' => array(
@@ -660,6 +659,35 @@ class Visual_Portfolio_Assets {
 				'build/assets/js/pagination-minimal-paged',
 			),
 		);
+
+		// Add lazy loading with lazysizes.
+		if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
+			self::register_script( 'lazysizes-config', 'build/assets/js/lazysizes-cfg', array() );
+			self::register_script( 'lazysizes-wp-lightbox-resolve', 'build/assets/js/lazysizes-wp-lightbox-resolve', array() );
+			self::register_script( 'lazysizes-object-fit-cover', 'build/assets/js/lazysizes-object-fit-cover', array(), '4.1.0' );
+			self::register_script( 'lazysizes-swiper-duplicates-load', 'build/assets/js/lazysizes-swiper-duplicates-load', array() );
+			self::register_script(
+				'lazysizes',
+				'assets/vendor/lazysizes/lazysizes.min',
+				array( 'lazysizes-config', 'lazysizes-wp-lightbox-resolve', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load', 'visual-portfolio-lazyload' ),
+				'5.3.2',
+				array(
+					'strategy'  => 'async',
+					'in_footer' => true,
+				)
+			);
+
+			$vp_styles['visual-portfolio-lazyload']  = array( 'build/assets/css/lazyload', array() );
+			$vp_scripts['visual-portfolio-lazyload'] = array(
+				'build/assets/js/lazyload',
+			);
+		}
+
+		foreach ( $vp_styles as $name => $data ) {
+			self::register_style( $name, $data[0], $data[1] );
+			wp_style_add_data( $name, 'rtl', 'replace' );
+			wp_style_add_data( $name, 'suffix', '.min' );
+		}
 
 		foreach ( $vp_scripts as $name => $data ) {
 			self::register_script( $name, $data[0], $data[1] ?? array() );
