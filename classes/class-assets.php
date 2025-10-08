@@ -657,12 +657,13 @@ class Visual_Portfolio_Assets {
 		// Add lazy loading with lazysizes.
 		if ( apply_filters( 'vpf_enqueue_plugin_lazysizes', true ) ) {
 			self::register_script( 'lazysizes-config', 'build/assets/js/lazysizes-cfg', array() );
+			self::register_script( 'lazysizes-wp-lightbox-resolve', 'build/assets/js/lazysizes-wp-lightbox-resolve', array() );
 			self::register_script( 'lazysizes-object-fit-cover', 'build/assets/js/lazysizes-object-fit-cover', array(), '4.1.0' );
 			self::register_script( 'lazysizes-swiper-duplicates-load', 'build/assets/js/lazysizes-swiper-duplicates-load', array() );
 			self::register_script(
 				'lazysizes',
 				'assets/vendor/lazysizes/lazysizes.min',
-				array( 'lazysizes-config', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load', 'visual-portfolio-lazyload' ),
+				array( 'lazysizes-config', 'lazysizes-wp-lightbox-resolve', 'lazysizes-object-fit-cover', 'lazysizes-swiper-duplicates-load', 'visual-portfolio-lazyload' ),
 				'5.3.2',
 				array(
 					'strategy'  => 'async',
