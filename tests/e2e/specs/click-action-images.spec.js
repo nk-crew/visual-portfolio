@@ -13,13 +13,18 @@ test.describe('click action gallery images', () => {
 		const pluginName = process.env.CORE
 			? 'visual-portfolio-pro'
 			: 'visual-portfolio-posts-amp-image-gallery';
-		await requestUtils.activatePlugin(pluginName);
-		await requestUtils.deleteAllMedia();
-		await requestUtils.deleteAllPages();
+
+		await Promise.all([
+			requestUtils.activatePlugin(pluginName),
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPages(),
+		]);
 	});
 	test.afterAll(async ({ requestUtils }) => {
-		await requestUtils.deleteAllMedia();
-		await requestUtils.deleteAllPages();
+		await Promise.all([
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPages(),
+		]);
 	});
 
 	/**
