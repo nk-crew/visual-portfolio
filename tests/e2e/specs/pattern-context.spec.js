@@ -34,7 +34,7 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		if (cachedPosts) {
 			return cachedPosts;
 		}
-		createRegularPosts({
+		await createRegularPosts({
 			requestUtils,
 			count,
 		});

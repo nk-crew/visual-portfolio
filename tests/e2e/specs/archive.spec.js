@@ -931,7 +931,11 @@ test.describe('archive pages', () => {
 						})
 					);
 
-					console.log(`Post "${post.title}" created successfully.`);
+					if (logsEnabled) {
+						console.log(
+							`Post "${post.title}" created successfully.`
+						);
+					}
 				} catch (error) {
 					console.error(
 						`Failed to create post "${post.title}":`,

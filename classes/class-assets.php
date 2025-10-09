@@ -115,7 +115,7 @@ class Visual_Portfolio_Assets {
 	 *     Otherwise, it may be a boolean in which case it determines whether the script is printed in the footer. Default false.
 	 *
 	 *     @type string    $strategy     Optional. If provided, may be either 'defer' or 'async'.
-	 *     @type bool      $in_footer    Optional. Whether to print the script in the footer. Default 'false'.
+	 *     @type bool      $in_footer    Optional. Whether to print the script in the footer. Default 'true'.
 	 * }
 	 */
 	public static function register_script( $name, $path, $dependencies = array(), $version = null, $args = array() ) {
@@ -123,6 +123,11 @@ class Visual_Portfolio_Assets {
 			$args = array(
 				'in_footer' => (bool) $args,
 			);
+		}
+
+		// Default to footer loading if not explicitly set.
+		if ( ! isset( $args['in_footer'] ) ) {
+			$args['in_footer'] = true;
 		}
 
 		$script_data = self::get_asset_file( $path, 'script' );
@@ -157,7 +162,7 @@ class Visual_Portfolio_Assets {
 	 *     Otherwise, it may be a boolean in which case it determines whether the script is printed in the footer. Default false.
 	 *
 	 *     @type string    $strategy     Optional. If provided, may be either 'defer' or 'async'.
-	 *     @type bool      $in_footer    Optional. Whether to print the script in the footer. Default 'false'.
+	 *     @type bool      $in_footer    Optional. Whether to print the script in the footer. Default 'true'.
 	 * }
 	 */
 	public static function enqueue_script( $name, $path, $dependencies = array(), $version = null, $args = array() ) {
