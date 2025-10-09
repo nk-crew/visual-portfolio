@@ -31,7 +31,11 @@ test.describe('iframe preview resize', () => {
 		]);
 	});
 
-	test('check disabled click action', async ({ page, admin, editor }) => {
+	test('verifies iframe preview loads with correct height', async ({
+		page,
+		admin,
+		editor,
+	}) => {
 		await admin.createNewPost({
 			title: 'Preview Test',
 			postType: 'page',
@@ -57,9 +61,11 @@ test.describe('iframe preview resize', () => {
 		);
 		await iframe.waitFor({ state: 'visible' });
 
-		// Wait for height to stabilize and be > 400px and < 500px
-		// We don't need to check the exact height value, just need to ensure the iframe is loaded
-		// and the height is calculated and set to a non-zero value.
+		// Wait for height to stabilize and be in the expected range.
+		// With 3 posts in a grid layout, the expected height is approximately 440-460px.
+		// We use a wider range (400-500px) to account for minor variations in rendering
+		// across different environments. The key is to verify the iframe height is calculated
+		// correctly and not stuck at a default/loading height.
 		await expect(async () => {
 			const height = await iframe.evaluate((el) => el.offsetHeight);
 			expect(height).toBeGreaterThan(400);
