@@ -434,9 +434,11 @@ if (PhotoSwipe && VPPopupAPI) {
 
 			resizeVideo(this);
 
-			if (self) {
-				self.emitEvent('afterChangePhotoSwipe', [this, pswpInstance]);
-			}
+			VPPopupAPI.emitEvent(
+				'afterChangePhotoSwipe',
+				[this, pswpInstance],
+				self
+			);
 		});
 
 		// disable video play if no active.
@@ -473,9 +475,11 @@ if (PhotoSwipe && VPPopupAPI) {
 				});
 			}
 
-			if (self) {
-				self.emitEvent('beforeChangePhotoSwipe', [data, pswpInstance]);
-			}
+			VPPopupAPI.emitEvent(
+				'beforeChangePhotoSwipe',
+				[data, pswpInstance],
+				self
+			);
 		});
 
 		// destroy event.
@@ -498,37 +502,29 @@ if (PhotoSwipe && VPPopupAPI) {
 					VPPopupAPI.maybeFocusGalleryItem(currentItemData);
 				}
 
-				if (self) {
-					self.emitEvent('beforeClosePhotoSwipe', [
-						options,
-						items,
-						pswpInstance,
-					]);
-				}
+				VPPopupAPI.emitEvent(
+					'beforeClosePhotoSwipe',
+					[options, items, pswpInstance],
+					self
+				);
 			}
 
 			pswpInstance = false;
 		});
 
-		if (self) {
-			self.emitEvent('beforeInitPhotoSwipe', [
-				options,
-				finalItems,
-				index,
-				pswpInstance,
-			]);
-		}
+		VPPopupAPI.emitEvent(
+			'beforeInitPhotoSwipe',
+			[options, finalItems, index, pswpInstance],
+			self
+		);
 
 		pswpInstance.init();
 
-		if (self) {
-			self.emitEvent('initPhotoSwipe', [
-				options,
-				finalItems,
-				index,
-				pswpInstance,
-			]);
-		}
+		VPPopupAPI.emitEvent(
+			'initPhotoSwipe',
+			[options, finalItems, index, pswpInstance],
+			self
+		);
 	};
 	VPPopupAPI.close = function () {
 		if (pswpInstance) {
