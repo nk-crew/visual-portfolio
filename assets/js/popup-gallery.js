@@ -393,6 +393,25 @@ const VPPopupAPI = {
 			$(data.el).find('.vp-portfolio__item-img > a').focus();
 		}
 	},
+
+	/**
+	 * Emit popup event with fallback for non-Visual Portfolio galleries
+	 * Uses self.emitEvent() when available, otherwise triggers document event manually
+	 *
+	 * @param {string}        eventName - Event name (e.g., 'initFancybox')
+	 * @param {Array}         eventArgs - Event arguments array
+	 * @param {Object | null} self      - Gallery instance (null for 3rd-party)
+	 */
+	emitEvent(eventName, eventArgs, self) {
+		if (self && self.emitEvent) {
+			// Use instance method for Visual Portfolio galleries
+			self.emitEvent(eventName, eventArgs);
+		} else {
+			// Manually trigger event for 3rd-party galleries
+			const globalEventArgs = [null].concat(eventArgs);
+			$(document).trigger(`${eventName}.vpf`, globalEventArgs);
+		}
+	},
 };
 
 window.VPPopupAPI = VPPopupAPI;

@@ -176,31 +176,27 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 					VPPopupAPI.maybeFocusGalleryItem(currentItemData);
 				}
 
-				if (self) {
-					self.emitEvent('beforeCloseFancybox', [
-						options,
-						items,
-						fancyboxInstance,
-					]);
-				}
+				VPPopupAPI.emitEvent(
+					'beforeCloseFancybox',
+					[options, items, fancyboxInstance],
+					self
+				);
 
 				fancyboxInstance = false;
 			},
 			beforeShow(e, instance) {
-				if (self) {
-					self.emitEvent('beforeShowFancybox', [e, instance]);
-				}
+				VPPopupAPI.emitEvent('beforeShowFancybox', [e, instance], self);
 			},
 			afterShow(e, instance) {
-				if (self) {
-					self.emitEvent('afterShowFancybox', [e, instance]);
-				}
+				VPPopupAPI.emitEvent('afterShowFancybox', [e, instance], self);
 			},
 		};
 
-		if (self) {
-			self.emitEvent('beforeInitFancybox', [options, finalItems, index]);
-		}
+		VPPopupAPI.emitEvent(
+			'beforeInitFancybox',
+			[options, finalItems, index],
+			self
+		);
 
 		// Disable Loop if only 1 item in gallery.
 		// We need this because Fancybox still let us scroll gallery using keyboard.
@@ -211,14 +207,11 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 		// Start new fancybox instance
 		fancyboxInstance = $.fancybox.open(finalItems, options, index);
 
-		if (self) {
-			self.emitEvent('initFancybox', [
-				options,
-				finalItems,
-				index,
-				fancyboxInstance,
-			]);
-		}
+		VPPopupAPI.emitEvent(
+			'initFancybox',
+			[options, finalItems, index, fancyboxInstance],
+			self
+		);
 	};
 	VPPopupAPI.close = function () {
 		if (fancyboxInstance) {
