@@ -565,6 +565,21 @@ class VP {
 		self.$sort.on(`click${evp}`, '.vp-sort .vp-sort__item a', function (e) {
 			e.preventDefault();
 			const $this = $(this);
+			const href = $this.attr('href');
+
+			// Emit event BEFORE loadNewItems - allows Pro modules to intercept
+			// Pro modules can set eventData.cancelled = true to handle navigation themselves
+			const eventData = {
+				url: href,
+				removeExisting: true,
+				cancelled: false,
+			};
+			self.emitEvent('beforeLoadNewItems', [eventData]);
+
+			if (eventData.cancelled) {
+				return; // Pro module will handle navigation
+			}
+
 			if (!self.loading) {
 				$this
 					.closest('.vp-sort__item')
@@ -572,7 +587,7 @@ class VP {
 					.siblings()
 					.removeClass('vp-sort__item-active');
 			}
-			self.loadNewItems($this.attr('href'), true);
+			self.loadNewItems(href, true);
 		});
 
 		// on filter/sort select change
@@ -589,7 +604,21 @@ class VP {
 					);
 
 					if ($option.length) {
-						self.loadNewItems($option.attr('data-vp-url'), true);
+						const url = $option.attr('data-vp-url');
+
+						// Emit event BEFORE loadNewItems - allows Pro modules to intercept
+						const eventData = {
+							url,
+							removeExisting: true,
+							cancelled: false,
+						};
+						self.emitEvent('beforeLoadNewItems', [eventData]);
+
+						if (eventData.cancelled) {
+							return; // Pro module will handle navigation
+						}
+
+						self.loadNewItems(url, true);
 					}
 				}
 			);
@@ -648,10 +677,18 @@ class VP {
 					return;
 				}
 
-				self.loadNewItems(
-					$this.attr('href'),
-					self.options.pagination === 'paged'
-				);
+				const url = $this.attr('href');
+				const removeExisting = self.options.pagination === 'paged';
+
+				// Emit event BEFORE loadNewItems - allows Pro modules to intercept
+				const eventData = { url, removeExisting, cancelled: false };
+				self.emitEvent('beforeLoadNewItems', [eventData]);
+
+				if (eventData.cancelled) {
+					return; // Pro module will handle navigation
+				}
+
+				self.loadNewItems(url, removeExisting);
 
 				scrollToTop($pagination);
 			}
