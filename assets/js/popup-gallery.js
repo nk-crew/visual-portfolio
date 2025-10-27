@@ -568,21 +568,35 @@ function parseImgData(link) {
 	};
 }
 
-/* Popup for default WordPress images */
+/**
+ * Popup for WordPress images and custom galleries
+ *
+ * This code is active when the "Lightbox for WordPress Images" setting is enabled.
+ * It handles:
+ * - WordPress native galleries (blocks, classic galleries, Jetpack)
+ * - WordPress single images in content
+ * - Custom galleries marked with .vp-lightbox-gallery class
+ *
+ * Custom gallery usage:
+ * - Single image: <a href="image.jpg" class="vp-lightbox-gallery"><img /></a>
+ * - Gallery: <div class="vp-lightbox-gallery"><a href="img1.jpg">...</a></div>
+ */
 if (settingsPopupGallery.enable_on_wordpress_images) {
 	$(document).on(
 		'click',
 		`
-      .wp-block-image > a,
-      .wp-block-image > figure > a,
-      .wp-block-gallery .blocks-gallery-item > figure > a,
-      .wp-block-gallery .wp-block-image > a,
-      .wp-block-media-text > figure > a,
-      .gallery .gallery-icon > a,
-      figure.wp-caption > a,
-      figure.tiled-gallery__item > a,
-      p > a
-    `,
+			.wp-block-image > a,
+			.wp-block-image > figure > a,
+			.wp-block-gallery .blocks-gallery-item > figure > a,
+			.wp-block-gallery .wp-block-image > a,
+			.wp-block-media-text > figure > a,
+			.gallery .gallery-icon > a,
+			figure.wp-caption > a,
+			figure.tiled-gallery__item > a,
+			p > a,
+			a.vp-lightbox-gallery,
+			.vp-lightbox-gallery a
+		`,
 		function (e) {
 			if (e.isDefaultPrevented()) {
 				return;
@@ -619,15 +633,27 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
 			const items = [];
 			const currentImage = parseImgData(this);
 			const $gallery = $this.closest(
-				'.wp-block-gallery, .gallery, .tiled-gallery__gallery'
+				'.wp-block-gallery, .gallery, .tiled-gallery__gallery, .vp-lightbox-gallery'
 			);
 			let activeIndex = 0;
 
-			// Block gallery, WordPress default gallery, Jetpack gallery.
+			// Block gallery, WordPress default gallery, Jetpack gallery, custom gallery.
 			if ($gallery.length) {
-				const $galleryItems = $gallery.find(
-					'.blocks-gallery-item > figure > a, .wp-block-image > a, .gallery-icon > a, figure.tiled-gallery__item > a'
+				// Check if it's a custom gallery or WordPress gallery
+				const isCustomGallery = $gallery.hasClass(
+					'vp-lightbox-gallery'
 				);
+				const $galleryItems = isCustomGallery
+					? $gallery.find('a')
+					: $gallery.find(
+							`
+								.blocks-gallery-item > figure > a,
+								.wp-block-image > a,
+								.gallery-icon > a,
+								figure.tiled-gallery__item > a
+							`
+						);
+
 				let i = 0;
 
 				$galleryItems.each(function () {
