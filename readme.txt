@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.8
 * Requires PHP: 7.2
-* Stable tag: 3.3.16
+* Stable tag: 3.4.0
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -323,6 +323,25 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.4.0 - Nov 5, 2025 =
+
+* added custom lightbox gallery support using `.vp-lightbox-gallery` class
+* added lightbox event support for third-party galleries. For example, JS events like `initFancybox` and `beforeInitPhotoSwipe` now also fire on non-portfolio galleries
+* added SEO optimizations
+* fixed register_script to use in_footer true by default, which we changed in recent plugin updates and broke some features, for example - iframe preview resizer
+* fixed lazy loading conflict with WordPress Lightbox block
+* fixed pattern context bug and posts query type handling (fixed issue with displaying block when WooCommerce installed)
+* fixed RSS feed generation for portfolio archives
+* fixed controls persistence and rendering in Saved Layouts
+* fixed taxonomy filter counts to use actual query results
+* fixed experimental filter block to work with nested loop blocks
+* skip lazy loading from applying to images with fetchpriority="high" attribute
+* **Pro:**
+* migrated VK to new api domain
+* deprecated Google Photos integration
+* fixed click action for custom image
+* fixed updater api
 
 = 3.3.16 - Jun 26, 2025 =
 

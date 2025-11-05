@@ -8,13 +8,13 @@
          "Visual Portfolio, Posts & Image Gallery": [
             ""
          ],
+         "https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline": [
+            ""
+         ],
          "Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block.": [
             ""
          ],
          "Visual Portfolio Team": [
-            ""
-         ],
-         "https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline": [
             ""
          ],
          "Visual Portfolio": [
@@ -987,6 +987,9 @@
             ""
          ],
          "Required parameters are missing.": [
+            ""
+         ],
+         "Invalid content source: %s": [
             ""
          ],
          "Sorry, you are not allowed to get filter items.": [
