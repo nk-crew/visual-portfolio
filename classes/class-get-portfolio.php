@@ -1571,6 +1571,9 @@ class Visual_Portfolio_Get {
 					if ( ! empty( $options['posts_ids'] ) ) {
 						$query_opts['post__in'] = $options['posts_ids'];
 					}
+
+					// Ignore sticky posts by default for manual selection.
+					$query_opts['ignore_sticky_posts'] = true;
 				} elseif ( 'custom_query' === $options['posts_source'] ) { // Custom Query.
 					$query_opts['post_type'] = 'any';
 
