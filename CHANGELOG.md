@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.4.1 - Nov 11, 2025 =
+
+* fixed sticky posts appearing in Manual Selection posts source
+* **Pro:**
+* fixed option Ignore Sticky Posts incorrectly change output for Current Query and Custom Query posts sources
+* fixed option Ignore Sticky Posts appear when Manual Selection posts source selected
+
 = 3.4.0 - Nov 5, 2025 =
 
 * added custom lightbox gallery support using `.vp-lightbox-gallery` class
