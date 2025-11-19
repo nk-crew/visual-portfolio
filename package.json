@@ -58,7 +58,7 @@
 		"file-loader": "^6.2.0",
 		"filemanager-webpack-plugin": "^8.0.0",
 		"filenamify": "^4.2.0",
-		"glob": "^10.2.7",
+		"glob": "^10.5.0",
 		"gulp": "^5.0.0",
 		"gulp-change-file-content": "^1.0.1",
 		"gulp-zip": "^4.2.0",
