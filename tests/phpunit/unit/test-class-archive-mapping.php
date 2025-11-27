@@ -232,17 +232,30 @@ class Test_Visual_Portfolio_Archive_Mapping extends WP_UnitTestCase {
 
 	/**
 	 * Test that get_portfolio_slug handles empty post_name gracefully.
+	 *
+	 * Note: WordPress auto-generates post_name from title, so we need to
+	 * directly update the database to simulate this edge case.
 	 */
 	public function test_get_portfolio_slug_handles_empty_post_name() {
-		// Create a test archive page with empty slug (edge case).
+		global $wpdb;
+
+		// Create a test archive page.
 		$this->archive_page_id = $this->factory->post->create(
 			array(
 				'post_type'   => 'page',
 				'post_title'  => 'Empty Slug Page',
-				'post_name'   => '', // Empty slug.
 				'post_status' => 'publish',
 			)
 		);
+
+		// Directly update the database to set empty post_name (WordPress normally auto-generates it).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->update(
+			$wpdb->posts,
+			array( 'post_name' => '' ),
+			array( 'ID' => $this->archive_page_id )
+		);
+		clean_post_cache( $this->archive_page_id );
 
 		// Set it as archive page in options.
 		update_option(
