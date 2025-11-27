@@ -54,19 +54,7 @@ class Test_Visual_Portfolio_Archive_Mapping extends WP_UnitTestCase {
 	 * @return void
 	 */
 	private function reset_static_cache() {
-		// Use reflection to reset static variables.
-		$reflection = new ReflectionClass( 'Visual_Portfolio_Archive_Mapping' );
-
-		// Reset get_portfolio_slug cache.
-		$method = $reflection->getMethod( 'get_portfolio_slug' );
-		$static_vars = $method->getStaticVariables();
-		if ( isset( $static_vars['cached_slug'] ) ) {
-			// We need to call the method in a fresh state.
-			// Since we can't directly modify static variables, we'll work around it in tests.
-		}
-
-		// For testing purposes, we'll create a helper that forces cache reset.
-		// In real code, static cache persists only within a single request.
+		Visual_Portfolio_Archive_Mapping::reset_cache();
 	}
 
 	/**

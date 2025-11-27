@@ -37,6 +37,20 @@ class Visual_Portfolio_Archive_Mapping {
 	private $permalinks = array();
 
 	/**
+	 * Cached portfolio slug.
+	 *
+	 * @var string|null
+	 */
+	private static $cached_slug = null;
+
+	/**
+	 * Cached portfolio label.
+	 *
+	 * @var string|null
+	 */
+	private static $cached_label = null;
+
+	/**
 	 * Visual_Portfolio_Archive_Mapping constructor.
 	 */
 	public function __construct() {
@@ -1223,15 +1237,13 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return string
 	 */
 	public static function get_portfolio_slug() {
-		static $cached_slug = null;
-
-		if ( null !== $cached_slug ) {
-			return $cached_slug;
+		if ( null !== self::$cached_slug ) {
+			return self::$cached_slug;
 		}
 
 		// When deleting the archive page, we leave the old slug without overwriting the permalinks.
 		// In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-		$cached_slug = _x( 'portfolio', 'default-slug', 'visual-portfolio' );
+		self::$cached_slug = _x( 'portfolio', 'default-slug', 'visual-portfolio' );
 
 		$archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
 
@@ -1239,11 +1251,11 @@ class Visual_Portfolio_Archive_Mapping {
 			$post = get_post( $archive_page );
 
 			if ( $post instanceof WP_Post && ! empty( $post->post_name ) ) {
-				$cached_slug = $post->post_name;
+				self::$cached_slug = $post->post_name;
 			}
 		}
 
-		return $cached_slug;
+		return self::$cached_slug;
 	}
 
 	/**
@@ -1252,15 +1264,13 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return string
 	 */
 	public static function get_portfolio_label() {
-		static $cached_label = null;
-
-		if ( null !== $cached_label ) {
-			return $cached_label;
+		if ( null !== self::$cached_label ) {
+			return self::$cached_label;
 		}
 
 		// When deleting the archive page, we leave the old label without overwriting the permalinks.
 		// In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-		$cached_label = _x( 'Portfolio', 'default-label', 'visual-portfolio' );
+		self::$cached_label = _x( 'Portfolio', 'default-label', 'visual-portfolio' );
 
 		$archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
 
@@ -1268,11 +1278,22 @@ class Visual_Portfolio_Archive_Mapping {
 			$post = get_post( $archive_page );
 
 			if ( $post instanceof WP_Post && ! empty( $post->post_title ) ) {
-				$cached_label = $post->post_title;
+				self::$cached_label = $post->post_title;
 			}
 		}
 
-		return $cached_label;
+		return self::$cached_label;
+	}
+
+	/**
+	 * Reset cached portfolio slug and label.
+	 * This is primarily used for testing purposes.
+	 *
+	 * @return void
+	 */
+	public static function reset_cache() {
+		self::$cached_slug  = null;
+		self::$cached_label = null;
 	}
 
 	/**
