@@ -861,8 +861,11 @@ class Visual_Portfolio_Settings {
 			'' => esc_html__( '-- Select Page --', 'visual-portfolio' ),
 		);
 		if ( $archive_page ) {
-			$archive_title               = get_post_field( 'post_title', $archive_page );
-			$pages_list[ $archive_page ] = $archive_title;
+			$post = get_post( $archive_page );
+
+			if ( $post instanceof WP_Post ) {
+				$pages_list[ $archive_page ] = $post->post_title;
+			}
 		}
 		return $pages_list;
 	}

@@ -762,7 +762,7 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return void
 	 */
 	public function init_rewrite_rules() {
-		$slug = get_post_field( 'post_name', $this->archive_page );
+		$slug = self::get_portfolio_slug();
 		add_rewrite_tag( '%vp_page_query%', '([^&]+)' );
 		add_rewrite_tag( '%vp_page_archive%', '([^&]+)' );
 		// We've added this custom category tag for cases where categories are used in conjunction with pagination on archive and other taxonomy pages,
@@ -1223,18 +1223,27 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return string
 	 */
 	public static function get_portfolio_slug() {
+		static $cached_slug = null;
+
+		if ( null !== $cached_slug ) {
+			return $cached_slug;
+		}
+
 		// When deleting the archive page, we leave the old slug without overwriting the permalinks.
 		// In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-		$custom_slug = _x( 'portfolio', 'default-slug', 'visual-portfolio' );
+		$cached_slug = _x( 'portfolio', 'default-slug', 'visual-portfolio' );
 
 		$archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
 
-		if ( isset( $archive_page ) && ! empty( $archive_page ) ) {
-			// If there is a selected page of archives, we substitute its slug.
-			$custom_slug = get_post_field( 'post_name', $archive_page );
+		if ( ! empty( $archive_page ) ) {
+			$post = get_post( $archive_page );
+
+			if ( $post instanceof WP_Post && ! empty( $post->post_name ) ) {
+				$cached_slug = $post->post_name;
+			}
 		}
 
-		return $custom_slug;
+		return $cached_slug;
 	}
 
 	/**
@@ -1243,18 +1252,27 @@ class Visual_Portfolio_Archive_Mapping {
 	 * @return string
 	 */
 	public static function get_portfolio_label() {
-		// When deleting the archive page, we leave the old slug without overwriting the permalinks.
+		static $cached_label = null;
+
+		if ( null !== $cached_label ) {
+			return $cached_label;
+		}
+
+		// When deleting the archive page, we leave the old label without overwriting the permalinks.
 		// In this case, instead of the archives page, a standard archives page with the corresponding template is substituted.
-		$custom_slug = _x( 'Portfolio', 'default-label', 'visual-portfolio' );
+		$cached_label = _x( 'Portfolio', 'default-label', 'visual-portfolio' );
 
 		$archive_page = Settings::get_option( 'portfolio_archive_page', 'vp_general' );
 
-		if ( isset( $archive_page ) && ! empty( $archive_page ) ) {
-			// If there is a selected page of archives, we substitute its slug.
-			$custom_slug = get_post_field( 'post_title', $archive_page );
+		if ( ! empty( $archive_page ) ) {
+			$post = get_post( $archive_page );
+
+			if ( $post instanceof WP_Post && ! empty( $post->post_title ) ) {
+				$cached_label = $post->post_title;
+			}
 		}
 
-		return $custom_slug;
+		return $cached_label;
 	}
 
 	/**
