@@ -214,9 +214,9 @@ const SelectedImageData = function (props) {
 				return {};
 			}
 
-			const { getMedia } = select('core');
+			const { getEntityRecord } = select('core');
 
-			const imgData = getMedia(imgId);
+			const imgData = getEntityRecord('postType', 'attachment', imgId);
 
 			if (!imgData) {
 				return {};

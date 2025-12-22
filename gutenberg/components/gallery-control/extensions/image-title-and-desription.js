@@ -13,10 +13,12 @@ function RenderTitleAndDescriptionImageControls(props) {
 
 	const { imgData } = useSelect(
 		(select) => {
-			const { getMedia } = select('core');
+			const { getEntityRecord } = select('core');
 
 			return {
-				imgData: img.id ? getMedia(img.id) : null,
+				imgData: img.id
+					? getEntityRecord('postType', 'attachment', img.id)
+					: null,
 			};
 		},
 		[img]
