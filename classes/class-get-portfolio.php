@@ -1185,12 +1185,12 @@ class Visual_Portfolio_Get {
 	/**
 	 * Sort associative array by custom field.
 	 *
-	 * @param array  $array - Sortable array.
+	 * @param array  $data - Sortable array.
 	 * @param string $field - Array field by which sorting will take place.
 	 * @param string $order - Sorting order (asc and desc).
 	 * @return array
 	 */
-	public static function sort_array_by_field( $array, $field, $order = 'desc' ) {
+	public static function sort_array_by_field( $data, $field, $order = 'desc' ) {
 		$array_with_empty_fields     = array();
 		$array_with_not_empty_fields = array();
 
@@ -1199,7 +1199,7 @@ class Visual_Portfolio_Get {
 		 * This is only necessary when sorting in descending order.
 		 */
 		if ( 'desc' === $order ) {
-			foreach ( $array as $key => &$element ) {
+			foreach ( $data as $key => &$element ) {
 				$element['__VP_SORT_ID__'] = $key;
 			}
 		}

@@ -29,7 +29,7 @@ class Visual_Portfolio_Parse_Blocks {
 	public static function init() {
 		add_action(
 			'wp',
-			function() {
+			function () {
 				// Simple use `render_block` in FSE themes to enqueue assets.
 				if ( current_theme_supports( 'block-templates' ) ) {
 					// Parse all blocks.

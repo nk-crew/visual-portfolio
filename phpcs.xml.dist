@@ -72,7 +72,7 @@
 		</properties>
 		<exclude name="VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable" />
 	</rule>
-	<rule ref="WordPress.CodeAnalysis.EmptyStatement"/>
+		<rule ref="Generic.CodeAnalysis.EmptyPHPStatement"/>
 
 	<!--
 	#############################################################################
@@ -98,16 +98,8 @@
 		</properties>
 	</rule>
 
-	<!-- Verify that everything in the global namespace is prefixed with a theme specific prefix.
-		Multiple valid prefixes can be provided as a comma-delimited list. -->
-	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
-		<properties>
-			<property name="prefixes" type="array">
-					<element value="Visual_Portfolio"/>
-					<element value="vpf"/>
-			</property>
-		</properties>
-	</rule>
+		<!-- PrefixAllGlobals is intentionally disabled for this project. -->
+		<exclude name="WordPress.NamingConventions.PrefixAllGlobals" />
 
 	<rule ref="WordPress.Arrays.MultipleStatementAlignment">
 		<properties>

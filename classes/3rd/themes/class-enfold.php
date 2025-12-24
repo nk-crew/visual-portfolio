@@ -42,23 +42,23 @@ class Visual_Portfolio_3rd_Enfold {
 	/**
 	 * Disable Enfold lightbox by adding classname.
 	 *
-	 * @param string $class - portfolio block classname.
+	 * @param string $class_name - portfolio block classname.
 	 *
 	 * @return string
 	 */
-	public function disable_lightbox_class( $class ) {
-		$class .= ' noLightbox';
-		return $class;
+	public function disable_lightbox_class( $class_name ) {
+		$class_name .= ' noLightbox';
+		return $class_name;
 	}
 
 	/**
 	 * Disable VPF lazy load if Enfold uses their own.
 	 *
-	 * @param boolean $return - portfolio block classname.
+	 * @param boolean $default_return - portfolio block classname.
 	 *
 	 * @return boolean
 	 */
-	public function disable_lazy_load( $return ) {
+	public function disable_lazy_load( $default_return ) {
 		$enfold_option = '';
 
 		if ( null !== $this->lazy_loading_option_cache ) {
@@ -75,7 +75,7 @@ class Visual_Portfolio_3rd_Enfold {
 			return false;
 		}
 
-		return $return;
+		return $default_return;
 	}
 }
 

@@ -45,7 +45,7 @@ $count       = $opts['categories_count'];
 			?>
 		</div>
 		<?php
-		$count--;
+		--$count;
 	}
 	?>
 </div>
