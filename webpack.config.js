@@ -5,13 +5,10 @@ const path = require( 'path' );
 
 const glob = require( 'glob' );
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
-const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const RemoveEmptyScriptsPlugin = require( 'webpack-remove-empty-scripts' );
 const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const isProduction = process.env.NODE_ENV === 'production';
 const FileManagerPlugin = require( 'filemanager-webpack-plugin' );
-
-const gutenbergSrcDirectory = path.resolve( process.cwd(), 'gutenberg' );
 
 const vendorFiles = [
 	{
@@ -196,44 +193,6 @@ const newConfig = {
 		...defaultConfig.plugins,
 		new RtlCssPlugin( {
 			filename: `[name]-rtl.css`,
-		} ),
-		new CopyWebpackPlugin( {
-			patterns: [
-				{
-					from: '**/block.json',
-					context: gutenbergSrcDirectory,
-					noErrorOnMissing: true,
-					transform( content, absoluteFrom ) {
-						const convertExtension = ( p ) => {
-							return p.replace( /\.(j|t)sx?$/, '.js' );
-						};
-
-						if ( path.basename( absoluteFrom ) === 'block.json' ) {
-							const blockJson = JSON.parse( content.toString() );
-							[ 'viewScript', 'script', 'editorScript' ].forEach(
-								( key ) => {
-									if ( Array.isArray( blockJson[ key ] ) ) {
-										blockJson[ key ] =
-											blockJson[ key ].map(
-												convertExtension
-											);
-									} else if (
-										typeof blockJson[ key ] === 'string'
-									) {
-										blockJson[ key ] = convertExtension(
-											blockJson[ key ]
-										);
-									}
-								}
-							);
-
-							return JSON.stringify( blockJson, null, 2 );
-						}
-
-						return content;
-					},
-				},
-			],
 		} ),
 		new FileManagerPlugin( {
 			events: {

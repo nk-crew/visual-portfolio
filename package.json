@@ -8,6 +8,7 @@
 	"scripts": {
 		"dev": "wp-scripts start -- inline --hot --progress",
 		"build": "wp-scripts build --progress",
+		"build:quiet": "wp-scripts build --stats=errors-warnings",
 		"build:prod": "npm run make-pot && npm run make-json && npm run build && npm run zip",
 		"bump:patch": "gulp bump --type patch",
 		"bump:minor": "gulp bump --type minor",
