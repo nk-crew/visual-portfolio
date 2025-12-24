@@ -1191,6 +1191,9 @@ class Visual_Portfolio_Get {
 	 * @return array
 	 */
 	public static function sort_array_by_field( $data, $field, $order = 'desc' ) {
+		if ( ! is_array( $data ) ) {
+			return array();
+		}
 		$array_with_empty_fields     = array();
 		$array_with_not_empty_fields = array();
 
@@ -1212,7 +1215,7 @@ class Visual_Portfolio_Get {
 		 * Prior to PHP 8.0.0, their relative order in the sorted array was undefined.
 		 */
 		usort(
-			$array,
+			$data,
 			function ( $a, $b ) use ( $field, $order ) {
 				// Primary comparison by field values.
 				if ( isset( $a[ $field ] ) && isset( $b[ $field ] ) ) {
@@ -1234,12 +1237,12 @@ class Visual_Portfolio_Get {
 
 		// Clearing the array of service keys.
 		if ( 'desc' === $order ) {
-			foreach ( $array as $key => &$element ) {
+			foreach ( $data as $key => &$element ) {
 				unset( $element['__VP_SORT_ID__'] );
 			}
 		}
 
-		foreach ( $array as $item ) {
+		foreach ( $data as $item ) {
 			if ( empty( $item[ $field ] ) ) {
 				$array_with_empty_fields[] = $item;
 			} else {
@@ -1247,9 +1250,9 @@ class Visual_Portfolio_Get {
 			}
 		}
 
-		$array = array_merge( $array_with_not_empty_fields, $array_with_empty_fields );
+		$data = array_merge( $array_with_not_empty_fields, $array_with_empty_fields );
 
-		return $array;
+		return $data;
 	}
 
 	/**
