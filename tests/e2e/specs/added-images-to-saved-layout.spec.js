@@ -9,6 +9,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 import imageFixtures from '../../fixtures/images.json';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
+import { openPublishedPage } from '../utils/open-published-page';
 
 /**
  * TODO: The test needs to be redone in the future.
@@ -263,16 +264,13 @@ test.describe('added images to saved layout', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
 		// Check images on frontend.
 		for (const image of await images) {
-			await expect(page.locator('.wp-image-' + image.id)).toBeVisible();
+			await expect(
+				frontendPage.locator('.wp-image-' + image.id)
+			).toBeVisible();
 		}
 	});
 
@@ -334,20 +332,19 @@ test.describe('added images to saved layout', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
 		// Check images on frontend.
 		for (const image of images) {
-			await expect(page.locator('.wp-image-' + image.id)).toBeVisible();
+			await expect(
+				frontendPage.locator('.wp-image-' + image.id)
+			).toBeVisible();
 
-			const itemContainer = page
+			const itemContainer = frontendPage
 				.locator('.vp-portfolio__item')
-				.filter({ has: page.locator('.wp-image-' + image.id) });
+				.filter({
+					has: frontendPage.locator('.wp-image-' + image.id),
+				});
 
 			await expect(itemContainer).toBeVisible();
 
@@ -362,7 +359,9 @@ test.describe('added images to saved layout', () => {
 				async (x) => x.description === image.description
 			);
 
-			await expect(page.getByAltText(foundFixture.alt)).toBeVisible();
+			await expect(
+				frontendPage.getByAltText(foundFixture.alt)
+			).toBeVisible();
 		}
 	});
 
@@ -386,14 +385,11 @@ test.describe('added images to saved layout', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
-
-		const postLink = page.url();
+		const publishedPage = await openPublishedPage(page);
+		const postLink = publishedPage.url();
+		if (publishedPage !== page) {
+			await publishedPage.close();
+		}
 
 		await page.goto(currentPage);
 
@@ -614,32 +610,31 @@ test.describe('added images to saved layout', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
 		// Check image attributes on frontend.
 		for (const image of imageFixtures) {
-			await expect(page.locator('.wp-image-' + image.id)).toBeVisible();
+			await expect(
+				frontendPage.locator('.wp-image-' + image.id)
+			).toBeVisible();
 
-			const itemContainer = page
+			const itemContainer = frontendPage
 				.locator('.vp-portfolio__item')
-				.filter({ has: page.locator('.wp-image-' + image.id) });
+				.filter({
+					has: frontendPage.locator('.wp-image-' + image.id),
+				});
 
 			await expect(itemContainer).toBeVisible();
 
 			if (typeof image.imageSettings !== 'undefined') {
 				await expect(
-					page.locator('.vp-portfolio__item-meta-excerpt', {
+					frontendPage.locator('.vp-portfolio__item-meta-excerpt', {
 						hasText: image.imageSettings.description,
 					})
 				).toBeVisible();
 
 				await expect(
-					page.locator('.vp-portfolio__item-meta-title > a', {
+					frontendPage.locator('.vp-portfolio__item-meta-title > a', {
 						hasText: image.imageSettings.title,
 					})
 				).toBeVisible();
@@ -651,13 +646,13 @@ test.describe('added images to saved layout', () => {
 						typeof image.imageSettings.url !== 'undefined'
 					) {
 						await expect(
-							page.locator('.vp-portfolio__item-meta-title > a', {
+							frontendPage.locator('.vp-portfolio__item-meta-title > a', {
 								hasText: image.imageSettings.title,
 							})
 						).toHaveAttribute('href', image.imageSettings.url);
 
 						await expect(
-							page.getByRole('link', { name: image.alt })
+							frontendPage.getByRole('link', { name: image.alt })
 						).toHaveAttribute('href', image.imageSettings.url);
 					}
 
@@ -666,25 +661,25 @@ test.describe('added images to saved layout', () => {
 						typeof image.imageSettings.videoUrl !== 'undefined'
 					) {
 						await expect(
-							page.locator('.vp-portfolio__item-meta-title > a', {
+							frontendPage.locator('.vp-portfolio__item-meta-title > a', {
 								hasText: image.imageSettings.title,
 							})
 						).toHaveAttribute('href', image.imageSettings.videoUrl);
 
 						await expect(
-							page.getByRole('link', { name: image.alt })
+							frontendPage.getByRole('link', { name: image.alt })
 						).toHaveAttribute('href', image.imageSettings.videoUrl);
 					}
 				}
 			} else {
 				await expect(
-					page.locator('.vp-portfolio__item-meta-excerpt', {
+					frontendPage.locator('.vp-portfolio__item-meta-excerpt', {
 						hasText: image.description,
 					})
 				).toBeVisible();
 			}
 
-			await expect(page.getByAltText(image.alt)).toBeVisible();
+			await expect(frontendPage.getByAltText(image.alt)).toBeVisible();
 		}
 	});
 });
