@@ -1,17 +1,17 @@
 /**
  * External Dependencies
  */
-const path = require('path');
+const path = require( 'path' );
 
-const glob = require('glob');
-const defaultConfig = require('@wordpress/scripts/config/webpack.config');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
-const RtlCssPlugin = require('rtlcss-webpack-plugin');
+const glob = require( 'glob' );
+const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const RemoveEmptyScriptsPlugin = require( 'webpack-remove-empty-scripts' );
+const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const isProduction = process.env.NODE_ENV === 'production';
-const FileManagerPlugin = require('filemanager-webpack-plugin');
+const FileManagerPlugin = require( 'filemanager-webpack-plugin' );
 
-const { getWordPressSrcDirectory } = require('@wordpress/scripts/utils');
+const gutenbergSrcDirectory = path.resolve( process.cwd(), 'gutenberg' );
 
 const vendorFiles = [
 	{
@@ -125,11 +125,11 @@ const vendorFiles = [
 	},
 ];
 
-defaultConfig.module.rules[2].use[1].options.url = false;
+defaultConfig.module.rules[ 2 ].use[ 1 ].options.url = false;
 
 // Prepare JS for assets.
 const entryAssetsJs = glob
-	.sync([
+	.sync( [
 		'./assets/js/**.js',
 		'./assets/admin/js/**.js',
 		'./assets/js/3rd/plugin-jetpack.js',
@@ -137,16 +137,16 @@ const entryAssetsJs = glob
 		'./gutenberg/index.js',
 		'./gutenberg/custom-post-meta.js',
 		'./gutenberg/layouts-editor.js',
-	])
-	.reduce(function (entries, entry) {
-		const name = entry.replace('.js', '');
-		entries[name] = path.resolve(process.cwd(), entry);
+	] )
+	.reduce( function ( entries, entry ) {
+		const name = entry.replace( '.js', '' );
+		entries[ name ] = path.resolve( process.cwd(), entry );
 		return entries;
-	}, {});
+	}, {} );
 
 // Prepare CSS for assets.
 const entryAssetsCss = glob
-	.sync([
+	.sync( [
 		'./assets/css/**.scss',
 		'./assets/admin/css/**.scss',
 		'./templates/**/style.scss',
@@ -154,20 +154,20 @@ const entryAssetsCss = glob
 		'./templates/**/**/**/style.scss',
 		'./gutenberg/blocks/**/style.scss',
 		'./gutenberg/blocks/**/editor.scss',
-	])
-	.filter((entry) => {
-		const filename = path.basename(entry);
+	] )
+	.filter( ( entry ) => {
+		const filename = path.basename( entry );
 
 		// Exclude file names started with _
-		return !/^_/.test(filename);
-	})
-	.reduce(function (entries, entry) {
-		const name = entry.replace('.scss', '');
+		return ! /^_/.test( filename );
+	} )
+	.reduce( function ( entries, entry ) {
+		const name = entry.replace( '.scss', '' );
 
-		entries[name] = path.resolve(process.cwd(), entry);
+		entries[ name ] = path.resolve( process.cwd(), entry );
 
 		return entries;
-	}, {});
+	}, {} );
 
 const newConfig = {
 	...defaultConfig,
@@ -183,59 +183,59 @@ const newConfig = {
 
 	performance: {
 		// Disable performance hints in console about too large chunks for Gutenberg assets.
-		assetFilter(assetFilename) {
-			return !assetFilename.startsWith('gutenberg/');
+		assetFilter( assetFilename ) {
+			return ! assetFilename.startsWith( 'gutenberg/' );
 		},
 	},
 
 	module: {
 		...defaultConfig.module,
-		rules: [...defaultConfig.module.rules],
+		rules: [ ...defaultConfig.module.rules ],
 	},
 	plugins: [
 		...defaultConfig.plugins,
-		new RtlCssPlugin({
+		new RtlCssPlugin( {
 			filename: `[name]-rtl.css`,
-		}),
-		new CopyWebpackPlugin({
+		} ),
+		new CopyWebpackPlugin( {
 			patterns: [
 				{
 					from: '**/block.json',
-					context: getWordPressSrcDirectory(),
+					context: gutenbergSrcDirectory,
 					noErrorOnMissing: true,
-					transform(content, absoluteFrom) {
-						const convertExtension = (p) => {
-							return p.replace(/\.(j|t)sx?$/, '.js');
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( p ) => {
+							return p.replace( /\.(j|t)sx?$/, '.js' );
 						};
 
-						if (path.basename(absoluteFrom) === 'block.json') {
-							const blockJson = JSON.parse(content.toString());
-							['viewScript', 'script', 'editorScript'].forEach(
-								(key) => {
-									if (Array.isArray(blockJson[key])) {
-										blockJson[key] =
-											blockJson[key].map(
+						if ( path.basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
 												convertExtension
 											);
 									} else if (
-										typeof blockJson[key] === 'string'
+										typeof blockJson[ key ] === 'string'
 									) {
-										blockJson[key] = convertExtension(
-											blockJson[key]
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
 										);
 									}
 								}
 							);
 
-							return JSON.stringify(blockJson, null, 2);
+							return JSON.stringify( blockJson, null, 2 );
 						}
 
 						return content;
 					},
 				},
 			],
-		}),
-		new FileManagerPlugin({
+		} ),
+		new FileManagerPlugin( {
 			events: {
 				onEnd: {
 					copy: [
@@ -262,8 +262,8 @@ const newConfig = {
 			},
 			runOnceInWatchMode: false,
 			runTasksInSeries: true,
-		}),
-	].filter(Boolean),
+		} ),
+	].filter( Boolean ),
 	watchOptions: {
 		ignored: [
 			'**/templates/**/*.css',
@@ -284,34 +284,36 @@ const newConfig = {
 					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
-					name(_, chunks, cacheGroupKey) {
+					name( _, chunks, cacheGroupKey ) {
 						const chunkName =
-							chunks[chunks.length > 1 ? 1 : 0].name;
-						let cssOutput = `${path.dirname(
+							chunks[ chunks.length > 1 ? 1 : 0 ].name;
+						let cssOutput = `${ path.dirname(
 							chunkName
-						)}/${cacheGroupKey}-${path.basename(chunkName)}`;
+						) }/${ cacheGroupKey }-${ path.basename( chunkName ) }`;
 						const foundingChunk = chunkName
-							.split(path.win32.sep)
-							.join(path.posix.sep);
+							.split( path.win32.sep )
+							.join( path.posix.sep );
 
 						if (
-							(foundingChunk.indexOf('templates/') > -1 ||
-								foundingChunk.indexOf('admin/css/') > -1 ||
-								foundingChunk.indexOf('gutenberg/') > -1) &&
+							( foundingChunk.indexOf( 'templates/' ) > -1 ||
+								foundingChunk.indexOf( 'admin/css/' ) > -1 ||
+								foundingChunk.indexOf( 'gutenberg/' ) > -1 ) &&
 							cacheGroupKey === 'style'
 						) {
-							cssOutput = `${path.dirname(
+							cssOutput = `${ path.dirname(
 								chunkName
-							)}/${path.basename(chunkName)}`;
+							) }/${ path.basename( chunkName ) }`;
 						}
 
 						if (
-							chunkName.indexOf('layouts-editor') > -1 &&
+							chunkName.indexOf( 'layouts-editor' ) > -1 &&
 							cacheGroupKey === 'style'
 						) {
-							cssOutput = `${path.dirname(
+							cssOutput = `${ path.dirname(
 								chunkName
-							)}/${cacheGroupKey}-${path.basename(chunkName)}`;
+							) }/${ cacheGroupKey }-${ path.basename(
+								chunkName
+							) }`;
 						}
 						return cssOutput;
 					},
@@ -322,14 +324,17 @@ const newConfig = {
 };
 
 // Production only.
-if (isProduction) {
+if ( isProduction ) {
 	// Remove JS files created for styles
 	// to prevent enqueue it on production.
-	newConfig.plugins = [new RemoveEmptyScriptsPlugin(), ...newConfig.plugins];
+	newConfig.plugins = [
+		new RemoveEmptyScriptsPlugin(),
+		...newConfig.plugins,
+	];
 }
 
 // Development only.
-if (!isProduction) {
+if ( ! isProduction ) {
 	newConfig.devServer = {
 		...newConfig.devServer,
 		// Support for dev server on all domains.
@@ -341,15 +346,15 @@ if (!isProduction) {
 	newConfig.optimization.runtimeChunk = 'single';
 }
 
-newConfig.module.rules = newConfig.module.rules.map((rule) => {
-	if (/svg/.test(rule.test)) {
+newConfig.module.rules = newConfig.module.rules.map( ( rule ) => {
+	if ( /svg/.test( rule.test ) ) {
 		return { ...rule, exclude: /\.svg$/i };
 	}
 
 	return rule;
-});
+} );
 
-newConfig.module.rules.push({
+newConfig.module.rules.push( {
 	test: /\.svg$/,
 	use: [
 		{
@@ -373,6 +378,6 @@ newConfig.module.rules.push({
 			loader: 'url-loader',
 		},
 	],
-});
+} );
 
 module.exports = newConfig;

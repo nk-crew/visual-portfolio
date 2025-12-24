@@ -1390,21 +1390,21 @@
          ],
          "%s Comment": [
             "",
-            "%s Comments"
+            ""
          ],
          "Reading Time": [
             ""
          ],
          "%s Min Read": [
             "",
-            "%s Mins Read"
+            ""
          ],
          "Views": [
             ""
          ],
          "%s View": [
             "",
-            "%s Views"
+            ""
          ],
          "Previous Slide": [
             ""
@@ -1564,7 +1564,7 @@
          ],
          "Showing %1$s of %2$s Image": [
             "",
-            "Showing %1$s of %2$s Images"
+            ""
          ],
          "Show More": [
             ""
