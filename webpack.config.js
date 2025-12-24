@@ -9,6 +9,7 @@ const RemoveEmptyScriptsPlugin = require( 'webpack-remove-empty-scripts' );
 const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const isProduction = process.env.NODE_ENV === 'production';
 const FileManagerPlugin = require( 'filemanager-webpack-plugin' );
+const isQuietBuild = process.env.VP_QUIET === '1';
 
 const vendorFiles = [
 	{
@@ -175,6 +176,14 @@ const newConfig = {
 		...entryAssetsCss,
 	},
 
+	// Reduce infrastructure logger noise (used by FileManagerPlugin) only for quiet builds.
+	infrastructureLogging: isQuietBuild
+		? {
+			...( defaultConfig.infrastructureLogging || {} ),
+			level: 'error',
+		}
+		: defaultConfig.infrastructureLogging,
+
 	// Display minimum info in terminal.
 	stats: 'minimal',
 
@@ -223,6 +232,15 @@ const newConfig = {
 			runTasksInSeries: true,
 		} ),
 	].filter( Boolean ),
+	ignoreWarnings: isQuietBuild
+		? [
+			( warning ) =>
+				/Deprecation Warning/i.test( warning?.message || '' ) ||
+				/Sass @import rules are deprecated/i.test(
+					warning?.message || ''
+				),
+		]
+		: undefined,
 	watchOptions: {
 		ignored: [
 			'**/templates/**/*.css',
