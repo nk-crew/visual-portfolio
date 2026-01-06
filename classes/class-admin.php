@@ -1357,7 +1357,7 @@ class Visual_Portfolio_Admin {
 				'type'          => 'textarea',
 				'label'         => esc_html__( 'Custom Query', 'visual-portfolio' ),
 				// translators: %1$s - escaped url.
-				'description'   => sprintf( wp_kses( __( 'Build custom query according to WordPress Codex. See example here <a href="%1$s">%1$s</a>.', 'visual-portfolio' ), $allowed_protocols ), esc_url( 'https://www.visualportfolio.com/docs/gallery-blocks/content-source/posts/#custom-query' ) ),
+				'description'   => wp_kses( sprintf( __( 'Build custom query according to WordPress Codex. See example here <a href="%1$s">%1$s</a>.', 'visual-portfolio' ), esc_url( 'https://www.visualportfolio.com/docs/gallery-blocks/content-source/posts/#custom-query' ) ), $allowed_protocols ),
 				'name'          => 'posts_custom_query',
 				'default'       => '',
 				'cols'          => 30,
