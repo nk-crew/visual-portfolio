@@ -7,6 +7,7 @@ import expectedPopupPreset from '../../fixtures/click-actions/popup-expected-pre
 import expectedUrlPreset from '../../fixtures/click-actions/url-expected-preset.json';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
+import { openPublishedPage } from '../utils/open-published-page';
 
 test.describe('click action gallery images', () => {
 	test.beforeAll(async ({ requestUtils }) => {
@@ -175,14 +176,9 @@ test.describe('click action gallery images', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
-		const link = page.locator('a.vp-portfolio__item-meta');
+		const link = frontendPage.locator('a.vp-portfolio__item-meta');
 
 		await expect(link).toBeHidden();
 	});
@@ -319,17 +315,12 @@ test.describe('click action gallery images', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
-		await page.waitForTimeout(2000);
+		await frontendPage.waitForTimeout(2000);
 
 		// Check Frontend.
-		const galleryFrontendImages = await page.locator(
+		const galleryFrontendImages = await frontendPage.locator(
 			'.vp-portfolio__items .vp-portfolio__item-wrap'
 		);
 
@@ -527,17 +518,12 @@ test.describe('click action gallery images', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
-		await page.waitForTimeout(3000);
+		await frontendPage.waitForTimeout(3000);
 
 		// Check Frontend.
-		const galleryFrontendImages = await page.locator(
+		const galleryFrontendImages = await frontendPage.locator(
 			'.vp-portfolio__items .vp-portfolio__item-wrap'
 		);
 

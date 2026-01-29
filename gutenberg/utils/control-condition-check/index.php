@@ -23,14 +23,16 @@ class Visual_Portfolio_Control_Condition_Check {
 
 		switch ( $operator ) {
 			case '==':
-                // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+				// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+				// phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 				$check_result = $left == $right;
 				break;
 			case '===':
 				$check_result = $left === $right;
 				break;
 			case '!=':
-                // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+				// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+				// phpcs:ignore Universal.Operators.StrictComparisons.LooseNotEqual
 				$check_result = $left != $right;
 				break;
 			case '!==':

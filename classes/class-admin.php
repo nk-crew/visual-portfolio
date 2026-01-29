@@ -2674,7 +2674,7 @@ class Visual_Portfolio_Admin {
 
 				// condition names prefix fix.
 				if ( isset( $field['condition'] ) ) {
-					$loop_over_conditions = function( $field_cond ) use ( &$loop_over_conditions, $style_name ) {
+					$loop_over_conditions = function ( $field_cond ) use ( &$loop_over_conditions, $style_name ) {
 						if ( is_array( $field_cond ) && ! isset( $field_cond['control'] ) ) {
 							foreach ( $field_cond as $k => $inner_cond ) {
 								$field_cond[ $k ] = $loop_over_conditions( $inner_cond );

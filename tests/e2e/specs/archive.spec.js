@@ -1587,6 +1587,10 @@ test.describe('archive pages', () => {
 		editor,
 		requestUtils,
 	}) => {
+		// Ensure RSS tests run in a clean portfolio state.
+		await deleteAllPortfolio({ requestUtils });
+		await deleteAllPortfolioTaxonomies(requestUtils);
+
 		// Create and configure archive page first
 		const { archiveUrl } = await createArchivePage(page, admin, editor);
 		await setArchiveSettings(admin, page);
@@ -1651,6 +1655,10 @@ test.describe('archive pages', () => {
 		editor,
 		requestUtils,
 	}) => {
+		// Ensure RSS tests run in a clean portfolio state.
+		await deleteAllPortfolio({ requestUtils });
+		await deleteAllPortfolioTaxonomies(requestUtils);
+
 		// Create and configure archive page first
 		const { archiveUrl } = await createArchivePage(page, admin, editor);
 		await setArchiveSettings(admin, page);

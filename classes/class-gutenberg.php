@@ -145,16 +145,16 @@ class Visual_Portfolio_Gutenberg {
 	 * Transform block context to attributes array.
 	 *
 	 * @param array  $context Block context.
-	 * @param string $namespace Context namespace.
+	 * @param string $context_namespace Context namespace.
 	 * @return array
 	 */
-	public static function transform_context_to_attributes( $context, $namespace = 'vp' ) {
+	public static function transform_context_to_attributes( $context, $context_namespace = 'vp' ) {
 		if ( empty( $context ) || ! is_array( $context ) ) {
 			return array();
 		}
 
 		$transformed_attributes = array();
-		$namespace_prefix       = $namespace . '/';
+		$namespace_prefix       = $context_namespace . '/';
 
 		foreach ( $context as $key => $value ) {
 			// Check if the context key belongs to our namespace.
