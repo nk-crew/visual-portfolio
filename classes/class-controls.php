@@ -269,7 +269,13 @@ class Visual_Portfolio_Controls {
 	 * @return array
 	 */
 	public static function get_registered_categories() {
-		return self::$registered_categories;
+		/**
+		 * Filter registered categories before returning.
+		 * Allows extensions to reorder or modify categories.
+		 *
+		 * @param array $categories Registered categories.
+		 */
+		return apply_filters( 'vpf_registered_categories', self::$registered_categories );
 	}
 
 	/**
