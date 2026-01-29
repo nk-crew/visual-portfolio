@@ -21,6 +21,7 @@
     <exclude-pattern>/tests/bootstrap.php</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
     <exclude-pattern>*/build/*</exclude-pattern>
+	<exclude-pattern>*/dist-zip/*</exclude-pattern>
 
 
 	<!-- Only check the PHP files. JS files are checked separately with JSCS and JSHint. -->
@@ -72,7 +73,7 @@
 		</properties>
 		<exclude name="VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable" />
 	</rule>
-		<rule ref="Generic.CodeAnalysis.EmptyPHPStatement"/>
+	<rule ref="Generic.CodeAnalysis.EmptyPHPStatement"/>
 
 	<!--
 	#############################################################################
@@ -98,8 +99,16 @@
 		</properties>
 	</rule>
 
-		<!-- PrefixAllGlobals is intentionally disabled for this project. -->
-		<exclude name="WordPress.NamingConventions.PrefixAllGlobals" />
+	<!-- Verify that everything in the global namespace is prefixed with a theme specific prefix.
+		 Multiple valid prefixes can be provided as a comma-delimited list. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="Visual_Portfolio"/>
+				<element value="vpf_"/>
+			</property>
+		</properties>
+	</rule>
 
 	<rule ref="WordPress.Arrays.MultipleStatementAlignment">
 		<properties>
