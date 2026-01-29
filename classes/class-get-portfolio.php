@@ -340,18 +340,31 @@ class Visual_Portfolio_Get {
 		$is_images  = 'images' === $options['content_source'];
 		$is_social  = 'social-stream' === $options['content_source'];
 
-		if ( $is_images || $is_social ) {
-			$query_opts = self::get_query_params( $options, false, $options['id'] );
+		// Get query params.
+		$query_opts = self::get_query_params( $options, false, $options['id'] );
 
+		/**
+		 * Filter to provide a custom query result object for non-standard content sources.
+		 * Return a query-like object with have_posts(), the_post(), reset_postdata() methods
+		 * and max_num_pages property, or false to use default WP_Query.
+		 *
+		 * @param bool|object $custom_query Custom query object or false.
+		 * @param array       $query_opts   Query options.
+		 * @param array       $options      Portfolio options.
+		 */
+		$custom_query = apply_filters( 'vpf_custom_query_result', false, $query_opts, $options );
+
+		if ( $is_images || $is_social ) {
 			if ( isset( $query_opts['max_num_pages'] ) ) {
 				$max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
 			} else {
 				$max_pages = $start_page;
 			}
+		} elseif ( $custom_query ) {
+			// Use custom query object provided by extensions.
+			$portfolio_query = $custom_query;
+			$max_pages       = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
 		} else {
-			// Get query params.
-			$query_opts = self::get_query_params( $options, false, $options['id'] );
-
 			// stupid hack as wp_reset_postdata() function is not working for some reason...
 			$old_post = $GLOBALS['post'];
 
@@ -576,7 +589,22 @@ class Visual_Portfolio_Get {
 
 		$items = array();
 
-		if ( ( $is_images || $is_social ) &&
+		/**
+		 * Filter to provide custom items array for non-standard content sources.
+		 * Return an array of items or false to use default processing.
+		 * Each item should follow the $each_item_args structure.
+		 *
+		 * @param bool|array $custom_items   Custom items array or false.
+		 * @param array      $each_item_args Default item args template.
+		 * @param array      $query_opts     Query options.
+		 * @param array      $options        Portfolio options.
+		 */
+		$custom_items = apply_filters( 'vpf_custom_items', false, $each_item_args, $query_opts, $options );
+
+		if ( is_array( $custom_items ) && ! empty( $custom_items ) ) {
+			// Use custom items provided by extensions.
+			$items = $custom_items;
+		} elseif ( ( $is_images || $is_social ) &&
 			isset( $query_opts['images'] ) &&
 			is_array( $query_opts['images'] ) &&
 			! empty( $query_opts['images'] ) ) {
@@ -1270,7 +1298,7 @@ class Visual_Portfolio_Get {
 		$is_images  = 'images' === $options['content_source'];
 
 		$paged = 0;
-		if ( ( isset( $options['pagination'] ) && $options['pagination'] ) || $is_images ) {
+		if ( isset( $options['pagination'] ) && $options['pagination'] ) {
 			$paged = self::get_current_page_number();
 		}
 		$count = isset( $options['items_count'] ) ? intval( $options['items_count'] ) : 6;
@@ -1785,7 +1813,20 @@ class Visual_Portfolio_Get {
 		// Get active item.
 		$active_item = self::get_filter_active_item( $query_opts );
 
-		if ( $is_images || $is_social ) {
+		/**
+		 * Filter to provide custom filter terms for non-standard content sources.
+		 * Return array with 'terms' and 'there_is_active' keys, or false for default.
+		 *
+		 * @param bool|array $custom_terms Custom terms data or false.
+		 * @param array      $query_opts   Query options.
+		 * @param mixed      $active_item  Currently active filter item.
+		 * @param array      $vp_options   Portfolio options.
+		 */
+		$custom_filter_terms = apply_filters( 'vpf_custom_filter_terms', false, $query_opts, $active_item, $vp_options );
+
+		if ( is_array( $custom_filter_terms ) ) {
+			$term_items = $custom_filter_terms;
+		} elseif ( $is_images || $is_social ) {
 			$term_items = self::get_images_terms( $query_opts, $active_item );
 		} else {
 			$portfolio_query = new WP_Query( $query_opts );
@@ -2315,7 +2356,7 @@ class Visual_Portfolio_Get {
 			'data-vp-filter' => $args['filter'],
 		);
 
-		if ( $args['focal_point'] && ! empty( $args['focal_point'] ) ) {
+		if ( isset( $args['focal_point'] ) && $args['focal_point'] && ! empty( $args['focal_point'] ) ) {
 			$attrs['style'] = '--vp-images__object-position: ' . esc_attr( 100 * floatval( $args['focal_point']['x'] ) ) . '% ' . esc_attr( 100 * floatval( $args['focal_point']['y'] ) ) . '%;';
 		}
 
