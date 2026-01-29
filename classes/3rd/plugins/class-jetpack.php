@@ -42,12 +42,12 @@ class Visual_Portfolio_3rd_Jetpack {
 	/**
 	 * Skip Jetpack lazy loading when data-src attribute added to image.
 	 *
-	 * @param boolean $return     skip lazy Jetpack.
+	 * @param boolean $default_return skip lazy Jetpack.
 	 * @param array   $attributes image attributes.
 	 *
 	 * @return boolean
 	 */
-	public function jetpack_lazy_images_skip_image_with_attributes( $return, $attributes ) {
+	public function jetpack_lazy_images_skip_image_with_attributes( $default_return, $attributes ) {
 		return isset( $attributes['data-src'] );
 	}
 }

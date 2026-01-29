@@ -99,14 +99,14 @@ class Visual_Portfolio_Convert_Attributes {
 	/**
 	 * Get nested value from array using dot notation
 	 *
-	 * @param array  $array Array to search in.
+	 * @param array  $data Array to search in.
 	 * @param string $path  Dot notation path.
 	 *
 	 * @return mixed
 	 */
-	private static function get_nested_value( $array, $path ) {
+	private static function get_nested_value( $data, $path ) {
 		$keys    = explode( '.', $path );
-		$current = $array;
+		$current = $data;
 
 		foreach ( $keys as $key ) {
 			if ( ! isset( $current[ $key ] ) ) {
@@ -121,13 +121,13 @@ class Visual_Portfolio_Convert_Attributes {
 	/**
 	 * Set nested value in array using dot notation
 	 *
-	 * @param array  $array Array to modify.
+	 * @param array  $data Array to modify.
 	 * @param string $path  Dot notation path.
 	 * @param mixed  $value Value to set.
 	 */
-	private static function set_nested_value( &$array, $path, $value ) {
+	private static function set_nested_value( &$data, $path, $value ) {
 		$keys = explode( '.', $path );
-		$temp = &$array;
+		$temp = &$data;
 
 		// Navigate to the parent of the final key.
 		for ( $i = 0; $i < count( $keys ) - 1; $i++ ) {

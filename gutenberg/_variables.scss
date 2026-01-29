@@ -2,6 +2,12 @@
  * WordPress.
  */
 @import "../node_modules/@wordpress/base-styles/colors.native";
+@import "../node_modules/@wordpress/base-styles/colors";
 @import "../node_modules/@wordpress/base-styles/variables";
 @import "../node_modules/@wordpress/base-styles/breakpoints";
 @import "../node_modules/@wordpress/base-styles/mixins";
+
+// Backward-compatible aliases (base-styles v6 removed these names).
+$light-gray-100: #f8f9f9;
+$light-gray-400: #e8eaeb;
+$light-gray-600: #d7dade;

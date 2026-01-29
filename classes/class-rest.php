@@ -275,7 +275,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		}
 
 		// Helper function to generate filter URLs.
-		$get_filter_url = function( $filter = '', $taxonomy = '' ) use ( $post_id, $content_source ) {
+		$get_filter_url = function ( $filter = '', $taxonomy = '' ) use ( $post_id, $content_source ) {
 			// Get the permalink of the current post.
 			$url = get_permalink( $post_id );
 

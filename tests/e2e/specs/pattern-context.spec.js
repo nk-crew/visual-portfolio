@@ -9,6 +9,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 import { createPatternViaAPI } from '../utils/create-pattern';
 import { createRegularPosts } from '../utils/create-posts';
 import { getWordpressImages } from '../utils/get-wordpress-images';
+import { openPublishedPage } from '../utils/open-published-page';
 
 test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 	// Cache images and posts to reuse across tests
@@ -149,24 +150,18 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		// Publish and view the page
 		await editor.publishPost();
 
-		// Navigate directly to the published page
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
 		// Verify images display correctly on frontend
 		for (let i = 0; i < Math.min(3, images.length); i++) {
 			await expect(
-				page.locator(`.wp-image-${images[i].id}`)
+				frontendPage.locator(`.wp-image-${images[i].id}`)
 			).toBeVisible();
 		}
 
 		// Verify the gallery container exists and has correct structure
-		await expect(page.locator('.vp-portfolio__items')).toBeVisible();
-		await expect(page.locator('.vp-portfolio__item')).toHaveCount(3);
+		await expect(frontendPage.locator('.vp-portfolio__items')).toBeVisible();
+		await expect(frontendPage.locator('.vp-portfolio__item')).toHaveCount(3);
 	});
 
 	test('Create and use synced pattern with VP block in Group wrapper', async ({
@@ -357,19 +352,13 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		// Save and publish the page
 		await editor.publishPost();
 
-		// Navigate directly to the published page
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
 		// Verify the Visual Portfolio container exists
-		await expect(page.locator('.vp-portfolio__items')).toBeVisible();
+		await expect(frontendPage.locator('.vp-portfolio__items')).toBeVisible();
 
 		// Verify the images are displayed on the frontend
-		const frontendImages = page.locator('.vp-portfolio__item img');
+		const frontendImages = frontendPage.locator('.vp-portfolio__item img');
 		const imageCount = await frontendImages.count();
 		expect(imageCount).toBeGreaterThan(0);
 	});
@@ -415,24 +404,18 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		// Publish and verify
 		await editor.publishPost();
 
-		// Navigate directly to the published page
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
 		// Check frontend
-		await expect(page.locator('.vp-portfolio__items')).toBeVisible();
-		const items = page.locator('.vp-portfolio__item');
+		await expect(frontendPage.locator('.vp-portfolio__items')).toBeVisible();
+		const items = frontendPage.locator('.vp-portfolio__item');
 
 		// Verify we have posts displayed (may be less than 3 if some failed to create)
 		const itemCount = await items.count();
 		expect(itemCount).toBeGreaterThan(0);
 
 		// Verify they are blog posts (not portfolio posts)
-		const firstItemTitle = await page
+		const firstItemTitle = await frontendPage
 			.locator('.vp-portfolio__item-meta-title')
 			.first()
 			.textContent();
@@ -486,26 +469,20 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		// Save and publish the page
 		await editor.publishPost();
 
-		// Navigate directly to the published page
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
 		// Verify on frontend
-		const vpItems = page.locator(
+		const vpItems = frontendPage.locator(
 			'.vp-portfolio__items, .visual-portfolio-wrapper, .wp-block-group'
 		);
 		const hasContent = await vpItems.count();
 
 		if (hasContent > 0) {
 			// At minimum, verify the Group wrapper is present
-			await expect(page.locator('.wp-block-group')).toBeVisible();
+			await expect(frontendPage.locator('.wp-block-group')).toBeVisible();
 
 			// Check if VP items rendered
-			const portfolioItems = page.locator('.vp-portfolio__item');
+			const portfolioItems = frontendPage.locator('.vp-portfolio__item');
 			const itemCount = await portfolioItems.count();
 
 			if (itemCount > 0) {
@@ -514,7 +491,7 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			} else {
 				// Pattern exists but VP might not fully render - this is acceptable
 				// The bug fix ensures the correct query context is maintained
-				const pageContent = await page.content();
+				const pageContent = await frontendPage.content();
 				expect(pageContent).toContain('wp-block-group');
 			}
 		}
@@ -601,24 +578,18 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		// Publish and check frontend
 		await editor.publishPost();
 
-		// Navigate directly to the published page
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
 		// Verify the nested structure rendered correctly
-		await expect(page.locator('.wp-block-group').first()).toBeVisible();
-		await expect(page.locator('.wp-block-columns')).toBeVisible();
-		await expect(page.locator('.vp-portfolio__items')).toBeVisible();
-		await expect(page.locator('.vp-portfolio__item')).toHaveCount(4);
+		await expect(frontendPage.locator('.wp-block-group').first()).toBeVisible();
+		await expect(frontendPage.locator('.wp-block-columns')).toBeVisible();
+		await expect(frontendPage.locator('.vp-portfolio__items')).toBeVisible();
+		await expect(frontendPage.locator('.vp-portfolio__item')).toHaveCount(4);
 
 		// Verify all images are displayed
 		for (let i = 0; i < 4; i++) {
 			await expect(
-				page.locator(`.wp-image-${images[i].id}`)
+				frontendPage.locator(`.wp-image-${images[i].id}`)
 			).toBeVisible();
 		}
 	});

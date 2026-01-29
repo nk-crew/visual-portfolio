@@ -406,16 +406,16 @@ class Visual_Portfolio_Custom_Post_Type {
 	/**
 	 * Remove screen options from vp list page.
 	 *
-	 * @param bool   $return  return default value.
+	 * @param bool   $default_return  return default value.
 	 * @param object $screen_object screen object.
 	 *
 	 * @return bool
 	 */
-	public function remove_screen_options( $return, $screen_object ) {
+	public function remove_screen_options( $default_return, $screen_object ) {
 		if ( 'vp_lists' === $screen_object->id ) {
 			return false;
 		}
-		return $return;
+		return $default_return;
 	}
 
 	/**
@@ -614,7 +614,7 @@ class Visual_Portfolio_Custom_Post_Type {
 				?>
 			</select>
 			<?php
-		};
+		}
 	}
 
 	/**

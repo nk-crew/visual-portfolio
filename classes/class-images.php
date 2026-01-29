@@ -349,12 +349,12 @@ class Visual_Portfolio_Images {
 	/**
 	 * Skip lazy loading using exclusion settings.
 	 *
-	 * @param boolean $return - default return value.
+	 * @param boolean $default_return - default return value.
 	 * @param array   $attributes - image attributes.
 	 *
 	 * @return boolean
 	 */
-	public static function add_lazyload_exclusions( $return, $attributes ) {
+	public static function add_lazyload_exclusions( $default_return, $attributes ) {
 		if ( ! empty( self::$lazyload_user_exclusions ) && ! empty( $attributes ) ) {
 			$full_attributes_string = '';
 
@@ -370,7 +370,7 @@ class Visual_Portfolio_Images {
 			}
 		}
 
-		return $return;
+		return $default_return;
 	}
 
 	/**
