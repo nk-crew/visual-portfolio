@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Visual Portfolio Team
+# Copyright (C) 2026 Visual Portfolio Team
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
@@ -9,9 +9,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-11-10T20:02:21+00:00\n"
+"POT-Creation-Date: 2026-02-05T11:55:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.10.0\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
 
 #. Plugin Name of the plugin
@@ -47,7 +47,7 @@ msgstr ""
 
 #: classes/3rd/plugins/class-elementor-widget.php:174
 #: classes/class-admin.php:2071
-#: classes/class-settings.php:197
+#: classes/class-settings.php:199
 msgid "General"
 msgstr ""
 
@@ -78,9 +78,9 @@ msgstr ""
 #: classes/class-admin.php:237
 #: classes/class-admin.php:286
 #: classes/class-custom-post-type.php:859
-#: classes/class-settings.php:764
-#: classes/class-settings.php:779
-#: classes/class-settings.php:794
+#: classes/class-settings.php:766
+#: classes/class-settings.php:781
+#: classes/class-settings.php:796
 #: gutenberg/components/controls-render/index.js:768
 msgid "Go Pro"
 msgstr ""
@@ -249,7 +249,7 @@ msgid "Centered Slides"
 msgstr ""
 
 #: classes/class-admin.php:745
-#: classes/class-settings.php:540
+#: classes/class-settings.php:542
 msgid "Loop"
 msgstr ""
 
@@ -263,7 +263,7 @@ msgstr ""
 
 #: classes/class-admin.php:773
 #: classes/class-admin.php:3473
-#: classes/class-settings.php:571
+#: classes/class-settings.php:573
 msgid "Display Arrows"
 msgstr ""
 
@@ -280,7 +280,7 @@ msgid "Mousewheel Control"
 msgstr ""
 
 #: classes/class-admin.php:805
-#: classes/class-settings.php:617
+#: classes/class-settings.php:619
 msgid "Display Thumbnails"
 msgstr ""
 
@@ -348,7 +348,7 @@ msgid "Protection"
 msgstr ""
 
 #: classes/class-admin.php:1273
-#: classes/class-settings.php:723
+#: classes/class-settings.php:725
 #: gutenberg/components/controls-render/index.js:583
 msgid "Custom CSS"
 msgstr ""
@@ -360,7 +360,7 @@ msgstr ""
 
 #: classes/class-admin.php:1321
 #: classes/class-custom-post-type.php:574
-#: classes/class-settings.php:202
+#: classes/class-settings.php:204
 msgid "Images"
 msgstr ""
 
@@ -376,6 +376,7 @@ msgstr ""
 
 #. translators: %1$s - escaped url.
 #: classes/class-admin.php:1360
+#, php-format
 msgid "Build custom query according to WordPress Codex. See example here <a href=\"%1$s\">%1$s</a>."
 msgstr ""
 
@@ -450,6 +451,7 @@ msgstr ""
 
 #. translators: %2$s - link text.
 #: classes/class-admin.php:1536
+#, php-format
 msgid "Menu Order is typically used in combination with one of these plugins: <a href=\"%1$s\" target=\"_blank\">%2$s</a>"
 msgstr ""
 
@@ -499,9 +501,9 @@ msgstr ""
 #: classes/class-admin.php:3215
 #: classes/class-admin.php:3557
 #: classes/class-custom-post-type.php:854
-#: classes/class-settings.php:761
-#: classes/class-settings.php:776
-#: classes/class-settings.php:791
+#: classes/class-settings.php:763
+#: classes/class-settings.php:778
+#: classes/class-settings.php:793
 msgid "Premium Only"
 msgstr ""
 
@@ -804,7 +806,7 @@ msgstr ""
 
 #: classes/class-admin.php:2386
 #: classes/class-admin.php:2754
-#: classes/class-archive-mapping.php:661
+#: classes/class-archive-mapping.php:675
 #: classes/class-deprecated.php:229
 msgid "Default"
 msgstr ""
@@ -887,7 +889,7 @@ msgid "Links Hover"
 msgstr ""
 
 #: classes/class-admin.php:2721
-#: classes/class-settings.php:402
+#: classes/class-settings.php:404
 msgid "Disabled"
 msgstr ""
 
@@ -1006,7 +1008,7 @@ msgid "All Button Text"
 msgstr ""
 
 #: classes/class-admin.php:3093
-#: classes/class-get-portfolio.php:1069
+#: classes/class-get-portfolio.php:1097
 #: classes/class-rest.php:307
 #: classes/class-shortcode.php:58
 #: gutenberg/blocks/filter-by-category/edit.js:153
@@ -1111,78 +1113,81 @@ msgid "Current Query"
 msgstr ""
 
 #. translators: %s - taxonomy name.
-#: classes/class-archive-mapping.php:430
-#: classes/class-archive-mapping.php:1490
+#: classes/class-archive-mapping.php:444
+#: classes/class-archive-mapping.php:1529
+#, php-format
 msgid "Portfolio Category: %s"
 msgstr ""
 
 #. translators: %s - taxonomy name.
-#: classes/class-archive-mapping.php:436
-#: classes/class-archive-mapping.php:1494
+#: classes/class-archive-mapping.php:450
+#: classes/class-archive-mapping.php:1533
+#, php-format
 msgid "Portfolio Tag: %s"
 msgstr ""
 
-#: classes/class-archive-mapping.php:541
+#: classes/class-archive-mapping.php:555
 msgid "Portfolio permalinks"
 msgstr ""
 
-#: classes/class-archive-mapping.php:548
+#: classes/class-archive-mapping.php:562
 msgid "Portfolio category base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:554
-#: classes/class-archive-mapping.php:592
+#: classes/class-archive-mapping.php:568
+#: classes/class-archive-mapping.php:606
 msgctxt "slug"
 msgid "portfolio-category"
 msgstr ""
 
-#: classes/class-archive-mapping.php:561
+#: classes/class-archive-mapping.php:575
 msgid "Portfolio tag base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:567
-#: classes/class-archive-mapping.php:593
+#: classes/class-archive-mapping.php:581
+#: classes/class-archive-mapping.php:607
 msgctxt "slug"
 msgid "portfolio-tag"
 msgstr ""
 
 #. translators: %s: Home URL
-#: classes/class-archive-mapping.php:643
+#: classes/class-archive-mapping.php:657
+#, php-format
 msgid "If you like, you may enter custom structures for your portfolio URLs here. For example, using <code>portfolio</code> would make your portfolio links like <code>%sportfolio/sample-portfolio/</code>. This setting affects portfolio URLs only, not things such as portfolio categories. We also recommend you use the <code>%%portfolio_page_slug%%</code> slug, which will automatically use the slug of you Portfolio Archive page."
 msgstr ""
 
-#: classes/class-archive-mapping.php:646
-#: classes/class-archive-mapping.php:750
-#: classes/class-archive-mapping.php:1228
+#: classes/class-archive-mapping.php:660
+#: classes/class-archive-mapping.php:764
+#: classes/class-archive-mapping.php:1246
 msgctxt "default-slug"
 msgid "portfolio"
 msgstr ""
 
-#: classes/class-archive-mapping.php:665
+#: classes/class-archive-mapping.php:679
 msgid "Portfolio base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:669
+#: classes/class-archive-mapping.php:683
 msgid "Portfolio base with category"
 msgstr ""
 
-#: classes/class-archive-mapping.php:674
+#: classes/class-archive-mapping.php:688
 msgid "Custom base"
 msgstr ""
 
-#: classes/class-archive-mapping.php:676
+#: classes/class-archive-mapping.php:690
 msgid "Enter a custom base to use. A base must be set or WordPress will use default instead."
 msgstr ""
 
-#: classes/class-archive-mapping.php:1138
+#: classes/class-archive-mapping.php:1152
 msgid "Portfolio"
 msgstr ""
 
-#: classes/class-archive-mapping.php:1214
+#: classes/class-archive-mapping.php:1228
 msgid "Portfolio Page"
 msgstr ""
 
-#: classes/class-archive-mapping.php:1248
+#: classes/class-archive-mapping.php:1273
 msgctxt "default-label"
 msgid "Portfolio"
 msgstr ""
@@ -1193,6 +1198,7 @@ msgstr ""
 
 #. translators: %s - Plugin name.
 #: classes/class-ask-review.php:74
+#, php-format
 msgid "Hey, we noticed you've been using %s for more than two weeks now – that's awesome!"
 msgstr ""
 
@@ -1220,6 +1226,7 @@ msgstr ""
 
 #. translators: %s - plugin name.
 #: classes/class-assets.php:737
+#, php-format
 msgid "Couldn't retrieve %s ID."
 msgstr ""
 
@@ -1418,6 +1425,7 @@ msgstr ""
 
 #. translators: %s - taxonomy name.
 #: classes/class-custom-post-type.php:299
+#, php-format
 msgid "Show All %s"
 msgstr ""
 
@@ -1439,16 +1447,19 @@ msgstr ""
 
 #. translators: %2$s - plugin name.
 #: classes/class-custom-post-type.php:480
+#, php-format
 msgid "If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href=\"%1$s\" target=\"_blank\">%2$s Blocks</a>."
 msgstr ""
 
 #. translators: %s - url to documentation.
 #: classes/class-custom-post-type.php:490
+#, php-format
 msgid "To reuse blocks, you can use the built-in Gutenberg feature - <a href=\"%s\" target=\"_blank\">Reusable Blocks</a>."
 msgstr ""
 
 #. translators: %s - url to documentation.
 #: classes/class-custom-post-type.php:496
+#, php-format
 msgid "Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href=\"%s\" target=\"_blank\">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks."
 msgstr ""
 
@@ -1503,34 +1514,35 @@ msgstr ""
 msgid "Caption Align"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2104
+#: classes/class-get-portfolio.php:2148
 #: gutenberg/blocks/sort/index.php:58
 #: gutenberg/blocks/sort/edit.js:13
 msgid "Default sorting"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2105
+#: classes/class-get-portfolio.php:2149
 #: gutenberg/blocks/sort/index.php:59
 msgid "Sort by date (newest)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2106
+#: classes/class-get-portfolio.php:2150
 #: gutenberg/blocks/sort/index.php:60
 msgid "Sort by date (oldest)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2107
+#: classes/class-get-portfolio.php:2151
 #: gutenberg/blocks/sort/index.php:61
 msgid "Sort by title (A-Z)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2108
+#: classes/class-get-portfolio.php:2152
 #: gutenberg/blocks/sort/index.php:62
 msgid "Sort by title (Z-A)"
 msgstr ""
 
 #. translators: %s - published in human format.
-#: classes/class-get-portfolio.php:2234
+#: classes/class-get-portfolio.php:2278
+#, php-format
 msgid "%s ago"
 msgstr ""
 
@@ -1556,6 +1568,7 @@ msgstr ""
 
 #. translators: %s: Invalid content source type
 #: classes/class-rest.php:259
+#, php-format
 msgid "Invalid content source: %s"
 msgstr ""
 
@@ -1591,346 +1604,355 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: classes/class-settings.php:207
+#: classes/class-settings.php:209
 msgid "Popup & Lightbox"
 msgstr ""
 
-#: classes/class-settings.php:212
+#: classes/class-settings.php:214
 msgid "Watermarks"
 msgstr ""
 
-#: classes/class-settings.php:217
+#: classes/class-settings.php:219
 #: classes/class-welcome-screen.php:188
 msgid "Social Feeds"
 msgstr ""
 
-#: classes/class-settings.php:222
+#: classes/class-settings.php:224
 #: classes/class-welcome-screen.php:196
 msgid "White Label"
 msgstr ""
 
-#: classes/class-settings.php:266
+#: classes/class-settings.php:268
 msgid "Register Portfolio Post Type"
 msgstr ""
 
-#: classes/class-settings.php:267
+#: classes/class-settings.php:269
 msgid "Add custom post type `portfolio` to showcase your works."
 msgstr ""
 
-#: classes/class-settings.php:273
+#: classes/class-settings.php:275
 msgid "Archive Page"
 msgstr ""
 
-#: classes/class-settings.php:274
+#: classes/class-settings.php:276
 msgid "Base page of your portfolio, where will be placed your works archive."
 msgstr ""
 
-#: classes/class-settings.php:286
+#: classes/class-settings.php:288
 msgid "Archive Page Items Per Page"
 msgstr ""
 
-#: classes/class-settings.php:299
+#: classes/class-settings.php:301
 msgid "Filter Taxonomies"
 msgstr ""
 
-#: classes/class-settings.php:300
+#: classes/class-settings.php:302
 msgid "You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by \",\" separating values. Example: \"product_cat,product_tag\""
 msgstr ""
 
-#: classes/class-settings.php:306
+#: classes/class-settings.php:308
 msgid "Placeholder Image"
 msgstr ""
 
-#: classes/class-settings.php:307
+#: classes/class-settings.php:309
 msgid "This image used on items in layouts where image is not specified."
 msgstr ""
 
-#: classes/class-settings.php:311
+#: classes/class-settings.php:313
 msgid "Choose image"
 msgstr ""
 
-#: classes/class-settings.php:318
+#: classes/class-settings.php:320
 msgid "AJAX Cache and Preload"
 msgstr ""
 
-#: classes/class-settings.php:319
+#: classes/class-settings.php:321
 msgid "Reduce AJAX calls request time."
 msgstr ""
 
-#: classes/class-settings.php:328
+#: classes/class-settings.php:330
 msgid "Responsive Breakpoints"
 msgstr ""
 
-#: classes/class-settings.php:334
-#: classes/class-settings.php:452
+#: classes/class-settings.php:336
+#: classes/class-settings.php:454
 msgid "Extra Large"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:341
+#: classes/class-settings.php:343
+#, php-format
 msgid "Sets the breakpoint on extra large screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:346
-#: classes/class-settings.php:445
-#: classes/class-settings.php:479
+#: classes/class-settings.php:348
+#: classes/class-settings.php:447
+#: classes/class-settings.php:481
 msgid "Large"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:353
+#: classes/class-settings.php:355
+#, php-format
 msgid "Sets the breakpoint on large screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:358
-#: classes/class-settings.php:438
-#: classes/class-settings.php:472
+#: classes/class-settings.php:360
+#: classes/class-settings.php:440
+#: classes/class-settings.php:474
 msgid "Medium"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:365
+#: classes/class-settings.php:367
+#, php-format
 msgid "Sets the breakpoint on medium screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:370
-#: classes/class-settings.php:431
-#: classes/class-settings.php:465
+#: classes/class-settings.php:372
+#: classes/class-settings.php:433
+#: classes/class-settings.php:467
 msgid "Small"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:377
+#: classes/class-settings.php:379
+#, php-format
 msgid "Sets the breakpoint on small screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:382
+#: classes/class-settings.php:384
 msgid "Extra Small"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:389
+#: classes/class-settings.php:391
+#, php-format
 msgid "Sets the breakpoint on extra small screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:396
+#: classes/class-settings.php:398
 msgid "Lazy Loading"
 msgstr ""
 
 #. translators: %s - plugin brand name.
-#: classes/class-settings.php:398
+#: classes/class-settings.php:400
+#, php-format
 msgid "Enable lazy loading for %s layouts only or for the whole website."
 msgstr ""
 
 #. translators: %s - plugin brand name.
-#: classes/class-settings.php:404
+#: classes/class-settings.php:406
+#, php-format
 msgid "%s Only"
 msgstr ""
 
-#: classes/class-settings.php:405
+#: classes/class-settings.php:407
 msgid "All images"
 msgstr ""
 
-#: classes/class-settings.php:410
+#: classes/class-settings.php:412
 msgid "Lazy Loading Excludes"
 msgstr ""
 
 #. translators: %s - link text.
-#: classes/class-settings.php:413
+#: classes/class-settings.php:415
+#, php-format
 msgid "Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href=\"%1$s\">%2$s</a>"
 msgstr ""
 
 #. translators: %s - link text.
-#: classes/class-settings.php:413
+#: classes/class-settings.php:415
 msgid "More info"
 msgstr ""
 
-#: classes/class-settings.php:425
+#: classes/class-settings.php:427
 msgid "Layouts Image Sizes"
 msgstr ""
 
-#: classes/class-settings.php:426
+#: classes/class-settings.php:428
 msgid "Image sizes used in portfolio layouts."
 msgstr ""
 
-#: classes/class-settings.php:459
+#: classes/class-settings.php:461
 msgid "Lightbox Image Sizes"
 msgstr ""
 
-#: classes/class-settings.php:460
+#: classes/class-settings.php:462
 msgid "Image sizes used in lightbox images."
 msgstr ""
 
 #. translators: %s: regenerate thumbnails url.
-#: classes/class-settings.php:487
+#: classes/class-settings.php:489
+#, php-format
 msgid "After publishing your changes, new image sizes may not be shown until you <a href=\"%s\" target=\"_blank\">Regenerate Thumbnails</a>."
 msgstr ""
 
-#: classes/class-settings.php:495
+#: classes/class-settings.php:497
 msgid "Vendor Script"
 msgstr ""
 
-#: classes/class-settings.php:498
+#: classes/class-settings.php:500
 msgid "Fancybox"
 msgstr ""
 
-#: classes/class-settings.php:499
+#: classes/class-settings.php:501
 msgid "PhotoSwipe"
 msgstr ""
 
-#: classes/class-settings.php:507
+#: classes/class-settings.php:509
 msgid "Lightbox for WordPress Images"
 msgstr ""
 
-#: classes/class-settings.php:508
+#: classes/class-settings.php:510
 msgid "Enable lightbox for WordPress native galleries and images."
 msgstr ""
 
-#: classes/class-settings.php:522
+#: classes/class-settings.php:524
 msgid "Deep Linking"
 msgstr ""
 
-#: classes/class-settings.php:523
+#: classes/class-settings.php:525
 msgid "Makes URL automatically change to reflect the current opened popup, and you can easily link directly to that image or video."
 msgstr ""
 
-#: classes/class-settings.php:530
+#: classes/class-settings.php:532
 msgid "Use Deep Linking URL to Share Images"
 msgstr ""
 
-#: classes/class-settings.php:531
+#: classes/class-settings.php:533
 msgid "Check to share Deep Linking URLs when sharing images. When disabled, all galleries will share direct links to image files."
 msgstr ""
 
-#: classes/class-settings.php:549
+#: classes/class-settings.php:551
 msgid "Click to Zoom"
 msgstr ""
 
-#: classes/class-settings.php:557
+#: classes/class-settings.php:559
 msgid "Restore Focus"
 msgstr ""
 
-#: classes/class-settings.php:558
+#: classes/class-settings.php:560
 msgid "Restore focus on the last active item after Popup is closed."
 msgstr ""
 
-#: classes/class-settings.php:566
+#: classes/class-settings.php:568
 msgid "UI Elements"
 msgstr ""
 
-#: classes/class-settings.php:572
+#: classes/class-settings.php:574
 msgid "Arrows to navigate between images."
 msgstr ""
 
-#: classes/class-settings.php:578
+#: classes/class-settings.php:580
 msgid "Display Images Counter"
 msgstr ""
 
-#: classes/class-settings.php:579
+#: classes/class-settings.php:581
 msgid "On the top left corner will be showed images counter."
 msgstr ""
 
-#: classes/class-settings.php:585
+#: classes/class-settings.php:587
 msgid "Display Zoom Button"
 msgstr ""
 
-#: classes/class-settings.php:591
+#: classes/class-settings.php:593
 msgid "Display Fullscreen Button"
 msgstr ""
 
-#: classes/class-settings.php:597
+#: classes/class-settings.php:599
 msgid "Display Share Button"
 msgstr ""
 
-#: classes/class-settings.php:603
+#: classes/class-settings.php:605
 msgid "Display Download Button"
 msgstr ""
 
-#: classes/class-settings.php:609
+#: classes/class-settings.php:611
 msgid "Display Close Button"
 msgstr ""
 
-#: classes/class-settings.php:630
+#: classes/class-settings.php:632
 msgid "Thumbnails Opened At Startup"
 msgstr ""
 
-#: classes/class-settings.php:647
+#: classes/class-settings.php:649
 msgid "Thumbnails Position"
 msgstr ""
 
-#: classes/class-settings.php:651
+#: classes/class-settings.php:653
 msgid "Vertical"
 msgstr ""
 
-#: classes/class-settings.php:652
+#: classes/class-settings.php:654
 msgid "Horizontal"
 msgstr ""
 
-#: classes/class-settings.php:668
+#: classes/class-settings.php:670
 msgid "Display Slideshow"
 msgstr ""
 
-#: classes/class-settings.php:683
+#: classes/class-settings.php:685
 msgid "Quick View"
 msgstr ""
 
-#: classes/class-settings.php:689
+#: classes/class-settings.php:691
 msgid "Display URL Button"
 msgstr ""
 
-#: classes/class-settings.php:690
+#: classes/class-settings.php:692
 msgid "Button with page URL will be placed in the popup toolbar."
 msgstr ""
 
-#: classes/class-settings.php:697
+#: classes/class-settings.php:699
 msgid "Internal Links"
-msgstr ""
-
-#: classes/class-settings.php:701
-#: classes/class-settings.php:714
-msgid "Open in New Tab"
-msgstr ""
-
-#: classes/class-settings.php:702
-#: classes/class-settings.php:715
-msgid "Open in Current Tab"
 msgstr ""
 
 #: classes/class-settings.php:703
 #: classes/class-settings.php:716
-msgid "Open in Frame (not recommended)"
+msgid "Open in New Tab"
 msgstr ""
 
 #: classes/class-settings.php:704
 #: classes/class-settings.php:717
+msgid "Open in Current Tab"
+msgstr ""
+
+#: classes/class-settings.php:705
+#: classes/class-settings.php:718
+msgid "Open in Frame (not recommended)"
+msgstr ""
+
+#: classes/class-settings.php:706
+#: classes/class-settings.php:719
 msgid "Prevent Click"
 msgstr ""
 
-#: classes/class-settings.php:710
+#: classes/class-settings.php:712
 msgid "External Links"
 msgstr ""
 
-#: classes/class-settings.php:724
+#: classes/class-settings.php:726
 msgid "When you display posts and pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`."
 msgstr ""
 
-#: classes/class-settings.php:746
+#: classes/class-settings.php:748
 msgid "Misc"
 msgstr ""
 
-#: classes/class-settings.php:751
+#: classes/class-settings.php:753
 msgid "Background Color"
 msgstr ""
 
-#: classes/class-settings.php:763
+#: classes/class-settings.php:765
 msgid "Protect your works using watermarks"
 msgstr ""
 
-#: classes/class-settings.php:778
+#: classes/class-settings.php:780
 msgid "Social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
-#: classes/class-settings.php:793
+#: classes/class-settings.php:795
 msgid "Remove our plugin brand and logos from Front and Admin areas"
 msgstr ""
 
@@ -1953,6 +1975,7 @@ msgstr ""
 
 #. translators: %s - pro link.
 #: classes/class-welcome-screen.php:118
+#, php-format
 msgid "Want to get more power with Pro? Visit %s"
 msgstr ""
 
@@ -2078,6 +2101,7 @@ msgstr ""
 
 #. translators: %1$s filter name, %2$s item count.
 #: gutenberg/blocks/filter-by-category-item/index.php:111
+#, php-format
 msgid "Currently filtering by %1$s, %2$s items"
 msgstr ""
 
@@ -2087,6 +2111,7 @@ msgstr ""
 
 #. translators: %1$s filter name, %2$s item count.
 #: gutenberg/blocks/filter-by-category-item/index.php:125
+#, php-format
 msgid "Filter by %1$s, %2$s items"
 msgstr ""
 
@@ -2102,6 +2127,7 @@ msgstr ""
 #. translators: %s page number.
 #: gutenberg/blocks/pagination-numbers/index.php:90
 #: gutenberg/blocks/pagination-numbers/index.php:97
+#, php-format
 msgid "Page %s"
 msgstr ""
 
@@ -2111,6 +2137,7 @@ msgstr ""
 
 #. translators: %s - author name.
 #: templates/items-list/item-parts/meta-author.php:50
+#, php-format
 msgid "By %s"
 msgstr ""
 
@@ -2124,6 +2151,7 @@ msgstr ""
 
 #. translators: %s Number of comments.
 #: templates/items-list/item-parts/meta-comments.php:44
+#, php-format
 msgid "%s Comment"
 msgid_plural "%s Comments"
 msgstr[0] ""
@@ -2135,6 +2163,7 @@ msgstr ""
 
 #. translators: %s Reading time minutes.
 #: templates/items-list/item-parts/meta-reading-time.php:35
+#, php-format
 msgid "%s Min Read"
 msgid_plural "%s Mins Read"
 msgstr[0] ""
@@ -2146,6 +2175,7 @@ msgstr ""
 
 #. translators: %s Number of views.
 #: templates/items-list/item-parts/meta-views.php:33
+#, php-format
 msgid "%s View"
 msgid_plural "%s Views"
 msgstr[0] ""
@@ -2168,6 +2198,7 @@ msgid "--- Select Layout ---"
 msgstr ""
 
 #: gutenberg/block-saved/edit.js:131
+#, js-format
 msgid "Saved %s"
 msgstr ""
 
@@ -2251,19 +2282,19 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:31
+#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:33
 msgid "Loaded automatically from the image Title"
 msgstr ""
 
-#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:38
+#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:40
 msgid "Loaded automatically from the image Caption"
 msgstr ""
 
-#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:45
+#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:47
 msgid "Loaded automatically from the image Alt"
 msgstr ""
 
-#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:52
+#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:54
 msgid "Loaded automatically from the image Description"
 msgstr ""
 
@@ -2365,6 +2396,7 @@ msgid "Bulk Image Settings"
 msgstr ""
 
 #: gutenberg/components/gallery-control/index.js:1109
+#, js-format
 msgid "Showing %1$s of %2$s Image"
 msgid_plural "Showing %1$s of %2$s Images"
 msgstr[0] ""
@@ -2443,6 +2475,7 @@ msgid "Top"
 msgstr ""
 
 #: gutenberg/custom-post-meta/video.js:137
+#, js-format
 msgid "Video will be used in %s layouts only. Full list of supported links"
 msgstr ""
 
@@ -2451,6 +2484,7 @@ msgid "Using large galleries may <u>decrease page loading speed</u>. We recommen
 msgstr ""
 
 #: gutenberg/extensions/items-count-all.js:67
+#, js-format
 msgid "Set the items per page to <u>less than %d</u>"
 msgstr ""
 
