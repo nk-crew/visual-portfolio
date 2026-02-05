@@ -178,6 +178,8 @@ class Visual_Portfolio_Settings {
 				'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
 			);
 
+			self::$settings_api->admin_enqueue_scripts();
+
 			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-archive-page-selector', 'build/assets/admin/js/archive-page-selector', array( 'select2' ) );
 
 			wp_localize_script( 'visual-portfolio-archive-page-selector', 'VPAdminVariables', $data_init );
@@ -811,8 +813,6 @@ class Visual_Portfolio_Settings {
 	 * @return void
 	 */
 	public static function print_settings_page() {
-		self::$settings_api->admin_enqueue_scripts();
-
 		echo '<div class="wrap">';
 		echo '<h2>' . esc_html__( 'Settings', 'visual-portfolio' ) . '</h2>';
 
