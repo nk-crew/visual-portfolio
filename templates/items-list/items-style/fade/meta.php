@@ -20,6 +20,9 @@ $inline_meta = $opts['show_author'] && $args['author'] ||
 	$opts['show_views_count'] && $args['views_count'] ||
 	$opts['show_reading_time'] && $args['reading_time'];
 
+// Allow extensions (e.g. Pro) to enable inline meta.
+$inline_meta = apply_filters( 'vpf_each_item_inline_meta_enabled', $inline_meta, $args, $opts );
+
 $show_meta = $inline_meta ||
 	$opts['show_icon'] ||
 	$opts['show_title'] && $args['title'] ||

@@ -1,0 +1,12 @@
+{
+  "inputs": [],
+  "servers": {
+    "aisquare-playwright": {
+      "command": "npx",
+      "args": [
+        "aisquare-playwright-mcp@latest"
+      ],
+      "type": "stdio"
+    }
+  }
+}

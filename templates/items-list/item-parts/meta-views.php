@@ -14,11 +14,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! $opts['show_views_count'] || ! $args['views_count'] ) {
+$meta_enabled = $opts['show_views_count'] && $args['views_count'];
+
+/**
+ * Allow extensions to enable views meta output.
+ *
+ * @param bool  $meta_enabled Whether views meta should be rendered.
+ * @param array $args         Item arguments.
+ * @param array $opts         Portfolio options.
+ */
+$meta_enabled = apply_filters( 'vpf_each_item_meta_views_enabled', $meta_enabled, $args, $opts );
+
+if ( ! $meta_enabled ) {
 	return;
 }
 
+$templates_data = array(
+	'args' => $args,
+	'opts' => $opts,
+);
+
 ?>
+
+<?php do_action( 'vpf_each_item_meta_views_before', $templates_data ); ?>
 
 <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-views">
 	<span class="vp-portfolio__item-meta-part-icon">
@@ -34,3 +52,5 @@ if ( ! $opts['show_views_count'] || ! $args['views_count'] ) {
 		?>
 	</span>
 </div>
+
+<?php do_action( 'vpf_each_item_meta_views_after', $templates_data ); ?>
