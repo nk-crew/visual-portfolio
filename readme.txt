@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.8
 * Requires PHP: 7.2
-* Stable tag: 3.4.1
+* Stable tag: 3.5.0
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -323,6 +323,22 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.5.0 - Feb 6, 2026 =
+
+* improved performance by reducing database queries
+* minor changes
+* **Pro:**
+* !IMPORTANT: Google Photos integration completely removed
+* !IMPORTANT: social integration migrated to custom post type. The system will automatically migrate your old social posts to the new system. This will take time because migration occurs in small portions.
+* added ability to manage downloaded social posts in custom post type and images in Media library
+* improved proofing feature:
+  * added possibility to reset proofing status
+  * added possibility to save selection before submitting
+  * added filter by selected/unselected
+  * added possibility to require minimum and maximum number of images for submission
+  * improve proofing actions bar - added number of selected and total number of images, added Save button, changed select/deselect links to checkbox
+* improved performance in image galleries by removing redundant full option calls
 
 = 3.4.1 - Nov 11, 2025 =
 
