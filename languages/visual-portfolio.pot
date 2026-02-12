@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.5.0\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.5.1\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-06T12:10:58+00:00\n"
+"POT-Creation-Date: 2026-02-12T06:11:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
@@ -414,7 +414,7 @@ msgid "Order by"
 msgstr ""
 
 #: classes/class-admin.php:1507
-#: templates/items-list/item-parts/meta-date.php:26
+#: templates/items-list/item-parts/meta-date.php:44
 msgid "Date"
 msgstr ""
 
@@ -2131,50 +2131,50 @@ msgstr ""
 msgid "Page %s"
 msgstr ""
 
-#: templates/items-list/item-parts/meta-author.php:32
+#: templates/items-list/item-parts/meta-author.php:50
 msgid "Author"
 msgstr ""
 
 #. translators: %s - author name.
-#: templates/items-list/item-parts/meta-author.php:50
+#: templates/items-list/item-parts/meta-author.php:68
 #, php-format
 msgid "By %s"
 msgstr ""
 
-#: templates/items-list/item-parts/meta-comments.php:32
+#: templates/items-list/item-parts/meta-comments.php:50
 msgid "Comments"
 msgstr ""
 
-#: templates/items-list/item-parts/meta-comments.php:41
+#: templates/items-list/item-parts/meta-comments.php:59
 msgid "No Comments"
 msgstr ""
 
 #. translators: %s Number of comments.
-#: templates/items-list/item-parts/meta-comments.php:44
+#: templates/items-list/item-parts/meta-comments.php:62
 #, php-format
 msgid "%s Comment"
 msgid_plural "%s Comments"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/items-list/item-parts/meta-reading-time.php:26
+#: templates/items-list/item-parts/meta-reading-time.php:44
 msgid "Reading Time"
 msgstr ""
 
 #. translators: %s Reading time minutes.
-#: templates/items-list/item-parts/meta-reading-time.php:35
+#: templates/items-list/item-parts/meta-reading-time.php:53
 #, php-format
 msgid "%s Min Read"
 msgid_plural "%s Mins Read"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/items-list/item-parts/meta-views.php:26
+#: templates/items-list/item-parts/meta-views.php:44
 msgid "Views"
 msgstr ""
 
 #. translators: %s Number of views.
-#: templates/items-list/item-parts/meta-views.php:33
+#: templates/items-list/item-parts/meta-views.php:51
 #, php-format
 msgid "%s View"
 msgid_plural "%s Views"

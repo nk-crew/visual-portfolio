@@ -4,9 +4,9 @@
 * Tags: portfolio, gallery, gallery block, image gallery, wordpress gallery plugin
 * Donate link: https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 6.2
-* Tested up to: 6.8
+* Tested up to: 6.9
 * Requires PHP: 7.2
-* Stable tag: 3.5.0
+* Stable tag: 3.5.1
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -323,6 +323,12 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.5.1 - Feb 12, 2026 =
+
+* updated supported WP version to 6.9
+* added support for Blocksy settings in our Portfolio CPT
+* minor changes
 
 = 3.5.0 - Feb 6, 2026 =
 

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.5.1 - Feb 12, 2026 =
+
+* updated supported WP version to 6.9
+* added support for Blocksy settings in our Portfolio CPT
+* minor changes
+
 = 3.5.0 - Feb 6, 2026 =
 
 * improved performance by reducing database queries
