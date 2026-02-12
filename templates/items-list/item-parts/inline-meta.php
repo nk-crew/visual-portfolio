@@ -21,6 +21,15 @@ $inline_meta = $opts['show_author'] && $args['author'] ||
 	$opts['show_views_count'] && $args['views_count'] ||
 	$opts['show_reading_time'] && $args['reading_time'];
 
+/**
+ * Allow extensions (e.g. Pro) to enable inline meta.
+ *
+ * @param bool  $inline_meta Whether inline meta should be rendered.
+ * @param array $args        Item arguments.
+ * @param array $opts        Portfolio options.
+ */
+$inline_meta = apply_filters( 'vpf_each_item_inline_meta_enabled', $inline_meta, $args, $opts );
+
 $templates_data = array(
 	'args'        => $args,
 	'opts'        => $opts,
@@ -49,5 +58,12 @@ if ( ! $inline_meta ) {
 
 	// Reading Time.
 	visual_portfolio()->include_template( 'items-list/item-parts/meta-reading-time', $templates_data );
+
+	/**
+	 * Action hook for extensions to print additional inline meta parts.
+	 *
+	 * @param array $templates_data Template arguments.
+	 */
+	do_action( 'vpf_each_item_inline_meta', $templates_data );
 	?>
 </div>

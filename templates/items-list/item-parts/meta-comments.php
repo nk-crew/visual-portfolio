@@ -15,16 +15,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! $opts['show_comments_count'] || '' === $args['comments_count'] ) {
+$meta_enabled = $opts['show_comments_count'] && '' !== $args['comments_count'];
+
+/**
+ * Allow extensions to enable comments meta output.
+ *
+ * @param bool  $meta_enabled Whether comments meta should be rendered.
+ * @param array $args         Item arguments.
+ * @param array $opts         Portfolio options.
+ */
+$meta_enabled = apply_filters( 'vpf_each_item_meta_comments_enabled', $meta_enabled, $args, $opts );
+
+if ( ! $meta_enabled ) {
 	return;
 }
 
-$allow_links = isset( $allow_links ) ? $allow_links : false;
-$link_data   = array(
+$allow_links    = isset( $allow_links ) ? $allow_links : false;
+$link_data      = array(
 	'href' => $allow_links ? $args['comments_url'] : false,
+);
+$templates_data = array(
+	'args'        => $args,
+	'opts'        => $opts,
+	'allow_links' => $allow_links,
 );
 
 ?>
+
+<?php do_action( 'vpf_each_item_meta_comments_before', $templates_data ); ?>
 
 <div class="vp-portfolio__item-meta-part vp-portfolio__item-meta-comments">
 	<span class="vp-portfolio__item-meta-part-icon">
@@ -48,3 +66,5 @@ $link_data   = array(
 		?>
 	</span>
 </div>
+
+<?php do_action( 'vpf_each_item_meta_comments_after', $templates_data ); ?>
