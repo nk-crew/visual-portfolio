@@ -65,6 +65,12 @@ class Visual_Portfolio_Templates {
 	 * @return bool True if the path is within an allowed directory.
 	 */
 	public static function is_allowed_template_path( $real_path ) {
+		$normalized_real_path = wp_normalize_path( $real_path );
+
+		if ( ! $normalized_real_path ) {
+			return false;
+		}
+
 		$allowed_dirs = array(
 			visual_portfolio()->plugin_path . 'templates/',
 			get_stylesheet_directory() . '/visual-portfolio/',
@@ -75,11 +81,27 @@ class Visual_Portfolio_Templates {
 			$allowed_dirs[] = visual_portfolio()->pro_plugin_path . 'templates/';
 		}
 
+		/**
+		 * Filters the list of allowed template directories.
+		 *
+		 * This is used by the Layer 3 realpath() inclusion guard.
+		 * Add your plugin directory here if you return a custom absolute template
+		 * path via the `vpf_include_template` filter.
+		 *
+		 * @since 3.5.2
+		 *
+		 * @param array  $allowed_dirs Allowed directories (absolute paths).
+		 * @param string $real_path    Resolved real path to the included template.
+		 */
+		$allowed_dirs = (array) apply_filters( 'vpf_allowed_template_dirs', $allowed_dirs, $real_path );
+
 		// Resolve all allowed directories to their real paths.
 		$allowed_dirs = array_filter( array_map( 'realpath', $allowed_dirs ) );
 
 		foreach ( $allowed_dirs as $dir ) {
-			if ( strpos( $real_path, $dir ) === 0 ) {
+			$normalized_dir = trailingslashit( wp_normalize_path( $dir ) );
+
+			if ( strpos( $normalized_real_path, $normalized_dir ) === 0 ) {
 				return true;
 			}
 		}

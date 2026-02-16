@@ -171,4 +171,47 @@ class Test_Class_Templates_LFI extends WP_UnitTestCase {
 			'Template loader should not include wp-includes/version.php via traversal'
 		);
 	}
+
+	/**
+	 * Test that 3rd-party plugins can allow templates from their directory.
+	 *
+	 * When a plugin uses the `vpf_include_template` filter to return an absolute
+	 * template path, it must also be able to extend the allowlist used by the
+	 * Layer 3 realpath() guard.
+	 */
+	public function test_include_template_allows_third_party_plugin_template_dir_via_filter() {
+		$temp_dir = trailingslashit( sys_get_temp_dir() ) . 'vp-templates-' . wp_generate_uuid4();
+		wp_mkdir_p( $temp_dir );
+
+		$template_file = trailingslashit( $temp_dir ) . 'custom-template.php';
+		file_put_contents( $template_file, '<?php echo "vp-third-party-template"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped' );
+
+		$include_filter = function ( $template, $template_name ) use ( $template_file ) {
+			if ( 'custom-template' === $template_name ) {
+				return $template_file;
+			}
+			return $template;
+		};
+
+		$allowed_dirs_filter = function ( $allowed_dirs ) use ( $temp_dir ) {
+			$allowed_dirs[] = $temp_dir;
+			return $allowed_dirs;
+		};
+
+		add_filter( 'vpf_include_template', $include_filter, 10, 2 );
+		add_filter( 'vpf_allowed_template_dirs', $allowed_dirs_filter, 10, 1 );
+
+		try {
+			ob_start();
+			Visual_Portfolio_Templates::include_template( 'custom-template' );
+			$output = ob_get_clean();
+
+			$this->assertSame( 'vp-third-party-template', $output );
+		} finally {
+			remove_filter( 'vpf_include_template', $include_filter, 10 );
+			remove_filter( 'vpf_allowed_template_dirs', $allowed_dirs_filter, 10 );
+			@unlink( $template_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			@rmdir( $temp_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+	}
 }
