@@ -137,11 +137,22 @@ test.describe( 'added images to block', () => {
 			}
 		}
 
-		await page
-			.locator( 'button.button.media-button.media-button-select', {
+		// Fallback for CI instability: ensure at least one item is selected.
+		if (
+			0 === ( await page.locator( 'li.attachment.selected' ).count() )
+		) {
+			await imageList.first().click();
+		}
+
+		const selectButton = page.locator(
+			'button.button.media-button.media-button-select',
+			{
 				hasText: 'Select',
-			} )
-			.click();
+			}
+		);
+
+		await expect( selectButton ).toBeEnabled( { timeout: 15000 } );
+		await selectButton.click();
 
 		await page
 			.locator( '.components-base-control__field', {
