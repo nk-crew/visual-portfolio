@@ -473,6 +473,9 @@ class Visual_Portfolio_Security {
 							$attributes[ $key ] = self::sanitize_hidden( $attribute );
 							break;
 						case 'icons_selector':
+							// Layer 2: Validate against allowed options (same as 'select' type).
+							$attributes[ $key ] = self::sanitize_selector( $attributes[ $key ], $controls[ $key ] );
+							break;
 						case 'text':
 						case 'radio':
 						case 'align':

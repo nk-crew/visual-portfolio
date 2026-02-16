@@ -16,6 +16,11 @@ class Visual_Portfolio_Templates {
 	 * @param array  $args args for template.
 	 */
 	public static function include_template( $template_name, $args = array() ) {
+		// Layer 1: Reject template names containing path traversal sequences.
+		if ( validate_file( $template_name ) !== 0 ) {
+			return;
+		}
+
 		// Allow 3rd party plugin filter template args from their plugin.
 		$args = apply_filters( 'vpf_include_template_args', $args, $template_name );
 
@@ -41,8 +46,45 @@ class Visual_Portfolio_Templates {
 		$template = apply_filters( 'vpf_include_template', $template, $template_name, $args );
 
 		if ( file_exists( $template ) ) {
-			include $template;
+			// Layer 3: Verify the resolved path is within allowed directories.
+			$real_path = realpath( $template );
+
+			if ( $real_path && self::is_allowed_template_path( $real_path ) ) {
+				include $template;
+			}
 		}
+	}
+
+	/**
+	 * Check if a resolved file path is within allowed template directories.
+	 *
+	 * Layer 3: Prevents inclusion of files outside expected template directories,
+	 * even if path traversal bypasses other checks.
+	 *
+	 * @param string $real_path The resolved (realpath) file path to check.
+	 * @return bool True if the path is within an allowed directory.
+	 */
+	public static function is_allowed_template_path( $real_path ) {
+		$allowed_dirs = array(
+			visual_portfolio()->plugin_path . 'templates/',
+			get_stylesheet_directory() . '/visual-portfolio/',
+			get_template_directory() . '/visual-portfolio/',
+		);
+
+		if ( visual_portfolio()->pro_plugin_path ) {
+			$allowed_dirs[] = visual_portfolio()->pro_plugin_path . 'templates/';
+		}
+
+		// Resolve all allowed directories to their real paths.
+		$allowed_dirs = array_filter( array_map( 'realpath', $allowed_dirs ) );
+
+		foreach ( $allowed_dirs as $dir ) {
+			if ( strpos( $real_path, $dir ) === 0 ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -52,6 +94,14 @@ class Visual_Portfolio_Templates {
 	 * @return string
 	 */
 	public static function find_template_styles( $template_name ) {
+		// Layer 1: Reject template names containing path traversal sequences.
+		if ( validate_file( $template_name ) !== 0 ) {
+			return array(
+				'path'    => '',
+				'version' => '',
+			);
+		}
+
 		$template         = '';
 		$template_version = '';
 
