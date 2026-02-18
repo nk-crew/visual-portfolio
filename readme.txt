@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 6.9
 * Requires PHP: 7.2
-* Stable tag: 3.5.1
+* Stable tag: 3.5.2
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -323,6 +323,10 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.5.2 - Feb 18, 2026 =
+
+* security: fixed local file inclusion via path traversal
 
 = 3.5.1 - Feb 12, 2026 =
 

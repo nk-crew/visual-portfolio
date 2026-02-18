@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.5.2 - Feb 18, 2026 =
+
+* security: fixed local file inclusion via path traversal
+
 = 3.5.1 - Feb 12, 2026 =
 
 * updated supported WP version to 6.9
