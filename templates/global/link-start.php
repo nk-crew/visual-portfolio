@@ -7,6 +7,7 @@
  * @var $rel
  * @var $tabindex
  * @var $class
+ * @var $aria_label
  * @var $fallback
  *
  * @package visual-portfolio
@@ -34,6 +35,9 @@ if ( isset( $href ) && $href ) {
 		}
 		if ( isset( $class ) && $class ) {
 			echo 'class="' . esc_attr( $class ) . '" ';
+		}
+		if ( isset( $aria_label ) && '' !== $aria_label ) {
+			echo 'aria-label="' . esc_attr( $aria_label ) . '" ';
 		}
 		?>
 	>
