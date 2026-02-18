@@ -267,9 +267,7 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 				await readMoreNativeSelect.selectOption( {
 					label: 'Always Display',
 				} );
-				await expect( readMoreNativeSelect ).toContainText(
-					'Always Display'
-				);
+				await expect( readMoreNativeSelect ).toHaveValue( 'true' );
 			} else {
 				await readMoreCustomSelect.click();
 				await page
@@ -299,10 +297,35 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 
 		// Verify Read More setting if it was set
 		if ( isReadMoreVisible ) {
-			const reloadedReadMore = page.locator(
-				'.vpf-control-group-items_style_read_more select, .vpf-control-group-items_style_read_more .vpf-component-select'
+			const reloadedReadMoreNativeSelect = page.locator(
+				'.vpf-control-group-items_style_read_more select:visible'
 			);
-			await expect( reloadedReadMore ).toContainText( 'Always Display' );
+			const reloadedReadMoreCustomSelect = page.locator(
+				'.vpf-control-group-items_style_read_more .vpf-component-select:visible'
+			);
+
+			const hasReloadedNativeReadMore = await reloadedReadMoreNativeSelect
+				.first()
+				.isVisible( { timeout: 1000 } )
+				.catch( () => false );
+			const hasReloadedCustomReadMore = await reloadedReadMoreCustomSelect
+				.first()
+				.isVisible( { timeout: 1000 } )
+				.catch( () => false );
+
+			expect(
+				hasReloadedNativeReadMore || hasReloadedCustomReadMore
+			).toBeTruthy();
+
+			if ( hasReloadedNativeReadMore ) {
+				await expect(
+					reloadedReadMoreNativeSelect.first()
+				).toHaveValue( 'true' );
+			} else {
+				await expect(
+					reloadedReadMoreCustomSelect.first()
+				).toContainText( 'Always Display' );
+			}
 		}
 	} );
 
