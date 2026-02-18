@@ -249,6 +249,55 @@ class Visual_Portfolio_Security {
 	}
 
 	/**
+	 * Sanitize icons selector attribute.
+	 *
+	 * Icons selector options are usually provided as an indexed array where each
+	 * option contains a `value` key, unlike regular select controls that may use
+	 * associative options by key.
+	 *
+	 * @param int|float|string $attribute - Unclear Selector Attribute.
+	 * @param array            $control - Array of control parameters.
+	 * @return int|float|string
+	 */
+	public static function sanitize_icons_selector( $attribute, $control ) {
+		$valid_options = array();
+
+		if ( isset( $control['options'] ) && is_array( $control['options'] ) ) {
+			foreach ( $control['options'] as $option_key => $option_data ) {
+				if ( is_array( $option_data ) && isset( $option_data['value'] ) ) {
+					$valid_options[] = (string) $option_data['value'];
+				} else {
+					$valid_options[] = (string) $option_key;
+				}
+			}
+		}
+
+		$attribute_string = is_bool( $attribute ) ? ( $attribute ? 'true' : 'false' ) : (string) $attribute;
+
+		// Reject path traversal sequences regardless of control options state.
+		if ( validate_file( $attribute_string ) !== 0 ) {
+			$attribute = self::reset_control_attribute_to_default( $attribute, $control );
+		}
+
+		// Apply strict allowlist only when options are available.
+		if ( ! empty( $valid_options ) && ! in_array( $attribute_string, $valid_options, true ) ) {
+			$attribute = self::reset_control_attribute_to_default( $attribute, $control );
+		}
+
+		if ( is_numeric( $attribute ) ) {
+			if ( false === strpos( $attribute, '.' ) ) {
+				$attribute = intval( $attribute );
+			} else {
+				$attribute = (float) $attribute;
+			}
+		} else {
+			$attribute = sanitize_text_field( wp_unslash( $attribute ) );
+		}
+
+		return $attribute;
+	}
+
+	/**
 	 * Reset the value of the control attribute to the default value.
 	 * Also check the attribute for a boolean value,
 	 * And if the default value contains a string like 'true' or 'false',
@@ -473,6 +522,9 @@ class Visual_Portfolio_Security {
 							$attributes[ $key ] = self::sanitize_hidden( $attribute );
 							break;
 						case 'icons_selector':
+							// Layer 2: Validate against allowed options (same as 'select' type).
+							$attributes[ $key ] = self::sanitize_icons_selector( $attributes[ $key ], $controls[ $key ] );
+							break;
 						case 'text':
 						case 'radio':
 						case 'align':
