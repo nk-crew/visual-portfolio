@@ -121,6 +121,11 @@
 	padding: 0 !important;
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
+}
+
+// Keep horizontal margin reset only before Swiper initialization.
+// Swiper controls slide gap via inline `margin-left`/`margin-right` depending on direction.
+[data-vp-layout="slider"] .vp-portfolio__item-wrap:not(.swiper-slide) {
 	margin-left: 0 !important;
 }
 
