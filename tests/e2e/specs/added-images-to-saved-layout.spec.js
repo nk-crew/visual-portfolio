@@ -17,28 +17,28 @@ import { openPublishedPage } from '../utils/open-published-page';
  * Because the block on the layout page is hardcoded,
  * Preventing the addition of other blocks.
  */
-test.describe('added images to saved layout', () => {
-	test.beforeEach(async ({ requestUtils }) => {
+test.describe( 'added images to saved layout', () => {
+	test.beforeEach( async ( { requestUtils } ) => {
 		const pluginName = process.env.CORE
 			? 'visual-portfolio-pro'
 			: 'visual-portfolio-posts-amp-image-gallery';
-		await requestUtils.activatePlugin(pluginName);
-	});
+		await requestUtils.activatePlugin( pluginName );
+	} );
 
-	test.afterEach(async ({ requestUtils }) => {
-		await Promise.all([
+	test.afterEach( async ( { requestUtils } ) => {
+		await Promise.all( [
 			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllPosts(),
-		]);
-	});
+		] );
+	} );
 
-	test.afterAll(async ({ requestUtils }) => {
-		await Promise.all([
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
 			requestUtils.deleteAllMedia(),
 			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllPosts(),
-		]);
-	});
+		] );
+	} );
 	/**
 	 * We create a gallery block and add pictures to it manually or automatically.
 	 *
@@ -58,22 +58,22 @@ test.describe('added images to saved layout', () => {
 		alternativeSetting = false,
 		checkImageSettings = false
 	) {
-		await admin.visitAdminPage('edit.php');
+		await admin.visitAdminPage( 'edit.php' );
 
-		const images = await getWordpressImages({
+		const images = await getWordpressImages( {
 			requestUtils,
 			page,
 			admin,
 			editor,
 			alternativeSetting,
-		});
+		} );
 
-		await admin.createNewPost({
+		await admin.createNewPost( {
 			title: 'Test Adding Images to Saved Layout',
 			postType: 'vp_lists',
 			showWelcomeGuide: false,
 			legacyCanvas: true,
-		});
+		} );
 
 		await page
 			.locator(
@@ -85,64 +85,65 @@ test.describe('added images to saved layout', () => {
 			.click();
 
 		await page
-			.locator('button#menu-item-browse', {
+			.locator( 'button#menu-item-browse', {
 				hasText: 'Media Library',
-			})
+			} )
 			.click();
 
-		await page.waitForTimeout(500);
+		await page.waitForTimeout( 500 );
 
 		const imageList = await page.locator(
 			'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"]'
 		);
 
-		for (const image of await imageList.elementHandles()) {
+		for ( const image of await imageList.elementHandles() ) {
 			if (
 				typeof images.find(
-					async (x) => x.id === (await image.getAttribute('data-id'))
+					async ( x ) =>
+						x.id === ( await image.getAttribute( 'data-id' ) )
 				).imgUrl !== 'undefined'
 			) {
 				await image.click();
 
-				const imageID = await image.getAttribute('data-id');
+				const imageID = await image.getAttribute( 'data-id' );
 
 				const foundImage = await findAsyncSequential(
 					images,
-					async (x) => x.id === Number(imageID)
+					async ( x ) => x.id === Number( imageID )
 				);
 
 				const foundFixture = await findAsyncSequential(
 					imageFixtures,
-					async (x) =>
-						x.description === (await foundImage.description)
+					async ( x ) =>
+						x.description === ( await foundImage.description )
 				);
 
-				if (typeof (await foundFixture) !== 'undefined') {
+				if ( typeof ( await foundFixture ) !== 'undefined' ) {
 					await page
-						.locator('#attachment-details-alt-text')
-						.fill(foundFixture.alt);
+						.locator( '#attachment-details-alt-text' )
+						.fill( foundFixture.alt );
 
 					await page
-						.locator('#attachment-details-caption')
-						.fill(foundFixture.caption);
+						.locator( '#attachment-details-caption' )
+						.fill( foundFixture.caption );
 
 					await page
-						.locator('#attachment-details-description')
-						.fill(foundFixture.description);
+						.locator( '#attachment-details-description' )
+						.fill( foundFixture.description );
 				}
 			}
 		}
 
 		await page
-			.locator('button.button.media-button.media-button-select', {
+			.locator( 'button.button.media-button.media-button-select', {
 				hasText: 'Select',
-			})
+			} )
 			.click();
 
 		await page
-			.locator('button.components-button.is-primary', {
+			.locator( 'button.components-button.is-primary', {
 				hasText: 'Continue',
-			})
+			} )
 			.click();
 
 		await page
@@ -155,25 +156,25 @@ test.describe('added images to saved layout', () => {
 			.click();
 
 		await page
-			.locator('button.components-button.is-primary', {
+			.locator( 'button.components-button.is-primary', {
 				hasText: 'Continue',
-			})
+			} )
 			.click();
 
 		await page
-			.locator('button.components-button.is-primary', {
+			.locator( 'button.components-button.is-primary', {
 				hasText: 'Continue',
-			})
+			} )
 			.click();
 
 		await page
-			.locator('.components-base-control__field', {
+			.locator( '.components-base-control__field', {
 				hasText: 'Items Per Page',
-			})
-			.locator('input.components-text-control__input')
-			.fill('10');
+			} )
+			.locator( 'input.components-text-control__input' )
+			.fill( '10' );
 
-		if (checkImageSettings) {
+		if ( checkImageSettings ) {
 			await page
 				.locator(
 					'button.components-button.components-panel__body-toggle',
@@ -202,36 +203,36 @@ test.describe('added images to saved layout', () => {
 				.click();
 
 			await page
-				.getByRole('checkbox', { name: 'Display Excerpt' })
+				.getByRole( 'checkbox', { name: 'Display Excerpt' } )
 				.check();
 		}
 
-		await page.waitForTimeout(500);
+		await page.waitForTimeout( 500 );
 
 		// Check images on backend editor.
-		for (const image of await images) {
+		for ( const image of await images ) {
 			await expect(
 				page
-					.frameLocator('[title="vp-preview"]')
-					.locator('.wp-image-' + image.id)
+					.frameLocator( '[title="vp-preview"]' )
+					.locator( '.wp-image-' + image.id )
 			).toBeVisible();
 		}
 
 		// Publish Post.
 		await editor.publishPost();
 
-		let postID = await page.locator('input[name="post_ID"]').inputValue();
-		postID = typeof postID === 'string' ? parseInt(postID, 10) : null;
+		let postID = await page.locator( 'input[name="post_ID"]' ).inputValue();
+		postID = typeof postID === 'string' ? parseInt( postID, 10 ) : null;
 
 		return { postID, images };
 	}
 
-	test('added images to a saved layout manually', async ({
+	test( 'added images to a saved layout manually', async ( {
 		page,
 		admin,
 		editor,
 		requestUtils,
-	}) => {
+	} ) => {
 		const { images, postID } = await generateGalleryBeforeEachTest(
 			requestUtils,
 			page,
@@ -239,24 +240,24 @@ test.describe('added images to saved layout', () => {
 			editor
 		);
 
-		await admin.createNewPost({
+		await admin.createNewPost( {
 			title: 'Test Saved Layout',
 			postType: 'page',
 			showWelcomeGuide: false,
 			legacyCanvas: true,
-		});
+		} );
 
-		await editor.insertBlock({
+		await editor.insertBlock( {
 			name: 'visual-portfolio/saved',
-			attributes: { id: String(postID) },
-		});
+			attributes: { id: String( postID ) },
+		} );
 
-		await page.waitForTimeout(500);
+		await page.waitForTimeout( 500 );
 
 		// Check images on backend editor.
-		for (const image of images) {
+		for ( const image of images ) {
 			await expect(
-				page.frame('vpf-preview-1').locator('.wp-image-' + image.id)
+				page.frame( 'vpf-preview-1' ).locator( '.wp-image-' + image.id )
 			).toBeVisible();
 		}
 
@@ -264,22 +265,22 @@ test.describe('added images to saved layout', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		const frontendPage = await openPublishedPage(page);
+		const frontendPage = await openPublishedPage( page );
 
 		// Check images on frontend.
-		for (const image of await images) {
+		for ( const image of await images ) {
 			await expect(
-				frontendPage.locator('.wp-image-' + image.id)
+				frontendPage.locator( '.wp-image-' + image.id )
 			).toBeVisible();
 		}
-	});
+	} );
 
-	test('checking image settings on saved layout', async ({
+	test( 'checking image settings on saved layout', async ( {
 		page,
 		admin,
 		editor,
 		requestUtils,
-	}) => {
+	} ) => {
 		const { images, postID } = await generateGalleryBeforeEachTest(
 			requestUtils,
 			page,
@@ -289,42 +290,42 @@ test.describe('added images to saved layout', () => {
 			true
 		);
 
-		await admin.createNewPost({
+		await admin.createNewPost( {
 			title: 'Test Saved Layout (image settings)',
 			postType: 'page',
 			showWelcomeGuide: false,
 			legacyCanvas: true,
-		});
+		} );
 
-		await editor.insertBlock({
+		await editor.insertBlock( {
 			name: 'visual-portfolio/saved',
-			attributes: { id: String(postID) },
-		});
+			attributes: { id: String( postID ) },
+		} );
 
-		await page.waitForTimeout(500);
+		await page.waitForTimeout( 500 );
 
 		// Check images on backend editor.
-		for (const image of images) {
+		for ( const image of images ) {
 			const imageContainer = page
-				.frame('vpf-preview-1')
-				.locator('.wp-image-' + image.id);
-			await expect(imageContainer).toBeVisible();
+				.frame( 'vpf-preview-1' )
+				.locator( '.wp-image-' + image.id );
+			await expect( imageContainer ).toBeVisible();
 
 			await expect(
 				page
-					.frame('vpf-preview-1')
-					.locator('.vp-portfolio__item-meta-excerpt', {
+					.frame( 'vpf-preview-1' )
+					.locator( '.vp-portfolio__item-meta-excerpt', {
 						hasText: image.description,
-					})
+					} )
 			).toBeVisible();
 
 			const foundFixture = await findAsyncSequential(
 				imageFixtures,
-				async (x) => x.description === image.description
+				async ( x ) => x.description === image.description
 			);
 
 			await expect(
-				page.frame('vpf-preview-1').getByAltText(foundFixture.alt)
+				page.frame( 'vpf-preview-1' ).getByAltText( foundFixture.alt )
 			).toBeVisible();
 		}
 
@@ -332,66 +333,66 @@ test.describe('added images to saved layout', () => {
 		await editor.publishPost();
 
 		// Go to published post.
-		const frontendPage = await openPublishedPage(page);
+		const frontendPage = await openPublishedPage( page );
 
 		// Check images on frontend.
-		for (const image of images) {
+		for ( const image of images ) {
 			await expect(
-				frontendPage.locator('.wp-image-' + image.id)
+				frontendPage.locator( '.wp-image-' + image.id )
 			).toBeVisible();
 
 			const itemContainer = frontendPage
-				.locator('.vp-portfolio__item')
-				.filter({
-					has: frontendPage.locator('.wp-image-' + image.id),
-				});
+				.locator( '.vp-portfolio__item' )
+				.filter( {
+					has: frontendPage.locator( '.wp-image-' + image.id ),
+				} );
 
-			await expect(itemContainer).toBeVisible();
+			await expect( itemContainer ).toBeVisible();
 
 			const descriptionText = itemContainer.locator(
 				'.vp-portfolio__item-meta-excerpt div'
 			);
 
-			await expect(descriptionText).toHaveText(image.description);
+			await expect( descriptionText ).toHaveText( image.description );
 
 			const foundFixture = await findAsyncSequential(
 				imageFixtures,
-				async (x) => x.description === image.description
+				async ( x ) => x.description === image.description
 			);
 
 			await expect(
-				frontendPage.getByAltText(foundFixture.alt)
+				frontendPage.getByAltText( foundFixture.alt )
 			).toBeVisible();
 		}
-	});
+	} );
 
-	test('checking alternative image settings on saved layout', async ({
+	test( 'checking alternative image settings on saved layout', async ( {
 		page,
 		admin,
 		editor,
 		requestUtils,
-	}) => {
+	} ) => {
 		const currentPage = page.url();
 
-		await admin.createNewPost({
+		await admin.createNewPost( {
 			title: 'Sample Test Page',
 			postType: 'page',
 			content: 'Test content',
 			showWelcomeGuide: false,
 			legacyCanvas: true,
-		});
+		} );
 
 		// Publish Post.
 		await editor.publishPost();
 
 		// Go to published post.
-		const publishedPage = await openPublishedPage(page);
+		const publishedPage = await openPublishedPage( page );
 		const postLink = publishedPage.url();
-		if (publishedPage !== page) {
+		if ( publishedPage !== page ) {
 			await publishedPage.close();
 		}
 
-		await page.goto(currentPage);
+		await page.goto( currentPage );
 
 		const { images, postID } = await generateGalleryBeforeEachTest(
 			requestUtils,
@@ -406,31 +407,31 @@ test.describe('added images to saved layout', () => {
 			'.vpf-component-gallery-control-items .vpf-component-gallery-control-item'
 		);
 
-		for (const item of await galleryControlItems.elementHandles()) {
+		for ( const item of await galleryControlItems.elementHandles() ) {
 			await item.click();
 
 			const itemDescription = await page
-				.locator('.components-base-control__field', {
+				.locator( '.components-base-control__field', {
 					hasText: 'Description',
-				})
-				.locator('textarea.components-textarea-control__input')
+				} )
+				.locator( 'textarea.components-textarea-control__input' )
 				.innerHTML();
 
 			const foundImage = await findAsyncSequential(
 				images,
-				async (x) => x.description === itemDescription
+				async ( x ) => x.description === itemDescription
 			);
 
 			const foundFixture = await findAsyncSequential(
 				imageFixtures,
-				async (x) => x.description === itemDescription
+				async ( x ) => x.description === itemDescription
 			);
 
-			const foundFixtureIndex = imageFixtures.indexOf(foundFixture);
+			const foundFixtureIndex = imageFixtures.indexOf( foundFixture );
 
-			imageFixtures[foundFixtureIndex].id = foundImage.id;
+			imageFixtures[ foundFixtureIndex ].id = foundImage.id;
 
-			if (typeof foundFixture.imageSettings !== 'undefined') {
+			if ( typeof foundFixture.imageSettings !== 'undefined' ) {
 				await page
 					.locator(
 						'.vpf-component-gallery-control-item-modal .components-base-control__field',
@@ -438,8 +439,8 @@ test.describe('added images to saved layout', () => {
 							hasText: 'Title',
 						}
 					)
-					.locator('input.components-text-control__input')
-					.fill(foundFixture.imageSettings.title);
+					.locator( 'input.components-text-control__input' )
+					.fill( foundFixture.imageSettings.title );
 
 				await page
 					.locator(
@@ -448,10 +449,12 @@ test.describe('added images to saved layout', () => {
 							hasText: 'Description',
 						}
 					)
-					.locator('textarea.components-textarea-control__input')
-					.fill(foundFixture.imageSettings.description);
+					.locator( 'textarea.components-textarea-control__input' )
+					.fill( foundFixture.imageSettings.description );
 
-				if (typeof foundFixture.imageSettings.format !== 'undefined') {
+				if (
+					typeof foundFixture.imageSettings.format !== 'undefined'
+				) {
 					await page
 						.locator(
 							'.vpf-component-gallery-control-item-modal .components-base-control__field',
@@ -459,13 +462,13 @@ test.describe('added images to saved layout', () => {
 								hasText: 'Format',
 							}
 						)
-						.locator('.vpf-component-select')
+						.locator( '.vpf-component-select' )
 						.click();
 
 					await page
-						.locator('.vpf-component-select-option-label', {
+						.locator( '.vpf-component-select-option-label', {
 							hasText: foundFixture.imageSettings.format,
-						})
+						} )
 						.click();
 
 					if (
@@ -478,8 +481,11 @@ test.describe('added images to saved layout', () => {
 								: foundFixture.imageSettings.url;
 
 						await page
-							.getByRole('textbox', { name: 'URL', exact: true })
-							.fill(foundFixture.imageSettings.url);
+							.getByRole( 'textbox', {
+								name: 'URL',
+								exact: true,
+							} )
+							.fill( foundFixture.imageSettings.url );
 					}
 
 					if (
@@ -494,40 +500,44 @@ test.describe('added images to saved layout', () => {
 									hasText: 'Video URL',
 								}
 							)
-							.locator('input.components-text-control__input')
-							.fill(foundFixture.imageSettings.videoUrl);
+							.locator( 'input.components-text-control__input' )
+							.fill( foundFixture.imageSettings.videoUrl );
 					}
 				}
 			}
 
-			await page.getByLabel('Close', { exact: true }).click();
+			await page.getByLabel( 'Close', { exact: true } ).click();
 		}
 
 		// Check image attributes on backend editor.
-		for (const image of imageFixtures) {
+		for ( const image of imageFixtures ) {
 			const imageContainer = page
-				.frameLocator('[title="vp-preview"]')
-				.locator('.wp-image-' + image.id);
-			await expect(imageContainer).toBeVisible();
+				.frameLocator( '[title="vp-preview"]' )
+				.locator( '.wp-image-' + image.id );
+			const backendImageLink = page
+				.frameLocator( '[title="vp-preview"]' )
+				.getByAltText( image.alt )
+				.locator( 'xpath=ancestor::a[1]' );
+			await expect( imageContainer ).toBeVisible();
 
-			if (typeof image.imageSettings !== 'undefined') {
+			if ( typeof image.imageSettings !== 'undefined' ) {
 				await expect(
 					page
-						.frameLocator('[title="vp-preview"]')
-						.locator('.vp-portfolio__item-meta-excerpt', {
+						.frameLocator( '[title="vp-preview"]' )
+						.locator( '.vp-portfolio__item-meta-excerpt', {
 							hasText: image.imageSettings.description,
-						})
+						} )
 				).toBeVisible();
 
 				await expect(
 					page
-						.frameLocator('[title="vp-preview"]')
-						.locator('.vp-portfolio__item-meta-title > a', {
+						.frameLocator( '[title="vp-preview"]' )
+						.locator( '.vp-portfolio__item-meta-title > a', {
 							hasText: image.imageSettings.title,
-						})
+						} )
 				).toBeVisible();
 
-				if (typeof image.imageSettings.format !== 'undefined') {
+				if ( typeof image.imageSettings.format !== 'undefined' ) {
 					const format = image.imageSettings.format;
 					if (
 						format === 'standard' &&
@@ -535,17 +545,19 @@ test.describe('added images to saved layout', () => {
 					) {
 						await expect(
 							page
-								.frameLocator('[title="vp-preview"]')
-								.locator('.vp-portfolio__item-meta-title > a', {
-									hasText: image.imageSettings.title,
-								})
-						).toHaveAttribute('href', image.imageSettings.url);
+								.frameLocator( '[title="vp-preview"]' )
+								.locator(
+									'.vp-portfolio__item-meta-title > a',
+									{
+										hasText: image.imageSettings.title,
+									}
+								)
+						).toHaveAttribute( 'href', image.imageSettings.url );
 
-						await expect(
-							page
-								.frameLocator('[title="vp-preview"]')
-								.getByRole('link', { name: image.alt })
-						).toHaveAttribute('href', image.imageSettings.url);
+						await expect( backendImageLink ).toHaveAttribute(
+							'href',
+							image.imageSettings.url
+						);
 					}
 
 					if (
@@ -554,106 +566,121 @@ test.describe('added images to saved layout', () => {
 					) {
 						await expect(
 							page
-								.frameLocator('[title="vp-preview"]')
-								.locator('.vp-portfolio__item-meta-title > a', {
-									hasText: image.imageSettings.title,
-								})
-						).toHaveAttribute('href', image.imageSettings.videoUrl);
+								.frameLocator( '[title="vp-preview"]' )
+								.locator(
+									'.vp-portfolio__item-meta-title > a',
+									{
+										hasText: image.imageSettings.title,
+									}
+								)
+						).toHaveAttribute(
+							'href',
+							image.imageSettings.videoUrl
+						);
 
-						await expect(
-							page
-								.frameLocator('[title="vp-preview"]')
-								.getByRole('link', { name: image.alt })
-						).toHaveAttribute('href', image.imageSettings.videoUrl);
+						await expect( backendImageLink ).toHaveAttribute(
+							'href',
+							image.imageSettings.videoUrl
+						);
 					}
 				}
 			} else {
 				await expect(
 					page
-						.frameLocator('[title="vp-preview"]')
-						.locator('.vp-portfolio__item-meta-excerpt', {
+						.frameLocator( '[title="vp-preview"]' )
+						.locator( '.vp-portfolio__item-meta-excerpt', {
 							hasText: image.description,
-						})
+						} )
 				).toBeVisible();
 			}
 
 			await expect(
 				page
-					.frameLocator('[title="vp-preview"]')
-					.getByAltText(image.alt)
+					.frameLocator( '[title="vp-preview"]' )
+					.getByAltText( image.alt )
 			).toBeVisible();
 		}
 
 		// Save Layout.
 		await page
-			.locator('button.components-button.editor-post-publish-button', {
+			.locator( 'button.components-button.editor-post-publish-button', {
 				hasText: 'Save',
-			})
+			} )
 			.first()
 			.click();
 
-		await admin.createNewPost({
+		await admin.createNewPost( {
 			title: 'Test Saved Layout (alternative image settings)',
 			postType: 'page',
 			showWelcomeGuide: false,
 			legacyCanvas: true,
-		});
+		} );
 
-		await editor.insertBlock({
+		await editor.insertBlock( {
 			name: 'visual-portfolio/saved',
-			attributes: { id: String(postID) },
-		});
+			attributes: { id: String( postID ) },
+		} );
 
-		await page.waitForTimeout(500);
+		await page.waitForTimeout( 500 );
 
 		// Publish Post.
 		await editor.publishPost();
 
 		// Go to published post.
-		const frontendPage = await openPublishedPage(page);
+		const frontendPage = await openPublishedPage( page );
 
 		// Check image attributes on frontend.
-		for (const image of imageFixtures) {
+		for ( const image of imageFixtures ) {
 			await expect(
-				frontendPage.locator('.wp-image-' + image.id)
+				frontendPage.locator( '.wp-image-' + image.id )
 			).toBeVisible();
+			const frontendImageLink = frontendPage
+				.getByAltText( image.alt )
+				.locator( 'xpath=ancestor::a[1]' );
 
 			const itemContainer = frontendPage
-				.locator('.vp-portfolio__item')
-				.filter({
-					has: frontendPage.locator('.wp-image-' + image.id),
-				});
+				.locator( '.vp-portfolio__item' )
+				.filter( {
+					has: frontendPage.locator( '.wp-image-' + image.id ),
+				} );
 
-			await expect(itemContainer).toBeVisible();
+			await expect( itemContainer ).toBeVisible();
 
-			if (typeof image.imageSettings !== 'undefined') {
+			if ( typeof image.imageSettings !== 'undefined' ) {
 				await expect(
-					frontendPage.locator('.vp-portfolio__item-meta-excerpt', {
+					frontendPage.locator( '.vp-portfolio__item-meta-excerpt', {
 						hasText: image.imageSettings.description,
-					})
+					} )
 				).toBeVisible();
 
 				await expect(
-					frontendPage.locator('.vp-portfolio__item-meta-title > a', {
-						hasText: image.imageSettings.title,
-					})
+					frontendPage.locator(
+						'.vp-portfolio__item-meta-title > a',
+						{
+							hasText: image.imageSettings.title,
+						}
+					)
 				).toBeVisible();
 
-				if (typeof image.imageSettings.format !== 'undefined') {
+				if ( typeof image.imageSettings.format !== 'undefined' ) {
 					const format = image.imageSettings.format;
 					if (
 						format === 'standard' &&
 						typeof image.imageSettings.url !== 'undefined'
 					) {
 						await expect(
-							frontendPage.locator('.vp-portfolio__item-meta-title > a', {
-								hasText: image.imageSettings.title,
-							})
-						).toHaveAttribute('href', image.imageSettings.url);
+							frontendPage.locator(
+								'.vp-portfolio__item-meta-title > a',
+								{
+									hasText: image.imageSettings.title,
+								}
+							)
+						).toHaveAttribute( 'href', image.imageSettings.url );
 
-						await expect(
-							frontendPage.getByRole('link', { name: image.alt })
-						).toHaveAttribute('href', image.imageSettings.url);
+						await expect( frontendImageLink ).toHaveAttribute(
+							'href',
+							image.imageSettings.url
+						);
 					}
 
 					if (
@@ -661,25 +688,34 @@ test.describe('added images to saved layout', () => {
 						typeof image.imageSettings.videoUrl !== 'undefined'
 					) {
 						await expect(
-							frontendPage.locator('.vp-portfolio__item-meta-title > a', {
-								hasText: image.imageSettings.title,
-							})
-						).toHaveAttribute('href', image.imageSettings.videoUrl);
+							frontendPage.locator(
+								'.vp-portfolio__item-meta-title > a',
+								{
+									hasText: image.imageSettings.title,
+								}
+							)
+						).toHaveAttribute(
+							'href',
+							image.imageSettings.videoUrl
+						);
 
-						await expect(
-							frontendPage.getByRole('link', { name: image.alt })
-						).toHaveAttribute('href', image.imageSettings.videoUrl);
+						await expect( frontendImageLink ).toHaveAttribute(
+							'href',
+							image.imageSettings.videoUrl
+						);
 					}
 				}
 			} else {
 				await expect(
-					frontendPage.locator('.vp-portfolio__item-meta-excerpt', {
+					frontendPage.locator( '.vp-portfolio__item-meta-excerpt', {
 						hasText: image.description,
-					})
+					} )
 				).toBeVisible();
 			}
 
-			await expect(frontendPage.getByAltText(image.alt)).toBeVisible();
+			await expect(
+				frontendPage.getByAltText( image.alt )
+			).toBeVisible();
 		}
-	});
-});
+	} );
+} );

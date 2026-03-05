@@ -69,6 +69,7 @@ test.describe( 'added images to block', () => {
 			admin,
 			editor,
 			alternativeSetting,
+			alwaysUpload: ! programmatically,
 		} );
 
 		let attributes = {
@@ -657,6 +658,10 @@ test.describe( 'added images to block', () => {
 			const imageContainer = page
 				.frame( 'vpf-preview-1' )
 				.locator( '.wp-image-' + image.id );
+			const backendImageLink = page
+				.frame( 'vpf-preview-1' )
+				.getByAltText( image.alt )
+				.locator( 'xpath=ancestor::a[1]' );
 			await expect( imageContainer ).toBeVisible();
 
 			if ( typeof image.imageSettings !== 'undefined' ) {
@@ -693,11 +698,10 @@ test.describe( 'added images to block', () => {
 								)
 						).toHaveAttribute( 'href', image.imageSettings.url );
 
-						await expect(
-							page
-								.frame( 'vpf-preview-1' )
-								.getByRole( 'link', { name: image.alt } )
-						).toHaveAttribute( 'href', image.imageSettings.url );
+						await expect( backendImageLink ).toHaveAttribute(
+							'href',
+							image.imageSettings.url
+						);
 					}
 
 					if (
@@ -718,11 +722,7 @@ test.describe( 'added images to block', () => {
 							image.imageSettings.videoUrl
 						);
 
-						await expect(
-							page
-								.frame( 'vpf-preview-1' )
-								.getByRole( 'link', { name: image.alt } )
-						).toHaveAttribute(
+						await expect( backendImageLink ).toHaveAttribute(
 							'href',
 							image.imageSettings.videoUrl
 						);
@@ -754,6 +754,9 @@ test.describe( 'added images to block', () => {
 			await expect(
 				frontendPage.locator( '.wp-image-' + image.id )
 			).toBeVisible();
+			const frontendImageLink = frontendPage
+				.getByAltText( image.alt )
+				.locator( 'xpath=ancestor::a[1]' );
 
 			const itemContainer = frontendPage
 				.locator( '.vp-portfolio__item' )
@@ -794,11 +797,10 @@ test.describe( 'added images to block', () => {
 							)
 						).toHaveAttribute( 'href', image.imageSettings.url );
 
-						await expect(
-							frontendPage.getByRole( 'link', {
-								name: image.alt,
-							} )
-						).toHaveAttribute( 'href', image.imageSettings.url );
+						await expect( frontendImageLink ).toHaveAttribute(
+							'href',
+							image.imageSettings.url
+						);
 					}
 
 					if (
@@ -817,11 +819,7 @@ test.describe( 'added images to block', () => {
 							image.imageSettings.videoUrl
 						);
 
-						await expect(
-							frontendPage.getByRole( 'link', {
-								name: image.alt,
-							} )
-						).toHaveAttribute(
+						await expect( frontendImageLink ).toHaveAttribute(
 							'href',
 							image.imageSettings.videoUrl
 						);

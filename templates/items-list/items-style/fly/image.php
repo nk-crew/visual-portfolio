@@ -15,9 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $link_data = array(
-	'href'   => $args['url'],
-	'target' => $args['url_target'],
-	'rel'    => $args['url_rel'],
+	'href'       => $args['url'],
+	'target'     => $args['url_target'],
+	'rel'        => $args['url_rel'],
+	'aria_label' => $args['aria_label'] ?? '',
 );
 
 ?>

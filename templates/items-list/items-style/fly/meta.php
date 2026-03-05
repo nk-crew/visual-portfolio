@@ -39,12 +39,13 @@ $templates_data = array(
 
 $link_data = array_merge(
 	array(
-		'href'     => $args['url'],
-		'target'   => $args['url_target'],
-		'rel'      => $args['url_rel'],
-		'fallback' => 'span',
-		'class'    => 'vp-portfolio__item-meta',
-		'tabindex' => '-1',
+		'href'       => $args['url'],
+		'target'     => $args['url_target'],
+		'rel'        => $args['url_rel'],
+		'aria_label' => $args['aria_label'] ?? '',
+		'fallback'   => 'span',
+		'class'      => 'vp-portfolio__item-meta',
+		'tabindex'   => '-1',
 	),
 	$templates_data
 );
