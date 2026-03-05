@@ -560,7 +560,9 @@ class Visual_Portfolio_Get {
 		$each_item_args = array(
 			'uid'                => '',
 			'post_id'            => '',
+			'post_type'          => '',
 			'url'                => '',
+			'aria_label'         => '',
 			'title'              => '',
 			'excerpt'            => '',
 			'content'            => '',
@@ -680,7 +682,8 @@ class Visual_Portfolio_Get {
 			while ( $portfolio_query->have_posts() ) {
 				$portfolio_query->the_post();
 
-				$the_post = get_post();
+				$the_post  = get_post();
+				$post_type = get_post_type();
 
 				self::$used_posts[] = get_the_ID();
 
@@ -729,13 +732,14 @@ class Visual_Portfolio_Get {
 					array(
 						'uid'            => hash( 'crc32b', 'post-' . get_the_ID() ),
 						'post_id'        => get_the_ID(),
+						'post_type'      => $post_type,
 						'url'            => get_permalink(),
 						'title'          => get_the_title(),
 						'content'        => get_the_content(),
 						'format'         => get_post_format() ? get_post_format() : 'standard',
 						'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
 						'filter'         => implode( ',', $filter_values ),
-						'image_id'       => 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
+						'image_id'       => 'attachment' === $post_type ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
 						'focal_point'    => Visual_Portfolio_Custom_Post_Meta::get_featured_image_focal_point( get_the_ID() ),
 						'categories'     => $categories,
 						'comments_count' => get_comments_number( get_the_ID() ),
@@ -2229,6 +2233,96 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
+	 * Get item kind label for aria-label generation.
+	 *
+	 * @param array $args - item args.
+	 *
+	 * @return string
+	 */
+	private static function get_item_kind_label( $args ) {
+		$format        = $args['format'] ?? '';
+		$format_labels = array(
+			'video'   => esc_html__( 'video', 'visual-portfolio' ),
+			'audio'   => esc_html__( 'audio', 'visual-portfolio' ),
+			'gallery' => esc_html__( 'gallery', 'visual-portfolio' ),
+		);
+
+		if ( isset( $format_labels[ $format ] ) ) {
+			return $format_labels[ $format ];
+		}
+
+		$post_type = $args['post_type'] ?? '';
+
+		if ( '' === $post_type && ! empty( $args['post_id'] ) ) {
+			$post_type = get_post_type( intval( $args['post_id'] ) );
+		}
+
+		if ( $post_type ) {
+			$post_type_labels = array(
+				'post'    => esc_html__( 'Post', 'visual-portfolio' ),
+				'page'    => esc_html__( 'Page', 'visual-portfolio' ),
+				'product' => esc_html__( 'Product', 'visual-portfolio' ),
+				'shop'    => esc_html__( 'Shop', 'visual-portfolio' ),
+				'project' => esc_html__( 'Project', 'visual-portfolio' ),
+				'work'    => esc_html__( 'Work', 'visual-portfolio' ),
+			);
+
+			if ( isset( $post_type_labels[ $post_type ] ) ) {
+				return $post_type_labels[ $post_type ];
+			}
+
+			$post_type_fallback = ucwords( str_replace( array( '-', '_' ), ' ', $post_type ) );
+			$post_type_fallback = wp_strip_all_tags( $post_type_fallback );
+
+			if ( '' !== trim( $post_type_fallback ) ) {
+				return $post_type_fallback;
+			}
+		}
+
+		$content_source        = $args['vp_opts']['content_source'] ?? '';
+		$content_source_labels = array(
+			'images'        => esc_html__( 'image', 'visual-portfolio' ),
+			'social-stream' => esc_html__( 'social post', 'visual-portfolio' ),
+		);
+
+		if ( isset( $content_source_labels[ $content_source ] ) ) {
+			return $content_source_labels[ $content_source ];
+		}
+
+		return esc_html__( 'item', 'visual-portfolio' );
+	}
+
+	/**
+	 * Get item aria-label.
+	 *
+	 * @param array $args - item args.
+	 *
+	 * @return string
+	 */
+	private static function get_item_aria_label( $args ) {
+		$aria_label = wp_strip_all_tags( $args['aria_label'] ?? '' );
+
+		if ( '' === trim( $aria_label ) ) {
+			$aria_label = wp_strip_all_tags( $args['title'] ?? '' );
+		}
+
+		if ( '' !== trim( $aria_label ) ) {
+			return $aria_label;
+		}
+
+		// translators: %s - item type label such as image, post type name, video, etc.
+		$aria_label = sprintf( esc_html__( 'Open %s', 'visual-portfolio' ), self::get_item_kind_label( $args ) );
+
+		/**
+		 * Filters the generated aria-label for each item link.
+		 *
+		 * @param string $aria_label generated aria-label.
+		 * @param array  $args       item args.
+		 */
+		return apply_filters( 'vpf_item_aria_label', $aria_label, $args );
+	}
+
+	/**
 	 * Print each item
 	 *
 	 * @param array $args current item data.
@@ -2322,6 +2416,8 @@ class Visual_Portfolio_Get {
 				$args['url_rel']    = $args['vp_opts']['items_click_action_url_rel'] ? $args['vp_opts']['items_click_action_url_rel'] : false;
 				break;
 		}
+
+		$args['aria_label'] = self::get_item_aria_label( $args );
 
 		// No Image.
 		if ( ! $args['image'] && $args['no_image'] ) {

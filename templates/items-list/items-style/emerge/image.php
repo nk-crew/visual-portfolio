@@ -18,7 +18,7 @@ $link_data = array(
 	'href'       => $args['url'],
 	'target'     => $args['url_target'],
 	'rel'        => $args['url_rel'],
-	'aria_label' => isset( $args['title'] ) && $args['title'] ? wp_strip_all_tags( $args['title'] ) : esc_html__( 'Open item', 'visual-portfolio' ),
+	'aria_label' => $args['aria_label'] ?? '',
 );
 
 ?>
