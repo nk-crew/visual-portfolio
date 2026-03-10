@@ -825,6 +825,8 @@ $escaped-svg-characters: (
 	margin-left: -20px;
 	font-size: 16px;
 	line-height: 1.6;
+	color: #1d2327;
+	background: #fff;
 
 	*,
 	*::before,
@@ -839,219 +841,222 @@ $escaped-svg-characters: (
 	p {
 		font-size: inherit;
 		line-height: 1.6;
+		margin-top: 0;
 	}
 
 	h2 {
 		margin-top: 0;
 		font-size: 2em;
-		font-weight: 700;
+		font-weight: 600;
 		line-height: 1.2;
 		text-align: center;
 	}
 
 	.vpf-welcome-head {
 		position: relative;
-		z-index: 0;
-		padding: 120px 0;
-		margin-bottom: 120px;
-		color: #fff;
-		background-color: #000;
+		margin-bottom: 44px;
+		background: #f6f7f7;
+		border-radius: 28px;
+		margin-top: 20px;
 
-		@media screen and (max-width: 600px) {
-			margin-bottom: 60px;
-		}
-
-		.vpf-welcome-head-background {
-			position: absolute;
-			top: 0;
-			right: -20px;
-			z-index: -1;
-			display: block;
-			width: calc(100% + 40px);
-			height: 100%;
-			object-fit: cover;
-		}
-
-		// Logo.
-		.vpf-welcome-head-logo {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			margin: 0;
-			margin-bottom: 20px;
-			color: #fff;
-
-			@media screen and (max-width: 600px) {
-				font-size: 20px;
-			}
-		}
-
-		.dashicons-visual-portfolio {
-			display: inline-block;
-			width: 60px;
-			height: 60px;
-			margin-top: 3px;
-			margin-right: 20px;
-			background-size: 60px;
-			opacity: 1;
-
-			@media screen and (max-width: 600px) {
-				width: 30px;
-				height: 30px;
-				margin-right: 10px;
-				background-size: 30px;
-			}
-		}
-
-		// Subtitle.
-		.vpf-welcome-subtitle {
-			max-width: 480px;
+		.vpf-welcome-head-inner {
+			position: relative;
+			max-width: 840px;
+			padding: 60px 10px;
 			margin: 0 auto;
-			font-weight: 500;
-			line-height: 1.7;
-			color: #c1c1c1;
 			text-align: center;
 		}
 
-		// Pro info.
-		.vpf-welcome-head-pro-info {
-			position: absolute;
-			bottom: -50px;
-			left: 50%;
-			width: 100%;
-			max-width: 570px;
-			padding: 25px 45px;
-			color: #131313;
-			text-align: center;
-			background-color: #fff;
-			border-radius: 3px;
-			box-shadow: 0 5px 10px 0 rgba(#000, 0.1);
-			transform: translateX(-50%);
+		.vpf-welcome-head-label {
+			display: inline-flex;
+			align-items: center;
+			width: fit-content;
+			font-size: 11px;
+			font-weight: 600;
+			letter-spacing: .04em;
+			margin-bottom: 18px;
+			padding: 4px 14px;
+			color: #2540CC;
+			text-transform: uppercase;
+			background: rgba(#2540CC, 10%);
+			border-radius: 999px;
+		}
 
-			@media screen and (max-width: 1120px) {
-				max-width: 530px;
-			}
+		.vpf-welcome-head-title {
+			margin: 0 0 18px;
+			font-size: 3em;
+			line-height: 1.02;
+			color: #0f172a;
+			text-align: center;
+			text-wrap: balance;
+
 			@media screen and (max-width: 600px) {
-				position: relative;
+				font-size: 2.15em;
 			}
+		}
+
+		.vpf-welcome-subtitle {
+			color: #475467;
+			font-weight: 400;
+			line-height: 1.5;
+			margin: 0 auto;
+			max-width: 680px;
+			text-align: center;
+			text-wrap: balance;
 		}
 	}
 
 	.vpf-welcome-content {
-		max-width: 900px;
+		max-width: 1180px;
 		margin: 0 auto;
 
-		// Title.
-		.vpf-welcome-content-title {
-			max-width: 600px;
-			margin: 0 auto;
-			margin-bottom: 80px;
-		}
-
-		// Features.
 		.vpf-welcome-content-features {
 			display: grid;
-			grid-template-columns: 1fr 1fr;
-			grid-gap: 30px;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			grid-gap: 22px;
+			list-style: none;
+			padding: 0;
+			margin: 0;
+
+			@media screen and (max-width: 1080px) {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+
+			@media screen and (max-width: 700px) {
+				grid-template-columns: 1fr;
+			}
+
+			li {
+				position: relative;
+				min-height: 100%;
+				padding: 26px;
+				background: #fff;
+				border: 1px solid #ececec;
+				border-radius: 20px;
+
+				> span {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					width: 42px;
+					height: 42px;
+					margin-bottom: 18px;
+					font-size: 13px;
+					font-weight: 700;
+					line-height: 1;
+					color: #2540CC;
+					background: #eef4ff;
+					border-radius: 12px;
+				}
+
+				> strong {
+					display: block;
+					margin-bottom: 10px;
+					font-size: 1.35em;
+					font-weight: 600;
+					line-height: 1.25;
+					color: #0f172a;
+				}
+
+				p:last-child {
+					margin-bottom: 0;
+					color: #475467;
+				}
+			}
+		}
+	}
+
+	.vpf-welcome-content-buttons {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 12px;
+		margin-top: 28px;
+
+		a {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 13px;
+			font-weight: 600;
+			letter-spacing: .02em;
+			padding: 9px 20px;
+			color: #fff;
+			text-decoration: none;
+			border-radius: 12px;
+			transition: background-color 0.15s ease, transform 0.15s ease;
+
+			&:hover,
+			&:focus {
+				transform: translateY(-1px);
+			}
+
+			&.is-primary {
+				background: #2540CC;
+
+				&:hover,
+				&:focus {
+					background: #2145e6;
+				}
+			}
+
+			&.is-secondary {
+				color: #344054;
+				background: #fff;
+				border: 1px solid #d0d5dd;
+
+				&:hover,
+				&:focus {
+					background: #f8fafc;
+				}
+			}
+		}
+	}
+
+	.vpf-welcome-foot-pro-info {
+		max-width: 1180px;
+		padding: 32px;
+		margin: 56px auto 72px;
+		border: 1px solid #e4e7ec;
+		border-radius: 24px;
+		box-shadow: 0 18px 46px rgba(#101828, 0.08);
+
+		@media screen and (max-width: 600px) {
+			padding: 24px;
+			margin-bottom: 40px;
+		}
+
+		h2 {
+			margin-bottom: 12px;
+			color: #0f172a;
+			text-align: left;
+		}
+
+		.vpf-welcome-foot-description {
+			max-width: 760px;
+			margin-bottom: 24px;
+			color: #475467;
+		}
+
+		ul {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 14px 28px;
+			max-width: none;
+			padding: 0;
+			margin: 0;
+			font-weight: 500;
 			list-style: none;
 
 			@media screen and (max-width: 600px) {
 				grid-template-columns: 1fr;
 			}
 
-			li {
-				position: relative;
-				padding-left: 50px;
-
-				> span {
-					position: absolute;
-					top: 0;
-					left: 0;
-					display: block;
-					font-size: 1.6em;
-					line-height: 1.3;
-				}
-
-				> strong {
-					font-size: 1.6em;
-					font-weight: 400;
-					line-height: 1.3;
-					color: #1d2327;
-				}
-			}
-		}
-
-		hr {
-			max-width: 200px;
-			margin-top: 30px;
-			margin-bottom: 60px;
-		}
-
-		// Buttons.
-		.vpf-welcome-content-buttons {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			grid-gap: 10px;
-			max-width: 450px;
-			margin: 0 auto;
-			margin-bottom: 50px;
-			text-align: center;
-
-			@media screen and (max-width: 600px) {
-				grid-template-columns: 1fr;
-			}
-
-			a {
-				padding: 11px;
-				font-size: 14px;
-				font-weight: 600;
-				color: #fff;
-				text-decoration: none;
-				text-transform: uppercase;
-				background-color: #2540cc;
-				border-radius: 3px;
-
-				&:hover,
-				&:focus {
-					background-color: #13289a;
-				}
-
-				&:last-child {
-					color: #000;
-					background-color: #d2d2d2;
-
-					&:hover,
-					&:focus {
-						background-color: #bdbdbd;
-					}
-				}
-			}
-		}
-	}
-
-	// Pro.
-	.vpf-welcome-foot-pro-info {
-		max-width: 700px;
-		padding: 40px;
-		margin: 60px auto;
-		background-color: #fff;
-		border: 1px solid #e0e0e0;
-
-		ul {
-			max-width: 500px;
-			margin: 40px auto;
-			column-count: 2;
-			font-weight: 500;
-
-			@media screen and (max-width: 600px) {
-				column-count: 1;
-			}
-
 			> li::before {
 				display: inline-block;
 				width: 20px;
 				height: 20px;
-				margin-right: 6px;
+				margin-right: 8px;
 				vertical-align: -0.25em;
 				content: "";
 				background-image: url("#{escape-svg('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#1e9059"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>')}");
@@ -1061,14 +1066,14 @@ $escaped-svg-characters: (
 		> a {
 			display: block;
 			padding: 16px;
+			margin-top: 20px;
 			font-size: 16px;
 			font-weight: 600;
 			color: #fff;
 			text-align: center;
 			text-decoration: none;
-			text-transform: uppercase;
 			background-color: #1e9059;
-			border-radius: 3px;
+			border-radius: 14px;
 
 			&:hover,
 			&:focus {
