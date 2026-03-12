@@ -19,6 +19,7 @@ const ALLOWED_CONTROL_CATEGORIES = [
 	'content-source-general',
 	'content-source-images',
 	'content-source-post-based',
+	'content-source-taxonomies',
 	'content-source-social-stream',
 	'custom_css',
 ];

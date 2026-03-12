@@ -110,8 +110,14 @@ export default class IconsSelector extends Component {
 	}
 
 	render() {
-		const { controlName, value, onChange, collapseRows, isSetupWizard } =
-			this.props;
+		const {
+			controlName,
+			value,
+			onChange,
+			collapseRows,
+			isSetupWizard,
+			columns = 3,
+		} = this.props;
 
 		const { options, ajaxStatus, collapsed } = this.state;
 
@@ -128,7 +134,7 @@ export default class IconsSelector extends Component {
 		const optionsArray = Object.keys(options);
 		const fromIndex = optionsArray.indexOf(value);
 
-		const itemsPerRow = isSetupWizard ? 5 : 3;
+		const itemsPerRow = isSetupWizard ? 5 : columns;
 		const allowedItems = collapseRows * itemsPerRow;
 		const allowCollapsing =
 			collapseRows !== false && optionsArray.length > allowedItems;
@@ -156,6 +162,13 @@ export default class IconsSelector extends Component {
 						: ''
 				)}
 				data-control-name={controlName}
+				style={
+					isSetupWizard
+						? undefined
+						: {
+								gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+						  }
+				}
 			>
 				{optionsArray
 					.filter((elm, i) => {

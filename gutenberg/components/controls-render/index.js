@@ -506,6 +506,7 @@ ControlsRender.Control = function (props) {
 					value={controlVal}
 					options={props.options}
 					onChange={(val) => onChange(val)}
+					columns={props.columns}
 					collapseRows={props.collapse_rows || false}
 					isSetupWizard={isSetupWizard}
 				/>
