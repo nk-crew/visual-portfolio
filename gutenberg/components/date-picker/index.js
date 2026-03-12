@@ -18,30 +18,33 @@ export default class VPDatePicker extends Component {
 
 		return (
 			<Dropdown
-				renderToggle={({ onToggle }) => (
-					<Button variant="secondary" onClick={onToggle}>
-						{value
-							? dateI18n(resolvedFormat, value)
-							: __('Select Date', 'visual-portfolio')}
+				renderToggle={ ( { onToggle } ) => (
+					<Button variant="secondary" onClick={ onToggle }>
+						{ value
+							? dateI18n( resolvedFormat, value )
+							: __( 'Select Date', 'visual-portfolio' ) }
 					</Button>
-				)}
-				renderContent={() => (
+				) }
+				renderContent={ () => (
 					<div className="components-datetime vpf-component-date-picker">
-						<DatePicker currentDate={value} onChange={onChange} />
-						{value ? (
+						<DatePicker
+							currentDate={ value }
+							onChange={ onChange }
+						/>
+						{ value ? (
 							<Button
 								variant="secondary"
-								onClick={() => {
-									onChange('');
-								}}
+								onClick={ () => {
+									onChange( '' );
+								} }
 							>
-								{__('Reset Date', 'visual-portfolio')}
+								{ __( 'Reset Date', 'visual-portfolio' ) }
 							</Button>
 						) : (
 							''
-						)}
+						) }
 					</div>
-				)}
+				) }
 			/>
 		);
 	}

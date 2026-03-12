@@ -1,6 +1,6 @@
 import $ from 'jquery';
 
-const $wnd = $(window);
+const $wnd = $( window );
 
 /**
  * Check if lines cross
@@ -12,7 +12,7 @@ const $wnd = $(window);
  *
  * @return {boolean} cross lines
  */
-function isCrossLine(a, b, c, d) {
+function isCrossLine( a, b, c, d ) {
 	// Working code #1:
 	//
 	// var common = (b.x - a.x)*(d.y - c.y) - (b.y - a.y)*(d.x - c.x);
@@ -29,37 +29,37 @@ function isCrossLine(a, b, c, d) {
 	// return r >= 0 && r <= 1 && s >= 0 && s <= 1;
 
 	// Working code #2:
-	const v1 = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
-	const v2 = (d.x - c.x) * (b.y - c.y) - (d.y - c.y) * (b.x - c.x);
-	const v3 = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-	const v4 = (b.x - a.x) * (d.y - a.y) - (b.y - a.y) * (d.x - a.x);
+	const v1 = ( d.x - c.x ) * ( a.y - c.y ) - ( d.y - c.y ) * ( a.x - c.x );
+	const v2 = ( d.x - c.x ) * ( b.y - c.y ) - ( d.y - c.y ) * ( b.x - c.x );
+	const v3 = ( b.x - a.x ) * ( c.y - a.y ) - ( b.y - a.y ) * ( c.x - a.x );
+	const v4 = ( b.x - a.x ) * ( d.y - a.y ) - ( b.y - a.y ) * ( d.x - a.x );
 	return v1 * v2 <= 0 && v3 * v4 <= 0;
 }
 
 // Init Events.
-$(document).on('initEvents.vpf', (event, self) => {
-	if (event.namespace !== 'vpf' || self.options.itemsStyle !== 'fly') {
+$( document ).on( 'initEvents.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' || self.options.itemsStyle !== 'fly' ) {
 		return;
 	}
 
-	const evp = `.vpf-uid-${self.uid}`;
+	const evp = `.vpf-uid-${ self.uid }`;
 
 	// determine cursor position
 	let lastCursorPos = {};
-	$wnd.on(`mousemove${evp}`, (e) => {
+	$wnd.on( `mousemove${ evp }`, ( e ) => {
 		lastCursorPos = {
 			x: e.clientX,
 			y: e.clientY,
 		};
-	});
+	} );
 
 	self.$item.on(
-		`mouseenter${evp} mouseleave${evp}`,
+		`mouseenter${ evp } mouseleave${ evp }`,
 		'.vp-portfolio__item',
-		function (e) {
-			const $this = $(this);
-			const itemRect = $this[0].getBoundingClientRect();
-			const $overlay = $this.find('.vp-portfolio__item-overlay');
+		function ( e ) {
+			const $this = $( this );
+			const itemRect = $this[ 0 ].getBoundingClientRect();
+			const $overlay = $this.find( '.vp-portfolio__item-overlay' );
 			const enter = e.type === 'mouseenter';
 			let endX = '0%';
 			let endY = '0%';
@@ -101,65 +101,65 @@ $(document).on('initEvents.vpf', (event, self) => {
 			);
 
 			// Sometimes isCrossLine returned false, so we need to check direction manually (less accurate, but it is not a big problem).
-			if (!isUp && !isDown && !isLeft && !isRight) {
+			if ( ! isUp && ! isDown && ! isLeft && ! isRight ) {
 				const x =
-					(itemRect.width / 2 - curCursorPos.x + itemRect.left) /
-					(itemRect.width / 2);
+					( itemRect.width / 2 - curCursorPos.x + itemRect.left ) /
+					( itemRect.width / 2 );
 				const y =
-					(itemRect.height / 2 - curCursorPos.y + itemRect.top) /
-					(itemRect.height / 2);
-				if (Math.abs(x) > Math.abs(y)) {
-					if (x > 0) {
+					( itemRect.height / 2 - curCursorPos.y + itemRect.top ) /
+					( itemRect.height / 2 );
+				if ( Math.abs( x ) > Math.abs( y ) ) {
+					if ( x > 0 ) {
 						isLeft = true;
 					} else {
 						isRight = true;
 					}
-				} else if (y > 0) {
+				} else if ( y > 0 ) {
 					isUp = true;
 				} else {
 					isDown = true;
 				}
 			}
 
-			if (isUp) {
+			if ( isUp ) {
 				endY = '-100.1%';
-			} else if (isDown) {
+			} else if ( isDown ) {
 				endY = '100.1%';
-			} else if (isLeft) {
+			} else if ( isLeft ) {
 				endX = '-100.1%';
-			} else if (isRight) {
+			} else if ( isRight ) {
 				endX = '100.1%';
 			}
 
-			if (enter) {
-				$overlay.css({
+			if ( enter ) {
+				$overlay.css( {
 					transition: 'none',
-					transform: `translateX(${endX}) translateY(${endY}) translateZ(0)`,
-				});
+					transform: `translateX(${ endX }) translateY(${ endY }) translateZ(0)`,
+				} );
 				// Trigger a reflow, flushing the CSS changes. This need to fix some glitches in Safari and Firefox.
 				// Info here - https://stackoverflow.com/questions/11131875/what-is-the-cleanest-way-to-disable-css-transition-effects-temporarily
 				// eslint-disable-next-line no-unused-expressions
-				$overlay[0].offsetHeight;
+				$overlay[ 0 ].offsetHeight;
 			}
 
-			$overlay.css({
+			$overlay.css( {
 				transition: '.2s transform ease-in-out',
-				transform: `translateX(${enter ? '0%' : endX}) translateY(${
+				transform: `translateX(${ enter ? '0%' : endX }) translateY(${
 					enter ? '0%' : endY
 				}) translateZ(0)`,
-			});
+			} );
 		}
 	);
-});
+} );
 
 // Destroy Events.
-$(document).on('destroyEvents.vpf', (event, self) => {
-	if (event.namespace !== 'vpf' || self.options.itemsStyle !== 'fly') {
+$( document ).on( 'destroyEvents.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' || self.options.itemsStyle !== 'fly' ) {
 		return;
 	}
 
-	const evp = `.vpf-uid-${self.uid}`;
+	const evp = `.vpf-uid-${ self.uid }`;
 
-	$wnd.off(`mousemove${evp}`);
-	self.$item.off(`mouseenter${evp} mouseleave${evp}`);
-});
+	$wnd.off( `mousemove${ evp }` );
+	self.$item.off( `mouseenter${ evp } mouseleave${ evp }` );
+} );

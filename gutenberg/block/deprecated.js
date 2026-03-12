@@ -65,57 +65,58 @@ export default [
 	{
 		attributes: {
 			...attributes,
-			...(() => {
+			...( () => {
 				const attrs = {};
-				Object.keys(V2_23_0_ATTRIBUTES).forEach((k) => {
-					attrs[k] = { type: 'string' };
-				});
+				Object.keys( V2_23_0_ATTRIBUTES ).forEach( ( k ) => {
+					attrs[ k ] = { type: 'string' };
+				} );
 				return attrs;
-			})(),
-			...(() => {
+			} )(),
+			...( () => {
 				const attrs = {};
-				V2_23_0_BORDER_RADIUS.forEach((k) => {
-					attrs[k] = { type: 'number', default: 0 };
-				});
+				V2_23_0_BORDER_RADIUS.forEach( ( k ) => {
+					attrs[ k ] = { type: 'number', default: 0 };
+				} );
 				return attrs;
-			})(),
+			} )(),
 		},
-		migrate(oldAttributes) {
+		migrate( oldAttributes ) {
 			const newAttributes = { ...oldAttributes };
 
-			Object.keys(V2_23_0_ATTRIBUTES).forEach((k) => {
-				if (k in newAttributes) {
-					if (newAttributes[k]) {
-						newAttributes[V2_23_0_ATTRIBUTES[k]] = newAttributes[k];
+			Object.keys( V2_23_0_ATTRIBUTES ).forEach( ( k ) => {
+				if ( k in newAttributes ) {
+					if ( newAttributes[ k ] ) {
+						newAttributes[ V2_23_0_ATTRIBUTES[ k ] ] =
+							newAttributes[ k ];
 					}
 
-					delete newAttributes[k];
+					delete newAttributes[ k ];
 				}
-			});
+			} );
 
-			V2_23_0_BORDER_RADIUS.forEach((k) => {
-				if (typeof newAttributes[k] === 'number') {
-					newAttributes[k] = `${newAttributes[k]}px`;
+			V2_23_0_BORDER_RADIUS.forEach( ( k ) => {
+				if ( typeof newAttributes[ k ] === 'number' ) {
+					newAttributes[ k ] = `${ newAttributes[ k ] }px`;
 				}
-			});
+			} );
 
-			return [newAttributes, []];
+			return [ newAttributes, [] ];
 		},
-		isEligible(attrs) {
-			const keys = Object.keys(V2_23_0_ATTRIBUTES);
+		isEligible( attrs ) {
+			const keys = Object.keys( V2_23_0_ATTRIBUTES );
 			let eligible = false;
 
-			keys.forEach((key) => {
-				if (!eligible && key in attrs) {
+			keys.forEach( ( key ) => {
+				if ( ! eligible && key in attrs ) {
 					eligible = true;
 				}
-			});
+			} );
 
-			V2_23_0_BORDER_RADIUS.forEach((k) => {
-				if (!eligible && typeof attrs[k] === 'number') {
+			V2_23_0_BORDER_RADIUS.forEach( ( k ) => {
+				if ( ! eligible && typeof attrs[ k ] === 'number' ) {
 					eligible = true;
 				}
-			});
+			} );
 
 			return eligible;
 		},

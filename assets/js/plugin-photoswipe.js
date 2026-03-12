@@ -10,14 +10,14 @@ const {
 } = window;
 const { __, settingsPopupGallery } = VPData;
 
-function resizeVideo(data, curItem) {
-	if (typeof curItem === 'undefined') {
-		if (data && data.itemHolders.length) {
-			data.itemHolders.forEach((val) => {
-				if (val.item && val.item.html) {
-					resizeVideo(data, val.item);
+function resizeVideo( data, curItem ) {
+	if ( typeof curItem === 'undefined' ) {
+		if ( data && data.itemHolders.length ) {
+			data.itemHolders.forEach( ( val ) => {
+				if ( val.item && val.item.html ) {
+					resizeVideo( data, val.item );
 				}
-			});
+			} );
 		}
 		return;
 	}
@@ -27,41 +27,41 @@ function resizeVideo(data, curItem) {
 	let vpH = data.viewportSize.y;
 	const ratio = curItem.vw / curItem.vh;
 	let resultW;
-	const $container = $(curItem.container);
+	const $container = $( curItem.container );
 
 	const bars = data.options.barsSize;
 	let barTop = 0;
 	let barBot = 0;
-	if (bars) {
+	if ( bars ) {
 		barTop = bars.top && bars.top !== 'auto' ? bars.top : 0;
 		barBot = bars.bottom && bars.bottom !== 'auto' ? bars.bottom : 0;
 	}
 	vpH -= barTop + barBot;
 
-	if (ratio > vpW / vpH) {
+	if ( ratio > vpW / vpH ) {
 		resultW = vpW;
 	} else {
 		resultW = vpH * ratio;
 	}
 
-	const $videoCont = $container.find('.vp-pswp-video');
+	const $videoCont = $container.find( '.vp-pswp-video' );
 
-	$videoCont.css('max-width', resultW);
-	$videoCont.children().css({
-		paddingBottom: `${100 * (curItem.vh / curItem.vw)}%`,
-	});
+	$videoCont.css( 'max-width', resultW );
+	$videoCont.children().css( {
+		paddingBottom: `${ 100 * ( curItem.vh / curItem.vw ) }%`,
+	} );
 
-	$container.css({
+	$container.css( {
 		top: barTop,
 		bottom: barBot,
-	});
+	} );
 }
 
-if (PhotoSwipe && VPPopupAPI) {
+if ( PhotoSwipe && VPPopupAPI ) {
 	let pswpInstance;
 
 	// prepare photoswipe markup
-	if (!$('.vp-pswp').length) {
+	if ( ! $( '.vp-pswp' ).length ) {
 		const markup = `
         <div class="pswp vp-pswp${
 			settingsPopupGallery.click_to_zoom ? '' : ' vp-pswp-no-zoom'
@@ -83,7 +83,7 @@ if (PhotoSwipe && VPPopupAPI) {
 							settingsPopupGallery.show_download_button
 								? ''
 								: ' pswp__element--disabled'
-						}" title="${__.pswp_download}" download>
+						}" title="${ __.pswp_download }" download>
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.62 17.09V19H5.38v-1.91zm-2.97-6.96L17 11.45l-5 4.87-5-4.87 1.36-1.32 2.68 2.64V5h1.92v7.77z"></path></svg>
 						</a>
                         <button class="pswp__button pswp__button--share" title="${
@@ -119,25 +119,25 @@ if (PhotoSwipe && VPPopupAPI) {
             </div>
         </div>
         `;
-		$('body').append(markup);
+		$( 'body' ).append( markup );
 	}
 
 	// Extend Popup API.
 	VPPopupAPI.vendor = 'photoswipe';
-	VPPopupAPI.open = function (items, index, self) {
+	VPPopupAPI.open = function ( items, index, self ) {
 		const finalItems = [];
 
 		// prepare items for fancybox api.
-		items.forEach((item) => {
-			if (item.type === 'embed') {
-				finalItems.push({
-					html: `<div class="vp-pswp-video"><div>${item.embed}</div></div>`,
+		items.forEach( ( item ) => {
+			if ( item.type === 'embed' ) {
+				finalItems.push( {
+					html: `<div class="vp-pswp-video"><div>${ item.embed }</div></div>`,
 					vw: item.width || 0,
 					vh: item.height || 0,
 					title: item.caption,
-				});
+				} );
 			} else {
-				finalItems.push({
+				finalItems.push( {
 					src: item.src,
 					el: item.el,
 					w: item.width || 0,
@@ -148,7 +148,7 @@ if (PhotoSwipe && VPPopupAPI) {
 						w: item.width || 0,
 						h: item.height || 0,
 					},
-					...(item.srcMedium
+					...( item.srcMedium
 						? {
 								m: {
 									src: item.srcMedium,
@@ -156,14 +156,14 @@ if (PhotoSwipe && VPPopupAPI) {
 									h: item.srcMediumHeight || 0,
 								},
 								msrc: item.srcMedium,
-							}
-						: {}),
-				});
+						  }
+						: {} ),
+				} );
 			}
-		});
+		} );
 
-		const $pswpElement = $('.vp-pswp');
-		const pswpElement = $pswpElement[0];
+		const $pswpElement = $( '.vp-pswp' );
+		const pswpElement = $pswpElement[ 0 ];
 
 		// define options (if needed)
 		const options = {
@@ -193,43 +193,44 @@ if (PhotoSwipe && VPPopupAPI) {
 				},
 			],
 			getImageURLForShare() {
-				const currentItem = items[pswpInstance.getCurrentIndex()];
+				const currentItem = items[ pswpInstance.getCurrentIndex() ];
 
-				if (currentItem.type === 'image' && currentItem.src) {
+				if ( currentItem.type === 'image' && currentItem.src ) {
 					return currentItem.src;
 				}
 
 				return pswpInstance.currItem.src || '';
 			},
 			getPageURLForShare() {
-				const currentItem = items[pswpInstance.getCurrentIndex()];
+				const currentItem = items[ pswpInstance.getCurrentIndex() ];
 
-				if (currentItem.type === 'image' && currentItem.src) {
+				if ( currentItem.type === 'image' && currentItem.src ) {
 					return currentItem.src;
 				}
 
 				return window.location.href;
 			},
 			getTextForShare() {
-				const currentItem = items[pswpInstance.getCurrentIndex()];
+				const currentItem = items[ pswpInstance.getCurrentIndex() ];
 
-				if (currentItem.caption) {
-					const $caption = $(currentItem.caption);
+				if ( currentItem.caption ) {
+					const $caption = $( currentItem.caption );
 
 					if (
-						$caption.filter('.vp-portfolio__item-popup-title')
+						$caption.filter( '.vp-portfolio__item-popup-title' )
 							.length
 					) {
 						return $caption
-							.filter('.vp-portfolio__item-popup-title')
+							.filter( '.vp-portfolio__item-popup-title' )
 							.text();
 					}
 					if (
-						$caption.filter('.vp-portfolio__item-popup-description')
-							.length
+						$caption.filter(
+							'.vp-portfolio__item-popup-description'
+						).length
 					) {
 						return $caption
-							.filter('.vp-portfolio__item-popup-description')
+							.filter( '.vp-portfolio__item-popup-description' )
 							.text();
 					}
 				}
@@ -241,21 +242,24 @@ if (PhotoSwipe && VPPopupAPI) {
 			tapToToggleControls: true,
 			showHideOpacity: true,
 			history: false,
-			getThumbBoundsFn(thumbIndex) {
-				if (!finalItems[thumbIndex] || !finalItems[thumbIndex].el) {
+			getThumbBoundsFn( thumbIndex ) {
+				if (
+					! finalItems[ thumbIndex ] ||
+					! finalItems[ thumbIndex ].el
+				) {
 					return false;
 				}
 
-				const $el = $(finalItems[thumbIndex].el).find('img')[0];
+				const $el = $( finalItems[ thumbIndex ].el ).find( 'img' )[ 0 ];
 
-				if (!$el) {
+				if ( ! $el ) {
 					return false;
 				}
 
 				const rect = $el.getBoundingClientRect();
 				const pageYScroll =
 					window.pageYOffset || document.documentElement.scrollTop;
-				const pswpTop = parseFloat($pswpElement.css('top')) || 0;
+				const pswpTop = parseFloat( $pswpElement.css( 'top' ) ) || 0;
 
 				return {
 					x: rect.left,
@@ -264,17 +268,17 @@ if (PhotoSwipe && VPPopupAPI) {
 					h: rect.height,
 				};
 			},
-			getDoubleTapZoom(isMouseClick, item) {
+			getDoubleTapZoom( isMouseClick, item ) {
 				// isMouseClick          - true if mouse, false if double-tap
 				// item                  - slide object that is zoomed, usually current
 				// item.initialZoomLevel - initial scale ratio of image
 				//                         e.g. if viewport is 700px and image is 1400px,
 				//                              initialZoomLevel will be 0.5
-				if (isMouseClick) {
+				if ( isMouseClick ) {
 					// is mouse click on image or zoom icon
 
 					// Click to zoom disabled.
-					if (!settingsPopupGallery.click_to_zoom) {
+					if ( ! settingsPopupGallery.click_to_zoom ) {
 						return item.initialZoomLevel;
 					}
 
@@ -283,7 +287,7 @@ if (PhotoSwipe && VPPopupAPI) {
 					// - check if zoomed out image in less than 25% of the screen width
 					if (
 						item.w > window.innerWidth &&
-						(item.w * item.initialZoomLevel) / window.innerWidth <
+						( item.w * item.initialZoomLevel ) / window.innerWidth <
 							0.25
 					) {
 						return window.innerWidth / item.w;
@@ -303,10 +307,10 @@ if (PhotoSwipe && VPPopupAPI) {
 			},
 		};
 
-		options.index = parseInt(index, 10);
+		options.index = parseInt( index, 10 );
 
 		// exit if index not found
-		if (!isNumber(options.index)) {
+		if ( ! isNumber( options.index ) ) {
 			return;
 		}
 
@@ -324,7 +328,7 @@ if (PhotoSwipe && VPPopupAPI) {
 		let firstResize = true;
 		let imageSrcWillChange;
 
-		pswpInstance.listen('beforeResize', () => {
+		pswpInstance.listen( 'beforeResize', () => {
 			// pswpInstance.viewportSize.x - width of PhotoSwipe viewport
 			// pswpInstance.viewportSize.y - height of PhotoSwipe viewport
 			// window.devicePixelRatio - ratio between physical pixels and device independent pixels (Number)
@@ -337,94 +341,96 @@ if (PhotoSwipe && VPPopupAPI) {
 			// Code below is needed if you want image to switch dynamically on window.resize
 
 			// Find out if current images need to be changed
-			if (useLargeImages && realViewportWidth < 1000) {
+			if ( useLargeImages && realViewportWidth < 1000 ) {
 				useLargeImages = false;
 				imageSrcWillChange = true;
-			} else if (!useLargeImages && realViewportWidth >= 1000) {
+			} else if ( ! useLargeImages && realViewportWidth >= 1000 ) {
 				useLargeImages = true;
 				imageSrcWillChange = true;
 			}
 
 			// Invalidate items only when source is changed and when it's not the first update
-			if (imageSrcWillChange && !firstResize) {
+			if ( imageSrcWillChange && ! firstResize ) {
 				// invalidateCurrItems sets a flag on slides that are in DOM,
 				// which will force update of content (image) on window.resize.
 				pswpInstance.invalidateCurrItems();
 			}
 
-			if (firstResize) {
+			if ( firstResize ) {
 				firstResize = false;
 			}
 
 			imageSrcWillChange = false;
-		});
+		} );
 
-		pswpInstance.listen('gettingData', (idx, item) => {
+		pswpInstance.listen( 'gettingData', ( idx, item ) => {
 			// Prepare iframes.
-			if (item.html) {
+			if ( item.html ) {
 				// -- Iframe Autoplay - Part 1 --
 				// Disable autoplay parameter in iframes on inactive slides.
 				// Mostly for Youtube and Vimeo to prevent video playing in background.
 				// Later we add autoplay only to active slides.
-				item.html = item.html.replace(/autoplay=1/, 'autoplay=0');
+				item.html = item.html.replace( /autoplay=1/, 'autoplay=0' );
 
 				return;
 			}
 
 			// Prepare image sizes.
-			if (useLargeImages && item.o) {
-				if (item.o.src) {
+			if ( useLargeImages && item.o ) {
+				if ( item.o.src ) {
 					item.src = item.o.src;
 				}
-				if (item.o.w) {
+				if ( item.o.w ) {
 					item.w = item.o.w;
 				}
-				if (item.o.h) {
+				if ( item.o.h ) {
 					item.h = item.o.h;
 				}
-			} else if (item.m) {
-				if (item.m.src) {
+			} else if ( item.m ) {
+				if ( item.m.src ) {
 					item.src = item.m.src;
 				}
-				if (item.m.w) {
+				if ( item.m.w ) {
 					item.w = item.m.w;
 				}
-				if (item.m.h) {
+				if ( item.m.h ) {
 					item.h = item.m.h;
 				}
 			}
-		});
+		} );
 
-		pswpInstance.listen('imageLoadComplete', (idx, item) => {
-			if (item.h < 1 || item.w < 1) {
+		pswpInstance.listen( 'imageLoadComplete', ( idx, item ) => {
+			if ( item.h < 1 || item.w < 1 ) {
 				const img = new Image();
 
 				img.onload = () => {
 					item.w = img.width;
 					item.h = img.height;
 					pswpInstance.invalidateCurrItems();
-					pswpInstance.updateSize(true);
+					pswpInstance.updateSize( true );
 				};
 
 				img.src = item.src;
 			}
-		});
+		} );
 
-		pswpInstance.listen('resize', function () {
-			resizeVideo(this);
-		});
+		pswpInstance.listen( 'resize', function () {
+			resizeVideo( this );
+		} );
 
-		pswpInstance.listen('afterChange', function () {
+		pswpInstance.listen( 'afterChange', function () {
 			// Download button.
 			const $downloadButton = settingsPopupGallery.show_download_button
-				? this.template.querySelector('.pswp__button--download')
+				? this.template.querySelector( '.pswp__button--download' )
 				: false;
 
-			if ($downloadButton) {
-				if (this.currItem.html) {
-					$downloadButton.classList.add('pswp__element--disabled');
+			if ( $downloadButton ) {
+				if ( this.currItem.html ) {
+					$downloadButton.classList.add( 'pswp__element--disabled' );
 				} else {
-					$downloadButton.classList.remove('pswp__element--disabled');
+					$downloadButton.classList.remove(
+						'pswp__element--disabled'
+					);
 					$downloadButton.setAttribute(
 						'href',
 						this.currItem?.o?.src || this.currItem?.m?.src
@@ -432,89 +438,89 @@ if (PhotoSwipe && VPPopupAPI) {
 				}
 			}
 
-			resizeVideo(this);
+			resizeVideo( this );
 
 			VPPopupAPI.emitEvent(
 				'afterChangePhotoSwipe',
-				[this, pswpInstance],
+				[ this, pswpInstance ],
 				self
 			);
-		});
+		} );
 
 		// disable video play if no active.
-		pswpInstance.listen('beforeChange', function () {
+		pswpInstance.listen( 'beforeChange', function () {
 			const data = this;
 
 			// -- Iframe Autoplay - Part 2 --
 			// Set autoplay to 1 on active slides and to 0 on inactive.
-			if (data && data.itemHolders.length) {
+			if ( data && data.itemHolders.length ) {
 				const currentIndex = data.getCurrentIndex();
 
-				data.itemHolders.forEach((val) => {
+				data.itemHolders.forEach( ( val ) => {
 					const $iframe = val.el
-						? $(val.el).find('.vp-pswp-video iframe')
+						? $( val.el ).find( '.vp-pswp-video iframe' )
 						: false;
 
-					if ($iframe && $iframe.length) {
-						if (val.index === currentIndex) {
+					if ( $iframe && $iframe.length ) {
+						if ( val.index === currentIndex ) {
 							$iframe.attr(
 								'src',
 								$iframe
-									.attr('src')
-									.replace(/autoplay=0/, 'autoplay=1')
+									.attr( 'src' )
+									.replace( /autoplay=0/, 'autoplay=1' )
 							);
 						} else {
 							$iframe.attr(
 								'src',
 								$iframe
-									.attr('src')
-									.replace(/autoplay=1/, 'autoplay=0')
+									.attr( 'src' )
+									.replace( /autoplay=1/, 'autoplay=0' )
 							);
 						}
 					}
-				});
+				} );
 			}
 
 			VPPopupAPI.emitEvent(
 				'beforeChangePhotoSwipe',
-				[data, pswpInstance],
+				[ data, pswpInstance ],
 				self
 			);
-		});
+		} );
 
 		// destroy event.
-		pswpInstance.listen('destroy', function () {
+		pswpInstance.listen( 'destroy', function () {
 			const data = this;
 
-			if (data) {
+			if ( data ) {
 				// Remove video block.
-				if (data.itemHolders.length) {
-					data.itemHolders.forEach((val) => {
-						if (val.el) {
-							$(val.el).find('.vp-pswp-video').remove();
+				if ( data.itemHolders.length ) {
+					data.itemHolders.forEach( ( val ) => {
+						if ( val.el ) {
+							$( val.el ).find( '.vp-pswp-video' ).remove();
 						}
-					});
+					} );
 				}
 
-				const currentItemData = items[data.getCurrentIndex()];
+				const currentItemData = items[ data.getCurrentIndex() ];
 
-				if (currentItemData) {
-					VPPopupAPI.maybeFocusGalleryItem(currentItemData);
+				if ( currentItemData ) {
+					VPPopupAPI.maybeFocusGalleryItem( currentItemData );
 				}
 
 				VPPopupAPI.emitEvent(
 					'beforeClosePhotoSwipe',
-					[options, items, pswpInstance],
+					[ options, items, pswpInstance ],
 					self
 				);
 			}
 
 			pswpInstance = false;
-		});
+		} );
 
 		VPPopupAPI.emitEvent(
 			'beforeInitPhotoSwipe',
-			[options, finalItems, index, pswpInstance],
+			[ options, finalItems, index, pswpInstance ],
 			self
 		);
 
@@ -522,12 +528,12 @@ if (PhotoSwipe && VPPopupAPI) {
 
 		VPPopupAPI.emitEvent(
 			'initPhotoSwipe',
-			[options, finalItems, index, pswpInstance],
+			[ options, finalItems, index, pswpInstance ],
 			self
 		);
 	};
 	VPPopupAPI.close = function () {
-		if (pswpInstance) {
+		if ( pswpInstance ) {
 			pswpInstance.close();
 			pswpInstance = false;
 		}

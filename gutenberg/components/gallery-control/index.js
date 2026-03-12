@@ -38,32 +38,32 @@ import getAllCategories from './utils/get-all-categories';
 
 const { navigator, VPGutenbergVariables } = window;
 
-const ALLOWED_MEDIA_TYPES = ['image'];
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const UNCATEGORIZED_VALUE = '------';
 const ITEMS_COUNT_DEFAULT = 18;
 
-function MediaUploadButton({ open, items, isSetupWizard }) {
-	const hasOpenedModal = useRef(false);
+function MediaUploadButton( { open, items, isSetupWizard } ) {
+	const hasOpenedModal = useRef( false );
 
 	// Automatically open the media modal on the first render
-	useEffect(() => {
+	useEffect( () => {
 		if (
-			!hasOpenedModal.current &&
+			! hasOpenedModal.current &&
 			isSetupWizard &&
-			(!items || !items.length)
+			( ! items || ! items.length )
 		) {
 			open();
 			hasOpenedModal.current = true; // Ensure it only opens once
 		}
-	}, [isSetupWizard, items, open]);
+	}, [ isSetupWizard, items, open ] );
 
 	return (
 		<Button
 			className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-add"
-			onClick={(event) => {
+			onClick={ ( event ) => {
 				event.stopPropagation();
 				open();
-			}}
+			} }
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -74,29 +74,29 @@ function MediaUploadButton({ open, items, isSetupWizard }) {
 				aria-hidden="true"
 				focusable="false"
 			>
-				{items && items.length ? (
+				{ items && items.length ? (
 					<path d="m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z" />
 				) : (
 					<path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
-				)}
+				) }
 			</svg>
 			<span>
-				{items && items.length
-					? __('Edit Gallery', 'visual-portfolio')
-					: __('Add Images', 'visual-portfolio')}
+				{ items && items.length
+					? __( 'Edit Gallery', 'visual-portfolio' )
+					: __( 'Add Images', 'visual-portfolio' ) }
 			</span>
 		</Button>
 	);
 }
 
-function getHumanFileSize(size) {
-	const i = Math.floor(Math.log(size) / Math.log(1024));
-	return `${(size / 1024 ** i).toFixed(2) * 1} ${
-		['B', 'KB', 'MB', 'GB', 'TB'][i]
+function getHumanFileSize( size ) {
+	const i = Math.floor( Math.log( size ) / Math.log( 1024 ) );
+	return `${ ( size / 1024 ** i ).toFixed( 2 ) * 1 } ${
+		[ 'B', 'KB', 'MB', 'GB', 'TB' ][ i ]
 	}`;
 }
 
-function prepareImage(img) {
+function prepareImage( img ) {
 	const imgData = {
 		id: img.id,
 		imgUrl: img.url,
@@ -104,10 +104,10 @@ function prepareImage(img) {
 	};
 
 	// Prepare thumbnail for all images except GIF, since GIFs animated only in full size.
-	if (!img.mime || img.mime !== 'image/gif') {
-		if (img.sizes && img.sizes.large && img.sizes.large.url) {
+	if ( ! img.mime || img.mime !== 'image/gif' ) {
+		if ( img.sizes && img.sizes.large && img.sizes.large.url ) {
 			imgData.imgThumbnailUrl = img.sizes.large.url;
-		} else if (img.sizes && img.sizes.medium && img.sizes.medium.url) {
+		} else if ( img.sizes && img.sizes.medium && img.sizes.medium.url ) {
 			imgData.imgThumbnailUrl = img.sizes.medium.url;
 		} else if (
 			img.sizes &&
@@ -118,10 +118,10 @@ function prepareImage(img) {
 		}
 	}
 
-	if (img.title) {
+	if ( img.title ) {
 		imgData.title = img.title;
 	}
-	if (img.description) {
+	if ( img.description ) {
 		imgData.description = img.description;
 	}
 
@@ -136,66 +136,66 @@ function prepareImage(img) {
  * @param {Array} currentImages - current images set.
  * @return {Array}
  */
-function prepareImages(images, currentImages) {
+function prepareImages( images, currentImages ) {
 	const result = [];
 	const currentImagesIds =
-		currentImages && Object.keys(currentImages).length
-			? currentImages.map((img) => img.id)
+		currentImages && Object.keys( currentImages ).length
+			? currentImages.map( ( img ) => img.id )
 			: [];
 
-	if (images && images.length) {
-		images.forEach((img) => {
+	if ( images && images.length ) {
+		images.forEach( ( img ) => {
 			// We have to check for image URL, because when the image is removed from the
 			// system, it should be removed from our block as well after re-save.
-			if (img.url) {
+			if ( img.url ) {
 				let currentImgData = false;
 
-				if (currentImagesIds.length) {
-					const currentId = currentImagesIds.indexOf(img.id);
+				if ( currentImagesIds.length ) {
+					const currentId = currentImagesIds.indexOf( img.id );
 
-					if (currentId > -1 && currentImages[currentId]) {
-						currentImgData = currentImages[currentId];
+					if ( currentId > -1 && currentImages[ currentId ] ) {
+						currentImgData = currentImages[ currentId ];
 					}
 				}
 
-				const imgData = currentImgData || prepareImage(img);
+				const imgData = currentImgData || prepareImage( img );
 
-				result.push(imgData);
+				result.push( imgData );
 			}
-		});
+		} );
 	}
 
 	return result;
 }
 
-function getItemIndexByImageId(items, imgId) {
-	return items.findIndex((img) => img.id === imgId);
+function getItemIndexByImageId( items, imgId ) {
+	return items.findIndex( ( img ) => img.id === imgId );
 }
 
-function getBulkImagesDefaultValue(allItems, selectedItems, optionName) {
+function getBulkImagesDefaultValue( allItems, selectedItems, optionName ) {
 	let result = null;
 
-	if (selectedItems && selectedItems.length) {
-		const selectedItemsData = allItems.filter((img) =>
-			selectedItems.includes(img.id)
+	if ( selectedItems && selectedItems.length ) {
+		const selectedItemsData = allItems.filter( ( img ) =>
+			selectedItems.includes( img.id )
 		);
 
-		if (selectedItemsData.length) {
-			result = selectedItemsData[0][optionName];
+		if ( selectedItemsData.length ) {
+			result = selectedItemsData[ 0 ][ optionName ];
 
-			selectedItemsData.forEach((img) => {
+			selectedItemsData.forEach( ( img ) => {
 				// Use isEqual to properly compare objects and arrays.
-				if (result && !isEqual(result, img[optionName])) {
+				if ( result && ! isEqual( result, img[ optionName ] ) ) {
 					result = null;
 				}
-			});
+			} );
 		}
 	}
 
 	return result;
 }
 
-const SelectedImageData = function (props) {
+const SelectedImageData = function ( props ) {
 	const {
 		showFocalPoint,
 		focalPoint,
@@ -205,20 +205,20 @@ const SelectedImageData = function (props) {
 		onChangeImage,
 	} = props;
 
-	const [showMoreInfo, setShowMoreInfo] = useState(false);
-	const [linkCopied, setLinkCopied] = useState(false);
+	const [ showMoreInfo, setShowMoreInfo ] = useState( false );
+	const [ linkCopied, setLinkCopied ] = useState( false );
 
 	const { imageData } = useSelect(
-		(select) => {
-			if (!imgId) {
+		( select ) => {
+			if ( ! imgId ) {
 				return {};
 			}
 
-			const { getEntityRecord } = select('core');
+			const { getEntityRecord } = select( 'core' );
 
-			const imgData = getEntityRecord('postType', 'attachment', imgId);
+			const imgData = getEntityRecord( 'postType', 'attachment', imgId );
 
-			if (!imgData) {
+			if ( ! imgData ) {
 				return {};
 			}
 
@@ -227,63 +227,63 @@ const SelectedImageData = function (props) {
 			};
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[showMoreInfo, imgId]
+		[ showMoreInfo, imgId ]
 	);
 
 	return (
 		<MediaUploadCheck>
 			<div
-				className={`vpf-component-gallery-control-item-modal-image-info editor-post-featured-image ${
+				className={ `vpf-component-gallery-control-item-modal-image-info editor-post-featured-image ${
 					showMoreInfo
 						? 'vpf-component-gallery-control-item-modal-image-info-sticky-bottom'
 						: ''
-				}`}
+				}` }
 			>
-				{showFocalPoint ? (
+				{ showFocalPoint ? (
 					<FocalPointPicker
-						url={imageData?.source_url || imgUrl}
-						value={focalPoint}
-						dimensions={{
+						url={ imageData?.source_url || imgUrl }
+						value={ focalPoint }
+						dimensions={ {
 							width: imageData?.media_details?.width || 80,
 							height: imageData?.media_details?.height || 80,
-						}}
-						onChange={(val) => {
-							onChangeFocalPoint(val);
-						}}
+						} }
+						onChange={ ( val ) => {
+							onChangeFocalPoint( val );
+						} }
 						__nextHasNoMarginBottom
 					/>
-				) : null}
+				) : null }
 				<MediaUpload
-					onSelect={(image) => {
-						const imgData = prepareImage(image);
-						onChangeImage(imgData);
-					}}
-					allowedTypes={ALLOWED_MEDIA_TYPES}
-					render={({ open }) => (
-						<Button onClick={open} variant="secondary">
-							{__('Replace Image', 'visual-portfolio')}
+					onSelect={ ( image ) => {
+						const imgData = prepareImage( image );
+						onChangeImage( imgData );
+					} }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					render={ ( { open } ) => (
+						<Button onClick={ open } variant="secondary">
+							{ __( 'Replace Image', 'visual-portfolio' ) }
 						</Button>
-					)}
+					) }
 				/>
 				<Button
-					onClick={() => {
-						onChangeImage(false);
-					}}
+					onClick={ () => {
+						onChangeImage( false );
+					} }
 					isLink
 					isDestructive
 				>
-					{__('Remove Image from Gallery', 'visual-portfolio')}
+					{ __( 'Remove Image from Gallery', 'visual-portfolio' ) }
 				</Button>
 				<div className="vpf-component-gallery-control-item-modal-image-additional-info">
 					<Button
-						onClick={() => {
-							setShowMoreInfo(!showMoreInfo);
-						}}
+						onClick={ () => {
+							setShowMoreInfo( ! showMoreInfo );
+						} }
 						isLink
 					>
-						{showMoreInfo
-							? __('Hide Additional Info', 'visual-portfolio')
-							: __('Show Additional Info', 'visual-portfolio')}
+						{ showMoreInfo
+							? __( 'Hide Additional Info', 'visual-portfolio' )
+							: __( 'Show Additional Info', 'visual-portfolio' ) }
 						<svg
 							width="20"
 							height="20"
@@ -298,109 +298,117 @@ const SelectedImageData = function (props) {
 								strokeWidth="2"
 								strokeLinecap="round"
 								strokeLinejoin="round"
-								transform={`rotate(${
+								transform={ `rotate(${
 									showMoreInfo ? '-' : ''
-								}90 10 10)`}
+								}90 10 10)` }
 							/>
 						</svg>
 					</Button>
-					{showMoreInfo ? (
+					{ showMoreInfo ? (
 						<>
 							<div>
 								<strong>
-									{__('File name:', 'visual-portfolio')}
-								</strong>{' '}
-								{imageData?.source_url.split('/').pop() || '-'}
-								<br />{' '}
+									{ __( 'File name:', 'visual-portfolio' ) }
+								</strong>{ ' ' }
+								{ imageData?.source_url.split( '/' ).pop() ||
+									'-' }
+								<br />{ ' ' }
 								<strong>
-									{__('File type:', 'visual-portfolio')}
-								</strong>{' '}
-								{imageData?.mime_type || '-'}
-								<br />{' '}
+									{ __( 'File type:', 'visual-portfolio' ) }
+								</strong>{ ' ' }
+								{ imageData?.mime_type || '-' }
+								<br />{ ' ' }
 								<strong>
-									{__('File size:', '@text_domain')}
-								</strong>{' '}
-								{imageData?.media_details?.filesize
+									{ __( 'File size:', '@text_domain' ) }
+								</strong>{ ' ' }
+								{ imageData?.media_details?.filesize
 									? getHumanFileSize(
 											imageData.media_details.filesize
-										)
-									: '-'}
-								{imageData?.media_details?.width ? (
+									  )
+									: '-' }
+								{ imageData?.media_details?.width ? (
 									<>
-										<br />{' '}
+										<br />{ ' ' }
 										<strong>
-											{__('Dimensions:', '@text_domain')}
-										</strong>{' '}
-										{imageData.media_details.width} by{' '}
-										{imageData.media_details.height} pixels
+											{ __(
+												'Dimensions:',
+												'@text_domain'
+											) }
+										</strong>{ ' ' }
+										{ imageData.media_details.width } by{ ' ' }
+										{ imageData.media_details.height }{ ' ' }
+										pixels
 									</>
-								) : null}
+								) : null }
 							</div>
 							<div>
 								<TextControl
-									label={__('File URL:', 'visual-portfolio')}
-									value={imageData?.source_url || ''}
+									label={ __(
+										'File URL:',
+										'visual-portfolio'
+									) }
+									value={ imageData?.source_url || '' }
 									readOnly
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 								/>
 								<Button
-									onClick={() => {
+									onClick={ () => {
 										navigator.clipboard
 											.writeText(
 												imageData?.source_url || ''
 											)
-											.then(() => {
-												setLinkCopied(true);
-											});
-									}}
+											.then( () => {
+												setLinkCopied( true );
+											} );
+									} }
 									variant="secondary"
 								>
-									{__(
+									{ __(
 										'Copy URL to Clipboard',
 										'visual-portfolio'
-									)}
+									) }
 								</Button>
-								{linkCopied ? (
+								{ linkCopied ? (
 									<span className="vpf-component-gallery-control-item-modal-image-additional-info-copied">
-										{__('Copied!', 'visual-portfolio')}
+										{ __( 'Copied!', 'visual-portfolio' ) }
 									</span>
-								) : null}
+								) : null }
 							</div>
-							{imageData?.link ? (
+							{ imageData?.link ? (
 								<div>
 									<a
-										href={imageData?.link}
+										href={ imageData?.link }
 										target="_blank"
 										rel="noreferrer"
 									>
-										{__(
+										{ __(
 											'View attachment page',
 											'visual-portfolio'
-										)}
+										) }
 									</a>
-									{' | '}
+									{ ' | ' }
 									<a
-										href={`${VPGutenbergVariables.admin_url}post.php?post=${imageData.id}&action=edit`}
+										href={ `${ VPGutenbergVariables.admin_url }post.php?post=${ imageData.id }&action=edit` }
 										target="_blank"
 										rel="noreferrer"
 									>
-										{__(
+										{ __(
 											'Edit more details',
 											'visual-portfolio'
-										)}
+										) }
 									</a>
 								</div>
-							) : null}
+							) : null }
 						</>
-					) : null}
+					) : null }
 				</div>
 			</div>
 		</MediaUploadCheck>
 	);
 };
 
-const ImageEditModal = function (props) {
+const ImageEditModal = function ( props ) {
 	const {
 		idx,
 		title,
@@ -422,78 +430,79 @@ const ImageEditModal = function (props) {
 	let focalPointImageIdx = idx;
 
 	// Find same focalPoint value from bulk items if available.
-	if (idx === -1 && bulkItems?.length && attributes?.[controlName]) {
+	if ( idx === -1 && bulkItems?.length && attributes?.[ controlName ] ) {
 		const bulkValue = getBulkImagesDefaultValue(
-			attributes[controlName],
+			attributes[ controlName ],
 			bulkItems,
 			'focalPoint'
 		);
 
-		if (bulkValue) {
+		if ( bulkValue ) {
 			focalPointImageIdx = getItemIndexByImageId(
-				attributes[controlName],
-				bulkItems[0]
+				attributes[ controlName ],
+				bulkItems[ 0 ]
 			);
 
-			if (focalPointImageIdx >= 0) {
+			if ( focalPointImageIdx >= 0 ) {
 				focalPointVal =
-					attributes[controlName]?.[focalPointImageIdx]?.focalPoint;
+					attributes[ controlName ]?.[ focalPointImageIdx ]
+						?.focalPoint;
 			}
 		}
 	}
 
 	return (
 		<Modal
-			title={title}
-			onRequestClose={(e) => {
-				if (e?.relatedTarget?.classList?.contains('media-modal')) {
+			title={ title }
+			onRequestClose={ ( e ) => {
+				if ( e?.relatedTarget?.classList?.contains( 'media-modal' ) ) {
 					// Don't close modal if opened media modal.
 				} else {
-					close(e);
+					close( e );
 				}
-			}}
+			} }
 		>
 			<div className="vpf-component-gallery-control-item-modal">
-				{focalPoint && img?.id ? (
+				{ focalPoint && img?.id ? (
 					<SelectedImageData
-						showFocalPoint={focalPoint}
-						focalPoint={focalPointVal}
-						imgId={img?.id}
-						imgUrl={img.imgThumbnailUrl || img.imgUrl}
-						onChangeFocalPoint={(val) => {
-							onChange({ focalPoint: val });
-						}}
-						onChangeImage={(imgData) => {
-							if (imgData === false) {
+						showFocalPoint={ focalPoint }
+						focalPoint={ focalPointVal }
+						imgId={ img?.id }
+						imgUrl={ img.imgThumbnailUrl || img.imgUrl }
+						onChangeFocalPoint={ ( val ) => {
+							onChange( { focalPoint: val } );
+						} }
+						onChangeImage={ ( imgData ) => {
+							if ( imgData === false ) {
 								onRemove();
 							} else {
-								onChange(imgData);
+								onChange( imgData );
 							}
-						}}
+						} }
 					/>
-				) : null}
+				) : null }
 
-				{/* Display focal point if no image ID available (used for bulk editor with image placeholder) */}
-				{focalPoint && !img?.id && img?.imgThumbnailUrl ? (
+				{ /* Display focal point if no image ID available (used for bulk editor with image placeholder) */ }
+				{ focalPoint && ! img?.id && img?.imgThumbnailUrl ? (
 					<div className="vpf-component-gallery-control-item-modal-image-info">
 						<FocalPointPicker
-							url={img.imgThumbnailUrl}
-							value={focalPointVal}
-							onChange={(val) => {
-								onChange({ focalPoint: val });
-							}}
+							url={ img.imgThumbnailUrl }
+							value={ focalPointVal }
+							onChange={ ( val ) => {
+								onChange( { focalPoint: val } );
+							} }
 							__nextHasNoMarginBottom
 						/>
 					</div>
-				) : null}
+				) : null }
 				<div>
-					{Object.keys(imageControls).map((name) => {
+					{ Object.keys( imageControls ).map( ( name ) => {
 						const newCondition = [];
 
 						// Hide controls if it's bulk edit and control is not allowed for bulk edit.
 						if (
 							isBulkEdit &&
-							!imageControls[name].allow_bulk_edit
+							! imageControls[ name ].allow_bulk_edit
 						) {
 							return null;
 						}
@@ -504,66 +513,69 @@ const ImageEditModal = function (props) {
 						if (
 							idx === -1 &&
 							bulkItems?.length &&
-							attributes?.[controlName]
+							attributes?.[ controlName ]
 						) {
 							const bulkValue = getBulkImagesDefaultValue(
-								attributes[controlName],
+								attributes[ controlName ],
 								bulkItems,
 								name
 							);
 
-							if (bulkValue) {
+							if ( bulkValue ) {
 								imageIdx = getItemIndexByImageId(
-									attributes[controlName],
-									bulkItems[0]
+									attributes[ controlName ],
+									bulkItems[ 0 ]
 								);
 							}
 						}
 
 						// prepare name.
-						const imgControlName = `${controlName}[${imageIdx}].${name}`;
+						const imgControlName = `${ controlName }[${ imageIdx }].${ name }`;
 
 						// prepare conditions for the current item.
-						if (imageControls[name].condition.length) {
-							imageControls[name].condition.forEach((data) => {
-								const newData = { ...data };
+						if ( imageControls[ name ].condition.length ) {
+							imageControls[ name ].condition.forEach(
+								( data ) => {
+									const newData = { ...data };
 
-								if (
-									newData.control &&
-									/SELF/g.test(newData.control)
-								) {
-									newData.control = newData.control.replace(
-										/SELF/g,
-										`${controlName}[${imageIdx}]`
-									);
+									if (
+										newData.control &&
+										/SELF/g.test( newData.control )
+									) {
+										newData.control =
+											newData.control.replace(
+												/SELF/g,
+												`${ controlName }[${ imageIdx }]`
+											);
+									}
+
+									newCondition.push( newData );
 								}
-
-								newCondition.push(newData);
-							});
+							);
 						}
 
 						return applyFilters(
 							'vpf.editor.gallery-controls-render',
 							<ControlsRender.Control
-								key={`${
+								key={ `${
 									img?.id ||
 									img?.imgThumbnailUrl ||
 									img?.imgUrl
-								}-${imageIdx}-${name}`}
-								attributes={attributes}
-								onChange={(val) => {
-									onChange({
-										[name]: val,
-									});
-								}}
-								{...imageControls[name]}
-								name={imgControlName}
-								value={img?.[name]}
-								condition={newCondition}
-								clientId={clientId}
-								isSetupWizard={isSetupWizard}
+								}-${ imageIdx }-${ name }` }
+								attributes={ attributes }
+								onChange={ ( val ) => {
+									onChange( {
+										[ name ]: val,
+									} );
+								} }
+								{ ...imageControls[ name ] }
+								name={ imgControlName }
+								value={ img?.[ name ] }
+								condition={ newCondition }
+								clientId={ clientId }
+								isSetupWizard={ isSetupWizard }
 							/>,
-							imageControls[name],
+							imageControls[ name ],
 							props,
 							{
 								name,
@@ -572,14 +584,14 @@ const ImageEditModal = function (props) {
 								condition: newCondition,
 							}
 						);
-					})}
+					} ) }
 				</div>
 			</div>
 		</Modal>
 	);
 };
 
-const SortableItem = function (props) {
+const SortableItem = function ( props ) {
 	const {
 		img,
 		items,
@@ -606,51 +618,51 @@ const SortableItem = function (props) {
 		transition,
 		isDragging,
 		isSorting,
-	} = useSortable({
+	} = useSortable( {
 		id: props.id,
-	});
+	} );
 
 	const style = {
-		transform: CSS.Translate.toString(transform),
+		transform: CSS.Translate.toString( transform ),
 		transition: isSorting ? transition : '',
 	};
 
-	const [isOpen, setOpen] = useState(false);
-	const openModal = () => setOpen(true);
-	const closeModal = () => setOpen(false);
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
 
 	return (
 		<>
 			<div
-				className={classnames(
+				className={ classnames(
 					'vpf-component-gallery-control-item',
 					isDragging && 'vpf-component-gallery-control-item-dragging',
 					isMuffled && 'vpf-component-gallery-control-item-muffled',
 					isChecked && 'vpf-component-gallery-control-item-checked'
-				)}
-				ref={setNodeRef}
-				style={style}
-				{...sortableAttributes}
-				{...listeners}
+				) }
+				ref={ setNodeRef }
+				style={ style }
+				{ ...sortableAttributes }
+				{ ...listeners }
 			>
 				<div className="vpf-component-gallery-control-item-toolbar">
-					{!isSetupWizard ? (
+					{ ! isSetupWizard ? (
 						<CheckboxControl
 							className={
 								'vpf-component-gallery-control-item-checkbox'
 							}
-							title={__('Select', 'visual-portfolio')}
-							checked={isChecked}
-							onChange={(val) => {
-								onCheck(val);
-							}}
+							title={ __( 'Select', 'visual-portfolio' ) }
+							checked={ isChecked }
+							onChange={ ( val ) => {
+								onCheck( val );
+							} }
 							__nextHasNoMarginBottom
 						/>
-					) : null}
+					) : null }
 					<Button
 						className="vpf-component-gallery-control-item-edit"
-						onClick={openModal}
-						aria-expanded={isOpen}
+						onClick={ openModal }
+						aria-expanded={ isOpen }
 					>
 						<svg
 							width="20"
@@ -668,15 +680,15 @@ const SortableItem = function (props) {
 					</Button>
 					<Button
 						className="vpf-component-gallery-control-item-remove"
-						onClick={() => {
-							const newImages = [...items];
+						onClick={ () => {
+							const newImages = [ ...items ];
 
-							if (newImages[idx]) {
-								newImages.splice(idx, 1);
+							if ( newImages[ idx ] ) {
+								newImages.splice( idx, 1 );
 
-								onChange(newImages);
+								onChange( newImages );
 							}
-						}}
+						} }
 					>
 						<svg
 							width="20"
@@ -695,60 +707,60 @@ const SortableItem = function (props) {
 				</div>
 				<Button
 					className="vpf-component-gallery-control-item-button"
-					onClick={openModal}
-					aria-expanded={isOpen}
+					onClick={ openModal }
+					aria-expanded={ isOpen }
 				>
 					<img
-						src={img.imgThumbnailUrl || img.imgUrl}
-						alt={img.alt || img.imgThumbnailUrl || img.imgUrl}
+						src={ img.imgThumbnailUrl || img.imgUrl }
+						alt={ img.alt || img.imgThumbnailUrl || img.imgUrl }
 						loading="lazy"
 					/>
 				</Button>
 			</div>
-			{isOpen ? (
+			{ isOpen ? (
 				<ImageEditModal
-					title={__('Image Settings', 'visual-portfolio')}
-					img={img}
-					idx={idx}
-					onChange={(val) => {
-						const newImages = [...items];
+					title={ __( 'Image Settings', 'visual-portfolio' ) }
+					img={ img }
+					idx={ idx }
+					onChange={ ( val ) => {
+						const newImages = [ ...items ];
 
-						if (newImages[idx]) {
-							newImages[idx] = {
-								...newImages[idx],
+						if ( newImages[ idx ] ) {
+							newImages[ idx ] = {
+								...newImages[ idx ],
 								...val,
 							};
 
-							onChange(newImages);
+							onChange( newImages );
 						}
-					}}
-					onRemove={() => {
-						const newImages = [...items];
+					} }
+					onRemove={ () => {
+						const newImages = [ ...items ];
 
-						if (newImages[idx]) {
-							newImages.splice(idx, 1);
+						if ( newImages[ idx ] ) {
+							newImages.splice( idx, 1 );
 
-							onChange(newImages);
+							onChange( newImages );
 
 							closeModal();
 						}
-					}}
-					imageControls={imageControls}
-					controlName={controlName}
-					attributes={attributes}
-					focalPoint={focalPoint}
-					clientId={clientId}
-					isSetupWizard={isSetupWizard}
-					close={() => {
+					} }
+					imageControls={ imageControls }
+					controlName={ controlName }
+					attributes={ attributes }
+					focalPoint={ focalPoint }
+					clientId={ clientId }
+					isSetupWizard={ isSetupWizard }
+					close={ () => {
 						closeModal();
-					}}
+					} }
 				/>
-			) : null}
+			) : null }
 		</>
 	);
 };
 
-const SortableList = function (props) {
+const SortableList = function ( props ) {
 	const {
 		items,
 		onChange,
@@ -762,112 +774,116 @@ const SortableList = function (props) {
 	} = props;
 
 	const sensors = useSensors(
-		useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+		useSensor( PointerSensor, { activationConstraint: { distance: 5 } } )
 	);
 
-	const [showingItems, setShowingItems] = useState(ITEMS_COUNT_DEFAULT);
-	const [filterCategory, setFilterCategory] = useState('');
-	const [checkedItems, setCheckedItems] = useState([]);
-	const [lastChecked, setLastChecked] = useState(false);
-	const [bulkEditOpen, setBulkEditOpen] = useState(false);
-	const [shiftHeld, setShiftHeld] = useState(false);
+	const [ showingItems, setShowingItems ] = useState( ITEMS_COUNT_DEFAULT );
+	const [ filterCategory, setFilterCategory ] = useState( '' );
+	const [ checkedItems, setCheckedItems ] = useState( [] );
+	const [ lastChecked, setLastChecked ] = useState( false );
+	const [ bulkEditOpen, setBulkEditOpen ] = useState( false );
+	const [ shiftHeld, setShiftHeld ] = useState( false );
 
-	useEffect(() => {
-		function downHandler({ key }) {
-			if (key === 'Shift') {
-				setShiftHeld(true);
+	useEffect( () => {
+		function downHandler( { key } ) {
+			if ( key === 'Shift' ) {
+				setShiftHeld( true );
 			}
 		}
 
-		function upHandler({ key }) {
-			if (key === 'Shift') {
-				setShiftHeld(false);
+		function upHandler( { key } ) {
+			if ( key === 'Shift' ) {
+				setShiftHeld( false );
 			}
 		}
 
-		window.addEventListener('keydown', downHandler);
-		window.addEventListener('keyup', upHandler);
+		window.addEventListener( 'keydown', downHandler );
+		window.addEventListener( 'keyup', upHandler );
 
 		return () => {
-			window.removeEventListener('keydown', downHandler);
-			window.removeEventListener('keyup', upHandler);
+			window.removeEventListener( 'keydown', downHandler );
+			window.removeEventListener( 'keyup', upHandler );
 		};
-	}, []);
+	}, [] );
 
-	const categories = getAllCategories(items);
+	const categories = getAllCategories( items );
 
-	useEffect(() => {
+	useEffect( () => {
 		if (
 			filterCategory &&
 			filterCategory !== UNCATEGORIZED_VALUE &&
-			(!categories ||
-				!categories.length ||
-				!categories.includes(filterCategory))
+			( ! categories ||
+				! categories.length ||
+				! categories.includes( filterCategory ) )
 		) {
-			setFilterCategory('');
+			setFilterCategory( '' );
 		}
-	}, [filterCategory, categories]);
+	}, [ filterCategory, categories ] );
 
 	const sortableItems = [];
-	if (items && items.length) {
-		items.forEach((data, i) => {
-			if (i < showingItems) {
-				sortableItems.push({
+	if ( items && items.length ) {
+		items.forEach( ( data, i ) => {
+			if ( i < showingItems ) {
+				sortableItems.push( {
 					id: i + 1,
 					data,
-				});
+				} );
 			}
-		});
+		} );
 	}
 
 	const editGalleryButton = (
 		<MediaUpload
 			multiple="add"
-			onSelect={(images) => {
-				onChange(prepareImages(images, items));
-			}}
-			allowedTypes={ALLOWED_MEDIA_TYPES}
-			value={items && items.length ? items.map((img) => img.id) : false}
-			render={({ open }) => (
+			onSelect={ ( images ) => {
+				onChange( prepareImages( images, items ) );
+			} }
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			value={
+				items && items.length ? items.map( ( img ) => img.id ) : false
+			}
+			render={ ( { open } ) => (
 				<MediaUploadButton
-					open={open}
-					items={items}
-					isSetupWizard={isSetupWizard}
+					open={ open }
+					items={ items }
+					isSetupWizard={ isSetupWizard }
 				/>
-			)}
+			) }
 		/>
 	);
 
 	return (
 		<div className="vpf-component-gallery-control-items">
-			{items && items.length && items.length > 9
+			{ items && items.length && items.length > 9
 				? editGalleryButton
-				: null}
-			{items?.length && !isSetupWizard ? (
+				: null }
+			{ items?.length && ! isSetupWizard ? (
 				<div className="vpf-component-gallery-control-item-fullwidth">
 					<div className="vpf-component-gallery-control-item-bulk-actions">
 						<CheckboxControl
-							title={__('Select All', 'visual-portfolio')}
-							checked={items.length === checkedItems.length}
+							title={ __( 'Select All', 'visual-portfolio' ) }
+							checked={ items.length === checkedItems.length }
 							indeterminate={
 								checkedItems.length > 0 &&
 								items.length !== checkedItems.length
 							}
-							onChange={() => {
-								if (items.length === checkedItems.length) {
-									setCheckedItems([]);
+							onChange={ () => {
+								if ( items.length === checkedItems.length ) {
+									setCheckedItems( [] );
 								} else {
-									setCheckedItems(items.map((img) => img.id));
+									setCheckedItems(
+										items.map( ( img ) => img.id )
+									);
 								}
-								setLastChecked(false);
-							}}
+								setLastChecked( false );
+							} }
 							__nextHasNoMarginBottom
 						/>
 						<SelectControl
-							title={__('Bulk Actions', 'visual-portfolio')}
-							value={filterCategory}
-							disabled={!checkedItems.length}
-							options={[
+							title={ __( 'Bulk Actions', 'visual-portfolio' ) }
+							value={ filterCategory }
+							disabled={ ! checkedItems.length }
+							options={ [
 								{
 									label: __(
 										'Bulk actions',
@@ -876,15 +892,15 @@ const SortableList = function (props) {
 									value: '',
 								},
 								{
-									label: __('Edit', 'visual-portfolio'),
+									label: __( 'Edit', 'visual-portfolio' ),
 									value: 'edit',
 								},
 								{
-									label: __('Delete', 'visual-portfolio'),
+									label: __( 'Delete', 'visual-portfolio' ),
 									value: 'delete',
 								},
-							]}
-							onChange={(val) => {
+							] }
+							onChange={ ( val ) => {
 								if (
 									val === 'delete' &&
 									// eslint-disable-next-line no-alert
@@ -897,31 +913,33 @@ const SortableList = function (props) {
 								) {
 									onChange(
 										items.filter(
-											(img) =>
-												!checkedItems.includes(img.id)
+											( img ) =>
+												! checkedItems.includes(
+													img.id
+												)
 										)
 									);
-									setCheckedItems([]);
-									setLastChecked(false);
-								} else if (val === 'edit') {
-									setBulkEditOpen(true);
+									setCheckedItems( [] );
+									setLastChecked( false );
+								} else if ( val === 'edit' ) {
+									setBulkEditOpen( true );
 								}
-							}}
+							} }
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 						/>
 					</div>
-					{categories?.length ? (
+					{ categories?.length ? (
 						<div className="vpf-component-gallery-control-item-filter">
 							<SelectControl
-								title={__(
+								title={ __(
 									'Filter by Category',
 									'visual-portfolio'
-								)}
-								value={filterCategory}
-								options={[
+								) }
+								value={ filterCategory }
+								options={ [
 									{
-										label: __('All', 'visual-portfolio'),
+										label: __( 'All', 'visual-portfolio' ),
 										value: '',
 									},
 									{
@@ -931,14 +949,14 @@ const SortableList = function (props) {
 										),
 										value: UNCATEGORIZED_VALUE,
 									},
-									...categories.map((val) => ({
+									...categories.map( ( val ) => ( {
 										label: val,
 										value: val,
-									})),
-								]}
-								onChange={(val) => {
-									setFilterCategory(val);
-								}}
+									} ) ),
+								] }
+								onChange={ ( val ) => {
+									setFilterCategory( val );
+								} }
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 							/>
@@ -954,99 +972,99 @@ const SortableList = function (props) {
 								/>
 							</svg>
 						</div>
-					) : null}
+					) : null }
 				</div>
-			) : null}
-			{bulkEditOpen && !isSetupWizard ? (
+			) : null }
+			{ bulkEditOpen && ! isSetupWizard ? (
 				<ImageEditModal
-					title={__('Bulk Image Settings', 'visual-portfolio')}
-					img={{
-						imgThumbnailUrl: `${VPGutenbergVariables.plugin_url}assets/images/placeholder.png`,
-					}}
-					idx={-1}
-					onChange={(val) => {
-						const newImages = [...items];
+					title={ __( 'Bulk Image Settings', 'visual-portfolio' ) }
+					img={ {
+						imgThumbnailUrl: `${ VPGutenbergVariables.plugin_url }assets/images/placeholder.png`,
+					} }
+					idx={ -1 }
+					onChange={ ( val ) => {
+						const newImages = [ ...items ];
 
-						newImages.forEach((img, i) => {
-							if (checkedItems.includes(img.id)) {
-								newImages[i] = {
+						newImages.forEach( ( img, i ) => {
+							if ( checkedItems.includes( img.id ) ) {
+								newImages[ i ] = {
 									...img,
 									...val,
 								};
 							}
-						});
+						} );
 
-						onChange(newImages);
-					}}
-					imageControls={imageControls}
-					controlName={controlName}
-					attributes={attributes}
-					focalPoint={focalPoint}
-					clientId={clientId}
-					isSetupWizard={isSetupWizard}
+						onChange( newImages );
+					} }
+					imageControls={ imageControls }
+					controlName={ controlName }
+					attributes={ attributes }
+					focalPoint={ focalPoint }
+					clientId={ clientId }
+					isSetupWizard={ isSetupWizard }
 					isBulkEdit
-					bulkItems={checkedItems}
-					close={() => {
-						setBulkEditOpen(false);
-					}}
+					bulkItems={ checkedItems }
+					close={ () => {
+						setBulkEditOpen( false );
+					} }
 				/>
-			) : null}
+			) : null }
 			<DndContext
-				sensors={sensors}
-				collisionDetection={closestCenter}
-				onDragEnd={(event) => {
+				sensors={ sensors }
+				collisionDetection={ closestCenter }
+				onDragEnd={ ( event ) => {
 					const { active, over } = event;
 
-					if (active.id !== over.id) {
-						onSortEnd(active.id - 1, over.id - 1);
+					if ( active.id !== over.id ) {
+						onSortEnd( active.id - 1, over.id - 1 );
 					}
-				}}
+				} }
 			>
 				<SortableContext
-					items={sortableItems}
-					strategy={rectSortingStrategy}
+					items={ sortableItems }
+					strategy={ rectSortingStrategy }
 				>
-					{sortableItems.map(({ data, id }) => {
+					{ sortableItems.map( ( { data, id } ) => {
 						let isMuffled = false;
 
-						if (filterCategory === UNCATEGORIZED_VALUE) {
+						if ( filterCategory === UNCATEGORIZED_VALUE ) {
 							isMuffled = data?.categories?.length;
-						} else if (filterCategory) {
+						} else if ( filterCategory ) {
 							isMuffled = data?.categories?.length
-								? !data.categories.includes(filterCategory)
+								? ! data.categories.includes( filterCategory )
 								: true;
 						}
 
 						return (
 							<SortableItem
-								key={`vpf-component-gallery-control-items-sortable-${id}`}
-								index={id}
-								id={id}
-								img={data}
-								items={items}
-								onChange={onChange}
-								imageControls={imageControls}
-								controlName={controlName}
-								attributes={attributes}
-								focalPoint={focalPoint}
-								isSetupWizard={isSetupWizard}
-								isMuffled={isMuffled}
-								clientId={clientId}
-								isChecked={checkedItems.includes(data.id)}
-								onCheck={() => {
+								key={ `vpf-component-gallery-control-items-sortable-${ id }` }
+								index={ id }
+								id={ id }
+								img={ data }
+								items={ items }
+								onChange={ onChange }
+								imageControls={ imageControls }
+								controlName={ controlName }
+								attributes={ attributes }
+								focalPoint={ focalPoint }
+								isSetupWizard={ isSetupWizard }
+								isMuffled={ isMuffled }
+								clientId={ clientId }
+								isChecked={ checkedItems.includes( data.id ) }
+								onCheck={ () => {
 									// Check/uncheck multiple items with shift key.
-									if (shiftHeld && lastChecked) {
+									if ( shiftHeld && lastChecked ) {
 										const start = items.findIndex(
-											(img) => img.id === lastChecked
+											( img ) => img.id === lastChecked
 										);
 										const end = items.findIndex(
-											(img) => img.id === data.id
+											( img ) => img.id === data.id
 										);
 										const newCheckedItems = [
 											...checkedItems,
 										];
 										const currentChecked =
-											checkedItems.includes(data.id);
+											checkedItems.includes( data.id );
 
 										const increment = start < end ? 1 : -1;
 										for (
@@ -1054,13 +1072,15 @@ const SortableList = function (props) {
 											i !== end + increment;
 											i += increment
 										) {
-											const imgId = items[i].id;
+											const imgId = items[ i ].id;
 											const index =
-												newCheckedItems.indexOf(imgId);
+												newCheckedItems.indexOf(
+													imgId
+												);
 
 											// Remove checked item.
-											if (currentChecked) {
-												if (index !== -1) {
+											if ( currentChecked ) {
+												if ( index !== -1 ) {
 													newCheckedItems.splice(
 														index,
 														1
@@ -1068,44 +1088,47 @@ const SortableList = function (props) {
 												}
 
 												// Add checked item.
-											} else if (index === -1) {
-												newCheckedItems.push(imgId);
+											} else if ( index === -1 ) {
+												newCheckedItems.push( imgId );
 											}
 										}
 
-										setCheckedItems(newCheckedItems);
+										setCheckedItems( newCheckedItems );
 
 										// Check/uncheck single item.
 									} else {
-										setCheckedItems((prevCheckedItems) => {
-											if (
-												prevCheckedItems.includes(
-													data.id
-												)
-											) {
-												return prevCheckedItems.filter(
-													(val) => val !== data.id
-												);
+										setCheckedItems(
+											( prevCheckedItems ) => {
+												if (
+													prevCheckedItems.includes(
+														data.id
+													)
+												) {
+													return prevCheckedItems.filter(
+														( val ) =>
+															val !== data.id
+													);
+												}
+												return [
+													...prevCheckedItems,
+													data.id,
+												];
 											}
-											return [
-												...prevCheckedItems,
-												data.id,
-											];
-										});
+										);
 									}
 
-									setLastChecked(data.id);
-								}}
+									setLastChecked( data.id );
+								} }
 							/>
 						);
-					})}
+					} ) }
 				</SortableContext>
 			</DndContext>
 
-			{items && items.length ? (
+			{ items && items.length ? (
 				<span className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-pagination">
 					<span>
-						{sprintf(
+						{ sprintf(
 							_n(
 								'Showing %1$s of %2$s Image',
 								'Showing %1$s of %2$s Images',
@@ -1116,32 +1139,32 @@ const SortableList = function (props) {
 								? items.length
 								: showingItems,
 							items.length
-						)}
+						) }
 					</span>
-					{items.length > showingItems ? (
+					{ items.length > showingItems ? (
 						<div className="vpf-component-gallery-control-item-pagination-buttons">
 							<Button
 								variant="secondary"
-								onClick={() => {
-									setShowingItems(showingItems + 18);
-								}}
+								onClick={ () => {
+									setShowingItems( showingItems + 18 );
+								} }
 							>
-								{__('Show More', 'visual-portfolio')}
+								{ __( 'Show More', 'visual-portfolio' ) }
 							</Button>
 							<Button
 								isLink
-								onClick={() => {
-									setShowingItems(items.length);
-								}}
+								onClick={ () => {
+									setShowingItems( items.length );
+								} }
 							>
-								{__('Show All', 'visual-portfolio')}
+								{ __( 'Show All', 'visual-portfolio' ) }
 							</Button>
 						</div>
-					) : null}
+					) : null }
 				</span>
-			) : null}
+			) : null }
 
-			{editGalleryButton}
+			{ editGalleryButton }
 		</div>
 	);
 };
@@ -1151,7 +1174,7 @@ const SortableList = function (props) {
  *
  * @param props
  */
-export default function GalleryControl(props) {
+export default function GalleryControl( props ) {
 	const {
 		imageControls,
 		attributes,
@@ -1163,41 +1186,41 @@ export default function GalleryControl(props) {
 		clientId,
 	} = props;
 
-	const filteredValue = value.filter((img) => img.id);
+	const filteredValue = value.filter( ( img ) => img.id );
 
 	return (
 		<div className="vpf-component-gallery-control">
 			<MediaUpload
-				onSelect={(images) => {
-					onChange(prepareImages(images));
-				}}
-				allowedTypes={ALLOWED_MEDIA_TYPES}
+				onSelect={ ( images ) => {
+					onChange( prepareImages( images ) );
+				} }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple="add"
 				value={
-					filteredValue && Object.keys(filteredValue).length
-						? filteredValue.map((img) => img.id)
+					filteredValue && Object.keys( filteredValue ).length
+						? filteredValue.map( ( img ) => img.id )
 						: []
 				}
-				render={() => (
+				render={ () => (
 					<SortableList
-						items={filteredValue}
-						onChange={onChange}
-						imageControls={imageControls}
-						controlName={controlName}
-						attributes={attributes}
-						focalPoint={focalPoint}
-						clientId={clientId}
-						isSetupWizard={isSetupWizard}
-						onSortEnd={(oldIndex, newIndex) => {
+						items={ filteredValue }
+						onChange={ onChange }
+						imageControls={ imageControls }
+						controlName={ controlName }
+						attributes={ attributes }
+						focalPoint={ focalPoint }
+						clientId={ clientId }
+						isSetupWizard={ isSetupWizard }
+						onSortEnd={ ( oldIndex, newIndex ) => {
 							const newImages = arrayMove(
 								filteredValue,
 								oldIndex,
 								newIndex
 							);
-							onChange(newImages);
-						}}
+							onChange( newImages );
+						} }
 					/>
-				)}
+				) }
 			/>
 		</div>
 	);

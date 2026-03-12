@@ -14,7 +14,7 @@ import edit from './edit';
 /**
  * Register block
  */
-registerBlockType(metadata.name, {
+registerBlockType( metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
@@ -22,4 +22,4 @@ registerBlockType(metadata.name, {
 	},
 	variations,
 	edit,
-});
+} );

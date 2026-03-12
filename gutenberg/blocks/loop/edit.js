@@ -24,15 +24,15 @@ const ALLOWED_CONTROL_CATEGORIES = [
 	'custom_css',
 ];
 
-function filterControlCategories(categories) {
+function filterControlCategories( categories ) {
 	return Object.fromEntries(
-		Object.entries(categories).filter(([key]) =>
-			ALLOWED_CONTROL_CATEGORIES.includes(key)
+		Object.entries( categories ).filter( ( [ key ] ) =>
+			ALLOWED_CONTROL_CATEGORIES.includes( key )
 		)
 	);
 }
 
-function renderControls(props) {
+function renderControls( props ) {
 	const { attributes } = props;
 	const { queryType } = attributes;
 
@@ -41,32 +41,32 @@ function renderControls(props) {
 			<ControlsRender
 				isModernBlock
 				category="content-source"
-				{...props}
+				{ ...props }
 			/>
 
-			{queryType &&
+			{ queryType &&
 				Object.keys(
-					filterControlCategories(registeredControlsCategories)
+					filterControlCategories( registeredControlsCategories )
 				)
-					.filter((name) => name !== 'content-source')
-					.map((name) => (
+					.filter( ( name ) => name !== 'content-source' )
+					.map( ( name ) => (
 						<ControlsRender
 							isModernBlock
-							key={name}
-							category={name}
-							{...props}
+							key={ name }
+							category={ name }
+							{ ...props }
 						/>
-					))}
+					) ) }
 		</>
 	);
 }
 
 // Debounce function to prevent too many API calls
-function debounce(func, wait) {
+function debounce( func, wait ) {
 	let timeout;
-	return function (...args) {
-		clearTimeout(timeout);
-		timeout = setTimeout(() => func(...args), wait);
+	return function ( ...args ) {
+		clearTimeout( timeout );
+		timeout = setTimeout( () => func( ...args ), wait );
 	};
 }
 
@@ -74,7 +74,7 @@ function debounce(func, wait) {
  * Block Edit Component
  * @param props
  */
-export default function BlockEdit(props) {
+export default function BlockEdit( props ) {
 	const { attributes, clientId, setAttributes } = props;
 
 	const {
@@ -86,11 +86,11 @@ export default function BlockEdit(props) {
 	} = attributes;
 
 	// Create a ref to track previous attribute values
-	const prevAttributesRef = useRef({});
+	const prevAttributesRef = useRef( {} );
 
 	// Function to update maxPages via REST API
-	const updateMaxPages = debounce(async () => {
-		if (!queryType || !baseQuery.perPage) {
+	const updateMaxPages = debounce( async () => {
+		if ( ! queryType || ! baseQuery.perPage ) {
 			return;
 		}
 
@@ -99,105 +99,105 @@ export default function BlockEdit(props) {
 			const requestData = {};
 
 			// Add all attributes to the request data
-			Object.entries(attributes).forEach(([key, value]) => {
-				if (value !== null) {
-					requestData[key] = value;
+			Object.entries( attributes ).forEach( ( [ key, value ] ) => {
+				if ( value !== null ) {
+					requestData[ key ] = value;
 				}
-			});
+			} );
 
 			// Add block ID
 			requestData.block_id = clientId;
 
 			// Make API request with data in the body
-			const response = await apiFetch({
+			const response = await apiFetch( {
 				path: '/visual-portfolio/v1/get-max-pages/',
 				method: 'POST',
 				data: requestData, // Send data in request body instead of URL
-			});
+			} );
 
 			// Update maxPages attribute if available in response
-			if (response?.max_pages !== undefined) {
-				setAttributes({
+			if ( response?.max_pages !== undefined ) {
+				setAttributes( {
 					baseQuery: {
 						...baseQuery,
-						maxPages: parseInt(response.max_pages, 10),
+						maxPages: parseInt( response.max_pages, 10 ),
 					},
-				});
+				} );
 			}
-		} catch (error) {
+		} catch ( error ) {
 			// eslint-disable-next-line no-console
-			console.error('Error fetching max pages:', error);
+			console.error( 'Error fetching max pages:', error );
 		}
-	}, 500);
+	}, 500 );
 
 	// Update maxPages when relevant attributes change
-	useEffect(() => {
-		if (!queryType || !baseQuery.perPage) {
+	useEffect( () => {
+		if ( ! queryType || ! baseQuery.perPage ) {
 			return;
 		}
 
 		// Compare with previous values to avoid unnecessary API calls
 		const prevAttrs = prevAttributesRef.current;
-		const hasChanged = Object.keys(attributes).some(
-			(key) =>
-				JSON.stringify(prevAttrs[key]) !==
-				JSON.stringify(attributes[key])
+		const hasChanged = Object.keys( attributes ).some(
+			( key ) =>
+				JSON.stringify( prevAttrs[ key ] ) !==
+				JSON.stringify( attributes[ key ] )
 		);
 
-		if (hasChanged) {
+		if ( hasChanged ) {
 			updateMaxPages();
 			prevAttributesRef.current = { ...attributes };
 		}
-	}, [attributes, queryType, baseQuery.perPage, updateMaxPages]);
+	}, [ attributes, queryType, baseQuery.perPage, updateMaxPages ] );
 
-	useEffect(() => {
-		if (queryType === 'images' && Array.isArray(imagesQuery.images)) {
+	useEffect( () => {
+		if ( queryType === 'images' && Array.isArray( imagesQuery.images ) ) {
 			// Extract all categories from images
 			const newCategories = new Set();
 
-			imagesQuery.images.forEach((image) => {
-				if (image.categories && Array.isArray(image.categories)) {
-					image.categories.forEach((category) => {
-						newCategories.add(category);
-					});
+			imagesQuery.images.forEach( ( image ) => {
+				if ( image.categories && Array.isArray( image.categories ) ) {
+					image.categories.forEach( ( category ) => {
+						newCategories.add( category );
+					} );
 				}
-			});
+			} );
 
 			// Convert Set to Array
-			const newCategoriesArray = Array.from(newCategories);
+			const newCategoriesArray = Array.from( newCategories );
 
 			// Check if the new categories are different from the current ones
 			const currentCategories = imagesQuery.categories || [];
 			const categoriesChanged =
-				JSON.stringify(currentCategories) !==
-				JSON.stringify(newCategoriesArray);
+				JSON.stringify( currentCategories ) !==
+				JSON.stringify( newCategoriesArray );
 
 			// Update the imagesQuery.categories attribute if there are changes
-			if (categoriesChanged) {
-				setAttributes({
+			if ( categoriesChanged ) {
+				setAttributes( {
 					imagesQuery: {
 						...imagesQuery,
 						categories: newCategoriesArray,
 					},
-				});
+				} );
 			}
 		}
-	}, [queryType, setAttributes, imagesQuery]);
+	}, [ queryType, setAttributes, imagesQuery ] );
 
 	// Display block preview if needed
-	if (previewExample === 'true') {
+	if ( previewExample === 'true' ) {
 		return (
 			<div className="vpf-example-preview">
 				<img
-					src={`${pluginUrl}/assets/admin/images/example-${layout}.png`}
-					alt={`Preview of ${layout} layout`}
+					src={ `${ pluginUrl }/assets/admin/images/example-${ layout }.png` }
+					alt={ `Preview of ${ layout } layout` }
 				/>
 			</div>
 		);
 	}
 
 	// Set up block props
-	const blockProps = useBlockProps({ className: 'vp-block-loop' });
+	const blockProps = useBlockProps( { className: 'vp-block-loop' } );
 	const innerBlocksProps = useInnerBlocksProps(
 		{},
 		{
@@ -217,14 +217,14 @@ export default function BlockEdit(props) {
 						],
 					],
 				],
-				['visual-portfolio/block', { setup_wizard: 'false' }],
+				[ 'visual-portfolio/block', { setup_wizard: 'false' } ],
 				[
 					'visual-portfolio/pagination',
 					{},
 					[
-						['visual-portfolio/pagination-previous'],
-						['visual-portfolio/pagination-numbers'],
-						['visual-portfolio/pagination-next'],
+						[ 'visual-portfolio/pagination-previous' ],
+						[ 'visual-portfolio/pagination-numbers' ],
+						[ 'visual-portfolio/pagination-next' ],
 					],
 				],
 			],
@@ -232,9 +232,9 @@ export default function BlockEdit(props) {
 	);
 
 	return (
-		<div {...blockProps}>
-			<InspectorControls>{renderControls(props)}</InspectorControls>
-			<div {...innerBlocksProps} />
+		<div { ...blockProps }>
+			<InspectorControls>{ renderControls( props ) }</InspectorControls>
+			<div { ...innerBlocksProps } />
 		</div>
 	);
 }

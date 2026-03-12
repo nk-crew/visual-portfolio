@@ -1,18 +1,18 @@
 import $ from 'jquery';
 
-const $body = $('body');
-const $doc = $(document);
-const $preview = $('#vp_preview');
+const $body = $( 'body' );
+const $doc = $( document );
+const $preview = $( '#vp_preview' );
 
 // prevent click on links.
 document.addEventListener(
 	'click',
-	(e) => {
+	( e ) => {
 		e.stopPropagation();
 		e.preventDefault();
 
-		if (window.parentIFrame) {
-			window.parentIFrame.sendMessage('clicked');
+		if ( window.parentIFrame ) {
+			window.parentIFrame.sendMessage( 'clicked' );
 		}
 	},
 	true
@@ -21,7 +21,7 @@ document.addEventListener(
 // prevent click on <select> and similar elements.
 document.addEventListener(
 	'mousedown',
-	(e) => {
+	( e ) => {
 		e.stopPropagation();
 		e.preventDefault();
 
@@ -32,8 +32,8 @@ document.addEventListener(
 );
 
 // add dynamic data to AJAX calls.
-$doc.on('startLoadingNewItems.vpf', (event, vpObject, url, ajaxData) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'startLoadingNewItems.vpf', ( event, vpObject, url, ajaxData ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
@@ -41,7 +41,7 @@ $doc.on('startLoadingNewItems.vpf', (event, vpObject, url, ajaxData) => {
 		ajaxData.data || {},
 		window.vp_preview_post_data
 	);
-});
+} );
 
 // Dynamic CSS cache.
 const dynamicCSScache = {};
@@ -50,41 +50,41 @@ const dynamicCSScache = {};
 window.iFrameResizer = {
 	log: false,
 	heightCalculationMethod() {
-		return $preview.outerHeight(true);
+		return $preview.outerHeight( true );
 	},
-	onMessage(data) {
-		if (!data || !data.name) {
+	onMessage( data ) {
+		if ( ! data || ! data.name ) {
 			return;
 		}
 
-		switch (data.name) {
+		switch ( data.name ) {
 			case 'resize':
 				// This random number needed for proper resize Isotope and other plugins.
-				$body.css('max-width', data.width + Math.random());
+				$body.css( 'max-width', data.width + Math.random() );
 				break;
 			case 'dynamic-css': {
 				// Insert dynamic styles.
-				const styleId = `vp-dynamic-styles-${data.blockId}-inline-css`;
+				const styleId = `vp-dynamic-styles-${ data.blockId }-inline-css`;
 
 				// Skip if styles haven't changed.
 				if (
-					dynamicCSScache[styleId] &&
-					data.styles === dynamicCSScache[styleId]
+					dynamicCSScache[ styleId ] &&
+					data.styles === dynamicCSScache[ styleId ]
 				) {
 					break;
 				}
 
-				let $style = $(`#${styleId}`);
+				let $style = $( `#${ styleId }` );
 
-				if (!$style.length) {
-					$style = $(`<style id="${styleId}"></style>`).appendTo(
+				if ( ! $style.length ) {
+					$style = $( `<style id="${ styleId }"></style>` ).appendTo(
 						'head'
 					);
 				}
 
-				dynamicCSScache[styleId] = data.styles;
+				dynamicCSScache[ styleId ] = data.styles;
 
-				$style.text(data.styles);
+				$style.text( data.styles );
 				break;
 			}
 			// no default

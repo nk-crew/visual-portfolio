@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 const { VPData } = window;
 const { settingsPopupGallery } = VPData;
-const templatesSupport = 'content' in document.createElement('template');
+const templatesSupport = 'content' in document.createElement( 'template' );
 
 /*
  * Global Popup Gallery API.
@@ -28,16 +28,16 @@ const VPPopupAPI = {
 				html5: 1,
 			},
 			paramsIndex: 10,
-			embedCallback(url, match) {
+			embedCallback( url, match ) {
 				let result = false;
 				const vendorData = this;
 				const videoId =
-					match && match[vendorData.patternIndex]
-						? match[vendorData.patternIndex]
+					match && match[ vendorData.patternIndex ]
+						? match[ vendorData.patternIndex ]
 						: false;
 
-				if (videoId) {
-					const isShorts = /\/shorts\//.test(url);
+				if ( videoId ) {
+					const isShorts = /\/shorts\//.test( url );
 
 					const width = isShorts ? 476 : 1920;
 					const height = isShorts ? 847 : 1080;
@@ -87,17 +87,17 @@ const VPPopupAPI = {
 	 *
 	 * @return {string}
 	 */
-	getQueryStringParams(query) {
+	getQueryStringParams( query ) {
 		return query
-			? (/^[?#]/.test(query) ? query.slice(1) : query)
-					.split('&')
-					.reduce((params, param) => {
-						const [key, value] = param.split('=');
-						params[key] = value
-							? decodeURIComponent(value.replace(/\+/g, ' '))
+			? ( /^[?#]/.test( query ) ? query.slice( 1 ) : query )
+					.split( '&' )
+					.reduce( ( params, param ) => {
+						const [ key, value ] = param.split( '=' );
+						params[ key ] = value
+							? decodeURIComponent( value.replace( /\+/g, ' ' ) )
 							: '';
 						return params;
-					}, {})
+					}, {} )
 			: {};
 	},
 
@@ -109,36 +109,40 @@ const VPPopupAPI = {
 	 *
 	 * @return {string}
 	 */
-	prepareParams(match, vendorData) {
+	prepareParams( match, vendorData ) {
 		let result = '';
 
 		// Prepare default params.
 		const params = vendorData.params || {};
 
 		// Parse params from URL.
-		if (vendorData.paramsIndex && match && match[vendorData.paramsIndex]) {
+		if (
+			vendorData.paramsIndex &&
+			match &&
+			match[ vendorData.paramsIndex ]
+		) {
 			const newParams = VPPopupAPI.getQueryStringParams(
-				match[vendorData.paramsIndex]
+				match[ vendorData.paramsIndex ]
 			);
 
-			if (newParams && typeof newParams === 'object') {
-				Object.keys(newParams).forEach((key) => {
-					if (key && newParams[key]) {
-						params[key] = newParams[key];
+			if ( newParams && typeof newParams === 'object' ) {
+				Object.keys( newParams ).forEach( ( key ) => {
+					if ( key && newParams[ key ] ) {
+						params[ key ] = newParams[ key ];
 					}
-				});
+				} );
 			}
 		}
 
-		if (params && Object.keys(params).length) {
-			Object.keys(params).forEach((key) => {
-				if (key && params[key]) {
-					if (result) {
+		if ( params && Object.keys( params ).length ) {
+			Object.keys( params ).forEach( ( key ) => {
+				if ( key && params[ key ] ) {
+					if ( result ) {
 						result += '&';
 					}
-					result += `${key}=${params[key]}`;
+					result += `${ key }=${ params[ key ] }`;
 				}
-			});
+			} );
 		}
 
 		return result;
@@ -154,17 +158,17 @@ const VPPopupAPI = {
 	 *
 	 * @return {Object}
 	 */
-	embedCallback(vendorData, videoId, url, match = false) {
+	embedCallback( vendorData, videoId, url, match = false ) {
 		let { embedUrl } = vendorData;
-		embedUrl = embedUrl.replace(/{{video_id}}/g, videoId);
-		embedUrl = embedUrl.replace(/{{video_url}}/g, url);
+		embedUrl = embedUrl.replace( /{{video_id}}/g, videoId );
+		embedUrl = embedUrl.replace( /{{video_url}}/g, url );
 		embedUrl = embedUrl.replace(
 			/{{video_url_encoded}}/g,
-			encodeURIComponent(url)
+			encodeURIComponent( url )
 		);
 		embedUrl = embedUrl.replace(
 			/{{params}}/g,
-			match ? VPPopupAPI.prepareParams(match, vendorData) : ''
+			match ? VPPopupAPI.prepareParams( match, vendorData ) : ''
 		);
 
 		const width = vendorData.width || 1920;
@@ -173,7 +177,7 @@ const VPPopupAPI = {
 		return {
 			vendor: vendorData.vendor,
 			id: videoId,
-			embed: `<iframe width="${width}" height="${height}" src="${embedUrl}" scrolling="no" frameborder="0" allowTransparency="true" allow="accelerometer; autoplay; clipboard-write; fullscreen; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
+			embed: `<iframe width="${ width }" height="${ height }" src="${ embedUrl }" scrolling="no" frameborder="0" allowTransparency="true" allow="accelerometer; autoplay; clipboard-write; fullscreen; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
 			embedUrl,
 			url,
 			width,
@@ -190,21 +194,21 @@ const VPPopupAPI = {
 	 * @param          poster
 	 * @return {object|boolean} video data
 	 */
-	parseVideo(url, poster) {
+	parseVideo( url, poster ) {
 		let result = false;
 
-		VPPopupAPI.vendors.forEach((vendorData) => {
-			if (!result) {
-				const match = url.match(vendorData.pattern);
+		VPPopupAPI.vendors.forEach( ( vendorData ) => {
+			if ( ! result ) {
+				const match = url.match( vendorData.pattern );
 				const videoId =
-					match && match[vendorData.patternIndex]
-						? match[vendorData.patternIndex]
+					match && match[ vendorData.patternIndex ]
+						? match[ vendorData.patternIndex ]
 						: false;
 
-				if (videoId) {
+				if ( videoId ) {
 					// Custom embed callback.
-					if (vendorData.embedCallback) {
-						result = vendorData.embedCallback(url, match, poster);
+					if ( vendorData.embedCallback ) {
+						result = vendorData.embedCallback( url, match, poster );
 
 						// Predefined embed callback.
 					} else {
@@ -217,10 +221,10 @@ const VPPopupAPI = {
 					}
 				}
 			}
-		});
+		} );
 
 		// Unknown vendor.
-		if (!result) {
+		if ( ! result ) {
 			result = VPPopupAPI.embedCallback(
 				{
 					vendor: 'unknown',
@@ -240,14 +244,14 @@ const VPPopupAPI = {
 	 *
 	 * @param {element} itemElement - gallery item
 	 */
-	parseItem(itemElement) {
+	parseItem( itemElement ) {
 		let result = false;
 
 		const $dataElement =
 			itemElement &&
-			itemElement.querySelector('.vp-portfolio__item-popup');
+			itemElement.querySelector( '.vp-portfolio__item-popup' );
 
-		if ($dataElement) {
+		if ( $dataElement ) {
 			result = {
 				$dataElement,
 				$content: $dataElement,
@@ -281,7 +285,7 @@ const VPPopupAPI = {
 	 *
 	 * @return {Array} gallery data
 	 */
-	parseGallery($gallery) {
+	parseGallery( $gallery ) {
 		const items = [];
 		let size;
 		let item;
@@ -292,25 +296,25 @@ const VPPopupAPI = {
 		// Skip Swiper slider duplicates.
 		// Previously we also used the `:not(.swiper-slide-duplicate-active)`, but it contains a valid first slide.
 		$gallery
-			.find('.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)')
-			.each(function () {
-				const itemData = VPPopupAPI.parseItem(this);
+			.find( '.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)' )
+			.each( function () {
+				const itemData = VPPopupAPI.parseItem( this );
 
-				if (itemData) {
+				if ( itemData ) {
 					size = (
 						itemData?.data?.vpPopupImgSize || '1920x1080'
-					).split('x');
+					).split( 'x' );
 					video = itemData?.data?.vpPopupVideo;
 					videoData = false;
 
-					if (video) {
+					if ( video ) {
 						videoData = VPPopupAPI.parseVideo(
 							video,
 							itemData?.data?.vpPopupPoster
 						);
 					}
 
-					if (videoData) {
+					if ( videoData ) {
 						item = {
 							type: 'embed',
 							el: this,
@@ -327,48 +331,57 @@ const VPPopupAPI = {
 							el: this,
 							src: itemData?.data?.vpPopupImg,
 							srcset: itemData?.data?.vpPopupImgSrcset,
-							width: parseInt(size[0], 10),
-							height: parseInt(size[1], 10),
+							width: parseInt( size[ 0 ], 10 ),
+							height: parseInt( size[ 1 ], 10 ),
 						};
 
 						const srcSmall =
 							itemData?.data?.vpPopupSmImg || item.src;
-						if (srcSmall) {
+						if ( srcSmall ) {
 							const smallSize = (
 								itemData?.data?.vpPopupSmImgSize ||
 								itemData?.data?.vpPopupImgSize ||
 								'1920x1080'
-							).split('x');
+							).split( 'x' );
 
 							item.srcSmall = srcSmall;
-							item.srcSmallWidth = parseInt(smallSize[0], 10);
-							item.srcSmallHeight = parseInt(smallSize[1], 10);
+							item.srcSmallWidth = parseInt( smallSize[ 0 ], 10 );
+							item.srcSmallHeight = parseInt(
+								smallSize[ 1 ],
+								10
+							);
 						}
 
 						const srcMedium =
 							itemData?.data?.vpPopupMdImg || item.src;
-						if (srcMedium) {
+						if ( srcMedium ) {
 							const mediumSize = (
 								itemData?.data?.vpPopupMdImgSize ||
 								itemData?.data?.vpPopupImgSize ||
 								'1920x1080'
-							).split('x');
+							).split( 'x' );
 
 							item.srcMedium = srcMedium;
-							item.srcMediumWidth = parseInt(mediumSize[0], 10);
-							item.srcMediumHeight = parseInt(mediumSize[1], 10);
+							item.srcMediumWidth = parseInt(
+								mediumSize[ 0 ],
+								10
+							);
+							item.srcMediumHeight = parseInt(
+								mediumSize[ 1 ],
+								10
+							);
 						}
 					}
 
-					if (itemData?.$title || itemData?.$description) {
+					if ( itemData?.$title || itemData?.$description ) {
 						item.caption =
-							(itemData?.$title?.outerHTML || '') +
-							(itemData?.$description?.outerHTML || '');
+							( itemData?.$title?.outerHTML || '' ) +
+							( itemData?.$description?.outerHTML || '' );
 					}
 
-					items.push(item);
+					items.push( item );
 				}
-			});
+			} );
 
 		return items;
 	},
@@ -379,18 +392,18 @@ const VPPopupAPI = {
 	 *
 	 * @param {Object} data - data of the current item
 	 */
-	maybeFocusGalleryItem(data) {
-		if (!settingsPopupGallery.restore_focus) {
+	maybeFocusGalleryItem( data ) {
+		if ( ! settingsPopupGallery.restore_focus ) {
 			return;
 		}
 
 		// Focus native gallery item.
-		if (data.linkEl) {
-			$(data.linkEl).focus();
+		if ( data.linkEl ) {
+			$( data.linkEl ).focus();
 
 			// Focus Visual Portfolio gallery item.
-		} else if (data.el) {
-			$(data.el).find('.vp-portfolio__item-img > a').focus();
+		} else if ( data.el ) {
+			$( data.el ).find( '.vp-portfolio__item-img > a' ).focus();
 		}
 	},
 
@@ -402,14 +415,14 @@ const VPPopupAPI = {
 	 * @param {Array}         eventArgs - Event arguments array
 	 * @param {Object | null} self      - Gallery instance (null for 3rd-party)
 	 */
-	emitEvent(eventName, eventArgs, self) {
-		if (self && self.emitEvent) {
+	emitEvent( eventName, eventArgs, self ) {
+		if ( self && self.emitEvent ) {
 			// Use instance method for Visual Portfolio galleries
-			self.emitEvent(eventName, eventArgs);
+			self.emitEvent( eventName, eventArgs );
 		} else {
 			// Manually trigger event for 3rd-party galleries
-			const globalEventArgs = [null].concat(eventArgs);
-			$(document).trigger(`${eventName}.vpf`, globalEventArgs);
+			const globalEventArgs = [ null ].concat( eventArgs );
+			$( document ).trigger( `${ eventName }.vpf`, globalEventArgs );
 		}
 	},
 };
@@ -417,8 +430,8 @@ const VPPopupAPI = {
 window.VPPopupAPI = VPPopupAPI;
 
 // Extend VP class.
-$(document).on('extendClass.vpf', (event, VP) => {
-	if (event.namespace !== 'vpf') {
+$( document ).on( 'extendClass.vpf', ( event, VP ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
@@ -428,67 +441,67 @@ $(document).on('extendClass.vpf', (event, VP) => {
 	VP.prototype.initPopupGallery = function () {
 		const self = this;
 		if (
-			!self.options.itemsClickAction ||
+			! self.options.itemsClickAction ||
 			self.options.itemsClickAction === 'url'
 		) {
 			return;
 		}
 
 		// prevent on preview page
-		if (self.isPreview()) {
+		if ( self.isPreview() ) {
 			return;
 		}
 
 		// click action
 		// `a.vp-portfolio__item-overlay` added as fallback for old templates, used in themes.
 		self.$item.on(
-			`click.vpf-uid-${self.uid}`,
+			`click.vpf-uid-${ self.uid }`,
 			`
         .vp-portfolio__item a.vp-portfolio__item-meta,
         .vp-portfolio__item .vp-portfolio__item-img > a,
         .vp-portfolio__item .vp-portfolio__item-meta-title > a,
         .vp-portfolio__item a.vp-portfolio__item-overlay
       `,
-			function (e) {
-				if (e.isDefaultPrevented()) {
+			function ( e ) {
+				if ( e.isDefaultPrevented() ) {
 					return;
 				}
 
-				const $this = $(this);
-				let $itemWrap = $this.closest('.vp-portfolio__item-wrap');
+				const $this = $( this );
+				let $itemWrap = $this.closest( '.vp-portfolio__item-wrap' );
 
 				// Use Swiper data-attribute to support slide duplicates.
 				if (
-					$itemWrap.hasClass('swiper-slide-duplicate') &&
-					$itemWrap.attr('data-swiper-slide-index')
+					$itemWrap.hasClass( 'swiper-slide-duplicate' ) &&
+					$itemWrap.attr( 'data-swiper-slide-index' )
 				) {
 					$itemWrap = self.$item.find(
-						`[data-swiper-slide-index="${$itemWrap.attr(
+						`[data-swiper-slide-index="${ $itemWrap.attr(
 							'data-swiper-slide-index'
-						)}"].swiper-slide:not(.swiper-slide-duplicate)`
+						) }"].swiper-slide:not(.swiper-slide-duplicate)`
 					);
 				}
 
-				if (!$itemWrap.find('.vp-portfolio__item-popup').length) {
+				if ( ! $itemWrap.find( '.vp-portfolio__item-popup' ).length ) {
 					return;
 				}
 
-				const items = VPPopupAPI.parseGallery(self.$item);
+				const items = VPPopupAPI.parseGallery( self.$item );
 				let index = -1;
 
 				// Get gallery item index.
 				// We should check all items with gallery data to prevent
 				// issue with items and custom URL used.
-				items.forEach((item, idx) => {
-					if (item.el === $itemWrap[0]) {
+				items.forEach( ( item, idx ) => {
+					if ( item.el === $itemWrap[ 0 ] ) {
 						index = idx;
 					}
-				});
+				} );
 
 				// Let's open popup once item index found.
-				if (index !== -1) {
+				if ( index !== -1 ) {
 					e.preventDefault();
-					VPPopupAPI.open(items, index, self);
+					VPPopupAPI.open( items, index, self );
 				}
 			}
 		);
@@ -501,62 +514,62 @@ $(document).on('extendClass.vpf', (event, VP) => {
 		const self = this;
 
 		if (
-			!self.options.itemsClickAction ||
+			! self.options.itemsClickAction ||
 			self.options.itemsClickAction === 'url'
 		) {
 			return;
 		}
 
-		self.$item.off(`click.vpf-uid-${self.uid}`);
+		self.$item.off( `click.vpf-uid-${ self.uid }` );
 
-		self.emitEvent('destroyPopupGallery');
+		self.emitEvent( 'destroyPopupGallery' );
 	};
-});
+} );
 
 // Init.
-$(document).on('init.vpf', (event, self) => {
-	if (event.namespace !== 'vpf') {
+$( document ).on( 'init.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
 	self.initPopupGallery();
-});
+} );
 
 // Destroy.
-$(document).on('destroy.vpf', (event, self) => {
-	if (event.namespace !== 'vpf') {
+$( document ).on( 'destroy.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
 	self.destroyPopupGallery();
-});
+} );
 
 // Check if link is image.
-function isLinkImage(link) {
+function isLinkImage( link ) {
 	return /(.png|.jpg|.jpeg|.gif|.tiff|.tif|.jfif|.jpe|.svg|.bmp|.webp)$/.test(
-		link.href.toLowerCase().split('?')[0].split('#')[0]
+		link.href.toLowerCase().split( '?' )[ 0 ].split( '#' )[ 0 ]
 	);
 }
 
 // Parse image data from link.
-function parseImgData(link) {
-	const $link = $(link);
-	let img = link.childNodes[0];
-	let caption = $link.next('figcaption');
+function parseImgData( link ) {
+	const $link = $( link );
+	let img = link.childNodes[ 0 ];
+	let caption = $link.next( 'figcaption' );
 
 	// <noscript> tag used in plugins, that adds lazy loading
-	if (img.nodeName === 'NOSCRIPT' && link.childNodes[1]) {
-		img = link.childNodes[1];
+	if ( img.nodeName === 'NOSCRIPT' && link.childNodes[ 1 ] ) {
+		img = link.childNodes[ 1 ];
 	}
 
-	if (!caption.length && $link.parent('.gallery-icon').length) {
-		caption = $link.parent('.gallery-icon').next('figcaption');
+	if ( ! caption.length && $link.parent( '.gallery-icon' ).length ) {
+		caption = $link.parent( '.gallery-icon' ).next( 'figcaption' );
 	}
 
 	caption = caption.html();
 
-	if (caption) {
-		caption = `<div class="vp-portfolio__item-popup-description">${caption}</div>`;
+	if ( caption ) {
+		caption = `<div class="vp-portfolio__item-popup-description">${ caption }</div>`;
 	}
 
 	return {
@@ -581,8 +594,8 @@ function parseImgData(link) {
  * - Single image: <a href="image.jpg" class="vp-lightbox-gallery"><img /></a>
  * - Gallery: <div class="vp-lightbox-gallery"><a href="img1.jpg">...</a></div>
  */
-if (settingsPopupGallery.enable_on_wordpress_images) {
-	$(document).on(
+if ( settingsPopupGallery.enable_on_wordpress_images ) {
+	$( document ).on(
 		'click',
 		`
 			.wp-block-image > a,
@@ -597,20 +610,20 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
 			a.vp-lightbox-gallery,
 			.vp-lightbox-gallery a
 		`,
-		function (e) {
-			if (e.isDefaultPrevented()) {
+		function ( e ) {
+			if ( e.isDefaultPrevented() ) {
 				return;
 			}
 
-			if (!this.childNodes.length) {
+			if ( ! this.childNodes.length ) {
 				return;
 			}
 
-			let imageNode = this.childNodes[0];
+			let imageNode = this.childNodes[ 0 ];
 
 			// <noscript> tag used in plugins, that adds lazy loading
-			if (imageNode.nodeName === 'NOSCRIPT' && this.childNodes[1]) {
-				imageNode = this.childNodes[1];
+			if ( imageNode.nodeName === 'NOSCRIPT' && this.childNodes[ 1 ] ) {
+				imageNode = this.childNodes[ 1 ];
 			}
 
 			// check if child node is <img> or <picture> tag.
@@ -623,28 +636,28 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
 			}
 
 			// check if link is image.
-			if (!isLinkImage(this)) {
+			if ( ! isLinkImage( this ) ) {
 				return;
 			}
 
 			e.preventDefault();
 
-			const $this = $(this);
+			const $this = $( this );
 			const items = [];
-			const currentImage = parseImgData(this);
+			const currentImage = parseImgData( this );
 			const $gallery = $this.closest(
 				'.wp-block-gallery, .gallery, .tiled-gallery__gallery, .vp-lightbox-gallery'
 			);
 			let activeIndex = 0;
 
 			// Block gallery, WordPress default gallery, Jetpack gallery, custom gallery.
-			if ($gallery.length) {
+			if ( $gallery.length ) {
 				// Check if it's a custom gallery or WordPress gallery
 				const isCustomGallery = $gallery.hasClass(
 					'vp-lightbox-gallery'
 				);
 				const $galleryItems = isCustomGallery
-					? $gallery.find('a')
+					? $gallery.find( 'a' )
 					: $gallery.find(
 							`
 								.blocks-gallery-item > figure > a,
@@ -652,29 +665,29 @@ if (settingsPopupGallery.enable_on_wordpress_images) {
 								.gallery-icon > a,
 								figure.tiled-gallery__item > a
 							`
-						);
+					  );
 
 				let i = 0;
 
-				$galleryItems.each(function () {
+				$galleryItems.each( function () {
 					// check if link is image.
-					if (isLinkImage(this)) {
-						if (this === currentImage.linkEl) {
+					if ( isLinkImage( this ) ) {
+						if ( this === currentImage.linkEl ) {
 							activeIndex = i;
 						}
 
-						items.push(parseImgData(this));
+						items.push( parseImgData( this ) );
 
 						i += 1;
 					}
-				});
+				} );
 
 				// WordPress gallery.
 			} else {
-				items.push(currentImage);
+				items.push( currentImage );
 			}
 
-			VPPopupAPI.open(items, activeIndex);
+			VPPopupAPI.open( items, activeIndex );
 		}
 	);
 }

@@ -77,7 +77,7 @@ const alignIcons = {
  *
  * @param props
  */
-function ElementsSelectorOptions(props) {
+function ElementsSelectorOptions( props ) {
 	const {
 		location,
 		locationData,
@@ -90,19 +90,19 @@ function ElementsSelectorOptions(props) {
 
 	const { clientId } = parentProps.props;
 
-	const [isOpen, setOpen] = useState(false);
-	const openModal = () => setOpen(true);
-	const closeModal = () => setOpen(false);
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
 
-	const isChildOfLoop = checkIsChildOfLoopBlock(clientId);
+	const isChildOfLoop = checkIsChildOfLoopBlock( clientId );
 
-	if (isChildOfLoop) {
-		return options[optionName] && options[optionName].category ? (
+	if ( isChildOfLoop ) {
+		return options[ optionName ] && options[ optionName ].category ? (
 			<ControlsRender
-				{...parentProps.props}
-				category={'layouts'}
-				categoryToggle={false}
-				showPanel={false}
+				{ ...parentProps.props }
+				category={ 'layouts' }
+				categoryToggle={ false }
+				showPanel={ false }
 			/>
 		) : null;
 	}
@@ -111,11 +111,13 @@ function ElementsSelectorOptions(props) {
 		<>
 			<button
 				type="button"
-				aria-expanded={isOpen}
+				aria-expanded={ isOpen }
 				className="vpf-component-elements-selector-control-location-options-item"
-				onClick={openModal}
+				onClick={ openModal }
 			>
-				{options[optionName] ? options[optionName].title : optionName}
+				{ options[ optionName ]
+					? options[ optionName ].title
+					: optionName }
 				<svg
 					width="20"
 					height="20"
@@ -133,41 +135,44 @@ function ElementsSelectorOptions(props) {
 				</svg>
 			</button>
 
-			{isOpen && (
+			{ isOpen && (
 				<Modal
-					title={`${
-						options[optionName]
-							? options[optionName].title
+					title={ `${
+						options[ optionName ]
+							? options[ optionName ].title
 							: optionName
-					} ${__('Settings', 'visual-portfolio')}`}
-					onRequestClose={(e) => {
+					} ${ __( 'Settings', 'visual-portfolio' ) }` }
+					onRequestClose={ ( e ) => {
 						if (
-							e?.relatedTarget?.classList?.contains('media-modal')
+							e?.relatedTarget?.classList?.contains(
+								'media-modal'
+							)
 						) {
 							// Don't close modal if opened media modal.
 							return;
 						}
-						closeModal(e);
-					}}
+						closeModal( e );
+					} }
 					className="vpf-component-elements-selector-modal"
 				>
-					{options[optionName] && options[optionName].category && (
-						<ControlsRender
-							{...parentProps.props}
-							category={options[optionName].category}
-							categoryToggle={false}
-						/>
-					)}
+					{ options[ optionName ] &&
+						options[ optionName ].category && (
+							<ControlsRender
+								{ ...parentProps.props }
+								category={ options[ optionName ].category }
+								categoryToggle={ false }
+							/>
+						) }
 
-					{optionName !== 'items' && (
+					{ optionName !== 'items' && (
 						<PanelBody>
 							<Button
 								isLink
-								style={{
+								style={ {
 									color: 'red',
 									marginTop: '5px',
-								}}
-								onClick={() => {
+								} }
+								onClick={ () => {
 									if (
 										// eslint-disable-next-line no-alert
 										window.confirm(
@@ -177,32 +182,32 @@ function ElementsSelectorOptions(props) {
 											)
 										)
 									) {
-										onChange({
+										onChange( {
 											...value,
-											[location]: {
-												...value[location],
+											[ location ]: {
+												...value[ location ],
 												elements:
 													locationData.elements.filter(
-														(elementName) =>
+														( elementName ) =>
 															elementName !==
 															optionName
 													),
 											},
-										});
+										} );
 									}
-								}}
+								} }
 							>
-								{__('Remove', 'visual-portfolio')}
-								{` ${
-									options[optionName]
-										? options[optionName].title
+								{ __( 'Remove', 'visual-portfolio' ) }
+								{ ` ${
+									options[ optionName ]
+										? options[ optionName ].title
 										: optionName
-								}`}
+								}` }
 							</Button>
 						</PanelBody>
-					)}
+					) }
 				</Modal>
-			)}
+			) }
 		</>
 	);
 }
@@ -211,45 +216,45 @@ function ElementsSelectorOptions(props) {
  * Component Class
  */
 export default class ElementsSelector extends Component {
-	constructor(...args) {
-		super(...args);
+	constructor( ...args ) {
+		super( ...args );
 
-		this.getLocationData = this.getLocationData.bind(this);
-		this.renderLocation = this.renderLocation.bind(this);
-		this.renderAlignSettings = this.renderAlignSettings.bind(this);
+		this.getLocationData = this.getLocationData.bind( this );
+		this.renderLocation = this.renderLocation.bind( this );
+		this.renderAlignSettings = this.renderAlignSettings.bind( this );
 	}
 
-	getLocationData(location) {
+	getLocationData( location ) {
 		const { options, locations, value } = this.props;
 
 		const title =
-			(locations[location] && locations[location].title) || false;
+			( locations[ location ] && locations[ location ].title ) || false;
 		const elements =
-			value[location] && value[location].elements
-				? value[location].elements
+			value[ location ] && value[ location ].elements
+				? value[ location ].elements
 				: [];
 		const align =
-			value[location] && value[location].align
-				? value[location].align
+			value[ location ] && value[ location ].align
+				? value[ location ].align
 				: false;
 		const availableAlign =
-			locations[location] && locations[location].align
-				? locations[location].align
+			locations[ location ] && locations[ location ].align
+				? locations[ location ].align
 				: [];
 		const availableElements = {};
 
 		// find all available elements
-		Object.keys(options).forEach((name) => {
-			const data = options[name];
+		Object.keys( options ).forEach( ( name ) => {
+			const data = options[ name ];
 
 			if (
-				(!data.allowed_locations ||
-					data.allowed_locations.indexOf(location) !== -1) &&
-				elements.indexOf(name) === -1
+				( ! data.allowed_locations ||
+					data.allowed_locations.indexOf( location ) !== -1 ) &&
+				elements.indexOf( name ) === -1
 			) {
-				availableElements[name] = data;
+				availableElements[ name ] = data;
 			}
-		});
+		} );
 
 		return {
 			title,
@@ -260,30 +265,30 @@ export default class ElementsSelector extends Component {
 		};
 	}
 
-	renderAlignSettings(location) {
+	renderAlignSettings( location ) {
 		const { value, onChange } = this.props;
 
-		const locationData = this.getLocationData(location);
+		const locationData = this.getLocationData( location );
 		const controls = [];
 
-		if (locationData.availableAlign.length) {
-			locationData.availableAlign.forEach((alignName) => {
+		if ( locationData.availableAlign.length ) {
+			locationData.availableAlign.forEach( ( alignName ) => {
 				controls.push(
 					<ToolbarButton
-						key={alignName}
-						icon={alignIcons[alignName]}
-						label={`${
-							alignName.charAt(0).toUpperCase() +
-							alignName.slice(1)
-						}`}
-						onClick={() =>
-							onChange({
+						key={ alignName }
+						icon={ alignIcons[ alignName ] }
+						label={ `${
+							alignName.charAt( 0 ).toUpperCase() +
+							alignName.slice( 1 )
+						}` }
+						onClick={ () =>
+							onChange( {
 								...value,
-								[location]: {
-									...value[location],
+								[ location ]: {
+									...value[ location ],
 									align: alignName,
 								},
-							})
+							} )
 						}
 						isActive={
 							locationData.align
@@ -292,10 +297,10 @@ export default class ElementsSelector extends Component {
 						}
 					/>
 				);
-			});
+			} );
 		}
 
-		if (!controls.length) {
+		if ( ! controls.length ) {
 			return null;
 		}
 
@@ -303,105 +308,105 @@ export default class ElementsSelector extends Component {
 			<Dropdown
 				className="vpf-component-elements-selector-align__dropdown"
 				contentClassName="vpf-component-elements-selector-align__dropdown-content"
-				popoverProps={{
+				popoverProps={ {
 					placement: 'left-start',
 					offset: 36,
 					shift: true,
-				}}
-				renderToggle={({ isOpen, onToggle }) => (
+				} }
+				renderToggle={ ( { isOpen, onToggle } ) => (
 					<button
 						type="button"
-						aria-expanded={isOpen}
+						aria-expanded={ isOpen }
 						className="vpf-component-elements-selector-control-location-options-item"
-						onClick={onToggle}
+						onClick={ onToggle }
 					>
-						{locationData.align && alignIcons[locationData.align]
-							? alignIcons[locationData.align]
-							: alignIcons.center}
+						{ locationData.align && alignIcons[ locationData.align ]
+							? alignIcons[ locationData.align ]
+							: alignIcons.center }
 					</button>
-				)}
-				renderContent={() => (
-					<Toolbar label="Elements Selector">{controls}</Toolbar>
-				)}
+				) }
+				renderContent={ () => (
+					<Toolbar label="Elements Selector">{ controls }</Toolbar>
+				) }
 			/>
 		);
 	}
 
-	renderLocation(location) {
+	renderLocation( location ) {
 		const { value, onChange, options, props } = this.props;
 		const { clientId } = props;
 
-		const locationData = this.getLocationData(location);
+		const locationData = this.getLocationData( location );
 		const { availableElements } = locationData;
 
 		// Remove elements selector if gallery is child of loop block.
 		// This needed because we have all elements as separate blocks.
-		if (checkIsChildOfLoopBlock(clientId)) {
+		if ( checkIsChildOfLoopBlock( clientId ) ) {
 			return (
 				locationData.elements.length > 0 &&
 				locationData.elements
-					.filter((optionName) => optionName === 'items')
-					.map((optionName) => (
+					.filter( ( optionName ) => optionName === 'items' )
+					.map( ( optionName ) => (
 						<ElementsSelectorOptions
-							key={optionName + location}
-							location={location}
-							locationData={locationData}
-							value={value}
-							onChange={onChange}
-							options={options}
-							optionName={optionName}
-							parentProps={this.props}
+							key={ optionName + location }
+							location={ location }
+							locationData={ locationData }
+							value={ value }
+							onChange={ onChange }
+							options={ options }
+							optionName={ optionName }
+							parentProps={ this.props }
 						/>
-					))
+					) )
 			);
 		}
 
 		return (
 			<div
-				key={location}
+				key={ location }
 				className="vpf-component-elements-selector-control-location"
 			>
-				{locationData.title ? (
+				{ locationData.title ? (
 					<div className="vpf-component-elements-selector-control-location-title">
-						{locationData.title}
+						{ locationData.title }
 					</div>
-				) : null}
+				) : null }
 
-				{locationData.availableAlign.length &&
+				{ locationData.availableAlign.length &&
 				locationData.elements.length ? (
 					<div className="vpf-component-elements-selector-control-location-align">
-						{this.renderAlignSettings(location)}
+						{ this.renderAlignSettings( location ) }
 					</div>
-				) : null}
+				) : null }
 
 				<div
-					className={classnames(
+					className={ classnames(
 						'vpf-component-elements-selector-control-location-options',
 						locationData.align
-							? `vpf-component-elements-selector-control-location-options-${locationData.align}`
+							? `vpf-component-elements-selector-control-location-options-${ locationData.align }`
 							: ''
-					)}
+					) }
 				>
-					{locationData.elements.length
-						? locationData.elements.map((optionName) => (
+					{ locationData.elements.length
+						? locationData.elements.map( ( optionName ) => (
 								<ElementsSelectorOptions
-									key={optionName}
-									location={location}
-									locationData={locationData}
-									value={value}
-									onChange={onChange}
-									options={options}
-									optionName={optionName}
-									parentProps={this.props}
+									key={ optionName }
+									location={ location }
+									locationData={ locationData }
+									value={ value }
+									onChange={ onChange }
+									options={ options }
+									optionName={ optionName }
+									parentProps={ this.props }
 								/>
-							))
-						: null}
-					{Object.keys(availableElements).length ? (
+						  ) )
+						: null }
+					{ Object.keys( availableElements ).length ? (
 						<DropdownMenu
 							className="vpf-component-elements-selector-control-location-options-add-button"
-							popoverProps={{
+							popoverProps={ {
 								position: 'bottom center',
-							}}
+							} }
 							icon={
 								<svg
 									width="20"
@@ -415,30 +420,31 @@ export default class ElementsSelector extends Component {
 									<path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z" />
 								</svg>
 							}
-							controls={Object.keys(availableElements).map(
-								(optionName) => ({
+							controls={ Object.keys( availableElements ).map(
+								( optionName ) => ( {
 									title: (
 										<>
 											{
-												availableElements[optionName]
+												availableElements[ optionName ]
 													.title
 											}
-											{availableElements[optionName]
+											{ availableElements[ optionName ]
 												.is_pro ? (
 												<span className="vpf-component-elements-selector-control-location-options-title-pro">
-													{__(
+													{ __(
 														'PRO',
 														'visual-portfolio'
-													)}
+													) }
 												</span>
 											) : (
 												''
-											)}
+											) }
 										</>
 									),
 									onClick() {
 										if (
-											availableElements[optionName].is_pro
+											availableElements[ optionName ]
+												.is_pro
 										) {
 											return;
 										}
@@ -448,26 +454,27 @@ export default class ElementsSelector extends Component {
 										];
 
 										if (
-											newElements.indexOf(optionName) ===
-											-1
+											newElements.indexOf(
+												optionName
+											) === -1
 										) {
-											newElements.push(optionName);
+											newElements.push( optionName );
 
-											onChange({
+											onChange( {
 												...value,
-												[location]: {
-													...value[location],
+												[ location ]: {
+													...value[ location ],
 													elements: newElements,
 												},
-											});
+											} );
 										}
 									},
-								})
-							)}
+								} )
+							) }
 						/>
 					) : (
 						''
-					)}
+					) }
 				</div>
 			</div>
 		);
@@ -478,9 +485,9 @@ export default class ElementsSelector extends Component {
 
 		return (
 			<div className="vpf-component-elements-selector-control">
-				{Object.keys(locations).map((name) =>
-					this.renderLocation(name)
-				)}
+				{ Object.keys( locations ).map( ( name ) =>
+					this.renderLocation( name )
+				) }
 			</div>
 		);
 	}

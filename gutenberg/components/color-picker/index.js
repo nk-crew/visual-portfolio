@@ -26,27 +26,27 @@ function useColors() {
 	}
 
 	// Old way.
-	const { colors, gradients } = useSelect((select) => {
-		const settings = select('core/block-editor').getSettings();
+	const { colors, gradients } = useSelect( ( select ) => {
+		const settings = select( 'core/block-editor' ).getSettings();
 
 		const themeColors = [];
 		const themeGradients = [];
 
-		if (settings.colors && settings.colors.length) {
-			themeColors.push({ name: 'Theme', colors: settings.colors });
+		if ( settings.colors && settings.colors.length ) {
+			themeColors.push( { name: 'Theme', colors: settings.colors } );
 		}
-		if (settings.gradients && settings.gradients.length) {
-			themeGradients.push({
+		if ( settings.gradients && settings.gradients.length ) {
+			themeGradients.push( {
 				name: 'Theme',
 				gradients: settings.gradients,
-			});
+			} );
 		}
 
 		return {
 			colors: themeColors,
 			gradients: themeGradients,
 		};
-	});
+	} );
 
 	return { colors, gradients };
 }
@@ -56,7 +56,7 @@ function useColors() {
  *
  * @param props
  */
-export default function ColorPicker(props) {
+export default function ColorPicker( props ) {
 	const {
 		label,
 		value,
@@ -67,19 +67,19 @@ export default function ColorPicker(props) {
 	} = props;
 	const { colors, gradients } = useColors();
 
-	const isGradient = value && value.match(/gradient/);
+	const isGradient = value && value.match( /gradient/ );
 	const colorValue = isGradient ? undefined : value;
 	const gradientValue = isGradient ? value : undefined;
 
 	const tabs = {
 		solid: (
 			<ColorPalette
-				colors={colors}
-				value={colorValue}
-				enableAlpha={alpha}
-				onChange={(val) => {
-					onChange(val);
-				}}
+				colors={ colors }
+				value={ colorValue }
+				enableAlpha={ alpha }
+				onChange={ ( val ) => {
+					onChange( val );
+				} }
 				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
 			/>
@@ -87,11 +87,11 @@ export default function ColorPicker(props) {
 		gradient: (
 			<GradientPicker
 				__nextHasNoMargin
-				value={gradientValue}
-				onChange={(val) => {
-					onChange(val);
-				}}
-				gradients={gradients}
+				value={ gradientValue }
+				onChange={ ( val ) => {
+					onChange( val );
+				} }
+				gradients={ gradients }
 			/>
 		),
 	};
@@ -100,33 +100,33 @@ export default function ColorPicker(props) {
 		<Dropdown
 			className="vpf-component-color-picker__dropdown"
 			contentClassName="vpf-component-color-picker__dropdown-content"
-			popoverProps={{
+			popoverProps={ {
 				placement: 'left-start',
 				offset: 36,
 				shift: true,
-			}}
-			renderToggle={({ isOpen, onToggle }) => (
+			} }
+			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					className={classnames(
+					className={ classnames(
 						'vpf-component-color-toggle',
 						isOpen ? 'vpf-component-color-toggle-active' : ''
-					)}
-					onClick={onToggle}
+					) }
+					onClick={ onToggle }
 				>
 					<span
 						className="vpf-component-color-toggle-indicator"
-						style={{ background: value || '' }}
+						style={ { background: value || '' } }
 					/>
 					<span className="vpf-component-color-toggle-label">
-						{label}
+						{ label }
 					</span>
 				</Button>
-			)}
-			renderContent={() => (
+			) }
+			renderContent={ () => (
 				<div className="vpf-component-color-picker">
-					{gradient ? (
+					{ gradient ? (
 						<TabPanel
-							tabs={[
+							tabs={ [
 								{
 									name: 'solid',
 									title: 'Solid',
@@ -135,19 +135,19 @@ export default function ColorPicker(props) {
 									name: 'gradient',
 									title: 'Gradient',
 								},
-							]}
-							initialTabName={isGradient ? 'gradient' : 'solid'}
+							] }
+							initialTabName={ isGradient ? 'gradient' : 'solid' }
 						>
-							{(tab) => {
-								return tabs[tab.name];
-							}}
+							{ ( tab ) => {
+								return tabs[ tab.name ];
+							} }
 						</TabPanel>
 					) : (
 						tabs.solid
-					)}
-					{afterDropdownContent || ''}
+					) }
+					{ afterDropdownContent || '' }
 				</div>
-			)}
+			) }
 		/>
 	);
 }

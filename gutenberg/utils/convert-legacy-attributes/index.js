@@ -52,7 +52,7 @@ const MODERN_DEFAULTS = {
 	},
 	postsQuery: {
 		source: 'portfolio',
-		postTypesSet: ['post'],
+		postTypesSet: [ 'post' ],
 		ids: [],
 		excludeIds: [],
 		order: 'desc',
@@ -74,20 +74,22 @@ const MODERN_DEFAULTS = {
 };
 
 // Helper functions
-function getNestedValue(obj, path) {
-	return path.split('.').reduce((current, key) => current?.[key], obj);
+function getNestedValue( obj, path ) {
+	return path
+		.split( '.' )
+		.reduce( ( current, key ) => current?.[ key ], obj );
 }
 
-function setNestedValue(obj, path, value) {
-	const keys = path.split('.');
+function setNestedValue( obj, path, value ) {
+	const keys = path.split( '.' );
 	const lastKey = keys.pop();
-	const target = keys.reduce((current, key) => {
-		if (!current[key]) {
-			current[key] = {};
+	const target = keys.reduce( ( current, key ) => {
+		if ( ! current[ key ] ) {
+			current[ key ] = {};
 		}
-		return current[key];
-	}, obj);
-	target[lastKey] = value;
+		return current[ key ];
+	}, obj );
+	target[ lastKey ] = value;
 }
 
 /**
@@ -97,53 +99,55 @@ function setNestedValue(obj, path, value) {
  * @param {boolean} includeDefaults  - Whether to include default structure for unset values.
  * @return {Object} Legacy attributes object.
  */
-function convertModernToLegacy(modernAttributes, includeDefaults = false) {
+function convertModernToLegacy( modernAttributes, includeDefaults = false ) {
 	const legacy = {};
 
 	// Merge with defaults if includeDefaults is true.
 	let attributesToConvert = modernAttributes;
-	if (includeDefaults) {
+	if ( includeDefaults ) {
 		attributesToConvert = {};
 		// Deep merge defaults with provided attributes
-		Object.entries(MODERN_DEFAULTS).forEach(([key, defaultValue]) => {
-			attributesToConvert[key] = {
-				...defaultValue,
-				...modernAttributes[key],
-			};
-		});
-		// Add any additional keys from modernAttributes that aren't in defaults
-		Object.keys(modernAttributes).forEach((key) => {
-			if (!MODERN_DEFAULTS[key]) {
-				attributesToConvert[key] = modernAttributes[key];
+		Object.entries( MODERN_DEFAULTS ).forEach(
+			( [ key, defaultValue ] ) => {
+				attributesToConvert[ key ] = {
+					...defaultValue,
+					...modernAttributes[ key ],
+				};
 			}
-		});
+		);
+		// Add any additional keys from modernAttributes that aren't in defaults
+		Object.keys( modernAttributes ).forEach( ( key ) => {
+			if ( ! MODERN_DEFAULTS[ key ] ) {
+				attributesToConvert[ key ] = modernAttributes[ key ];
+			}
+		} );
 	}
 
 	// Handle direct mappings
-	Object.entries(ATTRIBUTE_MAPPINGS.direct).forEach(
-		([modernKey, legacyKey]) => {
-			if (attributesToConvert[modernKey] !== undefined) {
-				let value = attributesToConvert[modernKey];
+	Object.entries( ATTRIBUTE_MAPPINGS.direct ).forEach(
+		( [ modernKey, legacyKey ] ) => {
+			if ( attributesToConvert[ modernKey ] !== undefined ) {
+				let value = attributesToConvert[ modernKey ];
 
 				// Apply value transformation if needed
-				if (VALUE_TRANSFORMATIONS.modernToLegacy[modernKey]) {
+				if ( VALUE_TRANSFORMATIONS.modernToLegacy[ modernKey ] ) {
 					value =
-						VALUE_TRANSFORMATIONS.modernToLegacy[modernKey][
+						VALUE_TRANSFORMATIONS.modernToLegacy[ modernKey ][
 							value
 						] || value;
 				}
 
-				legacy[legacyKey] = value;
+				legacy[ legacyKey ] = value;
 			}
 		}
 	);
 
 	// Handle nested mappings
-	Object.entries(ATTRIBUTE_MAPPINGS.nested).forEach(
-		([modernPath, legacyKey]) => {
-			const value = getNestedValue(attributesToConvert, modernPath);
-			if (value !== undefined) {
-				legacy[legacyKey] = value;
+	Object.entries( ATTRIBUTE_MAPPINGS.nested ).forEach(
+		( [ modernPath, legacyKey ] ) => {
+			const value = getNestedValue( attributesToConvert, modernPath );
+			if ( value !== undefined ) {
+				legacy[ legacyKey ] = value;
 			}
 		}
 	);
@@ -158,40 +162,46 @@ function convertModernToLegacy(modernAttributes, includeDefaults = false) {
  * @param {boolean} includeDefaults  - Whether to include default structure for unset values.
  * @return {Object} Modern attributes object.
  */
-function convertLegacyToModern(legacyAttributes, includeDefaults = false) {
+function convertLegacyToModern( legacyAttributes, includeDefaults = false ) {
 	const modern = {};
 
 	// Set default structure only if includeDefaults is true.
-	if (includeDefaults) {
-		Object.entries(MODERN_DEFAULTS).forEach(([key, defaultValue]) => {
-			modern[key] = { ...defaultValue };
-		});
+	if ( includeDefaults ) {
+		Object.entries( MODERN_DEFAULTS ).forEach(
+			( [ key, defaultValue ] ) => {
+				modern[ key ] = { ...defaultValue };
+			}
+		);
 	}
 
 	// Handle direct mappings (reverse)
-	Object.entries(ATTRIBUTE_MAPPINGS.direct).forEach(
-		([modernKey, legacyKey]) => {
-			if (legacyAttributes[legacyKey] !== undefined) {
-				let value = legacyAttributes[legacyKey];
+	Object.entries( ATTRIBUTE_MAPPINGS.direct ).forEach(
+		( [ modernKey, legacyKey ] ) => {
+			if ( legacyAttributes[ legacyKey ] !== undefined ) {
+				let value = legacyAttributes[ legacyKey ];
 
 				// Apply value transformation if needed
-				if (VALUE_TRANSFORMATIONS.legacyToModern[legacyKey]) {
+				if ( VALUE_TRANSFORMATIONS.legacyToModern[ legacyKey ] ) {
 					value =
-						VALUE_TRANSFORMATIONS.legacyToModern[legacyKey][
+						VALUE_TRANSFORMATIONS.legacyToModern[ legacyKey ][
 							value
 						] || value;
 				}
 
-				modern[modernKey] = value;
+				modern[ modernKey ] = value;
 			}
 		}
 	);
 
 	// Handle nested mappings (reverse)
-	Object.entries(ATTRIBUTE_MAPPINGS.nested).forEach(
-		([modernPath, legacyKey]) => {
-			if (legacyAttributes[legacyKey] !== undefined) {
-				setNestedValue(modern, modernPath, legacyAttributes[legacyKey]);
+	Object.entries( ATTRIBUTE_MAPPINGS.nested ).forEach(
+		( [ modernPath, legacyKey ] ) => {
+			if ( legacyAttributes[ legacyKey ] !== undefined ) {
+				setNestedValue(
+					modern,
+					modernPath,
+					legacyAttributes[ legacyKey ]
+				);
 			}
 		}
 	);

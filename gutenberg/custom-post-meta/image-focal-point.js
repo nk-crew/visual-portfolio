@@ -18,13 +18,13 @@ class VpImageFocalPointComponent extends Component {
 	render() {
 		const { getMeta, featuredImageId, updateMeta } = this.props;
 
-		if (!featuredImageId) {
+		if ( ! featuredImageId ) {
 			return null;
 		}
 
-		let focalPoint = getMeta('_vp_image_focal_point');
+		let focalPoint = getMeta( '_vp_image_focal_point' );
 
-		if (!focalPoint || !focalPoint.x || !focalPoint.y) {
+		if ( ! focalPoint || ! focalPoint.x || ! focalPoint.y ) {
 			focalPoint = {
 				x: 0.5,
 				y: 0.5,
@@ -35,42 +35,48 @@ class VpImageFocalPointComponent extends Component {
 			<div className="vpf-post-image-focal-point-panel">
 				<PanelRow>
 					<p className="description">
-						{__(
+						{ __(
 							'Focal point will be used in Visual Portfolio layouts only:',
 							'visual-portfolio'
-						)}
+						) }
 					</p>
 				</PanelRow>
 				<PanelRow>
 					<UnitControl
-						label={__('Left', 'visual-portfolio')}
-						value={100 * focalPoint.x + '%'}
-						onChange={(val) => {
+						label={ __( 'Left', 'visual-portfolio' ) }
+						value={ 100 * focalPoint.x + '%' }
+						onChange={ ( val ) => {
 							const newFocalPoint = { ...focalPoint };
-							newFocalPoint.x = parseFloat(val) / 100;
+							newFocalPoint.x = parseFloat( val ) / 100;
 
-							updateMeta('_vp_image_focal_point', newFocalPoint);
-						}}
-						min={0}
-						max={100}
-						step={1}
-						units={[{ value: '%', label: '%' }]}
+							updateMeta(
+								'_vp_image_focal_point',
+								newFocalPoint
+							);
+						} }
+						min={ 0 }
+						max={ 100 }
+						step={ 1 }
+						units={ [ { value: '%', label: '%' } ] }
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
 					<UnitControl
-						label={__('Top', 'visual-portfolio')}
-						value={100 * focalPoint.y + '%'}
-						onChange={(val) => {
+						label={ __( 'Top', 'visual-portfolio' ) }
+						value={ 100 * focalPoint.y + '%' }
+						onChange={ ( val ) => {
 							const newFocalPoint = { ...focalPoint };
-							newFocalPoint.y = parseFloat(val) / 100;
+							newFocalPoint.y = parseFloat( val ) / 100;
 
-							updateMeta('_vp_image_focal_point', newFocalPoint);
-						}}
-						min={0}
-						max={100}
-						step={1}
-						units={[{ value: '%', label: '%' }]}
+							updateMeta(
+								'_vp_image_focal_point',
+								newFocalPoint
+							);
+						} }
+						min={ 0 }
+						max={ 100 }
+						step={ 1 }
+						units={ [ { value: '%', label: '%' } ] }
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
@@ -80,36 +86,36 @@ class VpImageFocalPointComponent extends Component {
 	}
 }
 
-const VpImageFocalPoint = compose([
-	withSelect((select) => {
-		const { getEditedPostAttribute } = select('core/editor');
+const VpImageFocalPoint = compose( [
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
 
-		const featuredImageId = getEditedPostAttribute('featured_media');
-		const meta = getEditedPostAttribute('meta') || {};
+		const featuredImageId = getEditedPostAttribute( 'featured_media' );
+		const meta = getEditedPostAttribute( 'meta' ) || {};
 
 		return {
 			featuredImageId,
-			getMeta(name) {
-				return meta[name];
+			getMeta( name ) {
+				return meta[ name ];
 			},
 		};
-	}),
-	withDispatch((dispatch) => ({
-		updateMeta(name, val) {
-			dispatch('core/editor').editPost({ meta: { [name]: val } });
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		updateMeta( name, val ) {
+			dispatch( 'core/editor' ).editPost( { meta: { [ name ]: val } } );
 		},
-	})),
+	} ) ),
 	withInstanceId,
-])(VpImageFocalPointComponent);
+] )( VpImageFocalPointComponent );
 
 addFilter(
 	'editor.PostFeaturedImage',
 	'vpf/post-featured-image-focal-point',
-	(OriginalComponent) =>
-		function (props) {
+	( OriginalComponent ) =>
+		function ( props ) {
 			return (
 				<>
-					<OriginalComponent {...props} />
+					<OriginalComponent { ...props } />
 					<VpImageFocalPoint />
 				</>
 			);

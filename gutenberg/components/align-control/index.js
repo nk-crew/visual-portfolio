@@ -9,11 +9,11 @@ import { Button, Tooltip } from '@wordpress/components';
  *
  * @param props
  */
-export default function AlignControl(props) {
+export default function AlignControl( props ) {
 	const { options, value, onChange } = props;
 
-	let controlsArray = ['left', 'center', 'right'];
-	if (options === 'box') {
+	let controlsArray = [ 'left', 'center', 'right' ];
+	if ( options === 'box' ) {
 		controlsArray = [
 			'top-left',
 			'top-center',
@@ -27,26 +27,28 @@ export default function AlignControl(props) {
 
 	return (
 		<div className="vpf-component-align-control">
-			{controlsArray.map((align) => {
+			{ controlsArray.map( ( align ) => {
 				const alignTitle = align
-					.split('-')
-					.map((word) => {
-						return word.slice(0, 1).toUpperCase() + word.slice(1);
-					})
-					.join(' ');
+					.split( '-' )
+					.map( ( word ) => {
+						return (
+							word.slice( 0, 1 ).toUpperCase() + word.slice( 1 )
+						);
+					} )
+					.join( ' ' );
 
 				return (
-					<Tooltip key={`align-${align}`} text={alignTitle}>
+					<Tooltip key={ `align-${ align }` } text={ alignTitle }>
 						<Button
-							className={classnames(
-								`vpf-component-align-control-${align}`,
+							className={ classnames(
+								`vpf-component-align-control-${ align }`,
 								value === align
 									? 'vpf-component-align-control-active'
 									: ''
-							)}
-							onClick={() => {
-								onChange(align);
-							}}
+							) }
+							onClick={ () => {
+								onChange( align );
+							} }
 						>
 							<span />
 							<span />
@@ -54,7 +56,7 @@ export default function AlignControl(props) {
 						</Button>
 					</Tooltip>
 				);
-			})}
+			} ) }
 		</div>
 	);
 }

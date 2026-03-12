@@ -30,4 +30,4 @@ const settings = {
 	usesContext,
 };
 
-registerBlockType(name, settings);
+registerBlockType( name, settings );

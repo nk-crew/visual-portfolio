@@ -14,15 +14,16 @@ const { plugin_name: pluginName } = window.VPGutenbergVariables;
  *
  * @param props
  */
-export default function BlockEdit(props) {
+export default function BlockEdit( props ) {
 	const { clientId, setAttributes, attributes } = props;
 
 	const { id } = attributes;
 
 	const { portfolioLayouts } = useSelect(
-		(select) => ({
-			portfolioLayouts: select('visual-portfolio').getPortfolioLayouts(),
-		}),
+		( select ) => ( {
+			portfolioLayouts:
+				select( 'visual-portfolio' ).getPortfolioLayouts(),
+		} ),
 		[]
 	);
 
@@ -31,44 +32,47 @@ export default function BlockEdit(props) {
 		let currentItemUrl = false;
 
 		// prepare portfolios list.
-		if (portfolioLayouts) {
+		if ( portfolioLayouts ) {
 			portfolioLayoutsSelect = {
-				'': __('--- Select Layout ---', 'visual-portfolio'),
+				'': __( '--- Select Layout ---', 'visual-portfolio' ),
 			};
-			Object.keys(portfolioLayouts).forEach((key) => {
-				const val = portfolioLayouts[key];
+			Object.keys( portfolioLayouts ).forEach( ( key ) => {
+				const val = portfolioLayouts[ key ];
 
-				portfolioLayoutsSelect[` ${val.id}`] =
-					`${val.title} (#${val.id})`;
+				portfolioLayoutsSelect[
+					` ${ val.id }`
+				] = `${ val.title } (#${ val.id })`;
 
-				if (id && parseInt(id, 10) === val.id) {
+				if ( id && parseInt( id, 10 ) === val.id ) {
 					currentItemUrl = val.edit_url;
 				}
-			});
-		} else if (id) {
+			} );
+		} else if ( id ) {
 			portfolioLayoutsSelect = {
-				[` ${id}`]: `#${id}`,
+				[ ` ${ id }` ]: `#${ id }`,
 			};
 		}
 
 		return (
 			<>
-				{!portfolioLayoutsSelect ? <Spinner /> : ''}
-				{portfolioLayoutsSelect &&
-				Object.keys(portfolioLayoutsSelect).length ? (
+				{ ! portfolioLayoutsSelect ? <Spinner /> : '' }
+				{ portfolioLayoutsSelect &&
+				Object.keys( portfolioLayoutsSelect ).length ? (
 					<div className="vpf-component-layout-select">
 						<SelectControl
-							value={id ? ` ${id}` : ''}
-							onChange={(value) =>
-								setAttributes({
-									id: value ? `${parseInt(value, 10)}` : '',
-								})
+							value={ id ? ` ${ id }` : '' }
+							onChange={ ( value ) =>
+								setAttributes( {
+									id: value
+										? `${ parseInt( value, 10 ) }`
+										: '',
+								} )
 							}
-							options={portfolioLayoutsSelect}
+							options={ portfolioLayoutsSelect }
 						/>
-						{currentItemUrl ? (
+						{ currentItemUrl ? (
 							<Button
-								href={currentItemUrl}
+								href={ currentItemUrl }
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -95,15 +99,15 @@ export default function BlockEdit(props) {
 							</Button>
 						) : (
 							''
-						)}
+						) }
 					</div>
 				) : (
 					''
-				)}
-				{portfolioLayoutsSelect &&
-				!Object.keys(portfolioLayoutsSelect).length
-					? __('No saved layouts found.')
-					: ''}
+				) }
+				{ portfolioLayoutsSelect &&
+				! Object.keys( portfolioLayoutsSelect ).length
+					? __( 'No saved layouts found.' )
+					: '' }
 			</>
 		);
 	}
@@ -111,30 +115,30 @@ export default function BlockEdit(props) {
 	const blockProps = useBlockProps();
 
 	return (
-		<div {...blockProps}>
+		<div { ...blockProps }>
 			<InspectorControls>
-				<PanelBody>{getSelector()}</PanelBody>
+				<PanelBody>{ getSelector() }</PanelBody>
 			</InspectorControls>
-			{id ? (
+			{ id ? (
 				<IframePreview
-					attributes={{
+					attributes={ {
 						content_source: 'saved',
 						id,
-					}}
-					clientId={clientId}
+					} }
+					clientId={ clientId }
 				/>
 			) : (
 				<Placeholder
 					className="vpf-setup-wizard-saved"
-					icon={<ElementIcon width="20" height="20" />}
-					label={sprintf(
-						__('Saved %s', 'visual-portfolio'),
+					icon={ <ElementIcon width="20" height="20" /> }
+					label={ sprintf(
+						__( 'Saved %s', 'visual-portfolio' ),
 						pluginName
-					)}
+					) }
 				>
-					{getSelector()}
+					{ getSelector() }
 				</Placeholder>
-			)}
+			) }
 		</div>
 	);
 }

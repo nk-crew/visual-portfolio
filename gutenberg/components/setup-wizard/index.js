@@ -14,37 +14,37 @@ const NOTICE_LIMIT = parseInt(
 	10
 );
 
-function renderControls(props, category) {
-	return <ControlsRender {...props} category={category} isSetupWizard />;
+function renderControls( props, category ) {
+	return <ControlsRender { ...props } category={ category } isSetupWizard />;
 }
 
-function hasLayoutElement(element, attributes) {
+function hasLayoutElement( element, attributes ) {
 	const { layout_elements: layoutElements } = attributes;
 	const checkIn = element === 'filter' ? 'top' : 'bottom';
 
 	return (
-		typeof layoutElements[checkIn] !== 'undefined' &&
-		layoutElements[checkIn]?.elements.includes(element)
+		typeof layoutElements[ checkIn ] !== 'undefined' &&
+		layoutElements[ checkIn ]?.elements.includes( element )
 	);
 }
 
-function toggleLayoutElement(element, attributes) {
+function toggleLayoutElement( element, attributes ) {
 	const { layout_elements: layoutElements } = attributes;
 	const checkIn = element === 'filter' ? 'top' : 'bottom';
 
 	if (
-		typeof layoutElements[checkIn] === 'undefined' ||
-		!layoutElements[checkIn]?.elements
+		typeof layoutElements[ checkIn ] === 'undefined' ||
+		! layoutElements[ checkIn ]?.elements
 	) {
 		return layoutElements;
 	}
 
-	const result = JSON.parse(JSON.stringify(layoutElements));
+	const result = JSON.parse( JSON.stringify( layoutElements ) );
 
-	if (hasLayoutElement(element, attributes)) {
-		result[checkIn].elements = [];
+	if ( hasLayoutElement( element, attributes ) ) {
+		result[ checkIn ].elements = [];
 	} else {
-		result[checkIn].elements = [element];
+		result[ checkIn ].elements = [ element ];
 	}
 
 	return result;
@@ -55,7 +55,7 @@ function toggleLayoutElement(element, attributes) {
  *
  * @param props
  */
-export default function SetupWizard(props) {
+export default function SetupWizard( props ) {
 	const { attributes, setAttributes } = props;
 	const {
 		align,
@@ -65,27 +65,27 @@ export default function SetupWizard(props) {
 		images,
 	} = attributes;
 
-	const [step, setStep] = useState(0);
-	const [allowNextStep, setAllowNextStep] = useState(false);
+	const [ step, setStep ] = useState( 0 );
+	const [ allowNextStep, setAllowNextStep ] = useState( false );
 	const maxSteps = 2.5;
 
 	// Add startup attributes.
-	useEffect(() => {
-		if (!align && !contentSource) {
-			setAttributes({ align: 'wide' });
+	useEffect( () => {
+		if ( ! align && ! contentSource ) {
+			setAttributes( { align: 'wide' } );
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [] );
 
 	// Set some starter attributes for different content sources.
 	// And hide the setup wizard.
-	const setStarterAttributes = useCallback(() => {
+	const setStarterAttributes = useCallback( () => {
 		let newAttributes = {};
 
-		switch (contentSource) {
+		switch ( contentSource ) {
 			case 'images':
 				// Hide setup wizard once user select images.
-				if (images && images.length) {
+				if ( images && images.length ) {
 					newAttributes = {
 						...newAttributes,
 						items_count: -1,
@@ -93,7 +93,7 @@ export default function SetupWizard(props) {
 					};
 
 					// Add infinite scroll to the gallery when user adds a lot of images.
-					if (layout !== 'slider' && images.length > NOTICE_LIMIT) {
+					if ( layout !== 'slider' && images.length > NOTICE_LIMIT ) {
 						newAttributes = {
 							...newAttributes,
 							items_count: NOTICE_LIMIT,
@@ -103,10 +103,10 @@ export default function SetupWizard(props) {
 									align: 'center',
 								},
 								items: {
-									elements: ['items'],
+									elements: [ 'items' ],
 								},
 								bottom: {
-									elements: ['pagination'],
+									elements: [ 'pagination' ],
 									align: 'center',
 								},
 							},
@@ -126,10 +126,10 @@ export default function SetupWizard(props) {
 							align: 'center',
 						},
 						items: {
-							elements: ['items'],
+							elements: [ 'items' ],
 						},
 						bottom: {
-							elements: ['pagination'],
+							elements: [ 'pagination' ],
 							align: 'center',
 						},
 					},
@@ -152,32 +152,32 @@ export default function SetupWizard(props) {
 			items_click_action_popup_deep_link_pid: 'filename',
 		};
 
-		setAttributes(newAttributes);
-		setAllowNextStep(true);
-	}, [contentSource, images, layout, setAttributes]);
+		setAttributes( newAttributes );
+		setAllowNextStep( true );
+	}, [ contentSource, images, layout, setAttributes ] );
 
-	useEffect(() => {
-		if (contentSource) {
+	useEffect( () => {
+		if ( contentSource ) {
 			setStarterAttributes();
 		}
 		// We have to check for contentSource change here because we don't want to run this on every render.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [contentSource]);
+	}, [ contentSource ] );
 
 	return (
-		<div className={`vpf-setup-wizard vpf-setup-wizard-step-${step}`}>
-			<StepsWizard step={step}>
-				{/* Step 0: Content Source */}
+		<div className={ `vpf-setup-wizard vpf-setup-wizard-step-${ step }` }>
+			<StepsWizard step={ step }>
+				{ /* Step 0: Content Source */ }
 				<StepsWizard.Step>
-					<div className="vpf-setup-wizard-title">{pluginName}</div>
+					<div className="vpf-setup-wizard-title">{ pluginName }</div>
 					<div
 						className="vpf-setup-wizard-description"
-						dangerouslySetInnerHTML={{
+						dangerouslySetInnerHTML={ {
 							__html: __(
 								'Set the common settings in the setup wizard,<br />more options will be available in the block settings.<br />Select the Content Source first:',
 								'visual-portfolio'
 							),
-						}}
+						} }
 					/>
 					{ renderControls( props, 'content-source' ) }
 					{ renderControls( props, 'content-source-images' ) }
@@ -185,74 +185,80 @@ export default function SetupWizard(props) {
 					{ renderControls( props, 'content-source-social-stream' ) }
 				</StepsWizard.Step>
 
-				{/* Step 1: Items Style */}
+				{ /* Step 1: Items Style */ }
 				<StepsWizard.Step>
 					<div className="vpf-setup-wizard-title">
-						{__('Items Style', 'visual-portfolio')}
+						{ __( 'Items Style', 'visual-portfolio' ) }
 					</div>
 					<div
 						className="vpf-setup-wizard-description"
-						dangerouslySetInnerHTML={{
+						dangerouslySetInnerHTML={ {
 							__html: __(
 								'Select one of the featured styles to get started.<br />More style settings will be available in the block settings.',
 								'visual-portfolio'
 							),
-						}}
+						} }
 					/>
-					{renderControls(props, 'items-style')}
+					{ renderControls( props, 'items-style' ) }
 				</StepsWizard.Step>
 
-				{/* Step 2: Layout Elements */}
+				{ /* Step 2: Layout Elements */ }
 				<StepsWizard.Step>
 					<div className="vpf-setup-wizard-title">
-						{__('Additional Settings', 'visual-portfolio')}
+						{ __( 'Additional Settings', 'visual-portfolio' ) }
 					</div>
 					<div className="vpf-setup-wizard-layout-elements">
 						<div>
 							<ToggleControl
-								label={__('Filter', 'visual-portfolio')}
-								checked={hasLayoutElement('filter', attributes)}
-								onChange={() => {
-									setAttributes({
+								label={ __( 'Filter', 'visual-portfolio' ) }
+								checked={ hasLayoutElement(
+									'filter',
+									attributes
+								) }
+								onChange={ () => {
+									setAttributes( {
 										layout_elements: toggleLayoutElement(
 											'filter',
 											attributes
 										),
-									});
-								}}
+									} );
+								} }
 								__nextHasNoMarginBottom
 							/>
 						</div>
 						<div>
 							<ToggleControl
-								label={__('Pagination', 'visual-portfolio')}
-								checked={hasLayoutElement(
+								label={ __( 'Pagination', 'visual-portfolio' ) }
+								checked={ hasLayoutElement(
 									'pagination',
 									attributes
-								)}
-								onChange={() => {
-									setAttributes({
+								) }
+								onChange={ () => {
+									setAttributes( {
 										layout_elements: toggleLayoutElement(
 											'pagination',
 											attributes
 										),
-									});
-								}}
+									} );
+								} }
 								__nextHasNoMarginBottom
 							/>
 						</div>
 						<div>
 							<ToggleControl
-								label={__('Popup Gallery', 'visual-portfolio')}
-								checked={clickAction === 'popup_gallery'}
-								onChange={() => {
-									setAttributes({
+								label={ __(
+									'Popup Gallery',
+									'visual-portfolio'
+								) }
+								checked={ clickAction === 'popup_gallery' }
+								onChange={ () => {
+									setAttributes( {
 										items_click_action:
 											clickAction === 'popup_gallery'
 												? 'url'
 												: 'popup_gallery',
-									});
-								}}
+									} );
+								} }
 								__nextHasNoMarginBottom
 							/>
 						</div>
@@ -260,64 +266,70 @@ export default function SetupWizard(props) {
 				</StepsWizard.Step>
 			</StepsWizard>
 
-			{/* Pagination */}
+			{ /* Pagination */ }
 			<div className="vpf-setup-wizard-pagination">
-				{contentSource ? (
+				{ contentSource ? (
 					<>
 						<div className="vpf-setup-wizard-pagination-button">
 							<Button
 								isLink
-								onClick={() => {
+								onClick={ () => {
 									// Skip Setup
-									if (step === 0) {
-										setAttributes({
+									if ( step === 0 ) {
+										setAttributes( {
 											setup_wizard: '',
 											content_source:
 												attributes.contentSource ||
 												'images',
-										});
+										} );
 
 										// Previous Step
 									} else {
-										setStep(step - 1);
+										setStep( step - 1 );
 									}
-								}}
+								} }
 							>
-								{step === 0
-									? __('Skip Setup', 'visual-portfolio')
-									: __('Previous Step', 'visual-portfolio')}
+								{ step === 0
+									? __( 'Skip Setup', 'visual-portfolio' )
+									: __(
+											'Previous Step',
+											'visual-portfolio'
+									  ) }
 							</Button>
 						</div>
 						<div className="vpf-setup-wizard-pagination-progress">
 							<div
-								style={{
-									width: `${Math.max(
+								style={ {
+									width: `${ Math.max(
 										15,
-										Math.min(100, (100 * step) / maxSteps)
-									)}%`,
-								}}
+										Math.min(
+											100,
+											( 100 * step ) / maxSteps
+										)
+									) }%`,
+								} }
 							/>
 						</div>
 						<div className="vpf-setup-wizard-pagination-button vpf-setup-wizard-pagination-button-end">
 							<Button
 								variant="primary"
-								disabled={!allowNextStep}
-								onClick={() => {
-									if (step === 2) {
-										setAttributes({ setup_wizard: '' });
+								disabled={ ! allowNextStep }
+								onClick={ () => {
+									if ( step === 2 ) {
+										setAttributes( { setup_wizard: '' } );
 									} else {
-										setStep(step + 1);
+										setStep( step + 1 );
 									}
-								}}
+								} }
 							>
-								{__('Continue', 'visual-portfolio')}
+								{ __( 'Continue', 'visual-portfolio' ) }
 								<svg
 									width="14"
 									height="14"
 									viewBox="0 0 20 20"
 									fill="none"
 									xmlns="http://www.w3.org/2000/svg"
-									style={{ marginLeft: '5px' }}
+									style={ { marginLeft: '5px' } }
 								>
 									<path
 										d="M3 10H17"
@@ -339,7 +351,7 @@ export default function SetupWizard(props) {
 							</Button>
 						</div>
 					</>
-				) : null}
+				) : null }
 			</div>
 		</div>
 	);

@@ -30,7 +30,7 @@
 		"prelint:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio' cli composer install --no-interaction",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio' cli composer run-script lint",
 		"format:css": "stylelint --fix --custom-syntax postcss-scss \"assets/**/*.scss\" \"gutenberg/**/*.scss\" \"templates/**/*.scss\"",
-		"format:js": "eslint --ext .js --fix assets/ gutenberg/",
+		"format:js": "prettier --write \"assets/**/*.js\" \"gutenberg/**/*.js\"",
 		"format:php": "wp-env run --env-cwd='wp-content/plugins/visual-portfolio' cli composer run-script format",
 		"make-pot": "composer wp -- i18n make-pot ./ ./languages/visual-portfolio.pot --skip-audit --exclude=vendor,vendors,node_modules,build,dist-zip --headers='{\"Last-Translator\":\"Visual Portfolio\",\"Report-Msgid-Bugs-To\":\"https://github.com/nk-crew/visual-portfolio/issues\"}'",
 		"make-json": "node make-pot.js ./languages/visual-portfolio.pot ./languages/visual-portfolio.json --domain=visual-portfolio --pretty",

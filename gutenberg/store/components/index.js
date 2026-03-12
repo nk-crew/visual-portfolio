@@ -2,11 +2,11 @@ import { createReduxStore, register } from '@wordpress/data';
 
 import * as selectors from './selectors';
 
-const store = createReduxStore('visual-portfolio/components', {
+const store = createReduxStore( 'visual-portfolio/components', {
 	selectors,
-	reducer(state) {
+	reducer( state ) {
 		return state;
 	},
-});
+} );
 
-register(store);
+register( store );

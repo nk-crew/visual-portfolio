@@ -9,7 +9,10 @@ import {
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function PaginationPreviousEdit({ attributes, setAttributes }) {
+export default function PaginationPreviousEdit( {
+	attributes,
+	setAttributes,
+} ) {
 	const { label, showLabel, showArrow } = attributes;
 
 	return (
@@ -17,54 +20,54 @@ export default function PaginationPreviousEdit({ attributes, setAttributes }) {
 			<InspectorControls>
 				<PanelBody>
 					<ToggleControl
-						label={__('Show label text', 'visual-portfolio')}
-						checked={showLabel}
-						onChange={() =>
-							setAttributes({ showLabel: !showLabel })
+						label={ __( 'Show label text', 'visual-portfolio' ) }
+						checked={ showLabel }
+						onChange={ () =>
+							setAttributes( { showLabel: ! showLabel } )
 						}
-						disabled={!showArrow && showLabel}
+						disabled={ ! showArrow && showLabel }
 					/>
 					<ToggleControl
-						label={__('Show arrow', 'visual-portfolio')}
-						checked={showArrow}
-						onChange={() =>
-							setAttributes({ showArrow: !showArrow })
+						label={ __( 'Show arrow', 'visual-portfolio' ) }
+						checked={ showArrow }
+						onChange={ () =>
+							setAttributes( { showArrow: ! showArrow } )
 						}
-						disabled={!showLabel && showArrow}
+						disabled={ ! showLabel && showArrow }
 					/>
 				</PanelBody>
 			</InspectorControls>
 
 			<a
 				href="#pagination-previous-pseudo-link"
-				onClick={(event) => event.preventDefault()}
-				{...useBlockProps({
+				onClick={ ( event ) => event.preventDefault() }
+				{ ...useBlockProps( {
 					className: 'vp-block-pagination-previous',
-				})}
+				} ) }
 			>
-				{showArrow && (
+				{ showArrow && (
 					<span
 						className="vp-block-pagination-previous-arrow"
 						aria-hidden
 					>
 						&lsaquo;
 					</span>
-				)}
-				{showLabel && (
+				) }
+				{ showLabel && (
 					<PlainText
-						__experimentalVersion={2}
+						__experimentalVersion={ 2 }
 						tagName="span"
-						aria-label={__(
+						aria-label={ __(
 							'Previous page link',
 							'visual-portfolio'
-						)}
-						placeholder={__('Previous', 'visual-portfolio')}
-						value={label}
-						onChange={(newLabel) =>
-							setAttributes({ label: newLabel })
+						) }
+						placeholder={ __( 'Previous', 'visual-portfolio' ) }
+						value={ label }
+						onChange={ ( newLabel ) =>
+							setAttributes( { label: newLabel } )
 						}
 					/>
-				)}
+				) }
 			</a>
 		</>
 	);

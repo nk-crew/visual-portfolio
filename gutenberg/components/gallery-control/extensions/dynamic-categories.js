@@ -8,9 +8,9 @@ import getAllCategories from '../utils/get-all-categories';
 addFilter(
 	'vpf.editor.controls-render-data',
 	'vpf/editor/controls-render-data/images-categories-suggestions',
-	(data) => {
-		if (data.name === 'images') {
-			const categories = getAllCategories(data.attributes.images);
+	( data ) => {
+		if ( data.name === 'images' ) {
+			const categories = getAllCategories( data.attributes.images );
 
 			if (
 				categories.length &&
@@ -19,10 +19,10 @@ addFilter(
 				data.image_controls.categories.options
 			) {
 				data.image_controls.categories.options = categories.map(
-					(val) => ({
+					( val ) => ( {
 						label: val,
 						value: val,
-					})
+					} )
 				);
 			}
 		}

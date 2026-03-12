@@ -5,69 +5,69 @@ export default {
 		// Transform from default Gallery block.
 		{
 			type: 'block',
-			blocks: ['core/gallery'],
-			isMatch(attributes, blockData) {
+			blocks: [ 'core/gallery' ],
+			isMatch( attributes, blockData ) {
 				return (
-					(blockData &&
+					( blockData &&
 						blockData.innerBlocks &&
-						blockData.innerBlocks.length) ||
-					(attributes &&
+						blockData.innerBlocks.length ) ||
+					( attributes &&
 						attributes.images &&
-						attributes.images.length)
+						attributes.images.length )
 				);
 			},
-			transform(attributes, innerBlocks) {
+			transform( attributes, innerBlocks ) {
 				const { className } = attributes;
 
 				// New gallery since WordPress 5.9
 				const isNewGallery = innerBlocks && innerBlocks.length;
 				let images = [];
 
-				if (isNewGallery) {
-					images = innerBlocks.map((img) => ({
-						id: parseInt(img.attributes.id, 10),
+				if ( isNewGallery ) {
+					images = innerBlocks.map( ( img ) => ( {
+						id: parseInt( img.attributes.id, 10 ),
 						imgUrl: img.attributes.url,
 						imgThumbnailUrl: img.attributes.url,
 						title: img.attributes.caption,
 						url:
-							(img.attributes.linkDestination === 'custom' ||
+							( img.attributes.linkDestination === 'custom' ||
 								img.attributes.linkDestination ===
-									'attachment') &&
+									'attachment' ) &&
 							img.attributes.href
 								? img.attributes.href
 								: '',
-					}));
+					} ) );
 				} else {
-					images = attributes.images.map((img) => ({
-						id: parseInt(img.id, 10),
+					images = attributes.images.map( ( img ) => ( {
+						id: parseInt( img.id, 10 ),
 						imgUrl: img.fullUrl,
 						imgThumbnailUrl: img.url,
 						title: img.caption,
-					}));
+					} ) );
 				}
 
-				return createBlock('visual-portfolio/block', {
+				return createBlock( 'visual-portfolio/block', {
 					setup_wizard: 'false',
 					content_source: 'images',
 					items_count: -1,
 					layout: 'masonry',
 					items_style_fly__align: 'bottom-center',
-					masonry_columns: parseInt(attributes.columns, 10) || 3,
+					masonry_columns: parseInt( attributes.columns, 10 ) || 3,
 					items_click_action:
-						attributes.linkTo === 'none' && !isNewGallery
+						attributes.linkTo === 'none' && ! isNewGallery
 							? 'false'
 							: 'url',
 					images,
 					className,
-				});
+				} );
 			},
 		},
 
 		// Transform from default Latest Posts block.
 		{
 			type: 'block',
-			blocks: ['core/latest-posts'],
-			transform(attributes) {
+			blocks: [ 'core/latest-posts' ],
+			transform( attributes ) {
 				const {
 					className,
 					postLayout,
@@ -82,12 +82,12 @@ export default {
 					categories,
 				} = attributes;
 
-				return createBlock('visual-portfolio/block', {
+				return createBlock( 'visual-portfolio/block', {
 					content_source: 'post-based',
 					posts_source: 'post',
 					posts_order_by: orderBy,
 					posts_order_direction: order,
-					posts_taxonomies: categories ? [categories] : false,
+					posts_taxonomies: categories ? [ categories ] : false,
 					items_count: postsToShow,
 					layout: 'grid',
 					grid_columns: postLayout === 'grid' ? columns : 1,
@@ -106,7 +106,7 @@ export default {
 						? 'true'
 						: 'false',
 					className,
-				});
+				} );
 			},
 		},
 	],

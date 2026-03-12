@@ -7,10 +7,12 @@ import { __ } from '@wordpress/i18n';
 
 export default function Edit() {
 	return (
-		<div {...useBlockProps({ className: 'vp-block-sort' })}>
+		<div { ...useBlockProps( { className: 'vp-block-sort' } ) }>
 			<Disabled>
 				<select>
-					<option>{__('Default sorting', 'visual-portfolio')}</option>
+					<option>
+						{ __( 'Default sorting', 'visual-portfolio' ) }
+					</option>
 				</select>
 			</Disabled>
 		</div>

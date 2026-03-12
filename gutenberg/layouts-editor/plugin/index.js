@@ -14,19 +14,19 @@ function UpdateEditor() {
 		blocks,
 		postId,
 		blockData,
-	} = useSelect((select) => {
+	} = useSelect( ( select ) => {
 		const {
 			isSavingPost: checkIsSavingPost,
 			isAutosavingPost: checkIsAutosavingPost,
 			getCurrentPostId,
 			getEditorSettings,
-		} = select('core/editor');
+		} = select( 'core/editor' );
 
-		const { getSelectedBlock, getBlocks } = select('core/block-editor');
+		const { getSelectedBlock, getBlocks } = select( 'core/block-editor' );
 
-		const { getEditorMode } = select('core/edit-post');
+		const { getEditorMode } = select( 'core/edit-post' );
 
-		const { getBlockData } = select('visual-portfolio/saved-layout-data');
+		const { getBlockData } = select( 'visual-portfolio/saved-layout-data' );
 
 		return {
 			isSavingPost: checkIsSavingPost(),
@@ -38,51 +38,51 @@ function UpdateEditor() {
 			postId: getCurrentPostId(),
 			blockData: getBlockData(),
 		};
-	}, []);
+	}, [] );
 
 	const { selectBlock, insertBlocks, resetBlocks } =
-		useDispatch('core/block-editor');
-	const { editPost } = useDispatch('core/editor');
-	const { switchEditorMode } = useDispatch('core/edit-post');
+		useDispatch( 'core/block-editor' );
+	const { editPost } = useDispatch( 'core/editor' );
+	const { switchEditorMode } = useDispatch( 'core/edit-post' );
 
 	/**
 	 * Force change gutenberg edit mode to Visual.
 	 */
-	useEffect(() => {
-		if (editorSettings.richEditingEnabled && editorMode === 'text') {
+	useEffect( () => {
+		if ( editorSettings.richEditingEnabled && editorMode === 'text' ) {
 			switchEditorMode();
 		}
-	}, [editorSettings, editorMode, switchEditorMode]);
+	}, [ editorSettings, editorMode, switchEditorMode ] );
 
 	/**
 	 * Add default block to post if doesn't exist.
 	 */
-	const blocksRestoreBusy = useRef(false);
-	useEffect(() => {
-		if (blocksRestoreBusy.current) {
+	const blocksRestoreBusy = useRef( false );
+	useEffect( () => {
+		if ( blocksRestoreBusy.current ) {
 			return;
 		}
 
 		const isValidList =
 			blocks.length === 1 &&
-			blocks[0] &&
-			blocks[0].name === 'visual-portfolio/saved-editor';
+			blocks[ 0 ] &&
+			blocks[ 0 ].name === 'visual-portfolio/saved-editor';
 
-		if (!isValidList) {
+		if ( ! isValidList ) {
 			blocksRestoreBusy.current = true;
-			resetBlocks([]);
-			insertBlocks(createBlock('visual-portfolio/saved-editor'));
+			resetBlocks( [] );
+			insertBlocks( createBlock( 'visual-portfolio/saved-editor' ) );
 			blocksRestoreBusy.current = false;
 		}
-	}, [blocks, blocksRestoreBusy, resetBlocks, insertBlocks]);
+	}, [ blocks, blocksRestoreBusy, resetBlocks, insertBlocks ] );
 
 	/**
 	 * Always select block.
 	 * TODO: we actually should check the title block selected inside iframe
 	 */
-	const isBlockSelected = useRef(false);
-	useEffect(() => {
-		if (isBlockSelected.current) {
+	const isBlockSelected = useRef( false );
+	useEffect( () => {
+		if ( isBlockSelected.current ) {
 			return;
 		}
 
@@ -105,79 +105,79 @@ function UpdateEditor() {
 		}
 
 		let selectBlockId = '';
-		blocks.forEach((thisBlock) => {
-			if (thisBlock.name === 'visual-portfolio/saved-editor') {
+		blocks.forEach( ( thisBlock ) => {
+			if ( thisBlock.name === 'visual-portfolio/saved-editor' ) {
 				selectBlockId = thisBlock.clientId;
 			}
-		});
+		} );
 
-		if (selectBlockId) {
-			selectBlock(selectBlockId);
+		if ( selectBlockId ) {
+			selectBlock( selectBlockId );
 		}
-	}, [selectedBlock, blocks, selectBlock]);
+	}, [ selectedBlock, blocks, selectBlock ] );
 
 	/**
 	 * Check if post meta data edited and allow to update the post.
 	 */
-	const defaultBlockData = useRef(false);
-	const editorRefreshTimeout = useRef(false);
-	useEffect(() => {
-		if (!blockData || !Object.keys(blockData).length) {
+	const defaultBlockData = useRef( false );
+	const editorRefreshTimeout = useRef( false );
+	useEffect( () => {
+		if ( ! blockData || ! Object.keys( blockData ).length ) {
 			return;
 		}
 
-		if (isSavingPost || isAutosavingPost || !defaultBlockData.current) {
-			defaultBlockData.current = JSON.stringify(blockData);
+		if ( isSavingPost || isAutosavingPost || ! defaultBlockData.current ) {
+			defaultBlockData.current = JSON.stringify( blockData );
 			return;
 		}
 
-		clearTimeout(editorRefreshTimeout.current);
-		editorRefreshTimeout.current = setTimeout(() => {
-			if (defaultBlockData.current !== JSON.stringify(blockData)) {
-				editPost({ edited: new Date() });
+		clearTimeout( editorRefreshTimeout.current );
+		editorRefreshTimeout.current = setTimeout( () => {
+			if ( defaultBlockData.current !== JSON.stringify( blockData ) ) {
+				editPost( { edited: new Date() } );
 			}
-		}, 150);
-	}, [isSavingPost, isAutosavingPost, blockData, editPost]);
+		}, 150 );
+	}, [ isSavingPost, isAutosavingPost, blockData, editPost ] );
 
 	/**
 	 * Save meta data on post save.
 	 */
-	const wasSavingPost = useRef(false);
-	const wasAutosavingPost = useRef(false);
-	useEffect(() => {
+	const wasSavingPost = useRef( false );
+	const wasAutosavingPost = useRef( false );
+	useEffect( () => {
 		const shouldUpdate =
 			wasSavingPost.current &&
-			!isSavingPost &&
-			!wasAutosavingPost.current;
+			! isSavingPost &&
+			! wasAutosavingPost.current;
 
 		// Save current state for next inspection.
 		wasSavingPost.current = isSavingPost;
 		wasAutosavingPost.current = isAutosavingPost;
 
-		if (shouldUpdate) {
+		if ( shouldUpdate ) {
 			const prefixedBlockData = {};
 
-			Object.keys(blockData).forEach((name) => {
-				prefixedBlockData[`vp_${name}`] = blockData[name];
-			});
+			Object.keys( blockData ).forEach( ( name ) => {
+				prefixedBlockData[ `vp_${ name }` ] = blockData[ name ];
+			} );
 
-			apiFetch({
+			apiFetch( {
 				path: '/visual-portfolio/v1/update_layout/',
 				method: 'POST',
 				data: {
 					data: prefixedBlockData,
 					post_id: postId,
 				},
-			}).catch((response) => {
+			} ).catch( ( response ) => {
 				// eslint-disable-next-line no-console
-				console.log(response);
-			});
+				console.log( response );
+			} );
 		}
-	}, [isSavingPost, isAutosavingPost, postId, blockData]);
+	}, [ isSavingPost, isAutosavingPost, postId, blockData ] );
 
 	return null;
 }
 
-registerPlugin('vpf-saved-layouts-editor', {
+registerPlugin( 'vpf-saved-layouts-editor', {
 	render: UpdateEditor,
-});
+} );

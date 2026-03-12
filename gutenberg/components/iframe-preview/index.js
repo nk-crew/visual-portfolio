@@ -23,15 +23,18 @@ const {
 
 let uniqueIdCount = 1;
 
-function getUpdatedKeys(oldData, newData) {
-	const keys = uniq([...Object.keys(oldData), ...Object.keys(newData)]);
+function getUpdatedKeys( oldData, newData ) {
+	const keys = uniq( [
+		...Object.keys( oldData ),
+		...Object.keys( newData ),
+	] );
 	const changedKeys = [];
 
-	keys.forEach((k) => {
-		if (!isEqual(oldData[k], newData[k])) {
-			changedKeys.push(k);
+	keys.forEach( ( k ) => {
+		if ( ! isEqual( oldData[ k ], newData[ k ] ) ) {
+			changedKeys.push( k );
 		}
-	});
+	} );
 
 	return changedKeys;
 }
@@ -40,12 +43,12 @@ function getUpdatedKeys(oldData, newData) {
  * Component Class
  */
 class IframePreview extends Component {
-	constructor(...args) {
-		super(...args);
+	constructor( ...args ) {
+		super( ...args );
 
 		this.state = {
 			loading: true,
-			uniqueId: `vpf-preview-${uniqueIdCount}`,
+			uniqueId: `vpf-preview-${ uniqueIdCount }`,
 			currentIframeHeight: 0,
 			latestIframeHeight: 0,
 			blockPosition: null,
@@ -56,28 +59,29 @@ class IframePreview extends Component {
 		this.frameRef = createRef();
 		this.formRef = createRef();
 
-		this.maybePreviewTypeChanged = this.maybePreviewTypeChanged.bind(this);
-		this.maybeAttributesChanged = this.maybeAttributesChanged.bind(this);
-		this.onFrameLoad = this.onFrameLoad.bind(this);
-		this.maybeReload = this.maybeReload.bind(this);
+		this.maybePreviewTypeChanged =
+			this.maybePreviewTypeChanged.bind( this );
+		this.maybeAttributesChanged = this.maybeAttributesChanged.bind( this );
+		this.onFrameLoad = this.onFrameLoad.bind( this );
+		this.maybeReload = this.maybeReload.bind( this );
 		this.maybeReloadDebounce = debounce(
 			300,
-			rafSchd(this.maybeReload.bind(this))
+			rafSchd( this.maybeReload.bind( this ) )
 		);
-		this.maybeResizePreviews = this.maybeResizePreviews.bind(this);
+		this.maybeResizePreviews = this.maybeResizePreviews.bind( this );
 		this.maybeResizePreviewsThrottle = throttle(
 			100,
-			rafSchd(this.maybeResizePreviews)
+			rafSchd( this.maybeResizePreviews )
 		);
-		this.updateIframeHeight = this.updateIframeHeight.bind(this);
+		this.updateIframeHeight = this.updateIframeHeight.bind( this );
 
 		this.updateIframeHeightThrottle = throttle(
 			100,
-			rafSchd(this.updateIframeHeight)
+			rafSchd( this.updateIframeHeight )
 		);
-		this.printInput = this.printInput.bind(this);
+		this.printInput = this.printInput.bind( this );
 
-		this.trackBlockPosition = this.trackBlockPosition.bind(this);
+		this.trackBlockPosition = this.trackBlockPosition.bind( this );
 	}
 
 	componentDidMount() {
@@ -86,56 +90,59 @@ class IframePreview extends Component {
 		const { clientId } = self.props;
 
 		// Set initial block position
-		this.setState({
-			blockPosition: this.getBlockPosition(clientId),
-		});
+		this.setState( {
+			blockPosition: this.getBlockPosition( clientId ),
+		} );
 
 		// Subscribe to block position changes
-		this.unsubscribe = subscribe(() => {
-			this.trackBlockPosition(clientId);
-		});
+		this.unsubscribe = subscribe( () => {
+			this.trackBlockPosition( clientId );
+		} );
 
 		iframeResizer(
 			{
 				interval: 10,
 				warningTimeout: 60000,
 				checkOrigin: false,
-				onMessage({ message }) {
+				onMessage( { message } ) {
 					// select current block on click message.
-					if (message === 'clicked') {
-						dispatch('core/block-editor').selectBlock(clientId);
+					if ( message === 'clicked' ) {
+						dispatch( 'core/block-editor' ).selectBlock( clientId );
 
 						window.focus();
 					}
 				},
-				onResized({ height }) {
-					self.updateIframeHeightThrottle(`${height}px`);
+				onResized( { height } ) {
+					self.updateIframeHeightThrottle( `${ height }px` );
 				},
 			},
 			self.frameRef.current
 		);
 
-		self.frameRef.current.addEventListener('load', self.onFrameLoad);
-		window.addEventListener('resize', self.maybeResizePreviewsThrottle);
+		self.frameRef.current.addEventListener( 'load', self.onFrameLoad );
+		window.addEventListener( 'resize', self.maybeResizePreviewsThrottle );
 
 		self.maybeReload();
 	}
 
-	componentDidUpdate(prevProps) {
-		this.maybePreviewTypeChanged(prevProps);
-		this.maybeAttributesChanged(prevProps);
+	componentDidUpdate( prevProps ) {
+		this.maybePreviewTypeChanged( prevProps );
+		this.maybeAttributesChanged( prevProps );
 	}
 
 	componentWillUnmount() {
 		// Unsubscribe from block position tracking
-		if (this.unsubscribe) {
+		if ( this.unsubscribe ) {
 			this.unsubscribe();
 		}
 
-		this.frameRef.current.removeEventListener('load', this.onFrameLoad);
-		window.removeEventListener('resize', this.maybeResizePreviewsThrottle);
+		this.frameRef.current.removeEventListener( 'load', this.onFrameLoad );
+		window.removeEventListener(
+			'resize',
+			this.maybeResizePreviewsThrottle
+		);
 
-		if (this.frameRef.current.iframeResizer) {
+		if ( this.frameRef.current.iframeResizer ) {
 			this.frameRef.current.iframeResizer.close();
 			this.frameRef.current.iframeResizer.removeListeners();
 		}
@@ -146,38 +153,38 @@ class IframePreview extends Component {
 	 *
 	 * @param {Object} e - event data.
 	 */
-	onFrameLoad(e) {
+	onFrameLoad( e ) {
 		this.frameWindow = e.target.contentWindow;
 		this.frameJQuery = e.target.contentWindow.jQuery;
 
-		if (this.frameJQuery) {
-			this.$framePortfolio = this.frameJQuery('.vp-portfolio');
+		if ( this.frameJQuery ) {
+			this.$framePortfolio = this.frameJQuery( '.vp-portfolio' );
 
 			this.maybeResizePreviews();
 
-			if (this.frameTimeout) {
-				clearTimeout(this.frameTimeout);
+			if ( this.frameTimeout ) {
+				clearTimeout( this.frameTimeout );
 			}
 
 			// We need this timeout, since we resize iframe size and layouts resized with transitions.
-			this.frameTimeout = setTimeout(() => {
-				this.setState({
+			this.frameTimeout = setTimeout( () => {
+				this.setState( {
 					loading: false,
-				});
-			}, 300);
+				} );
+			}, 300 );
 		}
 	}
 
-	maybePreviewTypeChanged(prevProps) {
-		if (prevProps.previewDeviceType === this.props.previewDeviceType) {
+	maybePreviewTypeChanged( prevProps ) {
+		if ( prevProps.previewDeviceType === this.props.previewDeviceType ) {
 			return;
 		}
 
 		this.maybeResizePreviews();
 	}
 
-	maybeAttributesChanged(prevProps) {
-		if (this.busyReload) {
+	maybeAttributesChanged( prevProps ) {
+		if ( this.busyReload ) {
 			return;
 		}
 		this.busyReload = true;
@@ -186,29 +193,33 @@ class IframePreview extends Component {
 
 		const newContext = this.props.context
 			? Object.fromEntries(
-					Object.entries(this.props.context).map(([key, value]) => [
-						key.replace('vp/', ''),
-						value,
-					])
-				)
+					Object.entries( this.props.context ).map(
+						( [ key, value ] ) => [
+							key.replace( 'vp/', '' ),
+							value,
+						]
+					)
+			  )
 			: {};
 		const oldContext = prevProps.context
 			? Object.fromEntries(
-					Object.entries(prevProps.context).map(([key, value]) => [
-						key.replace('vp/', ''),
-						value,
-					])
-				)
+					Object.entries( prevProps.context ).map(
+						( [ key, value ] ) => [
+							key.replace( 'vp/', '' ),
+							value,
+						]
+					)
+			  )
 			: {};
 
 		const newAttributes = {
 			...this.props.attributes,
-			...convertModernToLegacy(newContext),
+			...convertModernToLegacy( newContext ),
 		};
 
 		const oldAttributes = {
 			...prevProps.attributes,
-			...convertModernToLegacy(oldContext),
+			...convertModernToLegacy( oldContext ),
 		};
 
 		const changedAttributes = {};
@@ -218,54 +229,57 @@ class IframePreview extends Component {
 		);
 
 		// check changed attributes
-		changedAttributeKeys.forEach((name) => {
-			if (typeof newAttributes[name] !== 'undefined') {
-				changedAttributes[name] = newAttributes[name];
+		changedAttributeKeys.forEach( ( name ) => {
+			if ( typeof newAttributes[ name ] !== 'undefined' ) {
+				changedAttributes[ name ] = newAttributes[ name ];
 			}
-		});
+		} );
 
-		if (Object.keys(changedAttributes).length) {
+		if ( Object.keys( changedAttributes ).length ) {
 			let reload = false;
 
-			Object.keys(changedAttributes).forEach((name) => {
+			Object.keys( changedAttributes ).forEach( ( name ) => {
 				// Don't reload if block has dynamic styles.
-				const hasStyles = hasDynamicCSS(name);
+				const hasStyles = hasDynamicCSS( name );
 
 				// Don't reload if reloading disabled in control attributes.
 				const hasReloadAttribute =
-					registeredControls[name] &&
-					registeredControls[name].reload_iframe;
+					registeredControls[ name ] &&
+					registeredControls[ name ].reload_iframe;
 
-				reload = reload || (!hasStyles && hasReloadAttribute);
-			});
+				reload = reload || ( ! hasStyles && hasReloadAttribute );
+			} );
 
-			const data = applyFilters('vpf.editor.changed-attributes', {
+			const data = applyFilters( 'vpf.editor.changed-attributes', {
 				attributes: changedAttributes,
 				reload,
 				$frame: this.frameRef.current,
 				frameWindow: this.frameWindow,
 				frameJQuery: this.frameJQuery,
 				$framePortfolio: this.$framePortfolio,
-			});
+			} );
 
-			if (!data.reload) {
+			if ( ! data.reload ) {
 				// Update AJAX dynamic data.
-				if (data.frameWindow && data.frameWindow.vp_preview_post_data) {
-					data.frameWindow.vp_preview_post_data[data.name] =
+				if (
+					data.frameWindow &&
+					data.frameWindow.vp_preview_post_data
+				) {
+					data.frameWindow.vp_preview_post_data[ data.name ] =
 						data.value;
 				}
 
 				// Insert dynamic CSS.
-				if (frame.iFrameResizer && newAttributes.block_id) {
-					frame.iFrameResizer.sendMessage({
+				if ( frame.iFrameResizer && newAttributes.block_id ) {
+					frame.iFrameResizer.sendMessage( {
 						name: 'dynamic-css',
 						blockId: newAttributes.block_id,
-						styles: getDynamicCSS(newAttributes),
-					});
+						styles: getDynamicCSS( newAttributes ),
+					} );
 				}
 			}
 
-			if (data.reload) {
+			if ( data.reload ) {
 				this.maybeReloadDebounce();
 			}
 			this.busyReload = false;
@@ -275,17 +289,17 @@ class IframePreview extends Component {
 	}
 
 	// Add new methods to track block position
-	getBlockPosition(clientId) {
+	getBlockPosition( clientId ) {
 		const { getBlockIndex, getBlockRootClientId } =
-			select('core/block-editor');
-		const rootClientId = getBlockRootClientId(clientId);
-		return getBlockIndex(clientId, rootClientId);
+			select( 'core/block-editor' );
+		const rootClientId = getBlockRootClientId( clientId );
+		return getBlockIndex( clientId, rootClientId );
 	}
 
-	trackBlockPosition(clientId) {
-		const newPosition = this.getBlockPosition(clientId);
+	trackBlockPosition( clientId ) {
+		const newPosition = this.getBlockPosition( clientId );
 
-		if (this.state.blockPosition !== newPosition) {
+		if ( this.state.blockPosition !== newPosition ) {
 			this.setState(
 				{
 					blockPosition: newPosition,
@@ -293,9 +307,9 @@ class IframePreview extends Component {
 				},
 				() => {
 					// Reload the iframe with a slight delay to ensure DOM is updated
-					setTimeout(() => {
+					setTimeout( () => {
 						this.maybeReload();
-					}, 100);
+					}, 100 );
 				}
 			);
 		}
@@ -304,7 +318,7 @@ class IframePreview extends Component {
 	maybeReload() {
 		let latestIframeHeight = 0;
 
-		if (this.frameRef.current) {
+		if ( this.frameRef.current ) {
 			latestIframeHeight = this.state.currentIframeHeight;
 		}
 
@@ -314,7 +328,7 @@ class IframePreview extends Component {
 				latestIframeHeight,
 			},
 			() => {
-				if (this.formRef.current) {
+				if ( this.formRef.current ) {
 					this.formRef.current.submit();
 				}
 			}
@@ -328,28 +342,28 @@ class IframePreview extends Component {
 		const contentWidth = $(
 			'.editor-styles-wrapper, .edit-post-visual-editor__content-area'
 		)
-			.eq(0)
+			.eq( 0 )
 			.width();
 
-		if (!contentWidth || !this.frameRef.current) {
+		if ( ! contentWidth || ! this.frameRef.current ) {
 			return;
 		}
 
 		const frame = this.frameRef.current;
-		const $frame = $(frame);
+		const $frame = $( frame );
 		const parentWidth = $frame
-			.closest('.visual-portfolio-gutenberg-preview')
+			.closest( '.visual-portfolio-gutenberg-preview' )
 			.width();
 
-		$frame.css({
+		$frame.css( {
 			width: contentWidth,
-		});
+		} );
 
-		if (frame.iFrameResizer) {
-			frame.iFrameResizer.sendMessage({
+		if ( frame.iFrameResizer ) {
+			frame.iFrameResizer.sendMessage( {
 				name: 'resize',
 				width: parentWidth,
-			});
+			} );
 			frame.iFrameResizer.resize();
 		}
 	}
@@ -359,10 +373,10 @@ class IframePreview extends Component {
 	 *
 	 * @param newHeight
 	 */
-	updateIframeHeight(newHeight) {
-		this.setState({
+	updateIframeHeight( newHeight ) {
+		this.setState( {
 			currentIframeHeight: newHeight,
-		});
+		} );
 	}
 
 	/**
@@ -373,7 +387,7 @@ class IframePreview extends Component {
 	 *
 	 * @return {JSX} - form control.
 	 */
-	printInput(name, val) {
+	printInput( name, val ) {
 		const params = {
 			type: 'text',
 			name,
@@ -381,26 +395,26 @@ class IframePreview extends Component {
 			readOnly: true,
 		};
 
-		if (typeof val === 'number') {
+		if ( typeof val === 'number' ) {
 			params.type = 'number';
-		} else if (typeof val === 'boolean') {
+		} else if ( typeof val === 'boolean' ) {
 			params.type = 'number';
 			params.value = val ? 1 : 0;
-		} else if (typeof val === 'object' && val !== null) {
+		} else if ( typeof val === 'object' && val !== null ) {
 			return (
 				<>
-					{Object.keys(val).map((i) => (
-						<Fragment key={`${name}[${i}]`}>
-							{this.printInput(`${name}[${i}]`, val[i])}
+					{ Object.keys( val ).map( ( i ) => (
+						<Fragment key={ `${ name }[${ i }]` }>
+							{ this.printInput( `${ name }[${ i }]`, val[ i ] ) }
 						</Fragment>
-					))}
+					) ) }
 				</>
 			);
 		} else {
 			params.value = params.value || '';
 		}
 
-		return <input {...params} />;
+		return <input { ...params } />;
 	}
 
 	render() {
@@ -413,52 +427,51 @@ class IframePreview extends Component {
 		const formData = {};
 		let contextAttributes = {};
 
-		if (context) {
+		if ( context ) {
 			// Then override with context values (they take priority)
-			Object.entries(context).forEach(([key, value]) => {
-				if (key.startsWith('vp/')) {
-					const formKey = `vp_${key.replace('vp/', '')}`;
-					formData[formKey] = value;
+			Object.entries( context ).forEach( ( [ key, value ] ) => {
+				if ( key.startsWith( 'vp/' ) ) {
+					const formKey = `vp_${ key.replace( 'vp/', '' ) }`;
+					formData[ formKey ] = value;
 				}
-			});
+			} );
 
 			contextAttributes = Object.fromEntries(
-				Object.entries(this.props.context).map(([key, value]) => [
-					key.replace('vp/', ''),
-					value,
-				])
+				Object.entries( this.props.context ).map(
+					( [ key, value ] ) => [ key.replace( 'vp/', '' ), value ]
+				)
 			);
 		}
 
 		const attributes = {
 			...this.props.attributes,
-			...convertModernToLegacy(contextAttributes),
+			...convertModernToLegacy( contextAttributes ),
 		};
 
 		const { id, content_source: contentSource } = attributes;
 
 		// Convert attributes for form submission.
-		Object.keys(attributes).forEach((key) => {
-			formData[`vp_${key}`] = attributes[key];
-		});
+		Object.keys( attributes ).forEach( ( key ) => {
+			formData[ `vp_${ key }` ] = attributes[ key ];
+		} );
 
 		return (
 			<div
-				className={classnames(
+				className={ classnames(
 					'visual-portfolio-gutenberg-preview',
 					loading ? 'visual-portfolio-gutenberg-preview-loading' : ''
-				)}
-				style={{
+				) }
+				style={ {
 					height: loading ? latestIframeHeight : currentIframeHeight,
-				}}
+				} }
 			>
 				<div className="visual-portfolio-gutenberg-preview-inner">
 					<form
-						action={variables.preview_url}
-						target={uniqueId}
+						action={ variables.preview_url }
+						target={ uniqueId }
 						method="POST"
-						style={{ display: 'none' }}
-						ref={this.formRef}
+						style={ { display: 'none' } }
+						ref={ this.formRef }
 					>
 						<input
 							type="hidden"
@@ -475,63 +488,63 @@ class IframePreview extends Component {
 						<input
 							type="hidden"
 							name="vp_preview_post_type"
-							value={postType}
+							value={ postType }
 							readOnly
 						/>
 						<input
 							type="hidden"
 							name="vp_preview_post_id"
-							value={postId}
+							value={ postId }
 							readOnly
 						/>
 						<input
 							type="hidden"
 							name="vp_preview_nonce"
-							value={variables.nonce}
+							value={ variables.nonce }
 							readOnly
 						/>
 
-						{contentSource === 'saved' ? (
+						{ contentSource === 'saved' ? (
 							<input
 								type="text"
 								name="vp_id"
-								value={id}
+								value={ id }
 								readOnly
 							/>
 						) : (
 							<>
-								{Object.entries(formData).map(
-									([key, value]) => (
-										<Fragment key={key}>
-											{this.printInput(key, value)}
+								{ Object.entries( formData ).map(
+									( [ key, value ] ) => (
+										<Fragment key={ key }>
+											{ this.printInput( key, value ) }
 										</Fragment>
 									)
-								)}
+								) }
 							</>
-						)}
+						) }
 					</form>
 					<iframe
 						title="vp-preview"
-						id={uniqueId}
-						name={uniqueId}
+						id={ uniqueId }
+						name={ uniqueId }
 						// eslint-disable-next-line react/no-unknown-property
 						allowtransparency="true"
-						ref={this.frameRef}
+						ref={ this.frameRef }
 					/>
 				</div>
-				{loading ? <Spinner /> : ''}
+				{ loading ? <Spinner /> : '' }
 			</div>
 		);
 	}
 }
 
-export default withSelect((selectEditor) => {
+export default withSelect( ( selectEditor ) => {
 	const {
 		getDeviceType,
 		getCurrentPost,
 		getBlockIndex,
 		getBlockRootClientId,
-	} = selectEditor('core/editor') || {};
+	} = selectEditor( 'core/editor' ) || {};
 	return {
 		previewDeviceType: getDeviceType ? getDeviceType() : 'desktop',
 		postType: getCurrentPost ? getCurrentPost().type : 'standard',
@@ -539,4 +552,4 @@ export default withSelect((selectEditor) => {
 		getBlockIndex,
 		getBlockRootClientId,
 	};
-})(IframePreview);
+} )( IframePreview );

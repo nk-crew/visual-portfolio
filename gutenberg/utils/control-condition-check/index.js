@@ -9,10 +9,10 @@ import controlGetValue from '../control-get-value';
  *
  * @return {boolean}
  */
-function compare(left, operator, right) {
+function compare( left, operator, right ) {
 	let checkResult = true;
 
-	switch (operator) {
+	switch ( operator ) {
 		case '==':
 			// eslint-disable-next-line eqeqeq
 			checkResult = left == right;
@@ -28,7 +28,7 @@ function compare(left, operator, right) {
 			checkResult = left !== right;
 			break;
 		case '*=':
-			checkResult = left.indexOf(right) !== -1;
+			checkResult = left.indexOf( right ) !== -1;
 			break;
 		case '>=':
 			checkResult = left >= right;
@@ -78,33 +78,37 @@ export default function conditionCheck(
 
 	const childRelation = result ? 'OR' : 'AND';
 
-	condition.forEach((data) => {
-		if (Array.isArray(data) && !data.control) {
+	condition.forEach( ( data ) => {
+		if ( Array.isArray( data ) && ! data.control ) {
 			result = compare(
 				result,
 				relation,
-				conditionCheck(data, attributes, childRelation)
+				conditionCheck( data, attributes, childRelation )
 			);
-		} else if (data.control) {
-			let left = controlGetValue(data.control, attributes);
+		} else if ( data.control ) {
+			let left = controlGetValue( data.control, attributes );
 			const operator = data.operator || '==';
 			let right = typeof data.value !== 'undefined' ? data.value : 'true';
 
-			if (left === 'true') {
+			if ( left === 'true' ) {
 				left = true;
-			} else if (left === 'false') {
+			} else if ( left === 'false' ) {
 				left = false;
 			}
 
-			if (right === 'true') {
+			if ( right === 'true' ) {
 				right = true;
-			} else if (right === 'false') {
+			} else if ( right === 'false' ) {
 				right = false;
 			}
 
-			result = compare(result, relation, compare(left, operator, right));
+			result = compare(
+				result,
+				relation,
+				compare( left, operator, right )
+			);
 		}
-	});
+	} );
 
 	return result;
 }

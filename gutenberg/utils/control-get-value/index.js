@@ -7,54 +7,56 @@
  *
  * @return {Mixed} value.
  */
-export default function controlGetValue(name, attributes) {
-	let val = attributes[name];
+export default function controlGetValue( name, attributes ) {
+	let val = attributes[ name ];
 
 	// Parse arrays and objects.
 	// Example `images[3].format`.
-	if (typeof val === 'undefined' && /[\[\.]/g.test(name)) {
+	if ( typeof val === 'undefined' && /[\[\.]/g.test( name ) ) {
 		// Find parts, used for objects.
 		// Example `images.format`
-		const valObjectParts = name.split('.');
+		const valObjectParts = name.split( '.' );
 		const valParts = [];
 
-		if (valObjectParts && valObjectParts.length) {
+		if ( valObjectParts && valObjectParts.length ) {
 			// Find parts, used for arrays.
 			// Example `images[3]`
-			valObjectParts.forEach((objPart) => {
-				if (/[\[]/g.test(objPart)) {
-					const valArrayParts = objPart.split(/[\[\]]/g);
+			valObjectParts.forEach( ( objPart ) => {
+				if ( /[\[]/g.test( objPart ) ) {
+					const valArrayParts = objPart.split( /[\[\]]/g );
 
-					if (valArrayParts && valArrayParts.length) {
-						valArrayParts.forEach((arrPart) => {
-							if (arrPart !== '') {
-								if (`${parseInt(arrPart, 10)}` === arrPart) {
-									valParts.push(parseInt(arrPart, 10));
+					if ( valArrayParts && valArrayParts.length ) {
+						valArrayParts.forEach( ( arrPart ) => {
+							if ( arrPart !== '' ) {
+								if (
+									`${ parseInt( arrPart, 10 ) }` === arrPart
+								) {
+									valParts.push( parseInt( arrPart, 10 ) );
 								} else {
-									valParts.push(arrPart);
+									valParts.push( arrPart );
 								}
 							}
-						});
+						} );
 					}
 				} else {
-					valParts.push(objPart);
+					valParts.push( objPart );
 				}
-			});
+			} );
 
 			// Try to find value in attributes.
-			if (valParts.length) {
+			if ( valParts.length ) {
 				let currentVal = attributes;
 
-				valParts.forEach((partName) => {
+				valParts.forEach( ( partName ) => {
 					if (
 						currentVal &&
-						typeof currentVal[partName] !== 'undefined'
+						typeof currentVal[ partName ] !== 'undefined'
 					) {
-						currentVal = currentVal[partName];
+						currentVal = currentVal[ partName ];
 					} else {
 						currentVal = undefined;
 					}
-				});
+				} );
 
 				val = currentVal;
 			}

@@ -17,4 +17,4 @@ const settings = {
 	save,
 };
 
-registerBlockType(name, settings);
+registerBlockType( name, settings );

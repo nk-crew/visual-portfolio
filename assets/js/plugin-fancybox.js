@@ -2,21 +2,21 @@ import $ from 'jquery';
 
 const { VPData, VPPopupAPI } = window;
 const { __, settingsPopupGallery } = VPData;
-const $doc = $(document);
-const $window = $(window);
+const $doc = $( document );
+const $window = $( window );
 
-if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
+if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 	let fancyboxInstance;
 
 	// Extend Popup API.
 	VPPopupAPI.vendor = 'fancybox';
-	VPPopupAPI.open = function (items, index, self) {
+	VPPopupAPI.open = function ( items, index, self ) {
 		const finalItems = [];
 
 		// prepare items for fancybox api.
-		items.forEach((item) => {
-			if (item.type === 'embed' && item.src) {
-				finalItems.push({
+		items.forEach( ( item ) => {
+			if ( item.type === 'embed' && item.src ) {
+				finalItems.push( {
 					type: 'iframe',
 					src: item.src,
 					opts: {
@@ -24,9 +24,9 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 						height: item.height,
 						caption: item.caption,
 					},
-				});
-			} else if (item.type === 'embed' && item.embed) {
-				finalItems.push({
+				} );
+			} else if ( item.type === 'embed' && item.embed ) {
+				finalItems.push( {
 					type: 'html',
 					src: item.embed,
 					opts: {
@@ -34,9 +34,9 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 						height: item.height,
 						caption: item.caption,
 					},
-				});
+				} );
 			} else {
-				finalItems.push({
+				finalItems.push( {
 					type: 'image',
 					src: item.src,
 					el: item.el,
@@ -47,31 +47,31 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 						caption: item.caption,
 						thumb: item.srcSmall,
 					},
-				});
+				} );
 			}
-		});
+		} );
 
 		const buttons = [];
-		if (settingsPopupGallery.show_zoom_button) {
-			buttons.push('zoom');
+		if ( settingsPopupGallery.show_zoom_button ) {
+			buttons.push( 'zoom' );
 		}
-		if (settingsPopupGallery.show_fullscreen_button) {
-			buttons.push('fullScreen');
+		if ( settingsPopupGallery.show_fullscreen_button ) {
+			buttons.push( 'fullScreen' );
 		}
-		if (settingsPopupGallery.show_slideshow) {
-			buttons.push('slideShow');
+		if ( settingsPopupGallery.show_slideshow ) {
+			buttons.push( 'slideShow' );
 		}
-		if (settingsPopupGallery.show_thumbs) {
-			buttons.push('thumbs');
+		if ( settingsPopupGallery.show_thumbs ) {
+			buttons.push( 'thumbs' );
 		}
-		if (settingsPopupGallery.show_share_button) {
-			buttons.push('share');
+		if ( settingsPopupGallery.show_share_button ) {
+			buttons.push( 'share' );
 		}
-		if (settingsPopupGallery.show_download_button) {
-			buttons.push('download');
+		if ( settingsPopupGallery.show_download_button ) {
+			buttons.push( 'download' );
 		}
-		if (settingsPopupGallery.show_close_button) {
-			buttons.push('close');
+		if ( settingsPopupGallery.show_close_button ) {
+			buttons.push( 'close' );
 		}
 
 		// define options
@@ -115,12 +115,12 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 			wheel: false,
 
 			share: {
-				url(instance, item) {
+				url( instance, item ) {
 					return (
-						(!instance.currentHash &&
-						!(item.type === 'inline' || item.type === 'html')
+						( ! instance.currentHash &&
+						! ( item.type === 'inline' || item.type === 'html' )
 							? item.origSrc || item.src
-							: false) || window.location
+							: false ) || window.location
 					);
 				},
 				tpl:
@@ -145,7 +145,7 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 			},
 
 			// Clicked on the content
-			clickContent(current) {
+			clickContent( current ) {
 				return current.type === 'image' &&
 					settingsPopupGallery.click_to_zoom
 					? 'zoom'
@@ -170,51 +170,59 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 			},
 
 			beforeClose() {
-				const currentItemData = items[fancyboxInstance.currIndex];
+				const currentItemData = items[ fancyboxInstance.currIndex ];
 
-				if (currentItemData) {
-					VPPopupAPI.maybeFocusGalleryItem(currentItemData);
+				if ( currentItemData ) {
+					VPPopupAPI.maybeFocusGalleryItem( currentItemData );
 				}
 
 				VPPopupAPI.emitEvent(
 					'beforeCloseFancybox',
-					[options, items, fancyboxInstance],
+					[ options, items, fancyboxInstance ],
 					self
 				);
 
 				fancyboxInstance = false;
 			},
-			beforeShow(e, instance) {
-				VPPopupAPI.emitEvent('beforeShowFancybox', [e, instance], self);
+			beforeShow( e, instance ) {
+				VPPopupAPI.emitEvent(
+					'beforeShowFancybox',
+					[ e, instance ],
+					self
+				);
 			},
-			afterShow(e, instance) {
-				VPPopupAPI.emitEvent('afterShowFancybox', [e, instance], self);
+			afterShow( e, instance ) {
+				VPPopupAPI.emitEvent(
+					'afterShowFancybox',
+					[ e, instance ],
+					self
+				);
 			},
 		};
 
 		VPPopupAPI.emitEvent(
 			'beforeInitFancybox',
-			[options, finalItems, index],
+			[ options, finalItems, index ],
 			self
 		);
 
 		// Disable Loop if only 1 item in gallery.
 		// We need this because Fancybox still let us scroll gallery using keyboard.
-		if (items.length === 1) {
+		if ( items.length === 1 ) {
 			options.loop = false;
 		}
 
 		// Start new fancybox instance
-		fancyboxInstance = $.fancybox.open(finalItems, options, index);
+		fancyboxInstance = $.fancybox.open( finalItems, options, index );
 
 		VPPopupAPI.emitEvent(
 			'initFancybox',
-			[options, finalItems, index, fancyboxInstance],
+			[ options, finalItems, index, fancyboxInstance ],
 			self
 		);
 	};
 	VPPopupAPI.close = function () {
-		if (fancyboxInstance) {
+		if ( fancyboxInstance ) {
 			fancyboxInstance.close();
 			fancyboxInstance = false;
 		}
@@ -222,11 +230,13 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 
 	// Fix zoom image sizes attribute.
 	// https://wordpress.org/support/topic/blurry-zoom-images/
-	$doc.on('transitionend', '.fancybox-content', function () {
-		const $img = $(this).find('.fancybox-image[sizes]');
+	$doc.on( 'transitionend', '.fancybox-content', function () {
+		const $img = $( this ).find( '.fancybox-image[sizes]' );
 
-		const sizes = `${Math.round(100 * ($img.width() / $window.width()))}vw`;
+		const sizes = `${ Math.round(
+			100 * ( $img.width() / $window.width() )
+		) }vw`;
 
-		$img.attr('sizes', sizes);
-	});
+		$img.attr( 'sizes', sizes );
+	} );
 }

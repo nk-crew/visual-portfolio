@@ -1,8 +1,8 @@
-function reducer(state = { layouts: [] }, action = {}) {
-	switch (action.type) {
+function reducer( state = { layouts: [] }, action = {} ) {
+	switch ( action.type ) {
 		case 'SET_PORTFOLIO_LAYOUTS':
 			if (
-				!state.layouts.length &&
+				! state.layouts.length &&
 				action.layouts &&
 				action.layouts.length
 			) {

@@ -6,11 +6,11 @@ export default {
 			attributes: {
 				id: {
 					type: 'string',
-					shortcode: (data) => data.named.id,
+					shortcode: ( data ) => data.named.id,
 				},
 				className: {
 					type: 'string',
-					shortcode: (data) => data.named.class,
+					shortcode: ( data ) => data.named.class,
 				},
 			},
 		},

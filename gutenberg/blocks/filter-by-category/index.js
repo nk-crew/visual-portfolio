@@ -5,7 +5,7 @@ import metadata from './block.json';
 import BlockEdit from './edit';
 import BlockSave from './save';
 
-registerBlockType(metadata.name, {
+registerBlockType( metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
@@ -13,4 +13,4 @@ registerBlockType(metadata.name, {
 	},
 	edit: BlockEdit,
 	save: BlockSave,
-});
+} );

@@ -16,8 +16,8 @@ const { ajaxurl, VPGutenbergMetaVariables } = window;
  * Component
  */
 class VpVideoComponent extends Component {
-	constructor(props) {
-		super(props);
+	constructor( props ) {
+		super( props );
 
 		this.state = {
 			oembedQuery: '',
@@ -26,7 +26,7 @@ class VpVideoComponent extends Component {
 
 		this.maybePrepareOembed = debounce(
 			300,
-			rafSchd(this.maybePrepareOembed.bind(this))
+			rafSchd( this.maybePrepareOembed.bind( this ) )
 		);
 	}
 
@@ -46,29 +46,29 @@ class VpVideoComponent extends Component {
 
 		const { getMeta, postFormat } = this.props;
 
-		if (postFormat !== 'video') {
+		if ( postFormat !== 'video' ) {
 			return;
 		}
 
-		const videoUrl = getMeta('_vp_format_video_url');
+		const videoUrl = getMeta( '_vp_format_video_url' );
 
-		if (oembedQuery === videoUrl) {
+		if ( oembedQuery === videoUrl ) {
 			return;
 		}
 
 		// Abort AJAX.
-		if (this.oembedAjax && this.oembedAjax.abort) {
+		if ( this.oembedAjax && this.oembedAjax.abort ) {
 			this.oembedAjax.abort();
 		}
 
-		if (!oembedQuery && oembedHTML) {
-			this.setState({
+		if ( ! oembedQuery && oembedHTML ) {
+			this.setState( {
 				oembedHTML: '',
-			});
+			} );
 			return;
 		}
 
-		this.oembedAjax = $.ajax({
+		this.oembedAjax = $.ajax( {
 			url: ajaxurl,
 			method: 'POST',
 			dataType: 'json',
@@ -77,21 +77,21 @@ class VpVideoComponent extends Component {
 				q: videoUrl,
 				nonce: VPGutenbergMetaVariables.nonce,
 			},
-			complete: (data) => {
+			complete: ( data ) => {
 				const json = data.responseJSON;
 				const newState = {
 					oembedQuery: videoUrl,
 					oembedHTML: '',
 				};
 
-				if (json && typeof json.html !== 'undefined') {
+				if ( json && typeof json.html !== 'undefined' ) {
 					newState.oembedHTML = json.html;
 				}
-				this.setState(newState);
+				this.setState( newState );
 
 				this.oembedAjax = null;
 			},
-		});
+		} );
 	}
 
 	render() {
@@ -99,14 +99,14 @@ class VpVideoComponent extends Component {
 
 		const { oembedHTML } = this.state;
 
-		if (postFormat !== 'video') {
+		if ( postFormat !== 'video' ) {
 			return null;
 		}
 
 		return (
 			<PluginDocumentSettingPanel
 				name="VPVideo"
-				title={__('Video', 'visual-portfolio')}
+				title={ __( 'Video', 'visual-portfolio' ) }
 				icon={
 					<svg
 						width="14"
@@ -133,30 +133,30 @@ class VpVideoComponent extends Component {
 			>
 				<PanelRow>
 					<p className="description">
-						{sprintf(
+						{ sprintf(
 							__(
 								'Video will be used in %s layouts only. Full list of supported links',
 								'visual-portfolio'
 							),
 							VPGutenbergMetaVariables.plugin_name
-						)}
+						) }
 						&nbsp;
 						<a
 							href="https://www.visualportfolio.com/docs/projects/project-formats/#supported-video-platforms"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{__('see here', 'visual-portfolio')}
+							{ __( 'see here', 'visual-portfolio' ) }
 						</a>
 					</p>
 				</PanelRow>
 				<PanelRow>
 					<TextControl
-						label={__('Video URL', 'visual-portfolio')}
-						value={getMeta('_vp_format_video_url') || ''}
-						onChange={(val) => {
-							updateMeta('_vp_format_video_url', val);
-						}}
+						label={ __( 'Video URL', 'visual-portfolio' ) }
+						value={ getMeta( '_vp_format_video_url' ) || '' }
+						onChange={ ( val ) => {
+							updateMeta( '_vp_format_video_url', val );
+						} }
 						type="url"
 						placeholder="https://"
 						__next40pxDefaultSize
@@ -166,7 +166,7 @@ class VpVideoComponent extends Component {
 				<PanelRow>
 					<div
 						className="vp-oembed-preview"
-						dangerouslySetInnerHTML={{ __html: oembedHTML }}
+						dangerouslySetInnerHTML={ { __html: oembedHTML } }
 					/>
 				</PanelRow>
 			</PluginDocumentSettingPanel>
@@ -174,27 +174,27 @@ class VpVideoComponent extends Component {
 	}
 }
 
-const VpVideo = compose([
-	withSelect((select) => ({
-		getMeta(name) {
+const VpVideo = compose( [
+	withSelect( ( select ) => ( {
+		getMeta( name ) {
 			const meta =
-				select('core/editor').getEditedPostAttribute('meta') || {};
-			return meta[name];
+				select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+			return meta[ name ];
 		},
-		postFormat: select('core/editor').getEditedPostAttribute('format'),
-	})),
-	withDispatch((dispatch) => ({
-		updateMeta(name, val) {
-			dispatch('core/editor').editPost({ meta: { [name]: val } });
+		postFormat: select( 'core/editor' ).getEditedPostAttribute( 'format' ),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		updateMeta( name, val ) {
+			dispatch( 'core/editor' ).editPost( { meta: { [ name ]: val } } );
 		},
-	})),
+	} ) ),
 	withInstanceId,
-])(VpVideoComponent);
+] )( VpVideoComponent );
 
 // Check if editPost available.
 // For example, on the Widgets screen this variable is not defined.
-if (wp.editPost) {
-	registerPlugin('vp-video', {
+if ( wp.editPost ) {
+	registerPlugin( 'vp-video', {
 		render: VpVideo,
-	});
+	} );
 }

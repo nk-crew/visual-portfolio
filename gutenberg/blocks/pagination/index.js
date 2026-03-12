@@ -15,7 +15,7 @@ import variations from './variations';
 /**
  * Register block
  */
-registerBlockType(metadata.name, {
+registerBlockType( metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
@@ -24,4 +24,4 @@ registerBlockType(metadata.name, {
 	edit,
 	save,
 	variations,
-});
+} );

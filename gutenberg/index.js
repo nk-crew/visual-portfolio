@@ -25,7 +25,7 @@ import { ReactComponent as ElementIcon } from '../assets/admin/images/icon-guten
 const { plugin_name: pluginName } = window.VPGutenbergVariables;
 
 // Collection.
-registerBlockCollection('visual-portfolio', {
+registerBlockCollection( 'visual-portfolio', {
 	title: pluginName,
 	icon: <ElementIcon width="20" height="20" />,
-});
+} );

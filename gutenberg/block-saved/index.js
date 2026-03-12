@@ -21,10 +21,10 @@ const settings = {
 	transforms,
 };
 
-registerBlockType(name, settings);
+registerBlockType( name, settings );
 
 // Fallback.
-registerBlockType('nk/visual-portfolio', {
+registerBlockType( 'nk/visual-portfolio', {
 	...settings,
 	title,
 	name: 'nk/visual-portfolio',
@@ -42,12 +42,12 @@ registerBlockType('nk/visual-portfolio', {
 			type: 'string',
 		},
 	},
-	edit: (props) => {
-		const { replaceBlocks } = useDispatch('core/block-editor');
+	edit: ( props ) => {
+		const { replaceBlocks } = useDispatch( 'core/block-editor' );
 
 		replaceBlocks(
-			[props.clientId],
-			createBlock('visual-portfolio/saved', props.attributes || {})
+			[ props.clientId ],
+			createBlock( 'visual-portfolio/saved', props.attributes || {} )
 		);
 
 		return null;
@@ -56,4 +56,4 @@ registerBlockType('nk/visual-portfolio', {
 		...metadata.supports,
 		inserter: false,
 	},
-});
+} );

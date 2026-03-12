@@ -9,8 +9,8 @@ import { Component } from '@wordpress/element';
  * Component Class
  */
 export default class ToggleModal extends Component {
-	constructor(...args) {
-		super(...args);
+	constructor( ...args ) {
+		super( ...args );
 
 		this.state = {
 			isOpened: false,
@@ -26,26 +26,26 @@ export default class ToggleModal extends Component {
 			<>
 				<Button
 					variant="secondary"
-					onClick={() => this.setState({ isOpened: !isOpened })}
+					onClick={ () => this.setState( { isOpened: ! isOpened } ) }
 				>
-					{buttonLabel}
+					{ buttonLabel }
 				</Button>
-				{isOpened ? (
+				{ isOpened ? (
 					<Modal
-						title={modalTitle}
-						onRequestClose={() =>
-							this.setState({ isOpened: !isOpened })
+						title={ modalTitle }
+						onRequestClose={ () =>
+							this.setState( { isOpened: ! isOpened } )
 						}
-						className={classnames(
+						className={ classnames(
 							'vpf-component-modal',
-							size ? `vpf-component-modal-size-${size}` : ''
-						)}
+							size ? `vpf-component-modal-size-${ size }` : ''
+						) }
 					>
-						{children}
+						{ children }
 					</Modal>
 				) : (
 					''
-				)}
+				) }
 			</>
 		);
 	}

@@ -6,11 +6,11 @@ import { addFilter } from '@wordpress/hooks';
 addFilter(
 	'vpf.editor.controls-on-change',
 	'vpf/editor/controls-on-change/classic-icon-with-overlay',
-	(newAttributes, control, val, attributes) => {
+	( newAttributes, control, val, attributes ) => {
 		if (
 			control.name === 'items_style_default__show_icon' &&
 			val &&
-			!attributes.items_style_default__bg_color
+			! attributes.items_style_default__bg_color
 		) {
 			newAttributes.items_style_default__bg_color = '#000';
 			newAttributes.items_style_default__text_color = '#fff';

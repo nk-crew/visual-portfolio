@@ -4,17 +4,17 @@ import { addFilter } from '@wordpress/hooks';
 addFilter(
 	'vpf.editor.changed-attributes',
 	'vpf/editor/changed-attributes/live-reload',
-	(data) => {
-		if (!data.$framePortfolio) {
+	( data ) => {
+		if ( ! data.$framePortfolio ) {
 			return data;
 		}
 
 		let reload = false;
 
-		Object.keys(data.attributes).forEach((name) => {
-			const val = data.attributes[name];
+		Object.keys( data.attributes ).forEach( ( name ) => {
+			const val = data.attributes[ name ];
 
-			switch (name) {
+			switch ( name ) {
 				case 'tiles_type':
 				case 'masonry_columns':
 				case 'masonry_images_aspect_ratio':
@@ -36,10 +36,10 @@ addFilter(
 				case 'items_gap':
 				case 'items_gap_vertical': {
 					data.$framePortfolio.attr(
-						`data-vp-${name.replace(/_/g, '-')}`,
+						`data-vp-${ name.replace( /_/g, '-' ) }`,
 						val
 					);
-					data.$framePortfolio.vpf('init');
+					data.$framePortfolio.vpf( 'init' );
 
 					break;
 				}
@@ -59,16 +59,16 @@ addFilter(
 						'bottom-left',
 						'bottom-center',
 						'bottom-right',
-					].forEach((alignName) => {
+					].forEach( ( alignName ) => {
 						allAlignClasses += `${
 							allAlignClasses ? ' ' : ''
-						}vp-portfolio__item-align-${alignName}`;
-					});
+						}vp-portfolio__item-align-${ alignName }`;
+					} );
 
 					data.$framePortfolio
-						.find('.vp-portfolio__item-overlay')
-						.removeClass(allAlignClasses)
-						.addClass(`vp-portfolio__item-align-${val}`);
+						.find( '.vp-portfolio__item-overlay' )
+						.removeClass( allAlignClasses )
+						.addClass( `vp-portfolio__item-align-${ val }` );
 
 					break;
 				}
@@ -88,17 +88,17 @@ addFilter(
 						'bottom-left',
 						'bottom-center',
 						'bottom-right',
-					].forEach((alignName) => {
+					].forEach( ( alignName ) => {
 						allAlignClasses += `${
 							allAlignClasses ? ' ' : ''
-						}vp-portfolio__item-caption-text-align-${alignName}`;
-					});
+						}vp-portfolio__item-caption-text-align-${ alignName }`;
+					} );
 
 					data.$framePortfolio
-						.find('.vp-portfolio__item-caption')
-						.removeClass(allAlignClasses)
+						.find( '.vp-portfolio__item-caption' )
+						.removeClass( allAlignClasses )
 						.addClass(
-							`vp-portfolio__item-caption-text-align-${val}`
+							`vp-portfolio__item-caption-text-align-${ val }`
 						);
 
 					break;
@@ -119,17 +119,17 @@ addFilter(
 						'bottom-left',
 						'bottom-center',
 						'bottom-right',
-					].forEach((alignName) => {
+					].forEach( ( alignName ) => {
 						allAlignClasses += `${
 							allAlignClasses ? ' ' : ''
-						}vp-portfolio__item-overlay-text-align-${alignName}`;
-					});
+						}vp-portfolio__item-overlay-text-align-${ alignName }`;
+					} );
 
 					data.$framePortfolio
-						.find('.vp-portfolio__item-overlay')
-						.removeClass(allAlignClasses)
+						.find( '.vp-portfolio__item-overlay' )
+						.removeClass( allAlignClasses )
 						.addClass(
-							`vp-portfolio__item-overlay-text-align-${val}`
+							`vp-portfolio__item-overlay-text-align-${ val }`
 						);
 
 					break;
@@ -142,7 +142,7 @@ addFilter(
 					reload = reload || data.reload;
 					break;
 			}
-		});
+		} );
 
 		return {
 			...data,

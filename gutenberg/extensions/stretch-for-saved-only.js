@@ -4,8 +4,8 @@ import { addFilter } from '@wordpress/hooks';
 addFilter(
 	'vpf.editor.controls-render-data',
 	'vpf/editor/controls-render-data/customize-controls',
-	(data) => {
-		if (data.name === 'stretch' && !window.VPSavedLayoutVariables) {
+	( data ) => {
+		if ( data.name === 'stretch' && ! window.VPSavedLayoutVariables ) {
 			data = {
 				...data,
 				skip: true,

@@ -1,8 +1,8 @@
 import apiFetch from '@wordpress/api-fetch';
 
-export function API_FETCH({ request }) {
-	return apiFetch(request)
-		.catch((fetchedData) => {
+export function API_FETCH( { request } ) {
+	return apiFetch( request )
+		.catch( ( fetchedData ) => {
 			if (
 				fetchedData &&
 				fetchedData.error &&
@@ -16,11 +16,11 @@ export function API_FETCH({ request }) {
 			}
 
 			return false;
-		})
-		.then((fetchedData) => {
-			if (fetchedData && fetchedData.success && fetchedData.response) {
+		} )
+		.then( ( fetchedData ) => {
+			if ( fetchedData && fetchedData.success && fetchedData.response ) {
 				return fetchedData.response;
 			}
 			return false;
-		});
+		} );
 }

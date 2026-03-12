@@ -5,26 +5,26 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const DEFAULT_RATIOS = {
-	'': __('Auto', 'visual-portfolio'),
-	'16:9': __('Wide 16:9', 'visual-portfolio'),
-	'21:9': __('Ultra Wide 21:9', 'visual-portfolio'),
-	'4:3': __('TV 4:3', 'visual-portfolio'),
-	'3:2': __('Classic Film 3:2', 'visual-portfolio'),
-	custom: __('Custom', 'visual-portfolio'),
+	'': __( 'Auto', 'visual-portfolio' ),
+	'16:9': __( 'Wide 16:9', 'visual-portfolio' ),
+	'21:9': __( 'Ultra Wide 21:9', 'visual-portfolio' ),
+	'4:3': __( 'TV 4:3', 'visual-portfolio' ),
+	'3:2': __( 'Classic Film 3:2', 'visual-portfolio' ),
+	custom: __( 'Custom', 'visual-portfolio' ),
 };
 
 /**
  * Component Class
  */
 export default class AspectRatio extends Component {
-	constructor(...args) {
-		super(...args);
+	constructor( ...args ) {
+		super( ...args );
 
 		this.state = {
-			isCustom: typeof DEFAULT_RATIOS[this.props.value] === 'undefined',
+			isCustom: typeof DEFAULT_RATIOS[ this.props.value ] === 'undefined',
 		};
 
-		this.updatePart = this.updatePart.bind(this);
+		this.updatePart = this.updatePart.bind( this );
 	}
 
 	/**
@@ -34,17 +34,17 @@ export default class AspectRatio extends Component {
 	 *
 	 * @return {Array}
 	 */
-	parseParts(val) {
+	parseParts( val ) {
 		let left = '';
 		let right = '';
 
-		if (val && /:/g.test(val)) {
-			const parts = val.split(':');
+		if ( val && /:/g.test( val ) ) {
+			const parts = val.split( ':' );
 
-			[left, right] = parts;
+			[ left, right ] = parts;
 		}
 
-		return [left, right];
+		return [ left, right ];
 	}
 
 	/**
@@ -53,22 +53,22 @@ export default class AspectRatio extends Component {
 	 * @param {string}  val  - new value for ratio part
 	 * @param {boolean} left - left part of aspect ratio
 	 */
-	updatePart(val, left = true) {
+	updatePart( val, left = true ) {
 		const { value, onChange } = this.props;
 
-		const parse = this.parseParts(value);
+		const parse = this.parseParts( value );
 
-		if (!val || !parse[0] || !parse[1]) {
+		if ( ! val || ! parse[ 0 ] || ! parse[ 1 ] ) {
 			return;
 		}
 
-		if (left) {
-			parse[0] = val;
+		if ( left ) {
+			parse[ 0 ] = val;
 		} else {
-			parse[1] = val;
+			parse[ 1 ] = val;
 		}
 
-		onChange(`${parse[0]}:${parse[1]}`);
+		onChange( `${ parse[ 0 ] }:${ parse[ 1 ] }` );
 	}
 
 	render() {
@@ -76,57 +76,61 @@ export default class AspectRatio extends Component {
 
 		const { isCustom } = this.state;
 
-		const parts = this.parseParts(value);
+		const parts = this.parseParts( value );
 
 		return (
 			<div className="vpf-component-aspect-ratio">
 				<SelectControl
-					value={isCustom ? 'custom' : value}
-					onChange={(val) => {
-						if (val === 'custom') {
-							this.setState({
+					value={ isCustom ? 'custom' : value }
+					onChange={ ( val ) => {
+						if ( val === 'custom' ) {
+							this.setState( {
 								isCustom: true,
-							});
+							} );
 
-							if (!value) {
-								onChange('3:4');
+							if ( ! value ) {
+								onChange( '3:4' );
 							}
 						} else {
-							this.setState({
+							this.setState( {
 								isCustom: false,
-							});
-							onChange(val);
+							} );
+							onChange( val );
 						}
-					}}
-					options={Object.keys(DEFAULT_RATIOS).map((ratio) => ({
-						label: DEFAULT_RATIOS[ratio],
-						value: ratio,
-					}))}
+					} }
+					options={ Object.keys( DEFAULT_RATIOS ).map(
+						( ratio ) => ( {
+							label: DEFAULT_RATIOS[ ratio ],
+							value: ratio,
+						} )
+					) }
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 				/>
-				{isCustom ? (
+				{ isCustom ? (
 					<div className="vpf-component-aspect-ratio-custom">
 						<TextControl
-							label={__('Width', 'visual-portfolio')}
+							label={ __( 'Width', 'visual-portfolio' ) }
 							type="number"
-							value={parts[0]}
-							onChange={(val) => this.updatePart(val, true)}
+							value={ parts[ 0 ] }
+							onChange={ ( val ) => this.updatePart( val, true ) }
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 						/>
 						<TextControl
-							label={__('Height', 'visual-portfolio')}
+							label={ __( 'Height', 'visual-portfolio' ) }
 							type="number"
-							value={parts[1]}
-							onChange={(val) => this.updatePart(val, false)}
+							value={ parts[ 1 ] }
+							onChange={ ( val ) =>
+								this.updatePart( val, false )
+							}
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 						/>
 					</div>
 				) : (
 					''
-				)}
+				) }
 			</div>
 		);
 	}

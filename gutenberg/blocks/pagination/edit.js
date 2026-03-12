@@ -15,12 +15,12 @@ const ALLOWED_BLOCKS = [
 ];
 
 export default function PagedPaginationEdit() {
-	const blockProps = useBlockProps({ className: 'vp-block-pagination' });
+	const blockProps = useBlockProps( { className: 'vp-block-pagination' } );
 
-	const innerBlocksProps = useInnerBlocksProps(blockProps, {
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-	});
+	} );
 
-	return <div {...innerBlocksProps} />;
+	return <div { ...innerBlocksProps } />;
 }

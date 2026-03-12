@@ -3,14 +3,14 @@ import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
 const { getComputedStyle } = window;
-const $wnd = $(window);
-const $doc = $(document);
+const $wnd = $( window );
+const $doc = $( document );
 
-const SUPPORTED_LAYOUTS = ['tiles', 'masonry', 'grid'];
+const SUPPORTED_LAYOUTS = [ 'tiles', 'masonry', 'grid' ];
 
 // Extend VP class.
-$doc.on('extendClass.vpf', (event, VP) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'extendClass.vpf', ( event, VP ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
@@ -23,15 +23,15 @@ $doc.on('extendClass.vpf', (event, VP) => {
 	 *
 	 * @param {Object} options isotope options
 	 */
-	VP.prototype.initIsotope = function (options) {
+	VP.prototype.initIsotope = function ( options ) {
 		const self = this;
 
 		if (
 			self.$items_wrap.isotope &&
-			SUPPORTED_LAYOUTS.includes(self.options.layout)
+			SUPPORTED_LAYOUTS.includes( self.options.layout )
 		) {
 			const isRtl =
-				getComputedStyle(self.$items_wrap[0]).direction === 'rtl';
+				getComputedStyle( self.$items_wrap[ 0 ] ).direction === 'rtl';
 
 			const initOptions = options || {
 				itemSelector: '.vp-portfolio__item-wrap',
@@ -44,7 +44,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
 								horizontalOrder:
 									self.options.masonryHorizontalOrder ===
 									'true',
-							}
+						  }
 						: {},
 				transitionDuration: '0.3s',
 				// We don't use stagger anymore because it is not
@@ -52,17 +52,17 @@ $doc.on('extendClass.vpf', (event, VP) => {
 				// When screen resized, latest items transition is too big and it looks ugly.
 				// stagger: '0.03s',
 				percentPosition: true,
-				originLeft: !isRtl,
+				originLeft: ! isRtl,
 
 				// See `initEvents.vpf` event why we need this option disabled.
 				resize: false,
 			};
 
-			self.emitEvent('beforeInitIsotope', [initOptions]);
+			self.emitEvent( 'beforeInitIsotope', [ initOptions ] );
 
-			self.$items_wrap.isotope(initOptions);
+			self.$items_wrap.isotope( initOptions );
 
-			self.emitEvent('initIsotope', [initOptions]);
+			self.emitEvent( 'initIsotope', [ initOptions ] );
 		}
 	};
 
@@ -71,94 +71,94 @@ $doc.on('extendClass.vpf', (event, VP) => {
 	 */
 	VP.prototype.destroyIsotope = function () {
 		const self = this;
-		const isotope = self.$items_wrap.data('isotope');
+		const isotope = self.$items_wrap.data( 'isotope' );
 
-		if (isotope) {
-			self.$items_wrap.isotope('destroy');
+		if ( isotope ) {
+			self.$items_wrap.isotope( 'destroy' );
 
-			self.emitEvent('destroyIsotope');
+			self.emitEvent( 'destroyIsotope' );
 		}
 	};
-});
+} );
 
 // Add Items.
-$doc.on('addItems.vpf', (event, self, $items, removeExisting) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'addItems.vpf', ( event, self, $items, removeExisting ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
-	const isotope = self.$items_wrap.data('isotope');
+	const isotope = self.$items_wrap.data( 'isotope' );
 
-	if (!isotope) {
+	if ( ! isotope ) {
 		return;
 	}
 
-	if (removeExisting) {
-		const $existing = self.$items_wrap.find('.vp-portfolio__item-wrap');
-		self.$items_wrap.isotope('remove', $existing);
+	if ( removeExisting ) {
+		const $existing = self.$items_wrap.find( '.vp-portfolio__item-wrap' );
+		self.$items_wrap.isotope( 'remove', $existing );
 
 		// we need to prepend items when remove existing just because Tiles layout have troubles with appending and removing items
-		self.$items_wrap.prepend($items).isotope('prepended', $items);
+		self.$items_wrap.prepend( $items ).isotope( 'prepended', $items );
 	} else {
-		self.$items_wrap.append($items).isotope('appended', $items);
+		self.$items_wrap.append( $items ).isotope( 'appended', $items );
 	}
 
 	// Idk why, but with timeout isotope recalculate all items fine.
 	// if we run only re-layout inside the timeout, there will be visible image blinking.
 	// So, we need to make these 2 calls.
-	self.initIsotope('layout');
-	setTimeout(() => {
-		self.initIsotope('layout');
-	}, 0);
-});
+	self.initIsotope( 'layout' );
+	setTimeout( () => {
+		self.initIsotope( 'layout' );
+	}, 0 );
+} );
 
 // Remove Items.
-$doc.on('removeItems.vpf', (event, self, $items) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'removeItems.vpf', ( event, self, $items ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
-	const isotope = self.$items_wrap.data('isotope');
+	const isotope = self.$items_wrap.data( 'isotope' );
 
-	if (!isotope) {
+	if ( ! isotope ) {
 		return;
 	}
 
-	self.$items_wrap.isotope('remove', $items);
-});
+	self.$items_wrap.isotope( 'remove', $items );
+} );
 
 // Init.
-$doc.on('init.vpf', (event, self) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'init.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
 	self.initIsotope();
-});
+} );
 
 // Images Loaded.
-$doc.on('imagesLoaded.vpf', (event, self) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'imagesLoaded.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
 	// sometimes on iOs images failed to calculate positions, so we need this imagesLoaded event.
 	// related issue: https://github.com/nk-crew/visual-portfolio/issues/55
-	self.initIsotope('layout');
-});
+	self.initIsotope( 'layout' );
+} );
 
 // Destroy.
-$doc.on('destroy.vpf', (event, self) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'destroy.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
 	self.destroyIsotope();
-});
+} );
 
 // Init events.
-$doc.on('initEvents.vpf', (event, self) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'initEvents.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
@@ -167,54 +167,54 @@ $doc.on('initEvents.vpf', (event, self) => {
 	// but items sizes are changed in CSS. For some reason Isotope don't relayout it.
 	if (
 		self.$items_wrap.isotope &&
-		SUPPORTED_LAYOUTS.includes(self.options.layout)
+		SUPPORTED_LAYOUTS.includes( self.options.layout )
 	) {
-		const evp = `.vpf-uid-${self.uid}`;
+		const evp = `.vpf-uid-${ self.uid }`;
 
 		$wnd.on(
-			`resize${evp}`,
+			`resize${ evp }`,
 			throttle(
 				100,
-				rafSchd(() => {
-					self.initIsotope('layout');
-				})
+				rafSchd( () => {
+					self.initIsotope( 'layout' );
+				} )
 			)
 		);
 	}
-});
+} );
 
 // Destroy events.
-$doc.on('destroyEvents.vpf', (event, self) => {
-	if (event.namespace !== 'vpf') {
+$doc.on( 'destroyEvents.vpf', ( event, self ) => {
+	if ( event.namespace !== 'vpf' ) {
 		return;
 	}
 
-	if (SUPPORTED_LAYOUTS.includes(self.options.layout)) {
-		const evp = `.vpf-uid-${self.uid}`;
+	if ( SUPPORTED_LAYOUTS.includes( self.options.layout ) ) {
+		const evp = `.vpf-uid-${ self.uid }`;
 
-		$wnd.off(`resize${evp}`);
+		$wnd.off( `resize${ evp }` );
 	}
-});
+} );
 
 // WPBakery Page Builder fullwidth row fix.
 $doc.on(
 	'vc-full-width-row',
 	debounce(
 		150,
-		rafSchd((event, el) => {
-			$(el)
-				.find('.vp-portfolio')
-				.each(function () {
-					if (!this.vpf || !this.vpf.initIsotope) {
+		rafSchd( ( event, el ) => {
+			$( el )
+				.find( '.vp-portfolio' )
+				.each( function () {
+					if ( ! this.vpf || ! this.vpf.initIsotope ) {
 						return;
 					}
 
-					const isotope = this.vpf.$items_wrap.data('isotope');
+					const isotope = this.vpf.$items_wrap.data( 'isotope' );
 
-					if (isotope) {
-						this.vpf.initIsotope('layout');
+					if ( isotope ) {
+						this.vpf.initIsotope( 'layout' );
 					}
-				});
-		})
+				} );
+		} )
 	)
 );

@@ -10,28 +10,28 @@ const { navigator } = window;
 
 let copiedTimeout;
 
-function ShortcodeRender(props) {
-	const [copied, setCopied] = useState(false);
+function ShortcodeRender( props ) {
+	const [ copied, setCopied ] = useState( false );
 
 	return (
 		<div className="vpf-layout-shortcode-copy">
-			<strong>{props.label}:</strong>
+			<strong>{ props.label }:</strong>
 			<div>
-				<pre>{props.content}</pre>
+				<pre>{ props.content }</pre>
 				<Button
-					onClick={() => {
+					onClick={ () => {
 						navigator.clipboard
-							.writeText(props.content)
-							.then(() => {
-								setCopied(true);
+							.writeText( props.content )
+							.then( () => {
+								setCopied( true );
 
-								clearTimeout(copiedTimeout);
+								clearTimeout( copiedTimeout );
 
-								copiedTimeout = setTimeout(() => {
-									setCopied(false);
-								}, 450);
-							});
-					}}
+								copiedTimeout = setTimeout( () => {
+									setCopied( false );
+								}, 450 );
+							} );
+					} }
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -43,11 +43,11 @@ function ShortcodeRender(props) {
 						<path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
 						<path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
 					</svg>
-					{copied ? (
+					{ copied ? (
 						<div className="vpf-layout-shortcode-copied">
-							{__('Copied!', 'visual-portfolio')}
+							{ __( 'Copied!', 'visual-portfolio' ) }
 						</div>
-					) : null}
+					) : null }
 				</Button>
 			</div>
 		</div>
@@ -59,25 +59,25 @@ function ShortcodeRender(props) {
  *
  * @param props
  */
-function LayoutsEditorBlock(props) {
+function LayoutsEditorBlock( props ) {
 	const { clientId } = props;
 
-	const [additionalShortcodes, setAdditionalShortcodes] = useState(false);
+	const [ additionalShortcodes, setAdditionalShortcodes ] = useState( false );
 
 	const { postId, blockData, VisualPortfolioBlockEdit } = useSelect(
-		(select) => {
+		( select ) => {
 			const { getBlockData } = select(
 				'visual-portfolio/saved-layout-data'
 			);
-			const { getCurrentPostId } = select('core/editor');
-			const { getBlockType } = select('core/blocks');
+			const { getCurrentPostId } = select( 'core/editor' );
+			const { getBlockType } = select( 'core/blocks' );
 
 			return {
 				postId: getCurrentPostId(),
 				blockData: getBlockData(),
 				VisualPortfolioBlockEdit:
-					getBlockType('visual-portfolio/block')?.edit ||
-					(() => null),
+					getBlockType( 'visual-portfolio/block' )?.edit ||
+					( () => null ),
 			};
 		}
 	);
@@ -88,17 +88,17 @@ function LayoutsEditorBlock(props) {
 
 	let shortcodes = [
 		{
-			label: __('This Saved Layout', 'visual-portfolio'),
-			content: `[visual_portfolio id="${postId}"]`,
+			label: __( 'This Saved Layout', 'visual-portfolio' ),
+			content: `[visual_portfolio id="${ postId }"]`,
 		},
 		{
-			label: __('Filter', 'visual-portfolio'),
-			content: `[visual_portfolio_filter id="${postId}" type="minimal" align="center" show_count="false" text_all="All"]`,
+			label: __( 'Filter', 'visual-portfolio' ),
+			content: `[visual_portfolio_filter id="${ postId }" type="minimal" align="center" show_count="false" text_all="All"]`,
 			isOptional: true,
 		},
 		{
-			label: __('Sort', 'visual-portfolio'),
-			content: `[visual_portfolio_sort id="${postId}" type="minimal" align="center"]`,
+			label: __( 'Sort', 'visual-portfolio' ),
+			content: `[visual_portfolio_sort id="${ postId }" type="minimal" align="center"]`,
 			isOptional: true,
 		},
 	];
@@ -113,76 +113,78 @@ function LayoutsEditorBlock(props) {
 		<>
 			<InspectorControls>
 				<PanelBody
-					title={__('Shortcodes', 'visual-portfolio')}
+					title={ __( 'Shortcodes', 'visual-portfolio' ) }
 					scrollAfterOpen
 				>
 					<p>
-						{__(
+						{ __(
 							'To output this saved layout and its components you can use the following shortcodes:'
-						)}
+						) }
 					</p>
-					{shortcodes.map((data) => {
-						if (data.isOptional) {
+					{ shortcodes.map( ( data ) => {
+						if ( data.isOptional ) {
 							return null;
 						}
 
 						return (
 							<ShortcodeRender
-								key={`shortcode-${data.label}`}
-								{...data}
+								key={ `shortcode-${ data.label }` }
+								{ ...data }
 							/>
 						);
-					})}
-					{additionalShortcodes ? (
+					} ) }
+					{ additionalShortcodes ? (
 						<>
-							{shortcodes.map((data) => {
-								if (!data.isOptional) {
+							{ shortcodes.map( ( data ) => {
+								if ( ! data.isOptional ) {
 									return null;
 								}
 
 								return (
 									<ShortcodeRender
-										key={`shortcode-${data.label}`}
-										{...data}
+										key={ `shortcode-${ data.label }` }
+										{ ...data }
 									/>
 								);
-							})}
-							{applyFilters(
+							} ) }
+							{ applyFilters(
 								'vpf.layouts-editor.shortcodes',
 								'',
 								this
-							)}
+							) }
 						</>
 					) : (
 						<Button
 							isLink
-							onClick={() => {
-								setAdditionalShortcodes(!additionalShortcodes);
-							}}
+							onClick={ () => {
+								setAdditionalShortcodes(
+									! additionalShortcodes
+								);
+							} }
 						>
-							{__(
+							{ __(
 								'Show Additional Shortcodes',
 								'visual-portfolio'
-							)}
+							) }
 						</Button>
-					)}
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<VisualPortfolioBlockEdit
-				attributes={{
+				attributes={ {
 					...blockData,
 					block_id: blockData.id || clientId,
-				}}
-				setAttributes={(data) => {
-					updateBlockData(data);
-				}}
-				clientId={clientId}
+				} }
+				setAttributes={ ( data ) => {
+					updateBlockData( data );
+				} }
+				clientId={ clientId }
 			/>
 		</>
 	);
 }
 
-registerBlockType('visual-portfolio/saved-editor', {
+registerBlockType( 'visual-portfolio/saved-editor', {
 	icon: {
 		foreground: '#2540CC',
 		src: (
@@ -246,4 +248,4 @@ registerBlockType('visual-portfolio/saved-editor', {
 	save() {
 		return null;
 	},
-});
+} );

@@ -10,32 +10,32 @@ import { Fragment, useState } from '@wordpress/element';
  *
  * @param props
  */
-export default function CollapseControl(props) {
+export default function CollapseControl( props ) {
 	const { children, options, initialOpen } = props;
 
-	const [collapsed, setCollapsed] = useState(initialOpen);
+	const [ collapsed, setCollapsed ] = useState( initialOpen );
 
 	return (
 		<div className="vpf-component-collapse-control">
-			{options.map((option) => {
+			{ options.map( ( option ) => {
 				return (
-					<Fragment key={option.category}>
+					<Fragment key={ option.category }>
 						<Button
-							onClick={() => {
+							onClick={ () => {
 								setCollapsed(
 									option.category === collapsed
 										? ''
 										: option.category
 								);
-							}}
-							className={classnames(
+							} }
+							className={ classnames(
 								'vpf-component-collapse-control-toggle',
 								option.category === collapsed
 									? 'vpf-component-collapse-control-active'
 									: ''
-							)}
+							) }
 						>
-							<span>{option.title}</span>
+							<span>{ option.title }</span>
 							<svg
 								viewBox="0 0 24 24"
 								xmlns="http://www.w3.org/2000/svg"
@@ -49,18 +49,18 @@ export default function CollapseControl(props) {
 							</svg>
 						</Button>
 						<div
-							className={classnames(
+							className={ classnames(
 								'vpf-component-collapse-control-content',
 								option.category === collapsed
 									? 'vpf-component-collapse-control-content-active'
 									: ''
-							)}
+							) }
 						>
-							{children(option)}
+							{ children( option ) }
 						</div>
 					</Fragment>
 				);
-			})}
+			} ) }
 		</div>
 	);
 }

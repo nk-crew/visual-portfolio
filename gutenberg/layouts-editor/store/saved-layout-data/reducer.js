@@ -1,10 +1,10 @@
 const { VPSavedLayoutVariables } = window;
 
-function reducer(state = { data: VPSavedLayoutVariables.data }, action = {}) {
-	switch (action.type) {
+function reducer( state = { data: VPSavedLayoutVariables.data }, action = {} ) {
+	switch ( action.type ) {
 		case 'SET_BLOCK_DATA':
-			if (action.data) {
-				if (state) {
+			if ( action.data ) {
+				if ( state ) {
 					return {
 						...state,
 						data: action.data,
@@ -15,7 +15,7 @@ function reducer(state = { data: VPSavedLayoutVariables.data }, action = {}) {
 
 			break;
 		case 'UPDATE_BLOCK_DATA':
-			if (action.data && state) {
+			if ( action.data && state ) {
 				return {
 					...state,
 					data: {

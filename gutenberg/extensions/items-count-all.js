@@ -28,41 +28,41 @@ function getNoticeState() {
 	return VPGutenbergVariables.items_count_notice;
 }
 
-const maybeUpdateNoticeStateMeta = debounce(3000, (postId) => {
-	apiFetch({
+const maybeUpdateNoticeStateMeta = debounce( 3000, ( postId ) => {
+	apiFetch( {
 		path: '/visual-portfolio/v1/update_gallery_items_count_notice_state',
 		method: 'POST',
 		data: {
 			notice_state: getNoticeState(),
 			post_id: postId,
 		},
-	});
-});
+	} );
+} );
 
-function updateNoticeState(postId) {
+function updateNoticeState( postId ) {
 	const newState = getNoticeState() === 'hide' ? 'show' : 'hide';
 
 	VPGutenbergVariables.items_count_notice = newState;
 
-	maybeUpdateNoticeStateMeta(postId);
+	maybeUpdateNoticeStateMeta( postId );
 }
 
-function CountNotice(props) {
+function CountNotice( props ) {
 	const { onToggle, postId } = props;
 
 	return (
-		<Notice status="warning" isDismissible={false}>
+		<Notice status="warning" isDismissible={ false }>
 			<p
-				dangerouslySetInnerHTML={{
+				dangerouslySetInnerHTML={ {
 					__html: __(
 						'Using large galleries may <u>decrease page loading speed</u>. We recommend you add these improvements:',
 						'visual-portfolio'
 					),
-				}}
+				} }
 			/>
 			<ol className="ol-decimal">
 				<li
-					dangerouslySetInnerHTML={{
+					dangerouslySetInnerHTML={ {
 						__html: sprintf(
 							__(
 								'Set the items per page to <u>less than %d</u>',
@@ -70,40 +70,40 @@ function CountNotice(props) {
 							),
 							NOTICE_LIMIT
 						),
-					}}
+					} }
 				/>
 				<li
-					dangerouslySetInnerHTML={{
+					dangerouslySetInnerHTML={ {
 						__html: __(
 							'Add <em>`Load More`</em> or <em>`Infinite Scroll`</em> pagination for best results.',
 							'visual-portfolio'
 						),
-					}}
+					} }
 				/>
 			</ol>
 			<p>
 				<Button
 					isLink
-					onClick={() => {
-						updateNoticeState(postId);
+					onClick={ () => {
+						updateNoticeState( postId );
 						onToggle();
-					}}
+					} }
 				>
-					{__('Ok, I understand', 'visual-portfolio')}
+					{ __( 'Ok, I understand', 'visual-portfolio' ) }
 				</Button>
 			</p>
 		</Notice>
 	);
 }
 
-function shouldDisplayNotice(count, attributes) {
+function shouldDisplayNotice( count, attributes ) {
 	let display = false;
 
 	// When selected images number is lower, then needed, don't display notice, even is count is large.
-	if (attributes.content_source === 'images') {
+	if ( attributes.content_source === 'images' ) {
 		display =
 			attributes?.images?.length > DISPLAY_NOTICE_AFTER &&
-			(count > DISPLAY_NOTICE_AFTER || count === -1);
+			( count > DISPLAY_NOTICE_AFTER || count === -1 );
 	} else {
 		display = count > DISPLAY_NOTICE_AFTER || count === -1;
 	}
@@ -111,48 +111,48 @@ function shouldDisplayNotice(count, attributes) {
 	return display;
 }
 
-function ItemsCountControl({ data }) {
+function ItemsCountControl( { data } ) {
 	const { description, attributes, onChange } = data;
 
-	const [maybeReRender, setMaybeReRender] = useState(1);
+	const [ maybeReRender, setMaybeReRender ] = useState( 1 );
 
 	const { postId } = useSelect(
-		(select) => ({
-			postId: select('core/editor')?.getCurrentPostId() || false,
-		}),
+		( select ) => ( {
+			postId: select( 'core/editor' )?.getCurrentPostId() || false,
+		} ),
 		[]
 	);
 
 	const renderControlHelp = description ? (
-		<RawHTML>{description}</RawHTML>
+		<RawHTML>{ description }</RawHTML>
 	) : (
 		false
 	);
 	const renderControlClassName = classnames(
 		'vpf-control-wrap',
-		`vpf-control-wrap-${data.type}`
+		`vpf-control-wrap-${ data.type }`
 	);
-	const controlVal = parseInt(controlGetValue(data.name, attributes), 10);
+	const controlVal = parseInt( controlGetValue( data.name, attributes ), 10 );
 
 	return (
 		<BaseControl
 			id="vpf-control-items-count-all"
 			label={
 				<>
-					{data.label}
-					{getNoticeState() === 'hide' &&
-					shouldDisplayNotice(controlVal, attributes) ? (
+					{ data.label }
+					{ getNoticeState() === 'hide' &&
+					shouldDisplayNotice( controlVal, attributes ) ? (
 						<Button
-							onClick={() => {
-								updateNoticeState(postId);
-								setMaybeReRender(maybeReRender + 1);
-							}}
-							style={{
+							onClick={ () => {
+								updateNoticeState( postId );
+								setMaybeReRender( maybeReRender + 1 );
+							} }
+							style={ {
 								position: 'absolute',
 								marginTop: '-5px',
 								padding: '0 4px',
 								color: '#cd7a0f',
-							}}
+							} }
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -167,30 +167,30 @@ function ItemsCountControl({ data }) {
 								/>
 							</svg>
 						</Button>
-					) : null}
+					) : null }
 				</>
 			}
-			help={renderControlHelp}
-			className={renderControlClassName}
+			help={ renderControlHelp }
+			className={ renderControlClassName }
 			__nextHasNoMarginBottom
 		>
 			<div>
 				<ButtonGroup>
 					<Button
-						variant={controlVal !== -1 ? 'primary' : ''}
-						isPressed={controlVal !== -1}
-						onClick={() => {
-							if (controlVal === -1) {
-								onChange(parseFloat(data.default || 6));
+						variant={ controlVal !== -1 ? 'primary' : '' }
+						isPressed={ controlVal !== -1 }
+						onClick={ () => {
+							if ( controlVal === -1 ) {
+								onChange( parseFloat( data.default || 6 ) );
 							}
-						}}
+						} }
 					>
-						{__('Custom Count', 'visual-portfolio')}
+						{ __( 'Custom Count', 'visual-portfolio' ) }
 					</Button>
 					<Button
-						variant={controlVal === -1 ? 'primary' : ''}
-						isPressed={controlVal === -1}
-						onClick={() => {
+						variant={ controlVal === -1 ? 'primary' : '' }
+						isPressed={ controlVal === -1 }
+						onClick={ () => {
 							if (
 								controlVal !== -1 &&
 								// eslint-disable-next-line no-alert
@@ -201,40 +201,40 @@ function ItemsCountControl({ data }) {
 									)
 								)
 							) {
-								onChange(-1);
+								onChange( -1 );
 							}
-						}}
+						} }
 					>
-						{__('All Items', 'visual-portfolio')}
+						{ __( 'All Items', 'visual-portfolio' ) }
 					</Button>
 				</ButtonGroup>
 			</div>
-			{controlVal !== -1 ? (
+			{ controlVal !== -1 ? (
 				<>
 					<br />
 					<TextControl
 						type="number"
-						min={data.min}
-						max={data.max}
-						step={data.step}
-						value={controlVal}
-						onChange={(val) => onChange(parseFloat(val))}
+						min={ data.min }
+						max={ data.max }
+						step={ data.step }
+						value={ controlVal }
+						onChange={ ( val ) => onChange( parseFloat( val ) ) }
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
 				</>
-			) : null}
-			{getNoticeState() === 'show' &&
-			shouldDisplayNotice(controlVal, attributes) ? (
+			) : null }
+			{ getNoticeState() === 'show' &&
+			shouldDisplayNotice( controlVal, attributes ) ? (
 				<div>
 					<CountNotice
-						postId={postId}
-						onToggle={() => {
-							setMaybeReRender(maybeReRender + 1);
-						}}
+						postId={ postId }
+						onToggle={ () => {
+							setMaybeReRender( maybeReRender + 1 );
+						} }
 					/>
 				</div>
-			) : null}
+			) : null }
 		</BaseControl>
 	);
 }
@@ -243,16 +243,16 @@ function ItemsCountControl({ data }) {
 addFilter(
 	'vpf.editor.controls-render',
 	'vpf/editor/controls-render/customize-controls',
-	(render, data) => {
-		if (data.name !== 'items_count') {
+	( render, data ) => {
+		if ( data.name !== 'items_count' ) {
 			return render;
 		}
 
 		return (
 			<ItemsCountControl
 				// we should use key prop, since `vpf.editor.controls-render` will use the result in array.
-				key={`control-${data.name}-${data.label}`}
-				data={data}
+				key={ `control-${ data.name }-${ data.label }` }
+				data={ data }
 			/>
 		);
 	}

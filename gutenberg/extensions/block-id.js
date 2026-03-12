@@ -16,10 +16,10 @@ const usedIds = {};
  *
  * @return {string} Wrapped component.
  */
-const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
+const withUniqueBlockId = createHigherOrderComponent( ( BlockEdit ) => {
 	class newEdit extends Component {
-		constructor(...args) {
-			super(...args);
+		constructor( ...args ) {
+			super( ...args );
 
 			const { attributes, clientId } = this.props;
 
@@ -27,12 +27,12 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
 			if (
 				clientId &&
 				attributes.block_id &&
-				typeof usedIds[attributes.block_id] === 'undefined'
+				typeof usedIds[ attributes.block_id ] === 'undefined'
 			) {
-				usedIds[attributes.block_id] = clientId;
+				usedIds[ attributes.block_id ] = clientId;
 			}
 
-			this.maybeCreateBlockId = this.maybeCreateBlockId.bind(this);
+			this.maybeCreateBlockId = this.maybeCreateBlockId.bind( this );
 		}
 
 		componentDidMount() {
@@ -44,7 +44,7 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
 		}
 
 		maybeCreateBlockId() {
-			if (this.props.blockName !== 'visual-portfolio/block') {
+			if ( this.props.blockName !== 'visual-portfolio/block' ) {
 				return;
 			}
 
@@ -52,41 +52,48 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
 
 			const { block_id: blockId } = attributes;
 
-			if (!blockId || usedIds[blockId] !== clientId) {
+			if ( ! blockId || usedIds[ blockId ] !== clientId ) {
 				let newBlockId = '';
 
 				// check if ID already exist.
 				let tryCount = 10;
 				while (
-					!newBlockId ||
-					(typeof usedIds[newBlockId] !== 'undefined' &&
-						usedIds[newBlockId] !== clientId &&
-						tryCount > 0)
+					! newBlockId ||
+					( typeof usedIds[ newBlockId ] !== 'undefined' &&
+						usedIds[ newBlockId ] !== clientId &&
+						tryCount > 0 )
 				) {
-					newBlockId = shorthash.unique(clientId);
+					newBlockId = shorthash.unique( clientId );
 					tryCount -= 1;
 				}
 
-				if (newBlockId && typeof usedIds[newBlockId] === 'undefined') {
-					usedIds[newBlockId] = clientId;
+				if (
+					newBlockId &&
+					typeof usedIds[ newBlockId ] === 'undefined'
+				) {
+					usedIds[ newBlockId ] = clientId;
 				}
 
-				if (newBlockId !== blockId) {
-					setAttributes({
+				if ( newBlockId !== blockId ) {
+					setAttributes( {
 						block_id: newBlockId,
-					});
+					} );
 				}
 			}
 		}
 
 		render() {
-			return <BlockEdit {...this.props} />;
+			return <BlockEdit { ...this.props } />;
 		}
 	}
 
-	return withSelect((select, ownProps) => ({
+	return withSelect( ( select, ownProps ) => ( {
 		blockName: ownProps.name,
-	}))(newEdit);
-}, 'withUniqueBlockId');
+	} ) )( newEdit );
+}, 'withUniqueBlockId' );
 
-addFilter('editor.BlockEdit', 'vpf/editor/unique-block-id', withUniqueBlockId);
+addFilter(
+	'editor.BlockEdit',
+	'vpf/editor/unique-block-id',
+	withUniqueBlockId
+);

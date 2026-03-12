@@ -27,20 +27,20 @@ import { debounce } from 'throttle-debounce';
  * @param window
  * @param factory
  */
-(function (window, factory) {
+( function ( window, factory ) {
 	const globalInstall = function () {
-		factory(window.lazySizes);
-		window.removeEventListener('lazyunveilread', globalInstall, true);
+		factory( window.lazySizes );
+		window.removeEventListener( 'lazyunveilread', globalInstall, true );
 	};
-	factory = factory.bind(null, window, window.document);
+	factory = factory.bind( null, window, window.document );
 
-	if (window.lazySizes) {
+	if ( window.lazySizes ) {
 		globalInstall();
 	} else {
-		window.addEventListener('lazyunveilread', globalInstall, true);
+		window.addEventListener( 'lazyunveilread', globalInstall, true );
 	}
-})(window, (window, document, lazySizes) => {
-	if (!window.addEventListener) {
+} )( window, ( window, document, lazySizes ) => {
+	if ( ! window.addEventListener ) {
 		return;
 	}
 
@@ -50,80 +50,83 @@ import { debounce } from 'throttle-debounce';
 	const observerMap = new WeakMap();
 
 	const wpLightboxResolve = {
-		observeClassChanges(img) {
+		observeClassChanges( img ) {
 			// Don't create duplicate observers.
-			if (observerMap.has(img)) {
+			if ( observerMap.has( img ) ) {
 				return;
 			}
 
 			// Debounced callback to restore classes via unveil if vp-lazyloaded is removed.
-			const restoreLazyloadedClass = debounce(50, () => {
+			const restoreLazyloadedClass = debounce( 50, () => {
 				// Check if element is still in the DOM before processing.
-				if (!document.contains(img)) {
-					this.disconnectObserver(img);
+				if ( ! document.contains( img ) ) {
+					this.disconnectObserver( img );
 					return;
 				}
 
-				if (!img.classList.contains('vp-lazyloaded')) {
-					unveil(img);
+				if ( ! img.classList.contains( 'vp-lazyloaded' ) ) {
+					unveil( img );
 				}
-			});
+			} );
 
 			// Create observer for class attribute changes.
-			const observer = new window.MutationObserver((mutations) => {
-				mutations.forEach((mutation) => {
+			const observer = new window.MutationObserver( ( mutations ) => {
+				mutations.forEach( ( mutation ) => {
 					if (
 						mutation.type === 'attributes' &&
 						mutation.attributeName === 'class'
 					) {
 						restoreLazyloadedClass();
 					}
-				});
-			});
+				} );
+			} );
 
 			// Start observing.
-			observer.observe(img, {
+			observer.observe( img, {
 				attributes: true,
-				attributeFilter: ['class'],
-			});
+				attributeFilter: [ 'class' ],
+			} );
 
 			// Store observer reference.
-			observerMap.set(img, observer);
+			observerMap.set( img, observer );
 
 			// Clean up observer when element is removed from DOM.
 			// Use Intersection Observer to detect when element is disconnected.
 			const cleanupObserver = new window.IntersectionObserver(
-				(entries) => {
-					entries.forEach((entry) => {
+				( entries ) => {
+					entries.forEach( ( entry ) => {
 						// When element is no longer intersecting and not in document, clean up.
-						if (!entry.isIntersecting && !document.contains(img)) {
-							this.disconnectObserver(img);
+						if (
+							! entry.isIntersecting &&
+							! document.contains( img )
+						) {
+							this.disconnectObserver( img );
 							cleanupObserver.disconnect();
 						}
-					});
+					} );
 				},
 				{ threshold: 0 }
 			);
 
-			cleanupObserver.observe(img);
+			cleanupObserver.observe( img );
 		},
-		disconnectObserver(img) {
-			const observer = observerMap.get(img);
-			if (observer) {
+		disconnectObserver( img ) {
+			const observer = observerMap.get( img );
+			if ( observer ) {
 				observer.disconnect();
-				observerMap.delete(img);
+				observerMap.delete( img );
 			}
 		},
 	};
 
 	lazySizes.wpLightboxResolve = wpLightboxResolve;
 
-	document.addEventListener('lazyloaded', (e) => {
+	document.addEventListener( 'lazyloaded', ( e ) => {
 		// for some reason sometimes e.detail is undefined, so we need to check it.
 		if (
 			e.defaultPrevented ||
-			!e.detail ||
-			!e.target ||
+			! e.detail ||
+			! e.target ||
 			e.detail.instance !== lazySizes
 		) {
 			return;
@@ -131,8 +134,10 @@ import { debounce } from 'throttle-debounce';
 
 		// Only allow for image blocks with lightbox enabled.
 		// Watch for class changes to prevent WP Lightbox from removing vp-lazyloaded.
-		if (e.target.parentNode?.classList.contains('wp-lightbox-container')) {
-			wpLightboxResolve.observeClassChanges(e.target);
+		if (
+			e.target.parentNode?.classList.contains( 'wp-lightbox-container' )
+		) {
+			wpLightboxResolve.observeClassChanges( e.target );
 		}
-	});
-});
+	} );
+} );

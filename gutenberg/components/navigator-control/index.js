@@ -25,7 +25,7 @@ const NavigatorBackButton =
  *
  * @param props
  */
-export default function NavigatorControl(props) {
+export default function NavigatorControl( props ) {
 	const { children, options } = props;
 
 	return (
@@ -37,13 +37,13 @@ export default function NavigatorControl(props) {
 				path="/"
 				className="vpf-component-navigator-control-toggles"
 			>
-				{options.map((option) => {
+				{ options.map( ( option ) => {
 					return (
 						<NavigatorButton
-							key={option.category}
-							path={`/${option.category}`}
+							key={ option.category }
+							path={ `/${ option.category }` }
 						>
-							<span>{option.title}</span>
+							<span>{ option.title }</span>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
@@ -56,14 +56,14 @@ export default function NavigatorControl(props) {
 							</svg>
 						</NavigatorButton>
 					);
-				})}
+				} ) }
 			</NavigatorScreen>
 
-			{options.map((option) => {
+			{ options.map( ( option ) => {
 				return (
 					<NavigatorScreen
-						key={option.category}
-						path={`/${option.category}`}
+						key={ option.category }
+						path={ `/${ option.category }` }
 					>
 						<div className="vpf-component-navigator-control-screen-title">
 							<NavigatorBackButton>
@@ -78,12 +78,12 @@ export default function NavigatorControl(props) {
 									<path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z" />
 								</svg>
 							</NavigatorBackButton>
-							<span>{option.title}</span>
+							<span>{ option.title }</span>
 						</div>
-						{children(option)}
+						{ children( option ) }
 					</NavigatorScreen>
 				);
-			})}
+			} ) }
 		</NavigatorProvider>
 	);
 }

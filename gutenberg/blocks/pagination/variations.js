@@ -7,17 +7,17 @@ import { ReactComponent as LoadMoreIcon } from '../../block-icons/pagination-loa
 export default [
 	{
 		name: 'paged',
-		scope: ['inserter', 'block'],
-		title: __('Pagination Paged (Experimental)'),
+		scope: [ 'inserter', 'block' ],
+		title: __( 'Pagination Paged (Experimental)' ),
 		description:
 			'Displays paged pagination for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.',
 		attributes: {
 			layout: { type: 'flex', justifyContent: 'space-between' },
 		},
 		innerBlocks: [
-			['visual-portfolio/pagination-previous'],
-			['visual-portfolio/pagination-numbers'],
-			['visual-portfolio/pagination-next'],
+			[ 'visual-portfolio/pagination-previous' ],
+			[ 'visual-portfolio/pagination-numbers' ],
+			[ 'visual-portfolio/pagination-next' ],
 		],
 		icon: {
 			foreground: '#2540CC',
@@ -26,12 +26,12 @@ export default [
 	},
 	{
 		name: 'load-more',
-		scope: ['inserter', 'block'],
-		title: __('Pagination Load More (Experimental)'),
+		scope: [ 'inserter', 'block' ],
+		title: __( 'Pagination Load More (Experimental)' ),
 		description:
 			'Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.',
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },
-		innerBlocks: [['visual-portfolio/pagination-load-more']],
+		innerBlocks: [ [ 'visual-portfolio/pagination-load-more' ] ],
 		icon: {
 			foreground: '#2540CC',
 			src: <LoadMoreIcon width="20" height="20" />,
@@ -39,12 +39,12 @@ export default [
 	},
 	{
 		name: 'infinite',
-		scope: ['inserter', 'block'],
-		title: __('Pagination Infinite (Experimental)'),
+		scope: [ 'inserter', 'block' ],
+		title: __( 'Pagination Infinite (Experimental)' ),
 		description:
 			'Displays a infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.',
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },
-		innerBlocks: [['visual-portfolio/pagination-infinite']],
+		innerBlocks: [ [ 'visual-portfolio/pagination-infinite' ] ],
 		icon: {
 			foreground: '#2540CC',
 			src: <InfiniteIcon width="20" height="20" />,

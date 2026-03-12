@@ -9,13 +9,13 @@ import { Notice } from '@wordpress/components';
  *
  * @param props
  */
-export default function NoticeComponent(props) {
+export default function NoticeComponent( props ) {
 	const { className, ...allProps } = props;
 
 	return (
 		<Notice
-			className={classnames('vpf-component-notice', className)}
-			{...allProps}
+			className={ classnames( 'vpf-component-notice', className ) }
+			{ ...allProps }
 		/>
 	);
 }

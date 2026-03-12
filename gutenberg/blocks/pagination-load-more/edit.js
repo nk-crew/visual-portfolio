@@ -4,22 +4,26 @@
 import { PlainText, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit({ attributes, setAttributes }) {
+export default function Edit( { attributes, setAttributes } ) {
 	const { label } = attributes;
 
 	return (
 		<a
 			href="#pagination-load-more-pseudo-link"
-			onClick={(event) => event.preventDefault()}
-			{...useBlockProps({ className: 'vp-block-pagination-load-more' })}
+			onClick={ ( event ) => event.preventDefault() }
+			{ ...useBlockProps( {
+				className: 'vp-block-pagination-load-more',
+			} ) }
 		>
 			<PlainText
-				__experimentalVersion={2}
+				__experimentalVersion={ 2 }
 				tagName="span"
-				aria-label={__('Load more link', 'visual-portfolio')}
-				placeholder={__('Load More', 'visual-portfolio')}
-				value={label}
-				onChange={(newLabel) => setAttributes({ label: newLabel })}
+				aria-label={ __( 'Load more link', 'visual-portfolio' ) }
+				placeholder={ __( 'Load More', 'visual-portfolio' ) }
+				value={ label }
+				onChange={ ( newLabel ) =>
+					setAttributes( { label: newLabel } )
+				}
 			/>
 		</a>
 	);

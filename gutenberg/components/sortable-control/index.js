@@ -19,7 +19,7 @@ import classnames from 'classnames/dedupe';
 import { Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
-const SortableItem = function ({ id, element, sourceOptions, items, props }) {
+const SortableItem = function ( { id, element, sourceOptions, items, props } ) {
 	const { allowDisablingOptions, onChange } = props;
 
 	const {
@@ -30,26 +30,26 @@ const SortableItem = function ({ id, element, sourceOptions, items, props }) {
 		transition,
 		isDragging,
 		isSorting,
-	} = useSortable({
+	} = useSortable( {
 		id,
-	});
+	} );
 
 	const style = {
-		transform: CSS.Translate.toString(transform),
+		transform: CSS.Translate.toString( transform ),
 		transition: isSorting ? transition : '',
 	};
 
-	const label = sourceOptions[element];
+	const label = sourceOptions[ element ];
 	return (
 		<li
-			className={classnames(
+			className={ classnames(
 				'vpf-component-sortable-item',
 				isDragging ? 'vpf-component-sortable-item-dragging' : ''
-			)}
-			ref={setNodeRef}
-			style={style}
+			) }
+			ref={ setNodeRef }
+			style={ style }
 		>
-			<span {...attributes} {...listeners}>
+			<span { ...attributes } { ...listeners }>
 				<svg
 					width="24"
 					height="24"
@@ -83,17 +83,17 @@ const SortableItem = function ({ id, element, sourceOptions, items, props }) {
 					/>
 				</svg>
 			</span>
-			{label}
-			{allowDisablingOptions ? (
+			{ label }
+			{ allowDisablingOptions ? (
 				<Button
 					className="vpf-component-sortable-delete"
-					onClick={() => {
-						const updateValue = [...items];
-						const findIndex = items.indexOf(element);
-						updateValue.splice(findIndex, 1);
+					onClick={ () => {
+						const updateValue = [ ...items ];
+						const findIndex = items.indexOf( element );
+						updateValue.splice( findIndex, 1 );
 
-						onChange(updateValue);
-					}}
+						onChange( updateValue );
+					} }
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -109,50 +109,50 @@ const SortableItem = function ({ id, element, sourceOptions, items, props }) {
 						/>
 					</svg>
 				</Button>
-			) : null}
+			) : null }
 		</li>
 	);
 };
 
-const SortableList = function ({
+const SortableList = function ( {
 	items,
 	sourceOptions,
 	classes,
 	onSortEnd,
 	props,
-}) {
-	const sensors = useSensors(useSensor(PointerSensor));
+} ) {
+	const sensors = useSensors( useSensor( PointerSensor ) );
 
 	return (
-		<ul className={classes}>
+		<ul className={ classes }>
 			<DndContext
-				sensors={sensors}
-				collisionDetection={closestCenter}
-				onDragEnd={(event) => {
+				sensors={ sensors }
+				collisionDetection={ closestCenter }
+				onDragEnd={ ( event ) => {
 					const { active, over } = event;
 
-					if (active.id !== over.id) {
+					if ( active.id !== over.id ) {
 						onSortEnd(
-							items.indexOf(active.id),
-							items.indexOf(over.id)
+							items.indexOf( active.id ),
+							items.indexOf( over.id )
 						);
 					}
-				}}
+				} }
 			>
 				<SortableContext
-					items={items}
-					strategy={verticalListSortingStrategy}
+					items={ items }
+					strategy={ verticalListSortingStrategy }
 				>
-					{items.map((value) => (
+					{ items.map( ( value ) => (
 						<SortableItem
-							key={`item-${value}`}
-							id={value}
-							element={value}
-							sourceOptions={sourceOptions}
-							props={props}
-							items={items}
+							key={ `item-${ value }` }
+							id={ value }
+							element={ value }
+							sourceOptions={ sourceOptions }
+							props={ props }
+							items={ items }
 						/>
-					))}
+					) ) }
 				</SortableContext>
 			</DndContext>
 		</ul>
@@ -169,12 +169,12 @@ export default class SortableControl extends Component {
 
 		let { value } = this.props;
 
-		if (typeof value === 'undefined') {
+		if ( typeof value === 'undefined' ) {
 			value = typeof defaultOptions !== 'undefined' ? defaultOptions : [];
 		}
 
-		const disabledOptions = Object.keys(options).filter(
-			(findValue) => !value.includes(findValue)
+		const disabledOptions = Object.keys( options ).filter(
+			( findValue ) => ! value.includes( findValue )
 		);
 		const classes = classnames(
 			'vpf-component-sortable',
@@ -186,33 +186,33 @@ export default class SortableControl extends Component {
 		return (
 			<div>
 				<SortableList
-					items={value}
-					sourceOptions={options}
-					classes={classes}
-					props={this.props}
-					onSortEnd={(oldIndex, newIndex) => {
+					items={ value }
+					sourceOptions={ options }
+					classes={ classes }
+					props={ this.props }
+					onSortEnd={ ( oldIndex, newIndex ) => {
 						const updateValue = arrayMove(
 							value,
 							oldIndex,
 							newIndex
 						);
-						onChange(updateValue);
-					}}
+						onChange( updateValue );
+					} }
 				/>
-				{disabledOptions.length > 0 ? (
+				{ disabledOptions.length > 0 ? (
 					<ul className="vpf-component-sortable-disabled">
-						{disabledOptions.map((el) => (
-							<li key={`disabled-item-${el}`}>
-								{allowDisablingOptions ? (
+						{ disabledOptions.map( ( el ) => (
+							<li key={ `disabled-item-${ el }` }>
+								{ allowDisablingOptions ? (
 									<Button
 										className="vpf-component-sortable-add"
-										onClick={() => {
-											const updateValue = [...value];
+										onClick={ () => {
+											const updateValue = [ ...value ];
 
-											updateValue.push(el);
+											updateValue.push( el );
 
-											onChange(updateValue);
-										}}
+											onChange( updateValue );
+										} }
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -228,12 +228,12 @@ export default class SortableControl extends Component {
 											/>
 										</svg>
 									</Button>
-								) : null}
-								{options[el]}
+								) : null }
+								{ options[ el ] }
 							</li>
-						))}
+						) ) }
 					</ul>
-				) : null}
+				) : null }
 			</div>
 		);
 	}

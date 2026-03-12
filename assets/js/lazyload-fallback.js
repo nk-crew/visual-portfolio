@@ -4,23 +4,23 @@
  */
 
 // Lazyloaded - remove preloader images placeholder effect.
-document.addEventListener('lazybeforeunveil', (e) => {
+document.addEventListener( 'lazybeforeunveil', ( e ) => {
 	const vpfImgWrapper = e.target.closest(
 		'.vp-portfolio__item-img, .vp-portfolio__thumbnail-img'
 	);
 
-	if (vpfImgWrapper) {
-		vpfImgWrapper.classList.add('vp-has-lazyloading');
+	if ( vpfImgWrapper ) {
+		vpfImgWrapper.classList.add( 'vp-has-lazyloading' );
 	}
-});
+} );
 
-document.addEventListener('lazyloaded', (e) => {
+document.addEventListener( 'lazyloaded', ( e ) => {
 	const vpfImgWrapper = e.target.closest(
 		'.vp-portfolio__item-img, .vp-portfolio__thumbnail-img'
 	);
 
-	if (vpfImgWrapper) {
-		vpfImgWrapper.classList.add('vp-has-lazyloaded');
-		vpfImgWrapper.classList.add('vp-has-lazyloading');
+	if ( vpfImgWrapper ) {
+		vpfImgWrapper.classList.add( 'vp-has-lazyloaded' );
+		vpfImgWrapper.classList.add( 'vp-has-lazyloading' );
 	}
-});
+} );

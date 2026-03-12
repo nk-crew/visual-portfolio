@@ -17,14 +17,14 @@ import { Component } from '@wordpress/element';
  * Component Class
  */
 export default class CodeEditor extends Component {
-	constructor(...args) {
-		super(...args);
+	constructor( ...args ) {
+		super( ...args );
 
 		this.state = {
 			codePlaceholder: this.props.codePlaceholder,
 		};
 
-		this.maybeRemovePlaceholder = this.maybeRemovePlaceholder.bind(this);
+		this.maybeRemovePlaceholder = this.maybeRemovePlaceholder.bind( this );
 	}
 
 	componentDidMount() {
@@ -39,8 +39,8 @@ export default class CodeEditor extends Component {
 
 		const { codePlaceholder } = this.state;
 
-		if (value && codePlaceholder) {
-			this.setState({ codePlaceholder: '' });
+		if ( value && codePlaceholder ) {
+			this.setState( { codePlaceholder: '' } );
 		}
 	}
 
@@ -53,35 +53,35 @@ export default class CodeEditor extends Component {
 			<AceEditor
 				className="vpf-component-code-editor"
 				theme="textmate"
-				onLoad={(editor) => {
-					editor.renderer.setScrollMargin(16, 16, 16, 16);
-					editor.renderer.setPadding(16);
-				}}
-				fontSize={12}
+				onLoad={ ( editor ) => {
+					editor.renderer.setScrollMargin( 16, 16, 16, 16 );
+					editor.renderer.setPadding( 16 );
+				} }
+				fontSize={ 12 }
 				showPrintMargin
 				showGutter
-				highlightActiveLine={false}
+				highlightActiveLine={ false }
 				width="100%"
-				setOptions={{
+				setOptions={ {
 					enableBasicAutocompletion: true,
 					enableLiveAutocompletion: true,
 					enableSnippets: true,
 					showLineNumbers: true,
 					printMargin: false,
 					tabSize: 2,
-				}}
-				editorProps={{
+				} }
+				editorProps={ {
 					$blockScrolling: Infinity,
-				}}
-				value={value || codePlaceholder}
-				onChange={(val) => {
-					onChange(val === codePlaceholder ? '' : val);
+				} }
+				value={ value || codePlaceholder }
+				onChange={ ( val ) => {
+					onChange( val === codePlaceholder ? '' : val );
 
 					this.maybeRemovePlaceholder();
-				}}
-				mode={mode}
-				maxLines={maxLines}
-				minLines={minLines}
+				} }
+				mode={ mode }
+				maxLines={ maxLines }
+				minLines={ minLines }
 			/>
 		);
 	}

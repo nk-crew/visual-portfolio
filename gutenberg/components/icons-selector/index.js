@@ -15,33 +15,33 @@ const cachedOptions = {};
  * Component Class
  */
 export default class IconsSelector extends Component {
-	constructor(...args) {
-		super(...args);
+	constructor( ...args ) {
+		super( ...args );
 
 		const { callback } = this.props;
 
 		this.state = {
 			options: { ...this.props.options },
-			ajaxStatus: !!callback,
+			ajaxStatus: !! callback,
 			collapsed: true,
 		};
 
-		cachedOptions[this.props.controlName] = { ...this.props.options };
+		cachedOptions[ this.props.controlName ] = { ...this.props.options };
 
-		this.requestAjax = this.requestAjax.bind(this);
+		this.requestAjax = this.requestAjax.bind( this );
 	}
 
 	componentDidMount() {
 		const { callback } = this.props;
 
-		if (callback) {
-			this.requestAjax({}, (result) => {
-				if (result.options) {
-					this.setState({
+		if ( callback ) {
+			this.requestAjax( {}, ( result ) => {
+				if ( result.options ) {
+					this.setState( {
 						options: result.options,
-					});
+					} );
 				}
-			});
+			} );
 		}
 	}
 
@@ -59,16 +59,16 @@ export default class IconsSelector extends Component {
 	) {
 		const { controlName, attributes } = this.props;
 
-		if (this.isAJAXinProgress) {
+		if ( this.isAJAXinProgress ) {
 			return;
 		}
 
 		this.isAJAXinProgress = true;
 
-		if (useStateLoading) {
-			this.setState({
+		if ( useStateLoading ) {
+			this.setState( {
 				ajaxStatus: 'progress',
-			});
+			} );
 		}
 
 		const ajaxData = {
@@ -79,34 +79,34 @@ export default class IconsSelector extends Component {
 			...additionalData,
 		};
 
-		$.ajax({
+		$.ajax( {
 			url: ajaxurl,
 			method: 'POST',
 			dataType: 'json',
 			data: ajaxData,
-			complete: (data) => {
+			complete: ( data ) => {
 				const json = data.responseJSON;
 
-				if (callback && json.response) {
-					if (json.response.options) {
-						cachedOptions[controlName] = {
-							...cachedOptions[controlName],
+				if ( callback && json.response ) {
+					if ( json.response.options ) {
+						cachedOptions[ controlName ] = {
+							...cachedOptions[ controlName ],
 							...json.response.options,
 						};
 					}
 
-					callback(json.response);
+					callback( json.response );
 				}
 
-				if (useStateLoading) {
-					this.setState({
+				if ( useStateLoading ) {
+					this.setState( {
 						ajaxStatus: true,
-					});
+					} );
 				}
 
 				this.isAJAXinProgress = false;
 			},
-		});
+		} );
 	}
 
 	render() {
@@ -123,7 +123,7 @@ export default class IconsSelector extends Component {
 
 		const isLoading = ajaxStatus && ajaxStatus === 'progress';
 
-		if (isLoading) {
+		if ( isLoading ) {
 			return (
 				<div className="vpf-component-icon-selector">
 					<Spinner />
@@ -131,8 +131,8 @@ export default class IconsSelector extends Component {
 			);
 		}
 
-		const optionsArray = Object.keys(options);
-		const fromIndex = optionsArray.indexOf(value);
+		const optionsArray = Object.keys( options );
+		const fromIndex = optionsArray.indexOf( value );
 
 		const itemsPerRow = isSetupWizard ? 5 : columns;
 		const allowedItems = collapseRows * itemsPerRow;
@@ -148,82 +148,82 @@ export default class IconsSelector extends Component {
 			fromIndex >= visibleCollapsedItems
 		) {
 			const toIndex = visibleCollapsedItems - 1;
-			const element = optionsArray[fromIndex];
-			optionsArray.splice(fromIndex, 1);
-			optionsArray.splice(toIndex, 0, element);
+			const element = optionsArray[ fromIndex ];
+			optionsArray.splice( fromIndex, 1 );
+			optionsArray.splice( toIndex, 0, element );
 		}
 
 		return (
 			<div
-				className={classnames(
+				className={ classnames(
 					'vpf-component-icon-selector',
 					allowCollapsing
 						? 'vpf-component-icon-selector-allow-collapsing'
 						: ''
-				)}
-				data-control-name={controlName}
+				) }
+				data-control-name={ controlName }
 				style={
 					isSetupWizard
 						? undefined
 						: {
-								gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+								gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
 						  }
 				}
 			>
-				{optionsArray
-					.filter((elm, i) => {
-						if (allowCollapsing) {
+				{ optionsArray
+					.filter( ( elm, i ) => {
+						if ( allowCollapsing ) {
 							return collapsed ? i < visibleCollapsedItems : true;
 						}
 						return true;
-					})
-					.map((k) => {
-						const option = options[k];
+					} )
+					.map( ( k ) => {
+						const option = options[ k ];
 						let { icon } = option;
 
-						if (isSetupWizard) {
-							if (option.image_preview_wizard) {
-								icon = `<img src="${option.image_preview_wizard}" alt="${option.title} Preview">`;
-							} else if (option.icon_wizard) {
+						if ( isSetupWizard ) {
+							if ( option.image_preview_wizard ) {
+								icon = `<img src="${ option.image_preview_wizard }" alt="${ option.title } Preview">`;
+							} else if ( option.icon_wizard ) {
 								icon = option.icon_wizard;
 							}
 						}
 
 						return (
 							<Button
-								key={`icon-selector-${option.title}-${option.value}`}
-								onClick={() => onChange(option.value)}
-								className={classnames(
+								key={ `icon-selector-${ option.title }-${ option.value }` }
+								onClick={ () => onChange( option.value ) }
+								className={ classnames(
 									'vpf-component-icon-selector-item',
 									value === option.value
 										? 'vpf-component-icon-selector-item-active'
 										: '',
 									option.className
-								)}
+								) }
 							>
-								{icon ? <RawHTML>{icon}</RawHTML> : ''}
-								{option.title ? (
-									<span>{option.title}</span>
+								{ icon ? <RawHTML>{ icon }</RawHTML> : '' }
+								{ option.title ? (
+									<span>{ option.title }</span>
 								) : (
 									''
-								)}
+								) }
 							</Button>
 						);
-					})}
-				{allowCollapsing ? (
+					} ) }
+				{ allowCollapsing ? (
 					<Button
-						onClick={() => {
-							this.setState({
-								collapsed: !collapsed,
-							});
-						}}
-						className={classnames(
+						onClick={ () => {
+							this.setState( {
+								collapsed: ! collapsed,
+							} );
+						} }
+						className={ classnames(
 							'vpf-component-icon-selector-item',
 							'vpf-component-icon-selector-item-collapse',
 							collapsed
 								? ''
 								: 'vpf-component-icon-selector-item-expanded'
-						)}
+						) }
 					>
 						<div className="vpf-component-icon-selector-item-collapse">
 							<svg
@@ -241,12 +241,12 @@ export default class IconsSelector extends Component {
 							</svg>
 						</div>
 						<span>
-							{collapsed
-								? __('More', 'visual-portfolio')
-								: __('Less', 'visual-portfolio')}
+							{ collapsed
+								? __( 'More', 'visual-portfolio' )
+								: __( 'Less', 'visual-portfolio' ) }
 						</span>
 					</Button>
-				) : null}
+				) : null }
 			</div>
 		);
 	}

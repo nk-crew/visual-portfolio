@@ -13,11 +13,11 @@ import edit from './edit';
 /**
  * Register block
  */
-registerBlockType(metadata.name, {
+registerBlockType( metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
 		src: <BlockIcon width="20" height="20" />,
 	},
 	edit,
-});
+} );
