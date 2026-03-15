@@ -188,7 +188,9 @@ class Visual_Portfolio_Custom_Post_Type {
 				array(
 					'label'              => esc_html__( 'Portfolio Categories', 'visual-portfolio' ),
 					'labels'             => array(
-						'menu_name' => esc_html__( 'Categories', 'visual-portfolio' ),
+						'name'          => esc_html__( 'Portfolio Categories', 'visual-portfolio' ),
+						'singular_name' => esc_html__( 'Portfolio Category', 'visual-portfolio' ),
+						'menu_name'     => esc_html__( 'Categories', 'visual-portfolio' ),
 					),
 					'rewrite'            => array(
 						'slug'  => $permalinks['category_base'],
@@ -209,7 +211,9 @@ class Visual_Portfolio_Custom_Post_Type {
 				array(
 					'label'              => esc_html__( 'Portfolio Tags', 'visual-portfolio' ),
 					'labels'             => array(
-						'menu_name' => esc_html__( 'Tags', 'visual-portfolio' ),
+						'name'          => esc_html__( 'Portfolio Tags', 'visual-portfolio' ),
+						'singular_name' => esc_html__( 'Portfolio Tag', 'visual-portfolio' ),
+						'menu_name'     => esc_html__( 'Tags', 'visual-portfolio' ),
 					),
 					'rewrite'            => array(
 						'slug'  => $permalinks['tag_base'],
