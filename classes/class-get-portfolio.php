@@ -354,6 +354,9 @@ class Visual_Portfolio_Get {
 		 */
 		$custom_query = apply_filters( 'vpf_custom_query_result', false, $query_opts, $options );
 
+		// This hack exists because wp_reset_postdata() does not work in some situations.
+		$old_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
+
 		if ( $is_images || $is_social ) {
 			if ( isset( $query_opts['max_num_pages'] ) ) {
 				$max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
@@ -365,9 +368,6 @@ class Visual_Portfolio_Get {
 			$portfolio_query = $custom_query;
 			$max_pages       = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
 		} else {
-			// stupid hack as wp_reset_postdata() function is not working for some reason...
-			$old_post = $GLOBALS['post'];
-
 			// get Post List.
 			$portfolio_query = new WP_Query( $query_opts );
 
@@ -782,7 +782,7 @@ class Visual_Portfolio_Get {
 			// Sometimes, when we use WPBakery Page Builder, without this reset output is wrong.
 			wp_reset_postdata();
 
-			// stupid hack as wp_reset_postdata() function is not working in some situations...
+			// This hack exists because wp_reset_postdata() does not work in some situations.
             // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 			$GLOBALS['post'] = $old_post;
 		}
@@ -1951,8 +1951,9 @@ class Visual_Portfolio_Get {
 		$there_is_active = false;
 		$term_counts     = array(); // Track actual counts from query results.
 
-		// stupid hack as wp_reset_postdata() function is not working for me...
+		// This hack exists because wp_reset_postdata() does not work in some situations.
 		$old_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
+
 		while ( $portfolio_query->have_posts() ) {
 			$portfolio_query->the_post();
 			$current_post_id = get_the_ID();
