@@ -8,6 +8,9 @@ on:
   # Allow manually triggering the workflow.
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
   # The concurrency group contains the workflow name and the branch name for pull requests
@@ -19,6 +22,7 @@ jobs:
   compute-previous-wordpress-version:
     name: Compute previous WordPress version
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
 
@@ -26,10 +30,10 @@ jobs:
       - name: Get previous WordPress version
         id: get-previous-wordpress-version
         run: |
-          curl \
+          curl --fail --silent --show-error --location \
             -H "Accept: application/json" \
             -o versions.json \
-            "http://api.wordpress.org/core/stable-check/1.0/"
+            "https://api.wordpress.org/core/stable-check/1.0/"
           LATEST_WP_VERSION=$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)
           IFS='.' read LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
           if [[ ${LATEST_WP_MINOR} == "0" ]]; then
@@ -90,12 +94,8 @@ jobs:
       - name: Override PHP version in composer.json
         run: composer config platform.php ${{ matrix.php }}
 
-      # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
-      # passing a custom cache suffix ensures that the cache is flushed at least once per week.
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v3
-        with:
-          custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
       - name: Install SVN
         run: sudo apt-get update && sudo apt-get install -y subversion
@@ -103,34 +103,8 @@ jobs:
       - name: Npm build
         run: npm run build
 
-      - name: Docker debug information
-        run: |
-          docker -v
-          docker compose version
-
-      - name: General debug information
-        run: |
-          npm --version
-          node --version
-          curl --version
-          git --version
-          svn --version
-          locale -a
-
       - name: Start Docker environment
         run: npm run wp-env start
-
-      - name: Log running Docker containers
-        run: docker ps -a
-
-      - name: Docker container debug information
-        run: |
-          npm run wp-env run tests-mysql mysql -- --version
-          npm run wp-env run tests-wordpress php -- --version
-          npm run wp-env run tests-wordpress php -m
-          npm run wp-env run tests-wordpress php -i
-          npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/visual-portfolio/vendor/bin/phpunit -- --version
-          npm run wp-env run tests-wordpress locale -a
 
       - name: Running unit tests
         run: |
@@ -156,6 +130,25 @@ jobs:
             echo "Only $num_tests tests passed, which is much fewer than expected." && exit 1
           fi
           echo "$num_tests tests passed."
+
+      - name: Debug environment on failure
+        if: ${{ failure() }}
+        run: |
+          docker -v || true
+          docker compose version || true
+          npm --version || true
+          node --version || true
+          curl --version || true
+          git --version || true
+          svn --version || true
+          locale -a || true
+          docker ps -a || true
+          npm run wp-env run tests-mysql mysql -- --version || true
+          npm run wp-env run tests-wordpress php -- --version || true
+          npm run wp-env run tests-wordpress php -m || true
+          npm run wp-env run tests-wordpress php -i || true
+          npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/visual-portfolio/vendor/bin/phpunit -- --version || true
+          npm run wp-env run tests-wordpress locale -a || true
 
   lint:
     name: Lint JS + CSS
@@ -204,12 +197,8 @@ jobs:
           path: .cache/phpcs.json
           key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
 
-      # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
-      # passing a custom cache suffix ensures that the cache is flushed at least once per week.
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v3
-        with:
-          custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 
       - name: Make Composer packages available globally
         run: echo "${PWD}/vendor/bin" >> $GITHUB_PATH

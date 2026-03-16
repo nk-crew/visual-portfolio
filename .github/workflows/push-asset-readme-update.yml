@@ -6,10 +6,18 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   trunk:
     name: Push to trunk
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,7 +25,7 @@ jobs:
       - name: Install SVN
         run: |
           sudo apt-get update
-          sudo apt-get install subversion
+          sudo apt-get install -y subversion
 
       - name: WordPress.org plugin asset/readme update
         uses: nk-crew/action-wordpress-plugin-asset-update@develop
