@@ -1661,11 +1661,6 @@ class Visual_Portfolio_Admin {
 				'setup_wizard'    => true,
 				'focal_point'     => true,
 				'image_controls'  => array(
-					'section_general' => array(
-						'type'        => 'section_heading',
-						'label'       => esc_html__( 'General', 'visual-portfolio' ),
-						'modal_width' => 'full',
-					),
 					'title' => array(
 						'type'        => 'text',
 						'label'       => esc_html__( 'Title', 'visual-portfolio' ),

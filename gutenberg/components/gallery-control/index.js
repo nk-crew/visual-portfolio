@@ -21,12 +21,15 @@ import { isEqual } from 'lodash';
 
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import {
+	__experimentalUnitControl,
 	Button,
 	CheckboxControl,
 	FocalPointPicker,
 	Modal,
+	PanelRow,
 	SelectControl,
 	TextControl,
+	UnitControl as __stableUnitControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -41,6 +44,7 @@ const { navigator, VPGutenbergVariables } = window;
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const UNCATEGORIZED_VALUE = '------';
 const ITEMS_COUNT_DEFAULT = 18;
+const UnitControl = __stableUnitControl || __experimentalUnitControl;
 
 function getImageControlLayout( name, control ) {
 	if ( control.modal_width ) {
@@ -250,82 +254,130 @@ const SelectedImageData = function ( props ) {
 		[ showMoreInfo, imgId ]
 	);
 
+	let focalPointValue = focalPoint;
+
+	if (
+		! focalPointValue ||
+		typeof focalPointValue.x !== 'number' ||
+		typeof focalPointValue.y !== 'number'
+	) {
+		focalPointValue = {
+			x: 0.5,
+			y: 0.5,
+		};
+	}
+
 	return (
 		<MediaUploadCheck>
-			<div
-				className={ `vpf-component-gallery-control-item-modal-image-info editor-post-featured-image ${
-					showMoreInfo
-						? 'vpf-component-gallery-control-item-modal-image-info-sticky-bottom'
-						: ''
-				}` }
-			>
-				{ showFocalPoint ? (
-					<FocalPointPicker
-						url={ imageData?.source_url || imgUrl }
-						value={ focalPoint }
-						dimensions={ {
-							width: imageData?.media_details?.width || 80,
-							height: imageData?.media_details?.height || 80,
-						} }
-						onChange={ ( val ) => {
-							onChangeFocalPoint( val );
-						} }
-						__nextHasNoMarginBottom
+			<div className="vpf-component-gallery-control-item-modal-image-info editor-post-featured-image">
+				<div className="vpf-component-gallery-control-item-modal-image-preview">
+					<img
+						src={ imageData?.source_url || imgUrl }
+						alt={ imageData?.alt_text || '' }
 					/>
-				) : null }
-				<MediaUpload
-					onSelect={ ( image ) => {
-						const imgData = prepareImage( image );
-						onChangeImage( imgData );
-					} }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					render={ ( { open } ) => (
-						<Button onClick={ open } variant="secondary">
-							{ __( 'Replace Image', 'visual-portfolio' ) }
+					<div className="vpf-component-gallery-control-item-modal-image-actions">
+						<MediaUpload
+							onSelect={ ( image ) => {
+								const imgData = prepareImage( image );
+								onChangeImage( imgData );
+							} }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							render={ ( { open } ) => (
+								<Button
+									onClick={ open }
+									className="vpf-component-gallery-control-item-modal-image-action"
+								>
+									{ __( 'Replace', 'visual-portfolio' ) }
+								</Button>
+							) }
+						/>
+						<Button
+							onClick={ () => {
+								onChangeImage( false );
+							} }
+							className="vpf-component-gallery-control-item-modal-image-action"
+						>
+							{ __( 'Remove', 'visual-portfolio' ) }
 						</Button>
-					) }
-				/>
-				<Button
-					onClick={ () => {
-						onChangeImage( false );
-					} }
-					isLink
-					isDestructive
-				>
-					{ __( 'Remove Image from Gallery', 'visual-portfolio' ) }
-				</Button>
+					</div>
+				</div>
 				<div className="vpf-component-gallery-control-item-modal-image-additional-info">
 					<Button
+						className="vpf-component-gallery-control-item-modal-image-additional-info-toggle"
 						onClick={ () => {
 							setShowMoreInfo( ! showMoreInfo );
 						} }
-						isLink
+						aria-expanded={ showMoreInfo }
 					>
 						{ showMoreInfo
-							? __( 'Hide Additional Info', 'visual-portfolio' )
-							: __( 'Show Additional Info', 'visual-portfolio' ) }
+							? __( 'Hide additional info', 'visual-portfolio' )
+							: __( 'Show additional info', 'visual-portfolio' ) }
 						<svg
-							width="20"
-							height="20"
-							viewBox="0 0 20 20"
-							fill="none"
+							viewBox="0 0 24 24"
 							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							className="components-panel__arrow"
+							aria-hidden="true"
+							focusable="false"
 						>
-							<path
-								d="M8 4L14 10L8 16"
-								stroke="currentColor"
-								fill="none"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								transform={ `rotate(${
-									showMoreInfo ? '-' : ''
-								}90 10 10)` }
-							/>
+							<path d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z" />
 						</svg>
 					</Button>
 					{ showMoreInfo ? (
 						<>
+							{ showFocalPoint ? (
+								<div className="vpf-component-gallery-control-item-modal-image-additional-info-focal-point">
+									<PanelRow>
+										<UnitControl
+											label={ __(
+												'Left',
+												'visual-portfolio'
+											) }
+											value={
+												100 * focalPointValue.x + '%'
+											}
+											onChange={ ( val ) => {
+												onChangeFocalPoint( {
+													...focalPointValue,
+													x: parseFloat( val ) / 100,
+												} );
+											} }
+											min={ 0 }
+											max={ 100 }
+											step={ 1 }
+											units={ [
+												{ value: '%', label: '%' },
+											] }
+											__next40pxDefaultSize
+											__nextHasNoMarginBottom
+										/>
+										<UnitControl
+											label={ __(
+												'Top',
+												'visual-portfolio'
+											) }
+											value={
+												100 * focalPointValue.y + '%'
+											}
+											onChange={ ( val ) => {
+												onChangeFocalPoint( {
+													...focalPointValue,
+													y: parseFloat( val ) / 100,
+												} );
+											} }
+											min={ 0 }
+											max={ 100 }
+											step={ 1 }
+											units={ [
+												{ value: '%', label: '%' },
+											] }
+											__next40pxDefaultSize
+											__nextHasNoMarginBottom
+										/>
+									</PanelRow>
+								</div>
+							) : null }
 							<div>
 								<strong>
 									{ __( 'File name:', 'visual-portfolio' ) }
