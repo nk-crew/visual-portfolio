@@ -1661,11 +1661,21 @@ class Visual_Portfolio_Admin {
 				'setup_wizard'    => true,
 				'focal_point'     => true,
 				'image_controls'  => array(
+					// Left panel.
 					'title' => array(
-						'type'        => 'text',
-						'label'       => esc_html__( 'Title', 'visual-portfolio' ),
-						'modal_width' => 'compact',
+						'type'           => 'text',
+						'label'          => esc_html__( 'Title', 'visual-portfolio' ),
+						'modal_width'    => 'full',
+						'modal_position' => 'left',
 					),
+					'description' => array(
+						'type'           => 'textarea',
+						'label'          => esc_html__( 'Description', 'visual-portfolio' ),
+						'modal_width'    => 'full',
+						'modal_position' => 'left',
+					),
+
+					// Right panel.
 					'categories' => array(
 						'type'            => 'select',
 						'label'           => esc_html__( 'Categories', 'visual-portfolio' ),
@@ -1673,11 +1683,6 @@ class Visual_Portfolio_Admin {
 						'creatable'       => true,
 						'allow_bulk_edit' => true,
 						'modal_width'     => 'compact',
-					),
-					'description' => array(
-						'type'        => 'textarea',
-						'label'       => esc_html__( 'Description', 'visual-portfolio' ),
-						'modal_width' => 'full',
 					),
 					'format' => array(
 						'type'            => 'select',
@@ -1695,7 +1700,7 @@ class Visual_Portfolio_Admin {
 						'label'       => esc_html__( 'URL', 'visual-portfolio' ),
 						'description' => esc_html__( 'By default used full image url, you can use custom one', 'visual-portfolio' ),
 						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
-						'modal_width' => 'compact',
+						'modal_width' => 'full',
 					),
 					'video_url' => array(
 						'type'        => 'text',
@@ -1737,14 +1742,14 @@ class Visual_Portfolio_Admin {
 					'image_settings_pro_note' => array(
 						'type'        => 'pro_note',
 						'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-						'description' => '<ul>
+						'description' => '<p>' . esc_html__( 'Unlock advanced image and video options such as:', 'visual-portfolio' ) . '</p>
+										<ul>
 											<li>' . esc_html__( 'Image albums', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Video thumbnail', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Thumbnail for hover state with Image and Video support', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Audio format', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Custom popup Image', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Custom Picture ID for Deep Linking', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'etc...', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Audio formats', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Video thumbnails', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Thumbnails for hover state.', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Custom popup image', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Picture ID for deep linking', 'visual-portfolio' ) . '</li>
 										</ul>',
 						'modal_width' => 'full',
 					),

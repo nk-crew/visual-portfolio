@@ -319,8 +319,6 @@
 	width: 100%;
 
 	.vpf-component-gallery-control-item-modal-image-info {
-		margin-bottom: 30px;
-
 		img {
 			display: block;
 			aspect-ratio: 2 / 1;
@@ -370,10 +368,8 @@
 		background: rgba(255, 255, 255, 0.75);
 	}
 
-	.vpf-component-gallery-control-item-modal-image-additional-info {
-		margin-top: 10px;
-
-		> .components-button {
+	.vpf-component-gallery-control-collapsible-section {
+		> .vpf-component-gallery-control-collapsible-section-toggle {
 			display: flex;
 			align-items: center;
 			height: 14px;
@@ -397,23 +393,27 @@
 			}
 		}
 
-		> div {
-			margin-top: 20px;
+		> .vpf-component-gallery-control-collapsible-section-content {
+			margin-top: 16px;
+		}
+	}
+
+	.vpf-component-gallery-control-item-modal-image-additional-info {
+		.vpf-component-gallery-control-collapsible-section-content {
+			word-wrap: break-word;
+		}
+	}
+
+	.vpf-component-gallery-control-item-modal-image-additional-info-focal-point {
+		margin-bottom: 16px;
+		margin-top: -6px;
+
+		.components-panel__row {
+			gap: 16px;
 		}
 
-		.vpf-component-gallery-control-item-modal-image-additional-info-focal-point {
-			.components-panel__row {
-				gap: 16px;
-			}
-
-			.components-input-control {
-				flex: 1;
-			}
-		}
-
-		.vpf-component-gallery-control-item-modal-image-additional-info-copied {
-			margin-left: 10px;
-			color: #15b11d;
+		.components-input-control {
+			flex: 1;
 		}
 	}
 
@@ -423,6 +423,10 @@
 		gap: 0 20px;
 		flex: 1;
 		min-width: 0;
+	}
+
+	.vpf-component-gallery-control-item-modal-fields-left {
+		margin-top: 16px;
 	}
 
 	.vpf-component-gallery-control-item-modal-field {
@@ -466,6 +470,10 @@
 				flex: 1;
 				width: auto;
 			}
+		}
+
+		.vpf-component-gallery-control-item-modal-fields-left {
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 

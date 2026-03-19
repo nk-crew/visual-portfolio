@@ -11,6 +11,10 @@
 	.vpf-setup-wizard-panel & {
 		margin: 0 auto;
 	}
+	.vpf-component-gallery-control-item-modal-wrap & {
+		width: 100%;
+		max-width: none;
+	}
 
 	&::before {
 		position: absolute;

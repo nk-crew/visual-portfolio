@@ -28,7 +28,6 @@ import {
 	Modal,
 	PanelRow,
 	SelectControl,
-	TextControl,
 	UnitControl as __stableUnitControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -37,9 +36,10 @@ import { applyFilters } from '@wordpress/hooks';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import ControlsRender from '../controls-render';
+import CollapsibleSection from './collapsible-section';
 import getAllCategories from './utils/get-all-categories';
 
-const { navigator, VPGutenbergVariables } = window;
+const { VPGutenbergVariables } = window;
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const UNCATEGORIZED_VALUE = '------';
@@ -64,6 +64,14 @@ function getImageControlLayout( name, control ) {
 	}
 
 	return 'compact';
+}
+
+function getImageControlPosition( name, control ) {
+	if ( control.modal_position ) {
+		return control.modal_position;
+	}
+
+	return 'right';
 }
 
 function MediaUploadButton( { open, items, isSetupWizard } ) {
@@ -225,12 +233,10 @@ const SelectedImageData = function ( props ) {
 		focalPoint,
 		imgId,
 		imgUrl,
+		leftControls,
 		onChangeFocalPoint,
 		onChangeImage,
 	} = props;
-
-	const [ showMoreInfo, setShowMoreInfo ] = useState( false );
-	const [ linkCopied, setLinkCopied ] = useState( false );
 
 	const { imageData } = useSelect(
 		( select ) => {
@@ -251,10 +257,17 @@ const SelectedImageData = function ( props ) {
 			};
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ showMoreInfo, imgId ]
+		[ imgId ]
 	);
 
 	let focalPointValue = focalPoint;
+	const imageSourceUrl = imageData?.source_url || '';
+	const imageFileName = imageSourceUrl
+		? imageSourceUrl.split( '/' ).pop()
+		: '';
+	const imageEditUrl = imageData?.id
+		? `${ VPGutenbergVariables.admin_url }post.php?post=${ imageData.id }&action=edit`
+		: '';
 
 	if (
 		! focalPointValue ||
@@ -301,180 +314,141 @@ const SelectedImageData = function ( props ) {
 						</Button>
 					</div>
 				</div>
-				<div className="vpf-component-gallery-control-item-modal-image-additional-info">
-					<Button
-						className="vpf-component-gallery-control-item-modal-image-additional-info-toggle"
-						onClick={ () => {
-							setShowMoreInfo( ! showMoreInfo );
-						} }
-						aria-expanded={ showMoreInfo }
-					>
-						{ showMoreInfo
-							? __( 'Hide additional info', 'visual-portfolio' )
-							: __( 'Show additional info', 'visual-portfolio' ) }
-						<svg
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							className="components-panel__arrow"
-							aria-hidden="true"
-							focusable="false"
-						>
-							<path d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z" />
-						</svg>
-					</Button>
-					{ showMoreInfo ? (
-						<>
-							{ showFocalPoint ? (
-								<div className="vpf-component-gallery-control-item-modal-image-additional-info-focal-point">
-									<PanelRow>
-										<UnitControl
-											label={ __(
-												'Left',
-												'visual-portfolio'
-											) }
-											value={
-												100 * focalPointValue.x + '%'
-											}
-											onChange={ ( val ) => {
-												onChangeFocalPoint( {
-													...focalPointValue,
-													x: parseFloat( val ) / 100,
-												} );
-											} }
-											min={ 0 }
-											max={ 100 }
-											step={ 1 }
-											units={ [
-												{ value: '%', label: '%' },
-											] }
-											__next40pxDefaultSize
-											__nextHasNoMarginBottom
-										/>
-										<UnitControl
-											label={ __(
-												'Top',
-												'visual-portfolio'
-											) }
-											value={
-												100 * focalPointValue.y + '%'
-											}
-											onChange={ ( val ) => {
-												onChangeFocalPoint( {
-													...focalPointValue,
-													y: parseFloat( val ) / 100,
-												} );
-											} }
-											min={ 0 }
-											max={ 100 }
-											step={ 1 }
-											units={ [
-												{ value: '%', label: '%' },
-											] }
-											__next40pxDefaultSize
-											__nextHasNoMarginBottom
-										/>
-									</PanelRow>
-								</div>
-							) : null }
-							<div>
-								<strong>
-									{ __( 'File name:', 'visual-portfolio' ) }
-								</strong>{ ' ' }
-								{ imageData?.source_url.split( '/' ).pop() ||
-									'-' }
-								<br />{ ' ' }
-								<strong>
-									{ __( 'File type:', 'visual-portfolio' ) }
-								</strong>{ ' ' }
-								{ imageData?.mime_type || '-' }
-								<br />{ ' ' }
-								<strong>
-									{ __( 'File size:', '@text_domain' ) }
-								</strong>{ ' ' }
-								{ imageData?.media_details?.filesize
-									? getHumanFileSize(
-											imageData.media_details.filesize
-									  )
-									: '-' }
-								{ imageData?.media_details?.width ? (
-									<>
-										<br />{ ' ' }
-										<strong>
-											{ __(
-												'Dimensions:',
-												'@text_domain'
-											) }
-										</strong>{ ' ' }
-										{ imageData.media_details.width } by{ ' ' }
-										{ imageData.media_details.height }{ ' ' }
-										pixels
-									</>
-								) : null }
-							</div>
-							<div>
-								<TextControl
-									label={ __(
-										'File URL:',
-										'visual-portfolio'
-									) }
-									value={ imageData?.source_url || '' }
-									readOnly
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-								/>
-								<Button
-									onClick={ () => {
-										navigator.clipboard
-											.writeText(
-												imageData?.source_url || ''
-											)
-											.then( () => {
-												setLinkCopied( true );
+				<div className="vpf-component-gallery-control-item-modal-fields vpf-component-gallery-control-item-modal-fields-left">
+					{ showFocalPoint ? (
+						<div className="vpf-component-gallery-control-item-modal-field vpf-component-gallery-control-item-modal-field-full">
+							<CollapsibleSection
+								label={ __(
+									'Image focal point',
+									'visual-portfolio'
+								) }
+								className="vpf-component-gallery-control-item-modal-image-additional-info-focal-point"
+							>
+								<PanelRow>
+									<UnitControl
+										label={ __(
+											'Left',
+											'visual-portfolio'
+										) }
+										value={ 100 * focalPointValue.x + '%' }
+										onChange={ ( val ) => {
+											onChangeFocalPoint( {
+												...focalPointValue,
+												x: parseFloat( val ) / 100,
 											} );
-									} }
-									variant="secondary"
-								>
-									{ __(
-										'Copy URL to Clipboard',
-										'visual-portfolio'
+										} }
+										min={ 0 }
+										max={ 100 }
+										step={ 1 }
+										units={ [ { value: '%', label: '%' } ] }
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+									/>
+									<UnitControl
+										label={ __(
+											'Top',
+											'visual-portfolio'
+										) }
+										value={ 100 * focalPointValue.y + '%' }
+										onChange={ ( val ) => {
+											onChangeFocalPoint( {
+												...focalPointValue,
+												y: parseFloat( val ) / 100,
+											} );
+										} }
+										min={ 0 }
+										max={ 100 }
+										step={ 1 }
+										units={ [ { value: '%', label: '%' } ] }
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+									/>
+								</PanelRow>
+							</CollapsibleSection>
+						</div>
+					) : null }
+					{ leftControls?.length ? (
+						<>
+							{ leftControls.map( ( control ) => (
+								<div
+									key={ control.name }
+									className={ classnames(
+										'vpf-component-gallery-control-item-modal-field',
+										`vpf-component-gallery-control-item-modal-field-${ control.layout }`
 									) }
-								</Button>
-								{ linkCopied ? (
-									<span className="vpf-component-gallery-control-item-modal-image-additional-info-copied">
-										{ __( 'Copied!', 'visual-portfolio' ) }
-									</span>
-								) : null }
-							</div>
-							{ imageData?.link ? (
-								<div>
-									<a
-										href={ imageData?.link }
-										target="_blank"
-										rel="noreferrer"
-									>
-										{ __(
-											'View attachment page',
-											'visual-portfolio'
-										) }
-									</a>
-									{ ' | ' }
-									<a
-										href={ `${ VPGutenbergVariables.admin_url }post.php?post=${ imageData.id }&action=edit` }
-										target="_blank"
-										rel="noreferrer"
-									>
-										{ __(
-											'Edit more details',
-											'visual-portfolio'
-										) }
-									</a>
+								>
+									{ control.control }
 								</div>
-							) : null }
+							) ) }
 						</>
 					) : null }
 				</div>
+				<CollapsibleSection
+					label={ __( 'Additional image info', 'visual-portfolio' ) }
+					className="vpf-component-gallery-control-item-modal-image-additional-info"
+				>
+					<div>
+						<p>
+							<strong>{ imageFileName || '-' }</strong>
+						</p>
+						<div>
+							{ imageData?.mime_type ? (
+								<div>{ imageData?.mime_type }</div>
+							) : null }
+							{ imageData?.media_details?.filesize ? (
+								<div>
+									{ getHumanFileSize(
+										imageData.media_details.filesize
+									) }
+								</div>
+							) : null }
+							{ imageData?.media_details?.width ? (
+								<div>
+									{ imageData.media_details.width } by{ ' ' }
+									{ imageData.media_details.height } pixels
+								</div>
+							) : null }
+						</div>
+					</div>
+					<ul>
+						{ imageSourceUrl ? (
+							<li>
+								<a
+									href={ imageSourceUrl }
+									target="_blank"
+									rel="noreferrer"
+								>
+									{ __( 'File URL', 'visual-portfolio' ) }
+								</a>
+							</li>
+						) : null }
+						{ imageData?.link ? (
+							<li>
+								<a
+									href={ imageData?.link }
+									target="_blank"
+									rel="noreferrer"
+								>
+									{ __(
+										'Attachment page',
+										'visual-portfolio'
+									) }
+								</a>
+							</li>
+						) : null }
+						{ imageEditUrl ? (
+							<li>
+								<a
+									href={ imageEditUrl }
+									target="_blank"
+									rel="noreferrer"
+								>
+									{ __( 'Edit details', 'visual-portfolio' ) }
+								</a>
+							</li>
+						) : null }
+					</ul>
+				</CollapsibleSection>
 			</div>
 		</MediaUploadCheck>
 	);
@@ -636,9 +610,19 @@ const ImageEditModal = function ( props ) {
 				name,
 				control,
 				layout: getImageControlLayout( name, imageControls[ name ] ),
+				position: getImageControlPosition(
+					name,
+					imageControls[ name ]
+				),
 			};
 		} )
 		.filter( Boolean );
+	const leftModalControls = modalControls.filter(
+		( control ) => 'left' === control.position
+	);
+	const rightModalControls = modalControls.filter(
+		( control ) => 'left' !== control.position
+	);
 
 	return (
 		<Modal
@@ -705,6 +689,7 @@ const ImageEditModal = function ( props ) {
 							focalPoint={ focalPointVal }
 							imgId={ img?.id }
 							imgUrl={ img.imgThumbnailUrl || img.imgUrl }
+							leftControls={ leftModalControls }
 							onChangeFocalPoint={ ( val ) => {
 								onChange( { focalPoint: val } );
 							} }
@@ -729,10 +714,25 @@ const ImageEditModal = function ( props ) {
 								} }
 								__nextHasNoMarginBottom
 							/>
+							{ leftModalControls.length ? (
+								<div className="vpf-component-gallery-control-item-modal-fields vpf-component-gallery-control-item-modal-fields-left">
+									{ leftModalControls.map( ( control ) => (
+										<div
+											key={ control.name }
+											className={ classnames(
+												'vpf-component-gallery-control-item-modal-field',
+												`vpf-component-gallery-control-item-modal-field-${ control.layout }`
+											) }
+										>
+											{ control.control }
+										</div>
+									) ) }
+								</div>
+							) : null }
 						</div>
 					) : null }
 					<div className="vpf-component-gallery-control-item-modal-fields">
-						{ modalControls.map( ( control ) => (
+						{ rightModalControls.map( ( control ) => (
 							<div
 								key={ control.name }
 								className={ classnames(
