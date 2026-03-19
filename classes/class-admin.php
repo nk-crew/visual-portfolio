@@ -1690,6 +1690,13 @@ class Visual_Portfolio_Admin {
 						'allow_bulk_edit' => true,
 						'modal_width'     => 'compact',
 					),
+					'url' => array(
+						'type'        => 'text',
+						'label'       => esc_html__( 'URL', 'visual-portfolio' ),
+						'description' => esc_html__( 'By default used full image url, you can use custom one', 'visual-portfolio' ),
+						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
+						'modal_width' => 'compact',
+					),
 					'video_url' => array(
 						'type'        => 'text',
 						'label'       => esc_html__( 'Video URL', 'visual-portfolio' ),
@@ -1702,13 +1709,6 @@ class Visual_Portfolio_Admin {
 								'value'   => 'video',
 							),
 						),
-					),
-					'url' => array(
-						'type'        => 'text',
-						'label'       => esc_html__( 'URL', 'visual-portfolio' ),
-						'description' => esc_html__( 'By default used full image url, you can use custom one', 'visual-portfolio' ),
-						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
-						'modal_width' => 'compact',
 					),
 					'section_author' => array(
 						'type'        => 'section_heading',
