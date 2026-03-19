@@ -276,6 +276,43 @@
 .vpf-component-gallery-control-modal {
 	width: min(828px, calc(100vw - 32px));
 	max-width: 828px;
+
+	.components-modal__header-heading {
+		width: 100%;
+	}
+}
+
+.vpf-component-gallery-control-modal-title {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.vpf-component-gallery-control-modal-title-nav {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-left: auto;
+}
+
+.vpf-component-gallery-control-modal-title-nav-button.components-button {
+	padding: 0;
+	height: 26px;
+	width: 26px;
+	margin: -4px;
+
+	&:disabled {
+		opacity: 0.45;
+	}
+
+	svg {
+		transform: rotate(-90deg);
+		width: 100%;
+		height: 100%;
+	}
+	+ .vpf-component-gallery-control-modal-title-nav-button.components-button svg {
+		transform: rotate(90deg);
+	}
 }
 
 .vpf-component-gallery-control-item-modal {

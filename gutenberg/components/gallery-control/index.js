@@ -494,6 +494,10 @@ const ImageEditModal = function ( props ) {
 		isSetupWizard,
 		isBulkEdit,
 		bulkItems,
+		canGoPrevious,
+		canGoNext,
+		onPrevious,
+		onNext,
 		close,
 		attributes,
 	} = props;
@@ -638,7 +642,52 @@ const ImageEditModal = function ( props ) {
 
 	return (
 		<Modal
-			title={ title }
+			title={
+				<div className="vpf-component-gallery-control-modal-title">
+					<span>{ title }</span>
+					{ ! isBulkEdit ? (
+						<div className="vpf-component-gallery-control-modal-title-nav">
+							<Button
+								className="vpf-component-gallery-control-modal-title-nav-button"
+								onClick={ onPrevious }
+								disabled={ ! canGoPrevious }
+								label={ __(
+									'Previous image',
+									'visual-portfolio'
+								) }
+							>
+								<svg
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									aria-hidden="true"
+									focusable="false"
+								>
+									<path d="M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"></path>
+								</svg>
+							</Button>
+							<Button
+								className="vpf-component-gallery-control-modal-title-nav-button"
+								onClick={ onNext }
+								disabled={ ! canGoNext }
+								label={ __( 'Next image', 'visual-portfolio' ) }
+							>
+								<svg
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									aria-hidden="true"
+									focusable="false"
+								>
+									<path d="M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"></path>
+								</svg>
+							</Button>
+						</div>
+					) : null }
+				</div>
+			}
 			className="vpf-component-gallery-control-modal"
 			onRequestClose={ ( e ) => {
 				if ( e?.relatedTarget?.classList?.contains( 'media-modal' ) ) {
@@ -648,51 +697,53 @@ const ImageEditModal = function ( props ) {
 				}
 			} }
 		>
-			<div className="vpf-component-gallery-control-item-modal">
-				{ focalPoint && img?.id ? (
-					<SelectedImageData
-						showFocalPoint={ focalPoint }
-						focalPoint={ focalPointVal }
-						imgId={ img?.id }
-						imgUrl={ img.imgThumbnailUrl || img.imgUrl }
-						onChangeFocalPoint={ ( val ) => {
-							onChange( { focalPoint: val } );
-						} }
-						onChangeImage={ ( imgData ) => {
-							if ( imgData === false ) {
-								onRemove();
-							} else {
-								onChange( imgData );
-							}
-						} }
-					/>
-				) : null }
-
-				{ /* Display focal point if no image ID available (used for bulk editor with image placeholder) */ }
-				{ focalPoint && ! img?.id && img?.imgThumbnailUrl ? (
-					<div className="vpf-component-gallery-control-item-modal-image-info">
-						<FocalPointPicker
-							url={ img.imgThumbnailUrl }
-							value={ focalPointVal }
-							onChange={ ( val ) => {
+			<div className="vpf-component-gallery-control-item-modal-wrap">
+				<div className="vpf-component-gallery-control-item-modal">
+					{ focalPoint && img?.id ? (
+						<SelectedImageData
+							showFocalPoint={ focalPoint }
+							focalPoint={ focalPointVal }
+							imgId={ img?.id }
+							imgUrl={ img.imgThumbnailUrl || img.imgUrl }
+							onChangeFocalPoint={ ( val ) => {
 								onChange( { focalPoint: val } );
 							} }
-							__nextHasNoMarginBottom
+							onChangeImage={ ( imgData ) => {
+								if ( imgData === false ) {
+									onRemove();
+								} else {
+									onChange( imgData );
+								}
+							} }
 						/>
-					</div>
-				) : null }
-				<div className="vpf-component-gallery-control-item-modal-fields">
-					{ modalControls.map( ( control ) => (
-						<div
-							key={ control.name }
-							className={ classnames(
-								'vpf-component-gallery-control-item-modal-field',
-								`vpf-component-gallery-control-item-modal-field-${ control.layout }`
-							) }
-						>
-							{ control.control }
+					) : null }
+
+					{ /* Display focal point if no image ID available (used for bulk editor with image placeholder) */ }
+					{ focalPoint && ! img?.id && img?.imgThumbnailUrl ? (
+						<div className="vpf-component-gallery-control-item-modal-image-info">
+							<FocalPointPicker
+								url={ img.imgThumbnailUrl }
+								value={ focalPointVal }
+								onChange={ ( val ) => {
+									onChange( { focalPoint: val } );
+								} }
+								__nextHasNoMarginBottom
+							/>
 						</div>
-					) ) }
+					) : null }
+					<div className="vpf-component-gallery-control-item-modal-fields">
+						{ modalControls.map( ( control ) => (
+							<div
+								key={ control.name }
+								className={ classnames(
+									'vpf-component-gallery-control-item-modal-field',
+									`vpf-component-gallery-control-item-modal-field-${ control.layout }`
+								) }
+							>
+								{ control.control }
+							</div>
+						) ) }
+					</div>
 				</div>
 			</div>
 		</Modal>
@@ -736,8 +787,14 @@ const SortableItem = function ( props ) {
 	};
 
 	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
+	const [ modalIndex, setModalIndex ] = useState( idx );
+	const openModal = () => {
+		setModalIndex( idx );
+		setOpen( true );
+	};
 	const closeModal = () => setOpen( false );
+	const activeIndex = isOpen ? modalIndex : idx;
+	const activeImage = items?.[ activeIndex ] || img;
 
 	return (
 		<>
@@ -828,14 +885,14 @@ const SortableItem = function ( props ) {
 			{ isOpen ? (
 				<ImageEditModal
 					title={ __( 'Image Settings', 'visual-portfolio' ) }
-					img={ img }
-					idx={ idx }
+					img={ activeImage }
+					idx={ activeIndex }
 					onChange={ ( val ) => {
 						const newImages = [ ...items ];
 
-						if ( newImages[ idx ] ) {
-							newImages[ idx ] = {
-								...newImages[ idx ],
+						if ( newImages[ activeIndex ] ) {
+							newImages[ activeIndex ] = {
+								...newImages[ activeIndex ],
 								...val,
 							};
 
@@ -845,12 +902,20 @@ const SortableItem = function ( props ) {
 					onRemove={ () => {
 						const newImages = [ ...items ];
 
-						if ( newImages[ idx ] ) {
-							newImages.splice( idx, 1 );
+						if ( newImages[ activeIndex ] ) {
+							newImages.splice( activeIndex, 1 );
 
 							onChange( newImages );
-
-							closeModal();
+							if ( newImages.length ) {
+								setModalIndex(
+									Math.min(
+										activeIndex,
+										newImages.length - 1
+									)
+								);
+							} else {
+								closeModal();
+							}
 						}
 					} }
 					imageControls={ imageControls }
@@ -859,6 +924,18 @@ const SortableItem = function ( props ) {
 					focalPoint={ focalPoint }
 					clientId={ clientId }
 					isSetupWizard={ isSetupWizard }
+					canGoPrevious={ activeIndex > 0 }
+					canGoNext={ activeIndex < items.length - 1 }
+					onPrevious={ () => {
+						if ( activeIndex > 0 ) {
+							setModalIndex( activeIndex - 1 );
+						}
+					} }
+					onNext={ () => {
+						if ( activeIndex < items.length - 1 ) {
+							setModalIndex( activeIndex + 1 );
+						}
+					} }
 					close={ () => {
 						closeModal();
 					} }
