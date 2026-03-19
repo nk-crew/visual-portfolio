@@ -312,10 +312,32 @@ if ( isProduction ) {
 
 // Development only.
 if ( ! isProduction ) {
+	const devServerProxy = newConfig.devServer?.proxy;
+	const devServerHost = newConfig.devServer?.host || 'localhost';
+	const devServerPort = newConfig.devServer?.port || 8887;
+	const devServerProtocol =
+		newConfig.devServer?.server === 'https' ? 'https' : 'http';
+
 	newConfig.devServer = {
 		...newConfig.devServer,
 		// Support for dev server on all domains.
 		allowedHosts: 'all',
+		// webpack-dev-server v5 expects proxy routes to be explicit objects with context/target.
+		proxy:
+			devServerProxy &&
+			! Array.isArray( devServerProxy ) &&
+			'object' === typeof devServerProxy
+				? Object.entries( devServerProxy ).map(
+						( [ context, options ] ) => ( {
+							context: [ context ],
+							target:
+								options.target ||
+								options.router ||
+								`${ devServerProtocol }://${ devServerHost }:${ devServerPort }`,
+							...options,
+						} )
+				  )
+				: devServerProxy,
 	};
 
 	// Fix HMR is not working with multiple entries.
