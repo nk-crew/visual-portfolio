@@ -42,6 +42,26 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const UNCATEGORIZED_VALUE = '------';
 const ITEMS_COUNT_DEFAULT = 18;
 
+function getImageControlLayout( name, control ) {
+	if ( control.modal_width ) {
+		return control.modal_width;
+	}
+
+	if (
+		control.type === 'textarea' ||
+		control.type === 'pro_note' ||
+		control.type === 'section_heading' ||
+		control.type === 'html' ||
+		control.type === 'sortable' ||
+		control.type === 'gallery' ||
+		control.multiple
+	) {
+		return 'full';
+	}
+
+	return 'compact';
+}
+
 function MediaUploadButton( { open, items, isSetupWizard } ) {
 	const hasOpenedModal = useRef( false );
 
@@ -451,9 +471,123 @@ const ImageEditModal = function ( props ) {
 		}
 	}
 
+	const modalControls = Object.keys( imageControls )
+		.map( ( name ) => {
+			// Hide controls if it's bulk edit and control is not allowed for bulk edit.
+			if ( isBulkEdit && ! imageControls[ name ].allow_bulk_edit ) {
+				return null;
+			}
+
+			const newCondition = [];
+			let imageIdx = idx;
+
+			// Find same control value from bulk items if available.
+			if (
+				idx === -1 &&
+				bulkItems?.length &&
+				attributes?.[ controlName ]
+			) {
+				const bulkValue = getBulkImagesDefaultValue(
+					attributes[ controlName ],
+					bulkItems,
+					name
+				);
+
+				if ( bulkValue ) {
+					imageIdx = getItemIndexByImageId(
+						attributes[ controlName ],
+						bulkItems[ 0 ]
+					);
+				}
+			}
+
+			// prepare name.
+			const imgControlName = `${ controlName }[${ imageIdx }].${ name }`;
+
+			// prepare conditions for the current item.
+			if ( imageControls[ name ].condition.length ) {
+				imageControls[ name ].condition.forEach( ( data ) => {
+					const newData = { ...data };
+
+					if ( newData.control && /SELF/g.test( newData.control ) ) {
+						newData.control = newData.control.replace(
+							/SELF/g,
+							`${ controlName }[${ imageIdx }]`
+						);
+					}
+
+					newCondition.push( newData );
+				} );
+			}
+
+			const controlProps = {
+				...imageControls[ name ],
+				attributes,
+				condition: newCondition,
+			};
+
+			if ( ! ControlsRender.AllowRender( controlProps, isSetupWizard ) ) {
+				return null;
+			}
+
+			let control;
+
+			if ( imageControls[ name ].type === 'section_heading' ) {
+				control = (
+					<div className="vpf-component-gallery-control-item-modal-heading">
+						<h3 className="vpf-component-gallery-control-item-modal-heading-title">
+							{ imageControls[ name ].label }
+						</h3>
+						{ imageControls[ name ].description ? (
+							<p className="vpf-component-gallery-control-item-modal-heading-description">
+								{ imageControls[ name ].description }
+							</p>
+						) : null }
+					</div>
+				);
+			} else {
+				control = applyFilters(
+					'vpf.editor.gallery-controls-render',
+					<ControlsRender.Control
+						key={ `${
+							img?.id || img?.imgThumbnailUrl || img?.imgUrl
+						}-${ imageIdx }-${ name }` }
+						attributes={ attributes }
+						onChange={ ( val ) => {
+							onChange( {
+								[ name ]: val,
+							} );
+						} }
+						{ ...imageControls[ name ] }
+						name={ imgControlName }
+						value={ img?.[ name ] }
+						condition={ newCondition }
+						clientId={ clientId }
+						isSetupWizard={ isSetupWizard }
+					/>,
+					imageControls[ name ],
+					props,
+					{
+						name,
+						fullName: imgControlName,
+						index: imageIdx,
+						condition: newCondition,
+					}
+				);
+			}
+
+			return {
+				name,
+				control,
+				layout: getImageControlLayout( name, imageControls[ name ] ),
+			};
+		} )
+		.filter( Boolean );
+
 	return (
 		<Modal
 			title={ title }
+			className="vpf-component-gallery-control-modal"
 			onRequestClose={ ( e ) => {
 				if ( e?.relatedTarget?.classList?.contains( 'media-modal' ) ) {
 					// Don't close modal if opened media modal.
@@ -495,96 +629,18 @@ const ImageEditModal = function ( props ) {
 						/>
 					</div>
 				) : null }
-				<div>
-					{ Object.keys( imageControls ).map( ( name ) => {
-						const newCondition = [];
-
-						// Hide controls if it's bulk edit and control is not allowed for bulk edit.
-						if (
-							isBulkEdit &&
-							! imageControls[ name ].allow_bulk_edit
-						) {
-							return null;
-						}
-
-						let imageIdx = idx;
-
-						// Find same control value from bulk items if available.
-						if (
-							idx === -1 &&
-							bulkItems?.length &&
-							attributes?.[ controlName ]
-						) {
-							const bulkValue = getBulkImagesDefaultValue(
-								attributes[ controlName ],
-								bulkItems,
-								name
-							);
-
-							if ( bulkValue ) {
-								imageIdx = getItemIndexByImageId(
-									attributes[ controlName ],
-									bulkItems[ 0 ]
-								);
-							}
-						}
-
-						// prepare name.
-						const imgControlName = `${ controlName }[${ imageIdx }].${ name }`;
-
-						// prepare conditions for the current item.
-						if ( imageControls[ name ].condition.length ) {
-							imageControls[ name ].condition.forEach(
-								( data ) => {
-									const newData = { ...data };
-
-									if (
-										newData.control &&
-										/SELF/g.test( newData.control )
-									) {
-										newData.control =
-											newData.control.replace(
-												/SELF/g,
-												`${ controlName }[${ imageIdx }]`
-											);
-									}
-
-									newCondition.push( newData );
-								}
-							);
-						}
-
-						return applyFilters(
-							'vpf.editor.gallery-controls-render',
-							<ControlsRender.Control
-								key={ `${
-									img?.id ||
-									img?.imgThumbnailUrl ||
-									img?.imgUrl
-								}-${ imageIdx }-${ name }` }
-								attributes={ attributes }
-								onChange={ ( val ) => {
-									onChange( {
-										[ name ]: val,
-									} );
-								} }
-								{ ...imageControls[ name ] }
-								name={ imgControlName }
-								value={ img?.[ name ] }
-								condition={ newCondition }
-								clientId={ clientId }
-								isSetupWizard={ isSetupWizard }
-							/>,
-							imageControls[ name ],
-							props,
-							{
-								name,
-								fullName: imgControlName,
-								index: imageIdx,
-								condition: newCondition,
-							}
-						);
-					} ) }
+				<div className="vpf-component-gallery-control-item-modal-fields">
+					{ modalControls.map( ( control ) => (
+						<div
+							key={ control.name }
+							className={ classnames(
+								'vpf-component-gallery-control-item-modal-field',
+								`vpf-component-gallery-control-item-modal-field-${ control.layout }`
+							) }
+						>
+							{ control.control }
+						</div>
+					) ) }
 				</div>
 			</div>
 		</Modal>

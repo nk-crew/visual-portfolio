@@ -1661,13 +1661,15 @@ class Visual_Portfolio_Admin {
 				'setup_wizard'    => true,
 				'focal_point'     => true,
 				'image_controls'  => array(
-					'title' => array(
-						'type'  => 'text',
-						'label' => esc_html__( 'Title', 'visual-portfolio' ),
+					'section_general' => array(
+						'type'        => 'section_heading',
+						'label'       => esc_html__( 'General', 'visual-portfolio' ),
+						'modal_width' => 'full',
 					),
-					'description' => array(
-						'type'  => 'textarea',
-						'label' => esc_html__( 'Description', 'visual-portfolio' ),
+					'title' => array(
+						'type'        => 'text',
+						'label'       => esc_html__( 'Title', 'visual-portfolio' ),
+						'modal_width' => 'compact',
 					),
 					'categories' => array(
 						'type'            => 'select',
@@ -1675,6 +1677,12 @@ class Visual_Portfolio_Admin {
 						'multiple'        => true,
 						'creatable'       => true,
 						'allow_bulk_edit' => true,
+						'modal_width'     => 'compact',
+					),
+					'description' => array(
+						'type'        => 'textarea',
+						'label'       => esc_html__( 'Description', 'visual-portfolio' ),
+						'modal_width' => 'full',
 					),
 					'format' => array(
 						'type'            => 'select',
@@ -1685,12 +1693,14 @@ class Visual_Portfolio_Admin {
 							'video'    => esc_html__( 'Video', 'visual-portfolio' ),
 						),
 						'allow_bulk_edit' => true,
+						'modal_width'     => 'compact',
 					),
 					'video_url' => array(
 						'type'        => 'text',
 						'label'       => esc_html__( 'Video URL', 'visual-portfolio' ),
 						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
 						'description' => esc_html__( 'Full list of supported links', 'visual-portfolio' ) . '&nbsp;<a href="https://www.visualportfolio.com/docs/projects/project-formats/#supported-video-platforms" target="_blank" rel="noopener noreferrer">' . esc_html__( 'see here', 'visual-portfolio' ) . '</a>',
+						'modal_width' => 'full',
 						'condition'   => array(
 							array(
 								'control' => 'SELF.format',
@@ -1703,28 +1713,45 @@ class Visual_Portfolio_Admin {
 						'label'       => esc_html__( 'URL', 'visual-portfolio' ),
 						'description' => esc_html__( 'By default used full image url, you can use custom one', 'visual-portfolio' ),
 						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
+						'modal_width' => 'compact',
+					),
+					'section_author' => array(
+						'type'        => 'section_heading',
+						'label'       => esc_html__( 'Author', 'visual-portfolio' ),
+						'modal_width' => 'full',
 					),
 					'author' => array(
 						'type'            => 'text',
 						'label'           => esc_html__( 'Author Name', 'visual-portfolio' ),
 						'default'         => '',
 						'allow_bulk_edit' => true,
+						'modal_width'     => 'compact',
 					),
 					'author_url' => array(
 						'type'            => 'text',
 						'label'           => esc_html__( 'Author URL', 'visual-portfolio' ),
 						'default'         => '',
 						'allow_bulk_edit' => true,
+						'modal_width'     => 'compact',
+					),
+					'section_advanced' => array(
+						'type'        => 'section_heading',
+						'label'       => esc_html__( 'Advanced', 'visual-portfolio' ),
+						'modal_width' => 'full',
 					),
 					'image_settings_pro_note' => array(
 						'type'        => 'pro_note',
 						'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
 						'description' => '<ul>
-                                            <li>' . esc_html__( 'Support for Audio format', 'visual-portfolio' ) . '</li>
-                                            <li>' . esc_html__( 'Custom image for Popup', 'visual-portfolio' ) . '</li>
-                                            <li>' . esc_html__( 'Custom image for hover state', 'visual-portfolio' ) . '</li>
-                                            <li>' . esc_html__( 'etc...', 'visual-portfolio' ) . '</li>
-                                        </ul>',
+											<li>' . esc_html__( 'Image albums', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Video thumbnail', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Thumbnail for hover state with Image and Video support', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Audio format', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Custom popup Image', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'Custom Picture ID for Deep Linking', 'visual-portfolio' ) . '</li>
+											<li>' . esc_html__( 'etc...', 'visual-portfolio' ) . '</li>
+										</ul>',
+						'modal_width' => 'full',
 					),
 				),
 				'default'         => array(

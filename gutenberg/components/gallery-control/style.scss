@@ -273,8 +273,13 @@
 	}
 }
 
+.vpf-component-gallery-control-modal {
+	width: min(855px, calc(100vw - 32px));
+	max-width: 855px;
+}
+
 .vpf-component-gallery-control-item-modal {
-	max-width: 540px;
+	width: 100%;
 
 	.vpf-component-gallery-control-item-modal-image-info {
 		margin-bottom: 30px;
@@ -313,6 +318,42 @@
 		}
 	}
 
+	.vpf-component-gallery-control-item-modal-fields {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 0 20px;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.vpf-component-gallery-control-item-modal-field {
+		min-width: 0;
+	}
+
+	.vpf-component-gallery-control-item-modal-field-full {
+		grid-column: 1 / -1;
+	}
+
+	.vpf-component-gallery-control-item-modal-heading {
+		margin-bottom: 14px;
+	}
+
+	.vpf-component-gallery-control-item-modal-heading-title {
+		color: #9f9f9f;
+		font-size: 11px;
+		font-weight: 500;
+		line-height: 1.4;
+		margin: 0;
+		text-transform: uppercase;
+	}
+
+	.vpf-component-gallery-control-item-modal-heading-description {
+		color: #9f9f9f;
+		margin: 6px 0 0;
+		font-size: 12px;
+		line-height: 1.5;
+	}
+
 	@media screen and (min-width: 600px) {
 		display: flex;
 		gap: 30px;
@@ -321,12 +362,13 @@
 		.vpf-component-gallery-control-item-modal-image-info {
 			position: sticky;
 			top: 30px;
-			flex: 1;
-			width: 230px;
+			flex: 0 0 260px;
+			width: 260px;
 			margin-bottom: 0;
 
 			+ div {
-				width: 280px;
+				flex: 1;
+				width: auto;
 			}
 		}
 
@@ -335,6 +377,16 @@
 			top: auto;
 			bottom: 30px;
 			margin-top: auto;
+		}
+	}
+
+	@media screen and (min-width: 782px) {
+		.vpf-component-gallery-control-item-modal-fields {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.vpf-component-gallery-control-item-modal-field-compact {
+			grid-column: span 1;
 		}
 	}
 }
