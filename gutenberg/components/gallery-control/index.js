@@ -468,17 +468,7 @@ const SelectedImageData = function ( props ) {
 						</div>
 					) : null }
 					{ leftControls?.length
-						? leftControls.map( ( control ) => (
-								<div
-									key={ control.name }
-									className={ classnames(
-										'vpf-component-gallery-control-item-modal-field',
-										`vpf-component-gallery-control-item-modal-field-${ control.layout }`
-									) }
-								>
-									{ control.control }
-								</div>
-						  ) )
+						? leftControls.map( ( control ) => control.control )
 						: null }
 				</div>
 				<CollapsibleSection
@@ -674,7 +664,7 @@ const ImageEditModal = function ( props ) {
 
 			if ( imageControls[ name ].type === 'section_heading' ) {
 				control = (
-					<div className="vpf-component-gallery-control-item-modal-heading">
+					<div className="vpf-component-gallery-control-item-modal-heading vpf-component-gallery-control-item-modal-field-full">
 						<h3 className="vpf-component-gallery-control-item-modal-heading-title">
 							{ imageControls[ name ].label }
 						</h3>
@@ -701,6 +691,13 @@ const ImageEditModal = function ( props ) {
 						{ ...imageControls[ name ] }
 						name={ imgControlName }
 						value={ img?.[ name ] }
+						className={ classnames(
+							'vpf-component-gallery-control-item-modal-field',
+							`vpf-component-gallery-control-item-modal-field-${ getImageControlLayout(
+								name,
+								imageControls[ name ]
+							) }`
+						) }
 						condition={ newCondition }
 						clientId={ clientId }
 						isSetupWizard={ isSetupWizard }
@@ -839,33 +836,17 @@ const ImageEditModal = function ( props ) {
 							/>
 							{ leftModalControls.length ? (
 								<div className="vpf-component-gallery-control-item-modal-fields vpf-component-gallery-control-item-modal-fields-left">
-									{ leftModalControls.map( ( control ) => (
-										<div
-											key={ control.name }
-											className={ classnames(
-												'vpf-component-gallery-control-item-modal-field',
-												`vpf-component-gallery-control-item-modal-field-${ control.layout }`
-											) }
-										>
-											{ control.control }
-										</div>
-									) ) }
+									{ leftModalControls.map(
+										( control ) => control.control
+									) }
 								</div>
 							) : null }
 						</div>
 					) : null }
 					<div className="vpf-component-gallery-control-item-modal-fields">
-						{ rightModalControls.map( ( control ) => (
-							<div
-								key={ control.name }
-								className={ classnames(
-									'vpf-component-gallery-control-item-modal-field',
-									`vpf-component-gallery-control-item-modal-field-${ control.layout }`
-								) }
-							>
-								{ control.control }
-							</div>
-						) ) }
+						{ rightModalControls.map(
+							( control ) => control.control
+						) }
 					</div>
 				</div>
 			</div>

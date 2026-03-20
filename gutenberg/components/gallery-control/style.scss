@@ -1,6 +1,6 @@
 @import "../../variables";
 
-.vpf-component-gallery-control {
+.vpf-component-gallery-control  {
 	.vpf-component-gallery-control-items {
 		position: relative;
 		display: grid;
@@ -443,6 +443,11 @@
 
 	.vpf-component-gallery-control-item-modal-field-full {
 		grid-column: 1 / -1;
+	}
+
+	// Make URL control compact when next control is also compact.
+	.vpf-control-wrap-name-images-url:has(+ .vpf-component-gallery-control-item-modal-field-compact) {
+		grid-column: 1;
 	}
 
 	.vpf-component-gallery-control-item-modal-heading {

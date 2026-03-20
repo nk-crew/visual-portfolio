@@ -1707,7 +1707,7 @@ class Visual_Portfolio_Admin {
 						'label'       => esc_html__( 'Video URL', 'visual-portfolio' ),
 						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
 						'description' => esc_html__( 'Full list of supported links', 'visual-portfolio' ) . '&nbsp;<a href="https://www.visualportfolio.com/docs/projects/project-formats/#supported-video-platforms" target="_blank" rel="noopener noreferrer">' . esc_html__( 'see here', 'visual-portfolio' ) . '</a>',
-						'modal_width' => 'full',
+						'modal_width' => 'compact',
 						'condition'   => array(
 							array(
 								'control' => 'SELF.format',

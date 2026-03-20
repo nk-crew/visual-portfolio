@@ -3,13 +3,15 @@ import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
+import getControlNameClassName from '../../../utils/get-control-name-class-name';
+
 /**
  * Change Title and Description controls when used dynamic source option.
  *
  * @param props
  */
 function RenderTitleAndDescriptionImageControls( props ) {
-	const { data, textSource, img, name, index } = props;
+	const { data, textSource, img, name, index, fullName } = props;
 
 	const { imgData } = useSelect(
 		( select ) => {
@@ -65,7 +67,7 @@ function RenderTitleAndDescriptionImageControls( props ) {
 		<ThisControl
 			className={ `vpf-control-wrap vpf-control-wrap-${
 				name === 'title' ? 'text' : 'textarea'
-			}` }
+			} ${ getControlNameClassName( fullName ) }` }
 			key={ `${
 				img.id || img.imgThumbnailUrl || img.imgUrl
 			}-${ index }-${ name }` }
@@ -83,7 +85,7 @@ addFilter(
 	'vpf/editor/gallery-controls-render/title-and-description-render-by-source',
 	( control, data, props, controlData ) => {
 		const { attributes, img } = props;
-		const { name, index } = controlData;
+		const { name, index, fullName } = controlData;
 
 		if (
 			( name === 'title' &&
@@ -101,6 +103,7 @@ addFilter(
 						img,
 						name,
 						index,
+						fullName,
 					} }
 				/>
 			);

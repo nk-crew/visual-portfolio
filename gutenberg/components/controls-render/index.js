@@ -35,6 +35,7 @@ import {
 	convertModernToLegacy,
 } from '../../utils/convert-legacy-attributes';
 import { maybeDecode, maybeEncode } from '../../utils/encode-decode';
+import getControlNameClassName from '../../utils/get-control-name-class-name';
 import AlignControl from '../align-control';
 import AspectRatio from '../aspect-ratio';
 import ClassesTree from '../classes-tree';
@@ -325,7 +326,9 @@ ControlsRender.Control = function ( props ) {
 	) : null;
 	let renderControlClassName = classnames(
 		'vpf-control-wrap',
-		`vpf-control-wrap-${ props.type }`
+		`vpf-control-wrap-${ props.type }`,
+		getControlNameClassName( props.name ),
+		props.className
 	);
 
 	if ( props.group ) {
