@@ -21,6 +21,8 @@ import { isEqual } from 'lodash';
 
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import {
+	__experimentalToggleGroupControl,
+	__experimentalToggleGroupControlOption,
 	__experimentalUnitControl,
 	Button,
 	CheckboxControl,
@@ -28,6 +30,8 @@ import {
 	Modal,
 	PanelRow,
 	SelectControl,
+	ToggleGroupControl as __stableToggleGroupControl,
+	ToggleGroupControlOption as __stableToggleGroupControlOption,
 	UnitControl as __stableUnitControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -41,10 +45,18 @@ import getAllCategories from './utils/get-all-categories';
 
 const { VPGutenbergVariables } = window;
 
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const UNCATEGORIZED_VALUE = '------';
 const ITEMS_COUNT_DEFAULT = 18;
+const IS_PRO_PLUGIN = !! VPGutenbergVariables?.pro;
 const UnitControl = __stableUnitControl || __experimentalUnitControl;
+const ToggleGroupControl =
+	__stableToggleGroupControl || __experimentalToggleGroupControl;
+const ToggleGroupControlOption =
+	__stableToggleGroupControlOption || __experimentalToggleGroupControlOption;
+
+function getAllowedMediaTypes( isPro = false ) {
+	return isPro ? [ 'image', 'video' ] : [ 'image' ];
+}
 
 function getImageControlLayout( name, control ) {
 	if ( control.modal_width ) {
@@ -227,6 +239,67 @@ function getBulkImagesDefaultValue( allItems, selectedItems, optionName ) {
 	return result;
 }
 
+function GalleryStateTabs( { activeMediaState, setActiveMediaState, isPro } ) {
+	return (
+		<div className="vpf-component-gallery-control-item-modal-state-tabs">
+			<ToggleGroupControl
+				label={ __( 'Media', 'visual-portfolio' ) }
+				value={ activeMediaState }
+				onChange={ ( value ) => {
+					if ( value ) {
+						setActiveMediaState( value );
+					}
+				} }
+				isBlock
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+			>
+				<ToggleGroupControlOption
+					value="normal"
+					label={ __( 'Normal', 'visual-portfolio' ) }
+				/>
+				<ToggleGroupControlOption
+					value="hover"
+					label={ __( 'Hover', 'visual-portfolio' ) }
+					disabled={ ! isPro }
+				/>
+			</ToggleGroupControl>
+		</div>
+	);
+}
+
+function getGalleryItemPreview( img, props ) {
+	const preview = (
+		<img
+			src={ img.imgThumbnailUrl || img.imgUrl }
+			alt={ img.alt || img.imgThumbnailUrl || img.imgUrl }
+			loading="lazy"
+		/>
+	);
+
+	return applyFilters(
+		'vpf.editor.gallery-item-preview',
+		preview,
+		img,
+		props
+	);
+}
+
+function getGalleryModalPreview( imageData, imgUrl, props ) {
+	const preview = (
+		<img
+			src={ imageData?.source_url || imgUrl }
+			alt={ imageData?.alt_text || '' }
+		/>
+	);
+
+	return applyFilters(
+		'vpf.editor.gallery-modal-media-render',
+		preview,
+		props
+	);
+}
+
 const SelectedImageData = function ( props ) {
 	const {
 		showFocalPoint,
@@ -234,9 +307,15 @@ const SelectedImageData = function ( props ) {
 		imgId,
 		imgUrl,
 		leftControls,
+		activeMediaState,
+		setActiveMediaState,
+		isPro,
+		modalProps,
 		onChangeFocalPoint,
 		onChangeImage,
+		img,
 	} = props;
+	const allowedMediaTypes = getAllowedMediaTypes( isPro );
 
 	const { imageData } = useSelect(
 		( select ) => {
@@ -280,21 +359,37 @@ const SelectedImageData = function ( props ) {
 		};
 	}
 
-	return (
-		<MediaUploadCheck>
-			<div className="vpf-component-gallery-control-item-modal-image-info editor-post-featured-image">
+	const extensionProps = {
+		...modalProps,
+		activeMediaState,
+		img,
+		imgId,
+		imgUrl,
+		imageData,
+		leftControls,
+	};
+	const leftContent =
+		activeMediaState === 'hover' ? (
+			applyFilters(
+				'vpf.editor.gallery-hover-controls-render',
+				null,
+				extensionProps
+			)
+		) : (
+			<>
 				<div className="vpf-component-gallery-control-item-modal-image-preview">
-					<img
-						src={ imageData?.source_url || imgUrl }
-						alt={ imageData?.alt_text || '' }
-					/>
+					{ getGalleryModalPreview(
+						imageData,
+						imgUrl,
+						extensionProps
+					) }
 					<div className="vpf-component-gallery-control-item-modal-image-actions">
 						<MediaUpload
 							onSelect={ ( image ) => {
 								const imgData = prepareImage( image );
 								onChangeImage( imgData );
 							} }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							allowedTypes={ allowedMediaTypes }
 							render={ ( { open } ) => (
 								<Button
 									onClick={ open }
@@ -314,6 +409,11 @@ const SelectedImageData = function ( props ) {
 						</Button>
 					</div>
 				</div>
+				{ applyFilters(
+					'vpf.editor.gallery-after-media-controls-render',
+					null,
+					extensionProps
+				) }
 				<div className="vpf-component-gallery-control-item-modal-fields vpf-component-gallery-control-item-modal-fields-left">
 					{ showFocalPoint ? (
 						<div className="vpf-component-gallery-control-item-modal-field vpf-component-gallery-control-item-modal-field-full">
@@ -367,9 +467,8 @@ const SelectedImageData = function ( props ) {
 							</CollapsibleSection>
 						</div>
 					) : null }
-					{ leftControls?.length ? (
-						<>
-							{ leftControls.map( ( control ) => (
+					{ leftControls?.length
+						? leftControls.map( ( control ) => (
 								<div
 									key={ control.name }
 									className={ classnames(
@@ -379,9 +478,8 @@ const SelectedImageData = function ( props ) {
 								>
 									{ control.control }
 								</div>
-							) ) }
-						</>
-					) : null }
+						  ) )
+						: null }
 				</div>
 				<CollapsibleSection
 					label={ __( 'Additional image info', 'visual-portfolio' ) }
@@ -449,6 +547,18 @@ const SelectedImageData = function ( props ) {
 						) : null }
 					</ul>
 				</CollapsibleSection>
+			</>
+		);
+
+	return (
+		<MediaUploadCheck>
+			<div className="vpf-component-gallery-control-item-modal-image-info editor-post-featured-image">
+				<GalleryStateTabs
+					activeMediaState={ activeMediaState }
+					setActiveMediaState={ setActiveMediaState }
+					isPro={ isPro }
+				/>
+				{ leftContent }
 			</div>
 		</MediaUploadCheck>
 	);
@@ -623,6 +733,14 @@ const ImageEditModal = function ( props ) {
 	const rightModalControls = modalControls.filter(
 		( control ) => 'left' !== control.position
 	);
+	const [ activeMediaState, setActiveMediaState ] = useState( 'normal' );
+
+	const modalExtensionProps = {
+		...props,
+		img,
+		leftControls: leftModalControls,
+		rightControls: rightModalControls,
+	};
 
 	return (
 		<Modal
@@ -690,6 +808,11 @@ const ImageEditModal = function ( props ) {
 							imgId={ img?.id }
 							imgUrl={ img.imgThumbnailUrl || img.imgUrl }
 							leftControls={ leftModalControls }
+							activeMediaState={ activeMediaState }
+							setActiveMediaState={ setActiveMediaState }
+							isPro={ IS_PRO_PLUGIN }
+							modalProps={ modalExtensionProps }
+							img={ img }
 							onChangeFocalPoint={ ( val ) => {
 								onChange( { focalPoint: val } );
 							} }
@@ -875,16 +998,12 @@ const SortableItem = function ( props ) {
 					onClick={ openModal }
 					aria-expanded={ isOpen }
 				>
-					<img
-						src={ img.imgThumbnailUrl || img.imgUrl }
-						alt={ img.alt || img.imgThumbnailUrl || img.imgUrl }
-						loading="lazy"
-					/>
+					{ getGalleryItemPreview( img, props ) }
 				</Button>
 			</div>
 			{ isOpen ? (
 				<ImageEditModal
-					title={ __( 'Image Settings', 'visual-portfolio' ) }
+					title={ __( 'Media Settings', 'visual-portfolio' ) }
 					img={ activeImage }
 					idx={ activeIndex }
 					onChange={ ( val ) => {
@@ -957,6 +1076,7 @@ const SortableList = function ( props ) {
 		isSetupWizard,
 		clientId,
 	} = props;
+	const allowedMediaTypes = getAllowedMediaTypes( IS_PRO_PLUGIN );
 
 	const sensors = useSensors(
 		useSensor( PointerSensor, { activationConstraint: { distance: 5 } } )
@@ -1023,7 +1143,7 @@ const SortableList = function ( props ) {
 			onSelect={ ( images ) => {
 				onChange( prepareImages( images, items ) );
 			} }
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			allowedTypes={ allowedMediaTypes }
 			value={
 				items && items.length ? items.map( ( img ) => img.id ) : false
 			}
@@ -1379,7 +1499,7 @@ export default function GalleryControl( props ) {
 				onSelect={ ( images ) => {
 					onChange( prepareImages( images ) );
 				} }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				allowedTypes={ getAllowedMediaTypes( IS_PRO_PLUGIN ) }
 				multiple="add"
 				value={
 					filteredValue && Object.keys( filteredValue ).length

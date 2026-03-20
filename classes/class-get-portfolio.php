@@ -2544,6 +2544,22 @@ class Visual_Portfolio_Get {
 				$img_md_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_md_popup'] );
 				$img_sm_meta = wp_get_attachment_image_src( $args['image_id'], $args['img_size_sm_popup'] );
 
+				if ( ! $img_meta ) {
+					$img_meta = array(
+						wp_get_attachment_url( $args['image_id'] ),
+						0,
+						0,
+					);
+				}
+
+				if ( ! $img_md_meta ) {
+					$img_md_meta = $img_meta;
+				}
+
+				if ( ! $img_sm_meta ) {
+					$img_sm_meta = $img_meta;
+				}
+
 				$popup_image = apply_filters(
 					'vpf_popup_image_data',
 					array(
