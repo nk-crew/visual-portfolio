@@ -5,11 +5,13 @@ import getDynamicCSS, {
 	prepareStylesFromParams,
 } from '../../utils/controls-dynamic-css';
 import { maybeDecode, maybeEncode } from '../../utils/encode-decode';
+import getControlNameClassName from '../../utils/get-control-name-class-name';
 
 export function get() {
 	return {
 		conditionCheck,
 		controlGetValue,
+		getControlNameClassName,
 		prepareStylesFromParams,
 		hasDynamicCSS,
 		getDynamicCSS,
