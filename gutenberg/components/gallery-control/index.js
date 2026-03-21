@@ -40,6 +40,7 @@ import FocalPointControl, {
 	hasCustomFocalPointValue,
 	normalizeFocalPointValue,
 } from '../focal-point-control';
+import MediaPreviewCard from '../media-preview-card';
 import CollapsibleSection from './collapsible-section';
 import getAllCategories from './utils/get-all-categories';
 
@@ -365,60 +366,45 @@ const SelectedImageData = function ( props ) {
 			)
 		) : (
 			<>
-				<div className="vpf-component-gallery-control-item-modal-image-preview">
+				<MediaPreviewCard
+					className="vpf-component-gallery-control-item-modal-image-preview"
+					onSelect={ ( image ) => {
+						const imgData = prepareImage( image );
+						onChangeImage( imgData );
+					} }
+					allowedTypes={ allowedMediaTypes }
+					onRemove={ () => {
+						onChangeImage( false );
+					} }
+				>
 					{ getGalleryModalPreview(
 						imageData,
 						imgUrl,
 						extensionProps
 					) }
-					<div className="vpf-component-gallery-control-item-modal-image-actions">
-						<MediaUpload
-							onSelect={ ( image ) => {
-								const imgData = prepareImage( image );
-								onChangeImage( imgData );
-							} }
-							allowedTypes={ allowedMediaTypes }
-							render={ ( { open } ) => (
-								<Button
-									onClick={ open }
-									className="vpf-component-gallery-control-item-modal-image-action"
-								>
-									{ __( 'Replace', 'visual-portfolio' ) }
-								</Button>
-							) }
-						/>
-						<Button
-							onClick={ () => {
-								onChangeImage( false );
-							} }
-							className="vpf-component-gallery-control-item-modal-image-action"
-						>
-							{ __( 'Remove', 'visual-portfolio' ) }
-						</Button>
-					</div>
-				</div>
+				</MediaPreviewCard>
 				{ applyFilters(
 					'vpf.editor.gallery-after-media-controls-render',
 					null,
 					extensionProps
 				) }
 				<div className="vpf-component-gallery-control-item-modal-fields vpf-component-gallery-control-item-modal-fields-left">
-						{ showFocalPoint ? (
-							<div className="vpf-component-gallery-control-item-modal-field vpf-component-gallery-control-item-modal-field-full">
-								<FocalPointControl
-									label={ __(
-										'Image focal point',
-										'visual-portfolio'
-									) }
-									className="vpf-component-gallery-control-item-modal-image-additional-info-focal-point"
-									value={ focalPointValue }
-									defaultExpanded={ hasCustomFocalPointValue(
-										focalPoint
-									) }
-									onChange={ onChangeFocalPoint }
-								/>
-							</div>
-						) : null }
+					{ showFocalPoint ? (
+						<div className="vpf-component-gallery-control-item-modal-field vpf-component-gallery-control-item-modal-field-full">
+							<FocalPointControl
+								label={ __(
+									'Image focal point',
+									'visual-portfolio'
+								) }
+								className="vpf-component-gallery-control-item-modal-image-additional-info-focal-point"
+								value={ focalPointValue }
+								defaultExpanded={ hasCustomFocalPointValue(
+									focalPoint
+								) }
+								onChange={ onChangeFocalPoint }
+							/>
+						</div>
+					) : null }
 					{ leftControls?.length
 						? leftControls.map( ( control ) => control.control )
 						: null }

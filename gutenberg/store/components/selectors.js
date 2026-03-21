@@ -5,6 +5,7 @@ import VPDatePicker from '../../components/date-picker';
 import ElementsSelector from '../../components/elements-selector';
 import FocalPointControl from '../../components/focal-point-control';
 import IconsSelector from '../../components/icons-selector';
+import MediaPreviewCard from '../../components/media-preview-card';
 import VpfSelectControl from '../../components/select-control';
 import SpinnerComponent from '../../components/spinner';
 import ToggleModal from '../../components/toggle-modal';
@@ -18,6 +19,7 @@ export function get() {
 		ElementsSelector,
 		FocalPointControl,
 		IconsSelector,
+		MediaPreviewCard,
 		VpfSelectControl,
 		SpinnerComponent,
 		ToggleModal,

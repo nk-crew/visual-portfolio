@@ -1,0 +1,56 @@
+.vpf-component-media-preview-card {
+	position: relative;
+	overflow: hidden;
+	border-radius: 2px;
+
+	&:hover,
+	&:focus-within {
+		.vpf-component-media-preview-card-actions {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+}
+
+.vpf-component-media-preview-card-media {
+	:where(img, video, iframe) {
+		display: block;
+		width: 100%;
+		aspect-ratio: 2 / 1;
+	}
+
+	:where(img, video) {
+		object-fit: cover;
+		object-position: 50% 50%;
+	}
+
+	iframe {
+		border: 0;
+	}
+}
+
+.vpf-component-media-preview-card-actions {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 8px;
+	padding: 8px;
+	background: linear-gradient(
+		180deg,
+		rgba(0, 0, 0, 0.04) 0%,
+		rgba(0, 0, 0, 0.34) 100%
+	);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.15s ease;
+}
+
+.vpf-component-media-preview-card-action.components-button {
+	min-width: 0;
+	flex: 1;
+	justify-content: center;
+	backdrop-filter: blur(16px) saturate(180%);
+	background: rgba(255, 255, 255, 0.75);
+}
