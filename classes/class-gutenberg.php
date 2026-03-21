@@ -223,6 +223,12 @@ class Visual_Portfolio_Gutenberg {
 			'visual-portfolio-gutenberg-custom-post-meta',
 			'build/gutenberg/custom-post-meta'
 		);
+		Visual_Portfolio_Assets::enqueue_style(
+			'visual-portfolio-gutenberg-custom-post-meta',
+			'build/gutenberg/custom-post-meta'
+		);
+		wp_style_add_data( 'visual-portfolio-gutenberg-custom-post-meta', 'rtl', 'replace' );
+		wp_style_add_data( 'visual-portfolio-gutenberg-custom-post-meta', 'suffix', '.min' );
 
 		wp_localize_script(
 			'visual-portfolio-gutenberg-custom-post-meta',

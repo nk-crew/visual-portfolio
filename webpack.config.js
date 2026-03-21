@@ -258,20 +258,51 @@ const newConfig = {
 				...defaultConfig.optimization.splitChunks.cacheGroups,
 				style: {
 					type: 'css/mini-extract',
-					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
-					chunks: 'all',
-					enforce: true,
-					name( _, chunks, cacheGroupKey ) {
-						const chunkName =
-							chunks[ chunks.length > 1 ? 1 : 0 ].name;
-						let cssOutput = `${ path.dirname(
-							chunkName
-						) }/${ cacheGroupKey }-${ path.basename( chunkName ) }`;
-						const foundingChunk = chunkName
+					test( module ) {
+						const resource = module.nameForCondition?.();
+
+						if ( ! resource ) {
+							return false;
+						}
+
+						const normalizedResource = resource
 							.split( path.win32.sep )
 							.join( path.posix.sep );
 
-						if (
+						if ( normalizedResource.includes( '/gutenberg/components/' ) ) {
+							return false;
+						}
+
+						return /[\\/]style(\.module)?\.(sc|sa|c)ss$/.test(
+							resource
+						);
+					},
+					chunks: 'all',
+					enforce: true,
+						name( _, chunks, cacheGroupKey ) {
+							const selectedChunk =
+								chunks[ chunks.length > 1 ? 1 : 0 ];
+							const chunkName = selectedChunk.name;
+							let cssOutput = `${ path.dirname(
+								chunkName
+							) }/${ cacheGroupKey }-${ path.basename( chunkName ) }`;
+
+							if ( chunks.length > 1 ) {
+								const combinedChunkName = chunks
+									.map( ( chunk ) => path.basename( chunk.name ) )
+									.sort()
+									.join( '-' );
+
+								return `${ path.dirname(
+									chunkName
+								) }/${ cacheGroupKey }-${ combinedChunkName }`;
+							}
+
+							const foundingChunk = chunkName
+								.split( path.win32.sep )
+								.join( path.posix.sep );
+
+							if (
 							( foundingChunk.indexOf( 'templates/' ) > -1 ||
 								foundingChunk.indexOf( 'admin/css/' ) > -1 ||
 								foundingChunk.indexOf( 'gutenberg/' ) > -1 ) &&

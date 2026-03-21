@@ -23,16 +23,12 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import {
 	__experimentalToggleGroupControl,
 	__experimentalToggleGroupControlOption,
-	__experimentalUnitControl,
 	Button,
 	CheckboxControl,
-	FocalPointPicker,
 	Modal,
-	PanelRow,
 	SelectControl,
 	ToggleGroupControl as __stableToggleGroupControl,
 	ToggleGroupControlOption as __stableToggleGroupControlOption,
-	UnitControl as __stableUnitControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -40,6 +36,10 @@ import { applyFilters } from '@wordpress/hooks';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import ControlsRender from '../controls-render';
+import FocalPointControl, {
+	hasCustomFocalPointValue,
+	normalizeFocalPointValue,
+} from '../focal-point-control';
 import CollapsibleSection from './collapsible-section';
 import getAllCategories from './utils/get-all-categories';
 
@@ -48,7 +48,6 @@ const { VPGutenbergVariables } = window;
 const UNCATEGORIZED_VALUE = '------';
 const ITEMS_COUNT_DEFAULT = 18;
 const IS_PRO_PLUGIN = !! VPGutenbergVariables?.pro;
-const UnitControl = __stableUnitControl || __experimentalUnitControl;
 const ToggleGroupControl =
 	__stableToggleGroupControl || __experimentalToggleGroupControl;
 const ToggleGroupControlOption =
@@ -339,7 +338,7 @@ const SelectedImageData = function ( props ) {
 		[ imgId ]
 	);
 
-	let focalPointValue = focalPoint;
+	const focalPointValue = normalizeFocalPointValue( focalPoint );
 	const imageSourceUrl = imageData?.source_url || '';
 	const imageFileName = imageSourceUrl
 		? imageSourceUrl.split( '/' ).pop()
@@ -347,17 +346,6 @@ const SelectedImageData = function ( props ) {
 	const imageEditUrl = imageData?.id
 		? `${ VPGutenbergVariables.admin_url }post.php?post=${ imageData.id }&action=edit`
 		: '';
-
-	if (
-		! focalPointValue ||
-		typeof focalPointValue.x !== 'number' ||
-		typeof focalPointValue.y !== 'number'
-	) {
-		focalPointValue = {
-			x: 0.5,
-			y: 0.5,
-		};
-	}
 
 	const extensionProps = {
 		...modalProps,
@@ -415,58 +403,22 @@ const SelectedImageData = function ( props ) {
 					extensionProps
 				) }
 				<div className="vpf-component-gallery-control-item-modal-fields vpf-component-gallery-control-item-modal-fields-left">
-					{ showFocalPoint ? (
-						<div className="vpf-component-gallery-control-item-modal-field vpf-component-gallery-control-item-modal-field-full">
-							<CollapsibleSection
-								label={ __(
-									'Image focal point',
-									'visual-portfolio'
-								) }
-								className="vpf-component-gallery-control-item-modal-image-additional-info-focal-point"
-							>
-								<PanelRow>
-									<UnitControl
-										label={ __(
-											'Left',
-											'visual-portfolio'
-										) }
-										value={ 100 * focalPointValue.x + '%' }
-										onChange={ ( val ) => {
-											onChangeFocalPoint( {
-												...focalPointValue,
-												x: parseFloat( val ) / 100,
-											} );
-										} }
-										min={ 0 }
-										max={ 100 }
-										step={ 1 }
-										units={ [ { value: '%', label: '%' } ] }
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-									/>
-									<UnitControl
-										label={ __(
-											'Top',
-											'visual-portfolio'
-										) }
-										value={ 100 * focalPointValue.y + '%' }
-										onChange={ ( val ) => {
-											onChangeFocalPoint( {
-												...focalPointValue,
-												y: parseFloat( val ) / 100,
-											} );
-										} }
-										min={ 0 }
-										max={ 100 }
-										step={ 1 }
-										units={ [ { value: '%', label: '%' } ] }
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-									/>
-								</PanelRow>
-							</CollapsibleSection>
-						</div>
-					) : null }
+						{ showFocalPoint ? (
+							<div className="vpf-component-gallery-control-item-modal-field vpf-component-gallery-control-item-modal-field-full">
+								<FocalPointControl
+									label={ __(
+										'Image focal point',
+										'visual-portfolio'
+									) }
+									className="vpf-component-gallery-control-item-modal-image-additional-info-focal-point"
+									value={ focalPointValue }
+									defaultExpanded={ hasCustomFocalPointValue(
+										focalPoint
+									) }
+									onChange={ onChangeFocalPoint }
+								/>
+							</div>
+						) : null }
 					{ leftControls?.length
 						? leftControls.map( ( control ) => control.control )
 						: null }
@@ -576,7 +528,7 @@ const ImageEditModal = function ( props ) {
 		attributes,
 	} = props;
 
-	let focalPointVal = img?.focalPoint;
+	let focalPointVal = normalizeFocalPointValue( img?.focalPoint );
 	let focalPointImageIdx = idx;
 
 	// Find same focalPoint value from bulk items if available.
@@ -594,9 +546,10 @@ const ImageEditModal = function ( props ) {
 			);
 
 			if ( focalPointImageIdx >= 0 ) {
-				focalPointVal =
+				focalPointVal = normalizeFocalPointValue(
 					attributes[ controlName ]?.[ focalPointImageIdx ]
-						?.focalPoint;
+						?.focalPoint
+				);
 			}
 		}
 	}
@@ -824,15 +777,14 @@ const ImageEditModal = function ( props ) {
 					) : null }
 
 					{ /* Display focal point if no image ID available (used for bulk editor with image placeholder) */ }
-					{ focalPoint && ! img?.id && img?.imgThumbnailUrl ? (
+					{ focalPoint && ! img?.id ? (
 						<div className="vpf-component-gallery-control-item-modal-image-info">
-							<FocalPointPicker
-								url={ img.imgThumbnailUrl }
+							<FocalPointControl
 								value={ focalPointVal }
+								collapsible={ false }
 								onChange={ ( val ) => {
 									onChange( { focalPoint: val } );
 								} }
-								__nextHasNoMarginBottom
 							/>
 							{ leftModalControls.length ? (
 								<div className="vpf-component-gallery-control-item-modal-fields vpf-component-gallery-control-item-modal-fields-left">

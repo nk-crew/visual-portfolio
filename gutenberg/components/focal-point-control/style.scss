@@ -1,0 +1,40 @@
+.vpf-component-focal-point-control {
+	&__toggle {
+		display: flex;
+		align-items: center;
+		height: 14px;
+		margin-top: -6px;
+		padding: 0;
+		font-weight: 450;
+		color: #757575;
+
+		.components-panel__arrow {
+			width: 20px;
+			height: 20px;
+			margin-left: 2px;
+			transition: transform 0.15s ease;
+		}
+
+		&[aria-expanded='true'] {
+			.components-panel__arrow {
+				transform: rotate(180deg);
+			}
+		}
+	}
+
+	&__content {
+		padding-top: 12px;
+
+		.components-panel__row {
+			gap: 16px;
+		}
+	}
+
+	> .components-panel__row {
+		gap: 15px;
+	}
+
+	.components-input-control {
+		flex: 1;
+	}
+}
