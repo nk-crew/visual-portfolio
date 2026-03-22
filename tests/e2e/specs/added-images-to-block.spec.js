@@ -10,7 +10,13 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 import imageFixtures from '../../fixtures/images.json';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
+import {
+	confirmMediaLibrarySelection,
+	openMediaLibrary,
+	selectMediaLibraryImages,
+} from '../utils/media-library';
 import { openPublishedPage } from '../utils/open-published-page';
+import { waitForPortfolioPreview } from '../utils/portfolio-preview';
 
 test.describe( 'added images to block', () => {
 	test.beforeEach( async ( { requestUtils } ) => {
@@ -114,46 +120,14 @@ test.describe( 'added images to block', () => {
 			)
 			.click();
 
-		await page
-			.locator( 'button#menu-item-browse', {
-				hasText: 'Media Library',
-			} )
-			.click();
+		await openMediaLibrary( page );
 
-		const imageList = page.locator(
-			'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"]'
-		);
+		const expectedImageIds = images
+			.filter( ( image ) => typeof image.imgUrl !== 'undefined' )
+			.map( ( image ) => image.id.toString() );
 
-		for ( const image of await imageList.elementHandles() ) {
-			const imageId = await image.getAttribute( 'data-id' );
-			const foundImage = images.find(
-				( x ) => x.id.toString() === imageId
-			);
-			if ( foundImage && typeof foundImage.imgUrl !== 'undefined' ) {
-				await image.click();
-				// Check if the image is selected by looking for a class change or attribute update
-				await image.evaluate( ( node ) =>
-					node.classList.contains( 'selected' )
-				);
-			}
-		}
-
-		// Fallback for CI instability: ensure at least one item is selected.
-		if (
-			0 === ( await page.locator( 'li.attachment.selected' ).count() )
-		) {
-			await imageList.first().click();
-		}
-
-		const selectButton = page.locator(
-			'button.button.media-button.media-button-select',
-			{
-				hasText: 'Select',
-			}
-		);
-
-		await expect( selectButton ).toBeEnabled( { timeout: 15000 } );
-		await selectButton.click();
+		await selectMediaLibraryImages( page, expectedImageIds );
+		await confirmMediaLibrarySelection( page );
 
 		await page
 			.locator( '.components-base-control__field', {
@@ -161,8 +135,6 @@ test.describe( 'added images to block', () => {
 			} )
 			.locator( 'input.components-text-control__input' )
 			.fill( '10' );
-
-		await page.waitForTimeout( 500 );
 
 		// Check images on backend editor.
 		for ( const image of images ) {
@@ -206,7 +178,7 @@ test.describe( 'added images to block', () => {
 			.locator( 'input.components-text-control__input' )
 			.fill( '10' );
 
-		await page.waitForTimeout( 500 );
+		await waitForPortfolioPreview( page );
 
 		// Check images on backend editor.
 		for ( const image of images ) {
@@ -251,44 +223,44 @@ test.describe( 'added images to block', () => {
 			)
 			.click();
 
-		await page
-			.locator( 'button#menu-item-browse', {
-				hasText: 'Media Library',
-			} )
-			.click();
+		await openMediaLibrary( page );
 
-		for ( const image of images ) {
-			const foundFixture = await findAsyncSequential(
-				imageFixtures,
-				async ( x ) => x.description === image.description
-			);
+		const selectableImages = images.filter(
+			( image ) => typeof image.imgUrl !== 'undefined'
+		);
 
-			expect( foundFixture ).toBeTruthy();
+		await selectMediaLibraryImages(
+			page,
+			selectableImages.map( ( image ) => image.id ),
+			{
+				afterSelect: async ( { imageId } ) => {
+					const currentImage = images.find(
+						( image ) => String( image.id ) === imageId
+					);
+					const foundFixture = await findAsyncSequential(
+						imageFixtures,
+						async ( x ) =>
+							x.description === currentImage.description
+					);
 
-			const attachment = page.locator(
-				`ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"][data-id="${ image.id }"]`
-			);
-			await expect( attachment ).toHaveCount( 1 );
-			await attachment.click();
+					expect( foundFixture ).toBeTruthy();
 
-			await page
-				.locator( '#attachment-details-alt-text' )
-				.fill( foundFixture.alt );
+					await page
+						.locator( '#attachment-details-alt-text' )
+						.fill( foundFixture.alt );
 
-			await page
-				.locator( '#attachment-details-caption' )
-				.fill( foundFixture.caption );
+					await page
+						.locator( '#attachment-details-caption' )
+						.fill( foundFixture.caption );
 
-			await page
-				.locator( '#attachment-details-description' )
-				.fill( foundFixture.description );
-		}
+					await page
+						.locator( '#attachment-details-description' )
+						.fill( foundFixture.description );
+				},
+			}
+		);
 
-		await page
-			.locator( 'button.button.media-button.media-button-select', {
-				hasText: 'Select',
-			} )
-			.click();
+		await confirmMediaLibrarySelection( page );
 
 		await page
 			.locator( '.components-base-control__field', {
@@ -331,8 +303,6 @@ test.describe( 'added images to block', () => {
 			.click();
 
 		await page.getByRole( 'checkbox', { name: 'Display Excerpt' } ).check();
-
-		await page.waitForTimeout( 500 );
 
 		// Check images on backend editor.
 		for ( const image of images ) {
@@ -440,44 +410,44 @@ test.describe( 'added images to block', () => {
 			)
 			.click();
 
-		await page
-			.locator( 'button#menu-item-browse', {
-				hasText: 'Media Library',
-			} )
-			.click();
+		await openMediaLibrary( page );
 
-		for ( const image of images ) {
-			const foundFixture = await findAsyncSequential(
-				imageFixtures,
-				async ( x ) => x.description === image.description
-			);
+		const selectableImages = images.filter(
+			( image ) => typeof image.imgUrl !== 'undefined'
+		);
 
-			expect( foundFixture ).toBeTruthy();
+		await selectMediaLibraryImages(
+			page,
+			selectableImages.map( ( image ) => image.id ),
+			{
+				afterSelect: async ( { imageId } ) => {
+					const currentImage = images.find(
+						( image ) => String( image.id ) === imageId
+					);
+					const foundFixture = await findAsyncSequential(
+						imageFixtures,
+						async ( x ) =>
+							x.description === currentImage.description
+					);
 
-			const attachment = page.locator(
-				`ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"][data-id="${ image.id }"]`
-			);
-			await expect( attachment ).toHaveCount( 1 );
-			await attachment.click();
+					expect( foundFixture ).toBeTruthy();
 
-			await page
-				.locator( '#attachment-details-alt-text' )
-				.fill( foundFixture.alt );
+					await page
+						.locator( '#attachment-details-alt-text' )
+						.fill( foundFixture.alt );
 
-			await page
-				.locator( '#attachment-details-caption' )
-				.fill( foundFixture.caption );
+					await page
+						.locator( '#attachment-details-caption' )
+						.fill( foundFixture.caption );
 
-			await page
-				.locator( '#attachment-details-description' )
-				.fill( foundFixture.description );
-		}
+					await page
+						.locator( '#attachment-details-description' )
+						.fill( foundFixture.description );
+				},
+			}
+		);
 
-		await page
-			.locator( 'button.button.media-button.media-button-select', {
-				hasText: 'Select',
-			} )
-			.click();
+		await confirmMediaLibrarySelection( page );
 
 		await page
 			.locator( '.components-base-control__field', {

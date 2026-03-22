@@ -9,7 +9,13 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 import imageFixtures from '../../fixtures/images.json';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
+import {
+	confirmMediaLibrarySelection,
+	openMediaLibrary,
+	selectMediaLibraryImages,
+} from '../utils/media-library';
 import { openPublishedPage } from '../utils/open-published-page';
+import { waitForPortfolioPreview } from '../utils/portfolio-preview';
 
 /**
  * TODO: The test needs to be redone in the future.
@@ -84,61 +90,44 @@ test.describe( 'added images to saved layout', () => {
 			)
 			.click();
 
-		await page
-			.locator( 'button#menu-item-browse', {
-				hasText: 'Media Library',
-			} )
-			.click();
+		await openMediaLibrary( page );
 
-		await page.waitForTimeout( 500 );
-
-		const imageList = await page.locator(
-			'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"]'
+		const selectableImages = images.filter(
+			( image ) => typeof image.imgUrl !== 'undefined'
 		);
 
-		for ( const image of await imageList.elementHandles() ) {
-			if (
-				typeof images.find(
-					async ( x ) =>
-						x.id === ( await image.getAttribute( 'data-id' ) )
-				).imgUrl !== 'undefined'
-			) {
-				await image.click();
+		await selectMediaLibraryImages(
+			page,
+			selectableImages.map( ( image ) => image.id ),
+			{
+				afterSelect: async ( { imageId } ) => {
+					const currentImage = selectableImages.find(
+						( image ) => String( image.id ) === imageId
+					);
+					const foundFixture = await findAsyncSequential(
+						imageFixtures,
+						async ( x ) =>
+							x.description === currentImage.description
+					);
 
-				const imageID = await image.getAttribute( 'data-id' );
+					if ( typeof foundFixture !== 'undefined' ) {
+						await page
+							.locator( '#attachment-details-alt-text' )
+							.fill( foundFixture.alt );
 
-				const foundImage = await findAsyncSequential(
-					images,
-					async ( x ) => x.id === Number( imageID )
-				);
+						await page
+							.locator( '#attachment-details-caption' )
+							.fill( foundFixture.caption );
 
-				const foundFixture = await findAsyncSequential(
-					imageFixtures,
-					async ( x ) =>
-						x.description === ( await foundImage.description )
-				);
-
-				if ( typeof ( await foundFixture ) !== 'undefined' ) {
-					await page
-						.locator( '#attachment-details-alt-text' )
-						.fill( foundFixture.alt );
-
-					await page
-						.locator( '#attachment-details-caption' )
-						.fill( foundFixture.caption );
-
-					await page
-						.locator( '#attachment-details-description' )
-						.fill( foundFixture.description );
-				}
+						await page
+							.locator( '#attachment-details-description' )
+							.fill( foundFixture.description );
+					}
+				},
 			}
-		}
+		);
 
-		await page
-			.locator( 'button.button.media-button.media-button-select', {
-				hasText: 'Select',
-			} )
-			.click();
+		await confirmMediaLibrarySelection( page );
 
 		await page
 			.locator( 'button.components-button.is-primary', {
@@ -207,8 +196,6 @@ test.describe( 'added images to saved layout', () => {
 				.check();
 		}
 
-		await page.waitForTimeout( 500 );
-
 		// Check images on backend editor.
 		for ( const image of await images ) {
 			await expect(
@@ -252,7 +239,7 @@ test.describe( 'added images to saved layout', () => {
 			attributes: { id: String( postID ) },
 		} );
 
-		await page.waitForTimeout( 500 );
+		await waitForPortfolioPreview( page );
 
 		// Check images on backend editor.
 		for ( const image of images ) {
@@ -302,7 +289,7 @@ test.describe( 'added images to saved layout', () => {
 			attributes: { id: String( postID ) },
 		} );
 
-		await page.waitForTimeout( 500 );
+		await waitForPortfolioPreview( page );
 
 		// Check images on backend editor.
 		for ( const image of images ) {
@@ -621,7 +608,7 @@ test.describe( 'added images to saved layout', () => {
 			attributes: { id: String( postID ) },
 		} );
 
-		await page.waitForTimeout( 500 );
+		await waitForPortfolioPreview( page );
 
 		// Publish Post.
 		await editor.publishPost();

@@ -14,6 +14,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { createRegularPosts } from '../utils/create-posts';
 import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
+import { openPublishedPage } from '../utils/open-published-page';
 
 /**
  * Base form data needed for every preview request.
@@ -339,22 +340,7 @@ test.describe( 'selector control attribute values validation', () => {
 		// Publish the page.
 		await editor.publishPost();
 
-		// Navigate to the frontend.
-		const viewButton = page
-			.locator( '.components-button', { hasText: 'View Page' } )
-			.first();
-		const popupPromise = page.waitForEvent( 'popup' ).catch( () => null );
-		const navPromise = page
-			.waitForNavigation( { waitUntil: 'domcontentloaded' } )
-			.catch( () => null );
-		await viewButton.click();
-		const popup = await Promise.race( [
-			popupPromise,
-			navPromise.then( () => null ),
-			page.waitForTimeout( 2000 ).then( () => null ),
-		] );
-		const frontendPage = popup || page;
-		await frontendPage.waitForLoadState( 'domcontentloaded' );
+		const frontendPage = await openPublishedPage( page );
 
 		// The portfolio should render without errors.
 		const portfolio = frontendPage.locator( '.vp-portfolio' );
@@ -394,22 +380,7 @@ test.describe( 'selector control attribute values validation', () => {
 
 		await editor.publishPost();
 
-		// Navigate to the frontend.
-		const viewButton = page
-			.locator( '.components-button', { hasText: 'View Page' } )
-			.first();
-		const popupPromise = page.waitForEvent( 'popup' ).catch( () => null );
-		const navPromise = page
-			.waitForNavigation( { waitUntil: 'domcontentloaded' } )
-			.catch( () => null );
-		await viewButton.click();
-		const popup = await Promise.race( [
-			popupPromise,
-			navPromise.then( () => null ),
-			page.waitForTimeout( 2000 ).then( () => null ),
-		] );
-		const frontendPage = popup || page;
-		await frontendPage.waitForLoadState( 'domcontentloaded' );
+		const frontendPage = await openPublishedPage( page );
 
 		// The portfolio should render with dates.
 		const portfolio = frontendPage.locator( '.vp-portfolio' );

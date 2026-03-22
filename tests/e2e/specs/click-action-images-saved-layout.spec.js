@@ -5,6 +5,13 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
+import {
+	confirmMediaLibrarySelection,
+	openMediaLibrary,
+	selectMediaLibraryImages,
+} from '../utils/media-library';
+import { openPublishedPage } from '../utils/open-published-page';
+import { waitForPortfolioPreview } from '../utils/portfolio-preview';
 
 /**
  * TODO: The test needs to be redone in the future.
@@ -64,33 +71,14 @@ test.describe('click action gallery images (saved layout)', () => {
 			)
 			.click();
 
-		await page
-			.locator('button#menu-item-browse', {
-				hasText: 'Media Library',
-			})
-			.click();
-
-		await page.waitForTimeout(500);
-
-		const imageList = await page.locator(
-			'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"]'
+		await openMediaLibrary(page);
+		await selectMediaLibraryImages(
+			page,
+			images
+				.filter((image) => typeof image.imgUrl !== 'undefined')
+				.map((image) => image.id)
 		);
-
-		for (const image of await imageList.elementHandles()) {
-			if (
-				typeof images.find(
-					async (x) => x.id === (await image.getAttribute('data-id'))
-				).imgUrl !== 'undefined'
-			) {
-				await image.click();
-			}
-		}
-
-		await page
-			.locator('button.button.media-button.media-button-select', {
-				hasText: 'Select',
-			})
-			.click();
+		await confirmMediaLibrarySelection(page);
 
 		await page
 			.locator('button.components-button.is-primary', {
@@ -263,20 +251,15 @@ test.describe('click action gallery images (saved layout)', () => {
 			attributes: { id: String(postID) },
 		});
 
-		await page.waitForTimeout(500);
+		await waitForPortfolioPreview(page);
 
 		// Publish Post.
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
-		const link = page.locator('a.vp-portfolio__item-meta');
+		const link = frontendPage.locator('a.vp-portfolio__item-meta');
 
 		await expect(link).toBeHidden();
 	});
