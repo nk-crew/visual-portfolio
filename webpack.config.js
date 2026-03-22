@@ -5,11 +5,43 @@ const path = require( 'path' );
 
 const glob = require( 'glob' );
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
+const FileManagerPlugin = require( 'filemanager-webpack-plugin' );
 const RemoveEmptyScriptsPlugin = require( 'webpack-remove-empty-scripts' );
 const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
+
 const isProduction = process.env.NODE_ENV === 'production';
-const FileManagerPlugin = require( 'filemanager-webpack-plugin' );
 const isQuietBuild = process.env.VP_QUIET === '1';
+
+const JS_ENTRY_PATTERNS = [
+	'./assets/js/**/*.js',
+	'./assets/admin/js/**/*.js',
+	'./gutenberg/**/view.js',
+	'./gutenberg/index.js',
+	'./gutenberg/custom-post-meta.js',
+	'./gutenberg/layouts-editor.js',
+];
+
+const CSS_ENTRY_PATTERNS = [
+	'./assets/css/**/*.scss',
+	'./assets/admin/css/**/*.scss',
+	'./templates/**/style.scss',
+	'./gutenberg/blocks/**/style.scss',
+	'./gutenberg/blocks/**/editor.scss',
+];
+
+const WATCH_IGNORED = [
+	'**/templates/**/*.css',
+	'**/templates/**/*.css.map',
+	'**/templates/**/*.js',
+	'**/templates/**/*.js.map',
+	'**/templates/**/*.asset.php',
+	'**/vendor/**',
+];
+
+const QUIET_BUILD_WARNING_PATTERNS = [
+	/Deprecation Warning/i,
+	/Sass @import rules are deprecated/i,
+];
 
 const vendorFiles = [
 	{
@@ -123,85 +155,214 @@ const vendorFiles = [
 	},
 ];
 
-defaultConfig.module.rules[ 2 ].use[ 1 ].options.url = false;
+function normalizePath( filePath ) {
+	return filePath.split( path.win32.sep ).join( path.posix.sep );
+}
 
-// Prepare JS for assets.
-const entryAssetsJs = glob
-	.sync( [
-		'./assets/js/**.js',
-		'./assets/admin/js/**.js',
-		'./assets/js/3rd/plugin-jetpack.js',
-		'./gutenberg/**/view.js',
-		'./gutenberg/index.js',
-		'./gutenberg/custom-post-meta.js',
-		'./gutenberg/layouts-editor.js',
-	] )
-	.reduce( function ( entries, entry ) {
-		const name = entry.replace( '.js', '' );
-		entries[ name ] = path.resolve( process.cwd(), entry );
-		return entries;
-	}, {} );
+function createEntries( patterns, extension, shouldInclude = () => true ) {
+	return glob.sync( patterns, { nodir: true } ).reduce( ( entries, entry ) => {
+		if ( ! shouldInclude( entry ) ) {
+			return entries;
+		}
 
-// Prepare CSS for assets.
-const entryAssetsCss = glob
-	.sync( [
-		'./assets/css/**.scss',
-		'./assets/admin/css/**.scss',
-		'./templates/**/style.scss',
-		'./templates/**/**/style.scss',
-		'./templates/**/**/**/style.scss',
-		'./gutenberg/blocks/**/style.scss',
-		'./gutenberg/blocks/**/editor.scss',
-	] )
-	.filter( ( entry ) => {
-		const filename = path.basename( entry );
-
-		// Exclude file names started with _
-		return ! /^_/.test( filename );
-	} )
-	.reduce( function ( entries, entry ) {
-		const name = entry.replace( '.scss', '' );
+		const name = entry.slice( 0, -extension.length );
 
 		entries[ name ] = path.resolve( process.cwd(), entry );
 
 		return entries;
 	}, {} );
+}
+
+function shouldIncludeScssEntry( entry ) {
+	return ! path.basename( entry ).startsWith( '_' );
+}
+
+function isPlainCssRule( rule ) {
+	return rule.test instanceof RegExp && rule.test.test( 'file.css' );
+}
+
+function isSvgRule( rule ) {
+	return rule.test instanceof RegExp && rule.test.test( 'file.svg' );
+}
+
+function disableCssLoaderUrls( rules ) {
+	return rules.map( ( rule ) => {
+		if ( ! isPlainCssRule( rule ) || ! Array.isArray( rule.use ) ) {
+			return rule;
+		}
+
+		return {
+			...rule,
+			use: rule.use.map( ( loader ) => {
+				if (
+					'string' === typeof loader ||
+					! loader.loader ||
+					! loader.loader.includes( 'css-loader' )
+				) {
+					return loader;
+				}
+
+				return {
+					...loader,
+					options: {
+						...loader.options,
+						url: false,
+					},
+				};
+			} ),
+		};
+	} );
+}
+
+function createSvgRules() {
+	return [
+		{
+			test: /\.svg$/,
+			issuer: /\.(j|t)sx?$/,
+			type: 'javascript/auto',
+			use: [
+				{
+					loader: '@svgr/webpack',
+					options: {
+						svgoConfig: {
+							plugins: [
+								{
+									name: 'preset-default',
+									params: {
+										overrides: {
+											removeViewBox: false,
+										},
+									},
+								},
+							],
+						},
+					},
+				},
+				{
+					loader: 'url-loader',
+				},
+			],
+		},
+		{
+			test: /\.svg$/,
+			issuer: /\.(pc|sc|sa|c)ss$/,
+			type: 'asset/inline',
+		},
+	];
+}
+
+function transformDevServerProxy( proxy, fallbackTarget ) {
+	if (
+		! proxy ||
+		Array.isArray( proxy ) ||
+		'object' !== typeof proxy
+	) {
+		return proxy;
+	}
+
+	return Object.entries( proxy ).map( ( [ context, options ] ) => ( {
+		context: [ context ],
+		target: options.target || options.router || fallbackTarget,
+		...options,
+	} ) );
+}
+
+function shouldIgnorePerformanceHint( assetFilename ) {
+	return ! assetFilename.startsWith( 'gutenberg/' );
+}
+
+function isTemplateStyleChunk( normalizedChunkName, cacheGroupKey ) {
+	return (
+		'style' === cacheGroupKey &&
+		( normalizedChunkName.includes( 'templates/' ) ||
+			normalizedChunkName.includes( 'admin/css/' ) ||
+			normalizedChunkName.includes( 'gutenberg/' ) )
+	);
+}
+
+function getStyleChunkName( _, chunks, cacheGroupKey ) {
+	if ( ! chunks.length ) {
+		return cacheGroupKey;
+	}
+
+	const selectedChunk = chunks[ chunks.length > 1 ? 1 : 0 ];
+	const chunkName = selectedChunk.name;
+
+	if ( chunks.length > 1 ) {
+		const combinedChunkName = chunks
+			.map( ( chunk ) => path.basename( chunk.name ) )
+			.sort()
+			.join( '-' );
+
+		return `${ path.dirname(
+			chunkName
+		) }/${ cacheGroupKey }-${ combinedChunkName }`;
+	}
+
+	if (
+		'style' === cacheGroupKey &&
+		chunkName.includes( 'layouts-editor' )
+	) {
+		return `${ path.dirname( chunkName ) }/${ cacheGroupKey }-${ path.basename(
+			chunkName
+		) }`;
+	}
+
+	const normalizedChunkName = normalizePath( chunkName );
+
+	if ( isTemplateStyleChunk( normalizedChunkName, cacheGroupKey ) ) {
+		return `${ path.dirname( chunkName ) }/${ path.basename( chunkName ) }`;
+	}
+
+	return `${ path.dirname( chunkName ) }/${ cacheGroupKey }-${ path.basename(
+		chunkName
+	) }`;
+}
+
+function shouldIgnoreQuietWarning( warning ) {
+	return QUIET_BUILD_WARNING_PATTERNS.some( ( pattern ) =>
+		pattern.test( warning?.message || '' )
+	);
+}
+
+const entryAssetsJs = createEntries( JS_ENTRY_PATTERNS, '.js' );
+const entryAssetsCss = createEntries(
+	CSS_ENTRY_PATTERNS,
+	'.scss',
+	shouldIncludeScssEntry
+);
+
+const defaultRules = disableCssLoaderUrls( defaultConfig.module.rules )
+	.filter( ( rule ) => ! isSvgRule( rule ) )
+	.concat( createSvgRules() );
+
+const splitChunks = defaultConfig.optimization?.splitChunks || {};
+const cacheGroups = splitChunks.cacheGroups || {};
 
 const newConfig = {
 	...defaultConfig,
 	entry: {
-		// Assets JS.
 		...entryAssetsJs,
-		// Assets CSS.
 		...entryAssetsCss,
 	},
-
-	// Reduce infrastructure logger noise (used by FileManagerPlugin) only for quiet builds.
 	infrastructureLogging: isQuietBuild
 		? {
 			...( defaultConfig.infrastructureLogging || {} ),
 			level: 'error',
 		}
 		: defaultConfig.infrastructureLogging,
-
-	// Display minimum info in terminal.
 	stats: 'minimal',
-
 	performance: {
-		// Disable performance hints in console about too large chunks for Gutenberg assets.
-		assetFilter( assetFilename ) {
-			return ! assetFilename.startsWith( 'gutenberg/' );
-		},
+		assetFilter: shouldIgnorePerformanceHint,
 	},
-
 	module: {
 		...defaultConfig.module,
-		rules: [ ...defaultConfig.module.rules ],
+		rules: defaultRules,
 	},
 	plugins: [
 		...defaultConfig.plugins,
 		new RtlCssPlugin( {
-			filename: `[name]-rtl.css`,
+			filename: '[name]-rtl.css',
 		} ),
 		new FileManagerPlugin( {
 			events: {
@@ -232,30 +393,16 @@ const newConfig = {
 			runTasksInSeries: true,
 		} ),
 	].filter( Boolean ),
-	ignoreWarnings: isQuietBuild
-		? [
-			( warning ) =>
-				/Deprecation Warning/i.test( warning?.message || '' ) ||
-				/Sass @import rules are deprecated/i.test(
-					warning?.message || ''
-				),
-		]
-		: undefined,
+	ignoreWarnings: isQuietBuild ? [ shouldIgnoreQuietWarning ] : undefined,
 	watchOptions: {
-		ignored: [
-			'**/templates/**/*.css',
-			'**/templates/**/*.css.map',
-			'**/templates/**/*.js',
-			'**/templates/**/*.js.map',
-			'**/templates/**/*.asset.php',
-			'**/vendor/**',
-		],
+		ignored: WATCH_IGNORED,
 	},
 	optimization: {
 		...defaultConfig.optimization,
 		splitChunks: {
+			...splitChunks,
 			cacheGroups: {
-				...defaultConfig.optimization.splitChunks.cacheGroups,
+				...cacheGroups,
 				style: {
 					type: 'css/mini-extract',
 					test( module ) {
@@ -265,9 +412,7 @@ const newConfig = {
 							return false;
 						}
 
-						const normalizedResource = resource
-							.split( path.win32.sep )
-							.join( path.posix.sep );
+						const normalizedResource = normalizePath( resource );
 
 						if ( normalizedResource.includes( '/gutenberg/components/' ) ) {
 							return false;
@@ -279,135 +424,39 @@ const newConfig = {
 					},
 					chunks: 'all',
 					enforce: true,
-						name( _, chunks, cacheGroupKey ) {
-							const selectedChunk =
-								chunks[ chunks.length > 1 ? 1 : 0 ];
-							const chunkName = selectedChunk.name;
-							let cssOutput = `${ path.dirname(
-								chunkName
-							) }/${ cacheGroupKey }-${ path.basename( chunkName ) }`;
-
-							if ( chunks.length > 1 ) {
-								const combinedChunkName = chunks
-									.map( ( chunk ) => path.basename( chunk.name ) )
-									.sort()
-									.join( '-' );
-
-								return `${ path.dirname(
-									chunkName
-								) }/${ cacheGroupKey }-${ combinedChunkName }`;
-							}
-
-							const foundingChunk = chunkName
-								.split( path.win32.sep )
-								.join( path.posix.sep );
-
-							if (
-							( foundingChunk.indexOf( 'templates/' ) > -1 ||
-								foundingChunk.indexOf( 'admin/css/' ) > -1 ||
-								foundingChunk.indexOf( 'gutenberg/' ) > -1 ) &&
-							cacheGroupKey === 'style'
-						) {
-							cssOutput = `${ path.dirname(
-								chunkName
-							) }/${ path.basename( chunkName ) }`;
-						}
-
-						if (
-							chunkName.indexOf( 'layouts-editor' ) > -1 &&
-							cacheGroupKey === 'style'
-						) {
-							cssOutput = `${ path.dirname(
-								chunkName
-							) }/${ cacheGroupKey }-${ path.basename(
-								chunkName
-							) }`;
-						}
-						return cssOutput;
-					},
+					name: getStyleChunkName,
 				},
 			},
 		},
 	},
 };
 
-// Production only.
 if ( isProduction ) {
-	// Remove JS files created for styles
-	// to prevent enqueue it on production.
 	newConfig.plugins = [
 		new RemoveEmptyScriptsPlugin(),
 		...newConfig.plugins,
 	];
 }
 
-// Development only.
 if ( ! isProduction ) {
-	const devServerProxy = newConfig.devServer?.proxy;
 	const devServerHost = newConfig.devServer?.host || 'localhost';
 	const devServerPort = newConfig.devServer?.port || 8887;
 	const devServerProtocol =
 		newConfig.devServer?.server === 'https' ? 'https' : 'http';
+	const fallbackTarget = `${ devServerProtocol }://${ devServerHost }:${ devServerPort }`;
 
 	newConfig.devServer = {
 		...newConfig.devServer,
-		// Support for dev server on all domains.
 		allowedHosts: 'all',
-		// webpack-dev-server v5 expects proxy routes to be explicit objects with context/target.
-		proxy:
-			devServerProxy &&
-			! Array.isArray( devServerProxy ) &&
-			'object' === typeof devServerProxy
-				? Object.entries( devServerProxy ).map(
-						( [ context, options ] ) => ( {
-							context: [ context ],
-							target:
-								options.target ||
-								options.router ||
-								`${ devServerProtocol }://${ devServerHost }:${ devServerPort }`,
-							...options,
-						} )
-				  )
-				: devServerProxy,
+		proxy: transformDevServerProxy(
+			newConfig.devServer?.proxy,
+			fallbackTarget
+		),
 	};
 
 	// Fix HMR is not working with multiple entries.
 	// @thanks https://github.com/webpack/webpack-dev-server/issues/2792#issuecomment-806983882
 	newConfig.optimization.runtimeChunk = 'single';
 }
-
-newConfig.module.rules = newConfig.module.rules.map( ( rule ) => {
-	if ( /svg/.test( rule.test ) ) {
-		return { ...rule, exclude: /\.svg$/i };
-	}
-
-	return rule;
-} );
-
-newConfig.module.rules.push( {
-	test: /\.svg$/,
-	use: [
-		{
-			loader: '@svgr/webpack',
-			options: {
-				svgoConfig: {
-					plugins: [
-						{
-							name: 'preset-default',
-							params: {
-								overrides: {
-									removeViewBox: false,
-								},
-							},
-						},
-					],
-				},
-			},
-		},
-		{
-			loader: 'url-loader',
-		},
-	],
-} );
 
 module.exports = newConfig;
