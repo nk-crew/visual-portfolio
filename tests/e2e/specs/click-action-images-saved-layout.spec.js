@@ -10,6 +10,8 @@ import {
 	openMediaLibrary,
 	selectMediaLibraryImages,
 } from '../utils/media-library';
+import { openPublishedPage } from '../utils/open-published-page';
+import { waitForPortfolioPreview } from '../utils/portfolio-preview';
 
 /**
  * TODO: The test needs to be redone in the future.
@@ -249,20 +251,15 @@ test.describe('click action gallery images (saved layout)', () => {
 			attributes: { id: String(postID) },
 		});
 
-		await page.waitForTimeout(500);
+		await waitForPortfolioPreview(page);
 
 		// Publish Post.
 		await editor.publishPost();
 
 		// Go to published post.
-		await page
-			.locator('.components-button', {
-				hasText: 'View Page',
-			})
-			.first()
-			.click();
+		const frontendPage = await openPublishedPage(page);
 
-		const link = page.locator('a.vp-portfolio__item-meta');
+		const link = frontendPage.locator('a.vp-portfolio__item-meta');
 
 		await expect(link).toBeHidden();
 	});

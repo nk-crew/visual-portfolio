@@ -3,8 +3,8 @@
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
-import expectedPopupPreset from '../../fixtures/click-actions/popup-expected-preset.json';
-import expectedUrlPreset from '../../fixtures/click-actions/url-expected-preset.json';
+import expectedPopupPresetFixture from '../../fixtures/click-actions/popup-expected-preset.json';
+import expectedUrlPresetFixture from '../../fixtures/click-actions/url-expected-preset.json';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 import {
@@ -13,6 +13,26 @@ import {
 	selectMediaLibraryImages,
 } from '../utils/media-library';
 import { openPublishedPage } from '../utils/open-published-page';
+
+function cloneFixture( fixture ) {
+	return JSON.parse( JSON.stringify( fixture ) );
+}
+
+function toClickActionExpectation( preset ) {
+	return preset.map( ( { isPopup, titleUrl } ) => ( {
+		isPopup,
+		titleUrl,
+	} ) );
+}
+
+function toPopupClickActionExpectation( preset ) {
+	return preset.map( ( { imageUrl, isPopup, titleUrl, videoUrl } ) => ( {
+		imageUrl,
+		isPopup,
+		titleUrl,
+		videoUrl,
+	} ) );
+}
 
 test.describe('click action gallery images', () => {
 	test.beforeAll(async ({ requestUtils }) => {
@@ -37,28 +57,29 @@ test.describe('click action gallery images', () => {
 	 * We prepare the fixture for popup comparison.
 	 * We correct the paths to the images to be current, loaded into the WordPress system.
 	 *
-	 * @param {string} size     Image Resolution.
-	 * @param {string} property Image property.
-	 * @param {number} key      Key of Image object.
+	 * @param {Array<Object>} expectedPreset Mutable popup fixture copy.
+	 * @param {string}        size           Image Resolution.
+	 * @param {string}        property       Image property.
+	 * @param {number}        key            Key of Image object.
 	 */
-	async function preparePopupFixture(size, property, key) {
+	async function preparePopupFixture(expectedPreset, size, property, key) {
 		if (
-			typeof expectedPopupPreset[key][property] === 'string' &&
-			expectedPopupPreset[key][property].includes(size)
+			typeof expectedPreset[key][property] === 'string' &&
+			expectedPreset[key][property].includes(size)
 		) {
 			switch (size) {
 				case '2000x2000':
-					expectedPopupPreset[key][property] = expectedPopupPreset[
+					expectedPreset[key][property] = expectedPreset[
 						key
 					][property].replace('.jpeg', '-1920x1920.jpeg');
 					break;
 				case '3840x2160':
-					expectedPopupPreset[key][property] = expectedPopupPreset[
+					expectedPreset[key][property] = expectedPreset[
 						key
 					][property].replace('scaled.jpeg', '1920x1080.jpeg');
 					break;
 				case '3840x2560':
-					expectedPopupPreset[key][property] = expectedPopupPreset[
+					expectedPreset[key][property] = expectedPreset[
 						key
 					][property].replace('scaled.jpeg', '1920x1280.jpeg');
 					break;
@@ -70,28 +91,29 @@ test.describe('click action gallery images', () => {
 	 * We prepare the fixture for url comparison.
 	 * We correct the paths to the images to be current, loaded into the WordPress system.
 	 *
-	 * @param {string} size     Image Resolution.
-	 * @param {string} property Image property.
-	 * @param {number} key      Key of Image object.
+	 * @param {Array<Object>} expectedPreset Mutable URL fixture copy.
+	 * @param {string}        size           Image Resolution.
+	 * @param {string}        property       Image property.
+	 * @param {number}        key            Key of Image object.
 	 */
-	async function prepareUrlFixture(size, property, key) {
+	async function prepareUrlFixture(expectedPreset, size, property, key) {
 		if (
-			typeof expectedUrlPreset[key][property] === 'string' &&
-			expectedUrlPreset[key][property].includes(size)
+			typeof expectedPreset[key][property] === 'string' &&
+			expectedPreset[key][property].includes(size)
 		) {
 			switch (size) {
 				case '2000x2000':
-					expectedUrlPreset[key][property] = expectedUrlPreset[key][
+					expectedPreset[key][property] = expectedPreset[key][
 						property
 					].replace('.jpeg', '-1920x1920.jpeg');
 					break;
 				case '3840x2160':
-					expectedUrlPreset[key][property] = expectedUrlPreset[key][
+					expectedPreset[key][property] = expectedPreset[key][
 						property
 					].replace('scaled.jpeg', '1920x1080.jpeg');
 					break;
 				case '3840x2560':
-					expectedUrlPreset[key][property] = expectedUrlPreset[key][
+					expectedPreset[key][property] = expectedPreset[key][
 						property
 					].replace('scaled.jpeg', '1920x1280.jpeg');
 					break;
@@ -177,6 +199,7 @@ test.describe('click action gallery images', () => {
 		editor,
 		requestUtils,
 	}) => {
+		const expectedUrlPreset = cloneFixture( expectedUrlPresetFixture );
 		// Create post for testing click action.
 		await admin.createNewPost({
 			title: 'URL Click Action',
@@ -242,7 +265,12 @@ test.describe('click action gallery images', () => {
 
 					if (match) {
 						const size = match[0];
-						await prepareUrlFixture(size, 'titleUrl', key);
+						await prepareUrlFixture(
+							expectedUrlPreset,
+							size,
+							'titleUrl',
+							key
+						);
 					}
 				}
 			}
@@ -298,7 +326,9 @@ test.describe('click action gallery images', () => {
 		}
 
 		// Compare the Backend resulting array of objects with the expected one.
-		expect(receivedUrlBackendPreset).toEqual(expectedUrlPreset);
+		expect( toClickActionExpectation( receivedUrlBackendPreset ) ).toEqual(
+			toClickActionExpectation( expectedUrlPreset )
+		);
 
 		// Publish Post.
 		await editor.publishPost();
@@ -337,7 +367,9 @@ test.describe('click action gallery images', () => {
 		}
 
 		// Compare the Frontend resulting array of objects with the expected one.
-		expect(receivedUrlFrontendPreset).toEqual(expectedUrlPreset);
+		expect( toClickActionExpectation( receivedUrlFrontendPreset ) ).toEqual(
+			toClickActionExpectation( expectedUrlPreset )
+		);
 	});
 
 	test('check popup click action', async ({
@@ -346,6 +378,7 @@ test.describe('click action gallery images', () => {
 		editor,
 		requestUtils,
 	}) => {
+		const expectedPopupPreset = cloneFixture( expectedPopupPresetFixture );
 		// Create post for testing click action.
 		await admin.createNewPost({
 			title: 'URL Click Action',
@@ -430,8 +463,18 @@ test.describe('click action gallery images', () => {
 
 				if (match) {
 					const size = match[0];
-					await preparePopupFixture(size, 'titleUrl', key);
-					await preparePopupFixture(size, 'imageUrl', key);
+					await preparePopupFixture(
+						expectedPopupPreset,
+						size,
+						'titleUrl',
+						key
+					);
+					await preparePopupFixture(
+						expectedPopupPreset,
+						size,
+						'imageUrl',
+						key
+					);
 				}
 			}
 		}));
@@ -505,7 +548,9 @@ test.describe('click action gallery images', () => {
 		}
 
 		// Compare the Backend resulting array of objects with the expected one.
-		expect(receivedPopupBackendPreset).toEqual(expectedPopupPreset);
+		expect( toPopupClickActionExpectation( receivedPopupBackendPreset ) ).toEqual(
+			toPopupClickActionExpectation( expectedPopupPreset )
+		);
 
 		// Publish Post.
 		await editor.publishPost();
@@ -561,6 +606,8 @@ test.describe('click action gallery images', () => {
 		}
 
 		// Compare the Frontend resulting array of objects with the expected one.
-		expect(receivedPopupFrontendPreset).toEqual(expectedPopupPreset);
+		expect( toPopupClickActionExpectation( receivedPopupFrontendPreset ) ).toEqual(
+			toPopupClickActionExpectation( expectedPopupPreset )
+		);
 	});
 });

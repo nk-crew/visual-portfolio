@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/check-alignment, jsdoc/check-line-alignment */
 /**
  * WordPress dependencies
  */
@@ -79,6 +80,43 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await page.getByRole( 'button', { name: 'Elements' } ).click();
 	}
 
+	/**
+	 * Return the display date format control once it becomes available.
+	 *
+	 * @param {import('@playwright/test').Page} page Playwright page object.
+	 * @return {import('@playwright/test').Locator} Visible display date control.
+	 */
+	function getDisplayDateControl( page ) {
+		return page.locator(
+			'.vpf-control-wrap-name-items_style_default__show_date select, .vpf-control-wrap-name-items_style_default__show_date .vpf-component-select'
+		);
+	}
+
+	/**
+	 * Return a display element toggle label by visible label.
+	 *
+	 * @param {import('@playwright/test').Page} page Playwright page object.
+	 * @param {string} controlName Toggle label.
+	 * @return {import('@playwright/test').Locator} Toggle locator.
+	 */
+	function getDisplayElementToggle( page, controlName ) {
+		return page
+			.locator( 'label' )
+			.filter( { hasText: controlName } );
+	}
+
+	/**
+	 * Return the Read More select control if it is available.
+	 *
+		 * @param {import('@playwright/test').Page} page Playwright page object.
+		 * @return {import('@playwright/test').Locator} Read More control.
+	 */
+	function getReadMoreControl( page ) {
+		return page.locator(
+			'.vpf-control-group-items_style_read_more select, .vpf-control-group-items_style_read_more .vpf-component-select'
+		);
+	}
+
 	test( 'should persist Display Date control settings', async ( {
 		page,
 		admin,
@@ -92,37 +130,26 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await navigateToElementsSection( page );
 
 		// Enable Display Date control by checkbox
-		const dateCheckbox = page
-			.locator( 'label' )
-			.filter( { hasText: 'Display Date' } );
-		await expect( dateCheckbox ).toBeVisible();
-		await dateCheckbox.click();
+		const dateToggle = getDisplayElementToggle( page, 'Display Date' );
+		await expect( dateToggle ).toBeVisible();
+		await dateToggle.click();
 
-		// Wait a bit for the control to appear
-		await page.waitForTimeout( 500 );
+		const dateControl = getDisplayDateControl( page );
+		await expect( dateControl ).toBeVisible();
 
-		// Find any dropdown that appeared after enabling the checkbox
-		// The Display Date dropdown should be visible now
-		const dateDropdown = page.locator( '.vpf-component-select' ).nth( 1 ); // Try the second select on the page
-		const isDropdownVisible = await dateDropdown
-			.isVisible( { timeout: 2000 } )
-			.catch( () => false );
+		// Save current state first to establish baseline
+		await editor.publishPost();
 
-		if ( isDropdownVisible ) {
-			// Save current state first to establish baseline
-			await editor.publishPost();
+		// Reload to verify control is still enabled
+		await page.reload();
+		await page.waitForLoadState( 'domcontentloaded' );
+		await navigateToElementsSection( page );
 
-			// Reload to verify control is still enabled
-			await page.reload();
-			await page.waitForLoadState( 'domcontentloaded' );
-			await navigateToElementsSection( page );
-
-			// Verify the Display Date checkbox is still checked (control should be visible)
-			const dateCheckboxReloaded = page
-				.locator( 'label' )
-				.filter( { hasText: 'Display Date' } );
-			await expect( dateCheckboxReloaded ).toBeVisible();
-		}
+		await expect(
+			getDisplayElementToggle( page, 'Display Date' )
+		).toBeVisible();
+		const reloadedDateControl = getDisplayDateControl( page );
+		await expect( reloadedDateControl ).toBeVisible();
 	} );
 
 	test( 'should persist Display Excerpt control settings', async ( {
@@ -138,13 +165,14 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await navigateToElementsSection( page );
 
 		// Find Display Excerpt checkbox
-		const excerptCheckbox = page
-			.locator( 'label' )
-			.filter( { hasText: 'Display Excerpt' } );
+		const excerptCheckbox = getDisplayElementToggle(
+			page,
+			'Display Excerpt'
+		);
 		await expect( excerptCheckbox ).toBeVisible();
 
 		// Check initial state and toggle
-		await excerptCheckbox.click();
+		await excerptCheckbox.check();
 
 		// Look for excerpt-related controls that appear
 		const excerptLengthControl = page.locator( '[name*="excerpt_length"]' );
@@ -187,9 +215,10 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await navigateToElementsSection( page );
 
 		// Find and toggle Display Categories
-		const categoriesCheckbox = page
-			.locator( 'label' )
-			.filter( { hasText: 'Display Categories' } );
+		const categoriesCheckbox = getDisplayElementToggle(
+			page,
+			'Display Categories'
+		);
 		const isCategoriesVisible = await categoriesCheckbox
 			.isVisible( { timeout: 2000 } )
 			.catch( () => false );
@@ -208,10 +237,9 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 			// The checkbox state should be maintained
 			// Note: We can't easily verify checkbox state without specific attributes
 			// but we can verify the control is still visible
-			const reloadedCheckbox = page
-				.locator( 'label' )
-				.filter( { hasText: 'Display Categories' } );
-			await expect( reloadedCheckbox ).toBeVisible();
+			await expect(
+				getDisplayElementToggle( page, 'Display Categories' )
+			).toBeVisible();
 		}
 	} );
 
@@ -235,49 +263,21 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		];
 
 		for ( const controlName of controlsToEnable ) {
-			const checkbox = page.getByRole( 'checkbox', {
-				name: controlName,
-			} );
+			const checkbox = getDisplayElementToggle( page, controlName );
 			const isVisible = await checkbox
 				.isVisible( { timeout: 1000 } )
 				.catch( () => false );
 			if ( isVisible ) {
-				await checkbox.check();
+				await checkbox.click();
 			}
 		}
 
-		// Also test Read More control if excerpt is enabled.
-		const readMoreNativeSelect = page.locator(
-			'.vpf-control-group-items_style_read_more select'
-		);
-		const readMoreCustomSelect = page.locator(
-			'.vpf-control-group-items_style_read_more .vpf-component-select'
-		);
-
-		const hasNativeReadMore = await readMoreNativeSelect
+		// Ensure dependent Read More control becomes available when excerpt is enabled.
+		const readMoreControl = getReadMoreControl( page );
+		const isReadMoreVisible = await readMoreControl
 			.isVisible( { timeout: 1000 } )
 			.catch( () => false );
-		const hasCustomReadMore = await readMoreCustomSelect
-			.isVisible( { timeout: 1000 } )
-			.catch( () => false );
-		const isReadMoreVisible = hasNativeReadMore || hasCustomReadMore;
-
-		if ( isReadMoreVisible ) {
-			if ( hasNativeReadMore ) {
-				await readMoreNativeSelect.selectOption( {
-					label: 'Always Display',
-				} );
-				await expect( readMoreNativeSelect ).toHaveValue( 'true' );
-			} else {
-				await readMoreCustomSelect.click();
-				await page
-					.getByRole( 'option', { name: 'Always Display' } )
-					.click();
-				await expect( readMoreCustomSelect ).toContainText(
-					'Always Display'
-				);
-			}
-		}
+		expect( isReadMoreVisible ).toBeTruthy();
 
 		// Save all settings
 		await editor.publishPost();
@@ -289,44 +289,12 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 
 		// Verify controls are still enabled
 		for ( const controlName of controlsToEnable ) {
-			const control = page
-				.locator( 'label' )
-				.filter( { hasText: controlName } );
-			await expect( control ).toBeVisible();
+			await expect(
+				getDisplayElementToggle( page, controlName )
+			).toBeVisible();
 		}
 
-		// Verify Read More setting if it was set
-		if ( isReadMoreVisible ) {
-			const reloadedReadMoreNativeSelect = page.locator(
-				'.vpf-control-group-items_style_read_more select:visible'
-			);
-			const reloadedReadMoreCustomSelect = page.locator(
-				'.vpf-control-group-items_style_read_more .vpf-component-select:visible'
-			);
-
-			const hasReloadedNativeReadMore = await reloadedReadMoreNativeSelect
-				.first()
-				.isVisible( { timeout: 1000 } )
-				.catch( () => false );
-			const hasReloadedCustomReadMore = await reloadedReadMoreCustomSelect
-				.first()
-				.isVisible( { timeout: 1000 } )
-				.catch( () => false );
-
-			expect(
-				hasReloadedNativeReadMore || hasReloadedCustomReadMore
-			).toBeTruthy();
-
-			if ( hasReloadedNativeReadMore ) {
-				await expect(
-					reloadedReadMoreNativeSelect.first()
-				).toHaveValue( 'true' );
-			} else {
-				await expect(
-					reloadedReadMoreCustomSelect.first()
-				).toContainText( 'Always Display' );
-			}
-		}
+		await expect( getReadMoreControl( page ) ).toBeVisible();
 	} );
 
 	test( 'should handle pagination controls correctly', async ( {

@@ -16,6 +16,7 @@ import {
 	selectMediaLibraryImages,
 } from '../utils/media-library';
 import { openPublishedPage } from '../utils/open-published-page';
+import { waitForPortfolioPreview } from '../utils/portfolio-preview';
 
 test.describe( 'added images to block', () => {
 	test.beforeEach( async ( { requestUtils } ) => {
@@ -177,7 +178,7 @@ test.describe( 'added images to block', () => {
 			.locator( 'input.components-text-control__input' )
 			.fill( '10' );
 
-		await page.waitForTimeout( 500 );
+		await waitForPortfolioPreview( page );
 
 		// Check images on backend editor.
 		for ( const image of images ) {
