@@ -1,4 +1,3 @@
-/* eslint-disable jsdoc/check-line-alignment */
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 
 export const MEDIA_LIBRARY_ATTACHMENT_SELECTOR =
@@ -26,15 +25,11 @@ export async function openMediaLibrary( page ) {
 /**
  * Select images by attachment ids in the media library modal.
  *
- * @param {import('@playwright/test').Page} page - Playwright page.
- * @param {Array<number|string>} imageIds - Attachment ids to select.
- * @param {Object} [options={}] - Extra options.
+ * @param {import('@playwright/test').Page} page         - Playwright page.
+ * @param {Array<number|string>}            imageIds     - Attachment ids to select.
+ * @param {Object}                          [options={}] - Extra options.
  */
-export async function selectMediaLibraryImages(
-	page,
-	imageIds,
-	options = {}
-) {
+export async function selectMediaLibraryImages( page, imageIds, options = {} ) {
 	const { afterSelect } = options;
 	const normalizedIds = imageIds.map( ( imageId ) => String( imageId ) );
 
