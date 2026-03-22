@@ -7,6 +7,11 @@ import expectedPopupPreset from '../../fixtures/click-actions/popup-expected-pre
 import expectedUrlPreset from '../../fixtures/click-actions/url-expected-preset.json';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
+import {
+	confirmMediaLibrarySelection,
+	openMediaLibrary,
+	selectMediaLibraryImages,
+} from '../utils/media-library';
 import { openPublishedPage } from '../utils/open-published-page';
 
 test.describe('click action gallery images', () => {
@@ -131,31 +136,14 @@ test.describe('click action gallery images', () => {
 			)
 			.click();
 
-		await page
-			.locator('button#menu-item-browse', {
-				hasText: 'Media Library',
-			})
-			.click();
-
-		const imageList = page.locator(
-			'ul.attachments.ui-sortable.ui-sortable-disabled li.attachment[role="checkbox"]'
+		await openMediaLibrary(page);
+		await selectMediaLibraryImages(
+			page,
+			images
+				.filter((image) => typeof image.imgUrl !== 'undefined')
+				.map((image) => image.id)
 		);
-
-		for (const image of await imageList.elementHandles()) {
-			if (
-				typeof images.find(
-					async (x) => x.id === (await image.getAttribute('data-id'))
-				).imgUrl !== 'undefined'
-			) {
-				await image.click();
-			}
-		}
-
-		await page
-			.locator('button.button.media-button.media-button-select', {
-				hasText: 'Select',
-			})
-			.click();
+		await confirmMediaLibrarySelection(page);
 
 		await page
 			.locator('.components-panel__body', {
@@ -223,7 +211,7 @@ test.describe('click action gallery images', () => {
 
 		const currentYearAndMonth = today.getFullYear() + '/' + month;
 
-		expectedUrlPreset.map(async (object, key) => {
+		await Promise.all(expectedUrlPreset.map(async (object, key) => {
 			if (object.titleUrl.includes('/wp-content/')) {
 				const titleUrl = testBaseUrl + object.titleUrl;
 				expectedUrlPreset[key].titleUrl = titleUrl.replace(
@@ -258,7 +246,7 @@ test.describe('click action gallery images', () => {
 					}
 				}
 			}
-		});
+		}));
 
 		await editor.insertBlock({
 			name: 'visual-portfolio/block',
@@ -278,11 +266,12 @@ test.describe('click action gallery images', () => {
 			.locator('input.components-text-control__input')
 			.fill('10');
 
-		await page.waitForTimeout(2000);
-
-		const galleryImages = await page
+		const galleryImages = page
 			.frame('vpf-preview-1')
 			.locator('.vp-portfolio__items .vp-portfolio__item-wrap');
+		await expect(galleryImages).toHaveCount(expectedUrlPreset.length, {
+			timeout: 15000,
+		});
 
 		const receivedUrlBackendPreset = [];
 
@@ -317,11 +306,14 @@ test.describe('click action gallery images', () => {
 		// Go to published post.
 		const frontendPage = await openPublishedPage(page);
 
-		await frontendPage.waitForTimeout(2000);
-
-		// Check Frontend.
-		const galleryFrontendImages = await frontendPage.locator(
+		const galleryFrontendImages = frontendPage.locator(
 			'.vp-portfolio__items .vp-portfolio__item-wrap'
+		);
+		await expect(galleryFrontendImages).toHaveCount(
+			expectedUrlPreset.length,
+			{
+				timeout: 15000,
+			}
 		);
 
 		const receivedUrlFrontendPreset = [];
@@ -388,7 +380,7 @@ test.describe('click action gallery images', () => {
 
 		const currentYearAndMonth = today.getFullYear() + '/' + month;
 
-		expectedPopupPreset.map(async (object, key) => {
+		await Promise.all(expectedPopupPreset.map(async (object, key) => {
 			if (object.titleUrl.includes('/wp-content/')) {
 				const titleUrl = testBaseUrl + object.titleUrl;
 				expectedPopupPreset[key].titleUrl = titleUrl.replace(
@@ -442,7 +434,7 @@ test.describe('click action gallery images', () => {
 					await preparePopupFixture(size, 'imageUrl', key);
 				}
 			}
-		});
+		}));
 
 		await editor.insertBlock({
 			name: 'visual-portfolio/block',
@@ -462,11 +454,12 @@ test.describe('click action gallery images', () => {
 			.locator('input.components-text-control__input')
 			.fill('10');
 
-		await page.waitForTimeout(3000);
-
-		const galleryImages = await page
+		const galleryImages = page
 			.frame('vpf-preview-1')
 			.locator('.vp-portfolio__items .vp-portfolio__item-wrap');
+		await expect(galleryImages).toHaveCount(expectedPopupPreset.length, {
+			timeout: 15000,
+		});
 
 		const receivedPopupBackendPreset = [];
 
@@ -520,11 +513,14 @@ test.describe('click action gallery images', () => {
 		// Go to published post.
 		const frontendPage = await openPublishedPage(page);
 
-		await frontendPage.waitForTimeout(3000);
-
-		// Check Frontend.
-		const galleryFrontendImages = await frontendPage.locator(
+		const galleryFrontendImages = frontendPage.locator(
 			'.vp-portfolio__items .vp-portfolio__item-wrap'
+		);
+		await expect(galleryFrontendImages).toHaveCount(
+			expectedPopupPreset.length,
+			{
+				timeout: 15000,
+			}
 		);
 
 		const receivedPopupFrontendPreset = [];
