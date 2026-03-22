@@ -3,6 +3,7 @@
  */
 const path = require( 'path' );
 
+const cssnano = require( 'cssnano' );
 const glob = require( 'glob' );
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const FileManagerPlugin = require( 'filemanager-webpack-plugin' );
@@ -177,17 +178,31 @@ function shouldIncludeScssEntry( entry ) {
 	return ! path.basename( entry ).startsWith( '_' );
 }
 
-function isPlainCssRule( rule ) {
-	return rule.test instanceof RegExp && rule.test.test( 'file.css' );
-}
-
 function isSvgRule( rule ) {
 	return rule.test instanceof RegExp && rule.test.test( 'file.svg' );
 }
 
 function disableCssLoaderUrls( rules ) {
 	return rules.map( ( rule ) => {
-		if ( ! isPlainCssRule( rule ) || ! Array.isArray( rule.use ) ) {
+		if ( ! Array.isArray( rule.use ) ) {
+			return rule;
+		}
+
+		function isCssLoader( loader ) {
+			return (
+				'object' === typeof loader &&
+				!! loader.loader &&
+				/(^|[\\/])css-loader[\\/]dist[\\/]cjs\.js$/.test(
+					loader.loader
+				)
+			);
+		}
+
+		const hasCssLoader = rule.use.some(
+			( loader ) => isCssLoader( loader )
+		);
+
+		if ( ! hasCssLoader ) {
 			return rule;
 		}
 
@@ -196,8 +211,7 @@ function disableCssLoaderUrls( rules ) {
 			use: rule.use.map( ( loader ) => {
 				if (
 					'string' === typeof loader ||
-					! loader.loader ||
-					! loader.loader.includes( 'css-loader' )
+					! isCssLoader( loader )
 				) {
 					return loader;
 				}
@@ -214,11 +228,77 @@ function disableCssLoaderUrls( rules ) {
 	} );
 }
 
+function patchPostCssLoaderOptions( rules ) {
+	if ( ! isProduction ) {
+		return rules;
+	}
+
+	// Keep WordPress' default PostCSS pipeline, but replace cssnano with a
+	// version that does not run SVGO on inline CSS SVGs. Without this override,
+	// production builds rewrite data:image/svg+xml URLs and break icons such as
+	// the Visual Portfolio logo in the WordPress admin menu.
+	return rules.map( ( rule ) => {
+		if ( ! Array.isArray( rule.use ) ) {
+			return rule;
+		}
+
+		return {
+			...rule,
+			use: rule.use.map( ( loader ) => {
+				if (
+					'string' === typeof loader ||
+					! loader.loader ||
+					! loader.loader.includes( 'postcss-loader' ) ||
+					! loader.options?.postcssOptions
+				) {
+					return loader;
+				}
+
+				const postcssOptions = loader.options.postcssOptions;
+				const plugins = Array.isArray( postcssOptions.plugins )
+					? postcssOptions.plugins.filter(
+						( plugin ) =>
+							!(
+								plugin &&
+								'object' === typeof plugin &&
+								Array.isArray( plugin.plugins ) &&
+								plugin.version
+							)
+					)
+					: [];
+
+				return {
+					...loader,
+					options: {
+						...loader.options,
+						postcssOptions: {
+							...postcssOptions,
+							plugins: [
+								...plugins,
+								cssnano( {
+									preset: [
+										'default',
+										{
+											discardComments: {
+												removeAll: true,
+											},
+											svgo: false,
+										},
+									],
+								} ),
+							],
+						},
+					},
+				};
+			} ),
+		};
+	} );
+}
+
 function createSvgRules() {
 	return [
 		{
 			test: /\.svg$/,
-			issuer: /\.(j|t)sx?$/,
 			type: 'javascript/auto',
 			use: [
 				{
@@ -242,11 +322,6 @@ function createSvgRules() {
 					loader: 'url-loader',
 				},
 			],
-		},
-		{
-			test: /\.svg$/,
-			issuer: /\.(pc|sc|sa|c)ss$/,
-			type: 'asset/inline',
 		},
 	];
 }
@@ -332,7 +407,9 @@ const entryAssetsCss = createEntries(
 	shouldIncludeScssEntry
 );
 
-const defaultRules = disableCssLoaderUrls( defaultConfig.module.rules )
+const defaultRules = patchPostCssLoaderOptions(
+	disableCssLoaderUrls( defaultConfig.module.rules )
+)
 	.filter( ( rule ) => ! isSvgRule( rule ) )
 	.concat( createSvgRules() );
 
