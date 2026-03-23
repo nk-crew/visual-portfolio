@@ -189,7 +189,7 @@
 	}
 
 	// Transitions
-	.vp-portfolio__item-img img {
+	.vp-portfolio__item-img :where(img, video, iframe) {
 
 		// Fix FireFox image blinking
 		// https://github.com/nk-crew/visual-portfolio/issues/92
@@ -203,7 +203,7 @@
 	// Overlay
 	.vp-portfolio__item:hover,
 	.vp-portfolio__item-focus-visible {
-		.vp-portfolio__item-img img {
+		.vp-portfolio__item-img :where(img, video, iframe) {
 			transform: var(--vp-items-style-fade--image-hover__transform);
 		}
 	}

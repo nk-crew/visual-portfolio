@@ -57,7 +57,7 @@
 		transition-property: clip-path;
 	}
 
-	.vp-portfolio__item-img img {
+	.vp-portfolio__item-img :where(img, video, iframe) {
 		transition-timing-function: var(--vp-items-style-default--image__transition-easing);
 		transition-duration: var(--vp-items-style-default--image__transition-duration);
 		transition-property: opacity, transform;
@@ -66,7 +66,7 @@
 
 	.vp-portfolio__item:hover,
 	.vp-portfolio__item-focus-visible {
-		.vp-portfolio__item-img img {
+		.vp-portfolio__item-img :where(img, video, iframe) {
 			transform: var(--vp-items-style-default--image-hover__transform);
 		}
 	}
