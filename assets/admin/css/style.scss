@@ -839,7 +839,7 @@ $escaped-svg-characters: (
 
 	.vpf-welcome-head {
 		position: relative;
-		margin-bottom: 44px;
+		margin-bottom: 60px;
 		background: #f6f7f7;
 		border-radius: 28px;
 		margin-top: 20px;
@@ -894,6 +894,19 @@ $escaped-svg-characters: (
 	.vpf-welcome-content {
 		max-width: 1180px;
 		margin: 0 auto;
+
+		h2 {
+			margin-bottom: 12px;
+		}
+
+		.vpf-welcome-foot-description {
+			margin: 0 auto;
+			text-wrap: balance;
+			text-align: center;
+			max-width: 680px;
+			margin-bottom: 40px;
+			color: #475467;
+		}
 
 		.vpf-welcome-content-features {
 			display: grid;
@@ -1014,24 +1027,30 @@ $escaped-svg-characters: (
 		h2 {
 			margin-bottom: 12px;
 			color: #0f172a;
-			text-align: left;
+			text-align: center;
 		}
 
 		.vpf-welcome-foot-description {
-			max-width: 760px;
-			margin-bottom: 24px;
+			margin: 0 auto;
+			text-wrap: balance;
+			text-align: center;
+			max-width: 680px;
+			margin-bottom: 40px;
 			color: #475467;
 		}
 
 		ul {
 			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 			gap: 14px 28px;
 			max-width: none;
 			padding: 0;
 			margin: 0;
-			font-weight: 500;
 			list-style: none;
+
+			@media screen and (max-width: 1000px) {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
 
 			@media screen and (max-width: 600px) {
 				grid-template-columns: 1fr;
@@ -1041,17 +1060,32 @@ $escaped-svg-characters: (
 				display: inline-block;
 				width: 20px;
 				height: 20px;
-				margin-right: 8px;
-				vertical-align: -0.25em;
+				margin-right: 10px;
+				vertical-align: -0.3em;
 				content: "";
 				background-image: url("#{escape-svg('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#1e9059"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>')}");
+			}
+
+			strong {
+				font-size: 15px;
+				font-weight: 600;
+				line-height: 1.35;
+				color: #0f172a;
+			}
+
+			p {
+				margin: 5px 0 0;
+				color: #667085;
+				font-size: 14px;
+				line-height: 1.55;
+				margin-left: 35px;
 			}
 		}
 
 		> a {
 			display: block;
 			padding: 16px;
-			margin-top: 20px;
+			margin-top: 40px;
 			font-size: 16px;
 			font-weight: 600;
 			color: #fff;
