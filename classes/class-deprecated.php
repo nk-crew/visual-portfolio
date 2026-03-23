@@ -172,7 +172,7 @@ class Visual_Portfolio_Deprecations {
 			case 'images_rounded_corners':
 				$fields[] = array(
 					'type'    => 'range',
-					'label'   => esc_html__( 'Images Rounded Corners', 'visual-portfolio' ),
+					'label'   => esc_html__( 'Media Rounded Corners', 'visual-portfolio' ),
 					'name'    => 'images_rounded_corners',
 					'min'     => 0,
 					'max'     => 100,

@@ -575,7 +575,7 @@ class Visual_Portfolio_Custom_Post_Type {
 			$all_items_styles    = Visual_Portfolio_Get::get_all_items_styles();
 			$all_content_sources = array(
 				'post-based'    => esc_html__( 'Posts', 'visual-portfolio' ),
-				'images'        => esc_html__( 'Images', 'visual-portfolio' ),
+				'images'        => esc_html__( 'Media', 'visual-portfolio' ),
 				'social-stream' => esc_html__( 'Social', 'visual-portfolio' ),
 			);
 
