@@ -24,8 +24,8 @@ class Visual_Portfolio_Welcome_Screen {
 		if ( $is_pro_context ) {
 			return array(
 				'head_label'               => esc_html__( 'Visual Portfolio Pro active', 'visual-portfolio' ),
-				'head_title'               => esc_html__( 'Your premium portfolio toolkit is already unlocked.', 'visual-portfolio' ),
-				'head_subtitle'            => esc_html__( 'Use the same visual workflow for galleries, post grids, and portfolio layouts, now with the additional Pro tools already available on this site.', 'visual-portfolio' ),
+				'head_title'               => esc_html__( 'Your premium portfolio features are already unlocked.', 'visual-portfolio' ),
+				'head_subtitle'            => esc_html__( 'Use the same visual workflow for galleries, post grids, and portfolio layouts, now with the additional Pro features already available on this site.', 'visual-portfolio' ),
 				'feature_section_title'    => esc_html__( 'Core workflow included in Pro', 'visual-portfolio' ),
 				'feature_section_subtitle' => esc_html__( 'These are the essential Visual Portfolio building blocks you can use across both free and Pro setups.', 'visual-portfolio' ),
 				'pro_section_title'        => esc_html__( 'Advantages already included with Pro', 'visual-portfolio' ),
@@ -38,8 +38,8 @@ class Visual_Portfolio_Welcome_Screen {
 			'head_title'               => esc_html__( 'Build a modern portfolio experience in WordPress.', 'visual-portfolio' ),
 			'head_subtitle'            => esc_html__( 'Create galleries, post grids, and polished portfolio layouts with a workflow that stays visual from setup to launch.', 'visual-portfolio' ),
 			'feature_section_title'    => esc_html__( 'Everything you can build right away', 'visual-portfolio' ),
-			'feature_section_subtitle' => esc_html__( 'Start with the core Visual Portfolio workflow and expand later only if your projects need more advanced tools.', 'visual-portfolio' ),
-			'pro_section_title'        => esc_html__( 'Need more advanced portfolio tools?', 'visual-portfolio' ),
+			'feature_section_subtitle' => esc_html__( 'Start with the core Visual Portfolio workflow and expand later only if your projects need more advanced features.', 'visual-portfolio' ),
+			'pro_section_title'        => esc_html__( 'Need more advanced portfolio features?', 'visual-portfolio' ),
 			'pro_section_subtitle'     => esc_html__( 'Pro expands the same workflow with features aimed at client work, content protection, social sources, and deeper customization.', 'visual-portfolio' ),
 		);
 	}
@@ -110,7 +110,7 @@ class Visual_Portfolio_Welcome_Screen {
 				'description' => esc_html__( 'Use deep linking and open posts or pages in popups alongside your media galleries.', 'visual-portfolio' ),
 			),
 			array(
-				'title'       => esc_html__( 'Social and query tools', 'visual-portfolio' ),
+				'title'       => esc_html__( 'Social sources and query controls', 'visual-portfolio' ),
 				'description' => esc_html__( 'Extend projects with social feeds, advanced query controls, and AJAX-driven performance improvements.', 'visual-portfolio' ),
 			),
 			array(
