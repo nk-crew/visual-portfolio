@@ -85,7 +85,7 @@ test.describe( 'added images to saved layout', () => {
 			.locator(
 				'button.components-button.vpf-component-icon-selector-item',
 				{
-					hasText: 'Images',
+					hasText: 'Media',
 				}
 			)
 			.click();

@@ -66,7 +66,7 @@ test.describe('click action gallery images (saved layout)', () => {
 			.locator(
 				'button.components-button.vpf-component-icon-selector-item',
 				{
-					hasText: 'Images',
+					hasText: 'Media',
 				}
 			)
 			.click();
