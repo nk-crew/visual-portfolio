@@ -679,6 +679,32 @@ class Visual_Portfolio_Settings {
 					),
 				),
 
+				// Albums settings.
+				array(
+					'name'   => 'album_section_title',
+					'label'  => esc_html__( 'Albums', 'visual-portfolio' ),
+					'type'   => 'section_title',
+					'is_pro' => true,
+				),
+				array(
+					'name'    => 'album_isolated_popup',
+					'label'   => esc_html__( 'Isolated Album Popup', 'visual-portfolio' ),
+					'desc'    => esc_html__( 'When enabled, clicking an album opens a popup with only that album\'s images. Navigation to other items is disabled.', 'visual-portfolio' ),
+					'type'    => 'toggle',
+					'default' => 'on',
+					'is_pro'  => true,
+				),
+				array(
+					'name'    => 'album_lazy_load_threshold',
+					'label'   => esc_html__( 'Album Lazy Load Threshold', 'visual-portfolio' ),
+					'desc'    => esc_html__( 'Number of album images to render inline. Additional images are loaded via REST API when the popup opens.', 'visual-portfolio' ),
+					'type'    => 'number',
+					'default' => 20,
+					'min'     => 5,
+					'max'     => 100,
+					'is_pro'  => true,
+				),
+
 				// Quick View settings.
 				array(
 					'name'   => 'popup_quick_view_title',

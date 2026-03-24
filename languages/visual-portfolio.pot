@@ -2147,7 +2147,7 @@ msgid "Free version active"
 msgstr ""
 
 #: classes/class-welcome-screen.php:173
-msgid "You already have access to premium portfolio tools."
+msgid "Your premium portfolio features are already unlocked."
 msgstr ""
 
 #: classes/class-welcome-screen.php:174
@@ -2171,7 +2171,7 @@ msgid "Your Pro advantages"
 msgstr ""
 
 #: classes/class-welcome-screen.php:211
-msgid "Need more advanced portfolio tools?"
+msgid "Need more advanced portfolio features?"
 msgstr ""
 
 #: classes/class-welcome-screen.php:217
