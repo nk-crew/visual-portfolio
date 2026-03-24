@@ -1698,7 +1698,7 @@ class Visual_Portfolio_Admin {
 					'url' => array(
 						'type'        => 'text',
 						'label'       => esc_html__( 'URL', 'visual-portfolio' ),
-						'description' => esc_html__( 'By default used full image url, you can use custom one', 'visual-portfolio' ),
+						'description' => esc_html__( 'By default used full media url, you can use custom one', 'visual-portfolio' ),
 						'placeholder' => esc_html__( 'https://...', 'visual-portfolio' ),
 						'modal_width' => 'full',
 					),

@@ -33,7 +33,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import ControlsRender from '../controls-render';
 import FocalPointControl, {
@@ -127,7 +127,7 @@ function MediaUploadButton( { open, items, isSetupWizard } ) {
 			<span>
 				{ items && items.length
 					? __( 'Edit Gallery', 'visual-portfolio' )
-					: __( 'Add Images', 'visual-portfolio' ) }
+					: __( 'Add Media', 'visual-portfolio' ) }
 			</span>
 		</Button>
 	);
@@ -410,7 +410,7 @@ const SelectedImageData = function ( props ) {
 						: null }
 				</div>
 				<CollapsibleSection
-					label={ __( 'Additional image info', 'visual-portfolio' ) }
+					label={ __( 'Additional media info', 'visual-portfolio' ) }
 					className="vpf-component-gallery-control-item-modal-image-additional-info"
 				>
 					<div>
@@ -1353,10 +1353,8 @@ const SortableList = function ( props ) {
 				<span className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-pagination">
 					<span>
 						{ sprintf(
-							_n(
-								'Showing %1$s of %2$s Image',
-								'Showing %1$s of %2$s Images',
-								items.length,
+							__(
+								'Showing %1$s of %2$s media items',
 								'visual-portfolio'
 							),
 							showingItems > items.length

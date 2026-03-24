@@ -115,7 +115,7 @@ test.describe( 'added images to block', () => {
 			.locator(
 				'button.components-button.vpf-component-gallery-control-item-add',
 				{
-					hasText: 'Add Images',
+					hasText: 'Add Media',
 				}
 			)
 			.click();
@@ -218,7 +218,7 @@ test.describe( 'added images to block', () => {
 			.locator(
 				'button.components-button.vpf-component-gallery-control-item-add',
 				{
-					hasText: 'Add Images',
+					hasText: 'Add Media',
 				}
 			)
 			.click();
@@ -405,7 +405,7 @@ test.describe( 'added images to block', () => {
 			.locator(
 				'button.components-button.vpf-component-gallery-control-item-add',
 				{
-					hasText: 'Add Images',
+					hasText: 'Add Media',
 				}
 			)
 			.click();
