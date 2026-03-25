@@ -10,7 +10,7 @@
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
-Modern photo gallery, video gallery, album gallery, and portfolio plugin with advanced layouts editor. Clean gallery styles with powerful settings in the Gutenberg block.
+Powerful WordPress gallery plugin for stunning photo, video & album galleries with advanced layouts and flexible block editing.
 
 ## Description ##
 
