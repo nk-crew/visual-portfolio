@@ -36,6 +36,10 @@ $body.on( 'input change', '.vpf-settings-form :input', function () {
 	updateSettingsSubmitState( $( this ).closest( '.vpf-settings-form' ) );
 } );
 
+$body.on( 'vpf_settings_form_updated', '.vpf-settings-form', function () {
+	updateSettingsSubmitState( $( this ) );
+} );
+
 // select shortcode text in input
 $body.on(
 	'focus',
