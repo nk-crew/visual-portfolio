@@ -59,7 +59,7 @@
          "Columns": [
             ""
          ],
-         "Images Aspect Ratio": [
+         "Media Aspect Ratio": [
             ""
          ],
          "Horizontal Order": [
@@ -203,7 +203,7 @@
          "Posts Settings": [
             ""
          ],
-         "Images Settings": [
+         "Media Settings": [
             ""
          ],
          "Taxonomies Settings": [
@@ -233,7 +233,7 @@
          "Posts": [
             ""
          ],
-         "Images": [
+         "Media": [
             ""
          ],
          "Taxonomies": [
@@ -356,7 +356,7 @@
          "URL": [
             ""
          ],
-         "By default used full image url, you can use custom one": [
+         "By default used full media url, you can use custom one": [
             ""
          ],
          "https://...": [
@@ -977,7 +977,7 @@
          "Visual Portfolio and Visual Portfolio Pro should not be active at the same time. We've automatically deactivated Visual Portfolio Pro.": [
             ""
          ],
-         "Images Rounded Corners": [
+         "Media Rounded Corners": [
             ""
          ],
          "Caption Align": [
@@ -1077,6 +1077,9 @@
             ""
          ],
          "Settings": [
+            ""
+         ],
+         "Images": [
             ""
          ],
          "Popup & Lightbox": [
@@ -1274,6 +1277,21 @@
          "Display Slideshow": [
             ""
          ],
+         "Albums": [
+            ""
+         ],
+         "Isolated Album Popup": [
+            ""
+         ],
+         "When enabled, clicking an album opens a popup with only that album's images. Navigation to other items is disabled.": [
+            ""
+         ],
+         "Album Lazy Load Threshold": [
+            ""
+         ],
+         "Number of album images to render inline. Additional images are loaded via REST API when the popup opens.": [
+            ""
+         ],
          "Quick View": [
             ""
          ],
@@ -1322,6 +1340,48 @@
          "-- Select Page --": [
             ""
          ],
+         "Visual Portfolio Pro active": [
+            ""
+         ],
+         "Your premium portfolio features are already unlocked.": [
+            ""
+         ],
+         "Use the same visual workflow for galleries, post grids, and portfolio layouts, now with the additional Pro features already available on this site.": [
+            ""
+         ],
+         "Core workflow included in Pro": [
+            ""
+         ],
+         "These are the essential Visual Portfolio building blocks you can use across both free and Pro setups.": [
+            ""
+         ],
+         "Advantages already included with Pro": [
+            ""
+         ],
+         "These premium capabilities are already enabled because you are using Visual Portfolio Pro.": [
+            ""
+         ],
+         "Free version active": [
+            ""
+         ],
+         "Build a modern portfolio experience in WordPress.": [
+            ""
+         ],
+         "Create galleries, post grids, and polished portfolio layouts with a workflow that stays visual from setup to launch.": [
+            ""
+         ],
+         "Everything you can build right away": [
+            ""
+         ],
+         "Start with the core Visual Portfolio workflow and expand later only if your projects need more advanced features.": [
+            ""
+         ],
+         "Need more advanced portfolio features?": [
+            ""
+         ],
+         "Pro expands the same workflow with features aimed at client work, content protection, social sources, and deeper customization.": [
+            ""
+         ],
          "Visual gallery builder": [
             ""
          ],
@@ -1358,64 +1418,64 @@
          "Help visitors explore larger collections with category filters, sort controls, load more, and infinite scrolling.": [
             ""
          ],
-         "Social feeds integrations": [
+         "Video items": [
             ""
          ],
-         "Proofing and client-friendly workflows": [
+         "Add video items to image galleries and post grids, then autoplay them on open or trigger playback on hover.": [
             ""
          ],
-         "Watermarks, age gate, and right click protection": [
+         "Albums and gallery format": [
             ""
          ],
-         "Popup deep linking for shareable views": [
+         "Build nested galleries and output album-style content across image galleries, posts, and taxonomy grids.": [
             ""
          ],
-         "Popup support for posts and pages": [
+         "Taxonomy grids": [
             ""
          ],
-         "Custom hover images, filters, and extra visual effects": [
+         "Use taxonomy terms as a dedicated gallery source and turn categories, tags, or custom taxonomies into visual grids.": [
             ""
          ],
-         "AJAX search, cache, and advanced query controls": [
+         "Proofing workflows": [
             ""
          ],
-         "White label and developer-friendly extensibility": [
+         "Collaborate with clients on image selections and benefit from self-healing proofing permalinks.": [
+            ""
+         ],
+         "Content protection": [
+            ""
+         ],
+         "Protect galleries with watermarks, age gate rules, and right click protection.": [
+            ""
+         ],
+         "Advanced popups": [
+            ""
+         ],
+         "Use deep linking and open posts or pages in popups alongside your media galleries.": [
+            ""
+         ],
+         "Social sources and query controls": [
+            ""
+         ],
+         "Extend projects with social feeds, advanced query controls, and AJAX-driven performance improvements.": [
+            ""
+         ],
+         "Branding and effects": [
+            ""
+         ],
+         "Unlock hover images, extra visual effects, white label options, and developer-friendly extensibility.": [
+            ""
+         ],
+         "And more...": [
+            ""
+         ],
+         "Get access to many more Pro features for layout control, client work, integrations, performance, and advanced customization.": [
             ""
          ],
          "Visual Portfolio Welcome Screen": [
             ""
          ],
-         "Included with Pro": [
-            ""
-         ],
-         "Free version active": [
-            ""
-         ],
-         "Your premium portfolio features are already unlocked.": [
-            ""
-         ],
-         "Build a modern portfolio experience in WordPress.": [
-            ""
-         ],
-         "Use this screen as a quick overview of the core workflows and the premium advantages already unlocked in your setup.": [
-            ""
-         ],
-         "Create galleries, post grids, and polished portfolio layouts with a workflow that stays visual from setup to launch.": [
-            ""
-         ],
          "Compare Free vs Pro": [
-            ""
-         ],
-         "Your Pro advantages": [
-            ""
-         ],
-         "Need more advanced portfolio features?": [
-            ""
-         ],
-         "These premium capabilities are already included because you are using Visual Portfolio Pro.": [
-            ""
-         ],
-         "Pro expands the same workflow with features aimed at client work, content protection, social sources, and deeper customization.": [
             ""
          ],
          "See Pro details": [
@@ -1562,13 +1622,10 @@
          "Edit Gallery": [
             ""
          ],
-         "Add Images": [
+         "Add Media": [
             ""
          ],
-         "Media": [
-            ""
-         ],
-         "Additional image info": [
+         "Additional media info": [
             ""
          ],
          "File URL": [
@@ -1587,9 +1644,6 @@
             ""
          ],
          "Select": [
-            ""
-         ],
-         "Media Settings": [
             ""
          ],
          "Select All": [
@@ -1619,8 +1673,7 @@
          "Bulk Image Settings": [
             ""
          ],
-         "Showing %1$s of %2$s Image": [
-            "",
+         "Showing %1$s of %2$s media items": [
             ""
          ],
          "Show More": [

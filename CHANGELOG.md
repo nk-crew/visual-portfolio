@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.6.0 - Mar 23, 2026 =
+
+* refined image settings in popup in image galleries - better fields and overall ux
+* refined welcome screen
+* improved featured image focal point on posts - setting hidden by default in collapse
+* improve settings page: disable the Save Changes button when no changes are made
+* fixed missing aria-label on overlay/item links with empty `<a>` tags
+* fixed slider gap on RTL sites
+* minor fixes and improvements
+* **Pro:**
+* added support for video items in image gallery and in post grids. Autoplay video on gallery item automatically or on hover <https://www.visualportfolio.com/video-gallery/>
+* added Gallery format and albums (nested gallery) support for image galleries, posts and taxonomy grids <https://www.visualportfolio.com/album-gallery/>
+* added support for displaying Taxonomies as gallery content source <https://www.visualportfolio.com/taxonomies/>
+* improved social feeds fetching queue startup condition: start immediately when a new social integration is added
+* fixed broken preview images in setup wizard skin examples
+* fixed proofing gallery permalink 404 by deferred rewrite self-healing
+* fixed the social feeds start queue trigger. Feeds now begin fetching as soon as the integration is added, and no longer depend on the block being added to the page
+* fixed search feature does not work correctly with paginated pages
+* fixed Social Items and Social Profiles menu items from displaying when no integrations are enabled
+
 = 3.5.2 - Feb 18, 2026 =
 
 * security: fixed local file inclusion via path traversal

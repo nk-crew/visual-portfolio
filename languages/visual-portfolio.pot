@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.5.2\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.6.0\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-22T15:54:37+00:00\n"
+"POT-Creation-Date: 2026-03-25T14:26:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
@@ -76,9 +76,9 @@ msgstr ""
 #: classes/class-admin.php:237
 #: classes/class-admin.php:286
 #: classes/class-custom-post-type.php:863
-#: classes/class-settings.php:766
-#: classes/class-settings.php:781
-#: classes/class-settings.php:796
+#: classes/class-settings.php:792
+#: classes/class-settings.php:807
+#: classes/class-settings.php:822
 #: gutenberg/components/controls-render/index.js:788
 msgid "Go Pro"
 msgstr ""
@@ -103,7 +103,7 @@ msgstr ""
 
 #: classes/class-admin.php:466
 #: classes/class-admin.php:503
-msgid "Images Aspect Ratio"
+msgid "Media Aspect Ratio"
 msgstr ""
 
 #: classes/class-admin.php:479
@@ -318,7 +318,8 @@ msgid "Posts Settings"
 msgstr ""
 
 #: classes/class-admin.php:1238
-msgid "Images Settings"
+#: gutenberg/components/gallery-control/index.js:925
+msgid "Media Settings"
 msgstr ""
 
 #: classes/class-admin.php:1243
@@ -350,7 +351,7 @@ msgid "Protection"
 msgstr ""
 
 #: classes/class-admin.php:1278
-#: classes/class-settings.php:725
+#: classes/class-settings.php:751
 #: gutenberg/components/controls-render/index.js:591
 msgid "Custom CSS"
 msgstr ""
@@ -362,8 +363,8 @@ msgstr ""
 
 #: classes/class-admin.php:1327
 #: classes/class-custom-post-type.php:578
-#: classes/class-settings.php:204
-msgid "Images"
+#: gutenberg/components/gallery-control/index.js:246
+msgid "Media"
 msgstr ""
 
 #: classes/class-admin.php:1333
@@ -505,9 +506,9 @@ msgstr ""
 #: classes/class-admin.php:3268
 #: classes/class-admin.php:3610
 #: classes/class-custom-post-type.php:858
-#: classes/class-settings.php:763
-#: classes/class-settings.php:778
-#: classes/class-settings.php:793
+#: classes/class-settings.php:789
+#: classes/class-settings.php:804
+#: classes/class-settings.php:819
 msgid "Premium Only"
 msgstr ""
 
@@ -565,7 +566,7 @@ msgid "URL"
 msgstr ""
 
 #: classes/class-admin.php:1701
-msgid "By default used full image url, you can use custom one"
+msgid "By default used full media url, you can use custom one"
 msgstr ""
 
 #: classes/class-admin.php:1702
@@ -1526,7 +1527,7 @@ msgstr ""
 
 #: classes/class-custom-post-type.php:804
 #: classes/class-custom-post-type.php:805
-#: classes/class-welcome-screen.php:189
+#: classes/class-welcome-screen.php:265
 msgid "Documentation"
 msgstr ""
 
@@ -1548,7 +1549,7 @@ msgid "Visual Portfolio and Visual Portfolio Pro should not be active at the sam
 msgstr ""
 
 #: classes/class-deprecated.php:175
-msgid "Images Rounded Corners"
+msgid "Media Rounded Corners"
 msgstr ""
 
 #: classes/class-deprecated.php:331
@@ -1694,9 +1695,13 @@ msgstr ""
 
 #: classes/class-settings.php:128
 #: classes/class-settings.php:129
-#: classes/class-settings.php:817
+#: classes/class-settings.php:843
 #: gutenberg/components/elements-selector/index.js:144
 msgid "Settings"
+msgstr ""
+
+#: classes/class-settings.php:204
+msgid "Images"
 msgstr ""
 
 #: classes/class-settings.php:209
@@ -1986,203 +1991,279 @@ msgid "Display Slideshow"
 msgstr ""
 
 #: classes/class-settings.php:685
-msgid "Quick View"
+msgid "Albums"
 msgstr ""
 
 #: classes/class-settings.php:691
-msgid "Display URL Button"
+msgid "Isolated Album Popup"
 msgstr ""
 
 #: classes/class-settings.php:692
-msgid "Button with page URL will be placed in the popup toolbar."
+msgid "When enabled, clicking an album opens a popup with only that album's images. Navigation to other items is disabled."
 msgstr ""
 
 #: classes/class-settings.php:699
+msgid "Album Lazy Load Threshold"
+msgstr ""
+
+#: classes/class-settings.php:700
+msgid "Number of album images to render inline. Additional images are loaded via REST API when the popup opens."
+msgstr ""
+
+#: classes/class-settings.php:711
+msgid "Quick View"
+msgstr ""
+
+#: classes/class-settings.php:717
+msgid "Display URL Button"
+msgstr ""
+
+#: classes/class-settings.php:718
+msgid "Button with page URL will be placed in the popup toolbar."
+msgstr ""
+
+#: classes/class-settings.php:725
 msgid "Internal Links"
 msgstr ""
 
-#: classes/class-settings.php:703
-#: classes/class-settings.php:716
+#: classes/class-settings.php:729
+#: classes/class-settings.php:742
 msgid "Open in New Tab"
 msgstr ""
 
-#: classes/class-settings.php:704
-#: classes/class-settings.php:717
+#: classes/class-settings.php:730
+#: classes/class-settings.php:743
 msgid "Open in Current Tab"
 msgstr ""
 
-#: classes/class-settings.php:705
-#: classes/class-settings.php:718
+#: classes/class-settings.php:731
+#: classes/class-settings.php:744
 msgid "Open in Frame (not recommended)"
 msgstr ""
 
-#: classes/class-settings.php:706
-#: classes/class-settings.php:719
+#: classes/class-settings.php:732
+#: classes/class-settings.php:745
 msgid "Prevent Click"
 msgstr ""
 
-#: classes/class-settings.php:712
+#: classes/class-settings.php:738
 msgid "External Links"
 msgstr ""
 
-#: classes/class-settings.php:726
+#: classes/class-settings.php:752
 msgid "When you display posts and pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`."
 msgstr ""
 
-#: classes/class-settings.php:748
+#: classes/class-settings.php:774
 msgid "Misc"
 msgstr ""
 
-#: classes/class-settings.php:753
+#: classes/class-settings.php:779
 msgid "Background Color"
 msgstr ""
 
-#: classes/class-settings.php:765
+#: classes/class-settings.php:791
 msgid "Protect your works using watermarks"
 msgstr ""
 
-#: classes/class-settings.php:780
+#: classes/class-settings.php:806
 msgid "Social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
-#: classes/class-settings.php:795
+#: classes/class-settings.php:821
 msgid "Remove our plugin brand and logos from Front and Admin areas"
 msgstr ""
 
-#: classes/class-settings.php:861
+#: classes/class-settings.php:887
 msgid "-- Select Page --"
 msgstr ""
 
-#: classes/class-welcome-screen.php:24
-msgid "Visual gallery builder"
+#: classes/class-welcome-screen.php:26
+msgid "Visual Portfolio Pro active"
 msgstr ""
 
-#: classes/class-welcome-screen.php:25
-msgid "Create galleries, portfolios, and post grids visually in Gutenberg with live preview and flexible controls."
-msgstr ""
-
-#: classes/class-welcome-screen.php:28
-msgid "Flexible layouts and styles"
-msgstr ""
-
-#: classes/class-welcome-screen.php:29
-msgid "Mix grid, masonry, justified, slider, and tiles layouts with polished hover styles for different creative workflows."
-msgstr ""
-
-#: classes/class-welcome-screen.php:32
-msgid "Dynamic query builder"
-msgstr ""
-
-#: classes/class-welcome-screen.php:33
-msgid "Display portfolio items, blog posts, or any post type and filter them by taxonomy, author, date, and more."
-msgstr ""
-
-#: classes/class-welcome-screen.php:36
-msgid "Fast by design"
-msgstr ""
-
-#: classes/class-welcome-screen.php:37
-msgid "Assets are loaded only where needed, so galleries stay lightweight and feel native on the front end."
-msgstr ""
-
-#: classes/class-welcome-screen.php:40
-msgid "Advanced media experience"
-msgstr ""
-
-#: classes/class-welcome-screen.php:41
-msgid "Present images, videos, and audio in one portfolio with responsive lightbox behavior and touch-friendly navigation."
-msgstr ""
-
-#: classes/class-welcome-screen.php:44
-msgid "Filtering, sorting, and pagination"
-msgstr ""
-
-#: classes/class-welcome-screen.php:45
-msgid "Help visitors explore larger collections with category filters, sort controls, load more, and infinite scrolling."
-msgstr ""
-
-#: classes/class-welcome-screen.php:57
-msgid "Social feeds integrations"
-msgstr ""
-
-#: classes/class-welcome-screen.php:58
-msgid "Proofing and client-friendly workflows"
-msgstr ""
-
-#: classes/class-welcome-screen.php:59
-msgid "Watermarks, age gate, and right click protection"
-msgstr ""
-
-#: classes/class-welcome-screen.php:60
-msgid "Popup deep linking for shareable views"
-msgstr ""
-
-#: classes/class-welcome-screen.php:61
-msgid "Popup support for posts and pages"
-msgstr ""
-
-#: classes/class-welcome-screen.php:62
-msgid "Custom hover images, filters, and extra visual effects"
-msgstr ""
-
-#: classes/class-welcome-screen.php:63
-msgid "AJAX search, cache, and advanced query controls"
-msgstr ""
-
-#: classes/class-welcome-screen.php:64
-msgid "White label and developer-friendly extensibility"
-msgstr ""
-
-#: classes/class-welcome-screen.php:105
-#: classes/class-welcome-screen.php:106
-msgid "Visual Portfolio Welcome Screen"
-msgstr ""
-
-#: classes/class-welcome-screen.php:166
-msgid "Included with Pro"
-msgstr ""
-
-#: classes/class-welcome-screen.php:167
-msgid "Free version active"
-msgstr ""
-
-#: classes/class-welcome-screen.php:173
+#: classes/class-welcome-screen.php:27
 msgid "Your premium portfolio features are already unlocked."
 msgstr ""
 
-#: classes/class-welcome-screen.php:174
+#: classes/class-welcome-screen.php:28
+msgid "Use the same visual workflow for galleries, post grids, and portfolio layouts, now with the additional Pro features already available on this site."
+msgstr ""
+
+#: classes/class-welcome-screen.php:29
+msgid "Core workflow included in Pro"
+msgstr ""
+
+#: classes/class-welcome-screen.php:30
+msgid "These are the essential Visual Portfolio building blocks you can use across both free and Pro setups."
+msgstr ""
+
+#: classes/class-welcome-screen.php:31
+msgid "Advantages already included with Pro"
+msgstr ""
+
+#: classes/class-welcome-screen.php:32
+msgid "These premium capabilities are already enabled because you are using Visual Portfolio Pro."
+msgstr ""
+
+#: classes/class-welcome-screen.php:37
+msgid "Free version active"
+msgstr ""
+
+#: classes/class-welcome-screen.php:38
 msgid "Build a modern portfolio experience in WordPress."
 msgstr ""
 
-#: classes/class-welcome-screen.php:180
-msgid "Use this screen as a quick overview of the core workflows and the premium advantages already unlocked in your setup."
-msgstr ""
-
-#: classes/class-welcome-screen.php:181
+#: classes/class-welcome-screen.php:39
 msgid "Create galleries, post grids, and polished portfolio layouts with a workflow that stays visual from setup to launch."
 msgstr ""
 
-#: classes/class-welcome-screen.php:187
-msgid "Compare Free vs Pro"
+#: classes/class-welcome-screen.php:40
+msgid "Everything you can build right away"
 msgstr ""
 
-#: classes/class-welcome-screen.php:210
-msgid "Your Pro advantages"
+#: classes/class-welcome-screen.php:41
+msgid "Start with the core Visual Portfolio workflow and expand later only if your projects need more advanced features."
 msgstr ""
 
-#: classes/class-welcome-screen.php:211
+#: classes/class-welcome-screen.php:42
 msgid "Need more advanced portfolio features?"
 msgstr ""
 
-#: classes/class-welcome-screen.php:217
-msgid "These premium capabilities are already included because you are using Visual Portfolio Pro."
-msgstr ""
-
-#: classes/class-welcome-screen.php:218
+#: classes/class-welcome-screen.php:43
 msgid "Pro expands the same workflow with features aimed at client work, content protection, social sources, and deeper customization."
 msgstr ""
 
-#: classes/class-welcome-screen.php:227
+#: classes/class-welcome-screen.php:55
+msgid "Visual gallery builder"
+msgstr ""
+
+#: classes/class-welcome-screen.php:56
+msgid "Create galleries, portfolios, and post grids visually in Gutenberg with live preview and flexible controls."
+msgstr ""
+
+#: classes/class-welcome-screen.php:59
+msgid "Flexible layouts and styles"
+msgstr ""
+
+#: classes/class-welcome-screen.php:60
+msgid "Mix grid, masonry, justified, slider, and tiles layouts with polished hover styles for different creative workflows."
+msgstr ""
+
+#: classes/class-welcome-screen.php:63
+msgid "Dynamic query builder"
+msgstr ""
+
+#: classes/class-welcome-screen.php:64
+msgid "Display portfolio items, blog posts, or any post type and filter them by taxonomy, author, date, and more."
+msgstr ""
+
+#: classes/class-welcome-screen.php:67
+msgid "Fast by design"
+msgstr ""
+
+#: classes/class-welcome-screen.php:68
+msgid "Assets are loaded only where needed, so galleries stay lightweight and feel native on the front end."
+msgstr ""
+
+#: classes/class-welcome-screen.php:71
+msgid "Advanced media experience"
+msgstr ""
+
+#: classes/class-welcome-screen.php:72
+msgid "Present images, videos, and audio in one portfolio with responsive lightbox behavior and touch-friendly navigation."
+msgstr ""
+
+#: classes/class-welcome-screen.php:75
+msgid "Filtering, sorting, and pagination"
+msgstr ""
+
+#: classes/class-welcome-screen.php:76
+msgid "Help visitors explore larger collections with category filters, sort controls, load more, and infinite scrolling."
+msgstr ""
+
+#: classes/class-welcome-screen.php:89
+msgid "Video items"
+msgstr ""
+
+#: classes/class-welcome-screen.php:90
+msgid "Add video items to image galleries and post grids, then autoplay them on open or trigger playback on hover."
+msgstr ""
+
+#: classes/class-welcome-screen.php:93
+msgid "Albums and gallery format"
+msgstr ""
+
+#: classes/class-welcome-screen.php:94
+msgid "Build nested galleries and output album-style content across image galleries, posts, and taxonomy grids."
+msgstr ""
+
+#: classes/class-welcome-screen.php:97
+msgid "Taxonomy grids"
+msgstr ""
+
+#: classes/class-welcome-screen.php:98
+msgid "Use taxonomy terms as a dedicated gallery source and turn categories, tags, or custom taxonomies into visual grids."
+msgstr ""
+
+#: classes/class-welcome-screen.php:101
+msgid "Proofing workflows"
+msgstr ""
+
+#: classes/class-welcome-screen.php:102
+msgid "Collaborate with clients on image selections and benefit from self-healing proofing permalinks."
+msgstr ""
+
+#: classes/class-welcome-screen.php:105
+msgid "Content protection"
+msgstr ""
+
+#: classes/class-welcome-screen.php:106
+msgid "Protect galleries with watermarks, age gate rules, and right click protection."
+msgstr ""
+
+#: classes/class-welcome-screen.php:109
+msgid "Advanced popups"
+msgstr ""
+
+#: classes/class-welcome-screen.php:110
+msgid "Use deep linking and open posts or pages in popups alongside your media galleries."
+msgstr ""
+
+#: classes/class-welcome-screen.php:113
+msgid "Social sources and query controls"
+msgstr ""
+
+#: classes/class-welcome-screen.php:114
+msgid "Extend projects with social feeds, advanced query controls, and AJAX-driven performance improvements."
+msgstr ""
+
+#: classes/class-welcome-screen.php:117
+msgid "Branding and effects"
+msgstr ""
+
+#: classes/class-welcome-screen.php:118
+msgid "Unlock hover images, extra visual effects, white label options, and developer-friendly extensibility."
+msgstr ""
+
+#: classes/class-welcome-screen.php:121
+msgid "And more..."
+msgstr ""
+
+#: classes/class-welcome-screen.php:122
+msgid "Get access to many more Pro features for layout control, client work, integrations, performance, and advanced customization."
+msgstr ""
+
+#: classes/class-welcome-screen.php:194
+#: classes/class-welcome-screen.php:195
+msgid "Visual Portfolio Welcome Screen"
+msgstr ""
+
+#: classes/class-welcome-screen.php:263
+msgid "Compare Free vs Pro"
+msgstr ""
+
+#: classes/class-welcome-screen.php:290
 msgid "See Pro details"
 msgstr ""
 
@@ -2400,15 +2481,11 @@ msgid "Edit Gallery"
 msgstr ""
 
 #: gutenberg/components/gallery-control/index.js:130
-msgid "Add Images"
-msgstr ""
-
-#: gutenberg/components/gallery-control/index.js:246
-msgid "Media"
+msgid "Add Media"
 msgstr ""
 
 #: gutenberg/components/gallery-control/index.js:413
-msgid "Additional image info"
+msgid "Additional media info"
 msgstr ""
 
 #: gutenberg/components/gallery-control/index.js:447
@@ -2433,10 +2510,6 @@ msgstr ""
 
 #: gutenberg/components/gallery-control/index.js:861
 msgid "Select"
-msgstr ""
-
-#: gutenberg/components/gallery-control/index.js:925
-msgid "Media Settings"
 msgstr ""
 
 #: gutenberg/components/gallery-control/index.js:1088
@@ -2477,16 +2550,14 @@ msgstr ""
 
 #: gutenberg/components/gallery-control/index.js:1356
 #, js-format
-msgid "Showing %1$s of %2$s Image"
-msgid_plural "Showing %1$s of %2$s Images"
-msgstr[0] ""
-msgstr[1] ""
+msgid "Showing %1$s of %2$s media items"
+msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1376
+#: gutenberg/components/gallery-control/index.js:1374
 msgid "Show More"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1384
+#: gutenberg/components/gallery-control/index.js:1382
 msgid "Show All"
 msgstr ""
 

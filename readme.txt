@@ -6,24 +6,24 @@
 * Requires at least: 6.2
 * Tested up to: 6.9
 * Requires PHP: 7.2
-* Stable tag: 3.5.2
+* Stable tag: 3.6.0
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
-Modern photo gallery and portfolio plugin with advanced layouts editor. Clean gallery styles with powerful settings in the Gutenberg block.
+Modern photo gallery, video gallery, album gallery, and portfolio plugin with advanced layouts editor. Clean gallery styles with powerful settings in the Gutenberg block.
 
 ## Description ##
 
 **Gallery & Portfolio Plugin For WordPress**
 ★★★★★<br>
 
-**Portfolio websites are the most popular nowadays.** We created [**Visual Portfolio, Photo Gallery & Post Grid WordPress plugin**](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head), to help every creative, agency, and photographers get access to the powerful tools they need to showcase their beautiful works and attract more love from their potential and existing customers.
+**Portfolio websites are the most popular nowadays.** We created [**Visual Portfolio, Photo Gallery & Post Grid WordPress plugin**](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head), to help every creative, agency, and photographers build image galleries, video galleries, album galleries, and filterable post grids that showcase their work and attract more love from their potential and existing customers.
 
 [youtube https://youtu.be/354pybu91aQ]
 
 [See Live Demo](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) | [Documentation](https://www.visualportfolio.com/docs/getting-started/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) | [GitHub](https://github.com/nk-crew/visual-portfolio)
 
-Create beautiful, clean, and powerful photo galleries and portfolio layouts using the Visual Portfolio gallery plugin. It is easy for simple photo galleries, but powerful enough for professionals. Whether you're a photographer, agency, or anything in between, **Visual Portfolio will boost your online presence**.
+Create beautiful, clean, and powerful photo galleries, video galleries, albums, and portfolio layouts using the Visual Portfolio gallery plugin. It is easy for simple image galleries, but powerful enough for professionals who need nested galleries, post grids, taxonomy grids, and advanced portfolio workflows. Whether you're a photographer, agency, or anything in between, **Visual Portfolio helps you present your work professionally online**.
 
 ### 🏆 Visual Gallery Builder ###
 
@@ -75,11 +75,11 @@ In case you want to use Visual Portfolio plugin for photo gallery only you can d
 
 ### 💎 Posts Query Builder ###
 
-Fine-tune the source of your galleries. Display posts, portfolios, and any other post types, filter by taxonomies, author, and date ranges, include or exclude specific posts, and much more options.
+Fine-tune the source of your galleries. Display posts, portfolios, taxonomies, and any other post types, filter by taxonomies, author, and date ranges, include or exclude specific posts, and build post grids or taxonomy grids from the same workflow.
 
 ### 🖼️ Photo Galleries ###
 
-Create galleries using image sets right inside block editor, just drop your images and the gallery is ready. You can create unlimited galleries with different styles, there is no limitation.
+Create galleries using image sets right inside block editor, just drop your images and the gallery is ready. You can create unlimited image galleries with different styles, build album galleries with nested galleries in Pro, and combine images with video items for richer visual storytelling.
 
 ### ⚡ Powerful Lightbox ###
 
@@ -95,7 +95,7 @@ Visual Portfolio uses only modern solutions, and lightboxes are not an exception
 
 ### 📹 Video and 🎵 Audio Support ###
 
-Visual Portfolio plugin allows you to work with audios and videos within a single gallery. You just need to copy the URL of the video or audio and it will work automatically in the popup gallery. The full list with supported vendors see below (mostly thanks to the Pro plugin).
+Visual Portfolio plugin allows you to work with audios and videos within a single gallery. You can paste a supported video or audio URL and it will work automatically in the popup gallery. In Pro, you can also add dedicated video items directly to image galleries and post grids, including autoplay on open or playback on hover. The full list with supported vendors see below.
 
 Supported Video Vendors:
 
@@ -141,6 +141,15 @@ Visual Portfolio gives you a wide range of filters and actions to customize ever
 > The Visual Portfolio plugin is also available in a professional version which includes more features and enhanced performance! [**Learn more about Visual Portfolio Pro**](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro)
 >
 > In order to maintain the free version of the plugin on an ongoing basis, and to provide quick and effective support for free, we offer a Pro version of the plugin. The Pro version allows you to:
+
+* [**Video Items in Galleries and Post Grids**](https://www.visualportfolio.com/video-gallery/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_video_gallery)
+Add video items directly into image galleries and post grids, with autoplay on open or play on hover.
+
+* [**Gallery Format and Albums**](https://www.visualportfolio.com/album-gallery/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_album_gallery)
+Display nested galleries and album-style content in image galleries, posts, and taxonomy grids.
+
+* [**Taxonomies as Gallery Source**](https://www.visualportfolio.com/taxonomies/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_taxonomies)
+Build galleries directly from taxonomy terms, not only from posts or images.
 
 * **Advanced Skin Settings**
   * **Image Filters and Blend Mode** – apply Instagram-like filters on images for Normal and Hover states
@@ -192,6 +201,9 @@ Requests properly cached and links preloaded before you click.
 
 * **Advanced Query Settings**
 Filter by Author, Date Range, Ignore Sticky Posts, exclude posts without Featured Image, and much more...
+
+* **Albums, Gallery Format, and Taxonomy Grids**
+Build nested gallery structures, output gallery format content, and create visual taxonomy grids from the same workflow. See the [Taxonomies demo](https://www.visualportfolio.com/taxonomies/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=pro_taxonomies).
 
 * **Quick View for Posts and Pages**
 Display posts and pages in popup iframe, not only image and video galleries. It's like works preview in Dribbble and Behance, but on your own site.
@@ -323,6 +335,26 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.6.0 - Mar 23, 2026 =
+
+* refined image settings in popup in image galleries - better fields and overall ux
+* refined welcome screen
+* improved featured image focal point on posts - setting hidden by default in collapse
+* improve settings page: disable the Save Changes button when no changes are made
+* fixed missing aria-label on overlay/item links with empty `<a>` tags
+* fixed slider gap on RTL sites
+* minor fixes and improvements
+* **Pro:**
+* added support for video items in image gallery and in post grids. Autoplay video on gallery item automatically or on hover <https://www.visualportfolio.com/video-gallery/>
+* added Gallery format and albums (nested gallery) support for image galleries, posts and taxonomy grids <https://www.visualportfolio.com/album-gallery/>
+* added support for displaying Taxonomies as gallery content source <https://www.visualportfolio.com/taxonomies/>
+* improved social feeds fetching queue startup condition: start immediately when a new social integration is added
+* fixed broken preview images in setup wizard skin examples
+* fixed proofing gallery permalink 404 by deferred rewrite self-healing
+* fixed the social feeds start queue trigger. Feeds now begin fetching as soon as the integration is added, and no longer depend on the block being added to the page
+* fixed search feature does not work correctly with paginated pages
+* fixed Social Items and Social Profiles menu items from displaying when no integrations are enabled
 
 = 3.5.2 - Feb 18, 2026 =
 
