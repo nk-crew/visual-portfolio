@@ -6,6 +6,36 @@ import { debounce } from '@wordpress/compose';
 const { ajaxurl, VPAdminVariables } = window;
 const $body = $( 'body' );
 
+function serializeSettingsForm( $form ) {
+	return JSON.stringify( $form.serializeArray() );
+}
+
+function updateSettingsSubmitState( $form ) {
+	const initialState = $form.data( 'vpfInitialState' );
+
+	if ( typeof initialState === 'undefined' ) {
+		return;
+	}
+
+	$form
+		.find( '.vpf-settings-submit' )
+		.prop(
+			'disabled',
+			serializeSettingsForm( $form ) === initialState
+		);
+}
+
+$( '.vpf-settings-form' ).each( function () {
+	const $form = $( this );
+
+	$form.data( 'vpfInitialState', serializeSettingsForm( $form ) );
+	updateSettingsSubmitState( $form );
+} );
+
+$body.on( 'input change', '.vpf-settings-form :input', function () {
+	updateSettingsSubmitState( $( this ).closest( '.vpf-settings-form' ) );
+} );
+
 // select shortcode text in input
 $body.on(
 	'focus',

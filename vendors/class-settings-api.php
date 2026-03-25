@@ -887,7 +887,7 @@ class Visual_Portfolio_Settings_API {
         ob_start();
         ?>
         <div id="<?php echo $form['id']; ?>" class="group" style="display: none;">
-            <form method="post" action="options.php">
+            <form method="post" action="options.php" class="vpf-settings-form">
                 <?php
                 do_action( 'wsa_form_top_' . $form['id'], $form );
                 settings_fields( $form['id'] );
@@ -896,7 +896,7 @@ class Visual_Portfolio_Settings_API {
                 if ( isset( $this->settings_fields[ $form['id'] ] ) ) :
                     ?>
                     <div class="metabox-holder-footer">
-                        <?php submit_button(); ?>
+                        <?php submit_button( '', 'primary vpf-settings-submit', 'submit', false, array( 'disabled' => 'disabled' ) ); ?>
                     </div>
                 <?php endif; ?>
             </form>
