@@ -10,6 +10,24 @@ function serializeSettingsForm( $form ) {
 	return JSON.stringify( $form.serializeArray() );
 }
 
+function storeSettingsFormState( $form ) {
+	$form.data( 'vpfInitialState', serializeSettingsForm( $form ) );
+}
+
+function getStoredSettingsFormState( $form ) {
+	const initialState = $form.data( 'vpfInitialState' );
+
+	if ( typeof initialState === 'undefined' ) {
+		return [];
+	}
+
+	try {
+		return JSON.parse( initialState );
+	} catch ( error ) {
+		return [];
+	}
+}
+
 function updateSettingsSubmitState( $form ) {
 	const initialState = $form.data( 'vpfInitialState' );
 
@@ -25,10 +43,27 @@ function updateSettingsSubmitState( $form ) {
 		);
 }
 
+window.VPAdminSettingsForms = {
+	getInitialState( $form ) {
+		return getStoredSettingsFormState( $form );
+	},
+	setInitialState( $form, initialState ) {
+		$form.data( 'vpfInitialState', JSON.stringify( initialState ) );
+		updateSettingsSubmitState( $form );
+	},
+	refresh( $form ) {
+		updateSettingsSubmitState( $form );
+	},
+	persist( $form ) {
+		storeSettingsFormState( $form );
+		updateSettingsSubmitState( $form );
+	},
+};
+
 $( '.vpf-settings-form' ).each( function () {
 	const $form = $( this );
 
-	$form.data( 'vpfInitialState', serializeSettingsForm( $form ) );
+	storeSettingsFormState( $form );
 	updateSettingsSubmitState( $form );
 } );
 
@@ -38,6 +73,13 @@ $body.on( 'input change', '.vpf-settings-form :input', function () {
 
 $body.on( 'vpf_settings_form_updated', '.vpf-settings-form', function () {
 	updateSettingsSubmitState( $( this ) );
+} );
+
+$body.on( 'vpf_settings_form_persisted', '.vpf-settings-form', function () {
+	const $form = $( this );
+
+	storeSettingsFormState( $form );
+	updateSettingsSubmitState( $form );
 } );
 
 // select shortcode text in input
