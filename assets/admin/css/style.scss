@@ -51,21 +51,29 @@ $escaped-svg-characters: (
 
 :root {
 	--vpf-admin-accent: var(--wp-admin-theme-color, #3858e9);
-	--vpf-admin-accent-soft: color-mix(
-		in srgb,
-		var(--vpf-admin-accent) 10%,
-		transparent
-	);
-	--vpf-admin-accent-soft-strong: color-mix(
-		in srgb,
-		var(--vpf-admin-accent) 14%,
-		transparent
-	);
-	--vpf-admin-accent-hover: color-mix(
-		in srgb,
-		var(--vpf-admin-accent) 88%,
-		#000
-	);
+	--vpf-admin-accent-soft: rgba(56, 88, 233, 0.1);
+	--vpf-admin-accent-soft-strong: rgba(56, 88, 233, 0.14);
+	--vpf-admin-accent-hover: #3150cd;
+}
+
+@supports (color: color-mix(in srgb, black 50%, white)) {
+	:root {
+		--vpf-admin-accent-soft: color-mix(
+			in srgb,
+			var(--vpf-admin-accent) 10%,
+			transparent
+		);
+		--vpf-admin-accent-soft-strong: color-mix(
+			in srgb,
+			var(--vpf-admin-accent) 14%,
+			transparent
+		);
+		--vpf-admin-accent-hover: color-mix(
+			in srgb,
+			var(--vpf-admin-accent) 88%,
+			#000
+		);
+	}
 }
 
 #adminmenu a[href*="https://www.visualportfolio.com/pricing/"],

@@ -11,9 +11,9 @@ export default function ButtonsGroup( props ) {
 
 	return (
 		<div
+			{ ...restProps }
 			className={ `vpf-component-buttons-group ${ className }`.trim() }
 			role="group"
-			{ ...restProps }
 		>
 			{ children }
 		</div>

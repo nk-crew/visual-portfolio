@@ -19,13 +19,24 @@ import './style.scss';
 
 import { Component } from '@wordpress/element';
 
-// Ace worker paths must be registered explicitly in our webpack build, otherwise
-// the editor falls back to a relative `worker-*.js` URL that does not exist.
-ace.config.setModuleUrl( 'ace/mode/css_worker', cssWorkerUrl );
-ace.config.setModuleUrl(
-	'ace/mode/javascript_worker',
-	javascriptWorkerUrl
-);
+let aceWorkersConfigured = false;
+
+function ensureAceWorkersConfigured() {
+	if ( aceWorkersConfigured ) {
+		return;
+	}
+
+	// Ace worker paths must be registered explicitly in our webpack build,
+	// otherwise the editor falls back to a relative `worker-*.js` URL that
+	// does not exist.
+	ace.config.setModuleUrl( 'ace/mode/css_worker', cssWorkerUrl );
+	ace.config.setModuleUrl(
+		'ace/mode/javascript_worker',
+		javascriptWorkerUrl
+	);
+
+	aceWorkersConfigured = true;
+}
 
 /**
  * Component Class
@@ -42,6 +53,7 @@ export default class CodeEditor extends Component {
 	}
 
 	componentDidMount() {
+		ensureAceWorkersConfigured();
 		this.maybeRemovePlaceholder();
 	}
 
