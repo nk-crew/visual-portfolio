@@ -49,6 +49,25 @@ $escaped-svg-characters: (
 
 @import "../../../gutenberg/components/pro-note/style.scss";
 
+:root {
+	--vpf-admin-accent: var(--wp-admin-theme-color, #3858e9);
+	--vpf-admin-accent-soft: color-mix(
+		in srgb,
+		var(--vpf-admin-accent) 10%,
+		transparent
+	);
+	--vpf-admin-accent-soft-strong: color-mix(
+		in srgb,
+		var(--vpf-admin-accent) 14%,
+		transparent
+	);
+	--vpf-admin-accent-hover: color-mix(
+		in srgb,
+		var(--vpf-admin-accent) 88%,
+		#000
+	);
+}
+
 #adminmenu a[href*="https://www.visualportfolio.com/pricing/"],
 .wp-list-table.plugins a[href*="https://www.visualportfolio.com/pricing/"],
 .vpf-admin-toolbar a[href*="https://www.visualportfolio.com/pricing/"] {
@@ -207,12 +226,12 @@ $escaped-svg-characters: (
 
 		&.is-active {
 			padding-bottom: 2px;
-			border-bottom: #007cba solid 3px;
+			border-bottom: var(--vpf-admin-accent) solid 3px;
 		}
 
 		&:hover,
 		&:focus {
-			color: #007cba;
+			color: var(--vpf-admin-accent);
 		}
 
 		.dashicons {
@@ -371,7 +390,7 @@ $escaped-svg-characters: (
 	display: flex;
 	padding: 0;
 	border: none;
-	border-left: 4px solid #2540cc;
+	border-left: 4px solid var(--vpf-admin-accent);
 	box-shadow: 0 0 4px rgba(0, 0, 0, 15%);
 
 	h3 {
@@ -480,7 +499,7 @@ $escaped-svg-characters: (
 			.nav-tab-active {
 				background: #fff;
 				border-color: #d7dbde;
-				border-left-color: #007cba;
+				border-left-color: var(--vpf-admin-accent);
 			}
 		}
 
@@ -707,11 +726,11 @@ $escaped-svg-characters: (
 		}
 
 		input:checked + .vp-toggle-field-slider-round {
-			background-color: #007cba;
+			background-color: var(--vpf-admin-accent);
 		}
 
 		input:focus + .vp-toggle-field-slider-round {
-			box-shadow: 0 0 1px #007cba;
+			box-shadow: 0 0 1px var(--vpf-admin-accent);
 		}
 
 		input:checked + .vp-toggle-field-slider-round::before {
@@ -731,7 +750,7 @@ $escaped-svg-characters: (
 		height: 3px;
 		vertical-align: middle;
 		cursor: pointer;
-		background: #007cba;
+		background: var(--vpf-admin-accent);
 		outline: none;
 		box-shadow: none;
 		appearance: none;
@@ -747,8 +766,8 @@ $escaped-svg-characters: (
 		}
 
 		&:active::-webkit-slider-thumb {
-			border-color: #007cba;
-			box-shadow: 0 0 0 1px #007cba;
+			border-color: var(--vpf-admin-accent);
+			box-shadow: 0 0 0 1px var(--vpf-admin-accent);
 		}
 	}
 
@@ -861,9 +880,9 @@ $escaped-svg-characters: (
 			letter-spacing: .04em;
 			margin-bottom: 18px;
 			padding: 4px 14px;
-			color: #2540CC;
+			color: var(--vpf-admin-accent);
 			text-transform: uppercase;
-			background: rgba(#2540CC, 10%);
+			background: var(--vpf-admin-accent-soft);
 			border-radius: 999px;
 		}
 
@@ -942,8 +961,8 @@ $escaped-svg-characters: (
 					font-size: 13px;
 					font-weight: 700;
 					line-height: 1;
-					color: #2540CC;
-					background: #eef4ff;
+					color: var(--vpf-admin-accent);
+					background: var(--vpf-admin-accent-soft-strong);
 					border-radius: 12px;
 				}
 
@@ -990,11 +1009,11 @@ $escaped-svg-characters: (
 			}
 
 			&.is-primary {
-				background: #2540CC;
+				background: var(--vpf-admin-accent);
 
 				&:hover,
 				&:focus {
-					background: #2145e6;
+					background: var(--vpf-admin-accent-hover);
 				}
 			}
 
