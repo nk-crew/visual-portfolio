@@ -8,6 +8,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { createPatternViaAPI } from '../utils/create-pattern';
 import { createRegularPosts } from '../utils/create-posts';
+import { getEditorCanvas } from '../utils/editor-canvas';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 import { openPublishedPage } from '../utils/open-published-page';
 
@@ -132,14 +133,16 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			],
 		});
 
+		const canvas = getEditorCanvas( page, editor );
+
 		// Verify the Group block and VP block structure exists
-		const groupBlock = page.locator('.wp-block-group').first();
+		const groupBlock = canvas.locator( '.wp-block-group' ).first();
 		await expect(groupBlock).toBeVisible();
 
 		// Check if VP block exists within the group
 		// Note: The preview iframe may not render in the editor when in patterns,
 		// which is what the bug fix addresses
-		const vpBlock = page
+		const vpBlock = canvas
 			.locator('[data-type="visual-portfolio/block"]')
 			.first();
 		if (await vpBlock.isVisible()) {
@@ -209,7 +212,8 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		});
 
 		// Select the Group block - wait for it to be visible first
-		const groupBlock = page.locator('.wp-block-group').first();
+		const canvas = getEditorCanvas( page, editor );
+		const groupBlock = canvas.locator( '.wp-block-group' ).first();
 		await expect(groupBlock).toBeVisible();
 		await groupBlock.click();
 
@@ -338,8 +342,8 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		await page.keyboard.press('Escape');
 
 		// Verify the pattern was inserted - look for the group block or the VP block
-		const insertedGroup = page.locator('.wp-block-group').first();
-		const insertedVP = page
+		const insertedGroup = canvas.locator( '.wp-block-group' ).first();
+		const insertedVP = canvas
 			.locator('[data-type="visual-portfolio/block"]')
 			.first();
 
@@ -395,10 +399,12 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			},
 		});
 
+		const canvas = getEditorCanvas( page, editor );
+
 		// Verify the Visual Portfolio block exists in the editor
 		// The preview may not fully render but the block should be present
 		await expect(
-			page.locator('[data-type="visual-portfolio/block"]')
+			canvas.locator( '[data-type="visual-portfolio/block"]' )
 		).toBeVisible();
 
 		// Publish and verify
@@ -569,10 +575,12 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			],
 		});
 
+		const canvas = getEditorCanvas( page, editor );
+
 		// Verify the Visual Portfolio block is in the editor
 		// The nested structure should contain the VP block
 		await expect(
-			page.locator('[data-type="visual-portfolio/block"]')
+			canvas.locator( '[data-type="visual-portfolio/block"]' )
 		).toBeVisible();
 
 		// Publish and check frontend

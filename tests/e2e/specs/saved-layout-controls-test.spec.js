@@ -8,6 +8,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
  * Internal dependencies
  */
 import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
+import { getEditorCanvas } from '../utils/editor-canvas';
 
 // Test constants
 const POSTS_SOURCE_BUTTON =
@@ -42,9 +43,10 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 	 * Helper to create a saved layout and navigate through initial setup.
 	 * @param admin
 	 * @param page
+	 * @param editor
 	 * @param title
 	 */
-	async function setupSavedLayoutWithPosts( admin, page, title ) {
+	async function setupSavedLayoutWithPosts( admin, page, editor, title ) {
 		await admin.createNewPost( {
 			title,
 			postType: 'vp_lists',
@@ -52,13 +54,17 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 			legacyCanvas: true,
 		} );
 
+		const canvas = getEditorCanvas( page, editor );
+
 		// Select Posts as data source
-		const postsButton = page.locator( POSTS_SOURCE_BUTTON );
+		const postsButton = canvas.locator( POSTS_SOURCE_BUTTON );
 		await expect( postsButton ).toBeVisible();
 		await postsButton.click();
 
 		// Navigate through setup wizard
-		const continueButton = page.getByRole( 'button', { name: 'Continue' } );
+		const continueButton = canvas.getByRole( 'button', {
+			name: 'Continue',
+		} );
 		for ( let i = 0; i < 3; i++ ) {
 			await continueButton.click();
 		}
@@ -125,6 +131,7 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
+			editor,
 			'Test Display Date Control'
 		);
 		await navigateToElementsSection( page );
@@ -160,6 +167,7 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
+			editor,
 			'Test Display Excerpt Control'
 		);
 		await navigateToElementsSection( page );
@@ -210,6 +218,7 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
+			editor,
 			'Test Display Categories Control'
 		);
 		await navigateToElementsSection( page );
@@ -251,6 +260,7 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
+			editor,
 			'Test Multiple Controls'
 		);
 		await navigateToElementsSection( page );
@@ -305,6 +315,7 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
+			editor,
 			'Test Pagination Controls'
 		);
 

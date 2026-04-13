@@ -19,6 +19,7 @@ import expectedArchivePostNameInfinity from '../../fixtures/archive/expected-pos
 import portfolioPosts from '../../fixtures/archive/portfolio-posts.json';
 import imageFixtures from '../../fixtures/images.json';
 import { deleteAllPortfolio } from '../utils/delete-all-portfolio';
+import { getEditorCanvas } from '../utils/editor-canvas';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 
@@ -268,14 +269,16 @@ test.describe('archive pages', () => {
 			name: 'visual-portfolio/block',
 		});
 
-		await page.getByRole('button', { name: 'Posts' }).click();
-		await page.getByRole('button', { name: 'Continue' }).click();
-		await page
+		const canvas = getEditorCanvas( page, editor );
+
+		await canvas.getByRole( 'button', { name: 'Posts' } ).click();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas
 			.getByRole('button', { name: 'Classic Preview Classic' })
 			.click();
-		await page.getByRole('button', { name: 'Continue' }).click();
-		await page.getByLabel('Filter').check();
-		await page.getByRole('button', { name: 'Continue' }).click();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas.getByLabel( 'Filter' ).check();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
 		await page.getByRole('button', { name: 'More' }).click();
 		await page.getByRole('button', { name: 'Current Query' }).click();
 		await page.getByRole('button', { name: 'Layout' }).click();
