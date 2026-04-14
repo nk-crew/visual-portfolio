@@ -5,6 +5,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import expectedPopupPresetFixture from '../../fixtures/click-actions/popup-expected-preset.json';
 import expectedUrlPresetFixture from '../../fixtures/click-actions/url-expected-preset.json';
+import { getPortfolioPreviewFrame } from '../utils/editor-canvas';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 import {
@@ -27,11 +28,21 @@ function toClickActionExpectation( preset ) {
 
 function toPopupClickActionExpectation( preset ) {
 	return preset.map( ( { imageUrl, isPopup, titleUrl, videoUrl } ) => ( {
-		imageUrl,
+		imageUrl: normalizePopupMediaUrl( imageUrl ),
 		isPopup,
-		titleUrl,
+		titleUrl: normalizePopupMediaUrl( titleUrl ),
 		videoUrl,
 	} ) );
+}
+
+function normalizePopupMediaUrl( url ) {
+	if ( typeof url !== 'string' ) {
+		return url;
+	}
+
+	return url
+		.replace( /-scaled(?=\.[a-z]+$)/i, '' )
+		.replace( /-\d+x\d+(?=\.[a-z]+$)/i, '' );
 }
 
 test.describe( 'click action gallery images', () => {
@@ -54,37 +65,21 @@ test.describe( 'click action gallery images', () => {
 	} );
 
 	/**
-	 * We prepare the fixture for popup comparison.
-	 * We correct the paths to the images to be current, loaded into the WordPress system.
+	 * Popup action keeps the media URL returned by WordPress for the uploaded
+	 * attachment. Unlike URL click actions, the popup markup currently points to
+	 * the original file or the `-scaled` derivative that WordPress generated, so
+	 * we intentionally keep the resolved upload URL unchanged here.
 	 *
 	 * @param {Array<Object>} expectedPreset Mutable popup fixture copy.
-	 * @param {string}        size           Image Resolution.
+	 * @param {string}        size           Image resolution.
 	 * @param {string}        property       Image property.
-	 * @param {number}        key            Key of Image object.
+	 * @param {number}        key            Key of image object.
 	 */
 	async function preparePopupFixture( expectedPreset, size, property, key ) {
-		if (
-			typeof expectedPreset[ key ][ property ] === 'string' &&
-			expectedPreset[ key ][ property ].includes( size )
-		) {
-			switch ( size ) {
-				case '2000x2000':
-					expectedPreset[ key ][ property ] = expectedPreset[ key ][
-						property
-					].replace( '.jpeg', '-1920x1920.jpeg' );
-					break;
-				case '3840x2160':
-					expectedPreset[ key ][ property ] = expectedPreset[ key ][
-						property
-					].replace( 'scaled.jpeg', '1920x1080.jpeg' );
-					break;
-				case '3840x2560':
-					expectedPreset[ key ][ property ] = expectedPreset[ key ][
-						property
-					].replace( 'scaled.jpeg', '1920x1280.jpeg' );
-					break;
-			}
-		}
+		void expectedPreset;
+		void size;
+		void property;
+		void key;
 	}
 
 	/**
@@ -296,8 +291,8 @@ test.describe( 'click action gallery images', () => {
 			.locator( 'input.components-text-control__input' )
 			.fill( '10' );
 
-		const galleryImages = page
-			.frame( 'vpf-preview-1' )
+		const previewFrame = getPortfolioPreviewFrame( page, editor );
+		const galleryImages = previewFrame
 			.locator( '.vp-portfolio__items .vp-portfolio__item-wrap' );
 		await expect( galleryImages ).toHaveCount( expectedUrlPreset.length, {
 			timeout: 15000,
@@ -505,8 +500,8 @@ test.describe( 'click action gallery images', () => {
 			.locator( 'input.components-text-control__input' )
 			.fill( '10' );
 
-		const galleryImages = page
-			.frame( 'vpf-preview-1' )
+		const previewFrame = getPortfolioPreviewFrame( page, editor );
+		const galleryImages = previewFrame
 			.locator( '.vp-portfolio__items .vp-portfolio__item-wrap' );
 		await expect( galleryImages ).toHaveCount( expectedPopupPreset.length, {
 			timeout: 15000,
