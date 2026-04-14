@@ -354,9 +354,8 @@ test.describe('archive pages', () => {
 			name: 'Save Changes',
 		});
 
-		if (await saveChangesButton.isEnabled()) {
-			await saveChangesButton.click();
-		}
+		await expect(saveChangesButton).toBeEnabled();
+		await saveChangesButton.click();
 	}
 
 	// This function ensures that the page is fully loaded before any data collection begins.

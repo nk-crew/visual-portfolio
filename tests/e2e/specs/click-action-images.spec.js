@@ -65,24 +65,6 @@ test.describe( 'click action gallery images', () => {
 	} );
 
 	/**
-	 * Popup action keeps the media URL returned by WordPress for the uploaded
-	 * attachment. Unlike URL click actions, the popup markup currently points to
-	 * the original file or the `-scaled` derivative that WordPress generated, so
-	 * we intentionally keep the resolved upload URL unchanged here.
-	 *
-	 * @param {Array<Object>} expectedPreset Mutable popup fixture copy.
-	 * @param {string}        size           Image resolution.
-	 * @param {string}        property       Image property.
-	 * @param {number}        key            Key of image object.
-	 */
-	async function preparePopupFixture( expectedPreset, size, property, key ) {
-		void expectedPreset;
-		void size;
-		void property;
-		void key;
-	}
-
-	/**
 	 * We prepare the fixture for url comparison.
 	 * We correct the paths to the images to be current, loaded into the WordPress system.
 	 *
@@ -460,24 +442,6 @@ test.describe( 'click action gallery images', () => {
 
 					expectedPopupPreset[ key ].imageUrl =
 						await foundImage.imgUrl;
-
-					const match = foundImage.imgUrl.match( /(\d+x\d+)/ );
-
-					if ( match ) {
-						const size = match[ 0 ];
-						await preparePopupFixture(
-							expectedPopupPreset,
-							size,
-							'titleUrl',
-							key
-						);
-						await preparePopupFixture(
-							expectedPopupPreset,
-							size,
-							'imageUrl',
-							key
-						);
-					}
 				}
 			} )
 		);
