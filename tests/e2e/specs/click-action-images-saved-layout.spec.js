@@ -3,6 +3,7 @@
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
+import { getEditorCanvas } from '../utils/editor-canvas';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 import {
@@ -62,7 +63,9 @@ test.describe('click action gallery images (saved layout)', () => {
 			legacyCanvas: true,
 		});
 
-		await page
+		const canvas = getEditorCanvas( page, editor );
+
+		await canvas
 			.locator(
 				'button.components-button.vpf-component-icon-selector-item',
 				{
@@ -80,13 +83,13 @@ test.describe('click action gallery images (saved layout)', () => {
 		);
 		await confirmMediaLibrarySelection(page);
 
-		await page
+		await canvas
 			.locator('button.components-button.is-primary', {
 				hasText: 'Continue',
 			})
 			.click();
 
-		await page
+		await canvas
 			.locator(
 				'button.components-button.vpf-component-icon-selector-item',
 				{
@@ -95,13 +98,13 @@ test.describe('click action gallery images (saved layout)', () => {
 			)
 			.click();
 
-		await page
+		await canvas
 			.locator('button.components-button.is-primary', {
 				hasText: 'Continue',
 			})
 			.click();
 
-		await page
+		await canvas
 			.locator('button.components-button.is-primary', {
 				hasText: 'Continue',
 			})
@@ -251,7 +254,7 @@ test.describe('click action gallery images (saved layout)', () => {
 			attributes: { id: String(postID) },
 		});
 
-		await waitForPortfolioPreview(page);
+		await waitForPortfolioPreview( page, { editor } );
 
 		// Publish Post.
 		await editor.publishPost();

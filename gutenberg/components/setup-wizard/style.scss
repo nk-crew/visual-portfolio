@@ -1,9 +1,14 @@
-@use "sass:color";
-
-$brand_color: #2540cc !default;
-
 .vpf-setup-wizard {
-	--wp-admin-theme-color: #{$brand_color};
+	--vpf-admin-accent: var(--wp-admin-theme-color, #3858e9);
+	--vpf-admin-accent-hover: #314ecf;
+
+	@supports (color: color-mix(in srgb, black 50%, white)) {
+		--vpf-admin-accent-hover: color-mix(
+			in srgb,
+			var(--vpf-admin-accent) 88%,
+			#000
+		);
+	}
 
 	padding: 20px;
 	padding-top: 50px;
@@ -21,7 +26,7 @@ $brand_color: #2540cc !default;
 		}
 
 		.vpf-setup-wizard {
-			border-color: $brand_color;
+			border-color: var(--vpf-admin-accent);
 		}
 	}
 
@@ -61,7 +66,7 @@ $brand_color: #2540cc !default;
 
 		> div {
 			height: 2px;
-			background-color: $brand_color;
+			background-color: var(--vpf-admin-accent);
 			transition: 0.3s width ease;
 		}
 	}
@@ -83,17 +88,17 @@ $brand_color: #2540cc !default;
 
 				&:hover,
 				&:focus {
-					color: $brand_color;
+					color: var(--vpf-admin-accent);
 				}
 			}
 		}
 
 		.components-button.is-primary {
-			background-color: $brand_color;
+			background-color: var(--vpf-admin-accent);
 
 			&:disabled {
-				background-color: $brand_color;
-				border-color: $brand_color;
+				background-color: var(--vpf-admin-accent);
+				border-color: var(--vpf-admin-accent);
 
 				svg {
 					color: #fff;
@@ -102,11 +107,11 @@ $brand_color: #2540cc !default;
 			}
 
 			&:hover:not(:disabled) {
-				background: color.adjust($brand_color, $lightness: -10%);
+				background: var(--vpf-admin-accent-hover);
 			}
 
 			&:focus:not(:disabled) {
-				box-shadow: inset 0 0 0 1px #fff, 0 0 0 1.5px $brand_color;
+				box-shadow: inset 0 0 0 1px #fff, 0 0 0 1.5px var(--vpf-admin-accent);
 			}
 		}
 	}
@@ -148,12 +153,12 @@ $brand_color: #2540cc !default;
 			}
 
 			&.vpf-component-icon-selector-item-active {
-				border-color: $brand_color !important;
-				box-shadow: 0 0 0 1px $brand_color !important;
+				border-color: var(--vpf-admin-accent) !important;
+				box-shadow: 0 0 0 1px var(--vpf-admin-accent) !important;
 
 				svg,
 				span {
-					color: $brand_color;
+					color: var(--vpf-admin-accent);
 				}
 			}
 		}
@@ -216,7 +221,7 @@ $brand_color: #2540cc !default;
 			}
 
 			&.vpf-component-icon-selector-item-active {
-				box-shadow: 0 0 0 1.5px #fff, 0 0 0 3.5px $brand_color !important;
+				box-shadow: 0 0 0 1.5px #fff, 0 0 0 3.5px var(--vpf-admin-accent) !important;
 			}
 
 			> span {

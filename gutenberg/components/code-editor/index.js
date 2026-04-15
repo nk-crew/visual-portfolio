@@ -1,6 +1,12 @@
 // It is required to load react-ace first.
 // eslint-disable-next-line simple-import-sort/imports
 import AceEditor from 'react-ace';
+import ace from 'ace-builds';
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import cssWorkerUrl from 'file-loader?esModule=false&name=gutenberg/[name].[contenthash].[ext]!ace-builds/src-noconflict/worker-css.js';
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import javascriptWorkerUrl from 'file-loader?esModule=false&name=gutenberg/[name].[contenthash].[ext]!ace-builds/src-noconflict/worker-javascript.js';
 
 import 'ace-builds/src-noconflict/mode-css';
 import 'ace-builds/src-noconflict/mode-javascript';
@@ -12,6 +18,25 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import './style.scss';
 
 import { Component } from '@wordpress/element';
+
+let aceWorkersConfigured = false;
+
+function ensureAceWorkersConfigured() {
+	if ( aceWorkersConfigured ) {
+		return;
+	}
+
+	// Ace worker paths must be registered explicitly in our webpack build,
+	// otherwise the editor falls back to a relative `worker-*.js` URL that
+	// does not exist.
+	ace.config.setModuleUrl( 'ace/mode/css_worker', cssWorkerUrl );
+	ace.config.setModuleUrl(
+		'ace/mode/javascript_worker',
+		javascriptWorkerUrl
+	);
+
+	aceWorkersConfigured = true;
+}
 
 /**
  * Component Class
@@ -28,6 +53,7 @@ export default class CodeEditor extends Component {
 	}
 
 	componentDidMount() {
+		ensureAceWorkersConfigured();
 		this.maybeRemovePlaceholder();
 	}
 

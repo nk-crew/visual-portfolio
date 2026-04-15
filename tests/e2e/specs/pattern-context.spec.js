@@ -8,6 +8,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { createPatternViaAPI } from '../utils/create-pattern';
 import { createRegularPosts } from '../utils/create-posts';
+import { getEditorCanvas } from '../utils/editor-canvas';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 import { openPublishedPage } from '../utils/open-published-page';
 
@@ -132,14 +133,16 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			],
 		});
 
+		const canvas = getEditorCanvas( page, editor );
+
 		// Verify the Group block and VP block structure exists
-		const groupBlock = page.locator('.wp-block-group').first();
+		const groupBlock = canvas.locator( '.wp-block-group' ).first();
 		await expect(groupBlock).toBeVisible();
 
 		// Check if VP block exists within the group
 		// Note: The preview iframe may not render in the editor when in patterns,
 		// which is what the bug fix addresses
-		const vpBlock = page
+		const vpBlock = canvas
 			.locator('[data-type="visual-portfolio/block"]')
 			.first();
 		if (await vpBlock.isVisible()) {
@@ -170,6 +173,9 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		editor,
 		requestUtils,
 	}) => {
+		const patternTitle =
+			'Test pattern with parent block and our inner VP block';
+
 		// Upload test images - use cached version
 		const images = await maybeUploadImages({
 			requestUtils,
@@ -209,7 +215,8 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		});
 
 		// Select the Group block - wait for it to be visible first
-		const groupBlock = page.locator('.wp-block-group').first();
+		const canvas = getEditorCanvas( page, editor );
+		const groupBlock = canvas.locator( '.wp-block-group' ).first();
 		await expect(groupBlock).toBeVisible();
 		await groupBlock.click();
 
@@ -240,9 +247,7 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 
 		// Clear any existing text and fill in the pattern name
 		await nameInput.click();
-		await nameInput.fill(
-			'Test pattern with parent block and our inner VP block'
-		);
+		await nameInput.fill( patternTitle );
 
 		// Ensure the Synced toggle is checked (it should be by default)
 		const syncedCheckbox = modal.locator('input[type="checkbox"]');
@@ -264,6 +269,36 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		// Save the page
 		await editor.saveDraft();
 
+		let syncedPatternId = null;
+		for ( let attempt = 0; attempt < 5; attempt++ ) {
+			const blocks = await requestUtils.rest( {
+				path: '/wp/v2/blocks',
+				method: 'GET',
+				params: {
+					search: patternTitle,
+					per_page: 20,
+					context: 'edit',
+				},
+			} );
+
+			const matchedPattern = Array.isArray( blocks )
+				? blocks.find(
+						( block ) =>
+							block?.title?.rendered === patternTitle ||
+							block?.title?.raw === patternTitle
+				  )
+				: null;
+
+			if ( matchedPattern?.id ) {
+				syncedPatternId = matchedPattern.id;
+				break;
+			}
+
+			await page.waitForTimeout( 1000 );
+		}
+
+		expect( syncedPatternId ).toBeTruthy();
+
 		// Create a new page to use the pattern
 		await admin.createNewPost({
 			title: 'Use Pattern Page',
@@ -272,82 +307,20 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			legacyCanvas: true,
 		});
 
-		// Open inserter - try different selectors based on editor state
-		const mainInserter = page.locator(
-			'button[aria-label="Toggle block inserter"]'
-		);
-		if (await mainInserter.isVisible()) {
-			await mainInserter.click();
-		} else {
-			// If that's not visible, try the inline "+" button
-			const plusButton = page
-				.locator('button[aria-label="Add block"]')
-				.first();
-			if (await plusButton.isVisible()) {
-				await plusButton.click();
-			} else {
-				// If neither worked, type "/" to trigger the inserter
-				await page.keyboard.type('/');
-			}
-		}
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: syncedPatternId },
+		} );
 
-		// Search for our pattern directly (newer WordPress versions show search immediately)
-		let searchBox = page.getByRole('searchbox', { name: /Search/i });
-
-		// If search box is not immediately visible, try Patterns tab first
-		if (!(await searchBox.isVisible())) {
-			const patternsTab = page.getByRole('tab', { name: /Patterns/i });
-			if (await patternsTab.isVisible()) {
-				await patternsTab.click();
-			}
-		}
-
-		// Now search for the pattern
-		searchBox = page.getByRole('searchbox', { name: /Search/i });
-		await expect(searchBox).toBeVisible();
-		await searchBox.fill('Test pattern with parent');
-
-		// Click on the pattern to insert it
-		// Try different selectors for finding the pattern
-		const patternListItem = page
-			.locator('.block-editor-block-patterns-list__item')
-			.filter({ hasText: 'Test pattern with parent' })
-			.first();
-
-		if (await patternListItem.isVisible()) {
-			await patternListItem.click();
-		} else {
-			// Try the option role approach
-			const patternOption = page
-				.getByRole('option')
-				.filter({ hasText: 'Test pattern with parent' })
-				.first();
-			await expect(patternOption).toBeVisible();
-			await patternOption.click();
-		}
-
-		// Close the inserter if it's still open
-		const inserterCloseButton = page.locator(
-			'button[aria-label="Close block inserter"]'
-		);
-		if (await inserterCloseButton.isVisible()) {
-			await inserterCloseButton.click();
-		}
-
-		// Press Escape to ensure we're out of any insertion mode
-		await page.keyboard.press('Escape');
-
-		// Verify the pattern was inserted - look for the group block or the VP block
-		const insertedGroup = page.locator('.wp-block-group').first();
-		const insertedVP = page
-			.locator('[data-type="visual-portfolio/block"]')
-			.first();
-
-		// Either the group or VP block should be visible
-		const hasInsertedContent =
-			(await insertedGroup.isVisible()) || (await insertedVP.isVisible());
-
-		expect(hasInsertedContent).toBeTruthy();
+		// Verify the synced pattern block was inserted and give the editor a
+		// moment to resolve the referenced pattern content asynchronously.
+		const insertedPattern = canvas.locator( '.wp-block-block' ).first();
+		await expect( insertedPattern ).toBeVisible();
+		await expect(
+			insertedPattern.locator( '.components-spinner' )
+		).toHaveCount( 0, {
+			timeout: 10000,
+		} );
 
 		// Save and publish the page
 		await editor.publishPost();
@@ -395,10 +368,12 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			},
 		});
 
+		const canvas = getEditorCanvas( page, editor );
+
 		// Verify the Visual Portfolio block exists in the editor
 		// The preview may not fully render but the block should be present
 		await expect(
-			page.locator('[data-type="visual-portfolio/block"]')
+			canvas.locator( '[data-type="visual-portfolio/block"]' )
 		).toBeVisible();
 
 		// Publish and verify
@@ -569,10 +544,12 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			],
 		});
 
+		const canvas = getEditorCanvas( page, editor );
+
 		// Verify the Visual Portfolio block is in the editor
 		// The nested structure should contain the VP block
 		await expect(
-			page.locator('[data-type="visual-portfolio/block"]')
+			canvas.locator( '[data-type="visual-portfolio/block"]' )
 		).toBeVisible();
 
 		// Publish and check frontend

@@ -5,7 +5,6 @@ import apiFetch from '@wordpress/api-fetch';
 import {
 	BaseControl,
 	Button,
-	ButtonGroup,
 	TextControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -13,6 +12,7 @@ import { RawHTML, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 
+import ButtonsGroup from '../components/buttons-group';
 import Notice from '../components/notice';
 import controlGetValue from '../utils/control-get-value';
 
@@ -175,7 +175,12 @@ function ItemsCountControl( { data } ) {
 			__nextHasNoMarginBottom
 		>
 			<div>
-				<ButtonGroup>
+				<ButtonsGroup
+					aria-label={ __(
+						'Items count mode',
+						'visual-portfolio'
+					) }
+				>
 					<Button
 						variant={ controlVal !== -1 ? 'primary' : '' }
 						isPressed={ controlVal !== -1 }
@@ -207,7 +212,7 @@ function ItemsCountControl( { data } ) {
 					>
 						{ __( 'All Items', 'visual-portfolio' ) }
 					</Button>
-				</ButtonGroup>
+				</ButtonsGroup>
 			</div>
 			{ controlVal !== -1 ? (
 				<>

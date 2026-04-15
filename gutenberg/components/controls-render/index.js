@@ -6,7 +6,6 @@ import {
 	__experimentalUnitControl,
 	BaseControl,
 	Button,
-	ButtonGroup,
 	CheckboxControl,
 	Notice,
 	PanelBody,
@@ -38,6 +37,7 @@ import { maybeDecode, maybeEncode } from '../../utils/encode-decode';
 import getControlNameClassName from '../../utils/get-control-name-class-name';
 import AlignControl from '../align-control';
 import AspectRatio from '../aspect-ratio';
+import ButtonsGroup from '../buttons-group';
 import ClassesTree from '../classes-tree';
 import CodeEditor from '../code-editor';
 import CollapseControl from '../collapse-control';
@@ -488,7 +488,7 @@ ControlsRender.Control = function ( props ) {
 			break;
 		case 'buttons':
 			renderControl = (
-				<ButtonGroup>
+				<ButtonsGroup aria-label={ props.label || props.name }>
 					{ Object.keys( props.options || {} ).map( ( val ) => (
 						<Button
 							variant={ controlVal === val ? 'primary' : '' }
@@ -499,7 +499,7 @@ ControlsRender.Control = function ( props ) {
 							{ props.options[ val ] }
 						</Button>
 					) ) }
-				</ButtonGroup>
+				</ButtonsGroup>
 			);
 			break;
 		case 'icons_selector':

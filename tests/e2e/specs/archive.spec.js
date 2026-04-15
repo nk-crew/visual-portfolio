@@ -19,6 +19,7 @@ import expectedArchivePostNameInfinity from '../../fixtures/archive/expected-pos
 import portfolioPosts from '../../fixtures/archive/portfolio-posts.json';
 import imageFixtures from '../../fixtures/images.json';
 import { deleteAllPortfolio } from '../utils/delete-all-portfolio';
+import { getEditorCanvas } from '../utils/editor-canvas';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 
@@ -268,14 +269,16 @@ test.describe('archive pages', () => {
 			name: 'visual-portfolio/block',
 		});
 
-		await page.getByRole('button', { name: 'Posts' }).click();
-		await page.getByRole('button', { name: 'Continue' }).click();
-		await page
+		const canvas = getEditorCanvas( page, editor );
+
+		await canvas.getByRole( 'button', { name: 'Posts' } ).click();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas
 			.getByRole('button', { name: 'Classic Preview Classic' })
 			.click();
-		await page.getByRole('button', { name: 'Continue' }).click();
-		await page.getByLabel('Filter').check();
-		await page.getByRole('button', { name: 'Continue' }).click();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas.getByLabel( 'Filter' ).check();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
 		await page.getByRole('button', { name: 'More' }).click();
 		await page.getByRole('button', { name: 'Current Query' }).click();
 		await page.getByRole('button', { name: 'Layout' }).click();
@@ -346,7 +349,13 @@ test.describe('archive pages', () => {
 			.click();
 		await page.getByRole('option', { name: 'Portfolio' }).first().click();
 		await page.getByLabel('Archive Page Items Per Page').fill('2');
-		await page.getByRole('button', { name: 'Save Changes' }).click();
+
+		const saveChangesButton = page.getByRole('button', {
+			name: 'Save Changes',
+		});
+
+		await expect(saveChangesButton).toBeEnabled();
+		await saveChangesButton.click();
 	}
 
 	// This function ensures that the page is fully loaded before any data collection begins.
@@ -655,84 +664,74 @@ test.describe('archive pages', () => {
 			});
 		}
 
-		let categoryKey = 0;
+		async function collectCategoryItems() {
+			const collectedItems = [];
+			let attempts = 0;
 
-		for (const category of receivedCategories) {
-			await Promise.all([
-				awaitPageLoading(page),
-				page
-					.waitForSelector('.vp-portfolio__ready', {
-						state: 'detached',
-						timeout: 500,
-					})
-					.catch(() => {
-						/* ignore if it doesn’t detach */
-					}),
-				page.waitForSelector('.vp-portfolio__ready', {
-					state: 'attached',
-					timeout: 15000,
-				}),
-				page
-					.locator('.vp-filter .vp-filter__item')
-					.filter({ hasText: category.title })
-					.click(),
-			]);
+			while (attempts < 10) {
+				await awaitPageLoading(page);
 
-			const pagination = page.locator(
-				'.vp-portfolio__layout-elements .vp-pagination'
-			);
-
-			let archiveItems = [];
-
-			switch (typePagination) {
-				case 'paged':
-					archiveItems = await getArchiveItems(page);
-
+				for (const item of await getArchiveItems(page)) {
 					if (
-						archiveItems.length === 2 &&
-						(await pagination.count())
+						!collectedItems.some(
+							(existingItem) => existingItem.url === item.url
+						)
 					) {
-						await clickToPagination(page, pagination);
-
-						await awaitPageLoading(page);
-
-						archiveItems = archiveItems.concat(
-							await getArchiveItems(page)
-						);
+						collectedItems.push(item);
 					}
-					break;
-				case 'loadMore':
-				case 'inf':
-					if (
-						await pagination
-							.locator('a.vp-pagination__load-more')
-							.count()
-					) {
-						const nextPageAttribute = await pagination
-							.locator('a.vp-pagination__load-more')
-							.getAttribute('href');
-						if (nextPageAttribute !== '') {
-							await clickToPagination(
-								page,
-								pagination,
-								typePagination
-							);
+				}
 
-							await awaitPageLoading(page);
-						}
+				const pagination = page.locator(
+					'.vp-portfolio__layout-elements .vp-pagination'
+				);
+
+				if (typePagination === 'paged') {
+					const nextPageExists = await pagination
+						.locator(
+							'.vp-pagination__item.vp-pagination__item-next > a'
+						)
+						.isVisible();
+
+					if (!nextPageExists) {
+						break;
 					}
 
-					// Wait for archiveItems to be filled
-					while (archiveItems.length === 0) {
-						await page.waitForTimeout(100); // Wait for 100ms before checking again
-						archiveItems = (await getArchiveItems(page)) || [];
+					await clickToPagination(page, pagination, typePagination);
+				} else {
+					const loadMoreButton = pagination.locator(
+						'a.vp-pagination__load-more'
+					);
+
+					if (!(await loadMoreButton.count())) {
+						break;
 					}
-					break;
+
+					const nextPageAttribute = await loadMoreButton.getAttribute(
+						'href'
+					);
+
+					if (!nextPageAttribute) {
+						break;
+					}
+
+					await clickToPagination(page, pagination, typePagination);
+				}
+
+				attempts++;
 			}
 
-			receivedCategories[categoryKey].items = archiveItems;
+			return collectedItems;
+		}
 
-			categoryKey++;
+		for (
+			let categoryKey = 0;
+			categoryKey < receivedCategories.length;
+			categoryKey++
+		) {
+			const category = receivedCategories[categoryKey];
+			await page.goto(category.url);
+			receivedCategories[categoryKey].items =
+				await collectCategoryItems();
 		}
 
 		return receivedCategories;
