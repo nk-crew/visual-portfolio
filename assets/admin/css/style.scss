@@ -450,6 +450,12 @@ $escaped-svg-characters: (
 .toplevel_page_visual-portfolio-settings {
 	$settings_nav_width: 220px !default;
 	$settings_content_height: 340px !default;
+	// Align settings controls with modern WP admin (forms / components).
+	$vp-settings-control-border: #949494;
+	$vp-settings-control-border-focus: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	$vp-settings-control-radius: 2px;
+	$vp-settings-control-height: 40px;
+	$vp-settings-control-padding-x: 12px;
 
 	// Navigation.
 	@media (min-width: 782px) {
@@ -755,22 +761,77 @@ $escaped-svg-characters: (
 	.vp-range-number-field {
 		box-sizing: border-box;
 		width: 55px;
+		min-height: $vp-settings-control-height;
+		padding: 4px 8px;
 		margin-left: 9px;
 		vertical-align: middle;
+		font-size: 14px;
+		line-height: 1.5;
+		color: #1d2327;
 		background: #fff;
-		border: 1px solid #8f969f;
-		border-radius: 4px;
+		border: 1px solid $vp-settings-control-border;
+		border-radius: $vp-settings-control-radius;
+		box-shadow: none;
+
+		&:focus {
+			border-color: $vp-settings-control-border-focus;
+			outline: 2px solid transparent;
+			box-shadow: 0 0 0 1px $vp-settings-control-border-focus;
+		}
 	}
 
 	/**
-     * Select2 Field
+     * Select2 (e.g. Archive Page) — match native admin controls.
      */
 	.select2-container {
+		max-width: 100%;
+
 		.select2-selection--single {
+			box-sizing: border-box;
 			width: 350px;
-			height: 30px;
-			border: 1px solid #8c8f94;
+			max-width: 100%;
+			height: auto !important;
+			min-height: $vp-settings-control-height;
+			background-color: #fff;
+			border: 1px solid $vp-settings-control-border;
+			border-radius: $vp-settings-control-radius;
 		}
+
+		.select2-selection--single .select2-selection__rendered {
+			padding-right: 36px;
+			padding-left: $vp-settings-control-padding-x;
+			font-size: 14px;
+			line-height: calc(#{$vp-settings-control-height} - 2px);
+			color: #1d2327;
+		}
+
+		.select2-selection--single .select2-selection__arrow {
+			top: 0;
+			right: 2px;
+			width: 28px;
+			height: 100%;
+			min-height: calc(#{$vp-settings-control-height} - 2px);
+		}
+
+		&.select2-container--focus .select2-selection--single,
+		&.select2-container--open .select2-selection--single {
+			border-color: $vp-settings-control-border-focus;
+			box-shadow: 0 0 0 1px $vp-settings-control-border-focus;
+		}
+	}
+
+	.select2-dropdown {
+		border-color: $vp-settings-control-border;
+		border-radius: $vp-settings-control-radius;
+	}
+
+	.select2-search__field {
+		min-height: 34px;
+		line-height: 1.4;
+	}
+
+	.select2-container--default .select2-results__option--highlighted[aria-selected] {
+		background-color: $vp-settings-control-border-focus;
 	}
 }
 
