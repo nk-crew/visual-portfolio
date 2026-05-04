@@ -38,7 +38,11 @@
 		"postinstall": "composer install"
 	},
 	"overrides": {
-		"webpack-dev-server": "5.2.2"
+		"webpack-dev-server": "5.2.2",
+		"react-sortable-hoc": {
+			"react": "^18.3.1",
+			"react-dom": "^18.3.1"
+		}
 	},
 	"devDependencies": {
 		"@babel/node": "^7.23.9",
