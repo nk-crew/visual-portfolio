@@ -4,6 +4,7 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { createRegularPosts } from '../utils/create-posts';
+import { getEditorCanvas } from '../utils/editor-canvas';
 
 test.describe('iframe preview resize', () => {
 	test.beforeAll(async ({ requestUtils }) => {
@@ -47,16 +48,18 @@ test.describe('iframe preview resize', () => {
 			name: 'visual-portfolio/block',
 		});
 
-		await page.getByRole('button', { name: 'Posts' }).click();
-		await page.getByRole('button', { name: 'Continue' }).click();
-		await page
+		const canvas = getEditorCanvas( page, editor );
+
+		await canvas.getByRole( 'button', { name: 'Posts' } ).click();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas
 			.getByRole('button', { name: 'Classic Preview Classic' })
 			.click();
-		await page.getByRole('button', { name: 'Continue' }).click();
-		await page.getByRole('button', { name: 'Continue' }).click();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
 		await page.getByRole('button', { name: 'Post', exact: true }).click();
 
-		const iframe = page.locator(
+		const iframe = canvas.locator(
 			'.visual-portfolio-gutenberg-preview:not(.visual-portfolio-gutenberg-preview-loading) iframe'
 		);
 		await iframe.waitFor({ state: 'visible' });

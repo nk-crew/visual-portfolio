@@ -10,6 +10,7 @@ import save from './save';
 import transforms from './transforms';
 
 const { name, title } = metadata;
+const legacyBlockName = 'nk/visual-portfolio';
 
 const settings = {
 	icon: {
@@ -24,10 +25,13 @@ const settings = {
 registerBlockType( name, settings );
 
 // Fallback.
-registerBlockType( 'nk/visual-portfolio', {
+registerBlockType( legacyBlockName, {
 	...settings,
+	apiVersion: metadata.apiVersion,
+	category: metadata.category,
+	description: metadata.description,
+	keywords: metadata.keywords,
 	title,
-	name: 'nk/visual-portfolio',
 	attributes: {
 		id: {
 			type: 'string',
@@ -47,7 +51,7 @@ registerBlockType( 'nk/visual-portfolio', {
 
 		replaceBlocks(
 			[ props.clientId ],
-			createBlock( 'visual-portfolio/saved', props.attributes || {} )
+			createBlock( name, props.attributes || {} )
 		);
 
 		return null;

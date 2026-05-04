@@ -32,17 +32,22 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
 	 * Register Block.
 	 */
 	public function register_block() {
-		register_block_type_from_metadata(
+		$saved_block = register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/block-saved',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
 			)
 		);
 
-		// Fallback.
-		register_block_type_from_metadata(
+		if ( ! $saved_block ) {
+			return;
+		}
+
+		// Legacy alias used only to migrate old content to the current block name.
+		register_block_type(
 			'nk/visual-portfolio',
 			array(
+				'api_version'     => $saved_block->api_version,
 				'render_callback' => array( $this, 'block_render' ),
 				'attributes'      => array(
 					'id' => array(
@@ -57,6 +62,12 @@ class Visual_Portfolio_Gutenberg_Saved_Block {
 					'anchor' => array(
 						'type' => 'string',
 					),
+				),
+				'supports'        => array_merge(
+					(array) $saved_block->supports,
+					array(
+						'inserter' => false,
+					)
 				),
 			)
 		);
