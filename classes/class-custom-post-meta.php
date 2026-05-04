@@ -408,11 +408,16 @@ class Visual_Portfolio_Custom_Post_Meta {
 			$post_id = get_the_ID();
 		}
 
-		$content     = get_the_content( null, false, $post_id );
-		$content     = wp_strip_all_tags( $content );
-		$words_count = count( preg_split( '/\s+/', $content ) );
+		$content = get_post_field( 'post_content', $post_id, 'raw' );
+		$content = is_string( $content ) ? trim( wp_strip_all_tags( $content ) ) : '';
 
-		return $words_count;
+		if ( '' === $content ) {
+			return 0;
+		}
+
+		$words = preg_split( '/\s+/', $content, -1, PREG_SPLIT_NO_EMPTY );
+
+		return is_array( $words ) ? count( $words ) : 0;
 	}
 }
 
