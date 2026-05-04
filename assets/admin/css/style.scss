@@ -49,7 +49,7 @@ $escaped-svg-characters: (
 
 @import "../../../gutenberg/components/pro-note/style.scss";
 
-#adminmenu a[href*="https://www.visualportfolio.com/pricing/"],
+#adminmenu .wp-submenu a[href*="https://www.visualportfolio.com/pricing/"],
 .wp-list-table.plugins a[href*="https://www.visualportfolio.com/pricing/"],
 .vpf-admin-toolbar a[href*="https://www.visualportfolio.com/pricing/"] {
 	font-weight: 700;
@@ -207,12 +207,12 @@ $escaped-svg-characters: (
 
 		&.is-active {
 			padding-bottom: 2px;
-			border-bottom: #007cba solid 3px;
+			border-bottom: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) solid 3px;
 		}
 
 		&:hover,
 		&:focus {
-			color: #007cba;
+			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		}
 
 		.dashicons {
@@ -371,7 +371,7 @@ $escaped-svg-characters: (
 	display: flex;
 	padding: 0;
 	border: none;
-	border-left: 4px solid #2540cc;
+	border-left: 4px solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 	box-shadow: 0 0 4px rgba(0, 0, 0, 15%);
 
 	h3 {
@@ -450,6 +450,12 @@ $escaped-svg-characters: (
 .toplevel_page_visual-portfolio-settings {
 	$settings_nav_width: 220px !default;
 	$settings_content_height: 340px !default;
+	// Align settings controls with modern WP admin (forms / components).
+	$vp-settings-control-border: #949494;
+	$vp-settings-control-border-focus: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	$vp-settings-control-radius: 2px;
+	$vp-settings-control-height: 40px;
+	$vp-settings-control-padding-x: 12px;
 
 	// Navigation.
 	@media (min-width: 782px) {
@@ -480,7 +486,7 @@ $escaped-svg-characters: (
 			.nav-tab-active {
 				background: #fff;
 				border-color: #d7dbde;
-				border-left-color: #007cba;
+				border-left-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 			}
 		}
 
@@ -707,11 +713,11 @@ $escaped-svg-characters: (
 		}
 
 		input:checked + .vp-toggle-field-slider-round {
-			background-color: #007cba;
+			background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		}
 
 		input:focus + .vp-toggle-field-slider-round {
-			box-shadow: 0 0 1px #007cba;
+			box-shadow: 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		}
 
 		input:checked + .vp-toggle-field-slider-round::before {
@@ -731,7 +737,7 @@ $escaped-svg-characters: (
 		height: 3px;
 		vertical-align: middle;
 		cursor: pointer;
-		background: #007cba;
+		background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		outline: none;
 		box-shadow: none;
 		appearance: none;
@@ -747,30 +753,85 @@ $escaped-svg-characters: (
 		}
 
 		&:active::-webkit-slider-thumb {
-			border-color: #007cba;
-			box-shadow: 0 0 0 1px #007cba;
+			border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+			box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		}
 	}
 
 	.vp-range-number-field {
 		box-sizing: border-box;
 		width: 55px;
+		min-height: $vp-settings-control-height;
+		padding: 4px 8px;
 		margin-left: 9px;
 		vertical-align: middle;
+		font-size: 14px;
+		line-height: 1.5;
+		color: #1d2327;
 		background: #fff;
-		border: 1px solid #8f969f;
-		border-radius: 4px;
+		border: 1px solid $vp-settings-control-border;
+		border-radius: $vp-settings-control-radius;
+		box-shadow: none;
+
+		&:focus {
+			border-color: $vp-settings-control-border-focus;
+			outline: 2px solid transparent;
+			box-shadow: 0 0 0 1px $vp-settings-control-border-focus;
+		}
 	}
 
 	/**
-     * Select2 Field
+     * Select2 (e.g. Archive Page) — match native admin controls.
      */
 	.select2-container {
+		max-width: 100%;
+
 		.select2-selection--single {
+			box-sizing: border-box;
 			width: 350px;
-			height: 30px;
-			border: 1px solid #8c8f94;
+			max-width: 100%;
+			height: auto !important;
+			min-height: $vp-settings-control-height;
+			background-color: #fff;
+			border: 1px solid $vp-settings-control-border;
+			border-radius: $vp-settings-control-radius;
 		}
+
+		.select2-selection--single .select2-selection__rendered {
+			padding-right: 36px;
+			padding-left: $vp-settings-control-padding-x;
+			font-size: 14px;
+			line-height: calc(#{$vp-settings-control-height} - 2px);
+			color: #1d2327;
+		}
+
+		.select2-selection--single .select2-selection__arrow {
+			top: 0;
+			right: 2px;
+			width: 28px;
+			height: 100%;
+			min-height: calc(#{$vp-settings-control-height} - 2px);
+		}
+
+		&.select2-container--focus .select2-selection--single,
+		&.select2-container--open .select2-selection--single {
+			border-color: $vp-settings-control-border-focus;
+			box-shadow: 0 0 0 1px $vp-settings-control-border-focus;
+		}
+	}
+
+	.select2-dropdown {
+		border-color: $vp-settings-control-border;
+		border-radius: $vp-settings-control-radius;
+	}
+
+	.select2-search__field {
+		min-height: 34px;
+		line-height: 1.4;
+	}
+
+	.select2-container--default .select2-results__option--highlighted[aria-selected] {
+		background-color: $vp-settings-control-border-focus;
 	}
 }
 
@@ -861,9 +922,13 @@ $escaped-svg-characters: (
 			letter-spacing: .04em;
 			margin-bottom: 18px;
 			padding: 4px 14px;
-			color: #2540CC;
+			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 			text-transform: uppercase;
-			background: rgba(#2540CC, 10%);
+			background: color-mix(
+				in srgb,
+				var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) 10%,
+				transparent
+			);
 			border-radius: 999px;
 		}
 
@@ -942,8 +1007,12 @@ $escaped-svg-characters: (
 					font-size: 13px;
 					font-weight: 700;
 					line-height: 1;
-					color: #2540CC;
-					background: #eef4ff;
+					color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+					background: color-mix(
+						in srgb,
+						var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) 14%,
+						transparent
+					);
 					border-radius: 12px;
 				}
 
@@ -990,11 +1059,11 @@ $escaped-svg-characters: (
 			}
 
 			&.is-primary {
-				background: #2540CC;
+				background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 
 				&:hover,
 				&:focus {
-					background: #2145e6;
+					background: var(--wp-admin-theme-color-darker-10, var(--wp-admin-theme-color-darker-20, var(--wp-admin-theme-color, #3858e9)));
 				}
 			}
 

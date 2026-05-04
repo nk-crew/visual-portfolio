@@ -35,7 +35,7 @@
 
 			&:hover,
 			&:focus {
-				color: var(--wp-admin-theme-color);
+				color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 				background: #f9f8f8;
 				border-color: #cbcbcb;
 			}
@@ -101,7 +101,7 @@
 
 	&:hover,
 	&:focus {
-		color: var(--wp-admin-theme-color);
+		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		border-color: $gray-600;
 	}
 }

@@ -7,6 +7,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
  * Internal dependencies
  */
 import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
+import { getEditorCanvas } from '../utils/editor-canvas';
 
 // Test constants
 const READ_MORE_CONTROL_SELECTOR =
@@ -42,11 +43,12 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 	/**
 	 * Helper to create a saved layout and navigate through initial setup.
 	 *
-	 * @param {Admin}  admin WordPress admin helpers
-	 * @param {Page}   page  Playwright page object
-	 * @param {string} title Layout title
+	 * @param {Admin}  admin  WordPress admin helpers
+	 * @param {Page}   page   Playwright page object
+	 * @param {Editor} editor Gutenberg editor helpers
+	 * @param {string} title  Layout title
 	 */
-	async function setupSavedLayoutWithPosts(admin, page, title) {
+	async function setupSavedLayoutWithPosts( admin, page, editor, title ) {
 		await admin.createNewPost({
 			title,
 			postType: 'vp_lists',
@@ -54,14 +56,18 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 			legacyCanvas: true,
 		});
 
+		const canvas = getEditorCanvas( page, editor );
+
 		// Select Posts as data source
-		const postsButton = page.locator(POSTS_SOURCE_BUTTON);
-		await expect(postsButton).toBeVisible();
+		const postsButton = canvas.locator( POSTS_SOURCE_BUTTON );
+		await expect( postsButton ).toBeVisible();
 		await postsButton.click();
 
 		// Navigate through setup wizard
-		const continueButton = page.getByRole('button', { name: 'Continue' });
-		for (let i = 0; i < 3; i++) {
+		const continueButton = canvas.getByRole( 'button', {
+			name: 'Continue',
+		} );
+		for ( let i = 0; i < 3; i++ ) {
 			await continueButton.click();
 		}
 	}
@@ -104,7 +110,12 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 		admin,
 		editor,
 	}) => {
-		await setupSavedLayoutWithPosts(admin, page, 'Test Read More Control');
+		await setupSavedLayoutWithPosts(
+			admin,
+			page,
+			editor,
+			'Test Read More Control'
+		);
 		await navigateToElementsSection(page);
 
 		// Enable excerpt and get control
@@ -139,6 +150,7 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
+			editor,
 			'Test Read More Persistence'
 		);
 		await navigateToElementsSection(page);
@@ -172,7 +184,12 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 		admin,
 		editor,
 	}) => {
-		await setupSavedLayoutWithPosts(admin, page, 'Test Read More Options');
+		await setupSavedLayoutWithPosts(
+			admin,
+			page,
+			editor,
+			'Test Read More Options'
+		);
 		await navigateToElementsSection(page);
 
 		const readMoreControl = await enableExcerptAndGetControl(page);

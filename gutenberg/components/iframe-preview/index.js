@@ -239,12 +239,19 @@ class IframePreview extends Component {
 			let reload = false;
 
 			Object.keys( changedAttributes ).forEach( ( name ) => {
+				// Attributes not registered as controls (e.g. the saved
+				// layout "id") have no dynamic CSS and no reload flag, so
+				// the safest default is to reload the iframe.
+				if ( ! registeredControls[ name ] ) {
+					reload = true;
+					return;
+				}
+
 				// Don't reload if block has dynamic styles.
 				const hasStyles = hasDynamicCSS( name );
 
 				// Don't reload if reloading disabled in control attributes.
 				const hasReloadAttribute =
-					registeredControls[ name ] &&
 					registeredControls[ name ].reload_iframe;
 
 				reload = reload || ( ! hasStyles && hasReloadAttribute );

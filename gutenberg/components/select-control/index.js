@@ -1,5 +1,7 @@
 import './style.scss';
 
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
 import selectStyles from 'gutenberg-react-select-styles';
 import $ from 'jquery';
 import rafSchd from 'raf-schd';
@@ -13,7 +15,7 @@ import {
 } from 'react-sortable-hoc';
 import { debounce } from 'throttle-debounce';
 
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const { Option } = components;
@@ -63,7 +65,12 @@ export default class VpfSelectControl extends Component {
 		this.state = {
 			options: {},
 			ajaxStatus: !! callback,
+			emotionReady: false,
 		};
+
+		this.probeRef = createRef();
+		this.emotionCache = null;
+		this.ownerDocument = null;
 
 		this.getOptions = this.getOptions.bind( this );
 		this.getDefaultValue = this.getDefaultValue.bind( this );
@@ -74,6 +81,28 @@ export default class VpfSelectControl extends Component {
 
 	componentDidMount() {
 		const { callback } = this.props;
+
+		// Detect whether we're rendered inside an iframe (WP 6.9+ editor
+		// canvas).  If so, create an @emotion cache that injects styles
+		// into the iframe's <head> instead of the parent document.
+		// This MUST happen before react-select renders for the first time,
+		// so we use a two-pass approach: the first render mounts a tiny
+		// probe element, and the real select appears on the second render
+		// triggered by the setState below.
+		if ( this.probeRef.current ) {
+			const ownerDoc = this.probeRef.current.ownerDocument;
+
+			if ( ownerDoc && ownerDoc !== document ) {
+				this.ownerDocument = ownerDoc;
+				this.emotionCache = createCache( {
+					key: 'vpf-sel',
+					container: ownerDoc.head,
+				} );
+			}
+		}
+
+		// eslint-disable-next-line react/no-did-mount-set-state
+		this.setState( { emotionReady: true } );
 
 		if ( callback ) {
 			this.requestAjax( {}, ( result ) => {
@@ -258,14 +287,47 @@ export default class VpfSelectControl extends Component {
 		} );
 	}
 
+	/**
+	 * Wrap a react-select element with an @emotion CacheProvider when
+	 * rendering inside an iframe (WP 6.9+).
+	 *
+	 * @param {JSX.Element} selectElement - The react-select component.
+	 *
+	 * @return {JSX.Element} - Wrapped element.
+	 */
+	wrapSelect( selectElement ) {
+		if ( this.emotionCache ) {
+			return (
+				<CacheProvider value={ this.emotionCache }>
+					{ selectElement }
+				</CacheProvider>
+			);
+		}
+
+		return selectElement;
+	}
+
 	render() {
 		const { onChange, isMultiple, isSearchable, isCreatable, callback } =
 			this.props;
 
-		const { ajaxStatus } = this.state;
+		const { ajaxStatus, emotionReady } = this.state;
+
+		// First render: mount a probe element so componentDidMount can
+		// detect whether we're inside an iframe and create the correct
+		// @emotion cache before react-select renders.
+		if ( ! emotionReady ) {
+			return <span ref={ this.probeRef } style={ { display: 'none' } } />;
+		}
 
 		const isAsync = !! callback && isSearchable;
 		const isLoading = ajaxStatus && ajaxStatus === 'progress';
+
+		// Use the document where this component is rendered, which may
+		// differ from the top-level document when inside the iframed
+		// block editor (WordPress 6.9+).
+		const ownerDoc = this.ownerDocument || document;
+		const isInIframe = ownerDoc !== document;
 
 		const selectProps = {
 			// Test opened menu items:
@@ -280,7 +342,11 @@ export default class VpfSelectControl extends Component {
 					};
 				},
 			},
-			menuPortalTarget: document.body,
+			// When inside an iframe (WP 6.9+), do NOT portal the menu
+			// to body — the coordinate systems differ and the dropdown
+			// appears in the wrong position.  Rendering inline works
+			// correctly in both contexts.
+			menuPortalTarget: isInIframe ? null : ownerDoc.body,
 			components: {
 				Option( optionProps ) {
 					const { data } = optionProps;
@@ -375,10 +441,14 @@ export default class VpfSelectControl extends Component {
 			selectProps.isSearchable = true;
 
 			if ( isMultiple ) {
-				return <SortableCreatableSelect { ...selectProps } />;
+				return this.wrapSelect(
+					<SortableCreatableSelect { ...selectProps } />
+				);
 			}
 
-			return <CreatableSelect { ...selectProps } />;
+			return this.wrapSelect(
+				<CreatableSelect { ...selectProps } />
+			);
 		}
 
 		// Async select.
@@ -407,17 +477,23 @@ export default class VpfSelectControl extends Component {
 			delete selectProps.isLoading;
 
 			if ( isMultiple ) {
-				return <SortableAsyncSelect { ...selectProps } />;
+				return this.wrapSelect(
+					<SortableAsyncSelect { ...selectProps } />
+				);
 			}
 
-			return <AsyncSelect { ...selectProps } />;
+			return this.wrapSelect(
+				<AsyncSelect { ...selectProps } />
+			);
 		}
 
 		// Default select.
 		if ( isMultiple ) {
-			return <SortableSelect { ...selectProps } />;
+			return this.wrapSelect(
+				<SortableSelect { ...selectProps } />
+			);
 		}
 
-		return <Select { ...selectProps } />;
+		return this.wrapSelect( <Select { ...selectProps } /> );
 	}
 }

@@ -6,8 +6,12 @@
 	margin-left: 0;
 
 	&.is-info {
-		color: $blue-50;
-		background-color: rgba($blue-30, 0.1);
+		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+		background-color: color-mix(
+			in srgb,
+			var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) 10%,
+			transparent
+		);
 
 		p {
 			color: inherit;

@@ -8,6 +8,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
  * Test Images
  */
 import imageFixtures from '../../fixtures/images.json';
+import { getPortfolioPreviewFrame } from '../utils/editor-canvas';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 import {
@@ -110,6 +111,7 @@ test.describe( 'added images to block', () => {
 			admin,
 			editor
 		);
+		const previewFrame = getPortfolioPreviewFrame( page, editor );
 
 		await page
 			.locator(
@@ -138,9 +140,7 @@ test.describe( 'added images to block', () => {
 
 		// Check images on backend editor.
 		for ( const image of images ) {
-			await expect(
-				page.frame( 'vpf-preview-1' ).locator( '.wp-image-' + image.id )
-			).toBeVisible();
+			await expect( previewFrame.locator( '.wp-image-' + image.id ) ).toBeVisible();
 		}
 
 		// Publish Post.
@@ -170,6 +170,7 @@ test.describe( 'added images to block', () => {
 			editor,
 			true
 		);
+		const previewFrame = getPortfolioPreviewFrame( page, editor );
 
 		await page
 			.locator( '.components-base-control__field', {
@@ -178,13 +179,11 @@ test.describe( 'added images to block', () => {
 			.locator( 'input.components-text-control__input' )
 			.fill( '10' );
 
-		await waitForPortfolioPreview( page );
+		await waitForPortfolioPreview( page, { editor } );
 
 		// Check images on backend editor.
 		for ( const image of images ) {
-			await expect(
-				page.frame( 'vpf-preview-1' ).locator( '.wp-image-' + image.id )
-			).toBeVisible();
+			await expect( previewFrame.locator( '.wp-image-' + image.id ) ).toBeVisible();
 		}
 
 		// Publish Post.
@@ -303,20 +302,19 @@ test.describe( 'added images to block', () => {
 			.click();
 
 		await page.getByRole( 'checkbox', { name: 'Display Excerpt' } ).check();
+		const previewFrame = getPortfolioPreviewFrame( page, editor );
 
 		// Check images on backend editor.
 		for ( const image of images ) {
-			const imageContainer = page
-				.frame( 'vpf-preview-1' )
-				.locator( '.wp-image-' + image.id );
+			const imageContainer = previewFrame.locator(
+				'.wp-image-' + image.id
+			);
 			await expect( imageContainer ).toBeVisible();
 
 			await expect(
-				page
-					.frame( 'vpf-preview-1' )
-					.locator( '.vp-portfolio__item-meta-excerpt', {
-						hasText: image.description,
-					} )
+				previewFrame.locator( '.vp-portfolio__item-meta-excerpt', {
+					hasText: image.description,
+				} )
 			).toBeVisible();
 
 			const foundFixture = await findAsyncSequential(
@@ -324,9 +322,7 @@ test.describe( 'added images to block', () => {
 				async ( x ) => x.description === image.description
 			);
 
-			await expect(
-				page.frame( 'vpf-preview-1' ).getByAltText( foundFixture.alt )
-			).toBeVisible();
+			await expect( previewFrame.getByAltText( foundFixture.alt ) ).toBeVisible();
 		}
 
 		// Publish Post.
@@ -623,32 +619,29 @@ test.describe( 'added images to block', () => {
 			await page.getByLabel( 'Close', { exact: true } ).click();
 		}
 
+		const previewFrame = getPortfolioPreviewFrame( page, editor );
+
 		// Check image attributes on backend editor.
 		for ( const image of imageFixtures ) {
-			const imageContainer = page
-				.frame( 'vpf-preview-1' )
-				.locator( '.wp-image-' + image.id );
-			const backendImageLink = page
-				.frame( 'vpf-preview-1' )
+			const imageContainer = previewFrame.locator(
+				'.wp-image-' + image.id
+			);
+			const backendImageLink = previewFrame
 				.getByAltText( image.alt )
 				.locator( 'xpath=ancestor::a[1]' );
 			await expect( imageContainer ).toBeVisible();
 
 			if ( typeof image.imageSettings !== 'undefined' ) {
 				await expect(
-					page
-						.frame( 'vpf-preview-1' )
-						.locator( '.vp-portfolio__item-meta-excerpt', {
-							hasText: image.imageSettings.description,
-						} )
+					previewFrame.locator( '.vp-portfolio__item-meta-excerpt', {
+						hasText: image.imageSettings.description,
+					} )
 				).toBeVisible();
 
 				await expect(
-					page
-						.frame( 'vpf-preview-1' )
-						.locator( '.vp-portfolio__item-meta-title > a', {
-							hasText: image.imageSettings.title,
-						} )
+					previewFrame.locator( '.vp-portfolio__item-meta-title > a', {
+						hasText: image.imageSettings.title,
+					} )
 				).toBeVisible();
 
 				if ( typeof image.imageSettings.format !== 'undefined' ) {
@@ -658,14 +651,12 @@ test.describe( 'added images to block', () => {
 						typeof image.imageSettings.url !== 'undefined'
 					) {
 						await expect(
-							page
-								.frame( 'vpf-preview-1' )
-								.locator(
-									'.vp-portfolio__item-meta-title > a',
-									{
-										hasText: image.imageSettings.title,
-									}
-								)
+							previewFrame.locator(
+								'.vp-portfolio__item-meta-title > a',
+								{
+									hasText: image.imageSettings.title,
+								}
+							)
 						).toHaveAttribute( 'href', image.imageSettings.url );
 
 						await expect( backendImageLink ).toHaveAttribute(
@@ -679,14 +670,12 @@ test.describe( 'added images to block', () => {
 						typeof image.imageSettings.videoUrl !== 'undefined'
 					) {
 						await expect(
-							page
-								.frame( 'vpf-preview-1' )
-								.locator(
-									'.vp-portfolio__item-meta-title > a',
-									{
-										hasText: image.imageSettings.title,
-									}
-								)
+							previewFrame.locator(
+								'.vp-portfolio__item-meta-title > a',
+								{
+									hasText: image.imageSettings.title,
+								}
+							)
 						).toHaveAttribute(
 							'href',
 							image.imageSettings.videoUrl
@@ -700,17 +689,13 @@ test.describe( 'added images to block', () => {
 				}
 			} else {
 				await expect(
-					page
-						.frame( 'vpf-preview-1' )
-						.locator( '.vp-portfolio__item-meta-excerpt', {
-							hasText: image.description,
-						} )
+					previewFrame.locator( '.vp-portfolio__item-meta-excerpt', {
+						hasText: image.description,
+					} )
 				).toBeVisible();
 			}
 
-			await expect(
-				page.frame( 'vpf-preview-1' ).getByAltText( image.alt )
-			).toBeVisible();
+			await expect( previewFrame.getByAltText( image.alt ) ).toBeVisible();
 		}
 
 		// Publish Post.
