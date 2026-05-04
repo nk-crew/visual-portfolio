@@ -39,7 +39,7 @@
 	margin-left: auto;
 	font-size: 0.8em;
 	color: #fff;
-	background-color: var(--wp-admin-theme-color, #3858e9);
+	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 	border-radius: 1em;
 }
 

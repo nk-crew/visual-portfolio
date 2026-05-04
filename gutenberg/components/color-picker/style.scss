@@ -19,7 +19,7 @@
 	border-radius: 0;
 
 	&.vpf-component-color-toggle-active {
-		color: var(--wp-admin-theme-color);
+		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		background-color: #f0f0f0;
 	}
 

@@ -11,8 +11,12 @@
 
 	&:hover,
 	&:focus {
-		color: var(--wp-admin-theme-color);
-		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.05);
+		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+		background-color: color-mix(
+			in srgb,
+			var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) 5%,
+			transparent
+		);
 	}
 
 	// Remove default Gutenberg box shadow.
@@ -21,7 +25,11 @@
 	}
 }
 %vpf-icons-selector-item-active {
-	color: var(--wp-admin-theme-color);
-	background-color: rgba(var(--wp-admin-theme-color--rgb), 0.05);
-	outline: 1px solid var(--wp-admin-theme-color) !important;
+	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	background-color: color-mix(
+		in srgb,
+		var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) 5%,
+		transparent
+	);
+	outline: 1px solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) !important;
 }

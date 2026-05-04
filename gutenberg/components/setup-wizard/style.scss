@@ -1,15 +1,4 @@
 .vpf-setup-wizard {
-	--vpf-admin-accent: var(--wp-admin-theme-color, #3858e9);
-	--vpf-admin-accent-hover: #314ecf;
-
-	@supports (color: color-mix(in srgb, black 50%, white)) {
-		--vpf-admin-accent-hover: color-mix(
-			in srgb,
-			var(--vpf-admin-accent) 88%,
-			#000
-		);
-	}
-
 	padding: 20px;
 	padding-top: 50px;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -26,7 +15,7 @@
 		}
 
 		.vpf-setup-wizard {
-			border-color: var(--vpf-admin-accent);
+			border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		}
 	}
 
@@ -66,7 +55,7 @@
 
 		> div {
 			height: 2px;
-			background-color: var(--vpf-admin-accent);
+			background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 			transition: 0.3s width ease;
 		}
 	}
@@ -88,17 +77,17 @@
 
 				&:hover,
 				&:focus {
-					color: var(--vpf-admin-accent);
+					color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 				}
 			}
 		}
 
 		.components-button.is-primary {
-			background-color: var(--vpf-admin-accent);
+			background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 
 			&:disabled {
-				background-color: var(--vpf-admin-accent);
-				border-color: var(--vpf-admin-accent);
+				background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+				border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 
 				svg {
 					color: #fff;
@@ -107,11 +96,11 @@
 			}
 
 			&:hover:not(:disabled) {
-				background: var(--vpf-admin-accent-hover);
+				background: var(--wp-admin-theme-color-darker-10, var(--wp-admin-theme-color-darker-20, var(--wp-admin-theme-color, #3858e9)));
 			}
 
 			&:focus:not(:disabled) {
-				box-shadow: inset 0 0 0 1px #fff, 0 0 0 1.5px var(--vpf-admin-accent);
+				box-shadow: inset 0 0 0 1px #fff, 0 0 0 1.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 			}
 		}
 	}
@@ -153,12 +142,12 @@
 			}
 
 			&.vpf-component-icon-selector-item-active {
-				border-color: var(--vpf-admin-accent) !important;
-				box-shadow: 0 0 0 1px var(--vpf-admin-accent) !important;
+				border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) !important;
+				box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) !important;
 
 				svg,
 				span {
-					color: var(--vpf-admin-accent);
+					color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 				}
 			}
 		}
@@ -221,7 +210,7 @@
 			}
 
 			&.vpf-component-icon-selector-item-active {
-				box-shadow: 0 0 0 1.5px #fff, 0 0 0 3.5px var(--vpf-admin-accent) !important;
+				box-shadow: 0 0 0 1.5px #fff, 0 0 0 3.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) !important;
 			}
 
 			> span {

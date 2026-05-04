@@ -52,8 +52,12 @@
 
 		.vpf-component-gallery-control-item-checked {
 			.vpf-component-gallery-control-item-button::before {
-				box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
-				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+				box-shadow: inset 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+				background-color: color-mix(
+					in srgb,
+					var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) 8%,
+					transparent
+				);
 			}
 
 			&:not(:hover):not(:focus) {

@@ -52,7 +52,7 @@
 		svg {
 			width: 14px;
 			height: 14px;
-			color: var(--wp-admin-theme-color);
+			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		}
 
 		.vpf-component-icon-selector-item-collapse {
@@ -71,7 +71,7 @@
 				left: -3px;
 				display: block;
 				content: "";
-				background-color: var(--wp-admin-theme-color);
+				background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 				border-radius: 15px;
 				opacity: 0.05;
 				transition: 0.1s opacity ease-in-out;
