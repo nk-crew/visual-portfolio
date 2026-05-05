@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.6.1 - May 5, 2026 =
+
+* compatibility fixes for WordPress 6.9 and 7.0; tested up to 7.0
+* improved drag-and-drop reordering in the editor (modernized implementation)
+* refined editor and settings controls (fields aligned with WordPress components)
+* fixed fatal error in the block editor when word count ran alongside certain content pagination plugins
+* minor fixes and improvements
+* **Pro:**
+* improved PHP 8.4 compatibility
+* fixed proofing gallery selection not persisting reliably
+* fixed proofing status not updating correctly after the editor autosaves post meta
+
 = 3.6.0 - Mar 23, 2026 =
 
 * refined image settings in popup in image galleries - better fields and overall ux

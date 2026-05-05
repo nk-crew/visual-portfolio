@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.0
 * Requires PHP: 7.2
-* Stable tag: 3.6.0
+* Stable tag: 3.6.1
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,18 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.6.1 - May 5, 2026 =
+
+* compatibility fixes for WordPress 6.9 and 7.0; tested up to 7.0
+* improved drag-and-drop reordering in the editor (modernized implementation)
+* refined editor and settings controls (fields aligned with WordPress components)
+* fixed fatal error in the block editor when word count ran alongside certain content pagination plugins
+* minor fixes and improvements
+* **Pro:**
+* improved PHP 8.4 compatibility
+* fixed proofing gallery selection not persisting reliably
+* fixed proofing status not updating correctly after the editor autosaves post meta
 
 = 3.6.0 - Mar 23, 2026 =
 

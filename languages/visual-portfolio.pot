@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.6.0\n"
+"Project-Id-Version: Visual Portfolio, Posts & Image Gallery 3.6.1\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-05T11:30:02+00:00\n"
+"POT-Creation-Date: 2026-05-05T13:29:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
@@ -2573,15 +2573,15 @@ msgstr ""
 msgid "Replace"
 msgstr ""
 
-#: gutenberg/components/select-control/index.js:500
+#: gutenberg/components/select-control/index.js:654
 msgid "Type to search…"
 msgstr ""
 
-#: gutenberg/components/select-control/index.js:501
+#: gutenberg/components/select-control/index.js:655
 msgid "Select…"
 msgstr ""
 
-#: gutenberg/components/select-control/index.js:523
+#: gutenberg/components/select-control/index.js:677
 msgid "Type and press Enter…"
 msgstr ""
 
