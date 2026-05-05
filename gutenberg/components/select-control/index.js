@@ -56,7 +56,7 @@ function arrayMove( array, from, to ) {
 /**
  * Component Class
  */
-export default class VpfSelectControl extends Component {
+export default class SelectControl extends Component {
 	constructor( ...args ) {
 		super( ...args );
 

@@ -5,7 +5,6 @@ import classnames from 'classnames/dedupe';
 import {
 	__experimentalUnitControl,
 	BaseControl,
-	Button,
 	CheckboxControl,
 	Notice,
 	PanelBody,
@@ -37,7 +36,6 @@ import { maybeDecode, maybeEncode } from '../../utils/encode-decode';
 import getControlNameClassName from '../../utils/get-control-name-class-name';
 import AlignControl from '../align-control';
 import AspectRatio from '../aspect-ratio';
-import ButtonsGroup from '../buttons-group';
 import ClassesTree from '../classes-tree';
 import CodeEditor from '../code-editor';
 import CollapseControl from '../collapse-control';
@@ -52,7 +50,9 @@ import SelectControl from '../select-control';
 import SortableControl from '../sortable-control';
 import TabsControl from '../tabs-control';
 import TilesSelector from '../tiles-selector';
-import ToggleGroupControl from '../toggle-group-control';
+import ToggleGroupControl, {
+	ToggleGroupButtonsControl,
+} from '../toggle-group-control';
 import ToggleModal from '../toggle-modal';
 
 const UnitControl = __stableUnitControl || __experimentalUnitControl;
@@ -488,18 +488,21 @@ ControlsRender.Control = function ( props ) {
 			break;
 		case 'buttons':
 			renderControl = (
-				<ButtonsGroup aria-label={ props.label || props.name }>
-					{ Object.keys( props.options || {} ).map( ( val ) => (
-						<Button
-							variant={ controlVal === val ? 'primary' : '' }
-							isPressed={ controlVal === val }
-							key={ val }
-							onClick={ () => onChange( val ) }
-						>
-							{ props.options[ val ] }
-						</Button>
-					) ) }
-				</ButtonsGroup>
+				<ToggleGroupButtonsControl
+					label={ props.label || props.name }
+					hideLabelFromVision
+					value={ controlVal }
+					options={ props.options || {} }
+					onChange={ ( val ) => {
+						const keys = Object.keys( props.options || {} );
+						const match = keys.find(
+							( k ) => String( k ) === String( val )
+						);
+						onChange(
+							match !== undefined ? match : val
+						);
+					} }
+				/>
 			);
 			break;
 		case 'icons_selector':

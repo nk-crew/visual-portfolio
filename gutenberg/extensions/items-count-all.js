@@ -1,19 +1,17 @@
+import './items-count-all.scss';
+
 import classnames from 'classnames/dedupe';
 import { debounce } from 'throttle-debounce';
 
 import apiFetch from '@wordpress/api-fetch';
-import {
-	BaseControl,
-	Button,
-	TextControl,
-} from '@wordpress/components';
+import { BaseControl, Button, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { RawHTML, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 
-import ButtonsGroup from '../components/buttons-group';
 import Notice from '../components/notice';
+import { ToggleGroupButtonsControl } from '../components/toggle-group-control';
 import controlGetValue from '../utils/control-get-value';
 
 const { VPGutenbergVariables } = window;
@@ -23,6 +21,9 @@ const NOTICE_LIMIT = parseInt(
 	10
 );
 const DISPLAY_NOTICE_AFTER = NOTICE_LIMIT + 5;
+
+const ITEMS_COUNT_MODE_CUSTOM = 'custom';
+const ITEMS_COUNT_MODE_ALL = 'all';
 
 function getNoticeState() {
 	return VPGutenbergVariables.items_count_notice;
@@ -115,6 +116,7 @@ function ItemsCountControl( { data } ) {
 	const { description, attributes, onChange } = data;
 
 	const [ maybeReRender, setMaybeReRender ] = useState( 1 );
+	const [ toggleGroupMountKey, setToggleGroupMountKey ] = useState( 0 );
 
 	const { postId } = useSelect(
 		( select ) => ( {
@@ -133,86 +135,92 @@ function ItemsCountControl( { data } ) {
 		`vpf-control-wrap-${ data.type }`
 	);
 	const controlVal = parseInt( controlGetValue( data.name, attributes ), 10 );
+	const itemsCountMode =
+		controlVal === -1 ? ITEMS_COUNT_MODE_ALL : ITEMS_COUNT_MODE_CUSTOM;
 
 	return (
 		<BaseControl
 			id="vpf-control-items-count-all"
 			label={
-				<>
-					{ data.label }
+				<span className="vpf-items-count-all-label">
+					<span className="vpf-items-count-all-label__text">
+						{ data.label }
+					</span>
 					{ getNoticeState() === 'hide' &&
 					shouldDisplayNotice( controlVal, attributes ) ? (
 						<Button
+							className="vpf-items-count-all-label__notice"
 							onClick={ () => {
 								updateNoticeState( postId );
 								setMaybeReRender( maybeReRender + 1 );
 							} }
-							style={ {
-								position: 'absolute',
-								marginTop: '-5px',
-								padding: '0 4px',
-								color: '#cd7a0f',
-							} }
+							aria-label={ __(
+								'Show gallery size notice',
+								'visual-portfolio'
+							) }
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
-								height="16"
-								width="16"
+								width="24"
+								height="24"
 								viewBox="0 0 24 24"
-								fill="red"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
 							>
-								<path
-									d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
-									fill="currentColor"
-								/>
+								<circle cx="12" cy="12" r="10" fill="none" />
+								<path d="M12 16v-4" />
+								<path d="M12 8h.01" />
 							</svg>
 						</Button>
 					) : null }
-				</>
+				</span>
 			}
 			help={ renderControlHelp }
 			className={ renderControlClassName }
 			__nextHasNoMarginBottom
 		>
 			<div>
-				<ButtonsGroup
-					aria-label={ __(
-						'Items count mode',
-						'visual-portfolio'
-					) }
-				>
-					<Button
-						variant={ controlVal !== -1 ? 'primary' : '' }
-						isPressed={ controlVal !== -1 }
-						onClick={ () => {
-							if ( controlVal === -1 ) {
-								onChange( parseFloat( data.default || 6 ) );
-							}
-						} }
-					>
-						{ __( 'Custom Count', 'visual-portfolio' ) }
-					</Button>
-					<Button
-						variant={ controlVal === -1 ? 'primary' : '' }
-						isPressed={ controlVal === -1 }
-						onClick={ () => {
+				<ToggleGroupButtonsControl
+					key={ `items-count-toggle-${ toggleGroupMountKey }` }
+					label={ __( 'Items count mode', 'visual-portfolio' ) }
+					hideLabelFromVision
+					value={ itemsCountMode }
+					options={ {
+						[ ITEMS_COUNT_MODE_CUSTOM ]: __(
+							'Custom Count',
+							'visual-portfolio'
+						),
+						[ ITEMS_COUNT_MODE_ALL ]: __(
+							'All Items',
+							'visual-portfolio'
+						),
+					} }
+					onChange={ ( next ) => {
+						if ( next === ITEMS_COUNT_MODE_ALL ) {
 							if (
 								controlVal !== -1 &&
 								// eslint-disable-next-line no-alert
-								window.confirm(
+								! window.confirm(
 									__(
 										'Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries.',
 										'visual-portfolio'
 									)
 								)
 							) {
-								onChange( -1 );
+								setToggleGroupMountKey( ( key ) => key + 1 );
+								return;
 							}
-						} }
-					>
-						{ __( 'All Items', 'visual-portfolio' ) }
-					</Button>
-				</ButtonsGroup>
+							onChange( -1 );
+						} else if ( next === ITEMS_COUNT_MODE_CUSTOM ) {
+							if ( controlVal === -1 ) {
+								onChange( parseFloat( data.default || 6 ) );
+							}
+						}
+					} }
+				/>
 			</div>
 			{ controlVal !== -1 ? (
 				<>

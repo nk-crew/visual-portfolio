@@ -6,8 +6,11 @@ import ElementsSelector from '../../components/elements-selector';
 import FocalPointControl from '../../components/focal-point-control';
 import IconsSelector from '../../components/icons-selector';
 import MediaPreviewCard from '../../components/media-preview-card';
-import VpfSelectControl from '../../components/select-control';
+import SelectControl from '../../components/select-control';
 import SpinnerComponent from '../../components/spinner';
+import ToggleGroupCategoryControl, {
+	ToggleGroupButtonsControl,
+} from '../../components/toggle-group-control';
 import ToggleModal from '../../components/toggle-modal';
 
 export function get() {
@@ -20,8 +23,10 @@ export function get() {
 		FocalPointControl,
 		IconsSelector,
 		MediaPreviewCard,
-		VpfSelectControl,
+		SelectControl,
 		SpinnerComponent,
 		ToggleModal,
+		ToggleGroupCategoryControl,
+		ToggleGroupButtonsControl,
 	};
 }
