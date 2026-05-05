@@ -24,9 +24,9 @@ function normalizeToggleGroupButtonOptions( options ) {
 		return [];
 	}
 	if ( Array.isArray( options ) ) {
-		return options.map( ( item ) => ( {
-			value: String( item.value ),
-			label: item.label,
+		return options.map( ( { value, ...itemProps } ) => ( {
+			...itemProps,
+			value: String( value ),
 		} ) );
 	}
 	return Object.keys( options ).map( ( key ) => ( {
@@ -75,11 +75,11 @@ export function ToggleGroupButtonsControl( props ) {
 				__nextHasNoMarginBottom
 				{ ...restProps }
 			>
-				{ pairs.map( ( { value: optionValue, label: optionLabel } ) => (
+				{ pairs.map( ( { value: optionValue, ...optionProps } ) => (
 					<ToggleGroupControlOption
 						key={ optionValue }
 						value={ optionValue }
-						label={ optionLabel }
+						{ ...optionProps }
 					/>
 				) ) }
 			</ToggleGroupControl>

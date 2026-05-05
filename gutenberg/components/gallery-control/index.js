@@ -21,14 +21,10 @@ import { isEqual } from 'lodash';
 
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import {
-	__experimentalToggleGroupControl,
-	__experimentalToggleGroupControlOption,
 	Button,
 	CheckboxControl,
 	Modal,
 	SelectControl,
-	ToggleGroupControl as __stableToggleGroupControl,
-	ToggleGroupControlOption as __stableToggleGroupControlOption,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -41,6 +37,7 @@ import FocalPointControl, {
 	normalizeFocalPointValue,
 } from '../focal-point-control';
 import MediaPreviewCard from '../media-preview-card';
+import { ToggleGroupButtonsControl } from '../toggle-group-control';
 import CollapsibleSection from './collapsible-section';
 import getAllCategories from './utils/get-all-categories';
 
@@ -49,10 +46,6 @@ const { VPGutenbergVariables } = window;
 const UNCATEGORIZED_VALUE = '------';
 const ITEMS_COUNT_DEFAULT = 18;
 const IS_PRO_PLUGIN = !! VPGutenbergVariables?.pro;
-const ToggleGroupControl =
-	__stableToggleGroupControl || __experimentalToggleGroupControl;
-const ToggleGroupControlOption =
-	__stableToggleGroupControlOption || __experimentalToggleGroupControlOption;
 
 function getAllowedMediaTypes( isPro = false ) {
 	return isPro ? [ 'image', 'video' ] : [ 'image' ];
@@ -242,7 +235,7 @@ function getBulkImagesDefaultValue( allItems, selectedItems, optionName ) {
 function GalleryStateTabs( { activeMediaState, setActiveMediaState, isPro } ) {
 	return (
 		<div className="vpf-component-gallery-control-item-modal-state-tabs">
-			<ToggleGroupControl
+			<ToggleGroupButtonsControl
 				label={ __( 'Media', 'visual-portfolio' ) }
 				value={ activeMediaState }
 				onChange={ ( value ) => {
@@ -250,20 +243,18 @@ function GalleryStateTabs( { activeMediaState, setActiveMediaState, isPro } ) {
 						setActiveMediaState( value );
 					}
 				} }
-				isBlock
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			>
-				<ToggleGroupControlOption
-					value="normal"
-					label={ __( 'Normal', 'visual-portfolio' ) }
-				/>
-				<ToggleGroupControlOption
-					value="hover"
-					label={ __( 'Hover', 'visual-portfolio' ) }
-					disabled={ ! isPro }
-				/>
-			</ToggleGroupControl>
+				options={ [
+					{
+						value: 'normal',
+						label: __( 'Normal', 'visual-portfolio' ),
+					},
+					{
+						value: 'hover',
+						label: __( 'Hover', 'visual-portfolio' ),
+						disabled: ! isPro,
+					},
+				] }
+			/>
 		</div>
 	);
 }
