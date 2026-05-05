@@ -44,13 +44,11 @@ class VpVideoComponent extends Component {
 	maybePrepareOembed() {
 		const { oembedQuery, oembedHTML } = this.state;
 
-		const { getMeta, postFormat } = this.props;
+		const { postFormat, videoUrl } = this.props;
 
 		if ( postFormat !== 'video' ) {
 			return;
 		}
-
-		const videoUrl = getMeta( '_vp_format_video_url' );
 
 		if ( oembedQuery === videoUrl ) {
 			return;
@@ -95,7 +93,7 @@ class VpVideoComponent extends Component {
 	}
 
 	render() {
-		const { getMeta, postFormat, updateMeta } = this.props;
+		const { postFormat, updateMeta, videoUrl } = this.props;
 
 		const { oembedHTML } = this.state;
 
@@ -153,7 +151,7 @@ class VpVideoComponent extends Component {
 				<PanelRow>
 					<TextControl
 						label={ __( 'Video URL', 'visual-portfolio' ) }
-						value={ getMeta( '_vp_format_video_url' ) || '' }
+						value={ videoUrl || '' }
 						onChange={ ( val ) => {
 							updateMeta( '_vp_format_video_url', val );
 						} }
@@ -175,14 +173,15 @@ class VpVideoComponent extends Component {
 }
 
 const VpVideo = compose( [
-	withSelect( ( select ) => ( {
-		getMeta( name ) {
-			const meta =
-				select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
-			return meta[ name ];
-		},
-		postFormat: select( 'core/editor' ).getEditedPostAttribute( 'format' ),
-	} ) ),
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const meta = getEditedPostAttribute( 'meta' ) || {};
+
+		return {
+			postFormat: getEditedPostAttribute( 'format' ),
+			videoUrl: meta._vp_format_video_url,
+		};
+	} ),
 	withDispatch( ( dispatch ) => ( {
 		updateMeta( name, val ) {
 			dispatch( 'core/editor' ).editPost( { meta: { [ name ]: val } } );

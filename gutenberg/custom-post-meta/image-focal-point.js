@@ -15,15 +15,13 @@ import FocalPointControl, {
  * @return {JSX.Element|null} Component output.
  */
 function VpImageFocalPointComponent( props ) {
-	const { getMeta, featuredImageId, updateMeta } = props;
+	const { featuredImageId, focalPointValue, updateMeta } = props;
 
 	if ( ! featuredImageId ) {
 		return null;
 	}
 
-	const focalPoint = normalizeFocalPointValue(
-		getMeta( '_vp_image_focal_point' )
-	);
+	const focalPoint = normalizeFocalPointValue( focalPointValue );
 
 	return (
 		<FocalPointControl
@@ -49,9 +47,7 @@ const VpImageFocalPoint = compose( [
 
 		return {
 			featuredImageId,
-			getMeta( name ) {
-				return meta[ name ];
-			},
+			focalPointValue: meta._vp_image_focal_point,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
