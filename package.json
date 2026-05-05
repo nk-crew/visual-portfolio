@@ -38,11 +38,7 @@
 		"postinstall": "composer install"
 	},
 	"overrides": {
-		"webpack-dev-server": "5.2.2",
-		"react-sortable-hoc": {
-			"react": "^18.3.1",
-			"react-dom": "^18.3.1"
-		}
+		"webpack-dev-server": "5.2.2"
 	},
 	"devDependencies": {
 		"@babel/node": "^7.23.9",
@@ -95,7 +91,7 @@
 		"classnames": "^2.3.2",
 		"copy-webpack-plugin": "^11.0.0",
 		"flickr-justified-gallery": "^2.2.0",
-		"gutenberg-react-select-styles": "^0.1.0",
+		"gutenberg-react-select-styles": "^0.1.1",
 		"iframe-resizer": "^4.3.11",
 		"is-number": "^7.0.0",
 		"isotope-layout": "^3.0.6",
@@ -104,7 +100,6 @@
 		"raf-schd": "^4.0.3",
 		"react-ace": "^12.0.0",
 		"react-select": "^5.7.3",
-		"react-sortable-hoc": "^2.0.0",
 		"shorthash": "0.0.2",
 		"simplebar": "^5.3.6",
 		"swiper": "^8.4.7",

@@ -1745,13 +1745,19 @@
          "Ok, I understand": [
             ""
          ],
+         "Show gallery size notice": [
+            ""
+         ],
+         "Items count mode": [
+            ""
+         ],
          "Custom Count": [
             ""
          ],
-         "Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries.": [
+         "All Items": [
             ""
          ],
-         "All Items": [
+         "Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries.": [
             ""
          ],
          "Copied!": [

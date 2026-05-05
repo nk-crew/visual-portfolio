@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-25T14:26:47+00:00\n"
+"POT-Creation-Date: 2026-05-05T11:30:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
@@ -79,7 +79,7 @@ msgstr ""
 #: classes/class-settings.php:792
 #: classes/class-settings.php:807
 #: classes/class-settings.php:822
-#: gutenberg/components/controls-render/index.js:788
+#: gutenberg/components/controls-render/index.js:791
 msgid "Go Pro"
 msgstr ""
 
@@ -318,7 +318,7 @@ msgid "Posts Settings"
 msgstr ""
 
 #: classes/class-admin.php:1238
-#: gutenberg/components/gallery-control/index.js:925
+#: gutenberg/components/gallery-control/index.js:934
 msgid "Media Settings"
 msgstr ""
 
@@ -352,7 +352,7 @@ msgstr ""
 
 #: classes/class-admin.php:1278
 #: classes/class-settings.php:751
-#: gutenberg/components/controls-render/index.js:591
+#: gutenberg/components/controls-render/index.js:594
 msgid "Custom CSS"
 msgstr ""
 
@@ -363,7 +363,7 @@ msgstr ""
 
 #: classes/class-admin.php:1327
 #: classes/class-custom-post-type.php:578
-#: gutenberg/components/gallery-control/index.js:246
+#: gutenberg/components/gallery-control/index.js:245
 msgid "Media"
 msgstr ""
 
@@ -556,7 +556,7 @@ msgstr ""
 
 #: classes/class-admin.php:1693
 #: classes/class-custom-post-meta.php:146
-#: gutenberg/custom-post-meta/video.js:109
+#: gutenberg/custom-post-meta/video.js:107
 msgid "Video"
 msgstr ""
 
@@ -575,7 +575,7 @@ msgid "https://..."
 msgstr ""
 
 #: classes/class-admin.php:1707
-#: gutenberg/custom-post-meta/video.js:155
+#: gutenberg/custom-post-meta/video.js:153
 msgid "Video URL"
 msgstr ""
 
@@ -584,7 +584,7 @@ msgid "Full list of supported links"
 msgstr ""
 
 #: classes/class-admin.php:1709
-#: gutenberg/custom-post-meta/video.js:149
+#: gutenberg/custom-post-meta/video.js:147
 msgid "see here"
 msgstr ""
 
@@ -767,12 +767,12 @@ msgid "Caption"
 msgstr ""
 
 #: classes/class-admin.php:2269
-#: gutenberg/components/gallery-control/index.js:259
+#: gutenberg/components/gallery-control/index.js:255
 msgid "Normal"
 msgstr ""
 
 #: classes/class-admin.php:2273
-#: gutenberg/components/gallery-control/index.js:263
+#: gutenberg/components/gallery-control/index.js:259
 msgid "Hover"
 msgstr ""
 
@@ -1044,7 +1044,7 @@ msgstr ""
 #: classes/class-rest.php:307
 #: classes/class-shortcode.php:58
 #: gutenberg/blocks/filter-by-category/edit.js:155
-#: gutenberg/components/gallery-control/index.js:1166
+#: gutenberg/components/gallery-control/index.js:1175
 msgid "All"
 msgstr ""
 
@@ -2426,11 +2426,11 @@ msgstr ""
 msgid "PRO"
 msgstr ""
 
-#: gutenberg/components/controls-render/index.js:592
+#: gutenberg/components/controls-render/index.js:595
 msgid "Open in Modal"
 msgstr ""
 
-#: gutenberg/components/controls-render/index.js:621
+#: gutenberg/components/controls-render/index.js:624
 msgid "Classes Tree:"
 msgstr ""
 
@@ -2452,7 +2452,7 @@ msgid "Remove"
 msgstr ""
 
 #: gutenberg/components/focal-point-control/index.js:72
-#: gutenberg/components/gallery-control/index.js:395
+#: gutenberg/components/gallery-control/index.js:392
 msgid "Image focal point"
 msgstr ""
 
@@ -2476,88 +2476,88 @@ msgstr ""
 msgid "Loaded automatically from the image Description"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:129
+#: gutenberg/components/gallery-control/index.js:128
 msgid "Edit Gallery"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:130
+#: gutenberg/components/gallery-control/index.js:129
 msgid "Add Media"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:413
+#: gutenberg/components/gallery-control/index.js:410
 msgid "Additional media info"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:447
+#: gutenberg/components/gallery-control/index.js:444
 msgid "File URL"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:458
+#: gutenberg/components/gallery-control/index.js:455
 msgid "Attachment page"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:472
+#: gutenberg/components/gallery-control/index.js:469
 msgid "Edit details"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:692
+#: gutenberg/components/gallery-control/index.js:693
 msgid "Previous image"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:712
+#: gutenberg/components/gallery-control/index.js:713
 msgid "Next image"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:861
+#: gutenberg/components/gallery-control/index.js:870
 msgid "Select"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1088
+#: gutenberg/components/gallery-control/index.js:1097
 msgid "Select All"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1107
+#: gutenberg/components/gallery-control/index.js:1116
 msgid "Bulk Actions"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1112
+#: gutenberg/components/gallery-control/index.js:1121
 msgid "Bulk actions"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1119
+#: gutenberg/components/gallery-control/index.js:1128
 msgid "Edit"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1123
+#: gutenberg/components/gallery-control/index.js:1132
 msgid "Delete"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1132
+#: gutenberg/components/gallery-control/index.js:1141
 msgid "Are you sure you want to remove selected items?"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1159
+#: gutenberg/components/gallery-control/index.js:1168
 msgid "Filter by Category"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1170
+#: gutenberg/components/gallery-control/index.js:1179
 msgid "Uncategorized"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1204
+#: gutenberg/components/gallery-control/index.js:1213
 msgid "Bulk Image Settings"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1356
+#: gutenberg/components/gallery-control/index.js:1365
 #, js-format
 msgid "Showing %1$s of %2$s media items"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1374
+#: gutenberg/components/gallery-control/index.js:1383
 msgid "Show More"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1382
+#: gutenberg/components/gallery-control/index.js:1391
 msgid "Show All"
 msgstr ""
 
@@ -2573,15 +2573,15 @@ msgstr ""
 msgid "Replace"
 msgstr ""
 
-#: gutenberg/components/select-control/index.js:342
+#: gutenberg/components/select-control/index.js:500
 msgid "Type to search…"
 msgstr ""
 
-#: gutenberg/components/select-control/index.js:343
+#: gutenberg/components/select-control/index.js:501
 msgid "Select…"
 msgstr ""
 
-#: gutenberg/components/select-control/index.js:371
+#: gutenberg/components/select-control/index.js:523
 msgid "Type and press Enter…"
 msgstr ""
 
@@ -2621,42 +2621,50 @@ msgstr ""
 msgid "Edit Tiles"
 msgstr ""
 
-#: gutenberg/custom-post-meta/image-focal-point.js:32
+#: gutenberg/custom-post-meta/image-focal-point.js:30
 msgid "Focal point will be used in Visual Portfolio layouts only:"
 msgstr ""
 
-#: gutenberg/custom-post-meta/video.js:137
+#: gutenberg/custom-post-meta/video.js:135
 #, js-format
 msgid "Video will be used in %s layouts only. Full list of supported links"
 msgstr ""
 
-#: gutenberg/extensions/items-count-all.js:57
+#: gutenberg/extensions/items-count-all.js:58
 msgid "Using large galleries may <u>decrease page loading speed</u>. We recommend you add these improvements:"
 msgstr ""
 
-#: gutenberg/extensions/items-count-all.js:67
+#: gutenberg/extensions/items-count-all.js:68
 #, js-format
 msgid "Set the items per page to <u>less than %d</u>"
 msgstr ""
 
-#: gutenberg/extensions/items-count-all.js:77
+#: gutenberg/extensions/items-count-all.js:78
 msgid "Add <em>`Load More`</em> or <em>`Infinite Scroll`</em> pagination for best results."
 msgstr ""
 
-#: gutenberg/extensions/items-count-all.js:92
+#: gutenberg/extensions/items-count-all.js:93
 msgid "Ok, I understand"
 msgstr ""
 
+#: gutenberg/extensions/items-count-all.js:157
+msgid "Show gallery size notice"
+msgstr ""
+
 #: gutenberg/extensions/items-count-all.js:188
+msgid "Items count mode"
+msgstr ""
+
+#: gutenberg/extensions/items-count-all.js:192
 msgid "Custom Count"
 msgstr ""
 
-#: gutenberg/extensions/items-count-all.js:198
-msgid "Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries."
+#: gutenberg/extensions/items-count-all.js:196
+msgid "All Items"
 msgstr ""
 
-#: gutenberg/extensions/items-count-all.js:208
-msgid "All Items"
+#: gutenberg/extensions/items-count-all.js:207
+msgid "Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries."
 msgstr ""
 
 #: gutenberg/layouts-editor/block/index.js:48

@@ -1,21 +1,33 @@
 import './style.scss';
 
+import {
+	closestCenter,
+	DndContext,
+	DragOverlay,
+	PointerSensor,
+	useSensor,
+	useSensors,
+} from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import selectStyles from 'gutenberg-react-select-styles';
 import $ from 'jquery';
 import rafSchd from 'raf-schd';
+import { createPortal } from 'react-dom';
 import Select, { components } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import CreatableSelect from 'react-select/creatable';
-import {
-	SortableContainer,
-	SortableElement,
-	sortableHandle,
-} from 'react-sortable-hoc';
 import { debounce } from 'throttle-debounce';
 
-import { Component, createRef } from '@wordpress/element';
+import {
+	Component,
+	createContext,
+	createRef,
+	useContext,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const { Option } = components;
@@ -23,35 +35,268 @@ const { Option } = components;
 const { ajaxurl, VPGutenbergVariables } = window;
 
 const cachedOptions = {};
+const SortableMultiValueContext = createContext( {} );
 
-const SortableSelect = SortableContainer( Select );
-const SortableCreatableSelect = SortableContainer( CreatableSelect );
-const SortableAsyncSelect = SortableContainer( AsyncSelect );
-const SortableMultiValueLabel = sortableHandle( ( props ) => (
-	<components.MultiValueLabel { ...props } />
-) );
-const SortableMultiValue = SortableElement( ( props ) => {
-	// this prevents the menu from being opened/closed when the user clicks
-	// on a value to begin dragging it. ideally, detecting a click (instead of
-	// a drag) would still focus the control and toggle the menu, but that
-	// requires some magic with refs that are out of scope for this example
+function noSortTransforms() {
+	return null;
+}
+
+function getSortableValueId( value ) {
+	return `sortable-value-${ String( value ) }`;
+}
+
+function DragOverlayChip( { label } ) {
+	return (
+		<div
+			style={ {
+				display: 'inline-flex',
+				alignItems: 'center',
+				padding: '3px 12px',
+				borderRadius: 2,
+				backgroundColor: 'var(--wp-admin-theme-color, #3858e9)',
+				color: '#fff',
+				fontSize: '100%',
+				lineHeight: 1.5,
+				boxShadow: '0 3px 10px rgba(0, 0, 0, 0.18)',
+				pointerEvents: 'none',
+				whiteSpace: 'nowrap',
+			} }
+		>
+			{ label }
+		</div>
+	);
+}
+
+const SortableMultiValueLabel = function ( props ) {
+	const sortableValueContext = useContext( SortableMultiValueContext );
+
+	// Prevent opening the menu when a drag starts from the tag label.
 	const onMouseDown = ( e ) => {
 		e.preventDefault();
 		e.stopPropagation();
 	};
-	const innerProps = { ...props.innerProps, onMouseDown };
-	return <components.MultiValue { ...props } innerProps={ innerProps } />;
-} );
+	const innerProps = {
+		...props.innerProps,
+		...sortableValueContext.attributes,
+		...sortableValueContext.listeners,
+		onMouseDown,
+		style: {
+			...( props.innerProps?.style || {} ),
+			cursor: 'grab',
+			touchAction: 'none',
+		},
+	};
 
-function arrayMove( array, from, to ) {
-	array = array.slice();
-	array.splice(
-		to < 0 ? array.length + to : to,
-		0,
-		array.splice( from, 1 )[ 0 ]
+	return (
+		<components.MultiValueLabel { ...props } innerProps={ innerProps } />
 	);
-	return array;
-}
+};
+
+const SortableMultiValue = function ( props ) {
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		transform,
+		transition,
+		isDragging,
+	} = useSortable( {
+		id: getSortableValueId( props.data.value ),
+	} );
+	const sortableValueContext = useContext( SortableMultiValueContext );
+	const isActive =
+		sortableValueContext.activeId ===
+		getSortableValueId( props.data.value );
+	const isIndicatorBefore =
+		sortableValueContext.indicatorId ===
+			getSortableValueId( props.data.value ) &&
+		sortableValueContext.indicatorPosition === 'before';
+	const isIndicatorAfter =
+		sortableValueContext.indicatorId ===
+			getSortableValueId( props.data.value ) &&
+		sortableValueContext.indicatorPosition === 'after';
+	const style = {
+		...( props.innerProps?.style || {} ),
+		transform: CSS.Translate.toString( transform ),
+		transition,
+		position: 'relative',
+		opacity: isActive ? 0.2 : 1,
+		zIndex: isDragging ? 2 : 'auto',
+	};
+	const innerProps = {
+		...props.innerProps,
+		ref: setNodeRef,
+		style,
+	};
+
+	return (
+		<SortableMultiValueContext.Provider
+			value={ {
+				attributes,
+				listeners,
+				activeId: sortableValueContext.activeId,
+				indicatorId: sortableValueContext.indicatorId,
+				indicatorPosition: sortableValueContext.indicatorPosition,
+			} }
+		>
+			<components.MultiValue { ...props } innerProps={ innerProps }>
+				{ isIndicatorBefore ? (
+					<span
+						aria-hidden="true"
+						style={ {
+							position: 'absolute',
+							left: -3,
+							top: 2,
+							bottom: 2,
+							width: 2,
+							backgroundColor:
+								'var(--wp-admin-theme-color, #3858e9)',
+							borderRadius: 999,
+							pointerEvents: 'none',
+						} }
+					/>
+				) : null }
+				{ props.children }
+				{ isIndicatorAfter ? (
+					<span
+						aria-hidden="true"
+						style={ {
+							position: 'absolute',
+							right: -3,
+							top: 2,
+							bottom: 2,
+							width: 2,
+							backgroundColor:
+								'var(--wp-admin-theme-color, #3858e9)',
+							borderRadius: 999,
+							pointerEvents: 'none',
+						} }
+					/>
+				) : null }
+			</components.MultiValue>
+		</SortableMultiValueContext.Provider>
+	);
+};
+
+const SortableSelectWrapper = function ( {
+	ComponentTag,
+	overlayContainer,
+	selectProps,
+	onSortEnd,
+} ) {
+	const sensors = useSensors(
+		useSensor( PointerSensor, {
+			activationConstraint: {
+				distance: 4,
+			},
+		} )
+	);
+	const items = ( selectProps.value || [] ).map( ( item ) =>
+		getSortableValueId( item.value )
+	);
+	const [ activeId, setActiveId ] = useState( null );
+	const [ indicator, setIndicator ] = useState( null );
+	const activeItem = ( selectProps.value || [] ).find(
+		( item ) => getSortableValueId( item.value ) === activeId
+	);
+	const selectComponents = {
+		...( selectProps.components || {} ),
+	};
+
+	selectComponents.MultiValue = function MultiValueWithContext( props ) {
+		return (
+			<SortableMultiValueContext.Provider
+				value={ {
+					activeId,
+					indicatorId: indicator?.id || null,
+					indicatorPosition: indicator?.position || null,
+				} }
+			>
+				<SortableMultiValue { ...props } />
+			</SortableMultiValueContext.Provider>
+		);
+	};
+	const dragOverlay = (
+		<DragOverlay style={ { zIndex: 999999 } }>
+			{ activeItem ? (
+				<DragOverlayChip label={ activeItem.label } />
+			) : null }
+		</DragOverlay>
+	);
+
+	return (
+		<DndContext
+			sensors={ sensors }
+			collisionDetection={ closestCenter }
+			onDragStart={ ( event ) => {
+				setActiveId( event.active.id );
+			} }
+			onDragOver={ ( event ) => {
+				const { active, over } = event;
+
+				if ( ! over || active.id === over.id ) {
+					setIndicator( null );
+					return;
+				}
+
+				const translatedRect = event.active.rect.current.translated;
+				const pointerX = translatedRect
+					? translatedRect.left + translatedRect.width / 2
+					: over.rect.left + over.rect.width / 2;
+				const position =
+					pointerX < over.rect.left + over.rect.width / 2
+						? 'before'
+						: 'after';
+
+				setIndicator( {
+					id: over.id,
+					position,
+				} );
+			} }
+			onDragEnd={ ( event ) => {
+				const { active, over } = event;
+				setActiveId( null );
+
+				if ( ! over || active.id === over.id ) {
+					setIndicator( null );
+					return;
+				}
+
+				const oldIndex = items.indexOf( active.id );
+				const overIndex = items.indexOf( over.id );
+				let newIndex = overIndex;
+
+				if ( indicator?.position === 'after' && oldIndex < overIndex ) {
+					newIndex = overIndex;
+				} else if ( indicator?.position === 'after' ) {
+					newIndex = overIndex + 1;
+				} else if ( oldIndex < overIndex ) {
+					newIndex = overIndex - 1;
+				}
+
+				setIndicator( null );
+				onSortEnd( {
+					oldIndex,
+					newIndex,
+				} );
+			} }
+			onDragCancel={ () => {
+				setActiveId( null );
+				setIndicator( null );
+			} }
+		>
+			<SortableContext items={ items } strategy={ noSortTransforms }>
+				<ComponentTag
+					{ ...selectProps }
+					components={ selectComponents }
+				/>
+			</SortableContext>
+			{ overlayContainer
+				? createPortal( dragOverlay, overlayContainer )
+				: dragOverlay }
+		</DndContext>
+	);
+};
 
 /**
  * Component Class
@@ -328,6 +573,7 @@ export default class SelectControl extends Component {
 		// block editor (WordPress 6.9+).
 		const ownerDoc = this.ownerDocument || document;
 		const isInIframe = ownerDoc !== document;
+		const overlayContainer = ownerDoc?.body || document.body;
 
 		const selectProps = {
 			// Test opened menu items:
@@ -411,8 +657,6 @@ export default class SelectControl extends Component {
 
 		// Multiple select.
 		if ( isMultiple ) {
-			selectProps.useDragHandle = true;
-			selectProps.axis = 'xy';
 			selectProps.onSortEnd = ( { oldIndex, newIndex } ) => {
 				const newValue = arrayMove(
 					this.getDefaultValue(),
@@ -421,10 +665,6 @@ export default class SelectControl extends Component {
 				);
 				selectProps.onChange( newValue );
 			};
-			selectProps.distance = 4;
-			// small fix for https://github.com/clauderic/react-sortable-hoc/pull/352:
-			selectProps.getHelperDimensions = ( { node } ) =>
-				node.getBoundingClientRect();
 			selectProps.components.MultiValue = SortableMultiValue;
 			selectProps.components.MultiValueLabel = SortableMultiValueLabel;
 
@@ -442,13 +682,16 @@ export default class SelectControl extends Component {
 
 			if ( isMultiple ) {
 				return this.wrapSelect(
-					<SortableCreatableSelect { ...selectProps } />
+					<SortableSelectWrapper
+						ComponentTag={ CreatableSelect }
+						overlayContainer={ overlayContainer }
+						selectProps={ selectProps }
+						onSortEnd={ selectProps.onSortEnd }
+					/>
 				);
 			}
 
-			return this.wrapSelect(
-				<CreatableSelect { ...selectProps } />
-			);
+			return this.wrapSelect( <CreatableSelect { ...selectProps } /> );
 		}
 
 		// Async select.
@@ -478,19 +721,27 @@ export default class SelectControl extends Component {
 
 			if ( isMultiple ) {
 				return this.wrapSelect(
-					<SortableAsyncSelect { ...selectProps } />
+					<SortableSelectWrapper
+						ComponentTag={ AsyncSelect }
+						overlayContainer={ overlayContainer }
+						selectProps={ selectProps }
+						onSortEnd={ selectProps.onSortEnd }
+					/>
 				);
 			}
 
-			return this.wrapSelect(
-				<AsyncSelect { ...selectProps } />
-			);
+			return this.wrapSelect( <AsyncSelect { ...selectProps } /> );
 		}
 
 		// Default select.
 		if ( isMultiple ) {
 			return this.wrapSelect(
-				<SortableSelect { ...selectProps } />
+				<SortableSelectWrapper
+					ComponentTag={ Select }
+					overlayContainer={ overlayContainer }
+					selectProps={ selectProps }
+					onSortEnd={ selectProps.onSortEnd }
+				/>
 			);
 		}
 
