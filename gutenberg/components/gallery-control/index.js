@@ -1374,7 +1374,7 @@ const SortableList = function ( props ) {
 								{ __( 'Show More', 'visual-portfolio' ) }
 							</Button>
 							<Button
-								isLink
+								variant="link"
 								onClick={ () => {
 									setShowingItems( items.length );
 								} }

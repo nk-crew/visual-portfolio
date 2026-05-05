@@ -272,7 +272,7 @@ export default function SetupWizard( props ) {
 					<>
 						<div className="vpf-setup-wizard-pagination-button">
 							<Button
-								isLink
+								variant="link"
 								onClick={ () => {
 									// Skip Setup
 									if ( step === 0 ) {

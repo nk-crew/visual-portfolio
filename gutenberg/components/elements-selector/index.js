@@ -167,7 +167,7 @@ function ElementsSelectorOptions( props ) {
 					{ optionName !== 'items' && (
 						<PanelBody>
 							<Button
-								isLink
+								variant="link"
 								style={ {
 									color: 'red',
 									marginTop: '5px',

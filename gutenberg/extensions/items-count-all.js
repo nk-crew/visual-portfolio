@@ -84,7 +84,7 @@ function CountNotice( props ) {
 			</ol>
 			<p>
 				<Button
-					isLink
+					variant="link"
 					onClick={ () => {
 						updateNoticeState( postId );
 						onToggle();

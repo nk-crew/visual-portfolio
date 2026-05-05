@@ -155,7 +155,7 @@ function LayoutsEditorBlock( props ) {
 						</>
 					) : (
 						<Button
-							isLink
+							variant="link"
 							onClick={ () => {
 								setAdditionalShortcodes(
 									! additionalShortcodes
