@@ -403,14 +403,24 @@ class Visual_Portfolio_Custom_Post_Type {
 		 * Add capacities
 		 */
 		foreach ( self::get_portfolio_caps() as $cap ) {
-			$wp_roles->add_cap( 'portfolio_manager', $cap );
-			$wp_roles->add_cap( 'portfolio_author', $cap );
-			$wp_roles->add_cap( 'administrator', $cap );
-			$wp_roles->add_cap( 'editor', $cap );
+			self::add_cap_to_roles(
+				array(
+					'portfolio_manager',
+					'portfolio_author',
+					'administrator',
+					'editor',
+				),
+				$cap
+			);
 		}
 		foreach ( self::get_lists_caps() as $cap ) {
-			$wp_roles->add_cap( 'portfolio_manager', $cap );
-			$wp_roles->add_cap( 'administrator', $cap );
+			self::add_cap_to_roles(
+				array(
+					'portfolio_manager',
+					'administrator',
+				),
+				$cap
+			);
 		}
 
 		update_option( 'visual_portfolio_updated_caps', $check_string );
@@ -430,16 +440,26 @@ class Visual_Portfolio_Custom_Post_Type {
 		}
 
 		foreach ( self::get_portfolio_caps() as $cap ) {
-			$wp_roles->remove_cap( 'portfolio_manager', $cap );
-			$wp_roles->remove_cap( 'portfolio_author', $cap );
-			$wp_roles->remove_cap( 'administrator', $cap );
-			$wp_roles->remove_cap( 'editor', $cap );
+			self::remove_cap_from_roles(
+				array(
+					'portfolio_manager',
+					'portfolio_author',
+					'administrator',
+					'editor',
+				),
+				$cap
+			);
 		}
 
 		if ( $remove_lists_caps ) {
 			foreach ( self::get_lists_caps() as $cap ) {
-				$wp_roles->remove_cap( 'portfolio_manager', $cap );
-				$wp_roles->remove_cap( 'administrator', $cap );
+				self::remove_cap_from_roles(
+					array(
+						'portfolio_manager',
+						'administrator',
+					),
+					$cap
+				);
 			}
 		}
 
@@ -479,6 +499,52 @@ class Visual_Portfolio_Custom_Post_Type {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Add capability to the specified roles.
+	 *
+	 * @param array  $role_names Role names.
+	 * @param string $capability Capability to add.
+	 * @return void
+	 */
+	private static function add_cap_to_roles( $role_names, $capability ) {
+		foreach ( self::get_roles_by_names( $role_names ) as $role ) {
+			$role->add_cap( $capability );
+		}
+	}
+
+	/**
+	 * Remove capability from the specified roles.
+	 *
+	 * @param array  $role_names Role names.
+	 * @param string $capability Capability to remove.
+	 * @return void
+	 */
+	private static function remove_cap_from_roles( $role_names, $capability ) {
+		foreach ( self::get_roles_by_names( $role_names ) as $role ) {
+			$role->remove_cap( $capability );
+		}
+	}
+
+	/**
+	 * Get existing role objects by names.
+	 *
+	 * @param array $role_names Role names.
+	 * @return array
+	 */
+	private static function get_roles_by_names( $role_names ) {
+		$roles = array();
+
+		foreach ( $role_names as $role_name ) {
+			$role = get_role( $role_name );
+
+			if ( $role ) {
+				$roles[] = $role;
+			}
+		}
+
+		return $roles;
 	}
 
 	/**
