@@ -518,6 +518,30 @@ test.describe( 'added images to block', () => {
 					imageFixtures[ foundFixtureIndex ].id = foundImage.id;
 
 					if ( typeof foundFixture.imageSettings !== 'undefined' ) {
+						const altField = page
+							.locator(
+								'.vpf-component-gallery-control-item-modal .components-base-control__field',
+								{
+									hasText: 'Alt',
+								}
+							)
+							.locator( 'input.components-text-control__input' );
+
+						await expect( altField ).toHaveValue(
+							foundFixture.alt
+						);
+
+						if (
+							typeof foundFixture.imageSettings.alt !==
+								'undefined'
+						) {
+							await altField.fill(
+								foundFixture.imageSettings.alt
+							);
+							imageFixtures[ foundFixtureIndex ].alt =
+								foundFixture.imageSettings.alt;
+						}
+
 						await page
 							.locator(
 								'.vpf-component-gallery-control-item-modal .components-base-control__field',
