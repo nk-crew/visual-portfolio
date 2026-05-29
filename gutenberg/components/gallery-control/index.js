@@ -1,5 +1,6 @@
 import './style.scss';
 import './extensions/dynamic-categories';
+import './extensions/image-alt';
 import './extensions/image-title-and-desription';
 
 import {
@@ -139,8 +140,37 @@ function getHumanFileSize( size ) {
 	}`;
 }
 
+function getAttachmentAlt( img ) {
+	if ( typeof img?.alt === 'string' ) {
+		return img.alt;
+	}
+
+	if ( typeof img?.alt_text === 'string' ) {
+		return img.alt_text;
+	}
+
+	return '';
+}
+
+function normalizeImageAlt( imgData, img ) {
+	if ( Object.prototype.hasOwnProperty.call( imgData, 'alt' ) ) {
+		return imgData;
+	}
+
+	const attachmentAlt = getAttachmentAlt( img );
+
+	if ( attachmentAlt ) {
+		return {
+			...imgData,
+			alt: attachmentAlt,
+		};
+	}
+
+	return imgData;
+}
+
 function prepareImage( img ) {
-	const imgData = {
+	let imgData = {
 		id: img.id,
 		imgUrl: img.url,
 		imgThumbnailUrl: img.url,
@@ -167,6 +197,8 @@ function prepareImage( img ) {
 	if ( img.description ) {
 		imgData.description = img.description;
 	}
+
+	imgData = normalizeImageAlt( imgData, img );
 
 	return imgData;
 }
@@ -197,7 +229,10 @@ function prepareImages( images, currentImages ) {
 					const currentId = currentImagesIds.indexOf( img.id );
 
 					if ( currentId > -1 && currentImages[ currentId ] ) {
-						currentImgData = currentImages[ currentId ];
+						currentImgData = normalizeImageAlt(
+							currentImages[ currentId ],
+							img
+						);
 					}
 				}
 
@@ -286,7 +321,7 @@ function getGalleryModalPreview( imageData, imgUrl, props ) {
 	const preview = (
 		<img
 			src={ imageData?.source_url || imgUrl }
-			alt={ imageData?.alt_text || '' }
+			alt={ props?.img?.alt || imageData?.alt_text || '' }
 		/>
 	);
 

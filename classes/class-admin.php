@@ -1668,6 +1668,13 @@ class Visual_Portfolio_Admin {
 						'modal_width'    => 'full',
 						'modal_position' => 'left',
 					),
+					'alt' => array(
+						'type'           => 'text',
+						'label'          => esc_html__( 'Alt', 'visual-portfolio' ),
+						'description'    => esc_html__( 'Edit alt text for this gallery item only.', 'visual-portfolio' ),
+						'modal_width'    => 'full',
+						'modal_position' => 'left',
+					),
 					'description' => array(
 						'type'           => 'textarea',
 						'label'          => esc_html__( 'Description', 'visual-portfolio' ),

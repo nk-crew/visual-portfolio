@@ -129,7 +129,15 @@ class Visual_Portfolio_Sitemap {
 									foreach ( $options['images'] as $image ) {
 										$image_id = $image['id'];
 
-										$image_alt = $image['description'] ?? get_post_meta( $image_id, '_wp_attachment_image_alt', true ) ?? '';
+										$image_alt = '';
+
+										if ( isset( $image['alt'] ) && '' !== trim( (string) $image['alt'] ) ) {
+											$image_alt = trim( (string) $image['alt'] );
+										} elseif ( isset( $image['description'] ) && '' !== trim( (string) $image['description'] ) ) {
+											$image_alt = trim( (string) $image['description'] );
+										} else {
+											$image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true ) ?? '';
+										}
 
 										$image_title = $image['title'] ?? get_the_title( $image_id );
 

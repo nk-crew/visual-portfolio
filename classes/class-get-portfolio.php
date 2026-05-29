@@ -652,6 +652,7 @@ class Visual_Portfolio_Get {
 						'uid'            => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
 						'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : Visual_Portfolio_Images::wp_get_attachment_image_url( $img['id'], $img_size_popup ),
 						'title'          => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
+						'alt'            => isset( $img['alt'] ) ? $img['alt'] : '',
 						'content'        => isset( $img['description'] ) && $img['description'] ? $img['description'] : '',
 						'format'         => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
 						'published_time' => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
@@ -1364,7 +1365,11 @@ class Visual_Portfolio_Get {
 
 			// prepare titles and descriptions.
 			foreach ( $images as $k => $img ) {
-				$img_meta = array(
+				$has_custom_alt     = array_key_exists( 'alt', $img );
+				$item_alt           = $has_custom_alt ? (string) $img['alt'] : '';
+				$title_source       = $options['images_titles_source'] ?? 'custom';
+				$description_source = $options['images_descriptions_source'] ?? 'custom';
+				$img_meta           = array(
 					'title'             => '',
 					'image_title'       => '',
 					'image_description' => '',
@@ -1405,9 +1410,13 @@ class Visual_Portfolio_Get {
 						}
 					}
 
+					if ( $has_custom_alt ) {
+						$img_meta['alt'] = $item_alt;
+					}
+
 					// title.
 					if ( 'custom' !== $options['images_titles_source'] ) {
-						$images[ $k ]['title'] = $img_meta[ $options['images_titles_source'] ] ?? '';
+						$images[ $k ]['title'] = $img_meta[ $title_source ] ?? '';
 					}
 
 					// image title.
@@ -1415,7 +1424,7 @@ class Visual_Portfolio_Get {
 
 					// description.
 					if ( 'custom' !== $options['images_descriptions_source'] ) {
-						$images[ $k ]['description'] = $img_meta[ $options['images_descriptions_source'] ] ?? '';
+						$images[ $k ]['description'] = $img_meta[ $description_source ] ?? '';
 					}
 
 					// image description.
@@ -2364,7 +2373,16 @@ class Visual_Portfolio_Get {
 		}
 
 		// prepare image.
-		$args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, '' );
+		$image_attrs = '';
+		$custom_alt  = isset( $args['alt'] ) ? trim( (string) $args['alt'] ) : '';
+
+		if ( '' !== $custom_alt ) {
+			$image_attrs = array(
+				'alt' => $custom_alt,
+			);
+		}
+
+		$args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, $image_attrs );
 
 		// prepare date.
 		if ( isset( $args['opts']['show_date'] ) ) {
@@ -2567,7 +2585,7 @@ class Visual_Portfolio_Get {
 						'title'            => $attachment->post_title,
 						'description'      => $attachment->post_content,
 						'caption'          => wp_get_attachment_caption( $attachment->ID ),
-						'alt'              => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+						'alt'              => isset( $args['alt'] ) && '' !== trim( (string) $args['alt'] ) ? trim( (string) $args['alt'] ) : get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
 						'url'              => $img_meta[0],
 						'srcset'           => wp_get_attachment_image_srcset( $args['image_id'], $args['img_size_popup'] ),
 						'width'            => $img_meta[1],
