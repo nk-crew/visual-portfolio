@@ -958,7 +958,7 @@ class Visual_Portfolio_Custom_Post_Type {
 	public function wp_before_admin_bar_render() {
 		global $wp_admin_bar;
 
-		if ( ! is_super_admin() || ! is_admin_bar_showing() ) {
+		if ( ! is_admin_bar_showing() || ! current_user_can( 'edit_vp_lists' ) ) {
 			return;
 		}
 
