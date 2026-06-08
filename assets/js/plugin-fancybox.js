@@ -135,6 +135,10 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 					'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.0248 4H16.1725L11.4815 9.08269L17 16H12.6801L9.29422 11.8058L5.4246 16H3.27379L8.29031 10.5625L3 4H7.42938L10.4867 7.83365L14.0248 4ZM13.2703 14.7827H14.4598L6.7814 5.15385H5.50369L13.2703 14.7827Z" fill="currentColor" /></svg>' +
 					'<span>X</span>' +
 					'</a>' +
+					'<a class="fancybox-share__button fancybox-share__button--li" href="https://www.linkedin.com/sharing/share-offsite/?url={{url}}">' +
+					'<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.94 8.5H3.56V20h3.38V8.5ZM5.25 3A1.97 1.97 0 1 0 5.3 6.94 1.97 1.97 0 0 0 5.25 3ZM20.44 13.02c0-3.47-1.85-5.08-4.32-5.08-1.99 0-2.88 1.1-3.38 1.87V8.5H9.38c.04.87 0 11.5 0 11.5h3.38v-6.42c0-.34.03-.69.13-.93.27-.69.88-1.4 1.92-1.4 1.36 0 1.9 1.05 1.9 2.58V20h3.38v-6.98Z" fill="currentColor"/></svg>' +
+					'<span>LinkedIn</span>' +
+					'</a>' +
 					'<a class="fancybox-share__button fancybox-share__button--pt" href="https://www.pinterest.com/pin/create/button/?url={{url}}&description={{descr}}&media={{media}}">' +
 					'<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m265 56c-109 0-164 78-164 144 0 39 15 74 47 87 5 2 10 0 12-5l4-19c2-6 1-8-3-13-9-11-15-25-15-45 0-58 43-110 113-110 62 0 96 38 96 88 0 67-30 122-73 122-24 0-42-19-36-44 6-29 20-60 20-81 0-19-10-35-31-35-25 0-44 26-44 60 0 21 7 36 7 36l-30 125c-8 37-1 83 0 87 0 3 4 4 5 2 2-3 32-39 42-75l16-64c8 16 31 29 56 29 74 0 124-67 124-157 0-69-58-132-146-132z" fill="#fff"/></svg>' +
 					'<span>Pinterest</span>' +
