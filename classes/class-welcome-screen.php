@@ -164,6 +164,25 @@ class Visual_Portfolio_Welcome_Screen {
 	}
 
 	/**
+	 * Get welcome page URL.
+	 *
+	 * @return string
+	 */
+	public static function get_welcome_page_url() {
+		$welcome_page_url =
+		Visual_Portfolio_Custom_Post_Type::portfolio_post_type_is_registered() ?
+		'edit.php?post_type=portfolio' :
+		'admin.php';
+
+		return add_query_arg(
+			array(
+				'page' => 'visual-portfolio-welcome',
+			),
+			admin_url( $welcome_page_url )
+		);
+	}
+
+	/**
 	 * Redirect to Welcome page after activation.
 	 */
 	public function redirect_to_welcome_screen() {
@@ -182,7 +201,7 @@ class Visual_Portfolio_Welcome_Screen {
 		}
 
 		// Redirect to welcome page.
-		wp_safe_redirect( add_query_arg( array( 'page' => 'visual-portfolio-welcome' ), admin_url( Visual_Portfolio_Custom_Post_Type::get_menu_slug() ) ) );
+		wp_safe_redirect( self::get_welcome_page_url() );
 	}
 
 	/**
