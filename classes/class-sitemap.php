@@ -95,8 +95,16 @@ class Visual_Portfolio_Sitemap {
 						'visual-portfolio/saved' === $block['blockName'] ||
 						'nk/visual-portfolio' === $block['blockName']
 					) {
-						$options = Visual_Portfolio_Get::get_options( $block['attrs'] );
-						switch ( $options['content_source'] ) {
+						$block_attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
+						$options     = Visual_Portfolio_Get::get_options( $block_attrs );
+
+						if ( ! is_array( $options ) ) {
+							$options = array();
+						}
+
+						$content_source = $options['content_source'] ?? ( $block_attrs['content_source'] ?? '' );
+
+						switch ( $content_source ) {
 							case 'post-based':
 								if ( isset( $options['posts_source'] ) ) {
 									$query_opts = Visual_Portfolio_Get::get_query_params( $options, false, $options['id'] );
@@ -125,11 +133,21 @@ class Visual_Portfolio_Sitemap {
 								}
 								break;
 							case 'images':
-								if ( isset( $options['images'] ) ) {
-									foreach ( $options['images'] as $image ) {
+								$images = $options['images'] ?? ( $block_attrs['images'] ?? array() );
+
+								if ( is_array( $images ) ) {
+									foreach ( $images as $image ) {
 										$image_id = $image['id'];
 
-										$image_alt = $image['description'] ?? get_post_meta( $image_id, '_wp_attachment_image_alt', true ) ?? '';
+										$image_alt = '';
+
+										if ( isset( $image['alt'] ) && '' !== trim( (string) $image['alt'] ) ) {
+											$image_alt = trim( (string) $image['alt'] );
+										} elseif ( isset( $image['description'] ) && '' !== trim( (string) $image['description'] ) ) {
+											$image_alt = trim( (string) $image['description'] );
+										} else {
+											$image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true ) ?? '';
+										}
 
 										$image_title = $image['title'] ?? get_the_title( $image_id );
 

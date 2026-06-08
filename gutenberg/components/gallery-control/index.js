@@ -1,5 +1,6 @@
 import './style.scss';
 import './extensions/dynamic-categories';
+import './extensions/image-alt';
 import './extensions/image-title-and-desription';
 
 import {
@@ -46,6 +47,10 @@ import MediaPreviewCard from '../media-preview-card';
 import { ToggleGroupButtonsControl } from '../toggle-group-control';
 import CollapsibleSection from './collapsible-section';
 import getAllCategories from './utils/get-all-categories';
+import {
+	getEffectiveAltText,
+	getItemAltValue,
+} from './utils/image-alt';
 
 const { VPGutenbergVariables } = window;
 
@@ -269,7 +274,7 @@ function getGalleryItemPreview( img, props ) {
 	const preview = (
 		<img
 			src={ img.imgThumbnailUrl || img.imgUrl }
-			alt={ img.alt || img.imgThumbnailUrl || img.imgUrl }
+			alt={ getItemAltValue( img ) || img.imgThumbnailUrl || img.imgUrl }
 			loading="lazy"
 		/>
 	);
@@ -286,7 +291,7 @@ function getGalleryModalPreview( imageData, imgUrl, props ) {
 	const preview = (
 		<img
 			src={ imageData?.source_url || imgUrl }
-			alt={ imageData?.alt_text || '' }
+			alt={ getEffectiveAltText( props?.img, imageData ) }
 		/>
 	);
 

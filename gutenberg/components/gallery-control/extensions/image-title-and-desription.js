@@ -4,6 +4,7 @@ import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 import getControlNameClassName from '../../../utils/get-control-name-class-name';
+import { getEffectiveAltText } from '../utils/image-alt';
 
 /**
  * Change Title and Description controls when used dynamic source option.
@@ -45,7 +46,7 @@ function RenderTitleAndDescriptionImageControls( props ) {
 			);
 			break;
 		case 'alt':
-			text = imgData?.alt_text || '';
+			text = getEffectiveAltText( img, imgData );
 			description = __(
 				'Loaded automatically from the image Alt',
 				'visual-portfolio'

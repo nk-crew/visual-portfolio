@@ -6,6 +6,7 @@
 		"description": "Description  of image 300 on 200",
 		"imageSettings": {
 			"title": "Alternative title of 300 on 200",
+			"alt": "Custom alt of image 300 on 200",
 			"description": "Alternative description  of image 300 on 200",
 			"format": "video",
 			"videoUrl": "https://www.youtube.com/watch?v=354pybu91aQ&ab_channel=VisualPortfolio"
