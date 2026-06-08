@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-08T13:43:19+00:00\n"
+"POT-Creation-Date: 2026-06-08T13:57:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
@@ -318,7 +318,7 @@ msgid "Posts Settings"
 msgstr ""
 
 #: classes/class-admin.php:1238
-#: gutenberg/components/gallery-control/index.js:969
+#: gutenberg/components/gallery-control/index.js:939
 msgid "Media Settings"
 msgstr ""
 
@@ -363,7 +363,7 @@ msgstr ""
 
 #: classes/class-admin.php:1327
 #: classes/class-custom-post-type.php:848
-#: gutenberg/components/gallery-control/index.js:280
+#: gutenberg/components/gallery-control/index.js:250
 msgid "Media"
 msgstr ""
 
@@ -775,12 +775,12 @@ msgid "Caption"
 msgstr ""
 
 #: classes/class-admin.php:2276
-#: gutenberg/components/gallery-control/index.js:290
+#: gutenberg/components/gallery-control/index.js:260
 msgid "Normal"
 msgstr ""
 
 #: classes/class-admin.php:2280
-#: gutenberg/components/gallery-control/index.js:294
+#: gutenberg/components/gallery-control/index.js:264
 msgid "Hover"
 msgstr ""
 
@@ -1052,7 +1052,7 @@ msgstr ""
 #: classes/class-rest.php:307
 #: classes/class-shortcode.php:58
 #: gutenberg/blocks/filter-by-category/edit.js:155
-#: gutenberg/components/gallery-control/index.js:1210
+#: gutenberg/components/gallery-control/index.js:1180
 msgid "All"
 msgstr ""
 
@@ -2461,7 +2461,7 @@ msgid "Remove"
 msgstr ""
 
 #: gutenberg/components/focal-point-control/index.js:72
-#: gutenberg/components/gallery-control/index.js:427
+#: gutenberg/components/gallery-control/index.js:397
 msgid "Image focal point"
 msgstr ""
 
@@ -2469,108 +2469,104 @@ msgstr ""
 msgid "Top"
 msgstr ""
 
-#: gutenberg/components/gallery-control/extensions/image-alt.js:34
-msgid "Initial value is loaded from Media Library. Changes affect only this gallery item."
-msgstr ""
-
-#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:43
+#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:36
 msgid "Loaded automatically from the image Title"
 msgstr ""
 
-#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:50
+#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:43
 msgid "Loaded automatically from the image Caption"
 msgstr ""
 
-#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:57
+#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:50
 msgid "Loaded automatically from the image Alt"
 msgstr ""
 
-#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:64
+#: gutenberg/components/gallery-control/extensions/image-title-and-desription.js:57
 msgid "Loaded automatically from the image Description"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:129
+#: gutenberg/components/gallery-control/index.js:133
 msgid "Edit Gallery"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:130
+#: gutenberg/components/gallery-control/index.js:134
 msgid "Add Media"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:445
+#: gutenberg/components/gallery-control/index.js:415
 msgid "Additional media info"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:479
+#: gutenberg/components/gallery-control/index.js:449
 msgid "File URL"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:490
+#: gutenberg/components/gallery-control/index.js:460
 msgid "Attachment page"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:504
+#: gutenberg/components/gallery-control/index.js:474
 msgid "Edit details"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:728
+#: gutenberg/components/gallery-control/index.js:698
 msgid "Previous image"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:748
+#: gutenberg/components/gallery-control/index.js:718
 msgid "Next image"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:905
+#: gutenberg/components/gallery-control/index.js:875
 msgid "Select"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1132
+#: gutenberg/components/gallery-control/index.js:1102
 msgid "Select All"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1151
+#: gutenberg/components/gallery-control/index.js:1121
 msgid "Bulk Actions"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1156
+#: gutenberg/components/gallery-control/index.js:1126
 msgid "Bulk actions"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1163
+#: gutenberg/components/gallery-control/index.js:1133
 msgid "Edit"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1167
+#: gutenberg/components/gallery-control/index.js:1137
 msgid "Delete"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1176
+#: gutenberg/components/gallery-control/index.js:1146
 msgid "Are you sure you want to remove selected items?"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1203
+#: gutenberg/components/gallery-control/index.js:1173
 msgid "Filter by Category"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1214
+#: gutenberg/components/gallery-control/index.js:1184
 msgid "Uncategorized"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1248
+#: gutenberg/components/gallery-control/index.js:1218
 msgid "Bulk Image Settings"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1400
+#: gutenberg/components/gallery-control/index.js:1370
 #, js-format
 msgid "Showing %1$s of %2$s media items"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1418
+#: gutenberg/components/gallery-control/index.js:1388
 msgid "Show More"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1426
+#: gutenberg/components/gallery-control/index.js:1396
 msgid "Show All"
 msgstr ""
 

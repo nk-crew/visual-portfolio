@@ -1410,7 +1410,7 @@ class Visual_Portfolio_Get {
 						}
 					}
 
-					if ( $has_custom_alt ) {
+					if ( $has_custom_alt && '' !== trim( $item_alt ) ) {
 						$img_meta['alt'] = $item_alt;
 					}
 

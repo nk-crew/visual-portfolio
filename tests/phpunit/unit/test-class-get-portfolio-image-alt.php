@@ -79,6 +79,40 @@ class Test_Class_Get_Portfolio_Image_Alt extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Empty item alt should fall back to attachment alt.
+	 */
+	public function test_image_alt_source_falls_back_to_attachment_alt_for_empty_item_alt() {
+		$attach_id = $this->wp_insert_attachment(
+			dirname( dirname( __FILE__ ) ) . '/fixtures/image.png'
+		);
+
+		update_post_meta( $attach_id, '_wp_attachment_image_alt', 'Attachment alt' );
+
+		$query = Visual_Portfolio_Get::get_query_params(
+			array(
+				'content_source'             => 'images',
+				'images'                     => array(
+					array(
+						'id'     => $attach_id,
+						'imgUrl' => wp_get_attachment_image_url( $attach_id, 'full' ),
+						'alt'    => '',
+					),
+				),
+				'images_titles_source'       => 'alt',
+				'images_descriptions_source' => 'alt',
+				'images_order_by'            => 'default',
+				'images_order_direction'     => 'asc',
+				'items_count'                => 10,
+			),
+			true
+		);
+
+		$this->assertNotEmpty( $query['images'] );
+		$this->assertSame( 'Attachment alt', $query['images'][0]['title'] );
+		$this->assertSame( 'Attachment alt', $query['images'][0]['description'] );
+	}
+
+	/**
 	 * Popup image alt should prefer the item-level alt value.
 	 */
 	public function test_popup_image_prefers_item_level_alt() {

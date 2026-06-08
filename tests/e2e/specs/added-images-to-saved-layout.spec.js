@@ -427,7 +427,11 @@ test.describe( 'added images to saved layout', () => {
 					)
 					.locator( 'input.components-text-control__input' );
 
-				await expect( altField ).toHaveValue( foundFixture.alt );
+				await expect( altField ).toHaveValue( '' );
+				await expect( altField ).toHaveAttribute(
+					'placeholder',
+					foundFixture.alt
+				);
 
 				if (
 					typeof foundFixture.imageSettings.alt !== 'undefined'

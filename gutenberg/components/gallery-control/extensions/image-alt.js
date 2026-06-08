@@ -2,15 +2,14 @@ import classnames from 'classnames/dedupe';
 
 import { BaseControl, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
 
 import getControlNameClassName from '../../../utils/get-control-name-class-name';
-
-function hasOwnAltValue( img ) {
-	return Object.prototype.hasOwnProperty.call( img || {}, 'alt' );
-}
+import {
+	getAltPlaceholder,
+	getItemAltValue,
+	hasItemAltOverride,
+} from '../utils/image-alt';
 
 function RenderImageAltControl( props ) {
 	const { data, img, onChange, index, fullName, className } = props;
@@ -25,29 +24,17 @@ function RenderImageAltControl( props ) {
 					: null,
 			};
 		},
-		[ img ]
+		[ img.id ]
 	);
 
-	const value = hasOwnAltValue( img ) ? img.alt : imgData?.alt_text || '';
-	const help = hasOwnAltValue( img )
-		? data.description
-		: __(
-				'Initial value is loaded from Media Library. Changes affect only this gallery item.',
-				'visual-portfolio'
-		  );
-
-	useEffect( () => {
-		if ( ! hasOwnAltValue( img ) && imgData?.alt_text ) {
-			onChange( {
-				alt: imgData.alt_text,
-			} );
-		}
-	}, [ img, imgData?.alt_text, onChange ] );
+	const value = hasItemAltOverride( img ) ? getItemAltValue( img ) : '';
+	const placeholder = getAltPlaceholder( imgData );
 
 	return (
 		<BaseControl
 			id={ `vpf-control-group-${ fullName }` }
 			label={ data.label }
+			help={ data.description || null }
 			className={ classnames(
 				'vpf-control-wrap',
 				'vpf-control-wrap-text',
@@ -61,6 +48,7 @@ function RenderImageAltControl( props ) {
 					img.id || img.imgThumbnailUrl || img.imgUrl
 				}-${ index }-alt` }
 				value={ value }
+				placeholder={ placeholder }
 				onChange={ ( val ) => {
 					onChange( {
 						alt: val,
@@ -69,7 +57,6 @@ function RenderImageAltControl( props ) {
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 			/>
-			<p className="components-base-control__help">{ help }</p>
 		</BaseControl>
 	);
 }

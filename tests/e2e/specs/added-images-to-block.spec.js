@@ -527,7 +527,9 @@ test.describe( 'added images to block', () => {
 							)
 							.locator( 'input.components-text-control__input' );
 
-						await expect( altField ).toHaveValue(
+						await expect( altField ).toHaveValue( '' );
+						await expect( altField ).toHaveAttribute(
+							'placeholder',
 							foundFixture.alt
 						);
 

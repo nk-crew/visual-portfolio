@@ -47,6 +47,10 @@ import MediaPreviewCard from '../media-preview-card';
 import { ToggleGroupButtonsControl } from '../toggle-group-control';
 import CollapsibleSection from './collapsible-section';
 import getAllCategories from './utils/get-all-categories';
+import {
+	getEffectiveAltText,
+	getItemAltValue,
+} from './utils/image-alt';
 
 const { VPGutenbergVariables } = window;
 
@@ -140,37 +144,8 @@ function getHumanFileSize( size ) {
 	}`;
 }
 
-function getAttachmentAlt( img ) {
-	if ( typeof img?.alt === 'string' ) {
-		return img.alt;
-	}
-
-	if ( typeof img?.alt_text === 'string' ) {
-		return img.alt_text;
-	}
-
-	return '';
-}
-
-function normalizeImageAlt( imgData, img ) {
-	if ( Object.prototype.hasOwnProperty.call( imgData, 'alt' ) ) {
-		return imgData;
-	}
-
-	const attachmentAlt = getAttachmentAlt( img );
-
-	if ( attachmentAlt ) {
-		return {
-			...imgData,
-			alt: attachmentAlt,
-		};
-	}
-
-	return imgData;
-}
-
 function prepareImage( img ) {
-	let imgData = {
+	const imgData = {
 		id: img.id,
 		imgUrl: img.url,
 		imgThumbnailUrl: img.url,
@@ -197,8 +172,6 @@ function prepareImage( img ) {
 	if ( img.description ) {
 		imgData.description = img.description;
 	}
-
-	imgData = normalizeImageAlt( imgData, img );
 
 	return imgData;
 }
@@ -229,10 +202,7 @@ function prepareImages( images, currentImages ) {
 					const currentId = currentImagesIds.indexOf( img.id );
 
 					if ( currentId > -1 && currentImages[ currentId ] ) {
-						currentImgData = normalizeImageAlt(
-							currentImages[ currentId ],
-							img
-						);
+						currentImgData = currentImages[ currentId ];
 					}
 				}
 
@@ -304,7 +274,7 @@ function getGalleryItemPreview( img, props ) {
 	const preview = (
 		<img
 			src={ img.imgThumbnailUrl || img.imgUrl }
-			alt={ img.alt || img.imgThumbnailUrl || img.imgUrl }
+			alt={ getItemAltValue( img ) || img.imgThumbnailUrl || img.imgUrl }
 			loading="lazy"
 		/>
 	);
@@ -321,7 +291,7 @@ function getGalleryModalPreview( imageData, imgUrl, props ) {
 	const preview = (
 		<img
 			src={ imageData?.source_url || imgUrl }
-			alt={ props?.img?.alt || imageData?.alt_text || '' }
+			alt={ getEffectiveAltText( props?.img, imageData ) }
 		/>
 	);
 
