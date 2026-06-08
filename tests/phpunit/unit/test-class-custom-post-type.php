@@ -57,7 +57,7 @@ class Test_Visual_Portfolio_Custom_Post_Type extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test disabling portfolio post type removes custom roles and capabilities.
+	 * Test disabling portfolio post type keeps manager role for Saved Layouts.
 	 *
 	 * @return void
 	 */
@@ -72,8 +72,12 @@ class Test_Visual_Portfolio_Custom_Post_Type extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertNull( get_role( 'portfolio_manager' ) );
+		$portfolio_manager = get_role( 'portfolio_manager' );
+
+		$this->assertNotNull( $portfolio_manager );
 		$this->assertNull( get_role( 'portfolio_author' ) );
+		$this->assertFalse( $portfolio_manager->has_cap( 'edit_portfolios' ) );
+		$this->assertTrue( $portfolio_manager->has_cap( 'edit_vp_lists' ) );
 		$this->assertFalse( get_role( 'administrator' )->has_cap( 'edit_portfolios' ) );
 		$this->assertTrue( get_role( 'administrator' )->has_cap( 'edit_vp_lists' ) );
 		$this->assertFalse( get_role( 'editor' )->has_cap( 'edit_portfolios' ) );

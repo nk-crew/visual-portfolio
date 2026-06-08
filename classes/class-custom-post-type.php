@@ -321,10 +321,7 @@ class Visual_Portfolio_Custom_Post_Type {
 	 */
 	public function add_role_caps() {
 		if ( ! self::portfolio_post_type_is_registered() ) {
-			if ( self::has_custom_roles_or_caps() ) {
-				self::remove_roles_and_caps( false );
-			}
-
+			self::sync_roles_without_portfolio();
 			return;
 		}
 
@@ -354,7 +351,7 @@ class Visual_Portfolio_Custom_Post_Type {
 			return;
 		}
 
-		self::remove_roles_and_caps( false );
+		self::sync_roles_without_portfolio( true );
 	}
 
 	/**
@@ -368,9 +365,7 @@ class Visual_Portfolio_Custom_Post_Type {
 			return;
 		}
 
-		global $wp_version;
-
-		$check_string = 'Plugin: ' . VISUAL_PORTFOLIO_VERSION . ' WP: ' . $wp_version;
+		$check_string = self::get_updated_caps_check_string( true );
 
 		if ( ! $force && get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
 			return;
@@ -413,6 +408,70 @@ class Visual_Portfolio_Custom_Post_Type {
 				$cap
 			);
 		}
+		foreach ( self::get_lists_caps() as $cap ) {
+			self::add_cap_to_roles(
+				array(
+					'portfolio_manager',
+					'administrator',
+				),
+				$cap
+			);
+		}
+
+		update_option( 'visual_portfolio_updated_caps', $check_string );
+	}
+
+	/**
+	 * Sync roles when portfolio post type is disabled.
+	 *
+	 * Keeps Portfolio Manager for Saved Layouts, removes Portfolio Author.
+	 *
+	 * @param bool $force Force capabilities sync.
+	 * @return void
+	 */
+	public static function sync_roles_without_portfolio( $force = false ) {
+		if ( ! is_blog_installed() ) {
+			return;
+		}
+
+		$check_string = self::get_updated_caps_check_string( false );
+
+		if ( ! $force && get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
+			return;
+		}
+
+		$wp_roles = wp_roles();
+
+		if ( ! isset( $wp_roles ) || empty( $wp_roles ) || ! $wp_roles ) {
+			return;
+		}
+
+		$author = $wp_roles->get_role( 'author' );
+
+		if ( ! $author ) {
+			return;
+		}
+
+		foreach ( self::get_portfolio_caps() as $cap ) {
+			self::remove_cap_from_roles(
+				array(
+					'portfolio_manager',
+					'portfolio_author',
+					'administrator',
+					'editor',
+				),
+				$cap
+			);
+		}
+
+		remove_role( 'portfolio_author' );
+
+		$wp_roles->add_role(
+			'portfolio_manager',
+			__( 'Portfolio Manager', 'visual-portfolio' ),
+			$author->capabilities
+		);
+
 		foreach ( self::get_lists_caps() as $cap ) {
 			self::add_cap_to_roles(
 				array(
@@ -481,14 +540,19 @@ class Visual_Portfolio_Custom_Post_Type {
 			return false;
 		}
 
-		if ( $wp_roles->is_role( 'portfolio_manager' ) || $wp_roles->is_role( 'portfolio_author' ) ) {
+		if ( $wp_roles->is_role( 'portfolio_author' ) ) {
 			return true;
 		}
 
-		$administrator = $wp_roles->get_role( 'administrator' );
-		$editor        = $wp_roles->get_role( 'editor' );
+		$portfolio_manager = $wp_roles->get_role( 'portfolio_manager' );
+		$administrator     = $wp_roles->get_role( 'administrator' );
+		$editor            = $wp_roles->get_role( 'editor' );
 
 		foreach ( self::get_portfolio_caps() as $cap ) {
+			if ( $portfolio_manager && $portfolio_manager->has_cap( $cap ) ) {
+				return true;
+			}
+
 			if ( $administrator && $administrator->has_cap( $cap ) ) {
 				return true;
 			}
@@ -499,6 +563,18 @@ class Visual_Portfolio_Custom_Post_Type {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get option value used to skip repeated capabilities sync.
+	 *
+	 * @param bool $portfolio_post_type_registered Is portfolio post type registered.
+	 * @return string
+	 */
+	private static function get_updated_caps_check_string( $portfolio_post_type_registered ) {
+		global $wp_version;
+
+		return 'Plugin: ' . VISUAL_PORTFOLIO_VERSION . ' WP: ' . $wp_version . ' Portfolio: ' . ( $portfolio_post_type_registered ? '1' : '0' );
 	}
 
 	/**
