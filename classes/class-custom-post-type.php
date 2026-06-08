@@ -41,6 +41,7 @@ class Visual_Portfolio_Custom_Post_Type {
 
 		// custom post roles.
 		add_action( 'init', array( $this, 'add_role_caps' ) );
+		add_action( 'update_option_vp_general', array( __CLASS__, 'sync_roles_after_settings_update' ), 10, 2 );
 
 		// remove screen options from portfolio list page.
 		add_action( 'screen_options_show_screen', array( $this, 'remove_screen_options' ), 10, 2 );
@@ -319,15 +320,54 @@ class Visual_Portfolio_Custom_Post_Type {
 	 * Add Roles
 	 */
 	public function add_role_caps() {
+		if ( ! self::portfolio_post_type_is_registered() ) {
+			self::sync_roles_without_portfolio();
+			return;
+		}
+
+		self::sync_roles_and_caps();
+	}
+
+	/**
+	 * Sync portfolio roles after settings update.
+	 *
+	 * @param array $old_value Previous option value.
+	 * @param array $value     New option value.
+	 * @return void
+	 */
+	public static function sync_roles_after_settings_update( $old_value, $value ) {
+		$old_value = is_array( $old_value ) ? $old_value : array();
+		$value     = is_array( $value ) ? $value : array();
+
+		$was_registered = ! empty( $old_value['register_portfolio_post_type'] );
+		$is_registered  = ! empty( $value['register_portfolio_post_type'] );
+
+		if ( $was_registered === $is_registered ) {
+			return;
+		}
+
+		if ( $is_registered ) {
+			self::sync_roles_and_caps( true );
+			return;
+		}
+
+		self::sync_roles_without_portfolio( true );
+	}
+
+	/**
+	 * Sync roles and capabilities.
+	 *
+	 * @param bool $force Force capabilities sync.
+	 * @return void
+	 */
+	public static function sync_roles_and_caps( $force = false ) {
 		if ( ! is_blog_installed() ) {
 			return;
 		}
 
-		global $wp_version;
+		$check_string = self::get_updated_caps_check_string( true );
 
-		$check_string = 'Plugin: ' . VISUAL_PORTFOLIO_VERSION . ' WP: ' . $wp_version;
-
-		if ( get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
+		if ( ! $force && get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
 			return;
 		}
 
@@ -338,6 +378,10 @@ class Visual_Portfolio_Custom_Post_Type {
 		}
 
 		$author = $wp_roles->get_role( 'author' );
+
+		if ( ! $author ) {
+			return;
+		}
 
 		$wp_roles->add_role(
 			'portfolio_manager',
@@ -350,7 +394,242 @@ class Visual_Portfolio_Custom_Post_Type {
 			$author->capabilities
 		);
 
-		$portfolio_cap = array(
+		/**
+		 * Add capacities
+		 */
+		foreach ( self::get_portfolio_caps() as $cap ) {
+			self::add_cap_to_roles(
+				array(
+					'portfolio_manager',
+					'portfolio_author',
+					'administrator',
+					'editor',
+				),
+				$cap
+			);
+		}
+		foreach ( self::get_lists_caps() as $cap ) {
+			self::add_cap_to_roles(
+				array(
+					'portfolio_manager',
+					'administrator',
+				),
+				$cap
+			);
+		}
+
+		update_option( 'visual_portfolio_updated_caps', $check_string );
+	}
+
+	/**
+	 * Sync roles when portfolio post type is disabled.
+	 *
+	 * Keeps Portfolio Manager for Saved Layouts, removes Portfolio Author.
+	 *
+	 * @param bool $force Force capabilities sync.
+	 * @return void
+	 */
+	public static function sync_roles_without_portfolio( $force = false ) {
+		if ( ! is_blog_installed() ) {
+			return;
+		}
+
+		$check_string = self::get_updated_caps_check_string( false );
+
+		if ( ! $force && get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
+			return;
+		}
+
+		$wp_roles = wp_roles();
+
+		if ( ! isset( $wp_roles ) || empty( $wp_roles ) || ! $wp_roles ) {
+			return;
+		}
+
+		$author = $wp_roles->get_role( 'author' );
+
+		if ( ! $author ) {
+			return;
+		}
+
+		foreach ( self::get_portfolio_caps() as $cap ) {
+			self::remove_cap_from_roles(
+				array(
+					'portfolio_manager',
+					'portfolio_author',
+					'administrator',
+					'editor',
+				),
+				$cap
+			);
+		}
+
+		remove_role( 'portfolio_author' );
+
+		$wp_roles->add_role(
+			'portfolio_manager',
+			__( 'Portfolio Manager', 'visual-portfolio' ),
+			$author->capabilities
+		);
+
+		foreach ( self::get_lists_caps() as $cap ) {
+			self::add_cap_to_roles(
+				array(
+					'portfolio_manager',
+					'administrator',
+				),
+				$cap
+			);
+		}
+
+		update_option( 'visual_portfolio_updated_caps', $check_string );
+	}
+
+	/**
+	 * Remove portfolio roles and capabilities.
+	 *
+	 * @param bool $remove_lists_caps Remove Saved Layouts capabilities too.
+	 * @return void
+	 */
+	public static function remove_roles_and_caps( $remove_lists_caps = true ) {
+		$wp_roles = wp_roles();
+
+		if ( ! isset( $wp_roles ) || empty( $wp_roles ) || ! $wp_roles ) {
+			return;
+		}
+
+		foreach ( self::get_portfolio_caps() as $cap ) {
+			self::remove_cap_from_roles(
+				array(
+					'portfolio_manager',
+					'portfolio_author',
+					'administrator',
+					'editor',
+				),
+				$cap
+			);
+		}
+
+		if ( $remove_lists_caps ) {
+			foreach ( self::get_lists_caps() as $cap ) {
+				self::remove_cap_from_roles(
+					array(
+						'portfolio_manager',
+						'administrator',
+					),
+					$cap
+				);
+			}
+		}
+
+		remove_role( 'portfolio_manager' );
+		remove_role( 'portfolio_author' );
+
+		delete_option( 'visual_portfolio_updated_caps' );
+	}
+
+	/**
+	 * Check if portfolio roles or capabilities are still registered.
+	 *
+	 * @return bool
+	 */
+	public static function has_custom_roles_or_caps() {
+		$wp_roles = wp_roles();
+
+		if ( ! isset( $wp_roles ) || empty( $wp_roles ) || ! $wp_roles ) {
+			return false;
+		}
+
+		if ( $wp_roles->is_role( 'portfolio_author' ) ) {
+			return true;
+		}
+
+		$portfolio_manager = $wp_roles->get_role( 'portfolio_manager' );
+		$administrator     = $wp_roles->get_role( 'administrator' );
+		$editor            = $wp_roles->get_role( 'editor' );
+
+		foreach ( self::get_portfolio_caps() as $cap ) {
+			if ( $portfolio_manager && $portfolio_manager->has_cap( $cap ) ) {
+				return true;
+			}
+
+			if ( $administrator && $administrator->has_cap( $cap ) ) {
+				return true;
+			}
+
+			if ( $editor && $editor->has_cap( $cap ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get option value used to skip repeated capabilities sync.
+	 *
+	 * @param bool $portfolio_post_type_registered Is portfolio post type registered.
+	 * @return string
+	 */
+	private static function get_updated_caps_check_string( $portfolio_post_type_registered ) {
+		global $wp_version;
+
+		return 'Plugin: ' . VISUAL_PORTFOLIO_VERSION . ' WP: ' . $wp_version . ' Portfolio: ' . ( $portfolio_post_type_registered ? '1' : '0' );
+	}
+
+	/**
+	 * Add capability to the specified roles.
+	 *
+	 * @param array  $role_names Role names.
+	 * @param string $capability Capability to add.
+	 * @return void
+	 */
+	private static function add_cap_to_roles( $role_names, $capability ) {
+		foreach ( self::get_roles_by_names( $role_names ) as $role ) {
+			$role->add_cap( $capability );
+		}
+	}
+
+	/**
+	 * Remove capability from the specified roles.
+	 *
+	 * @param array  $role_names Role names.
+	 * @param string $capability Capability to remove.
+	 * @return void
+	 */
+	private static function remove_cap_from_roles( $role_names, $capability ) {
+		foreach ( self::get_roles_by_names( $role_names ) as $role ) {
+			$role->remove_cap( $capability );
+		}
+	}
+
+	/**
+	 * Get existing role objects by names.
+	 *
+	 * @param array $role_names Role names.
+	 * @return array
+	 */
+	private static function get_roles_by_names( $role_names ) {
+		$roles = array();
+
+		foreach ( $role_names as $role_name ) {
+			$role = get_role( $role_name );
+
+			if ( $role ) {
+				$roles[] = $role;
+			}
+		}
+
+		return $roles;
+	}
+
+	/**
+	 * Get portfolio capabilities.
+	 *
+	 * @return array
+	 */
+	public static function get_portfolio_caps() {
+		return array(
 			'read_portfolio',
 			'read_private_portfolio',
 			'read_private_portfolios',
@@ -372,8 +651,15 @@ class Visual_Portfolio_Custom_Post_Type {
 			'delete_portfolio_terms',
 			'assign_portfolio_terms',
 		);
+	}
 
-		$lists_cap = array(
+	/**
+	 * Get saved layouts capabilities.
+	 *
+	 * @return array
+	 */
+	public static function get_lists_caps() {
+		return array(
 			'read_vp_list',
 			'read_private_vp_list',
 			'read_private_vp_lists',
@@ -389,22 +675,6 @@ class Visual_Portfolio_Custom_Post_Type {
 			'delete_published_vp_lists',
 			'publish_vp_lists',
 		);
-
-		/**
-		 * Add capacities
-		 */
-		foreach ( $portfolio_cap as $cap ) {
-			$wp_roles->add_cap( 'portfolio_manager', $cap );
-			$wp_roles->add_cap( 'portfolio_author', $cap );
-			$wp_roles->add_cap( 'administrator', $cap );
-			$wp_roles->add_cap( 'editor', $cap );
-		}
-		foreach ( $lists_cap as $cap ) {
-			$wp_roles->add_cap( 'portfolio_manager', $cap );
-			$wp_roles->add_cap( 'administrator', $cap );
-		}
-
-		update_option( 'visual_portfolio_updated_caps', $check_string );
 	}
 
 	/**
@@ -873,4 +1143,6 @@ class Visual_Portfolio_Custom_Post_Type {
 	}
 }
 
-new Visual_Portfolio_Custom_Post_Type();
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	new Visual_Portfolio_Custom_Post_Type();
+}
