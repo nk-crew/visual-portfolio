@@ -187,6 +187,11 @@ if ( PhotoSwipe && VPPopupAPI ) {
 					url: 'https://x.com/intent/tweet?text={{text}}&url={{url}}',
 				},
 				{
+					id: 'linkedin',
+					label: __.pswp_share_li,
+					url: 'https://www.linkedin.com/sharing/share-offsite/?url={{url}}',
+				},
+				{
 					id: 'pinterest',
 					label: __.pswp_share_pin,
 					url: 'https://www.pinterest.com/pin/create/button/?url={{url}}&media={{image_url}}&description={{text}}',

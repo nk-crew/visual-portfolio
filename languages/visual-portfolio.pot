@@ -1291,11 +1291,11 @@ msgstr ""
 msgid "Share on Facebook"
 msgstr ""
 
-#: classes/class-assets.php:746
-msgid "Tweet"
+#: classes/class-assets.php:747
+msgid "LinkedIn"
 msgstr ""
 
-#: classes/class-assets.php:747
+#: classes/class-assets.php:746
 msgid "X"
 msgstr ""
 
