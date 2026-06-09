@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.0
 * Requires PHP: 7.2
-* Stable tag: 3.6.1
+* Stable tag: 3.6.2
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,21 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.6.2 - Jun 9, 2026 =
+
+* added custom alt text support for gallery items — override alt text per image in the editor
+* updated popup share buttons: Twitter renamed to X, added LinkedIn
+* show Saved Layouts shortcuts in the frontend admin bar for Portfolio Manager and other roles with Saved Layouts access
+* fixed welcome screen redirect when Portfolio CPT is disabled
+* fixed portfolio roles not being removed during plugin cleanup
+* **Pro:**
+* added configurable proofing labels (id/filename/title/description)
+* improved Instagram business profile sync and cache profile avatars locally
+* improved self-hosted video support for MOV and other formats
+* use video featured image as gallery cover when no custom cover is set
+* fixed video thumbnails disappearing after AJAX pagination
+* fixed popup share buttons when deep linking is enabled
 
 = 3.6.1 - May 5, 2026 =
 
