@@ -89,6 +89,31 @@ $escaped-svg-characters: (
 }
 
 /**
+ * Dashboard "At a Glance" portfolio count icon.
+ */
+#dashboard_right_now {
+	a.portfolio-count::before,
+	span.portfolio-count::before {
+		content: "";
+		background-image: url(../images/icon.svg);
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: 18px;
+	}
+}
+
+#vpf_recent_portfolio_activity {
+	.inside ul {
+		margin: 0;
+	}
+
+	.vpf-dashboard-widget-footer {
+		margin-top: 12px;
+		margin-bottom: 0;
+	}
+}
+
+/**
  * Visual Composer Icon
  */
 .vc_element-icon[data-is-container="true"].icon-visual-portfolio,

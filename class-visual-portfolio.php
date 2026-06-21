@@ -218,6 +218,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'classes/class-settings.php';
 			require_once $this->plugin_path . 'classes/class-welcome-screen.php';
 			require_once $this->plugin_path . 'classes/class-ask-review.php';
+			require_once $this->plugin_path . 'classes/class-dashboard.php';
 			require_once $this->plugin_path . 'classes/class-images.php';
 			require_once $this->plugin_path . 'classes/class-rest.php';
 			require_once $this->plugin_path . 'classes/class-get-portfolio.php';

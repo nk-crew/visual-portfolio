@@ -1,0 +1,171 @@
+<?php
+/**
+ * Tests for Visual_Portfolio_Dashboard.
+ *
+ * @package Visual Portfolio
+ */
+
+/**
+ * Dashboard widgets test case.
+ */
+class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
+	/**
+	 * Original general settings option.
+	 *
+	 * @var mixed
+	 */
+	protected $original_vp_general;
+
+	/**
+	 * Preserve option state.
+	 */
+	public function set_up() {
+		parent::set_up();
+
+		$this->original_vp_general = get_option( 'vp_general' );
+		Visual_Portfolio_Custom_Post_Type::remove_roles_and_caps();
+		wp_set_current_user( 1 );
+	}
+
+	/**
+	 * Restore option state.
+	 */
+	public function tear_down() {
+		if ( false === $this->original_vp_general ) {
+			delete_option( 'vp_general' );
+		} else {
+			update_option( 'vp_general', $this->original_vp_general );
+		}
+
+		Visual_Portfolio_Custom_Post_Type::remove_roles_and_caps();
+
+		parent::tear_down();
+	}
+
+	/**
+	 * Enable portfolio post type for tests.
+	 *
+	 * @return void
+	 */
+	private function enable_portfolio_post_type() {
+		update_option(
+			'vp_general',
+			array(
+				'register_portfolio_post_type' => 'on',
+			)
+		);
+
+		if ( ! post_type_exists( 'portfolio' ) ) {
+			$custom_post_type = new Visual_Portfolio_Custom_Post_Type();
+			$custom_post_type->add_custom_post_type();
+		}
+
+		Visual_Portfolio_Custom_Post_Type::sync_roles_and_caps( true );
+		wp_set_current_user( 0 );
+		wp_set_current_user( 1 );
+	}
+
+	/**
+	 * Dashboard widgets are hidden when portfolio post type is disabled.
+	 */
+	public function test_should_show_portfolio_dashboard_widgets_returns_false_when_post_type_disabled() {
+		update_option(
+			'vp_general',
+			array(
+				'register_portfolio_post_type' => 'off',
+			)
+		);
+
+		$this->assertFalse( Visual_Portfolio_Dashboard::should_show_portfolio_dashboard_widgets() );
+	}
+
+	/**
+	 * Dashboard widgets are available for users who can edit portfolios.
+	 */
+	public function test_should_show_portfolio_dashboard_widgets_returns_true_for_administrator() {
+		$this->enable_portfolio_post_type();
+
+		$this->assertTrue( Visual_Portfolio_Dashboard::should_show_portfolio_dashboard_widgets() );
+	}
+
+	/**
+	 * Portfolio count is added to the At a Glance widget.
+	 */
+	public function test_add_portfolio_glance_item_includes_published_count() {
+		$this->enable_portfolio_post_type();
+
+		$this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'publish',
+				'post_title'  => 'Published Portfolio',
+			)
+		);
+
+		$this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'draft',
+				'post_title'  => 'Draft Portfolio',
+			)
+		);
+
+		$dashboard = new Visual_Portfolio_Dashboard();
+
+		$items = $dashboard->add_portfolio_glance_item( array() );
+
+		$this->assertCount( 1, $items );
+		$this->assertStringContainsString( 'portfolio-count', $items[0] );
+		$this->assertStringContainsString( 'edit.php?post_type=portfolio', $items[0] );
+		$this->assertStringContainsString( '1', $items[0] );
+	}
+
+	/**
+	 * Recent portfolio activity widget lists published items only.
+	 */
+	public function test_render_recent_portfolio_activity_widget_outputs_recent_items() {
+		$this->enable_portfolio_post_type();
+
+		$older_post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'publish',
+				'post_title'  => 'Older Portfolio',
+				'post_date'   => '2026-03-01 10:00:00',
+			)
+		);
+
+		$newer_post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'publish',
+				'post_title'  => 'Newer Portfolio',
+				'post_date'   => '2026-03-10 10:00:00',
+			)
+		);
+
+		$this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'draft',
+				'post_title'  => 'Draft Portfolio',
+			)
+		);
+
+		$dashboard = new Visual_Portfolio_Dashboard();
+
+		set_current_screen( 'dashboard' );
+
+		ob_start();
+		$dashboard->render_recent_portfolio_activity_widget();
+		$output = ob_get_clean();
+
+		$this->assertStringContainsString( 'Newer Portfolio', $output );
+		$this->assertStringContainsString( 'Older Portfolio', $output );
+		$this->assertStringNotContainsString( 'Draft Portfolio', $output );
+		$this->assertStringContainsString( 'post.php?post=' . $newer_post_id, $output );
+		$this->assertStringContainsString( 'post.php?post=' . $older_post_id, $output );
+		$this->assertStringContainsString( 'vpf-dashboard-widget-footer', $output );
+		$this->assertStringContainsString( 'post-new.php?post_type=portfolio', $output );
+	}
+}
