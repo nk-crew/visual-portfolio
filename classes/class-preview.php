@@ -249,10 +249,16 @@ class Visual_Portfolio_Preview {
 		// Disable the WP admin bar.
 		add_filter( 'show_admin_bar', '__return_false' );
 
-		// Avoid Cloudflare's Rocket Loader lazy load the editor iframe.
-		// TODO: we also need an additional filter, which is not available in the WP yet:
-		// https://github.com/WordPress/wordpress-develop/pull/1759 .
+		// Avoid Cloudflare's Rocket Loader lazy loading the editor iframe scripts.
+		//
+		// `script_loader_tag` only covers scripts with a `src`, while
+		// `wp_inline_script_attributes` (WP 5.7+) covers inline scripts such as
+		// the `VPData` / `vp_preview_post_data` localization. Both must be
+		// excluded, otherwise Rocket Loader defers the inline data and the
+		// portfolio scripts run before `VPData` exists, throwing
+		// "Cannot read properties of undefined (reading '__')".
 		add_filter( 'script_loader_tag', array( $this, 'rocket_loader_filter' ) );
+		add_filter( 'wp_inline_script_attributes', array( $this, 'rocket_loader_inline_filter' ) );
 
 		// Enqueue assets.
 		Visual_Portfolio_Assets::enqueue_script( 'iframe-resizer-content', 'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min', array(), '4.3.11' );
@@ -318,6 +324,24 @@ class Visual_Portfolio_Preview {
 	 */
 	public function rocket_loader_filter( $tag ) {
 		return str_replace( '<script', '<script data-cfasync="false"', $tag );
+	}
+
+	/**
+	 * Disable rocket loader for inline scripts in preview.
+	 *
+	 * Inline localization scripts (e.g. `VPData`, `vp_preview_post_data`) are
+	 * printed via `wp_get_inline_script_tag()`, which does not go through the
+	 * `script_loader_tag` filter. Without this, Cloudflare's Rocket Loader
+	 * defers them and the portfolio scripts run before `VPData` is defined.
+	 *
+	 * @param array $attributes - inline script attributes.
+	 *
+	 * @return array
+	 */
+	public function rocket_loader_inline_filter( $attributes ) {
+		$attributes['data-cfasync'] = 'false';
+
+		return $attributes;
 	}
 }
 
