@@ -239,7 +239,7 @@ class Visual_Portfolio_Dashboard {
 			return;
 		}
 
-		$num_posts = wp_count_posts( 'portfolio' );
+		$num_posts = wp_count_posts( 'portfolio', 'readable' );
 
 		if ( ! $num_posts ) {
 			return;
@@ -248,7 +248,15 @@ class Visual_Portfolio_Dashboard {
 		$published = isset( $num_posts->publish ) ? (int) $num_posts->publish : 0;
 		$drafts    = isset( $num_posts->draft ) ? (int) $num_posts->draft : 0;
 		$pending   = isset( $num_posts->pending ) ? (int) $num_posts->pending : 0;
-		$all       = $published + $drafts + $pending;
+
+		// Match WP_Posts_List_Table "All" total (includes private, future, etc.).
+		$all = array_sum( (array) $num_posts );
+
+		foreach ( get_post_stati( array( 'show_in_admin_all_list' => false ) ) as $state ) {
+			if ( isset( $num_posts->$state ) ) {
+				$all -= (int) $num_posts->$state;
+			}
+		}
 
 		$links = array(
 			array(

@@ -141,6 +141,8 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 
 	/**
 	 * Portfolio activity widget lists published items only, with Activity-style footer.
+	 *
+	 * Footer "All" matches the portfolio list screen (includes private/future, excludes trash).
 	 */
 	public function test_render_recent_portfolio_activity_widget_outputs_recent_items() {
 		$this->enable_portfolio_post_type();
@@ -169,6 +171,33 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 				'post_status' => 'draft',
 				'post_title'  => 'Draft Portfolio',
 				'post_date'   => '2026-03-15 10:00:00',
+			)
+		);
+
+		$this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'private',
+				'post_title'  => 'Private Portfolio',
+				'post_date'   => '2026-03-12 10:00:00',
+			)
+		);
+
+		$this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'future',
+				'post_title'  => 'Scheduled Portfolio',
+				'post_date'   => '2030-03-20 10:00:00',
+			)
+		);
+
+		$this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'trash',
+				'post_title'  => 'Trashed Portfolio',
+				'post_date'   => '2026-03-05 10:00:00',
 			)
 		);
 
@@ -203,7 +232,8 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'subsubsub', $output );
 		$this->assertStringContainsString( 'vpf-dashboard-widget-footer', $output );
-		$this->assertStringContainsString( 'All <span class="count">(3)</span>', $output );
+		// All matches list screen: publish + draft + private + future (excludes trash).
+		$this->assertStringContainsString( 'All <span class="count">(5)</span>', $output );
 		$this->assertStringContainsString( 'Published <span class="count">(2)</span>', $output );
 		$this->assertStringContainsString( 'Drafts <span class="count">(1)</span>', $output );
 		$this->assertStringContainsString( 'post_status=publish', $output );
