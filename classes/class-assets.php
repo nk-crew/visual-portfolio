@@ -316,7 +316,7 @@ class Visual_Portfolio_Assets {
 		self::store_used_assets( 'visual-portfolio', true, 'script', 12 );
 
 		// Layout.
-		switch ( $options['layout'] ) {
+		switch ( $options['layout'] ?? '' ) {
 			case 'masonry':
 				self::store_used_assets( 'visual-portfolio-layout-masonry', true, 'script' );
 				self::store_used_assets( 'visual-portfolio-layout-masonry', true, 'style' );
@@ -344,7 +344,7 @@ class Visual_Portfolio_Assets {
 		self::store_used_assets( 'visual-portfolio-custom-scrollbar', true, 'style' );
 
 		// Items Style.
-		if ( $options['items_style'] ) {
+		if ( ! empty( $options['items_style'] ) ) {
 			$items_style_pref = '';
 
 			if ( 'default' !== $options['items_style'] ) {
