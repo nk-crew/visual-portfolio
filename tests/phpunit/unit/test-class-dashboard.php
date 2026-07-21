@@ -121,7 +121,7 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Recent portfolio activity widget lists published items only.
+	 * Portfolio activity widget lists published items only, with Activity-style footer.
 	 */
 	public function test_render_recent_portfolio_activity_widget_outputs_recent_items() {
 		$this->enable_portfolio_post_type();
@@ -149,6 +149,7 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 				'post_type'   => 'portfolio',
 				'post_status' => 'draft',
 				'post_title'  => 'Draft Portfolio',
+				'post_date'   => '2026-03-15 10:00:00',
 			)
 		);
 
@@ -160,12 +161,33 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 		$dashboard->render_recent_portfolio_activity_widget();
 		$output = ob_get_clean();
 
+		$this->assertStringContainsString( 'vpf-dashboard-activity-title', $output );
+		$this->assertStringContainsString( 'vpf-dashboard-activity-date', $output );
+		$this->assertStringContainsString( 'vpf-dashboard-activity-thumb', $output );
+		$this->assertStringContainsString( 'vp-portfolio__thumbnail', $output );
+
 		$this->assertStringContainsString( 'Newer Portfolio', $output );
 		$this->assertStringContainsString( 'Older Portfolio', $output );
 		$this->assertStringNotContainsString( 'Draft Portfolio', $output );
+		$this->assertStringNotContainsString( 'post-state', $output );
+		$this->assertStringNotContainsString( 'post-new.php?post_type=portfolio', $output );
+
 		$this->assertStringContainsString( 'post.php?post=' . $newer_post_id, $output );
 		$this->assertStringContainsString( 'post.php?post=' . $older_post_id, $output );
+
+		$newer_pos = strpos( $output, 'Newer Portfolio' );
+		$older_pos = strpos( $output, 'Older Portfolio' );
+
+		$this->assertNotFalse( $newer_pos );
+		$this->assertNotFalse( $older_pos );
+		$this->assertLessThan( $older_pos, $newer_pos );
+
+		$this->assertStringContainsString( 'subsubsub', $output );
 		$this->assertStringContainsString( 'vpf-dashboard-widget-footer', $output );
-		$this->assertStringContainsString( 'post-new.php?post_type=portfolio', $output );
+		$this->assertStringContainsString( 'All <span class="count">(3)</span>', $output );
+		$this->assertStringContainsString( 'Published <span class="count">(2)</span>', $output );
+		$this->assertStringContainsString( 'Drafts <span class="count">(1)</span>', $output );
+		$this->assertStringContainsString( 'post_status=publish', $output );
+		$this->assertStringContainsString( 'post_status=draft', $output );
 	}
 }
