@@ -667,8 +667,8 @@ class Visual_Portfolio_Get {
 				);
 
 				// Excerpt.
-				if ( isset( $args['opts']['show_excerpt'] ) && $args['content'] ) {
-					$args['excerpt'] = wp_trim_words( $args['content'], $args['opts']['excerpt_words_count'], '...' );
+				if ( ! empty( $args['opts']['show_excerpt'] ) ) {
+					$args['excerpt'] = self::get_item_excerpt( $args );
 				}
 
 				if ( 'video' === $args['format'] && isset( $img['video_url'] ) && $img['video_url'] ) {
@@ -759,8 +759,8 @@ class Visual_Portfolio_Get {
 				}
 
 				// Excerpt.
-				if ( isset( $args['opts']['show_excerpt'] ) && $args['opts']['show_excerpt'] ) {
-					$args['excerpt'] = wp_trim_words( do_shortcode( has_excerpt() ? get_the_excerpt() : $args['content'] ), $args['opts']['excerpt_words_count'], '...' );
+				if ( ! empty( $args['opts']['show_excerpt'] ) ) {
+					$args['excerpt'] = self::get_item_excerpt( $args );
 				}
 
 				$args['allow_popup'] = isset( $args['image_id'] ) && $args['image_id'];
@@ -2598,6 +2598,7 @@ class Visual_Portfolio_Get {
 						'sm_height'        => $img_sm_meta[2],
 						'item_title'       => $args['title'],
 						'item_description' => $args['content'],
+						'item_excerpt'     => self::get_item_excerpt( $args ),
 						'item_author'      => $args['author'],
 						'item_author_url'  => $args['author_url'],
 					)
@@ -2611,6 +2612,9 @@ class Visual_Portfolio_Get {
 				}
 				if ( $popup_image && ! isset( $popup_image['item_description'] ) ) {
 					$popup_image['item_description'] = $popup_image['description'] ?? '';
+				}
+				if ( $popup_image && ! isset( $popup_image['item_excerpt'] ) ) {
+					$popup_image['item_excerpt'] = self::get_item_excerpt( $args );
 				}
 				if ( $popup_image && ! isset( $popup_image['item_author'] ) ) {
 					$popup_image['item_author'] = $popup_image['author'] ?? '';
@@ -2633,9 +2637,48 @@ class Visual_Portfolio_Get {
 			'poster'           => wp_get_attachment_image_url( $args['image_id'], 'full' ),
 			'item_title'       => $args['title'] ?? null,
 			'item_description' => $args['content'] ?? null,
+			'item_excerpt'     => self::get_item_excerpt( $args ),
 			'item_author'      => $args['author'] ?? null,
 			'item_author_url'  => $args['author_url'] ?? null,
 		);
+	}
+
+	/**
+	 * Build trimmed item excerpt for grid meta and lightbox sources.
+	 * Independent of the Display Excerpt items-style toggle.
+	 *
+	 * @param array $args Item args.
+	 * @return string
+	 */
+	public static function get_item_excerpt( $args ) {
+		$words_count = isset( $args['opts']['excerpt_words_count'] ) ? (int) $args['opts']['excerpt_words_count'] : 15;
+
+		if ( $words_count < 1 ) {
+			$words_count = 15;
+		}
+
+		// Reuse already computed grid excerpt when present.
+		if ( ! empty( $args['excerpt'] ) ) {
+			return $args['excerpt'];
+		}
+
+		$post_id = isset( $args['post_id'] ) ? (int) $args['post_id'] : 0;
+
+		if ( $post_id ) {
+			$raw = has_excerpt( $post_id ) ? get_the_excerpt( $post_id ) : ( $args['content'] ?? '' );
+
+			if ( $raw ) {
+				return wp_trim_words( do_shortcode( $raw ), $words_count, '...' );
+			}
+
+			return '';
+		}
+
+		if ( ! empty( $args['content'] ) ) {
+			return wp_trim_words( $args['content'], $words_count, '...' );
+		}
+
+		return '';
 	}
 
 	/**

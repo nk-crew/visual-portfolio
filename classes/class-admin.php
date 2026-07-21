@@ -2874,6 +2874,7 @@ class Visual_Portfolio_Admin {
 					'description'      => esc_html__( 'Image Description', 'visual-portfolio' ),
 					'item_title'       => esc_html__( 'Item Title', 'visual-portfolio' ),
 					'item_description' => esc_html__( 'Item Description', 'visual-portfolio' ),
+					'item_excerpt'     => esc_html__( 'Item Excerpt', 'visual-portfolio' ),
 					'item_author'      => esc_html__( 'Item Author', 'visual-portfolio' ),
 				),
 				'condition'     => array(
@@ -2901,6 +2902,7 @@ class Visual_Portfolio_Admin {
 					'description'      => esc_html__( 'Image Description', 'visual-portfolio' ),
 					'item_title'       => esc_html__( 'Item Title', 'visual-portfolio' ),
 					'item_description' => esc_html__( 'Item Description', 'visual-portfolio' ),
+					'item_excerpt'     => esc_html__( 'Item Excerpt', 'visual-portfolio' ),
 					'item_author'      => esc_html__( 'Item Author', 'visual-portfolio' ),
 				),
 				'condition'     => array(
