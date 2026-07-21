@@ -17,12 +17,28 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 	protected $original_vp_general;
 
 	/**
+	 * Original timezone_string option.
+	 *
+	 * @var mixed
+	 */
+	protected $original_timezone_string;
+
+	/**
+	 * Original gmt_offset option.
+	 *
+	 * @var mixed
+	 */
+	protected $original_gmt_offset;
+
+	/**
 	 * Preserve option state.
 	 */
 	public function set_up() {
 		parent::set_up();
 
-		$this->original_vp_general = get_option( 'vp_general' );
+		$this->original_vp_general       = get_option( 'vp_general' );
+		$this->original_timezone_string  = get_option( 'timezone_string' );
+		$this->original_gmt_offset       = get_option( 'gmt_offset' );
 		Visual_Portfolio_Custom_Post_Type::remove_roles_and_caps();
 		wp_set_current_user( 1 );
 	}
@@ -36,6 +52,9 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 		} else {
 			update_option( 'vp_general', $this->original_vp_general );
 		}
+
+		update_option( 'timezone_string', $this->original_timezone_string );
+		update_option( 'gmt_offset', $this->original_gmt_offset );
 
 		Visual_Portfolio_Custom_Post_Type::remove_roles_and_caps();
 
@@ -189,5 +208,106 @@ class Test_Visual_Portfolio_Dashboard extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Drafts <span class="count">(1)</span>', $output );
 		$this->assertStringContainsString( 'post_status=publish', $output );
 		$this->assertStringContainsString( 'post_status=draft', $output );
+	}
+
+	/**
+	 * Activity date "Today" uses site timezone, not UTC calendar day.
+	 *
+	 * On America/New_York, a local evening publish falls on the next UTC day;
+	 * comparing current_time()/wp_date() to gmdate() on a true Unix timestamp
+	 * would miss "Today".
+	 */
+	public function test_get_portfolio_activity_date_label_today_uses_site_timezone() {
+		$this->enable_portfolio_post_type();
+
+		update_option( 'timezone_string', 'America/New_York' );
+		update_option( 'gmt_offset', '0' );
+
+		$today_local = wp_date( 'Y-m-d' );
+		$post_id     = $this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'publish',
+				'post_title'  => 'Late Local Portfolio',
+				'post_date'   => $today_local . ' 23:30:00',
+			)
+		);
+
+		$post      = get_post( $post_id );
+		$timestamp = get_post_time( 'U', true, $post );
+
+		// Preconditions: UTC day differs from site-local day.
+		$this->assertNotSame( gmdate( 'Y-m-d', $timestamp ), $today_local );
+		$this->assertSame( $today_local, wp_date( 'Y-m-d', $timestamp ) );
+
+		$dashboard = new Visual_Portfolio_Dashboard();
+		$method    = new ReflectionMethod( Visual_Portfolio_Dashboard::class, 'get_portfolio_activity_date_label' );
+		$method->setAccessible( true );
+
+		$this->assertSame( __( 'Today', 'visual-portfolio' ), $method->invoke( $dashboard, $post ) );
+	}
+
+	/**
+	 * Activity year branch uses site timezone year, not UTC year.
+	 */
+	public function test_get_portfolio_activity_date_label_year_uses_site_timezone() {
+		$this->enable_portfolio_post_type();
+
+		update_option( 'timezone_string', 'America/New_York' );
+		update_option( 'gmt_offset', '0' );
+
+		// Dec 31 evening ET is already Jan 1 UTC — site year must win over gmdate year.
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'publish',
+				'post_title'  => 'New Year Eve Portfolio',
+				'post_date'   => '2025-12-31 23:30:00',
+			)
+		);
+
+		$post      = get_post( $post_id );
+		$timestamp = get_post_time( 'U', true, $post );
+
+		$this->assertSame( '2026', gmdate( 'Y', $timestamp ) );
+		$this->assertSame( '2025', wp_date( 'Y', $timestamp ) );
+
+		$dashboard = new Visual_Portfolio_Dashboard();
+		$method    = new ReflectionMethod( Visual_Portfolio_Dashboard::class, 'get_portfolio_activity_date_label' );
+		$method->setAccessible( true );
+
+		$label = $method->invoke( $dashboard, $post );
+
+		$this->assertStringContainsString( '2025', $label );
+		$this->assertStringNotContainsString( 'Today', $label );
+	}
+
+	/**
+	 * Early local morning stays on the site calendar day (no double timezone shift).
+	 */
+	public function test_get_portfolio_activity_date_label_early_morning_keeps_site_day() {
+		$this->enable_portfolio_post_type();
+
+		update_option( 'timezone_string', 'America/New_York' );
+		update_option( 'gmt_offset', '0' );
+
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'   => 'portfolio',
+				'post_status' => 'publish',
+				'post_title'  => 'Early Local Portfolio',
+				'post_date'   => '2026-03-10 01:00:00',
+			)
+		);
+
+		$post      = get_post( $post_id );
+		$dashboard = new Visual_Portfolio_Dashboard();
+		$method    = new ReflectionMethod( Visual_Portfolio_Dashboard::class, 'get_portfolio_activity_date_label' );
+		$method->setAccessible( true );
+
+		$label = $method->invoke( $dashboard, $post );
+
+		$this->assertSame( wp_date( __( 'M jS', 'visual-portfolio' ), get_post_time( 'U', true, $post ) ), $label );
+		$this->assertStringContainsString( '10', $label );
 	}
 }

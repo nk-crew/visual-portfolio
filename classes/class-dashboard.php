@@ -201,28 +201,30 @@ class Visual_Portfolio_Dashboard {
 	 * @return string
 	 */
 	protected function get_portfolio_activity_date_label( $portfolio_post ) {
-		$time = get_post_time( 'U', false, $portfolio_post );
+		// Use a true Unix timestamp (GMT) so comparisons and formatting share site timezone via wp_date().
+		$time = get_post_time( 'U', true, $portfolio_post );
 
 		if ( ! is_numeric( $time ) ) {
 			return get_the_time( get_option( 'date_format' ), $portfolio_post );
 		}
 
-		$time     = (int) $time;
-		$today    = current_time( 'Y-m-d' );
-		$year     = current_time( 'Y' );
-		$post_day = gmdate( 'Y-m-d', $time );
+		$time      = (int) $time;
+		$today     = wp_date( 'Y-m-d' );
+		$year      = wp_date( 'Y' );
+		$post_day  = wp_date( 'Y-m-d', $time );
+		$post_year = wp_date( 'Y', $time );
 
 		if ( $post_day === $today ) {
 			return __( 'Today', 'visual-portfolio' );
 		}
 
-		if ( gmdate( 'Y', $time ) !== $year ) {
+		if ( $post_year !== $year ) {
 			/* translators: Date format for portfolio activity from a different year, see https://www.php.net/manual/datetime.format.php */
-			return date_i18n( __( 'M jS Y', 'visual-portfolio' ), $time );
+			return wp_date( __( 'M jS Y', 'visual-portfolio' ), $time );
 		}
 
 		/* translators: Date format for portfolio activity, see https://www.php.net/manual/datetime.format.php */
-		return date_i18n( __( 'M jS', 'visual-portfolio' ), $time );
+		return wp_date( __( 'M jS', 'visual-portfolio' ), $time );
 	}
 
 	/**
