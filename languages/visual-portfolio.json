@@ -5,19 +5,16 @@
          "": {
             "domain": "visual-portfolio"
          },
-         "Visual Portfolio, Posts & Image Gallery": [
+         "Visual Portfolio": [
             ""
          ],
          "https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline": [
             ""
          ],
-         "Modern gallery and portfolio plugin with advanced layouts editor. Clean and powerful gallery styles with enormous settings in the Gutenberg block.": [
+         "Gallery and portfolio plugin with gallery blocks and layouts for the editor.": [
             ""
          ],
          "Visual Portfolio Team": [
-            ""
-         ],
-         "Visual Portfolio": [
             ""
          ],
          "-- Select Layout --": [
@@ -470,7 +467,7 @@
          "Stretch": [
             ""
          ],
-         "Break container and display it wide. This option helpful for 3rd-party page builders, in the Gutenberg themes you can use the built in Wide and Fullwidth features.": [
+         "Break the container and display the gallery wide. Helpful for 3rd-party page builders. In the block editor, use the built-in Wide and Fullwidth alignment instead.": [
             ""
          ],
          "Gap": [
@@ -618,6 +615,9 @@
             ""
          ],
          "Title Source": [
+            ""
+         ],
+         "Item Excerpt": [
             ""
          ],
          "Item Author": [
@@ -944,10 +944,10 @@
          "When to use Saved Layouts": [
             ""
          ],
-         "If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href=\"%1$s\" target=\"_blank\">%2$s Blocks</a>.": [
+         "If you are using the block editor for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href=\"%1$s\" target=\"_blank\">%2$s Blocks</a>.": [
             ""
          ],
-         "To reuse blocks, you can use the built-in Gutenberg feature - <a href=\"%s\" target=\"_blank\">Reusable Blocks</a>.": [
+         "To reuse blocks, you can use the built-in <a href=\"%s\" target=\"_blank\">Reusable Blocks</a> feature.": [
             ""
          ],
          "Saved Layouts may be only used for 3rd-party builders (such as Elementor, WPBakery Page Builder, etc.), <a href=\"%s\" target=\"_blank\">read more info in documentation</a>. Since WordPress moved from Shortcodes to Blocks system, we prepared for you advanced blocks.": [
@@ -975,6 +975,40 @@
             ""
          ],
          "Send a collection of photographs to your client for approval.": [
+            ""
+         ],
+         "Portfolio Activity": [
+            ""
+         ],
+         "%s ": [
+            "",
+            ""
+         ],
+         "No portfolio items yet.": [
+            ""
+         ],
+         "(no title)": [
+            ""
+         ],
+         "Edit “%s”": [
+            ""
+         ],
+         "Today": [
+            ""
+         ],
+         "M jS Y": [
+            ""
+         ],
+         "M jS": [
+            ""
+         ],
+         "Published": [
+            ""
+         ],
+         "Drafts": [
+            ""
+         ],
+         "Pending": [
             ""
          ],
          "Visual Portfolio and Visual Portfolio Pro should not be active at the same time. We've automatically deactivated Visual Portfolio.": [
@@ -1232,6 +1266,12 @@
          "Check to share Deep Linking URLs when sharing images. When disabled, all galleries will share direct links to image files.": [
             ""
          ],
+         "Load Next Pages": [
+            ""
+         ],
+         "Automatically load the next page of items while browsing the gallery when Load More or Infinite pagination is used.": [
+            ""
+         ],
          "Click to Zoom": [
             ""
          ],
@@ -1391,7 +1431,7 @@
          "Visual gallery builder": [
             ""
          ],
-         "Create galleries, portfolios, and post grids visually in Gutenberg with live preview and flexible controls.": [
+         "Create galleries, portfolios, and post grids visually with gallery blocks, live preview, and flexible controls.": [
             ""
          ],
          "Flexible layouts and styles": [

@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.0
 * Requires PHP: 7.2
-* Stable tag: 3.6.2
+* Stable tag: 3.7.0
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,18 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.7.0 - Jul 21, 2026 =
+
+* added Item Excerpt as a popup title/description source
+* added admin dashboard widgets — Portfolio Activity widget and portfolio count in At a Glance
+* fixed editor preview under Cloudflare Rocket Loader (inline VPData marked as cfasync-safe)
+* fixed block editor script loading when mod_substitute line limits truncated large scripts
+* fixed asset enqueue errors when layout or items click action options are missing
+* **Pro:**
+* added Load Next Pages for popup galleries — automatically load the next page while browsing lightbox when Load More or Infinite pagination is used
+* improved social video reliability — cache social videos locally and refresh expired Instagram CDN URLs
+* fixed Item Excerpt popup caption source for album images
 
 = 3.6.2 - Jun 9, 2026 =
 
