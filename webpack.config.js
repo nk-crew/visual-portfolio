@@ -9,9 +9,16 @@ const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const FileManagerPlugin = require( 'filemanager-webpack-plugin' );
 const RemoveEmptyScriptsPlugin = require( 'webpack-remove-empty-scripts' );
 const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isQuietBuild = process.env.VP_QUIET === '1';
+
+// Some hosts run Apache mod_substitute with the default 1MB line limit on
+// responses. Minified bundles can exceed that as a single line and break
+// the block editor script on those servers.
+const MAX_MINIFIED_LINE_LENGTH = 500000;
+const GUTENBERG_INDEX_ENTRY = 'gutenberg/index';
 
 const JS_ENTRY_PATTERNS = [
 	'./assets/js/**/*.js',
@@ -400,6 +407,131 @@ function shouldIgnoreQuietWarning( warning ) {
 	);
 }
 
+function isGutenbergIndexChunk( chunk ) {
+	return chunk.name === GUTENBERG_INDEX_ENTRY;
+}
+
+function createProductionMinimizers() {
+	return [
+		new TerserPlugin( {
+			parallel: true,
+			terserOptions: {
+				format: {
+					comments: /translators:/i,
+					max_line_len: MAX_MINIFIED_LINE_LENGTH,
+				},
+				compress: {
+					passes: 2,
+				},
+				mangle: {
+					reserved: [ '__', '_n', '_nx', '_x' ],
+				},
+			},
+			extractComments: false,
+		} ),
+	];
+}
+
+function wrapLongMinifiedLines( source, maxLineLength ) {
+	return source
+		.split( '\n' )
+		.map( ( line ) => {
+			if ( line.length <= maxLineLength ) {
+				return line;
+			}
+
+			const parts = [];
+			let start = 0;
+
+			while ( line.length - start > maxLineLength ) {
+				const windowEnd = start + maxLineLength;
+				const lastSemi = line.lastIndexOf( ';', windowEnd - 1 );
+
+				if ( lastSemi >= start ) {
+					parts.push( line.slice( start, lastSemi + 1 ) );
+					start = lastSemi + 1;
+					continue;
+				}
+
+				// No semicolon in the window: break at the next one, or hard-split.
+				const nextSemi = line.indexOf( ';', windowEnd );
+
+				if ( nextSemi === -1 ) {
+					parts.push( line.slice( start, windowEnd ) );
+					start = windowEnd;
+				} else {
+					parts.push( line.slice( start, nextSemi + 1 ) );
+					start = nextSemi + 1;
+				}
+			}
+
+			if ( start < line.length ) {
+				parts.push( line.slice( start ) );
+			}
+
+			return parts.join( '\n' );
+		} )
+		.join( '\n' );
+}
+
+class WrapLongMinifiedLinesPlugin {
+	constructor( options = {} ) {
+		this.maxLineLength = options.maxLineLength || MAX_MINIFIED_LINE_LENGTH;
+		this.test = options.test || /\.js$/;
+		// Run after file-loader / asset modules have emitted Ace workers.
+		this.stageName =
+			options.stageName || 'PROCESS_ASSETS_STAGE_REPORT';
+	}
+
+	apply( compiler ) {
+		compiler.hooks.thisCompilation.tap(
+			'WrapLongMinifiedLinesPlugin',
+			( compilation ) => {
+				const stage =
+					compilation[ this.stageName ] ??
+					compilation.PROCESS_ASSETS_STAGE_REPORT;
+
+				compilation.hooks.processAssets.tap(
+					{
+						name: 'WrapLongMinifiedLinesPlugin',
+						stage,
+					},
+					( assets ) => {
+						const { RawSource } = compiler.webpack.sources;
+
+						Object.keys( assets ).forEach( ( assetName ) => {
+							if ( ! this.test.test( assetName ) ) {
+								return;
+							}
+
+							const source = assets[ assetName ].source().toString();
+							const hasLongLine = source
+								.split( '\n' )
+								.some(
+									( line ) => line.length > this.maxLineLength
+								);
+
+							if ( ! hasLongLine ) {
+								return;
+							}
+
+							compilation.updateAsset(
+								assetName,
+								new RawSource(
+									wrapLongMinifiedLines(
+										source,
+										this.maxLineLength
+									)
+								)
+							);
+						} );
+					}
+				);
+			}
+		);
+	}
+}
+
 const entryAssetsJs = createEntries( JS_ENTRY_PATTERNS, '.js' );
 const entryAssetsCss = createEntries(
 	CSS_ENTRY_PATTERNS,
@@ -476,10 +608,20 @@ const newConfig = {
 	},
 	optimization: {
 		...defaultConfig.optimization,
+		...( isProduction
+			? { minimizer: createProductionMinimizers() }
+			: {} ),
 		splitChunks: {
 			...splitChunks,
 			cacheGroups: {
 				...cacheGroups,
+				gutenbergEditorVendor: {
+					test: /[\\/]node_modules[\\/](ace-builds|react-ace|gutenberg-react-select-styles)[\\/]/,
+					name: 'gutenberg/editor-vendor',
+					chunks: isGutenbergIndexChunk,
+					enforce: true,
+					priority: 20,
+				},
 				style: {
 					type: 'css/mini-extract',
 					test( module ) {
@@ -511,6 +653,9 @@ const newConfig = {
 if ( isProduction ) {
 	newConfig.plugins = [
 		new RemoveEmptyScriptsPlugin(),
+		new WrapLongMinifiedLinesPlugin( {
+			test: /gutenberg\/.*\.js$/,
+		} ),
 		...newConfig.plugins,
 	];
 }

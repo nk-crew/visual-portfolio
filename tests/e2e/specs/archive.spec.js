@@ -22,15 +22,14 @@ import { deleteAllPortfolio } from '../utils/delete-all-portfolio';
 import { getEditorCanvas } from '../utils/editor-canvas';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
+import { getPluginSlug } from '../utils/plugin-slug';
 
 const logsEnabled = process.env.LOGS || false;
 
 test.describe('archive pages', () => {
 	test.beforeEach(async ({ admin, page, requestUtils }) => {
 		await setPermalinkSettings(admin, page, 'Post name');
-		const pluginName = process.env.CORE
-			? 'visual-portfolio-pro'
-			: 'visual-portfolio-posts-amp-image-gallery';
+		const pluginName = getPluginSlug();
 		await requestUtils.activatePlugin(pluginName);
 	});
 
