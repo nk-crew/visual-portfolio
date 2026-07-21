@@ -370,7 +370,7 @@ class Visual_Portfolio_Assets {
 		}
 
 		// Popup.
-		if ( 'popup_gallery' === $options['items_click_action'] ) {
+		if ( 'popup_gallery' === ( $options['items_click_action'] ?? '' ) ) {
 			self::enqueue_popup_assets();
 		}
 
