@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.0
 * Requires PHP: 7.2
-* Stable tag: 3.7.0
+* Stable tag: 3.7.1
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,15 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.7.1 - Jul 21, 2026 =
+
+* fixed Fancybox afterShow callback arguments so popup listeners receive the gallery instance correctly
+* **Pro:**
+* fixed Load Next Pages not running in Fancybox lightbox
+* fixed popup freeze when deep linking to slides loaded via Load Next Pages
+* fixed N+ images counter flashing when navigating Fancybox slides
+* fixed stale same-version Pro update notice after upgrade
 
 = 3.7.0 - Jul 21, 2026 =
 

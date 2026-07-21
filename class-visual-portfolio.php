@@ -2,7 +2,7 @@
 /**
  * Plugin Name:  Visual Portfolio
  * Description:  Gallery and portfolio plugin with gallery blocks and layouts for the editor.
- * Version:      3.7.0
+ * Version:      3.7.1
  * Plugin URI:   https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
  * Author:       Visual Portfolio Team
  * Author URI:   https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'VISUAL_PORTFOLIO_VERSION' ) ) {
-	define( 'VISUAL_PORTFOLIO_VERSION', '3.7.0' );
+	define( 'VISUAL_PORTFOLIO_VERSION', '3.7.1' );
 }
 
 if ( ! class_exists( 'Visual_Portfolio' ) ) :

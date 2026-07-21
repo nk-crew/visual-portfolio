@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.7.1 - Jul 21, 2026 =
+
+* fixed Fancybox afterShow callback arguments so popup listeners receive the gallery instance correctly
+* **Pro:**
+* fixed Load Next Pages not running in Fancybox lightbox
+* fixed popup freeze when deep linking to slides loaded via Load Next Pages
+* fixed N+ images counter flashing when navigating Fancybox slides
+* fixed stale same-version Pro update notice after upgrade
+
 = 3.7.0 - Jul 21, 2026 =
 
 * added Item Excerpt as a popup title/description source
