@@ -440,22 +440,36 @@ function wrapLongMinifiedLines( source, maxLineLength ) {
 				return line;
 			}
 
-			let wrappedLine = '';
-			let currentLine = '';
+			const parts = [];
+			let start = 0;
 
-			for ( let index = 0; index < line.length; index += 1 ) {
-				currentLine += line[ index ];
+			while ( line.length - start > maxLineLength ) {
+				const windowEnd = start + maxLineLength;
+				const lastSemi = line.lastIndexOf( ';', windowEnd - 1 );
 
-				if (
-					currentLine.length >= maxLineLength &&
-					line[ index ] === ';'
-				) {
-					wrappedLine += `${ currentLine }\n`;
-					currentLine = '';
+				if ( lastSemi >= start ) {
+					parts.push( line.slice( start, lastSemi + 1 ) );
+					start = lastSemi + 1;
+					continue;
+				}
+
+				// No semicolon in the window: break at the next one, or hard-split.
+				const nextSemi = line.indexOf( ';', windowEnd );
+
+				if ( nextSemi === -1 ) {
+					parts.push( line.slice( start, windowEnd ) );
+					start = windowEnd;
+				} else {
+					parts.push( line.slice( start, nextSemi + 1 ) );
+					start = nextSemi + 1;
 				}
 			}
 
-			return wrappedLine + currentLine;
+			if ( start < line.length ) {
+				parts.push( line.slice( start ) );
+			}
+
+			return parts.join( '\n' );
 		} )
 		.join( '\n' );
 }
@@ -464,16 +478,23 @@ class WrapLongMinifiedLinesPlugin {
 	constructor( options = {} ) {
 		this.maxLineLength = options.maxLineLength || MAX_MINIFIED_LINE_LENGTH;
 		this.test = options.test || /\.js$/;
+		// Run after file-loader / asset modules have emitted Ace workers.
+		this.stageName =
+			options.stageName || 'PROCESS_ASSETS_STAGE_REPORT';
 	}
 
 	apply( compiler ) {
 		compiler.hooks.thisCompilation.tap(
 			'WrapLongMinifiedLinesPlugin',
 			( compilation ) => {
+				const stage =
+					compilation[ this.stageName ] ??
+					compilation.PROCESS_ASSETS_STAGE_REPORT;
+
 				compilation.hooks.processAssets.tap(
 					{
 						name: 'WrapLongMinifiedLinesPlugin',
-						stage: compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_TRANSFER,
+						stage,
 					},
 					( assets ) => {
 						const { RawSource } = compiler.webpack.sources;
