@@ -15,6 +15,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 import { createRegularPosts } from '../utils/create-posts';
 import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
 import { openPublishedPage } from '../utils/open-published-page';
+import { getPluginSlug } from '../utils/plugin-slug';
 
 /**
  * Base form data needed for every preview request.
@@ -35,9 +36,7 @@ test.describe( 'selector control attribute values validation', () => {
 	let nonce;
 
 	test.beforeAll( async ( { requestUtils } ) => {
-		const pluginName = process.env.CORE
-			? 'visual-portfolio-pro'
-			: 'visual-portfolio-posts-amp-image-gallery';
+		const pluginName = getPluginSlug();
 		await requestUtils.activatePlugin( pluginName );
 
 		// Create test posts so portfolio has content to render.

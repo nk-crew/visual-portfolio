@@ -17,13 +17,12 @@ import {
 	selectMediaLibraryImages,
 } from '../utils/media-library';
 import { openPublishedPage } from '../utils/open-published-page';
+import { getPluginSlug } from '../utils/plugin-slug';
 import { waitForPortfolioPreview } from '../utils/portfolio-preview';
 
 test.describe( 'added images to block', () => {
 	test.beforeEach( async ( { requestUtils } ) => {
-		const pluginName = process.env.CORE
-			? 'visual-portfolio-pro'
-			: 'visual-portfolio-posts-amp-image-gallery';
+		const pluginName = getPluginSlug();
 		await requestUtils.activatePlugin( pluginName );
 	} );
 

@@ -8,6 +8,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
  */
 import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
 import { getEditorCanvas } from '../utils/editor-canvas';
+import { getPluginSlug } from '../utils/plugin-slug';
 
 // Test constants
 const READ_MORE_CONTROL_SELECTOR =
@@ -18,9 +19,7 @@ const CLASSIC_SKIN_BUTTON = 'button:has-text("Classic")';
 
 test.describe('Read More Control in Saved Layout Posts', () => {
 	test.beforeAll(async ({ requestUtils }) => {
-		const pluginName = process.env.CORE
-			? 'visual-portfolio-pro'
-			: 'visual-portfolio-posts-amp-image-gallery';
+		const pluginName = getPluginSlug();
 		await requestUtils.activatePlugin(pluginName);
 
 		// Clean up any existing test data in parallel
@@ -165,8 +164,17 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 		await alwaysDisplayOption.click();
 		await expect(readMoreControl).toContainText('Always Display');
 
+		// Wait for layout meta REST save (runs when post saving starts).
+		const metaSaved = page.waitForResponse(
+			(response) =>
+				response.url().includes('/visual-portfolio/v1/update_layout') &&
+				response.request().method() === 'POST' &&
+				response.ok()
+		);
+
 		// Publish the layout
 		await editor.publishPost();
+		await metaSaved;
 		await expect(readMoreControl).toContainText('Always Display');
 
 		// Reload and verify persistence

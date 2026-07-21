@@ -5,12 +5,11 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { createRegularPosts } from '../utils/create-posts';
 import { getEditorCanvas } from '../utils/editor-canvas';
+import { getPluginSlug } from '../utils/plugin-slug';
 
 test.describe('iframe preview resize', () => {
 	test.beforeAll(async ({ requestUtils }) => {
-		const pluginName = process.env.CORE
-			? 'visual-portfolio-pro'
-			: 'visual-portfolio-posts-amp-image-gallery';
+		const pluginName = getPluginSlug();
 
 		await Promise.all([
 			requestUtils.activatePlugin(pluginName),

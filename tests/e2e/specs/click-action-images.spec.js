@@ -14,6 +14,7 @@ import {
 	selectMediaLibraryImages,
 } from '../utils/media-library';
 import { openPublishedPage } from '../utils/open-published-page';
+import { getPluginSlug } from '../utils/plugin-slug';
 
 function cloneFixture( fixture ) {
 	return JSON.parse( JSON.stringify( fixture ) );
@@ -47,9 +48,7 @@ function normalizePopupMediaUrl( url ) {
 
 test.describe( 'click action gallery images', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		const pluginName = process.env.CORE
-			? 'visual-portfolio-pro'
-			: 'visual-portfolio-posts-amp-image-gallery';
+		const pluginName = getPluginSlug();
 
 		await Promise.all( [
 			requestUtils.activatePlugin( pluginName ),

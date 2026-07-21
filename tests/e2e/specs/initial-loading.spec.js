@@ -1,10 +1,10 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
+import { getPluginSlug } from '../utils/plugin-slug';
+
 test.describe('initial loading', () => {
 	test.beforeAll(async ({ requestUtils }) => {
-		const pluginName = process.env.CORE
-			? 'visual-portfolio-pro'
-			: 'visual-portfolio-posts-amp-image-gallery';
+		const pluginName = getPluginSlug();
 		await requestUtils.activatePlugin(pluginName);
 	});
 
