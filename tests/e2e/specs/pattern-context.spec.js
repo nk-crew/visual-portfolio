@@ -11,6 +11,7 @@ import { createRegularPosts } from '../utils/create-posts';
 import { getEditorCanvas } from '../utils/editor-canvas';
 import { getWordpressImages } from '../utils/get-wordpress-images';
 import { openPublishedPage } from '../utils/open-published-page';
+import { getPluginSlug } from '../utils/plugin-slug';
 
 test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 	// Cache images and posts to reuse across tests
@@ -45,9 +46,7 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 	}
 
 	test.beforeEach(async ({ requestUtils }) => {
-		const pluginName = process.env.CORE
-			? 'visual-portfolio-pro'
-			: 'visual-portfolio-posts-amp-image-gallery';
+		const pluginName = getPluginSlug();
 		await requestUtils.activatePlugin(pluginName);
 	});
 
