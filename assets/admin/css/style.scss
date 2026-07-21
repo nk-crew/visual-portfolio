@@ -89,6 +89,83 @@ $escaped-svg-characters: (
 }
 
 /**
+ * Dashboard "At a Glance" portfolio count icon (dashicons-screenoptions).
+ */
+#dashboard_right_now {
+	a.portfolio-count::before,
+	span.portfolio-count::before {
+		content: "\f180";
+	}
+}
+
+#vpf_recent_portfolio_activity {
+	.inside {
+		padding-bottom: 0;
+	}
+
+	.inside ul.vpf-dashboard-activity {
+		margin: 0 -12px;
+
+		li {
+			display: grid;
+			grid-template-columns: clamp(160px, calc(2vw + 140px), 200px) auto;
+			gap: 12px;
+			align-items: center;
+			margin: 0;
+			padding: 6px 12px;
+			box-sizing: border-box;
+
+			&:nth-child(odd) {
+				background-color: #f6f7f7;
+			}
+		}
+	}
+
+	.vpf-dashboard-activity-date {
+		color: #646970;
+		white-space: nowrap;
+	}
+
+	.vpf-dashboard-activity-item {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		min-width: 0;
+	}
+
+	.vpf-dashboard-activity-title {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.vpf-dashboard-activity-thumb.vp-portfolio__thumbnail {
+		flex-shrink: 0;
+		width: 18px;
+		max-width: 18px;
+		margin-left: auto;
+		padding-top: 18px;
+		border-radius: 2px;
+
+		&:empty::after {
+			width: 12px;
+			height: 12px;
+			margin-top: -6px;
+			margin-left: -6px;
+		}
+	}
+
+	ul.subsubsub.vpf-dashboard-widget-footer {
+		float: none;
+		margin: 0 -12px;
+		padding: 4px 12px 8px;
+		white-space: normal;
+	}
+}
+
+/**
  * Visual Composer Icon
  */
 .vc_element-icon[data-is-container="true"].icon-visual-portfolio,
@@ -297,6 +374,7 @@ $escaped-svg-characters: (
 .vp-portfolio__thumbnail:empty {
 	background-color: #f1f1f1;
 	border: 1px solid #e8e8e8;
+	box-sizing: border-box;
 
 	&,
 	&:hover,
