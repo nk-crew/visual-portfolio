@@ -210,17 +210,17 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 				fancyboxInstance = false;
 				clearPopupSession();
 			},
-			beforeShow( e, instance ) {
+			beforeShow( instance, current ) {
 				VPPopupAPI.emitEvent(
 					'beforeShowFancybox',
-					[ e, instance ],
+					[ instance, current ],
 					self
 				);
 			},
-			afterShow( e, instance ) {
+			afterShow( instance, current ) {
 				VPPopupAPI.emitEvent(
 					'afterShowFancybox',
-					[ e, instance ],
+					[ instance, current ],
 					self
 				);
 			},
