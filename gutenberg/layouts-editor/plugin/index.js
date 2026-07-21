@@ -140,39 +140,43 @@ function UpdateEditor() {
 	}, [ isSavingPost, isAutosavingPost, blockData, editPost ] );
 
 	/**
-	 * Save meta data on post save.
+	 * Save meta data when the post starts saving so layout data is persisted
+	 * in parallel with the WordPress post save (avoids losing settings on
+	 * immediate reload/navigation after Publish).
 	 */
 	const wasSavingPost = useRef( false );
 	const wasAutosavingPost = useRef( false );
 	useEffect( () => {
-		const shouldUpdate =
-			wasSavingPost.current &&
-			! isSavingPost &&
-			! wasAutosavingPost.current;
+		const startedSaving =
+			! wasSavingPost.current &&
+			isSavingPost &&
+			! isAutosavingPost;
 
 		// Save current state for next inspection.
 		wasSavingPost.current = isSavingPost;
 		wasAutosavingPost.current = isAutosavingPost;
 
-		if ( shouldUpdate ) {
-			const prefixedBlockData = {};
-
-			Object.keys( blockData ).forEach( ( name ) => {
-				prefixedBlockData[ `vp_${ name }` ] = blockData[ name ];
-			} );
-
-			apiFetch( {
-				path: '/visual-portfolio/v1/update_layout/',
-				method: 'POST',
-				data: {
-					data: prefixedBlockData,
-					post_id: postId,
-				},
-			} ).catch( ( response ) => {
-				// eslint-disable-next-line no-console
-				console.log( response );
-			} );
+		if ( ! startedSaving || ! blockData || ! postId ) {
+			return;
 		}
+
+		const prefixedBlockData = {};
+
+		Object.keys( blockData ).forEach( ( name ) => {
+			prefixedBlockData[ `vp_${ name }` ] = blockData[ name ];
+		} );
+
+		apiFetch( {
+			path: '/visual-portfolio/v1/update_layout/',
+			method: 'POST',
+			data: {
+				data: prefixedBlockData,
+				post_id: postId,
+			},
+		} ).catch( ( response ) => {
+			// eslint-disable-next-line no-console
+			console.log( response );
+		} );
 	}, [ isSavingPost, isAutosavingPost, postId, blockData ] );
 
 	return null;
