@@ -74,18 +74,10 @@ $escaped-svg-characters: (
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: 18px;
-	opacity: 0.6;
 }
 
 .mce-widget .mce-i-visual-portfolio {
 	background-image: url(../images/icon-mce.svg);
-	opacity: 1;
-}
-
-.menu-top.current .dashicons-visual-portfolio,
-.menu-top:hover .dashicons-visual-portfolio,
-.wp-has-current-submenu .dashicons-visual-portfolio {
-	opacity: 1;
 }
 
 /**
