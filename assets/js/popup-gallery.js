@@ -78,6 +78,15 @@ const VPPopupAPI = {
 	init() {},
 	open() {},
 	close() {},
+	append() {},
+
+	/**
+	 * Active popup session references.
+	 * Set by vendor scripts while a popup is open.
+	 */
+	instance: false,
+	rawItems: false,
+	portfolio: false,
 
 	/**
 	 * Parse query parameters.

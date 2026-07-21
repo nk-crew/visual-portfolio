@@ -57,6 +57,61 @@ function resizeVideo( data, curItem ) {
 	} );
 }
 
+/**
+ * Map raw popup items to PhotoSwipe items.
+ *
+ * @param {Array} items - raw popup items.
+ * @return {Array} PhotoSwipe items.
+ */
+function mapItemsToPhotoSwipe( items ) {
+	const finalItems = [];
+
+	items.forEach( ( item ) => {
+		if ( item.type === 'embed' ) {
+			finalItems.push( {
+				html: `<div class="vp-pswp-video"><div>${ item.embed }</div></div>`,
+				vw: item.width || 0,
+				vh: item.height || 0,
+				title: item.caption,
+			} );
+		} else {
+			finalItems.push( {
+				src: item.src,
+				el: item.el,
+				w: item.width || 0,
+				h: item.height || 0,
+				title: item.caption,
+				o: {
+					src: item.src,
+					w: item.width || 0,
+					h: item.height || 0,
+				},
+				...( item.srcMedium
+					? {
+							m: {
+								src: item.srcMedium,
+								w: item.srcMediumWidth || 0,
+								h: item.srcMediumHeight || 0,
+							},
+							msrc: item.srcMedium,
+					  }
+					: {} ),
+			} );
+		}
+	} );
+
+	return finalItems;
+}
+
+/**
+ * Clear active popup session references.
+ */
+function clearPopupSession() {
+	VPPopupAPI.instance = false;
+	VPPopupAPI.rawItems = false;
+	VPPopupAPI.portfolio = false;
+}
+
 if ( PhotoSwipe && VPPopupAPI ) {
 	let pswpInstance;
 
@@ -125,42 +180,7 @@ if ( PhotoSwipe && VPPopupAPI ) {
 	// Extend Popup API.
 	VPPopupAPI.vendor = 'photoswipe';
 	VPPopupAPI.open = function ( items, index, self ) {
-		const finalItems = [];
-
-		// prepare items for fancybox api.
-		items.forEach( ( item ) => {
-			if ( item.type === 'embed' ) {
-				finalItems.push( {
-					html: `<div class="vp-pswp-video"><div>${ item.embed }</div></div>`,
-					vw: item.width || 0,
-					vh: item.height || 0,
-					title: item.caption,
-				} );
-			} else {
-				finalItems.push( {
-					src: item.src,
-					el: item.el,
-					w: item.width || 0,
-					h: item.height || 0,
-					title: item.caption,
-					o: {
-						src: item.src,
-						w: item.width || 0,
-						h: item.height || 0,
-					},
-					...( item.srcMedium
-						? {
-								m: {
-									src: item.srcMedium,
-									w: item.srcMediumWidth || 0,
-									h: item.srcMediumHeight || 0,
-								},
-								msrc: item.srcMedium,
-						  }
-						: {} ),
-				} );
-			}
-		} );
+		const finalItems = mapItemsToPhotoSwipe( items );
 
 		const $pswpElement = $( '.vp-pswp' );
 		const pswpElement = $pswpElement[ 0 ];
@@ -198,7 +218,8 @@ if ( PhotoSwipe && VPPopupAPI ) {
 				},
 			],
 			getImageURLForShare() {
-				const currentItem = items[ pswpInstance.getCurrentIndex() ];
+				const currentItem =
+					VPPopupAPI.rawItems[ pswpInstance.getCurrentIndex() ];
 
 				if ( currentItem.type === 'image' && currentItem.src ) {
 					return currentItem.src;
@@ -207,7 +228,8 @@ if ( PhotoSwipe && VPPopupAPI ) {
 				return pswpInstance.currItem.src || '';
 			},
 			getPageURLForShare() {
-				const currentItem = items[ pswpInstance.getCurrentIndex() ];
+				const currentItem =
+					VPPopupAPI.rawItems[ pswpInstance.getCurrentIndex() ];
 
 				if ( currentItem.type === 'image' && currentItem.src ) {
 					return currentItem.src;
@@ -216,7 +238,8 @@ if ( PhotoSwipe && VPPopupAPI ) {
 				return window.location.href;
 			},
 			getTextForShare() {
-				const currentItem = items[ pswpInstance.getCurrentIndex() ];
+				const currentItem =
+					VPPopupAPI.rawItems[ pswpInstance.getCurrentIndex() ];
 
 				if ( currentItem.caption ) {
 					const $caption = $( currentItem.caption );
@@ -319,6 +342,10 @@ if ( PhotoSwipe && VPPopupAPI ) {
 			return;
 		}
 
+		// Keep mutable session references for Pro modules (append, deep-linking, etc).
+		VPPopupAPI.rawItems = items;
+		VPPopupAPI.portfolio = self || false;
+
 		// Pass data to PhotoSwipe and initialize it
 		pswpInstance = new PhotoSwipe(
 			pswpElement,
@@ -326,6 +353,7 @@ if ( PhotoSwipe && VPPopupAPI ) {
 			finalItems,
 			options
 		);
+		VPPopupAPI.instance = pswpInstance;
 
 		// see: http://photoswipe.com/documentation/responsive-images.html
 		let realViewportWidth;
@@ -507,7 +535,8 @@ if ( PhotoSwipe && VPPopupAPI ) {
 					} );
 				}
 
-				const currentItemData = items[ data.getCurrentIndex() ];
+				const currentItemData =
+					VPPopupAPI.rawItems[ data.getCurrentIndex() ];
 
 				if ( currentItemData ) {
 					VPPopupAPI.maybeFocusGalleryItem( currentItemData );
@@ -515,12 +544,13 @@ if ( PhotoSwipe && VPPopupAPI ) {
 
 				VPPopupAPI.emitEvent(
 					'beforeClosePhotoSwipe',
-					[ options, items, pswpInstance ],
+					[ options, VPPopupAPI.rawItems, pswpInstance ],
 					self
 				);
 			}
 
 			pswpInstance = false;
+			clearPopupSession();
 		} );
 
 		VPPopupAPI.emitEvent(
@@ -537,10 +567,32 @@ if ( PhotoSwipe && VPPopupAPI ) {
 			self
 		);
 	};
+	VPPopupAPI.append = function ( items ) {
+		if ( ! pswpInstance || ! items || ! items.length ) {
+			return;
+		}
+
+		if ( Array.isArray( VPPopupAPI.rawItems ) ) {
+			items.forEach( ( item ) => {
+				VPPopupAPI.rawItems.push( item );
+			} );
+		}
+
+		const mappedItems = mapItemsToPhotoSwipe( items );
+
+		mappedItems.forEach( ( item ) => {
+			pswpInstance.items.push( item );
+		} );
+
+		if ( pswpInstance.ui && pswpInstance.ui.update ) {
+			pswpInstance.ui.update();
+		}
+	};
 	VPPopupAPI.close = function () {
 		if ( pswpInstance ) {
 			pswpInstance.close();
 			pswpInstance = false;
+			clearPopupSession();
 		}
 	};
 }

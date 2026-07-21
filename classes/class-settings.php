@@ -545,6 +545,16 @@ class Visual_Portfolio_Settings {
 					'is_pro'  => true,
 				),
 
+				// Load Next Pages.
+				array(
+					'name'    => 'load_next_pages',
+					'label'   => esc_html__( 'Load Next Pages', 'visual-portfolio' ),
+					'desc'    => esc_html__( 'Automatically load the next page of items while browsing the gallery when Load More or Infinite pagination is used.', 'visual-portfolio' ),
+					'type'    => 'toggle',
+					'default' => 'on',
+					'is_pro'  => true,
+				),
+
 				// Click to Zoom.
 				array(
 					'name'    => 'click_to_zoom',

@@ -5,51 +5,71 @@ const { __, settingsPopupGallery } = VPData;
 const $doc = $( document );
 const $window = $( window );
 
+/**
+ * Map raw popup items to Fancybox items.
+ *
+ * @param {Array} items - raw popup items.
+ * @return {Array} Fancybox items.
+ */
+function mapItemsToFancybox( items ) {
+	const finalItems = [];
+
+	items.forEach( ( item ) => {
+		if ( item.type === 'embed' && item.src ) {
+			finalItems.push( {
+				type: 'iframe',
+				src: item.src,
+				opts: {
+					width: item.width,
+					height: item.height,
+					caption: item.caption,
+				},
+			} );
+		} else if ( item.type === 'embed' && item.embed ) {
+			finalItems.push( {
+				type: 'html',
+				src: item.embed,
+				opts: {
+					width: item.width,
+					height: item.height,
+					caption: item.caption,
+				},
+			} );
+		} else {
+			finalItems.push( {
+				type: 'image',
+				src: item.src,
+				el: item.el,
+				opts: {
+					width: item.width,
+					height: item.height,
+					srcset: item.srcset,
+					caption: item.caption,
+					thumb: item.srcSmall,
+				},
+			} );
+		}
+	} );
+
+	return finalItems;
+}
+
+/**
+ * Clear active popup session references.
+ */
+function clearPopupSession() {
+	VPPopupAPI.instance = false;
+	VPPopupAPI.rawItems = false;
+	VPPopupAPI.portfolio = false;
+}
+
 if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 	let fancyboxInstance;
 
 	// Extend Popup API.
 	VPPopupAPI.vendor = 'fancybox';
 	VPPopupAPI.open = function ( items, index, self ) {
-		const finalItems = [];
-
-		// prepare items for fancybox api.
-		items.forEach( ( item ) => {
-			if ( item.type === 'embed' && item.src ) {
-				finalItems.push( {
-					type: 'iframe',
-					src: item.src,
-					opts: {
-						width: item.width,
-						height: item.height,
-						caption: item.caption,
-					},
-				} );
-			} else if ( item.type === 'embed' && item.embed ) {
-				finalItems.push( {
-					type: 'html',
-					src: item.embed,
-					opts: {
-						width: item.width,
-						height: item.height,
-						caption: item.caption,
-					},
-				} );
-			} else {
-				finalItems.push( {
-					type: 'image',
-					src: item.src,
-					el: item.el,
-					opts: {
-						width: item.width,
-						height: item.height,
-						srcset: item.srcset,
-						caption: item.caption,
-						thumb: item.srcSmall,
-					},
-				} );
-			}
-		} );
+		const finalItems = mapItemsToFancybox( items );
 
 		const buttons = [];
 		if ( settingsPopupGallery.show_zoom_button ) {
@@ -174,7 +194,8 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 			},
 
 			beforeClose() {
-				const currentItemData = items[ fancyboxInstance.currIndex ];
+				const currentItemData =
+					VPPopupAPI.rawItems[ fancyboxInstance.currIndex ];
 
 				if ( currentItemData ) {
 					VPPopupAPI.maybeFocusGalleryItem( currentItemData );
@@ -182,11 +203,12 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 
 				VPPopupAPI.emitEvent(
 					'beforeCloseFancybox',
-					[ options, items, fancyboxInstance ],
+					[ options, VPPopupAPI.rawItems, fancyboxInstance ],
 					self
 				);
 
 				fancyboxInstance = false;
+				clearPopupSession();
 			},
 			beforeShow( e, instance ) {
 				VPPopupAPI.emitEvent(
@@ -216,8 +238,13 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 			options.loop = false;
 		}
 
+		// Keep mutable session references for Pro modules (append, deep-linking, etc).
+		VPPopupAPI.rawItems = items;
+		VPPopupAPI.portfolio = self || false;
+
 		// Start new fancybox instance
 		fancyboxInstance = $.fancybox.open( finalItems, options, index );
+		VPPopupAPI.instance = fancyboxInstance;
 
 		VPPopupAPI.emitEvent(
 			'initFancybox',
@@ -225,10 +252,24 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 			self
 		);
 	};
+	VPPopupAPI.append = function ( items ) {
+		if ( ! fancyboxInstance || ! items || ! items.length ) {
+			return;
+		}
+
+		if ( Array.isArray( VPPopupAPI.rawItems ) ) {
+			items.forEach( ( item ) => {
+				VPPopupAPI.rawItems.push( item );
+			} );
+		}
+
+		fancyboxInstance.addContent( mapItemsToFancybox( items ) );
+	};
 	VPPopupAPI.close = function () {
 		if ( fancyboxInstance ) {
 			fancyboxInstance.close();
 			fancyboxInstance = false;
+			clearPopupSession();
 		}
 	};
 
