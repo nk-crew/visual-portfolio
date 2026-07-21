@@ -53,7 +53,7 @@ class Visual_Portfolio_Welcome_Screen {
 		return array(
 			array(
 				'title'       => esc_html__( 'Visual gallery builder', 'visual-portfolio' ),
-				'description' => esc_html__( 'Create galleries, portfolios, and post grids visually in Gutenberg with live preview and flexible controls.', 'visual-portfolio' ),
+				'description' => esc_html__( 'Create galleries, portfolios, and post grids visually with gallery blocks, live preview, and flexible controls.', 'visual-portfolio' ),
 			),
 			array(
 				'title'       => esc_html__( 'Flexible layouts and styles', 'visual-portfolio' ),

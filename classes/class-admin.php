@@ -1980,7 +1980,7 @@ class Visual_Portfolio_Admin {
 				'name'          => 'stretch',
 				'default'       => false,
 				'reload_iframe' => false,
-				'description'   => esc_attr__( 'Break container and display it wide. This option helpful for 3rd-party page builders, in the Gutenberg themes you can use the built in Wide and Fullwidth features.', 'visual-portfolio' ),
+				'description'   => esc_attr__( 'Break the container and display the gallery wide. Helpful for 3rd-party page builders. In the block editor, use the built-in Wide and Fullwidth alignment instead.', 'visual-portfolio' ),
 			)
 		);
 

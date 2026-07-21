@@ -1,7 +1,7 @@
-# Visual Portfolio, Photo Gallery & Post Grid #
+# Gallery by Visual Portfolio #
 
 * Contributors: visualportfolio, nko
-* Tags: portfolio, gallery, gallery block, image gallery, wordpress gallery plugin
+* Tags: gallery, photo gallery, image gallery, portfolio, video gallery
 * Donate link: https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
 * Requires at least: 6.2
 * Tested up to: 7.0
@@ -10,26 +10,26 @@
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
-Powerful WordPress gallery plugin for stunning photo, video & album galleries with advanced layouts and flexible block editing.
+Build photo galleries, image galleries, and portfolio grids with gallery blocks. Masonry, lightbox, sliders, and filters included.
 
 ## Description ##
 
-**Gallery & Portfolio Plugin For WordPress**
+**Photo gallery and portfolio plugin for WordPress**
 ★★★★★<br>
 
-**Portfolio websites are the most popular nowadays.** We created [**Visual Portfolio, Photo Gallery & Post Grid WordPress plugin**](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head), to help every creative, agency, and photographers build image galleries, video galleries, album galleries, and filterable post grids that showcase their work and attract more love from their potential and existing customers.
+[**Visual Portfolio**](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) is a WordPress gallery plugin built around gallery and portfolio blocks. Use it for photo galleries, image galleries, video galleries, and albums. Pick masonry, justified, tiles, grid, slider, or carousel layouts.
 
 [youtube https://youtu.be/354pybu91aQ]
 
 [See Live Demo](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) | [Documentation](https://www.visualportfolio.com/docs/getting-started/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=head) | [GitHub](https://github.com/nk-crew/visual-portfolio)
 
-Create beautiful, clean, and powerful photo galleries, video galleries, albums, and portfolio layouts using the Visual Portfolio gallery plugin. It is easy for simple image galleries, but powerful enough for professionals who need nested galleries, post grids, taxonomy grids, and advanced portfolio workflows. Whether you're a photographer, agency, or anything in between, **Visual Portfolio helps you present your work professionally online**.
+Keep it simple with a basic image gallery, or go further with nested galleries, filterable portfolio grids, post grids, and taxonomy grids. Add images, choose a layout, then tweak skins and the lightbox. You do not need to write code.
 
 ### 🏆 Visual Gallery Builder ###
 
-Build your portfolio and gallery blocks with no coding knowledge. Thanks to Gutenberg page builder you are able to create and customize galleries visually.
+Build gallery and portfolio blocks without coding. Customize layouts visually with live preview in the editor.
 
-Convenient visual block editor with support to various layouts such as Masonry, Justified, Tiles, Grid, Slider and Carousel. A **well thought out design, powerful features, and years of development** by the nK team make Visual Portfolio a game-changing Portfolio and Gallery plugin that will level the WordPress showcases playing field in your favor to help increase visitors engagement.
+Supported layouts: Masonry, Justified, Tiles, Grid, Slider, and Carousel. You get skins and the usual gallery controls in one place.
 
 ### 🚀 Optimized to be Fast as Native ###
 
@@ -53,7 +53,7 @@ Our gallery plugin shipped with popular layouts such as Masonry and Justified (F
 
 ### 🎨 Prebuilt Skins ###
 
-Showcase your projects ang gallery images with clean and beautiful skins. See it in action:
+Showcase your projects and gallery images with clean and beautiful skins. See it in action:
 
 * [Classic](https://www.visualportfolio.com/masonry/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
 * [Fade](https://www.visualportfolio.com/tiles-paged-pagination/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=effects)
@@ -69,7 +69,7 @@ The gallery block with live preview includes a lot of design settings that are p
 
 Optional custom post type `portfolio` will ensure all your portfolios to keep in a single post type. In this way, you can distinguish your portfolios from other post types. Taxonomies are used to categorize your portfolio types, it will help you to group and sort your portfolios. Moreover, you can use these portfolios as a source for your showcase gallery using Visual Portfolio block.
 
-Customize and rename Portfolio archive templates using visual gallery and page builder [https://www.visualportfolio.com/docs/portfolio-archive/](https://www.visualportfolio.com/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=archive)
+Customize and rename Portfolio archive templates using the gallery block and page builders: [https://www.visualportfolio.com/docs/portfolio-archive/](https://www.visualportfolio.com/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=archive)
 
 In case you want to use Visual Portfolio plugin for photo gallery only you can disable custom post type registration.
 
@@ -79,7 +79,7 @@ Fine-tune the source of your galleries. Display posts, portfolios, taxonomies, a
 
 ### 🖼️ Photo Galleries ###
 
-Create galleries using image sets right inside block editor, just drop your images and the gallery is ready. You can create unlimited image galleries with different styles, build album galleries with nested galleries in Pro, and combine images with video items for richer visual storytelling.
+Create galleries from image sets right inside the gallery block: drop your images in and the gallery is ready. You can create unlimited image galleries with different styles, build album galleries with nested galleries in Pro, and combine images with video items for richer visual storytelling.
 
 ### ⚡ Powerful Lightbox ###
 
@@ -269,8 +269,8 @@ All available features you can find on the [plugin's site](https://www.visualpor
 
 ## Screenshots ##
 
-1. Gutenberg Blocks
-2. Gutenberg Block Settings
+1. Gallery Blocks
+2. Gallery Block Settings
 3. Projects Admin
 
 ## Installation ##

@@ -751,7 +751,7 @@ class Visual_Portfolio_Custom_Post_Type {
 						sprintf(
 							// translators: %1$s - url to documentation.
 							// translators: %2$s - plugin name.
-							__( 'If you are using the Gutenberg page builder for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', 'visual-portfolio' ),
+							__( 'If you are using the block editor for your pages and posts, you should <strong>avoid using Saved Layouts</strong>. See here more info about <a href="%1$s" target="_blank">%2$s Blocks</a>.', 'visual-portfolio' ),
 							'https://www.visualportfolio.com/docs/gallery-blocks/',
 							visual_portfolio()->plugin_name
 						)
@@ -761,7 +761,7 @@ class Visual_Portfolio_Custom_Post_Type {
 				<p>
 					<?php
 					// translators: %s - url to documentation.
-					echo wp_kses_post( sprintf( __( 'To reuse blocks, you can use the built-in Gutenberg feature - <a href="%s" target="_blank">Reusable Blocks</a>.', 'visual-portfolio' ), 'https://www.wpbeginner.com/beginners-guide/how-to-create-a-reusable-block-in-wordpress/' ) );
+					echo wp_kses_post( sprintf( __( 'To reuse blocks, you can use the built-in <a href="%s" target="_blank">Reusable Blocks</a> feature.', 'visual-portfolio' ), 'https://www.wpbeginner.com/beginners-guide/how-to-create-a-reusable-block-in-wordpress/' ) );
 					?>
 				</p>
 				<p>
