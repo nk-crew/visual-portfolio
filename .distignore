@@ -8,7 +8,6 @@
 /artifacts
 /dist-zip
 /node_modules
-/scripts
 /tests
 /vendor
 
