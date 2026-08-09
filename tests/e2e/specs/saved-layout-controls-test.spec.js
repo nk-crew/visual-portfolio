@@ -16,27 +16,27 @@ const POSTS_SOURCE_BUTTON =
 	'button.components-button.vpf-component-icon-selector-item:has-text("Posts")';
 const CLASSIC_SKIN_BUTTON = 'button:has-text("Classic")';
 
-test.describe( 'Saved Layout Controls Persistence', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+test.describe('Saved Layout Controls Persistence', () => {
+	test.beforeAll(async ({ requestUtils }) => {
 		const pluginName = getPluginSlug();
-		await requestUtils.activatePlugin( pluginName );
+		await requestUtils.activatePlugin(pluginName);
 
 		// Clean up any existing test data in parallel
-		await Promise.all( [
+		await Promise.all([
 			requestUtils.deleteAllMedia(),
 			requestUtils.deleteAllPages(),
-			deleteAllSavedLayouts( { requestUtils } ),
-		] );
-	} );
+			deleteAllSavedLayouts({ requestUtils }),
+		]);
+	});
 
-	test.afterAll( async ( { requestUtils } ) => {
+	test.afterAll(async ({ requestUtils }) => {
 		// Clean up test data in parallel
-		await Promise.all( [
+		await Promise.all([
 			requestUtils.deleteAllMedia(),
 			requestUtils.deleteAllPages(),
-			deleteAllSavedLayouts( { requestUtils } ),
-		] );
-	} );
+			deleteAllSavedLayouts({ requestUtils }),
+		]);
+	});
 
 	/**
 	 * Helper to create a saved layout and navigate through initial setup.
@@ -45,26 +45,26 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 	 * @param editor
 	 * @param title
 	 */
-	async function setupSavedLayoutWithPosts( admin, page, editor, title ) {
-		await admin.createNewPost( {
+	async function setupSavedLayoutWithPosts(admin, page, editor, title) {
+		await admin.createNewPost({
 			title,
 			postType: 'vp_lists',
 			showWelcomeGuide: false,
 			legacyCanvas: true,
-		} );
+		});
 
-		const canvas = getEditorCanvas( page, editor );
+		const canvas = getEditorCanvas(page, editor);
 
 		// Select Posts as data source
-		const postsButton = canvas.locator( POSTS_SOURCE_BUTTON );
-		await expect( postsButton ).toBeVisible();
+		const postsButton = canvas.locator(POSTS_SOURCE_BUTTON);
+		await expect(postsButton).toBeVisible();
 		await postsButton.click();
 
 		// Navigate through setup wizard
-		const continueButton = canvas.getByRole( 'button', {
+		const continueButton = canvas.getByRole('button', {
 			name: 'Continue',
-		} );
-		for ( let i = 0; i < 3; i++ ) {
+		});
+		for (let i = 0; i < 3; i++) {
 			await continueButton.click();
 		}
 	}
@@ -73,16 +73,16 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 	 * Helper to navigate to Caption > Elements section with Classic skin.
 	 * @param page
 	 */
-	async function navigateToElementsSection( page ) {
+	async function navigateToElementsSection(page) {
 		// Select Classic skin to enable Caption > Elements options
-		await page.getByRole( 'button', { name: 'Skin' } ).click();
-		const classicSkin = page.locator( CLASSIC_SKIN_BUTTON ).first();
-		await expect( classicSkin ).toBeVisible();
+		await page.getByRole('button', { name: 'Skin' }).click();
+		const classicSkin = page.locator(CLASSIC_SKIN_BUTTON).first();
+		await expect(classicSkin).toBeVisible();
 		await classicSkin.click();
 
 		// Navigate to Caption > Elements
-		await page.getByRole( 'button', { name: 'Caption' } ).click();
-		await page.getByRole( 'button', { name: 'Elements' } ).click();
+		await page.getByRole('button', { name: 'Caption' }).click();
+		await page.getByRole('button', { name: 'Elements' }).click();
 	}
 
 	/**
@@ -91,7 +91,7 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 	 * @param {import('@playwright/test').Page} page Playwright page object.
 	 * @return {import('@playwright/test').Locator} Visible display date control.
 	 */
-	function getDisplayDateControl( page ) {
+	function getDisplayDateControl(page) {
 		return page.locator(
 			'.vpf-control-wrap-name-items_style_default__show_date select, .vpf-control-wrap-name-items_style_default__show_date .vpf-component-select'
 		);
@@ -104,92 +104,90 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 	 * @param {string} controlName Toggle label.
 	 * @return {import('@playwright/test').Locator} Toggle locator.
 	 */
-	function getDisplayElementToggle( page, controlName ) {
-		return page
-			.locator( 'label' )
-			.filter( { hasText: controlName } );
+	function getDisplayElementToggle(page, controlName) {
+		return page.locator('label').filter({ hasText: controlName });
 	}
 
 	/**
 	 * Return the Read More select control if it is available.
 	 *
-		 * @param {import('@playwright/test').Page} page Playwright page object.
-		 * @return {import('@playwright/test').Locator} Read More control.
+	 * @param {import('@playwright/test').Page} page Playwright page object.
+	 * @return {import('@playwright/test').Locator} Read More control.
 	 */
-	function getReadMoreControl( page ) {
+	function getReadMoreControl(page) {
 		return page.locator(
 			'.vpf-control-group-items_style_read_more select, .vpf-control-group-items_style_read_more .vpf-component-select'
 		);
 	}
 
-	test( 'should persist Display Date control settings', async ( {
+	test('should persist Display Date control settings', async ({
 		page,
 		admin,
 		editor,
-	} ) => {
+	}) => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
 			editor,
 			'Test Display Date Control'
 		);
-		await navigateToElementsSection( page );
+		await navigateToElementsSection(page);
 
 		// Enable Display Date control by checkbox
-		const dateToggle = getDisplayElementToggle( page, 'Display Date' );
-		await expect( dateToggle ).toBeVisible();
+		const dateToggle = getDisplayElementToggle(page, 'Display Date');
+		await expect(dateToggle).toBeVisible();
 		await dateToggle.click();
 
-		const dateControl = getDisplayDateControl( page );
-		await expect( dateControl ).toBeVisible();
+		const dateControl = getDisplayDateControl(page);
+		await expect(dateControl).toBeVisible();
 
 		// Save current state first to establish baseline
 		await editor.publishPost();
 
 		// Reload to verify control is still enabled
 		await page.reload();
-		await page.waitForLoadState( 'domcontentloaded' );
-		await navigateToElementsSection( page );
+		await page.waitForLoadState('domcontentloaded');
+		await navigateToElementsSection(page);
 
 		await expect(
-			getDisplayElementToggle( page, 'Display Date' )
+			getDisplayElementToggle(page, 'Display Date')
 		).toBeVisible();
-		const reloadedDateControl = getDisplayDateControl( page );
-		await expect( reloadedDateControl ).toBeVisible();
-	} );
+		const reloadedDateControl = getDisplayDateControl(page);
+		await expect(reloadedDateControl).toBeVisible();
+	});
 
-	test( 'should persist Display Excerpt control settings', async ( {
+	test('should persist Display Excerpt control settings', async ({
 		page,
 		admin,
 		editor,
-	} ) => {
+	}) => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
 			editor,
 			'Test Display Excerpt Control'
 		);
-		await navigateToElementsSection( page );
+		await navigateToElementsSection(page);
 
 		// Find Display Excerpt checkbox
 		const excerptCheckbox = getDisplayElementToggle(
 			page,
 			'Display Excerpt'
 		);
-		await expect( excerptCheckbox ).toBeVisible();
+		await expect(excerptCheckbox).toBeVisible();
 
 		// Check initial state and toggle
 		await excerptCheckbox.check();
 
 		// Look for excerpt-related controls that appear
-		const excerptLengthControl = page.locator( '[name*="excerpt_length"]' );
+		const excerptLengthControl = page.locator('[name*="excerpt_length"]');
 		const hasExcerptControls = await excerptLengthControl
-			.isVisible( { timeout: 2000 } )
-			.catch( () => false );
+			.isVisible({ timeout: 2000 })
+			.catch(() => false);
 
-		if ( hasExcerptControls ) {
+		if (hasExcerptControls) {
 			// Set excerpt length if available
-			await excerptLengthControl.fill( '20' );
+			await excerptLengthControl.fill('20');
 		}
 
 		// Save the layout
@@ -197,30 +195,30 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 
 		// Reload and verify
 		await page.reload();
-		await page.waitForLoadState( 'domcontentloaded' );
-		await navigateToElementsSection( page );
+		await page.waitForLoadState('domcontentloaded');
+		await navigateToElementsSection(page);
 
 		// Verify the excerpt setting persisted
-		if ( hasExcerptControls ) {
+		if (hasExcerptControls) {
 			const reloadedLengthControl = page.locator(
 				'[name*="excerpt_length"]'
 			);
-			await expect( reloadedLengthControl ).toHaveValue( '20' );
+			await expect(reloadedLengthControl).toHaveValue('20');
 		}
-	} );
+	});
 
-	test( 'should persist Display Categories control settings', async ( {
+	test('should persist Display Categories control settings', async ({
 		page,
 		admin,
 		editor,
-	} ) => {
+	}) => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
 			editor,
 			'Test Display Categories Control'
 		);
-		await navigateToElementsSection( page );
+		await navigateToElementsSection(page);
 
 		// Find and toggle Display Categories
 		const categoriesCheckbox = getDisplayElementToggle(
@@ -228,10 +226,10 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 			'Display Categories'
 		);
 		const isCategoriesVisible = await categoriesCheckbox
-			.isVisible( { timeout: 2000 } )
-			.catch( () => false );
+			.isVisible({ timeout: 2000 })
+			.catch(() => false);
 
-		if ( isCategoriesVisible ) {
+		if (isCategoriesVisible) {
 			await categoriesCheckbox.click();
 
 			// Save the layout
@@ -239,30 +237,30 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 
 			// Reload and verify the setting persisted
 			await page.reload();
-			await page.waitForLoadState( 'domcontentloaded' );
-			await navigateToElementsSection( page );
+			await page.waitForLoadState('domcontentloaded');
+			await navigateToElementsSection(page);
 
 			// The checkbox state should be maintained
 			// Note: We can't easily verify checkbox state without specific attributes
 			// but we can verify the control is still visible
 			await expect(
-				getDisplayElementToggle( page, 'Display Categories' )
+				getDisplayElementToggle(page, 'Display Categories')
 			).toBeVisible();
 		}
-	} );
+	});
 
-	test( 'should persist multiple control settings simultaneously', async ( {
+	test('should persist multiple control settings simultaneously', async ({
 		page,
 		admin,
 		editor,
-	} ) => {
+	}) => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
 			editor,
 			'Test Multiple Controls'
 		);
-		await navigateToElementsSection( page );
+		await navigateToElementsSection(page);
 
 		// Enable multiple controls
 		const controlsToEnable = [
@@ -271,46 +269,46 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 			'Display Categories',
 		];
 
-		for ( const controlName of controlsToEnable ) {
-			const checkbox = getDisplayElementToggle( page, controlName );
+		for (const controlName of controlsToEnable) {
+			const checkbox = getDisplayElementToggle(page, controlName);
 			const isVisible = await checkbox
-				.isVisible( { timeout: 1000 } )
-				.catch( () => false );
-			if ( isVisible ) {
+				.isVisible({ timeout: 1000 })
+				.catch(() => false);
+			if (isVisible) {
 				await checkbox.click();
 			}
 		}
 
 		// Ensure dependent Read More control becomes available when excerpt is enabled.
-		const readMoreControl = getReadMoreControl( page );
+		const readMoreControl = getReadMoreControl(page);
 		const isReadMoreVisible = await readMoreControl
-			.isVisible( { timeout: 1000 } )
-			.catch( () => false );
-		expect( isReadMoreVisible ).toBeTruthy();
+			.isVisible({ timeout: 1000 })
+			.catch(() => false);
+		expect(isReadMoreVisible).toBeTruthy();
 
 		// Save all settings
 		await editor.publishPost();
 
 		// Reload and verify all settings persisted
 		await page.reload();
-		await page.waitForLoadState( 'domcontentloaded' );
-		await navigateToElementsSection( page );
+		await page.waitForLoadState('domcontentloaded');
+		await navigateToElementsSection(page);
 
 		// Verify controls are still enabled
-		for ( const controlName of controlsToEnable ) {
+		for (const controlName of controlsToEnable) {
 			await expect(
-				getDisplayElementToggle( page, controlName )
+				getDisplayElementToggle(page, controlName)
 			).toBeVisible();
 		}
 
-		await expect( getReadMoreControl( page ) ).toBeVisible();
-	} );
+		await expect(getReadMoreControl(page)).toBeVisible();
+	});
 
-	test( 'should handle pagination controls correctly', async ( {
+	test('should handle pagination controls correctly', async ({
 		page,
 		admin,
 		editor,
-	} ) => {
+	}) => {
 		await setupSavedLayoutWithPosts(
 			admin,
 			page,
@@ -319,7 +317,7 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 		);
 
 		// Navigate to Pagination section instead of Elements
-		await page.getByRole( 'button', { name: 'Pagination' } ).click();
+		await page.getByRole('button', { name: 'Pagination' }).click();
 
 		// Look for pagination type selector
 		const paginationTypeControl = page
@@ -329,42 +327,38 @@ test.describe( 'Saved Layout Controls Persistence', () => {
 			.first();
 
 		const isPaginationVisible = await paginationTypeControl
-			.isVisible( { timeout: 2000 } )
-			.catch( () => false );
+			.isVisible({ timeout: 2000 })
+			.catch(() => false);
 
-		if ( isPaginationVisible ) {
+		if (isPaginationVisible) {
 			await paginationTypeControl.click();
 
 			// Select Load More option if available
-			const loadMoreOption = page.getByRole( 'option', {
+			const loadMoreOption = page.getByRole('option', {
 				name: 'Load More',
-			} );
+			});
 			const hasLoadMore = await loadMoreOption
-				.isVisible( { timeout: 1000 } )
-				.catch( () => false );
+				.isVisible({ timeout: 1000 })
+				.catch(() => false);
 
-			if ( hasLoadMore ) {
+			if (hasLoadMore) {
 				await loadMoreOption.click();
-				await expect( paginationTypeControl ).toContainText(
-					'Load More'
-				);
+				await expect(paginationTypeControl).toContainText('Load More');
 
 				// Save and verify persistence
 				await editor.publishPost();
 
 				await page.reload();
-				await page.waitForLoadState( 'domcontentloaded' );
-				await page
-					.getByRole( 'button', { name: 'Pagination' } )
-					.click();
+				await page.waitForLoadState('domcontentloaded');
+				await page.getByRole('button', { name: 'Pagination' }).click();
 
 				const reloadedControl = page
 					.locator(
 						'[class*="pagination"] select, [class*="pagination"] .vpf-component-select'
 					)
 					.first();
-				await expect( reloadedControl ).toContainText( 'Load More' );
+				await expect(reloadedControl).toContainText('Load More');
 			}
 		}
-	} );
-} );
+	});
+});

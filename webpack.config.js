@@ -1,15 +1,15 @@
 /**
  * External Dependencies
  */
-const path = require( 'path' );
+const path = require('path');
 
-const cssnano = require( 'cssnano' );
-const glob = require( 'glob' );
-const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
-const FileManagerPlugin = require( 'filemanager-webpack-plugin' );
-const RemoveEmptyScriptsPlugin = require( 'webpack-remove-empty-scripts' );
-const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
-const TerserPlugin = require( 'terser-webpack-plugin' );
+const cssnano = require('cssnano');
+const glob = require('glob');
+const defaultConfig = require('@wordpress/scripts/config/webpack.config');
+const FileManagerPlugin = require('filemanager-webpack-plugin');
+const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
+const RtlCssPlugin = require('rtlcss-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isQuietBuild = process.env.VP_QUIET === '1';
@@ -163,63 +163,56 @@ const vendorFiles = [
 	},
 ];
 
-function normalizePath( filePath ) {
-	return filePath.split( path.win32.sep ).join( path.posix.sep );
+function normalizePath(filePath) {
+	return filePath.split(path.win32.sep).join(path.posix.sep);
 }
 
-function createEntries( patterns, extension, shouldInclude = () => true ) {
-	return glob.sync( patterns, { nodir: true } ).reduce( ( entries, entry ) => {
-		if ( ! shouldInclude( entry ) ) {
+function createEntries(patterns, extension, shouldInclude = () => true) {
+	return glob.sync(patterns, { nodir: true }).reduce((entries, entry) => {
+		if (!shouldInclude(entry)) {
 			return entries;
 		}
 
-		const name = entry.slice( 0, -extension.length );
+		const name = entry.slice(0, -extension.length);
 
-		entries[ name ] = path.resolve( process.cwd(), entry );
+		entries[name] = path.resolve(process.cwd(), entry);
 
 		return entries;
-	}, {} );
+	}, {});
 }
 
-function shouldIncludeScssEntry( entry ) {
-	return ! path.basename( entry ).startsWith( '_' );
+function shouldIncludeScssEntry(entry) {
+	return !path.basename(entry).startsWith('_');
 }
 
-function isSvgRule( rule ) {
-	return rule.test instanceof RegExp && rule.test.test( 'file.svg' );
+function isSvgRule(rule) {
+	return rule.test instanceof RegExp && rule.test.test('file.svg');
 }
 
-function disableCssLoaderUrls( rules ) {
-	return rules.map( ( rule ) => {
-		if ( ! Array.isArray( rule.use ) ) {
+function disableCssLoaderUrls(rules) {
+	return rules.map((rule) => {
+		if (!Array.isArray(rule.use)) {
 			return rule;
 		}
 
-		function isCssLoader( loader ) {
+		function isCssLoader(loader) {
 			return (
 				'object' === typeof loader &&
-				!! loader.loader &&
-				/(^|[\\/])css-loader[\\/]dist[\\/]cjs\.js$/.test(
-					loader.loader
-				)
+				!!loader.loader &&
+				/(^|[\\/])css-loader[\\/]dist[\\/]cjs\.js$/.test(loader.loader)
 			);
 		}
 
-		const hasCssLoader = rule.use.some(
-			( loader ) => isCssLoader( loader )
-		);
+		const hasCssLoader = rule.use.some((loader) => isCssLoader(loader));
 
-		if ( ! hasCssLoader ) {
+		if (!hasCssLoader) {
 			return rule;
 		}
 
 		return {
 			...rule,
-			use: rule.use.map( ( loader ) => {
-				if (
-					'string' === typeof loader ||
-					! isCssLoader( loader )
-				) {
+			use: rule.use.map((loader) => {
+				if ('string' === typeof loader || !isCssLoader(loader)) {
 					return loader;
 				}
 
@@ -230,13 +223,13 @@ function disableCssLoaderUrls( rules ) {
 						url: false,
 					},
 				};
-			} ),
+			}),
 		};
-	} );
+	});
 }
 
-function patchPostCssLoaderOptions( rules ) {
-	if ( ! isProduction ) {
+function patchPostCssLoaderOptions(rules) {
+	if (!isProduction) {
 		return rules;
 	}
 
@@ -244,34 +237,34 @@ function patchPostCssLoaderOptions( rules ) {
 	// version that does not run SVGO on inline CSS SVGs. Without this override,
 	// production builds rewrite data:image/svg+xml URLs and break icons such as
 	// the Visual Portfolio logo in the WordPress admin menu.
-	return rules.map( ( rule ) => {
-		if ( ! Array.isArray( rule.use ) ) {
+	return rules.map((rule) => {
+		if (!Array.isArray(rule.use)) {
 			return rule;
 		}
 
 		return {
 			...rule,
-			use: rule.use.map( ( loader ) => {
+			use: rule.use.map((loader) => {
 				if (
 					'string' === typeof loader ||
-					! loader.loader ||
-					! loader.loader.includes( 'postcss-loader' ) ||
-					! loader.options?.postcssOptions
+					!loader.loader ||
+					!loader.loader.includes('postcss-loader') ||
+					!loader.options?.postcssOptions
 				) {
 					return loader;
 				}
 
 				const postcssOptions = loader.options.postcssOptions;
-				const plugins = Array.isArray( postcssOptions.plugins )
+				const plugins = Array.isArray(postcssOptions.plugins)
 					? postcssOptions.plugins.filter(
-						( plugin ) =>
-							!(
-								plugin &&
-								'object' === typeof plugin &&
-								Array.isArray( plugin.plugins ) &&
-								plugin.version
-							)
-					)
+							(plugin) =>
+								!(
+									plugin &&
+									'object' === typeof plugin &&
+									Array.isArray(plugin.plugins) &&
+									plugin.version
+								)
+						)
 					: [];
 
 				return {
@@ -282,7 +275,7 @@ function patchPostCssLoaderOptions( rules ) {
 							...postcssOptions,
 							plugins: [
 								...plugins,
-								cssnano( {
+								cssnano({
 									preset: [
 										'default',
 										{
@@ -292,14 +285,14 @@ function patchPostCssLoaderOptions( rules ) {
 											svgo: false,
 										},
 									],
-								} ),
+								}),
 							],
 						},
 					},
 				};
-			} ),
+			}),
 		};
-	} );
+	});
 }
 
 function createSvgRules() {
@@ -333,87 +326,80 @@ function createSvgRules() {
 	];
 }
 
-function transformDevServerProxy( proxy, fallbackTarget ) {
-	if (
-		! proxy ||
-		Array.isArray( proxy ) ||
-		'object' !== typeof proxy
-	) {
+function transformDevServerProxy(proxy, fallbackTarget) {
+	if (!proxy || Array.isArray(proxy) || 'object' !== typeof proxy) {
 		return proxy;
 	}
 
-	return Object.entries( proxy ).map( ( [ context, options ] ) => ( {
-		context: [ context ],
+	return Object.entries(proxy).map(([context, options]) => ({
+		context: [context],
 		target: options.target || options.router || fallbackTarget,
 		...options,
-	} ) );
+	}));
 }
 
-function shouldIgnorePerformanceHint( assetFilename ) {
-	return ! assetFilename.startsWith( 'gutenberg/' );
+function shouldIgnorePerformanceHint(assetFilename) {
+	return !assetFilename.startsWith('gutenberg/');
 }
 
-function isTemplateStyleChunk( normalizedChunkName, cacheGroupKey ) {
+function isTemplateStyleChunk(normalizedChunkName, cacheGroupKey) {
 	return (
 		'style' === cacheGroupKey &&
-		( normalizedChunkName.includes( 'templates/' ) ||
-			normalizedChunkName.includes( 'admin/css/' ) ||
-			normalizedChunkName.includes( 'gutenberg/' ) )
+		(normalizedChunkName.includes('templates/') ||
+			normalizedChunkName.includes('admin/css/') ||
+			normalizedChunkName.includes('gutenberg/'))
 	);
 }
 
-function getStyleChunkName( _, chunks, cacheGroupKey ) {
-	if ( ! chunks.length ) {
+function getStyleChunkName(_, chunks, cacheGroupKey) {
+	if (!chunks.length) {
 		return cacheGroupKey;
 	}
 
-	const selectedChunk = chunks[ chunks.length > 1 ? 1 : 0 ];
+	const selectedChunk = chunks[chunks.length > 1 ? 1 : 0];
 	const chunkName = selectedChunk.name;
 
-	if ( chunks.length > 1 ) {
+	if (chunks.length > 1) {
 		const combinedChunkName = chunks
-			.map( ( chunk ) => path.basename( chunk.name ) )
+			.map((chunk) => path.basename(chunk.name))
 			.sort()
-			.join( '-' );
+			.join('-');
 
-		return `${ path.dirname(
+		return `${path.dirname(
 			chunkName
-		) }/${ cacheGroupKey }-${ combinedChunkName }`;
+		)}/${cacheGroupKey}-${combinedChunkName}`;
 	}
 
-	if (
-		'style' === cacheGroupKey &&
-		chunkName.includes( 'layouts-editor' )
-	) {
-		return `${ path.dirname( chunkName ) }/${ cacheGroupKey }-${ path.basename(
+	if ('style' === cacheGroupKey && chunkName.includes('layouts-editor')) {
+		return `${path.dirname(chunkName)}/${cacheGroupKey}-${path.basename(
 			chunkName
-		) }`;
+		)}`;
 	}
 
-	const normalizedChunkName = normalizePath( chunkName );
+	const normalizedChunkName = normalizePath(chunkName);
 
-	if ( isTemplateStyleChunk( normalizedChunkName, cacheGroupKey ) ) {
-		return `${ path.dirname( chunkName ) }/${ path.basename( chunkName ) }`;
+	if (isTemplateStyleChunk(normalizedChunkName, cacheGroupKey)) {
+		return `${path.dirname(chunkName)}/${path.basename(chunkName)}`;
 	}
 
-	return `${ path.dirname( chunkName ) }/${ cacheGroupKey }-${ path.basename(
+	return `${path.dirname(chunkName)}/${cacheGroupKey}-${path.basename(
 		chunkName
-	) }`;
+	)}`;
 }
 
-function shouldIgnoreQuietWarning( warning ) {
-	return QUIET_BUILD_WARNING_PATTERNS.some( ( pattern ) =>
-		pattern.test( warning?.message || '' )
+function shouldIgnoreQuietWarning(warning) {
+	return QUIET_BUILD_WARNING_PATTERNS.some((pattern) =>
+		pattern.test(warning?.message || '')
 	);
 }
 
-function isGutenbergIndexChunk( chunk ) {
+function isGutenbergIndexChunk(chunk) {
 	return chunk.name === GUTENBERG_INDEX_ENTRY;
 }
 
 function createProductionMinimizers() {
 	return [
-		new TerserPlugin( {
+		new TerserPlugin({
 			parallel: true,
 			terserOptions: {
 				format: {
@@ -424,71 +410,70 @@ function createProductionMinimizers() {
 					passes: 2,
 				},
 				mangle: {
-					reserved: [ '__', '_n', '_nx', '_x' ],
+					reserved: ['__', '_n', '_nx', '_x'],
 				},
 			},
 			extractComments: false,
-		} ),
+		}),
 	];
 }
 
-function wrapLongMinifiedLines( source, maxLineLength ) {
+function wrapLongMinifiedLines(source, maxLineLength) {
 	return source
-		.split( '\n' )
-		.map( ( line ) => {
-			if ( line.length <= maxLineLength ) {
+		.split('\n')
+		.map((line) => {
+			if (line.length <= maxLineLength) {
 				return line;
 			}
 
 			const parts = [];
 			let start = 0;
 
-			while ( line.length - start > maxLineLength ) {
+			while (line.length - start > maxLineLength) {
 				const windowEnd = start + maxLineLength;
-				const lastSemi = line.lastIndexOf( ';', windowEnd - 1 );
+				const lastSemi = line.lastIndexOf(';', windowEnd - 1);
 
-				if ( lastSemi >= start ) {
-					parts.push( line.slice( start, lastSemi + 1 ) );
+				if (lastSemi >= start) {
+					parts.push(line.slice(start, lastSemi + 1));
 					start = lastSemi + 1;
 					continue;
 				}
 
 				// No semicolon in the window: break at the next one, or hard-split.
-				const nextSemi = line.indexOf( ';', windowEnd );
+				const nextSemi = line.indexOf(';', windowEnd);
 
-				if ( nextSemi === -1 ) {
-					parts.push( line.slice( start, windowEnd ) );
+				if (nextSemi === -1) {
+					parts.push(line.slice(start, windowEnd));
 					start = windowEnd;
 				} else {
-					parts.push( line.slice( start, nextSemi + 1 ) );
+					parts.push(line.slice(start, nextSemi + 1));
 					start = nextSemi + 1;
 				}
 			}
 
-			if ( start < line.length ) {
-				parts.push( line.slice( start ) );
+			if (start < line.length) {
+				parts.push(line.slice(start));
 			}
 
-			return parts.join( '\n' );
-		} )
-		.join( '\n' );
+			return parts.join('\n');
+		})
+		.join('\n');
 }
 
 class WrapLongMinifiedLinesPlugin {
-	constructor( options = {} ) {
+	constructor(options = {}) {
 		this.maxLineLength = options.maxLineLength || MAX_MINIFIED_LINE_LENGTH;
 		this.test = options.test || /\.js$/;
 		// Run after file-loader / asset modules have emitted Ace workers.
-		this.stageName =
-			options.stageName || 'PROCESS_ASSETS_STAGE_REPORT';
+		this.stageName = options.stageName || 'PROCESS_ASSETS_STAGE_REPORT';
 	}
 
-	apply( compiler ) {
+	apply(compiler) {
 		compiler.hooks.thisCompilation.tap(
 			'WrapLongMinifiedLinesPlugin',
-			( compilation ) => {
+			(compilation) => {
 				const stage =
-					compilation[ this.stageName ] ??
+					compilation[this.stageName] ??
 					compilation.PROCESS_ASSETS_STAGE_REPORT;
 
 				compilation.hooks.processAssets.tap(
@@ -496,22 +481,24 @@ class WrapLongMinifiedLinesPlugin {
 						name: 'WrapLongMinifiedLinesPlugin',
 						stage,
 					},
-					( assets ) => {
+					(assets) => {
 						const { RawSource } = compiler.webpack.sources;
 
-						Object.keys( assets ).forEach( ( assetName ) => {
-							if ( ! this.test.test( assetName ) ) {
+						Object.keys(assets).forEach((assetName) => {
+							if (!this.test.test(assetName)) {
 								return;
 							}
 
-							const source = assets[ assetName ].source().toString();
+							const source = assets[assetName]
+								.source()
+								.toString();
 							const hasLongLine = source
-								.split( '\n' )
+								.split('\n')
 								.some(
-									( line ) => line.length > this.maxLineLength
+									(line) => line.length > this.maxLineLength
 								);
 
-							if ( ! hasLongLine ) {
+							if (!hasLongLine) {
 								return;
 							}
 
@@ -524,7 +511,7 @@ class WrapLongMinifiedLinesPlugin {
 									)
 								)
 							);
-						} );
+						});
 					}
 				);
 			}
@@ -532,7 +519,7 @@ class WrapLongMinifiedLinesPlugin {
 	}
 }
 
-const entryAssetsJs = createEntries( JS_ENTRY_PATTERNS, '.js' );
+const entryAssetsJs = createEntries(JS_ENTRY_PATTERNS, '.js');
 const entryAssetsCss = createEntries(
 	CSS_ENTRY_PATTERNS,
 	'.scss',
@@ -540,10 +527,10 @@ const entryAssetsCss = createEntries(
 );
 
 const defaultRules = patchPostCssLoaderOptions(
-	disableCssLoaderUrls( defaultConfig.module.rules )
+	disableCssLoaderUrls(defaultConfig.module.rules)
 )
-	.filter( ( rule ) => ! isSvgRule( rule ) )
-	.concat( createSvgRules() );
+	.filter((rule) => !isSvgRule(rule))
+	.concat(createSvgRules());
 
 const splitChunks = defaultConfig.optimization?.splitChunks || {};
 const cacheGroups = splitChunks.cacheGroups || {};
@@ -556,9 +543,9 @@ const newConfig = {
 	},
 	infrastructureLogging: isQuietBuild
 		? {
-			...( defaultConfig.infrastructureLogging || {} ),
-			level: 'error',
-		}
+				...(defaultConfig.infrastructureLogging || {}),
+				level: 'error',
+			}
 		: defaultConfig.infrastructureLogging,
 	stats: 'minimal',
 	performance: {
@@ -570,10 +557,10 @@ const newConfig = {
 	},
 	plugins: [
 		...defaultConfig.plugins,
-		new RtlCssPlugin( {
+		new RtlCssPlugin({
 			filename: '[name]-rtl.css',
-		} ),
-		new FileManagerPlugin( {
+		}),
+		new FileManagerPlugin({
 			events: {
 				onEnd: {
 					copy: [
@@ -600,17 +587,15 @@ const newConfig = {
 			},
 			runOnceInWatchMode: false,
 			runTasksInSeries: true,
-		} ),
-	].filter( Boolean ),
-	ignoreWarnings: isQuietBuild ? [ shouldIgnoreQuietWarning ] : undefined,
+		}),
+	].filter(Boolean),
+	ignoreWarnings: isQuietBuild ? [shouldIgnoreQuietWarning] : undefined,
 	watchOptions: {
 		ignored: WATCH_IGNORED,
 	},
 	optimization: {
 		...defaultConfig.optimization,
-		...( isProduction
-			? { minimizer: createProductionMinimizers() }
-			: {} ),
+		...(isProduction ? { minimizer: createProductionMinimizers() } : {}),
 		splitChunks: {
 			...splitChunks,
 			cacheGroups: {
@@ -624,16 +609,20 @@ const newConfig = {
 				},
 				style: {
 					type: 'css/mini-extract',
-					test( module ) {
+					test(module) {
 						const resource = module.nameForCondition?.();
 
-						if ( ! resource ) {
+						if (!resource) {
 							return false;
 						}
 
-						const normalizedResource = normalizePath( resource );
+						const normalizedResource = normalizePath(resource);
 
-						if ( normalizedResource.includes( '/gutenberg/components/' ) ) {
+						if (
+							normalizedResource.includes(
+								'/gutenberg/components/'
+							)
+						) {
 							return false;
 						}
 
@@ -650,22 +639,22 @@ const newConfig = {
 	},
 };
 
-if ( isProduction ) {
+if (isProduction) {
 	newConfig.plugins = [
 		new RemoveEmptyScriptsPlugin(),
-		new WrapLongMinifiedLinesPlugin( {
+		new WrapLongMinifiedLinesPlugin({
 			test: /gutenberg\/.*\.js$/,
-		} ),
+		}),
 		...newConfig.plugins,
 	];
 }
 
-if ( ! isProduction ) {
+if (!isProduction) {
 	const devServerHost = newConfig.devServer?.host || 'localhost';
 	const devServerPort = newConfig.devServer?.port || 8887;
 	const devServerProtocol =
 		newConfig.devServer?.server === 'https' ? 'https' : 'http';
-	const fallbackTarget = `${ devServerProtocol }://${ devServerHost }:${ devServerPort }`;
+	const fallbackTarget = `${devServerProtocol}://${devServerHost}:${devServerPort}`;
 
 	newConfig.devServer = {
 		...newConfig.devServer,

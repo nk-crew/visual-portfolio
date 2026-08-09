@@ -1,86 +1,82 @@
+import { debounce } from '@wordpress/compose';
 import $ from 'jquery';
 import rafSchd from 'raf-schd';
 
-import { debounce } from '@wordpress/compose';
-
 const { ajaxurl, VPAdminVariables } = window;
-const $body = $( 'body' );
+const $body = $('body');
 
-function serializeSettingsForm( $form ) {
-	return JSON.stringify( $form.serializeArray() );
+function serializeSettingsForm($form) {
+	return JSON.stringify($form.serializeArray());
 }
 
-function storeSettingsFormState( $form ) {
-	$form.data( 'vpfInitialState', serializeSettingsForm( $form ) );
+function storeSettingsFormState($form) {
+	$form.data('vpfInitialState', serializeSettingsForm($form));
 }
 
-function getStoredSettingsFormState( $form ) {
-	const initialState = $form.data( 'vpfInitialState' );
+function getStoredSettingsFormState($form) {
+	const initialState = $form.data('vpfInitialState');
 
-	if ( typeof initialState === 'undefined' ) {
+	if (typeof initialState === 'undefined') {
 		return [];
 	}
 
 	try {
-		return JSON.parse( initialState );
-	} catch ( error ) {
+		return JSON.parse(initialState);
+	} catch (_error) {
 		return [];
 	}
 }
 
-function updateSettingsSubmitState( $form ) {
-	const initialState = $form.data( 'vpfInitialState' );
+function updateSettingsSubmitState($form) {
+	const initialState = $form.data('vpfInitialState');
 
-	if ( typeof initialState === 'undefined' ) {
+	if (typeof initialState === 'undefined') {
 		return;
 	}
 
 	$form
-		.find( '.vpf-settings-submit' )
-		.prop(
-			'disabled',
-			serializeSettingsForm( $form ) === initialState
-		);
+		.find('.vpf-settings-submit')
+		.prop('disabled', serializeSettingsForm($form) === initialState);
 }
 
 window.VPAdminSettingsForms = {
-	getInitialState( $form ) {
-		return getStoredSettingsFormState( $form );
+	getInitialState($form) {
+		return getStoredSettingsFormState($form);
 	},
-	setInitialState( $form, initialState ) {
-		$form.data( 'vpfInitialState', JSON.stringify( initialState ) );
-		updateSettingsSubmitState( $form );
+	setInitialState($form, initialState) {
+		$form.data('vpfInitialState', JSON.stringify(initialState));
+		updateSettingsSubmitState($form);
 	},
-	refresh( $form ) {
-		updateSettingsSubmitState( $form );
+	refresh($form) {
+		updateSettingsSubmitState($form);
 	},
-	persist( $form ) {
-		storeSettingsFormState( $form );
-		updateSettingsSubmitState( $form );
+	persist($form) {
+		storeSettingsFormState($form);
+		updateSettingsSubmitState($form);
 	},
 };
 
-$( '.vpf-settings-form' ).each( function () {
-	const $form = $( this );
+$('.vpf-settings-form').each(function () {
+	const $form = $(this);
 
-	storeSettingsFormState( $form );
-	updateSettingsSubmitState( $form );
-} );
+	storeSettingsFormState($form);
+	updateSettingsSubmitState($form);
+});
 
-$body.on( 'input change', '.vpf-settings-form :input', function () {
-	updateSettingsSubmitState( $( this ).closest( '.vpf-settings-form' ) );
-} );
+$body.on('input change', '.vpf-settings-form :input', function () {
+	updateSettingsSubmitState($(this).closest('.vpf-settings-form'));
+});
 
-$body.on( 'vpf_settings_form_updated', '.vpf-settings-form', function () {
-	updateSettingsSubmitState( $( this ) );
-} );
+$body.on('vpf_settings_form_updated', '.vpf-settings-form', function () {
+	updateSettingsSubmitState($(this));
+});
 
-$body.on( 'vpf_settings_form_persisted', '.vpf-settings-form', function () {
-	const $form = $( this );
+$body.on('vpf_settings_form_persisted', '.vpf-settings-form', function () {
+	const $form = $(this);
 
-	storeSettingsFormState( $form );
-	updateSettingsSubmitState( $form );
-} );
+	storeSettingsFormState($form);
+	updateSettingsSubmitState($form);
+});
 
 // select shortcode text in input
 $body.on(
@@ -90,47 +86,47 @@ $body.on(
 		this.select();
 	}
 );
-$body.on( 'click', '.vp-onclick-selection', function () {
+$body.on('click', '.vp-onclick-selection', function () {
 	// eslint-disable-next-line @wordpress/no-global-get-selection
-	window.getSelection().selectAllChildren( this );
-} );
+	window.getSelection().selectAllChildren(this);
+});
 // fix the problem with Gutenberg shortcode transform (allowed only plain text pasted).
-$body.on( 'copy cut', '.vp-onclick-selection', ( e ) => {
+$body.on('copy cut', '.vp-onclick-selection', (e) => {
 	// eslint-disable-next-line @wordpress/no-global-get-selection
 	const copyText = window
 		.getSelection()
 		.toString()
-		.replace( /[\n\r]+/g, '' );
+		.replace(/[\n\r]+/g, '');
 
-	e.originalEvent.clipboardData.setData( 'text/plain', copyText );
+	e.originalEvent.clipboardData.setData('text/plain', copyText);
 	e.originalEvent.preventDefault();
-} );
+});
 
 // Post format metabox show/hide
-const $videoMetabox = $( '#vp_format_video' );
-const $videoFormatCheckbox = $( '#post-format-video' );
+const $videoMetabox = $('#vp_format_video');
+const $videoFormatCheckbox = $('#post-format-video');
 let isVideoFormat = null;
 
-function toggleVideoMetabox( show ) {
-	if ( isVideoFormat === null || isVideoFormat !== show ) {
+function toggleVideoMetabox(show) {
+	if (isVideoFormat === null || isVideoFormat !== show) {
 		isVideoFormat = show;
-		$videoMetabox[ show ? 'show' : 'hide' ]();
+		$videoMetabox[show ? 'show' : 'hide']();
 	}
 }
 
-if ( $videoMetabox.length ) {
-	if ( $videoFormatCheckbox.length ) {
-		toggleVideoMetabox( $videoFormatCheckbox.is( ':checked' ) );
+if ($videoMetabox.length) {
+	if ($videoFormatCheckbox.length) {
+		toggleVideoMetabox($videoFormatCheckbox.is(':checked'));
 
-		$body.on( 'change', '[name=post_format]', () => {
-			toggleVideoMetabox( $videoFormatCheckbox.is( ':checked' ) );
-		} );
+		$body.on('change', '[name=post_format]', () => {
+			toggleVideoMetabox($videoFormatCheckbox.is(':checked'));
+		});
 	}
 }
 
 let oembedAjax = null;
-let runAjaxVideoOembed = function ( $this ) {
-	oembedAjax = $.ajax( {
+let runAjaxVideoOembed = ($this) => {
+	oembedAjax = $.ajax({
 		url: ajaxurl,
 		method: 'POST',
 		dataType: 'json',
@@ -139,30 +135,26 @@ let runAjaxVideoOembed = function ( $this ) {
 			q: $this.val(),
 			nonce: VPAdminVariables.nonce,
 		},
-		complete( data ) {
+		complete(data) {
 			const json = data.responseJSON;
-			if ( json && typeof json.html !== 'undefined' ) {
-				$this.next( '.vp-oembed-preview' ).html( json.html );
+			if (json && typeof json.html !== 'undefined') {
+				$this.next('.vp-oembed-preview').html(json.html);
 			}
 		},
-	} );
+	});
 };
-runAjaxVideoOembed = debounce( 300, rafSchd( runAjaxVideoOembed ) );
+runAjaxVideoOembed = debounce(300, rafSchd(runAjaxVideoOembed));
 
-$body.on(
-	'change input',
-	'.vp-input[name="_vp_format_video_url"]',
-	function () {
-		if ( oembedAjax !== null ) {
-			oembedAjax.abort();
-		}
-
-		const $this = $( this );
-		$this.next( '.vp-oembed-preview' ).html( '' );
-
-		runAjaxVideoOembed( $this );
+$body.on('change input', '.vp-input[name="_vp_format_video_url"]', function () {
+	if (oembedAjax !== null) {
+		oembedAjax.abort();
 	}
-);
+
+	const $this = $(this);
+	$this.next('.vp-oembed-preview').html('');
+
+	runAjaxVideoOembed($this);
+});
 
 /**
  * When attempting to disable registration of portfolio post type,
@@ -173,13 +165,13 @@ $body.on(
 	"input[name='vp_general[register_portfolio_post_type]']",
 	function () {
 		// Does some stuff and logs the event to the console
-		if ( ! $( this ).is( ':checked' ) ) {
+		if (!$(this).is(':checked')) {
 			// eslint-disable-next-line no-restricted-globals, no-alert, no-undef
 			const confirmation = confirm(
 				"Are you sure you want to turn off the Portfolio custom post type and related taxonomies? Make sure you don't use this post type on your site, otherwise you might see errors on the frontend."
 			);
-			if ( ! confirmation ) {
-				$( this ).prop( 'checked', true );
+			if (!confirmation) {
+				$(this).prop('checked', true);
 			}
 		}
 	}

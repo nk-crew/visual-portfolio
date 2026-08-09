@@ -11,45 +11,43 @@
  *   (`gettext-parser`) and avoiding that vulnerable dependency chain.
  */
 
-const fs = require( 'fs' );
-const gettextParser = require( 'gettext-parser' );
+const fs = require('node:fs');
+const gettextParser = require('gettext-parser');
 
-function getArgValue( args, name ) {
-	const prefix = `--${ name }=`;
-	const found = args.find( ( a ) => a.startsWith( prefix ) );
-	return found ? found.slice( prefix.length ) : null;
+function getArgValue(args, name) {
+	const prefix = `--${name}=`;
+	const found = args.find((a) => a.startsWith(prefix));
+	return found ? found.slice(prefix.length) : null;
 }
 
-function hasFlag( args, flag ) {
-	return args.includes( `--${ flag }` );
+function hasFlag(args, flag) {
+	return args.includes(`--${flag}`);
 }
 
-function buildJedJsonFromPot( potBuffer, domain ) {
-	const po = gettextParser.po.parse( potBuffer );
+function buildJedJsonFromPot(potBuffer, domain) {
+	const po = gettextParser.po.parse(potBuffer);
 	const usedDomain = domain || po.headers?.domain || 'messages';
 
 	const localeData = {
-		[ usedDomain ]: {
+		[usedDomain]: {
 			'': {
 				domain: usedDomain,
 			},
 		},
 	};
 
-	for ( const [ context, messages ] of Object.entries(
-		po.translations || {}
-	) ) {
-		for ( const [ msgid, message ] of Object.entries( messages || {} ) ) {
-			if ( msgid === '' ) {
+	for (const [context, messages] of Object.entries(po.translations || {})) {
+		for (const [msgid, message] of Object.entries(messages || {})) {
+			if (msgid === '') {
 				continue;
 			}
 
-			const key = context ? `${ context }\u0004${ msgid }` : msgid;
+			const key = context ? `${context}\u0004${msgid}` : msgid;
 
-			if ( Array.isArray( message.msgstr ) ) {
-				localeData[ usedDomain ][ key ] = message.msgstr;
+			if (Array.isArray(message.msgstr)) {
+				localeData[usedDomain][key] = message.msgstr;
 			} else {
-				localeData[ usedDomain ][ key ] = [ '' ];
+				localeData[usedDomain][key] = [''];
 			}
 		}
 	}
@@ -61,25 +59,25 @@ function buildJedJsonFromPot( potBuffer, domain ) {
 }
 
 function main() {
-	const args = process.argv.slice( 2 );
-	const input = args[ 0 ];
-	const output = args[ 1 ];
+	const args = process.argv.slice(2);
+	const input = args[0];
+	const output = args[1];
 
-	if ( ! input || ! output ) {
+	if (!input || !output) {
 		process.stderr.write(
 			'Usage: node make-pot.js <input.pot> <output.json> --domain=visual-portfolio [--pretty]\n'
 		);
-		process.exit( 1 );
+		process.exit(1);
 	}
 
-	const domain = getArgValue( args, 'domain' );
-	const pretty = hasFlag( args, 'pretty' );
+	const domain = getArgValue(args, 'domain');
+	const pretty = hasFlag(args, 'pretty');
 
-	const pot = fs.readFileSync( input );
-	const result = buildJedJsonFromPot( pot, domain );
+	const pot = fs.readFileSync(input);
+	const result = buildJedJsonFromPot(pot, domain);
 
-	const json = JSON.stringify( result, null, pretty ? 3 : 0 );
-	fs.writeFileSync( output, `${ json }\n` );
+	const json = JSON.stringify(result, null, pretty ? 3 : 0);
+	fs.writeFileSync(output, `${json}\n`);
 }
 
 main();

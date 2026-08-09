@@ -12,16 +12,16 @@ import { getPortfolioPreviewFrame } from './editor-canvas';
  * @param {string}                          [options.selector='.vp-portfolio__item-wrap'] Selector expected inside the preview.
  * @param {number}                          [options.timeout=15000] Maximum wait time.
  */
-export async function waitForPortfolioPreview( page, options = {} ) {
+export async function waitForPortfolioPreview(page, options = {}) {
 	const {
 		editor,
 		selector = '.vp-portfolio__item-wrap',
 		timeout = 15000,
 	} = options;
 
-	const previewFrame = getPortfolioPreviewFrame( page, editor );
+	const previewFrame = getPortfolioPreviewFrame(page, editor);
 
-	await expect( previewFrame.locator( selector ).first() ).toBeVisible( {
+	await expect(previewFrame.locator(selector).first()).toBeVisible({
 		timeout,
-	} );
+	});
 }

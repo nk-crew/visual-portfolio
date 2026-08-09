@@ -62,7 +62,7 @@ test.describe('click action gallery images (saved layout)', () => {
 			legacyCanvas: true,
 		});
 
-		const canvas = getEditorCanvas( page, editor );
+		const canvas = getEditorCanvas(page, editor);
 
 		await canvas
 			.locator(
@@ -253,7 +253,7 @@ test.describe('click action gallery images (saved layout)', () => {
 			attributes: { id: String(postID) },
 		});
 
-		await waitForPortfolioPreview( page, { editor } );
+		await waitForPortfolioPreview(page, { editor });
 
 		// Publish Post.
 		await editor.publishPost();

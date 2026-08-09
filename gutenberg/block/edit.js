@@ -10,8 +10,8 @@ const {
 	controls_categories: registeredControlsCategories,
 } = window.VPGutenbergVariables;
 
-function filterControlCategories( categories, isChildOfLoop ) {
-	if ( ! isChildOfLoop ) {
+function filterControlCategories(categories, isChildOfLoop) {
+	if (!isChildOfLoop) {
 		return categories;
 	}
 
@@ -27,24 +27,24 @@ function filterControlCategories( categories, isChildOfLoop ) {
 
 	// Create a new object with filtered categories
 	return Object.fromEntries(
-		Object.entries( categories ).filter(
-			( [ key ] ) => ! categoriesToRemove.includes( key )
+		Object.entries(categories).filter(
+			([key]) => !categoriesToRemove.includes(key)
 		)
 	);
 }
 
-function renderControls( props, isChildOfLoop ) {
+function renderControls(props, isChildOfLoop) {
 	const { attributes, context } = props;
 
 	let { content_source: contentSource } = attributes;
 
 	// Saved layouts by default displaying Portfolio source.
-	if ( contentSource === 'portfolio' ) {
+	if (contentSource === 'portfolio') {
 		contentSource = '';
 	}
 
 	// Use context value if available, otherwise use contentSource from attributes
-	contentSource = ( context && context[ 'vp/queryType' ] ) || contentSource;
+	contentSource = (context && context['vp/queryType']) || contentSource;
 
 	const filteredCategories = filterControlCategories(
 		registeredControlsCategories,
@@ -53,15 +53,14 @@ function renderControls( props, isChildOfLoop ) {
 
 	return (
 		<>
-			{ ! isChildOfLoop && (
-				<ControlsRender category="content-source" { ...props } />
-			) }
+			{!isChildOfLoop && (
+				<ControlsRender category="content-source" {...props} />
+			)}
 
-			{ /* Display all settings once selected Content Source */ }
-			{ contentSource ? (
-				<>
-					{ Object.keys( filteredCategories ).map( ( name ) => {
-						if ( name === 'content-source' ) {
+			{/* Display all settings once selected Content Source */}
+			{contentSource
+				? Object.keys(filteredCategories).map((name) => {
+						if (name === 'content-source') {
 							return null;
 						}
 
@@ -71,15 +70,14 @@ function renderControls( props, isChildOfLoop ) {
 
 						return (
 							<ControlsRender
-								key={ name }
-								category={ name }
-								categoryInitialOpen={ categoryInitialOpen }
-								{ ...props }
+								key={name}
+								category={name}
+								categoryInitialOpen={categoryInitialOpen}
+								{...props}
 							/>
 						);
-					} ) }
-				</>
-			) : null }
+					})
+				: null}
 		</>
 	);
 }
@@ -89,7 +87,7 @@ function renderControls( props, isChildOfLoop ) {
  *
  * @param props
  */
-export default function BlockEdit( props ) {
+export default function BlockEdit(props) {
 	const { attributes, setAttributes, context } = props;
 
 	const {
@@ -106,29 +104,25 @@ export default function BlockEdit( props ) {
 	const contentSource =
 		contentSourceFromContext || contentSourceFromAttributes;
 
-	const isChildOfLoop = !! contentSourceFromContext;
+	const isChildOfLoop = !!contentSourceFromContext;
 
 	// Display setup wizard on mount.
-	useEffect( () => {
-		if (
-			! setupWizard &&
-			( ! blockId || ! contentSource ) &&
-			! isChildOfLoop
-		) {
-			setAttributes( {
+	useEffect(() => {
+		if (!setupWizard && (!blockId || !contentSource) && !isChildOfLoop) {
+			setAttributes({
 				setup_wizard: 'true',
-			} );
+			});
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
+	}, []);
 
 	// Display block preview.
-	if ( previewExample === 'true' ) {
+	if (previewExample === 'true') {
 		return (
 			<div className="vpf-example-preview">
 				<img
-					src={ `${ pluginUrl }/assets/admin/images/example-${ layout }.png` }
-					alt={ `Preview of ${ layout } layout` }
+					src={`${pluginUrl}/assets/admin/images/example-${layout}.png`}
+					alt={`Preview of ${layout} layout`}
 				/>
 			</div>
 		);
@@ -137,17 +131,17 @@ export default function BlockEdit( props ) {
 	const blockProps = useBlockProps();
 
 	return (
-		<div { ...blockProps }>
-			{ setupWizard === 'true' ? (
-				<SetupWizard { ...props } />
+		<div {...blockProps}>
+			{setupWizard === 'true' ? (
+				<SetupWizard {...props} />
 			) : (
 				<>
 					<InspectorControls>
-						{ renderControls( props, isChildOfLoop ) }
+						{renderControls(props, isChildOfLoop)}
 					</InspectorControls>
-					<IframePreview { ...props } />
+					<IframePreview {...props} />
 				</>
-			) }
+			)}
 		</div>
 	);
 }

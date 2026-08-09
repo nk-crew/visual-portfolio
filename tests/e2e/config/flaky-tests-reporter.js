@@ -9,8 +9,9 @@
 /**
  * External dependencies
  */
+
+import fs from 'node:fs';
 import filenamify from 'filenamify';
-import fs from 'fs';
 
 // Remove "steps" to prevent stringify circular structure.
 function formatTestResult(testResult) {

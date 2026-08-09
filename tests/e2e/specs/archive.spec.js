@@ -148,7 +148,7 @@ test.describe('archive pages', () => {
 						state: 'visible',
 						timeout: 1000, // Increased timeout
 					});
-				} catch (error) {
+				} catch (_error) {
 					console.log(
 						`Image not visible for item ${i + 1}, skipping.`
 					);
@@ -190,7 +190,7 @@ test.describe('archive pages', () => {
 						title = await titleLocator.innerText({
 							timeout: 20000,
 						}); // Increased timeout
-					} catch (error) {
+					} catch (_error) {
 						console.log(
 							`Title not visible for item ${i + 1}, skipping.`
 						);
@@ -213,7 +213,7 @@ test.describe('archive pages', () => {
 						description = await descriptionLocator.innerText({
 							timeout: 1000,
 						});
-					} catch (error) {
+					} catch (_error) {
 						console.log(
 							`Description not visible for item ${i + 1}, skipping description extraction.`
 						);
@@ -268,16 +268,16 @@ test.describe('archive pages', () => {
 			name: 'visual-portfolio/block',
 		});
 
-		const canvas = getEditorCanvas( page, editor );
+		const canvas = getEditorCanvas(page, editor);
 
-		await canvas.getByRole( 'button', { name: 'Posts' } ).click();
-		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas.getByRole('button', { name: 'Posts' }).click();
+		await canvas.getByRole('button', { name: 'Continue' }).click();
 		await canvas
 			.getByRole('button', { name: 'Classic Preview Classic' })
 			.click();
-		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
-		await canvas.getByLabel( 'Filter' ).check();
-		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas.getByRole('button', { name: 'Continue' }).click();
+		await canvas.getByLabel('Filter').check();
+		await canvas.getByRole('button', { name: 'Continue' }).click();
 		await page.getByRole('button', { name: 'More' }).click();
 		await page.getByRole('button', { name: 'Current Query' }).click();
 		await page.getByRole('button', { name: 'Layout' }).click();
@@ -705,9 +705,8 @@ test.describe('archive pages', () => {
 						break;
 					}
 
-					const nextPageAttribute = await loadMoreButton.getAttribute(
-						'href'
-					);
+					const nextPageAttribute =
+						await loadMoreButton.getAttribute('href');
 
 					if (!nextPageAttribute) {
 						break;
@@ -987,7 +986,7 @@ test.describe('archive pages', () => {
 						fixtureData[fixtureKey].pagination[paginationKey].url =
 							fixtureUrl.replace(
 								'/?page_id=0000',
-								'/?page_id=' + archiveID
+								`/?page_id=${archiveID}`
 							);
 					}
 					paginationKey++;
@@ -1000,7 +999,7 @@ test.describe('archive pages', () => {
 				const fixtureUrl = testBaseUrl + expectedItem.url;
 				fixtureData[fixtureKey].items[itemKey].url = fixtureUrl.replace(
 					'/?page_id=000',
-					'/?page_id=' + archiveID
+					`/?page_id=${archiveID}`
 				);
 
 				// Update category URLs if they exist
@@ -1017,7 +1016,7 @@ test.describe('archive pages', () => {
 								categoryKey
 							].categoryUrl = categoryUrl.replace(
 								'/?page_id=0000',
-								'/?page_id=' + archiveID
+								`/?page_id=${archiveID}`
 							);
 						}
 						categoryKey++;
@@ -1031,7 +1030,7 @@ test.describe('archive pages', () => {
 				const fixtureUrl = testBaseUrl + expectedArchiveItem.url;
 				fixtureData[fixtureKey].url = fixtureUrl.replace(
 					'/?page_id=000',
-					'/?page_id=' + archiveID
+					`/?page_id=${archiveID}`
 				);
 			}
 
@@ -1597,7 +1596,7 @@ test.describe('archive pages', () => {
 		await createPortfolioPostsForFeed(page, admin, editor, requestUtils);
 
 		// Test the main portfolio RSS feed using archiveUrl
-		const feedUrl = archiveUrl.replace(/\/$/, '') + '/feed/';
+		const feedUrl = `${archiveUrl.replace(/\/$/, '')}/feed/`;
 
 		const response = await page.goto(feedUrl);
 
@@ -1612,7 +1611,7 @@ test.describe('archive pages', () => {
 		expect(content).toContain('</rss>');
 
 		// Load expected RSS feed fixture
-		const fs = require('fs');
+		const fs = require('node:fs');
 		const path = require('path');
 		const fixturePath = path.join(
 			__dirname,
@@ -1723,7 +1722,7 @@ test.describe('archive pages', () => {
 		expect(content).toContain('<channel>');
 
 		// Load expected ocean category RSS feed fixture
-		const fs = require('fs');
+		const fs = require('node:fs');
 		const path = require('path');
 		const fixturePath = path.join(
 			__dirname,
@@ -1759,7 +1758,7 @@ test.describe('archive pages', () => {
 		const { archiveUrl } = await createArchivePage(page, admin, editor);
 		await setArchiveSettings(admin, page);
 		// Test RSS feed with no portfolio posts using archiveUrl
-		const feedUrl = archiveUrl.replace(/\/$/, '') + '/feed/';
+		const feedUrl = `${archiveUrl.replace(/\/$/, '')}/feed/`;
 
 		const response = await page.goto(feedUrl);
 
@@ -1774,7 +1773,7 @@ test.describe('archive pages', () => {
 		expect(content).toContain('</rss>');
 
 		// Load expected empty RSS feed fixture
-		const fs = require('fs');
+		const fs = require('node:fs');
 		const path = require('path');
 		const fixturePath = path.join(
 			__dirname,

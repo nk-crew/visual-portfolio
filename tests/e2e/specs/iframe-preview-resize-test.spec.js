@@ -47,15 +47,15 @@ test.describe('iframe preview resize', () => {
 			name: 'visual-portfolio/block',
 		});
 
-		const canvas = getEditorCanvas( page, editor );
+		const canvas = getEditorCanvas(page, editor);
 
-		await canvas.getByRole( 'button', { name: 'Posts' } ).click();
-		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas.getByRole('button', { name: 'Posts' }).click();
+		await canvas.getByRole('button', { name: 'Continue' }).click();
 		await canvas
 			.getByRole('button', { name: 'Classic Preview Classic' })
 			.click();
-		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
-		await canvas.getByRole( 'button', { name: 'Continue' } ).click();
+		await canvas.getByRole('button', { name: 'Continue' }).click();
+		await canvas.getByRole('button', { name: 'Continue' }).click();
 		await page.getByRole('button', { name: 'Post', exact: true }).click();
 
 		const iframe = canvas.locator(

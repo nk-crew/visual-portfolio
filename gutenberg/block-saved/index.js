@@ -22,10 +22,10 @@ const settings = {
 	transforms,
 };
 
-registerBlockType( name, settings );
+registerBlockType(name, settings);
 
 // Fallback.
-registerBlockType( legacyBlockName, {
+registerBlockType(legacyBlockName, {
 	...settings,
 	apiVersion: metadata.apiVersion,
 	category: metadata.category,
@@ -46,12 +46,12 @@ registerBlockType( legacyBlockName, {
 			type: 'string',
 		},
 	},
-	edit: ( props ) => {
-		const { replaceBlocks } = useDispatch( 'core/block-editor' );
+	edit: (props) => {
+		const { replaceBlocks } = useDispatch('core/block-editor');
 
 		replaceBlocks(
-			[ props.clientId ],
-			createBlock( name, props.attributes || {} )
+			[props.clientId],
+			createBlock(name, props.attributes || {})
 		);
 
 		return null;
@@ -60,4 +60,4 @@ registerBlockType( legacyBlockName, {
 		...metadata.supports,
 		inserter: false,
 	},
-} );
+});

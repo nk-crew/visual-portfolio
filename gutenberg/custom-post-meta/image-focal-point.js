@@ -14,60 +14,57 @@ import FocalPointControl, {
  * @param {Object} props Component props.
  * @return {JSX.Element|null} Component output.
  */
-function VpImageFocalPointComponent( props ) {
+function VpImageFocalPointComponent(props) {
 	const { featuredImageId, focalPointValue, updateMeta } = props;
 
-	if ( ! featuredImageId ) {
+	if (!featuredImageId) {
 		return null;
 	}
 
-	const focalPoint = normalizeFocalPointValue( focalPointValue );
+	const focalPoint = normalizeFocalPointValue(focalPointValue);
 
 	return (
 		<FocalPointControl
-			value={ focalPoint }
-			defaultExpanded={ hasCustomFocalPointValue( focalPoint ) }
-			description={ __(
+			value={focalPoint}
+			defaultExpanded={hasCustomFocalPointValue(focalPoint)}
+			description={__(
 				'Focal point will be used in Visual Portfolio layouts only:',
 				'visual-portfolio'
-			) }
-			onChange={ ( nextValue ) => {
-				updateMeta( '_vp_image_focal_point', nextValue );
-			} }
+			)}
+			onChange={(nextValue) => {
+				updateMeta('_vp_image_focal_point', nextValue);
+			}}
 		/>
 	);
 }
 
-const VpImageFocalPoint = compose( [
-	withSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( 'core/editor' );
+const VpImageFocalPoint = compose([
+	withSelect((select) => {
+		const { getEditedPostAttribute } = select('core/editor');
 
-		const featuredImageId = getEditedPostAttribute( 'featured_media' );
-		const meta = getEditedPostAttribute( 'meta' ) || {};
+		const featuredImageId = getEditedPostAttribute('featured_media');
+		const meta = getEditedPostAttribute('meta') || {};
 
 		return {
 			featuredImageId,
 			focalPointValue: meta._vp_image_focal_point,
 		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		updateMeta( name, val ) {
-			dispatch( 'core/editor' ).editPost( { meta: { [ name ]: val } } );
+	}),
+	withDispatch((dispatch) => ({
+		updateMeta(name, val) {
+			dispatch('core/editor').editPost({ meta: { [name]: val } });
 		},
-	} ) ),
+	})),
 	withInstanceId,
-] )( VpImageFocalPointComponent );
+])(VpImageFocalPointComponent);
 
 addFilter(
 	'editor.PostFeaturedImage',
 	'vpf/post-featured-image-focal-point',
-	( OriginalComponent ) =>
-		function ( props ) {
-			return (
-				<>
-					<OriginalComponent { ...props } />
-					<VpImageFocalPoint />
-				</>
-			);
-		}
+	(OriginalComponent) => (props) => (
+		<>
+			<OriginalComponent {...props} />
+			<VpImageFocalPoint />
+		</>
+	)
 );

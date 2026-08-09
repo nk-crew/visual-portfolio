@@ -47,7 +47,7 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 	 * @param {Editor} editor Gutenberg editor helpers
 	 * @param {string} title  Layout title
 	 */
-	async function setupSavedLayoutWithPosts( admin, page, editor, title ) {
+	async function setupSavedLayoutWithPosts(admin, page, editor, title) {
 		await admin.createNewPost({
 			title,
 			postType: 'vp_lists',
@@ -55,18 +55,18 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 			legacyCanvas: true,
 		});
 
-		const canvas = getEditorCanvas( page, editor );
+		const canvas = getEditorCanvas(page, editor);
 
 		// Select Posts as data source
-		const postsButton = canvas.locator( POSTS_SOURCE_BUTTON );
-		await expect( postsButton ).toBeVisible();
+		const postsButton = canvas.locator(POSTS_SOURCE_BUTTON);
+		await expect(postsButton).toBeVisible();
 		await postsButton.click();
 
 		// Navigate through setup wizard
-		const continueButton = canvas.getByRole( 'button', {
+		const continueButton = canvas.getByRole('button', {
 			name: 'Continue',
-		} );
-		for ( let i = 0; i < 3; i++ ) {
+		});
+		for (let i = 0; i < 3; i++) {
 			await continueButton.click();
 		}
 	}
