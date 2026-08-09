@@ -2,6 +2,8 @@ import { request } from '@playwright/test';
 
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
+import { getPluginSlug } from '../utils/plugin-slug';
+
 async function globalSetup(config) {
 	const { storageState, baseURL } = config.projects[0].use;
 	const storageStatePath =
@@ -21,6 +23,9 @@ async function globalSetup(config) {
 	// Reset the test environment before running the tests.
 	await Promise.all([
 		requestUtils.activateTheme('empty-theme'),
+		// The plugin is mounted through `mappings` in `.wp-env.json`, which does
+		// not activate it, so make sure it is on before the specs run.
+		requestUtils.activatePlugin(getPluginSlug()),
 		// Disable this test plugin as it's conflicting with some of the tests.
 		// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
 		requestUtils.deactivatePlugin(

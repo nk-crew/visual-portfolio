@@ -8,11 +8,14 @@
 /artifacts
 /dist-zip
 /node_modules
+/scripts
 /tests
 /vendor
 
 # Files to ignore
 /.*
+/AGENTS.md
+/CLAUDE.md
 /composer.json
 /composer.lock
 /gulpfile.js
