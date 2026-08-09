@@ -128,6 +128,7 @@ export default function BlockEdit(props) {
 					className="vpf-setup-wizard-saved"
 					icon={<ElementIcon width="20" height="20" />}
 					label={sprintf(
+						// translators: %s: plugin name.
 						__('Saved %s', 'visual-portfolio'),
 						pluginName
 					)}

@@ -1324,6 +1324,7 @@ const SortableList = (props) => {
 				<span className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-pagination">
 					<span>
 						{sprintf(
+							// translators: %1$s: number of items shown, %2$s: total number of items.
 							__(
 								'Showing %1$s of %2$s media items',
 								'visual-portfolio'

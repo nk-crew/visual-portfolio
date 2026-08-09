@@ -80,16 +80,17 @@ class Visual_Portfolio_Dashboard {
 		$num_posts        = wp_count_posts( 'portfolio' );
 		$published        = isset( $num_posts->publish ) ? (int) $num_posts->publish : 0;
 
-		$text = sprintf(
-			/* translators: %s: number of portfolio items */
-			_n(
-				'%s ' . $post_type_object->labels->singular_name, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralSingle
-				'%s ' . $post_type_object->labels->name, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralPlural
-				$published,
-				'visual-portfolio'
-			),
-			number_format_i18n( $published )
-		);
+		$label = 1 === $published
+			? $post_type_object->labels->singular_name
+			: $post_type_object->labels->name;
+
+		/*
+		 * The labels are already translated when the post type is registered, so
+		 * the count and the label are simply composed here. Passing a
+		 * concatenated string to _n() built the lookup key at runtime, which
+		 * never matches a catalogue entry.
+		 */
+		$text = sprintf( '%1$s %2$s', number_format_i18n( $published ), $label );
 
 		$edit_url = admin_url( 'edit.php?post_type=portfolio' );
 
