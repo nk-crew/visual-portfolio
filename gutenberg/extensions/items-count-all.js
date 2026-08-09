@@ -64,6 +64,7 @@ function CountNotice(props) {
 				<li
 					dangerouslySetInnerHTML={{
 						__html: sprintf(
+							// translators: %d: maximum number of items per page.
 							__(
 								'Set the items per page to <u>less than %d</u>',
 								'visual-portfolio'

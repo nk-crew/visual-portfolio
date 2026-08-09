@@ -131,6 +131,7 @@ class VpVideoComponent extends Component {
 				<PanelRow>
 					<p className="description">
 						{sprintf(
+							// translators: %s: plugin name.
 							__(
 								'Video will be used in %s layouts only. Full list of supported links',
 								'visual-portfolio'
