@@ -8,11 +8,7 @@ const config = defineConfig(
 		globalSetup: fileURLToPath(
 			new URL('./config/global-setup.js', `file:${__filename}`).href
 		),
-		overrides: {
-			reporter: process.env.CI
-				? [['github'], ['./config/flaky-tests-reporter.js']]
-				: 'list',
-		},
+		reporters: ['./config/flaky-tests-reporter.js'],
 	})
 );
 
