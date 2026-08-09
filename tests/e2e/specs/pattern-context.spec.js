@@ -132,10 +132,10 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			],
 		});
 
-		const canvas = getEditorCanvas( page, editor );
+		const canvas = getEditorCanvas(page, editor);
 
 		// Verify the Group block and VP block structure exists
-		const groupBlock = canvas.locator( '.wp-block-group' ).first();
+		const groupBlock = canvas.locator('.wp-block-group').first();
 		await expect(groupBlock).toBeVisible();
 
 		// Check if VP block exists within the group
@@ -162,8 +162,12 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		}
 
 		// Verify the gallery container exists and has correct structure
-		await expect(frontendPage.locator('.vp-portfolio__items')).toBeVisible();
-		await expect(frontendPage.locator('.vp-portfolio__item')).toHaveCount(3);
+		await expect(
+			frontendPage.locator('.vp-portfolio__items')
+		).toBeVisible();
+		await expect(frontendPage.locator('.vp-portfolio__item')).toHaveCount(
+			3
+		);
 	});
 
 	test('Create and use synced pattern with VP block in Group wrapper', async ({
@@ -214,8 +218,8 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		});
 
 		// Select the Group block - wait for it to be visible first
-		const canvas = getEditorCanvas( page, editor );
-		const groupBlock = canvas.locator( '.wp-block-group' ).first();
+		const canvas = getEditorCanvas(page, editor);
+		const groupBlock = canvas.locator('.wp-block-group').first();
 		await expect(groupBlock).toBeVisible();
 		await groupBlock.click();
 
@@ -246,7 +250,7 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 
 		// Clear any existing text and fill in the pattern name
 		await nameInput.click();
-		await nameInput.fill( patternTitle );
+		await nameInput.fill(patternTitle);
 
 		// Ensure the Synced toggle is checked (it should be by default)
 		const syncedCheckbox = modal.locator('input[type="checkbox"]');
@@ -269,8 +273,8 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		await editor.saveDraft();
 
 		let syncedPatternId = null;
-		for ( let attempt = 0; attempt < 5; attempt++ ) {
-			const blocks = await requestUtils.rest( {
+		for (let attempt = 0; attempt < 5; attempt++) {
+			const blocks = await requestUtils.rest({
 				path: '/wp/v2/blocks',
 				method: 'GET',
 				params: {
@@ -278,25 +282,25 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 					per_page: 20,
 					context: 'edit',
 				},
-			} );
+			});
 
-			const matchedPattern = Array.isArray( blocks )
+			const matchedPattern = Array.isArray(blocks)
 				? blocks.find(
-						( block ) =>
+						(block) =>
 							block?.title?.rendered === patternTitle ||
 							block?.title?.raw === patternTitle
-				  )
+					)
 				: null;
 
-			if ( matchedPattern?.id ) {
+			if (matchedPattern?.id) {
 				syncedPatternId = matchedPattern.id;
 				break;
 			}
 
-			await page.waitForTimeout( 1000 );
+			await page.waitForTimeout(1000);
 		}
 
-		expect( syncedPatternId ).toBeTruthy();
+		expect(syncedPatternId).toBeTruthy();
 
 		// Create a new page to use the pattern
 		await admin.createNewPost({
@@ -306,20 +310,20 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			legacyCanvas: true,
 		});
 
-		await editor.insertBlock( {
+		await editor.insertBlock({
 			name: 'core/block',
 			attributes: { ref: syncedPatternId },
-		} );
+		});
 
 		// Verify the synced pattern block was inserted and give the editor a
 		// moment to resolve the referenced pattern content asynchronously.
-		const insertedPattern = canvas.locator( '.wp-block-block' ).first();
-		await expect( insertedPattern ).toBeVisible();
+		const insertedPattern = canvas.locator('.wp-block-block').first();
+		await expect(insertedPattern).toBeVisible();
 		await expect(
-			insertedPattern.locator( '.components-spinner' )
-		).toHaveCount( 0, {
+			insertedPattern.locator('.components-spinner')
+		).toHaveCount(0, {
 			timeout: 10000,
-		} );
+		});
 
 		// Save and publish the page
 		await editor.publishPost();
@@ -327,7 +331,9 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		const frontendPage = await openPublishedPage(page);
 
 		// Verify the Visual Portfolio container exists
-		await expect(frontendPage.locator('.vp-portfolio__items')).toBeVisible();
+		await expect(
+			frontendPage.locator('.vp-portfolio__items')
+		).toBeVisible();
 
 		// Verify the images are displayed on the frontend
 		const frontendImages = frontendPage.locator('.vp-portfolio__item img');
@@ -367,12 +373,12 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			},
 		});
 
-		const canvas = getEditorCanvas( page, editor );
+		const canvas = getEditorCanvas(page, editor);
 
 		// Verify the Visual Portfolio block exists in the editor
 		// The preview may not fully render but the block should be present
 		await expect(
-			canvas.locator( '[data-type="visual-portfolio/block"]' )
+			canvas.locator('[data-type="visual-portfolio/block"]')
 		).toBeVisible();
 
 		// Publish and verify
@@ -381,7 +387,9 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		const frontendPage = await openPublishedPage(page);
 
 		// Check frontend
-		await expect(frontendPage.locator('.vp-portfolio__items')).toBeVisible();
+		await expect(
+			frontendPage.locator('.vp-portfolio__items')
+		).toBeVisible();
 		const items = frontendPage.locator('.vp-portfolio__item');
 
 		// Verify we have posts displayed (may be less than 3 if some failed to create)
@@ -543,12 +551,12 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			],
 		});
 
-		const canvas = getEditorCanvas( page, editor );
+		const canvas = getEditorCanvas(page, editor);
 
 		// Verify the Visual Portfolio block is in the editor
 		// The nested structure should contain the VP block
 		await expect(
-			canvas.locator( '[data-type="visual-portfolio/block"]' )
+			canvas.locator('[data-type="visual-portfolio/block"]')
 		).toBeVisible();
 
 		// Publish and check frontend
@@ -557,10 +565,16 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 		const frontendPage = await openPublishedPage(page);
 
 		// Verify the nested structure rendered correctly
-		await expect(frontendPage.locator('.wp-block-group').first()).toBeVisible();
+		await expect(
+			frontendPage.locator('.wp-block-group').first()
+		).toBeVisible();
 		await expect(frontendPage.locator('.wp-block-columns')).toBeVisible();
-		await expect(frontendPage.locator('.vp-portfolio__items')).toBeVisible();
-		await expect(frontendPage.locator('.vp-portfolio__item')).toHaveCount(4);
+		await expect(
+			frontendPage.locator('.vp-portfolio__items')
+		).toBeVisible();
+		await expect(frontendPage.locator('.vp-portfolio__item')).toHaveCount(
+			4
+		);
 
 		// Verify all images are displayed
 		for (let i = 0; i < 4; i++) {

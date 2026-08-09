@@ -2,8 +2,8 @@ import $ from 'jquery';
 
 const { VPData, VPPopupAPI } = window;
 const { __, settingsPopupGallery } = VPData;
-const $doc = $( document );
-const $window = $( window );
+const $doc = $(document);
+const $window = $(window);
 
 /**
  * Map raw popup items to Fancybox items.
@@ -11,12 +11,12 @@ const $window = $( window );
  * @param {Array} items - raw popup items.
  * @return {Array} Fancybox items.
  */
-function mapItemsToFancybox( items ) {
+function mapItemsToFancybox(items) {
 	const finalItems = [];
 
-	items.forEach( ( item ) => {
-		if ( item.type === 'embed' && item.src ) {
-			finalItems.push( {
+	items.forEach((item) => {
+		if (item.type === 'embed' && item.src) {
+			finalItems.push({
 				type: 'iframe',
 				src: item.src,
 				opts: {
@@ -24,9 +24,9 @@ function mapItemsToFancybox( items ) {
 					height: item.height,
 					caption: item.caption,
 				},
-			} );
-		} else if ( item.type === 'embed' && item.embed ) {
-			finalItems.push( {
+			});
+		} else if (item.type === 'embed' && item.embed) {
+			finalItems.push({
 				type: 'html',
 				src: item.embed,
 				opts: {
@@ -34,9 +34,9 @@ function mapItemsToFancybox( items ) {
 					height: item.height,
 					caption: item.caption,
 				},
-			} );
+			});
 		} else {
-			finalItems.push( {
+			finalItems.push({
 				type: 'image',
 				src: item.src,
 				el: item.el,
@@ -47,9 +47,9 @@ function mapItemsToFancybox( items ) {
 					caption: item.caption,
 					thumb: item.srcSmall,
 				},
-			} );
+			});
 		}
-	} );
+	});
 
 	return finalItems;
 }
@@ -63,35 +63,35 @@ function clearPopupSession() {
 	VPPopupAPI.portfolio = false;
 }
 
-if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
+if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 	let fancyboxInstance;
 
 	// Extend Popup API.
 	VPPopupAPI.vendor = 'fancybox';
-	VPPopupAPI.open = function ( items, index, self ) {
-		const finalItems = mapItemsToFancybox( items );
+	VPPopupAPI.open = (items, index, self) => {
+		const finalItems = mapItemsToFancybox(items);
 
 		const buttons = [];
-		if ( settingsPopupGallery.show_zoom_button ) {
-			buttons.push( 'zoom' );
+		if (settingsPopupGallery.show_zoom_button) {
+			buttons.push('zoom');
 		}
-		if ( settingsPopupGallery.show_fullscreen_button ) {
-			buttons.push( 'fullScreen' );
+		if (settingsPopupGallery.show_fullscreen_button) {
+			buttons.push('fullScreen');
 		}
-		if ( settingsPopupGallery.show_slideshow ) {
-			buttons.push( 'slideShow' );
+		if (settingsPopupGallery.show_slideshow) {
+			buttons.push('slideShow');
 		}
-		if ( settingsPopupGallery.show_thumbs ) {
-			buttons.push( 'thumbs' );
+		if (settingsPopupGallery.show_thumbs) {
+			buttons.push('thumbs');
 		}
-		if ( settingsPopupGallery.show_share_button ) {
-			buttons.push( 'share' );
+		if (settingsPopupGallery.show_share_button) {
+			buttons.push('share');
 		}
-		if ( settingsPopupGallery.show_download_button ) {
-			buttons.push( 'download' );
+		if (settingsPopupGallery.show_download_button) {
+			buttons.push('download');
 		}
-		if ( settingsPopupGallery.show_close_button ) {
-			buttons.push( 'close' );
+		if (settingsPopupGallery.show_close_button) {
+			buttons.push('close');
 		}
 
 		// define options
@@ -135,12 +135,12 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 			wheel: false,
 
 			share: {
-				url( instance, item ) {
+				url(instance, item) {
 					return (
-						( ! instance.currentHash &&
-						! ( item.type === 'inline' || item.type === 'html' )
+						(!instance.currentHash &&
+						!(item.type === 'inline' || item.type === 'html')
 							? item.origSrc || item.src
-							: false ) || window.location
+							: false) || window.location
 					);
 				},
 				tpl:
@@ -169,7 +169,7 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 			},
 
 			// Clicked on the content
-			clickContent( current ) {
+			clickContent(current) {
 				return current.type === 'image' &&
 					settingsPopupGallery.click_to_zoom
 					? 'zoom'
@@ -195,32 +195,32 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 
 			beforeClose() {
 				const currentItemData =
-					VPPopupAPI.rawItems[ fancyboxInstance.currIndex ];
+					VPPopupAPI.rawItems[fancyboxInstance.currIndex];
 
-				if ( currentItemData ) {
-					VPPopupAPI.maybeFocusGalleryItem( currentItemData );
+				if (currentItemData) {
+					VPPopupAPI.maybeFocusGalleryItem(currentItemData);
 				}
 
 				VPPopupAPI.emitEvent(
 					'beforeCloseFancybox',
-					[ options, VPPopupAPI.rawItems, fancyboxInstance ],
+					[options, VPPopupAPI.rawItems, fancyboxInstance],
 					self
 				);
 
 				fancyboxInstance = false;
 				clearPopupSession();
 			},
-			beforeShow( instance, current ) {
+			beforeShow(instance, current) {
 				VPPopupAPI.emitEvent(
 					'beforeShowFancybox',
-					[ instance, current ],
+					[instance, current],
 					self
 				);
 			},
-			afterShow( instance, current ) {
+			afterShow(instance, current) {
 				VPPopupAPI.emitEvent(
 					'afterShowFancybox',
-					[ instance, current ],
+					[instance, current],
 					self
 				);
 			},
@@ -228,13 +228,13 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 
 		VPPopupAPI.emitEvent(
 			'beforeInitFancybox',
-			[ options, finalItems, index ],
+			[options, finalItems, index],
 			self
 		);
 
 		// Disable Loop if only 1 item in gallery.
 		// We need this because Fancybox still let us scroll gallery using keyboard.
-		if ( items.length === 1 ) {
+		if (items.length === 1) {
 			options.loop = false;
 		}
 
@@ -243,30 +243,30 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 		VPPopupAPI.portfolio = self || false;
 
 		// Start new fancybox instance
-		fancyboxInstance = $.fancybox.open( finalItems, options, index );
+		fancyboxInstance = $.fancybox.open(finalItems, options, index);
 		VPPopupAPI.instance = fancyboxInstance;
 
 		VPPopupAPI.emitEvent(
 			'initFancybox',
-			[ options, finalItems, index, fancyboxInstance ],
+			[options, finalItems, index, fancyboxInstance],
 			self
 		);
 	};
-	VPPopupAPI.append = function ( items ) {
-		if ( ! fancyboxInstance || ! items || ! items.length ) {
+	VPPopupAPI.append = (items) => {
+		if (!fancyboxInstance || !items || !items.length) {
 			return;
 		}
 
-		if ( Array.isArray( VPPopupAPI.rawItems ) ) {
-			items.forEach( ( item ) => {
-				VPPopupAPI.rawItems.push( item );
-			} );
+		if (Array.isArray(VPPopupAPI.rawItems)) {
+			items.forEach((item) => {
+				VPPopupAPI.rawItems.push(item);
+			});
 		}
 
-		fancyboxInstance.addContent( mapItemsToFancybox( items ) );
+		fancyboxInstance.addContent(mapItemsToFancybox(items));
 	};
-	VPPopupAPI.close = function () {
-		if ( fancyboxInstance ) {
+	VPPopupAPI.close = () => {
+		if (fancyboxInstance) {
 			fancyboxInstance.close();
 			fancyboxInstance = false;
 			clearPopupSession();
@@ -275,13 +275,11 @@ if ( typeof $.fancybox !== 'undefined' && VPPopupAPI ) {
 
 	// Fix zoom image sizes attribute.
 	// https://wordpress.org/support/topic/blurry-zoom-images/
-	$doc.on( 'transitionend', '.fancybox-content', function () {
-		const $img = $( this ).find( '.fancybox-image[sizes]' );
+	$doc.on('transitionend', '.fancybox-content', function () {
+		const $img = $(this).find('.fancybox-image[sizes]');
 
-		const sizes = `${ Math.round(
-			100 * ( $img.width() / $window.width() )
-		) }vw`;
+		const sizes = `${Math.round(100 * ($img.width() / $window.width()))}vw`;
 
-		$img.attr( 'sizes', sizes );
-	} );
+		$img.attr('sizes', sizes);
+	});
 }

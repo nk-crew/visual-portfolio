@@ -8,8 +8,8 @@
  * @param {Object}                          editor Gutenberg editor fixture.
  * @return {import('@playwright/test').FrameLocator} Editor canvas frame locator.
  */
-export function getEditorCanvas( page, editor ) {
-	return editor?.canvas || page.frameLocator( '[name="editor-canvas"]' );
+export function getEditorCanvas(page, editor) {
+	return editor?.canvas || page.frameLocator('[name="editor-canvas"]');
 }
 
 /**
@@ -19,8 +19,6 @@ export function getEditorCanvas( page, editor ) {
  * @param {Object}                          editor Gutenberg editor fixture.
  * @return {import('@playwright/test').FrameLocator} Preview frame locator.
  */
-export function getPortfolioPreviewFrame( page, editor ) {
-	return getEditorCanvas( page, editor ).frameLocator(
-		'[title="vp-preview"]'
-	);
+export function getPortfolioPreviewFrame(page, editor) {
+	return getEditorCanvas(page, editor).frameLocator('[title="vp-preview"]');
 }

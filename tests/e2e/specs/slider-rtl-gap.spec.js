@@ -68,12 +68,17 @@ test.describe('slider gap on RTL direction', () => {
 					hasSwiperRtlClass: !!document.querySelector('.swiper-rtl'),
 					inlineMarginLeft: inlineStyles.includes('margin-left')
 						? parseFloat(
-								inlineStyles.match(/margin-left:\s*([0-9.]+)px/)?.[1] ||
-									'0'
-						  )
+								inlineStyles.match(
+									/margin-left:\s*([0-9.]+)px/
+								)?.[1] || '0'
+							)
 						: 0,
-					computedMarginLeft: parseFloat(slideStyles.marginLeft || '0'),
-					computedMarginRight: parseFloat(slideStyles.marginRight || '0'),
+					computedMarginLeft: parseFloat(
+						slideStyles.marginLeft || '0'
+					),
+					computedMarginRight: parseFloat(
+						slideStyles.marginRight || '0'
+					),
 				};
 			});
 

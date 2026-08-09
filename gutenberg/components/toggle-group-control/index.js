@@ -19,20 +19,20 @@ const ToggleGroupControlOption =
  * @param {Object|Array<{value: *, label: string}>} options Options source.
  * @return {Array<{value: string, label: string}>} Pairs with string values for ToggleGroupControl.
  */
-function normalizeToggleGroupButtonOptions( options ) {
-	if ( ! options ) {
+function normalizeToggleGroupButtonOptions(options) {
+	if (!options) {
 		return [];
 	}
-	if ( Array.isArray( options ) ) {
-		return options.map( ( { value, ...itemProps } ) => ( {
+	if (Array.isArray(options)) {
+		return options.map(({ value, ...itemProps }) => ({
 			...itemProps,
-			value: String( value ),
-		} ) );
+			value: String(value),
+		}));
 	}
-	return Object.keys( options ).map( ( key ) => ( {
-		value: String( key ),
-		label: options[ key ],
-	} ) );
+	return Object.keys(options).map((key) => ({
+		value: String(key),
+		label: options[key],
+	}));
 }
 
 /**
@@ -47,7 +47,7 @@ function normalizeToggleGroupButtonOptions( options ) {
  * @param {string}       props.className           Extra class on the wrapper.
  * @return {JSX.Element} Toggle group field.
  */
-export function ToggleGroupButtonsControl( props ) {
+export function ToggleGroupButtonsControl(props) {
 	const {
 		value,
 		onChange,
@@ -59,29 +59,31 @@ export function ToggleGroupButtonsControl( props ) {
 		...restProps
 	} = props;
 
-	const pairs = normalizeToggleGroupButtonOptions( options );
+	const pairs = normalizeToggleGroupButtonOptions(options);
 
 	return (
 		<div
-			className={ `vpf-component-toggle-group-buttons ${ className }`.trim() }
+			className={`vpf-component-toggle-group-buttons ${className}`.trim()}
 		>
 			<ToggleGroupControl
-				label={ label }
-				hideLabelFromVision={ hideLabelFromVision }
-				value={ value === undefined || value === null ? '' : String( value ) }
-				onChange={ onChange }
-				isBlock={ isBlock }
+				label={label}
+				hideLabelFromVision={hideLabelFromVision}
+				value={
+					value === undefined || value === null ? '' : String(value)
+				}
+				onChange={onChange}
+				isBlock={isBlock}
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
-				{ ...restProps }
+				{...restProps}
 			>
-				{ pairs.map( ( { value: optionValue, ...optionProps } ) => (
+				{pairs.map(({ value: optionValue, ...optionProps }) => (
 					<ToggleGroupControlOption
-						key={ optionValue }
-						value={ optionValue }
-						{ ...optionProps }
+						key={optionValue}
+						value={optionValue}
+						{...optionProps}
 					/>
-				) ) }
+				))}
 			</ToggleGroupControl>
 		</div>
 	);
@@ -92,45 +94,45 @@ export function ToggleGroupButtonsControl( props ) {
  *
  * @param props
  */
-export default function ToggleGroupCustomControl( props ) {
+export default function ToggleGroupCustomControl(props) {
 	const { children, options } = props;
 
-	const [ collapsed, setCollapsed ] = useState( options[ 0 ].category );
+	const [collapsed, setCollapsed] = useState(options[0].category);
 
 	return (
 		<div className="vpf-component-toggle-group-control">
 			<ToggleGroupControl
 				className="vpf-component-toggle-group-control-toggle"
-				value={ collapsed }
-				onChange={ ( val ) => {
-					setCollapsed( val );
-				} }
+				value={collapsed}
+				onChange={(val) => {
+					setCollapsed(val);
+				}}
 				isBlock
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 			>
-				{ options.map( ( option ) => {
+				{options.map((option) => {
 					return (
 						<ToggleGroupControlOption
-							key={ option.category }
-							value={ option.category }
-							label={ option.title }
+							key={option.category}
+							value={option.category}
+							label={option.title}
 						/>
 					);
-				} ) }
+				})}
 			</ToggleGroupControl>
 
-			{ options.map( ( option ) => {
-				if ( collapsed === option.category ) {
+			{options.map((option) => {
+				if (collapsed === option.category) {
 					return (
-						<Fragment key={ option.category }>
-							{ children( option ) }
+						<Fragment key={option.category}>
+							{children(option)}
 						</Fragment>
 					);
 				}
 
 				return null;
-			} ) }
+			})}
 		</div>
 	);
 }

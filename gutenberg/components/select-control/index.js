@@ -12,6 +12,14 @@ import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import {
+	Component,
+	createContext,
+	createRef,
+	useContext,
+	useState,
+} from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import selectStyles from 'gutenberg-react-select-styles';
 import $ from 'jquery';
 import rafSchd from 'raf-schd';
@@ -21,34 +29,25 @@ import AsyncSelect from 'react-select/async';
 import CreatableSelect from 'react-select/creatable';
 import { debounce } from 'throttle-debounce';
 
-import {
-	Component,
-	createContext,
-	createRef,
-	useContext,
-	useState,
-} from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-
 const { Option } = components;
 
 const { ajaxurl, VPGutenbergVariables } = window;
 
 const cachedOptions = {};
-const SortableMultiValueContext = createContext( {} );
+const SortableMultiValueContext = createContext({});
 
 function noSortTransforms() {
 	return null;
 }
 
-function getSortableValueId( value ) {
-	return `sortable-value-${ String( value ) }`;
+function getSortableValueId(value) {
+	return `sortable-value-${String(value)}`;
 }
 
-function DragOverlayChip( { label } ) {
+function DragOverlayChip({ label }) {
 	return (
 		<div
-			style={ {
+			style={{
 				display: 'inline-flex',
 				alignItems: 'center',
 				padding: '3px 12px',
@@ -60,18 +59,18 @@ function DragOverlayChip( { label } ) {
 				boxShadow: '0 3px 10px rgba(0, 0, 0, 0.18)',
 				pointerEvents: 'none',
 				whiteSpace: 'nowrap',
-			} }
+			}}
 		>
-			{ label }
+			{label}
 		</div>
 	);
 }
 
-const SortableMultiValueLabel = function ( props ) {
-	const sortableValueContext = useContext( SortableMultiValueContext );
+const SortableMultiValueLabel = (props) => {
+	const sortableValueContext = useContext(SortableMultiValueContext);
 
 	// Prevent opening the menu when a drag starts from the tag label.
-	const onMouseDown = ( e ) => {
+	const onMouseDown = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 	};
@@ -81,18 +80,16 @@ const SortableMultiValueLabel = function ( props ) {
 		...sortableValueContext.listeners,
 		onMouseDown,
 		style: {
-			...( props.innerProps?.style || {} ),
+			...(props.innerProps?.style || {}),
 			cursor: 'grab',
 			touchAction: 'none',
 		},
 	};
 
-	return (
-		<components.MultiValueLabel { ...props } innerProps={ innerProps } />
-	);
+	return <components.MultiValueLabel {...props} innerProps={innerProps} />;
 };
 
-const SortableMultiValue = function ( props ) {
+const SortableMultiValue = (props) => {
 	const {
 		attributes,
 		listeners,
@@ -100,24 +97,23 @@ const SortableMultiValue = function ( props ) {
 		transform,
 		transition,
 		isDragging,
-	} = useSortable( {
-		id: getSortableValueId( props.data.value ),
-	} );
-	const sortableValueContext = useContext( SortableMultiValueContext );
+	} = useSortable({
+		id: getSortableValueId(props.data.value),
+	});
+	const sortableValueContext = useContext(SortableMultiValueContext);
 	const isActive =
-		sortableValueContext.activeId ===
-		getSortableValueId( props.data.value );
+		sortableValueContext.activeId === getSortableValueId(props.data.value);
 	const isIndicatorBefore =
 		sortableValueContext.indicatorId ===
-			getSortableValueId( props.data.value ) &&
+			getSortableValueId(props.data.value) &&
 		sortableValueContext.indicatorPosition === 'before';
 	const isIndicatorAfter =
 		sortableValueContext.indicatorId ===
-			getSortableValueId( props.data.value ) &&
+			getSortableValueId(props.data.value) &&
 		sortableValueContext.indicatorPosition === 'after';
 	const style = {
-		...( props.innerProps?.style || {} ),
-		transform: CSS.Translate.toString( transform ),
+		...(props.innerProps?.style || {}),
+		transform: CSS.Translate.toString(transform),
 		transition,
 		position: 'relative',
 		opacity: isActive ? 0.2 : 1,
@@ -131,19 +127,19 @@ const SortableMultiValue = function ( props ) {
 
 	return (
 		<SortableMultiValueContext.Provider
-			value={ {
+			value={{
 				attributes,
 				listeners,
 				activeId: sortableValueContext.activeId,
 				indicatorId: sortableValueContext.indicatorId,
 				indicatorPosition: sortableValueContext.indicatorPosition,
-			} }
+			}}
 		>
-			<components.MultiValue { ...props } innerProps={ innerProps }>
-				{ isIndicatorBefore ? (
+			<components.MultiValue {...props} innerProps={innerProps}>
+				{isIndicatorBefore ? (
 					<span
 						aria-hidden="true"
-						style={ {
+						style={{
 							position: 'absolute',
 							left: -3,
 							top: 2,
@@ -153,14 +149,14 @@ const SortableMultiValue = function ( props ) {
 								'var(--wp-admin-theme-color, #3858e9)',
 							borderRadius: 999,
 							pointerEvents: 'none',
-						} }
+						}}
 					/>
-				) : null }
-				{ props.children }
-				{ isIndicatorAfter ? (
+				) : null}
+				{props.children}
+				{isIndicatorAfter ? (
 					<span
 						aria-hidden="true"
-						style={ {
+						style={{
 							position: 'absolute',
 							right: -3,
 							top: 2,
@@ -170,72 +166,70 @@ const SortableMultiValue = function ( props ) {
 								'var(--wp-admin-theme-color, #3858e9)',
 							borderRadius: 999,
 							pointerEvents: 'none',
-						} }
+						}}
 					/>
-				) : null }
+				) : null}
 			</components.MultiValue>
 		</SortableMultiValueContext.Provider>
 	);
 };
 
-const SortableSelectWrapper = function ( {
+const SortableSelectWrapper = ({
 	ComponentTag,
 	overlayContainer,
 	selectProps,
 	onSortEnd,
-} ) {
+}) => {
 	const sensors = useSensors(
-		useSensor( PointerSensor, {
+		useSensor(PointerSensor, {
 			activationConstraint: {
 				distance: 4,
 			},
-		} )
+		})
 	);
-	const items = ( selectProps.value || [] ).map( ( item ) =>
-		getSortableValueId( item.value )
+	const items = (selectProps.value || []).map((item) =>
+		getSortableValueId(item.value)
 	);
-	const [ activeId, setActiveId ] = useState( null );
-	const [ indicator, setIndicator ] = useState( null );
-	const activeItem = ( selectProps.value || [] ).find(
-		( item ) => getSortableValueId( item.value ) === activeId
+	const [activeId, setActiveId] = useState(null);
+	const [indicator, setIndicator] = useState(null);
+	const activeItem = (selectProps.value || []).find(
+		(item) => getSortableValueId(item.value) === activeId
 	);
 	const selectComponents = {
-		...( selectProps.components || {} ),
+		...(selectProps.components || {}),
 	};
 
-	selectComponents.MultiValue = function MultiValueWithContext( props ) {
+	selectComponents.MultiValue = function MultiValueWithContext(props) {
 		return (
 			<SortableMultiValueContext.Provider
-				value={ {
+				value={{
 					activeId,
 					indicatorId: indicator?.id || null,
 					indicatorPosition: indicator?.position || null,
-				} }
+				}}
 			>
-				<SortableMultiValue { ...props } />
+				<SortableMultiValue {...props} />
 			</SortableMultiValueContext.Provider>
 		);
 	};
 	const dragOverlay = (
-		<DragOverlay style={ { zIndex: 999999 } }>
-			{ activeItem ? (
-				<DragOverlayChip label={ activeItem.label } />
-			) : null }
+		<DragOverlay style={{ zIndex: 999999 }}>
+			{activeItem ? <DragOverlayChip label={activeItem.label} /> : null}
 		</DragOverlay>
 	);
 
 	return (
 		<DndContext
-			sensors={ sensors }
-			collisionDetection={ closestCenter }
-			onDragStart={ ( event ) => {
-				setActiveId( event.active.id );
-			} }
-			onDragOver={ ( event ) => {
+			sensors={sensors}
+			collisionDetection={closestCenter}
+			onDragStart={(event) => {
+				setActiveId(event.active.id);
+			}}
+			onDragOver={(event) => {
 				const { active, over } = event;
 
-				if ( ! over || active.id === over.id ) {
-					setIndicator( null );
+				if (!over || active.id === over.id) {
+					setIndicator(null);
 					return;
 				}
 
@@ -248,52 +242,49 @@ const SortableSelectWrapper = function ( {
 						? 'before'
 						: 'after';
 
-				setIndicator( {
+				setIndicator({
 					id: over.id,
 					position,
-				} );
-			} }
-			onDragEnd={ ( event ) => {
+				});
+			}}
+			onDragEnd={(event) => {
 				const { active, over } = event;
-				setActiveId( null );
+				setActiveId(null);
 
-				if ( ! over || active.id === over.id ) {
-					setIndicator( null );
+				if (!over || active.id === over.id) {
+					setIndicator(null);
 					return;
 				}
 
-				const oldIndex = items.indexOf( active.id );
-				const overIndex = items.indexOf( over.id );
+				const oldIndex = items.indexOf(active.id);
+				const overIndex = items.indexOf(over.id);
 				let newIndex = overIndex;
 
-				if ( indicator?.position === 'after' && oldIndex < overIndex ) {
+				if (indicator?.position === 'after' && oldIndex < overIndex) {
 					newIndex = overIndex;
-				} else if ( indicator?.position === 'after' ) {
+				} else if (indicator?.position === 'after') {
 					newIndex = overIndex + 1;
-				} else if ( oldIndex < overIndex ) {
+				} else if (oldIndex < overIndex) {
 					newIndex = overIndex - 1;
 				}
 
-				setIndicator( null );
-				onSortEnd( {
+				setIndicator(null);
+				onSortEnd({
 					oldIndex,
 					newIndex,
-				} );
-			} }
-			onDragCancel={ () => {
-				setActiveId( null );
-				setIndicator( null );
-			} }
+				});
+			}}
+			onDragCancel={() => {
+				setActiveId(null);
+				setIndicator(null);
+			}}
 		>
-			<SortableContext items={ items } strategy={ noSortTransforms }>
-				<ComponentTag
-					{ ...selectProps }
-					components={ selectComponents }
-				/>
+			<SortableContext items={items} strategy={noSortTransforms}>
+				<ComponentTag {...selectProps} components={selectComponents} />
 			</SortableContext>
-			{ overlayContainer
-				? createPortal( dragOverlay, overlayContainer )
-				: dragOverlay }
+			{overlayContainer
+				? createPortal(dragOverlay, overlayContainer)
+				: dragOverlay}
 		</DndContext>
 	);
 };
@@ -302,14 +293,14 @@ const SortableSelectWrapper = function ( {
  * Component Class
  */
 export default class SelectControl extends Component {
-	constructor( ...args ) {
-		super( ...args );
+	constructor(...args) {
+		super(...args);
 
 		const { callback } = this.props;
 
 		this.state = {
 			options: {},
-			ajaxStatus: !! callback,
+			ajaxStatus: !!callback,
 			emotionReady: false,
 		};
 
@@ -317,11 +308,11 @@ export default class SelectControl extends Component {
 		this.emotionCache = null;
 		this.ownerDocument = null;
 
-		this.getOptions = this.getOptions.bind( this );
-		this.getDefaultValue = this.getDefaultValue.bind( this );
-		this.findValueData = this.findValueData.bind( this );
-		this.requestAjax = this.requestAjax.bind( this );
-		this.requestAjaxDebounce = debounce( 300, rafSchd( this.requestAjax ) );
+		this.getOptions = this.getOptions.bind(this);
+		this.getDefaultValue = this.getDefaultValue.bind(this);
+		this.findValueData = this.findValueData.bind(this);
+		this.requestAjax = this.requestAjax.bind(this);
+		this.requestAjaxDebounce = debounce(300, rafSchd(this.requestAjax));
 	}
 
 	componentDidMount() {
@@ -334,29 +325,29 @@ export default class SelectControl extends Component {
 		// so we use a two-pass approach: the first render mounts a tiny
 		// probe element, and the real select appears on the second render
 		// triggered by the setState below.
-		if ( this.probeRef.current ) {
+		if (this.probeRef.current) {
 			const ownerDoc = this.probeRef.current.ownerDocument;
 
-			if ( ownerDoc && ownerDoc !== document ) {
+			if (ownerDoc && ownerDoc !== document) {
 				this.ownerDocument = ownerDoc;
-				this.emotionCache = createCache( {
+				this.emotionCache = createCache({
 					key: 'vpf-sel',
 					container: ownerDoc.head,
-				} );
+				});
 			}
 		}
 
 		// eslint-disable-next-line react/no-did-mount-set-state
-		this.setState( { emotionReady: true } );
+		this.setState({ emotionReady: true });
 
-		if ( callback ) {
-			this.requestAjax( {}, ( result ) => {
-				if ( result.options ) {
-					this.setState( {
+		if (callback) {
+			this.requestAjax({}, (result) => {
+				if (result.options) {
+					this.setState({
 						options: result.options,
-					} );
+					});
 				}
-			} );
+			});
 		}
 	}
 
@@ -368,11 +359,11 @@ export default class SelectControl extends Component {
 	getOptions() {
 		const { controlName } = this.props;
 
-		if ( cachedOptions[ controlName ] ) {
-			return cachedOptions[ controlName ];
+		if (cachedOptions[controlName]) {
+			return cachedOptions[controlName];
 		}
 
-		return Object.keys( this.state.options ).length
+		return Object.keys(this.state.options).length
 			? this.state.options
 			: this.props.options;
 	}
@@ -387,26 +378,26 @@ export default class SelectControl extends Component {
 
 		let result = null;
 
-		if ( isMultiple ) {
-			if ( ( ! value && typeof value !== 'string' ) || ! value.length ) {
+		if (isMultiple) {
+			if ((!value && typeof value !== 'string') || !value.length) {
 				return result;
 			}
 
 			result = [];
 
-			value.forEach( ( innerVal ) => {
-				result.push( this.findValueData( innerVal ) );
-			} );
+			value.forEach((innerVal) => {
+				result.push(this.findValueData(innerVal));
+			});
 		} else {
 			// Handle boolean false properly - it's a valid value.
-			if ( value === null || value === undefined || value === '' ) {
+			if (value === null || value === undefined || value === '') {
 				return result;
 			}
 
 			// Convert boolean to string if needed for the dropdown.
 			const valueToFind =
-				typeof value === 'boolean' ? String( value ) : value;
-			result = this.findValueData( valueToFind );
+				typeof value === 'boolean' ? String(value) : value;
+			result = this.findValueData(valueToFind);
 		}
 
 		return result;
@@ -419,7 +410,7 @@ export default class SelectControl extends Component {
 	 *
 	 * @return {Object | boolean} - value object.
 	 */
-	findValueData( findVal ) {
+	findValueData(findVal) {
 		let result = {
 			value: findVal,
 			label: findVal,
@@ -428,18 +419,18 @@ export default class SelectControl extends Component {
 		const options = this.getOptions();
 
 		// Find value in options.
-		if ( options ) {
-			Object.keys( options ).forEach( ( val ) => {
-				const data = options[ val ];
+		if (options) {
+			Object.keys(options).forEach((val) => {
+				const data = options[val];
 
-				if ( val === findVal ) {
-					if ( typeof data === 'string' ) {
+				if (val === findVal) {
+					if (typeof data === 'string') {
 						result.label = data;
 					} else {
 						result = data;
 					}
 				}
-			} );
+			});
 		}
 
 		return result;
@@ -459,16 +450,16 @@ export default class SelectControl extends Component {
 	) {
 		const { controlName, attributes } = this.props;
 
-		if ( this.isAJAXinProgress ) {
+		if (this.isAJAXinProgress) {
 			return;
 		}
 
 		this.isAJAXinProgress = true;
 
-		if ( useStateLoading ) {
-			this.setState( {
+		if (useStateLoading) {
+			this.setState({
 				ajaxStatus: 'progress',
-			} );
+			});
 		}
 
 		const ajaxData = {
@@ -479,34 +470,34 @@ export default class SelectControl extends Component {
 			...additionalData,
 		};
 
-		$.ajax( {
+		$.ajax({
 			url: ajaxurl,
 			method: 'POST',
 			dataType: 'json',
 			data: ajaxData,
-			complete: ( data ) => {
+			complete: (data) => {
 				const json = data.responseJSON;
 
-				if ( callback && json.response ) {
-					if ( json.response.options ) {
-						cachedOptions[ controlName ] = {
-							...cachedOptions[ controlName ],
+				if (callback && json.response) {
+					if (json.response.options) {
+						cachedOptions[controlName] = {
+							...cachedOptions[controlName],
 							...json.response.options,
 						};
 					}
 
-					callback( json.response );
+					callback(json.response);
 				}
 
-				if ( useStateLoading ) {
-					this.setState( {
+				if (useStateLoading) {
+					this.setState({
 						ajaxStatus: true,
-					} );
+					});
 				}
 
 				this.isAJAXinProgress = false;
 			},
-		} );
+		});
 	}
 
 	/**
@@ -516,20 +507,20 @@ export default class SelectControl extends Component {
 	 *
 	 * @return {Object} - prepared options.
 	 */
-	prepareOptions( options ) {
-		return Object.keys( options || {} ).map( ( val ) => {
-			const option = options[ val ];
+	prepareOptions(options) {
+		return Object.keys(options || {}).map((val) => {
+			const option = options[val];
 			let result = {
 				value: val,
-				label: options[ val ],
+				label: options[val],
 			};
 
-			if ( typeof option === 'object' ) {
+			if (typeof option === 'object') {
 				result = { ...option };
 			}
 
 			return result;
-		} );
+		});
 	}
 
 	/**
@@ -540,11 +531,11 @@ export default class SelectControl extends Component {
 	 *
 	 * @return {JSX.Element} - Wrapped element.
 	 */
-	wrapSelect( selectElement ) {
-		if ( this.emotionCache ) {
+	wrapSelect(selectElement) {
+		if (this.emotionCache) {
 			return (
-				<CacheProvider value={ this.emotionCache }>
-					{ selectElement }
+				<CacheProvider value={this.emotionCache}>
+					{selectElement}
 				</CacheProvider>
 			);
 		}
@@ -561,11 +552,11 @@ export default class SelectControl extends Component {
 		// First render: mount a probe element so componentDidMount can
 		// detect whether we're inside an iframe and create the correct
 		// @emotion cache before react-select renders.
-		if ( ! emotionReady ) {
-			return <span ref={ this.probeRef } style={ { display: 'none' } } />;
+		if (!emotionReady) {
+			return <span ref={this.probeRef} style={{ display: 'none' }} />;
 		}
 
-		const isAsync = !! callback && isSearchable;
+		const isAsync = !!callback && isSearchable;
 		const isLoading = ajaxStatus && ajaxStatus === 'progress';
 
 		// Use the document where this component is rendered, which may
@@ -581,7 +572,7 @@ export default class SelectControl extends Component {
 			className: 'vpf-component-select',
 			styles: {
 				...selectStyles,
-				menuPortal: ( styles ) => {
+				menuPortal: (styles) => {
 					return {
 						...styles,
 						zIndex: 1000000,
@@ -594,56 +585,53 @@ export default class SelectControl extends Component {
 			// correctly in both contexts.
 			menuPortalTarget: isInIframe ? null : ownerDoc.body,
 			components: {
-				Option( optionProps ) {
+				Option(optionProps) {
 					const { data } = optionProps;
 
 					return (
-						<Option { ...optionProps }>
-							{ typeof data.img !== 'undefined' ? (
+						<Option {...optionProps}>
+							{typeof data.img !== 'undefined' ? (
 								<div className="vpf-component-select-option-img">
-									{ data.img ? (
-										<img
-											src={ data.img }
-											alt={ data.label }
-										/>
+									{data.img ? (
+										<img src={data.img} alt={data.label} />
 									) : (
 										''
-									) }
+									)}
 								</div>
 							) : (
 								''
-							) }
+							)}
 							<span className="vpf-component-select-option-label">
-								{ data.label }
+								{data.label}
 							</span>
-							{ data.category ? (
+							{data.category ? (
 								<div className="vpf-component-select-option-category">
-									{ data.category }
+									{data.category}
 								</div>
 							) : (
 								''
-							) }
+							)}
 						</Option>
 					);
 				},
 			},
 			value: this.getDefaultValue(),
-			options: this.prepareOptions( this.getOptions() ),
-			onChange( val ) {
-				if ( isMultiple ) {
-					if ( Array.isArray( val ) ) {
+			options: this.prepareOptions(this.getOptions()),
+			onChange(val) {
+				if (isMultiple) {
+					if (Array.isArray(val)) {
 						const result = [];
 
-						val.forEach( ( innerVal ) => {
-							result.push( innerVal ? innerVal.value : '' );
-						} );
+						val.forEach((innerVal) => {
+							result.push(innerVal ? innerVal.value : '');
+						});
 
-						onChange( result );
+						onChange(result);
 					} else {
-						onChange( [] );
+						onChange([]);
 					}
 				} else {
-					onChange( val ? val.value : '' );
+					onChange(val ? val.value : '');
 				}
 			},
 			isMulti: isMultiple,
@@ -651,19 +639,19 @@ export default class SelectControl extends Component {
 			isLoading,
 			isClearable: false,
 			placeholder: isSearchable
-				? __( 'Type to search…', 'visual-portfolio' )
-				: __( 'Select…', 'visual-portfolio' ),
+				? __('Type to search…', 'visual-portfolio')
+				: __('Select…', 'visual-portfolio'),
 		};
 
 		// Multiple select.
-		if ( isMultiple ) {
-			selectProps.onSortEnd = ( { oldIndex, newIndex } ) => {
+		if (isMultiple) {
+			selectProps.onSortEnd = ({ oldIndex, newIndex }) => {
 				const newValue = arrayMove(
 					this.getDefaultValue(),
 					oldIndex,
 					newIndex
 				);
-				selectProps.onChange( newValue );
+				selectProps.onChange(newValue);
 			};
 			selectProps.components.MultiValue = SortableMultiValue;
 			selectProps.components.MultiValueLabel = SortableMultiValueLabel;
@@ -673,42 +661,42 @@ export default class SelectControl extends Component {
 		}
 
 		// Creatable select.
-		if ( isCreatable ) {
+		if (isCreatable) {
 			selectProps.placeholder = __(
 				'Type and press Enter…',
 				'visual-portfolio'
 			);
 			selectProps.isSearchable = true;
 
-			if ( isMultiple ) {
+			if (isMultiple) {
 				return this.wrapSelect(
 					<SortableSelectWrapper
-						ComponentTag={ CreatableSelect }
-						overlayContainer={ overlayContainer }
-						selectProps={ selectProps }
-						onSortEnd={ selectProps.onSortEnd }
+						ComponentTag={CreatableSelect}
+						overlayContainer={overlayContainer}
+						selectProps={selectProps}
+						onSortEnd={selectProps.onSortEnd}
 					/>
 				);
 			}
 
-			return this.wrapSelect( <CreatableSelect { ...selectProps } /> );
+			return this.wrapSelect(<CreatableSelect {...selectProps} />);
 		}
 
 		// Async select.
-		if ( isAsync ) {
-			selectProps.loadOptions = ( inputValue, cb ) => {
+		if (isAsync) {
+			selectProps.loadOptions = (inputValue, cb) => {
 				this.requestAjaxDebounce(
 					{ q: inputValue },
-					( result ) => {
+					(result) => {
 						const newOptions = [];
 
-						if ( result && result.options ) {
-							Object.keys( result.options ).forEach( ( k ) => {
-								newOptions.push( result.options[ k ] );
-							} );
+						if (result && result.options) {
+							Object.keys(result.options).forEach((k) => {
+								newOptions.push(result.options[k]);
+							});
 						}
 
-						cb( newOptions.length ? newOptions : null );
+						cb(newOptions.length ? newOptions : null);
 					},
 					false
 				);
@@ -719,32 +707,32 @@ export default class SelectControl extends Component {
 			delete selectProps.options;
 			delete selectProps.isLoading;
 
-			if ( isMultiple ) {
+			if (isMultiple) {
 				return this.wrapSelect(
 					<SortableSelectWrapper
-						ComponentTag={ AsyncSelect }
-						overlayContainer={ overlayContainer }
-						selectProps={ selectProps }
-						onSortEnd={ selectProps.onSortEnd }
+						ComponentTag={AsyncSelect}
+						overlayContainer={overlayContainer}
+						selectProps={selectProps}
+						onSortEnd={selectProps.onSortEnd}
 					/>
 				);
 			}
 
-			return this.wrapSelect( <AsyncSelect { ...selectProps } /> );
+			return this.wrapSelect(<AsyncSelect {...selectProps} />);
 		}
 
 		// Default select.
-		if ( isMultiple ) {
+		if (isMultiple) {
 			return this.wrapSelect(
 				<SortableSelectWrapper
-					ComponentTag={ Select }
-					overlayContainer={ overlayContainer }
-					selectProps={ selectProps }
-					onSortEnd={ selectProps.onSortEnd }
+					ComponentTag={Select}
+					overlayContainer={overlayContainer}
+					selectProps={selectProps}
+					onSortEnd={selectProps.onSortEnd}
 				/>
 			);
 		}
 
-		return this.wrapSelect( <Select { ...selectProps } /> );
+		return this.wrapSelect(<Select {...selectProps} />);
 	}
 }

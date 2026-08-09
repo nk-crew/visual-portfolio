@@ -18,13 +18,10 @@ export async function openPublishedPage(page, options = {}) {
 		.waitForEvent('popup', { timeout })
 		.catch(() => null);
 	const frontendNavigationPromise = page
-		.waitForURL(
-			(url) => !url.pathname.includes('/wp-admin/'),
-			{
-				timeout,
-				waitUntil: 'domcontentloaded',
-			}
-		)
+		.waitForURL((url) => !url.pathname.includes('/wp-admin/'), {
+			timeout,
+			waitUntil: 'domcontentloaded',
+		})
 		.catch(() => null);
 
 	await viewButton.click();

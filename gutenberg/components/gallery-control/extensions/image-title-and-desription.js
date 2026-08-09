@@ -11,26 +11,26 @@ import { getEffectiveAltText } from '../utils/image-alt';
  *
  * @param props
  */
-function RenderTitleAndDescriptionImageControls( props ) {
+function RenderTitleAndDescriptionImageControls(props) {
 	const { data, textSource, img, name, index, fullName } = props;
 
 	const { imgData } = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( 'core' );
+		(select) => {
+			const { getEntityRecord } = select('core');
 
 			return {
 				imgData: img.id
-					? getEntityRecord( 'postType', 'attachment', img.id )
+					? getEntityRecord('postType', 'attachment', img.id)
 					: null,
 			};
 		},
-		[ img ]
+		[img]
 	);
 
 	let text = '';
 	let description = '';
 
-	switch ( textSource ) {
+	switch (textSource) {
 		case 'title':
 			text = imgData?.title?.raw || '';
 			description = __(
@@ -46,7 +46,7 @@ function RenderTitleAndDescriptionImageControls( props ) {
 			);
 			break;
 		case 'alt':
-			text = getEffectiveAltText( img, imgData );
+			text = getEffectiveAltText(img, imgData);
 			description = __(
 				'Loaded automatically from the image Alt',
 				'visual-portfolio'
@@ -66,15 +66,15 @@ function RenderTitleAndDescriptionImageControls( props ) {
 
 	return (
 		<ThisControl
-			className={ `vpf-control-wrap vpf-control-wrap-${
+			className={`vpf-control-wrap vpf-control-wrap-${
 				name === 'title' ? 'text' : 'textarea'
-			} ${ getControlNameClassName( fullName ) }` }
-			key={ `${
+			} ${getControlNameClassName(fullName)}`}
+			key={`${
 				img.id || img.imgThumbnailUrl || img.imgUrl
-			}-${ index }-${ name }` }
-			label={ data.label }
-			value={ text }
-			help={ description }
+			}-${index}-${name}`}
+			label={data.label}
+			value={text}
+			help={description}
 			disabled
 		/>
 	);
@@ -84,28 +84,28 @@ function RenderTitleAndDescriptionImageControls( props ) {
 addFilter(
 	'vpf.editor.gallery-controls-render',
 	'vpf/editor/gallery-controls-render/title-and-description-render-by-source',
-	( control, data, props, controlData ) => {
+	(control, data, props, controlData) => {
 		const { attributes, img } = props;
 		const { name, index, fullName } = controlData;
 
 		if (
-			( name === 'title' &&
+			(name === 'title' &&
 				attributes.images_titles_source &&
-				attributes.images_titles_source !== 'custom' ) ||
-			( name === 'description' &&
+				attributes.images_titles_source !== 'custom') ||
+			(name === 'description' &&
 				attributes.images_descriptions_source &&
-				attributes.images_descriptions_source !== 'custom' )
+				attributes.images_descriptions_source !== 'custom')
 		) {
 			control = (
 				<RenderTitleAndDescriptionImageControls
-					{ ...{
+					{...{
 						data,
-						textSource: attributes[ `images_${ name }s_source` ],
+						textSource: attributes[`images_${name}s_source`],
 						img,
 						name,
 						index,
 						fullName,
-					} }
+					}}
 				/>
 			);
 		}

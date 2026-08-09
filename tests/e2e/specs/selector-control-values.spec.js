@@ -32,37 +32,37 @@ const BASE_PREVIEW_FORM = {
 	vp_items_count: '6',
 };
 
-test.describe( 'selector control attribute values validation', () => {
+test.describe('selector control attribute values validation', () => {
 	let nonce;
 
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll(async ({ requestUtils }) => {
 		const pluginName = getPluginSlug();
-		await requestUtils.activatePlugin( pluginName );
+		await requestUtils.activatePlugin(pluginName);
 
 		// Create test posts so portfolio has content to render.
-		await createRegularPosts( { requestUtils, count: 3 } );
-	} );
+		await createRegularPosts({ requestUtils, count: 3 });
+	});
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
+	test.afterAll(async ({ requestUtils }) => {
+		await Promise.all([
 			requestUtils.deleteAllMedia(),
 			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllPosts(),
-			deleteAllSavedLayouts( { requestUtils } ),
-		] );
-	} );
+			deleteAllSavedLayouts({ requestUtils }),
+		]);
+	});
 
-	test.beforeEach( async ( { page } ) => {
+	test.beforeEach(async ({ page }) => {
 		// Navigate to admin to get a valid nonce.
-		await page.goto( '/wp-admin/' );
+		await page.goto('/wp-admin/');
 
-		nonce = await page.evaluate( () => {
-			if ( window.VPAdminVariables && window.VPAdminVariables.nonce ) {
+		nonce = await page.evaluate(() => {
+			if (window.VPAdminVariables && window.VPAdminVariables.nonce) {
 				return window.VPAdminVariables.nonce;
 			}
 			return null;
-		} );
-	} );
+		});
+	});
 
 	/**
 	 * Helper to make a preview POST request.
@@ -71,9 +71,9 @@ test.describe( 'selector control attribute values validation', () => {
 	 * @param {Object} extraFields - Additional form fields to merge with base.
 	 * @return {Object} Response object.
 	 */
-	async function previewRequest( pg, extraFields = {} ) {
+	async function previewRequest(pg, extraFields = {}) {
 		return pg.request.post(
-			`/?vp_preview=vp_preview&vp_preview_nonce=${ nonce }`,
+			`/?vp_preview=vp_preview&vp_preview_nonce=${nonce}`,
 			{
 				form: {
 					...BASE_PREVIEW_FORM,
@@ -89,14 +89,14 @@ test.describe( 'selector control attribute values validation', () => {
 	 * @param {Object} response - Playwright response.
 	 * @return {string} Response body text.
 	 */
-	async function assertNoError( response ) {
-		expect( response.status() ).not.toBe( 500 );
+	async function assertNoError(response) {
+		expect(response.status()).not.toBe(500);
 
 		const body = await response.text();
-		expect( body ).not.toContain(
+		expect(body).not.toContain(
 			'There has been a critical error on this website'
 		);
-		expect( body ).not.toContain( 'Fatal error' );
+		expect(body).not.toContain('Fatal error');
 
 		return body;
 	}
@@ -105,291 +105,289 @@ test.describe( 'selector control attribute values validation', () => {
 	// Test Case 1: Invalid selector values should fall back to defaults.
 	// =========================================================================
 
-	test( 'invalid posts_order_by value falls back to default in preview', async ( {
+	test('invalid posts_order_by value falls back to default in preview', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_posts_order_by: 'completely_invalid_value',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// The invalid value should NOT appear in the rendered output.
-		expect( body ).not.toContain( 'completely_invalid_value' );
+		expect(body).not.toContain('completely_invalid_value');
 
 		// Portfolio items should actually be rendered.
-		expect( body ).toContain( 'vp-portfolio__item-wrap' );
-	} );
+		expect(body).toContain('vp-portfolio__item-wrap');
+	});
 
-	test( 'invalid items_style value falls back to default in preview', async ( {
+	test('invalid items_style value falls back to default in preview', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_items_style: 'nonexistent_skin_style',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// The invalid value should not appear in any data attribute or class name.
-		expect( body ).not.toContain( 'nonexistent_skin_style' );
-	} );
+		expect(body).not.toContain('nonexistent_skin_style');
+	});
 
-	test( 'invalid sort value falls back to default in preview', async ( {
+	test('invalid sort value falls back to default in preview', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_sort: 'invalid_sort_option',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// The invalid sort value should not appear in output.
-		expect( body ).not.toContain( 'invalid_sort_option' );
-	} );
+		expect(body).not.toContain('invalid_sort_option');
+	});
 
-	test( 'valid selector values render items correctly in preview', async ( {
+	test('valid selector values render items correctly in preview', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page );
+		const response = await previewRequest(page);
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// Valid items_style "default" should produce rendered items.
-		expect( body ).toContain( 'vp-portfolio__items-style-default' );
-		expect( body ).toContain( 'vp-portfolio__item-wrap' );
-	} );
+		expect(body).toContain('vp-portfolio__items-style-default');
+		expect(body).toContain('vp-portfolio__item-wrap');
+	});
 
 	// =========================================================================
 	// Test Case 2: String boolean option 'true' should work correctly.
 	// PR #208 fix - show_date with value 'true' should display the date.
 	// =========================================================================
 
-	test( 'show_date with value true renders date in preview', async ( {
+	test('show_date with value true renders date in preview', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_items_style_default__show_date: 'true',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// When show_date is 'true', dates should be rendered in the output.
-		expect( body ).toContain( 'vp-portfolio__item-meta-date' );
-	} );
+		expect(body).toContain('vp-portfolio__item-meta-date');
+	});
 
-	test( 'show_date with value false does not render date in preview', async ( {
+	test('show_date with value false does not render date in preview', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_items_style_default__show_date: 'false',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// When show_date is 'false', date should not be rendered.
-		expect( body ).not.toContain( 'vp-portfolio__item-meta-date' );
-	} );
+		expect(body).not.toContain('vp-portfolio__item-meta-date');
+	});
 
-	test( 'show_date with value human renders human format date in preview', async ( {
+	test('show_date with value human renders human format date in preview', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_items_style_default__show_date: 'human',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// When show_date is 'human', dates should be rendered in human format.
-		expect( body ).toContain( 'vp-portfolio__item-meta-date' );
-		expect( body ).toContain( 'ago' );
-	} );
+		expect(body).toContain('vp-portfolio__item-meta-date');
+		expect(body).toContain('ago');
+	});
 
-	test( 'show_date with invalid value falls back to default (no date shown)', async ( {
+	test('show_date with invalid value falls back to default (no date shown)', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_items_style_default__show_date: 'invalid_value',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// Invalid show_date should fall back to default 'false',
 		// meaning no dates should be rendered.
-		expect( body ).not.toContain( 'vp-portfolio__item-meta-date' );
+		expect(body).not.toContain('vp-portfolio__item-meta-date');
 
 		// But items should still render.
-		expect( body ).toContain( 'vp-portfolio__item-wrap' );
-	} );
+		expect(body).toContain('vp-portfolio__item-wrap');
+	});
 
-	test( 'show_read_more with value true renders read more button', async ( {
+	test('show_read_more with value true renders read more button', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_items_style_default__show_read_more: 'true',
 			vp_items_style_default__read_more_label: 'Read More',
 			vp_items_style_default__show_excerpt: 'true',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// When show_read_more is 'true', the read more element should be present.
-		expect( body ).toContain( 'vp-portfolio__item-meta-read-more' );
-	} );
+		expect(body).toContain('vp-portfolio__item-meta-read-more');
+	});
 
-	test( 'show_read_more with invalid value falls back to default (no button)', async ( {
+	test('show_read_more with invalid value falls back to default (no button)', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			vp_items_style_default__show_read_more: 'invalid_value',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// Invalid show_read_more value should fall back to 'false',
 		// meaning no read more button.
-		expect( body ).not.toContain( 'vp-portfolio__item-meta-read-more' );
-	} );
+		expect(body).not.toContain('vp-portfolio__item-meta-read-more');
+	});
 
 	// =========================================================================
 	// Test Case 3: Selectors with dynamic value_callback accept arbitrary values.
 	// =========================================================================
 
-	test( 'dynamic callback selector (post_types_set) accepts arbitrary values', async ( {
+	test('dynamic callback selector (post_types_set) accepts arbitrary values', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
 		// post_types_set has a value_callback, so it should accept arbitrary values
 		// without resetting or causing errors.
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			'vp_post_types_set[]': 'post',
-		} );
+		});
 
-		const body = await assertNoError( response );
+		const body = await assertNoError(response);
 
 		// The preview should render portfolio items with the post type.
-		expect( body ).toContain( 'vp-portfolio__item-wrap' );
-	} );
+		expect(body).toContain('vp-portfolio__item-wrap');
+	});
 
-	test( 'dynamic callback selector does not break with custom post type value', async ( {
+	test('dynamic callback selector does not break with custom post type value', async ({
 		page,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
 		// Even with a non-standard post type that may not exist,
 		// the dynamic callback selector should not cause a fatal error.
-		const response = await previewRequest( page, {
+		const response = await previewRequest(page, {
 			'vp_post_types_set[]': 'custom_dynamic_type',
-		} );
+		});
 
-		await assertNoError( response );
-	} );
+		await assertNoError(response);
+	});
 
 	// =========================================================================
 	// Test Case 4: Block rendering with invalid and valid values.
 	// =========================================================================
 
-	test( 'block with invalid selector value renders with default in published page', async ( {
+	test('block with invalid selector value renders with default in published page', async ({
 		page,
 		admin,
 		editor,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
 		// Create a page with a VP block using an invalid posts_order_by.
-		await admin.createNewPost( {
+		await admin.createNewPost({
 			title: 'Test Invalid Selector Value',
 			postType: 'page',
 			showWelcomeGuide: false,
 			legacyCanvas: true,
-		} );
+		});
 
-		await editor.insertBlock( {
+		await editor.insertBlock({
 			name: 'visual-portfolio/block',
 			attributes: {
 				setup_wizard: 'false',
 				content_source: 'post-based',
 				posts_source: 'post_types_set',
-				post_types_set: [ 'post' ],
+				post_types_set: ['post'],
 				posts_order_by: 'totally_invalid_order',
 				items_count: 3,
 			},
-		} );
+		});
 
 		// Publish the page.
 		await editor.publishPost();
 
-		const frontendPage = await openPublishedPage( page );
+		const frontendPage = await openPublishedPage(page);
 
 		// The portfolio should render without errors.
-		const portfolio = frontendPage.locator( '.vp-portfolio' );
-		await expect( portfolio ).toBeVisible( { timeout: 15000 } );
+		const portfolio = frontendPage.locator('.vp-portfolio');
+		await expect(portfolio).toBeVisible({ timeout: 15000 });
 
 		// The invalid order by value should not appear in any data attributes.
 		const html = await frontendPage.content();
-		expect( html ).not.toContain( 'totally_invalid_order' );
-	} );
+		expect(html).not.toContain('totally_invalid_order');
+	});
 
-	test( 'block with valid true option for show_date renders date', async ( {
+	test('block with valid true option for show_date renders date', async ({
 		page,
 		admin,
 		editor,
-	} ) => {
-		test.skip( ! nonce, 'VP nonce not available on admin page' );
+	}) => {
+		test.skip(!nonce, 'VP nonce not available on admin page');
 
-		await admin.createNewPost( {
+		await admin.createNewPost({
 			title: 'Test Show Date True Option',
 			postType: 'page',
 			showWelcomeGuide: false,
 			legacyCanvas: true,
-		} );
+		});
 
-		await editor.insertBlock( {
+		await editor.insertBlock({
 			name: 'visual-portfolio/block',
 			attributes: {
 				setup_wizard: 'false',
 				content_source: 'post-based',
 				posts_source: 'post_types_set',
-				post_types_set: [ 'post' ],
+				post_types_set: ['post'],
 				items_style: 'default',
 				items_style_default__show_date: 'true',
 				items_count: 3,
 			},
-		} );
+		});
 
 		await editor.publishPost();
 
-		const frontendPage = await openPublishedPage( page );
+		const frontendPage = await openPublishedPage(page);
 
 		// The portfolio should render with dates.
-		const portfolio = frontendPage.locator( '.vp-portfolio' );
-		await expect( portfolio ).toBeVisible( { timeout: 15000 } );
+		const portfolio = frontendPage.locator('.vp-portfolio');
+		await expect(portfolio).toBeVisible({ timeout: 15000 });
 
 		// Date meta should be visible when show_date is 'true'.
-		const dateMeta = frontendPage.locator(
-			'.vp-portfolio__item-meta-date'
-		);
+		const dateMeta = frontendPage.locator('.vp-portfolio__item-meta-date');
 		const dateCount = await dateMeta.count();
-		expect( dateCount ).toBeGreaterThan( 0 );
-	} );
-} );
+		expect(dateCount).toBeGreaterThan(0);
+	});
+});

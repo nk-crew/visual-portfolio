@@ -31,7 +31,7 @@ export async function createRegularPosts({
 				},
 			});
 			categoryIds.push(category.id);
-		} catch (error) {
+		} catch (_error) {
 			// Category might already exist
 			const existingCategories = await requestUtils.rest({
 				path: `/wp/v2/categories?slug=${categoryName
