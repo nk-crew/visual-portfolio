@@ -3,9 +3,19 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
+import envPorts from '../../scripts/env-ports.js';
+
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
 	path.join(process.cwd(), 'artifacts/storage-states/admin.json');
+
+// Keeps parallel worktrees from fighting over the same port.
+//
+// `@wordpress/e2e-test-utils-playwright` reads `WP_BASE_URL` from the environment
+// rather than from the Playwright config, so export it here to keep both in sync.
+const { testsPort } = envPorts.getPorts();
+const BASE_URL = process.env.WP_BASE_URL || `http://localhost:${testsPort}`;
+process.env.WP_BASE_URL = BASE_URL;
 
 const config = defineConfig({
 	reporter: process.env.CI
@@ -25,7 +35,7 @@ const config = defineConfig({
 		new URL('./config/global-setup.js', `file:${__filename}`).href
 	),
 	use: {
-		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
+		baseURL: BASE_URL,
 		headless: true,
 		viewport: {
 			width: 960,
@@ -45,7 +55,10 @@ const config = defineConfig({
 	},
 	webServer: {
 		command: 'npm run env:start',
-		port: 8889,
+		// Must stay `port` rather than `url`: Playwright only exports
+		// `PLAYWRIGHT_TEST_BASE_URL` for the `port` form, and specs build their
+		// expected URLs from it.
+		port: testsPort,
 		timeout: 120000, // 120 seconds.
 		reuseExistingServer: true,
 	},

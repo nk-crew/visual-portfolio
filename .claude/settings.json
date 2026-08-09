@@ -1,0 +1,32 @@
+{
+	"permissions": {
+		"allow": [
+			"Bash(npm run:*)",
+			"Bash(npm ci)",
+			"Bash(npm install)",
+			"Bash(npm ls:*)",
+			"Bash(npx playwright:*)",
+			"Bash(composer install:*)",
+			"Bash(composer run-script:*)",
+			"Bash(node scripts/:*)",
+			"Bash(./scripts/worktree-setup.sh:*)",
+			"Bash(git status:*)",
+			"Bash(git diff:*)",
+			"Bash(git log:*)",
+			"Bash(git show:*)",
+			"Bash(git branch:*)",
+			"Bash(git worktree list)",
+			"Bash(gh pr view:*)",
+			"Bash(gh pr diff:*)",
+			"Bash(docker ps:*)"
+		],
+		"deny": [
+			"Read(./.env)",
+			"Read(./.env.*)",
+			"Write(./build/**)",
+			"Edit(./build/**)",
+			"Write(./vendor/**)",
+			"Edit(./vendor/**)"
+		]
+	}
+}

@@ -56,6 +56,14 @@ node_modules/
 # dotenv environment variables file
 .env
 
+# Local wp-env overrides
+.wp-env.override.json
+
+# Coding agent local state (shared config in .claude/ is committed)
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+
 # system files
 .DS_Store
 Thumbs.db

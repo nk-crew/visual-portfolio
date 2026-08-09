@@ -33,16 +33,20 @@ Visual Portfolio provides powerful tools to showcase your works and photo galler
 ### Prerequisites
 
 - PHP >= 7.2
-- Node.js >= 18.0
+- Node.js >= 22.0
 - Composer >= 2.0
+- Docker (for the local WordPress environment)
 
 ### Getting Started
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+Clone the repository, then run:
+
+```bash
+./scripts/worktree-setup.sh
+```
+
+That installs dependencies and starts a local WordPress environment. The same script
+prepares a fresh `git worktree`.
 
 ### Development Commands
 
@@ -76,23 +80,30 @@ npm run format:js   # Fix JavaScript code
 npm run format:css  # Fix CSS code
 ```
 
-### Testing
+### Local WordPress
 
 We use WordPress's official testing environment powered by Docker and wp-env.
 
-1. [Install Docker](https://www.docker.com/) on your machine
-2. Start the server:
-   ```bash
-   npm run env:start
-   ```
-3. Run tests:
-   ```bash
-   # End-to-end tests (Playwright)
-   npm run test:e2e
+```bash
+npm run env:start    # Start the development and tests sites
+npm run env:ports    # Print their URLs
+npm run env:stop     # Stop them
+npm run play         # Boot the plugin in WordPress Playground, no Docker needed
+```
 
-   # PHP Unit tests
-   npm run test:unit:php
-   ```
+Every checkout gets its own containers and database. Linked worktrees also get their own
+ports, so several branches can run at the same time; the main checkout keeps the usual
+8888 and 8889.
+
+### Testing
+
+```bash
+# End-to-end tests (Playwright)
+npm run test:e2e
+
+# PHP Unit tests
+npm run test:unit:php
+```
 
 ## License
 
