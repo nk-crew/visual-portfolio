@@ -4,7 +4,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 import ControlsRender from '../../components/controls-render';
 import { LOOP_GENERAL_CONTROLS, pickControls } from '../../utils/loop-controls';
@@ -58,15 +58,16 @@ function renderControls(props) {
 	return (
 		<>
 			<ControlsRender
+				{...props}
 				isModernBlock
 				category="content-source"
-				{...props}
 			/>
 
 			{categories
 				.filter((name) => name !== 'content-source')
 				.map((name) => (
 					<ControlsRender
+						{...props}
 						isModernBlock
 						key={name}
 						category={name}
@@ -77,7 +78,6 @@ function renderControls(props) {
 								? pickControls(LOOP_GENERAL_CONTROLS)
 								: undefined
 						}
-						{...props}
 					/>
 				))}
 		</>
@@ -109,18 +109,21 @@ export default function BlockEdit(props) {
 
 	// Everything the endpoint needs, and the only thing that should trigger it.
 	// `maxPages` is deliberately left out - it is what the request writes back.
-	const queryKey = JSON.stringify({
-		queryType,
-		baseQuery: { perPage: baseQuery?.perPage },
-		postsQuery,
-		imagesQuery,
-	});
+	// Memoised on the attribute identities, so a gallery with hundreds of images
+	// is not rebuilt on every render.
+	const query = useMemo(
+		() => ({
+			queryType,
+			baseQuery: { perPage: baseQuery?.perPage },
+			postsQuery,
+			imagesQuery,
+		}),
+		[queryType, baseQuery?.perPage, postsQuery, imagesQuery]
+	);
 
 	// `maxPages` drives the editor preview of the pagination blocks. The front
 	// end recalculates it per request, since saved content goes stale.
 	useEffect(() => {
-		const query = JSON.parse(queryKey);
-
 		if (!query.queryType || !query.baseQuery.perPage) {
 			return undefined;
 		}
@@ -163,7 +166,7 @@ export default function BlockEdit(props) {
 			cancelled = true;
 			clearTimeout(timeout);
 		};
-	}, [queryKey, setAttributes]);
+	}, [query, setAttributes]);
 
 	useEffect(() => {
 		if ('images' !== queryType || !Array.isArray(imagesQuery.images)) {

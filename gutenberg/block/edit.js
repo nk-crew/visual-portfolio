@@ -78,11 +78,11 @@ function renderControls(props, isChildOfLoop) {
 
 						return (
 							<ControlsRender
+								{...props}
 								key={name}
 								category={name}
 								categoryInitialOpen={categoryInitialOpen}
 								controls={controls}
-								{...props}
 							/>
 						);
 					})

@@ -53,23 +53,53 @@ const PAGED_PAGINATION = [
 	{ name: 'visual-portfolio/pagination-next' },
 ];
 
+/**
+ * Count the published posts the loop query will see.
+ *
+ * @param {Object} requestUtils - REST utils.
+ * @return {Promise<number>} number of published posts.
+ */
+async function getPublishedPostCount(requestUtils) {
+	const posts = await requestUtils.rest({
+		path: '/wp/v2/posts',
+		params: { per_page: 100, status: 'publish' },
+	});
+
+	return posts.length;
+}
+
 test.describe('Gallery Loop blocks', () => {
+	// Resetting posts globally is `global-setup.js`'s job, so this spec works
+	// with whatever else is published and cleans up only what it created.
+	let createdPostIds = [];
+	let totalPosts = 0;
+	let expectedPages = 0;
+
 	test.beforeAll(async ({ requestUtils }) => {
 		await requestUtils.activatePlugin(getPluginSlug());
-		await requestUtils.deleteAllPosts();
 
-		await createRegularPosts({
+		createdPostIds = await createRegularPosts({
 			requestUtils,
 			count: POSTS_COUNT,
 			categories: CATEGORIES,
 		});
+
+		totalPosts = await getPublishedPostCount(requestUtils);
+		expectedPages = Math.ceil(totalPosts / PER_PAGE);
 	});
 
 	test.afterAll(async ({ requestUtils }) => {
-		await Promise.all([
-			requestUtils.deleteAllPages(),
-			requestUtils.deleteAllPosts(),
-		]);
+		await requestUtils.deleteAllPages();
+
+		await Promise.all(
+			createdPostIds.map((id) =>
+				requestUtils.rest({
+					path: `/wp/v2/posts/${id}`,
+					method: 'DELETE',
+					params: { force: true },
+				})
+			)
+		);
 	});
 
 	test('filter items are fetched when the loop is inserted', async ({
@@ -85,13 +115,15 @@ test.describe('Gallery Loop blocks', () => {
 
 		await editor.insertBlock(getLoopBlock(PAGED_PAGINATION));
 
-		// The filter block asks the REST API for the terms behind the query, so
-		// a freshly inserted loop must end up with more than just the "All" item.
+		// The filter block asks the REST API for the terms behind the query, so a
+		// freshly inserted loop must end up with more than just the "All" item.
+		// Other posts on the site may contribute terms too, so this checks that
+		// the categories are there rather than an exact total.
 		await expect
-			.poll(async () => getFilterItemCount(await editor.getBlocks()), {
+			.poll(async () => getFilterItemLabels(await editor.getBlocks()), {
 				timeout: 20000,
 			})
-			.toBe(CATEGORIES.length + 1);
+			.toEqual(expect.arrayContaining(['All', ...CATEGORIES]));
 	});
 
 	test('category links point at the published page and filter its items', async ({
@@ -158,7 +190,6 @@ test.describe('Gallery Loop blocks', () => {
 
 		const frontend = await openPublishedPage(page);
 
-		const expectedPages = Math.ceil(POSTS_COUNT / PER_PAGE);
 		const numbers = frontend.locator('.vp-block-pagination-numbers > *');
 
 		await expect(numbers.first()).toBeVisible();
@@ -214,13 +245,11 @@ test.describe('Gallery Loop blocks', () => {
 		await expect(loadMore).toHaveCount(1);
 		await expect(items).toHaveCount(PER_PAGE);
 
-		const clicks = Math.ceil(POSTS_COUNT / PER_PAGE) - 1;
-
-		for (let i = 1; i <= clicks; i++) {
+		for (let i = 1; i <= expectedPages - 1; i++) {
 			await loadMore.click();
 
 			await expect(items).toHaveCount(
-				Math.min(POSTS_COUNT, PER_PAGE * (i + 1))
+				Math.min(totalPosts, PER_PAGE * (i + 1))
 			);
 		}
 
@@ -248,31 +277,33 @@ test.describe('Gallery Loop blocks', () => {
 		const publishedUrl = frontend.url();
 
 		const numbers = frontend.locator('.vp-block-pagination-numbers > *');
-		await expect(numbers).toHaveCount(Math.ceil(POSTS_COUNT / PER_PAGE));
+		await expect(numbers).toHaveCount(expectedPages);
 
 		// Publishing more posts must add a page, even though the page itself was
 		// not touched - the count is calculated per request, not stored.
-		await createRegularPosts({ requestUtils, count: PER_PAGE });
+		const extraIds = await createRegularPosts({
+			requestUtils,
+			count: PER_PAGE,
+		});
+		createdPostIds = createdPostIds.concat(extraIds);
 
 		await frontend.goto(publishedUrl);
 
-		await expect(numbers).toHaveCount(
-			Math.ceil((POSTS_COUNT + PER_PAGE) / PER_PAGE)
-		);
+		await expect(numbers).toHaveCount(expectedPages + 1);
 	});
 });
 
 /**
- * Count the filter items inside the inserted loop block.
+ * Read the filter item labels inside the inserted loop block.
  *
  * @param {Array} blocks - editor blocks.
- * @return {number} number of filter items.
+ * @return {string[]} filter item labels.
  */
-function getFilterItemCount(blocks) {
+function getFilterItemLabels(blocks) {
 	const loop = blocks.find((block) => 'visual-portfolio/loop' === block.name);
 	const filter = loop?.innerBlocks?.find(
 		(block) => 'visual-portfolio/filter-by-category' === block.name
 	);
 
-	return filter?.innerBlocks?.length ?? 0;
+	return (filter?.innerBlocks ?? []).map((block) => block.attributes.text);
 }

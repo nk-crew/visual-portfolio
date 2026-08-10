@@ -226,7 +226,14 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		// Sources that are not filterable have no terms to offer, but they are
 		// not an error - the block simply shows the "All" item.
 		if ( ! isset( $source_configs[ $content_source ] ) ) {
-			return $this->success( array( $this->get_all_filter_item( $post_id ) ) );
+			return $this->success(
+				array(
+					$this->get_all_filter_item(
+						$post_id,
+						! Visual_Portfolio_Get::get_filter_active_item( array() )
+					),
+				)
+			);
 		}
 
 		// Filter and add only relevant parameters.

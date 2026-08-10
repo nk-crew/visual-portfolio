@@ -90,6 +90,13 @@ export default function BlockEdit({
 	const { getBlocks } = useSelect(blockEditorStore);
 	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
 
+	// This block does not use the `url` the endpoint returns - it is rebuilt at
+	// render time - but the endpoint is public and needs the post to build it.
+	const postId = useSelect(
+		(select) => select('core/editor')?.getCurrentPostId(),
+		[]
+	);
+
 	const queryKey = JSON.stringify({
 		queryType,
 		source: postsQuery?.source,
@@ -121,6 +128,7 @@ export default function BlockEdit({
 				baseQuery,
 				postsQuery,
 				imagesQuery,
+				post_id: postId,
 				block_id: clientId,
 			},
 		})
@@ -143,6 +151,13 @@ export default function BlockEdit({
 					);
 
 					if (!item) {
+						// Opening a post must not delete what it already
+						// carries: an item the query no longer returns may be
+						// hand-made, and its `lock` forbids removing it by hand.
+						if (structureOnly) {
+							updatedBlocks.push(block);
+						}
+
 						return;
 					}
 
@@ -180,8 +195,6 @@ export default function BlockEdit({
 					);
 				});
 
-				syncedQueryRef.current = queryKey;
-
 				// Untouched items are returned by identity, so this also tells
 				// us whether anything is worth writing to the editor store.
 				const isUnchanged =
@@ -199,9 +212,15 @@ export default function BlockEdit({
 				console.error('Error fetching filter items:', error);
 			})
 			.finally(() => {
-				if (!cancelled) {
-					setIsLoading(false);
+				if (cancelled) {
+					return;
 				}
+
+				// Marked even when the request failed, so a single failure does
+				// not pin every later sync to the first-sync behaviour.
+				syncedQueryRef.current = queryKey;
+
+				setIsLoading(false);
 			});
 
 		return () => {
@@ -213,6 +232,7 @@ export default function BlockEdit({
 		baseQuery,
 		postsQuery,
 		imagesQuery,
+		postId,
 		clientId,
 		getBlocks,
 		replaceInnerBlocks,

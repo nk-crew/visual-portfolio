@@ -2211,7 +2211,7 @@ class Visual_Portfolio_Get {
 	 * @return array sort slug => label.
 	 */
 	public static function get_sort_items( $vp_options = array() ) {
-		return apply_filters(
+		$items = apply_filters(
 			'vpf_extend_sort_items',
 			array(
 				''           => __( 'Default sorting', 'visual-portfolio' ),
@@ -2221,6 +2221,16 @@ class Visual_Portfolio_Get {
 				'title_desc' => __( 'Sort by title (Z-A)', 'visual-portfolio' ),
 			),
 			$vp_options
+		);
+
+		// This filter used to receive escaped labels, so callbacks written
+		// against that may return escaped ones. Decoding keeps a single level of
+		// escaping either way, since every caller escapes on output.
+		return array_map(
+			function ( $label ) {
+				return is_string( $label ) ? html_entity_decode( $label, ENT_QUOTES, get_bloginfo( 'charset' ) ) : $label;
+			},
+			$items
 		);
 	}
 

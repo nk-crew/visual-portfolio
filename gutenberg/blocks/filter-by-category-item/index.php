@@ -55,8 +55,11 @@ class Visual_Portfolio_Block_Filter_By_Category_Item {
 
 		$taxonomy_id = isset( $attributes['taxonomyId'] ) ? (int) $attributes['taxonomyId'] : 0;
 
-		if ( 'posts' === $query_type && $taxonomy_id ) {
-			$term = get_term( $taxonomy_id );
+		// Posts are filtered by `taxonomy:slug`. A bare slug is silently ignored
+		// by the query, so an item without a resolvable term renders nothing
+		// rather than a link that looks like a filter and does not filter.
+		if ( 'posts' === $query_type ) {
+			$term = $taxonomy_id ? get_term( $taxonomy_id ) : false;
 
 			if ( ! $term || is_wp_error( $term ) ) {
 				return false;

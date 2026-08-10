@@ -45,25 +45,32 @@ const infiniteObserver = new window.IntersectionObserver(
 				return;
 			}
 
-			// The trigger is replaced with a fresh one after each load.
-			if (!target.isConnected) {
-				observer.unobserve(target);
-				return;
+			// Contained per entry, so one failing trigger does not stop the
+			// other loops reported in the same batch.
+			try {
+				// The trigger is replaced with a fresh one after each load.
+				if (!target.isConnected) {
+					observer.unobserve(target);
+					return;
+				}
+
+				const href = target.getAttribute('href');
+
+				// Nothing left to load.
+				if (!href) {
+					observer.unobserve(target);
+					return;
+				}
+
+				if (!entry.isIntersecting) {
+					return;
+				}
+
+				getLoopGallery(target)?.loadNewItems(href, false);
+			} catch (error) {
+				// eslint-disable-next-line no-console -- we have to log errors.
+				console.error(error);
 			}
-
-			const href = target.getAttribute('href');
-
-			// Nothing left to load.
-			if (!href) {
-				observer.unobserve(target);
-				return;
-			}
-
-			if (!entry.isIntersecting) {
-				return;
-			}
-
-			getLoopGallery(target)?.loadNewItems(href, false);
 		});
 	},
 	{ rootMargin: '300px 0px' }

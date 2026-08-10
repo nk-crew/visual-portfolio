@@ -976,25 +976,23 @@ class Visual_Portfolio_Assets {
 	/**
 	 * Enqueue assets used by a Gallery Loop block.
 	 *
-	 * A gallery inside a loop takes its content source from the loop context, so
-	 * its own attributes are not enough to resolve which assets it needs.
+	 * A gallery inside a loop has no `content_source` of its own - it comes from
+	 * the loop context at render time - so it is skipped by the check in
+	 * `maybe_parse_blocks_from_content()` and has to be picked up here.
+	 *
+	 * The loop query itself is not needed: `enqueue()` resolves assets from the
+	 * layout, skin, pagination, filter and click action, all of which live on the
+	 * gallery block.
 	 *
 	 * @param array $block - loop block data.
 	 */
 	private static function enqueue_loop_block( $block ) {
-		$loop_options = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $block['attrs'] ?? array(), true );
-
-		if ( empty( $loop_options ) ) {
-			return;
-		}
-
 		foreach ( self::find_gallery_blocks( $block['innerBlocks'] ?? array() ) as $gallery ) {
 			if ( ! isset( $gallery['attrs']['block_id'] ) ) {
 				continue;
 			}
 
-			// The loop query wins over whatever the gallery was configured with.
-			self::enqueue( array_merge( $gallery['attrs'], $loop_options ) );
+			self::enqueue( $gallery['attrs'] );
 		}
 	}
 
