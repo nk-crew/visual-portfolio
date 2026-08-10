@@ -14,6 +14,24 @@ export async function openPublishedPage(page, options = {}) {
 		.locator('.components-button', { hasText: 'View Page' })
 		.first();
 
+	// The post-publish panel can be dismissed by the time we get here, and the
+	// snackbar goes away on its own. Navigating to the permalink is equivalent.
+	if (!(await viewButton.isVisible())) {
+		const permalink = await page.evaluate(
+			() => window.wp?.data?.select('core/editor')?.getPermalink() || ''
+		);
+
+		if (!permalink) {
+			throw new Error(
+				'Could not find the published page: no "View Page" button and no permalink.'
+			);
+		}
+
+		await page.goto(permalink, { waitUntil: 'domcontentloaded' });
+
+		return page;
+	}
+
 	const popupPromise = page
 		.waitForEvent('popup', { timeout })
 		.catch(() => null);
