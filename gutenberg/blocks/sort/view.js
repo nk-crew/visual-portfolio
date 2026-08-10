@@ -1,12 +1,12 @@
 import $ from 'jquery';
 
+import { getLoopGallery } from '../../utils/loop-gallery';
+
 const $doc = $(document);
 
 $doc.on('change', '.vp-block-sort select', (e) => {
 	const $current = $(e.currentTarget);
-	const $loop = $current.closest('.vp-block-loop');
-	const $legacyBlock = $loop.find('.vp-portfolio');
-	const vpf = $legacyBlock?.[0]?.vpf;
+	const vpf = getLoopGallery(e.currentTarget);
 
 	if (!vpf) {
 		return;

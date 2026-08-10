@@ -84,8 +84,8 @@ class Visual_Portfolio_Block_Filter_By_Category_Item {
 		$is_all = '*' === $filter;
 		$text   = $attributes['text'] ?? '';
 
-		// Get showCount from parent block context. The parent also provides it
-		// under its old, longer key, which is deprecated but still consumable.
+		// Get showCount from parent block context. The parent still provides it
+		// under its old, longer key too, for blocks that consume that one.
 		$show_count = ! empty( $block->context['vp/showCount'] );
 
 		// The filter value and URL are resolved on every request, since the

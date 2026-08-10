@@ -125,6 +125,9 @@ export default function BlockEdit(props) {
 			return undefined;
 		}
 
+		// `clearTimeout` only stops a request that has not gone out yet.
+		let cancelled = false;
+
 		// Settings are usually changed in bursts - only ask once they settle.
 		const timeout = setTimeout(() => {
 			apiFetch({
@@ -136,6 +139,7 @@ export default function BlockEdit(props) {
 					const maxPages = parseInt(response?.max_pages, 10);
 
 					if (
+						cancelled ||
 						!maxPages ||
 						maxPages === baseQueryRef.current?.maxPages
 					) {
@@ -155,7 +159,10 @@ export default function BlockEdit(props) {
 				});
 		}, 500);
 
-		return () => clearTimeout(timeout);
+		return () => {
+			cancelled = true;
+			clearTimeout(timeout);
+		};
 	}, [queryKey, setAttributes]);
 
 	useEffect(() => {

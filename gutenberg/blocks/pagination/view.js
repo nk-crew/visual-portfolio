@@ -1,22 +1,11 @@
 import $ from 'jquery';
 import { throttle } from 'lodash';
 
+import { getLoopGallery } from '../../utils/loop-gallery';
+
 const $doc = $(document);
 
 const INFINITE_SELECTOR = '.vp-block-pagination-infinite';
-
-/**
- * Get the gallery instance the given loop control belongs to.
- *
- * @param {Element} element - control inside `.vp-block-loop`.
- * @return {Object|undefined} gallery instance.
- */
-function getLoopGallery(element) {
-	const loop = element.closest('.vp-block-loop');
-	const legacyBlock = loop?.querySelector('.vp-portfolio');
-
-	return legacyBlock?.vpf;
-}
 
 $doc.on(
 	'click',
