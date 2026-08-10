@@ -5,6 +5,10 @@
  * @package visual-portfolio
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Visual_Portfolio_Control_Condition_Check
  */

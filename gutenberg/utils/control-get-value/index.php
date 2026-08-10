@@ -1,9 +1,13 @@
 <?php
 /**
- * Control condition check.
+ * Get control value from block attributes.
  *
  * @package visual-portfolio
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Visual_Portfolio_Control_Get_Value
