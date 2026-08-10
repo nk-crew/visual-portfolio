@@ -5,6 +5,10 @@
  * @package visual-portfolio
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Visual_Portfolio_Controls_Dynamic_CSS
  */
