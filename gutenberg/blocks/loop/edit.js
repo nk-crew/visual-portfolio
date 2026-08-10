@@ -7,13 +7,15 @@ import {
 import { useEffect, useRef } from '@wordpress/element';
 
 import ControlsRender from '../../components/controls-render';
+import { LOOP_GENERAL_CONTROLS, pickControls } from '../../utils/loop-controls';
 
 const {
 	plugin_url: pluginUrl,
 	controls_categories: registeredControlsCategories,
 } = window.VPGutenbergVariables;
 
-// Content source categories to display
+// Content source categories to display. Anything outside this list belongs to
+// the gallery block inside the loop, which is what renders it.
 const ALLOWED_CONTROL_CATEGORIES = [
 	'content-source',
 	'content-source-general',
@@ -21,20 +23,37 @@ const ALLOWED_CONTROL_CATEGORIES = [
 	'content-source-post-based',
 	'content-source-taxonomies',
 	'content-source-social-stream',
-	'custom_css',
 ];
 
-function filterControlCategories(categories) {
-	return Object.fromEntries(
-		Object.entries(categories).filter(([key]) =>
-			ALLOWED_CONTROL_CATEGORIES.includes(key)
-		)
-	);
-}
+const TEMPLATE = [
+	[
+		'visual-portfolio/filter-by-category',
+		{},
+		// A placeholder until the filter block has fetched its items. It carries
+		// the default `filter` of `*`, so the fetched "All" item reuses it.
+		[
+			[
+				'visual-portfolio/filter-by-category-item',
+				{ text: 'All', isAll: true },
+			],
+		],
+	],
+	['visual-portfolio/block', { setup_wizard: 'false' }],
+	[
+		'visual-portfolio/pagination',
+		{},
+		[
+			['visual-portfolio/pagination-previous'],
+			['visual-portfolio/pagination-numbers'],
+			['visual-portfolio/pagination-next'],
+		],
+	],
+];
 
 function renderControls(props) {
-	const { attributes } = props;
-	const { queryType } = attributes;
+	const categories = Object.keys(registeredControlsCategories).filter(
+		(name) => ALLOWED_CONTROL_CATEGORIES.includes(name)
+	);
 
 	return (
 		<>
@@ -44,30 +63,25 @@ function renderControls(props) {
 				{...props}
 			/>
 
-			{queryType &&
-				Object.keys(
-					filterControlCategories(registeredControlsCategories)
-				)
-					.filter((name) => name !== 'content-source')
-					.map((name) => (
-						<ControlsRender
-							isModernBlock
-							key={name}
-							category={name}
-							{...props}
-						/>
-					))}
+			{categories
+				.filter((name) => name !== 'content-source')
+				.map((name) => (
+					<ControlsRender
+						isModernBlock
+						key={name}
+						category={name}
+						// Only some of the general settings are query settings,
+						// the rest are no-ops on this block.
+						controls={
+							'content-source-general' === name
+								? pickControls(LOOP_GENERAL_CONTROLS)
+								: undefined
+						}
+						{...props}
+					/>
+				))}
 		</>
 	);
-}
-
-// Debounce function to prevent too many API calls
-function debounce(func, wait) {
-	let timeout;
-	return (...args) => {
-		clearTimeout(timeout);
-		timeout = setTimeout(() => func(...args), wait);
-	};
 }
 
 /**
@@ -75,117 +89,121 @@ function debounce(func, wait) {
  * @param props
  */
 export default function BlockEdit(props) {
-	const { attributes, clientId, setAttributes } = props;
+	const { attributes, setAttributes } = props;
 
 	const {
 		layout,
 		queryType,
 		baseQuery,
+		postsQuery,
 		imagesQuery,
 		preview_image_example: previewExample,
 	} = attributes;
 
-	// Create a ref to track previous attribute values
-	const prevAttributesRef = useRef({});
+	// Read when a request resolves, so the pending value is never stale.
+	const baseQueryRef = useRef(baseQuery);
 
-	// Function to update maxPages via REST API
-	const updateMaxPages = debounce(async () => {
-		if (!queryType || !baseQuery.perPage) {
-			return;
+	useEffect(() => {
+		baseQueryRef.current = baseQuery;
+	}, [baseQuery]);
+
+	// Everything the endpoint needs, and the only thing that should trigger it.
+	// `maxPages` is deliberately left out - it is what the request writes back.
+	const queryKey = JSON.stringify({
+		queryType,
+		baseQuery: { perPage: baseQuery?.perPage },
+		postsQuery,
+		imagesQuery,
+	});
+
+	// `maxPages` drives the editor preview of the pagination blocks. The front
+	// end recalculates it per request, since saved content goes stale.
+	useEffect(() => {
+		const query = JSON.parse(queryKey);
+
+		if (!query.queryType || !query.baseQuery.perPage) {
+			return undefined;
 		}
 
-		try {
-			// Create a data object instead of query params
-			const requestData = {};
-
-			// Add all attributes to the request data
-			Object.entries(attributes).forEach(([key, value]) => {
-				if (value !== null) {
-					requestData[key] = value;
-				}
-			});
-
-			// Add block ID
-			requestData.block_id = clientId;
-
-			// Make API request with data in the body
-			const response = await apiFetch({
-				path: '/visual-portfolio/v1/get-max-pages/',
+		// Settings are usually changed in bursts - only ask once they settle.
+		const timeout = setTimeout(() => {
+			apiFetch({
+				path: '/visual-portfolio/v1/get_max_pages/',
 				method: 'POST',
-				data: requestData, // Send data in request body instead of URL
-			});
+				data: query,
+			})
+				.then((response) => {
+					const maxPages = parseInt(response?.max_pages, 10);
 
-			// Update maxPages attribute if available in response
-			if (response?.max_pages !== undefined) {
-				setAttributes({
-					baseQuery: {
-						...baseQuery,
-						maxPages: parseInt(response.max_pages, 10),
-					},
+					if (
+						!maxPages ||
+						maxPages === baseQueryRef.current?.maxPages
+					) {
+						return;
+					}
+
+					setAttributes({
+						baseQuery: {
+							...baseQueryRef.current,
+							maxPages,
+						},
+					});
+				})
+				.catch((error) => {
+					// eslint-disable-next-line no-console
+					console.error('Error fetching max pages:', error);
 				});
-			}
-		} catch (error) {
-			// eslint-disable-next-line no-console
-			console.error('Error fetching max pages:', error);
-		}
-	}, 500);
+		}, 500);
 
-	// Update maxPages when relevant attributes change
+		return () => clearTimeout(timeout);
+	}, [queryKey, setAttributes]);
+
 	useEffect(() => {
-		if (!queryType || !baseQuery.perPage) {
+		if ('images' !== queryType || !Array.isArray(imagesQuery.images)) {
 			return;
 		}
 
-		// Compare with previous values to avoid unnecessary API calls
-		const prevAttrs = prevAttributesRef.current;
-		const hasChanged = Object.keys(attributes).some(
-			(key) =>
-				JSON.stringify(prevAttrs[key]) !==
-				JSON.stringify(attributes[key])
-		);
+		// Extract all categories from images
+		const newCategories = new Set();
 
-		if (hasChanged) {
-			updateMaxPages();
-			prevAttributesRef.current = { ...attributes };
-		}
-	}, [attributes, queryType, baseQuery.perPage, updateMaxPages]);
-
-	useEffect(() => {
-		if (queryType === 'images' && Array.isArray(imagesQuery.images)) {
-			// Extract all categories from images
-			const newCategories = new Set();
-
-			imagesQuery.images.forEach((image) => {
-				if (image.categories && Array.isArray(image.categories)) {
-					image.categories.forEach((category) => {
-						newCategories.add(category);
-					});
-				}
-			});
-
-			// Convert Set to Array
-			const newCategoriesArray = Array.from(newCategories);
-
-			// Check if the new categories are different from the current ones
-			const currentCategories = imagesQuery.categories || [];
-			const categoriesChanged =
-				JSON.stringify(currentCategories) !==
-				JSON.stringify(newCategoriesArray);
-
-			// Update the imagesQuery.categories attribute if there are changes
-			if (categoriesChanged) {
-				setAttributes({
-					imagesQuery: {
-						...imagesQuery,
-						categories: newCategoriesArray,
-					},
+		imagesQuery.images.forEach((image) => {
+			if (image.categories && Array.isArray(image.categories)) {
+				image.categories.forEach((category) => {
+					newCategories.add(category);
 				});
 			}
+		});
+
+		// Convert Set to Array
+		const newCategoriesArray = Array.from(newCategories);
+
+		// Check if the new categories are different from the current ones
+		const currentCategories = imagesQuery.categories || [];
+		const categoriesChanged =
+			JSON.stringify(currentCategories) !==
+			JSON.stringify(newCategoriesArray);
+
+		// Update the imagesQuery.categories attribute if there are changes
+		if (categoriesChanged) {
+			setAttributes({
+				imagesQuery: {
+					...imagesQuery,
+					categories: newCategoriesArray,
+				},
+			});
 		}
 	}, [queryType, setAttributes, imagesQuery]);
 
-	// Display block preview if needed
-	if (previewExample === 'true') {
+	const blockProps = useBlockProps({ className: 'vp-block-loop' });
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			template: TEMPLATE,
+		}
+	);
+
+	// Display block preview if needed.
+	if ('true' === previewExample) {
 		return (
 			<div className="vpf-example-preview">
 				<img
@@ -195,41 +213,6 @@ export default function BlockEdit(props) {
 			</div>
 		);
 	}
-
-	// Set up block props
-	const blockProps = useBlockProps({ className: 'vp-block-loop' });
-	const innerBlocksProps = useInnerBlocksProps(
-		{},
-		{
-			template: [
-				[
-					'visual-portfolio/filter-by-category',
-					{},
-					[
-						[
-							'visual-portfolio/filter-by-category-item',
-							{
-								text: 'All',
-								isAll: true,
-								url: '#',
-								isActive: true,
-							},
-						],
-					],
-				],
-				['visual-portfolio/block', { setup_wizard: 'false' }],
-				[
-					'visual-portfolio/pagination',
-					{},
-					[
-						['visual-portfolio/pagination-previous'],
-						['visual-portfolio/pagination-numbers'],
-						['visual-portfolio/pagination-next'],
-					],
-				],
-			],
-		}
-	);
 
 	return (
 		<div {...blockProps}>
