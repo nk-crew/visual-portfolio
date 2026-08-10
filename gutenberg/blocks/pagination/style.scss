@@ -40,8 +40,13 @@
 
 // Fill style.
 .vp-block-pagination.is-style-fill {
+	// Every button-like trigger gets the same pill, including Load More and the
+	// Infinite trigger - without them the style did nothing at all on a loop
+	// that uses one of those instead of paged links.
 	.vp-block-pagination-next,
-	.vp-block-pagination-previous {
+	.vp-block-pagination-previous,
+	.vp-block-pagination-load-more,
+	.vp-block-pagination-infinite {
 		border-radius: 9999px;
 		padding: 0.3em 0.8em;
 		background-color: color-mix(in srgb, currentColor 7%, transparent);

@@ -32,14 +32,16 @@ function getItemKey(item) {
 /**
  * Attributes this block owns and keeps in sync with the query.
  *
- * On the first sync only the structure is refreshed, so that opening a post
- * does not silently rewrite labels and counts the user may have edited.
- *
- * @param {Object}  item          - filter item from the REST response.
- * @param {boolean} structureOnly - skip the display data.
+ * @param {Object}  item                  - filter item from the REST response.
+ * @param {Object}  [options]             - sync options.
+ * @param {boolean} [options.structureOnly] - first sync of already saved items.
+ * @param {Object}  [options.current]     - attributes the item already has.
  * @return {Object} block attributes.
  */
-function getItemAttributes(item, structureOnly) {
+function getItemAttributes(
+	item,
+	{ structureOnly = false, current = null } = {}
+) {
 	const isAll = '*' === item.filter;
 
 	const attributes = {
@@ -49,8 +51,15 @@ function getItemAttributes(item, structureOnly) {
 		parentId: item.parent,
 	};
 
+	// The label can be edited by hand, so the first sync leaves it as saved.
 	if (!structureOnly) {
 		attributes.text = isAll ? __('All', 'visual-portfolio') : item.label;
+	}
+
+	// Counts are server data, but rewriting a count that merely drifted would
+	// mark the post as modified just from opening it. A missing count is filled
+	// in regardless, otherwise "Display Count" has nothing to show.
+	if (!structureOnly || !current?.count) {
 		attributes.count = item.count || 0;
 	}
 
@@ -139,10 +148,10 @@ export default function BlockEdit({
 
 					matched.add(key);
 
-					const newAttributes = getItemAttributes(
-						item,
-						structureOnly
-					);
+					const newAttributes = getItemAttributes(item, {
+						structureOnly,
+						current: block.attributes,
+					});
 					const hasChanges = Object.keys(newAttributes).some(
 						(name) => block.attributes[name] !== newAttributes[name]
 					);
@@ -167,7 +176,7 @@ export default function BlockEdit({
 					}
 
 					updatedBlocks.push(
-						createBlock(ITEM_BLOCK, getItemAttributes(item, false))
+						createBlock(ITEM_BLOCK, getItemAttributes(item))
 					);
 				});
 

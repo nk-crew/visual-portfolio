@@ -59,10 +59,13 @@ class IframePreview extends Component {
 		this.maybeAttributesChanged = this.maybeAttributesChanged.bind(this);
 		this.onFrameLoad = this.onFrameLoad.bind(this);
 		this.maybeReload = this.maybeReload.bind(this);
-		this.maybeReloadDebounce = debounce(
-			300,
-			rafSchd(this.maybeReload.bind(this))
-		);
+		// No `rafSchd` here. Reloading only sets state and submits a form, so it
+		// has nothing to coalesce into a frame that `debounce` does not already
+		// coalesce - and `raf-schd` keeps its pending frame id until the frame
+		// runs, so one frame that never comes (a hidden editor canvas, a
+		// backgrounded tab that gets discarded) silently stops every later
+		// reload for the rest of the session.
+		this.maybeReloadDebounce = debounce(300, this.maybeReload.bind(this));
 		this.maybeResizePreviews = this.maybeResizePreviews.bind(this);
 		this.maybeResizePreviewsThrottle = throttle(
 			100,
