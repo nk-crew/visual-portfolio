@@ -1178,9 +1178,64 @@ class Visual_Portfolio_Get {
 	 *
 	 * @return int
 	 */
-	private static function get_current_page_number() {
+	public static function get_current_page_number() {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.NonceVerification
 		return max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
+	}
+
+	/**
+	 * Calculate how many pages the given query produces.
+	 *
+	 * The active filter is taken from the request by `get_query_params()`, so
+	 * the result already accounts for `?vp_filter`.
+	 *
+	 * @param array $options - block options in the legacy format.
+	 *
+	 * @return int
+	 */
+	public static function calculate_max_pages( $options ) {
+		$options = Visual_Portfolio_Security::validate_calculate_max_pages_params( $options );
+
+		$content_source = $options['content_source'] ?? '';
+
+		// `get_query_params()` expects a populated set of options, and there is
+		// nothing to count without a source anyway.
+		if ( ! $content_source ) {
+			return 1;
+		}
+
+		$items_count = (int) ( $options['items_count'] ?? 0 );
+
+		// A count of `0` divides by zero further down. A negative count means
+		// "all items" and is handled by `get_query_params()`.
+		if ( 0 === $items_count ) {
+			$items_count = 6;
+		}
+
+		$options['items_count'] = $items_count;
+
+		$query_opts = self::get_query_params( $options, false );
+
+		if ( isset( $query_opts['max_num_pages'] ) ) {
+			return max( 1, (int) $query_opts['max_num_pages'] );
+		}
+
+		switch ( $content_source ) {
+			case 'post-based':
+				$query     = new WP_Query( $query_opts );
+				$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
+
+				return max( 1, (int) $max_pages );
+
+			case 'images':
+			case 'social-stream':
+				$images_count = count( $query_opts['images'] ?? array() );
+
+				return max( 1, (int) ceil( $images_count / $items_count ) );
+
+			default:
+				return 1;
+		}
 	}
 
 	/**
@@ -2136,6 +2191,62 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
+	 * Get current sort slug
+	 * ?vp_sort=date_desc
+	 *
+	 * @return string
+	 */
+	public static function get_current_sort() {
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification
+		return isset( $_GET['vp_sort'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) ) : '';
+	}
+
+	/**
+	 * Get available sort items.
+	 *
+	 * Labels are not escaped, escape them on output.
+	 *
+	 * @param array $vp_options current vp_list options.
+	 *
+	 * @return array sort slug => label.
+	 */
+	public static function get_sort_items( $vp_options = array() ) {
+		return apply_filters(
+			'vpf_extend_sort_items',
+			array(
+				''           => __( 'Default sorting', 'visual-portfolio' ),
+				'date_desc'  => __( 'Sort by date (newest)', 'visual-portfolio' ),
+				'date'       => __( 'Sort by date (oldest)', 'visual-portfolio' ),
+				'title'      => __( 'Sort by title (A-Z)', 'visual-portfolio' ),
+				'title_desc' => __( 'Sort by title (Z-A)', 'visual-portfolio' ),
+			),
+			$vp_options
+		);
+	}
+
+	/**
+	 * Get URL of the given sort item.
+	 *
+	 * @param string $slug sort slug.
+	 * @param array  $vp_options current vp_list options.
+	 *
+	 * @return string
+	 */
+	public static function get_sort_item_url( $slug, $vp_options = array() ) {
+		return apply_filters(
+			'vpf_extend_sort_item_url',
+			self::get_pagenum_link(
+				array(
+					'vp_sort' => rawurlencode( $slug ),
+					'vp_page' => 1,
+				)
+			),
+			$slug,
+			$vp_options
+		);
+	}
+
+	/**
 	 * Print sort
 	 *
 	 * @param array $vp_options current vp_list options.
@@ -2148,38 +2259,12 @@ class Visual_Portfolio_Get {
 		$terms = array();
 
 		// Get active item.
-		$active_item = false;
+		$active_item = self::get_current_sort();
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( isset( $_GET['vp_sort'] ) ) {
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
-		}
-
-		$sort_items = apply_filters(
-			'vpf_extend_sort_items',
-			array(
-				''           => esc_html__( 'Default sorting', 'visual-portfolio' ),
-				'date_desc'  => esc_html__( 'Sort by date (newest)', 'visual-portfolio' ),
-				'date'       => esc_html__( 'Sort by date (oldest)', 'visual-portfolio' ),
-				'title'      => esc_html__( 'Sort by title (A-Z)', 'visual-portfolio' ),
-				'title_desc' => esc_html__( 'Sort by title (Z-A)', 'visual-portfolio' ),
-			),
-			$vp_options
-		);
+		$sort_items = self::get_sort_items( $vp_options );
 
 		foreach ( $sort_items as $slug => $label ) {
-			$url = apply_filters(
-				'vpf_extend_sort_item_url',
-				self::get_pagenum_link(
-					array(
-						'vp_sort' => rawurlencode( $slug ),
-						'vp_page' => 1,
-					)
-				),
-				$slug,
-				$vp_options
-			);
+			$url = self::get_sort_item_url( $slug, $vp_options );
 
 			$is_active = ! $active_item && ! $slug ? true : $active_item === $slug;
 

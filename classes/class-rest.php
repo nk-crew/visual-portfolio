@@ -84,15 +84,17 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			)
 		);
 
-		register_rest_route(
-			$namespace,
-			'/get-max-pages/',
-			array(
-				'methods'             => WP_REST_Server::READABLE . ', ' . WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'get_max_pages' ),
-				'permission_callback' => array( $this, 'get_max_pages_permission' ),
-			)
+		// Get max pages.
+		$max_pages_route = array(
+			'methods'             => array( WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ),
+			'callback'            => array( $this, 'get_max_pages' ),
+			'permission_callback' => array( $this, 'get_max_pages_permission' ),
 		);
+
+		register_rest_route( $namespace, '/get_max_pages/', $max_pages_route );
+
+		// Deprecated alias, the other routes in this namespace use snake_case.
+		register_rest_route( $namespace, '/get-max-pages/', $max_pages_route );
 	}
 
 	/**
@@ -105,64 +107,15 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	}
 
 	/**
-	 * Calculate max pages based on query attributes.
+	 * Calculate max pages based on modern query attributes.
 	 *
-	 * @param array $params Full query data.
+	 * @param array $params Full query data in the modern format.
 	 * @return int $max_pages Response max pages data.
 	 */
 	public function calculate_max_pages( $params ) {
-		// Convert modern params to legacy format.
-		$params = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params );
-
-		$params = Visual_Portfolio_Security::validate_calculate_max_pages_params( $params );
-
-		$content_source = $params['content_source'] ?? '';
-		$items_count    = (int) ( $params['items_count'] ?? 0 );
-
-		// Add filter from GET if not in params.
-		if ( empty( $params['vp_filter'] ) && ! empty( $_GET['vp_filter'] ) ) {
-			$params['vp_filter'] = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) );
-		}
-
-		// Decode JSON images if needed.
-		if ( 'images' === $content_source &&
-			is_string( $params['images'] ?? '' ) &&
-			0 === strpos( $params['images'], '[' ) ) {
-			$decoded = json_decode( $params['images'], true );
-			if ( JSON_ERROR_NONE === json_last_error() ) {
-				$params['images'] = $decoded;
-			}
-		}
-
-		// Get query options and calculate max pages.
-		$options = array_merge(
-			array(
-				'content_source' => $content_source,
-				'items_count'    => $items_count,
-			),
-			$params
+		return Visual_Portfolio_Get::calculate_max_pages(
+			Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params )
 		);
-
-		$query_opts = Visual_Portfolio_Get::get_query_params( $options, false );
-
-		if ( isset( $query_opts['max_num_pages'] ) ) {
-			return max( 1, $query_opts['max_num_pages'] );
-		}
-
-		switch ( $content_source ) {
-			case 'post-based':
-				$query     = new WP_Query( $query_opts );
-				$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
-				return max( 1, $max_pages );
-
-			case 'images':
-			case 'social-stream':
-				$images_count = count( $query_opts['images'] ?? array() );
-				return max( 1, ceil( $images_count / $items_count ) );
-
-			default:
-				return 1;
-		}
 	}
 
 	/**
@@ -194,6 +147,30 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	}
 
 	/**
+	 * Build the "All" filter item.
+	 *
+	 * @param int  $post_id - post the filter is displayed on.
+	 * @param bool $active - whether no filter is applied.
+	 *
+	 * @return array
+	 */
+	private function get_all_filter_item( $post_id, $active = true ) {
+		$url = get_permalink( $post_id );
+
+		return array(
+			'filter'      => '*',
+			'label'       => esc_html__( 'All', 'visual-portfolio' ),
+			'description' => '',
+			'count'       => false,
+			'active'      => $active,
+			'url'         => $url ? $url : home_url(),
+			'taxonomy'    => '',
+			'id'          => 0,
+			'parent'      => 0,
+		);
+	}
+
+	/**
 	 * Get filter items.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -213,7 +190,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 
 		$params         = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params );
 		$content_source = $params['content_source'] ?? false;
-		$post_id        = $request->get_param( 'post_id' );
+		$post_id        = absint( $request->get_param( 'post_id' ) );
 
 		if ( ! $content_source ) {
 			return $this->error(
@@ -223,42 +200,43 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		}
 
 		// Define allowed parameters for each content source.
-		$source_configs = array(
-			'post-based' => array(
-				'posts_source',
-				'post_types_set',
-				'posts_taxonomies',
-				'posts_taxonomies_relation',
-				'posts_order_by',
-				'posts_order_direction',
+		$source_configs = apply_filters(
+			'vpf_rest_filter_items_source_configs',
+			array(
+				'post-based' => array(
+					'posts_source',
+					'post_types_set',
+					'posts_taxonomies',
+					'posts_taxonomies_relation',
+					'posts_order_by',
+					'posts_order_direction',
+				),
+				'images' => array(
+					'images',
+					'images_titles_source',
+					'images_descriptions_source',
+					'images_order_by',
+					'images_order_direction',
+					'items_count',
+				),
 			),
-			'images' => array(
-				'images',
-				'images_titles_source',
-				'images_descriptions_source',
-				'images_order_by',
-				'images_order_direction',
-				'items_count',
-			),
+			$params
 		);
 
-		// Build options array.
-		$options = array(
-			'content_source' => $content_source,
-		);
-
-		if ( isset( $source_configs[ $content_source ] ) ) {
-			// Filter and add only relevant parameters.
-			$allowed_keys    = array_flip( $source_configs[ $content_source ] );
-			$filtered_params = array_intersect_key( $params, $allowed_keys );
-			$options         = array_merge( $options, $filtered_params );
-		} else {
-			return $this->error(
-				'invalid_content_source',
-				/* translators: %s: Invalid content source type */
-				sprintf( esc_html__( 'Invalid content source: %s', 'visual-portfolio' ), esc_html( $content_source ) )
-			);
+		// Sources that are not filterable have no terms to offer, but they are
+		// not an error - the block simply shows the "All" item.
+		if ( ! isset( $source_configs[ $content_source ] ) ) {
+			return $this->success( array( $this->get_all_filter_item( $post_id ) ) );
 		}
+
+		// Filter and add only relevant parameters.
+		$allowed_keys    = array_flip( $source_configs[ $content_source ] );
+		$filtered_params = array_intersect_key( $params, $allowed_keys );
+
+		$options = array_merge(
+			array( 'content_source' => $content_source ),
+			$filtered_params
+		);
 
 		// Get query parameters.
 		$query_opts = Visual_Portfolio_Get::get_query_params( $options, true );
@@ -302,17 +280,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		$response = array();
 
 		// Add 'All' item.
-		$response[] = array(
-			'filter'      => '*',
-			'label'       => esc_html__( 'All', 'visual-portfolio' ),
-			'description' => '',
-			'count'       => false,
-			'active'      => ! $active_item,
-			'url'         => $get_filter_url(),
-			'taxonomy'    => '',
-			'id'          => 0,
-			'parent'      => 0,
-		);
+		$response[] = $this->get_all_filter_item( $post_id, ! $active_item );
 
 		// Add term items.
 		if ( ! empty( $term_items['terms'] ) ) {
