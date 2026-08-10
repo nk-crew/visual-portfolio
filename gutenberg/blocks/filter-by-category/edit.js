@@ -10,7 +10,52 @@ import { PanelBody, Spinner, ToggleControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { isEqual } from 'lodash';
+
+const ITEM_BLOCK = 'visual-portfolio/filter-by-category-item';
+
+/**
+ * Identify a filter item.
+ *
+ * Term IDs are used where available and the filter slug otherwise, since image
+ * categories are not terms and all report ID 0. Matching on the slug alone
+ * would collide between two taxonomies sharing a slug.
+ *
+ * @param {Object} item - filter item from the REST response or block attributes.
+ * @return {string} unique key.
+ */
+function getItemKey(item) {
+	const id = item.id ?? item.taxonomyId ?? 0;
+
+	return `${id}:${item.filter}`;
+}
+
+/**
+ * Attributes this block owns and keeps in sync with the query.
+ *
+ * On the first sync only the structure is refreshed, so that opening a post
+ * does not silently rewrite labels and counts the user may have edited.
+ *
+ * @param {Object}  item          - filter item from the REST response.
+ * @param {boolean} structureOnly - skip the display data.
+ * @return {Object} block attributes.
+ */
+function getItemAttributes(item, structureOnly) {
+	const isAll = '*' === item.filter;
+
+	const attributes = {
+		filter: item.filter,
+		isAll,
+		taxonomyId: item.id,
+		parentId: item.parent,
+	};
+
+	if (!structureOnly) {
+		attributes.text = isAll ? __('All', 'visual-portfolio') : item.label;
+		attributes.count = item.count || 0;
+	}
+
+	return attributes;
+}
 
 export default function BlockEdit({
 	attributes,
@@ -18,9 +63,11 @@ export default function BlockEdit({
 	context,
 	clientId,
 }) {
-	const [isLoading, setIsLoading] = useState(true);
-	const previousContextRef = useRef(null);
-	const initialLoadDone = useRef(false);
+	const [isLoading, setIsLoading] = useState(false);
+
+	// Key of the query the current items were fetched for. Items live in the
+	// post content, so there is nothing to fetch until the query changes.
+	const syncedQueryRef = useRef(null);
 
 	const {
 		'vp/queryType': queryType,
@@ -29,196 +76,138 @@ export default function BlockEdit({
 		'vp/postsQuery': postsQuery,
 	} = context;
 
-	const images = imagesQuery.images;
-	const postsSource = postsQuery.source;
-	const postsTaxonomies = postsQuery.taxonomies;
+	// Selectors are read inside the effect: the items are driven by the query,
+	// and depending on the block list would re-run the effect on its own writes.
+	const { getBlocks } = useSelect(blockEditorStore);
+	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
 
-	const itemsCount = baseQuery?.perPage || 6;
-
-	const { currentBlocks, hasInnerBlocks, selectedBlockClientId, postId } =
-		useSelect(
-			(select) => ({
-				currentBlocks: select(blockEditorStore).getBlocks(clientId),
-				hasInnerBlocks:
-					select(blockEditorStore).getBlocks(clientId).length > 0,
-				selectedBlockClientId:
-					select(blockEditorStore).getSelectedBlockClientId(),
-				postId: select('core/editor')?.getCurrentPostId(),
-			}),
-			[clientId]
-		);
-
-	const { replaceInnerBlocks, selectBlock } = useDispatch(blockEditorStore);
+	const queryKey = JSON.stringify({
+		queryType,
+		source: postsQuery?.source,
+		taxonomies: postsQuery?.taxonomies,
+		images: imagesQuery?.images,
+	});
 
 	useEffect(() => {
-		const hasContextChanged = () => {
-			const currentContext = {
+		if (syncedQueryRef.current === queryKey) {
+			return undefined;
+		}
+
+		// Saved content already carries its items, so the first sync only fills
+		// in what is missing instead of rewriting what is there.
+		const structureOnly = null === syncedQueryRef.current;
+		const currentBlocks = getBlocks(clientId);
+
+		let cancelled = false;
+
+		if (!currentBlocks.length) {
+			setIsLoading(true);
+		}
+
+		apiFetch({
+			path: '/visual-portfolio/v1/get_filter_items/',
+			method: 'POST',
+			data: {
 				queryType,
+				baseQuery,
 				postsQuery,
 				imagesQuery,
-				postsSource,
-				postsTaxonomies,
-				images,
-				postId,
-			};
+				block_id: clientId,
+			},
+		})
+			.then((response) => {
+				if (cancelled || !response?.success) {
+					return;
+				}
 
-			if (!previousContextRef.current) {
-				previousContextRef.current = currentContext;
-				return true;
-			}
+				const items = response.response;
+				const matched = new Set();
 
-			const hasChanged = !isEqual(
-				previousContextRef.current,
-				currentContext
-			);
-			if (hasChanged) {
-				previousContextRef.current = currentContext;
-			}
+				// Keep the existing items in their current order, so manual
+				// reordering survives a refresh.
+				const updatedBlocks = [];
 
-			return hasChanged;
-		};
+				currentBlocks.forEach((block) => {
+					const key = getItemKey(block.attributes);
+					const item = items.find(
+						(candidate) => getItemKey(candidate) === key
+					);
 
-		const fetchFilterItems = async () => {
-			if (hasInnerBlocks && !initialLoadDone.current) {
-				initialLoadDone.current = true;
-				setIsLoading(false);
-				return;
-			}
+					if (!item) {
+						return;
+					}
 
-			if (!hasContextChanged() && hasInnerBlocks) {
-				setIsLoading(false);
-				return;
-			}
+					matched.add(key);
 
-			setIsLoading(true);
+					const newAttributes = getItemAttributes(
+						item,
+						structureOnly
+					);
+					const hasChanges = Object.keys(newAttributes).some(
+						(name) => block.attributes[name] !== newAttributes[name]
+					);
 
-			try {
-				const requestData = {
-					baseQuery,
-					imagesQuery,
-					post_id: postId,
-					postsQuery,
-					queryType,
-				};
-
-				// Add block ID
-				requestData.block_id = clientId;
-
-				// Make API request with data in the body
-				const response = await apiFetch({
-					path: '/visual-portfolio/v1/get_filter_items/',
-					method: 'POST',
-					data: requestData, // Send data in request body instead of URL
+					updatedBlocks.push(
+						hasChanges
+							? {
+									...block,
+									attributes: {
+										...block.attributes,
+										...newAttributes,
+									},
+								}
+							: block
+					);
 				});
 
-				if (response?.success) {
-					const updatedBlocks = [];
-					const processedFilters = new Set();
-
-					// First, maintain order of existing blocks and update their data
-					currentBlocks.forEach((block) => {
-						const filterValue = block.attributes.filter;
-						const newData = response.response.find(
-							(item) => item.filter === filterValue
-						);
-
-						if (newData) {
-							updatedBlocks.push({
-								...block,
-								attributes: {
-									...block.attributes,
-									text: newData.label,
-									filter: newData.filter,
-									url: newData.url,
-									taxonomyId: newData.id,
-									parentId: newData.parent,
-									isActive: newData.active,
-									count: newData.count || 0,
-								},
-							});
-							processedFilters.add(filterValue);
-						}
-					});
-
-					// Add new blocks that don't exist in current blocks
-					const newBlocks = response.response
-						.filter((item) => !processedFilters.has(item.filter))
-						.map((item) => {
-							const isAll = item.filter === '*';
-							return createBlock(
-								'visual-portfolio/filter-by-category-item',
-								{
-									text: isAll
-										? __('All', 'visual-portfolio')
-										: item.label,
-									filter: item.filter,
-									url: item.url,
-									taxonomyId: item.id,
-									parentId: item.parent,
-									isActive: item.active,
-									count: item.count || 0,
-								}
-							);
-						});
-
-					// Combine updated blocks with new ones
-					const finalBlocks = [...updatedBlocks, ...newBlocks];
-
-					// Store the current selection
-					const currentSelection = selectedBlockClientId;
-
-					// Update blocks
-					replaceInnerBlocks(clientId, finalBlocks, false);
-
-					// Restore the selection
-					if (currentSelection && currentSelection !== clientId) {
-						setTimeout(() => {
-							selectBlock(currentSelection);
-						}, 0);
+				// Append the items that are not in the block list yet.
+				items.forEach((item) => {
+					if (matched.has(getItemKey(item))) {
+						return;
 					}
+
+					updatedBlocks.push(
+						createBlock(ITEM_BLOCK, getItemAttributes(item, false))
+					);
+				});
+
+				syncedQueryRef.current = queryKey;
+
+				// Untouched items are returned by identity, so this also tells
+				// us whether anything is worth writing to the editor store.
+				const isUnchanged =
+					updatedBlocks.length === currentBlocks.length &&
+					updatedBlocks.every(
+						(block, index) => block === currentBlocks[index]
+					);
+
+				if (!isUnchanged) {
+					replaceInnerBlocks(clientId, updatedBlocks, false);
 				}
-			} catch (error) {
+			})
+			.catch((error) => {
 				// eslint-disable-next-line no-console
 				console.error('Error fetching filter items:', error);
-			}
+			})
+			.finally(() => {
+				if (!cancelled) {
+					setIsLoading(false);
+				}
+			});
 
-			setIsLoading(false);
+		return () => {
+			cancelled = true;
 		};
-
-		fetchFilterItems();
 	}, [
+		queryKey,
 		queryType,
-		postsSource,
-		postsTaxonomies,
-		images,
-		clientId,
-		hasInnerBlocks,
-		currentBlocks,
-		selectedBlockClientId,
-		replaceInnerBlocks,
-		selectBlock,
-		postId,
-		itemsCount,
-		attributes.showCount,
 		baseQuery,
-		imagesQuery,
 		postsQuery,
+		imagesQuery,
+		clientId,
+		getBlocks,
+		replaceInnerBlocks,
 	]);
-
-	useEffect(() => {
-		if (hasInnerBlocks && !isLoading) {
-			// Force re-render of inner blocks when showCount changes
-			const updatedBlocks = currentBlocks.map((block) => ({
-				...block,
-				attributes: {
-					...block.attributes,
-					// This will trigger a re-render
-					__timestamp: Date.now(),
-				},
-			}));
-			replaceInnerBlocks(clientId, updatedBlocks, false);
-		}
-	}, [attributes.showCount]);
 
 	const blockProps = useBlockProps({
 		className: 'vp-block-filter-by-category',
@@ -227,7 +216,7 @@ export default function BlockEdit({
 	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		orientation: 'horizontal',
 		renderAppender: false,
-		templateLock: false, // Changed from 'all' to false to allow moving
+		templateLock: false,
 	});
 
 	return (
@@ -235,6 +224,7 @@ export default function BlockEdit({
 			<InspectorControls>
 				<PanelBody>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={__('Display Count', 'visual-portfolio')}
 						checked={attributes.showCount}
 						onChange={() =>

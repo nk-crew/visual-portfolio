@@ -1,4 +1,4 @@
-// Pagination block.
+// Filter by category block.
 .vp-block-filter-by-category {
 	font-size: var(--wp--preset--font-size--medium, 1rem);
 	font-weight: 500;
@@ -18,13 +18,11 @@
 }
 
 // Fill style.
-.is-style-fill {
-	&.vp-block-filter-by-category {
-		gap: 0;
+.vp-block-filter-by-category.is-style-fill {
+	gap: 0;
 
-		a {
-			text-decoration: none;
-		}
+	a {
+		text-decoration: none;
 	}
 
 	.vp-block-filter-by-category-item {

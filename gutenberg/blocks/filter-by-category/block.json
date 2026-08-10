@@ -52,6 +52,7 @@
 		"vp/imagesQuery"
 	],
 	"providesContext": {
+		"vp/showCount": "showCount",
 		"visual-portfolio-filter-by-category/showCount": "showCount"
 	},
 	"styles": [{ "name": "fill", "label": "Fill" }],

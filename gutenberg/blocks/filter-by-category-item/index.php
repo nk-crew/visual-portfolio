@@ -33,6 +33,42 @@ class Visual_Portfolio_Block_Filter_By_Category_Item {
 	}
 
 	/**
+	 * Get the `vp_filter` query value for the given item.
+	 *
+	 * Posts are filtered by `taxonomy:slug`, media and social items by the
+	 * category slug alone. The value is built the same way as
+	 * `Visual_Portfolio_Get::get_posts_terms()` builds it, so URLs stay
+	 * identical to the ones the legacy filter produces.
+	 *
+	 * @param array  $attributes - block attributes.
+	 * @param string $query_type - content source of the parent loop.
+	 *
+	 * @return string|false Query value, or false when the term is gone.
+	 */
+	private static function get_filter_value( $attributes, $query_type ) {
+		$filter = $attributes['filter'] ?? '*';
+
+		// The "All" item resets the filter.
+		if ( '*' === $filter ) {
+			return '';
+		}
+
+		$taxonomy_id = isset( $attributes['taxonomyId'] ) ? (int) $attributes['taxonomyId'] : 0;
+
+		if ( 'posts' === $query_type && $taxonomy_id ) {
+			$term = get_term( $taxonomy_id );
+
+			if ( ! $term || is_wp_error( $term ) ) {
+				return false;
+			}
+
+			return rawurlencode( $term->taxonomy . ':' ) . $term->slug;
+		}
+
+		return rawurlencode( $filter );
+	}
+
+	/**
 	 * Block output
 	 *
 	 * @param array  $attributes - block attributes.
@@ -43,100 +79,83 @@ class Visual_Portfolio_Block_Filter_By_Category_Item {
 	 */
 	public function block_render( $attributes, $content, $block ) {
 		// Extract attributes with defaults.
-		$filter    = isset( $attributes['filter'] ) ? $attributes['filter'] : '*';
-		$count     = isset( $attributes['count'] ) ? intval( $attributes['count'] ) : 0;
-		$is_all    = isset( $attributes['isAll'] ) ? $attributes['isAll'] : false;
-		$text      = isset( $attributes['text'] ) ? $attributes['text'] : '';
-		$url       = isset( $attributes['url'] ) ? $attributes['url'] : '';
-		$is_active = isset( $attributes['isActive'] ) ? $attributes['isActive'] : false;
+		$filter = $attributes['filter'] ?? '*';
+		$count  = isset( $attributes['count'] ) ? (int) $attributes['count'] : 0;
+		$is_all = '*' === $filter;
+		$text   = $attributes['text'] ?? '';
 
-		// Get showCount from parent block context.
-		$show_count = false;
-		if ( isset( $block->context['visual-portfolio-filter-by-category/showCount'] ) ) {
-			$show_count = $block->context['visual-portfolio-filter-by-category/showCount'];
+		// Get showCount from parent block context. The parent also provides it
+		// under its old, longer key, which is deprecated but still consumable.
+		$show_count = ! empty( $block->context['vp/showCount'] );
+
+		// The filter value and URL are resolved on every request, since the
+		// permalink saved in the editor is wrong for templates and patterns,
+		// and goes stale when the post slug changes.
+		$filter_value = self::get_filter_value( $attributes, $block->context['vp/queryType'] ?? 'posts' );
+
+		// The term this item points at was deleted, there is nothing to filter by.
+		if ( false === $filter_value ) {
+			return '';
 		}
 
-		// Get current filter from URL and extract the actual value.
-		$current_filter = '';
-		if ( isset( $_GET['vp_filter'] ) && ! empty( $_GET['vp_filter'] ) ) {
-			$is_active      = false;
-			$current_filter = sanitize_text_field( urldecode( $_GET['vp_filter'] ) );
-
-			// Remove taxonomy prefix (e.g., 'portfolio_category:mountains' -> 'mountains').
-			if ( false !== strpos( $current_filter, ':' ) ) {
-				$parts          = explode( ':', $current_filter );
-				$current_filter = end( $parts );
-			}
-		}
+		$filter_link = Visual_Portfolio_Get::get_pagenum_link(
+			array(
+				'vp_filter' => $filter_value,
+				'vp_page'   => 1,
+			)
+		);
 
 		// Determine if this item should be active.
-		$should_be_active = false;
+		$current_filter = Visual_Portfolio_Get::get_filter_active_item( array() );
 
-		if ( '*' === $filter ) {
-			// "All" filter is active only when no filter is set in URL
-			$should_be_active = empty( $current_filter );
+		if ( $is_all ) {
+			// The "All" item is active only when no filter is set in the URL.
+			$is_active = ! $current_filter;
 		} else {
-			// Specific filter is active when it matches the URL parameter.
-			$should_be_active = ( ! empty( $current_filter ) && $current_filter === $filter );
-
-			if ( ! $should_be_active ) {
-				$should_be_active = $is_active;
-			}
+			$is_active = $current_filter && rawurldecode( $filter_value ) === $current_filter;
 		}
 
 		// Get block wrapper attributes but override the class completely.
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class' => 'vp-block-filter-by-category-item' . ( $should_be_active ? ' is-active' : '' ),
+				'class' => 'vp-block-filter-by-category-item' . ( $is_active ? ' is-active' : '' ),
 			)
 		);
 
-		$output_text = $text;
+		$output_text = wp_kses_post( $text );
 
 		// Build the count display.
 		if ( $show_count && ! $is_all && $count > 0 ) {
-			$output_text = $output_text . '<span class="vp-block-filter-by-category-count">' . $count . '</span>';
+			$output_text .= '<span class="vp-block-filter-by-category-count">' . esc_html( number_format_i18n( $count ) ) . '</span>';
 		}
 
-		$output = '';
-
-		$filter_link = '#';
-		if ( ! empty( $url ) ) {
-			$filter_link = esc_url( $url );
-		}
-
-		if ( $should_be_active ) {
-			$aria_label = '*' === $filter ? esc_attr__( 'Currently displaying all items', 'visual-portfolio' ) : sprintf(
-				// translators: %1$s filter name, %2$s item count.
-				esc_attr__( 'Currently filtering by %1$s, %2$s items', 'visual-portfolio' ),
-				esc_attr( $text ),
-				$count
-			);
-
-			$output = sprintf(
-				'<span aria-label="%1$s" aria-current="page" %2$s>%3$s</span>',
-				$aria_label,
+		// The active item is not a link, so an `aria-label` on it would be
+		// ignored - `aria-current` carries the state instead.
+		if ( $is_active ) {
+			return sprintf(
+				'<span aria-current="page" %1$s>%2$s</span>',
 				$wrapper_attributes,
 				$output_text
 			);
+		}
+
+		if ( $is_all ) {
+			$aria_label = __( 'Display all items', 'visual-portfolio' );
 		} else {
-			$aria_label = '*' === $filter ? esc_attr__( 'Display all items', 'visual-portfolio' ) : sprintf(
-				// translators: %1$s filter name, %2$s item count.
-				esc_attr__( 'Filter by %1$s, %2$s items', 'visual-portfolio' ),
-				esc_attr( $text ),
-				$count
-			);
-
-			$output = sprintf(
-				'<a aria-label="%1$s" href="%2$s" %3$s>%4$s</a>',
-				$aria_label,
-				$filter_link,
-				$wrapper_attributes,
-				$output_text
+			$aria_label = sprintf(
+				// translators: %s filter name.
+				__( 'Filter by %s', 'visual-portfolio' ),
+				wp_strip_all_tags( $text )
 			);
 		}
 
-		return $output;
+		return sprintf(
+			'<a aria-label="%1$s" href="%2$s" %3$s>%4$s</a>',
+			esc_attr( $aria_label ),
+			esc_url( $filter_link ),
+			$wrapper_attributes,
+			$output_text
+		);
 	}
 }
 new Visual_Portfolio_Block_Filter_By_Category_Item();
