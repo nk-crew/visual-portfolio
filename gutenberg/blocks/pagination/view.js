@@ -3,14 +3,27 @@ import { throttle } from 'lodash';
 
 const $doc = $(document);
 
+const INFINITE_SELECTOR = '.vp-block-pagination-infinite';
+
+/**
+ * Get the gallery instance the given loop control belongs to.
+ *
+ * @param {Element} element - control inside `.vp-block-loop`.
+ * @return {Object|undefined} gallery instance.
+ */
+function getLoopGallery(element) {
+	const loop = element.closest('.vp-block-loop');
+	const legacyBlock = loop?.querySelector('.vp-portfolio');
+
+	return legacyBlock?.vpf;
+}
+
 $doc.on(
 	'click',
 	'.vp-block-pagination-previous, .vp-block-pagination-next, .vp-block-pagination-numbers a, .vp-block-pagination-load-more, .vp-block-pagination-infinite',
 	(e) => {
 		const $current = $(e.currentTarget);
-		const $loop = $current.closest('.vp-block-loop');
-		const $legacyBlock = $loop.find('.vp-portfolio');
-		const vpf = $legacyBlock?.[0]?.vpf;
+		const vpf = getLoopGallery(e.currentTarget);
 
 		if (!vpf) {
 			return;
@@ -29,86 +42,59 @@ $doc.on(
 
 /**
  * Infinite scroll.
+ *
+ * The observer reports the initial intersection state right after `observe()`,
+ * so re-registering the trigger once the new markup arrives is enough to keep
+ * loading while it stays in view.
  */
-$doc.on('loadedNewItems.vpf', (event, vpObject) => {
-	if ('vpf' !== event.namespace) {
-		return;
-	}
-
-	if (!vpObject.$item.find('vp-block-pagination-infinite').length) {
-		return;
-	}
-
-	// Infinite pagination should start loading again in case the pagination is still in view.
-	// Use setTimeout to allow DOM to settle after content insertion
-	setTimeout(() => {
-		const $infinitePagination = vpObject.$item.find(
-			'.vp-block-pagination-infinite.is-intersecting:first'
-		);
-
-		if ($infinitePagination.length && $infinitePagination.attr('href')) {
-			vpObject.loadNewItems($infinitePagination.attr('href'), false);
-		}
-	}, 100);
-});
-
 const infiniteObserver = new window.IntersectionObserver(
 	(entries, observer) => {
-		try {
-			entries.forEach((entry) => {
-				if (!entry.target) {
-					return;
-				}
+		entries.forEach((entry) => {
+			const { target } = entry;
 
-				const href = entry.target.getAttribute('href');
+			if (!target) {
+				return;
+			}
 
-				// Disconnect observer when no href.
-				if (!href) {
-					observer.disconnect();
-					return;
-				}
+			// The trigger is replaced with a fresh one after each load.
+			if (!target.isConnected) {
+				observer.unobserve(target);
+				return;
+			}
 
-				if (entry.isIntersecting) {
-					// Mark as intersecting and trigger loading
-					entry.target.classList.add('is-intersecting');
+			const href = target.getAttribute('href');
 
-					const loop = entry.target.closest('.vp-block-loop');
-					const legacyBlock = loop?.querySelector('.vp-portfolio');
-					const vpf = legacyBlock?.vpf;
+			// Nothing left to load.
+			if (!href) {
+				observer.unobserve(target);
+				return;
+			}
 
-					if (vpf) {
-						vpf.loadNewItems(href, false);
-					}
-				} else {
-					// Remove intersecting marker when out of view
-					entry.target.classList.remove('is-intersecting');
-				}
-			});
-		} catch (error) {
-			// eslint-disable-next-line no-console -- we have to log errors.
-			console.log(error);
-		}
+			if (!entry.isIntersecting) {
+				return;
+			}
+
+			getLoopGallery(target)?.loadNewItems(href, false);
+		});
 	},
 	{ rootMargin: '300px 0px' }
 );
 
-const initInfiniteThrottled = throttle(() => {
+const initInfinite = throttle(() => {
 	document
-		.querySelectorAll(
-			'.vp-block-pagination-infinite[href]:not(.is-handled)'
-		)
+		.querySelectorAll(`${INFINITE_SELECTOR}[href]:not(.is-handled)`)
 		.forEach((element) => {
 			element.classList.add('is-handled');
 			infiniteObserver.observe(element);
 		});
 }, 200);
 
-$doc.on('ready', () => {
-	new window.MutationObserver(initInfiniteThrottled).observe(
-		document.documentElement,
-		{
-			childList: true,
-			subtree: true,
-		}
-	);
-});
+// This is a footer script, but `$( fn )` also fires immediately when the
+// document is already ready.
+$(initInfinite);
+
+// Pagination blocks are replaced with new markup after AJAX loading.
+$doc.on('replacedLoopBlocks.vpf', initInfinite);
+
+// Galleries may be initialized later than this script runs.
+$doc.on('init.vpf', initInfinite);

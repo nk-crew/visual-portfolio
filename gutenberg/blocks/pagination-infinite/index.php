@@ -30,8 +30,6 @@ class Visual_Portfolio_Block_Pagination_Infinite {
 				'render_callback' => array( $this, 'block_render' ),
 			)
 		);
-
-		Visual_Portfolio_Assets::store_used_assets( 'visual-portfolio-pagination-infinite', true, 'script' );
 	}
 
 	/**
@@ -44,14 +42,17 @@ class Visual_Portfolio_Block_Pagination_Infinite {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content, $block ) {
-		$max_pages = Visual_Portfolio_Block_Paged_Pagination::get_max_pages( $block->context );
+		$max_pages    = Visual_Portfolio_Block_Paged_Pagination::get_max_pages( $block->context );
+		$current_page = Visual_Portfolio_Get::get_current_page_number();
+
+		// Nothing left to load.
+		if ( $max_pages <= 1 || $current_page >= $max_pages ) {
+			return '';
+		}
 
 		// Get attributes with defaults.
 		$label         = $attributes['label'] ?? __( 'Load More', 'visual-portfolio' );
 		$loading_label = $attributes['loadingLabel'] ?? __( 'Loading...', 'visual-portfolio' );
-
-		// Get current page.
-		$current_page = max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
@@ -80,7 +81,7 @@ class Visual_Portfolio_Block_Pagination_Infinite {
 		}
 
 		return sprintf(
-			'<a href="%1$s" %2$s><span>%3$s</span><span class="vp-block-pagination-load-more-loading"><span class="vp-spinner"></span><span class="vp-screen-reader-text">%4$s</span></span></a>',
+			'<a href="%1$s" %2$s><span>%3$s</span><span class="vp-block-pagination-infinite-loading"><span class="vp-spinner"></span><span class="vp-screen-reader-text">%4$s</span></span></a>',
 			$next_link,
 			$wrapper_attributes,
 			wp_kses_post( $label ),

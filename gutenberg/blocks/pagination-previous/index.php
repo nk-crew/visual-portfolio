@@ -50,7 +50,7 @@ class Visual_Portfolio_Block_Pagination_Previous {
 		}
 
 		// Get current page.
-		$current_page = max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
+		$current_page = Visual_Portfolio_Get::get_current_page_number();
 
 		// If on the first page, don't show the previous link.
 		if ( $current_page <= 1 ) {
