@@ -7,6 +7,10 @@ import shorthash from 'shorthash';
 // List of used IDs to prevent duplicates.
 const usedIds = {};
 
+// Blocks that resolve their own options server-side and so need a stable id:
+// `Visual_Portfolio_Get::get_options()` refuses to resolve anything without one.
+const BLOCKS_WITH_ID = ['visual-portfolio/block', 'visual-portfolio/loop'];
+
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning the custom styles if needed.
@@ -43,7 +47,7 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
 		}
 
 		maybeCreateBlockId() {
-			if (this.props.blockName !== 'visual-portfolio/block') {
+			if (!BLOCKS_WITH_ID.includes(this.props.blockName)) {
 				return;
 			}
 

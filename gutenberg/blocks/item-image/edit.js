@@ -1,0 +1,400 @@
+/**
+ * WordPress dependencies
+ */
+import {
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	InspectorControls,
+	useBlockEditingMode,
+	useBlockProps,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+} from '@wordpress/block-editor';
+import {
+	RangeControl,
+	SelectControl,
+	TextControl,
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * External dependencies
+ */
+import classnames from 'classnames/dedupe';
+
+const SIZE_OPTIONS = [
+	{ label: __('Thumbnail', 'visual-portfolio'), value: 'thumbnail' },
+	{ label: __('Medium', 'visual-portfolio'), value: 'medium' },
+	{ label: __('Large', 'visual-portfolio'), value: 'large' },
+	{ label: __('Full Size', 'visual-portfolio'), value: 'full' },
+];
+
+const SCALE_OPTIONS = [
+	{ label: __('Cover', 'visual-portfolio'), value: 'cover' },
+	{ label: __('Contain', 'visual-portfolio'), value: 'contain' },
+	{ label: __('Fill', 'visual-portfolio'), value: 'fill' },
+];
+
+const DEFAULT_ATTRIBUTES = {
+	isLink: false,
+	rel: '',
+	linkTarget: '_self',
+	sizeSlug: 'large',
+	aspectRatio: '',
+	scale: 'cover',
+	overlayColor: undefined,
+	customOverlayColor: undefined,
+	gradient: undefined,
+	customGradient: undefined,
+	dimRatio: 0,
+};
+
+export default function ItemImageEdit({
+	attributes,
+	setAttributes,
+	context,
+	clientId,
+}) {
+	const {
+		isLink,
+		rel,
+		linkTarget,
+		sizeSlug,
+		aspectRatio,
+		scale,
+		overlayColor,
+		customOverlayColor,
+		gradient,
+		customGradient,
+		dimRatio,
+	} = attributes;
+
+	const {
+		'vp/itemImgUrl': itemImgUrl,
+		'vp/itemImgAlt': itemImgAlt,
+		'vp/itemImageSizes': itemImageSizes,
+		'vp/itemFocalPoint': itemFocalPoint,
+		'vp/itemUrl': itemUrl,
+	} = context;
+
+	const blockProps = useBlockProps();
+	const blockEditingMode = useBlockEditingMode();
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
+	// Sizes are resolved on the server; only the choice between them is made here.
+	const imageUrl = itemImageSizes?.[sizeSlug] || itemImgUrl;
+
+	const hasOverlay =
+		!!dimRatio &&
+		!!(overlayColor || customOverlayColor || gradient || customGradient);
+
+	const overlayStyles = {};
+
+	if (gradient || customGradient) {
+		overlayStyles.background = gradient
+			? `var(--wp--preset--gradient--${gradient})`
+			: customGradient;
+	} else if (overlayColor || customOverlayColor) {
+		overlayStyles.backgroundColor = overlayColor
+			? `var(--wp--preset--color--${overlayColor})`
+			: customOverlayColor;
+	}
+
+	const imageStyles = aspectRatio
+		? {
+				aspectRatio,
+				width: '100%',
+				height: '100%',
+				objectFit: scale,
+				objectPosition: itemFocalPoint
+					? `${itemFocalPoint.x * 100}% ${itemFocalPoint.y * 100}%`
+					: undefined,
+			}
+		: undefined;
+
+	const imageElement = (
+		<>
+			{imageUrl ? (
+				<img
+					src={imageUrl}
+					alt={itemImgAlt || ''}
+					style={imageStyles}
+				/>
+			) : (
+				<div
+					className="wp-block-visual-portfolio-item-image__placeholder"
+					style={imageStyles}
+				/>
+			)}
+			{hasOverlay && (
+				<span
+					className={classnames(
+						'wp-block-visual-portfolio-item-image__overlay',
+						'has-background-dim',
+						`has-background-dim-${dimRatio}`,
+						{
+							'has-background-gradient':
+								gradient || customGradient,
+						}
+					)}
+					style={overlayStyles}
+					aria-hidden="true"
+				/>
+			)}
+		</>
+	);
+
+	return (
+		<>
+			{blockEditingMode === 'default' && (
+				<>
+					<InspectorControls group="color">
+						{colorGradientSettings.hasColorsOrGradients && (
+							<ColorGradientSettingsDropdown
+								__experimentalIsRenderedInSidebar
+								settings={[
+									{
+										label: __(
+											'Overlay',
+											'visual-portfolio'
+										),
+										colorValue: overlayColor
+											? `var(--wp--preset--color--${overlayColor})`
+											: customOverlayColor,
+										gradientValue: gradient
+											? `var(--wp--preset--gradient--${gradient})`
+											: customGradient,
+										onColorChange: (value) => {
+											const slug =
+												colorGradientSettings.colors?.find(
+													(color) =>
+														color.color === value
+												)?.slug;
+
+											setAttributes({
+												overlayColor: slug,
+												customOverlayColor: slug
+													? undefined
+													: value,
+											});
+										},
+										onGradientChange: (value) => {
+											const slug =
+												colorGradientSettings.gradients?.find(
+													(item) =>
+														item.gradient === value
+												)?.slug;
+
+											setAttributes({
+												gradient: slug,
+												customGradient: slug
+													? undefined
+													: value,
+											});
+										},
+										isShownByDefault: true,
+									},
+								]}
+								panelId={clientId}
+								{...colorGradientSettings}
+							/>
+						)}
+						<ToolsPanelItem
+							label={__('Overlay opacity', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => dimRatio !== 0}
+							onDeselect={() => setAttributes({ dimRatio: 0 })}
+							panelId={clientId}
+						>
+							<RangeControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={__(
+									'Overlay opacity',
+									'visual-portfolio'
+								)}
+								value={dimRatio}
+								onChange={(value) =>
+									setAttributes({ dimRatio: value })
+								}
+								min={0}
+								max={100}
+								step={10}
+							/>
+						</ToolsPanelItem>
+					</InspectorControls>
+					<InspectorControls>
+						<ToolsPanel
+							label={__('Settings', 'visual-portfolio')}
+							panelId={clientId}
+							resetAll={() => setAttributes(DEFAULT_ATTRIBUTES)}
+						>
+							<ToolsPanelItem
+								label={__('Image size', 'visual-portfolio')}
+								isShownByDefault
+								hasValue={() => sizeSlug !== 'large'}
+								onDeselect={() =>
+									setAttributes({ sizeSlug: 'large' })
+								}
+								panelId={clientId}
+							>
+								<SelectControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={__('Image size', 'visual-portfolio')}
+									value={sizeSlug}
+									options={SIZE_OPTIONS}
+									onChange={(value) =>
+										setAttributes({ sizeSlug: value })
+									}
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={__('Aspect ratio', 'visual-portfolio')}
+								hasValue={() => !!aspectRatio}
+								onDeselect={() =>
+									setAttributes({ aspectRatio: '' })
+								}
+								panelId={clientId}
+							>
+								<TextControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={__(
+										'Aspect ratio',
+										'visual-portfolio'
+									)}
+									help={__(
+										'For example 1, 4/3 or 16/9. Leave empty to keep the original proportions.',
+										'visual-portfolio'
+									)}
+									value={aspectRatio}
+									onChange={(value) =>
+										setAttributes({ aspectRatio: value })
+									}
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={__('Scale', 'visual-portfolio')}
+								hasValue={() => scale !== 'cover'}
+								onDeselect={() =>
+									setAttributes({ scale: 'cover' })
+								}
+								panelId={clientId}
+							>
+								<SelectControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={__('Scale', 'visual-portfolio')}
+									help={__(
+										'Applies when an aspect ratio is set.',
+										'visual-portfolio'
+									)}
+									value={scale}
+									options={SCALE_OPTIONS}
+									onChange={(value) =>
+										setAttributes({ scale: value })
+									}
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={__('Link to item', 'visual-portfolio')}
+								isShownByDefault
+								hasValue={() => isLink}
+								onDeselect={() =>
+									setAttributes({ isLink: false })
+								}
+								panelId={clientId}
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={__(
+										'Link to item',
+										'visual-portfolio'
+									)}
+									checked={isLink}
+									onChange={() =>
+										setAttributes({ isLink: !isLink })
+									}
+								/>
+							</ToolsPanelItem>
+							{isLink && (
+								<>
+									<ToolsPanelItem
+										label={__(
+											'Open in new tab',
+											'visual-portfolio'
+										)}
+										hasValue={() => linkTarget === '_blank'}
+										onDeselect={() =>
+											setAttributes({
+												linkTarget: '_self',
+											})
+										}
+										panelId={clientId}
+									>
+										<ToggleControl
+											__nextHasNoMarginBottom
+											label={__(
+												'Open in new tab',
+												'visual-portfolio'
+											)}
+											checked={linkTarget === '_blank'}
+											onChange={(value) =>
+												setAttributes({
+													linkTarget: value
+														? '_blank'
+														: '_self',
+												})
+											}
+										/>
+									</ToolsPanelItem>
+									<ToolsPanelItem
+										label={__(
+											'Link rel',
+											'visual-portfolio'
+										)}
+										hasValue={() => !!rel}
+										onDeselect={() =>
+											setAttributes({ rel: '' })
+										}
+										panelId={clientId}
+									>
+										<TextControl
+											__next40pxDefaultSize
+											__nextHasNoMarginBottom
+											label={__(
+												'Link rel',
+												'visual-portfolio'
+											)}
+											value={rel}
+											onChange={(value) =>
+												setAttributes({ rel: value })
+											}
+										/>
+									</ToolsPanelItem>
+								</>
+							)}
+						</ToolsPanel>
+					</InspectorControls>
+				</>
+			)}
+			<figure {...blockProps}>
+				{isLink && itemUrl ? (
+					// The link is inert in the editor, the click belongs to the block.
+					<a
+						href={itemUrl}
+						target={linkTarget}
+						rel={rel || undefined}
+						onClick={(event) => event.preventDefault()}
+					>
+						{imageElement}
+					</a>
+				) : (
+					imageElement
+				)}
+			</figure>
+		</>
+	);
+}

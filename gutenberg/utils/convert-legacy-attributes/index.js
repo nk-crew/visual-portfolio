@@ -3,6 +3,7 @@ const ATTRIBUTE_MAPPINGS = {
 	// Direct mappings (modern.key -> legacy.key)
 	direct: {
 		queryType: 'content_source',
+		blockId: 'block_id',
 	},
 
 	// Nested mappings (modern.parent.child -> legacy.key)

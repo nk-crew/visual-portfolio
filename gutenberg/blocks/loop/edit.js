@@ -33,10 +33,18 @@ const TEMPLATE = [
 		// the default `filter` of `*`, so the fetched "All" item reuses it.
 		[['visual-portfolio/loop-filter-item', { text: 'All', isAll: true }]],
 	],
-	['visual-portfolio/block', { setup_wizard: 'false' }],
+	[
+		'visual-portfolio/item-template',
+		{ layoutType: 'grid' },
+		[
+			['visual-portfolio/item-image', { aspectRatio: '1', isLink: true }],
+			['visual-portfolio/item-title', { textAlign: 'center' }],
+		],
+	],
 	[
 		'visual-portfolio/loop-pagination',
 		{},
+		// The `paged` variation, expressed by its inner blocks.
 		[
 			['visual-portfolio/loop-pagination-previous'],
 			['visual-portfolio/loop-pagination-numbers'],

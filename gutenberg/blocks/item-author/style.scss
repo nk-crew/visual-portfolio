@@ -1,0 +1,18 @@
+// Item author block.
+.wp-block-visual-portfolio-item-author {
+	word-break: break-word;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	// The author name sits inline with the prefix - the theme's link typography
+	// would break that line up.
+	:where(a) {
+		font-family: inherit;
+		font-size: inherit;
+		font-style: inherit;
+		font-weight: inherit;
+		letter-spacing: inherit;
+		line-height: inherit;
+		text-decoration: inherit;
+	}
+}

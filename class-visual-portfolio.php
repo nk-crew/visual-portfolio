@@ -255,6 +255,15 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-load-more/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-infinite/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-sort/index.php';
+
+				require_once $this->plugin_path . 'gutenberg/blocks/item-template/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/item-image/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/item-title/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/item-description/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/item-categories/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/item-author/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/item-date/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/item-read-more/index.php';
 			}
 
 			require_once $this->plugin_path . 'classes/class-shortcode.php';

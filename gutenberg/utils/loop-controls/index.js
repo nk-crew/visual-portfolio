@@ -15,14 +15,13 @@ export const LOOP_GENERAL_CONTROLS = ['items_count'];
 /**
  * Take a subset of the registered controls, keyed the same way.
  *
- * @param {string[]} names   - control names.
- * @param {boolean}  exclude - return everything except the given names.
+ * @param {string[]} names - control names.
  * @return {Object} controls.
  */
-export function pickControls(names, exclude = false) {
+export function pickControls(names) {
 	return Object.fromEntries(
-		Object.entries(registeredControls).filter(
-			([name]) => names.includes(name) !== exclude
+		Object.entries(registeredControls).filter(([name]) =>
+			names.includes(name)
 		)
 	);
 }

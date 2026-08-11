@@ -36,8 +36,11 @@ function getLoopBlock(paginationBlocks) {
 		innerBlocks: [
 			{ name: 'visual-portfolio/loop-filter' },
 			{
-				name: 'visual-portfolio/block',
-				attributes: { setup_wizard: 'false' },
+				name: 'visual-portfolio/item-template',
+				innerBlocks: [
+					{ name: 'visual-portfolio/item-image' },
+					{ name: 'visual-portfolio/item-title' },
+				],
 			},
 			{
 				name: 'visual-portfolio/loop-pagination',
@@ -246,7 +249,9 @@ test.describe('Gallery Loop blocks', () => {
 		const loadMore = frontend.locator(
 			'.vp-block-loop-pagination-load-more'
 		);
-		const items = frontend.locator('.vp-portfolio__item');
+		const items = frontend.locator(
+			'.wp-block-visual-portfolio-item-template__item'
+		);
 
 		await expect(loadMore).toHaveCount(1);
 		await expect(items).toHaveCount(PER_PAGE);

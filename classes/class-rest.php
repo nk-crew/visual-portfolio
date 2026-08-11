@@ -84,6 +84,19 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			)
 		);
 
+		// Get gallery items for the editor preview of a Gallery Loop block.
+		if ( visual_portfolio()->supports_loop_blocks() ) {
+			register_rest_route(
+				$namespace,
+				'/get_loop_items/',
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'get_loop_items' ),
+					'permission_callback' => array( $this, 'get_loop_items_permission' ),
+				)
+			);
+		}
+
 		// Get max pages.
 		$max_pages_route = array(
 			'methods'             => array( WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ),
@@ -310,11 +323,15 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get filter items permission.
+	 * Whether the current user edits content of any kind.
 	 *
-	 * @return mixed
+	 * The query endpoints answer with data the editor needs to preview a block,
+	 * so editing anything is enough - a user without the blanket `edit_posts` may
+	 * still edit a custom post type the block is used in.
+	 *
+	 * @return bool
 	 */
-	public function get_filter_items_permission() {
+	private function can_edit_content() {
 		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
 		}
@@ -325,7 +342,175 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			}
 		}
 
+		return false;
+	}
+
+	/**
+	 * Get filter items permission.
+	 *
+	 * @return mixed
+	 */
+	public function get_filter_items_permission() {
+		if ( $this->can_edit_content() ) {
+			return true;
+		}
+
 		return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get filter items.', 'visual-portfolio' ), true );
+	}
+
+	/**
+	 * Get loop items permission.
+	 *
+	 * @return mixed
+	 */
+	public function get_loop_items_permission() {
+		if ( $this->can_edit_content() ) {
+			return true;
+		}
+
+		return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get gallery items.', 'visual-portfolio' ), true );
+	}
+
+	/**
+	 * URLs of an item image in the sizes the editor offers.
+	 *
+	 * @param int|string $image_id - attachment id, or the remote id of a Pro social image.
+	 * @param string     $fallback_url - URL to answer with when the id resolves to nothing.
+	 *
+	 * @return array
+	 */
+	private function get_item_image_sizes( $image_id, $fallback_url ) {
+		// Remote images of the social sources exist in a single size.
+		$is_attachment = $image_id && is_numeric( $image_id );
+		$urls          = array();
+
+		foreach ( array( 'thumbnail', 'medium', 'large', 'full' ) as $size ) {
+			$src = $is_attachment ? wp_get_attachment_image_src( (int) $image_id, $size ) : false;
+
+			$urls[ $size ] = $src ? $src[0] : $fallback_url;
+		}
+
+		return $urls;
+	}
+
+	/**
+	 * Get gallery items of a Gallery Loop block.
+	 *
+	 * Items come from the same pipeline the front end renders, mapped with the
+	 * same context mapper the item blocks read - the editor preview cannot drift
+	 * away from the rendered gallery because it never resolves anything itself.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_loop_items( $request ) {
+		$params      = $request->get_params();
+		$json_params = $request->get_json_params();
+
+		if ( ! empty( $json_params ) ) {
+			$params = array_merge( $params, $json_params );
+		}
+
+		$params         = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params, true );
+		$content_source = $params['content_source'] ?? false;
+
+		if ( ! $content_source ) {
+			return $this->error(
+				'missing_params',
+				esc_html__( 'Required parameters are missing.', 'visual-portfolio' )
+			);
+		}
+
+		// Define allowed parameters for each content source.
+		$source_configs = apply_filters(
+			'vpf_rest_loop_items_source_configs',
+			array(
+				'post-based' => array(
+					'posts_source',
+					'post_types_set',
+					'posts_ids',
+					'posts_excluded_ids',
+					'posts_offset',
+					'posts_taxonomies',
+					'posts_taxonomies_relation',
+					'posts_order_by',
+					'posts_order_direction',
+					'posts_avoid_duplicate_posts',
+					'posts_custom_query',
+				),
+				'images' => array(
+					'images',
+					'image_categories',
+					'images_titles_source',
+					'images_descriptions_source',
+					'images_order_by',
+					'images_order_direction',
+				),
+			),
+			$params
+		);
+
+		// A source no options are registered for has nothing that can be
+		// previewed safely, but it is not an error - the block shows its
+		// empty state.
+		if ( ! isset( $source_configs[ $content_source ] ) ) {
+			return $this->success(
+				array(
+					'items'     => array(),
+					'max_pages' => 1,
+				)
+			);
+		}
+
+		$allowed_keys = array_flip( array_merge( $source_configs[ $content_source ], array( 'items_count' ) ) );
+
+		$options = array_merge(
+			array(
+				'content_source' => $content_source,
+
+				// The preview is not a gallery on a page, it only needs an id the
+				// options resolver accepts.
+				'block_id'       => 'rest-loop-preview',
+			),
+			array_intersect_key( $params, $allowed_keys )
+		);
+
+		ksort( $options );
+
+		// The editor debounces its requests, but the social sources of the Pro
+		// plugin answer from external APIs - without a cache a few edits are
+		// enough to reach an Instagram or Unsplash rate limit.
+		$cache_key = 'vpf_loop_preview_' . md5( (string) wp_json_encode( $options ) );
+		$cached    = get_transient( $cache_key );
+
+		if ( is_array( $cached ) ) {
+			return $this->success( $cached );
+		}
+
+		$result   = Visual_Portfolio_Get::get_loop_items( $options );
+		$response = array(
+			'items'     => array(),
+			'max_pages' => 1,
+		);
+
+		if ( $result ) {
+			foreach ( $result['items'] as $item ) {
+				$item_data = Visual_Portfolio_Block_Item_Template::map_item_to_context( $item, $result['options'], '' );
+
+				$item_data['imageSizes'] = $this->get_item_image_sizes(
+					$item['image_id'] ?? '',
+					$item_data['itemImgUrl'] ?? ''
+				);
+
+				$response['items'][] = $item_data;
+			}
+
+			$response['max_pages'] = max( 1, (int) $result['max_pages'] );
+		}
+
+		set_transient( $cache_key, $response, MINUTE_IN_SECONDS );
+
+		return $this->success( $response );
 	}
 
 	/**

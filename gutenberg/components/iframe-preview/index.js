@@ -13,7 +13,6 @@ import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
-import { convertModernToLegacy } from '../../utils/convert-legacy-attributes';
 
 const {
 	VPAdminGutenbergVariables: variables,
@@ -186,32 +185,8 @@ class IframePreview extends Component {
 
 		const frame = this.frameRef.current;
 
-		const newContext = this.props.context
-			? Object.fromEntries(
-					Object.entries(this.props.context).map(([key, value]) => [
-						key.replace('vp/', ''),
-						value,
-					])
-				)
-			: {};
-		const oldContext = prevProps.context
-			? Object.fromEntries(
-					Object.entries(prevProps.context).map(([key, value]) => [
-						key.replace('vp/', ''),
-						value,
-					])
-				)
-			: {};
-
-		const newAttributes = {
-			...this.props.attributes,
-			...convertModernToLegacy(newContext),
-		};
-
-		const oldAttributes = {
-			...prevProps.attributes,
-			...convertModernToLegacy(oldContext),
-		};
+		const newAttributes = this.props.attributes;
+		const oldAttributes = prevProps.attributes;
 
 		const changedAttributes = {};
 		const changedAttributeKeys = getUpdatedKeys(
@@ -413,36 +388,13 @@ class IframePreview extends Component {
 	}
 
 	render() {
-		const { postType, postId, context } = this.props;
+		const { postType, postId } = this.props;
 
 		const { loading, uniqueId, currentIframeHeight, latestIframeHeight } =
 			this.state;
 
-		// Collect all data into a single object, prioritizing context values
 		const formData = {};
-		let contextAttributes = {};
-
-		if (context) {
-			// Then override with context values (they take priority)
-			Object.entries(context).forEach(([key, value]) => {
-				if (key.startsWith('vp/')) {
-					const formKey = `vp_${key.replace('vp/', '')}`;
-					formData[formKey] = value;
-				}
-			});
-
-			contextAttributes = Object.fromEntries(
-				Object.entries(this.props.context).map(([key, value]) => [
-					key.replace('vp/', ''),
-					value,
-				])
-			);
-		}
-
-		const attributes = {
-			...this.props.attributes,
-			...convertModernToLegacy(contextAttributes),
-		};
+		const attributes = this.props.attributes;
 
 		const { id, content_source: contentSource } = attributes;
 

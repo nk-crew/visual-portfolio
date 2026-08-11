@@ -1,0 +1,71 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/item-title",
+	"title": "Gallery Item Title (Experimental)",
+	"category": "media",
+	"description": "Displays the title of a gallery item. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/item-template"],
+	"textdomain": "visual-portfolio",
+	"usesContext": ["vp/itemTitle", "vp/itemUrl"],
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
+		"level": {
+			"type": "number",
+			"default": 3
+		},
+		"levelOptions": {
+			"type": "array"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false,
+			"role": "content"
+		},
+		"rel": {
+			"type": "string",
+			"attribute": "rel",
+			"default": "",
+			"role": "content"
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self",
+			"role": "content"
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"color": {
+			"text": true,
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"style": "visual-portfolio-block-item-title"
+}

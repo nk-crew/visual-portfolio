@@ -1,0 +1,6 @@
+// Item description block.
+.wp-block-visual-portfolio-item-description {
+	word-break: break-word;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+}

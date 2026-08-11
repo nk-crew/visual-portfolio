@@ -101,6 +101,7 @@
 		"vp/queryType": "queryType",
 		"vp/baseQuery": "baseQuery",
 		"vp/postsQuery": "postsQuery",
-		"vp/imagesQuery": "imagesQuery"
+		"vp/imagesQuery": "imagesQuery",
+		"vp/blockId": "block_id"
 	}
 }

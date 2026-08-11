@@ -1,0 +1,97 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/item-image",
+	"title": "Gallery Item Image (Experimental)",
+	"category": "media",
+	"description": "Displays the image of a gallery item. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/item-template"],
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/itemImgId",
+		"vp/itemImgUrl",
+		"vp/itemImgAlt",
+		"vp/itemNoImgId",
+		"vp/itemImageSizes",
+		"vp/itemFocalPoint",
+		"vp/itemUrl",
+		"vp/itemAriaLabel"
+	],
+	"attributes": {
+		"isLink": {
+			"type": "boolean",
+			"default": false,
+			"role": "content"
+		},
+		"rel": {
+			"type": "string",
+			"attribute": "rel",
+			"default": "",
+			"role": "content"
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self",
+			"role": "content"
+		},
+		"sizeSlug": {
+			"type": "string",
+			"default": "large"
+		},
+		"aspectRatio": {
+			"type": "string"
+		},
+		"scale": {
+			"type": "string",
+			"default": "cover"
+		},
+		"overlayColor": {
+			"type": "string"
+		},
+		"customOverlayColor": {
+			"type": "string"
+		},
+		"gradient": {
+			"type": "string"
+		},
+		"customGradient": {
+			"type": "string"
+		},
+		"dimRatio": {
+			"type": "number",
+			"default": 0
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"anchor": true,
+		"color": {
+			"text": false,
+			"background": false
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"filter": {
+			"duotone": true
+		},
+		"shadow": true,
+		"__experimentalBorder": {
+			"radius": true,
+			"width": true,
+			"color": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true
+			}
+		}
+	},
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-visual-portfolio-item-image img"
+		}
+	},
+	"style": "visual-portfolio-block-item-image"
+}

@@ -1,0 +1,42 @@
+.wp-block-visual-portfolio-item-image {
+	position: relative;
+	margin: 0;
+
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	// The link is the box the overlay is positioned against.
+	> a {
+		position: relative;
+		display: block;
+	}
+
+	// Editor stand-in for an item that has no image yet.
+	&__placeholder {
+		width: 100%;
+		aspect-ratio: 1;
+		background: currentcolor;
+		opacity: 0.1;
+	}
+
+	&__overlay {
+		position: absolute;
+		inset: 0;
+		background-color: #000;
+
+		&.has-background-gradient {
+			background-color: transparent;
+		}
+
+		// Core generates these levels for the Cover block only, and its
+		// stylesheet is not guaranteed to be on the page.
+		@for $i from 0 through 10 {
+			&.has-background-dim-#{$i * 10} {
+				opacity: #{$i * 0.1};
+			}
+		}
+	}
+}

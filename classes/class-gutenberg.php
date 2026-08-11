@@ -25,6 +25,80 @@ class Visual_Portfolio_Gutenberg {
 	 */
 	public function __construct() {
 		add_action( 'enqueue_block_assets', array( $this, 'enqueue_block_editor_assets' ) );
+		add_action( 'init', array( $this, 'register_block_patterns' ) );
+	}
+
+	/**
+	 * Register the Gallery Loop block patterns.
+	 *
+	 * Patterns are plain PHP files in `gutenberg/patterns/`, described by file
+	 * headers the same way theme patterns are. They all carry
+	 * `Block Types: visual-portfolio/loop`, which is what puts them in the
+	 * loop's own inserter.
+	 */
+	public function register_block_patterns() {
+		// Every pattern is built out of loop blocks, so they follow the family gate.
+		if ( ! visual_portfolio()->supports_loop_blocks() ) {
+			return;
+		}
+
+		register_block_pattern_category(
+			'visual-portfolio',
+			array(
+				'label' => __( 'Visual Portfolio', 'visual-portfolio' ),
+			)
+		);
+
+		$pattern_files = glob( visual_portfolio()->plugin_path . 'gutenberg/patterns/*.php' );
+
+		if ( empty( $pattern_files ) ) {
+			return;
+		}
+
+		foreach ( $pattern_files as $pattern_file ) {
+			$pattern_data = get_file_data(
+				$pattern_file,
+				array(
+					'title'       => 'Title',
+					'slug'        => 'Slug',
+					'description' => 'Description',
+					'categories'  => 'Categories',
+					'blockTypes'  => 'Block Types',
+				)
+			);
+
+			if ( empty( $pattern_data['title'] ) || empty( $pattern_data['slug'] ) ) {
+				continue;
+			}
+
+			ob_start();
+			include $pattern_file;
+			$content = ob_get_clean();
+
+			$categories = array( 'visual-portfolio' );
+
+			if ( ! empty( $pattern_data['categories'] ) ) {
+				$categories = array_merge( $categories, array_map( 'trim', explode( ',', $pattern_data['categories'] ) ) );
+			}
+
+			$block_types = empty( $pattern_data['blockTypes'] )
+				? array()
+				: array_map( 'trim', explode( ',', $pattern_data['blockTypes'] ) );
+
+			register_block_pattern(
+				$pattern_data['slug'],
+				array(
+					// Untranslated on purpose: `make-pot` only collects pattern
+					// headers from a `patterns/` directory at the plugin root, so
+					// wrapping these would produce strings no catalogue can carry.
+					'title'       => $pattern_data['title'],
+					'description' => $pattern_data['description'],
+					'content'     => $content,
+					'categories'  => $categories,
+					'blockTypes'  => $block_types,
+				)
+			);
+		}
 	}
 
 	/**

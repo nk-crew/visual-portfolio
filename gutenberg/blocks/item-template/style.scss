@@ -1,0 +1,46 @@
+// Columns and gap are a public contract: the server prints the variables on the
+// list, themes and Pro breakpoints override them with CSS alone.
+.wp-block-visual-portfolio-item-template {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+
+	&.vp-layout-grid {
+		display: grid;
+		grid-template-columns: repeat(var(--vp-layout-columns, 3), minmax(0, 1fr));
+		gap: var(--vp-layout-gap, 1.5rem);
+
+		@media (max-width: 781px) {
+			grid-template-columns: repeat(var(--vp-layout-columns-md, 2), minmax(0, 1fr));
+		}
+
+		@media (max-width: 600px) {
+			grid-template-columns: repeat(var(--vp-layout-columns-sm, 1), minmax(0, 1fr));
+		}
+	}
+
+	// Masonry is positioned by the script module, but the item widths it lays out
+	// come from here - Masonry reads them, it does not calculate them.
+	&.vp-layout-masonry {
+		--vp-layout-current-columns: var(--vp-layout-columns, 3);
+
+		position: relative;
+
+		@media (max-width: 781px) {
+			--vp-layout-current-columns: var(--vp-layout-columns-md, 2);
+		}
+
+		@media (max-width: 600px) {
+			--vp-layout-current-columns: var(--vp-layout-columns-sm, 1);
+		}
+
+		> .wp-block-visual-portfolio-item-template__item {
+			width: calc((100% - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
+			margin-bottom: var(--vp-layout-gap, 1.5rem);
+		}
+	}
+}
+
+.wp-block-visual-portfolio-item-template__item {
+	min-width: 0;
+}

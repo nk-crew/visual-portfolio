@@ -1,0 +1,17 @@
+// Item date block.
+.wp-block-visual-portfolio-item-date {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	// The date is a single inline run - the theme's link typography would make it
+	// stand out from the rest of the item meta.
+	:where(a) {
+		font-family: inherit;
+		font-size: inherit;
+		font-style: inherit;
+		font-weight: inherit;
+		letter-spacing: inherit;
+		line-height: inherit;
+		text-decoration: inherit;
+	}
+}

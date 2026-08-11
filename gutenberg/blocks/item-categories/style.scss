@@ -1,0 +1,6 @@
+// Item categories block.
+.wp-block-visual-portfolio-item-categories {
+	word-break: break-word;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+}

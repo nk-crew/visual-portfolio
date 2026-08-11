@@ -1,0 +1,17 @@
+// Item title block.
+.wp-block-visual-portfolio-item-title {
+	word-break: break-word;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	// The link is the heading - it should not pick up the theme's link typography.
+	:where(a) {
+		font-family: inherit;
+		font-size: inherit;
+		font-style: inherit;
+		font-weight: inherit;
+		letter-spacing: inherit;
+		line-height: inherit;
+		text-decoration: inherit;
+	}
+}
