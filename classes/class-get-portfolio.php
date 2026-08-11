@@ -70,6 +70,20 @@ class Visual_Portfolio_Get {
 	private static $used_layouts = array();
 
 	/**
+	 * Resolved loop items, keyed by loop attributes and request state.
+	 *
+	 * @var array
+	 */
+	private static $loop_items_cache = array();
+
+	/**
+	 * Query string parameters the loop pipeline reads.
+	 *
+	 * @var array
+	 */
+	private static $loop_query_vars = array( 'vp_page', 'vp_filter', 'vp_sort', 'vpf_random_seed' );
+
+	/**
 	 * Get all available layouts.
 	 *
 	 * @return array
@@ -336,49 +350,13 @@ class Visual_Portfolio_Get {
 		}
 
 		$is_preview = self::is_preview();
-		$start_page = self::get_current_page_number();
-		$is_images  = 'images' === $options['content_source'];
-		$is_social  = 'social-stream' === $options['content_source'];
 
-		// Get query params.
-		$query_opts = self::get_query_params( $options, false, $options['id'] );
-
-		/**
-		 * Filter to provide a custom query result object for non-standard content sources.
-		 * Return a query-like object with have_posts(), the_post(), reset_postdata() methods
-		 * and max_num_pages property, or false to use default WP_Query.
-		 *
-		 * @param bool|object $custom_query Custom query object or false.
-		 * @param array       $query_opts   Query options.
-		 * @param array       $options      Portfolio options.
-		 */
-		$custom_query = apply_filters( 'vpf_custom_query_result', false, $query_opts, $options );
-
-		// This hack exists because wp_reset_postdata() does not work in some situations.
-		$old_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
-
-		if ( $is_images || $is_social ) {
-			if ( isset( $query_opts['max_num_pages'] ) ) {
-				$max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
-			} else {
-				$max_pages = $start_page;
-			}
-		} elseif ( $custom_query ) {
-			// Use custom query object provided by extensions.
-			$portfolio_query = $custom_query;
-			$max_pages       = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
-		} else {
-			// get Post List.
-			$portfolio_query = new WP_Query( $query_opts );
-
-			$max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
-		}
-
-		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
-			array(
-				'vp_page' => $start_page + 1,
-			)
-		) : false;
+		$query           = self::resolve_query( $options );
+		$query_opts      = $query['query_opts'];
+		$portfolio_query = $query['portfolio_query'];
+		$start_page      = $query['start_page'];
+		$max_pages       = $query['max_pages'];
+		$next_page_url   = $query['next_page_url'];
 
 		$options['start_page']    = $start_page;
 		$options['max_pages']     = $max_pages;
@@ -589,6 +567,139 @@ class Visual_Portfolio_Get {
 			'vp_opts'            => $options,
 		);
 
+		$items = self::build_items( $each_item_args, $query_opts, $options, $portfolio_query );
+
+		$notices = array();
+
+		// No items found notice.
+		if ( empty( $items ) ) {
+			$class .= ' vp-portfolio-not-found';
+
+			// Don't display any output if no items found (works on frontend only).
+			if ( $options['no_items_notice'] && ( $is_preview || 'notice' === $options['no_items_action'] ) ) {
+				$notices[] = $options['no_items_notice'];
+			}
+		}
+
+		$errors = array();
+
+		if ( isset( $query_opts['error'] ) && ! empty( $query_opts['error'] ) && ( $is_preview || is_admin_bar_showing() ) ) {
+			$class   .= ' vp-portfolio-errors';
+			$errors[] = $query_opts['error'];
+		}
+
+		$result = array(
+			'options'           => $options,
+			'style_options'     => $style_options,
+			'class'             => $class,
+			'data_attrs'        => $data_attrs,
+			'items_class'       => $items_class,
+			'items'             => $items,
+			'notices'           => $notices,
+			'errors'            => $errors,
+			'img_size_popup'    => $img_size_popup,
+			'img_size_md_popup' => $img_size_md_popup,
+			'img_size_sm_popup' => $img_size_sm_popup,
+			'img_size'          => $img_size,
+		);
+
+		return $result;
+	}
+
+	/**
+	 * Resolve the query for the given options.
+	 *
+	 * Pure code motion out of `get_output_config()`, so the native Gallery Loop
+	 * blocks resolve their query through exactly the same path as the legacy
+	 * gallery - including the `vpf_custom_query_result` extension point.
+	 *
+	 * @param array $options portfolio options.
+	 *
+	 * @return array {
+	 *     @type array       $query_opts      Query options.
+	 *     @type object|null $portfolio_query Query object, null for images and social sources.
+	 *     @type int         $max_pages       Total pages count.
+	 *     @type int         $start_page      Currently requested page.
+	 *     @type string|bool $next_page_url   URL of the next page, false when there is none.
+	 * }
+	 */
+	private static function resolve_query( $options ) {
+		$start_page = self::get_current_page_number();
+		$is_images  = 'images' === $options['content_source'];
+		$is_social  = 'social-stream' === $options['content_source'];
+
+		// Get query params.
+		$query_opts = self::get_query_params( $options, false, $options['id'] );
+
+		/**
+		 * Filter to provide a custom query result object for non-standard content sources.
+		 * Return a query-like object with have_posts(), the_post(), reset_postdata() methods
+		 * and max_num_pages property, or false to use default WP_Query.
+		 *
+		 * @param bool|object $custom_query Custom query object or false.
+		 * @param array       $query_opts   Query options.
+		 * @param array       $options      Portfolio options.
+		 */
+		$custom_query = apply_filters( 'vpf_custom_query_result', false, $query_opts, $options );
+
+		$portfolio_query = null;
+
+		if ( $is_images || $is_social ) {
+			if ( isset( $query_opts['max_num_pages'] ) ) {
+				$max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
+			} else {
+				$max_pages = $start_page;
+			}
+		} elseif ( $custom_query ) {
+			// Use custom query object provided by extensions.
+			$portfolio_query = $custom_query;
+			$max_pages       = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
+		} else {
+			// get Post List.
+			$portfolio_query = new WP_Query( $query_opts );
+
+			$max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
+		}
+
+		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
+			array(
+				'vp_page' => $start_page + 1,
+			)
+		) : false;
+
+		return array(
+			'query_opts'      => $query_opts,
+			'portfolio_query' => $portfolio_query,
+			'max_pages'       => $max_pages,
+			'start_page'      => $start_page,
+			'next_page_url'   => $next_page_url,
+		);
+	}
+
+	/**
+	 * Build the normalized items array out of a resolved query.
+	 *
+	 * Pure code motion out of `get_output_config()`. Keeps every extension point
+	 * of the legacy pipeline: `vpf_custom_items`, `vpf_image_item_args` and
+	 * `vpf_post_item_args`.
+	 *
+	 * @param array       $each_item_args  Default item args template.
+	 * @param array       $query_opts      Query options.
+	 * @param array       $options         Portfolio options.
+	 * @param object|null $portfolio_query Query object, null for images and social sources.
+	 *
+	 * @return array
+	 */
+	private static function build_items( $each_item_args, $query_opts, $options, $portfolio_query = null ) {
+		$is_images      = 'images' === $options['content_source'];
+		$is_social      = 'social-stream' === $options['content_source'];
+		$img_size_popup = $each_item_args['img_size_popup'];
+
+		// This hack exists because wp_reset_postdata() does not work in some situations.
+		// Captured here rather than before the query: resolving a query never runs
+		// the loop, so the global post is still the one we have to restore.
+		$old_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
+
 		$items = array();
 
 		/**
@@ -788,41 +899,177 @@ class Visual_Portfolio_Get {
 			$GLOBALS['post'] = $old_post;
 		}
 
-		$notices = array();
+		return $items;
+	}
 
-		// No items found notice.
-		if ( empty( $items ) ) {
-			$class .= ' vp-portfolio-not-found';
+	/**
+	 * Default per-item args for the block pipeline.
+	 *
+	 * The same keys `get_output_config()` prepares, minus the skin options: in the
+	 * block world an item is composed of blocks, so there is no items style to
+	 * read options from. The `opts` key stays for the signature of the
+	 * `vpf_image_item_args` / `vpf_post_item_args` callbacks.
+	 *
+	 * @param array $options portfolio options.
+	 *
+	 * @return array
+	 */
+	public static function default_item_args( $options ) {
+		return array(
+			'uid'               => '',
+			'post_id'           => '',
+			'post_type'         => '',
+			'url'               => '',
+			'aria_label'        => '',
+			'title'             => '',
+			'excerpt'           => '',
+			'content'           => '',
+			'comments_count'    => '',
+			'comments_url'      => '',
+			'author'            => '',
+			'author_url'        => '',
+			'author_avatar'     => '',
+			'views_count'       => '',
+			'reading_time'      => '',
+			'format'            => '',
+			'published'         => '',
+			'published_time'    => '',
+			'categories'        => array(),
+			'filter'            => '',
+			'video'             => '',
+			'image_id'          => '',
+			'img_size_popup'    => 'vp_xl_popup',
+			'img_size_md_popup' => 'vp_md_popup',
+			'img_size_sm_popup' => 'vp_sm_popup',
+			'img_size'          => 'vp_xl',
+			'no_image'          => Visual_Portfolio_Settings::get_option( 'no_image', 'vp_general' ),
+			'focal_point'       => '',
+			'allow_popup'       => false,
+			'opts'              => array(),
+			'vp_opts'           => $options,
+		);
+	}
 
-			// Don't display any output if no items found (works on frontend only).
-			if ( $options['no_items_notice'] && ( $is_preview || 'notice' === $options['no_items_action'] ) ) {
-				$notices[] = $options['no_items_notice'];
-			}
+	/**
+	 * Build the memoization key for `get_loop_items()`.
+	 *
+	 * The request state that narrows the query is part of the identity - without
+	 * it a filtered loop would be served the unfiltered items of an earlier call.
+	 *
+	 * @param array $atts options for the loop.
+	 *
+	 * @return string|bool md5 hash, or false when the attributes are not serializable.
+	 */
+	private static function get_loop_items_cache_key( $atts ) {
+		$state = array();
+
+		foreach ( self::$loop_query_vars as $name ) {
+            // phpcs:ignore WordPress.Security.NonceVerification
+			$state[ $name ] = isset( $_REQUEST[ $name ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ $name ] ) ) : null;
 		}
 
-		$errors = array();
+		$identity = wp_json_encode( array( $atts, $state ) );
 
-		if ( isset( $query_opts['error'] ) && ! empty( $query_opts['error'] ) && ( $is_preview || is_admin_bar_showing() ) ) {
-			$class   .= ' vp-portfolio-errors';
-			$errors[] = $query_opts['error'];
+		// Without a reliable identity, two different loops would share one entry,
+		// which is worse than resolving the query twice.
+		return false === $identity ? false : md5( $identity );
+	}
+
+	/**
+	 * Get items for a native Gallery Loop block.
+	 *
+	 * The single data entry point of the loop block family: same query engine,
+	 * same pagination, filtering and sorting, same extension points as the
+	 * legacy gallery - without any of its markup concerns.
+	 *
+	 * @param array $atts options for the loop.
+	 *
+	 * @return array|bool
+	 */
+	public static function get_loop_items( $atts ) {
+		if ( ! is_array( $atts ) ) {
+			return false;
 		}
 
-		$result = array(
-			'options'           => $options,
-			'style_options'     => $style_options,
-			'class'             => $class,
-			'data_attrs'        => $data_attrs,
-			'items_class'       => $items_class,
-			'items'             => $items,
-			'notices'           => $notices,
-			'errors'            => $errors,
-			'img_size_popup'    => $img_size_popup,
-			'img_size_md_popup' => $img_size_md_popup,
-			'img_size_sm_popup' => $img_size_sm_popup,
-			'img_size'          => $img_size,
+		$cache_key = self::get_loop_items_cache_key( $atts );
+
+		// Several blocks of one loop ask for the same items in a single request.
+		if ( false !== $cache_key && isset( self::$loop_items_cache[ $cache_key ] ) ) {
+			return self::$loop_items_cache[ $cache_key ];
+		}
+
+		$options = self::get_options( $atts );
+
+		if ( ! $options ) {
+			return false;
+		}
+
+		// Loop galleries are always paged: without it `get_query_params()` does not
+		// resolve `paged` and the images branch slices from a negative offset.
+		if ( empty( $options['pagination'] ) ) {
+			$options['pagination'] = 'paged';
+		}
+
+		/**
+		 * Fires before the loop items are resolved.
+		 *
+		 * Per-render preparation, such as resetting cached social streams.
+		 *
+		 * @param array $options portfolio options.
+		 */
+		do_action( 'vpf_before_loop_items', $options );
+
+		$query = self::resolve_query( $options );
+		$items = self::build_items( self::default_item_args( $options ), $query['query_opts'], $options, $query['portfolio_query'] );
+
+		/**
+		 * Fires after the loop items are resolved.
+		 *
+		 * @param array $options portfolio options.
+		 */
+		do_action( 'vpf_after_loop_items', $options );
+
+		// The legacy pipeline only fills the excerpt behind the `show_excerpt` skin
+		// option, and skins do not exist here - every item gets one.
+		foreach ( $items as $k => $item ) {
+			$items[ $k ]['excerpt'] = self::get_item_excerpt( $item );
+		}
+
+		/**
+		 * Filters the resolved loop items.
+		 *
+		 * @param array $result  items, max_pages, start_page and options.
+		 * @param array $options portfolio options.
+		 */
+		$result = apply_filters(
+			'vpf_loop_items',
+			array(
+				'items'      => $items,
+				'max_pages'  => $query['max_pages'],
+				'start_page' => $query['start_page'],
+				'options'    => $options,
+			),
+			$options
 		);
 
+		if ( false !== $cache_key ) {
+			self::$loop_items_cache[ $cache_key ] = $result;
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Get the random seed of the current session.
+	 *
+	 * Public counterpart of `get_rand_seed_session()`: the loop control blocks
+	 * add the seed to their links so a randomly ordered loop stays stable across
+	 * pages without JavaScript.
+	 *
+	 * @return int
+	 */
+	public static function get_random_seed() {
+		return self::get_rand_seed_session();
 	}
 
 	/**
@@ -2431,7 +2678,7 @@ class Visual_Portfolio_Get {
 	 *
 	 * @return string
 	 */
-	private static function get_item_aria_label( $args ) {
+	public static function get_item_aria_label( $args ) {
 		$aria_label = wp_strip_all_tags( $args['aria_label'] ?? '' );
 
 		if ( '' === trim( $aria_label ) ) {
