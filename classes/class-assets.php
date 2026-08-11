@@ -736,6 +736,8 @@ class Visual_Portfolio_Assets {
 				// translators: %s - plugin name.
 				'couldnt_retrieve_vp'  => sprintf( __( 'Couldn\'t retrieve %s ID.', 'visual-portfolio' ), visual_portfolio()->plugin_name ),
 
+				'loop_items_updated'   => esc_html__( 'Gallery items updated.', 'visual-portfolio' ),
+
 				'pswp_close'           => esc_attr__( 'Close (Esc)', 'visual-portfolio' ),
 				'pswp_share'           => esc_attr__( 'Share', 'visual-portfolio' ),
 				'pswp_fs'              => esc_attr__( 'Toggle fullscreen', 'visual-portfolio' ),
@@ -945,6 +947,56 @@ class Visual_Portfolio_Assets {
 	}
 
 	/**
+	 * Find gallery blocks inside the given blocks tree.
+	 *
+	 * @param array $blocks - blocks array.
+	 *
+	 * @return array
+	 */
+	private static function find_gallery_blocks( $blocks ) {
+		$found = array();
+
+		if ( ! is_array( $blocks ) ) {
+			return $found;
+		}
+
+		foreach ( $blocks as $block ) {
+			if ( isset( $block['blockName'] ) && 'visual-portfolio/block' === $block['blockName'] ) {
+				$found[] = $block;
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$found = array_merge( $found, self::find_gallery_blocks( $block['innerBlocks'] ) );
+			}
+		}
+
+		return $found;
+	}
+
+	/**
+	 * Enqueue assets used by a Gallery Loop block.
+	 *
+	 * A gallery inside a loop has no `content_source` of its own - it comes from
+	 * the loop context at render time - so it is skipped by the check in
+	 * `maybe_parse_blocks_from_content()` and has to be picked up here.
+	 *
+	 * The loop query itself is not needed: `enqueue()` resolves assets from the
+	 * layout, skin, pagination, filter and click action, all of which live on the
+	 * gallery block.
+	 *
+	 * @param array $block - loop block data.
+	 */
+	private static function enqueue_loop_block( $block ) {
+		foreach ( self::find_gallery_blocks( $block['innerBlocks'] ?? array() ) as $gallery ) {
+			if ( ! isset( $gallery['attrs']['block_id'] ) ) {
+				continue;
+			}
+
+			self::enqueue( $gallery['attrs'] );
+		}
+	}
+
+	/**
 	 * Parse blocks from content.
 	 *
 	 * @param array $blocks - blocks array.
@@ -963,6 +1015,13 @@ class Visual_Portfolio_Assets {
 				isset( $block['attrs']['block_id'] )
 			) {
 				self::enqueue( $block['attrs'] );
+
+				// Gallery Loop block.
+			} elseif (
+				isset( $block['blockName'] ) &&
+				'visual-portfolio/loop' === $block['blockName']
+			) {
+				self::enqueue_loop_block( $block );
 
 				// Saved block.
 			} elseif (

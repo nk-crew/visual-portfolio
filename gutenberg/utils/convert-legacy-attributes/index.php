@@ -5,6 +5,10 @@
  * @package visual-portfolio
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Visual_Portfolio_Convert_Attributes
  */
@@ -157,7 +161,15 @@ class Visual_Portfolio_Convert_Attributes {
 		// Merge with defaults if include_defaults is true.
 		$attributes_to_convert = $modern_attributes;
 		if ( $include_defaults ) {
-			$attributes_to_convert = array_merge( self::$modern_defaults, $modern_attributes );
+			// Merge one level deep, so a partially set group keeps the defaults
+			// of the keys it does not carry.
+			foreach ( self::$modern_defaults as $key => $default_value ) {
+				$value = $modern_attributes[ $key ] ?? null;
+
+				$attributes_to_convert[ $key ] = is_array( $value )
+					? array_merge( $default_value, $value )
+					: $default_value;
+			}
 		}
 
 		// Handle direct mappings.

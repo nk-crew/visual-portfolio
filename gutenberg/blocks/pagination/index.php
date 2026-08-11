@@ -14,6 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Block_Paged_Pagination {
 	/**
+	 * Calculated max pages, keyed by loop query.
+	 *
+	 * Every pagination block inside a loop asks for the same number, so it is
+	 * only calculated once per request.
+	 *
+	 * @var array
+	 */
+	private static $max_pages_cache = array();
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -40,64 +50,40 @@ class Visual_Portfolio_Block_Paged_Pagination {
 	/**
 	 * Get max pages for all pagination blocks
 	 *
+	 * The `maxPages` value the editor stores in the loop attributes is only a
+	 * preview: it goes stale as soon as the queried content changes. The number
+	 * is calculated from the loop query on every request instead.
+	 *
 	 * @param array $context - Block Loop Context with query block attributes.
 	 * @return int
 	 */
 	public static function get_max_pages( $context ) {
-		// Get context values.
-		$max_pages = $context['vp/baseQuery']['maxPages'] ?? 1;
-
-		// Check if filtering is applied.
-		if ( empty( $_GET['vp_filter'] ) ) {
-			return $max_pages;
+		if ( empty( $context ) || ! is_array( $context ) ) {
+			return 1;
 		}
 
-		// If filter is applied, we need to recalculate max_pages.
-		$rest_api = new Visual_Portfolio_Rest();
+		$options = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $context );
 
-		$base_query = $context['vp/baseQuery'] ?? null;
-
-		// Create base request data.
-		$request_data = array(
-			'content_source' => $context['vp/queryType'] ?? 'posts',
-			'items_count'    => (int) ( $base_query['perPage'] ?? 6 ),
-			'vp_filter'      => sanitize_text_field( wp_unslash( $_GET['vp_filter'] ) ),
-		);
-
-		// Universal mapping: convert all visual-portfolio/* context keys to request parameters.
-		$request_data = array_merge( $request_data, self::map_context_to_request( $context ) );
-
-		return $rest_api->calculate_max_pages( $request_data );
-	}
-
-	/**
-	 * Universal context mapping helper
-	 *
-	 * @param array $context - Block context.
-	 * @return array - Mapped request data
-	 */
-	private static function map_context_to_request( $context ) {
-		$request_data = array();
-		$prefix       = 'vp/';
-
-		foreach ( $context as $key => $value ) {
-			// Skip if key doesn't start with our prefix.
-			if ( strpos( $key, $prefix ) !== 0 ) {
-				continue;
-			}
-
-			// Convert context key to request parameter key.
-			$param_key = str_replace( $prefix, '', $key );
-
-			// Skip keys we already handle in the main function.
-			if ( in_array( $param_key, array( 'maxPages', 'content_source', 'items_count' ), true ) ) {
-				continue;
-			}
-
-			$request_data[ $param_key ] = $value;
+		if ( empty( $options ) ) {
+			return 1;
 		}
 
-		return $request_data;
+		// The filter narrows the query, so it is part of the identity here.
+		$identity = wp_json_encode( array( $options, Visual_Portfolio_Get::get_filter_active_item( array() ) ) );
+
+		// Without a reliable identity two different loops would share one entry,
+		// which is worse than calculating twice.
+		if ( false === $identity ) {
+			return Visual_Portfolio_Get::calculate_max_pages( $options );
+		}
+
+		$cache_key = md5( $identity );
+
+		if ( ! isset( self::$max_pages_cache[ $cache_key ] ) ) {
+			self::$max_pages_cache[ $cache_key ] = Visual_Portfolio_Get::calculate_max_pages( $options );
+		}
+
+		return self::$max_pages_cache[ $cache_key ];
 	}
 
 	/**
@@ -116,7 +102,8 @@ class Visual_Portfolio_Block_Paged_Pagination {
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
 				'class'      => 'vp-block-pagination',
-				'aria-label' => esc_attr__( 'Pagination', 'visual-portfolio' ),
+				// `get_block_wrapper_attributes()` escapes the values itself.
+				'aria-label' => __( 'Pagination', 'visual-portfolio' ),
 			)
 		);
 

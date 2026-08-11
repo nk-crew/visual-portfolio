@@ -54,7 +54,7 @@
 			}
 		},
 		"customCss": { "type": "string", "default": "" },
-		"previewImageExample": { "type": "string", "default": "" },
+		"preview_image_example": { "type": "string", "default": "" },
 		"setupWizard": { "type": "string", "default": "" }
 	},
 	"supports": {
@@ -93,7 +93,7 @@
 	},
 	"example": {
 		"attributes": {
-			"preview_image_example": true,
+			"preview_image_example": "true",
 			"layout": "justified"
 		}
 	},

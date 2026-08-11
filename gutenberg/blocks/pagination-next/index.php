@@ -45,7 +45,7 @@ class Visual_Portfolio_Block_Pagination_Next {
 		$max_pages = Visual_Portfolio_Block_Paged_Pagination::get_max_pages( $block->context );
 
 		// Get current page.
-		$current_page = max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
+		$current_page = Visual_Portfolio_Get::get_current_page_number();
 
 		// If only one page or on the last page, don't show pagination.
 		if ( $max_pages <= 1 || $current_page >= $max_pages ) {

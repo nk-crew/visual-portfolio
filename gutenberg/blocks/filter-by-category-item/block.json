@@ -7,7 +7,7 @@
 	"description": "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/filter-by-category"],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["visual-portfolio-filter-by-category/showCount"],
+	"usesContext": ["vp/queryType", "vp/showCount"],
 	"supports": {
 		"lock": true,
 		"html": false,
@@ -55,7 +55,7 @@
 	"attributes": {
 		"lock": {
 			"type": "object",
-			"default": { "move": true, "remove": true }
+			"default": { "move": false, "remove": true }
 		},
 		"text": { "type": "string", "default": "" },
 		"filter": { "type": "string", "default": "*" },

@@ -21,22 +21,22 @@ export async function createRegularPosts({
 	// Create categories if provided
 	const categoryIds = [];
 	for (const categoryName of categories) {
+		const slug = categoryName.toLowerCase().replace(/\s+/g, '-');
+
 		try {
 			const category = await requestUtils.rest({
 				path: '/wp/v2/categories',
 				method: 'POST',
-				data: {
-					name: categoryName,
-					slug: categoryName.toLowerCase().replace(/\s+/g, '-'),
-				},
+				data: { name: categoryName, slug },
 			});
 			categoryIds.push(category.id);
 		} catch (_error) {
-			// Category might already exist
+			// Category might already exist. The query has to go through
+			// `params`: the REST root URL already carries a query string, so a
+			// `?` in the path ends up inside the `rest_route` parameter.
 			const existingCategories = await requestUtils.rest({
-				path: `/wp/v2/categories?slug=${categoryName
-					.toLowerCase()
-					.replace(/\s+/g, '-')}`,
+				path: '/wp/v2/categories',
+				params: { slug },
 			});
 			if (existingCategories && existingCategories.length > 0) {
 				categoryIds.push(existingCategories[0].id);

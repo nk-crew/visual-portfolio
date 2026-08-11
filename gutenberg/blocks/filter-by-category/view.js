@@ -1,12 +1,11 @@
 import $ from 'jquery';
 
+import { getLoopGallery } from '../../utils/loop-gallery';
+
 const $doc = $(document);
 
 $doc.on('click', '.vp-block-filter-by-category a', (e) => {
-	const $current = $(e.currentTarget);
-	const $loop = $current.closest('.vp-block-loop');
-	const $legacyBlock = $loop.find('.vp-portfolio');
-	const vpf = $legacyBlock?.[0]?.vpf;
+	const vpf = getLoopGallery(e.currentTarget);
 
 	if (!vpf) {
 		return;
@@ -14,5 +13,5 @@ $doc.on('click', '.vp-block-filter-by-category a', (e) => {
 
 	e.preventDefault();
 
-	vpf.loadNewItems($current.attr('href'), true);
+	vpf.loadNewItems($(e.currentTarget).attr('href'), true);
 });

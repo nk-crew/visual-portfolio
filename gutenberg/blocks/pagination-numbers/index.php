@@ -56,10 +56,7 @@ class Visual_Portfolio_Block_Pagination_Numbers {
 		);
 
 		// Get current page.
-		$current_page = max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
-		if ( $current_page < 1 ) {
-			$current_page = 1;
-		}
+		$current_page = Visual_Portfolio_Get::get_current_page_number();
 
 		$pagination_links = Visual_Portfolio_Get::get_pagination_links(
 			array(

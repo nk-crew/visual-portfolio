@@ -8,9 +8,11 @@ export default [
 	{
 		name: 'paged',
 		scope: ['inserter', 'block'],
-		title: __('Pagination Paged (Experimental)'),
-		description:
+		title: __('Pagination Paged (Experimental)', 'visual-portfolio'),
+		description: __(
 			'Displays paged pagination for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.',
+			'visual-portfolio'
+		),
 		attributes: {
 			layout: { type: 'flex', justifyContent: 'space-between' },
 		},
@@ -27,9 +29,11 @@ export default [
 	{
 		name: 'load-more',
 		scope: ['inserter', 'block'],
-		title: __('Pagination Load More (Experimental)'),
-		description:
+		title: __('Pagination Load More (Experimental)', 'visual-portfolio'),
+		description: __(
 			'Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.',
+			'visual-portfolio'
+		),
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },
 		innerBlocks: [['visual-portfolio/pagination-load-more']],
 		icon: {
@@ -40,9 +44,11 @@ export default [
 	{
 		name: 'infinite',
 		scope: ['inserter', 'block'],
-		title: __('Pagination Infinite (Experimental)'),
-		description:
-			'Displays a infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.',
+		title: __('Pagination Infinite (Experimental)', 'visual-portfolio'),
+		description: __(
+			'Displays an infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.',
+			'visual-portfolio'
+		),
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },
 		innerBlocks: [['visual-portfolio/pagination-infinite']],
 		icon: {

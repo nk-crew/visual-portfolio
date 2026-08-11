@@ -4,6 +4,7 @@ import { useEffect } from '@wordpress/element';
 import ControlsRender from '../components/controls-render';
 import IframePreview from '../components/iframe-preview';
 import SetupWizard from '../components/setup-wizard';
+import { LOOP_GENERAL_CONTROLS, pickControls } from '../utils/loop-controls';
 
 const {
 	plugin_url: pluginUrl,
@@ -15,10 +16,11 @@ function filterControlCategories(categories, isChildOfLoop) {
 		return categories;
 	}
 
-	// Categories to remove when block is child of Loop
+	// Categories to remove when block is child of Loop. `content-source-general`
+	// stays: the loop only takes over the query settings from it, the rendering
+	// ones are still applied by this block.
 	const categoriesToRemove = [
 		'content-source',
-		'content-source-general',
 		'content-source-images',
 		'content-source-post-based',
 		'content-source-taxonomies',
@@ -68,12 +70,19 @@ function renderControls(props, isChildOfLoop) {
 						const categoryInitialOpen =
 							isChildOfLoop && name === 'layout-elements';
 
+						// The loop owns the query settings of this category.
+						const controls =
+							isChildOfLoop && 'content-source-general' === name
+								? pickControls(LOOP_GENERAL_CONTROLS, true)
+								: undefined;
+
 						return (
 							<ControlsRender
+								{...props}
 								key={name}
 								category={name}
 								categoryInitialOpen={categoryInitialOpen}
-								{...props}
+								controls={controls}
 							/>
 						);
 					})

@@ -1,4 +1,4 @@
-// Pagination block.
+// Filter by category block.
 .vp-block-filter-by-category {
 	font-size: var(--wp--preset--font-size--medium, 1rem);
 	font-weight: 500;
@@ -18,29 +18,24 @@
 }
 
 // Fill style.
-.is-style-fill {
-	&.vp-block-filter-by-category {
-		gap: 0;
-
-		a {
-			text-decoration: none;
-		}
-	}
-
+//
+// Every item gets a filled pill and the active one a stronger fill. Spacing is
+// left to the block gap, so the setting in the editor still applies.
+.vp-block-filter-by-category.is-style-fill {
 	.vp-block-filter-by-category-item {
 		border-radius: 9999px;
 		padding: 0.3em 0.8em;
-		background-color: transparent;
+		background-color: color-mix(in srgb, currentColor 7%, transparent);
 		text-decoration: none;
 		font-weight: 400;
 
 		&:hover,
 		&:focus {
-			opacity: 0.6;
+			background-color: color-mix(in srgb, currentColor 12%, transparent);
 		}
 
 		&.is-active {
-			background-color: color-mix(in srgb, currentColor 10%, transparent);
+			background-color: color-mix(in srgb, currentColor 18%, transparent);
 		}
 	}
 }

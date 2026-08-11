@@ -40,58 +40,38 @@ class Visual_Portfolio_Block_Sort {
 	/**
 	 * Block output
 	 *
-	 * @param array  $attributes - block attributes.
-	 * @param string $content - block content.
+	 * The options are the same for every sort block, so neither the attributes
+	 * nor the inner content are used.
 	 *
 	 * @return string
 	 */
-	public function block_render( $attributes, $content ) {
+	public function block_render() {
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
 				'class' => 'vp-block-sort',
 			)
 		);
 
-		$content = '';
-
-		$sort_items = array(
-			''           => esc_html__( 'Default sorting', 'visual-portfolio' ),
-			'date_desc'  => esc_html__( 'Sort by date (newest)', 'visual-portfolio' ),
-			'date'       => esc_html__( 'Sort by date (oldest)', 'visual-portfolio' ),
-			'title'      => esc_html__( 'Sort by title (A-Z)', 'visual-portfolio' ),
-			'title_desc' => esc_html__( 'Sort by title (Z-A)', 'visual-portfolio' ),
-		);
+		$options = '';
 
 		// Get active item.
-		$active_item = false;
+		$active_item = Visual_Portfolio_Get::get_current_sort();
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( isset( $_GET['vp_sort'] ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$active_item = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
-		}
-
-		foreach ( $sort_items as $slug => $label ) {
-			$url = Visual_Portfolio_Get::get_pagenum_link(
-				array(
-					'vp_sort' => rawurlencode( $slug ),
-					'vp_page' => 1,
-				)
-			);
+		foreach ( Visual_Portfolio_Get::get_sort_items() as $slug => $label ) {
+			$url = Visual_Portfolio_Get::get_sort_item_url( $slug );
 
 			$is_active = ! $active_item && ! $slug ? true : $active_item === $slug;
 
-			$content .= '<option data-vp-url="' . esc_url( $url ) . '" value="' . esc_attr( $slug ) . '" ' . selected( $is_active, true, false ) . '>';
-			$content .= esc_html( $label );
-			$content .= '</option>';
+			$options .= '<option data-vp-url="' . esc_url( $url ) . '" value="' . esc_attr( $slug ) . '" ' . selected( $is_active, true, false ) . '>';
+			$options .= esc_html( $label );
+			$options .= '</option>';
 		}
 
-		$content = '<select>' . $content . '</select>';
-
 		return sprintf(
-			'<div %1$s>%2$s</div>',
+			'<div %1$s><select aria-label="%2$s">%3$s</select></div>',
 			$wrapper_attributes,
-			$content
+			esc_attr__( 'Sort items', 'visual-portfolio' ),
+			$options
 		);
 	}
 }

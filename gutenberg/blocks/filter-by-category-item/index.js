@@ -5,7 +5,7 @@ import metadata from './block.json';
 import BlockEdit from './edit';
 import BlockSave from './save';
 
-registerBlockType('vp/filter-by-category-item', {
+registerBlockType(metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',

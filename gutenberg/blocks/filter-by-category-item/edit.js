@@ -6,8 +6,7 @@ export default function BlockEdit({ attributes, setAttributes, context }) {
 	const { text, isActive, isAll, count } = attributes;
 
 	// Get context values with fallbacks
-	const showCount =
-		context?.['visual-portfolio-filter-by-category/showCount'] || false;
+	const showCount = context?.['vp/showCount'] || false;
 
 	const blockProps = useBlockProps({
 		className: classnames('vp-block-filter-by-category-item', {
