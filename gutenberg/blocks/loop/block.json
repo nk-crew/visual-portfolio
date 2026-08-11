@@ -102,6 +102,5 @@
 		"vp/baseQuery": "baseQuery",
 		"vp/postsQuery": "postsQuery",
 		"vp/imagesQuery": "imagesQuery"
-	},
-	"viewScript": "visual-portfolio-block-loop"
+	}
 }

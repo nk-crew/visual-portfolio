@@ -104,6 +104,22 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 		}
 
 		/**
+		 * Check if the Gallery Loop block family can be registered.
+		 *
+		 * The family is built on the Interactivity API, script modules and block
+		 * bindings, none of which are guaranteed before WordPress 6.5. One gate
+		 * for the whole family, so no file inside it needs a version branch or a
+		 * `function_exists` guard of its own.
+		 *
+		 * The plugin minimum stays where it is - the legacy blocks hold it.
+		 *
+		 * @return bool
+		 */
+		public function supports_loop_blocks() {
+			return version_compare( get_bloginfo( 'version' ), '6.5', '>=' );
+		}
+
+		/**
 		 * Init options
 		 */
 		public function init() {
@@ -225,17 +241,21 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 
 			require_once $this->plugin_path . 'classes/class-gutenberg.php';
 			require_once $this->plugin_path . 'gutenberg/block/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/loop/index.php';
 			require_once $this->plugin_path . 'gutenberg/block-saved/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/filter-by-category-item/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/filter-by-category/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/pagination/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/pagination-next/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/pagination-numbers/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/pagination-previous/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/pagination-load-more/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/pagination-infinite/index.php';
-			require_once $this->plugin_path . 'gutenberg/blocks/sort/index.php';
+
+			// Gallery Loop block family, see `supports_loop_blocks()`.
+			if ( $this->supports_loop_blocks() ) {
+				require_once $this->plugin_path . 'gutenberg/blocks/loop/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-filter-item/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-filter/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-next/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-numbers/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-previous/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-load-more/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-infinite/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-sort/index.php';
+			}
 
 			require_once $this->plugin_path . 'classes/class-shortcode.php';
 			require_once $this->plugin_path . 'classes/class-preview.php';

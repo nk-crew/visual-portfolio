@@ -222,6 +222,7 @@ class Visual_Portfolio_Gutenberg {
 				'plugin_name'              => visual_portfolio()->plugin_name,
 				'plugin_url'               => visual_portfolio()->plugin_url,
 				'pro'                      => visual_portfolio()->is_pro(),
+				'loop_blocks'              => visual_portfolio()->supports_loop_blocks(),
 				'admin_url'                => get_admin_url(),
 				'attributes'               => $attributes,
 				'controls'                 => Visual_Portfolio_Controls::get_registered_array(),

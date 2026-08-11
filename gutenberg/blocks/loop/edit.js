@@ -27,25 +27,20 @@ const ALLOWED_CONTROL_CATEGORIES = [
 
 const TEMPLATE = [
 	[
-		'visual-portfolio/filter-by-category',
+		'visual-portfolio/loop-filter',
 		{},
 		// A placeholder until the filter block has fetched its items. It carries
 		// the default `filter` of `*`, so the fetched "All" item reuses it.
-		[
-			[
-				'visual-portfolio/filter-by-category-item',
-				{ text: 'All', isAll: true },
-			],
-		],
+		[['visual-portfolio/loop-filter-item', { text: 'All', isAll: true }]],
 	],
 	['visual-portfolio/block', { setup_wizard: 'false' }],
 	[
-		'visual-portfolio/pagination',
+		'visual-portfolio/loop-pagination',
 		{},
 		[
-			['visual-portfolio/pagination-previous'],
-			['visual-portfolio/pagination-numbers'],
-			['visual-portfolio/pagination-next'],
+			['visual-portfolio/loop-pagination-previous'],
+			['visual-portfolio/loop-pagination-numbers'],
+			['visual-portfolio/loop-pagination-next'],
 		],
 	],
 ];

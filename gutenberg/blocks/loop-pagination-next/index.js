@@ -1,19 +1,23 @@
-import { ReactComponent as BlockIcon } from '../../block-icons/visual-portfolio.svg';
+/**
+ * WordPress dependencies
+ */
+
+/**
+ * Internal dependencies
+ */
+import { ReactComponent as BlockIcon } from '../../block-icons/loop-pagination-next.svg';
 import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import edit from './edit';
-import save from './save';
 
-const { name } = metadata;
-
-const settings = {
+/**
+ * Register block
+ */
+registerLoopBlock(metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
 		src: <BlockIcon width="20" height="20" />,
 	},
 	edit,
-	save,
-};
-
-registerLoopBlock(name, settings);
+});

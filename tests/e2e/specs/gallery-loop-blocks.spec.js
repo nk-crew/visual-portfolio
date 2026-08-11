@@ -34,13 +34,13 @@ function getLoopBlock(paginationBlocks) {
 			},
 		},
 		innerBlocks: [
-			{ name: 'visual-portfolio/filter-by-category' },
+			{ name: 'visual-portfolio/loop-filter' },
 			{
 				name: 'visual-portfolio/block',
 				attributes: { setup_wizard: 'false' },
 			},
 			{
-				name: 'visual-portfolio/pagination',
+				name: 'visual-portfolio/loop-pagination',
 				innerBlocks: paginationBlocks,
 			},
 		],
@@ -48,9 +48,9 @@ function getLoopBlock(paginationBlocks) {
 }
 
 const PAGED_PAGINATION = [
-	{ name: 'visual-portfolio/pagination-previous' },
-	{ name: 'visual-portfolio/pagination-numbers' },
-	{ name: 'visual-portfolio/pagination-next' },
+	{ name: 'visual-portfolio/loop-pagination-previous' },
+	{ name: 'visual-portfolio/loop-pagination-numbers' },
+	{ name: 'visual-portfolio/loop-pagination-next' },
 ];
 
 /**
@@ -144,17 +144,17 @@ test.describe('Gallery Loop blocks', () => {
 		const frontend = await openPublishedPage(page);
 		const pageUrl = new URL(frontend.url());
 
-		const items = frontend.locator('.vp-block-filter-by-category-item');
+		const items = frontend.locator('.vp-block-loop-filter-item');
 		await expect(items.first()).toBeVisible();
 
 		// "All" is rendered as a non-link span while it is the active item.
 		await expect(
-			frontend.locator('span.vp-block-filter-by-category-item.is-active')
+			frontend.locator('span.vp-block-loop-filter-item.is-active')
 		).toHaveCount(1);
 
 		// Only the categories are links while "All" is active.
 		const categoryLink = frontend
-			.locator('a.vp-block-filter-by-category-item')
+			.locator('a.vp-block-loop-filter-item')
 			.first();
 		const href = await categoryLink.getAttribute('href');
 		const label = (await categoryLink.innerText()).trim();
@@ -169,7 +169,7 @@ test.describe('Gallery Loop blocks', () => {
 		// The filter markup is replaced with the one of the filtered page, where
 		// the clicked category became the active item.
 		await expect(
-			frontend.locator('span.vp-block-filter-by-category-item.is-active')
+			frontend.locator('span.vp-block-loop-filter-item.is-active')
 		).toHaveText(label, { timeout: 15000 });
 	});
 
@@ -190,34 +190,36 @@ test.describe('Gallery Loop blocks', () => {
 
 		const frontend = await openPublishedPage(page);
 
-		const numbers = frontend.locator('.vp-block-pagination-numbers > *');
+		const numbers = frontend.locator(
+			'.vp-block-loop-pagination-numbers > *'
+		);
 
 		await expect(numbers.first()).toBeVisible();
 		await expect(numbers).toHaveCount(expectedPages);
 
 		// No "previous" link on the first page.
 		await expect(
-			frontend.locator('.vp-block-pagination-previous')
+			frontend.locator('.vp-block-loop-pagination-previous')
 		).toHaveCount(0);
 
-		await frontend.locator('.vp-block-pagination-next').click();
+		await frontend.locator('.vp-block-loop-pagination-next').click();
 
 		// The pagination markup is replaced with the one of the loaded page.
 		await expect(
-			frontend.locator('.vp-block-pagination-previous')
+			frontend.locator('.vp-block-loop-pagination-previous')
 		).toHaveCount(1);
 
 		// Walk to the last page - "next" must be gone there.
 		for (let i = 2; i < expectedPages; i++) {
-			await frontend.locator('.vp-block-pagination-next').click();
+			await frontend.locator('.vp-block-loop-pagination-next').click();
 			await expect(
-				frontend.locator('.vp-block-pagination-numbers .is-active')
+				frontend.locator('.vp-block-loop-pagination-numbers .is-active')
 			).toHaveText(String(i + 1));
 		}
 
-		await expect(frontend.locator('.vp-block-pagination-next')).toHaveCount(
-			0
-		);
+		await expect(
+			frontend.locator('.vp-block-loop-pagination-next')
+		).toHaveCount(0);
 	});
 
 	test('load more disappears once the last page is loaded', async ({
@@ -233,13 +235,17 @@ test.describe('Gallery Loop blocks', () => {
 		});
 
 		await editor.insertBlock(
-			getLoopBlock([{ name: 'visual-portfolio/pagination-load-more' }])
+			getLoopBlock([
+				{ name: 'visual-portfolio/loop-pagination-load-more' },
+			])
 		);
 		await editor.publishPost();
 
 		const frontend = await openPublishedPage(page);
 
-		const loadMore = frontend.locator('.vp-block-pagination-load-more');
+		const loadMore = frontend.locator(
+			'.vp-block-loop-pagination-load-more'
+		);
 		const items = frontend.locator('.vp-portfolio__item');
 
 		await expect(loadMore).toHaveCount(1);
@@ -276,7 +282,9 @@ test.describe('Gallery Loop blocks', () => {
 		const frontend = await openPublishedPage(page);
 		const publishedUrl = frontend.url();
 
-		const numbers = frontend.locator('.vp-block-pagination-numbers > *');
+		const numbers = frontend.locator(
+			'.vp-block-loop-pagination-numbers > *'
+		);
 		await expect(numbers).toHaveCount(expectedPages);
 
 		// Publishing more posts must add a page, even though the page itself was
@@ -302,7 +310,7 @@ test.describe('Gallery Loop blocks', () => {
 function getFilterItemLabels(blocks) {
 	const loop = blocks.find((block) => 'visual-portfolio/loop' === block.name);
 	const filter = loop?.innerBlocks?.find(
-		(block) => 'visual-portfolio/filter-by-category' === block.name
+		(block) => 'visual-portfolio/loop-filter' === block.name
 	);
 
 	return (filter?.innerBlocks ?? []).map((block) => block.attributes.text);

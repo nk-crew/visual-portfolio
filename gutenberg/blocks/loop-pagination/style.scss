@@ -1,0 +1,83 @@
+// Pagination block.
+.vp-block-loop-pagination {
+	font-size: var(--wp--preset--font-size--medium, 1rem);
+	font-weight: 500;
+}
+
+// Previous and next blocks.
+.vp-block-loop-pagination-next-arrow {
+	display: inline-block;
+	margin-left: 0.6ch;
+}
+.vp-block-loop-pagination-previous-arrow {
+	display: inline-block;
+	margin-right: 0.6ch;
+}
+
+// Load more and infinite blocks.
+.vp-block-loop-pagination-load-more-loading,
+.vp-block-loop-pagination-infinite-loading {
+	display: none;
+}
+
+.vp-portfolio__loading {
+	.vp-block-loop-pagination-load-more-loading,
+	.vp-block-loop-pagination-infinite-loading {
+		display: block;
+	}
+	.vp-block-loop-pagination-load-more > :first-child,
+	.vp-block-loop-pagination-infinite > :first-child {
+		display: none;
+	}
+}
+
+// Numbers block
+.vp-block-loop-pagination-numbers {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4ch;
+}
+
+// Fill style.
+.vp-block-loop-pagination.is-style-fill {
+	// Every button-like trigger gets the same pill, including Load More and the
+	// Infinite trigger - without them the style did nothing at all on a loop
+	// that uses one of those instead of paged links.
+	.vp-block-loop-pagination-next,
+	.vp-block-loop-pagination-previous,
+	.vp-block-loop-pagination-load-more,
+	.vp-block-loop-pagination-infinite {
+		border-radius: 9999px;
+		padding: 0.3em 0.8em;
+		background-color: color-mix(in srgb, currentColor 7%, transparent);
+		text-decoration: none;
+		font-weight: 400;
+
+		&:hover,
+		&:focus {
+			background-color: color-mix(in srgb, currentColor 10%, transparent);
+		}
+	}
+
+	.vp-block-loop-pagination-numbers {
+		align-items: center;
+		font-weight: 400;
+		gap: 0.6ch;
+
+		a {
+			text-decoration: none;
+
+			&:hover,
+			&:focus {
+				opacity: 0.6;
+			}
+		}
+
+		.is-active {
+			border-radius: 9999px;
+			padding: 0.3em 0.8em;
+			background-color: color-mix(in srgb, currentColor 7%, transparent);
+			text-decoration: none;
+		}
+	}
+}
