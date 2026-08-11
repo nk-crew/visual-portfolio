@@ -797,6 +797,9 @@
          "Couldn't retrieve %s ID.": [
             ""
          ],
+         "Gallery items updated.": [
+            ""
+         ],
          "Close (Esc)": [
             ""
          ],
@@ -980,10 +983,6 @@
          "Portfolio Activity": [
             ""
          ],
-         "%s ": [
-            "",
-            ""
-         ],
          "No portfolio items yet.": [
             ""
          ],
@@ -1095,10 +1094,10 @@
          "Required parameters are missing.": [
             ""
          ],
-         "Invalid content source: %s": [
+         "Sorry, you are not allowed to get filter items.": [
             ""
          ],
-         "Sorry, you are not allowed to get filter items.": [
+         "Sorry, you are not allowed to get gallery items.": [
             ""
          ],
          "Sorry, you are not allowed to get list of saved layouts.": [
@@ -1527,16 +1526,10 @@
          "See Pro details": [
             ""
          ],
-         "Currently displaying all items": [
-            ""
-         ],
-         "Currently filtering by %1$s, %2$s items": [
-            ""
-         ],
          "Display all items": [
             ""
          ],
-         "Filter by %1$s, %2$s items": [
+         "Filter by %s": [
             ""
          ],
          "Category filter": [
@@ -1546,6 +1539,9 @@
             ""
          ],
          "Page %s": [
+            ""
+         ],
+         "Sort items": [
             ""
          ],
          "By %s": [
@@ -1590,7 +1586,121 @@
          "Saved %s": [
             ""
          ],
+         "Gallery item author": [
+            ""
+         ],
+         "Show prefix": [
+            ""
+         ],
+         "Prefix text": [
+            ""
+         ],
+         "Link to author": [
+            ""
+         ],
+         "Open in new tab": [
+            ""
+         ],
+         "Link relation": [
+            ""
+         ],
+         "The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.": [
+            ""
+         ],
+         "Separator": [
+            ""
+         ],
+         "Character(s) placed between the categories.": [
+            ""
+         ],
+         "Gallery item categories": [
+            ""
+         ],
+         "Date format": [
+            ""
+         ],
+         "Link to item": [
+            ""
+         ],
+         "Gallery item description": [
+            ""
+         ],
+         "Source": [
+            ""
+         ],
+         "Excerpt": [
+            ""
+         ],
+         "Full content": [
+            ""
+         ],
+         "Max number of words": [
+            ""
+         ],
+         "Full Size": [
+            ""
+         ],
+         "Cover": [
+            ""
+         ],
+         "Contain": [
+            ""
+         ],
+         "Fill": [
+            ""
+         ],
+         "Overlay opacity": [
+            ""
+         ],
+         "Image size": [
+            ""
+         ],
+         "Aspect ratio": [
+            ""
+         ],
+         "For example 1, 4/3 or 16/9. Leave empty to keep the original proportions.": [
+            ""
+         ],
+         "Scale": [
+            ""
+         ],
+         "Applies when an aspect ratio is set.": [
+            ""
+         ],
+         "Link rel": [
+            ""
+         ],
+         "Show arrow": [
+            ""
+         ],
+         "“Read more” link text": [
+            ""
+         ],
+         "Read more": [
+            ""
+         ],
+         "Gallery Item Template": [
+            ""
+         ],
+         "No items found. Check the Content Source settings of the Gallery Loop block.": [
+            ""
+         ],
+         "Gallery item title": [
+            ""
+         ],
+         "Make title a link": [
+            ""
+         ],
          "Add category text…": [
+            ""
+         ],
+         "Loading text": [
+            ""
+         ],
+         "Announced to screen readers while the next items are loading.": [
+            ""
+         ],
+         "Infinite scroll trigger": [
             ""
          ],
          "Load more link": [
@@ -1599,13 +1709,34 @@
          "Show label text": [
             ""
          ],
-         "Show arrow": [
-            ""
-         ],
          "Next page link": [
             ""
          ],
+         "Number of links": [
+            ""
+         ],
+         "Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.": [
+            ""
+         ],
          "Previous page link": [
+            ""
+         ],
+         "Pagination Paged (Experimental)": [
+            ""
+         ],
+         "Displays paged pagination for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "Pagination Load More (Experimental)": [
+            ""
+         ],
+         "Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "Pagination Infinite (Experimental)": [
+            ""
+         ],
+         "Displays an infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "Wide 16:9": [
@@ -1848,13 +1979,34 @@
          "block title\u0004Visual Portfolio": [
             ""
          ],
-         "block title\u0004Filter by Category Item (Experimental)": [
+         "block title\u0004Gallery Item Author (Experimental)": [
             ""
          ],
-         "block title\u0004Filter by Category (Experimental)": [
+         "block title\u0004Gallery Item Categories (Experimental)": [
             ""
          ],
-         "block title\u0004Gallery Loop (Experimental)": [
+         "block title\u0004Gallery Item Date (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Item Description (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Item Image (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Item Read More (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Item Template (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Item Title (Experimental)": [
+            ""
+         ],
+         "block title\u0004Filter Item": [
+            ""
+         ],
+         "block title\u0004Gallery Filter (Experimental)": [
             ""
          ],
          "block title\u0004Infinite": [
@@ -1872,10 +2024,13 @@
          "block title\u0004Previous": [
             ""
          ],
-         "block title\u0004Pagination Wrapper (Experimental)": [
+         "block title\u0004Gallery Pagination (Experimental)": [
             ""
          ],
-         "block title\u0004Sort (Experimental)": [
+         "block title\u0004Gallery Sort (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Loop (Experimental)": [
             ""
          ],
          "block title\u0004Visual Portfolio Editor": [
@@ -1887,13 +2042,34 @@
          "block description\u0004Display galleries, posts and portfolio grids.": [
             ""
          ],
+         "block description\u0004Displays the author of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays the categories of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays the publish date of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays the description of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays the image of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays a link to the gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Contains the block elements used to render a gallery item, like the image, title, description and more. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays the title of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
          "block description\u0004Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "block description\u0004Displays category filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.": [
-            ""
-         ],
-         "block description\u0004Display gallery loop. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "block description\u0004Displays a infinite scroll trigger for pagination.": [
@@ -1915,6 +2091,9 @@
             ""
          ],
          "block description\u0004Displays sort options for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Display gallery loop. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "block description\u0004Edit saved Visual Portfolio layouts.": [
@@ -1945,6 +2124,9 @@
             ""
          ],
          "block style label\u0004Fill": [
+            ""
+         ],
+         "block style label\u0004Outline": [
             ""
          ]
       }
