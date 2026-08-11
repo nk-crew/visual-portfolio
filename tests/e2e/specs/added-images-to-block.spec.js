@@ -7,7 +7,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 /**
  * Test Images
  */
-import imageFixtures from '../../fixtures/images.json';
+import rawImageFixtures from '../../fixtures/images.json';
 import { getPortfolioPreviewFrame } from '../utils/editor-canvas';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
@@ -19,6 +19,14 @@ import {
 import { openPublishedPage } from '../utils/open-published-page';
 import { getPluginSlug } from '../utils/plugin-slug';
 import { waitForPortfolioPreview } from '../utils/portfolio-preview';
+
+// `images.json` is a module singleton: Node caches it, `workers: 1` puts every
+// spec in the same process, and this file writes `.id` and `.alt` back into it.
+// Those writes leaked into the other specs importing the same path -- the two
+// image specs read `.alt` back, and archive.spec.js reads the same objects --
+// so behaviour depended on which file ran first. Work on a copy, the way
+// click-action-images.spec.js already does with `cloneFixture`.
+const imageFixtures = JSON.parse(JSON.stringify(rawImageFixtures));
 
 test.describe('added images to block', () => {
 	test.beforeEach(async ({ requestUtils }) => {
