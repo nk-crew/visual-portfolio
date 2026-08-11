@@ -45,8 +45,6 @@ test.describe('click action gallery images (saved layout)', () => {
 		requestUtils,
 		alternativeSetting = false
 	) {
-		await admin.visitAdminPage('edit.php');
-
 		const images = await getWordpressImages({
 			requestUtils,
 			page,

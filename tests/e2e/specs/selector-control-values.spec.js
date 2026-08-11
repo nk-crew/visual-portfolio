@@ -52,17 +52,44 @@ test.describe('selector control attribute values validation', () => {
 		]);
 	});
 
-	test.beforeEach(async ({ page }) => {
-		// Navigate to admin to get a valid nonce.
-		await page.goto('/wp-admin/');
+	/**
+	 * Reads the preview nonce, loading wp-admin once for the whole file.
+	 *
+	 * This used to be a `beforeEach`, which meant a full wp-admin page load --
+	 * every admin script and stylesheet -- before each of these tests, purely to
+	 * read one string. The nonce stays valid for hours, far longer than a run,
+	 * and nothing here mutates it, so fetching it once is equivalent.
+	 *
+	 * A missing nonce is a failure, not a reason to skip. Each test used to
+	 * carry `test.skip( ! nonce )`, so if `VPAdminVariables` ever stopped being
+	 * printed the whole file would quietly skip and the suite would still be
+	 * green while asserting nothing.
+	 *
+	 * @param {Object} pg - Playwright page object.
+	 * @return {string} The preview nonce.
+	 */
+	async function getNonce(pg) {
+		if (nonce) {
+			return nonce;
+		}
 
-		nonce = await page.evaluate(() => {
+		await pg.goto('/wp-admin/');
+
+		nonce = await pg.evaluate(() => {
 			if (window.VPAdminVariables && window.VPAdminVariables.nonce) {
 				return window.VPAdminVariables.nonce;
 			}
 			return null;
 		});
-	});
+
+		if (!nonce) {
+			throw new Error(
+				'VPAdminVariables.nonce is not present on /wp-admin/. The preview endpoint cannot be exercised without it.'
+			);
+		}
+
+		return nonce;
+	}
 
 	/**
 	 * Helper to make a preview POST request.
@@ -72,8 +99,10 @@ test.describe('selector control attribute values validation', () => {
 	 * @return {Object} Response object.
 	 */
 	async function previewRequest(pg, extraFields = {}) {
+		const previewNonce = await getNonce(pg);
+
 		return pg.request.post(
-			`/?vp_preview=vp_preview&vp_preview_nonce=${nonce}`,
+			`/?vp_preview=vp_preview&vp_preview_nonce=${previewNonce}`,
 			{
 				form: {
 					...BASE_PREVIEW_FORM,
@@ -108,8 +137,6 @@ test.describe('selector control attribute values validation', () => {
 	test('invalid posts_order_by value falls back to default in preview', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_posts_order_by: 'completely_invalid_value',
 		});
@@ -126,8 +153,6 @@ test.describe('selector control attribute values validation', () => {
 	test('invalid items_style value falls back to default in preview', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_items_style: 'nonexistent_skin_style',
 		});
@@ -141,8 +166,6 @@ test.describe('selector control attribute values validation', () => {
 	test('invalid sort value falls back to default in preview', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_sort: 'invalid_sort_option',
 		});
@@ -156,8 +179,6 @@ test.describe('selector control attribute values validation', () => {
 	test('valid selector values render items correctly in preview', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page);
 
 		const body = await assertNoError(response);
@@ -175,8 +196,6 @@ test.describe('selector control attribute values validation', () => {
 	test('show_date with value true renders date in preview', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_items_style_default__show_date: 'true',
 		});
@@ -190,8 +209,6 @@ test.describe('selector control attribute values validation', () => {
 	test('show_date with value false does not render date in preview', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_items_style_default__show_date: 'false',
 		});
@@ -205,8 +222,6 @@ test.describe('selector control attribute values validation', () => {
 	test('show_date with value human renders human format date in preview', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_items_style_default__show_date: 'human',
 		});
@@ -221,8 +236,6 @@ test.describe('selector control attribute values validation', () => {
 	test('show_date with invalid value falls back to default (no date shown)', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_items_style_default__show_date: 'invalid_value',
 		});
@@ -240,8 +253,6 @@ test.describe('selector control attribute values validation', () => {
 	test('show_read_more with value true renders read more button', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_items_style_default__show_read_more: 'true',
 			vp_items_style_default__read_more_label: 'Read More',
@@ -257,8 +268,6 @@ test.describe('selector control attribute values validation', () => {
 	test('show_read_more with invalid value falls back to default (no button)', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		const response = await previewRequest(page, {
 			vp_items_style_default__show_read_more: 'invalid_value',
 		});
@@ -277,8 +286,6 @@ test.describe('selector control attribute values validation', () => {
 	test('dynamic callback selector (post_types_set) accepts arbitrary values', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		// post_types_set has a value_callback, so it should accept arbitrary values
 		// without resetting or causing errors.
 		const response = await previewRequest(page, {
@@ -294,8 +301,6 @@ test.describe('selector control attribute values validation', () => {
 	test('dynamic callback selector does not break with custom post type value', async ({
 		page,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		// Even with a non-standard post type that may not exist,
 		// the dynamic callback selector should not cause a fatal error.
 		const response = await previewRequest(page, {
@@ -314,8 +319,6 @@ test.describe('selector control attribute values validation', () => {
 		admin,
 		editor,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		// Create a page with a VP block using an invalid posts_order_by.
 		await admin.createNewPost({
 			title: 'Test Invalid Selector Value',
@@ -355,8 +358,6 @@ test.describe('selector control attribute values validation', () => {
 		admin,
 		editor,
 	}) => {
-		test.skip(!nonce, 'VP nonce not available on admin page');
-
 		await admin.createNewPost({
 			title: 'Test Show Date True Option',
 			postType: 'page',
