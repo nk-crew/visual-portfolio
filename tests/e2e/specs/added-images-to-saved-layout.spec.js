@@ -6,7 +6,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 /**
  * Test Images
  */
-import imageFixtures from '../../fixtures/images.json';
+import rawImageFixtures from '../../fixtures/images.json';
 import {
 	getEditorCanvas,
 	getPortfolioPreviewFrame,
@@ -21,6 +21,14 @@ import {
 import { openPublishedPage } from '../utils/open-published-page';
 import { getPluginSlug } from '../utils/plugin-slug';
 import { waitForPortfolioPreview } from '../utils/portfolio-preview';
+
+// `images.json` is a module singleton: Node caches it, `workers: 1` puts every
+// spec in the same process, and this file writes `.id` and `.alt` back into it.
+// Those writes leaked into the other specs importing the same path -- the two
+// image specs read `.alt` back, and archive.spec.js reads the same objects --
+// so behaviour depended on which file ran first. Work on a copy, the way
+// click-action-images.spec.js already does with `cloneFixture`.
+const imageFixtures = JSON.parse(JSON.stringify(rawImageFixtures));
 
 /**
  * TODO: The test needs to be redone in the future.
@@ -416,6 +424,20 @@ test.describe('added images to saved layout', () => {
 				imageFixtures,
 				async (x) => x.description === itemDescription
 			);
+
+			// `findAsyncSequential` returns undefined when nothing matches, and
+			// `indexOf(undefined)` is -1 -- so the write below threw
+			// "Cannot set properties of undefined", burying whatever the real
+			// failure was. added-images-to-block.spec.js already guards the
+			// identical block; this says which lookup came up empty.
+			expect(
+				foundImage,
+				`no uploaded image has the description "${itemDescription}"`
+			).toBeDefined();
+			expect(
+				foundFixture,
+				`no fixture has the description "${itemDescription}"`
+			).toBeDefined();
 
 			const foundFixtureIndex = imageFixtures.indexOf(foundFixture);
 
