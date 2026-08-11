@@ -93,15 +93,12 @@ test.describe('Pattern Context - Visual Portfolio blocks in patterns', () => {
 			editor,
 		});
 
-		// Create a new page to create the pattern
-		await admin.createNewPost({
-			title: 'Pattern Creation Page',
-			postType: 'page',
-			showWelcomeGuide: false,
-			legacyCanvas: true,
-		});
-
-		// Create a new page to test the pattern
+		// Create a new page to test the pattern.
+		//
+		// A 'Pattern Creation Page' used to be booted immediately before this
+		// one. Nothing ever read from it -- the next `createNewPost` navigated
+		// away and discarded the editor -- so it cost a full editor boot and
+		// left a stray draft behind.
 		await admin.createNewPost({
 			title: 'Test Pattern Context - Group Wrapper',
 			postType: 'page',

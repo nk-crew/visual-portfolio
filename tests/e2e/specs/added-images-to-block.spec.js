@@ -68,8 +68,6 @@ test.describe('added images to block', () => {
 		programmatically = false,
 		alternativeSetting = false
 	) {
-		await admin.visitAdminPage('edit.php');
-
 		await admin.createNewPost({
 			title: 'Test Adding Images to a Block Programmatically',
 			postType: 'page',

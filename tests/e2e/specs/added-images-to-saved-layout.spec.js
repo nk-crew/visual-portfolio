@@ -75,8 +75,6 @@ test.describe('added images to saved layout', () => {
 		alternativeSetting = false,
 		checkImageSettings = false
 	) {
-		await admin.visitAdminPage('edit.php');
-
 		const images = await getWordpressImages({
 			requestUtils,
 			page,
