@@ -7,6 +7,12 @@
 	"category": "media",
 	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery"
+	],
 	"supports": {
 		"html": false,
 		"className": false,

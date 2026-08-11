@@ -78,7 +78,7 @@ class Visual_Portfolio_Block_Loop_Pagination_Numbers {
 			if ( $link['is_dots'] ) {
 				$output .= '<span class="vp-block-loop-pagination-dots">...</span>';
 			} else {
-				$url = $link['url'] ? esc_url( $link['url'] ) : '#';
+				$url = $link['url'] ? esc_url( Visual_Portfolio_Block_Loop::add_random_seed( $link['url'], $block->context ) ) : '#';
 
 				if ( $link['active'] ) {
 					$output .= sprintf(
@@ -89,10 +89,11 @@ class Visual_Portfolio_Block_Loop_Pagination_Numbers {
 					);
 				} else {
 					$output .= sprintf(
-						'<a aria-label="%1$s" href="%2$s">%3$s</a>',
+						'<a aria-label="%1$s" href="%2$s" data-wp-interactive="%3$s" data-wp-on--click="actions.navigate">%4$s</a>',
 						// translators: %s page number.
 						sprintf( esc_attr__( 'Page %s', 'visual-portfolio' ), $link['label'] ),
 						$url,
+						esc_attr( Visual_Portfolio_Block_Loop::STORE ),
 						esc_html( $link['label'] )
 					);
 				}

@@ -54,7 +54,9 @@ class Visual_Portfolio_Block_Loop_Pagination_Next {
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class' => 'vp-block-loop-pagination-next',
+				'class'               => 'vp-block-loop-pagination-next',
+				'data-wp-interactive' => Visual_Portfolio_Block_Loop::STORE,
+				'data-wp-on--click'   => 'actions.navigate',
 			)
 		);
 		$show_label         = $attributes['showLabel'] ?? true;
@@ -85,7 +87,7 @@ class Visual_Portfolio_Block_Loop_Pagination_Next {
 		$next_link = '#';
 		foreach ( $pagination_links as $link ) {
 			if ( $link['is_next_arrow'] ) {
-				$next_link = $link['url'] ? esc_url( $link['url'] ) : '#';
+				$next_link = $link['url'] ? esc_url( Visual_Portfolio_Block_Loop::add_random_seed( $link['url'], $block->context ) ) : '#';
 				break;
 			}
 		}

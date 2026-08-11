@@ -236,15 +236,31 @@ class Visual_Portfolio_Block_Item_Template {
 
 		$layout_type = 'masonry' === ( $attributes['layoutType'] ?? 'grid' ) ? 'masonry' : 'grid';
 
+		// Masonry is the only layout that needs a script. WordPress ships both
+		// handles, and `masonry` pulls `imagesloaded` in itself.
+		if ( 'masonry' === $layout_type ) {
+			wp_enqueue_script( 'masonry' );
+		}
+
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
 				// `get_block_wrapper_attributes()` escapes the values itself.
-				'class' => 'vp-layout-' . $layout_type,
-				'style' => $this->get_layout_styles( $attributes ),
+				'class'                    => 'vp-layout-' . $layout_type,
+				'style'                    => $this->get_layout_styles( $attributes ),
+				'data-wp-interactive'      => Visual_Portfolio_Block_Loop::STORE,
+				'data-wp-init'             => 'callbacks.initLayout',
+				'data-wp-bind--aria-busy'  => 'state.isLoading',
 			)
 		);
 
-		return sprintf( '<ul %1$s>%2$s</ul>', $wrapper_attributes, $content );
+		// One live region per loop, next to the list rather than inside it: the
+		// items are appended into the list, and a region that moves with them
+		// announces nothing.
+		return sprintf(
+			'<ul %1$s>%2$s</ul><div class="wp-block-visual-portfolio-item-template__live-region" aria-live="polite" data-wp-text="state.ariaLiveMessage"></div>',
+			$wrapper_attributes,
+			$content
+		);
 	}
 }
 new Visual_Portfolio_Block_Item_Template();

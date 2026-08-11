@@ -101,11 +101,14 @@ class Visual_Portfolio_Block_Loop_Filter_Item {
 			return '';
 		}
 
-		$filter_link = Visual_Portfolio_Get::get_pagenum_link(
-			array(
-				'vp_filter' => $filter_value,
-				'vp_page'   => 1,
-			)
+		$filter_link = Visual_Portfolio_Block_Loop::add_random_seed(
+			Visual_Portfolio_Get::get_pagenum_link(
+				array(
+					'vp_filter' => $filter_value,
+					'vp_page'   => 1,
+				)
+			),
+			$block->context
 		);
 
 		// Determine if this item should be active.
@@ -119,10 +122,8 @@ class Visual_Portfolio_Block_Loop_Filter_Item {
 		}
 
 		// Get block wrapper attributes but override the class completely.
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => 'vp-block-loop-filter-item' . ( $is_active ? ' is-active' : '' ),
-			)
+		$wrapper_args = array(
+			'class' => 'vp-block-loop-filter-item' . ( $is_active ? ' is-active' : '' ),
 		);
 
 		$output_text = wp_kses_post( $text );
@@ -137,7 +138,7 @@ class Visual_Portfolio_Block_Loop_Filter_Item {
 		if ( $is_active ) {
 			return sprintf(
 				'<span aria-current="page" %1$s>%2$s</span>',
-				$wrapper_attributes,
+				get_block_wrapper_attributes( $wrapper_args ),
 				$output_text
 			);
 		}
@@ -152,11 +153,17 @@ class Visual_Portfolio_Block_Loop_Filter_Item {
 			);
 		}
 
+		// The store swaps the loop instead of reloading the page. It is an
+		// enhancement of the link, not a replacement: without it the href does
+		// the same thing, slower.
+		$wrapper_args['data-wp-interactive'] = Visual_Portfolio_Block_Loop::STORE;
+		$wrapper_args['data-wp-on--click']   = 'actions.navigate';
+
 		return sprintf(
 			'<a aria-label="%1$s" href="%2$s" %3$s>%4$s</a>',
 			esc_attr( $aria_label ),
 			esc_url( $filter_link ),
-			$wrapper_attributes,
+			get_block_wrapper_attributes( $wrapper_args ),
 			$output_text
 		);
 	}

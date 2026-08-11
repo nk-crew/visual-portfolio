@@ -20,7 +20,8 @@
 	display: none;
 }
 
-.vp-portfolio__loading {
+// The class the loop store puts on the wrapper while it is fetching.
+.vp-is-loading {
 	.vp-block-loop-pagination-load-more-loading,
 	.vp-block-loop-pagination-infinite-loading {
 		display: block;

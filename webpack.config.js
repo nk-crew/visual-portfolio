@@ -5,6 +5,7 @@ const path = require('path');
 
 const cssnano = require('cssnano');
 const glob = require('glob');
+const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin');
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
@@ -28,6 +29,10 @@ const JS_ENTRY_PATTERNS = [
 	'./gutenberg/custom-post-meta.js',
 	'./gutenberg/layouts-editor.js',
 ];
+
+// Interactivity API stores are ES modules, and webpack emits one format per
+// compilation - these entries build in a second, module-output one.
+const JS_MODULE_ENTRY_PATTERNS = ['./gutenberg/blocks/loop/view.js'];
 
 const CSS_ENTRY_PATTERNS = [
 	'./assets/css/**/*.scss',
@@ -295,6 +300,51 @@ function patchPostCssLoaderOptions(rules) {
 	});
 }
 
+function retargetBabelForModules(rules) {
+	// A script module is only ever fetched by a browser that supports
+	// `<script type="module">`, and the project Babel config targets far below
+	// that. Down there generators become regenerator calls, which the
+	// Interactivity API rejects - it dispatches actions by recognising a real
+	// `GeneratorFunction`.
+	return rules.map((rule) => {
+		if (!Array.isArray(rule.use)) {
+			return rule;
+		}
+
+		return {
+			...rule,
+			use: rule.use.map((loader) => {
+				if (
+					'string' === typeof loader ||
+					!loader.loader ||
+					!loader.loader.includes('babel-loader')
+				) {
+					return loader;
+				}
+
+				return {
+					...loader,
+					options: {
+						...loader.options,
+						babelrc: false,
+						configFile: false,
+						presets: [
+							[
+								require.resolve('@babel/preset-env'),
+								{
+									bugfixes: true,
+									modules: false,
+									targets: { esmodules: true },
+								},
+							],
+						],
+					},
+				};
+			}),
+		};
+	});
+}
+
 function createSvgRules() {
 	return [
 		{
@@ -519,12 +569,31 @@ class WrapLongMinifiedLinesPlugin {
 	}
 }
 
-const entryAssetsJs = createEntries(JS_ENTRY_PATTERNS, '.js');
+const entryAssetsJsModule = createEntries(JS_MODULE_ENTRY_PATTERNS, '.js');
+const moduleEntryNames = Object.keys(entryAssetsJsModule);
+
+const entryAssetsJs = createEntries(
+	JS_ENTRY_PATTERNS,
+	'.js',
+	(entry) => !moduleEntryNames.includes(entry.slice(0, -'.js'.length))
+);
 const entryAssetsCss = createEntries(
 	CSS_ENTRY_PATTERNS,
 	'.scss',
 	shouldIncludeScssEntry
 );
+
+// Both compilations write into `build/`, so the one that cleans it has to leave
+// the other one's output alone - and only that, so a source map left behind by
+// a watch build is still swept up.
+const moduleOutputFiles = moduleEntryNames.flatMap((name) => [
+	`${name}.js`,
+	`${name}.asset.php`,
+]);
+
+function shouldKeepOnClean(asset) {
+	return /^(fonts|images)\//.test(asset) || moduleOutputFiles.includes(asset);
+}
 
 const defaultRules = patchPostCssLoaderOptions(
 	disableCssLoaderUrls(defaultConfig.module.rules)
@@ -540,6 +609,12 @@ const newConfig = {
 	entry: {
 		...entryAssetsJs,
 		...entryAssetsCss,
+	},
+	output: {
+		...defaultConfig.output,
+		clean: {
+			keep: shouldKeepOnClean,
+		},
 	},
 	infrastructureLogging: isQuietBuild
 		? {
@@ -670,4 +745,54 @@ if (!isProduction) {
 	newConfig.optimization.runtimeChunk = 'single';
 }
 
-module.exports = newConfig;
+const moduleConfig = {
+	...defaultConfig,
+	entry: entryAssetsJsModule,
+	experiments: {
+		...defaultConfig.experiments,
+		outputModule: true,
+	},
+	output: {
+		...defaultConfig.output,
+		module: true,
+		chunkFormat: 'module',
+		environment: {
+			...defaultConfig.output.environment,
+			module: true,
+		},
+		library: {
+			...defaultConfig.output.library,
+			type: 'module',
+		},
+		// The script compilation cleans `build/`, see `shouldKeepOnClean()`.
+		clean: false,
+	},
+	infrastructureLogging: newConfig.infrastructureLogging,
+	stats: 'minimal',
+	performance: {
+		assetFilter: shouldIgnorePerformanceHint,
+	},
+	module: {
+		...defaultConfig.module,
+		rules: retargetBabelForModules(defaultRules),
+	},
+	// A fresh extraction plugin instead of the shared one: it reads the output
+	// format from the compiler it is applied to, so the script compilation's
+	// instance would externalize `@wordpress/*` as globals instead of imports.
+	plugins: [new DependencyExtractionWebpackPlugin()],
+	ignoreWarnings: isQuietBuild ? [shouldIgnoreQuietWarning] : undefined,
+	watchOptions: {
+		ignored: WATCH_IGNORED,
+	},
+	optimization: {
+		...defaultConfig.optimization,
+		...(isProduction ? { minimizer: createProductionMinimizers() } : {}),
+		// A script module cannot import a shared webpack runtime chunk.
+		runtimeChunk: false,
+	},
+	// Keeps the dev server from injecting its classic client entry and the HMR
+	// plugin into a module build; watching and rebuilding still happen.
+	devServer: false,
+};
+
+module.exports = [newConfig, moduleConfig];

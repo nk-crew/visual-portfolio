@@ -27,8 +27,6 @@ class Visual_Portfolio_Block_Loop_Filter {
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-loop-filter', 'build/gutenberg/blocks/loop-filter/style' );
 		wp_style_add_data( 'visual-portfolio-block-loop-filter', 'rtl', 'replace' );
 
-		Visual_Portfolio_Assets::register_script( 'visual-portfolio-block-loop-filter', 'build/gutenberg/blocks/loop-filter/view' );
-
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/loop-filter',
 			array(

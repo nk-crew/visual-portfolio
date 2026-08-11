@@ -20,11 +20,14 @@
 	}
 
 	// Masonry is positioned by the script module, but the item widths it lays out
-	// come from here - Masonry reads them, it does not calculate them.
+	// come from here - Masonry reads them, it does not calculate them. The gap
+	// is declared as `column-gap` for the same reason: it does nothing to a
+	// block container, it is where the script module reads the gutter from.
 	&.vp-layout-masonry {
 		--vp-layout-current-columns: var(--vp-layout-columns, 3);
 
 		position: relative;
+		column-gap: var(--vp-layout-gap, 1.5rem);
 
 		@media (max-width: 781px) {
 			--vp-layout-current-columns: var(--vp-layout-columns-md, 2);
@@ -43,4 +46,25 @@
 
 .wp-block-visual-portfolio-item-template__item {
 	min-width: 0;
+}
+
+// The loop is fetching its next state. The controls stay clickable - a second
+// click aborts the first request and starts over.
+.vp-is-loading .wp-block-visual-portfolio-item-template {
+	opacity: 0.6;
+	transition: opacity 0.15s ease-in-out;
+}
+
+// The announcement of a Load More append. Nothing else on a loop page reaches
+// for the plugin's global stylesheet, so it carries its own hiding.
+.wp-block-visual-portfolio-item-template__live-region {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	white-space: nowrap;
+	border: 0;
+	clip-path: inset(50%);
 }

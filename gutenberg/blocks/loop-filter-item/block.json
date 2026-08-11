@@ -7,7 +7,13 @@
 	"description": "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/loop-filter"],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["vp/queryType", "vp/showCount"],
+	"usesContext": [
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/showCount"
+	],
 	"supports": {
 		"lock": true,
 		"html": false,

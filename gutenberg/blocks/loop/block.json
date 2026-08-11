@@ -57,10 +57,12 @@
 		"preview_image_example": { "type": "string", "default": "" },
 		"setupWizard": { "type": "string", "default": "" }
 	},
+	"viewScriptModule": "visual-portfolio-block-loop-view",
 	"supports": {
 		"html": false,
 		"className": false,
 		"anchor": true,
+		"interactivity": true,
 		"align": ["wide", "full"],
 		"layout": true,
 		"typography": {

@@ -54,9 +54,14 @@ class Visual_Portfolio_Block_Loop_Pagination_Infinite {
 		$label         = $attributes['label'] ?? __( 'Load More', 'visual-portfolio' );
 		$loading_label = $attributes['loadingLabel'] ?? __( 'Loading...', 'visual-portfolio' );
 
+		// The trigger stays a real link: without the observer, or without any
+		// JavaScript at all, clicking it is still the next page.
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class' => 'vp-block-loop-pagination-infinite',
+				'class'               => 'vp-block-loop-pagination-infinite',
+				'data-wp-interactive' => Visual_Portfolio_Block_Loop::STORE,
+				'data-wp-init'        => 'callbacks.observeInfinite',
+				'data-wp-on--click'   => 'actions.loadMore',
 			)
 		);
 
@@ -75,7 +80,7 @@ class Visual_Portfolio_Block_Loop_Pagination_Infinite {
 		$next_link = '#';
 		foreach ( $pagination_links as $link ) {
 			if ( $link['is_next_arrow'] ) {
-				$next_link = $link['url'] ? esc_url( $link['url'] ) : '#';
+				$next_link = $link['url'] ? esc_url( Visual_Portfolio_Block_Loop::add_random_seed( $link['url'], $block->context ) ) : '#';
 				break;
 			}
 		}
