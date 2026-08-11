@@ -94,9 +94,19 @@ export async function getWordpressImages({
 		return filename.replace(/\.[^/.]+$/, '');
 	}
 
+	// One listing for the whole batch, not one per image. This used to call
+	// `fetchMediaList()` inside the `Promise.all` below, so ten concurrent
+	// requests each pulled the same full `wp/v2/media?per_page=100` response --
+	// and the waste grew with the library, since every response got longer as
+	// tests added attachments.
+	//
+	// Safe to read once: nothing uploads before the lookups finish, and the
+	// fallback uploads below only add slugs that no other entry is searching
+	// for.
+	const existingMedia = alwaysUpload ? [] : await fetchMediaList();
+
 	// Function to check if an image already exists and return its details
-	async function getExistingMediaDetails(filename) {
-		const existingMedia = await fetchMediaList();
+	function getExistingMediaDetails(filename) {
 		return existingMedia.find(
 			(media) => media.slug === removeFileExtension(filename)
 		);
@@ -112,7 +122,7 @@ export async function getWordpressImages({
 				media = await uploadMediaWithRetry(filepath);
 			} else {
 				// Check if the image already exists and retrieve its details.
-				media = await getExistingMediaDetails(object.filename);
+				media = getExistingMediaDetails(object.filename);
 
 				// If the image doesn't exist, upload it.
 				if (!media) {

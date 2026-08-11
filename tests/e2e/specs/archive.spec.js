@@ -27,6 +27,11 @@ import { getPluginSlug } from '../utils/plugin-slug';
 const logsEnabled = process.env.LOGS || false;
 
 test.describe('archive pages', () => {
+	// The permalink structure is a site-wide option that outlives a test, so
+	// tracking what it is already set to turns most `setPermalinkSettings` calls
+	// into no-ops. See the note on the helper itself.
+	let currentPermalinkStructure;
+
 	test.beforeEach(async ({ admin, page, requestUtils }) => {
 		await setPermalinkSettings(admin, page, 'Post name');
 		const pluginName = getPluginSlug();
@@ -862,12 +867,22 @@ test.describe('archive pages', () => {
 			return existingPosts.some((post) => post.title.rendered === title);
 		};
 
-		const images = await getWordpressImages({
-			requestUtils,
-			page,
-			admin,
-			editor,
-		});
+		// Only the `!postExists` branch below consumes these, and `afterEach`
+		// deletes pages and posts but not the portfolio CPT -- so after the
+		// first test every post already exists and fetching or uploading the
+		// images was pure overhead.
+		const missingPosts = (await portfolioPosts).filter(
+			(post) => !postExists(post.title)
+		);
+
+		const images = missingPosts.length
+			? await getWordpressImages({
+					requestUtils,
+					page,
+					admin,
+					editor,
+				})
+			: [];
 
 		// Get the current date and time
 		const currentDate = new Date();
@@ -957,9 +972,23 @@ test.describe('archive pages', () => {
 	 * @param {string} type  - The type of permalink structure to select.
 	 */
 	async function setPermalinkSettings(admin, page, type) {
+		// Two full page loads per call. Every test opened by re-saving the same
+		// `Post name` the `beforeEach` had just written, and the tests that
+		// switch to `Plain` switch back before they finish -- so most of these
+		// calls were writing a value that was already in place.
+		//
+		// The category-feed test also re-saves this screen to flush rewrite
+		// rules, but it drives the permalinks page directly rather than coming
+		// through here, so that flush still happens.
+		if (currentPermalinkStructure === type) {
+			return;
+		}
+
 		await admin.visitAdminPage('options-permalink.php');
 		await page.getByLabel(type).check();
 		await page.getByRole('button', { name: 'Save Changes' }).click();
+
+		currentPermalinkStructure = type;
 	}
 
 	/**
