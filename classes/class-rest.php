@@ -480,14 +480,39 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		// The editor debounces its requests, but the social sources of the Pro
 		// plugin answer from external APIs - without a cache a few edits are
 		// enough to reach an Instagram or Unsplash rate limit.
-		$cache_key = 'vpf_loop_preview_' . md5( (string) wp_json_encode( $options ) );
+		//
+		// The cached answer is per user: `perm` below narrows the query to what
+		// the current user may read, so two editors can get different items for
+		// the same options. It is also per request state - the pipeline reads
+		// the page, filter and sort out of the request, so options alone would
+		// serve page one's items for every page.
+		$request_state = array();
+
+		foreach ( array( 'vp_page', 'vp_filter', 'vp_sort' ) as $name ) {
+			$request_state[ $name ] = $request->get_param( $name );
+		}
+
+		$cache_key = 'vpf_loop_preview_' . md5( (string) wp_json_encode( array( $options, $request_state, get_current_user_id() ) ) );
 		$cached    = get_transient( $cache_key );
 
 		if ( is_array( $cached ) ) {
 			return $this->success( $cached );
 		}
 
-		$result   = Visual_Portfolio_Get::get_loop_items( $options );
+		// The `custom_query` source hands a hand-written query string straight to
+		// `WP_Query`, so the preview must not be a way to read posts the user
+		// cannot open in the editor. `perm` makes `WP_Query` apply the current
+		// user's read capabilities to any non-public status the query asks for.
+		$restrict_to_readable = static function ( $query ) {
+			$query->set( 'perm', 'readable' );
+		};
+
+		add_action( 'pre_get_posts', $restrict_to_readable );
+
+		$result = Visual_Portfolio_Get::get_loop_items( $options );
+
+		remove_action( 'pre_get_posts', $restrict_to_readable );
+
 		$response = array(
 			'items'     => array(),
 			'max_pages' => 1,
