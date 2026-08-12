@@ -1,0 +1,79 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/item-meta",
+	"title": "Gallery Item Meta (Experimental)",
+	"category": "media",
+	"description": "Displays a meta value of a gallery item, such as its comments, views or reading time. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/item-template"],
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/itemCommentsCount",
+		"vp/itemCommentsUrl",
+		"vp/itemViewsCount",
+		"vp/itemReadingTime"
+	],
+	"attributes": {
+		"metaType": {
+			"type": "string",
+			"default": "comments",
+			"enum": ["comments", "views", "reading-time"]
+		},
+		"textAlign": {
+			"type": "string"
+		},
+		"showIcon": {
+			"type": "boolean",
+			"default": true
+		},
+		"showZero": {
+			"type": "boolean",
+			"default": false
+		},
+		"prefix": {
+			"type": "string",
+			"default": ""
+		},
+		"suffix": {
+			"type": "string",
+			"default": ""
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false,
+			"role": "content"
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"color": {
+			"text": true,
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"style": "visual-portfolio-block-item-meta"
+}

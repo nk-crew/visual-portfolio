@@ -32,7 +32,15 @@ const JS_ENTRY_PATTERNS = [
 
 // Interactivity API stores are ES modules, and webpack emits one format per
 // compilation - these entries build in a second, module-output one.
-const JS_MODULE_ENTRY_PATTERNS = ['./gutenberg/blocks/loop/view.js'];
+//
+// Listed one by one rather than globbed: `JS_ENTRY_PATTERNS` already sweeps up
+// every `view.js` as a classic script, and a block that wants a module has to
+// say so here. Miss the line and the file still builds - as a classic script
+// `wp_register_script_module()` cannot load.
+const JS_MODULE_ENTRY_PATTERNS = [
+	'./gutenberg/blocks/loop/view.js',
+	'./gutenberg/blocks/item-cover/view.js',
+];
 
 const CSS_ENTRY_PATTERNS = [
 	'./assets/css/**/*.scss',

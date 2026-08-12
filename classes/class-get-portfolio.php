@@ -2397,13 +2397,30 @@ class Visual_Portfolio_Get {
 	public static function get_images_terms( $query_opts, $active_item ) {
 		$terms           = array();
 		$there_is_active = false;
-		// calculate categories count.
+
+		// Counts are keyed by the slug, not by the label: the filter query matches
+		// on the slug, so several labels that slugify to one term ("Cats", "cats")
+		// return the images of all of them and have to be counted as one term.
+		// An image that carries two such labels is still one image, the same way
+		// `get_posts_terms()` counts a post once per term.
 		$categories_count = array();
+
 		foreach ( $query_opts['images'] as $img ) {
-			if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
-				foreach ( $img['categories'] as $cat ) {
-					$categories_count[ $cat ] = ( isset( $categories_count[ $cat ] ) ? $categories_count[ $cat ] : 0 ) + 1;
+			if ( ! isset( $img['categories'] ) || ! is_array( $img['categories'] ) ) {
+				continue;
+			}
+
+			$counted_slugs = array();
+
+			foreach ( $img['categories'] as $cat ) {
+				$slug = self::create_slug( $cat );
+
+				if ( isset( $counted_slugs[ $slug ] ) ) {
+					continue;
 				}
+
+				$counted_slugs[ $slug ]    = true;
+				$categories_count[ $slug ] = ( isset( $categories_count[ $slug ] ) ? $categories_count[ $slug ] : 0 ) + 1;
 			}
 		}
 
@@ -2423,7 +2440,7 @@ class Visual_Portfolio_Get {
 						'filter'      => $slug,
 						'label'       => $cat,
 						'description' => '',
-						'count'       => isset( $categories_count[ $cat ] ) && $categories_count[ $cat ] ? $categories_count[ $cat ] : '',
+						'count'       => isset( $categories_count[ $slug ] ) && $categories_count[ $slug ] ? $categories_count[ $slug ] : '',
 						'taxonomy'    => 'category',
 						'id'          => 0,
 						'parent'      => 0,
@@ -2506,6 +2523,35 @@ class Visual_Portfolio_Get {
 			},
 			$items
 		);
+	}
+
+	/**
+	 * Get the sort options available to a Gallery Loop block.
+	 *
+	 * The loop family gets its own extension point instead of reusing the legacy
+	 * `vpf_extend_sort_items`: the sort block stores which of these options it
+	 * shows, so the set has to be something Pro and themes can extend knowing
+	 * the loop it is asked about. The base list is shared, and so is the
+	 * handling - the chosen value keeps travelling in `vp_sort`, and
+	 * `get_query_params()` resolves it. An option beyond the built-in four needs
+	 * a `vpf_extend_query_args` callback to order by.
+	 *
+	 * Labels are not escaped, escape them on output.
+	 *
+	 * @param array $loop_options options of the loop the block belongs to.
+	 *
+	 * @return array sort slug => label.
+	 */
+	public static function get_loop_sort_options( $loop_options = array() ) {
+		/**
+		 * Filters the sort options a Gallery Loop block can offer.
+		 *
+		 * @param array $options      sort slug => label.
+		 * @param array $loop_options options of the loop.
+		 */
+		$options = apply_filters( 'vpf_loop_sort_options', self::get_sort_items( $loop_options ), $loop_options );
+
+		return is_array( $options ) ? $options : array();
 	}
 
 	/**

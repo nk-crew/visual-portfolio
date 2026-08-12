@@ -252,6 +252,31 @@ class Visual_Portfolio_Gutenberg {
 	}
 
 	/**
+	 * Sort options the Gallery Sort block offers in the editor.
+	 *
+	 * An ordered list rather than a slug-keyed map: the default sorting has an
+	 * empty slug, which is an awkward object key, and the order the options are
+	 * registered in is the order the block renders them in.
+	 *
+	 * The editor asks without a loop, so a `vpf_loop_sort_options` callback that
+	 * answers differently per loop offers everything it has here.
+	 *
+	 * @return array
+	 */
+	private static function get_loop_sort_options() {
+		$result = array();
+
+		foreach ( Visual_Portfolio_Get::get_loop_sort_options() as $value => $label ) {
+			$result[] = array(
+				'value' => (string) $value,
+				'label' => $label,
+			);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Enqueue script for Gutenberg editor
 	 */
 	public function enqueue_block_editor_assets() {
@@ -297,6 +322,7 @@ class Visual_Portfolio_Gutenberg {
 				'plugin_url'               => visual_portfolio()->plugin_url,
 				'pro'                      => visual_portfolio()->is_pro(),
 				'loop_blocks'              => visual_portfolio()->supports_loop_blocks(),
+				'loop_sort_options'        => self::get_loop_sort_options(),
 				'admin_url'                => get_admin_url(),
 				'attributes'               => $attributes,
 				'controls'                 => Visual_Portfolio_Controls::get_registered_array(),

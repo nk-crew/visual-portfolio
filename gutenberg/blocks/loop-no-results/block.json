@@ -1,10 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "visual-portfolio/loop-sort",
-	"title": "Gallery Sort (Experimental)",
-	"description": "Displays sort options for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.",
+	"name": "visual-portfolio/loop-no-results",
+	"title": "No Results (Experimental)",
 	"category": "media",
+	"description": "Contains the block elements used to render content when no gallery items are found. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
 	"usesContext": [
@@ -12,28 +12,18 @@
 		"vp/baseQuery",
 		"vp/postsQuery",
 		"vp/imagesQuery",
-		"vp/sourceQuery"
+		"vp/sourceQuery",
+		"vp/blockId"
 	],
-	"attributes": {
-		"options": {
-			"type": "array",
-			"default": [],
-			"items": {
-				"type": "string"
-			}
-		},
-		"labels": {
-			"type": "object",
-			"default": {}
-		}
-	},
 	"supports": {
 		"html": false,
-		"className": false,
+		"reusable": false,
 		"anchor": true,
+		"align": ["wide", "full"],
 		"color": {
 			"text": true,
 			"gradients": true,
+			"link": true,
 			"__experimentalDefaultControls": {
 				"text": true,
 				"background": true
@@ -49,14 +39,11 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalWritingMode": true,
-			"__experimentalDefaultControls": {
-				"fontSize": true
-			}
+			"__experimentalDefaultControls": { "fontSize": true }
 		},
 		"spacing": {
 			"padding": true,
 			"margin": ["top", "bottom"]
 		}
-	},
-	"style": "visual-portfolio-block-loop-sort"
+	}
 }

@@ -36,18 +36,60 @@ class Visual_Portfolio_Block_Loop_Sort {
 	}
 
 	/**
+	 * Resolve which of the available sort options the block shows, in order.
+	 *
+	 * An empty selection means every available option: the set can grow after
+	 * the block was saved - Pro and themes extend it - and a block that pinned
+	 * the four built-in slugs would never show what arrives later.
+	 *
+	 * @param array $attributes - block attributes.
+	 * @param array $available - available options, slug => label.
+	 *
+	 * @return array slug => label.
+	 */
+	private static function get_shown_options( $attributes, $available ) {
+		$selected = isset( $attributes['options'] ) && is_array( $attributes['options'] ) ? $attributes['options'] : array();
+		$labels   = isset( $attributes['labels'] ) && is_array( $attributes['labels'] ) ? $attributes['labels'] : array();
+		$shown    = array();
+
+		foreach ( $available as $slug => $label ) {
+			// Numeric-looking slugs arrive from the array key as integers.
+			$slug = (string) $slug;
+
+			if ( ! empty( $selected ) && ! in_array( $slug, $selected, true ) ) {
+				continue;
+			}
+
+			if ( isset( $labels[ $slug ] ) && is_string( $labels[ $slug ] ) && '' !== trim( $labels[ $slug ] ) ) {
+				$label = $labels[ $slug ];
+			}
+
+			$shown[ $slug ] = $label;
+		}
+
+		return $shown;
+	}
+
+	/**
 	 * Block output
 	 *
-	 * The options are the same for every sort block, so the attributes and the
-	 * inner content are not used.
-	 *
-	 * @param array  $attributes - block attributes.
-	 * @param string $content - block content.
-	 * @param object $block - block instance.
+	 * @param array    $attributes - block attributes.
+	 * @param string   $content - block content.
+	 * @param WP_Block $block - block instance.
 	 *
 	 * @return string
 	 */
 	public function block_render( $attributes, $content, $block ) {
+		$loop_options = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );
+		$available    = Visual_Portfolio_Get::get_loop_sort_options( $loop_options );
+		$shown        = self::get_shown_options( $attributes, $available );
+
+		// Every selected option is gone from the available set - a select with
+		// nothing to choose from sorts nothing.
+		if ( empty( $shown ) ) {
+			return '';
+		}
+
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
 				'class' => 'vp-block-loop-sort',
@@ -59,9 +101,9 @@ class Visual_Portfolio_Block_Loop_Sort {
 		// Get active item.
 		$active_item = Visual_Portfolio_Get::get_current_sort();
 
-		foreach ( Visual_Portfolio_Get::get_sort_items() as $slug => $label ) {
+		foreach ( $shown as $slug => $label ) {
 			$url = Visual_Portfolio_Block_Loop::add_random_seed(
-				Visual_Portfolio_Get::get_sort_item_url( $slug ),
+				Visual_Portfolio_Get::get_sort_item_url( $slug, $loop_options ),
 				$block->context
 			);
 
