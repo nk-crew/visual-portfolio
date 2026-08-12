@@ -9,6 +9,8 @@
  * Loop items REST endpoint test case.
  */
 class ClassRestLoopItems extends WP_UnitTestCase {
+	use Visual_Portfolio_Loop_Blocks_Trait;
+
 	/**
 	 * Route the editor preview asks for its items.
 	 *
@@ -88,6 +90,8 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
+
+		$this->skip_without_loop_blocks();
 
 		global $wp_rest_server;
 

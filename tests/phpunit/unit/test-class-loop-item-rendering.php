@@ -13,6 +13,8 @@
  * Item rendering test case.
  */
 class ClassLoopItemRendering extends WP_UnitTestCase {
+	use Visual_Portfolio_Loop_Blocks_Trait;
+
 	/**
 	 * Images of the source.
 	 *
@@ -49,6 +51,8 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
+
+		$this->skip_without_loop_blocks();
 
 		update_option( 'vp_images', array( 'lazy_loading' => '' ) );
 		Visual_Portfolio_Images::init_lazyload();

@@ -9,6 +9,19 @@
  * Block bindings source test case.
  */
 class ClassBlockBindings extends WP_UnitTestCase {
+	use Visual_Portfolio_Loop_Blocks_Trait;
+
+	/**
+	 * Nothing in here exists below the family's WordPress requirement.
+	 *
+	 * @return void
+	 */
+	public function set_up() {
+		parent::set_up();
+
+		$this->skip_without_loop_blocks();
+	}
+
 	/**
 	 * Attachment the gallery is built from.
 	 *

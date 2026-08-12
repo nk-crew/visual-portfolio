@@ -9,6 +9,8 @@
  * Robots meta test case.
  */
 class ClassSeoOptimization extends WP_UnitTestCase {
+	use Visual_Portfolio_Loop_Blocks_Trait;
+
 	/**
 	 * Drop the request state a test wrote.
 	 *
@@ -162,6 +164,8 @@ class ClassSeoOptimization extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_paged_loop_links_its_neighbours() {
+		$this->skip_without_loop_blocks();
+
 		$post_id = $this->create_loop_page( 2, 6 );
 
 		$links = $this->get_pagination_links( $post_id, 'vp-1-page=2' );
@@ -181,6 +185,8 @@ class ClassSeoOptimization extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_last_page_has_no_next() {
+		$this->skip_without_loop_blocks();
+
 		$post_id = $this->create_loop_page( 2, 6 );
 
 		$links = $this->get_pagination_links( $post_id, 'vp-1-page=3' );
@@ -196,6 +202,8 @@ class ClassSeoOptimization extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_first_page_is_silent() {
+		$this->skip_without_loop_blocks();
+
 		$post_id = $this->create_loop_page( 2, 6 );
 
 		$this->assertSame( '', $this->get_pagination_links( $post_id, '' ) );
@@ -208,6 +216,8 @@ class ClassSeoOptimization extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_page_past_the_end_is_silent() {
+		$this->skip_without_loop_blocks();
+
 		$post_id = $this->create_loop_page( 2, 6 );
 
 		$this->assertSame( '', $this->get_pagination_links( $post_id, 'vp-1-page=9' ) );
