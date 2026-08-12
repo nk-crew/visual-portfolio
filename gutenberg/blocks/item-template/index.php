@@ -450,6 +450,39 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * Loading attributes the image of an item should carry.
+	 *
+	 * The first row is above the fold whatever the page around it looks like, so
+	 * it is loaded rather than deferred, and the very first picture is announced
+	 * as the one worth fetching first - the candidate for the largest paint.
+	 * Exactly one image is ever marked: a page where everything is urgent has
+	 * nothing urgent on it.
+	 *
+	 * Core decides for every other item on its own, through
+	 * `wp_get_loading_optimization_attributes()`, which counts the images before
+	 * this gallery on the page as well - so a loop under a hero image does not
+	 * take the priority away from it.
+	 *
+	 * `fetchpriority="high"` doubles as the marker that keeps our own lazy
+	 * loading off the image, see `get_image_blocked_attributes()`.
+	 *
+	 * @param int $index     - position of the item on the rendered page, from zero.
+	 * @param int $first_row - number of items in the first row.
+	 *
+	 * @return array Attributes to merge into the image, possibly empty.
+	 */
+	private function get_image_loading_attributes( $index, $first_row ) {
+		if ( 0 === $index ) {
+			return array(
+				'loading'       => 'eager',
+				'fetchpriority' => 'high',
+			);
+		}
+
+		return $index < $first_row ? array( 'loading' => 'eager' ) : array();
+	}
+
+	/**
 	 * Layout variables printed on the list.
 	 *
 	 * A public contract: themes and Pro breakpoints override the layout by
@@ -674,9 +707,18 @@ class Visual_Portfolio_Block_Item_Template {
 		// when the loop navigates. A no results block is a later phase.
 		$items   = $result && ! empty( $result['items'] ) ? $result['items'] : array();
 		$content = '';
+		$index   = 0;
+
+		// The widest the layout ever gets, which is the row a desktop sees first.
+		list( $first_row ) = $this->get_layout_columns( $attributes, $this->get_layout_type( $attributes ) );
 
 		foreach ( $items as $item ) {
-			$item_context = self::map_item_to_context( $item, $result['options'] );
+			$item_context = array_merge(
+				self::map_item_to_context( $item, $result['options'] ),
+				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row ) )
+			);
+
+			++$index;
 
 			$block_instance = $block->parsed_block;
 

@@ -111,9 +111,14 @@ class Visual_Portfolio_Block_Item_Cover {
 			);
 		}
 
-		$img_attr = array(
-			'class' => 'wp-block-visual-portfolio-item-cover__image-background',
-			'style' => implode( ';', $styles ),
+		$img_attr = array_merge(
+			// How urgent this picture is, decided by the item template from where
+			// the item sits in the gallery.
+			is_array( $context['vp/itemImageLoading'] ?? null ) ? $context['vp/itemImageLoading'] : array(),
+			array(
+				'class' => 'wp-block-visual-portfolio-item-cover__image-background',
+				'style' => implode( ';', $styles ),
+			)
 		);
 
 		// Only a custom alt is passed on - without the attribute the attachment
@@ -283,17 +288,17 @@ class Visual_Portfolio_Block_Item_Cover {
 	 * Attributes of the cover itself.
 	 *
 	 * @param array  $attributes   - block attributes.
+	 * @param string $placement    - resolved content placement.
 	 * @param string $effect       - resolved effect.
+	 * @param string $show_content - resolved reveal mode.
 	 * @param string $aspect_ratio - resolved aspect ratio, already sanitized.
 	 * @param bool   $has_link     - whether the cover rendered its link.
 	 *
 	 * @return array
 	 */
-	private function get_wrapper_attributes( $attributes, $effect, $aspect_ratio, $has_link ) {
-		$show_content = $attributes['showContent'] ?? 'hover';
-		$show_content = in_array( $show_content, array( 'always', 'hover', 'never' ), true ) ? $show_content : 'hover';
-
+	private function get_wrapper_attributes( $attributes, $placement, $effect, $show_content, $aspect_ratio, $has_link ) {
 		$classes = array(
+			'vp-content-placement-' . $placement,
 			'vp-effect-' . $effect,
 			'vp-show-content-' . $show_content,
 		);
@@ -302,14 +307,18 @@ class Visual_Portfolio_Block_Item_Cover {
 			$classes[] = 'vp-has-link';
 		}
 
-		$position = $attributes['contentPosition'] ?? 'center';
+		// Content under the image sits in the flow, so there is no box to place
+		// it in and nothing for the position matrix to say.
+		if ( 'over' === $placement ) {
+			$position = $attributes['contentPosition'] ?? 'center';
 
-		if ( isset( self::$content_positions[ $position ] ) ) {
-			$classes[] = self::$content_positions[ $position ];
-		}
+			if ( isset( self::$content_positions[ $position ] ) ) {
+				$classes[] = self::$content_positions[ $position ];
+			}
 
-		if ( ! empty( $attributes['verticalAlignment'] ) ) {
-			$classes[] = 'is-vertically-aligned-' . preg_replace( '/[^a-z]/', '', (string) $attributes['verticalAlignment'] );
+			if ( ! empty( $attributes['verticalAlignment'] ) ) {
+				$classes[] = 'is-vertically-aligned-' . preg_replace( '/[^a-z]/', '', (string) $attributes['verticalAlignment'] );
+			}
 		}
 
 		$styles = array();
@@ -322,7 +331,9 @@ class Visual_Portfolio_Block_Item_Cover {
 			$styles[] = 'min-height:' . $min_height;
 		}
 
-		if ( '' !== $aspect_ratio ) {
+		// With the content below, the ratio belongs to the picture rather than
+		// to the card - it is carried by the media box instead.
+		if ( '' !== $aspect_ratio && 'over' === $placement ) {
 			$styles[] = 'aspect-ratio:' . $aspect_ratio;
 		}
 
@@ -364,8 +375,22 @@ class Visual_Portfolio_Block_Item_Cover {
 	public function block_render( $attributes, $content, $block ) {
 		$context = $block->context;
 
+		$placement = ( $attributes['contentPlacement'] ?? 'over' ) === 'below' ? 'below' : 'over';
+
 		$effect = $attributes['effect'] ?? 'fade';
 		$effect = in_array( $effect, array( 'none', 'fade', 'fly', 'emerge' ), true ) ? $effect : 'fade';
+
+		$show_content = $attributes['showContent'] ?? 'hover';
+		$show_content = in_array( $show_content, array( 'always', 'hover', 'never' ), true ) ? $show_content : 'hover';
+
+		// Content under the image is content that is always there: nothing is
+		// revealed, so there is no effect to play and no state to reveal it in.
+		// `never` still means "do not render it", which is a placement-agnostic
+		// answer, so only the hover mode is rewritten.
+		if ( 'below' === $placement ) {
+			$effect       = 'none';
+			$show_content = 'never' === $show_content ? 'never' : 'always';
+		}
 
 		if ( 'fly' === $effect ) {
 			wp_enqueue_script_module( self::VIEW_MODULE );
@@ -382,9 +407,9 @@ class Visual_Portfolio_Block_Item_Cover {
 			$aspect_ratio = $this->get_image_ratio( $image );
 		}
 
-		$output = $image;
+		$media = $image;
 
-		$output .= $this->get_overlay(
+		$media .= $this->get_overlay(
 			array(
 				'dimRatio'       => $attributes['dimRatio'] ?? 0,
 				'color'          => $attributes['overlayColor'] ?? '',
@@ -394,7 +419,7 @@ class Visual_Portfolio_Block_Item_Cover {
 			)
 		);
 
-		$output .= $this->get_overlay(
+		$media .= $this->get_overlay(
 			array(
 				'dimRatio'       => $attributes['hoverDimRatio'] ?? 0,
 				'color'          => $attributes['hoverOverlayColor'] ?? '',
@@ -405,9 +430,18 @@ class Visual_Portfolio_Block_Item_Cover {
 			true
 		);
 
+		// The picture and everything painted on it are one box, whichever side of
+		// the content it ends up on: with the content below, that box is what the
+		// aspect ratio has to shape, and the overlays must not reach the text.
+		$output = sprintf(
+			'<div class="wp-block-visual-portfolio-item-cover__media"%1$s>%2$s</div>',
+			'below' === $placement && '' !== $aspect_ratio ? ' style="aspect-ratio:' . esc_attr( $aspect_ratio ) . '"' : '',
+			$media
+		);
+
 		// Content nobody is ever shown is content nothing has to announce either,
 		// so it is left out rather than hidden.
-		if ( 'never' !== ( $attributes['showContent'] ?? 'hover' ) ) {
+		if ( 'never' !== $show_content ) {
 			$output .= sprintf( '<div class="wp-block-visual-portfolio-item-cover__inner">%s</div>', $content );
 		}
 
@@ -416,7 +450,7 @@ class Visual_Portfolio_Block_Item_Cover {
 
 		return sprintf(
 			'<div %1$s>%2$s</div>',
-			get_block_wrapper_attributes( $this->get_wrapper_attributes( $attributes, $effect, $aspect_ratio, '' !== $link ) ),
+			get_block_wrapper_attributes( $this->get_wrapper_attributes( $attributes, $placement, $effect, $show_content, $aspect_ratio, '' !== $link ) ),
 			$output
 		);
 	}

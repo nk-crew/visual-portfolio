@@ -16,7 +16,9 @@
 		"vp/itemFocalPoint",
 		"vp/itemUrl",
 		"vp/itemAriaLabel",
-		"vp/itemPopupData"
+		"vp/itemPopupData",
+		"vp/itemImageLoading",
+		"vp/layoutColumns"
 	],
 	"attributes": {
 		"clickAction": {

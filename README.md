@@ -105,6 +105,12 @@ npm run test:e2e
 npm run test:unit:php
 ```
 
+### Reference
+
+- [Gallery Loop blocks](docs/gallery-loop-blocks.md) — the block-native gallery:
+  anatomy, block context, hooks, content sources, bindings, Interactivity stores,
+  and how its URLs behave behind a page cache.
+
 ## License
 
 This project is licensed under the GPL-2.0-or-later License - see the [LICENSE](LICENSE.txt) file for details.

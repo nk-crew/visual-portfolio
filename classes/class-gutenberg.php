@@ -317,6 +317,11 @@ class Visual_Portfolio_Gutenberg {
 			'VPGutenbergVariables',
 			array(
 				'nonce'                    => wp_create_nonce( 'vp-ajax-nonce' ),
+
+				// Developer tooling is on: the editor speaks up about mistakes
+				// only a developer can make, such as a loop control that ended
+				// up outside its loop.
+				'debug'                    => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 				'plugin_version'           => VISUAL_PORTFOLIO_VERSION,
 				'plugin_name'              => visual_portfolio()->plugin_name,
 				'plugin_url'               => visual_portfolio()->plugin_url,

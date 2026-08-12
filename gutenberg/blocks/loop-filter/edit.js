@@ -11,6 +11,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+
 const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
 
 /**
@@ -72,6 +77,8 @@ export default function BlockEdit({
 	context,
 	clientId,
 }) {
+	useLoopOrphanWarning('visual-portfolio/loop-filter', context);
+
 	const [isLoading, setIsLoading] = useState(false);
 
 	// Key of the query the current items were fetched for. Items live in the

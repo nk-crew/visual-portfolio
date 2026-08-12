@@ -183,7 +183,9 @@ class Visual_Portfolio_Block_Item_Image {
 	public function block_render( $attributes, $content, $block ) {
 		$context = $block->context;
 
-		$img_attr   = array();
+		// How urgent this picture is, decided by the item template from where the
+		// item sits in the gallery.
+		$img_attr   = is_array( $context['vp/itemImageLoading'] ?? null ) ? $context['vp/itemImageLoading'] : array();
 		$img_styles = $this->get_image_styles( $attributes, $context['vp/itemFocalPoint'] ?? '' );
 
 		if ( '' !== $img_styles ) {

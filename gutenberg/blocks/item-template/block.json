@@ -122,6 +122,10 @@
 		"vp/sourceQuery",
 		"vp/blockId"
 	],
+	"providesContext": {
+		"vp/layoutType": "layoutType",
+		"vp/layoutColumns": "layoutColumns"
+	},
 	"style": "visual-portfolio-block-item-template",
 	"editorStyle": "visual-portfolio-block-item-template-editor"
 }

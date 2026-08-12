@@ -128,11 +128,135 @@ class Visual_Portfolio_Block_Loop {
 	 * @return string
 	 */
 	public static function add_random_seed( $url, $context ) {
-		if ( ! $url || '#' === $url || ! self::is_random_order( $context ) ) {
+		$seed = self::get_control_random_seed( $context );
+
+		if ( ! $url || '#' === $url || ! $seed ) {
 			return $url;
 		}
 
-		return add_query_arg( 'vpf_random_seed', Visual_Portfolio_Get::get_random_seed(), $url );
+		return add_query_arg( 'vpf_random_seed', $seed, $url );
+	}
+
+	/**
+	 * Rebuild the context a loop provides, out of its saved attributes.
+	 *
+	 * `wp_head` runs long before any block is rendered, so whatever has to
+	 * answer for a loop up there - the pagination links of the document head -
+	 * resolves its context by hand. Going through the registered block type is
+	 * what makes the result identical to the context the render pipeline builds
+	 * further down, defaults and all, so the page count is calculated once and
+	 * serves both.
+	 *
+	 * @param array $attributes - saved attributes of a loop block.
+	 *
+	 * @return array Block context, keyed the way `providesContext` names it.
+	 */
+	public static function get_context_from_attributes( $attributes ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'visual-portfolio/loop' );
+
+		if ( ! $block_type || empty( $block_type->provides_context ) ) {
+			return array();
+		}
+
+		$context = array();
+
+		foreach ( $block_type->provides_context as $key => $attribute ) {
+			if ( isset( $attributes[ $attribute ] ) ) {
+				$context[ $key ] = $attributes[ $attribute ];
+			} elseif ( isset( $block_type->attributes[ $attribute ]['default'] ) ) {
+				$context[ $key ] = $block_type->attributes[ $attribute ]['default'];
+			}
+		}
+
+		return $context;
+	}
+
+	/**
+	 * The random seed a control of this loop has to carry, if any.
+	 *
+	 * Links get it through `add_random_seed()`; a control that submits a form
+	 * carries it as a hidden input instead.
+	 *
+	 * @param array $context - block context of the control.
+	 *
+	 * @return string Seed, or an empty string when the loop is not random.
+	 */
+	public static function get_control_random_seed( $context ) {
+		return self::is_random_order( $context ) ? (string) Visual_Portfolio_Get::get_random_seed() : '';
+	}
+
+	/**
+	 * The URL a control form submits to.
+	 *
+	 * A GET form throws away the query string of its action and replaces it with
+	 * its own fields, so the action is the path alone and everything the form has
+	 * to keep travels as a hidden input - see `get_preserved_inputs()`.
+	 *
+	 * @return string Unescaped URL.
+	 */
+	public static function get_form_action() {
+		$parts = explode( '?', Visual_Portfolio_Get::get_current_url(), 2 );
+
+		return $parts[0];
+	}
+
+	/**
+	 * Hidden inputs that carry the rest of the URL through a form submit.
+	 *
+	 * A GET form sends its own fields and nothing else. Without these, sorting
+	 * one gallery would send every other gallery on the page back to page one -
+	 * and on a site with plain permalinks it would lose the query string the
+	 * page itself is addressed by.
+	 *
+	 * @param array $exclude - parameter names the form writes itself.
+	 * @param array $extra   - parameters to add or override, name => value.
+	 *
+	 * @return string
+	 */
+	public static function get_preserved_inputs( $exclude = array(), $extra = array() ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$params = isset( $_GET ) && is_array( $_GET ) ? wp_unslash( $_GET ) : array();
+
+		foreach ( $exclude as $name ) {
+			unset( $params[ $name ] );
+		}
+
+		// Assigned one by one rather than merged: a query string may name a
+		// parameter `0`, and merging would renumber it into something else.
+		foreach ( $extra as $name => $value ) {
+			$params[ $name ] = $value;
+		}
+
+		return self::render_hidden_inputs( $params );
+	}
+
+	/**
+	 * Flatten parameters into hidden inputs, arrays included.
+	 *
+	 * @param array  $params - parameters.
+	 * @param string $prefix - name of the array these parameters came out of.
+	 *
+	 * @return string
+	 */
+	private static function render_hidden_inputs( $params, $prefix = '' ) {
+		$html = '';
+
+		foreach ( $params as $name => $value ) {
+			$field = '' === $prefix ? (string) $name : $prefix . '[' . $name . ']';
+
+			if ( is_array( $value ) ) {
+				$html .= self::render_hidden_inputs( $value, $field );
+				continue;
+			}
+
+			$html .= sprintf(
+				'<input type="hidden" name="%1$s" value="%2$s" />',
+				esc_attr( $field ),
+				esc_attr( sanitize_text_field( (string) $value ) )
+			);
+		}
+
+		return $html;
 	}
 
 	/**

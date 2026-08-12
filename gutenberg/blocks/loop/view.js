@@ -453,6 +453,12 @@ async function loadNextPage(trigger, context) {
 
 store('visual-portfolio/loop', {
 	state: {
+		// True wherever this module is running, which is the only thing a
+		// fallback control needs to know: the sort form binds its submit button
+		// to it and disappears the moment the select starts navigating on its
+		// own. A module that never arrives leaves the button where it is.
+		isEnhanced: true,
+
 		// Read through the context so that two loops on one page keep their own
 		// loading state.
 		get isLoading() {

@@ -314,7 +314,45 @@ test.describe('Gallery Loop blocks', () => {
 
 		await expect(numbers).toHaveCount(expectedPages + 1);
 	});
+
+	test('an inserted image takes the size its gallery wants', async ({
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Loop - image size default',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock(getLoopBlock(PAGED_PAGINATION));
+
+		// Three columns is the default of the item template. The size is
+		// written once the preview of the items has mounted the image block.
+		await expect
+			.poll(async () => getItemImageSize(await editor.getBlocks()))
+			.toBe('vp_lg');
+	});
 });
+
+/**
+ * The image size the item image of the inserted loop was given.
+ *
+ * @param {Array} blocks - editor blocks.
+ * @return {string|undefined} size slug.
+ */
+function getItemImageSize(blocks) {
+	const loop = blocks.find((block) => 'visual-portfolio/loop' === block.name);
+	const template = loop?.innerBlocks?.find(
+		(block) => 'visual-portfolio/item-template' === block.name
+	);
+	const image = template?.innerBlocks?.find(
+		(block) => 'visual-portfolio/item-image' === block.name
+	);
+
+	return image?.attributes?.sizeSlug;
+}
 
 /**
  * Read the filter item labels inside the inserted loop block.

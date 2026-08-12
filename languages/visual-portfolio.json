@@ -860,6 +860,9 @@
          "Zoom": [
             ""
          ],
+         "Gallery Item": [
+            ""
+         ],
          "Dynamic control callback function is not found.": [
             ""
          ],
@@ -1526,6 +1529,33 @@
          "See Pro details": [
             ""
          ],
+         "%s View": [
+            "",
+            ""
+         ],
+         "%s Min Read": [
+            "",
+            ""
+         ],
+         "No Comments": [
+            ""
+         ],
+         "%s Comment": [
+            "",
+            ""
+         ],
+         "Previous slide": [
+            ""
+         ],
+         "Next slide": [
+            ""
+         ],
+         "Go to slide %d": [
+            ""
+         ],
+         "Gallery carousel": [
+            ""
+         ],
          "Display all items": [
             ""
          ],
@@ -1544,31 +1574,22 @@
          "Sort items": [
             ""
          ],
+         "Gallery": [
+            ""
+         ],
+         "The image could not be loaded.": [
+            ""
+         ],
          "By %s": [
             ""
          ],
          "Comments": [
             ""
          ],
-         "No Comments": [
-            ""
-         ],
-         "%s Comment": [
-            "",
-            ""
-         ],
          "Reading Time": [
             ""
          ],
-         "%s Min Read": [
-            "",
-            ""
-         ],
          "Views": [
-            ""
-         ],
-         "%s View": [
-            "",
             ""
          ],
          "Previous Slide": [
@@ -1616,6 +1637,87 @@
          "Gallery item categories": [
             ""
          ],
+         "Over image": [
+            ""
+         ],
+         "Below image": [
+            ""
+         ],
+         "On hover": [
+            ""
+         ],
+         "Never": [
+            ""
+         ],
+         "Cover": [
+            ""
+         ],
+         "Contain": [
+            ""
+         ],
+         "Open the item": [
+            ""
+         ],
+         "Open the lightbox": [
+            ""
+         ],
+         "Content position": [
+            ""
+         ],
+         "Hover overlay": [
+            ""
+         ],
+         "Overlay opacity": [
+            ""
+         ],
+         "Hover overlay opacity": [
+            ""
+         ],
+         "Content placement": [
+            ""
+         ],
+         "Below the image the content is always visible, which is what a touch screen wants.": [
+            ""
+         ],
+         "How the content appears above the image. Fly follows the side the pointer came in from.": [
+            ""
+         ],
+         "Show content": [
+            ""
+         ],
+         "Touch screens always show the content, whatever this says.": [
+            ""
+         ],
+         "Image size": [
+            ""
+         ],
+         "Aspect ratio": [
+            ""
+         ],
+         "For example 1, 4/3 or 16/9. Leave empty to give every cover the proportions of its own image, the way a masonry layout wants them.": [
+            ""
+         ],
+         "Minimum height": [
+            ""
+         ],
+         "Scale": [
+            ""
+         ],
+         "Focal point": [
+            ""
+         ],
+         "Overrides the focal point stored with each image.": [
+            ""
+         ],
+         "On click": [
+            ""
+         ],
+         "Covers the whole item with a link, and gives the keyboard something to focus so the content can be reached.": [
+            ""
+         ],
+         "Link rel": [
+            ""
+         ],
          "Date format": [
             ""
          ],
@@ -1637,37 +1739,46 @@
          "Max number of words": [
             ""
          ],
-         "Full Size": [
-            ""
-         ],
-         "Cover": [
-            ""
-         ],
-         "Contain": [
-            ""
-         ],
          "Fill": [
-            ""
-         ],
-         "Overlay opacity": [
-            ""
-         ],
-         "Image size": [
-            ""
-         ],
-         "Aspect ratio": [
             ""
          ],
          "For example 1, 4/3 or 16/9. Leave empty to keep the original proportions.": [
             ""
          ],
-         "Scale": [
-            ""
-         ],
          "Applies when an aspect ratio is set.": [
             ""
          ],
-         "Link rel": [
+         "Show icon": [
+            ""
+         ],
+         "Show empty value": [
+            ""
+         ],
+         "Items with nothing to show here are skipped unless this is on.": [
+            ""
+         ],
+         "Suffix text": [
+            ""
+         ],
+         "Link to comments": [
+            ""
+         ],
+         "Gallery Item Comments (Experimental)": [
+            ""
+         ],
+         "Displays the number of comments of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "Gallery Item Views (Experimental)": [
+            ""
+         ],
+         "Displays the number of views of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "Gallery Item Reading Time (Experimental)": [
+            ""
+         ],
+         "Displays the reading time of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "Show arrow": [
@@ -1677,6 +1788,54 @@
             ""
          ],
          "Read more": [
+            ""
+         ],
+         "Carousel": [
+            ""
+         ],
+         "Slides per view": [
+            ""
+         ],
+         "Columns on tablet": [
+            ""
+         ],
+         "Columns on mobile": [
+            ""
+         ],
+         "Row height": [
+            ""
+         ],
+         "Row height tolerance": [
+            ""
+         ],
+         "Maximum rows": [
+            ""
+         ],
+         "Zero shows every row the items make.": [
+            ""
+         ],
+         "Last row": [
+            ""
+         ],
+         "Slide width from content": [
+            ""
+         ],
+         "Snap slides to": [
+            ""
+         ],
+         "Free scrolling": [
+            ""
+         ],
+         "Scroll stops wherever it is let go, instead of settling on a slide.": [
+            ""
+         ],
+         "Coverflow is drawn by the browser as the carousel scrolls. Browsers without scroll-driven animations simply show the carousel without it.": [
+            ""
+         ],
+         "Arrows": [
+            ""
+         ],
+         "Dots": [
             ""
          ],
          "Gallery Item Template": [
@@ -1692,6 +1851,9 @@
             ""
          ],
          "Add category text…": [
+            ""
+         ],
+         "Add text or blocks that will display when the gallery returns no results.": [
             ""
          ],
          "Loading text": [
@@ -1737,6 +1899,45 @@
             ""
          ],
          "Displays an infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "Sort Options": [
+            ""
+         ],
+         "Labels": [
+            ""
+         ],
+         "Ok, I understand": [
+            ""
+         ],
+         "Large galleries slow the page down. Keep the items per page under %d and add Load More or Infinite Scroll pagination.": [
+            ""
+         ],
+         "A random order is held still by a seed in the page links, which page caches store as separate pages. Display all items, or order the gallery some other way, if the site is cached.": [
+            ""
+         ],
+         "Render the whole gallery on a single page.": [
+            ""
+         ],
+         "Items per page": [
+            ""
+         ],
+         "Source Settings": [
+            ""
+         ],
+         "This source is set up and working. Editing it here arrives in the next update.": [
+            ""
+         ],
+         "Gallery Loop": [
+            ""
+         ],
+         "Choose where the gallery takes its items from.": [
+            ""
+         ],
+         "Start from a pattern, or lay the gallery out yourself.": [
+            ""
+         ],
+         "Start blank": [
             ""
          ],
          "Wide 16:9": [
@@ -1919,9 +2120,6 @@
          "Add <em>`Load More`</em> or <em>`Infinite Scroll`</em> pagination for best results.": [
             ""
          ],
-         "Ok, I understand": [
-            ""
-         ],
          "Show gallery size notice": [
             ""
          ],
@@ -1949,6 +2147,97 @@
          "Show Additional Shortcodes": [
             ""
          ],
+         "Image %d": [
+            ""
+         ],
+         "Edit %s": [
+            ""
+         ],
+         "Reorder %s": [
+            ""
+         ],
+         "Remove %s": [
+            ""
+         ],
+         "Image Settings": [
+            ""
+         ],
+         "Image %1$d of %2$d": [
+            ""
+         ],
+         "The part of the image that stays visible when it is cropped.": [
+            ""
+         ],
+         "What the gallery filter offers. Type anything and press Enter.": [
+            ""
+         ],
+         "Link URL": [
+            ""
+         ],
+         "Where the item links to. Left empty, it opens the image in the popup.": [
+            ""
+         ],
+         "To reorder an image, press Space or Enter, move it with the arrow keys, then press Space or Enter again. Press Escape to cancel.": [
+            ""
+         ],
+         "Picked up image %d.": [
+            ""
+         ],
+         "Image moved to position %d.": [
+            ""
+         ],
+         "Image dropped at position %d.": [
+            ""
+         ],
+         "Image dropped.": [
+            ""
+         ],
+         "Reordering cancelled.": [
+            ""
+         ],
+         "Drag images, upload new ones or pick from your media library.": [
+            ""
+         ],
+         "%d image": [
+            "",
+            ""
+         ],
+         "Add media": [
+            ""
+         ],
+         "Ascending": [
+            ""
+         ],
+         "Descending": [
+            ""
+         ],
+         "Order By": [
+            ""
+         ],
+         "Build a custom query the same way `WP_Query` arguments are written.": [
+            ""
+         ],
+         "Any of the selected": [
+            ""
+         ],
+         "All of the selected": [
+            ""
+         ],
+         "Skip over the first items of the query.": [
+            ""
+         ],
+         "Hide items already displayed by another gallery on the same page. Affects the front end only.": [
+            ""
+         ],
+         "Display social feeds such as Instagram, YouTube, Flickr, X, etc…": [
+            ""
+         ],
+         "Pro": [
+            ""
+         ],
+         "Full Size": [
+            ""
+         ],
          "slug\u0004portfolio-category": [
             ""
          ],
@@ -1973,6 +2262,9 @@
          "Post Type General Name\u0004Saved Layouts": [
             ""
          ],
+         "lightbox counter separator\u0004 / ": [
+            ""
+         ],
          "block title\u0004Visual Portfolio Saved Layout": [
             ""
          ],
@@ -1985,6 +2277,9 @@
          "block title\u0004Gallery Item Categories (Experimental)": [
             ""
          ],
+         "block title\u0004Gallery Item Cover (Experimental)": [
+            ""
+         ],
          "block title\u0004Gallery Item Date (Experimental)": [
             ""
          ],
@@ -1992,6 +2287,9 @@
             ""
          ],
          "block title\u0004Gallery Item Image (Experimental)": [
+            ""
+         ],
+         "block title\u0004Gallery Item Meta (Experimental)": [
             ""
          ],
          "block title\u0004Gallery Item Read More (Experimental)": [
@@ -2007,6 +2305,9 @@
             ""
          ],
          "block title\u0004Gallery Filter (Experimental)": [
+            ""
+         ],
+         "block title\u0004No Results (Experimental)": [
             ""
          ],
          "block title\u0004Infinite": [
@@ -2048,6 +2349,9 @@
          "block description\u0004Displays the categories of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
+         "block description\u0004Displays the image of a gallery item as a background, with blocks on top of it. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
          "block description\u0004Displays the publish date of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
@@ -2055,6 +2359,9 @@
             ""
          ],
          "block description\u0004Displays the image of a gallery item. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Displays a meta value of a gallery item, such as its comments, views or reading time. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "block description\u0004Displays a link to the gallery item. Block is experimental and will change in future releases. Please use with caution.": [
@@ -2070,6 +2377,9 @@
             ""
          ],
          "block description\u0004Displays category filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution.": [
+            ""
+         ],
+         "block description\u0004Contains the block elements used to render content when no gallery items are found. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
          "block description\u0004Displays a infinite scroll trigger for pagination.": [

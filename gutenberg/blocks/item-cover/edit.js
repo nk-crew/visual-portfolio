@@ -30,6 +30,14 @@ import { __ } from '@wordpress/i18n';
  */
 import classnames from 'classnames/dedupe';
 
+/**
+ * Internal dependencies
+ */
+import {
+	IMAGE_SIZE_OPTIONS,
+	useImageSizeOnInsert,
+} from '../../utils/item-image-size';
+
 const ALLOWED_BLOCKS = [
 	'visual-portfolio/item-title',
 	'visual-portfolio/item-description',
@@ -52,17 +60,15 @@ const EFFECT_OPTIONS = [
 	{ label: __('Emerge', 'visual-portfolio'), value: 'emerge' },
 ];
 
+const CONTENT_PLACEMENT_OPTIONS = [
+	{ label: __('Over image', 'visual-portfolio'), value: 'over' },
+	{ label: __('Below image', 'visual-portfolio'), value: 'below' },
+];
+
 const SHOW_CONTENT_OPTIONS = [
 	{ label: __('Always', 'visual-portfolio'), value: 'always' },
 	{ label: __('On hover', 'visual-portfolio'), value: 'hover' },
 	{ label: __('Never', 'visual-portfolio'), value: 'never' },
-];
-
-const SIZE_OPTIONS = [
-	{ label: __('Thumbnail', 'visual-portfolio'), value: 'thumbnail' },
-	{ label: __('Medium', 'visual-portfolio'), value: 'medium' },
-	{ label: __('Large', 'visual-portfolio'), value: 'large' },
-	{ label: __('Full Size', 'visual-portfolio'), value: 'full' },
 ];
 
 const BACKGROUND_SIZE_OPTIONS = [
@@ -96,6 +102,7 @@ const DEFAULT_ATTRIBUTES = {
 	minHeight: undefined,
 	backgroundSize: 'cover',
 	focalPoint: undefined,
+	contentPlacement: 'over',
 	contentPosition: 'center',
 	verticalAlignment: undefined,
 	effect: 'fade',
@@ -117,6 +124,7 @@ export default function ItemCoverEdit({
 		minHeight,
 		backgroundSize,
 		focalPoint,
+		contentPlacement,
 		contentPosition,
 		verticalAlignment,
 		effect,
@@ -141,10 +149,19 @@ export default function ItemCoverEdit({
 		'vp/itemImgAlt': itemImgAlt,
 		'vp/itemImageSizes': itemImageSizes,
 		'vp/itemFocalPoint': itemFocalPoint,
+		'vp/layoutColumns': layoutColumns,
 	} = context;
 
 	const blockEditingMode = useBlockEditingMode();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
+	useImageSizeOnInsert(clientId, layoutColumns, setAttributes);
+
+	// Content under the picture is content that is always there: nothing is
+	// revealed, so the effect, the reveal mode and the position matrix have
+	// nothing left to say and are taken out of the way. The render callback
+	// resolves the very same way.
+	const isBelow = contentPlacement === 'below';
 
 	// The render callback reads the proportions of the image off the tag it
 	// prints; here they arrive with the image itself.
@@ -202,18 +219,31 @@ export default function ItemCoverEdit({
 			: customHoverOverlayColor;
 	}
 
+	const resolvedRatio = aspectRatio || naturalRatio || undefined;
+
+	// `never` still means "do not render it", which holds wherever the content
+	// sits, so only the hover mode is rewritten.
+	let resolvedShowContent = showContent;
+
+	if (isBelow) {
+		resolvedShowContent = showContent === 'never' ? 'never' : 'always';
+	}
+
 	const blockProps = useBlockProps({
 		className: classnames(
-			`vp-effect-${effect}`,
-			`vp-show-content-${showContent}`,
-			CONTENT_POSITION_CLASSES[contentPosition],
+			`vp-content-placement-${isBelow ? 'below' : 'over'}`,
+			`vp-effect-${isBelow ? 'none' : effect}`,
+			`vp-show-content-${resolvedShowContent}`,
+			!isBelow && CONTENT_POSITION_CLASSES[contentPosition],
 			{
 				[`is-vertically-aligned-${verticalAlignment}`]:
-					verticalAlignment,
+					!isBelow && verticalAlignment,
 			}
 		),
 		style: {
-			aspectRatio: aspectRatio || naturalRatio || undefined,
+			// With the content below, the ratio shapes the picture rather than
+			// the card, so it travels to the media box instead.
+			aspectRatio: isBelow ? undefined : resolvedRatio,
 			minHeight: minHeight || undefined,
 		},
 	});
@@ -229,21 +259,26 @@ export default function ItemCoverEdit({
 		<>
 			{blockEditingMode === 'default' && (
 				<>
-					<BlockControls group="block">
-						<BlockAlignmentMatrixControl
-							label={__('Content position', 'visual-portfolio')}
-							value={contentPosition}
-							onChange={(value) =>
-								setAttributes({ contentPosition: value })
-							}
-						/>
-						<BlockVerticalAlignmentControl
-							value={verticalAlignment}
-							onChange={(value) =>
-								setAttributes({ verticalAlignment: value })
-							}
-						/>
-					</BlockControls>
+					{!isBelow && (
+						<BlockControls group="block">
+							<BlockAlignmentMatrixControl
+								label={__(
+									'Content position',
+									'visual-portfolio'
+								)}
+								value={contentPosition}
+								onChange={(value) =>
+									setAttributes({ contentPosition: value })
+								}
+							/>
+							<BlockVerticalAlignmentControl
+								value={verticalAlignment}
+								onChange={(value) =>
+									setAttributes({ verticalAlignment: value })
+								}
+							/>
+						</BlockControls>
+					)}
 					<InspectorControls group="color">
 						{colorGradientSettings.hasColorsOrGradients && (
 							<ColorGradientSettingsDropdown
@@ -395,35 +430,14 @@ export default function ItemCoverEdit({
 							resetAll={() => setAttributes(DEFAULT_ATTRIBUTES)}
 						>
 							<ToolsPanelItem
-								label={__('Effect', 'visual-portfolio')}
+								label={__(
+									'Content placement',
+									'visual-portfolio'
+								)}
 								isShownByDefault
-								hasValue={() => effect !== 'fade'}
+								hasValue={() => contentPlacement !== 'over'}
 								onDeselect={() =>
-									setAttributes({ effect: 'fade' })
-								}
-								panelId={clientId}
-							>
-								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={__('Effect', 'visual-portfolio')}
-									help={__(
-										'How the content appears above the image. Fly follows the side the pointer came in from.',
-										'visual-portfolio'
-									)}
-									value={effect}
-									options={EFFECT_OPTIONS}
-									onChange={(value) =>
-										setAttributes({ effect: value })
-									}
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={__('Show content', 'visual-portfolio')}
-								isShownByDefault
-								hasValue={() => showContent !== 'hover'}
-								onDeselect={() =>
-									setAttributes({ showContent: 'hover' })
+									setAttributes({ contentPlacement: 'over' })
 								}
 								panelId={clientId}
 							>
@@ -431,20 +445,82 @@ export default function ItemCoverEdit({
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 									label={__(
-										'Show content',
+										'Content placement',
 										'visual-portfolio'
 									)}
 									help={__(
-										'Touch screens always show the content, whatever this says.',
+										'Below the image the content is always visible, which is what a touch screen wants.',
 										'visual-portfolio'
 									)}
-									value={showContent}
-									options={SHOW_CONTENT_OPTIONS}
+									value={contentPlacement}
+									options={CONTENT_PLACEMENT_OPTIONS}
 									onChange={(value) =>
-										setAttributes({ showContent: value })
+										setAttributes({
+											contentPlacement: value,
+										})
 									}
 								/>
 							</ToolsPanelItem>
+							{!isBelow && (
+								<ToolsPanelItem
+									label={__('Effect', 'visual-portfolio')}
+									isShownByDefault
+									hasValue={() => effect !== 'fade'}
+									onDeselect={() =>
+										setAttributes({ effect: 'fade' })
+									}
+									panelId={clientId}
+								>
+									<SelectControl
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										label={__('Effect', 'visual-portfolio')}
+										help={__(
+											'How the content appears above the image. Fly follows the side the pointer came in from.',
+											'visual-portfolio'
+										)}
+										value={effect}
+										options={EFFECT_OPTIONS}
+										onChange={(value) =>
+											setAttributes({ effect: value })
+										}
+									/>
+								</ToolsPanelItem>
+							)}
+							{!isBelow && (
+								<ToolsPanelItem
+									label={__(
+										'Show content',
+										'visual-portfolio'
+									)}
+									isShownByDefault
+									hasValue={() => showContent !== 'hover'}
+									onDeselect={() =>
+										setAttributes({ showContent: 'hover' })
+									}
+									panelId={clientId}
+								>
+									<SelectControl
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										label={__(
+											'Show content',
+											'visual-portfolio'
+										)}
+										help={__(
+											'Touch screens always show the content, whatever this says.',
+											'visual-portfolio'
+										)}
+										value={showContent}
+										options={SHOW_CONTENT_OPTIONS}
+										onChange={(value) =>
+											setAttributes({
+												showContent: value,
+											})
+										}
+									/>
+								</ToolsPanelItem>
+							)}
 							<ToolsPanelItem
 								label={__('Image size', 'visual-portfolio')}
 								isShownByDefault
@@ -459,7 +535,7 @@ export default function ItemCoverEdit({
 									__nextHasNoMarginBottom
 									label={__('Image size', 'visual-portfolio')}
 									value={sizeSlug}
-									options={SIZE_OPTIONS}
+									options={IMAGE_SIZE_OPTIONS}
 									onChange={(value) =>
 										setAttributes({ sizeSlug: value })
 									}
@@ -645,54 +721,61 @@ export default function ItemCoverEdit({
 				</>
 			)}
 			<div {...blockProps}>
-				{imageUrl ? (
-					<img
-						className="wp-block-visual-portfolio-item-cover__image-background"
-						src={imageUrl}
-						alt={itemImgAlt || ''}
-						style={imageStyles}
-						onLoad={(event) =>
-							setNaturalRatio(
-								`${event.target.naturalWidth}/${event.target.naturalHeight}`
-							)
-						}
-					/>
-				) : (
-					<span
-						className="wp-block-visual-portfolio-item-cover__image-background"
-						style={{ background: 'currentcolor', opacity: 0.1 }}
-						aria-hidden="true"
-					/>
-				)}
-				{hasOverlay && (
-					<span
-						className={classnames(
-							'wp-block-visual-portfolio-item-cover__overlay',
-							'has-background-dim',
-							`has-background-dim-${dimRatio}`,
-							{
-								'has-background-gradient':
-									gradient || customGradient,
+				<div
+					className="wp-block-visual-portfolio-item-cover__media"
+					style={{
+						aspectRatio: isBelow ? resolvedRatio : undefined,
+					}}
+				>
+					{imageUrl ? (
+						<img
+							className="wp-block-visual-portfolio-item-cover__image-background"
+							src={imageUrl}
+							alt={itemImgAlt || ''}
+							style={imageStyles}
+							onLoad={(event) =>
+								setNaturalRatio(
+									`${event.target.naturalWidth}/${event.target.naturalHeight}`
+								)
 							}
-						)}
-						style={overlayStyles}
-						aria-hidden="true"
-					/>
-				)}
-				{hasHoverOverlay && (
-					<span
-						className={classnames(
-							'wp-block-visual-portfolio-item-cover__overlay',
-							'wp-block-visual-portfolio-item-cover__overlay--hover',
-							{
-								'has-background-gradient':
-									hoverGradient || customHoverGradient,
-							}
-						)}
-						style={hoverOverlayStyles}
-						aria-hidden="true"
-					/>
-				)}
+						/>
+					) : (
+						<span
+							className="wp-block-visual-portfolio-item-cover__image-background"
+							style={{ background: 'currentcolor', opacity: 0.1 }}
+							aria-hidden="true"
+						/>
+					)}
+					{hasOverlay && (
+						<span
+							className={classnames(
+								'wp-block-visual-portfolio-item-cover__overlay',
+								'has-background-dim',
+								`has-background-dim-${dimRatio}`,
+								{
+									'has-background-gradient':
+										gradient || customGradient,
+								}
+							)}
+							style={overlayStyles}
+							aria-hidden="true"
+						/>
+					)}
+					{hasHoverOverlay && (
+						<span
+							className={classnames(
+								'wp-block-visual-portfolio-item-cover__overlay',
+								'wp-block-visual-portfolio-item-cover__overlay--hover',
+								{
+									'has-background-gradient':
+										hoverGradient || customHoverGradient,
+								}
+							)}
+							style={hoverOverlayStyles}
+							aria-hidden="true"
+						/>
+					)}
+				</div>
 				{/* No link element here: it covers the cover on the front end,
 				    and in the editor that is every click meant for a block. */}
 				<div {...innerBlocksProps} />

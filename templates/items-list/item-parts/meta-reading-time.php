@@ -49,7 +49,7 @@ $templates_data = array(
 		<?php
 		echo esc_html(
 			sprintf(
-				// translators: %s Reading time minutes.
+				// translators: %s reading time in minutes.
 				_n(
 					'%s Min Read',
 					'%s Mins Read',

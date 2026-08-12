@@ -16,7 +16,9 @@
 		"vp/itemFocalPoint",
 		"vp/itemUrl",
 		"vp/itemAriaLabel",
-		"vp/itemPopupData"
+		"vp/itemPopupData",
+		"vp/itemImageLoading",
+		"vp/layoutColumns"
 	],
 	"attributes": {
 		"sizeSlug": {
@@ -37,6 +39,11 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		},
+		"contentPlacement": {
+			"type": "string",
+			"default": "over",
+			"enum": ["over", "below"]
 		},
 		"contentPosition": {
 			"type": "string",

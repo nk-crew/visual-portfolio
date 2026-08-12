@@ -58,7 +58,7 @@ $templates_data = array(
 		if ( ! $args['comments_count'] ) {
 			echo esc_html__( 'No Comments', 'visual-portfolio' );
 		} else {
-			// translators: %s Number of comments.
+			// translators: %s number of comments.
 			echo esc_html( sprintf( _n( '%s Comment', '%s Comments', $args['comments_count'], 'visual-portfolio' ), number_format_i18n( (int) $args['comments_count'] ) ) );
 		}
 

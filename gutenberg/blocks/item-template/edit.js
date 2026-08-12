@@ -27,6 +27,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
@@ -204,6 +205,8 @@ export default function BlockEdit({
 		'vp/postsQuery': postsQuery,
 		'vp/imagesQuery': imagesQuery,
 	} = context;
+
+	useLoopOrphanWarning('visual-portfolio/item-template', context);
 
 	const [items, setItems] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);

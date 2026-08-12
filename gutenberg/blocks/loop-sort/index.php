@@ -115,14 +115,35 @@ class Visual_Portfolio_Block_Loop_Sort {
 			$options .= '</option>';
 		}
 
-		// The only control of the family that is not a link: the store reads the
-		// URL of the selected option instead of an href.
+		$sort_name = Visual_Portfolio_Get::get_query_var_name( 'sort', $query_id );
+		$page_name = Visual_Portfolio_Get::get_query_var_name( 'page', $query_id );
+		$seed      = Visual_Portfolio_Block_Loop::get_control_random_seed( $block->context );
+
+		// A form is what makes the only control of the family that is not a link
+		// work without JavaScript: submitting it lands on the very URL the
+		// selected option carries. The two parameters this loop writes itself are
+		// left out - a new order starts at page one - and everything else in the
+		// query string is carried along, including the state of the other loops
+		// on the page.
+		$hidden = Visual_Portfolio_Block_Loop::get_preserved_inputs(
+			array( $sort_name, $page_name ),
+			$seed ? array( 'vpf_random_seed' => $seed ) : array()
+		);
+
+		// With the store running, changing the select swaps the loop and the
+		// button has nothing left to do. It is rendered shown and hidden from
+		// there rather than the other way round: a module that never arrives has
+		// to leave a working form behind, not a dead one.
 		return sprintf(
-			'<div %1$s><select aria-label="%2$s" data-wp-interactive="%3$s" data-wp-on--change="actions.navigate">%4$s</select></div>',
+			'<div %1$s><form method="get" action="%2$s" data-wp-interactive="%3$s">%4$s<select name="%5$s" aria-label="%6$s" data-wp-on--change="actions.navigate">%7$s</select><button type="submit" class="vp-block-loop-sort__submit" data-wp-bind--hidden="state.isEnhanced">%8$s</button></form></div>',
 			$wrapper_attributes,
-			esc_attr__( 'Sort items', 'visual-portfolio' ),
+			esc_url( Visual_Portfolio_Block_Loop::get_form_action() ),
 			esc_attr( Visual_Portfolio_Block_Loop::STORE ),
-			$options
+			$hidden,
+			esc_attr( $sort_name ),
+			esc_attr__( 'Sort items', 'visual-portfolio' ),
+			$options,
+			esc_html__( 'Sort', 'visual-portfolio' )
 		);
 	}
 }

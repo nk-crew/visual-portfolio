@@ -617,7 +617,7 @@ class Visual_Portfolio_Security {
 	 * Get allowed parameters configuration
 	 */
 	private static function get_allowed_params_config() {
-		return array(
+		$config = array(
 			'align'                       => 'string',
 			'anchor'                      => 'string',
 			'block_id'                    => 'string',
@@ -653,6 +653,23 @@ class Visual_Portfolio_Security {
 			'sort'                        => array( 'string', 'dropdown' ),
 			'stretch'                     => array( 'boolean', false ),
 		);
+
+		/**
+		 * Filter the allow-list of options `calculate_max_pages()` may receive.
+		 *
+		 * Third-party content sources map their `sourceQuery` into their own
+		 * legacy options through `vpf_convert_loop_source_attributes`, and
+		 * everything not listed here is dropped before the query is built - so a
+		 * source that does not register its options here can never report a page
+		 * count. Note the options arrive in the *legacy* format: `sourceQuery`
+		 * has already been converted away by the time this runs.
+		 *
+		 * Every entry is `option => type` or `option => array( type, default )`,
+		 * where type is one of `string`, `number`, `boolean`, `array`.
+		 *
+		 * @param array $config Allowed options, keyed by option name.
+		 */
+		return apply_filters( 'vpf_allowed_max_pages_params', $config );
 	}
 
 	/**

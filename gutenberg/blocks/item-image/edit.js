@@ -23,12 +23,13 @@ import { __ } from '@wordpress/i18n';
  */
 import classnames from 'classnames/dedupe';
 
-const SIZE_OPTIONS = [
-	{ label: __('Thumbnail', 'visual-portfolio'), value: 'thumbnail' },
-	{ label: __('Medium', 'visual-portfolio'), value: 'medium' },
-	{ label: __('Large', 'visual-portfolio'), value: 'large' },
-	{ label: __('Full Size', 'visual-portfolio'), value: 'full' },
-];
+/**
+ * Internal dependencies
+ */
+import {
+	IMAGE_SIZE_OPTIONS,
+	useImageSizeOnInsert,
+} from '../../utils/item-image-size';
 
 const SCALE_OPTIONS = [
 	{ label: __('Cover', 'visual-portfolio'), value: 'cover' },
@@ -82,11 +83,14 @@ export default function ItemImageEdit({
 		'vp/itemImageSizes': itemImageSizes,
 		'vp/itemFocalPoint': itemFocalPoint,
 		'vp/itemUrl': itemUrl,
+		'vp/layoutColumns': layoutColumns,
 	} = context;
 
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
+	useImageSizeOnInsert(clientId, layoutColumns, setAttributes);
 
 	// Sizes are resolved on the server; only the choice between them is made here.
 	const imageUrl = itemImageSizes?.[sizeSlug] || itemImgUrl;
@@ -250,7 +254,7 @@ export default function ItemImageEdit({
 									__nextHasNoMarginBottom
 									label={__('Image size', 'visual-portfolio')}
 									value={sizeSlug}
-									options={SIZE_OPTIONS}
+									options={IMAGE_SIZE_OPTIONS}
 									onChange={(value) =>
 										setAttributes({ sizeSlug: value })
 									}

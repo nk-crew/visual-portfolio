@@ -10,6 +10,11 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+
 const AVAILABLE_OPTIONS = window.VPGutenbergVariables?.loop_sort_options || [];
 
 /**
@@ -33,8 +38,10 @@ function getShownOptions(selected, labels) {
 	}));
 }
 
-export default function LoopSortEdit({ attributes, setAttributes }) {
+export default function LoopSortEdit({ attributes, setAttributes, context }) {
 	const { options = [], labels = {} } = attributes;
+
+	useLoopOrphanWarning('visual-portfolio/loop-sort', context);
 
 	const shown = getShownOptions(options, labels);
 

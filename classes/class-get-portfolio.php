@@ -1532,22 +1532,37 @@ class Visual_Portfolio_Get {
 			return max( 1, (int) $query_opts['max_num_pages'] );
 		}
 
-		switch ( $content_source ) {
-			case 'post-based':
-				$query     = new WP_Query( $query_opts );
-				$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
+		// Branch order mirrors `resolve_query()` on purpose: the count and the
+		// items have to agree about which query answers for this source.
+		if ( 'images' === $content_source || 'social-stream' === $content_source ) {
+			$images_count = count( $query_opts['images'] ?? array() );
 
-				return max( 1, (int) $max_pages );
-
-			case 'images':
-			case 'social-stream':
-				$images_count = count( $query_opts['images'] ?? array() );
-
-				return max( 1, (int) ceil( $images_count / $items_count ) );
-
-			default:
-				return 1;
+			return max( 1, (int) ceil( $images_count / $items_count ) );
 		}
+
+		/**
+		 * Sources that answer with their own query object resolve through this
+		 * filter in `resolve_query()`, so the page count has to ask it too -
+		 * otherwise such a loop reports a single page to the pagination blocks
+		 * and visitors never get past page one.
+		 *
+		 * @see Visual_Portfolio_Get::resolve_query() for the filter contract.
+		 */
+		$custom_query = apply_filters( 'vpf_custom_query_result', false, $query_opts, $options );
+
+		if ( $custom_query ) {
+			return isset( $custom_query->max_num_pages ) ? max( 1, (int) $custom_query->max_num_pages ) : 1;
+		}
+
+		// A source with neither its own query nor posts has nothing to count.
+		if ( 'post-based' !== $content_source ) {
+			return 1;
+		}
+
+		$query     = new WP_Query( $query_opts );
+		$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
+
+		return max( 1, (int) $max_pages );
 	}
 
 	/**
@@ -3419,6 +3434,33 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
+	 * The URL of the request being served.
+	 *
+	 * Read off `REQUEST_URI` rather than rebuilt, because a site may be running
+	 * on permalinks nothing else reproduces - `/index.php/%postname%` among them.
+	 * Only where the server said nothing is it built back from the parsed request.
+	 *
+	 * @return string Unescaped URL.
+	 */
+	public static function get_current_url() {
+		if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
+			return esc_url_raw( wp_unslash( ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
+		}
+
+		global $wp;
+
+		$current_url = trailingslashit( home_url( $wp->request ) );
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $_GET ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$current_url = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( $_GET ) ), $current_url );
+		}
+
+		return $current_url;
+	}
+
+	/**
 	 * Return current page url with paged support.
 	 *
 	 * Arguments are always named after the legacy parameters (`vp_page`,
@@ -3433,24 +3475,7 @@ class Visual_Portfolio_Get {
 	 * @return string
 	 */
 	public static function get_pagenum_link( $query_arg = array(), $query_id = null ) {
-		// Use current page url.
-		global $wp;
-		$current_url = '';
-
-		// We should use REQUEST_URI in case if the user used non-default permalinks.
-		// For example, this one:
-		// - /index.php/%postname% .
-		if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
-			$current_url = esc_url_raw( wp_unslash( ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
-		} else {
-			$current_url = trailingslashit( home_url( $wp->request ) );
-
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( ! empty( $_GET ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$current_url = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( $_GET ) ), $current_url );
-			}
-		}
+		$current_url = self::get_current_url();
 
 		$names = array(
 			'vp_filter' => self::get_query_var_name( 'filter', $query_id ),

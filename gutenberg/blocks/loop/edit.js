@@ -217,6 +217,40 @@ function ItemsCountNotice({ perPage, queryType, imagesCount }) {
 }
 
 /**
+ * Warn about a random order that is also paged.
+ *
+ * A random order is drawn again on every request, so the pages of one gallery
+ * would overlap and skip items. The controls carry a seed in their links to
+ * hold one order still - and that seed is part of the URL, which a page cache
+ * stores as a page of its own. On a cached site the pages are therefore either
+ * multiplied or, where the parameter is stripped, shuffled again.
+ *
+ * @param {Object} props           - component props.
+ * @param {Object} props.attributes - block attributes.
+ * @return {Element|null} component.
+ */
+function RandomOrderNotice({ attributes }) {
+	const { queryType, baseQuery, postsQuery, imagesQuery } = attributes;
+
+	const isRandom =
+		('images' === queryType && 'rand' === imagesQuery?.orderBy) ||
+		('images' !== queryType && 'rand' === postsQuery?.orderBy);
+
+	if (!isRandom || PER_PAGE_ALL === baseQuery?.perPage) {
+		return null;
+	}
+
+	return (
+		<Notice status="warning" isDismissible={false}>
+			{__(
+				'A random order is held still by a seed in the page links, which page caches store as separate pages. Display all items, or order the gallery some other way, if the site is cached.',
+				'visual-portfolio'
+			)}
+		</Notice>
+	);
+}
+
+/**
  * Settings every source shares.
  *
  * @param {Object}   props               - component props.
@@ -259,6 +293,8 @@ function GeneralPanel({ attributes, setAttributes }) {
 				queryType={queryType}
 				imagesCount={imagesQuery?.images?.length || 0}
 			/>
+
+			<RandomOrderNotice attributes={attributes} />
 		</PanelBody>
 	);
 }
