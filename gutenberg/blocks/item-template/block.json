@@ -63,6 +63,7 @@
 		"vp/baseQuery",
 		"vp/postsQuery",
 		"vp/imagesQuery",
+		"vp/sourceQuery",
 		"vp/blockId"
 	],
 	"style": "visual-portfolio-block-item-template"

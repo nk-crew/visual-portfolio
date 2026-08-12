@@ -12,6 +12,7 @@
 		"vp/baseQuery",
 		"vp/postsQuery",
 		"vp/imagesQuery",
+		"vp/sourceQuery",
 		"vp/showCount"
 	],
 	"supports": {

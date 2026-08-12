@@ -99,6 +99,7 @@ class Visual_Portfolio_Convert_Attributes {
 			'titlesSource'       => 'custom',
 			'descriptionsSource' => 'custom',
 		),
+		'sourceQuery' => array(),
 	);
 
 	/**
@@ -198,7 +199,31 @@ class Visual_Portfolio_Convert_Attributes {
 			}
 		}
 
-		return $legacy;
+		$query_type = $attributes_to_convert['queryType'] ?? '';
+
+		/**
+		 * Map the settings of a third-party content source to legacy options.
+		 *
+		 * The built-in sources own `postsQuery` and `imagesQuery`, and the maps
+		 * above convert them. Everything else writes to the free-form
+		 * `sourceQuery` attribute, and only the source itself knows which
+		 * options its own `vpf_extend_query_args` hooks read - so it maps them
+		 * here.
+		 *
+		 * The JS twin of this filter is the `mapToLegacy` callback of
+		 * `registerLoopSource()`; both are covered by the same fixture in
+		 * `tests/fixtures/loop-source-attributes.json`.
+		 *
+		 * @param array  $legacy       Legacy options built so far.
+		 * @param string $query_type   Selected content source.
+		 * @param array  $source_query Settings of the source.
+		 */
+		return apply_filters(
+			'vpf_convert_loop_source_attributes',
+			$legacy,
+			$query_type,
+			$attributes_to_convert['sourceQuery'] ?? array()
+		);
 	}
 
 	/**

@@ -53,9 +53,12 @@
 				"descriptionsSource": "custom"
 			}
 		},
+		"sourceQuery": {
+			"type": "object",
+			"default": {}
+		},
 		"customCss": { "type": "string", "default": "" },
-		"preview_image_example": { "type": "string", "default": "" },
-		"setupWizard": { "type": "string", "default": "" }
+		"preview_image_example": { "type": "string", "default": "" }
 	},
 	"viewScriptModule": "visual-portfolio-block-loop-view",
 	"supports": {
@@ -104,6 +107,7 @@
 		"vp/baseQuery": "baseQuery",
 		"vp/postsQuery": "postsQuery",
 		"vp/imagesQuery": "imagesQuery",
+		"vp/sourceQuery": "sourceQuery",
 		"vp/blockId": "block_id"
 	}
 }

@@ -1,3 +1,7 @@
+import { select } from '@wordpress/data';
+
+import { LOOP_SOURCES_STORE } from '../../store/loop-sources';
+
 // Attribute mapping configurations
 const ATTRIBUTE_MAPPINGS = {
 	// Direct mappings (modern.key -> legacy.key)
@@ -72,6 +76,7 @@ const MODERN_DEFAULTS = {
 		titlesSource: 'custom',
 		descriptionsSource: 'custom',
 	},
+	sourceQuery: {},
 };
 
 // Helper functions
@@ -148,6 +153,20 @@ function convertModernToLegacy(modernAttributes, includeDefaults = false) {
 			}
 		}
 	);
+
+	// The JS twin of the `vpf_convert_loop_source_attributes` PHP filter: a
+	// third-party source keeps its settings in the free-form `sourceQuery`, and
+	// only the source knows which legacy options they stand for.
+	const source = select(LOOP_SOURCES_STORE).getSource(
+		attributesToConvert.queryType
+	);
+
+	if (source?.mapToLegacy) {
+		Object.assign(
+			legacy,
+			source.mapToLegacy(attributesToConvert.sourceQuery || {})
+		);
+	}
 
 	return legacy;
 }

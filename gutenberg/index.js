@@ -1,5 +1,7 @@
 import './block';
 import './block-saved';
+// Sources have to exist before the loop's inspector asks for them.
+import './loop-sources';
 import './blocks/loop';
 import './blocks/loop-filter';
 import './blocks/loop-filter-item';

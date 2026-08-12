@@ -11,7 +11,8 @@
 		"vp/queryType",
 		"vp/baseQuery",
 		"vp/postsQuery",
-		"vp/imagesQuery"
+		"vp/imagesQuery",
+		"vp/sourceQuery"
 	],
 	"supports": {
 		"html": false,

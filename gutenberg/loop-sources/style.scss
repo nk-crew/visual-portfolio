@@ -1,0 +1,92 @@
+.vpf-loop-source-picker {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 8px;
+
+	.components-button.vpf-loop-source-picker__item {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		align-items: center;
+		justify-content: center;
+		height: auto;
+		padding: 14px 8px;
+		text-align: center;
+		border: 1px solid var(--wp-components-color-gray-300, #ddd);
+		border-radius: 2px;
+
+		&.is-selected {
+			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+			border-color: currentcolor;
+			box-shadow: inset 0 0 0 1px currentcolor;
+		}
+	}
+}
+
+.vpf-loop-source-picker__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 20px;
+}
+
+.vpf-loop-source-picker__title {
+	font-size: 12px;
+	line-height: 1.2;
+	overflow-wrap: anywhere;
+}
+
+.vpf-loop-source-picker__badge {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	padding: 1px 4px;
+	font-size: 9px;
+	font-weight: 600;
+	text-transform: uppercase;
+	background: var(--wp-components-color-gray-100, #f0f0f0);
+	border-radius: 2px;
+}
+
+.vpf-loop-source-fieldset {
+	margin-bottom: 16px;
+
+	legend {
+		margin-bottom: 8px;
+		font-size: 11px;
+		font-weight: 500;
+		text-transform: uppercase;
+	}
+}
+
+.vpf-loop-patterns {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 16px;
+	width: 100%;
+}
+
+.components-button.vpf-loop-patterns__item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	align-items: flex-start;
+	height: auto;
+	padding: 12px;
+	text-align: left;
+	white-space: normal;
+	background: var(--wp-components-color-background, #fff);
+	border: 1px solid var(--wp-components-color-gray-300, #ddd);
+	border-radius: 4px;
+}
+
+.vpf-loop-patterns__title {
+	font-weight: 600;
+}
+
+.vpf-loop-patterns__description {
+	font-size: 12px;
+	line-height: 1.4;
+	color: var(--wp-components-color-gray-700, #757575);
+}
