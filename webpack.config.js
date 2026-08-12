@@ -40,6 +40,7 @@ const JS_ENTRY_PATTERNS = [
 const JS_MODULE_ENTRY_PATTERNS = [
 	'./gutenberg/blocks/loop/view.js',
 	'./gutenberg/blocks/item-cover/view.js',
+	'./gutenberg/blocks/item-template/view.js',
 ];
 
 const CSS_ENTRY_PATTERNS = [

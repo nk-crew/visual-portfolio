@@ -11,18 +11,36 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import {
+	Notice,
 	PanelBody,
 	Placeholder,
 	RangeControl,
 	SelectControl,
 	Spinner,
+	ToggleControl,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { memo, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
+
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
+
+const LAYOUT_OPTIONS = [
+	{ label: __('Grid', 'visual-portfolio'), value: 'grid' },
+	{ label: __('Masonry', 'visual-portfolio'), value: 'masonry' },
+	{ label: __('Tiles', 'visual-portfolio'), value: 'tiles' },
+	{ label: __('Justified', 'visual-portfolio'), value: 'justified' },
+	{ label: __('Carousel', 'visual-portfolio'), value: 'carousel' },
+];
+
+// Layouts whose column count is chosen rather than derived.
+const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
 
 const TEMPLATE = [
 	['visual-portfolio/item-image', { aspectRatio: '1', isLink: true }],
@@ -52,14 +70,60 @@ function getItemContext(item) {
 
 /**
  * The one item whose inner blocks are editable.
+ *
+ * @param {Object} props       - component props.
+ * @param {Object} props.style - placement of the item, when the layout gives it one.
+ * @return {Element} component.
  */
-function ItemTemplateInnerBlocks() {
+function ItemTemplateInnerBlocks({ style }) {
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: ITEM_CLASS_NAME },
+		{ className: ITEM_CLASS_NAME, style },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 
 	return <li {...innerBlocksProps} />;
+}
+
+/**
+ * One preset of the tiles picker, drawn from the notation it stands for.
+ *
+ * @param {Object}   props           - component props.
+ * @param {string}   props.value     - tiles notation.
+ * @param {boolean}  props.isActive  - whether the gallery uses this pattern.
+ * @param {Function} props.onSelect  - picks the pattern.
+ * @return {Element} component.
+ */
+function TilesPreset({ value, isActive, onSelect }) {
+	const { columns, tiles } = useMemo(() => parseTiles(value), [value]);
+
+	return (
+		<button
+			type="button"
+			className={`vp-tiles-preset${isActive ? ' is-active' : ''}`}
+			aria-pressed={isActive}
+			aria-label={value}
+			onClick={() => onSelect(value)}
+		>
+			<span
+				className="vp-tiles-preset__grid"
+				style={{
+					gridTemplateColumns: `repeat(${columns}, 1fr)`,
+				}}
+			>
+				{tiles.map((tile, index) => (
+					<span
+						// The pattern is a list of positions, and a position is
+						// what identifies a tile in it.
+						key={index}
+						style={{
+							gridColumn: `span ${tile.width}`,
+							gridRow: `span ${tile.rowSpan}`,
+						}}
+					/>
+				))}
+			</span>
+		</button>
+	);
 }
 
 /**
@@ -70,6 +134,7 @@ function ItemTemplateInnerBlocks() {
  * @param {string}   props.blockContextId          - id of the item this copy shows.
  * @param {Function} props.setActiveBlockContextId - makes this item the editable one.
  * @param {boolean}  props.isHidden                - whether the editable item took its place.
+ * @param {Object}   props.style                   - placement of the item, when the layout gives it one.
  * @return {Element} component.
  */
 function ItemTemplateBlockPreview({
@@ -77,6 +142,7 @@ function ItemTemplateBlockPreview({
 	blockContextId,
 	setActiveBlockContextId,
 	isHidden,
+	style,
 }) {
 	const blockPreviewProps = useBlockPreview({
 		blocks,
@@ -92,7 +158,7 @@ function ItemTemplateBlockPreview({
 	return (
 		<li
 			className={ITEM_CLASS_NAME}
-			style={{ display: isHidden ? 'none' : undefined }}
+			style={{ ...style, display: isHidden ? 'none' : undefined }}
 		>
 			{/* biome-ignore lint/a11y/useSemanticElements: a button cannot hold the block markup it previews, and the preview is what has to be pressed. */}
 			<div
@@ -114,7 +180,24 @@ export default function BlockEdit({
 	context,
 	clientId,
 }) {
-	const { layoutType, layoutColumns, layoutGap } = attributes;
+	const {
+		layoutType,
+		layoutColumns,
+		layoutColumnsTablet,
+		layoutColumnsMobile,
+		layoutGap,
+		layoutTiles,
+		justifiedRowHeight,
+		justifiedRowHeightTolerance,
+		justifiedMaxRowsCount,
+		justifiedLastRow,
+		carouselAutoWidth,
+		carouselSnapAlign,
+		carouselFreeScroll,
+		carouselEffect,
+		carouselShowArrows,
+		carouselShowDots,
+	} = attributes;
 	const {
 		'vp/queryType': queryType,
 		'vp/baseQuery': baseQuery,
@@ -197,20 +280,89 @@ export default function BlockEdit({
 
 	const isEmpty = !isLoading && !blockContexts.length;
 
+	// Tiles carry their columns in the notation, so that is where the layout
+	// reads them, and the narrower viewports can only go below that number.
+	const tileStyles = useMemo(
+		() => ('tiles' === layoutType ? getTileStyles(layoutTiles) : []),
+		[layoutType, layoutTiles]
+	);
+	const tilesColumns = useMemo(
+		() =>
+			'tiles' === layoutType
+				? getTilesColumns(layoutTiles)
+				: { columns: 0, widest: 1 },
+		[layoutType, layoutTiles]
+	);
+	const columns = tilesColumns.columns || layoutColumns;
+	const narrower = (value) =>
+		Math.max(tilesColumns.widest, Math.min(value, columns));
+
+	// The catalogue of the tiles picker, which Pro and themes extend through
+	// `vpf_loop_tiles_presets`. It travels alongside the editor bundle: the
+	// editor hands the block editor a fixed list of settings and drops
+	// everything else, so this cannot be one of them.
+	const tilesPresets = window.VPGalleryTilesPresets || [];
+
 	// The layout describes a list of items; the empty state is a single notice
 	// and would be laid out into the first column of a grid.
 	const blockProps = useBlockProps(
 		isEmpty
 			? {}
 			: {
-					className: `vp-layout-${layoutType}`,
+					className: `vp-layout-${layoutType}${'carousel' === layoutType && carouselAutoWidth ? ' vp-carousel-auto-width' : ''}`,
 					style: {
-						'--vp-layout-columns': layoutColumns,
-						'--vp-layout-columns-md': Math.min(layoutColumns, 2),
-						'--vp-layout-columns-sm': 1,
+						'--vp-layout-columns': columns,
+						'--vp-layout-columns-md': narrower(layoutColumnsTablet),
+						'--vp-layout-columns-sm': narrower(layoutColumnsMobile),
 						'--vp-layout-gap': layoutGap,
+						'--vp-layout-row-height': `${justifiedRowHeight}px`,
+						'--vp-carousel-snap-align': carouselSnapAlign,
 					},
 				}
+	);
+
+	const columnsControls = (
+		<>
+			{COLUMN_LAYOUTS.includes(layoutType) && (
+				<RangeControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={
+						'carousel' === layoutType
+							? __('Slides per view', 'visual-portfolio')
+							: __('Columns', 'visual-portfolio')
+					}
+					value={layoutColumns}
+					onChange={(value) =>
+						setAttributes({ layoutColumns: value })
+					}
+					min={1}
+					max={6}
+				/>
+			)}
+			<RangeControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				label={__('Columns on tablet', 'visual-portfolio')}
+				value={layoutColumnsTablet}
+				onChange={(value) =>
+					setAttributes({ layoutColumnsTablet: value })
+				}
+				min={1}
+				max={6}
+			/>
+			<RangeControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				label={__('Columns on mobile', 'visual-portfolio')}
+				value={layoutColumnsMobile}
+				onChange={(value) =>
+					setAttributes({ layoutColumnsMobile: value })
+				}
+				min={1}
+				max={6}
+			/>
+		</>
 	);
 
 	const inspectorControls = (
@@ -221,35 +373,198 @@ export default function BlockEdit({
 					__nextHasNoMarginBottom
 					label={__('Type', 'visual-portfolio')}
 					value={layoutType}
-					options={[
-						{
-							label: __('Grid', 'visual-portfolio'),
-							value: 'grid',
-						},
-						{
-							label: __('Masonry', 'visual-portfolio'),
-							value: 'masonry',
-						},
-					]}
+					options={LAYOUT_OPTIONS}
 					onChange={(value) => setAttributes({ layoutType: value })}
 				/>
-				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={__('Columns', 'visual-portfolio')}
-					value={layoutColumns}
-					onChange={(value) =>
-						setAttributes({ layoutColumns: value })
-					}
-					min={1}
-					max={6}
-				/>
+
+				{'tiles' === layoutType && (
+					<div className="vp-tiles-presets">
+						{tilesPresets.map((preset) => (
+							<TilesPreset
+								key={preset}
+								value={preset}
+								isActive={preset === layoutTiles}
+								onSelect={(value) =>
+									setAttributes({ layoutTiles: value })
+								}
+							/>
+						))}
+					</div>
+				)}
+
+				{'justified' !== layoutType && columnsControls}
+
 				<UnitControl
 					__next40pxDefaultSize
 					label={__('Gap', 'visual-portfolio')}
 					value={layoutGap}
 					onChange={(value) => setAttributes({ layoutGap: value })}
 				/>
+
+				{'justified' === layoutType && (
+					<>
+						<RangeControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={__('Row height', 'visual-portfolio')}
+							value={justifiedRowHeight}
+							onChange={(value) =>
+								setAttributes({ justifiedRowHeight: value })
+							}
+							min={40}
+							max={800}
+						/>
+						<RangeControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={__(
+								'Row height tolerance',
+								'visual-portfolio'
+							)}
+							value={justifiedRowHeightTolerance}
+							onChange={(value) =>
+								setAttributes({
+									justifiedRowHeightTolerance: value,
+								})
+							}
+							min={0}
+							max={1}
+							step={0.05}
+						/>
+						<RangeControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={__('Maximum rows', 'visual-portfolio')}
+							help={__(
+								'Zero shows every row the items make.',
+								'visual-portfolio'
+							)}
+							value={justifiedMaxRowsCount}
+							onChange={(value) =>
+								setAttributes({ justifiedMaxRowsCount: value })
+							}
+							min={0}
+							max={20}
+						/>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={__('Last row', 'visual-portfolio')}
+							value={justifiedLastRow}
+							options={[
+								{
+									label: __('Left', 'visual-portfolio'),
+									value: 'left',
+								},
+								{
+									label: __('Center', 'visual-portfolio'),
+									value: 'center',
+								},
+								{
+									label: __('Right', 'visual-portfolio'),
+									value: 'right',
+								},
+								{
+									label: __('Hide', 'visual-portfolio'),
+									value: 'hide',
+								},
+							]}
+							onChange={(value) =>
+								setAttributes({ justifiedLastRow: value })
+							}
+						/>
+					</>
+				)}
+
+				{'carousel' === layoutType && (
+					<>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={__(
+								'Slide width from content',
+								'visual-portfolio'
+							)}
+							checked={carouselAutoWidth}
+							onChange={(value) =>
+								setAttributes({ carouselAutoWidth: value })
+							}
+						/>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={__('Snap slides to', 'visual-portfolio')}
+							value={carouselSnapAlign}
+							options={[
+								{
+									label: __('Start', 'visual-portfolio'),
+									value: 'start',
+								},
+								{
+									label: __('Center', 'visual-portfolio'),
+									value: 'center',
+								},
+							]}
+							onChange={(value) =>
+								setAttributes({ carouselSnapAlign: value })
+							}
+						/>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={__('Free scrolling', 'visual-portfolio')}
+							help={__(
+								'Scroll stops wherever it is let go, instead of settling on a slide.',
+								'visual-portfolio'
+							)}
+							checked={carouselFreeScroll}
+							onChange={(value) =>
+								setAttributes({ carouselFreeScroll: value })
+							}
+						/>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={__('Effect', 'visual-portfolio')}
+							value={carouselEffect}
+							options={[
+								{
+									label: __('None', 'visual-portfolio'),
+									value: 'none',
+								},
+								{
+									label: __('Coverflow', 'visual-portfolio'),
+									value: 'coverflow',
+								},
+							]}
+							onChange={(value) =>
+								setAttributes({ carouselEffect: value })
+							}
+						/>
+						{'coverflow' === carouselEffect && (
+							<Notice status="info" isDismissible={false}>
+								{__(
+									'Coverflow is drawn by the browser as the carousel scrolls. Browsers without scroll-driven animations simply show the carousel without it.',
+									'visual-portfolio'
+								)}
+							</Notice>
+						)}
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={__('Arrows', 'visual-portfolio')}
+							checked={carouselShowArrows}
+							onChange={(value) =>
+								setAttributes({ carouselShowArrows: value })
+							}
+						/>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={__('Dots', 'visual-portfolio')}
+							checked={carouselShowDots}
+							onChange={(value) =>
+								setAttributes({ carouselShowDots: value })
+							}
+						/>
+					</>
+				)}
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -278,16 +593,24 @@ export default function BlockEdit({
 			{inspectorControls}
 			{isLoading && <Spinner />}
 			<ul {...blockProps} aria-busy={isLoading || undefined}>
-				{blockContexts.map((blockContext) => {
+				{blockContexts.map((blockContext, index) => {
 					const isActive =
 						blockContext['vp/itemId'] === activeContextId;
+
+					// The tiles pattern repeats over the items, so an item is
+					// placed by where it falls inside one repetition.
+					const style = tileStyles.length
+						? tileStyles[index % tileStyles.length]
+						: undefined;
 
 					return (
 						<BlockContextProvider
 							key={blockContext['vp/itemId']}
 							value={blockContext}
 						>
-							{isActive ? <ItemTemplateInnerBlocks /> : null}
+							{isActive ? (
+								<ItemTemplateInnerBlocks style={style} />
+							) : null}
 
 							{/* Kept mounted under the active item as well: it is
 							    what the next item reuses when the selection moves. */}
@@ -298,6 +621,7 @@ export default function BlockEdit({
 									setActiveBlockContextId
 								}
 								isHidden={isActive}
+								style={style}
 							/>
 						</BlockContextProvider>
 					);

@@ -1,0 +1,44 @@
+// The tiles picker. Every preset is drawn from the pattern it stands for, so
+// the catalogue is whatever `vpf_loop_tiles_presets` returns and nothing here
+// has to be kept in step with it.
+.vp-tiles-presets {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.vp-tiles-preset {
+	padding: 4px;
+	cursor: pointer;
+	background: none;
+	border: 1px solid #ddd;
+	border-radius: 2px;
+
+	&:hover,
+	&:focus-visible {
+		border-color: var(--wp-admin-theme-color, #3858e9);
+	}
+
+	&.is-active {
+		border-color: var(--wp-admin-theme-color, #3858e9);
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #3858e9);
+	}
+}
+
+.vp-tiles-preset__grid {
+	display: grid;
+	grid-auto-flow: row dense;
+	grid-auto-rows: 5px;
+	gap: 2px;
+
+	> span {
+		background: currentcolor;
+		border-radius: 1px;
+		opacity: 0.55;
+	}
+}
+
+.vp-tiles-preset.is-active .vp-tiles-preset__grid > span {
+	opacity: 1;
+}

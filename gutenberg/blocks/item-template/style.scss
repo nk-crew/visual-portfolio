@@ -1,51 +1,263 @@
 // Columns and gap are a public contract: the server prints the variables on the
-// list, themes and Pro breakpoints override them with CSS alone.
+// list, themes and Pro breakpoints override them with CSS alone. Which of the
+// three column values is in effect is decided by the viewport rules the block
+// attaches to this stylesheet, generated from `settings.viewport` so that the
+// breakpoints are the site's rather than numbers frozen in here.
+$item: ".wp-block-visual-portfolio-item-template__item";
+
+// The layout Masonry positions by hand. Item widths come from here - Masonry
+// reads them, it does not calculate them. The gap is declared as `column-gap`
+// for the same reason: it does nothing to a block container, it is where the
+// script module reads the gutter from.
+@mixin masonry-script {
+	position: relative;
+	column-gap: var(--vp-layout-gap, 1.5rem);
+
+	> #{$item} {
+		width: calc((100% - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
+		margin-bottom: var(--vp-layout-gap, 1.5rem);
+	}
+}
+
+// The same layout, with the browser doing the packing. Applied wherever Grid
+// Lanes exists - to a page whose script never arrived through `@supports`, and
+// by class the moment the module confirms the support itself.
+@mixin masonry-lanes {
+	display: grid-lanes;
+	grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
+	gap: var(--vp-layout-gap, 1.5rem);
+
+	> #{$item} {
+		width: auto;
+		margin-bottom: 0;
+	}
+}
+
 .wp-block-visual-portfolio-item-template {
+	--vp-layout-current-columns: var(--vp-layout-columns, 3);
+
 	padding: 0;
 	margin: 0;
 	list-style: none;
 
 	&.vp-layout-grid {
 		display: grid;
-		grid-template-columns: repeat(var(--vp-layout-columns, 3), minmax(0, 1fr));
+		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
 		gap: var(--vp-layout-gap, 1.5rem);
+	}
 
-		@media (max-width: 781px) {
-			grid-template-columns: repeat(var(--vp-layout-columns-md, 2), minmax(0, 1fr));
-		}
+	&.vp-layout-masonry {
+		@include masonry-script;
 
-		@media (max-width: 600px) {
-			grid-template-columns: repeat(var(--vp-layout-columns-sm, 1), minmax(0, 1fr));
+		@supports (display: grid-lanes) {
+			@include masonry-lanes;
 		}
 	}
 
-	// Masonry is positioned by the script module, but the item widths it lays out
-	// come from here - Masonry reads them, it does not calculate them. The gap
-	// is declared as `column-gap` for the same reason: it does nothing to a
-	// block container, it is where the script module reads the gutter from.
-	&.vp-layout-masonry {
-		--vp-layout-current-columns: var(--vp-layout-columns, 3);
+	// Set by the module, and only where it found `display: grid-lanes`. It also
+	// takes `vp-layout-masonry` off the list, which is what stops the family
+	// store from starting the script the browser has made unnecessary.
+	&.vp-layout-masonry-native {
+		@include masonry-lanes;
+	}
 
+	// Widths, heights and packing all come from the pattern rules the tiles
+	// parser writes next to the list. Dense packing is what lets a short tile
+	// fall into the hole a tall neighbour left, which is the whole look.
+	//
+	// A tile is as tall as its notation says, measured against the width of a
+	// column - not as tall as the blocks inside it happen to be, which is what
+	// makes a pattern hold its shape whatever is put in it. The list is the
+	// query container, so `100cqw` is its own width and nothing here has to know
+	// how wide the page is. Where the height cannot be resolved the tiles keep
+	// their places in the pattern and take their heights from their content.
+	&.vp-layout-tiles {
+		display: grid;
+		container-type: inline-size;
+		grid-auto-flow: row dense;
+		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
+		gap: var(--vp-layout-gap, 1.5rem);
+
+		> #{$item} {
+			height: calc((100cqw + var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns) * var(--vp-tile-rows, 1) - var(--vp-layout-gap, 1.5rem));
+
+			// A tile is a cell of a fixed size, the way it has always been in
+			// this layout - what does not fit one is cut off rather than
+			// pushing the pattern apart.
+			overflow: hidden;
+		}
+	}
+
+	// Rows are measured and placed by fjGallery, which takes the items out of
+	// the flow entirely. What is declared here is the layout of a page whose
+	// script never arrived: items that grow into rows of their own accord.
+	&.vp-layout-justified {
 		position: relative;
-		column-gap: var(--vp-layout-gap, 1.5rem);
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--vp-layout-gap, 1.5rem);
 
-		@media (max-width: 781px) {
-			--vp-layout-current-columns: var(--vp-layout-columns-md, 2);
+		> #{$item} {
+			flex: 1 1 auto;
+			max-width: 100%;
 		}
 
-		@media (max-width: 600px) {
-			--vp-layout-current-columns: var(--vp-layout-columns-sm, 1);
+		&.vp-has-script > #{$item} {
+			flex-grow: 0;
 		}
+	}
 
-		> .wp-block-visual-portfolio-item-template__item {
+	// A scroll container, nothing more: the swipe, the scroll, the scrollbar and
+	// the keyboard are the browser's, and the module only adds pointer drag on
+	// top of them.
+	&.vp-layout-carousel {
+		display: flex;
+		gap: var(--vp-layout-gap, 1.5rem);
+		overflow-x: auto;
+		overflow-y: hidden;
+		scroll-snap-type: x mandatory;
+		scroll-behavior: smooth;
+		overscroll-behavior-x: contain;
+
+		> #{$item} {
+			flex: 0 0 auto;
 			width: calc((100% - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
-			margin-bottom: var(--vp-layout-gap, 1.5rem);
+			scroll-snap-align: var(--vp-carousel-snap-align, start);
+		}
+
+		&.vp-carousel-auto-width > #{$item} {
+			width: auto;
+		}
+
+		&.vp-carousel-free-scroll {
+			scroll-snap-type: none;
+		}
+
+		&:focus-visible {
+			outline: 2px solid currentcolor;
+			outline-offset: 2px;
+		}
+	}
+
+	// Coverflow is a scroll-driven animation and nothing else - where the
+	// timeline is missing the rule never applies and the carousel is exactly the
+	// carousel it was without it.
+	@supports (animation-timeline: view()) {
+		&.vp-layout-carousel.vp-carousel-coverflow {
+			perspective: 1200px;
+
+			> #{$item} {
+				animation: vp-carousel-coverflow linear both;
+				animation-timeline: view(inline);
+			}
+		}
+	}
+}
+
+@keyframes vp-carousel-coverflow {
+	0% {
+		opacity: 0.65;
+		transform: rotateY(32deg) scale(0.85);
+	}
+
+	50% {
+		opacity: 1;
+		transform: none;
+	}
+
+	100% {
+		opacity: 0.65;
+		transform: rotateY(-32deg) scale(0.85);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wp-block-visual-portfolio-item-template.vp-layout-carousel {
+		scroll-behavior: auto;
+
+		&.vp-carousel-coverflow > .wp-block-visual-portfolio-item-template__item {
+			animation: none;
 		}
 	}
 }
 
 .wp-block-visual-portfolio-item-template__item {
 	min-width: 0;
+}
+
+// Controls of a carousel. Server rendered so that a region swap brings them
+// back with the items, and hidden until the module is running - they move the
+// scroll container through the scroll API, and there is nothing to fall back to
+// when that API has nobody calling it.
+.wp-block-visual-portfolio-item-template__carousel-nav {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	margin-top: var(--vp-layout-gap, 1.5rem);
+}
+
+.vp-layout-carousel.vp-has-script + .wp-block-visual-portfolio-item-template__carousel-nav {
+	display: flex;
+}
+
+.wp-block-visual-portfolio-item-template__carousel-arrow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	padding: 0;
+	color: inherit;
+	cursor: pointer;
+	background: none;
+	border: 1px solid currentcolor;
+	border-radius: 50%;
+
+	&[disabled] {
+		opacity: 0.35;
+		cursor: default;
+	}
+
+	// The chevron is drawn rather than shipped: two borders on a rotated square
+	// weigh nothing and take the colour of the text around them.
+	> span {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-top: 2px solid currentcolor;
+		border-right: 2px solid currentcolor;
+	}
+
+	&--prev > span {
+		margin-left: 0.15rem;
+		transform: rotate(-135deg);
+	}
+
+	&--next > span {
+		margin-right: 0.15rem;
+		transform: rotate(45deg);
+	}
+}
+
+.wp-block-visual-portfolio-item-template__carousel-dots {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.wp-block-visual-portfolio-item-template__carousel-dot {
+	width: 0.5rem;
+	height: 0.5rem;
+	padding: 0;
+	cursor: pointer;
+	background: currentcolor;
+	border: 0;
+	border-radius: 50%;
+	opacity: 0.35;
+
+	&[aria-current="true"] {
+		opacity: 1;
+	}
 }
 
 // The loop is fetching its next state. The controls stay clickable - a second

@@ -250,6 +250,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'classes/class-images.php';
 			require_once $this->plugin_path . 'classes/class-rest.php';
 			require_once $this->plugin_path . 'classes/class-get-portfolio.php';
+			require_once $this->plugin_path . 'classes/class-tiles-parser.php';
 
 			require_once $this->plugin_path . 'classes/class-gutenberg.php';
 			require_once $this->plugin_path . 'gutenberg/block/index.php';

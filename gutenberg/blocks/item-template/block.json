@@ -11,15 +11,70 @@
 		"layoutType": {
 			"type": "string",
 			"default": "grid",
-			"enum": ["grid", "masonry"]
+			"enum": ["grid", "masonry", "tiles", "justified", "carousel"]
 		},
 		"layoutColumns": {
 			"type": "number",
 			"default": 3
 		},
+		"layoutColumnsTablet": {
+			"type": "number",
+			"default": 2
+		},
+		"layoutColumnsMobile": {
+			"type": "number",
+			"default": 1
+		},
 		"layoutGap": {
 			"type": "string",
 			"default": "1.5rem"
+		},
+		"layoutTiles": {
+			"type": "string",
+			"default": "3|1,1|"
+		},
+		"justifiedRowHeight": {
+			"type": "number",
+			"default": 320
+		},
+		"justifiedRowHeightTolerance": {
+			"type": "number",
+			"default": 0.25
+		},
+		"justifiedMaxRowsCount": {
+			"type": "number",
+			"default": 0
+		},
+		"justifiedLastRow": {
+			"type": "string",
+			"default": "left",
+			"enum": ["left", "center", "right", "hide"]
+		},
+		"carouselAutoWidth": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselSnapAlign": {
+			"type": "string",
+			"default": "start",
+			"enum": ["start", "center"]
+		},
+		"carouselFreeScroll": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselEffect": {
+			"type": "string",
+			"default": "none",
+			"enum": ["none", "coverflow"]
+		},
+		"carouselShowArrows": {
+			"type": "boolean",
+			"default": true
+		},
+		"carouselShowDots": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -67,5 +122,6 @@
 		"vp/sourceQuery",
 		"vp/blockId"
 	],
-	"style": "visual-portfolio-block-item-template"
+	"style": "visual-portfolio-block-item-template",
+	"editorStyle": "visual-portfolio-block-item-template-editor"
 }

@@ -14,18 +14,173 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Block_Item_Template {
 	/**
+	 * Handle of the block stylesheet.
+	 */
+	const STYLE = 'visual-portfolio-block-item-template';
+
+	/**
+	 * Identifier of the layout script module.
+	 */
+	const VIEW_MODULE = 'visual-portfolio-block-item-template-view';
+
+	/**
+	 * Interactivity store of the layouts.
+	 *
+	 * A store of its own rather than the family store: the layouts are the one
+	 * part of the item template with a front end, and keeping them here is what
+	 * lets a gallery that needs no layout script load none.
+	 */
+	const VIEW_MODULE_STORE = 'visual-portfolio/item-template';
+
+	/**
+	 * Handle of the justified layout library.
+	 *
+	 * The same vendored file the legacy layout uses, registered again without
+	 * the jQuery dependency the legacy handle carries - the loop family has no
+	 * jQuery in it and a layout is not a reason to load it.
+	 */
+	const JUSTIFIED_SCRIPT = 'visual-portfolio-flickr-justified-gallery';
+
+	/**
+	 * Handle of the carousel stylesheet.
+	 */
+	const CAROUSEL_STYLE = 'visual-portfolio-blossom-carousel';
+
+	/**
+	 * Tiles patterns already written into the page.
+	 *
+	 * Two galleries with the same pattern share one rule set, and a page can
+	 * hold any number of galleries.
+	 *
+	 * @var array
+	 */
+	private static $printed_tiles = array();
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_block' ), 11 );
+
+		// Breakpoints belong to the site, not to a block, so they are resolved
+		// once and attached to the stylesheet - on the front end and inside the
+		// editor canvas alike.
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_viewport_columns' ) );
+
+		// editor. Late, so that the editor bundle it attaches to is registered.
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_tiles_presets' ), 20 );
+	}
+
+	/**
+	 * Hand the tiles patterns to the picker.
+	 *
+	 * Alongside the editor bundle rather than through `block_editor_settings_all`:
+	 * the editor passes the block editor a fixed list of settings and drops
+	 * everything it does not know, so a filter written for our own data would
+	 * never arrive.
+	 *
+	 * @return void
+	 */
+	public function enqueue_tiles_presets() {
+		if ( ! wp_script_is( 'visual-portfolio-gutenberg', 'registered' ) ) {
+			return;
+		}
+
+		wp_localize_script(
+			'visual-portfolio-gutenberg',
+			'VPGalleryTilesPresets',
+			$this->get_tiles_presets()
+		);
+	}
+
+	/**
+	 * The tiles patterns the picker offers.
+	 *
+	 * The catalogue of the legacy layout, in the same notation, so a gallery
+	 * that used a preset there finds it here. Pro and themes add their own -
+	 * the picker draws whatever the filter returns.
+	 *
+	 * @return array
+	 */
+	public function get_tiles_presets() {
+		$presets = array(
+			'1|1,0.5|',
+			'2|1,1|',
+			'2|1,0.8|',
+			'2|1,1.34|',
+			'2|1,1.2|1,1.2|1,0.67|1,0.67|',
+			'2|1,1.2|1,0.67|1,1.2|1,0.67|',
+			'2|1,0.67|1,1|1,1|1,1|1,1|1,0.67|',
+			'3|1,1|',
+			'3|1,0.8|',
+			'3|1,1.3|',
+			'3|1,1|1,1|1,1|1,1.3|1,1.3|1,1.3|',
+			'3|1,1|1,1|1,2|1,1|1,1|1,1|1,1|1,1|',
+			'3|1,2|1,1|1,1|1,1|1,1|1,1|1,1|1,1|',
+			'3|1,1|1,2|1,1|1,1|1,1|1,1|1,1|1,1|',
+			'3|1,1|1,2|1,1|1,1|1,1|1,1|2,0.5|',
+			'3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,0.8|1,0.8|',
+			'3|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|1,0.8|',
+			'3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|1,0.8|',
+			'3|1,0.8|1,0.8|1,1.6|1,0.8|1,0.8|1,0.8|1,1.6|1,1.6|1,0.8|',
+			'3|1,1|2,1|1,1|2,0.5|1,1|',
+			'3|1,1|2,1|1,1|1,1|1,1|1,1|2,0.5|1,1|',
+			'3|1,2|2,0.5|1,1|1,2|2,0.5|',
+			'4|1,1|',
+			'4|1,1|1,1.34|1,1|1,1.34|1,1.34|1,1.34|1,1|1,1|',
+			'4|1,0.8|1,1|1,0.8|1,1|1,1|1,1|1,0.8|1,0.8|',
+			'4|1,1|1,1|2,1|1,1|1,1|2,1|1,1|1,1|1,1|1,1|',
+			'4|2,1|2,0.5|2,0.5|2,0.5|2,1|2,0.5|',
+		);
+
+		/**
+		 * Filters the tiles patterns offered by the layout picker.
+		 *
+		 * Values are the tiles notation - columns, then the width and height of
+		 * every tile of the repeating pattern, as in `3|1,1|2,0.5|`.
+		 *
+		 * @param array $presets tiles notations.
+		 */
+		return array_values(
+			array_unique( array_filter( (array) apply_filters( 'vpf_loop_tiles_presets', $presets ) ) )
+		);
 	}
 
 	/**
 	 * Register Block.
 	 */
 	public function register_block() {
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-item-template', 'build/gutenberg/blocks/item-template/style' );
-		wp_style_add_data( 'visual-portfolio-block-item-template', 'rtl', 'replace' );
+		Visual_Portfolio_Assets::register_style( self::STYLE, 'build/gutenberg/blocks/item-template/style' );
+		wp_style_add_data( self::STYLE, 'rtl', 'replace' );
+
+		Visual_Portfolio_Assets::register_style( self::STYLE . '-editor', 'build/gutenberg/blocks/item-template/editor' );
+		wp_style_add_data( self::STYLE . '-editor', 'rtl', 'replace' );
+
+		Visual_Portfolio_Assets::register_script(
+			self::JUSTIFIED_SCRIPT,
+			'assets/vendor/flickr-justified-gallery/dist/fjGallery.min',
+			array(),
+			'2.2.0'
+		);
+
+		wp_register_style(
+			self::CAROUSEL_STYLE,
+			visual_portfolio()->plugin_url . 'assets/vendor/blossom-carousel/dist/blossom-carousel-core.css',
+			array(),
+			'1.1.8'
+		);
+
+		$view_module = 'build/gutenberg/blocks/item-template/view';
+		$asset       = Visual_Portfolio_Assets::get_asset_file( $view_module, 'script' );
+
+		// Registered, never declared as `viewScriptModule`: metadata would load
+		// it for every gallery, and grid and tiles are stylesheet alone.
+		wp_register_script_module(
+			self::VIEW_MODULE,
+			visual_portfolio()->plugin_url . $view_module . '.js',
+			$asset['dependencies'],
+			$asset['version']
+		);
 
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/item-template',
@@ -37,6 +192,53 @@ class Visual_Portfolio_Block_Item_Template {
 				'skip_inner_blocks' => true,
 			)
 		);
+	}
+
+	/**
+	 * Publish the viewport overrides of the columns.
+	 *
+	 * The column counts themselves stay in `--vp-layout-columns{,-md,-sm}` on
+	 * the list, which is the documented contract themes and Pro redeclare. What
+	 * moved here is the breakpoints: they are the site's, read off
+	 * `settings.viewport` through the same call core makes for responsive block
+	 * styles, so a theme that moves its breakpoints moves every gallery with
+	 * them instead of leaving them on numbers hardcoded in our stylesheet.
+	 *
+	 * @return void
+	 */
+	public function enqueue_viewport_columns() {
+		static $done = false;
+
+		if ( $done ) {
+			return;
+		}
+
+		$done = true;
+
+		$settings = wp_get_global_settings();
+		$queries  = WP_Theme_JSON::get_viewport_media_queries( isset( $settings['viewport'] ) ? $settings['viewport'] : null );
+		$sources  = array(
+			'@tablet' => '--vp-layout-columns-md,2',
+			'@mobile' => '--vp-layout-columns-sm,1',
+		);
+
+		$css = '';
+
+		foreach ( $sources as $state => $source ) {
+			if ( empty( $queries[ $state ] ) ) {
+				continue;
+			}
+
+			$css .= sprintf(
+				'%1$s{.wp-block-visual-portfolio-item-template{--vp-layout-current-columns:var(%2$s);}}',
+				$queries[ $state ],
+				$source
+			);
+		}
+
+		if ( '' !== $css ) {
+			wp_add_inline_style( self::STYLE, $css );
+		}
 	}
 
 	/**
@@ -186,28 +388,245 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
-	 * Layout variables printed on the list.
-	 *
-	 * A public contract: themes and Pro breakpoints override the layout by
-	 * redeclaring these, without touching the markup.
+	 * Layout the block was saved with.
 	 *
 	 * @param array $attributes - block attributes.
 	 *
 	 * @return string
 	 */
-	private function get_layout_styles( $attributes ) {
-		$columns = isset( $attributes['layoutColumns'] ) ? (int) $attributes['layoutColumns'] : 3;
-		$columns = max( 1, $columns );
+	private function get_layout_type( $attributes ) {
+		$layout_type = isset( $attributes['layoutType'] ) ? (string) $attributes['layoutType'] : 'grid';
 
-		// The gap is a raw CSS length typed in the editor, and it is printed into
-		// an inline style - keep it to what a length can be made of.
-		$gap = preg_replace( '/[^0-9a-z.%\-]/i', '', (string) ( $attributes['layoutGap'] ?? '' ) );
+		return in_array( $layout_type, array( 'grid', 'masonry', 'tiles', 'justified', 'carousel' ), true ) ? $layout_type : 'grid';
+	}
+
+	/**
+	 * Columns of a layout, per viewport.
+	 *
+	 * Tiles are the exception: the number of columns is written into the tiles
+	 * notation, not chosen with the columns control, so the notation sets the
+	 * widest value and the narrower viewports can only go below it.
+	 *
+	 * @param array  $attributes  - block attributes.
+	 * @param string $layout_type - resolved layout.
+	 *
+	 * @return array `[ desktop, tablet, mobile ]`.
+	 */
+	private function get_layout_columns( $attributes, $layout_type ) {
+		$columns = array();
+
+		$defaults = array(
+			'layoutColumns'       => 3,
+			'layoutColumnsTablet' => 2,
+			'layoutColumnsMobile' => 1,
+		);
+
+		foreach ( $defaults as $name => $default ) {
+			$value     = isset( $attributes[ $name ] ) ? (int) $attributes[ $name ] : $default;
+			$columns[] = max( 1, min( Visual_Portfolio_Tiles_Parser::MAX_COLUMNS, $value ) );
+		}
+
+		if ( 'tiles' === $layout_type ) {
+			$parsed = Visual_Portfolio_Tiles_Parser::parse( $attributes['layoutTiles'] ?? '' );
+			$widest = 1;
+
+			foreach ( $parsed['tiles'] as $tile ) {
+				$widest = max( $widest, $tile['width'] );
+			}
+
+			// A narrower viewport never drops below the widest tile of the
+			// pattern: a tile spanning two columns of a single column grid would
+			// open an implicit second column and take the layout with it.
+			$columns[0] = $parsed['columns'];
+			$columns[1] = max( $widest, min( $columns[1], $parsed['columns'] ) );
+			$columns[2] = max( $widest, min( $columns[2], $parsed['columns'] ) );
+		}
+
+		return $columns;
+	}
+
+	/**
+	 * Layout variables printed on the list.
+	 *
+	 * A public contract: themes and Pro breakpoints override the layout by
+	 * redeclaring these, without touching the markup. Which of the three is in
+	 * effect is decided by the viewport rules of `enqueue_viewport_columns()`.
+	 *
+	 * @param array  $attributes  - block attributes.
+	 * @param string $layout_type - resolved layout.
+	 *
+	 * @return string
+	 */
+	private function get_layout_styles( $attributes, $layout_type ) {
+		list( $columns, $columns_md, $columns_sm ) = $this->get_layout_columns( $attributes, $layout_type );
+
+		$styles = sprintf(
+			'--vp-layout-columns:%1$d;--vp-layout-columns-md:%2$d;--vp-layout-columns-sm:%3$d;--vp-layout-gap:%4$s;',
+			$columns,
+			$columns_md,
+			$columns_sm,
+			$this->get_css_length( $attributes['layoutGap'] ?? '', '1.5rem' )
+		);
+
+		if ( 'justified' === $layout_type ) {
+			$styles .= sprintf(
+				'--vp-layout-row-height:%dpx;',
+				max( 40, (int) ( $attributes['justifiedRowHeight'] ?? 320 ) )
+			);
+		}
+
+		if ( 'carousel' === $layout_type ) {
+			$styles .= sprintf(
+				'--vp-carousel-snap-align:%s;',
+				'center' === ( $attributes['carouselSnapAlign'] ?? 'start' ) ? 'center' : 'start'
+			);
+		}
+
+		return $styles;
+	}
+
+	/**
+	 * A CSS length, reduced to what a length can be made of.
+	 *
+	 * The value is typed in the editor and printed into an inline style.
+	 *
+	 * @param string $value    - raw value.
+	 * @param string $fallback - value used when nothing usable is left.
+	 *
+	 * @return string
+	 */
+	private function get_css_length( $value, $fallback ) {
+		$value = preg_replace( '/[^0-9a-z.%\-]/i', '', (string) $value );
+
+		return '' === $value ? $fallback : $value;
+	}
+
+	/**
+	 * Load the layout module, and answer its state the way a page without it
+	 * would.
+	 *
+	 * Directives are evaluated on the server as well as in the browser, so a
+	 * class bound to state nobody seeded would be stripped from the markup
+	 * before it ever reached a browser. What is seeded here is the answer that
+	 * is right with no JavaScript running: masonry is the script's, and the
+	 * controls that need the script stay hidden. The module overwrites all three
+	 * as it loads - client state wins over server state - so the browser sees
+	 * its own answer before the first directive runs.
+	 *
+	 * @return void
+	 */
+	private function enqueue_view_module() {
+		static $done = false;
+
+		wp_enqueue_script_module( self::VIEW_MODULE );
+
+		if ( $done ) {
+			return;
+		}
+
+		$done = true;
+
+		wp_interactivity_state(
+			self::VIEW_MODULE_STORE,
+			array(
+				'hasScript'        => false,
+				'useJsMasonry'     => true,
+				'useNativeMasonry' => false,
+			)
+		);
+	}
+
+	/**
+	 * Rules of a tiles pattern, ready to be printed next to the list.
+	 *
+	 * Scoped by a class derived from the pattern, so the rules are written once
+	 * however many galleries on the page use it, and a gallery that arrives with
+	 * a region swap brings the rules it needs with it.
+	 *
+	 * @param string $tiles - tiles notation.
+	 *
+	 * @return string
+	 */
+	private function get_tiles_style( $tiles ) {
+		$class = Visual_Portfolio_Tiles_Parser::get_class( $tiles );
+
+		if ( isset( self::$printed_tiles[ $class ] ) ) {
+			return '';
+		}
+
+		self::$printed_tiles[ $class ] = true;
 
 		return sprintf(
-			'--vp-layout-columns:%1$d;--vp-layout-columns-md:%2$d;--vp-layout-columns-sm:1;--vp-layout-gap:%3$s;',
-			$columns,
-			min( $columns, 2 ),
-			'' === $gap ? '1.5rem' : $gap
+			'<style>%s</style>',
+			// The parser writes selectors, spans and ratios out of numbers it
+			// produced itself - there is no path from the notation to a `<`.
+			Visual_Portfolio_Tiles_Parser::to_css( $tiles, '.' . $class )
+		);
+	}
+
+	/**
+	 * Carousel controls.
+	 *
+	 * Server rendered, hidden until the script module says it is there: the
+	 * carousel itself is a scroll container, so without the module a visitor
+	 * still swipes, scrolls and tabs through it, and a row of buttons that
+	 * cannot move anything would be the only thing that broke.
+	 *
+	 * @param array $attributes - block attributes.
+	 * @param int   $count      - number of items rendered.
+	 *
+	 * @return string
+	 */
+	private function get_carousel_nav( $attributes, $count ) {
+		$controls = '';
+
+		if ( ! empty( $attributes['carouselShowArrows'] ) ) {
+			$arrows = array(
+				'prev' => __( 'Previous slide', 'visual-portfolio' ),
+				'next' => __( 'Next slide', 'visual-portfolio' ),
+			);
+
+			foreach ( $arrows as $direction => $label ) {
+				$controls .= sprintf(
+					'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-arrow wp-block-visual-portfolio-item-template__carousel-arrow--%1$s" aria-label="%2$s" data-wp-on--click="actions.%3$s"><span aria-hidden="true"></span></button>',
+					esc_attr( $direction ),
+					esc_attr( $label ),
+					'prev' === $direction ? 'carouselPrev' : 'carouselNext'
+				);
+			}
+		}
+
+		if ( ! empty( $attributes['carouselShowDots'] ) ) {
+			/* translators: %d: slide number. */
+			$label = __( 'Go to slide %d', 'visual-portfolio' );
+			$dots  = '';
+
+			for ( $index = 0; $index < $count; $index++ ) {
+				$dots .= sprintf(
+					'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-dot" data-vp-slide="%1$d" aria-label="%2$s"></button>',
+					$index,
+					esc_attr( sprintf( $label, $index + 1 ) )
+				);
+			}
+
+			// One listener for the row rather than one per dot: a Load More
+			// brings more slides, and a dot appended after hydration would
+			// carry no directive of its own.
+			$controls .= sprintf(
+				'<div class="wp-block-visual-portfolio-item-template__carousel-dots" data-vp-dot-label="%1$s" data-wp-on--click="actions.carouselGoTo">%2$s</div>',
+				esc_attr( $label ),
+				$dots
+			);
+		}
+
+		if ( '' === $controls ) {
+			return '';
+		}
+
+		return sprintf(
+			'<div class="wp-block-visual-portfolio-item-template__carousel-nav" data-wp-interactive="%1$s">%2$s</div>',
+			esc_attr( self::VIEW_MODULE_STORE ),
+			$controls
 		);
 	}
 
@@ -281,22 +700,110 @@ class Visual_Portfolio_Block_Item_Template {
 			);
 		}
 
-		$layout_type = 'masonry' === ( $attributes['layoutType'] ?? 'grid' ) ? 'masonry' : 'grid';
+		$layout_type = $this->get_layout_type( $attributes );
+		$classes     = array( 'vp-layout-' . $layout_type );
+		$extra       = array();
+		$before      = '';
+		$after       = '';
 
-		// Masonry is the only layout that needs a script. WordPress ships both
-		// handles, and `masonry` pulls `imagesloaded` in itself.
-		if ( 'masonry' === $layout_type ) {
-			wp_enqueue_script( 'masonry' );
+		// Masonry is the family store's: it is the one layout the store also
+		// has to lay out again after a Load More, and splitting init from
+		// relayout would leave two engines on one list. Every other layout the
+		// module owns end to end, so the list carries one init directive and it
+		// points at whichever of the two stores is in charge.
+		$init = 'callbacks.initLayout';
+
+		switch ( $layout_type ) {
+			case 'masonry':
+				// WordPress ships both handles, and `masonry` pulls
+				// `imagesloaded` in itself.
+				wp_enqueue_script( 'masonry' );
+				$this->enqueue_view_module();
+
+				// Grid Lanes lays masonry out in the stylesheet, and where it
+				// works the script has nothing left to do. The class the family
+				// store starts Masonry from is therefore not the class the
+				// stylesheet needs: this one is dropped and the native one is
+				// added the moment the module finds `display: grid-lanes`, and
+				// with no module at all the `@supports` rule still applies.
+				$extra['data-wp-class--vp-layout-masonry']        = self::VIEW_MODULE_STORE . '::state.useJsMasonry';
+				$extra['data-wp-class--vp-layout-masonry-native'] = self::VIEW_MODULE_STORE . '::state.useNativeMasonry';
+				break;
+
+			case 'tiles':
+				$before = $this->get_tiles_style( $attributes['layoutTiles'] ?? '' );
+
+				$classes[] = Visual_Portfolio_Tiles_Parser::get_class( $attributes['layoutTiles'] ?? '' );
+				break;
+
+			case 'justified':
+				wp_enqueue_script( self::JUSTIFIED_SCRIPT );
+				$this->enqueue_view_module();
+
+				$init = self::VIEW_MODULE_STORE . '::callbacks.initLayout';
+
+				$last_row = isset( $attributes['justifiedLastRow'] ) ? (string) $attributes['justifiedLastRow'] : 'left';
+
+				$extra['data-vp-justified-row-height'] = max( 40, (int) ( $attributes['justifiedRowHeight'] ?? 320 ) );
+				$extra['data-vp-justified-tolerance']  = max( 0, min( 1, (float) ( $attributes['justifiedRowHeightTolerance'] ?? 0.25 ) ) );
+				$extra['data-vp-justified-max-rows']   = max( 0, (int) ( $attributes['justifiedMaxRowsCount'] ?? 0 ) );
+				$extra['data-vp-justified-last-row']   = in_array( $last_row, array( 'left', 'center', 'right', 'hide' ), true ) ? $last_row : 'left';
+				$extra['data-wp-class--vp-has-script'] = self::VIEW_MODULE_STORE . '::state.hasScript';
+				break;
+
+			case 'carousel':
+				wp_enqueue_style( self::CAROUSEL_STYLE );
+				$this->enqueue_view_module();
+
+				if ( ! empty( $attributes['carouselAutoWidth'] ) ) {
+					$classes[] = 'vp-carousel-auto-width';
+				}
+
+				if ( ! empty( $attributes['carouselFreeScroll'] ) ) {
+					$classes[] = 'vp-carousel-free-scroll';
+				}
+
+				if ( 'coverflow' === ( $attributes['carouselEffect'] ?? 'none' ) ) {
+					$classes[] = 'vp-carousel-coverflow';
+				}
+
+				// A scroll container has to be reachable by keyboard, and a
+				// name has to say what the arrow keys are about to move.
+				$extra['tabindex']   = '0';
+				$extra['aria-label'] = __( 'Gallery carousel', 'visual-portfolio' );
+
+				// Blossom is a mouse-drag enhancement on top of the native
+				// scroll, so the module imports it only where a pointer can
+				// drag - which is why its address travels on the markup
+				// instead of being an eagerly loaded dependency.
+				$extra['data-vp-carousel-src'] = visual_portfolio()->plugin_url . 'assets/vendor/blossom-carousel/dist/blossom-carousel-core.js';
+
+				$init = self::VIEW_MODULE_STORE . '::callbacks.initLayout';
+
+				$extra['data-wp-class--vp-has-script'] = self::VIEW_MODULE_STORE . '::state.hasScript';
+
+				$after = $this->get_carousel_nav( $attributes, count( $items ) );
+				break;
 		}
 
 		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				// `get_block_wrapper_attributes()` escapes the values itself.
-				'class'                    => 'vp-layout-' . $layout_type,
-				'style'                    => $this->get_layout_styles( $attributes ),
-				'data-wp-interactive'      => Visual_Portfolio_Block_Loop::STORE,
-				'data-wp-init'             => 'callbacks.initLayout',
-				'data-wp-bind--aria-busy'  => 'state.isLoading',
+			array_merge(
+				array(
+					// `get_block_wrapper_attributes()` escapes the values itself.
+					'class'          => implode( ' ', $classes ),
+					'style'          => $this->get_layout_styles( $attributes, $layout_type ),
+					'data-vp-layout' => $layout_type,
+				),
+				// Before the init directive on purpose: both are applied by an
+				// effect, the effects run in the order the attributes are read,
+				// and the masonry class has to be gone before the family store
+				// looks for it.
+				$extra,
+				array(
+					'data-wp-interactive'     => Visual_Portfolio_Block_Loop::STORE,
+					'data-wp-init'            => $init,
+					'data-wp-bind--aria-busy' => 'state.isLoading',
+				)
 			)
 		);
 
@@ -304,9 +811,11 @@ class Visual_Portfolio_Block_Item_Template {
 		// items are appended into the list, and a region that moves with them
 		// announces nothing.
 		return sprintf(
-			'<ul %1$s>%2$s</ul><div class="wp-block-visual-portfolio-item-template__live-region" aria-live="polite" data-wp-text="state.ariaLiveMessage"></div>',
+			'%1$s<ul %2$s>%3$s</ul>%4$s<div class="wp-block-visual-portfolio-item-template__live-region" aria-live="polite" data-wp-text="state.ariaLiveMessage"></div>',
+			$before,
 			$wrapper_attributes,
-			$content
+			$content,
+			$after
 		);
 	}
 }
