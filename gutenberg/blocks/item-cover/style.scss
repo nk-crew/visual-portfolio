@@ -4,12 +4,16 @@
 // hover cover cannot be reached with a keyboard otherwise. Going through one
 // mixin is what keeps that true: there is no way to add a hover state here and
 // forget the keyboard one. The two editor classes join them so the item being
-// edited shows what it holds.
+// edited shows what it holds. Core gives 7.1 a way to style a hover state, not
+// a way to make one reachable, so this stays ours.
+//
+// The states live inside `:where()`, which weighs nothing: interactive-state
+// styling generates rules of the form `.wp-block-…:hover { … }`, and ours must
+// never be the reason one of them loses. Everything below is therefore as
+// specific as the class it hangs off, and a hover style a user wrote wins over
+// a hover style we assumed.
 @mixin revealed {
-	&:hover,
-	&:focus-within,
-	&.is-selected,
-	&.has-child-selected {
+	&:where(:hover, :focus-within, .is-selected, .has-child-selected) {
 		@content;
 	}
 }
@@ -213,6 +217,10 @@
 // Hiding the content behind a pointer only makes sense where there is one. On a
 // touch screen the content is always there and a single tap follows the link,
 // the way a tap on anything else does.
+//
+// Each revealed rule below is written after the hidden one it answers, and the
+// two now weigh the same: with the states inside `:where()` it is the order
+// that decides, not a specificity race we would win against the user as well.
 @media (hover: hover) {
 	.wp-block-visual-portfolio-item-cover {
 		&.vp-show-content-hover > .wp-block-visual-portfolio-item-cover__inner {

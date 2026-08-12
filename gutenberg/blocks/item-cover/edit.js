@@ -70,6 +70,12 @@ const BACKGROUND_SIZE_OPTIONS = [
 	{ label: __('Contain', 'visual-portfolio'), value: 'contain' },
 ];
 
+const CLICK_ACTION_OPTIONS = [
+	{ label: __('None', 'visual-portfolio'), value: 'none' },
+	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
+	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
+];
+
 // The nine positions of core Cover, under the class names core gives them.
 const CONTENT_POSITION_CLASSES = {
 	'top left': 'is-position-top-left',
@@ -94,7 +100,7 @@ const DEFAULT_ATTRIBUTES = {
 	verticalAlignment: undefined,
 	effect: 'fade',
 	showContent: 'hover',
-	isLink: false,
+	clickAction: 'none',
 	linkTarget: '_self',
 	rel: '',
 };
@@ -125,7 +131,7 @@ export default function ItemCoverEdit({
 		hoverGradient,
 		customHoverGradient,
 		hoverDimRatio,
-		isLink,
+		clickAction,
 		linkTarget,
 		rel,
 	} = attributes;
@@ -554,31 +560,30 @@ export default function ItemCoverEdit({
 								</ToolsPanelItem>
 							)}
 							<ToolsPanelItem
-								label={__('Link to item', 'visual-portfolio')}
+								label={__('On click', 'visual-portfolio')}
 								isShownByDefault
-								hasValue={() => isLink}
+								hasValue={() => 'none' !== clickAction}
 								onDeselect={() =>
-									setAttributes({ isLink: false })
+									setAttributes({ clickAction: 'none' })
 								}
 								panelId={clientId}
 							>
-								<ToggleControl
+								<SelectControl
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
-									label={__(
-										'Link to item',
-										'visual-portfolio'
-									)}
+									label={__('On click', 'visual-portfolio')}
 									help={__(
 										'Covers the whole item with a link, and gives the keyboard something to focus so the content can be reached.',
 										'visual-portfolio'
 									)}
-									checked={isLink}
-									onChange={() =>
-										setAttributes({ isLink: !isLink })
+									value={clickAction}
+									options={CLICK_ACTION_OPTIONS}
+									onChange={(value) =>
+										setAttributes({ clickAction: value })
 									}
 								/>
 							</ToolsPanelItem>
-							{isLink && (
+							{'url' === clickAction && (
 								<>
 									<ToolsPanelItem
 										label={__(

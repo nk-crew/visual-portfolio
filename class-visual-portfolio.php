@@ -270,6 +270,10 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-sort/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-no-results/index.php';
 
+				// Before the item blocks: they ask it for the attributes that
+				// turn an item into a lightbox trigger.
+				require_once $this->plugin_path . 'gutenberg/popup/index.php';
+
 				require_once $this->plugin_path . 'gutenberg/blocks/item-template/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/item-image/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/item-cover/index.php';

@@ -124,6 +124,54 @@ class Visual_Portfolio_Block_Item_Image {
 	}
 
 	/**
+	 * Wrap the image in whatever a click on it is supposed to do.
+	 *
+	 * A popup trigger is an anchor as much as a link is, and it points at the
+	 * full size image: without the lightbox module a click opens the picture,
+	 * which is all the lightbox would have shown anyway.
+	 *
+	 * @param string $image      - rendered image, overlay included.
+	 * @param array  $attributes - block attributes.
+	 * @param array  $context    - block context.
+	 *
+	 * @return string
+	 */
+	private function get_click_wrapper( $image, $attributes, $context ) {
+		$action = $attributes['clickAction'] ?? 'none';
+
+		if ( 'url' === $action && ! empty( $context['vp/itemUrl'] ) ) {
+			return sprintf(
+				'<a href="%1$s" target="%2$s"%3$s%4$s>%5$s</a>',
+				esc_url( $context['vp/itemUrl'] ),
+				esc_attr( $attributes['linkTarget'] ?? '_self' ),
+				empty( $attributes['rel'] ) ? '' : ' rel="' . esc_attr( $attributes['rel'] ) . '"',
+				empty( $context['vp/itemAriaLabel'] ) ? '' : ' aria-label="' . esc_attr( $context['vp/itemAriaLabel'] ) . '"',
+				$image
+			);
+		}
+
+		if ( 'popup' !== $action ) {
+			return $image;
+		}
+
+		$trigger = Visual_Portfolio_Popup::get_trigger_attributes( $context );
+
+		// An item the lightbox has nothing to show - a Pro source that refused
+		// it, an image that no longer exists - is not made clickable.
+		if ( empty( $trigger ) ) {
+			return $image;
+		}
+
+		return sprintf(
+			'<a href="%1$s" data-vp-popup="%2$s"%3$s>%4$s</a>',
+			esc_url( $trigger['href'] ),
+			esc_attr( $trigger['data-vp-popup'] ),
+			empty( $context['vp/itemAriaLabel'] ) ? '' : ' aria-label="' . esc_attr( $context['vp/itemAriaLabel'] ) . '"',
+			$image
+		);
+	}
+
+	/**
 	 * Block output
 	 *
 	 * @param array    $attributes - block attributes.
@@ -177,17 +225,7 @@ class Visual_Portfolio_Block_Item_Image {
 		}
 
 		$image .= $this->get_overlay( $attributes );
-
-		if ( ! empty( $attributes['isLink'] ) && ! empty( $context['vp/itemUrl'] ) ) {
-			$image = sprintf(
-				'<a href="%1$s" target="%2$s"%3$s%4$s>%5$s</a>',
-				esc_url( $context['vp/itemUrl'] ),
-				esc_attr( $attributes['linkTarget'] ?? '_self' ),
-				empty( $attributes['rel'] ) ? '' : ' rel="' . esc_attr( $attributes['rel'] ) . '"',
-				empty( $context['vp/itemAriaLabel'] ) ? '' : ' aria-label="' . esc_attr( $context['vp/itemAriaLabel'] ) . '"',
-				$image
-			);
-		}
+		$image  = $this->get_click_wrapper( $image, $attributes, $context );
 
 		return sprintf( '<figure %1$s>%2$s</figure>', get_block_wrapper_attributes(), $image );
 	}

@@ -283,6 +283,10 @@ class Visual_Portfolio_Block_Item_Template {
 			'vp/itemCommentsUrl'   => $item['comments_url'] ?? '',
 			'vp/itemViewsCount'    => $item['views_count'] ?? '',
 			'vp/itemReadingTime'   => $item['reading_time'] ?? '',
+
+			// Everything the lightbox needs to show this item, resolved here so
+			// that an item block only has to decide whether to open it.
+			'vp/itemPopupData'     => Visual_Portfolio_Popup::get_item_data( $item, $options ),
 		);
 
 		/**

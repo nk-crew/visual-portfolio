@@ -49,7 +49,10 @@ const TEMPLATE = [
 		'visual-portfolio/item-template',
 		{ layoutType: 'grid' },
 		[
-			['visual-portfolio/item-image', { aspectRatio: '1', isLink: true }],
+			[
+				'visual-portfolio/item-image',
+				{ aspectRatio: '1', clickAction: 'popup' },
+			],
 			['visual-portfolio/item-title', { textAlign: 'center' }],
 		],
 	],

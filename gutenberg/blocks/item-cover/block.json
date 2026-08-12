@@ -15,7 +15,8 @@
 		"vp/itemImageSizes",
 		"vp/itemFocalPoint",
 		"vp/itemUrl",
-		"vp/itemAriaLabel"
+		"vp/itemAriaLabel",
+		"vp/itemPopupData"
 	],
 	"attributes": {
 		"sizeSlug": {
@@ -86,9 +87,10 @@
 			"type": "number",
 			"default": 50
 		},
-		"isLink": {
-			"type": "boolean",
-			"default": false,
+		"clickAction": {
+			"type": "string",
+			"default": "none",
+			"enum": ["none", "url", "popup"],
 			"role": "content"
 		},
 		"linkTarget": {

@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- wp:visual-portfolio/loop {"queryType":"posts","baseQuery":{"perPage":6}} -->
 <div class="vp-block-loop">
 	<!-- wp:visual-portfolio/item-template {"layoutType":"grid","layoutColumns":3} -->
-		<!-- wp:visual-portfolio/item-image {"aspectRatio":"4/3","isLink":true} /-->
+		<!-- wp:visual-portfolio/item-image {"aspectRatio":"4/3","clickAction":"url"} /-->
 		<!-- wp:visual-portfolio/item-title {"isLink":true} /-->
 		<!-- wp:visual-portfolio/item-categories /-->
 		<!-- wp:visual-portfolio/item-date /-->

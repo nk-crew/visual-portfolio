@@ -43,7 +43,7 @@ const LAYOUT_OPTIONS = [
 const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
 
 const TEMPLATE = [
-	['visual-portfolio/item-image', { aspectRatio: '1', isLink: true }],
+	['visual-portfolio/item-image', { aspectRatio: '1', clickAction: 'popup' }],
 	['visual-portfolio/item-title', { textAlign: 'center' }],
 ];
 

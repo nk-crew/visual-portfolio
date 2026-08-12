@@ -198,31 +198,55 @@ class Visual_Portfolio_Block_Item_Cover {
 	}
 
 	/**
-	 * The link to the item.
+	 * What a click on the cover does.
 	 *
 	 * A sibling that covers the whole cover, not a wrapper around it: the content
 	 * on top may hold links of its own, and an anchor inside an anchor is invalid
 	 * markup. Being focusable it is also what reveals the content of a hover
-	 * cover to a keyboard, through `:focus-within`.
+	 * cover to a keyboard, through `:focus-within` - which is why a cover with no
+	 * click action still hides nothing from a keyboard, it simply has nothing to
+	 * hide behind.
+	 *
+	 * A popup trigger is the same anchor pointing at the full size image: with
+	 * no lightbox module a click opens the picture.
 	 *
 	 * @param array $attributes - block attributes.
 	 * @param array $context    - block context.
 	 *
 	 * @return string
 	 */
-	private function get_link( $attributes, $context ) {
-		if ( empty( $attributes['isLink'] ) || empty( $context['vp/itemUrl'] ) ) {
+	private function get_trigger( $attributes, $context ) {
+		$action = $attributes['clickAction'] ?? 'none';
+
+		// The anchor has no text of its own, so the label is not optional.
+		$aria_label = $context['vp/itemAriaLabel'] ?? '';
+
+		if ( 'url' === $action && ! empty( $context['vp/itemUrl'] ) ) {
+			return sprintf(
+				'<a class="wp-block-visual-portfolio-item-cover__link" href="%1$s" target="%2$s"%3$s aria-label="%4$s"></a>',
+				esc_url( $context['vp/itemUrl'] ),
+				esc_attr( $attributes['linkTarget'] ?? '_self' ),
+				empty( $attributes['rel'] ) ? '' : ' rel="' . esc_attr( $attributes['rel'] ) . '"',
+				esc_attr( $aria_label )
+			);
+		}
+
+		if ( 'popup' !== $action ) {
 			return '';
 		}
 
-		// The link has no text of its own, so the label is not optional.
-		$aria_label = $context['vp/itemAriaLabel'] ?? '';
+		$trigger = Visual_Portfolio_Popup::get_trigger_attributes( $context );
+
+		// An item the lightbox has nothing to show - a Pro source that refused
+		// it, an image that no longer exists - is not made clickable.
+		if ( empty( $trigger ) ) {
+			return '';
+		}
 
 		return sprintf(
-			'<a class="wp-block-visual-portfolio-item-cover__link" href="%1$s" target="%2$s"%3$s aria-label="%4$s"></a>',
-			esc_url( $context['vp/itemUrl'] ),
-			esc_attr( $attributes['linkTarget'] ?? '_self' ),
-			empty( $attributes['rel'] ) ? '' : ' rel="' . esc_attr( $attributes['rel'] ) . '"',
+			'<a class="wp-block-visual-portfolio-item-cover__link" href="%1$s" data-vp-popup="%2$s" aria-label="%3$s"></a>',
+			esc_url( $trigger['href'] ),
+			esc_attr( $trigger['data-vp-popup'] ),
 			esc_attr( $aria_label )
 		);
 	}
@@ -387,7 +411,7 @@ class Visual_Portfolio_Block_Item_Cover {
 			$output .= sprintf( '<div class="wp-block-visual-portfolio-item-cover__inner">%s</div>', $content );
 		}
 
-		$link    = $this->get_link( $attributes, $context );
+		$link    = $this->get_trigger( $attributes, $context );
 		$output .= $link;
 
 		return sprintf(

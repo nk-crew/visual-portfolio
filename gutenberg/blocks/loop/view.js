@@ -192,7 +192,14 @@ function refreshLayout(list, added) {
 	const layout = masonryLayouts.get(list);
 
 	if (!layout) {
-		initMasonry(list);
+		// The same class `initLayout` starts from, asked again rather than
+		// assumed: `window.Masonry` is on the page as soon as one loop on it is
+		// a masonry, and starting Masonry on the list of a carousel or a
+		// justified loop next to it would take that layout apart.
+		if (list.classList.contains(MASONRY_CLASS)) {
+			initMasonry(list);
+		}
+
 		return;
 	}
 

@@ -15,12 +15,14 @@
 		"vp/itemImageSizes",
 		"vp/itemFocalPoint",
 		"vp/itemUrl",
-		"vp/itemAriaLabel"
+		"vp/itemAriaLabel",
+		"vp/itemPopupData"
 	],
 	"attributes": {
-		"isLink": {
-			"type": "boolean",
-			"default": false,
+		"clickAction": {
+			"type": "string",
+			"default": "none",
+			"enum": ["none", "url", "popup"],
 			"role": "content"
 		},
 		"rel": {

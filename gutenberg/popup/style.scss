@@ -1,0 +1,56 @@
+// The two things the lightbox adds to the vendored stylesheet: a caption, and
+// a slide that is a video rather than an image.
+//
+// Everything else - the layout, the buttons, the transitions - comes from
+// `assets/vendor/photoswipe-5/photoswipe.css`, and is left alone so that the
+// library keeps owning what the library draws.
+.pswp.vp-popup {
+	// Above the slides, below the toolbar the library puts at the top.
+	.vp-popup-caption {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		z-index: 10;
+		box-sizing: border-box;
+		width: 100%;
+		padding: 1rem 2rem calc(1rem + env(safe-area-inset-bottom));
+		color: #fff;
+		text-align: center;
+		background: linear-gradient(to top, rgb(0 0 0 / 60%), transparent);
+
+		// The element is there on every slide and empty on most of them, and an
+		// empty gradient over the picture is still a gradient over the picture.
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	.vp-popup-caption__title {
+		font-size: 1.1em;
+		font-weight: 600;
+	}
+
+	.vp-popup-caption__text {
+		font-size: 0.9em;
+		opacity: 0.8;
+	}
+
+	// The box the library sized for the video, filled by the iframe.
+	//
+	// No `max-width` here, tempting as it is: the box is a child of the zoom
+	// wrapper, which stays zero sized for content the library does not zoom, so
+	// a percentage would resolve against nothing and collapse the video. The
+	// pixel size the library wrote on this element is already the right one.
+	.vp-popup-video {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #000;
+
+		iframe {
+			width: 100%;
+			height: 100%;
+			border: 0;
+		}
+	}
+}

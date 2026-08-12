@@ -30,7 +30,7 @@ const LOAD_MORE = '.vp-block-loop-pagination-load-more';
 const DEFAULT_ITEM_BLOCKS = [
 	{
 		name: 'visual-portfolio/item-image',
-		attributes: { aspectRatio: '1', isLink: true },
+		attributes: { aspectRatio: '1', clickAction: 'url' },
 	},
 	{
 		name: 'visual-portfolio/item-title',

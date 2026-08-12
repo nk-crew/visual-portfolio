@@ -36,8 +36,14 @@ const SCALE_OPTIONS = [
 	{ label: __('Fill', 'visual-portfolio'), value: 'fill' },
 ];
 
+const CLICK_ACTION_OPTIONS = [
+	{ label: __('None', 'visual-portfolio'), value: 'none' },
+	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
+	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
+];
+
 const DEFAULT_ATTRIBUTES = {
-	isLink: false,
+	clickAction: 'none',
 	rel: '',
 	linkTarget: '_self',
 	sizeSlug: 'large',
@@ -57,7 +63,7 @@ export default function ItemImageEdit({
 	clientId,
 }) {
 	const {
-		isLink,
+		clickAction,
 		rel,
 		linkTarget,
 		sizeSlug,
@@ -299,27 +305,26 @@ export default function ItemImageEdit({
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={__('Link to item', 'visual-portfolio')}
+								label={__('On click', 'visual-portfolio')}
 								isShownByDefault
-								hasValue={() => isLink}
+								hasValue={() => 'none' !== clickAction}
 								onDeselect={() =>
-									setAttributes({ isLink: false })
+									setAttributes({ clickAction: 'none' })
 								}
 								panelId={clientId}
 							>
-								<ToggleControl
+								<SelectControl
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
-									label={__(
-										'Link to item',
-										'visual-portfolio'
-									)}
-									checked={isLink}
-									onChange={() =>
-										setAttributes({ isLink: !isLink })
+									label={__('On click', 'visual-portfolio')}
+									value={clickAction}
+									options={CLICK_ACTION_OPTIONS}
+									onChange={(value) =>
+										setAttributes({ clickAction: value })
 									}
 								/>
 							</ToolsPanelItem>
-							{isLink && (
+							{'url' === clickAction && (
 								<>
 									<ToolsPanelItem
 										label={__(
@@ -381,7 +386,7 @@ export default function ItemImageEdit({
 				</>
 			)}
 			<figure {...blockProps}>
-				{isLink && itemUrl ? (
+				{'url' === clickAction && itemUrl ? (
 					// The link is inert in the editor, the click belongs to the block.
 					<a
 						href={itemUrl}

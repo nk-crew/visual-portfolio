@@ -37,6 +37,7 @@ const TILES = '3|1,1|2,1|1,1|2,0.5|1,1|';
  * @param {Object} options.layout     - item template attributes.
  * @param {number} [options.perPage]  - items per page.
  * @param {Array}  [options.controls] - inner blocks of the pagination block.
+ * @param {number} [options.queryId]  - id the URL parameters of the loop are named after.
  * @return {string} serialized blocks.
  */
 function getLoopMarkup({
@@ -45,10 +46,11 @@ function getLoopMarkup({
 	layout,
 	perPage = IMAGES_COUNT,
 	controls = [],
+	queryId = 1,
 }) {
 	const loop = {
 		block_id: blockId,
-		queryId: 1,
+		queryId,
 		queryType: 'images',
 		baseQuery: { perPage, maxPages: 0 },
 		imagesQuery: { images },
@@ -67,7 +69,7 @@ function getLoopMarkup({
 		// No aspect ratio on the image: justified measures the proportions of
 		// the file, and an image forced into a square would be laid out to one
 		// shape and drawn in another.
-		'<!-- wp:visual-portfolio/item-image {"isLink":true} /-->',
+		'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
 		'<!-- /wp:visual-portfolio/item-template -->',
 		pagination,
 		'</div>',
@@ -158,6 +160,33 @@ test.describe('Gallery Item Template layouts', () => {
 				title: options.title,
 				status: 'publish',
 				content: getLoopMarkup(options),
+			},
+		});
+
+		pageIds.push(created.id);
+
+		await page.goto(created.link, { waitUntil: 'domcontentloaded' });
+
+		return created.link;
+	}
+
+	/**
+	 * Publish a page holding several loops and open it.
+	 *
+	 * @param {Object} requestUtils - REST utils.
+	 * @param {Object} page         - Playwright page.
+	 * @param {string} title        - title of the page.
+	 * @param {Array}  loops        - one options object per loop, see `getLoopMarkup()`.
+	 * @return {Promise<string>} URL of the published page.
+	 */
+	async function publishLoops(requestUtils, page, title, loops) {
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title,
+				status: 'publish',
+				content: loops.map(getLoopMarkup).join(''),
 			},
 		});
 
@@ -480,6 +509,81 @@ test.describe('Gallery Item Template layouts', () => {
 				}))
 			).toEqual({ overflowX: 'auto', overflows: true });
 		});
+	});
+
+	test('a load more lays out its own loop and leaves the one beside it alone', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoops(
+			requestUtils,
+			page,
+			'Layouts - masonry beside carousel',
+			[
+				{
+					blockId: 'e2e-mixed-masonry',
+					queryId: 1,
+					images,
+					layout: { layoutType: 'masonry', layoutColumns: 2 },
+				},
+				{
+					blockId: 'e2e-mixed-carousel',
+					queryId: 2,
+					images,
+					perPage: 3,
+					layout: {
+						layoutType: 'carousel',
+						layoutColumns: 3,
+						layoutGap: '10px',
+					},
+					controls: ['loop-pagination-load-more'],
+				},
+			]
+		);
+
+		const masonry = page.locator(LIST).first();
+		const carousel = page.locator(LIST).nth(1);
+
+		await expect(masonry).toHaveClass(/vp-layout-masonry/);
+		await expect(carousel).toHaveClass(/vp-layout-carousel/);
+
+		// Masonry positions what it lays out, which is also what puts the
+		// library on the page - the reason the carousel below is in danger at
+		// all.
+		await expect
+			.poll(
+				async () =>
+					masonry
+						.locator(ITEM)
+						.evaluateAll((nodes) =>
+							nodes.every(
+								(node) =>
+									'absolute' ===
+									window.getComputedStyle(node).position
+							)
+						),
+				{ timeout: 20000 }
+			)
+			.toBe(true);
+
+		await page.locator(LOAD_MORE).click();
+		await expect(carousel.locator(ITEM)).toHaveCount(IMAGES_COUNT);
+
+		// The loop that loaded is a carousel, and a carousel is a row of items
+		// in the flow. Laying it out again means laying out a carousel, not
+		// reaching for the engine the loop above it happens to have loaded.
+		const positioned = await carousel
+			.locator(ITEM)
+			.evaluateAll((nodes) =>
+				nodes.some(
+					(node) =>
+						'absolute' === window.getComputedStyle(node).position
+				)
+			);
+
+		expect(positioned).toBe(false);
+		// Masonry writes the height of the container it took over.
+		expect(await carousel.evaluate((node) => node.style.height)).toBe('');
 	});
 
 	test('masonry leaves the layout to the browser where Grid Lanes exists', async ({
