@@ -77,11 +77,53 @@ class Visual_Portfolio_Get {
 	private static $loop_items_cache = array();
 
 	/**
-	 * Query string parameters the loop pipeline reads.
+	 * Roles of the query string parameters the loop pipeline reads.
+	 *
+	 * The names themselves depend on the loop, see `get_query_var_name()`.
 	 *
 	 * @var array
 	 */
-	private static $loop_query_vars = array( 'vp_page', 'vp_filter', 'vp_sort', 'vpf_random_seed' );
+	private static $loop_query_vars = array( 'page', 'filter', 'sort' );
+
+	/**
+	 * Query string name of a loop state parameter.
+	 *
+	 * A loop with a `queryId` owns its parameters - `vp-3-page` moves that loop
+	 * and nothing else, which is what lets two galleries live on one page. A
+	 * caller without an id gets the legacy global names: the legacy renderer
+	 * goes through these very helpers, and its URLs are public.
+	 *
+	 * @param string          $name     - `page`, `filter` or `sort`.
+	 * @param int|string|null $query_id - id of the loop, or null for the legacy names.
+	 *
+	 * @return string
+	 */
+	public static function get_query_var_name( $name, $query_id = null ) {
+		$query_id = self::sanitize_query_id( $query_id );
+
+		return null === $query_id ? 'vp_' . $name : 'vp-' . $query_id . '-' . $name;
+	}
+
+	/**
+	 * Normalize a loop query id.
+	 *
+	 * The id ends up inside a query string name, so anything that is not a
+	 * positive integer is refused rather than escaped - a loop that cannot name
+	 * its parameters reads the legacy ones instead of an unusable name.
+	 *
+	 * @param int|string|null $query_id - id of the loop.
+	 *
+	 * @return int|null
+	 */
+	public static function sanitize_query_id( $query_id ) {
+		if ( null === $query_id || is_bool( $query_id ) || is_array( $query_id ) || ! is_numeric( $query_id ) ) {
+			return null;
+		}
+
+		$query_id = (int) $query_id;
+
+		return $query_id > 0 ? $query_id : null;
+	}
 
 	/**
 	 * Get all available layouts.
@@ -613,7 +655,8 @@ class Visual_Portfolio_Get {
 	 * blocks resolve their query through exactly the same path as the legacy
 	 * gallery - including the `vpf_custom_query_result` extension point.
 	 *
-	 * @param array $options portfolio options.
+	 * @param array           $options portfolio options.
+	 * @param int|string|null $query_id id of the loop the query belongs to, or null for the legacy parameters.
 	 *
 	 * @return array {
 	 *     @type array       $query_opts      Query options.
@@ -623,13 +666,13 @@ class Visual_Portfolio_Get {
 	 *     @type string|bool $next_page_url   URL of the next page, false when there is none.
 	 * }
 	 */
-	private static function resolve_query( $options ) {
-		$start_page = self::get_current_page_number();
+	private static function resolve_query( $options, $query_id = null ) {
+		$start_page = self::get_current_page_number( $query_id );
 		$is_images  = 'images' === $options['content_source'];
 		$is_social  = 'social-stream' === $options['content_source'];
 
 		// Get query params.
-		$query_opts = self::get_query_params( $options, false, $options['id'] );
+		$query_opts = self::get_query_params( $options, false, $options['id'], $query_id );
 
 		/**
 		 * Filter to provide a custom query result object for non-standard content sources.
@@ -664,7 +707,8 @@ class Visual_Portfolio_Get {
 		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
 			array(
 				'vp_page' => $start_page + 1,
-			)
+			),
+			$query_id
 		) : false;
 
 		return array(
@@ -683,14 +727,15 @@ class Visual_Portfolio_Get {
 	 * of the legacy pipeline: `vpf_custom_items`, `vpf_image_item_args` and
 	 * `vpf_post_item_args`.
 	 *
-	 * @param array       $each_item_args  Default item args template.
-	 * @param array       $query_opts      Query options.
-	 * @param array       $options         Portfolio options.
-	 * @param object|null $portfolio_query Query object, null for images and social sources.
+	 * @param array           $each_item_args  Default item args template.
+	 * @param array           $query_opts      Query options.
+	 * @param array           $options         Portfolio options.
+	 * @param object|null     $portfolio_query Query object, null for images and social sources.
+	 * @param int|string|null $query_id        id of the loop the items belong to, or null for the legacy parameters.
 	 *
 	 * @return array
 	 */
-	private static function build_items( $each_item_args, $query_opts, $options, $portfolio_query = null ) {
+	private static function build_items( $each_item_args, $query_opts, $options, $portfolio_query = null, $query_id = null ) {
 		$is_images      = 'images' === $options['content_source'];
 		$is_social      = 'social-stream' === $options['content_source'];
 		$img_size_popup = $each_item_args['img_size_popup'];
@@ -740,7 +785,8 @@ class Visual_Portfolio_Get {
 								array(
 									'vp_filter' => rawurlencode( $slug ),
 									'vp_page'   => 1,
-								)
+								),
+								$query_id
 							);
 
 							$categories[] = array(
@@ -823,7 +869,8 @@ class Visual_Portfolio_Get {
 								array(
 									'vp_filter' => $unique_name,
 									'vp_page'   => 1,
-								)
+								),
+								$query_id
 							);
 							$categories[] = array(
 								'slug'        => $cat_item->slug,
@@ -955,18 +1002,29 @@ class Visual_Portfolio_Get {
 	 *
 	 * The request state that narrows the query is part of the identity - without
 	 * it a filtered loop would be served the unfiltered items of an earlier call.
+	 * Which parameters count as that state depends on the loop, so the id is
+	 * part of the identity too: two loops read two different pages out of one
+	 * request.
 	 *
-	 * @param array $atts options for the loop.
+	 * @param array           $atts options for the loop.
+	 * @param int|string|null $query_id id of the loop, or null for the legacy parameters.
 	 *
 	 * @return string|bool md5 hash, or false when the attributes are not serializable.
 	 */
-	private static function get_loop_items_cache_key( $atts ) {
-		$state = array();
+	private static function get_loop_items_cache_key( $atts, $query_id = null ) {
+		$query_id = self::sanitize_query_id( $query_id );
+		$state    = array( 'query_id' => $query_id );
 
-		foreach ( self::$loop_query_vars as $name ) {
+		foreach ( self::$loop_query_vars as $role ) {
+			$name = self::get_query_var_name( $role, $query_id );
+
             // phpcs:ignore WordPress.Security.NonceVerification
 			$state[ $name ] = isset( $_REQUEST[ $name ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ $name ] ) ) : null;
 		}
+
+		// The random seed is one per request, whichever loop asks for it.
+        // phpcs:ignore WordPress.Security.NonceVerification
+		$state['vpf_random_seed'] = isset( $_REQUEST['vpf_random_seed'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['vpf_random_seed'] ) ) : null;
 
 		$identity = wp_json_encode( array( $atts, $state ) );
 
@@ -982,16 +1040,17 @@ class Visual_Portfolio_Get {
 	 * same pagination, filtering and sorting, same extension points as the
 	 * legacy gallery - without any of its markup concerns.
 	 *
-	 * @param array $atts options for the loop.
+	 * @param array           $atts options for the loop.
+	 * @param int|string|null $query_id id of the loop, or null for the legacy parameters.
 	 *
 	 * @return array|bool
 	 */
-	public static function get_loop_items( $atts ) {
+	public static function get_loop_items( $atts, $query_id = null ) {
 		if ( ! is_array( $atts ) ) {
 			return false;
 		}
 
-		$cache_key = self::get_loop_items_cache_key( $atts );
+		$cache_key = self::get_loop_items_cache_key( $atts, $query_id );
 
 		// Several blocks of one loop ask for the same items in a single request.
 		if ( false !== $cache_key && isset( self::$loop_items_cache[ $cache_key ] ) ) {
@@ -1019,8 +1078,8 @@ class Visual_Portfolio_Get {
 		 */
 		do_action( 'vpf_before_loop_items', $options );
 
-		$query = self::resolve_query( $options );
-		$items = self::build_items( self::default_item_args( $options ), $query['query_opts'], $options, $query['portfolio_query'] );
+		$query = self::resolve_query( $options, $query_id );
+		$items = self::build_items( self::default_item_args( $options ), $query['query_opts'], $options, $query['portfolio_query'], $query_id );
 
 		/**
 		 * Fires after the loop items are resolved.
@@ -1421,26 +1480,32 @@ class Visual_Portfolio_Get {
 
 	/**
 	 * Get current page number
-	 * ?vp_page=2
+	 * ?vp_page=2 , or ?vp-3-page=2 for a loop that carries a query id.
+	 *
+	 * @param int|string|null $query_id - id of the loop asking, or null for the legacy parameter.
 	 *
 	 * @return int
 	 */
-	public static function get_current_page_number() {
+	public static function get_current_page_number( $query_id = null ) {
+		$name = self::get_query_var_name( 'page', $query_id );
+
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.NonceVerification
-		return max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
+		return max( 1, isset( $_GET[ $name ] ) ? Visual_Portfolio_Security::sanitize_number( $_GET[ $name ] ) : 1 );
 	}
 
 	/**
 	 * Calculate how many pages the given query produces.
 	 *
 	 * The active filter is taken from the request by `get_query_params()`, so
-	 * the result already accounts for `?vp_filter`.
+	 * the result already accounts for `?vp_filter` - or for the filter of the
+	 * given loop.
 	 *
-	 * @param array $options - block options in the legacy format.
+	 * @param array           $options - block options in the legacy format.
+	 * @param int|string|null $query_id - id of the loop asking, or null for the legacy parameters.
 	 *
 	 * @return int
 	 */
-	public static function calculate_max_pages( $options ) {
+	public static function calculate_max_pages( $options, $query_id = null ) {
 		$options = Visual_Portfolio_Security::validate_calculate_max_pages_params( $options );
 
 		$content_source = $options['content_source'] ?? '';
@@ -1461,7 +1526,7 @@ class Visual_Portfolio_Get {
 
 		$options['items_count'] = $items_count;
 
-		$query_opts = self::get_query_params( $options, false );
+		$query_opts = self::get_query_params( $options, false, false, $query_id );
 
 		if ( isset( $query_opts['max_num_pages'] ) ) {
 			return max( 1, (int) $query_opts['max_num_pages'] );
@@ -1695,20 +1760,26 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get query params array.
 	 *
-	 * @param array $options portfolio options.
-	 * @param bool  $for_filter prevent retrieving GET variable if used for filter.
-	 * @param int   $layout_id portfolio layout id.
+	 * @param array           $options portfolio options.
+	 * @param bool            $for_filter prevent retrieving GET variable if used for filter.
+	 * @param int             $layout_id portfolio layout id.
+	 * @param int|string|null $query_id id of the loop the query belongs to, or null for the legacy parameters.
 	 *
 	 * @return array
 	 */
-	public static function get_query_params( $options, $for_filter = false, $layout_id = false ) {
+	public static function get_query_params( $options, $for_filter = false, $layout_id = false, $query_id = null ) {
 		$options    = apply_filters( 'vpf_extend_options_before_query_args', $options, $layout_id );
 		$query_opts = array();
 		$is_images  = 'images' === $options['content_source'];
 
+		// The state this query is narrowed by. A filter list asks for the
+		// unnarrowed query, so it never reads the active filter.
+		$active_filter = $for_filter ? false : self::get_filter_active_item( $query_opts, $query_id );
+		$active_sort   = self::get_current_sort( $query_id );
+
 		$paged = 0;
 		if ( isset( $options['pagination'] ) && $options['pagination'] ) {
-			$paged = self::get_current_page_number();
+			$paged = self::get_current_page_number( $query_id );
 		}
 		$count = isset( $options['items_count'] ) ? intval( $options['items_count'] ) : 6;
 
@@ -1731,10 +1802,8 @@ class Visual_Portfolio_Get {
 			// Load certain taxonomies.
 			$images = array();
 
-            // phpcs:ignore WordPress.Security.NonceVerification
-			if ( ! $for_filter && ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification
-				$category = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
+			if ( false !== $active_filter ) {
+				$category = $active_filter;
 
 				foreach ( $options['images'] as $img ) {
 					if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
@@ -1759,26 +1828,20 @@ class Visual_Portfolio_Get {
 			}
 
 			// custom sorting.
-            // phpcs:ignore WordPress.Security.NonceVerification
-			if ( isset( $_GET['vp_sort'] ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification
-				$custom_get_order = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
-
-				switch ( $custom_get_order ) {
-					case 'title':
-					case 'date':
-						$custom_order           = $custom_get_order;
-						$custom_order_direction = 'asc';
-						break;
-					case 'title_desc':
-						$custom_order           = 'title';
-						$custom_order_direction = 'desc';
-						break;
-					case 'date_desc':
-						$custom_order           = 'date';
-						$custom_order_direction = 'desc';
-						break;
-				}
+			switch ( $active_sort ) {
+				case 'title':
+				case 'date':
+					$custom_order           = $active_sort;
+					$custom_order_direction = 'asc';
+					break;
+				case 'title_desc':
+					$custom_order           = 'title';
+					$custom_order_direction = 'desc';
+					break;
+				case 'date_desc':
+					$custom_order           = 'date';
+					$custom_order_direction = 'desc';
+					break;
 			}
 
 			// Sorting reads the image data from the attachment posts, so the whole
@@ -2048,41 +2111,33 @@ class Visual_Portfolio_Get {
 			}
 
 			// Custom sorting.
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( isset( $_GET['vp_sort'] ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$custom_get_order       = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
-				$custom_order           = false;
-				$custom_order_direction = false;
+			$custom_order           = false;
+			$custom_order_direction = false;
 
-				switch ( $custom_get_order ) {
-					case 'title':
-					case 'date':
-						$custom_order           = 'post_' . $custom_get_order;
-						$custom_order_direction = 'asc';
-						break;
-					case 'title_desc':
-						$custom_order           = 'post_title';
-						$custom_order_direction = 'desc';
-						break;
-					case 'date_desc':
-						$custom_order           = 'post_date';
-						$custom_order_direction = 'desc';
-						break;
-				}
+			switch ( $active_sort ) {
+				case 'title':
+				case 'date':
+					$custom_order           = 'post_' . $active_sort;
+					$custom_order_direction = 'asc';
+					break;
+				case 'title_desc':
+					$custom_order           = 'post_title';
+					$custom_order_direction = 'desc';
+					break;
+				case 'date_desc':
+					$custom_order           = 'post_date';
+					$custom_order_direction = 'desc';
+					break;
+			}
 
-				if ( $custom_order && $custom_order_direction ) {
-					$query_opts['orderby'] = $custom_order;
-					$query_opts['order']   = $custom_order_direction;
-				}
+			if ( $custom_order && $custom_order_direction ) {
+				$query_opts['orderby'] = $custom_order;
+				$query_opts['order']   = $custom_order_direction;
 			}
 
 			// Load certain taxonomies using custom filter.
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( ! $for_filter && ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
-				$taxonomies = explode( ':', $taxonomies );
+			if ( false !== $active_filter ) {
+				$taxonomies = explode( ':', $active_filter );
 
 				if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
                     // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
@@ -2465,17 +2520,20 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get filter active item.
 	 *
-	 * @param array $query_opts - Query array params.
-	 * @return boolean
+	 * @param array           $query_opts - Query array params.
+	 * @param int|string|null $query_id - id of the loop asking, or null for the legacy parameter.
+	 *
+	 * @return boolean|string
 	 */
-	public static function get_filter_active_item( $query_opts ) {
+	public static function get_filter_active_item( $query_opts, $query_id = null ) {
 		// Get active item.
 		$active_item = false;
+		$name        = self::get_query_var_name( 'filter', $query_id );
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
+		if ( ( isset( $_GET[ $name ] ) || isset( $query_opts['vp_filter'] ) ) ) {
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
+			$active_item = sanitize_text_field( wp_unslash( $_GET[ $name ] ?? $query_opts['vp_filter'] ) );
 		}
 
 		return $active_item;
@@ -2483,13 +2541,17 @@ class Visual_Portfolio_Get {
 
 	/**
 	 * Get current sort slug
-	 * ?vp_sort=date_desc
+	 * ?vp_sort=date_desc , or ?vp-3-sort=date_desc for a loop that carries a query id.
+	 *
+	 * @param int|string|null $query_id - id of the loop asking, or null for the legacy parameter.
 	 *
 	 * @return string
 	 */
-	public static function get_current_sort() {
+	public static function get_current_sort( $query_id = null ) {
+		$name = self::get_query_var_name( 'sort', $query_id );
+
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification
-		return isset( $_GET['vp_sort'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) ) : '';
+		return isset( $_GET[ $name ] ) ? sanitize_text_field( wp_unslash( $_GET[ $name ] ) ) : '';
 	}
 
 	/**
@@ -2557,19 +2619,21 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get URL of the given sort item.
 	 *
-	 * @param string $slug sort slug.
-	 * @param array  $vp_options current vp_list options.
+	 * @param string          $slug sort slug.
+	 * @param array           $vp_options current vp_list options.
+	 * @param int|string|null $query_id - id of the loop the control belongs to, or null for the legacy parameters.
 	 *
 	 * @return string
 	 */
-	public static function get_sort_item_url( $slug, $vp_options = array() ) {
+	public static function get_sort_item_url( $slug, $vp_options = array(), $query_id = null ) {
 		return apply_filters(
 			'vpf_extend_sort_item_url',
 			self::get_pagenum_link(
 				array(
 					'vp_sort' => rawurlencode( $slug ),
 					'vp_page' => 1,
-				)
+				),
+				$query_id
 			),
 			$slug,
 			$vp_options
@@ -3265,11 +3329,13 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get pagination links.
 	 *
-	 * @param array $args - Block Arguments.
-	 * @param array $vp_options - Block Options.
+	 * @param array           $args - Block Arguments.
+	 * @param array           $vp_options - Block Options.
+	 * @param int|string|null $query_id - id of the loop the pagination belongs to, or null for the legacy parameters.
+	 *
 	 * @return array
 	 */
-	public static function get_pagination_links( $args, $vp_options ) {
+	public static function get_pagination_links( $args, $vp_options, $query_id = null ) {
 		$pagination_links = paginate_links(
 			array(
 				'base'      => esc_url_raw(
@@ -3281,7 +3347,8 @@ class Visual_Portfolio_Get {
 							self::get_pagenum_link(
 								array(
 									'vp_page' => 999999999,
-								)
+								),
+								$query_id
 							)
 						)
 					)
@@ -3354,10 +3421,18 @@ class Visual_Portfolio_Get {
 	/**
 	 * Return current page url with paged support.
 	 *
-	 * @param array $query_arg - custom query arg.
+	 * Arguments are always named after the legacy parameters (`vp_page`,
+	 * `vp_filter`, `vp_sort`). With a query id they are written under the names
+	 * of that loop instead, so every caller builds a link the same way and only
+	 * the loop decides which parameters it owns. Parameters of other loops are
+	 * part of the current URL and survive untouched.
+	 *
+	 * @param array           $query_arg - custom query arg.
+	 * @param int|string|null $query_id - id of the loop the link belongs to, or null for the legacy parameters.
+	 *
 	 * @return string
 	 */
-	public static function get_pagenum_link( $query_arg = array() ) {
+	public static function get_pagenum_link( $query_arg = array(), $query_id = null ) {
 		// Use current page url.
 		global $wp;
 		$current_url = '';
@@ -3377,23 +3452,49 @@ class Visual_Portfolio_Get {
 			}
 		}
 
-		if ( isset( $query_arg['vp_filter'] ) && ! $query_arg['vp_filter'] ) {
-			unset( $query_arg['vp_filter'] );
-			$current_url = remove_query_arg( 'vp_filter', $current_url );
+		$names = array(
+			'vp_filter' => self::get_query_var_name( 'filter', $query_id ),
+			'vp_sort'   => self::get_query_var_name( 'sort', $query_id ),
+			'vp_page'   => self::get_query_var_name( 'page', $query_id ),
+		);
+
+		if ( 'vp_page' !== $names['vp_page'] ) {
+			$renamed = array();
+
+			foreach ( $query_arg as $key => $value ) {
+				$renamed[ $names[ $key ] ?? $key ] = $value;
+			}
+
+			$query_arg = $renamed;
 		}
-		if ( isset( $query_arg['vp_sort'] ) && ! $query_arg['vp_sort'] ) {
-			unset( $query_arg['vp_sort'] );
-			$current_url = remove_query_arg( 'vp_sort', $current_url );
+
+		// An empty filter or sort, and the first page, are the default state -
+		// they are dropped from the URL rather than written into it.
+		foreach ( array( 'vp_filter', 'vp_sort' ) as $legacy_name ) {
+			$name = $names[ $legacy_name ];
+
+			if ( isset( $query_arg[ $name ] ) && ! $query_arg[ $name ] ) {
+				unset( $query_arg[ $name ] );
+				$current_url = remove_query_arg( $name, $current_url );
+			}
 		}
-		if ( isset( $query_arg['vp_page'] ) && 1 === $query_arg['vp_page'] ) {
-			unset( $query_arg['vp_page'] );
-			$current_url = remove_query_arg( 'vp_page', $current_url );
+
+		if ( isset( $query_arg[ $names['vp_page'] ] ) && 1 === $query_arg[ $names['vp_page'] ] ) {
+			unset( $query_arg[ $names['vp_page'] ] );
+			$current_url = remove_query_arg( $names['vp_page'], $current_url );
 		}
 
 		// Add custom query args.
 		$current_url = add_query_arg( $query_arg, $current_url );
 
-		$current_url = apply_filters( 'vpf_get_pagenum_link', $current_url, $query_arg );
+		/**
+		 * Filters a link built by the gallery controls.
+		 *
+		 * @param string          $current_url resulting URL, unescaped.
+		 * @param array           $query_arg   query arguments added to it, under the names of the loop.
+		 * @param int|string|null $query_id    id of the loop the link belongs to, null for the legacy parameters.
+		 */
+		$current_url = apply_filters( 'vpf_get_pagenum_link', $current_url, $query_arg, $query_id );
 
 		return $current_url;
 	}

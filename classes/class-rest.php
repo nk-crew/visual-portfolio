@@ -411,6 +411,10 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			$params = array_merge( $params, $json_params );
 		}
 
+		// Read before the conversion: the query id is not a query option, it only
+		// names the parameters this loop reads its state from.
+		$query_id = Visual_Portfolio_Get::sanitize_query_id( $params['queryId'] ?? null );
+
 		$params         = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params, true );
 		$content_source = $params['content_source'] ?? false;
 
@@ -486,13 +490,20 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		// the same options. It is also per request state - the pipeline reads
 		// the page, filter and sort out of the request, so options alone would
 		// serve page one's items for every page.
+		//
+		// Those parameters are named after the loop, so the key is read under
+		// the very names the pipeline will read below. Keyed on the legacy names
+		// instead, a request for `vp-3-page=2` would be answered with the items
+		// cached for page one.
 		$request_state = array();
 
-		foreach ( array( 'vp_page', 'vp_filter', 'vp_sort' ) as $name ) {
+		foreach ( array( 'page', 'filter', 'sort' ) as $role ) {
+			$name = Visual_Portfolio_Get::get_query_var_name( $role, $query_id );
+
 			$request_state[ $name ] = $request->get_param( $name );
 		}
 
-		$cache_key = 'vpf_loop_preview_' . md5( (string) wp_json_encode( array( $options, $request_state, get_current_user_id() ) ) );
+		$cache_key = 'vpf_loop_preview_' . md5( (string) wp_json_encode( array( $options, $query_id, $request_state, get_current_user_id() ) ) );
 		$cached    = get_transient( $cache_key );
 
 		if ( is_array( $cached ) ) {
@@ -509,7 +520,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 
 		add_action( 'pre_get_posts', $restrict_to_readable );
 
-		$result = Visual_Portfolio_Get::get_loop_items( $options );
+		$result = Visual_Portfolio_Get::get_loop_items( $options, $query_id );
 
 		remove_action( 'pre_get_posts', $restrict_to_readable );
 

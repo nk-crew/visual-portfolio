@@ -95,6 +95,26 @@ class Visual_Portfolio_Block_Loop {
 	}
 
 	/**
+	 * Query id of the loop a block belongs to.
+	 *
+	 * Every control resolves its state through this: with an id the loop reads
+	 * and writes `vp-{id}-page|filter|sort`, so paging one gallery leaves the
+	 * other galleries on the page where they are. A loop saved before the
+	 * attribute existed has none, and keeps the legacy global parameters.
+	 *
+	 * @param array $context - block context of the control.
+	 *
+	 * @return int|null
+	 */
+	public static function get_query_id( $context ) {
+		if ( empty( $context ) || ! is_array( $context ) ) {
+			return null;
+		}
+
+		return Visual_Portfolio_Get::sanitize_query_id( $context['vp/queryId'] ?? null );
+	}
+
+	/**
 	 * Add the random seed to a control link.
 	 *
 	 * A randomly ordered loop reshuffles on every request, so without the seed

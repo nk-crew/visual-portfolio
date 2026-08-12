@@ -96,14 +96,15 @@ class Visual_Portfolio_Block_Loop_Sort {
 			)
 		);
 
-		$options = '';
+		$options  = '';
+		$query_id = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
 
 		// Get active item.
-		$active_item = Visual_Portfolio_Get::get_current_sort();
+		$active_item = Visual_Portfolio_Get::get_current_sort( $query_id );
 
 		foreach ( $shown as $slug => $label ) {
 			$url = Visual_Portfolio_Block_Loop::add_random_seed(
-				Visual_Portfolio_Get::get_sort_item_url( $slug, $loop_options ),
+				Visual_Portfolio_Get::get_sort_item_url( $slug, $loop_options, $query_id ),
 				$block->context
 			);
 

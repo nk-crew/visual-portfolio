@@ -80,9 +80,15 @@ export default class ClassesTree extends Component {
 
 		const { clientId } = this.props;
 
-		const iframePreview = document.querySelector(
-			`#block-${clientId} iframe`
-		);
+		// This renders in the inspector, which stays in the top-level document,
+		// while the block it inspects lives in the editor canvas - a document of
+		// its own since WordPress iframes the canvas.
+		const canvas = document.querySelector('iframe[name="editor-canvas"]');
+		const canvasDocument = canvas?.contentDocument;
+
+		const iframePreview =
+			document.querySelector(`#block-${clientId} iframe`) ||
+			canvasDocument?.querySelector(`#block-${clientId} iframe`);
 
 		if (iframePreview) {
 			this.iframePreview = iframePreview;

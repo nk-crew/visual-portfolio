@@ -112,7 +112,8 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 
 		wp_set_current_user( 0 );
 
-		unset( $_GET['vp_page'], $_GET['vp_filter'], $_GET['vp_sort'], $_REQUEST['vp_page'], $_REQUEST['vp_filter'], $_REQUEST['vp_sort'] );
+		$_GET     = array();
+		$_REQUEST = array();
 
 		$this->reset_loop_state();
 
@@ -211,14 +212,26 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 	 * permission callback and the JSON body parsing are all exercised.
 	 *
 	 * @param array $body - modern loop attributes.
+	 * @param array $query - request state, as the query string carries it.
 	 *
 	 * @return WP_REST_Response
 	 */
-	private function dispatch( $body ) {
+	private function dispatch( $body, $query = array() ) {
 		$request = new WP_REST_Request( 'POST', self::ROUTE );
 
 		$request->set_header( 'content-type', 'application/json' );
 		$request->set_body( (string) wp_json_encode( $body ) );
+
+		if ( ! empty( $query ) ) {
+			$request->set_query_params( $query );
+
+			// The pipeline reads the state out of the request, not out of the
+			// REST parameters - the same code answers a page load.
+			foreach ( $query as $name => $value ) {
+				$_GET[ $name ]     = $value;
+				$_REQUEST[ $name ] = $value;
+			}
+		}
 
 		return rest_do_request( $request );
 	}
@@ -591,6 +604,71 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 		$this->assertCount( 4, $this->get_items( $second ) );
 		$this->assertSame( 2, $calls );
 	}
+	/**
+	 * A preview of a loop is paged by the parameter of that loop.
+	 *
+	 * @return void
+	 */
+	public function test_preview_reads_the_namespaced_page() {
+		$body = $this->get_body( 'images', 2, array( 'images' => $this->get_images( 5 ) ) );
+
+		$body['queryId'] = 4;
+
+		$items = $this->get_items( $this->dispatch( $body, array( 'vp-4-page' => '2' ) ) );
+
+		$this->assertSame( 'Image 3', $items[0]['itemTitle'] );
+	}
+
+	/**
+	 * The cached answer of one page is not served for another.
+	 *
+	 * The key has to be built from the parameters the pipeline will read. Built
+	 * from the legacy names while the loop reads `vp-4-page`, every page of a
+	 * preview looks like the same request and the editor keeps showing page one.
+	 *
+	 * @return void
+	 */
+	public function test_transient_cache_keys_on_the_namespaced_page() {
+		$body = $this->get_body( 'images', 2, array( 'images' => $this->get_images( 5 ) ) );
+
+		$body['queryId'] = 4;
+
+		$first = $this->get_items( $this->dispatch( $body ) );
+
+		$this->reset_loop_state();
+
+		$second = $this->get_items( $this->dispatch( $body, array( 'vp-4-page' => '2' ) ) );
+
+		$this->assertSame( 'Image 1', $first[0]['itemTitle'] );
+		$this->assertSame( 'Image 3', $second[0]['itemTitle'] );
+	}
+
+	/**
+	 * Two loops with the same settings do not share a cached page.
+	 *
+	 * @return void
+	 */
+	public function test_transient_cache_keys_on_the_query_id() {
+		$body = $this->get_body( 'images', 2, array( 'images' => $this->get_images( 5 ) ) );
+
+		$paged            = $body;
+		$paged['queryId'] = 4;
+
+		$untouched            = $body;
+		$untouched['queryId'] = 5;
+
+		$query = array( 'vp-4-page' => '2' );
+
+		$first = $this->get_items( $this->dispatch( $paged, $query ) );
+
+		$this->reset_loop_state();
+
+		$second = $this->get_items( $this->dispatch( $untouched, $query ) );
+
+		$this->assertSame( 'Image 3', $first[0]['itemTitle'] );
+		$this->assertSame( 'Image 1', $second[0]['itemTitle'] );
+	}
+
 	/**
 	 * A hand-written query cannot be used to read posts the user may not open.
 	 *

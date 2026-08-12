@@ -45,7 +45,8 @@ class Visual_Portfolio_Block_Loop_Pagination_Next {
 		$max_pages = Visual_Portfolio_Block_Loop_Pagination::get_max_pages( $block->context );
 
 		// Get current page.
-		$current_page = Visual_Portfolio_Get::get_current_page_number();
+		$query_id     = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
+		$current_page = Visual_Portfolio_Get::get_current_page_number( $query_id );
 
 		// If only one page or on the last page, don't show pagination.
 		if ( $max_pages <= 1 || $current_page >= $max_pages ) {
@@ -80,7 +81,8 @@ class Visual_Portfolio_Block_Loop_Pagination_Next {
 			array(
 				'pagination_paged__show_arrows'  => true,
 				'pagination_paged__show_numbers' => false,
-			)
+			),
+			$query_id
 		);
 
 		// Find the next page link from the pagination links.

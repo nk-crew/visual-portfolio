@@ -38,11 +38,31 @@ class ClassGetPortfolioLoopItems extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function tear_down() {
-		unset( $_GET['vp_page'], $_GET['vp_filter'], $_GET['vp_sort'], $_REQUEST['vp_page'], $_REQUEST['vp_filter'], $_REQUEST['vp_sort'] );
+		$_GET     = array();
+		$_REQUEST = array();
 
 		$this->reset_loop_state();
 
 		parent::tear_down();
+	}
+
+	/**
+	 * Put a loop parameter into the request.
+	 *
+	 * Both superglobals: the pipeline reads the state out of `$_GET` and keys
+	 * its per-request memo on `$_REQUEST`.
+	 *
+	 * @param string          $role - `page`, `filter` or `sort`.
+	 * @param string          $value - value of the parameter.
+	 * @param int|string|null $query_id - loop the parameter belongs to.
+	 *
+	 * @return void
+	 */
+	private function set_param( $role, $value, $query_id = null ) {
+		$name = Visual_Portfolio_Get::get_query_var_name( $role, $query_id );
+
+		$_GET[ $name ]     = $value;
+		$_REQUEST[ $name ] = $value;
 	}
 
 	/**
@@ -441,5 +461,123 @@ class ClassGetPortfolioLoopItems extends WP_UnitTestCase {
 		$this->assertSame( 'Cats', $categories[0]['label'] );
 		$this->assertSame( 'cats', $categories[0]['slug'] );
 		$this->assertStringContainsString( 'vp_filter=cats', $categories[0]['url'] );
+	}
+
+	/**
+	 * A loop with a query id reads its page out of its own parameter.
+	 *
+	 * @return void
+	 */
+	public function test_page_is_read_from_the_namespaced_parameter() {
+		$atts = $this->get_atts( 'images', 2, array( 'images' => $this->get_images( 5 ) ) );
+
+		$this->set_param( 'page', '2', 1 );
+
+		$result = Visual_Portfolio_Get::get_loop_items( $atts, 1 );
+
+		$this->assertSame( 'Image 3', $result['items'][0]['title'] );
+
+		// The legacy parameter is not this loop's, and a loop without an id does
+		// not answer to a namespaced one.
+		$this->reset_loop_state();
+
+		$this->assertSame( 'Image 1', Visual_Portfolio_Get::get_loop_items( $atts )['items'][0]['title'] );
+	}
+
+	/**
+	 * Paging one loop leaves the other loop where it was.
+	 *
+	 * The two loops are deliberately identical: same attributes, same request,
+	 * only the query id differs. A memo keyed on the attributes and the legacy
+	 * parameter names cannot tell them apart and serves the second loop the
+	 * items of the first.
+	 *
+	 * @return void
+	 */
+	public function test_two_loops_page_independently() {
+		$atts = $this->get_atts( 'images', 2, array( 'images' => $this->get_images( 6 ) ) );
+
+		$this->set_param( 'page', '2', 1 );
+
+		$first  = Visual_Portfolio_Get::get_loop_items( $atts, 1 );
+		$second = Visual_Portfolio_Get::get_loop_items( $atts, 2 );
+
+		$this->assertSame( 'Image 3', $first['items'][0]['title'] );
+		$this->assertSame( 'Image 1', $second['items'][0]['title'] );
+
+		// And the other way round, so the assertion cannot pass on ordering.
+		$this->reset_loop_state();
+
+		$this->assertSame( 'Image 1', Visual_Portfolio_Get::get_loop_items( $atts, 2 )['items'][0]['title'] );
+		$this->assertSame( 'Image 3', Visual_Portfolio_Get::get_loop_items( $atts, 1 )['items'][0]['title'] );
+	}
+
+	/**
+	 * Filtering one loop leaves the other loop unfiltered.
+	 *
+	 * @return void
+	 */
+	public function test_two_loops_filter_independently() {
+		$images = array_merge( $this->get_images( 2, 'Cats' ), $this->get_images( 3, 'Dogs' ) );
+		$atts   = $this->get_atts( 'images', 10, array( 'images' => $images ) );
+
+		$this->set_param( 'filter', 'cats', 1 );
+
+		$this->assertCount( 2, Visual_Portfolio_Get::get_loop_items( $atts, 1 )['items'] );
+		$this->assertCount( 5, Visual_Portfolio_Get::get_loop_items( $atts, 2 )['items'] );
+	}
+
+	/**
+	 * Sorting one loop leaves the other loop in its own order.
+	 *
+	 * @return void
+	 */
+	public function test_two_loops_sort_independently() {
+		// Newest first is the default order, so the untouched loop answers with
+		// these the other way round.
+		$this->factory->post->create( array( 'post_title' => 'Alpha' ) );
+		$this->factory->post->create( array( 'post_title' => 'Beta' ) );
+
+		$atts = $this->get_atts( 'posts', 10, array( 'source' => 'post' ) );
+
+		$this->set_param( 'sort', 'title', 1 );
+
+		$sorted    = wp_list_pluck( Visual_Portfolio_Get::get_loop_items( $atts, 1 )['items'], 'title' );
+		$untouched = wp_list_pluck( Visual_Portfolio_Get::get_loop_items( $atts, 2 )['items'], 'title' );
+
+		$this->assertSame( array( 'Alpha', 'Beta' ), $sorted );
+		$this->assertSame( array( 'Beta', 'Alpha' ), $untouched );
+	}
+
+	/**
+	 * The category links of an item point back into the filter of its own loop.
+	 *
+	 * @return void
+	 */
+	public function test_image_categories_carry_namespaced_filter_urls() {
+		$atts = $this->get_atts( 'images', 6, array( 'images' => $this->get_images( 1, 'Cats' ) ) );
+
+		$result = Visual_Portfolio_Get::get_loop_items( $atts, 2 );
+
+		$url = $result['items'][0]['categories'][0]['url'];
+
+		$this->assertStringContainsString( 'vp-2-filter=cats', $url );
+		$this->assertStringNotContainsString( 'vp_filter', $url );
+	}
+
+	/**
+	 * The memo of a loop does not survive a change of its own parameters.
+	 *
+	 * @return void
+	 */
+	public function test_memoization_keys_on_the_namespaced_state() {
+		$images = array_merge( $this->get_images( 2, 'Cats' ), $this->get_images( 3, 'Dogs' ) );
+		$atts   = $this->get_atts( 'images', 10, array( 'images' => $images ) );
+
+		$this->assertCount( 5, Visual_Portfolio_Get::get_loop_items( $atts, 1 )['items'] );
+
+		$this->set_param( 'filter', 'cats', 1 );
+
+		$this->assertCount( 2, Visual_Portfolio_Get::get_loop_items( $atts, 1 )['items'] );
 	}
 }

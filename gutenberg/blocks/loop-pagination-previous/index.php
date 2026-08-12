@@ -50,7 +50,8 @@ class Visual_Portfolio_Block_Loop_Pagination_Previous {
 		}
 
 		// Get current page.
-		$current_page = Visual_Portfolio_Get::get_current_page_number();
+		$query_id     = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
+		$current_page = Visual_Portfolio_Get::get_current_page_number( $query_id );
 
 		// If on the first page, don't show the previous link.
 		if ( $current_page <= 1 ) {
@@ -85,7 +86,8 @@ class Visual_Portfolio_Block_Loop_Pagination_Previous {
 			array(
 				'pagination_paged__show_arrows'  => true,
 				'pagination_paged__show_numbers' => false,
-			)
+			),
+			$query_id
 		);
 
 		// Find the previous page link from the pagination links.

@@ -50,18 +50,39 @@ class Visual_Portfolio_SEO_Optimization {
 	 * while allowing crawlers to follow links.
 	 */
 	public function add_robots_meta() {
-		if (
-			$this->is_not_vp_archive( get_queried_object_id() ) &&
-			(
-				isset( $_GET['vp_filter'] ) ||
-				isset( $_GET['vp_sort'] ) ||
-				isset( $_GET['vp_search'] ) ||
-				// For paginated content beyond page 1.
-				( isset( $_GET['vp_page'] ) && (int) $_GET['vp_page'] > 1 )
-			)
-		) {
+		if ( $this->is_not_vp_archive( get_queried_object_id() ) && $this->is_narrowed_request() ) {
 			echo '<meta name="robots" content="noindex, follow" />' . "\n";
 		}
+	}
+
+	/**
+	 * Whether the request asks for a filtered, sorted, searched or paged view.
+	 *
+	 * Both parameter schemes count: the legacy gallery names them `vp_filter`
+	 * and friends, a Gallery Loop block names them after its own query id
+	 * (`vp-3-filter`), and a duplicate of the same content is a duplicate under
+	 * either name.
+	 *
+	 * @return bool
+	 */
+	private function is_narrowed_request() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		foreach ( array_keys( $_GET ) as $name ) {
+			$name = (string) $name;
+
+			if ( ! preg_match( '/^vp[_-](?:[0-9]+-)?(filter|sort|search|page)$/', $name, $matches ) ) {
+				continue;
+			}
+
+			// Page one is the canonical view, and every other parameter narrows
+			// the content by being there at all.
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.NonceVerification.Recommended
+			if ( 'page' !== $matches[1] || (int) $_GET[ $name ] > 1 ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

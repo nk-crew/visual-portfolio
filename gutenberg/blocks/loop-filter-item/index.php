@@ -101,18 +101,21 @@ class Visual_Portfolio_Block_Loop_Filter_Item {
 			return '';
 		}
 
+		$query_id = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
+
 		$filter_link = Visual_Portfolio_Block_Loop::add_random_seed(
 			Visual_Portfolio_Get::get_pagenum_link(
 				array(
 					'vp_filter' => $filter_value,
 					'vp_page'   => 1,
-				)
+				),
+				$query_id
 			),
 			$block->context
 		);
 
 		// Determine if this item should be active.
-		$current_filter = Visual_Portfolio_Get::get_filter_active_item( array() );
+		$current_filter = Visual_Portfolio_Get::get_filter_active_item( array(), $query_id );
 
 		if ( $is_all ) {
 			// The "All" item is active only when no filter is set in the URL.

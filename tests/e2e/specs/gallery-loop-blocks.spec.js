@@ -8,6 +8,7 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { createRegularPosts } from '../utils/create-posts';
+import { getLoopParamPattern } from '../utils/loop-query-params';
 import { openPublishedPage } from '../utils/open-published-page';
 import { getPluginSlug } from '../utils/plugin-slug';
 
@@ -163,9 +164,18 @@ test.describe('Gallery Loop blocks', () => {
 		const label = (await categoryLink.innerText()).trim();
 
 		// The URL is built at render time from the page being viewed, and posts
-		// are filtered by `taxonomy:slug`.
+		// are filtered by `taxonomy:slug` under the parameter of this loop.
 		expect(href).toContain(pageUrl.pathname);
-		expect(href).toContain('vp_filter=category%3A');
+
+		const filterParams = [...new URL(href, pageUrl).searchParams.entries()];
+
+		expect(
+			filterParams.filter(
+				([name, value]) =>
+					getLoopParamPattern('filter').test(name) &&
+					value.startsWith('category:')
+			)
+		).toHaveLength(1);
 
 		await categoryLink.click();
 

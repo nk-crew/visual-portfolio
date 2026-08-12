@@ -267,6 +267,9 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				require_once $this->plugin_path . 'gutenberg/blocks/item-date/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/item-meta/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/item-read-more/index.php';
+
+				// Reads the context keys of the item template, so it follows it.
+				require_once $this->plugin_path . 'classes/class-block-bindings.php';
 			}
 
 			require_once $this->plugin_path . 'classes/class-shortcode.php';

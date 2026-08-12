@@ -8,6 +8,7 @@
 	"ancestor": ["visual-portfolio/loop-filter"],
 	"textdomain": "visual-portfolio",
 	"usesContext": [
+		"vp/queryId",
 		"vp/queryType",
 		"vp/baseQuery",
 		"vp/postsQuery",

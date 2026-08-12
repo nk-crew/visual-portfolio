@@ -60,7 +60,7 @@ class Visual_Portfolio_Block_Loop_No_Results {
 			return '';
 		}
 
-		$result = Visual_Portfolio_Get::get_loop_items( $atts );
+		$result = Visual_Portfolio_Get::get_loop_items( $atts, Visual_Portfolio_Block_Loop::get_query_id( $block->context ) );
 
 		// A query that could not be resolved at all is not the same as one that
 		// found nothing, and the item template stays silent about it too.

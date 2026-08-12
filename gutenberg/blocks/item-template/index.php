@@ -114,6 +114,53 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * Every context key a gallery item can carry.
+	 *
+	 * Written out rather than read off `map_item_to_context()`: the block
+	 * bindings source declares the keys it needs at registration time, before
+	 * any item exists, and mapping an empty item to find out would run the
+	 * `vpf_loop_item_context` callbacks of Pro and themes with nothing to map.
+	 * `test-class-block-bindings.php` holds the two lists together.
+	 *
+	 * The trailing four are the keys reserved for Pro in `03-pro-integration.md`
+	 * - free never fills them, and declaring them here means a Pro item value
+	 * can be bound without Pro touching this source.
+	 *
+	 * @return array
+	 */
+	public static function get_context_keys() {
+		return array(
+			'vp/itemId',
+			'vp/itemPostId',
+			'vp/itemImgId',
+			'vp/itemImgUrl',
+			'vp/itemImgAlt',
+			'vp/itemNoImgId',
+			'vp/itemFocalPoint',
+			'vp/itemUrl',
+			'vp/itemAriaLabel',
+			'vp/itemTitle',
+			'vp/itemContent',
+			'vp/itemExcerpt',
+			'vp/itemCategories',
+			'vp/itemFormat',
+			'vp/itemVideoUrl',
+			'vp/itemAuthor',
+			'vp/itemAuthorUrl',
+			'vp/itemAuthorAvatar',
+			'vp/itemPublishedTime',
+			'vp/itemCommentsCount',
+			'vp/itemCommentsUrl',
+			'vp/itemViewsCount',
+			'vp/itemReadingTime',
+			'vp/itemHoverImgId',
+			'vp/itemHoverVideoUrl',
+			'vp/itemPopupData',
+			'vp/itemAlbumUrl',
+		);
+	}
+
+	/**
 	 * Fallback image URL of an item.
 	 *
 	 * Item blocks render images through `Visual_Portfolio_Images`, which resolves
@@ -198,7 +245,7 @@ class Visual_Portfolio_Block_Item_Template {
 			}
 		}
 
-		$result = $options ? Visual_Portfolio_Get::get_loop_items( $atts ) : false;
+		$result = $options ? Visual_Portfolio_Get::get_loop_items( $atts, Visual_Portfolio_Block_Loop::get_query_id( $block->context ) ) : false;
 
 		// An empty list is still printed: it is the node the front end replaces
 		// when the loop navigates. A no results block is a later phase.

@@ -8,6 +8,7 @@
 	"description": "Displays the next page link.",
 	"textdomain": "visual-portfolio",
 	"usesContext": [
+		"vp/queryId",
 		"vp/queryType",
 		"vp/baseQuery",
 		"vp/postsQuery",

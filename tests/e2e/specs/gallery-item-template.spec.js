@@ -9,6 +9,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { createRegularPosts } from '../utils/create-posts';
 import { getEditorCanvas } from '../utils/editor-canvas';
+import { getLoopParam } from '../utils/loop-query-params';
 import { openPublishedPage } from '../utils/open-published-page';
 import { getPluginSlug } from '../utils/plugin-slug';
 
@@ -355,9 +356,8 @@ test.describe('Gallery Item Template', () => {
 			.locator('.vp-block-loop-pagination-numbers a[aria-label="Page 2"]')
 			.click();
 
-		await expect
-			.poll(() => new URL(frontend.url()).searchParams.get('vp_page'))
-			.toBe('2');
+		// The page lives in the parameter of this loop, not in a global one.
+		await expect.poll(() => getLoopParam(frontend.url(), 'page')).toBe('2');
 
 		await expect.poll(() => titles.allInnerTexts()).not.toEqual(firstPage);
 

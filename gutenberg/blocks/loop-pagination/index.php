@@ -66,19 +66,22 @@ class Visual_Portfolio_Block_Loop_Pagination {
 			return 1;
 		}
 
-		// The filter narrows the query, so it is part of the identity here.
-		$identity = wp_json_encode( array( $options, Visual_Portfolio_Get::get_filter_active_item( array() ) ) );
+		$query_id = Visual_Portfolio_Block_Loop::get_query_id( $context );
+
+		// The filter narrows the query, so it is part of the identity here - and
+		// which filter that is depends on the loop.
+		$identity = wp_json_encode( array( $options, $query_id, Visual_Portfolio_Get::get_filter_active_item( array(), $query_id ) ) );
 
 		// Without a reliable identity two different loops would share one entry,
 		// which is worse than calculating twice.
 		if ( false === $identity ) {
-			return Visual_Portfolio_Get::calculate_max_pages( $options );
+			return Visual_Portfolio_Get::calculate_max_pages( $options, $query_id );
 		}
 
 		$cache_key = md5( $identity );
 
 		if ( ! isset( self::$max_pages_cache[ $cache_key ] ) ) {
-			self::$max_pages_cache[ $cache_key ] = Visual_Portfolio_Get::calculate_max_pages( $options );
+			self::$max_pages_cache[ $cache_key ] = Visual_Portfolio_Get::calculate_max_pages( $options, $query_id );
 		}
 
 		return self::$max_pages_cache[ $cache_key ];
