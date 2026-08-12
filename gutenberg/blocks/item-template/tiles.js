@@ -23,7 +23,12 @@ const MAX_ROW_SPAN = 6;
  * @return {number} number.
  */
 function toNumber(value, fallback) {
-	const parsed = parseFloat(String(value ?? '').trim());
+	const raw = String(value ?? '').trim();
+
+	// `Number` rather than `parseFloat`, which reads a number off the front of
+	// `2px` and leaves the editor laying a tile out to a width the server, whose
+	// `is_numeric()` refuses the same string, never renders.
+	const parsed = '' === raw ? Number.NaN : Number(raw);
 
 	return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }

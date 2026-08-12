@@ -51,6 +51,7 @@
 			"default": { "type": "flex" }
 		}
 	},
+	"usesContext": ["vp/blockId"],
 	"styles": [{ "name": "fill", "label": "Fill" }],
 	"style": "visual-portfolio-block-loop-pagination"
 }

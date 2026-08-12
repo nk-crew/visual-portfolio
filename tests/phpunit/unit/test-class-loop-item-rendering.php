@@ -54,6 +54,11 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 
 		$this->skip_without_loop_blocks();
 
+		// One image per request is asked for first, and every test here is a
+		// request of its own - the flag is process-wide and core never resets it
+		// between them.
+		wp_high_priority_element_flag( true );
+
 		update_option( 'vp_images', array( 'lazy_loading' => '' ) );
 		Visual_Portfolio_Images::init_lazyload();
 	}

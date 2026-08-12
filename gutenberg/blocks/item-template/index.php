@@ -47,16 +47,6 @@ class Visual_Portfolio_Block_Item_Template {
 	const CAROUSEL_STYLE = 'visual-portfolio-blossom-carousel';
 
 	/**
-	 * Tiles patterns already written into the page.
-	 *
-	 * Two galleries with the same pattern share one rule set, and a page can
-	 * hold any number of galleries.
-	 *
-	 * @var array
-	 */
-	private static $printed_tiles = array();
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -242,6 +232,31 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * Whether anything inside the item opens the lightbox.
+	 *
+	 * Asked once for the list rather than per item: resolving the popup payload
+	 * reads the attachment and its meta, and a gallery whose items are plain
+	 * links has nothing to open.
+	 *
+	 * @param array $blocks - inner blocks of the item template.
+	 *
+	 * @return bool
+	 */
+	private static function opens_a_popup( $blocks ) {
+		foreach ( $blocks as $inner ) {
+			if ( isset( $inner['attrs']['clickAction'] ) && 'popup' === $inner['attrs']['clickAction'] ) {
+				return true;
+			}
+
+			if ( ! empty( $inner['innerBlocks'] ) && self::opens_a_popup( $inner['innerBlocks'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Map a resolved loop item to the block context of the item blocks.
 	 *
 	 * The single mapping of item data to context: the render callback and the
@@ -252,10 +267,11 @@ class Visual_Portfolio_Block_Item_Template {
 	 * @param array  $options - portfolio options the item was resolved with.
 	 * @param string $prefix  - prefix of the returned keys. Block context is namespaced,
 	 *                          a REST response is not.
+	 * @param bool   $with_popup - whether anything in the item opens the lightbox.
 	 *
 	 * @return array
 	 */
-	public static function map_item_to_context( $item, $options, $prefix = 'vp/' ) {
+	public static function map_item_to_context( $item, $options, $prefix = 'vp/', $with_popup = true ) {
 		$context = array(
 			'vp/itemId'            => $item['uid'] ?? '',
 			'vp/itemPostId'        => $item['post_id'] ?? '',
@@ -285,8 +301,10 @@ class Visual_Portfolio_Block_Item_Template {
 			'vp/itemReadingTime'   => $item['reading_time'] ?? '',
 
 			// Everything the lightbox needs to show this item, resolved here so
-			// that an item block only has to decide whether to open it.
-			'vp/itemPopupData'     => Visual_Portfolio_Popup::get_item_data( $item, $options ),
+			// that an item block only has to decide whether to open it. Reading
+			// it costs an attachment lookup and half a dozen meta reads per
+			// item, so a gallery with nothing to open asks for nothing.
+			'vp/itemPopupData'     => $with_popup ? Visual_Portfolio_Popup::get_item_data( $item, $options ) : array(),
 		);
 
 		/**
@@ -472,7 +490,13 @@ class Visual_Portfolio_Block_Item_Template {
 	 * @return array Attributes to merge into the image, possibly empty.
 	 */
 	private function get_image_loading_attributes( $index, $first_row ) {
-		if ( 0 === $index ) {
+		// Core's own flag rather than a counter of ours: it is per request, so a
+		// second gallery does not split the priority budget with the first, and
+		// it is the same flag a hero image above the loop claims - whoever comes
+		// first keeps it.
+		if ( 0 === $index && wp_high_priority_element_flag() ) {
+			wp_high_priority_element_flag( false );
+
 			return array(
 				'loading'       => 'eager',
 				'fetchpriority' => 'high',
@@ -587,12 +611,12 @@ class Visual_Portfolio_Block_Item_Template {
 	private function get_tiles_style( $tiles ) {
 		$class = Visual_Portfolio_Tiles_Parser::get_class( $tiles );
 
-		if ( isset( self::$printed_tiles[ $class ] ) ) {
-			return '';
-		}
-
-		self::$printed_tiles[ $class ] = true;
-
+		// Printed beside every list rather than once per pattern per request.
+		// Nothing here can tell a discarded render from the real one - an SEO
+		// plugin running `the_content` in `wp_head` used to consume the only
+		// copy, leaving the gallery carrying a class with no rules behind it.
+		// Two galleries sharing a pattern repeat a few hundred bytes; the
+		// alternative was a tile pattern that silently collapsed to a grid.
 		return sprintf(
 			'<style>%s</style>',
 			// The parser writes selectors, spans and ratios out of numbers it
@@ -712,9 +736,11 @@ class Visual_Portfolio_Block_Item_Template {
 		// The widest the layout ever gets, which is the row a desktop sees first.
 		list( $first_row ) = $this->get_layout_columns( $attributes, $this->get_layout_type( $attributes ) );
 
+		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
+
 		foreach ( $items as $item ) {
 			$item_context = array_merge(
-				self::map_item_to_context( $item, $result['options'] ),
+				self::map_item_to_context( $item, $result['options'], 'vp/', $with_popup ),
 				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row ) )
 			);
 

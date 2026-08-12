@@ -90,6 +90,7 @@ export default function BlockEdit({
 		'vp/baseQuery': baseQuery,
 		'vp/imagesQuery': imagesQuery,
 		'vp/postsQuery': postsQuery,
+		'vp/sourceQuery': sourceQuery,
 	} = context;
 
 	// Selectors are read inside the effect: the items are driven by the query,
@@ -109,6 +110,7 @@ export default function BlockEdit({
 		source: postsQuery?.source,
 		taxonomies: postsQuery?.taxonomies,
 		images: imagesQuery?.images,
+		sourceQuery,
 	});
 
 	useEffect(() => {
@@ -135,6 +137,7 @@ export default function BlockEdit({
 				baseQuery,
 				postsQuery,
 				imagesQuery,
+				sourceQuery,
 				post_id: postId,
 				block_id: clientId,
 			},

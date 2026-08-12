@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<!-- wp:visual-portfolio/loop {"queryType":"images","baseQuery":{"perPage":12}} -->
+<!-- wp:visual-portfolio/loop {"block_id":"vppatmasonryfade","queryType":"images","baseQuery":{"perPage":12}} -->
 <div class="vp-block-loop">
 	<!-- wp:visual-portfolio/item-template {"layoutType":"masonry","layoutColumns":3} -->
 		<!-- wp:visual-portfolio/item-cover {"aspectRatio":"","effect":"fade","clickAction":"popup","customHoverOverlayColor":"#000000","hoverDimRatio":60} -->

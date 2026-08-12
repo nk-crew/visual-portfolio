@@ -22,6 +22,13 @@ const DOTS_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-dots';
 const MASONRY_CLASS = 'vp-layout-masonry';
 const MASONRY_NATIVE_CLASS = 'vp-layout-masonry-native';
 
+// Dispatched on the list by the family store once the router has swapped the
+// region in. An event rather than a cross-store call: the two modules load
+// independently and neither is guaranteed to be evaluated first.
+const RELAYOUT_EVENT = 'vp-relayout';
+
+const noop = () => {};
+
 const carousels = new WeakMap();
 const justifiedLists = new WeakSet();
 
@@ -389,6 +396,25 @@ function getListOf(element) {
 	return list && list.matches(LIST_SELECTOR) ? list : null;
 }
 
+/**
+ * Start the layout a list says it was rendered as.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function|undefined} Teardown, when the layout has one.
+ */
+function startLayout(list) {
+	if ('justified' === list.dataset.vpLayout) {
+		return initJustified(list);
+	}
+
+	if ('carousel' === list.dataset.vpLayout) {
+		return initCarousel(list);
+	}
+
+	return undefined;
+}
+
 store('visual-portfolio/item-template', {
 	state: {
 		// Read by the markup rather than by this module: a control that only
@@ -462,15 +488,26 @@ store('visual-portfolio/item-template', {
 		initLayout() {
 			const { ref } = getElement();
 
-			if ('justified' === ref.dataset.vpLayout) {
-				return initJustified(ref);
+			let teardown = startLayout(ref);
+
+			if (!teardown) {
+				return undefined;
 			}
 
-			if ('carousel' === ref.dataset.vpLayout) {
-				return initCarousel(ref);
-			}
+			// A region swap replaces the items but keeps the list, so this
+			// callback never runs again and the layout would go on measuring
+			// the page before it. The loop announces the swap.
+			const relayout = () => {
+				teardown();
+				teardown = startLayout(ref) || noop;
+			};
 
-			return undefined;
+			ref.addEventListener(RELAYOUT_EVENT, relayout);
+
+			return () => {
+				ref.removeEventListener(RELAYOUT_EVENT, relayout);
+				teardown();
+			};
 		},
 	},
 });

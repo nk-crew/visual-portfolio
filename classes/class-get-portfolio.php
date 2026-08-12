@@ -1015,14 +1015,19 @@ class Visual_Portfolio_Get {
 		$query_id = self::sanitize_query_id( $query_id );
 		$state    = array( 'query_id' => $query_id );
 
+		// Read where the pipeline reads it. `$_REQUEST` also carries the body of
+		// a POST - the REST preview is one - so the key would vary while the
+		// items it names do not, and with some `request_order` settings it would
+		// vary with cookies as well.
 		foreach ( self::$loop_query_vars as $role ) {
 			$name = self::get_query_var_name( $role, $query_id );
 
             // phpcs:ignore WordPress.Security.NonceVerification
-			$state[ $name ] = isset( $_REQUEST[ $name ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ $name ] ) ) : null;
+			$state[ $name ] = isset( $_GET[ $name ] ) ? sanitize_text_field( wp_unslash( $_GET[ $name ] ) ) : null;
 		}
 
-		// The random seed is one per request, whichever loop asks for it.
+		// The random seed is one per request, whichever loop asks for it, and
+		// `get_rand_seed_session()` reads it out of `$_REQUEST`.
         // phpcs:ignore WordPress.Security.NonceVerification
 		$state['vpf_random_seed'] = isset( $_REQUEST['vpf_random_seed'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['vpf_random_seed'] ) ) : null;
 
@@ -1059,7 +1064,9 @@ class Visual_Portfolio_Get {
 
 		$options = self::get_options( $atts );
 
-		if ( ! $options ) {
+		// No source is the same answer as no options: there is nothing to resolve,
+		// and every branch from here reads it.
+		if ( ! $options || ! isset( $options['content_source'] ) ) {
 			return false;
 		}
 
@@ -1554,11 +1561,10 @@ class Visual_Portfolio_Get {
 			return isset( $custom_query->max_num_pages ) ? max( 1, (int) $custom_query->max_num_pages ) : 1;
 		}
 
-		// A source with neither its own query nor posts has nothing to count.
-		if ( 'post-based' !== $content_source ) {
-			return 1;
-		}
-
+		// Everything left over is a `WP_Query`, which is what `resolve_query()`
+		// does with it too. A source that widens the query through
+		// `vpf_extend_query_args` rather than replacing the object used to fall
+		// past here and report one page while rendering several.
 		$query     = new WP_Query( $query_opts );
 		$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
 
@@ -2149,6 +2155,13 @@ class Visual_Portfolio_Get {
 				$query_opts['orderby'] = $custom_order;
 				$query_opts['order']   = $custom_order_direction;
 			}
+
+			// Asked again now that `$query_opts` is filled: the `current_query`
+			// branch replaces it with the main query's vars and `custom_query`
+			// merges the author's own query string into it, and both are how a
+			// mapped archive passes its `vp_filter` in - there is no request
+			// parameter to read it from.
+			$active_filter = $for_filter ? false : self::get_filter_active_item( $query_opts, $query_id );
 
 			// Load certain taxonomies using custom filter.
 			if ( false !== $active_filter ) {

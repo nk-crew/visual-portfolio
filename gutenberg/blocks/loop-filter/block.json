@@ -46,6 +46,7 @@
 		}
 	},
 	"usesContext": [
+		"vp/blockId",
 		"vp/queryType",
 		"vp/baseQuery",
 		"vp/postsQuery",

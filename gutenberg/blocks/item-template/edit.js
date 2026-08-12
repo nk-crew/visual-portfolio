@@ -204,6 +204,7 @@ export default function BlockEdit({
 		'vp/baseQuery': baseQuery,
 		'vp/postsQuery': postsQuery,
 		'vp/imagesQuery': imagesQuery,
+		'vp/sourceQuery': sourceQuery,
 	} = context;
 
 	useLoopOrphanWarning('visual-portfolio/item-template', context);
@@ -221,8 +222,11 @@ export default function BlockEdit({
 			baseQuery: { perPage: baseQuery?.perPage },
 			postsQuery,
 			imagesQuery,
+			// Where a third-party source keeps its settings. Without it the
+			// preview asks for a source it gives no options to.
+			sourceQuery,
 		}),
-		[queryType, baseQuery?.perPage, postsQuery, imagesQuery]
+		[queryType, baseQuery?.perPage, postsQuery, imagesQuery, sourceQuery]
 	);
 
 	// Items are resolved on the server for every source alike - titles, category

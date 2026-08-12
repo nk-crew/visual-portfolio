@@ -86,14 +86,14 @@ class Visual_Portfolio_Block_Loop_Pagination_Numbers {
 					$output .= sprintf(
 						'<span aria-label="%1$s" aria-current="page" class="is-active">%2$s</span>',
 						// translators: %s page number.
-						sprintf( esc_attr__( 'Page %s', 'visual-portfolio' ), $link['label'] ),
+						esc_attr( sprintf( __( 'Page %s', 'visual-portfolio' ), $link['label'] ) ),
 						esc_html( $link['label'] )
 					);
 				} else {
 					$output .= sprintf(
 						'<a aria-label="%1$s" href="%2$s" data-wp-interactive="%3$s" data-wp-on--click="actions.navigate">%4$s</a>',
 						// translators: %s page number.
-						sprintf( esc_attr__( 'Page %s', 'visual-portfolio' ), $link['label'] ),
+						esc_attr( sprintf( __( 'Page %s', 'visual-portfolio' ), $link['label'] ) ),
 						$url,
 						esc_attr( Visual_Portfolio_Block_Loop::STORE ),
 						esc_html( $link['label'] )

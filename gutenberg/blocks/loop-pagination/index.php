@@ -68,6 +68,17 @@ class Visual_Portfolio_Block_Loop_Pagination {
 
 		$query_id = Visual_Portfolio_Block_Loop::get_query_id( $context );
 
+		// The count the loop's own items were resolved with, which is the honest
+		// one: counting again here runs a second query that already has this
+		// loop's posts in `post__not_in` when it avoids duplicates, and reports
+		// a page less than there is. Memoized, so it costs nothing when the item
+		// template asked first - and answers for it when the controls come first.
+		$result = Visual_Portfolio_Get::get_loop_items( $options, $query_id );
+
+		if ( $result && isset( $result['max_pages'] ) ) {
+			return max( 1, (int) $result['max_pages'] );
+		}
+
 		// The filter narrows the query, so it is part of the identity here - and
 		// which filter that is depends on the loop.
 		$identity = wp_json_encode( array( $options, $query_id, Visual_Portfolio_Get::get_filter_active_item( array(), $query_id ) ) );

@@ -99,6 +99,13 @@ class Visual_Portfolio_SEO_Optimization {
 	 * @return array|null `page`, `max_pages` and `query_id`, or null.
 	 */
 	private function get_paged_loop() {
+		// This class loads on every version the plugin supports, the loop family
+		// only from the one it needs. Saved loop markup outlives a core rollback,
+		// and a legacy gallery on page two is enough to get us here.
+		if ( ! visual_portfolio()->supports_loop_blocks() ) {
+			return null;
+		}
+
 		if ( ! is_singular() || ! $this->has_page_param() ) {
 			return null;
 		}

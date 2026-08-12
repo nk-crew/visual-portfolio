@@ -20,6 +20,9 @@ const TRIGGER_SELECTOR =
 	'.vp-block-loop-pagination-load-more, .vp-block-loop-pagination-infinite';
 const MASONRY_CLASS = 'vp-layout-masonry';
 
+// Listened for by the item template module, which owns justified and carousel.
+const RELAYOUT_EVENT = 'vp-relayout';
+
 const masonryLayouts = new WeakMap();
 const resizeObservers = new WeakMap();
 const observedWidths = new WeakMap();
@@ -198,7 +201,13 @@ function refreshLayout(list, added) {
 		// justified loop next to it would take that layout apart.
 		if (list.classList.contains(MASONRY_CLASS)) {
 			initMasonry(list);
+
+			return;
 		}
+
+		// Justified and carousel are the item template module's, and its own
+		// init callback does not run again on a list the router kept.
+		list.dispatchEvent(new window.CustomEvent(RELAYOUT_EVENT));
 
 		return;
 	}
@@ -494,6 +503,12 @@ store('visual-portfolio/loop', {
 			const loop = ref.closest(LOOP_SELECTOR);
 
 			if (loop) {
+				// A Load More still in flight would append its page under the
+				// one the router is about to render, and register undos for a
+				// rollback that already ran.
+				pendingRequests.get(loop)?.abort();
+				pendingRequests.delete(loop);
+
 				undoManualEdits(loop);
 			}
 

@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<!-- wp:visual-portfolio/loop {"queryType":"images","baseQuery":{"perPage":12}} -->
+<!-- wp:visual-portfolio/loop {"block_id":"vppatmasonryclassic","queryType":"images","baseQuery":{"perPage":12}} -->
 <div class="vp-block-loop">
 	<!-- wp:visual-portfolio/item-template {"layoutType":"masonry","layoutColumns":4} -->
 		<!-- wp:visual-portfolio/item-image {"clickAction":"popup"} /-->
