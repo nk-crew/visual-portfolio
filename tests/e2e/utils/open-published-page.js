@@ -14,9 +14,25 @@ export async function openPublishedPage(page, options = {}) {
 		.locator('.components-button', { hasText: 'View Page' })
 		.first();
 
-	// The post-publish panel can be dismissed by the time we get here, and the
-	// snackbar goes away on its own. Navigating to the permalink is equivalent.
-	if (!(await viewButton.isVisible())) {
+	const popupPromise = page
+		.waitForEvent('popup', { timeout })
+		.catch(() => null);
+	const frontendNavigationPromise = page
+		.waitForURL((url) => !url.pathname.includes('/wp-admin/'), {
+			timeout,
+			waitUntil: 'domcontentloaded',
+		})
+		.catch(() => null);
+
+	// The post-publish snackbar dismisses itself, so the button can be gone
+	// between being seen and being clicked. Treat a failed click as "not there"
+	// rather than checking first and racing the animation.
+	const clicked = await viewButton
+		.click({ timeout: 5000 })
+		.then(() => true)
+		.catch(() => false);
+
+	if (!clicked) {
 		const permalink = await page.evaluate(
 			() => window.wp?.data?.select('core/editor')?.getPermalink() || ''
 		);
@@ -31,18 +47,6 @@ export async function openPublishedPage(page, options = {}) {
 
 		return page;
 	}
-
-	const popupPromise = page
-		.waitForEvent('popup', { timeout })
-		.catch(() => null);
-	const frontendNavigationPromise = page
-		.waitForURL((url) => !url.pathname.includes('/wp-admin/'), {
-			timeout,
-			waitUntil: 'domcontentloaded',
-		})
-		.catch(() => null);
-
-	await viewButton.click();
 
 	const popup = await Promise.race([
 		popupPromise,

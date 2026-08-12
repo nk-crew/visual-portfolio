@@ -106,17 +106,29 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 		/**
 		 * Check if the Gallery Loop block family can be registered.
 		 *
-		 * The family is built on the Interactivity API, script modules and block
-		 * bindings, none of which are guaranteed before WordPress 6.5. One gate
-		 * for the whole family, so no file inside it needs a version branch or a
-		 * `function_exists` guard of its own.
+		 * The family is written against the current editor rather than the oldest
+		 * one it could be made to work on: Interactivity API and script modules
+		 * (6.5), block bindings (6.5), responsive block styles and interactive
+		 * state styling (7.1). Columns and hover states are expressed through the
+		 * viewport and `:hover` mechanisms core now owns instead of a private
+		 * fallback of ours, and that is the version those exist in.
 		 *
-		 * The plugin minimum stays where it is - the legacy blocks hold it.
+		 * One gate for the whole family, so no file inside it needs a version
+		 * branch or a `function_exists` guard of its own.
+		 *
+		 * The plugin minimum stays where it is - the legacy blocks hold it, and
+		 * they keep working on every version they always did.
 		 *
 		 * @return bool
 		 */
 		public function supports_loop_blocks() {
-			return version_compare( get_bloginfo( 'version' ), '6.5', '>=' );
+			// `7.1-RC2` and `7.1-beta1` carry the 7.1 APIs, but `version_compare`
+			// ranks a pre-release below the release it precedes, so comparing the
+			// raw string would refuse the blocks to exactly the people testing
+			// them earliest.
+			$version = preg_replace( '/-.*$/', '', get_bloginfo( 'version' ) );
+
+			return version_compare( $version, '7.1', '>=' );
 		}
 
 		/**
