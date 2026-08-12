@@ -1,0 +1,121 @@
+.vpf-gallery-manager__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.vpf-gallery-manager__item {
+	position: relative;
+	aspect-ratio: 1;
+	background: var(--wp-components-color-gray-100, #f0f0f0);
+	border-radius: 2px;
+
+	&.is-dragging {
+		z-index: 1;
+		opacity: 0.6;
+	}
+}
+
+.components-button.vpf-gallery-manager__preview {
+	display: block;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	overflow: hidden;
+	border-radius: 2px;
+
+	img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.vpf-gallery-manager__preview-empty {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		135deg,
+		transparent 45%,
+		var(--wp-components-color-gray-300, #ddd) 45%,
+		var(--wp-components-color-gray-300, #ddd) 55%,
+		transparent 55%
+	);
+}
+
+.vpf-gallery-manager__item-actions {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	left: 2px;
+	display: flex;
+	justify-content: space-between;
+	pointer-events: none;
+	opacity: 0;
+
+	// Pointer users get the controls on hover; everyone else on focus. They stay
+	// in the tab order either way, so the gallery is operable from the keyboard -
+	// and while they are invisible they take no clicks, which would otherwise
+	// land on a remove button the user cannot see.
+	.vpf-gallery-manager__item:hover &,
+	&:focus-within {
+		pointer-events: auto;
+		opacity: 1;
+	}
+
+	.components-button {
+		color: #fff;
+		background: rgba(0, 0, 0, 0.6);
+
+		&:hover:not(:disabled),
+		&:focus:not(:disabled) {
+			color: #fff;
+			background: rgba(0, 0, 0, 0.8);
+		}
+
+		svg {
+			fill: currentcolor;
+		}
+	}
+}
+
+.vpf-gallery-manager__drag {
+	cursor: grab;
+}
+
+.vpf-gallery-manager__footer {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+}
+
+.vpf-gallery-manager__count {
+	font-size: 12px;
+	color: var(--wp-components-color-gray-700, #757575);
+}
+
+.vpf-gallery-manager__placeholder {
+	margin-bottom: 16px;
+}
+
+.vpf-gallery-manager-modal {
+	.components-base-control,
+	.components-focal-point-picker-control {
+		margin-bottom: 16px;
+	}
+}
+
+.vpf-gallery-manager-modal__nav {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+	font-size: 12px;
+	color: var(--wp-components-color-gray-700, #757575);
+}

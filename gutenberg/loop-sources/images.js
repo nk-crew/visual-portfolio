@@ -1,16 +1,10 @@
 import { PanelBody, SelectControl } from '@wordpress/components';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import GalleryControl from '../components/gallery-control';
-import { convertModernToLegacy } from '../utils/convert-legacy-attributes';
+import GalleryManager from './gallery-manager';
 import { ImagesIcon } from './icons';
 import { registerLoopSource } from './registry';
-
-// Per-image fields, registered from PHP together with the legacy gallery
-// control. Temporary: the gallery manager owns these fields, and the
-// `VP.LoopImageSettings` slot replaces `vpf_extend_image_controls` with them.
-const { controls: registeredControls } = window.VPGutenbergVariables;
 
 const TEXT_SOURCE_OPTIONS = [
 	{ value: 'none', label: __('None', 'visual-portfolio') },
@@ -70,11 +64,10 @@ function getUsedCategories(images) {
 /**
  * Settings of the images source.
  *
- * The gallery grid is still the legacy `GalleryControl`: it is driven by the
- * per-image fields registered in PHP and by the legacy attribute names, so it
- * gets legacy-shaped attributes handed to it. This is the seam - the native
- * gallery manager and the `VP.LoopImageSettings` slot replace this component,
- * and nothing outside this file knows how the images are edited.
+ * This file is the only one that knows how the images of a loop are edited: the
+ * gallery manager it mounts is native, and per-image fields are extended
+ * through the `VP.LoopImageSettings` slot rather than through the PHP control
+ * registry the legacy gallery control reads.
  *
  * @param {Object}   props               - component props.
  * @param {Object}   props.attributes    - loop attributes.
@@ -95,11 +88,6 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 	const update = (values) =>
 		setAttributes({ imagesQuery: { ...imagesQuery, ...values } });
 
-	const legacyAttributes = useMemo(
-		() => convertModernToLegacy(attributes),
-		[attributes]
-	);
-
 	useEffect(() => {
 		const used = getUsedCategories(images);
 
@@ -115,12 +103,8 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 
 	return (
 		<PanelBody title={__('Media Settings', 'visual-portfolio')}>
-			<GalleryControl
-				name="images"
-				imageControls={registeredControls?.images?.image_controls}
-				focalPoint={registeredControls?.images?.focal_point}
-				attributes={legacyAttributes}
-				value={images}
+			<GalleryManager
+				images={images}
 				onChange={(value) => update({ images: value })}
 				clientId={clientId}
 			/>

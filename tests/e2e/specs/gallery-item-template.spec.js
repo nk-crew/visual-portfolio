@@ -18,6 +18,8 @@ const IMAGES_COUNT = 3;
 const COLUMNS = 4;
 const GAP = '2rem';
 const CATEGORIES = ['Template Nature', 'Template City'];
+const MANAGER_TITLE = 'Manager edited title';
+const MANAGER_CATEGORY = 'Manager Category';
 
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
 const ITEM = '.wp-block-visual-portfolio-item-template__item';
@@ -596,6 +598,116 @@ test.describe('Gallery Item Template', () => {
 				frontend.locator(`${LIST} img.wp-image-${image.id}`)
 			).toHaveCount(1);
 		}
+	});
+
+	test('the gallery manager reorders and edits images from the inspector', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Template - gallery manager',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		// Attachment ids and nothing else, the way a pattern ships a gallery -
+		// the manager has to resolve the thumbnails on its own.
+		await editor.insertBlock(
+			getLoopBlock({
+				query: {
+					queryType: 'images',
+					imagesQuery: { images: images.map(({ id }) => ({ id })) },
+				},
+				perPage: IMAGES_COUNT,
+				itemBlocks: [{ name: 'visual-portfolio/item-title' }],
+			})
+		);
+
+		await editor.openDocumentSettingsSidebar();
+
+		const manager = page.locator('.vpf-gallery-manager');
+		const tiles = manager.locator('.vpf-gallery-manager__item');
+
+		await expect(tiles).toHaveCount(IMAGES_COUNT);
+		await expect(tiles.locator('img')).toHaveCount(IMAGES_COUNT);
+
+		const getImagesQuery = async () => {
+			const blocks = await editor.getBlocks();
+			const loop = blocks.find(
+				(block) => 'visual-portfolio/loop' === block.name
+			);
+
+			return loop?.attributes?.imagesQuery ?? {};
+		};
+
+		// The preview resolves through a request that writes `maxPages` back on
+		// the block; letting it land keeps it from re-rendering mid-gesture.
+		await expect(
+			getEditorCanvas(page, editor).locator(`${LIST} ${ITEM}:visible`)
+		).toHaveCount(IMAGES_COUNT);
+
+		// Reordering has to work without a mouse: the keyboard sensor picks the
+		// image up on Space and moves it with the arrow keys. The grid is
+		// centred first - a drag that starts against the edge of the sidebar
+		// scrolls it, and the sensor measures the grid before that.
+		const announcement = page.locator('[id^="DndLiveRegion"]');
+		const handle = manager.locator('.vpf-gallery-manager__drag').first();
+		await handle.evaluate((node) =>
+			node.scrollIntoView({ block: 'center' })
+		);
+		await handle.focus();
+		await page.keyboard.press('Space');
+
+		// The announcement is what says the image is up and the grid measured;
+		// before that the arrow keys have nothing to move it to.
+		await expect(announcement).toContainText('position 1');
+
+		await page.keyboard.press('ArrowRight');
+		await expect(announcement).toContainText('position 2');
+
+		await page.keyboard.press('Space');
+
+		await expect
+			.poll(async () =>
+				(await getImagesQuery()).images.map((image) => image.id)
+			)
+			.toEqual([images[1].id, images[0].id, images[2].id]);
+
+		// The drawer writes to the image it was opened on, and the categories of
+		// the images are what the filter block reads off the loop.
+		await tiles.first().locator('.vpf-gallery-manager__preview').click();
+
+		const drawer = page.getByRole('dialog', { name: 'Image Settings' });
+
+		await drawer.getByLabel('Title', { exact: true }).fill(MANAGER_TITLE);
+		await drawer
+			.getByRole('combobox', { name: 'Categories' })
+			.fill(MANAGER_CATEGORY);
+		await drawer
+			.getByRole('combobox', { name: 'Categories' })
+			.press('Enter');
+		await drawer.getByRole('button', { name: 'Close' }).click();
+
+		await expect
+			.poll(async () => {
+				const query = await getImagesQuery();
+
+				return {
+					title: query.images[0]?.title,
+					categories: query.categories,
+				};
+			})
+			.toEqual({ title: MANAGER_TITLE, categories: [MANAGER_CATEGORY] });
+
+		await editor.publishPost();
+
+		const frontend = await openPublishedPage(page);
+
+		await expect(
+			frontend.locator(`${LIST} ${ITEM}`).first().locator(TITLE)
+		).toHaveText(MANAGER_TITLE);
 	});
 
 	test('item date and item read more render inside every item', async ({
