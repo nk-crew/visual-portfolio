@@ -1344,6 +1344,116 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
+	 * Fill images with the data stored on their attachment posts.
+	 *
+	 * @param array $images images list.
+	 * @param array $options portfolio options.
+	 *
+	 * @return array
+	 */
+	private static function prepare_images_data( $images, $options ) {
+		if ( empty( $images ) ) {
+			return $images;
+		}
+
+		$images_ids = array();
+		foreach ( $images as $k => $img ) {
+			$images_ids[] = (int) $img['id'];
+		}
+
+		// Find all used attachments.
+		$all_attachments = get_posts(
+			array(
+				'post_type'              => 'attachment',
+				'posts_per_page'         => -1,
+				'paged'                  => -1,
+				'post__in'               => $images_ids,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		// prepare titles and descriptions.
+		foreach ( $images as $k => $img ) {
+			$has_custom_alt     = array_key_exists( 'alt', $img );
+			$item_alt           = $has_custom_alt ? (string) $img['alt'] : '';
+			$title_source       = $options['images_titles_source'] ?? 'custom';
+			$description_source = $options['images_descriptions_source'] ?? 'custom';
+			$img_meta           = array(
+				'title'             => '',
+				'image_title'       => '',
+				'image_description' => '',
+				'image_caption'     => '',
+				'image_alt'         => '',
+				'description'       => '',
+				'caption'           => '',
+				'alt'               => '',
+				'none'              => '',
+				'date'              => '',
+			);
+
+			// Find current attachment post data.
+			$attachment = false;
+			foreach ( $all_attachments as $post ) {
+				if ( $post->ID === (int) $img['id'] ) {
+					$attachment = $post;
+					break;
+				}
+			}
+
+			if ( $attachment ) {
+				// get image meta if needed.
+				if (
+					'none' !== $options['images_titles_source'] ||
+					'none' !== $options['images_descriptions_source'] ||
+
+					'image_title' === $options['images_order_by'] ||
+					'image_caption' === $options['images_order_by'] ||
+					'image_alt' === $options['images_order_by'] ||
+					'image_description' === $options['images_order_by']
+				) {
+					if ( $attachment && 'attachment' === $attachment->post_type ) {
+						$img_meta['title']       = $attachment->post_title;
+						$img_meta['description'] = $attachment->post_content;
+						$img_meta['caption']     = wp_get_attachment_caption( $attachment->ID );
+						$img_meta['alt']         = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
+					}
+				}
+
+				if ( $has_custom_alt && '' !== trim( $item_alt ) ) {
+					$img_meta['alt'] = $item_alt;
+				}
+
+				// title.
+				if ( 'custom' !== $options['images_titles_source'] ) {
+					$images[ $k ]['title'] = $img_meta[ $title_source ] ?? '';
+				}
+
+				// image title.
+				$images[ $k ]['image_title'] = $img_meta['title'] ?? '';
+
+				// description.
+				if ( 'custom' !== $options['images_descriptions_source'] ) {
+					$images[ $k ]['description'] = $img_meta[ $description_source ] ?? '';
+				}
+
+				// image description.
+				$images[ $k ]['image_description'] = $img_meta['description'] ?? '';
+
+				// image caption.
+				$images[ $k ]['image_caption'] = $img_meta['caption'] ?? '';
+
+				// image alt.
+				$images[ $k ]['image_alt'] = $img_meta['alt'] ?? '';
+
+				// add published date.
+				$images[ $k ]['published_time'] = get_the_date( 'Y-m-d H:i:s', $attachment );
+			}
+		}
+
+		return $images;
+	}
+
+	/**
 	 * Get query params array.
 	 *
 	 * @param array $options portfolio options.
@@ -1401,101 +1511,6 @@ class Visual_Portfolio_Get {
 				$images = $options['images'];
 			}
 
-			$images_ids = array();
-			foreach ( $images as $k => $img ) {
-				$images_ids[] = (int) $img['id'];
-			}
-
-			// Find all used attachments.
-			$all_attachments = get_posts(
-				array(
-					'post_type'              => 'attachment',
-					'posts_per_page'         => -1,
-					'paged'                  => -1,
-					'post__in'               => $images_ids,
-					'update_post_meta_cache' => false,
-					'update_post_term_cache' => false,
-				)
-			);
-
-			// prepare titles and descriptions.
-			foreach ( $images as $k => $img ) {
-				$has_custom_alt     = array_key_exists( 'alt', $img );
-				$item_alt           = $has_custom_alt ? (string) $img['alt'] : '';
-				$title_source       = $options['images_titles_source'] ?? 'custom';
-				$description_source = $options['images_descriptions_source'] ?? 'custom';
-				$img_meta           = array(
-					'title'             => '',
-					'image_title'       => '',
-					'image_description' => '',
-					'image_caption'     => '',
-					'image_alt'         => '',
-					'description'       => '',
-					'caption'           => '',
-					'alt'               => '',
-					'none'              => '',
-					'date'              => '',
-				);
-
-				// Find current attachment post data.
-				$attachment = false;
-				foreach ( $all_attachments as $post ) {
-					if ( $post->ID === (int) $img['id'] ) {
-						$attachment = $post;
-						break;
-					}
-				}
-
-				if ( $attachment ) {
-					// get image meta if needed.
-					if (
-						'none' !== $options['images_titles_source'] ||
-						'none' !== $options['images_descriptions_source'] ||
-
-						'image_title' === $options['images_order_by'] ||
-						'image_caption' === $options['images_order_by'] ||
-						'image_alt' === $options['images_order_by'] ||
-						'image_description' === $options['images_order_by']
-					) {
-						if ( $attachment && 'attachment' === $attachment->post_type ) {
-							$img_meta['title']       = $attachment->post_title;
-							$img_meta['description'] = $attachment->post_content;
-							$img_meta['caption']     = wp_get_attachment_caption( $attachment->ID );
-							$img_meta['alt']         = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
-						}
-					}
-
-					if ( $has_custom_alt && '' !== trim( $item_alt ) ) {
-						$img_meta['alt'] = $item_alt;
-					}
-
-					// title.
-					if ( 'custom' !== $options['images_titles_source'] ) {
-						$images[ $k ]['title'] = $img_meta[ $title_source ] ?? '';
-					}
-
-					// image title.
-					$images[ $k ]['image_title'] = $img_meta['title'] ?? '';
-
-					// description.
-					if ( 'custom' !== $options['images_descriptions_source'] ) {
-						$images[ $k ]['description'] = $img_meta[ $description_source ] ?? '';
-					}
-
-					// image description.
-					$images[ $k ]['image_description'] = $img_meta['description'] ?? '';
-
-					// image caption.
-					$images[ $k ]['image_caption'] = $img_meta['caption'] ?? '';
-
-					// image alt.
-					$images[ $k ]['image_alt'] = $img_meta['alt'] ?? '';
-
-					// add published date.
-					$images[ $k ]['published_time'] = get_the_date( 'Y-m-d H:i:s', $attachment );
-				}
-			}
-
 			// order.
 			$custom_order           = false;
 			$custom_order_direction = $options['images_order_direction'];
@@ -1525,6 +1540,17 @@ class Visual_Portfolio_Get {
 						$custom_order_direction = 'desc';
 						break;
 				}
+			}
+
+			// Only these orders read data from the attachment posts. With any other
+			// order the current page is known before the attachments are loaded,
+			// so they are loaded after the slicing below.
+			$order_from_attachments = in_array( $custom_order, array( 'date', 'image_title', 'image_caption', 'image_alt', 'image_description' ), true ) ||
+				( 'title' === $custom_order && 'custom' !== ( $options['images_titles_source'] ?? 'custom' ) ) ||
+				( 'description' === $custom_order && 'custom' !== ( $options['images_descriptions_source'] ?? 'custom' ) );
+
+			if ( $order_from_attachments ) {
+				$images = self::prepare_images_data( $images, $options );
 			}
 
 			if ( $custom_order && ! empty( $images ) ) {
@@ -1597,6 +1623,10 @@ class Visual_Portfolio_Get {
 				if ( $i > $start_from_item && $i <= $end_on_item ) {
 					$query_opts['images'][] = $img;
 				}
+			}
+
+			if ( ! $order_from_attachments ) {
+				$query_opts['images'] = self::prepare_images_data( $query_opts['images'], $options );
 			}
 		} else {
 			$query_opts = array(
