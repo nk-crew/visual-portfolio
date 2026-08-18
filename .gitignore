@@ -63,6 +63,7 @@ node_modules/
 # Coding agent local state (shared config in .claude/ is committed)
 .claude/settings.local.json
 .claude/worktrees/
+.claude/launch.json
 CLAUDE.local.md
 
 # system files
