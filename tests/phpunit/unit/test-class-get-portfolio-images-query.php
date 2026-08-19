@@ -40,6 +40,8 @@ class Test_Class_Get_Portfolio_Images_Query extends WP_UnitTestCase {
 					// 7 and 12 are coprime, so every title is unique and the
 					// title order differs from the gallery order.
 					'post_title'     => sprintf( 'Title %02d', ( $i * 7 ) % 12 ),
+					// Same trick for the upload date: unique, and in a third order.
+					'post_date'      => sprintf( '2024-%02d-01 10:00:00', 1 + ( ( $i * 5 ) % 12 ) ),
 					'post_mime_type' => 'image/jpeg',
 				)
 			);
@@ -58,7 +60,7 @@ class Test_Class_Get_Portfolio_Images_Query extends WP_UnitTestCase {
 	public function tear_down() {
 		remove_action( 'pre_get_posts', array( $this, 'capture_attachment_query' ) );
 
-		unset( $_GET['vp_page'] );
+		unset( $_GET['vp_page'], $_GET['vp_sort'] );
 
 		parent::tear_down();
 	}
@@ -78,10 +80,11 @@ class Test_Class_Get_Portfolio_Images_Query extends WP_UnitTestCase {
 	 * Get query params for the gallery.
 	 *
 	 * @param array $options options to override.
+	 * @param bool  $for_filter get the params for the filter list.
 	 *
 	 * @return array
 	 */
-	private function get_query_params( $options = array() ) {
+	private function get_query_params( $options = array(), $for_filter = false ) {
 		$images = array();
 		foreach ( $this->attachment_ids as $id ) {
 			$images[] = array(
@@ -103,8 +106,25 @@ class Test_Class_Get_Portfolio_Images_Query extends WP_UnitTestCase {
 					'pagination'                 => 'paged',
 				),
 				$options
-			)
+			),
+			$for_filter
 		);
+	}
+
+	/**
+	 * Gallery attachments sorted by their upload date.
+	 *
+	 * @return array
+	 */
+	private function ids_by_date() {
+		$by_date = array();
+		foreach ( $this->attachment_ids as $id ) {
+			$by_date[ get_post_field( 'post_date', $id ) ] = $id;
+		}
+
+		ksort( $by_date );
+
+		return array_values( $by_date );
 	}
 
 	/**
@@ -157,5 +177,58 @@ class Test_Class_Get_Portfolio_Images_Query extends WP_UnitTestCase {
 			$this->assertSame( get_post_meta( $image['id'], '_wp_attachment_image_alt', true ), $image['image_alt'] );
 			$this->assertNotEmpty( $image['published_time'] );
 		}
+	}
+
+	/**
+	 * Images of the current page still take their title from the attachment.
+	 */
+	public function test_current_page_images_take_the_title_from_the_attachment() {
+		$_GET['vp_page'] = 2;
+
+		$query = $this->get_query_params( array( 'images_titles_source' => 'title' ) );
+
+		$this->assertCount( 1, $this->requested_ids );
+		$this->assertCount( 4, $this->requested_ids[0] );
+
+		foreach ( $query['images'] as $image ) {
+			$this->assertSame( get_post_field( 'post_title', $image['id'] ), $image['title'] );
+		}
+	}
+
+	/**
+	 * Sorting by the upload date needs every attachment too.
+	 */
+	public function test_order_by_date_loads_every_attachment() {
+		$_GET['vp_page'] = 2;
+
+		$query = $this->get_query_params( array( 'images_order_by' => 'date' ) );
+
+		$this->assertCount( 1, $this->requested_ids );
+		$this->assertSame( $this->attachment_ids, $this->requested_ids[0] );
+		$this->assertSame( array_slice( $this->ids_by_date(), 4, 4 ), wp_list_pluck( $query['images'], 'id' ) );
+	}
+
+	/**
+	 * The sort request overrides the stored order, so the load follows the request.
+	 */
+	public function test_sort_request_overrides_the_stored_order() {
+		$_GET['vp_page'] = 2;
+		$_GET['vp_sort'] = 'date';
+
+		$query = $this->get_query_params();
+
+		$this->assertCount( 1, $this->requested_ids );
+		$this->assertSame( $this->attachment_ids, $this->requested_ids[0] );
+		$this->assertSame( array_slice( $this->ids_by_date(), 4, 4 ), wp_list_pluck( $query['images'], 'id' ) );
+	}
+
+	/**
+	 * The filter list is built from the block data, so it loads no attachment.
+	 */
+	public function test_filter_list_loads_no_attachments() {
+		$query = $this->get_query_params( array(), true );
+
+		$this->assertCount( 12, $query['images'] );
+		$this->assertSame( array(), $this->requested_ids );
 	}
 }

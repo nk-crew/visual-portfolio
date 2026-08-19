@@ -1356,8 +1356,18 @@ class Visual_Portfolio_Get {
 			return $images;
 		}
 
+		$title_source       = $options['images_titles_source'] ?? 'custom';
+		$description_source = $options['images_descriptions_source'] ?? 'custom';
+		$order_by           = $options['images_order_by'] ?? 'default';
+
+		// Attachment meta is read below only for these sources and orders,
+		// so the rest of the galleries don't pay for the meta cache.
+		$with_meta = 'none' !== $title_source ||
+			'none' !== $description_source ||
+			in_array( $order_by, array( 'image_title', 'image_caption', 'image_alt', 'image_description' ), true );
+
 		$images_ids = array();
-		foreach ( $images as $k => $img ) {
+		foreach ( $images as $img ) {
 			$images_ids[] = (int) $img['id'];
 		}
 
@@ -1368,86 +1378,68 @@ class Visual_Portfolio_Get {
 				'posts_per_page'         => -1,
 				'paged'                  => -1,
 				'post__in'               => $images_ids,
+				'update_post_meta_cache' => $with_meta,
 				'update_post_term_cache' => false,
 			)
 		);
 
+		$all_attachments = array_column( $all_attachments, null, 'ID' );
+
 		// prepare titles and descriptions.
 		foreach ( $images as $k => $img ) {
-			$has_custom_alt     = array_key_exists( 'alt', $img );
-			$item_alt           = $has_custom_alt ? (string) $img['alt'] : '';
-			$title_source       = $options['images_titles_source'] ?? 'custom';
-			$description_source = $options['images_descriptions_source'] ?? 'custom';
-			$img_meta           = array(
-				'title'             => '',
-				'image_title'       => '',
-				'image_description' => '',
-				'image_caption'     => '',
-				'image_alt'         => '',
-				'description'       => '',
-				'caption'           => '',
-				'alt'               => '',
-				'none'              => '',
-				'date'              => '',
+			$attachment = $all_attachments[ (int) $img['id'] ] ?? false;
+
+			// Nothing to take the data from once the attachment is deleted.
+			if ( ! $attachment ) {
+				continue;
+			}
+
+			$has_custom_alt = array_key_exists( 'alt', $img );
+			$item_alt       = $has_custom_alt ? (string) $img['alt'] : '';
+			$img_meta       = array(
+				'title'       => '',
+				'description' => '',
+				'caption'     => '',
+				'alt'         => '',
+				'none'        => '',
 			);
 
-			// Find current attachment post data.
-			$attachment = false;
-			foreach ( $all_attachments as $post ) {
-				if ( $post->ID === (int) $img['id'] ) {
-					$attachment = $post;
-					break;
-				}
+			// get image meta if needed.
+			if ( $with_meta ) {
+				$img_meta['title']       = $attachment->post_title;
+				$img_meta['description'] = $attachment->post_content;
+				$img_meta['caption']     = wp_get_attachment_caption( $attachment->ID );
+				$img_meta['alt']         = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
 			}
 
-			if ( $attachment ) {
-				// get image meta if needed.
-				if (
-					'none' !== $options['images_titles_source'] ||
-					'none' !== $options['images_descriptions_source'] ||
-
-					'image_title' === $options['images_order_by'] ||
-					'image_caption' === $options['images_order_by'] ||
-					'image_alt' === $options['images_order_by'] ||
-					'image_description' === $options['images_order_by']
-				) {
-					if ( $attachment && 'attachment' === $attachment->post_type ) {
-						$img_meta['title']       = $attachment->post_title;
-						$img_meta['description'] = $attachment->post_content;
-						$img_meta['caption']     = wp_get_attachment_caption( $attachment->ID );
-						$img_meta['alt']         = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
-					}
-				}
-
-				if ( $has_custom_alt && '' !== trim( $item_alt ) ) {
-					$img_meta['alt'] = $item_alt;
-				}
-
-				// title.
-				if ( 'custom' !== $options['images_titles_source'] ) {
-					$images[ $k ]['title'] = $img_meta[ $title_source ] ?? '';
-				}
-
-				// image title.
-				$images[ $k ]['image_title'] = $img_meta['title'] ?? '';
-
-				// description.
-				if ( 'custom' !== $options['images_descriptions_source'] ) {
-					$images[ $k ]['description'] = $img_meta[ $description_source ] ?? '';
-				}
-
-				// image description.
-				$images[ $k ]['image_description'] = $img_meta['description'] ?? '';
-
-				// image caption.
-				$images[ $k ]['image_caption'] = $img_meta['caption'] ?? '';
-
-				// image alt.
-				$images[ $k ]['image_alt'] = $img_meta['alt'] ?? '';
-
-				// add published date.
-				$images[ $k ]['published_time'] = get_the_date( 'Y-m-d H:i:s', $attachment );
+			if ( $has_custom_alt && '' !== trim( $item_alt ) ) {
+				$img_meta['alt'] = $item_alt;
 			}
+
+			// title.
+			if ( 'custom' !== $title_source ) {
+				$images[ $k ]['title'] = $img_meta[ $title_source ] ?? '';
+			}
+
+			// image title.
+			$images[ $k ]['image_title'] = $img_meta['title'];
+
+			// description.
+			if ( 'custom' !== $description_source ) {
+				$images[ $k ]['description'] = $img_meta[ $description_source ] ?? '';
+			}
+
+			// image description.
+			$images[ $k ]['image_description'] = $img_meta['description'];
+
+			// image caption.
+			$images[ $k ]['image_caption'] = $img_meta['caption'];
+
+			// image alt.
+			$images[ $k ]['image_alt'] = $img_meta['alt'];
+
+			// add published date.
+			$images[ $k ]['published_time'] = get_the_date( 'Y-m-d H:i:s', $attachment );
 		}
 
 		return $images;
@@ -1542,12 +1534,14 @@ class Visual_Portfolio_Get {
 				}
 			}
 
-			// Only these orders read data from the attachment posts. With any other
-			// order the current page is known before the attachments are loaded,
-			// so they are loaded after the slicing below.
-			$order_from_attachments = in_array( $custom_order, array( 'date', 'image_title', 'image_caption', 'image_alt', 'image_description' ), true ) ||
-				( 'title' === $custom_order && 'custom' !== ( $options['images_titles_source'] ?? 'custom' ) ) ||
-				( 'description' === $custom_order && 'custom' !== ( $options['images_descriptions_source'] ?? 'custom' ) );
+			// Sorting reads the image data from the attachment posts, so the whole
+			// gallery has to be loaded before the page can be picked. Manual and
+			// random orders, and the ones sorting by the values stored in the block,
+			// are known upfront — those load the current page only, after the slicing.
+			$order_from_attachments = $custom_order &&
+				! in_array( $custom_order, array( 'default', 'rand' ), true ) &&
+				! ( 'title' === $custom_order && 'custom' === ( $options['images_titles_source'] ?? 'custom' ) ) &&
+				! ( 'description' === $custom_order && 'custom' === ( $options['images_descriptions_source'] ?? 'custom' ) );
 
 			if ( $order_from_attachments ) {
 				$images = self::prepare_images_data( $images, $options );
@@ -1625,7 +1619,10 @@ class Visual_Portfolio_Get {
 				}
 			}
 
-			if ( ! $order_from_attachments ) {
+			// The filter list is built from the categories stored in the block, so
+			// it never reads the attachment data — and `$for_filter` keeps every
+			// image in the slice, which would load the whole gallery for nothing.
+			if ( ! $order_from_attachments && ! $for_filter ) {
 				$query_opts['images'] = self::prepare_images_data( $query_opts['images'], $options );
 			}
 		} else {
