@@ -35,8 +35,9 @@ class Test_Class_Get_Portfolio_Image_Alt extends WP_UnitTestCase {
 				'images_order_by'            => 'default',
 				'images_order_direction'     => 'asc',
 				'items_count'                => 10,
+				'pagination'                 => 'paged',
 			),
-			true
+			false
 		);
 
 		$this->assertNotEmpty( $query['images'] );
@@ -69,8 +70,9 @@ class Test_Class_Get_Portfolio_Image_Alt extends WP_UnitTestCase {
 				'images_order_by'            => 'default',
 				'images_order_direction'     => 'asc',
 				'items_count'                => 10,
+				'pagination'                 => 'paged',
 			),
-			true
+			false
 		);
 
 		$this->assertNotEmpty( $query['images'] );
@@ -103,8 +105,9 @@ class Test_Class_Get_Portfolio_Image_Alt extends WP_UnitTestCase {
 				'images_order_by'            => 'default',
 				'images_order_direction'     => 'asc',
 				'items_count'                => 10,
+				'pagination'                 => 'paged',
 			),
-			true
+			false
 		);
 
 		$this->assertNotEmpty( $query['images'] );
