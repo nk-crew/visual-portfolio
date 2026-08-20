@@ -477,6 +477,19 @@ class IframePreview extends Component {
 							value={variables.nonce}
 							readOnly
 						/>
+						{/*
+							WordPress 7.1+ isolates the block editor with
+							`Document-Isolation-Policy`. The preview has to be
+							served with the same policy, or the editor may not
+							touch the frame's `contentWindow` even though both
+							are same-origin.
+						*/}
+						<input
+							type="hidden"
+							name="vp_preview_isolated"
+							value={window.crossOriginIsolated ? 1 : 0}
+							readOnly
+						/>
 
 						{contentSource === 'saved' ? (
 							<input
