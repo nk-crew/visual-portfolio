@@ -236,7 +236,7 @@ Commits to PR 290 (free parts) and PR 62 (PRO parts).
       named by the diagnosis — expected in `PRO: modules/...` or a follow-up
       free commit if the bug is in `gutenberg/popup/`. Check: clicking a
       lightbox item on the Pro demo page opens PhotoSwipe 5.
-- [ ] Regression guard: a PHP unit test (or e2e where it fits) pinning the
+- [x] Regression guard: a PHP unit test (or e2e where it fits) pinning the
       trigger data presence with Pro active. Writes
       `PRO: tests/phpunit/unit/test-class-loop-popup.php` (new) or the free
       equivalent. Check: test fails on the pre-fix code, passes after.
@@ -246,21 +246,17 @@ unaffected. Commit to PR 62 (and PR 290 if the fix is shared).
 
 ## Where this run stopped
 
-Stages 0, 1 and 2 are complete and verified. Stage 3 is complete except the loop
-and source panels and the "Edit media" toolbar. Stage 4 is complete except its
-test adjustments and a visual pass over the three effects and the progress
-indicator. Stage 5 has not started. Stage 6 is done on the free side and not
-started on the Pro side. Stage 7's root cause is fixed in this repo (the vendored
-libraries now ship) and confirmed on both sites: the lightbox opens on the Pro
-demo page as well as the free one, and the Pro carousel now has its frame, its
-two arrows, no scrollbar and a live Blossom instance. The submodule pointer that
-carries the fix is moved in the Pro worktree but is not committed there, and the
-regression test for it is not written.
+Stages 0 through 5 are complete and verified, and stage 7 with them. Stage 6 is
+complete on the free side; its Pro half - the slot fills and the hover rendering -
+is the only work left, and nothing in the Pro repository is committed.
 
-Nothing is pushed. The last full check run before the environment went down was
-green: `npm run lint` (321 files), `npm run test:unit:php` (255 tests) and
-`npm run test:e2e`, all after stage 2; stages 3 and 4 have been linted and built
-but their PHP unit run did not finish.
+Checks at that point, all in this repo: `npm run lint` green, `npm run lint:php`
+green, `npm run test:unit:php` 255 tests OK, `npm run test:e2e` 90 passed with 9
+failures that predate this branch - all in the legacy specs
+(`added-images-to-block`, `added-images-to-saved-layout`, `iframe-preview-resize`,
+`pattern-context`), where a lazy-loaded picture inside the legacy preview iframe
+never becomes visible. The same nine fail on the first run of this session, before
+any change to the loop family.
 
 ## Deviations
 
@@ -288,6 +284,16 @@ but their PHP unit run did not finish.
   which is a defect the fixture with square images had been hiding. `masonry-layout` was
   added as a dependency and then reverted for the same reason; the front-end masonry keeps
   using the Masonry copy WordPress ships.
+- Stage 4/5: an e2e run piped into `tail` reports the exit code of `tail`, so three
+  earlier "green" readings of the suite in this session were wrong; the suite is run
+  and read directly now. The seven loop-family failures those runs hid were the specs
+  still describing the old columns model and the old carousel markup, and they are
+  rewritten.
+- Stage 5: block previews of a pattern never draw a gallery that fetches its items,
+  because a preview is promoted to real content on an idle frame and a screen of
+  fetching previews never leaves one. Neither the loop nor the item template asks the
+  server for anything inside a preview now (`gutenberg/utils/use-is-preview.js`), and
+  the item template draws the shapes of its items until they arrive.
 - Stage 2 deviates from decision 1 on one point: the block does not adopt core's
   `supports.layout`. The spike (stage 0) confirmed responsive states are closed to custom
   attributes, so adopting it would only help grid - while the layout support is per block,
