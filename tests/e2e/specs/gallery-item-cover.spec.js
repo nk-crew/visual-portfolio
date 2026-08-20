@@ -9,6 +9,7 @@
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
+import { getFixturePath } from '../utils/fixture-path';
 import { getPluginSlug } from '../utils/plugin-slug';
 
 const COVER = '.wp-block-visual-portfolio-item-cover';
@@ -53,7 +54,7 @@ test.describe('Gallery Item Cover placement', () => {
 		await requestUtils.activatePlugin(getPluginSlug());
 
 		const uploaded = await requestUtils.uploadMedia(
-			'tests/fixtures/image-800x600.png'
+			getFixturePath('image-800x600.png')
 		);
 
 		images = [{ id: uploaded.id, title: 'Cover item' }];

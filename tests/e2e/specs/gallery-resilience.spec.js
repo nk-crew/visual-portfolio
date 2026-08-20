@@ -10,6 +10,7 @@
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
+import { getFixturePath } from '../utils/fixture-path';
 import { getLoopParam } from '../utils/loop-query-params';
 import { getPluginSlug } from '../utils/plugin-slug';
 
@@ -98,7 +99,7 @@ test.describe('Gallery Loop resilience', () => {
 
 		while (images.length < IMAGES_COUNT) {
 			const uploaded = await requestUtils.uploadMedia(
-				'tests/fixtures/image-800x600.png'
+				getFixturePath('image-800x600.png')
 			);
 
 			images.push({ id: uploaded.id });

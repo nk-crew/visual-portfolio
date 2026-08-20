@@ -12,6 +12,7 @@
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
+import { getFixturePath } from '../utils/fixture-path';
 import { getPluginSlug } from '../utils/plugin-slug';
 
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
@@ -141,7 +142,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		// spec is not a file this one knows.
 		for (let index = 0; index < IMAGES_COUNT; index++) {
 			const uploaded = await requestUtils.uploadMedia(
-				'tests/fixtures/image-800x600.png'
+				getFixturePath('image-800x600.png')
 			);
 
 			images.push({ id: uploaded.id, url: uploaded.source_url });

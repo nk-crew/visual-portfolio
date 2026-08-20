@@ -10,8 +10,8 @@
  * switched off, where the editor could not have built anything.
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
-
 import { getEditorCanvas } from '../utils/editor-canvas';
+import { getFixturePath } from '../utils/fixture-path';
 import { getPluginSlug } from '../utils/plugin-slug';
 
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
@@ -130,7 +130,7 @@ test.describe('Gallery Item Template layouts', () => {
 		// real ones rather than whatever a previous spec left behind.
 		while (images.length < IMAGES_COUNT) {
 			const uploaded = await requestUtils.uploadMedia(
-				'tests/fixtures/image-800x600.png'
+				getFixturePath('image-800x600.png')
 			);
 
 			images.push({ id: uploaded.id });

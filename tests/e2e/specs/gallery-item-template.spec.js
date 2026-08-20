@@ -6,9 +6,9 @@
  * page - what the editor stored proves almost nothing about either.
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
-
 import { createRegularPosts } from '../utils/create-posts';
 import { getEditorCanvas } from '../utils/editor-canvas';
+import { getFixturePath } from '../utils/fixture-path';
 import { getLoopParam } from '../utils/loop-query-params';
 import { openPublishedPage } from '../utils/open-published-page';
 import { getPluginSlug } from '../utils/plugin-slug';
@@ -159,7 +159,7 @@ async function getGalleryImages(requestUtils, count) {
 	// nothing is uploaded twice. A library that has none is still worth testing.
 	while (images.length < count) {
 		const uploaded = await requestUtils.uploadMedia(
-			'tests/fixtures/image-800x600.png'
+			getFixturePath('image-800x600.png')
 		);
 
 		images.push({ id: uploaded.id, title: uploaded.title?.rendered ?? '' });
