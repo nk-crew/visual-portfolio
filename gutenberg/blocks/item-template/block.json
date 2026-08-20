@@ -67,15 +67,36 @@
 		"carouselEffect": {
 			"type": "string",
 			"default": "none",
-			"enum": ["none", "coverflow"]
+			"enum": ["none", "coverflow", "slideshow", "cards"]
+		},
+		"carouselRepeat": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselAutoplay": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselAutoplayDelay": {
+			"type": "number",
+			"default": 5
+		},
+		"carouselPeek": {
+			"type": "number",
+			"default": 0
+		},
+		"carouselEdgeFade": {
+			"type": "boolean",
+			"default": false
 		},
 		"carouselShowArrows": {
 			"type": "boolean",
 			"default": true
 		},
-		"carouselShowDots": {
-			"type": "boolean",
-			"default": false
+		"carouselIndicator": {
+			"type": "string",
+			"default": "none",
+			"enum": ["none", "dots", "progress"]
 		}
 	},
 	"supports": {

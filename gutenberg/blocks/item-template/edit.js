@@ -4,6 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import {
 	BlockContextProvider,
+	BlockControls,
 	store as blockEditorStore,
 	InspectorControls,
 	__experimentalUseBlockPreview as useBlockPreview,
@@ -20,11 +21,22 @@ import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ToolbarDropdownMenu,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { memo, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	gallery,
+	grid,
+	image,
+	postFeaturedImage,
+	stretchWide,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -46,6 +58,39 @@ const LAYOUT_OPTIONS = [
 
 // Layouts whose column count is chosen rather than derived.
 const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
+
+const LAYOUT_ICONS = {
+	grid,
+	masonry: gallery,
+	tiles: postFeaturedImage,
+	justified: stretchWide,
+	carousel: image,
+};
+
+const LAST_ROW_OPTIONS = [
+	{ label: __('Left', 'visual-portfolio'), value: 'left' },
+	{ label: __('Center', 'visual-portfolio'), value: 'center' },
+	{ label: __('Right', 'visual-portfolio'), value: 'right' },
+	{ label: __('Hide', 'visual-portfolio'), value: 'hide' },
+];
+
+const SNAP_OPTIONS = [
+	{ label: __('Start', 'visual-portfolio'), value: 'start' },
+	{ label: __('Center', 'visual-portfolio'), value: 'center' },
+];
+
+const INDICATOR_OPTIONS = [
+	{ label: __('None', 'visual-portfolio'), value: 'none' },
+	{ label: __('Dots', 'visual-portfolio'), value: 'dots' },
+	{ label: __('Progress bar', 'visual-portfolio'), value: 'progress' },
+];
+
+const EFFECT_OPTIONS = [
+	{ label: __('None', 'visual-portfolio'), value: 'none' },
+	{ label: __('Coverflow', 'visual-portfolio'), value: 'coverflow' },
+	{ label: __('Slideshow', 'visual-portfolio'), value: 'slideshow' },
+	{ label: __('Cards', 'visual-portfolio'), value: 'cards' },
+];
 
 // The same question the view module asks: where the browser packs masonry
 // itself, the stylesheet does the layout and no script should run over it.
@@ -212,8 +257,13 @@ export default function BlockEdit({
 		carouselSnapAlign,
 		carouselFreeScroll,
 		carouselEffect,
+		carouselRepeat,
+		carouselAutoplay,
+		carouselAutoplayDelay,
+		carouselPeek,
+		carouselEdgeFade,
 		carouselShowArrows,
-		carouselShowDots,
+		carouselIndicator,
 	} = attributes;
 	const {
 		'vp/queryType': queryType,
@@ -505,9 +555,9 @@ export default function BlockEdit({
 		</>
 	) : null;
 
-	const inspectorControls = (
-		<InspectorControls>
-			<PanelBody title={__('Layout', 'visual-portfolio')}>
+	const layoutControls = (
+		<PanelBody title={__('Layout', 'visual-portfolio')}>
+			<VStack spacing={4}>
 				<SelectControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
@@ -533,173 +583,348 @@ export default function BlockEdit({
 				)}
 
 				{columnsControls}
+			</VStack>
+		</PanelBody>
+	);
 
-				{'justified' === layoutType && (
-					<>
-						<RangeControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={__('Row height', 'visual-portfolio')}
-							value={justifiedRowHeight}
-							onChange={(value) =>
-								setAttributes({ justifiedRowHeight: value })
-							}
-							min={40}
-							max={800}
-						/>
-						<RangeControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={__(
-								'Row height tolerance',
-								'visual-portfolio'
-							)}
-							value={justifiedRowHeightTolerance}
-							onChange={(value) =>
-								setAttributes({
-									justifiedRowHeightTolerance: value,
-								})
-							}
-							min={0}
-							max={1}
-							step={0.05}
-						/>
-						<RangeControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={__('Maximum rows', 'visual-portfolio')}
-							help={__(
-								'Zero shows every row the items make.',
-								'visual-portfolio'
-							)}
-							value={justifiedMaxRowsCount}
-							onChange={(value) =>
-								setAttributes({ justifiedMaxRowsCount: value })
-							}
-							min={0}
-							max={20}
-						/>
-						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={__('Last row', 'visual-portfolio')}
-							value={justifiedLastRow}
-							options={[
-								{
-									label: __('Left', 'visual-portfolio'),
-									value: 'left',
-								},
-								{
-									label: __('Center', 'visual-portfolio'),
-									value: 'center',
-								},
-								{
-									label: __('Right', 'visual-portfolio'),
-									value: 'right',
-								},
-								{
-									label: __('Hide', 'visual-portfolio'),
-									value: 'hide',
-								},
-							]}
-							onChange={(value) =>
-								setAttributes({ justifiedLastRow: value })
-							}
-						/>
-					</>
-				)}
+	const justifiedControls = 'justified' === layoutType && (
+		<ToolsPanel
+			label={__('Justified', 'visual-portfolio')}
+			resetAll={() =>
+				setAttributes({
+					justifiedRowHeight: 320,
+					justifiedRowHeightTolerance: 0.25,
+					justifiedMaxRowsCount: 0,
+					justifiedLastRow: 'left',
+				})
+			}
+		>
+			<ToolsPanelItem
+				isShownByDefault
+				hasValue={() => 320 !== justifiedRowHeight}
+				label={__('Row height', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ justifiedRowHeight: 320 })}
+			>
+				<RangeControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={__('Row height', 'visual-portfolio')}
+					value={justifiedRowHeight}
+					onChange={(value) =>
+						setAttributes({ justifiedRowHeight: value })
+					}
+					min={40}
+					max={800}
+				/>
+			</ToolsPanelItem>
 
-				{'carousel' === layoutType && (
-					<>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={__(
-								'Slide width from content',
+			<ToolsPanelItem
+				hasValue={() => 0.25 !== justifiedRowHeightTolerance}
+				label={__('Row height tolerance', 'visual-portfolio')}
+				onDeselect={() =>
+					setAttributes({ justifiedRowHeightTolerance: 0.25 })
+				}
+			>
+				<RangeControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={__('Row height tolerance', 'visual-portfolio')}
+					value={justifiedRowHeightTolerance}
+					onChange={(value) =>
+						setAttributes({ justifiedRowHeightTolerance: value })
+					}
+					min={0}
+					max={1}
+					step={0.05}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => 0 !== justifiedMaxRowsCount}
+				label={__('Maximum rows', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ justifiedMaxRowsCount: 0 })}
+			>
+				<RangeControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={__('Maximum rows', 'visual-portfolio')}
+					help={__(
+						'Zero shows every row the items make.',
+						'visual-portfolio'
+					)}
+					value={justifiedMaxRowsCount}
+					onChange={(value) =>
+						setAttributes({ justifiedMaxRowsCount: value })
+					}
+					min={0}
+					max={20}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => 'left' !== justifiedLastRow}
+				label={__('Last row', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ justifiedLastRow: 'left' })}
+			>
+				<SelectControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={__('Last row', 'visual-portfolio')}
+					value={justifiedLastRow}
+					options={LAST_ROW_OPTIONS}
+					onChange={(value) =>
+						setAttributes({ justifiedLastRow: value })
+					}
+				/>
+			</ToolsPanelItem>
+		</ToolsPanel>
+	);
+
+	const carouselControls = 'carousel' === layoutType && (
+		<ToolsPanel
+			label={__('Carousel', 'visual-portfolio')}
+			resetAll={() =>
+				setAttributes({
+					carouselAutoWidth: false,
+					carouselSnapAlign: 'start',
+					carouselFreeScroll: false,
+					carouselEffect: 'none',
+					carouselRepeat: false,
+					carouselAutoplay: false,
+					carouselAutoplayDelay: 5,
+					carouselPeek: 0,
+					carouselEdgeFade: false,
+					carouselShowArrows: true,
+					carouselIndicator: 'none',
+				})
+			}
+		>
+			<ToolsPanelItem
+				isShownByDefault
+				hasValue={() => !carouselShowArrows}
+				label={__('Arrows', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselShowArrows: true })}
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={__('Arrows', 'visual-portfolio')}
+					checked={carouselShowArrows}
+					onChange={(value) =>
+						setAttributes({ carouselShowArrows: value })
+					}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				isShownByDefault
+				hasValue={() => 'none' !== carouselIndicator}
+				label={__('Indicator', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselIndicator: 'none' })}
+			>
+				<SelectControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={__('Indicator', 'visual-portfolio')}
+					value={carouselIndicator}
+					options={INDICATOR_OPTIONS}
+					onChange={(value) =>
+						setAttributes({ carouselIndicator: value })
+					}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => 'none' !== carouselEffect}
+				label={__('Effect', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselEffect: 'none' })}
+			>
+				<VStack spacing={2}>
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={__('Effect', 'visual-portfolio')}
+						value={carouselEffect}
+						options={EFFECT_OPTIONS}
+						onChange={(value) =>
+							setAttributes({ carouselEffect: value })
+						}
+					/>
+					{'none' !== carouselEffect && (
+						<Notice status="info" isDismissible={false}>
+							{__(
+								'Effects are drawn by the browser as the carousel scrolls. Browsers without scroll-driven animations simply show the carousel without them.',
 								'visual-portfolio'
 							)}
-							checked={carouselAutoWidth}
-							onChange={(value) =>
-								setAttributes({ carouselAutoWidth: value })
-							}
-						/>
-						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={__('Snap slides to', 'visual-portfolio')}
-							value={carouselSnapAlign}
-							options={[
-								{
-									label: __('Start', 'visual-portfolio'),
-									value: 'start',
-								},
-								{
-									label: __('Center', 'visual-portfolio'),
-									value: 'center',
-								},
-							]}
-							onChange={(value) =>
-								setAttributes({ carouselSnapAlign: value })
-							}
-						/>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={__('Free scrolling', 'visual-portfolio')}
-							help={__(
-								'Scroll stops wherever it is let go, instead of settling on a slide.',
-								'visual-portfolio'
-							)}
-							checked={carouselFreeScroll}
-							onChange={(value) =>
-								setAttributes({ carouselFreeScroll: value })
-							}
-						/>
-						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={__('Effect', 'visual-portfolio')}
-							value={carouselEffect}
-							options={[
-								{
-									label: __('None', 'visual-portfolio'),
-									value: 'none',
-								},
-								{
-									label: __('Coverflow', 'visual-portfolio'),
-									value: 'coverflow',
-								},
-							]}
-							onChange={(value) =>
-								setAttributes({ carouselEffect: value })
-							}
-						/>
-						{'coverflow' === carouselEffect && (
-							<Notice status="info" isDismissible={false}>
-								{__(
-									'Coverflow is drawn by the browser as the carousel scrolls. Browsers without scroll-driven animations simply show the carousel without it.',
-									'visual-portfolio'
-								)}
-							</Notice>
+						</Notice>
+					)}
+				</VStack>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => carouselAutoplay}
+				label={__('Autoplay', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselAutoplay: false })}
+			>
+				<VStack spacing={4}>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={__('Autoplay', 'visual-portfolio')}
+						help={__(
+							'Pauses while the visitor is on the carousel, and never runs for a visitor who asked for less motion.',
+							'visual-portfolio'
 						)}
-						<ToggleControl
+						checked={carouselAutoplay}
+						onChange={(value) =>
+							setAttributes({ carouselAutoplay: value })
+						}
+					/>
+					{carouselAutoplay && (
+						<RangeControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={__('Arrows', 'visual-portfolio')}
-							checked={carouselShowArrows}
+							label={__('Delay, seconds', 'visual-portfolio')}
+							value={carouselAutoplayDelay}
 							onChange={(value) =>
-								setAttributes({ carouselShowArrows: value })
+								setAttributes({ carouselAutoplayDelay: value })
 							}
+							min={2}
+							max={10}
+							step={0.5}
 						/>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={__('Dots', 'visual-portfolio')}
-							checked={carouselShowDots}
-							onChange={(value) =>
-								setAttributes({ carouselShowDots: value })
-							}
-						/>
-					</>
-				)}
-			</PanelBody>
+					)}
+				</VStack>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => carouselRepeat}
+				label={__('Repeat', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselRepeat: false })}
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={__('Repeat', 'visual-portfolio')}
+					help={__(
+						'The carousel runs on without an end, in both directions.',
+						'visual-portfolio'
+					)}
+					checked={carouselRepeat}
+					onChange={(value) =>
+						setAttributes({ carouselRepeat: value })
+					}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => 0 !== carouselPeek}
+				label={__('Peek', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselPeek: 0 })}
+			>
+				<RangeControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={__('Peek', 'visual-portfolio')}
+					help={__(
+						'How much of the next slide shows at the edge, as an invitation to scroll.',
+						'visual-portfolio'
+					)}
+					value={carouselPeek}
+					onChange={(value) => setAttributes({ carouselPeek: value })}
+					min={0}
+					max={200}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => carouselEdgeFade}
+				label={__('Fade the edges', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselEdgeFade: false })}
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={__('Fade the edges', 'visual-portfolio')}
+					checked={carouselEdgeFade}
+					onChange={(value) =>
+						setAttributes({ carouselEdgeFade: value })
+					}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => carouselAutoWidth}
+				label={__('Slide width from content', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselAutoWidth: false })}
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={__('Slide width from content', 'visual-portfolio')}
+					checked={carouselAutoWidth}
+					onChange={(value) =>
+						setAttributes({ carouselAutoWidth: value })
+					}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => 'start' !== carouselSnapAlign}
+				label={__('Snap slides to', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselSnapAlign: 'start' })}
+			>
+				<SelectControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={__('Snap slides to', 'visual-portfolio')}
+					value={carouselSnapAlign}
+					options={SNAP_OPTIONS}
+					onChange={(value) =>
+						setAttributes({ carouselSnapAlign: value })
+					}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => carouselFreeScroll}
+				label={__('Free scrolling', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselFreeScroll: false })}
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={__('Free scrolling', 'visual-portfolio')}
+					help={__(
+						'Scroll stops wherever it is let go, instead of settling on a slide.',
+						'visual-portfolio'
+					)}
+					checked={carouselFreeScroll}
+					onChange={(value) =>
+						setAttributes({ carouselFreeScroll: value })
+					}
+				/>
+			</ToolsPanelItem>
+		</ToolsPanel>
+	);
+
+	const inspectorControls = (
+		<InspectorControls>
+			{layoutControls}
+			{justifiedControls}
+			{carouselControls}
 		</InspectorControls>
+	);
+
+	// The layout a gallery is, switched where the other view switchers of the
+	// editor are rather than only in the sidebar.
+	const blockControls = (
+		<BlockControls group="block">
+			<ToolbarDropdownMenu
+				icon={LAYOUT_ICONS[layoutType]}
+				label={__('Layout', 'visual-portfolio')}
+				controls={LAYOUT_OPTIONS.map((option) => ({
+					title: option.label,
+					icon: LAYOUT_ICONS[option.value],
+					isActive: option.value === layoutType,
+					onClick: () => setAttributes({ layoutType: option.value }),
+				}))}
+			/>
+		</BlockControls>
 	);
 
 	// A gallery that resolves to nothing is a content source problem, and the
@@ -707,6 +932,7 @@ export default function BlockEdit({
 	if (isEmpty) {
 		return (
 			<>
+				{blockControls}
 				{inspectorControls}
 				<div {...blockProps}>
 					<Placeholder
@@ -723,6 +949,7 @@ export default function BlockEdit({
 
 	return (
 		<>
+			{blockControls}
 			{inspectorControls}
 			<ul {...blockProps} aria-busy={isLoading || undefined}>
 				{/* Out of the flow, so a settings change never moves the

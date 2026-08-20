@@ -604,69 +604,112 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
-	 * Carousel controls.
+	 * Arrows of a carousel.
 	 *
-	 * Server rendered, hidden until the script module says it is there: the
-	 * carousel itself is a scroll container, so without the module a visitor
-	 * still swipes, scrolls and tabs through it, and a row of buttons that
-	 * cannot move anything would be the only thing that broke.
+	 * They sit inside the frame that wraps the list, over the slides at either
+	 * edge, which is where a visitor reaches for them. The frame is the only
+	 * reason that wrapper exists: the list itself scrolls, so anything placed
+	 * inside it would scroll away.
+	 *
+	 * @return string
+	 */
+	private function get_carousel_arrows() {
+		$arrows = array(
+			'prev' => __( 'Previous slide', 'visual-portfolio' ),
+			'next' => __( 'Next slide', 'visual-portfolio' ),
+		);
+
+		$output = '';
+
+		foreach ( $arrows as $direction => $label ) {
+			$output .= sprintf(
+				'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-arrow wp-block-visual-portfolio-item-template__carousel-arrow--%1$s" aria-label="%2$s" data-wp-on--click="actions.%3$s"><span aria-hidden="true"></span></button>',
+				esc_attr( $direction ),
+				esc_attr( $label ),
+				'prev' === $direction ? 'carouselPrev' : 'carouselNext'
+			);
+		}
+
+		return $output;
+	}
+
+	/**
+	 * The indicator under a carousel.
+	 *
+	 * Dots, one per slide, or a single bar that fills as the carousel scrolls.
+	 * Server rendered so that a region swap brings it back with the items, and
+	 * hidden until the module is running - both move the scroll container
+	 * through the scroll API, and there is nothing to fall back to when that
+	 * API has nobody calling it.
+	 *
+	 * @param string $indicator - selected indicator.
+	 * @param int    $count     - number of items rendered.
+	 *
+	 * @return string
+	 */
+	private function get_carousel_indicator( $indicator, $count ) {
+		if ( 'progress' === $indicator ) {
+			return sprintf(
+				'<div class="wp-block-visual-portfolio-item-template__carousel-progress" role="progressbar" aria-label="%1$s"><span class="wp-block-visual-portfolio-item-template__carousel-progress-value"></span></div>',
+				esc_attr__( 'Carousel position', 'visual-portfolio' )
+			);
+		}
+
+		if ( 'dots' !== $indicator ) {
+			return '';
+		}
+
+		/* translators: %d: slide number. */
+		$label = __( 'Go to slide %d', 'visual-portfolio' );
+		$dots  = '';
+
+		for ( $index = 0; $index < $count; $index++ ) {
+			$dots .= sprintf(
+				'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-dot" data-vp-slide="%1$d" aria-label="%2$s"><span class="wp-block-visual-portfolio-item-template__carousel-dot-progress"></span></button>',
+				$index,
+				esc_attr( sprintf( $label, $index + 1 ) )
+			);
+		}
+
+		// One listener for the row rather than one per dot: a Load More brings
+		// more slides, and a dot appended after hydration would carry no
+		// directive of its own.
+		return sprintf(
+			'<div class="wp-block-visual-portfolio-item-template__carousel-dots" data-vp-dot-label="%1$s" data-wp-on--click="actions.carouselGoTo">%2$s</div>',
+			esc_attr( $label ),
+			$dots
+		);
+	}
+
+	/**
+	 * Controls of a carousel, and the frame the arrows need.
 	 *
 	 * @param array $attributes - block attributes.
 	 * @param int   $count      - number of items rendered.
 	 *
-	 * @return string
+	 * @return array `[ before, after ]` markup around the list.
 	 */
-	private function get_carousel_nav( $attributes, $count ) {
-		$controls = '';
+	private function get_carousel_chrome( $attributes, $count ) {
+		$store     = esc_attr( self::VIEW_MODULE_STORE );
+		$arrows    = empty( $attributes['carouselShowArrows'] ) ? '' : $this->get_carousel_arrows();
+		$indicator = $this->get_carousel_indicator( $attributes['carouselIndicator'] ?? 'none', $count );
 
-		if ( ! empty( $attributes['carouselShowArrows'] ) ) {
-			$arrows = array(
-				'prev' => __( 'Previous slide', 'visual-portfolio' ),
-				'next' => __( 'Next slide', 'visual-portfolio' ),
-			);
-
-			foreach ( $arrows as $direction => $label ) {
-				$controls .= sprintf(
-					'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-arrow wp-block-visual-portfolio-item-template__carousel-arrow--%1$s" aria-label="%2$s" data-wp-on--click="actions.%3$s"><span aria-hidden="true"></span></button>',
-					esc_attr( $direction ),
-					esc_attr( $label ),
-					'prev' === $direction ? 'carouselPrev' : 'carouselNext'
-				);
-			}
-		}
-
-		if ( ! empty( $attributes['carouselShowDots'] ) ) {
-			/* translators: %d: slide number. */
-			$label = __( 'Go to slide %d', 'visual-portfolio' );
-			$dots  = '';
-
-			for ( $index = 0; $index < $count; $index++ ) {
-				$dots .= sprintf(
-					'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-dot" data-vp-slide="%1$d" aria-label="%2$s"></button>',
-					$index,
-					esc_attr( sprintf( $label, $index + 1 ) )
-				);
-			}
-
-			// One listener for the row rather than one per dot: a Load More
-			// brings more slides, and a dot appended after hydration would
-			// carry no directive of its own.
-			$controls .= sprintf(
-				'<div class="wp-block-visual-portfolio-item-template__carousel-dots" data-vp-dot-label="%1$s" data-wp-on--click="actions.carouselGoTo">%2$s</div>',
-				esc_attr( $label ),
-				$dots
-			);
-		}
-
-		if ( '' === $controls ) {
-			return '';
-		}
-
-		return sprintf(
-			'<div class="wp-block-visual-portfolio-item-template__carousel-nav" data-wp-interactive="%1$s">%2$s</div>',
-			esc_attr( self::VIEW_MODULE_STORE ),
-			$controls
+		$before = sprintf(
+			'<div class="wp-block-visual-portfolio-item-template__carousel-frame" data-wp-interactive="%s">',
+			$store
 		);
+
+		$after = sprintf( '%s</div>', $arrows );
+
+		if ( '' !== $indicator ) {
+			$after .= sprintf(
+				'<div class="wp-block-visual-portfolio-item-template__carousel-nav" data-wp-interactive="%1$s">%2$s</div>',
+				$store,
+				$indicator
+			);
+		}
+
+		return array( $before, $after );
 	}
 
 	/**
@@ -815,8 +858,31 @@ class Visual_Portfolio_Block_Item_Template {
 					$classes[] = 'vp-carousel-free-scroll';
 				}
 
-				if ( 'coverflow' === ( $attributes['carouselEffect'] ?? 'none' ) ) {
-					$classes[] = 'vp-carousel-coverflow';
+				if ( ! empty( $attributes['carouselEdgeFade'] ) ) {
+					$classes[] = 'vp-carousel-edge-fade';
+				}
+
+				$effect = $attributes['carouselEffect'] ?? 'none';
+
+				if ( in_array( $effect, array( 'coverflow', 'slideshow', 'cards' ), true ) ) {
+					$classes[] = 'vp-carousel-' . $effect;
+				}
+
+				$peek = max( 0, min( 200, (int) ( $attributes['carouselPeek'] ?? 0 ) ) );
+
+				if ( $peek ) {
+					// Appended rather than set through `$extra`, which is merged
+					// over the wrapper attributes and would drop the layout
+					// variables with it.
+					$layout_styles .= sprintf( '--vp-carousel-peek:%dpx;', $peek );
+				}
+
+				if ( ! empty( $attributes['carouselRepeat'] ) ) {
+					$extra['data-vp-carousel-repeat'] = 'true';
+				}
+
+				if ( ! empty( $attributes['carouselAutoplay'] ) ) {
+					$extra['data-vp-carousel-autoplay'] = max( 2, min( 10, (float) ( $attributes['carouselAutoplayDelay'] ?? 5 ) ) );
 				}
 
 				// A scroll container has to be reachable by keyboard, and a
@@ -834,7 +900,7 @@ class Visual_Portfolio_Block_Item_Template {
 
 				$extra['data-wp-class--vp-has-script'] = self::VIEW_MODULE_STORE . '::state.hasScript';
 
-				$after = $this->get_carousel_nav( $attributes, count( $items ) );
+				list( $before, $after ) = $this->get_carousel_chrome( $attributes, count( $items ) );
 				break;
 		}
 

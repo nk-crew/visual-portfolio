@@ -24,6 +24,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { plus } from '@wordpress/icons';
 
 import GalleryImage from './gallery-image';
 import ImageSettingsModal from './image-settings-modal';
@@ -284,42 +285,40 @@ export default function GalleryManager({ images, onChange, clientId }) {
 								onRemove={removeImage}
 							/>
 						))}
+
+						<MediaUploadCheck>
+							<MediaUpload
+								multiple="add"
+								allowedTypes={ALLOWED_MEDIA_TYPES}
+								value={ids}
+								onSelect={onSelect}
+								render={({ open }) => (
+									<Button
+										className="vpf-gallery-manager__add"
+										icon={plus}
+										onClick={open}
+									>
+										{__('Add media', 'visual-portfolio')}
+									</Button>
+								)}
+							/>
+						</MediaUploadCheck>
 					</div>
 				</SortableContext>
 			</DndContext>
 
-			<div className="vpf-gallery-manager__footer">
-				<span className="vpf-gallery-manager__count">
-					{sprintf(
-						// translators: %d: number of images in the gallery.
-						_n(
-							'%d image',
-							'%d images',
-							images.length,
-							'visual-portfolio'
-						),
-						images.length
-					)}
-				</span>
-
-				<MediaUploadCheck>
-					<MediaUpload
-						multiple="add"
-						allowedTypes={ALLOWED_MEDIA_TYPES}
-						value={ids}
-						onSelect={onSelect}
-						render={({ open }) => (
-							<Button
-								variant="secondary"
-								size="compact"
-								onClick={open}
-							>
-								{__('Add media', 'visual-portfolio')}
-							</Button>
-						)}
-					/>
-				</MediaUploadCheck>
-			</div>
+			<span className="vpf-gallery-manager__count">
+				{sprintf(
+					// translators: %d: number of images in the gallery.
+					_n(
+						'%d image',
+						'%d images',
+						images.length,
+						'visual-portfolio'
+					),
+					images.length
+				)}
+			</span>
 
 			{editing ? (
 				<ImageSettingsModal

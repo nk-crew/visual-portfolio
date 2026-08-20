@@ -103,7 +103,7 @@ and front-end walk of all layouts on the demo page. Commit(s) to PR 290.
 
 ## Stage 3 — inspector and toolbar
 
-- [ ] Item template inspector → ToolsPanel: layout extras (justified controls,
+- [x] Item template inspector → ToolsPanel: layout extras (justified controls,
       carousel toggles) become opt-in items with defaults and Reset; standard
       spacing via VStack. Writes `gutenberg/blocks/item-template/edit.js`.
       Check: panel menu shows/hides optional controls, Reset restores defaults.
@@ -125,14 +125,14 @@ panel and toolbar. Commit(s) to PR 290.
 
 ## Stage 4 — carousel v2
 
-- [ ] Attribute reshape: `carouselIndicator` (`none|dots|progress`) replaces
+- [x] Attribute reshape: `carouselIndicator` (`none|dots|progress`) replaces
       `carouselShowDots`; add `carouselRepeat`, `carouselAutoplay`,
       `carouselAutoplayDelay`, `carouselPeek`, `carouselEdgeFade`; extend
       `carouselEffect` enum with `slideshow`, `cards`. Writes
       `gutenberg/blocks/item-template/block.json`,
       `gutenberg/blocks/item-template/edit.js`. Check: controls render per
       spec (delay only with autoplay on, etc.).
-- [ ] Nav markup and chrome: hide the scrollbar always; overlay arrows
+- [x] Nav markup and chrome: hide the scrollbar always; overlay arrows
       left/right (36px, borderless, `rgba(0,0,0,.5)`, white chevron, hover
       `.7`, visible on touch); dots 6px with an 18px active pill and 0.25s
       transition; progress-bar indicator variant; remove the below-carousel
@@ -140,13 +140,13 @@ panel and toolbar. Commit(s) to PR 290.
       `gutenberg/blocks/item-template/style.scss`,
       `gutenberg/blocks/item-template/view.js`. Check: front-end carousel
       matches the reference screenshots.
-- [ ] Focus behavior: no outline on mouse interaction (list and buttons),
+- [x] Focus behavior: no outline on mouse interaction (list and buttons),
       keyboard ring intact. Writes
       `gutenberg/blocks/item-template/style.scss`, and
       `gutenberg/blocks/item-template/view.js` if a focus call needs
       `preventScroll`/removal. Check: clicking arrows/scrollbar area never
       shows the ring; Tab still does.
-- [ ] Coverflow fix + new effects: correct rotation sign, `translateZ`,
+- [x] Coverflow fix + new effects: correct rotation sign, `translateZ`,
       center-on-top stacking; add slideshow (forces one slide per view) and
       cards recipes behind the existing `@supports` gate. Writes
       `gutenberg/blocks/item-template/style.scss`,
@@ -154,11 +154,11 @@ panel and toolbar. Commit(s) to PR 290.
       `gutenberg/blocks/item-template/edit.js` (editor parity). Check: each
       effect previews in editor and front end; Chrome without the feature
       still scrolls plainly.
-- [ ] Repeat: pass `{ repeat: true }` to Blossom and load it on touch too when
+- [x] Repeat: pass `{ repeat: true }` to Blossom and load it on touch too when
       enabled. Writes `gutenberg/blocks/item-template/view.js`,
       `gutenberg/blocks/item-template/index.php`. Check: desktop and a touch
       emulation loop infinitely.
-- [ ] Autoplay + peek + edge fade: timer honoring delay, pausing on
+- [x] Autoplay + peek + edge fade: timer honoring delay, pausing on
       hover/interaction, inert under reduced motion, autoplay progress filling
       the active pill; peek via scroll padding; edge fade via mask. Writes
       `gutenberg/blocks/item-template/view.js`,

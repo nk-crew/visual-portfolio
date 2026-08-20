@@ -20,6 +20,11 @@ import { getJustifiedOptions, layoutJustified, startLayout } from './layouts';
 const LIST_SELECTOR = '.wp-block-visual-portfolio-item-template';
 const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
 const NAV_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-nav';
+const FRAME_SELECTOR =
+	'.wp-block-visual-portfolio-item-template__carousel-frame';
+const PROGRESS_SELECTOR =
+	'.wp-block-visual-portfolio-item-template__carousel-progress';
+const PLAYING_CLASS = 'vp-carousel-is-playing';
 const DOT_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-dot';
 const DOTS_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-dots';
 const MASONRY_CLASS = 'vp-layout-masonry';
@@ -126,6 +131,17 @@ function initJustified(list) {
 }
 
 /**
+ * The frame the arrows of a carousel are pinned to.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {HTMLElement|null} Frame element.
+ */
+function getFrame(list) {
+	return list.closest(FRAME_SELECTOR);
+}
+
+/**
  * Controls that belong to a carousel.
  *
  * @param {HTMLElement} list Item template list.
@@ -133,7 +149,7 @@ function initJustified(list) {
  * @return {HTMLElement|null} Nav element, when the gallery renders one.
  */
 function getNav(list) {
-	const next = list.nextElementSibling;
+	const next = getFrame(list)?.nextElementSibling;
 
 	return next && next.matches(NAV_SELECTOR) ? next : null;
 }
@@ -165,12 +181,49 @@ function getCurrentSlide(list) {
 }
 
 /**
+ * How far through the carousel the scroll is, as a fraction.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {number} Between zero and one.
+ */
+function getScrollProgress(list) {
+	const total = list.scrollWidth - list.clientWidth;
+
+	return total > 0 ? Math.min(1, Math.max(0, list.scrollLeft / total)) : 1;
+}
+
+/**
  * Bring the controls in line with where the carousel is.
  *
  * @param {HTMLElement} list Item template list.
  */
 function syncNav(list) {
+	const frame = getFrame(list);
 	const nav = getNav(list);
+
+	// Snapping never lands exactly on the edge, and a whole pixel of slack is
+	// less than any scroll step.
+	const end = list.scrollWidth - list.clientWidth - 1;
+	const repeats = 'true' === list.dataset.vpCarouselRepeat;
+
+	if (frame) {
+		const prev = frame.querySelector(
+			'[data-wp-on--click="actions.carouselPrev"]'
+		);
+		const next = frame.querySelector(
+			'[data-wp-on--click="actions.carouselNext"]'
+		);
+
+		// A carousel that repeats has no ends to run out of.
+		if (prev) {
+			prev.disabled = !repeats && list.scrollLeft <= 1;
+		}
+
+		if (next) {
+			next.disabled = !repeats && list.scrollLeft >= end;
+		}
+	}
 
 	if (!nav) {
 		return;
@@ -183,22 +236,13 @@ function syncNav(list) {
 		dot.setAttribute('aria-current', index === current ? 'true' : 'false');
 	});
 
-	// Snapping never lands exactly on the edge, and a whole pixel of slack is
-	// less than any scroll step.
-	const end = list.scrollWidth - list.clientWidth - 1;
-	const prev = nav.querySelector(
-		'[data-wp-on--click="actions.carouselPrev"]'
-	);
-	const next = nav.querySelector(
-		'[data-wp-on--click="actions.carouselNext"]'
-	);
+	const progress = nav.querySelector(PROGRESS_SELECTOR);
 
-	if (prev) {
-		prev.disabled = list.scrollLeft <= 1;
-	}
+	if (progress) {
+		const value = getScrollProgress(list);
 
-	if (next) {
-		next.disabled = list.scrollLeft >= end;
+		progress.style.setProperty('--vp-carousel-progress', `${value * 100}%`);
+		progress.setAttribute('aria-valuenow', String(Math.round(value * 100)));
 	}
 }
 
@@ -226,6 +270,8 @@ function syncDots(list) {
 		dot.className = DOT_SELECTOR.slice(1);
 		dot.dataset.vpSlide = String(index);
 		dot.setAttribute('aria-label', label.replace('%d', String(index + 1)));
+		dot.innerHTML =
+			'<span class="wp-block-visual-portfolio-item-template__carousel-dot-progress"></span>';
 		container.appendChild(dot);
 	}
 }
@@ -260,6 +306,100 @@ function slide(list, direction) {
 }
 
 /**
+ * Run a carousel on its own.
+ *
+ * The delay is drawn onto the indicator as it runs down, so the dot doubles as
+ * the progress of the wait. Anything the visitor does with the carousel stops
+ * the clock until they leave it alone again, and a visitor who asked for less
+ * motion never starts one.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function} Teardown.
+ */
+function initAutoplay(list) {
+	const delay = parseFloat(list.dataset.vpCarouselAutoplay) * 1000;
+
+	if (
+		!delay ||
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches
+	) {
+		return noop;
+	}
+
+	const frame = getFrame(list) || list;
+
+	let start = 0;
+	let raf = 0;
+	let paused = false;
+
+	const setProgress = (value) => {
+		frame.style.setProperty(
+			'--vp-carousel-autoplay-progress',
+			`${value * 100}%`
+		);
+	};
+
+	const tick = (now) => {
+		raf = window.requestAnimationFrame(tick);
+
+		if (paused) {
+			start = now;
+
+			return;
+		}
+
+		const elapsed = now - start;
+
+		setProgress(Math.min(1, elapsed / delay));
+
+		if (elapsed < delay) {
+			return;
+		}
+
+		start = now;
+
+		// The last slide goes back to the first, so a carousel that does not
+		// repeat still runs on.
+		if (list.scrollLeft >= list.scrollWidth - list.clientWidth - 1) {
+			list.scrollTo({ left: 0, behavior: 'smooth' });
+		} else {
+			slide(list, 1);
+		}
+	};
+
+	const pause = () => {
+		paused = true;
+	};
+	const resume = () => {
+		paused = false;
+	};
+
+	frame.classList.add(PLAYING_CLASS);
+	frame.addEventListener('pointerenter', pause);
+	frame.addEventListener('pointerleave', resume);
+	frame.addEventListener('focusin', pause);
+	frame.addEventListener('focusout', resume);
+	list.addEventListener('pointerdown', pause);
+
+	raf = window.requestAnimationFrame((now) => {
+		start = now;
+		tick(now);
+	});
+
+	return () => {
+		window.cancelAnimationFrame(raf);
+		frame.classList.remove(PLAYING_CLASS);
+		frame.removeEventListener('pointerenter', pause);
+		frame.removeEventListener('pointerleave', resume);
+		frame.removeEventListener('focusin', pause);
+		frame.removeEventListener('focusout', resume);
+		list.removeEventListener('pointerdown', pause);
+		frame.style.removeProperty('--vp-carousel-autoplay-progress');
+	};
+}
+
+/**
  * Start a carousel.
  *
  * @param {HTMLElement} list Item template list.
@@ -285,20 +425,23 @@ function initCarousel(list) {
 
 	// Drag is the one thing the browser does not do for a scroll container, and
 	// it is the one thing Blossom adds - so it is loaded where a pointer can
-	// drag and nowhere else.
+	// drag and nowhere else. A carousel that repeats is the exception: the
+	// endlessness is Blossom's too, and a touch device is owed it as much as a
+	// desktop one.
+	const repeats = 'true' === list.dataset.vpCarouselRepeat;
 	const canDrag = window.matchMedia(
 		'(hover: hover) and (pointer: fine)'
 	).matches;
 	const source = list.dataset.vpCarouselSrc;
 
-	if (canDrag && source) {
+	if ((canDrag || repeats) && source) {
 		import(/* webpackIgnore: true */ source)
 			.then(({ Blossom }) => {
 				if (!list.isConnected || carousels.has(list)) {
 					return;
 				}
 
-				const carousel = Blossom(list, {});
+				const carousel = Blossom(list, { repeat: repeats });
 
 				carousels.set(list, carousel);
 				carousel.init();
@@ -308,7 +451,10 @@ function initCarousel(list) {
 			});
 	}
 
+	const stopAutoplay = initAutoplay(list);
+
 	return () => {
+		stopAutoplay();
 		stopColumns();
 		list.removeEventListener('scroll', onScroll);
 		stopObserving();
@@ -330,10 +476,13 @@ function initCarousel(list) {
  * @return {HTMLElement|null} Item template list.
  */
 function getListOf(element) {
-	const nav = element.closest(NAV_SELECTOR);
-	const list = nav && nav.previousElementSibling;
+	// An arrow sits inside the frame, beside the list; an indicator sits in the
+	// nav after it.
+	const frame =
+		element.closest(FRAME_SELECTOR) ||
+		element.closest(NAV_SELECTOR)?.previousElementSibling;
 
-	return list && list.matches(LIST_SELECTOR) ? list : null;
+	return frame?.querySelector(LIST_SELECTOR) || null;
 }
 
 /**

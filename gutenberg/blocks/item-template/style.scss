@@ -167,9 +167,11 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 		}
 	}
 
-	// A scroll container, nothing more: the swipe, the scroll, the scrollbar and
-	// the keyboard are the browser's, and the module only adds pointer drag on
-	// top of them.
+	// A scroll container, nothing more: the swipe, the scroll and the keyboard
+	// are the browser's, and the module only adds pointer drag on top of them.
+	// The scrollbar is hidden here rather than left to the carousel library -
+	// the library is loaded on a pointer device and only then, and a scrollbar
+	// under a gallery is not something a visitor should see meanwhile.
 	&.vp-layout-carousel {
 		display: flex;
 		gap: var(--vp-layout-gap, 1.5rem);
@@ -177,11 +179,21 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 		overflow-y: hidden;
 		scroll-snap-type: x mandatory;
 		scroll-behavior: smooth;
+		scrollbar-width: none;
 		overscroll-behavior-x: contain;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		// A slide of the next one showing at the edge, as an invitation to
+		// scroll on.
+		scroll-padding-inline: var(--vp-carousel-peek, 0);
+		padding-inline-end: var(--vp-carousel-peek, 0);
 
 		> #{$item} {
 			flex: 0 0 auto;
-			width: calc((100% - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
+			width: calc((100% - var(--vp-carousel-peek, 0px) - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
 			scroll-snap-align: var(--vp-carousel-snap-align, start);
 		}
 
@@ -193,41 +205,110 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 			scroll-snap-type: none;
 		}
 
+		// The edges dissolve rather than cut, so a half slide reads as more
+		// carousel rather than as a mistake.
+		&.vp-carousel-edge-fade {
+			mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+		}
+
+		// A pointer never draws a focus ring here: the ring is for the keyboard,
+		// and a click on the scrollbar or an arrow used to light the whole
+		// gallery up.
+		&:focus {
+			outline: none;
+		}
+
 		&:focus-visible {
 			outline: 2px solid currentcolor;
 			outline-offset: 2px;
 		}
 	}
 
-	// Coverflow is a scroll-driven animation and nothing else - where the
-	// timeline is missing the rule never applies and the carousel is exactly the
-	// carousel it was without it.
+	// Scroll driven effects, and nothing else - where the timeline is missing
+	// the rules never apply and the carousel is exactly the carousel it was
+	// without them.
 	@supports (animation-timeline: view()) {
-		&.vp-layout-carousel.vp-carousel-coverflow {
+		&.vp-layout-carousel:is(.vp-carousel-coverflow, .vp-carousel-slideshow, .vp-carousel-cards) {
 			perspective: 1200px;
 
 			> #{$item} {
-				animation: vp-carousel-coverflow linear both;
+				animation: linear both;
 				animation-timeline: view(inline);
 			}
+		}
+
+		&.vp-layout-carousel.vp-carousel-coverflow > #{$item} {
+			animation-name: vp-carousel-coverflow;
+		}
+
+		&.vp-layout-carousel.vp-carousel-slideshow > #{$item} {
+			animation-name: vp-carousel-slideshow;
+		}
+
+		&.vp-layout-carousel.vp-carousel-cards > #{$item} {
+			animation-name: vp-carousel-cards;
 		}
 	}
 }
 
+// A slide entering from the right faces left, towards the middle of the
+// carousel, and a slide leaving to the left faces right - which is the way the
+// original cover flow turns, and the way the sign used to be the wrong way
+// round here. The depth is what makes it read as a turn rather than a squash.
 @keyframes vp-carousel-coverflow {
 	0% {
-		opacity: 0.65;
-		transform: rotateY(32deg) scale(0.85);
+		z-index: 0;
+		opacity: 0.6;
+		transform: rotateY(-45deg) translateZ(-120px) scale(0.85);
 	}
 
 	50% {
+		z-index: 1;
 		opacity: 1;
-		transform: none;
+		transform: rotateY(0) translateZ(0) scale(1);
 	}
 
 	100% {
-		opacity: 0.65;
-		transform: rotateY(-32deg) scale(0.85);
+		z-index: 0;
+		opacity: 0.6;
+		transform: rotateY(45deg) translateZ(-120px) scale(0.85);
+	}
+}
+
+// One slide at a time, dissolving into the next instead of sliding.
+@keyframes vp-carousel-slideshow {
+	0% {
+		opacity: 0;
+	}
+
+	40%,
+	60% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+// A deck: the slide in the middle sits on top of the ones behind it.
+@keyframes vp-carousel-cards {
+	0% {
+		z-index: 0;
+		opacity: 0.4;
+		transform: translateX(35%) scale(0.8) rotate(4deg);
+	}
+
+	50% {
+		z-index: 1;
+		opacity: 1;
+		transform: translateX(0) scale(1) rotate(0);
+	}
+
+	100% {
+		z-index: 0;
+		opacity: 0.4;
+		transform: translateX(-35%) scale(0.8) rotate(-4deg);
 	}
 }
 
@@ -235,7 +316,7 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 	.wp-block-visual-portfolio-item-template.vp-layout-carousel {
 		scroll-behavior: auto;
 
-		&.vp-carousel-coverflow > .wp-block-visual-portfolio-item-template__item {
+		> .wp-block-visual-portfolio-item-template__item {
 			animation: none;
 		}
 	}
@@ -245,79 +326,169 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 	min-width: 0;
 }
 
+// The frame the arrows are pinned to. The list itself scrolls, so an arrow
+// inside it would scroll away with the slides.
+.wp-block-visual-portfolio-item-template__carousel-frame {
+	position: relative;
+}
+
 // Controls of a carousel. Server rendered so that a region swap brings them
 // back with the items, and hidden until the module is running - they move the
 // scroll container through the scroll API, and there is nothing to fall back to
 // when that API has nobody calling it.
-.wp-block-visual-portfolio-item-template__carousel-nav {
+.wp-block-visual-portfolio-item-template__carousel-arrow {
+	position: absolute;
+	top: 50%;
+	z-index: 2;
 	display: none;
 	align-items: center;
 	justify-content: center;
-	gap: 0.5rem;
-	margin-top: var(--vp-layout-gap, 1.5rem);
-}
-
-.vp-layout-carousel.vp-has-script + .wp-block-visual-portfolio-item-template__carousel-nav {
-	display: flex;
-}
-
-.wp-block-visual-portfolio-item-template__carousel-arrow {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 2.5rem;
-	height: 2.5rem;
+	width: 36px;
+	height: 36px;
 	padding: 0;
-	color: inherit;
+	color: #fff;
 	cursor: pointer;
-	background: none;
-	border: 1px solid currentcolor;
+	background: rgba(0, 0, 0, 0.5);
+	border: 0;
 	border-radius: 50%;
+	transform: translateY(-50%);
+	transition: background-color 0.2s ease, opacity 0.2s ease;
+
+	.vp-layout-carousel.vp-has-script ~ & {
+		display: flex;
+	}
+
+	&:hover:not([disabled]) {
+		background: rgba(0, 0, 0, 0.7);
+	}
 
 	&[disabled] {
-		opacity: 0.35;
 		cursor: default;
+		opacity: 0.25;
+	}
+
+	// A pointer never draws the ring; the keyboard always does.
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
 	}
 
 	// The chevron is drawn rather than shipped: two borders on a rotated square
-	// weigh nothing and take the colour of the text around them.
+	// weigh nothing and take the colour of the button around them.
 	> span {
-		width: 0.5rem;
-		height: 0.5rem;
+		width: 7px;
+		height: 7px;
 		border-top: 2px solid currentcolor;
 		border-right: 2px solid currentcolor;
 	}
 
-	&--prev > span {
-		margin-left: 0.15rem;
-		transform: rotate(-135deg);
+	&--prev {
+		left: 12px;
+
+		> span {
+			margin-left: 3px;
+			transform: rotate(-135deg);
+		}
 	}
 
-	&--next > span {
-		margin-right: 0.15rem;
-		transform: rotate(45deg);
+	&--next {
+		right: 12px;
+
+		> span {
+			margin-right: 3px;
+			transform: rotate(45deg);
+		}
 	}
+}
+
+.wp-block-visual-portfolio-item-template__carousel-nav {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	margin-top: var(--vp-layout-gap, 1.5rem);
+}
+
+.wp-block-visual-portfolio-item-template__carousel-frame:has(.vp-has-script) + .wp-block-visual-portfolio-item-template__carousel-nav {
+	display: flex;
 }
 
 .wp-block-visual-portfolio-item-template__carousel-dots {
 	display: flex;
 	align-items: center;
-	gap: 0.35rem;
+	gap: 6px;
 }
 
+// Six pixels while it waits, an eighteen pixel pill while it is the slide on
+// screen. Autoplay fills that pill as the delay runs down, so the indicator
+// says how long is left without a second control beside it.
 .wp-block-visual-portfolio-item-template__carousel-dot {
-	width: 0.5rem;
-	height: 0.5rem;
+	position: relative;
+	width: 6px;
+	height: 6px;
 	padding: 0;
+	overflow: hidden;
 	cursor: pointer;
-	background: currentcolor;
+
+	// The pill grows through `min-width`: `width` on a flex item is a base size
+	// the flex algorithm is free to overrule, and the transition never landed.
+	// The colour changes at once rather than fading - a colour transition on
+	// these dots stays on the shade it started from, and the movement is what
+	// carries the change anyway.
+	background: color-mix(in srgb, currentcolor 25%, transparent);
 	border: 0;
-	border-radius: 50%;
-	opacity: 0.35;
+	border-radius: 3px;
+	transition: min-width 0.25s ease;
+
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
 
 	&[aria-current="true"] {
-		opacity: 1;
+		min-width: 18px;
+		background: currentcolor;
 	}
+}
+
+.wp-block-visual-portfolio-item-template__carousel-dot-progress {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: none;
+	width: var(--vp-carousel-autoplay-progress, 0%);
+	height: 100%;
+	background: currentcolor;
+	opacity: 0.55;
+}
+
+.vp-carousel-is-playing .wp-block-visual-portfolio-item-template__carousel-dot[aria-current="true"] .wp-block-visual-portfolio-item-template__carousel-dot-progress {
+	display: block;
+}
+
+.wp-block-visual-portfolio-item-template__carousel-progress {
+	width: min(180px, 60%);
+	height: 4px;
+	overflow: hidden;
+	background: currentcolor;
+	border-radius: 2px;
+	opacity: 0.25;
+}
+
+.wp-block-visual-portfolio-item-template__carousel-progress-value {
+	display: block;
+	width: var(--vp-carousel-progress, 0%);
+	height: 100%;
+	background: currentcolor;
+	border-radius: inherit;
+	transition: width 0.15s linear;
 }
 
 // The loop is fetching its next state. The controls stay clickable - a second
