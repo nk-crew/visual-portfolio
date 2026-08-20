@@ -99,7 +99,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	public function test_first_row_is_loaded_eagerly() {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
-			array( 'layoutColumns' => 3 )
+			array( 'layoutColumnCount' => 3 )
 		);
 
 		// Exactly one image is urgent - a page where everything is urgent has
@@ -121,7 +121,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	public function test_first_row_follows_the_columns() {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
-			array( 'layoutColumns' => 5 )
+			array( 'layoutColumnCount' => 5 )
 		);
 
 		$this->assertSame( 5, substr_count( $output, 'loading="eager"' ) );
@@ -136,7 +136,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	public function test_cover_carries_the_loading_attributes() {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-cover --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->',
-			array( 'layoutColumns' => 2 )
+			array( 'layoutColumnCount' => 2 )
 		);
 
 		$this->assertSame( 1, substr_count( $output, 'fetchpriority="high"' ) );
@@ -158,7 +158,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
-			array( 'layoutColumns' => 1 )
+			array( 'layoutColumnCount' => 1 )
 		);
 
 		$this->assertStringContainsString( 'vp-lazyload', $output );

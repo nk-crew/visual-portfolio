@@ -13,21 +13,22 @@
 			"default": "grid",
 			"enum": ["grid", "masonry", "tiles", "justified", "carousel"]
 		},
-		"layoutColumns": {
+		"layoutColumnsMode": {
+			"type": "string",
+			"default": "auto",
+			"enum": ["auto", "manual"]
+		},
+		"layoutColumnCount": {
 			"type": "number",
 			"default": 3
 		},
-		"layoutColumnsTablet": {
-			"type": "number",
-			"default": 2
-		},
-		"layoutColumnsMobile": {
-			"type": "number",
-			"default": 1
-		},
-		"layoutGap": {
+		"layoutMinimumColumnWidth": {
 			"type": "string",
-			"default": "1.5rem"
+			"default": "16rem"
+		},
+		"layoutAutoFit": {
+			"type": "boolean",
+			"default": false
 		},
 		"layoutTiles": {
 			"type": "string",
@@ -104,7 +105,11 @@
 		},
 		"spacing": {
 			"padding": true,
-			"margin": ["top", "bottom"]
+			"margin": ["top", "bottom"],
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		},
 		"__experimentalBorder": {
 			"radius": true,
@@ -124,7 +129,7 @@
 	],
 	"providesContext": {
 		"vp/layoutType": "layoutType",
-		"vp/layoutColumns": "layoutColumns"
+		"vp/layoutColumns": "layoutColumnCount"
 	},
 	"style": "visual-portfolio-block-item-template",
 	"editorStyle": "visual-portfolio-block-item-template-editor"

@@ -28,9 +28,32 @@ the block. Visual Portfolio Pro adds social networks and taxonomy sources to the
 same picker.
 
 **Layouts.** The item template offers grid, masonry, tiles, justified and
-carousel. Columns are set per viewport; the numbers are published as
-`--vp-layout-columns`, `--vp-layout-columns-md` and `--vp-layout-columns-sm`, so
-a theme can override them in CSS without touching the block.
+carousel.
+
+Columns come in the two shapes the core grid layout offers, and are edited with
+the same controls. **Auto** asks for a minimum column width and fits as many
+columns as the container holds, up to a maximum count — zero lifts the maximum,
+and *Fill available space* drops the empty tracks of a row that cannot be
+filled. **Manual** asks for a count and keeps it. Tiles take their columns from
+the tiles notation, and justified has none.
+
+There are no per-viewport columns of our own: a narrower screen is what auto
+mode is for, and a fixed count is made responsive through the editor's own
+viewport states. The gap is **Block spacing** in the Dimensions panel, like any
+other block.
+
+What a theme overrides in CSS, without touching the markup:
+
+| Property | Meaning |
+|---|---|
+| `--vp-layout-columns` | Column count, or the maximum in auto mode |
+| `--vp-layout-min-column-width` | Minimum column width, auto mode only |
+| `--vp-layout-track` | The `minmax()` track a grid repeats, auto mode only |
+| `--vp-layout-gap` | Block spacing |
+| `--vp-layout-row-height` | Justified row height |
+
+Auto mode also puts `vp-layout-auto-columns` on the list, and
+`vp-layout-auto-fit` when empty tracks collapse.
 
 **Patterns.** The inserter ships one pattern per classic skin — grid classic,
 grid fade, grid fly, grid emerge, masonry classic, masonry fade and a posts

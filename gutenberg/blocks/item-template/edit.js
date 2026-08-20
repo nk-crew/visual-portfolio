@@ -18,6 +18,8 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -28,6 +30,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { getBlockGapValue, getColumnsProps } from './columns';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
 
@@ -47,6 +50,14 @@ const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
 // The same question the view module asks: where the browser packs masonry
 // itself, the stylesheet does the layout and no script should run over it.
 const HAS_NATIVE_MASONRY = !!window.CSS?.supports?.('display', 'grid-lanes');
+
+// The units a column width is typed in, the same set the core grid offers.
+const CSS_UNITS = [
+	{ value: 'px', label: 'px', default: 320 },
+	{ value: 'rem', label: 'rem', default: 20 },
+	{ value: 'em', label: 'em', default: 20 },
+	{ value: 'vw', label: 'vw', default: 20 },
+];
 
 const TEMPLATE = [
 	['visual-portfolio/item-image', { aspectRatio: '1', clickAction: 'popup' }],
@@ -188,10 +199,10 @@ export default function BlockEdit({
 }) {
 	const {
 		layoutType,
-		layoutColumns,
-		layoutColumnsTablet,
-		layoutColumnsMobile,
-		layoutGap,
+		layoutColumnsMode,
+		layoutColumnCount,
+		layoutMinimumColumnWidth,
+		layoutAutoFit,
 		layoutTiles,
 		justifiedRowHeight,
 		justifiedRowHeightTolerance,
@@ -293,7 +304,7 @@ export default function BlockEdit({
 	const isEmpty = !isLoading && !blockContexts.length;
 
 	// Tiles carry their columns in the notation, so that is where the layout
-	// reads them, and the narrower viewports can only go below that number.
+	// reads them.
 	const tileStyles = useMemo(
 		() => ('tiles' === layoutType ? getTileStyles(layoutTiles) : []),
 		[layoutType, layoutTiles]
@@ -305,9 +316,33 @@ export default function BlockEdit({
 				: { columns: 0, widest: 1 },
 		[layoutType, layoutTiles]
 	);
-	const columns = tilesColumns.columns || layoutColumns;
-	const narrower = (value) =>
-		Math.max(tilesColumns.widest, Math.min(value, columns));
+	// Tiles carry their columns in the notation, so that is where the layout
+	// reads them, whatever the columns controls say.
+	const columnsProps = useMemo(
+		() =>
+			getColumnsProps(
+				{
+					layoutType,
+					layoutColumnsMode,
+					layoutColumnCount:
+						tilesColumns.columns || layoutColumnCount,
+					layoutMinimumColumnWidth,
+					layoutAutoFit,
+				},
+				attributes.style?.spacing?.blockGap
+					? getBlockGapValue(attributes.style.spacing.blockGap)
+					: ''
+			),
+		[
+			layoutType,
+			layoutColumnsMode,
+			layoutColumnCount,
+			layoutMinimumColumnWidth,
+			layoutAutoFit,
+			tilesColumns.columns,
+			attributes.style?.spacing?.blockGap,
+		]
+	);
 
 	// The catalogue of the tiles picker, which Pro and themes extend through
 	// `vpf_loop_tiles_presets`. It travels alongside the editor bundle: the
@@ -362,7 +397,7 @@ export default function BlockEdit({
 			lastRow: justifiedLastRow,
 		},
 		itemsCount: blockContexts.length,
-		signature: `${columns}|${layoutGap}|${justifiedRowHeight}|${justifiedRowHeightTolerance}|${justifiedMaxRowsCount}|${justifiedLastRow}`,
+		signature: `${columnsProps.className}|${JSON.stringify(columnsProps.style)}|${justifiedRowHeight}|${justifiedRowHeightTolerance}|${justifiedMaxRowsCount}|${justifiedLastRow}`,
 	});
 
 	// The layout describes a list of items; the empty state is a single notice
@@ -372,21 +407,85 @@ export default function BlockEdit({
 			? {}
 			: {
 					ref: listRef,
-					className: layoutClasses,
+					className:
+						`${layoutClasses} ${columnsProps.className}`.trim(),
 					style: {
-						'--vp-layout-columns': columns,
-						'--vp-layout-columns-md': narrower(layoutColumnsTablet),
-						'--vp-layout-columns-sm': narrower(layoutColumnsMobile),
-						'--vp-layout-gap': layoutGap,
+						...columnsProps.style,
 						'--vp-layout-row-height': `${justifiedRowHeight}px`,
 						'--vp-carousel-snap-align': carouselSnapAlign,
 					},
 				}
 	);
 
-	const columnsControls = (
+	const isAuto = 'auto' === layoutColumnsMode;
+
+	// The two shapes the core grid layout offers, in its own words: a count, or
+	// a minimum width the container fits as many of as it can.
+	const columnsControls = COLUMN_LAYOUTS.includes(layoutType) ? (
 		<>
-			{COLUMN_LAYOUTS.includes(layoutType) && (
+			<ToggleGroupControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				isBlock
+				label={__('Columns', 'visual-portfolio')}
+				value={layoutColumnsMode}
+				onChange={(value) =>
+					setAttributes({ layoutColumnsMode: value })
+				}
+			>
+				<ToggleGroupControlOption
+					value="auto"
+					label={__('Auto', 'visual-portfolio')}
+				/>
+				<ToggleGroupControlOption
+					value="manual"
+					label={__('Manual', 'visual-portfolio')}
+				/>
+			</ToggleGroupControl>
+
+			{isAuto ? (
+				<>
+					<UnitControl
+						__next40pxDefaultSize
+						label={__('Minimum column width', 'visual-portfolio')}
+						value={layoutMinimumColumnWidth}
+						onChange={(value) =>
+							setAttributes({
+								layoutMinimumColumnWidth: value || '16rem',
+							})
+						}
+						units={CSS_UNITS}
+						min={0}
+					/>
+					<RangeControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={__('Maximum columns', 'visual-portfolio')}
+						help={__(
+							'Zero lets the gallery use every column that fits.',
+							'visual-portfolio'
+						)}
+						value={layoutColumnCount}
+						onChange={(value) =>
+							setAttributes({ layoutColumnCount: value })
+						}
+						min={0}
+						max={6}
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={__('Fill available space', 'visual-portfolio')}
+						help={__(
+							'A row that cannot be filled drops its empty columns instead of keeping them.',
+							'visual-portfolio'
+						)}
+						checked={layoutAutoFit}
+						onChange={(value) =>
+							setAttributes({ layoutAutoFit: value })
+						}
+					/>
+				</>
+			) : (
 				<RangeControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
@@ -395,38 +494,16 @@ export default function BlockEdit({
 							? __('Slides per view', 'visual-portfolio')
 							: __('Columns', 'visual-portfolio')
 					}
-					value={layoutColumns}
+					value={layoutColumnCount}
 					onChange={(value) =>
-						setAttributes({ layoutColumns: value })
+						setAttributes({ layoutColumnCount: value })
 					}
 					min={1}
 					max={6}
 				/>
 			)}
-			<RangeControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={__('Columns on tablet', 'visual-portfolio')}
-				value={layoutColumnsTablet}
-				onChange={(value) =>
-					setAttributes({ layoutColumnsTablet: value })
-				}
-				min={1}
-				max={6}
-			/>
-			<RangeControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={__('Columns on mobile', 'visual-portfolio')}
-				value={layoutColumnsMobile}
-				onChange={(value) =>
-					setAttributes({ layoutColumnsMobile: value })
-				}
-				min={1}
-				max={6}
-			/>
 		</>
-	);
+	) : null;
 
 	const inspectorControls = (
 		<InspectorControls>
@@ -455,14 +532,7 @@ export default function BlockEdit({
 					</div>
 				)}
 
-				{'justified' !== layoutType && columnsControls}
-
-				<UnitControl
-					__next40pxDefaultSize
-					label={__('Gap', 'visual-portfolio')}
-					value={layoutGap}
-					onChange={(value) => setAttributes({ layoutGap: value })}
-				/>
+				{columnsControls}
 
 				{'justified' === layoutType && (
 					<>

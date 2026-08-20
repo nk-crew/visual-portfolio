@@ -1,5 +1,8 @@
 import { getElement, store } from '@wordpress/interactivity';
 
+import { syncAutoColumns } from './auto-columns';
+import { getJustifiedOptions, layoutJustified, startLayout } from './layouts';
+
 /**
  * The layouts of the Gallery Item Template that need a browser.
  *
@@ -30,7 +33,6 @@ const RELAYOUT_EVENT = 'vp-relayout';
 const noop = () => {};
 
 const carousels = new WeakMap();
-const justifiedLists = new WeakSet();
 
 /**
  * Whether the browser packs a masonry layout without being asked twice.
@@ -111,35 +113,6 @@ function observeItems(list, onAppend) {
 }
 
 /**
- * Options fjGallery lays a list out with.
- *
- * @param {HTMLElement} list Item template list.
- *
- * @return {Object} fjGallery options.
- */
-function getJustifiedOptions(list) {
-	const gap = getGap(list);
-	const data = list.dataset;
-	const maxRows = parseInt(data.vpJustifiedMaxRows, 10) || 0;
-
-	return {
-		itemSelector: ITEM_SELECTOR,
-		imageSelector: 'img',
-		rowHeight: parseFloat(data.vpJustifiedRowHeight) || 320,
-		rowHeightTolerance: parseFloat(data.vpJustifiedTolerance) || 0,
-		// Zero means "as many as there are", which is how the control reads and
-		// not how the library does.
-		maxRowsCount: maxRows || Number.POSITIVE_INFINITY,
-		lastRow: data.vpJustifiedLastRow || 'left',
-		gutter: { horizontal: gap, vertical: gap },
-		// Items carry a title and a description under the image, so a row is
-		// only even once the tallest item in it has been measured.
-		calculateItemsHeight: true,
-		transitionDuration: '0s',
-	};
-}
-
-/**
  * Lay a justified gallery out.
  *
  * @param {HTMLElement} list Item template list.
@@ -147,47 +120,9 @@ function getJustifiedOptions(list) {
  * @return {Function} Teardown.
  */
 function initJustified(list) {
-	const start = () => {
-		const { fjGallery } = window;
-
-		if (!fjGallery || justifiedLists.has(list)) {
-			return;
-		}
-
-		justifiedLists.add(list);
-		fjGallery(list, getJustifiedOptions(list));
-	};
-
-	// WordPress prints classic scripts so that they run before a module, but a
-	// plugin that defers them turns that around. By `load` they have all run.
-	if (window.fjGallery) {
-		start();
-	} else {
-		window.addEventListener(
-			'load',
-			() => {
-				if (list.isConnected) {
-					start();
-				}
-			},
-			{ once: true }
-		);
-	}
-
-	const stopObserving = observeItems(list, (added) => {
-		if (justifiedLists.has(list)) {
-			window.fjGallery(list, 'appendImages', added);
-		}
-	});
-
-	return () => {
-		stopObserving();
-
-		if (justifiedLists.has(list)) {
-			justifiedLists.delete(list);
-			window.fjGallery(list, 'destroy');
-		}
-	};
+	return startLayout(list, (element) =>
+		layoutJustified(element, getJustifiedOptions(element))
+	);
 }
 
 /**
@@ -334,6 +269,10 @@ function slide(list, direction) {
 function initCarousel(list) {
 	const onScroll = () => syncNav(list);
 
+	// The slide width is a `calc()` over the column count, which auto mode has
+	// to work out from the container.
+	const stopColumns = syncAutoColumns(list, () => syncNav(list));
+
 	syncDots(list);
 	syncNav(list);
 
@@ -370,6 +309,7 @@ function initCarousel(list) {
 	}
 
 	return () => {
+		stopColumns();
 		list.removeEventListener('scroll', onScroll);
 		stopObserving();
 
@@ -403,7 +343,7 @@ function getListOf(element) {
  *
  * @return {Function|undefined} Teardown, when the layout has one.
  */
-function startLayout(list) {
+function startListLayout(list) {
 	if ('justified' === list.dataset.vpLayout) {
 		return initJustified(list);
 	}
@@ -488,7 +428,7 @@ store('visual-portfolio/item-template', {
 		initLayout() {
 			const { ref } = getElement();
 
-			let teardown = startLayout(ref);
+			let teardown = startListLayout(ref);
 
 			if (!teardown) {
 				return undefined;
@@ -499,7 +439,7 @@ store('visual-portfolio/item-template', {
 			// the page before it. The loop announces the swap.
 			const relayout = () => {
 				teardown();
-				teardown = startLayout(ref) || noop;
+				teardown = startListLayout(ref) || noop;
 			};
 
 			ref.addEventListener(RELAYOUT_EVENT, relayout);

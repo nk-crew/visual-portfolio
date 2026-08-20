@@ -1,5 +1,7 @@
 import { getContext, getElement, store } from '@wordpress/interactivity';
 
+import { syncAutoColumns } from '../item-template/auto-columns';
+
 /**
  * The front end of the whole Gallery Loop family - the loop wrapper, its filter,
  * sort and pagination controls and the item template all run on this one store.
@@ -24,6 +26,7 @@ const MASONRY_CLASS = 'vp-layout-masonry';
 const RELAYOUT_EVENT = 'vp-relayout';
 
 const masonryLayouts = new WeakMap();
+const autoColumns = new WeakMap();
 const resizeObservers = new WeakMap();
 const observedWidths = new WeakMap();
 const pendingRequests = new WeakMap();
@@ -148,6 +151,19 @@ function initMasonry(list) {
 		return;
 	}
 
+	// Masonry reads the column off the first item, and the item width is a
+	// `calc()` over the column count - which auto mode has to work out first.
+	autoColumns.set(
+		list,
+		syncAutoColumns(list, () => {
+			const current = masonryLayouts.get(list);
+
+			if (current) {
+				current.layout();
+			}
+		})
+	);
+
 	const layout = new Masonry(list, {
 		itemSelector: ITEM_SELECTOR,
 		columnWidth: ITEM_SELECTOR,
@@ -170,6 +186,13 @@ function initMasonry(list) {
  * @param {HTMLElement} list Item template list.
  */
 function destroyMasonry(list) {
+	const stopColumns = autoColumns.get(list);
+
+	if (stopColumns) {
+		autoColumns.delete(list);
+		stopColumns();
+	}
+
 	const layout = masonryLayouts.get(list);
 
 	if (layout) {

@@ -33,15 +33,6 @@ class Visual_Portfolio_Block_Item_Template {
 	const VIEW_MODULE_STORE = 'visual-portfolio/item-template';
 
 	/**
-	 * Handle of the justified layout library.
-	 *
-	 * The same vendored file the legacy layout uses, registered again without
-	 * the jQuery dependency the legacy handle carries - the loop family has no
-	 * jQuery in it and a layout is not a reason to load it.
-	 */
-	const JUSTIFIED_SCRIPT = 'visual-portfolio-flickr-justified-gallery';
-
-	/**
 	 * Handle of the carousel stylesheet.
 	 */
 	const CAROUSEL_STYLE = 'visual-portfolio-blossom-carousel';
@@ -51,11 +42,6 @@ class Visual_Portfolio_Block_Item_Template {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_block' ), 11 );
-
-		// Breakpoints belong to the site, not to a block, so they are resolved
-		// once and attached to the stylesheet - on the front end and inside the
-		// editor canvas alike.
-		add_action( 'enqueue_block_assets', array( $this, 'enqueue_viewport_columns' ) );
 
 		// editor. Late, so that the editor bundle it attaches to is registered.
 		add_action( 'enqueue_block_assets', array( $this, 'enqueue_tiles_presets' ), 20 );
@@ -146,13 +132,6 @@ class Visual_Portfolio_Block_Item_Template {
 		Visual_Portfolio_Assets::register_style( self::STYLE . '-editor', 'build/gutenberg/blocks/item-template/editor' );
 		wp_style_add_data( self::STYLE . '-editor', 'rtl', 'replace' );
 
-		Visual_Portfolio_Assets::register_script(
-			self::JUSTIFIED_SCRIPT,
-			'assets/vendor/flickr-justified-gallery/dist/fjGallery.min',
-			array(),
-			'2.2.0'
-		);
-
 		wp_register_style(
 			self::CAROUSEL_STYLE,
 			visual_portfolio()->plugin_url . 'assets/vendor/blossom-carousel/dist/blossom-carousel-core.css',
@@ -182,53 +161,6 @@ class Visual_Portfolio_Block_Item_Template {
 				'skip_inner_blocks' => true,
 			)
 		);
-	}
-
-	/**
-	 * Publish the viewport overrides of the columns.
-	 *
-	 * The column counts themselves stay in `--vp-layout-columns{,-md,-sm}` on
-	 * the list, which is the documented contract themes and Pro redeclare. What
-	 * moved here is the breakpoints: they are the site's, read off
-	 * `settings.viewport` through the same call core makes for responsive block
-	 * styles, so a theme that moves its breakpoints moves every gallery with
-	 * them instead of leaving them on numbers hardcoded in our stylesheet.
-	 *
-	 * @return void
-	 */
-	public function enqueue_viewport_columns() {
-		static $done = false;
-
-		if ( $done ) {
-			return;
-		}
-
-		$done = true;
-
-		$settings = wp_get_global_settings();
-		$queries  = WP_Theme_JSON::get_viewport_media_queries( isset( $settings['viewport'] ) ? $settings['viewport'] : null );
-		$sources  = array(
-			'@tablet' => '--vp-layout-columns-md,2',
-			'@mobile' => '--vp-layout-columns-sm,1',
-		);
-
-		$css = '';
-
-		foreach ( $sources as $state => $source ) {
-			if ( empty( $queries[ $state ] ) ) {
-				continue;
-			}
-
-			$css .= sprintf(
-				'%1$s{.wp-block-visual-portfolio-item-template{--vp-layout-current-columns:var(%2$s);}}',
-				$queries[ $state ],
-				$source
-			);
-		}
-
-		if ( '' !== $css ) {
-			wp_add_inline_style( self::STYLE, $css );
-		}
 	}
 
 	/**
@@ -423,48 +355,47 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
-	 * Columns of a layout, per viewport.
+	 * Whether the columns of a layout follow the container rather than a count.
 	 *
-	 * Tiles are the exception: the number of columns is written into the tiles
-	 * notation, not chosen with the columns control, so the notation sets the
-	 * widest value and the narrower viewports can only go below it.
+	 * Tiles carry their columns in the notation and justified has none, so
+	 * neither has a mode to choose.
 	 *
 	 * @param array  $attributes  - block attributes.
 	 * @param string $layout_type - resolved layout.
 	 *
-	 * @return array `[ desktop, tablet, mobile ]`.
+	 * @return bool
+	 */
+	private function is_auto_columns( $attributes, $layout_type ) {
+		if ( 'tiles' === $layout_type || 'justified' === $layout_type ) {
+			return false;
+		}
+
+		return 'auto' === ( $attributes['layoutColumnsMode'] ?? 'auto' );
+	}
+
+	/**
+	 * Columns of a layout.
+	 *
+	 * A count in manual mode, and the most the layout may reach in auto mode -
+	 * where how many there really are is a question only the container can
+	 * answer. Tiles are the exception: the number is written into the tiles
+	 * notation rather than chosen with the controls.
+	 *
+	 * @param array  $attributes  - block attributes.
+	 * @param string $layout_type - resolved layout.
+	 *
+	 * @return int
 	 */
 	private function get_layout_columns( $attributes, $layout_type ) {
-		$columns = array();
-
-		$defaults = array(
-			'layoutColumns'       => 3,
-			'layoutColumnsTablet' => 2,
-			'layoutColumnsMobile' => 1,
-		);
-
-		foreach ( $defaults as $name => $default ) {
-			$value     = isset( $attributes[ $name ] ) ? (int) $attributes[ $name ] : $default;
-			$columns[] = max( 1, min( Visual_Portfolio_Tiles_Parser::MAX_COLUMNS, $value ) );
-		}
-
 		if ( 'tiles' === $layout_type ) {
 			$parsed = Visual_Portfolio_Tiles_Parser::parse( $attributes['layoutTiles'] ?? '' );
-			$widest = 1;
 
-			foreach ( $parsed['tiles'] as $tile ) {
-				$widest = max( $widest, $tile['width'] );
-			}
-
-			// A narrower viewport never drops below the widest tile of the
-			// pattern: a tile spanning two columns of a single column grid would
-			// open an implicit second column and take the layout with it.
-			$columns[0] = $parsed['columns'];
-			$columns[1] = max( $widest, min( $columns[1], $parsed['columns'] ) );
-			$columns[2] = max( $widest, min( $columns[2], $parsed['columns'] ) );
+			return $parsed['columns'];
 		}
 
-		return $columns;
+		$columns = isset( $attributes['layoutColumnCount'] ) ? (int) $attributes['layoutColumnCount'] : 3;
+
+		return max( 1, min( Visual_Portfolio_Tiles_Parser::MAX_COLUMNS, $columns ) );
 	}
 
 	/**
@@ -507,27 +438,74 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
-	 * Layout variables printed on the list.
+	 * Block spacing, as a CSS length.
 	 *
-	 * A public contract: themes and Pro breakpoints override the layout by
-	 * redeclaring these, without touching the markup. Which of the three is in
-	 * effect is decided by the viewport rules of `enqueue_viewport_columns()`.
+	 * The gap is edited through the core Dimensions panel, which stores either a
+	 * length or a reference to a preset of the theme. Core prints no CSS for it
+	 * on a block without layout support, which is what lets the value land on
+	 * the layout variable the stylesheet already reads.
+	 *
+	 * @param array $attributes - block attributes.
+	 *
+	 * @return string CSS length, or an empty string when the theme decides.
+	 */
+	private function get_block_gap( $attributes ) {
+		$gap = $attributes['style']['spacing']['blockGap'] ?? '';
+
+		if ( ! is_string( $gap ) || '' === $gap ) {
+			return '';
+		}
+
+		// `var:preset|spacing|50` is how a preset travels in block attributes.
+		if ( 0 === strpos( $gap, 'var:' ) ) {
+			return sprintf( 'var(--wp--%s)', str_replace( '|', '--', substr( $gap, 4 ) ) );
+		}
+
+		return $this->get_css_length( $gap, '' );
+	}
+
+	/**
+	 * Layout classes and variables printed on the list.
+	 *
+	 * A public contract: themes override a gallery by redeclaring these,
+	 * without touching the markup.
 	 *
 	 * @param array  $attributes  - block attributes.
 	 * @param string $layout_type - resolved layout.
 	 *
-	 * @return string
+	 * @return array `[ classes, styles ]`.
 	 */
-	private function get_layout_styles( $attributes, $layout_type ) {
-		list( $columns, $columns_md, $columns_sm ) = $this->get_layout_columns( $attributes, $layout_type );
+	private function get_layout_props( $attributes, $layout_type ) {
+		$columns = $this->get_layout_columns( $attributes, $layout_type );
+		$classes = array();
+		$styles  = sprintf( '--vp-layout-columns:%d;', $columns );
+		$gap     = $this->get_block_gap( $attributes );
 
-		$styles = sprintf(
-			'--vp-layout-columns:%1$d;--vp-layout-columns-md:%2$d;--vp-layout-columns-sm:%3$d;--vp-layout-gap:%4$s;',
-			$columns,
-			$columns_md,
-			$columns_sm,
-			$this->get_css_length( $attributes['layoutGap'] ?? '', '1.5rem' )
-		);
+		if ( '' !== $gap ) {
+			$styles .= sprintf( '--vp-layout-gap:%s;', $gap );
+		}
+
+		if ( $this->is_auto_columns( $attributes, $layout_type ) ) {
+			$minimum = $this->get_css_length( $attributes['layoutMinimumColumnWidth'] ?? '', '16rem' );
+
+			$classes[] = 'vp-layout-auto-columns';
+
+			$styles .= sprintf( '--vp-layout-min-column-width:%s;', $minimum );
+
+			// The track a grid repeats. A maximum column count gives it a lower
+			// bound of its own, so the grid stops growing at the count rather
+			// than at the width.
+			$styles .= sprintf(
+				'--vp-layout-track:max(min(%1$s, 100%%), (100%% - (var(--vp-layout-gap, 1.5rem) * %2$d)) / %3$d);',
+				$minimum,
+				$columns - 1,
+				$columns
+			);
+
+			if ( ! empty( $attributes['layoutAutoFit'] ) ) {
+				$classes[] = 'vp-layout-auto-fit';
+			}
+		}
 
 		if ( 'justified' === $layout_type ) {
 			$styles .= sprintf(
@@ -543,7 +521,7 @@ class Visual_Portfolio_Block_Item_Template {
 			);
 		}
 
-		return $styles;
+		return array( $classes, $styles );
 	}
 
 	/**
@@ -734,7 +712,7 @@ class Visual_Portfolio_Block_Item_Template {
 		$index   = 0;
 
 		// The widest the layout ever gets, which is the row a desktop sees first.
-		list( $first_row ) = $this->get_layout_columns( $attributes, $this->get_layout_type( $attributes ) );
+		$first_row = $this->get_layout_columns( $attributes, $this->get_layout_type( $attributes ) );
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
 
@@ -773,8 +751,11 @@ class Visual_Portfolio_Block_Item_Template {
 		}
 
 		$layout_type = $this->get_layout_type( $attributes );
-		$classes     = array( 'vp-layout-' . $layout_type );
-		$extra       = array();
+
+		list( $layout_classes, $layout_styles ) = $this->get_layout_props( $attributes, $layout_type );
+
+		$classes = array_merge( array( 'vp-layout-' . $layout_type ), $layout_classes );
+		$extra   = array();
 		$before      = '';
 		$after       = '';
 
@@ -809,7 +790,6 @@ class Visual_Portfolio_Block_Item_Template {
 				break;
 
 			case 'justified':
-				wp_enqueue_script( self::JUSTIFIED_SCRIPT );
 				$this->enqueue_view_module();
 
 				$init = self::VIEW_MODULE_STORE . '::callbacks.initLayout';
@@ -863,7 +843,7 @@ class Visual_Portfolio_Block_Item_Template {
 				array(
 					// `get_block_wrapper_attributes()` escapes the values itself.
 					'class'          => implode( ' ', $classes ),
-					'style'          => $this->get_layout_styles( $attributes, $layout_type ),
+					'style'          => $layout_styles,
 					'data-vp-layout' => $layout_type,
 				),
 				// Before the init directive on purpose: both are applied by an

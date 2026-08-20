@@ -1,8 +1,14 @@
 // Columns and gap are a public contract: the server prints the variables on the
-// list, themes and Pro breakpoints override them with CSS alone. Which of the
-// three column values is in effect is decided by the viewport rules the block
-// attaches to this stylesheet, generated from `settings.viewport` so that the
-// breakpoints are the site's rather than numbers frozen in here.
+// list and a theme overrides a gallery by redeclaring them, without touching
+// the markup.
+//
+// Columns come in the two shapes the core grid layout offers. A count, in
+// `--vp-layout-columns`. Or a minimum width, in `--vp-layout-min-column-width`,
+// with `vp-layout-auto-columns` on the list - then the container decides how
+// many fit, and `--vp-layout-columns` is the most it may reach. There are no
+// per-viewport values of our own: a narrower screen is what the auto mode is
+// for, and a fixed count is made responsive by the editor's own viewport
+// states.
 $item: ".wp-block-visual-portfolio-item-template__item";
 
 // The layout Masonry positions by hand. Item widths come from here - Masonry
@@ -27,6 +33,10 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 	grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
 	gap: var(--vp-layout-gap, 1.5rem);
 
+	&.vp-layout-auto-columns {
+		grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
+	}
+
 	> #{$item} {
 		width: auto;
 		margin-bottom: 0;
@@ -35,15 +45,30 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 
 .wp-block-visual-portfolio-item-template {
 	--vp-layout-current-columns: var(--vp-layout-columns, 3);
+	--vp-layout-auto-placement: auto-fill;
 
 	padding: 0;
 	margin: 0;
 	list-style: none;
 
+	// Rows that cannot be filled collapse their empty tracks instead of
+	// keeping them - the "fill available space" of the core grid.
+	&.vp-layout-auto-fit {
+		--vp-layout-auto-placement: auto-fit;
+	}
+
 	&.vp-layout-grid {
 		display: grid;
 		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
 		gap: var(--vp-layout-gap, 1.5rem);
+	}
+
+	// A grid in auto mode needs no script: the browser fits as many tracks as
+	// the container holds. Masonry and the carousel cannot say it in CSS, and
+	// have their count written onto the list by the layout module instead.
+	&.vp-layout-grid.vp-layout-auto-columns {
+		container-type: inline-size;
+		grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
 	}
 
 	&.vp-layout-masonry {

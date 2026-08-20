@@ -64,20 +64,20 @@ Commit(s) to PR 290.
 
 ## Stage 2 — native data model
 
-- [ ] Grid via core grid semantics: Auto (minimum column width) / Manual
+- [x] Grid via core grid semantics: Auto (minimum column width) / Manual
       (column count) controls and CSS (`repeat(auto-fill, minmax(...))` in
       Auto). Writes `gutenberg/blocks/item-template/block.json`,
       `gutenberg/blocks/item-template/edit.js`,
       `gutenberg/blocks/item-template/index.php`,
       `gutenberg/blocks/item-template/style.scss`. Check: grid switches
       Auto/Manual in the editor and front end alike.
-- [ ] Block spacing as the gap: `supports.spacing.blockGap`, map the style
+- [x] Block spacing as the gap: `supports.spacing.blockGap`, map the style
       value onto `--vp-layout-gap` in editor and render; delete `layoutGap`.
       Writes `gutenberg/blocks/item-template/block.json`,
       `gutenberg/blocks/item-template/edit.js`,
       `gutenberg/blocks/item-template/index.php`. Check: Dimensions → Block
       spacing moves all five layouts.
-- [ ] Auto/Manual for masonry and carousel; tiles keep notation columns;
+- [x] Auto/Manual for masonry and carousel; tiles keep notation columns;
       remove `layoutColumnsTablet`/`layoutColumnsMobile` and the viewport
       columns CSS/inline-style plumbing. Manual counts clamp on narrow
       viewports; wire native responsive states only if the stage-0 spike
@@ -87,14 +87,14 @@ Commit(s) to PR 290.
       `gutenberg/blocks/item-template/view.js`,
       `gutenberg/blocks/item-template/style.scss`. Check: no tablet/mobile
       sliders remain; resizing the front end reflows sensibly in Auto mode.
-- [ ] Update the 7 existing patterns to the surviving attributes so the branch
+- [x] Update the 7 existing patterns to the surviving attributes so the branch
       stays green until stage 5 replaces them. Writes
       `gutenberg/patterns/*.php`. Check: inserting each pattern produces no
       invalid-attribute warnings.
-- [ ] Adjust affected PHP unit tests (columns resolution, render output).
+- [x] Adjust affected PHP unit tests (columns resolution, render output).
       Writes `tests/phpunit/unit/*.php` as needed. Check:
       `npm run test:unit:php` passes.
-- [ ] Docs pass one: rewrite the columns/gap contract section. Writes
+- [x] Docs pass one: rewrite the columns/gap contract section. Writes
       `docs/gallery-loop-blocks.md`. Check: no mention of
       `--vp-layout-columns-md/-sm` or `layoutGap` remains.
 
@@ -262,3 +262,20 @@ unaffected. Commit to PR 62 (and PR 290 if the fix is shared).
   relayouts from its own `load` listener.
 - Stage 1: the editor no longer runs a masonry script where the browser supports
   `display: grid-lanes`, mirroring the decision the view module makes on the front end.
+- Stage 1/2: the measured layouts are stated in `gutenberg/blocks/item-template/layouts.js`
+  and run on both sides, replacing fjGallery for the loop family. Two libraries were tried
+  first and neither works here: Masonry drops every element handed to it from the frame
+  around the canvas (`fizzy-ui-utils` filters on `instanceof HTMLElement`), and fjGallery
+  leaves a gallery of natural proportions untouched - on the page as well as in the editor,
+  which is a defect the fixture with square images had been hiding. `masonry-layout` was
+  added as a dependency and then reverted for the same reason; the front-end masonry keeps
+  using the Masonry copy WordPress ships.
+- Stage 2 deviates from decision 1 on one point: the block does not adopt core's
+  `supports.layout`. The spike (stage 0) confirmed responsive states are closed to custom
+  attributes, so adopting it would only help grid - while the layout support is per block,
+  not per layout type, and would print `display: grid` container CSS over masonry, tiles,
+  justified and the carousel too. The controls, their labels and the CSS they produce are
+  core's grid semantics exactly (Auto with a minimum column width, a maximum count and
+  fill-available-space; Manual with a count); only the storage is ours. Block spacing is
+  native: `supports.spacing.blockGap` renders the Dimensions control, core prints no CSS
+  for it without layout support, and the value is mapped onto `--vp-layout-gap`.
