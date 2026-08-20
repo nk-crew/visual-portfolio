@@ -29,6 +29,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
+import useEditorLayout from './use-editor-layout';
 
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
 
@@ -42,6 +43,10 @@ const LAYOUT_OPTIONS = [
 
 // Layouts whose column count is chosen rather than derived.
 const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
+
+// The same question the view module asks: where the browser packs masonry
+// itself, the stylesheet does the layout and no script should run over it.
+const HAS_NATIVE_MASONRY = !!window.CSS?.supports?.('display', 'grid-lanes');
 
 const TEMPLATE = [
 	['visual-portfolio/item-image', { aspectRatio: '1', clickAction: 'popup' }],
@@ -310,13 +315,64 @@ export default function BlockEdit({
 	// everything else, so this cannot be one of them.
 	const tilesPresets = window.VPGalleryTilesPresets || [];
 
+	// Every class the render callback puts on the list, so the preview is the
+	// same layout the page will be - free scrolling and the effects included,
+	// which used to be front end only and made the carousel preview a lie.
+	const layoutClasses = useMemo(() => {
+		if (isEmpty) {
+			return '';
+		}
+
+		const classes = [
+			'masonry' === layoutType && HAS_NATIVE_MASONRY
+				? 'vp-layout-masonry-native'
+				: `vp-layout-${layoutType}`,
+		];
+
+		if ('carousel' === layoutType) {
+			if (carouselAutoWidth) {
+				classes.push('vp-carousel-auto-width');
+			}
+
+			if (carouselFreeScroll) {
+				classes.push('vp-carousel-free-scroll');
+			}
+
+			if ('none' !== carouselEffect) {
+				classes.push(`vp-carousel-${carouselEffect}`);
+			}
+		}
+
+		return classes.join(' ');
+	}, [
+		isEmpty,
+		layoutType,
+		carouselAutoWidth,
+		carouselFreeScroll,
+		carouselEffect,
+	]);
+
+	// Justified and masonry are measured by a library on both sides.
+	const listRef = useEditorLayout({
+		layoutType,
+		justified: {
+			rowHeight: justifiedRowHeight,
+			rowHeightTolerance: justifiedRowHeightTolerance,
+			maxRowsCount: justifiedMaxRowsCount,
+			lastRow: justifiedLastRow,
+		},
+		itemsCount: blockContexts.length,
+		signature: `${columns}|${layoutGap}|${justifiedRowHeight}|${justifiedRowHeightTolerance}|${justifiedMaxRowsCount}|${justifiedLastRow}`,
+	});
+
 	// The layout describes a list of items; the empty state is a single notice
 	// and would be laid out into the first column of a grid.
 	const blockProps = useBlockProps(
 		isEmpty
 			? {}
 			: {
-					className: `vp-layout-${layoutType}${'carousel' === layoutType && carouselAutoWidth ? ' vp-carousel-auto-width' : ''}`,
+					ref: listRef,
+					className: layoutClasses,
 					style: {
 						'--vp-layout-columns': columns,
 						'--vp-layout-columns-md': narrower(layoutColumnsTablet),
@@ -598,8 +654,21 @@ export default function BlockEdit({
 	return (
 		<>
 			{inspectorControls}
-			{isLoading && <Spinner />}
 			<ul {...blockProps} aria-busy={isLoading || undefined}>
+				{/* Out of the flow, so a settings change never moves the
+				    gallery under the pointer that is still changing it. A
+				    list item rather than a sibling: the list is the block
+				    element, and neither layout library looks at a node
+				    without the item class. */}
+				{isLoading ? (
+					<li
+						className="wp-block-visual-portfolio-item-template__editor-spinner"
+						aria-hidden="true"
+					>
+						<Spinner />
+					</li>
+				) : null}
+
 				{blockContexts.map((blockContext, index) => {
 					const isActive =
 						blockContext['vp/itemId'] === activeContextId;

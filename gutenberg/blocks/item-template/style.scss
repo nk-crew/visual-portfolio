@@ -85,6 +85,28 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 			// this layout - what does not fit one is cut off rather than
 			// pushing the pattern apart.
 			overflow: hidden;
+
+			// The picture takes the space the rest of the item leaves, so a
+			// tile is filled edge to edge whatever its shape. The chain has to
+			// be unbroken: the image carries `height:100%`, and a single
+			// auto-height ancestor between it and the tile turns that back
+			// into the aspect ratio of the picture.
+			display: flex;
+			flex-direction: column;
+		}
+
+		#{$item} .wp-block-visual-portfolio-item-image {
+			flex: 1 1 auto;
+			min-height: 0;
+
+			> a {
+				height: 100%;
+			}
+
+			img {
+				height: 100%;
+				object-fit: cover;
+			}
 		}
 	}
 
@@ -104,6 +126,19 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 
 		&.vp-has-script > #{$item} {
 			flex-grow: 0;
+		}
+
+		// A measured row gives the picture its height, and the picture fills
+		// it - the same chain a tile needs, for the same reason.
+		&.vp-has-script #{$item} .wp-block-visual-portfolio-item-image {
+			> a {
+				height: 100%;
+			}
+
+			img {
+				height: 100%;
+				object-fit: cover;
+			}
 		}
 	}
 

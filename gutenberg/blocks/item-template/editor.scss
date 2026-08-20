@@ -42,3 +42,46 @@
 .vp-tiles-preset.is-active .vp-tiles-preset__grid > span {
 	opacity: 1;
 }
+
+// The preview is refetched on every settings change. Dimming the items in
+// place - rather than replacing them with a spinner above the list - is what
+// keeps the gallery from jumping out from under the pointer that is still
+// changing the setting.
+.wp-block-visual-portfolio-item-template {
+	position: relative;
+
+	&[aria-busy="true"] > .wp-block-visual-portfolio-item-template__item {
+		opacity: 0.6;
+		transition: opacity 0.15s ease-in-out;
+	}
+}
+
+.wp-block-visual-portfolio-item-template__editor-spinner {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	pointer-events: none;
+	background: var(--wp-admin-theme-color-darker-10, #1e1e1e);
+	border-radius: 50%;
+	opacity: 0.85;
+
+	.components-spinner {
+		margin: 0;
+		color: #fff;
+	}
+}
+
+// The read-only copy of the item sits between the tile and the blocks, so the
+// height chain a tile needs runs through it as well.
+.vp-layout-tiles > .wp-block-visual-portfolio-item-template__item > .wp-block-visual-portfolio-item-template__preview {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-height: 0;
+}
