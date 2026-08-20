@@ -2,10 +2,12 @@ import {
 	CheckboxControl,
 	FormTokenField,
 	__experimentalNumberControl as NumberControl,
-	PanelBody,
 	SelectControl,
 	TextareaControl,
 	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -39,6 +41,21 @@ const ORDER_OPTIONS = [
 	{ value: 'asc', label: __('Ascending', 'visual-portfolio') },
 ];
 
+// Defaults of `postsQuery`, from `blocks/loop/block.json`.
+const DEFAULTS = {
+	source: 'portfolio',
+	postTypesSet: ['post'],
+	ids: [],
+	excludeIds: [],
+	order: 'desc',
+	orderBy: 'post_date',
+	offset: 0,
+	taxonomies: [],
+	taxonomiesRelation: 'or',
+	avoidDuplicates: false,
+	customQuery: '',
+};
+
 /**
  * Post types the loop can query.
  *
@@ -66,20 +83,29 @@ function usePostTypes() {
 	);
 }
 
-function PostsSettingsPanel({ attributes, setAttributes }) {
+/**
+ * Settings of the posts source.
+ *
+ * @param {Object}   props               - component props.
+ * @param {Object}   props.attributes    - loop attributes.
+ * @param {Function} props.setAttributes - loop attribute setter.
+ * @param {string}   props.clientId      - loop client id.
+ * @return {Element} component.
+ */
+function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 	const { postsQuery } = attributes;
 	const {
-		source,
-		postTypesSet = [],
-		ids = [],
-		excludeIds = [],
-		taxonomies = [],
-		taxonomiesRelation,
-		order,
-		orderBy,
-		offset,
-		avoidDuplicates,
-		customQuery,
+		source = DEFAULTS.source,
+		postTypesSet = DEFAULTS.postTypesSet,
+		ids = DEFAULTS.ids,
+		excludeIds = DEFAULTS.excludeIds,
+		taxonomies = DEFAULTS.taxonomies,
+		taxonomiesRelation = DEFAULTS.taxonomiesRelation,
+		order = DEFAULTS.order,
+		orderBy = DEFAULTS.orderBy,
+		offset = DEFAULTS.offset,
+		avoidDuplicates = DEFAULTS.avoidDuplicates,
+		customQuery = DEFAULTS.customQuery,
 	} = postsQuery || {};
 
 	const postTypes = usePostTypes();
@@ -117,199 +143,315 @@ function PostsSettingsPanel({ attributes, setAttributes }) {
 	const isOrdered = !isCustomQuery && !isCurrentQuery;
 
 	return (
-		<PanelBody title={__('Posts Settings', 'visual-portfolio')}>
-			<SelectControl
+		<ToolsPanel
+			label={__('Posts Settings', 'visual-portfolio')}
+			panelId={clientId}
+			resetAll={() => update(DEFAULTS)}
+		>
+			<ToolsPanelItem
 				label={__('Source', 'visual-portfolio')}
-				value={source}
-				options={[
-					...postTypes.map(({ slug, label }) => ({
-						value: slug,
-						label,
-					})),
-					{
-						value: SOURCE_POST_TYPES_SET,
-						label: __('Post Types Set', 'visual-portfolio'),
-					},
-					{
-						value: SOURCE_IDS,
-						label: __('Manual Selection', 'visual-portfolio'),
-					},
-					{
-						value: SOURCE_CUSTOM_QUERY,
-						label: __('Custom Query', 'visual-portfolio'),
-					},
-					{
-						value: SOURCE_CURRENT_QUERY,
-						label: __('Current Query', 'visual-portfolio'),
-					},
-				]}
-				onChange={(value) => update({ source: value })}
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			/>
+				isShownByDefault
+				hasValue={() => DEFAULTS.source !== source}
+				onDeselect={() => update({ source: DEFAULTS.source })}
+				panelId={clientId}
+			>
+				<SelectControl
+					label={__('Source', 'visual-portfolio')}
+					value={source}
+					options={[
+						...postTypes.map(({ slug, label }) => ({
+							value: slug,
+							label,
+						})),
+						{
+							value: SOURCE_POST_TYPES_SET,
+							label: __('Post Types Set', 'visual-portfolio'),
+						},
+						{
+							value: SOURCE_IDS,
+							label: __('Manual Selection', 'visual-portfolio'),
+						},
+						{
+							value: SOURCE_CUSTOM_QUERY,
+							label: __('Custom Query', 'visual-portfolio'),
+						},
+						{
+							value: SOURCE_CURRENT_QUERY,
+							label: __('Current Query', 'visual-portfolio'),
+						},
+					]}
+					onChange={(value) => update({ source: value })}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+				/>
+			</ToolsPanelItem>
 
 			{SOURCE_POST_TYPES_SET === source ? (
-				<fieldset className="vpf-loop-source-fieldset">
-					<legend>{__('Post Types', 'visual-portfolio')}</legend>
-					{postTypes.map(({ slug, label }) => (
-						<CheckboxControl
-							key={slug}
-							label={label}
-							checked={postTypesSet.includes(slug)}
-							onChange={(checked) =>
-								update({
-									postTypesSet: checked
-										? [...postTypesSet, slug]
-										: postTypesSet.filter(
-												(name) => name !== slug
-											),
-								})
-							}
-							__nextHasNoMarginBottom
-						/>
-					))}
-				</fieldset>
+				<ToolsPanelItem
+					label={__('Post Types', 'visual-portfolio')}
+					isShownByDefault
+					hasValue={() =>
+						JSON.stringify(DEFAULTS.postTypesSet) !==
+						JSON.stringify(postTypesSet)
+					}
+					onDeselect={() =>
+						update({ postTypesSet: DEFAULTS.postTypesSet })
+					}
+					panelId={clientId}
+				>
+					<fieldset className="vpf-loop-source-fieldset">
+						<legend>{__('Post Types', 'visual-portfolio')}</legend>
+						<VStack spacing={4}>
+							{postTypes.map(({ slug, label }) => (
+								<CheckboxControl
+									key={slug}
+									label={label}
+									checked={postTypesSet.includes(slug)}
+									onChange={(checked) =>
+										update({
+											postTypesSet: checked
+												? [...postTypesSet, slug]
+												: postTypesSet.filter(
+														(name) => name !== slug
+													),
+										})
+									}
+									__nextHasNoMarginBottom
+								/>
+							))}
+						</VStack>
+					</fieldset>
+				</ToolsPanelItem>
 			) : null}
 
 			{isIds ? (
-				<FormTokenField
+				<ToolsPanelItem
+					// The source is the manual selection, so the selection is
+					// not an extra: without it the source shows nothing.
+					isShownByDefault
 					label={__('Specific Posts', 'visual-portfolio')}
-					value={postSearch.tokens}
-					suggestions={postSearch.suggestions}
-					onInputChange={postSearch.search}
-					onChange={(tokens) =>
-						update({ ids: postSearch.toIds(tokens) })
-					}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					__experimentalShowHowTo={false}
-				/>
+					hasValue={() => 0 < ids.length}
+					onDeselect={() => update({ ids: DEFAULTS.ids })}
+					panelId={clientId}
+				>
+					<FormTokenField
+						label={__('Specific Posts', 'visual-portfolio')}
+						value={postSearch.tokens}
+						suggestions={postSearch.suggestions}
+						onInputChange={postSearch.search}
+						onChange={(tokens) =>
+							update({ ids: postSearch.toIds(tokens) })
+						}
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						__experimentalShowHowTo={false}
+					/>
+				</ToolsPanelItem>
 			) : null}
 
 			{isCustomQuery ? (
-				<TextareaControl
+				<ToolsPanelItem
+					// As above: the query is the source, not a refinement of it.
+					isShownByDefault
 					label={__('Custom Query', 'visual-portfolio')}
-					help={__(
-						'Build a custom query the same way `WP_Query` arguments are written.',
-						'visual-portfolio'
-					)}
-					value={customQuery || ''}
-					rows={4}
-					onChange={(value) => update({ customQuery: value })}
-					__nextHasNoMarginBottom
-				/>
+					hasValue={() => DEFAULTS.customQuery !== customQuery}
+					onDeselect={() =>
+						update({ customQuery: DEFAULTS.customQuery })
+					}
+					panelId={clientId}
+				>
+					<TextareaControl
+						label={__('Custom Query', 'visual-portfolio')}
+						help={__(
+							'Build a custom query the same way `WP_Query` arguments are written.',
+							'visual-portfolio'
+						)}
+						value={customQuery}
+						rows={4}
+						onChange={(value) => update({ customQuery: value })}
+						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
 			) : null}
 
 			{isFiltered ? (
 				<>
-					<FormTokenField
+					<ToolsPanelItem
 						label={__('Excluded Posts', 'visual-portfolio')}
-						value={excludeSearch.tokens}
-						suggestions={excludeSearch.suggestions}
-						onInputChange={excludeSearch.search}
-						onChange={(tokens) =>
-							update({ excludeIds: excludeSearch.toIds(tokens) })
+						hasValue={() => 0 < excludeIds.length}
+						onDeselect={() =>
+							update({ excludeIds: DEFAULTS.excludeIds })
 						}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						__experimentalShowHowTo={false}
-					/>
+						panelId={clientId}
+					>
+						<FormTokenField
+							label={__('Excluded Posts', 'visual-portfolio')}
+							value={excludeSearch.tokens}
+							suggestions={excludeSearch.suggestions}
+							onInputChange={excludeSearch.search}
+							onChange={(tokens) =>
+								update({
+									excludeIds: excludeSearch.toIds(tokens),
+								})
+							}
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							__experimentalShowHowTo={false}
+						/>
+					</ToolsPanelItem>
 
-					<FormTokenField
+					<ToolsPanelItem
 						label={__('Taxonomies', 'visual-portfolio')}
-						value={termSearch.tokens}
-						suggestions={termSearch.suggestions}
-						onInputChange={termSearch.search}
-						onChange={(tokens) =>
-							update({ taxonomies: termSearch.toIds(tokens) })
+						hasValue={() => 0 < taxonomies.length}
+						onDeselect={() =>
+							update({ taxonomies: DEFAULTS.taxonomies })
 						}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						__experimentalShowHowTo={false}
-					/>
+						panelId={clientId}
+					>
+						<FormTokenField
+							label={__('Taxonomies', 'visual-portfolio')}
+							value={termSearch.tokens}
+							suggestions={termSearch.suggestions}
+							onInputChange={termSearch.search}
+							onChange={(tokens) =>
+								update({ taxonomies: termSearch.toIds(tokens) })
+							}
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							__experimentalShowHowTo={false}
+						/>
+					</ToolsPanelItem>
 
 					{taxonomies.length > 1 ? (
-						<SelectControl
+						<ToolsPanelItem
 							label={__(
 								'Taxonomies Relation',
 								'visual-portfolio'
 							)}
-							value={taxonomiesRelation}
-							options={[
-								{
-									value: 'or',
-									label: __(
-										'Any of the selected',
-										'visual-portfolio'
-									),
-								},
-								{
-									value: 'and',
-									label: __(
-										'All of the selected',
-										'visual-portfolio'
-									),
-								},
-							]}
-							onChange={(value) =>
-								update({ taxonomiesRelation: value })
+							hasValue={() =>
+								DEFAULTS.taxonomiesRelation !==
+								taxonomiesRelation
 							}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-						/>
+							onDeselect={() =>
+								update({
+									taxonomiesRelation:
+										DEFAULTS.taxonomiesRelation,
+								})
+							}
+							panelId={clientId}
+						>
+							<SelectControl
+								label={__(
+									'Taxonomies Relation',
+									'visual-portfolio'
+								)}
+								value={taxonomiesRelation}
+								options={[
+									{
+										value: 'or',
+										label: __(
+											'Any of the selected',
+											'visual-portfolio'
+										),
+									},
+									{
+										value: 'and',
+										label: __(
+											'All of the selected',
+											'visual-portfolio'
+										),
+									},
+								]}
+								onChange={(value) =>
+									update({ taxonomiesRelation: value })
+								}
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+							/>
+						</ToolsPanelItem>
 					) : null}
 				</>
 			) : null}
 
 			{isOrdered ? (
 				<>
-					<SelectControl
+					<ToolsPanelItem
 						label={__('Order By', 'visual-portfolio')}
-						value={orderBy}
-						options={ORDER_BY_OPTIONS}
-						onChange={(value) => update({ orderBy: value })}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-					/>
+						hasValue={() => DEFAULTS.orderBy !== orderBy}
+						onDeselect={() => update({ orderBy: DEFAULTS.orderBy })}
+						panelId={clientId}
+					>
+						<SelectControl
+							label={__('Order By', 'visual-portfolio')}
+							value={orderBy}
+							options={ORDER_BY_OPTIONS}
+							onChange={(value) => update({ orderBy: value })}
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+						/>
+					</ToolsPanelItem>
 
-					<SelectControl
+					<ToolsPanelItem
 						label={__('Order Direction', 'visual-portfolio')}
-						value={order}
-						options={ORDER_OPTIONS}
-						onChange={(value) => update({ order: value })}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-					/>
+						hasValue={() => DEFAULTS.order !== order}
+						onDeselect={() => update({ order: DEFAULTS.order })}
+						panelId={clientId}
+					>
+						<SelectControl
+							label={__('Order Direction', 'visual-portfolio')}
+							value={order}
+							options={ORDER_OPTIONS}
+							onChange={(value) => update({ order: value })}
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+						/>
+					</ToolsPanelItem>
 				</>
 			) : null}
 
 			{isFiltered ? (
-				<NumberControl
+				<ToolsPanelItem
 					label={__('Offset', 'visual-portfolio')}
-					help={__(
-						'Skip over the first items of the query.',
-						'visual-portfolio'
-					)}
-					min={0}
-					value={offset}
-					onChange={(value) =>
-						update({ offset: parseInt(value, 10) || 0 })
-					}
-					__next40pxDefaultSize
-				/>
+					hasValue={() => DEFAULTS.offset !== offset}
+					onDeselect={() => update({ offset: DEFAULTS.offset })}
+					panelId={clientId}
+				>
+					<NumberControl
+						label={__('Offset', 'visual-portfolio')}
+						help={__(
+							'Skip over the first items of the query.',
+							'visual-portfolio'
+						)}
+						min={0}
+						value={offset}
+						onChange={(value) =>
+							update({ offset: parseInt(value, 10) || 0 })
+						}
+						__next40pxDefaultSize
+					/>
+				</ToolsPanelItem>
 			) : null}
 
-			<ToggleControl
+			<ToolsPanelItem
 				label={__('Avoid Duplicates', 'visual-portfolio')}
-				help={__(
-					'Hide items already displayed by another gallery on the same page. Affects the front end only.',
-					'visual-portfolio'
-				)}
-				checked={!!avoidDuplicates}
-				onChange={(value) => update({ avoidDuplicates: value })}
-				__nextHasNoMarginBottom
-			/>
-		</PanelBody>
+				hasValue={() => avoidDuplicates}
+				onDeselect={() =>
+					update({ avoidDuplicates: DEFAULTS.avoidDuplicates })
+				}
+				panelId={clientId}
+			>
+				<ToggleControl
+					label={__('Avoid Duplicates', 'visual-portfolio')}
+					help={__(
+						'Hide items already displayed by another gallery on the same page. Affects the front end only.',
+						'visual-portfolio'
+					)}
+					checked={!!avoidDuplicates}
+					onChange={(value) => update({ avoidDuplicates: value })}
+					__nextHasNoMarginBottom
+				/>
+			</ToolsPanelItem>
+		</ToolsPanel>
 	);
 }
 

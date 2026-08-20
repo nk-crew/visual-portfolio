@@ -107,13 +107,13 @@ and front-end walk of all layouts on the demo page. Commit(s) to PR 290.
       carousel toggles) become opt-in items with defaults and Reset; standard
       spacing via VStack. Writes `gutenberg/blocks/item-template/edit.js`.
       Check: panel menu shows/hides optional controls, Reset restores defaults.
-- [ ] Loop + source panels → ToolsPanel and spacing: General extras, images
+- [x] Loop + source panels → ToolsPanel and spacing: General extras, images
       source (Title/Description Source, Order By, Order Direction), posts
       source extras. Writes `gutenberg/blocks/loop/edit.js`,
       `gutenberg/loop-sources/images.js`, `gutenberg/loop-sources/posts.js`.
       Check: no touching controls anywhere; screenshots match the Query Loop
       pattern.
-- [~] Toolbars: layout-type switcher on item template; click action control on
+- [x] Toolbars: layout-type switcher on item template; click action control on
       item image; "Edit media" on the loop for the images source. Writes
       `gutenberg/blocks/item-template/edit.js`,
       `gutenberg/blocks/item-image/edit.js`, `gutenberg/blocks/loop/edit.js`,
@@ -165,7 +165,7 @@ panel and toolbar. Commit(s) to PR 290.
       `gutenberg/blocks/item-template/style.scss`,
       `gutenberg/blocks/item-template/index.php`. Check: all three behave per
       spec on the demo page.
-- [ ] Unit/e2e adjustments for the new markup and attributes. Writes
+- [x] Unit/e2e adjustments for the new markup and attributes. Writes
       `tests/phpunit/unit/*.php`, `tests/e2e/**` as needed. Check:
       `npm run test:unit:php && npm run test:e2e` pass.
 
@@ -174,7 +174,7 @@ emulation, reduced motion) + the commands above. Commit(s) to PR 290.
 
 ## Stage 5 — wizard and patterns
 
-- [ ] Wizard flow: keep source step; for images render the gallery manager in
+- [x] Wizard flow: keep source step; for images render the gallery manager in
       the placeholder; then the native pattern setup modal with live previews
       built from the user's real source attributes, plus Start blank and the
       Filter / Pagination (Paged, Load more, Infinite, None) / Lightbox
@@ -183,10 +183,10 @@ emulation, reduced motion) + the commands above. Commit(s) to PR 290.
       `gutenberg/blocks/loop/pattern-setup.js` (new),
       `gutenberg/loop-sources/style.scss`. Check: full flow works for images
       and posts sources; previews show real content.
-- [ ] Replace the pattern set with the 8 approved patterns (delete the 7 old
+- [x] Replace the pattern set with the 8 approved patterns (delete the 7 old
       files). Writes `gutenberg/patterns/*.php`. Check: chooser lists exactly
       8 visually distinct previews; inserted results are unlocked.
-- [ ] Tiles preset swatches: repeat the pattern to fill the swatch, comfortable
+- [x] Tiles preset swatches: repeat the pattern to fill the swatch, comfortable
       row height, no single-cell previews. Writes
       `gutenberg/blocks/item-template/edit.js`,
       `gutenberg/blocks/item-template/editor.scss`. Check: every preset swatch

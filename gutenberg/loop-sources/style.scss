@@ -50,7 +50,8 @@
 }
 
 .vpf-loop-source-fieldset {
-	margin-bottom: 16px;
+	// The panel grid spaces the rows; a margin here would add to it.
+	margin-bottom: 0;
 
 	legend {
 		margin-bottom: 8px;

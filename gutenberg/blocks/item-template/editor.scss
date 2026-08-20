@@ -6,6 +6,8 @@
 	grid-template-columns: repeat(4, 1fr);
 	gap: 8px;
 	margin-bottom: 16px;
+	max-height: 320px;
+	overflow-y: auto;
 }
 
 .vp-tiles-preset {
@@ -29,7 +31,9 @@
 .vp-tiles-preset__grid {
 	display: grid;
 	grid-auto-flow: row dense;
-	grid-auto-rows: 5px;
+
+	// Tall enough that a tile reads as a tile rather than as a line.
+	grid-auto-rows: 9px;
 	gap: 2px;
 
 	> span {
@@ -84,4 +88,18 @@
 	flex: 1 1 auto;
 	flex-direction: column;
 	min-height: 0;
+}
+
+// The shape of an item, before the item itself has arrived.
+.wp-block-visual-portfolio-item-template__skeleton {
+	aspect-ratio: 1;
+	background: currentcolor;
+	border-radius: 2px;
+	opacity: 0.08;
+}
+
+// A tile is as tall as its pattern says, so a placeholder in one takes the
+// height of the cell rather than a square of its own.
+.vp-layout-tiles > .wp-block-visual-portfolio-item-template__skeleton {
+	aspect-ratio: auto;
 }

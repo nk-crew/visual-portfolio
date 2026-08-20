@@ -55,10 +55,17 @@ What a theme overrides in CSS, without touching the markup:
 Auto mode also puts `vp-layout-auto-columns` on the list, and
 `vp-layout-auto-fit` when empty tracks collapse.
 
-**Patterns.** The inserter ships one pattern per classic skin — grid classic,
-grid fade, grid fly, grid emerge, masonry classic, masonry fade and a posts
-layout. A pattern is a starting point: everything in it is ordinary blocks, and
-a "skin" is nothing but the composition.
+**Patterns.** An empty loop asks for a source, then for the images if that is
+the source, and then opens the pattern chooser — the same modal the core Query
+block opens, previewing each pattern with the content just picked. Alongside it
+sit the three choices a gallery is usually made with: a filter, what the
+pagination is, and whether an item opens in the lightbox. They are applied to
+whichever pattern is chosen.
+
+Eight patterns ship, one per shape rather than one per skin: Grid Classic, Grid
+Overlay, Masonry Clean, Masonry Captions, Tiles Mosaic, Justified Photo Wall,
+Carousel Showcase and Posts Cards. A pattern is a starting point and nothing
+more: everything in it is ordinary blocks, and it is inserted unlocked.
 
 **Controls.** Filter, sort and pagination are server-rendered links and forms.
 With JavaScript they swap the gallery in place; without it they work as ordinary

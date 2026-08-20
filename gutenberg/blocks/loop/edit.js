@@ -5,30 +5,30 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import {
-	cloneBlock,
-	createBlocksFromInnerBlocksTemplate,
-} from '@wordpress/blocks';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import {
 	Button,
+	__experimentalHStack as HStack,
 	Notice,
 	__experimentalNumberControl as NumberControl,
 	PanelBody,
 	Placeholder,
 	ToggleControl,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import GalleryManager from '../../loop-sources/gallery-manager';
 import { useLoopSource } from '../../loop-sources/registry';
 import SourcePicker from '../../loop-sources/source-picker';
+import { useIsPreview } from '../../utils/use-is-preview';
+import PatternSetup from './pattern-setup';
 
 const {
 	plugin_url: pluginUrl,
 	items_count_notice_limit: itemsCountNoticeLimit,
 } = window.VPGutenbergVariables;
-
-const BLOCK_NAME = 'visual-portfolio/loop';
 
 // Large galleries are slow to render, and the number where that starts to show
 // is the one the settings screen already talks about.
@@ -82,6 +82,11 @@ function useMaxPages({ attributes, setAttributes }) {
 	const { queryType, baseQuery, postsQuery, imagesQuery, sourceQuery } =
 		attributes;
 
+	// A preview is a picture of a gallery, not a gallery: it never paginates,
+	// and a request per preview is what kept the pattern chooser from ever
+	// reaching an idle frame - which is when it draws them.
+	const isPreview = useIsPreview();
+
 	// Read when a request resolves, so the pending value is never stale.
 	const baseQueryRef = useRef(baseQuery);
 
@@ -105,7 +110,7 @@ function useMaxPages({ attributes, setAttributes }) {
 	);
 
 	useEffect(() => {
-		if (!query.queryType || !query.baseQuery.perPage) {
+		if (isPreview || !query.queryType || !query.baseQuery.perPage) {
 			return undefined;
 		}
 
@@ -147,7 +152,7 @@ function useMaxPages({ attributes, setAttributes }) {
 			cancelled = true;
 			clearTimeout(timeout);
 		};
-	}, [query, setAttributes]);
+	}, [isPreview, query, setAttributes]);
 }
 
 /**
@@ -333,10 +338,11 @@ function SourcePanel(props) {
 }
 
 /**
- * What an empty loop shows: pick a source, then pick a starting point.
+ * What an empty loop shows: pick a source, fill it, then pick a shape.
  *
- * The patterns are the ones registered with `Block Types: visual-portfolio/loop`,
- * the same mechanic the core Query block uses.
+ * The order is the point. A pattern is previewed by rendering it, so a gallery
+ * of images has to have its images before the previews can be of anything - and
+ * a preview of somebody else's photographs is not a choice between layouts.
  *
  * @param {Object}   props               - component props.
  * @param {Object}   props.attributes    - block attributes.
@@ -345,41 +351,15 @@ function SourcePanel(props) {
  * @return {Element} component.
  */
 function LoopPlaceholder({ attributes, setAttributes, clientId }) {
-	const [hasPickedSource, setHasPickedSource] = useState(false);
+	const [step, setStep] = useState('source');
 	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
 
-	const patterns = useSelect(
-		(select) => {
-			const { getBlockRootClientId, getPatternsByBlockTypes } =
-				select(blockEditorStore);
-
-			return getPatternsByBlockTypes(
-				BLOCK_NAME,
-				getBlockRootClientId(clientId)
-			);
-		},
-		[clientId]
-	);
+	const insert = (blocks) => replaceInnerBlocks(clientId, blocks);
 
 	const startBlank = () =>
-		replaceInnerBlocks(
-			clientId,
-			createBlocksFromInnerBlocksTemplate(TEMPLATE)
-		);
+		insert(createBlocksFromInnerBlocksTemplate(TEMPLATE));
 
-	// The pattern brings the layout, the picked source stays on this block -
-	// which also keeps the block's own id, alignment and styles.
-	const startFromPattern = (pattern) => {
-		const loop = pattern.blocks.find(({ name }) => BLOCK_NAME === name);
-		const blocks = loop ? loop.innerBlocks : pattern.blocks;
-
-		replaceInnerBlocks(
-			clientId,
-			blocks.map((block) => cloneBlock(block))
-		);
-	};
-
-	if (!hasPickedSource) {
+	if ('source' === step) {
 		return (
 			<Placeholder
 				label={__('Gallery Loop', 'visual-portfolio')}
@@ -392,44 +372,88 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 					value={attributes.queryType}
 					onChange={(name) => {
 						setAttributes({ queryType: name });
-						setHasPickedSource(true);
+						setStep('images' === name ? 'media' : 'pattern');
 					}}
 				/>
 			</Placeholder>
 		);
 	}
 
+	// The gallery manager, before anything is drawn from it.
+	if ('media' === step) {
+		const images = attributes.imagesQuery?.images || [];
+
+		return (
+			<Placeholder
+				label={__('Gallery Loop', 'visual-portfolio')}
+				instructions={__(
+					'Add the images of the gallery.',
+					'visual-portfolio'
+				)}
+			>
+				<VStack spacing={4} className="vpf-loop-setup__media">
+					<GalleryManager
+						images={images}
+						clientId={clientId}
+						onChange={(value) =>
+							setAttributes({
+								imagesQuery: {
+									...attributes.imagesQuery,
+									images: value,
+								},
+							})
+						}
+					/>
+					<HStack justify="flex-start" spacing={3}>
+						<Button
+							variant="primary"
+							disabled={!images.length}
+							accessibleWhenDisabled
+							onClick={() => setStep('pattern')}
+						>
+							{__('Continue', 'visual-portfolio')}
+						</Button>
+						<Button variant="tertiary" onClick={startBlank}>
+							{__('Start blank', 'visual-portfolio')}
+						</Button>
+					</HStack>
+				</VStack>
+			</Placeholder>
+		);
+	}
+
+	// The chooser is a modal, the way the core Query block opens its patterns:
+	// a preview of a gallery needs the width of the screen to be a preview of
+	// anything.
 	return (
 		<Placeholder
 			label={__('Gallery Loop', 'visual-portfolio')}
 			instructions={__(
-				'Start from a pattern, or lay the gallery out yourself.',
+				'Choose a gallery to start from, or lay it out yourself.',
 				'visual-portfolio'
 			)}
 		>
-			{/* No thumbnails: a pattern of an empty gallery previews as
-				nothing, so the description is what tells them apart. */}
-			<div className="vpf-loop-patterns">
-				{patterns.map((pattern) => (
-					<Button
-						key={pattern.name}
-						className="vpf-loop-patterns__item"
-						onClick={() => startFromPattern(pattern)}
-					>
-						<span className="vpf-loop-patterns__title">
-							{pattern.title}
-						</span>
-						{pattern.description ? (
-							<span className="vpf-loop-patterns__description">
-								{pattern.description}
-							</span>
-						) : null}
-					</Button>
-				))}
-			</div>
-			<Button variant="tertiary" onClick={startBlank}>
-				{__('Start blank', 'visual-portfolio')}
-			</Button>
+			<HStack justify="flex-start" spacing={3}>
+				<Button
+					variant="primary"
+					onClick={() => setStep('pattern-modal')}
+				>
+					{__('Choose', 'visual-portfolio')}
+				</Button>
+				<Button variant="tertiary" onClick={startBlank}>
+					{__('Start blank', 'visual-portfolio')}
+				</Button>
+			</HStack>
+
+			{'pattern-modal' === step ? (
+				<PatternSetup
+					attributes={attributes}
+					clientId={clientId}
+					onChoose={insert}
+					onStartBlank={startBlank}
+					onCancel={() => setStep('pattern')}
+				/>
+			) : null}
 		</Placeholder>
 	);
 }

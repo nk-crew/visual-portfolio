@@ -42,6 +42,7 @@ import {
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { useIsPreview } from '../../utils/use-is-preview';
 import { getBlockGapValue, getColumnsProps } from './columns';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
@@ -58,6 +59,12 @@ const LAYOUT_OPTIONS = [
 
 // Layouts whose column count is chosen rather than derived.
 const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
+
+// How much of a tiles pattern a swatch shows: enough rows to read as a mosaic,
+// and a ceiling so that a pattern of a dozen small tiles does not draw a
+// hundred of them.
+const PREVIEW_ROWS = 3;
+const PREVIEW_MAX_REPEATS = 6;
 
 const LAYOUT_ICONS = {
 	grid,
@@ -158,6 +165,26 @@ function ItemTemplateInnerBlocks({ style }) {
 function TilesPreset({ value, isActive, onSelect }) {
 	const { columns, tiles } = useMemo(() => parseTiles(value), [value]);
 
+	// A pattern repeats over the items, and a swatch that drew it once said
+	// nothing about the shape: a pattern of a single square came out as one
+	// cell, which is the one thing the gallery it stands for never looks like.
+	// Repeated until the swatch is as tall as it is wide, it reads as a mosaic.
+	const preview = useMemo(() => {
+		const area = tiles.reduce(
+			(total, tile) => total + tile.width * tile.rowSpan,
+			0
+		);
+		const repeats = Math.max(
+			1,
+			Math.min(
+				PREVIEW_MAX_REPEATS,
+				Math.ceil((columns * PREVIEW_ROWS) / area)
+			)
+		);
+
+		return Array.from({ length: repeats }, () => tiles).flat();
+	}, [columns, tiles]);
+
 	return (
 		<button
 			type="button"
@@ -172,7 +199,7 @@ function TilesPreset({ value, isActive, onSelect }) {
 					gridTemplateColumns: `repeat(${columns}, 1fr)`,
 				}}
 			>
-				{tiles.map((tile, index) => (
+				{preview.map((tile, index) => (
 					<span
 						// The pattern is a list of positions, and a position is
 						// what identifies a tile in it.
@@ -275,6 +302,11 @@ export default function BlockEdit({
 
 	useLoopOrphanWarning('visual-portfolio/item-template', context);
 
+	// Inside a block preview the items are never fetched: a preview is a
+	// picture of the layout, and a request per preview is what kept the pattern
+	// chooser from ever reaching the idle frame it draws them on.
+	const isPreview = useIsPreview();
+
 	const [items, setItems] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [activeBlockContextId, setActiveBlockContextId] = useState();
@@ -299,6 +331,10 @@ export default function BlockEdit({
 	// links, ordering and the Pro sources are all query logic, and duplicating
 	// any of it here is what broke the first take on this block.
 	useEffect(() => {
+		if (isPreview) {
+			return undefined;
+		}
+
 		let cancelled = false;
 
 		setIsLoading(true);
@@ -334,7 +370,7 @@ export default function BlockEdit({
 			cancelled = true;
 			clearTimeout(timeout);
 		};
-	}, [query]);
+	}, [isPreview, query]);
 
 	const blocks = useSelect(
 		(select) => select(blockEditorStore).getBlocks(clientId),
@@ -352,6 +388,12 @@ export default function BlockEdit({
 		: blockContexts[0]?.['vp/itemId'];
 
 	const isEmpty = !isLoading && !blockContexts.length;
+
+	// As many shapes as the gallery is about to hold, within reason.
+	const skeletonCount = Math.max(
+		1,
+		Math.min(12, parseInt(baseQuery?.perPage, 10) || 6)
+	);
 
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them.
@@ -943,6 +985,33 @@ export default function BlockEdit({
 						)}
 					/>
 				</div>
+			</>
+		);
+	}
+
+	// Items are fetched, and a gallery that has not fetched them yet is a list
+	// of nothing - which is what a block preview measures when it sizes a
+	// pattern, and why a pattern of a gallery used to preview as a title with
+	// no picture under it. The shapes stand in until the items land.
+	if ((isLoading || isPreview) && !blockContexts.length) {
+		return (
+			<>
+				{blockControls}
+				{inspectorControls}
+				<ul {...blockProps} aria-busy="true">
+					{Array.from({ length: skeletonCount }, (item, index) => (
+						<li
+							// Placeholders differ in nothing but their place.
+							key={index}
+							className={`${ITEM_CLASS_NAME} wp-block-visual-portfolio-item-template__skeleton`}
+							style={
+								tileStyles.length
+									? tileStyles[index % tileStyles.length]
+									: undefined
+							}
+						/>
+					))}
+				</ul>
 			</>
 		);
 	}

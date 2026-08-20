@@ -1,6 +1,6 @@
 <?php
 /**
- * Title: Gallery Posts
+ * Title: Posts Cards
  * Slug: visual-portfolio/gallery-posts-classic
  * Categories: gallery
  * Block Types: visual-portfolio/loop

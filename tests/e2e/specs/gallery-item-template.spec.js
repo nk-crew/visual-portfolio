@@ -261,8 +261,9 @@ test.describe('Gallery Item Template', () => {
 				query: postsSource,
 				layout: {
 					layoutType: 'grid',
-					layoutColumns: COLUMNS,
-					layoutGap: GAP,
+					layoutColumnsMode: 'manual',
+					layoutColumnCount: COLUMNS,
+					style: { spacing: { blockGap: GAP } },
 				},
 			})
 		);
@@ -283,12 +284,6 @@ test.describe('Gallery Item Template', () => {
 
 			return {
 				columns: style.getPropertyValue('--vp-layout-columns').trim(),
-				columnsMd: style
-					.getPropertyValue('--vp-layout-columns-md')
-					.trim(),
-				columnsSm: style
-					.getPropertyValue('--vp-layout-columns-sm')
-					.trim(),
 				gap: style.getPropertyValue('--vp-layout-gap').trim(),
 				tracks: style.gridTemplateColumns.split(' ').length,
 			};
@@ -296,8 +291,6 @@ test.describe('Gallery Item Template', () => {
 
 		expect(layout).toEqual({
 			columns: String(COLUMNS),
-			columnsMd: '2',
-			columnsSm: '1',
 			gap: GAP,
 			tracks: COLUMNS,
 		});
@@ -486,7 +479,11 @@ test.describe('Gallery Item Template', () => {
 		await editor.insertBlock(
 			getLoopBlock({
 				query: postsSource,
-				layout: { layoutType: 'masonry', layoutColumns: 2 },
+				layout: {
+					layoutType: 'masonry',
+					layoutColumnsMode: 'manual',
+					layoutColumnCount: 2,
+				},
 				pagination: [
 					{ name: 'visual-portfolio/loop-pagination-load-more' },
 				],

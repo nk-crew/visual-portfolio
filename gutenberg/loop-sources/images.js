@@ -1,4 +1,8 @@
-import { PanelBody, SelectControl } from '@wordpress/components';
+import {
+	SelectControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -37,6 +41,16 @@ const ORDER_OPTIONS = [
 	{ value: 'asc', label: __('Ascending', 'visual-portfolio') },
 	{ value: 'desc', label: __('Descending', 'visual-portfolio') },
 ];
+
+// Defaults of `imagesQuery`, from `blocks/loop/block.json`. The images and the
+// categories they carry are left out on purpose: no reset may empty the gallery
+// the panel exists to edit.
+const DEFAULTS = {
+	titlesSource: 'custom',
+	descriptionsSource: 'custom',
+	orderBy: 'default',
+	order: 'asc',
+};
 
 /**
  * Every category used by at least one image.
@@ -79,10 +93,10 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 	const { imagesQuery } = attributes;
 	const {
 		images = [],
-		orderBy,
-		order,
-		titlesSource,
-		descriptionsSource,
+		orderBy = DEFAULTS.orderBy,
+		order = DEFAULTS.order,
+		titlesSource = DEFAULTS.titlesSource,
+		descriptionsSource = DEFAULTS.descriptionsSource,
 	} = imagesQuery || {};
 
 	const update = (values) =>
@@ -102,49 +116,94 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 	}, [images, imagesQuery, setAttributes]);
 
 	return (
-		<PanelBody title={__('Media Settings', 'visual-portfolio')}>
-			<GalleryManager
-				images={images}
-				onChange={(value) => update({ images: value })}
-				clientId={clientId}
-			/>
+		<ToolsPanel
+			label={__('Media Settings', 'visual-portfolio')}
+			panelId={clientId}
+			resetAll={() => update(DEFAULTS)}
+		>
+			<ToolsPanelItem
+				label={__('Images', 'visual-portfolio')}
+				isShownByDefault
+				hasValue={() => false}
+				panelId={clientId}
+			>
+				<GalleryManager
+					images={images}
+					onChange={(value) => update({ images: value })}
+					clientId={clientId}
+				/>
+			</ToolsPanelItem>
 
-			<SelectControl
+			<ToolsPanelItem
 				label={__('Items Title Source', 'visual-portfolio')}
-				value={titlesSource}
-				options={TEXT_SOURCE_OPTIONS}
-				onChange={(value) => update({ titlesSource: value })}
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			/>
+				hasValue={() => DEFAULTS.titlesSource !== titlesSource}
+				onDeselect={() =>
+					update({ titlesSource: DEFAULTS.titlesSource })
+				}
+				panelId={clientId}
+			>
+				<SelectControl
+					label={__('Items Title Source', 'visual-portfolio')}
+					value={titlesSource}
+					options={TEXT_SOURCE_OPTIONS}
+					onChange={(value) => update({ titlesSource: value })}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+				/>
+			</ToolsPanelItem>
 
-			<SelectControl
+			<ToolsPanelItem
 				label={__('Items Description Source', 'visual-portfolio')}
-				value={descriptionsSource}
-				options={TEXT_SOURCE_OPTIONS}
-				onChange={(value) => update({ descriptionsSource: value })}
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			/>
+				hasValue={() =>
+					DEFAULTS.descriptionsSource !== descriptionsSource
+				}
+				onDeselect={() =>
+					update({ descriptionsSource: DEFAULTS.descriptionsSource })
+				}
+				panelId={clientId}
+			>
+				<SelectControl
+					label={__('Items Description Source', 'visual-portfolio')}
+					value={descriptionsSource}
+					options={TEXT_SOURCE_OPTIONS}
+					onChange={(value) => update({ descriptionsSource: value })}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+				/>
+			</ToolsPanelItem>
 
-			<SelectControl
+			<ToolsPanelItem
 				label={__('Order By', 'visual-portfolio')}
-				value={orderBy}
-				options={ORDER_BY_OPTIONS}
-				onChange={(value) => update({ orderBy: value })}
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			/>
+				hasValue={() => DEFAULTS.orderBy !== orderBy}
+				onDeselect={() => update({ orderBy: DEFAULTS.orderBy })}
+				panelId={clientId}
+			>
+				<SelectControl
+					label={__('Order By', 'visual-portfolio')}
+					value={orderBy}
+					options={ORDER_BY_OPTIONS}
+					onChange={(value) => update({ orderBy: value })}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+				/>
+			</ToolsPanelItem>
 
-			<SelectControl
+			<ToolsPanelItem
 				label={__('Order Direction', 'visual-portfolio')}
-				value={order}
-				options={ORDER_OPTIONS}
-				onChange={(value) => update({ order: value })}
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			/>
-		</PanelBody>
+				hasValue={() => DEFAULTS.order !== order}
+				onDeselect={() => update({ order: DEFAULTS.order })}
+				panelId={clientId}
+			>
+				<SelectControl
+					label={__('Order Direction', 'visual-portfolio')}
+					value={order}
+					options={ORDER_OPTIONS}
+					onChange={(value) => update({ order: value })}
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+				/>
+			</ToolsPanelItem>
+		</ToolsPanel>
 	);
 }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Title: Gallery Grid
+ * Title: Grid Classic
  * Slug: visual-portfolio/gallery-grid-classic
  * Categories: gallery
  * Block Types: visual-portfolio/loop

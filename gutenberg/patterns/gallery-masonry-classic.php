@@ -1,6 +1,6 @@
 <?php
 /**
- * Title: Gallery Masonry
+ * Title: Masonry Clean
  * Slug: visual-portfolio/gallery-masonry-classic
  * Categories: gallery
  * Block Types: visual-portfolio/loop

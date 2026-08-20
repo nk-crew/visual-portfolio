@@ -17,6 +17,9 @@ import { getPluginSlug } from '../utils/plugin-slug';
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
 const ITEM = '.wp-block-visual-portfolio-item-template__item';
 const NAV = '.wp-block-visual-portfolio-item-template__carousel-nav';
+// The arrows live in the frame around the list rather than in the nav under
+// it: the list scrolls, and an arrow beside it has to stay put.
+const FRAME = '.wp-block-visual-portfolio-item-template__carousel-frame';
 const DOT = '.wp-block-visual-portfolio-item-template__carousel-dot';
 const NEXT_ARROW =
 	'.wp-block-visual-portfolio-item-template__carousel-arrow--next';
@@ -95,6 +98,10 @@ function getItemBoxes(page) {
 				width: Math.round(rect.width),
 				height: Math.round(rect.height),
 				position: window.getComputedStyle(node).position,
+
+				// The box the layout gave the item, before any transform an
+				// effect paints it with.
+				layoutWidth: node.offsetWidth,
 			};
 		})
 	);
@@ -208,7 +215,7 @@ test.describe('Gallery Item Template layouts', () => {
 			layout: {
 				layoutType: 'tiles',
 				layoutTiles: TILES,
-				layoutGap: '0px',
+				style: { spacing: { blockGap: '0px' } },
 			},
 		});
 
@@ -243,7 +250,7 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(boxes[3].height).toBeCloseTo(unit, -1);
 	});
 
-	test('tiles keeps enough columns for its widest tile on a phone', async ({
+	test('tiles keep the columns their notation names, on a phone as well', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -254,8 +261,7 @@ test.describe('Gallery Item Template layouts', () => {
 			layout: {
 				layoutType: 'tiles',
 				layoutTiles: TILES,
-				layoutGap: '0px',
-				layoutColumnsMobile: 1,
+				style: { spacing: { blockGap: '0px' } },
 			},
 		});
 
@@ -270,9 +276,11 @@ test.describe('Gallery Item Template layouts', () => {
 					.trim()
 			);
 
-		// One column was asked for, but a tile of the pattern spans two: giving
-		// it one would open an implicit column and pull the layout apart.
-		expect(columns).toBe('2');
+		// The pattern is the design: a tile spanning two of three columns means
+		// nothing in a grid of one, so the notation holds the count at every
+		// width. A gallery that should reflow instead is a grid or a masonry,
+		// where the columns follow the container.
+		expect(columns).toBe('3');
 
 		const boxes = await getItemBoxes(page);
 
@@ -291,7 +299,7 @@ test.describe('Gallery Item Template layouts', () => {
 			layout: {
 				layoutType: 'justified',
 				justifiedRowHeight: 200,
-				layoutGap: '10px',
+				style: { spacing: { blockGap: '10px' } },
 			},
 			controls: ['loop-pagination-load-more'],
 		});
@@ -358,10 +366,11 @@ test.describe('Gallery Item Template layouts', () => {
 			images,
 			layout: {
 				layoutType: 'carousel',
-				layoutColumns: 3,
-				layoutGap: '10px',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				style: { spacing: { blockGap: '10px' } },
 				carouselShowArrows: true,
-				carouselShowDots: true,
+				carouselIndicator: 'dots',
 			},
 		});
 
@@ -415,7 +424,7 @@ test.describe('Gallery Item Template layouts', () => {
 			})
 			.toBe(0);
 
-		await page.locator(`${NAV} ${NEXT_ARROW}`).click();
+		await page.locator(`${FRAME} ${NEXT_ARROW}`).click();
 		await expect
 			.poll(async () => list.evaluate((node) => node.scrollLeft), {
 				timeout: 10000,
@@ -439,8 +448,9 @@ test.describe('Gallery Item Template layouts', () => {
 	}) => {
 		const layout = {
 			layoutType: 'carousel',
-			layoutColumns: 3,
-			layoutGap: '10px',
+			layoutColumnsMode: 'manual',
+			layoutColumnCount: 3,
+			style: { spacing: { blockGap: '10px' } },
 			carouselShowArrows: false,
 		};
 
@@ -463,12 +473,13 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(page.locator(LIST)).toHaveClass(/vp-carousel-coverflow/);
 
 		// The effect is a scroll driven animation over the boxes the layout
-		// already made, so the boxes are the same either way - which is also
-		// what a browser without the timeline is left with.
+		// already made, so the layout is the same either way - which is also
+		// what a browser without the timeline is left with. The painted boxes
+		// are not compared: turning a slide in perspective is the effect.
 		const coverflow = await getItemBoxes(page);
 
-		expect(coverflow.map((item) => [item.x, item.width])).toEqual(
-			plain.map((item) => [item.x, item.width])
+		expect(coverflow.map((item) => item.layoutWidth)).toEqual(
+			plain.map((item) => item.layoutWidth)
 		);
 	});
 
@@ -485,10 +496,11 @@ test.describe('Gallery Item Template layouts', () => {
 				images,
 				layout: {
 					layoutType: 'carousel',
-					layoutColumns: 3,
-					layoutGap: '10px',
+					layoutColumnsMode: 'manual',
+					layoutColumnCount: 3,
+					style: { spacing: { blockGap: '10px' } },
 					carouselShowArrows: true,
-					carouselShowDots: true,
+					carouselIndicator: 'dots',
 				},
 			});
 
@@ -524,7 +536,11 @@ test.describe('Gallery Item Template layouts', () => {
 					blockId: 'e2e-mixed-masonry',
 					queryId: 1,
 					images,
-					layout: { layoutType: 'masonry', layoutColumns: 2 },
+					layout: {
+						layoutType: 'masonry',
+						layoutColumnsMode: 'manual',
+						layoutColumnCount: 2,
+					},
 				},
 				{
 					blockId: 'e2e-mixed-carousel',
@@ -533,8 +549,9 @@ test.describe('Gallery Item Template layouts', () => {
 					perPage: 3,
 					layout: {
 						layoutType: 'carousel',
-						layoutColumns: 3,
-						layoutGap: '10px',
+						layoutColumnsMode: 'manual',
+						layoutColumnCount: 3,
+						style: { spacing: { blockGap: '10px' } },
 					},
 					controls: ['loop-pagination-load-more'],
 				},
@@ -606,7 +623,11 @@ test.describe('Gallery Item Template layouts', () => {
 			title: 'Layouts - masonry native',
 			blockId: 'e2e-masonry-native',
 			images,
-			layout: { layoutType: 'masonry', layoutColumns: 2 },
+			layout: {
+				layoutType: 'masonry',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
 		});
 
 		const list = page.locator(LIST);
@@ -635,7 +656,7 @@ test.describe('Gallery Item Template layouts', () => {
 			layout: {
 				layoutType: 'tiles',
 				layoutTiles: TILES,
-				layoutGap: '0px',
+				style: { spacing: { blockGap: '0px' } },
 			},
 			controls: ['loop-pagination-numbers'],
 		});
