@@ -25,6 +25,8 @@
  * rather than in a browser nobody was watching.
  */
 class ClassLoopVendoredAssets extends WP_UnitTestCase {
+	use Visual_Portfolio_Loop_Blocks_Trait;
+
 	/**
 	 * The files, and what each one is for.
 	 *
@@ -64,6 +66,9 @@ class ClassLoopVendoredAssets extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_lightbox_constant_points_at_the_vendored_file() {
+		// The lightbox class is only included where the family is registered.
+		$this->skip_without_loop_blocks();
+
 		$this->assertFileExists(
 			visual_portfolio()->plugin_path . Visual_Portfolio_Popup::LIBRARY_PATH
 		);
