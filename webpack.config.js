@@ -160,6 +160,19 @@ const vendorFiles = [
 		source: 'node_modules/photoswipe-5/dist/photoswipe.css',
 		destination: 'assets/vendor/photoswipe-5/photoswipe.css',
 	},
+	// Blossom drives the carousel of the Gallery Loop family. The module is
+	// imported by address at run time rather than bundled, so the file has to
+	// exist under `assets/` - and its stylesheet is what hides the scrollbar.
+	{
+		source: 'node_modules/@blossom-carousel/core/dist/blossom-carousel-core.js',
+		destination:
+			'assets/vendor/blossom-carousel/dist/blossom-carousel-core.js',
+	},
+	{
+		source: 'node_modules/@blossom-carousel/core/dist/blossom-carousel-core.css',
+		destination:
+			'assets/vendor/blossom-carousel/dist/blossom-carousel-core.css',
+	},
 	{
 		source: 'node_modules/simplebar/dist/simplebar.min.js',
 		destination: 'assets/vendor/simplebar/dist/simplebar.min.js',

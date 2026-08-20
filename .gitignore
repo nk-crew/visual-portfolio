@@ -32,8 +32,9 @@ build/**/*.hot-update.js.map
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
-# Composer directories
-vendor
+# Composer directories. Anchored: an unanchored `vendor` also swallows
+# `assets/vendor/`, where the vendored front-end libraries live.
+/vendor/
 
 # Custom PHPCS configs
 .phpcs.xml
