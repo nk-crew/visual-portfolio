@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	BlockControls,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	InspectorControls,
 	useBlockEditingMode,
@@ -13,10 +14,12 @@ import {
 	SelectControl,
 	TextControl,
 	ToggleControl,
+	ToolbarDropdownMenu,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { fullscreen, link, linkOff } from '@wordpress/icons';
 
 /**
  * External dependencies
@@ -42,6 +45,14 @@ const CLICK_ACTION_OPTIONS = [
 	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
 	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
 ];
+
+// What a click does is a link setting, and the toolbar is where core keeps the
+// link of an image.
+const CLICK_ACTION_ICONS = {
+	none: linkOff,
+	url: link,
+	popup: fullscreen,
+};
 
 const DEFAULT_ATTRIBUTES = {
 	clickAction: 'none',
@@ -159,6 +170,21 @@ export default function ItemImageEdit({
 		<>
 			{blockEditingMode === 'default' && (
 				<>
+					<BlockControls group="block">
+						<ToolbarDropdownMenu
+							icon={CLICK_ACTION_ICONS[clickAction]}
+							label={__('On click', 'visual-portfolio')}
+							controls={CLICK_ACTION_OPTIONS.map((option) => ({
+								title: option.label,
+								icon: CLICK_ACTION_ICONS[option.value],
+								isActive: option.value === clickAction,
+								onClick: () =>
+									setAttributes({
+										clickAction: option.value,
+									}),
+							}))}
+						/>
+					</BlockControls>
 					<InspectorControls group="color">
 						{colorGradientSettings.hasColorsOrGradients && (
 							<ColorGradientSettingsDropdown
