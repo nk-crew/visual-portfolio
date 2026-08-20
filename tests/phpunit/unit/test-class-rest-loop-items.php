@@ -480,6 +480,10 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 	 * The block shows its empty state for a source nothing is registered for -
 	 * an error would surface in the editor as a broken preview instead.
 	 *
+	 * The name is one nothing will ever register. A real one - `social-stream`
+	 * was used here - passes the allowlist the moment Pro is active, and this
+	 * suite runs inside the Pro one as well.
+	 *
 	 * @return void
 	 */
 	public function test_unlisted_source_returns_an_empty_list() {
@@ -491,7 +495,7 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 
 		add_action( 'vpf_before_loop_items', $counter );
 
-		$response = $this->dispatch( $this->get_body( 'social-stream', 6 ) );
+		$response = $this->dispatch( $this->get_body( 'vpf-no-such-source', 6 ) );
 
 		remove_action( 'vpf_before_loop_items', $counter );
 
