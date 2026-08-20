@@ -247,7 +247,7 @@ class Visual_Portfolio_Preview {
 	 */
 	public function maybe_send_isolation_header() {
 		// Nonce is verified in `is_preview_check()` before the preview renders.
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$isolated = isset( $_POST['vp_preview_isolated'] ) ? Visual_Portfolio_Security::sanitize_boolean( $_POST['vp_preview_isolated'] ) : false;
 
 		if ( $isolated && ! headers_sent() ) {
