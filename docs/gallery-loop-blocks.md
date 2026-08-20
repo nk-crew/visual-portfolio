@@ -124,7 +124,8 @@ from block context; none of them queries anything.
 `vp/itemPopupData`.
 
 Reserved for Pro, never written by the free plugin, but guaranteed as names:
-`vp/itemHoverImgId`, `vp/itemHoverVideoUrl`, `vp/itemAlbumUrl`.
+`vp/itemHoverImgId`, `vp/itemHoverImgFocalPoint`, `vp/itemHoverVideoUrl`,
+`vp/itemAlbumUrl`.
 
 `vp/itemImageLoading` is a positional key rather than item data: it carries the
 `loading` and `fetchpriority` attributes the picture of this item should get, and

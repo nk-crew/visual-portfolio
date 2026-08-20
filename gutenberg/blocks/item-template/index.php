@@ -310,6 +310,7 @@ class Visual_Portfolio_Block_Item_Template {
 			'vp/itemViewsCount',
 			'vp/itemReadingTime',
 			'vp/itemHoverImgId',
+			'vp/itemHoverImgFocalPoint',
 			'vp/itemHoverVideoUrl',
 			'vp/itemPopupData',
 			'vp/itemAlbumUrl',
