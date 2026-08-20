@@ -231,7 +231,7 @@ Commits to PR 290 (free parts) and PR 62 (PRO parts).
 
 ## Stage 7 — Pro lightbox fix
 
-- [ ] Fix the root cause captured in stage 0 (wherever it lands: Pro module,
+- [x] Fix the root cause captured in stage 0 (wherever it lands: Pro module,
       popup data filters, or asset path in `core-plugin` consumption). Files
       named by the diagnosis — expected in `PRO: modules/...` or a follow-up
       free commit if the bug is in `gutenberg/popup/`. Check: clicking a
@@ -251,9 +251,11 @@ and source panels and the "Edit media" toolbar. Stage 4 is complete except its
 test adjustments and a visual pass over the three effects and the progress
 indicator. Stage 5 has not started. Stage 6 is done on the free side and not
 started on the Pro side. Stage 7's root cause is fixed in this repo (the vendored
-libraries now ship); the Pro submodule was moved onto this branch locally but the
-fix has not been confirmed on the Pro site and nothing is committed in the Pro
-repository.
+libraries now ship) and confirmed on both sites: the lightbox opens on the Pro
+demo page as well as the free one, and the Pro carousel now has its frame, its
+two arrows, no scrollbar and a live Blossom instance. The submodule pointer that
+carries the fix is moved in the Pro worktree but is not committed there, and the
+regression test for it is not written.
 
 Nothing is pushed. The last full check run before the environment went down was
 green: `npm run lint` (321 files), `npm run test:unit:php` (255 tests) and
