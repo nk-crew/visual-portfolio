@@ -35,6 +35,13 @@ const { pro: isProPlugin } = window.VPGutenbergVariables;
 // Videos are only useful with the Pro formats behind them.
 const ALLOWED_MEDIA_TYPES = isProPlugin ? ['image', 'video'] : ['image'];
 
+// The file chooser of an empty gallery takes MIME patterns rather than the
+// media types beside it, and offering fewer there than the gallery accepts is
+// what kept a video out of it until an image had been added first.
+const ACCEPTED_MIME_TYPES = ALLOWED_MEDIA_TYPES.map((type) => `${type}/*`).join(
+	','
+);
+
 /**
  * Thumbnail URL of every image, by image id.
  *
@@ -254,7 +261,7 @@ export default function GalleryManager({ images, onChange, clientId }) {
 							'visual-portfolio'
 						),
 					}}
-					accept="image/*"
+					accept={ACCEPTED_MIME_TYPES}
 					allowedTypes={ALLOWED_MEDIA_TYPES}
 					multiple
 					onSelect={onSelect}

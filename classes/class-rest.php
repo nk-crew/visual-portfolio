@@ -384,7 +384,12 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		$is_attachment = $image_id && is_numeric( $image_id );
 		$urls          = array();
 
-		foreach ( array( 'thumbnail', 'medium', 'large', 'full' ) as $size ) {
+		// Every size the editor's picker offers, the plugin's own among them -
+		// a size missing here falls back to the default URL, so choosing it
+		// changed the preview not at all while the page rendered it correctly.
+		$sizes = array( 'thumbnail', 'medium', 'large', 'full', 'vp_sm', 'vp_md', 'vp_lg', 'vp_xl' );
+
+		foreach ( $sizes as $size ) {
 			$src = $is_attachment ? wp_get_attachment_image_src( (int) $image_id, $size ) : false;
 
 			$urls[ $size ] = $src ? $src[0] : $fallback_url;
@@ -531,6 +536,17 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 
 		if ( $result ) {
 			foreach ( $result['items'] as $item ) {
+				// `perm` is not an authorisation check of its own: WordPress
+				// only holds `private` back with it, and every other status a
+				// query may ask for - `draft` and `pending` among them - is
+				// left to whoever asked. The endpoint is open to anyone who can
+				// edit a post of their own, and the custom query source hands
+				// the status straight through, so each item is checked against
+				// the capability that governs reading that one post.
+				if ( ! empty( $item['post_id'] ) && ! current_user_can( 'read_post', (int) $item['post_id'] ) ) {
+					continue;
+				}
+
 				$item_data = Visual_Portfolio_Block_Item_Template::map_item_to_context( $item, $result['options'], '' );
 
 				$item_data['imageSizes'] = $this->get_item_image_sizes(

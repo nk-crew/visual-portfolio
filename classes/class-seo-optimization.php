@@ -129,7 +129,15 @@ class Visual_Portfolio_SEO_Optimization {
 
 			// The very call the pagination block makes when it renders further
 			// down, memoized on the same key - the query runs once for both.
-			$max_pages = Visual_Portfolio_Block_Loop_Pagination::get_max_pages( $context );
+			//
+			// Resolving it records the loop's posts, and this runs in `wp_head`,
+			// before a single loop has rendered. A loop earlier in the document
+			// that avoids duplicates would then exclude the posts of a loop that
+			// has not had its turn yet, so the record is put back afterwards.
+			$used_posts = Visual_Portfolio_Get::snapshot_used_posts();
+			$max_pages  = Visual_Portfolio_Block_Loop_Pagination::get_max_pages( $context );
+
+			Visual_Portfolio_Get::restore_used_posts( $used_posts );
 
 			// A page beyond the end of the loop shows nothing; there is no series
 			// for it to be part of.

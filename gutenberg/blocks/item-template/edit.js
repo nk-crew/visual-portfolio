@@ -505,6 +505,7 @@ export default function BlockEdit({
 						...columnsProps.style,
 						'--vp-layout-row-height': `${justifiedRowHeight}px`,
 						'--vp-carousel-snap-align': carouselSnapAlign,
+						'--vp-carousel-peek': `${Math.max(0, Math.min(200, carouselPeek))}px`,
 					},
 				}
 	);

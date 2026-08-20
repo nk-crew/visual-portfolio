@@ -702,6 +702,18 @@ class Visual_Portfolio_Get {
 			$portfolio_query = new WP_Query( $query_opts );
 
 			$max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
+
+			// `max_num_pages` counts every post the query matched, and an offset
+			// is not part of that count - so a loop that skips the first few
+			// advertised pages past the end of its own results, and the last of
+			// them came up empty.
+			$offset   = isset( $options['posts_offset'] ) ? max( 0, (int) $options['posts_offset'] ) : 0;
+			$per_page = isset( $query_opts['posts_per_page'] ) ? (int) $query_opts['posts_per_page'] : 0;
+
+			if ( $offset && $per_page > 0 ) {
+				$reachable = (int) ceil( max( 0, (int) $portfolio_query->found_posts - $offset ) / $per_page );
+				$max_pages = max( $start_page, min( $max_pages, $reachable ) );
+			}
 		}
 
 		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
@@ -3564,6 +3576,35 @@ class Visual_Portfolio_Get {
 
 	/**
 	 * Get list with all used posts on the current page.
+	 *
+	 * @return array
+	 */
+	/**
+	 * The posts resolved so far, to be put back after a lookup.
+	 *
+	 * Resolving a loop records its posts, and "avoid duplicates" reads that
+	 * record - so anything that resolves a loop out of document order, such as
+	 * a `wp_head` lookup, changes what the loops after it are allowed to show.
+	 *
+	 * @return array
+	 */
+	public static function snapshot_used_posts() {
+		return self::$used_posts;
+	}
+
+	/**
+	 * Put a snapshot of the resolved posts back.
+	 *
+	 * @param array $snapshot - what `snapshot_used_posts()` returned.
+	 *
+	 * @return void
+	 */
+	public static function restore_used_posts( $snapshot ) {
+		self::$used_posts = (array) $snapshot;
+	}
+
+	/**
+	 * Get all used posts.
 	 *
 	 * @return array
 	 */

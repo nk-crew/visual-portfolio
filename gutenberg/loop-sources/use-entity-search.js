@@ -29,7 +29,7 @@ export default function useEntitySearch({
 	selected = [],
 }) {
 	const [labels, setLabels] = useState({});
-	const [suggestions, setSuggestions] = useState([]);
+	const [suggestionIds, setSuggestionIds] = useState([]);
 
 	const rememberLabels = useCallback((results) => {
 		if (!Array.isArray(results)) {
@@ -46,7 +46,10 @@ export default function useEntitySearch({
 
 		setLabels((current) => ({ ...current, ...found }));
 
-		return Object.values(found);
+		// Ids rather than titles: what a suggestion reads as is decided once,
+		// beside the tokens, so a title two entities share is told apart in
+		// both lists or in neither.
+		return Object.keys(found);
 	}, []);
 
 	// Ids saved in the block carry no titles, so resolve them once.
@@ -76,7 +79,7 @@ export default function useEntitySearch({
 	const runSearch = useCallback(
 		(term) => {
 			if (!term) {
-				setSuggestions([]);
+				setSuggestionIds([]);
 				return;
 			}
 
@@ -88,7 +91,7 @@ export default function useEntitySearch({
 					per_page: PER_PAGE,
 				}),
 			})
-				.then((results) => setSuggestions(rememberLabels(results)))
+				.then((results) => setSuggestionIds(rememberLabels(results)))
 				.catch(() => setSuggestions([]));
 		},
 		[type, subtype, rememberLabels]
@@ -96,9 +99,30 @@ export default function useEntitySearch({
 
 	const search = useDebounce(runSearch, 300);
 
+	// A title is what the user reads, and an id is what the block stores - so a
+	// title shared by two entities has to be told apart before it is offered.
+	// Only the ambiguous ones carry their id; the rest read as they always did.
+	const uniqueLabels = useMemo(() => {
+		const counts = {};
+
+		Object.values(labels).forEach((label) => {
+			counts[label] = (counts[label] || 0) + 1;
+		});
+
+		const result = {};
+
+		Object.keys(labels).forEach((id) => {
+			const label = labels[id];
+
+			result[id] = counts[label] > 1 ? `${label} (#${id})` : label;
+		});
+
+		return result;
+	}, [labels]);
+
 	const tokens = useMemo(
-		() => selected.map((id) => labels[String(id)] || String(id)),
-		[selected, labels]
+		() => selected.map((id) => uniqueLabels[String(id)] || String(id)),
+		[selected, uniqueLabels]
 	);
 
 	// Tokens the user typed by hand match nothing and are dropped.
@@ -106,8 +130,8 @@ export default function useEntitySearch({
 		(nextTokens) =>
 			nextTokens
 				.map((token) => {
-					const id = Object.keys(labels).find(
-						(key) => labels[key] === token
+					const id = Object.keys(uniqueLabels).find(
+						(key) => uniqueLabels[key] === token
 					);
 
 					// An id that never resolved to a title is its own token,
@@ -119,7 +143,12 @@ export default function useEntitySearch({
 					return id;
 				})
 				.filter(Boolean),
-		[labels, selected]
+		[uniqueLabels, selected]
+	);
+
+	const suggestions = useMemo(
+		() => suggestionIds.map((id) => uniqueLabels[id] || id),
+		[suggestionIds, uniqueLabels]
 	);
 
 	return { tokens, suggestions, search, toIds };

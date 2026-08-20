@@ -167,15 +167,20 @@ export function layoutJustified(list, options) {
 	let row = [];
 	let ratioSum = 0;
 
+	// How much taller than asked a row may settle at before another item has to
+	// go into it. At zero a row is only ever closed once it has come down to
+	// the asked for height, which is what the control meant before it was read.
+	const tallest =
+		rowHeight * (1 + Math.max(0, options.rowHeightTolerance || 0));
+
 	items.forEach((item, index) => {
 		row.push(index);
 		ratioSum += ratios[index];
 
-		// The height this row would settle at if it were closed here. Once it
-		// is no taller than asked for, the row is full.
+		// The height this row would settle at if it were closed here.
 		const height = (width - gap * (row.length - 1)) / ratioSum;
 
-		if (height <= rowHeight) {
+		if (height <= tallest) {
 			rows.push({ items: row, height, isFull: true });
 			row = [];
 			ratioSum = 0;
@@ -183,19 +188,11 @@ export function layoutJustified(list, options) {
 	});
 
 	if (row.length) {
-		// The last row never fills the width. Left and hidden keep the asked
-		// for height; centre and right stretch it the way the full rows are,
-		// so the block ends on a straight edge.
-		const stretch =
-			'center' === options.lastRow || 'right' === options.lastRow;
-
-		rows.push({
-			items: row,
-			height: stretch
-				? (width - gap * (row.length - 1)) / ratioSum
-				: rowHeight,
-			isFull: false,
-		});
+		// The last row keeps the asked for height whatever its alignment.
+		// Stretching it to the full width is what the alignment is an
+		// alternative to - a stretched row starts at the left edge and ends at
+		// the right one, and centring or right aligning it can then do nothing.
+		rows.push({ items: row, height: rowHeight, isFull: false });
 	}
 
 	const visible = options.maxRowsCount

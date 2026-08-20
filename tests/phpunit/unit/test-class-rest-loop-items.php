@@ -342,8 +342,9 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 
 		$this->assertSame( $post_id, $items[0]['itemPostId'] );
 		$this->assertSame( 'Context post', $items[0]['itemTitle'] );
+		// Every size the editor's picker offers, the plugin's own included.
 		$this->assertSame(
-			array( 'thumbnail', 'medium', 'large', 'full' ),
+			array( 'thumbnail', 'medium', 'large', 'full', 'vp_sm', 'vp_md', 'vp_lg', 'vp_xl' ),
 			array_keys( $items[0]['imageSizes'] )
 		);
 	}
@@ -416,11 +417,9 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 		$this->assertCount( 1, $items );
 		$this->assertSame( 'vpf_pro_social_123', $items[0]['itemImgId'] );
 		$this->assertSame(
-			array(
-				'thumbnail' => $remote_url,
-				'medium'    => $remote_url,
-				'large'     => $remote_url,
-				'full'      => $remote_url,
+			array_fill_keys(
+				array( 'thumbnail', 'medium', 'large', 'full', 'vp_sm', 'vp_md', 'vp_lg', 'vp_xl' ),
+				$remote_url
 			),
 			$items[0]['imageSizes']
 		);
@@ -734,18 +733,80 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Nor another author's drafts, which are not private but are not public.
+	 *
+	 * `perm=readable` is not the check it looks like: WordPress holds back only
+	 * the `private` status with it, and hands over every other one a query asks
+	 * for - so a draft of somebody else's used to come back in full.
+	 *
+	 * @return void
+	 */
+	public function test_custom_query_cannot_leak_other_drafts() {
+		$owner = self::factory()->user->create( array( 'role' => 'editor' ) );
+
+		$draft = self::factory()->post->create(
+			array(
+				'post_title'   => 'Unfinished post',
+				'post_content' => 'Not ready to be read.',
+				'post_status'  => 'draft',
+				'post_author'  => $owner,
+			)
+		);
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'contributor' ) ) );
+
+		$items = $this->get_items( $this->dispatch_custom_query( 'post_status=draft' ) );
+
+		$this->assertNotContains( $draft, wp_list_pluck( $items, 'itemPostId' ) );
+	}
+
+	/**
+	 * The author of a draft still previews it.
+	 *
+	 * @return void
+	 */
+	public function test_custom_query_still_shows_own_drafts() {
+		$author = self::factory()->user->create( array( 'role' => 'editor' ) );
+
+		$own = self::factory()->post->create(
+			array(
+				'post_title'  => 'My own draft',
+				'post_status' => 'draft',
+				'post_author' => $author,
+			)
+		);
+
+		wp_set_current_user( $author );
+
+		$items = $this->get_items( $this->dispatch_custom_query( 'post_status=draft' ) );
+
+		$this->assertContains( $own, wp_list_pluck( $items, 'itemPostId' ) );
+	}
+
+	/**
 	 * Ask the preview for private posts through a hand-written query.
 	 *
 	 * @return WP_REST_Response
 	 */
 	private function dispatch_private_custom_query() {
+		return $this->dispatch_custom_query( 'post_status=private' );
+	}
+
+	/**
+	 * Ask the preview through a hand-written query.
+	 *
+	 * @param string $custom_query - the query string handed to `WP_Query`.
+	 *
+	 * @return WP_REST_Response
+	 */
+	private function dispatch_custom_query( $custom_query ) {
 		return $this->dispatch(
 			array(
 				'queryType'  => 'posts',
 				'baseQuery'  => array( 'perPage' => 10 ),
 				'postsQuery' => array(
 					'source'      => 'custom_query',
-					'customQuery' => 'post_status=private',
+					'customQuery' => $custom_query,
 				),
 			)
 		);

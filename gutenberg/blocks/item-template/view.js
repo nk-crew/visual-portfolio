@@ -181,6 +181,33 @@ function getCurrentSlide(list) {
 }
 
 /**
+ * Whether the carousel runs right to left.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {boolean} True on an RTL page.
+ */
+function isRtl(list) {
+	return 'rtl' === window.getComputedStyle(list).direction;
+}
+
+/**
+ * How far the carousel has been scrolled from its own start.
+ *
+ * Not `scrollLeft`: a right to left carousel starts at zero and counts down
+ * into negative numbers as it advances, so everything measured from the raw
+ * value - the indicator, the current slide, both arrows - stayed at the start
+ * for the whole carousel.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {number} Distance from the start, never negative.
+ */
+function getScrollPosition(list) {
+	return Math.abs(list.scrollLeft);
+}
+
+/**
  * How far through the carousel the scroll is, as a fraction.
  *
  * @param {HTMLElement} list Item template list.
@@ -190,7 +217,9 @@ function getCurrentSlide(list) {
 function getScrollProgress(list) {
 	const total = list.scrollWidth - list.clientWidth;
 
-	return total > 0 ? Math.min(1, Math.max(0, list.scrollLeft / total)) : 1;
+	return total > 0
+		? Math.min(1, Math.max(0, getScrollPosition(list) / total))
+		: 1;
 }
 
 /**
@@ -216,12 +245,14 @@ function syncNav(list) {
 		);
 
 		// A carousel that repeats has no ends to run out of.
+		const position = getScrollPosition(list);
+
 		if (prev) {
-			prev.disabled = !repeats && list.scrollLeft <= 1;
+			prev.disabled = !repeats && position <= 1;
 		}
 
 		if (next) {
-			next.disabled = !repeats && list.scrollLeft >= end;
+			next.disabled = !repeats && position >= end;
 		}
 	}
 
@@ -302,7 +333,12 @@ function slide(list, direction) {
 		? item.getBoundingClientRect().width + getGap(list)
 		: list.clientWidth;
 
-	list.scrollBy({ left: step * direction, behavior: 'smooth' });
+	// Forwards is leftwards on a right to left page, and `scrollBy` speaks in
+	// the same signed numbers `scrollLeft` reports.
+	list.scrollBy({
+		left: step * direction * (isRtl(list) ? -1 : 1),
+		behavior: 'smooth',
+	});
 }
 
 /**
@@ -361,7 +397,10 @@ function initAutoplay(list) {
 
 		// The last slide goes back to the first, so a carousel that does not
 		// repeat still runs on.
-		if (list.scrollLeft >= list.scrollWidth - list.clientWidth - 1) {
+		if (
+			getScrollPosition(list) >=
+			list.scrollWidth - list.clientWidth - 1
+		) {
 			list.scrollTo({ left: 0, behavior: 'smooth' });
 		} else {
 			slide(list, 1);
