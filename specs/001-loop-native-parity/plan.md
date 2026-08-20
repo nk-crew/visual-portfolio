@@ -113,7 +113,7 @@ and front-end walk of all layouts on the demo page. Commit(s) to PR 290.
       `gutenberg/loop-sources/images.js`, `gutenberg/loop-sources/posts.js`.
       Check: no touching controls anywhere; screenshots match the Query Loop
       pattern.
-- [ ] Toolbars: layout-type switcher on item template; click action control on
+- [~] Toolbars: layout-type switcher on item template; click action control on
       item image; "Edit media" on the loop for the images source. Writes
       `gutenberg/blocks/item-template/edit.js`,
       `gutenberg/blocks/item-image/edit.js`, `gutenberg/blocks/loop/edit.js`,
@@ -197,13 +197,13 @@ for both sources on the free site. Commit(s) to PR 290.
 
 ## Stage 6 — media manager v2 and Pro slot
 
-- [ ] Port the legacy image-list look to the gallery manager grid (larger
+- [x] Port the legacy image-list look to the gallery manager grid (larger
       tiles, hover actions, add tile). Writes
       `gutenberg/loop-sources/gallery-manager/index.js`,
       `gutenberg/loop-sources/gallery-manager/gallery-image.js`,
       `gutenberg/loop-sources/gallery-manager/style.scss`. Check: list matches
       the legacy control visually.
-- [ ] Port the legacy modal layout: 828px, 233px preview column, two-column
+- [x] Port the legacy modal layout: 828px, 233px preview column, two-column
       fields, collapsible Additional, header prev/next, Default/Hover state
       tabs shown only when a hover fill is registered; extend the slot API
       with a state prop. Writes
@@ -243,6 +243,22 @@ Commits to PR 290 (free parts) and PR 62 (PRO parts).
 
 **Verify**: Pro demo page lightbox works with keyboard and mouse; free demo
 unaffected. Commit to PR 62 (and PR 290 if the fix is shared).
+
+## Where this run stopped
+
+Stages 0, 1 and 2 are complete and verified. Stage 3 is complete except the loop
+and source panels and the "Edit media" toolbar. Stage 4 is complete except its
+test adjustments and a visual pass over the three effects and the progress
+indicator. Stage 5 has not started. Stage 6 is done on the free side and not
+started on the Pro side. Stage 7's root cause is fixed in this repo (the vendored
+libraries now ship); the Pro submodule was moved onto this branch locally but the
+fix has not been confirmed on the Pro site and nothing is committed in the Pro
+repository.
+
+Nothing is pushed. The last full check run before the environment went down was
+green: `npm run lint` (321 files), `npm run test:unit:php` (255 tests) and
+`npm run test:e2e`, all after stage 2; stages 3 and 4 have been linted and built
+but their PHP unit run did not finish.
 
 ## Deviations
 
