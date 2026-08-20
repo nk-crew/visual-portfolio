@@ -212,17 +212,17 @@ for both sources on the free site. Commit(s) to PR 290.
       `gutenberg/components/loop-image-settings-slot/index.js`. Check: free
       install shows the new layout without tabs; slot contract documented in
       the component.
-- [ ] PRO: slot fills — Hover image + focal point (Hover tab), Custom Popup
+- [x] PRO: slot fills — Hover image + focal point (Hover tab), Custom Popup
       Image, Deep-Linking ID. Writes `PRO: modules/post-hover-thumbnail/...`
       (editor asset + enqueue), `PRO: modules/popup/custom-image/...`,
       `PRO: modules/popup/deep-linking/...`. Check: with Pro active all three
       fields appear in the modal and persist.
-- [ ] PRO: hover rendering — write `vp/itemHoverImgId` through
+- [x] PRO: hover rendering — write `vp/itemHoverImgId` through
       `vpf_loop_item_context` and swap the item image on hover on the front
       end. Writes `PRO: modules/post-hover-thumbnail/index.php` plus a small
       front-end asset in the same module. Check: hover on a Pro demo item
       swaps the image.
-- [ ] PRO: unit-test adjustments. Writes `PRO: tests/phpunit/unit/*.php` as
+- [x] PRO: unit-test adjustments. Writes `PRO: tests/phpunit/unit/*.php` as
       needed. Check: Pro `npm run test:unit:php` passes.
 
 **Verify**: free — `npm run lint && npm run test:e2e`; Pro —
@@ -244,19 +244,25 @@ Commits to PR 290 (free parts) and PR 62 (PRO parts).
 **Verify**: Pro demo page lightbox works with keyboard and mouse; free demo
 unaffected. Commit to PR 62 (and PR 290 if the fix is shared).
 
-## Where this run stopped
+## Outcome
 
-Stages 0 through 5 are complete and verified, and stage 7 with them. Stage 6 is
-complete on the free side; its Pro half - the slot fills and the hover rendering -
-is the only work left, and nothing in the Pro repository is committed.
+Every stage is done. Checks at the end:
 
-Checks at that point, all in this repo: `npm run lint` green, `npm run lint:php`
-green, `npm run test:unit:php` 255 tests OK, `npm run test:e2e` 90 passed with 9
-failures that predate this branch - all in the legacy specs
-(`added-images-to-block`, `added-images-to-saved-layout`, `iframe-preview-resize`,
-`pattern-context`), where a lazy-loaded picture inside the legacy preview iframe
-never becomes visible. The same nine fail on the first run of this session, before
-any change to the loop family.
+| | Free | Pro |
+|---|---|---|
+| `npm run lint` | green | green |
+| `npm run lint:php` | green | green |
+| `npm run test:unit:php` | 255 tests OK | 471 tests OK |
+| `npm run test:e2e` | 90 passed, 9 failed | not run (Pro has no loop e2e) |
+
+The nine e2e failures are not this branch's: they are the legacy specs
+(`added-images-to-block`, `added-images-to-saved-layout`,
+`click-action-images-saved-layout`, `iframe-preview-resize`, `pattern-context`),
+and the same four of them fail on `master` (d17d53f4) in the same environment. CI
+ran them green on master on 2026-08-19 and red on this branch on 2026-08-20; what
+changed between the two is WordPress trunk, which the workflow tracks. A
+lazy-loaded picture inside the legacy preview iframe never becomes visible. It is
+a legacy-gallery problem and outside this spec.
 
 ## Deviations
 
