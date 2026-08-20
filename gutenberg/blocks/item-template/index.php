@@ -799,8 +799,8 @@ class Visual_Portfolio_Block_Item_Template {
 
 		$classes = array_merge( array( 'vp-layout-' . $layout_type ), $layout_classes );
 		$extra   = array();
-		$before      = '';
-		$after       = '';
+		$before  = '';
+		$after   = '';
 
 		// Masonry is the family store's: it is the one layout the store also
 		// has to lay out again after a Load More, and splitting init from
