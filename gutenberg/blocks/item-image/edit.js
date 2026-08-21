@@ -58,12 +58,10 @@ const DEFAULT_ATTRIBUTES = {
 	rel: '',
 	linkTarget: '_self',
 	sizeSlug: 'large',
-	aspectRatio: '',
-	scale: 'cover',
 };
 
-// The overlay is edited in the Color panel and cleared by its own swatches, so
-// "Reset all" in Settings leaves it alone - the way `item-cover` does.
+// The overlay lives in the Color panel and the proportions in Dimensions, each
+// with a "Reset all" of its own, so "Reset all" in Settings leaves them alone.
 
 export default function ItemImageEdit({
 	attributes,
@@ -257,6 +255,49 @@ export default function ItemImageEdit({
 							/>
 						</ToolsPanelItem>
 					</InspectorControls>
+					<InspectorControls group="dimensions">
+						<ToolsPanelItem
+							label={__('Aspect ratio', 'visual-portfolio')}
+							hasValue={() => !!aspectRatio}
+							onDeselect={() =>
+								setAttributes({ aspectRatio: '' })
+							}
+							resetAllFilter={() => ({ aspectRatio: '' })}
+							panelId={clientId}
+						>
+							<TextControl
+								label={__('Aspect ratio', 'visual-portfolio')}
+								help={__(
+									'For example 1, 4/3 or 16/9. Leave empty to keep the original proportions.',
+									'visual-portfolio'
+								)}
+								value={aspectRatio}
+								onChange={(value) =>
+									setAttributes({ aspectRatio: value })
+								}
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={__('Scale', 'visual-portfolio')}
+							hasValue={() => scale !== 'cover'}
+							onDeselect={() => setAttributes({ scale: 'cover' })}
+							resetAllFilter={() => ({ scale: 'cover' })}
+							panelId={clientId}
+						>
+							<SelectControl
+								label={__('Scale', 'visual-portfolio')}
+								help={__(
+									'Applies when an aspect ratio is set.',
+									'visual-portfolio'
+								)}
+								value={scale}
+								options={SCALE_OPTIONS}
+								onChange={(value) =>
+									setAttributes({ scale: value })
+								}
+							/>
+						</ToolsPanelItem>
+					</InspectorControls>
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
@@ -279,50 +320,6 @@ export default function ItemImageEdit({
 									options={IMAGE_SIZE_OPTIONS}
 									onChange={(value) =>
 										setAttributes({ sizeSlug: value })
-									}
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={__('Aspect ratio', 'visual-portfolio')}
-								hasValue={() => !!aspectRatio}
-								onDeselect={() =>
-									setAttributes({ aspectRatio: '' })
-								}
-								panelId={clientId}
-							>
-								<TextControl
-									label={__(
-										'Aspect ratio',
-										'visual-portfolio'
-									)}
-									help={__(
-										'For example 1, 4/3 or 16/9. Leave empty to keep the original proportions.',
-										'visual-portfolio'
-									)}
-									value={aspectRatio}
-									onChange={(value) =>
-										setAttributes({ aspectRatio: value })
-									}
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={__('Scale', 'visual-portfolio')}
-								hasValue={() => scale !== 'cover'}
-								onDeselect={() =>
-									setAttributes({ scale: 'cover' })
-								}
-								panelId={clientId}
-							>
-								<SelectControl
-									label={__('Scale', 'visual-portfolio')}
-									help={__(
-										'Applies when an aspect ratio is set.',
-										'visual-portfolio'
-									)}
-									value={scale}
-									options={SCALE_OPTIONS}
-									onChange={(value) =>
-										setAttributes({ scale: value })
 									}
 								/>
 							</ToolsPanelItem>

@@ -95,11 +95,9 @@ const CONTENT_POSITION_CLASSES = {
 	'bottom right': 'is-position-bottom-right',
 };
 
+// The proportions live in the Dimensions panel, which resets them itself.
 const DEFAULT_ATTRIBUTES = {
 	sizeSlug: 'large',
-	aspectRatio: '1',
-	minHeight: undefined,
-	backgroundSize: 'cover',
 	focalPoint: undefined,
 	contentPlacement: 'over',
 	contentPosition: 'center',
@@ -420,6 +418,64 @@ export default function ItemCoverEdit({
 							/>
 						</ToolsPanelItem>
 					</InspectorControls>
+					<InspectorControls group="dimensions">
+						<ToolsPanelItem
+							label={__('Aspect ratio', 'visual-portfolio')}
+							hasValue={() => aspectRatio !== '1'}
+							onDeselect={() =>
+								setAttributes({ aspectRatio: '1' })
+							}
+							resetAllFilter={() => ({ aspectRatio: '1' })}
+							panelId={clientId}
+						>
+							<TextControl
+								label={__('Aspect ratio', 'visual-portfolio')}
+								help={__(
+									'For example 1, 4/3 or 16/9. Leave empty to give every cover the proportions of its own image, the way a masonry layout wants them.',
+									'visual-portfolio'
+								)}
+								value={aspectRatio}
+								onChange={(value) =>
+									setAttributes({ aspectRatio: value })
+								}
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={__('Minimum height', 'visual-portfolio')}
+							hasValue={() => !!minHeight}
+							onDeselect={() =>
+								setAttributes({ minHeight: undefined })
+							}
+							resetAllFilter={() => ({ minHeight: undefined })}
+							panelId={clientId}
+						>
+							<UnitControl
+								label={__('Minimum height', 'visual-portfolio')}
+								value={minHeight}
+								onChange={(value) =>
+									setAttributes({ minHeight: value })
+								}
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={__('Scale', 'visual-portfolio')}
+							hasValue={() => backgroundSize !== 'cover'}
+							onDeselect={() =>
+								setAttributes({ backgroundSize: 'cover' })
+							}
+							resetAllFilter={() => ({ backgroundSize: 'cover' })}
+							panelId={clientId}
+						>
+							<SelectControl
+								label={__('Scale', 'visual-portfolio')}
+								value={backgroundSize}
+								options={BACKGROUND_SIZE_OPTIONS}
+								onChange={(value) =>
+									setAttributes({ backgroundSize: value })
+								}
+							/>
+						</ToolsPanelItem>
+					</InspectorControls>
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
@@ -528,65 +584,6 @@ export default function ItemCoverEdit({
 									options={IMAGE_SIZE_OPTIONS}
 									onChange={(value) =>
 										setAttributes({ sizeSlug: value })
-									}
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={__('Aspect ratio', 'visual-portfolio')}
-								hasValue={() => aspectRatio !== '1'}
-								onDeselect={() =>
-									setAttributes({ aspectRatio: '1' })
-								}
-								panelId={clientId}
-							>
-								<TextControl
-									label={__(
-										'Aspect ratio',
-										'visual-portfolio'
-									)}
-									help={__(
-										'For example 1, 4/3 or 16/9. Leave empty to give every cover the proportions of its own image, the way a masonry layout wants them.',
-										'visual-portfolio'
-									)}
-									value={aspectRatio}
-									onChange={(value) =>
-										setAttributes({ aspectRatio: value })
-									}
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={__('Minimum height', 'visual-portfolio')}
-								hasValue={() => !!minHeight}
-								onDeselect={() =>
-									setAttributes({ minHeight: undefined })
-								}
-								panelId={clientId}
-							>
-								<UnitControl
-									label={__(
-										'Minimum height',
-										'visual-portfolio'
-									)}
-									value={minHeight}
-									onChange={(value) =>
-										setAttributes({ minHeight: value })
-									}
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={__('Scale', 'visual-portfolio')}
-								hasValue={() => backgroundSize !== 'cover'}
-								onDeselect={() =>
-									setAttributes({ backgroundSize: 'cover' })
-								}
-								panelId={clientId}
-							>
-								<SelectControl
-									label={__('Scale', 'visual-portfolio')}
-									value={backgroundSize}
-									options={BACKGROUND_SIZE_OPTIONS}
-									onChange={(value) =>
-										setAttributes({ backgroundSize: value })
 									}
 								/>
 							</ToolsPanelItem>
