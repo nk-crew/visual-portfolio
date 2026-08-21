@@ -11,6 +11,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ExternalLink,
+	SelectControl,
 	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -25,12 +26,25 @@ import { __ } from '@wordpress/i18n';
 import classnames from 'classnames/dedupe';
 import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
+const CLICK_ACTION_OPTIONS = [
+	{ label: __('None', 'visual-portfolio'), value: 'none' },
+	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
+	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
+];
+
 export default function ItemTitleEdit({
-	attributes: { level, levelOptions, textAlign, isLink, rel, linkTarget },
+	attributes,
 	setAttributes,
 	context: { 'vp/itemTitle': itemTitle, 'vp/itemUrl': itemUrl },
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const { level, levelOptions, textAlign, rel, linkTarget } = attributes;
+
+	// A title saved before the click action existed keeps meaning what its link
+	// toggle said - only an unset action falls back to it.
+	const clickAction =
+		attributes.clickAction ?? (attributes.isLink ? 'url' : 'none');
 
 	const TagName = level === 0 ? 'p' : `h${level}`;
 	const blockProps = useBlockProps({
@@ -69,6 +83,7 @@ export default function ItemTitleEdit({
 							dropdownMenuProps={dropdownMenuProps}
 							resetAll={() =>
 								setAttributes({
+									clickAction: 'none',
 									isLink: false,
 									rel: '',
 									linkTarget: '_self',
@@ -76,28 +91,23 @@ export default function ItemTitleEdit({
 							}
 						>
 							<ToolsPanelItem
-								label={__(
-									'Make title a link',
-									'visual-portfolio'
-								)}
+								label={__('On click', 'visual-portfolio')}
 								isShownByDefault
-								hasValue={() => isLink}
+								hasValue={() => 'none' !== clickAction}
 								onDeselect={() =>
-									setAttributes({ isLink: false })
+									setAttributes({ clickAction: 'none' })
 								}
 							>
-								<ToggleControl
-									label={__(
-										'Make title a link',
-										'visual-portfolio'
-									)}
-									checked={isLink}
-									onChange={() =>
-										setAttributes({ isLink: !isLink })
+								<SelectControl
+									label={__('On click', 'visual-portfolio')}
+									value={clickAction}
+									options={CLICK_ACTION_OPTIONS}
+									onChange={(value) =>
+										setAttributes({ clickAction: value })
 									}
 								/>
 							</ToolsPanelItem>
-							{isLink && (
+							{'url' === clickAction && (
 								<>
 									<ToolsPanelItem
 										label={__(
@@ -167,18 +177,18 @@ export default function ItemTitleEdit({
 				</>
 			)}
 			<TagName {...blockProps}>
-				{isLink ? (
+				{'none' === clickAction ? (
+					title
+				) : (
 					// Inert in the editor - it only carries the link styling.
 					<a
-						href={itemUrl || '#'}
+						href={('url' === clickAction && itemUrl) || '#'}
 						target={linkTarget}
 						rel={rel}
 						onClick={(event) => event.preventDefault()}
 					>
 						{title}
 					</a>
-				) : (
-					title
 				)}
 			</TagName>
 		</>

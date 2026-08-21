@@ -36,6 +36,56 @@ class Visual_Portfolio_Block_Item_Read_More {
 	}
 
 	/**
+	 * Wrap the label in whatever a click on it is supposed to do.
+	 *
+	 * A popup trigger points at the full size image: without the lightbox module
+	 * a click opens the picture, which is all the lightbox would have shown.
+	 *
+	 * @param string $label      - rendered label, arrow included.
+	 * @param array  $attributes - block attributes.
+	 * @param array  $context    - block context.
+	 *
+	 * @return string Empty when the click action has nothing to reach.
+	 */
+	private function get_click_wrapper( $label, $attributes, $context ) {
+		$action = $attributes['clickAction'] ?? 'url';
+
+		if ( 'none' === $action ) {
+			return '<span>' . $label . '</span>';
+		}
+
+		if ( 'popup' === $action ) {
+			$trigger = Visual_Portfolio_Popup::get_trigger_attributes( $context );
+
+			// An item the lightbox has nothing to show - a Pro source that
+			// refused it, an image that no longer exists - leaves nothing to
+			// read more of.
+			if ( empty( $trigger ) ) {
+				return '';
+			}
+
+			return sprintf(
+				'<a href="%1$s" data-vp-popup="%2$s">%3$s</a>',
+				esc_url( $trigger['href'] ),
+				esc_attr( $trigger['data-vp-popup'] ),
+				$label
+			);
+		}
+
+		if ( empty( $context['vp/itemUrl'] ) ) {
+			return '';
+		}
+
+		return sprintf(
+			'<a href="%1$s" target="%2$s"%3$s>%4$s</a>',
+			esc_url( $context['vp/itemUrl'] ),
+			esc_attr( $attributes['linkTarget'] ?? '_self' ),
+			empty( $attributes['rel'] ) ? '' : ' rel="' . esc_attr( $attributes['rel'] ) . '"',
+			$label
+		);
+	}
+
+	/**
 	 * Block output
 	 *
 	 * @param array    $attributes - block attributes.
@@ -45,12 +95,6 @@ class Visual_Portfolio_Block_Item_Read_More {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content, $block ) {
-		$url = isset( $block->context['vp/itemUrl'] ) ? $block->context['vp/itemUrl'] : '';
-
-		if ( ! $url ) {
-			return '';
-		}
-
 		// An untouched block shows the words the editor offers as its
 		// placeholder. A `block.json` default cannot carry them: attribute
 		// defaults are not part of the metadata a catalogue is built from, so
@@ -70,6 +114,12 @@ class Visual_Portfolio_Block_Item_Read_More {
 			$label .= ' <span aria-hidden="true">' . ( is_rtl() ? '&larr;' : '&rarr;' ) . '</span>';
 		}
 
+		$link = $this->get_click_wrapper( $label, $attributes, $block->context );
+
+		if ( '' === $link ) {
+			return '';
+		}
+
 		$classes = array();
 
 		if ( ! empty( $attributes['textAlign'] ) ) {
@@ -81,10 +131,9 @@ class Visual_Portfolio_Block_Item_Read_More {
 		}
 
 		return sprintf(
-			'<div %1$s><a href="%2$s">%3$s</a></div>',
+			'<div %1$s>%2$s</div>',
 			get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) ),
-			esc_url( $url ),
-			$label
+			$link
 		);
 	}
 }

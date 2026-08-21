@@ -3,21 +3,23 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 
-	a {
+	// The label is an anchor, or a span when a click does nothing - and always the
+	// first child, whatever the arrow after it is made of.
+	> :first-child {
 		display: inline-block;
 	}
 
-	// The button styles sit on the link, not on the wrapper, so `textAlign` still
+	// The button styles sit on the label, not on the wrapper, so `textAlign` still
 	// has a block-level box to align inside of. Everything is derived from
 	// `currentColor`, so the block's own color settings carry through.
-	&.is-style-fill a,
-	&.is-style-outline a {
+	&.is-style-fill > :first-child,
+	&.is-style-outline > :first-child {
 		padding: 0.4em 1em;
 		border-radius: 9999px;
 		text-decoration: none;
 	}
 
-	&.is-style-fill a {
+	&.is-style-fill > :first-child {
 		background-color: color-mix(in srgb, currentColor 10%, transparent);
 
 		&:hover,
@@ -26,7 +28,7 @@
 		}
 	}
 
-	&.is-style-outline a {
+	&.is-style-outline > :first-child {
 		border: 1px solid;
 	}
 }

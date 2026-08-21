@@ -7,7 +7,7 @@
 	"description": "Displays the title of a gallery item. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/item-template"],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["vp/itemTitle", "vp/itemUrl"],
+	"usesContext": ["vp/itemTitle", "vp/itemUrl", "vp/itemPopupData"],
 	"attributes": {
 		"textAlign": {
 			"type": "string"
@@ -18,6 +18,11 @@
 		},
 		"levelOptions": {
 			"type": "array"
+		},
+		"clickAction": {
+			"type": "string",
+			"enum": ["none", "url", "popup"],
+			"role": "content"
 		},
 		"isLink": {
 			"type": "boolean",

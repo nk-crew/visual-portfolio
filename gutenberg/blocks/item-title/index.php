@@ -36,6 +36,53 @@ class Visual_Portfolio_Block_Item_Title {
 	}
 
 	/**
+	 * Wrap the title in whatever a click on it is supposed to do.
+	 *
+	 * A popup trigger points at the full size image: without the lightbox module
+	 * a click opens the picture, which is all the lightbox would have shown.
+	 *
+	 * @param string $title      - rendered title.
+	 * @param array  $attributes - block attributes.
+	 * @param array  $context    - block context.
+	 *
+	 * @return string
+	 */
+	private function get_click_wrapper( $title, $attributes, $context ) {
+		// A title saved before the click action existed keeps meaning what its
+		// link toggle said - only an unset action falls back to it.
+		$action = $attributes['clickAction'] ?? ( empty( $attributes['isLink'] ) ? 'none' : 'url' );
+
+		if ( 'url' === $action && ! empty( $context['vp/itemUrl'] ) ) {
+			return sprintf(
+				'<a href="%1$s" target="%2$s"%3$s>%4$s</a>',
+				esc_url( $context['vp/itemUrl'] ),
+				esc_attr( $attributes['linkTarget'] ?? '_self' ),
+				empty( $attributes['rel'] ) ? '' : ' rel="' . esc_attr( $attributes['rel'] ) . '"',
+				$title
+			);
+		}
+
+		if ( 'popup' !== $action ) {
+			return $title;
+		}
+
+		$trigger = Visual_Portfolio_Popup::get_trigger_attributes( $context );
+
+		// An item the lightbox has nothing to show - a Pro source that refused
+		// it, an image that no longer exists - is not made clickable.
+		if ( empty( $trigger ) ) {
+			return $title;
+		}
+
+		return sprintf(
+			'<a href="%1$s" data-vp-popup="%2$s">%3$s</a>',
+			esc_url( $trigger['href'] ),
+			esc_attr( $trigger['data-vp-popup'] ),
+			$title
+		);
+	}
+
+	/**
 	 * Block output
 	 *
 	 * @param array    $attributes - block attributes.
@@ -51,18 +98,7 @@ class Visual_Portfolio_Block_Item_Title {
 			return '';
 		}
 
-		$title = wp_kses_post( $title );
-		$url   = isset( $block->context['vp/itemUrl'] ) ? $block->context['vp/itemUrl'] : '';
-
-		if ( ! empty( $attributes['isLink'] ) && $url ) {
-			$title = sprintf(
-				'<a href="%1$s" target="%2$s"%3$s>%4$s</a>',
-				esc_url( $url ),
-				esc_attr( isset( $attributes['linkTarget'] ) ? $attributes['linkTarget'] : '_self' ),
-				empty( $attributes['rel'] ) ? '' : ' rel="' . esc_attr( $attributes['rel'] ) . '"',
-				$title
-			);
-		}
+		$title = $this->get_click_wrapper( wp_kses_post( $title ), $attributes, $block->context );
 
 		$classes = array();
 

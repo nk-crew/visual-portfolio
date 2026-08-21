@@ -7,7 +7,7 @@
 	"description": "Displays a link to the gallery item. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/item-template"],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["vp/itemUrl"],
+	"usesContext": ["vp/itemUrl", "vp/itemPopupData"],
 	"attributes": {
 		"text": {
 			"type": "string"
@@ -18,6 +18,22 @@
 		"showArrow": {
 			"type": "boolean",
 			"default": false
+		},
+		"clickAction": {
+			"type": "string",
+			"default": "url",
+			"enum": ["none", "url", "popup"],
+			"role": "content"
+		},
+		"rel": {
+			"type": "string",
+			"default": "",
+			"role": "content"
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self",
+			"role": "content"
 		}
 	},
 	"styles": [

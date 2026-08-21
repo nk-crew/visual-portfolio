@@ -10,6 +10,8 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
+	SelectControl,
+	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -21,8 +23,14 @@ import { __, isRTL } from '@wordpress/i18n';
 import classnames from 'classnames/dedupe';
 import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
+const CLICK_ACTION_OPTIONS = [
+	{ label: __('None', 'visual-portfolio'), value: 'none' },
+	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
+	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
+];
+
 export default function ItemReadMoreEdit({
-	attributes: { text, textAlign, showArrow },
+	attributes: { text, textAlign, showArrow, clickAction, rel, linkTarget },
 	setAttributes,
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -50,7 +58,14 @@ export default function ItemReadMoreEdit({
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
 							dropdownMenuProps={dropdownMenuProps}
-							resetAll={() => setAttributes({ showArrow: false })}
+							resetAll={() =>
+								setAttributes({
+									showArrow: false,
+									clickAction: 'url',
+									rel: '',
+									linkTarget: '_self',
+								})
+							}
 						>
 							<ToolsPanelItem
 								label={__('Show arrow', 'visual-portfolio')}
@@ -70,6 +85,75 @@ export default function ItemReadMoreEdit({
 									}
 								/>
 							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={__('On click', 'visual-portfolio')}
+								isShownByDefault
+								hasValue={() => 'url' !== clickAction}
+								onDeselect={() =>
+									setAttributes({ clickAction: 'url' })
+								}
+							>
+								<SelectControl
+									label={__('On click', 'visual-portfolio')}
+									value={clickAction}
+									options={CLICK_ACTION_OPTIONS}
+									onChange={(value) =>
+										setAttributes({ clickAction: value })
+									}
+								/>
+							</ToolsPanelItem>
+							{'url' === clickAction && (
+								<>
+									<ToolsPanelItem
+										label={__(
+											'Open in new tab',
+											'visual-portfolio'
+										)}
+										hasValue={() => linkTarget === '_blank'}
+										onDeselect={() =>
+											setAttributes({
+												linkTarget: '_self',
+											})
+										}
+									>
+										<ToggleControl
+											label={__(
+												'Open in new tab',
+												'visual-portfolio'
+											)}
+											checked={linkTarget === '_blank'}
+											onChange={(value) =>
+												setAttributes({
+													linkTarget: value
+														? '_blank'
+														: '_self',
+												})
+											}
+										/>
+									</ToolsPanelItem>
+									<ToolsPanelItem
+										label={__(
+											'Link rel',
+											'visual-portfolio'
+										)}
+										hasValue={() => !!rel}
+										onDeselect={() =>
+											setAttributes({ rel: '' })
+										}
+									>
+										<TextControl
+											label={__(
+												'Link rel',
+												'visual-portfolio'
+											)}
+											value={rel}
+											onChange={(value) =>
+												setAttributes({ rel: value })
+											}
+										/>
+									</ToolsPanelItem>
+								</>
+							)}
 						</ToolsPanel>
 					</InspectorControls>
 				</>
@@ -77,7 +161,9 @@ export default function ItemReadMoreEdit({
 			<div {...blockProps}>
 				<RichText
 					identifier="text"
-					tagName="a"
+					// A link that leads nowhere is not a link, and the front end
+					// renders the same tag.
+					tagName={'none' === clickAction ? 'span' : 'a'}
 					aria-label={__('“Read more” link text', 'visual-portfolio')}
 					placeholder={__('Read more', 'visual-portfolio')}
 					value={text}
