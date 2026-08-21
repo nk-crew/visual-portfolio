@@ -40,7 +40,6 @@ function RenderImageAltControl(props) {
 				getControlNameClassName(fullName),
 				className
 			)}
-			__nextHasNoMarginBottom
 		>
 			<TextControl
 				key={`${
@@ -53,8 +52,6 @@ function RenderImageAltControl(props) {
 						alt: val,
 					});
 				}}
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 			/>
 		</BaseControl>
 	);

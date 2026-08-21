@@ -180,7 +180,6 @@ function ItemsCountControl({ data }) {
 			}
 			help={renderControlHelp}
 			className={renderControlClassName}
-			__nextHasNoMarginBottom
 		>
 			<div>
 				<ToggleGroupButtonsControl
@@ -232,8 +231,6 @@ function ItemsCountControl({ data }) {
 						step={data.step}
 						value={controlVal}
 						onChange={(val) => onChange(parseFloat(val))}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 				</>
 			) : null}

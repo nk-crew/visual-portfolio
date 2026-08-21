@@ -157,8 +157,6 @@ class VpVideoComponent extends Component {
 						}}
 						type="url"
 						placeholder="https://"
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 				</PanelRow>
 				<PanelRow>

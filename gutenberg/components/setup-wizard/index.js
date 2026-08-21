@@ -220,7 +220,6 @@ export default function SetupWizard(props) {
 										),
 									});
 								}}
-								__nextHasNoMarginBottom
 							/>
 						</div>
 						<div>
@@ -238,7 +237,6 @@ export default function SetupWizard(props) {
 										),
 									});
 								}}
-								__nextHasNoMarginBottom
 							/>
 						</div>
 						<div>
@@ -253,7 +251,6 @@ export default function SetupWizard(props) {
 												: 'popup_gallery',
 									});
 								}}
-								__nextHasNoMarginBottom
 							/>
 						</div>
 					</div>

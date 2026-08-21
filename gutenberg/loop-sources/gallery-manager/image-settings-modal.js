@@ -245,7 +245,6 @@ export default function ImageSettingsModal({
 									onChange={(focalPoint) =>
 										onChange({ focalPoint })
 									}
-									__nextHasNoMarginBottom
 								/>
 							) : null}
 
@@ -262,8 +261,6 @@ export default function ImageSettingsModal({
 						label={__('Title', 'visual-portfolio')}
 						value={image.title || ''}
 						onChange={(title) => onChange({ title })}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 
 					<TextareaControl
@@ -272,7 +269,6 @@ export default function ImageSettingsModal({
 						value={image.description || ''}
 						rows={3}
 						onChange={(description) => onChange({ description })}
-						__nextHasNoMarginBottom
 					/>
 
 					<FormTokenField
@@ -286,8 +282,6 @@ export default function ImageSettingsModal({
 						onChange={(categories) =>
 							onChange({ categories: categories.map(String) })
 						}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						__experimentalExpandOnFocus
 					/>
 
@@ -296,8 +290,6 @@ export default function ImageSettingsModal({
 						value={image.format || 'standard'}
 						options={FORMAT_OPTIONS}
 						onChange={(format) => onChange({ format })}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 
 					{isVideo ? (
@@ -307,8 +299,6 @@ export default function ImageSettingsModal({
 							placeholder="https://"
 							value={image.video_url || ''}
 							onChange={(value) => onChange({ video_url: value })}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 						/>
 					) : null}
 
@@ -323,16 +313,12 @@ export default function ImageSettingsModal({
 						placeholder="https://"
 						value={image.url || ''}
 						onChange={(url) => onChange({ url })}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 
 					<TextControl
 						label={__('Author', 'visual-portfolio')}
 						value={image.author || ''}
 						onChange={(author) => onChange({ author })}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 
 					<TextControl
@@ -341,8 +327,6 @@ export default function ImageSettingsModal({
 						placeholder="https://"
 						value={image.author_url || ''}
 						onChange={(value) => onChange({ author_url: value })}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 
 					<LoopImageSettingsSlot {...fillProps} />

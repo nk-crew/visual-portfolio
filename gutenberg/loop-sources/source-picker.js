@@ -30,7 +30,6 @@ export default function SourcePicker({ value, onChange }) {
 					})}
 					isPressed={name === value}
 					onClick={() => onChange(name)}
-					__next40pxDefaultSize
 				>
 					<span className="vpf-loop-source-picker__icon">{icon}</span>
 					<span className="vpf-loop-source-picker__title">
