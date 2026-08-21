@@ -5,8 +5,10 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	CheckboxControl,
 	Disabled,
-	PanelBody,
 	TextControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -14,6 +16,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 const AVAILABLE_OPTIONS = window.VPGutenbergVariables?.loop_sort_options || [];
 
@@ -39,6 +42,8 @@ function getShownOptions(selected, labels) {
 }
 
 export default function LoopSortEdit({ attributes, setAttributes, context }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const { options = [], labels = {} } = attributes;
 
 	useLoopOrphanWarning('visual-portfolio/loop-sort', context);
@@ -86,49 +91,64 @@ export default function LoopSortEdit({ attributes, setAttributes, context }) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={__('Sort Options', 'visual-portfolio')}>
-					{AVAILABLE_OPTIONS.map(({ value, label }) => {
-						const isChecked =
-							!options.length || options.includes(value);
-
-						return (
-							<CheckboxControl
-								key={value || 'default'}
-								__nextHasNoMarginBottom
-								label={label}
-								checked={isChecked}
-								disabled={isChecked && shown.length === 1}
-								onChange={(nextChecked) =>
-									toggleOption(value, nextChecked)
-								}
-							/>
-						);
-					})}
-				</PanelBody>
-				<PanelBody
-					title={__('Labels', 'visual-portfolio')}
-					initialOpen={false}
+				<ToolsPanel
+					label={__('Settings', 'visual-portfolio')}
+					resetAll={() => setAttributes({ options: [], labels: {} })}
+					dropdownMenuProps={dropdownMenuProps}
 				>
-					{shown.map(({ value }) => (
-						<TextControl
-							key={value || 'default'}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={
-								AVAILABLE_OPTIONS.find(
-									(option) => option.value === value
-								)?.label
-							}
-							placeholder={
-								AVAILABLE_OPTIONS.find(
-									(option) => option.value === value
-								)?.label
-							}
-							value={labels?.[value] || ''}
-							onChange={(label) => setLabel(value, label)}
-						/>
-					))}
-				</PanelBody>
+					<ToolsPanelItem
+						label={__('Sort Options', 'visual-portfolio')}
+						isShownByDefault
+						hasValue={() => !!options.length}
+						onDeselect={() => setAttributes({ options: [] })}
+					>
+						<VStack spacing={4}>
+							{AVAILABLE_OPTIONS.map(({ value, label }) => {
+								const isChecked =
+									!options.length || options.includes(value);
+
+								return (
+									<CheckboxControl
+										key={value || 'default'}
+										label={label}
+										checked={isChecked}
+										disabled={
+											isChecked && shown.length === 1
+										}
+										onChange={(nextChecked) =>
+											toggleOption(value, nextChecked)
+										}
+									/>
+								);
+							})}
+						</VStack>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={__('Labels', 'visual-portfolio')}
+						hasValue={() => !!Object.keys(labels).length}
+						onDeselect={() => setAttributes({ labels: {} })}
+					>
+						<VStack spacing={4}>
+							{shown.map(({ value }) => (
+								<TextControl
+									key={value || 'default'}
+									label={
+										AVAILABLE_OPTIONS.find(
+											(option) => option.value === value
+										)?.label
+									}
+									placeholder={
+										AVAILABLE_OPTIONS.find(
+											(option) => option.value === value
+										)?.label
+									}
+									value={labels?.[value] || ''}
+									onChange={(label) => setLabel(value, label)}
+								/>
+							))}
+						</VStack>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div {...useBlockProps({ className: 'vp-block-loop-sort' })}>
 				<Disabled>

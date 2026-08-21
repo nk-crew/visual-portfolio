@@ -6,7 +6,12 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { PanelBody, Spinner, ToggleControl } from '@wordpress/components';
+import {
+	Spinner,
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -15,6 +20,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
 
@@ -77,12 +83,17 @@ export default function BlockEdit({
 	context,
 	clientId,
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const { showCount, showAllItem } = attributes;
+
 	useLoopOrphanWarning('visual-portfolio/loop-filter', context);
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	// Key of the query the current items were fetched for. Items live in the
-	// post content, so there is nothing to fetch until the query changes.
+	// Key of the state the current items were synced for. Items live in the
+	// post content, so there is nothing to sync until the query - or the choice
+	// of whether to keep the "All" item - changes.
 	const syncedQueryRef = useRef(null);
 
 	const {
@@ -111,6 +122,7 @@ export default function BlockEdit({
 		taxonomies: postsQuery?.taxonomies,
 		images: imagesQuery?.images,
 		sourceQuery,
+		showAllItem,
 	});
 
 	useEffect(() => {
@@ -122,6 +134,12 @@ export default function BlockEdit({
 		// in what is missing instead of rewriting what is there.
 		const structureOnly = null === syncedQueryRef.current;
 		const currentBlocks = getBlocks(clientId);
+
+		// The "All" item is one of the synced items, so hiding it means
+		// dropping it: an item left in the block list is still rendered.
+		const keptBlocks = showAllItem
+			? currentBlocks
+			: currentBlocks.filter((block) => '*' !== block.attributes.filter);
 
 		let cancelled = false;
 
@@ -147,14 +165,16 @@ export default function BlockEdit({
 					return;
 				}
 
-				const items = response.response;
+				const items = showAllItem
+					? response.response
+					: response.response.filter((item) => '*' !== item.filter);
 				const matched = new Set();
 
 				// Keep the existing items in their current order, so manual
 				// reordering survives a refresh.
 				const updatedBlocks = [];
 
-				currentBlocks.forEach((block) => {
+				keptBlocks.forEach((block) => {
 					const key = getItemKey(block.attributes);
 					const item = items.find(
 						(candidate) => getItemKey(candidate) === key
@@ -194,15 +214,24 @@ export default function BlockEdit({
 					);
 				});
 
-				// Append the items that are not in the block list yet.
+				// Append the items that are not in the block list yet. The
+				// "All" item is the one that resets the filter, so it leads
+				// the list rather than trailing the categories it resets.
 				items.forEach((item) => {
 					if (matched.has(getItemKey(item))) {
 						return;
 					}
 
-					updatedBlocks.push(
-						createBlock(ITEM_BLOCK, getItemAttributes(item))
+					const block = createBlock(
+						ITEM_BLOCK,
+						getItemAttributes(item)
 					);
+
+					if ('*' === item.filter) {
+						updatedBlocks.unshift(block);
+					} else {
+						updatedBlocks.push(block);
+					}
 				});
 
 				// Untouched items are returned by identity, so this also tells
@@ -242,6 +271,7 @@ export default function BlockEdit({
 		baseQuery,
 		postsQuery,
 		imagesQuery,
+		showAllItem,
 		postId,
 		clientId,
 		getBlocks,
@@ -261,18 +291,53 @@ export default function BlockEdit({
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={__('Settings', 'visual-portfolio')}
+					resetAll={() =>
+						setAttributes({
+							showCount: false,
+							showAllItem: true,
+						})
+					}
+					dropdownMenuProps={dropdownMenuProps}
+				>
+					<ToolsPanelItem
 						label={__('Display Count', 'visual-portfolio')}
-						checked={attributes.showCount}
-						onChange={() =>
-							setAttributes({
-								showCount: !attributes.showCount,
-							})
-						}
-					/>
-				</PanelBody>
+						isShownByDefault
+						hasValue={() => showCount}
+						onDeselect={() => setAttributes({ showCount: false })}
+					>
+						<ToggleControl
+							label={__('Display Count', 'visual-portfolio')}
+							help={__(
+								'Show how many items each category holds.',
+								'visual-portfolio'
+							)}
+							checked={showCount}
+							onChange={() =>
+								setAttributes({ showCount: !showCount })
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={__("Show 'All' item", 'visual-portfolio')}
+						isShownByDefault
+						hasValue={() => !showAllItem}
+						onDeselect={() => setAttributes({ showAllItem: true })}
+					>
+						<ToggleControl
+							label={__("Show 'All' item", 'visual-portfolio')}
+							help={__(
+								'The item that clears the filter and brings the whole gallery back.',
+								'visual-portfolio'
+							)}
+							checked={showAllItem}
+							onChange={() =>
+								setAttributes({ showAllItem: !showAllItem })
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			{isLoading ? (
 				<div {...blockProps}>

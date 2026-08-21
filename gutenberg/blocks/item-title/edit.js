@@ -19,17 +19,19 @@ import {
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 export default function ItemTitleEdit({
 	attributes: { level, levelOptions, textAlign, isLink, rel, linkTarget },
 	setAttributes,
 	context: { 'vp/itemTitle': itemTitle, 'vp/itemUrl': itemUrl },
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const TagName = level === 0 ? 'p' : `h${level}`;
 	const blockProps = useBlockProps({
 		className: classnames({
@@ -64,6 +66,7 @@ export default function ItemTitleEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							resetAll={() =>
 								setAttributes({
 									isLink: false,
@@ -84,7 +87,6 @@ export default function ItemTitleEdit({
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={__(
 										'Make title a link',
 										'visual-portfolio'
@@ -111,7 +113,6 @@ export default function ItemTitleEdit({
 										}
 									>
 										<ToggleControl
-											__nextHasNoMarginBottom
 											label={__(
 												'Open in new tab',
 												'visual-portfolio'
@@ -138,8 +139,6 @@ export default function ItemTitleEdit({
 										}
 									>
 										<TextControl
-											__next40pxDefaultSize
-											__nextHasNoMarginBottom
 											label={__(
 												'Link relation',
 												'visual-portfolio'

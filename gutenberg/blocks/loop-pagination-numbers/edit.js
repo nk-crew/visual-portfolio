@@ -2,8 +2,20 @@
  * WordPress dependencies
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import {
+	RangeControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+
+// Keep in sync with the `midSize` default in `block.json`.
+const DEFAULT_MID_SIZE = 2;
 
 const createPaginationItem = (content, Tag = 'a', className = '') => (
 	<Tag key={content} className={className}>
@@ -45,6 +57,8 @@ export default function PaginationNumbersEdit({
 	setAttributes,
 	context,
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const { midSize } = attributes;
 	const { 'vp/baseQuery': baseQuery } = context;
 
@@ -57,26 +71,39 @@ export default function PaginationNumbersEdit({
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody>
-					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={__('Settings', 'visual-portfolio')}
+					resetAll={() =>
+						setAttributes({ midSize: DEFAULT_MID_SIZE })
+					}
+					dropdownMenuProps={dropdownMenuProps}
+				>
+					<ToolsPanelItem
 						label={__('Number of links', 'visual-portfolio')}
-						help={__(
-							'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.',
-							'visual-portfolio'
-						)}
-						value={midSize}
-						onChange={(value) => {
-							setAttributes({
-								midSize: parseInt(value, 10),
-							});
-						}}
-						min={0}
-						max={5}
-						withInputField={false}
-					/>
-				</PanelBody>
+						isShownByDefault
+						hasValue={() => DEFAULT_MID_SIZE !== midSize}
+						onDeselect={() =>
+							setAttributes({ midSize: DEFAULT_MID_SIZE })
+						}
+					>
+						<RangeControl
+							label={__('Number of links', 'visual-portfolio')}
+							help={__(
+								'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.',
+								'visual-portfolio'
+							)}
+							value={midSize}
+							onChange={(value) => {
+								setAttributes({
+									midSize: parseInt(value, 10),
+								});
+							}}
+							min={0}
+							max={5}
+							withInputField={false}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div
 				{...useBlockProps({

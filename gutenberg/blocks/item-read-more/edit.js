@@ -15,16 +15,18 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 export default function ItemReadMoreEdit({
 	attributes: { text, textAlign, showArrow },
 	setAttributes,
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const blockProps = useBlockProps({
 		className: classnames({
 			[`has-text-align-${textAlign}`]: textAlign,
@@ -47,6 +49,7 @@ export default function ItemReadMoreEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							resetAll={() => setAttributes({ showArrow: false })}
 						>
 							<ToolsPanelItem
@@ -58,7 +61,6 @@ export default function ItemReadMoreEdit({
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={__('Show arrow', 'visual-portfolio')}
 									checked={showArrow}
 									onChange={() =>

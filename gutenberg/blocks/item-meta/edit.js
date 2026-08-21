@@ -15,11 +15,11 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 /**
  * Internal dependencies
@@ -39,6 +39,8 @@ export default function ItemMetaEdit({
 	setAttributes,
 	context,
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const blockProps = useBlockProps({
 		className: classnames({
 			[`has-text-align-${textAlign}`]: textAlign,
@@ -81,6 +83,7 @@ export default function ItemMetaEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							resetAll={() =>
 								setAttributes({
 									showIcon: true,
@@ -100,7 +103,6 @@ export default function ItemMetaEdit({
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={__('Show icon', 'visual-portfolio')}
 									checked={showIcon}
 									onChange={() =>
@@ -120,7 +122,6 @@ export default function ItemMetaEdit({
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={__(
 										'Show empty value',
 										'visual-portfolio'
@@ -142,8 +143,6 @@ export default function ItemMetaEdit({
 								onDeselect={() => setAttributes({ prefix: '' })}
 							>
 								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__(
 										'Prefix text',
 										'visual-portfolio'
@@ -161,8 +160,6 @@ export default function ItemMetaEdit({
 								onDeselect={() => setAttributes({ suffix: '' })}
 							>
 								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__(
 										'Suffix text',
 										'visual-portfolio'
@@ -186,7 +183,6 @@ export default function ItemMetaEdit({
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={__(
 											'Link to comments',
 											'visual-portfolio'

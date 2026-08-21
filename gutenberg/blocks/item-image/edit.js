@@ -20,12 +20,10 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { fullscreen, link, linkOff } from '@wordpress/icons';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
-
 /**
  * Internal dependencies
  */
@@ -33,6 +31,7 @@ import {
 	IMAGE_SIZE_OPTIONS,
 	useImageSizeOnInsert,
 } from '../../utils/item-image-size';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 const SCALE_OPTIONS = [
 	{ label: __('Cover', 'visual-portfolio'), value: 'cover' },
@@ -74,6 +73,8 @@ export default function ItemImageEdit({
 	context,
 	clientId,
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const {
 		clickAction,
 		rel,
@@ -244,8 +245,6 @@ export default function ItemImageEdit({
 							panelId={clientId}
 						>
 							<RangeControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={__(
 									'Overlay opacity',
 									'visual-portfolio'
@@ -263,6 +262,7 @@ export default function ItemImageEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							panelId={clientId}
 							resetAll={() => setAttributes(DEFAULT_ATTRIBUTES)}
 						>
@@ -276,8 +276,6 @@ export default function ItemImageEdit({
 								panelId={clientId}
 							>
 								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__('Image size', 'visual-portfolio')}
 									value={sizeSlug}
 									options={IMAGE_SIZE_OPTIONS}
@@ -295,8 +293,6 @@ export default function ItemImageEdit({
 								panelId={clientId}
 							>
 								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__(
 										'Aspect ratio',
 										'visual-portfolio'
@@ -320,8 +316,6 @@ export default function ItemImageEdit({
 								panelId={clientId}
 							>
 								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__('Scale', 'visual-portfolio')}
 									help={__(
 										'Applies when an aspect ratio is set.',
@@ -344,8 +338,6 @@ export default function ItemImageEdit({
 								panelId={clientId}
 							>
 								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__('On click', 'visual-portfolio')}
 									value={clickAction}
 									options={CLICK_ACTION_OPTIONS}
@@ -370,7 +362,6 @@ export default function ItemImageEdit({
 										panelId={clientId}
 									>
 										<ToggleControl
-											__nextHasNoMarginBottom
 											label={__(
 												'Open in new tab',
 												'visual-portfolio'
@@ -397,8 +388,6 @@ export default function ItemImageEdit({
 										panelId={clientId}
 									>
 										<TextControl
-											__next40pxDefaultSize
-											__nextHasNoMarginBottom
 											label={__(
 												'Link rel',
 												'visual-portfolio'

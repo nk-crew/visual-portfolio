@@ -24,12 +24,10 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
-
 /**
  * Internal dependencies
  */
@@ -37,6 +35,7 @@ import {
 	IMAGE_SIZE_OPTIONS,
 	useImageSizeOnInsert,
 } from '../../utils/item-image-size';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 const ALLOWED_BLOCKS = [
 	'visual-portfolio/item-title',
@@ -118,6 +117,8 @@ export default function ItemCoverEdit({
 	context,
 	clientId,
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const {
 		sizeSlug,
 		aspectRatio,
@@ -379,8 +380,6 @@ export default function ItemCoverEdit({
 							panelId={clientId}
 						>
 							<RangeControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={__(
 									'Overlay opacity',
 									'visual-portfolio'
@@ -407,8 +406,6 @@ export default function ItemCoverEdit({
 							panelId={clientId}
 						>
 							<RangeControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={__(
 									'Hover overlay opacity',
 									'visual-portfolio'
@@ -426,6 +423,7 @@ export default function ItemCoverEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							panelId={clientId}
 							resetAll={() => setAttributes(DEFAULT_ATTRIBUTES)}
 						>
@@ -442,8 +440,6 @@ export default function ItemCoverEdit({
 								panelId={clientId}
 							>
 								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__(
 										'Content placement',
 										'visual-portfolio'
@@ -472,8 +468,6 @@ export default function ItemCoverEdit({
 									panelId={clientId}
 								>
 									<SelectControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
 										label={__('Effect', 'visual-portfolio')}
 										help={__(
 											'How the content appears above the image. Fly follows the side the pointer came in from.',
@@ -501,8 +495,6 @@ export default function ItemCoverEdit({
 									panelId={clientId}
 								>
 									<SelectControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
 										label={__(
 											'Show content',
 											'visual-portfolio'
@@ -531,8 +523,6 @@ export default function ItemCoverEdit({
 								panelId={clientId}
 							>
 								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__('Image size', 'visual-portfolio')}
 									value={sizeSlug}
 									options={IMAGE_SIZE_OPTIONS}
@@ -550,8 +540,6 @@ export default function ItemCoverEdit({
 								panelId={clientId}
 							>
 								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__(
 										'Aspect ratio',
 										'visual-portfolio'
@@ -575,7 +563,6 @@ export default function ItemCoverEdit({
 								panelId={clientId}
 							>
 								<UnitControl
-									__next40pxDefaultSize
 									label={__(
 										'Minimum height',
 										'visual-portfolio'
@@ -595,8 +582,6 @@ export default function ItemCoverEdit({
 								panelId={clientId}
 							>
 								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__('Scale', 'visual-portfolio')}
 									value={backgroundSize}
 									options={BACKGROUND_SIZE_OPTIONS}
@@ -618,7 +603,6 @@ export default function ItemCoverEdit({
 									panelId={clientId}
 								>
 									<FocalPointPicker
-										__nextHasNoMarginBottom
 										label={__(
 											'Focal point',
 											'visual-portfolio'
@@ -645,8 +629,6 @@ export default function ItemCoverEdit({
 								panelId={clientId}
 							>
 								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__('On click', 'visual-portfolio')}
 									help={__(
 										'Covers the whole item with a link, and gives the keyboard something to focus so the content can be reached.',
@@ -675,7 +657,6 @@ export default function ItemCoverEdit({
 										panelId={clientId}
 									>
 										<ToggleControl
-											__nextHasNoMarginBottom
 											label={__(
 												'Open in new tab',
 												'visual-portfolio'
@@ -702,8 +683,6 @@ export default function ItemCoverEdit({
 										panelId={clientId}
 									>
 										<TextControl
-											__next40pxDefaultSize
-											__nextHasNoMarginBottom
 											label={__(
 												'Link rel',
 												'visual-portfolio'

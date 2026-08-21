@@ -16,11 +16,11 @@ import {
 } from '@wordpress/components';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { __ } from '@wordpress/i18n';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 export default function ItemDateEdit({
 	attributes: { textAlign, format, isLink },
@@ -30,6 +30,8 @@ export default function ItemDateEdit({
 		'vp/itemUrl': itemUrl,
 	},
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const blockProps = useBlockProps({
 		className: classnames({
 			[`has-text-align-${textAlign}`]: textAlign,
@@ -62,6 +64,7 @@ export default function ItemDateEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							resetAll={() =>
 								setAttributes({
 									format: undefined,
@@ -94,7 +97,6 @@ export default function ItemDateEdit({
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={__(
 										'Link to item',
 										'visual-portfolio'

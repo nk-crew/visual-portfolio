@@ -16,11 +16,11 @@ import {
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 // Keep in sync with `Visual_Portfolio_Block_Item_Description::DEFAULT_EXCERPT_LENGTH`.
 const DEFAULT_EXCERPT_LENGTH = 15;
@@ -57,6 +57,8 @@ export default function ItemDescriptionEdit({
 	setAttributes,
 	context: { 'vp/itemExcerpt': itemExcerpt, 'vp/itemContent': itemContent },
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const blockProps = useBlockProps({
 		className: classnames({
 			[`has-text-align-${textAlign}`]: textAlign,
@@ -99,6 +101,7 @@ export default function ItemDescriptionEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							resetAll={() =>
 								setAttributes({
 									source: 'excerpt',
@@ -115,8 +118,6 @@ export default function ItemDescriptionEdit({
 								}
 							>
 								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__('Source', 'visual-portfolio')}
 									value={source}
 									options={[
@@ -158,8 +159,6 @@ export default function ItemDescriptionEdit({
 									}
 								>
 									<RangeControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
 										label={__(
 											'Max number of words',
 											'visual-portfolio'

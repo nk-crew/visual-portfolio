@@ -16,11 +16,11 @@ import {
 import { Fragment } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 const DEFAULT_SEPARATOR = ', ';
 
@@ -29,6 +29,8 @@ export default function ItemCategoriesEdit({
 	setAttributes,
 	context: { 'vp/itemCategories': itemCategories },
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const blockProps = useBlockProps({
 		className: classnames({
 			[`has-text-align-${textAlign}`]: textAlign,
@@ -55,6 +57,7 @@ export default function ItemCategoriesEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							resetAll={() =>
 								setAttributes({ separator: DEFAULT_SEPARATOR })
 							}
@@ -70,8 +73,6 @@ export default function ItemCategoriesEdit({
 								}
 							>
 								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={__('Separator', 'visual-portfolio')}
 									help={__(
 										'Character(s) placed between the categories.',

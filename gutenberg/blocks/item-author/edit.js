@@ -18,11 +18,11 @@ import {
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 const DEFAULT_PREFIX = 'by ';
 
@@ -31,6 +31,8 @@ export default function ItemAuthorEdit({
 	setAttributes,
 	context: { 'vp/itemAuthor': itemAuthor, 'vp/itemAuthorUrl': itemAuthorUrl },
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const blockProps = useBlockProps({
 		className: classnames({
 			[`has-text-align-${textAlign}`]: textAlign,
@@ -57,6 +59,7 @@ export default function ItemAuthorEdit({
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
+							dropdownMenuProps={dropdownMenuProps}
 							resetAll={() =>
 								setAttributes({
 									showPrefix: true,
@@ -76,7 +79,6 @@ export default function ItemAuthorEdit({
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={__(
 										'Show prefix',
 										'visual-portfolio'
@@ -104,8 +106,6 @@ export default function ItemAuthorEdit({
 									}
 								>
 									<TextControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
 										label={__(
 											'Prefix text',
 											'visual-portfolio'
@@ -126,7 +126,6 @@ export default function ItemAuthorEdit({
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={__(
 										'Link to author',
 										'visual-portfolio'
@@ -153,7 +152,6 @@ export default function ItemAuthorEdit({
 										}
 									>
 										<ToggleControl
-											__nextHasNoMarginBottom
 											label={__(
 												'Open in new tab',
 												'visual-portfolio'
@@ -180,8 +178,6 @@ export default function ItemAuthorEdit({
 										}
 									>
 										<TextControl
-											__next40pxDefaultSize
-											__nextHasNoMarginBottom
 											label={__(
 												'Link relation',
 												'visual-portfolio'

@@ -55,6 +55,9 @@
 	],
 	"providesContext": { "vp/showCount": "showCount" },
 	"styles": [{ "name": "fill", "label": "Fill" }],
-	"attributes": { "showCount": { "type": "boolean", "default": false } },
+	"attributes": {
+		"showCount": { "type": "boolean", "default": false },
+		"showAllItem": { "type": "boolean", "default": true }
+	},
 	"style": "visual-portfolio-block-loop-filter"
 }
