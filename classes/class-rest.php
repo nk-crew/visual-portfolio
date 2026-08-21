@@ -359,6 +359,29 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	}
 
 	/**
+	 * Whether the caller may read everything one item would return.
+	 *
+	 * `read_post` on an attachment follows its parent, so an image of a private
+	 * post is refused while an unattached one is allowed - the same answer core
+	 * gives for `/wp/v2/media`.
+	 *
+	 * @param array $item - resolved gallery item.
+	 *
+	 * @return bool
+	 */
+	private function can_read_item( $item ) {
+		foreach ( array( 'post_id', 'image_id' ) as $key ) {
+			$id = isset( $item[ $key ] ) ? (int) $item[ $key ] : 0;
+
+			if ( $id && ! current_user_can( 'read_post', $id ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Get loop items permission.
 	 *
 	 * @return mixed
@@ -546,7 +569,12 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 				// edit a post of their own, and the custom query source hands
 				// the status straight through, so each item is checked against
 				// the capability that governs reading that one post.
-				if ( ! empty( $item['post_id'] ) && ! current_user_can( 'read_post', (int) $item['post_id'] ) ) {
+				//
+				// Two ids can carry someone else's content into the response:
+				// the post an item stands for, and the attachment its image
+				// comes from. An images source has no post at all, so checking
+				// the first alone answered for any attachment id on the site.
+				if ( ! $this->can_read_item( $item ) ) {
 					continue;
 				}
 

@@ -793,6 +793,91 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An images source may not read an attachment of someone else's private post.
+	 *
+	 * Items of that source carry no post id at all, so a check that only looked
+	 * at the post let any id on the site through - title, content, popup data
+	 * and every image size of it.
+	 *
+	 * @return void
+	 */
+	public function test_images_source_refuses_an_attachment_of_a_private_post() {
+		$this->skip_without_loop_blocks();
+
+		$owner = self::factory()->user->create( array( 'role' => 'editor' ) );
+
+		$private = self::factory()->post->create(
+			array(
+				'post_author' => $owner,
+				'post_status' => 'private',
+			)
+		);
+
+		$attachment = self::factory()->attachment->create_object(
+			array(
+				'file'           => 'secret-blueprint.jpg',
+				'post_parent'    => $private,
+				'post_author'    => $owner,
+				'post_mime_type' => 'image/jpeg',
+				'post_title'     => 'SECRET BLUEPRINT',
+				'post_content'   => 'confidential description',
+			)
+		);
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'contributor' ) ) );
+
+		$response = $this->dispatch(
+			array(
+				'queryType'   => 'images',
+				'baseQuery'   => array( 'perPage' => 10 ),
+				'imagesQuery' => array(
+					'images'             => array( array( 'id' => $attachment ) ),
+					'titlesSource'       => 'title',
+					'descriptionsSource' => 'description',
+				),
+			)
+		);
+
+		$body = (string) wp_json_encode( $response->get_data() );
+
+		$this->assertStringNotContainsString( 'SECRET BLUEPRINT', $body );
+		$this->assertStringNotContainsString( 'confidential description', $body );
+		$this->assertStringNotContainsString( 'secret-blueprint.jpg', $body );
+	}
+
+	/**
+	 * An unattached image stays readable, the way core answers for media.
+	 *
+	 * @return void
+	 */
+	public function test_images_source_allows_an_unattached_attachment() {
+		$this->skip_without_loop_blocks();
+
+		$attachment = self::factory()->attachment->create_object(
+			array(
+				'file'           => 'public-photo.jpg',
+				'post_mime_type' => 'image/jpeg',
+				'post_title'     => 'PUBLIC PHOTO',
+			)
+		);
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'contributor' ) ) );
+
+		$response = $this->dispatch(
+			array(
+				'queryType'   => 'images',
+				'baseQuery'   => array( 'perPage' => 10 ),
+				'imagesQuery' => array(
+					'images'       => array( array( 'id' => $attachment ) ),
+					'titlesSource' => 'title',
+				),
+			)
+		);
+
+		$this->assertStringContainsString( 'PUBLIC PHOTO', (string) wp_json_encode( $response->get_data() ) );
+	}
+
+	/**
 	 * Ask the preview through a hand-written query.
 	 *
 	 * @param string $custom_query - the query string handed to `WP_Query`.
