@@ -1,10 +1,9 @@
 import {
 	CheckboxControl,
 	FormTokenField,
-	__experimentalNumberControl as NumberControl,
 	SelectControl,
 	TextareaControl,
-	ToggleControl,
+	TextControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
@@ -13,9 +12,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
+import { useToolsPanelDropdownMenuProps } from '../utils/tools-panel';
 import { PostsIcon } from './icons';
 import { registerLoopSource } from './registry';
+import useAuthorSearch from './use-author-search';
 import useEntitySearch from './use-entity-search';
 
 // Sources that describe how to build the query rather than which post type to
@@ -53,6 +53,9 @@ const DEFAULTS = {
 	taxonomies: [],
 	taxonomiesRelation: 'or',
 	avoidDuplicates: false,
+	excludeCurrent: false,
+	authors: [],
+	keyword: '',
 	customQuery: '',
 };
 
@@ -93,6 +96,8 @@ function usePostTypes() {
  * @return {Element} component.
  */
 function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const { postsQuery } = attributes;
 	const {
 		source = DEFAULTS.source,
@@ -103,8 +108,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 		taxonomiesRelation = DEFAULTS.taxonomiesRelation,
 		order = DEFAULTS.order,
 		orderBy = DEFAULTS.orderBy,
-		offset = DEFAULTS.offset,
-		avoidDuplicates = DEFAULTS.avoidDuplicates,
 		customQuery = DEFAULTS.customQuery,
 	} = postsQuery || {};
 
@@ -129,7 +132,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 		selected: excludeIds,
 	});
 	const termSearch = useEntitySearch({ type: 'term', selected: taxonomies });
-
 	const update = (values) =>
 		setAttributes({ postsQuery: { ...postsQuery, ...values } });
 
@@ -144,8 +146,8 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 
 	return (
 		<ToolsPanel
-			label={__('Posts Settings', 'visual-portfolio')}
-			panelId={clientId}
+			label={__('Settings', 'visual-portfolio')}
+			dropdownMenuProps={dropdownMenuProps}
 			resetAll={() => update(DEFAULTS)}
 		>
 			<ToolsPanelItem
@@ -181,8 +183,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 						},
 					]}
 					onChange={(value) => update({ source: value })}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				/>
 			</ToolsPanelItem>
 
@@ -216,7 +216,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 													),
 										})
 									}
-									__nextHasNoMarginBottom
 								/>
 							))}
 						</VStack>
@@ -242,8 +241,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 						onChange={(tokens) =>
 							update({ ids: postSearch.toIds(tokens) })
 						}
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						__experimentalShowHowTo={false}
 					/>
 				</ToolsPanelItem>
@@ -269,7 +266,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 						value={customQuery}
 						rows={4}
 						onChange={(value) => update({ customQuery: value })}
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) : null}
@@ -294,8 +290,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 									excludeIds: excludeSearch.toIds(tokens),
 								})
 							}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							__experimentalShowHowTo={false}
 						/>
 					</ToolsPanelItem>
@@ -314,10 +308,10 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 							suggestions={termSearch.suggestions}
 							onInputChange={termSearch.search}
 							onChange={(tokens) =>
-								update({ taxonomies: termSearch.toIds(tokens) })
+								update({
+									taxonomies: termSearch.toIds(tokens),
+								})
 							}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							__experimentalShowHowTo={false}
 						/>
 					</ToolsPanelItem>
@@ -345,6 +339,10 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 									'Taxonomies Relation',
 									'visual-portfolio'
 								)}
+								help={__(
+									'AND keeps items that match every taxonomy, OR keeps items that match any of them.',
+									'visual-portfolio'
+								)}
 								value={taxonomiesRelation}
 								options={[
 									{
@@ -365,8 +363,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 								onChange={(value) =>
 									update({ taxonomiesRelation: value })
 								}
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 							/>
 						</ToolsPanelItem>
 					) : null}
@@ -386,8 +382,6 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 							value={orderBy}
 							options={ORDER_BY_OPTIONS}
 							onChange={(value) => update({ orderBy: value })}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 						/>
 					</ToolsPanelItem>
 
@@ -402,54 +396,135 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 							value={order}
 							options={ORDER_OPTIONS}
 							onChange={(value) => update({ order: value })}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 						/>
 					</ToolsPanelItem>
 				</>
 			) : null}
+		</ToolsPanel>
+	);
+}
 
-			{isFiltered ? (
-				<ToolsPanelItem
-					label={__('Offset', 'visual-portfolio')}
-					hasValue={() => DEFAULTS.offset !== offset}
-					onDeselect={() => update({ offset: DEFAULTS.offset })}
-					panelId={clientId}
-				>
-					<NumberControl
-						label={__('Offset', 'visual-portfolio')}
-						help={__(
-							'Skip over the first items of the query.',
-							'visual-portfolio'
-						)}
-						min={0}
-						value={offset}
-						onChange={(value) =>
-							update({ offset: parseInt(value, 10) || 0 })
-						}
-						__next40pxDefaultSize
-					/>
-				</ToolsPanelItem>
-			) : null}
+/**
+ * What narrows the query, in its own panel below Display.
+ *
+ * The split is the core Query block's, and it is a real distinction rather
+ * than tidiness: Settings decide the shape of the query and every one of them
+ * has a sensible value, while a filter is a set that is normally empty - so
+ * none of these is shown until it is asked for.
+ *
+ * @param {Object}   props               - component props.
+ * @param {Object}   props.attributes    - loop attributes.
+ * @param {Function} props.setAttributes - loop attribute setter.
+ * @return {Element|null} component.
+ */
+function PostsFiltersPanel({ attributes, setAttributes }) {
+	const { postsQuery } = attributes;
+	const {
+		source = DEFAULTS.source,
+		avoidDuplicates = DEFAULTS.avoidDuplicates,
+		excludeCurrent = DEFAULTS.excludeCurrent,
+		authors = DEFAULTS.authors,
+		keyword = DEFAULTS.keyword,
+	} = postsQuery || {};
 
+	const update = (values) =>
+		setAttributes({ postsQuery: { ...postsQuery, ...values } });
+
+	const authorSearch = useAuthorSearch(authors);
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// A hand-written query is already narrowed, and a manual selection is a
+	// list rather than a query.
+	if (SOURCE_IDS === source || SOURCE_CUSTOM_QUERY === source) {
+		return null;
+	}
+
+	return (
+		<ToolsPanel
+			label={__('Filters', 'visual-portfolio')}
+			dropdownMenuProps={dropdownMenuProps}
+			resetAll={() =>
+				update({
+					authors: DEFAULTS.authors,
+					keyword: DEFAULTS.keyword,
+					avoidDuplicates: DEFAULTS.avoidDuplicates,
+					excludeCurrent: DEFAULTS.excludeCurrent,
+				})
+			}
+		>
 			<ToolsPanelItem
-				label={__('Avoid Duplicates', 'visual-portfolio')}
-				hasValue={() => avoidDuplicates}
-				onDeselect={() =>
-					update({ avoidDuplicates: DEFAULTS.avoidDuplicates })
-				}
-				panelId={clientId}
+				label={__('Authors', 'visual-portfolio')}
+				hasValue={() => 0 < authors.length}
+				onDeselect={() => update({ authors: DEFAULTS.authors })}
 			>
-				<ToggleControl
-					label={__('Avoid Duplicates', 'visual-portfolio')}
+				<FormTokenField
+					label={__('Authors', 'visual-portfolio')}
 					help={__(
-						'Hide items already displayed by another gallery on the same page. Affects the front end only.',
+						'Only posts written by the authors you list.',
 						'visual-portfolio'
 					)}
-					checked={!!avoidDuplicates}
-					onChange={(value) => update({ avoidDuplicates: value })}
-					__nextHasNoMarginBottom
+					value={authorSearch.tokens}
+					suggestions={authorSearch.suggestions}
+					onInputChange={authorSearch.search}
+					onChange={(tokens) =>
+						update({ authors: authorSearch.toIds(tokens) })
+					}
+					__experimentalShowHowTo={false}
 				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				label={__('Keyword', 'visual-portfolio')}
+				hasValue={() => !!keyword}
+				onDeselect={() => update({ keyword: DEFAULTS.keyword })}
+			>
+				<TextControl
+					label={__('Keyword', 'visual-portfolio')}
+					help={__(
+						'Show only the items whose text contains this.',
+						'visual-portfolio'
+					)}
+					value={keyword}
+					onChange={(value) => update({ keyword: value })}
+				/>
+			</ToolsPanelItem>
+
+			{/* One item, because both answer the same question - what
+				    this gallery must not repeat - and a reader looking for
+				    one will look where the other is. */}
+			<ToolsPanelItem
+				label={__('Exclusions', 'visual-portfolio')}
+				hasValue={() => avoidDuplicates || excludeCurrent}
+				onDeselect={() =>
+					update({
+						avoidDuplicates: DEFAULTS.avoidDuplicates,
+						excludeCurrent: DEFAULTS.excludeCurrent,
+					})
+				}
+			>
+				<VStack spacing={4}>
+					<CheckboxControl
+						label={__('Avoid duplicates', 'visual-portfolio')}
+						help={__(
+							'Hide items already shown by another gallery on the same page.',
+							'visual-portfolio'
+						)}
+						checked={!!avoidDuplicates}
+						onChange={(value) => update({ avoidDuplicates: value })}
+					/>
+					<CheckboxControl
+						label={__(
+							'Exclude the current post',
+							'visual-portfolio'
+						)}
+						help={__(
+							'Keeps a post out of a gallery placed on its own page.',
+							'visual-portfolio'
+						)}
+						checked={!!excludeCurrent}
+						onChange={(value) => update({ excludeCurrent: value })}
+					/>
+				</VStack>
 			</ToolsPanelItem>
 		</ToolsPanel>
 	);
@@ -461,4 +536,5 @@ registerLoopSource({
 	icon: <PostsIcon />,
 	category: 'core',
 	SettingsPanel: PostsSettingsPanel,
+	FiltersPanel: PostsFiltersPanel,
 });

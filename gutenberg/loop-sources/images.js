@@ -6,6 +6,8 @@ import {
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { useToolsPanelDropdownMenuProps } from '../utils/tools-panel';
+
 import GalleryManager from './gallery-manager';
 import { ImagesIcon } from './icons';
 import { registerLoopSource } from './registry';
@@ -90,6 +92,8 @@ function getUsedCategories(images) {
  * @return {Element} component.
  */
 function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const { imagesQuery } = attributes;
 	const {
 		images = [],
@@ -117,7 +121,8 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 
 	return (
 		<ToolsPanel
-			label={__('Media Settings', 'visual-portfolio')}
+			label={__('Settings', 'visual-portfolio')}
+			dropdownMenuProps={dropdownMenuProps}
 			panelId={clientId}
 			resetAll={() => update(DEFAULTS)}
 		>
@@ -144,11 +149,13 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 			>
 				<SelectControl
 					label={__('Items Title Source', 'visual-portfolio')}
+					help={__(
+						'Which field of the image the title is read from.',
+						'visual-portfolio'
+					)}
 					value={titlesSource}
 					options={TEXT_SOURCE_OPTIONS}
 					onChange={(value) => update({ titlesSource: value })}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				/>
 			</ToolsPanelItem>
 
@@ -164,11 +171,13 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 			>
 				<SelectControl
 					label={__('Items Description Source', 'visual-portfolio')}
+					help={__(
+						'Which field of the image the description is read from.',
+						'visual-portfolio'
+					)}
 					value={descriptionsSource}
 					options={TEXT_SOURCE_OPTIONS}
 					onChange={(value) => update({ descriptionsSource: value })}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				/>
 			</ToolsPanelItem>
 
@@ -183,8 +192,6 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 					value={orderBy}
 					options={ORDER_BY_OPTIONS}
 					onChange={(value) => update({ orderBy: value })}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				/>
 			</ToolsPanelItem>
 
@@ -199,8 +206,6 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 					value={order}
 					options={ORDER_OPTIONS}
 					onChange={(value) => update({ order: value })}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				/>
 			</ToolsPanelItem>
 		</ToolsPanel>

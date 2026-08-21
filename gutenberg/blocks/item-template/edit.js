@@ -13,7 +13,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	Notice,
-	PanelBody,
 	Placeholder,
 	RangeControl,
 	SelectControl,
@@ -37,11 +36,11 @@ import {
 	postFeaturedImage,
 	stretchWide,
 } from '@wordpress/icons';
-
 /**
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
 import { getBlockGapValue, getColumnsProps } from './columns';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
@@ -56,6 +55,27 @@ const LAYOUT_OPTIONS = [
 	{ label: __('Justified', 'visual-portfolio'), value: 'justified' },
 	{ label: __('Carousel', 'visual-portfolio'), value: 'carousel' },
 ];
+
+// One line each, in the editor's own voice: what the layout does to the items.
+const LAYOUT_DESCRIPTIONS = {
+	grid: __('Equal cells in a fixed grid.', 'visual-portfolio'),
+	masonry: __(
+		'Columns of equal width, items keep their own height.',
+		'visual-portfolio'
+	),
+	tiles: __(
+		'A repeating pattern of differently sized cells.',
+		'visual-portfolio'
+	),
+	justified: __(
+		'Rows of equal height, items keep their own aspect ratio.',
+		'visual-portfolio'
+	),
+	carousel: __(
+		'A single row the visitor scrolls through.',
+		'visual-portfolio'
+	),
+};
 
 // Layouts whose column count is chosen rather than derived.
 const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
@@ -269,6 +289,7 @@ export default function BlockEdit({
 	context,
 	clientId,
 }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const {
 		layoutType,
 		layoutColumnsMode,
@@ -298,13 +319,11 @@ export default function BlockEdit({
 		'vp/postsQuery': postsQuery,
 		'vp/imagesQuery': imagesQuery,
 		'vp/sourceQuery': sourceQuery,
+		'vp/previewQuery': previewQuery,
 	} = context;
 
 	useLoopOrphanWarning('visual-portfolio/item-template', context);
 
-	// Inside a block preview the items are never fetched: a preview is a
-	// picture of the layout, and a request per preview is what kept the pattern
-	// chooser from ever reaching the idle frame it draws them on.
 	const isPreview = useIsPreview();
 
 	const [items, setItems] = useState([]);
@@ -314,27 +333,37 @@ export default function BlockEdit({
 	// Everything the endpoint needs, and the only thing that should trigger it.
 	// Memoised on the attribute identities, so a gallery with hundreds of images
 	// is not rebuilt on every render.
+	//
+	// A pattern chooser hands its own source down through `vp/previewQuery`, so
+	// every pattern is previewed with the gallery the user has already picked
+	// rather than with whatever the pattern was written against. It is the
+	// mechanic the core Query block uses for `previewPostType`: plain block
+	// context, injected around the list and never declared by any parent.
 	const query = useMemo(
-		() => ({
+		() =>
+			previewQuery || {
+				queryType,
+				baseQuery: { perPage: baseQuery?.perPage },
+				postsQuery,
+				imagesQuery,
+				// Where a third-party source keeps its settings. Without it the
+				// preview asks for a source it gives no options to.
+				sourceQuery,
+			},
+		[
+			previewQuery,
 			queryType,
-			baseQuery: { perPage: baseQuery?.perPage },
+			baseQuery?.perPage,
 			postsQuery,
 			imagesQuery,
-			// Where a third-party source keeps its settings. Without it the
-			// preview asks for a source it gives no options to.
 			sourceQuery,
-		}),
-		[queryType, baseQuery?.perPage, postsQuery, imagesQuery, sourceQuery]
+		]
 	);
 
 	// Items are resolved on the server for every source alike - titles, category
 	// links, ordering and the Pro sources are all query logic, and duplicating
 	// any of it here is what broke the first take on this block.
 	useEffect(() => {
-		if (isPreview) {
-			return undefined;
-		}
-
 		let cancelled = false;
 
 		setIsLoading(true);
@@ -370,7 +399,7 @@ export default function BlockEdit({
 			cancelled = true;
 			clearTimeout(timeout);
 		};
-	}, [isPreview, query]);
+	}, [query]);
 
 	const blocks = useSelect(
 		(select) => select(blockEditorStore).getBlocks(clientId),
@@ -517,10 +546,12 @@ export default function BlockEdit({
 	const columnsControls = COLUMN_LAYOUTS.includes(layoutType) ? (
 		<>
 			<ToggleGroupControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				isBlock
 				label={__('Columns', 'visual-portfolio')}
+				help={__(
+					'Auto fits as many columns as the width allows. Manual keeps the count you set.',
+					'visual-portfolio'
+				)}
 				value={layoutColumnsMode}
 				onChange={(value) =>
 					setAttributes({ layoutColumnsMode: value })
@@ -539,8 +570,11 @@ export default function BlockEdit({
 			{isAuto ? (
 				<>
 					<UnitControl
-						__next40pxDefaultSize
 						label={__('Minimum column width', 'visual-portfolio')}
+						help={__(
+							'The narrowest a column may get before the row drops one.',
+							'visual-portfolio'
+						)}
 						value={layoutMinimumColumnWidth}
 						onChange={(value) =>
 							setAttributes({
@@ -551,8 +585,6 @@ export default function BlockEdit({
 						min={0}
 					/>
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={__('Maximum columns', 'visual-portfolio')}
 						help={__(
 							'Zero lets the gallery use every column that fits.',
@@ -566,7 +598,6 @@ export default function BlockEdit({
 						max={6}
 					/>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={__('Fill available space', 'visual-portfolio')}
 						help={__(
 							'A row that cannot be filled drops its empty columns instead of keeping them.',
@@ -580,8 +611,6 @@ export default function BlockEdit({
 				</>
 			) : (
 				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={
 						'carousel' === layoutType
 							? __('Slides per view', 'visual-portfolio')
@@ -599,40 +628,87 @@ export default function BlockEdit({
 	) : null;
 
 	const layoutControls = (
-		<PanelBody title={__('Layout', 'visual-portfolio')}>
-			<VStack spacing={4}>
-				<SelectControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={__('Type', 'visual-portfolio')}
-					value={layoutType}
-					options={LAYOUT_OPTIONS}
-					onChange={(value) => setAttributes({ layoutType: value })}
-				/>
+		<ToolsPanel
+			label={__('Settings', 'visual-portfolio')}
+			dropdownMenuProps={dropdownMenuProps}
+			resetAll={() =>
+				setAttributes({
+					layoutType: 'grid',
+					layoutTiles: '3|1,1|',
+					layoutColumnsMode: 'auto',
+					layoutColumnCount: 3,
+					layoutMinimumColumnWidth: '16rem',
+					layoutAutoFit: false,
+				})
+			}
+		>
+			<ToolsPanelItem
+				isShownByDefault
+				hasValue={() =>
+					'grid' !== layoutType || '3|1,1|' !== layoutTiles
+				}
+				label={__('Type', 'visual-portfolio')}
+				onDeselect={() =>
+					setAttributes({ layoutType: 'grid', layoutTiles: '3|1,1|' })
+				}
+			>
+				<VStack spacing={4}>
+					<SelectControl
+						label={__('Type', 'visual-portfolio')}
+						help={LAYOUT_DESCRIPTIONS[layoutType]}
+						value={layoutType}
+						options={LAYOUT_OPTIONS}
+						onChange={(value) =>
+							setAttributes({ layoutType: value })
+						}
+					/>
 
-				{'tiles' === layoutType && (
-					<div className="vp-tiles-presets">
-						{tilesPresets.map((preset) => (
-							<TilesPreset
-								key={preset}
-								value={preset}
-								isActive={preset === layoutTiles}
-								onSelect={(value) =>
-									setAttributes({ layoutTiles: value })
-								}
-							/>
-						))}
-					</div>
-				)}
+					{'tiles' === layoutType && (
+						<div className="vp-tiles-presets">
+							{tilesPresets.map((preset) => (
+								<TilesPreset
+									key={preset}
+									value={preset}
+									isActive={preset === layoutTiles}
+									onSelect={(value) =>
+										setAttributes({ layoutTiles: value })
+									}
+								/>
+							))}
+						</div>
+					)}
+				</VStack>
+			</ToolsPanelItem>
 
-				{columnsControls}
-			</VStack>
-		</PanelBody>
+			{columnsControls && (
+				<ToolsPanelItem
+					isShownByDefault
+					hasValue={() =>
+						'auto' !== layoutColumnsMode ||
+						3 !== layoutColumnCount ||
+						'16rem' !== layoutMinimumColumnWidth ||
+						layoutAutoFit
+					}
+					label={__('Columns', 'visual-portfolio')}
+					onDeselect={() =>
+						setAttributes({
+							layoutColumnsMode: 'auto',
+							layoutColumnCount: 3,
+							layoutMinimumColumnWidth: '16rem',
+							layoutAutoFit: false,
+						})
+					}
+				>
+					<VStack spacing={4}>{columnsControls}</VStack>
+				</ToolsPanelItem>
+			)}
+		</ToolsPanel>
 	);
 
 	const justifiedControls = 'justified' === layoutType && (
 		<ToolsPanel
 			label={__('Justified', 'visual-portfolio')}
+			dropdownMenuProps={dropdownMenuProps}
 			resetAll={() =>
 				setAttributes({
 					justifiedRowHeight: 320,
@@ -649,9 +725,11 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ justifiedRowHeight: 320 })}
 			>
 				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={__('Row height', 'visual-portfolio')}
+					help={__(
+						'The height every row aims for.',
+						'visual-portfolio'
+					)}
 					value={justifiedRowHeight}
 					onChange={(value) =>
 						setAttributes({ justifiedRowHeight: value })
@@ -669,9 +747,11 @@ export default function BlockEdit({
 				}
 			>
 				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={__('Row height tolerance', 'visual-portfolio')}
+					help={__(
+						'How far a row may drift from that height to keep items uncropped.',
+						'visual-portfolio'
+					)}
 					value={justifiedRowHeightTolerance}
 					onChange={(value) =>
 						setAttributes({ justifiedRowHeightTolerance: value })
@@ -688,8 +768,6 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ justifiedMaxRowsCount: 0 })}
 			>
 				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={__('Maximum rows', 'visual-portfolio')}
 					help={__(
 						'Zero shows every row the items make.',
@@ -710,9 +788,11 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ justifiedLastRow: 'left' })}
 			>
 				<SelectControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={__('Last row', 'visual-portfolio')}
+					help={__(
+						'What happens to a row that has too few items to fill it.',
+						'visual-portfolio'
+					)}
 					value={justifiedLastRow}
 					options={LAST_ROW_OPTIONS}
 					onChange={(value) =>
@@ -726,6 +806,7 @@ export default function BlockEdit({
 	const carouselControls = 'carousel' === layoutType && (
 		<ToolsPanel
 			label={__('Carousel', 'visual-portfolio')}
+			dropdownMenuProps={dropdownMenuProps}
 			resetAll={() =>
 				setAttributes({
 					carouselAutoWidth: false,
@@ -749,7 +830,6 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ carouselShowArrows: true })}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={__('Arrows', 'visual-portfolio')}
 					checked={carouselShowArrows}
 					onChange={(value) =>
@@ -765,9 +845,11 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ carouselIndicator: 'none' })}
 			>
 				<SelectControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={__('Indicator', 'visual-portfolio')}
+					help={__(
+						"What marks the visitor's place in the carousel.",
+						'visual-portfolio'
+					)}
 					value={carouselIndicator}
 					options={INDICATOR_OPTIONS}
 					onChange={(value) =>
@@ -783,9 +865,11 @@ export default function BlockEdit({
 			>
 				<VStack spacing={2}>
 					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={__('Effect', 'visual-portfolio')}
+						help={__(
+							'How one slide gives way to the next.',
+							'visual-portfolio'
+						)}
 						value={carouselEffect}
 						options={EFFECT_OPTIONS}
 						onChange={(value) =>
@@ -810,7 +894,6 @@ export default function BlockEdit({
 			>
 				<VStack spacing={4}>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={__('Autoplay', 'visual-portfolio')}
 						help={__(
 							'Pauses while the visitor is on the carousel, and never runs for a visitor who asked for less motion.',
@@ -823,9 +906,11 @@ export default function BlockEdit({
 					/>
 					{carouselAutoplay && (
 						<RangeControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={__('Delay, seconds', 'visual-portfolio')}
+							help={__(
+								'How long a slide is held before the carousel moves on.',
+								'visual-portfolio'
+							)}
 							value={carouselAutoplayDelay}
 							onChange={(value) =>
 								setAttributes({ carouselAutoplayDelay: value })
@@ -844,7 +929,6 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ carouselRepeat: false })}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={__('Repeat', 'visual-portfolio')}
 					help={__(
 						'The carousel runs on without an end, in both directions.',
@@ -863,8 +947,6 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ carouselPeek: 0 })}
 			>
 				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={__('Peek', 'visual-portfolio')}
 					help={__(
 						'How much of the next slide shows at the edge, as an invitation to scroll.',
@@ -883,8 +965,11 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ carouselEdgeFade: false })}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={__('Fade the edges', 'visual-portfolio')}
+					help={__(
+						'Slides dissolve at the edges of the carousel instead of being cut off.',
+						'visual-portfolio'
+					)}
 					checked={carouselEdgeFade}
 					onChange={(value) =>
 						setAttributes({ carouselEdgeFade: value })
@@ -898,8 +983,11 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ carouselAutoWidth: false })}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={__('Slide width from content', 'visual-portfolio')}
+					help={__(
+						'Each slide is as wide as its own image instead of a share of the row.',
+						'visual-portfolio'
+					)}
 					checked={carouselAutoWidth}
 					onChange={(value) =>
 						setAttributes({ carouselAutoWidth: value })
@@ -913,9 +1001,11 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ carouselSnapAlign: 'start' })}
 			>
 				<SelectControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={__('Snap slides to', 'visual-portfolio')}
+					help={__(
+						'Where a slide comes to rest when scrolling stops.',
+						'visual-portfolio'
+					)}
 					value={carouselSnapAlign}
 					options={SNAP_OPTIONS}
 					onChange={(value) =>
@@ -930,7 +1020,6 @@ export default function BlockEdit({
 				onDeselect={() => setAttributes({ carouselFreeScroll: false })}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={__('Free scrolling', 'visual-portfolio')}
 					help={__(
 						'Scroll stops wherever it is let go, instead of settling on a slide.',
@@ -990,11 +1079,10 @@ export default function BlockEdit({
 		);
 	}
 
-	// Items are fetched, and a gallery that has not fetched them yet is a list
-	// of nothing - which is what a block preview measures when it sizes a
-	// pattern, and why a pattern of a gallery used to preview as a title with
-	// no picture under it. The shapes stand in until the items land.
-	if ((isLoading || isPreview) && !blockContexts.length) {
+	// A gallery that has not fetched its items yet is a list of nothing, and an
+	// empty list is what the editor would flash on every settings change. The
+	// shapes stand in until the items land.
+	if (isLoading && !blockContexts.length) {
 		return (
 			<>
 				{blockControls}
@@ -1037,7 +1125,10 @@ export default function BlockEdit({
 				) : null}
 
 				{blockContexts.map((blockContext, index) => {
+					// Nothing is edited inside a block preview, so no item
+					// there is the editable one.
 					const isActive =
+						!isPreview &&
 						blockContext['vp/itemId'] === activeContextId;
 
 					// The tiles pattern repeats over the items, so an item is

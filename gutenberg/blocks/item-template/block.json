@@ -141,6 +141,7 @@
 	},
 	"usesContext": [
 		"vp/queryId",
+		"vp/previewQuery",
 		"vp/queryType",
 		"vp/baseQuery",
 		"vp/postsQuery",

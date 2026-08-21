@@ -24,6 +24,9 @@ import { LOOP_SOURCES_STORE } from '../store/loop-sources';
  * - `name` matches the `queryType` attribute of the loop. Built-in sources own
  *   `posts` and `images`; everything else is namespaced `<vendor>/<source>`.
  * - `SettingsPanel` gets `{ attributes, setAttributes, clientId }` of the loop.
+ * - `FiltersPanel` is optional and gets the same props. It renders below the
+ *   loop's own Display panel, which is where the core Query block keeps what
+ *   narrows a query rather than what shapes it.
  *   A source without one is listed in the picker but not editable.
  * - `mapToLegacy` turns the free-form `sourceQuery` attribute into the legacy
  *   options the source's own `vpf_extend_query_args` hooks read. It is the JS
