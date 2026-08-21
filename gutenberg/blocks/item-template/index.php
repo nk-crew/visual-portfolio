@@ -937,13 +937,15 @@ class Visual_Portfolio_Block_Item_Template {
 
 		// One live region per loop, next to the list rather than inside it: the
 		// items are appended into the list, and a region that moves with them
-		// announces nothing.
+		// announces nothing. Sitting outside the list also puts it outside the
+		// list's interactivity namespace, so it names the store itself.
 		return sprintf(
-			'%1$s<ul %2$s>%3$s</ul>%4$s<div class="wp-block-visual-portfolio-item-template__live-region" aria-live="polite" data-wp-text="state.ariaLiveMessage"></div>',
+			'%1$s<ul %2$s>%3$s</ul>%4$s<div class="wp-block-visual-portfolio-item-template__live-region" aria-live="polite" data-wp-interactive="%5$s" data-wp-text="state.ariaLiveMessage"></div>',
 			$before,
 			$wrapper_attributes,
 			$content,
-			$after
+			$after,
+			esc_attr( Visual_Portfolio_Block_Loop::STORE )
 		);
 	}
 }
