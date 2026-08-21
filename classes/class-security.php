@@ -510,10 +510,12 @@ class Visual_Portfolio_Security {
 					unset( $attributes[ 'vp_' . $key ] );
 				}
 
-				// A loop-only option has no control behind it, so the lookup
-				// below would fall through to the text branch and flatten an
-				// array of ids to an empty string.
-				if ( isset( $loop_only[ $key ] ) ) {
+				// Without a control behind it the lookup below falls through to
+				// the text branch, which flattens an array of ids to an empty
+				// string. A registered control keeps its own sanitizer: Pro
+				// registers `posts_authors` for the legacy gallery, and this
+				// must not answer for it.
+				if ( isset( $loop_only[ $key ] ) && ! isset( $controls[ $key ] ) ) {
 					$attributes[ $key ] = self::sanitize_loop_only_option( $loop_only[ $key ], $attribute );
 					continue;
 				}
@@ -643,6 +645,27 @@ class Visual_Portfolio_Security {
 	}
 
 	/**
+	 * Whether this install leaves the named option to the loop.
+	 *
+	 * A name a control registers belongs to that control on every path - Pro
+	 * registers `posts_authors` for the legacy gallery and applies it through
+	 * `vpf_extend_query_args`, so the loop's own handling steps aside there.
+	 *
+	 * @param string $name - option name.
+	 *
+	 * @return bool
+	 */
+	public static function is_loop_only_option( $name ) {
+		if ( ! isset( self::get_loop_only_options()[ $name ] ) ) {
+			return false;
+		}
+
+		$controls = Visual_Portfolio_Controls::get_registered_array();
+
+		return ! isset( $controls[ $name ] );
+	}
+
+	/**
 	 * Sanitize one loop-only option.
 	 *
 	 * @param string $type - type from `get_loop_only_options()`.
@@ -655,7 +678,7 @@ class Visual_Portfolio_Security {
 			case 'ids':
 				return array_values( array_filter( array_map( 'absint', (array) $value ) ) );
 			case 'text':
-				return sanitize_text_field( (string) $value );
+				return is_scalar( $value ) ? sanitize_text_field( wp_unslash( (string) $value ) ) : '';
 			case 'boolean':
 				return self::sanitize_boolean( $value );
 			case 'number':

@@ -241,9 +241,10 @@ class Visual_Portfolio_Get {
 
 		// Options a loop block carries that no legacy control registers. The
 		// loop above keeps registered controls only, so these would never
-		// reach the query.
+		// reach the query. A name a control does register - Pro registers
+		// `posts_authors` - is already resolved above and is left alone.
 		foreach ( array_keys( Visual_Portfolio_Security::get_loop_only_options() ) as $name ) {
-			if ( isset( $atts[ $name ] ) ) {
+			if ( isset( $atts[ $name ] ) && ! array_key_exists( $name, $result ) ) {
 				$result[ $name ] = $atts[ $name ];
 			}
 		}
@@ -712,11 +713,15 @@ class Visual_Portfolio_Get {
 
 			$max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
 
-			// `max_num_pages` counts every post the query matched, and an offset
-			// is not part of that count - so a loop that skips the first few
-			// advertised pages past the end of its own results, and the last of
-			// them came up empty.
-			$offset   = isset( $options['posts_offset'] ) ? max( 0, (int) $options['posts_offset'] ) : 0;
+			// `max_num_pages` counts every post the query matched, and an
+			// offset is not part of that count, so a gallery that skips the
+			// first few would advertise pages past the end of its own results.
+			//
+			// Read the offset off the query rather than the options: it is
+			// stored for every post-based gallery but only reaches `WP_Query`
+			// for a post-type source, and clamping the others would cost them
+			// pages their results really have.
+			$offset   = isset( $query_opts['offset'] ) ? max( 0, (int) $options['posts_offset'] ) : 0;
 			$per_page = isset( $query_opts['posts_per_page'] ) ? (int) $query_opts['posts_per_page'] : 0;
 
 			if ( $offset && $per_page > 0 ) {
@@ -1088,6 +1093,12 @@ class Visual_Portfolio_Get {
 
 		// Several blocks of one loop ask for the same items in a single request.
 		if ( false !== $cache_key && isset( self::$loop_items_cache[ $cache_key ] ) ) {
+			// `build_items()` records the posts it renders, and behind the memo
+			// it does not run again. A caller that resolved the loop only to
+			// measure it puts that record back, so the render that follows has
+			// to re-establish it or a later gallery sees nothing to avoid.
+			self::record_used_posts( self::$loop_items_cache[ $cache_key ] );
+
 			return self::$loop_items_cache[ $cache_key ];
 		}
 
@@ -2146,8 +2157,13 @@ class Visual_Portfolio_Get {
 					}
 				}
 
-				// Narrow the query the way the Filters panel asks.
-				if ( ! empty( $options['posts_authors'] ) ) {
+				// Narrow the query the way the Filters panel asks. Authors are
+				// skipped where a control registers them, because Pro owns the
+				// option there and applies it through `vpf_extend_query_args`.
+				if (
+					! empty( $options['posts_authors'] ) &&
+					Visual_Portfolio_Security::is_loop_only_option( 'posts_authors' )
+				) {
 					$query_opts['author__in'] = array_map( 'intval', (array) $options['posts_authors'] );
 				}
 
@@ -2169,20 +2185,26 @@ class Visual_Portfolio_Get {
 				// We should prevent this when using filter, since all current posts will be excluded
 				// from the filter query and we may not see all filter buttons.
 				if ( ! $for_filter && $options['posts_avoid_duplicate_posts'] ) {
-					// On a single post the page's own list is that post, so
-					// counting it as shown would hide it - the job of the
-					// "Exclude the current post" switch above. A loop offers
-					// that switch and so leaves the list out when it is off;
-					// a legacy gallery has no such switch and keeps the
-					// behaviour it always had.
-					$with_main_query = ! (
+					$used = self::get_all_used_posts();
+
+					// The page's own list is what puts the post being viewed on
+					// that list, and on a single post it is the only thing on
+					// it. A loop offers "Exclude the current post" as its own
+					// switch, so this one never does that job for it - and the
+					// post comes back off here rather than by skipping the
+					// list, which would only hold while nothing else had read
+					// it first. A legacy gallery has no such switch and keeps
+					// the behaviour it always had.
+					if (
 						array_key_exists( 'posts_exclude_current', $options ) &&
 						empty( $options['posts_exclude_current'] ) &&
 						is_singular()
-					);
+					) {
+						$used = array_diff( $used, array( get_queried_object_id() ) );
+					}
 
 					$not_id                     = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
-					$query_opts['post__not_in'] = array_merge( $not_id, self::get_all_used_posts( $with_main_query ) );
+					$query_opts['post__not_in'] = array_merge( $not_id, $used );
 
 					// Remove posts from post__in.
 					if ( isset( $query_opts['post__in'] ) ) {
@@ -3623,10 +3645,26 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
-	 * Get list with all used posts on the current page.
+	 * Put the posts of a resolved loop on the used list.
 	 *
-	 * @return array
+	 * @param array $result - what `get_loop_items()` returns.
+	 *
+	 * @return void
 	 */
+	private static function record_used_posts( $result ) {
+		if ( empty( $result['items'] ) || ! is_array( $result['items'] ) ) {
+			return;
+		}
+
+		foreach ( $result['items'] as $item ) {
+			$post_id = empty( $item['post_id'] ) ? 0 : (int) $item['post_id'];
+
+			if ( $post_id && ! in_array( $post_id, self::$used_posts, true ) ) {
+				self::$used_posts[] = $post_id;
+			}
+		}
+	}
+
 	/**
 	 * The posts resolved so far, to be put back after a lookup.
 	 *
@@ -3637,7 +3675,10 @@ class Visual_Portfolio_Get {
 	 * @return array
 	 */
 	public static function snapshot_used_posts() {
-		return self::$used_posts;
+		return array(
+			'used_posts'       => self::$used_posts,
+			'check_main_query' => self::$check_main_query,
+		);
 	}
 
 	/**
@@ -3648,22 +3689,23 @@ class Visual_Portfolio_Get {
 	 * @return void
 	 */
 	public static function restore_used_posts( $snapshot ) {
-		self::$used_posts = (array) $snapshot;
+		self::$used_posts = (array) ( $snapshot['used_posts'] ?? array() );
+
+		// The main query is folded in once per request. Without putting the
+		// latch back, a caller that only measured a loop would spend it, and
+		// every gallery further down the page - the legacy one included -
+		// would stop excluding what the page itself already listed.
+		self::$check_main_query = (bool) ( $snapshot['check_main_query'] ?? true );
 	}
 
 	/**
 	 * Get all used posts.
 	 *
-	 * @param bool $with_main_query - whether the page's own list counts as shown.
-	 *                                A loop asks without it on a single post,
-	 *                                where that list is the post being viewed and
-	 *                                "Exclude the current post" is the switch that
-	 *                                owns it.
 	 * @return array
 	 */
-	public static function get_all_used_posts( $with_main_query = true ) {
+	public static function get_all_used_posts() {
 		// add post IDs from main query.
-		if ( $with_main_query && self::$check_main_query && ! self::is_preview() ) {
+		if ( self::$check_main_query && ! self::is_preview() ) {
 			self::$check_main_query = false;
 
 			global $wp_query;

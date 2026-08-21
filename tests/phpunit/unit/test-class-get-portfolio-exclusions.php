@@ -207,6 +207,75 @@ class ClassGetPortfolioExclusions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The choice holds whoever read the used-posts list first.
+	 *
+	 * The page's own list is folded in once per request, so a gallery that
+	 * asked before this one has already spent that. Skipping the fold would
+	 * only work for whoever got there first.
+	 *
+	 * @return void
+	 */
+	public function test_avoid_duplicates_keeps_the_current_post_after_another_gallery_ran() {
+		$this->go_to( get_permalink( self::$current_post ) );
+		$this->reset_loop_state();
+
+		// A gallery with the switch on resolves first: it folds the page's own
+		// list in and spends the one-shot latch.
+		Visual_Portfolio_Get::get_loop_items(
+			$this->get_atts(
+				array(
+					'avoidDuplicates' => true,
+					'excludeCurrent'  => true,
+				)
+			)
+		);
+
+		$result = Visual_Portfolio_Get::get_loop_items(
+			$this->get_atts(
+				array(
+					'avoidDuplicates' => true,
+					'excludeCurrent'  => false,
+				)
+			)
+		);
+
+		$this->assertContains(
+			self::$current_post,
+			wp_list_pluck( $result['items'], 'post_id' ),
+			'The second gallery has the switch off, so the post being viewed stays.'
+		);
+	}
+
+	/**
+	 * A lookup that only measures a loop leaves the request as it found it.
+	 *
+	 * The head links resolve a loop in `wp_head` and put the record back. Both
+	 * halves of that record have to come back, or every gallery below stops
+	 * excluding what the page itself listed.
+	 *
+	 * @return void
+	 */
+	public function test_a_lookup_puts_the_whole_record_back() {
+		$this->go_to( get_permalink( self::$current_post ) );
+		$this->reset_loop_state();
+
+		$atts     = $this->get_atts( array( 'avoidDuplicates' => true ) );
+		$snapshot = Visual_Portfolio_Get::snapshot_used_posts();
+
+		Visual_Portfolio_Get::get_loop_items( $atts );
+		Visual_Portfolio_Get::restore_used_posts( $snapshot );
+
+		// The render that follows sits behind the memo, and has to record the
+		// posts the measuring call already resolved.
+		Visual_Portfolio_Get::get_loop_items( $atts );
+
+		$used = Visual_Portfolio_Get::get_all_used_posts();
+
+		$this->assertContains( self::$other_post, $used, 'The rendered posts belong on the used list.' );
+		$this->assertContains( self::$current_post, $used, 'The latch was spent by the lookup and never put back.' );
+	}
+
+	/**
 	 * A gallery without the switch keeps the behaviour it always had.
 	 *
 	 * The legacy block has no "Exclude the current post" option, so avoiding
