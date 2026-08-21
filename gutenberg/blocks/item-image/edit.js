@@ -60,12 +60,10 @@ const DEFAULT_ATTRIBUTES = {
 	sizeSlug: 'large',
 	aspectRatio: '',
 	scale: 'cover',
-	overlayColor: undefined,
-	customOverlayColor: undefined,
-	gradient: undefined,
-	customGradient: undefined,
-	dimRatio: 0,
 };
+
+// The overlay is edited in the Color panel and cleared by its own swatches, so
+// "Reset all" in Settings leaves it alone - the way `item-cover` does.
 
 export default function ItemImageEdit({
 	attributes,

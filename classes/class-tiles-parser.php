@@ -251,7 +251,10 @@ class Visual_Portfolio_Tiles_Parser {
 	private static function to_float( $value, $fallback ) {
 		$value = is_numeric( trim( (string) $value ) ) ? (float) $value : 0;
 
-		return $value > 0 ? $value : (float) $fallback;
+		// `1e400` is numeric and casts to INF, which `number_format` prints as
+		// the literal `inf` - an invalid CSS length that costs the tile its
+		// height.
+		return $value > 0 && is_finite( $value ) ? $value : (float) $fallback;
 	}
 
 	/**

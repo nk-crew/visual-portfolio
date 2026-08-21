@@ -10,8 +10,7 @@
 	"usesContext": ["vp/itemUrl"],
 	"attributes": {
 		"text": {
-			"type": "string",
-			"default": "Read more"
+			"type": "string"
 		},
 		"textAlign": {
 			"type": "string"
@@ -22,8 +21,14 @@
 		}
 	},
 	"styles": [
-		{ "name": "fill", "label": "Fill" },
-		{ "name": "outline", "label": "Outline" }
+		{
+			"name": "fill",
+			"label": "Fill"
+		},
+		{
+			"name": "outline",
+			"label": "Outline"
+		}
 	],
 	"supports": {
 		"html": false,

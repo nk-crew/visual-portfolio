@@ -48,7 +48,12 @@ const TEMPLATE = [
 		{},
 		// A placeholder until the filter block has fetched its items. It carries
 		// the default `filter` of `*`, so the fetched "All" item reuses it.
-		[['visual-portfolio/loop-filter-item', { text: 'All', isAll: true }]],
+		[
+			[
+				'visual-portfolio/loop-filter-item',
+				{ text: __('All', 'visual-portfolio'), isAll: true },
+			],
+		],
 	],
 	[
 		'visual-portfolio/item-template',

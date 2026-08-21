@@ -148,7 +148,19 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 		<ToolsPanel
 			label={__('Settings', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
-			resetAll={() => update(DEFAULTS)}
+			resetAll={() =>
+				update({
+					source: DEFAULTS.source,
+					postTypesSet: DEFAULTS.postTypesSet,
+					ids: DEFAULTS.ids,
+					excludeIds: DEFAULTS.excludeIds,
+					taxonomies: DEFAULTS.taxonomies,
+					taxonomiesRelation: DEFAULTS.taxonomiesRelation,
+					order: DEFAULTS.order,
+					orderBy: DEFAULTS.orderBy,
+					customQuery: DEFAULTS.customQuery,
+				})
+			}
 		>
 			<ToolsPanelItem
 				label={__('Source', 'visual-portfolio')}

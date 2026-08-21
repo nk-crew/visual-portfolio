@@ -24,7 +24,7 @@ import { __ } from '@wordpress/i18n';
 import classnames from 'classnames/dedupe';
 import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
-const DEFAULT_PREFIX = 'by ';
+const DEFAULT_PREFIX = __('by ', 'visual-portfolio');
 
 export default function ItemAuthorEdit({
 	attributes: { textAlign, showPrefix, prefix, isLink, rel, linkTarget },
@@ -32,6 +32,9 @@ export default function ItemAuthorEdit({
 	context: { 'vp/itemAuthor': itemAuthor, 'vp/itemAuthorUrl': itemAuthorUrl },
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// An untouched block carries no prefix of its own and shows the default.
+	const prefixValue = prefix ?? DEFAULT_PREFIX;
 
 	const blockProps = useBlockProps({
 		className: classnames({
@@ -98,7 +101,9 @@ export default function ItemAuthorEdit({
 										'visual-portfolio'
 									)}
 									isShownByDefault
-									hasValue={() => prefix !== DEFAULT_PREFIX}
+									hasValue={() =>
+										prefixValue !== DEFAULT_PREFIX
+									}
 									onDeselect={() =>
 										setAttributes({
 											prefix: DEFAULT_PREFIX,
@@ -110,7 +115,7 @@ export default function ItemAuthorEdit({
 											'Prefix text',
 											'visual-portfolio'
 										)}
-										value={prefix}
+										value={prefixValue}
 										onChange={(newPrefix) =>
 											setAttributes({ prefix: newPrefix })
 										}
@@ -206,7 +211,7 @@ export default function ItemAuthorEdit({
 				</>
 			)}
 			<div {...blockProps}>
-				{showPrefix && prefix}
+				{showPrefix && prefixValue}
 				{isLink ? (
 					// Inert in the editor - it only carries the link styling.
 					<a

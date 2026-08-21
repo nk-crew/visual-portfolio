@@ -888,9 +888,14 @@ export default function BlockEdit({
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
-				hasValue={() => carouselAutoplay}
+				hasValue={() => carouselAutoplay || 5 !== carouselAutoplayDelay}
 				label={__('Autoplay', 'visual-portfolio')}
-				onDeselect={() => setAttributes({ carouselAutoplay: false })}
+				onDeselect={() =>
+					setAttributes({
+						carouselAutoplay: false,
+						carouselAutoplayDelay: 5,
+					})
+				}
 			>
 				<VStack spacing={4}>
 					<ToggleControl

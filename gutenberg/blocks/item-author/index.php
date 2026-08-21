@@ -64,8 +64,12 @@ class Visual_Portfolio_Block_Item_Author {
 			);
 		}
 
-		if ( ! empty( $attributes['showPrefix'] ) && ! empty( $attributes['prefix'] ) ) {
-			$output = esc_html( $attributes['prefix'] ) . $output;
+		// See the note in `item-read-more`: the default lives here rather than
+		// in `block.json`, so it follows the site's language.
+		$prefix = (string) ( $attributes['prefix'] ?? __( 'by ', 'visual-portfolio' ) );
+
+		if ( ! empty( $attributes['showPrefix'] ) && '' !== $prefix ) {
+			$output = esc_html( $prefix ) . $output;
 		}
 
 		$classes = array();

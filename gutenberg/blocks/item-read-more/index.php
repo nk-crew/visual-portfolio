@@ -51,7 +51,12 @@ class Visual_Portfolio_Block_Item_Read_More {
 			return '';
 		}
 
-		$text = isset( $attributes['text'] ) ? (string) $attributes['text'] : '';
+		// An untouched block shows the words the editor offers as its
+		// placeholder. A `block.json` default cannot carry them: attribute
+		// defaults are not part of the metadata a catalogue is built from, so
+		// they would ship in English whatever the site speaks. A block whose
+		// text was deliberately cleared still renders nothing.
+		$text = (string) ( $attributes['text'] ?? __( 'Read more', 'visual-portfolio' ) );
 
 		if ( '' === trim( $text ) ) {
 			return '';

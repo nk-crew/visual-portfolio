@@ -17,8 +17,7 @@
 			"default": true
 		},
 		"prefix": {
-			"type": "string",
-			"default": "by "
+			"type": "string"
 		},
 		"isLink": {
 			"type": "boolean",

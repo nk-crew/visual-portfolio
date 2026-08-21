@@ -52,8 +52,8 @@ class Visual_Portfolio_Block_Loop_Pagination_Infinite {
 		}
 
 		// Get attributes with defaults.
-		$label         = $attributes['label'] ?? __( 'Load More', 'visual-portfolio' );
-		$loading_label = $attributes['loadingLabel'] ?? __( 'Loading...', 'visual-portfolio' );
+		$label         = empty( $attributes['label'] ) ? __( 'Load More', 'visual-portfolio' ) : $attributes['label'];
+		$loading_label = empty( $attributes['loadingLabel'] ) ? __( 'Loading...', 'visual-portfolio' ) : $attributes['loadingLabel'];
 
 		// The trigger stays a real link: without the observer, or without any
 		// JavaScript at all, clicking it is still the next page.
