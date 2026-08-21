@@ -16,10 +16,20 @@
 	],
 	"textdomain": "visual-portfolio",
 	"attributes": {
-		"layout": { "type": "string", "default": "default" },
-		"block_id": { "type": "string" },
-		"queryId": { "type": "number" },
-		"queryType": { "type": "string", "default": "posts" },
+		"layout": {
+			"type": "string",
+			"default": "default"
+		},
+		"block_id": {
+			"type": "string"
+		},
+		"queryId": {
+			"type": "number"
+		},
+		"queryType": {
+			"type": "string",
+			"default": "posts"
+		},
 		"baseQuery": {
 			"type": "object",
 			"default": {
@@ -42,7 +52,6 @@
 				"taxonomiesRelation": "or",
 				"avoidDuplicates": false,
 				"excludeCurrent": false,
-				"authors": [],
 				"keyword": "",
 				"customQuery": ""
 			}
@@ -62,8 +71,14 @@
 			"type": "object",
 			"default": {}
 		},
-		"customCss": { "type": "string", "default": "" },
-		"preview_image_example": { "type": "string", "default": "" }
+		"customCss": {
+			"type": "string",
+			"default": ""
+		},
+		"preview_image_example": {
+			"type": "string",
+			"default": ""
+		}
 	},
 	"viewScriptModule": "visual-portfolio-block-loop-view",
 	"supports": {
@@ -82,12 +97,16 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
-			"__experimentalDefaultControls": { "fontSize": true }
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
-			"blockGap": { "__experimentalDefault": "1.25em" },
+			"blockGap": {
+				"__experimentalDefault": "1.25em"
+			},
 			"__experimentalDefaultControls": {
 				"blockGap": true,
 				"padding": false,

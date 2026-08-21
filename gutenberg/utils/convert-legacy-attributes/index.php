@@ -39,7 +39,6 @@ class Visual_Portfolio_Convert_Attributes {
 			'postsQuery.taxonomiesRelation'        => 'posts_taxonomies_relation',
 			'postsQuery.avoidDuplicates'           => 'posts_avoid_duplicate_posts',
 			'postsQuery.excludeCurrent'            => 'posts_exclude_current',
-			'postsQuery.authors'                   => 'posts_authors',
 			'postsQuery.keyword'                   => 'posts_keyword',
 			'postsQuery.customQuery'               => 'posts_custom_query',
 			'baseQuery.maxPagesLimit'              => 'max_pages',

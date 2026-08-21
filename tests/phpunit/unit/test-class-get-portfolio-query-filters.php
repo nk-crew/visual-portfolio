@@ -6,9 +6,9 @@
  */
 
 /**
- * Authors, keyword and the page ceiling.
+ * Keyword and the page ceiling.
  *
- * None of these is a legacy control, so they only reach the query through the
+ * Neither is a legacy control, so they only reach the query through the
  * loop-only list in `Visual_Portfolio_Security`. Without it they are dropped
  * silently and the gallery looks unfiltered.
  */
@@ -106,34 +106,6 @@ class ClassGetPortfolioQueryFilters extends WP_UnitTestCase {
 		$atts['block_id'] = 'query-filters-test';
 
 		return Visual_Portfolio_Get::get_loop_items( $atts );
-	}
-
-	/**
-	 * A list of authors keeps only their posts.
-	 *
-	 * @return void
-	 */
-	public function test_authors_narrow_the_query() {
-		$result = $this->get_result( array( 'postsQuery' => array( 'authors' => array( self::$author ) ) ) );
-
-		$this->assertCount( 3, $result['items'] );
-
-		foreach ( $result['items'] as $item ) {
-			$this->assertSame( self::$author, (int) get_post_field( 'post_author', $item['post_id'] ) );
-		}
-	}
-
-	/**
-	 * An author id arriving as a string still narrows the query.
-	 *
-	 * The editor stores tokens, and a token is a string.
-	 *
-	 * @return void
-	 */
-	public function test_authors_accept_string_ids() {
-		$result = $this->get_result( array( 'postsQuery' => array( 'authors' => array( (string) self::$author ) ) ) );
-
-		$this->assertCount( 3, $result['items'] );
 	}
 
 	/**

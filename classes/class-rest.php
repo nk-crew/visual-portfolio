@@ -469,7 +469,6 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 					'posts_order_direction',
 					'posts_avoid_duplicate_posts',
 					'posts_exclude_current',
-					'posts_authors',
 					'posts_keyword',
 					'posts_custom_query',
 				),

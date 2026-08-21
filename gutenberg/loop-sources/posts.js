@@ -11,11 +11,11 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/tools-panel';
 import { PostsIcon } from './icons';
 import { registerLoopSource } from './registry';
-import useAuthorSearch from './use-author-search';
 import useEntitySearch from './use-entity-search';
 
 // Sources that describe how to build the query rather than which post type to
@@ -54,7 +54,6 @@ const DEFAULTS = {
 	taxonomiesRelation: 'or',
 	avoidDuplicates: false,
 	excludeCurrent: false,
-	authors: [],
 	keyword: '',
 	customQuery: '',
 };
@@ -429,20 +428,19 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
  * @param {Function} props.setAttributes - loop attribute setter.
  * @return {Element|null} component.
  */
-function PostsFiltersPanel({ attributes, setAttributes }) {
+function PostsFiltersPanel(props) {
+	const { attributes, setAttributes } = props;
 	const { postsQuery } = attributes;
 	const {
 		source = DEFAULTS.source,
 		avoidDuplicates = DEFAULTS.avoidDuplicates,
 		excludeCurrent = DEFAULTS.excludeCurrent,
-		authors = DEFAULTS.authors,
 		keyword = DEFAULTS.keyword,
 	} = postsQuery || {};
 
 	const update = (values) =>
 		setAttributes({ postsQuery: { ...postsQuery, ...values } });
 
-	const authorSearch = useAuthorSearch(authors);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// A hand-written query is already narrowed, and a manual selection is a
@@ -451,39 +449,28 @@ function PostsFiltersPanel({ attributes, setAttributes }) {
 		return null;
 	}
 
+	// Anything else this install can narrow a posts query by. A `ToolsPanelItem`
+	// returned here is an ordinary child of the panel below, so it registers
+	// with the panel the way the built-in ones do. Pro adds the Authors filter
+	// through this, and resets it from its own menu entry - the panel cannot
+	// know what to write back for someone else's option.
+	const extraItems = applyFilters('vpf.loopPostsFilterItems', [], props);
+
 	return (
 		<ToolsPanel
 			label={__('Filters', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
 			resetAll={() =>
 				update({
-					authors: DEFAULTS.authors,
 					keyword: DEFAULTS.keyword,
 					avoidDuplicates: DEFAULTS.avoidDuplicates,
 					excludeCurrent: DEFAULTS.excludeCurrent,
 				})
 			}
 		>
-			<ToolsPanelItem
-				label={__('Authors', 'visual-portfolio')}
-				hasValue={() => 0 < authors.length}
-				onDeselect={() => update({ authors: DEFAULTS.authors })}
-			>
-				<FormTokenField
-					label={__('Authors', 'visual-portfolio')}
-					help={__(
-						'Only posts written by the authors you list.',
-						'visual-portfolio'
-					)}
-					value={authorSearch.tokens}
-					suggestions={authorSearch.suggestions}
-					onInputChange={authorSearch.search}
-					onChange={(tokens) =>
-						update({ authors: authorSearch.toIds(tokens) })
-					}
-					__experimentalShowHowTo={false}
-				/>
-			</ToolsPanelItem>
+			{extraItems.map(({ name, Item }) => (
+				<Item key={name} {...props} />
+			))}
 
 			<ToolsPanelItem
 				label={__('Keyword', 'visual-portfolio')}

@@ -241,8 +241,8 @@ class Visual_Portfolio_Get {
 
 		// Options a loop block carries that no legacy control registers. The
 		// loop above keeps registered controls only, so these would never
-		// reach the query. A name a control does register - Pro registers
-		// `posts_authors` - is already resolved above and is left alone.
+		// reach the query. A name a control does register is already resolved
+		// above and is left alone.
 		foreach ( array_keys( Visual_Portfolio_Security::get_loop_only_options() ) as $name ) {
 			if ( isset( $atts[ $name ] ) && ! array_key_exists( $name, $result ) ) {
 				$result[ $name ] = $atts[ $name ];
@@ -2157,16 +2157,7 @@ class Visual_Portfolio_Get {
 					}
 				}
 
-				// Narrow the query the way the Filters panel asks. Authors are
-				// skipped where a control registers them, because Pro owns the
-				// option there and applies it through `vpf_extend_query_args`.
-				if (
-					! empty( $options['posts_authors'] ) &&
-					Visual_Portfolio_Security::is_loop_only_option( 'posts_authors' )
-				) {
-					$query_opts['author__in'] = array_map( 'intval', (array) $options['posts_authors'] );
-				}
-
+				// Narrow the query the way the Filters panel asks.
 				if ( ! empty( $options['posts_keyword'] ) ) {
 					$query_opts['s'] = (string) $options['posts_keyword'];
 				}

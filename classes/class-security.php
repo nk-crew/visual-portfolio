@@ -512,9 +512,9 @@ class Visual_Portfolio_Security {
 
 				// Without a control behind it the lookup below falls through to
 				// the text branch, which flattens an array of ids to an empty
-				// string. A registered control keeps its own sanitizer: Pro
-				// registers `posts_authors` for the legacy gallery, and this
-				// must not answer for it.
+				// string. A name a control does register keeps that control's
+				// own sanitizer - Pro registers several of these names for the
+				// legacy gallery, and this must not answer for them.
 				if ( isset( $loop_only[ $key ] ) && ! isset( $controls[ $key ] ) ) {
 					$attributes[ $key ] = self::sanitize_loop_only_option( $loop_only[ $key ], $attribute );
 					continue;
@@ -637,32 +637,10 @@ class Visual_Portfolio_Security {
 	 */
 	public static function get_loop_only_options() {
 		return array(
-			'posts_authors'         => 'ids',
 			'posts_keyword'         => 'text',
 			'posts_exclude_current' => 'boolean',
 			'max_pages'             => 'number',
 		);
-	}
-
-	/**
-	 * Whether this install leaves the named option to the loop.
-	 *
-	 * A name a control registers belongs to that control on every path - Pro
-	 * registers `posts_authors` for the legacy gallery and applies it through
-	 * `vpf_extend_query_args`, so the loop's own handling steps aside there.
-	 *
-	 * @param string $name - option name.
-	 *
-	 * @return bool
-	 */
-	public static function is_loop_only_option( $name ) {
-		if ( ! isset( self::get_loop_only_options()[ $name ] ) ) {
-			return false;
-		}
-
-		$controls = Visual_Portfolio_Controls::get_registered_array();
-
-		return ! isset( $controls[ $name ] );
 	}
 
 	/**
@@ -714,7 +692,6 @@ class Visual_Portfolio_Security {
 			'items_count'                 => array( 'number', 6 ),
 			'max_pages'                   => array( 'number', 0 ),
 			'post_types_set'              => array( 'array', array( 'post' ) ),
-			'posts_authors'               => array( 'array', array() ),
 			'posts_avoid_duplicate_posts' => array( 'boolean', false ),
 			'posts_custom_query'          => array( 'string', '' ),
 			'posts_exclude_current'       => array( 'boolean', false ),

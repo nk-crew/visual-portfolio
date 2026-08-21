@@ -77,8 +77,9 @@ its own, in this order:
 | Display | Items per page, offset, and a ceiling on the pages shown |
 | Filters | What narrows the query. Starts empty, opened one option at a time |
 
-A posts loop narrows by authors, by a keyword its text contains, and by two
-exclusions that do not overlap. *Avoid duplicates* hides what the page has
+A posts loop narrows by a keyword its text contains and by two exclusions that
+do not overlap. Visual Portfolio Pro adds an Authors filter to the same panel,
+through the `vpf.loopPostsFilterItems` JavaScript filter. *Avoid duplicates* hides what the page has
 already shown — another gallery, or the list of a listing page. *Exclude the
 current post* hides the post being viewed, and nothing else. Either, both or
 neither can be on.
