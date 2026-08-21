@@ -506,7 +506,7 @@ function PostsFiltersPanel({ attributes, setAttributes }) {
 					<CheckboxControl
 						label={__('Avoid duplicates', 'visual-portfolio')}
 						help={__(
-							"Hide posts the page has already shown - another gallery, or the page's own list. On a single post that covers the post itself.",
+							'Hide posts another gallery on the page has already shown, or that a listing page already lists.',
 							'visual-portfolio'
 						)}
 						checked={!!avoidDuplicates}
@@ -518,7 +518,7 @@ function PostsFiltersPanel({ attributes, setAttributes }) {
 							'visual-portfolio'
 						)}
 						help={__(
-							'Keeps a post out of a gallery placed on its own page, whether or not duplicates are avoided.',
+							'Keep the post being viewed out of a gallery placed on its own page.',
 							'visual-portfolio'
 						)}
 						checked={!!excludeCurrent}

@@ -500,7 +500,8 @@ class Visual_Portfolio_Security {
 	 */
 	public static function sanitize_attributes( $attributes = array() ) {
 		if ( ! empty( $attributes ) ) {
-			$controls = Visual_Portfolio_Controls::get_registered_array();
+			$controls  = Visual_Portfolio_Controls::get_registered_array();
+			$loop_only = self::get_loop_only_options();
 			foreach ( $attributes as $key => $attribute ) {
 				if ( 0 === strpos( $key, 'vp_' ) ) {
 					$key                = preg_replace( '/^vp_/', '', $key );
@@ -508,6 +509,15 @@ class Visual_Portfolio_Security {
 					$attributes[ $key ] = $attribute;
 					unset( $attributes[ 'vp_' . $key ] );
 				}
+
+				// A loop-only option has no control behind it, so the lookup
+				// below would fall through to the text branch and flatten an
+				// array of ids to an empty string.
+				if ( isset( $loop_only[ $key ] ) ) {
+					$attributes[ $key ] = self::sanitize_loop_only_option( $loop_only[ $key ], $attribute );
+					continue;
+				}
+
 				$sanitize_callback = $controls[ $key ]['sanitize_callback'] ?? false;
 				if ( $sanitize_callback ) {
 					$finding_class = is_string( $sanitize_callback ) && strripos( $sanitize_callback, '::' );
@@ -611,6 +621,48 @@ class Visual_Portfolio_Security {
 			}
 		}
 		return $attributes;
+	}
+
+	/**
+	 * Options a loop block carries that no legacy control registers.
+	 *
+	 * `Visual_Portfolio_Get::get_options()` keeps registered controls and
+	 * nothing else, so without this list the loop's own query options are
+	 * dropped before the query is built. Each entry names how the value is
+	 * sanitized on the way in.
+	 *
+	 * @return array
+	 */
+	public static function get_loop_only_options() {
+		return array(
+			'posts_authors'         => 'ids',
+			'posts_keyword'         => 'text',
+			'posts_exclude_current' => 'boolean',
+			'max_pages'             => 'number',
+		);
+	}
+
+	/**
+	 * Sanitize one loop-only option.
+	 *
+	 * @param string $type - type from `get_loop_only_options()`.
+	 * @param mixed  $value - raw value.
+	 *
+	 * @return mixed
+	 */
+	public static function sanitize_loop_only_option( $type, $value ) {
+		switch ( $type ) {
+			case 'ids':
+				return array_values( array_filter( array_map( 'absint', (array) $value ) ) );
+			case 'text':
+				return sanitize_text_field( (string) $value );
+			case 'boolean':
+				return self::sanitize_boolean( $value );
+			case 'number':
+				return self::sanitize_number( $value );
+		}
+
+		return null;
 	}
 
 	/**

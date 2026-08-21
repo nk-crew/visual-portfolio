@@ -78,11 +78,15 @@ its own, in this order:
 | Filters | What narrows the query. Starts empty, opened one option at a time |
 
 A posts loop narrows by authors, by a keyword its text contains, and by two
-exclusions. *Avoid duplicates* hides posts the page has already shown, whether
-by another gallery or by the page's own list — on a single post that covers the
-post itself. *Exclude the current post* covers only that post, and works whether
-or not duplicates are avoided; it is what an archive needs, where the first
-option has nothing to exclude.
+exclusions that do not overlap. *Avoid duplicates* hides what the page has
+already shown — another gallery, or the list of a listing page. *Exclude the
+current post* hides the post being viewed, and nothing else. Either, both or
+neither can be on.
+
+On a single post the page's own list is that post, so the two would otherwise
+be the same switch. The loop leaves that list out when *Exclude the current
+post* is off, which is why it never hides the post on its own. The legacy
+gallery has no such switch and keeps the behaviour it always had.
 
 The item template follows the same shape: Settings holds the layout type and the
 columns, and neither can be hidden; each layout adds a panel of its own.

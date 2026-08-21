@@ -239,6 +239,15 @@ class Visual_Portfolio_Get {
 			}
 		}
 
+		// Options a loop block carries that no legacy control registers. The
+		// loop above keeps registered controls only, so these would never
+		// reach the query.
+		foreach ( array_keys( Visual_Portfolio_Security::get_loop_only_options() ) as $name ) {
+			if ( isset( $atts[ $name ] ) ) {
+				$result[ $name ] = $atts[ $name ];
+			}
+		}
+
 		if ( ! isset( $result['id'] ) ) {
 			$result['id'] = $block_id ? $block_id : $id;
 		}
@@ -2160,8 +2169,20 @@ class Visual_Portfolio_Get {
 				// We should prevent this when using filter, since all current posts will be excluded
 				// from the filter query and we may not see all filter buttons.
 				if ( ! $for_filter && $options['posts_avoid_duplicate_posts'] ) {
+					// On a single post the page's own list is that post, so
+					// counting it as shown would hide it - the job of the
+					// "Exclude the current post" switch above. A loop offers
+					// that switch and so leaves the list out when it is off;
+					// a legacy gallery has no such switch and keeps the
+					// behaviour it always had.
+					$with_main_query = ! (
+						array_key_exists( 'posts_exclude_current', $options ) &&
+						empty( $options['posts_exclude_current'] ) &&
+						is_singular()
+					);
+
 					$not_id                     = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
-					$query_opts['post__not_in'] = array_merge( $not_id, self::get_all_used_posts() );
+					$query_opts['post__not_in'] = array_merge( $not_id, self::get_all_used_posts( $with_main_query ) );
 
 					// Remove posts from post__in.
 					if ( isset( $query_opts['post__in'] ) ) {
@@ -3633,11 +3654,16 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get all used posts.
 	 *
+	 * @param bool $with_main_query - whether the page's own list counts as shown.
+	 *                                A loop asks without it on a single post,
+	 *                                where that list is the post being viewed and
+	 *                                "Exclude the current post" is the switch that
+	 *                                owns it.
 	 * @return array
 	 */
-	public static function get_all_used_posts() {
+	public static function get_all_used_posts( $with_main_query = true ) {
 		// add post IDs from main query.
-		if ( self::$check_main_query && ! self::is_preview() ) {
+		if ( $with_main_query && self::$check_main_query && ! self::is_preview() ) {
 			self::$check_main_query = false;
 
 			global $wp_query;
