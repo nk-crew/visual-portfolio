@@ -32,6 +32,9 @@ const observedWidths = new WeakMap();
 const pendingRequests = new WeakMap();
 const loopUndos = new WeakMap();
 
+// Loops whose region the router is replacing right now.
+const navigating = new WeakSet();
+
 /**
  * Context of the loop the current element belongs to.
  *
@@ -418,6 +421,12 @@ async function loadNextPage(trigger, context) {
 		return false;
 	}
 
+	// The router is about to replace this whole region, so a page appended
+	// into it would land under content that is on its way out.
+	if (navigating.has(loop)) {
+		return false;
+	}
+
 	const previous = pendingRequests.get(loop);
 
 	if (previous) {
@@ -537,6 +546,10 @@ store('visual-portfolio/loop', {
 
 			context.isLoading = true;
 
+			if (loop) {
+				navigating.add(loop);
+			}
+
 			try {
 				const router = yield import('@wordpress/interactivity-router');
 
@@ -546,6 +559,10 @@ store('visual-portfolio/loop', {
 				return;
 			} finally {
 				context.isLoading = false;
+
+				if (loop) {
+					navigating.delete(loop);
+				}
 			}
 
 			const list = loop ? loop.querySelector(LIST_SELECTOR) : null;

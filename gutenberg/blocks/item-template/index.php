@@ -479,14 +479,21 @@ class Visual_Portfolio_Block_Item_Template {
 	private function get_layout_props( $attributes, $layout_type ) {
 		$columns = $this->get_layout_columns( $attributes, $layout_type );
 		$classes = array();
-		$styles  = sprintf( '--vp-layout-columns:%d;', $columns );
 		$gap     = $this->get_block_gap( $attributes );
+
+		// Auto mode reads the count as a maximum, and zero lifts it - which is
+		// what the control promises. `get_layout_columns()` floors it at one,
+		// because its other caller needs a real count for the first row.
+		$is_auto = $this->is_auto_columns( $attributes, $layout_type );
+		$maximum = $is_auto && empty( $attributes['layoutColumnCount'] ) ? 0 : $columns;
+
+		$styles = sprintf( '--vp-layout-columns:%d;', $maximum );
 
 		if ( '' !== $gap ) {
 			$styles .= sprintf( '--vp-layout-gap:%s;', $gap );
 		}
 
-		if ( $this->is_auto_columns( $attributes, $layout_type ) ) {
+		if ( $is_auto ) {
 			$minimum = $this->get_css_length( $attributes['layoutMinimumColumnWidth'] ?? '', '16rem' );
 
 			$classes[] = 'vp-layout-auto-columns';
@@ -495,13 +502,15 @@ class Visual_Portfolio_Block_Item_Template {
 
 			// The track a grid repeats. A maximum column count gives it a lower
 			// bound of its own, so the grid stops growing at the count rather
-			// than at the width.
-			$styles .= sprintf(
-				'--vp-layout-track:max(min(%1$s, 100%%), (100%% - (var(--vp-layout-gap, 1.5rem) * %2$d)) / %3$d);',
-				$minimum,
-				$columns - 1,
-				$columns
-			);
+			// than at the width. Without a maximum the width is the only bound.
+			$styles .= $maximum
+				? sprintf(
+					'--vp-layout-track:max(min(%1$s, 100%%), (100%% - (var(--vp-layout-gap, 1.5rem) * %2$d)) / %3$d);',
+					$minimum,
+					$maximum - 1,
+					$maximum
+				)
+				: sprintf( '--vp-layout-track:min(%s, 100%%);', $minimum );
 
 			if ( ! empty( $attributes['layoutAutoFit'] ) ) {
 				$classes[] = 'vp-layout-auto-fit';

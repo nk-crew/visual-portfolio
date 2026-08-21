@@ -294,6 +294,12 @@ function syncDots(list) {
 	const dots = container.querySelectorAll(DOT_SELECTOR);
 	const label = container.dataset.vpDotLabel || '';
 
+	// Load More and a filter both change how many slides there are, and a dot
+	// with no slide behind it does nothing when clicked.
+	for (let index = dots.length - 1; index >= items; index -= 1) {
+		dots[index].remove();
+	}
+
 	for (let index = dots.length; index < items; index += 1) {
 		const dot = document.createElement('button');
 

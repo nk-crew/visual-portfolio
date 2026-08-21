@@ -41,7 +41,12 @@ function getItems(list) {
 	const view = list.ownerDocument.defaultView || window;
 
 	return Array.from(list.querySelectorAll(ITEM_SELECTOR)).filter(
-		(item) => 'none' !== view.getComputedStyle(item).display
+		(item) =>
+			// An item this layout hid is still one of its own: leaving it out
+			// would mean the pass that could show it again never sees it, and
+			// a justified gallery would shed items on every relayout.
+			'true' === item.dataset.vpLayoutHidden ||
+			'none' !== view.getComputedStyle(item).display
 	);
 }
 

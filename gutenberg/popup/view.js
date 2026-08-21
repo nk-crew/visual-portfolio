@@ -240,6 +240,9 @@ function registerVideo(pswp) {
 	});
 }
 
+// True while a click is waiting for the library to arrive.
+let opening = false;
+
 /**
  * Open the gallery.
  *
@@ -251,7 +254,22 @@ function registerVideo(pswp) {
  * @return {Promise<void>} Resolved once the lightbox is on screen.
  */
 async function openGallery(config, items, index, trigger) {
-	const PhotoSwipe = await loadLibrary(config.library);
+	// The first click on a page waits for the library to arrive over the
+	// network, and a second one during that wait would open a second lightbox
+	// over the first.
+	if (opening) {
+		return;
+	}
+
+	opening = true;
+
+	let PhotoSwipe;
+
+	try {
+		PhotoSwipe = await loadLibrary(config.library);
+	} finally {
+		opening = false;
+	}
 	const strings = config.i18n || {};
 
 	const pswp = new PhotoSwipe({

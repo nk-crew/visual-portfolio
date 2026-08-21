@@ -92,7 +92,7 @@ export default function useEntitySearch({
 				}),
 			})
 				.then((results) => setSuggestionIds(rememberLabels(results)))
-				.catch(() => setSuggestions([]));
+				.catch(() => setSuggestionIds([]));
 		},
 		[type, subtype, rememberLabels]
 	);

@@ -102,7 +102,11 @@ export function getColumnsTrack(attributes) {
  * @return {number} column count.
  */
 export function getColumnCount(attributes) {
-	return Math.max(1, parseInt(attributes.layoutColumnCount, 10) || 1);
+	const count = Math.max(0, parseInt(attributes.layoutColumnCount, 10) || 0);
+
+	// Auto mode reads the count as a maximum, and zero lifts it. A named count
+	// is a count, so it never drops below one.
+	return isAutoColumns(attributes) ? count : Math.max(1, count);
 }
 
 /**
