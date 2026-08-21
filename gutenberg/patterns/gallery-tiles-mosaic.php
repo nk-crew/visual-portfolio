@@ -4,6 +4,7 @@
  * Slug: visual-portfolio/gallery-tiles-mosaic
  * Categories: gallery
  * Block Types: visual-portfolio/loop
+ * Viewport Width: 960
  * Description: A mosaic of tiles of different sizes, cropped to the shape the pattern gives them.
  *
  * @package visual-portfolio

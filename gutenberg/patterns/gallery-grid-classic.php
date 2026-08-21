@@ -4,6 +4,7 @@
  * Slug: visual-portfolio/gallery-grid-classic
  * Categories: gallery
  * Block Types: visual-portfolio/loop
+ * Viewport Width: 960
  * Description: Display gallery items in a grid layout, with a title under each image.
  *
  * @package visual-portfolio

@@ -4,6 +4,7 @@
  * Slug: visual-portfolio/gallery-posts-classic
  * Categories: gallery
  * Block Types: visual-portfolio/loop
+ * Viewport Width: 960
  * Description: Display posts in a grid, with the title, the categories and the publish date under each image.
  *
  * @package visual-portfolio

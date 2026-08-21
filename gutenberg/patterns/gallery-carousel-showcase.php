@@ -4,6 +4,7 @@
  * Slug: visual-portfolio/gallery-carousel-showcase
  * Categories: gallery
  * Block Types: visual-portfolio/loop
+ * Viewport Width: 960
  * Description: A carousel of wide slides with arrows and dots, for showing a few pictures at a time.
  *
  * @package visual-portfolio

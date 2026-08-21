@@ -4,6 +4,7 @@
  * Slug: visual-portfolio/gallery-masonry-classic
  * Categories: gallery
  * Block Types: visual-portfolio/loop
+ * Viewport Width: 960
  * Description: Display gallery items in a masonry layout, keeping every image at its own aspect ratio.
  *
  * @package visual-portfolio

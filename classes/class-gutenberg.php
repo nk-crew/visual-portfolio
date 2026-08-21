@@ -59,11 +59,12 @@ class Visual_Portfolio_Gutenberg {
 			$pattern_data = get_file_data(
 				$pattern_file,
 				array(
-					'title'       => 'Title',
-					'slug'        => 'Slug',
-					'description' => 'Description',
-					'categories'  => 'Categories',
-					'blockTypes'  => 'Block Types',
+					'title'         => 'Title',
+					'slug'          => 'Slug',
+					'description'   => 'Description',
+					'categories'    => 'Categories',
+					'blockTypes'    => 'Block Types',
+					'viewportWidth' => 'Viewport Width',
 				)
 			);
 
@@ -85,19 +86,25 @@ class Visual_Portfolio_Gutenberg {
 				? array()
 				: array_map( 'trim', explode( ',', $pattern_data['blockTypes'] ) );
 
-			register_block_pattern(
-				$pattern_data['slug'],
-				array(
-					// Untranslated on purpose: `make-pot` only collects pattern
-					// headers from a `patterns/` directory at the plugin root, so
-					// wrapping these would produce strings no catalogue can carry.
-					'title'       => $pattern_data['title'],
-					'description' => $pattern_data['description'],
-					'content'     => $content,
-					'categories'  => $categories,
-					'blockTypes'  => $block_types,
-				)
+			$pattern = array(
+				// Untranslated on purpose: `make-pot` only collects pattern
+				// headers from a `patterns/` directory at the plugin root, so
+				// wrapping these would produce strings no catalogue can carry.
+				'title'       => $pattern_data['title'],
+				'description' => $pattern_data['description'],
+				'content'     => $content,
+				'categories'  => $categories,
+				'blockTypes'  => $block_types,
 			);
+
+			// The width a preview of the pattern is drawn at. Left out, the
+			// editor assumes 1200px, and a gallery meant for a column of a page
+			// is then previewed as a wall.
+			if ( ! empty( $pattern_data['viewportWidth'] ) ) {
+				$pattern['viewportWidth'] = (int) $pattern_data['viewportWidth'];
+			}
+
+			register_block_pattern( $pattern_data['slug'], $pattern );
 		}
 	}
 

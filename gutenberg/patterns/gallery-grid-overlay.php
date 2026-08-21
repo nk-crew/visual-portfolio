@@ -4,6 +4,7 @@
  * Slug: visual-portfolio/gallery-grid-overlay
  * Categories: gallery
  * Block Types: visual-portfolio/loop
+ * Viewport Width: 960
  * Description: Display gallery items in a grid, with the title and the categories fading in above the image on hover.
  *
  * @package visual-portfolio

@@ -4,6 +4,7 @@
  * Slug: visual-portfolio/gallery-justified-wall
  * Categories: gallery
  * Block Types: visual-portfolio/loop
+ * Viewport Width: 960
  * Description: Rows of an even height that fill the width, keeping every picture at its own proportions.
  *
  * @package visual-portfolio

@@ -61,33 +61,47 @@
 	}
 }
 
-.vpf-loop-patterns {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-	gap: 16px;
+// The pattern chooser, laid out the way the core Query block lays its own out:
+// columns rather than a grid, so a tall pattern and a short one sit side by
+// side without a row of white space between them. Scoped to our own overlay -
+// the same rule on the bare list class would reflow the inserter as well.
+.vpf-loop-setup__overlay .block-editor-block-patterns-list {
+	column-count: 2;
+	column-gap: 24px;
+
+	@media (min-width: 1280px) {
+		column-count: 3;
+	}
+
+	.block-editor-block-patterns-list__list-item {
+		break-inside: avoid-column;
+	}
+
+	// A preview is measured before it is drawn, and a gallery measures zero
+	// until its items arrive. Without a floor the card is a sliver until then.
+	.block-editor-block-preview__container {
+		min-height: 100px;
+	}
+}
+
+.vpf-loop-setup__search {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	padding: 16px 0;
+	background: #fff;
+}
+
+// The three things a gallery is assembled from, asked before its shape.
+.vpf-loop-wizard {
 	width: 100%;
 }
 
-.components-button.vpf-loop-patterns__item {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
+.vpf-loop-wizard__choices {
 	align-items: flex-start;
-	height: auto;
-	padding: 12px;
-	text-align: left;
-	white-space: normal;
-	background: var(--wp-components-color-background, #fff);
-	border: 1px solid var(--wp-components-color-gray-300, #ddd);
-	border-radius: 4px;
-}
 
-.vpf-loop-patterns__title {
-	font-weight: 600;
-}
-
-.vpf-loop-patterns__description {
-	font-size: 12px;
-	line-height: 1.4;
-	color: var(--wp-components-color-gray-700, #757575);
+	> * {
+		flex: 1 1 180px;
+		min-width: 0;
+	}
 }

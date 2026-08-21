@@ -4,6 +4,7 @@
  * Slug: visual-portfolio/gallery-masonry-captions
  * Categories: gallery
  * Block Types: visual-portfolio/loop
+ * Viewport Width: 960
  * Description: A masonry of pictures at their own proportions, each with its title and description under it.
  *
  * @package visual-portfolio
