@@ -1,6 +1,5 @@
 import {
 	Button,
-	FocalPointPicker,
 	FormTokenField,
 	Modal,
 	SelectControl,
@@ -13,12 +12,15 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 
+import FocalPointControl from '../../components/focal-point-control';
 import CollapsibleSection from '../../components/gallery-control/collapsible-section';
 import LoopImageSettingsSlot, {
 	LoopImageSettingsHoverSlot,
 	useHasHoverStateFills,
 } from '../../components/loop-image-settings-slot';
+import MediaPreviewCard from '../../components/media-preview-card';
 import { ToggleGroupButtonsControl } from '../../components/toggle-group-control';
+import { prepareImage } from './prepare-images';
 
 const { admin_url: adminUrl } = window.VPGutenbergVariables;
 
@@ -31,8 +33,6 @@ const STATE_OPTIONS = [
 	{ value: 'default', label: __('Default', 'visual-portfolio') },
 	{ value: 'hover', label: __('Hover', 'visual-portfolio') },
 ];
-
-const DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 /**
  * File size in the largest unit that keeps it readable.
@@ -136,9 +136,11 @@ function AdditionalMediaInfo({ imageId }) {
  * @param {number}   props.total               - number of images in the gallery.
  * @param {string}   props.previewUrl          - URL of the image preview.
  * @param {Array}    props.categorySuggestions - categories used elsewhere in the gallery.
+ * @param {Array}    props.allowedTypes        - media types the gallery accepts.
  * @param {string}   props.clientId            - loop client id.
  * @param {Function} props.onChange            - merges the given values into the image.
  * @param {Function} props.onNavigate          - called with the index to edit instead.
+ * @param {Function} props.onRemove            - drops the image from the gallery.
  * @param {Function} props.onClose             - closes the drawer.
  * @return {Element} component.
  */
@@ -148,9 +150,11 @@ export default function ImageSettingsModal({
 	total,
 	previewUrl,
 	categorySuggestions,
+	allowedTypes,
 	clientId,
 	onChange,
 	onNavigate,
+	onRemove,
 	onClose,
 }) {
 	const [state, setState] = useState('default');
@@ -229,24 +233,25 @@ export default function ImageSettingsModal({
 					) : (
 						<>
 							{previewUrl ? (
-								<FocalPointPicker
-									label={__(
-										'Focal point',
-										'visual-portfolio'
-									)}
-									help={__(
-										'The part of the image that stays visible when it is cropped.',
-										'visual-portfolio'
-									)}
-									url={previewUrl}
-									value={
-										image.focalPoint || DEFAULT_FOCAL_POINT
+								<MediaPreviewCard
+									onSelect={(media) =>
+										onChange(prepareImage(media))
 									}
-									onChange={(focalPoint) =>
-										onChange({ focalPoint })
-									}
-								/>
+									allowedTypes={allowedTypes}
+									onRemove={onRemove}
+								>
+									<img src={previewUrl} alt="" />
+								</MediaPreviewCard>
 							) : null}
+
+							{/* Remounted per image, so it opens only for an off-centre point. */}
+							<FocalPointControl
+								key={image.id}
+								value={image.focalPoint}
+								onChange={(focalPoint) =>
+									onChange({ focalPoint })
+								}
+							/>
 
 							{image.id ? (
 								<AdditionalMediaInfo imageId={image.id} />

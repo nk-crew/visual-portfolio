@@ -334,9 +334,11 @@ export default function GalleryManager({ images, onChange, clientId }) {
 					total={images.length}
 					previewUrl={previewUrls[editing.id]}
 					categorySuggestions={categorySuggestions}
+					allowedTypes={ALLOWED_MEDIA_TYPES}
 					clientId={clientId}
 					onChange={(values) => updateImage(editingIndex, values)}
 					onNavigate={setEditingIndex}
+					onRemove={() => removeImage(editingIndex)}
 					onClose={() => setEditingIndex(null)}
 				/>
 			) : null}
