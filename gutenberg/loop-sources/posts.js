@@ -381,35 +381,37 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 			) : null}
 
 			{isOrdered ? (
-				<>
-					<ToolsPanelItem
-						label={__('Order By', 'visual-portfolio')}
-						hasValue={() => DEFAULTS.orderBy !== orderBy}
-						onDeselect={() => update({ orderBy: DEFAULTS.orderBy })}
-						panelId={clientId}
-					>
+				// One item: a direction on its own says nothing without the
+				// field it sorts, so the menu offers them together.
+				<ToolsPanelItem
+					label={__('Order', 'visual-portfolio')}
+					hasValue={() =>
+						DEFAULTS.orderBy !== orderBy || DEFAULTS.order !== order
+					}
+					onDeselect={() =>
+						update({
+							orderBy: DEFAULTS.orderBy,
+							order: DEFAULTS.order,
+						})
+					}
+					panelId={clientId}
+				>
+					<VStack spacing={4}>
 						<SelectControl
 							label={__('Order By', 'visual-portfolio')}
 							value={orderBy}
 							options={ORDER_BY_OPTIONS}
 							onChange={(value) => update({ orderBy: value })}
 						/>
-					</ToolsPanelItem>
 
-					<ToolsPanelItem
-						label={__('Order Direction', 'visual-portfolio')}
-						hasValue={() => DEFAULTS.order !== order}
-						onDeselect={() => update({ order: DEFAULTS.order })}
-						panelId={clientId}
-					>
 						<SelectControl
 							label={__('Order Direction', 'visual-portfolio')}
 							value={order}
 							options={ORDER_OPTIONS}
 							onChange={(value) => update({ order: value })}
 						/>
-					</ToolsPanelItem>
-				</>
+					</VStack>
+				</ToolsPanelItem>
 			) : null}
 		</ToolsPanel>
 	);

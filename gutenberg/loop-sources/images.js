@@ -2,6 +2,7 @@ import {
 	SelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -140,73 +141,77 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
-				label={__('Items Title Source', 'visual-portfolio')}
-				hasValue={() => DEFAULTS.titlesSource !== titlesSource}
-				onDeselect={() =>
-					update({ titlesSource: DEFAULTS.titlesSource })
-				}
-				panelId={clientId}
-			>
-				<SelectControl
-					label={__('Items Title Source', 'visual-portfolio')}
-					help={__(
-						'Which field of the image the title is read from.',
-						'visual-portfolio'
-					)}
-					value={titlesSource}
-					options={TEXT_SOURCE_OPTIONS}
-					onChange={(value) => update({ titlesSource: value })}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				label={__('Items Description Source', 'visual-portfolio')}
+				label={__('Item Text Source', 'visual-portfolio')}
 				hasValue={() =>
+					DEFAULTS.titlesSource !== titlesSource ||
 					DEFAULTS.descriptionsSource !== descriptionsSource
 				}
 				onDeselect={() =>
-					update({ descriptionsSource: DEFAULTS.descriptionsSource })
+					update({
+						titlesSource: DEFAULTS.titlesSource,
+						descriptionsSource: DEFAULTS.descriptionsSource,
+					})
 				}
 				panelId={clientId}
 			>
-				<SelectControl
-					label={__('Items Description Source', 'visual-portfolio')}
-					help={__(
-						'Which field of the image the description is read from.',
-						'visual-portfolio'
-					)}
-					value={descriptionsSource}
-					options={TEXT_SOURCE_OPTIONS}
-					onChange={(value) => update({ descriptionsSource: value })}
-				/>
+				<VStack spacing={4}>
+					<SelectControl
+						label={__('Items Title Source', 'visual-portfolio')}
+						help={__(
+							'Which field of the image the title is read from.',
+							'visual-portfolio'
+						)}
+						value={titlesSource}
+						options={TEXT_SOURCE_OPTIONS}
+						onChange={(value) => update({ titlesSource: value })}
+					/>
+
+					<SelectControl
+						label={__(
+							'Items Description Source',
+							'visual-portfolio'
+						)}
+						help={__(
+							'Which field of the image the description is read from.',
+							'visual-portfolio'
+						)}
+						value={descriptionsSource}
+						options={TEXT_SOURCE_OPTIONS}
+						onChange={(value) =>
+							update({ descriptionsSource: value })
+						}
+					/>
+				</VStack>
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
-				label={__('Order By', 'visual-portfolio')}
-				hasValue={() => DEFAULTS.orderBy !== orderBy}
-				onDeselect={() => update({ orderBy: DEFAULTS.orderBy })}
+				label={__('Order', 'visual-portfolio')}
+				hasValue={() =>
+					DEFAULTS.orderBy !== orderBy || DEFAULTS.order !== order
+				}
+				onDeselect={() =>
+					update({
+						orderBy: DEFAULTS.orderBy,
+						order: DEFAULTS.order,
+					})
+				}
 				panelId={clientId}
 			>
-				<SelectControl
-					label={__('Order By', 'visual-portfolio')}
-					value={orderBy}
-					options={ORDER_BY_OPTIONS}
-					onChange={(value) => update({ orderBy: value })}
-				/>
-			</ToolsPanelItem>
+				<VStack spacing={4}>
+					<SelectControl
+						label={__('Order By', 'visual-portfolio')}
+						value={orderBy}
+						options={ORDER_BY_OPTIONS}
+						onChange={(value) => update({ orderBy: value })}
+					/>
 
-			<ToolsPanelItem
-				label={__('Order Direction', 'visual-portfolio')}
-				hasValue={() => DEFAULTS.order !== order}
-				onDeselect={() => update({ order: DEFAULTS.order })}
-				panelId={clientId}
-			>
-				<SelectControl
-					label={__('Order Direction', 'visual-portfolio')}
-					value={order}
-					options={ORDER_OPTIONS}
-					onChange={(value) => update({ order: value })}
-				/>
+					<SelectControl
+						label={__('Order Direction', 'visual-portfolio')}
+						value={order}
+						options={ORDER_OPTIONS}
+						onChange={(value) => update({ order: value })}
+					/>
+				</VStack>
 			</ToolsPanelItem>
 		</ToolsPanel>
 	);

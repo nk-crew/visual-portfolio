@@ -13,6 +13,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	PanelBody,
 	Placeholder,
+	RangeControl,
 	SelectControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -320,13 +321,14 @@ function DisplayPanel({ attributes, setAttributes }) {
 					/>
 
 					{PER_PAGE_ALL === perPage ? null : (
-						<NumberControl
+						<RangeControl
 							label={__('Items per page', 'visual-portfolio')}
 							help={__(
 								'How many items one page of the gallery carries.',
 								'visual-portfolio'
 							)}
 							min={1}
+							max={100}
 							value={perPage}
 							onChange={(value) =>
 								setBase({ perPage: parseInt(value, 10) || 1 })
@@ -684,15 +686,15 @@ export default function BlockEdit(props) {
 					clientId={clientId}
 				/>
 
-				<DisplayPanel
-					attributes={attributes}
-					setAttributes={setAttributes}
-				/>
-
 				<SourceFiltersPanel
 					attributes={attributes}
 					setAttributes={setAttributes}
 					clientId={clientId}
+				/>
+
+				<DisplayPanel
+					attributes={attributes}
+					setAttributes={setAttributes}
 				/>
 			</InspectorControls>
 			<div {...innerBlocksProps} />
