@@ -24,7 +24,8 @@
 			"type": "object",
 			"default": {
 				"perPage": 6,
-				"maxPages": 1
+				"maxPages": 1,
+				"maxPagesLimit": 0
 			}
 		},
 		"postsQuery": {
@@ -40,6 +41,9 @@
 				"taxonomies": [],
 				"taxonomiesRelation": "or",
 				"avoidDuplicates": false,
+				"excludeCurrent": false,
+				"authors": [],
+				"keyword": "",
 				"customQuery": ""
 			}
 		},

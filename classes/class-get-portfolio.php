@@ -716,6 +716,14 @@ class Visual_Portfolio_Get {
 			}
 		}
 
+		// A ceiling the gallery is not allowed to pass, whatever the query found.
+		// Zero lifts it, the way the core Query block reads the same setting.
+		$max_pages_limit = isset( $options['max_pages'] ) ? max( 0, (int) $options['max_pages'] ) : 0;
+
+		if ( $max_pages_limit ) {
+			$max_pages = min( $max_pages, $max_pages_limit );
+		}
+
 		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
 			array(
 				'vp_page' => $start_page + 1,
@@ -2127,6 +2135,25 @@ class Visual_Portfolio_Get {
 					if ( isset( $options['posts_offset'] ) && $options['posts_offset'] ) {
 						$query_opts['offset'] = $options['posts_offset'] + ( $paged - 1 ) * $count;
 					}
+				}
+
+				// Narrow the query the way the Filters panel asks.
+				if ( ! empty( $options['posts_authors'] ) ) {
+					$query_opts['author__in'] = array_map( 'intval', (array) $options['posts_authors'] );
+				}
+
+				if ( ! empty( $options['posts_keyword'] ) ) {
+					$query_opts['s'] = (string) $options['posts_keyword'];
+				}
+
+				// The post being viewed has no business appearing in a gallery
+				// on its own page. Unlike "avoid duplicates", which is about
+				// several galleries sharing a page, this is about one post
+				// listing itself.
+				if ( ! $for_filter && ! empty( $options['posts_exclude_current'] ) && is_singular() ) {
+					$current                    = get_queried_object_id();
+					$not_current                = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
+					$query_opts['post__not_in'] = array_merge( $not_current, array( $current ) );
 				}
 
 				// Avoid duplicates.
