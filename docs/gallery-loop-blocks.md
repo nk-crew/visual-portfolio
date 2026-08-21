@@ -67,6 +67,26 @@ Overlay, Masonry Clean, Masonry Captions, Tiles Mosaic, Justified Photo Wall,
 Carousel Showcase and Posts Cards. A pattern is a starting point and nothing
 more: everything in it is ordinary blocks, and it is inserted unlocked.
 
+**Inspector.** The loop sorts its settings the way the core Query block sorts
+its own, in this order:
+
+| Panel | Holds |
+|---|---|
+| Content Source | The source, and the way back to the chooser |
+| Settings | What the source cannot run without. These cannot be hidden |
+| Display | Items per page, offset, and a ceiling on the pages shown |
+| Filters | What narrows the query. Starts empty, opened one option at a time |
+
+A posts loop narrows by authors, by a keyword its text contains, and by two
+exclusions. *Avoid duplicates* hides posts the page has already shown, whether
+by another gallery or by the page's own list — on a single post that covers the
+post itself. *Exclude the current post* covers only that post, and works whether
+or not duplicates are avoided; it is what an archive needs, where the first
+option has nothing to exclude.
+
+The item template follows the same shape: Settings holds the layout type and the
+columns, and neither can be hidden; each layout adds a panel of its own.
+
 **Controls.** Filter, sort and pagination are server-rendered links and forms.
 With JavaScript they swap the gallery in place; without it they work as ordinary
 page loads. Both paths land on the same URL.
