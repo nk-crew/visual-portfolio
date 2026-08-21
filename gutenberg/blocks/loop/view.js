@@ -620,28 +620,68 @@ store('visual-portfolio/loop', {
 			// The observer fires outside of any directive, so the context is
 			// taken while there still is one.
 			const context = getLoopContext();
+
+			// How far ahead of the viewport a page is fetched, and how often
+			// the visitor is asked before it is. Written onto the trigger by
+			// whoever renders it; absent, the loop scrolls on by itself from
+			// the first screen, 300px early.
+			const number = (name, fallback) => {
+				const value = parseInt(ref.dataset[name], 10);
+
+				return Number.isNaN(value) ? fallback : value;
+			};
+
+			const everyPages = Math.max(0, number('vpInfiniteEveryPage', 0));
+			let loaded = 0;
+			let paused = 'true' === ref.dataset.vpInfiniteStartupLoadMore;
+
+			// The trigger is a Load More button as well as a sentinel: a click
+			// on it lets the scrolling resume.
+			const resume = () => {
+				paused = false;
+			};
+
+			ref.addEventListener('click', resume);
+
 			const observer = new window.IntersectionObserver(
 				(entries) => {
+					if (paused) {
+						return;
+					}
+
 					if (!entries.some((entry) => entry.isIntersecting)) {
 						return;
 					}
 
 					loadNextPage(ref, context).then((appended) => {
+						if (!appended) {
+							return;
+						}
+
+						loaded += 1;
+
+						if (everyPages && 0 === loaded % everyPages) {
+							paused = true;
+						}
+
 						// Intersection is reported on change, and appending
 						// items does not move a trigger that was already in
 						// view. Observing it again reports where it is now.
-						if (appended && ref.isConnected) {
+						if (ref.isConnected) {
 							observer.unobserve(ref);
 							observer.observe(ref);
 						}
 					});
 				},
-				{ rootMargin: '300px' }
+				{ rootMargin: `${number('vpInfiniteThreshold', 300)}px` }
 			);
 
 			observer.observe(ref);
 
-			return () => observer.disconnect();
+			return () => {
+				ref.removeEventListener('click', resume);
+				observer.disconnect();
+			};
 		},
 	},
 });
