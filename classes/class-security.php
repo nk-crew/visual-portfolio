@@ -636,10 +636,23 @@ class Visual_Portfolio_Security {
 	 * @return array
 	 */
 	public static function get_loop_only_options() {
-		return array(
-			'posts_keyword'         => 'text',
-			'posts_exclude_current' => 'boolean',
-			'max_pages'             => 'number',
+		/**
+		 * Options a loop carries that no legacy control registers.
+		 *
+		 * A source or a module that gives the loop a setting the legacy
+		 * gallery has no control for registers it here, or `get_options()`
+		 * drops it before the query is built. The value is the type its
+		 * sanitizer takes: `ids`, `text`, `boolean` or `number`.
+		 *
+		 * @param array $options Option name to sanitizer type.
+		 */
+		return apply_filters(
+			'vpf_loop_only_options',
+			array(
+				'posts_keyword'         => 'text',
+				'posts_exclude_current' => 'boolean',
+				'max_pages'             => 'number',
+			)
 		);
 	}
 
