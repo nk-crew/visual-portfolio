@@ -221,8 +221,10 @@ function createEntries(patterns, extension, shouldInclude = () => true) {
 	}, {});
 }
 
-function shouldIncludeScssEntry(entry) {
-	return !path.basename(entry).startsWith('_');
+// A leading underscore marks a file that is imported rather than served: SCSS
+// partials, and the JavaScript one bundle shares with another.
+function isPartial(entry) {
+	return path.basename(entry).startsWith('_');
 }
 
 function isSvgRule(rule) {
@@ -610,12 +612,14 @@ const moduleEntryNames = Object.keys(entryAssetsJsModule);
 const entryAssetsJs = createEntries(
 	JS_ENTRY_PATTERNS,
 	'.js',
-	(entry) => !moduleEntryNames.includes(entry.slice(0, -'.js'.length))
+	(entry) =>
+		!isPartial(entry) &&
+		!moduleEntryNames.includes(entry.slice(0, -'.js'.length))
 );
 const entryAssetsCss = createEntries(
 	CSS_ENTRY_PATTERNS,
 	'.scss',
-	shouldIncludeScssEntry
+	(entry) => !isPartial(entry)
 );
 
 // Both compilations write into `build/`, so the one that cleans it has to leave
