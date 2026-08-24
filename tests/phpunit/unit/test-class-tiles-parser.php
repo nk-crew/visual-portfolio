@@ -160,10 +160,10 @@ class ClassTilesParser extends WP_UnitTestCase {
 
 				$this->assertStringContainsString(
 					sprintf(
-						'%1$s{grid-column:span %2$d;grid-row:span %3$d;',
+						'%1$s{grid-row:span %2$d;--vp-tile-columns:%3$d;',
 						$selector,
-						$tile['width'],
-						$tile['row_span']
+						$tile['row_span'],
+						$tile['width']
 					),
 					$css,
 					"Rule of tile $index in $preset"
@@ -180,12 +180,12 @@ class ClassTilesParser extends WP_UnitTestCase {
 	public function test_numbers_are_written_the_way_css_reads_them() {
 		$css = Visual_Portfolio_Tiles_Parser::to_css( '3|1,0.5|2,1.34|', '.vp-test' );
 
-		$this->assertStringContainsString( '--vp-tile-rows:0.5;', $css );
-		$this->assertStringContainsString( '--vp-tile-rows:2.68;', $css );
+		$this->assertStringContainsString( '--vp-tile-height:0.5;', $css );
+		$this->assertStringContainsString( '--vp-tile-height:1.34;', $css );
 
 		// A whole number stays whole - `1.0000` is noise in a stylesheet.
 		$this->assertStringContainsString(
-			'--vp-tile-rows:1;',
+			'--vp-tile-height:1;',
 			Visual_Portfolio_Tiles_Parser::to_css( '3|1,1|', '.vp-test' )
 		);
 	}
@@ -220,7 +220,7 @@ class ClassTilesParser extends WP_UnitTestCase {
 	public function test_single_tile_pattern_matches_every_item() {
 		$css = Visual_Portfolio_Tiles_Parser::to_css( '4|1,1|', '.vp-test' );
 
-		$this->assertStringContainsString( '.vp-test>*{grid-column:span 1', $css );
+		$this->assertStringContainsString( '.vp-test>*{grid-row:span 1', $css );
 		$this->assertStringNotContainsString( 'nth-child', $css );
 	}
 
@@ -234,28 +234,27 @@ class ClassTilesParser extends WP_UnitTestCase {
 	 */
 	public function test_columns_stay_out_of_the_pattern_rules() {
 		$this->assertStringNotContainsString(
-			'columns',
+			'--vp-layout',
 			Visual_Portfolio_Tiles_Parser::to_css( '4|1,1|1,2|', '.vp-test' )
 		);
 		$this->assertSame( 4, Visual_Portfolio_Tiles_Parser::parse( '4|1,1|1,2|' )['columns'] );
 	}
 
 	/**
-	 * Every tile says how tall it is, counted in columns.
+	 * Every tile says how wide and how tall it is, in the notation's own terms.
 	 *
-	 * It is what the stylesheet turns into a height, so a tile is the size its
-	 * notation describes whatever the blocks inside it would have made of it.
+	 * The two stay apart because the stylesheet clamps the width to the columns
+	 * a narrowed layout has left and lets the height follow it - multiplied
+	 * together here, a tile would keep the height of a width it no longer has.
 	 *
 	 * @return void
 	 */
-	public function test_tile_height_reaches_the_stylesheet() {
+	public function test_tile_size_reaches_the_stylesheet() {
 		$css = Visual_Portfolio_Tiles_Parser::to_css( '3|1,1|1,2|2,0.5|', '.vp-test' );
 
-		$this->assertStringContainsString( '--vp-tile-rows:1;', $css );
-		$this->assertStringContainsString( '--vp-tile-rows:2;', $css );
-
-		// Width counts: two columns at half height is one column tall.
-		$this->assertSame( 2, substr_count( $css, '--vp-tile-rows:1;' ) );
+		$this->assertStringContainsString( '--vp-tile-columns:1;--vp-tile-height:1;', $css );
+		$this->assertStringContainsString( '--vp-tile-columns:1;--vp-tile-height:2;', $css );
+		$this->assertStringContainsString( '--vp-tile-columns:2;--vp-tile-height:0.5;', $css );
 	}
 
 	/**

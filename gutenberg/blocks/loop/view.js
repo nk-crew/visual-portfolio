@@ -1,6 +1,6 @@
 import { getContext, getElement, store } from '@wordpress/interactivity';
 
-import { syncAutoColumns } from '../item-template/auto-columns';
+import { syncColumns } from '../item-template/auto-columns';
 
 /**
  * The front end of the whole Gallery Loop family - the loop wrapper, its filter,
@@ -155,10 +155,12 @@ function initMasonry(list) {
 	}
 
 	// Masonry reads the column off the first item, and the item width is a
-	// `calc()` over the column count - which auto mode has to work out first.
+	// `calc()` over the column count. The count has to be settled before the
+	// first placement, and the items placed again whenever it moves - which a
+	// container of a fixed width does not report as a resize.
 	autoColumns.set(
 		list,
-		syncAutoColumns(list, () => {
+		syncColumns(list, () => {
 			const current = masonryLayouts.get(list);
 
 			if (current) {

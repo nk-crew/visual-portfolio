@@ -37,16 +37,21 @@ and *Fill available space* drops the empty tracks of a row that cannot be
 filled. **Manual** asks for a count and keeps it. Tiles take their columns from
 the tiles notation, and justified has none.
 
-There are no per-viewport columns of our own: a narrower screen is what auto
-mode is for, and a fixed count is made responsive through the editor's own
-viewport states. The gap is **Block spacing** in the Dimensions panel, like any
-other block.
+A count is not a promise to show that many on a phone. The stylesheet caps it at
+the plugin's breakpoints — four below 1200px, three below 992px, two below 768px
+and one below 576px — which is the ladder the legacy gallery walked, so every
+layout ends up a single column on a narrow screen. A tile is capped with it and
+keeps its proportions, so a pattern narrows into a stack instead of spilling out
+of the grid. Auto mode is untouched: fitting the container is already what it
+does. There is no per-viewport count of our own to set. The gap is **Block
+spacing** in the Dimensions panel, like any other block.
 
 What a theme overrides in CSS, without touching the markup:
 
 | Property | Meaning |
 |---|---|
 | `--vp-layout-columns` | Column count, or the maximum in auto mode |
+| `--vp-layout-current-columns` | Columns the layout is drawn with, after narrowing |
 | `--vp-layout-min-column-width` | Minimum column width, auto mode only |
 | `--vp-layout-track` | The `minmax()` track a grid repeats, auto mode only |
 | `--vp-layout-gap` | Block spacing |

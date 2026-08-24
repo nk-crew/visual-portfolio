@@ -5,11 +5,25 @@
 // Columns come in the two shapes the core grid layout offers. A count, in
 // `--vp-layout-columns`. Or a minimum width, in `--vp-layout-min-column-width`,
 // with `vp-layout-auto-columns` on the list - then the container decides how
-// many fit, and `--vp-layout-columns` is the most it may reach. There are no
-// per-viewport values of our own: a narrower screen is what the auto mode is
-// for, and a fixed count is made responsive by the editor's own viewport
-// states.
+// many fit, and `--vp-layout-columns` is the most it may reach. Either way what
+// a layout is finally drawn with is `--vp-layout-current-columns`, and a named
+// count is capped there as the screen narrows.
 $item: ".wp-block-visual-portfolio-item-template__item";
+
+// How far a named column count may go at each of the plugin's breakpoints, the
+// ones `Visual_Portfolio_Breakpoints` carries. Widest first: on a phone every
+// step matches and the last one wins.
+$narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
+
+// Registered so that the count stays a number. The steps cap it with `min()`,
+// and an unregistered custom property hands that straight back to
+// `getComputedStyle()` as the text it was written as - which is where the
+// editor's masonry reads its column count from.
+@property --vp-layout-current-columns {
+	syntax: "<integer>";
+	inherits: true;
+	initial-value: 3;
+}
 
 // The layout Masonry positions by hand. Item widths come from here - Masonry
 // reads them, it does not calculate them. The gap is declared as `column-gap`
@@ -57,6 +71,20 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 		--vp-layout-auto-placement: auto-fit;
 	}
 
+	// A named count steps down as the screen narrows rather than holding on:
+	// four columns at 375px are unreadable, and the legacy gallery has always
+	// stacked them. Capping walks the same ladder that one walked for up to
+	// five columns and takes one step more at six, so a phone gets a single
+	// column whatever the desktop was set to. Auto mode is left out - fitting
+	// the container is already what it does.
+	&:not(.vp-layout-auto-columns) {
+		@each $width, $columns in $narrow-steps {
+			@media (max-width: $width) {
+				--vp-layout-current-columns: min(var(--vp-layout-columns, 3), #{$columns});
+			}
+		}
+	}
+
 	&.vp-layout-grid {
 		display: grid;
 		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
@@ -86,9 +114,11 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 		@include masonry-lanes;
 	}
 
-	// Widths, heights and packing all come from the pattern rules the tiles
-	// parser writes next to the list. Dense packing is what lets a short tile
-	// fall into the hole a tall neighbour left, which is the whole look.
+	// The width and the height of every tile come from the pattern rules the
+	// tiles parser writes next to the list, and the two numbers stay apart so
+	// the rules below can clamp the width and let the height follow. Dense
+	// packing is what lets a short tile fall into the hole a tall neighbour
+	// left, which is the whole look.
 	//
 	// A tile is as tall as its notation says, measured against the width of a
 	// column - not as tall as the blocks inside it happen to be, which is what
@@ -104,7 +134,15 @@ $item: ".wp-block-visual-portfolio-item-template__item";
 		gap: var(--vp-layout-gap, 1.5rem);
 
 		> #{$item} {
-			height: calc((100cqw + var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns) * var(--vp-tile-rows, 1) - var(--vp-layout-gap, 1.5rem));
+			// A tile is never wider than the grid it is in: two columns of a
+			// one column grid would open an implicit second column and take the
+			// pattern with it. Its height follows the width it ends up with, so
+			// however far the grid has narrowed a tile is still `height` times
+			// as tall as it is wide - which is all the notation ever says.
+			--vp-tile-span: min(var(--vp-tile-columns, 1), var(--vp-layout-current-columns));
+
+			grid-column: span var(--vp-tile-span);
+			height: calc((100cqw + var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns) * var(--vp-tile-height, 1) * var(--vp-tile-span) - var(--vp-layout-gap, 1.5rem));
 
 			// A tile is a cell of a fixed size, the way it has always been in
 			// this layout - what does not fit one is cut off rather than

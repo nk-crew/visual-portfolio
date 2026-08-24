@@ -134,7 +134,9 @@ class Visual_Portfolio_Tiles_Parser {
 	 *
 	 * The columns of the pattern are not here: they are the layout's columns,
 	 * they change with the viewport, and they live where every other layout
-	 * keeps them - in `--vp-layout-columns` on the list.
+	 * keeps them - in `--vp-layout-columns` on the list. What a rule carries is
+	 * the size of one tile, and the stylesheet is what holds it to the columns
+	 * that are left.
 	 *
 	 * @param string $tiles    - tiles notation.
 	 * @param string $selector - selector of the list the rules are scoped to.
@@ -148,20 +150,22 @@ class Visual_Portfolio_Tiles_Parser {
 
 		foreach ( $parsed['tiles'] as $index => $tile ) {
 			$declarations = array(
-				sprintf( 'grid-column:span %d', $tile['width'] ),
 				sprintf( 'grid-row:span %d', $tile['row_span'] ),
 
-				// How tall the tile is, counted in columns - `height` times its
-				// own width, whether it spans one column or three. The
-				// stylesheet turns it into a height, which is what makes a tile
-				// the size its notation says however tall the blocks inside it
-				// are.
+				// The two numbers the notation is written in, left apart rather
+				// than multiplied into one: the stylesheet clamps the width to
+				// the columns the layout has left after narrowing, and the
+				// height is a multiple of that width, so it has to be able to
+				// follow.
 				//
-				// Not an `aspect-ratio`, which is what the notation reads like:
-				// a grid item with a ratio and a resolved height takes its width
-				// from the ratio too, and a half height tile would come out a
-				// column short of the cells it was placed in.
-				sprintf( '--vp-tile-rows:%s', self::to_css_number( $tile['height'] * $tile['width'] ) ),
+				// The height reaches the stylesheet as a number and comes back
+				// as a `height`, not as an `aspect-ratio` - which is what the
+				// notation reads like. A grid item with a ratio and a resolved
+				// height takes its width from the ratio too, and a half height
+				// tile would come out a column short of the cells it was placed
+				// in.
+				sprintf( '--vp-tile-columns:%d', $tile['width'] ),
+				sprintf( '--vp-tile-height:%s', self::to_css_number( $tile['height'] ) ),
 			);
 
 			$rules[] = sprintf(

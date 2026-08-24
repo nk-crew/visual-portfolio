@@ -1,11 +1,14 @@
 /**
- * The column count of a layout whose columns follow the container.
+ * The column count a layout is drawn with, kept in step with the screen.
  *
  * A grid says "as many as fit, each at least this wide" in one line of CSS and
  * needs nothing from here. Masonry and the carousel cannot: their items are
  * placed by a script, or sized by a `calc()` that has to name a number. So the
- * number is worked out here and published as `--vp-layout-current-columns`,
- * which is the property both of those layouts already read.
+ * number is settled here and published as `--vp-layout-current-columns`, which
+ * is the property both of those layouts already read.
+ *
+ * Where it comes from depends on the mode. Auto mode measures the container.
+ * A named count is narrowed by the stylesheet instead, and is only read back.
  */
 
 const AUTO_CLASS = 'vp-layout-auto-columns';
@@ -63,33 +66,47 @@ export function getAutoColumns(list) {
 }
 
 /**
- * Keep the column count of a list in step with its width.
+ * The count the stylesheet settled on, for a list that names its columns.
  *
- * A no-op for a list that names its columns, so a caller does not have to ask
- * which mode the layout is in.
+ * @param {HTMLElement} list - item template list.
+ * @return {number} column count, at least one.
+ */
+function getNamedColumns(list) {
+	const view = list.ownerDocument.defaultView || window;
+	const styles = view.getComputedStyle(list);
+
+	return Math.max(
+		1,
+		parseInt(styles.getPropertyValue(COLUMNS_PROPERTY), 10) || 1
+	);
+}
+
+/**
+ * Keep the column count of a list, and whoever draws from it, up to date.
  *
  * @param {HTMLElement} list     - item template list.
  * @param {Function}    onChange - called when the count changed.
  * @return {Function} teardown.
  */
-export function syncAutoColumns(list, onChange = () => {}) {
-	if (!list.classList.contains(AUTO_CLASS)) {
-		return () => {};
-	}
-
+export function syncColumns(list, onChange = () => {}) {
 	const view = list.ownerDocument.defaultView || window;
+	const isAuto = list.classList.contains(AUTO_CLASS);
 
 	let current = 0;
 
 	const update = () => {
-		const columns = getAutoColumns(list);
+		const columns = isAuto ? getAutoColumns(list) : getNamedColumns(list);
 
 		if (columns === current) {
 			return;
 		}
 
 		current = columns;
-		list.style.setProperty(COLUMNS_PROPERTY, String(columns));
+
+		if (isAuto) {
+			list.style.setProperty(COLUMNS_PROPERTY, String(columns));
+		}
+
 		onChange(columns);
 	};
 
@@ -99,8 +116,18 @@ export function syncAutoColumns(list, onChange = () => {}) {
 
 	observer.observe(list);
 
+	// A named count is stepped down at the viewport's own breakpoints, and a
+	// gallery inside a container of a fixed width crosses one without ever
+	// changing size itself - so the viewport is watched as well.
+	if (!isAuto) {
+		observer.observe(list.ownerDocument.documentElement);
+	}
+
 	return () => {
 		observer.disconnect();
-		list.style.removeProperty(COLUMNS_PROPERTY);
+
+		if (isAuto) {
+			list.style.removeProperty(COLUMNS_PROPERTY);
+		}
 	};
 }

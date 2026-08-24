@@ -89,31 +89,26 @@ export function parseTiles(tiles) {
  * Columns a pattern asks for.
  *
  * @param {string} tiles - tiles notation.
- * @return {{columns: number, widest: number}} columns of the pattern, and the
- *                                             widest tile in it.
+ * @return {number} columns of the pattern.
  */
 export function getTilesColumns(tiles) {
-	const parsed = parseTiles(tiles);
-
-	return {
-		columns: parsed.columns,
-		// A narrower viewport never drops below the widest tile of the pattern:
-		// a tile spanning two columns of a single column grid would open an
-		// implicit second column and take the layout with it.
-		widest: Math.max(...parsed.tiles.map((tile) => tile.width)),
-	};
+	return parseTiles(tiles).columns;
 }
 
 /**
  * Grid placement of every tile of a pattern.
+ *
+ * The width and the height stay apart, the way the parser writes them: the
+ * stylesheet clamps the width to the columns a narrowed layout has left, and
+ * the height is a multiple of that width.
  *
  * @param {string} tiles - tiles notation.
  * @return {Array} style objects, one per tile of the pattern.
  */
 export function getTileStyles(tiles) {
 	return parseTiles(tiles).tiles.map((tile) => ({
-		gridColumn: `span ${tile.width}`,
 		gridRow: `span ${tile.rowSpan}`,
-		'--vp-tile-rows': tile.height * tile.width,
+		'--vp-tile-columns': tile.width,
+		'--vp-tile-height': tile.height,
 	}));
 }

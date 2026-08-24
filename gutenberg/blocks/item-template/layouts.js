@@ -23,7 +23,7 @@
 /**
  * Internal dependencies
  */
-import { syncAutoColumns } from './auto-columns';
+import { syncColumns } from './auto-columns';
 
 const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
 const IMAGE_SELECTOR = '.wp-block-visual-portfolio-item-image';
@@ -305,7 +305,7 @@ export function startLayout(list, layout) {
 
 	// A layout whose columns follow the container needs the count before it can
 	// place anything, and it has to be placed again when the count changes.
-	const stopColumns = syncAutoColumns(list, update);
+	const stopColumns = syncColumns(list, update);
 
 	update();
 

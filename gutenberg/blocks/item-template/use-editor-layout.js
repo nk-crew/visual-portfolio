@@ -6,7 +6,7 @@ import { useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { syncAutoColumns } from './auto-columns';
+import { syncColumns } from './auto-columns';
 import { layoutJustified, layoutMasonry, startLayout } from './layouts';
 
 /**
@@ -54,8 +54,9 @@ export default function useEditorLayout({
 		}
 
 		// The carousel is drawn by the stylesheet, but its slide width is a
-		// `calc()` over the column count - which auto mode has to work out.
-		return syncAutoColumns(list);
+		// `calc()` over the column count, and both the container and the
+		// breakpoints can move it.
+		return syncColumns(list);
 	}, [layoutType, itemsCount, signature]);
 
 	return ref;

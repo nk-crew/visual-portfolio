@@ -9,7 +9,8 @@
  *
  * The two modes are the ones the core grid layout offers:
  *
- * - Manual: exactly `layoutColumnCount` columns, whatever the container is.
+ * - Manual: `layoutColumnCount` columns, which the stylesheet caps as the
+ *   screen narrows so a phone is never asked to show four of them.
  * - Auto: as many columns as fit, each at least `layoutMinimumColumnWidth`
  *   wide, never more than `layoutColumnCount` of them. A count of zero lifts
  *   the maximum. `layoutAutoFit` decides whether a row that cannot be filled

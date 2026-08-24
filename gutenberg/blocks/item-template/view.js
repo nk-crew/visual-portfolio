@@ -1,6 +1,6 @@
 import { getElement, store } from '@wordpress/interactivity';
 
-import { syncAutoColumns } from './auto-columns';
+import { syncColumns } from './auto-columns';
 import { getJustifiedOptions, layoutJustified, startLayout } from './layouts';
 
 /**
@@ -456,7 +456,7 @@ function initCarousel(list) {
 
 	// The slide width is a `calc()` over the column count, which auto mode has
 	// to work out from the container.
-	const stopColumns = syncAutoColumns(list, () => syncNav(list));
+	const stopColumns = syncColumns(list, () => syncNav(list));
 
 	syncDots(list);
 	syncNav(list);

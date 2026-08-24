@@ -430,10 +430,7 @@ export default function BlockEdit({
 		[layoutType, layoutTiles]
 	);
 	const tilesColumns = useMemo(
-		() =>
-			'tiles' === layoutType
-				? getTilesColumns(layoutTiles)
-				: { columns: 0, widest: 1 },
+		() => ('tiles' === layoutType ? getTilesColumns(layoutTiles) : 0),
 		[layoutType, layoutTiles]
 	);
 	// Tiles carry their columns in the notation, so that is where the layout
@@ -444,8 +441,7 @@ export default function BlockEdit({
 				{
 					layoutType,
 					layoutColumnsMode,
-					layoutColumnCount:
-						tilesColumns.columns || layoutColumnCount,
+					layoutColumnCount: tilesColumns || layoutColumnCount,
 					layoutMinimumColumnWidth,
 					layoutAutoFit,
 				},
@@ -459,7 +455,7 @@ export default function BlockEdit({
 			layoutColumnCount,
 			layoutMinimumColumnWidth,
 			layoutAutoFit,
-			tilesColumns.columns,
+			tilesColumns,
 			attributes.style?.spacing?.blockGap,
 		]
 	);
