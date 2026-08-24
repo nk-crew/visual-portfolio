@@ -40,11 +40,6 @@
 		"focalPoint": {
 			"type": "object"
 		},
-		"contentPlacement": {
-			"type": "string",
-			"default": "over",
-			"enum": ["over", "below"]
-		},
 		"contentPosition": {
 			"type": "string",
 			"default": "center"

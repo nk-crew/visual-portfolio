@@ -289,7 +289,6 @@ class Visual_Portfolio_Block_Item_Cover {
 	 * Attributes of the cover itself.
 	 *
 	 * @param array  $attributes   - block attributes.
-	 * @param string $placement    - resolved content placement.
 	 * @param string $effect       - resolved effect.
 	 * @param string $show_content - resolved reveal mode.
 	 * @param string $aspect_ratio - resolved aspect ratio, already sanitized.
@@ -297,9 +296,8 @@ class Visual_Portfolio_Block_Item_Cover {
 	 *
 	 * @return array
 	 */
-	private function get_wrapper_attributes( $attributes, $placement, $effect, $show_content, $aspect_ratio, $has_link ) {
+	private function get_wrapper_attributes( $attributes, $effect, $show_content, $aspect_ratio, $has_link ) {
 		$classes = array(
-			'vp-content-placement-' . $placement,
 			'vp-effect-' . $effect,
 			'vp-show-content-' . $show_content,
 		);
@@ -308,18 +306,14 @@ class Visual_Portfolio_Block_Item_Cover {
 			$classes[] = 'vp-has-link';
 		}
 
-		// Content under the image sits in the flow, so there is no box to place
-		// it in and nothing for the position matrix to say.
-		if ( 'over' === $placement ) {
-			$position = $attributes['contentPosition'] ?? 'center';
+		$position = $attributes['contentPosition'] ?? 'center';
 
-			if ( isset( self::$content_positions[ $position ] ) ) {
-				$classes[] = self::$content_positions[ $position ];
-			}
+		if ( isset( self::$content_positions[ $position ] ) ) {
+			$classes[] = self::$content_positions[ $position ];
+		}
 
-			if ( ! empty( $attributes['verticalAlignment'] ) ) {
-				$classes[] = 'is-vertically-aligned-' . preg_replace( '/[^a-z]/', '', (string) $attributes['verticalAlignment'] );
-			}
+		if ( ! empty( $attributes['verticalAlignment'] ) ) {
+			$classes[] = 'is-vertically-aligned-' . preg_replace( '/[^a-z]/', '', (string) $attributes['verticalAlignment'] );
 		}
 
 		$styles = array();
@@ -332,9 +326,11 @@ class Visual_Portfolio_Block_Item_Cover {
 			$styles[] = 'min-height:' . $min_height;
 		}
 
-		// With the content below, the ratio belongs to the picture rather than
-		// to the card - it is carried by the media box instead.
-		if ( '' !== $aspect_ratio && 'over' === $placement ) {
+		// The ratio is published as a variable beside the property it sets, so a
+		// stylesheet that lays the card out some other way can hand it to
+		// another box.
+		if ( '' !== $aspect_ratio ) {
+			$styles[] = '--vp-cover-aspect-ratio:' . $aspect_ratio;
 			$styles[] = 'aspect-ratio:' . $aspect_ratio;
 		}
 
@@ -404,22 +400,11 @@ class Visual_Portfolio_Block_Item_Cover {
 	public function block_render( $attributes, $content, $block ) {
 		$context = $block->context;
 
-		$placement = ( $attributes['contentPlacement'] ?? 'over' ) === 'below' ? 'below' : 'over';
-
 		$effect = $attributes['effect'] ?? 'fade';
 		$effect = in_array( $effect, array( 'none', 'fade', 'fly', 'emerge' ), true ) ? $effect : 'fade';
 
 		$show_content = $attributes['showContent'] ?? 'hover';
 		$show_content = in_array( $show_content, array( 'always', 'hover', 'never' ), true ) ? $show_content : 'hover';
-
-		// Content under the image is content that is always there: nothing is
-		// revealed, so there is no effect to play and no state to reveal it in.
-		// `never` still means "do not render it", which is a placement-agnostic
-		// answer, so only the hover mode is rewritten.
-		if ( 'below' === $placement ) {
-			$effect       = 'none';
-			$show_content = 'never' === $show_content ? 'never' : 'always';
-		}
 
 		if ( 'fly' === $effect ) {
 			wp_enqueue_script_module( self::VIEW_MODULE );
@@ -459,12 +444,11 @@ class Visual_Portfolio_Block_Item_Cover {
 			true
 		);
 
-		// The picture and everything painted on it are one box, whichever side of
-		// the content it ends up on: with the content below, that box is what the
-		// aspect ratio has to shape, and the overlays must not reach the text.
+		// The picture and everything painted on it are one box, so a stylesheet
+		// that moves the content out from under the overlays can shape and stop
+		// them both at once.
 		$output = sprintf(
-			'<div class="wp-block-visual-portfolio-item-cover__media"%1$s>%2$s</div>',
-			'below' === $placement && '' !== $aspect_ratio ? ' style="aspect-ratio:' . esc_attr( $aspect_ratio ) . '"' : '',
+			'<div class="wp-block-visual-portfolio-item-cover__media">%s</div>',
 			$media
 		);
 
@@ -485,7 +469,7 @@ class Visual_Portfolio_Block_Item_Cover {
 
 		return sprintf(
 			'<div %1$s>%2$s</div>',
-			get_block_wrapper_attributes( $this->get_wrapper_attributes( $attributes, $placement, $effect, $show_content, $aspect_ratio, '' !== $link ) ),
+			get_block_wrapper_attributes( $this->get_wrapper_attributes( $attributes, $effect, $show_content, $aspect_ratio, '' !== $link ) ),
 			$output
 		);
 	}

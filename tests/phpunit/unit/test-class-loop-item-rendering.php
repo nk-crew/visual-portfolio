@@ -169,7 +169,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A cover puts its content over the picture by default.
+	 * A cover puts its content over the picture.
 	 *
 	 * @return void
 	 */
@@ -178,55 +178,15 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			'<!-- wp:visual-portfolio/item-cover --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->'
 		);
 
-		$this->assertStringContainsString( 'vp-content-placement-over', $output );
 		$this->assertStringContainsString( 'vp-effect-fade', $output );
 		$this->assertStringContainsString( 'vp-show-content-hover', $output );
 		$this->assertStringContainsString( 'is-position-center-center', $output );
 
 		// The ratio shapes the card, and the picture fills it.
 		$this->assertStringContainsString( 'aspect-ratio:1', $output );
-	}
 
-	/**
-	 * Content below the picture is content that is simply there.
-	 *
-	 * @return void
-	 */
-	public function test_cover_places_content_below_the_image() {
-		$output = $this->render_loop(
-			'<!-- wp:visual-portfolio/item-cover {"contentPlacement":"below","effect":"fly","contentPosition":"bottom left","verticalAlignment":"bottom"} --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->'
-		);
-
-		$this->assertStringContainsString( 'vp-content-placement-below', $output );
-
-		// Nothing is revealed, so there is no effect and no reveal state.
-		$this->assertStringContainsString( 'vp-effect-none', $output );
-		$this->assertStringContainsString( 'vp-show-content-always', $output );
-
-		// And no box to place the content in.
-		$this->assertStringNotContainsString( 'is-position-bottom-left', $output );
-		$this->assertStringNotContainsString( 'is-vertically-aligned-bottom', $output );
-
-		// The content is still rendered, under the picture.
-		$this->assertStringContainsString( 'wp-block-visual-portfolio-item-cover__inner', $output );
-
-		// The fly module has nothing to move, so its directives are not there.
-		$this->assertStringNotContainsString( 'data-vp-fly', $output );
-	}
-
-	/**
-	 * With the content below, the ratio shapes the picture instead of the card.
-	 *
-	 * @return void
-	 */
-	public function test_cover_ratio_moves_to_the_media_box() {
-		$output = $this->render_loop(
-			'<!-- wp:visual-portfolio/item-cover {"contentPlacement":"below","aspectRatio":"4/3"} --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->'
-		);
-
-		$this->assertStringContainsString(
-			'<div class="wp-block-visual-portfolio-item-cover__media" style="aspect-ratio:4/3">',
-			$output
-		);
+		// It is published as a variable too, so a stylesheet can hand it to the
+		// media box when the card is laid out some other way.
+		$this->assertStringContainsString( '--vp-cover-aspect-ratio:1', $output );
 	}
 }

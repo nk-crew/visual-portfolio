@@ -1,11 +1,8 @@
 /**
  * Gallery Item Cover: where the content ends up.
  *
- * `contentPlacement` is the difference between a card whose text is painted on
- * the picture and one whose text is under it, and the only proof of either is
- * geometry - no class says where a box landed. The third case is the one that
- * would ship broken without a test: a picture whose proportions nobody declared
- * still has to have a height of its own.
+ * A cover paints its text on the picture, and the only proof of that is
+ * geometry - no class says where a box landed.
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
@@ -140,39 +137,5 @@ test.describe('Gallery Item Cover placement', () => {
 
 		// A ratio of one, by default.
 		expect(boxes.cover.height).toBe(boxes.cover.width);
-	});
-
-	test('below the image, the content follows the picture', async ({
-		page,
-		requestUtils,
-	}) => {
-		const boxes = await measure(requestUtils, page, 'Cover - below', {
-			contentPlacement: 'below',
-		});
-
-		// Nothing overlaps: the content starts where the picture ends.
-		expect(boxes.inner.top).toBeGreaterThanOrEqual(boxes.media.bottom);
-
-		// The ratio shapes the picture now, not the card.
-		expect(boxes.media.height).toBe(boxes.media.width);
-		expect(boxes.cover.height).toBeGreaterThan(boxes.media.height);
-
-		// And the picture fills the box that was made for it.
-		expect(boxes.image.height).toBe(boxes.media.height);
-	});
-
-	test('below the image with no ratio, the picture keeps its own', async ({
-		page,
-		requestUtils,
-	}) => {
-		const boxes = await measure(requestUtils, page, 'Cover - below free', {
-			contentPlacement: 'below',
-			aspectRatio: '',
-		});
-
-		// The one thing that must never happen: a picture with no height.
-		expect(boxes.image.height).toBeGreaterThan(0);
-		expect(boxes.media.height).toBe(boxes.image.height);
-		expect(boxes.inner.top).toBeGreaterThanOrEqual(boxes.media.bottom);
 	});
 });

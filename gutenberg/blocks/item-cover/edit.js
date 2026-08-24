@@ -61,11 +61,6 @@ const EFFECT_OPTIONS = [
 	{ label: __('Emerge', 'visual-portfolio'), value: 'emerge' },
 ];
 
-const CONTENT_PLACEMENT_OPTIONS = [
-	{ label: __('Over image', 'visual-portfolio'), value: 'over' },
-	{ label: __('Below image', 'visual-portfolio'), value: 'below' },
-];
-
 const SHOW_CONTENT_OPTIONS = [
 	{ label: __('Always', 'visual-portfolio'), value: 'always' },
 	{ label: __('On hover', 'visual-portfolio'), value: 'hover' },
@@ -96,7 +91,6 @@ const CONTENT_POSITION_CLASSES = {
 const DEFAULT_ATTRIBUTES = {
 	sizeSlug: 'large',
 	focalPoint: undefined,
-	contentPlacement: 'over',
 	contentPosition: 'center',
 	verticalAlignment: undefined,
 	effect: 'fade',
@@ -120,7 +114,6 @@ export default function ItemCoverEdit({
 		minHeight,
 		backgroundSize,
 		focalPoint,
-		contentPlacement,
 		contentPosition,
 		verticalAlignment,
 		effect,
@@ -153,12 +146,6 @@ export default function ItemCoverEdit({
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	useImageSizeOnInsert(clientId, layoutColumns, setAttributes);
-
-	// Content under the picture is content that is always there: nothing is
-	// revealed, so the effect, the reveal mode and the position matrix have
-	// nothing left to say and are taken out of the way. The render callback
-	// resolves the very same way.
-	const isBelow = contentPlacement === 'below';
 
 	// The render callback reads the proportions of the image off the tag it
 	// prints; here they arrive with the image itself.
@@ -218,29 +205,22 @@ export default function ItemCoverEdit({
 
 	const resolvedRatio = aspectRatio || naturalRatio || undefined;
 
-	// `never` still means "do not render it", which holds wherever the content
-	// sits, so only the hover mode is rewritten.
-	let resolvedShowContent = showContent;
-
-	if (isBelow) {
-		resolvedShowContent = showContent === 'never' ? 'never' : 'always';
-	}
-
 	const blockProps = useBlockProps({
 		className: classnames(
-			`vp-content-placement-${isBelow ? 'below' : 'over'}`,
-			`vp-effect-${isBelow ? 'none' : effect}`,
-			`vp-show-content-${resolvedShowContent}`,
-			!isBelow && CONTENT_POSITION_CLASSES[contentPosition],
+			`vp-effect-${effect}`,
+			`vp-show-content-${showContent}`,
+			CONTENT_POSITION_CLASSES[contentPosition],
 			{
 				[`is-vertically-aligned-${verticalAlignment}`]:
-					!isBelow && verticalAlignment,
+					verticalAlignment,
 			}
 		),
 		style: {
-			// With the content below, the ratio shapes the picture rather than
-			// the card, so it travels to the media box instead.
-			aspectRatio: isBelow ? undefined : resolvedRatio,
+			// The ratio is published as a variable beside the property it sets,
+			// so a stylesheet that lays the card out some other way can hand it
+			// to another box.
+			'--vp-cover-aspect-ratio': resolvedRatio,
+			aspectRatio: resolvedRatio,
 			minHeight: minHeight || undefined,
 		},
 	});
@@ -266,26 +246,21 @@ export default function ItemCoverEdit({
 		<>
 			{blockEditingMode === 'default' && (
 				<>
-					{!isBelow && (
-						<BlockControls group="block">
-							<BlockAlignmentMatrixControl
-								label={__(
-									'Content position',
-									'visual-portfolio'
-								)}
-								value={contentPosition}
-								onChange={(value) =>
-									setAttributes({ contentPosition: value })
-								}
-							/>
-							<BlockVerticalAlignmentControl
-								value={verticalAlignment}
-								onChange={(value) =>
-									setAttributes({ verticalAlignment: value })
-								}
-							/>
-						</BlockControls>
-					)}
+					<BlockControls group="block">
+						<BlockAlignmentMatrixControl
+							label={__('Content position', 'visual-portfolio')}
+							value={contentPosition}
+							onChange={(value) =>
+								setAttributes({ contentPosition: value })
+							}
+						/>
+						<BlockVerticalAlignmentControl
+							value={verticalAlignment}
+							onChange={(value) =>
+								setAttributes({ verticalAlignment: value })
+							}
+						/>
+					</BlockControls>
 					<InspectorControls group="color">
 						{colorGradientSettings.hasColorsOrGradients && (
 							<ColorGradientSettingsDropdown
@@ -478,91 +453,52 @@ export default function ItemCoverEdit({
 							resetAll={() => setAttributes(DEFAULT_ATTRIBUTES)}
 						>
 							<ToolsPanelItem
-								label={__(
-									'Content placement',
-									'visual-portfolio'
-								)}
+								label={__('Effect', 'visual-portfolio')}
 								isShownByDefault
-								hasValue={() => contentPlacement !== 'over'}
+								hasValue={() => effect !== 'fade'}
 								onDeselect={() =>
-									setAttributes({ contentPlacement: 'over' })
+									setAttributes({ effect: 'fade' })
+								}
+								panelId={clientId}
+							>
+								<SelectControl
+									label={__('Effect', 'visual-portfolio')}
+									help={__(
+										'How the content appears above the image. Fly follows the side the pointer came in from.',
+										'visual-portfolio'
+									)}
+									value={effect}
+									options={EFFECT_OPTIONS}
+									onChange={(value) =>
+										setAttributes({ effect: value })
+									}
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={__('Show content', 'visual-portfolio')}
+								isShownByDefault
+								hasValue={() => showContent !== 'hover'}
+								onDeselect={() =>
+									setAttributes({ showContent: 'hover' })
 								}
 								panelId={clientId}
 							>
 								<SelectControl
 									label={__(
-										'Content placement',
-										'visual-portfolio'
-									)}
-									help={__(
-										'Below the image the content is always visible, which is what a touch screen wants.',
-										'visual-portfolio'
-									)}
-									value={contentPlacement}
-									options={CONTENT_PLACEMENT_OPTIONS}
-									onChange={(value) =>
-										setAttributes({
-											contentPlacement: value,
-										})
-									}
-								/>
-							</ToolsPanelItem>
-							{!isBelow && (
-								<ToolsPanelItem
-									label={__('Effect', 'visual-portfolio')}
-									isShownByDefault
-									hasValue={() => effect !== 'fade'}
-									onDeselect={() =>
-										setAttributes({ effect: 'fade' })
-									}
-									panelId={clientId}
-								>
-									<SelectControl
-										label={__('Effect', 'visual-portfolio')}
-										help={__(
-											'How the content appears above the image. Fly follows the side the pointer came in from.',
-											'visual-portfolio'
-										)}
-										value={effect}
-										options={EFFECT_OPTIONS}
-										onChange={(value) =>
-											setAttributes({ effect: value })
-										}
-									/>
-								</ToolsPanelItem>
-							)}
-							{!isBelow && (
-								<ToolsPanelItem
-									label={__(
 										'Show content',
 										'visual-portfolio'
 									)}
-									isShownByDefault
-									hasValue={() => showContent !== 'hover'}
-									onDeselect={() =>
-										setAttributes({ showContent: 'hover' })
+									help={__(
+										'Touch screens always show the content, whatever this says.',
+										'visual-portfolio'
+									)}
+									value={showContent}
+									options={SHOW_CONTENT_OPTIONS}
+									onChange={(value) =>
+										setAttributes({ showContent: value })
 									}
-									panelId={clientId}
-								>
-									<SelectControl
-										label={__(
-											'Show content',
-											'visual-portfolio'
-										)}
-										help={__(
-											'Touch screens always show the content, whatever this says.',
-											'visual-portfolio'
-										)}
-										value={showContent}
-										options={SHOW_CONTENT_OPTIONS}
-										onChange={(value) =>
-											setAttributes({
-												showContent: value,
-											})
-										}
-									/>
-								</ToolsPanelItem>
-							)}
+								/>
+							</ToolsPanelItem>
 							<ToolsPanelItem
 								label={__('Image size', 'visual-portfolio')}
 								isShownByDefault
@@ -691,12 +627,7 @@ export default function ItemCoverEdit({
 				</>
 			)}
 			<div {...blockProps}>
-				<div
-					className="wp-block-visual-portfolio-item-cover__media"
-					style={{
-						aspectRatio: isBelow ? resolvedRatio : undefined,
-					}}
-				>
+				<div className="wp-block-visual-portfolio-item-cover__media">
 					{imageUrl ? (
 						<img
 							className="wp-block-visual-portfolio-item-cover__image-background"

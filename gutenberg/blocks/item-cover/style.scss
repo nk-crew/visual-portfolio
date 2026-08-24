@@ -241,37 +241,6 @@
 			pointer-events: auto;
 		}
 	}
-
-	// Content under the picture instead of on top of it. The cover becomes an
-	// ordinary column - the picture keeps the ratio, the content follows it -
-	// and nothing is ever hidden, which is the same answer the touch rules below
-	// reach for and the only one that also holds for a pointer.
-	//
-	// The render callback settles the rest: no reveal state, no effect and no
-	// position matrix, because there is no box left to place the content in.
-	&.vp-content-placement-below {
-		align-items: stretch;
-		justify-content: flex-start;
-
-		// Padding of our own only made sense around overlaid content. A padding
-		// the user set arrives as an inline style and still wins over this.
-		padding: 0;
-		row-gap: 0.75em;
-
-		> .wp-block-visual-portfolio-item-cover__media {
-			position: relative;
-			inset: auto;
-
-			// Height comes from the ratio on the media box, and when there is
-			// none - a remote image of unknown size - a percentage against an
-			// auto height is auto, so the picture keeps its own proportions.
-			> .wp-block-visual-portfolio-item-cover__image-background {
-				position: relative;
-				inset: auto;
-				height: 100%;
-			}
-		}
-	}
 }
 
 // Hiding the content behind a pointer only makes sense where there is one. On a
