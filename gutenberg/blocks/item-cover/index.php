@@ -91,7 +91,8 @@ class Visual_Portfolio_Block_Item_Cover {
 	 * @return string
 	 */
 	private function get_image( $attributes, $context ) {
-		$scale = ( $attributes['backgroundSize'] ?? 'cover' ) === 'contain' ? 'contain' : 'cover';
+		$scale = $attributes['backgroundSize'] ?? 'cover';
+		$scale = in_array( $scale, array( 'cover', 'contain', 'fill' ), true ) ? $scale : 'cover';
 
 		// An explicit focal point of this block wins over the one stored with the
 		// image: it is the setting the user just dragged, looking at this cover.

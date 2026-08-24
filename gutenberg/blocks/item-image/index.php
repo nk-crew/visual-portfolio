@@ -38,8 +38,9 @@ class Visual_Portfolio_Block_Item_Image {
 	/**
 	 * Inline styles of the image itself.
 	 *
-	 * Cropping happens on the `img`, not on the figure: the aspect ratio is the
-	 * box, `object-fit` and the focal point decide what of the image survives it.
+	 * Cropping happens on the `img`, not on the figure: the aspect ratio, or a
+	 * width and a height, are the box, and `object-fit` with the focal point
+	 * decide what of the image survives it.
 	 *
 	 * @param array $attributes  - block attributes.
 	 * @param mixed $focal_point - focal point of the item, `array( 'x', 'y' )` or empty.
@@ -48,19 +49,36 @@ class Visual_Portfolio_Block_Item_Image {
 	 */
 	private function get_image_styles( $attributes, $focal_point ) {
 		$aspect_ratio = preg_replace( '#[^0-9./ ]#', '', (string) ( $attributes['aspectRatio'] ?? '' ) );
+		$width        = empty( $attributes['width'] ) ? '' : safecss_filter_attr( 'width:' . $attributes['width'] );
+		$height       = empty( $attributes['height'] ) ? '' : safecss_filter_attr( 'height:' . $attributes['height'] );
 
-		if ( '' === $aspect_ratio ) {
+		if ( '' === $aspect_ratio && '' === $width && '' === $height ) {
 			return '';
 		}
 
 		$scale  = $attributes['scale'] ?? 'cover';
 		$scale  = in_array( $scale, array( 'cover', 'contain', 'fill' ), true ) ? $scale : 'cover';
-		$styles = array(
-			'aspect-ratio:' . $aspect_ratio,
-			'width:100%',
-			'height:100%',
-			'object-fit:' . $scale,
-		);
+		$styles = array();
+
+		// The order of `wp-includes/blocks/post-featured-image.php`: a ratio
+		// takes the whole width, and a width or a height of its own overrides
+		// what the ratio said - the later declaration is the one that counts.
+		if ( '' !== $aspect_ratio ) {
+			$styles[] = 'aspect-ratio:' . $aspect_ratio;
+			$styles[] = 'width:100%';
+		}
+
+		if ( '' !== $height ) {
+			$styles[] = $height;
+		} elseif ( '' !== $width ) {
+			$styles[] = 'height:auto';
+		}
+
+		if ( '' !== $width ) {
+			$styles[] = $width;
+		}
+
+		$styles[] = 'object-fit:' . $scale;
 
 		if ( isset( $focal_point['x'], $focal_point['y'] ) ) {
 			$styles[] = sprintf(

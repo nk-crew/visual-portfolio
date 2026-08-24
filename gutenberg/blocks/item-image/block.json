@@ -45,6 +45,12 @@
 		"aspectRatio": {
 			"type": "string"
 		},
+		"width": {
+			"type": "string"
+		},
+		"height": {
+			"type": "string"
+		},
 		"scale": {
 			"type": "string",
 			"default": "cover"

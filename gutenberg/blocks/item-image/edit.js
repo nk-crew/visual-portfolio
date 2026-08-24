@@ -27,7 +27,7 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
-import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
+import { DimensionsTool } from '../../utils/dimensions-tools';
 import {
 	IMAGE_SIZE_OPTIONS,
 	useImageSizeOnInsert,
@@ -72,6 +72,8 @@ export default function ItemImageEdit({
 		linkTarget,
 		sizeSlug,
 		aspectRatio,
+		width,
+		height,
 		scale,
 		overlayColor,
 		customOverlayColor,
@@ -114,17 +116,18 @@ export default function ItemImageEdit({
 			: customOverlayColor;
 	}
 
-	const imageStyles = aspectRatio
-		? {
-				aspectRatio,
-				width: '100%',
-				height: '100%',
-				objectFit: scale,
-				objectPosition: itemFocalPoint
-					? `${itemFocalPoint.x * 100}% ${itemFocalPoint.y * 100}%`
-					: undefined,
-			}
-		: undefined;
+	// The rules of the core Featured Image block: a ratio owns the width, an
+	// explicit width or height takes it back, and the scale only means
+	// something once one of them has given the picture a box.
+	const imageStyles = {
+		aspectRatio: aspectRatio || undefined,
+		height: height || (width ? 'auto' : undefined),
+		width: width || (aspectRatio ? '100%' : undefined),
+		objectFit: aspectRatio || height ? scale : undefined,
+		objectPosition: itemFocalPoint
+			? `${itemFocalPoint.x * 100}% ${itemFocalPoint.y * 100}%`
+			: undefined,
+	};
 
 	const imageElement = (
 		<>
@@ -265,26 +268,11 @@ export default function ItemImageEdit({
 						</ToolsPanelItem>
 					</InspectorControls>
 					<InspectorControls group="dimensions">
-						<AspectRatioTool
+						<DimensionsTool
 							panelId={clientId}
-							value={aspectRatio}
-							onChange={(value) =>
-								setAttributes({ aspectRatio: value })
-							}
-							resetAllFilter={() => ({ aspectRatio: '' })}
+							value={{ aspectRatio, width, height, scale }}
+							onChange={setAttributes}
 						/>
-						{/* Without a ratio the image keeps its own proportions,
-						    and there is no box left for the scale to fill. */}
-						{!!aspectRatio && (
-							<ScaleTool
-								panelId={clientId}
-								value={scale}
-								onChange={(value) =>
-									setAttributes({ scale: value })
-								}
-								resetAllFilter={() => ({ scale: 'cover' })}
-							/>
-						)}
 					</InspectorControls>
 					<InspectorControls>
 						<ToolsPanel
