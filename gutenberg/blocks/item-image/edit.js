@@ -143,7 +143,21 @@ export default function ItemImageEdit({
 				<div
 					className="wp-block-visual-portfolio-item-image__placeholder"
 					style={imageStyles}
-				/>
+				>
+					<svg
+						className="wp-block-visual-portfolio-item-image__placeholder-illustration"
+						viewBox="0 0 60 60"
+						preserveAspectRatio="none"
+						xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true"
+						focusable="false"
+					>
+						<path
+							vectorEffect="non-scaling-stroke"
+							d="M60 60 0 0"
+						/>
+					</svg>
+				</div>
 			)}
 			{hasOverlay && (
 				<span
