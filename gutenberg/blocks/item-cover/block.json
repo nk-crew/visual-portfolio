@@ -137,8 +137,10 @@
 		"spacing": {
 			"padding": true,
 			"margin": true,
+			"blockGap": true,
 			"__experimentalDefaultControls": {
-				"padding": true
+				"padding": true,
+				"blockGap": true
 			}
 		},
 		"filter": {

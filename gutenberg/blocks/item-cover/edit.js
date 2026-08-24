@@ -6,6 +6,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentControl,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalGetGapCSSValue as getGapCSSValue,
 	InspectorControls,
 	useBlockEditingMode,
 	useBlockProps,
@@ -137,6 +138,7 @@ export default function ItemCoverEdit({
 		clickAction,
 		linkTarget,
 		rel,
+		style,
 	} = attributes;
 
 	const {
@@ -245,8 +247,18 @@ export default function ItemCoverEdit({
 
 	// The inner blocks stay editable whatever `showContent` says - the render
 	// callback is the one that leaves them out.
+	//
+	// Block spacing is written here rather than left to the block supports: the
+	// value only reaches CSS through the layout support, which core's Cover has
+	// and this block does not. The gap belongs to the box that holds the blocks,
+	// which is this one and never the card around it.
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: 'wp-block-visual-portfolio-item-cover__inner' },
+		{
+			className: 'wp-block-visual-portfolio-item-cover__inner',
+			style: {
+				gap: getGapCSSValue(style?.spacing?.blockGap) || undefined,
+			},
+		},
 		{ template: TEMPLATE, allowedBlocks: ALLOWED_BLOCKS }
 	);
 

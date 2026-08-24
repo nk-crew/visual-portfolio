@@ -365,6 +365,34 @@ class Visual_Portfolio_Block_Item_Cover {
 	}
 
 	/**
+	 * The gap between the blocks the cover holds.
+	 *
+	 * Block spacing reaches CSS through the layout support, which core's Cover
+	 * block has and this one does not: the gap belongs to the box holding the
+	 * blocks, never to the card around it. The conversion is the one layout
+	 * performs, down to the characters a length may not be made of.
+	 *
+	 * @param array $attributes - block attributes.
+	 *
+	 * @return string CSS length, or an empty string when there is none.
+	 */
+	private function get_block_gap( $attributes ) {
+		$gap = $attributes['style']['spacing']['blockGap'] ?? '';
+
+		if ( ! is_string( $gap ) || '' === $gap ) {
+			return '';
+		}
+
+		if ( str_contains( $gap, 'var:preset|spacing|' ) ) {
+			$slug = preg_replace( '/[^a-z0-9-]/', '', strtolower( substr( $gap, strrpos( $gap, '|' ) + 1 ) ) );
+
+			return '' === $slug ? '' : 'var(--wp--preset--spacing--' . $slug . ')';
+		}
+
+		return preg_match( '%[\\\\(&=#<>]|-\s|/\*%', $gap ) ? '' : $gap;
+	}
+
+	/**
 	 * Block output
 	 *
 	 * @param array    $attributes - block attributes.
@@ -443,7 +471,13 @@ class Visual_Portfolio_Block_Item_Cover {
 		// Content nobody is ever shown is content nothing has to announce either,
 		// so it is left out rather than hidden.
 		if ( 'never' !== $show_content ) {
-			$output .= sprintf( '<div class="wp-block-visual-portfolio-item-cover__inner">%s</div>', $content );
+			$gap = $this->get_block_gap( $attributes );
+
+			$output .= sprintf(
+				'<div class="wp-block-visual-portfolio-item-cover__inner"%1$s>%2$s</div>',
+				'' === $gap ? '' : ' style="gap:' . esc_attr( $gap ) . '"',
+				$content
+			);
 		}
 
 		$link    = $this->get_trigger( $attributes, $context );
