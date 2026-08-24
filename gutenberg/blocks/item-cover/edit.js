@@ -24,6 +24,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 /**
  * External dependencies
@@ -204,6 +205,18 @@ export default function ItemCoverEdit({
 	}
 
 	const resolvedRatio = aspectRatio || naturalRatio || undefined;
+
+	// Anything else this install lets a cover be set to. A `ToolsPanelItem`
+	// returned here is an ordinary child of the Settings panel, so it registers
+	// with it the way the built-in ones do. Pro moves the content under the
+	// picture on a narrow screen through this, and resets it from its own menu
+	// entry - the panel cannot know what to write back for someone else's
+	// option.
+	const extraSettings = applyFilters('vpf.itemCoverSettingsItems', [], {
+		attributes,
+		setAttributes,
+		clientId,
+	});
 
 	const blockProps = useBlockProps({
 		className: classnames(
@@ -622,6 +635,14 @@ export default function ItemCoverEdit({
 									</ToolsPanelItem>
 								</>
 							)}
+							{extraSettings.map(({ name, Item }) => (
+								<Item
+									key={name}
+									attributes={attributes}
+									setAttributes={setAttributes}
+									clientId={clientId}
+								/>
+							))}
 						</ToolsPanel>
 					</InspectorControls>
 				</>
