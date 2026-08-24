@@ -77,6 +77,21 @@
 	}
 }
 
+// Hit-testing, put back over the read-only copies of the item.
+//
+// A block in a preview is inert, and the boxes above it are the template and
+// the item, both switched off with the rest of the pattern. The pointer
+// therefore fell through every item but the one being edited: pressing a copy
+// selected the gallery instead of making that copy the editable one, and a
+// cover that reveals itself on hover only ever revealed the first item.
+//
+// The copy is the box that takes the pointer back. What it holds stays inert,
+// so nothing inside it can be clicked - the press is the one the copy itself
+// listens for.
+.wp-block-visual-portfolio-item-template__preview {
+	pointer-events: auto;
+}
+
 // The read-only copy of the item sits between the tile and the blocks, so the
 // height chain a tile needs runs through it as well.
 .vp-layout-tiles > .wp-block-visual-portfolio-item-template__item > .wp-block-visual-portfolio-item-template__preview {

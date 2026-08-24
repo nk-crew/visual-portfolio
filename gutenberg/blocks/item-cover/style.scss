@@ -16,6 +16,15 @@
 	&:where(:hover, :focus-within, .is-selected, .has-child-selected) {
 		@content;
 	}
+
+	// In the editor every item but the one being edited is an inert copy, and
+	// the pointer stops at the box that holds it rather than reaching the cover
+	// inside. That box standing in for the cover is what makes a gallery show
+	// the same reveal on all of its items instead of on the first one alone.
+	// The class only ever exists in the editor.
+	:where(.wp-block-visual-portfolio-item-template__preview:hover) & {
+		@content;
+	}
 }
 
 .wp-block-visual-portfolio-item-cover {
