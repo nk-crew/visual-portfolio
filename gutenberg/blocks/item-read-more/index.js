@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { arrowRight } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,7 +17,7 @@ registerLoopBlock(metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
-		src: arrowRight,
+		src: link,
 	},
 	edit,
 });

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { calendar } from '@wordpress/icons';
+import { postDate } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,7 +17,7 @@ registerLoopBlock(metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
-		src: calendar,
+		src: postDate,
 	},
 	edit,
 });

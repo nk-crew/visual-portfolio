@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { heading } from '@wordpress/icons';
+import { title } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,7 +17,7 @@ registerLoopBlock(metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
-		src: heading,
+		src: title,
 	},
 	edit,
 });
