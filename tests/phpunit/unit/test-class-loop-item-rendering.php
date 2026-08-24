@@ -182,11 +182,10 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'vp-show-content-hover', $output );
 		$this->assertStringContainsString( 'is-position-center-center', $output );
 
-		// The ratio shapes the card, and the picture fills it.
-		$this->assertStringContainsString( 'aspect-ratio:1', $output );
-
-		// It is published as a variable too, so a stylesheet can hand it to the
-		// media box when the card is laid out some other way.
+		// The ratio travels as a variable, so a stylesheet can hand it to the
+		// media box when the card is laid out some other way. Written inline as
+		// the property, it would outweigh that stylesheet.
 		$this->assertStringContainsString( '--vp-cover-aspect-ratio:1', $output );
+		$this->assertStringNotContainsString( 'style="aspect-ratio', $output );
 	}
 }

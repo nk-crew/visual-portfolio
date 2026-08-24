@@ -229,11 +229,11 @@ export default function ItemCoverEdit({
 			}
 		),
 		style: {
-			// The ratio is published as a variable beside the property it sets,
-			// so a stylesheet that lays the card out some other way can hand it
-			// to another box.
+			// The ratio travels as a variable, and the stylesheet is what turns
+			// it into the property. An inline `aspect-ratio` would outweigh
+			// every rule there is, and a stylesheet that lays the card out as a
+			// column has to be able to hand the ratio to the picture instead.
 			'--vp-cover-aspect-ratio': resolvedRatio,
-			aspectRatio: resolvedRatio,
 			minHeight: minHeight || undefined,
 		},
 	});

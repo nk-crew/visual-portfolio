@@ -33,6 +33,11 @@
 	// picking an effect can never out-specify being hovered.
 	--vp-image-hover-scale: 1;
 
+	// The render callback publishes the ratio as a variable rather than as the
+	// property: written inline, `aspect-ratio` would outweigh every rule there
+	// is, and a stylesheet that lays the card out as a column needs to hand the
+	// ratio to the picture instead.
+	aspect-ratio: var(--vp-cover-aspect-ratio, auto);
 	position: relative;
 	display: flex;
 	flex-direction: column;
