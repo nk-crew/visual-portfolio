@@ -250,7 +250,7 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(boxes[3].height).toBeCloseTo(unit, -1);
 	});
 
-	test('tiles keep the columns their notation names, on a phone as well', async ({
+	test('tiles collapse to one column on a phone', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -276,15 +276,17 @@ test.describe('Gallery Item Template layouts', () => {
 					.trim()
 			);
 
-		// The pattern is the design: a tile spanning two of three columns means
-		// nothing in a grid of one, so the notation holds the count at every
-		// width. A gallery that should reflow instead is a grid or a masonry,
-		// where the columns follow the container.
-		expect(columns).toBe('3');
+		// The notation names three columns, and this test used to hold it to
+		// three at every width. The legacy gallery stacked its tiles instead,
+		// and three columns on a phone is three thumbnails a hundred pixels
+		// wide, so the count now follows the screen like every other layout.
+		expect(columns).toBe('1');
 
 		const boxes = await getItemBoxes(page);
 
-		expect(boxes[1].width).toBeCloseTo(boxes[0].width * 2, -1);
+		// A tile wider than the grid is capped at the grid, so the one that
+		// spans two of three columns is no wider than the one that spans one.
+		expect(boxes[1].width).toBeCloseTo(boxes[0].width, -1);
 	});
 
 	test('justified lays the items into rows, and again after a load more', async ({
