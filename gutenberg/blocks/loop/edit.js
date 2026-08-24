@@ -617,7 +617,12 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 				<PatternSetup
 					attributes={attributes}
 					clientId={clientId}
-					onChoose={(blocks) => insert(applyChoices(blocks, choices))}
+					onChoose={(blocks, metadata) => {
+						// Named after the pattern and derived from by core, the
+						// same as a block core inserted from a pattern itself.
+						setAttributes({ metadata });
+						insert(applyChoices(blocks, choices));
+					}}
 					onCancel={() => setStep('pattern')}
 				/>
 			) : null}

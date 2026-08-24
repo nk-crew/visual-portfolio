@@ -61,7 +61,8 @@ function findLoop(blocks) {
  * @param {Object}   props              - component props.
  * @param {Object}   props.attributes   - loop attributes.
  * @param {string}   props.clientId     - loop client id.
- * @param {Function} props.onChoose     - called with the blocks to insert.
+ * @param {Function} props.onChoose     - called with the blocks to insert and
+ *                                        the pattern's metadata.
  * @param {Function} props.onCancel     - closes the chooser without choosing.
  * @return {Element} component.
  */
@@ -104,7 +105,9 @@ export default function PatternSetup({
 
 	// A pattern is written as a whole loop block; what is inserted is its inner
 	// blocks, so the block the user already has keeps its id, its alignment and
-	// the source they picked.
+	// the source they picked. Its `metadata` is carried over separately: core
+	// wrote it onto the root block when it parsed the pattern, and derives the
+	// whole content-only behaviour of an inserted pattern from it.
 	const previews = useMemo(() => {
 		const term = search.trim().toLowerCase();
 
@@ -151,7 +154,12 @@ export default function PatternSetup({
 				<BlockPatternsList
 					blockPatterns={previews}
 					label={__('Gallery patterns', 'visual-portfolio')}
-					onClickPattern={(pattern) => onChoose(pattern.innerBlocks)}
+					onClickPattern={(pattern) =>
+						onChoose(
+							pattern.innerBlocks,
+							pattern.blocks[0].attributes.metadata
+						)
+					}
 				/>
 			</BlockContextProvider>
 		</Modal>
