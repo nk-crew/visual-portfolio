@@ -23,12 +23,13 @@ const HOVER_OVERLAY = '.wp-block-visual-portfolio-item-cover__overlay--hover';
  *
  * @param {Array}  images     - images of the source.
  * @param {Object} coverAttrs - attributes of the cover.
+ * @param {number} index      - place of this loop on the page.
  * @return {string} serialized blocks.
  */
-function getMarkup(images, coverAttrs) {
+function getMarkup(images, coverAttrs, index = 0) {
 	const loop = {
-		block_id: 'e2e-cover',
-		queryId: 1,
+		block_id: `e2e-cover-${index}`,
+		queryId: index + 1,
 		queryType: 'images',
 		baseQuery: { perPage: images.length },
 		imagesQuery: { images },
@@ -79,20 +80,25 @@ test.describe('Gallery Item Cover placement', () => {
 	/**
 	 * Publish a page of covers and open it.
 	 *
-	 * @param {Object} requestUtils - REST utils.
-	 * @param {Object} page         - Playwright page.
-	 * @param {string} title        - page title.
-	 * @param {Object} coverAttrs   - attributes of the cover.
+	 * @param {Object}       requestUtils - REST utils.
+	 * @param {Object}       page         - Playwright page.
+	 * @param {string}       title        - page title.
+	 * @param {Object|Array} coverAttrs   - attributes of the cover, or one set
+	 *                                      per gallery to put on the page.
 	 * @return {Promise<void>} resolves once the page is open.
 	 */
 	async function publish(requestUtils, page, title, coverAttrs) {
+		const variants = Array.isArray(coverAttrs) ? coverAttrs : [coverAttrs];
+
 		const created = await requestUtils.rest({
 			path: '/wp/v2/pages',
 			method: 'POST',
 			data: {
 				title,
 				status: 'publish',
-				content: getMarkup(images, coverAttrs),
+				content: variants
+					.map((attrs, index) => getMarkup(images, attrs, index))
+					.join(''),
 			},
 		});
 
@@ -186,6 +192,13 @@ test.describe('Gallery Item Cover placement', () => {
 
 		const cover = page.locator(COVER).first();
 
+		// Waiting out of sight to begin with: the panel is parked under the
+		// card, and its overlay with it.
+		const parked = await readBoxes(cover);
+
+		expect(parked.inner.top).toBeGreaterThanOrEqual(parked.cover.bottom);
+		expect(parked.overlay).toEqual(parked.inner);
+
 		await cover.hover();
 
 		// Settled, so that the panel is measured where it arrived.
@@ -223,9 +236,11 @@ test.describe('Gallery Item Cover placement', () => {
 		const inner = cover.locator(INNER);
 		const overlay = cover.locator(HOVER_OVERLAY);
 
-		// Armed by the script module, which is the only thing that hides the
-		// content of a flying cover.
-		await expect(cover).toHaveAttribute('data-vp-fly', 'true');
+		// Parked by the stylesheet rather than by the script, so a cover whose
+		// module never arrives still hides what it holds.
+		const parked = await readBoxes(cover);
+
+		expect(parked.inner.top).toBeGreaterThanOrEqual(parked.cover.bottom);
 
 		const rect = await cover.boundingBox();
 
@@ -272,5 +287,77 @@ test.describe('Gallery Item Cover placement', () => {
 
 		await expect(inner).toHaveCSS('opacity', '1');
 		await expect(overlay).toHaveCSS('opacity', '0.6');
+	});
+
+	test('the three display states answer the pointer the way each says', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publish(
+			requestUtils,
+			page,
+			'Cover - display states',
+			['hover', 'default', 'always'].map((showContent) => ({
+				effect: 'fade',
+				showContent,
+				hoverDimRatio: 60,
+				customHoverOverlayColor: '#000000',
+			}))
+		);
+
+		/**
+		 * Whether the panel of a cover is drawn.
+		 *
+		 * Both halves are read: an overlay shown over hidden text, or text over
+		 * a missing overlay, is the state falling apart rather than changing.
+		 *
+		 * @param {Object} cover - locator of the cover.
+		 * @return {Promise<Object>} opacity of the overlay and of the blocks.
+		 */
+		function readPanel(cover) {
+			return cover.evaluate(
+				(node, selectors) => {
+					const inner = node.querySelector(selectors.inner);
+					const block = [...inner.children].find(
+						(child) =>
+							!child.classList.contains(selectors.overlayClass)
+					);
+
+					return {
+						overlay: getComputedStyle(
+							node.querySelector(selectors.overlay)
+						).opacity,
+						block: getComputedStyle(block).opacity,
+					};
+				},
+				{
+					inner: INNER,
+					overlay: HOVER_OVERLAY,
+					overlayClass:
+						'wp-block-visual-portfolio-item-cover__overlay',
+				}
+			);
+		}
+
+		const shown = { overlay: '0.6', block: '1' };
+		const hidden = { overlay: '0', block: '0' };
+
+		for (const [state, atRest, hovered] of [
+			['hover', hidden, shown],
+			['default', shown, hidden],
+			['always', shown, shown],
+		]) {
+			const cover = page.locator(`${COVER}.vp-show-content-${state}`);
+
+			await page.mouse.move(0, 0);
+			await page.waitForTimeout(500);
+
+			expect(await readPanel(cover), `${state} at rest`).toEqual(atRest);
+
+			await cover.hover();
+			await page.waitForTimeout(500);
+
+			expect(await readPanel(cover), `${state} hovered`).toEqual(hovered);
+		}
 	});
 });

@@ -1,4 +1,43 @@
-// Every state that reveals a cover.
+// The panel of a cover is one box: the hover overlay and the blocks on it. That
+// is how the legacy gallery builds every one of its item styles, and it is what
+// makes a state a single answer - a panel is somewhere, or it is not, and the
+// overlay can never be shown while the text it belongs to is hidden.
+//
+// Two mixins hold the two states. Which of them a cover is in is the Display
+// setting, and the effect only decides how it travels between them.
+@mixin panel-hidden {
+	> .wp-block-visual-portfolio-item-cover__inner {
+		clip-path: var(--vp-panel-hidden-clip, none);
+		transform: var(--vp-panel-hidden-transform, none);
+	}
+
+	> .wp-block-visual-portfolio-item-cover__inner > .wp-block-visual-portfolio-item-cover__overlay--hover {
+		opacity: calc(var(--vp-hover-overlay-opacity, 0.5) * var(--vp-overlay-hidden-share, 0));
+	}
+
+	> .wp-block-visual-portfolio-item-cover__inner > :where(:not(.wp-block-visual-portfolio-item-cover__overlay)) {
+		opacity: var(--vp-content-hidden-opacity, 0);
+		transform: var(--vp-content-hidden-transform, none);
+	}
+}
+
+@mixin panel-shown {
+	> .wp-block-visual-portfolio-item-cover__inner {
+		clip-path: var(--vp-panel-clip, none);
+		transform: none;
+	}
+
+	> .wp-block-visual-portfolio-item-cover__inner > .wp-block-visual-portfolio-item-cover__overlay--hover {
+		opacity: var(--vp-hover-overlay-opacity, 0.5);
+	}
+
+	> .wp-block-visual-portfolio-item-cover__inner > :where(:not(.wp-block-visual-portfolio-item-cover__overlay)) {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+// Every state that counts as hovered.
 //
 // `:hover` is never written without `:focus-within` beside it - the content of a
 // hover cover cannot be reached with a keyboard otherwise. Going through one
@@ -12,7 +51,7 @@
 // never be the reason one of them loses. Everything below is therefore as
 // specific as the class it hangs off, and a hover style a user wrote wins over
 // a hover style we assumed.
-@mixin revealed {
+@mixin hovered {
 	&:where(:hover, :focus-within, .is-selected, .has-child-selected) {
 		@content;
 	}
@@ -28,16 +67,11 @@
 }
 
 .wp-block-visual-portfolio-item-cover {
-	// An effect is a set of custom properties, never a rule of its own: the state
-	// rules further down switch between the hidden values and the shown ones, so
+	// An effect is a set of custom properties, never a rule of its own: the two
+	// state mixins switch between the hidden values and the shown ones, so
 	// picking an effect can never out-specify being hovered. The numbers are the
 	// ones the legacy gallery animates the matching items style with.
 	--vp-image-hover-transform: none;
-
-	// How much of its own opacity the hover overlay keeps while hidden. A share
-	// rather than a value: the opacity itself is written on the overlay, and a
-	// variable declared here would be substituted here, where it is not.
-	--vp-overlay-hidden-share: 0;
 	--vp-panel-hidden-transform: none;
 	--vp-panel-hidden-clip: none;
 	--vp-panel-clip: none;
@@ -45,6 +79,11 @@
 	--vp-content-hidden-transform: none;
 	--vp-content-transition-duration: 0.25s;
 	--vp-content-stagger-delay: 0s;
+
+	// How much of its own opacity the hover overlay keeps while hidden. A share
+	// rather than a value: the opacity itself is written on the overlay, and a
+	// variable declared here would be substituted here, where it is not.
+	--vp-overlay-hidden-share: 0;
 
 	// The render callback publishes the ratio as a variable rather than as the
 	// property: written inline, `aspect-ratio` would outweigh every rule there
@@ -54,10 +93,7 @@
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	justify-content: center;
 	box-sizing: border-box;
-	padding: 1rem;
 	overflow: hidden;
 
 	// Nothing travels, so nothing is timed.
@@ -66,7 +102,7 @@
 	}
 
 	// The panel stays where it is and the blocks on it arrive one after the
-	// other, a step apart.
+	// other, a step apart, over an overlay that fades on its own.
 	&.vp-effect-fade {
 		--vp-image-hover-transform: scale(1.05);
 		--vp-content-hidden-transform: translateY(10px);
@@ -74,9 +110,7 @@
 	}
 
 	// The panel rises from under the foot of the card with its top edge tilted,
-	// straightening as it arrives, and the picture lifts rather than zooms. The
-	// overlay is the background of that panel and travels with it, so it never
-	// fades and never covers the whole card.
+	// straightening as it arrives, and the picture lifts rather than zooms.
 	&.vp-effect-emerge {
 		--vp-image-hover-transform: translateY(-10px);
 		--vp-content-hidden-transform: translateY(10px);
@@ -87,109 +121,28 @@
 		--vp-panel-hidden-clip: polygon(0 var(--vp-panel-skew), 100% var(--vp-panel-skew), 100% 100%, 0 100%);
 		--vp-panel-clip: polygon(0 0, 100% var(--vp-panel-skew), 100% 100%, 0 100%);
 
-		// The panel reaches the edges of the card, so the card keeps no room of
-		// its own. A padding the user set arrives inline and still wins, and
-		// insets the panel the way it would inset anything else.
-		padding: 0;
-
 		> .wp-block-visual-portfolio-item-cover__inner {
-			width: 100%;
-
-			// Beats the position matrix without arguing with it: a column has
-			// nothing left to justify once its one child claims the space above.
+			// A band at the foot of the card rather than the whole of it, as
+			// tall as the blocks it holds and no taller.
+			flex: 0 0 auto;
 			margin-top: auto;
 			padding: calc(1.5em + var(--vp-panel-skew)) 2em 1.5em;
 		}
-
-		// The overlay is rendered inside the panel for this effect - no box can
-		// be exactly as tall as blocks it does not hold.
-		> .wp-block-visual-portfolio-item-cover__inner > .wp-block-visual-portfolio-item-cover__overlay {
-			position: absolute;
-			inset: 0;
-
-			// Behind the blocks, inside the layer the panel already makes.
-			z-index: -1;
-		}
 	}
 
-	// The panel of a fly cover neither fades nor waits: the module puts it on
-	// the edge the pointer crossed and brings it in from there. Until the module
-	// has armed the cover the panel is parked at the foot of the card, and where
-	// the module never arrives - blocked, failed or JavaScript off - it is not
-	// parked at all and the cover shows what it holds.
+	// Nothing fades and nothing else moves: the whole panel is simply somewhere
+	// else. The foot of the card is where it waits until the script module says
+	// which edge the pointer crossed, and the module writes that from then on -
+	// a stylesheet cannot know it.
 	&.vp-effect-fly {
 		--vp-content-hidden-opacity: 1;
 		--vp-overlay-hidden-share: 1;
-
-		&[data-vp-fly="true"] {
-			--vp-panel-hidden-transform: translateY(100%);
-			--vp-overlay-hidden-transform: translateY(100%);
-		}
+		--vp-panel-hidden-transform: translateY(100%);
 	}
 
-	// The nine positions of core Cover, under the class names core gives them.
-	// The cover is a column, so the cross axis is the horizontal one.
-	&.is-position-top-left {
-		align-items: flex-start;
-		justify-content: flex-start;
-	}
-
-	&.is-position-top-center {
-		align-items: center;
-		justify-content: flex-start;
-	}
-
-	&.is-position-top-right {
-		align-items: flex-end;
-		justify-content: flex-start;
-	}
-
-	&.is-position-center-left {
-		align-items: flex-start;
-		justify-content: center;
-	}
-
-	&.is-position-center-center {
-		align-items: center;
-		justify-content: center;
-	}
-
-	&.is-position-center-right {
-		align-items: flex-end;
-		justify-content: center;
-	}
-
-	&.is-position-bottom-left {
-		align-items: flex-start;
-		justify-content: flex-end;
-	}
-
-	&.is-position-bottom-center {
-		align-items: center;
-		justify-content: flex-end;
-	}
-
-	&.is-position-bottom-right {
-		align-items: flex-end;
-		justify-content: flex-end;
-	}
-
-	// The toolbar control overrides the vertical axis of the position matrix -
-	// declared after it, and deliberately at the same weight.
-	&.is-vertically-aligned-top {
-		justify-content: flex-start;
-	}
-
-	&.is-vertically-aligned-center {
-		justify-content: center;
-	}
-
-	&.is-vertically-aligned-bottom {
-		justify-content: flex-end;
-	}
-
-	// The picture and everything painted on it. One box, so that the overlays
-	// stop where the picture does once the content moves out from under them.
+	// The picture and everything painted on it. One box, so that the overlay
+	// stops where the picture does when a stylesheet lays the card out as a
+	// column.
 	&__media {
 		position: absolute;
 		inset: 0;
@@ -224,7 +177,7 @@
 		inset: 0;
 		z-index: 1;
 		background-color: #000;
-		transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+		transition: opacity 0.2s ease-in-out;
 
 		&.has-background-gradient {
 			background-color: transparent;
@@ -239,12 +192,8 @@
 		}
 	}
 
-	// A touch screen never hovers, so the hover overlay is simply the overlay
-	// there. The pointer states below take it back to zero.
-	&__overlay--hover {
-		opacity: var(--vp-hover-overlay-opacity, 0.5);
-	}
-
+	// The panel: the hover overlay and the blocks on it, filling the card unless
+	// an effect makes it something smaller.
 	&__inner {
 		position: relative;
 
@@ -252,16 +201,22 @@
 		// stacking context cannot lift a child out of its parent's layer.
 		z-index: 4;
 		display: flex;
+		flex: 1 1 auto;
 		flex-direction: column;
-		gap: 0.5em;
-
-		// The emerging panel is a full-width box with a padding of its own, and
-		// a theme that leaves the border box alone would have it overhang the
-		// card by that padding.
+		align-items: center;
+		justify-content: center;
 		box-sizing: border-box;
-		max-width: 100%;
+		gap: 0.5em;
+		padding: 2em;
 		transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), clip-path 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 		clip-path: var(--vp-panel-clip, none);
+
+		// The background of the panel, and the only thing in it that is not a
+		// block. Behind them, inside the layer the panel already makes.
+		> .wp-block-visual-portfolio-item-cover__overlay--hover {
+			z-index: -1;
+			opacity: var(--vp-hover-overlay-opacity, 0.5);
+		}
 
 		// The blocks arrive one after another rather than as a panel. Six is as
 		// far as the legacy gallery counts, and a seventh block joins the sixth.
@@ -277,6 +232,68 @@
 			transition-duration: var(--vp-content-transition-duration, 0.25s);
 			transition-property: opacity, transform;
 		}
+	}
+
+	// The nine positions of core Cover, under the class names core gives them.
+	// They place the blocks inside the panel, which is the box that fills the
+	// card - the card itself only ever holds that one child.
+	&.is-position-top-left > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+
+	&.is-position-top-center > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: center;
+		justify-content: flex-start;
+	}
+
+	&.is-position-top-right > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: flex-end;
+		justify-content: flex-start;
+	}
+
+	&.is-position-center-left > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: flex-start;
+		justify-content: center;
+	}
+
+	&.is-position-center-center > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: center;
+		justify-content: center;
+	}
+
+	&.is-position-center-right > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: flex-end;
+		justify-content: center;
+	}
+
+	&.is-position-bottom-left > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: flex-start;
+		justify-content: flex-end;
+	}
+
+	&.is-position-bottom-center > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: center;
+		justify-content: flex-end;
+	}
+
+	&.is-position-bottom-right > .wp-block-visual-portfolio-item-cover__inner {
+		align-items: flex-end;
+		justify-content: flex-end;
+	}
+
+	// The toolbar control overrides the vertical axis of the position matrix -
+	// declared after it, and deliberately at the same weight.
+	&.is-vertically-aligned-top > .wp-block-visual-portfolio-item-cover__inner {
+		justify-content: flex-start;
+	}
+
+	&.is-vertically-aligned-center > .wp-block-visual-portfolio-item-cover__inner {
+		justify-content: center;
+	}
+
+	&.is-vertically-aligned-bottom > .wp-block-visual-portfolio-item-cover__inner {
+		justify-content: flex-end;
 	}
 
 	// The link covers the whole cover instead of wrapping it: the content on top
@@ -302,55 +319,35 @@
 	}
 }
 
-// Hiding the content behind a pointer only makes sense where there is one. On a
-// touch screen the content is always there and a single tap follows the link,
-// the way a tap on anything else does.
+// Hiding the panel behind a pointer only makes sense where there is one. On a
+// touch screen it is always there and a single tap follows the link, the way a
+// tap on anything else does.
 //
-// Each revealed rule below is written after the hidden one it answers, and the
-// two now weigh the same: with the states inside `:where()` it is the order
-// that decides, not a specificity race we would win against the user as well.
+// Each pair below is written hidden state first, and the two weigh the same:
+// with the hovered states inside `:where()` it is the order that decides, not a
+// specificity race we would win against the user as well.
 @media (hover: hover) {
 	.wp-block-visual-portfolio-item-cover {
-		// The panel, and the blocks on it. Only emerge moves the panel; fade
-		// leaves it where it is and animates what it holds; fly is the module's.
-		&.vp-show-content-hover > .wp-block-visual-portfolio-item-cover__inner {
-			clip-path: var(--vp-panel-hidden-clip, none);
-			transform: var(--vp-panel-hidden-transform, none);
-		}
-
-		&.vp-show-content-hover > .wp-block-visual-portfolio-item-cover__inner > :where(:not(.wp-block-visual-portfolio-item-cover__overlay)) {
-			opacity: var(--vp-content-hidden-opacity, 0);
-			transform: var(--vp-content-hidden-transform, none);
-		}
-
+		// Hover state only: the panel waits out of sight.
 		&.vp-show-content-hover {
-			@include revealed {
-				> .wp-block-visual-portfolio-item-cover__inner {
-					clip-path: var(--vp-panel-clip, none);
-					transform: none;
-				}
+			@include panel-hidden;
 
-				> .wp-block-visual-portfolio-item-cover__inner > :where(:not(.wp-block-visual-portfolio-item-cover__overlay)) {
-					opacity: 1;
-					transform: none;
-				}
+			@include hovered {
+				@include panel-shown;
 			}
 		}
 
-		// Written as a descendant: for emerge the hover overlay is the
-		// background of the panel and is rendered inside it, for the rest it is
-		// painted over the picture.
-		.wp-block-visual-portfolio-item-cover__overlay--hover {
-			opacity: calc(var(--vp-hover-overlay-opacity, 0.5) * var(--vp-overlay-hidden-share, 0));
-			transform: var(--vp-overlay-hidden-transform, none);
+		// Default state only: the panel is there, and stands aside for the
+		// pointer. The same effect, played the other way round.
+		&.vp-show-content-default {
+			@include panel-shown;
+
+			@include hovered {
+				@include panel-hidden;
+			}
 		}
 
-		@include revealed {
-			.wp-block-visual-portfolio-item-cover__overlay--hover {
-				opacity: var(--vp-hover-overlay-opacity, 0.5);
-				transform: none;
-			}
-
+		@include hovered {
 			> .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__image-background {
 				transform: var(--vp-image-hover-transform, none);
 			}
@@ -359,7 +356,7 @@
 }
 
 // The states still change, they just stop being animated: hovering a cover
-// snaps to the revealed state instead of travelling to it.
+// snaps to the other state instead of travelling to it.
 @media (prefers-reduced-motion: reduce) {
 	.wp-block-visual-portfolio-item-cover {
 		// The `img` qualifier answers the one the transition above carries: a

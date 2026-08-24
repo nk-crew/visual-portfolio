@@ -1,4 +1,4 @@
-import { getContext, getElement, store } from '@wordpress/interactivity';
+import { getElement, store } from '@wordpress/interactivity';
 
 /**
  * Internal dependencies
@@ -11,25 +11,24 @@ import { getFlyOffset } from '../../../assets/js/_fly-side';
  * The only JavaScript of the block, and only covers that ask for `fly` load it -
  * `fade`, `emerge` and `none` are stylesheet alone.
  *
- * The panel is the overlay and the content together, and it moves the way the
- * legacy items style moves its own: nothing fades, the side is the edge the
- * pointer crossed, and the panel is put on that side without a transition
- * before being brought in - or a pointer entering from the right would still be
- * answered by a panel travelling from wherever it left last time.
+ * The panel is one box - the hover overlay with the blocks on it - and it moves
+ * the way the legacy items style moves its own: nothing fades, the side is the
+ * edge the pointer crossed, and the panel is put on that side without a
+ * transition before being brought in, or a pointer entering from the right
+ * would still be answered by a panel travelling from wherever it left last
+ * time.
  *
- * Arming is what the stylesheet waits for: until `data-vp-fly` is on the cover
- * the panel is where it started and the content is shown, which is what a
- * visitor whose JavaScript never arrived gets.
+ * The stylesheet parks the panel at the foot of the card, so a cover whose
+ * script never arrives still hides and reveals what it holds - it simply always
+ * does so from below.
  */
 
-// The panel is these two boxes: the overlay painted over the picture, and the
-// blocks on top of it.
-const PANEL_PARTS = [
-	'.wp-block-visual-portfolio-item-cover__overlay--hover',
-	'.wp-block-visual-portfolio-item-cover__inner',
-];
-
+const PANEL = '.wp-block-visual-portfolio-item-cover__inner';
 const TRANSITION = '0.2s transform ease-in-out';
+
+// A cover set to the default state holds its panel up and stands aside for the
+// pointer, so entering and leaving mean the opposite of what they do otherwise.
+const INVERTED = 'vp-show-content-default';
 
 // Where the pointer was before the move that entered or left a cover. One
 // listener answers for every cover on the page, and `mouseenter` is dispatched
@@ -49,36 +48,34 @@ window.addEventListener(
 /**
  * Move the panel of a cover.
  *
- * @param {HTMLElement} cover  Cover.
- * @param {Object}      offset Translation of the resting panel.
- * @param {boolean}     enter  Whether the pointer is entering.
+ * @param {HTMLElement} cover    Cover.
+ * @param {Object}      offset   Translation of the resting panel.
+ * @param {boolean}     arriving Whether the panel is coming in.
  */
-function movePanel(cover, offset, enter) {
-	const parts = PANEL_PARTS.map((selector) =>
-		cover.querySelector(selector)
-	).filter(Boolean);
+function movePanel(cover, offset, arriving) {
+	const panel = cover.querySelector(PANEL);
+
+	if (!panel) {
+		return;
+	}
 
 	const resting = `translateX(${offset.x}) translateY(${offset.y}) translateZ(0)`;
 
-	if (enter) {
+	if (arriving) {
 		// Seated on the side the pointer crossed, and seated silently: the
 		// panel has to start there rather than travel there.
-		parts.forEach((part) => {
-			part.style.transition = 'none';
-			part.style.transform = resting;
-		});
+		panel.style.transition = 'none';
+		panel.style.transform = resting;
 
 		// Flush the change before the transition goes back on, or Safari and
 		// Firefox animate the seating as well.
 		void cover.offsetHeight;
 	}
 
-	parts.forEach((part) => {
-		part.style.transition = TRANSITION;
-		part.style.transform = enter
-			? 'translateX(0%) translateY(0%) translateZ(0)'
-			: resting;
-	});
+	panel.style.transition = TRANSITION;
+	panel.style.transform = arriving
+		? 'translateX(0%) translateY(0%) translateZ(0)'
+		: resting;
 }
 
 store('visual-portfolio/item-cover', {
@@ -86,13 +83,14 @@ store('visual-portfolio/item-cover', {
 		/**
 		 * Move the panel, entering and leaving.
 		 *
-		 * The same answer serves both: on the way in the panel comes from the
-		 * edge that was crossed, on the way out it leaves through it.
+		 * The same answer serves both: the panel comes from the edge that was
+		 * crossed and leaves through it.
 		 *
 		 * @param {MouseEvent} event Pointer event.
 		 */
 		flyPanel(event) {
 			const { ref } = getElement();
+			const entering = 'mouseenter' === event.type;
 
 			movePanel(
 				ref,
@@ -101,19 +99,8 @@ store('visual-portfolio/item-cover', {
 					{ x: event.clientX, y: event.clientY },
 					lastCursor
 				),
-				'mouseenter' === event.type
+				entering !== ref.classList.contains(INVERTED)
 			);
-		},
-	},
-	callbacks: {
-		/**
-		 * Arm the effect.
-		 *
-		 * Runs again whenever the router swaps the loop region in, so a cover
-		 * that arrived with a new page is armed like any other.
-		 */
-		armFly() {
-			getContext().flyArmed = true;
 		},
 	},
 });

@@ -340,25 +340,23 @@ class Visual_Portfolio_Block_Item_Cover {
 			'style' => implode( ';', $styles ),
 		);
 
-		// An effect that hides the content has nothing to do for a cover whose
-		// content is always there.
-		if ( 'fly' !== $effect || 'hover' !== $show_content ) {
+		// A panel that is always there has no edge to come in from.
+		if ( 'fly' !== $effect || 'always' === $show_content ) {
 			return $wrapper;
 		}
 
-		// Armed by the script module. Until the attribute is there the panel is
-		// where it started and the stylesheet leaves the content alone, which is
-		// what makes a cover without JavaScript a cover showing what it holds.
+		// The stylesheet parks the panel at the foot of the card; the module
+		// takes over from the first time the pointer names an edge. Where it
+		// never arrives - blocked, failed or JavaScript off - the panel keeps
+		// coming from the foot, which is the fade the legacy gallery falls back
+		// to as well.
 		$wrapper['data-wp-interactive'] = self::STORE;
-		$wrapper['data-wp-context']     = wp_json_encode( array( 'flyArmed' => false ) );
-		$wrapper['data-wp-init']        = 'callbacks.armFly';
 
 		// Not the async variants: the panel has to be seated on the side the
 		// pointer crossed in the same frame it enters, or the first transition
 		// runs from wherever the panel was left.
-		$wrapper['data-wp-on--mouseenter']    = 'actions.flyPanel';
-		$wrapper['data-wp-on--mouseleave']    = 'actions.flyPanel';
-		$wrapper['data-wp-bind--data-vp-fly'] = 'context.flyArmed';
+		$wrapper['data-wp-on--mouseenter'] = 'actions.flyPanel';
+		$wrapper['data-wp-on--mouseleave'] = 'actions.flyPanel';
 
 		return $wrapper;
 	}
@@ -406,10 +404,13 @@ class Visual_Portfolio_Block_Item_Cover {
 		$effect = $attributes['effect'] ?? 'fade';
 		$effect = in_array( $effect, array( 'none', 'fade', 'fly', 'emerge' ), true ) ? $effect : 'fade';
 
+		// The three states the legacy gallery offers, under the names it uses:
+		// hover state only, default state only, always.
 		$show_content = $attributes['showContent'] ?? 'hover';
-		$show_content = in_array( $show_content, array( 'always', 'hover', 'never' ), true ) ? $show_content : 'hover';
+		$show_content = in_array( $show_content, array( 'always', 'hover', 'default' ), true ) ? $show_content : 'hover';
 
-		if ( 'fly' === $effect && 'hover' === $show_content ) {
+		// A panel that is always there has no edge to come in from.
+		if ( 'fly' === $effect && 'always' !== $show_content ) {
 			wp_enqueue_script_module( self::VIEW_MODULE );
 		}
 
@@ -447,15 +448,6 @@ class Visual_Portfolio_Block_Item_Cover {
 			true
 		);
 
-		// An emerging cover carries its hover overlay inside the panel instead of
-		// over the picture: the overlay is the background of the panel there, and
-		// nothing but the panel itself is exactly as tall as the blocks it holds.
-		$overlay_in_panel = 'emerge' === $effect;
-
-		if ( ! $overlay_in_panel ) {
-			$media .= $hover_overlay;
-		}
-
 		// The picture and everything painted on it are one box, so a stylesheet
 		// that moves the content out from under the overlays can shape and stop
 		// them both at once.
@@ -464,18 +456,18 @@ class Visual_Portfolio_Block_Item_Cover {
 			$media
 		);
 
-		// Content nobody is ever shown is content nothing has to announce either,
-		// so it is left out rather than hidden.
-		if ( 'never' !== $show_content ) {
-			$gap = $this->get_block_gap( $attributes );
+		// The panel: the hover overlay and the blocks on it, in one box. The
+		// overlay is the background of the panel and never a box of its own, so
+		// that a state moves the two of them together.
+		$gap = $this->get_block_gap( $attributes );
 
-			$output .= sprintf(
-				'<div class="wp-block-visual-portfolio-item-cover__inner"%1$s>%2$s</div>',
-				'' === $gap ? '' : ' style="gap:' . esc_attr( $gap ) . '"',
-				// Last, so that the blocks keep the places the staggering counts.
-				$content . ( $overlay_in_panel ? $hover_overlay : '' )
-			);
-		}
+		$output .= sprintf(
+			'<div class="wp-block-visual-portfolio-item-cover__inner"%1$s>%2$s</div>',
+			'' === $gap ? '' : ' style="gap:' . esc_attr( $gap ) . '"',
+			// The overlay last, so that the blocks keep the places the
+			// staggering counts.
+			$content . $hover_overlay
+		);
 
 		$link    = $this->get_trigger( $attributes, $context );
 		$output .= $link;

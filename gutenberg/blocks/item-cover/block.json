@@ -55,7 +55,7 @@
 		"showContent": {
 			"type": "string",
 			"default": "hover",
-			"enum": ["always", "hover", "never"]
+			"enum": ["always", "hover", "default"]
 		},
 		"overlayColor": {
 			"type": "string"

@@ -62,10 +62,11 @@ const EFFECT_OPTIONS = [
 	{ label: __('Emerge', 'visual-portfolio'), value: 'emerge' },
 ];
 
+// The three states the legacy gallery offers, in its own order.
 const SHOW_CONTENT_OPTIONS = [
-	{ label: __('Always', 'visual-portfolio'), value: 'always' },
 	{ label: __('On hover', 'visual-portfolio'), value: 'hover' },
-	{ label: __('Never', 'visual-portfolio'), value: 'never' },
+	{ label: __('Except on hover', 'visual-portfolio'), value: 'default' },
+	{ label: __('Always', 'visual-portfolio'), value: 'always' },
 ];
 
 const CLICK_ACTION_OPTIONS = [
@@ -238,11 +239,8 @@ export default function ItemCoverEdit({
 		},
 	});
 
-	// An emerging cover carries its hover overlay inside the panel instead of
-	// over the picture: the overlay is the background of the panel there, and
-	// nothing but the panel itself is exactly as tall as the blocks it holds.
-	const overlayInPanel = 'emerge' === effect;
-
+	// The hover overlay is the background of the panel rather than a box of its
+	// own, so that a state moves it and the blocks together.
 	const hoverOverlay = (
 		<span
 			className={classnames(
@@ -522,7 +520,7 @@ export default function ItemCoverEdit({
 										'visual-portfolio'
 									)}
 									help={__(
-										'Touch screens always show the content, whatever this says.',
+										'When the overlay and the blocks on it are drawn. Touch screens show them whatever this says.',
 										'visual-portfolio'
 									)}
 									value={showContent}
@@ -703,7 +701,6 @@ export default function ItemCoverEdit({
 							aria-hidden="true"
 						/>
 					)}
-					{hasHoverOverlay && !overlayInPanel && hoverOverlay}
 				</div>
 				{/* No link element here: it covers the cover on the front end,
 				    and in the editor that is every click meant for a block. */}
@@ -711,7 +708,7 @@ export default function ItemCoverEdit({
 					{innerBlocksProps.children}
 					{/* Last, so that the blocks keep the places the staggering
 					    counts. */}
-					{hasHoverOverlay && overlayInPanel && hoverOverlay}
+					{hasHoverOverlay && hoverOverlay}
 				</div>
 			</div>
 		</>
