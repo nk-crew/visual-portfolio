@@ -87,11 +87,14 @@
 }
 
 // The shape of an item, before the item itself has arrived.
-.wp-block-visual-portfolio-item-template__skeleton {
+// A shape standing in for an item is the same wash as a picture standing in for
+// an image: the dimming the busy list applies to real items would make it six
+// times darker, so it is stated at the same weight as that rule.
+.wp-block-visual-portfolio-item-template[aria-busy="true"] > .wp-block-visual-portfolio-item-template__skeleton {
 	aspect-ratio: 1;
 	background: currentcolor;
 	border-radius: 2px;
-	opacity: 0.08;
+	opacity: 0.1;
 }
 
 // A tile is as tall as its pattern says, so a placeholder in one takes the

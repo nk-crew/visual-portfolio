@@ -66,6 +66,11 @@
 // side without a row of white space between them. Scoped to our own overlay -
 // the same rule on the bare list class would reflow the inserter as well.
 .vpf-loop-setup__overlay .block-editor-block-patterns-list {
+	// Core's own list carries `height: 100%`, which resolves against a plain
+	// block parent there and stays `auto`. Ours is a flex item of the modal, so
+	// it resolves to a real height - and a multicol box with a definite height
+	// grows sideways instead of down.
+	height: auto;
 	column-count: 2;
 	column-gap: 24px;
 
