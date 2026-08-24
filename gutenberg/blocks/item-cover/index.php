@@ -340,22 +340,25 @@ class Visual_Portfolio_Block_Item_Cover {
 			'style' => implode( ';', $styles ),
 		);
 
-		if ( 'fly' !== $effect ) {
+		// An effect that hides the content has nothing to do for a cover whose
+		// content is always there.
+		if ( 'fly' !== $effect || 'hover' !== $show_content ) {
 			return $wrapper;
 		}
 
-		// The side the pointer came in from, written by the script module. Until
-		// it is there the stylesheet leaves the content alone, which is what
-		// makes a cover without JavaScript a cover with its content shown.
+		// Armed by the script module. Until the attribute is there the panel is
+		// where it started and the stylesheet leaves the content alone, which is
+		// what makes a cover without JavaScript a cover showing what it holds.
 		$wrapper['data-wp-interactive'] = self::STORE;
-		$wrapper['data-wp-context']     = wp_json_encode( array( 'flyFrom' => '' ) );
+		$wrapper['data-wp-context']     = wp_json_encode( array( 'flyArmed' => false ) );
 		$wrapper['data-wp-init']        = 'callbacks.armFly';
 
-		// Not the async variants: the side has to be on the element in the same
-		// frame the pointer enters it, or the first transition runs the old way.
-		$wrapper['data-wp-on--mouseenter']    = 'actions.setFlySide';
-		$wrapper['data-wp-on--mouseleave']    = 'actions.setFlySide';
-		$wrapper['data-wp-bind--data-vp-fly'] = 'context.flyFrom';
+		// Not the async variants: the panel has to be seated on the side the
+		// pointer crossed in the same frame it enters, or the first transition
+		// runs from wherever the panel was left.
+		$wrapper['data-wp-on--mouseenter']    = 'actions.flyPanel';
+		$wrapper['data-wp-on--mouseleave']    = 'actions.flyPanel';
+		$wrapper['data-wp-bind--data-vp-fly'] = 'context.flyArmed';
 
 		return $wrapper;
 	}
@@ -406,7 +409,7 @@ class Visual_Portfolio_Block_Item_Cover {
 		$show_content = $attributes['showContent'] ?? 'hover';
 		$show_content = in_array( $show_content, array( 'always', 'hover', 'never' ), true ) ? $show_content : 'hover';
 
-		if ( 'fly' === $effect ) {
+		if ( 'fly' === $effect && 'hover' === $show_content ) {
 			wp_enqueue_script_module( self::VIEW_MODULE );
 		}
 
@@ -433,7 +436,7 @@ class Visual_Portfolio_Block_Item_Cover {
 			)
 		);
 
-		$media .= $this->get_overlay(
+		$hover_overlay = $this->get_overlay(
 			array(
 				'dimRatio'       => $attributes['hoverDimRatio'] ?? 0,
 				'color'          => $attributes['hoverOverlayColor'] ?? '',
@@ -443,6 +446,15 @@ class Visual_Portfolio_Block_Item_Cover {
 			),
 			true
 		);
+
+		// An emerging cover carries its hover overlay inside the panel instead of
+		// over the picture: the overlay is the background of the panel there, and
+		// nothing but the panel itself is exactly as tall as the blocks it holds.
+		$overlay_in_panel = 'emerge' === $effect;
+
+		if ( ! $overlay_in_panel ) {
+			$media .= $hover_overlay;
+		}
 
 		// The picture and everything painted on it are one box, so a stylesheet
 		// that moves the content out from under the overlays can shape and stop
@@ -460,7 +472,8 @@ class Visual_Portfolio_Block_Item_Cover {
 			$output .= sprintf(
 				'<div class="wp-block-visual-portfolio-item-cover__inner"%1$s>%2$s</div>',
 				'' === $gap ? '' : ' style="gap:' . esc_attr( $gap ) . '"',
-				$content
+				// Last, so that the blocks keep the places the staggering counts.
+				$content . ( $overlay_in_panel ? $hover_overlay : '' )
 			);
 		}
 

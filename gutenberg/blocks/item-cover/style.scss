@@ -30,8 +30,21 @@
 .wp-block-visual-portfolio-item-cover {
 	// An effect is a set of custom properties, never a rule of its own: the state
 	// rules further down switch between the hidden values and the shown ones, so
-	// picking an effect can never out-specify being hovered.
-	--vp-image-hover-scale: 1;
+	// picking an effect can never out-specify being hovered. The numbers are the
+	// ones the legacy gallery animates the matching items style with.
+	--vp-image-hover-transform: none;
+
+	// How much of its own opacity the hover overlay keeps while hidden. A share
+	// rather than a value: the opacity itself is written on the overlay, and a
+	// variable declared here would be substituted here, where it is not.
+	--vp-overlay-hidden-share: 0;
+	--vp-panel-hidden-transform: none;
+	--vp-panel-hidden-clip: none;
+	--vp-panel-clip: none;
+	--vp-content-hidden-opacity: 0;
+	--vp-content-hidden-transform: none;
+	--vp-content-transition-duration: 0.25s;
+	--vp-content-stagger-delay: 0s;
 
 	// The render callback publishes the ratio as a variable rather than as the
 	// property: written inline, `aspect-ratio` would outweigh every rule there
@@ -47,46 +60,70 @@
 	padding: 1rem;
 	overflow: hidden;
 
+	// Nothing travels, so nothing is timed.
+	&.vp-effect-none {
+		--vp-content-transition-duration: 0s;
+	}
+
+	// The panel stays where it is and the blocks on it arrive one after the
+	// other, a step apart.
 	&.vp-effect-fade {
-		--vp-content-hidden-transform: translateY(0.75rem);
-		--vp-image-hover-scale: 1.05;
+		--vp-image-hover-transform: scale(1.05);
+		--vp-content-hidden-transform: translateY(10px);
+		--vp-content-stagger-delay: 0.07s;
 	}
 
+	// The panel rises from under the foot of the card with its top edge tilted,
+	// straightening as it arrives, and the picture lifts rather than zooms. The
+	// overlay is the background of that panel and travels with it, so it never
+	// fades and never covers the whole card.
 	&.vp-effect-emerge {
-		--vp-content-hidden-transform: scale(0.85);
-		--vp-image-hover-scale: 1.1;
+		--vp-image-hover-transform: translateY(-10px);
+		--vp-content-hidden-transform: translateY(10px);
+		--vp-content-stagger-delay: 0.07s;
+		--vp-overlay-hidden-share: 1;
+		--vp-panel-skew: 20px;
+		--vp-panel-hidden-transform: translateY(100%);
+		--vp-panel-hidden-clip: polygon(0 var(--vp-panel-skew), 100% var(--vp-panel-skew), 100% 100%, 0 100%);
+		--vp-panel-clip: polygon(0 0, 100% var(--vp-panel-skew), 100% 100%, 0 100%);
+
+		// The panel reaches the edges of the card, so the card keeps no room of
+		// its own. A padding the user set arrives inline and still wins, and
+		// insets the panel the way it would inset anything else.
+		padding: 0;
+
+		> .wp-block-visual-portfolio-item-cover__inner {
+			width: 100%;
+
+			// Beats the position matrix without arguing with it: a column has
+			// nothing left to justify once its one child claims the space above.
+			margin-top: auto;
+			padding: calc(1.5em + var(--vp-panel-skew)) 2em 1.5em;
+		}
+
+		// The overlay is rendered inside the panel for this effect - no box can
+		// be exactly as tall as blocks it does not hold.
+		> .wp-block-visual-portfolio-item-cover__inner > .wp-block-visual-portfolio-item-cover__overlay {
+			position: absolute;
+			inset: 0;
+
+			// Behind the blocks, inside the layer the panel already makes.
+			z-index: -1;
+		}
 	}
 
-	// The content of a fly cover stays where it is until its script module has
-	// named the side the pointer crossed. Without that module - blocked, failed
-	// or JavaScript off - there is no `data-vp-fly` and the cover shows its
-	// content, rather than hiding it behind an animation nothing will play.
+	// The panel of a fly cover neither fades nor waits: the module puts it on
+	// the edge the pointer crossed and brings it in from there. Until the module
+	// has armed the cover the panel is parked at the foot of the card, and where
+	// the module never arrives - blocked, failed or JavaScript off - it is not
+	// parked at all and the cover shows what it holds.
 	&.vp-effect-fly {
 		--vp-content-hidden-opacity: 1;
-		--vp-image-hover-scale: 1.05;
+		--vp-overlay-hidden-share: 1;
 
-		&[data-vp-fly] {
-			--vp-content-hidden-opacity: 0;
-		}
-
-		&[data-vp-fly="top"] {
-			--vp-content-hidden-transform: translateY(-100%);
-			--vp-overlay-hidden-transform: translateY(-100%);
-		}
-
-		&[data-vp-fly="right"] {
-			--vp-content-hidden-transform: translateX(100%);
-			--vp-overlay-hidden-transform: translateX(100%);
-		}
-
-		&[data-vp-fly="bottom"] {
-			--vp-content-hidden-transform: translateY(100%);
+		&[data-vp-fly="true"] {
+			--vp-panel-hidden-transform: translateY(100%);
 			--vp-overlay-hidden-transform: translateY(100%);
-		}
-
-		&[data-vp-fly="left"] {
-			--vp-content-hidden-transform: translateX(-100%);
-			--vp-overlay-hidden-transform: translateX(-100%);
 		}
 	}
 
@@ -179,7 +216,7 @@
 	// single class, where the placement rules further down can still override
 	// them.
 	> .wp-block-visual-portfolio-item-cover__media > img.wp-block-visual-portfolio-item-cover__image-background {
-		transition: transform 0.4s ease, opacity var(--vp-lazyload-transition-duration, 0.3s);
+		transition: transform 0.2s ease-in-out, opacity var(--vp-lazyload-transition-duration, 0.3s);
 	}
 
 	&__overlay {
@@ -187,7 +224,7 @@
 		inset: 0;
 		z-index: 1;
 		background-color: #000;
-		transition: opacity 0.3s ease, transform 0.3s ease;
+		transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
 
 		&.has-background-gradient {
 			background-color: transparent;
@@ -217,12 +254,29 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
-		max-width: 100%;
-		transition: opacity 0.3s ease, transform 0.3s ease;
-	}
 
-	&.vp-effect-none > .wp-block-visual-portfolio-item-cover__inner {
-		transition: none;
+		// The emerging panel is a full-width box with a padding of its own, and
+		// a theme that leaves the border box alone would have it overhang the
+		// card by that padding.
+		box-sizing: border-box;
+		max-width: 100%;
+		transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), clip-path 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		clip-path: var(--vp-panel-clip, none);
+
+		// The blocks arrive one after another rather than as a panel. Six is as
+		// far as the legacy gallery counts, and a seventh block joins the sixth.
+		@for $i from 1 through 6 {
+			> :nth-child(#{$i}) {
+				--vp-content-stagger-index: #{$i};
+			}
+		}
+
+		> :where(:not(.wp-block-visual-portfolio-item-cover__overlay)) {
+			transition-delay: calc(var(--vp-content-stagger-delay, 0s) * var(--vp-content-stagger-index, 1));
+			transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+			transition-duration: var(--vp-content-transition-duration, 0.25s);
+			transition-property: opacity, transform;
+		}
 	}
 
 	// The link covers the whole cover instead of wrapping it: the content on top
@@ -257,7 +311,14 @@
 // that decides, not a specificity race we would win against the user as well.
 @media (hover: hover) {
 	.wp-block-visual-portfolio-item-cover {
+		// The panel, and the blocks on it. Only emerge moves the panel; fade
+		// leaves it where it is and animates what it holds; fly is the module's.
 		&.vp-show-content-hover > .wp-block-visual-portfolio-item-cover__inner {
+			clip-path: var(--vp-panel-hidden-clip, none);
+			transform: var(--vp-panel-hidden-transform, none);
+		}
+
+		&.vp-show-content-hover > .wp-block-visual-portfolio-item-cover__inner > :where(:not(.wp-block-visual-portfolio-item-cover__overlay)) {
 			opacity: var(--vp-content-hidden-opacity, 0);
 			transform: var(--vp-content-hidden-transform, none);
 		}
@@ -265,25 +326,33 @@
 		&.vp-show-content-hover {
 			@include revealed {
 				> .wp-block-visual-portfolio-item-cover__inner {
+					clip-path: var(--vp-panel-clip, none);
+					transform: none;
+				}
+
+				> .wp-block-visual-portfolio-item-cover__inner > :where(:not(.wp-block-visual-portfolio-item-cover__overlay)) {
 					opacity: 1;
 					transform: none;
 				}
 			}
 		}
 
-		> .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__overlay--hover {
-			opacity: 0;
+		// Written as a descendant: for emerge the hover overlay is the
+		// background of the panel and is rendered inside it, for the rest it is
+		// painted over the picture.
+		.wp-block-visual-portfolio-item-cover__overlay--hover {
+			opacity: calc(var(--vp-hover-overlay-opacity, 0.5) * var(--vp-overlay-hidden-share, 0));
 			transform: var(--vp-overlay-hidden-transform, none);
 		}
 
 		@include revealed {
-			> .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__overlay--hover {
+			.wp-block-visual-portfolio-item-cover__overlay--hover {
 				opacity: var(--vp-hover-overlay-opacity, 0.5);
 				transform: none;
 			}
 
 			> .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__image-background {
-				transform: scale(var(--vp-image-hover-scale, 1));
+				transform: var(--vp-image-hover-transform, none);
 			}
 		}
 	}
@@ -297,8 +366,9 @@
 		// shorthand sets the duration too, so a lighter selector could not take
 		// it back to nothing.
 		> .wp-block-visual-portfolio-item-cover__media > img.wp-block-visual-portfolio-item-cover__image-background,
-		> .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__overlay,
-		> .wp-block-visual-portfolio-item-cover__inner {
+		.wp-block-visual-portfolio-item-cover__overlay,
+		> .wp-block-visual-portfolio-item-cover__inner,
+		> .wp-block-visual-portfolio-item-cover__inner > * {
 			transition-duration: 0s;
 		}
 	}

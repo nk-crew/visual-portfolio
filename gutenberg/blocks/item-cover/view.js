@@ -1,62 +1,108 @@
 import { getContext, getElement, store } from '@wordpress/interactivity';
 
 /**
+ * Internal dependencies
+ */
+import { getFlyOffset } from '../../../assets/js/_fly-side';
+
+/**
  * The `fly` effect of the Gallery Item Cover.
  *
  * The only JavaScript of the block, and only covers that ask for `fly` load it -
- * `fade`, `emerge` and `none` are stylesheet alone. All it does is name the edge
- * the pointer crossed, in a `data-vp-fly` attribute the stylesheet translates
- * the overlay and the content from.
+ * `fade`, `emerge` and `none` are stylesheet alone.
  *
- * The attribute is also what arms the effect: until this module has run there is
- * none, and a cover with its content simply shown is what a visitor without
- * JavaScript gets.
+ * The panel is the overlay and the content together, and it moves the way the
+ * legacy items style moves its own: nothing fades, the side is the edge the
+ * pointer crossed, and the panel is put on that side without a transition
+ * before being brought in - or a pointer entering from the right would still be
+ * answered by a panel travelling from wherever it left last time.
+ *
+ * Arming is what the stylesheet waits for: until `data-vp-fly` is on the cover
+ * the panel is where it started and the content is shown, which is what a
+ * visitor whose JavaScript never arrived gets.
  */
 
-// Where the content flies in from before the pointer has said anything - after a
-// keyboard focus, or on the frame the pointer enters a cover for the first time.
-const DEFAULT_SIDE = 'bottom';
+// The panel is these two boxes: the overlay painted over the picture, and the
+// blocks on top of it.
+const PANEL_PARTS = [
+	'.wp-block-visual-portfolio-item-cover__overlay--hover',
+	'.wp-block-visual-portfolio-item-cover__inner',
+];
+
+const TRANSITION = '0.2s transform ease-in-out';
+
+// Where the pointer was before the move that entered or left a cover. One
+// listener answers for every cover on the page, and `mouseenter` is dispatched
+// before the `mousemove` of the same movement - so at the moment a cover asks,
+// this is still the point the pointer came from.
+const lastCursor = { x: 0, y: 0 };
+
+window.addEventListener(
+	'mousemove',
+	(event) => {
+		lastCursor.x = event.clientX;
+		lastCursor.y = event.clientY;
+	},
+	{ passive: true }
+);
 
 /**
- * The edge of an element a pointer event is closest to.
+ * Move the panel of a cover.
  *
- * Distances are measured on the box scaled to a square, so the diagonals of a
- * wide cover still split it corner to corner and a pointer entering the long top
- * edge is not read as coming from the side.
- *
- * @param {HTMLElement} element Cover.
- * @param {MouseEvent}  event   Pointer event.
- *
- * @return {string} One of `top`, `right`, `bottom`, `left`.
+ * @param {HTMLElement} cover  Cover.
+ * @param {Object}      offset Translation of the resting panel.
+ * @param {boolean}     enter  Whether the pointer is entering.
  */
-function getSide(element, event) {
-	const rect = element.getBoundingClientRect();
-	const width = rect.width || 1;
-	const height = rect.height || 1;
-	const x = (event.clientX - rect.left) / width - 0.5;
-	const y = (event.clientY - rect.top) / height - 0.5;
+function movePanel(cover, offset, enter) {
+	const parts = PANEL_PARTS.map((selector) =>
+		cover.querySelector(selector)
+	).filter(Boolean);
 
-	if (Math.abs(x) > Math.abs(y)) {
-		return x > 0 ? 'right' : 'left';
+	const resting = `translateX(${offset.x}) translateY(${offset.y}) translateZ(0)`;
+
+	if (enter) {
+		// Seated on the side the pointer crossed, and seated silently: the
+		// panel has to start there rather than travel there.
+		parts.forEach((part) => {
+			part.style.transition = 'none';
+			part.style.transform = resting;
+		});
+
+		// Flush the change before the transition goes back on, or Safari and
+		// Firefox animate the seating as well.
+		void cover.offsetHeight;
 	}
 
-	return y > 0 ? 'bottom' : 'top';
+	parts.forEach((part) => {
+		part.style.transition = TRANSITION;
+		part.style.transform = enter
+			? 'translateX(0%) translateY(0%) translateZ(0)'
+			: resting;
+	});
 }
 
 store('visual-portfolio/item-cover', {
 	actions: {
 		/**
-		 * Take the side of the pointer, entering and leaving.
+		 * Move the panel, entering and leaving.
 		 *
-		 * The same answer serves both: on the way in the content flies in from
-		 * the edge that was crossed, on the way out it leaves through it.
+		 * The same answer serves both: on the way in the panel comes from the
+		 * edge that was crossed, on the way out it leaves through it.
 		 *
 		 * @param {MouseEvent} event Pointer event.
 		 */
-		setFlySide(event) {
+		flyPanel(event) {
 			const { ref } = getElement();
 
-			getContext().flyFrom = getSide(ref, event);
+			movePanel(
+				ref,
+				getFlyOffset(
+					ref.getBoundingClientRect(),
+					{ x: event.clientX, y: event.clientY },
+					lastCursor
+				),
+				'mouseenter' === event.type
+			);
 		},
 	},
 	callbacks: {
@@ -67,11 +113,7 @@ store('visual-portfolio/item-cover', {
 		 * that arrived with a new page is armed like any other.
 		 */
 		armFly() {
-			const context = getContext();
-
-			if (!context.flyFrom) {
-				context.flyFrom = DEFAULT_SIDE;
-			}
+			getContext().flyArmed = true;
 		},
 	},
 });

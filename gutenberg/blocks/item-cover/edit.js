@@ -238,6 +238,26 @@ export default function ItemCoverEdit({
 		},
 	});
 
+	// An emerging cover carries its hover overlay inside the panel instead of
+	// over the picture: the overlay is the background of the panel there, and
+	// nothing but the panel itself is exactly as tall as the blocks it holds.
+	const overlayInPanel = 'emerge' === effect;
+
+	const hoverOverlay = (
+		<span
+			className={classnames(
+				'wp-block-visual-portfolio-item-cover__overlay',
+				'wp-block-visual-portfolio-item-cover__overlay--hover',
+				{
+					'has-background-gradient':
+						hoverGradient || customHoverGradient,
+				}
+			)}
+			style={hoverOverlayStyles}
+			aria-hidden="true"
+		/>
+	);
+
 	// The inner blocks stay editable whatever `showContent` says - the render
 	// callback is the one that leaves them out.
 	//
@@ -683,24 +703,16 @@ export default function ItemCoverEdit({
 							aria-hidden="true"
 						/>
 					)}
-					{hasHoverOverlay && (
-						<span
-							className={classnames(
-								'wp-block-visual-portfolio-item-cover__overlay',
-								'wp-block-visual-portfolio-item-cover__overlay--hover',
-								{
-									'has-background-gradient':
-										hoverGradient || customHoverGradient,
-								}
-							)}
-							style={hoverOverlayStyles}
-							aria-hidden="true"
-						/>
-					)}
+					{hasHoverOverlay && !overlayInPanel && hoverOverlay}
 				</div>
 				{/* No link element here: it covers the cover on the front end,
 				    and in the editor that is every click meant for a block. */}
-				<div {...innerBlocksProps} />
+				<div {...innerBlocksProps}>
+					{innerBlocksProps.children}
+					{/* Last, so that the blocks keep the places the staggering
+					    counts. */}
+					{hasHoverOverlay && overlayInPanel && hoverOverlay}
+				</div>
 			</div>
 		</>
 	);
