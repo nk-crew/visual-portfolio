@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<!-- wp:visual-portfolio/loop {"block_id":"vppatgridclassic","queryType":"images","baseQuery":{"perPage":9}} -->
-<div class="vp-block-loop">
+<!-- wp:visual-portfolio/loop {"align":"wide","block_id":"vppatgridclassic","queryType":"images","baseQuery":{"perPage":9}} -->
+<div class="vp-block-loop alignwide">
 	<!-- wp:visual-portfolio/item-template {"layoutType":"grid","layoutColumnsMode":"manual","layoutColumnCount":3} -->
 		<!-- wp:visual-portfolio/item-image {"aspectRatio":"1","clickAction":"popup"} /-->
 		<!-- wp:visual-portfolio/item-title {"textAlign":"center"} /-->

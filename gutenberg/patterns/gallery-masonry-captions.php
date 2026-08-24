@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<!-- wp:visual-portfolio/loop {"block_id":"vppatmasonrycaptions","queryType":"images","baseQuery":{"perPage":9}} -->
-<div class="vp-block-loop">
+<!-- wp:visual-portfolio/loop {"align":"wide","block_id":"vppatmasonrycaptions","queryType":"images","baseQuery":{"perPage":9}} -->
+<div class="vp-block-loop alignwide">
 	<!-- wp:visual-portfolio/item-template {"layoutType":"masonry","layoutColumnsMode":"auto","layoutMinimumColumnWidth":"18rem","layoutColumnCount":3} -->
 		<!-- wp:visual-portfolio/item-image {"clickAction":"popup"} /-->
 		<!-- wp:visual-portfolio/item-title /-->

@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<!-- wp:visual-portfolio/loop {"block_id":"vppattilesmosaic","queryType":"images","baseQuery":{"perPage":10}} -->
-<div class="vp-block-loop">
+<!-- wp:visual-portfolio/loop {"align":"wide","block_id":"vppattilesmosaic","queryType":"images","baseQuery":{"perPage":10}} -->
+<div class="vp-block-loop alignwide">
 	<!-- wp:visual-portfolio/item-template {"layoutType":"tiles","layoutTiles":"3|1,1|2,0.5|1,1|1,2|1,1|"} -->
 		<!-- wp:visual-portfolio/item-image {"clickAction":"popup"} /-->
 	<!-- /wp:visual-portfolio/item-template -->

@@ -13,7 +13,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	Notice,
-	Placeholder,
 	RangeControl,
 	SelectControl,
 	Spinner,
@@ -1071,15 +1070,9 @@ export default function BlockEdit({
 			<>
 				{blockControls}
 				{inspectorControls}
-				<div {...blockProps}>
-					<Placeholder
-						label={__('Gallery Item Template', 'visual-portfolio')}
-						instructions={__(
-							'No items found. Check the Content Source settings of the Gallery Loop block.',
-							'visual-portfolio'
-						)}
-					/>
-				</div>
+				<p {...blockProps}>
+					{__('No results found.', 'visual-portfolio')}
+				</p>
 			</>
 		);
 	}
