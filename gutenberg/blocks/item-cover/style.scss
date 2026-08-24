@@ -152,7 +152,20 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform 0.4s ease;
+	}
+
+	// The transition is stated apart from the box above, and deliberately heavy.
+	// The lazyload stylesheet writes `transition` on `img.vp-lazyloaded`, a
+	// shorthand that replaces the whole list, and that selector outweighs a
+	// class of ours: the first image of a page is eager and kept its transform,
+	// while every lazy one below it snapped instead of travelling. The fade the
+	// lazyload rule owns is restated with it, or the images stop fading in.
+	//
+	// Only `transition` lives here. The box properties stay at the weight of a
+	// single class, where the placement rules further down can still override
+	// them.
+	> .wp-block-visual-portfolio-item-cover__media > img.wp-block-visual-portfolio-item-cover__image-background {
+		transition: transform 0.4s ease, opacity var(--vp-lazyload-transition-duration, 0.3s);
 	}
 
 	&__overlay {
@@ -297,7 +310,10 @@
 // snaps to the revealed state instead of travelling to it.
 @media (prefers-reduced-motion: reduce) {
 	.wp-block-visual-portfolio-item-cover {
-		> .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__image-background,
+		// The `img` qualifier answers the one the transition above carries: a
+		// shorthand sets the duration too, so a lighter selector could not take
+		// it back to nothing.
+		> .wp-block-visual-portfolio-item-cover__media > img.wp-block-visual-portfolio-item-cover__image-background,
 		> .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__overlay,
 		> .wp-block-visual-portfolio-item-cover__inner {
 			transition-duration: 0s;
