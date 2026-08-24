@@ -27,17 +27,12 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
+import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
 import {
 	IMAGE_SIZE_OPTIONS,
 	useImageSizeOnInsert,
 } from '../../utils/item-image-size';
 import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
-
-const SCALE_OPTIONS = [
-	{ label: __('Cover', 'visual-portfolio'), value: 'cover' },
-	{ label: __('Contain', 'visual-portfolio'), value: 'contain' },
-	{ label: __('Fill', 'visual-portfolio'), value: 'fill' },
-];
 
 const CLICK_ACTION_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
@@ -270,47 +265,26 @@ export default function ItemImageEdit({
 						</ToolsPanelItem>
 					</InspectorControls>
 					<InspectorControls group="dimensions">
-						<ToolsPanelItem
-							label={__('Aspect ratio', 'visual-portfolio')}
-							hasValue={() => !!aspectRatio}
-							onDeselect={() =>
-								setAttributes({ aspectRatio: '' })
+						<AspectRatioTool
+							panelId={clientId}
+							value={aspectRatio}
+							onChange={(value) =>
+								setAttributes({ aspectRatio: value })
 							}
 							resetAllFilter={() => ({ aspectRatio: '' })}
-							panelId={clientId}
-						>
-							<TextControl
-								label={__('Aspect ratio', 'visual-portfolio')}
-								help={__(
-									'For example 1, 4/3 or 16/9. Leave empty to keep the original proportions.',
-									'visual-portfolio'
-								)}
-								value={aspectRatio}
-								onChange={(value) =>
-									setAttributes({ aspectRatio: value })
-								}
-							/>
-						</ToolsPanelItem>
-						<ToolsPanelItem
-							label={__('Scale', 'visual-portfolio')}
-							hasValue={() => scale !== 'cover'}
-							onDeselect={() => setAttributes({ scale: 'cover' })}
-							resetAllFilter={() => ({ scale: 'cover' })}
-							panelId={clientId}
-						>
-							<SelectControl
-								label={__('Scale', 'visual-portfolio')}
-								help={__(
-									'Applies when an aspect ratio is set.',
-									'visual-portfolio'
-								)}
+						/>
+						{/* Without a ratio the image keeps its own proportions,
+						    and there is no box left for the scale to fill. */}
+						{!!aspectRatio && (
+							<ScaleTool
+								panelId={clientId}
 								value={scale}
-								options={SCALE_OPTIONS}
 								onChange={(value) =>
 									setAttributes({ scale: value })
 								}
+								resetAllFilter={() => ({ scale: 'cover' })}
 							/>
-						</ToolsPanelItem>
+						)}
 					</InspectorControls>
 					<InspectorControls>
 						<ToolsPanel

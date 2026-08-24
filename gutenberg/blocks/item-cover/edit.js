@@ -31,6 +31,7 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
+import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
 import {
 	IMAGE_SIZE_OPTIONS,
 	useImageSizeOnInsert,
@@ -68,11 +69,6 @@ const SHOW_CONTENT_OPTIONS = [
 	{ label: __('Always', 'visual-portfolio'), value: 'always' },
 	{ label: __('On hover', 'visual-portfolio'), value: 'hover' },
 	{ label: __('Never', 'visual-portfolio'), value: 'never' },
-];
-
-const BACKGROUND_SIZE_OPTIONS = [
-	{ label: __('Cover', 'visual-portfolio'), value: 'cover' },
-	{ label: __('Contain', 'visual-portfolio'), value: 'contain' },
 ];
 
 const CLICK_ACTION_OPTIONS = [
@@ -419,27 +415,17 @@ export default function ItemCoverEdit({
 						</ToolsPanelItem>
 					</InspectorControls>
 					<InspectorControls group="dimensions">
-						<ToolsPanelItem
-							label={__('Aspect ratio', 'visual-portfolio')}
-							hasValue={() => aspectRatio !== '1'}
-							onDeselect={() =>
-								setAttributes({ aspectRatio: '1' })
+						{/* "Original" here is the proportions of each item's own
+						    image, which is what a masonry layout is made of. */}
+						<AspectRatioTool
+							panelId={clientId}
+							value={aspectRatio}
+							defaultValue="1"
+							onChange={(value) =>
+								setAttributes({ aspectRatio: value })
 							}
 							resetAllFilter={() => ({ aspectRatio: '1' })}
-							panelId={clientId}
-						>
-							<TextControl
-								label={__('Aspect ratio', 'visual-portfolio')}
-								help={__(
-									'For example 1, 4/3 or 16/9. Leave empty to give every cover the proportions of its own image, the way a masonry layout wants them.',
-									'visual-portfolio'
-								)}
-								value={aspectRatio}
-								onChange={(value) =>
-									setAttributes({ aspectRatio: value })
-								}
-							/>
-						</ToolsPanelItem>
+						/>
 						<ToolsPanelItem
 							label={__('Minimum height', 'visual-portfolio')}
 							hasValue={() => !!minHeight}
@@ -457,24 +443,20 @@ export default function ItemCoverEdit({
 								}
 							/>
 						</ToolsPanelItem>
-						<ToolsPanelItem
-							label={__('Scale', 'visual-portfolio')}
-							hasValue={() => backgroundSize !== 'cover'}
-							onDeselect={() =>
-								setAttributes({ backgroundSize: 'cover' })
-							}
-							resetAllFilter={() => ({ backgroundSize: 'cover' })}
-							panelId={clientId}
-						>
-							<SelectControl
-								label={__('Scale', 'visual-portfolio')}
+						{/* A cover with neither is exactly its own image, so
+						    there is nothing for the scale to do. */}
+						{!!(aspectRatio || minHeight) && (
+							<ScaleTool
+								panelId={clientId}
 								value={backgroundSize}
-								options={BACKGROUND_SIZE_OPTIONS}
 								onChange={(value) =>
 									setAttributes({ backgroundSize: value })
 								}
+								resetAllFilter={() => ({
+									backgroundSize: 'cover',
+								})}
 							/>
-						</ToolsPanelItem>
+						)}
 					</InspectorControls>
 					<InspectorControls>
 						<ToolsPanel
