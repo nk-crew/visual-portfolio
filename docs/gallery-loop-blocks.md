@@ -62,10 +62,12 @@ sit the three choices a gallery is usually made with: a filter, what the
 pagination is, and whether an item opens in the lightbox. They are applied to
 whichever pattern is chosen.
 
-Eight patterns ship, one per shape rather than one per skin: Grid Classic, Grid
-Overlay, Masonry Clean, Masonry Captions, Tiles Mosaic, Justified Photo Wall,
-Carousel Showcase and Posts Cards. A pattern is a starting point and nothing
-more: everything in it is ordinary blocks, and it is inserted unlocked.
+Fourteen patterns ship. Eight are one per shape rather than one per skin: Grid
+Classic, Grid Overlay, Masonry Clean, Masonry Captions, Tiles Mosaic, Justified
+Photo Wall, Carousel Showcase and Posts Cards. Six more take a shape and add one
+thing the blocks can do: Grid Rounded, Masonry Reveal, Filtered Portfolio Grid,
+Paged Posts Grid, Carousel Peek and Blog Roll. A pattern is a starting point and
+nothing more: everything in it is ordinary blocks, and it is inserted unlocked.
 
 **Inspector.** The loop sorts its settings the way the core Query block sorts
 its own, in this order:

@@ -2,16 +2,21 @@
 	position: relative;
 	margin: 0;
 
+	// The border support of the block lands on the figure, and a wrapper does
+	// not clip the corners of what it holds - the radius has to travel down to
+	// the picture and through the link between them.
 	img {
 		display: block;
 		width: 100%;
 		height: auto;
+		border-radius: inherit;
 	}
 
 	// The link is the box the overlay is positioned against.
 	> a {
 		position: relative;
 		display: block;
+		border-radius: inherit;
 	}
 
 	// Editor stand-in for an item that has no image yet.
@@ -26,6 +31,7 @@
 		position: absolute;
 		inset: 0;
 		background-color: #000;
+		border-radius: inherit;
 
 		&.has-background-gradient {
 			background-color: transparent;
