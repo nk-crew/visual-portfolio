@@ -49,7 +49,8 @@
 		"spacing": {
 			"margin": true,
 			"padding": true
-		}
+		},
+		"contentRole": true
 	},
 	"style": "visual-portfolio-block-item-description"
 }
