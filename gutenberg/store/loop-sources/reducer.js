@@ -16,13 +16,17 @@ export default function reducer(state = DEFAULT_STATE, action = {}) {
 			({ name }) => name === action.source.name
 		);
 
-		// Re-registering keeps the slot, so Pro can replace a teaser card with
-		// the real source without moving it in the picker.
+		// Re-registering merges over the slot rather than taking it, so Pro can
+		// turn a teaser card into the real source by naming only what it adds:
+		// the card keeps its place in the picker and its icon, and the drawing
+		// of a source lives in one plugin instead of two.
 		const sources =
 			-1 === index
 				? [...state.sources, action.source]
 				: state.sources.map((source, current) =>
-						current === index ? action.source : source
+						current === index
+							? { ...source, ...action.source }
+							: source
 					);
 
 		return { ...state, sources };

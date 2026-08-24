@@ -6,7 +6,17 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { META_TYPES } from './meta-types';
+import { ReactComponent as CommentsIcon } from '../../block-icons/item-meta-variation-comments.svg';
+import { ReactComponent as ReadingTimeIcon } from '../../block-icons/item-meta-variation-reading-time.svg';
+import { ReactComponent as ViewsIcon } from '../../block-icons/item-meta-variation-views.svg';
+
+// The inserter mark of a variation. Kept apart from `META_TYPES[].icon`, which
+// is the mark the block itself prints - in the editor and on the front end.
+const VARIATION_ICONS = {
+	comments: CommentsIcon,
+	views: ViewsIcon,
+	'reading-time': ReadingTimeIcon,
+};
 
 /**
  * Build the variation of a meta type.
@@ -21,7 +31,7 @@ import { META_TYPES } from './meta-types';
  * @return {Object} block variation.
  */
 function getVariation(name, title, description) {
-	const Icon = META_TYPES[name].icon;
+	const Icon = VARIATION_ICONS[name];
 
 	return {
 		name,

@@ -33,6 +33,10 @@ import { LOOP_SOURCES_STORE } from '../store/loop-sources';
  *   twin of the `vpf_convert_loop_source_attributes` PHP filter, and the two
  *   must agree - see `tests/fixtures/loop-source-attributes.json`.
  *
+ * Registering a name a second time merges over the first registration, so a
+ * source can be extended - typically by Pro - without repeating what is already
+ * there.
+ *
  * Code that cannot import this module dispatches the store action instead:
  * `wp.data.dispatch( 'visual-portfolio/loop-sources' ).registerSource( … )`.
  *

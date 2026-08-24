@@ -1,11 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { link } from '@wordpress/icons';
-
-/**
  * Internal dependencies
  */
+import { ReactComponent as BlockIcon } from '../../block-icons/item-read-more.svg';
 import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import edit from './edit';
@@ -17,7 +13,7 @@ registerLoopBlock(metadata.name, {
 	...metadata,
 	icon: {
 		foreground: '#2540CC',
-		src: link,
+		src: <BlockIcon width="20" height="20" />,
 	},
 	edit,
 });

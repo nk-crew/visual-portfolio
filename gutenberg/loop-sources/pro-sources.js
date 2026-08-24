@@ -17,7 +17,8 @@ const { plugin_version: pluginVersion, pro: isProPlugin } =
  * - without Pro, so the picker can advertise them;
  * - with Pro, so a loop already set to one of them keeps a name, an icon and a
  *   place in the picker. Pro re-registers these names in Phase 7 with a real
- *   `SettingsPanel`, which takes over the slot held here.
+ *   `SettingsPanel`, which merges into the slot held here - the title and the
+ *   icon of both sources are the ones declared below.
  */
 const PRO_SOURCES = [
 	{

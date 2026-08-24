@@ -5,7 +5,7 @@
 /**
  * Internal dependencies
  */
-import { ReactComponent as BlockIcon } from '../../block-icons/item-meta-comments.svg';
+import { ReactComponent as BlockIcon } from '../../block-icons/item-meta.svg';
 import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import edit from './edit';
