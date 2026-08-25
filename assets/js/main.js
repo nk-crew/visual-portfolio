@@ -793,11 +793,14 @@ class VP {
 			return;
 		}
 
-		// load to invisible container, then append to posts container
-		content = content
-			.replace('<body', '<body><div id="vp-ajax-load-body"')
-			.replace('</body>', '</div></body>');
-		const $body = $(content).filter('#vp-ajax-load-body');
+		// Parse the response instead of marking its body with a string replace.
+		// The marker landed on the first `<body` in the response, and on a page
+		// that prints that literal earlier, in inline CSS or inline JS, that is
+		// not the body tag, so the block was never found. A parsed document is
+		// also inert, so the response no longer requests its images.
+		const $body = $(
+			new window.DOMParser().parseFromString(content, 'text/html').body
+		);
 
 		// find current block on new page
 		const $newVP = $body.find(`.vp-portfolio.vp-uid-${this.uid}`);
@@ -895,6 +898,12 @@ class VP {
 		const nextPageUrl = $newVP.attr('data-vp-next-page-url');
 		this.options.nextPageUrl = nextPageUrl;
 		this.$item.attr('data-vp-next-page-url', nextPageUrl);
+
+		// Nothing was replaced, so forget the request. `loadNewItems()` refuses a
+		// URL it has already loaded, and the pagination would stay dead.
+		if (!$newVP.length) {
+			this.href = false;
+		}
 
 		this.$item.removeClass('vp-portfolio__loading');
 
