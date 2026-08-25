@@ -47,8 +47,13 @@ $preview-resize-transition: 300ms;
 		opacity: 0;
 	}
 
+	// Taken out of flow so the wrapper keeps the height the editor gives it while the new
+	// document loads. Pinned to all four edges rather than left to shrink-to-fit, because the
+	// frame inside resolves its `height: 100%` against this box: with no height here the frame
+	// loads into a zero-pixel viewport and measures itself in one.
 	> .visual-portfolio-gutenberg-preview-inner {
 		position: absolute;
+		inset: 0;
 	}
 
 	> .components-spinner {

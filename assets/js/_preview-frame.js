@@ -53,6 +53,7 @@ function throttleTrailing(delay, fn) {
 		const immediate = (...args) => fn(...args);
 
 		immediate.cancel = () => {};
+		immediate.reset = () => {};
 
 		return immediate;
 	}
@@ -103,6 +104,13 @@ function throttleTrailing(delay, fn) {
 		pending = null;
 	};
 
+	// Forget the open window as well as the pending call, so the next call runs on a leading
+	// edge again. Used when the thing being rate-limited is replaced rather than merely quiet.
+	throttled.reset = () => {
+		throttled.cancel();
+		lastRun = 0;
+	};
+
 	return throttled;
 }
 
@@ -120,7 +128,7 @@ function throttleTrailing(delay, fn) {
  * @return {Object} handle with `sendMessage`, `resize` and `destroy`.
  */
 export function connectPreviewFrame(iframe, options = {}) {
-	const {
+	let {
 		targetOrigin = window.location.origin,
 		sizeHeight = true,
 		applyInterval = 0,
@@ -196,8 +204,21 @@ export function connectPreviewFrame(iframe, options = {}) {
 			return;
 		}
 
+		// Where the frame really is, rather than where the server said it would be. The two
+		// disagree on a site whose stored URL carries a different scheme or host from the one
+		// the browser used, and posting to the wrong origin drops every message in silence.
+		// Safe to trust: the check above already established that this is our own frame.
+		if (event.origin && event.origin !== 'null') {
+			targetOrigin = event.origin;
+		}
+
 		switch (data.type) {
 			case 'ready':
+				// A `ready` means the frame is showing a document this connection has not
+				// sized yet. Reopen the rate limiter so that document's first height applies
+				// at once instead of waiting out a window the previous one opened.
+				applyHeight.reset();
+
 				// Ask for a measurement before running the caller's hook. The frame may have
 				// loaded before this listener existed, so its own `ready` announcement can be
 				// long gone - and if `onInit` throws, the frame must still get sized rather
@@ -377,19 +398,19 @@ export function initPreviewFrameChild(options = {}) {
 			return;
 		}
 
-		// `event.source` is the window whose script called `postMessage`, not the frame that
-		// contains us. The editor runs in the admin page while this preview sits inside the
-		// canvas frame, so the sender is an ancestor rather than `window.parent` itself.
+		// Judged by origin, never by position in the frame tree. Being our parent proves only
+		// that a page embedded us, which any page can do, and the sender is not the parent
+		// anyway: the editor runs in the admin page while this preview sits inside the canvas
+		// frame, so `event.source` is an ancestor further up.
 		//
-		// Accept a direct parent, our own origin, or one of the origins the server told us the
-		// editor lives on. That last one matters when a site puts `admin_url` and `home_url`
-		// on different hosts: the frame is served from one and driven from the other, and
-		// without it the dynamic CSS and resize messages would be dropped in silence.
-		const fromParent = event.source === window.parent;
+		// Our own origin covers the ordinary site. The list from the server covers a site that
+		// puts `admin_url` and `home_url` on different hosts - the frame is served from one and
+		// driven from the other, and without it the dynamic CSS and resize messages would be
+		// dropped in silence.
 		const sameOrigin = event.origin === window.location.origin;
 		const knownHost = hostOrigins.indexOf(event.origin) !== -1;
 
-		if (!fromParent && !sameOrigin && !knownHost) {
+		if (!sameOrigin && !knownHost) {
 			return;
 		}
 
@@ -459,6 +480,20 @@ export function initPreviewFrameChild(options = {}) {
 
 	window.addEventListener('load', scheduleMeasure);
 
+	// A hidden tab is throttled hard, and a box that changes while it is hidden may never be
+	// reported. Re-measure on the way back, forcing it past the `lastHeight` check so a height
+	// the host missed is sent again rather than assumed delivered.
+	function handleVisibility() {
+		if (destroyed || document.visibilityState !== 'visible') {
+			return;
+		}
+
+		lastHeight = -1;
+		scheduleMeasure();
+	}
+
+	document.addEventListener('visibilitychange', handleVisibility);
+
 	post('ready');
 	measure();
 
@@ -482,6 +517,7 @@ export function initPreviewFrameChild(options = {}) {
 
 			window.removeEventListener('message', handleMessage);
 			window.removeEventListener('load', scheduleMeasure);
+			document.removeEventListener('visibilitychange', handleVisibility);
 		},
 	};
 }

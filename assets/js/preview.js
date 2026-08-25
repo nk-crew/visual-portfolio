@@ -13,8 +13,8 @@ const dynamicCSScache = {};
  *
  * Looked up on every call rather than cached: loading a page of results over AJAX replaces this
  * element, and a cached reference would keep reporting the height of a node that is no longer in
- * the document. `getElementById` is the cheapest lookup there is, and measuring only happens once
- * per animation frame.
+ * the document. `getElementById` is the cheapest lookup there is, and a burst of changes is
+ * coalesced into a single measurement anyway.
  *
  * @return {HTMLElement|null} the measured element, if it exists yet.
  */

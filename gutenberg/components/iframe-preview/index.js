@@ -153,6 +153,11 @@ class IframePreview extends Component {
 			this.unsubscribe();
 		}
 
+		if (this.frameTimeout) {
+			clearTimeout(this.frameTimeout);
+			this.frameTimeout = null;
+		}
+
 		this.frameRef.current.removeEventListener('load', this.onFrameLoad);
 		(this.previewWindow || window).removeEventListener(
 			'resize',
@@ -178,28 +183,45 @@ class IframePreview extends Component {
 		// counts as cross-origin and reading anything off its window throws, even though
 		// both documents are on the same host. Reading `contentWindow` itself still works,
 		// so the throw lands here rather than on the line above.
+		//
+		// The same read says whether this is the blank document an `<iframe>` starts on.
+		// Some browsers fire `load` for that one, and taking it for the preview would drop
+		// the spinner before the form has posted anything into the frame. A frame that
+		// throws is never the blank one: blank inherits this document's origin and policy,
+		// so it always reads.
+		let blank = false;
+
 		try {
 			this.frameJQuery = e.target.contentWindow.jQuery;
+			blank = e.target.contentWindow.location.href === 'about:blank';
 		} catch {
 			this.frameJQuery = null;
+		}
+
+		if (blank) {
+			return;
 		}
 
 		if (this.frameJQuery) {
 			this.$framePortfolio = this.frameJQuery('.vp-portfolio');
 
 			this.maybeResizePreviews();
-
-			if (this.frameTimeout) {
-				clearTimeout(this.frameTimeout);
-			}
-
-			// We need this timeout, since we resize iframe size and layouts resized with transitions.
-			this.frameTimeout = setTimeout(() => {
-				this.setState({
-					loading: false,
-				});
-			}, 300);
 		}
+
+		if (this.frameTimeout) {
+			clearTimeout(this.frameTimeout);
+		}
+
+		// We need this timeout, since we resize iframe size and layouts resized with transitions.
+		//
+		// Outside the check above on purpose. Height and messages travel over `postMessage`,
+		// which works whether or not this document may read the frame's window, so a preview
+		// that is running fine must not be left behind a spinner because that read failed.
+		this.frameTimeout = setTimeout(() => {
+			this.setState({
+				loading: false,
+			});
+		}, 300);
 	}
 
 	maybePreviewTypeChanged(prevProps) {

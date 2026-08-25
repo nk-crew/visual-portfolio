@@ -40,8 +40,12 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
 			// stylesheet was never loaded, and the preview ran without the rules that give it
 			// `overflow: hidden`, `pointer-events: none` and `max-width: none` on the frame.
 			Visual_Portfolio_Assets::register_style( 'visual-portfolio-elementor-editor', 'build/assets/admin/css/elementor' );
+
+			// No `suffix`, unlike the plugin's other styles. Core swaps the RTL file in by
+			// replacing "{suffix}.css" in the URL, and these files are registered without a
+			// `.min`, so declaring one means the swap never matches and the RTL stylesheet
+			// never loads.
 			wp_style_add_data( 'visual-portfolio-elementor-editor', 'rtl', 'replace' );
-			wp_style_add_data( 'visual-portfolio-elementor-editor', 'suffix', '.min' );
 		}
 	}
 

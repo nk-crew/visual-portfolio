@@ -81,10 +81,29 @@ $wnd.on('elementor/frontend/init', ($data) => {
 	// No `rafSchd`: it holds its pending frame id until that frame runs, and a hidden editor tab
 	// gets no frames - so one call made while the tab is in the background would swallow every
 	// later resize.
+	//
+	// Width only. This function exists to hand the frames a viewport width, and reacting to
+	// height as well would close a loop: applying a frame's height grows the document being
+	// watched here, and the answer to that would be to re-send a width the frame relayouts
+	// against, which changes its height again.
+	let lastObservedWidth = null;
+
+	function handleDocumentResize(entries) {
+		const width = entries[0]?.contentRect?.width;
+
+		if (width === lastObservedWidth) {
+			return;
+		}
+
+		lastObservedWidth = width;
+
+		maybeResizePreviewsDebounced();
+	}
+
 	if (typeof elementorWindow.ResizeObserver !== 'undefined') {
-		new elementorWindow.ResizeObserver(
-			maybeResizePreviewsDebounced
-		).observe(elementorWindow.document.documentElement);
+		new elementorWindow.ResizeObserver(handleDocumentResize).observe(
+			elementorWindow.document.documentElement
+		);
 	}
 
 	// Kept as a fallback for anything that resizes the preview window itself.
