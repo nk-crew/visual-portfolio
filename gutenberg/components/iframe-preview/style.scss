@@ -1,13 +1,30 @@
+// Preview height eases instead of snapping. Content settles over about a second and reports a
+// new height as it goes; without this the preview steps through those heights and reads as
+// jitter. Shorter than the interval the editor applies heights at, so each step finishes before
+// the next one starts.
+//
+// Only the wrapper carries a height, and the frame fills it. Giving both their own height meant
+// two edges easing independently, which looks like the preview resizing twice.
+$preview-resize-transition: 300ms;
+
 .visual-portfolio-gutenberg-preview {
 	position: relative;
 	min-height: 40px;
 	overflow: hidden;
+	transition: height $preview-resize-transition ease;
 
 	iframe {
 		position: absolute;
 		width: 100%;
+		height: 100%;
 		max-width: none !important;
 		margin: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.visual-portfolio-gutenberg-preview {
+		transition: none;
 	}
 }
 
@@ -30,8 +47,13 @@
 		opacity: 0;
 	}
 
+	// Taken out of flow so the wrapper keeps the height the editor gives it while the new
+	// document loads. Pinned to all four edges rather than left to shrink-to-fit, because the
+	// frame inside resolves its `height: 100%` against this box: with no height here the frame
+	// loads into a zero-pixel viewport and measures itself in one.
 	> .visual-portfolio-gutenberg-preview-inner {
 		position: absolute;
+		inset: 0;
 	}
 
 	> .components-spinner {

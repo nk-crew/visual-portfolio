@@ -6,12 +6,14 @@ import { dispatch, select, subscribe, withSelect } from '@wordpress/data';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import classnames from 'classnames/dedupe';
-import iframeResizer from 'iframe-resizer/js/iframeResizer';
 import $ from 'jquery';
 import { isEqual, uniq } from 'lodash';
-import rafSchd from 'raf-schd';
-import { debounce, throttle } from 'throttle-debounce';
+import { debounce } from 'throttle-debounce';
 
+import {
+	connectPreviewFrame,
+	resolveTargetOrigin,
+} from '../../../assets/js/_preview-frame';
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
 
 const {
@@ -20,6 +22,12 @@ const {
 } = window;
 
 let uniqueIdCount = 1;
+
+// Smallest gap between preview resizes, in ms. Content settles over roughly a second and reports
+// a new height many times a second while it does; applying each one makes the preview jitter.
+// This is deliberately longer than the CSS transition in `style.scss`, so every step finishes
+// easing before the next one starts and the movement reads as continuous rather than stepped.
+const PREVIEW_RESIZE_INTERVAL = 400;
 
 function getUpdatedKeys(oldData, newData) {
 	const keys = uniq([...Object.keys(oldData), ...Object.keys(newData)]);
@@ -66,16 +74,19 @@ class IframePreview extends Component {
 		// reload for the rest of the session.
 		this.maybeReloadDebounce = debounce(300, this.maybeReload.bind(this));
 		this.maybeResizePreviews = this.maybeResizePreviews.bind(this);
-		this.maybeResizePreviewsThrottle = throttle(
-			100,
-			rafSchd(this.maybeResizePreviews)
+		// Debounced, not throttled: this hands the frame a new width, which makes the gallery
+		// inside recompute its columns. Doing that on every step of a drag is both expensive and
+		// visibly jumpy, because the column count changes as the width crosses each breakpoint.
+		// Waiting for the drag to stop gives one relayout at the size the user actually chose.
+		//
+		// No `rafSchd`: it holds its pending frame id until that frame runs, and a hidden editor
+		// tab gets no frames, so one call made while the tab is in the background would swallow
+		// every later resize.
+		this.maybeResizePreviewsDebounce = debounce(
+			300,
+			this.maybeResizePreviews
 		);
 		this.updateIframeHeight = this.updateIframeHeight.bind(this);
-
-		this.updateIframeHeightThrottle = throttle(
-			100,
-			rafSchd(this.updateIframeHeight)
-		);
 		this.printInput = this.printInput.bind(this);
 
 		this.trackBlockPosition = this.trackBlockPosition.bind(this);
@@ -96,25 +107,25 @@ class IframePreview extends Component {
 			this.trackBlockPosition(clientId);
 		});
 
-		iframeResizer(
-			{
-				interval: 10,
-				warningTimeout: 60000,
-				checkOrigin: false,
-				onMessage({ message }) {
-					// select current block on click message.
-					if (message === 'clicked') {
-						dispatch('core/block-editor').selectBlock(clientId);
+		self.previewFrame = connectPreviewFrame(self.frameRef.current, {
+			targetOrigin: resolveTargetOrigin(variables.preview_url),
+			applyInterval: PREVIEW_RESIZE_INTERVAL,
+			// The wrapper carries the height and the frame fills it, so exactly one box
+			// changes size. Sizing both left two edges easing independently, which reads as
+			// the preview resizing twice.
+			sizeHeight: false,
+			onMessage({ message }) {
+				// select current block on click message.
+				if (message === 'clicked') {
+					dispatch('core/block-editor').selectBlock(clientId);
 
-						window.focus();
-					}
-				},
-				onResized({ height }) {
-					self.updateIframeHeightThrottle(`${height}px`);
-				},
+					window.focus();
+				}
 			},
-			self.frameRef.current
-		);
+			onResized({ height }) {
+				self.updateIframeHeight(`${height}px`);
+			},
+		});
 
 		self.frameRef.current.addEventListener('load', self.onFrameLoad);
 
@@ -125,7 +136,7 @@ class IframePreview extends Component {
 		self.previewWindow = self.getPreviewDocument().defaultView || window;
 		self.previewWindow.addEventListener(
 			'resize',
-			self.maybeResizePreviewsThrottle
+			self.maybeResizePreviewsDebounce
 		);
 
 		self.maybeReload();
@@ -142,15 +153,20 @@ class IframePreview extends Component {
 			this.unsubscribe();
 		}
 
+		if (this.frameTimeout) {
+			clearTimeout(this.frameTimeout);
+			this.frameTimeout = null;
+		}
+
 		this.frameRef.current.removeEventListener('load', this.onFrameLoad);
 		(this.previewWindow || window).removeEventListener(
 			'resize',
-			this.maybeResizePreviewsThrottle
+			this.maybeResizePreviewsDebounce
 		);
 
-		if (this.frameRef.current.iframeResizer) {
-			this.frameRef.current.iframeResizer.close();
-			this.frameRef.current.iframeResizer.removeListeners();
+		if (this.previewFrame) {
+			this.previewFrame.destroy();
+			this.previewFrame = null;
 		}
 	}
 
@@ -161,24 +177,51 @@ class IframePreview extends Component {
 	 */
 	onFrameLoad(e) {
 		this.frameWindow = e.target.contentWindow;
-		this.frameJQuery = e.target.contentWindow.jQuery;
+
+		// WordPress 7.1 serves the editor with `Document-Isolation-Policy`, which places it
+		// in its own agent cluster. A frame that does not answer with the same policy then
+		// counts as cross-origin and reading anything off its window throws, even though
+		// both documents are on the same host. Reading `contentWindow` itself still works,
+		// so the throw lands here rather than on the line above.
+		//
+		// The same read says whether this is the blank document an `<iframe>` starts on.
+		// Some browsers fire `load` for that one, and taking it for the preview would drop
+		// the spinner before the form has posted anything into the frame. A frame that
+		// throws is never the blank one: blank inherits this document's origin and policy,
+		// so it always reads.
+		let blank = false;
+
+		try {
+			this.frameJQuery = e.target.contentWindow.jQuery;
+			blank = e.target.contentWindow.location.href === 'about:blank';
+		} catch {
+			this.frameJQuery = null;
+		}
+
+		if (blank) {
+			return;
+		}
 
 		if (this.frameJQuery) {
 			this.$framePortfolio = this.frameJQuery('.vp-portfolio');
 
 			this.maybeResizePreviews();
-
-			if (this.frameTimeout) {
-				clearTimeout(this.frameTimeout);
-			}
-
-			// We need this timeout, since we resize iframe size and layouts resized with transitions.
-			this.frameTimeout = setTimeout(() => {
-				this.setState({
-					loading: false,
-				});
-			}, 300);
 		}
+
+		if (this.frameTimeout) {
+			clearTimeout(this.frameTimeout);
+		}
+
+		// We need this timeout, since we resize iframe size and layouts resized with transitions.
+		//
+		// Outside the check above on purpose. Height and messages travel over `postMessage`,
+		// which works whether or not this document may read the frame's window, so a preview
+		// that is running fine must not be left behind a spinner because that read failed.
+		this.frameTimeout = setTimeout(() => {
+			this.setState({
+				loading: false,
+			});
+		}, 300);
 	}
 
 	maybePreviewTypeChanged(prevProps) {
@@ -194,8 +237,6 @@ class IframePreview extends Component {
 			return;
 		}
 		this.busyReload = true;
-
-		const frame = this.frameRef.current;
 
 		const newAttributes = this.props.attributes;
 		const oldAttributes = prevProps.attributes;
@@ -252,8 +293,8 @@ class IframePreview extends Component {
 				}
 
 				// Insert dynamic CSS.
-				if (frame.iFrameResizer && newAttributes.block_id) {
-					frame.iFrameResizer.sendMessage({
+				if (this.previewFrame && newAttributes.block_id) {
+					this.previewFrame.sendMessage({
 						name: 'dynamic-css',
 						blockId: newAttributes.block_id,
 						styles: getDynamicCSS(newAttributes),
@@ -355,12 +396,12 @@ class IframePreview extends Component {
 			width: contentWidth,
 		});
 
-		if (frame.iFrameResizer) {
-			frame.iFrameResizer.sendMessage({
+		if (this.previewFrame) {
+			this.previewFrame.sendMessage({
 				name: 'resize',
 				width: parentWidth,
 			});
-			frame.iFrameResizer.resize();
+			this.previewFrame.resize();
 		}
 	}
 

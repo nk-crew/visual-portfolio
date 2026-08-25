@@ -293,6 +293,32 @@ class Visual_Portfolio_Gutenberg {
 			return;
 		}
 
+		// Styles are enqueued on both passes of this hook. WordPress runs it a
+		// second time to collect what the editor canvas iframe needs, and the
+		// block's editor styles have to be in there - the canvas is a document
+		// of its own, and as of 7.1 the post editor always has one.
+		Visual_Portfolio_Assets::enqueue_style(
+			'visual-portfolio-gutenberg',
+			'build/gutenberg/index'
+		);
+		wp_style_add_data( 'visual-portfolio-gutenberg', 'rtl', 'replace' );
+		wp_style_add_data( 'visual-portfolio-gutenberg', 'suffix', '.min' );
+
+		Visual_Portfolio_Assets::enqueue_style(
+			'visual-portfolio-gutenberg-custom-post-meta',
+			'build/gutenberg/custom-post-meta'
+		);
+		wp_style_add_data( 'visual-portfolio-gutenberg-custom-post-meta', 'rtl', 'replace' );
+		wp_style_add_data( 'visual-portfolio-gutenberg-custom-post-meta', 'suffix', '.min' );
+
+		// The editor bundle belongs to the editor around the canvas, not inside
+		// it. Core marks the collecting pass by turning this flag off, so a
+		// script left past here would be downloaded and run a second time in
+		// the iframe, registering every block again in a registry nothing reads.
+		if ( ! wp_should_load_block_editor_scripts_and_styles() ) {
+			return;
+		}
+
 		$attributes = self::get_block_attributes();
 
 		$gutenberg_script_dependencies = array( 'masonry' );
@@ -314,12 +340,6 @@ class Visual_Portfolio_Gutenberg {
 			'build/gutenberg/index',
 			$gutenberg_script_dependencies
 		);
-		Visual_Portfolio_Assets::enqueue_style(
-			'visual-portfolio-gutenberg',
-			'build/gutenberg/index'
-		);
-		wp_style_add_data( 'visual-portfolio-gutenberg', 'rtl', 'replace' );
-		wp_style_add_data( 'visual-portfolio-gutenberg', 'suffix', '.min' );
 
 		// Asking for the sort options fires `vpf_loop_sort_options`, and the
 		// block that reads them ships with the Gallery Loop family.
@@ -355,12 +375,6 @@ class Visual_Portfolio_Gutenberg {
 			'visual-portfolio-gutenberg-custom-post-meta',
 			'build/gutenberg/custom-post-meta'
 		);
-		Visual_Portfolio_Assets::enqueue_style(
-			'visual-portfolio-gutenberg-custom-post-meta',
-			'build/gutenberg/custom-post-meta'
-		);
-		wp_style_add_data( 'visual-portfolio-gutenberg-custom-post-meta', 'rtl', 'replace' );
-		wp_style_add_data( 'visual-portfolio-gutenberg-custom-post-meta', 'suffix', '.min' );
 
 		wp_localize_script(
 			'visual-portfolio-gutenberg-custom-post-meta',

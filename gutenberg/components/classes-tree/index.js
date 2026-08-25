@@ -64,7 +64,14 @@ export default class ClassesTree extends Component {
 		}
 
 		// this.frameWindow = this.iframePreview.contentWindow;
-		this.frameJQuery = this.iframePreview.contentWindow.jQuery;
+		// See the note in `iframe-preview`: under WordPress 7.1's `Document-Isolation-Policy`
+		// a frame without the same policy reads as cross-origin, so this throws. The
+		// `contentWindow` guard above does not cover it — that property is still readable.
+		try {
+			this.frameJQuery = this.iframePreview.contentWindow.jQuery;
+		} catch {
+			this.frameJQuery = null;
+		}
 
 		if (this.frameJQuery) {
 			this.$framePortfolio = this.frameJQuery('.vp-portfolio');

@@ -640,11 +640,10 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			);
 		}
 
-		if ( ! empty( $layouts ) ) {
-			return $this->success( $layouts );
-		} else {
-			return $this->error( 'no_layouts_found', __( 'Layouts not found.', 'visual-portfolio' ) );
-		}
+		// An empty list is a valid answer, not a failure. This used to return HTTP 401,
+		// which made the editor log a console error on every load and told any other client
+		// that the request was unauthenticated when it was not.
+		return $this->success( $layouts );
 	}
 
 	/**

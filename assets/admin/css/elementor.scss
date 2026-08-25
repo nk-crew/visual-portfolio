@@ -1,6 +1,9 @@
 /**
  * Elementor Preview Styles
  */
+// Matches the block editor: the height eases rather than snapping while content settles.
+$preview-resize-transition: 300ms;
+
 .visual-portfolio-elementor-preview {
 	position: relative;
 	overflow: hidden;
@@ -9,5 +12,12 @@
 	iframe {
 		max-width: none;
 		min-height: 20px;
+		transition: height $preview-resize-transition ease;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.visual-portfolio-elementor-preview iframe {
+		transition: none;
 	}
 }

@@ -82,10 +82,19 @@ class Visual_Portfolio_Admin {
 		}
 
 		if ( 'vp_lists' === get_post_type() ) {
-			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor' );
+			// The style is enqueued on both passes of this hook: WordPress runs
+			// it a second time to collect what the editor canvas iframe needs,
+			// and the saved layout is drawn in there. The script is editor
+			// chrome, and core marks that pass by turning this flag off.
 			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-saved-layouts', 'build/gutenberg/style-layouts-editor' );
 			wp_style_add_data( 'visual-portfolio-saved-layouts', 'rtl', 'replace' );
 			wp_style_add_data( 'visual-portfolio-saved-layouts', 'suffix', '.min' );
+
+			if ( ! wp_should_load_block_editor_scripts_and_styles() ) {
+				return;
+			}
+
+			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor' );
 
 			$block_data = Visual_Portfolio_Get::get_options( array( 'id' => get_the_ID() ) );
 			$data_init  = array(

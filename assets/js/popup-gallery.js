@@ -394,11 +394,11 @@ const VPPopupAPI = {
 
 		// Focus native gallery item.
 		if (data.linkEl) {
-			$(data.linkEl).focus();
+			$(data.linkEl).trigger('focus');
 
 			// Focus Visual Portfolio gallery item.
 		} else if (data.el) {
-			$(data.el).find('.vp-portfolio__item-img > a').focus();
+			$(data.el).find('.vp-portfolio__item-img > a').trigger('focus');
 		}
 	},
 

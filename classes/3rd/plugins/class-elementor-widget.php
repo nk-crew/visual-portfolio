@@ -32,12 +32,20 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
 		parent::__construct( $data, $args );
 
 		if ( $this->is_preview_mode() ) {
-			Visual_Portfolio_Assets::register_script( 'iframe-resizer', 'assets/vendor/iframe-resizer/js/iframeResizer.min', array(), '4.3.11' );
-			Visual_Portfolio_Assets::register_script( 'visual-portfolio-elementor', 'build/assets/admin/js/elementor', array( 'elementor-frontend', 'iframe-resizer' ) );
+			Visual_Portfolio_Assets::register_script( 'visual-portfolio-elementor', 'build/assets/admin/js/elementor', array( 'elementor-frontend' ) );
 
-			Visual_Portfolio_Assets::register_style( 'visual-portfolio-elementor', 'build/assets/admin/css/elementor' );
-			wp_style_add_data( 'visual-portfolio-elementor', 'rtl', 'replace' );
-			wp_style_add_data( 'visual-portfolio-elementor', 'suffix', '.min' );
+			// A handle of its own. `visual-portfolio-elementor` is already taken by the
+			// front-end conflict styles registered in `Visual_Portfolio_Assets`, and
+			// `wp_register_style` keeps the first registration - so under the shared name this
+			// stylesheet was never loaded, and the preview ran without the rules that give it
+			// `overflow: hidden`, `pointer-events: none` and `max-width: none` on the frame.
+			Visual_Portfolio_Assets::register_style( 'visual-portfolio-elementor-editor', 'build/assets/admin/css/elementor' );
+
+			// No `suffix`, unlike the plugin's other styles. Core swaps the RTL file in by
+			// replacing "{suffix}.css" in the URL, and these files are registered without a
+			// `.min`, so declaring one means the swap never matches and the RTL stylesheet
+			// never loads.
+			wp_style_add_data( 'visual-portfolio-elementor-editor', 'rtl', 'replace' );
 		}
 	}
 
@@ -137,7 +145,7 @@ class Visual_Portfolio_3rd_Elementor_Widget extends \Elementor\Widget_Base {
 	 */
 	public function get_style_depends() {
 		if ( $this->is_preview_mode() ) {
-			return array( 'visual-portfolio-elementor' );
+			return array( 'visual-portfolio-elementor-editor' );
 		}
 
 		return array();

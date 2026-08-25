@@ -33,7 +33,10 @@ class Visual_Portfolio_Custom_Post_Meta {
 	 */
 	public static function is_gutenberg() {
 		$current_screen = get_current_screen();
-		if ( method_exists( $current_screen, 'is_block_editor' ) && $current_screen->is_block_editor() ) {
+
+		// No screen at all outside a real admin request, and `method_exists()` is
+		// deprecated for taking null since PHP 8.1.
+		if ( $current_screen && method_exists( $current_screen, 'is_block_editor' ) && $current_screen->is_block_editor() ) {
 			return true;
 		}
 

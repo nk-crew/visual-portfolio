@@ -1,10 +1,10 @@
 {
 	"require-dev": {
-		"wp-coding-standards/wpcs": "^3.3",
+		"wp-coding-standards/wpcs": "^3.4",
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.2",
-		"php-stubs/wordpress-stubs": "^6.9",
-		"php-stubs/wordpress-tests-stubs": "^6.8",
+		"php-stubs/wordpress-stubs": "^7.0",
+		"php-stubs/wordpress-tests-stubs": "^7.1",
 		"spatie/phpunit-watcher": "^1.24",
 		"symfony/process": "^6.4",
 		"yoast/phpunit-polyfills": "^4.0",

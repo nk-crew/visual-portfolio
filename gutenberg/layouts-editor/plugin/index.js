@@ -78,7 +78,6 @@ function UpdateEditor() {
 
 	/**
 	 * Always select block.
-	 * TODO: we actually should check the title block selected inside iframe
 	 */
 	const isBlockSelected = useRef(false);
 	useEffect(() => {
@@ -96,10 +95,17 @@ function UpdateEditor() {
 		}
 
 		// check if selected post title, also do nothing.
+		// The title is rendered inside the editor canvas, which WordPress
+		// iframes - always, as of 7.1 - so it is not in this document.
+		const titleSelector =
+			'.editor-post-title__block.is-selected, .editor-post-title.is-selected';
+		const canvasDocument = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		)?.contentDocument;
+
 		if (
-			document.querySelector(
-				'.editor-post-title__block.is-selected, .editor-post-title.is-selected'
-			)
+			document.querySelector(titleSelector) ||
+			canvasDocument?.querySelector(titleSelector)
 		) {
 			return;
 		}
