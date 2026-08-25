@@ -132,11 +132,10 @@ export function connectPreviewFrame(iframe, options = {}) {
 	let destroyed = false;
 	let initialised = false;
 
-	// A frame sized to its content never wants a scrollbar of its own. The frame hides its own
-	// document's overflow as well; this covers the moment before its script has run.
-	if (sizeHeight) {
-		iframe.style.overflow = 'hidden';
-	}
+	// A frame sized to its content never wants a scrollbar of its own, whoever applies the
+	// height. The frame hides its own document's overflow as well; this covers the moment
+	// before its script has run.
+	iframe.style.overflow = 'hidden';
 
 	// The frame posts to its own `window.parent`, which is the window that owns the frame's
 	// document - not necessarily the window this code runs in. Since WordPress 7.1 always

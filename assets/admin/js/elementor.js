@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { throttle } from 'throttle-debounce';
+import { debounce } from 'throttle-debounce';
 
 import {
 	connectPreviewFrame,
@@ -65,7 +65,11 @@ $wnd.on('elementor/frontend/init', ($data) => {
 			});
 	}
 
-	const maybeResizePreviewsThrottled = throttle(300, maybeResizePreviews);
+	// Debounced, not throttled: this hands the frame a new width, which makes the gallery inside
+	// recompute its columns. Doing that on every step of a drag is expensive and visibly jumpy,
+	// because the column count changes as the width crosses each breakpoint. Waiting for the
+	// resizing to stop gives one relayout at the size the user actually chose.
+	const maybeResizePreviewsDebounced = debounce(300, maybeResizePreviews);
 
 	// Follow the preview's own box, not just a window resize event.
 	//
@@ -74,17 +78,17 @@ $wnd.on('elementor/frontend/init', ($data) => {
 	// reports the box itself whatever caused it to change. The window listener stays as well,
 	// for anything that resizes the preview window without changing this element.
 	//
-	// No `rafSchd` on the throttle: it holds its pending frame id until that frame runs, and a
-	// hidden editor tab gets no frames - so one call made while the tab is in the background
-	// would swallow every later resize.
+	// No `rafSchd`: it holds its pending frame id until that frame runs, and a hidden editor tab
+	// gets no frames - so one call made while the tab is in the background would swallow every
+	// later resize.
 	if (typeof elementorWindow.ResizeObserver !== 'undefined') {
 		new elementorWindow.ResizeObserver(
-			maybeResizePreviewsThrottled
+			maybeResizePreviewsDebounced
 		).observe(elementorWindow.document.documentElement);
 	}
 
 	// Kept as a fallback for anything that resizes the preview window itself.
-	$wnd.on('resize', maybeResizePreviewsThrottled);
+	$wnd.on('resize', maybeResizePreviewsDebounced);
 
 	// added/changed widget.
 	elementorFrontend.hooks.addAction(

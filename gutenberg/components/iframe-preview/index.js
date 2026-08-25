@@ -8,7 +8,7 @@ import { applyFilters } from '@wordpress/hooks';
 import classnames from 'classnames/dedupe';
 import $ from 'jquery';
 import { isEqual, uniq } from 'lodash';
-import { debounce, throttle } from 'throttle-debounce';
+import { debounce } from 'throttle-debounce';
 
 import {
 	connectPreviewFrame,
@@ -74,11 +74,16 @@ class IframePreview extends Component {
 		// reload for the rest of the session.
 		this.maybeReloadDebounce = debounce(300, this.maybeReload.bind(this));
 		this.maybeResizePreviews = this.maybeResizePreviews.bind(this);
-		// No `rafSchd` here either, for the reason above: a hidden editor tab gets no frames, and
-		// `raf-schd` holds its pending frame id until one arrives, so a single call made while
-		// the tab is in the background swallows every later resize.
-		this.maybeResizePreviewsThrottle = throttle(
-			100,
+		// Debounced, not throttled: this hands the frame a new width, which makes the gallery
+		// inside recompute its columns. Doing that on every step of a drag is both expensive and
+		// visibly jumpy, because the column count changes as the width crosses each breakpoint.
+		// Waiting for the drag to stop gives one relayout at the size the user actually chose.
+		//
+		// No `rafSchd`: it holds its pending frame id until that frame runs, and a hidden editor
+		// tab gets no frames, so one call made while the tab is in the background would swallow
+		// every later resize.
+		this.maybeResizePreviewsDebounce = debounce(
+			300,
 			this.maybeResizePreviews
 		);
 		this.updateIframeHeight = this.updateIframeHeight.bind(this);
@@ -105,6 +110,10 @@ class IframePreview extends Component {
 		self.previewFrame = connectPreviewFrame(self.frameRef.current, {
 			targetOrigin: resolveTargetOrigin(variables.preview_url),
 			applyInterval: PREVIEW_RESIZE_INTERVAL,
+			// The wrapper carries the height and the frame fills it, so exactly one box
+			// changes size. Sizing both left two edges easing independently, which reads as
+			// the preview resizing twice.
+			sizeHeight: false,
 			onMessage({ message }) {
 				// select current block on click message.
 				if (message === 'clicked') {
@@ -127,7 +136,7 @@ class IframePreview extends Component {
 		self.previewWindow = self.getPreviewDocument().defaultView || window;
 		self.previewWindow.addEventListener(
 			'resize',
-			self.maybeResizePreviewsThrottle
+			self.maybeResizePreviewsDebounce
 		);
 
 		self.maybeReload();
@@ -147,7 +156,7 @@ class IframePreview extends Component {
 		this.frameRef.current.removeEventListener('load', this.onFrameLoad);
 		(this.previewWindow || window).removeEventListener(
 			'resize',
-			this.maybeResizePreviewsThrottle
+			this.maybeResizePreviewsDebounce
 		);
 
 		if (this.previewFrame) {
