@@ -71,8 +71,9 @@ Fourteen patterns ship. Eight are one per shape rather than one per skin: Grid
 Classic, Grid Overlay, Masonry Clean, Masonry Captions, Tiles Mosaic, Justified
 Photo Wall, Carousel Showcase and Posts Cards. Six more take a shape and add one
 thing the blocks can do: Grid Rounded, Masonry Reveal, Filtered Portfolio Grid,
-Paged Posts Grid, Carousel Peek and Blog Roll. A pattern is a starting point and
-nothing more: everything in it is ordinary blocks, and it is inserted unlocked.
+Paged Posts Grid, Carousel Coverflow and Blog Roll. A pattern is a starting
+point and nothing more: everything in it is ordinary blocks, and it is inserted
+unlocked.
 
 **Inspector.** The loop sorts its settings the way the core Query block sorts
 its own, in this order:
@@ -192,6 +193,7 @@ it reads — no hook involved:
 | `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
+| `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers. See below |
 | `vpf_loop_item_popup_data` | filter `( $data, $item, $options )` | Lightbox data of one item |
 | `vpf_rest_loop_items_source_configs` | filter | Allow-list of source parameters the editor preview endpoint accepts |
 
@@ -248,6 +250,57 @@ Three of them need a word for sources that are neither posts nor images:
 
   Entries are `option => type`, where the type is `ids`, `text`, `boolean` or
   `number` and names the sanitizer the value passes through on the way in.
+
+### Carousel effects
+
+An effect is a pair of scroll driven animations over two boxes the item template
+already renders. A carousel that plays one wraps every item in them, so an
+effect needs a stylesheet, a name on each side, and no markup of its own:
+
+```html
+<li class="…__item" style="--vp-slide-index:0">
+    <div class="…__slide">
+        <div class="…__card">…the blocks of the item…</div>
+    </div>
+</li>
+```
+
+The item stays the box the browser snaps to and the module measures slide
+positions from, so an effect may turn a card, scale it or pin it in place
+without moving the carousel underneath it. `--vp-slide-index` is the place of
+the item in the list, which is what a stacking effect deals the pile in.
+
+Register the name on the server and in the editor:
+
+```php
+add_filter(
+    'vpf_carousel_effects',
+    function ( $effects ) {
+        $effects[] = 'acme-flip';
+
+        return $effects;
+    }
+);
+```
+
+```js
+addFilter( 'vpf.carouselEffects', 'acme/flip', ( options ) => [
+    ...options,
+    { label: 'Flip', value: 'acme-flip' },
+] );
+```
+
+The list is given the classes `vp-carousel-effect` and `vp-carousel-acme-flip`,
+and the stylesheet is the install's own to enqueue —
+`render_block_visual-portfolio/item-template` is where Pro does it. Everything
+geometric belongs inside
+`@supports (animation-timeline: view())`: without it the two boxes are still
+rendered and the carousel is the plain carousel it would have been anyway.
+
+The frame around the list is an inline-size query container, so a width is
+stated in `cqw` rather than in a percentage of the list — a carousel that
+repeats is padded by half its width at each end, and a percentage of what that
+leaves is nothing.
 
 ### Sitemap
 

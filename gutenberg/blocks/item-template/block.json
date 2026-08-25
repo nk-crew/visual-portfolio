@@ -67,7 +67,7 @@
 		"carouselEffect": {
 			"type": "string",
 			"default": "none",
-			"enum": ["none", "coverflow", "slideshow", "cards"]
+			"enum": ["none", "coverflow", "slideshow"]
 		},
 		"carouselRepeat": {
 			"type": "boolean",

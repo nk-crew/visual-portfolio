@@ -188,4 +188,99 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		$this->assertStringContainsString( '--vp-cover-aspect-ratio:1', $output );
 		$this->assertStringNotContainsString( 'style="aspect-ratio', $output );
 	}
+
+	/**
+	 * A carousel with no effect is the item and its blocks, and nothing else.
+	 *
+	 * @return void
+	 */
+	public function test_a_plain_carousel_renders_no_effect_boxes() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' )
+		);
+
+		$this->assertStringContainsString( 'vp-layout-carousel', $output );
+		$this->assertStringNotContainsString( 'vp-carousel-effect', $output );
+		$this->assertStringNotContainsString( '__slide', $output );
+		$this->assertStringNotContainsString( '__card', $output );
+	}
+
+	/**
+	 * An effect wraps every item in the two boxes it is drawn on, and numbers
+	 * them - a stacking effect deals the items into a pile, and the pile has to
+	 * know which card is which.
+	 *
+	 * @return void
+	 */
+	public function test_an_effect_wraps_and_numbers_the_slides() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'     => 'carousel',
+				'carouselEffect' => 'coverflow',
+			)
+		);
+
+		$this->assertStringContainsString( 'vp-carousel-effect', $output );
+		$this->assertStringContainsString( 'vp-carousel-coverflow', $output );
+
+		$count = count( self::$images );
+
+		$this->assertSame( $count, substr_count( $output, 'wp-block-visual-portfolio-item-template__slide' ) );
+		$this->assertSame( $count, substr_count( $output, 'wp-block-visual-portfolio-item-template__card' ) );
+
+		for ( $index = 0; $index < $count; $index++ ) {
+			$this->assertStringContainsString( sprintf( '--vp-slide-index:%d', $index ), $output );
+		}
+	}
+
+	/**
+	 * An effect this install does not have is not an effect.
+	 *
+	 * The name is filtered, so a gallery saved with a Pro effect on a site
+	 * without Pro has to fall back to the carousel rather than to a class with
+	 * no stylesheet behind it.
+	 *
+	 * @return void
+	 */
+	public function test_an_unknown_effect_is_dropped() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'     => 'carousel',
+				'carouselEffect' => 'acme-unknown',
+			)
+		);
+
+		$this->assertStringContainsString( 'vp-layout-carousel', $output );
+		$this->assertStringNotContainsString( 'vp-carousel-effect', $output );
+		$this->assertStringNotContainsString( 'acme-unknown', $output );
+	}
+
+	/**
+	 * The controls of a carousel sit in one box, so that the countdown of
+	 * autoplay - drawn on the dots - can be published where the frame the
+	 * arrows are pinned to and the dots under it both read it.
+	 *
+	 * @return void
+	 */
+	public function test_the_carousel_controls_share_one_box() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'carouselIndicator' => 'dots',
+			)
+		);
+
+		$position = strpos( $output, 'wp-block-visual-portfolio-item-template__carousel"' );
+
+		$this->assertNotFalse( $position );
+		$this->assertGreaterThan(
+			$position,
+			strpos( $output, 'wp-block-visual-portfolio-item-template__carousel-nav' )
+		);
+		$this->assertStringContainsString( 'data-wp-class--vp-carousel-has-controls', $output );
+	}
 }

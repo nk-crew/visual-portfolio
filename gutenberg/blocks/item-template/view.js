@@ -22,11 +22,13 @@ const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
 const NAV_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-nav';
 const FRAME_SELECTOR =
 	'.wp-block-visual-portfolio-item-template__carousel-frame';
+const CAROUSEL_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel';
 const PROGRESS_SELECTOR =
 	'.wp-block-visual-portfolio-item-template__carousel-progress';
 const PLAYING_CLASS = 'vp-carousel-is-playing';
 const DOT_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-dot';
 const DOTS_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-dots';
+const EDGE_FADE_CLASS = 'vp-carousel-edge-fade';
 const MASONRY_CLASS = 'vp-layout-masonry';
 const MASONRY_NATIVE_CLASS = 'vp-layout-masonry-native';
 
@@ -47,9 +49,17 @@ const RELAYOUT_EVENT = 'vp-relayout';
 const GO_TO_EVENT = 'vp-carousel-go-to';
 const AUTOPLAY_EVENT = 'vp-carousel-autoplay';
 
+// How long an arrow keeps counting from the slide the last press was headed
+// for. Presses that come faster than the carousel travels are still one slide
+// each, and a press after the carousel has settled counts from where it is.
+const STEP_MEMORY = 700;
+
 const noop = () => {};
 
 const carousels = new WeakMap();
+
+// The slide the last press asked for, per carousel.
+const pending = new WeakMap();
 
 /**
  * Whether the browser packs a masonry layout without being asked twice.
@@ -77,27 +87,6 @@ if (nativeMasonry && typeof document !== 'undefined') {
 			list.classList.remove(MASONRY_CLASS);
 			list.classList.add(MASONRY_NATIVE_CLASS);
 		});
-}
-
-/**
- * Gap of a list, as CSS resolved it.
- *
- * Reading it back keeps the stylesheet the only place the number is written
- * down, so a theme that overrides the layout variables per breakpoint keeps
- * working.
- *
- * @param {HTMLElement} list Item template list.
- *
- * @return {number} Gap in pixels.
- */
-function getGap(list) {
-	const gap = window.getComputedStyle(list).columnGap;
-
-	if (gap.endsWith('%')) {
-		return (parseFloat(gap) / 100) * list.clientWidth || 0;
-	}
-
-	return parseFloat(gap) || 0;
 }
 
 /**
@@ -167,27 +156,83 @@ function getNav(list) {
 }
 
 /**
- * Index of the slide the carousel is resting on.
+ * The box the controls of a carousel belong to.
  *
  * @param {HTMLElement} list Item template list.
  *
- * @return {number} Index of the nearest item.
+ * @return {HTMLElement|null} Carousel element.
  */
-function getCurrentSlide(list) {
+function getCarousel(list) {
+	return list.closest(CAROUSEL_SELECTOR);
+}
+
+/**
+ * How far the carousel has to be scrolled for each of its slides to rest where
+ * it snaps.
+ *
+ * Measured from the layout rather than from the rendered boxes: `offsetLeft` is
+ * where a slide was laid out, and an effect that turns a card, scales it or
+ * pins it with `position: sticky` never moves that. Read from the drawn
+ * rectangles instead - which is what the carousel library does - and the arrows
+ * of a cover flow answer with a position the slide is already at, so pressing
+ * them does nothing at all.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {number[]} Scroll distance from the start, one per slide.
+ */
+function getSlideTargets(list) {
 	const items = Array.from(list.querySelectorAll(ITEM_SELECTOR));
+
+	if (!items.length) {
+		return [];
+	}
+
 	// The start of a carousel, not its left: on a right to left page the first
 	// slide sits against the right edge, and measuring from the left one marked
 	// the last slide as the current one for the whole carousel.
 	const rtl = isRtl(list);
-	const box = list.getBoundingClientRect();
-	const edge = rtl ? box.right : box.left;
+	const content = list.scrollWidth;
+	const furthest = Math.max(0, content - list.clientWidth);
+	// Where a slide comes to rest is the browser's answer, and these are the
+	// two properties it reads it from - the alignment from the slide, the
+	// padding it is held off the edge by from the container.
+	const centred = window
+		.getComputedStyle(items[0])
+		.scrollSnapAlign.startsWith('center');
+	const padding = centred
+		? 0
+		: parseFloat(window.getComputedStyle(list).scrollPaddingInlineStart) ||
+			0;
+
+	return items.map((item) => {
+		const start = rtl
+			? content - item.offsetLeft - item.offsetWidth
+			: item.offsetLeft;
+		const lead = centred
+			? (list.clientWidth - item.offsetWidth) / 2
+			: padding;
+
+		return Math.max(0, Math.min(furthest, start - lead));
+	});
+}
+
+/**
+ * Index of the slide the carousel is resting on.
+ *
+ * @param {HTMLElement} list    Item template list.
+ * @param {number[]}    targets Resting places of the slides.
+ *
+ * @return {number} Index of the nearest item.
+ */
+function getCurrentSlide(list, targets = getSlideTargets(list)) {
+	const position = getScrollPosition(list);
 
 	let nearest = 0;
 	let distance = Number.POSITIVE_INFINITY;
 
-	items.forEach((item, index) => {
-		const rect = item.getBoundingClientRect();
-		const offset = Math.abs((rtl ? rect.right : rect.left) - edge);
+	targets.forEach((target, index) => {
+		const offset = Math.abs(target - position);
 
 		if (offset < distance) {
 			distance = offset;
@@ -266,8 +311,13 @@ function syncNav(list) {
 
 	// Snapping never lands exactly on the edge, and a whole pixel of slack is
 	// less than any scroll step.
+	const position = getScrollPosition(list);
 	const end = list.scrollWidth - list.clientWidth - 1;
 	const repeats = 'true' === list.dataset.vpCarouselRepeat;
+
+	// A carousel that repeats has no ends to run out of.
+	const atStart = !repeats && position <= 1;
+	const atEnd = !repeats && position >= end;
 
 	if (frame) {
 		const prev = frame.querySelector(
@@ -277,16 +327,23 @@ function syncNav(list) {
 			'[data-wp-on--click="actions.carouselNext"]'
 		);
 
-		// A carousel that repeats has no ends to run out of.
-		const position = getScrollPosition(list);
-
 		if (prev) {
-			prev.disabled = !repeats && position <= 1;
+			prev.disabled = atStart;
 		}
 
 		if (next) {
-			next.disabled = !repeats && position >= end;
+			next.disabled = atEnd;
 		}
+	}
+
+	// The fade is an invitation to scroll on, so the end that has been reached
+	// loses it. Written by the side of the screen, which is where a mask is
+	// placed - on a right to left page the start of the carousel is the right.
+	if (list.classList.contains(EDGE_FADE_CLASS)) {
+		const rtl = isRtl(list);
+
+		setFade(list, 'left', rtl ? atEnd : atStart);
+		setFade(list, 'right', rtl ? atStart : atEnd);
 	}
 
 	if (!nav) {
@@ -307,6 +364,32 @@ function syncNav(list) {
 
 		progress.style.setProperty('--vp-carousel-progress', `${value * 100}%`);
 		progress.setAttribute('aria-valuenow', String(Math.round(value * 100)));
+	}
+}
+
+/**
+ * Take the fade off one side of a carousel, or give it back.
+ *
+ * @param {HTMLElement} list    Item template list.
+ * @param {string}      side    `left` or `right`.
+ * @param {boolean}     reached Whether the carousel has run out that way.
+ */
+function setFade(list, side, reached) {
+	const property = `--vp-carousel-fade-${side}`;
+
+	// Every scroll event asks, and all but two of them ask for the answer that
+	// is already written down.
+	if (reached === ('0px' === list.style.getPropertyValue(property))) {
+		return;
+	}
+
+	// Removed rather than set back to a width: the stylesheet is where the
+	// width of the fade is written down, and a theme that changed it there
+	// keeps its answer.
+	if (reached) {
+		list.style.setProperty(property, '0px');
+	} else {
+		list.style.removeProperty(property);
 	}
 }
 
@@ -355,9 +438,9 @@ function syncDots(list) {
 function slide(list, direction) {
 	const carousel = carousels.get(list);
 
-	// Blossom knows where the snap points are; without it a slide is the width
-	// of the first item, which is the width the stylesheet gave all of them.
-	if (carousel) {
+	// A carousel that repeats has no first and no last slide to count between:
+	// the endlessness is Blossom's, and so is the step through it.
+	if (carousel && 'true' === list.dataset.vpCarouselRepeat) {
 		if (direction > 0) {
 			carousel.next();
 		} else {
@@ -367,40 +450,42 @@ function slide(list, direction) {
 		return;
 	}
 
-	const item = list.querySelector(ITEM_SELECTOR);
-	const step = item
-		? item.getBoundingClientRect().width + getGap(list)
-		: list.clientWidth;
+	const targets = getSlideTargets(list);
+	const held = pending.get(list);
 
-	// Forwards is leftwards on a right to left page, and `scrollBy` speaks in
-	// the same signed numbers `scrollLeft` reports.
-	list.scrollBy({
-		left: step * direction * (isRtl(list) ? -1 : 1),
-		behavior: getScrollBehavior(),
-	});
+	// A press that comes faster than the carousel travels is still one slide:
+	// it counts from the slide the last press was headed for, not from the one
+	// the animation happens to be passing.
+	const from =
+		held && window.performance.now() - held.time < STEP_MEMORY
+			? held.index
+			: getCurrentSlide(list, targets);
+
+	goToSlide(list, from + direction, targets);
 }
 
 /**
  * Scroll a carousel to one of its slides.
  *
- * @param {HTMLElement} list  Item template list.
- * @param {number}      index Slide to rest on.
+ * @param {HTMLElement} list    Item template list.
+ * @param {number}      index   Slide to rest on.
+ * @param {number[]}    targets Resting places of the slides.
  */
-function goToSlide(list, index) {
-	const item = list.querySelectorAll(ITEM_SELECTOR)[index];
+function goToSlide(list, index, targets = getSlideTargets(list)) {
+	const wanted = Math.max(0, Math.min(targets.length - 1, index));
 
-	if (!item) {
+	if (!targets.length || wanted !== index) {
 		return;
 	}
 
-	// The list is scrolled rather than the item scrolled into view: that one
+	pending.set(list, { index: wanted, time: window.performance.now() });
+
+	// The list is scrolled rather than the slide scrolled into view: that one
 	// walks every scrollable ancestor, and the page must not move under a
-	// lightbox that is showing the same item.
+	// lightbox that is showing the same item. Forwards is leftwards on a right
+	// to left page, which is the sign `scrollLeft` speaks in.
 	list.scrollTo({
-		left:
-			list.scrollLeft +
-			item.getBoundingClientRect().left -
-			list.getBoundingClientRect().left,
+		left: isRtl(list) ? -targets[wanted] : targets[wanted],
 		behavior: getScrollBehavior(),
 	});
 }
@@ -427,7 +512,10 @@ function initAutoplay(list) {
 		return noop;
 	}
 
-	const frame = getFrame(list) || list;
+	// The countdown is drawn on the dots, and the dots sit outside the frame
+	// the arrows are pinned to - so it is published on the box that holds both,
+	// which is also the box a visitor's pointer rests on.
+	const carousel = getCarousel(list) || list;
 
 	let start = 0;
 	let raf = 0;
@@ -437,7 +525,7 @@ function initAutoplay(list) {
 	let held = false;
 
 	const setProgress = (value) => {
-		frame.style.setProperty(
+		carousel.style.setProperty(
 			'--vp-carousel-autoplay-progress',
 			`${value * 100}%`
 		);
@@ -484,11 +572,11 @@ function initAutoplay(list) {
 		held = false === event.detail?.playing;
 	};
 
-	frame.classList.add(PLAYING_CLASS);
-	frame.addEventListener('pointerenter', pause);
-	frame.addEventListener('pointerleave', resume);
-	frame.addEventListener('focusin', pause);
-	frame.addEventListener('focusout', resume);
+	carousel.classList.add(PLAYING_CLASS);
+	carousel.addEventListener('pointerenter', pause);
+	carousel.addEventListener('pointerleave', resume);
+	carousel.addEventListener('focusin', pause);
+	carousel.addEventListener('focusout', resume);
 	list.addEventListener('pointerdown', pause);
 	list.addEventListener(AUTOPLAY_EVENT, hold);
 
@@ -499,14 +587,14 @@ function initAutoplay(list) {
 
 	return () => {
 		window.cancelAnimationFrame(raf);
-		frame.classList.remove(PLAYING_CLASS);
-		frame.removeEventListener('pointerenter', pause);
-		frame.removeEventListener('pointerleave', resume);
-		frame.removeEventListener('focusin', pause);
-		frame.removeEventListener('focusout', resume);
+		carousel.classList.remove(PLAYING_CLASS);
+		carousel.removeEventListener('pointerenter', pause);
+		carousel.removeEventListener('pointerleave', resume);
+		carousel.removeEventListener('focusin', pause);
+		carousel.removeEventListener('focusout', resume);
 		list.removeEventListener('pointerdown', pause);
 		list.removeEventListener(AUTOPLAY_EVENT, hold);
-		frame.style.removeProperty('--vp-carousel-autoplay-progress');
+		carousel.style.removeProperty('--vp-carousel-autoplay-progress');
 	};
 }
 

@@ -151,7 +151,7 @@ class Visual_Portfolio_Block_Item_Template {
 			$asset['version']
 		);
 
-		register_block_type_from_metadata(
+		$block_type = register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/item-template',
 			array(
 				'render_callback'   => array( $this, 'block_render' ),
@@ -161,6 +161,13 @@ class Visual_Portfolio_Block_Item_Template {
 				'skip_inner_blocks' => true,
 			)
 		);
+
+		// The metadata lists the effects the free plugin draws, and an
+		// attribute outside the list is dropped before the render callback ever
+		// sees it. An install that adds one has to be able to keep it.
+		if ( $block_type instanceof WP_Block_Type && isset( $block_type->attributes['carouselEffect'] ) ) {
+			$block_type->attributes['carouselEffect']['enum'] = array_merge( array( 'none' ), self::get_carousel_effects() );
+		}
 	}
 
 	/**
@@ -665,6 +672,45 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * The effects a carousel can be drawn with.
+	 *
+	 * Every one of them is a pair of scroll driven animations over two boxes
+	 * rendered inside the item, so an effect an install adds needs a stylesheet
+	 * and this filter and nothing else.
+	 *
+	 * @return array effect names.
+	 */
+	public static function get_carousel_effects() {
+		/**
+		 * Filters the carousel effects a gallery offers.
+		 *
+		 * The name is the value of the `carouselEffect` attribute, and the class
+		 * the list is given is `vp-carousel-` and the name.
+		 *
+		 * @param array $effects effect names.
+		 */
+		return array_values( array_filter( (array) apply_filters( 'vpf_carousel_effects', array( 'coverflow', 'slideshow' ) ) ) );
+	}
+
+	/**
+	 * The effect a gallery is drawn with, once it is one this install has.
+	 *
+	 * @param array  $attributes - block attributes.
+	 * @param string $layout_type - resolved layout.
+	 *
+	 * @return string effect name, or an empty string.
+	 */
+	private function get_carousel_effect( $attributes, $layout_type ) {
+		if ( 'carousel' !== $layout_type ) {
+			return '';
+		}
+
+		$effect = (string) ( $attributes['carouselEffect'] ?? 'none' );
+
+		return in_array( $effect, self::get_carousel_effects(), true ) ? $effect : '';
+	}
+
+	/**
 	 * Controls of a carousel, and the frame the arrows need.
 	 *
 	 * @param array $attributes - block attributes.
@@ -677,8 +723,12 @@ class Visual_Portfolio_Block_Item_Template {
 		$arrows    = empty( $attributes['carouselShowArrows'] ) ? '' : $this->get_carousel_arrows();
 		$indicator = $this->get_carousel_indicator( $attributes['carouselIndicator'] ?? 'none', $count );
 
+		// The controls are hidden until the module is running, and the class
+		// that says so is on the box that holds all of them - the countdown of
+		// autoplay is drawn on the dots, which sit outside the frame the arrows
+		// are pinned to, so both have to read it from the same place.
 		$before = sprintf(
-			'<div class="wp-block-visual-portfolio-item-template__carousel-frame" data-wp-interactive="%s">',
+			'<div class="wp-block-visual-portfolio-item-template__carousel" data-wp-interactive="%1$s" data-wp-class--vp-carousel-has-controls="%1$s::state.hasScript"><div class="wp-block-visual-portfolio-item-template__carousel-frame">',
 			$store
 		);
 
@@ -686,13 +736,12 @@ class Visual_Portfolio_Block_Item_Template {
 
 		if ( '' !== $indicator ) {
 			$after .= sprintf(
-				'<div class="wp-block-visual-portfolio-item-template__carousel-nav" data-wp-interactive="%1$s">%2$s</div>',
-				$store,
+				'<div class="wp-block-visual-portfolio-item-template__carousel-nav">%s</div>',
 				$indicator
 			);
 		}
 
-		return array( $before, $after );
+		return array( $before, $after . '</div>' );
 	}
 
 	/**
@@ -737,8 +786,15 @@ class Visual_Portfolio_Block_Item_Template {
 		$content = '';
 		$index   = 0;
 
+		$layout_type = $this->get_layout_type( $attributes );
+
 		// The widest the layout ever gets, which is the row a desktop sees first.
-		$first_row = $this->get_layout_columns( $attributes, $this->get_layout_type( $attributes ) );
+		$first_row = $this->get_layout_columns( $attributes, $layout_type );
+
+		// An effect is played on two boxes inside the item rather than on the
+		// item, which stays the box the browser snaps to and the module
+		// measures. Nothing else in the family renders them.
+		$effect = $this->get_carousel_effect( $attributes, $layout_type );
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
 
@@ -770,13 +826,19 @@ class Visual_Portfolio_Block_Item_Template {
 
 			remove_filter( 'render_block_context', $filter_block_context, 1 );
 
-			$content .= sprintf(
-				'<li class="wp-block-visual-portfolio-item-template__item">%s</li>',
-				$item_content
-			);
+			$content .= $effect
+				? sprintf(
+					// The place in the pile, for the effects that deal the
+					// items into one.
+					'<li class="wp-block-visual-portfolio-item-template__item" style="--vp-slide-index:%1$d"><div class="wp-block-visual-portfolio-item-template__slide"><div class="wp-block-visual-portfolio-item-template__card">%2$s</div></div></li>',
+					$index - 1,
+					$item_content
+				)
+				: sprintf(
+					'<li class="wp-block-visual-portfolio-item-template__item">%s</li>',
+					$item_content
+				);
 		}
-
-		$layout_type = $this->get_layout_type( $attributes );
 
 		list( $layout_classes, $layout_styles ) = $this->get_layout_props( $attributes, $layout_type );
 
@@ -845,9 +907,8 @@ class Visual_Portfolio_Block_Item_Template {
 					$classes[] = 'vp-carousel-edge-fade';
 				}
 
-				$effect = $attributes['carouselEffect'] ?? 'none';
-
-				if ( in_array( $effect, array( 'coverflow', 'slideshow', 'cards' ), true ) ) {
+				if ( $effect ) {
+					$classes[] = 'vp-carousel-effect';
 					$classes[] = 'vp-carousel-' . $effect;
 				}
 

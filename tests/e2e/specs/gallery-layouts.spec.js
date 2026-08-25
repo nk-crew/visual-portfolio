@@ -444,45 +444,99 @@ test.describe('Gallery Item Template layouts', () => {
 			.not.toBe('0');
 	});
 
-	test('coverflow leaves the carousel alone where it is not understood', async ({
+	test('coverflow overhangs its neighbours and still snaps a card at a time', async ({
 		page,
 		requestUtils,
 	}) => {
-		const layout = {
-			layoutType: 'carousel',
-			layoutColumnsMode: 'manual',
-			layoutColumnCount: 3,
-			style: { spacing: { blockGap: '10px' } },
-			carouselShowArrows: false,
-		};
-
-		await publishLoop(requestUtils, page, {
-			title: 'Layouts - carousel plain',
-			blockId: 'e2e-carousel-plain',
-			images,
-			layout,
-		});
-
-		const plain = await getItemBoxes(page);
-
 		await publishLoop(requestUtils, page, {
 			title: 'Layouts - carousel coverflow',
 			blockId: 'e2e-carousel-coverflow',
 			images,
-			layout: { ...layout, carouselEffect: 'coverflow' },
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				style: { spacing: { blockGap: '10px' } },
+				carouselShowArrows: true,
+				carouselEffect: 'coverflow',
+			},
 		});
 
 		await expect(page.locator(LIST)).toHaveClass(/vp-carousel-coverflow/);
 
-		// The effect is a scroll driven animation over the boxes the layout
-		// already made, so the layout is the same either way - which is also
-		// what a browser without the timeline is left with. The painted boxes
-		// are not compared: turning a slide in perspective is the effect.
-		const coverflow = await getItemBoxes(page);
+		const boxes = await getItemBoxes(page);
 
-		expect(coverflow.map((item) => item.layoutWidth)).toEqual(
-			plain.map((item) => item.layoutWidth)
+		// Every box the carousel counts in is the same, and it is half a card:
+		// what overhangs the neighbours is the slide inside it, which is what
+		// makes a cover flow read as a stack rather than as a tilted row.
+		expect(new Set(boxes.map((item) => item.layoutWidth)).size).toBe(1);
+
+		const geometry = await page.locator(LIST).evaluate((list) => {
+			const item = list.querySelector(
+				'.wp-block-visual-portfolio-item-template__item'
+			);
+			const slide = list.querySelector(
+				'.wp-block-visual-portfolio-item-template__slide'
+			);
+
+			return {
+				slide: slide.offsetWidth / item.offsetWidth,
+				// The list is narrowed to one box and padded with the rest, so
+				// the first card can come to the middle like any other.
+				centred:
+					Math.abs(
+						item.offsetLeft +
+							item.offsetWidth / 2 -
+							list.clientWidth / 2
+					) < 2,
+			};
+		});
+
+		expect(geometry).toEqual({ slide: 2, centred: true });
+	});
+
+	test('the arrows step one slide a press, however fast they are pressed', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel stepping',
+			blockId: 'e2e-carousel-stepping',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselShowArrows: true,
+				// The effect turns the slides in perspective. Slide positions
+				// are read from the layout for exactly this reason: measured
+				// from the painted boxes, the arrows of a cover flow answer
+				// with a position the carousel is already at, and pressing them
+				// does nothing at all.
+				carouselEffect: 'coverflow',
+			},
+		});
+
+		const list = page.locator(LIST);
+		const step = await list.evaluate(
+			(node) =>
+				node.querySelector(
+					'.wp-block-visual-portfolio-item-template__item'
+				).offsetWidth
 		);
+
+		// Three presses inside the travel of one, which is where a carousel
+		// that counts from wherever the animation happens to be loses them.
+		for (let press = 0; press < 3; press++) {
+			// eslint-disable-next-line no-await-in-loop
+			await page.locator(`${FRAME} ${NEXT_ARROW}`).click({ delay: 0 });
+		}
+
+		await expect
+			.poll(async () => list.evaluate((node) => node.scrollLeft), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(step * 2.5);
 	});
 
 	test.describe('without JavaScript', () => {

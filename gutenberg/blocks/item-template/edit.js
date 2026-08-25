@@ -28,6 +28,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { memo, useEffect, useMemo, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import {
 	gallery,
@@ -50,6 +51,11 @@ import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
 
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
+
+// The two boxes a carousel effect is drawn on. Rendered inside the item and
+// only for an effect, the same way the render callback renders them.
+const SLIDE_CLASS_NAME = 'wp-block-visual-portfolio-item-template__slide';
+const CARD_CLASS_NAME = 'wp-block-visual-portfolio-item-template__card';
 
 const LAYOUT_OPTIONS = [
 	{ label: __('Grid', 'visual-portfolio'), value: 'grid' },
@@ -119,8 +125,20 @@ const EFFECT_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
 	{ label: __('Coverflow', 'visual-portfolio'), value: 'coverflow' },
 	{ label: __('Slideshow', 'visual-portfolio'), value: 'slideshow' },
-	{ label: __('Cards', 'visual-portfolio'), value: 'cards' },
 ];
+
+/**
+ * The effects this install offers.
+ *
+ * An effect is a stylesheet over two boxes the item template already renders,
+ * so Pro and a theme add one through this filter and `vpf_carousel_effects` on
+ * the server, and write no markup at all.
+ *
+ * @return {Array} select options.
+ */
+function getEffectOptions() {
+	return applyFilters('vpf.carouselEffects', EFFECT_OPTIONS);
+}
 
 // The same question the view module asks: where the browser packs masonry
 // itself, the stylesheet does the layout and no script should run over it.
@@ -166,17 +184,106 @@ function getItemContext(item) {
 /**
  * The one item whose inner blocks are editable.
  *
- * @param {Object} props       - component props.
- * @param {Object} props.style - placement of the item, when the layout gives it one.
+ * @param {Object}  props        - component props.
+ * @param {Object}  props.style  - placement of the item, when the layout gives it one.
+ * @param {boolean} props.effect - whether a carousel effect is playing.
+ * @param {number}  props.index  - place of the item in the list.
  * @return {Element} component.
  */
-function ItemTemplateInnerBlocks({ style }) {
+function ItemTemplateInnerBlocks({ style, effect, index }) {
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: ITEM_CLASS_NAME, style },
+		effect
+			? { className: CARD_CLASS_NAME }
+			: { className: ITEM_CLASS_NAME, style },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 
-	return <li {...innerBlocksProps} />;
+	if (!effect) {
+		return <li {...innerBlocksProps} />;
+	}
+
+	return (
+		<li
+			className={ITEM_CLASS_NAME}
+			style={{ ...style, '--vp-slide-index': index }}
+		>
+			<div className={SLIDE_CLASS_NAME}>
+				<div {...innerBlocksProps} />
+			</div>
+		</li>
+	);
+}
+
+/**
+ * The controls of a carousel, drawn for the preview.
+ *
+ * The same markup the render callback prints, minus everything that would need
+ * a scroll position to answer: the arrows are switched off and the indicator
+ * says the carousel is at its first slide, which is where a preview always is.
+ * What they are here for is the shape of the gallery - a carousel with dots
+ * under it is taller than one without, and the editor used to keep that hidden
+ * until the post was published.
+ *
+ * @param {Object}  props           - component props.
+ * @param {boolean} props.arrows    - whether the gallery renders arrows.
+ * @param {string}  props.indicator - the indicator the gallery renders.
+ * @param {number}  props.count     - number of slides.
+ * @param {Element} props.children  - the list itself.
+ * @return {Element} component.
+ */
+function CarouselChrome({ arrows, indicator, count, children }) {
+	const name = 'wp-block-visual-portfolio-item-template__carousel';
+
+	return (
+		<div className={`${name} vp-carousel-has-controls`}>
+			<div className={`${name}-frame`}>
+				{children}
+				{arrows
+					? ['prev', 'next'].map((direction) => (
+							<button
+								key={direction}
+								type="button"
+								className={`${name}-arrow ${name}-arrow--${direction}`}
+								// Drawn, not offered: a preview has no scroll
+								// position for them to move.
+								disabled={'prev' === direction}
+								tabIndex={-1}
+								aria-hidden="true"
+							>
+								<span />
+							</button>
+						))
+					: null}
+			</div>
+			{'none' !== indicator ? (
+				<div className={`${name}-nav`}>
+					{'dots' === indicator ? (
+						<div className={`${name}-dots`}>
+							{Array.from({ length: count }, (dot, index) => (
+								<button
+									// Dots differ in nothing but their place.
+									key={index}
+									type="button"
+									className={`${name}-dot`}
+									aria-current={
+										0 === index ? 'true' : 'false'
+									}
+									tabIndex={-1}
+									aria-hidden="true"
+								>
+									<span className={`${name}-dot-progress`} />
+								</button>
+							))}
+						</div>
+					) : (
+						<div className={`${name}-progress`}>
+							<span className={`${name}-progress-value`} />
+						</div>
+					)}
+				</div>
+			) : null}
+		</div>
+	);
 }
 
 /**
@@ -258,11 +365,15 @@ function ItemTemplateBlockPreview({
 	setActiveBlockContextId,
 	isHidden,
 	style,
+	effect,
+	index,
 }) {
 	const blockPreviewProps = useBlockPreview({
 		blocks,
 		props: {
-			className: 'wp-block-visual-portfolio-item-template__preview',
+			className: effect
+				? `wp-block-visual-portfolio-item-template__preview ${CARD_CLASS_NAME}`
+				: 'wp-block-visual-portfolio-item-template__preview',
 		},
 	});
 
@@ -270,11 +381,8 @@ function ItemTemplateBlockPreview({
 		setActiveBlockContextId(blockContextId);
 	};
 
-	return (
-		<li
-			className={ITEM_CLASS_NAME}
-			style={{ ...style, display: isHidden ? 'none' : undefined }}
-		>
+	const preview = (
+		<>
 			{/* biome-ignore lint/a11y/useSemanticElements: a button cannot hold the block markup it previews, and the preview is what has to be pressed. */}
 			<div
 				{...blockPreviewProps}
@@ -283,6 +391,23 @@ function ItemTemplateBlockPreview({
 				onClick={handleOnClick}
 				onKeyPress={handleOnClick}
 			/>
+		</>
+	);
+
+	return (
+		<li
+			className={ITEM_CLASS_NAME}
+			style={{
+				...style,
+				display: isHidden ? 'none' : undefined,
+				...(effect ? { '--vp-slide-index': index } : null),
+			}}
+		>
+			{effect ? (
+				<div className={SLIDE_CLASS_NAME}>{preview}</div>
+			) : (
+				preview
+			)}
 		</li>
 	);
 }
@@ -494,7 +619,12 @@ export default function BlockEdit({
 				classes.push('vp-carousel-free-scroll');
 			}
 
+			if (carouselEdgeFade) {
+				classes.push('vp-carousel-edge-fade');
+			}
+
 			if ('none' !== carouselEffect) {
+				classes.push('vp-carousel-effect');
 				classes.push(`vp-carousel-${carouselEffect}`);
 			}
 		}
@@ -505,8 +635,13 @@ export default function BlockEdit({
 		layoutType,
 		carouselAutoWidth,
 		carouselFreeScroll,
+		carouselEdgeFade,
 		carouselEffect,
 	]);
+
+	// A carousel effect is drawn on two boxes inside the item, and only a
+	// carousel has them.
+	const slideEffect = 'carousel' === layoutType && 'none' !== carouselEffect;
 
 	// Justified and masonry are measured by a library on both sides.
 	const listRef = useEditorLayout({
@@ -535,6 +670,11 @@ export default function BlockEdit({
 						'--vp-layout-row-height': `${justifiedRowHeight}px`,
 						'--vp-carousel-snap-align': carouselSnapAlign,
 						'--vp-carousel-peek': `${Math.max(0, Math.min(200, carouselPeek))}px`,
+						// A preview rests where the carousel starts, and the
+						// end that has been reached carries no fade.
+						'--vp-carousel-fade-left': carouselEdgeFade
+							? '0px'
+							: undefined,
 					},
 				}
 	);
@@ -877,7 +1017,7 @@ export default function BlockEdit({
 							'visual-portfolio'
 						)}
 						value={carouselEffect}
-						options={EFFECT_OPTIONS}
+						options={getEffectOptions()}
 						onChange={(value) =>
 							setAttributes({ carouselEffect: value })
 						}
@@ -1070,6 +1210,21 @@ export default function BlockEdit({
 		</BlockControls>
 	);
 
+	// The controls of a carousel go around the list, and only a carousel has
+	// them.
+	const withChrome = (list, count) =>
+		'carousel' === layoutType ? (
+			<CarouselChrome
+				arrows={carouselShowArrows}
+				indicator={carouselIndicator}
+				count={count}
+			>
+				{list}
+			</CarouselChrome>
+		) : (
+			list
+		);
+
 	// A gallery that resolves to nothing is a content source problem, and the
 	// source lives on the parent block.
 	if (isEmpty) {
@@ -1092,20 +1247,28 @@ export default function BlockEdit({
 			<>
 				{blockControls}
 				{inspectorControls}
-				<ul {...blockProps} aria-busy="true">
-					{Array.from({ length: skeletonCount }, (item, index) => (
-						<li
-							// Placeholders differ in nothing but their place.
-							key={index}
-							className={`${ITEM_CLASS_NAME} wp-block-visual-portfolio-item-template__skeleton`}
-							style={
-								tileStyles.length
-									? tileStyles[index % tileStyles.length]
-									: undefined
-							}
-						/>
-					))}
-				</ul>
+				{withChrome(
+					<ul {...blockProps} aria-busy="true">
+						{Array.from(
+							{ length: skeletonCount },
+							(item, index) => (
+								<li
+									// Placeholders differ in nothing but their place.
+									key={index}
+									className={`${ITEM_CLASS_NAME} wp-block-visual-portfolio-item-template__skeleton`}
+									style={
+										tileStyles.length
+											? tileStyles[
+													index % tileStyles.length
+												]
+											: undefined
+									}
+								/>
+							)
+						)}
+					</ul>,
+					skeletonCount
+				)}
 			</>
 		);
 	}
@@ -1114,58 +1277,67 @@ export default function BlockEdit({
 		<>
 			{blockControls}
 			{inspectorControls}
-			<ul {...blockProps} aria-busy={isLoading || undefined}>
-				{/* Out of the flow, so a settings change never moves the
+			{withChrome(
+				<ul {...blockProps} aria-busy={isLoading || undefined}>
+					{/* Out of the flow, so a settings change never moves the
 				    gallery under the pointer that is still changing it. A
 				    list item rather than a sibling: the list is the block
 				    element, and neither layout library looks at a node
 				    without the item class. */}
-				{isLoading ? (
-					<li
-						className="wp-block-visual-portfolio-item-template__editor-spinner"
-						aria-hidden="true"
-					>
-						<Spinner />
-					</li>
-				) : null}
-
-				{blockContexts.map((blockContext, index) => {
-					// Nothing is edited inside a block preview, so no item
-					// there is the editable one.
-					const isActive =
-						!isPreview &&
-						blockContext['vp/itemId'] === activeContextId;
-
-					// The tiles pattern repeats over the items, so an item is
-					// placed by where it falls inside one repetition.
-					const style = tileStyles.length
-						? tileStyles[index % tileStyles.length]
-						: undefined;
-
-					return (
-						<BlockContextProvider
-							key={blockContext['vp/itemId']}
-							value={blockContext}
+					{isLoading ? (
+						<li
+							className="wp-block-visual-portfolio-item-template__editor-spinner"
+							aria-hidden="true"
 						>
-							{isActive ? (
-								<ItemTemplateInnerBlocks style={style} />
-							) : null}
+							<Spinner />
+						</li>
+					) : null}
 
-							{/* Kept mounted under the active item as well: it is
+					{blockContexts.map((blockContext, index) => {
+						// Nothing is edited inside a block preview, so no item
+						// there is the editable one.
+						const isActive =
+							!isPreview &&
+							blockContext['vp/itemId'] === activeContextId;
+
+						// The tiles pattern repeats over the items, so an item is
+						// placed by where it falls inside one repetition.
+						const style = tileStyles.length
+							? tileStyles[index % tileStyles.length]
+							: undefined;
+
+						return (
+							<BlockContextProvider
+								key={blockContext['vp/itemId']}
+								value={blockContext}
+							>
+								{isActive ? (
+									<ItemTemplateInnerBlocks
+										style={style}
+										effect={slideEffect}
+										index={index}
+									/>
+								) : null}
+
+								{/* Kept mounted under the active item as well: it is
 							    what the next item reuses when the selection moves. */}
-							<MemoizedItemTemplateBlockPreview
-								blocks={blocks}
-								blockContextId={blockContext['vp/itemId']}
-								setActiveBlockContextId={
-									setActiveBlockContextId
-								}
-								isHidden={isActive}
-								style={style}
-							/>
-						</BlockContextProvider>
-					);
-				})}
-			</ul>
+								<MemoizedItemTemplateBlockPreview
+									blocks={blocks}
+									blockContextId={blockContext['vp/itemId']}
+									setActiveBlockContextId={
+										setActiveBlockContextId
+									}
+									isHidden={isActive}
+									style={style}
+									effect={slideEffect}
+									index={index}
+								/>
+							</BlockContextProvider>
+						);
+					})}
+				</ul>,
+				blockContexts.length
+			)}
 		</>
 	);
 }
