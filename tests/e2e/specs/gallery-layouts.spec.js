@@ -16,6 +16,7 @@ import { getPluginSlug } from '../utils/plugin-slug';
 
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
 const ITEM = '.wp-block-visual-portfolio-item-template__item';
+const CAROUSEL = '.wp-block-visual-portfolio-item-template__carousel';
 const NAV = '.wp-block-visual-portfolio-item-template__carousel-nav';
 // The arrows live in the frame around the list rather than in the nav under
 // it: the list scrolls, and an arrow beside it has to stay put.
@@ -442,6 +443,91 @@ test.describe('Gallery Item Template layouts', () => {
 					.getAttribute('data-vp-slide')
 			)
 			.not.toBe('0');
+	});
+
+	test('autoplay holds its countdown while the pointer rests on the carousel', async ({
+		page,
+		requestUtils,
+	}) => {
+		// The suite asks for less motion, and a carousel never runs itself for
+		// a visitor who did.
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel autoplay',
+			blockId: 'e2e-carousel-autoplay',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselAutoplay: true,
+				carouselAutoplayDelay: 2,
+				carouselIndicator: 'dots',
+			},
+		});
+
+		const carousel = page.locator(CAROUSEL);
+
+		await expect(carousel).toHaveClass(/vp-carousel-is-playing/);
+
+		const box = await carousel.boundingBox();
+
+		// Every frame of the wait, with the slide it was taken on. Asserting on
+		// the shape of the countdown rather than on where it got to by a given
+		// moment is what keeps this from being a race.
+		const taken = carousel.evaluate(
+			(node) =>
+				new Promise((resolve) => {
+					const list = node.querySelector('ul');
+					const frames = [];
+					const step = () => {
+						frames.push([
+							parseFloat(
+								node.style.getPropertyValue(
+									'--vp-carousel-autoplay-progress'
+								)
+							) || 0,
+							Math.round(list.scrollLeft),
+						]);
+
+						if (frames.length < 150) {
+							window.requestAnimationFrame(step);
+						} else {
+							resolve(frames);
+						}
+					};
+
+					window.requestAnimationFrame(step);
+				})
+		);
+
+		await page.waitForTimeout(500);
+		await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+		await page.waitForTimeout(700);
+		await page.mouse.move(1, 1);
+
+		const frames = await taken;
+
+		// The countdown stood still for a while, which is the pause.
+		expect(
+			frames.filter(
+				(frame, index) => index > 0 && frame[0] === frames[index - 1][0]
+			).length
+		).toBeGreaterThan(10);
+
+		// And it never turned back on a slide it was already counting down -
+		// the only place it starts over is the moment it runs out, which is
+		// also the moment it moves on.
+		const rewound = frames.filter(
+			(frame, index) =>
+				index > 0 &&
+				frame[1] === frames[index - 1][1] &&
+				frames[index - 1][0] < 90 &&
+				frame[0] < frames[index - 1][0] - 0.5
+		);
+
+		expect(rewound).toEqual([]);
 	});
 
 	test('coverflow overhangs its neighbours and still snaps a card at a time', async ({

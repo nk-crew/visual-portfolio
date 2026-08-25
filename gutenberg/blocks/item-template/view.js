@@ -517,7 +517,12 @@ function initAutoplay(list) {
 	// which is also the box a visitor's pointer rests on.
 	const carousel = getCarousel(list) || list;
 
-	let start = 0;
+	// How much of the wait is already behind, and the frame it was last added
+	// to. Kept apart so that a pause holds the clock rather than turning it
+	// back: a visitor who rests the pointer on a carousel and takes it off
+	// again is owed the rest of the wait, not the whole of it.
+	let elapsed = 0;
+	let last = 0;
 	let raf = 0;
 	let paused = false;
 	// Asked for from outside, and kept apart from `paused` so that releasing it
@@ -534,13 +539,15 @@ function initAutoplay(list) {
 	const tick = (now) => {
 		raf = window.requestAnimationFrame(tick);
 
-		if (paused || held) {
-			start = now;
+		const step = now - last;
 
+		last = now;
+
+		if (paused || held) {
 			return;
 		}
 
-		const elapsed = now - start;
+		elapsed += step;
 
 		setProgress(Math.min(1, elapsed / delay));
 
@@ -548,7 +555,7 @@ function initAutoplay(list) {
 			return;
 		}
 
-		start = now;
+		elapsed = 0;
 
 		// The last slide goes back to the first, so a carousel that does not
 		// repeat still runs on.
@@ -581,7 +588,7 @@ function initAutoplay(list) {
 	list.addEventListener(AUTOPLAY_EVENT, hold);
 
 	raf = window.requestAnimationFrame((now) => {
-		start = now;
+		last = now;
 		tick(now);
 	});
 
