@@ -118,8 +118,12 @@ visual-portfolio/loop                      query, block id, layout wrapper
 │   └── any block that reads `vp/item*` context
 ├── visual-portfolio/loop-no-results
 └── visual-portfolio/loop-pagination
-    └── loop-pagination-{previous,numbers,next,load-more,infinite}
+    └── loop-pagination-{previous,numbers,next} or loop-pagination-trigger
 ```
+
+One trigger block covers both the button and the scroll: `loop-pagination-trigger`
+carries a `triggerType` of `load-more` or `infinite`, offered as two variations,
+and block transforms convert between it and the three paged children.
 
 Items are resolved once, by `Visual_Portfolio_Get::get_loop_items()`, which is
 the same query pipeline the legacy gallery uses. Every item block reads its data
@@ -200,7 +204,7 @@ so every one of these keeps working unchanged: `vpf_get_options`,
 `vpf_post_item_args`, `vpf_custom_filter_terms`, `vpf_extend_filter_items`,
 `vpf_wp_get_attachment_image`, `vpf_get_pagenum_link`.
 
-Two of them need a word for sources that are neither posts nor images:
+Three of them need a word for sources that are neither posts nor images:
 
 - **`vpf_custom_query_result`** answers for the items *and* for the page count.
   `Visual_Portfolio_Get::calculate_max_pages()` asks it in the same order the
@@ -226,6 +230,24 @@ Two of them need a word for sources that are neither posts nor images:
   Entries are `option => type` or `option => array( type, default )`, where the
   type is `string`, `number`, `boolean` or `array`. The options arrive in the
   legacy format — `sourceQuery` has already been converted away.
+- **`vpf_loop_only_options`** registers a loop option that no legacy control
+  does. `Visual_Portfolio_Get::get_options()` keeps registered controls and
+  nothing else, so an option a source or a module adds is dropped before the
+  query is built unless it is listed here:
+
+  ```php
+  add_filter(
+      'vpf_loop_only_options',
+      function ( $options ) {
+          $options['acme_account'] = 'text';
+
+          return $options;
+      }
+  );
+  ```
+
+  Entries are `option => type`, where the type is `ids`, `text`, `boolean` or
+  `number` and names the sanitizer the value passes through on the way in.
 
 ### Sitemap
 
@@ -275,7 +297,11 @@ Anything a source writes into legacy options and later needs for counting pages
 must also be registered through `vpf_allowed_max_pages_params`.
 
 Per-image fields in the gallery manager are added through the
-`VP.LoopImageSettings` slot.
+`VP.LoopImageSettings` slot. Settings of the Item Cover block are added through
+the `vpf.itemCoverSettingsItems` JavaScript filter, which is given an empty array
+and `{ attributes, setAttributes, clientId }` and returns `ToolsPanelItem`
+children — ordinary children of the block's Settings panel, registering with it
+the way the built-in ones do.
 
 ## Block Bindings
 
@@ -326,6 +352,41 @@ gallery that is a plain grid downloads none of the three.
 No jQuery is involved anywhere on the front end. The layouts that need a library
 use `masonry` and `imagesloaded` from WordPress and a jQuery-free build of
 fjGallery registered under a handle of the family's own.
+
+### Lightbox events
+
+The lightbox is a script module, so it announces itself with DOM events on
+`document` rather than with the jQuery events the legacy gallery fires. Pro
+listens to these; so may anyone else.
+
+| Event | When |
+|---|---|
+| `vp-popup-open` | the lightbox is on screen |
+| `vp-popup-change` | the slide changed |
+| `vp-popup-close` | the lightbox is closing |
+
+All three carry the same `detail`:
+
+| Key | What it is |
+|---|---|
+| `loop` | the loop element the lightbox was opened from — its items and its pagination hang below this |
+| `gallery` | the root element of the lightbox itself |
+| `index` | index of the slide being shown |
+| `total` | how many slides the lightbox holds right now |
+| `item` | the trigger the shown slide was built from; the item is its `closest()` |
+| `refresh()` | picks up the triggers the loop has grown since the lightbox opened, and returns the new `total` |
+
+The carousel takes commands the same way, on the list element of an item
+template:
+
+| Event | Payload |
+|---|---|
+| `vp-carousel-go-to` | `detail.index` — scroll to that slide |
+| `vp-carousel-autoplay` | `detail.playing` — `false` holds autoplay, `true` releases it |
+
+Holding autoplay is not the same as stopping it: the pause a pointer or a focus
+already applies keeps working underneath, and releasing the hold does not
+override it.
 
 ## URL parameters and caching
 

@@ -22,3 +22,26 @@ export function useToolsPanelDropdownMenuProps() {
 		? { popoverProps: { placement: 'left-start', offset: 259 } }
 		: {};
 }
+
+/**
+ * What a "Reset all" writes.
+ *
+ * `ToolsPanel` hands `resetAll` the `resetAllFilter` callbacks of the items
+ * registered with it, and an item added through one of our extension points is
+ * only reset through its own - the panel cannot know what to write back for
+ * someone else's option. Each filter is applied over what the ones before it
+ * produced, the way core's block support panels apply them.
+ *
+ * @param {Array}  filters  - `resetAllFilter` callbacks, as `ToolsPanel` passes them.
+ * @param {Object} defaults - what the panel's own controls reset to.
+ * @return {Object} attributes to write.
+ */
+export function getResetAllValues(filters, defaults = {}) {
+	const values = { ...defaults };
+
+	(filters || []).forEach((filter) => {
+		Object.assign(values, filter(values));
+	});
+
+	return values;
+}

@@ -4,11 +4,3 @@ import './style.scss';
 import './posts';
 import './images';
 import './pro-sources';
-
-export {
-	getLoopSource,
-	getLoopSources,
-	registerLoopSource,
-	useLoopSource,
-	useLoopSources,
-} from './registry';

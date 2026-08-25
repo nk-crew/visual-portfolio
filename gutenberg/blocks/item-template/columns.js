@@ -20,26 +20,6 @@
 const DEFAULT_MINIMUM_COLUMN_WIDTH = '16rem';
 
 /**
- * Block spacing, as a CSS length.
- *
- * The Dimensions panel stores either a length or a reference to a preset of
- * the theme.
- *
- * @param {string} value - stored block gap.
- * @return {string} CSS length.
- */
-export function getBlockGapValue(value) {
-	const gap = String(value ?? '');
-
-	// `var:preset|spacing|50` is how a preset travels in block attributes.
-	if (0 === gap.indexOf('var:')) {
-		return `var(--wp--${gap.slice(4).replace(/\|/g, '--')})`;
-	}
-
-	return gap;
-}
-
-/**
  * A CSS length, reduced to what a length can be made of.
  *
  * The value is typed into the editor and ends up inside a `minmax()`.

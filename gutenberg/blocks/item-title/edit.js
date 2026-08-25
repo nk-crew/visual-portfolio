@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
 	BlockControls,
 	HeadingLevelDropdown,
 	InspectorControls,
@@ -20,11 +19,10 @@ import {
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 const CLICK_ACTION_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
@@ -39,7 +37,7 @@ export default function ItemTitleEdit({
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { level, levelOptions, textAlign, rel, linkTarget } = attributes;
+	const { level, levelOptions, rel, linkTarget } = attributes;
 
 	// A title saved before the click action existed keeps meaning what its link
 	// toggle said - only an unset action falls back to it.
@@ -47,11 +45,7 @@ export default function ItemTitleEdit({
 		attributes.clickAction ?? (attributes.isLink ? 'url' : 'none');
 
 	const TagName = level === 0 ? 'p' : `h${level}`;
-	const blockProps = useBlockProps({
-		className: classnames({
-			[`has-text-align-${textAlign}`]: textAlign,
-		}),
-	});
+	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
 	const title = itemTitle
@@ -70,24 +64,20 @@ export default function ItemTitleEdit({
 								setAttributes({ level: newLevel })
 							}
 						/>
-						<AlignmentControl
-							value={textAlign}
-							onChange={(nextAlign) =>
-								setAttributes({ textAlign: nextAlign })
-							}
-						/>
 					</BlockControls>
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}
 							dropdownMenuProps={dropdownMenuProps}
-							resetAll={() =>
-								setAttributes({
-									clickAction: 'none',
-									isLink: false,
-									rel: '',
-									linkTarget: '_self',
-								})
+							resetAll={(filters) =>
+								setAttributes(
+									getResetAllValues(filters, {
+										clickAction: 'none',
+										isLink: false,
+										rel: '',
+										linkTarget: '_self',
+									})
+								)
 							}
 						>
 							<ToolsPanelItem

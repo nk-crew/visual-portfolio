@@ -139,6 +139,11 @@ class Visual_Portfolio_Sitemap {
 
 			$image_url = $image['imgUrl'] ?? wp_get_attachment_image_url( $image_id, 'full' );
 
+			// An entry with no URL reaches the SEO plugins as `image:loc => false`.
+			if ( ! $image_url ) {
+				continue;
+			}
+
 			$block_images[] = array(
 				'src'   => $image_url,
 				'alt'   => $image_alt,
@@ -172,10 +177,18 @@ class Visual_Portfolio_Sitemap {
 
 			$image_id = apply_filters( 'vpf_parse_sitemap_image_id_from_blocks', 'attachment' === get_post_type() ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ), get_the_ID() );
 
+			$image_url = wp_get_attachment_image_url( $image_id, 'full' );
+
+			// A post with no featured image has no picture to list, and an
+			// entry with no URL reaches the SEO plugins as `image:loc => false`.
+			if ( ! $image_url ) {
+				continue;
+			}
+
 			$image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
 
 			$block_images[] = array(
-				'src'   => wp_get_attachment_image_url( $image_id, 'full' ),
+				'src'   => $image_url,
 				'alt'   => $image_alt,
 				'title' => get_the_title( $image_id ),
 			);

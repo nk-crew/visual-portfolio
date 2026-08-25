@@ -23,7 +23,7 @@ const FRAME = '.wp-block-visual-portfolio-item-template__carousel-frame';
 const DOT = '.wp-block-visual-portfolio-item-template__carousel-dot';
 const NEXT_ARROW =
 	'.wp-block-visual-portfolio-item-template__carousel-arrow--next';
-const LOAD_MORE = '.vp-block-loop-pagination-load-more';
+const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 
 const IMAGES_COUNT = 6;
 
@@ -303,7 +303,7 @@ test.describe('Gallery Item Template layouts', () => {
 				justifiedRowHeight: 200,
 				style: { spacing: { blockGap: '10px' } },
 			},
-			controls: ['loop-pagination-load-more'],
+			controls: ['loop-pagination-trigger'],
 		});
 
 		const list = page.locator(LIST);
@@ -555,7 +555,7 @@ test.describe('Gallery Item Template layouts', () => {
 						layoutColumnCount: 3,
 						style: { spacing: { blockGap: '10px' } },
 					},
-					controls: ['loop-pagination-load-more'],
+					controls: ['loop-pagination-trigger'],
 				},
 			]
 		);

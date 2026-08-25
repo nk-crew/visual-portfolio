@@ -1,4 +1,9 @@
-import { getConfig, getElement, store } from '@wordpress/interactivity';
+import {
+	getConfig,
+	getElement,
+	store,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 /**
  * The lightbox of the Gallery Loop family.
@@ -13,10 +18,38 @@ import { getConfig, getElement, store } from '@wordpress/interactivity';
  * to tell the lightbox anything.
  *
  * Pro composes onto the same namespace with another `store()` call.
+ *
+ * Events
+ *
+ * A store is reachable from another script module and from nothing else, so
+ * what the lightbox is doing is told to the page as three `CustomEvent`s on
+ * `document`. They are the whole of the surface a script outside this module
+ * gets, and the Pro lightbox modules are written against them.
+ *
+ * - `vp-popup-open`   the lightbox is on screen.
+ * - `vp-popup-change` the slide on screen changed.
+ * - `vp-popup-close`  the lightbox is about to close.
+ *
+ * All three carry the same `detail`:
+ *
+ * - `loop`    the loop element the lightbox was opened from. Everything else
+ *             about the gallery - its items, its pagination - is found under it.
+ * - `gallery` the lightbox's own root element, for a module that draws into it.
+ * - `index`   index of the slide on screen.
+ * - `total`   how many slides the lightbox holds.
+ * - `item`    the trigger the slide on screen was built from. The item element
+ *             is the `closest()` ancestor of it.
+ * - `refresh` takes the triggers the loop has grown since into the lightbox and
+ *             returns the total afterwards. What a module that appends a page
+ *             while the lightbox is open calls once the items are in the DOM.
  */
 
 const NAMESPACE = 'visual-portfolio/popup';
 const TRIGGER_SELECTOR = '[data-vp-popup]';
+
+const OPEN_EVENT = 'vp-popup-open';
+const CHANGE_EVENT = 'vp-popup-change';
+const CLOSE_EVENT = 'vp-popup-close';
 
 // A popup is a page of its own as far as the browser is concerned, so the
 // address of the library is published on the page rather than bundled: it is
@@ -244,16 +277,60 @@ function registerVideo(pswp) {
 let opening = false;
 
 /**
+ * Take the triggers a loop holds and the gallery does not into it.
+ *
+ * @param {Object}      gallery Gallery of the lightbox.
+ * @param {HTMLElement} loop    Loop wrapper.
+ *
+ * @return {number} How many slides the gallery holds afterwards.
+ */
+function addTriggers(gallery, loop) {
+	const known = new Set(gallery.triggers);
+
+	loop.querySelectorAll(TRIGGER_SELECTOR).forEach((element) => {
+		if (known.has(element)) {
+			return;
+		}
+
+		const data = getTriggerData(element);
+
+		if (!data) {
+			return;
+		}
+
+		gallery.triggers.push(element);
+		gallery.slides.push(getSlide(data));
+	});
+
+	return gallery.slides.length;
+}
+
+/**
+ * Every popup trigger of a loop, in the order the items are rendered in.
+ *
+ * @param {HTMLElement} loop Loop wrapper.
+ *
+ * @return {Object} `triggers`, and the `slides` built from them index by index.
+ */
+function readGallery(loop) {
+	const gallery = { triggers: [], slides: [] };
+
+	addTriggers(gallery, loop);
+
+	return gallery;
+}
+
+/**
  * Open the gallery.
  *
  * @param {Object}      config  Store configuration.
- * @param {Array}       items   Slides of the gallery.
+ * @param {Object}      gallery Triggers of the loop and the slides built from them.
  * @param {number}      index   Slide to open on.
- * @param {HTMLElement} trigger Element the popup was opened from.
+ * @param {HTMLElement} loop    Loop the lightbox was opened from.
  *
  * @return {Promise<void>} Resolved once the lightbox is on screen.
  */
-async function openGallery(config, items, index, trigger) {
+async function openGallery(config, gallery, index, loop) {
 	// The first click on a page waits for the library to arrive over the
 	// network, and a second one during that wait would open a second lightbox
 	// over the first.
@@ -273,7 +350,7 @@ async function openGallery(config, items, index, trigger) {
 	const strings = config.i18n || {};
 
 	const pswp = new PhotoSwipe({
-		dataSource: items,
+		dataSource: gallery.slides,
 		index,
 		mainClass: 'vp-popup',
 		closeTitle: strings.close,
@@ -289,12 +366,56 @@ async function openGallery(config, items, index, trigger) {
 		returnFocus: false,
 	});
 
-	registerCaption(pswp, items);
+	registerCaption(pswp, gallery.slides);
 	registerVideo(pswp);
 
+	const emit = (name) => {
+		document.dispatchEvent(
+			new window.CustomEvent(name, {
+				detail: {
+					loop,
+					gallery: pswp.element || null,
+					index: pswp.currIndex,
+					total: gallery.slides.length,
+					item: gallery.triggers[pswp.currIndex] || null,
+					refresh: () => {
+						const total = addTriggers(gallery, loop);
+
+						// `dataSource` is the array just extended, so the
+						// library counts the new slides on its own - only the
+						// counter and the arrows are written on a change.
+						pswp.dispatch('change');
+
+						return total;
+					},
+				},
+			})
+		);
+	};
+
+	// The library announces the slide it opens on as a change of its own, and
+	// so does a refresh that appended slides. Neither is the visitor moving.
+	let shown = index;
+
+	pswp.on('change', () => {
+		if (shown === pswp.currIndex) {
+			return;
+		}
+
+		shown = pswp.currIndex;
+		emit(CHANGE_EVENT);
+	});
+
+	pswp.on('close', () => emit(CLOSE_EVENT));
+
 	pswp.on('destroy', () => {
-		if (trigger.isConnected) {
-			trigger.focus();
+		// The trigger of the item on screen, not the one that was clicked: the
+		// visitor browsed away from that one, and where they stopped is where
+		// the page they come back to should be.
+		const item = gallery.triggers[pswp.currIndex];
+
+		if (config.restoreFocus && item && item.isConnected) {
+			item.focus();
 		}
 	});
 
@@ -304,6 +425,8 @@ async function openGallery(config, items, index, trigger) {
 	if (pswp.element && strings.gallery) {
 		pswp.element.setAttribute('aria-label', strings.gallery);
 	}
+
+	emit(OPEN_EVENT);
 }
 
 store(NAMESPACE, {
@@ -316,7 +439,7 @@ store(NAMESPACE, {
 		 *
 		 * @param {Event} event Click event.
 		 */
-		openPopup(event) {
+		openPopup: withSyncEvent((event) => {
 			const { ref } = getElement();
 			// A click on the loop is most often a click on something else - an
 			// item, a control, the space between them.
@@ -339,34 +462,23 @@ store(NAMESPACE, {
 			// The gallery is every trigger of this loop, in the order the items
 			// are rendered in - including the ones a Load More appended. `ref`
 			// is the loop wrapper: the listener is on it, not on the trigger.
-			const items = [];
-			let index = 0;
+			const gallery = readGallery(ref);
 
-			ref.querySelectorAll(TRIGGER_SELECTOR).forEach((element) => {
-				const data = getTriggerData(element);
-
-				if (!data) {
-					return;
-				}
-
-				if (element === trigger) {
-					index = items.length;
-				}
-
-				items.push(getSlide(data));
-			});
-
-			if (!items.length) {
+			if (!gallery.slides.length) {
 				return;
 			}
 
+			// A trigger whose data could not be read is in no gallery at all,
+			// and the first slide is as good a place to open on as any.
+			const index = Math.max(0, gallery.triggers.indexOf(trigger));
+
 			event.preventDefault();
 
-			openGallery(config, items, index, trigger).catch(() => {
+			openGallery(config, gallery, index, ref).catch(() => {
 				// The library never arrived. The trigger is a link to the full
 				// size image, and that is where the click goes.
 				window.location.assign(trigger.href);
 			});
-		},
+		}),
 	},
 });

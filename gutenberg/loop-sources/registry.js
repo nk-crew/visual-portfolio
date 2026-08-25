@@ -1,4 +1,4 @@
-import { dispatch, select, useSelect } from '@wordpress/data';
+import { dispatch, useSelect } from '@wordpress/data';
 
 import { LOOP_SOURCES_STORE } from '../store/loop-sources';
 
@@ -58,25 +58,6 @@ export function registerLoopSource(settings) {
 		isPro: false,
 		...settings,
 	});
-}
-
-/**
- * All registered sources, outside of a component.
- *
- * @return {Array} sources.
- */
-export function getLoopSources() {
-	return select(LOOP_SOURCES_STORE).getSources();
-}
-
-/**
- * A single registered source, outside of a component.
- *
- * @param {string} name - source name.
- * @return {Object|undefined} source.
- */
-export function getLoopSource(name) {
-	return select(LOOP_SOURCES_STORE).getSource(name);
 }
 
 /**

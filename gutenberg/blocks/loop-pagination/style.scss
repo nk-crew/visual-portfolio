@@ -14,21 +14,74 @@
 	margin-right: 0.6ch;
 }
 
-// Load more and infinite blocks.
-.vp-block-loop-pagination-load-more-loading,
-.vp-block-loop-pagination-infinite-loading {
+// The trigger block, in both of its variations. It holds the label and the
+// loading indicator, and shows exactly one of them.
+.vp-block-loop-pagination-trigger-loading {
 	display: none;
 }
 
 // The class the loop store puts on the wrapper while it is fetching.
 .vp-is-loading {
-	.vp-block-loop-pagination-load-more-loading,
-	.vp-block-loop-pagination-infinite-loading {
+	.vp-block-loop-pagination-trigger-loading {
 		display: block;
 	}
-	.vp-block-loop-pagination-load-more > :first-child,
-	.vp-block-loop-pagination-infinite > :first-child {
+
+	.vp-block-loop-pagination-trigger > :first-child {
 		display: none;
+	}
+}
+
+// The indicator itself, and the name a screen reader is given for it. Declared
+// here because the family never enqueues the plugin's global stylesheet, and
+// without them a Load More shows the literal word "Loading" where the spinner
+// should be.
+.vp-block-loop-pagination-trigger {
+	.vp-spinner {
+		--vp-spinner__color: currentcolor;
+		--vp-spinner__size: 20px;
+		--vp-spinner__border-size: 2px;
+		--vp-spinner__speed: 0.3s;
+
+		position: relative;
+		display: block;
+		width: var(--vp-spinner__size);
+		height: var(--vp-spinner__size);
+		text-indent: -9999em;
+		border: var(--vp-spinner__border-size) solid transparent;
+		border-left: var(--vp-spinner__border-size) solid var(--vp-spinner__color);
+		border-radius: 50%;
+		animation: vp-block-loop-spinner var(--vp-spinner__speed) infinite linear;
+
+		&::after {
+			position: absolute;
+			top: calc(-1 * var(--vp-spinner__border-size));
+			right: calc(-1 * var(--vp-spinner__border-size));
+			bottom: calc(-1 * var(--vp-spinner__border-size));
+			left: calc(-1 * var(--vp-spinner__border-size));
+			display: block;
+			content: "";
+			border: var(--vp-spinner__border-size) solid var(--vp-spinner__color);
+			border-radius: 50%;
+			opacity: 0.3;
+		}
+	}
+
+	.vp-screen-reader-text {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		white-space: nowrap;
+		border: 0;
+		clip-path: inset(50%);
+	}
+}
+
+@keyframes vp-block-loop-spinner {
+	100% {
+		transform: rotate(360deg);
 	}
 }
 
@@ -41,13 +94,12 @@
 
 // Fill style.
 .vp-block-loop-pagination.is-style-fill {
-	// Every button-like trigger gets the same pill, including Load More and the
-	// Infinite trigger - without them the style did nothing at all on a loop
-	// that uses one of those instead of paged links.
+	// Every button-like trigger gets the same pill, the Load More and infinite
+	// trigger included - without it the style did nothing at all on a loop that
+	// uses one of those instead of paged links.
 	.vp-block-loop-pagination-next,
 	.vp-block-loop-pagination-previous,
-	.vp-block-loop-pagination-load-more,
-	.vp-block-loop-pagination-infinite {
+	.vp-block-loop-pagination-trigger {
 		border-radius: 9999px;
 		padding: 0.3em 0.8em;
 		background-color: color-mix(in srgb, currentColor 7%, transparent);

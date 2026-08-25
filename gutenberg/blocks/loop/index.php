@@ -138,6 +138,35 @@ class Visual_Portfolio_Block_Loop {
 	}
 
 	/**
+	 * URL of one page of a loop.
+	 *
+	 * The controls that link to a single page ask for it here rather than
+	 * through `get_pagination_links()`: that one runs `paginate_links()` and
+	 * reads its markup back with a regular expression to hand out the whole set
+	 * of anchors, and a block that wants one address would build and parse the
+	 * lot to throw all but one of them away.
+	 *
+	 * @param int   $page    - page number.
+	 * @param array $context - block context of the control.
+	 *
+	 * @return string URL, already escaped, or `#` when there is none.
+	 */
+	public static function get_page_url( $page, $context ) {
+		$page = (int) $page;
+
+		if ( $page < 1 ) {
+			return '#';
+		}
+
+		$url = Visual_Portfolio_Get::get_pagenum_link(
+			array( 'vp_page' => $page ),
+			self::get_query_id( $context )
+		);
+
+		return $url ? esc_url( self::add_random_seed( $url, $context ) ) : '#';
+	}
+
+	/**
 	 * Rebuild the context a loop provides, out of its saved attributes.
 	 *
 	 * `wp_head` runs long before any block is rendered, so whatever has to

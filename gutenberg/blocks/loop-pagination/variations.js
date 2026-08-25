@@ -35,7 +35,7 @@ export default [
 			'visual-portfolio'
 		),
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },
-		innerBlocks: [['visual-portfolio/loop-pagination-load-more']],
+		innerBlocks: [['visual-portfolio/loop-pagination-trigger']],
 		icon: {
 			foreground: '#2540CC',
 			src: <LoadMoreIcon width="20" height="20" />,
@@ -50,7 +50,12 @@ export default [
 			'visual-portfolio'
 		),
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },
-		innerBlocks: [['visual-portfolio/loop-pagination-infinite']],
+		innerBlocks: [
+			[
+				'visual-portfolio/loop-pagination-trigger',
+				{ triggerType: 'infinite' },
+			],
+		],
 		icon: {
 			foreground: '#2540CC',
 			src: <InfiniteIcon width="20" height="20" />,

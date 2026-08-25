@@ -264,12 +264,17 @@ class Visual_Portfolio_Popup {
 		wp_interactivity_config(
 			self::STORE,
 			array(
-				'library' => visual_portfolio()->plugin_url . self::LIBRARY_PATH,
+				'library'      => visual_portfolio()->plugin_url . self::LIBRARY_PATH,
+
+				// The same setting the legacy popup honours, and the same
+				// meaning: on closing, the focus goes back to the item that was
+				// on screen rather than staying in a dialog that is gone.
+				'restoreFocus' => (bool) Visual_Portfolio_Settings::get_option( 'restore_focus', 'vp_popup_gallery' ),
 
 				// The library labels its own buttons in English otherwise, and a
 				// lightbox is the one part of a gallery that is nothing but
 				// buttons.
-				'i18n'    => array(
+				'i18n'         => array(
 					'gallery'   => __( 'Gallery', 'visual-portfolio' ),
 					'close'     => __( 'Close', 'visual-portfolio' ),
 					'zoom'      => __( 'Zoom in/out', 'visual-portfolio' ),

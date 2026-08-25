@@ -60,11 +60,11 @@ class Visual_Portfolio_Block_Loop_Pagination_Next {
 				'data-wp-on--click'   => 'actions.navigate',
 			)
 		);
-		$show_label         = $attributes['showLabel'] ?? true;
+		$show_label         = $block->context['vp/showLabel'] ?? true;
 		$default_label      = esc_html__( 'Next', 'visual-portfolio' );
 		$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
 		$label              = $show_label ? $label_text : '';
-		$show_arrow         = $attributes['showArrow'] ?? true;
+		$show_arrow         = $block->context['vp/showArrow'] ?? true;
 
 		if ( ! $label ) {
 			$wrapper_attributes .= ' aria-label="' . $label_text . '"';
@@ -73,26 +73,7 @@ class Visual_Portfolio_Block_Loop_Pagination_Next {
 			$label = $label . '<span class="vp-block-loop-pagination-next-arrow" aria-hidden="true">&rsaquo;</span>';
 		}
 
-		$pagination_links = Visual_Portfolio_Get::get_pagination_links(
-			array(
-				'start_page' => $current_page,
-				'max_pages'  => $max_pages,
-			),
-			array(
-				'pagination_paged__show_arrows'  => true,
-				'pagination_paged__show_numbers' => false,
-			),
-			$query_id
-		);
-
-		// Find the next page link from the pagination links.
-		$next_link = '#';
-		foreach ( $pagination_links as $link ) {
-			if ( $link['is_next_arrow'] ) {
-				$next_link = $link['url'] ? esc_url( Visual_Portfolio_Block_Loop::add_random_seed( $link['url'], $block->context ) ) : '#';
-				break;
-			}
-		}
+		$next_link = Visual_Portfolio_Block_Loop::get_page_url( $current_page + 1, $block->context );
 
 		return sprintf(
 			'<a href="%1$s" %2$s>%3$s</a>',

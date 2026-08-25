@@ -439,33 +439,6 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
-	 * Block spacing, as a CSS length.
-	 *
-	 * The gap is edited through the core Dimensions panel, which stores either a
-	 * length or a reference to a preset of the theme. Core prints no CSS for it
-	 * on a block without layout support, which is what lets the value land on
-	 * the layout variable the stylesheet already reads.
-	 *
-	 * @param array $attributes - block attributes.
-	 *
-	 * @return string CSS length, or an empty string when the theme decides.
-	 */
-	private function get_block_gap( $attributes ) {
-		$gap = $attributes['style']['spacing']['blockGap'] ?? '';
-
-		if ( ! is_string( $gap ) || '' === $gap ) {
-			return '';
-		}
-
-		// `var:preset|spacing|50` is how a preset travels in block attributes.
-		if ( 0 === strpos( $gap, 'var:' ) ) {
-			return sprintf( 'var(--wp--%s)', str_replace( '|', '--', substr( $gap, 4 ) ) );
-		}
-
-		return $this->get_css_length( $gap, '' );
-	}
-
-	/**
 	 * Layout classes and variables printed on the list.
 	 *
 	 * A public contract: themes override a gallery by redeclaring these,
@@ -479,7 +452,7 @@ class Visual_Portfolio_Block_Item_Template {
 	private function get_layout_props( $attributes, $layout_type ) {
 		$columns = $this->get_layout_columns( $attributes, $layout_type );
 		$classes = array();
-		$gap     = $this->get_block_gap( $attributes );
+		$gap     = visual_portfolio_get_block_gap( $attributes['style']['spacing']['blockGap'] ?? '' );
 
 		// Auto mode reads the count as a maximum, and zero lifts it - which is
 		// what the control promises. `get_layout_columns()` floors it at one,

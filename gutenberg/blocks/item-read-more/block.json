@@ -7,13 +7,11 @@
 	"description": "Displays a link to the gallery item. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/item-template"],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["vp/itemUrl", "vp/itemPopupData"],
+	"usesContext": ["vp/itemTitle", "vp/itemUrl", "vp/itemPopupData"],
 	"attributes": {
 		"text": {
-			"type": "string"
-		},
-		"textAlign": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"showArrow": {
 			"type": "boolean",
@@ -46,6 +44,10 @@
 			"label": "Outline"
 		}
 	],
+	"example": {
+		"attributes": { "text": "Read more" },
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"reusable": false,
@@ -61,6 +63,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

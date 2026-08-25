@@ -282,20 +282,6 @@
 		justify-content: flex-end;
 	}
 
-	// The toolbar control overrides the vertical axis of the position matrix -
-	// declared after it, and deliberately at the same weight.
-	&.is-vertically-aligned-top > .wp-block-visual-portfolio-item-cover__inner {
-		justify-content: flex-start;
-	}
-
-	&.is-vertically-aligned-center > .wp-block-visual-portfolio-item-cover__inner {
-		justify-content: center;
-	}
-
-	&.is-vertically-aligned-bottom > .wp-block-visual-portfolio-item-cover__inner {
-		justify-content: flex-end;
-	}
-
 	// The link covers the whole cover instead of wrapping it: the content on top
 	// may hold links of its own, and an anchor inside an anchor is invalid
 	// markup. It is also the focusable element that reveals a hover cover to a
@@ -350,6 +336,19 @@
 		@include hovered {
 			> .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__image-background {
 				transform: var(--vp-image-hover-transform, none);
+			}
+		}
+
+		// The one frame in which the `fly` module puts the panel on the side
+		// the pointer crossed. It has to start on that side rather than travel
+		// to it, so the cover is held hidden and untransitioned while it is
+		// seated. Written last and at the weight of the states above, so it is
+		// the order that settles the tie.
+		&.vp-is-seating {
+			@include panel-hidden;
+
+			> .wp-block-visual-portfolio-item-cover__inner {
+				transition-duration: 0s;
 			}
 		}
 	}

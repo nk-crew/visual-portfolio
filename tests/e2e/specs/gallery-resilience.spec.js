@@ -20,7 +20,7 @@ const TITLE = '.wp-block-visual-portfolio-item-title';
 const SORT = '.vp-block-loop-sort';
 const SORT_SUBMIT = '.vp-block-loop-sort__submit';
 const NEXT = '.vp-block-loop-pagination-next';
-const LOAD_MORE = '.vp-block-loop-pagination-load-more';
+const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 
 const PER_PAGE = 2;
 const IMAGES_COUNT = 6;
@@ -365,7 +365,7 @@ test.describe('Gallery Loop resilience', () => {
 			getLoopMarkup({
 				queryId: 1,
 				images,
-				controls: [getPagination(['loop-pagination-load-more'])],
+				controls: [getPagination(['loop-pagination-trigger'])],
 			})
 		);
 

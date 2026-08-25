@@ -1,6 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDebounce } from '@wordpress/compose';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
 
 const SEARCH_PATH = '/wp/v2/search';
@@ -40,7 +41,8 @@ export default function useEntitySearch({
 
 		results.forEach(({ id, title }) => {
 			if (id && title) {
-				found[String(id)] = title;
+				// REST answers with the raw title, entities and all.
+				found[String(id)] = decodeEntities(title);
 			}
 		});
 

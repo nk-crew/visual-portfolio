@@ -26,7 +26,10 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import GalleryManager from '../../loop-sources/gallery-manager';
 import { useLoopSource } from '../../loop-sources/registry';
 import SourcePicker from '../../loop-sources/source-picker';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
 import PatternSetup from './pattern-setup';
 import { applyChoices, PAGINATION_OPTIONS } from './starting-choices';
@@ -52,7 +55,7 @@ const TEMPLATE = [
 		[
 			[
 				'visual-portfolio/loop-filter-item',
-				{ text: __('All', 'visual-portfolio'), isAll: true },
+				{ text: __('All', 'visual-portfolio') },
 			],
 		],
 	],
@@ -64,7 +67,10 @@ const TEMPLATE = [
 				'visual-portfolio/item-image',
 				{ aspectRatio: '1', clickAction: 'popup' },
 			],
-			['visual-portfolio/item-title', { textAlign: 'center' }],
+			[
+				'visual-portfolio/item-title',
+				{ style: { typography: { textAlign: 'center' } } },
+			],
 		],
 	],
 	[
@@ -293,12 +299,14 @@ function DisplayPanel({ attributes, setAttributes }) {
 		<ToolsPanel
 			label={__('Display', 'visual-portfolio')}
 			dropdownMenuProps={useToolsPanelDropdownMenuProps()}
-			resetAll={() => {
+			resetAll={(filters) => {
 				setBase({ perPage: 6, maxPagesLimit: 0 });
 
 				if (isPosts) {
 					setPosts({ offset: 0 });
 				}
+
+				setAttributes(getResetAllValues(filters));
 			}}
 		>
 			<ToolsPanelItem
@@ -636,7 +644,7 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
  */
 export default function BlockEdit(props) {
 	const { attributes, setAttributes, clientId } = props;
-	const { layout, preview_image_example: previewExample } = attributes;
+	const { previewLayout, preview_image_example: previewExample } = attributes;
 
 	useMaxPages({ attributes, setAttributes });
 
@@ -653,8 +661,8 @@ export default function BlockEdit(props) {
 		return (
 			<div className="vpf-example-preview">
 				<img
-					src={`${pluginUrl}/assets/admin/images/example-${layout}.png`}
-					alt={`Preview of ${layout} layout`}
+					src={`${pluginUrl}/assets/admin/images/example-${previewLayout}.png`}
+					alt={`Preview of ${previewLayout} layout`}
 				/>
 			</div>
 		);

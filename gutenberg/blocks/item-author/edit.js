@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
-	BlockControls,
 	InspectorControls,
 	useBlockEditingMode,
 	useBlockProps,
@@ -18,16 +16,15 @@ import {
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 const DEFAULT_PREFIX = __('by ', 'visual-portfolio');
 
 export default function ItemAuthorEdit({
-	attributes: { textAlign, showPrefix, prefix, isLink, rel, linkTarget },
+	attributes: { prefix, isLink, rel, linkTarget },
 	setAttributes,
 	context: { 'vp/itemAuthor': itemAuthor, 'vp/itemAuthorUrl': itemAuthorUrl },
 }) {
@@ -36,11 +33,7 @@ export default function ItemAuthorEdit({
 	// An untouched block carries no prefix of its own and shows the default.
 	const prefixValue = prefix ?? DEFAULT_PREFIX;
 
-	const blockProps = useBlockProps({
-		className: classnames({
-			[`has-text-align-${textAlign}`]: textAlign,
-		}),
-	});
+	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
 	const author = itemAuthor
@@ -50,168 +43,121 @@ export default function ItemAuthorEdit({
 	return (
 		<>
 			{blockEditingMode === 'default' && (
-				<>
-					<BlockControls group="block">
-						<AlignmentControl
-							value={textAlign}
-							onChange={(nextAlign) =>
-								setAttributes({ textAlign: nextAlign })
-							}
-						/>
-					</BlockControls>
-					<InspectorControls>
-						<ToolsPanel
-							label={__('Settings', 'visual-portfolio')}
-							dropdownMenuProps={dropdownMenuProps}
-							resetAll={() =>
-								setAttributes({
-									showPrefix: true,
+				<InspectorControls>
+					<ToolsPanel
+						label={__('Settings', 'visual-portfolio')}
+						dropdownMenuProps={dropdownMenuProps}
+						resetAll={(filters) =>
+							setAttributes(
+								getResetAllValues(filters, {
 									prefix: DEFAULT_PREFIX,
 									isLink: false,
 									rel: '',
 									linkTarget: '_self',
 								})
+							)
+						}
+					>
+						<ToolsPanelItem
+							label={__('Prefix text', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => prefixValue !== DEFAULT_PREFIX}
+							onDeselect={() =>
+								setAttributes({ prefix: DEFAULT_PREFIX })
 							}
 						>
-							<ToolsPanelItem
-								label={__('Show prefix', 'visual-portfolio')}
-								isShownByDefault
-								hasValue={() => !showPrefix}
-								onDeselect={() =>
-									setAttributes({ showPrefix: true })
+							<TextControl
+								label={__('Prefix text', 'visual-portfolio')}
+								value={prefixValue}
+								onChange={(newPrefix) =>
+									setAttributes({ prefix: newPrefix })
 								}
-							>
-								<ToggleControl
-									label={__(
-										'Show prefix',
-										'visual-portfolio'
-									)}
-									checked={showPrefix}
-									onChange={() =>
-										setAttributes({
-											showPrefix: !showPrefix,
-										})
-									}
-								/>
-							</ToolsPanelItem>
-							{showPrefix && (
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={__('Link to author', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => isLink}
+							onDeselect={() => setAttributes({ isLink: false })}
+						>
+							<ToggleControl
+								label={__('Link to author', 'visual-portfolio')}
+								checked={isLink}
+								onChange={() =>
+									setAttributes({ isLink: !isLink })
+								}
+							/>
+						</ToolsPanelItem>
+						{isLink && (
+							<>
 								<ToolsPanelItem
 									label={__(
-										'Prefix text',
+										'Open in new tab',
 										'visual-portfolio'
 									)}
 									isShownByDefault
-									hasValue={() =>
-										prefixValue !== DEFAULT_PREFIX
-									}
+									hasValue={() => linkTarget === '_blank'}
 									onDeselect={() =>
 										setAttributes({
-											prefix: DEFAULT_PREFIX,
+											linkTarget: '_self',
 										})
 									}
 								>
-									<TextControl
-										label={__(
-											'Prefix text',
-											'visual-portfolio'
-										)}
-										value={prefixValue}
-										onChange={(newPrefix) =>
-											setAttributes({ prefix: newPrefix })
-										}
-									/>
-								</ToolsPanelItem>
-							)}
-							<ToolsPanelItem
-								label={__('Link to author', 'visual-portfolio')}
-								isShownByDefault
-								hasValue={() => isLink}
-								onDeselect={() =>
-									setAttributes({ isLink: false })
-								}
-							>
-								<ToggleControl
-									label={__(
-										'Link to author',
-										'visual-portfolio'
-									)}
-									checked={isLink}
-									onChange={() =>
-										setAttributes({ isLink: !isLink })
-									}
-								/>
-							</ToolsPanelItem>
-							{isLink && (
-								<>
-									<ToolsPanelItem
+									<ToggleControl
 										label={__(
 											'Open in new tab',
 											'visual-portfolio'
 										)}
-										isShownByDefault
-										hasValue={() => linkTarget === '_blank'}
-										onDeselect={() =>
+										checked={linkTarget === '_blank'}
+										onChange={(value) =>
 											setAttributes({
-												linkTarget: '_self',
+												linkTarget: value
+													? '_blank'
+													: '_self',
 											})
 										}
-									>
-										<ToggleControl
-											label={__(
-												'Open in new tab',
-												'visual-portfolio'
-											)}
-											checked={linkTarget === '_blank'}
-											onChange={(value) =>
-												setAttributes({
-													linkTarget: value
-														? '_blank'
-														: '_self',
-												})
-											}
-										/>
-									</ToolsPanelItem>
-									<ToolsPanelItem
+									/>
+								</ToolsPanelItem>
+								<ToolsPanelItem
+									label={__(
+										'Link relation',
+										'visual-portfolio'
+									)}
+									isShownByDefault
+									hasValue={() => !!rel}
+									onDeselect={() =>
+										setAttributes({ rel: '' })
+									}
+								>
+									<TextControl
 										label={__(
 											'Link relation',
 											'visual-portfolio'
 										)}
-										isShownByDefault
-										hasValue={() => !!rel}
-										onDeselect={() =>
-											setAttributes({ rel: '' })
-										}
-									>
-										<TextControl
-											label={__(
-												'Link relation',
+										help={createInterpolateElement(
+											__(
+												'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.',
 												'visual-portfolio'
-											)}
-											help={createInterpolateElement(
-												__(
-													'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.',
-													'visual-portfolio'
+											),
+											{
+												a: (
+													<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
 												),
-												{
-													a: (
-														<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
-													),
-												}
-											)}
-											value={rel}
-											onChange={(newRel) =>
-												setAttributes({ rel: newRel })
 											}
-										/>
-									</ToolsPanelItem>
-								</>
-							)}
-						</ToolsPanel>
-					</InspectorControls>
-				</>
+										)}
+										value={rel}
+										onChange={(newRel) =>
+											setAttributes({ rel: newRel })
+										}
+									/>
+								</ToolsPanelItem>
+							</>
+						)}
+					</ToolsPanel>
+				</InspectorControls>
 			)}
 			<div {...blockProps}>
-				{showPrefix && prefixValue}
+				{prefixValue}
 				{isLink ? (
 					// Inert in the editor - it only carries the link styling.
 					<a

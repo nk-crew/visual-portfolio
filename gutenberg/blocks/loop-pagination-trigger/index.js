@@ -1,14 +1,12 @@
 /**
- * WordPress dependencies
- */
-
-/**
  * Internal dependencies
  */
 import { ReactComponent as BlockIcon } from '../../block-icons/loop-pagination-load-more.svg';
 import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import edit from './edit';
+import transforms from './transforms';
+import variations from './variations';
 
 /**
  * Register block
@@ -20,4 +18,6 @@ registerLoopBlock(metadata.name, {
 		src: <BlockIcon width="20" height="20" />,
 	},
 	edit,
+	transforms,
+	variations,
 });

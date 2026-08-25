@@ -7,9 +7,12 @@ import {
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { useToolsPanelDropdownMenuProps } from '../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/tools-panel';
 
-import GalleryManager from './gallery-manager';
+import GalleryManager, { getUsedCategories } from './gallery-manager';
 import { ImagesIcon } from './icons';
 import { registerLoopSource } from './registry';
 
@@ -54,29 +57,6 @@ const DEFAULTS = {
 	orderBy: 'default',
 	order: 'asc',
 };
-
-/**
- * Every category used by at least one image.
- *
- * The filter block reads `imagesQuery.categories`, so it has to follow what the
- * images themselves carry.
- *
- * @param {Array} images - gallery images.
- * @return {Array} categories.
- */
-function getUsedCategories(images) {
-	const categories = new Set();
-
-	images.forEach((image) => {
-		if (Array.isArray(image.categories)) {
-			image.categories.forEach((category) => {
-				categories.add(category);
-			});
-		}
-	});
-
-	return Array.from(categories);
-}
 
 /**
  * Settings of the images source.
@@ -125,7 +105,7 @@ function ImagesSettingsPanel({ attributes, setAttributes, clientId }) {
 			label={__('Settings', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
 			panelId={clientId}
-			resetAll={() => update(DEFAULTS)}
+			resetAll={(filters) => update(getResetAllValues(filters, DEFAULTS))}
 		>
 			<ToolsPanelItem
 				label={__('Images', 'visual-portfolio')}

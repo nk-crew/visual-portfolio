@@ -36,13 +36,11 @@ class Visual_Portfolio_Block {
 	/**
 	 * Block output
 	 *
-	 * @param array  $attributes - block attributes.
-	 * @param string $content - block content.
-	 * @param object $block - block instance.
+	 * @param array $attributes - block attributes.
 	 *
 	 * @return string
 	 */
-	public function block_render( $attributes, $content, $block ) {
+	public function block_render( $attributes ) {
 		$attributes = array_merge(
 			array(
 				'anchor'    => '',
@@ -52,22 +50,16 @@ class Visual_Portfolio_Block {
 			$attributes
 		);
 
-		// Transform context to attributes.
-		$context_attributes = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );
-
-		// Merge with block attributes.
-		$merged_attributes = array_merge( $attributes, $context_attributes );
-
 		$class_name = 'wp-block-visual-portfolio';
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'id'    => $merged_attributes['anchor'],
+				'id'    => $attributes['anchor'],
 				'class' => $class_name,
 			)
 		);
 
-		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, Visual_Portfolio_Get::get( $merged_attributes ) );
+		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, Visual_Portfolio_Get::get( $attributes ) );
 	}
 }
 new Visual_Portfolio_Block();

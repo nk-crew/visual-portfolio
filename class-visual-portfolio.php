@@ -265,14 +265,18 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-next/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-numbers/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-previous/index.php';
-				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-load-more/index.php';
-				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-infinite/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-trigger/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-sort/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-no-results/index.php';
 
 				// Before the item blocks: they ask it for the attributes that
 				// turn an item into a lightbox trigger.
 				require_once $this->plugin_path . 'gutenberg/popup/index.php';
+
+				// Shared by the item blocks that paint an overlay on a picture
+				// and by those that lay their children out on a gap.
+				require_once $this->plugin_path . 'gutenberg/utils/block-gap/index.php';
+				require_once $this->plugin_path . 'gutenberg/utils/item-overlay/index.php';
 
 				require_once $this->plugin_path . 'gutenberg/blocks/item-template/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/item-image/index.php';

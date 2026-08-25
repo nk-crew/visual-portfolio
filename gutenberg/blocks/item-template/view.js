@@ -35,6 +35,18 @@ const MASONRY_NATIVE_CLASS = 'vp-layout-masonry-native';
 // independently and neither is guaranteed to be evaluated first.
 const RELAYOUT_EVENT = 'vp-relayout';
 
+// Listened for on the list, so that a script that is not a module of ours can
+// drive a carousel - the Pro lightbox scrolls one to the slide it is showing
+// and holds its autoplay while it is open.
+//
+// `vp-carousel-go-to`     `detail.index`   slide to rest on.
+// `vp-carousel-autoplay`  `detail.playing` false holds autoplay, true releases
+//                                          it. A hold, not a play button: the
+//                                          pointer of the visitor still pauses
+//                                          a released carousel.
+const GO_TO_EVENT = 'vp-carousel-go-to';
+const AUTOPLAY_EVENT = 'vp-carousel-autoplay';
+
 const noop = () => {};
 
 const carousels = new WeakMap();
@@ -163,13 +175,19 @@ function getNav(list) {
  */
 function getCurrentSlide(list) {
 	const items = Array.from(list.querySelectorAll(ITEM_SELECTOR));
-	const edge = list.getBoundingClientRect().left;
+	// The start of a carousel, not its left: on a right to left page the first
+	// slide sits against the right edge, and measuring from the left one marked
+	// the last slide as the current one for the whole carousel.
+	const rtl = isRtl(list);
+	const box = list.getBoundingClientRect();
+	const edge = rtl ? box.right : box.left;
 
 	let nearest = 0;
 	let distance = Number.POSITIVE_INFINITY;
 
 	items.forEach((item, index) => {
-		const offset = Math.abs(item.getBoundingClientRect().left - edge);
+		const rect = item.getBoundingClientRect();
+		const offset = Math.abs((rtl ? rect.right : rect.left) - edge);
 
 		if (offset < distance) {
 			distance = offset;
@@ -189,6 +207,21 @@ function getCurrentSlide(list) {
  */
 function isRtl(list) {
 	return 'rtl' === window.getComputedStyle(list).direction;
+}
+
+/**
+ * How a carousel should travel.
+ *
+ * The stylesheet takes `scroll-behavior` back to `auto` under
+ * `prefers-reduced-motion`, and a `behavior` passed to the scroll API outranks
+ * the property - a visitor who asked for less motion still got the slide.
+ *
+ * @return {string} `smooth`, or `auto` where motion was asked against.
+ */
+function getScrollBehavior() {
+	return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+		? 'auto'
+		: 'smooth';
 }
 
 /**
@@ -343,7 +376,32 @@ function slide(list, direction) {
 	// the same signed numbers `scrollLeft` reports.
 	list.scrollBy({
 		left: step * direction * (isRtl(list) ? -1 : 1),
-		behavior: 'smooth',
+		behavior: getScrollBehavior(),
+	});
+}
+
+/**
+ * Scroll a carousel to one of its slides.
+ *
+ * @param {HTMLElement} list  Item template list.
+ * @param {number}      index Slide to rest on.
+ */
+function goToSlide(list, index) {
+	const item = list.querySelectorAll(ITEM_SELECTOR)[index];
+
+	if (!item) {
+		return;
+	}
+
+	// The list is scrolled rather than the item scrolled into view: that one
+	// walks every scrollable ancestor, and the page must not move under a
+	// lightbox that is showing the same item.
+	list.scrollTo({
+		left:
+			list.scrollLeft +
+			item.getBoundingClientRect().left -
+			list.getBoundingClientRect().left,
+		behavior: getScrollBehavior(),
 	});
 }
 
@@ -374,6 +432,9 @@ function initAutoplay(list) {
 	let start = 0;
 	let raf = 0;
 	let paused = false;
+	// Asked for from outside, and kept apart from `paused` so that releasing it
+	// does not start a carousel the pointer is resting on.
+	let held = false;
 
 	const setProgress = (value) => {
 		frame.style.setProperty(
@@ -385,7 +446,7 @@ function initAutoplay(list) {
 	const tick = (now) => {
 		raf = window.requestAnimationFrame(tick);
 
-		if (paused) {
+		if (paused || held) {
 			start = now;
 
 			return;
@@ -407,7 +468,7 @@ function initAutoplay(list) {
 			getScrollPosition(list) >=
 			list.scrollWidth - list.clientWidth - 1
 		) {
-			list.scrollTo({ left: 0, behavior: 'smooth' });
+			list.scrollTo({ left: 0, behavior: getScrollBehavior() });
 		} else {
 			slide(list, 1);
 		}
@@ -419,6 +480,9 @@ function initAutoplay(list) {
 	const resume = () => {
 		paused = false;
 	};
+	const hold = (event) => {
+		held = false === event.detail?.playing;
+	};
 
 	frame.classList.add(PLAYING_CLASS);
 	frame.addEventListener('pointerenter', pause);
@@ -426,6 +490,7 @@ function initAutoplay(list) {
 	frame.addEventListener('focusin', pause);
 	frame.addEventListener('focusout', resume);
 	list.addEventListener('pointerdown', pause);
+	list.addEventListener(AUTOPLAY_EVENT, hold);
 
 	raf = window.requestAnimationFrame((now) => {
 		start = now;
@@ -440,6 +505,7 @@ function initAutoplay(list) {
 		frame.removeEventListener('focusin', pause);
 		frame.removeEventListener('focusout', resume);
 		list.removeEventListener('pointerdown', pause);
+		list.removeEventListener(AUTOPLAY_EVENT, hold);
 		frame.style.removeProperty('--vp-carousel-autoplay-progress');
 	};
 }
@@ -453,6 +519,7 @@ function initAutoplay(list) {
  */
 function initCarousel(list) {
 	const onScroll = () => syncNav(list);
+	const onGoTo = (event) => goToSlide(list, event.detail?.index);
 
 	// The slide width is a `calc()` over the column count, which auto mode has
 	// to work out from the container.
@@ -462,6 +529,7 @@ function initCarousel(list) {
 	syncNav(list);
 
 	list.addEventListener('scroll', onScroll, { passive: true });
+	list.addEventListener(GO_TO_EVENT, onGoTo);
 
 	const stopObserving = observeItems(list, () => {
 		syncDots(list);
@@ -502,6 +570,7 @@ function initCarousel(list) {
 		stopAutoplay();
 		stopColumns();
 		list.removeEventListener('scroll', onScroll);
+		list.removeEventListener(GO_TO_EVENT, onGoTo);
 		stopObserving();
 
 		const carousel = carousels.get(list);
@@ -599,15 +668,7 @@ store('visual-portfolio/item-template', {
 				return;
 			}
 
-			const item = list.querySelectorAll(ITEM_SELECTOR)[index];
-
-			if (item) {
-				item.scrollIntoView({
-					behavior: 'smooth',
-					block: 'nearest',
-					inline: 'start',
-				});
-			}
+			goToSlide(list, index);
 		},
 	},
 	callbacks: {

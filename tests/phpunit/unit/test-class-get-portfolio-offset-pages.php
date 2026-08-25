@@ -36,19 +36,23 @@ class ClassGetPortfolioOffsetPages extends WP_UnitTestCase {
 	 *
 	 * @param string $source - `posts_source` value.
 	 * @param int    $offset - stored offset.
+	 * @param array  $extra - options overriding the defaults of the gallery.
 	 *
 	 * @return int
 	 */
-	private function get_max_pages( $source, $offset ) {
+	private function get_max_pages( $source, $offset, $extra = array() ) {
 		$config = Visual_Portfolio_Get::get_output_config(
-			array(
-				'block_id'       => 'offset-pages-test',
-				'content_source' => 'post-based',
-				'posts_source'   => $source,
-				'posts_ids'      => self::$post_ids,
-				'items_count'    => 6,
-				'pagination'     => 'paged',
-				'posts_offset'   => $offset,
+			array_merge(
+				array(
+					'block_id'       => 'offset-pages-test',
+					'content_source' => 'post-based',
+					'posts_source'   => $source,
+					'posts_ids'      => self::$post_ids,
+					'items_count'    => 6,
+					'pagination'     => 'paged',
+					'posts_offset'   => $offset,
+				),
+				$extra
 			)
 		);
 
@@ -73,5 +77,24 @@ class ClassGetPortfolioOffsetPages extends WP_UnitTestCase {
 	public function test_a_post_type_source_still_counts_the_offset() {
 		$this->assertSame( 2, $this->get_max_pages( 'post', 0 ) );
 		$this->assertSame( 1, $this->get_max_pages( 'post', 3 ) );
+	}
+
+	/**
+	 * A custom query carries an offset of its own, which the stored one has
+	 * nothing to do with. Subtracting the stored one leaves a single page.
+	 *
+	 * @return void
+	 */
+	public function test_a_custom_query_offset_is_not_the_stored_one() {
+		$pages = $this->get_max_pages(
+			'custom_query',
+			20,
+			array(
+				'items_count'        => 2,
+				'posts_custom_query' => 'post_type=post&offset=2',
+			)
+		);
+
+		$this->assertSame( 5, $pages );
 	}
 }

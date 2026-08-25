@@ -23,8 +23,16 @@ import { getFlyOffset } from '../../../assets/js/_fly-side';
  * does so from below.
  */
 
-const PANEL = '.wp-block-visual-portfolio-item-cover__inner';
-const TRANSITION = '0.2s transform ease-in-out';
+// The side the panel rests on, written as the variable the stylesheet already
+// parks the panel with. The module never writes `transform` itself: an inline
+// property outweighs every rule there is, and one pass of the pointer would
+// leave the panel deaf to `:focus-within` and to `prefers-reduced-motion` for
+// the rest of the page's life.
+const SIDE = '--vp-panel-hidden-transform';
+
+// Worn for the one frame in which the panel is put on the side the pointer
+// crossed. The stylesheet reads it as hidden, and not travelling.
+const SEATING = 'vp-is-seating';
 
 // A cover set to the default state holds its panel up and stands aside for the
 // pointer, so entering and leaving mean the opposite of what they do otherwise.
@@ -53,29 +61,24 @@ window.addEventListener(
  * @param {boolean}     arriving Whether the panel is coming in.
  */
 function movePanel(cover, offset, arriving) {
-	const panel = cover.querySelector(PANEL);
-
-	if (!panel) {
-		return;
+	// Seated on the side the pointer crossed, and seated silently: the panel
+	// has to start there rather than travel there.
+	if (arriving) {
+		cover.classList.add(SEATING);
 	}
 
-	const resting = `translateX(${offset.x}) translateY(${offset.y}) translateZ(0)`;
+	cover.style.setProperty(
+		SIDE,
+		`translateX(${offset.x}) translateY(${offset.y})`
+	);
 
 	if (arriving) {
-		// Seated on the side the pointer crossed, and seated silently: the
-		// panel has to start there rather than travel there.
-		panel.style.transition = 'none';
-		panel.style.transform = resting;
-
-		// Flush the change before the transition goes back on, or Safari and
-		// Firefox animate the seating as well.
+		// Flush the seating before the state rules take the panel in, or
+		// Safari and Firefox animate the seating as well.
 		void cover.offsetHeight;
-	}
 
-	panel.style.transition = TRANSITION;
-	panel.style.transform = arriving
-		? 'translateX(0%) translateY(0%) translateZ(0)'
-		: resting;
+		cover.classList.remove(SEATING);
+	}
 }
 
 store('visual-portfolio/item-cover', {
@@ -89,6 +92,14 @@ store('visual-portfolio/item-cover', {
 		 * @param {MouseEvent} event Pointer event.
 		 */
 		flyPanel(event) {
+			// The states themselves live in `@media (hover: hover)`, and the
+			// side is read the same way: on a touch screen the compatibility
+			// mouse events of a tap would park the panel off a card that no
+			// rule there ever brings it back onto.
+			if (!window.matchMedia('(hover: hover)').matches) {
+				return;
+			}
+
 			const { ref } = getElement();
 			const entering = 'mouseenter' === event.type;
 

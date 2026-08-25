@@ -60,6 +60,7 @@
 			}
 		}
 	},
+	"selectors": { "root": ".vp-block-loop-filter-item" },
 	"attributes": {
 		"lock": {
 			"type": "object",
@@ -67,11 +68,7 @@
 		},
 		"text": { "type": "string", "default": "" },
 		"filter": { "type": "string", "default": "*" },
-		"isAll": { "type": "boolean", "default": false },
-		"url": { "type": "string", "default": "" },
 		"taxonomyId": { "type": "number", "default": 0 },
-		"parentId": { "type": "number", "default": 0 },
-		"isActive": { "type": "boolean", "default": false },
 		"count": { "type": "number", "default": 0 },
 		"style": { "type": "object" }
 	}

@@ -25,7 +25,7 @@ const CAPTION = '.vp-popup-caption';
 // current one is a thing a visitor can click.
 const SLIDE = '.pswp__item[aria-hidden="false"]';
 const SLIDE_IMAGE = '.pswp__img:not(.pswp__img--placeholder)';
-const LOAD_MORE = '.vp-block-loop-pagination-load-more';
+const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 const PAGE_NUMBER = '.vp-block-loop-pagination-numbers a';
 
 const IMAGES_COUNT = 4;
@@ -415,7 +415,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			images,
 			clickAction: 'popup',
 			perPage: 2,
-			controls: ['loop-pagination-load-more'],
+			controls: ['loop-pagination-trigger'],
 		});
 
 		await expect(page.locator(TRIGGER)).toHaveCount(2);

@@ -77,10 +77,6 @@ class Visual_Portfolio_Block_Item_Date {
 
 		$classes = array();
 
-		if ( ! empty( $attributes['textAlign'] ) ) {
-			$classes[] = 'has-text-align-' . $attributes['textAlign'];
-		}
-
 		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 			$classes[] = 'has-link-color';
 		}

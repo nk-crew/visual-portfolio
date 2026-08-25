@@ -16,7 +16,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 const AVAILABLE_OPTIONS = window.VPGutenbergVariables?.loop_sort_options || [];
 
@@ -93,7 +96,14 @@ export default function LoopSortEdit({ attributes, setAttributes, context }) {
 			<InspectorControls>
 				<ToolsPanel
 					label={__('Settings', 'visual-portfolio')}
-					resetAll={() => setAttributes({ options: [], labels: {} })}
+					resetAll={(filters) =>
+						setAttributes(
+							getResetAllValues(filters, {
+								options: [],
+								labels: {},
+							})
+						)
+					}
 					dropdownMenuProps={dropdownMenuProps}
 				>
 					<ToolsPanelItem

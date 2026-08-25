@@ -45,6 +45,7 @@
 			"default": { "type": "flex" }
 		}
 	},
+	"selectors": { "root": ".vp-block-loop-filter" },
 	"usesContext": [
 		"vp/blockId",
 		"vp/queryType",

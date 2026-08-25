@@ -10,8 +10,7 @@
 		"visual-portfolio/loop-pagination-previous",
 		"visual-portfolio/loop-pagination-numbers",
 		"visual-portfolio/loop-pagination-next",
-		"visual-portfolio/loop-pagination-load-more",
-		"visual-portfolio/loop-pagination-infinite"
+		"visual-portfolio/loop-pagination-trigger"
 	],
 	"textdomain": "visual-portfolio",
 	"supports": {
@@ -51,7 +50,15 @@
 			"default": { "type": "flex" }
 		}
 	},
-	"usesContext": ["vp/blockId"],
+	"selectors": { "root": ".vp-block-loop-pagination" },
+	"providesContext": {
+		"vp/showLabel": "showLabel",
+		"vp/showArrow": "showArrow"
+	},
 	"styles": [{ "name": "fill", "label": "Fill" }],
+	"attributes": {
+		"showLabel": { "type": "boolean", "default": true },
+		"showArrow": { "type": "boolean", "default": true }
+	},
 	"style": "visual-portfolio-block-loop-pagination"
 }

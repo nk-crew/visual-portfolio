@@ -1,9 +1,9 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "visual-portfolio/loop-pagination-load-more",
+	"name": "visual-portfolio/loop-pagination-trigger",
 	"title": "Load More",
-	"description": "Displays a load more button for pagination.",
+	"description": "Displays a trigger that loads the next items, on click or as the reader reaches it.",
 	"category": "media",
 	"ancestor": ["visual-portfolio/loop-pagination"],
 	"textdomain": "visual-portfolio",
@@ -17,8 +17,17 @@
 		"vp/sourceQuery"
 	],
 	"attributes": {
-		"label": { "type": "string" },
-		"loadingLabel": { "type": "string" }
+		"triggerType": {
+			"type": "string",
+			"default": "load-more",
+			"enum": ["load-more", "infinite"]
+		},
+		"label": {
+			"type": "string"
+		},
+		"loadingLabel": {
+			"type": "string"
+		}
 	},
 	"supports": {
 		"reusable": false,
@@ -44,5 +53,8 @@
 				"fontSize": true
 			}
 		}
+	},
+	"selectors": {
+		"root": ".vp-block-loop-pagination-trigger"
 	}
 }

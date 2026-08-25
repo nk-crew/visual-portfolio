@@ -72,10 +72,6 @@ class Visual_Portfolio_Gutenberg {
 				continue;
 			}
 
-			ob_start();
-			include $pattern_file;
-			$content = ob_get_clean();
-
 			$categories = array( 'visual-portfolio' );
 
 			if ( ! empty( $pattern_data['categories'] ) ) {
@@ -92,7 +88,13 @@ class Visual_Portfolio_Gutenberg {
 				// wrapping these would produce strings no catalogue can carry.
 				'title'       => $pattern_data['title'],
 				'description' => $pattern_data['description'],
-				'content'     => $content,
+
+				// The path rather than the markup: core reads the file the first
+				// time a pattern's content is actually asked for, which on a
+				// front-end request is never. Including all thirteen here cost
+				// every page of the site thirteen includes and thirteen output
+				// buffers to build something nobody looked at.
+				'filePath'    => $pattern_file,
 				'categories'  => $categories,
 				'blockTypes'  => $block_types,
 			);
@@ -319,6 +321,10 @@ class Visual_Portfolio_Gutenberg {
 		wp_style_add_data( 'visual-portfolio-gutenberg', 'rtl', 'replace' );
 		wp_style_add_data( 'visual-portfolio-gutenberg', 'suffix', '.min' );
 
+		// Asking for the sort options fires `vpf_loop_sort_options`, and the
+		// block that reads them ships with the Gallery Loop family.
+		$loop_blocks = visual_portfolio()->supports_loop_blocks();
+
 		wp_localize_script(
 			'visual-portfolio-gutenberg',
 			'VPGutenbergVariables',
@@ -333,8 +339,8 @@ class Visual_Portfolio_Gutenberg {
 				'plugin_name'              => visual_portfolio()->plugin_name,
 				'plugin_url'               => visual_portfolio()->plugin_url,
 				'pro'                      => visual_portfolio()->is_pro(),
-				'loop_blocks'              => visual_portfolio()->supports_loop_blocks(),
-				'loop_sort_options'        => self::get_loop_sort_options(),
+				'loop_blocks'              => $loop_blocks,
+				'loop_sort_options'        => $loop_blocks ? self::get_loop_sort_options() : array(),
 				'admin_url'                => get_admin_url(),
 				'attributes'               => $attributes,
 				'controls'                 => Visual_Portfolio_Controls::get_registered_array(),

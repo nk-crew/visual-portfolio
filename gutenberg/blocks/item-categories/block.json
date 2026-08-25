@@ -9,14 +9,14 @@
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/itemCategories"],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"separator": {
 			"type": "string",
 			"default": ", ",
 			"role": "content"
 		}
+	},
+	"example": {
+		"viewportWidth": 350
 	},
 	"supports": {
 		"html": false,
@@ -33,6 +33,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

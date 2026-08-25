@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
-	BlockControls,
 	InspectorControls,
 	RichText,
 	useBlockEditingMode,
@@ -17,11 +15,10 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 const CLICK_ACTION_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
@@ -30,133 +27,118 @@ const CLICK_ACTION_OPTIONS = [
 ];
 
 export default function ItemReadMoreEdit({
-	attributes: { text, textAlign, showArrow, clickAction, rel, linkTarget },
+	attributes: { text, showArrow, clickAction, rel, linkTarget },
 	setAttributes,
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const blockProps = useBlockProps({
-		className: classnames({
-			[`has-text-align-${textAlign}`]: textAlign,
-		}),
-	});
+	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
 	return (
 		<>
 			{blockEditingMode === 'default' && (
-				<>
-					<BlockControls group="block">
-						<AlignmentControl
-							value={textAlign}
-							onChange={(nextAlign) =>
-								setAttributes({ textAlign: nextAlign })
-							}
-						/>
-					</BlockControls>
-					<InspectorControls>
-						<ToolsPanel
-							label={__('Settings', 'visual-portfolio')}
-							dropdownMenuProps={dropdownMenuProps}
-							resetAll={() =>
-								setAttributes({
+				<InspectorControls>
+					<ToolsPanel
+						label={__('Settings', 'visual-portfolio')}
+						dropdownMenuProps={dropdownMenuProps}
+						resetAll={(filters) =>
+							setAttributes(
+								getResetAllValues(filters, {
 									showArrow: false,
 									clickAction: 'url',
 									rel: '',
 									linkTarget: '_self',
 								})
+							)
+						}
+					>
+						<ToolsPanelItem
+							label={__('Show arrow', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => showArrow}
+							onDeselect={() =>
+								setAttributes({ showArrow: false })
 							}
 						>
-							<ToolsPanelItem
+							<ToggleControl
 								label={__('Show arrow', 'visual-portfolio')}
-								isShownByDefault
-								hasValue={() => showArrow}
-								onDeselect={() =>
-									setAttributes({ showArrow: false })
+								checked={showArrow}
+								onChange={() =>
+									setAttributes({
+										showArrow: !showArrow,
+									})
 								}
-							>
-								<ToggleControl
-									label={__('Show arrow', 'visual-portfolio')}
-									checked={showArrow}
-									onChange={() =>
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={__('On click', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => 'url' !== clickAction}
+							onDeselect={() =>
+								setAttributes({ clickAction: 'url' })
+							}
+						>
+							<SelectControl
+								label={__('On click', 'visual-portfolio')}
+								value={clickAction}
+								options={CLICK_ACTION_OPTIONS}
+								onChange={(value) =>
+									setAttributes({ clickAction: value })
+								}
+							/>
+						</ToolsPanelItem>
+						{'url' === clickAction && (
+							<>
+								<ToolsPanelItem
+									label={__(
+										'Open in new tab',
+										'visual-portfolio'
+									)}
+									hasValue={() => linkTarget === '_blank'}
+									onDeselect={() =>
 										setAttributes({
-											showArrow: !showArrow,
+											linkTarget: '_self',
 										})
 									}
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
-								label={__('On click', 'visual-portfolio')}
-								isShownByDefault
-								hasValue={() => 'url' !== clickAction}
-								onDeselect={() =>
-									setAttributes({ clickAction: 'url' })
-								}
-							>
-								<SelectControl
-									label={__('On click', 'visual-portfolio')}
-									value={clickAction}
-									options={CLICK_ACTION_OPTIONS}
-									onChange={(value) =>
-										setAttributes({ clickAction: value })
-									}
-								/>
-							</ToolsPanelItem>
-							{'url' === clickAction && (
-								<>
-									<ToolsPanelItem
+								>
+									<ToggleControl
 										label={__(
 											'Open in new tab',
 											'visual-portfolio'
 										)}
-										hasValue={() => linkTarget === '_blank'}
-										onDeselect={() =>
+										checked={linkTarget === '_blank'}
+										onChange={(value) =>
 											setAttributes({
-												linkTarget: '_self',
+												linkTarget: value
+													? '_blank'
+													: '_self',
 											})
 										}
-									>
-										<ToggleControl
-											label={__(
-												'Open in new tab',
-												'visual-portfolio'
-											)}
-											checked={linkTarget === '_blank'}
-											onChange={(value) =>
-												setAttributes({
-													linkTarget: value
-														? '_blank'
-														: '_self',
-												})
-											}
-										/>
-									</ToolsPanelItem>
-									<ToolsPanelItem
+									/>
+								</ToolsPanelItem>
+								<ToolsPanelItem
+									label={__('Link rel', 'visual-portfolio')}
+									hasValue={() => !!rel}
+									onDeselect={() =>
+										setAttributes({ rel: '' })
+									}
+								>
+									<TextControl
 										label={__(
 											'Link rel',
 											'visual-portfolio'
 										)}
-										hasValue={() => !!rel}
-										onDeselect={() =>
-											setAttributes({ rel: '' })
+										value={rel}
+										onChange={(value) =>
+											setAttributes({ rel: value })
 										}
-									>
-										<TextControl
-											label={__(
-												'Link rel',
-												'visual-portfolio'
-											)}
-											value={rel}
-											onChange={(value) =>
-												setAttributes({ rel: value })
-											}
-										/>
-									</ToolsPanelItem>
-								</>
-							)}
-						</ToolsPanel>
-					</InspectorControls>
-				</>
+									/>
+								</ToolsPanelItem>
+							</>
+						)}
+					</ToolsPanel>
+				</InspectorControls>
 			)}
 			<div {...blockProps}>
 				<RichText

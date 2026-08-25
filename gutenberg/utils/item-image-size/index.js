@@ -1,24 +1,37 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Image sizes an item block can render.
  *
- * The four sizes the plugin registers itself sit beside the core ones: they are
- * the ones cut for galleries, and the smart default below picks among them.
+ * The editor is handed the list `image_size_names_choose` produced, so a size a
+ * theme or another plugin registers is offered here as well. The four sizes cut
+ * for galleries are this plugin's own additions to that filter, and the smart
+ * default below picks among them.
+ *
+ * @return {Array} `{ label, value }` options.
  */
-export const IMAGE_SIZE_OPTIONS = [
-	{ label: __('Thumbnail', 'visual-portfolio'), value: 'thumbnail' },
-	{ label: __('Medium', 'visual-portfolio'), value: 'medium' },
-	{ label: __('Large', 'visual-portfolio'), value: 'large' },
-	{ label: __('Small (VP)', 'visual-portfolio'), value: 'vp_sm' },
-	{ label: __('Medium (VP)', 'visual-portfolio'), value: 'vp_md' },
-	{ label: __('Large (VP)', 'visual-portfolio'), value: 'vp_lg' },
-	{ label: __('Extra Large (VP)', 'visual-portfolio'), value: 'vp_xl' },
-	{ label: __('Full Size', 'visual-portfolio'), value: 'full' },
-];
+export function useImageSizeOptions() {
+	const imageSizes = useSelect(
+		(select) => select(blockEditorStore).getSettings().imageSizes,
+		[]
+	);
+
+	return useMemo(() => {
+		const options = (imageSizes || []).map(({ slug, name }) => ({
+			label: name,
+			value: slug,
+		}));
+
+		// The one entry that is not a cut size, so it belongs at the end of the
+		// scale rather than in the middle of it, where the filter leaves it.
+		return [
+			...options.filter(({ value }) => 'full' !== value),
+			...options.filter(({ value }) => 'full' === value),
+		];
+	}, [imageSizes]);
+}
 
 /**
  * The image size a gallery of the given width wants.

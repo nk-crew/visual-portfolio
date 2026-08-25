@@ -27,6 +27,11 @@ class Visual_Portfolio_Block_Item_Cover {
 	const VIEW_MODULE = 'visual-portfolio-block-item-cover-view';
 
 	/**
+	 * Class of the overlays painted on the picture.
+	 */
+	const OVERLAY_CLASS = 'wp-block-visual-portfolio-item-cover__overlay';
+
+	/**
 	 * The nine positions of the content, as core Cover names them.
 	 *
 	 * @var array
@@ -151,59 +156,6 @@ class Visual_Portfolio_Block_Item_Cover {
 	}
 
 	/**
-	 * One of the two overlays above the image.
-	 *
-	 * The class names are the ones core uses for the same job, so a theme that
-	 * styles cover overlays styles these too. The hover overlay carries its
-	 * opacity as a custom property instead: it is the value the stylesheet
-	 * animates to, and a class cannot be read back at hover time.
-	 *
-	 * @param array $overlay  - resolved overlay values, see `block_render()`.
-	 * @param bool  $is_hover - whether this is the overlay of the hover state.
-	 *
-	 * @return string
-	 */
-	private function get_overlay( $overlay, $is_hover = false ) {
-		$dim_ratio      = (int) $overlay['dimRatio'];
-		$has_background = $overlay['color'] || $overlay['customColor'] || $overlay['gradient'] || $overlay['customGradient'];
-
-		if ( $dim_ratio <= 0 || ! $has_background ) {
-			return '';
-		}
-
-		$classes = array( 'wp-block-visual-portfolio-item-cover__overlay' );
-		$styles  = array();
-
-		if ( $is_hover ) {
-			$classes[] = 'wp-block-visual-portfolio-item-cover__overlay--hover';
-			$styles[]  = '--vp-hover-overlay-opacity:' . round( $dim_ratio / 100, 2 );
-		} else {
-			$classes[] = 'has-background-dim';
-			$classes[] = 'has-background-dim-' . $dim_ratio;
-		}
-
-		if ( $overlay['gradient'] || $overlay['customGradient'] ) {
-			$classes[] = 'has-background-gradient';
-
-			if ( $overlay['gradient'] ) {
-				$classes[] = 'has-' . $overlay['gradient'] . '-gradient-background';
-			} else {
-				$styles[] = 'background:' . $overlay['customGradient'];
-			}
-		} elseif ( $overlay['color'] ) {
-			$classes[] = 'has-' . $overlay['color'] . '-background-color';
-		} else {
-			$styles[] = 'background-color:' . $overlay['customColor'];
-		}
-
-		return sprintf(
-			'<span class="%1$s"%2$s aria-hidden="true"></span>',
-			esc_attr( implode( ' ', $classes ) ),
-			empty( $styles ) ? '' : ' style="' . esc_attr( implode( ';', $styles ) ) . '"'
-		);
-	}
-
-	/**
 	 * What a click on the cover does.
 	 *
 	 * A sibling that covers the whole cover, not a wrapper around it: the content
@@ -312,10 +264,6 @@ class Visual_Portfolio_Block_Item_Cover {
 			$classes[] = self::$content_positions[ $position ];
 		}
 
-		if ( ! empty( $attributes['verticalAlignment'] ) ) {
-			$classes[] = 'is-vertically-aligned-' . preg_replace( '/[^a-z]/', '', (string) $attributes['verticalAlignment'] );
-		}
-
 		$styles = array();
 
 		// A raw CSS length typed in the editor, printed into an inline style -
@@ -362,34 +310,6 @@ class Visual_Portfolio_Block_Item_Cover {
 	}
 
 	/**
-	 * The gap between the blocks the cover holds.
-	 *
-	 * Block spacing reaches CSS through the layout support, which core's Cover
-	 * block has and this one does not: the gap belongs to the box holding the
-	 * blocks, never to the card around it. The conversion is the one layout
-	 * performs, down to the characters a length may not be made of.
-	 *
-	 * @param array $attributes - block attributes.
-	 *
-	 * @return string CSS length, or an empty string when there is none.
-	 */
-	private function get_block_gap( $attributes ) {
-		$gap = $attributes['style']['spacing']['blockGap'] ?? '';
-
-		if ( ! is_string( $gap ) || '' === $gap ) {
-			return '';
-		}
-
-		if ( str_contains( $gap, 'var:preset|spacing|' ) ) {
-			$slug = preg_replace( '/[^a-z0-9-]/', '', strtolower( substr( $gap, strrpos( $gap, '|' ) + 1 ) ) );
-
-			return '' === $slug ? '' : 'var(--wp--preset--spacing--' . $slug . ')';
-		}
-
-		return preg_match( '%[\\\\(&=#<>]|-\s|/\*%', $gap ) ? '' : $gap;
-	}
-
-	/**
 	 * Block output
 	 *
 	 * @param array    $attributes - block attributes.
@@ -427,7 +347,8 @@ class Visual_Portfolio_Block_Item_Cover {
 
 		$media = $image;
 
-		$media .= $this->get_overlay(
+		$media .= visual_portfolio_get_item_overlay(
+			self::OVERLAY_CLASS,
 			array(
 				'dimRatio'       => $attributes['dimRatio'] ?? 0,
 				'color'          => $attributes['overlayColor'] ?? '',
@@ -437,7 +358,8 @@ class Visual_Portfolio_Block_Item_Cover {
 			)
 		);
 
-		$hover_overlay = $this->get_overlay(
+		$hover_overlay = visual_portfolio_get_item_overlay(
+			self::OVERLAY_CLASS,
 			array(
 				'dimRatio'       => $attributes['hoverDimRatio'] ?? 0,
 				'color'          => $attributes['hoverOverlayColor'] ?? '',
@@ -459,11 +381,32 @@ class Visual_Portfolio_Block_Item_Cover {
 		// The panel: the hover overlay and the blocks on it, in one box. The
 		// overlay is the background of the panel and never a box of its own, so
 		// that a state moves the two of them together.
-		$gap = $this->get_block_gap( $attributes );
+		// The gap belongs to the box that holds the blocks, never to the card
+		// around it: block spacing reaches CSS through the layout support,
+		// which core's Cover block has and this one does not.
+		$gap = visual_portfolio_get_block_gap( $attributes['style']['spacing']['blockGap'] ?? '' );
+
+		$panel_styles = array();
+
+		if ( '' !== $gap ) {
+			$panel_styles[] = 'gap:' . $gap;
+		}
+
+		// Padding is skipped by the block supports and applied here instead, for
+		// the same reason: it belongs to the box the blocks sit in. Left on the
+		// card it could only be added to the panel's own, and it would inset the
+		// overlay with it, leaving an unshaded frame around the picture.
+		$padding = wp_style_engine_get_styles(
+			array( 'spacing' => array( 'padding' => $attributes['style']['spacing']['padding'] ?? null ) )
+		);
+
+		if ( ! empty( $padding['css'] ) ) {
+			$panel_styles[] = $padding['css'];
+		}
 
 		$output .= sprintf(
 			'<div class="wp-block-visual-portfolio-item-cover__inner"%1$s>%2$s</div>',
-			'' === $gap ? '' : ' style="gap:' . esc_attr( $gap ) . '"',
+			empty( $panel_styles ) ? '' : ' style="' . esc_attr( implode( ';', $panel_styles ) ) . '"',
 			// The overlay last, so that the blocks keep the places the
 			// staggering counts.
 			$content . $hover_overlay

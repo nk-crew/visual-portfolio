@@ -60,5 +60,6 @@
 			"margin": ["top", "bottom"]
 		}
 	},
+	"selectors": { "root": ".vp-block-loop-sort" },
 	"style": "visual-portfolio-block-loop-sort"
 }

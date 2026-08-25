@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
-	BlockControls,
 	__experimentalDateFormatPicker as DateFormatPicker,
 	InspectorControls,
 	useBlockEditingMode,
@@ -16,14 +14,13 @@ import {
 } from '@wordpress/components';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { __ } from '@wordpress/i18n';
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 export default function ItemDateEdit({
-	attributes: { textAlign, format, isLink },
+	attributes: { format, isLink },
 	setAttributes,
 	context: {
 		'vp/itemPublishedTime': itemPublishedTime,
@@ -32,11 +29,7 @@ export default function ItemDateEdit({
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const blockProps = useBlockProps({
-		className: classnames({
-			[`has-text-align-${textAlign}`]: textAlign,
-		}),
-	});
+	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
 	const siteFormat = getDateSettings().formats.date;
@@ -52,64 +45,51 @@ export default function ItemDateEdit({
 	return (
 		<>
 			{blockEditingMode === 'default' && (
-				<>
-					<BlockControls group="block">
-						<AlignmentControl
-							value={textAlign}
-							onChange={(nextAlign) =>
-								setAttributes({ textAlign: nextAlign })
-							}
-						/>
-					</BlockControls>
-					<InspectorControls>
-						<ToolsPanel
-							label={__('Settings', 'visual-portfolio')}
-							dropdownMenuProps={dropdownMenuProps}
-							resetAll={() =>
-								setAttributes({
+				<InspectorControls>
+					<ToolsPanel
+						label={__('Settings', 'visual-portfolio')}
+						dropdownMenuProps={dropdownMenuProps}
+						resetAll={(filters) =>
+							setAttributes(
+								getResetAllValues(filters, {
 									format: undefined,
 									isLink: false,
 								})
+							)
+						}
+					>
+						<ToolsPanelItem
+							label={__('Date format', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => !!format}
+							onDeselect={() =>
+								setAttributes({ format: undefined })
 							}
 						>
-							<ToolsPanelItem
-								label={__('Date format', 'visual-portfolio')}
-								isShownByDefault
-								hasValue={() => !!format}
-								onDeselect={() =>
-									setAttributes({ format: undefined })
+							<DateFormatPicker
+								format={format}
+								defaultFormat={siteFormat}
+								onChange={(nextFormat) =>
+									setAttributes({ format: nextFormat })
 								}
-							>
-								<DateFormatPicker
-									format={format}
-									defaultFormat={siteFormat}
-									onChange={(nextFormat) =>
-										setAttributes({ format: nextFormat })
-									}
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={__('Link to item', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => isLink}
+							onDeselect={() => setAttributes({ isLink: false })}
+						>
+							<ToggleControl
 								label={__('Link to item', 'visual-portfolio')}
-								isShownByDefault
-								hasValue={() => isLink}
-								onDeselect={() =>
-									setAttributes({ isLink: false })
+								checked={isLink}
+								onChange={() =>
+									setAttributes({ isLink: !isLink })
 								}
-							>
-								<ToggleControl
-									label={__(
-										'Link to item',
-										'visual-portfolio'
-									)}
-									checked={isLink}
-									onChange={() =>
-										setAttributes({ isLink: !isLink })
-									}
-								/>
-							</ToolsPanelItem>
-						</ToolsPanel>
-					</InspectorControls>
-				</>
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
 			)}
 			<div {...blockProps}>
 				{isLink ? (

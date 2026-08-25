@@ -44,9 +44,6 @@
 			"type": "string",
 			"default": "center"
 		},
-		"verticalAlignment": {
-			"type": "string"
-		},
 		"effect": {
 			"type": "string",
 			"default": "fade",
@@ -106,6 +103,11 @@
 			"role": "content"
 		}
 	},
+	"example": {
+		"attributes": { "showContent": "always" },
+		"innerBlocks": [{ "name": "visual-portfolio/item-title" }],
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"reusable": false,
@@ -133,6 +135,7 @@
 			"padding": true,
 			"margin": true,
 			"blockGap": true,
+			"__experimentalSkipSerialization": ["padding"],
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"blockGap": true

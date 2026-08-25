@@ -19,9 +19,6 @@
 			"default": "comments",
 			"enum": ["comments", "views", "reading-time"]
 		},
-		"textAlign": {
-			"type": "string"
-		},
 		"showIcon": {
 			"type": "boolean",
 			"default": true
@@ -32,17 +29,22 @@
 		},
 		"prefix": {
 			"type": "string",
-			"default": ""
+			"default": "",
+			"role": "content"
 		},
 		"suffix": {
 			"type": "string",
-			"default": ""
+			"default": "",
+			"role": "content"
 		},
 		"isLink": {
 			"type": "boolean",
 			"default": false,
 			"role": "content"
 		}
+	},
+	"example": {
+		"viewportWidth": 350
 	},
 	"supports": {
 		"html": false,
@@ -59,6 +61,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

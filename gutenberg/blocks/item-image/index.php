@@ -92,56 +92,6 @@ class Visual_Portfolio_Block_Item_Image {
 	}
 
 	/**
-	 * Overlay above the image.
-	 *
-	 * The class names are the ones core uses for the same job, so a theme that
-	 * styles cover overlays styles these too.
-	 *
-	 * @param array $attributes - block attributes.
-	 *
-	 * @return string
-	 */
-	private function get_overlay( $attributes ) {
-		$dim_ratio      = isset( $attributes['dimRatio'] ) ? (int) $attributes['dimRatio'] : 0;
-		$color          = $attributes['overlayColor'] ?? '';
-		$custom_color   = $attributes['customOverlayColor'] ?? '';
-		$gradient       = $attributes['gradient'] ?? '';
-		$custom_grad    = $attributes['customGradient'] ?? '';
-		$has_background = $color || $custom_color || $gradient || $custom_grad;
-
-		if ( $dim_ratio <= 0 || ! $has_background ) {
-			return '';
-		}
-
-		$classes = array(
-			'wp-block-visual-portfolio-item-image__overlay',
-			'has-background-dim',
-			'has-background-dim-' . $dim_ratio,
-		);
-		$styles  = array();
-
-		if ( $gradient || $custom_grad ) {
-			$classes[] = 'has-background-gradient';
-
-			if ( $gradient ) {
-				$classes[] = 'has-' . $gradient . '-gradient-background';
-			} else {
-				$styles[] = 'background:' . $custom_grad;
-			}
-		} elseif ( $color ) {
-			$classes[] = 'has-' . $color . '-background-color';
-		} else {
-			$styles[] = 'background-color:' . $custom_color;
-		}
-
-		return sprintf(
-			'<span class="%1$s"%2$s aria-hidden="true"></span>',
-			esc_attr( implode( ' ', $classes ) ),
-			empty( $styles ) ? '' : ' style="' . esc_attr( implode( ';', $styles ) ) . '"'
-		);
-	}
-
-	/**
 	 * Wrap the image in whatever a click on it is supposed to do.
 	 *
 	 * A popup trigger is an anchor as much as a link is, and it points at the
@@ -244,7 +194,16 @@ class Visual_Portfolio_Block_Item_Image {
 			Visual_Portfolio_Assets::enqueue_lazyload_assets();
 		}
 
-		$image .= $this->get_overlay( $attributes );
+		$image .= visual_portfolio_get_item_overlay(
+			'wp-block-visual-portfolio-item-image__overlay',
+			array(
+				'dimRatio'       => $attributes['dimRatio'] ?? 0,
+				'color'          => $attributes['overlayColor'] ?? '',
+				'customColor'    => $attributes['customOverlayColor'] ?? '',
+				'gradient'       => $attributes['gradient'] ?? '',
+				'customGradient' => $attributes['customGradient'] ?? '',
+			)
+		);
 		$image  = $this->get_click_wrapper( $image, $attributes, $context );
 
 		return sprintf( '<figure %1$s>%2$s</figure>', get_block_wrapper_attributes(), $image );

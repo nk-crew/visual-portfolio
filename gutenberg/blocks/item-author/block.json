@@ -9,15 +9,9 @@
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/itemAuthor", "vp/itemAuthorUrl"],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
-		"showPrefix": {
-			"type": "boolean",
-			"default": true
-		},
 		"prefix": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"isLink": {
 			"type": "boolean",
@@ -36,6 +30,9 @@
 			"role": "content"
 		}
 	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"reusable": false,
@@ -51,6 +48,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

@@ -76,10 +76,6 @@ class Visual_Portfolio_Block_Item_Categories {
 
 		$classes = array();
 
-		if ( ! empty( $attributes['textAlign'] ) ) {
-			$classes[] = 'has-text-align-' . $attributes['textAlign'];
-		}
-
 		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 			$classes[] = 'has-link-color';
 		}

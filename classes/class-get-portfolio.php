@@ -697,36 +697,51 @@ class Visual_Portfolio_Get {
 
 		$portfolio_query = null;
 
+		// What the query really found, before the floor below. A request naming
+		// a page past the end must not be answered with that page: a loop asks
+		// this to decide whether the page exists at all, and the head links and
+		// the numbered pagination are built from the answer.
+		$found_pages = 0;
+
 		if ( $is_images || $is_social ) {
 			if ( isset( $query_opts['max_num_pages'] ) ) {
-				$max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
+				$found_pages = (int) $query_opts['max_num_pages'];
+				$max_pages   = $found_pages < $start_page ? $start_page : $found_pages;
 			} else {
 				$max_pages = $start_page;
 			}
 		} elseif ( $custom_query ) {
 			// Use custom query object provided by extensions.
 			$portfolio_query = $custom_query;
-			$max_pages       = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
+			$found_pages     = (int) $portfolio_query->max_num_pages;
+			$max_pages       = $found_pages < $start_page ? $start_page : $found_pages;
 		} else {
 			// get Post List.
 			$portfolio_query = new WP_Query( $query_opts );
 
-			$max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
+			$found_pages = (int) $portfolio_query->max_num_pages;
+			$max_pages   = $found_pages < $start_page ? $start_page : $found_pages;
 
 			// `max_num_pages` counts every post the query matched, and an
 			// offset is not part of that count, so a gallery that skips the
 			// first few would advertise pages past the end of its own results.
 			//
-			// Read the offset off the query rather than the options: it is
-			// stored for every post-based gallery but only reaches `WP_Query`
-			// for a post-type source, and clamping the others would cost them
-			// pages their results really have.
-			$offset   = isset( $query_opts['offset'] ) ? max( 0, (int) $options['posts_offset'] ) : 0;
-			$per_page = isset( $query_opts['posts_per_page'] ) ? (int) $query_opts['posts_per_page'] : 0;
+			// Only the offset the gallery itself applied may be subtracted.
+			// `posts_offset` is stored for every post-based gallery but reaches
+			// `WP_Query` for a post-type source alone, shifted by a page for
+			// every page shown; a custom query or a `vpf_extend_query_args`
+			// callback can put an unrelated offset there, and subtracting the
+			// stored one would cost the gallery pages its results really have.
+			$per_page     = isset( $query_opts['posts_per_page'] ) ? (int) $query_opts['posts_per_page'] : 0;
+			$paged        = isset( $query_opts['paged'] ) ? (int) $query_opts['paged'] : 0;
+			$posts_offset = max( 0, (int) ( $options['posts_offset'] ?? 0 ) );
+			$own_offset   = $posts_offset + ( $paged - 1 ) * $per_page;
+			$offset       = isset( $query_opts['offset'] ) && (int) $query_opts['offset'] === $own_offset ? $posts_offset : 0;
 
 			if ( $offset && $per_page > 0 ) {
-				$reachable = (int) ceil( max( 0, (int) $portfolio_query->found_posts - $offset ) / $per_page );
-				$max_pages = max( $start_page, min( $max_pages, $reachable ) );
+				$reachable   = (int) ceil( max( 0, (int) $portfolio_query->found_posts - $offset ) / $per_page );
+				$found_pages = min( $found_pages, $reachable );
+				$max_pages   = max( $start_page, min( $max_pages, $reachable ) );
 			}
 		}
 
@@ -735,7 +750,8 @@ class Visual_Portfolio_Get {
 		$max_pages_limit = isset( $options['max_pages'] ) ? max( 0, (int) $options['max_pages'] ) : 0;
 
 		if ( $max_pages_limit ) {
-			$max_pages = min( $max_pages, $max_pages_limit );
+			$max_pages   = min( $max_pages, $max_pages_limit );
+			$found_pages = min( $found_pages, $max_pages_limit );
 		}
 
 		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
@@ -749,6 +765,7 @@ class Visual_Portfolio_Get {
 			'query_opts'      => $query_opts,
 			'portfolio_query' => $portfolio_query,
 			'max_pages'       => $max_pages,
+			'found_pages'     => $found_pages,
 			'start_page'      => $start_page,
 			'next_page_url'   => $next_page_url,
 		);
@@ -1147,11 +1164,15 @@ class Visual_Portfolio_Get {
 		 * @param array $result  items, max_pages, start_page and options.
 		 * @param array $options portfolio options.
 		 */
+		// The count the query really found, not the one floored to the page that
+		// was asked for: a loop uses this to decide whether a requested page
+		// exists, and answering `9` to `?vp-1-page=9` would make every page past
+		// the end look like a page of the series.
 		$result = apply_filters(
 			'vpf_loop_items',
 			array(
 				'items'      => $items,
-				'max_pages'  => $query['max_pages'],
+				'max_pages'  => max( 1, (int) $query['found_pages'] ),
 				'start_page' => $query['start_page'],
 				'options'    => $options,
 			),

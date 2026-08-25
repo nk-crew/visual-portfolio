@@ -253,7 +253,7 @@ test.describe('Gallery Item Cover placement', () => {
 		 *
 		 * @param {Object} from - point outside the card to enter from.
 		 * @param {Object} to   - point outside the card to leave through.
-		 * @return {Promise<string>} inline transform the panel came to rest at.
+		 * @return {Promise<string>} side the panel came to rest on.
 		 */
 		async function walk(from, to) {
 			await page.mouse.move(from.x, from.y);
@@ -263,7 +263,13 @@ test.describe('Gallery Item Cover placement', () => {
 			);
 			await page.mouse.move(to.x, to.y);
 
-			return inner.evaluate((node) => node.style.transform);
+			// The side is published as the variable the stylesheet parks the
+			// panel with, never as an inline transform: an inline property
+			// would outweigh the `:focus-within` and reduced-motion rules for
+			// the rest of the page's life.
+			return cover.evaluate((node) =>
+				node.style.getPropertyValue('--vp-panel-hidden-transform')
+			);
 		}
 
 		const outLeft = { x: rect.x - 30, y: rect.y + rect.height / 2 };

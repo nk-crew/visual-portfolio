@@ -1,71 +1,42 @@
 /**
  * WordPress dependencies
  */
-import {
-	InspectorControls,
-	PlainText,
-	useBlockProps,
-} from '@wordpress/block-editor';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import { PlainText, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-export default function PaginationPreviousEdit({ attributes, setAttributes }) {
-	const { label, showLabel, showArrow } = attributes;
+export default function PaginationPreviousEdit({
+	attributes,
+	setAttributes,
+	context: { 'vp/showLabel': showLabel, 'vp/showArrow': showArrow },
+}) {
+	const { label } = attributes;
 
 	return (
-		<>
-			<InspectorControls>
-				<PanelBody>
-					<ToggleControl
-						label={__('Show label text', 'visual-portfolio')}
-						checked={showLabel}
-						onChange={() =>
-							setAttributes({ showLabel: !showLabel })
-						}
-						disabled={!showArrow && showLabel}
-					/>
-					<ToggleControl
-						label={__('Show arrow', 'visual-portfolio')}
-						checked={showArrow}
-						onChange={() =>
-							setAttributes({ showArrow: !showArrow })
-						}
-						disabled={!showLabel && showArrow}
-					/>
-				</PanelBody>
-			</InspectorControls>
-
-			<a
-				href="#pagination-previous-pseudo-link"
-				onClick={(event) => event.preventDefault()}
-				{...useBlockProps({
-					className: 'vp-block-loop-pagination-previous',
-				})}
-			>
-				{showArrow && (
-					<span
-						className="vp-block-loop-pagination-previous-arrow"
-						aria-hidden
-					>
-						&lsaquo;
-					</span>
-				)}
-				{showLabel && (
-					<PlainText
-						__experimentalVersion={2}
-						tagName="span"
-						aria-label={__(
-							'Previous page link',
-							'visual-portfolio'
-						)}
-						placeholder={__('Previous', 'visual-portfolio')}
-						value={label}
-						onChange={(newLabel) =>
-							setAttributes({ label: newLabel })
-						}
-					/>
-				)}
-			</a>
-		</>
+		<a
+			href="#pagination-previous-pseudo-link"
+			onClick={(event) => event.preventDefault()}
+			{...useBlockProps({
+				className: 'vp-block-loop-pagination-previous',
+			})}
+		>
+			{showArrow && (
+				<span
+					className="vp-block-loop-pagination-previous-arrow"
+					aria-hidden
+				>
+					&lsaquo;
+				</span>
+			)}
+			{showLabel && (
+				<PlainText
+					__experimentalVersion={2}
+					tagName="span"
+					aria-label={__('Previous page link', 'visual-portfolio')}
+					placeholder={__('Previous', 'visual-portfolio')}
+					value={label}
+					onChange={(newLabel) => setAttributes({ label: newLabel })}
+				/>
+			)}
+		</a>
 	);
 }

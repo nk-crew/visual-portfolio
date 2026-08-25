@@ -53,27 +53,67 @@ class Visual_Portfolio_Block_Item_Description {
 		$source = isset( $attributes['source'] ) ? $attributes['source'] : 'excerpt';
 
 		if ( 'content' === $source ) {
-			$text = isset( $block->context['vp/itemContent'] ) ? $block->context['vp/itemContent'] : '';
-		} else {
-			$text = $this->get_excerpt( $attributes, $block->context );
+			return $this->render_content( $block->context );
 		}
 
-		$text = (string) $text;
+		$text = (string) $this->get_excerpt( $attributes, $block->context );
 
 		if ( '' === trim( $text ) ) {
 			return '';
 		}
 
-		$classes = array();
+		return sprintf(
+			'<p %1$s>%2$s</p>',
+			get_block_wrapper_attributes(),
+			wp_kses_post( $text )
+		);
+	}
 
-		if ( ! empty( $attributes['textAlign'] ) ) {
-			$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	/**
+	 * Render the whole content of an item, the way core's Post Content does.
+	 *
+	 * `vp/itemContent` is raw post content: blocks and shortcodes in it are
+	 * still delimiters until `the_content` has run, and a block-level child of
+	 * the result would close a `<p>` early.
+	 *
+	 * @param array $context - block context.
+	 *
+	 * @return string
+	 */
+	private function render_content( $context ) {
+		static $seen_ids = array();
+
+		$text    = (string) ( $context['vp/itemContent'] ?? '' );
+		$post_id = (int) ( $context['vp/itemPostId'] ?? 0 );
+
+		if ( '' === trim( $text ) ) {
+			return '';
+		}
+
+		// An item whose content holds the gallery it is rendered in would
+		// render itself forever.
+		if ( $post_id ) {
+			if ( isset( $seen_ids[ $post_id ] ) ) {
+				return '';
+			}
+
+			$seen_ids[ $post_id ] = true;
+		}
+
+		/** This filter is documented in wp-includes/post-template.php */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core's content filter, not a hook of ours.
+		$text = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $text ) );
+
+		unset( $seen_ids[ $post_id ] );
+
+		if ( '' === trim( $text ) ) {
+			return '';
 		}
 
 		return sprintf(
-			'<p %1$s>%2$s</p>',
-			get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) ),
-			wp_kses_post( $text )
+			'<div %1$s>%2$s</div>',
+			get_block_wrapper_attributes(),
+			$text
 		);
 	}
 

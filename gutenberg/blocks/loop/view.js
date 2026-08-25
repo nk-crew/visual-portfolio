@@ -1,4 +1,9 @@
-import { getContext, getElement, store } from '@wordpress/interactivity';
+import {
+	getContext,
+	getElement,
+	store,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 import { syncColumns } from '../item-template/auto-columns';
 
@@ -18,9 +23,26 @@ const LOOP_SELECTOR = '.vp-block-loop';
 const LIST_SELECTOR = '.wp-block-visual-portfolio-item-template';
 const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
 const PAGINATION_SELECTOR = '.vp-block-loop-pagination';
-const TRIGGER_SELECTOR =
-	'.vp-block-loop-pagination-load-more, .vp-block-loop-pagination-infinite';
+const TRIGGER_SELECTOR = '.vp-block-loop-pagination-trigger';
 const MASONRY_CLASS = 'vp-layout-masonry';
+
+// Written on the list once Masonry is positioning the items, and read by the
+// stylesheet: until then the browser packs them into columns on its own. Not
+// the hydration-time `vp-has-script` class - `masonry` is a classic script and a
+// plugin is free to defer it, so the module can be running long before it.
+const MASONRY_READY_CLASS = 'vp-has-masonry';
+
+// What a fetch of the next page came to. Only the infinite observer reads them:
+// it has to know whether asking again could ever answer differently.
+const APPENDED = 'appended';
+const RETRY = 'retry';
+const STOP = 'stop';
+
+// The router hands back a promise that never settles when it gives a navigation
+// to the browser rather than swapping the region, so waiting on it alone would
+// leave the loop marked busy for good. Ten seconds is the router's own patience
+// with a page - past that, nothing this loop could say about itself is true.
+const NAVIGATION_TIMEOUT = 10000;
 
 // Listened for by the item template module, which owns justified and carousel.
 const RELAYOUT_EVENT = 'vp-relayout';
@@ -32,8 +54,11 @@ const observedWidths = new WeakMap();
 const pendingRequests = new WeakMap();
 const loopUndos = new WeakMap();
 
-// Loops whose region the router is replacing right now.
-const navigating = new WeakSet();
+// Loops whose region the router is replacing right now, each against the token
+// of the navigation doing it. Two clicks in a row are two navigations, and only
+// the newest of them owns the loading state - the first one to settle would
+// otherwise clear the flag for both.
+const navigating = new WeakMap();
 
 /**
  * Context of the loop the current element belongs to.
@@ -169,6 +194,10 @@ function initMasonry(list) {
 		})
 	);
 
+	// Before the widths are read: Masonry measures the column off the first
+	// item, and the column fallback gives every item the width of its column.
+	list.classList.add(MASONRY_READY_CLASS);
+
 	const layout = new Masonry(list, {
 		itemSelector: ITEM_SELECTOR,
 		columnWidth: ITEM_SELECTOR,
@@ -191,6 +220,8 @@ function initMasonry(list) {
  * @param {HTMLElement} list Item template list.
  */
 function destroyMasonry(list) {
+	list.classList.remove(MASONRY_READY_CLASS);
+
 	const stopColumns = autoColumns.get(list);
 
 	if (stopColumns) {
@@ -344,6 +375,16 @@ function undoManualEdits(loop) {
 	});
 }
 
+// The router owns `popstate` itself, so a Back out of a region swap renders the
+// page it remembers without any action of ours running first. Preact leaves the
+// items a Load More appended standing - it never created them - and the visitor
+// would be looking at two pages at once. Registered while the module is
+// evaluated, which is before the router is ever imported, so this listener is
+// always the earlier of the two.
+window.addEventListener('popstate', () => {
+	window.document.querySelectorAll(LOOP_SELECTOR).forEach(undoManualEdits);
+});
+
 /**
  * Move the items of a fetched list into the rendered one.
  *
@@ -408,25 +449,27 @@ function advanceTrigger(trigger, nextLoop, loop) {
  * The router can only replace a region, never extend it, so this is the one
  * control that fetches for itself.
  *
- * @param {HTMLElement} trigger Load more or infinite trigger.
- * @param {Object}      context Loop context.
+ * @param {HTMLElement} trigger  Load more or infinite trigger.
+ * @param {Object}      context  Loop context.
+ * @param {boolean}     byClick  Whether a visitor asked for the page.
  *
- * @return {Promise<boolean>} Whether items were appended.
+ * @return {Promise<string>} `appended`, `retry` when asking again could still
+ *                           answer differently, or `stop` when it could not.
  */
-async function loadNextPage(trigger, context) {
+async function loadNextPage(trigger, context, byClick) {
 	const href = getControlUrl(trigger);
 	const loop = trigger.closest(LOOP_SELECTOR);
 	const list = loop ? loop.querySelector(LIST_SELECTOR) : null;
 	const region = loop ? loop.getAttribute('data-wp-router-region') : '';
 
 	if (!href || !list || !region) {
-		return false;
+		return STOP;
 	}
 
 	// The router is about to replace this whole region, so a page appended
 	// into it would land under content that is on its way out.
 	if (navigating.has(loop)) {
-		return false;
+		return RETRY;
 	}
 
 	const previous = pendingRequests.get(loop);
@@ -476,16 +519,21 @@ async function loadNextPage(trigger, context) {
 		refreshLayout(list, added);
 		announceUpdate(context);
 
-		return true;
+		return APPENDED;
 	} catch (error) {
 		if ('AbortError' === error.name) {
-			return false;
+			return RETRY;
 		}
 
-		// Never leave a control that does nothing behind.
-		window.location.assign(href);
+		// Never leave a control that does nothing behind - but only where the
+		// visitor pressed one. Loading the page under an observer that fired on
+		// its own would throw away their scroll position and every page already
+		// appended, for a navigation nobody asked for.
+		if (byClick) {
+			window.location.assign(href);
+		}
 
-		return false;
+		return STOP;
 	} finally {
 		if (pendingRequests.get(loop) === controller) {
 			pendingRequests.delete(loop);
@@ -521,7 +569,7 @@ store('visual-portfolio/loop', {
 		 *
 		 * @param {Event} event Control event.
 		 */
-		*navigate(event) {
+		navigate: withSyncEvent(function* (event) {
 			const { ref } = getElement();
 			const href = getControlUrl(ref);
 
@@ -548,23 +596,49 @@ store('visual-portfolio/loop', {
 
 			context.isLoading = true;
 
+			// Named so that a navigation the visitor started over the top of
+			// this one can be told apart from it: whichever is the loop's
+			// current one is the one that gets to say it has finished.
+			const token = {};
+
 			if (loop) {
-				navigating.add(loop);
+				navigating.set(loop, token);
 			}
 
-			try {
-				const router = yield import('@wordpress/interactivity-router');
+			// Ends the loading state, and says whether this navigation was
+			// still the loop's own to end. A newer one owns the loop from the
+			// moment it starts, this one leaves everything to it.
+			const release = () => {
+				if (loop && navigating.get(loop) !== token) {
+					return false;
+				}
 
-				yield router.actions.navigate(href);
-			} catch {
-				window.location.assign(href);
-				return;
-			} finally {
 				context.isLoading = false;
 
 				if (loop) {
 					navigating.delete(loop);
 				}
+
+				return true;
+			};
+
+			try {
+				const router = yield import('@wordpress/interactivity-router');
+
+				yield Promise.race([
+					router.actions.navigate(href),
+					new Promise((resolve) => {
+						window.setTimeout(resolve, NAVIGATION_TIMEOUT);
+					}),
+				]);
+			} catch {
+				release();
+				window.location.assign(href);
+				return;
+			}
+
+			if (!release()) {
+				return;
 			}
 
 			const list = loop ? loop.querySelector(LIST_SELECTOR) : null;
@@ -572,14 +646,33 @@ store('visual-portfolio/loop', {
 			if (list) {
 				refreshLayout(list);
 			}
-		},
+
+			// The node that was activated is either gone - the last page has
+			// no Next - or still standing there meaning something else, and
+			// either way the visitor is left somewhere they did not choose.
+			// The items that just arrived are where they meant to be. A sort
+			// control is the exception: it comes back from the swap unchanged,
+			// and moving off it would lose them their place in the form.
+			if (list && !(ref instanceof window.HTMLSelectElement)) {
+				const target = list.querySelector('a[href], button');
+
+				if (target) {
+					target.focus();
+				} else {
+					// A gallery whose items hold no link at all still has to
+					// catch the focus rather than drop it on the body.
+					list.setAttribute('tabindex', '-1');
+					list.focus();
+				}
+			}
+		}),
 
 		/**
 		 * Append the next page of items.
 		 *
 		 * @param {Event} event Control event.
 		 */
-		*loadMore(event) {
+		loadMore: withSyncEvent(function* (event) {
 			const { ref } = getElement();
 
 			if (!getControlUrl(ref) || !isPlainActivation(event)) {
@@ -588,8 +681,8 @@ store('visual-portfolio/loop', {
 
 			event.preventDefault();
 
-			yield loadNextPage(ref, getLoopContext());
-		},
+			yield loadNextPage(ref, getLoopContext(), true);
+		}),
 	},
 	callbacks: {
 		/**
@@ -655,20 +748,25 @@ store('visual-portfolio/loop', {
 						return;
 					}
 
-					loadNextPage(ref, context).then((appended) => {
-						if (!appended) {
+					loadNextPage(ref, context, false).then((result) => {
+						if (STOP === result) {
 							return;
 						}
 
-						loaded += 1;
+						if (APPENDED === result) {
+							loaded += 1;
 
-						if (everyPages && 0 === loaded % everyPages) {
-							paused = true;
+							if (everyPages && 0 === loaded % everyPages) {
+								paused = true;
+							}
 						}
 
-						// Intersection is reported on change, and appending
-						// items does not move a trigger that was already in
-						// view. Observing it again reports where it is now.
+						// Intersection is reported on change, and neither
+						// appending items nor refusing to fetch them moves a
+						// trigger that was already in view. Observing it again
+						// reports where it is now - without it a page turned
+						// down because the router was mid-swap would be the
+						// last one the loop ever loaded.
 						if (ref.isConnected) {
 							observer.unobserve(ref);
 							observer.observe(ref);

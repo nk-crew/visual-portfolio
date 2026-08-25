@@ -248,17 +248,13 @@ test.describe('Gallery Loop blocks', () => {
 		});
 
 		await editor.insertBlock(
-			getLoopBlock([
-				{ name: 'visual-portfolio/loop-pagination-load-more' },
-			])
+			getLoopBlock([{ name: 'visual-portfolio/loop-pagination-trigger' }])
 		);
 		await editor.publishPost();
 
 		const frontend = await openPublishedPage(page);
 
-		const loadMore = frontend.locator(
-			'.vp-block-loop-pagination-load-more'
-		);
+		const loadMore = frontend.locator('.vp-block-loop-pagination-trigger');
 		const items = frontend.locator(
 			'.wp-block-visual-portfolio-item-template__item'
 		);

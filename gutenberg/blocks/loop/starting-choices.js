@@ -27,16 +27,22 @@ export const PAGINATION_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
 ];
 
-// What each pagination shape is made of. The pagination block is a container;
-// which of these it holds is the whole difference between them.
+// What each pagination shape is made of, as `[ name, attributes ]`. The
+// pagination block is a container; which of these it holds is the whole
+// difference between them.
 const PAGINATION_INNER = {
 	paged: [
-		'visual-portfolio/loop-pagination-previous',
-		'visual-portfolio/loop-pagination-numbers',
-		'visual-portfolio/loop-pagination-next',
+		['visual-portfolio/loop-pagination-previous'],
+		['visual-portfolio/loop-pagination-numbers'],
+		['visual-portfolio/loop-pagination-next'],
 	],
-	'load-more': ['visual-portfolio/loop-pagination-load-more'],
-	infinite: ['visual-portfolio/loop-pagination-infinite'],
+	'load-more': [['visual-portfolio/loop-pagination-trigger']],
+	infinite: [
+		[
+			'visual-portfolio/loop-pagination-trigger',
+			{ triggerType: 'infinite' },
+		],
+	],
 };
 
 /**
@@ -82,7 +88,6 @@ export function applyChoices(blocks, choices) {
 				// reuses it.
 				createBlock('visual-portfolio/loop-filter-item', {
 					text: __('All', 'visual-portfolio'),
-					isAll: true,
 				}),
 			]),
 			...result,
@@ -90,8 +95,8 @@ export function applyChoices(blocks, choices) {
 	}
 
 	if ('none' !== choices.pagination) {
-		const inner = PAGINATION_INNER[choices.pagination].map((name) =>
-			createBlock(name)
+		const inner = PAGINATION_INNER[choices.pagination].map(
+			([name, blockAttributes]) => createBlock(name, blockAttributes)
 		);
 		const index = result.findIndex(({ name }) => PAGINATION_NAME === name);
 		const pagination = createBlock(PAGINATION_NAME, {}, inner);

@@ -13,7 +13,10 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
-import { useToolsPanelDropdownMenuProps } from '../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/tools-panel';
 import { PostsIcon } from './icons';
 import { registerLoopSource } from './registry';
 import useEntitySearch from './use-entity-search';
@@ -147,18 +150,20 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 		<ToolsPanel
 			label={__('Settings', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
-			resetAll={() =>
-				update({
-					source: DEFAULTS.source,
-					postTypesSet: DEFAULTS.postTypesSet,
-					ids: DEFAULTS.ids,
-					excludeIds: DEFAULTS.excludeIds,
-					taxonomies: DEFAULTS.taxonomies,
-					taxonomiesRelation: DEFAULTS.taxonomiesRelation,
-					order: DEFAULTS.order,
-					orderBy: DEFAULTS.orderBy,
-					customQuery: DEFAULTS.customQuery,
-				})
+			resetAll={(filters) =>
+				update(
+					getResetAllValues(filters, {
+						source: DEFAULTS.source,
+						postTypesSet: DEFAULTS.postTypesSet,
+						ids: DEFAULTS.ids,
+						excludeIds: DEFAULTS.excludeIds,
+						taxonomies: DEFAULTS.taxonomies,
+						taxonomiesRelation: DEFAULTS.taxonomiesRelation,
+						order: DEFAULTS.order,
+						orderBy: DEFAULTS.orderBy,
+						customQuery: DEFAULTS.customQuery,
+					})
+				)
 			}
 		>
 			<ToolsPanelItem
@@ -454,20 +459,22 @@ function PostsFiltersPanel(props) {
 	// Anything else this install can narrow a posts query by. A `ToolsPanelItem`
 	// returned here is an ordinary child of the panel below, so it registers
 	// with the panel the way the built-in ones do. Pro adds the Authors filter
-	// through this, and resets it from its own menu entry - the panel cannot
-	// know what to write back for someone else's option.
+	// through this; its `resetAllFilter` is what "Reset all" writes back for it,
+	// in the same `postsQuery` the built-in filters live in.
 	const extraItems = applyFilters('vpf.loopPostsFilterItems', [], props);
 
 	return (
 		<ToolsPanel
 			label={__('Filters', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
-			resetAll={() =>
-				update({
-					keyword: DEFAULTS.keyword,
-					avoidDuplicates: DEFAULTS.avoidDuplicates,
-					excludeCurrent: DEFAULTS.excludeCurrent,
-				})
+			resetAll={(filters) =>
+				update(
+					getResetAllValues(filters, {
+						keyword: DEFAULTS.keyword,
+						avoidDuplicates: DEFAULTS.avoidDuplicates,
+						excludeCurrent: DEFAULTS.excludeCurrent,
+					})
+				)
 			}
 		>
 			{extraItems.map(({ name, Item }) => (

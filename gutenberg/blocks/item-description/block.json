@@ -9,9 +9,6 @@
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/itemExcerpt", "vp/itemContent", "vp/itemPostId"],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"source": {
 			"type": "string",
 			"default": "excerpt"
@@ -20,6 +17,9 @@
 			"type": "number",
 			"default": 15
 		}
+	},
+	"example": {
+		"viewportWidth": 350
 	},
 	"supports": {
 		"html": false,
@@ -35,6 +35,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

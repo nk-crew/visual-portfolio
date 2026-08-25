@@ -36,6 +36,33 @@ class Visual_Portfolio_Block_Item_Read_More {
 	}
 
 	/**
+	 * Name the item a link points at, for a reader listing the links.
+	 *
+	 * "Read more" says nothing about which item it opens, the way core's Read
+	 * More block names the post it links to.
+	 *
+	 * @param array $context - block context.
+	 *
+	 * @return string Empty when the item has no title.
+	 */
+	private static function get_screen_reader_name( $context ) {
+		$title = trim( wp_strip_all_tags( (string) ( $context['vp/itemTitle'] ?? '' ) ) );
+
+		if ( '' === $title ) {
+			return '';
+		}
+
+		return sprintf(
+			'<span class="screen-reader-text">%s</span>',
+			sprintf(
+				// translators: %s gallery item title.
+				esc_html__( ': %s', 'visual-portfolio' ),
+				esc_html( $title )
+			)
+		);
+	}
+
+	/**
 	 * Wrap the label in whatever a click on it is supposed to do.
 	 *
 	 * A popup trigger points at the full size image: without the lightbox module
@@ -53,6 +80,8 @@ class Visual_Portfolio_Block_Item_Read_More {
 		if ( 'none' === $action ) {
 			return '<span>' . $label . '</span>';
 		}
+
+		$label .= self::get_screen_reader_name( $context );
 
 		if ( 'popup' === $action ) {
 			$trigger = Visual_Portfolio_Popup::get_trigger_attributes( $context );
@@ -106,7 +135,8 @@ class Visual_Portfolio_Block_Item_Read_More {
 			return '';
 		}
 
-		$label = esc_html( $text );
+		// `$text` comes from a `RichText`, so it is already markup.
+		$label = wp_kses_post( $text );
 
 		if ( ! empty( $attributes['showArrow'] ) ) {
 			// Decorative - the link text already carries the meaning. Picking the
@@ -121,10 +151,6 @@ class Visual_Portfolio_Block_Item_Read_More {
 		}
 
 		$classes = array();
-
-		if ( ! empty( $attributes['textAlign'] ) ) {
-			$classes[] = 'has-text-align-' . $attributes['textAlign'];
-		}
 
 		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 			$classes[] = 'has-link-color';

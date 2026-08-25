@@ -4,9 +4,9 @@
 import {
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	BlockControls,
-	BlockVerticalAlignmentControl,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalGetGapCSSValue as getGapCSSValue,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 	InspectorControls,
 	useBlockEditingMode,
 	useBlockProps,
@@ -15,7 +15,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	FocalPointPicker,
-	RangeControl,
 	SelectControl,
 	TextControl,
 	ToggleControl,
@@ -35,10 +34,22 @@ import classnames from 'classnames/dedupe';
  */
 import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
 import {
-	IMAGE_SIZE_OPTIONS,
 	useImageSizeOnInsert,
+	useImageSizeOptions,
 } from '../../utils/item-image-size';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getOverlaySetting,
+	getOverlayValues,
+	HOVER_OVERLAY_ATTRIBUTES,
+	hasOverlay,
+	ItemOverlay,
+	OVERLAY_ATTRIBUTES,
+	OverlayOpacityItem,
+} from '../../utils/item-overlay';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 const ALLOWED_BLOCKS = [
 	'visual-portfolio/item-title',
@@ -53,7 +64,12 @@ const ALLOWED_BLOCKS = [
 	'core/group',
 ];
 
-const TEMPLATE = [['visual-portfolio/item-title', { textAlign: 'center' }]];
+const TEMPLATE = [
+	[
+		'visual-portfolio/item-title',
+		{ style: { typography: { textAlign: 'center' } } },
+	],
+];
 
 const EFFECT_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
@@ -89,12 +105,13 @@ const CONTENT_POSITION_CLASSES = {
 	'bottom right': 'is-position-bottom-right',
 };
 
+const OVERLAY_CLASS = 'wp-block-visual-portfolio-item-cover__overlay';
+
 // The proportions live in the Dimensions panel, which resets them itself.
 const DEFAULT_ATTRIBUTES = {
 	sizeSlug: 'large',
 	focalPoint: undefined,
 	contentPosition: 'center',
-	verticalAlignment: undefined,
 	effect: 'fade',
 	showContent: 'hover',
 	clickAction: 'none',
@@ -117,19 +134,8 @@ export default function ItemCoverEdit({
 		backgroundSize,
 		focalPoint,
 		contentPosition,
-		verticalAlignment,
 		effect,
 		showContent,
-		overlayColor,
-		customOverlayColor,
-		gradient,
-		customGradient,
-		dimRatio,
-		hoverOverlayColor,
-		customHoverOverlayColor,
-		hoverGradient,
-		customHoverGradient,
-		hoverDimRatio,
 		clickAction,
 		linkTarget,
 		rel,
@@ -149,6 +155,8 @@ export default function ItemCoverEdit({
 
 	useImageSizeOnInsert(clientId, layoutColumns, setAttributes);
 
+	const imageSizeOptions = useImageSizeOptions();
+
 	// The render callback reads the proportions of the image off the tag it
 	// prints; here they arrive with the image itself.
 	const [naturalRatio, setNaturalRatio] = useState('');
@@ -167,52 +175,16 @@ export default function ItemCoverEdit({
 			: undefined,
 	};
 
-	const hasOverlay =
-		!!dimRatio &&
-		!!(overlayColor || customOverlayColor || gradient || customGradient);
-	const hasHoverOverlay =
-		!!hoverDimRatio &&
-		!!(
-			hoverOverlayColor ||
-			customHoverOverlayColor ||
-			hoverGradient ||
-			customHoverGradient
-		);
-
-	const overlayStyles = {};
-
-	if (gradient || customGradient) {
-		overlayStyles.background = gradient
-			? `var(--wp--preset--gradient--${gradient})`
-			: customGradient;
-	} else if (overlayColor || customOverlayColor) {
-		overlayStyles.backgroundColor = overlayColor
-			? `var(--wp--preset--color--${overlayColor})`
-			: customOverlayColor;
-	}
-
-	const hoverOverlayStyles = {
-		'--vp-hover-overlay-opacity': hoverDimRatio / 100,
-	};
-
-	if (hoverGradient || customHoverGradient) {
-		hoverOverlayStyles.background = hoverGradient
-			? `var(--wp--preset--gradient--${hoverGradient})`
-			: customHoverGradient;
-	} else if (hoverOverlayColor || customHoverOverlayColor) {
-		hoverOverlayStyles.backgroundColor = hoverOverlayColor
-			? `var(--wp--preset--color--${hoverOverlayColor})`
-			: customHoverOverlayColor;
-	}
+	const overlay = getOverlayValues(attributes, OVERLAY_ATTRIBUTES);
+	const hoverOverlay = getOverlayValues(attributes, HOVER_OVERLAY_ATTRIBUTES);
 
 	const resolvedRatio = aspectRatio || naturalRatio || undefined;
 
 	// Anything else this install lets a cover be set to. A `ToolsPanelItem`
 	// returned here is an ordinary child of the Settings panel, so it registers
 	// with it the way the built-in ones do. Pro moves the content under the
-	// picture on a narrow screen through this, and resets it from its own menu
-	// entry - the panel cannot know what to write back for someone else's
-	// option.
+	// picture on a narrow screen through this; its `resetAllFilter` is what
+	// "Reset all" writes back for it.
 	const extraSettings = applyFilters('vpf.itemCoverSettingsItems', [], {
 		attributes,
 		setAttributes,
@@ -223,11 +195,7 @@ export default function ItemCoverEdit({
 		className: classnames(
 			`vp-effect-${effect}`,
 			`vp-show-content-${showContent}`,
-			CONTENT_POSITION_CLASSES[contentPosition],
-			{
-				[`is-vertically-aligned-${verticalAlignment}`]:
-					verticalAlignment,
-			}
+			CONTENT_POSITION_CLASSES[contentPosition]
 		),
 		style: {
 			// The ratio travels as a variable, and the stylesheet is what turns
@@ -239,23 +207,6 @@ export default function ItemCoverEdit({
 		},
 	});
 
-	// The hover overlay is the background of the panel rather than a box of its
-	// own, so that a state moves it and the blocks together.
-	const hoverOverlay = (
-		<span
-			className={classnames(
-				'wp-block-visual-portfolio-item-cover__overlay',
-				'wp-block-visual-portfolio-item-cover__overlay--hover',
-				{
-					'has-background-gradient':
-						hoverGradient || customHoverGradient,
-				}
-			)}
-			style={hoverOverlayStyles}
-			aria-hidden="true"
-		/>
-	);
-
 	// The inner blocks stay editable whatever `showContent` says - the render
 	// callback is the one that leaves them out.
 	//
@@ -263,11 +214,18 @@ export default function ItemCoverEdit({
 	// value only reaches CSS through the layout support, which core's Cover has
 	// and this block does not. The gap belongs to the box that holds the blocks,
 	// which is this one and never the card around it.
+	// Padding is kept off the card and put on the panel instead - the box the
+	// blocks actually sit in. On the card it could only ever be added to the
+	// panel's own, and it would inset the overlay with it, leaving an unshaded
+	// frame around the picture.
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-visual-portfolio-item-cover__inner',
 			style: {
 				gap: getGapCSSValue(style?.spacing?.blockGap) || undefined,
+				...getSpacingClassesAndStyles({
+					style: { spacing: { padding: style?.spacing?.padding } },
+				}).style,
 			},
 		},
 		{ template: TEMPLATE, allowedBlocks: ALLOWED_BLOCKS }
@@ -285,152 +243,56 @@ export default function ItemCoverEdit({
 								setAttributes({ contentPosition: value })
 							}
 						/>
-						<BlockVerticalAlignmentControl
-							value={verticalAlignment}
-							onChange={(value) =>
-								setAttributes({ verticalAlignment: value })
-							}
-						/>
 					</BlockControls>
 					<InspectorControls group="color">
 						{colorGradientSettings.hasColorsOrGradients && (
 							<ColorGradientSettingsDropdown
 								__experimentalIsRenderedInSidebar
 								settings={[
-									{
+									getOverlaySetting({
 										label: __(
 											'Overlay',
 											'visual-portfolio'
 										),
-										colorValue: overlayColor
-											? `var(--wp--preset--color--${overlayColor})`
-											: customOverlayColor,
-										gradientValue: gradient
-											? `var(--wp--preset--gradient--${gradient})`
-											: customGradient,
-										onColorChange: (value) => {
-											const slug =
-												colorGradientSettings.colors?.find(
-													(color) =>
-														color.color === value
-												)?.slug;
-
-											setAttributes({
-												overlayColor: slug,
-												customOverlayColor: slug
-													? undefined
-													: value,
-											});
-										},
-										onGradientChange: (value) => {
-											const slug =
-												colorGradientSettings.gradients?.find(
-													(item) =>
-														item.gradient === value
-												)?.slug;
-
-											setAttributes({
-												gradient: slug,
-												customGradient: slug
-													? undefined
-													: value,
-											});
-										},
-										isShownByDefault: true,
-									},
-									{
+										attributes,
+										names: OVERLAY_ATTRIBUTES,
+										setAttributes,
+										colorGradientSettings,
+									}),
+									getOverlaySetting({
 										label: __(
 											'Hover overlay',
 											'visual-portfolio'
 										),
-										colorValue: hoverOverlayColor
-											? `var(--wp--preset--color--${hoverOverlayColor})`
-											: customHoverOverlayColor,
-										gradientValue: hoverGradient
-											? `var(--wp--preset--gradient--${hoverGradient})`
-											: customHoverGradient,
-										onColorChange: (value) => {
-											const slug =
-												colorGradientSettings.colors?.find(
-													(color) =>
-														color.color === value
-												)?.slug;
-
-											setAttributes({
-												hoverOverlayColor: slug,
-												customHoverOverlayColor: slug
-													? undefined
-													: value,
-											});
-										},
-										onGradientChange: (value) => {
-											const slug =
-												colorGradientSettings.gradients?.find(
-													(item) =>
-														item.gradient === value
-												)?.slug;
-
-											setAttributes({
-												hoverGradient: slug,
-												customHoverGradient: slug
-													? undefined
-													: value,
-											});
-										},
-										isShownByDefault: true,
-									},
+										attributes,
+										names: HOVER_OVERLAY_ATTRIBUTES,
+										setAttributes,
+										colorGradientSettings,
+									}),
 								]}
 								panelId={clientId}
 								{...colorGradientSettings}
 							/>
 						)}
-						<ToolsPanelItem
+						<OverlayOpacityItem
 							label={__('Overlay opacity', 'visual-portfolio')}
-							isShownByDefault
-							hasValue={() => dimRatio !== 0}
-							onDeselect={() => setAttributes({ dimRatio: 0 })}
+							attributes={attributes}
+							names={OVERLAY_ATTRIBUTES}
+							defaultValue={0}
+							setAttributes={setAttributes}
 							panelId={clientId}
-						>
-							<RangeControl
-								label={__(
-									'Overlay opacity',
-									'visual-portfolio'
-								)}
-								value={dimRatio}
-								onChange={(value) =>
-									setAttributes({ dimRatio: value })
-								}
-								min={0}
-								max={100}
-								step={10}
-							/>
-						</ToolsPanelItem>
-						<ToolsPanelItem
+						/>
+						<OverlayOpacityItem
 							label={__(
 								'Hover overlay opacity',
 								'visual-portfolio'
 							)}
-							isShownByDefault
-							hasValue={() => hoverDimRatio !== 50}
-							onDeselect={() =>
-								setAttributes({ hoverDimRatio: 50 })
-							}
+							attributes={attributes}
+							names={HOVER_OVERLAY_ATTRIBUTES}
+							defaultValue={50}
+							setAttributes={setAttributes}
 							panelId={clientId}
-						>
-							<RangeControl
-								label={__(
-									'Hover overlay opacity',
-									'visual-portfolio'
-								)}
-								value={hoverDimRatio}
-								onChange={(value) =>
-									setAttributes({ hoverDimRatio: value })
-								}
-								min={0}
-								max={100}
-								step={10}
-							/>
-						</ToolsPanelItem>
+						/>
 					</InspectorControls>
 					<InspectorControls group="dimensions">
 						{/* "Original" here is the proportions of each item's own
@@ -481,7 +343,14 @@ export default function ItemCoverEdit({
 							label={__('Settings', 'visual-portfolio')}
 							dropdownMenuProps={dropdownMenuProps}
 							panelId={clientId}
-							resetAll={() => setAttributes(DEFAULT_ATTRIBUTES)}
+							resetAll={(filters) =>
+								setAttributes(
+									getResetAllValues(
+										filters,
+										DEFAULT_ATTRIBUTES
+									)
+								)
+							}
 						>
 							<ToolsPanelItem
 								label={__('Effect', 'visual-portfolio')}
@@ -542,7 +411,7 @@ export default function ItemCoverEdit({
 								<SelectControl
 									label={__('Image size', 'visual-portfolio')}
 									value={sizeSlug}
-									options={IMAGE_SIZE_OPTIONS}
+									options={imageSizeOptions}
 									onChange={(value) =>
 										setAttributes({ sizeSlug: value })
 									}
@@ -686,19 +555,10 @@ export default function ItemCoverEdit({
 							aria-hidden="true"
 						/>
 					)}
-					{hasOverlay && (
-						<span
-							className={classnames(
-								'wp-block-visual-portfolio-item-cover__overlay',
-								'has-background-dim',
-								`has-background-dim-${dimRatio}`,
-								{
-									'has-background-gradient':
-										gradient || customGradient,
-								}
-							)}
-							style={overlayStyles}
-							aria-hidden="true"
+					{hasOverlay(overlay) && (
+						<ItemOverlay
+							className={OVERLAY_CLASS}
+							overlay={overlay}
 						/>
 					)}
 				</div>
@@ -707,8 +567,16 @@ export default function ItemCoverEdit({
 				<div {...innerBlocksProps}>
 					{innerBlocksProps.children}
 					{/* Last, so that the blocks keep the places the staggering
-					    counts. */}
-					{hasHoverOverlay && hoverOverlay}
+					    counts. The overlay is the background of the panel
+					    rather than a box of its own, so that a state moves it
+					    and the blocks together. */}
+					{hasOverlay(hoverOverlay) && (
+						<ItemOverlay
+							className={OVERLAY_CLASS}
+							overlay={hoverOverlay}
+							isHover
+						/>
+					)}
 				</div>
 			</div>
 		</>

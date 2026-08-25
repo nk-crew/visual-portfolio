@@ -9,9 +9,6 @@
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/itemPublishedTime", "vp/itemUrl"],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"format": {
 			"type": "string"
 		},
@@ -20,6 +17,9 @@
 			"default": false,
 			"role": "content"
 		}
+	},
+	"example": {
+		"viewportWidth": 350
 	},
 	"supports": {
 		"html": false,
@@ -36,6 +36,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

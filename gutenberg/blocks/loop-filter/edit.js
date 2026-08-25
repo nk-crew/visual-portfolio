@@ -20,7 +20,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
 
@@ -57,9 +60,7 @@ function getItemAttributes(
 
 	const attributes = {
 		filter: item.filter,
-		isAll,
 		taxonomyId: item.id,
-		parentId: item.parent,
 	};
 
 	// The label can be edited by hand, so the first sync leaves it as saved.
@@ -293,11 +294,13 @@ export default function BlockEdit({
 			<InspectorControls>
 				<ToolsPanel
 					label={__('Settings', 'visual-portfolio')}
-					resetAll={() =>
-						setAttributes({
-							showCount: false,
-							showAllItem: true,
-						})
+					resetAll={(filters) =>
+						setAttributes(
+							getResetAllValues(filters, {
+								showCount: false,
+								showAllItem: true,
+							})
+						)
 					}
 					dropdownMenuProps={dropdownMenuProps}
 				>

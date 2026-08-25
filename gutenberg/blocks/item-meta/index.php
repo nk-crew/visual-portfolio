@@ -108,35 +108,43 @@ class Visual_Portfolio_Block_Item_Meta {
 	/**
 	 * The icon of a meta type.
 	 *
-	 * Kept in step with `gutenberg/block-icons/item-meta-*.svg`, which the editor
-	 * renders - the same mark on both sides of the editor boundary.
+	 * The same file the editor imports, so the mark is identical on both sides
+	 * of the editor boundary. It ships with the plugin, and is read once per
+	 * request rather than once per item.
 	 *
 	 * @param string $meta_type - meta type of the block.
 	 *
 	 * @return string
 	 */
 	private static function get_icon( $meta_type ) {
-		$open  = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">';
-		$close = '</svg>';
+		static $cache = array();
 
-		if ( 'views' === $meta_type ) {
-			return $open .
-				'<circle cx="10" cy="10" r="2.5" fill="currentColor" />' .
-				'<path d="M1 10C1 10 4.27273 3 10 3C15.7273 3 19 10 19 10C19 10 15.7273 17 10 17C4.27273 17 1 10 1 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent" />' .
-				$close;
+		if ( isset( $cache[ $meta_type ] ) ) {
+			return $cache[ $meta_type ];
 		}
 
-		if ( 'reading-time' === $meta_type ) {
-			return $open .
-				'<path d="M2.60001 16.8823C2.60001 16.3207 2.84403 15.7821 3.2784 15.3849C3.71277 14.9878 4.30189 14.7647 4.91618 14.7647H17.4235" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent" />' .
-				'<path d="M4.91618 1H17.4235V19H4.91618C4.30189 19 3.71277 18.7629 3.2784 18.341C2.84403 17.919 2.60001 17.3467 2.60001 16.75V3.25C2.60001 2.65326 2.84403 2.08097 3.2784 1.65901C3.71277 1.23705 4.30189 1 4.91618 1V1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent" />' .
-				$close;
+		$path = visual_portfolio()->plugin_path . 'gutenberg/block-icons/item-meta-' . $meta_type . '.svg';
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$icon = is_readable( $path ) ? (string) file_get_contents( $path ) : '';
+
+		if ( '' !== $icon ) {
+			// The value spells the meaning out, so the mark next to it is
+			// decorative - which the file itself cannot say, being an icon in
+			// the inserter as well.
+			$processor = new WP_HTML_Tag_Processor( $icon );
+
+			if ( $processor->next_tag( 'svg' ) ) {
+				$processor->set_attribute( 'aria-hidden', 'true' );
+				$processor->set_attribute( 'focusable', 'false' );
+
+				$icon = $processor->get_updated_html();
+			}
 		}
 
-		return $open .
-			'<path d="M4 15V15C2.34315 15 1 13.6569 1 12V4C1 2.34315 2.34315 1 4 1H16C17.6569 1 19 2.34315 19 4V12C19 13.6569 17.6569 15 16 15H11.5" stroke="currentColor" stroke-width="1.5" fill="transparent" />' .
-			'<path d="M3.5 15H5.20001V19L9.5 15H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="transparent" />' .
-			$close;
+		$cache[ $meta_type ] = $icon;
+
+		return $icon;
 	}
 
 	/**
@@ -165,7 +173,6 @@ class Visual_Portfolio_Block_Item_Meta {
 			esc_html( self::get_text( $meta_type, $value ) ) .
 			esc_html( $attributes['suffix'] ?? '' );
 
-		// The value spells the meaning out, so the mark next to it is decorative.
 		$icon = empty( $attributes['showIcon'] ) ? '' : self::get_icon( $meta_type );
 
 		$inner = $icon . '<span>' . $text . '</span>';
@@ -178,10 +185,6 @@ class Visual_Portfolio_Block_Item_Meta {
 		}
 
 		$classes = array();
-
-		if ( ! empty( $attributes['textAlign'] ) ) {
-			$classes[] = 'has-text-align-' . $attributes['textAlign'];
-		}
 
 		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 			$classes[] = 'has-link-color';

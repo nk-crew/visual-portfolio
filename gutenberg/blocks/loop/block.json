@@ -16,10 +16,6 @@
 	],
 	"textdomain": "visual-portfolio",
 	"attributes": {
-		"layout": {
-			"type": "string",
-			"default": "default"
-		},
 		"block_id": {
 			"type": "string"
 		},
@@ -78,6 +74,10 @@
 		"preview_image_example": {
 			"type": "string",
 			"default": ""
+		},
+		"previewLayout": {
+			"type": "string",
+			"default": "default"
 		}
 	},
 	"viewScriptModule": "visual-portfolio-block-loop-view",
@@ -120,10 +120,11 @@
 			"style": true
 		}
 	},
+	"selectors": { "root": ".vp-block-loop" },
 	"example": {
 		"attributes": {
 			"preview_image_example": "true",
-			"layout": "justified"
+			"previewLayout": "justified"
 		}
 	},
 	"providesContext": {

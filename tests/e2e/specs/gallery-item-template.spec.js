@@ -25,7 +25,7 @@ const MANAGER_CATEGORY = 'Manager Category';
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
 const ITEM = '.wp-block-visual-portfolio-item-template__item';
 const TITLE = '.wp-block-visual-portfolio-item-title';
-const LOAD_MORE = '.vp-block-loop-pagination-load-more';
+const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 
 const DEFAULT_ITEM_BLOCKS = [
 	{
@@ -34,7 +34,10 @@ const DEFAULT_ITEM_BLOCKS = [
 	},
 	{
 		name: 'visual-portfolio/item-title',
-		attributes: { textAlign: 'center', isLink: true },
+		attributes: {
+			style: { typography: { textAlign: 'center' } },
+			isLink: true,
+		},
 	},
 ];
 
@@ -383,7 +386,7 @@ test.describe('Gallery Item Template', () => {
 			getLoopBlock({
 				query: postsSource,
 				pagination: [
-					{ name: 'visual-portfolio/loop-pagination-load-more' },
+					{ name: 'visual-portfolio/loop-pagination-trigger' },
 				],
 			})
 		);
@@ -485,7 +488,7 @@ test.describe('Gallery Item Template', () => {
 					layoutColumnCount: 2,
 				},
 				pagination: [
-					{ name: 'visual-portfolio/loop-pagination-load-more' },
+					{ name: 'visual-portfolio/loop-pagination-trigger' },
 				],
 			})
 		);

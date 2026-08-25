@@ -1,6 +1,6 @@
 <?php
 /**
- * Block Pagination Load More.
+ * Block Pagination Trigger.
  *
  * @package visual-portfolio
  */
@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Visual Portfolio Pagination Load More block.
+ * Visual Portfolio Pagination Trigger block.
  */
-class Visual_Portfolio_Block_Loop_Pagination_Load_More {
+class Visual_Portfolio_Block_Loop_Pagination_Trigger {
 	/**
 	 * Constructor.
 	 */
@@ -25,7 +25,7 @@ class Visual_Portfolio_Block_Loop_Pagination_Load_More {
 	 */
 	public function register_block() {
 		register_block_type_from_metadata(
-			visual_portfolio()->plugin_path . 'gutenberg/blocks/loop-pagination-load-more',
+			visual_portfolio()->plugin_path . 'gutenberg/blocks/loop-pagination-trigger',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
 			)
@@ -51,48 +51,37 @@ class Visual_Portfolio_Block_Loop_Pagination_Load_More {
 			return '';
 		}
 
+		$is_infinite = 'infinite' === ( $attributes['triggerType'] ?? 'load-more' );
+
 		// Get attributes with defaults.
 		$label         = empty( $attributes['label'] ) ? __( 'Load More', 'visual-portfolio' ) : $attributes['label'];
 		$loading_label = empty( $attributes['loadingLabel'] ) ? __( 'Loading...', 'visual-portfolio' ) : $attributes['loadingLabel'];
 
 		// The router replaces a region, it cannot extend one, so this trigger is
-		// the one control that fetches for itself.
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class'               => 'vp-block-loop-pagination-load-more',
-				'data-wp-interactive' => Visual_Portfolio_Block_Loop::STORE,
-				'data-wp-on--click'   => 'actions.loadMore',
-			)
+		// the one control that fetches for itself. It stays a real link either
+		// way: without the observer, or without any JavaScript at all, clicking
+		// it is still the next page.
+		// One class for both variations. What separates them is the directive
+		// below, which is the only difference that changes behaviour.
+		$wrapper_args = array(
+			'class'               => 'vp-block-loop-pagination-trigger',
+			'data-wp-interactive' => Visual_Portfolio_Block_Loop::STORE,
+			'data-wp-on--click'   => 'actions.loadMore',
 		);
 
-		$pagination_links = Visual_Portfolio_Get::get_pagination_links(
-			array(
-				'start_page' => $current_page,
-				'max_pages'  => $max_pages,
-			),
-			array(
-				'pagination_paged__show_arrows'  => true,
-				'pagination_paged__show_numbers' => false,
-			),
-			$query_id
-		);
-
-		// Find the next page link from the pagination links.
-		$next_link = '#';
-		foreach ( $pagination_links as $link ) {
-			if ( $link['is_next_arrow'] ) {
-				$next_link = $link['url'] ? esc_url( Visual_Portfolio_Block_Loop::add_random_seed( $link['url'], $block->context ) ) : '#';
-				break;
-			}
+		if ( $is_infinite ) {
+			$wrapper_args['data-wp-init'] = 'callbacks.observeInfinite';
 		}
 
+		$next_link = Visual_Portfolio_Block_Loop::get_page_url( $current_page + 1, $block->context );
+
 		return sprintf(
-			'<a href="%1$s" %2$s><span>%3$s</span><span class="vp-block-loop-pagination-load-more-loading"><span class="vp-spinner"></span><span class="vp-screen-reader-text">%4$s</span></span></a>',
+			'<a href="%1$s" %2$s><span>%3$s</span><span class="vp-block-loop-pagination-trigger-loading"><span class="vp-spinner"></span><span class="vp-screen-reader-text">%4$s</span></span></a>',
 			$next_link,
-			$wrapper_attributes,
+			get_block_wrapper_attributes( $wrapper_args ),
 			wp_kses_post( $label ),
 			wp_kses_post( $loading_label )
 		);
 	}
 }
-new Visual_Portfolio_Block_Loop_Pagination_Load_More();
+new Visual_Portfolio_Block_Loop_Pagination_Trigger();

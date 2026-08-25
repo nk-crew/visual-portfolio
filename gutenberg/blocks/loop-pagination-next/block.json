@@ -14,12 +14,12 @@
 		"vp/baseQuery",
 		"vp/postsQuery",
 		"vp/imagesQuery",
-		"vp/sourceQuery"
+		"vp/sourceQuery",
+		"vp/showLabel",
+		"vp/showArrow"
 	],
 	"attributes": {
-		"label": { "type": "string" },
-		"showLabel": { "type": "boolean", "default": true },
-		"showArrow": { "type": "boolean", "default": true }
+		"label": { "type": "string" }
 	},
 	"supports": {
 		"reusable": false,
@@ -45,5 +45,6 @@
 				"fontSize": true
 			}
 		}
-	}
+	},
+	"selectors": { "root": ".vp-block-loop-pagination-next" }
 }

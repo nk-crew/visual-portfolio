@@ -39,6 +39,31 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 }
 
+// The same layout as far as a browser with no Grid Lanes can pack it on its
+// own. Multi-column measures nothing and needs nobody: an item is as tall as it
+// is, and the browser fills each column before starting the next.
+//
+// What it costs is the reading order. A column is read top to bottom, so the
+// items run down the first one and continue at the top of the second, where the
+// script keeps them in source order across each row. That is the trade for a
+// gallery that is a gallery before - and without - the script.
+@mixin masonry-columns {
+	column-count: var(--vp-layout-current-columns);
+	column-gap: var(--vp-layout-gap, 1.5rem);
+
+	// A count and a width together are the cap and the minimum of the same
+	// question: as many columns as fit, and never more than the count.
+	&.vp-layout-auto-columns {
+		column-width: var(--vp-layout-min-column-width, 16rem);
+	}
+
+	> #{$item} {
+		width: auto;
+		margin-bottom: var(--vp-layout-gap, 1.5rem);
+		break-inside: avoid;
+	}
+}
+
 // The same layout, with the browser doing the packing. Applied wherever Grid
 // Lanes exists - to a page whose script never arrived through `@supports`, and
 // by class the moment the module confirms the support itself.
@@ -101,6 +126,20 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 
 	&.vp-layout-masonry {
 		@include masonry-script;
+
+		// Until Masonry has placed the items there is nothing placing them:
+		// with JavaScript off, and on a page whose `masonry` handle was
+		// deferred, for as long as that takes. The class is written by the loop
+		// module when it starts Masonry, not by hydration, so the columns hold
+		// until the script really has the list.
+		//
+		// Only where the browser cannot pack the items itself - where it can,
+		// the rule below is already the whole layout, script or no script.
+		@supports not (display: grid-lanes) {
+			&:not(.vp-has-masonry) {
+				@include masonry-columns;
+			}
+		}
 
 		@supports (display: grid-lanes) {
 			@include masonry-lanes;

@@ -6,6 +6,7 @@ import {
 	BlockContextProvider,
 	BlockControls,
 	store as blockEditorStore,
+	__experimentalGetGapCSSValue as getGapCSSValue,
 	InspectorControls,
 	__experimentalUseBlockPreview as useBlockPreview,
 	useBlockProps,
@@ -39,9 +40,12 @@ import {
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
-import { getBlockGapValue, getColumnsProps } from './columns';
+import { getColumnsProps } from './columns';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
 
@@ -132,7 +136,10 @@ const CSS_UNITS = [
 
 const TEMPLATE = [
 	['visual-portfolio/item-image', { aspectRatio: '1', clickAction: 'popup' }],
-	['visual-portfolio/item-title', { textAlign: 'center' }],
+	[
+		'visual-portfolio/item-title',
+		{ style: { typography: { textAlign: 'center' } } },
+	],
 ];
 
 /**
@@ -445,9 +452,7 @@ export default function BlockEdit({
 					layoutMinimumColumnWidth,
 					layoutAutoFit,
 				},
-				attributes.style?.spacing?.blockGap
-					? getBlockGapValue(attributes.style.spacing.blockGap)
-					: ''
+				getGapCSSValue(attributes.style?.spacing?.blockGap) || ''
 			),
 		[
 			layoutType,
@@ -626,15 +631,17 @@ export default function BlockEdit({
 		<ToolsPanel
 			label={__('Settings', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
-			resetAll={() =>
-				setAttributes({
-					layoutType: 'grid',
-					layoutTiles: '3|1,1|',
-					layoutColumnsMode: 'auto',
-					layoutColumnCount: 3,
-					layoutMinimumColumnWidth: '16rem',
-					layoutAutoFit: false,
-				})
+			resetAll={(filters) =>
+				setAttributes(
+					getResetAllValues(filters, {
+						layoutType: 'grid',
+						layoutTiles: '3|1,1|',
+						layoutColumnsMode: 'auto',
+						layoutColumnCount: 3,
+						layoutMinimumColumnWidth: '16rem',
+						layoutAutoFit: false,
+					})
+				)
 			}
 		>
 			<ToolsPanelItem
@@ -704,13 +711,15 @@ export default function BlockEdit({
 		<ToolsPanel
 			label={__('Justified', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
-			resetAll={() =>
-				setAttributes({
-					justifiedRowHeight: 320,
-					justifiedRowHeightTolerance: 0.25,
-					justifiedMaxRowsCount: 0,
-					justifiedLastRow: 'left',
-				})
+			resetAll={(filters) =>
+				setAttributes(
+					getResetAllValues(filters, {
+						justifiedRowHeight: 320,
+						justifiedRowHeightTolerance: 0.25,
+						justifiedMaxRowsCount: 0,
+						justifiedLastRow: 'left',
+					})
+				)
 			}
 		>
 			<ToolsPanelItem
@@ -802,20 +811,22 @@ export default function BlockEdit({
 		<ToolsPanel
 			label={__('Carousel', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
-			resetAll={() =>
-				setAttributes({
-					carouselAutoWidth: false,
-					carouselSnapAlign: 'start',
-					carouselFreeScroll: false,
-					carouselEffect: 'none',
-					carouselRepeat: false,
-					carouselAutoplay: false,
-					carouselAutoplayDelay: 5,
-					carouselPeek: 0,
-					carouselEdgeFade: false,
-					carouselShowArrows: true,
-					carouselIndicator: 'none',
-				})
+			resetAll={(filters) =>
+				setAttributes(
+					getResetAllValues(filters, {
+						carouselAutoWidth: false,
+						carouselSnapAlign: 'start',
+						carouselFreeScroll: false,
+						carouselEffect: 'none',
+						carouselRepeat: false,
+						carouselAutoplay: false,
+						carouselAutoplayDelay: 5,
+						carouselPeek: 0,
+						carouselEdgeFade: false,
+						carouselShowArrows: true,
+						carouselIndicator: 'none',
+					})
+				)
 			}
 		>
 			<ToolsPanelItem

@@ -2,8 +2,9 @@ import { ReactComponent as BlockIcon } from '../../block-icons/loop-filter-item.
 import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import BlockEdit from './edit';
-import BlockSave from './save';
 
+// No `save`: the render callback prints the item, and the default save already
+// stores nothing.
 registerLoopBlock(metadata.name, {
 	...metadata,
 	icon: {
@@ -11,5 +12,4 @@ registerLoopBlock(metadata.name, {
 		src: <BlockIcon width="20" height="20" />,
 	},
 	edit: BlockEdit,
-	save: BlockSave,
 });

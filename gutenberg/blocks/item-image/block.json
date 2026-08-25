@@ -72,6 +72,10 @@
 			"default": 0
 		}
 	},
+	"example": {
+		"attributes": { "aspectRatio": "3/2" },
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"reusable": false,

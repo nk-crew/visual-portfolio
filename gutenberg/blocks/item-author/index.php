@@ -68,15 +68,11 @@ class Visual_Portfolio_Block_Item_Author {
 		// in `block.json`, so it follows the site's language.
 		$prefix = (string) ( $attributes['prefix'] ?? __( 'by ', 'visual-portfolio' ) );
 
-		if ( ! empty( $attributes['showPrefix'] ) && '' !== $prefix ) {
+		if ( '' !== $prefix ) {
 			$output = esc_html( $prefix ) . $output;
 		}
 
 		$classes = array();
-
-		if ( ! empty( $attributes['textAlign'] ) ) {
-			$classes[] = 'has-text-align-' . $attributes['textAlign'];
-		}
 
 		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 			$classes[] = 'has-link-color';

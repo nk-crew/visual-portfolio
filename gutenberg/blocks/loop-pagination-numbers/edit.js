@@ -12,7 +12,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 // Keep in sync with the `midSize` default in `block.json`.
 const DEFAULT_MID_SIZE = 2;
@@ -73,8 +76,12 @@ export default function PaginationNumbersEdit({
 			<InspectorControls>
 				<ToolsPanel
 					label={__('Settings', 'visual-portfolio')}
-					resetAll={() =>
-						setAttributes({ midSize: DEFAULT_MID_SIZE })
+					resetAll={(filters) =>
+						setAttributes(
+							getResetAllValues(filters, {
+								midSize: DEFAULT_MID_SIZE,
+							})
+						)
 					}
 					dropdownMenuProps={dropdownMenuProps}
 				>

@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
-	BlockControls,
 	InspectorControls,
 	useBlockEditingMode,
 	useBlockProps,
@@ -16,26 +14,21 @@ import {
 import { Fragment } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 const DEFAULT_SEPARATOR = ', ';
 
 export default function ItemCategoriesEdit({
-	attributes: { textAlign, separator },
+	attributes: { separator },
 	setAttributes,
 	context: { 'vp/itemCategories': itemCategories },
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const blockProps = useBlockProps({
-		className: classnames({
-			[`has-text-align-${textAlign}`]: textAlign,
-		}),
-	});
+	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
 	const categories = (itemCategories || []).filter(
@@ -45,50 +38,44 @@ export default function ItemCategoriesEdit({
 	return (
 		<>
 			{blockEditingMode === 'default' && (
-				<>
-					<BlockControls group="block">
-						<AlignmentControl
-							value={textAlign}
-							onChange={(nextAlign) =>
-								setAttributes({ textAlign: nextAlign })
-							}
-						/>
-					</BlockControls>
-					<InspectorControls>
-						<ToolsPanel
-							label={__('Settings', 'visual-portfolio')}
-							dropdownMenuProps={dropdownMenuProps}
-							resetAll={() =>
-								setAttributes({ separator: DEFAULT_SEPARATOR })
+				<InspectorControls>
+					<ToolsPanel
+						label={__('Settings', 'visual-portfolio')}
+						dropdownMenuProps={dropdownMenuProps}
+						resetAll={(filters) =>
+							setAttributes(
+								getResetAllValues(filters, {
+									separator: DEFAULT_SEPARATOR,
+								})
+							)
+						}
+					>
+						<ToolsPanelItem
+							label={__('Separator', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => separator !== DEFAULT_SEPARATOR}
+							onDeselect={() =>
+								setAttributes({
+									separator: DEFAULT_SEPARATOR,
+								})
 							}
 						>
-							<ToolsPanelItem
+							<TextControl
 								label={__('Separator', 'visual-portfolio')}
-								isShownByDefault
-								hasValue={() => separator !== DEFAULT_SEPARATOR}
-								onDeselect={() =>
+								help={__(
+									'Character(s) placed between the categories.',
+									'visual-portfolio'
+								)}
+								value={separator}
+								onChange={(newSeparator) =>
 									setAttributes({
-										separator: DEFAULT_SEPARATOR,
+										separator: newSeparator,
 									})
 								}
-							>
-								<TextControl
-									label={__('Separator', 'visual-portfolio')}
-									help={__(
-										'Character(s) placed between the categories.',
-										'visual-portfolio'
-									)}
-									value={separator}
-									onChange={(newSeparator) =>
-										setAttributes({
-											separator: newSeparator,
-										})
-									}
-								/>
-							</ToolsPanelItem>
-						</ToolsPanel>
-					</InspectorControls>
-				</>
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
 			)}
 			<div {...blockProps}>
 				{categories.length

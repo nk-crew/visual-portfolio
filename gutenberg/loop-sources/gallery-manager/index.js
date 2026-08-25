@@ -167,6 +167,27 @@ function useAccessibility(ids) {
 }
 
 /**
+ * Every category used by at least one image.
+ *
+ * Both the suggestions of the category field and the `imagesQuery.categories`
+ * the filter block reads are this list, so it is collected once.
+ *
+ * @param {Array} images - gallery images.
+ * @return {Array} categories.
+ */
+export function getUsedCategories(images) {
+	const categories = new Set();
+
+	(images || []).forEach((image) => {
+		(image.categories || []).forEach((category) => {
+			categories.add(category);
+		});
+	});
+
+	return Array.from(categories);
+}
+
+/**
  * The gallery of the images source: add, reorder and edit images.
  *
  * @param {Object}   props           - component props.
@@ -187,17 +208,10 @@ export default function GalleryManager({ images, onChange, clientId }) {
 	const ids = useMemo(() => images.map((image) => image.id), [images]);
 	const accessibility = useAccessibility(ids);
 
-	const categorySuggestions = useMemo(() => {
-		const categories = new Set();
-
-		images.forEach((image) => {
-			(image.categories || []).forEach((category) => {
-				categories.add(category);
-			});
-		});
-
-		return Array.from(categories);
-	}, [images]);
+	const categorySuggestions = useMemo(
+		() => getUsedCategories(images),
+		[images]
+	);
 
 	const sensors = useSensors(
 		// Without a threshold every click on a thumbnail starts a drag.

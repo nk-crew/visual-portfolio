@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
-	BlockControls,
 	InspectorControls,
 	useBlockEditingMode,
 	useBlockProps,
@@ -16,11 +14,10 @@ import {
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 // Keep in sync with `Visual_Portfolio_Block_Item_Description::DEFAULT_EXCERPT_LENGTH`.
 const DEFAULT_EXCERPT_LENGTH = 15;
@@ -53,17 +50,13 @@ function trimWords(text, count) {
 }
 
 export default function ItemDescriptionEdit({
-	attributes: { textAlign, source, excerptLength },
+	attributes: { source, excerptLength },
 	setAttributes,
 	context: { 'vp/itemExcerpt': itemExcerpt, 'vp/itemContent': itemContent },
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const blockProps = useBlockProps({
-		className: classnames({
-			[`has-text-align-${textAlign}`]: textAlign,
-		}),
-	});
+	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
 	let preview;
@@ -86,99 +79,94 @@ export default function ItemDescriptionEdit({
 		? decodeEntities(preview)
 		: __('Gallery item description', 'visual-portfolio');
 
+	// The render callback prints the whole content in a `div`, the way core's
+	// Post Content block does, and only an excerpt in a `p`.
+	const TagName = source === 'content' ? 'div' : 'p';
+
 	return (
 		<>
 			{blockEditingMode === 'default' && (
-				<>
-					<BlockControls group="block">
-						<AlignmentControl
-							value={textAlign}
-							onChange={(nextAlign) =>
-								setAttributes({ textAlign: nextAlign })
-							}
-						/>
-					</BlockControls>
-					<InspectorControls>
-						<ToolsPanel
-							label={__('Settings', 'visual-portfolio')}
-							dropdownMenuProps={dropdownMenuProps}
-							resetAll={() =>
-								setAttributes({
+				<InspectorControls>
+					<ToolsPanel
+						label={__('Settings', 'visual-portfolio')}
+						dropdownMenuProps={dropdownMenuProps}
+						resetAll={(filters) =>
+							setAttributes(
+								getResetAllValues(filters, {
 									source: 'excerpt',
 									excerptLength: DEFAULT_EXCERPT_LENGTH,
 								})
+							)
+						}
+					>
+						<ToolsPanelItem
+							label={__('Source', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => source !== 'excerpt'}
+							onDeselect={() =>
+								setAttributes({ source: 'excerpt' })
 							}
 						>
-							<ToolsPanelItem
+							<SelectControl
 								label={__('Source', 'visual-portfolio')}
+								value={source}
+								options={[
+									{
+										label: __(
+											'Excerpt',
+											'visual-portfolio'
+										),
+										value: 'excerpt',
+									},
+									{
+										label: __(
+											'Full content',
+											'visual-portfolio'
+										),
+										value: 'content',
+									},
+								]}
+								onChange={(newSource) =>
+									setAttributes({ source: newSource })
+								}
+							/>
+						</ToolsPanelItem>
+						{source === 'excerpt' && (
+							<ToolsPanelItem
+								label={__(
+									'Max number of words',
+									'visual-portfolio'
+								)}
 								isShownByDefault
-								hasValue={() => source !== 'excerpt'}
+								hasValue={() =>
+									excerptLength !== DEFAULT_EXCERPT_LENGTH
+								}
 								onDeselect={() =>
-									setAttributes({ source: 'excerpt' })
+									setAttributes({
+										excerptLength: DEFAULT_EXCERPT_LENGTH,
+									})
 								}
 							>
-								<SelectControl
-									label={__('Source', 'visual-portfolio')}
-									value={source}
-									options={[
-										{
-											label: __(
-												'Excerpt',
-												'visual-portfolio'
-											),
-											value: 'excerpt',
-										},
-										{
-											label: __(
-												'Full content',
-												'visual-portfolio'
-											),
-											value: 'content',
-										},
-									]}
-									onChange={(newSource) =>
-										setAttributes({ source: newSource })
-									}
-								/>
-							</ToolsPanelItem>
-							{source === 'excerpt' && (
-								<ToolsPanelItem
+								<RangeControl
 									label={__(
 										'Max number of words',
 										'visual-portfolio'
 									)}
-									isShownByDefault
-									hasValue={() =>
-										excerptLength !== DEFAULT_EXCERPT_LENGTH
-									}
-									onDeselect={() =>
+									value={excerptLength}
+									onChange={(value) =>
 										setAttributes({
-											excerptLength:
-												DEFAULT_EXCERPT_LENGTH,
+											excerptLength: value,
 										})
 									}
-								>
-									<RangeControl
-										label={__(
-											'Max number of words',
-											'visual-portfolio'
-										)}
-										value={excerptLength}
-										onChange={(value) =>
-											setAttributes({
-												excerptLength: value,
-											})
-										}
-										min={1}
-										max={100}
-									/>
-								</ToolsPanelItem>
-							)}
-						</ToolsPanel>
-					</InspectorControls>
-				</>
+									min={1}
+									max={100}
+								/>
+							</ToolsPanelItem>
+						)}
+					</ToolsPanel>
+				</InspectorControls>
 			)}
-			<p {...blockProps}>{preview}</p>
+			<TagName {...blockProps}>{preview}</TagName>
 		</>
 	);
 }

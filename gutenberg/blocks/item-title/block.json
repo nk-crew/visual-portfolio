@@ -9,9 +9,6 @@
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/itemTitle", "vp/itemUrl", "vp/itemPopupData"],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"level": {
 			"type": "number",
 			"default": 3
@@ -41,6 +38,9 @@
 			"role": "content"
 		}
 	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"reusable": false,
@@ -56,6 +56,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

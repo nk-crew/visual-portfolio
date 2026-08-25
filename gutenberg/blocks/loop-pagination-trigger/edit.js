@@ -12,23 +12,37 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+/**
+ * External dependencies
+ */
 
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 export default function Edit({ attributes, setAttributes }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { label, loadingLabel } = attributes;
+	const { triggerType, label, loadingLabel } = attributes;
+
+	const isInfinite = 'infinite' === triggerType;
 
 	return (
 		<>
 			<InspectorControls>
 				<ToolsPanel
 					label={__('Settings', 'visual-portfolio')}
-					resetAll={() => setAttributes({ loadingLabel: undefined })}
+					resetAll={(filters) =>
+						setAttributes(
+							getResetAllValues(filters, {
+								loadingLabel: undefined,
+							})
+						)
+					}
 					dropdownMenuProps={dropdownMenuProps}
 				>
 					<ToolsPanelItem
@@ -38,6 +52,7 @@ export default function Edit({ attributes, setAttributes }) {
 						onDeselect={() =>
 							setAttributes({ loadingLabel: undefined })
 						}
+						resetAllFilter={() => ({ loadingLabel: undefined })}
 					>
 						<TextControl
 							label={__('Loading text', 'visual-portfolio')}
@@ -56,16 +71,20 @@ export default function Edit({ attributes, setAttributes }) {
 			</InspectorControls>
 
 			<a
-				href="#pagination-load-more-pseudo-link"
+				href="#pagination-trigger-pseudo-link"
 				onClick={(event) => event.preventDefault()}
 				{...useBlockProps({
-					className: 'vp-block-loop-pagination-load-more',
+					className: 'vp-block-loop-pagination-trigger',
 				})}
 			>
 				<PlainText
 					__experimentalVersion={2}
 					tagName="span"
-					aria-label={__('Load more link', 'visual-portfolio')}
+					aria-label={
+						isInfinite
+							? __('Infinite scroll trigger', 'visual-portfolio')
+							: __('Load more link', 'visual-portfolio')
+					}
 					placeholder={__('Load More', 'visual-portfolio')}
 					value={label}
 					onChange={(newLabel) => setAttributes({ label: newLabel })}

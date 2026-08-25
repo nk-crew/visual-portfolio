@@ -10,7 +10,6 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import {
-	RangeControl,
 	SelectControl,
 	TextControl,
 	ToggleControl,
@@ -21,18 +20,25 @@ import {
 import { __ } from '@wordpress/i18n';
 import { fullscreen, link, linkOff } from '@wordpress/icons';
 /**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
-/**
  * Internal dependencies
  */
 import { DimensionsTool } from '../../utils/dimensions-tools';
 import {
-	IMAGE_SIZE_OPTIONS,
 	useImageSizeOnInsert,
+	useImageSizeOptions,
 } from '../../utils/item-image-size';
-import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import {
+	getOverlaySetting,
+	getOverlayValues,
+	hasOverlay,
+	ItemOverlay,
+	OVERLAY_ATTRIBUTES,
+	OverlayOpacityItem,
+} from '../../utils/item-overlay';
+import {
+	getResetAllValues,
+	useToolsPanelDropdownMenuProps,
+} from '../../utils/tools-panel';
 
 const CLICK_ACTION_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
@@ -75,11 +81,6 @@ export default function ItemImageEdit({
 		width,
 		height,
 		scale,
-		overlayColor,
-		customOverlayColor,
-		gradient,
-		customGradient,
-		dimRatio,
 	} = attributes;
 
 	const {
@@ -97,24 +98,12 @@ export default function ItemImageEdit({
 
 	useImageSizeOnInsert(clientId, layoutColumns, setAttributes);
 
+	const imageSizeOptions = useImageSizeOptions();
+
 	// Sizes are resolved on the server; only the choice between them is made here.
 	const imageUrl = itemImageSizes?.[sizeSlug] || itemImgUrl;
 
-	const hasOverlay =
-		!!dimRatio &&
-		!!(overlayColor || customOverlayColor || gradient || customGradient);
-
-	const overlayStyles = {};
-
-	if (gradient || customGradient) {
-		overlayStyles.background = gradient
-			? `var(--wp--preset--gradient--${gradient})`
-			: customGradient;
-	} else if (overlayColor || customOverlayColor) {
-		overlayStyles.backgroundColor = overlayColor
-			? `var(--wp--preset--color--${overlayColor})`
-			: customOverlayColor;
-	}
+	const overlay = getOverlayValues(attributes, OVERLAY_ATTRIBUTES);
 
 	// The rules of the core Featured Image block: a ratio owns the width, an
 	// explicit width or height takes it back, and the scale only means
@@ -157,19 +146,10 @@ export default function ItemImageEdit({
 					</svg>
 				</div>
 			)}
-			{hasOverlay && (
-				<span
-					className={classnames(
-						'wp-block-visual-portfolio-item-image__overlay',
-						'has-background-dim',
-						`has-background-dim-${dimRatio}`,
-						{
-							'has-background-gradient':
-								gradient || customGradient,
-						}
-					)}
-					style={overlayStyles}
-					aria-hidden="true"
+			{hasOverlay(overlay) && (
+				<ItemOverlay
+					className="wp-block-visual-portfolio-item-image__overlay"
+					overlay={overlay}
 				/>
 			)}
 		</>
@@ -199,73 +179,29 @@ export default function ItemImageEdit({
 							<ColorGradientSettingsDropdown
 								__experimentalIsRenderedInSidebar
 								settings={[
-									{
+									getOverlaySetting({
 										label: __(
 											'Overlay',
 											'visual-portfolio'
 										),
-										colorValue: overlayColor
-											? `var(--wp--preset--color--${overlayColor})`
-											: customOverlayColor,
-										gradientValue: gradient
-											? `var(--wp--preset--gradient--${gradient})`
-											: customGradient,
-										onColorChange: (value) => {
-											const slug =
-												colorGradientSettings.colors?.find(
-													(color) =>
-														color.color === value
-												)?.slug;
-
-											setAttributes({
-												overlayColor: slug,
-												customOverlayColor: slug
-													? undefined
-													: value,
-											});
-										},
-										onGradientChange: (value) => {
-											const slug =
-												colorGradientSettings.gradients?.find(
-													(item) =>
-														item.gradient === value
-												)?.slug;
-
-											setAttributes({
-												gradient: slug,
-												customGradient: slug
-													? undefined
-													: value,
-											});
-										},
-										isShownByDefault: true,
-									},
+										attributes,
+										names: OVERLAY_ATTRIBUTES,
+										setAttributes,
+										colorGradientSettings,
+									}),
 								]}
 								panelId={clientId}
 								{...colorGradientSettings}
 							/>
 						)}
-						<ToolsPanelItem
+						<OverlayOpacityItem
 							label={__('Overlay opacity', 'visual-portfolio')}
-							isShownByDefault
-							hasValue={() => dimRatio !== 0}
-							onDeselect={() => setAttributes({ dimRatio: 0 })}
+							attributes={attributes}
+							names={OVERLAY_ATTRIBUTES}
+							defaultValue={0}
+							setAttributes={setAttributes}
 							panelId={clientId}
-						>
-							<RangeControl
-								label={__(
-									'Overlay opacity',
-									'visual-portfolio'
-								)}
-								value={dimRatio}
-								onChange={(value) =>
-									setAttributes({ dimRatio: value })
-								}
-								min={0}
-								max={100}
-								step={10}
-							/>
-						</ToolsPanelItem>
+						/>
 					</InspectorControls>
 					<InspectorControls group="dimensions">
 						<DimensionsTool
@@ -279,7 +215,14 @@ export default function ItemImageEdit({
 							label={__('Settings', 'visual-portfolio')}
 							dropdownMenuProps={dropdownMenuProps}
 							panelId={clientId}
-							resetAll={() => setAttributes(DEFAULT_ATTRIBUTES)}
+							resetAll={(filters) =>
+								setAttributes(
+									getResetAllValues(
+										filters,
+										DEFAULT_ATTRIBUTES
+									)
+								)
+							}
 						>
 							<ToolsPanelItem
 								label={__('Image size', 'visual-portfolio')}
@@ -293,7 +236,7 @@ export default function ItemImageEdit({
 								<SelectControl
 									label={__('Image size', 'visual-portfolio')}
 									value={sizeSlug}
-									options={IMAGE_SIZE_OPTIONS}
+									options={imageSizeOptions}
 									onChange={(value) =>
 										setAttributes({ sizeSlug: value })
 									}
