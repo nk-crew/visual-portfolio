@@ -13,11 +13,5 @@
 		"className": false,
 		"html": false,
 		"align": ["wide", "full"]
-	},
-	"usesContext": [
-		"vp/queryType",
-		"vp/baseQuery",
-		"vp/postsQuery",
-		"vp/imagesQuery"
-	]
+	}
 }

@@ -1,0 +1,158 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/item-template",
+	"title": "Gallery Item Template (Experimental)",
+	"category": "media",
+	"description": "Contains the block elements used to render a gallery item, like the image, title, description and more. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/loop"],
+	"textdomain": "visual-portfolio",
+	"attributes": {
+		"layoutType": {
+			"type": "string",
+			"default": "grid",
+			"enum": ["grid", "masonry", "tiles", "justified", "carousel"]
+		},
+		"layoutColumnsMode": {
+			"type": "string",
+			"default": "auto",
+			"enum": ["auto", "manual"]
+		},
+		"layoutColumnCount": {
+			"type": "number",
+			"default": 3
+		},
+		"layoutMinimumColumnWidth": {
+			"type": "string",
+			"default": "16rem"
+		},
+		"layoutAutoFit": {
+			"type": "boolean",
+			"default": false
+		},
+		"layoutTiles": {
+			"type": "string",
+			"default": "3|1,1|"
+		},
+		"justifiedRowHeight": {
+			"type": "number",
+			"default": 320
+		},
+		"justifiedRowHeightTolerance": {
+			"type": "number",
+			"default": 0.25
+		},
+		"justifiedMaxRowsCount": {
+			"type": "number",
+			"default": 0
+		},
+		"justifiedLastRow": {
+			"type": "string",
+			"default": "left",
+			"enum": ["left", "center", "right", "hide"]
+		},
+		"carouselAutoWidth": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselSnapAlign": {
+			"type": "string",
+			"default": "start",
+			"enum": ["start", "center"]
+		},
+		"carouselFreeScroll": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselEffect": {
+			"type": "string",
+			"default": "none",
+			"enum": ["none", "coverflow", "slideshow"]
+		},
+		"carouselRepeat": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselAutoplay": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselAutoplayDelay": {
+			"type": "number",
+			"default": 5
+		},
+		"carouselPeek": {
+			"type": "number",
+			"default": 0
+		},
+		"carouselEdgeFade": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselShowArrows": {
+			"type": "boolean",
+			"default": true
+		},
+		"carouselIndicator": {
+			"type": "string",
+			"default": "none",
+			"enum": ["none", "dots", "progress"]
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"anchor": true,
+		"interactivity": true,
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		}
+	},
+	"usesContext": [
+		"vp/queryId",
+		"vp/previewQuery",
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/sourceQuery",
+		"vp/blockId"
+	],
+	"providesContext": {
+		"vp/layoutType": "layoutType",
+		"vp/layoutColumns": "layoutColumnCount"
+	},
+	"style": "visual-portfolio-block-item-template",
+	"editorStyle": "visual-portfolio-block-item-template-editor"
+}

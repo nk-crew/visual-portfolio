@@ -1,3 +1,5 @@
+import { getFixturePath } from './fixture-path';
+
 /**
  * Create posts with test data for Visual Portfolio testing
  */
@@ -81,7 +83,7 @@ export async function createRegularPosts({
 
 				const imageFile = imageFiles[i % imageFiles.length];
 				const media = await requestUtils.uploadMedia(
-					`tests/fixtures/${imageFile}`
+					getFixturePath(imageFile)
 				);
 
 				if (media && media.id) {

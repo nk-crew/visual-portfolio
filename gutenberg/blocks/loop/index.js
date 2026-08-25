@@ -1,6 +1,5 @@
-import { registerBlockType } from '@wordpress/blocks';
-
 import { ReactComponent as BlockIcon } from '../../block-icons/visual-portfolio.svg';
+import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
@@ -17,4 +16,4 @@ const settings = {
 	save,
 };
 
-registerBlockType(name, settings);
+registerLoopBlock(name, settings);

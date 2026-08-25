@@ -1,0 +1,22 @@
+// Sort block.
+.vp-block-loop-sort {
+	font-size: var(--wp--preset--font-size--medium, 1rem);
+	font-weight: 500;
+
+	form {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+		align-items: center;
+	}
+
+	select {
+		font-size: inherit;
+	}
+
+	// Only ever seen where the script module is not: with it the select
+	// navigates on its own and the button is bound away.
+	&__submit {
+		font-size: inherit;
+	}
+}

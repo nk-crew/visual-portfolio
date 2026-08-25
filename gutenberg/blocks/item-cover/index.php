@@ -1,0 +1,425 @@
+<?php
+/**
+ * Block Item Cover.
+ *
+ * @package visual-portfolio
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Visual Portfolio Item Cover block.
+ */
+class Visual_Portfolio_Block_Item_Cover {
+	/**
+	 * Interactivity API store of the block.
+	 *
+	 * Its own namespace, not the one of the loop: the only thing it does is
+	 * measure where the pointer entered a single cover.
+	 */
+	const STORE = 'visual-portfolio/item-cover';
+
+	/**
+	 * Script module of the `fly` effect.
+	 */
+	const VIEW_MODULE = 'visual-portfolio-block-item-cover-view';
+
+	/**
+	 * Class of the overlays painted on the picture.
+	 */
+	const OVERLAY_CLASS = 'wp-block-visual-portfolio-item-cover__overlay';
+
+	/**
+	 * The nine positions of the content, as core Cover names them.
+	 *
+	 * @var array
+	 */
+	private static $content_positions = array(
+		'top left'      => 'is-position-top-left',
+		'top center'    => 'is-position-top-center',
+		'top right'     => 'is-position-top-right',
+		'center left'   => 'is-position-center-left',
+		'center'        => 'is-position-center-center',
+		'center center' => 'is-position-center-center',
+		'center right'  => 'is-position-center-right',
+		'bottom left'   => 'is-position-bottom-left',
+		'bottom center' => 'is-position-bottom-center',
+		'bottom right'  => 'is-position-bottom-right',
+	);
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		add_action( 'init', array( $this, 'register_block' ), 11 );
+	}
+
+	/**
+	 * Register Block.
+	 */
+	public function register_block() {
+		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-item-cover', 'build/gutenberg/blocks/item-cover/style' );
+		wp_style_add_data( 'visual-portfolio-block-item-cover', 'rtl', 'replace' );
+
+		$view_module = 'build/gutenberg/blocks/item-cover/view';
+		$asset       = Visual_Portfolio_Assets::get_asset_file( $view_module, 'script' );
+
+		// Registered, never declared as `viewScriptModule`: metadata would enqueue
+		// it for every cover, and only the `fly` effect has anything to run.
+		wp_register_script_module(
+			self::VIEW_MODULE,
+			visual_portfolio()->plugin_url . $view_module . '.js',
+			$asset['dependencies'],
+			$asset['version']
+		);
+
+		register_block_type_from_metadata(
+			visual_portfolio()->plugin_path . 'gutenberg/blocks/item-cover',
+			array(
+				'render_callback' => array( $this, 'block_render' ),
+			)
+		);
+	}
+
+	/**
+	 * The image behind the content.
+	 *
+	 * Rendered the same way `item-image` renders its image, which is the one path
+	 * that carries srcset, `wp-image-{id}`, our lazy loading and the remote images
+	 * of the Pro sources.
+	 *
+	 * @param array $attributes - block attributes.
+	 * @param array $context    - block context.
+	 *
+	 * @return string
+	 */
+	private function get_image( $attributes, $context ) {
+		$scale = $attributes['backgroundSize'] ?? 'cover';
+		$scale = in_array( $scale, array( 'cover', 'contain', 'fill' ), true ) ? $scale : 'cover';
+
+		// An explicit focal point of this block wins over the one stored with the
+		// image: it is the setting the user just dragged, looking at this cover.
+		$focal_point = $attributes['focalPoint'] ?? null;
+
+		if ( ! isset( $focal_point['x'], $focal_point['y'] ) ) {
+			$focal_point = $context['vp/itemFocalPoint'] ?? null;
+		}
+
+		$styles = array( 'object-fit:' . $scale );
+
+		if ( isset( $focal_point['x'], $focal_point['y'] ) ) {
+			$styles[] = sprintf(
+				'object-position:%1$s%% %2$s%%',
+				100 * (float) $focal_point['x'],
+				100 * (float) $focal_point['y']
+			);
+		}
+
+		$img_attr = array_merge(
+			// How urgent this picture is, decided by the item template from where
+			// the item sits in the gallery.
+			is_array( $context['vp/itemImageLoading'] ?? null ) ? $context['vp/itemImageLoading'] : array(),
+			array(
+				'class' => 'wp-block-visual-portfolio-item-cover__image-background',
+				'style' => implode( ';', $styles ),
+			)
+		);
+
+		// Only a custom alt is passed on - without the attribute the attachment
+		// answers with its own, which is what an image without one should use.
+		if ( ! empty( $context['vp/itemImgAlt'] ) ) {
+			$img_attr['alt'] = $context['vp/itemImgAlt'];
+		}
+
+		$img_id = $context['vp/itemImgId'] ?? '';
+		$size   = $attributes['sizeSlug'] ?? 'large';
+		$image  = '';
+
+		if ( $img_id ) {
+			$image = Visual_Portfolio_Images::get_attachment_image( $img_id, $size, false, $img_attr );
+		}
+
+		// The global No Image fallback of the plugin settings.
+		if ( ! $image && ! empty( $context['vp/itemNoImgId'] ) ) {
+			$image = Visual_Portfolio_Images::get_attachment_image( $context['vp/itemNoImgId'], $size, false, $img_attr );
+		}
+
+		// The assets walker only knows about galleries of the legacy block, so the
+		// lazy loading scripts of this one are requested here.
+		if ( $image && Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' ) ) {
+			Visual_Portfolio_Assets::enqueue_lazyload_assets();
+		}
+
+		return $image;
+	}
+
+	/**
+	 * What a click on the cover does.
+	 *
+	 * A sibling that covers the whole cover, not a wrapper around it: the content
+	 * on top may hold links of its own, and an anchor inside an anchor is invalid
+	 * markup. Being focusable it is also what reveals the content of a hover
+	 * cover to a keyboard, through `:focus-within` - which is why a cover with no
+	 * click action still hides nothing from a keyboard, it simply has nothing to
+	 * hide behind.
+	 *
+	 * A popup trigger is the same anchor pointing at the full size image: with
+	 * no lightbox module a click opens the picture.
+	 *
+	 * @param array $attributes - block attributes.
+	 * @param array $context    - block context.
+	 *
+	 * @return string
+	 */
+	private function get_trigger( $attributes, $context ) {
+		$action = $attributes['clickAction'] ?? 'none';
+
+		// The anchor has no text of its own, so the label is not optional.
+		$aria_label = $context['vp/itemAriaLabel'] ?? '';
+
+		if ( 'url' === $action && ! empty( $context['vp/itemUrl'] ) ) {
+			return sprintf(
+				'<a class="wp-block-visual-portfolio-item-cover__link" href="%1$s" target="%2$s"%3$s aria-label="%4$s"></a>',
+				esc_url( $context['vp/itemUrl'] ),
+				esc_attr( $attributes['linkTarget'] ?? '_self' ),
+				empty( $attributes['rel'] ) ? '' : ' rel="' . esc_attr( $attributes['rel'] ) . '"',
+				esc_attr( $aria_label )
+			);
+		}
+
+		if ( 'popup' !== $action ) {
+			return '';
+		}
+
+		$trigger = Visual_Portfolio_Popup::get_trigger_attributes( $context );
+
+		// An item the lightbox has nothing to show - a Pro source that refused
+		// it, an image that no longer exists - is not made clickable.
+		if ( empty( $trigger ) ) {
+			return '';
+		}
+
+		return sprintf(
+			'<a class="wp-block-visual-portfolio-item-cover__link" href="%1$s" data-vp-popup="%2$s" aria-label="%3$s"></a>',
+			esc_url( $trigger['href'] ),
+			esc_attr( $trigger['data-vp-popup'] ),
+			esc_attr( $aria_label )
+		);
+	}
+
+	/**
+	 * The proportions of a rendered image.
+	 *
+	 * Read back off the tag rather than looked up: it is the one place every
+	 * image path meets, including the remote images the Pro sources render
+	 * through `vpf_wp_get_attachment_image`, which no attachment lookup knows.
+	 *
+	 * @param string $image - rendered image tag.
+	 *
+	 * @return string Ratio as `width/height`, or an empty string.
+	 */
+	private function get_image_ratio( $image ) {
+		if ( ! $image ) {
+			return '';
+		}
+
+		$processor = new WP_HTML_Tag_Processor( $image );
+
+		if ( ! $processor->next_tag( 'img' ) ) {
+			return '';
+		}
+
+		$width  = (int) $processor->get_attribute( 'width' );
+		$height = (int) $processor->get_attribute( 'height' );
+
+		return $width > 0 && $height > 0 ? $width . '/' . $height : '';
+	}
+
+	/**
+	 * Attributes of the cover itself.
+	 *
+	 * @param array  $attributes   - block attributes.
+	 * @param string $effect       - resolved effect.
+	 * @param string $show_content - resolved reveal mode.
+	 * @param string $aspect_ratio - resolved aspect ratio, already sanitized.
+	 * @param bool   $has_link     - whether the cover rendered its link.
+	 *
+	 * @return array
+	 */
+	private function get_wrapper_attributes( $attributes, $effect, $show_content, $aspect_ratio, $has_link ) {
+		$classes = array(
+			'vp-effect-' . $effect,
+			'vp-show-content-' . $show_content,
+		);
+
+		if ( $has_link ) {
+			$classes[] = 'vp-has-link';
+		}
+
+		$position = $attributes['contentPosition'] ?? 'center';
+
+		if ( isset( self::$content_positions[ $position ] ) ) {
+			$classes[] = self::$content_positions[ $position ];
+		}
+
+		$styles = array();
+
+		// A raw CSS length typed in the editor, printed into an inline style -
+		// keep it to what a length can be made of.
+		$min_height = preg_replace( '/[^0-9a-z.%\-]/i', '', (string) ( $attributes['minHeight'] ?? '' ) );
+
+		if ( '' !== $min_height ) {
+			$styles[] = 'min-height:' . $min_height;
+		}
+
+		// The ratio travels as a variable, and the stylesheet is what turns it
+		// into the property. An inline `aspect-ratio` would outweigh every rule
+		// there is, and a stylesheet that lays the card out as a column has to
+		// be able to hand the ratio to the picture instead.
+		if ( '' !== $aspect_ratio ) {
+			$styles[] = '--vp-cover-aspect-ratio:' . $aspect_ratio;
+		}
+
+		$wrapper = array(
+			// `get_block_wrapper_attributes()` escapes the values itself.
+			'class' => implode( ' ', $classes ),
+			'style' => implode( ';', $styles ),
+		);
+
+		// A panel that is always there has no edge to come in from.
+		if ( 'fly' !== $effect || 'always' === $show_content ) {
+			return $wrapper;
+		}
+
+		// The stylesheet parks the panel at the foot of the card; the module
+		// takes over from the first time the pointer names an edge. Where it
+		// never arrives - blocked, failed or JavaScript off - the panel keeps
+		// coming from the foot, which is the fade the legacy gallery falls back
+		// to as well.
+		$wrapper['data-wp-interactive'] = self::STORE;
+
+		// Not the async variants: the panel has to be seated on the side the
+		// pointer crossed in the same frame it enters, or the first transition
+		// runs from wherever the panel was left.
+		$wrapper['data-wp-on--mouseenter'] = 'actions.flyPanel';
+		$wrapper['data-wp-on--mouseleave'] = 'actions.flyPanel';
+
+		return $wrapper;
+	}
+
+	/**
+	 * Block output
+	 *
+	 * @param array    $attributes - block attributes.
+	 * @param string   $content - block content.
+	 * @param WP_Block $block - block instance.
+	 *
+	 * @return string
+	 */
+	public function block_render( $attributes, $content, $block ) {
+		$context = $block->context;
+
+		$effect = $attributes['effect'] ?? 'fade';
+		$effect = in_array( $effect, array( 'none', 'fade', 'fly', 'emerge' ), true ) ? $effect : 'fade';
+
+		// The three states the legacy gallery offers, under the names it uses:
+		// hover state only, default state only, always.
+		$show_content = $attributes['showContent'] ?? 'hover';
+		$show_content = in_array( $show_content, array( 'always', 'hover', 'default' ), true ) ? $show_content : 'hover';
+
+		// A panel that is always there has no edge to come in from.
+		if ( 'fly' === $effect && 'always' !== $show_content ) {
+			wp_enqueue_script_module( self::VIEW_MODULE );
+		}
+
+		$image = $this->get_image( $attributes, $context );
+
+		$aspect_ratio = trim( preg_replace( '#[^0-9./ ]#', '', (string) ( $attributes['aspectRatio'] ?? '' ) ) );
+
+		// A cover with no ratio of its own takes the one of its image, so the box
+		// is exactly the picture - which is what a masonry column is made of. The
+		// grid patterns set a ratio and get their even rows instead.
+		if ( '' === $aspect_ratio ) {
+			$aspect_ratio = $this->get_image_ratio( $image );
+		}
+
+		$media = $image;
+
+		$media .= visual_portfolio_get_item_overlay(
+			self::OVERLAY_CLASS,
+			array(
+				'dimRatio'       => $attributes['dimRatio'] ?? 0,
+				'color'          => $attributes['overlayColor'] ?? '',
+				'customColor'    => $attributes['customOverlayColor'] ?? '',
+				'gradient'       => $attributes['gradient'] ?? '',
+				'customGradient' => $attributes['customGradient'] ?? '',
+			)
+		);
+
+		$hover_overlay = visual_portfolio_get_item_overlay(
+			self::OVERLAY_CLASS,
+			array(
+				'dimRatio'       => $attributes['hoverDimRatio'] ?? 0,
+				'color'          => $attributes['hoverOverlayColor'] ?? '',
+				'customColor'    => $attributes['customHoverOverlayColor'] ?? '',
+				'gradient'       => $attributes['hoverGradient'] ?? '',
+				'customGradient' => $attributes['customHoverGradient'] ?? '',
+			),
+			true
+		);
+
+		// The picture and everything painted on it are one box, so a stylesheet
+		// that moves the content out from under the overlays can shape and stop
+		// them both at once.
+		$output = sprintf(
+			'<div class="wp-block-visual-portfolio-item-cover__media">%s</div>',
+			$media
+		);
+
+		// The panel: the hover overlay and the blocks on it, in one box. The
+		// overlay is the background of the panel and never a box of its own, so
+		// that a state moves the two of them together.
+		// The gap belongs to the box that holds the blocks, never to the card
+		// around it: block spacing reaches CSS through the layout support,
+		// which core's Cover block has and this one does not.
+		$gap = visual_portfolio_get_block_gap( $attributes['style']['spacing']['blockGap'] ?? '' );
+
+		$panel_styles = array();
+
+		if ( '' !== $gap ) {
+			$panel_styles[] = 'gap:' . $gap;
+		}
+
+		// Padding is skipped by the block supports and applied here instead, for
+		// the same reason: it belongs to the box the blocks sit in. Left on the
+		// card it could only be added to the panel's own, and it would inset the
+		// overlay with it, leaving an unshaded frame around the picture.
+		$padding = wp_style_engine_get_styles(
+			array( 'spacing' => array( 'padding' => $attributes['style']['spacing']['padding'] ?? null ) )
+		);
+
+		if ( ! empty( $padding['css'] ) ) {
+			$panel_styles[] = $padding['css'];
+		}
+
+		$output .= sprintf(
+			'<div class="wp-block-visual-portfolio-item-cover__inner"%1$s>%2$s</div>',
+			empty( $panel_styles ) ? '' : ' style="' . esc_attr( implode( ';', $panel_styles ) ) . '"',
+			// The overlay last, so that the blocks keep the places the
+			// staggering counts.
+			$content . $hover_overlay
+		);
+
+		$link    = $this->get_trigger( $attributes, $context );
+		$output .= $link;
+
+		return sprintf(
+			'<div %1$s>%2$s</div>',
+			get_block_wrapper_attributes( $this->get_wrapper_attributes( $attributes, $effect, $show_content, $aspect_ratio, '' !== $link ) ),
+			$output
+		);
+	}
+}
+new Visual_Portfolio_Block_Item_Cover();

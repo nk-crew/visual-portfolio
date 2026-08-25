@@ -5,6 +5,7 @@ const path = require('path');
 
 const cssnano = require('cssnano');
 const glob = require('glob');
+const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin');
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
@@ -29,12 +30,27 @@ const JS_ENTRY_PATTERNS = [
 	'./gutenberg/layouts-editor.js',
 ];
 
+// Interactivity API stores are ES modules, and webpack emits one format per
+// compilation - these entries build in a second, module-output one.
+//
+// Listed one by one rather than globbed: `JS_ENTRY_PATTERNS` already sweeps up
+// every `view.js` as a classic script, and a block that wants a module has to
+// say so here. Miss the line and the file still builds - as a classic script
+// `wp_register_script_module()` cannot load.
+const JS_MODULE_ENTRY_PATTERNS = [
+	'./gutenberg/blocks/loop/view.js',
+	'./gutenberg/blocks/item-cover/view.js',
+	'./gutenberg/blocks/item-template/view.js',
+	'./gutenberg/popup/view.js',
+];
+
 const CSS_ENTRY_PATTERNS = [
 	'./assets/css/**/*.scss',
 	'./assets/admin/css/**/*.scss',
 	'./templates/**/style.scss',
 	'./gutenberg/blocks/**/style.scss',
 	'./gutenberg/blocks/**/editor.scss',
+	'./gutenberg/popup/style.scss',
 ];
 
 const WATCH_IGNORED = [
@@ -133,6 +149,30 @@ const vendorFiles = [
 		source: 'node_modules/photoswipe/dist/default-skin/preloader.gif',
 		destination: 'assets/vendor/photoswipe/dist/default-skin/preloader.gif',
 	},
+	// PhotoSwipe 5 is the lightbox of the Gallery Loop family, and lives beside
+	// the 4 above rather than replacing it: that one belongs to the legacy
+	// gallery, is loaded as a classic script and is driven by jQuery.
+	{
+		source: 'node_modules/photoswipe-5/dist/photoswipe.esm.min.js',
+		destination: 'assets/vendor/photoswipe-5/photoswipe.esm.min.js',
+	},
+	{
+		source: 'node_modules/photoswipe-5/dist/photoswipe.css',
+		destination: 'assets/vendor/photoswipe-5/photoswipe.css',
+	},
+	// Blossom drives the carousel of the Gallery Loop family. The module is
+	// imported by address at run time rather than bundled, so the file has to
+	// exist under `assets/` - and its stylesheet is what hides the scrollbar.
+	{
+		source: 'node_modules/@blossom-carousel/core/dist/blossom-carousel-core.js',
+		destination:
+			'assets/vendor/blossom-carousel/dist/blossom-carousel-core.js',
+	},
+	{
+		source: 'node_modules/@blossom-carousel/core/dist/blossom-carousel-core.css',
+		destination:
+			'assets/vendor/blossom-carousel/dist/blossom-carousel-core.css',
+	},
 	{
 		source: 'node_modules/simplebar/dist/simplebar.min.js',
 		destination: 'assets/vendor/simplebar/dist/simplebar.min.js',
@@ -181,8 +221,10 @@ function createEntries(patterns, extension, shouldInclude = () => true) {
 	}, {});
 }
 
-function shouldIncludeScssEntry(entry) {
-	return !path.basename(entry).startsWith('_');
+// A leading underscore marks a file that is imported rather than served: SCSS
+// partials, and the JavaScript one bundle shares with another.
+function isPartial(entry) {
+	return path.basename(entry).startsWith('_');
 }
 
 function isSvgRule(rule) {
@@ -288,6 +330,51 @@ function patchPostCssLoaderOptions(rules) {
 								}),
 							],
 						},
+					},
+				};
+			}),
+		};
+	});
+}
+
+function retargetBabelForModules(rules) {
+	// A script module is only ever fetched by a browser that supports
+	// `<script type="module">`, and the project Babel config targets far below
+	// that. Down there generators become regenerator calls, which the
+	// Interactivity API rejects - it dispatches actions by recognising a real
+	// `GeneratorFunction`.
+	return rules.map((rule) => {
+		if (!Array.isArray(rule.use)) {
+			return rule;
+		}
+
+		return {
+			...rule,
+			use: rule.use.map((loader) => {
+				if (
+					'string' === typeof loader ||
+					!loader.loader ||
+					!loader.loader.includes('babel-loader')
+				) {
+					return loader;
+				}
+
+				return {
+					...loader,
+					options: {
+						...loader.options,
+						babelrc: false,
+						configFile: false,
+						presets: [
+							[
+								require.resolve('@babel/preset-env'),
+								{
+									bugfixes: true,
+									modules: false,
+									targets: { esmodules: true },
+								},
+							],
+						],
 					},
 				};
 			}),
@@ -519,12 +606,33 @@ class WrapLongMinifiedLinesPlugin {
 	}
 }
 
-const entryAssetsJs = createEntries(JS_ENTRY_PATTERNS, '.js');
+const entryAssetsJsModule = createEntries(JS_MODULE_ENTRY_PATTERNS, '.js');
+const moduleEntryNames = Object.keys(entryAssetsJsModule);
+
+const entryAssetsJs = createEntries(
+	JS_ENTRY_PATTERNS,
+	'.js',
+	(entry) =>
+		!isPartial(entry) &&
+		!moduleEntryNames.includes(entry.slice(0, -'.js'.length))
+);
 const entryAssetsCss = createEntries(
 	CSS_ENTRY_PATTERNS,
 	'.scss',
-	shouldIncludeScssEntry
+	(entry) => !isPartial(entry)
 );
+
+// Both compilations write into `build/`, so the one that cleans it has to leave
+// the other one's output alone - and only that, so a source map left behind by
+// a watch build is still swept up.
+const moduleOutputFiles = moduleEntryNames.flatMap((name) => [
+	`${name}.js`,
+	`${name}.asset.php`,
+]);
+
+function shouldKeepOnClean(asset) {
+	return /^(fonts|images)\//.test(asset) || moduleOutputFiles.includes(asset);
+}
 
 const defaultRules = patchPostCssLoaderOptions(
 	disableCssLoaderUrls(defaultConfig.module.rules)
@@ -540,6 +648,12 @@ const newConfig = {
 	entry: {
 		...entryAssetsJs,
 		...entryAssetsCss,
+	},
+	output: {
+		...defaultConfig.output,
+		clean: {
+			keep: shouldKeepOnClean,
+		},
 	},
 	infrastructureLogging: isQuietBuild
 		? {
@@ -670,4 +784,54 @@ if (!isProduction) {
 	newConfig.optimization.runtimeChunk = 'single';
 }
 
-module.exports = newConfig;
+const moduleConfig = {
+	...defaultConfig,
+	entry: entryAssetsJsModule,
+	experiments: {
+		...defaultConfig.experiments,
+		outputModule: true,
+	},
+	output: {
+		...defaultConfig.output,
+		module: true,
+		chunkFormat: 'module',
+		environment: {
+			...defaultConfig.output.environment,
+			module: true,
+		},
+		library: {
+			...defaultConfig.output.library,
+			type: 'module',
+		},
+		// The script compilation cleans `build/`, see `shouldKeepOnClean()`.
+		clean: false,
+	},
+	infrastructureLogging: newConfig.infrastructureLogging,
+	stats: 'minimal',
+	performance: {
+		assetFilter: shouldIgnorePerformanceHint,
+	},
+	module: {
+		...defaultConfig.module,
+		rules: retargetBabelForModules(defaultRules),
+	},
+	// A fresh extraction plugin instead of the shared one: it reads the output
+	// format from the compiler it is applied to, so the script compilation's
+	// instance would externalize `@wordpress/*` as globals instead of imports.
+	plugins: [new DependencyExtractionWebpackPlugin()],
+	ignoreWarnings: isQuietBuild ? [shouldIgnoreQuietWarning] : undefined,
+	watchOptions: {
+		ignored: WATCH_IGNORED,
+	},
+	optimization: {
+		...defaultConfig.optimization,
+		...(isProduction ? { minimizer: createProductionMinimizers() } : {}),
+		// A script module cannot import a shared webpack runtime chunk.
+		runtimeChunk: false,
+	},
+	// Keeps the dev server from injecting its classic client entry and the HMR
+	// plugin into a module build; watching and rebuilding still happen.
+	devServer: false,
+};
+
+module.exports = [newConfig, moduleConfig];

@@ -13,7 +13,6 @@ import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
-import { convertModernToLegacy } from '../../utils/convert-legacy-attributes';
 
 const {
 	VPAdminGutenbergVariables: variables,
@@ -118,7 +117,16 @@ class IframePreview extends Component {
 		);
 
 		self.frameRef.current.addEventListener('load', self.onFrameLoad);
-		window.addEventListener('resize', self.maybeResizePreviewsThrottle);
+
+		// The block renders inside the editor canvas, and WordPress iframes that
+		// canvas - always, as of 7.1. Only the canvas window is told when it
+		// resizes, which is what the preview follows: opening the sidebar or
+		// switching the device preview never reaches the outer window.
+		self.previewWindow = self.getPreviewDocument().defaultView || window;
+		self.previewWindow.addEventListener(
+			'resize',
+			self.maybeResizePreviewsThrottle
+		);
 
 		self.maybeReload();
 	}
@@ -135,7 +143,10 @@ class IframePreview extends Component {
 		}
 
 		this.frameRef.current.removeEventListener('load', this.onFrameLoad);
-		window.removeEventListener('resize', this.maybeResizePreviewsThrottle);
+		(this.previewWindow || window).removeEventListener(
+			'resize',
+			this.maybeResizePreviewsThrottle
+		);
 
 		if (this.frameRef.current.iframeResizer) {
 			this.frameRef.current.iframeResizer.close();
@@ -186,32 +197,8 @@ class IframePreview extends Component {
 
 		const frame = this.frameRef.current;
 
-		const newContext = this.props.context
-			? Object.fromEntries(
-					Object.entries(this.props.context).map(([key, value]) => [
-						key.replace('vp/', ''),
-						value,
-					])
-				)
-			: {};
-		const oldContext = prevProps.context
-			? Object.fromEntries(
-					Object.entries(prevProps.context).map(([key, value]) => [
-						key.replace('vp/', ''),
-						value,
-					])
-				)
-			: {};
-
-		const newAttributes = {
-			...this.props.attributes,
-			...convertModernToLegacy(newContext),
-		};
-
-		const oldAttributes = {
-			...prevProps.attributes,
-			...convertModernToLegacy(oldContext),
-		};
+		const newAttributes = this.props.attributes;
+		const oldAttributes = prevProps.attributes;
 
 		const changedAttributes = {};
 		const changedAttributeKeys = getUpdatedKeys(
@@ -331,11 +318,25 @@ class IframePreview extends Component {
 	}
 
 	/**
+	 * Document this preview is rendered in.
+	 *
+	 * The editor canvas is a document of its own, so the editor wrapper the
+	 * preview measures itself against is not in the top-level one.
+	 *
+	 * @return {Document} owner document of the preview, the top-level one until
+	 *                    the frame is mounted.
+	 */
+	getPreviewDocument() {
+		return this.frameRef.current?.ownerDocument || document;
+	}
+
+	/**
 	 * Resize frame to properly work with @media.
 	 */
 	maybeResizePreviews() {
 		const contentWidth = $(
-			'.editor-styles-wrapper, .edit-post-visual-editor__content-area'
+			'.editor-styles-wrapper, .edit-post-visual-editor__content-area',
+			this.getPreviewDocument()
 		)
 			.eq(0)
 			.width();
@@ -413,36 +414,13 @@ class IframePreview extends Component {
 	}
 
 	render() {
-		const { postType, postId, context } = this.props;
+		const { postType, postId } = this.props;
 
 		const { loading, uniqueId, currentIframeHeight, latestIframeHeight } =
 			this.state;
 
-		// Collect all data into a single object, prioritizing context values
 		const formData = {};
-		let contextAttributes = {};
-
-		if (context) {
-			// Then override with context values (they take priority)
-			Object.entries(context).forEach(([key, value]) => {
-				if (key.startsWith('vp/')) {
-					const formKey = `vp_${key.replace('vp/', '')}`;
-					formData[formKey] = value;
-				}
-			});
-
-			contextAttributes = Object.fromEntries(
-				Object.entries(this.props.context).map(([key, value]) => [
-					key.replace('vp/', ''),
-					value,
-				])
-			);
-		}
-
-		const attributes = {
-			...this.props.attributes,
-			...convertModernToLegacy(contextAttributes),
-		};
+		const attributes = this.props.attributes;
 
 		const { id, content_source: contentSource } = attributes;
 

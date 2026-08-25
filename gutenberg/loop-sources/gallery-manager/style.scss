@@ -1,0 +1,262 @@
+.vpf-gallery-manager__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.vpf-gallery-manager__item {
+	position: relative;
+	aspect-ratio: 1;
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+
+	// A hairline that follows the rounded corner and sits above the image,
+	// which is what keeps a white photo from bleeding into the panel.
+	&::after {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		content: "";
+		border-radius: 5px;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+	}
+
+	&.is-dragging {
+		z-index: 2;
+		opacity: 0.6;
+	}
+}
+
+.components-button.vpf-gallery-manager__preview {
+	display: block;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	overflow: hidden;
+	border-radius: 5px;
+
+	img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.vpf-gallery-manager__preview-empty {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		135deg,
+		transparent 45%,
+		var(--wp-components-color-gray-300, #ddd) 45%,
+		var(--wp-components-color-gray-300, #ddd) 55%,
+		transparent 55%
+	);
+}
+
+.vpf-gallery-manager__item-actions {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	left: 4px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 20px;
+	color: #272727;
+	pointer-events: none;
+	background-color: #fff;
+	border-radius: 3px;
+	box-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+	opacity: 0;
+	transition: 0.2s opacity;
+
+	// Pointer users get the controls on hover; everyone else on focus. They stay
+	// in the tab order either way, so the gallery is operable from the keyboard -
+	// and while they are invisible they take no clicks, which would otherwise
+	// land on a remove button the user cannot see.
+	.vpf-gallery-manager__item:hover &,
+	&:focus-within {
+		pointer-events: auto;
+		opacity: 1;
+	}
+
+	// Sized against the 20px bar, over the button's own small-size rules.
+	.components-button.has-icon {
+		min-width: 20px;
+		width: 20px;
+		height: 20px;
+		padding: 2px;
+		color: inherit;
+
+		svg {
+			width: 16px;
+			height: 16px;
+			fill: currentcolor;
+		}
+	}
+
+	.vpf-gallery-manager__remove {
+		&:hover:not(:disabled),
+		&:focus:not(:disabled) {
+			color: #d51515;
+		}
+	}
+}
+
+.vpf-gallery-manager__drag {
+	cursor: grab;
+}
+
+.components-button.vpf-gallery-manager__add {
+	grid-column: 1 / -1;
+	justify-content: center;
+	height: 36px;
+	border: 1px solid var(--wp-components-color-foreground, #1e1e1e);
+	border-radius: 2px;
+}
+
+.vpf-gallery-manager__count {
+	display: block;
+	margin-bottom: 16px;
+	font-size: 12px;
+	color: var(--wp-components-color-gray-700, #757575);
+	text-align: center;
+}
+
+.vpf-gallery-manager__placeholder {
+	margin-bottom: 16px;
+}
+
+.vpf-gallery-manager-modal {
+	// The legacy media settings width, kept off the frame's own size classes so
+	// the modal still shrinks with the viewport.
+	width: min(828px, calc(100vw - 32px));
+	max-width: 828px;
+
+	.components-modal__header-heading {
+		width: 100%;
+	}
+
+	// The collapsible section is the legacy gallery control's, and so are its
+	// class names - only its styles live over there, under another modal.
+	.vpf-component-gallery-control-collapsible-section-toggle {
+		display: flex;
+		align-items: center;
+		height: 14px;
+		padding: 0;
+		font-weight: 450;
+		color: #7d7d7d;
+		text-decoration: none;
+		background: transparent;
+
+		.components-panel__arrow {
+			width: 20px;
+			height: 20px;
+			margin-left: 2px;
+			transition: transform 0.15s ease;
+		}
+
+		&[aria-expanded="true"] .components-panel__arrow {
+			transform: rotate(180deg);
+		}
+	}
+
+	.vpf-component-gallery-control-collapsible-section-content {
+		margin-top: 16px;
+	}
+}
+
+.vpf-gallery-manager-modal__title {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+.vpf-gallery-manager-modal__nav {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	margin-left: auto;
+	font-size: 12px;
+	font-weight: 400;
+	color: var(--wp-components-color-gray-700, #757575);
+
+	.components-button:disabled {
+		opacity: 0.45;
+	}
+}
+
+.vpf-gallery-manager-modal__body {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.vpf-gallery-manager-modal__media {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	min-width: 0;
+
+	:where(img, video, iframe) {
+		width: 100%;
+	}
+}
+
+.vpf-gallery-manager-modal__media-info {
+	font-size: 12px;
+	color: var(--wp-components-color-gray-700, #757575);
+	word-wrap: break-word;
+
+	p {
+		margin: 0 0 6px;
+	}
+
+	ul {
+		margin: 8px 0 0;
+	}
+}
+
+.vpf-gallery-manager-modal__fields {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 16px 20px;
+	min-width: 0;
+
+	> * {
+		min-width: 0;
+	}
+}
+
+@media screen and (min-width: 600px) {
+	.vpf-gallery-manager-modal__body {
+		flex-direction: row;
+		gap: 30px;
+		align-items: flex-start;
+	}
+
+	.vpf-gallery-manager-modal__media {
+		flex: 0 0 233px;
+		width: 233px;
+	}
+
+	.vpf-gallery-manager-modal__fields {
+		flex: 1;
+	}
+}
+
+@media screen and (min-width: 782px) {
+	.vpf-gallery-manager-modal__fields {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.vpf-gallery-manager-modal__field-full {
+		grid-column: 1 / -1;
+	}
+}

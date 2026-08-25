@@ -56,7 +56,14 @@ jobs:
         run: |
           npx playwright install --with-deps chromium
 
+      # The Gallery Loop family registers on WordPress 7.1 and above, so the
+      # end-to-end suite has to meet a build that carries it. `.wp-env.json`
+      # pins the branch for local work; naming it here as well keeps the two
+      # from drifting apart silently, and is the line to change once 7.1 is
+      # released and `WordPress/WordPress` carries the family on its own.
       - name: Install WordPress and start the server
+        env:
+          WP_ENV_CORE: WordPress/WordPress#7.1-branch
         run: |
           npm run wp-env start
 

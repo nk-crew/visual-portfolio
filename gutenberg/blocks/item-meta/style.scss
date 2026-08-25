@@ -1,0 +1,32 @@
+// Item meta block.
+.wp-block-visual-portfolio-item-meta {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	// The icon and the value are one inline run, so `text-align` on the block
+	// still places them.
+	> a,
+	> span {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5ch;
+	}
+
+	svg {
+		width: 1em;
+		height: 1em;
+		flex-shrink: 0;
+	}
+
+	// A single inline run - the theme's link typography would make it stand out
+	// from the rest of the item meta.
+	:where(a) {
+		font-family: inherit;
+		font-size: inherit;
+		font-style: inherit;
+		font-weight: inherit;
+		letter-spacing: inherit;
+		line-height: inherit;
+		text-decoration: inherit;
+	}
+}

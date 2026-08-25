@@ -1,0 +1,771 @@
+// Columns and gap are a public contract: the server prints the variables on the
+// list and a theme overrides a gallery by redeclaring them, without touching
+// the markup.
+//
+// Columns come in the two shapes the core grid layout offers. A count, in
+// `--vp-layout-columns`. Or a minimum width, in `--vp-layout-min-column-width`,
+// with `vp-layout-auto-columns` on the list - then the container decides how
+// many fit, and `--vp-layout-columns` is the most it may reach. Either way what
+// a layout is finally drawn with is `--vp-layout-current-columns`, and a named
+// count is capped there as the screen narrows.
+$item: ".wp-block-visual-portfolio-item-template__item";
+
+// The two boxes a carousel effect is drawn on. They are rendered inside the
+// item and only for an effect - the item itself stays the box the browser snaps
+// to and the module measures, so a card that turns never moves the slide it
+// belongs to.
+$slide: ".wp-block-visual-portfolio-item-template__slide";
+$card: ".wp-block-visual-portfolio-item-template__card";
+
+// The alpha ramp of the edge fade. A straight gradient reads as a grey band
+// with a shoulder at each end; these are the stops of an ease-in-out, which is
+// what makes the picture look like it is dissolving rather than dimming. Each
+// entry is an alpha and how far through the ramp it sits.
+$edge-ramp: (0 0, 0.013 0.081, 0.049 0.155, 0.104 0.225, 0.175 0.29, 0.259 0.353, 0.352 0.412, 0.45 0.471, 0.55 0.529, 0.648 0.588, 0.741 0.647, 0.825 0.71, 0.896 0.775, 0.951 0.845, 0.987 0.919, 1 1);
+
+// The stops of a mask that fades a box in over `$start` and out over `$end`.
+//
+// One gradient rather than a ramp layer at each edge and a solid one between
+// them: a mask layer is placed with `mask-position`, whose percentages are a
+// fraction of the room the layer has left to move in rather than a distance
+// from the edge, so the solid middle landed short of where it was asked for and
+// left a transparent band before the far ramp.
+//
+// A width of zero collapses that side's stops onto one another, which is a mask
+// that is opaque from the edge - the side the carousel has run out of, drawn
+// with nothing to hint at.
+@function vp-edge-stops($start, $end) {
+	$stops: ();
+
+	@each $stop in $edge-ramp {
+		$alpha: nth($stop, 1);
+
+		$stops: append($stops, rgba(0, 0, 0, $alpha) calc(#{$start} * #{nth($stop, 2)}), comma);
+	}
+
+	// Backwards, so the far ramp is written in the order a gradient reads.
+	@for $index from length($edge-ramp) through 1 {
+		$stop: nth($edge-ramp, $index);
+		$alpha: nth($stop, 1);
+
+		$stops: append($stops, rgba(0, 0, 0, $alpha) calc(100% - #{$end} * #{nth($stop, 2)}), comma);
+	}
+
+	@return $stops;
+}
+
+// How far a named column count may go at each of the plugin's breakpoints, the
+// ones `Visual_Portfolio_Breakpoints` carries. Widest first: on a phone every
+// step matches and the last one wins.
+$narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
+
+// Registered so that the count stays a number. The steps cap it with `min()`,
+// and an unregistered custom property hands that straight back to
+// `getComputedStyle()` as the text it was written as - which is where the
+// editor's masonry reads its column count from.
+@property --vp-layout-current-columns {
+	syntax: "<integer>";
+	inherits: true;
+	initial-value: 3;
+}
+
+// How much of each edge the fade covers. Named by the side of the screen rather
+// than by the end of the carousel, because a mask is placed by the side of the
+// screen; the module answers for which of them is the far end on a right to
+// left page. Registered so the module can take one side off - the end the
+// carousel has already reached has nothing left to hint at - and have the
+// change travel rather than jump.
+@property --vp-carousel-fade-left {
+	syntax: "<length-percentage>";
+	inherits: true;
+	initial-value: 0%;
+}
+
+@property --vp-carousel-fade-right {
+	syntax: "<length-percentage>";
+	inherits: true;
+	initial-value: 0%;
+}
+
+// The place of an item in the list, printed by the server. A stacking effect
+// deals the items into a pile, and the pile has to know which card is which.
+@property --vp-slide-index {
+	syntax: "<integer>";
+	inherits: true;
+	initial-value: 0;
+}
+
+// The layout Masonry positions by hand. Item widths come from here - Masonry
+// reads them, it does not calculate them. The gap is declared as `column-gap`
+// for the same reason: it does nothing to a block container, it is where the
+// script module reads the gutter from.
+@mixin masonry-script {
+	position: relative;
+	column-gap: var(--vp-layout-gap, 1.5rem);
+
+	> #{$item} {
+		width: calc((100% - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
+		margin-bottom: var(--vp-layout-gap, 1.5rem);
+	}
+}
+
+// The same layout as far as a browser with no Grid Lanes can pack it on its
+// own. Multi-column measures nothing and needs nobody: an item is as tall as it
+// is, and the browser fills each column before starting the next.
+//
+// What it costs is the reading order. A column is read top to bottom, so the
+// items run down the first one and continue at the top of the second, where the
+// script keeps them in source order across each row. That is the trade for a
+// gallery that is a gallery before - and without - the script.
+@mixin masonry-columns {
+	column-count: var(--vp-layout-current-columns);
+	column-gap: var(--vp-layout-gap, 1.5rem);
+
+	// A count and a width together are the cap and the minimum of the same
+	// question: as many columns as fit, and never more than the count.
+	&.vp-layout-auto-columns {
+		column-width: var(--vp-layout-min-column-width, 16rem);
+	}
+
+	> #{$item} {
+		width: auto;
+		margin-bottom: var(--vp-layout-gap, 1.5rem);
+		break-inside: avoid;
+	}
+}
+
+// The same layout, with the browser doing the packing. Applied wherever Grid
+// Lanes exists - to a page whose script never arrived through `@supports`, and
+// by class the moment the module confirms the support itself.
+@mixin masonry-lanes {
+	display: grid-lanes;
+	grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
+	gap: var(--vp-layout-gap, 1.5rem);
+
+	&.vp-layout-auto-columns {
+		grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
+	}
+
+	> #{$item} {
+		width: auto;
+		margin-bottom: 0;
+	}
+}
+
+.wp-block-visual-portfolio-item-template {
+	--vp-layout-current-columns: var(--vp-layout-columns, 3);
+	--vp-layout-auto-placement: auto-fill;
+
+	padding: 0;
+	margin: 0;
+	list-style: none;
+
+	// Rows that cannot be filled collapse their empty tracks instead of
+	// keeping them - the "fill available space" of the core grid.
+	&.vp-layout-auto-fit {
+		--vp-layout-auto-placement: auto-fit;
+	}
+
+	// A named count steps down as the screen narrows rather than holding on:
+	// four columns at 375px are unreadable, and the legacy gallery has always
+	// stacked them. Capping walks the same ladder that one walked for up to
+	// five columns and takes one step more at six, so a phone gets a single
+	// column whatever the desktop was set to. Auto mode is left out - fitting
+	// the container is already what it does.
+	&:not(.vp-layout-auto-columns) {
+		@each $width, $columns in $narrow-steps {
+			@media (max-width: $width) {
+				--vp-layout-current-columns: min(var(--vp-layout-columns, 3), #{$columns});
+			}
+		}
+	}
+
+	&.vp-layout-grid {
+		display: grid;
+		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
+		gap: var(--vp-layout-gap, 1.5rem);
+	}
+
+	// A grid in auto mode needs no script: the browser fits as many tracks as
+	// the container holds. Masonry and the carousel cannot say it in CSS, and
+	// have their count written onto the list by the layout module instead.
+	&.vp-layout-grid.vp-layout-auto-columns {
+		container-type: inline-size;
+		grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
+	}
+
+	&.vp-layout-masonry {
+		@include masonry-script;
+
+		// Until Masonry has placed the items there is nothing placing them:
+		// with JavaScript off, and on a page whose `masonry` handle was
+		// deferred, for as long as that takes. The class is written by the loop
+		// module when it starts Masonry, not by hydration, so the columns hold
+		// until the script really has the list.
+		//
+		// Only where the browser cannot pack the items itself - where it can,
+		// the rule below is already the whole layout, script or no script.
+		@supports not (display: grid-lanes) {
+			&:not(.vp-has-masonry) {
+				@include masonry-columns;
+			}
+		}
+
+		@supports (display: grid-lanes) {
+			@include masonry-lanes;
+		}
+	}
+
+	// Set by the module, and only where it found `display: grid-lanes`. It also
+	// takes `vp-layout-masonry` off the list, which is what stops the family
+	// store from starting the script the browser has made unnecessary.
+	&.vp-layout-masonry-native {
+		@include masonry-lanes;
+	}
+
+	// The width and the height of every tile come from the pattern rules the
+	// tiles parser writes next to the list, and the two numbers stay apart so
+	// the rules below can clamp the width and let the height follow. Dense
+	// packing is what lets a short tile fall into the hole a tall neighbour
+	// left, which is the whole look.
+	//
+	// A tile is as tall as its notation says, measured against the width of a
+	// column - not as tall as the blocks inside it happen to be, which is what
+	// makes a pattern hold its shape whatever is put in it. The list is the
+	// query container, so `100cqw` is its own width and nothing here has to know
+	// how wide the page is. Where the height cannot be resolved the tiles keep
+	// their places in the pattern and take their heights from their content.
+	&.vp-layout-tiles {
+		display: grid;
+		container-type: inline-size;
+		grid-auto-flow: row dense;
+		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
+		gap: var(--vp-layout-gap, 1.5rem);
+
+		> #{$item} {
+			// A tile is never wider than the grid it is in: two columns of a
+			// one column grid would open an implicit second column and take the
+			// pattern with it. Its height follows the width it ends up with, so
+			// however far the grid has narrowed a tile is still `height` times
+			// as tall as it is wide - which is all the notation ever says.
+			--vp-tile-span: min(var(--vp-tile-columns, 1), var(--vp-layout-current-columns));
+
+			grid-column: span var(--vp-tile-span);
+			height: calc((100cqw + var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns) * var(--vp-tile-height, 1) * var(--vp-tile-span) - var(--vp-layout-gap, 1.5rem));
+
+			// A tile is a cell of a fixed size, the way it has always been in
+			// this layout - what does not fit one is cut off rather than
+			// pushing the pattern apart.
+			overflow: hidden;
+
+			// The picture takes the space the rest of the item leaves, so a
+			// tile is filled edge to edge whatever its shape. The chain has to
+			// be unbroken: the image carries `height:100%`, and a single
+			// auto-height ancestor between it and the tile turns that back
+			// into the aspect ratio of the picture.
+			display: flex;
+			flex-direction: column;
+		}
+
+		#{$item} .wp-block-visual-portfolio-item-image {
+			flex: 1 1 auto;
+			min-height: 0;
+
+			> a {
+				height: 100%;
+			}
+
+			img {
+				height: 100%;
+				object-fit: cover;
+			}
+		}
+	}
+
+	// Rows are measured and placed by fjGallery, which takes the items out of
+	// the flow entirely. What is declared here is the layout of a page whose
+	// script never arrived: items that grow into rows of their own accord.
+	&.vp-layout-justified {
+		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--vp-layout-gap, 1.5rem);
+
+		> #{$item} {
+			flex: 1 1 auto;
+			max-width: 100%;
+		}
+
+		&.vp-has-script > #{$item} {
+			flex-grow: 0;
+		}
+
+		// A measured row gives the picture its height, and the picture fills
+		// it - the same chain a tile needs, for the same reason.
+		&.vp-has-script #{$item} .wp-block-visual-portfolio-item-image {
+			> a {
+				height: 100%;
+			}
+
+			img {
+				height: 100%;
+				object-fit: cover;
+			}
+		}
+	}
+
+	// A scroll container, nothing more: the swipe, the scroll and the keyboard
+	// are the browser's, and the module only adds pointer drag on top of them.
+	// The scrollbar is hidden here rather than left to the carousel library -
+	// the library is loaded on a pointer device and only then, and a scrollbar
+	// under a gallery is not something a visitor should see meanwhile.
+	&.vp-layout-carousel {
+		// The box a slide snaps at, which is not always the box a visitor sees:
+		// a cover flow card is two of these wide and overhangs its neighbours.
+		//
+		// Measured against the frame rather than against the list itself. A
+		// carousel that repeats is padded by half its width at each end - that
+		// is how the library carries the loop - and a slide sized against what
+		// the padding leaves came out at nothing at all.
+		--vp-carousel-slide-width: calc((100cqw - var(--vp-carousel-peek, 0px) - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
+
+		// Makes the list the box an item measures its `offsetLeft` from, which
+		// is how the module reads slide positions: a layout number, and so the
+		// same number under an effect that turns a card or pins it in place.
+		position: relative;
+		display: flex;
+		gap: var(--vp-layout-gap, 1.5rem);
+		overflow-x: auto;
+		overflow-y: hidden;
+		scroll-snap-type: x mandatory;
+		scroll-behavior: smooth;
+		scrollbar-width: none;
+		overscroll-behavior-x: contain;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		// A slide of the next one showing at the edge, as an invitation to
+		// scroll on.
+		scroll-padding-inline: var(--vp-carousel-peek, 0);
+		padding-inline-end: var(--vp-carousel-peek, 0);
+
+		> #{$item} {
+			flex: 0 0 auto;
+			width: var(--vp-carousel-slide-width);
+			scroll-snap-align: var(--vp-carousel-snap-align, start);
+		}
+
+		&.vp-carousel-auto-width > #{$item} {
+			width: auto;
+		}
+
+		&.vp-carousel-free-scroll {
+			scroll-snap-type: none;
+		}
+
+		// The edges dissolve rather than cut, so a half slide reads as more
+		// carousel rather than as a mistake. Three layers: a ramp at each edge
+		// and the solid middle between them, which is what lets one side be
+		// sized on its own - the module takes the fade off whichever end the
+		// carousel has already run out of, where there is nothing left to hint
+		// at.
+		&.vp-carousel-edge-fade {
+			--vp-carousel-fade-left: var(--vp-carousel-fade-size, 6%);
+			--vp-carousel-fade-right: var(--vp-carousel-fade-size, 6%);
+
+			mask-image: linear-gradient(to right, vp-edge-stops(var(--vp-carousel-fade-left), var(--vp-carousel-fade-right)));
+			transition: --vp-carousel-fade-left 0.2s linear, --vp-carousel-fade-right 0.2s linear;
+		}
+
+		// A pointer never draws a focus ring here: the ring is for the keyboard,
+		// and a click on the scrollbar or an arrow used to light the whole
+		// gallery up.
+		&:focus {
+			outline: none;
+		}
+
+		&:focus-visible {
+			outline: 2px solid currentcolor;
+			outline-offset: 2px;
+		}
+	}
+
+	// The boxes an effect is drawn on, in the shape every effect needs them:
+	// the blocks of an item keep the column they are given in every other
+	// layout. Outside `@supports` on purpose - a browser without scroll driven
+	// animations gets a carousel with two more boxes in it and nothing else.
+	&.vp-layout-carousel.vp-carousel-effect {
+		> #{$item},
+		#{$slide},
+		#{$card} {
+			display: flex;
+			flex-direction: column;
+		}
+
+		#{$slide},
+		#{$card} {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+	}
+
+	// Scroll driven effects, and nothing else - where the timeline is missing
+	// the rules never apply and the carousel is exactly the carousel it was
+	// without them.
+	@supports (animation-timeline: view()) {
+		// Cards one whole slide wide over boxes half that, so every card
+		// overhangs its neighbours by a quarter of itself on each side. The
+		// overlap is what makes a cover flow read as a stack seen edge on,
+		// rather than as a row of pictures that happen to be tilted.
+		&.vp-layout-carousel.vp-carousel-coverflow {
+			// The list is narrowed to one snapping box and the rest of the
+			// width is padding, so the first and the last card can come to the
+			// middle like any other. Stated against the block rather than
+			// against the narrowed list, which is the one way of writing it
+			// that does not depend on its own outcome.
+			gap: 0;
+			padding-inline: calc(50cqw - 25cqw / max(var(--vp-layout-current-columns), 2));
+			scroll-padding-inline: 0;
+
+			> #{$item} {
+				width: 100%;
+				scroll-snap-align: center;
+				view-timeline-name: --vp-carousel-slide;
+				view-timeline-axis: inline;
+				// The window the turn is played over: a little under three
+				// quarters of a card to each side of the middle. Beyond it a
+				// card is already as far on its edge as it goes.
+				view-timeline-inset: calc(50cqw - 70cqw / max(var(--vp-layout-current-columns), 2));
+			}
+
+			#{$slide} {
+				position: relative;
+				width: 200%;
+				margin-inline: -50%;
+				// One vanishing point per card, at its own middle, so a card
+				// turns on the spot instead of being seen from the side of the
+				// gallery. Stated in card widths rather than in pixels, so the
+				// depth of the turn is the same whatever the gallery is sized
+				// at - and so the card it foreshortens grows by the same
+				// fraction every time, which is what the compensating scale in
+				// the keyframes is worked out from.
+				perspective: calc(var(--vp-carousel-slide-width) * 5);
+				animation: vp-carousel-coverflow-slide linear both;
+				animation-range: contain;
+				animation-timeline: --vp-carousel-slide;
+			}
+
+			#{$card} {
+				animation: vp-carousel-coverflow-card linear both;
+				animation-range: contain;
+				animation-timeline: --vp-carousel-slide;
+			}
+		}
+
+		// One slide riding over the one it replaces. The picture travels at half
+		// the speed of the carousel, so the arriving slide covers the leaving
+		// one rather than dissolving into it - nothing here touches opacity.
+		&.vp-layout-carousel.vp-carousel-slideshow {
+			// Slides that touch, so the arriving one meets the leaving one
+			// rather than following it across a gutter.
+			gap: 0;
+
+			#{$slide} {
+				overflow: hidden;
+				view-timeline-name: --vp-carousel-slide;
+				view-timeline-axis: inline;
+			}
+
+			#{$card} {
+				animation: vp-carousel-slideshow-card linear both;
+				animation-range: cover;
+				animation-timeline: --vp-carousel-slide;
+			}
+		}
+	}
+}
+
+// A card entering from the right faces left, towards the middle of the
+// carousel, and a card leaving to the left faces right - which is the way the
+// original cover flow turns. The depth is what makes it read as a turn rather
+// than a squash, and the raised stacking is what keeps the card in the middle
+// in front of the ones it overhangs.
+@keyframes vp-carousel-coverflow-slide {
+	0% {
+		z-index: 0;
+		transform: translateX(30%);
+	}
+
+	50% {
+		z-index: 100;
+		transform: translateX(0);
+	}
+
+	100% {
+		z-index: 0;
+		transform: translateX(-30%);
+	}
+}
+
+// The near edge of a turned card is closer to the eye than the card was, so it
+// is drawn taller than the box it was laid out in - and the list is a scroll
+// container, which cuts whatever leaves it. The card is scaled down by as much
+// as the turn will magnify it, so a cover flow of any size stays inside the
+// gallery. The card in the middle is not turned and so is not scaled: what is
+// left is the size difference a cover flow is read by.
+@keyframes vp-carousel-coverflow-card {
+	0% {
+		transform: rotateY(-55deg) scale(0.8);
+	}
+
+	50% {
+		transform: rotateY(0) scale(1);
+	}
+
+	100% {
+		transform: rotateY(55deg) scale(0.8);
+	}
+}
+
+// Half the speed of the carousel, which is what parallax is.
+@keyframes vp-carousel-slideshow-card {
+	0% {
+		transform: translateX(-50%);
+	}
+
+	50% {
+		transform: translateX(0);
+	}
+
+	100% {
+		transform: translateX(50%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wp-block-visual-portfolio-item-template.vp-layout-carousel {
+		scroll-behavior: auto;
+
+		> .wp-block-visual-portfolio-item-template__item,
+		.wp-block-visual-portfolio-item-template__slide,
+		.wp-block-visual-portfolio-item-template__card {
+			animation: none;
+		}
+	}
+}
+
+.wp-block-visual-portfolio-item-template__item {
+	min-width: 0;
+}
+
+// One box around the list and everything that drives it. The autoplay
+// indicator is drawn on the dots and the dots sit below the frame the arrows
+// are pinned to, so the countdown has to be published where both can read it.
+.wp-block-visual-portfolio-item-template__carousel {
+	--vp-carousel-track: color-mix(in oklab, currentcolor 10%, transparent 90%);
+}
+
+// The frame the arrows are pinned to. The list itself scrolls, so an arrow
+// inside it would scroll away with the slides.
+//
+// It clips as well: dragging past the last slide pulls the whole scroll
+// container along as a rubber band, and a scroll container carries its own
+// clipping with it - so without a box that stays put, the slides walked out of
+// the gallery instead of stretching inside it.
+.wp-block-visual-portfolio-item-template__carousel-frame {
+	position: relative;
+	overflow: clip;
+
+	// The width a slide is measured against. The list cannot answer for it: the
+	// endless mode pads the list by half its width, and a percentage of what
+	// that leaves is nothing.
+	container-type: inline-size;
+}
+
+// Controls of a carousel. Server rendered so that a region swap brings them
+// back with the items, and hidden until the module is running - they move the
+// scroll container through the scroll API, and there is nothing to fall back to
+// when that API has nobody calling it. The editor draws the same controls and
+// shows them the same way, so a carousel looks in the editor the way it will
+// look on the page.
+.wp-block-visual-portfolio-item-template__carousel-arrow {
+	position: absolute;
+	top: 50%;
+	z-index: 2;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	color: #fff;
+	cursor: pointer;
+	background: rgba(0, 0, 0, 0.5);
+	border: 0;
+	border-radius: 50%;
+	transform: translateY(-50%);
+	transition: background-color 0.2s ease, opacity 0.2s ease;
+
+	.vp-carousel-has-controls & {
+		display: flex;
+	}
+
+	&:hover:not([disabled]) {
+		background: rgba(0, 0, 0, 0.7);
+	}
+
+	&[disabled] {
+		cursor: default;
+		opacity: 0.25;
+	}
+
+	// A pointer never draws the ring; the keyboard always does.
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
+
+	// The chevron is drawn rather than shipped: two borders on a rotated square
+	// weigh nothing and take the colour of the button around them.
+	> span {
+		width: 7px;
+		height: 7px;
+		border-top: 2px solid currentcolor;
+		border-right: 2px solid currentcolor;
+	}
+
+	&--prev {
+		left: 12px;
+
+		> span {
+			margin-left: 3px;
+			transform: rotate(-135deg);
+		}
+	}
+
+	&--next {
+		right: 12px;
+
+		> span {
+			margin-right: 3px;
+			transform: rotate(45deg);
+		}
+	}
+}
+
+.wp-block-visual-portfolio-item-template__carousel-nav {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	margin-top: var(--vp-layout-gap, 1.5rem);
+
+	.vp-carousel-has-controls & {
+		display: flex;
+	}
+}
+
+.wp-block-visual-portfolio-item-template__carousel-dots {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+// A dot is the progress bar in miniature, and it is built the same way: a track
+// that is always there and a fill that says how far along the carousel is. Six
+// pixels while it waits, a twenty four pixel pill while it is the slide on
+// screen - filled to the end at rest, and filled as the delay runs down when
+// autoplay is what moves the carousel on.
+.wp-block-visual-portfolio-item-template__carousel-dot {
+	position: relative;
+	// The pill grows through `min-width`: `width` on a flex item is a base size
+	// the flex algorithm is free to overrule, and the transition never landed.
+	min-width: 6px;
+	width: 6px;
+	height: 6px;
+	padding: 0;
+	overflow: hidden;
+	cursor: pointer;
+	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+	border: 0;
+	border-radius: 3px;
+	transition: min-width 0.25s ease, background-color 0.25s ease;
+
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
+
+	&[aria-current="true"] {
+		min-width: 24px;
+	}
+}
+
+.wp-block-visual-portfolio-item-template__carousel-dot-progress {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: 0;
+	width: 0;
+	background-color: currentcolor;
+	border-radius: inherit;
+	transition: width 0.25s ease;
+
+	[aria-current="true"] > & {
+		width: 100%;
+	}
+}
+
+// While autoplay runs the fill is the wait rather than the place, and it is
+// redrawn every frame - a transition would leave it a frame behind for the
+// whole of the delay.
+.vp-carousel-is-playing .wp-block-visual-portfolio-item-template__carousel-dot[aria-current="true"] > .wp-block-visual-portfolio-item-template__carousel-dot-progress {
+	width: var(--vp-carousel-autoplay-progress, 0%);
+	transition: none;
+}
+
+.wp-block-visual-portfolio-item-template__carousel-progress {
+	width: min(180px, 60%);
+	height: 4px;
+	overflow: hidden;
+	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+	border-radius: 2px;
+}
+
+.wp-block-visual-portfolio-item-template__carousel-progress-value {
+	display: block;
+	width: var(--vp-carousel-progress, 0%);
+	height: 100%;
+	background-color: currentcolor;
+	border-radius: inherit;
+	transition: width 0.15s linear;
+}
+
+// The loop is fetching its next state. The controls stay clickable - a second
+// click aborts the first request and starts over.
+.vp-is-loading .wp-block-visual-portfolio-item-template {
+	opacity: 0.6;
+	transition: opacity 0.15s ease-in-out;
+}
+
+// The announcement of a Load More append. Nothing else on a loop page reaches
+// for the plugin's global stylesheet, so it carries its own hiding.
+.wp-block-visual-portfolio-item-template__live-region {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	white-space: nowrap;
+	border: 0;
+	clip-path: inset(50%);
+}

@@ -54,6 +54,9 @@ function _manually_load_plugin() {
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
+// Shared helpers for the test cases themselves.
+require_once dirname( __FILE__ ) . '/trait-loop-blocks.php';
+
 /**
  * Adds a wp_die handler for use during tests.
  *

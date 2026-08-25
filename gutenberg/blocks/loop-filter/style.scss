@@ -1,0 +1,41 @@
+// Filter by category block.
+.vp-block-loop-filter {
+	font-size: var(--wp--preset--font-size--medium, 1rem);
+	font-weight: 500;
+}
+
+// Count.
+.vp-block-loop-filter-count {
+	display: inline-block;
+	margin-left: 0.6ch;
+
+	&::before {
+		content: "(";
+	}
+	&::after {
+		content: ")";
+	}
+}
+
+// Fill style.
+//
+// Every item gets a filled pill and the active one a stronger fill. Spacing is
+// left to the block gap, so the setting in the editor still applies.
+.vp-block-loop-filter.is-style-fill {
+	.vp-block-loop-filter-item {
+		border-radius: 9999px;
+		padding: 0.3em 0.8em;
+		background-color: color-mix(in srgb, currentColor 7%, transparent);
+		text-decoration: none;
+		font-weight: 400;
+
+		&:hover,
+		&:focus {
+			background-color: color-mix(in srgb, currentColor 12%, transparent);
+		}
+
+		&.is-active {
+			background-color: color-mix(in srgb, currentColor 18%, transparent);
+		}
+	}
+}

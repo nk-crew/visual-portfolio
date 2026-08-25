@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-no-results",
+	"title": "No Results (Experimental)",
+	"category": "media",
+	"description": "Contains the block elements used to render content when no gallery items are found. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/loop"],
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/queryId",
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/sourceQuery",
+		"vp/blockId"
+	],
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"anchor": true,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"padding": true,
+			"margin": ["top", "bottom"]
+		}
+	}
+}

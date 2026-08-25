@@ -84,6 +84,19 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			)
 		);
 
+		// Get gallery items for the editor preview of a Gallery Loop block.
+		if ( visual_portfolio()->supports_loop_blocks() ) {
+			register_rest_route(
+				$namespace,
+				'/get_loop_items/',
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'get_loop_items' ),
+					'permission_callback' => array( $this, 'get_loop_items_permission' ),
+				)
+			);
+		}
+
 		// Get max pages.
 		$max_pages_route = array(
 			'methods'             => array( WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ),
@@ -310,11 +323,15 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get filter items permission.
+	 * Whether the current user edits content of any kind.
 	 *
-	 * @return mixed
+	 * The query endpoints answer with data the editor needs to preview a block,
+	 * so editing anything is enough - a user without the blanket `edit_posts` may
+	 * still edit a custom post type the block is used in.
+	 *
+	 * @return bool
 	 */
-	public function get_filter_items_permission() {
+	private function can_edit_content() {
 		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
 		}
@@ -325,7 +342,257 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			}
 		}
 
+		return false;
+	}
+
+	/**
+	 * Get filter items permission.
+	 *
+	 * @return mixed
+	 */
+	public function get_filter_items_permission() {
+		if ( $this->can_edit_content() ) {
+			return true;
+		}
+
 		return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get filter items.', 'visual-portfolio' ), true );
+	}
+
+	/**
+	 * Whether the caller may read everything one item would return.
+	 *
+	 * `read_post` on an attachment follows its parent, so an image of a private
+	 * post is refused while an unattached one is allowed - the same answer core
+	 * gives for `/wp/v2/media`.
+	 *
+	 * @param array $item - resolved gallery item.
+	 *
+	 * @return bool
+	 */
+	private function can_read_item( $item ) {
+		foreach ( array( 'post_id', 'image_id' ) as $key ) {
+			$id = isset( $item[ $key ] ) ? (int) $item[ $key ] : 0;
+
+			if ( $id && ! current_user_can( 'read_post', $id ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get loop items permission.
+	 *
+	 * @return mixed
+	 */
+	public function get_loop_items_permission() {
+		if ( $this->can_edit_content() ) {
+			return true;
+		}
+
+		return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get gallery items.', 'visual-portfolio' ), true );
+	}
+
+	/**
+	 * URLs of an item image in the sizes the editor offers.
+	 *
+	 * @param int|string $image_id - attachment id, or the remote id of a Pro social image.
+	 * @param string     $fallback_url - URL to answer with when the id resolves to nothing.
+	 *
+	 * @return array
+	 */
+	private function get_item_image_sizes( $image_id, $fallback_url ) {
+		// Remote images of the social sources exist in a single size.
+		$is_attachment = $image_id && is_numeric( $image_id );
+		$urls          = array();
+
+		// Every size the editor's picker offers, the plugin's own among them -
+		// a size missing here falls back to the default URL, so choosing it
+		// changed the preview not at all while the page rendered it correctly.
+		$sizes = array( 'thumbnail', 'medium', 'large', 'full', 'vp_sm', 'vp_md', 'vp_lg', 'vp_xl' );
+
+		foreach ( $sizes as $size ) {
+			$src = $is_attachment ? wp_get_attachment_image_src( (int) $image_id, $size ) : false;
+
+			$urls[ $size ] = $src ? $src[0] : $fallback_url;
+		}
+
+		return $urls;
+	}
+
+	/**
+	 * Get gallery items of a Gallery Loop block.
+	 *
+	 * Items come from the same pipeline the front end renders, mapped with the
+	 * same context mapper the item blocks read - the editor preview cannot drift
+	 * away from the rendered gallery because it never resolves anything itself.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_loop_items( $request ) {
+		$params      = $request->get_params();
+		$json_params = $request->get_json_params();
+
+		if ( ! empty( $json_params ) ) {
+			$params = array_merge( $params, $json_params );
+		}
+
+		// Read before the conversion: the query id is not a query option, it only
+		// names the parameters this loop reads its state from.
+		$query_id = Visual_Portfolio_Get::sanitize_query_id( $params['queryId'] ?? null );
+
+		$params         = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params, true );
+		$content_source = $params['content_source'] ?? false;
+
+		if ( ! $content_source ) {
+			return $this->error(
+				'missing_params',
+				esc_html__( 'Required parameters are missing.', 'visual-portfolio' )
+			);
+		}
+
+		// Define allowed parameters for each content source.
+		$source_configs = apply_filters(
+			'vpf_rest_loop_items_source_configs',
+			array(
+				'post-based' => array(
+					'posts_source',
+					'post_types_set',
+					'posts_ids',
+					'posts_excluded_ids',
+					'posts_offset',
+					'posts_taxonomies',
+					'posts_taxonomies_relation',
+					'posts_order_by',
+					'posts_order_direction',
+					'posts_avoid_duplicate_posts',
+					'posts_exclude_current',
+					'posts_keyword',
+					'posts_custom_query',
+				),
+				'images' => array(
+					'images',
+					'image_categories',
+					'images_titles_source',
+					'images_descriptions_source',
+					'images_order_by',
+					'images_order_direction',
+				),
+			),
+			$params
+		);
+
+		// A source no options are registered for has nothing that can be
+		// previewed safely, but it is not an error - the block shows its
+		// empty state.
+		if ( ! isset( $source_configs[ $content_source ] ) ) {
+			return $this->success(
+				array(
+					'items'     => array(),
+					'max_pages' => 1,
+				)
+			);
+		}
+
+		$allowed_keys = array_flip( array_merge( $source_configs[ $content_source ], array( 'items_count' ) ) );
+
+		$options = array_merge(
+			array(
+				'content_source' => $content_source,
+
+				// The preview is not a gallery on a page, it only needs an id the
+				// options resolver accepts.
+				'block_id'       => 'rest-loop-preview',
+			),
+			array_intersect_key( $params, $allowed_keys )
+		);
+
+		ksort( $options );
+
+		// The editor debounces its requests, but the social sources of the Pro
+		// plugin answer from external APIs - without a cache a few edits are
+		// enough to reach an Instagram or Unsplash rate limit.
+		//
+		// The cached answer is per user: `perm` below narrows the query to what
+		// the current user may read, so two editors can get different items for
+		// the same options. It is also per request state - the pipeline reads
+		// the page, filter and sort out of the request, so options alone would
+		// serve page one's items for every page.
+		//
+		// Those parameters are named after the loop, so the key is read under
+		// the very names the pipeline will read below. Keyed on the legacy names
+		// instead, a request for `vp-3-page=2` would be answered with the items
+		// cached for page one.
+		$request_state = array();
+
+		foreach ( array( 'page', 'filter', 'sort' ) as $role ) {
+			$name = Visual_Portfolio_Get::get_query_var_name( $role, $query_id );
+
+			$request_state[ $name ] = $request->get_param( $name );
+		}
+
+		$cache_key = 'vpf_loop_preview_' . md5( (string) wp_json_encode( array( $options, $query_id, $request_state, get_current_user_id() ) ) );
+		$cached    = get_transient( $cache_key );
+
+		if ( is_array( $cached ) ) {
+			return $this->success( $cached );
+		}
+
+		// The `custom_query` source hands a hand-written query string straight to
+		// `WP_Query`, so the preview must not be a way to read posts the user
+		// cannot open in the editor. `perm` makes `WP_Query` apply the current
+		// user's read capabilities to any non-public status the query asks for.
+		$restrict_to_readable = static function ( $query ) {
+			$query->set( 'perm', 'readable' );
+		};
+
+		add_action( 'pre_get_posts', $restrict_to_readable );
+
+		$result = Visual_Portfolio_Get::get_loop_items( $options, $query_id );
+
+		remove_action( 'pre_get_posts', $restrict_to_readable );
+
+		$response = array(
+			'items'     => array(),
+			'max_pages' => 1,
+		);
+
+		if ( $result ) {
+			foreach ( $result['items'] as $item ) {
+				// `perm` is not an authorisation check of its own: WordPress
+				// only holds `private` back with it, and every other status a
+				// query may ask for - `draft` and `pending` among them - is
+				// left to whoever asked. The endpoint is open to anyone who can
+				// edit a post of their own, and the custom query source hands
+				// the status straight through, so each item is checked against
+				// the capability that governs reading that one post.
+				//
+				// Two ids can carry someone else's content into the response:
+				// the post an item stands for, and the attachment its image
+				// comes from. An images source has no post at all, so checking
+				// the first alone answered for any attachment id on the site.
+				if ( ! $this->can_read_item( $item ) ) {
+					continue;
+				}
+
+				$item_data = Visual_Portfolio_Block_Item_Template::map_item_to_context( $item, $result['options'], '' );
+
+				$item_data['imageSizes'] = $this->get_item_image_sizes(
+					$item['image_id'] ?? '',
+					$item_data['itemImgUrl'] ?? ''
+				);
+
+				$response['items'][] = $item_data;
+			}
+
+			$response['max_pages'] = max( 1, (int) $result['max_pages'] );
+		}
+
+		set_transient( $cache_key, $response, MINUTE_IN_SECONDS );
+
+		return $this->success( $response );
 	}
 
 	/**

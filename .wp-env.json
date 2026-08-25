@@ -1,5 +1,5 @@
 {
-	"core": null,
+	"core": "WordPress/WordPress#7.1-branch",
 	"themes": ["./tests/themes/empty-theme"],
 	"mappings": {
 		"wp-content/plugins/visual-portfolio": ".",

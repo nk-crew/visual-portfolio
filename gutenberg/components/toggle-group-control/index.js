@@ -73,8 +73,6 @@ export function ToggleGroupButtonsControl(props) {
 				}
 				onChange={onChange}
 				isBlock={isBlock}
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				{...restProps}
 			>
 				{pairs.map(({ value: optionValue, ...optionProps }) => (
@@ -108,8 +106,6 @@ export default function ToggleGroupCustomControl(props) {
 					setCollapsed(val);
 				}}
 				isBlock
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 			>
 				{options.map((option) => {
 					return (

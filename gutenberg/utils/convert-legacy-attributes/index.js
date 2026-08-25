@@ -1,8 +1,13 @@
+import { select } from '@wordpress/data';
+
+import { LOOP_SOURCES_STORE } from '../../store/loop-sources';
+
 // Attribute mapping configurations
 const ATTRIBUTE_MAPPINGS = {
 	// Direct mappings (modern.key -> legacy.key)
 	direct: {
 		queryType: 'content_source',
+		blockId: 'block_id',
 	},
 
 	// Nested mappings (modern.parent.child -> legacy.key)
@@ -18,6 +23,9 @@ const ATTRIBUTE_MAPPINGS = {
 		'postsQuery.taxonomies': 'posts_taxonomies',
 		'postsQuery.taxonomiesRelation': 'posts_taxonomies_relation',
 		'postsQuery.avoidDuplicates': 'posts_avoid_duplicate_posts',
+		'postsQuery.excludeCurrent': 'posts_exclude_current',
+		'postsQuery.keyword': 'posts_keyword',
+		'baseQuery.maxPagesLimit': 'max_pages',
 		'postsQuery.customQuery': 'posts_custom_query',
 		'imagesQuery.images': 'images',
 		'imagesQuery.categories': 'image_categories',
@@ -71,6 +79,7 @@ const MODERN_DEFAULTS = {
 		titlesSource: 'custom',
 		descriptionsSource: 'custom',
 	},
+	sourceQuery: {},
 };
 
 // Helper functions
@@ -147,6 +156,20 @@ function convertModernToLegacy(modernAttributes, includeDefaults = false) {
 			}
 		}
 	);
+
+	// The JS twin of the `vpf_convert_loop_source_attributes` PHP filter: a
+	// third-party source keeps its settings in the free-form `sourceQuery`, and
+	// only the source knows which legacy options they stand for.
+	const source = select(LOOP_SOURCES_STORE).getSource(
+		attributesToConvert.queryType
+	);
+
+	if (source?.mapToLegacy) {
+		Object.assign(
+			legacy,
+			source.mapToLegacy(attributesToConvert.sourceQuery || {})
+		);
+	}
 
 	return legacy;
 }

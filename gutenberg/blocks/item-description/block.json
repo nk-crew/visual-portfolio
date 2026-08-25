@@ -1,0 +1,57 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/item-description",
+	"title": "Gallery Item Description (Experimental)",
+	"category": "media",
+	"description": "Displays the description of a gallery item. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/item-template"],
+	"textdomain": "visual-portfolio",
+	"usesContext": ["vp/itemExcerpt", "vp/itemContent", "vp/itemPostId"],
+	"attributes": {
+		"source": {
+			"type": "string",
+			"default": "excerpt"
+		},
+		"excerptLength": {
+			"type": "number",
+			"default": 15
+		}
+	},
+	"example": {
+		"viewportWidth": 350
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"textAlign": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"contentRole": true
+	},
+	"style": "visual-portfolio-block-item-description"
+}

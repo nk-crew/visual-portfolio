@@ -1,0 +1,21 @@
+{
+	"_comment": "Shared fixture for the two halves of the loop source mapping: the `vpf_convert_loop_source_attributes` PHP filter and the `mapToLegacy` callback of `registerLoopSource()`. Both take `modern` and must produce every entry of `legacy`.",
+	"modern": {
+		"queryType": "acme/social",
+		"baseQuery": {
+			"perPage": 12
+		},
+		"sourceQuery": {
+			"network": "instagram",
+			"username": "visualportfolio",
+			"count": 24,
+			"cacheExpiration": 60
+		}
+	},
+	"legacy": {
+		"content_source": "social-stream",
+		"social_instagram_username": "visualportfolio",
+		"social_instagram_count": 24,
+		"social_cache_expiration": 60
+	}
+}

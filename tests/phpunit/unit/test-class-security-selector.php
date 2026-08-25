@@ -15,6 +15,17 @@
  */
 class Test_Class_Security_Selector extends WP_UnitTestCase {
 	/**
+	 * The controls the plugin registered, to put back after the test.
+	 *
+	 * The registry is static and shared by the whole run, so a test that leaves
+	 * its own fixtures in it takes `content_source` and the rest away from
+	 * every test that comes later in the alphabet.
+	 *
+	 * @var array
+	 */
+	private $registry_backup = array();
+
+	/**
 	 * Set up test environment.
 	 *
 	 * @return void
@@ -30,10 +41,30 @@ class Test_Class_Security_Selector extends WP_UnitTestCase {
 
 		$registered = $reflection->getProperty( 'registered_fields' );
 		$registered->setAccessible( true );
+		$this->registry_backup = $registered->getValue();
 		$registered->setValue( null, array() );
 
 		// Register test controls.
 		$this->register_test_controls();
+	}
+
+	/**
+	 * Give the plugin's own controls back.
+	 *
+	 * @return void
+	 */
+	public function tear_down() {
+		$reflection = new ReflectionClass( 'Visual_Portfolio_Controls' );
+
+		$registered = $reflection->getProperty( 'registered_fields' );
+		$registered->setAccessible( true );
+		$registered->setValue( null, $this->registry_backup );
+
+		$cached = $reflection->getProperty( 'cached_all_registered_controls' );
+		$cached->setAccessible( true );
+		$cached->setValue( null, array() );
+
+		parent::tear_down();
 	}
 
 	/**

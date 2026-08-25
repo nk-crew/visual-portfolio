@@ -70,6 +70,62 @@ class Visual_Portfolio_Get {
 	private static $used_layouts = array();
 
 	/**
+	 * Resolved loop items, keyed by loop attributes and request state.
+	 *
+	 * @var array
+	 */
+	private static $loop_items_cache = array();
+
+	/**
+	 * Roles of the query string parameters the loop pipeline reads.
+	 *
+	 * The names themselves depend on the loop, see `get_query_var_name()`.
+	 *
+	 * @var array
+	 */
+	private static $loop_query_vars = array( 'page', 'filter', 'sort' );
+
+	/**
+	 * Query string name of a loop state parameter.
+	 *
+	 * A loop with a `queryId` owns its parameters - `vp-3-page` moves that loop
+	 * and nothing else, which is what lets two galleries live on one page. A
+	 * caller without an id gets the legacy global names: the legacy renderer
+	 * goes through these very helpers, and its URLs are public.
+	 *
+	 * @param string          $name     - `page`, `filter` or `sort`.
+	 * @param int|string|null $query_id - id of the loop, or null for the legacy names.
+	 *
+	 * @return string
+	 */
+	public static function get_query_var_name( $name, $query_id = null ) {
+		$query_id = self::sanitize_query_id( $query_id );
+
+		return null === $query_id ? 'vp_' . $name : 'vp-' . $query_id . '-' . $name;
+	}
+
+	/**
+	 * Normalize a loop query id.
+	 *
+	 * The id ends up inside a query string name, so anything that is not a
+	 * positive integer is refused rather than escaped - a loop that cannot name
+	 * its parameters reads the legacy ones instead of an unusable name.
+	 *
+	 * @param int|string|null $query_id - id of the loop.
+	 *
+	 * @return int|null
+	 */
+	public static function sanitize_query_id( $query_id ) {
+		if ( null === $query_id || is_bool( $query_id ) || is_array( $query_id ) || ! is_numeric( $query_id ) ) {
+			return null;
+		}
+
+		$query_id = (int) $query_id;
+
+		return $query_id > 0 ? $query_id : null;
+	}
+
+	/**
 	 * Get all available layouts.
 	 *
 	 * @return array
@@ -180,6 +236,16 @@ class Visual_Portfolio_Get {
 				$result[ $item['name'] ] = $atts[ $item['name'] ];
 			} else {
 				$result[ $item['name'] ] = Visual_Portfolio_Controls::get_registered_value( $item['name'], $block_id ? false : $id );
+			}
+		}
+
+		// Options a loop block carries that no legacy control registers. The
+		// loop above keeps registered controls only, so these would never
+		// reach the query. A name a control does register is already resolved
+		// above and is left alone.
+		foreach ( array_keys( Visual_Portfolio_Security::get_loop_only_options() ) as $name ) {
+			if ( isset( $atts[ $name ] ) && ! array_key_exists( $name, $result ) ) {
+				$result[ $name ] = $atts[ $name ];
 			}
 		}
 
@@ -336,49 +402,13 @@ class Visual_Portfolio_Get {
 		}
 
 		$is_preview = self::is_preview();
-		$start_page = self::get_current_page_number();
-		$is_images  = 'images' === $options['content_source'];
-		$is_social  = 'social-stream' === $options['content_source'];
 
-		// Get query params.
-		$query_opts = self::get_query_params( $options, false, $options['id'] );
-
-		/**
-		 * Filter to provide a custom query result object for non-standard content sources.
-		 * Return a query-like object with have_posts(), the_post(), reset_postdata() methods
-		 * and max_num_pages property, or false to use default WP_Query.
-		 *
-		 * @param bool|object $custom_query Custom query object or false.
-		 * @param array       $query_opts   Query options.
-		 * @param array       $options      Portfolio options.
-		 */
-		$custom_query = apply_filters( 'vpf_custom_query_result', false, $query_opts, $options );
-
-		// This hack exists because wp_reset_postdata() does not work in some situations.
-		$old_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
-
-		if ( $is_images || $is_social ) {
-			if ( isset( $query_opts['max_num_pages'] ) ) {
-				$max_pages = (int) ( $query_opts['max_num_pages'] < $start_page ? $start_page : $query_opts['max_num_pages'] );
-			} else {
-				$max_pages = $start_page;
-			}
-		} elseif ( $custom_query ) {
-			// Use custom query object provided by extensions.
-			$portfolio_query = $custom_query;
-			$max_pages       = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
-		} else {
-			// get Post List.
-			$portfolio_query = new WP_Query( $query_opts );
-
-			$max_pages = (int) ( $portfolio_query->max_num_pages < $start_page ? $start_page : $portfolio_query->max_num_pages );
-		}
-
-		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
-			array(
-				'vp_page' => $start_page + 1,
-			)
-		) : false;
+		$query           = self::resolve_query( $options );
+		$query_opts      = $query['query_opts'];
+		$portfolio_query = $query['portfolio_query'];
+		$start_page      = $query['start_page'];
+		$max_pages       = $query['max_pages'];
+		$next_page_url   = $query['next_page_url'];
 
 		$options['start_page']    = $start_page;
 		$options['max_pages']     = $max_pages;
@@ -589,6 +619,183 @@ class Visual_Portfolio_Get {
 			'vp_opts'            => $options,
 		);
 
+		$items = self::build_items( $each_item_args, $query_opts, $options, $portfolio_query );
+
+		$notices = array();
+
+		// No items found notice.
+		if ( empty( $items ) ) {
+			$class .= ' vp-portfolio-not-found';
+
+			// Don't display any output if no items found (works on frontend only).
+			if ( $options['no_items_notice'] && ( $is_preview || 'notice' === $options['no_items_action'] ) ) {
+				$notices[] = $options['no_items_notice'];
+			}
+		}
+
+		$errors = array();
+
+		if ( isset( $query_opts['error'] ) && ! empty( $query_opts['error'] ) && ( $is_preview || is_admin_bar_showing() ) ) {
+			$class   .= ' vp-portfolio-errors';
+			$errors[] = $query_opts['error'];
+		}
+
+		$result = array(
+			'options'           => $options,
+			'style_options'     => $style_options,
+			'class'             => $class,
+			'data_attrs'        => $data_attrs,
+			'items_class'       => $items_class,
+			'items'             => $items,
+			'notices'           => $notices,
+			'errors'            => $errors,
+			'img_size_popup'    => $img_size_popup,
+			'img_size_md_popup' => $img_size_md_popup,
+			'img_size_sm_popup' => $img_size_sm_popup,
+			'img_size'          => $img_size,
+		);
+
+		return $result;
+	}
+
+	/**
+	 * Resolve the query for the given options.
+	 *
+	 * Pure code motion out of `get_output_config()`, so the native Gallery Loop
+	 * blocks resolve their query through exactly the same path as the legacy
+	 * gallery - including the `vpf_custom_query_result` extension point.
+	 *
+	 * @param array           $options portfolio options.
+	 * @param int|string|null $query_id id of the loop the query belongs to, or null for the legacy parameters.
+	 *
+	 * @return array {
+	 *     @type array       $query_opts      Query options.
+	 *     @type object|null $portfolio_query Query object, null for images and social sources.
+	 *     @type int         $max_pages       Total pages count.
+	 *     @type int         $start_page      Currently requested page.
+	 *     @type string|bool $next_page_url   URL of the next page, false when there is none.
+	 * }
+	 */
+	private static function resolve_query( $options, $query_id = null ) {
+		$start_page = self::get_current_page_number( $query_id );
+		$is_images  = 'images' === $options['content_source'];
+		$is_social  = 'social-stream' === $options['content_source'];
+
+		// Get query params.
+		$query_opts = self::get_query_params( $options, false, $options['id'], $query_id );
+
+		/**
+		 * Filter to provide a custom query result object for non-standard content sources.
+		 * Return a query-like object with have_posts(), the_post(), reset_postdata() methods
+		 * and max_num_pages property, or false to use default WP_Query.
+		 *
+		 * @param bool|object $custom_query Custom query object or false.
+		 * @param array       $query_opts   Query options.
+		 * @param array       $options      Portfolio options.
+		 */
+		$custom_query = apply_filters( 'vpf_custom_query_result', false, $query_opts, $options );
+
+		$portfolio_query = null;
+
+		// What the query really found, before the floor below. A request naming
+		// a page past the end must not be answered with that page: a loop asks
+		// this to decide whether the page exists at all, and the head links and
+		// the numbered pagination are built from the answer.
+		$found_pages = 0;
+
+		if ( $is_images || $is_social ) {
+			if ( isset( $query_opts['max_num_pages'] ) ) {
+				$found_pages = (int) $query_opts['max_num_pages'];
+				$max_pages   = $found_pages < $start_page ? $start_page : $found_pages;
+			} else {
+				$max_pages = $start_page;
+			}
+		} elseif ( $custom_query ) {
+			// Use custom query object provided by extensions.
+			$portfolio_query = $custom_query;
+			$found_pages     = (int) $portfolio_query->max_num_pages;
+			$max_pages       = $found_pages < $start_page ? $start_page : $found_pages;
+		} else {
+			// get Post List.
+			$portfolio_query = new WP_Query( $query_opts );
+
+			$found_pages = (int) $portfolio_query->max_num_pages;
+			$max_pages   = $found_pages < $start_page ? $start_page : $found_pages;
+
+			// `max_num_pages` counts every post the query matched, and an
+			// offset is not part of that count, so a gallery that skips the
+			// first few would advertise pages past the end of its own results.
+			//
+			// Only the offset the gallery itself applied may be subtracted.
+			// `posts_offset` is stored for every post-based gallery but reaches
+			// `WP_Query` for a post-type source alone, shifted by a page for
+			// every page shown; a custom query or a `vpf_extend_query_args`
+			// callback can put an unrelated offset there, and subtracting the
+			// stored one would cost the gallery pages its results really have.
+			$per_page     = isset( $query_opts['posts_per_page'] ) ? (int) $query_opts['posts_per_page'] : 0;
+			$paged        = isset( $query_opts['paged'] ) ? (int) $query_opts['paged'] : 0;
+			$posts_offset = max( 0, (int) ( $options['posts_offset'] ?? 0 ) );
+			$own_offset   = $posts_offset + ( $paged - 1 ) * $per_page;
+			$offset       = isset( $query_opts['offset'] ) && (int) $query_opts['offset'] === $own_offset ? $posts_offset : 0;
+
+			if ( $offset && $per_page > 0 ) {
+				$reachable   = (int) ceil( max( 0, (int) $portfolio_query->found_posts - $offset ) / $per_page );
+				$found_pages = min( $found_pages, $reachable );
+				$max_pages   = max( $start_page, min( $max_pages, $reachable ) );
+			}
+		}
+
+		// A ceiling the gallery is not allowed to pass, whatever the query found.
+		// Zero lifts it, the way the core Query block reads the same setting.
+		$max_pages_limit = isset( $options['max_pages'] ) ? max( 0, (int) $options['max_pages'] ) : 0;
+
+		if ( $max_pages_limit ) {
+			$max_pages   = min( $max_pages, $max_pages_limit );
+			$found_pages = min( $found_pages, $max_pages_limit );
+		}
+
+		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
+			array(
+				'vp_page' => $start_page + 1,
+			),
+			$query_id
+		) : false;
+
+		return array(
+			'query_opts'      => $query_opts,
+			'portfolio_query' => $portfolio_query,
+			'max_pages'       => $max_pages,
+			'found_pages'     => $found_pages,
+			'start_page'      => $start_page,
+			'next_page_url'   => $next_page_url,
+		);
+	}
+
+	/**
+	 * Build the normalized items array out of a resolved query.
+	 *
+	 * Pure code motion out of `get_output_config()`. Keeps every extension point
+	 * of the legacy pipeline: `vpf_custom_items`, `vpf_image_item_args` and
+	 * `vpf_post_item_args`.
+	 *
+	 * @param array           $each_item_args  Default item args template.
+	 * @param array           $query_opts      Query options.
+	 * @param array           $options         Portfolio options.
+	 * @param object|null     $portfolio_query Query object, null for images and social sources.
+	 * @param int|string|null $query_id        id of the loop the items belong to, or null for the legacy parameters.
+	 *
+	 * @return array
+	 */
+	private static function build_items( $each_item_args, $query_opts, $options, $portfolio_query = null, $query_id = null ) {
+		$is_images      = 'images' === $options['content_source'];
+		$is_social      = 'social-stream' === $options['content_source'];
+		$img_size_popup = $each_item_args['img_size_popup'];
+
+		// This hack exists because wp_reset_postdata() does not work in some situations.
+		// Captured here rather than before the query: resolving a query never runs
+		// the loop, so the global post is still the one we have to restore.
+		$old_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
+
 		$items = array();
 
 		/**
@@ -629,7 +836,8 @@ class Visual_Portfolio_Get {
 								array(
 									'vp_filter' => rawurlencode( $slug ),
 									'vp_page'   => 1,
-								)
+								),
+								$query_id
 							);
 
 							$categories[] = array(
@@ -712,7 +920,8 @@ class Visual_Portfolio_Get {
 								array(
 									'vp_filter' => $unique_name,
 									'vp_page'   => 1,
-								)
+								),
+								$query_id
 							);
 							$categories[] = array(
 								'slug'        => $cat_item->slug,
@@ -788,41 +997,206 @@ class Visual_Portfolio_Get {
 			$GLOBALS['post'] = $old_post;
 		}
 
-		$notices = array();
+		return $items;
+	}
 
-		// No items found notice.
-		if ( empty( $items ) ) {
-			$class .= ' vp-portfolio-not-found';
+	/**
+	 * Default per-item args for the block pipeline.
+	 *
+	 * The same keys `get_output_config()` prepares, minus the skin options: in the
+	 * block world an item is composed of blocks, so there is no items style to
+	 * read options from. The `opts` key stays for the signature of the
+	 * `vpf_image_item_args` / `vpf_post_item_args` callbacks.
+	 *
+	 * @param array $options portfolio options.
+	 *
+	 * @return array
+	 */
+	public static function default_item_args( $options ) {
+		return array(
+			'uid'               => '',
+			'post_id'           => '',
+			'post_type'         => '',
+			'url'               => '',
+			'aria_label'        => '',
+			'title'             => '',
+			'excerpt'           => '',
+			'content'           => '',
+			'comments_count'    => '',
+			'comments_url'      => '',
+			'author'            => '',
+			'author_url'        => '',
+			'author_avatar'     => '',
+			'views_count'       => '',
+			'reading_time'      => '',
+			'format'            => '',
+			'published'         => '',
+			'published_time'    => '',
+			'categories'        => array(),
+			'filter'            => '',
+			'video'             => '',
+			'image_id'          => '',
+			'img_size_popup'    => 'vp_xl_popup',
+			'img_size_md_popup' => 'vp_md_popup',
+			'img_size_sm_popup' => 'vp_sm_popup',
+			'img_size'          => 'vp_xl',
+			'no_image'          => Visual_Portfolio_Settings::get_option( 'no_image', 'vp_general' ),
+			'focal_point'       => '',
+			'allow_popup'       => false,
+			'opts'              => array(),
+			'vp_opts'           => $options,
+		);
+	}
 
-			// Don't display any output if no items found (works on frontend only).
-			if ( $options['no_items_notice'] && ( $is_preview || 'notice' === $options['no_items_action'] ) ) {
-				$notices[] = $options['no_items_notice'];
-			}
+	/**
+	 * Build the memoization key for `get_loop_items()`.
+	 *
+	 * The request state that narrows the query is part of the identity - without
+	 * it a filtered loop would be served the unfiltered items of an earlier call.
+	 * Which parameters count as that state depends on the loop, so the id is
+	 * part of the identity too: two loops read two different pages out of one
+	 * request.
+	 *
+	 * @param array           $atts options for the loop.
+	 * @param int|string|null $query_id id of the loop, or null for the legacy parameters.
+	 *
+	 * @return string|bool md5 hash, or false when the attributes are not serializable.
+	 */
+	private static function get_loop_items_cache_key( $atts, $query_id = null ) {
+		$query_id = self::sanitize_query_id( $query_id );
+		$state    = array( 'query_id' => $query_id );
+
+		// Read where the pipeline reads it. `$_REQUEST` also carries the body of
+		// a POST - the REST preview is one - so the key would vary while the
+		// items it names do not, and with some `request_order` settings it would
+		// vary with cookies as well.
+		foreach ( self::$loop_query_vars as $role ) {
+			$name = self::get_query_var_name( $role, $query_id );
+
+            // phpcs:ignore WordPress.Security.NonceVerification
+			$state[ $name ] = isset( $_GET[ $name ] ) ? sanitize_text_field( wp_unslash( $_GET[ $name ] ) ) : null;
 		}
 
-		$errors = array();
+		// The random seed is one per request, whichever loop asks for it, and
+		// `get_rand_seed_session()` reads it out of `$_REQUEST`.
+        // phpcs:ignore WordPress.Security.NonceVerification
+		$state['vpf_random_seed'] = isset( $_REQUEST['vpf_random_seed'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['vpf_random_seed'] ) ) : null;
 
-		if ( isset( $query_opts['error'] ) && ! empty( $query_opts['error'] ) && ( $is_preview || is_admin_bar_showing() ) ) {
-			$class   .= ' vp-portfolio-errors';
-			$errors[] = $query_opts['error'];
+		$identity = wp_json_encode( array( $atts, $state ) );
+
+		// Without a reliable identity, two different loops would share one entry,
+		// which is worse than resolving the query twice.
+		return false === $identity ? false : md5( $identity );
+	}
+
+	/**
+	 * Get items for a native Gallery Loop block.
+	 *
+	 * The single data entry point of the loop block family: same query engine,
+	 * same pagination, filtering and sorting, same extension points as the
+	 * legacy gallery - without any of its markup concerns.
+	 *
+	 * @param array           $atts options for the loop.
+	 * @param int|string|null $query_id id of the loop, or null for the legacy parameters.
+	 *
+	 * @return array|bool
+	 */
+	public static function get_loop_items( $atts, $query_id = null ) {
+		if ( ! is_array( $atts ) ) {
+			return false;
 		}
 
-		$result = array(
-			'options'           => $options,
-			'style_options'     => $style_options,
-			'class'             => $class,
-			'data_attrs'        => $data_attrs,
-			'items_class'       => $items_class,
-			'items'             => $items,
-			'notices'           => $notices,
-			'errors'            => $errors,
-			'img_size_popup'    => $img_size_popup,
-			'img_size_md_popup' => $img_size_md_popup,
-			'img_size_sm_popup' => $img_size_sm_popup,
-			'img_size'          => $img_size,
+		$cache_key = self::get_loop_items_cache_key( $atts, $query_id );
+
+		// Several blocks of one loop ask for the same items in a single request.
+		if ( false !== $cache_key && isset( self::$loop_items_cache[ $cache_key ] ) ) {
+			// `build_items()` records the posts it renders, and behind the memo
+			// it does not run again. A caller that resolved the loop only to
+			// measure it puts that record back, so the render that follows has
+			// to re-establish it or a later gallery sees nothing to avoid.
+			self::record_used_posts( self::$loop_items_cache[ $cache_key ] );
+
+			return self::$loop_items_cache[ $cache_key ];
+		}
+
+		$options = self::get_options( $atts );
+
+		// No source is the same answer as no options: there is nothing to resolve,
+		// and every branch from here reads it.
+		if ( ! $options || ! isset( $options['content_source'] ) ) {
+			return false;
+		}
+
+		// Loop galleries are always paged: without it `get_query_params()` does not
+		// resolve `paged` and the images branch slices from a negative offset.
+		if ( empty( $options['pagination'] ) ) {
+			$options['pagination'] = 'paged';
+		}
+
+		/**
+		 * Fires before the loop items are resolved.
+		 *
+		 * Per-render preparation, such as resetting cached social streams.
+		 *
+		 * @param array $options portfolio options.
+		 */
+		do_action( 'vpf_before_loop_items', $options );
+
+		$query = self::resolve_query( $options, $query_id );
+		$items = self::build_items( self::default_item_args( $options ), $query['query_opts'], $options, $query['portfolio_query'], $query_id );
+
+		/**
+		 * Fires after the loop items are resolved.
+		 *
+		 * @param array $options portfolio options.
+		 */
+		do_action( 'vpf_after_loop_items', $options );
+
+		// The legacy pipeline only fills the excerpt behind the `show_excerpt` skin
+		// option, and skins do not exist here - every item gets one.
+		foreach ( $items as $k => $item ) {
+			$items[ $k ]['excerpt'] = self::get_item_excerpt( $item );
+		}
+
+		/**
+		 * Filters the resolved loop items.
+		 *
+		 * @param array $result  items, max_pages, start_page and options.
+		 * @param array $options portfolio options.
+		 */
+		// The count the query really found, not the one floored to the page that
+		// was asked for: a loop uses this to decide whether a requested page
+		// exists, and answering `9` to `?vp-1-page=9` would make every page past
+		// the end look like a page of the series.
+		$result = apply_filters(
+			'vpf_loop_items',
+			array(
+				'items'      => $items,
+				'max_pages'  => max( 1, (int) $query['found_pages'] ),
+				'start_page' => $query['start_page'],
+				'options'    => $options,
+			),
+			$options
 		);
 
+		if ( false !== $cache_key ) {
+			self::$loop_items_cache[ $cache_key ] = $result;
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Get the random seed of the current session.
+	 *
+	 * Public counterpart of `get_rand_seed_session()`: the loop control blocks
+	 * add the seed to their links so a randomly ordered loop stays stable across
+	 * pages without JavaScript.
+	 *
+	 * @return int
+	 */
+	public static function get_random_seed() {
+		return self::get_rand_seed_session();
 	}
 
 	/**
@@ -1174,26 +1548,32 @@ class Visual_Portfolio_Get {
 
 	/**
 	 * Get current page number
-	 * ?vp_page=2
+	 * ?vp_page=2 , or ?vp-3-page=2 for a loop that carries a query id.
+	 *
+	 * @param int|string|null $query_id - id of the loop asking, or null for the legacy parameter.
 	 *
 	 * @return int
 	 */
-	public static function get_current_page_number() {
+	public static function get_current_page_number( $query_id = null ) {
+		$name = self::get_query_var_name( 'page', $query_id );
+
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.NonceVerification
-		return max( 1, isset( $_GET['vp_page'] ) ? Visual_Portfolio_Security::sanitize_number( $_GET['vp_page'] ) : 1 );
+		return max( 1, isset( $_GET[ $name ] ) ? Visual_Portfolio_Security::sanitize_number( $_GET[ $name ] ) : 1 );
 	}
 
 	/**
 	 * Calculate how many pages the given query produces.
 	 *
 	 * The active filter is taken from the request by `get_query_params()`, so
-	 * the result already accounts for `?vp_filter`.
+	 * the result already accounts for `?vp_filter` - or for the filter of the
+	 * given loop.
 	 *
-	 * @param array $options - block options in the legacy format.
+	 * @param array           $options - block options in the legacy format.
+	 * @param int|string|null $query_id - id of the loop asking, or null for the legacy parameters.
 	 *
 	 * @return int
 	 */
-	public static function calculate_max_pages( $options ) {
+	public static function calculate_max_pages( $options, $query_id = null ) {
 		$options = Visual_Portfolio_Security::validate_calculate_max_pages_params( $options );
 
 		$content_source = $options['content_source'] ?? '';
@@ -1214,28 +1594,42 @@ class Visual_Portfolio_Get {
 
 		$options['items_count'] = $items_count;
 
-		$query_opts = self::get_query_params( $options, false );
+		$query_opts = self::get_query_params( $options, false, false, $query_id );
 
 		if ( isset( $query_opts['max_num_pages'] ) ) {
 			return max( 1, (int) $query_opts['max_num_pages'] );
 		}
 
-		switch ( $content_source ) {
-			case 'post-based':
-				$query     = new WP_Query( $query_opts );
-				$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
+		// Branch order mirrors `resolve_query()` on purpose: the count and the
+		// items have to agree about which query answers for this source.
+		if ( 'images' === $content_source || 'social-stream' === $content_source ) {
+			$images_count = count( $query_opts['images'] ?? array() );
 
-				return max( 1, (int) $max_pages );
-
-			case 'images':
-			case 'social-stream':
-				$images_count = count( $query_opts['images'] ?? array() );
-
-				return max( 1, (int) ceil( $images_count / $items_count ) );
-
-			default:
-				return 1;
+			return max( 1, (int) ceil( $images_count / $items_count ) );
 		}
+
+		/**
+		 * Sources that answer with their own query object resolve through this
+		 * filter in `resolve_query()`, so the page count has to ask it too -
+		 * otherwise such a loop reports a single page to the pagination blocks
+		 * and visitors never get past page one.
+		 *
+		 * @see Visual_Portfolio_Get::resolve_query() for the filter contract.
+		 */
+		$custom_query = apply_filters( 'vpf_custom_query_result', false, $query_opts, $options );
+
+		if ( $custom_query ) {
+			return isset( $custom_query->max_num_pages ) ? max( 1, (int) $custom_query->max_num_pages ) : 1;
+		}
+
+		// Everything left over is a `WP_Query`, which is what `resolve_query()`
+		// does with it too. A source that widens the query through
+		// `vpf_extend_query_args` rather than replacing the object used to fall
+		// past here and report one page while rendering several.
+		$query     = new WP_Query( $query_opts );
+		$max_pages = $query->max_num_pages ? $query->max_num_pages : ceil( $query->found_posts / $items_count );
+
+		return max( 1, (int) $max_pages );
 	}
 
 	/**
@@ -1448,20 +1842,26 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get query params array.
 	 *
-	 * @param array $options portfolio options.
-	 * @param bool  $for_filter prevent retrieving GET variable if used for filter.
-	 * @param int   $layout_id portfolio layout id.
+	 * @param array           $options portfolio options.
+	 * @param bool            $for_filter prevent retrieving GET variable if used for filter.
+	 * @param int             $layout_id portfolio layout id.
+	 * @param int|string|null $query_id id of the loop the query belongs to, or null for the legacy parameters.
 	 *
 	 * @return array
 	 */
-	public static function get_query_params( $options, $for_filter = false, $layout_id = false ) {
+	public static function get_query_params( $options, $for_filter = false, $layout_id = false, $query_id = null ) {
 		$options    = apply_filters( 'vpf_extend_options_before_query_args', $options, $layout_id );
 		$query_opts = array();
 		$is_images  = 'images' === $options['content_source'];
 
+		// The state this query is narrowed by. A filter list asks for the
+		// unnarrowed query, so it never reads the active filter.
+		$active_filter = $for_filter ? false : self::get_filter_active_item( $query_opts, $query_id );
+		$active_sort   = self::get_current_sort( $query_id );
+
 		$paged = 0;
 		if ( isset( $options['pagination'] ) && $options['pagination'] ) {
-			$paged = self::get_current_page_number();
+			$paged = self::get_current_page_number( $query_id );
 		}
 		$count = isset( $options['items_count'] ) ? intval( $options['items_count'] ) : 6;
 
@@ -1484,10 +1884,8 @@ class Visual_Portfolio_Get {
 			// Load certain taxonomies.
 			$images = array();
 
-            // phpcs:ignore WordPress.Security.NonceVerification
-			if ( ! $for_filter && ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification
-				$category = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
+			if ( false !== $active_filter ) {
+				$category = $active_filter;
 
 				foreach ( $options['images'] as $img ) {
 					if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
@@ -1512,26 +1910,20 @@ class Visual_Portfolio_Get {
 			}
 
 			// custom sorting.
-            // phpcs:ignore WordPress.Security.NonceVerification
-			if ( isset( $_GET['vp_sort'] ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification
-				$custom_get_order = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
-
-				switch ( $custom_get_order ) {
-					case 'title':
-					case 'date':
-						$custom_order           = $custom_get_order;
-						$custom_order_direction = 'asc';
-						break;
-					case 'title_desc':
-						$custom_order           = 'title';
-						$custom_order_direction = 'desc';
-						break;
-					case 'date_desc':
-						$custom_order           = 'date';
-						$custom_order_direction = 'desc';
-						break;
-				}
+			switch ( $active_sort ) {
+				case 'title':
+				case 'date':
+					$custom_order           = $active_sort;
+					$custom_order_direction = 'asc';
+					break;
+				case 'title_desc':
+					$custom_order           = 'title';
+					$custom_order_direction = 'desc';
+					break;
+				case 'date_desc':
+					$custom_order           = 'date';
+					$custom_order_direction = 'desc';
+					break;
 			}
 
 			// Sorting reads the image data from the attachment posts, so the whole
@@ -1786,12 +2178,45 @@ class Visual_Portfolio_Get {
 					}
 				}
 
+				// Narrow the query the way the Filters panel asks.
+				if ( ! empty( $options['posts_keyword'] ) ) {
+					$query_opts['s'] = (string) $options['posts_keyword'];
+				}
+
+				// The post being viewed has no business appearing in a gallery
+				// on its own page. Unlike "avoid duplicates", which is about
+				// several galleries sharing a page, this is about one post
+				// listing itself.
+				if ( ! $for_filter && ! empty( $options['posts_exclude_current'] ) && is_singular() ) {
+					$current                    = get_queried_object_id();
+					$not_current                = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
+					$query_opts['post__not_in'] = array_merge( $not_current, array( $current ) );
+				}
+
 				// Avoid duplicates.
 				// We should prevent this when using filter, since all current posts will be excluded
 				// from the filter query and we may not see all filter buttons.
 				if ( ! $for_filter && $options['posts_avoid_duplicate_posts'] ) {
+					$used = self::get_all_used_posts();
+
+					// The page's own list is what puts the post being viewed on
+					// that list, and on a single post it is the only thing on
+					// it. A loop offers "Exclude the current post" as its own
+					// switch, so this one never does that job for it - and the
+					// post comes back off here rather than by skipping the
+					// list, which would only hold while nothing else had read
+					// it first. A legacy gallery has no such switch and keeps
+					// the behaviour it always had.
+					if (
+						array_key_exists( 'posts_exclude_current', $options ) &&
+						empty( $options['posts_exclude_current'] ) &&
+						is_singular()
+					) {
+						$used = array_diff( $used, array( get_queried_object_id() ) );
+					}
+
 					$not_id                     = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
-					$query_opts['post__not_in'] = array_merge( $not_id, self::get_all_used_posts() );
+					$query_opts['post__not_in'] = array_merge( $not_id, $used );
 
 					// Remove posts from post__in.
 					if ( isset( $query_opts['post__in'] ) ) {
@@ -1801,41 +2226,40 @@ class Visual_Portfolio_Get {
 			}
 
 			// Custom sorting.
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( isset( $_GET['vp_sort'] ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$custom_get_order       = sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) );
-				$custom_order           = false;
-				$custom_order_direction = false;
+			$custom_order           = false;
+			$custom_order_direction = false;
 
-				switch ( $custom_get_order ) {
-					case 'title':
-					case 'date':
-						$custom_order           = 'post_' . $custom_get_order;
-						$custom_order_direction = 'asc';
-						break;
-					case 'title_desc':
-						$custom_order           = 'post_title';
-						$custom_order_direction = 'desc';
-						break;
-					case 'date_desc':
-						$custom_order           = 'post_date';
-						$custom_order_direction = 'desc';
-						break;
-				}
-
-				if ( $custom_order && $custom_order_direction ) {
-					$query_opts['orderby'] = $custom_order;
-					$query_opts['order']   = $custom_order_direction;
-				}
+			switch ( $active_sort ) {
+				case 'title':
+				case 'date':
+					$custom_order           = 'post_' . $active_sort;
+					$custom_order_direction = 'asc';
+					break;
+				case 'title_desc':
+					$custom_order           = 'post_title';
+					$custom_order_direction = 'desc';
+					break;
+				case 'date_desc':
+					$custom_order           = 'post_date';
+					$custom_order_direction = 'desc';
+					break;
 			}
 
+			if ( $custom_order && $custom_order_direction ) {
+				$query_opts['orderby'] = $custom_order;
+				$query_opts['order']   = $custom_order_direction;
+			}
+
+			// Asked again now that `$query_opts` is filled: the `current_query`
+			// branch replaces it with the main query's vars and `custom_query`
+			// merges the author's own query string into it, and both are how a
+			// mapped archive passes its `vp_filter` in - there is no request
+			// parameter to read it from.
+			$active_filter = $for_filter ? false : self::get_filter_active_item( $query_opts, $query_id );
+
 			// Load certain taxonomies using custom filter.
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( ! $for_filter && ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$taxonomies = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
-				$taxonomies = explode( ':', $taxonomies );
+			if ( false !== $active_filter ) {
+				$taxonomies = explode( ':', $active_filter );
 
 				if ( $taxonomies && isset( $taxonomies[0] ) && isset( $taxonomies[1] ) ) {
                     // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
@@ -2150,13 +2574,30 @@ class Visual_Portfolio_Get {
 	public static function get_images_terms( $query_opts, $active_item ) {
 		$terms           = array();
 		$there_is_active = false;
-		// calculate categories count.
+
+		// Counts are keyed by the slug, not by the label: the filter query matches
+		// on the slug, so several labels that slugify to one term ("Cats", "cats")
+		// return the images of all of them and have to be counted as one term.
+		// An image that carries two such labels is still one image, the same way
+		// `get_posts_terms()` counts a post once per term.
 		$categories_count = array();
+
 		foreach ( $query_opts['images'] as $img ) {
-			if ( isset( $img['categories'] ) && is_array( $img['categories'] ) ) {
-				foreach ( $img['categories'] as $cat ) {
-					$categories_count[ $cat ] = ( isset( $categories_count[ $cat ] ) ? $categories_count[ $cat ] : 0 ) + 1;
+			if ( ! isset( $img['categories'] ) || ! is_array( $img['categories'] ) ) {
+				continue;
+			}
+
+			$counted_slugs = array();
+
+			foreach ( $img['categories'] as $cat ) {
+				$slug = self::create_slug( $cat );
+
+				if ( isset( $counted_slugs[ $slug ] ) ) {
+					continue;
 				}
+
+				$counted_slugs[ $slug ]    = true;
+				$categories_count[ $slug ] = ( isset( $categories_count[ $slug ] ) ? $categories_count[ $slug ] : 0 ) + 1;
 			}
 		}
 
@@ -2176,7 +2617,7 @@ class Visual_Portfolio_Get {
 						'filter'      => $slug,
 						'label'       => $cat,
 						'description' => '',
-						'count'       => isset( $categories_count[ $cat ] ) && $categories_count[ $cat ] ? $categories_count[ $cat ] : '',
+						'count'       => isset( $categories_count[ $slug ] ) && $categories_count[ $slug ] ? $categories_count[ $slug ] : '',
 						'taxonomy'    => 'category',
 						'id'          => 0,
 						'parent'      => 0,
@@ -2201,17 +2642,20 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get filter active item.
 	 *
-	 * @param array $query_opts - Query array params.
-	 * @return boolean
+	 * @param array           $query_opts - Query array params.
+	 * @param int|string|null $query_id - id of the loop asking, or null for the legacy parameter.
+	 *
+	 * @return boolean|string
 	 */
-	public static function get_filter_active_item( $query_opts ) {
+	public static function get_filter_active_item( $query_opts, $query_id = null ) {
 		// Get active item.
 		$active_item = false;
+		$name        = self::get_query_var_name( 'filter', $query_id );
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ( isset( $_GET['vp_filter'] ) || isset( $query_opts['vp_filter'] ) ) ) {
+		if ( ( isset( $_GET[ $name ] ) || isset( $query_opts['vp_filter'] ) ) ) {
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$active_item = sanitize_text_field( wp_unslash( $_GET['vp_filter'] ?? $query_opts['vp_filter'] ) );
+			$active_item = sanitize_text_field( wp_unslash( $_GET[ $name ] ?? $query_opts['vp_filter'] ) );
 		}
 
 		return $active_item;
@@ -2219,13 +2663,17 @@ class Visual_Portfolio_Get {
 
 	/**
 	 * Get current sort slug
-	 * ?vp_sort=date_desc
+	 * ?vp_sort=date_desc , or ?vp-3-sort=date_desc for a loop that carries a query id.
+	 *
+	 * @param int|string|null $query_id - id of the loop asking, or null for the legacy parameter.
 	 *
 	 * @return string
 	 */
-	public static function get_current_sort() {
+	public static function get_current_sort( $query_id = null ) {
+		$name = self::get_query_var_name( 'sort', $query_id );
+
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification
-		return isset( $_GET['vp_sort'] ) ? sanitize_text_field( wp_unslash( $_GET['vp_sort'] ) ) : '';
+		return isset( $_GET[ $name ] ) ? sanitize_text_field( wp_unslash( $_GET[ $name ] ) ) : '';
 	}
 
 	/**
@@ -2262,21 +2710,52 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
+	 * Get the sort options available to a Gallery Loop block.
+	 *
+	 * The loop family gets its own extension point instead of reusing the legacy
+	 * `vpf_extend_sort_items`: the sort block stores which of these options it
+	 * shows, so the set has to be something Pro and themes can extend knowing
+	 * the loop it is asked about. The base list is shared, and so is the
+	 * handling - the chosen value keeps travelling in `vp_sort`, and
+	 * `get_query_params()` resolves it. An option beyond the built-in four needs
+	 * a `vpf_extend_query_args` callback to order by.
+	 *
+	 * Labels are not escaped, escape them on output.
+	 *
+	 * @param array $loop_options options of the loop the block belongs to.
+	 *
+	 * @return array sort slug => label.
+	 */
+	public static function get_loop_sort_options( $loop_options = array() ) {
+		/**
+		 * Filters the sort options a Gallery Loop block can offer.
+		 *
+		 * @param array $options      sort slug => label.
+		 * @param array $loop_options options of the loop.
+		 */
+		$options = apply_filters( 'vpf_loop_sort_options', self::get_sort_items( $loop_options ), $loop_options );
+
+		return is_array( $options ) ? $options : array();
+	}
+
+	/**
 	 * Get URL of the given sort item.
 	 *
-	 * @param string $slug sort slug.
-	 * @param array  $vp_options current vp_list options.
+	 * @param string          $slug sort slug.
+	 * @param array           $vp_options current vp_list options.
+	 * @param int|string|null $query_id - id of the loop the control belongs to, or null for the legacy parameters.
 	 *
 	 * @return string
 	 */
-	public static function get_sort_item_url( $slug, $vp_options = array() ) {
+	public static function get_sort_item_url( $slug, $vp_options = array(), $query_id = null ) {
 		return apply_filters(
 			'vpf_extend_sort_item_url',
 			self::get_pagenum_link(
 				array(
 					'vp_sort' => rawurlencode( $slug ),
 					'vp_page' => 1,
-				)
+				),
+				$query_id
 			),
 			$slug,
 			$vp_options
@@ -2431,7 +2910,7 @@ class Visual_Portfolio_Get {
 	 *
 	 * @return string
 	 */
-	private static function get_item_aria_label( $args ) {
+	public static function get_item_aria_label( $args ) {
 		$aria_label = wp_strip_all_tags( $args['aria_label'] ?? '' );
 
 		if ( '' === trim( $aria_label ) ) {
@@ -2972,11 +3451,13 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get pagination links.
 	 *
-	 * @param array $args - Block Arguments.
-	 * @param array $vp_options - Block Options.
+	 * @param array           $args - Block Arguments.
+	 * @param array           $vp_options - Block Options.
+	 * @param int|string|null $query_id - id of the loop the pagination belongs to, or null for the legacy parameters.
+	 *
 	 * @return array
 	 */
-	public static function get_pagination_links( $args, $vp_options ) {
+	public static function get_pagination_links( $args, $vp_options, $query_id = null ) {
 		$pagination_links = paginate_links(
 			array(
 				'base'      => esc_url_raw(
@@ -2988,7 +3469,8 @@ class Visual_Portfolio_Get {
 							self::get_pagenum_link(
 								array(
 									'vp_page' => 999999999,
-								)
+								),
+								$query_id
 							)
 						)
 					)
@@ -3059,48 +3541,92 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
+	 * The URL of the request being served.
+	 *
+	 * Read off `REQUEST_URI` rather than rebuilt, because a site may be running
+	 * on permalinks nothing else reproduces - `/index.php/%postname%` among them.
+	 * Only where the server said nothing is it built back from the parsed request.
+	 *
+	 * @return string Unescaped URL.
+	 */
+	public static function get_current_url() {
+		if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
+			return esc_url_raw( wp_unslash( ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
+		}
+
+		global $wp;
+
+		$current_url = trailingslashit( home_url( $wp->request ) );
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $_GET ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$current_url = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( $_GET ) ), $current_url );
+		}
+
+		return $current_url;
+	}
+
+	/**
 	 * Return current page url with paged support.
 	 *
-	 * @param array $query_arg - custom query arg.
+	 * Arguments are always named after the legacy parameters (`vp_page`,
+	 * `vp_filter`, `vp_sort`). With a query id they are written under the names
+	 * of that loop instead, so every caller builds a link the same way and only
+	 * the loop decides which parameters it owns. Parameters of other loops are
+	 * part of the current URL and survive untouched.
+	 *
+	 * @param array           $query_arg - custom query arg.
+	 * @param int|string|null $query_id - id of the loop the link belongs to, or null for the legacy parameters.
+	 *
 	 * @return string
 	 */
-	public static function get_pagenum_link( $query_arg = array() ) {
-		// Use current page url.
-		global $wp;
-		$current_url = '';
+	public static function get_pagenum_link( $query_arg = array(), $query_id = null ) {
+		$current_url = self::get_current_url();
 
-		// We should use REQUEST_URI in case if the user used non-default permalinks.
-		// For example, this one:
-		// - /index.php/%postname% .
-		if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
-			$current_url = esc_url_raw( wp_unslash( ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
-		} else {
-			$current_url = trailingslashit( home_url( $wp->request ) );
+		$names = array(
+			'vp_filter' => self::get_query_var_name( 'filter', $query_id ),
+			'vp_sort'   => self::get_query_var_name( 'sort', $query_id ),
+			'vp_page'   => self::get_query_var_name( 'page', $query_id ),
+		);
 
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( ! empty( $_GET ) ) {
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$current_url = add_query_arg( array_map( 'sanitize_text_field', wp_unslash( $_GET ) ), $current_url );
+		if ( 'vp_page' !== $names['vp_page'] ) {
+			$renamed = array();
+
+			foreach ( $query_arg as $key => $value ) {
+				$renamed[ $names[ $key ] ?? $key ] = $value;
+			}
+
+			$query_arg = $renamed;
+		}
+
+		// An empty filter or sort, and the first page, are the default state -
+		// they are dropped from the URL rather than written into it.
+		foreach ( array( 'vp_filter', 'vp_sort' ) as $legacy_name ) {
+			$name = $names[ $legacy_name ];
+
+			if ( isset( $query_arg[ $name ] ) && ! $query_arg[ $name ] ) {
+				unset( $query_arg[ $name ] );
+				$current_url = remove_query_arg( $name, $current_url );
 			}
 		}
 
-		if ( isset( $query_arg['vp_filter'] ) && ! $query_arg['vp_filter'] ) {
-			unset( $query_arg['vp_filter'] );
-			$current_url = remove_query_arg( 'vp_filter', $current_url );
-		}
-		if ( isset( $query_arg['vp_sort'] ) && ! $query_arg['vp_sort'] ) {
-			unset( $query_arg['vp_sort'] );
-			$current_url = remove_query_arg( 'vp_sort', $current_url );
-		}
-		if ( isset( $query_arg['vp_page'] ) && 1 === $query_arg['vp_page'] ) {
-			unset( $query_arg['vp_page'] );
-			$current_url = remove_query_arg( 'vp_page', $current_url );
+		if ( isset( $query_arg[ $names['vp_page'] ] ) && 1 === $query_arg[ $names['vp_page'] ] ) {
+			unset( $query_arg[ $names['vp_page'] ] );
+			$current_url = remove_query_arg( $names['vp_page'], $current_url );
 		}
 
 		// Add custom query args.
 		$current_url = add_query_arg( $query_arg, $current_url );
 
-		$current_url = apply_filters( 'vpf_get_pagenum_link', $current_url, $query_arg );
+		/**
+		 * Filters a link built by the gallery controls.
+		 *
+		 * @param string          $current_url resulting URL, unescaped.
+		 * @param array           $query_arg   query arguments added to it, under the names of the loop.
+		 * @param int|string|null $query_id    id of the loop the link belongs to, null for the legacy parameters.
+		 */
+		$current_url = apply_filters( 'vpf_get_pagenum_link', $current_url, $query_arg, $query_id );
 
 		return $current_url;
 	}
@@ -3131,7 +3657,61 @@ class Visual_Portfolio_Get {
 	}
 
 	/**
-	 * Get list with all used posts on the current page.
+	 * Put the posts of a resolved loop on the used list.
+	 *
+	 * @param array $result - what `get_loop_items()` returns.
+	 *
+	 * @return void
+	 */
+	private static function record_used_posts( $result ) {
+		if ( empty( $result['items'] ) || ! is_array( $result['items'] ) ) {
+			return;
+		}
+
+		foreach ( $result['items'] as $item ) {
+			$post_id = empty( $item['post_id'] ) ? 0 : (int) $item['post_id'];
+
+			if ( $post_id && ! in_array( $post_id, self::$used_posts, true ) ) {
+				self::$used_posts[] = $post_id;
+			}
+		}
+	}
+
+	/**
+	 * The posts resolved so far, to be put back after a lookup.
+	 *
+	 * Resolving a loop records its posts, and "avoid duplicates" reads that
+	 * record - so anything that resolves a loop out of document order, such as
+	 * a `wp_head` lookup, changes what the loops after it are allowed to show.
+	 *
+	 * @return array
+	 */
+	public static function snapshot_used_posts() {
+		return array(
+			'used_posts'       => self::$used_posts,
+			'check_main_query' => self::$check_main_query,
+		);
+	}
+
+	/**
+	 * Put a snapshot of the resolved posts back.
+	 *
+	 * @param array $snapshot - what `snapshot_used_posts()` returned.
+	 *
+	 * @return void
+	 */
+	public static function restore_used_posts( $snapshot ) {
+		self::$used_posts = (array) ( $snapshot['used_posts'] ?? array() );
+
+		// The main query is folded in once per request. Without putting the
+		// latch back, a caller that only measured a loop would spend it, and
+		// every gallery further down the page - the legacy one included -
+		// would stop excluding what the page itself already listed.
+		self::$check_main_query = (bool) ( $snapshot['check_main_query'] ?? true );
+	}
+
+	/**
+	 * Get all used posts.
 	 *
 	 * @return array
 	 */

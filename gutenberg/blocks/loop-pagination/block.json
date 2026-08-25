@@ -1,0 +1,64 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-pagination",
+	"title": "Gallery Pagination (Experimental)",
+	"category": "media",
+	"description": "Displays pagination wrapper which can include paged, load more and infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/loop"],
+	"allowedBlocks": [
+		"visual-portfolio/loop-pagination-previous",
+		"visual-portfolio/loop-pagination-numbers",
+		"visual-portfolio/loop-pagination-next",
+		"visual-portfolio/loop-pagination-trigger"
+	],
+	"textdomain": "visual-portfolio",
+	"supports": {
+		"html": false,
+		"className": false,
+		"anchor": true,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"blockGap": ["horizontal", "vertical"],
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"__experimentalDefaultControls": { "blockGap": true }
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": { "type": "flex" }
+		}
+	},
+	"selectors": { "root": ".vp-block-loop-pagination" },
+	"providesContext": {
+		"vp/showLabel": "showLabel",
+		"vp/showArrow": "showArrow"
+	},
+	"styles": [{ "name": "fill", "label": "Fill" }],
+	"attributes": {
+		"showLabel": { "type": "boolean", "default": true },
+		"showArrow": { "type": "boolean", "default": true }
+	},
+	"style": "visual-portfolio-block-loop-pagination"
+}

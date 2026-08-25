@@ -101,8 +101,6 @@ export default function FocalPointControl(props) {
 					max={100}
 					step={1}
 					units={[{ value: '%', label: '%' }]}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				/>
 				<UnitControl
 					label={__('Top', 'visual-portfolio')}
@@ -116,8 +114,6 @@ export default function FocalPointControl(props) {
 					max={100}
 					step={1}
 					units={[{ value: '%', label: '%' }]}
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				/>
 			</PanelRow>
 		</>

@@ -1,0 +1,164 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/item-cover",
+	"title": "Gallery Item Cover (Experimental)",
+	"category": "media",
+	"description": "Displays the image of a gallery item as a background, with blocks on top of it. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/item-template"],
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/itemImgId",
+		"vp/itemImgUrl",
+		"vp/itemImgAlt",
+		"vp/itemNoImgId",
+		"vp/itemImageSizes",
+		"vp/itemFocalPoint",
+		"vp/itemUrl",
+		"vp/itemAriaLabel",
+		"vp/itemPopupData",
+		"vp/itemImageLoading",
+		"vp/layoutColumns"
+	],
+	"attributes": {
+		"sizeSlug": {
+			"type": "string",
+			"default": "large"
+		},
+		"aspectRatio": {
+			"type": "string",
+			"default": "1"
+		},
+		"minHeight": {
+			"type": "string"
+		},
+		"backgroundSize": {
+			"type": "string",
+			"default": "cover",
+			"enum": ["cover", "contain", "fill"]
+		},
+		"focalPoint": {
+			"type": "object"
+		},
+		"contentPosition": {
+			"type": "string",
+			"default": "center"
+		},
+		"effect": {
+			"type": "string",
+			"default": "fade",
+			"enum": ["none", "fade", "fly", "emerge"]
+		},
+		"showContent": {
+			"type": "string",
+			"default": "hover",
+			"enum": ["always", "hover", "default"]
+		},
+		"overlayColor": {
+			"type": "string"
+		},
+		"customOverlayColor": {
+			"type": "string"
+		},
+		"gradient": {
+			"type": "string"
+		},
+		"customGradient": {
+			"type": "string"
+		},
+		"dimRatio": {
+			"type": "number",
+			"default": 0
+		},
+		"hoverOverlayColor": {
+			"type": "string"
+		},
+		"customHoverOverlayColor": {
+			"type": "string"
+		},
+		"hoverGradient": {
+			"type": "string"
+		},
+		"customHoverGradient": {
+			"type": "string"
+		},
+		"hoverDimRatio": {
+			"type": "number",
+			"default": 50
+		},
+		"clickAction": {
+			"type": "string",
+			"default": "none",
+			"enum": ["none", "url", "popup"],
+			"role": "content"
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self",
+			"role": "content"
+		},
+		"rel": {
+			"type": "string",
+			"default": "",
+			"role": "content"
+		}
+	},
+	"example": {
+		"attributes": { "showContent": "always" },
+		"innerBlocks": [{ "name": "visual-portfolio/item-title" }],
+		"viewportWidth": 350
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"anchor": true,
+		"interactivity": true,
+		"color": {
+			"text": true,
+			"background": false,
+			"__experimentalDefaultControls": {
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true,
+			"blockGap": true,
+			"__experimentalSkipSerialization": ["padding"],
+			"__experimentalDefaultControls": {
+				"padding": true,
+				"blockGap": true
+			}
+		},
+		"filter": {
+			"duotone": true
+		},
+		"shadow": true,
+		"__experimentalBorder": {
+			"radius": true,
+			"width": true,
+			"color": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true
+			}
+		}
+	},
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-visual-portfolio-item-cover img"
+		}
+	},
+	"style": "visual-portfolio-block-item-cover"
+}

@@ -848,7 +848,6 @@ const SortableItem = (props) => {
 							onChange={(val) => {
 								onCheck(val);
 							}}
-							__nextHasNoMarginBottom
 						/>
 					) : null}
 					<Button
@@ -1079,7 +1078,6 @@ const SortableList = (props) => {
 								}
 								setLastChecked(false);
 							}}
-							__nextHasNoMarginBottom
 						/>
 						<SelectControl
 							title={__('Bulk Actions', 'visual-portfolio')}
@@ -1125,8 +1123,6 @@ const SortableList = (props) => {
 									setBulkEditOpen(true);
 								}
 							}}
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 						/>
 					</div>
 					{categories?.length ? (
@@ -1157,8 +1153,6 @@ const SortableList = (props) => {
 								onChange={(val) => {
 									setFilterCategory(val);
 								}}
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 							/>
 							<svg
 								width="20"

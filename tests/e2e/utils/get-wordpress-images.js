@@ -7,6 +7,7 @@ const path = require('path');
  * Test Images
  */
 import imagePaths from '../../fixtures/images.json';
+import { getFixturePath } from './fixture-path';
 
 /**
  *
@@ -60,10 +61,7 @@ export async function getWordpressImages({
 		await page.goto(currentPage);
 	}
 
-	const imagePath =
-		process.env.CORE || usingInPro
-			? 'core-plugin/tests/fixtures/'
-			: 'tests/fixtures/';
+	const imagePath = getFixturePath('', usingInPro);
 
 	async function uploadMediaWithRetry(filepath, retries = 5) {
 		for (let attempt = 1; attempt <= retries; attempt++) {

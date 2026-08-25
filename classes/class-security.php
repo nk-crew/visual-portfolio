@@ -500,7 +500,8 @@ class Visual_Portfolio_Security {
 	 */
 	public static function sanitize_attributes( $attributes = array() ) {
 		if ( ! empty( $attributes ) ) {
-			$controls = Visual_Portfolio_Controls::get_registered_array();
+			$controls  = Visual_Portfolio_Controls::get_registered_array();
+			$loop_only = self::get_loop_only_options();
 			foreach ( $attributes as $key => $attribute ) {
 				if ( 0 === strpos( $key, 'vp_' ) ) {
 					$key                = preg_replace( '/^vp_/', '', $key );
@@ -508,6 +509,17 @@ class Visual_Portfolio_Security {
 					$attributes[ $key ] = $attribute;
 					unset( $attributes[ 'vp_' . $key ] );
 				}
+
+				// Without a control behind it the lookup below falls through to
+				// the text branch, which flattens an array of ids to an empty
+				// string. A name a control does register keeps that control's
+				// own sanitizer - Pro registers several of these names for the
+				// legacy gallery, and this must not answer for them.
+				if ( isset( $loop_only[ $key ] ) && ! isset( $controls[ $key ] ) ) {
+					$attributes[ $key ] = self::sanitize_loop_only_option( $loop_only[ $key ], $attribute );
+					continue;
+				}
+
 				$sanitize_callback = $controls[ $key ]['sanitize_callback'] ?? false;
 				if ( $sanitize_callback ) {
 					$finding_class = is_string( $sanitize_callback ) && strripos( $sanitize_callback, '::' );
@@ -614,10 +626,64 @@ class Visual_Portfolio_Security {
 	}
 
 	/**
+	 * Options a loop block carries that no legacy control registers.
+	 *
+	 * `Visual_Portfolio_Get::get_options()` keeps registered controls and
+	 * nothing else, so without this list the loop's own query options are
+	 * dropped before the query is built. Each entry names how the value is
+	 * sanitized on the way in.
+	 *
+	 * @return array
+	 */
+	public static function get_loop_only_options() {
+		/**
+		 * Options a loop carries that no legacy control registers.
+		 *
+		 * A source or a module that gives the loop a setting the legacy
+		 * gallery has no control for registers it here, or `get_options()`
+		 * drops it before the query is built. The value is the type its
+		 * sanitizer takes: `ids`, `text`, `boolean` or `number`.
+		 *
+		 * @param array $options Option name to sanitizer type.
+		 */
+		return apply_filters(
+			'vpf_loop_only_options',
+			array(
+				'posts_keyword'         => 'text',
+				'posts_exclude_current' => 'boolean',
+				'max_pages'             => 'number',
+			)
+		);
+	}
+
+	/**
+	 * Sanitize one loop-only option.
+	 *
+	 * @param string $type - type from `get_loop_only_options()`.
+	 * @param mixed  $value - raw value.
+	 *
+	 * @return mixed
+	 */
+	public static function sanitize_loop_only_option( $type, $value ) {
+		switch ( $type ) {
+			case 'ids':
+				return array_values( array_filter( array_map( 'absint', (array) $value ) ) );
+			case 'text':
+				return is_scalar( $value ) ? sanitize_text_field( wp_unslash( (string) $value ) ) : '';
+			case 'boolean':
+				return self::sanitize_boolean( $value );
+			case 'number':
+				return self::sanitize_number( $value );
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get allowed parameters configuration
 	 */
 	private static function get_allowed_params_config() {
-		return array(
+		$config = array(
 			'align'                       => 'string',
 			'anchor'                      => 'string',
 			'block_id'                    => 'string',
@@ -637,9 +703,12 @@ class Visual_Portfolio_Security {
 			'images_order_direction'      => array( 'string', 'asc' ),
 			'images_titles_source'        => array( 'string', 'custom' ),
 			'items_count'                 => array( 'number', 6 ),
+			'max_pages'                   => array( 'number', 0 ),
 			'post_types_set'              => array( 'array', array( 'post' ) ),
 			'posts_avoid_duplicate_posts' => array( 'boolean', false ),
 			'posts_custom_query'          => array( 'string', '' ),
+			'posts_exclude_current'       => array( 'boolean', false ),
+			'posts_keyword'               => array( 'string', '' ),
 			'posts_excluded_ids'          => array( 'array', array() ),
 			'posts_ids'                   => array( 'array', array() ),
 			'posts_offset'                => 'number',
@@ -653,6 +722,23 @@ class Visual_Portfolio_Security {
 			'sort'                        => array( 'string', 'dropdown' ),
 			'stretch'                     => array( 'boolean', false ),
 		);
+
+		/**
+		 * Filter the allow-list of options `calculate_max_pages()` may receive.
+		 *
+		 * Third-party content sources map their `sourceQuery` into their own
+		 * legacy options through `vpf_convert_loop_source_attributes`, and
+		 * everything not listed here is dropped before the query is built - so a
+		 * source that does not register its options here can never report a page
+		 * count. Note the options arrive in the *legacy* format: `sourceQuery`
+		 * has already been converted away by the time this runs.
+		 *
+		 * Every entry is `option => type` or `option => array( type, default )`,
+		 * where type is one of `string`, `number`, `boolean`, `array`.
+		 *
+		 * @param array $config Allowed options, keyed by option name.
+		 */
+		return apply_filters( 'vpf_allowed_max_pages_params', $config );
 	}
 
 	/**

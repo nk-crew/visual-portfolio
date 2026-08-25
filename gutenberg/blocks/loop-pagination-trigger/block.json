@@ -1,0 +1,60 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-pagination-trigger",
+	"title": "Load More",
+	"description": "Displays a trigger that loads the next items, on click or as the reader reaches it.",
+	"category": "media",
+	"ancestor": ["visual-portfolio/loop-pagination"],
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/blockId",
+		"vp/queryId",
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/sourceQuery"
+	],
+	"attributes": {
+		"triggerType": {
+			"type": "string",
+			"default": "load-more",
+			"enum": ["load-more", "infinite"]
+		},
+		"label": {
+			"type": "string"
+		},
+		"loadingLabel": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"className": false,
+		"color": {
+			"gradients": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	},
+	"selectors": {
+		"root": ".vp-block-loop-pagination-trigger"
+	}
+}

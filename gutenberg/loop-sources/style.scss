@@ -1,0 +1,112 @@
+.vpf-loop-source-picker {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 8px;
+
+	.components-button.vpf-loop-source-picker__item {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		align-items: center;
+		justify-content: center;
+		height: auto;
+		padding: 14px 8px;
+		text-align: center;
+		border: 1px solid var(--wp-components-color-gray-300, #ddd);
+		border-radius: 2px;
+
+		// `isPressed` already fills the button and turns its text white, so the
+		// selected item only needs its border to follow.
+		&.is-selected {
+			border-color: transparent;
+		}
+	}
+}
+
+.vpf-loop-source-picker__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 20px;
+}
+
+.vpf-loop-source-picker__title {
+	font-size: 12px;
+	line-height: 1.2;
+	overflow-wrap: anywhere;
+}
+
+.vpf-loop-source-picker__badge {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	padding: 1px 4px;
+	font-size: 9px;
+	font-weight: 600;
+	text-transform: uppercase;
+	background: var(--wp-components-color-gray-100, #f0f0f0);
+	border-radius: 2px;
+}
+
+.vpf-loop-source-fieldset {
+	// The panel grid spaces the rows; a margin here would add to it.
+	margin-bottom: 0;
+
+	legend {
+		margin-bottom: 8px;
+		font-size: 11px;
+		font-weight: 500;
+		text-transform: uppercase;
+	}
+}
+
+// The pattern chooser, laid out the way the core Query block lays its own out:
+// columns rather than a grid, so a tall pattern and a short one sit side by
+// side without a row of white space between them. Scoped to our own overlay -
+// the same rule on the bare list class would reflow the inserter as well.
+.vpf-loop-setup__overlay .block-editor-block-patterns-list {
+	// Core's own list carries `height: 100%`, which resolves against a plain
+	// block parent there and stays `auto`. Ours is a flex item of the modal, so
+	// it resolves to a real height - and a multicol box with a definite height
+	// grows sideways instead of down.
+	height: auto;
+	column-count: 2;
+	column-gap: 24px;
+
+	@media (min-width: 1280px) {
+		column-count: 3;
+	}
+
+	.block-editor-block-patterns-list__list-item {
+		break-inside: avoid-column;
+	}
+
+	// A preview is measured before it is drawn, and a gallery measures zero
+	// until its items arrive. Without a floor the card is a sliver until then.
+	.block-editor-block-preview__container {
+		min-height: 100px;
+	}
+}
+
+.vpf-loop-setup__search {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	padding: 16px 0;
+	background: #fff;
+}
+
+// The three things a gallery is assembled from, asked before its shape.
+.vpf-loop-wizard {
+	width: 100%;
+}
+
+.vpf-loop-wizard__choices {
+	align-items: flex-start;
+
+	> * {
+		flex: 1 1 180px;
+		min-width: 0;
+	}
+}
