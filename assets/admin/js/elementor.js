@@ -1,11 +1,14 @@
 import $ from 'jquery';
-import rafSchd from 'raf-schd';
 import { throttle } from 'throttle-debounce';
 
 import {
 	connectPreviewFrame,
 	resolveTargetOrigin,
 } from '../../js/_preview-frame';
+
+// Smallest gap between preview resizes, in ms. Matches the block editor, and is longer than the
+// CSS transition so each step finishes easing before the next begins.
+const PREVIEW_RESIZE_INTERVAL = 400;
 
 // Frame element -> connection handle, so a resize can reach a frame set up elsewhere.
 //
@@ -62,8 +65,26 @@ $wnd.on('elementor/frontend/init', ($data) => {
 			});
 	}
 
-	// window resize.
-	$wnd.on('resize', throttle(300, rafSchd(maybeResizePreviews)));
+	const maybeResizePreviewsThrottled = throttle(300, maybeResizePreviews);
+
+	// Follow the preview's own box, not just a window resize event.
+	//
+	// Switching the device preview resizes the preview frame from the editor chrome. A window
+	// listener only hears about that if the preview window is told, while a ResizeObserver
+	// reports the box itself whatever caused it to change. The window listener stays as well,
+	// for anything that resizes the preview window without changing this element.
+	//
+	// No `rafSchd` on the throttle: it holds its pending frame id until that frame runs, and a
+	// hidden editor tab gets no frames - so one call made while the tab is in the background
+	// would swallow every later resize.
+	if (typeof elementorWindow.ResizeObserver !== 'undefined') {
+		new elementorWindow.ResizeObserver(
+			maybeResizePreviewsThrottled
+		).observe(elementorWindow.document.documentElement);
+	}
+
+	// Kept as a fallback for anything that resizes the preview window itself.
+	$wnd.on('resize', maybeResizePreviewsThrottled);
 
 	// added/changed widget.
 	elementorFrontend.hooks.addAction(
@@ -101,6 +122,7 @@ $wnd.on('elementor/frontend/init', ($data) => {
 						targetOrigin: resolveTargetOrigin(
 							variables.preview_url
 						),
+						applyInterval: PREVIEW_RESIZE_INTERVAL,
 						onInit() {
 							maybeResizePreviews();
 						},

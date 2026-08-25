@@ -37,6 +37,76 @@ export function resolveTargetOrigin(url) {
 }
 
 /**
+ * Rate-limit a function, running it immediately and then at most once per `delay`.
+ *
+ * Leading edge so the first height lands with no delay, trailing edge so the last one always
+ * lands too - without it the preview would settle on whatever height happened to fall on a tick
+ * rather than the real one.
+ *
+ * @param {number}   delay - smallest gap between calls, in ms. Zero disables the limiting.
+ * @param {Function} fn    - the function to rate-limit.
+ *
+ * @return {Function} the rate-limited function, with a `cancel` method.
+ */
+function throttleTrailing(delay, fn) {
+	if (!delay) {
+		const immediate = (...args) => fn(...args);
+
+		immediate.cancel = () => {};
+
+		return immediate;
+	}
+
+	let lastRun = 0;
+	let timer = null;
+	let pending = null;
+
+	function run(args) {
+		lastRun = Date.now();
+		pending = null;
+		fn(...args);
+	}
+
+	function throttled(...args) {
+		const remaining = delay - (Date.now() - lastRun);
+
+		pending = args;
+
+		if (remaining <= 0) {
+			if (timer !== null) {
+				clearTimeout(timer);
+				timer = null;
+			}
+
+			run(args);
+
+			return;
+		}
+
+		if (timer === null) {
+			timer = setTimeout(() => {
+				timer = null;
+
+				if (pending) {
+					run(pending);
+				}
+			}, remaining);
+		}
+	}
+
+	throttled.cancel = () => {
+		if (timer !== null) {
+			clearTimeout(timer);
+			timer = null;
+		}
+
+		pending = null;
+	};
+
+	return throttled;
+}
+
+/**
  * Host side. Connect to a preview iframe.
  *
  * @param {HTMLIFrameElement} iframe               - the frame to drive.
@@ -53,6 +123,7 @@ export function connectPreviewFrame(iframe, options = {}) {
 	const {
 		targetOrigin = window.location.origin,
 		sizeHeight = true,
+		applyInterval = 0,
 		onResized,
 		onMessage,
 		onInit,
@@ -73,6 +144,24 @@ export function connectPreviewFrame(iframe, options = {}) {
 	// editor script runs in the admin page, so listening on the global `window` would never
 	// see the frame's messages.
 	const hostWindow = iframe.ownerDocument.defaultView || window;
+
+	// Settling content reports a new height many times a second, and applying every one of them
+	// makes the preview jitter. Rate-limiting here rather than in the caller keeps the frame and
+	// whatever the caller sizes around it moving as one - split between two limiters they drift
+	// apart and the frame visibly lags its own container.
+	const applyHeight = throttleTrailing(applyInterval, (height) => {
+		if (destroyed) {
+			return;
+		}
+
+		if (sizeHeight) {
+			iframe.style.height = `${height}px`;
+		}
+
+		if (onResized) {
+			onResized({ height });
+		}
+	});
 
 	function post(type, payload) {
 		if (destroyed || !iframe.contentWindow) {
@@ -131,13 +220,7 @@ export function connectPreviewFrame(iframe, options = {}) {
 					break;
 				}
 
-				if (sizeHeight) {
-					iframe.style.height = `${height}px`;
-				}
-
-				if (onResized) {
-					onResized({ height });
-				}
+				applyHeight(height);
 				break;
 			}
 			case 'message':
@@ -164,6 +247,7 @@ export function connectPreviewFrame(iframe, options = {}) {
 		},
 		destroy() {
 			destroyed = true;
+			applyHeight.cancel();
 			hostWindow.removeEventListener('message', handleMessage);
 		},
 	};

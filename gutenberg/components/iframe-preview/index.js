@@ -8,7 +8,6 @@ import { applyFilters } from '@wordpress/hooks';
 import classnames from 'classnames/dedupe';
 import $ from 'jquery';
 import { isEqual, uniq } from 'lodash';
-import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
 import {
@@ -23,6 +22,12 @@ const {
 } = window;
 
 let uniqueIdCount = 1;
+
+// Smallest gap between preview resizes, in ms. Content settles over roughly a second and reports
+// a new height many times a second while it does; applying each one makes the preview jitter.
+// This is deliberately longer than the CSS transition in `style.scss`, so every step finishes
+// easing before the next one starts and the movement reads as continuous rather than stepped.
+const PREVIEW_RESIZE_INTERVAL = 400;
 
 function getUpdatedKeys(oldData, newData) {
 	const keys = uniq([...Object.keys(oldData), ...Object.keys(newData)]);
@@ -69,21 +74,14 @@ class IframePreview extends Component {
 		// reload for the rest of the session.
 		this.maybeReloadDebounce = debounce(300, this.maybeReload.bind(this));
 		this.maybeResizePreviews = this.maybeResizePreviews.bind(this);
+		// No `rafSchd` here either, for the reason above: a hidden editor tab gets no frames, and
+		// `raf-schd` holds its pending frame id until one arrives, so a single call made while
+		// the tab is in the background swallows every later resize.
 		this.maybeResizePreviewsThrottle = throttle(
 			100,
-			rafSchd(this.maybeResizePreviews)
+			this.maybeResizePreviews
 		);
 		this.updateIframeHeight = this.updateIframeHeight.bind(this);
-
-		// No `rafSchd` here either, and for a sharper reason than above: this is the
-		// callback that gives the preview its height, and until it runs the wrapper stays
-		// at zero with `overflow: hidden`. A frame that is not painted gets no animation
-		// frame, so scheduling the first height update on one deadlocks it - zero height
-		// forever. `throttle` alone already coalesces the burst.
-		this.updateIframeHeightThrottle = throttle(
-			100,
-			this.updateIframeHeight
-		);
 		this.printInput = this.printInput.bind(this);
 
 		this.trackBlockPosition = this.trackBlockPosition.bind(this);
@@ -106,6 +104,7 @@ class IframePreview extends Component {
 
 		self.previewFrame = connectPreviewFrame(self.frameRef.current, {
 			targetOrigin: resolveTargetOrigin(variables.preview_url),
+			applyInterval: PREVIEW_RESIZE_INTERVAL,
 			onMessage({ message }) {
 				// select current block on click message.
 				if (message === 'clicked') {
@@ -115,7 +114,7 @@ class IframePreview extends Component {
 				}
 			},
 			onResized({ height }) {
-				self.updateIframeHeightThrottle(`${height}px`);
+				self.updateIframeHeight(`${height}px`);
 			},
 		});
 

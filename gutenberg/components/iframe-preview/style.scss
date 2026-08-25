@@ -1,13 +1,29 @@
+// Preview height eases instead of snapping. Content settles over about a second and reports a
+// new height as it goes; without this the preview steps through those heights and reads as
+// jitter. Shorter than the interval the editor applies heights at, so each step finishes before
+// the next begins. The wrapper and the frame carry the same transition so they move as one -
+// animating only the wrapper would leave a gap under a shrinking frame.
+$preview-resize-transition: 300ms;
+
 .visual-portfolio-gutenberg-preview {
 	position: relative;
 	min-height: 40px;
 	overflow: hidden;
+	transition: height $preview-resize-transition ease;
 
 	iframe {
 		position: absolute;
 		width: 100%;
 		max-width: none !important;
 		margin: 0;
+		transition: height $preview-resize-transition ease;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.visual-portfolio-gutenberg-preview,
+	.visual-portfolio-gutenberg-preview iframe {
+		transition: none;
 	}
 }
 
