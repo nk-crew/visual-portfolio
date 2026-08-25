@@ -2,6 +2,28 @@ import $ from 'jquery';
 import rafSchd from 'raf-schd';
 import { throttle } from 'throttle-debounce';
 
+import {
+	connectPreviewFrame,
+	resolveTargetOrigin,
+} from '../../js/_preview-frame';
+
+// Frame element -> connection handle, so a resize can reach a frame set up elsewhere.
+//
+// A plain Map rather than a WeakMap because it has to be iterable: Elementor renders a widget
+// again with a brand new `<iframe>` element, so the previous handle is never looked up by key
+// and would otherwise keep its `message` listener and its detached frame alive for the rest of
+// the editing session. `pruneConnections` drops the ones whose frame has left the document.
+const connections = new Map();
+
+function pruneConnections() {
+	connections.forEach((connection, frame) => {
+		if (!frame.isConnected) {
+			connection.destroy();
+			connections.delete(frame);
+		}
+	});
+}
+
 const { elementorFrontend, VPAdminElementorVariables: variables } = window;
 const $wnd = $(window);
 
@@ -28,12 +50,14 @@ $wnd.on('elementor/frontend/init', ($data) => {
 					width: elementorWidth,
 				});
 
-				if (item.iFrameResizer) {
-					item.iFrameResizer.sendMessage({
+				const connection = connections.get(item);
+
+				if (connection) {
+					connection.sendMessage({
 						name: 'resize',
 						width: parentWidth,
 					});
-					item.iFrameResizer.resize();
+					connection.resize();
 				}
 			});
 	}
@@ -60,24 +84,40 @@ $wnd.on('elementor/frontend/init', ($data) => {
 			$frame.attr('src', iframeURL);
 
 			// resize iframe
-			if ($.fn.iFrameResize) {
-				$frame.iFrameResize({
-					onInit() {
-						maybeResizePreviews();
-					},
-					onMessage({ message }) {
-						// select current block on click message.
-						if (message === 'clicked') {
-							// Select current widget to display settings.
-							$frame
-								.closest('.elementor-element')
-								.find('.elementor-editor-element-edit')
-								.click();
+			const frame = $frame.get(0);
 
-							window.focus();
-						}
-					},
-				});
+			if (frame) {
+				pruneConnections();
+
+				const previous = connections.get(frame);
+
+				if (previous) {
+					previous.destroy();
+				}
+
+				connections.set(
+					frame,
+					connectPreviewFrame(frame, {
+						targetOrigin: resolveTargetOrigin(
+							variables.preview_url
+						),
+						onInit() {
+							maybeResizePreviews();
+						},
+						onMessage({ message }) {
+							// select current block on click message.
+							if (message === 'clicked') {
+								// Select current widget to display settings.
+								$frame
+									.closest('.elementor-element')
+									.find('.elementor-editor-element-edit')
+									.trigger('click');
+
+								window.focus();
+							}
+						},
+					})
+				);
 			}
 		}
 	);

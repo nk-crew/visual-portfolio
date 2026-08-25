@@ -417,7 +417,8 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				}
 
 				// Convert url to hostname, eg: "youtube" instead of "https://youtube.com/".
-				$data['provider-name'] = pathinfo( str_replace( array( 'www.' ), '', wp_parse_url( $url, PHP_URL_HOST ) ), PATHINFO_FILENAME );
+				// A URL with no host parses to null, which `str_replace()` is deprecated for taking since PHP 8.1.
+				$data['provider-name'] = pathinfo( str_replace( array( 'www.' ), '', (string) wp_parse_url( $url, PHP_URL_HOST ) ), PATHINFO_FILENAME );
 
 				// save cache.
 				set_transient( $cache_name, $data, DAY_IN_SECONDS );

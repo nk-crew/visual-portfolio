@@ -92,24 +92,6 @@ const vendorFiles = [
 			'assets/vendor/flickr-justified-gallery/dist/fjGallery.css',
 	},
 	{
-		source: 'node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js',
-		destination:
-			'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js',
-	},
-	{
-		source: 'node_modules/iframe-resizer/js/iframeResizer.contentWindow.map',
-		destination:
-			'assets/vendor/iframe-resizer/js/iframeResizer.contentWindow.map',
-	},
-	{
-		source: 'node_modules/iframe-resizer/js/iframeResizer.min.js',
-		destination: 'assets/vendor/iframe-resizer/js/iframeResizer.min.js',
-	},
-	{
-		source: 'node_modules/iframe-resizer/js/iframeResizer.map',
-		destination: 'assets/vendor/iframe-resizer/js/iframeResizer.map',
-	},
-	{
 		source: 'node_modules/isotope-layout/dist/isotope.pkgd.min.js',
 		destination: 'assets/vendor/isotope-layout/dist/isotope.pkgd.min.js',
 	},

@@ -6,12 +6,15 @@ import { dispatch, select, subscribe, withSelect } from '@wordpress/data';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import classnames from 'classnames/dedupe';
-import iframeResizer from 'iframe-resizer/js/iframeResizer';
 import $ from 'jquery';
 import { isEqual, uniq } from 'lodash';
 import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
+import {
+	connectPreviewFrame,
+	resolveTargetOrigin,
+} from '../../../assets/js/_preview-frame';
 import getDynamicCSS, { hasDynamicCSS } from '../../utils/controls-dynamic-css';
 
 const {
@@ -72,9 +75,14 @@ class IframePreview extends Component {
 		);
 		this.updateIframeHeight = this.updateIframeHeight.bind(this);
 
+		// No `rafSchd` here either, and for a sharper reason than above: this is the
+		// callback that gives the preview its height, and until it runs the wrapper stays
+		// at zero with `overflow: hidden`. A frame that is not painted gets no animation
+		// frame, so scheduling the first height update on one deadlocks it - zero height
+		// forever. `throttle` alone already coalesces the burst.
 		this.updateIframeHeightThrottle = throttle(
 			100,
-			rafSchd(this.updateIframeHeight)
+			this.updateIframeHeight
 		);
 		this.printInput = this.printInput.bind(this);
 
@@ -96,25 +104,20 @@ class IframePreview extends Component {
 			this.trackBlockPosition(clientId);
 		});
 
-		iframeResizer(
-			{
-				interval: 10,
-				warningTimeout: 60000,
-				checkOrigin: false,
-				onMessage({ message }) {
-					// select current block on click message.
-					if (message === 'clicked') {
-						dispatch('core/block-editor').selectBlock(clientId);
+		self.previewFrame = connectPreviewFrame(self.frameRef.current, {
+			targetOrigin: resolveTargetOrigin(variables.preview_url),
+			onMessage({ message }) {
+				// select current block on click message.
+				if (message === 'clicked') {
+					dispatch('core/block-editor').selectBlock(clientId);
 
-						window.focus();
-					}
-				},
-				onResized({ height }) {
-					self.updateIframeHeightThrottle(`${height}px`);
-				},
+					window.focus();
+				}
 			},
-			self.frameRef.current
-		);
+			onResized({ height }) {
+				self.updateIframeHeightThrottle(`${height}px`);
+			},
+		});
 
 		self.frameRef.current.addEventListener('load', self.onFrameLoad);
 
@@ -148,9 +151,9 @@ class IframePreview extends Component {
 			this.maybeResizePreviewsThrottle
 		);
 
-		if (this.frameRef.current.iframeResizer) {
-			this.frameRef.current.iframeResizer.close();
-			this.frameRef.current.iframeResizer.removeListeners();
+		if (this.previewFrame) {
+			this.previewFrame.destroy();
+			this.previewFrame = null;
 		}
 	}
 
@@ -161,7 +164,17 @@ class IframePreview extends Component {
 	 */
 	onFrameLoad(e) {
 		this.frameWindow = e.target.contentWindow;
-		this.frameJQuery = e.target.contentWindow.jQuery;
+
+		// WordPress 7.1 serves the editor with `Document-Isolation-Policy`, which places it
+		// in its own agent cluster. A frame that does not answer with the same policy then
+		// counts as cross-origin and reading anything off its window throws, even though
+		// both documents are on the same host. Reading `contentWindow` itself still works,
+		// so the throw lands here rather than on the line above.
+		try {
+			this.frameJQuery = e.target.contentWindow.jQuery;
+		} catch {
+			this.frameJQuery = null;
+		}
 
 		if (this.frameJQuery) {
 			this.$framePortfolio = this.frameJQuery('.vp-portfolio');
@@ -194,8 +207,6 @@ class IframePreview extends Component {
 			return;
 		}
 		this.busyReload = true;
-
-		const frame = this.frameRef.current;
 
 		const newAttributes = this.props.attributes;
 		const oldAttributes = prevProps.attributes;
@@ -252,8 +263,8 @@ class IframePreview extends Component {
 				}
 
 				// Insert dynamic CSS.
-				if (frame.iFrameResizer && newAttributes.block_id) {
-					frame.iFrameResizer.sendMessage({
+				if (this.previewFrame && newAttributes.block_id) {
+					this.previewFrame.sendMessage({
 						name: 'dynamic-css',
 						blockId: newAttributes.block_id,
 						styles: getDynamicCSS(newAttributes),
@@ -355,12 +366,12 @@ class IframePreview extends Component {
 			width: contentWidth,
 		});
 
-		if (frame.iFrameResizer) {
-			frame.iFrameResizer.sendMessage({
+		if (this.previewFrame) {
+			this.previewFrame.sendMessage({
 				name: 'resize',
 				width: parentWidth,
 			});
-			frame.iFrameResizer.resize();
+			this.previewFrame.resize();
 		}
 	}
 

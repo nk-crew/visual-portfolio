@@ -2,7 +2,19 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import classnames from 'classnames/dedupe';
 import { debounce } from 'throttle-debounce';
 
-const { ResizeObserver, MutationObserver } = window;
+/**
+ * Window the wizard is rendered in.
+ *
+ * The wizard is drawn inside the block, and WordPress iframes the editor
+ * canvas - always, as of 7.1 - so the observers and the style resolver have to
+ * come from the canvas window rather than the one the editor bundle runs in.
+ *
+ * @param {HTMLElement} element - element inside the wizard.
+ * @return {Window} window that owns the element.
+ */
+function getView(element) {
+	return element?.ownerDocument?.defaultView || window;
+}
 
 function stepsWizard(props) {
 	const { step, children } = props;
@@ -15,8 +27,10 @@ function stepsWizard(props) {
 		let newHeight = 0;
 
 		if ($ref.current.childNodes !== null) {
+			const view = getView($ref.current);
+
 			$ref.current.childNodes.forEach(($child) => {
-				const styles = window.getComputedStyle($child);
+				const styles = view.getComputedStyle($child);
 				const margin =
 					parseFloat(styles.marginTop) +
 					parseFloat(styles.marginBottom);
@@ -48,8 +62,9 @@ function stepsWizard(props) {
 
 		// Resize observer is used to properly set height
 		// when selected images, saved post and reloaded page.
-		const resizeObserver = new ResizeObserver(calculateHeight);
-		const mutationObserver = new MutationObserver(calculateHeight);
+		const view = getView($element);
+		const resizeObserver = new view.ResizeObserver(calculateHeight);
+		const mutationObserver = new view.MutationObserver(calculateHeight);
 
 		resizeObserver.observe($element);
 		mutationObserver.observe($element, {
