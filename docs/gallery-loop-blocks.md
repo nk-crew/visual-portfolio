@@ -193,7 +193,7 @@ it reads — no hook involved:
 | `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
-| `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers. See below |
+| `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
 | `vpf_loop_item_popup_data` | filter `( $data, $item, $options )` | Lightbox data of one item |
 | `vpf_rest_loop_items_source_configs` | filter | Allow-list of source parameters the editor preview endpoint accepts |
 
@@ -276,7 +276,7 @@ Register the name on the server and in the editor:
 add_filter(
     'vpf_carousel_effects',
     function ( $effects ) {
-        $effects[] = 'acme-flip';
+        $effects['acme-flip'] = array( 'columns' => false );
 
         return $effects;
     }
@@ -286,9 +286,15 @@ add_filter(
 ```js
 addFilter( 'vpf.carouselEffects', 'acme/flip', ( options ) => [
     ...options,
-    { label: 'Flip', value: 'acme-flip' },
+    { label: 'Flip', value: 'acme-flip', columns: false },
 ] );
 ```
+
+`columns` says whether the effect leaves the column count to the gallery. An
+effect that spreads one slide over the width — a slideshow, a deck of cards —
+owns that width, so the count is forced to one and the control is not offered
+beside it. Cover flow is the other kind: the count is how many cards fit across
+it, and it keeps the control.
 
 The list is given the classes `vp-carousel-effect` and `vp-carousel-acme-flip`,
 and the stylesheet is the install's own to enqueue —

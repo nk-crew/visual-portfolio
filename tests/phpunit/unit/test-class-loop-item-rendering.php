@@ -259,6 +259,38 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An effect that spreads one slide over the width of the gallery takes the
+	 * column count with it.
+	 *
+	 * Left to a count, the slideshow and the decks were drawn as several
+	 * fractions of themselves side by side.
+	 *
+	 * @return void
+	 */
+	public function test_a_single_slide_effect_takes_the_column_count() {
+		$layout = array(
+			'layoutType'        => 'carousel',
+			'layoutColumnsMode' => 'auto',
+			'layoutColumnCount' => 3,
+			'carouselEffect'    => 'slideshow',
+		);
+
+		$output = $this->render_loop( '<!-- wp:visual-portfolio/item-image /-->', $layout );
+
+		$this->assertStringContainsString( '--vp-layout-columns:1', $output );
+		$this->assertStringNotContainsString( 'vp-layout-auto-columns', $output );
+
+		// Cover flow is the other kind: the count is how many cards fit across
+		// the gallery, so it keeps whatever was set.
+		$layout['layoutColumnsMode'] = 'manual';
+		$layout['carouselEffect']    = 'coverflow';
+
+		$output = $this->render_loop( '<!-- wp:visual-portfolio/item-image /-->', $layout );
+
+		$this->assertStringContainsString( '--vp-layout-columns:3', $output );
+	}
+
+	/**
 	 * The controls of a carousel sit in one box, so that the countdown of
 	 * autoplay - drawn on the dots - can be published where the frame the
 	 * arrows are pinned to and the dots under it both read it.

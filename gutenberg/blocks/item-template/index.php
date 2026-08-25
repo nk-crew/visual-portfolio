@@ -166,7 +166,7 @@ class Visual_Portfolio_Block_Item_Template {
 		// attribute outside the list is dropped before the render callback ever
 		// sees it. An install that adds one has to be able to keep it.
 		if ( $block_type instanceof WP_Block_Type && isset( $block_type->attributes['carouselEffect'] ) ) {
-			$block_type->attributes['carouselEffect']['enum'] = array_merge( array( 'none' ), self::get_carousel_effects() );
+			$block_type->attributes['carouselEffect']['enum'] = array_merge( array( 'none' ), array_keys( self::get_carousel_effects() ) );
 		}
 	}
 
@@ -678,18 +678,43 @@ class Visual_Portfolio_Block_Item_Template {
 	 * rendered inside the item, so an effect an install adds needs a stylesheet
 	 * and this filter and nothing else.
 	 *
-	 * @return array effect names.
+	 * `columns` says whether the effect leaves the column count to the gallery.
+	 * An effect that shows one slide at a time and spreads it over the width -
+	 * a slideshow, a deck of cards - owns that width, and a count set beside it
+	 * would only cut the effect into pieces.
+	 *
+	 * @return array effect name to its settings.
 	 */
 	public static function get_carousel_effects() {
 		/**
 		 * Filters the carousel effects a gallery offers.
 		 *
-		 * The name is the value of the `carouselEffect` attribute, and the class
-		 * the list is given is `vp-carousel-` and the name.
+		 * The key is the value of the `carouselEffect` attribute, and the class
+		 * the list is given is `vp-carousel-` and that name.
 		 *
-		 * @param array $effects effect names.
+		 * @param array $effects effect name to `array( 'columns' => bool )`.
 		 */
-		return array_values( array_filter( (array) apply_filters( 'vpf_carousel_effects', array( 'coverflow', 'slideshow' ) ) ) );
+		$effects = apply_filters(
+			'vpf_carousel_effects',
+			array(
+				'coverflow' => array( 'columns' => true ),
+				'slideshow' => array( 'columns' => false ),
+			)
+		);
+
+		$known = array();
+
+		foreach ( (array) $effects as $name => $settings ) {
+			if ( ! is_string( $name ) || '' === $name ) {
+				continue;
+			}
+
+			$known[ $name ] = array(
+				'columns' => ! isset( $settings['columns'] ) || (bool) $settings['columns'],
+			);
+		}
+
+		return $known;
 	}
 
 	/**
@@ -707,7 +732,20 @@ class Visual_Portfolio_Block_Item_Template {
 
 		$effect = (string) ( $attributes['carouselEffect'] ?? 'none' );
 
-		return in_array( $effect, self::get_carousel_effects(), true ) ? $effect : '';
+		return isset( self::get_carousel_effects()[ $effect ] ) ? $effect : '';
+	}
+
+	/**
+	 * Whether an effect leaves the column count to the gallery.
+	 *
+	 * @param string $effect - effect name.
+	 *
+	 * @return bool
+	 */
+	private function effect_takes_columns( $effect ) {
+		$effects = self::get_carousel_effects();
+
+		return ! isset( $effects[ $effect ] ) || $effects[ $effect ]['columns'];
 	}
 
 	/**
@@ -788,13 +826,21 @@ class Visual_Portfolio_Block_Item_Template {
 
 		$layout_type = $this->get_layout_type( $attributes );
 
-		// The widest the layout ever gets, which is the row a desktop sees first.
-		$first_row = $this->get_layout_columns( $attributes, $layout_type );
-
 		// An effect is played on two boxes inside the item rather than on the
 		// item, which stays the box the browser snaps to and the module
 		// measures. Nothing else in the family renders them.
 		$effect = $this->get_carousel_effect( $attributes, $layout_type );
+
+		// An effect that spreads one slide over the width of the gallery owns
+		// that width. Left to a count, it drew the slideshow and the decks as
+		// several fractions of themselves side by side.
+		if ( $effect && ! $this->effect_takes_columns( $effect ) ) {
+			$attributes['layoutColumnsMode'] = 'manual';
+			$attributes['layoutColumnCount'] = 1;
+		}
+
+		// The widest the layout ever gets, which is the row a desktop sees first.
+		$first_row = $this->get_layout_columns( $attributes, $layout_type );
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
 

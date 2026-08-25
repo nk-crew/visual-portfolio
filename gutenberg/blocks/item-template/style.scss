@@ -19,25 +19,40 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 
 // The alpha ramp of the edge fade. A straight gradient reads as a grey band
 // with a shoulder at each end; these are the stops of an ease-in-out, which is
-// what makes the picture look like it is dissolving rather than dimming.
-$edge-ramp: (
-	rgb(0 0 0 / 0) 0%,
-	rgb(0 0 0 / 0.013) 8.1%,
-	rgb(0 0 0 / 0.049) 15.5%,
-	rgb(0 0 0 / 0.104) 22.5%,
-	rgb(0 0 0 / 0.175) 29%,
-	rgb(0 0 0 / 0.259) 35.3%,
-	rgb(0 0 0 / 0.352) 41.2%,
-	rgb(0 0 0 / 0.45) 47.1%,
-	rgb(0 0 0 / 0.55) 52.9%,
-	rgb(0 0 0 / 0.648) 58.8%,
-	rgb(0 0 0 / 0.741) 64.7%,
-	rgb(0 0 0 / 0.825) 71%,
-	rgb(0 0 0 / 0.896) 77.5%,
-	rgb(0 0 0 / 0.951) 84.5%,
-	rgb(0 0 0 / 0.987) 91.9%,
-	rgb(0 0 0 / 1) 100%
-);
+// what makes the picture look like it is dissolving rather than dimming. Each
+// entry is an alpha and how far through the ramp it sits.
+$edge-ramp: (0 0, 0.013 0.081, 0.049 0.155, 0.104 0.225, 0.175 0.29, 0.259 0.353, 0.352 0.412, 0.45 0.471, 0.55 0.529, 0.648 0.588, 0.741 0.647, 0.825 0.71, 0.896 0.775, 0.951 0.845, 0.987 0.919, 1 1);
+
+// The stops of a mask that fades a box in over `$start` and out over `$end`.
+//
+// One gradient rather than a ramp layer at each edge and a solid one between
+// them: a mask layer is placed with `mask-position`, whose percentages are a
+// fraction of the room the layer has left to move in rather than a distance
+// from the edge, so the solid middle landed short of where it was asked for and
+// left a transparent band before the far ramp.
+//
+// A width of zero collapses that side's stops onto one another, which is a mask
+// that is opaque from the edge - the side the carousel has run out of, drawn
+// with nothing to hint at.
+@function vp-edge-stops($start, $end) {
+	$stops: ();
+
+	@each $stop in $edge-ramp {
+		$alpha: nth($stop, 1);
+
+		$stops: append($stops, rgba(0, 0, 0, $alpha) calc(#{$start} * #{nth($stop, 2)}), comma);
+	}
+
+	// Backwards, so the far ramp is written in the order a gradient reads.
+	@for $index from length($edge-ramp) through 1 {
+		$stop: nth($edge-ramp, $index);
+		$alpha: nth($stop, 1);
+
+		$stops: append($stops, rgba(0, 0, 0, $alpha) calc(100% - #{$end} * #{nth($stop, 2)}), comma);
+	}
+
+	@return $stops;
+}
 
 // How far a named column count may go at each of the plugin's breakpoints, the
 // ones `Visual_Portfolio_Breakpoints` carries. Widest first: on a phone every
@@ -360,16 +375,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			--vp-carousel-fade-left: var(--vp-carousel-fade-size, 6%);
 			--vp-carousel-fade-right: var(--vp-carousel-fade-size, 6%);
 
-			mask-image:
-				linear-gradient(to right, #{$edge-ramp}),
-				linear-gradient(#000, #000),
-				linear-gradient(to left, #{$edge-ramp});
-			mask-repeat: no-repeat;
-			mask-position: left center, left var(--vp-carousel-fade-left) top 0, right center;
-			mask-size:
-				var(--vp-carousel-fade-left) 100%,
-				calc(100% - var(--vp-carousel-fade-left) - var(--vp-carousel-fade-right)) 100%,
-				var(--vp-carousel-fade-right) 100%;
+			mask-image: linear-gradient(to right, vp-edge-stops(var(--vp-carousel-fade-left), var(--vp-carousel-fade-right)));
 			transition: --vp-carousel-fade-left 0.2s linear, --vp-carousel-fade-right 0.2s linear;
 		}
 
@@ -440,8 +446,12 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 				margin-inline: -50%;
 				// One vanishing point per card, at its own middle, so a card
 				// turns on the spot instead of being seen from the side of the
-				// gallery.
-				perspective: 500px;
+				// gallery. Stated in card widths rather than in pixels, so the
+				// depth of the turn is the same whatever the gallery is sized
+				// at - and so the card it foreshortens grows by the same
+				// fraction every time, which is what the compensating scale in
+				// the keyframes is worked out from.
+				perspective: calc(var(--vp-carousel-slide-width) * 5);
 				animation: vp-carousel-coverflow-slide linear both;
 				animation-range: contain;
 				animation-timeline: --vp-carousel-slide;
@@ -490,7 +500,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 
 	50% {
 		z-index: 100;
-		transform: translateX(0) scale(1.2);
+		transform: translateX(0);
 	}
 
 	100% {
@@ -499,17 +509,23 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 }
 
+// The near edge of a turned card is closer to the eye than the card was, so it
+// is drawn taller than the box it was laid out in - and the list is a scroll
+// container, which cuts whatever leaves it. The card is scaled down by as much
+// as the turn will magnify it, so a cover flow of any size stays inside the
+// gallery. The card in the middle is not turned and so is not scaled: what is
+// left is the size difference a cover flow is read by.
 @keyframes vp-carousel-coverflow-card {
 	0% {
-		transform: rotateY(-55deg);
+		transform: rotateY(-55deg) scale(0.8);
 	}
 
 	50% {
-		transform: rotateY(0);
+		transform: rotateY(0) scale(1);
 	}
 
 	100% {
-		transform: rotateY(55deg);
+		transform: rotateY(55deg) scale(0.8);
 	}
 }
 

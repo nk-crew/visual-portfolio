@@ -803,4 +803,78 @@ test.describe('Gallery Item Template layouts', () => {
 			'span 2'
 		);
 	});
+
+	// An effect that spreads one slide over the width of the gallery owns that
+	// width. Cover flow is the other kind - the count is how many cards fit
+	// across it - and the control follows which of the two the effect is.
+	for (const [effect, offered, columns] of [
+		['coverflow', true, '3'],
+		['slideshow', false, '1'],
+	]) {
+		test(`the columns control ${offered ? 'stays for' : 'steps aside for'} ${effect}`, async ({
+			page,
+			admin,
+			editor,
+		}) => {
+			await admin.createNewPost({
+				title: `Layouts - columns ${effect}`,
+				postType: 'page',
+				showWelcomeGuide: false,
+				legacyCanvas: true,
+			});
+
+			await editor.insertBlock({
+				name: 'visual-portfolio/loop',
+				attributes: {
+					baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
+					queryType: 'images',
+					imagesQuery: { images },
+				},
+				innerBlocks: [
+					{
+						name: 'visual-portfolio/item-template',
+						attributes: {
+							layoutType: 'carousel',
+							layoutColumnsMode: 'manual',
+							layoutColumnCount: 3,
+							carouselEffect: effect,
+						},
+						innerBlocks: [
+							{
+								name: 'visual-portfolio/item-image',
+								attributes: { aspectRatio: '1' },
+							},
+						],
+					},
+				],
+			});
+
+			const canvas = getEditorCanvas(page, editor);
+
+			await editor.selectBlocks(
+				canvas.locator('[data-type="visual-portfolio/item-template"]')
+			);
+			await editor.openDocumentSettingsSidebar();
+
+			const control = page
+				.locator('.interface-interface-skeleton__sidebar')
+				.getByText('Columns', { exact: true });
+
+			await (offered
+				? expect(control).toBeVisible()
+				: expect(control).toBeHidden());
+
+			// And the preview is drawn the way the page will be drawn, which is
+			// the same count the render callback resolves.
+			await expect
+				.poll(async () =>
+					canvas
+						.locator(LIST)
+						.evaluate((node) =>
+							node.style.getPropertyValue('--vp-layout-columns')
+						)
+				)
+				.toBe(columns);
+		});
+	}
 });

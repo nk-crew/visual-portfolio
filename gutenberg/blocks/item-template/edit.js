@@ -121,10 +121,16 @@ const INDICATOR_OPTIONS = [
 	{ label: __('Progress bar', 'visual-portfolio'), value: 'progress' },
 ];
 
+// `columns: false` says the effect spreads one slide over the width of the
+// gallery and owns that width, so the columns control is not offered beside it.
 const EFFECT_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
 	{ label: __('Coverflow', 'visual-portfolio'), value: 'coverflow' },
-	{ label: __('Slideshow', 'visual-portfolio'), value: 'slideshow' },
+	{
+		label: __('Slideshow', 'visual-portfolio'),
+		value: 'slideshow',
+		columns: false,
+	},
 ];
 
 /**
@@ -138,6 +144,19 @@ const EFFECT_OPTIONS = [
  */
 function getEffectOptions() {
 	return applyFilters('vpf.carouselEffects', EFFECT_OPTIONS);
+}
+
+/**
+ * Whether an effect leaves the column count to the gallery.
+ *
+ * @param {string} effect - selected effect.
+ *
+ * @return {boolean} True when the columns control is worth offering.
+ */
+function effectTakesColumns(effect) {
+	const option = getEffectOptions().find((item) => item.value === effect);
+
+	return !option || false !== option.columns;
 }
 
 // The same question the view module asks: where the browser packs masonry
@@ -565,6 +584,12 @@ export default function BlockEdit({
 		() => ('tiles' === layoutType ? getTilesColumns(layoutTiles) : 0),
 		[layoutType, layoutTiles]
 	);
+	// An effect that spreads one slide over the width of the gallery owns that
+	// width, so the preview draws it the way the page will and the control that
+	// would fight it is not offered.
+	const singleSlide =
+		'carousel' === layoutType && !effectTakesColumns(carouselEffect);
+
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them, whatever the columns controls say.
 	const columnsProps = useMemo(
@@ -572,8 +597,12 @@ export default function BlockEdit({
 			getColumnsProps(
 				{
 					layoutType,
-					layoutColumnsMode,
-					layoutColumnCount: tilesColumns || layoutColumnCount,
+					layoutColumnsMode: singleSlide
+						? 'manual'
+						: layoutColumnsMode,
+					layoutColumnCount: singleSlide
+						? 1
+						: tilesColumns || layoutColumnCount,
 					layoutMinimumColumnWidth,
 					layoutAutoFit,
 				},
@@ -586,6 +615,7 @@ export default function BlockEdit({
 			layoutMinimumColumnWidth,
 			layoutAutoFit,
 			tilesColumns,
+			singleSlide,
 			attributes.style?.spacing?.blockGap,
 		]
 	);
@@ -683,7 +713,8 @@ export default function BlockEdit({
 
 	// The two shapes the core grid layout offers, in its own words: a count, or
 	// a minimum width the container fits as many of as it can.
-	const columnsControls = COLUMN_LAYOUTS.includes(layoutType) ? (
+	const hasColumns = COLUMN_LAYOUTS.includes(layoutType) && !singleSlide;
+	const columnsControls = hasColumns ? (
 		<>
 			<ToggleGroupControl
 				isBlock
