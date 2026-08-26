@@ -348,7 +348,6 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * **Pro:**
 * added Gallery Loop support to every Pro source, so social streams, protected galleries and Pro layouts work inside the new blocks
 * fixed YouTube video backgrounds asking some visitors to sign in before playing
-* raised the minimum PHP requirement to 7.4
 
 = 3.7.1 - Jul 21, 2026 =
 
