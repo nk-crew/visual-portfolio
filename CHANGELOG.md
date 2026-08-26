@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.8.0 - Aug 26, 2026 =
+
+* added Gallery Item blocks for building the item template inside the experimental Gallery Loop: Image, Title, Description, Date, Author, Categories, Read More, Cover and Meta
+* added WordPress 7.1 compatibility
+* improved gallery loading speed on portfolios with many images
+* fixed Load More fetching the next page and adding nothing, on sites whose markup contains `<body` inside inline CSS or JavaScript
+* fixed the block editor preview jumping while it resized
+* fixed the Elementor widget preview rendering without its styles
+* raised the minimum PHP requirement to 7.4
+* **Pro:**
+* added Gallery Loop support to every Pro source, so social streams, protected galleries and Pro layouts work inside the new blocks
+* added WordPress 7.1 compatibility
+* fixed YouTube video backgrounds asking some visitors to sign in before playing
+* raised the minimum PHP requirement to 7.4
+
 = 3.7.1 - Jul 21, 2026 =
 
 * fixed Fancybox afterShow callback arguments so popup listeners receive the gallery instance correctly
