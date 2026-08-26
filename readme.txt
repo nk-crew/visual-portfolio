@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.1
 * Requires PHP: 7.4
-* Stable tag: 3.7.1
+* Stable tag: 3.8.0
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,19 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.8.0 - Aug 26, 2026 =
+
+* added Gallery Item blocks for building the item template inside the experimental Gallery Loop: Image, Title, Description, Date, Author, Categories, Read More, Cover and Meta
+* added WordPress 7.1 compatibility
+* improved gallery loading speed on portfolios with many images
+* fixed Load More fetching the next page and adding nothing, on sites whose markup contains `<body` inside inline CSS or JavaScript
+* fixed the block editor preview jumping while it resized
+* fixed the Elementor widget preview rendering without its styles
+* raised the minimum PHP requirement to 7.4
+* **Pro:**
+* added Gallery Loop support to every Pro source, so social streams, protected galleries and Pro layouts work inside the new blocks
+* fixed YouTube video backgrounds asking some visitors to sign in before playing
 
 = 3.7.1 - Jul 21, 2026 =
 
