@@ -13,7 +13,6 @@ All notable changes to this project will be documented in this file.
 * raised the minimum PHP requirement to 7.4
 * **Pro:**
 * added Gallery Loop support to every Pro source, so social streams, protected galleries and Pro layouts work inside the new blocks
-* added WordPress 7.1 compatibility
 * fixed YouTube video backgrounds asking some visitors to sign in before playing
 * raised the minimum PHP requirement to 7.4
 
