@@ -42,8 +42,38 @@ if (
 	in_array( plugin_basename( __FILE__ ), $vpf_active_plugins, true ) &&
 	in_array( 'visual-portfolio-pro/class-visual-portfolio-pro.php', $vpf_active_plugins, true )
 ) {
-	unset( $vpf_active_plugins );
-	return;
+	$vpf_pro_file = WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php';
+
+	// `active_plugins` goes on naming a plugin whose directory was removed by hand
+	// and WordPress simply skips it, so stepping aside for one of those would leave
+	// the site with neither plugin.
+	$vpf_step_aside = file_exists( $vpf_pro_file );
+
+	/*
+	 * Pro up to 3.8.0 reads an undefined `VISUAL_PORTFOLIO_VERSION` as a sign that
+	 * an unsupported core is installed, and deactivates this plugin from its own
+	 * bootstrap. On a network that takes it off every site, including the ones with
+	 * no Pro at all, so this copy loads in front of such a Pro and leaves the class
+	 * guard below to keep it inert. Once `VISUAL_PORTFOLIO_PRO` is defined that
+	 * decision is already behind us for this request, and the version is moot.
+	 */
+	if ( $vpf_step_aside && ! defined( 'VISUAL_PORTFOLIO_PRO' ) ) {
+		$vpf_pro_data = get_file_data( $vpf_pro_file, array( 'Version' => 'Version' ) );
+
+		$vpf_step_aside = ! empty( $vpf_pro_data['Version'] ) &&
+			version_compare( $vpf_pro_data['Version'], '3.8.1-alpha', '>=' );
+
+		unset( $vpf_pro_data );
+	}
+
+	unset( $vpf_pro_file );
+
+	if ( $vpf_step_aside ) {
+		unset( $vpf_active_plugins, $vpf_step_aside );
+		return;
+	}
+
+	unset( $vpf_step_aside );
 }
 
 unset( $vpf_active_plugins );
