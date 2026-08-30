@@ -17,6 +17,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/*
+ * Visual Portfolio Pro carries its own copy of this core, so only one of the two
+ * may run. Which copy PHP reaches first depends on the order WordPress includes
+ * plugins in, and that order is not ours to pick: network-activated plugins come
+ * before site-activated ones, and a third party can reorder `active_plugins`. So
+ * the standalone plugin steps aside on its own whenever the Pro plugin is active,
+ * before it defines anything at all.
+ *
+ * Only the activated plugin steps aside. The copy inside the Pro plugin, and any
+ * copy embedded in a theme or another plugin, is not in the list below and keeps
+ * loading as before.
+ */
+$vpf_active_plugins = (array) get_option( 'active_plugins', array() );
+
+if ( is_multisite() ) {
+	$vpf_active_plugins = array_merge(
+		$vpf_active_plugins,
+		array_keys( (array) get_site_option( 'active_sitewide_plugins', array() ) )
+	);
+}
+
+if (
+	in_array( plugin_basename( __FILE__ ), $vpf_active_plugins, true ) &&
+	in_array( 'visual-portfolio-pro/class-visual-portfolio-pro.php', $vpf_active_plugins, true )
+) {
+	unset( $vpf_active_plugins );
+	return;
+}
+
+unset( $vpf_active_plugins );
+
 if ( ! defined( 'VISUAL_PORTFOLIO_VERSION' ) ) {
 	define( 'VISUAL_PORTFOLIO_VERSION', '3.8.0' );
 }
