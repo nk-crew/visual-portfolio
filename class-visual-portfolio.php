@@ -17,6 +17,67 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/*
+ * Visual Portfolio Pro carries its own copy of this core, so only one of the two
+ * may run. Which copy PHP reaches first depends on the order WordPress includes
+ * plugins in, and that order is not ours to pick: network-activated plugins come
+ * before site-activated ones, and a third party can reorder `active_plugins`. So
+ * the standalone plugin steps aside on its own whenever the Pro plugin is active,
+ * before it defines anything at all.
+ *
+ * Only the activated plugin steps aside. The copy inside the Pro plugin, and any
+ * copy embedded in a theme or another plugin, is not in the list below and keeps
+ * loading as before.
+ */
+$vpf_active_plugins = (array) get_option( 'active_plugins', array() );
+
+if ( is_multisite() ) {
+	$vpf_active_plugins = array_merge(
+		$vpf_active_plugins,
+		array_keys( (array) get_site_option( 'active_sitewide_plugins', array() ) )
+	);
+}
+
+if (
+	in_array( plugin_basename( __FILE__ ), $vpf_active_plugins, true ) &&
+	in_array( 'visual-portfolio-pro/class-visual-portfolio-pro.php', $vpf_active_plugins, true )
+) {
+	$vpf_pro_file = WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php';
+
+	// `active_plugins` goes on naming a plugin whose directory was removed by hand
+	// and WordPress simply skips it, so stepping aside for one of those would leave
+	// the site with neither plugin.
+	$vpf_step_aside = file_exists( $vpf_pro_file );
+
+	/*
+	 * Pro up to 3.8.0 reads an undefined `VISUAL_PORTFOLIO_VERSION` as a sign that
+	 * an unsupported core is installed, and deactivates this plugin from its own
+	 * bootstrap. On a network that takes it off every site, including the ones with
+	 * no Pro at all, so this copy loads in front of such a Pro and leaves the class
+	 * guard below to keep it inert. Once `VISUAL_PORTFOLIO_PRO` is defined that
+	 * decision is already behind us for this request, and the version is moot.
+	 */
+	if ( $vpf_step_aside && ! defined( 'VISUAL_PORTFOLIO_PRO' ) ) {
+		$vpf_pro_data = get_file_data( $vpf_pro_file, array( 'Version' => 'Version' ) );
+
+		$vpf_step_aside = ! empty( $vpf_pro_data['Version'] ) &&
+			version_compare( $vpf_pro_data['Version'], '3.8.1-alpha', '>=' );
+
+		unset( $vpf_pro_data );
+	}
+
+	unset( $vpf_pro_file );
+
+	if ( $vpf_step_aside ) {
+		unset( $vpf_active_plugins, $vpf_step_aside );
+		return;
+	}
+
+	unset( $vpf_step_aside );
+}
+
+unset( $vpf_active_plugins );
+
 if ( ! defined( 'VISUAL_PORTFOLIO_VERSION' ) ) {
 	define( 'VISUAL_PORTFOLIO_VERSION', '3.8.0' );
 }
@@ -139,19 +200,35 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			$this->plugin_path     = plugin_dir_path( __FILE__ );
 			$this->plugin_url      = plugin_dir_url( __FILE__ );
 
-			// Check for new standalone Pro plugin and for old Pro addon plugin for back compatibility.
-			if ( $this->is_pro() ) {
-				$this->pro_plugin_path = plugin_dir_path( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
-				$this->pro_plugin_url  = plugin_dir_url( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
-			}
+			$this->set_pro_plugin_paths();
 
 			// include helper files.
 			$this->include_dependencies();
 
 			// Hooks.
+			add_action( 'plugins_loaded', array( $this, 'set_pro_plugin_paths' ) );
 			add_action( 'init', array( $this, 'earlier_init_hook' ), 5 );
 			add_action( 'init', array( $this, 'init_hook' ) );
 			add_action( 'init', array( $this, 'run_deferred_rewrite_rules' ), 20 );
+		}
+
+		/**
+		 * Point at the Pro plugin directory, for the new standalone Pro plugin and for the
+		 * old Pro addon plugin alike.
+		 *
+		 * `register_activation_hook()` builds this instance while the main file is being
+		 * included, so `init()` can run before the Pro plugin's own file has, and `is_pro()`
+		 * would answer no. Asking again once every plugin is in keeps the Pro template and
+		 * style lookups in `Visual_Portfolio_Templates` working whichever of the two loaded
+		 * first.
+		 */
+		public function set_pro_plugin_paths() {
+			if ( ! $this->is_pro() ) {
+				return;
+			}
+
+			$this->pro_plugin_path = plugin_dir_path( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
+			$this->pro_plugin_url  = plugin_dir_url( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
 		}
 
 		/**
