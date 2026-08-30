@@ -200,19 +200,35 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			$this->plugin_path     = plugin_dir_path( __FILE__ );
 			$this->plugin_url      = plugin_dir_url( __FILE__ );
 
-			// Check for new standalone Pro plugin and for old Pro addon plugin for back compatibility.
-			if ( $this->is_pro() ) {
-				$this->pro_plugin_path = plugin_dir_path( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
-				$this->pro_plugin_url  = plugin_dir_url( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
-			}
+			$this->set_pro_plugin_paths();
 
 			// include helper files.
 			$this->include_dependencies();
 
 			// Hooks.
+			add_action( 'plugins_loaded', array( $this, 'set_pro_plugin_paths' ) );
 			add_action( 'init', array( $this, 'earlier_init_hook' ), 5 );
 			add_action( 'init', array( $this, 'init_hook' ) );
 			add_action( 'init', array( $this, 'run_deferred_rewrite_rules' ), 20 );
+		}
+
+		/**
+		 * Point at the Pro plugin directory, for the new standalone Pro plugin and for the
+		 * old Pro addon plugin alike.
+		 *
+		 * `register_activation_hook()` builds this instance while the main file is being
+		 * included, so `init()` can run before the Pro plugin's own file has, and `is_pro()`
+		 * would answer no. Asking again once every plugin is in keeps the Pro template and
+		 * style lookups in `Visual_Portfolio_Templates` working whichever of the two loaded
+		 * first.
+		 */
+		public function set_pro_plugin_paths() {
+			if ( ! $this->is_pro() ) {
+				return;
+			}
+
+			$this->pro_plugin_path = plugin_dir_path( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
+			$this->pro_plugin_url  = plugin_dir_url( WP_PLUGIN_DIR . '/visual-portfolio-pro/class-visual-portfolio-pro.php' );
 		}
 
 		/**
