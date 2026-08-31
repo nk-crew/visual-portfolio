@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.8.1 - Aug 31, 2026 =
+
+* changed Visual Portfolio to stay active next to Visual Portfolio Pro instead of being deactivated
+* fixed Pro gallery templates and styles being ignored on networks where Visual Portfolio and Visual Portfolio Pro are activated at different scopes
+
 = 3.8.0 - Aug 26, 2026 =
 
 * added Gallery Item blocks for building the item template inside the experimental Gallery Loop: Image, Title, Description, Date, Author, Categories, Read More, Cover and Meta
