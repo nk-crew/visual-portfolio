@@ -108,6 +108,16 @@ row, which is where the two carousel patterns put them and where an indicator
 between two arrows reads best — but each of them can be dragged anywhere inside
 the loop.
 
+The row carries two styles. *Below the gallery* is the default and leaves it in
+the flow. *Over the slides* takes it out of the flow and lays it over the box the
+list scrolls in, with an arrow pinned to either edge of it — the shape a carousel
+is usually expected to have. That box is a sibling of the control blocks rather
+than a parent of them, so it cannot be positioned against directly: the item
+template measures its frame and publishes it on the loop as
+`--vp-carousel-frame-{top,left,width,height}`, in the editor as well as on the
+page. Without the measurement the row falls back to the whole loop, which is the
+same box whenever the gallery is all the loop holds.
+
 None of them can be deleted: every one is inserted with `lock.remove`, and the
 switch that takes one off a page is *Hide on the page* on its toolbar. A hidden
 control renders nothing at all and stays on the canvas, dimmed, which is where

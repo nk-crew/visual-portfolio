@@ -27,7 +27,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { memo, useEffect, useMemo, useState } from '@wordpress/element';
+import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import {
@@ -47,6 +47,7 @@ import {
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
 import { getColumnsProps } from './columns';
+import { publishFrameBox } from './frame-box';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
 
@@ -239,8 +240,17 @@ function ItemTemplateInnerBlocks({ style, effect, index }) {
  * @return {Element} component.
  */
 function CarouselFrame({ children }) {
+	const frame = useRef();
+
+	// The same box the view module publishes, so an arrow drawn over the slides
+	// sits where it will sit on the page.
+	useEffect(() => publishFrameBox(frame.current), []);
+
 	return (
-		<div className="wp-block-visual-portfolio-item-template__carousel-frame">
+		<div
+			ref={frame}
+			className="wp-block-visual-portfolio-item-template__carousel-frame"
+		>
 			{children}
 		</div>
 	);

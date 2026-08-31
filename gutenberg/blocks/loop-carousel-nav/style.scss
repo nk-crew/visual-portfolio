@@ -31,20 +31,33 @@
 	height: 2.25em;
 	padding: 0;
 	font-size: 1rem;
-	color: inherit;
 	cursor: pointer;
-	background-color: transparent;
+	border-radius: 50%;
+	transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+
+	// Colours are variables so that a style - overlaid over the slides, where
+	// nothing but white on a dark pill reads over a photograph - can restate
+	// them, and are skipped outright for an arrow the block supports have
+	// already coloured.
+	&:not(.has-text-color) {
+		color: var(--vp-carousel-arrow-color, inherit);
+	}
+
+	&:not(.has-background) {
+		background-color: var(--vp-carousel-arrow-background, transparent);
+	}
 
 	// Written out rather than taken from `--vp-carousel-track`, which is the
 	// unfilled part of an indicator: an arrow is drawn the same whether it was
 	// dropped in the row beside one or in the heading above the gallery.
-	border: 1px solid color-mix(in oklab, currentcolor 20%, transparent 80%);
-	border-radius: 50%;
-	transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+	border: 1px solid var(--vp-carousel-arrow-border, color-mix(in oklab, currentcolor 20%, transparent 80%));
+
+	&:hover:not([disabled]):not(.has-background) {
+		background-color: var(--vp-carousel-arrow-background-hover, color-mix(in oklab, currentcolor 8%, transparent 92%));
+	}
 
 	&:hover:not([disabled]) {
-		background-color: color-mix(in oklab, currentcolor 8%, transparent 92%);
-		border-color: currentcolor;
+		border-color: var(--vp-carousel-arrow-border-hover, currentcolor);
 	}
 
 	// The end of the carousel, when it has one to run out of.
@@ -172,4 +185,70 @@
 	background-color: currentcolor;
 	border-radius: inherit;
 	transition: width 0.15s linear;
+}
+
+// Arrows over the slides, at either edge: the shape a carousel was expected to
+// have long before its controls were blocks, and the one thing splitting them
+// out of the gallery took away.
+//
+// The row is not in the flow at all - it is laid over the box the list scrolls
+// in. That box is a sibling of this block rather than a parent of it, so it
+// cannot be positioned against directly: the view module measures the frame and
+// publishes it on the loop, which the gallery and every control of it share.
+.vp-block-loop:has(.vp-block-loop-carousel-nav.is-style-overlay) {
+	position: relative;
+}
+
+.vp-block-loop-carousel-nav.is-style-overlay {
+	--vp-carousel-arrow-background: rgba(0, 0, 0, 0.5);
+	--vp-carousel-arrow-background-hover: rgba(0, 0, 0, 0.7);
+	--vp-carousel-arrow-border: transparent;
+	--vp-carousel-arrow-border-hover: transparent;
+	--vp-carousel-track: rgba(255, 255, 255, 0.4);
+
+	position: absolute;
+
+	// The whole loop, when the frame was never measured - which is the same box
+	// whenever the gallery is all the loop holds.
+	top: var(--vp-carousel-frame-top, 0);
+	left: var(--vp-carousel-frame-left, 0);
+	z-index: 2;
+	width: var(--vp-carousel-frame-width, 100%);
+	height: var(--vp-carousel-frame-height, 100%);
+	margin: 0;
+
+	// The slides underneath still have to take a drag, a swipe and a click.
+	pointer-events: none;
+
+	> * {
+		pointer-events: auto;
+	}
+
+	&:not(.has-text-color) {
+		color: #fff;
+	}
+
+	// Pinned to the sides rather than laid out in the row, so the justification
+	// of the row is left to whatever else was dropped in it.
+	.vp-block-loop-carousel-previous,
+	.vp-block-loop-carousel-next {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.vp-block-loop-carousel-previous {
+		inset-inline-start: 12px;
+	}
+
+	.vp-block-loop-carousel-next {
+		inset-inline-end: 12px;
+	}
+
+	// An indicator over the pictures belongs at the foot of them rather than
+	// across the middle of them.
+	.vp-block-loop-carousel-indicator {
+		align-self: flex-end;
+		margin-bottom: 12px;
+	}
 }

@@ -23,6 +23,7 @@ const CAROUSEL = '.vp-block-loop';
 const NAV = '.vp-block-loop-carousel-nav';
 const FRAME = '.wp-block-visual-portfolio-item-template__carousel-frame';
 const DOT = '.vp-block-loop-carousel-dot';
+const PREV_ARROW = '.vp-block-loop-carousel-previous';
 const NEXT_ARROW = '.vp-block-loop-carousel-next';
 const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 
@@ -42,6 +43,7 @@ const TILES = '3|1,1|2,1|1,1|2,0.5|1,1|';
  * @param {number} [options.perPage]  - items per page.
  * @param {Array}  [options.controls] - inner blocks of the pagination block.
  * @param {Array}  [options.carousel] - carousel controls, `name` or `[name, attributes]`.
+ * @param {string} [options.carouselClassName] - class of the carousel control row.
  * @param {number} [options.queryId]  - id the URL parameters of the loop are named after.
  * @return {string} serialized blocks.
  */
@@ -52,6 +54,7 @@ function getLoopMarkup({
 	perPage = IMAGES_COUNT,
 	controls = [],
 	carousel = [],
+	carouselClassName = '',
 	queryId = 1,
 }) {
 	const loop = {
@@ -71,8 +74,11 @@ function getLoopMarkup({
 	// The controls of a carousel are siblings of the item template, and this
 	// row is only the usual place to keep them - each of them is a block that
 	// can be dropped anywhere in the loop.
+	const navAttributes = carouselClassName
+		? ` ${JSON.stringify({ className: carouselClassName })}`
+		: '';
 	const carouselNav = carousel.length
-		? `<!-- wp:visual-portfolio/loop-carousel-nav -->${carousel
+		? `<!-- wp:visual-portfolio/loop-carousel-nav${navAttributes} -->${carousel
 				.map((control) => {
 					const [name, attributes] = Array.isArray(control)
 						? control
@@ -470,6 +476,54 @@ test.describe('Gallery Item Template layouts', () => {
 					.getAttribute('data-vp-slide')
 			)
 			.not.toBe('0');
+	});
+
+	test('the overlay style lays the arrows over the slides', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel overlay',
+			blockId: 'e2e-carousel-overlay',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+			carouselClassName: 'is-style-overlay',
+		});
+
+		const list = page.locator(LIST);
+		const next = page.locator(NEXT_ARROW);
+
+		const [frame, prevBox, nextBox] = await Promise.all([
+			page.locator(FRAME).boundingBox(),
+			page.locator(PREV_ARROW).boundingBox(),
+			next.boundingBox(),
+		]);
+
+		// Inside the box the slides scroll in, one at either edge of it and
+		// both level with its middle. The row is a sibling of the gallery, so
+		// this is the measurement the module publishes and nothing else.
+		expect(prevBox.x).toBeGreaterThanOrEqual(frame.x);
+		expect(nextBox.x + nextBox.width).toBeLessThanOrEqual(
+			frame.x + frame.width
+		);
+		expect(nextBox.x).toBeGreaterThan(prevBox.x + prevBox.width);
+		expect(prevBox.y + prevBox.height / 2).toBeCloseTo(
+			frame.y + frame.height / 2,
+			-1
+		);
+
+		// And an arrow over the slides still moves them.
+		await next.click();
+		await expect
+			.poll(async () => list.evaluate((node) => node.scrollLeft), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(0);
 	});
 
 	test('autoplay holds its countdown while the pointer rests on the carousel', async ({
