@@ -66,7 +66,13 @@ export function publishFrameBox(frame) {
 
 	// The frame answers for its own size, and the loop for everything above it
 	// that could push the frame down.
-	const observer = new window.ResizeObserver(write);
+	//
+	// Built from the window the frame belongs to rather than from this one. The
+	// editor canvas is an iframe, and an observer made in the window around it
+	// accepts the elements without ever reporting on them: the box was measured
+	// once, before the pictures had loaded, and stayed that way.
+	const view = frame.ownerDocument.defaultView || window;
+	const observer = new view.ResizeObserver(write);
 
 	observer.observe(frame);
 	observer.observe(root);
