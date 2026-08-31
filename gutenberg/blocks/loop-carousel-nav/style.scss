@@ -15,11 +15,8 @@
 	display: none;
 }
 
-// A row for the controls, and nothing else: the layout support draws the flex
+// A row for the controls and nothing else: the layout support draws the flex
 // rules, and everything inside it is a block of its own.
-.vp-block-loop-carousel-nav {
-	--vp-carousel-track: color-mix(in oklab, currentcolor 10%, transparent 90%);
-}
 
 .vp-block-loop-carousel-previous,
 .vp-block-loop-carousel-next {
@@ -37,12 +34,16 @@
 	color: inherit;
 	cursor: pointer;
 	background-color: transparent;
-	border: 1px solid var(--vp-carousel-track, color-mix(in oklab, currentcolor 20%, transparent 80%));
+
+	// Written out rather than taken from `--vp-carousel-track`, which is the
+	// unfilled part of an indicator: an arrow is drawn the same whether it was
+	// dropped in the row beside one or in the heading above the gallery.
+	border: 1px solid color-mix(in oklab, currentcolor 20%, transparent 80%);
 	border-radius: 50%;
 	transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 
 	&:hover:not([disabled]) {
-		background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+		background-color: color-mix(in oklab, currentcolor 8%, transparent 92%);
 		border-color: currentcolor;
 	}
 
