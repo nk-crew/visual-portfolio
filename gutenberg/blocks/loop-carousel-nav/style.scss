@@ -1,0 +1,174 @@
+// The controls of a carousel gallery. One stylesheet for the four blocks: they
+// are one control surface split into blocks so that a gallery can put its
+// arrows and its indicator wherever they belong, and a visitor should not be
+// able to tell which of them the theme loaded.
+//
+// Every one of them moves the scroll container through the scroll API, and
+// there is nothing to fall back to when that API has nobody calling it - so the
+// server renders them switched off and the module takes the class away once it
+// has a carousel running. A control that ended up beside a grid keeps it, and
+// stays out of the way.
+.vp-block-loop-carousel-nav.vp-carousel-control-idle,
+.vp-block-loop-carousel-previous.vp-carousel-control-idle,
+.vp-block-loop-carousel-next.vp-carousel-control-idle,
+.vp-block-loop-carousel-indicator.vp-carousel-control-idle {
+	display: none;
+}
+
+// A row for the controls, and nothing else: the layout support draws the flex
+// rules, and everything inside it is a block of its own.
+.vp-block-loop-carousel-nav {
+	--vp-carousel-track: color-mix(in oklab, currentcolor 10%, transparent 90%);
+}
+
+.vp-block-loop-carousel-previous,
+.vp-block-loop-carousel-next {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+
+	// Sized in `em` so that the font size control is the size control - there
+	// is no text in the button for it to do anything else with.
+	width: 2.25em;
+	height: 2.25em;
+	padding: 0;
+	font-size: 1rem;
+	color: inherit;
+	cursor: pointer;
+	background-color: transparent;
+	border: 1px solid var(--vp-carousel-track, color-mix(in oklab, currentcolor 20%, transparent 80%));
+	border-radius: 50%;
+	transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+
+	&:hover:not([disabled]) {
+		background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+		border-color: currentcolor;
+	}
+
+	// The end of the carousel, when it has one to run out of.
+	&[disabled] {
+		cursor: default;
+		opacity: 0.35;
+	}
+
+	// A pointer never draws the ring; the keyboard always does.
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
+
+	// The chevron is drawn rather than shipped: two borders on a rotated square
+	// weigh nothing and take the colour of the button around them.
+	> span {
+		width: 0.4375em;
+		height: 0.4375em;
+		border-top: 0.125em solid currentcolor;
+		border-right: 0.125em solid currentcolor;
+	}
+}
+
+.vp-block-loop-carousel-previous > span {
+	margin-left: 0.19em;
+	transform: rotate(-135deg);
+}
+
+.vp-block-loop-carousel-next > span {
+	margin-right: 0.19em;
+	transform: rotate(45deg);
+}
+
+.vp-block-loop-carousel-indicator {
+	--vp-carousel-track: color-mix(in oklab, currentcolor 10%, transparent 90%);
+
+	display: flex;
+	align-items: center;
+}
+
+.vp-block-loop-carousel-indicator--dots {
+	gap: 6px;
+
+	// Filled by the module, one per slide: a Load More brings more slides and a
+	// filter takes some away, and the dots follow.
+	&:empty {
+		display: none;
+	}
+}
+
+// A dot is the progress bar in miniature, and it is built the same way: a track
+// that is always there and a fill that says how far along the carousel is. Six
+// pixels while it waits, a twenty four pixel pill while it is the slide on
+// screen - filled to the end at rest, and filled as the delay runs down when
+// autoplay is what moves the carousel on.
+.vp-block-loop-carousel-dot {
+	position: relative;
+
+	// The pill grows through `min-width`: `width` on a flex item is a base size
+	// the flex algorithm is free to overrule, and the transition never landed.
+	min-width: 6px;
+	width: 6px;
+	height: 6px;
+	padding: 0;
+	overflow: hidden;
+	cursor: pointer;
+	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+	border: 0;
+	border-radius: 3px;
+	transition: min-width 0.25s ease, background-color 0.25s ease;
+
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
+
+	&[aria-current="true"] {
+		min-width: 24px;
+	}
+}
+
+.vp-block-loop-carousel-dot-progress {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: 0;
+	width: 0;
+	background-color: currentcolor;
+	border-radius: inherit;
+	transition: width 0.25s ease;
+
+	[aria-current="true"] > & {
+		width: 100%;
+	}
+}
+
+// While autoplay runs the fill is the wait rather than the place, and it is
+// redrawn every frame - a transition would leave it a frame behind for the
+// whole of the delay.
+.vp-carousel-is-playing .vp-block-loop-carousel-dot[aria-current="true"] > .vp-block-loop-carousel-dot-progress {
+	width: var(--vp-carousel-autoplay-progress, 0%);
+	transition: none;
+}
+
+.vp-block-loop-carousel-indicator--progress {
+	width: min(180px, 60%);
+	height: 4px;
+	overflow: hidden;
+	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+	border-radius: 2px;
+}
+
+.vp-block-loop-carousel-progress-value {
+	display: block;
+	width: var(--vp-carousel-progress, 0%);
+	height: 100%;
+	background-color: currentcolor;
+	border-radius: inherit;
+	transition: width 0.15s linear;
+}

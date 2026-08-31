@@ -16,14 +16,14 @@ import { getPluginSlug } from '../utils/plugin-slug';
 
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
 const ITEM = '.wp-block-visual-portfolio-item-template__item';
-const CAROUSEL = '.wp-block-visual-portfolio-item-template__carousel';
-const NAV = '.wp-block-visual-portfolio-item-template__carousel-nav';
-// The arrows live in the frame around the list rather than in the nav under
-// it: the list scrolls, and an arrow beside it has to stay put.
+// What a carousel is steered with is a set of blocks beside the gallery rather
+// than markup inside it, so the loop is the box everything about a running
+// carousel is published on - and the box a control is looked for in.
+const CAROUSEL = '.vp-block-loop';
+const NAV = '.vp-block-loop-carousel-nav';
 const FRAME = '.wp-block-visual-portfolio-item-template__carousel-frame';
-const DOT = '.wp-block-visual-portfolio-item-template__carousel-dot';
-const NEXT_ARROW =
-	'.wp-block-visual-portfolio-item-template__carousel-arrow--next';
+const DOT = '.vp-block-loop-carousel-dot';
+const NEXT_ARROW = '.vp-block-loop-carousel-next';
 const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 
 const IMAGES_COUNT = 6;
@@ -41,6 +41,7 @@ const TILES = '3|1,1|2,1|1,1|2,0.5|1,1|';
  * @param {Object} options.layout     - item template attributes.
  * @param {number} [options.perPage]  - items per page.
  * @param {Array}  [options.controls] - inner blocks of the pagination block.
+ * @param {Array}  [options.carousel] - carousel controls, `name` or `[name, attributes]`.
  * @param {number} [options.queryId]  - id the URL parameters of the loop are named after.
  * @return {string} serialized blocks.
  */
@@ -50,6 +51,7 @@ function getLoopMarkup({
 	layout,
 	perPage = IMAGES_COUNT,
 	controls = [],
+	carousel = [],
 	queryId = 1,
 }) {
 	const loop = {
@@ -66,6 +68,23 @@ function getLoopMarkup({
 				.join('')}<!-- /wp:visual-portfolio/loop-pagination -->`
 		: '';
 
+	// The controls of a carousel are siblings of the item template, and this
+	// row is only the usual place to keep them - each of them is a block that
+	// can be dropped anywhere in the loop.
+	const carouselNav = carousel.length
+		? `<!-- wp:visual-portfolio/loop-carousel-nav -->${carousel
+				.map((control) => {
+					const [name, attributes] = Array.isArray(control)
+						? control
+						: [control, null];
+
+					return attributes
+						? `<!-- wp:visual-portfolio/${name} ${JSON.stringify(attributes)} /-->`
+						: `<!-- wp:visual-portfolio/${name} /-->`;
+				})
+				.join('')}<!-- /wp:visual-portfolio/loop-carousel-nav -->`
+		: '';
+
 	return [
 		`<!-- wp:visual-portfolio/loop ${JSON.stringify(loop)} -->`,
 		'<div class="wp-block-visual-portfolio-loop vp-block-loop">',
@@ -75,6 +94,7 @@ function getLoopMarkup({
 		// shape and drawn in another.
 		'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
 		'<!-- /wp:visual-portfolio/item-template -->',
+		carouselNav,
 		pagination,
 		'</div>',
 		'<!-- /wp:visual-portfolio/loop -->',
@@ -372,9 +392,12 @@ test.describe('Gallery Item Template layouts', () => {
 				layoutColumnsMode: 'manual',
 				layoutColumnCount: 3,
 				style: { spacing: { blockGap: '10px' } },
-				carouselShowArrows: true,
-				carouselIndicator: 'dots',
 			},
+			carousel: [
+				'loop-carousel-previous',
+				'loop-carousel-indicator',
+				'loop-carousel-next',
+			],
 		});
 
 		const list = page.locator(LIST);
@@ -427,7 +450,11 @@ test.describe('Gallery Item Template layouts', () => {
 			})
 			.toBe(0);
 
-		await page.locator(`${FRAME} ${NEXT_ARROW}`).click();
+		// The arrows are blocks beside the gallery rather than markup inside
+		// it - the frame holds the list and nothing else.
+		await expect(page.locator(`${FRAME} ${NEXT_ARROW}`)).toHaveCount(0);
+
+		await page.locator(NEXT_ARROW).click();
 		await expect
 			.poll(async () => list.evaluate((node) => node.scrollLeft), {
 				timeout: 10000,
@@ -463,8 +490,8 @@ test.describe('Gallery Item Template layouts', () => {
 				layoutColumnCount: 3,
 				carouselAutoplay: true,
 				carouselAutoplayDelay: 2,
-				carouselIndicator: 'dots',
 			},
+			carousel: ['loop-carousel-indicator'],
 		});
 
 		const carousel = page.locator(CAROUSEL);
@@ -543,9 +570,9 @@ test.describe('Gallery Item Template layouts', () => {
 				layoutColumnsMode: 'manual',
 				layoutColumnCount: 3,
 				style: { spacing: { blockGap: '10px' } },
-				carouselShowArrows: true,
 				carouselEffect: 'coverflow',
 			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
 		});
 
 		await expect(page.locator(LIST)).toHaveClass(/vp-carousel-coverflow/);
@@ -593,7 +620,6 @@ test.describe('Gallery Item Template layouts', () => {
 				layoutType: 'carousel',
 				layoutColumnsMode: 'manual',
 				layoutColumnCount: 3,
-				carouselShowArrows: true,
 				// The effect turns the slides in perspective. Slide positions
 				// are read from the layout for exactly this reason: measured
 				// from the painted boxes, the arrows of a cover flow answer
@@ -601,6 +627,7 @@ test.describe('Gallery Item Template layouts', () => {
 				// does nothing at all.
 				carouselEffect: 'coverflow',
 			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
 		});
 
 		const list = page.locator(LIST);
@@ -615,7 +642,7 @@ test.describe('Gallery Item Template layouts', () => {
 		// that counts from wherever the animation happens to be loses them.
 		for (let press = 0; press < 3; press++) {
 			// eslint-disable-next-line no-await-in-loop
-			await page.locator(`${FRAME} ${NEXT_ARROW}`).click({ delay: 0 });
+			await page.locator(NEXT_ARROW).click({ delay: 0 });
 		}
 
 		await expect
@@ -641,9 +668,12 @@ test.describe('Gallery Item Template layouts', () => {
 					layoutColumnsMode: 'manual',
 					layoutColumnCount: 3,
 					style: { spacing: { blockGap: '10px' } },
-					carouselShowArrows: true,
-					carouselIndicator: 'dots',
 				},
+				carousel: [
+					'loop-carousel-previous',
+					'loop-carousel-indicator',
+					'loop-carousel-next',
+				],
 			});
 
 			const list = page.locator(LIST);

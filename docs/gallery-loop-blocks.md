@@ -2,8 +2,9 @@
 
 The block-native gallery of Visual Portfolio: a `visual-portfolio/loop` block holds
 a query, a `visual-portfolio/item-template` inside it lays the items out, and
-`item-*` blocks inside that draw one item. `loop-filter`, `loop-sort` and
-`loop-pagination` are the controls around them.
+`item-*` blocks inside that draw one item. `loop-filter`, `loop-sort`,
+`loop-pagination` and the `loop-carousel-*` blocks are the controls around
+them.
 
 Every block of the family is marked **(Experimental)** and registered only on
 **WordPress 7.1 and newer**. The legacy `visual-portfolio/block`,
@@ -100,6 +101,23 @@ gallery has no such switch and keeps the behaviour it always had.
 The item template follows the same shape: Settings holds the layout type and the
 columns, and neither can be hidden; each layout adds a panel of its own.
 
+**Carousel controls.** The arrows and the indicator of a carousel are blocks:
+*Carousel Previous Slide*, *Carousel Next Slide* and *Carousel Indicator*, which
+is drawn as dots or as a bar. They are usually kept in a *Carousel Navigation*
+row, which is where the two carousel patterns put them and where an indicator
+between two arrows reads best — but each of them can be dragged anywhere inside
+the loop.
+
+None of them can be deleted: every one is inserted with `lock.remove`, and the
+switch that takes one off a page is *Hide on the page* on its toolbar. A hidden
+control renders nothing at all and stays on the canvas, dimmed, which is where
+it is found and switched back on. The lock is the ordinary block lock, so a
+second arrow added on purpose is unlocked through the block's own Lock dialog.
+
+A control is rendered switched off and stays that way until a carousel is
+running under it, so one that ended up beside a grid — or on a page whose module
+never loaded — never appears.
+
 **Controls.** Filter, sort and pagination are server-rendered links and forms.
 With JavaScript they swap the gallery in place; without it they work as ordinary
 page loads. Both paths land on the same URL.
@@ -117,10 +135,18 @@ visual-portfolio/loop                      query, block id, layout wrapper
 │   ├── visual-portfolio/item-title | description | categories | author | date
 │   ├── visual-portfolio/item-read-more | item-meta
 │   └── any block that reads `vp/item*` context
+├── visual-portfolio/loop-carousel-nav        a row for the controls below
+│   └── loop-carousel-{previous,next,indicator}
 ├── visual-portfolio/loop-no-results
 └── visual-portfolio/loop-pagination
     └── loop-pagination-{previous,numbers,next} or loop-pagination-trigger
 ```
+
+The three carousel controls declare the **loop** as their ancestor rather than
+the row, so the row is only the usual place to keep them: an arrow can sit in a
+heading beside the gallery, an indicator under it, and a gallery is free to draw
+two of either. They find their carousel through the loop they were dropped in —
+one item template to a loop — however deeply they were nested on the way.
 
 One trigger block covers both the button and the scroll: `loop-pagination-trigger`
 carries a `triggerType` of `load-more` or `infinite`, offered as two variations,
@@ -388,7 +414,7 @@ without any change here.
 | Store | Module | What it does |
 |---|---|---|
 | `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
-| `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, native masonry detection |
+| `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`), native masonry detection |
 | `visual-portfolio/item-cover` | `build/gutenberg/blocks/item-cover/view.js` | The `fly` effect only |
 | `visual-portfolio/popup` | `build/gutenberg/popup/view.js` | The lightbox |
 

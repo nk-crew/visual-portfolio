@@ -19,15 +19,29 @@ import { getJustifiedOptions, layoutJustified, startLayout } from './layouts';
 
 const LIST_SELECTOR = '.wp-block-visual-portfolio-item-template';
 const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
-const NAV_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-nav';
 const FRAME_SELECTOR =
 	'.wp-block-visual-portfolio-item-template__carousel-frame';
-const CAROUSEL_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel';
-const PROGRESS_SELECTOR =
-	'.wp-block-visual-portfolio-item-template__carousel-progress';
+
+// What a carousel is steered with. Every one of them is a block of its own and
+// can be dropped anywhere inside the loop - under the gallery, above it, in a
+// row beside the heading, an arrow on either side of the dots - so the loop is
+// what a control and the list it drives have in common, and it is the box
+// everything about a running carousel is published on.
+const LOOP_SELECTOR = '.vp-block-loop';
+const CONTROL_SELECTOR = '[data-vp-carousel-control]';
+const PREV_SELECTOR = '.vp-block-loop-carousel-previous';
+const NEXT_SELECTOR = '.vp-block-loop-carousel-next';
+const DOTS_SELECTOR = '.vp-block-loop-carousel-indicator--dots';
+const DOT_SELECTOR = '.vp-block-loop-carousel-dot';
+const DOT_PROGRESS_CLASS = 'vp-block-loop-carousel-dot-progress';
+const PROGRESS_SELECTOR = '.vp-block-loop-carousel-indicator--progress';
+
+// Taken off a control once a carousel is running for it to move. The server
+// renders every control with it: they all drive the scroll container through
+// the scroll API, there is nothing to fall back to when that API has nobody
+// calling it, and a control that ended up beside a grid never loses it.
+const IDLE_CLASS = 'vp-carousel-control-idle';
 const PLAYING_CLASS = 'vp-carousel-is-playing';
-const DOT_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-dot';
-const DOTS_SELECTOR = '.wp-block-visual-portfolio-item-template__carousel-dots';
 const EDGE_FADE_CLASS = 'vp-carousel-edge-fade';
 const MASONRY_CLASS = 'vp-layout-masonry';
 const MASONRY_NATIVE_CLASS = 'vp-layout-masonry-native';
@@ -143,27 +157,29 @@ function getFrame(list) {
 }
 
 /**
- * Controls that belong to a carousel.
+ * The box the controls of a carousel are published on.
+ *
+ * The loop is the one ancestor a control and its list are guaranteed to share,
+ * and it is also the region the router replaces - so a class or a custom
+ * property written here comes back with the gallery after a navigation.
  *
  * @param {HTMLElement} list Item template list.
  *
- * @return {HTMLElement|null} Nav element, when the gallery renders one.
+ * @return {HTMLElement} Loop element, or the nearest box there is.
  */
-function getNav(list) {
-	const next = getFrame(list)?.nextElementSibling;
-
-	return next && next.matches(NAV_SELECTOR) ? next : null;
+function getControlsRoot(list) {
+	return list.closest(LOOP_SELECTOR) || getFrame(list) || list;
 }
 
 /**
- * The box the controls of a carousel belong to.
+ * The controls this carousel is steered with.
  *
  * @param {HTMLElement} list Item template list.
  *
- * @return {HTMLElement|null} Carousel element.
+ * @return {HTMLElement[]} Control blocks of the gallery.
  */
-function getCarousel(list) {
-	return list.closest(CAROUSEL_SELECTOR);
+function getControls(list) {
+	return Array.from(getControlsRoot(list).querySelectorAll(CONTROL_SELECTOR));
 }
 
 /**
@@ -303,11 +319,14 @@ function getScrollProgress(list) {
 /**
  * Bring the controls in line with where the carousel is.
  *
+ * Every control of the gallery, wherever it was put: a gallery is free to draw
+ * two indicators, or an arrow on either side of its heading, and all of them
+ * say the same thing about the same carousel.
+ *
  * @param {HTMLElement} list Item template list.
  */
 function syncNav(list) {
-	const frame = getFrame(list);
-	const nav = getNav(list);
+	const root = getControlsRoot(list);
 
 	// Snapping never lands exactly on the edge, and a whole pixel of slack is
 	// less than any scroll step.
@@ -319,22 +338,13 @@ function syncNav(list) {
 	const atStart = !repeats && position <= 1;
 	const atEnd = !repeats && position >= end;
 
-	if (frame) {
-		const prev = frame.querySelector(
-			'[data-wp-on--click="actions.carouselPrev"]'
-		);
-		const next = frame.querySelector(
-			'[data-wp-on--click="actions.carouselNext"]'
-		);
+	root.querySelectorAll(PREV_SELECTOR).forEach((prev) => {
+		prev.disabled = atStart;
+	});
 
-		if (prev) {
-			prev.disabled = atStart;
-		}
-
-		if (next) {
-			next.disabled = atEnd;
-		}
-	}
+	root.querySelectorAll(NEXT_SELECTOR).forEach((next) => {
+		next.disabled = atEnd;
+	});
 
 	// The fade is an invitation to scroll on, so the end that has been reached
 	// loses it. Written by the side of the screen, which is where a mask is
@@ -346,25 +356,20 @@ function syncNav(list) {
 		setFade(list, 'right', rtl ? atStart : atEnd);
 	}
 
-	if (!nav) {
-		return;
-	}
-
-	const dots = Array.from(nav.querySelectorAll(DOT_SELECTOR));
 	const current = getCurrentSlide(list);
 
-	dots.forEach((dot, index) => {
+	root.querySelectorAll(DOT_SELECTOR).forEach((dot) => {
+		const index = parseInt(dot.dataset.vpSlide, 10);
+
 		dot.setAttribute('aria-current', index === current ? 'true' : 'false');
 	});
 
-	const progress = nav.querySelector(PROGRESS_SELECTOR);
+	const value = getScrollProgress(list);
 
-	if (progress) {
-		const value = getScrollProgress(list);
-
+	root.querySelectorAll(PROGRESS_SELECTOR).forEach((progress) => {
 		progress.style.setProperty('--vp-carousel-progress', `${value * 100}%`);
 		progress.setAttribute('aria-valuenow', String(Math.round(value * 100)));
-	}
+	});
 }
 
 /**
@@ -394,24 +399,35 @@ function setFade(list, side, reached) {
 }
 
 /**
- * Give a carousel as many dots as it has slides.
+ * Give every indicator of a carousel as many dots as it has slides.
  *
  * @param {HTMLElement} list Item template list.
  */
 function syncDots(list) {
-	const nav = getNav(list);
-	const container = nav && nav.querySelector(DOTS_SELECTOR);
-
-	if (!container) {
-		return;
-	}
-
 	const items = list.querySelectorAll(ITEM_SELECTOR).length;
+
+	getControlsRoot(list)
+		.querySelectorAll(DOTS_SELECTOR)
+		.forEach((container) => {
+			fillDots(container, items);
+		});
+}
+
+/**
+ * Give one indicator its dots.
+ *
+ * The block renders the row empty: how many slides there are is the item
+ * template's answer and not the indicator's - the two are siblings - and Load
+ * More and a filter both change the count after the page was rendered anyway.
+ *
+ * @param {HTMLElement} container Indicator drawn as dots.
+ * @param {number}      items     Number of slides.
+ */
+function fillDots(container, items) {
 	const dots = container.querySelectorAll(DOT_SELECTOR);
 	const label = container.dataset.vpDotLabel || '';
 
-	// Load More and a filter both change how many slides there are, and a dot
-	// with no slide behind it does nothing when clicked.
+	// A dot with no slide behind it does nothing when clicked.
 	for (let index = dots.length - 1; index >= items; index -= 1) {
 		dots[index].remove();
 	}
@@ -423,8 +439,7 @@ function syncDots(list) {
 		dot.className = DOT_SELECTOR.slice(1);
 		dot.dataset.vpSlide = String(index);
 		dot.setAttribute('aria-label', label.replace('%d', String(index + 1)));
-		dot.innerHTML =
-			'<span class="wp-block-visual-portfolio-item-template__carousel-dot-progress"></span>';
+		dot.innerHTML = `<span class="${DOT_PROGRESS_CLASS}"></span>`;
 		container.appendChild(dot);
 	}
 }
@@ -512,10 +527,15 @@ function initAutoplay(list) {
 		return noop;
 	}
 
-	// The countdown is drawn on the dots, and the dots sit outside the frame
-	// the arrows are pinned to - so it is published on the box that holds both,
-	// which is also the box a visitor's pointer rests on.
-	const carousel = getCarousel(list) || list;
+	// The countdown is drawn on the dots, and an indicator can be anywhere in
+	// the gallery - so it is published on the loop, which every control of the
+	// carousel inherits from.
+	const root = getControlsRoot(list);
+
+	// Anything the visitor is doing with the carousel holds the clock: resting
+	// the pointer on a slide, and reaching for a control just as much - which
+	// no longer means the same box, so both are listened to.
+	const boxes = [getFrame(list) || list, ...getControls(list)];
 
 	// How much of the wait is already behind, and the frame it was last added
 	// to. Kept apart so that a pause holds the clock rather than turning it
@@ -530,7 +550,7 @@ function initAutoplay(list) {
 	let held = false;
 
 	const setProgress = (value) => {
-		carousel.style.setProperty(
+		root.style.setProperty(
 			'--vp-carousel-autoplay-progress',
 			`${value * 100}%`
 		);
@@ -579,11 +599,13 @@ function initAutoplay(list) {
 		held = false === event.detail?.playing;
 	};
 
-	carousel.classList.add(PLAYING_CLASS);
-	carousel.addEventListener('pointerenter', pause);
-	carousel.addEventListener('pointerleave', resume);
-	carousel.addEventListener('focusin', pause);
-	carousel.addEventListener('focusout', resume);
+	root.classList.add(PLAYING_CLASS);
+	boxes.forEach((box) => {
+		box.addEventListener('pointerenter', pause);
+		box.addEventListener('pointerleave', resume);
+		box.addEventListener('focusin', pause);
+		box.addEventListener('focusout', resume);
+	});
 	list.addEventListener('pointerdown', pause);
 	list.addEventListener(AUTOPLAY_EVENT, hold);
 
@@ -594,14 +616,41 @@ function initAutoplay(list) {
 
 	return () => {
 		window.cancelAnimationFrame(raf);
-		carousel.classList.remove(PLAYING_CLASS);
-		carousel.removeEventListener('pointerenter', pause);
-		carousel.removeEventListener('pointerleave', resume);
-		carousel.removeEventListener('focusin', pause);
-		carousel.removeEventListener('focusout', resume);
+		root.classList.remove(PLAYING_CLASS);
+		boxes.forEach((box) => {
+			box.removeEventListener('pointerenter', pause);
+			box.removeEventListener('pointerleave', resume);
+			box.removeEventListener('focusin', pause);
+			box.removeEventListener('focusout', resume);
+		});
 		list.removeEventListener('pointerdown', pause);
 		list.removeEventListener(AUTOPLAY_EVENT, hold);
-		carousel.style.removeProperty('--vp-carousel-autoplay-progress');
+		root.style.removeProperty('--vp-carousel-autoplay-progress');
+	};
+}
+
+/**
+ * Let the controls of a carousel be seen and used.
+ *
+ * They are rendered switched off, and until this runs nothing on the page could
+ * have moved them - so a control beside a grid, or on a page whose module never
+ * loaded, stays switched off and out of the way.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function} Teardown.
+ */
+function wakeControls(list) {
+	const controls = getControls(list);
+
+	controls.forEach((control) => {
+		control.classList.remove(IDLE_CLASS);
+	});
+
+	return () => {
+		controls.forEach((control) => {
+			control.classList.add(IDLE_CLASS);
+		});
 	};
 }
 
@@ -619,6 +668,7 @@ function initCarousel(list) {
 	// The slide width is a `calc()` over the column count, which auto mode has
 	// to work out from the container.
 	const stopColumns = syncColumns(list, () => syncNav(list));
+	const sleepControls = wakeControls(list);
 
 	syncDots(list);
 	syncNav(list);
@@ -664,6 +714,7 @@ function initCarousel(list) {
 	return () => {
 		stopAutoplay();
 		stopColumns();
+		sleepControls();
 		list.removeEventListener('scroll', onScroll);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
 		stopObserving();
@@ -685,13 +736,9 @@ function initCarousel(list) {
  * @return {HTMLElement|null} Item template list.
  */
 function getListOf(element) {
-	// An arrow sits inside the frame, beside the list; an indicator sits in the
-	// nav after it.
-	const frame =
-		element.closest(FRAME_SELECTOR) ||
-		element.closest(NAV_SELECTOR)?.previousElementSibling;
-
-	return frame?.querySelector(LIST_SELECTOR) || null;
+	// One item template to a loop, so the loop a control was dropped in names
+	// the list it drives - however deeply it was nested on the way there.
+	return element.closest(LOOP_SELECTOR)?.querySelector(LIST_SELECTOR) || null;
 }
 
 /**

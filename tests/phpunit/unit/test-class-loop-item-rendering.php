@@ -71,7 +71,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	 *
 	 * @return string
 	 */
-	private function render_loop( $item_blocks, $layout = array() ) {
+	private function render_loop( $item_blocks, $layout = array(), $siblings = '' ) {
 		$loop = array(
 			'block_id'    => 'render-test',
 			'queryId'     => 1,
@@ -82,10 +82,11 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 
 		return do_blocks(
 			sprintf(
-				'<!-- wp:visual-portfolio/loop %1$s --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template %2$s -->%3$s<!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->',
+				'<!-- wp:visual-portfolio/loop %1$s --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template %2$s -->%3$s<!-- /wp:visual-portfolio/item-template -->%4$s</div><!-- /wp:visual-portfolio/loop -->',
 				wp_json_encode( $loop ),
 				wp_json_encode( $layout ),
-				$item_blocks
+				$item_blocks,
+				$siblings
 			)
 		);
 	}
@@ -291,28 +292,72 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The controls of a carousel sit in one box, so that the countdown of
-	 * autoplay - drawn on the dots - can be published where the frame the
-	 * arrows are pinned to and the dots under it both read it.
+	 * A carousel is drawn inside the one box of it that stays put, and the
+	 * controls are blocks beside that box rather than markup inside it.
 	 *
 	 * @return void
 	 */
-	public function test_the_carousel_controls_share_one_box() {
+	public function test_the_carousel_is_drawn_inside_a_frame() {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
-			array(
-				'layoutType'        => 'carousel',
-				'carouselIndicator' => 'dots',
-			)
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-previous /--><!-- wp:visual-portfolio/loop-carousel-indicator /--><!-- wp:visual-portfolio/loop-carousel-next /--><!-- /wp:visual-portfolio/loop-carousel-nav -->'
 		);
 
-		$position = strpos( $output, 'wp-block-visual-portfolio-item-template__carousel"' );
+		$frame = strpos( $output, 'wp-block-visual-portfolio-item-template__carousel-frame' );
 
-		$this->assertNotFalse( $position );
+		$this->assertNotFalse( $frame );
+
+		// The controls come after the gallery here, and nothing but their own
+		// place in the post says so - they are siblings of the item template.
 		$this->assertGreaterThan(
-			$position,
-			strpos( $output, 'wp-block-visual-portfolio-item-template__carousel-nav' )
+			$frame,
+			strpos( $output, 'vp-block-loop-carousel-nav' )
 		);
-		$this->assertStringContainsString( 'data-wp-class--vp-carousel-has-controls', $output );
+
+		// Every one of them moves the scroll container through the scroll API,
+		// so every one of them is rendered switched off.
+		$this->assertSame( 4, substr_count( $output, 'vp-carousel-control-idle' ) );
+
+		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselPrev"', $output );
+		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselNext"', $output );
+
+		// The dots are the view module's: how many slides there are is the item
+		// template's answer, and a Load More changes it afterwards anyway.
+		$this->assertStringContainsString( 'vp-block-loop-carousel-indicator--dots', $output );
+		$this->assertStringNotContainsString( 'vp-block-loop-carousel-dot"', $output );
+	}
+
+	/**
+	 * A control that was switched off renders nothing at all. It cannot be
+	 * deleted, so hiding is the only way one is taken off a page.
+	 *
+	 * @return void
+	 */
+	public function test_a_hidden_carousel_control_renders_nothing() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-previous {"isHidden":true} /--><!-- wp:visual-portfolio/loop-carousel-next /-->'
+		);
+
+		$this->assertStringNotContainsString( 'vp-block-loop-carousel-previous', $output );
+		$this->assertStringContainsString( 'vp-block-loop-carousel-next', $output );
+	}
+
+	/**
+	 * A row whose every control was switched off is not a row at all: the gap
+	 * its layout draws and the margin around it would be left behind.
+	 *
+	 * @return void
+	 */
+	public function test_an_empty_carousel_nav_renders_nothing() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-previous {"isHidden":true} /--><!-- /wp:visual-portfolio/loop-carousel-nav -->'
+		);
+
+		$this->assertStringNotContainsString( 'vp-block-loop-carousel-nav', $output );
 	}
 }

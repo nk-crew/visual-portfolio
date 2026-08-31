@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-carousel-indicator",
+	"title": "Carousel Indicator (Experimental)",
+	"category": "media",
+	"description": "Says which slide of a carousel gallery is on screen, as dots or as a bar. Block is experimental and will change in future releases. Please use with caution.",
+	"keywords": [
+		"carousel",
+		"slider",
+		"dots",
+		"bullets",
+		"pagination",
+		"progress"
+	],
+	"ancestor": ["visual-portfolio/loop"],
+	"textdomain": "visual-portfolio",
+	"usesContext": ["vp/queryType"],
+	"attributes": {
+		"lock": {
+			"type": "object",
+			"default": { "move": false, "remove": true }
+		},
+		"isHidden": { "type": "boolean", "default": false },
+		"indicator": {
+			"type": "string",
+			"default": "dots",
+			"enum": ["dots", "progress"]
+		}
+	},
+	"supports": {
+		"html": false,
+		"className": false,
+		"anchor": true,
+		"reusable": false,
+		"color": {
+			"text": true,
+			"background": false,
+			"gradients": false,
+			"__experimentalDefaultControls": { "text": true }
+		},
+		"spacing": {
+			"margin": true,
+			"__experimentalDefaultControls": { "margin": false }
+		}
+	},
+	"selectors": { "root": ".vp-block-loop-carousel-indicator" },
+	"style": "visual-portfolio-block-loop-carousel",
+	"editorStyle": "visual-portfolio-block-loop-carousel-editor"
+}

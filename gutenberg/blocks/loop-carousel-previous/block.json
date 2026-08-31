@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-carousel-previous",
+	"title": "Carousel Previous Slide (Experimental)",
+	"category": "media",
+	"description": "Moves a carousel gallery back one slide. Block is experimental and will change in future releases. Please use with caution.",
+	"keywords": ["carousel", "slider", "arrow", "previous"],
+	"ancestor": ["visual-portfolio/loop"],
+	"textdomain": "visual-portfolio",
+	"usesContext": ["vp/queryType"],
+	"attributes": {
+		"lock": {
+			"type": "object",
+			"default": { "move": false, "remove": true }
+		},
+		"isHidden": { "type": "boolean", "default": false }
+	},
+	"supports": {
+		"html": false,
+		"className": false,
+		"anchor": true,
+		"reusable": false,
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"margin": true,
+			"__experimentalDefaultControls": { "margin": false }
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": { "radius": true }
+		}
+	},
+	"selectors": { "root": ".vp-block-loop-carousel-previous" },
+	"style": "visual-portfolio-block-loop-carousel",
+	"editorStyle": "visual-portfolio-block-loop-carousel-editor"
+}

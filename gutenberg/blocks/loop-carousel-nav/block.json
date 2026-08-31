@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-carousel-nav",
+	"title": "Carousel Navigation (Experimental)",
+	"category": "media",
+	"description": "Holds the controls of a carousel gallery in one row. Block is experimental and will change in future releases. Please use with caution.",
+	"keywords": ["carousel", "slider", "arrows", "dots", "navigation"],
+	"ancestor": ["visual-portfolio/loop"],
+	"allowedBlocks": [
+		"visual-portfolio/loop-carousel-previous",
+		"visual-portfolio/loop-carousel-next",
+		"visual-portfolio/loop-carousel-indicator"
+	],
+	"textdomain": "visual-portfolio",
+	"usesContext": ["vp/queryType"],
+	"attributes": {
+		"lock": {
+			"type": "object",
+			"default": { "move": false, "remove": true }
+		},
+		"isHidden": { "type": "boolean", "default": false }
+	},
+	"supports": {
+		"html": false,
+		"className": false,
+		"anchor": true,
+		"reusable": false,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": { "text": true }
+		},
+		"spacing": {
+			"blockGap": ["horizontal", "vertical"],
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"__experimentalDefaultControls": { "blockGap": true }
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": { "type": "flex", "justifyContent": "center" }
+		}
+	},
+	"selectors": { "root": ".vp-block-loop-carousel-nav" },
+	"style": "visual-portfolio-block-loop-carousel",
+	"editorStyle": "visual-portfolio-block-loop-carousel-editor"
+}

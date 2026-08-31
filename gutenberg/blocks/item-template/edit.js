@@ -115,12 +115,6 @@ const SNAP_OPTIONS = [
 	{ label: __('Center', 'visual-portfolio'), value: 'center' },
 ];
 
-const INDICATOR_OPTIONS = [
-	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Dots', 'visual-portfolio'), value: 'dots' },
-	{ label: __('Progress bar', 'visual-portfolio'), value: 'progress' },
-];
-
 // `columns: false` says the effect spreads one slide over the width of the
 // gallery and owns that width, so the columns control is not offered beside it.
 const EFFECT_OPTIONS = [
@@ -234,73 +228,20 @@ function ItemTemplateInnerBlocks({ style, effect, index }) {
 }
 
 /**
- * The controls of a carousel, drawn for the preview.
+ * The frame a carousel is drawn inside.
  *
- * The same markup the render callback prints, minus everything that would need
- * a scroll position to answer: the arrows are switched off and the indicator
- * says the carousel is at its first slide, which is where a preview always is.
- * What they are here for is the shape of the gallery - a carousel with dots
- * under it is taller than one without, and the editor used to keep that hidden
- * until the post was published.
+ * The list itself scrolls, so it is the one box of a carousel that stays
+ * put, and the same box the render callback prints. Everything a visitor
+ * steers a carousel with is a block of its own and is drawn by that block.
  *
- * @param {Object}  props           - component props.
- * @param {boolean} props.arrows    - whether the gallery renders arrows.
- * @param {string}  props.indicator - the indicator the gallery renders.
- * @param {number}  props.count     - number of slides.
- * @param {Element} props.children  - the list itself.
+ * @param {Object}  props          - component props.
+ * @param {Element} props.children - the list itself.
  * @return {Element} component.
  */
-function CarouselChrome({ arrows, indicator, count, children }) {
-	const name = 'wp-block-visual-portfolio-item-template__carousel';
-
+function CarouselFrame({ children }) {
 	return (
-		<div className={`${name} vp-carousel-has-controls`}>
-			<div className={`${name}-frame`}>
-				{children}
-				{arrows
-					? ['prev', 'next'].map((direction) => (
-							<button
-								key={direction}
-								type="button"
-								className={`${name}-arrow ${name}-arrow--${direction}`}
-								// Drawn, not offered: a preview has no scroll
-								// position for them to move.
-								disabled={'prev' === direction}
-								tabIndex={-1}
-								aria-hidden="true"
-							>
-								<span />
-							</button>
-						))
-					: null}
-			</div>
-			{'none' !== indicator ? (
-				<div className={`${name}-nav`}>
-					{'dots' === indicator ? (
-						<div className={`${name}-dots`}>
-							{Array.from({ length: count }, (dot, index) => (
-								<button
-									// Dots differ in nothing but their place.
-									key={index}
-									type="button"
-									className={`${name}-dot`}
-									aria-current={
-										0 === index ? 'true' : 'false'
-									}
-									tabIndex={-1}
-									aria-hidden="true"
-								>
-									<span className={`${name}-dot-progress`} />
-								</button>
-							))}
-						</div>
-					) : (
-						<div className={`${name}-progress`}>
-							<span className={`${name}-progress-value`} />
-						</div>
-					)}
-				</div>
-			) : null}
+		<div className="wp-block-visual-portfolio-item-template__carousel-frame">
+			{children}
 		</div>
 	);
 }
@@ -460,8 +401,6 @@ export default function BlockEdit({
 		carouselAutoplayDelay,
 		carouselPeek,
 		carouselEdgeFade,
-		carouselShowArrows,
-		carouselIndicator,
 	} = attributes;
 	const {
 		'vp/queryType': queryType,
@@ -994,47 +933,10 @@ export default function BlockEdit({
 						carouselAutoplayDelay: 5,
 						carouselPeek: 0,
 						carouselEdgeFade: false,
-						carouselShowArrows: true,
-						carouselIndicator: 'none',
 					})
 				)
 			}
 		>
-			<ToolsPanelItem
-				isShownByDefault
-				hasValue={() => !carouselShowArrows}
-				label={__('Arrows', 'visual-portfolio')}
-				onDeselect={() => setAttributes({ carouselShowArrows: true })}
-			>
-				<ToggleControl
-					label={__('Arrows', 'visual-portfolio')}
-					checked={carouselShowArrows}
-					onChange={(value) =>
-						setAttributes({ carouselShowArrows: value })
-					}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				isShownByDefault
-				hasValue={() => 'none' !== carouselIndicator}
-				label={__('Indicator', 'visual-portfolio')}
-				onDeselect={() => setAttributes({ carouselIndicator: 'none' })}
-			>
-				<SelectControl
-					label={__('Indicator', 'visual-portfolio')}
-					help={__(
-						"What marks the visitor's place in the carousel.",
-						'visual-portfolio'
-					)}
-					value={carouselIndicator}
-					options={INDICATOR_OPTIONS}
-					onChange={(value) =>
-						setAttributes({ carouselIndicator: value })
-					}
-				/>
-			</ToolsPanelItem>
-
 			<ToolsPanelItem
 				hasValue={() => 'none' !== carouselEffect}
 				label={__('Effect', 'visual-portfolio')}
@@ -1241,17 +1143,10 @@ export default function BlockEdit({
 		</BlockControls>
 	);
 
-	// The controls of a carousel go around the list, and only a carousel has
-	// them.
-	const withChrome = (list, count) =>
+	// A carousel is drawn inside a frame, and only a carousel has one.
+	const withChrome = (list) =>
 		'carousel' === layoutType ? (
-			<CarouselChrome
-				arrows={carouselShowArrows}
-				indicator={carouselIndicator}
-				count={count}
-			>
-				{list}
-			</CarouselChrome>
+			<CarouselFrame>{list}</CarouselFrame>
 		) : (
 			list
 		);
@@ -1297,8 +1192,7 @@ export default function BlockEdit({
 								/>
 							)
 						)}
-					</ul>,
-					skeletonCount
+					</ul>
 				)}
 			</>
 		);
@@ -1366,8 +1260,7 @@ export default function BlockEdit({
 							</BlockContextProvider>
 						);
 					})}
-				</ul>,
-				blockContexts.length
+				</ul>
 			)}
 		</>
 	);

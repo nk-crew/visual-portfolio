@@ -88,15 +88,6 @@
 		"carouselEdgeFade": {
 			"type": "boolean",
 			"default": false
-		},
-		"carouselShowArrows": {
-			"type": "boolean",
-			"default": true
-		},
-		"carouselIndicator": {
-			"type": "string",
-			"default": "none",
-			"enum": ["none", "dots", "progress"]
 		}
 	},
 	"supports": {

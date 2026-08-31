@@ -1,0 +1,25 @@
+// A control that is switched off is still drawn on the canvas: hiding is what a
+// carousel control is taken off a page with - it cannot be deleted - so the
+// canvas is the only place it can be found and switched back on.
+.vp-block-is-hidden {
+	position: relative;
+	opacity: 0.4;
+
+	&::after {
+		position: absolute;
+		inset: -2px;
+		pointer-events: none;
+		content: "";
+		border: 1px dashed currentcolor;
+		border-radius: 2px;
+	}
+}
+
+// The dots of a carousel are appended by the module, one per slide, and the
+// editor runs none of it. Three of them are drawn instead, which is the shape
+// of the control rather than a count - and a click on one of them belongs to
+// the block, not to a dot that leads nowhere. The arrows are the block itself,
+// so they stay clickable: that click is what selects them.
+.vp-block-loop-carousel-indicator .vp-block-loop-carousel-dot {
+	pointer-events: none;
+}

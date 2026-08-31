@@ -594,84 +594,6 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
-	 * Arrows of a carousel.
-	 *
-	 * They sit inside the frame that wraps the list, over the slides at either
-	 * edge, which is where a visitor reaches for them. The frame is the only
-	 * reason that wrapper exists: the list itself scrolls, so anything placed
-	 * inside it would scroll away.
-	 *
-	 * @return string
-	 */
-	private function get_carousel_arrows() {
-		$arrows = array(
-			'prev' => __( 'Previous slide', 'visual-portfolio' ),
-			'next' => __( 'Next slide', 'visual-portfolio' ),
-		);
-
-		$output = '';
-
-		foreach ( $arrows as $direction => $label ) {
-			$output .= sprintf(
-				'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-arrow wp-block-visual-portfolio-item-template__carousel-arrow--%1$s" aria-label="%2$s" data-wp-on--click="actions.%3$s"><span aria-hidden="true"></span></button>',
-				esc_attr( $direction ),
-				esc_attr( $label ),
-				'prev' === $direction ? 'carouselPrev' : 'carouselNext'
-			);
-		}
-
-		return $output;
-	}
-
-	/**
-	 * The indicator under a carousel.
-	 *
-	 * Dots, one per slide, or a single bar that fills as the carousel scrolls.
-	 * Server rendered so that a region swap brings it back with the items, and
-	 * hidden until the module is running - both move the scroll container
-	 * through the scroll API, and there is nothing to fall back to when that
-	 * API has nobody calling it.
-	 *
-	 * @param string $indicator - selected indicator.
-	 * @param int    $count     - number of items rendered.
-	 *
-	 * @return string
-	 */
-	private function get_carousel_indicator( $indicator, $count ) {
-		if ( 'progress' === $indicator ) {
-			return sprintf(
-				'<div class="wp-block-visual-portfolio-item-template__carousel-progress" role="progressbar" aria-label="%1$s"><span class="wp-block-visual-portfolio-item-template__carousel-progress-value"></span></div>',
-				esc_attr__( 'Carousel position', 'visual-portfolio' )
-			);
-		}
-
-		if ( 'dots' !== $indicator ) {
-			return '';
-		}
-
-		/* translators: %d: slide number. */
-		$label = __( 'Go to slide %d', 'visual-portfolio' );
-		$dots  = '';
-
-		for ( $index = 0; $index < $count; $index++ ) {
-			$dots .= sprintf(
-				'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-dot" data-vp-slide="%1$d" aria-label="%2$s"><span class="wp-block-visual-portfolio-item-template__carousel-dot-progress"></span></button>',
-				$index,
-				esc_attr( sprintf( $label, $index + 1 ) )
-			);
-		}
-
-		// One listener for the row rather than one per dot: a Load More brings
-		// more slides, and a dot appended after hydration would carry no
-		// directive of its own.
-		return sprintf(
-			'<div class="wp-block-visual-portfolio-item-template__carousel-dots" data-vp-dot-label="%1$s" data-wp-on--click="actions.carouselGoTo">%2$s</div>',
-			esc_attr( $label ),
-			$dots
-		);
-	}
-
-	/**
 	 * The effects a carousel can be drawn with.
 	 *
 	 * Every one of them is a pair of scroll driven animations over two boxes
@@ -746,40 +668,6 @@ class Visual_Portfolio_Block_Item_Template {
 		$effects = self::get_carousel_effects();
 
 		return ! isset( $effects[ $effect ] ) || $effects[ $effect ]['columns'];
-	}
-
-	/**
-	 * Controls of a carousel, and the frame the arrows need.
-	 *
-	 * @param array $attributes - block attributes.
-	 * @param int   $count      - number of items rendered.
-	 *
-	 * @return array `[ before, after ]` markup around the list.
-	 */
-	private function get_carousel_chrome( $attributes, $count ) {
-		$store     = esc_attr( self::VIEW_MODULE_STORE );
-		$arrows    = empty( $attributes['carouselShowArrows'] ) ? '' : $this->get_carousel_arrows();
-		$indicator = $this->get_carousel_indicator( $attributes['carouselIndicator'] ?? 'none', $count );
-
-		// The controls are hidden until the module is running, and the class
-		// that says so is on the box that holds all of them - the countdown of
-		// autoplay is drawn on the dots, which sit outside the frame the arrows
-		// are pinned to, so both have to read it from the same place.
-		$before = sprintf(
-			'<div class="wp-block-visual-portfolio-item-template__carousel" data-wp-interactive="%1$s" data-wp-class--vp-carousel-has-controls="%1$s::state.hasScript"><div class="wp-block-visual-portfolio-item-template__carousel-frame">',
-			$store
-		);
-
-		$after = sprintf( '%s</div>', $arrows );
-
-		if ( '' !== $indicator ) {
-			$after .= sprintf(
-				'<div class="wp-block-visual-portfolio-item-template__carousel-nav">%s</div>',
-				$indicator
-			);
-		}
-
-		return array( $before, $after . '</div>' );
 	}
 
 	/**
@@ -990,7 +878,14 @@ class Visual_Portfolio_Block_Item_Template {
 
 				$extra['data-wp-class--vp-has-script'] = self::VIEW_MODULE_STORE . '::state.hasScript';
 
-				list( $before, $after ) = $this->get_carousel_chrome( $attributes, count( $items ) );
+				// The frame the list scrolls inside. It clips: dragging past the
+				// last slide pulls the whole scroll container along as a rubber
+				// band, and a scroll container carries its own clipping with it -
+				// so without a box that stays put, the slides walked out of the
+				// gallery instead of stretching inside it. It is also the width a
+				// slide is measured against.
+				$before = '<div class="wp-block-visual-portfolio-item-template__carousel-frame">';
+				$after  = '</div>';
 				break;
 		}
 
