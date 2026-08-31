@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.1
 * Requires PHP: 7.4
-* Stable tag: 3.8.0
+* Stable tag: 3.8.1
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,11 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.8.1 - Aug 31, 2026 =
+
+* changed Visual Portfolio to stay active next to Visual Portfolio Pro instead of being deactivated
+* fixed Pro gallery templates and styles being ignored on networks where Visual Portfolio and Visual Portfolio Pro are activated at different scopes
 
 = 3.8.0 - Aug 26, 2026 =
 
