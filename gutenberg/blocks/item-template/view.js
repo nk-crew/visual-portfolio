@@ -446,6 +446,38 @@ function fillDots(container, items) {
 }
 
 /**
+ * The slide a press steps to.
+ *
+ * Not simply the next one along. A centred carousel would have to scroll past
+ * its own start to bring its first slides to the middle, and past its end for
+ * the last ones - so each of those rests where the scroll is clamped to, which
+ * is where a carousel sitting at either end already is. Stepping onto one asks
+ * it to stay exactly where it is, and since it never moves, every further press
+ * asks the same thing again: the arrows do nothing for as long as they are
+ * pressed. The slides that rest where this one does are stepped over.
+ *
+ * @param {number[]} targets   Resting places of the slides.
+ * @param {number}   from      Slide the press counts from.
+ * @param {number}   direction `1` forwards, `-1` back.
+ *
+ * @return {number} Slide to rest on, off the end when the carousel has run out
+ *                  of places to go that way.
+ */
+function getNextSlide(targets, from, direction) {
+	let index = from + direction;
+
+	while (
+		index >= 0 &&
+		index < targets.length &&
+		targets[index] === targets[from]
+	) {
+		index += direction;
+	}
+
+	return index;
+}
+
+/**
  * Move a carousel by one slide.
  *
  * @param {HTMLElement} list      Item template list.
@@ -477,7 +509,7 @@ function slide(list, direction) {
 			? held.index
 			: getCurrentSlide(list, targets);
 
-	goToSlide(list, from + direction, targets);
+	goToSlide(list, getNextSlide(targets, from, direction), targets);
 }
 
 /**

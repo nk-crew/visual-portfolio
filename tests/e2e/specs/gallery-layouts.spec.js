@@ -706,6 +706,61 @@ test.describe('Gallery Item Template layouts', () => {
 			.toBeGreaterThan(step * 2.5);
 	});
 
+	test('the arrows move a centred carousel off the slide it opens on', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel centred',
+			blockId: 'e2e-carousel-centred',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				style: { spacing: { blockGap: '10px' } },
+				carouselSnapAlign: 'center',
+				// Slides narrower than the columns they are laid out in, which
+				// is what puts the middle of the carousel out of the reach of
+				// the ones it opens on.
+				carouselPeek: 80,
+			},
+			carousel: ['loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		const geometry = await list.evaluate((node) => {
+			const items = node.querySelectorAll(
+				'.wp-block-visual-portfolio-item-template__item'
+			);
+
+			return {
+				snap: window.getComputedStyle(items[0]).scrollSnapAlign,
+				// What the case is about: the second slide would have to be
+				// scrolled to a negative position to come to the middle, so it
+				// rests where the carousel already is - against the start.
+				second:
+					items[1].offsetLeft -
+					(node.clientWidth - items[1].offsetWidth) / 2,
+			};
+		});
+
+		expect(geometry.snap).toBe('center');
+		expect(geometry.second).toBeLessThan(0);
+
+		// One press, one move: a slide that rests where the carousel already
+		// is gets stepped over rather than asked for, and an arrow that asks
+		// for it never moves the carousel at all.
+		await page.locator(NEXT_ARROW).click();
+
+		await expect
+			.poll(async () => list.evaluate((node) => node.scrollLeft), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(0);
+	});
+
 	test.describe('without JavaScript', () => {
 		test.use({ javaScriptEnabled: false });
 
