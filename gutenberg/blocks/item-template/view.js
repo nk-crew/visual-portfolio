@@ -728,6 +728,26 @@ function initCarousel(list) {
 	).matches;
 	const source = list.dataset.vpCarouselSrc;
 
+	// A press with a mouse is the start of a drag as often as it is a click,
+	// and the link under it takes focus on the press - which a theme draws a
+	// ring around, so every swipe lit the picture up. Focus is the default of
+	// the press and the click is not: it fires either way, and the keyboard
+	// still reaches the link the ordinary way. The list takes the focus
+	// instead, which is what lets the arrow keys move the carousel after a
+	// click on it.
+	const onMouseDown = (event) => {
+		if (0 !== event.button) {
+			return;
+		}
+
+		event.preventDefault();
+		list.focus({ preventScroll: true });
+	};
+
+	if (canDrag) {
+		list.addEventListener('mousedown', onMouseDown);
+	}
+
 	if ((canDrag || repeats) && source) {
 		import(/* webpackIgnore: true */ source)
 			.then(({ Blossom }) => {
