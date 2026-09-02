@@ -42,6 +42,8 @@ const PROGRESS_SELECTOR = '.vp-block-loop-carousel-indicator--progress';
 // calling it, and a control that ended up beside a grid never loses it.
 const IDLE_CLASS = 'vp-carousel-control-idle';
 const PLAYING_CLASS = 'vp-carousel-is-playing';
+// A slide Blossom has moved round to the far end of a repeating carousel.
+const MOVED_ROUND_CLASS = 'vp-carousel-moved-round';
 const EDGE_FADE_CLASS = 'vp-carousel-edge-fade';
 const MASONRY_CLASS = 'vp-layout-masonry';
 const MASONRY_NATIVE_CLASS = 'vp-layout-masonry-native';
@@ -62,6 +64,11 @@ const RELAYOUT_EVENT = 'vp-relayout';
 //                                          a released carousel.
 const GO_TO_EVENT = 'vp-carousel-go-to';
 const AUTOPLAY_EVENT = 'vp-carousel-autoplay';
+
+// Dispatched on the list by a press on an arrow or a dot. Autoplay starts
+// its wait over on it: a visitor who has just chosen a slide is owed a whole
+// delay on it, not whatever was left of the last one.
+const STEP_EVENT = 'vp-carousel-step';
 
 // How long an arrow keeps counting from the slide the last press was headed
 // for. Presses that come faster than the carousel travels are still one slide
@@ -113,11 +120,14 @@ function isRepeating(list) {
  */
 function getRepeatGeometry(list) {
 	const items = list.querySelectorAll(ITEM_SELECTOR);
-	const period = list.scrollWidth - list.clientWidth;
 	const step =
 		items.length > 1
 			? Math.abs(items[1].offsetLeft - items[0].offsetLeft)
-			: period;
+			: list.scrollWidth - list.clientWidth;
+	// A step per slide, which the stylesheet makes the scrollable width of
+	// the list - and not the scrollable width read back, which a slide moved
+	// round to the far end stretches by its own width.
+	const period = items.length ? items.length * step : 0;
 
 	let origin = 0;
 
@@ -217,28 +227,32 @@ function goToRepeatingSlide(list, index, direction = 0) {
 
 	const end = period - REPEAT_EDGE;
 
+	// A place on the clock, in the range Blossom keeps the scroll in.
+	const inRange = (place) => {
+		const turned = onTheClock(place, period);
+
+		if (turned < REPEAT_EDGE) {
+			return turned + period;
+		}
+
+		return turned > end ? turned - period : turned;
+	};
+
 	if (target >= REPEAT_EDGE && target <= end) {
 		scrollListTo(list, target);
 
 		return;
 	}
 
-	// Over the edge. The first move is to the edge itself, and the second
-	// starts once Blossom has put the scroll back by a period - which is a
-	// jump of that size in the position, and nothing else moves it that far
-	// at once. Snapping is held off for the crossing: the edge is past the
-	// last place the browser would let the carousel rest, and a scroll that
-	// snapped short of it never crossed.
-	const beyond = target > end;
-	const rest = beyond ? target - period : target + period;
+	// Over the edge. Snapping is held off for the crossing: the edge is past
+	// the last place the browser would let the carousel rest, and a scroll
+	// that snapped short of it never crossed.
 	const snap = {
 		value: list.style.getPropertyValue('scroll-snap-type'),
 		priority: list.style.getPropertyPriority('scroll-snap-type'),
 	};
 
 	list.style.setProperty('scroll-snap-type', 'none', 'important');
-
-	let last = position;
 
 	const restoreSnap = () => {
 		if (snap.value) {
@@ -252,43 +266,113 @@ function goToRepeatingSlide(list, index, direction = 0) {
 		}
 	};
 
-	const onScroll = () => {
+	const jumpTo = (place) => {
+		list.scrollTo({
+			left: isRtl(list) ? -place : place,
+			behavior: 'instant',
+		});
+	};
+
+	// Where the first move ends is not where the step ends. Forwards, the
+	// scroll runs past the end of the clock and on to the target, as far as
+	// the copies moved round let it - and Blossom may put it back by a
+	// period on the way, or may not. Backwards, it runs to zero and Blossom
+	// puts it at the far end. Either way the carousel is then the same
+	// picture as somewhere on the clock, and the step is finished from
+	// there: put onto the clock in one jump nobody sees, and scrolled the
+	// rest of the way.
+	const arrive = () => {
 		const now = getScrollPosition(list);
-		const wrapped = beyond
-			? now < last - period / 2
-			: now > last + period / 2;
+		const here = inRange(now);
+		const want = inRange(base);
 
-		last = now;
+		if (Math.abs(now - here) > 1) {
+			jumpTo(here);
+		}
 
-		if (!wrapped) {
+		if (Math.abs(here - want) <= 1) {
+			restoreSnap();
+
 			return;
 		}
 
-		stop();
-
-		// Blossom puts the scroll back at the near edge, and a place inside
-		// that margin is that edge: asking for it would cross straight back.
-		if (rest > REPEAT_EDGE && Math.abs(now - rest) > 1) {
-			scrollListTo(list, rest);
-		}
-
-		// Snapping comes back once the carousel has come to rest, where the
-		// snap and the rest agree. Given back while it was still travelling,
-		// the snap took the carousel somewhere else.
+		scrollListTo(list, want);
 		whenSettled(list, restoreSnap);
 	};
 
-	const timer = window.setTimeout(() => {
-		stop();
-		restoreSnap();
-	}, 3000);
-	const stop = () => {
-		window.clearTimeout(timer);
-		list.removeEventListener('scroll', onScroll);
+	if (target > end) {
+		const furthest = list.scrollWidth - list.clientWidth;
+
+		scrollListTo(list, Math.min(target, furthest));
+	} else {
+		// Blossom measures the clock again on a change in the list, and a
+		// measurement taken while copies were moved round past the end came
+		// out too long: its far end sat off the clock, and the scroll it put
+		// there showed the wrong slide. There are no such copies here, at
+		// the start, so it is asked to measure now.
+		remeasureLoop(list);
+		scrollListTo(list, 0);
+	}
+
+	whenSettled(list, arrive);
+}
+
+/**
+ * Have Blossom measure a repeating carousel again.
+ *
+ * It watches the list for children coming and going, and a comment is a
+ * child that changes nothing else.
+ *
+ * @param {HTMLElement} list Item template list.
+ */
+function remeasureLoop(list) {
+	const mark = list.ownerDocument.createComment('');
+
+	list.appendChild(mark);
+	mark.remove();
+}
+
+/**
+ * Mark the slides a repeating carousel has moved round.
+ *
+ * Blossom carries the loop by translating the slides one end has run out of
+ * to the other, and writes the translation on each slide as it goes. A
+ * scroll-driven effect is drawn from where a slide was laid out, not from
+ * where a transform put it, so a moved slide arrived wearing the state of a
+ * slide far off the other edge - half out of its box, or turned away. The
+ * class lets the stylesheet draw a moved slide plain.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function} Teardown.
+ */
+function markMovedRound(list) {
+	const mark = (item) => {
+		item.classList.toggle(
+			MOVED_ROUND_CLASS,
+			!!parseFloat(item.style.translate)
+		);
 	};
 
-	list.addEventListener('scroll', onScroll, { passive: true });
-	scrollListTo(list, beyond ? period : 0);
+	const observer = new window.MutationObserver((mutations) => {
+		mutations.forEach((mutation) => {
+			mark(mutation.target);
+		});
+	});
+
+	list.querySelectorAll(ITEM_SELECTOR).forEach(mark);
+	observer.observe(list, {
+		attributes: true,
+		attributeFilter: ['style'],
+		subtree: true,
+	});
+
+	return () => {
+		observer.disconnect();
+		list.querySelectorAll(ITEM_SELECTOR).forEach((item) => {
+			item.classList.remove(MOVED_ROUND_CLASS);
+		});
+	};
 }
 
 /**
@@ -319,6 +403,21 @@ function whenSettled(list, callback) {
 	};
 
 	window.requestAnimationFrame(tick);
+}
+
+/**
+ * Put a repeating carousel on its first slide, at once.
+ *
+ * @param {HTMLElement} list Item template list.
+ */
+function openOnFirstSlide(list) {
+	const { origin } = getRepeatGeometry(list);
+
+	list.scrollTo({
+		left: isRtl(list) ? -origin : origin,
+		behavior: 'instant',
+	});
+	syncNav(list);
 }
 
 /**
@@ -750,6 +849,8 @@ function getNextSlide(targets, from, direction) {
  * @param {number}      direction `1` forwards, `-1` back.
  */
 function slide(list, direction) {
+	list.dispatchEvent(new window.CustomEvent(STEP_EVENT));
+
 	const held = pending.get(list);
 	const remembered =
 		held && window.performance.now() - held.time < STEP_MEMORY;
@@ -895,6 +996,10 @@ function initAutoplay(list) {
 	const hold = (event) => {
 		held = false === event.detail?.playing;
 	};
+	const restart = () => {
+		elapsed = 0;
+		setProgress(0);
+	};
 
 	root.classList.add(PLAYING_CLASS);
 	boxes.forEach((box) => {
@@ -905,6 +1010,7 @@ function initAutoplay(list) {
 	});
 	list.addEventListener('pointerdown', pause);
 	list.addEventListener(AUTOPLAY_EVENT, hold);
+	list.addEventListener(STEP_EVENT, restart);
 
 	raf = window.requestAnimationFrame((now) => {
 		last = now;
@@ -922,6 +1028,7 @@ function initAutoplay(list) {
 		});
 		list.removeEventListener('pointerdown', pause);
 		list.removeEventListener(AUTOPLAY_EVENT, hold);
+		list.removeEventListener(STEP_EVENT, restart);
 		root.style.removeProperty('--vp-carousel-autoplay-progress');
 	};
 }
@@ -984,6 +1091,16 @@ function initCarousel(list) {
 	// endlessness is Blossom's too, and a touch device is owed it as much as a
 	// desktop one.
 	const repeats = isRepeating(list);
+
+	// A repeating carousel opens on its first slide. The padding the loop is
+	// carried in comes from the stylesheet, so the place is known before the
+	// library that carries the loop has loaded - and it is taken now, so
+	// that the library never finds the scroll at zero, which it puts at the
+	// far end.
+	if (repeats) {
+		openOnFirstSlide(list);
+	}
+
 	const canDrag = window.matchMedia(
 		'(hover: hover) and (pointer: fine)'
 	).matches;
@@ -1021,18 +1138,10 @@ function initCarousel(list) {
 				carousels.set(list, carousel);
 				carousel.init();
 
-				// Blossom opens a repeating carousel at the far end of its
-				// range, which is the first slide only once the copies have
-				// been moved round - and the browser's snap has other ideas
-				// meanwhile. It is opened on the first slide outright.
+				// Taken again once the library has laid the loop out, in
+				// case its first pass moved the scroll.
 				if (repeats) {
-					const { origin } = getRepeatGeometry(list);
-
-					list.scrollTo({
-						left: isRtl(list) ? -origin : origin,
-						behavior: 'instant',
-					});
-					syncNav(list);
+					openOnFirstSlide(list);
 				}
 			})
 			.catch(() => {
@@ -1041,8 +1150,10 @@ function initCarousel(list) {
 	}
 
 	const stopAutoplay = initAutoplay(list);
+	const stopMarking = repeats ? markMovedRound(list) : noop;
 
 	return () => {
+		stopMarking();
 		stopAutoplay();
 		stopColumns();
 		sleepControls();
@@ -1142,6 +1253,7 @@ store('visual-portfolio/item-template', {
 				return;
 			}
 
+			list.dispatchEvent(new window.CustomEvent(STEP_EVENT));
 			goToSlide(list, index);
 		},
 	},

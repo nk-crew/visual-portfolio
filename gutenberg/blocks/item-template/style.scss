@@ -557,6 +557,17 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 }
 
+// A slide a repeating carousel has moved round to its far end is drawn plain:
+// a scroll-driven effect is measured from where the slide was laid out, not
+// from where it was moved to, and it arrived wearing the state of a slide far
+// off the other edge. The module marks them - see `markMovedRound`.
+.wp-block-visual-portfolio-item-template.vp-layout-carousel > .wp-block-visual-portfolio-item-template__item.vp-carousel-moved-round {
+	.wp-block-visual-portfolio-item-template__slide,
+	.wp-block-visual-portfolio-item-template__card {
+		animation: none;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.wp-block-visual-portfolio-item-template.vp-layout-carousel {
 		scroll-behavior: auto;

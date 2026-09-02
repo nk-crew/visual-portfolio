@@ -556,7 +556,11 @@ test.describe('Gallery Item Template layouts', () => {
 		// scroll lands in - the snap pulls the carousel back to a slide right
 		// after, and the library lays the loop out again for wherever it
 		// rests.
-		await expect(list).toHaveAttribute('has-repeat', 'true');
+		// The library that carries the loop is fetched by the module, and a
+		// cold cache takes its time.
+		await expect(list).toHaveAttribute('has-repeat', 'true', {
+			timeout: 15000,
+		});
 
 		const seam = () =>
 			list.evaluate(async (node) => {
@@ -625,7 +629,11 @@ test.describe('Gallery Item Template layouts', () => {
 		const list = page.locator(LIST);
 		const dots = page.locator(`${NAV} ${DOT}`);
 
-		await expect(list).toHaveAttribute('has-repeat', 'true');
+		// The library that carries the loop is fetched by the module, and a
+		// cold cache takes its time.
+		await expect(list).toHaveAttribute('has-repeat', 'true', {
+			timeout: 15000,
+		});
 		await expect(dots).toHaveCount(IMAGES_COUNT);
 
 		// The slide the carousel rests on, read the way the module reads it:
@@ -634,7 +642,7 @@ test.describe('Gallery Item Template layouts', () => {
 			list.evaluate((node) => {
 				const items = node.children;
 				const step = items[1].offsetLeft - items[0].offsetLeft;
-				const period = node.scrollWidth - node.clientWidth;
+				const period = items.length * step;
 				// The first slide rests where the padding puts it.
 				const origin = parseFloat(
 					window.getComputedStyle(node).paddingInlineStart
