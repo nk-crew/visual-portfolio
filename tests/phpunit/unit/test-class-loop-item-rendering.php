@@ -361,6 +361,27 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A carousel that repeats loads every image up front: its last slides are
+	 * shown before its first, moved there by a transform, where nothing that
+	 * loads an image on sight looks.
+	 *
+	 * @return void
+	 */
+	public function test_a_repeating_carousel_loads_every_image_up_front() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'     => 'carousel',
+				'carouselRepeat' => true,
+			)
+		);
+
+		$this->assertSame( 5, substr_count( $output, 'loading="eager"' ) );
+		$this->assertSame( 4, substr_count( $output, 'data-skip-lazy' ) );
+		$this->assertStringNotContainsString( 'loading="lazy"', $output );
+	}
+
+	/**
 	 * A control that was switched off renders nothing at all. It cannot be
 	 * deleted, so hiding is the only way one is taken off a page.
 	 *
