@@ -361,6 +361,19 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			width: auto;
 		}
 
+		// A centred carousel rests every slide in the middle, the first and
+		// the last included: padded by the room a centred slide leaves on
+		// either side, so that the start of the list is where the first
+		// slide is centred and the end where the last one is. Without it
+		// neither could reach the middle, and every slide that could not
+		// rested where the one before it did - a press on the arrow, and on
+		// the dot of such a slide, went nowhere. Not for slides of their own
+		// width, which the padding cannot be worked out from.
+		&.vp-carousel-snap-center:not(.vp-carousel-auto-width) {
+			padding-inline: calc((100cqw - var(--vp-carousel-slide-width)) / 2);
+			scroll-padding-inline: 0;
+		}
+
 		&.vp-carousel-free-scroll {
 			scroll-snap-type: none;
 		}

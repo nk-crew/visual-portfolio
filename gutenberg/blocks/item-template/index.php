@@ -841,6 +841,12 @@ class Visual_Portfolio_Block_Item_Template {
 					$classes[] = 'vp-carousel-edge-fade';
 				}
 
+				// A centred carousel is padded so that its first and its last
+				// slide can reach the middle - see the stylesheet.
+				if ( 'center' === ( $attributes['carouselSnapAlign'] ?? 'start' ) ) {
+					$classes[] = 'vp-carousel-snap-center';
+				}
+
 				if ( $effect ) {
 					$classes[] = 'vp-carousel-effect';
 					$classes[] = 'vp-carousel-' . $effect;

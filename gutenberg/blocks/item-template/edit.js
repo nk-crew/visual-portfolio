@@ -602,6 +602,10 @@ export default function BlockEdit({
 				classes.push('vp-carousel-edge-fade');
 			}
 
+			if ('center' === carouselSnapAlign) {
+				classes.push('vp-carousel-snap-center');
+			}
+
 			if ('none' !== carouselEffect) {
 				classes.push('vp-carousel-effect');
 				classes.push(`vp-carousel-${carouselEffect}`);
@@ -615,6 +619,7 @@ export default function BlockEdit({
 		carouselAutoWidth,
 		carouselFreeScroll,
 		carouselEdgeFade,
+		carouselSnapAlign,
 		carouselEffect,
 	]);
 

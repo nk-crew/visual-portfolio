@@ -478,7 +478,62 @@ test.describe('Gallery Item Template layouts', () => {
 			.not.toBe('0');
 	});
 
-	test('the overlay style lays the arrows over the slides', async ({
+	test('a centred carousel rests every slide in the middle, the first and the last included', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel centred',
+			blockId: 'e2e-carousel-centred',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselSnapAlign: 'center',
+			},
+			carousel: [
+				'loop-carousel-previous',
+				'loop-carousel-indicator',
+				'loop-carousel-next',
+			],
+		});
+
+		const list = page.locator(LIST);
+		const dots = page.locator(`${NAV} ${DOT}`);
+
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+
+		// Padded so that the first slide sits in the middle: the list starts
+		// at the first slide's resting place, and every slide after it has one
+		// of its own. Without the padding the first slides all rested at the
+		// start, and a press on the arrow - or on the second dot - went
+		// nowhere.
+		const centred = async (index) =>
+			list.evaluate((node, slide) => {
+				const item = node.children[slide].getBoundingClientRect();
+				const box = node.getBoundingClientRect();
+
+				return Math.abs(
+					item.left + item.width / 2 - (box.left + box.width / 2)
+				);
+			}, index);
+
+		expect(await centred(0)).toBeLessThan(2);
+
+		await page.locator(NEXT_ARROW).click();
+		await expect.poll(() => centred(1), { timeout: 10000 }).toBeLessThan(2);
+		await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true');
+
+		// Back to the start, and the second dot is a place of its own.
+		await page.locator(PREV_ARROW).click();
+		await expect.poll(() => centred(0), { timeout: 10000 }).toBeLessThan(2);
+
+		await dots.nth(1).click();
+		await expect.poll(() => centred(1), { timeout: 10000 }).toBeLessThan(2);
+	});
+
+	test('controls inside the item template are laid over the slides', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -704,61 +759,6 @@ test.describe('Gallery Item Template layouts', () => {
 				timeout: 10000,
 			})
 			.toBeGreaterThan(step * 2.5);
-	});
-
-	test('the arrows move a centred carousel off the slide it opens on', async ({
-		page,
-		requestUtils,
-	}) => {
-		await publishLoop(requestUtils, page, {
-			title: 'Layouts - carousel centred',
-			blockId: 'e2e-carousel-centred',
-			images,
-			layout: {
-				layoutType: 'carousel',
-				layoutColumnsMode: 'manual',
-				layoutColumnCount: 3,
-				style: { spacing: { blockGap: '10px' } },
-				carouselSnapAlign: 'center',
-				// Slides narrower than the columns they are laid out in, which
-				// is what puts the middle of the carousel out of the reach of
-				// the ones it opens on.
-				carouselPeek: 80,
-			},
-			carousel: ['loop-carousel-next'],
-		});
-
-		const list = page.locator(LIST);
-
-		const geometry = await list.evaluate((node) => {
-			const items = node.querySelectorAll(
-				'.wp-block-visual-portfolio-item-template__item'
-			);
-
-			return {
-				snap: window.getComputedStyle(items[0]).scrollSnapAlign,
-				// What the case is about: the second slide would have to be
-				// scrolled to a negative position to come to the middle, so it
-				// rests where the carousel already is - against the start.
-				second:
-					items[1].offsetLeft -
-					(node.clientWidth - items[1].offsetWidth) / 2,
-			};
-		});
-
-		expect(geometry.snap).toBe('center');
-		expect(geometry.second).toBeLessThan(0);
-
-		// One press, one move: a slide that rests where the carousel already
-		// is gets stepped over rather than asked for, and an arrow that asks
-		// for it never moves the carousel at all.
-		await page.locator(NEXT_ARROW).click();
-
-		await expect
-			.poll(async () => list.evaluate((node) => node.scrollLeft), {
-				timeout: 10000,
-			})
-			.toBeGreaterThan(0);
 	});
 
 	test.describe('without JavaScript', () => {
