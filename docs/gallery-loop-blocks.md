@@ -119,7 +119,7 @@ which have no hover, always show it). The editor draws the same blocks inside
 the item being edited, positioned against the same frame.
 
 The arrows carry an *Icon* — chevron or arrow — and three block styles:
-*Outlined*, *Filled* (a dark pill with a white glyph) and *Plain*. The indicator
+*Plain*, *Outlined* and *Filled* (a dark pill with a white glyph). The indicator
 carries block styles of its own: *Plain*, *Outlined* and *Filled*, the box
 around the dots or the bar. Selecting the row offers the same
 settings and applies them to every arrow and indicator inside it.

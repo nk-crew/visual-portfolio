@@ -52,9 +52,9 @@
 		}
 	},
 	"styles": [
-		{ "name": "default", "label": "Outlined", "isDefault": true },
-		{ "name": "filled", "label": "Filled" },
-		{ "name": "plain", "label": "Plain" }
+		{ "name": "default", "label": "Plain", "isDefault": true },
+		{ "name": "outlined", "label": "Outlined" },
+		{ "name": "filled", "label": "Filled" }
 	],
 	"selectors": { "root": ".vp-block-loop-carousel-next" },
 	"style": "visual-portfolio-block-loop-carousel",

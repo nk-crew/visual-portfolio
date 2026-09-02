@@ -35,12 +35,9 @@
 	border-radius: 50%;
 	transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 
-	// Outlined unless the block says otherwise: a ring of the text colour
-	// around a transparent button. Written out rather than taken from
-	// `--vp-carousel-track`, which is the unfilled part of an indicator: an
-	// arrow is drawn the same whether it was dropped in the row beside one or
-	// in the heading above the gallery. An arrow the block supports have
-	// already coloured keeps its colours.
+	// Plain unless a block style says otherwise: the glyph and nothing around
+	// it. The colours are variables so that a style can restate them, and an
+	// arrow the block supports have already coloured keeps its colours.
 	&:not(.has-text-color) {
 		color: var(--vp-carousel-arrow-color, inherit);
 	}
@@ -49,37 +46,35 @@
 		background-color: var(--vp-carousel-arrow-background, transparent);
 	}
 
-	border: 1px solid var(--vp-carousel-arrow-border, color-mix(in oklab, currentcolor 20%, transparent 80%));
+	border: 1px solid var(--vp-carousel-arrow-border, transparent);
 
 	&:hover:not([disabled]):not(.has-background) {
-		background-color: var(--vp-carousel-arrow-background-hover, color-mix(in oklab, currentcolor 8%, transparent 92%));
+		background-color: var(--vp-carousel-arrow-background-hover, transparent);
 	}
 
 	&:hover:not([disabled]) {
-		border-color: var(--vp-carousel-arrow-border-hover, currentcolor);
+		border-color: var(--vp-carousel-arrow-border-hover, transparent);
+		opacity: var(--vp-carousel-arrow-hover-opacity, 0.7);
+	}
+
+	// Outlined: a ring of the text colour around a transparent button.
+	// Written out rather than taken from `--vp-carousel-track`, which is the
+	// unfilled part of an indicator: an arrow is drawn the same whether it
+	// was dropped in the row beside one or in the heading above the gallery.
+	&.is-style-outlined {
+		--vp-carousel-arrow-border: color-mix(in oklab, currentcolor 20%, transparent 80%);
+		--vp-carousel-arrow-border-hover: currentcolor;
+		--vp-carousel-arrow-background-hover: color-mix(in oklab, currentcolor 8%, transparent 92%);
+		--vp-carousel-arrow-hover-opacity: 1;
 	}
 
 	// Filled: a dark pill with a white glyph, which is the one pair that reads
-	// over a photograph as well as it does on a page. The styles are block
-	// styles, picked in the sidebar.
+	// over a photograph as well as it does on a page.
 	&.is-style-filled {
 		--vp-carousel-arrow-color: #fff;
 		--vp-carousel-arrow-background: rgba(0, 0, 0, 0.5);
 		--vp-carousel-arrow-background-hover: rgba(0, 0, 0, 0.7);
-		--vp-carousel-arrow-border: transparent;
-		--vp-carousel-arrow-border-hover: transparent;
-	}
-
-	// Plain: the glyph and nothing around it.
-	&.is-style-plain {
-		--vp-carousel-arrow-background: transparent;
-		--vp-carousel-arrow-background-hover: transparent;
-		--vp-carousel-arrow-border: transparent;
-		--vp-carousel-arrow-border-hover: transparent;
-
-		&:hover:not([disabled]) {
-			opacity: 0.7;
-		}
+		--vp-carousel-arrow-hover-opacity: 1;
 	}
 
 	// The end of the carousel, when it has one to run out of.
