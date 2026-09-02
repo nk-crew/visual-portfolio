@@ -108,7 +108,11 @@ export function getColumnsProps(attributes, blockGap) {
 	};
 
 	if (blockGap) {
-		style['--vp-layout-gap'] = blockGap;
+		// None is a bare zero, which is a number rather than a length and
+		// invalid inside the `calc()` the slide width is worked out with.
+		style['--vp-layout-gap'] = /^0(\.0+)?$/.test(blockGap)
+			? '0px'
+			: blockGap;
 	}
 
 	if (isAuto) {

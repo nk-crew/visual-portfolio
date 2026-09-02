@@ -752,6 +752,44 @@ test.describe('Gallery Item Template layouts', () => {
 			.toBeGreaterThan(0);
 	});
 
+	test('a carousel with no block spacing still lays its slides out', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel no gap',
+			blockId: 'e2e-carousel-no-gap',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselRepeat: true,
+				// None in the block spacing control is a bare zero.
+				style: { spacing: { blockGap: '0' } },
+			},
+			carousel: ['loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveClass(/vp-layout-carousel/);
+
+		// A zero with a unit: a bare one is a number, and a slide width worked
+		// out from it in a `calc()` was invalid, which left the slides their
+		// own size.
+		await expect(list).toHaveAttribute('style', /--vp-layout-gap:\s*0px/);
+
+		const [frame, first, second] = await Promise.all([
+			page.locator(FRAME).boundingBox(),
+			list.locator(ITEM).nth(0).boundingBox(),
+			list.locator(ITEM).nth(1).boundingBox(),
+		]);
+
+		expect(first.width).toBeCloseTo(frame.width / 3, 0);
+		expect(second.x).toBeCloseTo(first.x + first.width, 0);
+	});
+
 	test('controls inside the item template are laid over the slides', async ({
 		page,
 		requestUtils,

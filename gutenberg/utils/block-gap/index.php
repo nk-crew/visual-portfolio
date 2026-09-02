@@ -42,6 +42,13 @@ function visual_portfolio_get_block_gap( $gap ) {
 		return '';
 	}
 
+	// None is a bare zero, and a bare zero is a number: inside a `calc()` a
+	// number cannot be taken from a length, so every slide width the layouts
+	// work out from the gap came out invalid. A zero with a unit is a length.
+	if ( preg_match( '/^0(\.0+)?$/', $gap ) ) {
+		return '0px';
+	}
+
 	// `var:preset|spacing|50` is how a preset travels in block attributes.
 	if ( str_contains( $gap, 'var:preset|spacing|' ) ) {
 		$slug = _wp_to_kebab_case( substr( $gap, strrpos( $gap, '|' ) + 1 ) );
