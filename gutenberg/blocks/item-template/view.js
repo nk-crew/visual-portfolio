@@ -937,6 +937,10 @@ function initAutoplay(list) {
 	// Asked for from outside, and kept apart from `paused` so that releasing it
 	// does not start a carousel the pointer is resting on.
 	let held = false;
+	// Off the screen. A carousel nobody can see has nobody to run for, and a
+	// visitor who scrolls back to it is owed the slide they left it on: the
+	// clock holds rather than turning back, like a pause.
+	let offscreen = true;
 
 	const setProgress = (value) => {
 		root.style.setProperty(
@@ -952,7 +956,7 @@ function initAutoplay(list) {
 
 		last = now;
 
-		if (paused || held) {
+		if (paused || held || offscreen) {
 			return;
 		}
 
@@ -992,6 +996,22 @@ function initAutoplay(list) {
 		setProgress(0);
 	};
 
+	// Half of the frame on screen is the carousel in view: less than that
+	// is a strip along the edge of the window, which is not something a
+	// visitor is watching.
+	const frame = getFrame(list) || list;
+	const view = frame.ownerDocument.defaultView || window;
+	const watcher = new view.IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				offscreen = !entry.isIntersecting;
+			});
+		},
+		{ threshold: 0.5 }
+	);
+
+	watcher.observe(frame);
+
 	root.classList.add(PLAYING_CLASS);
 	boxes.forEach((box) => {
 		box.addEventListener('pointerenter', pause);
@@ -1010,6 +1030,7 @@ function initAutoplay(list) {
 
 	return () => {
 		window.cancelAnimationFrame(raf);
+		watcher.disconnect();
 		root.classList.remove(PLAYING_CLASS);
 		boxes.forEach((box) => {
 			box.removeEventListener('pointerenter', pause);

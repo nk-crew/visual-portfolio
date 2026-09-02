@@ -699,6 +699,59 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 	});
 
+	test('autoplay runs only while the carousel is on screen', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		// Pushed below the fold by a tall spacer.
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - carousel autoplay off screen',
+				status: 'publish',
+				content:
+					'<!-- wp:spacer {"height":"3000px"} --><div style="height:3000px" aria-hidden="true" class="wp-block-spacer"></div><!-- /wp:spacer -->' +
+					getLoopMarkup({
+						blockId: 'e2e-carousel-autoplay-offscreen',
+						images,
+						layout: {
+							layoutType: 'carousel',
+							layoutColumnsMode: 'manual',
+							layoutColumnCount: 3,
+							carouselAutoplay: true,
+							carouselAutoplayDelay: 2,
+						},
+						carousel: ['loop-carousel-indicator'],
+					}),
+			},
+		});
+
+		pageIds.push(created.id);
+
+		await page.goto(created.link, { waitUntil: 'domcontentloaded' });
+
+		const carousel = page.locator(CAROUSEL);
+		const list = page.locator(LIST);
+
+		await expect(carousel).toHaveClass(/vp-carousel-is-playing/);
+
+		// Out of sight, the clock does not run: longer than a delay later
+		// the carousel is still on its first slide.
+		await page.waitForTimeout(3000);
+		expect(await list.evaluate((node) => node.scrollLeft)).toBe(0);
+
+		// Scrolled into view, it runs on.
+		await list.scrollIntoViewIfNeeded();
+		await expect
+			.poll(async () => list.evaluate((node) => node.scrollLeft), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(0);
+	});
+
 	test('controls inside the item template are laid over the slides', async ({
 		page,
 		requestUtils,
