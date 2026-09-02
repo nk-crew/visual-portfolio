@@ -531,6 +531,76 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(() => centred(1), { timeout: 10000 }).toBeLessThan(2);
 	});
 
+	test('a repeating carousel keeps the gap at its seam', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel repeat',
+			blockId: 'e2e-carousel-repeat',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselRepeat: true,
+			},
+			carousel: ['loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		// The loop is the library's: as the carousel nears its end it moves
+		// the first slides round to the far end, and the seam is where the
+		// last slide meets the first one again. Measured in the frame the
+		// scroll lands in - the snap pulls the carousel back to a slide right
+		// after, and the library lays the loop out again for wherever it
+		// rests.
+		await expect(list).toHaveAttribute('has-repeat', 'true');
+
+		const seam = () =>
+			list.evaluate(async (node) => {
+				node.scrollLeft = node.scrollWidth - node.clientWidth - 100;
+
+				await new Promise((resolve) =>
+					window.requestAnimationFrame(() =>
+						window.requestAnimationFrame(resolve)
+					)
+				);
+
+				const items = Array.from(node.children);
+				const first = items[0];
+				const last = items[items.length - 1];
+
+				if (!(parseFloat(first.style.translate) > 0)) {
+					return null;
+				}
+
+				return {
+					gap: parseFloat(window.getComputedStyle(node).gap),
+					seam:
+						first.getBoundingClientRect().left -
+						last.getBoundingClientRect().right,
+				};
+			});
+
+		let measured = null;
+
+		await expect
+			.poll(
+				async () => {
+					measured = await seam();
+
+					return measured;
+				},
+				{ timeout: 10000 }
+			)
+			.not.toBeNull();
+
+		// One gap, the same one the slides keep between themselves.
+		expect(measured.seam).toBeCloseTo(measured.gap, 0);
+	});
+
 	test('controls inside the item template are laid over the slides', async ({
 		page,
 		requestUtils,
