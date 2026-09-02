@@ -23,6 +23,7 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import { useIsPreview } from '../../utils/use-is-preview';
 
 const CLICK_ACTION_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
@@ -48,9 +49,19 @@ export default function ItemTitleEdit({
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
+	// The placeholder stands in on the item being edited and nowhere else:
+	// the read-only copies of the item, and every other preview, show what
+	// the page will show - and an item without a title shows nothing.
+	const isPreview = useIsPreview();
 	const title = itemTitle
 		? decodeEntities(itemTitle)
-		: __('Gallery item title', 'visual-portfolio');
+		: isPreview
+			? ''
+			: __('Gallery item title', 'visual-portfolio');
+
+	if (!title) {
+		return null;
+	}
 
 	return (
 		<>

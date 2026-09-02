@@ -18,6 +18,7 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import { useIsPreview } from '../../utils/use-is-preview';
 
 const DEFAULT_SEPARATOR = ', ';
 
@@ -34,6 +35,12 @@ export default function ItemCategoriesEdit({
 	const categories = (itemCategories || []).filter(
 		(category) => category?.label
 	);
+
+	// The placeholder stands in on the item being edited and nowhere else.
+	const isPreview = useIsPreview();
+	const placeholder = isPreview
+		? null
+		: __('Gallery item categories', 'visual-portfolio');
 
 	return (
 		<>
@@ -91,7 +98,7 @@ export default function ItemCategoriesEdit({
 								</a>
 							</Fragment>
 						))
-					: __('Gallery item categories', 'visual-portfolio')}
+					: placeholder}
 			</div>
 		</>
 	);
