@@ -89,6 +89,12 @@ const pending = new WeakMap();
 // the margin in from both ends, and a step past it is made in two moves.
 const REPEAT_EDGE = 4;
 
+// How long a step of a repeating carousel takes, drawn by the module.
+const TRAVEL_DURATION = 450;
+
+// The custom property Blossom keeps the snap type of the list in.
+const SNAP_TYPE_PROPERTY = '--snap-type';
+
 /**
  * Whether a carousel repeats.
  *
@@ -185,9 +191,9 @@ function getCurrentRepeatingSlide(list, geometry = getRepeatGeometry(list)) {
  *
  * The slide is at its own step on the clock, one period apart from itself
  * again - so of those places the one asked for is the nearest, or the
- * nearest ahead or behind when the press said which way. A place past
- * either edge of the range is reached in two moves: to the edge, where
- * Blossom puts the scroll back by a period, and on from there.
+ * nearest ahead or behind when the press said which way. The travel is one
+ * unbroken move, however far off the range it aims: every frame of it is
+ * put back onto the range, which is the same picture.
  *
  * @param {HTMLElement} list      Item template list.
  * @param {number}      index     Slide to rest on, counted round the loop.
@@ -224,112 +230,142 @@ function goToRepeatingSlide(list, index, direction = 0) {
 	}
 
 	pending.set(list, { index: wanted, time: window.performance.now() });
+	travelRepeating(list, position, target, period);
+}
 
+// The travel under way on each repeating carousel, so that a press that
+// comes before the last one has arrived takes over from it rather than
+// racing it.
+const travels = new WeakMap();
+
+/**
+ * Where a position on the clock of a repeating carousel is scrolled to.
+ *
+ * Blossom keeps the scroll a margin in from either end of its range and puts
+ * a scroll that reaches an end back at the other, so the range a frame can
+ * be drawn at is the margin in from both ends - and a position off it is
+ * the same picture a period along.
+ *
+ * @param {number} place  Position, anywhere on the clock.
+ * @param {number} period Length of the clock.
+ *
+ * @return {number} The same picture, inside the range.
+ */
+function onTheRange(place, period) {
 	const end = period - REPEAT_EDGE;
+	const turned = onTheClock(place, period);
 
-	// A place on the clock, in the range Blossom keeps the scroll in.
-	const inRange = (place) => {
-		const turned = onTheClock(place, period);
-
-		if (turned < REPEAT_EDGE) {
-			return turned + period;
-		}
-
-		return turned > end ? turned - period : turned;
-	};
-
-	if (target >= REPEAT_EDGE && target <= end) {
-		scrollListTo(list, target);
-
-		return;
+	if (turned >= REPEAT_EDGE && turned <= end) {
+		return turned;
 	}
 
-	// Over the edge. Snapping is held off for the crossing: the edge is past
-	// the last place the browser would let the carousel rest, and a scroll
-	// that snapped short of it never crossed.
-	const snap = {
-		value: list.style.getPropertyValue('scroll-snap-type'),
-		priority: list.style.getPropertyPriority('scroll-snap-type'),
+	// Inside the margin at either end, which is one picture: the near edge.
+	return turned + period <= end ? turned + period : REPEAT_EDGE;
+}
+
+/**
+ * Move a repeating carousel from one position on its clock to another.
+ *
+ * Drawn frame by frame rather than left to the browser's smooth scroll: the
+ * browser cannot scroll past the range, and a move made in two scrolls came
+ * to rest halfway. Snapping is held off for the move and given back at
+ * rest, where the snap and the rest agree. A visitor who asked for less
+ * motion gets the arrival alone.
+ *
+ * @param {HTMLElement} list   Item template list.
+ * @param {number}      from   Position the move starts at.
+ * @param {number}      to     Position it ends at, anywhere on the clock.
+ * @param {number}      period Length of the clock.
+ */
+function travelRepeating(list, from, to, period) {
+	stopTravel(list);
+
+	// Blossom writes the snap type of the list into a custom property and
+	// reads it back in a rule of its own, with `!important` and in a layer
+	// of its own - which outranks anything set on the element. The property
+	// is the one switch the rule answers to.
+	const snap = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
+
+	list.style.setProperty(SNAP_TYPE_PROPERTY, 'none');
+
+	// Set outright: the list scrolls smoothly by its stylesheet, and a
+	// position merely assigned to it is a smooth scroll of its own - which,
+	// for the frame that steps from one end of the range to the other, was a
+	// smooth scroll the whole way back.
+	const place = (position) => {
+		const at = onTheRange(position, period);
+
+		list.scrollTo({ left: isRtl(list) ? -at : at, behavior: 'instant' });
 	};
 
-	list.style.setProperty('scroll-snap-type', 'none', 'important');
+	const finish = () => {
+		travels.delete(list);
 
-	const restoreSnap = () => {
-		if (snap.value) {
-			list.style.setProperty(
-				'scroll-snap-type',
-				snap.value,
-				snap.priority
-			);
+		if (snap) {
+			list.style.setProperty(SNAP_TYPE_PROPERTY, snap);
 		} else {
-			list.style.removeProperty('scroll-snap-type');
+			list.style.removeProperty(SNAP_TYPE_PROPERTY);
 		}
 	};
 
-	const jumpTo = (place) => {
-		list.scrollTo({
-			left: isRtl(list) ? -place : place,
-			behavior: 'instant',
-		});
-	};
+	const duration = 'auto' === getScrollBehavior() ? 0 : TRAVEL_DURATION;
+	const started = window.performance.now();
 
-	// Where the first move ends is not where the step ends. Forwards, the
-	// scroll runs past the end of the clock and on to the target, as far as
-	// the copies moved round let it - and Blossom may put it back by a
-	// period on the way, or may not. Backwards, it runs to zero and Blossom
-	// puts it at the far end. Either way the carousel is then the same
-	// picture as somewhere on the clock, and the step is finished from
-	// there: put onto the clock in one jump nobody sees, and scrolled the
-	// rest of the way.
-	const arrive = () => {
-		const now = getScrollPosition(list);
-		const here = inRange(now);
-		const want = inRange(base);
+	let raf = 0;
 
-		if (Math.abs(now - here) > 1) {
-			jumpTo(here);
-		}
+	const frame = (now) => {
+		const t = duration ? Math.min(1, (now - started) / duration) : 1;
+		// Ease in and out, so the move starts and stops as a scroll does.
+		const eased = 0.5 - Math.cos(Math.PI * t) / 2;
 
-		if (Math.abs(here - want) <= 1) {
-			restoreSnap();
+		place(from + (to - from) * eased);
+
+		if (t < 1) {
+			raf = window.requestAnimationFrame(frame);
 
 			return;
 		}
 
-		scrollListTo(list, want);
-		whenSettled(list, restoreSnap);
+		// Snapping comes back a frame later. Blossom lays the copies out on
+		// the scroll event, which the browser runs before the next frame's
+		// callbacks - and a snap given back before that found the slide the
+		// carousel rests on still moved round to the far end, and took the
+		// carousel to the nearest slide that was not.
+		raf = window.requestAnimationFrame(() => {
+			raf = window.requestAnimationFrame(finish);
+		});
 	};
 
-	if (target > end) {
-		const furthest = list.scrollWidth - list.clientWidth;
+	travels.set(list, () => {
+		window.cancelAnimationFrame(raf);
+		finish();
+	});
 
-		scrollListTo(list, Math.min(target, furthest));
-	} else {
-		// Blossom measures the clock again on a change in the list, and a
-		// measurement taken while copies were moved round past the end came
-		// out too long: its far end sat off the clock, and the scroll it put
-		// there showed the wrong slide. There are no such copies here, at
-		// the start, so it is asked to measure now.
-		remeasureLoop(list);
-		scrollListTo(list, 0);
-	}
-
-	whenSettled(list, arrive);
+	raf = window.requestAnimationFrame(frame);
 }
 
 /**
- * Have Blossom measure a repeating carousel again.
- *
- * It watches the list for children coming and going, and a comment is a
- * child that changes nothing else.
+ * Stop the travel under way on a repeating carousel, where there is one.
  *
  * @param {HTMLElement} list Item template list.
  */
-function remeasureLoop(list) {
-	const mark = list.ownerDocument.createComment('');
+function stopTravel(list) {
+	travels.get(list)?.();
+}
 
-	list.appendChild(mark);
-	mark.remove();
+/**
+ * Put a repeating carousel on its first slide, at once.
+ *
+ * @param {HTMLElement} list Item template list.
+ */
+function openOnFirstSlide(list) {
+	const { origin } = getRepeatGeometry(list);
+
+	list.scrollTo({
+		left: isRtl(list) ? -origin : origin,
+		behavior: 'instant',
+	});
+	syncNav(list);
 }
 
 /**
@@ -373,51 +409,6 @@ function markMovedRound(list) {
 			item.classList.remove(MOVED_ROUND_CLASS);
 		});
 	};
-}
-
-/**
- * Call back once a carousel has stopped moving.
- *
- * @param {HTMLElement} list     Item template list.
- * @param {Function}    callback Called at rest, or after a while regardless.
- */
-function whenSettled(list, callback) {
-	const started = window.performance.now();
-
-	let last = getScrollPosition(list);
-	let still = 0;
-
-	const tick = () => {
-		const now = getScrollPosition(list);
-
-		still = Math.abs(now - last) < 0.5 ? still + 1 : 0;
-		last = now;
-
-		if (still >= 4 || window.performance.now() - started > 3000) {
-			callback();
-
-			return;
-		}
-
-		window.requestAnimationFrame(tick);
-	};
-
-	window.requestAnimationFrame(tick);
-}
-
-/**
- * Put a repeating carousel on its first slide, at once.
- *
- * @param {HTMLElement} list Item template list.
- */
-function openOnFirstSlide(list) {
-	const { origin } = getRepeatGeometry(list);
-
-	list.scrollTo({
-		left: isRtl(list) ? -origin : origin,
-		behavior: 'instant',
-	});
-	syncNav(list);
 }
 
 /**
@@ -1126,6 +1117,11 @@ function initCarousel(list) {
 		list.addEventListener('mousedown', onMouseDown);
 	}
 
+	// A drag takes over from a step the module is still drawing.
+	const onPointerDown = () => stopTravel(list);
+
+	list.addEventListener('pointerdown', onPointerDown);
+
 	if ((canDrag || repeats) && source) {
 		import(/* webpackIgnore: true */ source)
 			.then(({ Blossom }) => {
@@ -1160,6 +1156,8 @@ function initCarousel(list) {
 		list.removeEventListener('scroll', onScroll);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
 		list.removeEventListener('mousedown', onMouseDown);
+		list.removeEventListener('pointerdown', onPointerDown);
+		stopTravel(list);
 		stopObserving();
 
 		const carousel = carousels.get(list);
