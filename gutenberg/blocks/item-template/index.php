@@ -488,11 +488,11 @@ class Visual_Portfolio_Block_Item_Template {
 	 *
 	 * @param int  $index     - position of the item on the rendered page, from zero.
 	 * @param int  $first_row - number of items in the first row.
-	 * @param bool $all_at_once - whether every image is loaded up front.
+	 * @param bool $up_front    - whether this image is loaded up front regardless.
 	 *
 	 * @return array Attributes to merge into the image, possibly empty.
 	 */
-	private function get_image_loading_attributes( $index, $first_row, $all_at_once = false ) {
+	private function get_image_loading_attributes( $index, $first_row, $up_front = false ) {
 		// Core's own flag rather than a counter of ours: it is per request, so a
 		// second gallery does not split the priority budget with the first, and
 		// it is the same flag a hero image above the loop claims - whoever comes
@@ -506,11 +506,11 @@ class Visual_Portfolio_Block_Item_Template {
 			);
 		}
 
-		// A carousel that repeats shows its last slides before its first and
-		// its first after its last, moved there by a transform - which is
-		// where nothing that loads an image on sight looks. Every image of it
-		// is loaded up front, and kept from the plugin's own lazy loading.
-		if ( $all_at_once ) {
+		// A carousel that repeats shows its last slide before its first,
+		// moved there by a transform - which is where nothing that loads an
+		// image on sight looks. That one is loaded up front, and kept from
+		// the plugin's own lazy loading.
+		if ( $up_front ) {
 			return array(
 				'loading'        => 'eager',
 				'data-skip-lazy' => 'true',
@@ -805,6 +805,7 @@ class Visual_Portfolio_Block_Item_Template {
 		// The widest the layout ever gets, which is the row a desktop sees first.
 		$first_row = $this->get_layout_columns( $attributes, $layout_type );
 		$repeats   = 'carousel' === $layout_type && ! empty( $attributes['carouselRepeat'] );
+		$last      = count( $items ) - 1;
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
 
@@ -821,7 +822,7 @@ class Visual_Portfolio_Block_Item_Template {
 		foreach ( $items as $item ) {
 			$item_context = array_merge(
 				self::map_item_to_context( $item, $result['options'], 'vp/', $with_popup ),
-				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row, $repeats ) )
+				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row, $repeats && $index === $last ) )
 			);
 
 			++$index;

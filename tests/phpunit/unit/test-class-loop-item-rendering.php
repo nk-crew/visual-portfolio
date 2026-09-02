@@ -361,13 +361,13 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A carousel that repeats loads every image up front: its last slides are
-	 * shown before its first, moved there by a transform, where nothing that
-	 * loads an image on sight looks.
+	 * A carousel that repeats loads its last image up front: the last slide
+	 * is shown before the first, moved there by a transform, where nothing
+	 * that loads an image on sight looks. The rest load as they always did.
 	 *
 	 * @return void
 	 */
-	public function test_a_repeating_carousel_loads_every_image_up_front() {
+	public function test_a_repeating_carousel_loads_its_last_image_up_front() {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array(
@@ -376,9 +376,14 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( 5, substr_count( $output, 'loading="eager"' ) );
-		$this->assertSame( 4, substr_count( $output, 'data-skip-lazy' ) );
-		$this->assertStringNotContainsString( 'loading="lazy"', $output );
+		// The first row of three, and the last one. The image between them
+		// is left to load on sight.
+		$this->assertSame( 4, substr_count( $output, 'loading="eager"' ) );
+		$this->assertSame( 1, substr_count( $output, 'data-skip-lazy' ) );
+
+		$last = strrpos( $output, 'wp-block-visual-portfolio-item-template__item' );
+
+		$this->assertGreaterThan( $last, strpos( $output, 'data-skip-lazy' ) );
 	}
 
 	/**

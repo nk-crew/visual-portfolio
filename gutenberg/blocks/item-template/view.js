@@ -1,3 +1,107 @@
+/**
+ * Mark the slides a repeating carousel has moved round.
+ *
+ * Blossom carries the loop by translating the slides one end has run out of
+ * to the other, and writes the translation on each slide as it goes. A
+ * scroll-driven effect is drawn from where a slide was laid out, not from
+ * where a transform put it, so a moved slide arrived wearing the state of a
+ * slide far off the other edge - half out of its box, or turned away. A
+ * moved slide is marked, and the range of the scroll it is in view for is
+ * written on it, so that the stylesheet can animate it from the scroll of
+ * the list instead of from its own place in the layout.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function} Teardown.
+ */
+function markMovedRound(list) {
+	const mark = (item) => {
+		const moved = parseFloat(item.style.translate) || 0;
+
+		item.classList.toggle(MOVED_ROUND_CLASS, !!moved);
+
+		if (!moved) {
+			item.style.removeProperty(COPY_COVER_PROPERTY);
+			item.style.removeProperty(COPY_CONTAIN_PROPERTY);
+
+			return;
+		}
+
+		// Where the slide is drawn, in the scroll's own coordinates, and the
+		// two ranges a view timeline knows: `cover`, from the slide's first
+		// edge entering the box to its last edge leaving it, and `contain`,
+		// from the whole slide being inside to its first edge leaving. The
+		// box is the list inset by what the effect asks for.
+		const slide = item.querySelector(SLIDE_SELECTOR);
+		const inset = slide
+			? parseFloat(window.getComputedStyle(slide).viewTimelineInset) || 0
+			: 0;
+		const start = item.offsetLeft + moved;
+		const end = start + item.offsetWidth;
+		const box = list.clientWidth;
+
+		item.style.setProperty(
+			COPY_COVER_PROPERTY,
+			`${start - box + inset}px ${end - inset}px`
+		);
+		item.style.setProperty(
+			COPY_CONTAIN_PROPERTY,
+			`${end - box + inset}px ${start - inset}px`
+		);
+	};
+
+	const observer = new window.MutationObserver((mutations) => {
+		mutations.forEach((mutation) => {
+			mark(mutation.target);
+		});
+	});
+
+	list.querySelectorAll(ITEM_SELECTOR).forEach(mark);
+	observer.observe(list, {
+		attributes: true,
+		attributeFilter: ['style'],
+		subtree: true,
+	});
+
+	return () => {
+		observer.disconnect();
+		list.querySelectorAll(ITEM_SELECTOR).forEach((item) => {
+			item.classList.remove(MOVED_ROUND_CLASS);
+			item.style.removeProperty(COPY_COVER_PROPERTY);
+			item.style.removeProperty(COPY_CONTAIN_PROPERTY);
+		});
+	};
+}
+
+/**
+ * Have Blossom measure a repeating carousel again.
+ *
+ * Its snap positions are read off the slides as they are drawn, copies
+ * included, and only when the list changes - so the copies moved round
+ * since were unknown to it, and a swipe back from the first slide had no
+ * last slide to land on and came back to the first. It watches the list for
+ * children coming and going, and a comment is a child that changes nothing
+ * else. Asked only while no copy has been moved past the end: a
+ * measurement taken with one came out longer than the loop, and the far end
+ * it puts a dragged scroll back at sat off it.
+ *
+ * @param {HTMLElement} list Item template list.
+ */
+function remeasureLoop(list) {
+	const { period } = getRepeatGeometry(list);
+	const paddingEnd =
+		parseFloat(window.getComputedStyle(list).paddingInlineEnd) || 0;
+
+	if (getScrollPosition(list) > period - paddingEnd) {
+		return;
+	}
+
+	const mark = list.ownerDocument.createComment('');
+
+	list.appendChild(mark);
+	mark.remove();
+}
+
 import { getElement, store } from '@wordpress/interactivity';
 
 import { syncColumns } from './auto-columns';
@@ -44,6 +148,10 @@ const IDLE_CLASS = 'vp-carousel-control-idle';
 const PLAYING_CLASS = 'vp-carousel-is-playing';
 // A slide Blossom has moved round to the far end of a repeating carousel.
 const MOVED_ROUND_CLASS = 'vp-carousel-moved-round';
+// The scroll ranges a moved slide is in view for, written on the slide.
+const COPY_COVER_PROPERTY = '--vp-carousel-copy-cover';
+const COPY_CONTAIN_PROPERTY = '--vp-carousel-copy-contain';
+const SLIDE_SELECTOR = '.wp-block-visual-portfolio-item-template__slide';
 const EDGE_FADE_CLASS = 'vp-carousel-edge-fade';
 const MASONRY_CLASS = 'vp-layout-masonry';
 const MASONRY_NATIVE_CLASS = 'vp-layout-masonry-native';
@@ -306,6 +414,8 @@ function travelRepeating(list, from, to, period) {
 		} else {
 			list.style.removeProperty(SNAP_TYPE_PROPERTY);
 		}
+
+		remeasureLoop(list);
 	};
 
 	const duration = 'auto' === getScrollBehavior() ? 0 : TRAVEL_DURATION;
@@ -366,49 +476,6 @@ function openOnFirstSlide(list) {
 		behavior: 'instant',
 	});
 	syncNav(list);
-}
-
-/**
- * Mark the slides a repeating carousel has moved round.
- *
- * Blossom carries the loop by translating the slides one end has run out of
- * to the other, and writes the translation on each slide as it goes. A
- * scroll-driven effect is drawn from where a slide was laid out, not from
- * where a transform put it, so a moved slide arrived wearing the state of a
- * slide far off the other edge - half out of its box, or turned away. The
- * class lets the stylesheet draw a moved slide plain.
- *
- * @param {HTMLElement} list Item template list.
- *
- * @return {Function} Teardown.
- */
-function markMovedRound(list) {
-	const mark = (item) => {
-		item.classList.toggle(
-			MOVED_ROUND_CLASS,
-			!!parseFloat(item.style.translate)
-		);
-	};
-
-	const observer = new window.MutationObserver((mutations) => {
-		mutations.forEach((mutation) => {
-			mark(mutation.target);
-		});
-	});
-
-	list.querySelectorAll(ITEM_SELECTOR).forEach(mark);
-	observer.observe(list, {
-		attributes: true,
-		attributeFilter: ['style'],
-		subtree: true,
-	});
-
-	return () => {
-		observer.disconnect();
-		list.querySelectorAll(ITEM_SELECTOR).forEach((item) => {
-			item.classList.remove(MOVED_ROUND_CLASS);
-		});
-	};
 }
 
 /**
@@ -1156,9 +1223,17 @@ function initCarousel(list) {
 				carousel.init();
 
 				// Taken again once the library has laid the loop out, in
-				// case its first pass moved the scroll.
+				// case its first pass moved the scroll - and the loop is
+				// measured once more after that, with the copies in place.
 				if (repeats) {
 					openOnFirstSlide(list);
+					window.requestAnimationFrame(() => {
+						window.requestAnimationFrame(() => {
+							if (carousels.has(list)) {
+								remeasureLoop(list);
+							}
+						});
+					});
 				}
 			})
 			.catch(() => {

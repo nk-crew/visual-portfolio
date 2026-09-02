@@ -428,6 +428,17 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	// the rules never apply and the carousel is exactly the carousel it was
 	// without them.
 	@supports (animation-timeline: view()) {
+		// The scroll of the list, named for the slides a repeating carousel
+		// has moved round. Their own view timelines are measured from where
+		// they were laid out, not from where the transform put them, so a
+		// moved slide is animated from the scroll instead, over the range of
+		// it the slide is in view for - which the module works out from the
+		// move and writes on the slide.
+		&.vp-layout-carousel.vp-carousel-effect {
+			scroll-timeline-name: --vp-carousel-scroll;
+			scroll-timeline-axis: inline;
+		}
+
 		// Cards one whole slide wide over boxes half that, so every card
 		// overhangs its neighbours by a quarter of itself on each side. The
 		// overlap is what makes a cover flow read as a stack seen edge on,
@@ -475,6 +486,14 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 				animation-range: contain;
 				animation-timeline: --vp-carousel-slide;
 			}
+
+			> #{$item}.vp-carousel-moved-round {
+				#{$slide},
+				#{$card} {
+					animation-range: var(--vp-carousel-copy-contain);
+					animation-timeline: --vp-carousel-scroll;
+				}
+			}
 		}
 
 		// One slide riding over the one it replaces. The picture travels at half
@@ -495,6 +514,11 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 				animation: vp-carousel-slideshow-card linear both;
 				animation-range: cover;
 				animation-timeline: --vp-carousel-slide;
+			}
+
+			> #{$item}.vp-carousel-moved-round #{$card} {
+				animation-range: var(--vp-carousel-copy-cover);
+				animation-timeline: --vp-carousel-scroll;
 			}
 		}
 	}
@@ -554,17 +578,6 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 
 	100% {
 		transform: translateX(50%);
-	}
-}
-
-// A slide a repeating carousel has moved round to its far end is drawn plain:
-// a scroll-driven effect is measured from where the slide was laid out, not
-// from where it was moved to, and it arrived wearing the state of a slide far
-// off the other edge. The module marks them - see `markMovedRound`.
-.wp-block-visual-portfolio-item-template.vp-layout-carousel > .wp-block-visual-portfolio-item-template__item.vp-carousel-moved-round {
-	.wp-block-visual-portfolio-item-template__slide,
-	.wp-block-visual-portfolio-item-template__card {
-		animation: none;
 	}
 }
 
