@@ -117,3 +117,34 @@
 .vp-layout-tiles > .wp-block-visual-portfolio-item-template__skeleton {
 	aspect-ratio: auto;
 }
+
+// Controls over the slides, in the editor.
+//
+// A carousel control dropped into the template is drawn inside the item being
+// edited - the one place the block editor can put it - and positioned against
+// the frame, the way the page pins it. Nothing between the two may be
+// positioned, or the control would be placed against that instead and scroll
+// away with the list. The block editor positions every block, the list
+// included, so the list is put back.
+.block-editor-block-list__layout .wp-block-visual-portfolio-item-template.vp-layout-carousel {
+	position: static;
+}
+
+// An effect turns the card and gives the slide a perspective, and either
+// makes the card the box the control is placed against. The item being
+// edited is drawn flat while it holds a control - at the first slide, which
+// is where the editor rests a carousel, that is how an effect draws it
+// anyway.
+.wp-block-visual-portfolio-item-template__item:has(> .wp-block-visual-portfolio-item-template__slide > .wp-block-visual-portfolio-item-template__card > [class*="vp-block-loop-carousel-"]) {
+	> .wp-block-visual-portfolio-item-template__slide,
+	> .wp-block-visual-portfolio-item-template__slide > .wp-block-visual-portfolio-item-template__card {
+		perspective: none;
+		animation: none;
+	}
+}
+
+// Always shown on the canvas: a control the pointer has to find is a control
+// that cannot be selected.
+.wp-block-visual-portfolio-item-template__carousel-frame .is-shown-on-hover {
+	opacity: 1;
+}

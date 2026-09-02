@@ -47,7 +47,7 @@ class Visual_Portfolio_Block_Loop_Carousel_Previous {
 		return sprintf(
 			'<button type="button" %1$s><span aria-hidden="true"></span></button>',
 			Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(
-				'vp-block-loop-carousel-previous',
+				Visual_Portfolio_Block_Loop_Carousel_Nav::arrow_classes( 'vp-block-loop-carousel-previous', $attributes ),
 				'previous',
 				array(
 					'aria-label'          => __( 'Previous slide', 'visual-portfolio' ),

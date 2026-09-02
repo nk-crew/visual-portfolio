@@ -48,7 +48,7 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 			return sprintf(
 				'<div %1$s><span class="vp-block-loop-carousel-progress-value"></span></div>',
 				Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(
-					'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--progress',
+					Visual_Portfolio_Block_Loop_Carousel_Nav::indicator_classes( 'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--progress', $attributes ),
 					'indicator',
 					array(
 						'role'       => 'progressbar',
@@ -65,7 +65,7 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 		return sprintf(
 			'<div %1$s></div>',
 			Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(
-				'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--dots',
+				Visual_Portfolio_Block_Loop_Carousel_Nav::indicator_classes( 'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--dots', $attributes ),
 				'indicator',
 				array(
 					/* translators: %d: slide number. */

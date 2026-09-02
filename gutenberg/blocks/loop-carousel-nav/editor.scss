@@ -23,3 +23,25 @@
 .vp-block-loop-carousel-indicator .vp-block-loop-carousel-dot {
 	pointer-events: none;
 }
+
+// A control over the slides is positioned against the frame - see the
+// stylesheet. The block editor positions every block wrapper itself, in a rule
+// of the same weight that can load after ours, so the placement is said again
+// with the editor's own class on it.
+.wp-block-visual-portfolio-item-template__item > .block-editor-block-list__block,
+.wp-block-visual-portfolio-item-template__card > .block-editor-block-list__block {
+	&.vp-block-loop-carousel-nav,
+	&.vp-block-loop-carousel-previous,
+	&.vp-block-loop-carousel-next,
+	&.vp-block-loop-carousel-indicator {
+		position: absolute;
+	}
+}
+
+// The item being edited is the box the block editor lays its blocks out in,
+// and the editor positions that box as well - which would make it, and not
+// the frame, the box a control is placed against.
+.wp-block-visual-portfolio-item-template__item.block-editor-block-list__layout,
+.wp-block-visual-portfolio-item-template__card.block-editor-block-list__layout {
+	position: static;
+}

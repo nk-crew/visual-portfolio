@@ -171,6 +171,69 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * The blocks a carousel is steered with.
+	 *
+	 * Dropped inside the item template they are not items: the template renders
+	 * each of them once, beside the list rather than in it, and inside the
+	 * frame the list scrolls in - which is what lays them over the slides.
+	 *
+	 * @var array
+	 */
+	const CONTROL_BLOCKS = array(
+		'visual-portfolio/loop-carousel-nav',
+		'visual-portfolio/loop-carousel-previous',
+		'visual-portfolio/loop-carousel-next',
+		'visual-portfolio/loop-carousel-indicator',
+	);
+
+	/**
+	 * Take the carousel controls out of a parsed item template.
+	 *
+	 * `innerContent` is the inner blocks in order with the markup between
+	 * them, so both lists are walked together: a control leaves both, and
+	 * everything else keeps its place.
+	 *
+	 * @param array $parsed_block - parsed block of the item template.
+	 *
+	 * @return array The parsed block without its controls, and the controls.
+	 */
+	private static function split_controls( $parsed_block ) {
+		$inner_blocks  = $parsed_block['innerBlocks'] ?? array();
+		$inner_content = $parsed_block['innerContent'] ?? array_fill( 0, count( $inner_blocks ), null );
+		$kept          = array();
+		$content       = array();
+		$controls      = array();
+		$index         = 0;
+
+		foreach ( $inner_content as $chunk ) {
+			if ( null !== $chunk ) {
+				$content[] = $chunk;
+				continue;
+			}
+
+			$inner = $inner_blocks[ $index ] ?? null;
+			++$index;
+
+			if ( ! $inner ) {
+				continue;
+			}
+
+			if ( in_array( $inner['blockName'] ?? '', self::CONTROL_BLOCKS, true ) ) {
+				$controls[] = $inner;
+				continue;
+			}
+
+			$kept[]    = $inner;
+			$content[] = null;
+		}
+
+		$parsed_block['innerBlocks']  = $kept;
+		$parsed_block['innerContent'] = $content;
+
+		return array( $parsed_block, $controls );
+	}
+
+	/**
 	 * Whether anything inside the item opens the lightbox.
 	 *
 	 * Asked once for the list rather than per item: resolving the popup payload
@@ -732,6 +795,16 @@ class Visual_Portfolio_Block_Item_Template {
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
 
+		// The controls are rendered once, after the list, with the context of
+		// the gallery rather than of an item.
+		list( $template, $controls ) = self::split_controls( $block->parsed_block );
+
+		$controls_content = '';
+
+		foreach ( $controls as $control ) {
+			$controls_content .= ( new WP_Block( $control, $block->context ) )->render();
+		}
+
 		foreach ( $items as $item ) {
 			$item_context = array_merge(
 				self::map_item_to_context( $item, $result['options'], 'vp/', $with_popup ),
@@ -740,7 +813,7 @@ class Visual_Portfolio_Block_Item_Template {
 
 			++$index;
 
-			$block_instance = $block->parsed_block;
+			$block_instance = $template;
 
 			// A name no block is registered under, so that the per item copies of
 			// the inner blocks do not render the block supports of this one.
@@ -779,7 +852,11 @@ class Visual_Portfolio_Block_Item_Template {
 		$classes = array_merge( array( 'vp-layout-' . $layout_type ), $layout_classes );
 		$extra   = array();
 		$before  = '';
-		$after   = '';
+
+		// A control beside a list that is not a carousel is rendered switched
+		// off and stays that way - see the nav block - so it is printed all
+		// the same, and comes back when the layout does.
+		$after = $controls_content;
 
 		// Masonry is the family store's: it is the one layout the store also
 		// has to lay out again after a Load More, and splitting init from
@@ -890,8 +967,11 @@ class Visual_Portfolio_Block_Item_Template {
 				// so without a box that stays put, the slides walked out of the
 				// gallery instead of stretching inside it. It is also the width a
 				// slide is measured against.
+				//
+				// The controls go inside it, after the list: over the slides,
+				// pinned to the box that stays put.
 				$before = '<div class="wp-block-visual-portfolio-item-template__carousel-frame">';
-				$after  = '</div>';
+				$after  = $controls_content . '</div>';
 				break;
 		}
 

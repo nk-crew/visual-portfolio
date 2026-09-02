@@ -26,7 +26,13 @@
 			"type": "string",
 			"default": "dots",
 			"enum": ["dots", "progress"]
-		}
+		},
+		"appearance": {
+			"type": "string",
+			"default": "filled",
+			"enum": ["filled", "outlined", "plain"]
+		},
+		"showOnHover": { "type": "boolean", "default": false }
 	},
 	"supports": {
 		"html": false,

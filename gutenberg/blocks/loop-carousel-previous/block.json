@@ -14,7 +14,18 @@
 			"type": "object",
 			"default": { "move": false, "remove": true }
 		},
-		"isHidden": { "type": "boolean", "default": false }
+		"isHidden": { "type": "boolean", "default": false },
+		"icon": {
+			"type": "string",
+			"default": "chevron",
+			"enum": ["chevron", "arrow"]
+		},
+		"appearance": {
+			"type": "string",
+			"default": "outlined",
+			"enum": ["outlined", "filled", "plain"]
+		},
+		"showOnHover": { "type": "boolean", "default": false }
 	},
 	"supports": {
 		"html": false,

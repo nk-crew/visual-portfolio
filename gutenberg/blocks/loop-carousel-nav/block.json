@@ -19,7 +19,8 @@
 			"type": "object",
 			"default": { "move": false, "remove": true }
 		},
-		"isHidden": { "type": "boolean", "default": false }
+		"isHidden": { "type": "boolean", "default": false },
+		"showOnHover": { "type": "boolean", "default": false }
 	},
 	"supports": {
 		"html": false,
@@ -44,10 +45,6 @@
 			"default": { "type": "flex", "justifyContent": "center" }
 		}
 	},
-	"styles": [
-		{ "name": "default", "label": "Below the gallery", "isDefault": true },
-		{ "name": "overlay", "label": "Over the slides" }
-	],
 	"selectors": { "root": ".vp-block-loop-carousel-nav" },
 	"style": "visual-portfolio-block-loop-carousel",
 	"editorStyle": "visual-portfolio-block-loop-carousel-editor"

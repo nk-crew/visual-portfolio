@@ -38,6 +38,15 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	const IDLE_CLASS = 'vp-carousel-control-idle';
 
 	/**
+	 * Class a control over the slides fades behind until the pointer rests on
+	 * the carousel.
+	 *
+	 * Does nothing to a control that is not over the slides, and nothing on a
+	 * screen without a pointer to rest: the stylesheet asks both questions.
+	 */
+	const SHOW_ON_HOVER_CLASS = 'is-shown-on-hover';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -78,6 +87,62 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	}
 
 	/**
+	 * The classes an arrow carries for its settings.
+	 *
+	 * The defaults - a chevron in an outlined button - carry no class: they
+	 * are what the stylesheet draws unless told otherwise.
+	 *
+	 * @param string $class_name - class the front end knows the arrow by.
+	 * @param array  $attributes - block attributes.
+	 *
+	 * @return string
+	 */
+	public static function arrow_classes( $class_name, $attributes ) {
+		$classes = array( $class_name );
+
+		if ( 'arrow' === ( $attributes['icon'] ?? 'chevron' ) ) {
+			$classes[] = 'has-arrow-icon';
+		}
+
+		$appearance = $attributes['appearance'] ?? 'outlined';
+
+		if ( in_array( $appearance, array( 'filled', 'plain' ), true ) ) {
+			$classes[] = 'is-' . $appearance;
+		}
+
+		if ( ! empty( $attributes['showOnHover'] ) ) {
+			$classes[] = self::SHOW_ON_HOVER_CLASS;
+		}
+
+		return implode( ' ', $classes );
+	}
+
+	/**
+	 * The classes an indicator carries for its settings.
+	 *
+	 * Filled is the default and carries no class.
+	 *
+	 * @param string $class_name - classes the front end knows the indicator by.
+	 * @param array  $attributes - block attributes.
+	 *
+	 * @return string
+	 */
+	public static function indicator_classes( $class_name, $attributes ) {
+		$classes    = array( $class_name );
+		$appearance = $attributes['appearance'] ?? 'filled';
+
+		if ( in_array( $appearance, array( 'outlined', 'plain' ), true ) ) {
+			$classes[] = 'is-' . $appearance;
+		}
+
+		if ( ! empty( $attributes['showOnHover'] ) ) {
+			$classes[] = self::SHOW_ON_HOVER_CLASS;
+		}
+
+		return implode( ' ', $classes );
+	}
+
+	/**
 	 * Wrapper attributes a carousel control is rendered with.
 	 *
 	 * @param string $class_name - class the front end knows the control by.
@@ -114,9 +179,15 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 			return '';
 		}
 
+		$classes = array( 'vp-block-loop-carousel-nav' );
+
+		if ( ! empty( $attributes['showOnHover'] ) ) {
+			$classes[] = self::SHOW_ON_HOVER_CLASS;
+		}
+
 		return sprintf(
 			'<div %1$s>%2$s</div>',
-			self::control_attributes( 'vp-block-loop-carousel-nav', 'nav' ),
+			self::control_attributes( implode( ' ', $classes ), 'nav' ),
 			$content
 		);
 	}

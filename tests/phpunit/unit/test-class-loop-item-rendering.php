@@ -329,6 +329,38 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A control dropped inside the item template is not an item: it is
+	 * rendered once, after the list and inside the frame, which is what lays
+	 * it over the slides.
+	 *
+	 * @return void
+	 */
+	public function test_controls_inside_the_template_are_rendered_once_inside_the_frame() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /--><!-- wp:visual-portfolio/loop-carousel-nav {"showOnHover":true} --><!-- wp:visual-portfolio/loop-carousel-previous {"icon":"arrow","appearance":"filled"} /--><!-- wp:visual-portfolio/loop-carousel-next /--><!-- /wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-indicator {"appearance":"plain"} /-->',
+			array( 'layoutType' => 'carousel' )
+		);
+
+		// Five items, one row and one indicator.
+		$this->assertSame( 1, substr_count( $output, 'vp-block-loop-carousel-nav' ) );
+		$this->assertSame( 1, substr_count( $output, 'vp-block-loop-carousel-indicator--dots' ) );
+		$this->assertSame( 5, substr_count( $output, 'wp-block-visual-portfolio-item-template__item' ) );
+
+		// After the list and before the frame closes.
+		$list_end  = strpos( $output, '</ul>' );
+		$frame_end = strpos( $output, '</div>', $list_end );
+		$nav       = strpos( $output, 'vp-block-loop-carousel-nav' );
+
+		$this->assertGreaterThan( $list_end, $nav );
+		$this->assertLessThan( $frame_end, $nav );
+
+		// The settings become classes.
+		$this->assertStringContainsString( 'vp-block-loop-carousel-nav is-shown-on-hover', $output );
+		$this->assertStringContainsString( 'vp-block-loop-carousel-previous has-arrow-icon is-filled', $output );
+		$this->assertStringContainsString( 'vp-block-loop-carousel-indicator--dots is-plain', $output );
+	}
+
+	/**
 	 * A control that was switched off renders nothing at all. It cannot be
 	 * deleted, so hiding is the only way one is taken off a page.
 	 *

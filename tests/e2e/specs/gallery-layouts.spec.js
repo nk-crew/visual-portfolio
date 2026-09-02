@@ -43,7 +43,7 @@ const TILES = '3|1,1|2,1|1,1|2,0.5|1,1|';
  * @param {number} [options.perPage]  - items per page.
  * @param {Array}  [options.controls] - inner blocks of the pagination block.
  * @param {Array}  [options.carousel] - carousel controls, `name` or `[name, attributes]`.
- * @param {string} [options.carouselClassName] - class of the carousel control row.
+ * @param {boolean} [options.carouselOverlay] - put the controls inside the item template, over the slides.
  * @param {number} [options.queryId]  - id the URL parameters of the loop are named after.
  * @return {string} serialized blocks.
  */
@@ -54,7 +54,7 @@ function getLoopMarkup({
 	perPage = IMAGES_COUNT,
 	controls = [],
 	carousel = [],
-	carouselClassName = '',
+	carouselOverlay = false,
 	queryId = 1,
 }) {
 	const loop = {
@@ -71,14 +71,11 @@ function getLoopMarkup({
 				.join('')}<!-- /wp:visual-portfolio/loop-pagination -->`
 		: '';
 
-	// The controls of a carousel are siblings of the item template, and this
-	// row is only the usual place to keep them - each of them is a block that
-	// can be dropped anywhere in the loop.
-	const navAttributes = carouselClassName
-		? ` ${JSON.stringify({ className: carouselClassName })}`
-		: '';
+	// The controls of a carousel are blocks of their own, and this row is only
+	// the usual place to keep them: beside the item template they sit below
+	// the gallery, and inside it they are laid over the slides.
 	const carouselNav = carousel.length
-		? `<!-- wp:visual-portfolio/loop-carousel-nav${navAttributes} -->${carousel
+		? `<!-- wp:visual-portfolio/loop-carousel-nav -->${carousel
 				.map((control) => {
 					const [name, attributes] = Array.isArray(control)
 						? control
@@ -99,8 +96,9 @@ function getLoopMarkup({
 		// the file, and an image forced into a square would be laid out to one
 		// shape and drawn in another.
 		'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+		carouselOverlay ? carouselNav : '',
 		'<!-- /wp:visual-portfolio/item-template -->',
-		carouselNav,
+		carouselOverlay ? '' : carouselNav,
 		pagination,
 		'</div>',
 		'<!-- /wp:visual-portfolio/loop -->',
@@ -547,11 +545,16 @@ test.describe('Gallery Item Template layouts', () => {
 				layoutColumnCount: 3,
 			},
 			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
-			carouselClassName: 'is-style-overlay',
+			carouselOverlay: true,
 		});
 
 		const list = page.locator(LIST);
 		const next = page.locator(NEXT_ARROW);
+
+		// Rendered once, inside the frame and after the list - not once per
+		// item, which is what a block inside the template otherwise is.
+		await expect(page.locator(`${FRAME} > ${NAV}`)).toHaveCount(1);
+		await expect(page.locator(`${LIST} ${NAV}`)).toHaveCount(0);
 
 		const [frame, prevBox, nextBox] = await Promise.all([
 			page.locator(FRAME).boundingBox(),
@@ -560,8 +563,7 @@ test.describe('Gallery Item Template layouts', () => {
 		]);
 
 		// Inside the box the slides scroll in, one at either edge of it and
-		// both level with its middle. The row is a sibling of the gallery, so
-		// this is the measurement the module publishes and nothing else.
+		// both level with its middle.
 		expect(prevBox.x).toBeGreaterThanOrEqual(frame.x);
 		expect(nextBox.x + nextBox.width).toBeLessThanOrEqual(
 			frame.x + frame.width
@@ -1027,6 +1029,81 @@ test.describe('Gallery Item Template layouts', () => {
 			'grid-column-start',
 			'span 2'
 		);
+	});
+
+	test('the editor lays a control inside the item template over the slides', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Layouts - editor overlay',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: {
+				baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
+				queryType: 'images',
+				imagesQuery: { images },
+			},
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: {
+						layoutType: 'carousel',
+						layoutColumnsMode: 'manual',
+						layoutColumnCount: 3,
+					},
+					innerBlocks: [
+						{
+							name: 'visual-portfolio/item-image',
+							attributes: { aspectRatio: '1' },
+						},
+						{
+							name: 'visual-portfolio/loop-carousel-nav',
+							innerBlocks: [
+								{
+									name: 'visual-portfolio/loop-carousel-previous',
+								},
+								{ name: 'visual-portfolio/loop-carousel-next' },
+							],
+						},
+					],
+				},
+			],
+		});
+
+		const canvas = getEditorCanvas(page, editor);
+		const list = canvas.locator(LIST);
+		const nav = canvas.locator(NAV);
+
+		await expect(list).toHaveClass(/vp-layout-carousel/);
+
+		// Drawn once, by the item being edited: the read-only copies of the
+		// item show the item and nothing else.
+		await expect(nav).toHaveCount(1);
+
+		// And laid over the frame rather than inside the slide: the same box,
+		// with an arrow at either edge of it.
+		const [frame, navBox, prevBox, nextBox] = await Promise.all([
+			canvas.locator(FRAME).boundingBox(),
+			nav.boundingBox(),
+			canvas.locator(PREV_ARROW).boundingBox(),
+			canvas.locator(NEXT_ARROW).boundingBox(),
+		]);
+
+		expect(navBox.x).toBeCloseTo(frame.x, 0);
+		expect(navBox.width).toBeCloseTo(frame.width, 0);
+		expect(navBox.height).toBeCloseTo(frame.height, 0);
+		expect(prevBox.x).toBeGreaterThanOrEqual(frame.x);
+		expect(nextBox.x + nextBox.width).toBeLessThanOrEqual(
+			frame.x + frame.width + 1
+		);
+		expect(nextBox.x).toBeGreaterThan(frame.x + frame.width / 2);
 	});
 
 	// An effect that spreads one slide over the width of the gallery owns that

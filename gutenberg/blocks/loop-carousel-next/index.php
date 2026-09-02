@@ -47,7 +47,7 @@ class Visual_Portfolio_Block_Loop_Carousel_Next {
 		return sprintf(
 			'<button type="button" %1$s><span aria-hidden="true"></span></button>',
 			Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(
-				'vp-block-loop-carousel-next',
+				Visual_Portfolio_Block_Loop_Carousel_Nav::arrow_classes( 'vp-block-loop-carousel-next', $attributes ),
 				'next',
 				array(
 					'aria-label'          => __( 'Next slide', 'visual-portfolio' ),

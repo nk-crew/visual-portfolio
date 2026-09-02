@@ -1,7 +1,6 @@
 import { getElement, store } from '@wordpress/interactivity';
 
 import { syncColumns } from './auto-columns';
-import { publishFrameBox } from './frame-box';
 import { getJustifiedOptions, layoutJustified, startLayout } from './layouts';
 
 /**
@@ -703,9 +702,6 @@ function initCarousel(list) {
 	const stopColumns = syncColumns(list, () => syncNav(list));
 	const sleepControls = wakeControls(list);
 
-	// The box a control drawn over the slides is positioned against.
-	const stopFrameBox = publishFrameBox(getFrame(list));
-
 	syncDots(list);
 	syncNav(list);
 
@@ -771,9 +767,9 @@ function initCarousel(list) {
 		stopAutoplay();
 		stopColumns();
 		sleepControls();
-		stopFrameBox();
 		list.removeEventListener('scroll', onScroll);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
+		list.removeEventListener('mousedown', onMouseDown);
 		stopObserving();
 
 		const carousel = carousels.get(list);

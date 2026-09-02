@@ -27,7 +27,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { memo, useEffect, useMemo, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import {
@@ -40,6 +40,7 @@ import {
 /**
  * Internal dependencies
  */
+import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import {
 	getResetAllValues,
@@ -47,7 +48,6 @@ import {
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
 import { getColumnsProps } from './columns';
-import { publishFrameBox } from './frame-box';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
 
@@ -232,25 +232,19 @@ function ItemTemplateInnerBlocks({ style, effect, index }) {
  * The frame a carousel is drawn inside.
  *
  * The list itself scrolls, so it is the one box of a carousel that stays
- * put, and the same box the render callback prints. Everything a visitor
- * steers a carousel with is a block of its own and is drawn by that block.
+ * put, and the same box the render callback prints. A control dropped into
+ * the template is laid over the slides against this box: on the page it is
+ * printed inside the frame, and in the editor it is drawn inside the item
+ * being edited - the one place the block editor can put it - with nothing
+ * positioned between the two.
  *
  * @param {Object}  props          - component props.
  * @param {Element} props.children - the list itself.
  * @return {Element} component.
  */
 function CarouselFrame({ children }) {
-	const frame = useRef();
-
-	// The same box the view module publishes, so an arrow drawn over the slides
-	// sits where it will sit on the page.
-	useEffect(() => publishFrameBox(frame.current), []);
-
 	return (
-		<div
-			ref={frame}
-			className="wp-block-visual-portfolio-item-template__carousel-frame"
-		>
+		<div className="wp-block-visual-portfolio-item-template__carousel-frame">
 			{children}
 		</div>
 	);
@@ -500,8 +494,13 @@ export default function BlockEdit({
 		};
 	}, [query]);
 
+	// The read-only copies show the item and nothing else: a carousel control
+	// dropped in the template is drawn once, by the item being edited.
 	const blocks = useSelect(
-		(select) => select(blockEditorStore).getBlocks(clientId),
+		(select) =>
+			select(blockEditorStore)
+				.getBlocks(clientId)
+				.filter((block) => !CONTROL_BLOCKS.includes(block.name)),
 		[clientId]
 	);
 

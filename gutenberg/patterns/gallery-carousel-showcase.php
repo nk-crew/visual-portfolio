@@ -19,11 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<!-- wp:visual-portfolio/item-template {"layoutType":"carousel","layoutColumnsMode":"manual","layoutColumnCount":3,"carouselSnapAlign":"center"} -->
 		<!-- wp:visual-portfolio/item-image {"aspectRatio":"4/3","clickAction":"popup"} /-->
 		<!-- wp:visual-portfolio/item-title {"textAlign":"center"} /-->
+		<!-- wp:visual-portfolio/loop-carousel-nav {"showOnHover":true} -->
+			<!-- wp:visual-portfolio/loop-carousel-previous {"appearance":"filled"} /-->
+			<!-- wp:visual-portfolio/loop-carousel-next {"appearance":"filled"} /-->
+		<!-- /wp:visual-portfolio/loop-carousel-nav -->
 	<!-- /wp:visual-portfolio/item-template -->
-	<!-- wp:visual-portfolio/loop-carousel-nav {"className":"is-style-overlay"} -->
-		<!-- wp:visual-portfolio/loop-carousel-previous /-->
-		<!-- wp:visual-portfolio/loop-carousel-next /-->
-	<!-- /wp:visual-portfolio/loop-carousel-nav -->
 	<!-- wp:visual-portfolio/loop-carousel-nav -->
 		<!-- wp:visual-portfolio/loop-carousel-indicator /-->
 	<!-- /wp:visual-portfolio/loop-carousel-nav -->

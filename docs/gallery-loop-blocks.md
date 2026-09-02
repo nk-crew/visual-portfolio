@@ -108,15 +108,20 @@ row, which is where the two carousel patterns put them and where an indicator
 between two arrows reads best — but each of them can be dragged anywhere inside
 the loop.
 
-The row carries two styles. *Below the gallery* is the default and leaves it in
-the flow. *Over the slides* takes it out of the flow and lays it over the box the
-list scrolls in, with an arrow pinned to either edge of it — the shape a carousel
-is usually expected to have. That box is a sibling of the control blocks rather
-than a parent of them, so it cannot be positioned against directly: the item
-template measures its frame and publishes it on the loop as
-`--vp-carousel-frame-{top,left,width,height}`, in the editor as well as on the
-page. Without the measurement the row falls back to the whole loop, which is the
-same box whenever the gallery is all the loop holds.
+Where a control sits decides how it is drawn. Beside the item template it is in
+the flow, below or above the gallery. Dropped *inside* the item template — the
+row or any single control — it is laid over the slides: the template renders it
+once, after the list and inside the frame the list scrolls in, so an arrow is
+pinned to either edge of the pictures and an indicator to the foot of them. A
+control over the slides is white unless coloured, and gains a *Show on hover*
+switch that fades it in while the pointer rests on the carousel (touch screens,
+which have no hover, always show it). The editor draws the same blocks inside
+the item being edited, positioned against the same frame.
+
+The arrows carry an *Icon* — chevron or arrow — and a *Button style*: outlined,
+filled (a dark pill with a white glyph) or plain. The indicator carries a
+*Style* of its own: filled, outlined or plain. Selecting the row offers the same
+settings and applies them to every arrow and indicator inside it.
 
 None of them can be deleted: every one is inserted with `lock.remove`, and the
 switch that takes one off a page is *Hide on the page* on its toolbar. A hidden

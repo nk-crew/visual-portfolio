@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -11,6 +11,13 @@ import {
 	blockClassName,
 	VisibilityToolbar,
 } from '../../utils/block-visibility';
+import {
+	ControlPanel,
+	IndicatorControls,
+	indicatorClassNames,
+	ShowOnHoverControl,
+	useControlPlacement,
+} from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import metadata from './block.json';
 
@@ -27,15 +34,18 @@ export default function CarouselIndicatorEdit({
 	attributes,
 	setAttributes,
 	context,
+	clientId,
 }) {
-	const { indicator, isHidden } = attributes;
+	const { indicator, isHidden, showOnHover } = attributes;
 	const isProgress = 'progress' === indicator;
 
 	useLoopOrphanWarning(metadata.name, context);
 
+	const { isOverlay, isInRow } = useControlPlacement(clientId);
+
 	const blockProps = useBlockProps({
 		className: blockClassName(
-			`vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--${isProgress ? 'progress' : 'dots'}`,
+			`vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--${isProgress ? 'progress' : 'dots'} ${indicatorClassNames(attributes)}`.trim(),
 			isHidden
 		),
 	});
@@ -55,6 +65,23 @@ export default function CarouselIndicatorEdit({
 				isHidden={isHidden}
 				setAttributes={setAttributes}
 			/>
+			<InspectorControls>
+				<ControlPanel title={__('Indicator', 'visual-portfolio')}>
+					<IndicatorControls
+						attributes={attributes}
+						onChange={setAttributes}
+					/>
+					{/* An indicator in a row leaves the fade to the row. */}
+					{isOverlay && !isInRow ? (
+						<ShowOnHoverControl
+							value={showOnHover}
+							onChange={(value) =>
+								setAttributes({ showOnHover: value })
+							}
+						/>
+					) : null}
+				</ControlPanel>
+			</InspectorControls>
 			<div {...blockProps} style={style}>
 				{isProgress ? (
 					<span className="vp-block-loop-carousel-progress-value" />

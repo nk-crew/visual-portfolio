@@ -35,10 +35,12 @@
 	border-radius: 50%;
 	transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 
-	// Colours are variables so that a style - overlaid over the slides, where
-	// nothing but white on a dark pill reads over a photograph - can restate
-	// them, and are skipped outright for an arrow the block supports have
-	// already coloured.
+	// Outlined unless the block says otherwise: a ring of the text colour
+	// around a transparent button. Written out rather than taken from
+	// `--vp-carousel-track`, which is the unfilled part of an indicator: an
+	// arrow is drawn the same whether it was dropped in the row beside one or
+	// in the heading above the gallery. An arrow the block supports have
+	// already coloured keeps its colours.
 	&:not(.has-text-color) {
 		color: var(--vp-carousel-arrow-color, inherit);
 	}
@@ -47,9 +49,6 @@
 		background-color: var(--vp-carousel-arrow-background, transparent);
 	}
 
-	// Written out rather than taken from `--vp-carousel-track`, which is the
-	// unfilled part of an indicator: an arrow is drawn the same whether it was
-	// dropped in the row beside one or in the heading above the gallery.
 	border: 1px solid var(--vp-carousel-arrow-border, color-mix(in oklab, currentcolor 20%, transparent 80%));
 
 	&:hover:not([disabled]):not(.has-background) {
@@ -58,6 +57,28 @@
 
 	&:hover:not([disabled]) {
 		border-color: var(--vp-carousel-arrow-border-hover, currentcolor);
+	}
+
+	// Filled: a dark pill with a white glyph, which is the one pair that reads
+	// over a photograph as well as it does on a page.
+	&.is-filled {
+		--vp-carousel-arrow-color: #fff;
+		--vp-carousel-arrow-background: rgba(0, 0, 0, 0.5);
+		--vp-carousel-arrow-background-hover: rgba(0, 0, 0, 0.7);
+		--vp-carousel-arrow-border: transparent;
+		--vp-carousel-arrow-border-hover: transparent;
+	}
+
+	// Plain: the glyph and nothing around it.
+	&.is-plain {
+		--vp-carousel-arrow-background: transparent;
+		--vp-carousel-arrow-background-hover: transparent;
+		--vp-carousel-arrow-border: transparent;
+		--vp-carousel-arrow-border-hover: transparent;
+
+		&:hover:not([disabled]) {
+			opacity: 0.7;
+		}
 	}
 
 	// The end of the carousel, when it has one to run out of.
@@ -84,6 +105,25 @@
 		border-top: 0.125em solid currentcolor;
 		border-right: 0.125em solid currentcolor;
 	}
+
+	// An arrow is the chevron with a shaft through it: a line across the
+	// middle of the button, ending under the tip. The chevron moves out to
+	// meet it - its tip is 0.31em from its own centre, and the shaft ends
+	// 0.4em from the button's.
+	&.has-arrow-icon {
+		position: relative;
+
+		&::before {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0.8em;
+			height: 0.125em;
+			content: "";
+			background-color: currentcolor;
+			transform: translate(-50%, -50%);
+		}
+	}
 }
 
 .vp-block-loop-carousel-previous > span {
@@ -94,6 +134,16 @@
 .vp-block-loop-carousel-next > span {
 	margin-right: 0.19em;
 	transform: rotate(45deg);
+}
+
+.vp-block-loop-carousel-previous.has-arrow-icon > span {
+	margin-right: 0.18em;
+	margin-left: 0;
+}
+
+.vp-block-loop-carousel-next.has-arrow-icon > span {
+	margin-right: 0;
+	margin-left: 0.18em;
 }
 
 .vp-block-loop-carousel-indicator {
@@ -187,45 +237,83 @@
 	transition: width 0.15s linear;
 }
 
-// Arrows over the slides, at either edge: the shape a carousel was expected to
-// have long before its controls were blocks, and the one thing splitting them
-// out of the gallery took away.
-//
-// The row is not in the flow at all - it is laid over the box the list scrolls
-// in. That box is a sibling of this block rather than a parent of it, so it
-// cannot be positioned against directly: the view module measures the frame and
-// publishes it on the loop, which the gallery and every control of it share.
-.vp-block-loop:has(.vp-block-loop-carousel-nav.is-style-overlay) {
-	position: relative;
+// Outlined: the track is a ring of the text colour, and the fill is what
+// says where the carousel is. Plain: no track at all - a waiting dot is the
+// text colour at a fraction of its strength, and the bar is its fill alone.
+.vp-block-loop-carousel-indicator.is-outlined {
+	--vp-carousel-track: transparent;
+
+	.vp-block-loop-carousel-dot,
+	&.vp-block-loop-carousel-indicator--progress {
+		box-shadow: inset 0 0 0 1px currentcolor;
+	}
 }
 
-.vp-block-loop-carousel-nav.is-style-overlay {
-	--vp-carousel-arrow-background: rgba(0, 0, 0, 0.5);
-	--vp-carousel-arrow-background-hover: rgba(0, 0, 0, 0.7);
-	--vp-carousel-arrow-border: transparent;
-	--vp-carousel-arrow-border-hover: transparent;
+.vp-block-loop-carousel-indicator.is-plain {
+	--vp-carousel-track: transparent;
+
+	.vp-block-loop-carousel-dot {
+		// The pill grows from a dot that is already the text colour, so its
+		// fill has nothing to change but the strength.
+		background-color: color-mix(in oklab, currentcolor 35%, transparent 65%);
+	}
+}
+
+// Controls over the slides.
+//
+// A control dropped inside the gallery - the item template - is not one of its
+// items: the template renders it once, beside the list rather than in it, and
+// inside the frame the list scrolls in. The frame is the one box of a carousel
+// that stays put, so the control is pinned to it: arrows at either edge, an
+// indicator along the foot, a row across the whole of it.
+//
+// The editor draws the same blocks inside the item being edited instead - the
+// one place the block editor can put them - and the frame is still the box
+// they are placed against: nothing between the two is positioned, so the
+// list's own clipping never reaches them.
+$frame: ".wp-block-visual-portfolio-item-template__carousel-frame";
+$item: ".wp-block-visual-portfolio-item-template__item";
+$card: ".wp-block-visual-portfolio-item-template__card";
+
+// Built one control at a time: a list interpolated after the combinator
+// would leave every control but the first without its box, and pin every
+// arrow on the page.
+@mixin over-the-slides($controls) {
+	$selectors: ();
+
+	@each $control in $controls {
+		@each $box in ($frame, $item, $card) {
+			$selectors: append($selectors, "#{$box} > #{$control}", comma);
+		}
+	}
+
+	#{$selectors} {
+		@content;
+	}
+}
+
+@include over-the-slides((".vp-block-loop-carousel-nav", ".vp-block-loop-carousel-previous", ".vp-block-loop-carousel-next", ".vp-block-loop-carousel-indicator")) {
 	--vp-carousel-track: rgba(255, 255, 255, 0.4);
 
 	position: absolute;
-
-	// The whole loop, when the frame was never measured - which is the same box
-	// whenever the gallery is all the loop holds.
-	top: var(--vp-carousel-frame-top, 0);
-	left: var(--vp-carousel-frame-left, 0);
 	z-index: 2;
-	width: var(--vp-carousel-frame-width, 100%);
-	height: var(--vp-carousel-frame-height, 100%);
 	margin: 0;
+
+	// White, unless the block was coloured: nothing else reads over a
+	// photograph.
+	&:not(.has-text-color) {
+		color: #fff;
+	}
+}
+
+@include over-the-slides((".vp-block-loop-carousel-nav",)) {
+	inset: 0;
 
 	// The slides underneath still have to take a drag, a swipe and a click.
 	pointer-events: none;
 
 	> * {
 		pointer-events: auto;
-	}
-
-	&:not(.has-text-color) {
-		color: #fff;
 	}
 
 	// Pinned to the sides rather than laid out in the row, so the justification
@@ -250,5 +338,47 @@
 	.vp-block-loop-carousel-indicator {
 		align-self: flex-end;
 		margin-bottom: 12px;
+	}
+}
+
+// An arrow or an indicator dropped in on its own goes where the row would
+// have put it.
+@include over-the-slides((".vp-block-loop-carousel-previous", ".vp-block-loop-carousel-next")) {
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+@include over-the-slides((".vp-block-loop-carousel-previous",)) {
+	inset-inline-start: 12px;
+}
+
+@include over-the-slides((".vp-block-loop-carousel-next",)) {
+	inset-inline-end: 12px;
+}
+
+@include over-the-slides((".vp-block-loop-carousel-indicator",)) {
+	inset-inline: 0;
+	bottom: 12px;
+	width: fit-content;
+	margin-inline: auto;
+
+	&.vp-block-loop-carousel-indicator--progress {
+		width: min(180px, 60%);
+	}
+}
+
+// A control that waits for the pointer. Only where there is a pointer to
+// wait for: a touch screen has no hover, and a control it never showed would
+// be a control it does not have. The keyboard brings it out as well - the
+// list takes focus, and so does the control itself.
+@media (hover: hover) {
+	#{$frame} > .is-shown-on-hover {
+		opacity: 0;
+		transition: opacity 0.2s ease;
+	}
+
+	#{$frame}:hover > .is-shown-on-hover,
+	#{$frame}:focus-within > .is-shown-on-hover {
+		opacity: 1;
 	}
 }

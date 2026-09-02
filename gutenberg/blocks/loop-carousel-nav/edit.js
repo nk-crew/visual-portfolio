@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	InspectorControls,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -10,6 +17,16 @@ import {
 	blockClassName,
 	VisibilityToolbar,
 } from '../../utils/block-visibility';
+import {
+	ARROW_BLOCKS,
+	ArrowControls,
+	ControlPanel,
+	INDICATOR_BLOCK,
+	IndicatorControls,
+	SHOW_ON_HOVER_CLASS,
+	ShowOnHoverControl,
+	useControlPlacement,
+} from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import metadata from './block.json';
 
@@ -23,17 +40,58 @@ const TEMPLATE = [
 	['visual-portfolio/loop-carousel-next'],
 ];
 
+/**
+ * The controls in the row, by kind.
+ *
+ * The row has no look of its own: what it offers in the sidebar is the
+ * settings of the arrows and the indicator inside it, so that both arrows are
+ * restyled at once and without leaving the row.
+ *
+ * @param {string} clientId - client id of the row.
+ *
+ * @return {Object} `arrows` and `indicators`, each a list of blocks.
+ */
+function useRowControls(clientId) {
+	return useSelect(
+		(select) => {
+			const { getClientIdsOfDescendants, getBlock } =
+				select(blockEditorStore);
+			const blocks = getClientIdsOfDescendants(clientId).map(getBlock);
+
+			return {
+				arrows: blocks.filter((block) =>
+					ARROW_BLOCKS.includes(block.name)
+				),
+				indicators: blocks.filter(
+					(block) => INDICATOR_BLOCK === block.name
+				),
+			};
+		},
+		[clientId]
+	);
+}
+
 export default function CarouselNavEdit({
 	attributes,
 	setAttributes,
 	context,
+	clientId,
 }) {
-	const { isHidden } = attributes;
+	const { isHidden, showOnHover } = attributes;
 
 	useLoopOrphanWarning(metadata.name, context);
 
+	const { isOverlay } = useControlPlacement(clientId);
+	const { arrows, indicators } = useRowControls(clientId);
+	const { updateBlockAttributes } = useDispatch(blockEditorStore);
+
 	const blockProps = useBlockProps({
-		className: blockClassName('vp-block-loop-carousel-nav', isHidden),
+		className: blockClassName(
+			showOnHover
+				? `vp-block-loop-carousel-nav ${SHOW_ON_HOVER_CLASS}`
+				: 'vp-block-loop-carousel-nav',
+			isHidden
+		),
 	});
 
 	// The allowed blocks are declared in `block.json`.
@@ -48,6 +106,46 @@ export default function CarouselNavEdit({
 				isHidden={isHidden}
 				setAttributes={setAttributes}
 			/>
+			<InspectorControls>
+				{isOverlay ? (
+					<ControlPanel
+						title={__('Over the slides', 'visual-portfolio')}
+					>
+						<ShowOnHoverControl
+							value={showOnHover}
+							onChange={(value) =>
+								setAttributes({ showOnHover: value })
+							}
+						/>
+					</ControlPanel>
+				) : null}
+				{arrows.length ? (
+					<ControlPanel title={__('Arrows', 'visual-portfolio')}>
+						<ArrowControls
+							attributes={arrows[0].attributes}
+							onChange={(values) =>
+								updateBlockAttributes(
+									arrows.map((block) => block.clientId),
+									values
+								)
+							}
+						/>
+					</ControlPanel>
+				) : null}
+				{indicators.length ? (
+					<ControlPanel title={__('Indicator', 'visual-portfolio')}>
+						<IndicatorControls
+							attributes={indicators[0].attributes}
+							onChange={(values) =>
+								updateBlockAttributes(
+									indicators.map((block) => block.clientId),
+									values
+								)
+							}
+						/>
+					</ControlPanel>
+				) : null}
+			</InspectorControls>
 			<div {...innerBlocksProps} />
 		</>
 	);
