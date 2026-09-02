@@ -635,10 +635,30 @@ test.describe('Gallery Item Template layouts', () => {
 				const items = node.children;
 				const step = items[1].offsetLeft - items[0].offsetLeft;
 				const period = node.scrollWidth - node.clientWidth;
-				const position = ((node.scrollLeft % period) + period) % period;
+				// The first slide rests where the padding puts it.
+				const origin = parseFloat(
+					window.getComputedStyle(node).paddingInlineStart
+				);
+				const position =
+					(((node.scrollLeft - origin) % period) + period) % period;
 
 				return Math.round(position / step) % items.length;
 			});
+
+		// Opened on the first slide, drawn flush with the frame.
+		await expect.poll(resting, { timeout: 10000 }).toBe(0);
+		await expect
+			.poll(
+				() =>
+					list.evaluate((node) =>
+						Math.round(
+							node.children[0].getBoundingClientRect().left -
+								node.parentElement.getBoundingClientRect().left
+						)
+					),
+				{ timeout: 10000 }
+			)
+			.toBe(0);
 
 		const current = () =>
 			dots.evaluateAll((nodes) =>

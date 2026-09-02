@@ -632,14 +632,23 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 }
 
 // The padding Blossom carries the loop with, restated in the length of the
-// frame rather than as a share of it. The library reads `scroll-padding`
-// back to place its snaps, and a percentage it reads as that many pixels -
-// so its snaps sat 370px off the browser's, and a drag settled twice. In
-// the library's own layer, since that is where the padding is written with
+// frame rather than as a share of it: the library reads `scroll-padding`
+// back to place its snaps, and a percentage it reads as that many pixels, so
+// its snaps sat 370px off the browser's and a drag settled twice.
+//
+// The scroll padding itself is taken away. Half the frame of it lines a
+// slide up with the middle of the frame, which is where a centred slide
+// belongs and where a slide aligned to the start does not: a carousel of
+// whole-width slides opened on the second half of one. Without it a slide
+// rests where its alignment says, and the padding is only the room the
+// copies moved round from the far end are drawn in. The view module reads
+// the padding back to place the slides on the loop.
+//
+// In the library's own layer, since that is where both are written with
 // `!important`, and a rule outside it would lose.
 @layer blossom-carousel {
 	.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"] {
 		padding-inline: 50cqw !important;
-		scroll-padding-inline: 50cqw !important;
+		scroll-padding-inline: 0 !important;
 	}
 }

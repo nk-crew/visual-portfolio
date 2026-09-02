@@ -100,14 +100,16 @@ function isRepeating(list) {
  * nears an end, moves the slides the other end has run out of round to it -
  * by the scrollable width, which the stylesheet makes one slide-and-gap per
  * slide. So the scroll position is a clock: it comes back to the same picture
- * every period, and the slides sit one step apart on it.
+ * every period, and the slides sit one step apart on it, the first of them
+ * where the padding and its alignment put it.
  *
  * Read from the layout rather than the drawn boxes - `offsetLeft` never moves
  * with a slide that was moved round.
  *
  * @param {HTMLElement} list Item template list.
  *
- * @return {Object} `count`, `step` and `period`, all in pixels but the count.
+ * @return {Object} `count`, and `step`, `period` and `origin` in pixels - the
+ *                  origin being where the first slide rests.
  */
 function getRepeatGeometry(list) {
 	const items = list.querySelectorAll(ITEM_SELECTOR);
@@ -117,7 +119,21 @@ function getRepeatGeometry(list) {
 			? Math.abs(items[1].offsetLeft - items[0].offsetLeft)
 			: period;
 
-	return { count: items.length, step, period };
+	let origin = 0;
+
+	if (items.length) {
+		const style = window.getComputedStyle(list);
+		const centred = window
+			.getComputedStyle(items[0])
+			.scrollSnapAlign.startsWith('center');
+		const padding = parseFloat(style.paddingInlineStart) || 0;
+
+		origin = centred
+			? padding + (items[0].offsetWidth - list.clientWidth) / 2
+			: padding - (parseFloat(style.scrollPaddingInlineStart) || 0);
+	}
+
+	return { count: items.length, step, period, origin };
 }
 
 /**
@@ -141,14 +157,16 @@ function onTheClock(position, period) {
  * @return {number} Index of the nearest slide.
  */
 function getCurrentRepeatingSlide(list, geometry = getRepeatGeometry(list)) {
-	const { count, step, period } = geometry;
+	const { count, step, period, origin } = geometry;
 
 	if (!count || !step) {
 		return 0;
 	}
 
 	return (
-		Math.round(onTheClock(getScrollPosition(list), period) / step) % count
+		Math.round(
+			onTheClock(getScrollPosition(list) - origin, period) / step
+		) % count
 	);
 }
 
@@ -167,7 +185,7 @@ function getCurrentRepeatingSlide(list, geometry = getRepeatGeometry(list)) {
  */
 function goToRepeatingSlide(list, index, direction = 0) {
 	const geometry = getRepeatGeometry(list);
-	const { count, step, period } = geometry;
+	const { count, step, period, origin } = geometry;
 
 	if (!count || !step) {
 		return;
@@ -175,7 +193,7 @@ function goToRepeatingSlide(list, index, direction = 0) {
 
 	const wanted = ((index % count) + count) % count;
 	const position = getScrollPosition(list);
-	const base = wanted * step;
+	const base = origin + wanted * step;
 
 	let target = base;
 
@@ -1002,6 +1020,20 @@ function initCarousel(list) {
 
 				carousels.set(list, carousel);
 				carousel.init();
+
+				// Blossom opens a repeating carousel at the far end of its
+				// range, which is the first slide only once the copies have
+				// been moved round - and the browser's snap has other ideas
+				// meanwhile. It is opened on the first slide outright.
+				if (repeats) {
+					const { origin } = getRepeatGeometry(list);
+
+					list.scrollTo({
+						left: isRtl(list) ? -origin : origin,
+						behavior: 'instant',
+					});
+					syncNav(list);
+				}
 			})
 			.catch(() => {
 				// A carousel without drag is still a carousel.
