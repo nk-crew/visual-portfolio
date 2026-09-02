@@ -20,16 +20,11 @@
 			"default": "chevron",
 			"enum": ["chevron", "arrow"]
 		},
-		"appearance": {
-			"type": "string",
-			"default": "outlined",
-			"enum": ["outlined", "filled", "plain"]
-		},
 		"showOnHover": { "type": "boolean", "default": false }
 	},
 	"supports": {
 		"html": false,
-		"className": false,
+		"className": true,
 		"anchor": true,
 		"reusable": false,
 		"color": {
@@ -56,6 +51,11 @@
 			"__experimentalDefaultControls": { "radius": true }
 		}
 	},
+	"styles": [
+		{ "name": "default", "label": "Outlined", "isDefault": true },
+		{ "name": "filled", "label": "Filled" },
+		{ "name": "plain", "label": "Plain" }
+	],
 	"selectors": { "root": ".vp-block-loop-carousel-next" },
 	"style": "visual-portfolio-block-loop-carousel",
 	"editorStyle": "visual-portfolio-block-loop-carousel-editor"

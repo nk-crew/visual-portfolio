@@ -118,9 +118,10 @@ switch that fades it in while the pointer rests on the carousel (touch screens,
 which have no hover, always show it). The editor draws the same blocks inside
 the item being edited, positioned against the same frame.
 
-The arrows carry an *Icon* — chevron or arrow — and a *Button style*: outlined,
-filled (a dark pill with a white glyph) or plain. The indicator carries a
-*Background*: none, an outlined pill or a filled one around the dots or the bar. Selecting the row offers the same
+The arrows carry an *Icon* — chevron or arrow — and three block styles:
+*Outlined*, *Filled* (a dark pill with a white glyph) and *Plain*. The indicator
+carries block styles of its own: *Plain*, *Outlined* and *Filled*, the box
+around the dots or the bar. Selecting the row offers the same
 settings and applies them to every arrow and indicator inside it.
 
 None of them can be deleted: every one is inserted with `lock.remove`, and the

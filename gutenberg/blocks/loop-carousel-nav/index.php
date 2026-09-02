@@ -89,8 +89,9 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	/**
 	 * The classes an arrow carries for its settings.
 	 *
-	 * The defaults - a chevron in an outlined button - carry no class: they
-	 * are what the stylesheet draws unless told otherwise.
+	 * A chevron is the default and carries no class. How the button is drawn
+	 * - outlined, filled or plain - is a block style, and the wrapper
+	 * attributes print that class on their own.
 	 *
 	 * @param string $class_name - class the front end knows the arrow by.
 	 * @param array  $attributes - block attributes.
@@ -104,12 +105,6 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 			$classes[] = 'has-arrow-icon';
 		}
 
-		$appearance = $attributes['appearance'] ?? 'outlined';
-
-		if ( in_array( $appearance, array( 'filled', 'plain' ), true ) ) {
-			$classes[] = 'is-' . $appearance;
-		}
-
 		if ( ! empty( $attributes['showOnHover'] ) ) {
 			$classes[] = self::SHOW_ON_HOVER_CLASS;
 		}
@@ -120,8 +115,8 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	/**
 	 * The classes an indicator carries for its settings.
 	 *
-	 * The appearance is the box around the indicator - outlined or filled -
-	 * and none is the default, which carries no class.
+	 * The box around it - outlined or filled - is a block style, and the
+	 * wrapper attributes print that class on their own.
 	 *
 	 * @param string $class_name - classes the front end knows the indicator by.
 	 * @param array  $attributes - block attributes.
@@ -129,12 +124,7 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	 * @return string
 	 */
 	public static function indicator_classes( $class_name, $attributes ) {
-		$classes    = array( $class_name );
-		$appearance = $attributes['appearance'] ?? 'none';
-
-		if ( in_array( $appearance, array( 'outlined', 'filled' ), true ) ) {
-			$classes[] = 'is-' . $appearance;
-		}
+		$classes = array( $class_name );
 
 		if ( ! empty( $attributes['showOnHover'] ) ) {
 			$classes[] = self::SHOW_ON_HOVER_CLASS;

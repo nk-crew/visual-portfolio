@@ -337,7 +337,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	 */
 	public function test_controls_inside_the_template_are_rendered_once_inside_the_frame() {
 		$output = $this->render_loop(
-			'<!-- wp:visual-portfolio/item-image /--><!-- wp:visual-portfolio/loop-carousel-nav {"showOnHover":true} --><!-- wp:visual-portfolio/loop-carousel-previous {"icon":"arrow","appearance":"filled"} /--><!-- wp:visual-portfolio/loop-carousel-next /--><!-- /wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-indicator {"appearance":"filled"} /-->',
+			'<!-- wp:visual-portfolio/item-image /--><!-- wp:visual-portfolio/loop-carousel-nav {"showOnHover":true} --><!-- wp:visual-portfolio/loop-carousel-previous {"icon":"arrow","className":"is-style-filled"} /--><!-- wp:visual-portfolio/loop-carousel-next /--><!-- /wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-indicator {"className":"is-style-filled"} /-->',
 			array( 'layoutType' => 'carousel' )
 		);
 
@@ -356,8 +356,9 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 
 		// The settings become classes.
 		$this->assertStringContainsString( 'vp-block-loop-carousel-nav is-shown-on-hover', $output );
-		$this->assertStringContainsString( 'vp-block-loop-carousel-previous has-arrow-icon is-filled', $output );
-		$this->assertStringContainsString( 'vp-block-loop-carousel-indicator--dots is-filled', $output );
+		$this->assertStringContainsString( 'vp-block-loop-carousel-previous has-arrow-icon', $output );
+		$this->assertStringContainsString( 'is-style-filled', $output );
+		$this->assertSame( 2, substr_count( $output, 'is-style-filled' ) );
 	}
 
 	/**

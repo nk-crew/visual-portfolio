@@ -20,8 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<!-- wp:visual-portfolio/item-image {"aspectRatio":"4/3","clickAction":"popup"} /-->
 		<!-- wp:visual-portfolio/item-title {"textAlign":"center"} /-->
 		<!-- wp:visual-portfolio/loop-carousel-nav {"showOnHover":true} -->
-			<!-- wp:visual-portfolio/loop-carousel-previous {"appearance":"filled"} /-->
-			<!-- wp:visual-portfolio/loop-carousel-next {"appearance":"filled"} /-->
+			<!-- wp:visual-portfolio/loop-carousel-previous {"className":"is-style-filled"} /-->
+			<!-- wp:visual-portfolio/loop-carousel-next {"className":"is-style-filled"} /-->
 		<!-- /wp:visual-portfolio/loop-carousel-nav -->
 	<!-- /wp:visual-portfolio/item-template -->
 	<!-- wp:visual-portfolio/loop-carousel-nav -->

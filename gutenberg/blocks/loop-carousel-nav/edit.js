@@ -21,8 +21,6 @@ import {
 	ARROW_BLOCKS,
 	ArrowControls,
 	ControlPanel,
-	INDICATOR_BLOCK,
-	IndicatorControls,
 	SHOW_ON_HOVER_CLASS,
 	ShowOnHoverControl,
 	useControlPlacement,
@@ -41,31 +39,25 @@ const TEMPLATE = [
 ];
 
 /**
- * The controls in the row, by kind.
+ * The arrows in the row.
  *
  * The row has no look of its own: what it offers in the sidebar is the
- * settings of the arrows and the indicator inside it, so that both arrows are
- * restyled at once and without leaving the row.
+ * settings of the arrows inside it, so that both are set at once and
+ * without leaving the row.
  *
  * @param {string} clientId - client id of the row.
  *
- * @return {Object} `arrows` and `indicators`, each a list of blocks.
+ * @return {Array} arrow blocks.
  */
-function useRowControls(clientId) {
+function useRowArrows(clientId) {
 	return useSelect(
 		(select) => {
 			const { getClientIdsOfDescendants, getBlock } =
 				select(blockEditorStore);
-			const blocks = getClientIdsOfDescendants(clientId).map(getBlock);
 
-			return {
-				arrows: blocks.filter((block) =>
-					ARROW_BLOCKS.includes(block.name)
-				),
-				indicators: blocks.filter(
-					(block) => INDICATOR_BLOCK === block.name
-				),
-			};
+			return getClientIdsOfDescendants(clientId)
+				.map(getBlock)
+				.filter((block) => ARROW_BLOCKS.includes(block.name));
 		},
 		[clientId]
 	);
@@ -82,7 +74,7 @@ export default function CarouselNavEdit({
 	useLoopOrphanWarning(metadata.name, context);
 
 	const { isOverlay } = useControlPlacement(clientId);
-	const { arrows, indicators } = useRowControls(clientId);
+	const arrows = useRowArrows(clientId);
 	const { updateBlockAttributes } = useDispatch(blockEditorStore);
 
 	const blockProps = useBlockProps({
@@ -126,19 +118,6 @@ export default function CarouselNavEdit({
 							onChange={(values) =>
 								updateBlockAttributes(
 									arrows.map((block) => block.clientId),
-									values
-								)
-							}
-						/>
-					</ControlPanel>
-				) : null}
-				{indicators.length ? (
-					<ControlPanel title={__('Indicator', 'visual-portfolio')}>
-						<IndicatorControls
-							attributes={indicators[0].attributes}
-							onChange={(values) =>
-								updateBlockAttributes(
-									indicators.map((block) => block.clientId),
 									values
 								)
 							}

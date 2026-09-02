@@ -13,7 +13,6 @@ import {
 } from '../../utils/block-visibility';
 import {
 	ControlPanel,
-	IndicatorControls,
 	indicatorClassNames,
 	ShowOnHoverControl,
 	useControlPlacement,
@@ -65,23 +64,18 @@ export default function CarouselIndicatorEdit({
 				isHidden={isHidden}
 				setAttributes={setAttributes}
 			/>
-			<InspectorControls>
-				<ControlPanel title={__('Indicator', 'visual-portfolio')}>
-					<IndicatorControls
-						attributes={attributes}
-						onChange={setAttributes}
-					/>
-					{/* An indicator in a row leaves the fade to the row. */}
-					{isOverlay && !isInRow ? (
+			{isOverlay && !isInRow ? (
+				<InspectorControls>
+					<ControlPanel title={__('Indicator', 'visual-portfolio')}>
 						<ShowOnHoverControl
 							value={showOnHover}
 							onChange={(value) =>
 								setAttributes({ showOnHover: value })
 							}
 						/>
-					) : null}
-				</ControlPanel>
-			</InspectorControls>
+					</ControlPanel>
+				</InspectorControls>
+			) : null}
 			<div {...blockProps} style={style}>
 				{isProgress ? (
 					<span className="vp-block-loop-carousel-progress-value" />

@@ -27,16 +27,11 @@
 			"default": "dots",
 			"enum": ["dots", "progress"]
 		},
-		"appearance": {
-			"type": "string",
-			"default": "none",
-			"enum": ["none", "outlined", "filled"]
-		},
 		"showOnHover": { "type": "boolean", "default": false }
 	},
 	"supports": {
 		"html": false,
-		"className": false,
+		"className": true,
 		"anchor": true,
 		"reusable": false,
 		"color": {
@@ -50,6 +45,11 @@
 			"__experimentalDefaultControls": { "margin": false }
 		}
 	},
+	"styles": [
+		{ "name": "default", "label": "Plain", "isDefault": true },
+		{ "name": "outlined", "label": "Outlined" },
+		{ "name": "filled", "label": "Filled" }
+	],
 	"selectors": { "root": ".vp-block-loop-carousel-indicator" },
 	"style": "visual-portfolio-block-loop-carousel",
 	"editorStyle": "visual-portfolio-block-loop-carousel-editor"

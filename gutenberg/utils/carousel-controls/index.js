@@ -35,19 +35,8 @@ export const ARROW_ICONS = [
 	{ value: 'arrow', label: __('Arrow', 'visual-portfolio') },
 ];
 
-// How an arrow button is drawn. Outlined is the default and carries no class.
-export const ARROW_APPEARANCES = [
-	{ value: 'outlined', label: __('Outlined', 'visual-portfolio') },
-	{ value: 'filled', label: __('Filled', 'visual-portfolio') },
-	{ value: 'plain', label: __('Plain', 'visual-portfolio') },
-];
-
-// The box an indicator sits in. None is the default and carries no class.
-export const INDICATOR_APPEARANCES = [
-	{ value: 'none', label: __('None', 'visual-portfolio') },
-	{ value: 'outlined', label: __('Outlined', 'visual-portfolio') },
-	{ value: 'filled', label: __('Filled', 'visual-portfolio') },
-];
+// How an arrow button is drawn, and the box an indicator sits in, are block
+// styles - `is-style-filled` and the like - and need nothing here.
 
 /**
  * The classes an arrow carries for its settings.
@@ -59,12 +48,9 @@ export const INDICATOR_APPEARANCES = [
  *
  * @return {string} class names, possibly empty.
  */
-export function arrowClassNames({ icon, appearance, showOnHover }) {
+export function arrowClassNames({ icon, showOnHover }) {
 	return [
 		'arrow' === icon ? 'has-arrow-icon' : '',
-		'filled' === appearance || 'plain' === appearance
-			? `is-${appearance}`
-			: '',
 		showOnHover ? SHOW_ON_HOVER_CLASS : '',
 	]
 		.filter(Boolean)
@@ -78,15 +64,8 @@ export function arrowClassNames({ icon, appearance, showOnHover }) {
  *
  * @return {string} class names, possibly empty.
  */
-export function indicatorClassNames({ appearance, showOnHover }) {
-	return [
-		'outlined' === appearance || 'filled' === appearance
-			? `is-${appearance}`
-			: '',
-		showOnHover ? SHOW_ON_HOVER_CLASS : '',
-	]
-		.filter(Boolean)
-		.join(' ');
+export function indicatorClassNames({ showOnHover }) {
+	return showOnHover ? SHOW_ON_HOVER_CLASS : '';
 }
 
 /**
@@ -150,46 +129,18 @@ export function ShowOnHoverControl({ value, onChange }) {
  * The settings of an arrow.
  *
  * @param {Object}   props            - component props.
- * @param {Object}   props.attributes - `icon` and `appearance`.
+ * @param {Object}   props.attributes - `icon`.
  * @param {Function} props.onChange   - attribute setter.
  *
  * @return {Element} component.
  */
 export function ArrowControls({ attributes, onChange }) {
 	return (
-		<>
-			<ToggleGroupButtonsControl
-				label={__('Icon', 'visual-portfolio')}
-				value={attributes.icon || 'chevron'}
-				options={ARROW_ICONS}
-				onChange={(icon) => onChange({ icon })}
-			/>
-			<ToggleGroupButtonsControl
-				label={__('Button style', 'visual-portfolio')}
-				value={attributes.appearance || 'outlined'}
-				options={ARROW_APPEARANCES}
-				onChange={(appearance) => onChange({ appearance })}
-			/>
-		</>
-	);
-}
-
-/**
- * The settings of an indicator.
- *
- * @param {Object}   props            - component props.
- * @param {Object}   props.attributes - `appearance`.
- * @param {Function} props.onChange   - attribute setter.
- *
- * @return {Element} component.
- */
-export function IndicatorControls({ attributes, onChange }) {
-	return (
 		<ToggleGroupButtonsControl
-			label={__('Background', 'visual-portfolio')}
-			value={attributes.appearance || 'none'}
-			options={INDICATOR_APPEARANCES}
-			onChange={(appearance) => onChange({ appearance })}
+			label={__('Icon', 'visual-portfolio')}
+			value={attributes.icon || 'chevron'}
+			options={ARROW_ICONS}
+			onChange={(icon) => onChange({ icon })}
 		/>
 	);
 }

@@ -60,8 +60,9 @@
 	}
 
 	// Filled: a dark pill with a white glyph, which is the one pair that reads
-	// over a photograph as well as it does on a page.
-	&.is-filled {
+	// over a photograph as well as it does on a page. The styles are block
+	// styles, picked in the sidebar.
+	&.is-style-filled {
 		--vp-carousel-arrow-color: #fff;
 		--vp-carousel-arrow-background: rgba(0, 0, 0, 0.5);
 		--vp-carousel-arrow-background-hover: rgba(0, 0, 0, 0.7);
@@ -70,7 +71,7 @@
 	}
 
 	// Plain: the glyph and nothing around it.
-	&.is-plain {
+	&.is-style-plain {
 		--vp-carousel-arrow-background: transparent;
 		--vp-carousel-arrow-background-hover: transparent;
 		--vp-carousel-arrow-border: transparent;
@@ -240,13 +241,13 @@
 	transition: width 0.15s linear;
 }
 
-// The box an indicator sits in: a pill outlined in the text colour, or filled
+// The box an indicator sits in, a block style: a pill outlined in the text colour, or filled
 // dark with the dots in white - the pair that reads over a photograph. The
 // dots and the bar are drawn the same in every box; the bar keeps its
 // height, and its track is painted on the content box alone so that the box
 // around it can carry a paint of its own.
-.vp-block-loop-carousel-indicator.is-outlined,
-.vp-block-loop-carousel-indicator.is-filled {
+.vp-block-loop-carousel-indicator.is-style-outlined,
+.vp-block-loop-carousel-indicator.is-style-filled {
 	padding: 8px 12px;
 	border-radius: 999px;
 
@@ -257,11 +258,11 @@
 	}
 }
 
-.vp-block-loop-carousel-indicator.is-outlined {
+.vp-block-loop-carousel-indicator.is-style-outlined {
 	border: 1px solid color-mix(in oklab, currentcolor 20%, transparent 80%);
 }
 
-.vp-block-loop-carousel-indicator.is-filled {
+.vp-block-loop-carousel-indicator.is-style-filled {
 	--vp-carousel-track: rgba(255, 255, 255, 0.4);
 
 	background-color: rgba(0, 0, 0, 0.5);
