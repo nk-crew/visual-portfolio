@@ -614,10 +614,32 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 // how the library carries the loop - and the slides it moves round to the far
 // end are moved by the scrollable width, which is the slides and the gaps
 // between them and not a gap after the last one: the first slide landed flush
-// against the last. A margin after the last slide is part of that width, so
-// the seam gets its gap. Not padding on the list: the padding is a share of
+// against the last. One more gap at the end of the list gives the seam its
+// gap. It is a box rather than padding or a margin: the padding is a share of
 // the frame, and a list padded by more than the frame grows by the excess,
-// which leaves the scrollable width exactly where it was.
-.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"] > .wp-block-visual-portfolio-item-template__item:last-of-type {
-	margin-inline-end: var(--vp-layout-gap, 1.5rem);
+// which leaves the scrollable width where it was - and the browser does not
+// scroll as far as the end margin of the last slide, which left the seam
+// out of reach. A box the width of the gap, pulled back over the gap the
+// list draws before it, is scrolled to and counted.
+.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"]::after {
+	flex: 0 0 var(--vp-layout-gap, 1.5rem);
+	margin-inline-start: calc(-1 * var(--vp-layout-gap, 1.5rem));
+	content: "";
+
+	// Not a place to rest: the loop wraps at the far end of the range, and a
+	// carousel that snapped to the box just short of it never got there.
+	scroll-snap-align: none;
+}
+
+// The padding Blossom carries the loop with, restated in the length of the
+// frame rather than as a share of it. The library reads `scroll-padding`
+// back to place its snaps, and a percentage it reads as that many pixels -
+// so its snaps sat 370px off the browser's, and a drag settled twice. In
+// the library's own layer, since that is where the padding is written with
+// `!important`, and a rule outside it would lose.
+@layer blossom-carousel {
+	.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"] {
+		padding-inline: 50cqw !important;
+		scroll-padding-inline: 50cqw !important;
+	}
 }

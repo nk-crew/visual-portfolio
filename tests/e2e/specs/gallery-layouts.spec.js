@@ -601,6 +601,76 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(measured.seam).toBeCloseTo(measured.gap, 0);
 	});
 
+	test('a repeating carousel steps round its seam and its dots name every slide', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel repeat steps',
+			blockId: 'e2e-carousel-repeat-steps',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+				carouselRepeat: true,
+			},
+			carousel: [
+				'loop-carousel-previous',
+				'loop-carousel-indicator',
+				'loop-carousel-next',
+			],
+		});
+
+		const list = page.locator(LIST);
+		const dots = page.locator(`${NAV} ${DOT}`);
+
+		await expect(list).toHaveAttribute('has-repeat', 'true');
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+
+		// The slide the carousel rests on, read the way the module reads it:
+		// the position on a clock one period long, one step per slide.
+		const resting = () =>
+			list.evaluate((node) => {
+				const items = node.children;
+				const step = items[1].offsetLeft - items[0].offsetLeft;
+				const period = node.scrollWidth - node.clientWidth;
+				const position = ((node.scrollLeft % period) + period) % period;
+
+				return Math.round(position / step) % items.length;
+			});
+
+		const current = () =>
+			dots.evaluateAll((nodes) =>
+				nodes.findIndex(
+					(dot) => 'true' === dot.getAttribute('aria-current')
+				)
+			);
+
+		// The last two slides are places of their own - a dot for either of
+		// them goes there and stays there.
+		for (const index of [IMAGES_COUNT - 2, IMAGES_COUNT - 1]) {
+			await dots.nth(index).click();
+			await expect.poll(resting, { timeout: 10000 }).toBe(index);
+			await expect.poll(current, { timeout: 10000 }).toBe(index);
+		}
+
+		// And the arrow steps on past the last slide to the first, across
+		// the seam where the library wraps the scroll round.
+		await page.locator(NEXT_ARROW).click();
+		await expect.poll(resting, { timeout: 10000 }).toBe(0);
+		await expect.poll(current, { timeout: 10000 }).toBe(0);
+
+		await page.locator(NEXT_ARROW).click();
+		await expect.poll(resting, { timeout: 10000 }).toBe(1);
+
+		// Back across it the other way.
+		await page.locator(PREV_ARROW).click();
+		await page.locator(PREV_ARROW).click();
+		await expect.poll(resting, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
+		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
+	});
+
 	test('controls inside the item template are laid over the slides', async ({
 		page,
 		requestUtils,
