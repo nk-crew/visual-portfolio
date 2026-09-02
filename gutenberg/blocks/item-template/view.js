@@ -81,25 +81,63 @@ function markMovedRound(list) {
  * since were unknown to it, and a swipe back from the first slide had no
  * last slide to land on and came back to the first. It watches the list for
  * children coming and going, and a comment is a child that changes nothing
- * else. Asked only while no copy has been moved past the end: a
- * measurement taken with one came out longer than the loop, and the far end
- * it puts a dragged scroll back at sat off it.
+ * else.
  *
  * @param {HTMLElement} list Item template list.
  */
 function remeasureLoop(list) {
-	const { period } = getRepeatGeometry(list);
-	const paddingEnd =
-		parseFloat(window.getComputedStyle(list).paddingInlineEnd) || 0;
-
-	if (getScrollPosition(list) > period - paddingEnd) {
-		return;
-	}
-
 	const mark = list.ownerDocument.createComment('');
 
 	list.appendChild(mark);
 	mark.remove();
+}
+
+/**
+ * Answer Blossom's question about the scrollable width with the loop's.
+ *
+ * Blossom reads the scrollable width of the list to know how far a slide
+ * is moved round and where the range ends, and reads it whenever the list
+ * changes - which is as often as not while a slide is moved past the end,
+ * stretching the width by its own. Measured then, the loop came out too
+ * long: a slide moved round was taken back while it was still on screen,
+ * leaving a blank strip at the edge until the carousel came to rest. The
+ * list answers with the width the loop has by construction - a step per
+ * slide past its own box - whoever asks.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function} Teardown.
+ */
+function answerForScrollWidth(list) {
+	const inherited = Object.getOwnPropertyDescriptor(
+		Element.prototype,
+		'scrollWidth'
+	);
+
+	if (!inherited?.get) {
+		return noop;
+	}
+
+	Object.defineProperty(list, 'scrollWidth', {
+		configurable: true,
+		get() {
+			const items = list.querySelectorAll(ITEM_SELECTOR);
+
+			if (items.length < 2) {
+				return inherited.get.call(list);
+			}
+
+			return (
+				list.clientWidth +
+				items.length *
+					Math.abs(items[1].offsetLeft - items[0].offsetLeft)
+			);
+		},
+	});
+
+	return () => {
+		delete list.scrollWidth;
+	};
 }
 
 import { getElement, store } from '@wordpress/interactivity';
@@ -182,6 +220,10 @@ const STEP_EVENT = 'vp-carousel-step';
 // for. Presses that come faster than the carousel travels are still one slide
 // each, and a press after the carousel has settled counts from where it is.
 const STEP_MEMORY = 700;
+
+// How long the slide a press asked for stays the current one before the
+// position is read again - long enough for the carousel to get there.
+const STEP_HOLD = 1200;
 
 const noop = () => {};
 
@@ -780,7 +822,15 @@ function syncNav(list) {
 		setFade(list, 'right', rtl ? atStart : atEnd);
 	}
 
-	const current = getCurrentSlide(list);
+	// The slide a press asked for is the current one from the press on: the
+	// dots the carousel passes on its way there are not visited, and the
+	// one pressed is the one lit. Once the carousel has had time to arrive,
+	// the position answers again - which is also what a drag reads.
+	const held = pending.get(list);
+	const current =
+		held && window.performance.now() - held.time < STEP_HOLD
+			? held.index
+			: getCurrentSlide(list);
 
 	root.querySelectorAll(DOT_SELECTOR).forEach((dot) => {
 		const index = parseInt(dot.dataset.vpSlide, 10);
@@ -1210,6 +1260,8 @@ function initCarousel(list) {
 
 	list.addEventListener('pointerdown', onPointerDown);
 
+	const stopAnswering = repeats ? answerForScrollWidth(list) : noop;
+
 	if ((canDrag || repeats) && source) {
 		import(/* webpackIgnore: true */ source)
 			.then(({ Blossom }) => {
@@ -1254,6 +1306,7 @@ function initCarousel(list) {
 		list.removeEventListener('mousedown', onMouseDown);
 		list.removeEventListener('pointerdown', onPointerDown);
 		stopTravel(list);
+		stopAnswering();
 		stopObserving();
 
 		const carousel = carousels.get(list);
