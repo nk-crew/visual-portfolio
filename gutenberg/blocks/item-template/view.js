@@ -245,6 +245,25 @@ const TRAVEL_DURATION = 450;
 // The custom property Blossom keeps the snap type of the list in.
 const SNAP_TYPE_PROPERTY = '--snap-type';
 
+// How long a flick of a repeating carousel keeps going after it was let go.
+// The slide it comes to rest on is the one it would have reached at the speed
+// it left the pointer at, so a flick moves further the harder it is thrown.
+const FLICK_CARRY = 150;
+
+// How much of the end of a drag its speed is read from. Longer than a frame,
+// so a pointer that stopped before it was let go throws nothing.
+const FLICK_WINDOW = 80;
+
+// How far a press has to move the carousel to have been a drag rather than a
+// click. The distance Blossom reads a press by, so a press that moves nothing
+// here moves nothing there either.
+const DRAG_SLOP = 10;
+
+// Written on the list by Blossom while it is the one carrying drags. Where it
+// is not - a touch device, which scrolls the carousel itself - the landing is
+// the browser's and not this module's.
+const OVERFLOW_ATTRIBUTE = 'has-overflow';
+
 /**
  * Whether a carousel repeats.
  *
@@ -444,8 +463,23 @@ function travelRepeating(list, from, to, period) {
 	// smooth scroll the whole way back.
 	const place = (position) => {
 		const at = onTheRange(position, period);
+		const moved = at !== getScrollPosition(list);
 
 		list.scrollTo({ left: isRtl(list) ? -at : at, behavior: 'instant' });
+
+		if (!moved) {
+			return;
+		}
+
+		// Blossom moves the slides round when the list reports a scroll, and
+		// the browser reports one at the top of the next frame - after this
+		// frame has been drawn. So the frame that crosses the seam was drawn
+		// where the carousel had got to with the slides still where it came
+		// from, which is a blank strip as wide as whatever had yet to be
+		// moved round: a flicker, once per pass, on the step across the seam.
+		// The list is told here instead, and the slides move round in time to
+		// be drawn.
+		list.dispatchEvent(new window.Event('scroll'));
 	};
 
 	const finish = () => {
@@ -493,6 +527,12 @@ function travelRepeating(list, from, to, period) {
 		finish();
 	});
 
+	// The carousel is put where it already is before the first frame is asked
+	// for. Blossom stops throwing a carousel the moment anything else scrolls
+	// it, and a travel that waited for its frame let a throw it was taking
+	// over from move the carousel once more first.
+	place(from);
+
 	raf = window.requestAnimationFrame(frame);
 }
 
@@ -503,6 +543,104 @@ function travelRepeating(list, from, to, period) {
  */
 function stopTravel(list) {
 	travels.get(list)?.();
+}
+
+/**
+ * Land a drag of a repeating carousel on one of its slides.
+ *
+ * Blossom lets a carousel go at the resting place nearest to where the throw
+ * was headed, chosen from a list of them it measures off the slides as they
+ * are drawn - the copies moved round to the far end included - and measures
+ * again only when the list gains or loses a child. The loop moves those
+ * copies on every scroll, so the list is out of date by the time it is read:
+ * a flick back from the first slide was aimed at a last slide that had since
+ * been moved, and came back to the first, or at a slide that was no longer
+ * anywhere near, and did not move at all. A place off either end of the
+ * scroll is put back onto it as well, and the loop takes a scroll that
+ * reaches an end round to the other - so a flick across the seam finished at
+ * the edge of the range, which is half a slide from anywhere.
+ *
+ * The throw is worked out here instead, on the clock of the loop, and drawn
+ * by the travel an arrow press is drawn by. Blossom still carries the drag
+ * itself; this is only where it comes to rest.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function} Teardown.
+ */
+function landDrags(list) {
+	// Where the pointer has been, in time order, since the press began.
+	let trail = [];
+	// How far it has travelled, however much of that it took back.
+	let travelled = 0;
+
+	const onMove = (event) => {
+		travelled += Math.abs(event.clientX - trail[trail.length - 1].x);
+		trail.push({ x: event.clientX, time: event.timeStamp });
+	};
+
+	const stopWatching = () => {
+		window.removeEventListener('pointermove', onMove);
+		window.removeEventListener('pointerup', onUp);
+		window.removeEventListener('pointercancel', onUp);
+	};
+
+	function onUp(event) {
+		stopWatching();
+
+		// A press that moved nothing was a click, and Blossom leaves the
+		// carousel where it is for one of those too.
+		if (
+			travelled <= DRAG_SLOP ||
+			'true' !== list.getAttribute(OVERFLOW_ATTRIBUTE)
+		) {
+			return;
+		}
+
+		const { count, step, origin } = getRepeatGeometry(list);
+
+		if (!count || !step) {
+			return;
+		}
+
+		const end = { x: event.clientX, time: event.timeStamp };
+		// The tail of the drag is what it was thrown with. A pointer that came
+		// to a stop before it was let go has no point inside the window, and
+		// the last one there is answers with a throw of nothing.
+		const start =
+			trail.find((point) => end.time - point.time <= FLICK_WINDOW) ||
+			trail[trail.length - 1];
+		const elapsed = Math.max(1, end.time - start.time);
+		// A carousel runs against the pointer: thrown to the left it goes
+		// forwards, and back on a right to left page, which starts at the
+		// right.
+		const carry =
+			((end.x - start.x) / elapsed) *
+			FLICK_CARRY *
+			(isRtl(list) ? 1 : -1);
+		const landing = getScrollPosition(list) + carry;
+
+		goToRepeatingSlide(list, Math.round((landing - origin) / step));
+	}
+
+	const onDown = (event) => {
+		// A drag takes over from a step the module is still drawing.
+		stopTravel(list);
+
+		trail = [{ x: event.clientX, time: event.timeStamp }];
+		travelled = 0;
+
+		window.addEventListener('pointermove', onMove);
+		window.addEventListener('pointerup', onUp);
+		window.addEventListener('pointercancel', onUp);
+	};
+
+	list.addEventListener('pointerdown', onDown);
+
+	return () => {
+		list.removeEventListener('pointerdown', onDown);
+		stopWatching();
+	};
 }
 
 /**
@@ -1255,10 +1393,9 @@ function initCarousel(list) {
 		list.addEventListener('mousedown', onMouseDown);
 	}
 
-	// A drag takes over from a step the module is still drawing.
-	const onPointerDown = () => stopTravel(list);
-
-	list.addEventListener('pointerdown', onPointerDown);
+	// A drag of a repeating carousel takes over from a step the module is
+	// still drawing, and is landed on a slide by the module as well.
+	const stopLanding = repeats ? landDrags(list) : noop;
 
 	const stopAnswering = repeats ? answerForScrollWidth(list) : noop;
 
@@ -1304,7 +1441,7 @@ function initCarousel(list) {
 		list.removeEventListener('scroll', onScroll);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
 		list.removeEventListener('mousedown', onMouseDown);
-		list.removeEventListener('pointerdown', onPointerDown);
+		stopLanding();
 		stopTravel(list);
 		stopAnswering();
 		stopObserving();
