@@ -29,8 +29,8 @@
 		},
 		"appearance": {
 			"type": "string",
-			"default": "filled",
-			"enum": ["filled", "outlined", "plain"]
+			"default": "none",
+			"enum": ["none", "outlined", "filled"]
 		},
 		"showOnHover": { "type": "boolean", "default": false }
 	},

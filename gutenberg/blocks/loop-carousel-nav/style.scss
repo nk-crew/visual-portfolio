@@ -178,6 +178,9 @@
 	height: 6px;
 	padding: 0;
 	overflow: hidden;
+	// A button has a colour of its own in every browser, and the fill of the
+	// dot is drawn in the colour of the indicator around it.
+	color: inherit;
 	cursor: pointer;
 	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
 	border: 0;
@@ -237,25 +240,38 @@
 	transition: width 0.15s linear;
 }
 
-// Outlined: the track is a ring of the text colour, and the fill is what
-// says where the carousel is. Plain: no track at all - a waiting dot is the
-// text colour at a fraction of its strength, and the bar is its fill alone.
-.vp-block-loop-carousel-indicator.is-outlined {
-	--vp-carousel-track: transparent;
+// The box an indicator sits in: a pill outlined in the text colour, or filled
+// dark with the dots in white - the pair that reads over a photograph. The
+// dots and the bar are drawn the same in every box; the bar keeps its
+// height, and its track is painted on the content box alone so that the box
+// around it can carry a paint of its own.
+.vp-block-loop-carousel-indicator.is-outlined,
+.vp-block-loop-carousel-indicator.is-filled {
+	padding: 8px 12px;
+	border-radius: 999px;
 
-	.vp-block-loop-carousel-dot,
 	&.vp-block-loop-carousel-indicator--progress {
-		box-shadow: inset 0 0 0 1px currentcolor;
+		box-sizing: content-box;
+		height: 4px;
+		background: linear-gradient(var(--vp-carousel-track), var(--vp-carousel-track)) content-box;
 	}
 }
 
-.vp-block-loop-carousel-indicator.is-plain {
-	--vp-carousel-track: transparent;
+.vp-block-loop-carousel-indicator.is-outlined {
+	border: 1px solid color-mix(in oklab, currentcolor 20%, transparent 80%);
+}
 
-	.vp-block-loop-carousel-dot {
-		// The pill grows from a dot that is already the text colour, so its
-		// fill has nothing to change but the strength.
-		background-color: color-mix(in oklab, currentcolor 35%, transparent 65%);
+.vp-block-loop-carousel-indicator.is-filled {
+	--vp-carousel-track: rgba(255, 255, 255, 0.4);
+
+	background-color: rgba(0, 0, 0, 0.5);
+
+	&:not(.has-text-color) {
+		color: #fff;
+	}
+
+	&.vp-block-loop-carousel-indicator--progress {
+		background: linear-gradient(var(--vp-carousel-track), var(--vp-carousel-track)) content-box, rgba(0, 0, 0, 0.5) padding-box;
 	}
 }
 

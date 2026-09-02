@@ -42,11 +42,11 @@ export const ARROW_APPEARANCES = [
 	{ value: 'plain', label: __('Plain', 'visual-portfolio') },
 ];
 
-// How the indicator is drawn. Filled is the default and carries no class.
+// The box an indicator sits in. None is the default and carries no class.
 export const INDICATOR_APPEARANCES = [
-	{ value: 'filled', label: __('Filled', 'visual-portfolio') },
+	{ value: 'none', label: __('None', 'visual-portfolio') },
 	{ value: 'outlined', label: __('Outlined', 'visual-portfolio') },
-	{ value: 'plain', label: __('Plain', 'visual-portfolio') },
+	{ value: 'filled', label: __('Filled', 'visual-portfolio') },
 ];
 
 /**
@@ -80,7 +80,7 @@ export function arrowClassNames({ icon, appearance, showOnHover }) {
  */
 export function indicatorClassNames({ appearance, showOnHover }) {
 	return [
-		'outlined' === appearance || 'plain' === appearance
+		'outlined' === appearance || 'filled' === appearance
 			? `is-${appearance}`
 			: '',
 		showOnHover ? SHOW_ON_HOVER_CLASS : '',
@@ -186,8 +186,8 @@ export function ArrowControls({ attributes, onChange }) {
 export function IndicatorControls({ attributes, onChange }) {
 	return (
 		<ToggleGroupButtonsControl
-			label={__('Style', 'visual-portfolio')}
-			value={attributes.appearance || 'filled'}
+			label={__('Background', 'visual-portfolio')}
+			value={attributes.appearance || 'none'}
 			options={INDICATOR_APPEARANCES}
 			onChange={(appearance) => onChange({ appearance })}
 		/>

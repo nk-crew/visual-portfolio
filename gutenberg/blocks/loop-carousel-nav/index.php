@@ -120,7 +120,8 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	/**
 	 * The classes an indicator carries for its settings.
 	 *
-	 * Filled is the default and carries no class.
+	 * The appearance is the box around the indicator - outlined or filled -
+	 * and none is the default, which carries no class.
 	 *
 	 * @param string $class_name - classes the front end knows the indicator by.
 	 * @param array  $attributes - block attributes.
@@ -129,9 +130,9 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	 */
 	public static function indicator_classes( $class_name, $attributes ) {
 		$classes    = array( $class_name );
-		$appearance = $attributes['appearance'] ?? 'filled';
+		$appearance = $attributes['appearance'] ?? 'none';
 
-		if ( in_array( $appearance, array( 'outlined', 'plain' ), true ) ) {
+		if ( in_array( $appearance, array( 'outlined', 'filled' ), true ) ) {
 			$classes[] = 'is-' . $appearance;
 		}
 

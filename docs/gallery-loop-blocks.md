@@ -120,7 +120,7 @@ the item being edited, positioned against the same frame.
 
 The arrows carry an *Icon* — chevron or arrow — and a *Button style*: outlined,
 filled (a dark pill with a white glyph) or plain. The indicator carries a
-*Style* of its own: filled, outlined or plain. Selecting the row offers the same
+*Background*: none, an outlined pill or a filled one around the dots or the bar. Selecting the row offers the same
 settings and applies them to every arrow and indicator inside it.
 
 None of them can be deleted: every one is inserted with `lock.remove`, and the
