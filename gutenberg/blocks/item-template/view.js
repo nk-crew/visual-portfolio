@@ -242,13 +242,22 @@ const REPEAT_EDGE = 4;
 // How long a step of a repeating carousel takes, drawn by the module.
 const TRAVEL_DURATION = 450;
 
+// The shortest and the longest a move that carries on from a drag takes. Its
+// length is otherwise the speed it was let go at, which for a slow drag over
+// the last of a slide is a glide of several seconds, and for a hard flick
+// that has almost arrived is a single frame.
+const TRAVEL_SHORTEST = 120;
+const TRAVEL_LONGEST = 700;
+
 // The custom property Blossom keeps the snap type of the list in.
 const SNAP_TYPE_PROPERTY = '--snap-type';
 
 // How long a flick of a repeating carousel keeps going after it was let go.
 // The slide it comes to rest on is the one it would have reached at the speed
 // it left the pointer at, so a flick moves further the harder it is thrown.
-const FLICK_CARRY = 150;
+// The same distance Blossom throws a carousel that does not repeat, so that
+// two carousels one under the other answer a flick alike.
+const FLICK_CARRY = 290;
 
 // How much of the end of a drag its speed is read from. Longer than a frame,
 // so a pointer that stopped before it was let go throws nothing.
@@ -367,8 +376,11 @@ function getCurrentRepeatingSlide(list, geometry = getRepeatGeometry(list)) {
  * @param {HTMLElement} list      Item template list.
  * @param {number}      index     Slide to rest on, counted round the loop.
  * @param {number}      direction `1` forwards, `-1` back, `0` the nearest way.
+ * @param {number}      speed     How fast the carousel is already going, in
+ *                                pixels of scroll per millisecond. Zero for a
+ *                                press, which starts from rest.
  */
-function goToRepeatingSlide(list, index, direction = 0) {
+function goToRepeatingSlide(list, index, direction = 0, speed = 0) {
 	const geometry = getRepeatGeometry(list);
 	const { count, step, period, origin } = geometry;
 
@@ -399,7 +411,7 @@ function goToRepeatingSlide(list, index, direction = 0) {
 	}
 
 	pending.set(list, { index: wanted, time: window.performance.now() });
-	travelRepeating(list, position, target, period);
+	travelRepeating(list, position, target, period, speed);
 }
 
 // The travel under way on each repeating carousel, so that a press that
@@ -445,8 +457,11 @@ function onTheRange(place, period) {
  * @param {number}      from   Position the move starts at.
  * @param {number}      to     Position it ends at, anywhere on the clock.
  * @param {number}      period Length of the clock.
+ * @param {number}      speed  How fast the carousel is already going, in
+ *                             pixels of scroll per millisecond. Zero for a
+ *                             move that starts from rest.
  */
-function travelRepeating(list, from, to, period) {
+function travelRepeating(list, from, to, period, speed = 0) {
 	stopTravel(list);
 
 	// Blossom writes the snap type of the list into a custom property and
@@ -494,15 +509,43 @@ function travelRepeating(list, from, to, period) {
 		remeasureLoop(list);
 	};
 
-	const duration = 'auto' === getScrollBehavior() ? 0 : TRAVEL_DURATION;
+	// A carousel that was thrown is already going, and a move that eased in
+	// from a standstill stopped it dead under the finger that let it go and
+	// started it again. It carries on instead, and only slows down - which is
+	// what the browser does with a carousel that does not repeat, and what
+	// this one was next to and read worse than.
+	const distance = Math.abs(to - from);
+	// Not a throw when the carousel has to turn round to get there: a drag
+	// let go short of the next slide comes back to the one it left, and
+	// coming back is a move that starts from rest like any other.
+	const thrown = distance > 0 && Math.sign(to - from) === Math.sign(speed);
+	// A cube leaves the start at three times the average speed of the move,
+	// so three times the distance over the speed is the length that carries
+	// on at exactly the speed it was let go at.
+	const carried = Math.min(
+		TRAVEL_LONGEST,
+		Math.max(TRAVEL_SHORTEST, (3 * distance) / Math.abs(speed))
+	);
+
+	let duration = thrown ? carried : TRAVEL_DURATION;
+
+	// A visitor who asked for less motion gets the arrival alone.
+	if ('auto' === getScrollBehavior()) {
+		duration = 0;
+	}
+
 	const started = window.performance.now();
 
 	let raf = 0;
 
 	const frame = (now) => {
 		const t = duration ? Math.min(1, (now - started) / duration) : 1;
-		// Ease in and out, so the move starts and stops as a scroll does.
-		const eased = 0.5 - Math.cos(Math.PI * t) / 2;
+		const left = 1 - t;
+		// Slowing down out of the throw, or easing in and out of a rest - so
+		// the move starts and stops as a scroll of its own does.
+		const eased = thrown
+			? 1 - left * left * left
+			: 0.5 - Math.cos(Math.PI * t) / 2;
 
 		place(from + (to - from) * eased);
 
@@ -611,16 +654,19 @@ function landDrags(list) {
 			trail.find((point) => end.time - point.time <= FLICK_WINDOW) ||
 			trail[trail.length - 1];
 		const elapsed = Math.max(1, end.time - start.time);
-		// A carousel runs against the pointer: thrown to the left it goes
-		// forwards, and back on a right to left page, which starts at the
-		// right.
-		const carry =
-			((end.x - start.x) / elapsed) *
-			FLICK_CARRY *
-			(isRtl(list) ? 1 : -1);
-		const landing = getScrollPosition(list) + carry;
+		// How fast the carousel was going when it was let go, in the scroll's
+		// own direction: a carousel runs against the pointer, thrown to the
+		// left it goes forwards, and back on a right to left page, which
+		// starts at the right.
+		const speed = ((end.x - start.x) / elapsed) * (isRtl(list) ? 1 : -1);
+		const landing = getScrollPosition(list) + speed * FLICK_CARRY;
 
-		goToRepeatingSlide(list, Math.round((landing - origin) / step));
+		goToRepeatingSlide(
+			list,
+			Math.round((landing - origin) / step),
+			0,
+			speed
+		);
 	}
 
 	const onDown = (event) => {
