@@ -596,3 +596,15 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	border: 0;
 	clip-path: inset(50%);
 }
+
+// A carousel that repeats is padded by half its width at each end - that is
+// how the library carries the loop - and the slides it moves round to the far
+// end are moved by the width of the content, which is the slides and the gaps
+// between them and not the gap after the last one. Padded by one gap more,
+// the seam gets its gap. In the library's own layer, since that is where the
+// padding is written with `!important`, and a rule outside it would lose.
+@layer blossom-carousel {
+	.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"] {
+		padding-inline: 50% calc(50% + var(--vp-layout-gap, 1.5rem)) !important;
+	}
+}
