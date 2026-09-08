@@ -105,6 +105,10 @@
 		"carouselStretchSlides": {
 			"type": "boolean",
 			"default": false
+		},
+		"carouselSlidesPerGroup": {
+			"type": "number",
+			"default": 1
 		}
 	},
 	"supports": {

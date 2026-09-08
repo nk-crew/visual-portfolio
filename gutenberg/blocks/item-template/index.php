@@ -1027,6 +1027,17 @@ class Visual_Portfolio_Block_Item_Template {
 					$classes[] = 'vp-carousel-stretch-slides';
 				}
 
+				// How many slides an arrow moves at a press. One is what a
+				// carousel has always done, so it is written only when it is
+				// something else - the markup of every gallery already out
+				// there stays exactly as it was. Zero asks for a whole screen,
+				// which the module measures.
+				$group = max( 0, min( 6, (int) ( $attributes['carouselSlidesPerGroup'] ?? 1 ) ) );
+
+				if ( 1 !== $group ) {
+					$extra['data-vp-carousel-group'] = $group;
+				}
+
 				if ( ! empty( $attributes['carouselRepeat'] ) ) {
 					$extra['data-vp-carousel-repeat'] = 'true';
 				}

@@ -1326,6 +1326,89 @@ function getNextSlide(targets, from, direction) {
 }
 
 /**
+ * How many slides an arrow moves at a press.
+ *
+ * One by default, which is what a carousel has always done. A number is that
+ * many. Zero is a whole screen, which has to be measured: a carousel whose
+ * slides are their own width has no count of slides that means a screenful.
+ *
+ * @param {HTMLElement} list    Item template list.
+ * @param {number[]}    targets Resting places of the slides.
+ * @param {number}      from    Slide the press counts from.
+ *
+ * @return {number} Slides to move, at least one.
+ */
+function getGroupSize(list, targets, from) {
+	const asked = parseInt(list.dataset.vpCarouselGroup, 10);
+
+	if (asked >= 1) {
+		return asked;
+	}
+
+	if (!Number.isInteger(asked)) {
+		return 1;
+	}
+
+	const width = list.clientWidth;
+
+	// A repeating carousel has no targets to walk: every slide is a step of
+	// the same size, and the loop is carried by moving them round.
+	if (isRepeating(list)) {
+		const { step } = getRepeatGeometry(list);
+
+		return step > 0 ? Math.max(1, Math.round(width / step)) : 1;
+	}
+
+	// The slide a screen further along, measured rather than counted, so that
+	// slides of unequal width step by what is actually on screen.
+	const origin = targets[Math.max(0, Math.min(targets.length - 1, from))];
+
+	for (let index = from + 1; index < targets.length; index += 1) {
+		if (Math.abs(targets[index] - origin) >= width) {
+			return index - from;
+		}
+	}
+
+	return Math.max(1, targets.length - 1 - from);
+}
+
+/**
+ * The slide a press steps to when an arrow moves a whole frame.
+ *
+ * Clamped to the ends rather than allowed off them: a carousel of ten slides
+ * stepping three at a time reaches the eighth, and asking for the eleventh
+ * would be refused - the arrow would die two slides early with a whole screen
+ * still to see.
+ *
+ * @param {number[]} targets   Resting places of the slides.
+ * @param {number}   from      Slide the press counts from.
+ * @param {number}   direction `1` forwards, `-1` back.
+ * @param {number}   group     Slides a press moves.
+ *
+ * @return {number} Slide to rest on, off the end when there is nowhere to go.
+ */
+function getGroupSlide(targets, from, direction, group) {
+	const wanted = from + direction * group;
+
+	// Nowhere left to go that way: answered off the end, the way `getNextSlide`
+	// answers it, so that a press at the end does nothing rather than jumping.
+	if (
+		(direction > 0 && from >= targets.length - 1) ||
+		(direction < 0 && from <= 0)
+	) {
+		return wanted;
+	}
+
+	const index = Math.max(0, Math.min(targets.length - 1, wanted));
+
+	// The slides that rest where this one does are stepped over, for the same
+	// reason a single step steps over them.
+	return targets[index] === targets[from]
+		? getNextSlide(targets, from, direction)
+		: index;
+}
+
+/**
  * Move a carousel by one slide.
  *
  * @param {HTMLElement} list      Item template list.
@@ -1345,20 +1428,28 @@ function slide(list, direction) {
 	// at the seam.
 	if (isRepeating(list)) {
 		const from = remembered ? held.index : getCurrentRepeatingSlide(list);
+		const group = getGroupSize(list, [], from);
 
-		goToRepeatingSlide(list, from + direction, direction);
+		goToRepeatingSlide(list, from + direction * group, direction);
 
 		return;
 	}
 
 	const targets = getSlideTargets(list);
 
-	// A press that comes faster than the carousel travels is still one slide:
+	// A press that comes faster than the carousel travels is still one step:
 	// it counts from the slide the last press was headed for, not from the one
 	// the animation happens to be passing.
 	const from = remembered ? held.index : getCurrentSlide(list, targets);
+	const group = getGroupSize(list, targets, from);
 
-	goToSlide(list, getNextSlide(targets, from, direction), targets);
+	goToSlide(
+		list,
+		1 === group
+			? getNextSlide(targets, from, direction)
+			: getGroupSlide(targets, from, direction, group),
+		targets
+	);
 }
 
 /**

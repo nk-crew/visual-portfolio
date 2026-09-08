@@ -353,6 +353,43 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * How many slides an arrow moves is written only when it is not the one
+	 * slide a carousel has always moved, so the markup of a gallery already
+	 * published stays exactly as it was.
+	 *
+	 * @return void
+	 */
+	public function test_a_step_of_one_writes_nothing_and_a_bigger_step_writes_itself() {
+		$plain = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' )
+		);
+
+		$this->assertStringNotContainsString( 'data-vp-carousel-group', $plain );
+
+		$grouped = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'             => 'carousel',
+				'carouselSlidesPerGroup' => 4,
+			)
+		);
+
+		$this->assertStringContainsString( 'data-vp-carousel-group="4"', $grouped );
+
+		// Zero asks for a whole screen, which the module measures.
+		$screen = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'             => 'carousel',
+				'carouselSlidesPerGroup' => 0,
+			)
+		);
+
+		$this->assertStringContainsString( 'data-vp-carousel-group="0"', $screen );
+	}
+
+	/**
 	 * A slide takes the height it was given, and the blocks inside it fill
 	 * that height rather than sitting at the top of it.
 	 *

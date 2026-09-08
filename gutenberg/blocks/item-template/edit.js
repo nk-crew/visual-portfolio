@@ -528,6 +528,7 @@ export default function BlockEdit({
 		carouselContainerWidth,
 		carouselSlideHeight,
 		carouselStretchSlides,
+		carouselSlidesPerGroup,
 	} = attributes;
 	const {
 		'vp/queryType': queryType,
@@ -1084,6 +1085,7 @@ export default function BlockEdit({
 						carouselContainerWidth: '1200px',
 						carouselSlideHeight: '',
 						carouselStretchSlides: false,
+						carouselSlidesPerGroup: 1,
 					})
 				)
 			}
@@ -1235,6 +1237,26 @@ export default function BlockEdit({
 					onChange={(value) => setAttributes({ carouselPeek: value })}
 					min={0}
 					max={200}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => 1 !== carouselSlidesPerGroup}
+				label={__('Slides per step', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselSlidesPerGroup: 1 })}
+			>
+				<RangeControl
+					label={__('Slides per step', 'visual-portfolio')}
+					help={__(
+						'How many slides an arrow moves at a press. Zero moves a whole screen at a time, however many slides that is.',
+						'visual-portfolio'
+					)}
+					value={carouselSlidesPerGroup}
+					onChange={(value) =>
+						setAttributes({ carouselSlidesPerGroup: value ?? 1 })
+					}
+					min={0}
+					max={6}
 				/>
 			</ToolsPanelItem>
 

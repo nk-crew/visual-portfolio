@@ -699,6 +699,93 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 	});
 
+	test('an arrow can move a whole frame', async ({ page, requestUtils }) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel group step',
+			blockId: 'e2e-carousel-group-step',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+				carouselSlidesPerGroup: 2,
+			},
+			carousel: [
+				'loop-carousel-previous',
+				'loop-carousel-indicator',
+				'loop-carousel-next',
+			],
+		});
+
+		const dots = page.locator(`${NAV} ${DOT}`);
+		const next = page.locator(NEXT_ARROW);
+		const prev = page.locator(PREV_ARROW);
+		const current = () =>
+			dots.evaluateAll((nodes) =>
+				nodes.findIndex(
+					(dot) => 'true' === dot.getAttribute('aria-current')
+				)
+			);
+
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await expect.poll(current, { timeout: 10000 }).toBe(0);
+
+		// Two slides a press rather than one.
+		await next.click();
+		await expect.poll(current, { timeout: 10000 }).toBe(2);
+
+		await next.click();
+		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 2);
+		await expect(next).toBeDisabled();
+
+		// And back the same way.
+		await prev.click();
+		await expect.poll(current, { timeout: 10000 }).toBe(2);
+	});
+
+	test('a step wider than the carousel still reaches its end', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel group clamp',
+			blockId: 'e2e-carousel-group-clamp',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+				// A step wider than there are slides to take: asking for a
+				// slide off the end used to be refused outright, and the arrow
+				// did nothing at all.
+				carouselSlidesPerGroup: 6,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+		const next = page.locator(NEXT_ARROW);
+		const prev = page.locator(PREV_ARROW);
+		const atEnd = () =>
+			list.evaluate(
+				(node) =>
+					node.scrollLeft >= node.scrollWidth - node.clientWidth - 1
+			);
+
+		await expect(prev).toBeDisabled();
+
+		await next.click();
+		await expect.poll(atEnd, { timeout: 10000 }).toBe(true);
+		await expect(next).toBeDisabled();
+
+		await prev.click();
+		await expect
+			.poll(() => list.evaluate((node) => node.scrollLeft), {
+				timeout: 10000,
+			})
+			.toBe(0);
+	});
+
 	test('a counter names the slide on screen and how many there are', async ({
 		page,
 		requestUtils,
