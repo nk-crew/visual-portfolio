@@ -144,20 +144,45 @@ const CONTAINER_OPTIONS = [
 ];
 
 /**
- * Whether a carousel has a container to hold its slides to.
+ * Why a carousel has no container to hold its slides to.
  *
  * A container is the edge a slide starts from, and two carousels have no such
- * edge: a centred one rests every slide in the middle of the frame, and one
- * that repeats is padded by half its width at each end to carry the loop.
+ * edge. The control stays where it was, switched off and saying why, rather
+ * than disappearing: a setting that vanishes reads as a setting that was never
+ * there. The same shape the image block locks its alternative text in - the
+ * control disabled, and the reason where its help would be.
  *
  * @param {Object} attributes - block attributes.
  *
- * @return {boolean} True where the container is worth offering.
+ * @return {string|undefined} The reason, or nothing when there is a container.
+ */
+function getCarouselContainerReason(attributes) {
+	if (attributes.carouselRepeat) {
+		return __(
+			'A carousel that repeats has no edge for its slides to start from.',
+			'visual-portfolio'
+		);
+	}
+
+	if ('center' === attributes.carouselSnapAlign) {
+		return __(
+			'Slides that rest in the middle have no edge to start from.',
+			'visual-portfolio'
+		);
+	}
+
+	return undefined;
+}
+
+/**
+ * Whether a carousel has a container to hold its slides to.
+ *
+ * @param {Object} attributes - block attributes.
+ *
+ * @return {boolean} True where the container is worth having.
  */
 function hasCarouselContainer(attributes) {
-	return (
-		!attributes.carouselRepeat && 'center' !== attributes.carouselSnapAlign
-	);
+	return !getCarouselContainerReason(attributes);
 }
 
 /**
@@ -1018,6 +1043,10 @@ export default function BlockEdit({
 		</ToolsPanel>
 	);
 
+	// A carousel with no edge for its slides to start from says why, and the
+	// container control is left in place, greyed.
+	const containerReason = getCarouselContainerReason(attributes);
+
 	const carouselControls = 'carousel' === layoutType && (
 		<ToolsPanel
 			label={__('Carousel', 'visual-portfolio')}
@@ -1127,47 +1156,49 @@ export default function BlockEdit({
 				/>
 			</ToolsPanelItem>
 
-			{hasCarouselContainer(attributes) && (
-				<ToolsPanelItem
-					hasValue={() => 'none' !== carouselContainer}
-					label={__('Container width', 'visual-portfolio')}
-					onDeselect={() =>
-						setAttributes({
-							carouselContainer: 'none',
-							carouselContainerWidth: '1200px',
-						})
-					}
-				>
-					<VStack spacing={2}>
-						<SelectControl
-							label={__('Container width', 'visual-portfolio')}
-							help={__(
+			<ToolsPanelItem
+				hasValue={() => 'none' !== carouselContainer}
+				label={__('Container width', 'visual-portfolio')}
+				onDeselect={() =>
+					setAttributes({
+						carouselContainer: 'none',
+						carouselContainerWidth: '1200px',
+					})
+				}
+			>
+				<VStack spacing={2}>
+					<SelectControl
+						label={__('Container width', 'visual-portfolio')}
+						help={
+							containerReason ||
+							__(
 								'Holds the slides to a width while the carousel itself keeps the full one, so a full-width gallery starts where the text above it does.',
 								'visual-portfolio'
-							)}
-							value={carouselContainer}
-							options={CONTAINER_OPTIONS}
+							)
+						}
+						disabled={!!containerReason}
+						value={carouselContainer}
+						options={CONTAINER_OPTIONS}
+						onChange={(value) =>
+							setAttributes({ carouselContainer: value })
+						}
+					/>
+					{'custom' === carouselContainer && (
+						<UnitControl
+							label={__('Width', 'visual-portfolio')}
+							disabled={!!containerReason}
+							value={carouselContainerWidth}
 							onChange={(value) =>
-								setAttributes({ carouselContainer: value })
+								setAttributes({
+									carouselContainerWidth: value || '1200px',
+								})
 							}
+							units={CSS_UNITS}
+							min={0}
 						/>
-						{'custom' === carouselContainer && (
-							<UnitControl
-								label={__('Width', 'visual-portfolio')}
-								value={carouselContainerWidth}
-								onChange={(value) =>
-									setAttributes({
-										carouselContainerWidth:
-											value || '1200px',
-									})
-								}
-								units={CSS_UNITS}
-								min={0}
-							/>
-						)}
-					</VStack>
-				</ToolsPanelItem>
-			)}
+					)}
+				</VStack>
+			</ToolsPanelItem>
 
 			<ToolsPanelItem
 				hasValue={() => 0 !== carouselPeek}
