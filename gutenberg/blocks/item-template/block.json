@@ -88,6 +88,15 @@
 		"carouselEdgeFade": {
 			"type": "boolean",
 			"default": false
+		},
+		"carouselContainer": {
+			"type": "string",
+			"default": "none",
+			"enum": ["none", "content", "wide", "custom"]
+		},
+		"carouselContainerWidth": {
+			"type": "string",
+			"default": "1200px"
 		}
 	},
 	"supports": {

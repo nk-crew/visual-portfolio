@@ -379,6 +379,24 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 	}
 }
 
+// A carousel held to a container keeps its controls inside it too: an arrow
+// pinned to the far edge of a full width gallery sits beside a slide that is
+// half off the page, which is not a place a visitor would look for it. Only
+// the controls pinned to the frame - the ones drawn inside a slide are
+// already as far in as the container is.
+#{$frame} > .vp-block-loop-carousel-nav,
+#{$frame} > .vp-block-loop-carousel-indicator {
+	inset-inline: var(--vp-carousel-inset, 0);
+}
+
+#{$frame} > .vp-block-loop-carousel-previous {
+	inset-inline-start: calc(var(--vp-carousel-inset, 0px) + 12px);
+}
+
+#{$frame} > .vp-block-loop-carousel-next {
+	inset-inline-end: calc(var(--vp-carousel-inset, 0px) + 12px);
+}
+
 // A control that waits for the pointer. Only where there is a pointer to
 // wait for: a touch screen has no hover, and a control it never showed would
 // be a control it does not have. The keyboard brings it out as well - the

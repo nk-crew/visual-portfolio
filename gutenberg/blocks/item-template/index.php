@@ -590,6 +590,47 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * The room a carousel keeps beside its slides, so that a gallery running
+	 * the full width of the page still starts where the text above it does.
+	 *
+	 * A container is a width, and the room beside it is whatever the frame has
+	 * over that width, halved. Never negative: a frame no wider than the
+	 * container - a gallery that is not full width, a phone - is left alone,
+	 * and a theme that names no width of its own is read as the frame itself,
+	 * which comes to the same thing.
+	 *
+	 * The slides are not clipped to it. The scroll container keeps the whole
+	 * width, so the slides that have not been reached yet run on past the
+	 * container and off the edge of the page, which is the point of a full
+	 * width carousel.
+	 *
+	 * @param array $attributes - block attributes.
+	 *
+	 * @return string CSS length, or an empty string for no room at all.
+	 */
+	private function get_carousel_inset( $attributes ) {
+		switch ( (string) ( $attributes['carouselContainer'] ?? 'none' ) ) {
+			case 'content':
+				$width = 'var(--wp--style--global--content-size, 100cqw)';
+				break;
+
+			case 'wide':
+				$width = 'var(--wp--style--global--wide-size, 100cqw)';
+				break;
+
+			case 'custom':
+				$width = $this->get_css_length( $attributes['carouselContainerWidth'] ?? '', '' );
+				break;
+
+			default:
+				$width = '';
+				break;
+		}
+
+		return '' === $width ? '' : sprintf( 'max(0px, (100cqw - %s) / 2)', $width );
+	}
+
+	/**
 	 * A CSS length, reduced to what a length can be made of.
 	 *
 	 * The value is typed in the editor and printed into an inline style.
@@ -984,7 +1025,17 @@ class Visual_Portfolio_Block_Item_Template {
 				//
 				// The controls go inside it, after the list: over the slides,
 				// pinned to the box that stays put.
-				$before = '<div class="wp-block-visual-portfolio-item-template__carousel-frame">';
+				//
+				// The room a container keeps is carried here rather than on the
+				// list: the list inherits it, and so do the controls pinned to
+				// the frame, which line up with the slides instead of with the
+				// edge of the page.
+				$inset = $this->get_carousel_inset( $attributes );
+
+				$before = sprintf(
+					'<div class="wp-block-visual-portfolio-item-template__carousel-frame"%s>',
+					'' === $inset ? '' : sprintf( ' style="%s"', esc_attr( '--vp-carousel-inset:' . $inset . ';' ) )
+				);
 				$after  = $controls_content . '</div>';
 				break;
 		}

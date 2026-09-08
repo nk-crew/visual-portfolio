@@ -116,6 +116,41 @@ const SNAP_OPTIONS = [
 	{ label: __('Center', 'visual-portfolio'), value: 'center' },
 ];
 
+// The widths a carousel can rest its slides inside. The two named ones are the
+// theme's own, so a gallery lines up with the text above it without anybody
+// typing a number.
+const CONTAINER_OPTIONS = [
+	{ label: __('None', 'visual-portfolio'), value: 'none' },
+	{ label: __('Content', 'visual-portfolio'), value: 'content' },
+	{ label: __('Wide', 'visual-portfolio'), value: 'wide' },
+	{ label: __('Custom', 'visual-portfolio'), value: 'custom' },
+];
+
+/**
+ * The room a carousel keeps beside its slides.
+ *
+ * A mirror of `Visual_Portfolio_Block_Item_Template::get_carousel_inset()`,
+ * which stays the source of truth for what a page renders.
+ *
+ * @param {string} container - chosen container width.
+ * @param {string} width     - the width typed for a custom container.
+ *
+ * @return {string|undefined} CSS length, or nothing when there is no container.
+ */
+function getCarouselInset(container, width) {
+	let size;
+
+	if ('content' === container) {
+		size = 'var(--wp--style--global--content-size, 100cqw)';
+	} else if ('wide' === container) {
+		size = 'var(--wp--style--global--wide-size, 100cqw)';
+	} else if ('custom' === container) {
+		size = String(width ?? '').replace(/[^0-9a-z.%-]/gi, '');
+	}
+
+	return size ? `max(0px, (100cqw - ${size}) / 2)` : undefined;
+}
+
 // `columns: false` says the effect spreads one slide over the width of the
 // gallery and owns that width, so the columns control is not offered beside it.
 const EFFECT_OPTIONS = [
@@ -238,13 +273,21 @@ function ItemTemplateInnerBlocks({ style, effect, index }) {
  * being edited - the one place the block editor can put it - with nothing
  * positioned between the two.
  *
+ * The room a container keeps is carried here rather than on the list, the
+ * same way the render callback prints it: the list inherits it, and so do the
+ * controls pinned to the frame.
+ *
  * @param {Object}  props          - component props.
  * @param {Element} props.children - the list itself.
+ * @param {string}  props.inset    - room kept beside the slides.
  * @return {Element} component.
  */
-function CarouselFrame({ children }) {
+function CarouselFrame({ children, inset }) {
 	return (
-		<div className="wp-block-visual-portfolio-item-template__carousel-frame">
+		<div
+			className="wp-block-visual-portfolio-item-template__carousel-frame"
+			style={{ '--vp-carousel-inset': inset }}
+		>
 			{children}
 		</div>
 	);
@@ -405,6 +448,8 @@ export default function BlockEdit({
 		carouselAutoplayDelay,
 		carouselPeek,
 		carouselEdgeFade,
+		carouselContainer,
+		carouselContainerWidth,
 	} = attributes;
 	const {
 		'vp/queryType': queryType,
@@ -947,6 +992,8 @@ export default function BlockEdit({
 						carouselAutoplayDelay: 5,
 						carouselPeek: 0,
 						carouselEdgeFade: false,
+						carouselContainer: 'none',
+						carouselContainerWidth: '1200px',
 					})
 				)
 			}
@@ -1037,6 +1084,45 @@ export default function BlockEdit({
 						setAttributes({ carouselRepeat: value })
 					}
 				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => 'none' !== carouselContainer}
+				label={__('Container width', 'visual-portfolio')}
+				onDeselect={() =>
+					setAttributes({
+						carouselContainer: 'none',
+						carouselContainerWidth: '1200px',
+					})
+				}
+			>
+				<VStack spacing={2}>
+					<SelectControl
+						label={__('Container width', 'visual-portfolio')}
+						help={__(
+							'Holds the slides to a width while the carousel itself keeps the full one, so a full-width gallery starts where the text above it does.',
+							'visual-portfolio'
+						)}
+						value={carouselContainer}
+						options={CONTAINER_OPTIONS}
+						onChange={(value) =>
+							setAttributes({ carouselContainer: value })
+						}
+					/>
+					{'custom' === carouselContainer && (
+						<UnitControl
+							label={__('Width', 'visual-portfolio')}
+							value={carouselContainerWidth}
+							onChange={(value) =>
+								setAttributes({
+									carouselContainerWidth: value || '1200px',
+								})
+							}
+							units={CSS_UNITS}
+							min={0}
+						/>
+					)}
+				</VStack>
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
@@ -1160,7 +1246,14 @@ export default function BlockEdit({
 	// A carousel is drawn inside a frame, and only a carousel has one.
 	const withChrome = (list) =>
 		'carousel' === layoutType ? (
-			<CarouselFrame>{list}</CarouselFrame>
+			<CarouselFrame
+				inset={getCarouselInset(
+					carouselContainer,
+					carouselContainerWidth
+				)}
+			>
+				{list}
+			</CarouselFrame>
 		) : (
 			list
 		);

@@ -327,7 +327,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		// carousel that repeats is padded by half its width at each end - that
 		// is how the library carries the loop - and a slide sized against what
 		// the padding leaves came out at nothing at all.
-		--vp-carousel-slide-width: calc((100cqw - var(--vp-carousel-peek, 0px) - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
+		--vp-carousel-slide-width: calc((100cqw - var(--vp-carousel-inset, 0px) * 2 - var(--vp-carousel-peek, 0px) - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
 
 		// Makes the list the box an item measures its `offsetLeft` from, which
 		// is how the module reads slide positions: a layout number, and so the
@@ -347,9 +347,11 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		}
 
 		// A slide of the next one showing at the edge, as an invitation to
-		// scroll on.
-		scroll-padding-inline: var(--vp-carousel-peek, 0);
-		padding-inline-end: var(--vp-carousel-peek, 0);
+		// scroll on, and beside it the room a container keeps: the list still
+		// scrolls the whole width, the slides only come to rest inside it.
+		padding-inline-start: var(--vp-carousel-inset, 0);
+		padding-inline-end: calc(var(--vp-carousel-inset, 0px) + var(--vp-carousel-peek, 0px));
+		scroll-padding-inline: calc(var(--vp-carousel-inset, 0px) + var(--vp-carousel-peek, 0px));
 
 		> #{$item} {
 			flex: 0 0 auto;
@@ -660,19 +662,20 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 // back to place its snaps, and a percentage it reads as that many pixels, so
 // its snaps sat 370px off the browser's and a drag settled twice.
 //
-// The scroll padding itself is taken away. Half the frame of it lines a
-// slide up with the middle of the frame, which is where a centred slide
-// belongs and where a slide aligned to the start does not: a carousel of
-// whole-width slides opened on the second half of one. Without it a slide
-// rests where its alignment says, and the padding is only the room the
-// copies moved round from the far end are drawn in. The view module reads
-// the padding back to place the slides on the loop.
+// The scroll padding itself is down to the room a container keeps, and to
+// nothing at all without one. Half the frame of it lines a slide up with the
+// middle of the frame, which is where a centred slide belongs and where a
+// slide aligned to the start does not: a carousel of whole-width slides
+// opened on the second half of one. This way a slide rests where its
+// alignment says, and the padding is only the room the copies moved round
+// from the far end are drawn in. The view module reads the padding back to
+// place the slides on the loop.
 //
 // In the library's own layer, since that is where both are written with
 // `!important`, and a rule outside it would lose.
 @layer blossom-carousel {
 	.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"] {
 		padding-inline: 50cqw !important;
-		scroll-padding-inline: 0 !important;
+		scroll-padding-inline: var(--vp-carousel-inset, 0) !important;
 	}
 }
