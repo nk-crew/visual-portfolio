@@ -44,14 +44,22 @@ and one below 576px — which is the ladder the legacy gallery walked, so every
 layout ends up a single column on a narrow screen. A tile is capped with it and
 keeps its proportions, so a pattern narrows into a stack instead of spilling out
 of the grid. Auto mode is untouched: fitting the container is already what it
-does. There is no per-viewport count of our own to set. The gap is **Block
-spacing** in the Dimensions panel, like any other block.
+does. The gap is **Block spacing** in the Dimensions panel, like any other block.
+
+A manual count can answer for one screen at a time: three tabs above the slider
+— *Desktop*, *Tablet*, *Phone* — and a count for each. A tablet is 992px and
+narrower, a phone 576px and narrower, which are the plugin's own breakpoints.
+Both extra counts start at zero, which is the ladder above, so a gallery that
+never opens them is drawn exactly as it was. Auto mode does not offer them: the
+width of a column is what decides the count there.
 
 What a theme overrides in CSS, without touching the markup:
 
 | Property | Meaning |
 |---|---|
 | `--vp-layout-columns` | Column count, or the maximum in auto mode |
+| `--vp-layout-columns-tablet` | Count below 992px, when one was set |
+| `--vp-layout-columns-mobile` | Count below 576px, when one was set |
 | `--vp-layout-current-columns` | Columns the layout is drawn with, after narrowing |
 | `--vp-layout-min-column-width` | Minimum column width, auto mode only |
 | `--vp-layout-track` | The `minmax()` track a grid repeats, auto mode only |
@@ -101,12 +109,12 @@ gallery has no such switch and keeps the behaviour it always had.
 The item template follows the same shape: Settings holds the layout type and the
 columns, and neither can be hidden; each layout adds a panel of its own.
 
-**Carousel controls.** The arrows and the indicator of a carousel are blocks:
-*Carousel Previous Slide*, *Carousel Next Slide* and *Carousel Indicator*, which
-is drawn as dots or as a bar. They are usually kept in a *Carousel Navigation*
-row, which is where the two carousel patterns put them and where an indicator
-between two arrows reads best — but each of them can be dragged anywhere inside
-the loop.
+**Carousel controls.** Everything a carousel is steered with is a block:
+*Carousel Previous Slide*, *Carousel Next Slide*, *Carousel Indicator* — drawn
+as dots, as a bar or as a counter — *Carousel Play and Pause*, and *Carousel
+Thumbnails*. They are usually kept in a *Carousel Navigation* row, which is
+where the two carousel patterns put them and where an indicator between two
+arrows reads best — but each of them can be dragged anywhere inside the loop.
 
 Where a control sits decides how it is drawn. Beside the item template it is in
 the flow, below or above the gallery. Dropped *inside* the item template — the
@@ -124,6 +132,34 @@ carries block styles of its own: *Plain*, *Outlined* and *Filled*, the box
 around the dots or the bar. Selecting the row offers the same
 settings and applies them to every arrow and indicator inside it.
 
+The indicator comes in three variations. *Dots* draws one per slide and carries
+*Dots at once*: left at zero it draws them all, which is a wall of them for a
+gallery of forty, and given a number it shows that many through a window and
+slides the rest under it, with the slide on screen in the middle and the dots at
+either edge shrinking away. Every dot stays in the page — one the window has
+moved past cannot be clicked, but tabbing to it brings it back. *Progress bar*
+draws a single bar that can be dragged, and answers the arrow keys, Home and End
+when focused; it is a `slider` rather than a `progressbar`, because ARIA gives a
+progress bar no way to set a value. *Counter* is the pair of numbers, the slide
+on screen and how many there are, and is hidden from screen readers: the arrows
+and the dots already say the same thing.
+
+*Carousel Play and Pause* stops a carousel that moves on its own and starts it
+again, which is what WCAG 2.2.2 asks of any motion lasting more than five
+seconds — autoplay pauses under the pointer, but a visitor on a phone or at a
+keyboard had no way to stop it. It carries an *Icon* — pause or stop — and
+*Draw the wait*, a ring around the button that fills as the delay runs down. A
+button beside a carousel with no autoplay, or one a visitor asked less motion
+of, stays switched off like an arrow beside a grid.
+
+*Carousel Thumbnails* is a strip of small pictures, one per slide, that presses
+through to its slide and lights the one on screen; the strip scrolls itself, so
+the current thumbnail is brought into the middle of it and the page never moves.
+It carries a *Height* and an *Aspect ratio*, and two block styles: *Plain*, a
+ring around the current thumbnail, and *Dimmed*, where everything else steps
+back instead. A gallery that appends items with **Load More** does not extend
+the strip — the module has no picture to add — so the two are not combined yet.
+
 None of them can be deleted: every one is inserted with `lock.remove`, and the
 switch that takes one off a page is *Hide on the page* on its toolbar. A hidden
 control renders nothing at all and stays on the canvas, dimmed, which is where
@@ -133,6 +169,11 @@ second arrow added on purpose is unlocked through the block's own Lock dialog.
 A control is rendered switched off and stays that way until a carousel is
 running under it, so one that ended up beside a grid — or on a page whose module
 never loaded — never appears.
+
+The carousel panel of the item template carries the rest: *Effect*, *Autoplay*
+and its delay, *Repeat*, *Container width*, *Peek*, *Slides per step* (zero
+moves a whole screen at a time), *Slide height* and *Blocks fill the slide*,
+*Fade the edges*, *Slide width from content* and *Free scrolling*.
 
 **Controls.** Filter, sort and pagination are server-rendered links and forms.
 With JavaScript they swap the gallery in place; without it they work as ordinary
@@ -152,17 +193,23 @@ visual-portfolio/loop                      query, block id, layout wrapper
 │   ├── visual-portfolio/item-read-more | item-meta
 │   └── any block that reads `vp/item*` context
 ├── visual-portfolio/loop-carousel-nav        a row for the controls below
-│   └── loop-carousel-{previous,next,indicator}
+│   └── loop-carousel-{previous,next,indicator,autoplay,thumbnails}
 ├── visual-portfolio/loop-no-results
 └── visual-portfolio/loop-pagination
     └── loop-pagination-{previous,numbers,next} or loop-pagination-trigger
 ```
 
-The three carousel controls declare the **loop** as their ancestor rather than
+The five carousel controls declare the **loop** as their ancestor rather than
 the row, so the row is only the usual place to keep them: an arrow can sit in a
-heading beside the gallery, an indicator under it, and a gallery is free to draw
-two of either. They find their carousel through the loop they were dropped in —
-one item template to a loop — however deeply they were nested on the way.
+heading beside the gallery, an indicator under it, thumbnails below both, and a
+gallery is free to draw two of either. They find their carousel through the loop
+they were dropped in — one item template to a loop — however deeply they were
+nested on the way.
+
+The thumbnails are the exception to "no item block queries anything": the strip
+is a sibling of the item template and has no items to read, so it resolves the
+query itself, the way `loop-no-results` and `loop-pagination` do. That costs
+nothing — `get_loop_items()` memoizes per request.
 
 One trigger block covers both the button and the scroll: `loop-pagination-trigger`
 carries a `triggerType` of `load-more` or `infinite`, offered as two variations,
@@ -488,6 +535,11 @@ template:
 Holding autoplay is not the same as stopping it: the pause a pointer or a focus
 already applies keeps working underneath, and releasing the hold does not
 override it.
+
+Nor does it override the visitor. The *Carousel Play and Pause* button writes
+its own answer down separately and sends the same event with
+`detail.source: 'visitor'`; a hold released by anything else leaves that answer
+alone, so closing a lightbox never starts a carousel somebody had stopped.
 
 ## URL parameters and caching
 
