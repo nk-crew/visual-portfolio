@@ -1818,7 +1818,15 @@ function initAutoplay(list) {
 
 		held = false === event.detail?.playing;
 	};
-	const stop = () => {
+	// Only the visitor's own press starts the wait over. A hold asked for from
+	// outside keeps the countdown where it was, the way a pause under the
+	// pointer does - a lightbox that opens and closes owes the carousel the
+	// rest of its wait, not the whole of it.
+	const stop = (event) => {
+		if ('visitor' !== event.detail?.source) {
+			return;
+		}
+
 		elapsed = 0;
 		setProgress(0);
 	};
