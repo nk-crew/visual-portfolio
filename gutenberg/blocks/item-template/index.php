@@ -580,13 +580,23 @@ class Visual_Portfolio_Block_Item_Template {
 		}
 
 		if ( 'carousel' === $layout_type ) {
-			$styles .= sprintf(
-				'--vp-carousel-snap-align:%s;',
-				'center' === ( $attributes['carouselSnapAlign'] ?? 'start' ) ? 'center' : 'start'
-			);
+			$styles .= sprintf( '--vp-carousel-snap-align:%s;', $this->get_carousel_snap_align( $attributes ) );
 		}
 
 		return array( $classes, $styles );
+	}
+
+	/**
+	 * Where a slide of a carousel comes to rest.
+	 *
+	 * @param array $attributes - block attributes.
+	 *
+	 * @return string `start`, `center` or `end`.
+	 */
+	private function get_carousel_snap_align( $attributes ) {
+		$align = (string) ( $attributes['carouselSnapAlign'] ?? 'start' );
+
+		return in_array( $align, array( 'center', 'end' ), true ) ? $align : 'start';
 	}
 
 	/**
@@ -609,6 +619,14 @@ class Visual_Portfolio_Block_Item_Template {
 	 * @return string CSS length, or an empty string for no room at all.
 	 */
 	private function get_carousel_inset( $attributes ) {
+		// A container is the edge a slide starts from, and two carousels have
+		// no such edge: a centred one rests every slide in the middle of the
+		// frame, and one that repeats is padded by half its width at each end
+		// to carry the loop.
+		if ( ! empty( $attributes['carouselRepeat'] ) || 'center' === $this->get_carousel_snap_align( $attributes ) ) {
+			return '';
+		}
+
 		switch ( (string) ( $attributes['carouselContainer'] ?? 'none' ) ) {
 			case 'content':
 				$width = 'var(--wp--style--global--content-size, 100cqw)';
@@ -973,10 +991,13 @@ class Visual_Portfolio_Block_Item_Template {
 					$classes[] = 'vp-carousel-edge-fade';
 				}
 
-				// A centred carousel is padded so that its first and its last
-				// slide can reach the middle - see the stylesheet.
-				if ( 'center' === ( $attributes['carouselSnapAlign'] ?? 'start' ) ) {
-					$classes[] = 'vp-carousel-snap-center';
+				// A carousel that rests its slides anywhere but at the start is
+				// padded so that the first and the last of them can get there
+				// too - see the stylesheet.
+				$snap_align = $this->get_carousel_snap_align( $attributes );
+
+				if ( 'start' !== $snap_align ) {
+					$classes[] = 'vp-carousel-snap-' . $snap_align;
 				}
 
 				if ( $effect ) {

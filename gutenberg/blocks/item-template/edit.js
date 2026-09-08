@@ -34,6 +34,9 @@ import {
 	gallery,
 	grid,
 	image,
+	justifyCenter,
+	justifyLeft,
+	justifyRight,
 	postFeaturedImage,
 	stretchWide,
 } from '@wordpress/icons';
@@ -111,10 +114,27 @@ const LAST_ROW_OPTIONS = [
 	{ label: __('Hide', 'visual-portfolio'), value: 'hide' },
 ];
 
+// Where a slide comes to rest. Switched in the toolbar beside the layout,
+// with the icons the editor draws horizontal alignment with everywhere else.
 const SNAP_OPTIONS = [
-	{ label: __('Start', 'visual-portfolio'), value: 'start' },
-	{ label: __('Center', 'visual-portfolio'), value: 'center' },
+	{
+		label: __('Start', 'visual-portfolio'),
+		value: 'start',
+		icon: justifyLeft,
+	},
+	{
+		label: __('Center', 'visual-portfolio'),
+		value: 'center',
+		icon: justifyCenter,
+	},
+	{ label: __('End', 'visual-portfolio'), value: 'end', icon: justifyRight },
 ];
+
+const SNAP_ICONS = {
+	start: justifyLeft,
+	center: justifyCenter,
+	end: justifyRight,
+};
 
 // The widths a carousel can rest its slides inside. The two named ones are the
 // theme's own, so a gallery lines up with the text above it without anybody
@@ -127,25 +147,50 @@ const CONTAINER_OPTIONS = [
 ];
 
 /**
+ * Whether a carousel has a container to hold its slides to.
+ *
+ * A container is the edge a slide starts from, and two carousels have no such
+ * edge: a centred one rests every slide in the middle of the frame, and one
+ * that repeats is padded by half its width at each end to carry the loop.
+ *
+ * @param {Object} attributes - block attributes.
+ *
+ * @return {boolean} True where the container is worth offering.
+ */
+function hasCarouselContainer(attributes) {
+	return (
+		!attributes.carouselRepeat && 'center' !== attributes.carouselSnapAlign
+	);
+}
+
+/**
  * The room a carousel keeps beside its slides.
  *
  * A mirror of `Visual_Portfolio_Block_Item_Template::get_carousel_inset()`,
  * which stays the source of truth for what a page renders.
  *
- * @param {string} container - chosen container width.
- * @param {string} width     - the width typed for a custom container.
+ * @param {Object} attributes - block attributes.
  *
  * @return {string|undefined} CSS length, or nothing when there is no container.
  */
-function getCarouselInset(container, width) {
+function getCarouselInset(attributes) {
+	const { carouselContainer, carouselContainerWidth } = attributes;
+
 	let size;
 
-	if ('content' === container) {
+	if (!hasCarouselContainer(attributes)) {
+		return undefined;
+	}
+
+	if ('content' === carouselContainer) {
 		size = 'var(--wp--style--global--content-size, 100cqw)';
-	} else if ('wide' === container) {
+	} else if ('wide' === carouselContainer) {
 		size = 'var(--wp--style--global--wide-size, 100cqw)';
-	} else if ('custom' === container) {
-		size = String(width ?? '').replace(/[^0-9a-z.%-]/gi, '');
+	} else if ('custom' === carouselContainer) {
+		size = String(carouselContainerWidth ?? '').replace(
+			/[^0-9a-z.%-]/gi,
+			''
+		);
 	}
 
 	return size ? `max(0px, (100cqw - ${size}) / 2)` : undefined;
@@ -646,8 +691,8 @@ export default function BlockEdit({
 				classes.push('vp-carousel-edge-fade');
 			}
 
-			if ('center' === carouselSnapAlign) {
-				classes.push('vp-carousel-snap-center');
+			if ('start' !== carouselSnapAlign) {
+				classes.push(`vp-carousel-snap-${carouselSnapAlign}`);
 			}
 
 			if ('none' !== carouselEffect) {
@@ -984,7 +1029,6 @@ export default function BlockEdit({
 				setAttributes(
 					getResetAllValues(filters, {
 						carouselAutoWidth: false,
-						carouselSnapAlign: 'start',
 						carouselFreeScroll: false,
 						carouselEffect: 'none',
 						carouselRepeat: false,
@@ -1086,44 +1130,47 @@ export default function BlockEdit({
 				/>
 			</ToolsPanelItem>
 
-			<ToolsPanelItem
-				hasValue={() => 'none' !== carouselContainer}
-				label={__('Container width', 'visual-portfolio')}
-				onDeselect={() =>
-					setAttributes({
-						carouselContainer: 'none',
-						carouselContainerWidth: '1200px',
-					})
-				}
-			>
-				<VStack spacing={2}>
-					<SelectControl
-						label={__('Container width', 'visual-portfolio')}
-						help={__(
-							'Holds the slides to a width while the carousel itself keeps the full one, so a full-width gallery starts where the text above it does.',
-							'visual-portfolio'
-						)}
-						value={carouselContainer}
-						options={CONTAINER_OPTIONS}
-						onChange={(value) =>
-							setAttributes({ carouselContainer: value })
-						}
-					/>
-					{'custom' === carouselContainer && (
-						<UnitControl
-							label={__('Width', 'visual-portfolio')}
-							value={carouselContainerWidth}
+			{hasCarouselContainer(attributes) && (
+				<ToolsPanelItem
+					hasValue={() => 'none' !== carouselContainer}
+					label={__('Container width', 'visual-portfolio')}
+					onDeselect={() =>
+						setAttributes({
+							carouselContainer: 'none',
+							carouselContainerWidth: '1200px',
+						})
+					}
+				>
+					<VStack spacing={2}>
+						<SelectControl
+							label={__('Container width', 'visual-portfolio')}
+							help={__(
+								'Holds the slides to a width while the carousel itself keeps the full one, so a full-width gallery starts where the text above it does.',
+								'visual-portfolio'
+							)}
+							value={carouselContainer}
+							options={CONTAINER_OPTIONS}
 							onChange={(value) =>
-								setAttributes({
-									carouselContainerWidth: value || '1200px',
-								})
+								setAttributes({ carouselContainer: value })
 							}
-							units={CSS_UNITS}
-							min={0}
 						/>
-					)}
-				</VStack>
-			</ToolsPanelItem>
+						{'custom' === carouselContainer && (
+							<UnitControl
+								label={__('Width', 'visual-portfolio')}
+								value={carouselContainerWidth}
+								onChange={(value) =>
+									setAttributes({
+										carouselContainerWidth:
+											value || '1200px',
+									})
+								}
+								units={CSS_UNITS}
+								min={0}
+							/>
+						)}
+					</VStack>
+				</ToolsPanelItem>
+			)}
 
 			<ToolsPanelItem
 				hasValue={() => 0 !== carouselPeek}
@@ -1180,25 +1227,6 @@ export default function BlockEdit({
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
-				hasValue={() => 'start' !== carouselSnapAlign}
-				label={__('Snap slides to', 'visual-portfolio')}
-				onDeselect={() => setAttributes({ carouselSnapAlign: 'start' })}
-			>
-				<SelectControl
-					label={__('Snap slides to', 'visual-portfolio')}
-					help={__(
-						'Where a slide comes to rest when scrolling stops.',
-						'visual-portfolio'
-					)}
-					value={carouselSnapAlign}
-					options={SNAP_OPTIONS}
-					onChange={(value) =>
-						setAttributes({ carouselSnapAlign: value })
-					}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
 				hasValue={() => carouselFreeScroll}
 				label={__('Free scrolling', 'visual-portfolio')}
 				onDeselect={() => setAttributes({ carouselFreeScroll: false })}
@@ -1227,7 +1255,8 @@ export default function BlockEdit({
 	);
 
 	// The layout a gallery is, switched where the other view switchers of the
-	// editor are rather than only in the sidebar.
+	// editor are rather than only in the sidebar - and beside it, for a
+	// carousel, where its slides come to rest.
 	const blockControls = (
 		<BlockControls group="block">
 			<ToolbarDropdownMenu
@@ -1240,18 +1269,26 @@ export default function BlockEdit({
 					onClick: () => setAttributes({ layoutType: option.value }),
 				}))}
 			/>
+			{'carousel' === layoutType && (
+				<ToolbarDropdownMenu
+					icon={SNAP_ICONS[carouselSnapAlign]}
+					label={__('Snap slides to', 'visual-portfolio')}
+					controls={SNAP_OPTIONS.map((option) => ({
+						title: option.label,
+						icon: option.icon,
+						isActive: option.value === carouselSnapAlign,
+						onClick: () =>
+							setAttributes({ carouselSnapAlign: option.value }),
+					}))}
+				/>
+			)}
 		</BlockControls>
 	);
 
 	// A carousel is drawn inside a frame, and only a carousel has one.
 	const withChrome = (list) =>
 		'carousel' === layoutType ? (
-			<CarouselFrame
-				inset={getCarouselInset(
-					carouselContainer,
-					carouselContainerWidth
-				)}
-			>
+			<CarouselFrame inset={getCarouselInset(attributes)}>
 				{list}
 			</CarouselFrame>
 		) : (

@@ -58,7 +58,7 @@
 		"carouselSnapAlign": {
 			"type": "string",
 			"default": "start",
-			"enum": ["start", "center"]
+			"enum": ["start", "center", "end"]
 		},
 		"carouselFreeScroll": {
 			"type": "boolean",

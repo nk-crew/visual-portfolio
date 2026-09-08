@@ -317,17 +317,45 @@ function getRepeatGeometry(list) {
 
 	if (items.length) {
 		const style = window.getComputedStyle(list);
-		const centred = window
-			.getComputedStyle(items[0])
-			.scrollSnapAlign.startsWith('center');
 		const padding = parseFloat(style.paddingInlineStart) || 0;
 
-		origin = centred
-			? padding + (items[0].offsetWidth - list.clientWidth) / 2
-			: padding - (parseFloat(style.scrollPaddingInlineStart) || 0);
+		origin =
+			padding -
+			getSnapLead(
+				window.getComputedStyle(items[0]).scrollSnapAlign,
+				style,
+				list.clientWidth,
+				items[0].offsetWidth
+			);
 	}
 
 	return { count: items.length, step, period, origin };
+}
+
+/**
+ * How far into the frame a slide comes to rest.
+ *
+ * The browser's own answer, restated: a slide aligned to the start rests where
+ * the scroll padding leaves it, a centred one in the middle of the frame, and
+ * one aligned to the end against the far edge, less the padding held there.
+ *
+ * @param {string} align  `scroll-snap-align` of the slides.
+ * @param {Object} style  Computed style of the list.
+ * @param {number} frame  Width of the box the list scrolls inside.
+ * @param {number} width  Width of the slide.
+ *
+ * @return {number} Distance from the start of the frame.
+ */
+function getSnapLead(align, style, frame, width) {
+	if (align.startsWith('center')) {
+		return (frame - width) / 2;
+	}
+
+	if (align.startsWith('end')) {
+		return frame - (parseFloat(style.scrollPaddingInlineEnd) || 0) - width;
+	}
+
+	return parseFloat(style.scrollPaddingInlineStart) || 0;
 }
 
 /**
@@ -857,23 +885,22 @@ function getSlideTargets(list) {
 	const content = list.scrollWidth;
 	const furthest = Math.max(0, content - list.clientWidth);
 	// Where a slide comes to rest is the browser's answer, and these are the
-	// two properties it reads it from - the alignment from the slide, the
-	// padding it is held off the edge by from the container.
-	const centred = window
-		.getComputedStyle(items[0])
-		.scrollSnapAlign.startsWith('center');
-	const padding = centred
-		? 0
-		: parseFloat(window.getComputedStyle(list).scrollPaddingInlineStart) ||
-			0;
+	// properties it reads it from - the alignment from the slide, the padding
+	// it is held off the edge by from the container. Read once for the list:
+	// every slide is aligned the same way, and this runs on every scroll.
+	const align = window.getComputedStyle(items[0]).scrollSnapAlign;
+	const style = window.getComputedStyle(list);
 
 	return items.map((item) => {
 		const start = rtl
 			? content - item.offsetLeft - item.offsetWidth
 			: item.offsetLeft;
-		const lead = centred
-			? (list.clientWidth - item.offsetWidth) / 2
-			: padding;
+		const lead = getSnapLead(
+			align,
+			style,
+			list.clientWidth,
+			item.offsetWidth
+		);
 
 		return Math.max(0, Math.min(furthest, start - lead));
 	});
