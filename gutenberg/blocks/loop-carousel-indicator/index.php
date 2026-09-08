@@ -58,6 +58,22 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 			);
 		}
 
+		// How many dots a row shows at once. Zero shows one per slide, which
+		// is a wall of them for a gallery of forty - so the row can be given a
+		// window instead, and the dots slide under it as the carousel moves.
+		$max_dots = max( 0, min( 15, (int) ( $attributes['maxDots'] ?? 0 ) ) );
+		$extra    = array(
+			/* translators: %d: slide number. */
+			'data-vp-dot-label'   => __( 'Go to slide %d', 'visual-portfolio' ),
+			'data-wp-interactive' => Visual_Portfolio_Block_Item_Template::VIEW_MODULE_STORE,
+			'data-wp-on--click'   => 'actions.carouselGoTo',
+		);
+
+		if ( $max_dots ) {
+			$extra['data-vp-max-dots'] = $max_dots;
+			$extra['style']            = '--vp-carousel-dots-visible:' . $max_dots . ';';
+		}
+
 		// Rendered empty on purpose. The number of slides is the item
 		// template's answer and not this block's - the two are siblings, and a
 		// Load More or a filter changes the count after the page was rendered
@@ -67,12 +83,7 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 			Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(
 				Visual_Portfolio_Block_Loop_Carousel_Nav::indicator_classes( 'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--dots', $attributes ),
 				'indicator',
-				array(
-					/* translators: %d: slide number. */
-					'data-vp-dot-label'   => __( 'Go to slide %d', 'visual-portfolio' ),
-					'data-wp-interactive' => Visual_Portfolio_Block_Item_Template::VIEW_MODULE_STORE,
-					'data-wp-on--click'   => 'actions.carouselGoTo',
-				)
+				$extra
 			)
 		);
 	}

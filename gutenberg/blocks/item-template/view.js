@@ -182,6 +182,12 @@ const DOT_SELECTOR = '.vp-block-loop-carousel-dot';
 // name rather than against what they look like.
 const SLIDE_TARGET_SELECTOR = '[data-vp-slide]';
 const DOT_PROGRESS_CLASS = 'vp-block-loop-carousel-dot-progress';
+// An indicator showing a window of its dots rather than all of them, and the
+// two states a dot takes as it reaches the edge of that window.
+const DOTS_COLLAPSED_CLASS = 'is-collapsed';
+const DOT_EDGE_CLASS = 'is-edge';
+const DOT_EDGE_FAR_CLASS = 'is-edge-far';
+const DOTS_SHIFT_PROPERTY = '--vp-carousel-dots-shift';
 const PROGRESS_SELECTOR = '.vp-block-loop-carousel-indicator--progress';
 
 // Taken off a control once a carousel is running for it to move. The server
@@ -237,6 +243,16 @@ const carousels = new WeakMap();
 
 // The slide the last press asked for, per carousel.
 const pending = new WeakMap();
+
+// The slide a dot window was last drawn for, per indicator. Sliding the dots
+// under the window is the one thing here that has to measure, so it is done
+// when the slide changes and not on every frame of a scroll.
+const dotWindows = new WeakMap();
+
+// Indicators already listening for the end of the pill that grows under the
+// slide on screen. The dot a window is centred on is measured while that pill
+// is still growing, so the row is placed again once it has stopped.
+const settling = new WeakSet();
 
 // How close to either end of its scroll range Blossom lets a repeating
 // carousel rest. The loop is carried by copies of the slides moved round to
@@ -1057,6 +1073,10 @@ function syncIndicators(list, root = getControlsRoot(list)) {
 		);
 	});
 
+	root.querySelectorAll(DOTS_SELECTOR).forEach((container) => {
+		slideDotWindow(container, current);
+	});
+
 	const value = getScrollProgress(list);
 
 	root.querySelectorAll(PROGRESS_SELECTOR).forEach((progress) => {
@@ -1135,6 +1155,115 @@ function fillDots(container, items) {
 		dot.innerHTML = `<span class="${DOT_PROGRESS_CLASS}"></span>`;
 		container.appendChild(dot);
 	}
+}
+
+/**
+ * Slide the dots of an indicator under the window it shows them through.
+ *
+ * A gallery of forty slides draws forty dots, which is a wall rather than an
+ * indicator. A row given a window keeps every dot in the page - each one is
+ * still a button naming a slide, still reachable by keyboard and still
+ * carrying the label a screen reader reads - and moves them under it, with the
+ * one on screen in the middle and the dots at either edge shrinking away.
+ *
+ * The measuring is the only thing here that costs anything, so it happens when
+ * the slide changes rather than on every frame of a scroll.
+ *
+ * @param {HTMLElement} container Indicator drawn as dots.
+ * @param {number}      current   Slide the carousel is showing.
+ * @param {boolean}     force     Measure again for the slide already drawn.
+ */
+function slideDotWindow(container, current, force = false) {
+	const max = parseInt(container.dataset.vpMaxDots, 10) || 0;
+	const dots = container.querySelectorAll(DOT_SELECTOR);
+
+	// A row that fits is a plain row: no window, no shift, and no classes left
+	// behind by a gallery that had more slides a moment ago.
+	if (!max || dots.length <= max) {
+		container.classList.remove(DOTS_COLLAPSED_CLASS);
+		container.style.removeProperty(DOTS_SHIFT_PROPERTY);
+		dots.forEach((dot) => {
+			dot.classList.remove(DOT_EDGE_CLASS, DOT_EDGE_FAR_CLASS);
+		});
+		dotWindows.delete(container);
+
+		return;
+	}
+
+	container.classList.add(DOTS_COLLAPSED_CLASS);
+
+	if (!force && dotWindows.get(container) === current) {
+		return;
+	}
+
+	dotWindows.set(container, current);
+
+	// The pill under the slide on screen is still growing when this runs - the
+	// dots are lit a line above - so where it ends up is asked again once it
+	// has stopped. `min-width` is what grows; nothing else on a dot changes a
+	// position.
+	if (!settling.has(container)) {
+		settling.add(container);
+		container.addEventListener('transitionend', (event) => {
+			if ('min-width' === event.propertyName) {
+				slideDotWindow(container, dotWindows.get(container) ?? 0, true);
+			}
+		});
+
+		// A dot the window has moved past is still a button in the page, so
+		// tabbing to it brings it back under the window - the alternative is a
+		// focus ring drawn on something nobody can see.
+		container.addEventListener('focusin', (event) => {
+			const dot = event.target.closest(DOT_SELECTOR);
+
+			if (dot) {
+				slideDotWindow(container, parseInt(dot.dataset.vpSlide, 10));
+			}
+		});
+	}
+
+	// Read every position first and write afterwards: a measurement taken
+	// between two writes makes the browser lay the row out again for each dot.
+	const boxes = Array.from(dots, (dot) => [dot.offsetLeft, dot.offsetWidth]);
+	const width = container.clientWidth;
+	const [lastLeft, lastWidth] = boxes[boxes.length - 1];
+	const content = lastLeft + lastWidth;
+	const index = Math.min(Math.max(current, 0), boxes.length - 1);
+	const [activeLeft, activeWidth] = boxes[index];
+
+	// Centred, but never pulled away from either end: the first dots sit at the
+	// start of the window and the last ones at its end, as they would in a row
+	// that was never collapsed.
+	const shift = Math.round(
+		Math.min(
+			0,
+			Math.max(
+				width - content,
+				width / 2 - (activeLeft + activeWidth / 2)
+			)
+		)
+	);
+
+	container.style.setProperty(DOTS_SHIFT_PROPERTY, `${shift}px`);
+
+	// Only an edge with dots behind it shrinks them. At the start of the row
+	// the first dot sits against the window and is nonetheless the first there
+	// is - shrinking it would say there are earlier slides, and there are not.
+	const more = [shift < 0, shift > width - content];
+
+	dots.forEach((dot, at) => {
+		const [left, size] = boxes[at];
+		const start = left + shift;
+		// How far the dot sits from whichever edge still has dots beyond it,
+		// negative once it has passed that edge.
+		const inside = Math.min(
+			more[0] ? start : Number.POSITIVE_INFINITY,
+			more[1] ? width - (start + size) : Number.POSITIVE_INFINITY
+		);
+
+		dot.classList.toggle(DOT_EDGE_CLASS, inside >= 0 && inside < size * 2);
+		dot.classList.toggle(DOT_EDGE_FAR_CLASS, inside < 0);
+	});
 }
 
 /**

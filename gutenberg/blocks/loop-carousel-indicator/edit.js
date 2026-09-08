@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { RangeControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -35,7 +36,7 @@ export default function CarouselIndicatorEdit({
 	context,
 	clientId,
 }) {
-	const { indicator, isHidden, showOnHover } = attributes;
+	const { indicator, isHidden, showOnHover, maxDots } = attributes;
 	const isProgress = 'progress' === indicator;
 
 	useLoopOrphanWarning(metadata.name, context);
@@ -64,15 +65,32 @@ export default function CarouselIndicatorEdit({
 				isHidden={isHidden}
 				setAttributes={setAttributes}
 			/>
-			{isOverlay && !isInRow ? (
+			{!isProgress || (isOverlay && !isInRow) ? (
 				<InspectorControls>
 					<ControlPanel title={__('Indicator', 'visual-portfolio')}>
-						<ShowOnHoverControl
-							value={showOnHover}
-							onChange={(value) =>
-								setAttributes({ showOnHover: value })
-							}
-						/>
+						{isProgress ? null : (
+							<RangeControl
+								label={__('Dots at once', 'visual-portfolio')}
+								help={__(
+									'How many dots the row shows before it starts sliding them under a window. Zero draws one dot per slide, however many there are.',
+									'visual-portfolio'
+								)}
+								value={maxDots}
+								onChange={(value) =>
+									setAttributes({ maxDots: value ?? 0 })
+								}
+								min={0}
+								max={15}
+							/>
+						)}
+						{isOverlay && !isInRow ? (
+							<ShowOnHoverControl
+								value={showOnHover}
+								onChange={(value) =>
+									setAttributes({ showOnHover: value })
+								}
+							/>
+						) : null}
 					</ControlPanel>
 				</InspectorControls>
 			) : null}

@@ -157,6 +157,33 @@
 	&:empty {
 		display: none;
 	}
+
+	// A row given a window shows a few dots at a time and slides the rest under
+	// it. Every dot stays in the page - the module only moves them - so each one
+	// is still a button naming a slide, and still reachable by keyboard.
+	//
+	// `clip` rather than `hidden`: a hidden box is a scroll container, and the
+	// browser would scroll it to a dot that took focus, fighting the shift the
+	// module writes. Clipping cannot scroll, and the module answers focus itself.
+	&.is-collapsed {
+		position: relative;
+		max-width: calc(var(--vp-carousel-dots-visible, 5) * 12px + 18px);
+		overflow: clip;
+
+		> .vp-block-loop-carousel-dot {
+			translate: var(--vp-carousel-dots-shift, 0);
+
+			// Shrinking away at the edges rather than being cut in half, so the
+			// row reads as a window onto more dots.
+			&.is-edge {
+				scale: 0.66;
+			}
+
+			&.is-edge-far {
+				scale: 0.33;
+			}
+		}
+	}
 }
 
 // A dot is the progress bar in miniature, and it is built the same way: a track
@@ -181,7 +208,7 @@
 	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
 	border: 0;
 	border-radius: 3px;
-	transition: min-width 0.25s ease, background-color 0.25s ease;
+	transition: min-width 0.25s ease, background-color 0.25s ease, translate 0.25s ease, scale 0.25s ease;
 
 	&:focus {
 		outline: none;

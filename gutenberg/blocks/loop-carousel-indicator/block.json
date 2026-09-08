@@ -27,7 +27,8 @@
 			"default": "dots",
 			"enum": ["dots", "progress"]
 		},
-		"showOnHover": { "type": "boolean", "default": false }
+		"showOnHover": { "type": "boolean", "default": false },
+		"maxDots": { "type": "number", "default": 0 }
 	},
 	"supports": {
 		"html": false,

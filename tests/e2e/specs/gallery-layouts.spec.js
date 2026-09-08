@@ -699,6 +699,87 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 	});
 
+	test('an indicator given a window slides its dots under it', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel dot window',
+			blockId: 'e2e-carousel-dot-window',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: [
+				'loop-carousel-previous',
+				['loop-carousel-indicator', { maxDots: 3 }],
+				'loop-carousel-next',
+			],
+		});
+
+		const dots = page.locator(`${NAV} ${DOT}`);
+		const indicator = page.locator(
+			`${NAV} .vp-block-loop-carousel-indicator--dots`
+		);
+
+		// Every slide keeps a dot of its own: the window only moves them, so
+		// each one is still a button naming a slide and still reachable by
+		// keyboard.
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await expect(indicator).toHaveClass(/is-collapsed/);
+
+		const shift = () =>
+			indicator.evaluate((node) =>
+				Math.round(
+					parseFloat(
+						node.style.getPropertyValue('--vp-carousel-dots-shift')
+					) || 0
+				)
+			);
+
+		// How many dots are drawn full size, which is the window itself.
+		const whole = () =>
+			dots.evaluateAll(
+				(nodes) =>
+					nodes.filter(
+						(dot) =>
+							!dot.classList.contains('is-edge') &&
+							!dot.classList.contains('is-edge-far')
+					).length
+			);
+
+		// At the start the row is flush: there are no slides before the first
+		// one, so nothing shrinks on that side and nothing has moved.
+		await expect.poll(shift, { timeout: 10000 }).toBe(0);
+		await expect.poll(whole, { timeout: 10000 }).toBeLessThan(IMAGES_COUNT);
+
+		// A dot the window has moved past is clipped, so a pointer cannot
+		// reach it - but it is still a button in the page, and tabbing to it
+		// brings it back under the window rather than drawing a focus ring on
+		// something nobody can see.
+		const last = dots.nth(IMAGES_COUNT - 1);
+
+		await last.focus();
+		await expect
+			.poll(
+				() =>
+					last.evaluate((dot) =>
+						dot.classList.contains('is-edge-far')
+					),
+				{ timeout: 10000 }
+			)
+			.toBe(false);
+		await expect.poll(shift, { timeout: 10000 }).toBeLessThan(0);
+
+		// And from there it works like any other dot.
+		await page.keyboard.press('Enter');
+		await expect
+			.poll(() => last.getAttribute('aria-current'), { timeout: 10000 })
+			.toBe('true');
+	});
+
 	test('autoplay runs only while the carousel is on screen', async ({
 		page,
 		requestUtils,
