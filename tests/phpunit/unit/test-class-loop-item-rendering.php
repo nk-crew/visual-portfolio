@@ -329,6 +329,63 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A slide takes the height it was given, and the blocks inside it fill
+	 * that height rather than sitting at the top of it.
+	 *
+	 * @return void
+	 */
+	public function test_a_slide_takes_a_height_and_its_blocks_fill_it() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'            => 'carousel',
+				'carouselSlideHeight'   => '420px',
+				'carouselStretchSlides' => true,
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-carousel-slide-height:420px', $output );
+		$this->assertStringContainsString( 'vp-carousel-stretch-slides', $output );
+	}
+
+	/**
+	 * The height is typed, so it is reduced to what a CSS length can be made
+	 * of before it reaches an inline style, and nothing is printed when there
+	 * is nothing usable left.
+	 *
+	 * @return void
+	 */
+	public function test_a_typed_slide_height_is_reduced_to_a_length() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'          => 'carousel',
+				'carouselSlideHeight' => '420px;background:url(javascript:alert(1))',
+			)
+		);
+
+		// What is left is a nonsense identifier rather than a declaration:
+		// with no colon, no brackets and no semicolon there is nothing to end
+		// the height with and nothing to fetch.
+		$this->assertStringContainsString(
+			'--vp-carousel-slide-height:420pxbackgroundurljavascriptalert1',
+			$output
+		);
+		$this->assertStringNotContainsString( 'url(', $output );
+		$this->assertStringNotContainsString( 'javascript:', $output );
+
+		$empty = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'          => 'carousel',
+				'carouselSlideHeight' => '',
+			)
+		);
+
+		$this->assertStringNotContainsString( '--vp-carousel-slide-height', $empty );
+	}
+
+	/**
 	 * A control dropped inside the item template is not an item: it is
 	 * rendered once, after the list and inside the frame, which is what lays
 	 * it over the slides.

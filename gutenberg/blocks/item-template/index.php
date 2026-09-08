@@ -1009,6 +1009,24 @@ class Visual_Portfolio_Block_Item_Template {
 					$layout_styles .= sprintf( '--vp-carousel-peek:%dpx;', $peek );
 				}
 
+				// The height of the frame a slide is drawn in, which is not
+				// the shape of the picture inside it - that is the image
+				// block's own aspect ratio. Empty leaves the slide as tall as
+				// its contents, which is what a carousel of cards wants.
+				$slide_height = $this->get_css_length( $attributes['carouselSlideHeight'] ?? '', '' );
+
+				if ( '' !== $slide_height ) {
+					$layout_styles .= sprintf( '--vp-carousel-slide-height:%s;', $slide_height );
+				}
+
+				// Every slide is already as tall as the tallest - the list is a
+				// flex row and stretches them. What this asks for is the blocks
+				// inside a slide filling the height they were given, rather
+				// than sitting at the top of it.
+				if ( ! empty( $attributes['carouselStretchSlides'] ) ) {
+					$classes[] = 'vp-carousel-stretch-slides';
+				}
+
 				if ( ! empty( $attributes['carouselRepeat'] ) ) {
 					$extra['data-vp-carousel-repeat'] = 'true';
 				}

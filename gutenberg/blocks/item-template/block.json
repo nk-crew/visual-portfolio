@@ -97,6 +97,14 @@
 		"carouselContainerWidth": {
 			"type": "string",
 			"default": "1200px"
+		},
+		"carouselSlideHeight": {
+			"type": "string",
+			"default": ""
+		},
+		"carouselStretchSlides": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

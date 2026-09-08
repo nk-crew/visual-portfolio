@@ -268,6 +268,15 @@ const CSS_UNITS = [
 	{ value: 'vw', label: 'vw', default: 20 },
 ];
 
+// A slide height is typed in the same units, and in `vh` besides: a share of
+// the screen is what the legacy slider offered as a percentage height.
+const SLIDE_HEIGHT_UNITS = [
+	{ value: 'px', label: 'px', default: 320 },
+	{ value: 'rem', label: 'rem', default: 20 },
+	{ value: 'em', label: 'em', default: 20 },
+	{ value: 'vh', label: 'vh', default: 60 },
+];
+
 const TEMPLATE = [
 	['visual-portfolio/item-image', { aspectRatio: '1', clickAction: 'popup' }],
 	[
@@ -517,6 +526,8 @@ export default function BlockEdit({
 		carouselEdgeFade,
 		carouselContainer,
 		carouselContainerWidth,
+		carouselSlideHeight,
+		carouselStretchSlides,
 	} = attributes;
 	const {
 		'vp/queryType': queryType,
@@ -717,6 +728,10 @@ export default function BlockEdit({
 				classes.push('vp-carousel-snap-center');
 			}
 
+			if (carouselStretchSlides) {
+				classes.push('vp-carousel-stretch-slides');
+			}
+
 			if ('none' !== carouselEffect) {
 				classes.push('vp-carousel-effect');
 				classes.push(`vp-carousel-${carouselEffect}`);
@@ -731,6 +746,7 @@ export default function BlockEdit({
 		carouselFreeScroll,
 		carouselEdgeFade,
 		carouselSnapAlign,
+		carouselStretchSlides,
 		carouselEffect,
 	]);
 
@@ -765,6 +781,8 @@ export default function BlockEdit({
 						'--vp-layout-row-height': `${justifiedRowHeight}px`,
 						'--vp-carousel-snap-align': carouselSnapAlign,
 						'--vp-carousel-peek': `${Math.max(0, Math.min(200, carouselPeek))}px`,
+						'--vp-carousel-slide-height':
+							carouselSlideHeight || undefined,
 						// A preview rests where the carousel starts, and the
 						// end that has been reached carries no fade.
 						'--vp-carousel-fade-left': carouselEdgeFade
@@ -1064,6 +1082,8 @@ export default function BlockEdit({
 						carouselEdgeFade: false,
 						carouselContainer: 'none',
 						carouselContainerWidth: '1200px',
+						carouselSlideHeight: '',
+						carouselStretchSlides: false,
 					})
 				)
 			}
@@ -1215,6 +1235,46 @@ export default function BlockEdit({
 					onChange={(value) => setAttributes({ carouselPeek: value })}
 					min={0}
 					max={200}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => '' !== carouselSlideHeight}
+				label={__('Slide height', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselSlideHeight: '' })}
+			>
+				<UnitControl
+					label={__('Slide height', 'visual-portfolio')}
+					help={__(
+						'The height of the box a slide is drawn in. Left empty, a slide is as tall as the tallest one beside it.',
+						'visual-portfolio'
+					)}
+					value={carouselSlideHeight}
+					onChange={(value) =>
+						setAttributes({ carouselSlideHeight: value || '' })
+					}
+					units={SLIDE_HEIGHT_UNITS}
+					min={0}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => carouselStretchSlides}
+				label={__('Blocks fill the slide', 'visual-portfolio')}
+				onDeselect={() =>
+					setAttributes({ carouselStretchSlides: false })
+				}
+			>
+				<ToggleControl
+					label={__('Blocks fill the slide', 'visual-portfolio')}
+					help={__(
+						'The image grows to take whatever the title and the text leave, so every slide ends at the same line. The shape of the picture itself is the image block’s own aspect ratio.',
+						'visual-portfolio'
+					)}
+					checked={carouselStretchSlides}
+					onChange={(value) =>
+						setAttributes({ carouselStretchSlides: value })
+					}
 				/>
 			</ToolsPanelItem>
 

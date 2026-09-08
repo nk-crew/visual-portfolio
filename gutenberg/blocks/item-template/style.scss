@@ -356,11 +356,40 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		> #{$item} {
 			flex: 0 0 auto;
 			width: var(--vp-carousel-slide-width);
+			// The frame a slide is drawn in. Unset it is `auto`, and the row
+			// still stretches every slide to the tallest of them - a flex row
+			// with no `align-items` of its own already does that.
+			height: var(--vp-carousel-slide-height, auto);
 			scroll-snap-align: var(--vp-carousel-snap-align, start);
 		}
 
 		&.vp-carousel-auto-width > #{$item} {
 			width: auto;
+		}
+
+		// The blocks of a slide fill the height the slide was given rather
+		// than sitting at the top of it: the item becomes a column, and the
+		// picture takes what the rest of the blocks leave - the same chain a
+		// justified row needs, for the same reason.
+		&.vp-carousel-stretch-slides {
+			> #{$item} {
+				display: flex;
+				flex-direction: column;
+			}
+
+			#{$item} .wp-block-visual-portfolio-item-image {
+				flex: 1 1 auto;
+				min-height: 0;
+
+				> a {
+					height: 100%;
+				}
+
+				img {
+					height: 100%;
+					object-fit: cover;
+				}
+			}
 		}
 
 		// A centred carousel rests every slide in the middle, the first and
