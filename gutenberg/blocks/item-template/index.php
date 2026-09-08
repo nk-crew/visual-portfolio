@@ -591,12 +591,10 @@ class Visual_Portfolio_Block_Item_Template {
 	 *
 	 * @param array $attributes - block attributes.
 	 *
-	 * @return string `start`, `center` or `end`.
+	 * @return string `start` or `center`.
 	 */
 	private function get_carousel_snap_align( $attributes ) {
-		$align = (string) ( $attributes['carouselSnapAlign'] ?? 'start' );
-
-		return in_array( $align, array( 'center', 'end' ), true ) ? $align : 'start';
+		return 'center' === ( $attributes['carouselSnapAlign'] ?? 'start' ) ? 'center' : 'start';
 	}
 
 	/**
@@ -991,13 +989,10 @@ class Visual_Portfolio_Block_Item_Template {
 					$classes[] = 'vp-carousel-edge-fade';
 				}
 
-				// A carousel that rests its slides anywhere but at the start is
-				// padded so that the first and the last of them can get there
-				// too - see the stylesheet.
-				$snap_align = $this->get_carousel_snap_align( $attributes );
-
-				if ( 'start' !== $snap_align ) {
-					$classes[] = 'vp-carousel-snap-' . $snap_align;
+				// A centred carousel is padded so that its first and its last
+				// slide can reach the middle - see the stylesheet.
+				if ( 'center' === $this->get_carousel_snap_align( $attributes ) ) {
+					$classes[] = 'vp-carousel-snap-center';
 				}
 
 				if ( $effect ) {

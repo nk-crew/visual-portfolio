@@ -36,7 +36,6 @@ import {
 	image,
 	justifyCenter,
 	justifyLeft,
-	justifyRight,
 	postFeaturedImage,
 	stretchWide,
 } from '@wordpress/icons';
@@ -127,13 +126,11 @@ const SNAP_OPTIONS = [
 		value: 'center',
 		icon: justifyCenter,
 	},
-	{ label: __('End', 'visual-portfolio'), value: 'end', icon: justifyRight },
 ];
 
 const SNAP_ICONS = {
 	start: justifyLeft,
 	center: justifyCenter,
-	end: justifyRight,
 };
 
 // The widths a carousel can rest its slides inside. The two named ones are the
@@ -691,8 +688,8 @@ export default function BlockEdit({
 				classes.push('vp-carousel-edge-fade');
 			}
 
-			if ('start' !== carouselSnapAlign) {
-				classes.push(`vp-carousel-snap-${carouselSnapAlign}`);
+			if ('center' === carouselSnapAlign) {
+				classes.push('vp-carousel-snap-center');
 			}
 
 			if ('none' !== carouselEffect) {

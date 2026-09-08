@@ -375,17 +375,6 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			padding-inline: calc((100cqw - var(--vp-carousel-slide-width)) / 2);
 			scroll-padding-inline: 0;
 		}
-
-		// A carousel aligned to the end rests every slide against the far edge
-		// of the frame, the first one included: padded at the start by the room
-		// a slide resting there leaves behind it. Without it the first slides
-		// could never reach the edge, and the arrow that asked them to went
-		// nowhere. The far edge is the one the container and the peek are
-		// measured from, so both come off the padding.
-		&.vp-carousel-snap-end:not(.vp-carousel-auto-width) {
-			padding-inline-start: calc(100cqw - var(--vp-carousel-slide-width) - var(--vp-carousel-inset, 0px) - var(--vp-carousel-peek, 0px));
-		}
-
 		&.vp-carousel-free-scroll {
 			scroll-snap-type: none;
 		}
