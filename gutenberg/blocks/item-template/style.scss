@@ -408,6 +408,16 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			scroll-snap-type: none;
 		}
 
+		// Held off while the progress bar is being dragged, so the carousel
+		// follows the finger instead of being pulled back to the nearest slide
+		// on every move. Blossom writes the snap type into a custom property
+		// and reads it back with `!important`, so the module sets that too -
+		// this is the switch for a carousel that never loaded it.
+		&.vp-carousel-is-scrubbing {
+			scroll-snap-type: none;
+			scroll-behavior: auto;
+		}
+
 		// The edges dissolve rather than cut, so a half slide reads as more
 		// carousel rather than as a mistake. Three layers: a ramp at each edge
 		// and the solid middle between them, which is what lets one side be

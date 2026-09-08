@@ -190,6 +190,11 @@ const DOT_EDGE_FAR_CLASS = 'is-edge-far';
 const DOTS_SHIFT_PROPERTY = '--vp-carousel-dots-shift';
 const PROGRESS_SELECTOR = '.vp-block-loop-carousel-indicator--progress';
 const AUTOPLAY_SELECTOR = '[data-vp-carousel-control="autoplay"]';
+// Snapping is held off while a bar is being dragged. Two switches, because a
+// page has only one of them: the custom property is the one Blossom's own
+// `!important` layer answers to, and the class is for the carousel on a touch
+// screen, which never loads Blossom at all.
+const SCRUBBING_CLASS = 'vp-carousel-is-scrubbing';
 const STOPPED_CLASS = 'vp-carousel-is-stopped';
 const COUNTER_SELECTOR = '.vp-block-loop-carousel-indicator--counter';
 const COUNTER_CURRENT_SELECTOR = '.vp-block-loop-carousel-counter-current';
@@ -477,6 +482,35 @@ function onTheRange(place, period) {
 }
 
 /**
+ * Put a repeating carousel at a position on its clock, at once.
+ *
+ * Blossom moves the slides round when the list reports a scroll, and the
+ * browser reports one at the top of the next frame - after this frame has been
+ * drawn. So the frame that crosses the seam was drawn where the carousel had
+ * got to with the slides still where it came from, which is a blank strip as
+ * wide as whatever had yet to be moved round: a flicker, once per pass. The
+ * list is told here instead, and the slides move round in time to be drawn.
+ *
+ * @param {HTMLElement} list     Item template list.
+ * @param {number}      position Position, anywhere on the clock.
+ * @param {number}      period   Length of the clock.
+ */
+function placeRepeating(list, position, period) {
+	const at = onTheRange(position, period);
+	const moved = at !== getScrollPosition(list);
+
+	// Set outright: the list scrolls smoothly by its stylesheet, and a
+	// position merely assigned to it is a smooth scroll of its own - which,
+	// for the frame that steps from one end of the range to the other, was a
+	// smooth scroll the whole way back.
+	list.scrollTo({ left: isRtl(list) ? -at : at, behavior: 'instant' });
+
+	if (moved) {
+		list.dispatchEvent(new window.Event('scroll'));
+	}
+}
+
+/**
  * Move a repeating carousel from one position on its clock to another.
  *
  * Drawn frame by frame rather than left to the browser's smooth scroll: the
@@ -508,26 +542,7 @@ function travelRepeating(list, from, to, period, speed = 0) {
 	// position merely assigned to it is a smooth scroll of its own - which,
 	// for the frame that steps from one end of the range to the other, was a
 	// smooth scroll the whole way back.
-	const place = (position) => {
-		const at = onTheRange(position, period);
-		const moved = at !== getScrollPosition(list);
-
-		list.scrollTo({ left: isRtl(list) ? -at : at, behavior: 'instant' });
-
-		if (!moved) {
-			return;
-		}
-
-		// Blossom moves the slides round when the list reports a scroll, and
-		// the browser reports one at the top of the next frame - after this
-		// frame has been drawn. So the frame that crosses the seam was drawn
-		// where the carousel had got to with the slides still where it came
-		// from, which is a blank strip as wide as whatever had yet to be
-		// moved round: a flicker, once per pass, on the step across the seam.
-		// The list is told here instead, and the slides move round in time to
-		// be drawn.
-		list.dispatchEvent(new window.Event('scroll'));
-	};
+	const place = (position) => placeRepeating(list, position, period);
 
 	const finish = () => {
 		travels.delete(list);
@@ -741,15 +756,18 @@ function openOnFirstSlide(list) {
  *
  * @param {HTMLElement} list     Item template list.
  * @param {number}      position Distance from the start.
+ * @param {string}      behavior How to get there. The smooth scroll a visitor
+ *                               asked for by default; `instant` for a move
+ *                               that is following a finger.
  */
-function scrollListTo(list, position) {
+function scrollListTo(list, position, behavior = getScrollBehavior()) {
 	// The list is scrolled rather than the slide scrolled into view: that one
 	// walks every scrollable ancestor, and the page must not move under a
 	// lightbox that is showing the same item. Forwards is leftwards on a right
 	// to left page, which is the sign `scrollLeft` speaks in.
 	list.scrollTo({
 		left: isRtl(list) ? -position : position,
-		behavior: getScrollBehavior(),
+		behavior,
 	});
 }
 
@@ -1100,6 +1118,19 @@ function syncIndicators(list, root = getControlsRoot(list)) {
 	root.querySelectorAll(PROGRESS_SELECTOR).forEach((progress) => {
 		progress.style.setProperty('--vp-carousel-progress', `${value * 100}%`);
 		progress.setAttribute('aria-valuenow', String(Math.round(value * 100)));
+
+		// The number is a percentage, which says nothing on its own. What a
+		// visitor is told is the slide it stands for.
+		const label = progress.dataset.vpPositionLabel;
+
+		if (label) {
+			progress.setAttribute(
+				'aria-valuetext',
+				label
+					.replace('%1$d', String(current + 1))
+					.replace('%2$d', String(total))
+			);
+		}
 	});
 }
 
@@ -1485,6 +1516,168 @@ function goToSlide(list, index, targets = getSlideTargets(list)) {
 }
 
 /**
+ * Let the progress bar of a carousel be dragged, and steered by the keyboard.
+ *
+ * The bar says where the carousel is; a bar that can be taken hold of says it
+ * and answers for it. Everything a key does goes through `slide`, so the step
+ * event fires and autoplay starts its wait over, which is the courtesy a
+ * visitor who has just chosen a slide is owed.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function} Teardown.
+ */
+function initScrub(list) {
+	const root = getControlsRoot(list);
+	const bars = Array.from(root.querySelectorAll(PROGRESS_SELECTOR));
+
+	if (!bars.length) {
+		return noop;
+	}
+
+	let snap = null;
+	let dragging = null;
+
+	const holdSnap = () => {
+		snap = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
+		list.style.setProperty(SNAP_TYPE_PROPERTY, 'none');
+		list.classList.add(SCRUBBING_CLASS);
+	};
+
+	const freeSnap = () => {
+		if (snap) {
+			list.style.setProperty(SNAP_TYPE_PROPERTY, snap);
+		} else {
+			list.style.removeProperty(SNAP_TYPE_PROPERTY);
+		}
+
+		snap = null;
+		list.classList.remove(SCRUBBING_CLASS);
+	};
+
+	// How far along the bar the pointer is, from its start rather than from
+	// its left: on a right to left page the start of the carousel is the right.
+	const getFraction = (bar, clientX) => {
+		const box = bar.getBoundingClientRect();
+		const along = isRtl(list) ? box.right - clientX : clientX - box.left;
+
+		return box.width > 0 ? Math.min(1, Math.max(0, along / box.width)) : 0;
+	};
+
+	const scrubTo = (fraction) => {
+		if (isRepeating(list)) {
+			const { origin, period } = getRepeatGeometry(list);
+
+			placeRepeating(list, origin + fraction * period, period);
+
+			return;
+		}
+
+		scrollListTo(
+			list,
+			fraction * (list.scrollWidth - list.clientWidth),
+			'instant'
+		);
+	};
+
+	// Let go on a slide rather than between two: mandatory snapping does it
+	// for a plain carousel as soon as it is given back, and a repeating one is
+	// walked to the nearest slide the way an arrow walks it.
+	const land = (fraction) => {
+		freeSnap();
+
+		if (!isRepeating(list)) {
+			return;
+		}
+
+		const total = list.querySelectorAll(ITEM_SELECTOR).length;
+
+		goToRepeatingSlide(list, Math.round(fraction * total) % total || 0, 0);
+	};
+
+	const onMove = (event) => {
+		if (dragging) {
+			scrubTo(getFraction(dragging, event.clientX));
+		}
+	};
+
+	const onUp = (event) => {
+		if (!dragging) {
+			return;
+		}
+
+		const fraction = getFraction(dragging, event.clientX);
+
+		dragging = null;
+		window.removeEventListener('pointermove', onMove);
+		window.removeEventListener('pointerup', onUp);
+		window.removeEventListener('pointercancel', onUp);
+		land(fraction);
+	};
+
+	const onDown = (event) => {
+		// A drag takes over from a step the module is still drawing.
+		stopTravel(list);
+
+		dragging = event.currentTarget;
+		holdSnap();
+		scrubTo(getFraction(dragging, event.clientX));
+
+		window.addEventListener('pointermove', onMove);
+		window.addEventListener('pointerup', onUp);
+		window.addEventListener('pointercancel', onUp);
+	};
+
+	const onKey = (event) => {
+		const rtl = isRtl(list);
+		const total = list.querySelectorAll(ITEM_SELECTOR).length;
+		const back = rtl ? 'ArrowRight' : 'ArrowLeft';
+		const on = rtl ? 'ArrowLeft' : 'ArrowRight';
+
+		switch (event.key) {
+			case back:
+			case 'ArrowDown':
+			case 'PageDown':
+				slide(list, -1);
+				break;
+			case on:
+			case 'ArrowUp':
+			case 'PageUp':
+				slide(list, 1);
+				break;
+			case 'Home':
+				goToSlide(list, 0);
+				break;
+			case 'End':
+				goToSlide(list, total - 1);
+				break;
+			default:
+				return;
+		}
+
+		// The page scrolls on the arrow keys and jumps on Home, and a bar that
+		// answered them would have done both at once.
+		event.preventDefault();
+	};
+
+	bars.forEach((bar) => {
+		bar.addEventListener('pointerdown', onDown);
+		bar.addEventListener('keydown', onKey);
+	});
+
+	return () => {
+		bars.forEach((bar) => {
+			bar.removeEventListener('pointerdown', onDown);
+			bar.removeEventListener('keydown', onKey);
+		});
+		window.removeEventListener('pointermove', onMove);
+		window.removeEventListener('pointerup', onUp);
+		window.removeEventListener('pointercancel', onUp);
+		freeSnap();
+	};
+}
+
+/**
  * Run a carousel on its own.
  *
  * The delay is drawn onto the indicator as it runs down, so the dot doubles as
@@ -1817,11 +2010,13 @@ function initCarousel(list) {
 	}
 
 	const stopAutoplay = initAutoplay(list);
+	const stopScrub = initScrub(list);
 	const stopMarking = repeats ? markMovedRound(list) : noop;
 
 	return () => {
 		stopMarking();
 		stopAutoplay();
+		stopScrub();
 		stopColumns();
 		sleepControls();
 		list.removeEventListener('scroll', onScroll);

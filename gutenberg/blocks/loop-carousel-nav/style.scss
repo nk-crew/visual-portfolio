@@ -320,12 +320,38 @@
 	opacity: 0.7;
 }
 .vp-block-loop-carousel-indicator--progress {
+	position: relative;
 	width: min(180px, 60%);
 	height: 4px;
 	overflow: hidden;
+	cursor: grab;
 	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
 	border-radius: 2px;
+
+	&:active {
+		cursor: grabbing;
+	}
+
+	// Four pixels is not something a finger can take hold of. The bar keeps
+	// its own height and is given a target twenty four pixels tall around it,
+	// which is what a pointer has to be able to reach.
+	&::before {
+		position: absolute;
+		inset-block: -10px;
+		inset-inline: 0;
+		content: "";
+	}
+
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 4px;
+	}
 }
+
 
 .vp-block-loop-carousel-progress-value {
 	display: block;

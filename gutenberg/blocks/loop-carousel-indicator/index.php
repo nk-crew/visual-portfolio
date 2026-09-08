@@ -66,6 +66,15 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 			);
 		}
 
+		// A bar that can be dragged is a slider and not a progress bar: ARIA
+		// gives `progressbar` no way to set a value, so nothing would offer a
+		// visitor the arrow keys it answers to. `aria-valuenow` stays the
+		// percentage it has always been, and the slide it means is spelled out
+		// beside it by the module.
+		//
+		// Focusable without a script running is safe: every control is
+		// rendered switched off, and a control that is `display: none` cannot
+		// take focus.
 		if ( 'progress' === $indicator ) {
 			return sprintf(
 				'<div %1$s><span class="vp-block-loop-carousel-progress-value"></span></div>',
@@ -73,8 +82,15 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 					Visual_Portfolio_Block_Loop_Carousel_Nav::indicator_classes( 'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--progress', $attributes ),
 					'indicator',
 					array(
-						'role'       => 'progressbar',
-						'aria-label' => __( 'Carousel position', 'visual-portfolio' ),
+						'role'                   => 'slider',
+						'tabindex'               => '0',
+						'aria-label'             => __( 'Carousel position', 'visual-portfolio' ),
+						'aria-orientation'       => 'horizontal',
+						'aria-valuemin'          => '0',
+						'aria-valuemax'          => '100',
+						'aria-valuenow'          => '0',
+						/* translators: 1: slide number, 2: number of slides. */
+						'data-vp-position-label' => __( 'Slide %1$d of %2$d', 'visual-portfolio' ),
 					)
 				)
 			);

@@ -699,6 +699,70 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 	});
 
+	test('the progress bar can be dragged and steered by the keyboard', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel scrub',
+			blockId: 'e2e-carousel-scrub',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: [['loop-carousel-indicator', { indicator: 'progress' }]],
+		});
+
+		const list = page.locator(LIST);
+		const bar = page.locator('.vp-block-loop-carousel-indicator--progress');
+		const position = () => list.evaluate((node) => node.scrollLeft);
+
+		// A bar that can be taken hold of is a slider and not a progress bar:
+		// nothing would offer a visitor the arrow keys of a progress bar.
+		await expect(bar).toHaveAttribute('role', 'slider');
+		await expect(bar).toHaveAttribute('tabindex', '0');
+		await expect(bar).toHaveAttribute(
+			'aria-valuetext',
+			`Slide 1 of ${IMAGES_COUNT}`
+		);
+
+		// Dragged to the far end, the carousel goes with it.
+		const box = await bar.boundingBox();
+
+		await page.mouse.move(box.x + 4, box.y + box.height / 2);
+		await page.mouse.down();
+		await page.mouse.move(box.x + box.width - 2, box.y + box.height / 2, {
+			steps: 8,
+		});
+		await page.mouse.up();
+
+		await expect.poll(position, { timeout: 10000 }).toBeGreaterThan(0);
+
+		// Let go, the carousel rests on a slide rather than between two.
+		await expect
+			.poll(
+				() =>
+					list.evaluate((node) => {
+						const items = node.children;
+						const step = items[1].offsetLeft - items[0].offsetLeft;
+
+						return Math.abs(node.scrollLeft % step) < 2;
+					}),
+				{ timeout: 10000 }
+			)
+			.toBe(true);
+
+		// And the keyboard steps it, which is the whole point of the role.
+		await page.keyboard.press('Home');
+		await expect.poll(position, { timeout: 10000 }).toBe(0);
+
+		await bar.focus();
+		await page.keyboard.press('ArrowRight');
+		await expect.poll(position, { timeout: 10000 }).toBeGreaterThan(0);
+	});
+
 	test('a carousel that moves on its own can be stopped', async ({
 		page,
 		requestUtils,

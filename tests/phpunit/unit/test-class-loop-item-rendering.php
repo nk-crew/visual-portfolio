@@ -329,6 +329,34 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The progress bar can be dragged, so it is a slider and not a progress
+	 * bar: ARIA gives `progressbar` no way to set a value, and nothing would
+	 * offer a visitor the arrow keys it answers to.
+	 *
+	 * @return void
+	 */
+	public function test_the_progress_bar_is_a_slider() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-indicator {"indicator":"progress"} /-->'
+		);
+
+		$this->assertStringContainsString( 'role="slider"', $output );
+		$this->assertStringNotContainsString( 'role="progressbar"', $output );
+		$this->assertStringContainsString( 'aria-orientation="horizontal"', $output );
+		$this->assertStringContainsString( 'aria-valuemin="0"', $output );
+		$this->assertStringContainsString( 'aria-valuemax="100"', $output );
+		$this->assertStringContainsString( 'data-vp-position-label', $output );
+
+		// Focusable without a script running is safe: every control is
+		// rendered switched off, and a control that is not drawn cannot take
+		// focus.
+		$this->assertStringContainsString( 'tabindex="0"', $output );
+		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
+	}
+
+	/**
 	 * The play and pause button carries both of its names on the markup, so
 	 * the module needs no translations of its own, and is rendered as though
 	 * the carousel were running.
