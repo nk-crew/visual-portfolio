@@ -12,6 +12,7 @@
 .vp-block-loop-carousel-previous.vp-carousel-control-idle,
 .vp-block-loop-carousel-next.vp-carousel-control-idle,
 .vp-block-loop-carousel-autoplay.vp-carousel-control-idle,
+.vp-block-loop-carousel-thumbnails.vp-carousel-control-idle,
 .vp-block-loop-carousel-indicator.vp-carousel-control-idle {
 	display: none;
 }
@@ -303,6 +304,78 @@
 	transition: none;
 }
 
+// A strip of small pictures, one per slide, that the carousel can be steered
+// by. It scrolls on its own - a gallery of forty has more thumbnails than a
+// row can hold - and the module brings the one on screen into the middle of it.
+.vp-block-loop-carousel-thumbnails {
+	display: flex;
+	gap: var(--vp-carousel-thumb-gap, 8px);
+	overflow-x: auto;
+	scrollbar-width: none;
+	scroll-behavior: smooth;
+	overscroll-behavior-x: contain;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.vp-block-loop-carousel-thumb {
+	flex: none;
+	width: calc(var(--vp-carousel-thumb-height, 72px) * var(--vp-carousel-thumb-ratio, 1));
+	height: var(--vp-carousel-thumb-height, 72px);
+	padding: 0;
+	overflow: hidden;
+	cursor: pointer;
+	background: none;
+	border: 0;
+	border-radius: 4px;
+	// The one on screen is told apart by a ring rather than by a size: a strip
+	// whose boxes changed size would reflow every time the carousel moved.
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+	opacity: var(--vp-carousel-thumb-opacity, 1);
+	transition: opacity 0.2s ease, outline-color 0.2s ease;
+
+	img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	// An item with no picture keeps its place in the strip, so that pressing a
+	// thumbnail always reaches the slide beside it.
+	&:empty,
+	&.is-placeholder {
+		background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+	}
+
+	&[aria-current="true"] {
+		outline-color: currentcolor;
+		opacity: 1;
+	}
+
+	&:focus {
+		outline-color: currentcolor;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
+}
+
+// Dimmed: everything but the slide on screen steps back, which reads better
+// under a large picture than a ring does.
+.vp-block-loop-carousel-thumbnails.is-style-dimmed {
+	--vp-carousel-thumb-opacity: 0.45;
+
+	.vp-block-loop-carousel-thumb[aria-current="true"] {
+		outline-color: transparent;
+	}
+}
+
 // The slide on screen and how many there are. Tabular figures so that the
 // number does not jump about as it counts past nine, and the pair sized as one
 // so a theme can set it in the type of the gallery around it.
@@ -430,7 +503,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 	}
 }
 
-@include over-the-slides((".vp-block-loop-carousel-nav", ".vp-block-loop-carousel-previous", ".vp-block-loop-carousel-next", ".vp-block-loop-carousel-autoplay", ".vp-block-loop-carousel-indicator")) {
+@include over-the-slides((".vp-block-loop-carousel-nav", ".vp-block-loop-carousel-previous", ".vp-block-loop-carousel-next", ".vp-block-loop-carousel-autoplay", ".vp-block-loop-carousel-indicator", ".vp-block-loop-carousel-thumbnails")) {
 	--vp-carousel-track: rgba(255, 255, 255, 0.4);
 
 	position: absolute;
@@ -500,6 +573,11 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 
 @include over-the-slides((".vp-block-loop-carousel-next",)) {
 	inset-inline-end: 12px;
+}
+
+@include over-the-slides((".vp-block-loop-carousel-thumbnails",)) {
+	inset-inline: 12px;
+	bottom: 12px;
 }
 
 @include over-the-slides((".vp-block-loop-carousel-autoplay",)) {

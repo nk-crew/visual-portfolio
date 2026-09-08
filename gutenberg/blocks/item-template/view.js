@@ -195,6 +195,8 @@ const AUTOPLAY_SELECTOR = '[data-vp-carousel-control="autoplay"]';
 // `!important` layer answers to, and the class is for the carousel on a touch
 // screen, which never loads Blossom at all.
 const SCRUBBING_CLASS = 'vp-carousel-is-scrubbing';
+const THUMBS_SELECTOR = '.vp-block-loop-carousel-thumbnails';
+const THUMB_SELECTOR = '.vp-block-loop-carousel-thumb';
 const STOPPED_CLASS = 'vp-carousel-is-stopped';
 const COUNTER_SELECTOR = '.vp-block-loop-carousel-indicator--counter';
 const COUNTER_CURRENT_SELECTOR = '.vp-block-loop-carousel-counter-current';
@@ -1106,6 +1108,10 @@ function syncIndicators(list, root = getControlsRoot(list)) {
 		slideDotWindow(container, current);
 	});
 
+	root.querySelectorAll(THUMBS_SELECTOR).forEach((strip) => {
+		showThumb(strip, current);
+	});
+
 	// Counted from one, the way a visitor counts. A carousel that repeats is
 	// already counted round its seam by `getCurrentSlide`.
 	root.querySelectorAll(COUNTER_SELECTOR).forEach((counter) => {
@@ -1220,6 +1226,36 @@ function fillDots(container, items) {
 		dot.innerHTML = `<span class="${DOT_PROGRESS_CLASS}"></span>`;
 		container.appendChild(dot);
 	}
+}
+
+/**
+ * Bring the thumbnail of the slide on screen into view inside its strip.
+ *
+ * The strip scrolls itself rather than the page: `scrollIntoView` walks every
+ * scrollable ancestor, and the page must not move under a lightbox that is
+ * showing the same item - the same reason the carousel is scrolled by position
+ * and not by slide.
+ *
+ * @param {HTMLElement} strip   Row of thumbnails.
+ * @param {number}      current Slide the carousel is showing.
+ */
+function showThumb(strip, current) {
+	if (dotWindows.get(strip) === current) {
+		return;
+	}
+
+	dotWindows.set(strip, current);
+
+	const thumb = strip.querySelectorAll(THUMB_SELECTOR)[current];
+
+	if (!thumb || strip.scrollWidth <= strip.clientWidth) {
+		return;
+	}
+
+	strip.scrollTo({
+		left: thumb.offsetLeft - (strip.clientWidth - thumb.offsetWidth) / 2,
+		behavior: getScrollBehavior(),
+	});
 }
 
 /**

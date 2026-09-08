@@ -1,0 +1,60 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-carousel-thumbnails",
+	"title": "Carousel Thumbnails (Experimental)",
+	"category": "media",
+	"description": "A strip of small pictures a carousel gallery can be steered by. Block is experimental and will change in future releases. Please use with caution.",
+	"keywords": ["carousel", "slider", "thumbnails", "filmstrip"],
+	"ancestor": ["visual-portfolio/loop"],
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/queryId",
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/sourceQuery",
+		"vp/blockId"
+	],
+	"attributes": {
+		"lock": {
+			"type": "object",
+			"default": { "move": false, "remove": true }
+		},
+		"isHidden": { "type": "boolean", "default": false },
+		"sizeSlug": { "type": "string", "default": "thumbnail" },
+		"thumbHeight": { "type": "number", "default": 72 },
+		"aspectRatio": { "type": "string", "default": "1" },
+		"showOnHover": { "type": "boolean", "default": false }
+	},
+	"supports": {
+		"html": false,
+		"className": true,
+		"anchor": true,
+		"reusable": false,
+		"align": ["wide", "full"],
+		"color": {
+			"text": true,
+			"background": false,
+			"gradients": false,
+			"__experimentalDefaultControls": { "text": true }
+		},
+		"spacing": {
+			"blockGap": ["horizontal"],
+			"margin": true,
+			"__experimentalDefaultControls": { "blockGap": true }
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"__experimentalDefaultControls": { "radius": true }
+		}
+	},
+	"styles": [
+		{ "name": "default", "label": "Plain", "isDefault": true },
+		{ "name": "dimmed", "label": "Dimmed" }
+	],
+	"selectors": { "root": ".vp-block-loop-carousel-thumbnails" },
+	"style": "visual-portfolio-block-loop-carousel",
+	"editorStyle": "visual-portfolio-block-loop-carousel-editor"
+}

@@ -329,6 +329,35 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The thumbnails are a strip of buttons naming a slide each, in the order
+	 * the slides are in - an item with no picture keeps its place, or every
+	 * press after it would reach the wrong slide.
+	 *
+	 * @return void
+	 */
+	public function test_the_thumbnails_name_every_slide_in_order() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-thumbnails /-->'
+		);
+
+		// Five items, five thumbnails, numbered from zero.
+		$this->assertSame( 5, substr_count( $output, 'vp-block-loop-carousel-thumb"' ) );
+
+		foreach ( range( 0, 4 ) as $index ) {
+			$this->assertStringContainsString( 'data-vp-slide="' . $index . '"', $output );
+		}
+
+		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselGoTo"', $output );
+		$this->assertStringContainsString( '--vp-carousel-thumb-height:72px', $output );
+
+		// Switched off until a carousel is running under it, like every other
+		// control.
+		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
+	}
+
+	/**
 	 * The progress bar can be dragged, so it is a slider and not a progress
 	 * bar: ARIA gives `progressbar` no way to set a value, and nothing would
 	 * offer a visitor the arrow keys it answers to.

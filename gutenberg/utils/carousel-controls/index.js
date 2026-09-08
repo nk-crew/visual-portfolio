@@ -22,12 +22,14 @@ export const PREVIOUS_BLOCK = 'visual-portfolio/loop-carousel-previous';
 export const NEXT_BLOCK = 'visual-portfolio/loop-carousel-next';
 export const INDICATOR_BLOCK = 'visual-portfolio/loop-carousel-indicator';
 export const AUTOPLAY_BLOCK = 'visual-portfolio/loop-carousel-autoplay';
+export const THUMBNAILS_BLOCK = 'visual-portfolio/loop-carousel-thumbnails';
 export const ARROW_BLOCKS = [PREVIOUS_BLOCK, NEXT_BLOCK];
 export const CONTROL_BLOCKS = [
 	NAV_BLOCK,
 	...ARROW_BLOCKS,
 	INDICATOR_BLOCK,
 	AUTOPLAY_BLOCK,
+	THUMBNAILS_BLOCK,
 ];
 
 /**

@@ -699,6 +699,49 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 	});
 
+	test('a carousel can be steered by its thumbnails', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel thumbnails',
+			blockId: 'e2e-carousel-thumbnails',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: ['loop-carousel-next', 'loop-carousel-thumbnails'],
+		});
+
+		const list = page.locator(LIST);
+		const thumbs = page.locator('.vp-block-loop-carousel-thumb');
+		const current = () =>
+			thumbs.evaluateAll((nodes) =>
+				nodes.findIndex(
+					(thumb) => 'true' === thumb.getAttribute('aria-current')
+				)
+			);
+
+		// One per slide, in the order the slides are in.
+		await expect(thumbs).toHaveCount(IMAGES_COUNT);
+		await expect.poll(current, { timeout: 10000 }).toBe(0);
+
+		// A press on a thumbnail takes the carousel to its slide.
+		await thumbs.nth(3).click();
+		await expect.poll(current, { timeout: 10000 }).toBe(3);
+		await expect
+			.poll(() => list.evaluate((node) => node.scrollLeft), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(0);
+
+		// And the carousel moved by its arrow lights the thumbnail it lands on.
+		await page.locator(NEXT_ARROW).click();
+		await expect.poll(current, { timeout: 10000 }).toBe(4);
+	});
+
 	test('the progress bar can be dragged and steered by the keyboard', async ({
 		page,
 		requestUtils,

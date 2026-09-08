@@ -185,6 +185,7 @@ class Visual_Portfolio_Block_Item_Template {
 		'visual-portfolio/loop-carousel-next',
 		'visual-portfolio/loop-carousel-indicator',
 		'visual-portfolio/loop-carousel-autoplay',
+		'visual-portfolio/loop-carousel-thumbnails',
 	);
 
 	/**
