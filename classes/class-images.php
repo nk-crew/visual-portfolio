@@ -330,8 +330,10 @@ class Visual_Portfolio_Images {
 				if ( isset( $attributes[ $attr_name ] ) && $attr_value === $attributes[ $attr_name ] ) {
 					return true;
 				}
-			} elseif ( isset( $attributes[ $attr ] ) ) {
-				// Handle attribute name only (backward compatibility).
+			} elseif ( array_key_exists( $attr, $attributes ) ) {
+				// Handle attribute name only (backward compatibility). Skip markers are usually
+				// written without a value, `<img data-skip-lazy>`, and those carry `null`, which
+				// isset() reports as absent.
 				return true;
 			}
 		}
@@ -475,7 +477,7 @@ class Visual_Portfolio_Images {
 			$attributes['src'] = $placeholder;
 		}
 
-		if ( isset( $attributes['sizes'] ) ) {
+		if ( array_key_exists( 'sizes', $attributes ) ) {
 			unset( $attributes['sizes'] );
 		}
 
@@ -585,7 +587,11 @@ class Visual_Portfolio_Images {
 		$flattened_attributes = array();
 
 		foreach ( $attributes as $name => $attribute ) {
-			$flattened_attributes[ $name ] = $attribute['value'];
+			// `null` stands for an attribute written without a value, such as `<img srcset>`.
+			// An empty string stands for an attribute whose value is empty, such as `alt=""`,
+			// and the two have to stay apart: printing `alt=""` back as a bare `alt` is what
+			// makes crawlers report the image as having no alt text at all.
+			$flattened_attributes[ $name ] = 'y' === $attribute['vless'] ? null : $attribute['value'];
 		}
 
 		return $flattened_attributes;
@@ -594,7 +600,8 @@ class Visual_Portfolio_Images {
 	/**
 	 * Build attributes string.
 	 *
-	 * @param array $attributes Attributes.
+	 * @param array $attributes Attributes. A `null` value prints the attribute name on its own,
+	 *                          an empty string prints it as `name=""`.
 	 *
 	 * @return string
 	 */
@@ -602,7 +609,7 @@ class Visual_Portfolio_Images {
 		$string = array();
 
 		foreach ( $attributes as $name => $value ) {
-			if ( '' === $value ) {
+			if ( null === $value ) {
 				$string[] = sprintf( '%s', $name );
 			} else {
 				$string[] = sprintf( '%s="%s"', $name, esc_attr( $value ) );
