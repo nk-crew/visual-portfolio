@@ -480,13 +480,13 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A carousel that repeats loads its last image up front: the last slide
-	 * is shown before the first, moved there by a transform, where nothing
+	 * A carousel that repeats loads the slides at its seam up front: they are
+	 * shown before the first slide, moved there by a transform, where nothing
 	 * that loads an image on sight looks. The rest load as they always did.
 	 *
 	 * @return void
 	 */
-	public function test_a_repeating_carousel_loads_its_last_image_up_front() {
+	public function test_a_repeating_carousel_loads_the_slides_at_its_seam_up_front() {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array(
@@ -495,14 +495,60 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			)
 		);
 
-		// The first row of three, and the last one. The image between them
-		// is left to load on sight.
-		$this->assertSame( 4, substr_count( $output, 'loading="eager"' ) );
-		$this->assertSame( 1, substr_count( $output, 'data-skip-lazy' ) );
+		// Three across, so the seam holds three slides: half a screenful and
+		// one more. With five images that is the last three, plus the two of
+		// the first row that are not among them.
+		$this->assertSame( 5, substr_count( $output, 'loading="eager"' ) );
+		$this->assertSame( 3, substr_count( $output, 'data-skip-lazy' ) );
 
-		$last = strrpos( $output, 'wp-block-visual-portfolio-item-template__item' );
+		// The seam is at the end of the list, so the first slide is never one
+		// of them - it is the one the others are drawn in front of.
+		$first = strpos( $output, 'wp-block-visual-portfolio-item-template__item' );
+		$second = strpos( $output, 'wp-block-visual-portfolio-item-template__item', $first + 1 );
 
-		$this->assertGreaterThan( $last, strpos( $output, 'data-skip-lazy' ) );
+		$this->assertGreaterThan( $second, strpos( $output, 'data-skip-lazy' ) );
+	}
+
+	/**
+	 * The seam is sized by the frame and not by the gallery, so a long
+	 * carousel does not load every image it has.
+	 *
+	 * @return void
+	 */
+	public function test_the_seam_is_sized_by_the_frame_rather_than_the_gallery() {
+		$narrow = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 1,
+				'carouselRepeat'    => true,
+			)
+		);
+
+		// One slide across: the seam is the last two.
+		$this->assertSame( 2, substr_count( $narrow, 'data-skip-lazy' ) );
+
+		$wide = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 6,
+				'carouselRepeat'    => true,
+			)
+		);
+
+		// Six across, so four - and never more than there are images.
+		$this->assertSame( 4, substr_count( $wide, 'data-skip-lazy' ) );
+
+		// A carousel that does not repeat has no seam at all.
+		$plain = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' )
+		);
+
+		$this->assertStringNotContainsString( 'data-skip-lazy', $plain );
 	}
 
 	/**

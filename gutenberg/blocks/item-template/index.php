@@ -470,6 +470,39 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * How many slides of a repeating carousel sit at its seam.
+	 *
+	 * The loop is carried by moving trailing slides round to the front, and
+	 * the library moves as many of them as it takes to cover the padding it
+	 * rests behind - half the width of the list, which is roughly half a
+	 * screenful of slides and one more. Those are the slides drawn before the
+	 * first one, where nothing that loads an image on sight will look.
+	 *
+	 * Sized by the frame rather than by the gallery, so forty slides at four
+	 * across warm three images and not forty.
+	 *
+	 * @param array $attributes - block attributes.
+	 * @param int   $columns    - slides across the frame.
+	 * @param int   $total      - slides in the gallery.
+	 *
+	 * @return int Slides at the end of the list to load up front.
+	 */
+	private function get_seam_size( $attributes, $columns, $total ) {
+		// Two answers the server cannot work out: auto columns with no maximum
+		// come back as one column, and slides of their own width have no count
+		// at all. Three across is the shape of the default gallery, and it is
+		// the honest guess for both.
+		if (
+			! empty( $attributes['carouselAutoWidth'] ) ||
+			( 'auto' === ( $attributes['layoutColumnsMode'] ?? 'auto' ) && empty( $attributes['layoutColumnCount'] ) )
+		) {
+			$columns = 3;
+		}
+
+		return max( 1, min( $total, (int) ceil( $columns / 2 ) + 1 ) );
+	}
+
+	/**
 	 * Loading attributes the image of an item should carry.
 	 *
 	 * The first row is above the fold whatever the page around it looks like, so
@@ -506,10 +539,10 @@ class Visual_Portfolio_Block_Item_Template {
 			);
 		}
 
-		// A carousel that repeats shows its last slide before its first,
+		// A carousel that repeats shows its last slides before its first,
 		// moved there by a transform - which is where nothing that loads an
-		// image on sight looks. That one is loaded up front, and kept from
-		// the plugin's own lazy loading.
+		// image on sight looks. Those are loaded up front, and kept from the
+		// plugin's own lazy loading.
 		if ( $up_front ) {
 			return array(
 				'loading'        => 'eager',
@@ -863,6 +896,7 @@ class Visual_Portfolio_Block_Item_Template {
 		$first_row = $this->get_layout_columns( $attributes, $layout_type );
 		$repeats   = 'carousel' === $layout_type && ! empty( $attributes['carouselRepeat'] );
 		$last      = count( $items ) - 1;
+		$warm      = $repeats ? $this->get_seam_size( $attributes, $first_row, count( $items ) ) : 0;
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
 
@@ -879,7 +913,7 @@ class Visual_Portfolio_Block_Item_Template {
 		foreach ( $items as $item ) {
 			$item_context = array_merge(
 				self::map_item_to_context( $item, $result['options'], 'vp/', $with_popup ),
-				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row, $repeats && $index === $last ) )
+				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row, $warm && $index > $last - $warm ) )
 			);
 
 			++$index;
