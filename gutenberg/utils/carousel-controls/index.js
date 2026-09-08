@@ -21,8 +21,14 @@ export const NAV_BLOCK = 'visual-portfolio/loop-carousel-nav';
 export const PREVIOUS_BLOCK = 'visual-portfolio/loop-carousel-previous';
 export const NEXT_BLOCK = 'visual-portfolio/loop-carousel-next';
 export const INDICATOR_BLOCK = 'visual-portfolio/loop-carousel-indicator';
+export const AUTOPLAY_BLOCK = 'visual-portfolio/loop-carousel-autoplay';
 export const ARROW_BLOCKS = [PREVIOUS_BLOCK, NEXT_BLOCK];
-export const CONTROL_BLOCKS = [NAV_BLOCK, ...ARROW_BLOCKS, INDICATOR_BLOCK];
+export const CONTROL_BLOCKS = [
+	NAV_BLOCK,
+	...ARROW_BLOCKS,
+	INDICATOR_BLOCK,
+	AUTOPLAY_BLOCK,
+];
 
 /**
  * The class a control fades behind until the pointer rests on the carousel.
@@ -33,6 +39,13 @@ export const SHOW_ON_HOVER_CLASS = 'is-shown-on-hover';
 export const ARROW_ICONS = [
 	{ value: 'chevron', label: __('Chevron', 'visual-portfolio') },
 	{ value: 'arrow', label: __('Arrow', 'visual-portfolio') },
+];
+
+// What the button that stops a carousel is drawn as while it is running: a
+// pause by default, and a square for a gallery that reads better with one.
+export const AUTOPLAY_ICONS = [
+	{ value: 'play-pause', label: __('Pause', 'visual-portfolio') },
+	{ value: 'play-stop', label: __('Stop', 'visual-portfolio') },
 ];
 
 // How an arrow button is drawn, and the box an indicator sits in, are block
@@ -66,6 +79,23 @@ export function arrowClassNames({ icon, showOnHover }) {
  */
 export function indicatorClassNames({ showOnHover }) {
 	return showOnHover ? SHOW_ON_HOVER_CLASS : '';
+}
+
+/**
+ * The classes the play and pause button carries for its settings.
+ *
+ * @param {Object} attributes - block attributes.
+ *
+ * @return {string} class names, possibly empty.
+ */
+export function autoplayClassNames({ icon, showProgress, showOnHover }) {
+	return [
+		'play-stop' === icon ? 'has-stop-icon' : '',
+		showProgress ? 'has-progress' : '',
+		showOnHover ? SHOW_ON_HOVER_CLASS : '',
+	]
+		.filter(Boolean)
+		.join(' ');
 }
 
 /**

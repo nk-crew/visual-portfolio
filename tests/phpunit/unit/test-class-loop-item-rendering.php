@@ -329,6 +329,56 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The play and pause button carries both of its names on the markup, so
+	 * the module needs no translations of its own, and is rendered as though
+	 * the carousel were running.
+	 *
+	 * @return void
+	 */
+	public function test_the_play_and_pause_button_carries_both_of_its_names() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'       => 'carousel',
+				'carouselAutoplay' => true,
+			),
+			'<!-- wp:visual-portfolio/loop-carousel-autoplay /-->'
+		);
+
+		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselAutoplayToggle"', $output );
+		$this->assertStringContainsString( 'data-vp-play-label', $output );
+		$this->assertStringContainsString( 'data-vp-pause-label', $output );
+		$this->assertStringContainsString( 'aria-pressed="false"', $output );
+
+		// Switched off until a carousel is running under it, like every other
+		// control - and a carousel with no autoplay never wakes this one.
+		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
+
+		// The wait is drawn round the button by default.
+		$this->assertStringContainsString( 'has-progress', $output );
+	}
+
+	/**
+	 * The settings of the button become classes, the way an arrow's do.
+	 *
+	 * @return void
+	 */
+	public function test_the_play_and_pause_button_settings_become_classes() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'       => 'carousel',
+				'carouselAutoplay' => true,
+			),
+			'<!-- wp:visual-portfolio/loop-carousel-autoplay {"icon":"play-stop","showProgress":false,"showOnHover":true} /-->'
+		);
+
+		$this->assertStringContainsString( 'has-stop-icon', $output );
+		$this->assertStringContainsString( 'is-shown-on-hover', $output );
+		$this->assertStringNotContainsString( 'has-progress', $output );
+	}
+
+	/**
 	 * The counter is rendered as an empty pair of numbers, and out of the
 	 * reach of a screen reader: the arrows and the dots already say where the
 	 * carousel is.

@@ -11,6 +11,7 @@
 .vp-block-loop-carousel-nav.vp-carousel-control-idle,
 .vp-block-loop-carousel-previous.vp-carousel-control-idle,
 .vp-block-loop-carousel-next.vp-carousel-control-idle,
+.vp-block-loop-carousel-autoplay.vp-carousel-control-idle,
 .vp-block-loop-carousel-indicator.vp-carousel-control-idle {
 	display: none;
 }
@@ -19,7 +20,8 @@
 // rules, and everything inside it is a block of its own.
 
 .vp-block-loop-carousel-previous,
-.vp-block-loop-carousel-next {
+.vp-block-loop-carousel-next,
+.vp-block-loop-carousel-autoplay {
 	display: inline-flex;
 	flex: none;
 	align-items: center;
@@ -140,6 +142,61 @@
 .vp-block-loop-carousel-next.has-arrow-icon > span {
 	margin-right: 0;
 	margin-left: 0.18em;
+}
+
+// The play and pause button borrows the box of an arrow and draws its own
+// glyph: two bars while the carousel is running, a triangle once it has been
+// stopped. Drawn with borders for the same reason the chevron is.
+.vp-block-loop-carousel-autoplay {
+	position: relative;
+
+	> span {
+		box-sizing: border-box;
+		width: 0.55em;
+		height: 0.62em;
+		border: 0 solid currentcolor;
+		border-right-width: 0.17em;
+		border-left-width: 0.17em;
+	}
+
+	// A square for a gallery that reads better with one.
+	&.has-stop-icon > span {
+		width: 0.55em;
+		height: 0.55em;
+		background-color: currentcolor;
+		border: 0;
+	}
+}
+
+// Stopped: the button offers the way back, so it becomes a play triangle
+// whichever glyph it was drawn with.
+.vp-carousel-is-stopped .vp-block-loop-carousel-autoplay > span {
+	width: 0;
+	height: 0;
+	margin-left: 0.12em;
+	background-color: transparent;
+	border: 0.31em solid transparent;
+	border-right-width: 0;
+	border-left: 0.5em solid currentcolor;
+}
+
+// The wait drawn round the button as it runs down, from the same custom
+// property the dot of the slide on screen fills itself with. No transition:
+// it is rewritten every frame, and a transition would leave the ring a frame
+// behind for the whole of the delay.
+.vp-block-loop-carousel-autoplay.has-progress::after {
+	position: absolute;
+	inset: -2px;
+	content: "";
+	background: conic-gradient(currentcolor var(--vp-carousel-autoplay-progress, 0%), transparent 0);
+	border-radius: 50%;
+	mask: radial-gradient(closest-side, transparent 82%, #000 83%);
+	transition: none;
+}
+
+// Nothing is running down while the carousel is stopped, so the ring goes.
+.vp-carousel-is-stopped .vp-block-loop-carousel-autoplay.has-progress::after {
+	content: none;
 }
 
 .vp-block-loop-carousel-indicator {
@@ -347,7 +404,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 	}
 }
 
-@include over-the-slides((".vp-block-loop-carousel-nav", ".vp-block-loop-carousel-previous", ".vp-block-loop-carousel-next", ".vp-block-loop-carousel-indicator")) {
+@include over-the-slides((".vp-block-loop-carousel-nav", ".vp-block-loop-carousel-previous", ".vp-block-loop-carousel-next", ".vp-block-loop-carousel-autoplay", ".vp-block-loop-carousel-indicator")) {
 	--vp-carousel-track: rgba(255, 255, 255, 0.4);
 
 	position: absolute;
@@ -394,6 +451,14 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		align-self: flex-end;
 		margin-bottom: 12px;
 	}
+
+	// The button that stops the carousel sits in the corner, out of the way of
+	// the arrows and of whatever the pictures are of.
+	.vp-block-loop-carousel-autoplay {
+		position: absolute;
+		top: 12px;
+		inset-inline-end: 12px;
+	}
 }
 
 // An arrow or an indicator dropped in on its own goes where the row would
@@ -408,6 +473,11 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 }
 
 @include over-the-slides((".vp-block-loop-carousel-next",)) {
+	inset-inline-end: 12px;
+}
+
+@include over-the-slides((".vp-block-loop-carousel-autoplay",)) {
+	top: 12px;
 	inset-inline-end: 12px;
 }
 

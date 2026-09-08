@@ -189,6 +189,8 @@ const DOT_EDGE_CLASS = 'is-edge';
 const DOT_EDGE_FAR_CLASS = 'is-edge-far';
 const DOTS_SHIFT_PROPERTY = '--vp-carousel-dots-shift';
 const PROGRESS_SELECTOR = '.vp-block-loop-carousel-indicator--progress';
+const AUTOPLAY_SELECTOR = '[data-vp-carousel-control="autoplay"]';
+const STOPPED_CLASS = 'vp-carousel-is-stopped';
 const COUNTER_SELECTOR = '.vp-block-loop-carousel-indicator--counter';
 const COUNTER_CURRENT_SELECTOR = '.vp-block-loop-carousel-counter-current';
 const COUNTER_TOTAL_SELECTOR = '.vp-block-loop-carousel-counter-total';
@@ -246,6 +248,11 @@ const carousels = new WeakMap();
 
 // The slide the last press asked for, per carousel.
 const pending = new WeakMap();
+
+// Carousels a visitor has stopped. Kept apart from the hold an outside script
+// asks for - the Pro lightbox holds autoplay while it is open - because
+// releasing that hold must not start a carousel the visitor pressed stop on.
+const stopped = new WeakSet();
 
 // The slide a dot window was last drawn for, per indicator. Sliding the dots
 // under the window is the one thing here that has to measure, so it is done
@@ -1539,7 +1546,7 @@ function initAutoplay(list) {
 
 		last = now;
 
-		if (paused || held || offscreen) {
+		if (paused || held || offscreen || stopped.has(list)) {
 			return;
 		}
 
@@ -1572,7 +1579,19 @@ function initAutoplay(list) {
 		paused = false;
 	};
 	const hold = (event) => {
+		// A visitor pressing stop and a script asking for a hold are two
+		// different things, and they are written down separately: closing a
+		// lightbox releases its own hold and must not start a carousel the
+		// visitor stopped.
+		if ('visitor' === event.detail?.source) {
+			return;
+		}
+
 		held = false === event.detail?.playing;
+	};
+	const stop = () => {
+		elapsed = 0;
+		setProgress(0);
 	};
 	const restart = () => {
 		elapsed = 0;
@@ -1604,7 +1623,9 @@ function initAutoplay(list) {
 	});
 	list.addEventListener('pointerdown', pause);
 	list.addEventListener(AUTOPLAY_EVENT, hold);
+	list.addEventListener(AUTOPLAY_EVENT, stop);
 	list.addEventListener(STEP_EVENT, restart);
+	syncAutoplay(list, root);
 
 	raf = window.requestAnimationFrame((now) => {
 		last = now;
@@ -1623,9 +1644,35 @@ function initAutoplay(list) {
 		});
 		list.removeEventListener('pointerdown', pause);
 		list.removeEventListener(AUTOPLAY_EVENT, hold);
+		list.removeEventListener(AUTOPLAY_EVENT, stop);
 		list.removeEventListener(STEP_EVENT, restart);
 		root.style.removeProperty('--vp-carousel-autoplay-progress');
 	};
+}
+
+/**
+ * Bring the play and pause button in line with the carousel it stops.
+ *
+ * @param {HTMLElement} list Item template list.
+ * @param {HTMLElement} root Box the controls of the carousel are published on.
+ */
+function syncAutoplay(list, root = getControlsRoot(list)) {
+	const playing = !stopped.has(list);
+
+	root.classList.toggle(STOPPED_CLASS, !playing);
+
+	root.querySelectorAll(AUTOPLAY_SELECTOR).forEach((button) => {
+		const label = playing
+			? button.dataset.vpPauseLabel
+			: button.dataset.vpPlayLabel;
+
+		// Pressed is stopped: the button holds the carousel down.
+		button.setAttribute('aria-pressed', playing ? 'false' : 'true');
+
+		if (label) {
+			button.setAttribute('aria-label', label);
+		}
+	});
 }
 
 /**
@@ -1639,8 +1686,13 @@ function initAutoplay(list) {
  *
  * @return {Function} Teardown.
  */
-function wakeControls(list) {
-	const controls = getControls(list);
+function wakeControls(list, hasAutoplay) {
+	// A carousel with no autoplay, and one a visitor asked less motion of,
+	// have nothing for a play and pause button to stop - so it is left
+	// switched off, the way an arrow beside a grid is.
+	const controls = getControls(list).filter(
+		(control) => hasAutoplay || !control.matches(AUTOPLAY_SELECTOR)
+	);
 
 	controls.forEach((control) => {
 		control.classList.remove(IDLE_CLASS);
@@ -1667,7 +1719,13 @@ function initCarousel(list) {
 	// The slide width is a `calc()` over the column count, which auto mode has
 	// to work out from the container.
 	const stopColumns = syncColumns(list, () => syncNav(list));
-	const sleepControls = wakeControls(list);
+
+	// Whether a play and pause button has anything to stop, which is the same
+	// question `initAutoplay` answers by doing nothing at all.
+	const hasAutoplay =
+		!!parseFloat(list.dataset.vpCarouselAutoplay) &&
+		!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const sleepControls = wakeControls(list, hasAutoplay);
 
 	syncDots(list);
 	syncNav(list);
@@ -1844,6 +1902,37 @@ store('visual-portfolio/item-template', {
 			if (list) {
 				slide(list, 1);
 			}
+		},
+
+		/**
+		 * Stop a carousel that moves on its own, or start it again.
+		 *
+		 * The stop of a visitor outranks a hold asked for from outside: a
+		 * lightbox that closes releases its own hold, and must not start a
+		 * carousel somebody pressed stop on.
+		 */
+		carouselAutoplayToggle() {
+			const { ref } = getElement();
+			const list = getListOf(ref);
+
+			if (!list) {
+				return;
+			}
+
+			const playing = stopped.has(list);
+
+			if (playing) {
+				stopped.delete(list);
+			} else {
+				stopped.add(list);
+			}
+
+			syncAutoplay(list);
+			list.dispatchEvent(
+				new window.CustomEvent(AUTOPLAY_EVENT, {
+					detail: { playing, source: 'visitor' },
+				})
+			);
 		},
 
 		/**

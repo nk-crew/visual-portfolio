@@ -699,6 +699,92 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 	});
 
+	test('a carousel that moves on its own can be stopped', async ({
+		page,
+		requestUtils,
+	}) => {
+		// Playwright asks for less motion by default, and a carousel that was
+		// asked for less motion never runs on its own.
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel autoplay stop',
+			blockId: 'e2e-carousel-autoplay-stop',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+				carouselAutoplay: true,
+				carouselAutoplayDelay: 2,
+			},
+			carousel: ['loop-carousel-autoplay'],
+		});
+
+		const list = page.locator(LIST);
+		const button = page.locator('.vp-block-loop-carousel-autoplay');
+		const position = () => list.evaluate((node) => node.scrollLeft);
+
+		// A carousel with autoplay wakes the button, the way a carousel wakes
+		// an arrow.
+		await expect(button).toBeVisible();
+		await expect(button).toHaveAttribute('aria-pressed', 'false');
+
+		// Pressed is stopped: the button holds the carousel down, and says so.
+		await button.click();
+		await expect(button).toHaveAttribute('aria-pressed', 'true');
+
+		// The pointer is off the carousel and a whole delay has passed, and it
+		// has still not moved.
+		await page.mouse.move(0, 0);
+		await page.waitForTimeout(2600);
+		await expect.poll(position, { timeout: 1000 }).toBe(0);
+
+		// A script releasing a hold of its own does not undo it. The Pro
+		// lightbox holds autoplay while it is open and releases it on close,
+		// and a carousel the visitor stopped must stay stopped through that.
+		await list.dispatchEvent('vp-carousel-autoplay', {
+			detail: { playing: true },
+		});
+		await page.waitForTimeout(2600);
+		await expect.poll(position, { timeout: 1000 }).toBe(0);
+		await expect(button).toHaveAttribute('aria-pressed', 'true');
+
+		// And pressing it again lets the carousel run on.
+		await button.click();
+		await expect(button).toHaveAttribute('aria-pressed', 'false');
+		await page.mouse.move(0, 0);
+		await expect.poll(position, { timeout: 10000 }).toBeGreaterThan(0);
+	});
+
+	test('a play and pause button beside a carousel that never runs stays hidden', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel autoplay absent',
+			blockId: 'e2e-carousel-autoplay-absent',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: ['loop-carousel-next', 'loop-carousel-autoplay'],
+		});
+
+		// The arrow wakes, because there is a carousel to move.
+		await expect(page.locator(NEXT_ARROW)).toBeVisible();
+
+		// The button does not: there is no autoplay for it to stop, and a
+		// control that cannot do anything stays out of the way.
+		await expect(
+			page.locator('.vp-block-loop-carousel-autoplay')
+		).toBeHidden();
+	});
+
 	test('an arrow can move a whole frame', async ({ page, requestUtils }) => {
 		await publishLoop(requestUtils, page, {
 			title: 'Layouts - carousel group step',

@@ -14,6 +14,7 @@ import './blocks/loop-carousel-nav';
 import './blocks/loop-carousel-previous';
 import './blocks/loop-carousel-next';
 import './blocks/loop-carousel-indicator';
+import './blocks/loop-carousel-autoplay';
 import './blocks/loop-sort';
 import './blocks/loop-no-results';
 import './blocks/item-template';
