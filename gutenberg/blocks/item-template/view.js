@@ -189,6 +189,9 @@ const DOT_EDGE_CLASS = 'is-edge';
 const DOT_EDGE_FAR_CLASS = 'is-edge-far';
 const DOTS_SHIFT_PROPERTY = '--vp-carousel-dots-shift';
 const PROGRESS_SELECTOR = '.vp-block-loop-carousel-indicator--progress';
+const COUNTER_SELECTOR = '.vp-block-loop-carousel-indicator--counter';
+const COUNTER_CURRENT_SELECTOR = '.vp-block-loop-carousel-counter-current';
+const COUNTER_TOTAL_SELECTOR = '.vp-block-loop-carousel-counter-total';
 
 // Taken off a control once a carousel is running for it to move. The server
 // renders every control with it: they all drive the scroll container through
@@ -1063,6 +1066,7 @@ function getDisplayedSlide(list) {
  */
 function syncIndicators(list, root = getControlsRoot(list)) {
 	const current = getDisplayedSlide(list);
+	const total = list.querySelectorAll(ITEM_SELECTOR).length;
 
 	root.querySelectorAll(SLIDE_TARGET_SELECTOR).forEach((target) => {
 		const index = parseInt(target.dataset.vpSlide, 10);
@@ -1077,12 +1081,35 @@ function syncIndicators(list, root = getControlsRoot(list)) {
 		slideDotWindow(container, current);
 	});
 
+	// Counted from one, the way a visitor counts. A carousel that repeats is
+	// already counted round its seam by `getCurrentSlide`.
+	root.querySelectorAll(COUNTER_SELECTOR).forEach((counter) => {
+		setText(counter, COUNTER_CURRENT_SELECTOR, current + 1);
+		setText(counter, COUNTER_TOTAL_SELECTOR, total);
+	});
+
 	const value = getScrollProgress(list);
 
 	root.querySelectorAll(PROGRESS_SELECTOR).forEach((progress) => {
 		progress.style.setProperty('--vp-carousel-progress', `${value * 100}%`);
 		progress.setAttribute('aria-valuenow', String(Math.round(value * 100)));
 	});
+}
+
+/**
+ * Write a number into one half of a counter, and only when it has changed.
+ *
+ * @param {HTMLElement} counter  Indicator drawn as a counter.
+ * @param {string}      selector Half of it to write.
+ * @param {number}      value    Number to write.
+ */
+function setText(counter, selector, value) {
+	const box = counter.querySelector(selector);
+	const text = String(value);
+
+	if (box && box.textContent !== text) {
+		box.textContent = text;
+	}
 }
 
 /**

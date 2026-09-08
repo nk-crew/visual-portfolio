@@ -329,6 +329,30 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The counter is rendered as an empty pair of numbers, and out of the
+	 * reach of a screen reader: the arrows and the dots already say where the
+	 * carousel is.
+	 *
+	 * @return void
+	 */
+	public function test_a_counter_is_rendered_empty_and_hidden_from_a_reader() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-indicator {"indicator":"counter"} /-->'
+		);
+
+		$this->assertStringContainsString( 'vp-block-loop-carousel-indicator--counter', $output );
+		$this->assertStringContainsString( 'aria-hidden="true"', $output );
+		$this->assertStringContainsString( '<span class="vp-block-loop-carousel-counter-current"></span>', $output );
+		$this->assertStringContainsString( '<span class="vp-block-loop-carousel-counter-total"></span>', $output );
+
+		// Switched off until a carousel is running under it, like every other
+		// control.
+		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
+	}
+
+	/**
 	 * A slide takes the height it was given, and the blocks inside it fill
 	 * that height rather than sitting at the top of it.
 	 *

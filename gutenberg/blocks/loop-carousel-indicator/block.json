@@ -25,7 +25,7 @@
 		"indicator": {
 			"type": "string",
 			"default": "dots",
-			"enum": ["dots", "progress"]
+			"enum": ["dots", "progress", "counter"]
 		},
 		"showOnHover": { "type": "boolean", "default": false },
 		"maxDots": { "type": "number", "default": 0 }

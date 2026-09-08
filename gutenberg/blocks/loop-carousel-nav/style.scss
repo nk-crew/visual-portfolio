@@ -246,6 +246,22 @@
 	transition: none;
 }
 
+// The slide on screen and how many there are. Tabular figures so that the
+// number does not jump about as it counts past nine, and the pair sized as one
+// so a theme can set it in the type of the gallery around it.
+.vp-block-loop-carousel-indicator--counter {
+	gap: 0.35em;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+.vp-block-loop-carousel-counter-separator {
+	opacity: 0.5;
+}
+
+.vp-block-loop-carousel-counter-total {
+	opacity: 0.7;
+}
 .vp-block-loop-carousel-indicator--progress {
 	width: min(180px, 60%);
 	height: 4px;

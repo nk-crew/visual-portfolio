@@ -30,6 +30,10 @@ const PREVIEW_DOTS = 3;
 // and not so far that it reads as a full one.
 const PREVIEW_PROGRESS = 35;
 
+// The pair a counter is drawn with here, for the same reason: the shape of the
+// control, not the number of items the preview happens to hold.
+const PREVIEW_COUNT = 12;
+
 export default function CarouselIndicatorEdit({
 	attributes,
 	setAttributes,
@@ -38,6 +42,8 @@ export default function CarouselIndicatorEdit({
 }) {
 	const { indicator, isHidden, showOnHover, maxDots } = attributes;
 	const isProgress = 'progress' === indicator;
+	const isCounter = 'counter' === indicator;
+	const isDots = !isProgress && !isCounter;
 
 	useLoopOrphanWarning(metadata.name, context);
 
@@ -45,7 +51,7 @@ export default function CarouselIndicatorEdit({
 
 	const blockProps = useBlockProps({
 		className: blockClassName(
-			`vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--${isProgress ? 'progress' : 'dots'} ${indicatorClassNames(attributes)}`.trim(),
+			`vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--${isDots ? 'dots' : indicator} ${indicatorClassNames(attributes)}`.trim(),
 			isHidden
 		),
 	});
@@ -65,10 +71,10 @@ export default function CarouselIndicatorEdit({
 				isHidden={isHidden}
 				setAttributes={setAttributes}
 			/>
-			{!isProgress || (isOverlay && !isInRow) ? (
+			{isDots || (isOverlay && !isInRow) ? (
 				<InspectorControls>
 					<ControlPanel title={__('Indicator', 'visual-portfolio')}>
-						{isProgress ? null : (
+						{isDots ? (
 							<RangeControl
 								label={__('Dots at once', 'visual-portfolio')}
 								help={__(
@@ -82,7 +88,7 @@ export default function CarouselIndicatorEdit({
 								min={0}
 								max={15}
 							/>
-						)}
+						) : null}
 						{isOverlay && !isInRow ? (
 							<ShowOnHoverControl
 								value={showOnHover}
@@ -97,25 +103,39 @@ export default function CarouselIndicatorEdit({
 			<div {...blockProps} style={style}>
 				{isProgress ? (
 					<span className="vp-block-loop-carousel-progress-value" />
-				) : (
-					Array.from({ length: PREVIEW_DOTS }, (ignored, index) => (
-						<button
-							key={index}
-							type="button"
-							className="vp-block-loop-carousel-dot"
-							aria-current={0 === index ? 'true' : 'false'}
-							/* translators: %d: slide number. */
-							aria-label={sprintf(
-								__('Go to slide %d', 'visual-portfolio'),
-								index + 1
-							)}
-							tabIndex={-1}
-							onClick={(event) => event.preventDefault()}
-						>
-							<span className="vp-block-loop-carousel-dot-progress" />
-						</button>
-					))
-				)}
+				) : null}
+				{isCounter ? (
+					<>
+						<span className="vp-block-loop-carousel-counter-current">
+							1
+						</span>
+						<span className="vp-block-loop-carousel-counter-separator">
+							/
+						</span>
+						<span className="vp-block-loop-carousel-counter-total">
+							{PREVIEW_COUNT}
+						</span>
+					</>
+				) : null}
+				{isDots
+					? Array.from({ length: PREVIEW_DOTS }, (ignored, index) => (
+							<button
+								key={index}
+								type="button"
+								className="vp-block-loop-carousel-dot"
+								aria-current={0 === index ? 'true' : 'false'}
+								/* translators: %d: slide number. */
+								aria-label={sprintf(
+									__('Go to slide %d', 'visual-portfolio'),
+									index + 1
+								)}
+								tabIndex={-1}
+								onClick={(event) => event.preventDefault()}
+							>
+								<span className="vp-block-loop-carousel-dot-progress" />
+							</button>
+						))
+					: null}
 			</div>
 		</>
 	);

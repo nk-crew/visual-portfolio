@@ -44,7 +44,29 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 			return '';
 		}
 
-		if ( 'progress' === ( $attributes['indicator'] ?? 'dots' ) ) {
+		$indicator = $attributes['indicator'] ?? 'dots';
+
+		// The slide on screen and how many there are, as a pair of numbers.
+		// Both are written by the view module for the same reason the dots are
+		// - the count is the item template's answer, and a Load More or a
+		// filter changes it after the page was rendered.
+		//
+		// Hidden from a screen reader on purpose: the arrows say where the
+		// carousel can still go and the dots say where it is, and a third
+		// voice saying the same thing would read out on every step of an
+		// autoplay.
+		if ( 'counter' === $indicator ) {
+			return sprintf(
+				'<div %1$s><span class="vp-block-loop-carousel-counter-current"></span><span class="vp-block-loop-carousel-counter-separator">/</span><span class="vp-block-loop-carousel-counter-total"></span></div>',
+				Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(
+					Visual_Portfolio_Block_Loop_Carousel_Nav::indicator_classes( 'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--counter', $attributes ),
+					'indicator',
+					array( 'aria-hidden' => 'true' )
+				)
+			);
+		}
+
+		if ( 'progress' === $indicator ) {
 			return sprintf(
 				'<div %1$s><span class="vp-block-loop-carousel-progress-value"></span></div>',
 				Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(

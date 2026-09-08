@@ -699,6 +699,46 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 	});
 
+	test('a counter names the slide on screen and how many there are', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel counter',
+			blockId: 'e2e-carousel-counter',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: [
+				'loop-carousel-previous',
+				['loop-carousel-indicator', { indicator: 'counter' }],
+				'loop-carousel-next',
+			],
+		});
+
+		const counter = page.locator(
+			`${NAV} .vp-block-loop-carousel-indicator--counter`
+		);
+		const current = counter.locator(
+			'.vp-block-loop-carousel-counter-current'
+		);
+
+		// Counted from one, the way a visitor counts.
+		await expect(current).toHaveText('1');
+		await expect(
+			counter.locator('.vp-block-loop-carousel-counter-total')
+		).toHaveText(String(IMAGES_COUNT));
+
+		await page.locator(NEXT_ARROW).click();
+		await expect(current).toHaveText('2');
+
+		await page.locator(PREV_ARROW).click();
+		await expect(current).toHaveText('1');
+	});
+
 	test('an indicator given a window slides its dots under it', async ({
 		page,
 		requestUtils,
