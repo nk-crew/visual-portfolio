@@ -42,6 +42,7 @@ import {
 /**
  * Internal dependencies
  */
+import { ToggleGroupButtonsControl } from '../../components/toggle-group-control';
 import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import {
@@ -49,7 +50,7 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
-import { getColumnsProps } from './columns';
+import { getColumnsProps, SCREEN_COLUMNS } from './columns';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
 
@@ -267,6 +268,18 @@ const CSS_UNITS = [
 	{ value: 'em', label: 'em', default: 20 },
 	{ value: 'vw', label: 'vw', default: 20 },
 ];
+
+// The screens the column count can be set for. Named after the breakpoints
+// the plugin already carries, which is where the stylesheet answers them.
+const SCREEN_OPTIONS = [
+	{ value: 'desktop', label: __('Desktop', 'visual-portfolio') },
+	{ value: 'tablet', label: __('Tablet', 'visual-portfolio') },
+	{ value: 'mobile', label: __('Phone', 'visual-portfolio') },
+];
+
+const SCREEN_ATTRIBUTES = Object.fromEntries(
+	SCREEN_COLUMNS.map(({ screen, attribute }) => [screen, attribute])
+);
 
 // A slide height is typed in the same units, and in `vh` besides: a share of
 // the screen is what the legacy slider offered as a percentage height.
@@ -508,6 +521,8 @@ export default function BlockEdit({
 		layoutType,
 		layoutColumnsMode,
 		layoutColumnCount,
+		layoutColumnCountTablet,
+		layoutColumnCountMobile,
 		layoutMinimumColumnWidth,
 		layoutAutoFit,
 		layoutTiles,
@@ -530,6 +545,9 @@ export default function BlockEdit({
 		carouselStretchSlides,
 		carouselSlidesPerGroup,
 	} = attributes;
+	// Which screen the columns control is answering for. A view of the editor
+	// rather than anything saved with the post.
+	const [screen, setScreen] = useState('desktop');
 	const {
 		'vp/queryType': queryType,
 		'vp/baseQuery': baseQuery,
@@ -865,19 +883,50 @@ export default function BlockEdit({
 					/>
 				</>
 			) : (
-				<RangeControl
-					label={
-						'carousel' === layoutType
-							? __('Slides per view', 'visual-portfolio')
-							: __('Columns', 'visual-portfolio')
-					}
-					value={layoutColumnCount}
-					onChange={(value) =>
-						setAttributes({ layoutColumnCount: value })
-					}
-					min={1}
-					max={6}
-				/>
+				<VStack spacing={2}>
+					{/* The count is set for one screen at a time. A tablet and
+					    a phone start at zero, which is the ladder the
+					    stylesheet has always walked - so a gallery that never
+					    opens these is drawn exactly as it was. */}
+					<ToggleGroupButtonsControl
+						label={__('Screen', 'visual-portfolio')}
+						value={screen}
+						options={SCREEN_OPTIONS}
+						onChange={setScreen}
+					/>
+					<RangeControl
+						label={
+							'carousel' === layoutType
+								? __('Slides per view', 'visual-portfolio')
+								: __('Columns', 'visual-portfolio')
+						}
+						help={
+							'desktop' === screen
+								? undefined
+								: __(
+										'Zero steps the desktop count down on its own, the way it always has.',
+										'visual-portfolio'
+									)
+						}
+						value={
+							'desktop' === screen
+								? layoutColumnCount
+								: attributes[SCREEN_ATTRIBUTES[screen]] || 0
+						}
+						onChange={(value) =>
+							setAttributes(
+								'desktop' === screen
+									? { layoutColumnCount: value ?? 1 }
+									: {
+											[SCREEN_ATTRIBUTES[screen]]:
+												value ?? 0,
+										}
+							)
+						}
+						min={'desktop' === screen ? 1 : 0}
+						max={6}
+					/>
+				</VStack>
 			)}
 		</>
 	) : null;
@@ -893,6 +942,8 @@ export default function BlockEdit({
 						layoutTiles: '3|1,1|',
 						layoutColumnsMode: 'auto',
 						layoutColumnCount: 3,
+						layoutColumnCountTablet: 0,
+						layoutColumnCountMobile: 0,
 						layoutMinimumColumnWidth: '16rem',
 						layoutAutoFit: false,
 					})
@@ -943,6 +994,8 @@ export default function BlockEdit({
 					hasValue={() =>
 						'auto' !== layoutColumnsMode ||
 						3 !== layoutColumnCount ||
+						layoutColumnCountTablet ||
+						layoutColumnCountMobile ||
 						'16rem' !== layoutMinimumColumnWidth ||
 						layoutAutoFit
 					}
@@ -951,6 +1004,8 @@ export default function BlockEdit({
 						setAttributes({
 							layoutColumnsMode: 'auto',
 							layoutColumnCount: 3,
+							layoutColumnCountTablet: 0,
+							layoutColumnCountMobile: 0,
 							layoutMinimumColumnWidth: '16rem',
 							layoutAutoFit: false,
 						})

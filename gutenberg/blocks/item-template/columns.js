@@ -90,6 +90,14 @@ export function getColumnCount(attributes) {
 	return isAutoColumns(attributes) ? count : Math.max(1, count);
 }
 
+// The screens a column count can be set for, and the attribute each one is
+// written to. Named after the breakpoints the plugin already carries: a tablet
+// is 992px and narrower, a phone 576px and narrower.
+export const SCREEN_COLUMNS = [
+	{ screen: 'tablet', attribute: 'layoutColumnCountTablet' },
+	{ screen: 'mobile', attribute: 'layoutColumnCountMobile' },
+];
+
 /**
  * Classes and custom properties the layout is drawn from.
  *
@@ -106,6 +114,19 @@ export function getColumnsProps(attributes, blockGap) {
 	const style = {
 		'--vp-layout-columns': getColumnCount(attributes),
 	};
+
+	// A count of its own for a narrower screen, which only manual mode offers:
+	// in auto mode the width of a column is what decides the count.
+	if (!isAuto) {
+		SCREEN_COLUMNS.forEach(({ screen, attribute }) => {
+			const count = attributes[attribute];
+
+			if (count) {
+				classNames.push(`vp-has-${screen}-columns`);
+				style[`--vp-layout-columns-${screen}`] = count;
+			}
+		});
+	}
 
 	if (blockGap) {
 		// None is a bare zero, which is a number rather than a length and

@@ -329,6 +329,56 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A count of its own for a narrower screen is written only when it was
+	 * asked for, so a gallery that never opened the setting is drawn exactly
+	 * as it was.
+	 *
+	 * @return void
+	 */
+	public function test_a_narrow_screen_can_be_given_a_column_count_of_its_own() {
+		$plain = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'grid',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 4,
+			)
+		);
+
+		$this->assertStringNotContainsString( '--vp-layout-columns-tablet', $plain );
+		$this->assertStringNotContainsString( 'vp-has-tablet-columns', $plain );
+
+		$responsive = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'              => 'grid',
+				'layoutColumnsMode'       => 'manual',
+				'layoutColumnCount'       => 4,
+				'layoutColumnCountTablet' => 2,
+				'layoutColumnCountMobile' => 1,
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-layout-columns-tablet:2', $responsive );
+		$this->assertStringContainsString( '--vp-layout-columns-mobile:1', $responsive );
+		$this->assertStringContainsString( 'vp-has-tablet-columns', $responsive );
+		$this->assertStringContainsString( 'vp-has-mobile-columns', $responsive );
+
+		// Auto mode has no use for it: the width of a column is what decides
+		// the count there, and a second answer would fight it.
+		$auto = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'              => 'grid',
+				'layoutColumnsMode'       => 'auto',
+				'layoutColumnCountTablet' => 2,
+			)
+		);
+
+		$this->assertStringNotContainsString( '--vp-layout-columns-tablet', $auto );
+	}
+
+	/**
 	 * The thumbnails are a strip of buttons naming a slide each, in the order
 	 * the slides are in - an item with no picture keeps its place, or every
 	 * press after it would reach the wrong slide.

@@ -579,6 +579,25 @@ class Visual_Portfolio_Block_Item_Template {
 
 		$styles = sprintf( '--vp-layout-columns:%d;', $maximum );
 
+		// A count of its own for a narrower screen. Left at zero the count
+		// steps down the ladder the stylesheet walks, which is what a gallery
+		// has always done; a number set here is the answer for that screen
+		// instead. Only in manual mode - the width of a column is what decides
+		// the count in auto mode, and a second answer would fight it.
+		if ( ! $is_auto ) {
+			foreach ( array(
+				'tablet' => 'layoutColumnCountTablet',
+				'mobile' => 'layoutColumnCountMobile',
+			) as $screen => $attribute ) {
+				$count = max( 0, min( Visual_Portfolio_Tiles_Parser::MAX_COLUMNS, (int) ( $attributes[ $attribute ] ?? 0 ) ) );
+
+				if ( $count ) {
+					$classes[] = 'vp-has-' . $screen . '-columns';
+					$styles   .= sprintf( '--vp-layout-columns-%1$s:%2$d;', $screen, $count );
+				}
+			}
+		}
+
 		if ( '' !== $gap ) {
 			$styles .= sprintf( '--vp-layout-gap:%s;', $gap );
 		}

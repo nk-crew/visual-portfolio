@@ -699,6 +699,50 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 	});
 
+	test('a narrow screen draws the column count it was given', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - responsive columns',
+			blockId: 'e2e-responsive-columns',
+			images,
+			layout: {
+				layoutType: 'grid',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 4,
+				layoutColumnCountTablet: 3,
+				layoutColumnCountMobile: 2,
+			},
+		});
+
+		const list = page.locator(LIST);
+		// How many items sit on the first row, which is the column count as a
+		// visitor sees it.
+		const columns = () =>
+			list.evaluate((node) => {
+				const items = Array.from(node.children);
+				const top = items[0].getBoundingClientRect().top;
+
+				return items.filter(
+					(item) =>
+						Math.abs(item.getBoundingClientRect().top - top) < 2
+				).length;
+			});
+
+		await page.setViewportSize({ width: 1280, height: 900 });
+		await expect.poll(columns, { timeout: 10000 }).toBe(4);
+
+		// A tablet is 992px and narrower. Without a count of its own the
+		// ladder would have stepped this down to three anyway, so the phone is
+		// what proves the setting: the ladder gives one column there.
+		await page.setViewportSize({ width: 900, height: 900 });
+		await expect.poll(columns, { timeout: 10000 }).toBe(3);
+
+		await page.setViewportSize({ width: 500, height: 900 });
+		await expect.poll(columns, { timeout: 10000 }).toBe(2);
+	});
+
 	test('a carousel can be steered by its thumbnails', async ({
 		page,
 		requestUtils,
