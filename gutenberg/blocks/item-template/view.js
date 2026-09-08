@@ -175,6 +175,12 @@ const PREV_SELECTOR = '.vp-block-loop-carousel-previous';
 const NEXT_SELECTOR = '.vp-block-loop-carousel-next';
 const DOTS_SELECTOR = '.vp-block-loop-carousel-indicator--dots';
 const DOT_SELECTOR = '.vp-block-loop-carousel-dot';
+// What every control that names a slide carries: a dot, and the thumbnails a
+// carousel can be steered by. The two are the same control - a row of buttons
+// that name a slide index and light the one the carousel rests on - so the
+// click and the sweep that lights them are written once, against what they
+// name rather than against what they look like.
+const SLIDE_TARGET_SELECTOR = '[data-vp-slide]';
 const DOT_PROGRESS_CLASS = 'vp-block-loop-carousel-dot-progress';
 const PROGRESS_SELECTOR = '.vp-block-loop-carousel-indicator--progress';
 
@@ -1006,20 +1012,49 @@ function syncNav(list) {
 		setFade(list, 'right', rtl ? atStart : atEnd);
 	}
 
-	// The slide a press asked for is the current one from the press on: the
-	// dots the carousel passes on its way there are not visited, and the
-	// one pressed is the one lit. Once the carousel has had time to arrive,
-	// the position answers again - which is also what a drag reads.
+	syncIndicators(list, root);
+}
+
+/**
+ * The slide a carousel is showing as its current one.
+ *
+ * The slide a press asked for is the current one from the press on: the ones
+ * the carousel passes on its way there are not visited, and the one pressed is
+ * the one lit. Once the carousel has had time to arrive, the position answers
+ * again - which is also what a drag reads.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {number} Index of the slide, from zero.
+ */
+function getDisplayedSlide(list) {
 	const held = pending.get(list);
-	const current =
-		held && window.performance.now() - held.time < STEP_HOLD
-			? held.index
-			: getCurrentSlide(list);
 
-	root.querySelectorAll(DOT_SELECTOR).forEach((dot) => {
-		const index = parseInt(dot.dataset.vpSlide, 10);
+	return held && window.performance.now() - held.time < STEP_HOLD
+		? held.index
+		: getCurrentSlide(list);
+}
 
-		dot.setAttribute('aria-current', index === current ? 'true' : 'false');
+/**
+ * Bring every indicator of a carousel in line with where it is.
+ *
+ * Dots, the counter and the progress bar are three drawings of the same pair
+ * of numbers, and the thumbnails are the dots with pictures - so all of them
+ * are answered in one place, from one reading of the position.
+ *
+ * @param {HTMLElement} list Item template list.
+ * @param {HTMLElement} root Box the controls of the carousel are published on.
+ */
+function syncIndicators(list, root = getControlsRoot(list)) {
+	const current = getDisplayedSlide(list);
+
+	root.querySelectorAll(SLIDE_TARGET_SELECTOR).forEach((target) => {
+		const index = parseInt(target.dataset.vpSlide, 10);
+
+		target.setAttribute(
+			'aria-current',
+			index === current ? 'true' : 'false'
+		);
 	});
 
 	const value = getScrollProgress(list);
@@ -1565,9 +1600,9 @@ store('visual-portfolio/item-template', {
 		},
 
 		/**
-		 * Jump to the slide a dot names.
+		 * Jump to the slide a dot or a thumbnail names.
 		 *
-		 * Bound to the dot container rather than to a dot: dots are appended as
+		 * Bound to the container rather than to a dot: dots are appended as
 		 * a Load More brings more slides, and a node inserted after hydration
 		 * carries no directives of its own.
 		 *
@@ -1575,9 +1610,9 @@ store('visual-portfolio/item-template', {
 		 */
 		carouselGoTo(event) {
 			const { ref } = getElement();
-			const dot = event.target.closest(DOT_SELECTOR);
+			const target = event.target.closest(SLIDE_TARGET_SELECTOR);
 			const list = getListOf(ref);
-			const index = dot ? parseInt(dot.dataset.vpSlide, 10) : -1;
+			const index = target ? parseInt(target.dataset.vpSlide, 10) : -1;
 
 			if (!list || index < 0) {
 				return;
