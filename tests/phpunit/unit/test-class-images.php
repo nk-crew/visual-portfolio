@@ -308,6 +308,18 @@ class ClassImages extends WP_UnitTestCase {
             ),
             'A valueless attribute must not gain an empty value'
         );
+
+        // A valueless `sizes` is still dropped, the same as one that carries a value.
+        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" sizes>';
+        $lazy_string  = '<img src="' . $placeholder . '" alt="Test Image" width="10" height="10" data-src="image.jpg" data-sizes="auto" loading="eager" class="vp-lazyload">';
+
+        $this->assertEquals(
+            $this->get_noscript_image( $image_string ) . $lazy_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'A valueless sizes attribute must still be dropped'
+        );
     }
 
     /**
