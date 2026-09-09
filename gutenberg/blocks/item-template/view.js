@@ -187,9 +187,11 @@ const DOT_PROGRESS_CLASS = 'vp-block-loop-carousel-dot-progress';
 // next is a single thing crawling across the row.
 const WORM_CLASS = 'vp-block-loop-carousel-dot-worm';
 const WORM_SELECTOR = `.${WORM_CLASS}`;
-// How long it takes to crawl. The dots make room for it over the same stretch,
-// so the row and the pill arrive together.
-const WORM_DURATION = 320;
+// How much of what is left each edge of the pill covers in a frame. The edge
+// in front of the travel moves faster than the one behind it, and the
+// difference between them is how far the pill stretches on its way.
+const WORM_LEADS = 0.26;
+const WORM_TRAILS = 0.12;
 // An indicator showing a window of its dots rather than all of them, and the
 // two states a dot takes as it reaches the edge of that window.
 const DOTS_COLLAPSED_CLASS = 'is-collapsed';
@@ -291,6 +293,11 @@ const watched = new WeakSet();
 // Where the pill of an indicator was left, so that the next move knows the
 // ground it has to cover.
 const worms = new WeakMap();
+
+// The crawl drawing it, when one is: its two edges and the frame they are
+// drawn on. A step landing mid-crawl moves where it is headed rather than
+// starting a second one.
+const crawls = new WeakMap();
 
 // How close to either end of its scroll range Blossom lets a repeating
 // carousel rest. The loop is carried by copies of the slides moved round to
@@ -1295,144 +1302,6 @@ function getDotGeometry(container, count, current) {
 }
 
 /**
- * Where the pill of an indicator is at this moment.
- *
- * Read from the crawl that is drawing it rather than from the stylesheet: a
- * browser does not report an animated `inset-inline-start` as the computed
- * value of the property, so asking the element gives the place it was told to
- * be at rather than the place it is.
- *
- * @param {HTMLElement} worm     The pill.
- * @param {Object}      fallback Where it is when nothing is drawing it.
- *
- * @return {Object} `left` and `width` in pixels, and whether a crawl was
- *                  drawing it.
- */
-function getLivePill(worm, fallback) {
-	// The pill also carries transitions of its own - the shift of a collapsed
-	// row, the colours of a wait - and they are animations too. The crawl is
-	// the one that moves it along the row.
-	const animation = worm
-		.getAnimations()
-		.find((each) =>
-			each.effect
-				?.getKeyframes?.()
-				?.some((frame) => undefined !== frame.insetInlineStart)
-		);
-	const progress = animation?.effect?.getComputedTiming?.().progress;
-
-	if (!animation || 'number' !== typeof progress) {
-		return { ...fallback, crawling: false };
-	}
-
-	const frames = animation.effect.getKeyframes();
-	let index = 1;
-
-	while (index < frames.length - 1 && frames[index].offset < progress) {
-		index += 1;
-	}
-
-	const before = frames[index - 1];
-	const after = frames[index];
-	const span = after.offset - before.offset || 1;
-	const along = Math.min(1, Math.max(0, (progress - before.offset) / span));
-	const mix = (from, until) =>
-		parseFloat(from) + (parseFloat(until) - parseFloat(from)) * along;
-
-	return {
-		left: mix(before.insetInlineStart, after.insetInlineStart),
-		width: mix(before.width, after.width),
-		crawling: true,
-	};
-}
-
-/**
- * Crawl the pill of an indicator from the slide it was on to the one it is on.
- *
- * It stretches to cover the ground between the two and gathers itself at the
- * far end, rather than vanishing from one dot and appearing at another - which
- * is two things happening where a visitor is following one.
- *
- * @param {HTMLElement} container Indicator drawn as dots.
- * @param {Object}      geometry  Where the dots will come to rest.
- */
-function moveWorm(container, geometry) {
-	const worm = container.querySelector(WORM_SELECTOR);
-
-	if (!worm) {
-		return;
-	}
-
-	const to = {
-		left: Math.round(
-			geometry.centreOf(geometry.index) - geometry.grown / 2
-		),
-		width: geometry.grown,
-	};
-	const at = worms.get(container);
-
-	// Written only when it has changed. The row is asked about on every frame
-	// of a scroll, and writing the same two lengths back each time laid the
-	// page out again for nothing.
-	if (at && at.left === to.left && at.width === to.width) {
-		return;
-	}
-
-	worms.set(container, to);
-
-	// Nothing to crawl from, or a visitor who asked for less motion: the pill
-	// is simply where it belongs.
-	if (!at || 'auto' === getScrollBehavior() || !worm.animate) {
-		worm.style.insetInlineStart = `${to.left}px`;
-		worm.style.width = `${to.width}px`;
-
-		return;
-	}
-
-	// Where the pill has got to, taken from the crawl that is drawing it: a
-	// swipe changes the slide again before a crawl has arrived, and beginning
-	// the next one from the place the last was aimed at snapped the pill
-	// across the ground it had not covered yet.
-	const live = getLivePill(worm, at);
-
-	// A crawl still going is taken over rather than queued behind it.
-	worm.getAnimations().forEach((animation) => {
-		animation.cancel();
-	});
-
-	worm.style.insetInlineStart = `${to.left}px`;
-	worm.style.width = `${to.width}px`;
-
-	const start = {
-		insetInlineStart: `${live.left}px`,
-		width: `${live.width}px`,
-	};
-	const end = { insetInlineStart: `${to.left}px`, width: `${to.width}px` };
-	const from = Math.min(live.left, to.left);
-	const until = Math.max(live.left + live.width, to.left + to.width);
-
-	// A pill at rest stretches across the ground it has to cover and gathers
-	// itself at the far end. One that is already crawling - a swipe moving the
-	// carousel on before it has arrived - is led straight on instead: stretching
-	// again from a pill that is already stretched made it pulse, once per
-	// slide, which is what a visitor saw as the row shaking.
-	worm.animate(
-		live.crawling
-			? [start, end]
-			: [
-					start,
-					{
-						insetInlineStart: `${from}px`,
-						width: `${until - from}px`,
-						offset: 0.5,
-					},
-					end,
-				],
-		{ duration: WORM_DURATION, easing: 'ease-out' }
-	);
-}
-
-/**
  * Let a swipe rest where an arrow would leave the carousel.
  *
  * A carousel whose arrows move a whole frame should answer a finger the same
@@ -1499,6 +1368,109 @@ function showThumb(strip, current) {
 		left: Math.max(0, Math.min(furthest, middle)),
 		behavior: getScrollBehavior(),
 	});
+}
+/**
+ * Crawl the pill of an indicator to the dot the carousel has reached.
+ *
+ * Two edges rather than one box: the edge in front of the travel leaves at
+ * once and the one behind it follows, so the pill stretches across the ground
+ * between two dots and gathers itself once the trailing edge has caught up.
+ *
+ * Drawn frame by frame rather than handed to the browser as an animation,
+ * because the far end moves: a swipe steps again before the pill has arrived,
+ * and an animation can only be replaced - which either snapped the pill to
+ * where the last step was aimed or stretched it a second time from a shape
+ * that was already stretched, pulsing once per slide. Given a new destination
+ * mid-crawl, the two edges simply carry on towards it.
+ *
+ * @param {HTMLElement} container Indicator drawn as dots.
+ * @param {Object}      geometry  Where the dots come to rest.
+ */
+function moveWorm(container, geometry) {
+	const worm = container.querySelector(WORM_SELECTOR);
+
+	if (!worm) {
+		return;
+	}
+
+	const to = {
+		left: Math.round(
+			geometry.centreOf(geometry.index) - geometry.grown / 2
+		),
+		width: geometry.grown,
+	};
+	const at = worms.get(container);
+
+	// Written only when it has changed. The row is asked about on every frame
+	// of a scroll, and writing the same two lengths back each time laid the
+	// page out again for nothing.
+	if (at && at.left === to.left && at.width === to.width) {
+		return;
+	}
+
+	worms.set(container, to);
+
+	const place = (left, width) => {
+		worm.style.insetInlineStart = `${Math.round(left)}px`;
+		worm.style.width = `${Math.round(width)}px`;
+	};
+
+	// Nothing to crawl from, or a visitor who asked for less motion: the pill
+	// is simply where it belongs.
+	if (!at || 'auto' === getScrollBehavior()) {
+		crawls.delete(container);
+		place(to.left, to.width);
+
+		return;
+	}
+
+	const crawl = crawls.get(container) || {
+		tail: at.left,
+		head: at.left + at.width,
+		frame: 0,
+	};
+
+	crawl.tailTo = to.left;
+	crawl.headTo = to.left + to.width;
+	crawls.set(container, crawl);
+
+	// One crawl at a time. A step that lands mid-crawl has moved where it is
+	// headed, and the edges carry on from where they are.
+	if (crawl.frame) {
+		return;
+	}
+
+	const tick = () => {
+		if (!worm.isConnected || crawls.get(container) !== crawl) {
+			crawl.frame = 0;
+
+			return;
+		}
+
+		// Whichever edge is in front of the travel leaves first; the other is
+		// what the pill is stretched by.
+		const onwards = crawl.headTo > crawl.head || crawl.tailTo > crawl.tail;
+		const headBy = onwards ? WORM_LEADS : WORM_TRAILS;
+		const tailBy = onwards ? WORM_TRAILS : WORM_LEADS;
+
+		crawl.head += (crawl.headTo - crawl.head) * headBy;
+		crawl.tail += (crawl.tailTo - crawl.tail) * tailBy;
+
+		const arrived =
+			Math.abs(crawl.headTo - crawl.head) < 0.5 &&
+			Math.abs(crawl.tailTo - crawl.tail) < 0.5;
+
+		if (arrived) {
+			crawl.head = crawl.headTo;
+			crawl.tail = crawl.tailTo;
+		}
+
+		place(crawl.tail, Math.max(1, crawl.head - crawl.tail));
+
+		crawl.frame = arrived ? 0 : window.requestAnimationFrame(tick);
+	};
+
+	crawl.frame = window.requestAnimationFrame(tick);
 }
 
 /**

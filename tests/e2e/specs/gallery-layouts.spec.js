@@ -1228,10 +1228,16 @@ test.describe('Gallery Item Template layouts', () => {
 		// crossed most of it between two frames.
 		expect(Math.max(...steps)).toBeLessThan(9);
 
-		// And it is led straight on rather than stretched a second time: a
-		// pill already spanning two dots that stretches again to span three
-		// pulses, once per slide, which is the shaking a swipe showed.
-		expect(Math.max(...seen.map(([, width]) => width))).toBeLessThan(40);
+		// And it stretches while it travels rather than sliding along at the
+		// width of a dot: the edge in front leaves first and the one behind
+		// follows, so a pill in motion spans the ground between two dots.
+		const widths = seen.map(([, width]) => width);
+
+		expect(Math.max(...widths)).toBeGreaterThan(20);
+
+		// Without pulsing: it is led straight on rather than stretched a
+		// second time from a shape that is already stretched.
+		expect(Math.max(...widths)).toBeLessThan(46);
 	});
 
 	test('an indicator given a window slides its dots under it', async ({
