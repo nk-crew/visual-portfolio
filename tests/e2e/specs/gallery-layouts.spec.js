@@ -1188,11 +1188,11 @@ test.describe('Gallery Item Template layouts', () => {
 				width: Math.round(parseFloat(node.style.width) || 0),
 			}));
 
-		// It rests in the middle of the first slot: an 18px slot with a 14px
+		// It rests in the middle of the first slot: a 14px slot with a 12px
 		// pill in it.
 		await expect.poll(at, { timeout: 10000 }).toEqual({
-			left: 2,
-			width: 14,
+			left: 1,
+			width: 12,
 		});
 
 		// The row is exactly as wide with the first slide showing as with any
@@ -1213,16 +1213,16 @@ test.describe('Gallery Item Template layouts', () => {
 		await page.locator(NEXT_ARROW).click();
 		await expect
 			.poll(async () => (await at()).left, { timeout: 10000 })
-			.toBe(20);
+			.toBe(15);
 		await expect
 			.poll(async () => (await at()).width, { timeout: 10000 })
-			.toBe(14);
+			.toBe(12);
 		await expect.poll(spread, { timeout: 10000 }).toBe(before);
 
 		await page.locator(PREV_ARROW).click();
 		await expect
 			.poll(async () => (await at()).left, { timeout: 10000 })
-			.toBe(2);
+			.toBe(1);
 		await expect.poll(spread, { timeout: 10000 }).toBe(before);
 	});
 
@@ -1307,6 +1307,61 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(turns).toBeLessThanOrEqual(1);
 	});
 
+	test('the pill sits on its dot inside a box that is padded', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel filled dots',
+			blockId: 'e2e-carousel-filled-dots',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: [
+				['loop-carousel-indicator', { className: 'is-style-filled' }],
+				'loop-carousel-next',
+			],
+		});
+
+		const row = page.locator(
+			`${NAV} .vp-block-loop-carousel-indicator--dots`
+		);
+
+		await expect(row).toHaveClass(/is-style-filled/);
+
+		// The pill is placed against the box the row sits in, and this box
+		// keeps a padding for itself - so the pill has to be placed inside it
+		// rather than a padding to the left of the dot it names.
+		const offset = () =>
+			row.evaluate((node) => {
+				const worm = node.querySelector(
+					'.vp-block-loop-carousel-dot-worm'
+				);
+				const dot = node.querySelector(
+					'.vp-block-loop-carousel-dot[aria-current="true"]'
+				);
+
+				if (!worm || !dot) {
+					return null;
+				}
+
+				const pill = worm.getBoundingClientRect();
+				const mark = dot.getBoundingClientRect();
+
+				return Math.round(
+					pill.left + pill.width / 2 - (mark.left + mark.width / 2)
+				);
+			});
+
+		await expect.poll(offset, { timeout: 10000 }).toBe(0);
+
+		await page.locator(NEXT_ARROW).click();
+		await expect.poll(offset, { timeout: 10000 }).toBe(0);
+	});
+
 	test('an indicator given a window slides its dots under it', async ({
 		page,
 		requestUtils,
@@ -1379,7 +1434,7 @@ test.describe('Gallery Item Template layouts', () => {
 					),
 				{ timeout: 10000 }
 			)
-			.toEqual(Array.from({ length: IMAGES_COUNT }, () => 18));
+			.toEqual(Array.from({ length: IMAGES_COUNT }, () => 14));
 
 		// And pressing one moves the carousel. The row used to slide under the
 		// pointer as the dot took focus, which took the dot out from under it

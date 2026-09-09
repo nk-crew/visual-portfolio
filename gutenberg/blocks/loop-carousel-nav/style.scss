@@ -200,12 +200,18 @@
 	// row centred under a gallery slid from side to side every time the
 	// carousel moved, twice over during a swipe.
 	--vp-carousel-dot-size: 6px;
-	--vp-carousel-dot-slot: 18px;
-	--vp-carousel-dot-active-size: 14px;
+	--vp-carousel-dot-slot: 14px;
+	--vp-carousel-dot-active-size: 12px;
 	// The colour of a dot that is not the slide on screen. The pill borrows it
 	// while a wait runs down, so the part of it that has not filled yet is the
 	// same tone as the dots it is crawling over.
-	--vp-carousel-dot-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+	//
+	// Solid rather than a wash: two washes laid over each other make a darker
+	// patch, and a wash over a photograph picks up whatever is behind it. The
+	// page it is drawn on is the second colour, which a theme restates when
+	// the row sits on something other than the page.
+	--vp-carousel-dot-ground: Canvas;
+	--vp-carousel-dot-color: color-mix(in oklab, currentcolor 22%, var(--vp-carousel-dot-ground));
 
 	gap: 0;
 
@@ -529,6 +535,8 @@
 }
 
 .vp-block-loop-carousel-indicator.is-style-filled {
+	// Drawn on the dark pill of the style rather than on the page.
+	--vp-carousel-dot-ground: rgba(0, 0, 0, 0.65);
 	--vp-carousel-track: rgba(255, 255, 255, 0.4);
 
 	background-color: rgba(0, 0, 0, 0.5);
@@ -577,6 +585,10 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 
 @include over-the-slides((".vp-block-loop-carousel-nav", ".vp-block-loop-carousel-previous", ".vp-block-loop-carousel-next", ".vp-block-loop-carousel-autoplay", ".vp-block-loop-carousel-indicator", ".vp-block-loop-carousel-thumbnails")) {
 	--vp-carousel-track: rgba(255, 255, 255, 0.4);
+	// Over the pictures there is no page behind a dot to mix with, so the
+	// ground it is drawn on is the shadow the controls carry over a
+	// photograph.
+	--vp-carousel-dot-ground: rgba(0, 0, 0, 0.35);
 
 	position: absolute;
 	z-index: 2;

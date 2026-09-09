@@ -1309,6 +1309,11 @@ function getDotGeometry(container, count, current) {
 	const grown =
 		parseFloat(style.getPropertyValue('--vp-carousel-dot-active-size')) ||
 		slot;
+	// The row is placed inside whatever the box around it keeps for itself,
+	// and the pill is placed against that box rather than against the row - so
+	// an indicator drawn as a filled pill, which is padded, had its own pill
+	// sitting a padding to the left of the dots it was meant to be on.
+	const inset = parseFloat(style.paddingInlineStart) || 0;
 	const index = Math.min(Math.max(current, 0), Math.max(0, count - 1));
 
 	// Every slide keeps a slot of the same width, so where a dot sits does not
@@ -1318,7 +1323,7 @@ function getDotGeometry(container, count, current) {
 		slot,
 		grown,
 		index,
-		centreOf: (at) => at * slot + slot / 2,
+		centreOf: (at) => inset + at * slot + slot / 2,
 		content: count * slot,
 	};
 }
