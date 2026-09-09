@@ -1453,8 +1453,9 @@ function showThumb(strip, current) {
  *
  * @param {HTMLElement} container Indicator drawn as dots.
  * @param {Object}      geometry  Where the dots come to rest.
+ * @param {number}      reach     The most ground it may cover at once.
  */
-function moveWorm(container, geometry) {
+function moveWorm(container, geometry, reach) {
 	const worm = container.querySelector(WORM_SELECTOR);
 
 	if (!worm) {
@@ -1509,7 +1510,7 @@ function moveWorm(container, geometry) {
 	// holding the right one back is what stretches the pill - hold the wrong
 	// one and it shrinks away from the direction it is travelling in.
 	crawl.onwards = crawl.tailTo >= crawl.tailFrom;
-	crawl.reach = geometry.slot * WORM_REACH;
+	crawl.reach = reach;
 	crawl.started = window.performance.now();
 	crawls.set(container, crawl);
 
@@ -1601,7 +1602,14 @@ function syncDotRow(container, current, places) {
 	const collapsed = max > 0 && dots.length > max;
 	const geometry = getDotGeometry(container, dots.length, at);
 
-	moveWorm(container, geometry);
+	// A row showing its dots through a window has only so much room, and a
+	// pill drawn wider than the window would be clipped by it. A row showing
+	// all of its dots has the whole row to stretch across.
+	moveWorm(
+		container,
+		geometry,
+		collapsed ? geometry.slot * WORM_REACH : Number.POSITIVE_INFINITY
+	);
 
 	// A row that fits is a plain row: no window, no shift, and no classes left
 	// behind by a gallery that had more slides a moment ago.
@@ -1630,10 +1638,15 @@ function syncDotRow(container, current, places) {
 		// A dot the window has moved past is still a button in the page, so
 		// tabbing to it brings it back under the window - the alternative is a
 		// focus ring drawn on something nobody can see.
+		//
+		// Only for a visitor arriving by keyboard. A press gives the dot focus
+		// too, and moving the row then took the dot out from under the pointer
+		// between pressing and letting go - so the press never became a click
+		// and the carousel did not move.
 		container.addEventListener('focusin', (event) => {
 			const dot = event.target.closest(DOT_SELECTOR);
 
-			if (dot) {
+			if (dot?.matches(':focus-visible')) {
 				syncDotRow(
 					container,
 					parseInt(dot.dataset.vpSlide, 10),

@@ -1363,12 +1363,48 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(shift, { timeout: 10000 }).toBe(0);
 		await expect.poll(whole, { timeout: 10000 }).toBeLessThan(IMAGES_COUNT);
 
+		// Every dot the window shows is a full sized target, however small the
+		// mark drawn in it: the ones at the edge are what a visitor reaches
+		// for to go further, and shrinking the button with the mark left them
+		// too small to press.
+		await expect
+			.poll(
+				() =>
+					dots.evaluateAll((nodes) =>
+						nodes
+							.map((dot) =>
+								Math.round(dot.getBoundingClientRect().width)
+							)
+							.filter(Boolean)
+					),
+				{ timeout: 10000 }
+			)
+			.toEqual(Array.from({ length: IMAGES_COUNT }, () => 18));
+
+		// And pressing one moves the carousel. The row used to slide under the
+		// pointer as the dot took focus, which took the dot out from under it
+		// between pressing and letting go, so the press never became a click.
+		const list = page.locator(LIST);
+		const at = () => list.evaluate((node) => Math.round(node.scrollLeft));
+
+		await dots.nth(2).click();
+		await expect.poll(at, { timeout: 10000 }).toBeGreaterThan(0);
+
+		const further = await at();
+
+		await dots.nth(1).click();
+		await expect.poll(at, { timeout: 10000 }).toBeLessThan(further);
+
 		// A dot the window has moved past is clipped, so a pointer cannot
 		// reach it - but it is still a button in the page, and tabbing to it
 		// brings it back under the window rather than drawing a focus ring on
 		// something nobody can see.
 		const last = dots.nth(IMAGES_COUNT - 1);
 
+		// Through the keyboard, which is the only way the row moves for a
+		// focus: a press gives a dot focus too, and moving the row then would
+		// take it out from under the pointer.
+		await page.keyboard.press('Tab');
 		await last.focus();
 		await expect
 			.poll(
