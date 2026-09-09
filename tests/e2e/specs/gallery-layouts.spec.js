@@ -1170,6 +1170,63 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(spread, { timeout: 10000 }).toBe(before);
 	});
 
+	test('a crawl interrupted carries on rather than jumping', async ({
+		page,
+		requestUtils,
+	}) => {
+		// The pill only crawls for a visitor who has not asked for less
+		// motion; Playwright asks for less by default.
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel worm interrupted',
+			blockId: 'e2e-carousel-worm-interrupted',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: ['loop-carousel-indicator', 'loop-carousel-next'],
+		});
+
+		const worm = page.locator('.vp-block-loop-carousel-dot-worm');
+
+		await expect(worm).toHaveCount(1);
+
+		// Two steps in quick succession, which is what a swipe does, with the
+		// pill watched as it is drawn.
+		await page.locator(NEXT_ARROW).click();
+		await page.waitForTimeout(100);
+
+		const watching = worm.evaluate(async (node) => {
+			const seen = [];
+
+			for (let i = 0; i < 14; i += 1) {
+				seen.push(node.getBoundingClientRect().left);
+				await new Promise((settle) => {
+					window.requestAnimationFrame(() =>
+						window.setTimeout(settle, 24)
+					);
+				});
+			}
+
+			return seen;
+		});
+
+		await page.locator(NEXT_ARROW).click();
+
+		const seen = await watching;
+		const steps = seen
+			.slice(1)
+			.map((at, index) => Math.abs(at - seen[index]));
+
+		// One dot is 18px along from the next. A crawl that carried on covers
+		// that in steps of a pixel or two; one that began again at the far end
+		// crossed most of it between two frames.
+		expect(Math.max(...steps)).toBeLessThan(9);
+	});
+
 	test('an indicator given a window slides its dots under it', async ({
 		page,
 		requestUtils,

@@ -1295,6 +1295,56 @@ function getDotGeometry(container, count, current) {
 }
 
 /**
+ * Where the pill of an indicator is at this moment.
+ *
+ * Read from the crawl that is drawing it rather than from the stylesheet: a
+ * browser does not report an animated `inset-inline-start` as the computed
+ * value of the property, so asking the element gives the place it was told to
+ * be at rather than the place it is.
+ *
+ * @param {HTMLElement} worm     The pill.
+ * @param {Object}      fallback Where it is when nothing is drawing it.
+ *
+ * @return {Object} `left` and `width`, in pixels.
+ */
+function getLivePill(worm, fallback) {
+	// The pill also carries transitions of its own - the shift of a collapsed
+	// row, the colours of a wait - and they are animations too. The crawl is
+	// the one that moves it along the row.
+	const animation = worm
+		.getAnimations()
+		.find((each) =>
+			each.effect
+				?.getKeyframes?.()
+				?.some((frame) => undefined !== frame.insetInlineStart)
+		);
+	const progress = animation?.effect?.getComputedTiming?.().progress;
+
+	if (!animation || 'number' !== typeof progress) {
+		return fallback;
+	}
+
+	const frames = animation.effect.getKeyframes();
+	let index = 1;
+
+	while (index < frames.length - 1 && frames[index].offset < progress) {
+		index += 1;
+	}
+
+	const before = frames[index - 1];
+	const after = frames[index];
+	const span = after.offset - before.offset || 1;
+	const along = Math.min(1, Math.max(0, (progress - before.offset) / span));
+	const mix = (from, until) =>
+		parseFloat(from) + (parseFloat(until) - parseFloat(from)) * along;
+
+	return {
+		left: mix(before.insetInlineStart, after.insetInlineStart),
+		width: mix(before.width, after.width),
+	};
+}
+
+/**
  * Crawl the pill of an indicator from the slide it was on to the one it is on.
  *
  * It stretches to cover the ground between the two and gathers itself at the
@@ -1327,27 +1377,36 @@ function moveWorm(container, geometry) {
 	}
 
 	worms.set(container, to);
-	worm.style.insetInlineStart = `${to.left}px`;
-	worm.style.width = `${to.width}px`;
 
 	// Nothing to crawl from, or a visitor who asked for less motion: the pill
 	// is simply where it belongs.
 	if (!at || 'auto' === getScrollBehavior() || !worm.animate) {
+		worm.style.insetInlineStart = `${to.left}px`;
+		worm.style.width = `${to.width}px`;
+
 		return;
 	}
 
-	const from = Math.min(at.left, to.left);
-	const until = Math.max(at.left + at.width, to.left + to.width);
+	// Where the pill has got to, taken from the crawl that is drawing it: a
+	// swipe changes the slide again before a crawl has arrived, and beginning
+	// the next one from the place the last was aimed at snapped the pill
+	// across the ground it had not covered yet.
+	const live = getLivePill(worm, at);
 
-	// A press that comes before the last crawl has finished takes over from it
-	// rather than queueing behind it.
+	// A crawl still going is taken over rather than queued behind it.
 	worm.getAnimations().forEach((animation) => {
 		animation.cancel();
 	});
 
+	worm.style.insetInlineStart = `${to.left}px`;
+	worm.style.width = `${to.width}px`;
+
+	const from = Math.min(live.left, to.left);
+	const until = Math.max(live.left + live.width, to.left + to.width);
+
 	worm.animate(
 		[
-			{ insetInlineStart: `${at.left}px`, width: `${at.width}px` },
+			{ insetInlineStart: `${live.left}px`, width: `${live.width}px` },
 			{
 				insetInlineStart: `${from}px`,
 				width: `${until - from}px`,
@@ -1355,7 +1414,7 @@ function moveWorm(container, geometry) {
 			},
 			{ insetInlineStart: `${to.left}px`, width: `${to.width}px` },
 		],
-		{ duration: WORM_DURATION, easing: 'ease-in-out' }
+		{ duration: WORM_DURATION, easing: 'ease-out' }
 	);
 }
 
