@@ -236,11 +236,16 @@
 			// so the row reads as a window onto more dots: the one beside the
 			// slide on screen is whole, the next in is smaller, and the one at
 			// the edge is smaller again.
-			&.is-edge {
+			//
+			// The mark shrinks, not the button around it. Scaling the button
+			// took the target with it, and the dots at the edge of the window
+			// - the ones a visitor reaches for to go further - became too
+			// small to press.
+			&.is-edge::before {
 				scale: 0.7;
 			}
 
-			&.is-edge-far {
+			&.is-edge-far::before {
 				scale: 0.4;
 				opacity: 0.6;
 			}
@@ -265,7 +270,7 @@
 	background: none;
 	border: 0;
 	border-radius: 50%;
-	transition: translate 0.25s ease, scale 0.25s ease, opacity 0.25s ease;
+	transition: translate 0.25s ease;
 
 	&::before {
 		display: block;
@@ -274,6 +279,7 @@
 		content: "";
 		background-color: var(--vp-carousel-dot-color);
 		border-radius: 50%;
+		transition: opacity 0.2s ease, scale 0.25s ease;
 	}
 
 	&:focus {
@@ -318,7 +324,15 @@
 // would leave it a frame behind for the whole delay.
 //
 // What has not filled yet is drawn in the colour of a dot, so the pill reads
-// as part of the row rather than as a shape of its own.
+// as part of the row rather than as a shape of its own. The dot under it steps
+// aside while it does: the colour of a dot is a wash rather than a solid, and
+// two of them laid over each other made a darker patch in the middle of the
+// pill.
+.vp-carousel-is-playing
+	.vp-block-loop-carousel-dot[aria-current="true"]::before {
+	opacity: 0;
+}
+
 .vp-carousel-is-playing .vp-block-loop-carousel-dot-worm {
 	background-color: var(--vp-carousel-dot-color);
 	transition: background-color 0.25s ease, opacity 0.25s ease;

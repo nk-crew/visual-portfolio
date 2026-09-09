@@ -978,7 +978,9 @@ test.describe('Gallery Item Template layouts', () => {
 				)
 			);
 
-		await expect(dots).toHaveCount(IMAGES_COUNT);
+		// A dot per frame rather than per slide: the slides in between are
+		// scrolled past, and a dot for one of them would do nothing.
+		await expect(dots).toHaveCount(IMAGES_COUNT / 2);
 		await expect.poll(current, { timeout: 10000 }).toBe(0);
 
 		// A swipe comes to rest where an arrow leaves the carousel: only the
@@ -1000,17 +1002,71 @@ test.describe('Gallery Item Template layouts', () => {
 			)
 			.toEqual(['S', '-', 'S', '-', 'S', 'S']);
 
-		// Two slides a press rather than one.
+		// Two slides a press rather than one, which is one frame along.
 		await next.click();
-		await expect.poll(current, { timeout: 10000 }).toBe(2);
+		await expect.poll(current, { timeout: 10000 }).toBe(1);
 
 		await next.click();
-		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 2);
+		await expect.poll(current, { timeout: 10000 }).toBe(2);
 		await expect(next).toBeDisabled();
 
 		// And back the same way.
 		await prev.click();
-		await expect.poll(current, { timeout: 10000 }).toBe(2);
+		await expect.poll(current, { timeout: 10000 }).toBe(1);
+	});
+
+	test('an indicator names the frames a carousel steps between', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel grouped dots',
+			blockId: 'e2e-carousel-grouped-dots',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+				carouselSlidesPerGroup: 2,
+			},
+			carousel: ['loop-carousel-indicator'],
+		});
+
+		const list = page.locator(LIST);
+		const dots = page.locator(`${NAV} ${DOT}`);
+
+		// Three frames of two slides, so three dots - one per place the
+		// carousel can come to rest. A dot for a slide it scrolls past is a
+		// dot that does nothing when pressed.
+		await expect(dots).toHaveCount(IMAGES_COUNT / 2);
+		await expect
+			.poll(
+				() =>
+					dots.evaluateAll((nodes) =>
+						nodes.map((dot) => dot.dataset.vpSlide)
+					),
+				{ timeout: 10000 }
+			)
+			.toEqual(['0', '2', '4']);
+
+		// And each of them takes the carousel to its frame.
+		await dots.nth(1).click();
+		await expect
+			.poll(() => list.evaluate((node) => node.scrollLeft), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(0);
+		await expect
+			.poll(
+				() =>
+					dots.evaluateAll((nodes) =>
+						nodes.findIndex(
+							(dot) => 'true' === dot.getAttribute('aria-current')
+						)
+					),
+				{ timeout: 10000 }
+			)
+			.toBe(1);
 	});
 
 	test('a step wider than the carousel still reaches its end', async ({
@@ -1235,9 +1291,20 @@ test.describe('Gallery Item Template layouts', () => {
 
 		expect(Math.max(...widths)).toBeGreaterThan(20);
 
-		// Without pulsing: it is led straight on rather than stretched a
-		// second time from a shape that is already stretched.
-		expect(Math.max(...widths)).toBeLessThan(46);
+		// Stretching once and not once per slide. A pill that gathered itself
+		// between the two steps and stretched again would grow, shrink and
+		// grow - which is the pulsing a swipe used to show.
+		const turns = widths
+			.slice(1)
+			.map((width, index) => Math.sign(Math.round(width - widths[index])))
+			.filter(Boolean)
+			.reduce(
+				(count, way, index, ways) =>
+					index && way !== ways[index - 1] ? count + 1 : count,
+				0
+			);
+
+		expect(turns).toBeLessThanOrEqual(1);
 	});
 
 	test('an indicator given a window slides its dots under it', async ({
