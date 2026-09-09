@@ -212,8 +212,10 @@
 	// `clip` rather than `hidden`: a hidden box is a scroll container, and the
 	// browser would scroll it to a dot that took focus, fighting the shift the
 	// module writes. Clipping cannot scroll, and the module answers focus itself.
+	// The pill is drawn over the row, so the row is the box it is placed in.
+	position: relative;
+
 	&.is-collapsed {
-		position: relative;
 		max-width: calc(
 			var(--vp-carousel-dots-visible, 5) * (var(--vp-carousel-dot-size) + var(--vp-carousel-dots-gap)) +
 			var(--vp-carousel-dot-active-size) - var(--vp-carousel-dot-size) - var(--vp-carousel-dots-gap)
@@ -239,11 +241,10 @@
 	}
 }
 
-// A dot is the progress bar in miniature, and it is built the same way: a track
-// that is always there and a fill that says how far along the carousel is. Six
-// pixels while it waits, a twenty four pixel pill while it is the slide on
-// screen - filled to the end at rest, and filled as the delay runs down when
-// autoplay is what moves the carousel on.
+// A dot is the place a slide keeps in the row, and nothing more: six pixels of
+// track, or the width of the pill while it is the slide on screen, so that the
+// pill has somewhere to sit. What is drawn in it is the pill, which crawls
+// from one dot to the next rather than appearing at the far end.
 .vp-block-loop-carousel-dot {
 	position: relative;
 
@@ -279,6 +280,24 @@
 	}
 }
 
+// The pill itself. Placed and sized by the module, which knows where the dots
+// will come to rest before they have finished getting there - so it crawls
+// across a row that is still making room for it, and the two arrive together.
+.vp-block-loop-carousel-dot-worm {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: 0;
+	block-size: var(--vp-carousel-dot-size, 6px);
+	inline-size: var(--vp-carousel-dot-size, 6px);
+	margin-block: auto;
+	overflow: hidden;
+	pointer-events: none;
+	background-color: currentcolor;
+	border-radius: calc(var(--vp-carousel-dot-size, 6px) / 2);
+	translate: var(--vp-carousel-dots-shift, 0);
+	transition: translate 0.25s ease;
+}
+
 .vp-block-loop-carousel-dot-progress {
 	position: absolute;
 	inset-block: 0;
@@ -286,19 +305,17 @@
 	width: 0;
 	background-color: currentcolor;
 	border-radius: inherit;
-	transition: width 0.25s ease;
-
-	[aria-current="true"] > & {
-		width: 100%;
-	}
 }
 
-// While autoplay runs the fill is the wait rather than the place, and it is
-// redrawn every frame - a transition would leave it a frame behind for the
-// whole of the delay.
-.vp-carousel-is-playing .vp-block-loop-carousel-dot[aria-current="true"] > .vp-block-loop-carousel-dot-progress {
-	width: var(--vp-carousel-autoplay-progress, 0%);
-	transition: none;
+// While autoplay runs the pill is the wait rather than the place: it becomes
+// the track and fills as the delay runs down. Redrawn every frame, so no
+// transition - one would leave the fill a frame behind for the whole delay.
+.vp-carousel-is-playing .vp-block-loop-carousel-dot-worm {
+	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+
+	> .vp-block-loop-carousel-dot-progress {
+		width: var(--vp-carousel-autoplay-progress, 0%);
+	}
 }
 
 // A strip of small pictures, one per slide, that the carousel can be steered

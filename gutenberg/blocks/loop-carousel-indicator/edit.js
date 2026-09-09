@@ -131,6 +131,20 @@ export default function CarouselIndicatorEdit({
 						</span>
 					</>
 				) : null}
+				{isDots ? (
+					<span
+						className="vp-block-loop-carousel-dot-worm"
+						aria-hidden="true"
+						// The preview rests on the first slide, so the pill
+						// sits on the first dot at the width it takes there.
+						style={{
+							insetInlineStart: 0,
+							width: 'var(--vp-carousel-dot-active-size, 24px)',
+						}}
+					>
+						<span className="vp-block-loop-carousel-dot-progress" />
+					</span>
+				) : null}
 				{isDots
 					? Array.from({ length: PREVIEW_DOTS }, (ignored, index) => (
 							<button
@@ -145,9 +159,7 @@ export default function CarouselIndicatorEdit({
 								)}
 								tabIndex={-1}
 								onClick={(event) => event.preventDefault()}
-							>
-								<span className="vp-block-loop-carousel-dot-progress" />
-							</button>
+							/>
 						))
 					: null}
 			</div>

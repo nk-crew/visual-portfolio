@@ -182,6 +182,14 @@ const DOT_SELECTOR = '.vp-block-loop-carousel-dot';
 // name rather than against what they look like.
 const SLIDE_TARGET_SELECTOR = '[data-vp-slide]';
 const DOT_PROGRESS_CLASS = 'vp-block-loop-carousel-dot-progress';
+// The filled pill that marks the slide on screen. One per indicator, drawn over
+// the dots rather than being one of them, so that moving from one slide to the
+// next is a single thing crawling across the row.
+const WORM_CLASS = 'vp-block-loop-carousel-dot-worm';
+const WORM_SELECTOR = `.${WORM_CLASS}`;
+// How long it takes to crawl. The dots make room for it over the same stretch,
+// so the row and the pill arrive together.
+const WORM_DURATION = 320;
 // An indicator showing a window of its dots rather than all of them, and the
 // two states a dot takes as it reaches the edge of that window.
 const DOTS_COLLAPSED_CLASS = 'is-collapsed';
@@ -275,6 +283,10 @@ const dotWindows = new WeakMap();
 
 // Indicators already listening for a dot of theirs taking focus.
 const watched = new WeakSet();
+
+// Where the pill of an indicator was left, so that the next move knows the
+// ground it has to cover.
+const worms = new WeakMap();
 
 // How close to either end of its scroll range Blossom lets a repeating
 // carousel rest. The loop is carried by copies of the slides moved round to
@@ -1110,7 +1122,7 @@ function syncIndicators(list, root = getControlsRoot(list)) {
 	});
 
 	root.querySelectorAll(DOTS_SELECTOR).forEach((container) => {
-		slideDotWindow(container, current);
+		syncDotRow(container, current);
 	});
 
 	root.querySelectorAll(THUMBS_SELECTOR).forEach((strip) => {
@@ -1228,9 +1240,120 @@ function fillDots(container, items) {
 		dot.className = DOT_SELECTOR.slice(1);
 		dot.dataset.vpSlide = String(index);
 		dot.setAttribute('aria-label', label.replace('%d', String(index + 1)));
-		dot.innerHTML = `<span class="${DOT_PROGRESS_CLASS}"></span>`;
 		container.appendChild(dot);
 	}
+
+	// The pill is drawn over the dots and is nobody's slide, so it is out of
+	// the reach of a pointer and of a screen reader: the dot underneath is the
+	// button, and it is the one that says which slide it names.
+	if (items && !container.querySelector(WORM_SELECTOR)) {
+		const worm = document.createElement('span');
+
+		worm.className = WORM_CLASS;
+		worm.setAttribute('aria-hidden', 'true');
+		worm.innerHTML = `<span class="${DOT_PROGRESS_CLASS}"></span>`;
+		container.prepend(worm);
+	}
+}
+
+/**
+ * Where the dots of a row will come to rest.
+ *
+ * Worked out from the shape the stylesheet writes down rather than read off the
+ * row: the dots are still making room for the pill while this runs, so a
+ * measurement taken now is of a row halfway through a move.
+ *
+ * @param {HTMLElement} container Indicator drawn as dots.
+ * @param {number}      count     How many dots it has.
+ * @param {number}      current   Slide the carousel is showing.
+ *
+ * @return {Object} The sizes, and where each dot starts and ends.
+ */
+function getDotGeometry(container, count, current) {
+	const style = window.getComputedStyle(container);
+	const size =
+		parseFloat(style.getPropertyValue('--vp-carousel-dot-size')) || 6;
+	const grown =
+		parseFloat(style.getPropertyValue('--vp-carousel-dot-active-size')) ||
+		size;
+	const gap = parseFloat(style.columnGap) || 0;
+	const index = Math.min(Math.max(current, 0), Math.max(0, count - 1));
+	const step = size + gap;
+	// Every dot is the same width but the one on screen, and the ones after it
+	// are pushed along by however much wider it is.
+	const startOf = (at) => at * step + (at > index ? grown - size : 0);
+	const widthOf = (at) => (at === index ? grown : size);
+
+	return {
+		size,
+		grown,
+		index,
+		startOf,
+		widthOf,
+		content: count ? startOf(count - 1) + widthOf(count - 1) : 0,
+	};
+}
+
+/**
+ * Crawl the pill of an indicator from the slide it was on to the one it is on.
+ *
+ * It stretches to cover the ground between the two and gathers itself at the
+ * far end, rather than vanishing from one dot and appearing at another - which
+ * is two things happening where a visitor is following one.
+ *
+ * @param {HTMLElement} container Indicator drawn as dots.
+ * @param {Object}      geometry  Where the dots will come to rest.
+ */
+function moveWorm(container, geometry) {
+	const worm = container.querySelector(WORM_SELECTOR);
+
+	if (!worm) {
+		return;
+	}
+
+	const to = {
+		left: geometry.startOf(geometry.index),
+		width: geometry.widthOf(geometry.index),
+	};
+	const at = worms.get(container);
+
+	worms.set(container, to);
+
+	worm.style.insetInlineStart = `${to.left}px`;
+	worm.style.width = `${to.width}px`;
+
+	// Nothing to crawl from, nothing to crawl over, or a visitor who asked for
+	// less motion: the pill is simply where it belongs.
+	if (
+		!at ||
+		(at.left === to.left && at.width === to.width) ||
+		'auto' === getScrollBehavior() ||
+		!worm.animate
+	) {
+		return;
+	}
+
+	const from = Math.min(at.left, to.left);
+	const until = Math.max(at.left + at.width, to.left + to.width);
+
+	// A press that comes before the last crawl has finished takes over from it
+	// rather than queueing behind it.
+	worm.getAnimations().forEach((animation) => {
+		animation.cancel();
+	});
+
+	worm.animate(
+		[
+			{ insetInlineStart: `${at.left}px`, width: `${at.width}px` },
+			{
+				insetInlineStart: `${from}px`,
+				width: `${until - from}px`,
+				offset: 0.5,
+			},
+			{ insetInlineStart: `${to.left}px`, width: `${to.width}px` },
+		],
+		{ duration: WORM_DURATION, easing: 'ease-in-out' }
+	);
 }
 
 /**
@@ -1303,27 +1426,33 @@ function showThumb(strip, current) {
 }
 
 /**
- * Slide the dots of an indicator under the window it shows them through.
+ * Bring a row of dots in line with the slide the carousel is showing.
  *
- * A gallery of forty slides draws forty dots, which is a wall rather than an
- * indicator. A row given a window keeps every dot in the page - each one is
- * still a button naming a slide, still reachable by keyboard and still
- * carrying the label a screen reader reads - and moves them under it, with the
- * one on screen in the middle and the dots at either edge shrinking away.
- *
- * The measuring is the only thing here that costs anything, so it happens when
- * the slide changes rather than on every frame of a scroll.
+ * The pill crawls to the dot that names it, and a row given a window slides
+ * under that window - a gallery of forty slides draws forty dots, which is a
+ * wall rather than an indicator. Every dot stays in the page either way: each
+ * one is still a button naming a slide, still reachable by keyboard and still
+ * carrying the label a screen reader reads.
  *
  * @param {HTMLElement} container Indicator drawn as dots.
  * @param {number}      current   Slide the carousel is showing.
  */
-function slideDotWindow(container, current) {
-	const max = parseInt(container.dataset.vpMaxDots, 10) || 0;
+function syncDotRow(container, current) {
 	const dots = container.querySelectorAll(DOT_SELECTOR);
+
+	if (!dots.length) {
+		return;
+	}
+
+	const max = parseInt(container.dataset.vpMaxDots, 10) || 0;
+	const collapsed = max > 0 && dots.length > max;
+	const geometry = getDotGeometry(container, dots.length, current);
+
+	moveWorm(container, geometry);
 
 	// A row that fits is a plain row: no window, no shift, and no classes left
 	// behind by a gallery that had more slides a moment ago.
-	if (!max || dots.length <= max) {
+	if (!collapsed) {
 		container.classList.remove(DOTS_COLLAPSED_CLASS);
 		container.style.removeProperty(DOTS_SHIFT_PROPERTY);
 		dots.forEach((dot) => {
@@ -1352,34 +1481,13 @@ function slideDotWindow(container, current) {
 			const dot = event.target.closest(DOT_SELECTOR);
 
 			if (dot) {
-				slideDotWindow(container, parseInt(dot.dataset.vpSlide, 10));
+				syncDotRow(container, parseInt(dot.dataset.vpSlide, 10));
 			}
 		});
 	}
 
-	// Where the dots will be, worked out from the shape the stylesheet writes
-	// down rather than read off the row. The pill under the slide on screen is
-	// still growing when this runs, so a measurement taken now is of a row
-	// halfway through a move - the shift landed on the wrong place, and asking
-	// again once the pill had stopped moved the row twice for one slide, which
-	// is the twitch a visitor saw.
-	const style = window.getComputedStyle(container);
-	const size =
-		parseFloat(style.getPropertyValue('--vp-carousel-dot-size')) || 6;
-	const grown =
-		parseFloat(style.getPropertyValue('--vp-carousel-dot-active-size')) ||
-		size;
-	const gap = parseFloat(style.columnGap) || 0;
+	const { index, grown, startOf, widthOf, content } = geometry;
 	const width = container.clientWidth;
-	const index = Math.min(Math.max(current, 0), dots.length - 1);
-	const step = size + gap;
-
-	// The start of a dot once the row has settled: every dot is the same width
-	// but the one on screen, and the ones after it are pushed along by however
-	// much wider it is.
-	const startOf = (at) => at * step + (at > index ? grown - size : 0);
-	const widthOf = (at) => (at === index ? grown : size);
-	const content = startOf(dots.length - 1) + widthOf(dots.length - 1);
 
 	// Centred, but never pulled away from either end: the first dots sit at the
 	// start of the window and the last ones at its end, as they would in a row

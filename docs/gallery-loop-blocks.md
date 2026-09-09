@@ -138,7 +138,11 @@ carries block styles of its own: *Plain*, *Outlined* and *Filled*, the box
 around the dots or the bar. Selecting the row offers the same
 settings and applies them to every arrow and indicator inside it.
 
-The indicator comes in three variations. *Dots* draws one per slide and carries
+The indicator comes in three variations. *Dots* draws one per slide, with a single filled pill that crawls from the dot
+it was on to the one it is on - stretching to cover the ground between them and
+gathering itself at the far end, rather than vanishing from one and appearing
+at the other. The dots are the places, the pill is what moves; under autoplay
+the pill is the wait, filling as the delay runs down. It carries
 *Dots at once*: left at zero it draws them all, which is a wall of them for a
 gallery of forty, and given a number it shows that many through a window and
 slides the rest under it, with the slide on screen in the middle and the dots at

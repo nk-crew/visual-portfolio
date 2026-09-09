@@ -1082,6 +1082,63 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(current).toHaveText('1');
 	});
 
+	test('the pill of an indicator crawls from one dot to the next', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel worm',
+			blockId: 'e2e-carousel-worm',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: [
+				'loop-carousel-previous',
+				'loop-carousel-indicator',
+				'loop-carousel-next',
+			],
+		});
+
+		const dots = page.locator(`${NAV} ${DOT}`);
+		const worm = page.locator('.vp-block-loop-carousel-dot-worm');
+
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+
+		// One pill for the row, and it is out of the reach of a pointer and a
+		// screen reader: the dot underneath is the button.
+		await expect(worm).toHaveCount(1);
+		await expect(worm).toHaveAttribute('aria-hidden', 'true');
+
+		const at = () =>
+			worm.evaluate((node) => ({
+				left: Math.round(parseFloat(node.style.insetInlineStart) || 0),
+				width: Math.round(parseFloat(node.style.width) || 0),
+			}));
+
+		// It rests on the first dot, at the width a dot takes there.
+		await expect.poll(at, { timeout: 10000 }).toEqual({
+			left: 0,
+			width: 24,
+		});
+
+		// And moves along the row rather than being redrawn somewhere else.
+		await page.locator(NEXT_ARROW).click();
+		await expect
+			.poll(async () => (await at()).left, { timeout: 10000 })
+			.toBeGreaterThan(0);
+		await expect
+			.poll(async () => (await at()).width, { timeout: 10000 })
+			.toBe(24);
+
+		await page.locator(PREV_ARROW).click();
+		await expect
+			.poll(async () => (await at()).left, { timeout: 10000 })
+			.toBe(0);
+	});
+
 	test('an indicator given a window slides its dots under it', async ({
 		page,
 		requestUtils,
