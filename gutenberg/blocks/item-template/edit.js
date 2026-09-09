@@ -31,12 +31,15 @@ import { memo, useEffect, useMemo, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import {
+	alignNone,
 	gallery,
 	grid,
 	image,
 	justifyCenter,
 	justifyLeft,
+	positionCenter,
 	postFeaturedImage,
+	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
 /**
@@ -143,6 +146,16 @@ const CONTAINER_OPTIONS = [
 	{ label: __('Wide', 'visual-portfolio'), value: 'wide' },
 	{ label: __('Custom', 'visual-portfolio'), value: 'custom' },
 ];
+
+// Switched in the toolbar beside the layout, where the editor keeps its other
+// width switchers. The typed width of a custom container stays in the sidebar:
+// a number is not something a toolbar asks for.
+const CONTAINER_ICONS = {
+	none: stretchFullWidth,
+	content: positionCenter,
+	wide: stretchWide,
+	custom: alignNone,
+};
 
 /**
  * Why a carousel has no container to hold its slides to.
@@ -1444,6 +1457,19 @@ export default function BlockEdit({
 						isActive: option.value === carouselSnapAlign,
 						onClick: () =>
 							setAttributes({ carouselSnapAlign: option.value }),
+					}))}
+				/>
+			)}
+			{'carousel' === layoutType && !containerReason && (
+				<ToolbarDropdownMenu
+					icon={CONTAINER_ICONS[carouselContainer]}
+					label={__('Container width', 'visual-portfolio')}
+					controls={CONTAINER_OPTIONS.map((option) => ({
+						title: option.label,
+						icon: CONTAINER_ICONS[option.value],
+						isActive: option.value === carouselContainer,
+						onClick: () =>
+							setAttributes({ carouselContainer: option.value }),
 					}))}
 				/>
 			)}

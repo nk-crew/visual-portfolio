@@ -76,22 +76,33 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 		// rendered switched off, and a control that is `display: none` cannot
 		// take focus.
 		if ( 'progress' === $indicator ) {
+			$draggable = ! isset( $attributes['isDraggable'] ) || $attributes['isDraggable'];
+			$classes   = 'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--progress';
+			$extra     = array(
+				'aria-label'    => __( 'Carousel position', 'visual-portfolio' ),
+				'aria-valuenow' => '0',
+			);
+
+			if ( $draggable ) {
+				$classes .= ' is-draggable';
+
+				$extra['role']             = 'slider';
+				$extra['tabindex']         = '0';
+				$extra['aria-orientation'] = 'horizontal';
+				$extra['aria-valuemin']    = '0';
+				$extra['aria-valuemax']    = '100';
+				/* translators: 1: slide number, 2: number of slides. */
+				$extra['data-vp-position-label'] = __( 'Slide %1$d of %2$d', 'visual-portfolio' );
+			} else {
+				$extra['role'] = 'progressbar';
+			}
+
 			return sprintf(
 				'<div %1$s><span class="vp-block-loop-carousel-progress-value"></span></div>',
 				Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(
-					Visual_Portfolio_Block_Loop_Carousel_Nav::indicator_classes( 'vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--progress', $attributes ),
+					Visual_Portfolio_Block_Loop_Carousel_Nav::indicator_classes( $classes, $attributes ),
 					'indicator',
-					array(
-						'role'                   => 'slider',
-						'tabindex'               => '0',
-						'aria-label'             => __( 'Carousel position', 'visual-portfolio' ),
-						'aria-orientation'       => 'horizontal',
-						'aria-valuemin'          => '0',
-						'aria-valuemax'          => '100',
-						'aria-valuenow'          => '0',
-						/* translators: 1: slide number, 2: number of slides. */
-						'data-vp-position-label' => __( 'Slide %1$d of %2$d', 'visual-portfolio' ),
-					)
+					$extra
 				)
 			);
 		}

@@ -109,6 +109,10 @@ gallery has no such switch and keeps the behaviour it always had.
 The item template follows the same shape: Settings holds the layout type and the
 columns, and neither can be hidden; each layout adds a panel of its own.
 
+The layout, where the slides come to rest and the container width are switched
+in the block toolbar as well as in the sidebar, beside the editor's own view
+switchers. The typed width of a custom container stays in the sidebar.
+
 **Carousel controls.** Everything a carousel is steered with is a block:
 *Carousel Previous Slide*, *Carousel Next Slide*, *Carousel Indicator* — drawn
 as dots, as a bar or as a counter — *Carousel Play and Pause*, and *Carousel
@@ -138,17 +142,19 @@ gallery of forty, and given a number it shows that many through a window and
 slides the rest under it, with the slide on screen in the middle and the dots at
 either edge shrinking away. Every dot stays in the page — one the window has
 moved past cannot be clicked, but tabbing to it brings it back. *Progress bar*
-draws a single bar that can be dragged, and answers the arrow keys, Home and End
-when focused; it is a `slider` rather than a `progressbar`, because ARIA gives a
-progress bar no way to set a value. *Counter* is the pair of numbers, the slide
+draws a single bar. *Can be dragged* is on by default: the bar answers a drag,
+and the arrow keys, Home and End when focused, which makes it a `slider` rather
+than a `progressbar` — ARIA gives a progress bar no way to set a value. A press
+that never moved travels to where it landed the way an arrow does, rather than
+jumping there. Switched off, the bar only says where the carousel is, and is a
+`progressbar` again. *Counter* is the pair of numbers, the slide
 on screen and how many there are, and is hidden from screen readers: the arrows
 and the dots already say the same thing.
 
 *Carousel Play and Pause* stops a carousel that moves on its own and starts it
 again, which is what WCAG 2.2.2 asks of any motion lasting more than five
 seconds — autoplay pauses under the pointer, but a visitor on a phone or at a
-keyboard had no way to stop it. It carries an *Icon* — pause or stop — and
-*Draw the wait*, a ring around the button that fills as the delay runs down. A
+keyboard had no way to stop it. It carries an *Icon* — pause or stop. A
 button beside a carousel with no autoplay, or one a visitor asked less motion
 of, stays switched off like an arrow beside a grid.
 
@@ -157,7 +163,9 @@ through to its slide and lights the one on screen; the strip scrolls itself, so
 the current thumbnail is brought into the middle of it and the page never moves.
 It carries a *Height* and an *Aspect ratio*, and two block styles: *Plain*, a
 ring around the current thumbnail, and *Dimmed*, where everything else steps
-back instead. A gallery that appends items with **Load More** does not extend
+back instead. A finger drags the strip because it is a scroll container; a
+mouse drags it because the strip is handed to the same library the carousel
+uses, which is already on the page. A gallery that appends items with **Load More** does not extend
 the strip — the module has no picture to add — so the two are not combined yet.
 
 None of them can be deleted: every one is inserted with `lock.remove`, and the
@@ -172,7 +180,8 @@ never loaded — never appears.
 
 The carousel panel of the item template carries the rest: *Effect*, *Autoplay*
 and its delay, *Repeat*, *Container width*, *Peek*, *Slides per step* (zero
-moves a whole screen at a time), *Slide height* and *Blocks fill the slide*,
+moves a whole screen at a time, and a swipe comes to rest on the same frames an
+arrow does), *Slide height* and *Blocks fill the slide*,
 *Fade the edges*, *Slide width from content* and *Free scrolling*.
 
 **Controls.** Filter, sort and pagination are server-rendered links and forms.

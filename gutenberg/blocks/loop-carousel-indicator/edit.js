@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { RangeControl } from '@wordpress/components';
+import { RangeControl, ToggleControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -40,7 +40,8 @@ export default function CarouselIndicatorEdit({
 	context,
 	clientId,
 }) {
-	const { indicator, isHidden, showOnHover, maxDots } = attributes;
+	const { indicator, isHidden, showOnHover, maxDots, isDraggable } =
+		attributes;
 	const isProgress = 'progress' === indicator;
 	const isCounter = 'counter' === indicator;
 	const isDots = !isProgress && !isCounter;
@@ -51,7 +52,7 @@ export default function CarouselIndicatorEdit({
 
 	const blockProps = useBlockProps({
 		className: blockClassName(
-			`vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--${isDots ? 'dots' : indicator} ${indicatorClassNames(attributes)}`.trim(),
+			`vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--${isDots ? 'dots' : indicator}${isProgress && isDraggable ? ' is-draggable' : ''} ${indicatorClassNames(attributes)}`.trim(),
 			isHidden
 		),
 	});
@@ -71,7 +72,7 @@ export default function CarouselIndicatorEdit({
 				isHidden={isHidden}
 				setAttributes={setAttributes}
 			/>
-			{isDots || (isOverlay && !isInRow) ? (
+			{isDots || isProgress || (isOverlay && !isInRow) ? (
 				<InspectorControls>
 					<ControlPanel title={__('Indicator', 'visual-portfolio')}>
 						{isDots ? (
@@ -87,6 +88,19 @@ export default function CarouselIndicatorEdit({
 								}
 								min={0}
 								max={15}
+							/>
+						) : null}
+						{isProgress ? (
+							<ToggleControl
+								label={__('Can be dragged', 'visual-portfolio')}
+								help={__(
+									'The bar answers a drag, and the arrow keys, Home and End when focused. Switched off it only says where the carousel is.',
+									'visual-portfolio'
+								)}
+								checked={isDraggable}
+								onChange={(value) =>
+									setAttributes({ isDraggable: value })
+								}
 							/>
 						) : null}
 						{isOverlay && !isInRow ? (

@@ -20,7 +20,6 @@
 			"default": "play-pause",
 			"enum": ["play-pause", "play-stop"]
 		},
-		"showProgress": { "type": "boolean", "default": true },
 		"showOnHover": { "type": "boolean", "default": false }
 	},
 	"supports": {

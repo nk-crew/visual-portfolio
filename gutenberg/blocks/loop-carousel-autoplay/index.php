@@ -51,12 +51,6 @@ class Visual_Portfolio_Block_Loop_Carousel_Autoplay {
 			$classes[] = 'has-stop-icon';
 		}
 
-		// The wait is drawn round the button as it runs down, from the same
-		// custom property the dot of the slide on screen fills itself with.
-		if ( ! empty( $attributes['showProgress'] ) ) {
-			$classes[] = 'has-progress';
-		}
-
 		if ( ! empty( $attributes['showOnHover'] ) ) {
 			$classes[] = Visual_Portfolio_Block_Loop_Carousel_Nav::SHOW_ON_HOVER_CLASS;
 		}

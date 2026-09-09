@@ -967,6 +967,25 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(dots).toHaveCount(IMAGES_COUNT);
 		await expect.poll(current, { timeout: 10000 }).toBe(0);
 
+		// A swipe comes to rest where an arrow leaves the carousel: only the
+		// slides that begin a frame are places it may stop at, and the last
+		// slide, which is the end of the carousel whatever the step is.
+		await expect
+			.poll(
+				() =>
+					page
+						.locator(`${LIST} > ${ITEM}`)
+						.evaluateAll((nodes) =>
+							nodes.map((node) =>
+								node.classList.contains('vp-carousel-no-snap')
+									? '-'
+									: 'S'
+							)
+						),
+				{ timeout: 10000 }
+			)
+			.toEqual(['S', '-', 'S', '-', 'S', 'S']);
+
 		// Two slides a press rather than one.
 		await next.click();
 		await expect.poll(current, { timeout: 10000 }).toBe(2);
@@ -1668,6 +1687,88 @@ test.describe('Gallery Item Template layouts', () => {
 
 		expect(after[0].width).toBe(before[0].width);
 		expect(after[1].width).toBeCloseTo(after[0].width * 2, -1);
+	});
+
+	test('a slide whose blocks fill it is drawn the same whether it is selected', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		// Titles the items actually have: an empty one is not rendered at all,
+		// and the picture would take the whole slide for a reason of its own.
+		const titled = [];
+
+		for (const image of images) {
+			titled.push({ ...image, title: 'Slide title' });
+		}
+
+		await admin.createNewPost({
+			title: 'Layouts - editor stretch height',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: {
+				baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
+				queryType: 'images',
+				imagesQuery: { images: titled },
+			},
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: {
+						layoutType: 'carousel',
+						layoutColumnsMode: 'manual',
+						layoutColumnCount: 3,
+						carouselStretchSlides: true,
+						carouselSlideHeight: '320px',
+					},
+					innerBlocks: [
+						{
+							name: 'visual-portfolio/item-image',
+							attributes: { aspectRatio: '4/3' },
+						},
+						{ name: 'visual-portfolio/item-title' },
+					],
+				},
+			],
+		});
+
+		const canvas = getEditorCanvas(page, editor);
+		const pictures = canvas.locator(
+			`${LIST} .wp-block-visual-portfolio-item-image`
+		);
+
+		// The editor keeps a hidden twin of the item being edited beside the
+		// drawn ones, so only the boxes with a height are the ones on screen.
+		const heights = () =>
+			pictures.evaluateAll((nodes) =>
+				nodes
+					.map((node) =>
+						Math.round(node.getBoundingClientRect().height)
+					)
+					.filter(Boolean)
+			);
+
+		await expect
+			.poll(async () => (await heights()).length, { timeout: 20000 })
+			.toBe(IMAGES_COUNT);
+
+		const drawn = await heights();
+
+		// The slide being edited is drawn from its blocks and the rest from a
+		// read-only copy, and the copy has to fill the slide the same way -
+		// otherwise a picture changed size the moment its slide was clicked.
+		expect(new Set(drawn).size).toBe(1);
+
+		// And each of them leaves the title its room rather than taking the
+		// whole 320px slide.
+		expect(drawn[0]).toBeLessThan(320);
+		expect(drawn[0]).toBeGreaterThan(0);
 	});
 
 	test('the editor draws the layout the moment it is picked', async ({

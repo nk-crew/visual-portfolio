@@ -90,10 +90,9 @@ export function indicatorClassNames({ showOnHover }) {
  *
  * @return {string} class names, possibly empty.
  */
-export function autoplayClassNames({ icon, showProgress, showOnHover }) {
+export function autoplayClassNames({ icon, showOnHover }) {
 	return [
 		'play-stop' === icon ? 'has-stop-icon' : '',
-		showProgress ? 'has-progress' : '',
 		showOnHover ? SHOW_ON_HOVER_CLASS : '',
 	]
 		.filter(Boolean)

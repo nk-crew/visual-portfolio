@@ -382,6 +382,13 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			width: auto;
 		}
 
+		// A carousel whose arrows move a whole frame answers a finger the same
+		// way: the slides between one frame and the next are scrolled past
+		// rather than rested on, so a swipe lands where an arrow would.
+		> #{$item}.vp-carousel-no-snap {
+			scroll-snap-align: none;
+		}
+
 		// The blocks of a slide fill the height the slide was given rather
 		// than sitting at the top of it: the item becomes a column, and the
 		// picture takes what the rest of the blocks leave - the same chain a

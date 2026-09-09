@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -29,7 +28,7 @@ export default function CarouselAutoplayEdit({
 	context,
 	clientId,
 }) {
-	const { isHidden, icon, showProgress, showOnHover } = attributes;
+	const { isHidden, icon, showOnHover } = attributes;
 
 	useLoopOrphanWarning(metadata.name, context);
 
@@ -57,17 +56,6 @@ export default function CarouselAutoplayEdit({
 						value={icon}
 						options={AUTOPLAY_ICONS}
 						onChange={(value) => setAttributes({ icon: value })}
-					/>
-					<ToggleControl
-						label={__('Draw the wait', 'visual-portfolio')}
-						help={__(
-							'A ring around the button fills as the delay before the next slide runs down.',
-							'visual-portfolio'
-						)}
-						checked={showProgress}
-						onChange={(value) =>
-							setAttributes({ showProgress: value })
-						}
 					/>
 					{/* A button in a row leaves the fade to the row. */}
 					{isOverlay && !isInRow ? (

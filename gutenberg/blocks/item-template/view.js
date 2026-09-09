@@ -189,12 +189,19 @@ const DOT_EDGE_CLASS = 'is-edge';
 const DOT_EDGE_FAR_CLASS = 'is-edge-far';
 const DOTS_SHIFT_PROPERTY = '--vp-carousel-dots-shift';
 const PROGRESS_SELECTOR = '.vp-block-loop-carousel-indicator--progress';
+// A bar the visitor may take hold of. One that may not is a plain progress
+// bar: it says where the carousel is and answers for nothing.
+const SCRUB_SELECTOR =
+	'.vp-block-loop-carousel-indicator--progress.is-draggable';
 const AUTOPLAY_SELECTOR = '[data-vp-carousel-control="autoplay"]';
 // Snapping is held off while a bar is being dragged. Two switches, because a
 // page has only one of them: the custom property is the one Blossom's own
 // `!important` layer answers to, and the class is for the carousel on a touch
 // screen, which never loads Blossom at all.
 const SCRUBBING_CLASS = 'vp-carousel-is-scrubbing';
+// A slide that is not the start of a group, and so not a place a swipe comes
+// to rest on when the arrows move a frame at a time.
+const NO_SNAP_CLASS = 'vp-carousel-no-snap';
 const THUMBS_SELECTOR = '.vp-block-loop-carousel-thumbnails';
 const THUMB_SELECTOR = '.vp-block-loop-carousel-thumb';
 const STOPPED_CLASS = 'vp-carousel-is-stopped';
@@ -1229,6 +1236,37 @@ function fillDots(container, items) {
 }
 
 /**
+ * Let a swipe rest where an arrow would leave the carousel.
+ *
+ * A carousel whose arrows move a whole frame should answer a finger the same
+ * way - otherwise the two disagree about what a step is, and a swipe lands
+ * between two frames. Only the slides that begin a group keep their snap; the
+ * rest are scrolled past.
+ *
+ * @param {HTMLElement} list Item template list.
+ */
+function syncSnapGroups(list) {
+	const items = list.querySelectorAll(ITEM_SELECTOR);
+
+	if (!items.length) {
+		return;
+	}
+
+	const group = getGroupSize(list, getSlideTargets(list), 0);
+	const last = items.length - 1;
+
+	items.forEach((item, index) => {
+		// The last slide keeps its snap whatever the step is. Snapping is
+		// mandatory, so a carousel can only come to rest where a slide says it
+		// may - and a gallery whose slide count is not a whole number of
+		// frames would otherwise be pulled back from its own end.
+		const rests = 0 === index % group || index === last;
+
+		item.classList.toggle(NO_SNAP_CLASS, group > 1 && !rests);
+	});
+}
+
+/**
  * Bring the thumbnail of the slide on screen into view inside its strip.
  *
  * The strip scrolls itself rather than the page: `scrollIntoView` walks every
@@ -1252,8 +1290,16 @@ function showThumb(strip, current) {
 		return;
 	}
 
+	// Measured against the strip itself, which is why the stylesheet positions
+	// it: `offsetLeft` answers for the nearest positioned ancestor, and an
+	// unpositioned strip handed back a distance from the frame the carousel
+	// scrolls in - so the thumbnail brought into view was never the right one.
+	const middle =
+		thumb.offsetLeft - (strip.clientWidth - thumb.offsetWidth) / 2;
+	const furthest = strip.scrollWidth - strip.clientWidth;
+
 	strip.scrollTo({
-		left: thumb.offsetLeft - (strip.clientWidth - thumb.offsetWidth) / 2,
+		left: Math.max(0, Math.min(furthest, middle)),
 		behavior: getScrollBehavior(),
 	});
 }
@@ -1352,18 +1398,45 @@ function slideDotWindow(container, current, force = false) {
 	// is - shrinking it would say there are earlier slides, and there are not.
 	const more = [shift < 0, shift > width - content];
 
-	dots.forEach((dot, at) => {
-		const [left, size] = boxes[at];
-		const start = left + shift;
-		// How far the dot sits from whichever edge still has dots beyond it,
-		// negative once it has passed that edge.
-		const inside = Math.min(
-			more[0] ? start : Number.POSITIVE_INFINITY,
-			more[1] ? width - (start + size) : Number.POSITIVE_INFINITY
-		);
+	// Which dots the window shows. Counted rather than measured against a
+	// threshold: the dots are not all the same width - the one on screen is a
+	// pill three times the others - so a distance in pixels said different
+	// things at different places in the row.
+	const shown = [];
 
-		dot.classList.toggle(DOT_EDGE_CLASS, inside >= 0 && inside < size * 2);
-		dot.classList.toggle(DOT_EDGE_FAR_CLASS, inside < 0);
+	boxes.forEach(([left, size], at) => {
+		const centre = left + size / 2 + shift;
+
+		if (centre >= 0 && centre <= width) {
+			shown.push(at);
+		}
+	});
+
+	// How far in from either end of the window a dot sits, but only for an end
+	// that has more dots behind it: at the start of the row the first dot is
+	// the first there is, and shrinking it would say otherwise.
+	const rank = (at) => {
+		const place = shown.indexOf(at);
+
+		if (place < 0) {
+			return -1;
+		}
+
+		return Math.min(
+			more[0] ? place : Number.POSITIVE_INFINITY,
+			more[1] ? shown.length - 1 - place : Number.POSITIVE_INFINITY
+		);
+	};
+
+	dots.forEach((dot, at) => {
+		// A ladder of two steps in from each end: the dot at the edge of the
+		// window is the smallest, the one beside it is bigger, and everything
+		// nearer the slide on screen is drawn whole. The dot the window is
+		// centred on is never one of them.
+		const place = at === index ? Number.POSITIVE_INFINITY : rank(at);
+
+		dot.classList.toggle(DOT_EDGE_CLASS, 1 === place);
+		dot.classList.toggle(DOT_EDGE_FAR_CLASS, place <= 0);
 	});
 }
 
@@ -1552,6 +1625,68 @@ function goToSlide(list, index, targets = getSlideTargets(list)) {
 }
 
 /**
+ * Let a strip of thumbnails be dragged along by a mouse.
+ *
+ * A finger already drags it - it is a scroll container - and a mouse does not,
+ * which is the same gap the carousel itself fills. It is filled the same way:
+ * the strip is handed to Blossom, the library the carousel already loads, so a
+ * thumbnail row behaves like the slides above it and nothing new is shipped to
+ * do it.
+ *
+ * @param {HTMLElement} list    Item template list.
+ * @param {boolean}     canDrag Whether the pointer of this visitor can drag.
+ *
+ * @return {Function} Teardown.
+ */
+function initThumbDrag(list, canDrag) {
+	const strips = Array.from(
+		getControlsRoot(list).querySelectorAll(THUMBS_SELECTOR)
+	);
+	const source = list.dataset.vpCarouselSrc;
+
+	if (!strips.length || !source || !canDrag) {
+		return noop;
+	}
+
+	const dragged = [];
+	let dropped = false;
+
+	// The same module the carousel imports, and the same request: a module
+	// asked for twice is evaluated once.
+	import(/* webpackIgnore: true */ source)
+		.then(({ Blossom }) => {
+			if (dropped) {
+				return;
+			}
+
+			strips.forEach((strip) => {
+				if (!strip.isConnected || carousels.has(strip)) {
+					return;
+				}
+
+				const carousel = Blossom(strip, { repeat: false });
+
+				carousels.set(strip, carousel);
+				carousel.init();
+				dragged.push(strip);
+			});
+		})
+		.catch(() => {
+			// A strip that could not be handed over is still a scroll
+			// container, and still answers a finger and a wheel.
+		});
+
+	return () => {
+		dropped = true;
+
+		dragged.forEach((strip) => {
+			carousels.get(strip)?.destroy();
+			carousels.delete(strip);
+		});
+	};
+}
+
+/**
  * Let the progress bar of a carousel be dragged, and steered by the keyboard.
  *
  * The bar says where the carousel is; a bar that can be taken hold of says it
@@ -1565,7 +1700,7 @@ function goToSlide(list, index, targets = getSlideTargets(list)) {
  */
 function initScrub(list) {
 	const root = getControlsRoot(list);
-	const bars = Array.from(root.querySelectorAll(PROGRESS_SELECTOR));
+	const bars = Array.from(root.querySelectorAll(SCRUB_SELECTOR));
 
 	if (!bars.length) {
 		return noop;
@@ -1573,6 +1708,10 @@ function initScrub(list) {
 
 	let snap = null;
 	let dragging = null;
+	// A press that never moved is a press, not a drag: the carousel travels to
+	// where it landed the way it travels for an arrow, rather than jumping.
+	let from = 0;
+	let moved = false;
 
 	const holdSnap = () => {
 		snap = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
@@ -1600,6 +1739,8 @@ function initScrub(list) {
 		return box.width > 0 ? Math.min(1, Math.max(0, along / box.width)) : 0;
 	};
 
+	// Following a finger, frame by frame: the carousel is put where the finger
+	// is and nowhere else, so it never lags behind or overshoots it.
 	const scrubTo = (fraction) => {
 		if (isRepeating(list)) {
 			const { origin, period } = getRepeatGeometry(list);
@@ -1614,6 +1755,26 @@ function initScrub(list) {
 			fraction * (list.scrollWidth - list.clientWidth),
 			'instant'
 		);
+	};
+
+	// Travelling to where a press landed, which is a different thing: the
+	// carousel is asked to go there and gets there the way it does for an
+	// arrow - the browser's own smooth scroll, and for a repeating carousel
+	// the step the module draws.
+	const travelTo = (fraction) => {
+		const total = list.querySelectorAll(ITEM_SELECTOR).length;
+
+		// A visitor who has just chosen a place is owed a whole delay on it,
+		// the same courtesy an arrow gets.
+		list.dispatchEvent(new window.CustomEvent(STEP_EVENT));
+
+		if (isRepeating(list)) {
+			goToRepeatingSlide(list, Math.round(fraction * total) % total, 0);
+
+			return;
+		}
+
+		scrollListTo(list, fraction * (list.scrollWidth - list.clientWidth));
 	};
 
 	// Let go on a slide rather than between two: mandatory snapping does it
@@ -1632,9 +1793,23 @@ function initScrub(list) {
 	};
 
 	const onMove = (event) => {
-		if (dragging) {
-			scrubTo(getFraction(dragging, event.clientX));
+		if (!dragging) {
+			return;
 		}
+
+		// A couple of pixels of travel under a finger is still a press. Only
+		// past that does the carousel start following it, and only then is
+		// snapping taken off.
+		if (!moved) {
+			if (Math.abs(event.clientX - from) < 3) {
+				return;
+			}
+
+			moved = true;
+			holdSnap();
+		}
+
+		scrubTo(getFraction(dragging, event.clientX));
 	};
 
 	const onUp = (event) => {
@@ -1643,12 +1818,19 @@ function initScrub(list) {
 		}
 
 		const fraction = getFraction(dragging, event.clientX);
+		const dragged = moved;
 
 		dragging = null;
+		moved = false;
 		window.removeEventListener('pointermove', onMove);
 		window.removeEventListener('pointerup', onUp);
 		window.removeEventListener('pointercancel', onUp);
-		land(fraction);
+
+		if (dragged) {
+			land(fraction);
+		} else {
+			travelTo(fraction);
+		}
 	};
 
 	const onDown = (event) => {
@@ -1656,8 +1838,8 @@ function initScrub(list) {
 		stopTravel(list);
 
 		dragging = event.currentTarget;
-		holdSnap();
-		scrubTo(getFraction(dragging, event.clientX));
+		from = event.clientX;
+		moved = false;
 
 		window.addEventListener('pointermove', onMove);
 		window.addEventListener('pointerup', onUp);
@@ -1788,6 +1970,13 @@ function initAutoplay(list) {
 		}
 
 		elapsed = 0;
+
+		// Emptied with the same frame that starts the move, so the dot of the
+		// slide being left does not sit there full while the carousel travels.
+		// A step fires the step event and lands here again through `restart`;
+		// the wrap back to the first slide does not, and used to leave the
+		// wait drawn full for a frame.
+		setProgress(0);
 
 		// The last slide goes back to the first, so a carousel that does not
 		// repeat still runs on.
@@ -1955,7 +2144,12 @@ function initCarousel(list) {
 
 	// The slide width is a `calc()` over the column count, which auto mode has
 	// to work out from the container.
-	const stopColumns = syncColumns(list, () => syncNav(list));
+	const stopColumns = syncColumns(list, () => {
+		// A group measured as a screenful changes with the width of the frame,
+		// so where a swipe rests is worked out again with the columns.
+		syncSnapGroups(list);
+		syncNav(list);
+	});
 
 	// Whether a play and pause button has anything to stop, which is the same
 	// question `initAutoplay` answers by doing nothing at all.
@@ -1965,6 +2159,7 @@ function initCarousel(list) {
 	const sleepControls = wakeControls(list, hasAutoplay);
 
 	syncDots(list);
+	syncSnapGroups(list);
 	syncNav(list);
 
 	list.addEventListener('scroll', onScroll, { passive: true });
@@ -1972,6 +2167,7 @@ function initCarousel(list) {
 
 	const stopObserving = observeItems(list, () => {
 		syncDots(list);
+		syncSnapGroups(list);
 		syncNav(list);
 	});
 
@@ -2055,12 +2251,14 @@ function initCarousel(list) {
 
 	const stopAutoplay = initAutoplay(list);
 	const stopScrub = initScrub(list);
+	const stopThumbDrag = initThumbDrag(list, canDrag);
 	const stopMarking = repeats ? markMovedRound(list) : noop;
 
 	return () => {
 		stopMarking();
 		stopAutoplay();
 		stopScrub();
+		stopThumbDrag();
 		stopColumns();
 		sleepControls();
 		list.removeEventListener('scroll', onScroll);

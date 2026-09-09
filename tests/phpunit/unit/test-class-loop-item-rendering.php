@@ -436,6 +436,27 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A bar that may not be dragged is a progress bar again: nothing offers a
+	 * visitor keys it does not answer.
+	 *
+	 * @return void
+	 */
+	public function test_a_progress_bar_that_cannot_be_dragged_is_not_a_slider() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-indicator {"indicator":"progress","isDraggable":false} /-->'
+		);
+
+		$this->assertStringContainsString( 'role="progressbar"', $output );
+		$this->assertStringNotContainsString( 'role="slider"', $output );
+		$this->assertStringNotContainsString( 'is-draggable', $output );
+
+		// The carousel itself is still reachable by keyboard; the bar is not.
+		$this->assertSame( 1, substr_count( $output, 'tabindex' ) );
+	}
+
+	/**
 	 * The play and pause button carries both of its names on the markup, so
 	 * the module needs no translations of its own, and is rendered as though
 	 * the carousel were running.
@@ -460,9 +481,6 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		// Switched off until a carousel is running under it, like every other
 		// control - and a carousel with no autoplay never wakes this one.
 		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
-
-		// The wait is drawn round the button by default.
-		$this->assertStringContainsString( 'has-progress', $output );
 	}
 
 	/**
@@ -477,12 +495,11 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 				'layoutType'       => 'carousel',
 				'carouselAutoplay' => true,
 			),
-			'<!-- wp:visual-portfolio/loop-carousel-autoplay {"icon":"play-stop","showProgress":false,"showOnHover":true} /-->'
+			'<!-- wp:visual-portfolio/loop-carousel-autoplay {"icon":"play-stop","showOnHover":true} /-->'
 		);
 
 		$this->assertStringContainsString( 'has-stop-icon', $output );
 		$this->assertStringContainsString( 'is-shown-on-hover', $output );
-		$this->assertStringNotContainsString( 'has-progress', $output );
 	}
 
 	/**

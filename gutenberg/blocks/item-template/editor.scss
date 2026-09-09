@@ -93,8 +93,13 @@
 }
 
 // The read-only copy of the item sits between the tile and the blocks, so the
-// height chain a tile needs runs through it as well.
-.vp-layout-tiles > .wp-block-visual-portfolio-item-template__item > .wp-block-visual-portfolio-item-template__preview {
+// height chain a tile needs runs through it as well - and so does the one a
+// carousel needs when its blocks fill the slide. Without it the copy is as
+// tall as its contents and the picture inside it grows to match, so a slide
+// changed height the moment it was selected and the copy gave way to the
+// blocks themselves.
+.vp-layout-tiles > .wp-block-visual-portfolio-item-template__item > .wp-block-visual-portfolio-item-template__preview,
+.vp-carousel-stretch-slides > .wp-block-visual-portfolio-item-template__item > .wp-block-visual-portfolio-item-template__preview {
 	display: flex;
 	flex: 1 1 auto;
 	flex-direction: column;

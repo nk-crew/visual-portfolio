@@ -181,24 +181,6 @@
 	border-left: 0.5em solid currentcolor;
 }
 
-// The wait drawn round the button as it runs down, from the same custom
-// property the dot of the slide on screen fills itself with. No transition:
-// it is rewritten every frame, and a transition would leave the ring a frame
-// behind for the whole of the delay.
-.vp-block-loop-carousel-autoplay.has-progress::after {
-	position: absolute;
-	inset: -2px;
-	content: "";
-	background: conic-gradient(currentcolor var(--vp-carousel-autoplay-progress, 0%), transparent 0);
-	border-radius: 50%;
-	mask: radial-gradient(closest-side, transparent 82%, #000 83%);
-	transition: none;
-}
-
-// Nothing is running down while the carousel is stopped, so the ring goes.
-.vp-carousel-is-stopped .vp-block-loop-carousel-autoplay.has-progress::after {
-	content: none;
-}
 
 .vp-block-loop-carousel-indicator {
 	--vp-carousel-track: color-mix(in oklab, currentcolor 10%, transparent 90%);
@@ -231,14 +213,17 @@
 		> .vp-block-loop-carousel-dot {
 			translate: var(--vp-carousel-dots-shift, 0);
 
-			// Shrinking away at the edges rather than being cut in half, so the
-			// row reads as a window onto more dots.
+			// Shrinking away towards the edges rather than being cut in half,
+			// so the row reads as a window onto more dots: the one beside the
+			// slide on screen is whole, the next in is smaller, and the one at
+			// the edge is smaller again.
 			&.is-edge {
-				scale: 0.66;
+				scale: 0.7;
 			}
 
 			&.is-edge-far {
-				scale: 0.33;
+				scale: 0.4;
+				opacity: 0.6;
 			}
 		}
 	}
@@ -266,7 +251,9 @@
 	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
 	border: 0;
 	border-radius: 3px;
-	transition: min-width 0.25s ease, background-color 0.25s ease, translate 0.25s ease, scale 0.25s ease;
+	// The pill, the shift and the shrinking all move together, so a dot never
+	// looks like two things happening at once.
+	transition: min-width 0.25s ease, background-color 0.25s ease, translate 0.25s ease, scale 0.25s ease, opacity 0.25s ease;
 
 	&:focus {
 		outline: none;
@@ -308,6 +295,10 @@
 // by. It scrolls on its own - a gallery of forty has more thumbnails than a
 // row can hold - and the module brings the one on screen into the middle of it.
 .vp-block-loop-carousel-thumbnails {
+	// The box a thumbnail measures its position from: the module reads
+	// `offsetLeft` to bring the one on screen into view, and that answers for
+	// the nearest positioned ancestor.
+	position: relative;
 	display: flex;
 	gap: var(--vp-carousel-thumb-gap, 8px);
 	overflow-x: auto;
@@ -381,6 +372,9 @@
 // so a theme can set it in the type of the gallery around it.
 .vp-block-loop-carousel-indicator--counter {
 	gap: 0.35em;
+	// Smaller than the text around it: a pair of numbers beside two arrows is
+	// a caption, not a heading.
+	font-size: 0.8125em;
 	font-variant-numeric: tabular-nums;
 	line-height: 1;
 }
@@ -397,31 +391,36 @@
 	width: min(180px, 60%);
 	height: 4px;
 	overflow: hidden;
-	cursor: grab;
 	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
 	border-radius: 2px;
 
-	&:active {
-		cursor: grabbing;
-	}
+	// A bar the visitor may take hold of says so, and is reachable. One that
+	// may not is left as it was: something to read, not to press.
+	&.is-draggable {
+		cursor: grab;
 
-	// Four pixels is not something a finger can take hold of. The bar keeps
-	// its own height and is given a target twenty four pixels tall around it,
-	// which is what a pointer has to be able to reach.
-	&::before {
-		position: absolute;
-		inset-block: -10px;
-		inset-inline: 0;
-		content: "";
-	}
+		&:active {
+			cursor: grabbing;
+		}
 
-	&:focus {
-		outline: none;
-	}
+		// Four pixels is not something a finger can take hold of. The bar
+		// keeps its own height and is given a target twenty four pixels tall
+		// around it, which is what a pointer has to be able to reach.
+		&::before {
+			position: absolute;
+			inset-block: -10px;
+			inset-inline: 0;
+			content: "";
+		}
 
-	&:focus-visible {
-		outline: 2px solid currentcolor;
-		outline-offset: 4px;
+		&:focus {
+			outline: none;
+		}
+
+		&:focus-visible {
+			outline: 2px solid currentcolor;
+			outline-offset: 4px;
+		}
 	}
 }
 
@@ -432,7 +431,11 @@
 	height: 100%;
 	background-color: currentcolor;
 	border-radius: inherit;
-	transition: width 0.15s linear;
+
+	// No transition of its own. The fill is rewritten from the scroll position
+	// on every frame the carousel moves, so it is already as smooth as the
+	// carousel is - and an easing on top of that only made the bar lag behind
+	// the slides it is reporting on.
 }
 
 // The box an indicator sits in, a block style: a pill outlined in the text colour, or filled
