@@ -46,12 +46,14 @@ keeps its proportions, so a pattern narrows into a stack instead of spilling out
 of the grid. Auto mode is untouched: fitting the container is already what it
 does. The gap is **Block spacing** in the Dimensions panel, like any other block.
 
-A manual count can answer for one screen at a time: three tabs above the slider
-— *Desktop*, *Tablet*, *Phone* — and a count for each. A tablet is 992px and
-narrower, a phone 576px and narrower, which are the plugin's own breakpoints.
-Both extra counts start at zero, which is the ladder above, so a gallery that
-never opens them is drawn exactly as it was. Auto mode does not offer them: the
-width of a column is what decides the count there.
+A manual count can answer for one screen at a time, and the screen is the one
+the editor is already previewing: switch the preview to *Tablet* or *Mobile* in
+the editor's own toolbar and the columns control answers for that screen. A
+tablet is 992px and narrower, a phone 576px and narrower, which are the
+plugin's own breakpoints. Both extra counts start at zero, which is the ladder
+above, so a gallery that never touches them is drawn exactly as it was. Auto
+mode does not offer them: the width of a column is what decides the count
+there.
 
 What a theme overrides in CSS, without touching the markup:
 
@@ -154,7 +156,9 @@ and the dots already say the same thing.
 *Carousel Play and Pause* stops a carousel that moves on its own and starts it
 again, which is what WCAG 2.2.2 asks of any motion lasting more than five
 seconds — autoplay pauses under the pointer, but a visitor on a phone or at a
-keyboard had no way to stop it. It carries an *Icon* — pause or stop. A
+keyboard had no way to stop it. It carries an *Icon* — pause or stop. Stopping holds the countdown where it
+was rather than emptying it, the same way the pointer resting on a carousel
+does, so starting again finishes the wait instead of beginning a new one. A
 button beside a carousel with no autoplay, or one a visitor asked less motion
 of, stays switched off like an arrow beside a grid.
 

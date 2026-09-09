@@ -273,10 +273,8 @@ const stopped = new WeakSet();
 // when the slide changes and not on every frame of a scroll.
 const dotWindows = new WeakMap();
 
-// Indicators already listening for the end of the pill that grows under the
-// slide on screen. The dot a window is centred on is measured while that pill
-// is still growing, so the row is placed again once it has stopped.
-const settling = new WeakSet();
+// Indicators already listening for a dot of theirs taking focus.
+const watched = new WeakSet();
 
 // How close to either end of its scroll range Blossom lets a repeating
 // carousel rest. The loop is carried by copies of the slides moved round to
@@ -1318,9 +1316,8 @@ function showThumb(strip, current) {
  *
  * @param {HTMLElement} container Indicator drawn as dots.
  * @param {number}      current   Slide the carousel is showing.
- * @param {boolean}     force     Measure again for the slide already drawn.
  */
-function slideDotWindow(container, current, force = false) {
+function slideDotWindow(container, current) {
 	const max = parseInt(container.dataset.vpMaxDots, 10) || 0;
 	const dots = container.querySelectorAll(DOT_SELECTOR);
 
@@ -1339,23 +1336,14 @@ function slideDotWindow(container, current, force = false) {
 
 	container.classList.add(DOTS_COLLAPSED_CLASS);
 
-	if (!force && dotWindows.get(container) === current) {
+	if (dotWindows.get(container) === current) {
 		return;
 	}
 
 	dotWindows.set(container, current);
 
-	// The pill under the slide on screen is still growing when this runs - the
-	// dots are lit a line above - so where it ends up is asked again once it
-	// has stopped. `min-width` is what grows; nothing else on a dot changes a
-	// position.
-	if (!settling.has(container)) {
-		settling.add(container);
-		container.addEventListener('transitionend', (event) => {
-			if ('min-width' === event.propertyName) {
-				slideDotWindow(container, dotWindows.get(container) ?? 0, true);
-			}
-		});
+	if (!watched.has(container)) {
+		watched.add(container);
 
 		// A dot the window has moved past is still a button in the page, so
 		// tabbing to it brings it back under the window - the alternative is a
@@ -1369,14 +1357,29 @@ function slideDotWindow(container, current, force = false) {
 		});
 	}
 
-	// Read every position first and write afterwards: a measurement taken
-	// between two writes makes the browser lay the row out again for each dot.
-	const boxes = Array.from(dots, (dot) => [dot.offsetLeft, dot.offsetWidth]);
+	// Where the dots will be, worked out from the shape the stylesheet writes
+	// down rather than read off the row. The pill under the slide on screen is
+	// still growing when this runs, so a measurement taken now is of a row
+	// halfway through a move - the shift landed on the wrong place, and asking
+	// again once the pill had stopped moved the row twice for one slide, which
+	// is the twitch a visitor saw.
+	const style = window.getComputedStyle(container);
+	const size =
+		parseFloat(style.getPropertyValue('--vp-carousel-dot-size')) || 6;
+	const grown =
+		parseFloat(style.getPropertyValue('--vp-carousel-dot-active-size')) ||
+		size;
+	const gap = parseFloat(style.columnGap) || 0;
 	const width = container.clientWidth;
-	const [lastLeft, lastWidth] = boxes[boxes.length - 1];
-	const content = lastLeft + lastWidth;
-	const index = Math.min(Math.max(current, 0), boxes.length - 1);
-	const [activeLeft, activeWidth] = boxes[index];
+	const index = Math.min(Math.max(current, 0), dots.length - 1);
+	const step = size + gap;
+
+	// The start of a dot once the row has settled: every dot is the same width
+	// but the one on screen, and the ones after it are pushed along by however
+	// much wider it is.
+	const startOf = (at) => at * step + (at > index ? grown - size : 0);
+	const widthOf = (at) => (at === index ? grown : size);
+	const content = startOf(dots.length - 1) + widthOf(dots.length - 1);
 
 	// Centred, but never pulled away from either end: the first dots sit at the
 	// start of the window and the last ones at its end, as they would in a row
@@ -1384,59 +1387,49 @@ function slideDotWindow(container, current, force = false) {
 	const shift = Math.round(
 		Math.min(
 			0,
-			Math.max(
-				width - content,
-				width / 2 - (activeLeft + activeWidth / 2)
-			)
+			Math.max(width - content, width / 2 - (startOf(index) + grown / 2))
 		)
 	);
 
 	container.style.setProperty(DOTS_SHIFT_PROPERTY, `${shift}px`);
 
 	// Only an edge with dots behind it shrinks them. At the start of the row
-	// the first dot sits against the window and is nonetheless the first there
-	// is - shrinking it would say there are earlier slides, and there are not.
+	// the first dot is the first there is, and shrinking it would say there
+	// are earlier slides.
 	const more = [shift < 0, shift > width - content];
 
-	// Which dots the window shows. Counted rather than measured against a
-	// threshold: the dots are not all the same width - the one on screen is a
-	// pill three times the others - so a distance in pixels said different
-	// things at different places in the row.
+	// Which dots the window shows.
 	const shown = [];
 
-	boxes.forEach(([left, size], at) => {
-		const centre = left + size / 2 + shift;
+	dots.forEach((ignored, at) => {
+		const centre = startOf(at) + widthOf(at) / 2 + shift;
 
 		if (centre >= 0 && centre <= width) {
 			shown.push(at);
 		}
 	});
 
-	// How far in from either end of the window a dot sits, but only for an end
-	// that has more dots behind it: at the start of the row the first dot is
-	// the first there is, and shrinking it would say otherwise.
-	const rank = (at) => {
-		const place = shown.indexOf(at);
-
-		if (place < 0) {
-			return -1;
-		}
-
-		return Math.min(
-			more[0] ? place : Number.POSITIVE_INFINITY,
-			more[1] ? shown.length - 1 - place : Number.POSITIVE_INFINITY
-		);
-	};
-
 	dots.forEach((dot, at) => {
-		// A ladder of two steps in from each end: the dot at the edge of the
-		// window is the smallest, the one beside it is bigger, and everything
-		// nearer the slide on screen is drawn whole. The dot the window is
-		// centred on is never one of them.
-		const place = at === index ? Number.POSITIVE_INFINITY : rank(at);
+		const place = shown.indexOf(at);
+		// How far in from either end of the window a dot sits, for an end that
+		// has more dots behind it. A ladder of two steps: the dot at the edge
+		// is the smallest, the one beside it is bigger, and everything nearer
+		// the slide on screen is drawn whole - which the dot on screen always
+		// is, since the window is centred on it.
+		const rank =
+			at === index || place < 0
+				? place < 0
+					? -1
+					: Number.POSITIVE_INFINITY
+				: Math.min(
+						more[0] ? place : Number.POSITIVE_INFINITY,
+						more[1]
+							? shown.length - 1 - place
+							: Number.POSITIVE_INFINITY
+					);
 
-		dot.classList.toggle(DOT_EDGE_CLASS, 1 === place);
-		dot.classList.toggle(DOT_EDGE_FAR_CLASS, place <= 0);
+		dot.classList.toggle(DOT_EDGE_CLASS, 1 === rank);
+		dot.classList.toggle(DOT_EDGE_FAR_CLASS, rank <= 0);
 	});
 }
 
@@ -1938,6 +1931,11 @@ function initAutoplay(list) {
 	// Asked for from outside, and kept apart from `paused` so that releasing it
 	// does not start a carousel the pointer is resting on.
 	let held = false;
+	// Stopped by the visitor, held from outside, paused under the pointer and
+	// off the screen are four ways of holding the same clock, and none of them
+	// turns it back: whatever was left of the wait is what is left of it when
+	// the carousel runs on.
+	//
 	// Off the screen. A carousel nobody can see has nobody to run for, and a
 	// visitor who scrolls back to it is owed the slide they left it on: the
 	// clock holds rather than turning back, like a pause.
@@ -2007,18 +2005,6 @@ function initAutoplay(list) {
 
 		held = false === event.detail?.playing;
 	};
-	// Only the visitor's own press starts the wait over. A hold asked for from
-	// outside keeps the countdown where it was, the way a pause under the
-	// pointer does - a lightbox that opens and closes owes the carousel the
-	// rest of its wait, not the whole of it.
-	const stop = (event) => {
-		if ('visitor' !== event.detail?.source) {
-			return;
-		}
-
-		elapsed = 0;
-		setProgress(0);
-	};
 	const restart = () => {
 		elapsed = 0;
 		setProgress(0);
@@ -2049,7 +2035,6 @@ function initAutoplay(list) {
 	});
 	list.addEventListener('pointerdown', pause);
 	list.addEventListener(AUTOPLAY_EVENT, hold);
-	list.addEventListener(AUTOPLAY_EVENT, stop);
 	list.addEventListener(STEP_EVENT, restart);
 	syncAutoplay(list, root);
 
@@ -2070,7 +2055,6 @@ function initAutoplay(list) {
 		});
 		list.removeEventListener('pointerdown', pause);
 		list.removeEventListener(AUTOPLAY_EVENT, hold);
-		list.removeEventListener(AUTOPLAY_EVENT, stop);
 		list.removeEventListener(STEP_EVENT, restart);
 		root.style.removeProperty('--vp-carousel-autoplay-progress');
 	};

@@ -1771,6 +1771,80 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(drawn[0]).toBeGreaterThan(0);
 	});
 
+	test('the columns control answers for the screen the editor is previewing', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Layouts - responsive control',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: {
+				baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
+				queryType: 'images',
+				imagesQuery: { images },
+			},
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: {
+						layoutType: 'grid',
+						layoutColumnsMode: 'manual',
+						layoutColumnCount: 4,
+					},
+					innerBlocks: [{ name: 'visual-portfolio/item-image' }],
+				},
+			],
+		});
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await editor.selectBlocks(
+			canvas.locator('[data-type="visual-portfolio/item-template"]')
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const columns = page.getByRole('slider', { name: 'Columns' });
+
+		// The desktop count, which is what the block was given.
+		await expect(columns).toHaveValue('4');
+
+		// Switching the preview switches what the control answers for: there
+		// is one answer to what the gallery looks like on a phone, and it is
+		// the editor's own switcher rather than a second set of tabs.
+		await page.getByRole('button', { name: 'View', exact: true }).click();
+		await page.getByRole('menuitemradio', { name: 'Tablet' }).click();
+
+		await expect(columns).toHaveValue('0');
+
+		await columns.fill('2');
+
+		await expect
+			.poll(
+				() =>
+					editor
+						.getBlocks()
+						.then(
+							(blocks) =>
+								blocks[0].innerBlocks[0].attributes
+									.layoutColumnCountTablet
+						),
+				{ timeout: 10000 }
+			)
+			.toBe(2);
+
+		// And the desktop count was left where it was.
+		const blocks = await editor.getBlocks();
+
+		expect(blocks[0].innerBlocks[0].attributes.layoutColumnCount).toBe(4);
+	});
+
 	test('the editor draws the layout the moment it is picked', async ({
 		page,
 		admin,

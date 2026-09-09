@@ -190,7 +190,14 @@
 }
 
 .vp-block-loop-carousel-indicator--dots {
-	gap: 6px;
+	// The shape of a dot, written down rather than left in the rules: the
+	// module works out where the row will come to rest from these, instead of
+	// measuring a row that is still moving.
+	--vp-carousel-dot-size: 6px;
+	--vp-carousel-dot-active-size: 24px;
+	--vp-carousel-dots-gap: 6px;
+
+	gap: var(--vp-carousel-dots-gap);
 
 	// Filled by the module, one per slide: a Load More brings more slides and a
 	// filter takes some away, and the dots follow.
@@ -207,7 +214,10 @@
 	// module writes. Clipping cannot scroll, and the module answers focus itself.
 	&.is-collapsed {
 		position: relative;
-		max-width: calc(var(--vp-carousel-dots-visible, 5) * 12px + 18px);
+		max-width: calc(
+			var(--vp-carousel-dots-visible, 5) * (var(--vp-carousel-dot-size) + var(--vp-carousel-dots-gap)) +
+			var(--vp-carousel-dot-active-size) - var(--vp-carousel-dot-size) - var(--vp-carousel-dots-gap)
+		);
 		overflow: clip;
 
 		> .vp-block-loop-carousel-dot {
@@ -239,9 +249,9 @@
 
 	// The pill grows through `min-width`: `width` on a flex item is a base size
 	// the flex algorithm is free to overrule, and the transition never landed.
-	min-width: 6px;
-	width: 6px;
-	height: 6px;
+	min-width: var(--vp-carousel-dot-size, 6px);
+	width: var(--vp-carousel-dot-size, 6px);
+	height: var(--vp-carousel-dot-size, 6px);
 	padding: 0;
 	overflow: hidden;
 	// A button has a colour of its own in every browser, and the fill of the
@@ -250,7 +260,7 @@
 	cursor: pointer;
 	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
 	border: 0;
-	border-radius: 3px;
+	border-radius: calc(var(--vp-carousel-dot-size, 6px) / 2);
 	// The pill, the shift and the shrinking all move together, so a dot never
 	// looks like two things happening at once.
 	transition: min-width 0.25s ease, background-color 0.25s ease, translate 0.25s ease, scale 0.25s ease, opacity 0.25s ease;
@@ -265,7 +275,7 @@
 	}
 
 	&[aria-current="true"] {
-		min-width: 24px;
+		min-width: var(--vp-carousel-dot-active-size, 24px);
 	}
 }
 

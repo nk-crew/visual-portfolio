@@ -45,7 +45,6 @@ import {
 /**
  * Internal dependencies
  */
-import { ToggleGroupButtonsControl } from '../../components/toggle-group-control';
 import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import {
@@ -53,7 +52,7 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
-import { getColumnsProps, SCREEN_COLUMNS } from './columns';
+import { getColumnsProps } from './columns';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
 
@@ -282,17 +281,25 @@ const CSS_UNITS = [
 	{ value: 'vw', label: 'vw', default: 20 },
 ];
 
-// The screens the column count can be set for. Named after the breakpoints
-// the plugin already carries, which is where the stylesheet answers them.
-const SCREEN_OPTIONS = [
-	{ value: 'desktop', label: __('Desktop', 'visual-portfolio') },
-	{ value: 'tablet', label: __('Tablet', 'visual-portfolio') },
-	{ value: 'mobile', label: __('Phone', 'visual-portfolio') },
-];
+// The count is set for one screen at a time, and the screen is the one the
+// editor is already previewing - the switcher in its own toolbar, rather than a
+// second set of tabs in the sidebar saying the same thing. Keyed by the names
+// the editor calls its devices.
+const SCREEN_ATTRIBUTES = {
+	Tablet: 'layoutColumnCountTablet',
+	Mobile: 'layoutColumnCountMobile',
+};
 
-const SCREEN_ATTRIBUTES = Object.fromEntries(
-	SCREEN_COLUMNS.map(({ screen, attribute }) => [screen, attribute])
-);
+const SCREEN_LABELS = {
+	Tablet: __(
+		'The count for a tablet, 992px and narrower. Zero steps the desktop count down on its own, the way it always has.',
+		'visual-portfolio'
+	),
+	Mobile: __(
+		'The count for a phone, 576px and narrower. Zero steps the desktop count down on its own, the way it always has.',
+		'visual-portfolio'
+	),
+};
 
 // A slide height is typed in the same units, and in `vh` besides: a share of
 // the screen is what the legacy slider offered as a percentage height.
@@ -560,7 +567,18 @@ export default function BlockEdit({
 	} = attributes;
 	// Which screen the columns control is answering for. A view of the editor
 	// rather than anything saved with the post.
-	const [screen, setScreen] = useState('desktop');
+	// Which screen the count is being set for: whichever one the editor is
+	// previewing. Switching the preview switches the control, so there is one
+	// answer to "what does this gallery look like on a phone" and not two.
+	const deviceType = useSelect(
+		(select) =>
+			select('core/editor')?.getDeviceType?.() ??
+			select('core/edit-post')?.__experimentalGetPreviewDeviceType?.() ??
+			select('core/edit-site')?.__experimentalGetPreviewDeviceType?.() ??
+			'Desktop',
+		[]
+	);
+	const screenAttribute = SCREEN_ATTRIBUTES[deviceType];
 	const {
 		'vp/queryType': queryType,
 		'vp/baseQuery': baseQuery,
@@ -896,50 +914,28 @@ export default function BlockEdit({
 					/>
 				</>
 			) : (
-				<VStack spacing={2}>
-					{/* The count is set for one screen at a time. A tablet and
-					    a phone start at zero, which is the ladder the
-					    stylesheet has always walked - so a gallery that never
-					    opens these is drawn exactly as it was. */}
-					<ToggleGroupButtonsControl
-						label={__('Screen', 'visual-portfolio')}
-						value={screen}
-						options={SCREEN_OPTIONS}
-						onChange={setScreen}
-					/>
-					<RangeControl
-						label={
-							'carousel' === layoutType
-								? __('Slides per view', 'visual-portfolio')
-								: __('Columns', 'visual-portfolio')
-						}
-						help={
-							'desktop' === screen
-								? undefined
-								: __(
-										'Zero steps the desktop count down on its own, the way it always has.',
-										'visual-portfolio'
-									)
-						}
-						value={
-							'desktop' === screen
-								? layoutColumnCount
-								: attributes[SCREEN_ATTRIBUTES[screen]] || 0
-						}
-						onChange={(value) =>
-							setAttributes(
-								'desktop' === screen
-									? { layoutColumnCount: value ?? 1 }
-									: {
-											[SCREEN_ATTRIBUTES[screen]]:
-												value ?? 0,
-										}
-							)
-						}
-						min={'desktop' === screen ? 1 : 0}
-						max={6}
-					/>
-				</VStack>
+				<RangeControl
+					label={
+						'carousel' === layoutType
+							? __('Slides per view', 'visual-portfolio')
+							: __('Columns', 'visual-portfolio')
+					}
+					help={SCREEN_LABELS[deviceType]}
+					value={
+						screenAttribute
+							? attributes[screenAttribute] || 0
+							: layoutColumnCount
+					}
+					onChange={(value) =>
+						setAttributes(
+							screenAttribute
+								? { [screenAttribute]: value ?? 0 }
+								: { layoutColumnCount: value ?? 1 }
+						)
+					}
+					min={screenAttribute ? 0 : 1}
+					max={6}
+				/>
 			)}
 		</>
 	) : null;
