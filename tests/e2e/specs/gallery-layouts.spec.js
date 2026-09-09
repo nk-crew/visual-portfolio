@@ -1203,7 +1203,9 @@ test.describe('Gallery Item Template layouts', () => {
 			const seen = [];
 
 			for (let i = 0; i < 14; i += 1) {
-				seen.push(node.getBoundingClientRect().left);
+				const box = node.getBoundingClientRect();
+
+				seen.push([box.left, box.width]);
 				await new Promise((settle) => {
 					window.requestAnimationFrame(() =>
 						window.setTimeout(settle, 24)
@@ -1219,12 +1221,17 @@ test.describe('Gallery Item Template layouts', () => {
 		const seen = await watching;
 		const steps = seen
 			.slice(1)
-			.map((at, index) => Math.abs(at - seen[index]));
+			.map(([at], index) => Math.abs(at - seen[index][0]));
 
 		// One dot is 18px along from the next. A crawl that carried on covers
 		// that in steps of a pixel or two; one that began again at the far end
 		// crossed most of it between two frames.
 		expect(Math.max(...steps)).toBeLessThan(9);
+
+		// And it is led straight on rather than stretched a second time: a
+		// pill already spanning two dots that stretches again to span three
+		// pulses, once per slide, which is the shaking a swipe showed.
+		expect(Math.max(...seen.map(([, width]) => width))).toBeLessThan(40);
 	});
 
 	test('an indicator given a window slides its dots under it', async ({

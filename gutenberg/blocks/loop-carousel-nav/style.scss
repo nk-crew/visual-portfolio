@@ -202,6 +202,10 @@
 	--vp-carousel-dot-size: 6px;
 	--vp-carousel-dot-slot: 18px;
 	--vp-carousel-dot-active-size: 14px;
+	// The colour of a dot that is not the slide on screen. The pill borrows it
+	// while a wait runs down, so the part of it that has not filled yet is the
+	// same tone as the dots it is crawling over.
+	--vp-carousel-dot-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
 
 	gap: 0;
 
@@ -268,16 +272,8 @@
 		inline-size: var(--vp-carousel-dot-size, 6px);
 		block-size: var(--vp-carousel-dot-size, 6px);
 		content: "";
-		background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+		background-color: var(--vp-carousel-dot-color);
 		border-radius: 50%;
-		transition: opacity 0.2s ease;
-	}
-
-	// The slot the pill is sitting in shows the pill and nothing else: while
-	// autoplay runs the pill is only part filled, and the mark underneath
-	// showed through it.
-	&[aria-current="true"]::before {
-		opacity: 0;
 	}
 
 	&:focus {
@@ -321,11 +317,10 @@
 // the delay runs down. Redrawn every frame, so no transition on the fill - one
 // would leave it a frame behind for the whole delay.
 //
-// Dimmed rather than emptied. Drawn in the track colour the pill was all but
-// invisible at the top of a wait, so for the first moment of every slide the
-// row looked as though no slide were current at all.
+// What has not filled yet is drawn in the colour of a dot, so the pill reads
+// as part of the row rather than as a shape of its own.
 .vp-carousel-is-playing .vp-block-loop-carousel-dot-worm {
-	background-color: color-mix(in oklab, currentcolor 35%, transparent 65%);
+	background-color: var(--vp-carousel-dot-color);
 	transition: background-color 0.25s ease, opacity 0.25s ease;
 
 	> .vp-block-loop-carousel-dot-progress {

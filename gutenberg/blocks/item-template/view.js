@@ -1305,7 +1305,8 @@ function getDotGeometry(container, count, current) {
  * @param {HTMLElement} worm     The pill.
  * @param {Object}      fallback Where it is when nothing is drawing it.
  *
- * @return {Object} `left` and `width`, in pixels.
+ * @return {Object} `left` and `width` in pixels, and whether a crawl was
+ *                  drawing it.
  */
 function getLivePill(worm, fallback) {
 	// The pill also carries transitions of its own - the shift of a collapsed
@@ -1321,7 +1322,7 @@ function getLivePill(worm, fallback) {
 	const progress = animation?.effect?.getComputedTiming?.().progress;
 
 	if (!animation || 'number' !== typeof progress) {
-		return fallback;
+		return { ...fallback, crawling: false };
 	}
 
 	const frames = animation.effect.getKeyframes();
@@ -1341,6 +1342,7 @@ function getLivePill(worm, fallback) {
 	return {
 		left: mix(before.insetInlineStart, after.insetInlineStart),
 		width: mix(before.width, after.width),
+		crawling: true,
 	};
 }
 
@@ -1401,19 +1403,31 @@ function moveWorm(container, geometry) {
 	worm.style.insetInlineStart = `${to.left}px`;
 	worm.style.width = `${to.width}px`;
 
+	const start = {
+		insetInlineStart: `${live.left}px`,
+		width: `${live.width}px`,
+	};
+	const end = { insetInlineStart: `${to.left}px`, width: `${to.width}px` };
 	const from = Math.min(live.left, to.left);
 	const until = Math.max(live.left + live.width, to.left + to.width);
 
+	// A pill at rest stretches across the ground it has to cover and gathers
+	// itself at the far end. One that is already crawling - a swipe moving the
+	// carousel on before it has arrived - is led straight on instead: stretching
+	// again from a pill that is already stretched made it pulse, once per
+	// slide, which is what a visitor saw as the row shaking.
 	worm.animate(
-		[
-			{ insetInlineStart: `${live.left}px`, width: `${live.width}px` },
-			{
-				insetInlineStart: `${from}px`,
-				width: `${until - from}px`,
-				offset: 0.5,
-			},
-			{ insetInlineStart: `${to.left}px`, width: `${to.width}px` },
-		],
+		live.crawling
+			? [start, end]
+			: [
+					start,
+					{
+						insetInlineStart: `${from}px`,
+						width: `${until - from}px`,
+						offset: 0.5,
+					},
+					end,
+				],
 		{ duration: WORM_DURATION, easing: 'ease-out' }
 	);
 }
