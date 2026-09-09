@@ -223,6 +223,10 @@ const COUNTER_TOTAL_SELECTOR = '.vp-block-loop-carousel-counter-total';
 // calling it, and a control that ended up beside a grid never loses it.
 const IDLE_CLASS = 'vp-carousel-control-idle';
 const PLAYING_CLASS = 'vp-carousel-is-playing';
+// Autoplay is running but its clock is held - the pointer is on the carousel,
+// something in it has focus, or a script asked for a hold. The indicator says
+// so rather than looking like a carousel that has stalled.
+const PAUSED_CLASS = 'vp-carousel-is-paused';
 // A slide Blossom has moved round to the far end of a repeating carousel.
 const MOVED_ROUND_CLASS = 'vp-carousel-moved-round';
 // The scroll ranges a moved slide is in view for, written on the slide.
@@ -1271,26 +1275,22 @@ function fillDots(container, items) {
  */
 function getDotGeometry(container, count, current) {
 	const style = window.getComputedStyle(container);
-	const size =
-		parseFloat(style.getPropertyValue('--vp-carousel-dot-size')) || 6;
+	const slot =
+		parseFloat(style.getPropertyValue('--vp-carousel-dot-slot')) || 18;
 	const grown =
 		parseFloat(style.getPropertyValue('--vp-carousel-dot-active-size')) ||
-		size;
-	const gap = parseFloat(style.columnGap) || 0;
+		slot;
 	const index = Math.min(Math.max(current, 0), Math.max(0, count - 1));
-	const step = size + gap;
-	// Every dot is the same width but the one on screen, and the ones after it
-	// are pushed along by however much wider it is.
-	const startOf = (at) => at * step + (at > index ? grown - size : 0);
-	const widthOf = (at) => (at === index ? grown : size);
 
+	// Every slide keeps a slot of the same width, so where a dot sits does not
+	// depend on which slide is showing: the row is the same width and the same
+	// shape whatever the carousel is doing, and only the pill moves.
 	return {
-		size,
+		slot,
 		grown,
 		index,
-		startOf,
-		widthOf,
-		content: count ? startOf(count - 1) + widthOf(count - 1) : 0,
+		centreOf: (at) => at * slot + slot / 2,
+		content: count * slot,
 	};
 }
 
@@ -1312,24 +1312,27 @@ function moveWorm(container, geometry) {
 	}
 
 	const to = {
-		left: geometry.startOf(geometry.index),
-		width: geometry.widthOf(geometry.index),
+		left: Math.round(
+			geometry.centreOf(geometry.index) - geometry.grown / 2
+		),
+		width: geometry.grown,
 	};
 	const at = worms.get(container);
 
-	worms.set(container, to);
+	// Written only when it has changed. The row is asked about on every frame
+	// of a scroll, and writing the same two lengths back each time laid the
+	// page out again for nothing.
+	if (at && at.left === to.left && at.width === to.width) {
+		return;
+	}
 
+	worms.set(container, to);
 	worm.style.insetInlineStart = `${to.left}px`;
 	worm.style.width = `${to.width}px`;
 
-	// Nothing to crawl from, nothing to crawl over, or a visitor who asked for
-	// less motion: the pill is simply where it belongs.
-	if (
-		!at ||
-		(at.left === to.left && at.width === to.width) ||
-		'auto' === getScrollBehavior() ||
-		!worm.animate
-	) {
+	// Nothing to crawl from, or a visitor who asked for less motion: the pill
+	// is simply where it belongs.
+	if (!at || 'auto' === getScrollBehavior() || !worm.animate) {
 		return;
 	}
 
@@ -1486,17 +1489,14 @@ function syncDotRow(container, current) {
 		});
 	}
 
-	const { index, grown, startOf, widthOf, content } = geometry;
+	const { index, centreOf, content } = geometry;
 	const width = container.clientWidth;
 
 	// Centred, but never pulled away from either end: the first dots sit at the
 	// start of the window and the last ones at its end, as they would in a row
 	// that was never collapsed.
 	const shift = Math.round(
-		Math.min(
-			0,
-			Math.max(width - content, width / 2 - (startOf(index) + grown / 2))
-		)
+		Math.min(0, Math.max(width - content, width / 2 - centreOf(index)))
 	);
 
 	container.style.setProperty(DOTS_SHIFT_PROPERTY, `${shift}px`);
@@ -1510,7 +1510,7 @@ function syncDotRow(container, current) {
 	const shown = [];
 
 	dots.forEach((ignored, at) => {
-		const centre = startOf(at) + widthOf(at) / 2 + shift;
+		const centre = centreOf(at) + shift;
 
 		if (centre >= 0 && centre <= width) {
 			shown.push(at);
@@ -2096,11 +2096,19 @@ function initAutoplay(list) {
 		}
 	};
 
+	// Whether the clock is held, for the indicator to draw. Off the screen is
+	// not among them: a carousel nobody can see has nothing to say.
+	const mark = () => {
+		root.classList.toggle(PAUSED_CLASS, paused || held);
+	};
+
 	const pause = () => {
 		paused = true;
+		mark();
 	};
 	const resume = () => {
 		paused = false;
+		mark();
 	};
 	const hold = (event) => {
 		// A visitor pressing stop and a script asking for a hold are two
@@ -2112,6 +2120,7 @@ function initAutoplay(list) {
 		}
 
 		held = false === event.detail?.playing;
+		mark();
 	};
 	const restart = () => {
 		elapsed = 0;
@@ -2154,7 +2163,7 @@ function initAutoplay(list) {
 	return () => {
 		window.cancelAnimationFrame(raf);
 		watcher.disconnect();
-		root.classList.remove(PLAYING_CLASS);
+		root.classList.remove(PLAYING_CLASS, PAUSED_CLASS);
 		boxes.forEach((box) => {
 			box.removeEventListener('pointerenter', pause);
 			box.removeEventListener('pointerleave', resume);

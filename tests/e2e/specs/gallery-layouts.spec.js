@@ -869,7 +869,7 @@ test.describe('Gallery Item Template layouts', () => {
 				carouselAutoplay: true,
 				carouselAutoplayDelay: 2,
 			},
-			carousel: ['loop-carousel-autoplay'],
+			carousel: ['loop-carousel-autoplay', 'loop-carousel-indicator'],
 		});
 
 		const list = page.locator(LIST);
@@ -884,6 +884,20 @@ test.describe('Gallery Item Template layouts', () => {
 		// Pressed is stopped: the button holds the carousel down, and says so.
 		await button.click();
 		await expect(button).toHaveAttribute('aria-pressed', 'true');
+
+		// And the indicator stops drawing a wait: a half filled pill on a
+		// stopped carousel is a countdown that never ends.
+		const fill = page.locator(
+			'.vp-block-loop-carousel-dot-worm .vp-block-loop-carousel-dot-progress'
+		);
+
+		await expect
+			.poll(
+				() =>
+					fill.evaluate((node) => node.getBoundingClientRect().width),
+				{ timeout: 10000 }
+			)
+			.toBe(0);
 
 		// The pointer is off the carousel and a whole delay has passed, and it
 		// has still not moved.
@@ -1118,25 +1132,42 @@ test.describe('Gallery Item Template layouts', () => {
 				width: Math.round(parseFloat(node.style.width) || 0),
 			}));
 
-		// It rests on the first dot, at the width a dot takes there.
+		// It rests in the middle of the first slot: an 18px slot with a 14px
+		// pill in it.
 		await expect.poll(at, { timeout: 10000 }).toEqual({
-			left: 0,
-			width: 24,
+			left: 2,
+			width: 14,
 		});
 
-		// And moves along the row rather than being redrawn somewhere else.
+		// The row is exactly as wide with the first slide showing as with any
+		// other - every slide keeps a slot of the same width, so a row centred
+		// under a gallery does not slide from side to side as the carousel
+		// moves.
+		const row = page.locator(
+			`${NAV} .vp-block-loop-carousel-indicator--dots`
+		);
+		const spread = () =>
+			row.evaluate((node) =>
+				Math.round(node.getBoundingClientRect().width)
+			);
+		const before = await spread();
+
+		// And the pill moves along the row rather than being redrawn at the
+		// far end of it.
 		await page.locator(NEXT_ARROW).click();
 		await expect
 			.poll(async () => (await at()).left, { timeout: 10000 })
-			.toBeGreaterThan(0);
+			.toBe(20);
 		await expect
 			.poll(async () => (await at()).width, { timeout: 10000 })
-			.toBe(24);
+			.toBe(14);
+		await expect.poll(spread, { timeout: 10000 }).toBe(before);
 
 		await page.locator(PREV_ARROW).click();
 		await expect
 			.poll(async () => (await at()).left, { timeout: 10000 })
-			.toBe(0);
+			.toBe(2);
+		await expect.poll(spread, { timeout: 10000 }).toBe(before);
 	});
 
 	test('an indicator given a window slides its dots under it', async ({

@@ -193,11 +193,17 @@
 	// The shape of a dot, written down rather than left in the rules: the
 	// module works out where the row will come to rest from these, instead of
 	// measuring a row that is still moving.
+	// Every slide keeps a slot of the same width, whether it is the one on
+	// screen or not, so the row is exactly as wide with the first slide
+	// showing as with the last. The dot under the slide on screen used to
+	// widen, and while one widened and another narrowed the row breathed - a
+	// row centred under a gallery slid from side to side every time the
+	// carousel moved, twice over during a swipe.
 	--vp-carousel-dot-size: 6px;
-	--vp-carousel-dot-active-size: 24px;
-	--vp-carousel-dots-gap: 6px;
+	--vp-carousel-dot-slot: 18px;
+	--vp-carousel-dot-active-size: 14px;
 
-	gap: var(--vp-carousel-dots-gap);
+	gap: 0;
 
 	// Filled by the module, one per slide: a Load More brings more slides and a
 	// filter takes some away, and the dots follow.
@@ -216,10 +222,7 @@
 	position: relative;
 
 	&.is-collapsed {
-		max-width: calc(
-			var(--vp-carousel-dots-visible, 5) * (var(--vp-carousel-dot-size) + var(--vp-carousel-dots-gap)) +
-			var(--vp-carousel-dot-active-size) - var(--vp-carousel-dot-size) - var(--vp-carousel-dots-gap)
-		);
+		max-width: calc(var(--vp-carousel-dots-visible, 5) * var(--vp-carousel-dot-slot));
 		overflow: clip;
 
 		> .vp-block-loop-carousel-dot {
@@ -241,30 +244,41 @@
 	}
 }
 
-// A dot is the place a slide keeps in the row, and nothing more: six pixels of
-// track, or the width of the pill while it is the slide on screen, so that the
-// pill has somewhere to sit. What is drawn in it is the pill, which crawls
-// from one dot to the next rather than appearing at the far end.
+// A dot is the slot a slide keeps in the row and the mark drawn in the middle
+// of it. The slot never changes width; what moves is the pill.
 .vp-block-loop-carousel-dot {
-	position: relative;
-
-	// The pill grows through `min-width`: `width` on a flex item is a base size
-	// the flex algorithm is free to overrule, and the transition never landed.
-	min-width: var(--vp-carousel-dot-size, 6px);
-	width: var(--vp-carousel-dot-size, 6px);
-	height: var(--vp-carousel-dot-size, 6px);
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--vp-carousel-dot-slot, 18px);
+	block-size: var(--vp-carousel-dot-slot, 18px);
 	padding: 0;
-	overflow: hidden;
-	// A button has a colour of its own in every browser, and the fill of the
-	// dot is drawn in the colour of the indicator around it.
+	// A button has a colour of its own in every browser, and the mark is drawn
+	// in the colour of the indicator around it.
 	color: inherit;
 	cursor: pointer;
-	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+	background: none;
 	border: 0;
-	border-radius: calc(var(--vp-carousel-dot-size, 6px) / 2);
-	// The pill, the shift and the shrinking all move together, so a dot never
-	// looks like two things happening at once.
-	transition: min-width 0.25s ease, background-color 0.25s ease, translate 0.25s ease, scale 0.25s ease, opacity 0.25s ease;
+	border-radius: 50%;
+	transition: translate 0.25s ease, scale 0.25s ease, opacity 0.25s ease;
+
+	&::before {
+		display: block;
+		inline-size: var(--vp-carousel-dot-size, 6px);
+		block-size: var(--vp-carousel-dot-size, 6px);
+		content: "";
+		background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+		border-radius: 50%;
+		transition: opacity 0.2s ease;
+	}
+
+	// The slot the pill is sitting in shows the pill and nothing else: while
+	// autoplay runs the pill is only part filled, and the mark underneath
+	// showed through it.
+	&[aria-current="true"]::before {
+		opacity: 0;
+	}
 
 	&:focus {
 		outline: none;
@@ -272,11 +286,7 @@
 
 	&:focus-visible {
 		outline: 2px solid currentcolor;
-		outline-offset: 2px;
-	}
-
-	&[aria-current="true"] {
-		min-width: var(--vp-carousel-dot-active-size, 24px);
+		outline-offset: -2px;
 	}
 }
 
@@ -288,7 +298,7 @@
 	inset-block: 0;
 	inset-inline-start: 0;
 	block-size: var(--vp-carousel-dot-size, 6px);
-	inline-size: var(--vp-carousel-dot-size, 6px);
+	inline-size: var(--vp-carousel-dot-active-size, 14px);
 	margin-block: auto;
 	overflow: hidden;
 	pointer-events: none;
@@ -307,14 +317,36 @@
 	border-radius: inherit;
 }
 
-// While autoplay runs the pill is the wait rather than the place: it becomes
-// the track and fills as the delay runs down. Redrawn every frame, so no
-// transition - one would leave the fill a frame behind for the whole delay.
+// While autoplay runs the pill is the wait as well as the place: it fills as
+// the delay runs down. Redrawn every frame, so no transition on the fill - one
+// would leave it a frame behind for the whole delay.
+//
+// Dimmed rather than emptied. Drawn in the track colour the pill was all but
+// invisible at the top of a wait, so for the first moment of every slide the
+// row looked as though no slide were current at all.
 .vp-carousel-is-playing .vp-block-loop-carousel-dot-worm {
-	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
+	background-color: color-mix(in oklab, currentcolor 35%, transparent 65%);
+	transition: background-color 0.25s ease, opacity 0.25s ease;
 
 	> .vp-block-loop-carousel-dot-progress {
 		width: var(--vp-carousel-autoplay-progress, 0%);
+	}
+}
+
+// Held under a pointer or a focus. The wait is not running, and the pill says
+// so instead of looking like a carousel that has stalled.
+.vp-carousel-is-playing.vp-carousel-is-paused .vp-block-loop-carousel-dot-worm {
+	opacity: 0.65;
+}
+
+// Stopped by the visitor: nothing is running down, so the pill is the slide on
+// screen and nothing else - a half filled pill would be a wait that never ends.
+.vp-carousel-is-stopped .vp-block-loop-carousel-dot-worm {
+	background-color: currentcolor;
+	opacity: 1;
+
+	> .vp-block-loop-carousel-dot-progress {
+		width: 0;
 	}
 }
 
@@ -399,9 +431,10 @@
 // so a theme can set it in the type of the gallery around it.
 .vp-block-loop-carousel-indicator--counter {
 	gap: 0.35em;
-	// Smaller than the text around it: a pair of numbers beside two arrows is
-	// a caption, not a heading.
-	font-size: 0.8125em;
+	// Smaller than the text around it and set heavier to hold its own at that
+	// size: a pair of numbers beside two arrows is a caption, not a heading.
+	font-size: 0.6875em;
+	font-weight: 600;
 	font-variant-numeric: tabular-nums;
 	line-height: 1;
 }
