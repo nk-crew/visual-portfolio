@@ -1436,6 +1436,25 @@ test.describe('Gallery Item Template layouts', () => {
 			)
 			.toEqual(Array.from({ length: IMAGES_COUNT }, () => 14));
 
+		// The pill is drawn over the dots. A collapsed row slides them with a
+		// translate, which puts them in the pill's own painting layer and
+		// after it in the markup, so without saying otherwise the marks are
+		// drawn on top of it.
+		await expect
+			.poll(
+				() =>
+					indicator.evaluate(
+						(node) =>
+							window.getComputedStyle(
+								node.querySelector(
+									'.vp-block-loop-carousel-dot-worm'
+								)
+							).zIndex
+					),
+				{ timeout: 10000 }
+			)
+			.toBe('1');
+
 		// And pressing one moves the carousel. The row used to slide under the
 		// pointer as the dot took focus, which took the dot out from under it
 		// between pressing and letting go, so the press never became a click.

@@ -228,8 +228,11 @@
 	// `clip` rather than `hidden`: a hidden box is a scroll container, and the
 	// browser would scroll it to a dot that took focus, fighting the shift the
 	// module writes. Clipping cannot scroll, and the module answers focus itself.
-	// The pill is drawn over the row, so the row is the box it is placed in.
+	// The pill is drawn over the row, so the row is the box it is placed in -
+	// and a layer of its own, so that raising the pill above the dots raises
+	// it above nothing else on the page.
 	position: relative;
+	isolation: isolate;
 
 	&.is-collapsed {
 		max-width: calc(var(--vp-carousel-dots-visible, 5) * var(--vp-carousel-dot-slot));
@@ -303,6 +306,11 @@
 // across a row that is still making room for it, and the two arrive together.
 .vp-block-loop-carousel-dot-worm {
 	position: absolute;
+	// Above the dots. A collapsed row slides its dots with a translate, which
+	// puts them in the same painting layer as the pill and after it in the
+	// markup - so the marks were drawn over the pill that is meant to be on
+	// top of them.
+	z-index: 1;
 	inset-block: 0;
 	inset-inline-start: 0;
 	block-size: var(--vp-carousel-dot-size, 6px);
