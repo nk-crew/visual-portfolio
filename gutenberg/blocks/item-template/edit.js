@@ -372,7 +372,14 @@ function MaximumColumnsControl({ value, onChange }) {
 						label={label}
 						hideLabelFromVision
 						value={value}
-						onChange={(next) => onChange(parseInt(next, 10) || 0)}
+						onChange={(next) =>
+							onChange(
+								Math.min(
+									MAX_COLUMN_COUNT,
+									Math.max(0, parseInt(next, 10) || 0)
+								)
+							)
+						}
 						min={0}
 						max={MAX_COLUMN_COUNT}
 					/>
