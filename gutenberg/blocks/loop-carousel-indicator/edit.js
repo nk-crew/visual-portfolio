@@ -136,10 +136,11 @@ export default function CarouselIndicatorEdit({
 						className="vp-block-loop-carousel-dot-worm"
 						aria-hidden="true"
 						// The preview rests on the first slide, so the pill
-						// sits in the middle of the first slot.
+						// sits in the middle of the first slot - inside the
+						// room the row keeps for the dots to step aside into.
 						style={{
 							insetInlineStart:
-								'calc((var(--vp-carousel-dot-slot, 18px) - var(--vp-carousel-dot-active-size, 14px)) / 2)',
+								'calc(var(--vp-carousel-dot-spread) + (var(--vp-carousel-dot-slot) - var(--vp-carousel-dot-active-size)) / 2)',
 						}}
 					>
 						<span className="vp-block-loop-carousel-dot-progress" />

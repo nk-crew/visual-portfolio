@@ -1188,17 +1188,19 @@ test.describe('Gallery Item Template layouts', () => {
 				width: Math.round(parseFloat(node.style.width) || 0),
 			}));
 
-		// It rests in the middle of the first slot: a 14px slot with a 12px
-		// pill in it.
+		// It rests in the middle of the first slot: a 14px slot with an 18px
+		// pill in it, drawn inside the 6px the row keeps at either end for
+		// the dots to step aside into.
 		await expect.poll(at, { timeout: 10000 }).toEqual({
-			left: 1,
-			width: 12,
+			left: 4,
+			width: 18,
 		});
 
 		// The row is exactly as wide with the first slide showing as with any
 		// other - every slide keeps a slot of the same width, so a row centred
 		// under a gallery does not slide from side to side as the carousel
-		// moves.
+		// moves. What makes room for the pill is the dots either side of it
+		// stepping aside, which is a move and not a layout.
 		const row = page.locator(
 			`${NAV} .vp-block-loop-carousel-indicator--dots`
 		);
@@ -1208,21 +1210,48 @@ test.describe('Gallery Item Template layouts', () => {
 			);
 		const before = await spread();
 
+		// Where the dots have come to rest, from the middle of one to the
+		// middle of the next.
+		const gaps = () =>
+			dots.evaluateAll((nodes) => {
+				const centres = nodes.map((dot) => {
+					const box = dot.getBoundingClientRect();
+
+					return box.left + box.width / 2;
+				});
+
+				return centres
+					.slice(1)
+					.map((centre, index) =>
+						Math.round(centre - centres[index])
+					);
+			});
+
 		// And the pill moves along the row rather than being redrawn at the
 		// far end of it.
 		await page.locator(NEXT_ARROW).click();
 		await expect
 			.poll(async () => (await at()).left, { timeout: 10000 })
-			.toBe(15);
+			.toBe(18);
 		await expect
 			.poll(async () => (await at()).width, { timeout: 10000 })
-			.toBe(12);
+			.toBe(18);
 		await expect.poll(spread, { timeout: 10000 }).toBe(before);
+
+		// The dots either side of the pill have stood back to let it in: the
+		// gap they leave it is a slot and the six pixels it is wider by, and
+		// every other pair of dots is a plain slot apart.
+		await expect
+			.poll(async () => (await gaps()).slice(0, 2), { timeout: 10000 })
+			.toEqual([20, 20]);
+		await expect
+			.poll(async () => (await gaps()).slice(2), { timeout: 10000 })
+			.toEqual(Array.from({ length: IMAGES_COUNT - 3 }, () => 14));
 
 		await page.locator(PREV_ARROW).click();
 		await expect
 			.poll(async () => (await at()).left, { timeout: 10000 })
-			.toBe(1);
+			.toBe(4);
 		await expect.poll(spread, { timeout: 10000 }).toBe(before);
 	});
 
@@ -1279,7 +1308,7 @@ test.describe('Gallery Item Template layouts', () => {
 			.slice(1)
 			.map(([at], index) => Math.abs(at - seen[index][0]));
 
-		// One dot is 18px along from the next. A crawl that carried on covers
+		// One dot is 14px along from the next. A crawl that carried on covers
 		// that in steps of a pixel or two; one that began again at the far end
 		// crossed most of it between two frames.
 		expect(Math.max(...steps)).toBeLessThan(9);
@@ -1289,7 +1318,7 @@ test.describe('Gallery Item Template layouts', () => {
 		// follows, so a pill in motion spans the ground between two dots.
 		const widths = seen.map(([, width]) => width);
 
-		expect(Math.max(...widths)).toBeGreaterThan(20);
+		expect(Math.max(...widths)).toBeGreaterThan(24);
 
 		// Stretching once and not once per slide. A pill that gathered itself
 		// between the two steps and stretched again would grow, shrink and
@@ -1436,24 +1465,30 @@ test.describe('Gallery Item Template layouts', () => {
 			)
 			.toEqual(Array.from({ length: IMAGES_COUNT }, () => 14));
 
-		// The pill is drawn over the dots. A collapsed row slides them with a
-		// translate, which puts them in the pill's own painting layer and
-		// after it in the markup, so without saying otherwise the marks are
-		// drawn on top of it.
+		// The pill is drawn over every dot, the one it names included. A dot
+		// carries a translate, which puts it in the pill's own painting layer
+		// and after it in the markup, so without saying otherwise the marks
+		// are drawn on top of it - and while autoplay runs the pill is the
+		// wait running down, which is the one thing in the row a visitor is
+		// watching.
 		await expect
 			.poll(
 				() =>
-					indicator.evaluate(
-						(node) =>
-							window.getComputedStyle(
-								node.querySelector(
-									'.vp-block-loop-carousel-dot-worm'
-								)
-							).zIndex
-					),
+					indicator.evaluate((node) => [
+						window.getComputedStyle(
+							node.querySelector(
+								'.vp-block-loop-carousel-dot-worm'
+							)
+						).zIndex,
+						window.getComputedStyle(
+							node.querySelector(
+								'.vp-block-loop-carousel-dot[aria-current="true"]'
+							)
+						).zIndex,
+					]),
 				{ timeout: 10000 }
 			)
-			.toBe('1');
+			.toEqual(['2', '1']);
 
 		// And pressing one moves the carousel. The row used to slide under the
 		// pointer as the dot took focus, which took the dot out from under it

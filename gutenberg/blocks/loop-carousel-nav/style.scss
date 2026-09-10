@@ -193,15 +193,29 @@
 	// The shape of a dot, written down rather than left in the rules: the
 	// module works out where the row will come to rest from these, instead of
 	// measuring a row that is still moving.
+	//
 	// Every slide keeps a slot of the same width, whether it is the one on
 	// screen or not, so the row is exactly as wide with the first slide
-	// showing as with the last. The dot under the slide on screen used to
-	// widen, and while one widened and another narrowed the row breathed - a
-	// row centred under a gallery slid from side to side every time the
-	// carousel moved, twice over during a swipe.
+	// showing as with the last. What makes room for the pill is the dots
+	// either side of it stepping aside - a move rather than a width, so the
+	// row is laid out once and never again.
 	--vp-carousel-dot-size: 6px;
 	--vp-carousel-dot-slot: 14px;
-	--vp-carousel-dot-active-size: 12px;
+	--vp-carousel-dot-active-size: 18px;
+	// How far a dot steps aside for the one on screen: half of what the pill
+	// is wider than a mark, so the gutter either side of the pill is the
+	// gutter between any two dots. The module works the same number out of
+	// the same two lengths - a custom property that is a sum of others is
+	// handed back unresolved, so it cannot simply read this one.
+	--vp-carousel-dot-spread: calc(
+		(var(--vp-carousel-dot-active-size) - var(--vp-carousel-dot-size)) / 2
+	);
+	// Which way along the row is forwards. Everything that moves a dot is
+	// worked out in the order the dots are read in - a step aside here, the
+	// shift of a window in the module - and comes out as a translate, which
+	// is a direction on the screen. In a row that reads the other way the two
+	// are opposites.
+	--vp-carousel-dot-way: 1;
 	// The colour of a dot that is not the slide on screen. The pill borrows it
 	// while a wait runs down, so the part of it that has not filled yet is the
 	// same tone as the dots it is crawling over.
@@ -213,7 +227,16 @@
 	--vp-carousel-dot-ground: Canvas;
 	--vp-carousel-dot-color: color-mix(in oklab, currentcolor 22%, var(--vp-carousel-dot-ground));
 
+	&:dir(rtl) {
+		--vp-carousel-dot-way: -1;
+	}
+
 	gap: 0;
+	// The room the dots step aside into, kept by the row rather than taken
+	// from whatever stands beside it: the row is as wide as the widest thing
+	// it can draw, so a dot at either end still sits inside its own box and
+	// an indicator drawn as a pill still has its padding around the dots.
+	padding-inline: var(--vp-carousel-dot-spread);
 
 	// Filled by the module, one per slide: a Load More brings more slides and a
 	// filter takes some away, and the dots follow.
@@ -239,8 +262,6 @@
 		overflow: clip;
 
 		> .vp-block-loop-carousel-dot {
-			translate: var(--vp-carousel-dots-shift, 0);
-
 			// Shrinking away towards the edges rather than being cut in half,
 			// so the row reads as a window onto more dots: the one beside the
 			// slide on screen is whole, the next in is smaller, and the one at
@@ -279,6 +300,14 @@
 	background: none;
 	border: 0;
 	border-radius: 50%;
+	// Where the dot has been put: the shift of a row sliding under a window,
+	// and the step it takes aside for the dot on screen.
+	translate: calc(
+		(
+				var(--vp-carousel-dots-shift, 0px) +
+					var(--vp-carousel-dot-step, 0px)
+			) * var(--vp-carousel-dot-way, 1)
+	);
 	transition: translate 0.25s ease;
 
 	&::before {
@@ -301,16 +330,47 @@
 	}
 }
 
+// The dots part around the one on screen: those before it step back and those
+// after it step on, so the room the pill stands in is as much wider than a
+// slot as the pill is wider than a mark - and the gutter either side of it is
+// the gutter between any two dots.
+//
+// A step rather than a width. Two slots changing width at once only cancel out
+// while both are at rest: a swipe catching them halfway through left the row
+// wider than it was, and a row centred under a gallery slid from side to side
+// every time the carousel moved. Nothing here is a layout, so nothing can.
+//
+// The dot on screen does not move, which is what keeps the pill travelling a
+// slot at a time however far along the row it has got to.
+.vp-block-loop-carousel-dot[aria-current="true"]
+	~ .vp-block-loop-carousel-dot {
+	--vp-carousel-dot-step: var(--vp-carousel-dot-spread);
+}
+
+.vp-block-loop-carousel-dot:has(
+		~ .vp-block-loop-carousel-dot[aria-current="true"]
+	) {
+	--vp-carousel-dot-step: calc(var(--vp-carousel-dot-spread) * -1);
+}
+
+// The dot on screen is drawn over the rest of the row. While autoplay runs its
+// pill is the wait running down - the one thing in the row a visitor is
+// watching - and a neighbour that has stepped aside must not be drawn across
+// it. `z-index` answers on a flex item whether or not it is positioned.
+.vp-block-loop-carousel-dot[aria-current="true"] {
+	z-index: 1;
+}
+
 // The pill itself. Placed and sized by the module, which knows where the dots
 // will come to rest before they have finished getting there - so it crawls
 // across a row that is still making room for it, and the two arrive together.
 .vp-block-loop-carousel-dot-worm {
 	position: absolute;
-	// Above the dots. A collapsed row slides its dots with a translate, which
-	// puts them in the same painting layer as the pill and after it in the
-	// markup - so the marks were drawn over the pill that is meant to be on
-	// top of them.
-	z-index: 1;
+	// Above every dot, the one it is drawn on included. A dot carries a
+	// translate, which puts it in the same painting layer as the pill and
+	// after it in the markup - so the marks were drawn over the pill that is
+	// meant to be on top of them.
+	z-index: 2;
 	inset-block: 0;
 	inset-inline-start: 0;
 	block-size: var(--vp-carousel-dot-size, 6px);
@@ -320,7 +380,12 @@
 	pointer-events: none;
 	background-color: currentcolor;
 	border-radius: calc(var(--vp-carousel-dot-size, 6px) / 2);
-	translate: var(--vp-carousel-dots-shift, 0);
+	// Riding along with the row it is drawn on: the pill is placed from the
+	// inline start, which already reads the right way round, but the shift
+	// under a window is a direction on the screen.
+	translate: calc(
+		var(--vp-carousel-dots-shift, 0px) * var(--vp-carousel-dot-way, 1)
+	);
 	transition: translate 0.25s ease;
 }
 
@@ -535,6 +600,13 @@
 		box-sizing: content-box;
 		height: 4px;
 		background: linear-gradient(var(--vp-carousel-track), var(--vp-carousel-track)) content-box;
+	}
+
+	// The padding of the box, and the room the dots step aside into on top of
+	// it: the row keeps that room for itself, and a box around it has to
+	// leave it there or the dots at either end press against the edge.
+	&.vp-block-loop-carousel-indicator--dots {
+		padding-inline: calc(12px + var(--vp-carousel-dot-spread));
 	}
 }
 

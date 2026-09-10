@@ -1306,9 +1306,16 @@ function getDotGeometry(container, count, current) {
 	const style = window.getComputedStyle(container);
 	const slot =
 		parseFloat(style.getPropertyValue('--vp-carousel-dot-slot')) || 18;
+	const size =
+		parseFloat(style.getPropertyValue('--vp-carousel-dot-size')) || 6;
 	const grown =
 		parseFloat(style.getPropertyValue('--vp-carousel-dot-active-size')) ||
 		slot;
+	// How far a dot steps aside for the one on screen. The stylesheet works
+	// the same number out of the same two lengths; a custom property that is
+	// a sum of others is handed back unresolved, so it is worked out again
+	// here rather than read.
+	const spread = Math.max(0, (grown - size) / 2);
 	// The row is placed inside whatever the box around it keeps for itself,
 	// and the pill is placed against that box rather than against the row - so
 	// an indicator drawn as a filled pill, which is padded, had its own pill
@@ -1316,15 +1323,25 @@ function getDotGeometry(container, count, current) {
 	const inset = parseFloat(style.paddingInlineStart) || 0;
 	const index = Math.min(Math.max(current, 0), Math.max(0, count - 1));
 
-	// Every slide keeps a slot of the same width, so where a dot sits does not
-	// depend on which slide is showing: the row is the same width and the same
-	// shape whatever the carousel is doing, and only the pill moves.
+	// Every slide keeps a slot of the same width, so the row is the same width
+	// and the same shape whatever the carousel is doing. A dot rests where its
+	// slot puts it, give or take the step it takes aside for the one on
+	// screen - and the one on screen takes none, which is what keeps the pill
+	// travelling a slot at a time.
+	const stepOf = (at) => {
+		if (at === index) {
+			return 0;
+		}
+
+		return at < index ? -spread : spread;
+	};
+
 	return {
 		slot,
 		grown,
 		index,
-		centreOf: (at) => inset + at * slot + slot / 2,
-		content: count * slot,
+		centreOf: (at) => inset + at * slot + slot / 2 + stepOf(at),
+		content: count * slot + spread * 2,
 	};
 }
 
