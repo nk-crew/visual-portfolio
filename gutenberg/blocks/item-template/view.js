@@ -1648,11 +1648,22 @@ function syncDotRow(container, current, places) {
 
 	container.classList.add(DOTS_COLLAPSED_CLASS);
 
-	if (dotWindows.get(container) === at) {
+	// The window is drawn around the dot the visitor has tabbed to, when there
+	// is one, and around the slide on screen otherwise.
+	//
+	// A press on a dot sets the carousel scrolling, and the scroll goes on
+	// reporting where it has reached for as long as it takes to get there - so
+	// a focus that landed while one was still settling had the row pulled back
+	// out from under it a frame later, and the ring was drawn on a dot nobody
+	// could see. Which is the one thing the window is here to prevent.
+	const held = container.querySelector(`${DOT_SELECTOR}:focus-visible`);
+	const middle = held ? Array.prototype.indexOf.call(dots, held) : at;
+
+	if (dotWindows.get(container) === middle) {
 		return;
 	}
 
-	dotWindows.set(container, at);
+	dotWindows.set(container, middle);
 
 	if (!watched.has(container)) {
 		watched.add(container);
@@ -1678,14 +1689,14 @@ function syncDotRow(container, current, places) {
 		});
 	}
 
-	const { index, centreOf, content } = geometry;
+	const { centreOf, content } = geometry;
 	const width = container.clientWidth;
 
 	// Centred, but never pulled away from either end: the first dots sit at the
 	// start of the window and the last ones at its end, as they would in a row
 	// that was never collapsed.
 	const shift = Math.round(
-		Math.min(0, Math.max(width - content, width / 2 - centreOf(index)))
+		Math.min(0, Math.max(width - content, width / 2 - centreOf(middle)))
 	);
 
 	container.style.setProperty(DOTS_SHIFT_PROPERTY, `${shift}px`);
@@ -1711,10 +1722,10 @@ function syncDotRow(container, current, places) {
 		// How far in from either end of the window a dot sits, for an end that
 		// has more dots behind it. A ladder of two steps: the dot at the edge
 		// is the smallest, the one beside it is bigger, and everything nearer
-		// the slide on screen is drawn whole - which the dot on screen always
-		// is, since the window is centred on it.
+		// the middle is drawn whole - which the dot the window is drawn around
+		// always is, since the window is centred on it.
 		const rank =
-			at === index || place < 0
+			at === middle || place < 0
 				? place < 0
 					? -1
 					: Number.POSITIVE_INFINITY

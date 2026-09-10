@@ -29,11 +29,14 @@
 	justify-content: center;
 
 	// Sized in `em` so that the font size control is the size control - there
-	// is no text in the button for it to do anything else with.
+	// is no text in the button for it to do anything else with. The glyph is
+	// an em too, so this one length is the size of the drawing and of the
+	// button drawn around it, and a theme can set either from a variable
+	// without going near the block.
 	width: 2.25em;
 	height: 2.25em;
 	padding: 0;
-	font-size: 1rem;
+	font-size: var(--vp-carousel-arrow-size, 0.875rem);
 	cursor: pointer;
 	border-radius: 50%;
 	transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
@@ -96,89 +99,61 @@
 		outline-offset: 2px;
 	}
 
-	// The chevron is drawn rather than shipped: two borders on a rotated square
-	// weigh nothing and take the colour of the button around them.
+	// The glyph is a drawing rather than a shape built out of borders: a
+	// chevron of two borders on a rotated square has to be nudged back into
+	// the middle of the button by hand, its two arms cannot be given round
+	// ends, and an arrow needs a second box drawn behind it for the shaft.
+	//
+	// Painted through a mask rather than laid in as a picture, so the drawing
+	// carries no colour of its own and the button's does: the colour the
+	// block was given, the white the controls take over a photograph, and
+	// every state in between, all without a second copy of the file.
 	> span {
-		width: 0.4375em;
-		height: 0.4375em;
-		border-top: 0.125em solid currentcolor;
-		border-right: 0.125em solid currentcolor;
+		width: 1em;
+		height: 1em;
+		background-color: currentcolor;
+		mask: var(--vp-carousel-icon) center / 1em 1em no-repeat;
 	}
+}
 
-	// An arrow is the chevron with a shaft through it: a line across the
-	// middle of the button, ending under the tip. The chevron moves out to
-	// meet it - its tip is 0.31em from its own centre, and the shaft ends
-	// 0.4em from the button's.
+// The arrows are one drawing pointing one way. The button that goes back
+// turns it over, and a row that reads the other way turns both of them over
+// again - which a stylesheet flipped for that reading cannot do for itself,
+// the drawing being a file rather than a length.
+.vp-block-loop-carousel-previous,
+.vp-block-loop-carousel-next {
+	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='m9.5 4.5 7.5 7.5-7.5 7.5' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+
 	&.has-arrow-icon {
-		position: relative;
-
-		&::before {
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			width: 0.8em;
-			height: 0.125em;
-			content: "";
-			background-color: currentcolor;
-			transform: translate(-50%, -50%);
-		}
+		--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M3.75 12h16.5m-7-7 7 7-7 7' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 	}
 }
 
-.vp-block-loop-carousel-previous > span {
-	margin-left: 0.19em;
-	transform: rotate(-135deg);
+.vp-block-loop-carousel-previous > span,
+.vp-block-loop-carousel-next:dir(rtl) > span {
+	scale: -1 1;
 }
 
-.vp-block-loop-carousel-next > span {
-	margin-right: 0.19em;
-	transform: rotate(45deg);
-}
-
-.vp-block-loop-carousel-previous.has-arrow-icon > span {
-	margin-right: 0.18em;
-	margin-left: 0;
-}
-
-.vp-block-loop-carousel-next.has-arrow-icon > span {
-	margin-right: 0;
-	margin-left: 0.18em;
+.vp-block-loop-carousel-previous:dir(rtl) > span {
+	scale: 1 1;
 }
 
 // The play and pause button borrows the box of an arrow and draws its own
 // glyph: two bars while the carousel is running, a triangle once it has been
-// stopped. Drawn with borders for the same reason the chevron is.
+// stopped.
 .vp-block-loop-carousel-autoplay {
-	position: relative;
-
-	> span {
-		box-sizing: border-box;
-		width: 0.55em;
-		height: 0.62em;
-		border: 0 solid currentcolor;
-		border-right-width: 0.17em;
-		border-left-width: 0.17em;
-	}
+	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 4.75v14.5M15 4.75v14.5' fill='none' stroke='black' stroke-width='2.75' stroke-linecap='round'/></svg>");
 
 	// A square for a gallery that reads better with one.
-	&.has-stop-icon > span {
-		width: 0.55em;
-		height: 0.55em;
-		background-color: currentcolor;
-		border: 0;
+	&.has-stop-icon {
+		--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='5.75' y='5.75' width='12.5' height='12.5' rx='2' fill='black'/></svg>");
 	}
 }
 
 // Stopped: the button offers the way back, so it becomes a play triangle
 // whichever glyph it was drawn with.
-.vp-carousel-is-stopped .vp-block-loop-carousel-autoplay > span {
-	width: 0;
-	height: 0;
-	margin-left: 0.12em;
-	background-color: transparent;
-	border: 0.31em solid transparent;
-	border-right-width: 0;
-	border-left: 0.5em solid currentcolor;
+.vp-carousel-is-stopped .vp-block-loop-carousel-autoplay {
+	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.5 5.5 19 12 8.5 18.5Z' fill='black' stroke='black' stroke-width='2' stroke-linejoin='round'/></svg>");
 }
 
 
@@ -216,16 +191,30 @@
 	// is a direction on the screen. In a row that reads the other way the two
 	// are opposites.
 	--vp-carousel-dot-way: 1;
-	// The colour of a dot that is not the slide on screen. The pill borrows it
-	// while a wait runs down, so the part of it that has not filled yet is the
-	// same tone as the dots it is crawling over.
+	// The colour of a dot that is not the slide on screen, and of the part of
+	// the pill that a wait has not run down yet.
+	//
+	// Two tones and not one. The pill used to borrow the colour of a dot, and
+	// a wait that had just started drew it in exactly the tone of the twelve
+	// dots around it - so at the moment the carousel arrived the slide it had
+	// arrived at was the one thing in the row a visitor could not pick out.
+	// The pill is the darker of the two, whatever it has left to run.
 	//
 	// Solid rather than a wash: two washes laid over each other make a darker
-	// patch, and a wash over a photograph picks up whatever is behind it. The
-	// page it is drawn on is the second colour, which a theme restates when
-	// the row sits on something other than the page.
+	// patch, and a wash over a photograph picks up whatever is behind it. So
+	// each is a mixture of the text colour and the ground it is drawn on -
+	// the page, or whatever a context says it sits on instead.
+	//
+	// How much of each is the text colour is a variable of its own. A row on
+	// a page is a faint mark on a plain ground and wants little of it; a row
+	// drawn on something dark is white on a shadow and wants most of it, or
+	// it comes out as a smudge. The two colours are written once here, and
+	// the strength is what a context restates.
 	--vp-carousel-dot-ground: Canvas;
-	--vp-carousel-dot-color: color-mix(in oklab, currentcolor 22%, var(--vp-carousel-dot-ground));
+	--vp-carousel-dot-tone: 18%;
+	--vp-carousel-dot-track-tone: 42%;
+	--vp-carousel-dot-color: color-mix(in oklab, currentcolor var(--vp-carousel-dot-tone), var(--vp-carousel-dot-ground));
+	--vp-carousel-dot-track: color-mix(in oklab, currentcolor var(--vp-carousel-dot-track-tone), var(--vp-carousel-dot-ground));
 
 	&:dir(rtl) {
 		--vp-carousel-dot-way: -1;
@@ -300,15 +289,32 @@
 	background: none;
 	border: 0;
 	border-radius: 50%;
-	// Where the dot has been put: the shift of a row sliding under a window,
-	// and the step it takes aside for the dot on screen.
+	// Two movements with nothing to do with each other, so they are written
+	// on two properties and timed apart: the shift of a row sliding under a
+	// window, and the step a dot takes aside for the one on screen.
 	translate: calc(
-		(
-				var(--vp-carousel-dots-shift, 0px) +
-					var(--vp-carousel-dot-step, 0px)
-			) * var(--vp-carousel-dot-way, 1)
+		var(--vp-carousel-dots-shift, 0px) * var(--vp-carousel-dot-way, 1)
 	);
-	transition: translate 0.25s ease;
+	transform: translateX(
+		calc(var(--vp-carousel-dot-step, 0px) * var(--vp-carousel-dot-way, 1))
+	);
+	// The step waits, and lands with the pill.
+	//
+	// A dot changing places is the one thing in the row that must not be
+	// seen. Two of them move at every step - the dot being left and the dot
+	// being arrived at - and they move backwards, against the way the pill is
+	// travelling, because the room a pill needs is room its neighbours give
+	// up as it passes. Moving at once, the dot ahead darted back to meet a
+	// pill that had not set off yet.
+	//
+	// So the step is held until the pill is drawn over both places, and is
+	// over by the time the pill has gathered itself again: the dots change
+	// places underneath it, and what a visitor sees is a pill crossing a row
+	// that was always spaced this way. The numbers are the module's crawl -
+	// 420ms - divided into the wait and what is left of it.
+	transition:
+		translate 0.25s ease,
+		transform 0.24s ease 0.18s;
 
 	&::before {
 		display: block;
@@ -327,6 +333,17 @@
 	&:focus-visible {
 		outline: 2px solid currentcolor;
 		outline-offset: -2px;
+	}
+}
+
+// A visitor who has asked for less motion is given none: the module places
+// the pill where it belongs instead of crawling it there, and a step that
+// waited for a crawl that never happens is a dot seen to move on its own -
+// the one thing the wait was there to prevent.
+@media (prefers-reduced-motion: reduce) {
+	.vp-block-loop-carousel-dot,
+	.vp-block-loop-carousel-dot-worm {
+		transition: none;
 	}
 }
 
@@ -402,18 +419,18 @@
 // the delay runs down. Redrawn every frame, so no transition on the fill - one
 // would leave it a frame behind for the whole delay.
 //
-// What has not filled yet is drawn in the colour of a dot, so the pill reads
-// as part of the row rather than as a shape of its own. The dot under it steps
-// aside while it does: the colour of a dot is a wash rather than a solid, and
-// two of them laid over each other made a darker patch in the middle of the
-// pill.
+// What has not filled yet is drawn a shade darker than a dot, so a pill whose
+// wait has only just begun is still plainly the slide on screen. The dot under
+// it steps aside while it does: the colour of a dot is a wash rather than a
+// solid, and two of them laid over each other made a darker patch in the
+// middle of the pill.
 .vp-carousel-is-playing
 	.vp-block-loop-carousel-dot[aria-current="true"]::before {
 	opacity: 0;
 }
 
 .vp-carousel-is-playing .vp-block-loop-carousel-dot-worm {
-	background-color: var(--vp-carousel-dot-color);
+	background-color: var(--vp-carousel-dot-track);
 	transition: background-color 0.25s ease, opacity 0.25s ease;
 
 	> .vp-block-loop-carousel-dot-progress {
@@ -615,8 +632,11 @@
 }
 
 .vp-block-loop-carousel-indicator.is-style-filled {
-	// Drawn on the dark pill of the style rather than on the page.
+	// Drawn on the dark pill of the style rather than on the page, so the
+	// dots are white on a shadow here too.
 	--vp-carousel-dot-ground: rgba(0, 0, 0, 0.65);
+	--vp-carousel-dot-tone: 62%;
+	--vp-carousel-dot-track-tone: 85%;
 	--vp-carousel-track: rgba(255, 255, 255, 0.4);
 
 	background-color: rgba(0, 0, 0, 0.5);
@@ -668,7 +688,15 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 	// Over the pictures there is no page behind a dot to mix with, so the
 	// ground it is drawn on is the shadow the controls carry over a
 	// photograph.
+	//
+	// And the dots are drawn far lighter here than they are on a page. A dot
+	// on a page is a faint mark on a plain ground; over a photograph the same
+	// mixture came out as a dark smudge, near enough the pictures behind it
+	// to be lost against them. The shadow is kept - it is what holds the row
+	// against a light photograph - but the white is most of the mixture now.
 	--vp-carousel-dot-ground: rgba(0, 0, 0, 0.35);
+	--vp-carousel-dot-tone: 65%;
+	--vp-carousel-dot-track-tone: 88%;
 
 	position: absolute;
 	z-index: 2;
