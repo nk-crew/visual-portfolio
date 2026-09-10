@@ -132,6 +132,36 @@ function getItemBoxes(page) {
 	);
 }
 
+/**
+ * Wait until a carousel has come to rest.
+ *
+ * A scroll asked for while the browser is running one of its own - the snap it
+ * runs after an arrow key, the glide it gives a smooth scroll - leaves the
+ * carousel a few pixels short of wherever it was sent, so a test that presses
+ * something while one is still settling reads a position nobody asked for.
+ *
+ * @param {import('@playwright/test').Locator} list - the carousel.
+ */
+async function settle(list) {
+	let before = null;
+
+	await expect
+		.poll(
+			async () => {
+				const now = await list.evaluate((node) =>
+					Math.round(node.scrollLeft)
+				);
+				const still = now === before;
+
+				before = now;
+
+				return still;
+			},
+			{ timeout: 10000 }
+		)
+		.toBe(true);
+}
+
 test.describe('Gallery Item Template layouts', () => {
 	let images = [];
 	let pageIds = [];
@@ -446,6 +476,14 @@ test.describe('Gallery Item Template layouts', () => {
 				{ timeout: 10000 }
 			)
 			.toBeGreaterThan(0);
+
+		// And the carousel is left to come to rest before it is asked to go
+		// anywhere else. The poll above stops at the first reading above zero,
+		// which is a frame in the middle of the snap the browser runs itself
+		// after an arrow key - and a scroll asked for while the browser is
+		// running one of its own leaves the carousel a few pixels short of
+		// wherever it was sent.
+		await settle(list);
 
 		await page.locator(`${NAV} ${DOT}`).first().click();
 		await expect
@@ -1759,6 +1797,61 @@ test.describe('Gallery Item Template layouts', () => {
 		);
 
 		expect(rewound).toEqual([]);
+	});
+
+	test('a wait starts again on the slide the carousel is moved to', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel autoplay restart',
+			blockId: 'e2e-carousel-autoplay-restart',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+				carouselAutoplay: true,
+				carouselAutoplayDelay: 4,
+			},
+			carousel: ['loop-carousel-indicator'],
+		});
+
+		const carousel = page.locator(CAROUSEL);
+		const list = page.locator(LIST);
+
+		await expect(carousel).toHaveClass(/vp-carousel-is-playing/);
+
+		const countdown = () =>
+			carousel.evaluate(
+				(node) =>
+					parseFloat(
+						node.style.getPropertyValue(
+							'--vp-carousel-autoplay-progress'
+						)
+					) || 0
+			);
+
+		// The pointer is off the carousel, so the wait runs.
+		await page.mouse.move(1, 1);
+		await expect.poll(countdown, { timeout: 10000 }).toBeGreaterThan(20);
+
+		// Moved the way a swipe moves it - the scroll itself, with no arrow
+		// pressed and no dot. A press says what it did and is listened for;
+		// a swipe says nothing, and the wait used to go on running down from
+		// where it had got to, so a slide a visitor had just swiped to could
+		// be taken away from them a moment later.
+		await list.evaluate((node) => {
+			node.scrollTo({
+				left: node.scrollLeft + node.clientWidth,
+				behavior: 'instant',
+			});
+		});
+
+		// The slide it landed on is owed the whole of a wait.
+		await expect.poll(countdown, { timeout: 2000 }).toBeLessThan(10);
 	});
 
 	test('coverflow overhangs its neighbours and still snaps a card at a time', async ({

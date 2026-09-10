@@ -2249,11 +2249,21 @@ function initAutoplay(list) {
 	// clock holds rather than turning back, like a pause.
 	let offscreen = true;
 
+	// The slide the wait is being counted for. A wait belongs to a slide, not
+	// to the carousel, so it starts again whenever the carousel comes to be
+	// showing a different one.
+	let seen = -1;
+
 	const setProgress = (value) => {
 		root.style.setProperty(
 			'--vp-carousel-autoplay-progress',
 			`${value * 100}%`
 		);
+	};
+
+	const restart = () => {
+		elapsed = 0;
+		setProgress(0);
 	};
 
 	const tick = (now) => {
@@ -2262,6 +2272,24 @@ function initAutoplay(list) {
 		const step = now - last;
 
 		last = now;
+
+		// Whichever way the carousel moved, the slide it moved to is owed the
+		// whole of a wait. A press on an arrow or a dot says so itself and is
+		// listened for, but a swipe says nothing - so the delay went on
+		// running down from wherever it had got to, and a slide a visitor had
+		// just swiped to could be taken away from them a moment later.
+		//
+		// Asked of the carousel rather than waited for as an event, because
+		// there is no one event to wait for: a swipe, a throw, a drag of the
+		// progress bar, a Load More that changes what the slides are, and the
+		// carousel's own step are all the same thing to a visitor watching the
+		// wait run down.
+		const showing = getDisplayedSlide(list);
+
+		if (showing !== seen) {
+			seen = showing;
+			restart();
+		}
 
 		if (paused || held || offscreen || stopped.has(list)) {
 			return;
@@ -2321,10 +2349,6 @@ function initAutoplay(list) {
 
 		held = false === event.detail?.playing;
 		mark();
-	};
-	const restart = () => {
-		elapsed = 0;
-		setProgress(0);
 	};
 
 	// Half of the frame on screen is the carousel in view: less than that
